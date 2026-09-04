@@ -35,9 +35,9 @@ subreddits from the ideal-customer answer.
 
 ## Acceptance
 
-- [ ] A form collects the four answers and the signal checkboxes from PLAN.md
+- [x] A form collects the four answers and the signal checkboxes from PLAN.md
 - [x] Queries are generated from the answers, and proposed subreddits with them
-- [ ] Generated queries are shown to the user, and each can be edited or
+- [x] Generated queries are shown to the user, and each can be edited or
       removed before the monitor starts
 - [x] The user's answers and the generated queries are stored separately, so
       queries can be regenerated without retyping
@@ -105,3 +105,11 @@ numbers here before treating those scores as current.
 
   The form itself is the next pass, with the jsdom test harness docs/testing.md
   assumes. Two boxes stay open, and the Notes above say what each one needs.
+- 2026-09-05 — Built the React form and its jsdom harness. The form reads the
+  signal labels and source readiness from the API, sends the four answers to
+  query generation, and shows every generated query and subreddit as an
+  editable, removable field before creation. A deployment with no model offers
+  manual query entry. A missing source credential saves the answers in a
+  paused monitor and names the environment variable, but does not validate the
+  key with the provider. The credential acceptance box stays open for the
+  connection-testing screen described above.

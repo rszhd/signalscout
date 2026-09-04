@@ -118,3 +118,11 @@ singleton key, not a lock the code writes itself.
   real snapshot expiry and a real rate limit are all still unproven. The
   scheduler now calls the connector, so the next run against a live key is what
   finds out.
+- 2026-09-05 — The first live poll reached Bright Data and exposed
+  [BUG-001](../todo/BUG-001-a-pending-reddit-collection-is-not-resumed.md).
+  Bright Data accepted the collection trigger, and the poll job completed with
+  a wait cursor, zero posts and zero units. The collector did not persist or
+  enqueue that cursor, so no job returned for the snapshot. The monitor row was
+  active with six queries and five subreddits, and `last_polled_at` advanced,
+  but the database held zero posts, zero matches and no classification call.
+  The trigger is now proven against the provider. Snapshot retrieval is not.

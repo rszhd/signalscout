@@ -19,8 +19,8 @@ the query generator, the monitor writes and the routes, so a monitor is now an
 HTTP call rather than an `INSERT`. Two steps are still placeholders: US-008
 owns the pre-filter, so every post reaches the model, and US-016 owns the
 notification. Nothing reads the matches back out; US-011 builds the inbox.
-**There is still no UI for any of it.** `apps/web` serves one page that checks
-`/api/health`, so every route is reachable only with `curl`.
+`apps/web` now serves the US-010 monitor form, but there is still no UI for
+matches or connections.
 
 **Reddit's own API is closed to us.** Reddit ended self-serve app registration
 in November 2025. Reddit is reached through Bright Data instead, and X through
@@ -46,21 +46,24 @@ Three tickets are in `doing/`.
 [US-001](backlog/doing/US-001-the-workspace-runs-with-one-command.md) waits on
 the first CI run, which needs a remote this repository does not have.
 [US-007](backlog/doing/US-007-the-worker-runs-jobs-on-a-schedule.md) has every
-acceptance box verified and waits on one poll against a real Bright Data key.
-Both are code-complete: build on them, do not reopen them.
+acceptance box verified, but its first live Bright Data poll exposed
+[BUG-001](backlog/todo/BUG-001-a-pending-reddit-collection-is-not-resumed.md).
+The trigger succeeds and returns a wait cursor. The collector loses that
+cursor, so no job returns for the snapshot and the next poll can trigger the
+same collection again. Fix BUG-001 before treating the poll as code-complete.
 
-[US-010](backlog/doing/US-010-a-monitor-is-created-from-four-answers.md) is
-half done. The server half is built and tested; the React form is not, and
-neither is the jsdom harness docs/testing.md assumes for it. That form is the
-next work. Two acceptance boxes stay open, and the ticket's Notes say what each
-one needs — read them first, because one of the two is a design decision and
-not an oversight.
+[US-010](backlog/doing/US-010-a-monitor-is-created-from-four-answers.md) has
+the server routes and the React form, with the jsdom harness that drives the
+form through the DOM. One acceptance box stays open: credentials are present
+or missing, but are not validated with the provider. The ticket's Notes keep
+that open for a connection-testing screen on purpose.
 
-**The Reddit connector has never met the provider.** `capture.mjs` did, so the
-payload shapes are evidence, but the connector itself has only replayed them.
-A failed collection, an expired snapshot and any rate limit are all unproven.
-The scheduler now calls it, so the next run with a real `REDDIT_API_KEY` is
-what finds out. Until that has happened, say the claim is unproven.
+**The Reddit connector has only triggered a live collection.** On 2026-09-05,
+the first UI-created monitor reached Bright Data and received a pending
+snapshot. BUG-001 lost its cursor before the snapshot could be read. A
+completed collection, a failed collection, an expired snapshot and any rate
+limit are all still unproven. Until BUG-001 is fixed and the continuation runs
+live, say only the trigger is proven.
 
 ---
 

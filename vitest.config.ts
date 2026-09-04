@@ -14,7 +14,7 @@ export default defineConfig({
     },
   },
   test: {
-    include: ["{apps,packages}/*/src/**/*.test.ts"],
+    include: ["{apps,packages}/*/src/**/*.test.{ts,tsx}"],
     environment: "node",
     /**
      * No test reaches a model provider, so the suite runs with no key even on

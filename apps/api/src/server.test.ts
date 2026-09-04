@@ -1,7 +1,7 @@
 import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { createLogger, loadEnv } from "@intentwatch/core";
+import { createDatabase, createLogger, loadEnv } from "@intentwatch/core";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { buildServer } from "./server.js";
 
@@ -16,6 +16,9 @@ const logger = createLogger({ level: "silent", name: "test" });
  */
 describe("the API and the UI on one port", () => {
   let webDist: string;
+  // A pool over a URL nothing connects to. No route below runs a query, and
+  // `pg` opens no connection until one does.
+  const database = createDatabase("postgres://user:pw@localhost:5432/unused");
 
   beforeAll(() => {
     webDist = mkdtempSync(join(tmpdir(), "intentwatch-web-"));
@@ -23,8 +26,9 @@ describe("the API and the UI on one port", () => {
     writeFileSync(join(webDist, "asset.js"), "export const built = true;\n");
   });
 
-  afterAll(() => {
+  afterAll(async () => {
     rmSync(webDist, { recursive: true, force: true });
+    await database.close();
   });
 
   async function server(overrides: Record<string, string> = {}) {
@@ -34,7 +38,7 @@ describe("the API and the UI on one port", () => {
       ...overrides,
     });
 
-    return buildServer({ env, logger });
+    return buildServer({ env, logger, db: database.db, queryGenerator: null });
   }
 
   it("answers /api/health with the worker mode it is running in", async () => {

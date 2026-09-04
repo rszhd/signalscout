@@ -1,4 +1,4 @@
-import type { Env, Logger, WorkerHandle } from "@intentwatch/core";
+import type { createDatabase, Database, Env, Logger, WorkerHandle } from "@intentwatch/core";
 import { createLogger, loadEnv } from "@intentwatch/core";
 import { describe, expect, it, vi } from "vitest";
 import type { ApiServer } from "./server.js";
@@ -26,8 +26,26 @@ function fakeServer() {
 
   return {
     app,
-    buildServer: vi.fn(async (_options: { env: Env; logger: Logger }): Promise<ApiServer> => app),
+    buildServer: vi.fn(
+      async (_options: { env: Env; logger: Logger; db: Database }): Promise<ApiServer> => app,
+    ),
   };
+}
+
+/**
+ * A pool that is never opened.
+ *
+ * Injected so these tests touch no database, and so `stop` closing the pool is
+ * an assertion rather than a hope. A pool left open holds the event loop and
+ * the process never exits, which a test that only checks the server closed
+ * would never see.
+ */
+function fakeDatabase() {
+  const close = vi.fn(async () => undefined);
+
+  const handle = { db: {}, pool: {}, close } as unknown as ReturnType<typeof createDatabase>;
+
+  return { close, createDatabase: vi.fn(() => handle) };
 }
 
 function fakeWorker() {
@@ -42,11 +60,14 @@ describe("startApi", () => {
     const server = fakeServer();
     const worker = fakeWorker();
 
+    const database = fakeDatabase();
+
     const handle = await startApi({
       env: envWith(true),
       logger,
       buildServer: server.buildServer,
       startWorker: worker.startWorker,
+      createDatabase: database.createDatabase,
     });
 
     expect(worker.startWorker).toHaveBeenCalledTimes(1);
@@ -60,11 +81,14 @@ describe("startApi", () => {
     const server = fakeServer();
     const worker = fakeWorker();
 
+    const database = fakeDatabase();
+
     const handle = await startApi({
       env: envWith(false),
       logger,
       buildServer: server.buildServer,
       startWorker: worker.startWorker,
+      createDatabase: database.createDatabase,
     });
 
     expect(worker.startWorker).not.toHaveBeenCalled();
@@ -72,5 +96,8 @@ describe("startApi", () => {
 
     await handle.stop();
     expect(server.app.close).toHaveBeenCalledTimes(1);
+    // A pool the shutdown forgets keeps the process alive after it is asked
+    // to exit.
+    expect(database.close).toHaveBeenCalledTimes(1);
   });
 });

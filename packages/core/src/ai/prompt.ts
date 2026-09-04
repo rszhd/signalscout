@@ -16,6 +16,7 @@
  * post in one poll.
  */
 import type { Signal } from "../db/schema.js";
+import { describeSignals } from "../monitors/signals.js";
 
 /** The four answers PLAN.md's monitor form asks for, as the classifier sees them. */
 export interface MonitorProfile {
@@ -37,10 +38,6 @@ export interface PostForClassification {
   readonly postedAt: Date;
 }
 
-function listOrNone(values: readonly string[]): string {
-  return values.length > 0 ? values.join(", ") : "none stated";
-}
-
 export function buildSystemPrompt(monitor: MonitorProfile): string {
   return [
     "You read one public social media post and decide whether the person who",
@@ -57,7 +54,9 @@ export function buildSystemPrompt(monitor: MonitorProfile): string {
     monitor.problem,
     "",
     "SIGNALS THE USER ASKED FOR",
-    listOrNone(monitor.signals),
+    describeSignals(monitor.signals),
+    "None stated means no kind of post is expected, not that every kind",
+    "scores well. Judge the post on its own.",
     "",
     "HOW TO SCORE",
     "Score each dimension from 0 to 100.",

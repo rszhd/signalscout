@@ -5,6 +5,11 @@ export default defineConfig({
   resolve: {
     alias: {
       // Tests run against core's source, so `pnpm test` needs no build first.
+      // The longer specifier is first: an alias is matched in order, and
+      // "@intentwatch/core" is a prefix of "@intentwatch/core/testing".
+      "@intentwatch/core/testing": fileURLToPath(
+        new URL("./packages/core/src/testing/index.ts", import.meta.url),
+      ),
       "@intentwatch/core": fileURLToPath(new URL("./packages/core/src/index.ts", import.meta.url)),
     },
   },

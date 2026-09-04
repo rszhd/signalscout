@@ -1,6 +1,16 @@
 import { existsSync } from "node:fs";
 import fastifyStatic from "@fastify/static";
-import type { Env, Logger } from "@intentwatch/core";
+import {
+  aiConfigFromEnvironment,
+  builtInSources,
+  createQueryGenerator,
+  type Database,
+  type Env,
+  type Logger,
+  needsApiKey,
+  type QueryGenerator,
+  type SourceDescriptor,
+} from "@intentwatch/core";
 import Fastify, {
   type FastifyInstance,
   type RawReplyDefaultExpression,
@@ -13,6 +23,7 @@ import {
   type ZodTypeProvider,
 } from "fastify-type-provider-zod";
 import { z } from "zod";
+import { registerMonitorRoutes } from "./monitors.js";
 
 /**
  * Where the built UI lives. In the image and in a local `pnpm build` this is
@@ -38,13 +49,54 @@ export type ApiServer = FastifyInstance<
 export interface BuildServerOptions {
   env: Env;
   logger: Logger;
+  db: Database;
+  /**
+   * The connectors this build ships. Injected so a test can describe a source
+   * without one existing, and so nothing here has to build a source runtime:
+   * the API reads credential fields and never searches.
+   */
+  sources?: readonly SourceDescriptor[];
+  /** Where the source keys live until US-004 encrypts them. */
+  environment?: Record<string, string | undefined>;
+  /**
+   * How the monitor form writes its queries. Undefined builds one from the
+   * environment, which is null when no model key is set. A test passes one
+   * backed by a stub, because no test spends money.
+   */
+  queryGenerator?: QueryGenerator | null;
+}
+
+/**
+ * The generator this deployment can use, or null.
+ *
+ * Null rather than a throw. A self-hoster with no model key still has a
+ * working product: they type the queries themselves, and the form says so.
+ * Refusing to boot would take the whole UI away over an optional feature.
+ */
+export function queryGeneratorFor(env: Env, logger: Logger): QueryGenerator | null {
+  if (needsApiKey(env.AI_PROVIDER) && !env.AI_API_KEY) {
+    logger.warn(
+      { provider: env.AI_PROVIDER },
+      "no AI_API_KEY: the monitor form cannot write queries, and posts are not scored",
+    );
+    return null;
+  }
+
+  return createQueryGenerator({ config: aiConfigFromEnvironment(env) });
 }
 
 /**
  * Build the Fastify instance without listening, so a test can drive it with
  * `inject` and no port.
  */
-export async function buildServer({ env, logger }: BuildServerOptions): Promise<ApiServer> {
+export async function buildServer({
+  env,
+  logger,
+  db,
+  sources = builtInSources,
+  environment,
+  queryGenerator,
+}: BuildServerOptions): Promise<ApiServer> {
   const app = Fastify({ loggerInstance: logger }).withTypeProvider<ZodTypeProvider>();
 
   app.setValidatorCompiler(validatorCompiler);
@@ -62,6 +114,13 @@ export async function buildServer({ env, logger }: BuildServerOptions): Promise<
       },
     },
     handler: async () => ({ status: "ok" as const, workerInProcess: env.WORKER_IN_PROCESS }),
+  });
+
+  await registerMonitorRoutes(app, {
+    db,
+    sources,
+    environment,
+    queryGenerator: queryGenerator === undefined ? queryGeneratorFor(env, logger) : queryGenerator,
   });
 
   const webDist = resolveWebDist(env);

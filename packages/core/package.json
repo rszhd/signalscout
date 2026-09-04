@@ -8,6 +8,11 @@
       "development": "./src/index.ts",
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
+    },
+    "./testing": {
+      "development": "./src/testing/index.ts",
+      "types": "./dist/testing/index.d.ts",
+      "default": "./dist/testing/index.js"
     }
   },
   "scripts": {
@@ -15,7 +20,8 @@
     "typecheck": "tsc --build",
     "migrate": "tsx src/db/migrate-cli.ts",
     "generate": "drizzle-kit generate",
-    "capture:classifier": "tsx src/ai/fixtures/capture.ts"
+    "capture:classifier": "tsx src/ai/fixtures/capture.ts",
+    "capture:queries": "tsx src/ai/fixtures/capture-queries.ts"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "4.0.49",

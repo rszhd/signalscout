@@ -29,6 +29,13 @@
       "when": 1788544445080,
       "tag": "0003_add_classification_scoring",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1788547119238,
+      "tag": "0004_add_monitor_pause_and_call_purpose",
+      "breakpoints": true
     }
   ]
 }

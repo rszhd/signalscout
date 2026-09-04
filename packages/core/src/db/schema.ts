@@ -100,9 +100,22 @@ export const minimumPollIntervalSeconds = 60;
  */
 export const defaultMinimumScore = 30;
 
-/** How a call to the model ended. `ai/classify.ts` owns the three outcomes. */
+/** How a call to the model ended. `ai/call.ts` owns the three outcomes. */
 export const modelCallOutcomes = ["scored", "rejected", "failed"] as const;
 export type ModelCallOutcome = (typeof modelCallOutcomes)[number];
+
+/**
+ * What a call to the model was for.
+ *
+ * US-010 gave the product a second kind of call. Without this column the two
+ * are indistinguishable on a bill page, and "what was my key spent on" is a
+ * question a bring-your-own-keys product has to be able to answer. It also
+ * keeps the classifier's own failure count honest: that count is "how many
+ * times did this model refuse this post", and it must never include a call
+ * about no post at all.
+ */
+export const modelCallPurposes = ["classification", "query_generation"] as const;
+export type ModelCallPurpose = (typeof modelCallPurposes)[number];
 
 /** SQL fragment for a score column that must read 0 to 100. */
 function scoreRange(column: string) {
@@ -167,6 +180,19 @@ export const monitors = pgTable(
      * a slow poll from stretching the interval it was given.
      */
     lastPolledAt: timestamp("last_polled_at", { withTimezone: true }),
+    /**
+     * When somebody paused this monitor. Null means it is running.
+     *
+     * A timestamp and not a boolean, because "paused 3 days ago" is what a
+     * person needs to read on the monitor list, and a boolean cannot say it.
+     *
+     * Pausing writes this column and nothing else. Every post, match, verdict
+     * and model call the monitor already has is untouched, so resuming picks
+     * up a monitor with its history rather than a new one with the same name.
+     * The scheduler is the only reader: `findDueMonitors` skips a paused row,
+     * so nothing is collected and nothing is billed while it is set. US-010.
+     */
+    pausedAt: timestamp("paused_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
@@ -293,6 +319,12 @@ export const modelCalls = pgTable(
     provider: text("provider").notNull(),
     model: text("model").notNull(),
     outcome: text("outcome").$type<ModelCallOutcome>().notNull(),
+    /**
+     * Defaulted, because every row that existed before this column was a
+     * classification. New callers set it: a default is for the rows nobody can
+     * ask any more, not for the ones being written now.
+     */
+    purpose: text("purpose").$type<ModelCallPurpose>().notNull().default("classification"),
     inputTokens: integer("input_tokens"),
     outputTokens: integer("output_tokens"),
     latencyMs: integer("latency_ms").notNull(),
@@ -306,6 +338,7 @@ export const modelCalls = pgTable(
     // The classifier counts a post's failures on this pair before every call.
     index("model_calls_monitor_post_idx").on(table.monitorId, table.postId),
     check("model_calls_outcome_known", oneOf("outcome", modelCallOutcomes)),
+    check("model_calls_purpose_known", oneOf("purpose", modelCallPurposes)),
   ],
 );
 

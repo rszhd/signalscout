@@ -17,10 +17,10 @@
  * `sources/reddit/`, and STACK.md, *A source is not a provider*, keeps it
  * there. The field's own label already says whose key to paste.
  */
-import type { SocialSource, SourceCredentials } from "../sources/types.js";
+import type { SourceCredentials, SourceDescriptor } from "../sources/types.js";
 
 /** What the poll step calls to get one source's credentials. */
-export type CredentialLookup = (source: SocialSource) => SourceCredentials | undefined;
+export type CredentialLookup = (source: SourceDescriptor) => SourceCredentials | undefined;
 
 /** `apiKey` -> `API_KEY`, `apiSecret` -> `API_SECRET`. */
 function screamingSnakeCase(value: string): string {
@@ -56,4 +56,41 @@ export function credentialsFromEnvironment(
 
     return credentials;
   };
+}
+
+/** One credential a source needs and the environment does not hold. */
+export interface MissingCredential {
+  readonly sourceId: string;
+  /** "Reddit", so the sentence a user reads names what they connected. */
+  readonly sourceName: string;
+  readonly field: string;
+  /** The connector's own label: "Bright Data API key". */
+  readonly label: string;
+  readonly environmentVariable: string;
+}
+
+/**
+ * Which of a source's credentials are not set, named the way a person can act
+ * on.
+ *
+ * `credentialsFromEnvironment` answers "can this source run?" and deliberately
+ * says nothing more, because a poll with half a key is simply a poll that must
+ * not happen. US-010 asks the other question: a monitor that cannot start owes
+ * the user the sentence that says why, and "check your credentials" is not
+ * that sentence. Both read the same naming rule above, so neither can be right
+ * about a variable the other is wrong about.
+ */
+export function missingCredentials(
+  source: SourceDescriptor,
+  environment: Record<string, string | undefined> = process.env,
+): MissingCredential[] {
+  return source.credentialFields
+    .filter((field) => !environment[environmentVariableFor(source.id, field.name)])
+    .map((field) => ({
+      sourceId: source.id,
+      sourceName: source.displayName,
+      field: field.name,
+      label: field.label,
+      environmentVariable: environmentVariableFor(source.id, field.name),
+    }));
 }

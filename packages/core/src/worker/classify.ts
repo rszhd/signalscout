@@ -21,9 +21,11 @@
  * asks the source for what is new, and a post from an hour ago is not.
  */
 import { and, count, eq, inArray, ne } from "drizzle-orm";
+import type { ModelCall } from "../ai/call.js";
 import { scoreColumns } from "../ai/classification.js";
-import type { Classifier, ModelCall } from "../ai/classify.js";
+import type { Classifier } from "../ai/classify.js";
 import type { MonitorProfile } from "../ai/prompt.js";
+import { recordModelCall } from "../ai/record.js";
 import {
   type ModelCallOutcome,
   matches,
@@ -92,6 +94,9 @@ export function createClassifyStep({ classifier }: ClassifyOptions): Step<Classi
           and(
             eq(modelCalls.monitorId, monitorId),
             inArray(modelCalls.postId, ids),
+            // This count is "how often did the model refuse this post". Other
+            // kinds of call are recorded in the same table and are not that.
+            eq(modelCalls.purpose, "classification"),
             ne(modelCalls.outcome, "scored"),
           ),
         )
@@ -114,17 +119,13 @@ export function createClassifyStep({ classifier }: ClassifyOptions): Step<Classi
       error?: string,
     ) => {
       spentMicros += call.estimatedCostMicros ?? 0;
-      await db.insert(modelCalls).values({
+      await recordModelCall(db, {
+        purpose: "classification",
+        outcome,
+        call,
         monitorId,
         postId,
-        provider: call.provider,
-        model: call.model,
-        outcome,
-        inputTokens: call.inputTokens ?? null,
-        outputTokens: call.outputTokens ?? null,
-        latencyMs: call.latencyMs,
-        estimatedCostMicros: call.estimatedCostMicros ?? null,
-        error: error ?? null,
+        error,
       });
     };
 

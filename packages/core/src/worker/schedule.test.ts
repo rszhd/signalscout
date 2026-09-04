@@ -59,6 +59,21 @@ describe("which monitors are due", () => {
     expect(await findDueMonitors(db)).toEqual([]);
   });
 
+  it("does not poll a paused monitor, however long it has waited", async () => {
+    // Overdue on every other test in this file, and still not due. Pausing is
+    // enforced here because it is a promise about money: a pause that only hid
+    // the monitor in the UI would keep collecting and keep billing. US-010.
+    const paused = await insertMonitor(database, { pausedAt: new Date() });
+    const running = await insertMonitor(database);
+
+    await db.update(monitors).set({ lastPolledAt: minutes(120) });
+
+    const ids = (await findDueMonitors(db)).map((monitor) => monitor.id);
+
+    expect(ids).toEqual([running]);
+    expect(ids).not.toContain(paused);
+  });
+
   it("gives a new monitor the default interval, not one the worker chose", async () => {
     const id = await insertMonitor(database);
     const [monitor] = await db.select().from(monitors).where(eq(monitors.id, id));

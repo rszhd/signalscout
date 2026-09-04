@@ -14,6 +14,7 @@
  */
 import { eq, sql } from "drizzle-orm";
 import { monitors, posts, type Source } from "../db/schema.js";
+import { monitorQueries } from "../monitors/monitors.js";
 import type { SourceRegistry } from "../sources/registry.js";
 import type {
   CandidatePost,
@@ -98,13 +99,6 @@ async function readSource(
   return { sourceId: source.id, pages, posts: collected, unitsConsumed };
 }
 
-/** The generated queries are jsonb, so the column's type is a promise, not a fact. */
-function queriesOf(value: unknown): string[] {
-  return Array.isArray(value)
-    ? value.filter((entry): entry is string => typeof entry === "string")
-    : [];
-}
-
 function toRow(sourceId: Source, post: CandidatePost) {
   return {
     source: sourceId,
@@ -138,7 +132,7 @@ export function createCollectStep({ registry, credentialsFor }: CollectOptions):
     await db.update(monitors).set({ lastPolledAt: sql`now()` }).where(eq(monitors.id, monitorId));
 
     const query: SourceQuery = {
-      queries: queriesOf(monitor.generatedQueries),
+      queries: monitorQueries(monitor.generatedQueries),
       channels: monitor.generatedSubreddits,
       since,
     };

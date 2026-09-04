@@ -14,32 +14,47 @@ settled the `SocialSource` interface and shipped a fake connector. US-005 added
 the real Reddit connector, through Bright Data. US-007 added the scheduler, so
 a monitor is polled on its own interval and the posts are stored. US-009 added
 the classifier, so a post is now scored against a monitor and a match is
-written when it clears the monitor's `min_score`. Two steps are still
-placeholders: US-008 owns the pre-filter, so every post reaches the model, and
-US-016 owns the notification. Nothing reads the matches back out; US-011 builds
-the inbox. There is also no way to create a monitor yet; US-010 builds the
-form, and until then a monitor is an `INSERT`.
+written when it clears the monitor's `min_score`. US-010's server half added
+the query generator, the monitor writes and the routes, so a monitor is now an
+HTTP call rather than an `INSERT`. Two steps are still placeholders: US-008
+owns the pre-filter, so every post reaches the model, and US-016 owns the
+notification. Nothing reads the matches back out; US-011 builds the inbox.
+**There is still no UI for any of it.** `apps/web` serves one page that checks
+`/api/health`, so every route is reachable only with `curl`.
 
 **Reddit's own API is closed to us.** Reddit ended self-serve app registration
 in November 2025. Reddit is reached through Bright Data instead, and X through
 its official pay-per-use API. Read STACK.md, *A source is not a provider*,
 before touching a connector: the interface does not change to suit a provider.
 
-**The classifier has met a real model; the connector has not met Bright Data.**
+**The classifier has met a real model; nothing else has.**
 `ai/fixtures/capture.ts` ran against a live provider on 2026-09-05, so the
 prompt, the schema and the cost recording are proven for the happy path, and
 the four answers it recorded are replayed in CI for nothing. The failure paths
 are not proven: a real rate limit, a real refusal and a real timeout have only
 been simulated. Say so until one has happened.
 
-Two tickets are in `doing/`, and both are code-complete.
+Two things moved after that run. US-010 changed the classifier's system prompt
+— the signals now arrive as a labelled line each — so the recorded answers
+predate the prompt they are replayed against. And US-010 added a second model
+call, the query generator, which no model has ever answered.
+`capture:classifier` and `capture:queries` are the two commands that close
+those gaps. Until they run, say the recorded scores are stale and the query
+generation unproven.
+
+Three tickets are in `doing/`.
 [US-001](backlog/doing/US-001-the-workspace-runs-with-one-command.md) waits on
 the first CI run, which needs a remote this repository does not have.
 [US-007](backlog/doing/US-007-the-worker-runs-jobs-on-a-schedule.md) has every
 acceptance box verified and waits on one poll against a real Bright Data key.
-Build on both; do not reopen them. The next ticket to start is
-[US-010](backlog/todo/US-010-a-monitor-is-created-from-four-answers.md), which
-gives a person a way to make the monitor that everything else already reads.
+Both are code-complete: build on them, do not reopen them.
+
+[US-010](backlog/doing/US-010-a-monitor-is-created-from-four-answers.md) is
+half done. The server half is built and tested; the React form is not, and
+neither is the jsdom harness docs/testing.md assumes for it. That form is the
+next work. Two acceptance boxes stay open, and the ticket's Notes say what each
+one needs — read them first, because one of the two is a design decision and
+not an oversight.
 
 **The Reddit connector has never met the provider.** `capture.mjs` did, so the
 payload shapes are evidence, but the connector itself has only replayed them.
@@ -153,13 +168,25 @@ backlog/index.sh              # rebuild OPEN.md and DONE.md — run after any ti
 backlog/index.sh --check      # exit 1 if either list is stale
 
 pnpm --filter @intentwatch/core capture:classifier   # spends money; see below
+pnpm --filter @intentwatch/core capture:queries      # spends money; see below
 ```
 
-`capture:classifier` is the only command here that spends money. It asks a real
-model to score PLAN.md's four worked examples, records the answers as the
-fixtures `ai/examples.test.ts` replays, and prints the scores that justify the
-default `min_score`. Four short calls. Re-run it when the prompt, the schema or
-the model changes, and put its numbers in the ticket.
+These two are the only commands here that spend money, and both are
+instruments: they ask a real model something and record what it said, because
+an answer we wrote would be evidence about our own schema and none about the
+model.
+
+`capture:classifier` scores PLAN.md's four worked examples, records the answers
+as the fixtures `ai/examples.test.ts` replays, and prints the scores that
+justify the default `min_score`. Four short calls.
+
+`capture:queries` writes the search queries for the same example monitor and
+records them. One short call. Read its output rather than trusting it: two
+failures are invisible to the schema, a subreddit that does not exist and eight
+queries that are one query written eight ways.
+
+Re-run either when its prompt, its schema or the model changes, and put the
+numbers in the ticket.
 
 Do not invent a command that does not exist yet — check `package.json` first.
 

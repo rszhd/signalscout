@@ -25,11 +25,15 @@ export interface DueMonitor {
 
 /**
  * Monitors whose last poll started at least their own interval ago, plus
- * those that have never been polled.
+ * those that have never been polled, minus the paused ones.
  *
  * `now()` is Postgres's clock, not the worker's. Two workers on two machines
  * with two slightly wrong clocks would otherwise disagree about what is due,
  * and the disagreement would show up as a poll that runs early.
+ *
+ * Pausing is enforced here and nowhere else. A pause that only hid the monitor
+ * in the UI would keep collecting and keep billing, which is the opposite of
+ * what a person means when they press it. US-010.
  */
 export async function findDueMonitors(db: Database): Promise<DueMonitor[]> {
   return db
@@ -39,6 +43,8 @@ export async function findDueMonitors(db: Database): Promise<DueMonitor[]> {
       and(
         // A monitor that names no source has nothing to poll.
         sql`cardinality(${monitors.sources}) > 0`,
+        // A paused monitor keeps its history and collects nothing.
+        isNull(monitors.pausedAt),
         or(
           isNull(monitors.lastPolledAt),
           sql`${monitors.lastPolledAt} + make_interval(secs => ${monitors.pollIntervalSeconds}) <= now()`,

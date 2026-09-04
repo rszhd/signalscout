@@ -1,4 +1,10 @@
 export {
+  generateStructured,
+  type ModelCall,
+  type StructuredCallOptions,
+  type StructuredResult,
+} from "./ai/call.js";
+export {
   type Classification,
   classificationSchema,
   leadScore,
@@ -14,7 +20,6 @@ export {
   type ClassifierOptions,
   type ClassifyRequest,
   createClassifier,
-  type ModelCall,
 } from "./ai/classify.js";
 export {
   type AiConfig,
@@ -36,6 +41,22 @@ export {
   MissingAiKeyError,
   modelPrices,
 } from "./ai/provider.js";
+export {
+  buildQuerySystemPrompt,
+  buildQueryUserPrompt,
+  createQueryGenerator,
+  maximumQueries,
+  maximumSubreddits,
+  minimumQueries,
+  type QueryGenerator,
+  type QueryGeneratorOptions,
+  type QueryPlan,
+  type QueryPlanOutcome,
+  queryPlanSchema,
+  searchQuerySchema,
+  subredditSchema,
+} from "./ai/queries.js";
+export { type RecordModelCallInput, recordModelCall } from "./ai/record.js";
 export { aiEnvSchema, type Env, envSchema, loadAiEnv, loadEnv } from "./config/env.js";
 export { createDatabase, type Database } from "./db/client.js";
 export { migrationsFolder, runMigrations } from "./db/migrate.js";
@@ -47,9 +68,11 @@ export {
   type IntentType,
   intentTypes,
   type ModelCallOutcome,
+  type ModelCallPurpose,
   matches,
   minimumPollIntervalSeconds,
   modelCallOutcomes,
+  modelCallPurposes,
   modelCalls,
   monitors,
   posts,
@@ -61,6 +84,30 @@ export {
   verdicts,
 } from "./db/schema.js";
 export { createLogger, type Logger, type LoggerOptions } from "./logger.js";
+export {
+  type CreatedMonitor,
+  type CreateMonitorInput,
+  createMonitor,
+  deleteMonitor,
+  describeSignals,
+  getMonitor,
+  listMonitors,
+  type Monitor,
+  type MonitorAnswers,
+  type MonitorEnvironment,
+  type MonitorPlan,
+  monitorQueries,
+  pauseMonitor,
+  type ResumeResult,
+  resumeMonitor,
+  type SignalDescription,
+  signalDescriptions,
+  signalList,
+  singleUserId,
+  startBlockers,
+  type UpdateMonitorInput,
+  updateMonitor,
+} from "./monitors/index.js";
 export {
   assertSourcesCanBeStored,
   builtInSources,
@@ -99,6 +146,8 @@ export {
   type CredentialLookup,
   credentialsFromEnvironment,
   environmentVariableFor,
+  type MissingCredential,
+  missingCredentials,
 } from "./worker/credentials.js";
 export {
   allQueues,

@@ -1,0 +1,81 @@
+# `docker compose up` runs the whole product: Postgres, the migrations, and one
+# Node process serving the API and the built UI on one port.
+#
+# The app image is pulled, never built here. It is built in CI and published, so
+# a 1 GB server never compiles anything. To build it yourself:
+#
+#   docker compose -f docker-compose.yml -f docker-compose.build.yml up --build
+
+name: intentwatch
+
+x-app-environment: &app-environment
+  NODE_ENV: production
+  LOG_LEVEL: ${LOG_LEVEL:-info}
+  HOST: 0.0.0.0
+  PORT: ${PORT:-3000}
+  DATABASE_URL: postgres://${POSTGRES_USER:-intentwatch}:${POSTGRES_PASSWORD:-intentwatch}@postgres:5432/${POSTGRES_DB:-intentwatch}
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg17
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-intentwatch}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-intentwatch}
+      POSTGRES_DB: ${POSTGRES_DB:-intentwatch}
+    # Bound to loopback: the app reaches Postgres over the compose network, and
+    # this port exists only so `pnpm dev` and `pnpm test` can reach it.
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-intentwatch} -d ${POSTGRES_DB:-intentwatch}"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+
+  # Runs to completion before anything connects. Two processes applying the
+  # same migrations at boot is a race nobody needs.
+  migrate:
+    image: ${INTENTWATCH_IMAGE:-ghcr.io/intentwatch/intentwatch:latest}
+    command: ["node", "packages/core/dist/db/migrate-cli.js"]
+    environment: *app-environment
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+  app:
+    image: ${INTENTWATCH_IMAGE:-ghcr.io/intentwatch/intentwatch:latest}
+    environment:
+      <<: *app-environment
+      WORKER_IN_PROCESS: ${WORKER_IN_PROCESS:-true}
+    ports:
+      - "${PORT:-3000}:${PORT:-3000}"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  # Started only when COMPOSE_PROFILES=worker. Set that together with
+  # WORKER_IN_PROCESS=false; on their own, either one leaves you with no worker
+  # or with two.
+  worker:
+    profiles: ["worker"]
+    image: ${INTENTWATCH_IMAGE:-ghcr.io/intentwatch/intentwatch:latest}
+    command: ["node", "apps/worker/dist/index.js"]
+    environment:
+      <<: *app-environment
+      WORKER_IN_PROCESS: "false"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+volumes:
+  postgres-data:

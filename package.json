@@ -1,0 +1,30 @@
+{
+  "name": "intentwatch",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.20.0",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "build": "tsc --build && pnpm --filter @intentwatch/web build",
+    "typecheck": "tsc --build && pnpm --filter @intentwatch/web typecheck",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "biome check .",
+    "format": "biome check --write .",
+    "db:up": "docker compose up -d postgres",
+    "db:migrate": "pnpm --filter @intentwatch/core migrate",
+    "db:generate": "pnpm --filter @intentwatch/core generate"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.12",
+    "@types/node": "26.4.1",
+    "concurrently": "10.0.5",
+    "tsx": "4.23.13",
+    "typescript": "7.0.2",
+    "vitest": "5.0.0"
+  }
+}

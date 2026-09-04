@@ -15,16 +15,18 @@ get is not a dashboard. It is an inbox of people who might need what you build.
 
 ---
 
-## Status: not working yet
+## Status: the skeleton runs, the product does not
 
-**There is no code in this repository.** What exists is the plan, the stack
-decision, the testing practice, and 18 tickets.
+`docker compose up` starts Postgres, applies the migrations, and serves the app
+on one port. There are no monitors, no connectors and no classifier yet, so
+there is nothing to watch and nothing to score. The page you get says the API is
+alive, and that is honestly all it says.
 
 If you are here early: [PLAN.md](PLAN.md) is the product argument and
 [STACK.md](STACK.md) is the engineering one. [`backlog/OPEN.md`](backlog/OPEN.md)
 is what is being built and in what order.
 
-Watch the repository if you want to know when it runs.
+Watch the repository if you want to know when it does something.
 
 ---
 
@@ -96,8 +98,6 @@ connector, you hold the relationship with Reddit.
 
 ## Running it
 
-Planned, not yet true:
-
 ```bash
 git clone https://github.com/<user>/intentwatch
 cd intentwatch
@@ -105,11 +105,31 @@ cp .env.example .env      # add your keys
 docker compose up
 ```
 
+The app is then on <http://localhost:3000>.
+
 One Postgres and one Node process. It is designed to run on a 1 GB VPS, and the
-image is built in CI so your server never compiles anything.
+image is built in CI, so your server pulls it and never compiles anything.
+
+The worker runs inside the API process by default. To give it its own
+container, set `WORKER_IN_PROCESS=false` and `COMPOSE_PROFILES=worker` in
+`.env`. It is the same image either way.
 
 There will be a cheap hosted version later, for people who would rather not run
 a server. The open-source build will not be crippled to sell it.
+
+### Working on it
+
+```bash
+pnpm install
+pnpm dev
+```
+
+`pnpm dev` starts Postgres, applies the migrations, and runs the API on port
+3000, the Vite dev server on 5173 and the worker as a third process. It writes
+a `.env` from `.env.example` if you have none.
+
+`pnpm test` needs the same Postgres, because the tests use a real one. `pnpm
+lint`, `pnpm typecheck` and `pnpm build` need nothing.
 
 ---
 

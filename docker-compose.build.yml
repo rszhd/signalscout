@@ -1,0 +1,12 @@
+# Build the image locally instead of pulling the published one. Used by CI to
+# check the Dockerfile, and by anyone changing it.
+#
+#   docker compose -f docker-compose.yml -f docker-compose.build.yml up --build
+
+services:
+  migrate:
+    build: .
+  app:
+    build: .
+  worker:
+    build: .

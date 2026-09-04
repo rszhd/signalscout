@@ -7,8 +7,15 @@ IntentWatch finds public conversations from people describing a problem your
 product solves. Read [PLAN.md](PLAN.md) for the product and
 [STACK.md](STACK.md) for the stack before proposing anything structural.
 
-**There is no application code yet.** The first ticket is
-[US-001](backlog/todo/US-001-the-workspace-runs-with-one-command.md).
+**The workspace exists and runs; the product does not.** US-001 built the
+skeleton: four packages, Postgres with `pgvector`, migrations, the queue, and a
+page that proves the bundle is served. Nothing collects, filters or scores yet.
+
+[US-001](backlog/doing/US-001-the-workspace-runs-with-one-command.md) is still
+in `doing/`. Its code is complete, and one acceptance box waits on the first CI
+run, which needs a remote this repository does not have. Build on the skeleton;
+do not reopen it. The next ticket to start is
+[US-002](backlog/todo/US-002-the-schema-holds-monitors-posts-matches-and-feedback.md).
 
 ---
 
@@ -93,13 +100,25 @@ count the call sites and give each its own case.
 ## Commands
 
 ```bash
+pnpm dev                      # Postgres, migrations, API (3000), Vite (5173), worker
+pnpm test                     # Vitest; needs the Postgres that `pnpm db:up` starts
+pnpm lint                     # Biome: formatting and lint rules together
+pnpm typecheck                # tsc --build across the workspace, plus the web app
+pnpm build                    # every package, then the Vite bundle
+pnpm db:up                    # Postgres alone, for `pnpm test`
+pnpm db:migrate               # apply migrations to DATABASE_URL
+pnpm db:generate              # drizzle-kit generate, after a schema change
+
+docker compose up             # the published image: Postgres, migrations, the app
+
 backlog/index.sh              # rebuild OPEN.md and DONE.md — run after any ticket change
 backlog/index.sh --check      # exit 1 if either list is stale
 ```
 
-Everything else arrives with US-001: `pnpm dev`, `pnpm test`, `pnpm lint`,
-`pnpm typecheck`, `docker compose up`. Do not invent a command that does not
-exist yet — check `package.json` first.
+Do not invent a command that does not exist yet — check `package.json` first.
+
+`pnpm test` uses a real Postgres and creates a database per test file. If it
+cannot reach one it says so; it does not fall back to a fake.
 
 ---
 

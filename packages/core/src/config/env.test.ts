@@ -33,3 +33,35 @@ describe("loadEnv", () => {
     expect(() => loadEnv({ ...minimal, PORT: "70000" })).toThrow(/PORT/);
   });
 });
+
+describe("the AI provider", () => {
+  it("defaults to a cheap hosted model with no key", () => {
+    const env = loadEnv(minimal);
+
+    expect(env.AI_PROVIDER).toBe("anthropic");
+    expect(env.AI_MODEL).toBe("claude-haiku-4-5");
+    expect(env.AI_API_KEY).toBeUndefined();
+    expect(env.AI_TIMEOUT_MS).toBe(30_000);
+  });
+
+  it("switches to a local model without any other change", () => {
+    const env = loadEnv({ ...minimal, AI_PROVIDER: "ollama", AI_MODEL: "llama3.2" });
+
+    expect(env.AI_PROVIDER).toBe("ollama");
+    expect(env.AI_MODEL).toBe("llama3.2");
+  });
+
+  it("rejects a provider we have no client for", () => {
+    expect(() => loadEnv({ ...minimal, AI_PROVIDER: "some-startup" })).toThrow(/AI_PROVIDER/);
+  });
+
+  // `.env.example` ships blank values and `pnpm dev` copies it, so a present
+  // but empty variable must read as absent rather than stop the process.
+  it("reads a blank value as an unset one", () => {
+    const env = loadEnv({ ...minimal, AI_API_KEY: "", AI_MODEL: "", AI_INPUT_PRICE_MICROS: "" });
+
+    expect(env.AI_API_KEY).toBeUndefined();
+    expect(env.AI_MODEL).toBe("claude-haiku-4-5");
+    expect(env.AI_INPUT_PRICE_MICROS).toBeUndefined();
+  });
+});

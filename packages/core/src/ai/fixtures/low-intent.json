@@ -1,0 +1,24 @@
+{
+  "slug": "low-intent",
+  "provider": "openai",
+  "model": "gpt-5.6-luna",
+  "capturedAt": "2026-09-04T18:12:20.486Z",
+  "object": {
+    "reasons": [
+      "The author praises Playwright as “awesome.”",
+      "The post does not describe broken end-to-end tests, UI-change maintenance, or manual release testing.",
+      "The author does not ask for a recommendation, alternative, or solution."
+    ],
+    "relevance": 35,
+    "problemFit": 5,
+    "icpFit": 10,
+    "intent": 0,
+    "urgency": 0,
+    "intentType": "none"
+  },
+  "usage": {
+    "inputTokens": 604,
+    "outputTokens": 88
+  },
+  "latencyMs": 3539
+}

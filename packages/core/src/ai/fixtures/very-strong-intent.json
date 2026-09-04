@@ -1,0 +1,24 @@
+{
+  "slug": "very-strong-intent",
+  "provider": "openai",
+  "model": "gpt-5.6-luna",
+  "capturedAt": "2026-09-04T18:12:34.665Z",
+  "object": {
+    "reasons": [
+      "The author says they are a four-person SaaS team.",
+      "They manually test signup and checkout on every release.",
+      "They ask what tools other small teams are using."
+    ],
+    "relevance": 95,
+    "problemFit": 92,
+    "icpFit": 98,
+    "intent": 95,
+    "urgency": 90,
+    "intentType": "recommendation_request"
+  },
+  "usage": {
+    "inputTokens": 626,
+    "outputTokens": 78
+  },
+  "latencyMs": 2554
+}

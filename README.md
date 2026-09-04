@@ -63,12 +63,20 @@ REDDIT_API_KEY=          # Reddit, served by Bright Data
 X_API_KEY=               # optional
 X_API_SECRET=
 
-OPENAI_API_KEY=          # or Anthropic, Google, OpenRouter, or a local model
+AI_PROVIDER=anthropic    # openai | anthropic | google | openrouter | ollama
+AI_MODEL=claude-haiku-4-5
+AI_API_KEY=              # not needed for ollama
 ```
 
 Nothing is proxied through us. There is no IntentWatch account to create, no
 data leaves your instance, and the AI provider is yours to choose — including
-Ollama, if you want no external provider at all.
+Ollama, if you want no external provider at all. Changing provider is those
+three lines; there is no code path per provider and no picker in the UI.
+
+Every model call is recorded with its token counts and, where we know the
+model's price, what it cost. Where we do not know the price, the record says so
+rather than guessing. Set `AI_INPUT_PRICE_MICROS` and `AI_OUTPUT_PRICE_MICROS`
+to teach it what your model costs.
 
 You only need keys for the sources you turn on. Reddit alone is a useful
 product, so `REDDIT_API_KEY` and an AI key are enough to start.

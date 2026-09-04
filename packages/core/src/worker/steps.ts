@@ -3,11 +3,11 @@
  *
  * A step is a plain function of a payload and a context. It is not a pg-boss
  * handler: nothing here knows about jobs, retries or batches. That separation
- * is what lets US-008 and US-009 replace a step without touching the queue
- * wiring, and what lets a test drive one step and assert that the step before
- * it did not run.
+ * is what let US-009 replace a step without touching the queue wiring, and
+ * what lets a test drive one step and assert that the step before it did not
+ * run.
  *
- * Three of the four are placeholders. They are wired, logged and chained, and
+ * Two of the four are placeholders. They are wired, logged and chained, and
  * they do no work, because the work belongs to tickets that have not been
  * done. A placeholder that passes its payload on is honest; one that quietly
  * dropped it would make the empty inbox look like a quiet day.
@@ -54,17 +54,25 @@ export const passThroughFilter: Step<FilterPayload> = async (
 };
 
 /**
- * US-009 replaces this with the model call. It writes no match, because an
- * unscored post is not a match and inventing one would put a number in front
- * of a person that no model produced.
+ * What runs in place of the classifier when no model is configured.
+ *
+ * US-009 built the classify step; this is the branch where the deployment has
+ * not been given a key to run it with. It writes no match, because an unscored
+ * post is not a match and inventing one would put a number in front of a
+ * person that no model produced.
+ *
+ * It logs an error and completes rather than throwing. A missing key is not
+ * transient: retrying it four times and dead-lettering the job buries the one
+ * sentence the user has to read. `worker/collect.ts` treats a missing source
+ * key the same way, for the same reason.
  */
-export const unimplementedClassify: Step<ClassifyPayload> = async (
+export const unconfiguredClassify: Step<ClassifyPayload> = async (
   { monitorId, postIds },
   { boss, logger },
 ) => {
-  logger.info(
+  logger.error(
     { monitorId, posts: postIds.length },
-    "classification is not implemented yet (US-009)",
+    "classification skipped: no model is configured. Set AI_API_KEY, or AI_PROVIDER=ollama.",
   );
   await boss.send(notifyQueue, { monitorId, matchIds: [] });
 };

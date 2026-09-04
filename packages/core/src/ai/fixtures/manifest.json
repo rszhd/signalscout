@@ -1,0 +1,54 @@
+{
+  "capturedBy": "packages/core/src/ai/fixtures/capture.ts",
+  "provider": "openai",
+  "model": "gpt-5.6-luna",
+  "note": "The model's own answers to PLAN.md's four worked examples, as the AI SDK parsed them. The monitor is `exampleMonitor` in examples.ts.",
+  "monitor": {
+    "product": "A test runner for web apps. You record a browser flow once and it keeps working when the UI changes.",
+    "idealCustomer": "Small SaaS teams, two to twenty people, with no dedicated QA engineer, shipping every week.",
+    "problem": "End-to-end tests break whenever the UI changes, so teams stop trusting them and go back to testing by hand before every release.",
+    "signals": [
+      "recommendation_request",
+      "problem",
+      "alternative_search"
+    ]
+  },
+  "fixtures": [
+    {
+      "file": "low-intent.json",
+      "capturedAt": "2026-09-04T18:12:20.486Z",
+      "usage": {
+        "inputTokens": 604,
+        "outputTokens": 88
+      },
+      "latencyMs": 3539
+    },
+    {
+      "file": "mild-problem-signal.json",
+      "capturedAt": "2026-09-04T18:12:29.813Z",
+      "usage": {
+        "inputTokens": 612,
+        "outputTokens": 97
+      },
+      "latencyMs": 9326
+    },
+    {
+      "file": "strong-intent.json",
+      "capturedAt": "2026-09-04T18:12:32.111Z",
+      "usage": {
+        "inputTokens": 615,
+        "outputTokens": 97
+      },
+      "latencyMs": 2298
+    },
+    {
+      "file": "very-strong-intent.json",
+      "capturedAt": "2026-09-04T18:12:34.665Z",
+      "usage": {
+        "inputTokens": 626,
+        "outputTokens": 78
+      },
+      "latencyMs": 2554
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "slug": "mild-problem-signal",
+  "provider": "openai",
+  "model": "gpt-5.6-luna",
+  "capturedAt": "2026-09-04T18:12:29.813Z",
+  "object": {
+    "reasons": [
+      "Says their Playwright tests break whenever the UI changes.",
+      "Describes the exact end-to-end testing problem the product addresses.",
+      "Does not mention team size, shipping cadence, or lack of dedicated QA.",
+      "Does not ask for a recommendation or describe looking for a solution."
+    ],
+    "relevance": 95,
+    "problemFit": 95,
+    "icpFit": 35,
+    "intent": 25,
+    "urgency": 70,
+    "intentType": "problem"
+  },
+  "usage": {
+    "inputTokens": 612,
+    "outputTokens": 97
+  },
+  "latencyMs": 9326
+}

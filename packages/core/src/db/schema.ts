@@ -12,6 +12,7 @@ import { sql } from "drizzle-orm";
 import {
   boolean,
   check,
+  index,
   integer,
   jsonb,
   pgTable,
@@ -86,6 +87,23 @@ export const defaultPollIntervalSeconds = 3600;
  */
 export const minimumPollIntervalSeconds = 60;
 
+/**
+ * The lowest lead score that becomes a match, for a monitor that has not said
+ * otherwise.
+ *
+ * Deliberately permissive. docs/testing.md, *A measured constant needs a
+ * committed instrument*: a threshold set too high discards good leads before
+ * anyone sees them, and a silent false negative is worse than a noisy inbox
+ * because nobody can tell it happened. The instrument that produced this
+ * number is `ai/fixtures/capture.mjs`, which scores PLAN.md's four worked
+ * examples and prints the totals; re-run it before moving this.
+ */
+export const defaultMinimumScore = 30;
+
+/** How a call to the model ended. `ai/classify.ts` owns the three outcomes. */
+export const modelCallOutcomes = ["scored", "rejected", "failed"] as const;
+export type ModelCallOutcome = (typeof modelCallOutcomes)[number];
+
 /** SQL fragment for a score column that must read 0 to 100. */
 function scoreRange(column: string) {
   return sql.raw(`${column} BETWEEN 0 AND 100`);
@@ -129,6 +147,16 @@ export const monitors = pgTable(
      * US-010's form writes this column.
      */
     sources: text("sources").array().$type<Source[]>().notNull().default(sql`'{}'`),
+    /**
+     * The lowest lead score this monitor turns into a match.
+     *
+     * Per monitor because the right threshold is a judgement about one
+     * product's market, not a constant: a monitor over a busy general
+     * subreddit needs a higher bar than one over a niche the founder reads
+     * anyway. The classifier compares against this column and never against
+     * the default.
+     */
+    minScore: integer("min_score").notNull().default(defaultMinimumScore),
     /** Per monitor, never a constant: US-007's whole point about the cost dial. */
     pollIntervalSeconds: integer("poll_interval_seconds")
       .notNull()
@@ -147,6 +175,7 @@ export const monitors = pgTable(
       "monitors_poll_interval_floor",
       sql.raw(`poll_interval_seconds >= ${minimumPollIntervalSeconds}`),
     ),
+    check("monitors_min_score_range", scoreRange("min_score")),
   ],
 );
 
@@ -234,6 +263,49 @@ export const matches = pgTable(
     check("matches_intent_range", scoreRange("intent")),
     check("matches_urgency_range", scoreRange("urgency")),
     check("matches_intent_type_known", oneOf("intent_type", intentTypes)),
+  ],
+);
+
+/**
+ * One call to a model, whatever it returned.
+ *
+ * Every call is recorded, not only the ones that produced a match. Three
+ * things need that. A self-hoster asks what their key was spent on, and a
+ * refusal is billed like an answer. US-013's budget guard needs spend it can
+ * add up without asking the provider. And the classifier drops a post that has
+ * failed a bounded number of times, which is a count of the rows here, so the
+ * limit survives a restart instead of living in one job's memory.
+ *
+ * Both foreign keys are nullable and set null rather than cascade. A deleted
+ * post must not erase what reading it cost: the bill outlives the row.
+ *
+ * `estimated_cost_micros` is null when the model's price is not configured.
+ * Null means "we cannot say", and zero means "this was free". A guessed price
+ * would be indistinguishable from a real one on a bill page.
+ */
+export const modelCalls = pgTable(
+  "model_calls",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    monitorId: uuid("monitor_id").references(() => monitors.id, { onDelete: "set null" }),
+    postId: uuid("post_id").references(() => posts.id, { onDelete: "set null" }),
+    /** Named, not chosen by the user: one provider per source, one per model. */
+    provider: text("provider").notNull(),
+    model: text("model").notNull(),
+    outcome: text("outcome").$type<ModelCallOutcome>().notNull(),
+    inputTokens: integer("input_tokens"),
+    outputTokens: integer("output_tokens"),
+    latencyMs: integer("latency_ms").notNull(),
+    /** Micro-dollars. Null when the price is unknown. */
+    estimatedCostMicros: integer("estimated_cost_micros"),
+    /** The provider's message, for a call that did not produce a match. */
+    error: text("error"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    // The classifier counts a post's failures on this pair before every call.
+    index("model_calls_monitor_post_idx").on(table.monitorId, table.postId),
+    check("model_calls_outcome_known", oneOf("outcome", modelCallOutcomes)),
   ],
 );
 

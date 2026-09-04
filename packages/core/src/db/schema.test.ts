@@ -9,6 +9,9 @@
  * - Deletion reconciliation — `last_verified_at` and `hidden` on matches. The
  *   reconciliation job needs somewhere to record what it checked.
  *
+ * `model_calls` joins them: it is what a user's spend is added up from, so a
+ * deleted post must not take the record of what reading it cost with it.
+ *
  * The assertions here were written before the schema, and each guard is
  * separated from its absence: a value that must pass sits next to the value
  * that must fail, so a dropped constraint turns a test red.
@@ -191,6 +194,27 @@ describe("monitors", () => {
     expect(only(result.rows).generated_subreddits).toEqual(["SaaS", "webdev"]);
   });
 
+  it("starts at the permissive default threshold", async () => {
+    const monitorId = await insertMonitor();
+
+    const row = only(
+      (
+        await sql.query<{ min_score: number }>("SELECT min_score FROM monitors WHERE id = $1", [
+          monitorId,
+        ])
+      ).rows,
+    );
+
+    expect(row.min_score).toBe(30);
+  });
+
+  it("accepts the ends of the threshold range and refuses either side", async () => {
+    await expect(insertMonitor({ min_score: 0 })).resolves.toEqual(expect.any(String));
+    await expect(insertMonitor({ min_score: 100 })).resolves.toEqual(expect.any(String));
+    await expect(insertMonitor({ min_score: 101 })).rejects.toThrow(/violates check constraint/);
+    await expect(insertMonitor({ min_score: -1 })).rejects.toThrow(/violates check constraint/);
+  });
+
   it("starts with no generated queries, so a new monitor is not silently searchable", async () => {
     const id = await insertMonitor({ name: "Fresh" });
 
@@ -200,6 +224,81 @@ describe("monitors", () => {
     );
 
     expect(only(result.rows).generated_queries).toEqual([]);
+  });
+});
+
+describe("model calls", () => {
+  /** One recorded call to a model. Returns its id. */
+  async function insertModelCall(overrides: Record<string, unknown> = {}): Promise<string> {
+    const values = {
+      monitor_id: overrides.monitor_id ?? (await insertMonitor()),
+      post_id: overrides.post_id ?? (await insertPost()),
+      provider: "anthropic",
+      model: "claude-haiku-4-5",
+      outcome: "scored",
+      input_tokens: 900,
+      output_tokens: 120,
+      latency_ms: 1_400,
+      estimated_cost_micros: 1_500,
+      ...overrides,
+    };
+    const columns = Object.keys(values);
+    const placeholders = columns.map((_, index) => `$${index + 1}`);
+    const result = await sql.query<{ id: string }>(
+      `INSERT INTO model_calls (${columns.join(", ")}) VALUES (${placeholders.join(", ")}) RETURNING id`,
+      Object.values(values),
+    );
+    return only(result.rows).id;
+  }
+
+  it.each(["scored", "rejected", "failed"])("records a call that ended as %s", async (outcome) => {
+    await expect(insertModelCall({ outcome })).resolves.toEqual(expect.any(String));
+  });
+
+  it("refuses an outcome the classifier cannot produce", async () => {
+    await expect(insertModelCall({ outcome: "maybe" })).rejects.toThrow(
+      /violates check constraint/,
+    );
+  });
+
+  /**
+   * The bill outlives the row. A user asking what their key was spent on must
+   * get an answer after the post has been deleted, so the foreign key sets
+   * null rather than cascading.
+   */
+  it("keeps the record when the post it read is deleted", async () => {
+    const postId = await insertPost();
+    const callId = await insertModelCall({ post_id: postId });
+
+    await sql.query("DELETE FROM posts WHERE id = $1", [postId]);
+
+    const row = only(
+      (
+        await sql.query<{ post_id: string | null; estimated_cost_micros: number }>(
+          "SELECT post_id, estimated_cost_micros FROM model_calls WHERE id = $1",
+          [callId],
+        )
+      ).rows,
+    );
+
+    expect(row.post_id).toBeNull();
+    expect(row.estimated_cost_micros).toBe(1_500);
+  });
+
+  /** Null is "we cannot say what this cost". Zero would be a claim. */
+  it("holds no cost for a model whose price nobody configured", async () => {
+    const callId = await insertModelCall({ estimated_cost_micros: null });
+
+    const row = only(
+      (
+        await sql.query<{ estimated_cost_micros: number | null }>(
+          "SELECT estimated_cost_micros FROM model_calls WHERE id = $1",
+          [callId],
+        )
+      ).rows,
+    );
+
+    expect(row.estimated_cost_micros).toBeNull();
   });
 });
 

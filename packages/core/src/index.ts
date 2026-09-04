@@ -1,14 +1,56 @@
-export { type Env, envSchema, loadEnv } from "./config/env.js";
+export {
+  type Classification,
+  classificationSchema,
+  leadScore,
+  maximumReasons,
+  minimumReasons,
+  restatesTheScores,
+  scoreColumns,
+  scoreWeights,
+} from "./ai/classification.js";
+export {
+  type ClassificationOutcome,
+  type Classifier,
+  type ClassifierOptions,
+  type ClassifyRequest,
+  createClassifier,
+  type ModelCall,
+} from "./ai/classify.js";
+export {
+  type AiConfig,
+  type AiEnvironment,
+  type AiProvider,
+  aiConfigFromEnvironment,
+  aiProviders,
+  needsApiKey,
+} from "./ai/config.js";
+export {
+  buildSystemPrompt,
+  buildUserPrompt,
+  type MonitorProfile,
+  type PostForClassification,
+} from "./ai/prompt.js";
+export {
+  createModel,
+  estimateCostMicros,
+  MissingAiKeyError,
+  modelPrices,
+} from "./ai/provider.js";
+export { aiEnvSchema, type Env, envSchema, loadAiEnv, loadEnv } from "./config/env.js";
 export { createDatabase, type Database } from "./db/client.js";
 export { migrationsFolder, runMigrations } from "./db/migrate.js";
 export {
+  defaultMinimumScore,
   defaultPollIntervalSeconds,
   embeddingDimensions,
   feedback,
   type IntentType,
   intentTypes,
+  type ModelCallOutcome,
   matches,
   minimumPollIntervalSeconds,
+  modelCallOutcomes,
+  modelCalls,
   monitors,
   posts,
   type Signal,
@@ -47,6 +89,11 @@ export {
   sourceIdPattern,
   UnknownSourceError,
 } from "./sources/index.js";
+export {
+  type ClassifyOptions,
+  createClassifyStep,
+  maxClassificationAttempts,
+} from "./worker/classify.js";
 export { createCollectStep, excerptLength, maxPagesPerPoll } from "./worker/collect.js";
 export {
   type CredentialLookup,
@@ -92,6 +139,6 @@ export {
   passThroughFilter,
   type Step,
   type StepContext,
-  unimplementedClassify,
+  unconfiguredClassify,
   unimplementedNotify,
 } from "./worker/steps.js";

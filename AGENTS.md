@@ -7,20 +7,30 @@ IntentWatch finds public conversations from people describing a problem your
 product solves. Read [PLAN.md](PLAN.md) for the product and
 [STACK.md](STACK.md) for the stack before proposing anything structural.
 
-**The pipeline runs; nothing scores yet.** US-001 built the skeleton: four
-packages, Postgres with `pgvector`, migrations, the queue, and a page that
-proves the bundle is served. US-002 added the four tables. US-003 settled the
-`SocialSource` interface and shipped a fake connector. US-005 added the real
-Reddit connector, through Bright Data. US-007 added the scheduler, so a monitor
-is now polled on its own interval and the posts are stored. The three steps
-after the poll are placeholders: US-008 owns the filter, US-009 the classifier,
-US-016 the notification. Nothing is scored, so the inbox has nothing to show.
-There is also no way to create a monitor yet; US-010 builds the form.
+**The pipeline scores posts; nothing shows them yet.** US-001 built the
+skeleton: four packages, Postgres with `pgvector`, migrations, the queue, and a
+page that proves the bundle is served. US-002 added the four tables. US-003
+settled the `SocialSource` interface and shipped a fake connector. US-005 added
+the real Reddit connector, through Bright Data. US-007 added the scheduler, so
+a monitor is polled on its own interval and the posts are stored. US-009 added
+the classifier, so a post is now scored against a monitor and a match is
+written when it clears the monitor's `min_score`. Two steps are still
+placeholders: US-008 owns the pre-filter, so every post reaches the model, and
+US-016 owns the notification. Nothing reads the matches back out; US-011 builds
+the inbox. There is also no way to create a monitor yet; US-010 builds the
+form, and until then a monitor is an `INSERT`.
 
 **Reddit's own API is closed to us.** Reddit ended self-serve app registration
 in November 2025. Reddit is reached through Bright Data instead, and X through
 its official pay-per-use API. Read STACK.md, *A source is not a provider*,
 before touching a connector: the interface does not change to suit a provider.
+
+**The classifier has met a real model; the connector has not met Bright Data.**
+`ai/fixtures/capture.ts` ran against a live provider on 2026-09-05, so the
+prompt, the schema and the cost recording are proven for the happy path, and
+the four answers it recorded are replayed in CI for nothing. The failure paths
+are not proven: a real rate limit, a real refusal and a real timeout have only
+been simulated. Say so until one has happened.
 
 Two tickets are in `doing/`, and both are code-complete.
 [US-001](backlog/doing/US-001-the-workspace-runs-with-one-command.md) waits on
@@ -28,8 +38,8 @@ the first CI run, which needs a remote this repository does not have.
 [US-007](backlog/doing/US-007-the-worker-runs-jobs-on-a-schedule.md) has every
 acceptance box verified and waits on one poll against a real Bright Data key.
 Build on both; do not reopen them. The next ticket to start is
-[US-009](backlog/todo/US-009-the-model-scores-a-post-against-a-monitor.md),
-which fills in the classify step the scheduler already calls.
+[US-010](backlog/todo/US-010-a-monitor-is-created-from-four-answers.md), which
+gives a person a way to make the monitor that everything else already reads.
 
 **The Reddit connector has never met the provider.** `capture.mjs` did, so the
 payload shapes are evidence, but the connector itself has only replayed them.
@@ -67,11 +77,15 @@ misunderstanding being encoded twice.
 
 **No test spends money.** No test reaches the Reddit API, the X API, or a model
 provider. An X read is billed at $0.005 and a test loop does not stop when the
-assertion passes.
+assertion passes. `vitest.config.ts` blanks `AI_API_KEY` for the whole suite,
+so a machine with a key exported cannot spend one by accident.
 
 **Fixtures for someone else's API are captured, not written.** Never write a
 Reddit or X payload from memory, however plausible. A fixture you wrote is
-evidence about our parser and no evidence at all about the wire format.
+evidence about our parser and no evidence at all about the wire format. The
+same holds for a model's answers: `ai/fixtures/*.json` came from a real
+provider through `capture.ts`, and an answer you wrote would be evidence about
+our schema and none about the model.
 
 **One migration number, one file.** Two branches that each take the next number
 merge cleanly and break at boot.
@@ -137,7 +151,15 @@ docker compose up             # the published image: Postgres, migrations, the a
 
 backlog/index.sh              # rebuild OPEN.md and DONE.md — run after any ticket change
 backlog/index.sh --check      # exit 1 if either list is stale
+
+pnpm --filter @intentwatch/core capture:classifier   # spends money; see below
 ```
+
+`capture:classifier` is the only command here that spends money. It asks a real
+model to score PLAN.md's four worked examples, records the answers as the
+fixtures `ai/examples.test.ts` replays, and prints the scores that justify the
+default `min_score`. Four short calls. Re-run it when the prompt, the schema or
+the model changes, and put its numbers in the ticket.
 
 Do not invent a command that does not exist yet — check `package.json` first.
 

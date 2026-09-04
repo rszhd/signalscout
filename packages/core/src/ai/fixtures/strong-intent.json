@@ -1,0 +1,24 @@
+{
+  "slug": "strong-intent",
+  "provider": "openai",
+  "model": "gpt-5.6-luna",
+  "capturedAt": "2026-09-04T18:12:32.111Z",
+  "object": {
+    "reasons": [
+      "Says their Playwright suite is becoming “impossible to maintain.”",
+      "Asks directly whether there is “something easier,” indicating they are seeking an alternative.",
+      "Does not state the team size, release cadence, or whether UI changes are causing the maintenance issues."
+    ],
+    "relevance": 95,
+    "problemFit": 90,
+    "icpFit": 40,
+    "intent": 92,
+    "urgency": 88,
+    "intentType": "alternative_search"
+  },
+  "usage": {
+    "inputTokens": 615,
+    "outputTokens": 97
+  },
+  "latencyMs": 2298
+}

@@ -14,9 +14,15 @@
     "build": "tsc --build",
     "typecheck": "tsc --build",
     "migrate": "tsx src/db/migrate-cli.ts",
-    "generate": "drizzle-kit generate"
+    "generate": "drizzle-kit generate",
+    "capture:classifier": "tsx src/ai/fixtures/capture.ts"
   },
   "dependencies": {
+    "@ai-sdk/anthropic": "4.0.49",
+    "@ai-sdk/google": "4.0.63",
+    "@ai-sdk/openai": "4.0.58",
+    "@ai-sdk/openai-compatible": "3.0.43",
+    "ai": "7.0.92",
     "drizzle-orm": "0.45.2",
     "pg": "8.23.0",
     "pg-boss": "12.30.0",

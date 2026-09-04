@@ -11,12 +11,16 @@
  * database the self-hoster already backs up.
  */
 import { PgBoss } from "pg-boss";
+import { type Classifier, createClassifier } from "../ai/classify.js";
+import { type AiConfig, aiConfigFromEnvironment, needsApiKey } from "../ai/config.js";
+import { loadAiEnv } from "../config/env.js";
 import { createDatabase, type Database } from "../db/client.js";
 import type { Logger } from "../logger.js";
 import { builtInSources } from "../sources/index.js";
 import { createSourceRegistry, type SourceRegistry } from "../sources/registry.js";
 import { createSourceRuntime } from "../sources/runtime.js";
 import { assertSourcesCanBeStored } from "../sources/storage.js";
+import { createClassifyStep } from "./classify.js";
 import { createCollectStep } from "./collect.js";
 import { type CredentialLookup, credentialsFromEnvironment } from "./credentials.js";
 import {
@@ -41,7 +45,7 @@ import {
   passThroughFilter,
   type Step,
   type StepContext,
-  unimplementedClassify,
+  unconfiguredClassify,
   unimplementedNotify,
 } from "./steps.js";
 
@@ -60,8 +64,17 @@ export interface StartWorkerOptions {
   registry?: SourceRegistry;
   /** Where source keys come from. US-004 replaces the environment with the database. */
   credentialsFor?: CredentialLookup;
-  /** Replaces one or more steps. US-008 and US-009 arrive through here. */
+  /** Replaces one or more steps. US-008 arrives through here. */
   steps?: Partial<PipelineSteps>;
+  /**
+   * Which model scores posts. Defaults to the one AI_PROVIDER and AI_MODEL
+   * name. A deployment with no key configured gets no classifier and says so
+   * once per job, rather than failing to boot: polling still works, and the
+   * posts are stored for when a key arrives.
+   */
+  classifier?: Classifier;
+  /** The AI settings, when they do not come from the process environment. */
+  aiConfig?: AiConfig;
   /** Retry and backoff settings, so a test does not wait out production's backoff. */
   retry?: RetryPolicy;
   /** False leaves the clock off, for a test that ticks the scheduler by hand. */
@@ -116,12 +129,34 @@ function instrument<Payload extends { monitorId: string }>(
   };
 }
 
+/**
+ * Build the classifier the environment describes, or none.
+ *
+ * The one failure this hides is a missing key, and it is reported rather than
+ * hidden: an error line naming the variable, once, at boot. Anything else
+ * thrown while building a provider is a real misconfiguration and stops the
+ * process, which is where a wrong base URL belongs.
+ */
+function classifierFromEnvironment(config: AiConfig, logger: Logger): Classifier | undefined {
+  if (needsApiKey(config.provider) && !config.apiKey) {
+    logger.error(
+      { provider: config.provider, model: config.model },
+      "no model is configured: set AI_API_KEY, or AI_PROVIDER=ollama for a local model. Posts will be collected but not scored.",
+    );
+    return undefined;
+  }
+
+  return createClassifier({ config });
+}
+
 export async function startWorker({
   databaseUrl,
   logger,
   registry,
   credentialsFor = credentialsFromEnvironment(),
   steps = {},
+  classifier,
+  aiConfig,
   retry = defaultRetryPolicy,
   scheduleTicks = true,
 }: StartWorkerOptions): Promise<WorkerHandle> {
@@ -147,10 +182,15 @@ export async function startWorker({
 
   const context: StepContext = { db, boss, logger };
 
+  const model =
+    classifier ??
+    classifierFromEnvironment(aiConfig ?? aiConfigFromEnvironment(loadAiEnv()), logger);
+
   const pipeline: PipelineSteps = {
     poll: steps.poll ?? createCollectStep({ registry: sources, credentialsFor }),
     filter: steps.filter ?? passThroughFilter,
-    classify: steps.classify ?? unimplementedClassify,
+    classify:
+      steps.classify ?? (model ? createClassifyStep({ classifier: model }) : unconfiguredClassify),
     notify: steps.notify ?? unimplementedNotify,
   };
 
@@ -182,7 +222,11 @@ export async function startWorker({
   }
 
   logger.info(
-    { queues: queueDefinitions(retry).map((queue) => queue.name), sources: sources.ids() },
+    {
+      queues: queueDefinitions(retry).map((queue) => queue.name),
+      sources: sources.ids(),
+      model: model ? `${model.provider}/${model.model}` : "none",
+    },
     "worker ready",
   );
 

@@ -155,6 +155,16 @@ It is run by hand against a live provider when the prompt or the model changes,
 not in CI, because it costs money and it is not deterministic. Its results go in
 the ticket that changed the prompt.
 
+Both halves are one command:
+
+    pnpm --filter @intentwatch/core capture:classifier
+
+It scores the four examples against a live model, records the answers as the
+fixtures `ai/examples.test.ts` replays, and prints the scores. The bands that
+test asserts were written before the first run, and the house rule applies to
+them like any other expected value: a band moves only when the behaviour was
+meant to change.
+
 ---
 
 ## Rules that catch silent failures
@@ -237,7 +247,9 @@ number is right.
 Three of ours are exactly this shape:
 
 - the pre-filter similarity threshold (US-008)
-- the minimum score that makes a match (US-009)
+- the minimum score that makes a match (US-009) — the instrument is
+  `packages/core/src/ai/fixtures/capture.ts`, and the numbers it produced are
+  in the ticket
 - the weight of age against score in the inbox ordering (US-011)
 
 Each owes the repository the command that produced it, committed and

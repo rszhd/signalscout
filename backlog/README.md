@@ -115,6 +115,10 @@ the short list, so a decision is not reopened by accident.
   it.
 - **No Next.js, no Redis.** Decided on build memory and on service count. See
   STACK.md, *Why these choices*.
+- **A red test is fixed in the code, not in the assertion.** An expected value
+  changes only when the behaviour was meant to change, and the commit says
+  which and why. See [`docs/testing.md`](../docs/testing.md), which also names
+  the correctness-critical surfaces that are written test-first.
 - **A metered read is spent before the code sees the post.** An X read costs
   more than classifying it. Budget guards and deduplication are correctness
   concerns, not features.

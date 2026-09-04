@@ -42,7 +42,13 @@ spending cap means the first cursor bug is discovered on a user's invoice.
 - [ ] Rate limit responses are handled inside the connector with a back-off
 - [ ] A partial page or a mid-page error records the reads already consumed;
       spend is never lost because a call failed
-- [ ] Tests run against recorded fixtures, and no test hits the live API
+- [ ] Tests run against fixtures captured from real X responses by a
+      committed, re-runnable script
+- [ ] Captured payloads are stored whole, with identifying fields scrubbed, and
+      no fixture is written from memory
+- [ ] The connector takes an injected HTTP client, and the test setup makes the
+      real one unreachable — a test that would spend money fails rather than
+      spending it
 - [ ] The setup documentation states the per-read price and what a typical
       monitor costs per month
 
@@ -52,6 +58,10 @@ spending cap means the first cursor bug is discovered on a user's invoice.
 - Ships with [US-013](US-013-a-monitor-cannot-spend-past-its-budget.md). Not
   after it.
 - STACK.md, *Source economics*.
+- [docs/testing.md](../../docs/testing.md), *No test spends money* and *A
+  fixture for someone else's API must be captured, not written*. The capture
+  script costs a few reads once; a test loop against the live API bills
+  continuously.
 - Pricing changes. Keep the per-read price in one place, sourced from the
   connector, so a change is a one-line edit.
 
@@ -59,3 +69,6 @@ spending cap means the first cursor bug is discovered on a user's invoice.
 
 - 2026-09-04 — Written after checking current X pricing: pay-per-use replaced
   the fixed tiers, and the $200 Basic tier was retired.
+- 2026-09-04 — Added the captured-fixture and injected-client requirements,
+  after adopting docs/testing.md. The injected client is what makes "no test
+  spends money" enforceable rather than a convention.

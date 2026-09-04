@@ -47,7 +47,10 @@ use?" is often a better signal than the post above it. Both are fetched.
       fetched twice
 - [ ] Only an id, an excerpt, an author handle, a permalink and a timestamp
       are stored — not a full permanent copy
-- [ ] Tests run against recorded fixtures, not the live API
+- [ ] Tests run against fixtures captured from real Reddit responses by a
+      committed, re-runnable script; no test hits the live API
+- [ ] Captured payloads are stored whole, with identifying fields scrubbed, and
+      no fixture is written from memory
 - [ ] The README states what a user agrees to when they register a Reddit app
 
 ## Notes
@@ -58,7 +61,12 @@ use?" is often a better signal than the post above it. Both are fetched.
   an engineering one. It is not settled by this ticket and must be settled
   before the hosted launch.
 - `snoowrap` is unmaintained. Use `fetch` against the OAuth API.
+- [docs/testing.md](../../docs/testing.md), *A fixture for someone else's API
+  must be captured, not written*. A plausible Reddit payload written from
+  memory is the exact failure that rule exists to prevent.
 
 ## Log
 
 - 2026-09-04 — Written from PLAN.md and STACK.md.
+- 2026-09-04 — Fixture requirement tightened from "recorded" to "captured
+  by a committed script", after adopting docs/testing.md.

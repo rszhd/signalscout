@@ -52,6 +52,9 @@ structured output, so a parse failure is an expected path, not a crash.
       retryable, and never writes a match
 - [ ] A post that fails classification a bounded number of times is dropped
       and logged, not retried forever
+- [ ] The happy path is asserted through the same entry point the worker calls,
+      not only through the parts, so a programming error inside the error
+      handler cannot pass as a handled model error
 - [ ] The provider is chosen by configuration, and switching to Ollama needs
       no code change
 - [ ] Each call records the model, token counts, latency and estimated cost
@@ -63,6 +66,12 @@ structured output, so a parse failure is an expected path, not a crash.
 - Depends on [US-002](US-002-the-schema-holds-monitors-posts-matches-and-feedback.md)
   and [US-007](US-007-the-worker-runs-jobs-on-a-schedule.md).
 - PLAN.md, *Intent classification*, for the examples and the intent types.
+- [docs/testing.md](../../docs/testing.md), *A broad catch obliges an assertion
+  on the happy path*. The failure shape to avoid: the catch swallows a
+  programming error, nothing is ever scored, and an empty inbox reads as a
+  quiet day rather than a broken product.
+- The four examples in PLAN.md are the start of the labelled set described in
+  *Testing the model*. Grow it from real matches and from US-012 feedback.
 - Open question for the maintainer: whether the monitor's four answers go into
   the system prompt whole, or are summarised once at monitor creation and
   cached. Whole is simpler and more expensive. Decide during the work and
@@ -71,3 +80,6 @@ structured output, so a parse failure is an expected path, not a crash.
 ## Log
 
 - 2026-09-04 — Written from PLAN.md and STACK.md.
+- 2026-09-04 — Added the happy-path assertion through the worker's entry
+  point, after adopting docs/testing.md. Without it the error handler is the
+  only untested line in the file that matters most.

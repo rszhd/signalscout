@@ -23,6 +23,7 @@ import {
   type ZodTypeProvider,
 } from "fastify-type-provider-zod";
 import { z } from "zod";
+import { registerMatchRoutes } from "./matches.js";
 import { registerMonitorRoutes } from "./monitors.js";
 
 /**
@@ -115,6 +116,8 @@ export async function buildServer({
     },
     handler: async () => ({ status: "ok" as const, workerInProcess: env.WORKER_IN_PROCESS }),
   });
+
+  await registerMatchRoutes(app, { db });
 
   await registerMonitorRoutes(app, {
     db,

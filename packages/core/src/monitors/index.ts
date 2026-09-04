@@ -20,6 +20,7 @@ export {
 } from "./monitors.js";
 export {
   describeSignals,
+  intentTypeLabel,
   type SignalDescription,
   signalDescriptions,
   signalList,

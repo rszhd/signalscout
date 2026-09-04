@@ -1,0 +1,1 @@
+CREATE INDEX "matches_inbox_idx" ON "matches" USING btree ("monitor_id","score") WHERE hidden = false;

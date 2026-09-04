@@ -18,11 +18,11 @@ written when it clears the monitor's `min_score`. BUG-001 made the poll finish
 what it starts: an asynchronous collection is remembered in
 `source_continuations` and resumed, rather than triggered again. US-010's
 server half added the query generator, the monitor writes and the routes, so a
-monitor is now an HTTP call rather than an `INSERT`. Two steps are still
-placeholders: US-008 owns the pre-filter, so every post reaches the model, and
-US-016 owns the notification. Nothing reads the matches back out; US-011 builds
-the inbox. `apps/web` now serves the US-010 monitor form, but there is still no
-UI for matches or connections.
+monitor is now an HTTP call rather than an `INSERT`. US-011 added the inbox, so
+a match is read back out, ordered by score and age together. Two steps are
+still placeholders: US-008 owns the pre-filter, so every post reaches the
+model, and US-016 owns the notification. `apps/web` now has two screens, the
+monitor form and the inbox, and no screen for connections.
 
 **Reddit's own API is closed to us.** Reddit ended self-serve app registration
 in November 2025. Reddit is reached through Bright Data instead, and X through
@@ -60,6 +60,15 @@ the server routes and the React form, with the jsdom harness that drives the
 form through the DOM. One acceptance box stays open: credentials are present
 or missing, but are not validated with the provider. The ticket's Notes keep
 that open for a connection-testing screen on purpose.
+
+**The inbox has never shown a real match.** US-011 closed on 2026-09-05
+against seeded rows and stubbed responses. No match in this product has been
+produced by a live classification and then read on the screen, because the
+live run stored posts and never scored them with a real model. What is proven
+is that the list renders what the database holds, and the ordering rule —
+score, minus twelve points for every day since the post — measured at 12.7 ms
+for a first page over 5,000 matches. What is not proven is that the reasons
+read well to a person.
 
 **The Reddit connector has collected once, live.** On 2026-09-05 a monitor
 with one keyword triggered a collection, waited through fourteen resumes over

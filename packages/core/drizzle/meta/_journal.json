@@ -43,6 +43,13 @@
       "when": 1788550398538,
       "tag": "0005_add_source_continuations",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1788562835462,
+      "tag": "0006_add_match_inbox_index",
+      "breakpoints": true
     }
   ]
 }

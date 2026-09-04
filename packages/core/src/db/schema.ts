@@ -346,6 +346,11 @@ export const matches = pgTable(
   },
   (table) => [
     unique("matches_monitor_post_unique").on(table.monitorId, table.postId),
+    // The inbox reads this table one page at a time, filtered by monitor and
+    // by score, and never shows a hidden row. Partial, because the hidden rows
+    // are the ones nothing may read: keeping them out of the index keeps them
+    // out of the plan as well as out of the result. US-011.
+    index("matches_inbox_idx").on(table.monitorId, table.score).where(sql`hidden = false`),
     check("matches_score_range", scoreRange("score")),
     check("matches_relevance_range", scoreRange("relevance")),
     check("matches_problem_fit_range", scoreRange("problem_fit")),

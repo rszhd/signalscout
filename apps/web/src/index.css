@@ -447,7 +447,14 @@ button:disabled {
   border: 0;
 }
 .primary-button {
+  /* Flex, not the button default, because this class is worn by an <a> as
+     well as by a <button>. A link is not a button: `min-height` leaves its
+     text at the top of the box, and only the button element centres it for
+     free. Centring here keeps the two looking like one control. */
+  display: inline-flex;
   min-height: 44px;
+  align-items: center;
+  justify-content: center;
   padding: 0 1.25rem;
   border-radius: 10px;
   color: #f7faf6;
@@ -455,6 +462,7 @@ button:disabled {
   box-shadow: 0 8px 20px rgb(39 83 48 / 17%);
   font-size: 0.8rem;
   font-weight: 750;
+  text-align: center;
 }
 
 .primary-button:hover:not(:disabled) {
@@ -633,8 +641,13 @@ button:disabled {
 }
 
 .center-state > p {
+  /* The paragraph is always the last thing before a button in this block, in
+     every one of its states. Without the gap the sentence and the button read
+     as one control. */
   max-width: 440px;
+  margin-bottom: 1.6rem;
 }
+
 .spinner {
   width: 30px;
   height: 30px;
@@ -774,5 +787,277 @@ button:disabled {
     animation-duration: 0.01ms;
     animation-iteration-count: 1;
     transition-duration: 0.01ms;
+  }
+}
+
+/* --- The intent inbox (US-011) ------------------------------------------- */
+
+.site-nav {
+  display: inline-flex;
+  gap: 1.6rem;
+}
+
+.site-nav a {
+  padding: 0.2rem 0;
+  border-bottom: 2px solid transparent;
+  color: #6e756f;
+  font-size: 0.86rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.site-nav a:hover {
+  color: #2c5835;
+}
+
+.site-nav a.current {
+  border-bottom-color: #2c5835;
+  color: #18211a;
+}
+
+.inbox-page {
+  width: min(860px, 92vw);
+  margin: 0 auto;
+  padding: clamp(2.4rem, 5vw, 4rem) 0 5rem;
+}
+
+.inbox-heading {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.6rem;
+  align-items: end;
+  justify-content: space-between;
+  margin-bottom: 2.2rem;
+}
+
+.inbox-heading h1 {
+  max-width: 22ch;
+  margin: 0 0 0.7rem;
+  font-size: clamp(1.7rem, 3.2vw, 2.3rem);
+  font-weight: 760;
+  letter-spacing: -0.03em;
+  line-height: 1.12;
+}
+
+.inbox-heading .intro-copy {
+  max-width: 46ch;
+  margin: 0;
+}
+
+.inbox-filters {
+  display: flex;
+  gap: 1rem;
+}
+
+.filter {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.filter > span {
+  color: #4c7654;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.filter select {
+  min-width: 11rem;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid rgb(43 54 45 / 18%);
+  border-radius: 10px;
+  color: #1c211d;
+  background: #fffefa;
+  font-size: 0.88rem;
+}
+
+.filter select:focus {
+  border-color: #2c5835;
+  outline: 2px solid rgb(44 88 53 / 22%);
+}
+
+.match-list {
+  display: grid;
+  gap: 1.1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.match-card {
+  display: grid;
+  gap: 1rem;
+  padding: 1.5rem 1.6rem;
+  border: 1px solid rgb(43 54 45 / 12%);
+  border-radius: 16px;
+  background: #fffefa;
+  box-shadow: 0 1px 2px rgb(28 33 29 / 4%);
+}
+
+.match-top {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 1rem;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.intent-band {
+  display: inline-flex;
+  gap: 0.5rem;
+  align-items: baseline;
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.intent-band strong {
+  font-size: 1.5rem;
+  font-weight: 780;
+  letter-spacing: -0.02em;
+}
+
+.intent-band.high {
+  color: #a8410f;
+}
+
+.intent-band.medium {
+  color: #2c5835;
+}
+
+.intent-band.low {
+  color: #6e756f;
+}
+
+.match-origin {
+  margin: 0;
+  color: #6e756f;
+  font-size: 0.82rem;
+}
+
+.match-quote {
+  margin: 0;
+  padding-left: 1rem;
+  border-left: 3px solid rgb(44 88 53 / 25%);
+}
+
+.match-quote strong {
+  display: block;
+  margin-bottom: 0.3rem;
+  font-size: 1rem;
+  font-weight: 680;
+  line-height: 1.35;
+}
+
+.match-quote p {
+  margin: 0;
+  color: #3c433d;
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.section-label {
+  margin: 0 0 0.5rem;
+  color: #4c7654;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.match-why ul {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.match-why li {
+  display: grid;
+  grid-template-columns: 1.1rem 1fr;
+  gap: 0.4rem;
+  color: #1c211d;
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.match-why li span {
+  color: #4c7654;
+  font-weight: 700;
+}
+
+.match-scores {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.match-scores > div {
+  display: flex;
+  gap: 0.5rem;
+  align-items: baseline;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  background: rgb(44 88 53 / 8%);
+}
+
+.match-scores dt {
+  color: #4c7654;
+  font-size: 0.74rem;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.match-scores dd {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.match-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem 1rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.match-actions .primary-button {
+  text-decoration: none;
+}
+
+.match-meta {
+  color: #6e756f;
+  font-size: 0.8rem;
+}
+
+.inbox-more {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.8rem;
+}
+
+.center-state .primary-button {
+  text-decoration: none;
+}
+
+@media (width <= 720px) {
+  .inbox-heading {
+    align-items: start;
+  }
+
+  .inbox-filters {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .filter select {
+    width: 100%;
   }
 }

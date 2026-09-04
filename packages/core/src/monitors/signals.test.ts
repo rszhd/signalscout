@@ -15,8 +15,8 @@
 import { describe, expect, it } from "vitest";
 import { buildSystemPrompt } from "../ai/prompt.js";
 import { buildQueryUserPrompt } from "../ai/queries.js";
-import { signals } from "../db/schema.js";
-import { describeSignals, signalDescriptions, signalList } from "./signals.js";
+import { intentTypes, signals } from "../db/schema.js";
+import { describeSignals, intentTypeLabel, signalDescriptions, signalList } from "./signals.js";
 
 const monitor = {
   product: "A test runner that records browser flows instead of coding them",
@@ -92,6 +92,25 @@ describe("no signals at all", () => {
 
     for (const signal of signalList) {
       expect(prompt).not.toContain(signal.describes);
+    }
+  });
+});
+
+describe("the words on an inbox card", () => {
+  it("gives every answer the classifier may return a label", () => {
+    // The classifier answers with one of `intentTypes`, and the inbox prints
+    // it. A type with no label would reach a card as a bare id, and only the
+    // card would be wrong: the prompt, the schema and the row would all look
+    // right. US-011.
+    for (const intentType of intentTypes) {
+      expect(intentTypeLabel(intentType)).toMatch(/[a-z]/);
+      expect(intentTypeLabel(intentType)).not.toBe(intentType);
+    }
+  });
+
+  it("uses the label the checkbox used", () => {
+    for (const signal of signals) {
+      expect(intentTypeLabel(signal)).toBe(signalDescriptions[signal].label);
     }
   });
 });

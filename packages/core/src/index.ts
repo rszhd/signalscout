@@ -87,12 +87,25 @@ export {
 } from "./db/schema.js";
 export { createLogger, type Logger, type LoggerOptions } from "./logger.js";
 export {
+  cursorFor,
+  cursorPattern,
+  defaultPageSize,
+  type InboxMatch,
+  type ListMatchesOptions,
+  listMatches,
+  type MatchPage,
+  maximumPageSize,
+  rankDecayPointsPerDay,
+  UnusableCursorError,
+} from "./matches/index.js";
+export {
   type CreatedMonitor,
   type CreateMonitorInput,
   createMonitor,
   deleteMonitor,
   describeSignals,
   getMonitor,
+  intentTypeLabel,
   listMonitors,
   type Monitor,
   type MonitorAnswers,

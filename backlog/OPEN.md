@@ -2,13 +2,12 @@
 
 # Open tickets
 
-15 open — 2 doing, 13 todo, 0 parked (5 p1, 9 p2, 1 p3).
+14 open — 2 doing, 12 todo, 0 parked (4 p1, 9 p2, 1 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
 | p1 | US-001 | [The workspace runs with one command](doing/US-001-the-workspace-runs-with-one-command.md) | chore | doing | 2026-09-04 |
 | p1 | US-010 | [A monitor is created from four answers](doing/US-010-a-monitor-is-created-from-four-answers.md) | feature | doing | 2026-09-04 |
-| p1 | US-011 | [The inbox shows why a post matched](todo/US-011-the-inbox-shows-why-a-post-matched.md) | feature | todo | 2026-09-04 |
 | p1 | US-013 | [A monitor cannot spend past its budget](todo/US-013-a-monitor-cannot-spend-past-its-budget.md) | feature | todo | 2026-09-04 |
 | p1 | US-014 | [A query's cost is known before it runs](todo/US-014-a-querys-cost-is-known-before-it-runs.md) | feature | todo | 2026-09-04 |
 | p2 | US-004 | [A stored key is encrypted at rest](todo/US-004-a-stored-key-is-encrypted-at-rest.md) | feature | todo | 2026-09-04 |

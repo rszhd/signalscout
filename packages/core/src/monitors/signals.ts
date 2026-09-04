@@ -15,7 +15,7 @@
  * coincidence to be tidied away: the classifier is asked to answer with one of
  * those words, so it should have been told to look for the same words.
  */
-import { type Signal, signals } from "../db/schema.js";
+import { type IntentType, type Signal, signals } from "../db/schema.js";
 
 export interface SignalDescription {
   readonly id: Signal;
@@ -98,4 +98,17 @@ export function describeSignals(selected: readonly Signal[]): string {
       return description ? `- ${description.id}: ${description.describes}` : `- ${id}`;
     })
     .join("\n");
+}
+
+/**
+ * What the classifier's answer is called on an inbox card.
+ *
+ * `intentTypes` is `signals` plus "none", so the words a person reads on a
+ * card are the words they ticked in the form. A second list of labels here is
+ * exactly the drift this file exists to prevent: the checkbox would say
+ * "Looking for alternatives" and the card "alternative_search", and only one
+ * of them would ever be corrected. US-011.
+ */
+export function intentTypeLabel(intentType: IntentType): string {
+  return intentType === "none" ? "No clear intent" : signalDescriptions[intentType].label;
 }

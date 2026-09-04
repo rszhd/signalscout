@@ -18,9 +18,13 @@ get is not a dashboard. It is an inbox of people who might need what you build.
 ## Status: the skeleton runs, the product does not
 
 `docker compose up` starts Postgres, applies the migrations, and serves the app
-on one port. There are no monitors, no connectors and no classifier yet, so
-there is nothing to watch and nothing to score. The page you get says the API is
-alive, and that is honestly all it says.
+on one port. The page you get says the API is alive, and that is honestly all it
+says.
+
+The Reddit connector now works: given a key and a query it returns candidate
+posts and reports what they cost. Nothing calls it yet. There are no monitors to
+run it for, no schedule to run it on, and no classifier to score what it finds,
+so the product still does nothing end to end.
 
 If you are here early: [PLAN.md](PLAN.md) is the product argument and
 [STACK.md](STACK.md) is the engineering one. [`backlog/OPEN.md`](backlog/OPEN.md)
@@ -111,6 +115,21 @@ say it here than let you find it in an agreement you skimmed.
 
 If you have a Reddit client id issued before November 2025, it still works.
 There is no connector for it today. Open an issue if you want one.
+
+#### Connecting it
+
+1. Create an account at [brightdata.com](https://brightdata.com). No card, no
+   company verification.
+2. Open **Settings → API keys** and create a key.
+3. Put it in `.env` as `BRIGHTDATA_API_KEY=…`.
+
+That is all. You do not choose a dataset, a scraper or a plan; IntentWatch asks
+for the Reddit ones by name.
+
+A **record** is one post. The free tier is 5,000 records a month, and a monitor
+only spends them when it runs, so a query that finds nothing costs nothing. The
+app checks the key before it saves it, and that check is free: it asks Bright
+Data to collect an empty list, which authenticates without collecting anything.
 
 ---
 

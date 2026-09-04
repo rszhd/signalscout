@@ -7,12 +7,12 @@ IntentWatch finds public conversations from people describing a problem your
 product solves. Read [PLAN.md](PLAN.md) for the product and
 [STACK.md](STACK.md) for the stack before proposing anything structural.
 
-**The workspace exists and the vocabulary is settled; the product does not
-run.** US-001 built the skeleton: four packages, Postgres with `pgvector`,
-migrations, the queue, and a page that proves the bundle is served. US-002 added
-the four tables. US-003 settled the `SocialSource` interface and shipped a fake
-connector. Nothing collects, filters or scores yet, and no real connector
-exists.
+**One connector works; the product does not run.** US-001 built the skeleton:
+four packages, Postgres with `pgvector`, migrations, the queue, and a page that
+proves the bundle is served. US-002 added the four tables. US-003 settled the
+`SocialSource` interface and shipped a fake connector. US-005 added the real
+Reddit connector, through Bright Data. Nothing calls it: there is no schedule,
+no monitor and no classifier, so nothing filters or scores yet.
 
 **Reddit's own API is closed to us.** Reddit ended self-serve app registration
 in November 2025. Reddit is reached through Bright Data instead, and X through
@@ -23,7 +23,13 @@ before touching a connector: the interface does not change to suit a provider.
 in `doing/`. Its code is complete, and one acceptance box waits on the first CI
 run, which needs a remote this repository does not have. Build on the skeleton;
 do not reopen it. The next ticket to start is
-[US-005](backlog/todo/US-005-reddit-returns-candidate-posts.md).
+[US-007](backlog/todo/US-007-the-worker-runs-jobs-on-a-schedule.md), which is
+what finally calls the Reddit connector.
+
+**The Reddit connector has never met the provider.** `capture.mjs` did, so the
+payload shapes are evidence, but the connector itself has only replayed them.
+A failed collection, an expired snapshot and any rate limit are all unproven.
+US-007 is where that gets found out.
 
 ---
 

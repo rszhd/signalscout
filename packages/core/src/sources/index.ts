@@ -7,6 +7,12 @@ export {
   fakeSourceId,
 } from "./fake/index.js";
 export {
+  RedditSource,
+  redditSourceDefinition,
+  redditSourceId,
+  toCandidatePost,
+} from "./reddit/index.js";
+export {
   type CreateSourceRegistryOptions,
   createSourceRegistry,
   type SourceRegistry,
@@ -31,16 +37,17 @@ export type {
 } from "./types.js";
 export { sourceIdPattern } from "./types.js";
 
+import { redditSourceDefinition } from "./reddit/index.js";
 import type { SourceDefinition } from "./types.js";
 
 /**
  * The connectors this build ships.
  *
- * It is empty on purpose. US-005 adds Reddit and US-006 adds X, and the
- * interface was settled before either existed so that the second connector is
- * not the one that argues about the shape. A connector is added here and in
- * one new folder under `sources/`; nothing else in the repository changes,
- * unless its posts are stored, which also needs a migration. See
- * docs/sources.md.
+ * US-005 added Reddit and US-006 adds X. The interface was settled before
+ * either existed so that the second connector is not the one that argues about
+ * the shape. A connector is added here and in one new folder under `sources/`;
+ * nothing else in the repository changes, unless its posts are stored, which
+ * also needs a migration. `posts.source` already accepts "reddit", so Reddit
+ * needed none. See docs/sources.md.
  */
-export const builtInSources: readonly SourceDefinition[] = [];
+export const builtInSources: readonly SourceDefinition[] = [redditSourceDefinition];

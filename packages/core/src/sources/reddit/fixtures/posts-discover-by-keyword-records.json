@@ -1,0 +1,1719 @@
+[
+  {
+    "post_id": "t3_1vvuwfy",
+    "url": "https://www.reddit.com/r/learnpython/comments/1vvuwfy/playwright_button_is_clicked_but_doesnt_continue/",
+    "user_posted": "redditor-1",
+    "title": "(Playwright) Button is clicked, but doesn't continue",
+    "description": "I'm currently trying to click 2 buttons on a website that have videos playing on them. However, when I have the \"time.sleep(2)\" function in the loop, the loop stops. I've checked the selector and it points to 2 different play buttons on the page. I checked clicking on the button in my actual browser to see if the site updates anything--nothing. Any help would be highly appreciated def download_page(url:str): with sync_playwright() as p: print(f\"Opening {url}...\") browser = p.chromium.connect_over_cdp(endpoint_url) context = browser.contexts[0] page = context.pages[0] page.on(\"response\", lambda request: print(request.url)) reponse = page.goto(url, wait_until=\"load\") # context.set_default_timeout(300.0) try: #Check \"Continuing for course\" page.wait_for_selector(\".btn.btn-quaternary.btn-xl.btn-block-sm-down.course-progress__btn.js-course-progress__start-course\").scroll_into_view_if_needed() page.locator(\".btn.btn-quaternary.btn-xl.btn-block-sm-down.course-progress__btn.js-course-progress__start-course\").click() page.wait_for_selector(\".CoverVideo-playButton.bgc-neutral-100\").scroll_into_view_if_needed() buttons = page.locator(\".CoverVideo-playButton.bgc-neutral-100\").all() for button in buttons: time.sleep(2) button.click() print(\"check\") # headers = reponse.request # for value in headers: # print(f\"{value}\") except TE: print(\"Timeout\") Read more",
+    "num_comments": 9,
+    "date_posted": "2026-08-23T02:22:56.940Z",
+    "community_name": "learnpython",
+    "num_upvotes": 8,
+    "photos": null,
+    "videos": null,
+    "tag": null,
+    "related_posts": [
+      {
+        "community": "windowsltsc",
+        "community_url": "https://www.reddit.com/r/WindowsLTSC/comments/1v77gms/if_clicking_start_menu_has_a_1_second_delay_set/",
+        "title": "If clicking Start Menu has a >1 second delay, set \"EnShellFeedsTaskbarViewMode\" registry to \"2\" (disable)",
+        "url": "https://www.reddit.com/r/WindowsLTSC/comments/1v77gms/if_clicking_start_menu_has_a_1_second_delay_set/",
+        "thumbnail": null,
+        "num_upvotes": "26",
+        "num_comments": 4
+      },
+      {
+        "community": null,
+        "community_url": "https://www.reddit.com/user/Roblox/",
+        "title": "Be anyone. Build any life. Discover roleplay worlds on Roblox.",
+        "url": null,
+        "thumbnail": null,
+        "num_upvotes": null,
+        "num_comments": null
+      },
+      {
+        "community": "whenthe",
+        "community_url": "https://www.reddit.com/r/whenthe/comments/1t0ax0a/the_buttons_did_not_account_for_my_attentionspan/",
+        "title": "The buttons did not account for my attention-span",
+        "url": "https://www.reddit.com/r/whenthe/comments/1t0ax0a/the_buttons_did_not_account_for_my_attentionspan/",
+        "thumbnail": null,
+        "num_upvotes": "135",
+        "num_comments": 31
+      },
+      {
+        "community": "pythonlearning",
+        "community_url": "https://www.reddit.com/r/PythonLearning/comments/1vy63u8/new_to_python_could_someone_help_me_with_this/",
+        "title": "New to python, could someone help me with this please",
+        "url": "https://www.reddit.com/r/PythonLearning/comments/1vy63u8/new_to_python_could_someone_help_me_with_this/",
+        "thumbnail": null,
+        "num_upvotes": "25",
+        "num_comments": 51
+      },
+      {
+        "community": "pythonlearning",
+        "community_url": "https://www.reddit.com/r/PythonLearning/comments/1o3rxzr/remember_my_coding_game_for_learning_python_after/",
+        "title": "Remember my coding game for learning Python? After more than three years, I finally released version 1.0!",
+        "url": "https://www.reddit.com/r/PythonLearning/comments/1o3rxzr/remember_my_coding_game_for_learning_python_after/",
+        "thumbnail": null,
+        "num_upvotes": "792",
+        "num_comments": 62
+      },
+      {
+        "community": "zaiglm",
+        "community_url": "https://www.reddit.com/r/ZaiGLM/comments/1utwx1m/i_cant_get_to_the_login_page_just_shows_a_white/",
+        "title": "I can't get to the login page. Just shows a white screen when I click the button",
+        "url": "https://www.reddit.com/r/ZaiGLM/comments/1utwx1m/i_cant_get_to_the_login_page_just_shows_a_white/",
+        "thumbnail": null,
+        "num_upvotes": "0",
+        "num_comments": 6
+      },
+      {
+        "community": "pythonlearning",
+        "community_url": "https://www.reddit.com/r/PythonLearning/comments/1p2svxs/day_44_of_learning_python/",
+        "title": "Day 44 of learning Python",
+        "url": "https://www.reddit.com/r/PythonLearning/comments/1p2svxs/day_44_of_learning_python/",
+        "thumbnail": null,
+        "num_upvotes": "211",
+        "num_comments": 25
+      },
+      {
+        "community": "learnpython",
+        "community_url": "https://www.reddit.com/r/learnpython/comments/1qtslxl/i_understand_python_code_but_cant_write_it/",
+        "title": "I understand Python code, but can’t write it confidently from scratch — what should I do next",
+        "url": "https://www.reddit.com/r/learnpython/comments/1qtslxl/i_understand_python_code_but_cant_write_it/",
+        "thumbnail": null,
+        "num_upvotes": "88",
+        "num_comments": 63
+      },
+      {
+        "community": "motorola",
+        "community_url": "https://www.reddit.com/r/motorola/comments/1tzlap4/remap_ai_key_button_to_other_activitiesapp_for/",
+        "title": "Remap AI Key button to other Activities/App (for Double/Long Press)",
+        "url": "https://www.reddit.com/r/motorola/comments/1tzlap4/remap_ai_key_button_to_other_activitiesapp_for/",
+        "thumbnail": null,
+        "num_upvotes": "18",
+        "num_comments": 25
+      },
+      {
+        "community": "rusegame",
+        "community_url": "https://www.reddit.com/r/rusegame/comments/1utac6w/ruse_mod_manager_v117_fixes_a_startup_freeze_when/",
+        "title": "RUSE Mod Manager v1.1.7 — fixes a startup freeze when an update was waiting (heads up: you'll need to update by hand this one time)",
+        "url": "https://www.reddit.com/r/rusegame/comments/1utac6w/ruse_mod_manager_v117_fixes_a_startup_freeze_when/",
+        "thumbnail": null,
+        "num_upvotes": "12",
+        "num_comments": 2
+      },
+      {
+        "community": "learnpython",
+        "community_url": "https://www.reddit.com/r/learnpython/comments/1nc4k53/how_do_i_actually_get_good_at_python/",
+        "title": "How do I actually get good at Python?",
+        "url": "https://www.reddit.com/r/learnpython/comments/1nc4k53/how_do_i_actually_get_good_at_python/",
+        "thumbnail": null,
+        "num_upvotes": "268",
+        "num_comments": 109
+      },
+      {
+        "community": "addons4kodi",
+        "community_url": "https://www.reddit.com/r/Addons4Kodi/comments/1u4stqr/gears_error_wont_allow_me_to_select_anything_to/",
+        "title": "Gears error, won't allow me to select anything to watch :-(",
+        "url": "https://www.reddit.com/r/Addons4Kodi/comments/1u4stqr/gears_error_wont_allow_me_to_select_anything_to/",
+        "thumbnail": null,
+        "num_upvotes": "8",
+        "num_comments": 20
+      },
+      {
+        "community": "wutheringwavesguide",
+        "community_url": "https://www.reddit.com/r/WutheringWavesGuide/comments/1uqwol3/bug_permanent_utility_lock_you_cannot_currently/",
+        "title": "[Bug] Permanent Utility Lock / \"You cannot currently use this function\" (Even with no active quests, video attached)",
+        "url": "https://www.reddit.com/r/WutheringWavesGuide/comments/1uqwol3/bug_permanent_utility_lock_you_cannot_currently/",
+        "thumbnail": null,
+        "num_upvotes": "12",
+        "num_comments": 11
+      },
+      {
+        "community": "learnpython",
+        "community_url": "https://www.reddit.com/r/learnpython/comments/1n6gno5/beginner_struggling_after_1_week_whats_the_best/",
+        "title": "Beginner struggling after 1 week what’s the best way to actually learn Python?",
+        "url": "https://www.reddit.com/r/learnpython/comments/1n6gno5/beginner_struggling_after_1_week_whats_the_best/",
+        "thumbnail": null,
+        "num_upvotes": "62",
+        "num_comments": 78
+      },
+      {
+        "community": "learnpython",
+        "community_url": "https://www.reddit.com/r/learnpython/comments/1vu60qc/what_python_concept_took_you_the_longest_to/",
+        "title": "What Python concept took you the longest to understand properly?",
+        "url": "https://www.reddit.com/r/learnpython/comments/1vu60qc/what_python_concept_took_you_the_longest_to/",
+        "thumbnail": null,
+        "num_upvotes": "163",
+        "num_comments": 102
+      },
+      {
+        "community": "learnpython",
+        "community_url": "https://www.reddit.com/r/learnpython/comments/1qispeb/how_do_i_put_a_space_between_every_character_in_a/",
+        "title": "How do I put a space between every character in a string?",
+        "url": "https://www.reddit.com/r/learnpython/comments/1qispeb/how_do_i_put_a_space_between_every_character_in_a/",
+        "thumbnail": null,
+        "num_upvotes": "10",
+        "num_comments": 14
+      },
+      {
+        "community": "learnpython",
+        "community_url": "https://www.reddit.com/r/learnpython/comments/1q3wbxx/please_help_me_figure_out_what_to_do_after/",
+        "title": "Please help me figure out what to do after learning basic python.",
+        "url": "https://www.reddit.com/r/learnpython/comments/1q3wbxx/please_help_me_figure_out_what_to_do_after/",
+        "thumbnail": null,
+        "num_upvotes": "35",
+        "num_comments": 37
+      },
+      {
+        "community": "learnpython",
+        "community_url": "https://www.reddit.com/r/learnpython/comments/1ss7tum/is_there_even_a_point_to_learning_python_anymore/",
+        "title": "Is there even a point to learning python anymore?",
+        "url": "https://www.reddit.com/r/learnpython/comments/1ss7tum/is_there_even_a_point_to_learning_python_anymore/",
+        "thumbnail": null,
+        "num_upvotes": "0",
+        "num_comments": 68
+      },
+      {
+        "community": "learnpython",
+        "community_url": "https://www.reddit.com/r/learnpython/comments/1npjk65/im_planning_on_learning_python/",
+        "title": "I'm planning on learning python specifically/strictly for AI, is this a smart decision to save time?",
+        "url": "https://www.reddit.com/r/learnpython/comments/1npjk65/im_planning_on_learning_python/",
+        "thumbnail": null,
+        "num_upvotes": "0",
+        "num_comments": 16
+      },
+      {
+        "community": "pythonlearning",
+        "community_url": "https://www.reddit.com/r/PythonLearning/comments/1v68zr3/how_to_turn_off_these_random_hintsy/",
+        "title": "How to turn off these random hintsy",
+        "url": "https://www.reddit.com/r/PythonLearning/comments/1v68zr3/how_to_turn_off_these_random_hintsy/",
+        "thumbnail": null,
+        "num_upvotes": "30",
+        "num_comments": 9
+      },
+      {
+        "community": "learnpython",
+        "community_url": "https://www.reddit.com/r/learnpython/comments/1ovwys1/best_app_to_learn_python/",
+        "title": "Best app to learn python?",
+        "url": "https://www.reddit.com/r/learnpython/comments/1ovwys1/best_app_to_learn_python/",
+        "thumbnail": null,
+        "num_upvotes": "23",
+        "num_comments": 25
+      },
+      {
+        "community": "learnpython",
+        "community_url": "https://www.reddit.com/r/learnpython/comments/1tfm72l/i_made_this_15_hours_into_python/",
+        "title": "I made this 1.5 hours into python",
+        "url": "https://www.reddit.com/r/learnpython/comments/1tfm72l/i_made_this_15_hours_into_python/",
+        "thumbnail": null,
+        "num_upvotes": "139",
+        "num_comments": 116
+      },
+      {
+        "community": "learnpython",
+        "community_url": "https://www.reddit.com/r/learnpython/comments/1rv549m/how_do_you_actually_practice_python_without/",
+        "title": "How do you actually practice Python without getting stuck in tutorial mode?",
+        "url": "https://www.reddit.com/r/learnpython/comments/1rv549m/how_do_you_actually_practice_python_without/",
+        "thumbnail": null,
+        "num_upvotes": "89",
+        "num_comments": 38
+      },
+      {
+        "community": "learnpython",
+        "community_url": "https://www.reddit.com/r/learnpython/comments/1vnyqqz/python_is_so_confusing_to_me/",
+        "title": "Python is so confusing to me.",
+        "url": "https://www.reddit.com/r/learnpython/comments/1vnyqqz/python_is_so_confusing_to_me/",
+        "thumbnail": null,
+        "num_upvotes": "22",
+        "num_comments": 54
+      },
+      {
+        "community": "learnpython",
+        "community_url": "https://www.reddit.com/r/learnpython/comments/1s9wndl/i_just_started_my_intro_to_python_course_and_im/",
+        "title": "I just started my Intro to Python course and I'm having a blast!",
+        "url": "https://www.reddit.com/r/learnpython/comments/1s9wndl/i_just_started_my_intro_to_python_course_and_im/",
+        "thumbnail": null,
+        "num_upvotes": "44",
+        "num_comments": 18
+      },
+      {
+        "community": "learnpython",
+        "community_url": "https://www.reddit.com/r/learnpython/comments/1u8bl0z/how_did_you_find_fun_projects_to_stay_motivated/",
+        "title": "How did you find fun projects to stay motivated while learning Python?",
+        "url": "https://www.reddit.com/r/learnpython/comments/1u8bl0z/how_did_you_find_fun_projects_to_stay_motivated/",
+        "thumbnail": null,
+        "num_upvotes": "62",
+        "num_comments": 23
+      }
+    ],
+    "comments": [
+      {
+        "comment": "One thing, wait_for_selector is discouraged https://playwright.dev/python/docs/api/class-page#page-wait-for-selector And as mentioned in the \"more locators\" https://playwright.dev/python/docs/locators#more-locators (regarding the nth selector etc): These methods are not recommended because when your page changes, Playwright may click on an element you did not intend. Instead, follow best practices above to create a locator that uniquely identifies the target element. Things for debugging: See what it's seeing: https://playwright.dev/python/docs/screenshots - this might show you that there's another page, that it's slow to load, that the button has a loader, that sort of thing. Print something helpful. Is your print(\"check\") actually helping you? If it appears, that has told you that \"there was a button and calling sleep/click did not throw an error\". Try printing the button, or the button count. Get a fresh version each time. How do you know that when this is running, clicking the first button doesn't trigger a captcha or a cloudflare block? How do you know that the element wasn't disabled? You can theorise because you are looking at the same page in your own browser, but things like user-agents etc can be used by websites to try and prevent web scraping or interaction from non-humans, but you can't prove it. One simple check is to use your locator again in the loop, is there still 2 buttons? Combine this with the print, and you have confirmation of what you actually tried to click. If both uses of click on that selector fail, are you sure you have the right selector? See if you can write a super simple JavaScript that does the same thing, and just run it from the console in your browser. For a starting point, https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector takes the same CSS selectors, https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/click clicks. I'd also suggest adding a clear, singular selector for each button if you can. Then you can try them separately, maybe the first one you click always works but the second always fails, but you don't know in a loop. This could look like using a parent element to get the child elements, or if the page is super super unhelpful, using some odd css selectors (like next sibling) or xpath, but avoid if you can. Ideally you'd be able to use some things like filter. For example, if each video is in a div with a title: ## div with the class \"watch\" ### header ### div containing video player with the class \"player\" ############## somewhere in here, play button header = page.getByText(\"Video 1\") video_1_div = page.locator(\".watch\").filter({has: header}) video_1_div.get_by_role(\"button\") But if you've got two identical players with no identifying features at all, you can take a high level element (say a wrapper div with the class \"player\") and use a numbered selector on that which is a little safer. page.get_by_role(\"button\", name=\"start course\").click() time.sleep(2) player_1_wrapper = page.locator(\":nth-match(.player, 1)\") player_1_wrapper.get_by_role(\"button\").click() time.sleep(2) player_2_wrapper = page.locator(\":nth-match(.player, 2)\") player_2_wrapper.get_by_role(\"button\").click() Why use the locator on the player and not the button? Because if you now need to debug this and decided to use the screenshot tool, you can do that on the player rather than only knowing that you have a button, also because if you realise there's actually two buttons or there's an overlay or they add another button at the top of the page or an ad uses the same button style selectors or they change the button classes (in your case, if they changed the colour of their button, you selector breaks because you've included a tailwind style colour class in your selector). And they would likely want to remain at least broadly accessibility compliant, so they want a screenreader to recognise the play button as a button, so the role can be good. You'll need to check if there's other buttons (volume etc). Playing around with JS or jquery in the console can be super helpful for getting an understanding of navigating the dom with things like playwright / beautiful soup.",
+        "url": "https://www.reddit.com/r/learnpython/comments/1vvuwfy/comment/p5fc78e/",
+        "user_commenting": "redditor-2",
+        "user_url": "https://scrubbed.invalid/redditor-3",
+        "date_of_comment": "2026-08-23T15:41:55.501Z",
+        "num_upvotes": 4,
+        "num_replies": 1,
+        "replies": [
+          {
+            "user_replying": "redditor-2",
+            "user_url": "https://scrubbed.invalid/redditor-3",
+            "reply": "Also what does the button do ? Can you test for that happening? That's a much stronger \"it worked\" signal than just printing \"yay I clicked it, honest\" I can test for the button working by just checking if the video's playing. I also tried to put the screenshot command. (Also, it's not even considered a button, but a span; there's no buttons for the videos, just div (container) > span (button) > svg (play icon) ) for button in buttons: button.screenshot(path=(\"R:\\\\1.png\")) button.locator(\".CoverVideo-playButton.bgc-neutral-100\").click() time.sleep(1) print(button) But it just clicks the first element. If I remove the time.sleep(1), it'll click both buttons just fine, but the videos won't play at all. If I put the screenshot after the sleep func, it'll shoot to the next element, but the loop doesn't continue. When I stop the program by X'ing out... Call log: - waiting for locator(\".course--lessons-list__item\").filter(has=locator(\".CoverVideo-playButton.bgc-neutral-100\")).nth(1).locator(\".CoverVideo-playButton.bgc-neutral-100\") ...is shown. I KNOW that playwright knows the list has two elements in it, since I printed it and it found both elements + using CTRL+F in the HTML to confirm their existence. container = page.locator(\".course--lessons-list__item\") buttons = container.filter( has=page.locator(\".CoverVideo-playButton.bgc-neutral-100\") ).all() ^This is the code I changed for the search of the buttons, but still the same issue",
+            "date_of_reply": "2026-08-23T15:44:24.020Z",
+            "num_replies": 1,
+            "num_upvotes": 4
+          }
+        ]
+      },
+      {
+        "comment": "Been working with a playwright script for the past few months. It can be weird at times. Are the two buttons on the same page at the same time?",
+        "url": "https://www.reddit.com/r/learnpython/comments/1vvuwfy/comment/p5c3q8z/",
+        "user_commenting": "redditor-4",
+        "user_url": "https://scrubbed.invalid/redditor-3",
+        "date_of_comment": "2026-08-23T02:32:58.380Z",
+        "num_upvotes": 2,
+        "num_replies": 1,
+        "replies": [
+          {
+            "user_replying": "redditor-1",
+            "user_url": "https://scrubbed.invalid/redditor-3",
+            "reply": "Yup Edit: Ok, so I forgot the X+=1 and now it still doesn't work. Now it skips over #0 and just doesn't click it page.wait_for_selector(\".CoverVideo-playButton.bgc-neutral-100\").scroll_into_view_if_needed() buttons = page.locator(\".CoverVideo-playButton.bgc-neutral-100\") button_length = buttons.count() x=0 while x < button_length: buttons.nth(x).click() time.sleep(2)",
+            "date_of_reply": "2026-08-23T02:33:28.161Z",
+            "num_replies": 1,
+            "num_upvotes": 0
+          }
+        ]
+      }
+    ],
+    "community_url": "https://www.reddit.com/r/learnpython/",
+    "community_description": "Subreddit for posting questions and asking for general advice about all topics related to learning python.",
+    "community_members_num": 1052775,
+    "community_rank": {
+      "community_rank_type": null,
+      "community_rank_value": null
+    },
+    "post_karma": 0,
+    "bio_description": null,
+    "embedded_links": null,
+    "description_markdown": "\n        \n     \n       \n       \n      I&apos;m currently trying to click 2 buttons on a website that have videos playing on them. However, when I have the &quot;time.sleep(2)&quot; function in the loop, the loop stops. I&apos;ve checked the selector and it points to 2 different play buttons on the page. I checked clicking on the button in my actual browser to see if the site updates anything--nothing. Any help would be highly appreciated\n      \ndef download_page(url:str):\n&#xA0; &#xA0; with sync_playwright() as p:\n&#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; print(f&quot;Opening {url}...&quot;)\n&#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; browser = p.chromium.connect_over_cdp(endpoint_url)\n&#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; context = browser.contexts[0]\n&#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; page = context.pages[0]\n&#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; page.on(&quot;response&quot;, lambda request: print(request.url))\n&#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; reponse = page.goto(url, wait_until=&quot;load&quot;)\n&#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; # context.set_default_timeout(300.0)\n&#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; try:\n&#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; #Check &quot;Continuing for course&quot;\n&#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; page.wait_for_selector(&quot;.btn.btn-quaternary.btn-xl.btn-block-sm-down.course-progress__btn.js-course-progress__start-course&quot;).scroll_into_view_if_needed()\n&#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; page.locator(&quot;.btn.btn-quaternary.btn-xl.btn-block-sm-down.course-progress__btn.js-course-progress__start-course&quot;).click()\n&#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; \n&#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; page.wait_for_selector(&quot;.CoverVideo-playButton.bgc-neutral-100&quot;).scroll_into_view_if_needed()\n&#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; buttons = page.locator(&quot;.CoverVideo-playButton.bgc-neutral-100&quot;).all()\n&#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; \n&#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; for button in buttons:\n&#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; time.sleep(2)\n&#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; button.click()\n&#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; print(&quot;check&quot;)\n&#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; \n\n\n&#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; # headers = reponse.request\n&#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; # for value in headers:\n&#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; # &#xA0; &#xA0; print(f&quot;{value}&quot;)\n&#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; except TE:\n&#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; &#xA0; print(&quot;Timeout&quot;) \n     \n      \n     \n       \n      \n       Read more \n     \n      \n       \n      \n     \n     \n    \n    ",
+    "subreddit_icon_image": "https://styles.redditmedia.com/t5_2r8ot/styles/communityIcon_jwr5s7l5ici61.png?width=96&height=96&frame=1&auto=webp&s=b02f9795cfd640038e1af42b4db6fd4995728ad0",
+    "author_icon": "https://scrubbed.invalid/redditor-5",
+    "user_id": "redditor-6",
+    "archived": "false",
+    "locked_post": false,
+    "timestamp": "2026-09-04T17:02:45.309Z",
+    "input": {
+      "url": "https://www.reddit.com/r/learnpython/comments/1vvuwfy/playwright_button_is_clicked_but_doesnt_continue/"
+    },
+    "discovery_input": {
+      "keyword": "playwright tests keep breaking",
+      "date": "Past month",
+      "num_of_posts": 5,
+      "sort_by": ""
+    }
+  },
+  {
+    "post_id": "t3_1vydwa6",
+    "url": "https://www.reddit.com/r/usertesting/comments/1vydwa6/anyone_else_just_get_shut_down/",
+    "user_posted": "redditor-7",
+    "title": "Anyone else just get shut down?",
+    "description": "I was taking some tests on the Intellizoom/UT platform and all of a sudden all of my screeners disappeared and I noticed all of my payments got cancelled. Not sure why. Anyone else experience this today or recently? Edit: this morning 8/27 everything appears to be restored but no email from customer service about jt. Edit 2: got an email stating they messed up and all should be back to normal. Read more",
+    "num_comments": 63,
+    "date_posted": "2026-08-25T21:56:34.329Z",
+    "community_name": "usertesting",
+    "num_upvotes": 14,
+    "photos": null,
+    "videos": null,
+    "tag": null,
+    "related_posts": [
+      {
+        "community": "askuk",
+        "community_url": "https://www.reddit.com/r/AskUK/comments/1vzlclk/are_all_schools_coming_down_hard_on_packed_lunches/",
+        "title": "Are all schools coming down hard on packed lunches?",
+        "url": "https://www.reddit.com/r/AskUK/comments/1vzlclk/are_all_schools_coming_down_hard_on_packed_lunches/",
+        "thumbnail": null,
+        "num_upvotes": "459",
+        "num_comments": 542
+      },
+      {
+        "community": null,
+        "community_url": "https://www.reddit.com/user/splash_sports/",
+        "title": "How my group finally solved the 'who's paying?' problem in our NFL Survivor contest",
+        "url": null,
+        "thumbnail": null,
+        "num_upvotes": null,
+        "num_comments": null
+      },
+      {
+        "community": "nba",
+        "community_url": "https://www.reddit.com/r/nba/comments/1vyxawx/cowherd_when_i_see_a_picture_of_him_luka_don%C4%8Di%C4%87/",
+        "title": "Cowherd: \"When I see a picture of him (Luka Dončić) slimmed down, and people are buzzing. Guys, that’s the baseline... This is what a pro athlete should look like. We shouldn’t be buzzing every other year. 'Huh, put him on Men's Health.' He's a pro athlete. Gotta just stay in shape\"",
+        "url": "https://www.reddit.com/r/nba/comments/1vyxawx/cowherd_when_i_see_a_picture_of_him_luka_don%C4%8Di%C4%87/",
+        "thumbnail": null,
+        "num_upvotes": "3124",
+        "num_comments": 911
+      },
+      {
+        "community": "usertesting",
+        "community_url": "https://www.reddit.com/r/usertesting/comments/1mxafk3/my_first_2_months_on_usertesting_and_why_im_done/",
+        "title": "My First 2 Months on UserTesting and Why I’m Done",
+        "url": "https://www.reddit.com/r/usertesting/comments/1mxafk3/my_first_2_months_on_usertesting_and_why_im_done/",
+        "thumbnail": null,
+        "num_upvotes": "67",
+        "num_comments": 50
+      },
+      {
+        "community": "fireemblem",
+        "community_url": "https://www.reddit.com/r/fireemblem/comments/1vyy1je/parts_of_the_taken_downprivated_video_from/",
+        "title": "parts of the taken down/privated video from gamersyde official(the one that had 11 minutes of gameplay, and showed early dialogue of eshmel and hong hua and the cai/dietrich/theodora's class as enemies, and lind's class)",
+        "url": "https://www.reddit.com/r/fireemblem/comments/1vyy1je/parts_of_the_taken_downprivated_video_from/",
+        "thumbnail": null,
+        "num_upvotes": "85",
+        "num_comments": 77
+      },
+      {
+        "community": "usertesting",
+        "community_url": "https://www.reddit.com/r/usertesting/comments/xdm82d/detailed_review_of_my_first_30_days_on_usertesting/",
+        "title": "DETAILED review of my first 30 days on UserTesting",
+        "url": "https://www.reddit.com/r/usertesting/comments/xdm82d/detailed_review_of_my_first_30_days_on_usertesting/",
+        "thumbnail": null,
+        "num_upvotes": "478",
+        "num_comments": 266
+      },
+      {
+        "community": "usertesting",
+        "community_url": "https://www.reddit.com/r/usertesting/comments/106xybk/i_love_usertesting_been_on_ut_for_2_months_and_i/",
+        "title": "I love UserTesting! Been on UT for 2 months and I made $400+ in December!",
+        "url": "https://www.reddit.com/r/usertesting/comments/106xybk/i_love_usertesting_been_on_ut_for_2_months_and_i/",
+        "thumbnail": null,
+        "num_upvotes": "26",
+        "num_comments": 70
+      },
+      {
+        "community": "usertesting",
+        "community_url": "https://www.reddit.com/r/usertesting/comments/142y4o3/it_is_possible_to_make_a_lot_from_usertesting/",
+        "title": "It is possible to make a lot from UserTesting",
+        "url": "https://www.reddit.com/r/usertesting/comments/142y4o3/it_is_possible_to_make_a_lot_from_usertesting/",
+        "thumbnail": null,
+        "num_upvotes": "56",
+        "num_comments": 73
+      },
+      {
+        "community": "usertesting",
+        "community_url": "https://www.reddit.com/r/usertesting/comments/1qvsqzk/something_went_wrong_error_on_every_test_for_the/",
+        "title": "\"Something went wrong\" error on every test for the last week :(",
+        "url": "https://www.reddit.com/r/usertesting/comments/1qvsqzk/something_went_wrong_error_on_every_test_for_the/",
+        "thumbnail": null,
+        "num_upvotes": "8",
+        "num_comments": 24
+      },
+      {
+        "community": "usertesting",
+        "community_url": "https://www.reddit.com/r/usertesting/comments/1urmwg2/are_these_people_serious/",
+        "title": "Are these people serious?",
+        "url": "https://www.reddit.com/r/usertesting/comments/1urmwg2/are_these_people_serious/",
+        "thumbnail": null,
+        "num_upvotes": "51",
+        "num_comments": 29
+      },
+      {
+        "community": "journalism",
+        "community_url": "https://www.reddit.com/r/Journalism/comments/1vz4jas/ai_stole_me_article_a_way_to_take_it_down/",
+        "title": "AI stole me article. A way to take it down",
+        "url": "https://www.reddit.com/r/Journalism/comments/1vz4jas/ai_stole_me_article_a_way_to_take_it_down/",
+        "thumbnail": null,
+        "num_upvotes": "28",
+        "num_comments": 9
+      },
+      {
+        "community": "beermoney",
+        "community_url": "https://www.reddit.com/r/beermoney/comments/i03we2/how_to_pass_the_usertesting_sample_test_in_your/",
+        "title": "How to pass the Usertesting Sample Test (in your first attempt)",
+        "url": "https://www.reddit.com/r/beermoney/comments/i03we2/how_to_pass_the_usertesting_sample_test_in_your/",
+        "thumbnail": null,
+        "num_upvotes": "121",
+        "num_comments": 61
+      },
+      {
+        "community": "beermoney",
+        "community_url": "https://www.reddit.com/r/beermoney/comments/1jn9ma4/how_is_your_experience_with_usertesting/",
+        "title": "How is your experience with UserTesting?",
+        "url": "https://www.reddit.com/r/beermoney/comments/1jn9ma4/how_is_your_experience_with_usertesting/",
+        "thumbnail": null,
+        "num_upvotes": "20",
+        "num_comments": 36
+      },
+      {
+        "community": "usertesting",
+        "community_url": "https://www.reddit.com/r/usertesting/comments/1bkgvpu/is_usertesting_a_side_hustle_or_your_main_income/",
+        "title": "Is UserTesting a side hustle or your main income? Has it been worth it overall?",
+        "url": "https://www.reddit.com/r/usertesting/comments/1bkgvpu/is_usertesting_a_side_hustle_or_your_main_income/",
+        "thumbnail": null,
+        "num_upvotes": "25",
+        "num_comments": 57
+      },
+      {
+        "community": "redsox",
+        "community_url": "https://www.reddit.com/r/redsox/comments/1vz82jd/we_have_3_players_who_could_receive_downballot/",
+        "title": "We have 3 players who could receive down-ballot MVP votes",
+        "url": "https://www.reddit.com/r/redsox/comments/1vz82jd/we_have_3_players_who_could_receive_downballot/",
+        "thumbnail": null,
+        "num_upvotes": "38",
+        "num_comments": 34
+      },
+      {
+        "community": "technology",
+        "community_url": "https://www.reddit.com/r/technology/comments/1vddxka/reddit_stock_tumbles_the_most_on_record_as_lack/",
+        "title": "Reddit stock tumbles the most on record as lack of new AI deals, US daily users metric disappoints",
+        "url": "https://www.reddit.com/r/technology/comments/1vddxka/reddit_stock_tumbles_the_most_on_record_as_lack/",
+        "thumbnail": null,
+        "num_upvotes": "3561",
+        "num_comments": 424
+      },
+      {
+        "community": "beermoney",
+        "community_url": "https://www.reddit.com/r/beermoney/comments/1344psg/any_feedbackopinion_websites_like_usertesting/",
+        "title": "Any feedback/opinion websites like UserTesting?",
+        "url": "https://www.reddit.com/r/beermoney/comments/1344psg/any_feedbackopinion_websites_like_usertesting/",
+        "thumbnail": null,
+        "num_upvotes": "50",
+        "num_comments": 20
+      },
+      {
+        "community": "usertesting",
+        "community_url": "https://www.reddit.com/r/usertesting/comments/1vulc8v/apparently_they_only_want_the_rich/",
+        "title": "Apparently they only want the rich",
+        "url": "https://www.reddit.com/r/usertesting/comments/1vulc8v/apparently_they_only_want_the_rich/",
+        "thumbnail": null,
+        "num_upvotes": "70",
+        "num_comments": 37
+      },
+      {
+        "community": "usertesting",
+        "community_url": "https://www.reddit.com/r/usertesting/comments/hpfaxi/legit/",
+        "title": "Legit?",
+        "url": "https://www.reddit.com/r/usertesting/comments/hpfaxi/legit/",
+        "thumbnail": null,
+        "num_upvotes": "48",
+        "num_comments": 63
+      },
+      {
+        "community": "steam",
+        "community_url": "https://www.reddit.com/r/Steam/comments/1vowyug/do_you_think_steam_will_shut_down_any_time_soon/",
+        "title": "Do you think steam will shut down any time soon?",
+        "url": "https://www.reddit.com/r/Steam/comments/1vowyug/do_you_think_steam_will_shut_down_any_time_soon/",
+        "thumbnail": null,
+        "num_upvotes": "0",
+        "num_comments": 36
+      },
+      {
+        "community": "xbox",
+        "community_url": "https://www.reddit.com/r/xbox/comments/1vzi42d/are_xbox_servers_down/",
+        "title": "Are xbox servers down?",
+        "url": "https://www.reddit.com/r/xbox/comments/1vzi42d/are_xbox_servers_down/",
+        "thumbnail": null,
+        "num_upvotes": "20",
+        "num_comments": 24
+      },
+      {
+        "community": "usertesting",
+        "community_url": "https://www.reddit.com/r/usertesting/comments/1rco3wp/ill_pass_on_this_one/",
+        "title": "I'll pass on this one",
+        "url": "https://www.reddit.com/r/usertesting/comments/1rco3wp/ill_pass_on_this_one/",
+        "thumbnail": null,
+        "num_upvotes": "41",
+        "num_comments": 16
+      },
+      {
+        "community": "productreview",
+        "community_url": "https://www.reddit.com/r/productreview/comments/1kfp3wb/is_usertesting_still_worth_doing_in_2025/",
+        "title": "Is UserTesting Still Worth Doing in 2025?",
+        "url": "https://www.reddit.com/r/productreview/comments/1kfp3wb/is_usertesting_still_worth_doing_in_2025/",
+        "thumbnail": null,
+        "num_upvotes": "29",
+        "num_comments": 8
+      },
+      {
+        "community": "help",
+        "community_url": "https://www.reddit.com/r/help/comments/1obk0ue/is_anyone_else_having_issues_with_reddit_today_is/",
+        "title": "Is anyone else having issues with Reddit today? Is Reddit acting weird for anyone else today? Pages not loading / profile stuck?",
+        "url": "https://www.reddit.com/r/help/comments/1obk0ue/is_anyone_else_having_issues_with_reddit_today_is/",
+        "thumbnail": null,
+        "num_upvotes": "58",
+        "num_comments": 72
+      },
+      {
+        "community": "help",
+        "community_url": "https://www.reddit.com/r/help/comments/1sf75kl/is_reddit_down_again/",
+        "title": "Is reddit down AGAIN?",
+        "url": "https://www.reddit.com/r/help/comments/1sf75kl/is_reddit_down_again/",
+        "thumbnail": null,
+        "num_upvotes": "13",
+        "num_comments": 30
+      },
+      {
+        "community": "help",
+        "community_url": "https://www.reddit.com/r/help/comments/1qfynop/help_is_anyone_elses_reddit_app_down/",
+        "title": "help? is anyone else's reddit app down",
+        "url": "https://www.reddit.com/r/help/comments/1qfynop/help_is_anyone_elses_reddit_app_down/",
+        "thumbnail": null,
+        "num_upvotes": "5",
+        "num_comments": 19
+      }
+    ],
+    "comments": [
+      {
+        "comment": "Everything came back up for me. I just never got an explanation or a follow up to my service request.",
+        "url": "https://www.reddit.com/r/usertesting/comments/1vydwa6/comment/p6jfnsz/",
+        "user_commenting": "redditor-8",
+        "user_url": "https://scrubbed.invalid/redditor-9",
+        "date_of_comment": "2026-08-29T02:37:14.199Z",
+        "num_upvotes": 1,
+        "num_replies": 0,
+        "replies": []
+      },
+      {
+        "comment": "I haven't been restored yet. Anyone else?",
+        "url": "https://www.reddit.com/r/usertesting/comments/1vydwa6/comment/p6gcy4m/",
+        "user_commenting": "redditor-10",
+        "user_url": "https://scrubbed.invalid/redditor-9",
+        "date_of_comment": "2026-08-28T17:18:02.025Z",
+        "num_upvotes": 1,
+        "num_replies": 1
+      },
+      {
+        "comment": "Yes. I thought it was only me but I gues not.",
+        "url": "https://www.reddit.com/r/usertesting/comments/1vydwa6/comment/p6awxi1/",
+        "user_commenting": "redditor-10",
+        "user_url": "https://scrubbed.invalid/redditor-9",
+        "date_of_comment": "2026-08-27T22:04:24.052Z",
+        "num_upvotes": 2,
+        "num_replies": 0,
+        "replies": []
+      },
+      {
+        "comment": "Payments are starting to come through! I just received the first two that were missed yesterday",
+        "url": "https://www.reddit.com/r/usertesting/comments/1vydwa6/comment/p67jfmw/",
+        "user_commenting": "redditor-11",
+        "user_url": "https://scrubbed.invalid/redditor-9",
+        "date_of_comment": "2026-08-27T13:25:36.163Z",
+        "num_upvotes": 1,
+        "num_replies": 0,
+        "replies": []
+      },
+      {
+        "comment": "My tests are also now back on my dashboard 🙌🏼",
+        "url": "https://www.reddit.com/r/usertesting/comments/1vydwa6/comment/p66vru0/",
+        "user_commenting": "redditor-12",
+        "user_url": "https://scrubbed.invalid/redditor-9",
+        "date_of_comment": "2026-08-27T11:17:25.646Z",
+        "num_upvotes": 2,
+        "num_replies": 1
+      },
+      {
+        "comment": "My payments are back at pending!! It still looks like I’m locked out of testing though because not even surveys are on my dash but payments have been restored!! Sorry, something went wrong when loading this video. View in app",
+        "url": "https://www.reddit.com/r/usertesting/comments/1vydwa6/comment/p66ptqx/",
+        "user_commenting": "redditor-12",
+        "user_url": "https://scrubbed.invalid/redditor-9",
+        "date_of_comment": "2026-08-27T10:37:48.742Z",
+        "num_upvotes": 1,
+        "num_replies": 2
+      },
+      {
+        "comment": "My tests have been moved from Canceled back to Pending. But missed payments have note been made. I tried to add that to my support ticket, but the response from the chat bot was to just keep ending the chat and asking me to rate the support.",
+        "url": "https://www.reddit.com/r/usertesting/comments/1vydwa6/comment/p66oozk/",
+        "user_commenting": "redditor-11",
+        "user_url": "https://scrubbed.invalid/redditor-9",
+        "date_of_comment": "2026-08-27T10:29:50.212Z",
+        "num_upvotes": 1,
+        "num_replies": 1
+      },
+      {
+        "comment": "Sounds like another one of their many glitches they won’t communicate about and will just miraculously “fix” without reason.",
+        "url": "https://www.reddit.com/r/usertesting/comments/1vydwa6/comment/p636alx/",
+        "user_commenting": "redditor-13",
+        "user_url": "https://scrubbed.invalid/redditor-9",
+        "date_of_comment": "2026-08-26T21:08:23.738Z",
+        "num_upvotes": 2,
+        "num_replies": 0,
+        "replies": []
+      },
+      {
+        "comment": "Anyone get an update yet?",
+        "url": "https://www.reddit.com/r/usertesting/comments/1vydwa6/comment/p61r3mm/",
+        "user_commenting": "redditor-12",
+        "user_url": "https://scrubbed.invalid/redditor-9",
+        "date_of_comment": "2026-08-26T17:29:35.057Z",
+        "num_upvotes": 1,
+        "num_replies": 1
+      },
+      {
+        "comment": "Same has happened to me (in the UK). About 2 hours ago I noticed all my pending User Tests worth $486 have been marked as red and cancelled! This is not a good show and clearly seems to be an error at UT's end. I've send a ticket for all the good that will do but I just with that User Testing would have the courtesy of putting up a status message about this issue on their HomePage when you log in, as so many people will think that their accounts have been suspended or something! 😡",
+        "url": "https://www.reddit.com/r/usertesting/comments/1vydwa6/comment/p5zmoy2/",
+        "user_commenting": "redditor-14",
+        "user_url": "https://scrubbed.invalid/redditor-9",
+        "date_of_comment": "2026-08-26T11:43:28.274Z",
+        "num_upvotes": 2,
+        "num_replies": 0,
+        "replies": []
+      },
+      {
+        "comment": "Exactly the same. Have done 279 over the last 18 months and the last 6 are showing as cancelled!!! no explanation!! and seems to just show as something went wrong when you try to complete one!!!",
+        "url": "https://www.reddit.com/r/usertesting/comments/1vydwa6/comment/p5yzodl/",
+        "user_commenting": "redditor-15",
+        "user_url": "https://scrubbed.invalid/redditor-9",
+        "date_of_comment": "2026-08-26T08:58:51.009Z",
+        "num_upvotes": 1,
+        "num_replies": 0,
+        "replies": []
+      },
+      {
+        "comment": "I hadn’t noticed until I saw this. The same has happened to men",
+        "url": "https://www.reddit.com/r/usertesting/comments/1vydwa6/comment/p5yq48e/",
+        "user_commenting": "redditor-16",
+        "user_url": "https://scrubbed.invalid/redditor-9",
+        "date_of_comment": "2026-08-26T07:39:11.816Z",
+        "num_upvotes": 1,
+        "num_replies": 0,
+        "replies": []
+      },
+      {
+        "comment": "What is that?",
+        "url": "https://www.reddit.com/r/usertesting/comments/1vydwa6/comment/p5y2xv3/",
+        "user_commenting": "redditor-17",
+        "user_url": "https://scrubbed.invalid/redditor-9",
+        "date_of_comment": "2026-08-26T04:39:09.495Z",
+        "num_upvotes": 1,
+        "num_replies": 0,
+        "replies": []
+      },
+      {
+        "comment": "Has to go check and see if I was impacted. Seem to be good. Happened to me a month or two ago and took a week or so to get resolved. Apparently they still don't have their shit together and AI going off the rails again.",
+        "url": "https://www.reddit.com/r/usertesting/comments/1vydwa6/comment/p5xaqes/",
+        "user_commenting": "redditor-18",
+        "user_url": "https://scrubbed.invalid/redditor-9",
+        "date_of_comment": "2026-08-26T01:48:29.316Z",
+        "num_upvotes": 3,
+        "num_replies": 0,
+        "replies": []
+      }
+    ],
+    "community_url": "https://www.reddit.com/r/usertesting/",
+    "community_description": "This is a subreddit for UserTesting and sites like it. User testing sites are sites where you test websites for people and get paid. It is a good side job and if you work at it you can make a decent amount of money.\n\nThis sub is mainly for Testers.",
+    "community_members_num": 40007,
+    "community_rank": {
+      "community_rank_type": null,
+      "community_rank_value": null
+    },
+    "post_karma": 0,
+    "bio_description": null,
+    "embedded_links": null,
+    "description_markdown": "\n        \n     \n       \n       \n      I was taking some tests on the Intellizoom/UT platform and all of a sudden all of my screeners disappeared and I noticed all of my payments got cancelled. Not sure why. Anyone else experience this today or recently?\n      \n      Edit: this morning 8/27 everything appears to be restored but no email from customer service about jt.\n      \n      Edit 2: got an email stating they messed up and all should be back to normal.\n     \n     \n      \n     \n       \n      \n       Read more \n     \n      \n       \n      \n     \n     \n    \n    ",
+    "subreddit_icon_image": "https://styles.redditmedia.com/t5_2wx4f/styles/communityIcon_edwnqsbrcv331.png?width=96&height=96&frame=1&auto=webp&s=f8060da814e413836b3fc7718aab63fa53f2b326",
+    "author_icon": "https://scrubbed.invalid/redditor-19",
+    "user_id": "redditor-20",
+    "archived": "false",
+    "locked_post": false,
+    "timestamp": "2026-09-04T17:02:45.898Z",
+    "input": {
+      "url": "https://www.reddit.com/r/usertesting/comments/1vydwa6/anyone_else_just_get_shut_down/"
+    },
+    "discovery_input": {
+      "keyword": "playwright tests keep breaking",
+      "date": "Past month",
+      "num_of_posts": 5,
+      "sort_by": ""
+    }
+  },
+  {
+    "post_id": "t3_1vsozsw",
+    "url": "https://www.reddit.com/r/usertesting/comments/1vsozsw/every_test_today_which_i_have_qualified_for/",
+    "user_posted": "redditor-21",
+    "title": "every test today which I have qualified for 'something went wrong'",
+    "description": "i have tried using Edge and also Chrome but get same results. managed to do 5 or 6 yesterday without issue. also the ones which require location verification also dont work.( on mobile). it approved my location but when you go back the page doesnt move on.. anyone else getting the same ? Read more",
+    "num_comments": 11,
+    "date_posted": "2026-08-19T15:03:36.963Z",
+    "community_name": "usertesting",
+    "num_upvotes": 3,
+    "photos": null,
+    "videos": null,
+    "tag": null,
+    "related_posts": [
+      {
+        "community": "dmv",
+        "community_url": "https://www.reddit.com/r/DMV/comments/1uhcm66/i_took_my_online_permit_exam_seven_months_ago_why/",
+        "title": "I took my online permit exam seven months ago, why does it still say in progress",
+        "url": "https://www.reddit.com/r/DMV/comments/1uhcm66/i_took_my_online_permit_exam_seven_months_ago_why/",
+        "thumbnail": null,
+        "num_upvotes": "1",
+        "num_comments": 2
+      },
+      {
+        "community": null,
+        "community_url": "https://www.reddit.com/user/FarmersInsurance/",
+        "title": "We know how Reddit works. One question turns into 12 tabs and 47 comments. We'll keep the insurance part simpler.",
+        "url": null,
+        "thumbnail": null,
+        "num_upvotes": null,
+        "num_comments": null
+      },
+      {
+        "community": "gmail",
+        "community_url": "https://www.reddit.com/r/GMail/comments/1u7pw0y/google_suspects_i_am_a_bot_and_doesnt_accept_my/",
+        "title": "Google suspects I am a bot and doesnt accept my appeal, refused 3 times right now going to the forth",
+        "url": "https://www.reddit.com/r/GMail/comments/1u7pw0y/google_suspects_i_am_a_bot_and_doesnt_accept_my/",
+        "thumbnail": null,
+        "num_upvotes": "0",
+        "num_comments": 32
+      },
+      {
+        "community": "usertesting",
+        "community_url": "https://www.reddit.com/r/usertesting/comments/1qjfyso/after_2_years_and_440_tests/",
+        "title": "After 2 years and 440 tests",
+        "url": "https://www.reddit.com/r/usertesting/comments/1qjfyso/after_2_years_and_440_tests/",
+        "thumbnail": null,
+        "num_upvotes": "32",
+        "num_comments": 13
+      },
+      {
+        "community": "outlier_ai",
+        "community_url": "https://www.reddit.com/r/outlier_ai/comments/1u0kxx8/got_onboarded_submitted_assessment_first_failed/",
+        "title": "Got onboarded, submitted assessment first, failed for “AI use” (I didn’t use any) and now account is gone / shows country not available",
+        "url": "https://www.reddit.com/r/outlier_ai/comments/1u0kxx8/got_onboarded_submitted_assessment_first_failed/",
+        "thumbnail": null,
+        "num_upvotes": "5",
+        "num_comments": 8
+      },
+      {
+        "community": "claudeai",
+        "community_url": "https://www.reddit.com/r/ClaudeAI/comments/1ulahiw/ccaf_june_19_submission_still_no_results_after_13/",
+        "title": "CCA-F June 19 submission — Still no results after 13 days while others who took exam after me already got theirs. (Claude Certified Architect)",
+        "url": "https://www.reddit.com/r/ClaudeAI/comments/1ulahiw/ccaf_june_19_submission_still_no_results_after_13/",
+        "thumbnail": null,
+        "num_upvotes": "0",
+        "num_comments": 15
+      },
+      {
+        "community": "gatetard",
+        "community_url": "https://www.reddit.com/r/GATEtard/comments/1u26z25/round_5_done_no_offers_yet_have_i_done_something/",
+        "title": "Round 5 done. No offers yet. Have I done something wrong?",
+        "url": "https://www.reddit.com/r/GATEtard/comments/1u26z25/round_5_done_no_offers_yet_have_i_done_something/",
+        "thumbnail": null,
+        "num_upvotes": "10",
+        "num_comments": 27
+      },
+      {
+        "community": "medicoretards",
+        "community_url": "https://www.reddit.com/r/MEDICOreTARDS/comments/1ubp48l/i_bubbled_one_digit_of_test_booklet_number/",
+        "title": "I bubbled one digit of test booklet number wrongly. Does anyone know what I can do or cannot?",
+        "url": "https://www.reddit.com/r/MEDICOreTARDS/comments/1ubp48l/i_bubbled_one_digit_of_test_booklet_number/",
+        "thumbnail": null,
+        "num_upvotes": "2",
+        "num_comments": 11
+      },
+      {
+        "community": "jeeneetards",
+        "community_url": "https://www.reddit.com/r/JEENEETards/comments/1vmgfuz/my_improvement_exam_result75_but_cbse_bs_boards/",
+        "title": "My improvement exam result(>75%) BUT CBSE BS BOARDS DID THIS. PLEASE READ BODY TEXT",
+        "url": "https://www.reddit.com/r/JEENEETards/comments/1vmgfuz/my_improvement_exam_result75_but_cbse_bs_boards/",
+        "thumbnail": null,
+        "num_upvotes": "2",
+        "num_comments": 10
+      },
+      {
+        "community": "themachinelearning",
+        "community_url": "https://www.reddit.com/r/TheMachineLearning/comments/1w6tsla/maybe_we_should_just_stop_trusting_benchmarks/",
+        "title": "Maybe we should just stop trusting benchmarks entirely at this point",
+        "url": "https://www.reddit.com/r/TheMachineLearning/comments/1w6tsla/maybe_we_should_just_stop_trusting_benchmarks/",
+        "thumbnail": null,
+        "num_upvotes": "51",
+        "num_comments": 26
+      },
+      {
+        "community": "pte",
+        "community_url": "https://www.reddit.com/r/pte/comments/1ulb15o/gave_test_on_30th_june_still_no_results/",
+        "title": "Gave test on 30th june, still no results",
+        "url": "https://www.reddit.com/r/pte/comments/1ulb15o/gave_test_on_30th_june_still_no_results/",
+        "thumbnail": null,
+        "num_upvotes": "1",
+        "num_comments": 3
+      },
+      {
+        "community": "canadaexpressentry",
+        "community_url": "https://www.reddit.com/r/canadaexpressentry/comments/1u2sbz1/no_p1_for_over_100_days_fd_of_approval_recorded/",
+        "title": "No P1 for over 100 days. FD of Approval recorded on GCMS. Tried everything, advice needed.",
+        "url": "https://www.reddit.com/r/canadaexpressentry/comments/1u2sbz1/no_p1_for_over_100_days_fd_of_approval_recorded/",
+        "thumbnail": null,
+        "num_upvotes": "6",
+        "num_comments": 21
+      },
+      {
+        "community": "cognitivetesting",
+        "community_url": "https://www.reddit.com/r/cognitiveTesting/comments/1w5p7q2/we_do_not_get_enough_attention/",
+        "title": "We do not get enough attention",
+        "url": "https://www.reddit.com/r/cognitiveTesting/comments/1w5p7q2/we_do_not_get_enough_attention/",
+        "thumbnail": null,
+        "num_upvotes": "336",
+        "num_comments": 66
+      },
+      {
+        "community": "capm",
+        "community_url": "https://www.reddit.com/r/capm/comments/1v5lav5/exam_didnt_let_me_in_past_the_applications/",
+        "title": "Exam Didn't Let me in Past the Applications Checking, Missed my test time due to the system not working! Anyone else experience this?",
+        "url": "https://www.reddit.com/r/capm/comments/1v5lav5/exam_didnt_let_me_in_past_the_applications/",
+        "thumbnail": null,
+        "num_upvotes": "7",
+        "num_comments": 2
+      },
+      {
+        "community": "cognitivetesting",
+        "community_url": "https://www.reddit.com/r/cognitiveTesting/comments/1w10e1c/how_accurate_is_this_data/",
+        "title": "How accurate is this data?",
+        "url": "https://www.reddit.com/r/cognitiveTesting/comments/1w10e1c/how_accurate_is_this_data/",
+        "thumbnail": null,
+        "num_upvotes": "45",
+        "num_comments": 29
+      },
+      {
+        "community": "leetcode",
+        "community_url": "https://www.reddit.com/r/leetcode/comments/1w0vu7e/my_sincere_admiration_for_people_who_manage_to/",
+        "title": "My sincere admiration for people who manage to pull these types of tests",
+        "url": "https://www.reddit.com/r/leetcode/comments/1w0vu7e/my_sincere_admiration_for_people_who_manage_to/",
+        "thumbnail": null,
+        "num_upvotes": "229",
+        "num_comments": 35
+      },
+      {
+        "community": "whoop",
+        "community_url": "https://www.reddit.com/r/whoop/comments/1u7ga1p/whoop_intial_setup_error_something_went_wrong/",
+        "title": "Whoop Intial Setup Error 'Something went wrong'",
+        "url": "https://www.reddit.com/r/whoop/comments/1u7ga1p/whoop_intial_setup_error_something_went_wrong/",
+        "thumbnail": null,
+        "num_upvotes": "2",
+        "num_comments": 4
+      },
+      {
+        "community": "hesiexam",
+        "community_url": "https://www.reddit.com/r/HESIexam/comments/1v8111l/hesi_a2_launched_my_old_results_instead_of_my/",
+        "title": "HESI A2 launched my old results instead of my scheduled exam. Has this happened to anyone else?",
+        "url": "https://www.reddit.com/r/HESIexam/comments/1v8111l/hesi_a2_launched_my_old_results_instead_of_my/",
+        "thumbnail": null,
+        "num_upvotes": "2",
+        "num_comments": 1
+      },
+      {
+        "community": "torontometu",
+        "community_url": "https://www.reddit.com/r/TorontoMetU/comments/1w2r6vw/what_any_solutions/",
+        "title": "what?! any solutions?",
+        "url": "https://www.reddit.com/r/TorontoMetU/comments/1w2r6vw/what_any_solutions/",
+        "thumbnail": null,
+        "num_upvotes": "41",
+        "num_comments": 15
+      },
+      {
+        "community": "mumbaiuniversity",
+        "community_url": "https://www.reddit.com/r/MumbaiUniversity/comments/1ux9k5w/i_have_applied_for_colleges_for_aiml_through_the/",
+        "title": "I have Applied for colleges for Ai/ml through the portal but still it's showing 'No action taken' from a whole month. Am I already late for taking admissions for bsc ai/ml? I even checked on the individual website of the applied colleges but still no update.",
+        "url": "https://www.reddit.com/r/MumbaiUniversity/comments/1ux9k5w/i_have_applied_for_colleges_for_aiml_through_the/",
+        "thumbnail": null,
+        "num_upvotes": "2",
+        "num_comments": 0
+      },
+      {
+        "community": "micro1_ai",
+        "community_url": "https://www.reddit.com/r/micro1_ai/comments/1vegv72/interview_showing_pending_even_after_i_completed/",
+        "title": "Interview showing pending even after I completed it + dashboard giving network error now",
+        "url": "https://www.reddit.com/r/micro1_ai/comments/1vegv72/interview_showing_pending_even_after_i_completed/",
+        "thumbnail": null,
+        "num_upvotes": "1",
+        "num_comments": 2
+      },
+      {
+        "community": "shittysysadmin",
+        "community_url": "https://www.reddit.com/r/ShittySysadmin/comments/1w6kb5h/who_else_is_supposed_to_review_my_work_the_users/",
+        "title": "Who else is supposed to review my work, the users? HA! 😩",
+        "url": "https://www.reddit.com/r/ShittySysadmin/comments/1w6kb5h/who_else_is_supposed_to_review_my_work_the_users/",
+        "thumbnail": null,
+        "num_upvotes": "27",
+        "num_comments": 10
+      }
+    ],
+    "comments": [
+      {
+        "comment": "Did a test Tuesday night on mobile about Canva AI that was a face recording and about 17 mins long, going fast. It took over an hour for it to upload. I wound up cancelling the upload cause I needed to use my phone. Never had a mobile upload take that long and there was no progress bar or anything. Waste of time. You might want to stay out of that test for now if you get it.",
+        "url": "https://www.reddit.com/r/usertesting/comments/1vsozsw/comment/p4ruf10/",
+        "user_commenting": "redditor-13",
+        "user_url": "https://scrubbed.invalid/redditor-9",
+        "date_of_comment": "2026-08-20T06:24:28.044Z",
+        "num_upvotes": 2,
+        "num_replies": 1,
+        "replies": [
+          {
+            "user_replying": "redditor-22",
+            "user_url": "https://scrubbed.invalid/redditor-9",
+            "reply": "Happened to me as well. 30min test, last upload and just wouldn't complete.",
+            "date_of_reply": "2026-08-21T09:38:05.284Z",
+            "num_replies": 0,
+            "num_upvotes": 2
+          }
+        ]
+      },
+      {
+        "comment": "Yesterday I thought I did great with a test but then I got an email saying it did not upload and that there were a bunch of reasons why it was my fault. SMH.",
+        "url": "https://www.reddit.com/r/usertesting/comments/1vsozsw/comment/p4qyo0i/",
+        "user_commenting": "redditor-23",
+        "user_url": "https://scrubbed.invalid/redditor-9",
+        "date_of_comment": "2026-08-20T02:42:48.127Z",
+        "num_upvotes": 1,
+        "num_replies": 0,
+        "replies": []
+      },
+      {
+        "comment": "there is a specific test which the start button does not work and has been on the site in various iterations for DAYS now. UT figure your 💩 out and hold these researchers accountable for wasting people's time.",
+        "url": "https://www.reddit.com/r/usertesting/comments/1vsozsw/comment/p4qbqb7/",
+        "user_commenting": "redditor-24",
+        "user_url": "https://scrubbed.invalid/redditor-9",
+        "date_of_comment": "2026-08-20T00:35:47.683Z",
+        "num_upvotes": 1,
+        "num_replies": 0,
+        "replies": []
+      },
+      {
+        "comment": "I have three tests which have moved from Pending to Processing, and are overdue payout by a few hours - not seen that before. Apart from that I have had a normal UserTesting experience today, based in the UK..",
+        "url": "https://www.reddit.com/r/usertesting/comments/1vsozsw/comment/p4o6wzf/",
+        "user_commenting": "redditor-25",
+        "user_url": "https://scrubbed.invalid/redditor-9",
+        "date_of_comment": "2026-08-19T18:35:47.354Z",
+        "num_upvotes": 2,
+        "num_replies": 1
+      },
+      {
+        "comment": "Test history is not opening here. Very interesting stuff",
+        "url": "https://www.reddit.com/r/usertesting/comments/1vsozsw/comment/p4nwxoo/",
+        "user_commenting": "redditor-26",
+        "user_url": "https://scrubbed.invalid/redditor-9",
+        "date_of_comment": "2026-08-19T17:54:11.108Z",
+        "num_upvotes": 3,
+        "num_replies": 0,
+        "replies": []
+      },
+      {
+        "comment": "Website is down for me right now",
+        "url": "https://www.reddit.com/r/usertesting/comments/1vsozsw/comment/p4ndnki/",
+        "user_commenting": "redditor-27",
+        "user_url": "https://scrubbed.invalid/redditor-9",
+        "date_of_comment": "2026-08-19T16:33:53.159Z",
+        "num_upvotes": 2,
+        "num_replies": 0,
+        "replies": []
+      },
+      {
+        "comment": "They messed up the platform with the recent update. Everything is shitty now. At a standstill",
+        "url": "https://www.reddit.com/r/usertesting/comments/1vsozsw/comment/p4ncda2/",
+        "user_commenting": "redditor-28",
+        "user_url": "https://scrubbed.invalid/redditor-9",
+        "date_of_comment": "2026-08-19T16:28:29.202Z",
+        "num_upvotes": 3,
+        "num_replies": 0,
+        "replies": []
+      },
+      {
+        "comment": "User testing was sh*t today",
+        "url": "https://www.reddit.com/r/usertesting/comments/1vsozsw/comment/p4mut2u/",
+        "user_commenting": "redditor-29",
+        "user_url": "https://scrubbed.invalid/redditor-9",
+        "date_of_comment": "2026-08-19T15:13:17.325Z",
+        "num_upvotes": 4,
+        "num_replies": 0,
+        "replies": []
+      }
+    ],
+    "community_url": "https://www.reddit.com/r/usertesting/",
+    "community_description": "This is a subreddit for UserTesting and sites like it. User testing sites are sites where you test websites for people and get paid. It is a good side job and if you work at it you can make a decent amount of money.\n\nThis sub is mainly for Testers.",
+    "community_members_num": 40007,
+    "community_rank": {
+      "community_rank_type": null,
+      "community_rank_value": null
+    },
+    "post_karma": 0,
+    "bio_description": null,
+    "embedded_links": null,
+    "description_markdown": "\n        \n     \n       \n       \n      i have tried using Edge and also Chrome but get same results.\n      \n      managed to do 5 or 6 yesterday without issue.\n      \n      also the ones which require location verification also dont work.( on mobile).\n      \n      it approved my location but when you go back the page doesnt move on..\n      \n      anyone else getting the same ?\n     \n     \n      \n     \n       \n      \n       Read more \n     \n      \n       \n      \n     \n     \n    \n    ",
+    "subreddit_icon_image": "https://styles.redditmedia.com/t5_2wx4f/styles/communityIcon_edwnqsbrcv331.png?width=96&height=96&frame=1&auto=webp&s=f8060da814e413836b3fc7718aab63fa53f2b326",
+    "author_icon": "https://scrubbed.invalid/redditor-30",
+    "user_id": "redditor-31",
+    "archived": "false",
+    "locked_post": false,
+    "timestamp": "2026-09-04T17:02:55.089Z",
+    "input": {
+      "url": "https://www.reddit.com/r/usertesting/comments/1vsozsw/every_test_today_which_i_have_qualified_for/"
+    },
+    "discovery_input": {
+      "keyword": "playwright tests keep breaking",
+      "date": "Past month",
+      "num_of_posts": 5,
+      "sort_by": ""
+    }
+  },
+  {
+    "post_id": "t3_1vx2j3t",
+    "url": "https://www.reddit.com/r/ChatGPTCoding/comments/1vx2j3t/my_aiwritten_tests_kept_passing_broken_code_so_i/",
+    "user_posted": "redditor-32",
+    "title": "My AI-written tests kept passing broken code, so I started testing the tests",
+    "description": "I’m not really a programmer. I’ve mostly been making and patching stuff by telling LLMs what I want and then checking whether it actually works. One thing kept pissing me off though. I’d ask it to fix something, it would write a test, the test would pass, and then later I’d find out the test wasn’t actually checking what I thought it was checking. So at some point I started doing a pretty dumb simple thing. After something passed, I’d intentionally break the exact behavior the test was supposed to protect and run the test again. If it still passed, then obviously the test was bullshit. I ran into this with a plugin that had a paged archive. The archive test was green, so I changed the code so only part of the archive would get copied. Test still passed. Then I made the test stricter, and managed to screw it up in the opposite direction. The new test rejected the correct code too, because I had made a bad assumption about how the archive pages would be laid out. So I threw that one away as well. Eventually I got a test where the normal version passed and the deliberately broken version failed for the reason I actually cared about. While doing that I also found a real bug where a failed write could leave part of the stored data changed. After this happened enough times I kind of stopped treating “tests passed” as the end of the story. I started doing the same thing to the stuff that decides whether the tests passed. Basically asking things like, if part of the checking process never ran, could it still say everything was fine? If I gave it old or altered results, would it notice? If it claimed it could rebuild the final result from the original, did it actually do that? It has gradually turned into this whole verification procedure I use when I’m patching things with LLMs. I later found out mutation testing is obviously related to what I was doing, but most of what I’ve read about mutation testing is about breaking the program to see whether the tests notice. What I ended up doing also treats the tests and the rest of the checking process as things that can be wrong. I’ve tried it on a few different plugins/projects now and it has found enough weird false-passes that I’m starting to wonder whether this is actually useful outside my own workflow or whether I just invented an absurdly overcomplicated way of checking AI-written code. Has anyone here done something similar, or is there an existing methodology/tool I should be looking at? Read more",
+    "num_comments": 25,
+    "date_posted": "2026-08-24T13:15:44.105Z",
+    "community_name": "ChatGPTCoding",
+    "num_upvotes": 0,
+    "photos": null,
+    "videos": null,
+    "tag": null,
+    "related_posts": [
+      {
+        "community": "vibecodedevs",
+        "community_url": "https://www.reddit.com/r/VibeCodeDevs/comments/1v46euv/my_ai_agent_kept_saying_done_tests_pass_when_it/",
+        "title": "My AI agent kept saying “Done! Tests pass” when it wasn’t true. I spent months trying to catch it with 50+ text patterns. They all failed. Here’s what finally worked",
+        "url": "https://www.reddit.com/r/VibeCodeDevs/comments/1v46euv/my_ai_agent_kept_saying_done_tests_pass_when_it/",
+        "thumbnail": null,
+        "num_upvotes": "0",
+        "num_comments": 15
+      },
+      {
+        "community": null,
+        "community_url": "https://www.reddit.com/user/anthropic-ai/",
+        "title": "Claude Fable 5.1 is here. Better judgment on hard problems, and it tells you when it's stuck.",
+        "url": null,
+        "thumbnail": null,
+        "num_upvotes": null,
+        "num_comments": null
+      },
+      {
+        "community": "claudecode",
+        "community_url": "https://www.reddit.com/r/ClaudeCode/comments/1v474z0/my_ai_agent_kept_saying_done_tests_pass_when_it/",
+        "title": "My AI agent kept saying “Done! Tests pass” when it wasn’t true. I spent months trying to catch it with 50+ text patterns. They all failed. Here’s what finally worked.",
+        "url": "https://www.reddit.com/r/ClaudeCode/comments/1v474z0/my_ai_agent_kept_saying_done_tests_pass_when_it/",
+        "thumbnail": null,
+        "num_upvotes": "0",
+        "num_comments": 13
+      },
+      {
+        "community": "programiranje",
+        "community_url": "https://www.reddit.com/r/programiranje/comments/1u73jfu/fix_messy_ai_code/",
+        "title": "Fix messy AI code…",
+        "url": "https://www.reddit.com/r/programiranje/comments/1u73jfu/fix_messy_ai_code/",
+        "thumbnail": null,
+        "num_upvotes": "34",
+        "num_comments": 36
+      },
+      {
+        "community": "theaibrain",
+        "community_url": "https://www.reddit.com/r/TheAIBrain/comments/1uff62e/when_ai_becomes_your_coding_partner_not_your/",
+        "title": "When AI becomes your coding partner, not your replacement.",
+        "url": "https://www.reddit.com/r/TheAIBrain/comments/1uff62e/when_ai_becomes_your_coding_partner_not_your/",
+        "thumbnail": null,
+        "num_upvotes": "59",
+        "num_comments": 7
+      },
+      {
+        "community": "theprimeagen",
+        "community_url": "https://www.reddit.com/r/theprimeagen/comments/1rjrayr/why_you_still_need_to_write_code_even_with_ai/",
+        "title": "Why You STILL Need to Write Code (Even With AI)",
+        "url": "https://www.reddit.com/r/theprimeagen/comments/1rjrayr/why_you_still_need_to_write_code_even_with_ai/",
+        "thumbnail": null,
+        "num_upvotes": "30",
+        "num_comments": 13
+      },
+      {
+        "community": "techghana",
+        "community_url": "https://www.reddit.com/r/TechGhana/comments/1rs0tk7/ai_has_killed_coding/",
+        "title": "AI has killed coding",
+        "url": "https://www.reddit.com/r/TechGhana/comments/1rs0tk7/ai_has_killed_coding/",
+        "thumbnail": null,
+        "num_upvotes": "39",
+        "num_comments": 27
+      },
+      {
+        "community": "csmajors",
+        "community_url": "https://www.reddit.com/r/csMajors/comments/1ni4mit/ive_lost_the_ability_to_code_without_ai/",
+        "title": "I've lost the ability to code without AI",
+        "url": "https://www.reddit.com/r/csMajors/comments/1ni4mit/ive_lost_the_ability_to_code_without_ai/",
+        "thumbnail": null,
+        "num_upvotes": "163",
+        "num_comments": 46
+      },
+      {
+        "community": "blackboxai_",
+        "community_url": "https://www.reddit.com/r/BlackboxAI_/comments/1pvnqvv/spent_4_hours_debugging_aigenerated_code_when/",
+        "title": "Spent 4 hours debugging AI-generated code when writing it myself would have taken 30 minutes",
+        "url": "https://www.reddit.com/r/BlackboxAI_/comments/1pvnqvv/spent_4_hours_debugging_aigenerated_code_when/",
+        "thumbnail": null,
+        "num_upvotes": "48",
+        "num_comments": 22
+      },
+      {
+        "community": "developerspak",
+        "community_url": "https://www.reddit.com/r/developersPak/comments/1rehdr9/understand_code_but_cant_code_without_ai/",
+        "title": "Understand code but can't code without AI",
+        "url": "https://www.reddit.com/r/developersPak/comments/1rehdr9/understand_code_but_cant_code_without_ai/",
+        "thumbnail": null,
+        "num_upvotes": "26",
+        "num_comments": 36
+      },
+      {
+        "community": "whowrote_this",
+        "community_url": "https://www.reddit.com/r/WhoWrote_This/comments/1uw52eb/ive_been_reverseengineering_what_detectors_flag/",
+        "title": "i’ve been reverse-engineering what detectors flag, and my “avoid ai detection” prompts got better",
+        "url": "https://www.reddit.com/r/WhoWrote_This/comments/1uw52eb/ive_been_reverseengineering_what_detectors_flag/",
+        "thumbnail": null,
+        "num_upvotes": "5",
+        "num_comments": 6
+      },
+      {
+        "community": "codereview",
+        "community_url": "https://www.reddit.com/r/codereview/comments/1vuddna/how_are_you_actually_reviewing_ai_generated_code/",
+        "title": "how are you actually reviewing AI generated code at this point?",
+        "url": "https://www.reddit.com/r/codereview/comments/1vuddna/how_are_you_actually_reviewing_ai_generated_code/",
+        "thumbnail": null,
+        "num_upvotes": "11",
+        "num_comments": 72
+      },
+      {
+        "community": "vibecoding",
+        "community_url": "https://www.reddit.com/r/vibecoding/comments/1vhlt0l/i_started_to_hate_ai_coding/",
+        "title": "I started to hate ai coding",
+        "url": "https://www.reddit.com/r/vibecoding/comments/1vhlt0l/i_started_to_hate_ai_coding/",
+        "thumbnail": null,
+        "num_upvotes": "160",
+        "num_comments": 86
+      },
+      {
+        "community": "learnprogramming",
+        "community_url": "https://www.reddit.com/r/learnprogramming/comments/1qphcm9/if_ai_writes_the_code_what_actually_matters_to/",
+        "title": "If AI writes the code, what actually matters to learn right now?",
+        "url": "https://www.reddit.com/r/learnprogramming/comments/1qphcm9/if_ai_writes_the_code_what_actually_matters_to/",
+        "thumbnail": null,
+        "num_upvotes": "0",
+        "num_comments": 21
+      },
+      {
+        "community": "vibecoding",
+        "community_url": "https://www.reddit.com/r/vibecoding/comments/1vnedrx/ai_code_is_making_me_insecure_about_my_coding/",
+        "title": "AI code is making me insecure about my coding abilities.",
+        "url": "https://www.reddit.com/r/vibecoding/comments/1vnedrx/ai_code_is_making_me_insecure_about_my_coding/",
+        "thumbnail": null,
+        "num_upvotes": "80",
+        "num_comments": 39
+      },
+      {
+        "community": "chatgptcoding",
+        "community_url": "https://www.reddit.com/r/ChatGPTCoding/comments/1puwr5p/the_best_codegenerating_ai/",
+        "title": "The best code-generating AI",
+        "url": "https://www.reddit.com/r/ChatGPTCoding/comments/1puwr5p/the_best_codegenerating_ai/",
+        "thumbnail": null,
+        "num_upvotes": "14",
+        "num_comments": 52
+      },
+      {
+        "community": "vibecoding",
+        "community_url": "https://www.reddit.com/r/vibecoding/comments/1rslo6j/pov_you_and_your_tech_lead_are_trying_to/",
+        "title": "POV: You and your tech lead are trying to understand code written by AI",
+        "url": "https://www.reddit.com/r/vibecoding/comments/1rslo6j/pov_you_and_your_tech_lead_are_trying_to/",
+        "thumbnail": null,
+        "num_upvotes": "29",
+        "num_comments": 6
+      },
+      {
+        "community": "chatgptcoding",
+        "community_url": "https://www.reddit.com/r/ChatGPTCoding/comments/1oqqfie/what_are_the_best_ai_tools_for_coding/",
+        "title": "What are the best AI tools for coding",
+        "url": "https://www.reddit.com/r/ChatGPTCoding/comments/1oqqfie/what_are_the_best_ai_tools_for_coding/",
+        "thumbnail": null,
+        "num_upvotes": "23",
+        "num_comments": 73
+      },
+      {
+        "community": "vibecoding",
+        "community_url": "https://www.reddit.com/r/vibecoding/comments/1vulcwc/dont_know_what_to_do_when_ai_is_writing_my_code/",
+        "title": "Don't know what to do when ai is writing my code",
+        "url": "https://www.reddit.com/r/vibecoding/comments/1vulcwc/dont_know_what_to_do_when_ai_is_writing_my_code/",
+        "thumbnail": null,
+        "num_upvotes": "2",
+        "num_comments": 43
+      },
+      {
+        "community": "chatgptcoding",
+        "community_url": "https://www.reddit.com/r/ChatGPTCoding/comments/1st778o/whats_the_step_where_ai_coding_tools_still_drop/",
+        "title": "What's the step where AI coding tools still drop you completely?",
+        "url": "https://www.reddit.com/r/ChatGPTCoding/comments/1st778o/whats_the_step_where_ai_coding_tools_still_drop/",
+        "thumbnail": null,
+        "num_upvotes": "44",
+        "num_comments": 180
+      },
+      {
+        "community": "chatgptcoding",
+        "community_url": "https://www.reddit.com/r/ChatGPTCoding/comments/1qlsd8e/what_are_the_remaining_arguments_against_using_ai/",
+        "title": "What are the remaining arguments against using AI for coding?",
+        "url": "https://www.reddit.com/r/ChatGPTCoding/comments/1qlsd8e/what_are_the_remaining_arguments_against_using_ai/",
+        "thumbnail": null,
+        "num_upvotes": "0",
+        "num_comments": 33
+      },
+      {
+        "community": "chatgptcoding",
+        "community_url": "https://www.reddit.com/r/ChatGPTCoding/comments/1ok0d8g/coding_feels_faster_with_ai_agents_but_im_not/",
+        "title": "coding feels faster with ai agents, but i’m not sure i’m learning more",
+        "url": "https://www.reddit.com/r/ChatGPTCoding/comments/1ok0d8g/coding_feels_faster_with_ai_agents_but_im_not/",
+        "thumbnail": null,
+        "num_upvotes": "25",
+        "num_comments": 33
+      },
+      {
+        "community": "chatgptcoding",
+        "community_url": "https://www.reddit.com/r/ChatGPTCoding/comments/1vv1fxd/ai_coding_made_me_build_too_many_things/",
+        "title": "AI coding made me build too many things",
+        "url": "https://www.reddit.com/r/ChatGPTCoding/comments/1vv1fxd/ai_coding_made_me_build_too_many_things/",
+        "thumbnail": null,
+        "num_upvotes": "39",
+        "num_comments": 34
+      },
+      {
+        "community": "chatgptcoding",
+        "community_url": "https://www.reddit.com/r/ChatGPTCoding/comments/1vp4oux/how_do_i_start_learning_ai_maximizing_the_use_of/",
+        "title": "How do I start learning AI & maximizing the use of it.",
+        "url": "https://www.reddit.com/r/ChatGPTCoding/comments/1vp4oux/how_do_i_start_learning_ai_maximizing_the_use_of/",
+        "thumbnail": null,
+        "num_upvotes": "1",
+        "num_comments": 26
+      },
+      {
+        "community": "buildwithclaude",
+        "community_url": "https://www.reddit.com/r/BuildWithClaude/comments/1ukbj8x/i_kept_losing_context_every_time_i_started_new/",
+        "title": "I kept losing context every time I started new projects or sessions, so I built a structure to fix it",
+        "url": "https://www.reddit.com/r/BuildWithClaude/comments/1ukbj8x/i_kept_losing_context_every_time_i_started_new/",
+        "thumbnail": null,
+        "num_upvotes": "4",
+        "num_comments": 1
+      },
+      {
+        "community": "sideproject",
+        "community_url": "https://www.reddit.com/r/SideProject/comments/1uusgxo/i_lost_6_months_of_files_because_my_backup_script/",
+        "title": "I lost 6 months of files because my backup script silently failed, so I built PulseCheck",
+        "url": "https://www.reddit.com/r/SideProject/comments/1uusgxo/i_lost_6_months_of_files_because_my_backup_script/",
+        "thumbnail": null,
+        "num_upvotes": "2",
+        "num_comments": 10
+      }
+    ],
+    "comments": [
+      {
+        "comment": "You found the two failure modes I keep hitting. First: the test and the code share one misunderstanding, so green means they agree. Breaking the behavior on purpose is the cheapest way to see that. If the test stays green, it was never a test. Second: you wrote a stricter test that rejected the correct code too. That is a spec bug, not a code bug. The test encoded a layout you assumed, not the one the archive actually has. Same shape as a vacuous requirement. The trigger never matches real data, so the suite can pass or fail for the wrong reason. The useful end state is the one you landed on. Normal run passes, deliberately broken run fails for the reason you named, and the thing that scores the suite cannot report pass if part of it never ran.",
+        "url": "https://www.reddit.com/r/ChatGPTCoding/comments/1vx2j3t/comment/p6kv73r/",
+        "user_commenting": "redditor-33",
+        "user_url": "https://scrubbed.invalid/redditor-34",
+        "date_of_comment": "2026-08-29T09:28:50.009Z",
+        "num_upvotes": 1,
+        "num_replies": 0,
+        "replies": []
+      },
+      {
+        "comment": "if you can break the thing the test claims to protect and it stays green, you don't have a test. i throw that test out before i touch the feature again.",
+        "url": "https://www.reddit.com/r/ChatGPTCoding/comments/1vx2j3t/comment/p5u4q9z/",
+        "user_commenting": "redditor-35",
+        "user_url": "https://scrubbed.invalid/redditor-34",
+        "date_of_comment": "2026-08-25T16:57:48.313Z",
+        "num_upvotes": 1,
+        "num_replies": 1
+      },
+      {
+        "comment": "I knew of mutation testing before you menitoned it. I was hoping you'd descipt more coding detail of the thing you were doing that was not mutation testing, but you didn't.",
+        "url": "https://www.reddit.com/r/ChatGPTCoding/comments/1vx2j3t/comment/p5qwp11/",
+        "user_commenting": "redditor-36",
+        "user_url": "https://scrubbed.invalid/redditor-34",
+        "date_of_comment": "2026-08-25T05:31:00.874Z",
+        "num_upvotes": 1,
+        "num_replies": 0,
+        "replies": []
+      },
+      {
+        "comment": "You have sort or reinvented mutation testing, where you do things like swap positive to negative in your code and if the test still passes you know you have a problem",
+        "url": "https://www.reddit.com/r/ChatGPTCoding/comments/1vx2j3t/comment/p5pgkim/",
+        "user_commenting": "redditor-37",
+        "user_url": "https://scrubbed.invalid/redditor-34",
+        "date_of_comment": "2026-08-25T00:10:34.820Z",
+        "num_upvotes": 1,
+        "num_replies": 1
+      },
+      {
+        "comment": null,
+        "url": "https://www.reddit.com/r/ChatGPTCoding/comments/1vx2j3t/comment/p5omy3n/",
+        "user_commenting": "redditor-38",
+        "user_url": "https://scrubbed.invalid/redditor-34",
+        "date_of_comment": "2026-08-24T21:40:01.112Z",
+        "num_upvotes": 1,
+        "num_replies": 1
+      },
+      {
+        "comment": "My AI creates and validates code with great tests even without me asking (cause my agent.md file includes a test and security section). These posts are always so fucking annoying cause they never reveal the 4 most important things: What AI were you using? 2, What tools/harness were you using? 3. What prompts were you using? 4. Were you monitoring or guiding the AI as it worked?",
+        "url": "https://www.reddit.com/r/ChatGPTCoding/comments/1vx2j3t/comment/p5mta1m/",
+        "user_commenting": "redditor-39",
+        "user_url": "https://scrubbed.invalid/redditor-34",
+        "date_of_comment": "2026-08-24T16:58:07.080Z",
+        "num_upvotes": 2,
+        "num_replies": 1
+      },
+      {
+        "comment": "Also my experience with both Claude and Codex. People need to understand these agents are optimized to get your approval, not to write correct software. Once you understand that, you have 3 choices: meticulously guide the agents through the troubleshooting and development processes yourself and write your own constraints/tests, OR Spend the money to design a well orchestrated pool of agents that creates a Nash Equilibrium which incentivizes the agents to produce correct and robust software based on the short-sightedness trained into them. OR Just hire a jr/entry level and train them. Humans actually learn. The AI agents so far are not very teachable.",
+        "url": "https://www.reddit.com/r/ChatGPTCoding/comments/1vx2j3t/comment/p5msb1h/",
+        "user_commenting": "redditor-40",
+        "user_url": "https://scrubbed.invalid/redditor-34",
+        "date_of_comment": "2026-08-24T16:53:58.077Z",
+        "num_upvotes": 3,
+        "num_replies": 2
+      },
+      {
+        "comment": "You’re the blind leading the blind who you’re then trusting to test and validate the blind lmfao. Gee. I wonder what the problem could be?",
+        "url": "https://www.reddit.com/r/ChatGPTCoding/comments/1vx2j3t/comment/p5mpr9r/",
+        "user_commenting": "redditor-41",
+        "user_url": "https://scrubbed.invalid/redditor-34",
+        "date_of_comment": "2026-08-24T16:43:09.680Z",
+        "num_upvotes": 1,
+        "num_replies": 0,
+        "replies": []
+      },
+      {
+        "comment": "I went a similar direction but with two different models cross-checking each other's code instead of a mutation approach. Codex builds, Claude reviews (or the reverse), and the reviewer gets an explicit instruction: don't accept \"the code works\" as a starting assumption; go find the reason it doesn't. The best thing it caught wasn't exactly a bug; it was a pattern. The builder had fixed one failure path correctly; the reviewer caught that the same class of bug existed in two other paths the fix never touched. The builder's reply was basically, \"You're right, and this is on me; I fixed this path but didn't extend the same rule to the other two.\" That \"same class\" catch is the kind of thing I don't think the builder ever finds reviewing its own work, because it already believes its fix generalizes. Feels like the same root idea as your test-testing: don't let whoever produced the result also be the one who says it's fine. You're doing it by trying to kill the test yourself; I'm doing it by making a second model whose only job is to disbelieve the first one. Hope it helps!",
+        "url": "https://www.reddit.com/r/ChatGPTCoding/comments/1vx2j3t/comment/p5lxe2n/",
+        "user_commenting": "redditor-42",
+        "user_url": "https://scrubbed.invalid/redditor-34",
+        "date_of_comment": "2026-08-24T14:39:35.815Z",
+        "num_upvotes": 1,
+        "num_replies": 1
+      },
+      {
+        "comment": "And then those tests started passing broken code so I started writing tests for those tests and then started testing all those tests. And now they call me testes testes. - this guy probably",
+        "url": "https://www.reddit.com/r/ChatGPTCoding/comments/1vx2j3t/comment/p5lvarz/",
+        "user_commenting": "redditor-43",
+        "user_url": "https://scrubbed.invalid/redditor-34",
+        "date_of_comment": "2026-08-24T14:30:07.475Z",
+        "num_upvotes": 1,
+        "num_replies": 0,
+        "replies": []
+      },
+      {
+        "comment": "Which AI? a 7b model or a 2t model? by which company? it is like saying you have to audit the work of \"this guy\" which guy?",
+        "url": "https://www.reddit.com/r/ChatGPTCoding/comments/1vx2j3t/comment/p5ln3to/",
+        "user_commenting": "redditor-44",
+        "user_url": "https://scrubbed.invalid/redditor-34",
+        "date_of_comment": "2026-08-24T13:52:24.507Z",
+        "num_upvotes": 2,
+        "num_replies": 1
+      }
+    ],
+    "community_url": "https://www.reddit.com/r/ChatGPTCoding/",
+    "community_description": "r/ChatGPTCoding is a community for people building, learning, and experimenting with AI-assisted coding. Discuss workflows, questions, technical lessons, news, and projects with any AI model or tool—from ChatGPT and Codex to Claude, Cursor, open-source models, and whatever comes next.",
+    "community_members_num": 398084,
+    "community_rank": {
+      "community_rank_type": null,
+      "community_rank_value": null
+    },
+    "post_karma": 0,
+    "bio_description": null,
+    "embedded_links": null,
+    "description_markdown": "\n        \n     \n       \n       \n      I&#x2019;m not really a programmer. I&#x2019;ve mostly been making and patching stuff by telling LLMs what I want and then checking whether it actually works.\n      \n      One thing kept pissing me off though. I&#x2019;d ask it to fix something, it would write a test, the test would pass, and then later I&#x2019;d find out the test wasn&#x2019;t actually checking what I thought it was checking.\n      \n      So at some point I started doing a pretty dumb simple thing. After something passed, I&#x2019;d intentionally break the exact behavior the test was supposed to protect and run the test again.\n      \n      If it still passed, then obviously the test was bullshit.\n      \n      I ran into this with a plugin that had a paged archive. The archive test was green, so I changed the code so only part of the archive would get copied. Test still passed.\n      \n      Then I made the test stricter, and managed to screw it up in the opposite direction. The new test rejected the correct code too, because I had made a bad assumption about how the archive pages would be laid out.\n      \n      So I threw that one away as well.\n      \n      Eventually I got a test where the normal version passed and the deliberately broken version failed for the reason I actually cared about. While doing that I also found a real bug where a failed write could leave part of the stored data changed.\n      \n      After this happened enough times I kind of stopped treating &#x201C;tests passed&#x201D; as the end of the story.\n      \n      I started doing the same thing to the stuff that decides whether the tests passed. Basically asking things like, if part of the checking process never ran, could it still say everything was fine? If I gave it old or altered results, would it notice? If it claimed it could rebuild the final result from the original, did it actually do that?\n      \n      It has gradually turned into this whole verification procedure I use when I&#x2019;m patching things with LLMs.\n      \n      I later found out mutation testing is obviously related to what I was doing, but most of what I&#x2019;ve read about mutation testing is about breaking the program to see whether the tests notice. What I ended up doing also treats the tests and the rest of the checking process as things that can be wrong.\n      \n      I&#x2019;ve tried it on a few different plugins/projects now and it has found enough weird false-passes that I&#x2019;m starting to wonder whether this is actually useful outside my own workflow or whether I just invented an absurdly overcomplicated way of checking AI-written code.\n      \n      Has anyone here done something similar, or is there an existing methodology/tool I should be looking at?\n     \n     \n      \n     \n       \n      \n       Read more \n     \n      \n       \n      \n     \n     \n    \n    ",
+    "subreddit_icon_image": "https://styles.redditmedia.com/t5_7ipnaj/styles/communityIcon_b3w3sve9shug1.png?width=96&height=96&frame=1&auto=webp&s=0996fbbd405d1e62e38ff2b648456d03137f318f",
+    "author_icon": "https://scrubbed.invalid/redditor-45",
+    "user_id": "redditor-46",
+    "archived": "false",
+    "locked_post": false,
+    "timestamp": "2026-09-04T17:02:57.280Z",
+    "input": {
+      "url": "https://www.reddit.com/r/ChatGPTCoding/comments/1vx2j3t/my_aiwritten_tests_kept_passing_broken_code_so_i/"
+    },
+    "discovery_input": {
+      "keyword": "playwright tests keep breaking",
+      "date": "Past month",
+      "num_of_posts": 5,
+      "sort_by": ""
+    }
+  },
+  {
+    "post_id": "t3_1w0n9hi",
+    "url": "https://www.reddit.com/r/Playwright/comments/1w0n9hi/question_from_a_colleague_test_data_strategy_in/",
+    "user_posted": "redditor-47",
+    "title": "Question from a colleague: Test Data Strategy in Playwright.",
+    "description": "A colleague of mine asked me to post this question here and get some feedback from the Playwright community. He is considering a test data strategy with two modes: Fresh Data and Reuse Data. 🔹 Fresh Data Mode — CI / Full Regression For CI or full regression runs, generate unique test data for every run using a Run ID. The goal is to support: ✅ Test data isolation ✅ Avoiding conflicts between test runs ✅ Parallel execution ✅ Better test reproducibility 🔹 Reuse Data Mode — Local Debugging For local debugging, instead of creating new test data every time, use a predefined set of reusable test data. For example: Reuse: Find existing test data → Execute test Instead of: Fresh: Create test data → Execute test The idea is to reduce execution time when repeatedly running the same test while investigating a failure. The proposed approach is: 🟢 CI / Full Regression → Fresh Data 🟡 Local Debugging → Reuse Data 🔴 Destructive Tests → Dedicated Test Data One important rule: in Reuse Data mode, if the required test data isn't found, the test should fail with a clear message rather than automatically creating new data. This keeps the behavior predictable and avoids accidentally creating unnecessary data. 🤔 I would love to hear from experienced Playwright and automation engineers: Is the Fresh Data + Reuse Data approach a good strategy? Or would you recommend a different approach for managing test data efficiently between CI execution and local debugging? Would really appreciate your thoughts and suggestions. 🙌",
+    "num_comments": 5,
+    "date_posted": "2026-08-28T10:54:33.168Z",
+    "community_name": "Playwright",
+    "num_upvotes": 8,
+    "photos": null,
+    "videos": null,
+    "tag": null,
+    "related_posts": [
+      {
+        "community": "pureretention",
+        "community_url": "https://www.reddit.com/r/pureretention/comments/1u5o94t/i_did_a_crazy_test_yesterday_and_i_succeeded/",
+        "title": "I did a crazy test yesterday and I succeeded",
+        "url": "https://www.reddit.com/r/pureretention/comments/1u5o94t/i_did_a_crazy_test_yesterday_and_i_succeeded/",
+        "thumbnail": null,
+        "num_upvotes": "64",
+        "num_comments": 13
+      },
+      {
+        "community": "function_health",
+        "community_url": "https://www.reddit.com/r/Function_Health/comments/1vqrtak/last_week_i_posted_about_creating_a_database_of/",
+        "title": "Last week I posted about creating a database of doctors that are willing to dive into function test results, here is a list I started building.",
+        "url": "https://www.reddit.com/r/Function_Health/comments/1vqrtak/last_week_i_posted_about_creating_a_database_of/",
+        "thumbnail": null,
+        "num_upvotes": "39",
+        "num_comments": 14
+      },
+      {
+        "community": null,
+        "community_url": "https://www.reddit.com/user/shopify/",
+        "title": "Sell everywhere with Shopify. One place to manage it all.",
+        "url": null,
+        "thumbnail": null,
+        "num_upvotes": null,
+        "num_comments": null
+      },
+      {
+        "community": "duolingoenglishtest",
+        "community_url": "https://www.reddit.com/r/DuolingoEnglishTest/comments/1psbblz/dont_be_afraid_of_taking_the_test/",
+        "title": "Don’t be afraid of taking the test.",
+        "url": "https://www.reddit.com/r/DuolingoEnglishTest/comments/1psbblz/dont_be_afraid_of_taking_the_test/",
+        "thumbnail": null,
+        "num_upvotes": "13",
+        "num_comments": 20
+      },
+      {
+        "community": "hyundaisantacruz",
+        "community_url": "https://www.reddit.com/r/hyundaisantacruz/comments/1sy5vsj/this_felt_like_a_test_i_didnt_study_for/",
+        "title": "This felt like a test I didn't study for",
+        "url": "https://www.reddit.com/r/hyundaisantacruz/comments/1sy5vsj/this_felt_like_a_test_i_didnt_study_for/",
+        "thumbnail": null,
+        "num_upvotes": "41",
+        "num_comments": 24
+      },
+      {
+        "community": "dungeon_within",
+        "community_url": "https://www.reddit.com/r/Dungeon_Within/comments/1ua1ygk/sharing_learnings/",
+        "title": "Sharing learnings",
+        "url": "https://www.reddit.com/r/Dungeon_Within/comments/1ua1ygk/sharing_learnings/",
+        "thumbnail": null,
+        "num_upvotes": "24",
+        "num_comments": 36
+      },
+      {
+        "community": "adminassistant",
+        "community_url": "https://www.reddit.com/r/AdminAssistant/comments/1ryioqt/test_genius/",
+        "title": "test genius",
+        "url": "https://www.reddit.com/r/AdminAssistant/comments/1ryioqt/test_genius/",
+        "thumbnail": null,
+        "num_upvotes": "14",
+        "num_comments": 5
+      },
+      {
+        "community": "pwhl_seattle",
+        "community_url": "https://www.reddit.com/r/PWHL_Seattle/comments/1s8m69y/i_took_a_test/",
+        "title": "I Took a Test",
+        "url": "https://www.reddit.com/r/PWHL_Seattle/comments/1s8m69y/i_took_a_test/",
+        "thumbnail": null,
+        "num_upvotes": "97",
+        "num_comments": 9
+      },
+      {
+        "community": "polito",
+        "community_url": "https://www.reddit.com/r/polito/comments/1szebj2/help_me_prepare_for_the_tili_test/",
+        "title": "Help me prepare for the TIL-I test",
+        "url": "https://www.reddit.com/r/polito/comments/1szebj2/help_me_prepare_for_the_tili_test/",
+        "thumbnail": null,
+        "num_upvotes": "7",
+        "num_comments": 31
+      },
+      {
+        "community": "daylightcomputer",
+        "community_url": "https://www.reddit.com/r/daylightcomputer/comments/1vsne96/this_project_isnt_dead/",
+        "title": "This project isn’t dead",
+        "url": "https://www.reddit.com/r/daylightcomputer/comments/1vsne96/this_project_isnt_dead/",
+        "thumbnail": null,
+        "num_upvotes": "25",
+        "num_comments": 16
+      },
+      {
+        "community": "mercorai_workers",
+        "community_url": "https://www.reddit.com/r/mercorai_workers/comments/1vsv3rd/extremely_frustrated_with_that_project/",
+        "title": "extremely frustrated with *that project*",
+        "url": "https://www.reddit.com/r/mercorai_workers/comments/1vsv3rd/extremely_frustrated_with_that_project/",
+        "thumbnail": null,
+        "num_upvotes": "32",
+        "num_comments": 26
+      },
+      {
+        "community": "returnofreckoning",
+        "community_url": "https://www.reddit.com/r/ReturnofReckoning/comments/1tzjv5m/class_questions/",
+        "title": "Class Questions",
+        "url": "https://www.reddit.com/r/ReturnofReckoning/comments/1tzjv5m/class_questions/",
+        "thumbnail": null,
+        "num_upvotes": "16",
+        "num_comments": 29
+      },
+      {
+        "community": "cultofciphertology",
+        "community_url": "https://www.reddit.com/r/CultOfCiphertology/comments/1sdhgfk/my_quiz_is_made_d/",
+        "title": "My quiz is made :D",
+        "url": "https://www.reddit.com/r/CultOfCiphertology/comments/1sdhgfk/my_quiz_is_made_d/",
+        "thumbnail": null,
+        "num_upvotes": "51",
+        "num_comments": 29
+      },
+      {
+        "community": "bigfive",
+        "community_url": "https://www.reddit.com/r/BigFive/comments/1v3a417/whats_a_good_test/",
+        "title": "Whats a good test",
+        "url": "https://www.reddit.com/r/BigFive/comments/1v3a417/whats_a_good_test/",
+        "thumbnail": null,
+        "num_upvotes": "5",
+        "num_comments": 12
+      },
+      {
+        "community": "ndis",
+        "community_url": "https://www.reddit.com/r/NDIS/comments/1ujbokp/new_planning_process_testing/",
+        "title": "New planning process testing",
+        "url": "https://www.reddit.com/r/NDIS/comments/1ujbokp/new_planning_process_testing/",
+        "thumbnail": null,
+        "num_upvotes": "12",
+        "num_comments": 15
+      },
+      {
+        "community": "aeo",
+        "community_url": "https://www.reddit.com/r/aeo/comments/1uuz0yd/new_research_is_the_data_from_your_ai_visibility/",
+        "title": "New Research: Is the Data from Your AI Visibility Tool Statistically Significant?",
+        "url": "https://www.reddit.com/r/aeo/comments/1uuz0yd/new_research_is_the_data_from_your_ai_visibility/",
+        "thumbnail": null,
+        "num_upvotes": "4",
+        "num_comments": 8
+      },
+      {
+        "community": "quickfixplus",
+        "community_url": "https://www.reddit.com/r/QuickFixPlus/comments/1svxa5w/just_took_the_test/",
+        "title": "Just took the test",
+        "url": "https://www.reddit.com/r/QuickFixPlus/comments/1svxa5w/just_took_the_test/",
+        "thumbnail": null,
+        "num_upvotes": "11",
+        "num_comments": 30
+      },
+      {
+        "community": "pennfoster",
+        "community_url": "https://www.reddit.com/r/pennfoster/comments/1s856ey/will_they_notice_if_i_just_do_the_test/",
+        "title": "Will they notice if I just do the test",
+        "url": "https://www.reddit.com/r/pennfoster/comments/1s856ey/will_they_notice_if_i_just_do_the_test/",
+        "thumbnail": null,
+        "num_upvotes": "8",
+        "num_comments": 13
+      },
+      {
+        "community": "tsaapplicant",
+        "community_url": "https://www.reddit.com/r/TSAApplicant/comments/1s910qv/i_took_the_test/",
+        "title": "I took the test",
+        "url": "https://www.reddit.com/r/TSAApplicant/comments/1s910qv/i_took_the_test/",
+        "thumbnail": null,
+        "num_upvotes": "5",
+        "num_comments": 32
+      },
+      {
+        "community": "machinelearningnews",
+        "community_url": "https://www.reddit.com/r/machinelearningnews/comments/1v0psix/i_built_a_small_ai_research_platform_to_test/",
+        "title": "I built a small AI research platform to test whether controlling reasoning beats simply reasoning more. Here are the results.",
+        "url": "https://www.reddit.com/r/machinelearningnews/comments/1v0psix/i_built_a_small_ai_research_platform_to_test/",
+        "thumbnail": null,
+        "num_upvotes": "12",
+        "num_comments": 4
+      },
+      {
+        "community": "rwshelp",
+        "community_url": "https://www.reddit.com/r/RWShelp/comments/1v3211g/the_assessments_are_crazy/",
+        "title": "The assessments are crazy",
+        "url": "https://www.reddit.com/r/RWShelp/comments/1v3211g/the_assessments_are_crazy/",
+        "thumbnail": null,
+        "num_upvotes": "9",
+        "num_comments": 15
+      },
+      {
+        "community": "celpip_guide",
+        "community_url": "https://www.reddit.com/r/CELPIP_Guide/comments/1tf8mkz/i_am_concerned_about_my_speaking_test/",
+        "title": "I am concerned about my speaking test",
+        "url": "https://www.reddit.com/r/CELPIP_Guide/comments/1tf8mkz/i_am_concerned_about_my_speaking_test/",
+        "thumbnail": null,
+        "num_upvotes": "5",
+        "num_comments": 9
+      },
+      {
+        "community": "nphcdivine9",
+        "community_url": "https://www.reddit.com/r/NPHCdivine9/comments/1vj0czk/knowledge_preparation/",
+        "title": "Knowledge preparation",
+        "url": "https://www.reddit.com/r/NPHCdivine9/comments/1vj0czk/knowledge_preparation/",
+        "thumbnail": null,
+        "num_upvotes": "33",
+        "num_comments": 25
+      },
+      {
+        "community": "quant",
+        "community_url": "https://www.reddit.com/r/quant/comments/1usmgyr/we_tested_a_methodological_critique_of_our_macro/",
+        "title": "We tested a methodological critique of our macro ARIMA model. Here's the results.",
+        "url": "https://www.reddit.com/r/quant/comments/1usmgyr/we_tested_a_methodological_critique_of_our_macro/",
+        "thumbnail": null,
+        "num_upvotes": "0",
+        "num_comments": 1
+      },
+      {
+        "community": "miscritscontent",
+        "community_url": "https://www.reddit.com/r/MiscritsContent/comments/1ud8ip6/query/",
+        "title": "Query",
+        "url": "https://www.reddit.com/r/MiscritsContent/comments/1ud8ip6/query/",
+        "thumbnail": null,
+        "num_upvotes": "27",
+        "num_comments": 7
+      },
+      {
+        "community": "jewishleft",
+        "community_url": "https://www.reddit.com/r/jewishleft/comments/1skedf5/a_question_for_learners/",
+        "title": "A Question For Learners",
+        "url": "https://www.reddit.com/r/jewishleft/comments/1skedf5/a_question_for_learners/",
+        "thumbnail": null,
+        "num_upvotes": "27",
+        "num_comments": 82
+      }
+    ],
+    "comments": null,
+    "community_url": "https://www.reddit.com/r/Playwright/",
+    "community_description": "Community for https://playwright.dev/\n\n\nCommunity Slack\nJoin our community Slack Channel to connect with other developers using Playwright.",
+    "community_members_num": 10271,
+    "community_rank": {
+      "community_rank_type": null,
+      "community_rank_value": null
+    },
+    "post_karma": 0,
+    "bio_description": null,
+    "embedded_links": null,
+    "description_markdown": "\n        \n     \n       \n       \n      A colleague of mine asked me to post this question here and get some feedback from the Playwright community.\n      \n      He is considering a test data strategy with two modes: Fresh Data and Reuse Data.\n      \n      &#x1F539; Fresh Data Mode &#x2014; CI / Full Regression\n      \n      For CI or full regression runs, generate unique test data for every run using a Run ID.\n      \n      The goal is to support:\n      \n      &#x2705; Test data isolation\n      \n      &#x2705; Avoiding conflicts between test runs\n      \n      &#x2705; Parallel execution\n      \n      &#x2705; Better test reproducibility\n      \n      &#x1F539; Reuse Data Mode &#x2014; Local Debugging\n      \n      For local debugging, instead of creating new test data every time, use a predefined set of reusable test data.\n      \n      For example:\n      \n      Reuse: Find existing test data &#x2192; Execute test\n      \n      Instead of:\n      \n      Fresh: Create test data &#x2192; Execute test\n      \n      The idea is to reduce execution time when repeatedly running the same test while investigating a failure.\n      \n      The proposed approach is:\n      \n      &#x1F7E2; CI / Full Regression &#x2192; Fresh Data\n      \n      &#x1F7E1; Local Debugging &#x2192; Reuse Data\n      \n      &#x1F534; Destructive Tests &#x2192; Dedicated Test Data\n      \n      One important rule: in Reuse Data mode, if the required test data isn&apos;t found, the test should fail with a clear message rather than automatically creating new data.\n      \n      This keeps the behavior predictable and avoids accidentally creating unnecessary data.\n      \n      &#x1F914; I would love to hear from experienced Playwright and automation engineers:\n      \n      Is the Fresh Data + Reuse Data approach a good strategy?\n      \n      Or would you recommend a different approach for managing test data efficiently between CI execution and local debugging?\n      \n      Would really appreciate your thoughts and suggestions. &#x1F64C;\n     \n     \n     \n    \n    ",
+    "subreddit_icon_image": "https://styles.redditmedia.com/t5_2yvmp/styles/communityIcon_n9zq6b7wmv2c1.png?width=96&height=96&frame=1&auto=webp&s=8f05578fc17cc9db31ccd7062888998b2ce748ac",
+    "author_icon": "https://scrubbed.invalid/redditor-48",
+    "user_id": "redditor-49",
+    "archived": "false",
+    "locked_post": false,
+    "timestamp": "2026-09-04T17:03:02.972Z",
+    "input": {
+      "url": "https://www.reddit.com/r/Playwright/comments/1w0n9hi/question_from_a_colleague_test_data_strategy_in/"
+    },
+    "discovery_input": {
+      "keyword": "playwright tests keep breaking",
+      "date": "Past month",
+      "num_of_posts": 5,
+      "sort_by": ""
+    }
+  }
+]

@@ -1,0 +1,1377 @@
+[
+  {
+    "post_id": "t3_1w6xfub",
+    "url": "https://www.reddit.com/r/QualityAssurance/comments/1w6xfub/new_to_bug_reports_how_to_properly_document_bug/",
+    "user_posted": "redditor-1",
+    "title": "New to bug reports how to properly document bug that persists on the page that follows?",
+    "description": "I’m getting the hang of doing bug reports and I’m confused as I’m trying to document a bug that occurs on the cart page but in a way also carries over to checkout. Basically the total price in the cart page doesn’t update correctly when you increase the product quantity, but this incorrect total price carries over to the checkout screen itself. So I assumed I should stop the main reproduction steps and expected/actual result at the cart page and then in additional notes write that the wrong price carries over to the checkout section. Just want to know if I’m doing this correctly and if I should also be including a screenshot or some sort of evidence for the checkout’s total price being incorrect too or if all I should attach is a screen recording showing my steps up until the cart where the main bug happens. I’m curious on how more experienced QA testers handle this. Thanks!",
+    "num_comments": 3,
+    "date_posted": "2026-09-04T07:27:49.039Z",
+    "community_name": "QualityAssurance",
+    "num_upvotes": 3,
+    "photos": null,
+    "videos": null,
+    "tag": null,
+    "related_posts": [
+      {
+        "community": "experienceddevs",
+        "community_url": "https://www.reddit.com/r/ExperiencedDevs/comments/1tysnmi/is_it_just_me_or_is_anyone_else_noticing_more/",
+        "title": "Is it just me, or is anyone else noticing more bugs across the web and in software in general?",
+        "url": "https://www.reddit.com/r/ExperiencedDevs/comments/1tysnmi/is_it_just_me_or_is_anyone_else_noticing_more/",
+        "thumbnail": null,
+        "num_upvotes": "1513",
+        "num_comments": 347
+      },
+      {
+        "community": "bugbounty",
+        "community_url": "https://www.reddit.com/r/bugbounty/comments/1n81it6/how_can_i_get_a_job_in_cybersecurity_with_only/",
+        "title": "How can I get a job in cybersecurity with only bug bounty experience?",
+        "url": "https://www.reddit.com/r/bugbounty/comments/1n81it6/how_can_i_get_a_job_in_cybersecurity_with_only/",
+        "thumbnail": null,
+        "num_upvotes": "61",
+        "num_comments": 18
+      },
+      {
+        "community": "bugbounty",
+        "community_url": "https://www.reddit.com/r/bugbounty/comments/1us4dfi/struggling_to_find_my_first_bug_after_months_of/",
+        "title": "Struggling to find my first bug after months of learning – what am I doing wrong?",
+        "url": "https://www.reddit.com/r/bugbounty/comments/1us4dfi/struggling_to_find_my_first_bug_after_months_of/",
+        "thumbnail": null,
+        "num_upvotes": "42",
+        "num_comments": 20
+      },
+      {
+        "community": "apolloreborn",
+        "community_url": "https://www.reddit.com/r/ApolloReborn/comments/1ustbcf/new_easier_bug_reporting_and_feature_requests/",
+        "title": "New: Easier bug reporting and feature requests",
+        "url": "https://www.reddit.com/r/ApolloReborn/comments/1ustbcf/new_easier_bug_reporting_and_feature_requests/",
+        "thumbnail": null,
+        "num_upvotes": "56",
+        "num_comments": 19
+      },
+      {
+        "community": "experienceddevs",
+        "community_url": "https://www.reddit.com/r/ExperiencedDevs/comments/1oqyuaw/anyone_else_prefer_bughunting_over_long_builds/",
+        "title": "Anyone else prefer bug-hunting over long builds? What did you do about it?",
+        "url": "https://www.reddit.com/r/ExperiencedDevs/comments/1oqyuaw/anyone_else_prefer_bughunting_over_long_builds/",
+        "thumbnail": null,
+        "num_upvotes": "329",
+        "num_comments": 105
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1p59630/our_bug_reports_are_ignored_until_a_customer_says/",
+        "title": "Our Bug Reports Are Ignored… Until a Customer Says the Same Thing",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1p59630/our_bug_reports_are_ignored_until_a_customer_says/",
+        "thumbnail": null,
+        "num_upvotes": "94",
+        "num_comments": 65
+      },
+      {
+        "community": "mcreator",
+        "community_url": "https://www.reddit.com/r/MCreator/comments/1vpk5ax/if_all_your_bug_testing_isnt_in_one_world_youre/",
+        "title": "if all your bug testing isn't in one world, you're doing it wrong. just look at this, this is so cool",
+        "url": "https://www.reddit.com/r/MCreator/comments/1vpk5ax/if_all_your_bug_testing_isnt_in_one_world_youre/",
+        "thumbnail": null,
+        "num_upvotes": "39",
+        "num_comments": 9
+      },
+      {
+        "community": "bugbounty",
+        "community_url": "https://www.reddit.com/r/bugbounty/comments/1v2aavn/sticking_to_normal_bug_bounty_programs_or_switch/",
+        "title": "Sticking to normal bug bounty programs or switch to research?",
+        "url": "https://www.reddit.com/r/bugbounty/comments/1v2aavn/sticking_to_normal_bug_bounty_programs_or_switch/",
+        "thumbnail": null,
+        "num_upvotes": "26",
+        "num_comments": 12
+      },
+      {
+        "community": "bugbounty",
+        "community_url": "https://www.reddit.com/r/bugbounty/comments/1o5ei76/beyond_writeups_targets_how_do_you_keep_improving/",
+        "title": "Beyond Writeups & Targets: How Do You Keep Improving Daily as a Bug Hunter?",
+        "url": "https://www.reddit.com/r/bugbounty/comments/1o5ei76/beyond_writeups_targets_how_do_you_keep_improving/",
+        "thumbnail": null,
+        "num_upvotes": "34",
+        "num_comments": 7
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1ofkhgb/is_it_fair_that_qa_always_gets_the_blame_for_bugs/",
+        "title": "Is It Fair That QA Always Gets the Blame for Bugs, Even When We Didn’t Write the Code?",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1ofkhgb/is_it_fair_that_qa_always_gets_the_blame_for_bugs/",
+        "thumbnail": null,
+        "num_upvotes": "25",
+        "num_comments": 57
+      },
+      {
+        "community": "embedded",
+        "community_url": "https://www.reddit.com/r/embedded/comments/1vtszpx/share_the_funniestannoying_embedded_issue_youve/",
+        "title": "Share the funniest/annoying embedded issue you’ve ever spent hours debugging ? 😂",
+        "url": "https://www.reddit.com/r/embedded/comments/1vtszpx/share_the_funniestannoying_embedded_issue_youve/",
+        "thumbnail": null,
+        "num_upvotes": "76",
+        "num_comments": 103
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1tjhoug/bug_was_invisible_in_staging_for_four_months/",
+        "title": "bug was invisible in staging for four months. showed up in production on day one.",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1tjhoug/bug_was_invisible_in_staging_for_four_months/",
+        "thumbnail": null,
+        "num_upvotes": "42",
+        "num_comments": 20
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1ok0rbm/which_qa_tools_are_actually_useful_daytoday/",
+        "title": "Which QA tools are actually useful day-to-day?",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1ok0rbm/which_qa_tools_are_actually_useful_daytoday/",
+        "thumbnail": null,
+        "num_upvotes": "100",
+        "num_comments": 62
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1qpcvg3/how_to_deal_with_missed_bugs_reaching_production/",
+        "title": "How to deal with missed bugs reaching production",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1qpcvg3/how_to_deal_with_missed_bugs_reaching_production/",
+        "thumbnail": null,
+        "num_upvotes": "20",
+        "num_comments": 45
+      },
+      {
+        "community": "bugbountynoobs",
+        "community_url": "https://www.reddit.com/r/BugBountyNoobs/comments/1t559ao/how_to_actually_get_into_bug_bounty/",
+        "title": "How to actually get into bug bounty?",
+        "url": "https://www.reddit.com/r/BugBountyNoobs/comments/1t559ao/how_to_actually_get_into_bug_bounty/",
+        "thumbnail": null,
+        "num_upvotes": "35",
+        "num_comments": 18
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1txvjd3/claude_in_chrome_for_qa_traversal_automatic/",
+        "title": "Claude in Chrome for QA traversal - automatic screenshots of bugs",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1txvjd3/claude_in_chrome_for_qa_traversal_automatic/",
+        "thumbnail": null,
+        "num_upvotes": "14",
+        "num_comments": 19
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1ng59bj/risk_based_testing_examples/",
+        "title": "Risk based testing examples?",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1ng59bj/risk_based_testing_examples/",
+        "thumbnail": null,
+        "num_upvotes": "8",
+        "num_comments": 18
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1s3xqja/which_tool_is_best_for_the_performance_testing/",
+        "title": "Which tool is best for the performance testing?",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1s3xqja/which_tool_is_best_for_the_performance_testing/",
+        "thumbnail": null,
+        "num_upvotes": "7",
+        "num_comments": 30
+      },
+      {
+        "community": "bugbountynoobs",
+        "community_url": "https://www.reddit.com/r/BugBountyNoobs/comments/1tcklos/how_to_learn_bug_bounty_hunting_from_zero/",
+        "title": "How to learn bug bounty hunting from zero?",
+        "url": "https://www.reddit.com/r/BugBountyNoobs/comments/1tcklos/how_to_learn_bug_bounty_hunting_from_zero/",
+        "thumbnail": null,
+        "num_upvotes": "11",
+        "num_comments": 11
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1sv0fa1/built_a_new_qa_sandbox_to_practice_automation_no/",
+        "title": "Built a new QA sandbox to practice automation (no more basic demo sites!)",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1sv0fa1/built_a_new_qa_sandbox_to_practice_automation_no/",
+        "thumbnail": null,
+        "num_upvotes": "56",
+        "num_comments": 13
+      },
+      {
+        "community": "bugbountynoobs",
+        "community_url": "https://www.reddit.com/r/BugBountyNoobs/comments/1ulc1dz/new_to_bug_bounty_and_feeling_completely_lost/",
+        "title": "New to bug bounty and feeling completely lost — looking for methodology advice",
+        "url": "https://www.reddit.com/r/BugBountyNoobs/comments/1ulc1dz/new_to_bug_bounty_and_feeling_completely_lost/",
+        "thumbnail": null,
+        "num_upvotes": "6",
+        "num_comments": 4
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1nj99yc/which_automation_tool_should_we_prefer_for_web/",
+        "title": "Which Automation tool should we prefer for Web Automation testing and Mobile Application automation testing. We want open source and fast automation tools.",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1nj99yc/which_automation_tool_should_we_prefer_for_web/",
+        "thumbnail": null,
+        "num_upvotes": "13",
+        "num_comments": 48
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1nx4i0l/api_testing_vs_browser_automation/",
+        "title": "API Testing vs Browser Automation",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1nx4i0l/api_testing_vs_browser_automation/",
+        "thumbnail": null,
+        "num_upvotes": "30",
+        "num_comments": 20
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1pigyji/how_can_i_force_errors_in_an_api_call_in_the/",
+        "title": "How can I force errors in an API call in the browser when doing manual testing?",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1pigyji/how_can_i_force_errors_in_an_api_call_in_the/",
+        "thumbnail": null,
+        "num_upvotes": "11",
+        "num_comments": 12
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1t9wh8x/i_need_automated_api_testing_experience_but_i/",
+        "title": "I need automated API testing experience, but I don't know how to start",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1t9wh8x/i_need_automated_api_testing_experience_but_i/",
+        "thumbnail": null,
+        "num_upvotes": "13",
+        "num_comments": 19
+      }
+    ],
+    "comments": [
+      {
+        "comment": "To me, that's one bug. Write the steps, and do a screen recording. Include the environment name (dev, staging, etc) and version/branch number as step one. Your screen recording should be full screen and show the page url so the dev knows exactly where the error is. I don't use a fancy screen capture tool; I just cmd+shift+5 on my Mac. It also helps sometimes to have the Dev Tools/Inspector open when you do the screen recording. On a Mac, you right click and select Inspect. If the page displays an error when you go to Checkout, click the Console tab in the Inspector and have that visible as you test. If there is no visible error, open the Network tab. This way the dev can see what's happening as you click things on the page. This is how I'd write the bug: DevEnv1, branch BR123 Log in as {role). {specify whatever steps are needed to get to the product page} Search for {product name/number}. Note that the product price is $x. Add that product to cart. {specify whatever steps are needed to view the Cart} In the Cart, view that product. Note that the product price is still $x, as expected. In the Cart, update the qty. Note that the product price is now $y. Check Out View the product price. Submit the order. Go to Order History. Search for that order. View the product price. Actual Result: The product price is $x when the product is added to cart. When you update the qty in Cart, then proceed to Checkout, the price is displayed as $y. See attached screen recording. Expected Result: The price should remain as $x from Cart to Checkout to Order Submission to Order History.",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1w6xfub/comment/p7sbjva/",
+        "user_commenting": "redditor-2",
+        "user_url": "https://scrubbed.invalid/redditor-3",
+        "date_of_comment": "2026-09-04T14:31:20.395Z",
+        "num_upvotes": 1,
+        "num_replies": 0,
+        "replies": []
+      },
+      {
+        "comment": "Two ways, first in the environment I’m in where I trust my engineers to read the bug to fix it and the testers to read it later to verify the fix. I would go with the note route and a very good summary that includes that it persists to the 2nd page If people don’t read, two bugs that are linked together and that details each situation. One for cart and one for checkout, it may need two solutions and this way you’re sure both pages are checked",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1w6xfub/comment/p7qlkdl/",
+        "user_commenting": "redditor-4",
+        "user_url": "https://scrubbed.invalid/redditor-3",
+        "date_of_comment": "2026-09-04T08:05:02.708Z",
+        "num_upvotes": 1,
+        "num_replies": 0,
+        "replies": []
+      }
+    ],
+    "community_url": "https://www.reddit.com/r/QualityAssurance/",
+    "community_description": "Anything software QA -related; tools, processes, questions etc. As long as it's relevant you can post or ask whatever you like.\n\nSpam is forbidden. Spam masquerading as low-effort articles will be dealt with and link posts have been disabled. If you  are submitting an article or video, put a description before the link.\n\nWe like newbies. There are stickied threads for newbies, no they don't have to use them. Please do not message mods to shut down newbie threads.",
+    "community_members_num": 83275,
+    "community_rank": {
+      "community_rank_type": null,
+      "community_rank_value": null
+    },
+    "post_karma": 0,
+    "bio_description": null,
+    "embedded_links": null,
+    "description_markdown": "\n        \n     \n       \n       \n      I&#x2019;m getting the hang of doing bug reports and I&#x2019;m confused as I&#x2019;m trying to document a bug that occurs on the cart page but in a way also carries over to checkout. Basically the total price in the cart page doesn&#x2019;t update correctly when you increase the product quantity, but this incorrect total price carries over to the checkout screen itself. So I assumed I should stop the main reproduction steps and expected/actual result at the cart page and then in additional notes write that the wrong price carries over to the checkout section. Just want to know if I&#x2019;m doing this correctly and if I should also be including a screenshot or some sort of evidence for the checkout&#x2019;s total price being incorrect too or if all I should attach is a screen recording showing my steps up until the cart where the main bug happens. I&#x2019;m curious on how more experienced QA testers handle this. Thanks!\n     \n     \n     \n    \n    ",
+    "subreddit_icon_image": null,
+    "author_icon": "https://scrubbed.invalid/redditor-5",
+    "user_id": "redditor-6",
+    "archived": "false",
+    "locked_post": false,
+    "timestamp": "2026-09-04T17:03:47.061Z",
+    "input": {
+      "url": "https://www.reddit.com/r/QualityAssurance/comments/1w6xfub/new_to_bug_reports_how_to_properly_document_bug/"
+    },
+    "discovery_input": {
+      "url": "https://www.reddit.com/r/QualityAssurance/",
+      "sort_by": "New",
+      "sort_by_time": "",
+      "keyword": "",
+      "start_date": ""
+    }
+  },
+  {
+    "post_id": "t3_1w71asb",
+    "url": "https://www.reddit.com/r/QualityAssurance/comments/1w71asb/starting_automation_from_0_as_a_qa_lead_how_are/",
+    "user_posted": "redditor-7",
+    "title": "Starting Automation from 0% as a QA Lead — How are you using AI, MCPs & Agents in QA?",
+    "description": "Hey everyone, I’m joining a fintech organization on September 15 as an Automation QA Lead . They currently have 0% automation , so I’ll be responsible for building the framework, defining the automation process/strategy, selecting test cases and getting automation started from scratch. The interesting part: I won’t have additional automation resources initially. It’ll basically be me + Claude Desktop + AI tools . I have good experience with Playwright and Cypress , and I’m planning to use Playwright + JavaScript . Since AI is now such a big part of development, I want to build the automation process with AI in mind from Day 1 , rather than adding it later. I’d love to hear from people already doing this in real projects: AI + Automation How are you using AI in your Playwright/automation workflow? What tasks are actually worth delegating to AI? Any useful AI workflows/prompts you recommend? MCPs Which MCPs have actually been useful for QA automation? For example: Playwright, GitHub, Jira, Confluence, Database, Browser/DevTools, API , or custom MCPs. AI Agents Are you using/building AI agents for QA? For example: Test case generation Automation/code generation Test data generation Failure analysis Locator maintenance Regression selection Test review Reporting Which ones have provided real value, and which are just hype? Starting from 0% If you had to build a Playwright framework and automation process from scratch today, what would you prioritize from Day 1? Anything that you wish you had designed differently when starting your own framework? GitHub Repos If you've built any GitHub repositories around Playwright + AI, AI agents, MCPs, self-healing automation, AI test generation, etc., please share them. Also, if you know any good open-source GitHub repos that I should study, please drop them in the comments. Basically, if you were in my position — one QA Automation Lead, 0% existing automation, Playwright + JavaScript, and AI available from Day 1 — how would you approach it? Would love to hear real-world experiences, useful tools/MCPs, GitHub repos, and lessons from things that didn't work. Thanks!",
+    "num_comments": 13,
+    "date_posted": "2026-09-04T11:07:02.873Z",
+    "community_name": "QualityAssurance",
+    "num_upvotes": 6,
+    "photos": null,
+    "videos": null,
+    "tag": null,
+    "related_posts": [
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1sh5cs6/when_did_qa_automation_become_competitive/",
+        "title": "When did QA automation become competitive programming?",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1sh5cs6/when_did_qa_automation_become_competitive/",
+        "thumbnail": null,
+        "num_upvotes": "189",
+        "num_comments": 110
+      },
+      {
+        "community": null,
+        "community_url": "https://www.reddit.com/user/carnivalcruise/",
+        "title": "How about a vacation from upvoting? ​Find your fun again. Carnival is calling.",
+        "url": null,
+        "thumbnail": null,
+        "num_upvotes": null,
+        "num_comments": null
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1qe3oc4/what_is_an_ai_qa_and_what_it_actually_does/",
+        "title": "What is an AI QA and what it actually does?",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1qe3oc4/what_is_an_ai_qa_and_what_it_actually_does/",
+        "thumbnail": null,
+        "num_upvotes": "2",
+        "num_comments": 11
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1vx3ztv/is_the_qaautomation_jobs_really_bad_right_now/",
+        "title": "Is the QA/Automation jobs really bad right now?",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1vx3ztv/is_the_qaautomation_jobs_really_bad_right_now/",
+        "thumbnail": null,
+        "num_upvotes": "15",
+        "num_comments": 32
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1tp15zu/what_realworld_qa_use_cases_do_you_have_with_aiai/",
+        "title": "What real-world QA use cases do you have with AI/AI agents?",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1tp15zu/what_realworld_qa_use_cases_do_you_have_with_aiai/",
+        "thumbnail": null,
+        "num_upvotes": "18",
+        "num_comments": 30
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1s7j8xh/beginner_in_qa_automation_seeking_advice_on_tools/",
+        "title": "Beginner in QA Automation - Seeking Advice on Tools, Projects, and Practical Automation Ideas",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1s7j8xh/beginner_in_qa_automation_seeking_advice_on_tools/",
+        "thumbnail": null,
+        "num_upvotes": "35",
+        "num_comments": 26
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1oe01td/are_qa_engineers_just_becoming_automation/",
+        "title": "Are QA Engineers Just Becoming Automation Developers with a Different Job Title?",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1oe01td/are_qa_engineers_just_becoming_automation/",
+        "thumbnail": null,
+        "num_upvotes": "94",
+        "num_comments": 61
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1neohvh/how_do_you_test_ai_as_a_qa_or_what_are_the/",
+        "title": "How do you test AI as a QA? Or what are the resourced to learn that?",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1neohvh/how_do_you_test_ai_as_a_qa_or_what_are_the/",
+        "thumbnail": null,
+        "num_upvotes": "3",
+        "num_comments": 29
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1vo2rs5/how_should_i_approach_qa_automation_as_a_startup/",
+        "title": "How Should I Approach QA Automation as a Startup With Limited Testing Experien",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1vo2rs5/how_should_i_approach_qa_automation_as_a_startup/",
+        "thumbnail": null,
+        "num_upvotes": "4",
+        "num_comments": 26
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1sxdmmo/are_you_actually_using_ai_in_test_automation/",
+        "title": "Are you actually using AI in test automation ?",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1sxdmmo/are_you_actually_using_ai_in_test_automation/",
+        "thumbnail": null,
+        "num_upvotes": "39",
+        "num_comments": 71
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1th4vhx/how_do_you_work_with_dedicated_qas_who_only_do/",
+        "title": "How do you work with dedicated QAs who only do automation?",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1th4vhx/how_do_you_work_with_dedicated_qas_who_only_do/",
+        "thumbnail": null,
+        "num_upvotes": "37",
+        "num_comments": 31
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1oey7s2/tired_of_being_dev_want_to_migrate_to_qa/",
+        "title": "Tired of being DEV, want to migrate to QA",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1oey7s2/tired_of_being_dev_want_to_migrate_to_qa/",
+        "thumbnail": null,
+        "num_upvotes": "61",
+        "num_comments": 57
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1vbaic0/should_i_even_be_calling_myself_a_qa_engineer/",
+        "title": "Should I even be calling myself a QA Engineer anymore?",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1vbaic0/should_i_even_be_calling_myself_a_qa_engineer/",
+        "thumbnail": null,
+        "num_upvotes": "33",
+        "num_comments": 40
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1vmpnsx/future_of_a_qa_career/",
+        "title": "Future of a QA Career",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1vmpnsx/future_of_a_qa_career/",
+        "thumbnail": null,
+        "num_upvotes": "50",
+        "num_comments": 50
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1vysv8w/how_are_you_using_ai_in_your_daytoday_qatesting/",
+        "title": "How are you using AI in your day-to-day QA/testing work? Looking for feedback on my approach",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1vysv8w/how_are_you_using_ai_in_your_daytoday_qatesting/",
+        "thumbnail": null,
+        "num_upvotes": "15",
+        "num_comments": 22
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1vjvd5n/10_months_into_qa_and_seriously_questioning/",
+        "title": "10 months into QA and seriously questioning whether I want to continue in this career",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1vjvd5n/10_months_into_qa_and_seriously_questioning/",
+        "thumbnail": null,
+        "num_upvotes": "40",
+        "num_comments": 43
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1vxk8f1/is_building_a_longterm_career_as_a_qasdet_still/",
+        "title": "Is building a long-term career as a QA/SDET still worth it in the AI era, or should I pivot?",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1vxk8f1/is_building_a_longterm_career_as_a_qasdet_still/",
+        "thumbnail": null,
+        "num_upvotes": "16",
+        "num_comments": 28
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1ue6u13/what_are_the_most_frustrating_and_timeconsuming/",
+        "title": "What are the most frustrating and time-consuming parts of your QA job?",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1ue6u13/what_are_the_most_frustrating_and_timeconsuming/",
+        "thumbnail": null,
+        "num_upvotes": "27",
+        "num_comments": 54
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1s5blry/interesting_article_on_the_future_of_qa/",
+        "title": "Interesting article on the future of QA",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1s5blry/interesting_article_on_the_future_of_qa/",
+        "thumbnail": null,
+        "num_upvotes": "49",
+        "num_comments": 29
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1v27pdi/how_can_i_stand_out_as_an_entrylevel_qa/",
+        "title": "How can I stand out as an entry-level QA Automation Engineer?",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1v27pdi/how_can_i_stand_out_as_an_entrylevel_qa/",
+        "thumbnail": null,
+        "num_upvotes": "3",
+        "num_comments": 9
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1tvpuxg/what_does_the_qa_process_look_like_at_your_company/",
+        "title": "What does the QA process look like at your company?",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1tvpuxg/what_does_the_qa_process_look_like_at_your_company/",
+        "thumbnail": null,
+        "num_upvotes": "28",
+        "num_comments": 20
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1vtvnve/qa_vs_ai_is_quality_engineering_still_worth/",
+        "title": "QA vs. AI: Is Quality Engineering still worth investing in? Need career advice!",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1vtvnve/qa_vs_ai_is_quality_engineering_still_worth/",
+        "thumbnail": null,
+        "num_upvotes": "7",
+        "num_comments": 27
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1vdargf/what_qa_does_in_ai_testing_role/",
+        "title": "What QA Does in AI Testing Role?",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1vdargf/what_qa_does_in_ai_testing_role/",
+        "thumbnail": null,
+        "num_upvotes": "17",
+        "num_comments": 19
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1ucbobh/what_would_you_prioritize_if_you_were_building_qa/",
+        "title": "What would you prioritize if you were building QA from the ground up as the only QA in a company?",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1ucbobh/what_would_you_prioritize_if_you_were_building_qa/",
+        "thumbnail": null,
+        "num_upvotes": "23",
+        "num_comments": 16
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1ubpdel/can_i_get_from_qa_to_development_job/",
+        "title": "Can i get from QA to development job ?",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1ubpdel/can_i_get_from_qa_to_development_job/",
+        "thumbnail": null,
+        "num_upvotes": "6",
+        "num_comments": 7
+      }
+    ],
+    "comments": [
+      {
+        "comment": "What kind of automation? Ui? API? as others say I would not use Ai until I have good framework skeleton to build on.",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1w71asb/comment/p7syh5r/",
+        "user_commenting": "redditor-8",
+        "user_url": "https://scrubbed.invalid/redditor-3",
+        "date_of_comment": "2026-09-04T16:11:30.641Z",
+        "num_upvotes": 1,
+        "num_replies": 0,
+        "replies": []
+      },
+      {
+        "comment": "For example: Playwright, GitHub, Jira, Confluence, Database, Browser/ DevTools, API, or custom MCPs. All of them. In my setup: AI builds the automation in a typical CDCI lifecycle. Playwright, Cypress, or Selenium is fine. I have AI running on a loop to do a series of tasks depending on thier role. Dev AI will work on the automation, code review checks the code, and a QA AI will test the changes to the automation. Custom MCP chat server that allows AI and users to chat in real time. Multiple AI can be spun up and divide up work or collaborate. I read through every PR and do a code review. Then when I approve it autodeploys from GH into GCP. I can run any test individually or run the entire suite. The services are all in docker so I can put it on any local or cloud service. Since you are at 0% for automation, I would just learn what you can from the manual testing, that will be your biggest data source to get going. If that is also at 0% or just bad, then you should start with traditional QA work and build up your tests, SOPs, and processes. Then flip over to automate it once you know how everything works.",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1w71asb/comment/p7sxw8e/",
+        "user_commenting": "redditor-9",
+        "user_url": "https://scrubbed.invalid/redditor-3",
+        "date_of_comment": "2026-09-04T16:09:00.537Z",
+        "num_upvotes": 1,
+        "num_replies": 0,
+        "replies": []
+      },
+      {
+        "comment": "If you are planning to co-live with AI. Make sure you are having great guardrails in your project like AGENTS.MD , CLAUDE.MD , rules guidance around e2e code review, project specific custom skill files. Go with playwright-cli instead of playwright-mcp as it uses less tokens and quick. Also, use playwright with typescript. Make sure you enable trace in your runs at-least for failed tests so that it will be easy to analyze especially for the AI.",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1w71asb/comment/p7std30/",
+        "user_commenting": "redditor-10",
+        "user_url": "https://scrubbed.invalid/redditor-3",
+        "date_of_comment": "2026-09-04T15:49:23.686Z",
+        "num_upvotes": 1,
+        "num_replies": 0,
+        "replies": []
+      },
+      {
+        "comment": "This sub is against AI, you shouldn't be asking this question here. Every comment and post supporting AI will be Downvoted. To answer your question, get an understanding of the application first before you finalize the stack. We are using Playwright MCP and it definitely helps our case. AI can hallucinate, don't let it be the judge, always ensure that you review the code.",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1w71asb/comment/p7slde3/",
+        "user_commenting": "redditor-11",
+        "user_url": "https://scrubbed.invalid/redditor-3",
+        "date_of_comment": "2026-09-04T15:14:40.208Z",
+        "num_upvotes": -2,
+        "num_replies": 1
+      },
+      {
+        "comment": "To extend on other people's points. Frameworks enable something or someone to create tests. So what you create should keep that in mind if it's enable agents to right automation. Ai assisted development or people with x skills to write automation and have all of the reviewed and monitor.",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1w71asb/comment/p7sjzz7/",
+        "user_commenting": "redditor-12",
+        "user_url": "https://scrubbed.invalid/redditor-3",
+        "date_of_comment": "2026-09-04T15:08:36.763Z",
+        "num_upvotes": 1,
+        "num_replies": 0,
+        "replies": []
+      },
+      {
+        "comment": "If I were starting at 0%, I’d actually use AI less than you think for the first few weeks. Your biggest risk isn’t writing tests slowly. It’s using AI to help you build 200 tests around the wrong architecture :) I’d spend the first month teaching Claude your system: architecture, critical user journeys, APIs, test data, past prod bugs, Jira history, what breaks often, what absolutely cannot break. Then I’d use AI for the boring/high-volume stuff: first-pass test generation, fixture creation, failure clustering, PR analysis, regression suggestions, etc. The interesting agent to build IMO isn’t “write Playwright tests for me.” It’s: “Here’s today’s PR. Based on what changed, dependencies touched and what has broken historically, tell me what we should test tonight and why.” That would be one of my Day 1 design goals even if I didn’t actually build the agent until month 2.",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1w71asb/comment/p7sfhei/",
+        "user_commenting": "redditor-13",
+        "user_url": "https://scrubbed.invalid/redditor-3",
+        "date_of_comment": "2026-09-04T14:48:46.815Z",
+        "num_upvotes": 3,
+        "num_replies": 1
+      },
+      {
+        "comment": "You've clearly used AI to write that, so ask it how it should go ahead?",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1w71asb/comment/p7s2ip4/",
+        "user_commenting": "redditor-14",
+        "user_url": "https://scrubbed.invalid/redditor-3",
+        "date_of_comment": "2026-09-04T13:50:08.053Z",
+        "num_upvotes": 19,
+        "num_replies": 0,
+        "replies": []
+      },
+      {
+        "comment": "I would get a lay of the land first before diving into a framework. Figure out what is important and what is possible. How would I run these tests in an ideal world? How would I do setup and teardown, seed the data, custom selectors, how would I run it in CI? I would also advise against just being a Playwright UI person, that is dime a dozen skill set. You need to know where the boundaries of the application are, why they matter, then design a framework around them. Playwright is the easy part, having a system architected to allow a good test suite to run consistently is the hard part.",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1w71asb/comment/p7rmfvt/",
+        "user_commenting": "redditor-15",
+        "user_url": "https://scrubbed.invalid/redditor-3",
+        "date_of_comment": "2026-09-04T12:30:36.723Z",
+        "num_upvotes": 2,
+        "num_replies": 0,
+        "replies": []
+      }
+    ],
+    "community_url": "https://www.reddit.com/r/QualityAssurance/",
+    "community_description": "Anything software QA -related; tools, processes, questions etc. As long as it's relevant you can post or ask whatever you like.\n\nSpam is forbidden. Spam masquerading as low-effort articles will be dealt with and link posts have been disabled. If you  are submitting an article or video, put a description before the link.\n\nWe like newbies. There are stickied threads for newbies, no they don't have to use them. Please do not message mods to shut down newbie threads.",
+    "community_members_num": 83275,
+    "community_rank": {
+      "community_rank_type": null,
+      "community_rank_value": null
+    },
+    "post_karma": 0,
+    "bio_description": null,
+    "embedded_links": null,
+    "description_markdown": "\n        \n     \n       \n       \n      Hey everyone,\n      \n      I&#x2019;m joining a fintech organization on  September 15 as an Automation QA Lead . They currently have  0% automation , so I&#x2019;ll be responsible for building the framework, defining the automation process/strategy, selecting test cases and getting automation started from scratch.\n      \n      The interesting part:  I won&#x2019;t have additional automation resources initially.  It&#x2019;ll basically be  me + Claude Desktop + AI tools .\n      \n      I have good experience with  Playwright and Cypress , and I&#x2019;m planning to use  Playwright + JavaScript .\n      \n      Since AI is now such a big part of development, I want to build the automation process with  AI in mind from Day 1 , rather than adding it later.\n      \n      I&#x2019;d love to hear from people already doing this in real projects:\n      AI + Automation  \n         \n       \n      How are you using AI in your Playwright/automation workflow?\n     \n      \n       \n      What tasks are actually worth delegating to AI?\n     \n      \n       \n      Any useful AI workflows/prompts you recommend?\n     \n     \n        MCPs  \n      Which MCPs have actually been useful for QA automation?\n      \n      For example:  Playwright, GitHub, Jira, Confluence, Database, Browser/DevTools, API , or custom MCPs.\n      AI Agents  \n      Are you using/building AI agents for QA?\n      \n      For example:\n      \n         \n       \n      Test case generation\n     \n      \n       \n      Automation/code generation\n     \n      \n       \n      Test data generation\n     \n      \n       \n      Failure analysis\n     \n      \n       \n      Locator maintenance\n     \n      \n       \n      Regression selection\n     \n      \n       \n      Test review\n     \n      \n       \n      Reporting\n     \n     \n        \n      Which ones have provided real value, and which are just hype?\n      Starting from 0%  \n      If you had to build a Playwright framework and automation process from scratch today, what would you prioritize from Day 1?\n      \n      Anything that you wish you had designed differently when starting your own framework?\n      GitHub Repos  \n      If you&apos;ve  built any GitHub repositories  around Playwright + AI, AI agents, MCPs, self-healing automation, AI test generation, etc., please share them.\n      \n      Also, if you know any  good open-source GitHub repos  that I should study, please drop them in the comments.\n      \n      Basically, if you were in my position &#x2014;  one QA Automation Lead, 0% existing automation, Playwright + JavaScript, and AI available from Day 1  &#x2014; how would you approach it?\n      \n      Would love to hear  real-world experiences, useful tools/MCPs, GitHub repos, and lessons from things that didn&apos;t work. \n      \n      Thanks!\n     \n     \n     \n    \n    ",
+    "subreddit_icon_image": null,
+    "author_icon": "https://scrubbed.invalid/redditor-16",
+    "user_id": "redditor-17",
+    "archived": "false",
+    "locked_post": false,
+    "timestamp": "2026-09-04T17:03:47.495Z",
+    "input": {
+      "url": "https://www.reddit.com/r/QualityAssurance/comments/1w71asb/starting_automation_from_0_as_a_qa_lead_how_are/"
+    },
+    "discovery_input": {
+      "url": "https://www.reddit.com/r/QualityAssurance/",
+      "sort_by": "New",
+      "sort_by_time": "",
+      "keyword": "",
+      "start_date": ""
+    }
+  },
+  {
+    "post_id": "t3_1w6xq38",
+    "url": "https://www.reddit.com/r/QualityAssurance/comments/1w6xq38/qa_engineer_but_searching_under_the_wrong_title/",
+    "user_posted": "redditor-18",
+    "title": "QA Engineer but searching under the wrong title?",
+    "description": "Looking to switch employers and feel like I'm searching wrong and I could use a sanity check. I am an QA Engineer. 1 year in the role, previously long background in 2nd-level support. My day-to-day is pretty shift-left: I test fresh tickets/PRs directly with developers (bugfix verification, feature testing), write test cases including a first test iteration, do design reviews, and sit in on concept/planning meetings for new features. No test automation. Problem: \"QA Engineer\" job postings rarely match what I actually do, because most describe classic end-of-cycle testing or expect automation skills, not the early/conceptual involvement I have. So I'm struggling to find postings worth applying to. Questions: If your job leans more QA Analyst / Requirements Engineering than a \"typical\" QA Engineer, do you search under different job titles? And which job boards actually give good results for this kind of hybrid role and remote roles, beyond the obvious big ones like LinkedIn? I am in the EU.",
+    "num_comments": 3,
+    "date_posted": "2026-09-04T07:44:55.211Z",
+    "community_name": "QualityAssurance",
+    "num_upvotes": 5,
+    "photos": null,
+    "videos": null,
+    "tag": null,
+    "related_posts": [
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1vbaic0/should_i_even_be_calling_myself_a_qa_engineer/",
+        "title": "Should I even be calling myself a QA Engineer anymore?",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1vbaic0/should_i_even_be_calling_myself_a_qa_engineer/",
+        "thumbnail": null,
+        "num_upvotes": "33",
+        "num_comments": 40
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1vstp2y/so_does_anyone_here_also_actually_still_like/",
+        "title": "So does anyone here also actually still like their QA job (currently?)",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1vstp2y/so_does_anyone_here_also_actually_still_like/",
+        "thumbnail": null,
+        "num_upvotes": "37",
+        "num_comments": 48
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1vay1he/feeling_lost_and_stressed_as_a_qa_engineer_need/",
+        "title": "Feeling lost and stressed as a QA engineer — need some perspective",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1vay1he/feeling_lost_and_stressed_as_a_qa_engineer_need/",
+        "thumbnail": null,
+        "num_upvotes": "21",
+        "num_comments": 14
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1vmpnsx/future_of_a_qa_career/",
+        "title": "Future of a QA Career",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1vmpnsx/future_of_a_qa_career/",
+        "thumbnail": null,
+        "num_upvotes": "50",
+        "num_comments": 50
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1vnhi31/any_of_you_guys_qa_but_never_learned_it/",
+        "title": "Any of you guys QA but never learned it ?",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1vnhi31/any_of_you_guys_qa_but_never_learned_it/",
+        "thumbnail": null,
+        "num_upvotes": "114",
+        "num_comments": 49
+      },
+      {
+        "community": "softwaretesting",
+        "community_url": "https://www.reddit.com/r/softwaretesting/comments/1vstrqv/so_does_anyone_here_also_actually_still_like/",
+        "title": "So does anyone here also actually still like their QA job (currently?)",
+        "url": "https://www.reddit.com/r/softwaretesting/comments/1vstrqv/so_does_anyone_here_also_actually_still_like/",
+        "thumbnail": null,
+        "num_upvotes": "62",
+        "num_comments": 56
+      },
+      {
+        "community": "softwaretesting",
+        "community_url": "https://www.reddit.com/r/softwaretesting/comments/1txgu2k/i_dont_know_what_to_do_about_qa_career_i_feel/",
+        "title": "I don’t know what to do about QA career. I feel trapped",
+        "url": "https://www.reddit.com/r/softwaretesting/comments/1txgu2k/i_dont_know_what_to_do_about_qa_career_i_feel/",
+        "thumbnail": null,
+        "num_upvotes": "51",
+        "num_comments": 17
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1vjvd5n/10_months_into_qa_and_seriously_questioning/",
+        "title": "10 months into QA and seriously questioning whether I want to continue in this career",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1vjvd5n/10_months_into_qa_and_seriously_questioning/",
+        "thumbnail": null,
+        "num_upvotes": "40",
+        "num_comments": 43
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1nyna61/where_to_transition_to_from_qa/",
+        "title": "Where to transition to FROM QA",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1nyna61/where_to_transition_to_from_qa/",
+        "thumbnail": null,
+        "num_upvotes": "26",
+        "num_comments": 20
+      },
+      {
+        "community": "softwaretesting",
+        "community_url": "https://www.reddit.com/r/softwaretesting/comments/1t4d173/anyone_happy_in_their_current_qa_role/",
+        "title": "Anyone happy in their current QA role?",
+        "url": "https://www.reddit.com/r/softwaretesting/comments/1t4d173/anyone_happy_in_their_current_qa_role/",
+        "thumbnail": null,
+        "num_upvotes": "21",
+        "num_comments": 41
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1t635zs/anyone_else_feel_like_the_qa_role_is_slowly/",
+        "title": "Anyone else feel like the QA role is slowly merging into something else?",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1t635zs/anyone_else_feel_like_the_qa_role_is_slowly/",
+        "thumbnail": null,
+        "num_upvotes": "82",
+        "num_comments": 51
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1vketaj/my_recent_qa_interview_experience/",
+        "title": "My recent QA interview experience",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1vketaj/my_recent_qa_interview_experience/",
+        "thumbnail": null,
+        "num_upvotes": "67",
+        "num_comments": 22
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1vo72a2/moving_back_from_ba_to_qa_after_2_years_am_i/",
+        "title": "Moving back from BA to QA after 2 years, am I making the right move? Which direction should I focus on? 7yrs exp. in QA",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1vo72a2/moving_back_from_ba_to_qa_after_2_years_am_i/",
+        "thumbnail": null,
+        "num_upvotes": "8",
+        "num_comments": 12
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1ummyk2/qa_folks_what_do_recruiters_consistently_get/",
+        "title": "QA folks: what do recruiters consistently get wrong about our roles?",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1ummyk2/qa_folks_what_do_recruiters_consistently_get/",
+        "thumbnail": null,
+        "num_upvotes": "26",
+        "num_comments": 36
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1vtfjfy/where_did_you_find_your_qa_job_besides_linkedin/",
+        "title": "Where did you find your QA job besides LinkedIn?",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1vtfjfy/where_did_you_find_your_qa_job_besides_linkedin/",
+        "thumbnail": null,
+        "num_upvotes": "27",
+        "num_comments": 34
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1vn25ve/3_years_as_a_qa_tester_but_worried_my_experience/",
+        "title": "3+ Years as a QA Tester, but Worried My Experience Isn't “Real” QA Experience — Need Advice",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1vn25ve/3_years_as_a_qa_tester_but_worried_my_experience/",
+        "thumbnail": null,
+        "num_upvotes": "18",
+        "num_comments": 25
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1tjmri4/frustrating_qa_career/",
+        "title": "Frustrating QA Career",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1tjmri4/frustrating_qa_career/",
+        "thumbnail": null,
+        "num_upvotes": "24",
+        "num_comments": 23
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1vyjpw6/how_do_you_stand_out_as_a_qatester/",
+        "title": "How do you stand out as a QA/Tester?",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1vyjpw6/how_do_you_stand_out_as_a_qatester/",
+        "thumbnail": null,
+        "num_upvotes": "13",
+        "num_comments": 42
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1tvpuxg/what_does_the_qa_process_look_like_at_your_company/",
+        "title": "What does the QA process look like at your company?",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1tvpuxg/what_does_the_qa_process_look_like_at_your_company/",
+        "thumbnail": null,
+        "num_upvotes": "28",
+        "num_comments": 20
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1v7fpn5/post_qa_careers/",
+        "title": "Post QA Careers",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1v7fpn5/post_qa_careers/",
+        "thumbnail": null,
+        "num_upvotes": "29",
+        "num_comments": 31
+      },
+      {
+        "community": "devpt",
+        "community_url": "https://www.reddit.com/r/devpt/comments/1urqdsr/qa_engineer/",
+        "title": "QA Engineer",
+        "url": "https://www.reddit.com/r/devpt/comments/1urqdsr/qa_engineer/",
+        "thumbnail": null,
+        "num_upvotes": "9",
+        "num_comments": 15
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1ucbobh/what_would_you_prioritize_if_you_were_building_qa/",
+        "title": "What would you prioritize if you were building QA from the ground up as the only QA in a company?",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1ucbobh/what_would_you_prioritize_if_you_were_building_qa/",
+        "thumbnail": null,
+        "num_upvotes": "23",
+        "num_comments": 16
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1w3cr06/got_tired_of_filtering_job_boards_for_qa_roles_so/",
+        "title": "Got tired of filtering job boards for QA roles, so I made a tiny site that only lists remote QA/testing jobs",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1w3cr06/got_tired_of_filtering_job_boards_for_qa_roles_so/",
+        "thumbnail": null,
+        "num_upvotes": "118",
+        "num_comments": 18
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1vnomnt/is_anyone_hiring_for_qa/",
+        "title": "Is anyone hiring for QA?",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1vnomnt/is_anyone_hiring_for_qa/",
+        "thumbnail": null,
+        "num_upvotes": "11",
+        "num_comments": 10
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1w0xbxf/discussion_transitioning_from_software/",
+        "title": "Discussion: Transitioning From Software Development to QA",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1w0xbxf/discussion_transitioning_from_software/",
+        "thumbnail": null,
+        "num_upvotes": "7",
+        "num_comments": 27
+      }
+    ],
+    "comments": [
+      {
+        "comment": "BA roles where BA absorbed test duties.",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1w6xq38/comment/p7qlt1q/",
+        "user_commenting": "redditor-19",
+        "user_url": "https://scrubbed.invalid/redditor-3",
+        "date_of_comment": "2026-09-04T08:07:08.631Z",
+        "num_upvotes": 1,
+        "num_replies": 1,
+        "replies": [
+          {
+            "user_replying": "redditor-20",
+            "user_url": "https://scrubbed.invalid/redditor-3",
+            "reply": "Yup your role is QA Analyst not QA Engineer. Look under that title.",
+            "date_of_reply": "2026-09-04T11:53:27.895Z",
+            "num_replies": 0,
+            "num_upvotes": 1
+          }
+        ]
+      }
+    ],
+    "community_url": "https://www.reddit.com/r/QualityAssurance/",
+    "community_description": "Anything software QA -related; tools, processes, questions etc. As long as it's relevant you can post or ask whatever you like.\n\nSpam is forbidden. Spam masquerading as low-effort articles will be dealt with and link posts have been disabled. If you  are submitting an article or video, put a description before the link.\n\nWe like newbies. There are stickied threads for newbies, no they don't have to use them. Please do not message mods to shut down newbie threads.",
+    "community_members_num": 83275,
+    "community_rank": {
+      "community_rank_type": null,
+      "community_rank_value": null
+    },
+    "post_karma": 0,
+    "bio_description": null,
+    "embedded_links": null,
+    "description_markdown": "\n        \n     \n       \n       \n      Looking to switch employers and feel like I&apos;m searching wrong and I could use a sanity check.\n      \n      I am an QA Engineer. 1 year in the role, previously long background in 2nd-level support. My day-to-day is pretty shift-left: I test fresh tickets/PRs directly with developers (bugfix verification, feature testing), write test cases including a first test iteration, do design reviews, and sit in on concept/planning meetings for new features. No test automation.\n      \n      Problem: &quot;QA Engineer&quot; job postings rarely match what I actually do, because most describe classic end-of-cycle testing or expect automation skills, not the early/conceptual involvement I have. So I&apos;m struggling to find postings worth applying to.\n      \n      Questions: If your job leans more QA Analyst / Requirements Engineering than a &quot;typical&quot; QA Engineer, do you search under different job titles? And which job boards actually give good results for this kind of hybrid role and remote roles, beyond the obvious big ones like LinkedIn? I am in the EU.\n     \n     \n     \n    \n    ",
+    "subreddit_icon_image": null,
+    "author_icon": "https://scrubbed.invalid/redditor-21",
+    "user_id": "redditor-22",
+    "archived": "false",
+    "locked_post": false,
+    "timestamp": "2026-09-04T17:03:48.286Z",
+    "input": {
+      "url": "https://www.reddit.com/r/QualityAssurance/comments/1w6xq38/qa_engineer_but_searching_under_the_wrong_title/"
+    },
+    "discovery_input": {
+      "url": "https://www.reddit.com/r/QualityAssurance/",
+      "sort_by": "New",
+      "sort_by_time": "",
+      "keyword": "",
+      "start_date": ""
+    }
+  },
+  {
+    "post_id": "t3_1w6sqjr",
+    "url": "https://www.reddit.com/r/QualityAssurance/comments/1w6sqjr/need_advice_on_what_to_built_for_qa_project/",
+    "user_posted": "redditor-23",
+    "title": "Need advice on what to built for QA project",
+    "description": "Hey , i have been assigned with developing an internal company project to help with QA process, issue is most of the things are already solved by jira bot like generating testcases or logging them etc… if not than chatgpt can do it instance , i need a problem that i can solve using AI and can build the project around it. I am asking here as this is the perfect space to ask as there are so many far experienced QA than me . Please advice me if you can… Thanks….",
+    "num_comments": 17,
+    "date_posted": "2026-09-04T03:18:15.292Z",
+    "community_name": "QualityAssurance",
+    "num_upvotes": 6,
+    "photos": null,
+    "videos": null,
+    "tag": null,
+    "related_posts": [
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1vn25ve/3_years_as_a_qa_tester_but_worried_my_experience/",
+        "title": "3+ Years as a QA Tester, but Worried My Experience Isn't “Real” QA Experience — Need Advice",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1vn25ve/3_years_as_a_qa_tester_but_worried_my_experience/",
+        "thumbnail": null,
+        "num_upvotes": "18",
+        "num_comments": 25
+      },
+      {
+        "community": null,
+        "community_url": "https://www.reddit.com/user/CapitalOne/",
+        "title": "No fees or minimums on checking accounts is the only play you need when you bank with Capital One.",
+        "url": null,
+        "thumbnail": null,
+        "num_upvotes": null,
+        "num_comments": null
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1vstp2y/so_does_anyone_here_also_actually_still_like/",
+        "title": "So does anyone here also actually still like their QA job (currently?)",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1vstp2y/so_does_anyone_here_also_actually_still_like/",
+        "thumbnail": null,
+        "num_upvotes": "37",
+        "num_comments": 48
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1vm807o/looking_for_qatesters_to_join_an_earlystage/",
+        "title": "Looking for QA/Testers to Join an Early-Stage Startup Team",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1vm807o/looking_for_qatesters_to_join_an_earlystage/",
+        "thumbnail": null,
+        "num_upvotes": "16",
+        "num_comments": 90
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1vbaic0/should_i_even_be_calling_myself_a_qa_engineer/",
+        "title": "Should I even be calling myself a QA Engineer anymore?",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1vbaic0/should_i_even_be_calling_myself_a_qa_engineer/",
+        "thumbnail": null,
+        "num_upvotes": "33",
+        "num_comments": 40
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1vxk8f1/is_building_a_longterm_career_as_a_qasdet_still/",
+        "title": "Is building a long-term career as a QA/SDET still worth it in the AI era, or should I pivot?",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1vxk8f1/is_building_a_longterm_career_as_a_qasdet_still/",
+        "thumbnail": null,
+        "num_upvotes": "16",
+        "num_comments": 28
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1tgr9d4/getting_bored_in_qa_and_at_the_same_time_worried/",
+        "title": "Getting bored in QA and at the same time worried. What should I do?",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1tgr9d4/getting_bored_in_qa_and_at_the_same_time_worried/",
+        "thumbnail": null,
+        "num_upvotes": "34",
+        "num_comments": 42
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1vay1he/feeling_lost_and_stressed_as_a_qa_engineer_need/",
+        "title": "Feeling lost and stressed as a QA engineer — need some perspective",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1vay1he/feeling_lost_and_stressed_as_a_qa_engineer_need/",
+        "thumbnail": null,
+        "num_upvotes": "21",
+        "num_comments": 14
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1ue6u13/what_are_the_most_frustrating_and_timeconsuming/",
+        "title": "What are the most frustrating and time-consuming parts of your QA job?",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1ue6u13/what_are_the_most_frustrating_and_timeconsuming/",
+        "thumbnail": null,
+        "num_upvotes": "27",
+        "num_comments": 54
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1oey7s2/tired_of_being_dev_want_to_migrate_to_qa/",
+        "title": "Tired of being DEV, want to migrate to QA",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1oey7s2/tired_of_being_dev_want_to_migrate_to_qa/",
+        "thumbnail": null,
+        "num_upvotes": "61",
+        "num_comments": 57
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1nrm8ht/can_i_move_to_development_after_7_years_in_qa/",
+        "title": "Can I move to development after 7 years in QA?",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1nrm8ht/can_i_move_to_development_after_7_years_in_qa/",
+        "thumbnail": null,
+        "num_upvotes": "35",
+        "num_comments": 43
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1vjvd5n/10_months_into_qa_and_seriously_questioning/",
+        "title": "10 months into QA and seriously questioning whether I want to continue in this career",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1vjvd5n/10_months_into_qa_and_seriously_questioning/",
+        "thumbnail": null,
+        "num_upvotes": "40",
+        "num_comments": 43
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1ungsqj/when_i_started_my_qa_career_i_believed_my_job_was/",
+        "title": "When I started my QA career, I believed my job was simple",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1ungsqj/when_i_started_my_qa_career_i_believed_my_job_was/",
+        "thumbnail": null,
+        "num_upvotes": "0",
+        "num_comments": 13
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1vysv8w/how_are_you_using_ai_in_your_daytoday_qatesting/",
+        "title": "How are you using AI in your day-to-day QA/testing work? Looking for feedback on my approach",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1vysv8w/how_are_you_using_ai_in_your_daytoday_qatesting/",
+        "thumbnail": null,
+        "num_upvotes": "15",
+        "num_comments": 22
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1nsit1x/preparing_for_a_junior_qa_role_what_should_i/",
+        "title": "Preparing for a Junior QA Role - What Should I Focus On?",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1nsit1x/preparing_for_a_junior_qa_role_what_should_i/",
+        "thumbnail": null,
+        "num_upvotes": "4",
+        "num_comments": 23
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1s7j8xh/beginner_in_qa_automation_seeking_advice_on_tools/",
+        "title": "Beginner in QA Automation - Seeking Advice on Tools, Projects, and Practical Automation Ideas",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1s7j8xh/beginner_in_qa_automation_seeking_advice_on_tools/",
+        "thumbnail": null,
+        "num_upvotes": "35",
+        "num_comments": 26
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1ucbobh/what_would_you_prioritize_if_you_were_building_qa/",
+        "title": "What would you prioritize if you were building QA from the ground up as the only QA in a company?",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1ucbobh/what_would_you_prioritize_if_you_were_building_qa/",
+        "thumbnail": null,
+        "num_upvotes": "23",
+        "num_comments": 16
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1vtvnve/qa_vs_ai_is_quality_engineering_still_worth/",
+        "title": "QA vs. AI: Is Quality Engineering still worth investing in? Need career advice!",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1vtvnve/qa_vs_ai_is_quality_engineering_still_worth/",
+        "thumbnail": null,
+        "num_upvotes": "7",
+        "num_comments": 27
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1rmdnep/starting_as_qa_director_in_april_after/",
+        "title": "Starting as QA Director in April after acquisition — looking for practical advice",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1rmdnep/starting_as_qa_director_in_april_after/",
+        "thumbnail": null,
+        "num_upvotes": "31",
+        "num_comments": 19
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1rbjt5h/website_for_qa_practice/",
+        "title": "Website for QA Practice",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1rbjt5h/website_for_qa_practice/",
+        "thumbnail": null,
+        "num_upvotes": "30",
+        "num_comments": 6
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1tjmri4/frustrating_qa_career/",
+        "title": "Frustrating QA Career",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1tjmri4/frustrating_qa_career/",
+        "thumbnail": null,
+        "num_upvotes": "24",
+        "num_comments": 23
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1nhzblh/is_qa_a_good_career_to_get_into/",
+        "title": "Is QA a good career to get into?",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1nhzblh/is_qa_a_good_career_to_get_into/",
+        "thumbnail": null,
+        "num_upvotes": "3",
+        "num_comments": 54
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1ubpdel/can_i_get_from_qa_to_development_job/",
+        "title": "Can i get from QA to development job ?",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1ubpdel/can_i_get_from_qa_to_development_job/",
+        "thumbnail": null,
+        "num_upvotes": "6",
+        "num_comments": 7
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1w3cr06/got_tired_of_filtering_job_boards_for_qa_roles_so/",
+        "title": "Got tired of filtering job boards for QA roles, so I made a tiny site that only lists remote QA/testing jobs",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1w3cr06/got_tired_of_filtering_job_boards_for_qa_roles_so/",
+        "thumbnail": null,
+        "num_upvotes": "118",
+        "num_comments": 18
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1v27pdi/how_can_i_stand_out_as_an_entrylevel_qa/",
+        "title": "How can I stand out as an entry-level QA Automation Engineer?",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1v27pdi/how_can_i_stand_out_as_an_entrylevel_qa/",
+        "thumbnail": null,
+        "num_upvotes": "3",
+        "num_comments": 9
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1w3ljp9/qa_just_venting_feeling_stuck/",
+        "title": "QA just venting.. feeling stuck",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1w3ljp9/qa_just_venting_feeling_stuck/",
+        "thumbnail": null,
+        "num_upvotes": "19",
+        "num_comments": 11
+      }
+    ],
+    "comments": [
+      {
+        "comment": "Did you ask your QA team what they need?",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1w6sqjr/comment/p7ro1ty/",
+        "user_commenting": "redditor-24",
+        "user_url": "https://scrubbed.invalid/redditor-3",
+        "date_of_comment": "2026-09-04T12:39:10.493Z",
+        "num_upvotes": 1,
+        "num_replies": 0,
+        "replies": []
+      },
+      {
+        "comment": "the eval-harness idea somebody dropped in one line is honestly the one worth building, more than another test-case generator on top of what jira or chatgpt already does. you can't assert on equality with non-deterministic output, so it ends up being weaker checks, did it call the right tool, are the required fields actually there, roughly that level of thing. score that against a rubric or a golden set with fuzzy matching instead of exact match. nobody in the thread really spelled that part out yet.",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1w6sqjr/comment/p7qtjik/",
+        "user_commenting": "redditor-25",
+        "user_url": "https://scrubbed.invalid/redditor-3",
+        "date_of_comment": "2026-09-04T09:14:09.816Z",
+        "num_upvotes": 1,
+        "num_replies": 0,
+        "replies": []
+      },
+      {
+        "comment": "I think you accidentally found the problem already. You’ve been told to build something with AI and now you’re looking for a QA problem to justify it. That’s backwards. Go to or create meetings with different teams. Ask devs, QAs, PMs, support \" what actually sucks in our SDLC you'd like to change? What wastes time? What breaks repeatedly? What is manual, flaky, slow, invisible or painful?\". For all of them create tickets , they have to be addressed, but find a real bottlenecks firsts, understand it, measure it, then decide what solves it. Maybe it’s AI. Maybe it’s better monitoring. Maybe it’s release automation with better CI workflows. Maybe it’s just fixing (and showing it to directors, making them believe it's the right way and thanks to this you'd have easier path of forcing others to use yours) a shit process. Generating test cases, Jira tickets and summaries is the obvious low-hanging fruit everyone already built (if you need one, don't reinvent wheel and adapt what is available). Don’t invent an AI-shaped problem because management asked for an AI-shaped project. I can bet €50 that there are more costly stuff holding your company than \"we lack AI in our workflows\". I can bet additional €50 that there's issue \"lack of documentation\". Your job as QA is also to challenge stupid management requests.",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1w6sqjr/comment/p7qj32t/",
+        "user_commenting": "redditor-26",
+        "user_url": "https://scrubbed.invalid/redditor-3",
+        "date_of_comment": "2026-09-04T07:43:34.779Z",
+        "num_upvotes": 3,
+        "num_replies": 1
+      },
+      {
+        "comment": "id build a risk testing assistant that analyzes jira tix, PRs, and past bugs to flag whats most likely to break and what deserve testing first",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1w6sqjr/comment/p7q4t8j/",
+        "user_commenting": "redditor-27",
+        "user_url": "https://scrubbed.invalid/redditor-3",
+        "date_of_comment": "2026-09-04T05:48:01.788Z",
+        "num_upvotes": 5,
+        "num_replies": 0,
+        "replies": []
+      },
+      {
+        "comment": "Automate some logging analysis",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1w6sqjr/comment/p7pz622/",
+        "user_commenting": "redditor-19",
+        "user_url": "https://scrubbed.invalid/redditor-3",
+        "date_of_comment": "2026-09-04T05:05:32.260Z",
+        "num_upvotes": 2,
+        "num_replies": 0,
+        "replies": []
+      },
+      {
+        "comment": "So we have tools, but we're missing a problem for the tools. How about problem to be solved: \"save company's money by not using tools which are not needed*. Other than that, make agents which will create test automation and prepare PR, based on output of Jira bots",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1w6sqjr/comment/p7pyesh/",
+        "user_commenting": "redditor-28",
+        "user_url": "https://scrubbed.invalid/redditor-3",
+        "date_of_comment": "2026-09-04T05:00:02.186Z",
+        "num_upvotes": 3,
+        "num_replies": 0,
+        "replies": []
+      },
+      {
+        "comment": "I’d build something around “what should we test?” rather than “write me test cases.” Feed it a PR + Jira ticket + recent production bugs, and have it flag the areas most likely to break, explain why, and recommend what deserves regression coverage. Basically a risk-based testing assistant. The useful output isn’t 50 AI-generated test cases nobody wants to read :) It’s “these 4 things changed, these 2 dependencies are affected, and this area caused 3 bugs before, test here first.” That’s a problem I’d actually want AI helping with.",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1w6sqjr/comment/p7pwhpi/",
+        "user_commenting": "redditor-13",
+        "user_url": "https://scrubbed.invalid/redditor-3",
+        "date_of_comment": "2026-09-04T04:46:21.812Z",
+        "num_upvotes": 11,
+        "num_replies": 2
+      },
+      {
+        "comment": "Build a eval harness for testing ai assisted features , ai bots , whatever that uses ai and gives non deterministic outputs",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1w6sqjr/comment/p7pppzm/",
+        "user_commenting": "redditor-29",
+        "user_url": "https://scrubbed.invalid/redditor-3",
+        "date_of_comment": "2026-09-04T03:59:22.929Z",
+        "num_upvotes": 2,
+        "num_replies": 0,
+        "replies": []
+      }
+    ],
+    "community_url": "https://www.reddit.com/r/QualityAssurance/",
+    "community_description": "Anything software QA -related; tools, processes, questions etc. As long as it's relevant you can post or ask whatever you like.\n\nSpam is forbidden. Spam masquerading as low-effort articles will be dealt with and link posts have been disabled. If you  are submitting an article or video, put a description before the link.\n\nWe like newbies. There are stickied threads for newbies, no they don't have to use them. Please do not message mods to shut down newbie threads.",
+    "community_members_num": 83275,
+    "community_rank": {
+      "community_rank_type": null,
+      "community_rank_value": null
+    },
+    "post_karma": 0,
+    "bio_description": null,
+    "embedded_links": null,
+    "description_markdown": "\n        \n     \n       \n       \n      Hey , i have been assigned with developing an internal company project to help with QA process, issue is most of the things are already solved by jira bot like generating testcases or logging them etc&#x2026; if not than chatgpt can do it instance , i need a problem that i can solve using AI and can build the project around it.\n      \n      I am asking here as this is the perfect space to ask as there are so many far experienced QA than me .\n      \n      Please advice me if you can&#x2026; Thanks&#x2026;.\n     \n     \n     \n    \n    ",
+    "subreddit_icon_image": null,
+    "author_icon": "https://scrubbed.invalid/redditor-30",
+    "user_id": "redditor-31",
+    "archived": "false",
+    "locked_post": false,
+    "timestamp": "2026-09-04T17:03:49.439Z",
+    "input": {
+      "url": "https://www.reddit.com/r/QualityAssurance/comments/1w6sqjr/need_advice_on_what_to_built_for_qa_project/"
+    },
+    "discovery_input": {
+      "url": "https://www.reddit.com/r/QualityAssurance/",
+      "sort_by": "New",
+      "sort_by_time": "",
+      "keyword": "",
+      "start_date": ""
+    }
+  },
+  {
+    "post_id": "t3_1w6jjip",
+    "url": "https://www.reddit.com/r/QualityAssurance/comments/1w6jjip/i_built_a_classical_image_processing_algorithm/",
+    "user_posted": "redditor-32",
+    "title": "I built a classical image processing algorithm that counts textile threads with high accuracy, source in body!",
+    "description": "Hello everyone! I'm a materials engineering student, during my last internship at a medical device company, i was FORCED to count threads by hand, hated it so much that I wrote code that automated it, tried to turn it into a startup, not going all that great so I thought i'll just document and release it, works on an Orange Pi and camera module, perfect for production lines, let me know if you have any remarks or questions, check it out! (includes sample images) https://github.com/Asxcvg/thread-counter",
+    "num_comments": 3,
+    "date_posted": "2026-09-03T20:43:04.995Z",
+    "community_name": "QualityAssurance",
+    "num_upvotes": 1,
+    "photos": null,
+    "videos": null,
+    "tag": null,
+    "related_posts": [
+      {
+        "community": "microsoftfabric",
+        "community_url": "https://www.reddit.com/r/MicrosoftFabric/comments/1vpycj7/can_we_expect_improvements_with_data_agents_with/",
+        "title": "Can we expect improvements with data agents with semantic models?",
+        "url": "https://www.reddit.com/r/MicrosoftFabric/comments/1vpycj7/can_we_expect_improvements_with_data_agents_with/",
+        "thumbnail": null,
+        "num_upvotes": "33",
+        "num_comments": 40
+      },
+      {
+        "community": "microsoftfabric",
+        "community_url": "https://www.reddit.com/r/MicrosoftFabric/comments/1vqdos2/microsoft_fabric_mirroring_semantic_model_aidata/",
+        "title": "Microsoft Fabric Mirroring → Semantic Model → AI/Data Agent: best architecture?",
+        "url": "https://www.reddit.com/r/MicrosoftFabric/comments/1vqdos2/microsoft_fabric_mirroring_semantic_model_aidata/",
+        "thumbnail": null,
+        "num_upvotes": "18",
+        "num_comments": 20
+      },
+      {
+        "community": "salesoperations",
+        "community_url": "https://www.reddit.com/r/SalesOperations/comments/1vhjprb/best_in_class_data_enrichment_tool/",
+        "title": "Best in class data enrichment tool",
+        "url": "https://www.reddit.com/r/SalesOperations/comments/1vhjprb/best_in_class_data_enrichment_tool/",
+        "thumbnail": null,
+        "num_upvotes": "9",
+        "num_comments": 22
+      }
+    ],
+    "comments": [
+      {
+        "comment": "This is a software testing sub. But somehow still a bit relevant. Anyway good job you massive nerd. I'd be proud as hack too if I did that 😁",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1w6jjip/comment/p7nqw4w/",
+        "user_commenting": "redditor-33",
+        "user_url": "https://scrubbed.invalid/redditor-3",
+        "date_of_comment": "2026-09-03T21:26:40.265Z",
+        "num_upvotes": 1,
+        "num_replies": 1,
+        "replies": [
+          {
+            "user_replying": "redditor-32",
+            "user_url": "https://scrubbed.invalid/redditor-3",
+            "reply": "thank you!",
+            "date_of_reply": "2026-09-03T21:36:33.413Z",
+            "num_replies": 0,
+            "num_upvotes": 1
+          }
+        ]
+      }
+    ],
+    "community_url": "https://www.reddit.com/r/QualityAssurance/",
+    "community_description": "Anything software QA -related; tools, processes, questions etc. As long as it's relevant you can post or ask whatever you like.\n\nSpam is forbidden. Spam masquerading as low-effort articles will be dealt with and link posts have been disabled. If you  are submitting an article or video, put a description before the link.\n\nWe like newbies. There are stickied threads for newbies, no they don't have to use them. Please do not message mods to shut down newbie threads.",
+    "community_members_num": 83275,
+    "community_rank": {
+      "community_rank_type": null,
+      "community_rank_value": null
+    },
+    "post_karma": 0,
+    "bio_description": null,
+    "embedded_links": null,
+    "description_markdown": "\n        \n     \n       \n       \n      Hello everyone!\n      \n      I&apos;m a materials engineering student, during my last internship at a medical device company, i was FORCED to count threads by hand, hated it so much that I wrote code that automated it, tried to turn it into a startup, not going all that great so I thought i&apos;ll just document and release it, works on an Orange Pi and camera module, perfect for production lines, let me know if you have any remarks or questions, check it out! (includes sample images)\n      \n       https://github.com/Asxcvg/thread-counter \n     \n     \n     \n    \n    ",
+    "subreddit_icon_image": null,
+    "author_icon": "https://scrubbed.invalid/redditor-34",
+    "user_id": "redditor-35",
+    "archived": "false",
+    "locked_post": false,
+    "timestamp": "2026-09-04T17:03:51.019Z",
+    "input": {
+      "url": "https://www.reddit.com/r/QualityAssurance/comments/1w6jjip/i_built_a_classical_image_processing_algorithm/"
+    },
+    "discovery_input": {
+      "url": "https://www.reddit.com/r/QualityAssurance/",
+      "sort_by": "New",
+      "sort_by_time": "",
+      "keyword": "",
+      "start_date": ""
+    }
+  }
+]

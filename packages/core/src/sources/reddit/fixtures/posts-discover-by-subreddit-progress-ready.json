@@ -1,0 +1,9 @@
+{
+  "status": "ready",
+  "snapshot_id": "sd_mtn7d1q324wb89f3vg",
+  "dataset_id": "gd_lvz8ah06191smkebj4",
+  "records": 5,
+  "errors": 0,
+  "collection_duration": 45674,
+  "avg_duration_per_input": 45674
+}

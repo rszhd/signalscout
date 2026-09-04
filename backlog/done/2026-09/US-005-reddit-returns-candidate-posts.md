@@ -6,7 +6,7 @@ priority: p1
 created: 2026-09-04
 parent:
 area:
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -52,27 +52,28 @@ a permanent full copy.
 
 ## Acceptance
 
-- [ ] A Reddit connector implements `SocialSource` and is registered in
+- [x] A Reddit connector implements `SocialSource` and is registered in
       `builtInSources`; nothing outside its folder names Bright Data
-- [ ] The user's own Bright Data key authenticates; a missing or invalid key
+- [x] The user's own Bright Data key authenticates; a missing or invalid key
       fails validation with a message that names what to fix
-- [ ] A search accepts subreddits and a query, and discovers posts by both
+- [x] A search accepts subreddits and a query, and discovers posts by both
 - [ ] Comments are opt-in per search, and the request that fetches them is
       counted and reported separately, because it is a second charge
-- [ ] `unitsConsumed` is the number of records the provider billed, and it is
+      — moved to [US-020](../../todo/US-020-a-monitor-can-include-reddit-comments.md)
+- [x] `unitsConsumed` is the number of records the provider billed, and it is
       never derived from `posts.length` by the caller
-- [ ] A request too large to answer synchronously returns
+- [x] A request too large to answer synchronously returns
       `next.status === "wait"` carrying the snapshot id as the cursor, and a
       later call with that cursor returns the finished page
-- [ ] A cursor is stored per query and sent on the next poll, so no page is
+- [x] A cursor is stored per query and sent on the next poll, so no page is
       fetched twice
-- [ ] Only an id, an excerpt, an author handle, a permalink and a timestamp
+- [x] Only an id, an excerpt, an author handle, a permalink and a timestamp
       are stored — not a full permanent copy
-- [ ] Tests run against fixtures captured from real Bright Data responses by a
+- [x] Tests run against fixtures captured from real Bright Data responses by a
       committed, re-runnable script; no test reaches the live API
-- [ ] Captured payloads are stored whole, with identifying fields scrubbed, and
+- [x] Captured payloads are stored whole, with identifying fields scrubbed, and
       no fixture is written from memory
-- [ ] The README says Reddit data arrives through Bright Data, and what a user
+- [x] The README says Reddit data arrives through Bright Data, and what a user
       needs in order to connect it
 
 ## Notes
@@ -88,6 +89,14 @@ a permanent full copy.
   have described wrongly.
 - [docs/testing.md](../../docs/testing.md), *A fixture for someone else's API
   must be captured, not written*.
+- The capture script is `packages/core/src/sources/reddit/fixtures/capture.mjs`.
+  `--only=credentials` re-captures the free payloads and spends nothing; a full
+  run costs about 25 records against a free tier of 5,000 a month.
+- **Bright Data sent no rate-limit headers in any captured response**, so the
+  connector has no back-off of its own. It is not a gap that can be closed by
+  guessing: the header would have to be observed first. If a poll is ever
+  refused for rate, capture that answer and handle it here, never in the
+  caller. docs/sources.md, *The rate limit is yours, not the caller's*.
 
 ## Log
 
@@ -111,3 +120,39 @@ a permanent full copy.
 - 2026-09-05 — Two consequences the provider decision carries, recorded here so
   they are not rediscovered: comments cost a second call per post, and a large
   request is asynchronous. Neither needs a change to `SocialSource`.
+- 2026-09-05 — Fixtures captured from a live account. The first run proved why
+  the rule exists: Bright Data's own documentation was wrong three times over.
+  `date` is a named range ("Past month"), not the calendar date the docs show,
+  and a calendar date is refused. Progress reports `running`, not the
+  documented `collecting` and `digesting`. Snapshot ids are `sd_`, not `s_`.
+  A parser written from the documentation would have been wrong in all three
+  places and green in every test.
+- 2026-09-05 — Credentials are checked by triggering an empty input list. An
+  empty list cannot start a collection, so the check is free however valid the
+  key is. A bad key answers 401 before the input is read; a good one gets as
+  far as "No data to trigger". Both answers are captured, so the branch is not
+  a guess about which failure means which.
+- 2026-09-05 — Comments split out to US-020. They cannot be added without
+  changing the `SocialSource` interface US-003 settled: `SourceQuery` has no
+  opt-in and no place for post URLs, and `unitsConsumed` is one number, so a
+  second charge cannot be reported apart from the first. That is three missing
+  fields, and the decision deserved its own ticket rather than being taken in
+  passing. The comment fixtures are already captured and committed, so US-020
+  starts with its evidence in hand.
+- 2026-09-05 — A gap found while checking the acceptance list rather than by a
+  test: with both queries and subreddits set, the first version collected the
+  keywords for ever and never asked for the subreddits. The cursor now names
+  the phase, and the connector hands over to the subreddits when the keywords
+  are exhausted. A caller that reads `next` cannot tell, which is the point.
+- 2026-09-05 — Every load-bearing line was broken on purpose and the suite went
+  red for all ten: double billing, billing the page length, dropping the
+  `since` filter, ignoring the cursor offset, reading a not-yet-servable
+  snapshot as records, rounding the date window inwards, failing to recognise a
+  rejected key, never handing over to the subreddit phase, accepting a cursor
+  we never issued, and starting a phase without reporting it. Two of the ten
+  survived at first; the tests were widened until they did not.
+- 2026-09-05 — **Unproven until it runs somewhere real.** `capture.mjs` drove
+  the live trigger, progress and download endpoints, so the payload shapes are
+  evidence. The connector's own code has only ever replayed them. Its handling
+  of a failed collection, of a snapshot that expires, and of any rate limit has
+  never met the provider. Budget that into the first ticket that schedules it.

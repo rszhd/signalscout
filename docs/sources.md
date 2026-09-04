@@ -23,12 +23,9 @@ takes a `SourceRuntime` and returns a `SocialSource`.
 export const redditSourceDefinition: SourceDefinition = {
   id: "reddit",
   displayName: "Reddit",
-  billableUnit: "call",
-  pricePerUnitMicros: 240,
-  credentialFields: [
-    { name: "clientId", label: "Client ID", secret: false },
-    { name: "clientSecret", label: "Client secret", secret: true },
-  ],
+  billableUnit: "record",
+  pricePerUnitMicros: 1500,
+  credentialFields: [{ name: "apiKey", label: "Bright Data API key", secret: true }],
   create: (runtime) => new RedditSource(runtime),
 };
 ```
@@ -88,6 +85,14 @@ capture script beside the fixture, store the payload whole, and scrub the
 identifying fields. A payload written from memory is evidence about our parser
 and no evidence at all about the wire format. [testing.md](testing.md) has the
 case that proves it.
+
+`biome.json` excludes `sources/*/fixtures/*.json` from formatting. A captured
+payload is evidence about someone else's API; a formatter that rewrites it
+makes the file a record of our tooling instead.
+
+`sources/reddit/fixtures/capture.mjs` is the worked example. Its first run
+answered three questions the provider's own documentation got wrong, which is
+the whole argument for capturing rather than writing.
 
 The fake source is the exception, and it is not one: its fixtures are
 `CandidatePost` values, which is our own shape. Use it to test everything

@@ -1,0 +1,196 @@
+{
+  "capturedBy": "packages/core/src/sources/reddit/fixtures/capture.mjs",
+  "provider": "Bright Data, Reddit Scraper API, datasets v3",
+  "note": "Author identity is replaced with stable pseudonyms. Everything else is whole.",
+  "fixtures": [
+    {
+      "file": "comments-by-post-url-progress-ready.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.brightdata.com/datasets/v3/progress/sd_mtn7eaqq212gsm8sev"
+      },
+      "capturedAt": "2026-09-04T17:05:00.417Z",
+      "identitiesReplaced": 0
+    },
+    {
+      "file": "comments-by-post-url-progress-running.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.brightdata.com/datasets/v3/progress/sd_mtn7eaqq212gsm8sev"
+      },
+      "capturedAt": "2026-09-04T17:04:04.877Z",
+      "identitiesReplaced": 0
+    },
+    {
+      "file": "comments-by-post-url-records.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.brightdata.com/datasets/v3/snapshot/sd_mtn7eaqq212gsm8sev?format=json"
+      },
+      "capturedAt": "2026-09-04T17:05:01.811Z",
+      "identitiesReplaced": 5
+    },
+    {
+      "file": "comments-by-post-url-snapshot-not-ready.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.brightdata.com/datasets/v3/snapshot/sd_mtn7eaqq212gsm8sev?format=json",
+        "note": "asked while the snapshot was \"running\""
+      },
+      "capturedAt": "2026-09-04T17:04:05.161Z",
+      "identitiesReplaced": 0
+    },
+    {
+      "file": "comments-by-post-url-trigger.json",
+      "request": {
+        "method": "POST",
+        "url": "https://api.brightdata.com/datasets/v3/trigger?dataset_id=gd_lvzdpsdlw09j6t702&format=json&include_errors=true&limit_per_input=5",
+        "body": [
+          {
+            "url": "https://www.reddit.com/r/learnpython/comments/1vvuwfy/playwright_button_is_clicked_but_doesnt_continue/",
+            "days_back": 30
+          }
+        ]
+      },
+      "capturedAt": "2026-09-04T17:04:04.522Z",
+      "identitiesReplaced": 0
+    },
+    {
+      "file": "credentials-accepted.json",
+      "request": {
+        "method": "POST",
+        "url": "https://api.brightdata.com/datasets/v3/trigger?dataset_id=gd_lvz8ah06191smkebj4&format=json&include_errors=true&limit_per_input=5&type=discover_new&discover_by=keyword",
+        "body": [],
+        "note": "sent with a working key; an empty input list collects nothing, so this costs nothing"
+      },
+      "capturedAt": "2026-09-04T17:07:41.687Z",
+      "identitiesReplaced": 0
+    },
+    {
+      "file": "credentials-rejected.json",
+      "request": {
+        "method": "POST",
+        "url": "https://api.brightdata.com/datasets/v3/trigger?dataset_id=gd_lvz8ah06191smkebj4&format=json&include_errors=true&limit_per_input=5&type=discover_new&discover_by=keyword",
+        "body": [],
+        "note": "sent with a deliberately invalid bearer token"
+      },
+      "capturedAt": "2026-09-04T17:07:40.799Z",
+      "identitiesReplaced": 0
+    },
+    {
+      "file": "input-rejected.json",
+      "request": {
+        "method": "POST",
+        "url": "https://api.brightdata.com/datasets/v3/trigger?dataset_id=gd_lvz8ah06191smkebj4&format=json&include_errors=true&limit_per_input=5&type=discover_new&discover_by=keyword",
+        "note": "sent date \"2026-08-01\"; the accepted values are \"All time\", \"Past month\", \"Past week\", \"Today\""
+      },
+      "capturedAt": "2026-09-04T17:07:42.066Z",
+      "identitiesReplaced": 0
+    },
+    {
+      "file": "posts-discover-by-keyword-progress-ready.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.brightdata.com/datasets/v3/progress/sd_mtn7bkgzumllqhwfk"
+      },
+      "capturedAt": "2026-09-04T17:03:04.015Z",
+      "identitiesReplaced": 0
+    },
+    {
+      "file": "posts-discover-by-keyword-progress-running.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.brightdata.com/datasets/v3/progress/sd_mtn7bkgzumllqhwfk"
+      },
+      "capturedAt": "2026-09-04T17:01:57.483Z",
+      "identitiesReplaced": 0
+    },
+    {
+      "file": "posts-discover-by-keyword-records.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.brightdata.com/datasets/v3/snapshot/sd_mtn7bkgzumllqhwfk?format=json"
+      },
+      "capturedAt": "2026-09-04T17:03:05.701Z",
+      "identitiesReplaced": 49
+    },
+    {
+      "file": "posts-discover-by-keyword-snapshot-not-ready.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.brightdata.com/datasets/v3/snapshot/sd_mtn7bkgzumllqhwfk?format=json",
+        "note": "asked while the snapshot was \"running\""
+      },
+      "capturedAt": "2026-09-04T17:01:57.764Z",
+      "identitiesReplaced": 0
+    },
+    {
+      "file": "posts-discover-by-keyword-trigger.json",
+      "request": {
+        "method": "POST",
+        "url": "https://api.brightdata.com/datasets/v3/trigger?dataset_id=gd_lvz8ah06191smkebj4&format=json&include_errors=true&limit_per_input=5&type=discover_new&discover_by=keyword",
+        "body": [
+          {
+            "keyword": "playwright tests keep breaking",
+            "date": "Past month",
+            "num_of_posts": 5
+          }
+        ]
+      },
+      "capturedAt": "2026-09-04T17:01:57.181Z",
+      "identitiesReplaced": 0
+    },
+    {
+      "file": "posts-discover-by-subreddit-progress-ready.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.brightdata.com/datasets/v3/progress/sd_mtn7d1q324wb89f3vg"
+      },
+      "capturedAt": "2026-09-04T17:04:01.348Z",
+      "identitiesReplaced": 0
+    },
+    {
+      "file": "posts-discover-by-subreddit-progress-running.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.brightdata.com/datasets/v3/progress/sd_mtn7d1q324wb89f3vg"
+      },
+      "capturedAt": "2026-09-04T17:03:06.405Z",
+      "identitiesReplaced": 0
+    },
+    {
+      "file": "posts-discover-by-subreddit-records.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.brightdata.com/datasets/v3/snapshot/sd_mtn7d1q324wb89f3vg?format=json"
+      },
+      "capturedAt": "2026-09-04T17:04:04.059Z",
+      "identitiesReplaced": 35
+    },
+    {
+      "file": "posts-discover-by-subreddit-snapshot-not-ready.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.brightdata.com/datasets/v3/snapshot/sd_mtn7d1q324wb89f3vg?format=json",
+        "note": "asked while the snapshot was \"running\""
+      },
+      "capturedAt": "2026-09-04T17:03:06.663Z",
+      "identitiesReplaced": 0
+    },
+    {
+      "file": "posts-discover-by-subreddit-trigger.json",
+      "request": {
+        "method": "POST",
+        "url": "https://api.brightdata.com/datasets/v3/trigger?dataset_id=gd_lvz8ah06191smkebj4&format=json&include_errors=true&limit_per_input=5&type=discover_new&discover_by=subreddit_url",
+        "body": [
+          {
+            "url": "https://www.reddit.com/r/QualityAssurance/",
+            "sort_by": "New"
+          }
+        ]
+      },
+      "capturedAt": "2026-09-04T17:03:06.118Z",
+      "identitiesReplaced": 0
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "httpStatus": 400,
+  "body": {
+    "error": "Invalid input provided",
+    "code": "validation_error",
+    "type": "validation",
+    "line": "{\"keyword\":\"playwright tests\",\"date\":\"2026-08-01\",\"num_of_posts\":1,\"sort_by\":\"\"}",
+    "index": 1,
+    "errors": [
+      [
+        "date",
+        "This value is not allowed"
+      ]
+    ]
+  }
+}

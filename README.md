@@ -58,7 +58,7 @@ before anything reaches a model, so you are not billed for reading noise.
 IntentWatch ships the integrations. You own the accounts.
 
 ```env
-BRIGHTDATA_API_KEY=      # Reddit
+REDDIT_API_KEY=          # Reddit, served by Bright Data
 
 X_API_KEY=               # optional
 X_API_SECRET=
@@ -71,7 +71,7 @@ data leaves your instance, and the AI provider is yours to choose — including
 Ollama, if you want no external provider at all.
 
 You only need keys for the sources you turn on. Reddit alone is a useful
-product, so `BRIGHTDATA_API_KEY` and an AI key are enough to start.
+product, so `REDDIT_API_KEY` and an AI key are enough to start.
 
 ### What that costs
 
@@ -121,7 +121,8 @@ There is no connector for it today. Open an issue if you want one.
 1. Create an account at [brightdata.com](https://brightdata.com). No card, no
    company verification.
 2. Open **Settings → API keys** and create a key.
-3. Put it in `.env` as `BRIGHTDATA_API_KEY=…`.
+3. Put it in `.env` as `REDDIT_API_KEY=…`. The variable is named after the
+   source you connect, not the company that serves it.
 
 That is all. You do not choose a dataset, a scraper or a plan; IntentWatch asks
 for the Reddit ones by name.
@@ -150,6 +151,35 @@ image is built in CI, so your server pulls it and never compiles anything.
 The worker runs inside the API process by default. To give it its own
 container, set `WORKER_IN_PROCESS=false` and `COMPOSE_PROFILES=worker` in
 `.env`. It is the same image either way.
+
+### When a monitor stops finding things
+
+The queue is tables in your own Postgres, so looking at it is SQL and needs no
+extra tool.
+
+```sql
+-- What is waiting, running or failing, per queue.
+SELECT name, state, count(*) FROM pgboss.job GROUP BY name, state;
+
+-- Jobs that failed every attempt. They stop here; nothing retries them.
+SELECT source_name, created_on, output FROM pgboss.job
+WHERE name = 'dead-letter' ORDER BY created_on DESC LIMIT 20;
+
+-- Is the scheduler's clock running?
+SELECT * FROM pgboss.schedule;
+
+-- When each monitor was last polled, and how often it asks to be.
+SELECT name, last_polled_at, poll_interval_seconds FROM monitors;
+```
+
+A job that failed is retried five times with a growing delay, over about an
+hour, and then moves to `dead-letter` and stops. That is deliberate: a job that
+throws for ever must not keep spending your API allowance while nobody is
+watching. Fix the cause, then `SELECT` the row to see what it was.
+
+Poll frequency is a cost dial, not a speed dial. Each monitor carries its own
+`poll_interval_seconds`, at least 60, and a shorter interval means more reads
+against your key.
 
 There will be a cheap hosted version later, for people who would rather not run
 a server. The open-source build will not be crippled to sell it.

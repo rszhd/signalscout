@@ -171,7 +171,7 @@ export class BrightDataClient {
     if (httpStatus === 401 || httpStatus === 403 || /invalid credentials/i.test(text)) {
       return new BrightDataError(
         "credentials",
-        "Bright Data rejected the API key. Check BRIGHTDATA_API_KEY, or create a new key " +
+        "Bright Data rejected the API key. Check REDDIT_API_KEY, or create a new key " +
           "at brightdata.com under Settings, API keys.",
         httpStatus,
       );

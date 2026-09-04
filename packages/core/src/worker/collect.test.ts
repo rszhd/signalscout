@@ -1,0 +1,240 @@
+import { eq } from "drizzle-orm";
+import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
+import { createDatabase, type Database } from "../db/client.js";
+import { monitors, posts } from "../db/schema.js";
+import { fakePosts } from "../sources/fake/fixtures.js";
+import type { CandidatePost, SocialSource } from "../sources/types.js";
+import { createTestDatabase, type TestDatabase } from "../testing/database.js";
+import { createCollectStep, excerptLength, maxPagesPerPoll } from "./collect.js";
+import type { CredentialLookup } from "./credentials.js";
+import { filterQueue } from "./queues.js";
+import type { StepContext } from "./steps.js";
+import { fakeRegistry, insertMonitor, silentLogger } from "./testing.js";
+
+/**
+ * The poll step, driven without a queue.
+ *
+ * The source is the fake connector, whose runtime is given a `fetch` that
+ * cannot reach anything, so "this test spends no money" is a property of the
+ * setup and not a claim about the code.
+ */
+const credentials: CredentialLookup = () => ({ token: "test-token" });
+
+function stubBoss() {
+  return { send: vi.fn(async (_queue: string, _payload: unknown) => "job-1") };
+}
+
+/** What the step handed to a queue, or a failure that says which queue was silent. */
+function sentTo(boss: ReturnType<typeof stubBoss>, queue: string): { postIds: string[] } {
+  const call = boss.send.mock.calls.find(([name]) => name === queue);
+
+  if (!call) throw new Error(`Nothing was sent to the ${queue} queue.`);
+
+  return call[1] as { postIds: string[] };
+}
+
+function contextFor(db: Database, boss: ReturnType<typeof stubBoss>): StepContext {
+  return { db, boss: boss as unknown as StepContext["boss"], logger: silentLogger };
+}
+
+describe("the poll step", () => {
+  let database: TestDatabase;
+  let db: Database;
+  let close: () => Promise<void>;
+
+  beforeAll(async () => {
+    database = await createTestDatabase("worker_collect");
+    ({ db, close } = createDatabase(database.url));
+  }, 60_000);
+
+  afterAll(async () => {
+    await close?.();
+    await database?.drop();
+  });
+
+  afterEach(async () => {
+    await db.delete(posts);
+    await db.delete(monitors);
+  });
+
+  it("stores what the source returned and hands the ids to the filter step", async () => {
+    const monitorId = await insertMonitor(database);
+    const boss = stubBoss();
+    const registry = fakeRegistry();
+
+    await createCollectStep({ registry, credentialsFor: credentials })(
+      { monitorId },
+      contextFor(db, boss),
+    );
+
+    const stored = await db.select().from(posts);
+
+    expect(stored).toHaveLength(fakePosts.length);
+    expect(stored.map((post) => post.externalId).sort()).toEqual(
+      fakePosts.map((post) => post.externalId).sort(),
+    );
+    expect(stored.every((post) => post.source === "reddit")).toBe(true);
+
+    expect(boss.send).toHaveBeenCalledTimes(1);
+    expect(sentTo(boss, filterQueue).postIds).toHaveLength(fakePosts.length);
+  });
+
+  it("pages until the source says it is done, and never on the page length", async () => {
+    // Two posts a page, five posts. A caller that stopped when a page came
+    // back shorter than the last would keep two of the five.
+    const monitorId = await insertMonitor(database);
+    const registry = fakeRegistry({ pageSize: 2 });
+
+    await createCollectStep({ registry, credentialsFor: credentials })(
+      { monitorId },
+      contextFor(db, stubBoss()),
+    );
+
+    expect(await db.select().from(posts)).toHaveLength(fakePosts.length);
+  });
+
+  it("stops at the page cap rather than spending without a limit", async () => {
+    const many: CandidatePost[] = Array.from({ length: 40 }, (_, index) => ({
+      externalId: `bulk-${index}`,
+      url: `https://example.test/bulk/${index}`,
+      text: `Post number ${index}`,
+      postedAt: new Date("2026-08-10T09:00:00.000Z"),
+    }));
+
+    const monitorId = await insertMonitor(database);
+    const registry = fakeRegistry({ posts: many, pageSize: 1 });
+    const source = registry.get("reddit") as SocialSource & { calls: readonly unknown[] };
+
+    await createCollectStep({ registry, credentialsFor: credentials })(
+      { monitorId },
+      contextFor(db, stubBoss()),
+    );
+
+    // The cap, not the forty posts behind it. The budget guard in US-013 is
+    // the real limit; this is the backstop that stops one poll running away
+    // before it exists.
+    expect(source.calls).toHaveLength(maxPagesPerPoll);
+    expect(await db.select().from(posts)).toHaveLength(maxPagesPerPoll);
+  });
+
+  it("stops when the source asks to be called back later", async () => {
+    const monitorId = await insertMonitor(database);
+    // One search, then the allowance is gone and the connector reports a wait.
+    const registry = fakeRegistry({ pageSize: 1, callsBeforeRateLimit: 1 });
+    const source = registry.get("reddit") as SocialSource & { calls: readonly unknown[] };
+
+    await createCollectStep({ registry, credentialsFor: credentials })(
+      { monitorId },
+      contextFor(db, stubBoss()),
+    );
+
+    // Two calls: the one that was served, and the one that was told to wait.
+    // Holding the job open for the window would block a worker slot and, on a
+    // long window, expire the job.
+    expect(source.calls).toHaveLength(2);
+    expect(await db.select().from(posts)).toHaveLength(1);
+  });
+
+  it("skips a source with no credentials instead of failing the job", async () => {
+    // A missing key is not transient. Failing here would retry four times and
+    // then bury the one sentence the user has to read in a dead letter queue.
+    const monitorId = await insertMonitor(database);
+    const registry = fakeRegistry();
+    const source = registry.get("reddit") as SocialSource & { calls: readonly unknown[] };
+    const boss = stubBoss();
+
+    await expect(
+      createCollectStep({ registry, credentialsFor: () => undefined })(
+        { monitorId },
+        contextFor(db, boss),
+      ),
+    ).resolves.toBeUndefined();
+
+    expect(source.calls).toHaveLength(0);
+    expect(boss.send).not.toHaveBeenCalled();
+    expect(await db.select().from(posts)).toHaveLength(0);
+  });
+
+  it("moves the poll mark forward and asks the next poll only for what is newer", async () => {
+    const monitorId = await insertMonitor(database);
+    const registry = fakeRegistry();
+    const source = registry.get("reddit") as SocialSource & {
+      calls: readonly { query: { since?: Date } }[];
+    };
+    const collect = createCollectStep({ registry, credentialsFor: credentials });
+
+    await collect({ monitorId }, contextFor(db, stubBoss()));
+
+    const [afterFirst] = await db.select().from(monitors).where(eq(monitors.id, monitorId));
+
+    expect(source.calls[0]?.query.since).toBeUndefined();
+    expect(afterFirst?.lastPolledAt).not.toBeNull();
+
+    await collect({ monitorId }, contextFor(db, stubBoss()));
+
+    // The second poll asks from where the first one got to. Without this every
+    // poll re-reads the whole window, and on X every re-read is billed.
+    expect(source.calls[1]?.query.since?.getTime()).toBe(afterFirst?.lastPolledAt?.getTime());
+  });
+
+  it("stores a post once, and still gives its id to a second monitor", async () => {
+    const first = await insertMonitor(database);
+    const second = await insertMonitor(database, { name: "Second monitor" });
+    const registry = fakeRegistry();
+    const collect = createCollectStep({ registry, credentialsFor: credentials });
+
+    const firstBoss = stubBoss();
+    const secondBoss = stubBoss();
+
+    await collect({ monitorId: first }, contextFor(db, firstBoss));
+    await collect({ monitorId: second }, contextFor(db, secondBoss));
+
+    // One row per post, however many monitors saw it. The unique constraint is
+    // the last defence when the cursor logic fails.
+    expect(await db.select().from(posts)).toHaveLength(fakePosts.length);
+
+    // And the second monitor still gets every id. Returning only the newly
+    // inserted rows would drop a post out of the second monitor's pipeline
+    // for good, because it was already stored by the first.
+    expect(sentTo(secondBoss, filterQueue).postIds).toHaveLength(fakePosts.length);
+  });
+
+  it("keeps an excerpt, not the whole post", async () => {
+    // Reddit's terms require that content the author removed stops being
+    // shown. The less we hold, the less there is to remove.
+    const long = "x".repeat(excerptLength + 500);
+    const monitorId = await insertMonitor(database);
+    const registry = fakeRegistry({
+      posts: [
+        {
+          externalId: "long-1",
+          url: "https://example.test/long/1",
+          text: long,
+          postedAt: new Date("2026-08-10T09:00:00.000Z"),
+        },
+      ],
+    });
+
+    await createCollectStep({ registry, credentialsFor: credentials })(
+      { monitorId },
+      contextFor(db, stubBoss()),
+    );
+
+    const [stored] = await db.select().from(posts);
+
+    expect(stored?.excerpt).toHaveLength(excerptLength);
+  });
+
+  it("does nothing when the monitor was deleted between the tick and the job", async () => {
+    const boss = stubBoss();
+
+    await expect(
+      createCollectStep({ registry: fakeRegistry(), credentialsFor: credentials })(
+        { monitorId: "00000000-0000-0000-0000-000000000000" },
+        contextFor(db, boss),
+      ),
+    ).resolves.toBeUndefined();
+
+    expect(boss.send).not.toHaveBeenCalled();
+  });
+});

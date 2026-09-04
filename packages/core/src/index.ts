@@ -2,11 +2,13 @@ export { type Env, envSchema, loadEnv } from "./config/env.js";
 export { createDatabase, type Database } from "./db/client.js";
 export { migrationsFolder, runMigrations } from "./db/migrate.js";
 export {
+  defaultPollIntervalSeconds,
   embeddingDimensions,
   feedback,
   type IntentType,
   intentTypes,
   matches,
+  minimumPollIntervalSeconds,
   monitors,
   posts,
   type Signal,
@@ -16,7 +18,7 @@ export {
   type Verdict,
   verdicts,
 } from "./db/schema.js";
-export { createLogger, type Logger } from "./logger.js";
+export { createLogger, type Logger, type LoggerOptions } from "./logger.js";
 export {
   assertSourcesCanBeStored,
   builtInSources,
@@ -45,10 +47,51 @@ export {
   sourceIdPattern,
   UnknownSourceError,
 } from "./sources/index.js";
+export { createCollectStep, excerptLength, maxPagesPerPoll } from "./worker/collect.js";
+export {
+  type CredentialLookup,
+  credentialsFromEnvironment,
+  environmentVariableFor,
+} from "./worker/credentials.js";
+export {
+  allQueues,
+  type ClassifyPayload,
+  classifyQueue,
+  deadLetterQueue,
+  type FilterPayload,
+  filterQueue,
+  heartbeatQueue,
+  type NotifyPayload,
+  notifyQueue,
+  type PipelinePayload,
+  type PipelineQueue,
+  type PollPayload,
+  pipelineQueues,
+  pollQueue,
+  pollQueuePolicy,
+  queueDefinitions,
+  type RetryPolicy,
+  retryPolicy,
+  scheduleTickCron,
+  scheduleTickQueue,
+} from "./worker/queues.js";
 export {
   type HeartbeatPayload,
-  heartbeatQueue,
   type StartWorkerOptions,
   startWorker,
   type WorkerHandle,
 } from "./worker/runtime.js";
+export {
+  type DueMonitor,
+  enqueueDuePolls,
+  findDueMonitors,
+  type TickResult,
+} from "./worker/schedule.js";
+export {
+  type PipelineSteps,
+  passThroughFilter,
+  type Step,
+  type StepContext,
+  unimplementedClassify,
+  unimplementedNotify,
+} from "./worker/steps.js";

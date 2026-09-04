@@ -515,7 +515,7 @@ describe("a key is checked without spending anything", () => {
     expect(check.valid).toBe(false);
     // A boolean would leave a user with nowhere to go. PLAN.md's sketch
     // returned one; US-003 replaced it with a sentence for this case.
-    expect(check).toMatchObject({ reason: expect.stringContaining("BRIGHTDATA_API_KEY") });
+    expect(check).toMatchObject({ reason: expect.stringContaining("REDDIT_API_KEY") });
   });
 
   it("says the field is empty rather than asking the provider", async () => {

@@ -65,6 +65,27 @@ export type Verdict = (typeof verdicts)[number];
  */
 export const embeddingDimensions = 1536;
 
+/**
+ * How long a new monitor waits between polls.
+ *
+ * Poll frequency is a cost dial, not a performance dial. Bright Data's free
+ * allowance is 5,000 records a month, and one poll can collect fifty, so a
+ * default of every fifteen minutes spends the allowance before anyone reads a
+ * match. One hour is the conservative start. US-013's cap is the real guard;
+ * this only decides how fast an unguarded monitor gets there.
+ */
+export const defaultPollIntervalSeconds = 3600;
+
+/**
+ * The shortest interval a monitor may be set to.
+ *
+ * There is no product reason to poll a social network more than once a minute,
+ * and on a metered source a typo of `1` instead of `100` is an invoice. The
+ * floor is a constraint rather than form validation because the worker reads
+ * this column directly.
+ */
+export const minimumPollIntervalSeconds = 60;
+
 /** SQL fragment for a score column that must read 0 to 100. */
 function scoreRange(column: string) {
   return sql.raw(`${column} BETWEEN 0 AND 100`);
@@ -80,25 +101,54 @@ function oneOf(column: string, values: readonly string[]) {
  * generated queries beside them. They are separate columns on purpose: a query
  * is regenerated when the prompt improves, and nobody retypes an answer.
  */
-export const monitors = pgTable("monitors", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  /**
-   * Better Auth owns the user table and creates it in US-017, so this carries
-   * no foreign key yet. Text, because Better Auth ids are text.
-   */
-  userId: text("user_id").notNull(),
-  name: text("name").notNull(),
-  /** The four answers. PLAN.md, *Monitor creation*. */
-  product: text("product").notNull(),
-  idealCustomer: text("ideal_customer").notNull(),
-  problem: text("problem").notNull(),
-  signals: text("signals").array().notNull().default(sql`'{}'`),
-  /** Generated, not typed. Shown to the user and editable. US-010. */
-  generatedQueries: jsonb("generated_queries").notNull().default(sql`'[]'::jsonb`),
-  generatedSubreddits: text("generated_subreddits").array().notNull().default(sql`'{}'`),
-  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
-});
+export const monitors = pgTable(
+  "monitors",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    /**
+     * Better Auth owns the user table and creates it in US-017, so this carries
+     * no foreign key yet. Text, because Better Auth ids are text.
+     */
+    userId: text("user_id").notNull(),
+    name: text("name").notNull(),
+    /** The four answers. PLAN.md, *Monitor creation*. */
+    product: text("product").notNull(),
+    idealCustomer: text("ideal_customer").notNull(),
+    problem: text("problem").notNull(),
+    signals: text("signals").array().notNull().default(sql`'{}'`),
+    /** Generated, not typed. Shown to the user and editable. US-010. */
+    generatedQueries: jsonb("generated_queries").notNull().default(sql`'[]'::jsonb`),
+    generatedSubreddits: text("generated_subreddits").array().notNull().default(sql`'{}'`),
+    /**
+     * The connectors this monitor polls. Empty means the monitor is configured
+     * but polls nothing, which is what a half-finished monitor should do.
+     *
+     * There is no check constraint listing the ids, because the registry already
+     * refuses to boot on a source it does not have, and `posts.source` refuses to
+     * store one the schema cannot hold. Two guards at boot beat one at 02:00.
+     * US-010's form writes this column.
+     */
+    sources: text("sources").array().$type<Source[]>().notNull().default(sql`'{}'`),
+    /** Per monitor, never a constant: US-007's whole point about the cost dial. */
+    pollIntervalSeconds: integer("poll_interval_seconds")
+      .notNull()
+      .default(defaultPollIntervalSeconds),
+    /**
+     * When the last poll *started*, not when it finished. The scheduler adds the
+     * interval to this to decide what is due, so measuring from the start keeps
+     * a slow poll from stretching the interval it was given.
+     */
+    lastPolledAt: timestamp("last_polled_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  () => [
+    check(
+      "monitors_poll_interval_floor",
+      sql.raw(`poll_interval_seconds >= ${minimumPollIntervalSeconds}`),
+    ),
+  ],
+);
 
 /**
  * A candidate post, stored once however many monitors match it.

@@ -15,6 +15,13 @@
       "when": 1788536372869,
       "tag": "0001_create_core_tables",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1788542607138,
+      "tag": "0002_add_monitor_polling",
+      "breakpoints": true
     }
   ]
 }

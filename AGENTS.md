@@ -7,29 +7,35 @@ IntentWatch finds public conversations from people describing a problem your
 product solves. Read [PLAN.md](PLAN.md) for the product and
 [STACK.md](STACK.md) for the stack before proposing anything structural.
 
-**One connector works; the product does not run.** US-001 built the skeleton:
-four packages, Postgres with `pgvector`, migrations, the queue, and a page that
+**The pipeline runs; nothing scores yet.** US-001 built the skeleton: four
+packages, Postgres with `pgvector`, migrations, the queue, and a page that
 proves the bundle is served. US-002 added the four tables. US-003 settled the
 `SocialSource` interface and shipped a fake connector. US-005 added the real
-Reddit connector, through Bright Data. Nothing calls it: there is no schedule,
-no monitor and no classifier, so nothing filters or scores yet.
+Reddit connector, through Bright Data. US-007 added the scheduler, so a monitor
+is now polled on its own interval and the posts are stored. The three steps
+after the poll are placeholders: US-008 owns the filter, US-009 the classifier,
+US-016 the notification. Nothing is scored, so the inbox has nothing to show.
+There is also no way to create a monitor yet; US-010 builds the form.
 
 **Reddit's own API is closed to us.** Reddit ended self-serve app registration
 in November 2025. Reddit is reached through Bright Data instead, and X through
 its official pay-per-use API. Read STACK.md, *A source is not a provider*,
 before touching a connector: the interface does not change to suit a provider.
 
-[US-001](backlog/doing/US-001-the-workspace-runs-with-one-command.md) is still
-in `doing/`. Its code is complete, and one acceptance box waits on the first CI
-run, which needs a remote this repository does not have. Build on the skeleton;
-do not reopen it. The next ticket to start is
-[US-007](backlog/todo/US-007-the-worker-runs-jobs-on-a-schedule.md), which is
-what finally calls the Reddit connector.
+Two tickets are in `doing/`, and both are code-complete.
+[US-001](backlog/doing/US-001-the-workspace-runs-with-one-command.md) waits on
+the first CI run, which needs a remote this repository does not have.
+[US-007](backlog/doing/US-007-the-worker-runs-jobs-on-a-schedule.md) has every
+acceptance box verified and waits on one poll against a real Bright Data key.
+Build on both; do not reopen them. The next ticket to start is
+[US-009](backlog/todo/US-009-the-model-scores-a-post-against-a-monitor.md),
+which fills in the classify step the scheduler already calls.
 
 **The Reddit connector has never met the provider.** `capture.mjs` did, so the
 payload shapes are evidence, but the connector itself has only replayed them.
 A failed collection, an expired snapshot and any rate limit are all unproven.
-US-007 is where that gets found out.
+The scheduler now calls it, so the next run with a real `REDDIT_API_KEY` is
+what finds out. Until that has happened, say the claim is unproven.
 
 ---
 

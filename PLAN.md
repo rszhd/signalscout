@@ -82,7 +82,7 @@ Users provide their own credentials for external services.
 For example:
 
 ```env
-BRIGHTDATA_API_KEY=
+REDDIT_API_KEY=
 
 X_API_KEY=
 X_API_SECRET=

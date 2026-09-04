@@ -1,13 +1,13 @@
 import { eq } from "drizzle-orm";
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { createDatabase, type Database } from "../db/client.js";
-import { monitors, posts } from "../db/schema.js";
+import { maxResumeAttempts, monitors, posts, sourceContinuations } from "../db/schema.js";
 import { fakePosts } from "../sources/fake/fixtures.js";
-import type { CandidatePost, SocialSource } from "../sources/types.js";
+import type { CandidatePost, SearchRequest, SocialSource } from "../sources/types.js";
 import { createTestDatabase, type TestDatabase } from "../testing/database.js";
 import { createCollectStep, excerptLength, maxPagesPerPoll } from "./collect.js";
 import type { CredentialLookup } from "./credentials.js";
-import { filterQueue } from "./queues.js";
+import { filterQueue, pollQueue } from "./queues.js";
 import type { StepContext } from "./steps.js";
 import { fakeRegistry, insertMonitor, silentLogger } from "./testing.js";
 
@@ -21,7 +21,9 @@ import { fakeRegistry, insertMonitor, silentLogger } from "./testing.js";
 const credentials: CredentialLookup = () => ({ token: "test-token" });
 
 function stubBoss() {
-  return { send: vi.fn(async (_queue: string, _payload: unknown) => "job-1") };
+  return {
+    send: vi.fn(async (_queue: string, _payload: unknown, _options?: unknown) => "job-1"),
+  };
 }
 
 /** What the step handed to a queue, or a failure that says which queue was silent. */
@@ -31,6 +33,15 @@ function sentTo(boss: ReturnType<typeof stubBoss>, queue: string): { postIds: st
   if (!call) throw new Error(`Nothing was sent to the ${queue} queue.`);
 
   return call[1] as { postIds: string[] };
+}
+
+/** The poll job the step booked for itself, or a failure saying none was. */
+function pollSend(boss: ReturnType<typeof stubBoss>): [string, unknown, { startAfter?: Date }] {
+  const call = boss.send.mock.calls.find(([name]) => name === pollQueue);
+
+  if (!call) throw new Error("No poll job was booked.");
+
+  return call as unknown as [string, unknown, { startAfter?: Date }];
 }
 
 function contextFor(db: Database, boss: ReturnType<typeof stubBoss>): StepContext {
@@ -236,5 +247,219 @@ describe("the poll step", () => {
     ).resolves.toBeUndefined();
 
     expect(boss.send).not.toHaveBeenCalled();
+  });
+
+  /**
+   * Correctness-critical: cursor and deduplication. Written before the fix.
+   *
+   * BUG-001. A Bright Data collection is asynchronous: the trigger answers
+   * with a wait and a cursor, and the records exist only inside the snapshot
+   * that cursor names. A poll that drops the cursor pays for a collection
+   * nobody reads, and the next poll pays again for the same query. The first
+   * live run did exactly that.
+   *
+   * The fake reports a wait the same way a metered source does, so these drive
+   * the caller's half without a network and without a bill.
+   */
+  describe("a collection the source asked us to come back for", () => {
+    function continuationsFor(monitorId: string) {
+      return db
+        .select()
+        .from(sourceContinuations)
+        .where(eq(sourceContinuations.monitorId, monitorId));
+    }
+
+    /** Serves one post of the five, then reports a wait carrying its cursor. */
+    function waitingRegistry() {
+      return fakeRegistry({ pageSize: 1, callsBeforeRateLimit: 1 });
+    }
+
+    function callsOf(registry: ReturnType<typeof fakeRegistry>): readonly SearchRequest[] {
+      return (registry.get("reddit") as SocialSource & { calls: readonly SearchRequest[] }).calls;
+    }
+
+    /**
+     * The provider's wait, over.
+     *
+     * Moving the stored deadline is how this file says time passed. Sleeping
+     * out the fake's real window would hold the suite for a minute and would
+     * be a race rather than an ordering: docs/testing.md, *A wait in
+     * milliseconds is a race*.
+     */
+    async function theWaitIsOver(monitorId: string) {
+      await db
+        .update(sourceContinuations)
+        .set({ resumeAfter: new Date(Date.now() - 1000) })
+        .where(eq(sourceContinuations.monitorId, monitorId));
+    }
+
+    async function poll(
+      registry: ReturnType<typeof fakeRegistry>,
+      monitorId: string,
+      boss = stubBoss(),
+    ) {
+      await createCollectStep({ registry, credentialsFor: credentials })(
+        { monitorId },
+        contextFor(db, boss),
+      );
+      return boss;
+    }
+
+    it("keeps the cursor the source issued, and books the resume for when it said", async () => {
+      const monitorId = await insertMonitor(database);
+      const before = Date.now();
+
+      const boss = await poll(waitingRegistry(), monitorId);
+
+      // "1" is the fake's own cursor after one post of five. Stored unread:
+      // the job that holds it in memory is over.
+      const [continuation] = await continuationsFor(monitorId);
+
+      expect(continuation?.source).toBe("reddit");
+      expect(continuation?.cursor).toBe("1");
+      expect(continuation?.attempts).toBe(0);
+      expect(continuation?.resumeAfter.getTime()).toBeGreaterThan(before);
+
+      const [, payload, options] = pollSend(boss);
+
+      expect(payload).toEqual({ monitorId });
+      expect(options.startAfter?.getTime()).toBe(continuation?.resumeAfter.getTime());
+    });
+
+    it("resumes from the stored cursor instead of collecting the query again", async () => {
+      const monitorId = await insertMonitor(database);
+
+      await poll(waitingRegistry(), monitorId);
+      await theWaitIsOver(monitorId);
+
+      // A second process: a new registry, a new source, a new step. Nothing is
+      // carried in memory from the poll that started the collection, so what
+      // the resume knows it read from the database.
+      const registry = fakeRegistry();
+      await poll(registry, monitorId);
+
+      // The cursor the first poll was given. Starting again would send
+      // `undefined`, which on Bright Data is a second collection and a second
+      // bill for a query already collected.
+      expect(callsOf(registry)[0]?.cursor).toBe("1");
+      expect(await db.select().from(posts)).toHaveLength(fakePosts.length);
+
+      // Read to the end, so there is nothing left to come back for.
+      expect(await continuationsFor(monitorId)).toHaveLength(0);
+    });
+
+    it("stores each post once across the wait, and gives each id to the filter once", async () => {
+      const monitorId = await insertMonitor(database);
+
+      const first = await poll(waitingRegistry(), monitorId);
+      await theWaitIsOver(monitorId);
+      const second = await poll(fakeRegistry(), monitorId);
+
+      const handed = [
+        ...sentTo(first, filterQueue).postIds,
+        ...sentTo(second, filterQueue).postIds,
+      ];
+
+      // A resume that re-read the pages before its cursor would classify and
+      // bill the same post twice.
+      expect(handed).toHaveLength(fakePosts.length);
+      expect(new Set(handed).size).toBe(fakePosts.length);
+    });
+
+    it("asks the resumed collection for the window the trigger asked for", async () => {
+      const lastPolledAt = new Date("2026-07-01T00:00:00.000Z");
+      const monitorId = await insertMonitor(database, { lastPolledAt });
+
+      await poll(waitingRegistry(), monitorId);
+
+      const [continuation] = await continuationsFor(monitorId);
+      expect(continuation?.since?.getTime()).toBe(lastPolledAt.getTime());
+
+      await theWaitIsOver(monitorId);
+
+      const registry = fakeRegistry();
+      await poll(registry, monitorId);
+
+      // Not the poll mark, which the trigger moved to now. Reading that column
+      // here would ask for posts newer than the trigger and drop every record
+      // the collection was paid for.
+      expect(callsOf(registry)[0]?.query.since?.getTime()).toBe(lastPolledAt.getTime());
+      expect(await db.select().from(posts)).toHaveLength(fakePosts.length);
+    });
+
+    it("does not touch the source while the wait it asked for is still running", async () => {
+      const monitorId = await insertMonitor(database);
+      const resumeAfter = new Date(Date.now() + 60 * 60 * 1000);
+
+      await db
+        .insert(sourceContinuations)
+        .values({ monitorId, source: "reddit", cursor: "1", resumeAfter });
+
+      const registry = fakeRegistry();
+      const boss = await poll(registry, monitorId);
+
+      // A scheduler tick that reached the source here would start a second
+      // collection for a snapshot already paid for. That is the cost half of
+      // BUG-001.
+      expect(callsOf(registry)).toHaveLength(0);
+      expect(await db.select().from(posts)).toHaveLength(0);
+
+      const [continuation] = await continuationsFor(monitorId);
+      expect(continuation?.cursor).toBe("1");
+      expect(continuation?.attempts).toBe(0);
+
+      // The alarm is booked again, so a job lost between polls does not strand
+      // the snapshot until the monitor's own interval comes round.
+      expect(pollSend(boss)[2].startAfter?.getTime()).toBe(resumeAfter.getTime());
+    });
+
+    it("counts a resume that found the collection still not ready", async () => {
+      const monitorId = await insertMonitor(database);
+
+      await db.insert(sourceContinuations).values({
+        monitorId,
+        source: "reddit",
+        cursor: "1",
+        resumeAfter: new Date(Date.now() - 1000),
+      });
+
+      // An allowance of nothing: every call reports a wait, carrying back the
+      // cursor it was given.
+      const registry = fakeRegistry({ callsBeforeRateLimit: 0 });
+      const boss = await poll(registry, monitorId);
+
+      expect(callsOf(registry)[0]?.cursor).toBe("1");
+
+      const rows = await continuationsFor(monitorId);
+
+      // One row, updated. A second row here is a second collection in flight.
+      expect(rows).toHaveLength(1);
+      expect(rows[0]?.attempts).toBe(1);
+      expect(rows[0]?.cursor).toBe("1");
+      expect(pollSend(boss)[2].startAfter).toBeInstanceOf(Date);
+    });
+
+    it("gives up on a collection that never becomes ready", async () => {
+      const monitorId = await insertMonitor(database);
+
+      await db.insert(sourceContinuations).values({
+        monitorId,
+        source: "reddit",
+        cursor: "1",
+        resumeAfter: new Date(Date.now() - 1000),
+        attempts: maxResumeAttempts,
+      });
+
+      const registry = fakeRegistry();
+      const boss = await poll(registry, monitorId);
+
+      // The row goes, so the next scheduled poll starts the query fresh rather
+      // than the monitor waiting on a snapshot for ever. Nothing is resumed
+      // and nothing is triggered inside this poll: giving up must not itself
+      // spend money.
+      expect(await continuationsFor(monitorId)).toHaveLength(0);
+      expect(callsOf(registry)).toHaveLength(0);
+      expect(boss.send).not.toHaveBeenCalled();
+    });
   });
 });

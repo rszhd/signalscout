@@ -494,6 +494,84 @@ describe("feedback", () => {
  * This holds them together: a hand edit to either side that the other does not
  * follow turns this red, rather than failing at the first real insert.
  */
+/** A collection started at a source and not yet read. Returns its id. */
+async function insertContinuation(overrides: Record<string, unknown> = {}): Promise<string> {
+  const values = {
+    monitor_id: overrides.monitor_id ?? (await insertMonitor()),
+    source: "reddit",
+    cursor: "keyword|s_abc123|0",
+    resume_after: new Date("2026-09-05T10:00:30.000Z"),
+    ...overrides,
+  };
+  const columns = Object.keys(values);
+  const placeholders = columns.map((_, index) => `$${index + 1}`);
+  const result = await sql.query<{ id: string }>(
+    `INSERT INTO source_continuations (${columns.join(", ")}) VALUES (${placeholders.join(", ")}) RETURNING id`,
+    Object.values(values),
+  );
+  return only(result.rows).id;
+}
+
+describe("source continuations", () => {
+  it("holds one collection in flight per monitor and source", async () => {
+    // The constraint is the guarantee. Two workers polling the same monitor at
+    // once is a state this product expects, and the second one must not be
+    // able to record a second collection for a query already collecting.
+    const monitorId = await insertMonitor();
+
+    await insertContinuation({ monitor_id: monitorId, cursor: "keyword|s_first|0" });
+
+    await expect(
+      insertContinuation({ monitor_id: monitorId, cursor: "keyword|s_second|0" }),
+    ).rejects.toThrow(/duplicate key value/);
+  });
+
+  it("lets one monitor wait on a collection at each of its sources", async () => {
+    const monitorId = await insertMonitor();
+
+    await insertContinuation({ monitor_id: monitorId, source: "reddit" });
+
+    await expect(insertContinuation({ monitor_id: monitorId, source: "x" })).resolves.toEqual(
+      expect.any(String),
+    );
+  });
+
+  it("refuses a source the schema cannot store posts for", async () => {
+    await expect(insertContinuation({ source: "mastodon" })).rejects.toThrow(
+      /source_continuations_source_known/,
+    );
+  });
+
+  it("counts no resumes until one happens", async () => {
+    const id = await insertContinuation();
+    const row = only(
+      (
+        await sql.query<{ attempts: number }>(
+          "SELECT attempts FROM source_continuations WHERE id = $1",
+          [id],
+        )
+      ).rows,
+    );
+
+    expect(row.attempts).toBe(0);
+  });
+
+  it("forgets the collection when the monitor it belongs to is deleted", async () => {
+    // Nothing may resume a collection for a monitor that is gone. The row
+    // would otherwise name a monitor the poll step cannot load.
+    const monitorId = await insertMonitor();
+    await insertContinuation({ monitor_id: monitorId });
+
+    await sql.query("DELETE FROM monitors WHERE id = $1", [monitorId]);
+
+    const remaining = await sql.query("SELECT id FROM source_continuations WHERE monitor_id = $1", [
+      monitorId,
+    ]);
+
+    expect(remaining.rows).toHaveLength(0);
+  });
+});
+
 describe("the Drizzle schema and the tables agree", () => {
   it("writes and reads a monitor, a post, a match and a verdict", async () => {
     const { db, close } = createDatabase(database.url);

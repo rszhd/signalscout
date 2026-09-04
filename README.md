@@ -178,7 +178,16 @@ SELECT * FROM pgboss.schedule;
 
 -- When each monitor was last polled, and how often it asks to be.
 SELECT name, last_polled_at, poll_interval_seconds FROM monitors;
+
+-- Collections a source has started and nobody has read yet.
+SELECT monitor_id, source, resume_after, attempts FROM source_continuations;
 ```
+
+A row in `source_continuations` is normal for a few minutes: Reddit collections
+are asynchronous, so a poll starts one, writes down where to come back, and a
+later job reads it. A row whose `attempts` keeps climbing is a collection that
+never became ready. It is given up after a hundred and twenty tries, and the
+next poll asks again.
 
 A job that failed is retried five times with a growing delay, over about an
 hour, and then moves to `dead-letter` and stops. That is deliberate: a job that

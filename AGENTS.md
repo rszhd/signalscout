@@ -14,7 +14,9 @@ settled the `SocialSource` interface and shipped a fake connector. US-005 added
 the real Reddit connector, through Bright Data. US-007 added the scheduler, so
 a monitor is polled on its own interval and the posts are stored. US-009 added
 the classifier, so a post is now scored against a monitor and a match is
-written when it clears the monitor's `min_score`. US-010's server half added
+written when it clears the monitor's `min_score`. BUG-001 made the poll finish
+what it starts: an asynchronous collection is remembered in
+`source_continuations` and resumed, rather than triggered again. US-010's server half added
 the query generator, the monitor writes and the routes, so a monitor is now an
 HTTP call rather than an `INSERT`. Two steps are still placeholders: US-008
 owns the pre-filter, so every post reaches the model, and US-016 owns the
@@ -42,15 +44,17 @@ call, the query generator, which no model has ever answered.
 those gaps. Until they run, say the recorded scores are stale and the query
 generation unproven.
 
-Three tickets are in `doing/`.
+Four tickets are in `doing/`.
 [US-001](backlog/doing/US-001-the-workspace-runs-with-one-command.md) waits on
 the first CI run, which needs a remote this repository does not have.
 [US-007](backlog/doing/US-007-the-worker-runs-jobs-on-a-schedule.md) has every
 acceptance box verified, but its first live Bright Data poll exposed
-[BUG-001](backlog/todo/BUG-001-a-pending-reddit-collection-is-not-resumed.md).
-The trigger succeeds and returns a wait cursor. The collector loses that
-cursor, so no job returns for the snapshot and the next poll can trigger the
-same collection again. Fix BUG-001 before treating the poll as code-complete.
+[BUG-001](backlog/doing/BUG-001-a-pending-reddit-collection-is-not-resumed.md).
+BUG-001 is now fixed in code: a source that answers a poll with a wait writes a
+`source_continuations` row, and a later poll resumes from that cursor instead
+of triggering the collection again. Its last box needs a live key, so both
+tickets stay in `doing/` until one poll has collected and read a real
+snapshot.
 
 [US-010](backlog/doing/US-010-a-monitor-is-created-from-four-answers.md) has
 the server routes and the React form, with the jsdom harness that drives the
@@ -60,10 +64,11 @@ that open for a connection-testing screen on purpose.
 
 **The Reddit connector has only triggered a live collection.** On 2026-09-05,
 the first UI-created monitor reached Bright Data and received a pending
-snapshot. BUG-001 lost its cursor before the snapshot could be read. A
-completed collection, a failed collection, an expired snapshot and any rate
-limit are all still unproven. Until BUG-001 is fixed and the continuation runs
-live, say only the trigger is proven.
+snapshot. The cursor that snapshot came with is now kept, but nothing has read
+a finished one. A completed collection, a failed collection, an expired
+snapshot and any rate limit are all still unproven, and so is the resume
+itself. Until a live poll collects and reads a snapshot, say only the trigger
+is proven.
 
 ---
 

@@ -71,6 +71,13 @@ than you are willing to hold the job, return
 `next: { status: "wait", retryAfter, cursor }` and let the scheduler do
 something else. The caller learns *when* to come back and never *how* you knew.
 
+Give that wait a cursor whenever coming back means reading work already
+started. The collector stores it in `source_continuations` and calls you again
+with it, so the wait costs one row and not a second collection. A wait with no
+cursor means the query starts from the beginning, which on a provider that
+bills at collection time is a second bill. BUG-001 is what a dropped cursor
+cost.
+
 **A short page is not the last page.** Return fewer posts than the caller asked
 for whenever you want to. The caller reads `next`, never `posts.length`. Every
 connector must be able to prove this, which is why the fake can be told to do

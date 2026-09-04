@@ -54,9 +54,9 @@ singleton key, not a lock the code writes itself.
 - Depends on [US-002](US-002-the-schema-holds-monitors-posts-matches-and-feedback.md).
 - STACK.md, *Not Redis*, for why this is a library and not a service.
 - A stuck queue is inspected with `SELECT * FROM pgboss.job`. The README now
-  says so, under *When a monitor stops finding things*, with the four queries
-  worth having: state per queue, the dead letter queue, the schedule, and each
-  monitor's poll mark.
+  says so, under *When a monitor stops finding things*, with the five queries
+  worth having: state per queue, the dead letter queue, the schedule, each
+  monitor's poll mark, and the collections BUG-001 added.
 - Files: `packages/core/src/worker/` holds `queues.ts` (names, payloads, retry
   policy), `schedule.ts` (which monitors are due), `collect.ts` (the poll step),
   `steps.ts` (the step contract and the three placeholders) and `runtime.ts`
@@ -119,10 +119,15 @@ singleton key, not a lock the code writes itself.
   scheduler now calls the connector, so the next run against a live key is what
   finds out.
 - 2026-09-05 — The first live poll reached Bright Data and exposed
-  [BUG-001](../todo/BUG-001-a-pending-reddit-collection-is-not-resumed.md).
+  [BUG-001](BUG-001-a-pending-reddit-collection-is-not-resumed.md).
   Bright Data accepted the collection trigger, and the poll job completed with
   a wait cursor, zero posts and zero units. The collector did not persist or
   enqueue that cursor, so no job returned for the snapshot. The monitor row was
   active with six queries and five subreddits, and `last_polled_at` advanced,
   but the database held zero posts, zero matches and no classification call.
   The trigger is now proven against the provider. Snapshot retrieval is not.
+- 2026-09-05 — [BUG-001](BUG-001-a-pending-reddit-collection-is-not-resumed.md)
+  is fixed in code. The poll step now reads and writes `source_continuations`,
+  so a wait keeps its cursor and the next poll resumes the collection instead
+  of starting a second one. This ticket still waits on the same live run as
+  BUG-001's last box: one poll that collects and reads a real snapshot.

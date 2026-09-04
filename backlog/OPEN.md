@@ -2,11 +2,11 @@
 
 # Open tickets
 
-17 open — 3 doing, 14 todo, 0 parked (1 p0, 6 p1, 9 p2, 1 p3).
+17 open — 4 doing, 13 todo, 0 parked (1 p0, 6 p1, 9 p2, 1 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
-| p0 | BUG-001 | [A pending Reddit collection is not resumed](todo/BUG-001-a-pending-reddit-collection-is-not-resumed.md) | bug | todo | 2026-09-05 |
+| p0 | BUG-001 | [A pending Reddit collection is not resumed](doing/BUG-001-a-pending-reddit-collection-is-not-resumed.md) | bug | doing | 2026-09-05 |
 | p1 | US-001 | [The workspace runs with one command](doing/US-001-the-workspace-runs-with-one-command.md) | chore | doing | 2026-09-04 |
 | p1 | US-007 | [The worker runs jobs on a schedule](doing/US-007-the-worker-runs-jobs-on-a-schedule.md) | feature | doing | 2026-09-04 |
 | p1 | US-010 | [A monitor is created from four answers](doing/US-010-a-monitor-is-created-from-four-answers.md) | feature | doing | 2026-09-04 |

@@ -242,6 +242,65 @@ export const posts = pgTable(
 );
 
 /**
+ * How many times one continuation may be resumed before it is abandoned.
+ *
+ * A collection that never finishes would otherwise be resumed every thirty
+ * seconds for the life of the monitor. At the provider's own retry hint that
+ * cap is about an hour, which outlasts every collection the capture run saw
+ * and still stops. Abandoning is logged and deletes the row, so the next
+ * scheduled poll starts the query again rather than the monitor going quiet.
+ */
+export const maxResumeAttempts = 120;
+
+/**
+ * A collection that was started at a source and has not been read yet.
+ *
+ * Correctness-critical: cursor and deduplication. Bright Data bills at
+ * collection time, so a trigger whose cursor is lost is money spent on records
+ * nobody reads, and the next poll pays again for the same query. BUG-001 is
+ * that failure, seen live.
+ *
+ * The row is the durable fact and the queued job is only the alarm clock. That
+ * order matters: if the queue refuses the job, or the process dies before it is
+ * sent, the next poll still finds this row and reads the snapshot instead of
+ * triggering a second collection for it.
+ *
+ * `UNIQUE (monitor_id, source)` is what "one collection in flight per monitor
+ * per source" means. It is a constraint rather than a rule in the collector
+ * because two workers polling at once is a state this product expects.
+ *
+ * `since` is carried here and not read from `monitors.last_polled_at`. The poll
+ * mark moves when the collection is triggered, so a resume that read the column
+ * would ask for posts newer than the trigger and drop everything it had just
+ * paid to collect.
+ */
+export const sourceContinuations = pgTable(
+  "source_continuations",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    monitorId: uuid("monitor_id")
+      .notNull()
+      .references(() => monitors.id, { onDelete: "cascade" }),
+    source: text("source").$type<Source>().notNull(),
+    /** Opaque to everything outside the connector that issued it. */
+    cursor: text("cursor").notNull(),
+    /** The `since` of the poll that started this collection. Null means all time. */
+    since: timestamp("since", { withTimezone: true }),
+    /** The source's own answer to "come back at". Nothing reads the snapshot before it. */
+    resumeAfter: timestamp("resume_after", { withTimezone: true }).notNull(),
+    /** Resumes so far. Bounded by `maxResumeAttempts`, so a stuck collection stops. */
+    attempts: integer("attempts").notNull().default(0),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    unique("source_continuations_monitor_source_unique").on(table.monitorId, table.source),
+    check("source_continuations_source_known", oneOf("source", sources)),
+    check("source_continuations_attempts_bounded", sql.raw(`attempts >= 0`)),
+  ],
+);
+
+/**
  * One classified post against one monitor.
  *
  * A row exists only for a post the model scored. A refusal, a timeout or an

@@ -2,7 +2,7 @@
 
 # Open tickets
 
-18 open — 0 doing, 18 todo, 0 parked (8 p1, 9 p2, 1 p3).
+19 open — 0 doing, 19 todo, 0 parked (8 p1, 10 p2, 1 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -23,6 +23,7 @@
 | p2 | US-015 | [A deleted post stops being shown](todo/US-015-a-deleted-post-stops-being-shown.md) | feature | todo | 2026-09-04 |
 | p2 | US-016 | [A match reaches email or a webhook](todo/US-016-a-match-reaches-email-or-a-webhook.md) | feature | todo | 2026-09-04 |
 | p2 | US-017 | [A self-hosted instance has one account](todo/US-017-a-self-hosted-instance-has-one-account.md) | feature | todo | 2026-09-04 |
+| p2 | US-019 | [The project has a license](todo/US-019-the-project-has-a-license.md) | chore | todo | 2026-09-04 |
 | p3 | US-018 | [A mutation sweep proves the suite is sensitive](todo/US-018-a-mutation-sweep-proves-the-suite-is-sensitive.md) | chore | todo | 2026-09-04 |
 
 Finished work is in [DONE.md](DONE.md). The rules and the ticket

@@ -163,3 +163,6 @@ The trade to weigh: a permissive license (MIT, Apache-2.0) maximises adoption,
 while a copyleft one (AGPL-3.0) stops a cloud provider running this as a service
 without contributing back. Both are defensible for a project with a cheap hosted
 tier.
+
+The argument is written out in
+[US-019](backlog/todo/US-019-the-project-has-a-license.md).

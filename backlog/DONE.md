@@ -2,7 +2,11 @@
 
 # Done
 
-_Nothing finished yet._
+1 finished.
+
+| ID | Ticket | Type | Resolution | Month |
+| ---: | --- | --- | --- | --- |
+| US-002 | [The schema holds monitors, posts, matches and feedback](done/2026-09/US-002-the-schema-holds-monitors-posts-matches-and-feedback.md) | feature | shipped | 2026-09 |
 
 Open work is in [OPEN.md](OPEN.md). The rules and the ticket
 format are in [README.md](README.md).

@@ -242,7 +242,8 @@ export const posts = pgTable(
 );
 
 /**
- * How many times one continuation may be resumed before it is abandoned.
+ * How many resumes in a row may bring nothing back before the continuation is
+ * abandoned.
  *
  * A collection that never finishes would otherwise be resumed every thirty
  * seconds for the life of the monitor. At the provider's own retry hint that
@@ -288,7 +289,11 @@ export const sourceContinuations = pgTable(
     since: timestamp("since", { withTimezone: true }),
     /** The source's own answer to "come back at". Nothing reads the snapshot before it. */
     resumeAfter: timestamp("resume_after", { withTimezone: true }).notNull(),
-    /** Resumes so far. Bounded by `maxResumeAttempts`, so a stuck collection stops. */
+    /**
+     * Resumes in a row that brought nothing back. A resume that returned posts
+     * sets it to zero, so the cap below stops a stuck collection and never a
+     * long one that is being read a page at a time.
+     */
     attempts: integer("attempts").notNull().default(0),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),

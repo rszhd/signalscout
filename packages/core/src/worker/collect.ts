@@ -45,6 +45,11 @@ import type { Step, StepContext } from "./steps.js";
  * Five pages is a generous hour of conversation and a bill that one mistake
  * cannot make unbounded. When US-013 lands, the cap it enforces is the real
  * limit and this becomes the backstop behind it.
+ *
+ * It bounds one job, not one query. A source stopped here keeps its cursor in
+ * `source_continuations` and the next poll reads on from it: the pages behind
+ * that cursor are collected and billed already, so dropping it would make the
+ * next poll buy the whole query again.
  */
 export const maxPagesPerPoll = 5;
 
@@ -69,6 +74,14 @@ interface SourceOutcome {
    * query is started again from the beginning rather than resumed.
    */
   readonly waitCursor?: string;
+  /**
+   * Set when the page cap stopped a source that had another page ready now.
+   *
+   * It is kept for the same reason as `waitCursor`. The pages behind it are
+   * collected and paid for already, so a poll that dropped this would make the
+   * next one buy them a second time.
+   */
+  readonly moreCursor?: string;
 }
 
 /**
@@ -89,6 +102,8 @@ async function readSource(
   let unitsConsumed = 0;
   let cursor = startCursor;
   let pages = 0;
+  /** Where the next page starts, while there is one. Cleared when the source is done. */
+  let more: string | undefined;
 
   while (pages < maxPagesPerPoll) {
     const result = await source.search({ query, credentials, cursor });
@@ -97,7 +112,10 @@ async function readSource(
     unitsConsumed += result.unitsConsumed;
     collected.push(...result.posts);
 
-    if (result.next.status === "done") break;
+    if (result.next.status === "done") {
+      more = undefined;
+      break;
+    }
 
     if (result.next.status === "wait") {
       // The connector already backed off as far as it was willing to. Holding
@@ -115,9 +133,16 @@ async function readSource(
     }
 
     cursor = result.next.cursor;
+    more = result.next.cursor;
   }
 
-  return { sourceId: source.id, pages, posts: collected, unitsConsumed };
+  return {
+    sourceId: source.id,
+    pages,
+    posts: collected,
+    unitsConsumed,
+    ...(more === undefined ? {} : { moreCursor: more }),
+  };
 }
 
 function toRow(sourceId: Source, post: CandidatePost) {
@@ -250,6 +275,8 @@ export function createCollectStep({ registry, credentialsFor }: CollectOptions):
         "source read",
       );
 
+      const progressed = outcome.posts.length > 0;
+
       if (outcome.waitUntil) {
         wakeNoLaterThan(outcome.waitUntil);
 
@@ -259,6 +286,7 @@ export function createCollectStep({ registry, credentialsFor }: CollectOptions):
             cursor: outcome.waitCursor,
             ...(window ? { since: window } : {}),
             resumeAfter: outcome.waitUntil,
+            progressed,
           });
         } else if (continuation) {
           // A wait with no cursor is the interface saying "start this query
@@ -266,6 +294,25 @@ export function createCollectStep({ registry, credentialsFor }: CollectOptions):
           // source no longer wants us to read.
           await forgetContinuation(db, monitorId, continuation.source);
         }
+      } else if (outcome.moreCursor) {
+        /**
+         * The page cap stopped a source that had another page ready.
+         *
+         * It is remembered like a wait, and due at once, because the pages
+         * behind the cursor are already collected and already billed: reading
+         * them costs nothing and dropping the cursor makes the next poll
+         * collect the whole query again. The cap still holds — it is what one
+         * job may fetch, and US-013's budget guard is what a monitor may
+         * spend.
+         */
+        await rememberContinuation(db, monitorId, {
+          source: source.id as Source,
+          cursor: outcome.moreCursor,
+          ...(window ? { since: window } : {}),
+          resumeAfter: now,
+          progressed,
+        });
+        wakeNoLaterThan(now);
       } else if (continuation) {
         // Read to the end. Nothing left to come back for.
         await forgetContinuation(db, monitorId, continuation.source);

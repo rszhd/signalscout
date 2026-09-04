@@ -439,6 +439,70 @@ describe("the poll step", () => {
       expect(pollSend(boss)[2].startAfter).toBeInstanceOf(Date);
     });
 
+    it("continues from where the page cap stopped, rather than collecting again", async () => {
+      // Twelve posts, one per page, five pages per poll. The pages behind the
+      // cap are collected and billed already: a poll that dropped that cursor
+      // would make the next one pay for the whole query a second time.
+      const many: CandidatePost[] = Array.from({ length: 12 }, (_, index) => ({
+        externalId: `paged-${index}`,
+        url: `https://example.test/paged/${index}`,
+        text: `Post number ${index}`,
+        postedAt: new Date("2026-08-10T09:00:00.000Z"),
+      }));
+
+      const monitorId = await insertMonitor(database);
+      const paged = () => fakeRegistry({ posts: many, pageSize: 1 });
+
+      const boss = await poll(paged(), monitorId);
+
+      const [stopped] = await continuationsFor(monitorId);
+
+      expect(stopped?.cursor).toBe(String(maxPagesPerPoll));
+      // Due at once. Nothing was refused by the source, so there is nothing to
+      // wait for.
+      expect(stopped?.resumeAfter.getTime()).toBeLessThanOrEqual(Date.now());
+      expect(pollSend(boss)[2].startAfter).toBeInstanceOf(Date);
+
+      const second = paged();
+      await poll(second, monitorId);
+
+      expect(callsOf(second)[0]?.cursor).toBe(String(maxPagesPerPoll));
+      expect(await db.select().from(posts)).toHaveLength(2 * maxPagesPerPoll);
+
+      await poll(paged(), monitorId);
+
+      expect(await db.select().from(posts)).toHaveLength(many.length);
+      expect(await continuationsFor(monitorId)).toHaveLength(0);
+    });
+
+    it("counts only the resumes in a row that brought nothing back", async () => {
+      // A long collection read a page at a time must not be abandoned. The cap
+      // is for a collection that never becomes ready, not for one that works.
+      const many: CandidatePost[] = Array.from({ length: 12 }, (_, index) => ({
+        externalId: `counted-${index}`,
+        url: `https://example.test/counted/${index}`,
+        text: `Post number ${index}`,
+        postedAt: new Date("2026-08-10T09:00:00.000Z"),
+      }));
+
+      const monitorId = await insertMonitor(database);
+
+      await db.insert(sourceContinuations).values({
+        monitorId,
+        source: "reddit",
+        cursor: "0",
+        resumeAfter: new Date(Date.now() - 1000),
+        attempts: maxResumeAttempts - 1,
+      });
+
+      await poll(fakeRegistry({ posts: many, pageSize: 1 }), monitorId);
+
+      const [continuation] = await continuationsFor(monitorId);
+
+      expect(continuation?.cursor).toBe(String(maxPagesPerPoll));
+      expect(continuation?.attempts).toBe(0);
+    });
+
     it("gives up on a collection that never becomes ready", async () => {
       const monitorId = await insertMonitor(database);
 

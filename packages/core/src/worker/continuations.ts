@@ -25,7 +25,7 @@ export interface Continuation {
   /** The `since` of the poll that triggered the collection. */
   readonly since?: Date;
   readonly resumeAfter: Date;
-  /** Resumes that found the collection still not ready. */
+  /** Resumes in a row that brought back nothing. Progress resets it. */
   readonly attempts: number;
 }
 
@@ -52,6 +52,8 @@ export interface ContinuationRecord {
   readonly cursor: string;
   readonly since?: Date;
   readonly resumeAfter: Date;
+  /** Did this read bring anything back? A read that did clears the count. */
+  readonly progressed: boolean;
 }
 
 /**
@@ -61,13 +63,16 @@ export interface ContinuationRecord {
  * that triggered the collection, and a resume that widened or narrowed it
  * would be reading a snapshot with a question it was not collected for.
  *
- * `attempts` counts resumes, not pages. It is what stops a collection that
- * never becomes ready being resumed for the life of the monitor.
+ * `attempts` counts resumes in a row that brought nothing back, and a resume
+ * that returned posts sets it to zero. Counting every resume instead would
+ * abandon a long collection that was being read a page at a time, which is the
+ * opposite of what the cap is for: it exists to stop a collection that never
+ * becomes ready, not one that is working.
  */
 export async function rememberContinuation(
   db: Database,
   monitorId: string,
-  { source, cursor, since, resumeAfter }: ContinuationRecord,
+  { source, cursor, since, resumeAfter, progressed }: ContinuationRecord,
 ): Promise<void> {
   await db
     .insert(sourceContinuations)
@@ -77,7 +82,7 @@ export async function rememberContinuation(
       set: {
         cursor,
         resumeAfter,
-        attempts: sql`${sourceContinuations.attempts} + 1`,
+        attempts: progressed ? 0 : sql`${sourceContinuations.attempts} + 1`,
         updatedAt: sql`now()`,
       },
     });

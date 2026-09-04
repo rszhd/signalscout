@@ -117,6 +117,20 @@ classification model calls. The only model call was query generation.
   the poll that triggered the collection. Both the row and the pg-boss job are
   in Postgres. No test kills a process; that is the limit of the claim.
 
+  **The page cap dropped the same cursor, and now does not.** `readSource`
+  stops after `maxPagesPerPoll` pages. If the source still had a page ready,
+  that cursor went the way of the wait cursor and the next poll collected the
+  whole query again. It is the same defect in a second branch, and it predates
+  this ticket. A source stopped by the cap now writes a continuation that is
+  due at once. The cap keeps its meaning for one job, which is what bounds a
+  runaway page loop; what a monitor may spend is US-013's question, not this
+  constant's.
+
+  **`attempts` counts resumes in a row that brought nothing back.** Counting
+  every resume would abandon a long collection halfway through being read a
+  page at a time, which is the failure the cap exists to prevent, arriving by
+  the other door.
+
   **Unproven until it runs somewhere real.** Every test drives the fake
   connector with a `fetch` that cannot reach anything. A completed Bright Data
   snapshot, an expired one and a real rate limit have still never happened

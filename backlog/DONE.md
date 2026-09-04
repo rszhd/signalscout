@@ -2,10 +2,11 @@
 
 # Done
 
-1 finished.
+2 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
+| US-003 | [A source implements one interface](done/2026-09/US-003-a-source-implements-one-interface.md) | feature | shipped | 2026-09 |
 | US-002 | [The schema holds monitors, posts, matches and feedback](done/2026-09/US-002-the-schema-holds-monitors-posts-matches-and-feedback.md) | feature | shipped | 2026-09 |
 
 Open work is in [OPEN.md](OPEN.md). The rules and the ticket

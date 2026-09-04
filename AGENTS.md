@@ -7,15 +7,18 @@ IntentWatch finds public conversations from people describing a problem your
 product solves. Read [PLAN.md](PLAN.md) for the product and
 [STACK.md](STACK.md) for the stack before proposing anything structural.
 
-**The workspace exists and runs; the product does not.** US-001 built the
-skeleton: four packages, Postgres with `pgvector`, migrations, the queue, and a
-page that proves the bundle is served. Nothing collects, filters or scores yet.
+**The workspace exists and the vocabulary is settled; the product does not
+run.** US-001 built the skeleton: four packages, Postgres with `pgvector`,
+migrations, the queue, and a page that proves the bundle is served. US-002 added
+the four tables. US-003 settled the `SocialSource` interface and shipped a fake
+connector. Nothing collects, filters or scores yet, and no real connector
+exists.
 
 [US-001](backlog/doing/US-001-the-workspace-runs-with-one-command.md) is still
 in `doing/`. Its code is complete, and one acceptance box waits on the first CI
 run, which needs a remote this repository does not have. Build on the skeleton;
 do not reopen it. The next ticket to start is
-[US-002](backlog/todo/US-002-the-schema-holds-monitors-posts-matches-and-feedback.md).
+[US-005](backlog/todo/US-005-reddit-returns-candidate-posts.md).
 
 ---
 
@@ -26,6 +29,8 @@ do not reopen it. The next ticket to start is
 2. Read the ticket's **Context**. It holds the reasoning that the code cannot.
 3. Read [`docs/testing.md`](docs/testing.md) if you will write a test, which is
    almost always.
+4. Read [`docs/sources.md`](docs/sources.md) if the task touches a connector.
+   It holds the steps and the three things connectors get wrong.
 
 The ticket's **Acceptance** list is the definition of done. Every box is true
 or false. Do not mark one done that you have not verified.

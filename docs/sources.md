@@ -1,0 +1,96 @@
+# Adding a source
+
+A source is a connector: the code that turns one social network into
+`CandidatePost` values, reports what the fetch cost, and manages its own rate
+limit. `packages/core/src/sources/types.ts` holds the interface, and its
+comments say why each member exists.
+
+This page is the steps. It is short on purpose: if adding a connector needs
+more than this, the interface is wrong and the fix belongs in the interface.
+
+---
+
+## The steps
+
+**1. Make one folder.** `packages/core/src/sources/<id>/`. The id is lower-case
+letters, digits and hyphens, and it never changes: it reaches URLs, columns and
+saved monitors.
+
+**2. Export one `SourceDefinition`.** The static facts, plus a `create` that
+takes a `SourceRuntime` and returns a `SocialSource`.
+
+```ts
+export const redditSourceDefinition: SourceDefinition = {
+  id: "reddit",
+  displayName: "Reddit",
+  billableUnit: "call",
+  pricePerUnitMicros: 240,
+  credentialFields: [
+    { name: "clientId", label: "Client ID", secret: false },
+    { name: "clientSecret", label: "Client secret", secret: true },
+  ],
+  create: (runtime) => new RedditSource(runtime),
+};
+```
+
+**3. Add one line to `builtInSources`** in `packages/core/src/sources/index.ts`.
+
+That is the whole change. Nothing that consumes a source needs a case for it:
+the collector pages it through `next`, the budget guard prices it from
+`pricePerUnitMicros`, and the settings form renders `credentialFields`.
+`packages/core/src/sources/adding-a-connector.test.ts` is that claim written as
+code — a complete connector, driven by caller code that never names it.
+
+**4. If its posts are stored, write a migration.** `posts.source` carries a
+check constraint listing the sources the schema accepts. This is the one thing
+step 3 does not cover. Add the id to `sources` in
+`packages/core/src/db/schema.ts`, run `pnpm db:generate`, and keep the rule:
+one migration number, one file.
+
+`assertSourcesCanBeStored` turns the mistake into a failed boot rather than a
+failed insert at 02:00. Call it where the connector is wired in.
+
+---
+
+## What the runtime is for
+
+Every side effect a connector has arrives through `SourceRuntime`: `fetch`,
+`now`, `sleep`, `logger`. Nothing else. A connector that reaches
+`globalThis.fetch` or `Date.now()` directly cannot be tested without the
+network or without real time, and no test in this repository may reach Reddit,
+X or a model provider. See [testing.md](testing.md).
+
+---
+
+## The three things connectors get wrong
+
+**Cost is not the post count.** Reddit bills one call and returns up to 100
+posts. X bills every post read. `unitsConsumed` is the connector's answer, in
+its own `billableUnit`, and the caller must not compute it.
+
+**The rate limit is yours, not the caller's.** Reddit sends `X-Ratelimit-*`
+headers; X does not. Read them here and back off here. When the wait is longer
+than you are willing to hold the job, return
+`next: { status: "wait", retryAfter, cursor }` and let the scheduler do
+something else. The caller learns *when* to come back and never *how* you knew.
+
+**A short page is not the last page.** Return fewer posts than the caller asked
+for whenever you want to. The caller reads `next`, never `posts.length`. Every
+connector must be able to prove this, which is why the fake can be told to do
+it.
+
+---
+
+## Testing a connector
+
+Fixtures for someone else's API are **captured, not written**. Commit the
+capture script beside the fixture, store the payload whole, and scrub the
+identifying fields. A payload written from memory is evidence about our parser
+and no evidence at all about the wire format. [testing.md](testing.md) has the
+case that proves it.
+
+The fake source is the exception, and it is not one: its fixtures are
+`CandidatePost` values, which is our own shape. Use it to test everything
+downstream of a connector. It can be told to run out of allowance and to hand
+back a short page, so a caller can be tested against both without a network and
+without a bill.

@@ -16,25 +16,25 @@ a monitor is polled on its own interval and the posts are stored. US-009 added
 the classifier, so a post is now scored against a monitor and a match is
 written when it clears the monitor's `min_score`. BUG-001 made the poll finish
 what it starts: an asynchronous collection is remembered in
-`source_continuations` and resumed, rather than triggered again. US-010's server half added
-the query generator, the monitor writes and the routes, so a monitor is now an
-HTTP call rather than an `INSERT`. Two steps are still placeholders: US-008
-owns the pre-filter, so every post reaches the model, and US-016 owns the
-notification. Nothing reads the matches back out; US-011 builds the inbox.
-`apps/web` now serves the US-010 monitor form, but there is still no UI for
-matches or connections.
+`source_continuations` and resumed, rather than triggered again. US-010's
+server half added the query generator, the monitor writes and the routes, so a
+monitor is now an HTTP call rather than an `INSERT`. Two steps are still
+placeholders: US-008 owns the pre-filter, so every post reaches the model, and
+US-016 owns the notification. Nothing reads the matches back out; US-011 builds
+the inbox. `apps/web` now serves the US-010 monitor form, but there is still no
+UI for matches or connections.
 
 **Reddit's own API is closed to us.** Reddit ended self-serve app registration
 in November 2025. Reddit is reached through Bright Data instead, and X through
 its official pay-per-use API. Read STACK.md, *A source is not a provider*,
 before touching a connector: the interface does not change to suit a provider.
 
-**The classifier has met a real model; nothing else has.**
-`ai/fixtures/capture.ts` ran against a live provider on 2026-09-05, so the
-prompt, the schema and the cost recording are proven for the happy path, and
-the four answers it recorded are replayed in CI for nothing. The failure paths
-are not proven: a real rate limit, a real refusal and a real timeout have only
-been simulated. Say so until one has happened.
+**The classifier has met a real model, and the Reddit connector a real
+provider.** `ai/fixtures/capture.ts` ran against a live provider on 2026-09-05,
+so the prompt, the schema and the cost recording are proven for the happy path,
+and the four answers it recorded are replayed in CI for nothing. The failure
+paths are not proven: a real rate limit, a real refusal and a real timeout have
+only been simulated. Say so until one has happened.
 
 Two things moved after that run. US-010 changed the classifier's system prompt
 — the signals now arrive as a labelled line each — so the recorded answers
@@ -44,17 +44,16 @@ call, the query generator, which no model has ever answered.
 those gaps. Until they run, say the recorded scores are stale and the query
 generation unproven.
 
-Four tickets are in `doing/`.
+Two tickets are in `doing/`.
 [US-001](backlog/doing/US-001-the-workspace-runs-with-one-command.md) waits on
 the first CI run, which needs a remote this repository does not have.
-[US-007](backlog/doing/US-007-the-worker-runs-jobs-on-a-schedule.md) has every
-acceptance box verified, but its first live Bright Data poll exposed
-[BUG-001](backlog/doing/BUG-001-a-pending-reddit-collection-is-not-resumed.md).
-BUG-001 is now fixed in code: a source that answers a poll with a wait writes a
-`source_continuations` row, and a later poll resumes from that cursor instead
-of triggering the collection again. Its last box needs a live key, so both
-tickets stay in `doing/` until one poll has collected and read a real
-snapshot.
+[US-010](backlog/doing/US-010-a-monitor-is-created-from-four-answers.md) waits
+on a connection-testing screen; see below.
+
+US-007 and
+[BUG-001](backlog/done/2026-09/BUG-001-a-pending-reddit-collection-is-not-resumed.md)
+closed together on 2026-09-05, when one live run carried a collection from the
+trigger through fifteen poll jobs to forty-nine stored posts.
 
 [US-010](backlog/doing/US-010-a-monitor-is-created-from-four-answers.md) has
 the server routes and the React form, with the jsdom harness that drives the
@@ -62,13 +61,20 @@ form through the DOM. One acceptance box stays open: credentials are present
 or missing, but are not validated with the provider. The ticket's Notes keep
 that open for a connection-testing screen on purpose.
 
-**The Reddit connector has only triggered a live collection.** On 2026-09-05,
-the first UI-created monitor reached Bright Data and received a pending
-snapshot. The cursor that snapshot came with is now kept, but nothing has read
-a finished one. A completed collection, a failed collection, an expired
-snapshot and any rate limit are all still unproven, and so is the resume
-itself. Until a live poll collects and reads a snapshot, say only the trigger
-is proven.
+**The Reddit connector has collected once, live.** On 2026-09-05 a monitor
+with one keyword triggered a collection, waited through fourteen resumes over
+7.6 minutes, and stored forty-nine real posts. The trigger, the wait, the
+cursor, the snapshot read and the storage are proven against the provider. A
+real DNS failure hit a poll job in the same run, and the retry recovered it.
+
+Three things are still unproven: an expired snapshot, a collection the provider
+reports as failed, and a rate limit. The X connector has never run at all.
+
+That run also measured what nobody had measured. A monitor left at the
+60-second floor triggered a collection every minute, and each one billed 9 to
+11 records and returned no posts, because everything it found was older than
+the last poll. Poll frequency is a cost dial. US-013 and US-014 are what turn
+that from a lesson into a limit.
 
 ---
 
@@ -167,7 +173,7 @@ pnpm lint                     # Biome: formatting and lint rules together
 pnpm typecheck                # tsc --build across the workspace, plus the web app
 pnpm build                    # every package, then the Vite bundle
 pnpm db:up                    # Postgres alone, for `pnpm test`
-pnpm db:migrate               # apply migrations to DATABASE_URL
+pnpm db:migrate               # apply migrations to DATABASE_URL, read from .env
 pnpm db:generate              # drizzle-kit generate, after a schema change
 
 docker compose up             # the published image: Postgres, migrations, the app

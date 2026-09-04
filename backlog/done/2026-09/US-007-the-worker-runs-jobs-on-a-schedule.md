@@ -6,7 +6,7 @@ priority: p1
 created: 2026-09-04
 parent:
 area:
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -131,3 +131,16 @@ singleton key, not a lock the code writes itself.
   so a wait keeps its cursor and the next poll resumes the collection instead
   of starting a second one. This ticket still waits on the same live run as
   BUG-001's last box: one poll that collects and reads a real snapshot.
+- 2026-09-05 — That run happened, and this ticket closes with it. The scheduler
+  ticked, the poll triggered a collection, fifteen poll jobs carried it to a
+  finished snapshot, and forty-nine real posts reached the pre-filter and the
+  classify step. The chain in the Context — poll, pre-filter, classify, notify
+  — ran end to end against a live provider for the first time.
+
+  Two things the suite could not have told us. A real DNS failure hit a poll
+  job mid-run; it failed, retried and recovered, which is the retry policy
+  meeting a real fault rather than a simulated one. And a monitor left at the
+  60-second floor triggered a collection every minute and billed 9 to 11
+  records each time for no posts, because everything found was older than the
+  last poll. The interval is a cost dial, exactly as the Context says, and
+  US-013 is what turns that from a lesson into a limit.

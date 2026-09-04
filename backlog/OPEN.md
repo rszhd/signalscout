@@ -2,13 +2,11 @@
 
 # Open tickets
 
-17 open — 4 doing, 13 todo, 0 parked (1 p0, 6 p1, 9 p2, 1 p3).
+15 open — 2 doing, 13 todo, 0 parked (5 p1, 9 p2, 1 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
-| p0 | BUG-001 | [A pending Reddit collection is not resumed](doing/BUG-001-a-pending-reddit-collection-is-not-resumed.md) | bug | doing | 2026-09-05 |
 | p1 | US-001 | [The workspace runs with one command](doing/US-001-the-workspace-runs-with-one-command.md) | chore | doing | 2026-09-04 |
-| p1 | US-007 | [The worker runs jobs on a schedule](doing/US-007-the-worker-runs-jobs-on-a-schedule.md) | feature | doing | 2026-09-04 |
 | p1 | US-010 | [A monitor is created from four answers](doing/US-010-a-monitor-is-created-from-four-answers.md) | feature | doing | 2026-09-04 |
 | p1 | US-011 | [The inbox shows why a post matched](todo/US-011-the-inbox-shows-why-a-post-matched.md) | feature | todo | 2026-09-04 |
 | p1 | US-013 | [A monitor cannot spend past its budget](todo/US-013-a-monitor-cannot-spend-past-its-budget.md) | feature | todo | 2026-09-04 |

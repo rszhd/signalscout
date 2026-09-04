@@ -6,7 +6,7 @@ priority: p0
 created: 2026-09-05
 parent: US-007
 area: sources
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -44,12 +44,12 @@ classification model calls. The only model call was query generation.
       collection for the same monitor and source
 - [x] Posts returned after the wait are stored and enqueue the filter exactly
       once
-- [ ] A live Bright Data run triggers one collection, resumes its snapshot and
+- [x] A live Bright Data run triggers one collection, resumes its snapshot and
       stores the returned posts
 
 ## Notes
 
-- Parent: [US-007](../doing/US-007-the-worker-runs-jobs-on-a-schedule.md).
+- Parent: [US-007](US-007-the-worker-runs-jobs-on-a-schedule.md).
 - `packages/core/src/worker/collect.ts` drops the cursor on the wait branch and
   returns from the poll job.
 - `packages/core/src/sources/reddit/index.ts` puts the snapshot id in the
@@ -135,3 +135,39 @@ classification model calls. The only model call was query generation.
   connector with a `fetch` that cannot reach anything. A completed Bright Data
   snapshot, an expired one and a real rate limit have still never happened
   here. The next run against a live key is what finds out.
+- 2026-09-05 — It ran against a live key, and the whole cycle worked. A monitor
+  with one keyword and no subreddits, polled by the worker on its own schedule:
+
+  ```
+  03:54:14  trigger            0 posts, 0 units, wait + cursor sd_mtndh50r1f9v09znhc
+  03:54:46  resume  x14        0 posts, 0 units, snapshot still collecting
+  ...       (every 32 s, the provider's own hint, cursor unchanged)
+  04:01:51  resume             49 posts, 49 records billed, continuation deleted
+  04:01:51  pre-filter         49 posts
+  04:01:53  classify           49 posts, skipped: no model key was given
+  ```
+
+  Forty-nine real Reddit posts are stored, with their subreddits and their own
+  dates. One collection was triggered, not fifteen. This is the failure the
+  ticket was written for, and it is gone.
+
+  **The collection took 7.6 minutes, not the 2 the capture run saw.** Fourteen
+  resumes of the 120 the cap allows. The cap is about an hour at this rate, so
+  it is far enough above a slow collection and still stops a stuck one.
+
+  **A real network failure hit the poll and the retry recovered it.** DNS
+  failed mid-run — `getaddrinfo ENOTFOUND api.brightdata.com` — the job failed,
+  pg-boss retried it, and the continuation row was still there when it did.
+  That path had only ever been simulated.
+
+  **The run cost about $0.17.** 114 records over eight collections. Only the
+  first collection was the test; the other seven are the setup's own lesson.
+  The check monitor was left on the 60-second floor, so the scheduler polled it
+  every minute for hours, and each poll triggered a collection that billed 9 to
+  11 records and returned no posts — everything it found was older than the
+  last poll. Nothing is wrong in the code: it is what US-013 and US-014 exist
+  for, measured. A monitor polled every minute pays for asking, whether or not
+  anything was said.
+
+  **Still unproven.** An expired snapshot, a failed collection and a real rate
+  limit. The X connector has never run at all.

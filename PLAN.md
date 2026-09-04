@@ -82,13 +82,20 @@ Users provide their own credentials for external services.
 For example:
 
 ```env
-X_BEARER_TOKEN=
+BRIGHTDATA_API_KEY=
 
-REDDIT_CLIENT_ID=
-REDDIT_CLIENT_SECRET=
+X_API_KEY=
+X_API_SECRET=
 
 OPENAI_API_KEY=
 ```
+
+Reddit is the exception that proves the rule. Reddit closed self-serve API
+registration in November 2025, so a user cannot get their own Reddit key any
+more. Reddit therefore arrives through Bright Data, and the key the user brings
+is a Bright Data one. The principle is unchanged: the user owns the account and
+pays for their own usage. STACK.md, *A source is not a provider*, holds the
+reasoning and the rule it produced.
 
 Later we can support multiple AI providers:
 
@@ -381,24 +388,16 @@ src/
 
 Social networks should implement a common connector interface.
 
-For example:
-
-```ts
-interface SocialSource {
-  id: string;
-
-  validateCredentials(
-    credentials: Credentials
-  ): Promise<boolean>;
-
-  search(
-    monitor: Monitor,
-    cursor?: string
-  ): Promise<SearchResult>;
-}
-```
+The sketch this plan started from was three members: an id,
+`validateCredentials` and `search`. US-003 settled the real one, and it is
+wider, because three facts about billing and throttling were missing here and
+each one, left out, ends up copied into the worker: a page carries a cost as
+well as a cursor, back-off belongs to the connector, and a source declares its
+own price. `packages/core/src/sources/types.ts` is the interface, and its
+comments say why each member exists.
 
 This makes additional integrations easy for both us and community contributors.
+See [docs/sources.md](docs/sources.md) for the steps.
 
 ---
 

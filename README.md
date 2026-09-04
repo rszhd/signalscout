@@ -54,17 +54,20 @@ before anything reaches a model, so you are not billed for reading noise.
 IntentWatch ships the integrations. You own the accounts.
 
 ```env
-REDDIT_CLIENT_ID=
-REDDIT_CLIENT_SECRET=
+BRIGHTDATA_API_KEY=      # Reddit
 
-X_BEARER_TOKEN=          # optional
+X_API_KEY=               # optional
+X_API_SECRET=
 
 OPENAI_API_KEY=          # or Anthropic, Google, OpenRouter, or a local model
 ```
 
-Nothing is proxied through us. There is no account to create, no data leaves
-your instance, and the AI provider is yours to choose — including Ollama, if you
-want no external provider at all.
+Nothing is proxied through us. There is no IntentWatch account to create, no
+data leaves your instance, and the AI provider is yours to choose — including
+Ollama, if you want no external provider at all.
+
+You only need keys for the sources you turn on. Reddit alone is a useful
+product, so `BRIGHTDATA_API_KEY` and an AI key are enough to start.
 
 ### What that costs
 
@@ -72,27 +75,42 @@ Honest numbers, because a tool that spends your money should say what it spends.
 
 | | Cost |
 |---|---|
-| Reddit, free tier | $0 — 100 queries per minute, which is far more than you need |
+| Reddit, via Bright Data | free for the first 5,000 posts each month, then $0.0015 per post |
 | X, pay-per-use | $0.005 per post read, no subscription, no free tier |
 | Embedding pre-filter | roughly $0.00001 per post |
 | Classification | roughly $0.001 per post with a cheap model |
 
-**On X the money is spent at fetch time**, before any filter sees the text. So
-every monitor has a spending cap, every query can be cost-tested before it runs,
-and the app shows what it spent. About $25 of X credit buys roughly 5,000 post
+**The money is spent at fetch time**, before any filter sees the text. So every
+monitor has a spending cap, every query can be cost-tested before it runs, and
+the app shows what it spent. About $25 of X credit buys roughly 5,000 post
 reads.
 
-Reddit alone is free, and Reddit alone is a useful product.
+Reddit is the cheap source: free to start, and about a third the cost of X after
+that. Reddit alone is a useful product.
 
-### Before you connect Reddit
+### Reddit comes through Bright Data, and you should know why
 
-You register your own Reddit application, under your own account, and you accept
-Reddit's API terms directly. Read them.
+In November 2025 Reddit closed self-serve API registration. Getting a client id
+now means a manual approval request under their Responsible Builder Policy, and
+developers report rejections for small projects. We are not willing to ship a
+product that only works for the users who win an approval.
 
-Reddit's free tier is for **personal, non-commercial** use. Commercial
-monitoring requires a reviewed contract that starts far above what this tool is
-for. Whether your use qualifies is your call to make, not ours — we ship a
-connector, you hold the relationship with Reddit.
+So IntentWatch reads Reddit through **Bright Data**, a third-party data
+provider, and you bring a Bright Data key. Their free tier covers 5,000 posts a
+month and needs no card.
+
+Be clear about what that means, because it is not a free pass. Your Reddit data
+arrives through a company that is not Reddit. You sign Bright Data's agreement
+instead of Reddit's, and that agreement puts the compliance burden on you: you
+warrant that your use violates no third party's rights, and you indemnify Bright
+Data if it does. The question of whether commercial monitoring of Reddit is
+allowed did not go away. It moved onto you, and it became less visible.
+
+We think this is the honest trade for an open-source tool, and we would rather
+say it here than let you find it in an agreement you skimmed.
+
+If you have a Reddit client id issued before November 2025, it still works.
+There is no connector for it today. Open an issue if you want one.
 
 ---
 

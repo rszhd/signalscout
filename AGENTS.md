@@ -14,6 +14,11 @@ the four tables. US-003 settled the `SocialSource` interface and shipped a fake
 connector. Nothing collects, filters or scores yet, and no real connector
 exists.
 
+**Reddit's own API is closed to us.** Reddit ended self-serve app registration
+in November 2025. Reddit is reached through Bright Data instead, and X through
+its official pay-per-use API. Read STACK.md, *A source is not a provider*,
+before touching a connector: the interface does not change to suit a provider.
+
 [US-001](backlog/doing/US-001-the-workspace-runs-with-one-command.md) is still
 in `doing/`. Its code is complete, and one acceptance box waits on the first CI
 run, which needs a remote this repository does not have. Build on the skeleton;
@@ -79,6 +84,8 @@ Do not reopen these without being asked. The reasoning is in
 | Python | TypeScript |
 | A managed auth service | Better Auth in our own Postgres |
 | An in-memory Postgres fake | Real Postgres, from the first test file |
+| A Reddit API key per user | Reddit through Bright Data |
+| A provider picker in the UI | One provider per source, named but not chosen |
 
 If you believe one is wrong, say so in one paragraph and wait. Do not
 reintroduce it as part of another change.

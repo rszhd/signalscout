@@ -2,22 +2,22 @@
 
 # Open tickets
 
-17 open — 1 doing, 16 todo, 0 parked (6 p1, 10 p2, 1 p3).
+17 open — 2 doing, 15 todo, 0 parked (8 p1, 8 p2, 1 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
 | p1 | US-001 | [The workspace runs with one command](doing/US-001-the-workspace-runs-with-one-command.md) | chore | doing | 2026-09-04 |
-| p1 | US-005 | [Reddit returns candidate posts](todo/US-005-reddit-returns-candidate-posts.md) | feature | todo | 2026-09-04 |
+| p1 | US-005 | [Reddit returns candidate posts](doing/US-005-reddit-returns-candidate-posts.md) | feature | doing | 2026-09-04 |
 | p1 | US-007 | [The worker runs jobs on a schedule](todo/US-007-the-worker-runs-jobs-on-a-schedule.md) | feature | todo | 2026-09-04 |
 | p1 | US-009 | [The model scores a post against a monitor](todo/US-009-the-model-scores-a-post-against-a-monitor.md) | feature | todo | 2026-09-04 |
 | p1 | US-010 | [A monitor is created from four answers](todo/US-010-a-monitor-is-created-from-four-answers.md) | feature | todo | 2026-09-04 |
 | p1 | US-011 | [The inbox shows why a post matched](todo/US-011-the-inbox-shows-why-a-post-matched.md) | feature | todo | 2026-09-04 |
+| p1 | US-013 | [A monitor cannot spend past its budget](todo/US-013-a-monitor-cannot-spend-past-its-budget.md) | feature | todo | 2026-09-04 |
+| p1 | US-014 | [A query's cost is known before it runs](todo/US-014-a-querys-cost-is-known-before-it-runs.md) | feature | todo | 2026-09-04 |
 | p2 | US-004 | [A stored key is encrypted at rest](todo/US-004-a-stored-key-is-encrypted-at-rest.md) | feature | todo | 2026-09-04 |
 | p2 | US-006 | [X returns candidate posts and says what it spent](todo/US-006-x-returns-candidate-posts-and-says-what-it-spent.md) | feature | todo | 2026-09-04 |
 | p2 | US-008 | [A cheap filter runs before the model](todo/US-008-a-cheap-filter-runs-before-the-model.md) | feature | todo | 2026-09-04 |
 | p2 | US-012 | [A match is marked good or not relevant](todo/US-012-a-match-is-marked-good-or-not-relevant.md) | feature | todo | 2026-09-04 |
-| p2 | US-013 | [A monitor cannot spend past its budget](todo/US-013-a-monitor-cannot-spend-past-its-budget.md) | feature | todo | 2026-09-04 |
-| p2 | US-014 | [A query's cost is known before it runs](todo/US-014-a-querys-cost-is-known-before-it-runs.md) | feature | todo | 2026-09-04 |
 | p2 | US-015 | [A deleted post stops being shown](todo/US-015-a-deleted-post-stops-being-shown.md) | feature | todo | 2026-09-04 |
 | p2 | US-016 | [A match reaches email or a webhook](todo/US-016-a-match-reaches-email-or-a-webhook.md) | feature | todo | 2026-09-04 |
 | p2 | US-017 | [A self-hosted instance has one account](todo/US-017-a-self-hosted-instance-has-one-account.md) | feature | todo | 2026-09-04 |

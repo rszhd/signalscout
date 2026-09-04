@@ -121,7 +121,8 @@ This single choice covers the whole multi-provider section of PLAN.md.
 Python would only help if we ran local embedding or classification models
 ourselves. We do not. Users bring their own AI keys.
 
-Reddit and X are plain HTTP, so `fetch` is enough. PRAW and Tweepy add nothing.
+Reddit, X and Bright Data are plain HTTP, so `fetch` is enough. PRAW and Tweepy
+add nothing, and `snoowrap` is unmaintained.
 
 Add a small Python service later only if we ship a local model.
 
@@ -134,40 +135,94 @@ design more than any framework choice.
 
 | Step | Cost per post |
 |---|---|
-| Reddit read, free tier | $0 |
-| Reddit read, commercial tier | ~$0.0000024 (100 posts per $0.00024 call) |
+| Reddit read, Bright Data free allowance | $0, first 5,000 records each month |
+| Reddit read, Bright Data pay-as-you-go | $0.0015 ($1.50 per 1,000 records) |
 | X read, pay-per-use | $0.005 |
 | Embedding pre-filter | ~$0.00001 |
 | AI classification, cheap model | ~$0.001 |
 
 **Fetching an X post costs about five times more than classifying it.** The money
-is spent before our code ever sees the text.
+is spent before our code ever sees the text. Reddit through Bright Data costs
+about a third of an X read, and starts free, so Reddit still carries the MVP.
+
+## A source is not a provider
+
+Reddit taught us this the hard way, so the rule is written down before it is
+needed again:
+
+> **The architecture supports replaceable providers. The product offers one
+> provider per source.**
+
+A user connects *Reddit*, not *a Bright Data Reddit scraper*. The UI names the
+provider in secondary text, because a user routed through a third party must be
+told so, but it never asks them to choose one. Internally the provider is a
+`SourceDefinition` like any other, so replacing it changes no monitor, no score,
+no match and no notification.
+
+This is why `SocialSource` already carries `unitsConsumed` and `next`: a
+provider that bills per record and answers asynchronously fits it without a new
+member. Do not weaken that interface to accommodate a provider. If a provider
+does not fit, it is the provider we describe wrongly, not the interface.
 
 ## Reddit
 
-| Tier | Cost | Limit | Condition |
-|---|---|---|---|
-| Free | $0 | 100 queries/min with OAuth | Approved personal, non-commercial use |
-| Commercial | $0.24 per 1,000 calls | Negotiated | Reviewed contract, entry around $12,000/month |
+**Reddit's self-serve API is closed.** Since its Responsible Builder Policy in
+November 2025, registering a script or web app requires a manual approval
+request. Reports from developers describe rejections for small projects and
+long silences. Keys issued before the policy are grandfathered and still work.
 
-There is nothing in between. The rate limit is not our problem: 100 queries per
-minute is 144,000 calls per day, and one search call returns up to 100 posts.
-The terms are the constraint, not the volume.
+An open-source product cannot ask every self-hoster to win an approval. So
+Reddit is reached through **Bright Data**, and the user brings a Bright Data key
+instead of a Reddit one.
 
-Bring-your-own-keys is the answer. Each self-hoster registers their own Reddit
-app under their own account and accepts Reddit's terms directly. We ship a
-connector. The user holds the relationship with Reddit.
+| | Cost | Allowance |
+|---|---|---|
+| Bright Data free tier | $0 | 5,000 records per month, no card |
+| Bright Data pay-as-you-go | $1.50 per 1,000 records | no minimum, no commitment |
 
-State this plainly in the README so users know what they agree to.
+Two facts shape the connector:
 
-The hosted version is the harder case. Settle it before the hosted launch. It is
-a legal question, not an engineering one.
+**Comments cannot be discovered by keyword.** Posts are discovered by keyword or
+by subreddit. Comments are collected *by post URL only* — the same limit Reddit's
+own API has. So a monitor that wants comments pays a second call per post, and
+the cost per monitor roughly doubles. This is a product decision, not a default.
+
+**Collection is asynchronous.** A small request answers within about a minute.
+A larger one returns a `snapshot_id` to poll. That is `next: { status: "wait" }`
+with the snapshot id as the cursor; the scheduler does other work meanwhile.
+
+Access is not gated. Bright Data's free tier needs no card, no company
+verification and no KYC review; only their proxy products are excluded, and we
+use none. That was checked rather than assumed, because an unverified access
+claim is what cost us Reddit.
+
+The terms question does not disappear by changing provider — it moves. Bright
+Data's Master Service Agreement makes the *customer* warrant that their use
+violates no third-party rights, and indemnify Bright Data if it does. So the
+question of whether commercial Reddit monitoring is allowed now sits with the
+user, less visibly than before. Say that in the README rather than implying a
+third party absorbed it.
+
+Two clauses to re-read before the hosted launch, not before the connector:
+
+- A customer may not redistribute collected data "to offer a similar or
+  competitive product". Bring-your-own-key keeps us clear of this, because each
+  user's own account collects their own data. Pooling data across users would
+  not be clear of it.
+- The customer is solely responsible for the lawful grounds for personal data.
+  An author handle is personal data under GDPR, and we store one.
+
+The hosted version's position is still a legal question, not an engineering
+one.
 
 ## X
 
-Pay-per-use, no subscription. $0.005 per post read. Capped at 3 million post
-reads per billing cycle. No free tier. Roughly $25 buys 5,000 reads, or about
-165 posts per day.
+Pay-per-use, and since February 2026 that is the only self-serve path: Basic and
+Pro are closed to new signups, and there is no free tier. $0.005 per post read,
+no monthly minimum. Roughly $25 buys 5,000 reads, or about 165 posts per day.
+
+**No free tier plus per-read billing makes the budget guard a prerequisite, not
+a follow-up.** US-013 and US-014 land before the X connector, not after it.
 
 ---
 
@@ -209,17 +264,21 @@ a metered API key to software that cannot report what it spent.
 `pg-boss` supports throttled jobs, so the poll interval per monitor becomes a
 cost dial we can set from the UI.
 
-## 4. Respect rate limit headers
+## 4. Respect the provider's throttle
 
-Reddit returns `X-Ratelimit-Remaining` and `X-Ratelimit-Reset` on every response.
-Read them in the connector and back off. Do not poll on a fixed timer and hope.
+Every provider says "slow down" in its own dialect. Reddit's own API sends
+`X-Ratelimit-Remaining` and `X-Ratelimit-Reset`; Bright Data answers a large
+request with a `snapshot_id` to poll; X sends neither. Read that signal in the
+connector and back off there. Do not poll on a fixed timer and hope.
 
-Put this in `packages/core/sources/reddit`, not in the worker, so every caller
-gets it.
+Put this in the connector's own folder, not in the worker, so every caller gets
+it and no caller learns how the connector found out. `NextPage` is the whole
+vocabulary the caller needs.
 
 ## 5. Honor deletions
 
-Reddit's terms require us to stop showing content the author removed.
+Reddit requires that content the author removed stops being shown. This does
+not soften because the data arrived through a third party.
 
 Store the post ID and a short excerpt, not a permanent full copy. Run a
 reconciliation job that re-checks matched posts and hides the deleted ones.

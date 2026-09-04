@@ -2,7 +2,7 @@
 id: US-013
 title: A monitor cannot spend past its budget
 type: feature
-priority: p2
+priority: p1
 created: 2026-09-04
 parent:
 area:
@@ -65,3 +65,7 @@ we cannot win.
 ## Log
 
 - 2026-09-04 — Written from STACK.md.
+- 2026-09-05 — Raised from p2 to p1. X lost its free tier: since February 2026
+  pay-per-use is the only self-serve path, so the first X read a user makes is
+  billed. A cap that lands after the connector is a cap that lands after the
+  first surprise invoice. See STACK.md, *X*.

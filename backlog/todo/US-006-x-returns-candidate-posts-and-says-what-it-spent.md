@@ -72,3 +72,6 @@ spending cap means the first cursor bug is discovered on a user's invoice.
 - 2026-09-04 — Added the captured-fixture and injected-client requirements,
   after adopting docs/testing.md. The injected client is what makes "no test
   spends money" enforceable rather than a convention.
+- 2026-09-05 — Unchanged, but now sequenced behind US-013 and US-014, which were
+  raised to p1. X has no free allowance, so the cap and the estimate land before
+  the first billed read, not after it.

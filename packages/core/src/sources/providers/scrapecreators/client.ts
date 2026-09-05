@@ -40,6 +40,15 @@ const apiBase = "https://api.scrapecreators.com/v1/reddit";
 export const endpoints = {
   search: `${apiBase}/search`,
   subreddit: `${apiBase}/subreddit`,
+  /**
+   * The replies under one post, by URL. US-020.
+   *
+   * One credit buys a page of about 25 comments, whatever the thread holds:
+   * measured on 2026-09-06, threads claiming 640, 296 and 95 comments each
+   * returned exactly 25. So a credit buys a page and not a thread, and the
+   * connector reads one page and stops.
+   */
+  postComments: `${apiBase}/post/comments`,
 } as const;
 
 /**
@@ -52,6 +61,21 @@ export const endpoints = {
  * pages it will discard.
  */
 export const sortNewest = "new";
+
+/** One page of a comment tree, straight off the wire. */
+export interface CommentPage {
+  readonly post: Record<string, unknown>;
+  readonly comments: readonly unknown[];
+  /** Present only when the provider says there is another page and names it. */
+  readonly after?: string;
+  readonly creditsCharged: number;
+}
+
+function objectOf(value: unknown): Record<string, unknown> | undefined {
+  return typeof value === "object" && value !== null
+    ? (value as Record<string, unknown>)
+    : undefined;
+}
 
 /**
  * A refusal from ScrapeCreators, already turned into a sentence a user can act
@@ -257,6 +281,43 @@ export class ScrapeCreatorsClient {
     return {
       records,
       ...(after ? { after } : {}),
+      creditsCharged: this.chargeOf(body),
+    };
+  }
+
+  /**
+   * One page of replies, as the provider returns it.
+   *
+   * Separate from `fetchPage` because the answer is a different shape: the
+   * comments are a nested tree under `comments`, the cursor is at
+   * `more.cursor`, and the post itself rides along in `post`. Sharing one
+   * reader would have meant a function that knows which endpoint called it.
+   */
+  async fetchComments(
+    url: string,
+    cursor: string | undefined,
+    signal?: AbortSignal,
+  ): Promise<CommentPage> {
+    const answer = await this.call(
+      endpoints.postComments,
+      { url, ...(cursor ? { cursor } : {}) },
+      signal,
+    );
+
+    if (answer.httpStatus !== 200) throw this.fail(answer);
+
+    const body =
+      typeof answer.body === "object" && answer.body !== null
+        ? (answer.body as Record<string, unknown>)
+        : {};
+
+    const more = objectOf(body.more);
+    const next = typeof more?.cursor === "string" && more.cursor !== "" ? more.cursor : undefined;
+
+    return {
+      post: objectOf(body.post) ?? {},
+      comments: Array.isArray(body.comments) ? body.comments : [],
+      ...(more?.has_more === true && next ? { after: next } : {}),
       creditsCharged: this.chargeOf(body),
     };
   }

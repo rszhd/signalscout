@@ -101,6 +101,20 @@ export interface SourceQuery {
   readonly channels: readonly string[];
   /** Return nothing posted at or before this time. The cursor is the finer tool. */
   readonly since?: Date;
+  /**
+   * Whether the monitor wants the replies underneath the posts it finds.
+   *
+   * It is here rather than on `SearchRequest` because it is the monitor's
+   * setting, and every stage that reads a query needs to know it — the poll
+   * decides whether to open threads, and the cost test has to say what a
+   * month of it costs. A connector's `search` ignores it: replies are fetched
+   * by `fetchReplies`, in a second call, because every provider we have reads
+   * them by post URL and a search does not know a URL until it has answered.
+   *
+   * A connector with no `fetchReplies` ignores this entirely rather than
+   * failing. US-020.
+   */
+  readonly includeReplies?: boolean;
 }
 
 export interface SearchRequest {
@@ -135,6 +149,78 @@ export interface CandidatePost {
   readonly text: string;
   /** When the author posted it, not when we read it. */
   readonly postedAt: Date;
+  /**
+   * How many replies the platform says this post has.
+   *
+   * The poll stores it and compares it on the next pass, because that is what
+   * makes "open a thread only when something was said in it" possible without
+   * paying to find out. Both Reddit answers carry it on every post and X
+   * carries it as `engagement.comments`.
+   *
+   * Absent means the platform did not say. That is not zero, and a poll must
+   * treat it as "cannot tell" and fall back to its own bound.
+   */
+  readonly replyCount?: number;
+}
+
+/**
+ * One reply, as a connector returns it.
+ *
+ * It is a `CandidatePost` and two links, because a reply is stored in `posts`
+ * like anything else: it has its own platform id, its own author and its own
+ * text, and `UNIQUE (source, external_id)` keys it exactly as a post. Reddit's
+ * `t1_` fullname and an X reply id are the same kind of thing.
+ *
+ * The two links are what a post does not have. A reply is unreadable without
+ * the post above it — "same here, what did you switch to?" names no product
+ * and no problem — so the parent travels with it and reaches the classifier's
+ * prompt.
+ */
+export interface CandidateReply extends CandidatePost {
+  /** The `external_id` of the post this reply hangs under. Never absent. */
+  readonly parentPostExternalId: string;
+  /**
+   * The `external_id` of the reply directly above this one, when there is one.
+   *
+   * Absent means the reply sits directly under the post. On Reddit that is
+   * `parent_id` starting `t3_`; on X and LinkedIn the provider says so in the
+   * shared comment schema.
+   */
+  readonly parentReplyExternalId?: string;
+}
+
+export interface ReplyRequest {
+  /** The post to read replies under. Every provider we have takes a URL. */
+  readonly postUrl: string;
+  /** The platform id of that post, so a connector can check what came back. */
+  readonly postExternalId: string;
+  readonly credentials: SourceCredentials;
+  /** Opaque, from a previous `ReplyResult`. Absent starts at the first page. */
+  readonly cursor?: string;
+  readonly signal?: AbortSignal;
+}
+
+export interface ReplyResult {
+  readonly replies: readonly CandidateReply[];
+  /** Billable units this call consumed, in the source's own unit. */
+  readonly unitsConsumed: number;
+  readonly next: NextPage;
+  /**
+   * Whether this answer is known to be missing replies the thread holds.
+   *
+   * **This is not `next.status === "done"`, and conflating them is the bug
+   * this field exists to prevent.** ScrapeCreators reports a top-level
+   * `has_more: false` while nested subtrees underneath it still say
+   * `has_more: true`: measured on 2026-09-06, a thread of 95 comments answered
+   * "complete" after 43. SocialCrawl publishes the same warning about its own
+   * `truncated`, which can arrive with no cursor at all.
+   *
+   * So a connector that cannot promise completeness says `true` here, and
+   * nothing may record the thread as fully read. False means the connector
+   * has positive evidence it reached the end, not merely that it ran out of
+   * cursors.
+   */
+  readonly partial: boolean;
 }
 
 /**
@@ -274,6 +360,35 @@ export interface ConnectorDescriptor {
    * more", and this is how much more there could be.
    */
   readonly maxUnitsPerQueryPoll: number;
+  /**
+   * Whether this connector can read the replies under a post.
+   *
+   * The same fact as `SocialSource.fetchReplies` being present, said where a
+   * screen can read it without building a connector and without a key. The
+   * monitor form needs it: a person who ticks "include replies" on three
+   * platforms must be told which of them will actually return any, rather
+   * than being given none in silence.
+   *
+   * Default it to false in a descriptor that does not say. A connector that
+   * cannot fetch replies and forgets to declare so is then merely quiet,
+   * where the other way round would be a promise the form makes and the
+   * connector breaks.
+   */
+  readonly canFetchReplies?: boolean;
+  /**
+   * What one call to `fetchReplies` costs, when it differs from
+   * `pricePerUnitMicros`.
+   *
+   * It differs more often than not. On ScrapeCreators a search and a comment
+   * page are both one credit; on SocialCrawl an X search is one credit and an
+   * X reply page is one, while a Reddit comment call is five against a Reddit
+   * search's one. A guard fed the search price for a reply page would let a
+   * monitor spend five times its cap, which is the mistake US-028 already made
+   * once with LinkedIn credits and wrote down.
+   *
+   * Absent means the same price as a search.
+   */
+  readonly replyPricePerUnitMicros?: number;
 }
 
 export interface SocialSource extends ConnectorDescriptor {
@@ -281,6 +396,20 @@ export interface SocialSource extends ConnectorDescriptor {
   search(request: SearchRequest): Promise<SearchResult>;
   /** Absent means verification is unsupported, never that a post is deleted. */
   verify?(request: VerificationRequest): Promise<VerificationResult>;
+  /**
+   * Read the replies under one post. Absent means this connector cannot.
+   *
+   * Absent is the declaration, and it is why `SourceQuery.includeReplies` is
+   * ignored rather than refused: a monitor that asks for replies on a platform
+   * whose connector has no method here still polls, and still returns posts.
+   * `canFetchReplies` on the descriptor is the same fact, readable without
+   * building a connector, because the monitor form has to say which of a
+   * person's platforms will actually return them.
+   *
+   * US-020. Every provider we have reads replies by post URL, so this is a
+   * second call and not a flag on `search`.
+   */
+  fetchReplies?(request: ReplyRequest): Promise<ReplyResult>;
 }
 
 /**

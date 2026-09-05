@@ -176,6 +176,13 @@
       "when": 1788628789733,
       "tag": "0024_add_triage_stage",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1788628849733,
+      "tag": "0025_a_monitor_can_read_replies",
+      "breakpoints": true
     }
   ]
 }

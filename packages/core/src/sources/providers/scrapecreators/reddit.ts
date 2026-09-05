@@ -20,8 +20,11 @@
 import { redditPlatform } from "../../platforms.js";
 import type {
   CandidatePost,
+  CandidateReply,
   ConnectorDefinition,
   CredentialCheck,
+  ReplyRequest,
+  ReplyResult,
   SearchRequest,
   SearchResult,
   SocialSource,
@@ -73,6 +76,9 @@ export const scrapeCreatorsReddit: ConnectorDefinition = {
   pricePerUnitMicros: 1880,
   /** `maxPagesPerInput`: what one keyword or subreddit costs in one poll. */
   maxUnitsPerQueryPoll: maxPagesPerInput,
+  canFetchReplies: true,
+  /** A comment page is one credit, the same as a search. Measured, not assumed. */
+  replyPricePerUnitMicros: 1880,
   create: (runtime) => new ScrapeCreatorsRedditSource(runtime),
 };
 
@@ -186,6 +192,46 @@ export class ScrapeCreatorsRedditSource implements SocialSource {
     }
 
     return { valid: true };
+  }
+
+  /**
+   * One page of the replies under one post.
+   *
+   * **A credit buys a page, not a thread, and the provider will not say so.**
+   * Measured on 2026-09-06: threads claiming 640, 296 and 95 comments each
+   * returned exactly 25 for one credit, each with `more.has_more: true`. Worse,
+   * draining the 95-comment thread from the top level stopped after three calls
+   * with 43 comments and `has_more: false` — while fourteen nested subtrees
+   * inside the first page still said `has_more: true`.
+   *
+   * So a top-level "no more" is not the end of the thread, and `partial` is
+   * reported from that measurement rather than from the flag. This connector
+   * only ever claims a thread is complete when the provider both ran out of
+   * cursors and returned every reply the post said it had.
+   */
+  async fetchReplies(request: ReplyRequest): Promise<ReplyResult> {
+    const client = this.client(request.credentials);
+    const page = await client.fetchComments(request.postUrl, request.cursor, request.signal);
+
+    const channel = textOf(page.post.subreddit);
+    const replies = toCandidateReplies(page.comments, request.postExternalId, channel);
+
+    // The post's own count against what we hold. Equal or greater is the only
+    // evidence that a thread was read to the end; anything else is partial,
+    // including a page that simply stopped offering cursors.
+    const claimed = page.post.num_comments;
+    const complete =
+      page.after === undefined &&
+      typeof claimed === "number" &&
+      Number.isFinite(claimed) &&
+      replies.length >= claimed;
+
+    return {
+      replies,
+      unitsConsumed: page.creditsCharged,
+      next: page.after ? { status: "ready", cursor: page.after } : { status: "done" },
+      partial: !complete,
+    };
   }
 
   /**
@@ -380,6 +426,8 @@ export function toCandidatePost(record: unknown): CandidatePost | undefined {
   const author = text(row.author);
   const channel = text(row.subreddit);
 
+  const replyCount = row.num_comments;
+
   return {
     externalId,
     url,
@@ -390,7 +438,73 @@ export function toCandidatePost(record: unknown): CandidatePost | undefined {
     ...(author ? { author } : {}),
     ...(channel ? { channel } : {}),
     ...(title ? { title } : {}),
+    ...(typeof replyCount === "number" && Number.isFinite(replyCount) && replyCount >= 0
+      ? { replyCount }
+      : {}),
   };
+}
+
+/**
+ * One comment from the tree, and every comment nested under it.
+ *
+ * The tree is walked rather than read flat because a nested reply is a lead as
+ * readily as a top-level one, and because `parent_id` is what tells them
+ * apart: Reddit writes the post's `t3_` fullname there for a top-level comment
+ * and the parent comment's `t1_` for a nested one. That distinction reaches
+ * the classifier's prompt, so it is carried rather than flattened away.
+ */
+export function toCandidateReplies(
+  comments: readonly unknown[],
+  parentPostExternalId: string,
+  channel: string | undefined,
+): CandidateReply[] {
+  const out: CandidateReply[] = [];
+
+  const walk = (nodes: readonly unknown[]) => {
+    for (const node of nodes) {
+      if (typeof node !== "object" || node === null) continue;
+
+      const row = node as Record<string, unknown>;
+      const externalId = text(row.name) ?? (text(row.id) ? `t1_${text(row.id)}` : undefined);
+      const url = text(row.url) ?? permalink(row.permalink);
+      const postedAt = timestampOf(row);
+      const body = text(row.body);
+
+      // A removed comment carries `[deleted]` or `[removed]` as its body, the
+      // same markers `verify` reads. It is skipped rather than stored: there
+      // is nothing for a model to read, and paying to classify the word
+      // "[deleted]" is the cheapest mistake in this file to avoid.
+      const removed = body === undefined || body === "[deleted]" || body === "[removed]";
+
+      if (externalId && url && postedAt && !removed && body) {
+        const author = text(row.author);
+        // `t3_` names the post, so a comment carrying it is top-level.
+        const parent = text(row.parent_id);
+        const parentReply = parent?.startsWith("t1_") ? parent : undefined;
+
+        out.push({
+          externalId,
+          url,
+          text: body,
+          postedAt,
+          parentPostExternalId,
+          ...(author ? { author } : {}),
+          ...(channel ? { channel } : {}),
+          ...(parentReply ? { parentReplyExternalId: parentReply } : {}),
+        });
+      }
+
+      const replies = row.replies;
+      const items =
+        typeof replies === "object" && replies !== null
+          ? (replies as { items?: unknown }).items
+          : undefined;
+      if (Array.isArray(items)) walk(items);
+    }
+  };
+
+  walk(comments);
+  return out;
 }
 
 /**
@@ -417,6 +531,10 @@ function timestampOf(row: Record<string, unknown>): Date | undefined {
 function permalink(value: unknown): string | undefined {
   const path = text(value);
   return path ? `https://www.reddit.com${path}` : undefined;
+}
+
+export function textOf(value: unknown): string | undefined {
+  return text(value);
 }
 
 function text(value: unknown): string | undefined {

@@ -146,6 +146,9 @@ describe("reading a captured record", () => {
         "Starting Automation from 0% as a QA Lead — How are you using AI, MCPs & Agents in QA?",
       text: expect.any(String) as unknown as string,
       postedAt: new Date("2026-09-04T11:08:36.000Z"),
+      // US-020 added this. It is what makes "open a thread only when somebody
+      // said something new in it" possible without paying to find out.
+      replyCount: 22,
     });
   });
 
@@ -492,5 +495,141 @@ describe("in the registry", () => {
     expect(registry.get(redditPlatformId, scrapeCreatorsProviderId).provider.displayName).toBe(
       "ScrapeCreators",
     );
+  });
+});
+
+/**
+ * Replies, driven against the two comment threads captured live on
+ * 2026-09-04 and 2026-09-06 and committed under `sources/deletion-fixtures/`.
+ *
+ * They are read from there rather than copied here because US-029 already
+ * labelled every comment in both by hand, and two copies of a payload drift.
+ */
+function thread(name: string): { httpStatus: number; body: unknown } {
+  return {
+    httpStatus: 200,
+    body: JSON.parse(
+      readFileSync(new URL(`../../deletion-fixtures/${name}.json`, import.meta.url), "utf8"),
+    ) as unknown,
+  };
+}
+
+/** 22 claimed, 21 returned, one of them a `[deleted]` body. */
+const shallowThread = thread("scrapecreators-comments-canonical");
+/** 58 claimed, 25 returned, and the provider says `has_more: false`. */
+const truncatedThread = thread("scrapecreators-comments-statement-post");
+
+function replyRequest(overrides: Record<string, unknown> = {}) {
+  return {
+    postUrl: "https://www.reddit.com/r/softwaretesting/comments/1w71bul/",
+    postExternalId: "t3_1w71bul",
+    credentials,
+    ...overrides,
+  };
+}
+
+describe("reading the replies under a post", () => {
+  it("declares that it can, so the monitor form does not have to guess", () => {
+    expect(scrapeCreatorsReddit.canFetchReplies).toBe(true);
+    // A comment page is one credit, the same as a search. Measured, not assumed.
+    expect(scrapeCreatorsReddit.replyPricePerUnitMicros).toBe(1880);
+  });
+
+  it("asks the comments endpoint for the post's own URL", async () => {
+    const { fetch: fetchStub, calls } = scrapeCreators([shallowThread]);
+    const source = new ScrapeCreatorsRedditSource(runtimeWith(fetchStub));
+
+    await source.fetchReplies(replyRequest());
+
+    expect(calls[0]?.url).toContain("/v1/reddit/post/comments");
+    expect(calls[0]?.url).toContain(encodeURIComponent(replyRequest().postUrl));
+    expect(calls[0]?.apiKey).toBe(credentials.apiKey);
+  });
+
+  it("returns every comment in the tree, nested ones included", async () => {
+    const { fetch: fetchStub } = scrapeCreators([shallowThread]);
+    const source = new ScrapeCreatorsRedditSource(runtimeWith(fetchStub));
+
+    const result = await source.fetchReplies(replyRequest());
+
+    // 21 comments arrived and one of them is a `[deleted]` body, which is
+    // skipped: there is nothing for a model to read in it.
+    expect(result.replies).toHaveLength(20);
+    expect(result.replies.every((reply) => reply.text.length > 0)).toBe(true);
+  });
+
+  it("keys a reply by Reddit's own t1_ fullname, so deduplication needs no change", async () => {
+    const { fetch: fetchStub } = scrapeCreators([shallowThread]);
+    const source = new ScrapeCreatorsRedditSource(runtimeWith(fetchStub));
+
+    const result = await source.fetchReplies(replyRequest());
+
+    expect(result.replies.every((reply) => reply.externalId.startsWith("t1_"))).toBe(true);
+  });
+
+  it("carries the post above it, and the reply above it when there is one", async () => {
+    const { fetch: fetchStub } = scrapeCreators([shallowThread]);
+    const source = new ScrapeCreatorsRedditSource(runtimeWith(fetchStub));
+
+    const result = await source.fetchReplies(replyRequest());
+
+    expect(result.replies.every((reply) => reply.parentPostExternalId === "t3_1w71bul")).toBe(true);
+
+    // A top-level comment names the post in `parent_id`, so it carries no
+    // parent reply. A nested one names the comment above it.
+    const top = result.replies.filter((reply) => reply.parentReplyExternalId === undefined);
+    const nested = result.replies.filter((reply) => reply.parentReplyExternalId !== undefined);
+
+    expect(top.length).toBeGreaterThan(0);
+    expect(nested.length).toBeGreaterThan(0);
+    expect(nested.every((reply) => reply.parentReplyExternalId?.startsWith("t1_"))).toBe(true);
+  });
+
+  it("bills what the provider says it billed", async () => {
+    const { fetch: fetchStub } = scrapeCreators([shallowThread]);
+    const source = new ScrapeCreatorsRedditSource(runtimeWith(fetchStub));
+
+    const result = await source.fetchReplies(replyRequest());
+
+    expect(result.unitsConsumed).toBe(1);
+  });
+});
+
+/**
+ * **The trap, and the reason this connector reports `partial` at all.**
+ *
+ * Measured live on 2026-09-06: threads claiming 640, 296 and 95 comments each
+ * returned exactly 25 for one credit, and draining the 95-comment thread from
+ * the top level stopped after 43 with `has_more: false` while fourteen nested
+ * subtrees inside the first page still said `has_more: true`.
+ *
+ * So the provider's "no more" is about the top level, not the thread. A
+ * collector that believed it would lose half a thread and report success —
+ * silently, which is the failure shape this repository keeps writing down.
+ */
+describe("a thread that is not fully read", () => {
+  it("reports partial when the provider claims no more but the count disagrees", async () => {
+    const { fetch: fetchStub } = scrapeCreators([truncatedThread]);
+    const source = new ScrapeCreatorsRedditSource(runtimeWith(fetchStub));
+
+    const result = await source.fetchReplies(
+      replyRequest({ postExternalId: "t3_1tac8be" }),
+    );
+
+    // The captured answer says has_more: false and carries no cursor.
+    expect(result.next).toEqual({ status: "done" });
+    // 58 comments claimed, 25 returned. "Done" is not "complete".
+    expect(result.partial).toBe(true);
+  });
+
+  it("reports partial on the shallow thread too, because a skipped body is a gap", async () => {
+    const { fetch: fetchStub } = scrapeCreators([shallowThread]);
+    const source = new ScrapeCreatorsRedditSource(runtimeWith(fetchStub));
+
+    const result = await source.fetchReplies(replyRequest());
+
+    // 22 claimed, 20 stored. Completeness is claimed only from positive
+    // evidence, so this errs toward partial and says so.
+    expect(result.partial).toBe(true);
   });
 });

@@ -9,6 +9,7 @@
  * they were written first.
  */
 import { sql } from "drizzle-orm";
+import type { AnyPgColumn } from "drizzle-orm/pg-core";
 import {
   bigint,
   boolean,
@@ -60,6 +61,19 @@ export type Source = (typeof sources)[number];
  */
 export const providers = ["brightdata", "scrapecreators", "socialcrawl"] as const;
 export type Provider = (typeof providers)[number];
+
+/**
+ * A row in `posts` is one of these. US-020.
+ *
+ * A reply is not a second kind of thing to the pipeline — it is filtered,
+ * classified, matched and deleted by the same code — so this is a column and
+ * not a table. What it decides is narrow and specific: a reply skips the
+ * embedding stage, because US-029 measured that a comment borrows its subject
+ * from the post above it and no similarity threshold separates the person
+ * asking from the experts answering.
+ */
+export const postKinds = ["post", "reply"] as const;
+export type PostKind = (typeof postKinds)[number];
 
 /** The signals a user ticks in the monitor form. PLAN.md, *Monitor creation*. */
 export const signals = [
@@ -276,6 +290,22 @@ export const monitors = pgTable(
      */
     preFilterEnabled: boolean("pre_filter_enabled").notNull().default(true),
     /**
+     * Whether this monitor reads the replies underneath the posts it finds.
+     *
+     * Off by default, and off for every monitor that existed before US-020,
+     * because it is the expensive direction. The fetch is small — one credit
+     * buys a page of about 25 Reddit comments — but the model calls are not: a
+     * subreddit poll of 23 posts holds about 280 replies, so turning this on
+     * multiplies the classifier's work by roughly twelve.
+     *
+     * It is one switch across every platform rather than one per platform. A
+     * person's question is "do I want the conversation as well as the posts",
+     * and it does not change per network. Which of their platforms can answer
+     * is a fact about the connectors, and the form reads that from
+     * `canFetchReplies` rather than asking again here.
+     */
+    includeReplies: boolean("include_replies").notNull().default(false),
+    /**
      * The cosine similarity a post needs to reach the model, once it has
      * passed the keyword stage.
      *
@@ -396,11 +426,71 @@ export const posts = pgTable(
      * no longer know. Null means "we cannot say", not "no provider".
      */
     provider: text("provider").$type<Provider>(),
+    /**
+     * Whether this row is a post or a reply underneath one. US-020.
+     *
+     * A reply is stored here rather than in its own table because it is the
+     * same thing to everything downstream: it is classified, matched,
+     * de-duplicated, deleted and shown by the same code. Reddit's `t1_`
+     * fullname and an X reply id key it exactly as a post id does, so
+     * `UNIQUE (source, external_id)` needed no change at all.
+     */
+    kind: text("kind").$type<PostKind>().notNull().default("post"),
+    /**
+     * The post this reply hangs under. Null on a post.
+     *
+     * A reply is unreadable without it — "same here, what did you switch to?"
+     * names no product and no problem — so the classifier is given the parent's
+     * title and the inbox shows it above the reply. The cascade is deliberate:
+     * deleting a post takes its replies, because a reply whose thread is gone
+     * cannot be judged by anybody.
+     */
+    parentPostId: uuid("parent_post_id").references((): AnyPgColumn => posts.id, {
+      onDelete: "cascade",
+    }),
+    /**
+     * The reply directly above this one, by its platform id. Null at the top.
+     *
+     * Stored as the platform's own id rather than as a row reference, because
+     * a page of replies arrives with parents that may not be stored yet and a
+     * foreign key would make the insert order matter. It is context for the
+     * prompt, not a join anything depends on.
+     */
+    parentReplyExternalId: text("parent_reply_external_id"),
+    /**
+     * How many replies the platform said this post had, when it was collected.
+     *
+     * This is the whole re-open rule. A thread is bought again only when this
+     * number has grown, so a monitor polling hourly does not re-buy every
+     * thread it has ever seen for the life of the monitor. Null means the
+     * platform did not say, which is not zero.
+     */
+    replyCount: integer("reply_count"),
+    /**
+     * Whether the thread under this post is known to be incompletely read.
+     *
+     * Null on a post nobody asked for replies on. True is the normal state
+     * after one page: both providers report a top-level "no more" while nested
+     * subtrees still hold replies, so this is our own honesty and not theirs.
+     * False may be written only from positive evidence that the thread ended.
+     */
+    repliesPartial: boolean("replies_partial"),
   },
   (table) => [
     unique("posts_source_external_id_unique").on(table.source, table.externalId),
     check("posts_source_known", oneOf("source", sources)),
     check("posts_provider_known", optionallyOneOf("provider", providers)),
+    check("posts_kind_known", oneOf("kind", postKinds)),
+    // A reply has a parent and a post does not. Without this the two columns
+    // drift apart and a reply with no thread reaches the classifier as if it
+    // were a post, which is the one thing US-020 exists to prevent.
+    check(
+      "posts_reply_has_parent",
+      sql.raw(
+        "(kind = 'post' AND parent_post_id IS NULL) OR (kind = 'reply' AND parent_post_id IS NOT NULL)",
+      ),
+    ),
+    index("posts_parent_idx").on(table.parentPostId),
   ],
 );
 

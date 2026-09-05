@@ -227,13 +227,41 @@ function embedderFromEnvironment(
  * deployment on purpose: the settings fall back to the classifier's, so the
  * question a deployment answers is which model triages, never whether one does.
  */
-function triagerFromEnvironment(config: AiConfig, logger: Logger): Triager | undefined {
+function triagerFromEnvironment(
+  config: AiConfig,
+  classifierModel: string | undefined,
+  logger: Logger,
+): Triager | undefined {
   if (needsApiKey(config.provider) && !config.apiKey) {
     logger.error(
       { provider: config.provider, model: config.model },
       "the triage provider has no key: set AI_TRIAGE_API_KEY, or AI_API_KEY if triage shares the classifier's provider. Nothing will be triaged.",
     );
     return undefined;
+  }
+
+  /**
+   * The cascade only saves money when the second reader is dearer than the
+   * first, and this is the one line that says so out loud.
+   *
+   * US-030 measured it: a triage answer is not shorter than a classification.
+   * The answer is one word, but the tokens billed as output include the
+   * model's own reasoning, so on the pair we measured triage cost about the
+   * same per item as the classification it was meant to avoid. All the saving
+   * therefore comes from the price gap, and with no gap there is none: on one
+   * model for both stages, triage made 46 comments 48% dearer rather than 48%
+   * cheaper.
+   *
+   * It is a warning and not a refusal because the stage still does its other
+   * job — it keeps the experts answering under a post out of the inbox — and
+   * because a deployment may be running a local model, where the money
+   * argument does not apply at all.
+   */
+  if (classifierModel !== undefined && config.model === classifierModel) {
+    logger.warn(
+      { model: config.model },
+      "triage and classification are the same model, so triage adds cost rather than saving it. Set AI_TRIAGE_MODEL to a cheaper one, or expect a larger bill.",
+    );
   }
 
   return createTriager({ config });
@@ -320,6 +348,7 @@ export async function startWorker({
     triager ??
     triagerFromEnvironment(
       triageConfig ?? triageConfigFromEnvironment(readAiEnvironment()),
+      model?.model,
       logger,
     );
 

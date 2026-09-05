@@ -10,10 +10,17 @@
  * single yes-or-no question badly enough to be cheap and well enough to be
  * safe.
  *
- * **The answer carries no reasons, and that is where the saving is.** Output
- * tokens are priced about five times input tokens, so a classification's 95
- * output tokens cost more than its 680 input ones. One word instead of five
- * scores and four reasons is most of the difference, whatever model runs it.
+ * **The answer carries no reasons.** That was expected to be where the saving
+ * came from — output is priced several times input, and a classification
+ * returns 95 output tokens — and on the first model we measured it was not.
+ * `capture:triage` recorded about 113 output tokens per triage answer against
+ * the classification's 95, because a reasoning model bills its own thinking as
+ * output and a short answer does not shorten the thinking.
+ *
+ * So the reasons are still absent, for the two honest reasons left: there is
+ * nothing to show a person, and a model asked to justify a one-word answer
+ * writes more of them. The saving comes from the price gap between the two
+ * models instead. `worker/runtime.ts` warns when there is no gap.
  *
  * **The prompt is told which way to fail.** A model asked to be strict will
  * be, and here strictness is the expensive direction: a dropped lead leaves no

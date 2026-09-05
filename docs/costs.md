@@ -60,10 +60,16 @@ stage saves money at all.
 
 **Triage is a model call, not a free stage.** The pre-filter's third stage asks
 a cheap model about every item the first two kept, so it spends money on the
-items it keeps as well as the ones it drops. It is worth it because its answer
-is one word: a classification returns about 95 output tokens and a triage
-answer about six, and output is priced roughly five times input. Measured over
-46 real comments it kept 21 and dropped 21 of the 26 people answering.
+items it keeps as well as the ones it drops. Its answer is one word, and that turned out
+not to be the saving: a reasoning model bills its own thinking as output, so a
+triage answer measured 113 output tokens against a classification's 95, and
+cost slightly more per call than the classification it avoids.
+
+**The saving is the price gap between the two models, and nothing else.** Over
+46 real comments, keeping 19, a classifier ten times dearer than the triage
+model made the bill 48% smaller; the same model on both stages made it 48%
+larger. The worker warns at startup when the two match. Choose a triage model
+cheaper than the classifier, or expect the stage to cost you money.
 
 It has the same "no price until you set one" behaviour as an embedding.
 `AI_TRIAGE_INPUT_PRICE_MICROS` and `AI_TRIAGE_OUTPUT_PRICE_MICROS` fall back to

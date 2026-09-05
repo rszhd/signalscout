@@ -39,7 +39,11 @@ interface CapturedTriage {
     readonly commentsKept: number;
     readonly unanswered: number;
   };
-  readonly usage: { readonly inputTokens: number; readonly outputTokens: number };
+  readonly usage: {
+    readonly inputTokens: number;
+    readonly outputTokens: number;
+    readonly estimatedCostMicros?: number;
+  };
   readonly answers: readonly {
     readonly kind: "comment" | "post";
     readonly id: string;
@@ -76,23 +80,60 @@ describe("what the model returned", () => {
     expect(answers.every((answer) => answer.status === "scored")).toBe(true);
   });
 
-  it("spent about six output tokens an item, which is where the saving is", () => {
-    // A classification is 95 output tokens, from ai/fixtures/manifest.json.
-    // Output is priced about five times input, so this ratio is the cascade.
-    expect(verdicts.usage.outputTokens / answers.length).toBeLessThan(130);
-    expect(verdicts.usage.inputTokens / answers.length).toBeLessThan(700);
+  /**
+   * The assumption this ticket was written on, and the measurement that broke
+   * it.
+   *
+   * A one-word answer was expected to cost a fraction of a classification's 95
+   * output tokens. It does not: this model bills its own reasoning as output,
+   * so the answer being short does not make the call short. The saving comes
+   * from the price gap between the two models, which is why
+   * `worker/runtime.ts` warns when a deployment has no gap.
+   *
+   * The bound is above the classification's 95 on purpose. It goes red if some
+   * later prompt makes the answer genuinely cheap, which would be good news
+   * that should be measured rather than assumed.
+   */
+  it("did not spend fewer output tokens than a classification", () => {
+    const perItem = verdicts.usage.outputTokens / answers.length;
+
+    // ai/fixtures/manifest.json: a classification is 78 to 105 output tokens.
+    expect(perItem).toBeGreaterThan(95);
+    expect(perItem).toBeLessThan(200);
+  });
+
+  it("cost about a quarter of a cent an item, and the run recorded it", () => {
+    expect(verdicts.usage.estimatedCostMicros).toBeGreaterThan(0);
+
+    const perItem = (verdicts.usage.estimatedCostMicros ?? 0) / answers.length;
+
+    // One classification on the same model is about 250 micro-dollars. Triage
+    // is not cheaper per call; it is cheaper only than the dearer model it
+    // stands in front of.
+    expect(perItem).toBeGreaterThan(200);
+    expect(perItem).toBeLessThan(400);
   });
 });
 
 describe("what it kept and dropped", () => {
-  it("dropped four fifths of the people answering, which is the saving", () => {
+  /**
+   * Bands, not exact counts, and the reason is measured.
+   *
+   * The same 50 items were captured twice on 2026-09-06 and the model did not
+   * answer the same way: 21 comments kept on the first run and 19 on the
+   * second, 5 people answering kept and then 6. `examples.test.ts` uses bands
+   * for the same reason. An exact count here would go red on a re-capture that
+   * changed nothing, and a test that cries wolf is one nobody reads.
+   */
+  it("drops most of the people answering, which is the saving", () => {
     expect(verdicts.counts.answering).toBe(26);
-    expect(verdicts.counts.answeringKept).toBe(5);
+    expect(verdicts.counts.answeringKept).toBeLessThanOrEqual(9);
   });
 
-  it("kept about half of all comments", () => {
+  it("keeps roughly half of all comments", () => {
     expect(verdicts.counts.comments).toBe(46);
-    expect(verdicts.counts.commentsKept).toBe(21);
+    expect(verdicts.counts.commentsKept).toBeGreaterThan(12);
+    expect(verdicts.counts.commentsKept).toBeLessThan(28);
   });
 
   /**

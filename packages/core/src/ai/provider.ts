@@ -65,13 +65,22 @@ export function createModel(config: AiConfig): LanguageModel {
  * records no cost and says so, which a self-hoster can act on. A guessed price
  * would look exactly like a real one on the bill page US-014 builds.
  *
- * Anthropic list prices, read 2026-09-05. One US dollar is 1,000,000 micros,
+ * Anthropic list prices, read 2026-09-05, and OpenAI's, read 2026-09-06 off
+ * developers.openai.com/api/docs/pricing. One US dollar is 1,000,000 micros,
  * so $1.00 per million tokens is 1_000_000 here.
+ *
+ * The OpenAI family matters to US-030 beyond its own bill. Luna is a tenth of
+ * Terra on both halves, where Haiku is half of Sonnet — so the model a
+ * deployment triages with decides whether the cascade saves a little or a lot,
+ * and the ticket's arithmetic is only true for the pair it names.
  */
 export const modelPrices: Readonly<Record<string, { input: number; output: number }>> = {
   "claude-haiku-4-5": { input: 1_000_000, output: 5_000_000 },
   "claude-sonnet-5": { input: 2_000_000, output: 10_000_000 },
   "claude-opus-5": { input: 5_000_000, output: 25_000_000 },
+  "gpt-5.6-luna": { input: 200_000, output: 1_200_000 },
+  "gpt-5.6-terra": { input: 2_000_000, output: 12_000_000 },
+  "gpt-5.6-sol": { input: 4_000_000, output: 20_000_000 },
 };
 
 export interface TokenUsage {

@@ -393,20 +393,38 @@ deployment that sets nothing still gets the stage on the model it already has.
 The price does not fall back once a triage model is named: a cheap model billed
 at the classifier's rate would report a saving that did not happen.
 
-**It has met a real model, over 46 hand-labelled comments.** `capture:triage`
-asked `openai/gpt-5.6-luna` about every comment US-029 labelled, plus PLAN.md's
-four worked examples: fifty calls, 29,999 input and 5,677 output tokens. It
-kept 21 of 46 comments, **dropped 21 of the 26 people answering**, and kept all
-three worked examples PLAN.md scores as leads. The cost is unknown, because
-`provider.ts` prices only the three Claude models and no override is set — the
-same "we cannot say" an unpriced embedding already records.
+**It has met a real model, over 46 hand-labelled comments, and the numbers
+reversed the ticket's premise.** `capture:triage` asked `openai/gpt-5.6-luna`
+about every comment US-029 labelled, plus PLAN.md's four worked examples: fifty
+calls, 29,999 input and 6,135 output tokens, **$0.013360**. It kept 19 of 46
+comments, dropped 20 of the 26 people answering, and kept all three worked
+examples PLAN.md scores as leads.
 
-Two findings travel with it. It refused one of the four people asking, and that
-one asks for a way to test a **native Android app** while the monitor sells a
-browser test runner — so the hand label and the verdict disagree for a reason,
+**A one-word answer is not a cheap answer.** The stage was built on the idea
+that most of the saving is the short output. It is not: this model bills its
+own reasoning as output, so a triage answer cost **113 output tokens against a
+classification's 95**, and 267 micro-dollars against a classification's 250 on
+the same model. Triage is dearer per call than the thing it avoids.
+
+**So the whole saving is the price gap, and with no gap there is a loss.** Over
+those 46 comments: with `gpt-5.6-terra` classifying, triage takes the bill from
+$0.1150 to $0.0598, which is 48% off. With `gpt-5.6-luna` on both stages — this
+repository's current `.env` — it takes $0.0115 to $0.0170, which is 48% **more**.
+The worker warns at startup when the two models match. It warns rather than
+refuses, because the stage still keeps the experts out of the inbox and because
+a local model makes the money argument moot.
+
+OpenAI's published prices are in `provider.ts`, read 2026-09-06: luna $0.20 and
+$1.20 per million tokens, terra $2.00 and $12.00, sol $4.00 and $20.00.
+
+Three findings travel with it. The model is not deterministic: the same fifty
+items captured twice the same evening kept 21 comments and then 19, so the
+replay test asserts bands rather than exact counts. It refused one of the four
+people asking — the same one both times — and that one asks for a way to test a
+**native Android app** while the monitor sells a browser test runner — so the hand label and the verdict disagree for a reason,
 because `asking` answers "is this person asking?" and triage is asked "could
 this be a person to reach?". The instrument claimed those were the same question
-on its first run and was corrected. And 13 of 16 jokes and notices survived,
+on its first run and was corrected. And 10 of 16 jokes and notices survived,
 including a `[deleted]` body and a moderator's vendor-spam notice: the stage is
 lenient on noise and firm on experts, which is the safe direction and the next
 thing to attack. Two threads and one monitor is not a distribution.

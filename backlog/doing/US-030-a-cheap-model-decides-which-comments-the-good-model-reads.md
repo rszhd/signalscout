@@ -64,10 +64,17 @@ calls: a classification is 680 input and 95 output tokens. Against the table in
 
 A triage stage on Haiku that keeps a fifth for full scoring lands near $0.26
 against $0.65. That is about half, not an order of magnitude: Haiku is 2x
-cheaper than Sonnet, where an embedding is about 100x cheaper. **Most of the
-saving comes from the output, not the model.** Output is priced five times
-input, so a triage answer of one enum instead of five scores and four reasons
-is where the money is.
+cheaper than Sonnet, where an embedding is about 100x cheaper.
+
+**One sentence here was wrong and the measurement removed it.** It said most of
+the saving comes from the output rather than the model, because a one-word
+answer replaces five scores and four reasons. It does not. A reasoning model
+bills its own thinking as output, so a short answer does not make a short call:
+measured, a triage answer cost **113 output tokens against a classification's
+95**. The answer is still short for other reasons, and none of them is money.
+
+So **all** of the saving is the price gap between the two models, and a
+deployment with no gap has no saving. See the Log for what that costs.
 
 Say the smaller number in the ticket. A cascade sold as an order of magnitude
 is a cascade someone will later tune too hard.
@@ -94,10 +101,8 @@ recorded.
       cannot spend past its cap through this stage
 - [x] The fixtures the tests replay are captured from a real model through a
       script named in `package.json`, never written by hand
-- [ ] The Log records the measured keep rate and the measured cost of one poll,
-      against the same poll with the stage off — **the keep rate is measured, the
-      cost is not: `gpt-5.6-luna` has no price in `provider.ts` and none is set,
-      so every call is recorded with a null cost**
+- [x] The Log records the measured keep rate and the measured cost of one poll,
+      against the same poll with the stage off
 - [x] On a comment this is the only paid stage in front of the classifier: no
       embedding runs, and the Log records the keep rate against that shape.
       US-029 answered it — see the Context above
@@ -199,3 +204,49 @@ recorded.
   page, and then one live poll run with the stage on and off. Neither is
   blocked by anything here; both need a price nobody has read yet, and this
   repository does not fill that table from memory.
+
+- 2026-09-06T02:50+08:00 — Priced, and the arithmetic reversed the ticket's own
+  premise. OpenAI's published prices were read off
+  developers.openai.com/api/docs/pricing and added to `ai/provider.ts`, which is
+  where a price with a source belongs: luna at $0.20 and $1.20 per million
+  tokens, terra at $2.00 and $12.00, sol at $4.00 and $20.00.
+
+  `capture:triage` then ran again and recorded its own cost for the first time:
+  **50 items, 29,999 input and 6,135 output tokens, $0.013360.** That is 267
+  micro-dollars an item. One classification on the same model, at the 680 and 95
+  tokens `ai/fixtures/manifest.json` measured, is 250. **Triage costs slightly
+  more per call than the classification it exists to avoid.**
+
+  The reason is the output. A one-word answer was supposed to be the saving, and
+  it is not: this model bills its own reasoning as output, so triage spent 113
+  output tokens against a classification's 95. The Context sentence claiming
+  otherwise is struck.
+
+  So the whole saving is the price gap, and here is what that means over the 46
+  labelled comments at a keep rate of 19:
+
+  | Classifier | Triage off | Triage on | Change |
+  |---|---|---|---|
+  | `gpt-5.6-luna` | $0.0115 | $0.0170 | **+48%** |
+  | `gpt-5.6-terra` | $0.1150 | $0.0598 | **−48%** |
+
+  **On one model for both stages the stage is a loss**, and that is this
+  deployment's current configuration. `worker/runtime.ts` now warns at startup
+  when the two models match, rather than letting the bill say it later. It warns
+  instead of refusing, because the stage still keeps the experts answering out
+  of the inbox, and because a local model makes the money argument moot.
+
+  The second run also drifted: same 50 items, same prompt, 19 comments kept
+  where the first run kept 21, and 6 people answering kept where the first kept
+  5. The refused asker was the same one both times. `triage-examples.test.ts`
+  now asserts bands rather than exact counts, the way `examples.test.ts` already
+  does, because a test that goes red on a re-capture that changed nothing is one
+  nobody reads.
+
+- 2026-09-06T02:51+08:00 — What is left before this closes. One live poll with
+  the stage on and off, which is now arithmetic rather than a guess but has
+  still never run end to end. And a decision that is the owner's: this
+  deployment classifies with luna, so triage costs it money today. Moving the
+  classifier to terra makes the cascade pay and is its own ticket, because
+  `ai/fixtures/*.json` were captured with luna and `capture:classifier` and
+  `capture:queries` would both have to run again.

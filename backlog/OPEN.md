@@ -2,7 +2,7 @@
 
 # Open tickets
 
-6 open — 2 doing, 4 todo, 0 parked (1 p1, 4 p2, 1 p3).
+9 open — 2 doing, 7 todo, 0 parked (1 p1, 7 p2, 1 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -11,6 +11,9 @@
 | p2 | US-017 | [A self-hosted instance has one account](todo/US-017-a-self-hosted-instance-has-one-account.md) | feature | todo | 2026-09-04T22:49+08:00 |
 | p2 | US-019 | [The project has a license](todo/US-019-the-project-has-a-license.md) | chore | todo | 2026-09-04T23:00+08:00 |
 | p2 | US-020 | [A monitor can include Reddit comments](todo/US-020-a-monitor-can-include-reddit-comments.md) | feature | todo | 2026-09-05T01:18+08:00 |
+| p2 | US-029 | [A measurement says which pre-filter fits a comment](todo/US-029-a-measurement-says-which-pre-filter-fits-a-comment.md) | spike | todo | 2026-09-06T01:32+08:00 |
+| p2 | US-030 | [A cheap model decides which comments the good model reads](todo/US-030-a-cheap-model-decides-which-comments-the-good-model-reads.md) | feature | todo | 2026-09-06T01:32+08:00 |
+| p2 | US-031 | [SocialCrawl is measured as a third Reddit provider](todo/US-031-socialcrawl-is-measured-as-a-third-reddit-provider.md) | spike | todo | 2026-09-06T01:50+08:00 |
 | p3 | US-018 | [A mutation sweep proves the suite is sensitive](todo/US-018-a-mutation-sweep-proves-the-suite-is-sensitive.md) | chore | todo | 2026-09-04T22:54+08:00 |
 
 Finished work is in [DONE.md](DONE.md). The rules and the ticket

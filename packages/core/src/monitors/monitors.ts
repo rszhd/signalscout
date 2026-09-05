@@ -48,7 +48,21 @@ export interface MonitorPlan {
   readonly subreddits: readonly string[];
 }
 
-export interface CreateMonitorInput extends MonitorAnswers, MonitorPlan {
+/**
+ * The pre-filter settings a caller may write.
+ *
+ * Both are on the monitor because the right answer is a judgement about one
+ * product's market, like `minScore`. `preFilterEnabled` is false for the
+ * person who suspects the filter is hiding something: a filter that cannot be
+ * turned off cannot be found out.
+ */
+export interface MonitorFilterSettings {
+  readonly preFilterEnabled?: boolean;
+  /** Cosine similarity, 0 to 1. Zero keeps everything the keyword stage kept. */
+  readonly similarityThreshold?: number;
+}
+
+export interface CreateMonitorInput extends MonitorAnswers, MonitorPlan, MonitorFilterSettings {
   /**
    * `Source`, not a free connector id. `posts.source` can only hold a source
    * the schema names, so a monitor that named any other id would collect posts
@@ -158,6 +172,10 @@ export async function createMonitor(
       ...(input.pollIntervalSeconds === undefined
         ? {}
         : { pollIntervalSeconds: input.pollIntervalSeconds }),
+      ...(input.preFilterEnabled === undefined ? {} : { preFilterEnabled: input.preFilterEnabled }),
+      ...(input.similarityThreshold === undefined
+        ? {}
+        : { similarityThreshold: input.similarityThreshold }),
       // Created paused when it could not poll anyway, or when the person
       // asked for it. Never started against either.
       pausedAt: missing.length > 0 || input.startPaused ? new Date() : null,
@@ -176,7 +194,10 @@ export async function createMonitor(
  * resuming has a rule, and an update that could write the column would be a
  * second way to start a monitor with no key.
  */
-export interface UpdateMonitorInput extends Partial<MonitorAnswers>, Partial<MonitorPlan> {
+export interface UpdateMonitorInput
+  extends Partial<MonitorAnswers>,
+    Partial<MonitorPlan>,
+    MonitorFilterSettings {
   readonly sources?: readonly Source[];
   readonly minScore?: number;
   readonly pollIntervalSeconds?: number;
@@ -200,6 +221,10 @@ export async function updateMonitor(
     ...(input.pollIntervalSeconds === undefined
       ? {}
       : { pollIntervalSeconds: input.pollIntervalSeconds }),
+    ...(input.preFilterEnabled === undefined ? {} : { preFilterEnabled: input.preFilterEnabled }),
+    ...(input.similarityThreshold === undefined
+      ? {}
+      : { similarityThreshold: input.similarityThreshold }),
   };
 
   if (Object.keys(changes).length === 0) return getMonitor(db, id);

@@ -15,12 +15,16 @@ import {
   createDatabase,
   createLogger,
   type Database,
+  filterDrops,
+  getMonitor,
   loadEnv,
   type ModelCall,
   modelCalls,
   monitors,
+  posts,
   type QueryGenerator,
   type QueryPlanOutcome,
+  recordFilterDrops,
   recordSourceUsage,
 } from "@intentwatch/core";
 import { createTestDatabase, type TestDatabase } from "@intentwatch/core/testing";
@@ -97,8 +101,10 @@ describe("the monitor routes", () => {
   });
 
   afterEach(async () => {
+    await db.delete(filterDrops);
     await db.delete(modelCalls);
     await db.delete(monitors);
+    await db.delete(posts);
   });
 
   interface ServerOptions {
@@ -493,6 +499,107 @@ describe("the monitor routes", () => {
       });
     });
   });
+  describe("the pre-filter", () => {
+    it("starts on, at the permissive threshold, having dropped nothing", async () => {
+      await withServer({}, async (app) => {
+        const id = await create(app);
+
+        const response = await app.inject({ method: "GET", url: `/api/monitors/${id}` });
+
+        expect(response.json().preFilter).toEqual({
+          enabled: true,
+          similarityThreshold: 0.15,
+          dropped: { keyword: 0, embedding: 0 },
+        });
+      });
+    });
+
+    it("takes a threshold a person set, and keeps it", async () => {
+      await withServer({}, async (app) => {
+        const id = await create(app);
+
+        const response = await app.inject({
+          method: "PATCH",
+          url: `/api/monitors/${id}`,
+          payload: { preFilter: { similarityThreshold: 0.4 } },
+        });
+
+        expect(response.statusCode).toBe(200);
+        expect(response.json().preFilter.similarityThreshold).toBeCloseTo(0.4, 5);
+        // The worker reads the row, not the response.
+        const row = await getMonitor(db, id);
+        expect(row?.similarityThreshold).toBeCloseTo(0.4, 5);
+      });
+    });
+
+    it("turns the whole filter off when a person asks", async () => {
+      await withServer({}, async (app) => {
+        const id = await create(app);
+
+        const response = await app.inject({
+          method: "PATCH",
+          url: `/api/monitors/${id}`,
+          payload: { preFilter: { enabled: false } },
+        });
+
+        expect(response.json().preFilter.enabled).toBe(false);
+        // Off is off, and it does not silently move the threshold with it.
+        expect(response.json().preFilter.similarityThreshold).toBeCloseTo(0.15, 5);
+      });
+    });
+
+    it("refuses a similarity no cosine distance can produce", async () => {
+      await withServer({}, async (app) => {
+        const id = await create(app);
+
+        const response = await app.inject({
+          method: "PATCH",
+          url: `/api/monitors/${id}`,
+          payload: { preFilter: { similarityThreshold: 1.4 } },
+        });
+
+        expect(response.statusCode).toBe(400);
+      });
+    });
+
+    it("counts what each stage dropped, on the list a screen reads", async () => {
+      await withServer({}, async (app) => {
+        const id = await create(app);
+
+        const [post] = await db
+          .insert(posts)
+          .values({
+            source: "reddit",
+            externalId: "prefilter-1",
+            url: "https://example.test/1",
+            excerpt: "My sourdough starter died over the weekend.",
+            postedAt: new Date("2026-09-01T10:00:00Z"),
+          })
+          .returning({ id: posts.id });
+
+        const [second] = await db
+          .insert(posts)
+          .values({
+            source: "reddit",
+            externalId: "prefilter-2",
+            url: "https://example.test/2",
+            excerpt: "Playwright is awesome.",
+            postedAt: new Date("2026-09-01T11:00:00Z"),
+          })
+          .returning({ id: posts.id });
+
+        await recordFilterDrops(db, id, [
+          { postId: post?.id as string, stage: "keyword", similarity: null },
+          { postId: second?.id as string, stage: "embedding", similarity: 0.04 },
+        ]);
+
+        const response = await app.inject({ method: "GET", url: "/api/monitors" });
+
+        expect(response.json()[0].preFilter.dropped).toEqual({ keyword: 1, embedding: 1 });
+      });
+    });
+  });
+
   describe("the budget", () => {
     it("reports no cap and a zero spend for a monitor that has never polled", async () => {
       await withServer({}, async (app) => {

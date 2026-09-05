@@ -21,7 +21,8 @@
     "migrate": "tsx --env-file-if-exists=../../.env src/db/migrate-cli.ts",
     "generate": "drizzle-kit generate",
     "capture:classifier": "tsx src/ai/fixtures/capture.ts",
-    "capture:queries": "tsx src/ai/fixtures/capture-queries.ts"
+    "capture:queries": "tsx src/ai/fixtures/capture-queries.ts",
+    "capture:embeddings": "tsx src/ai/fixtures/capture-embeddings.ts"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "4.0.49",

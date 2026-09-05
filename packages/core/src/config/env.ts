@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { aiProviders } from "../ai/config.js";
+import { aiProviders, embeddingProviders } from "../ai/config.js";
 
 /**
  * Every environment variable the application reads is declared here, once.
@@ -46,6 +46,34 @@ const aiFields = {
    */
   AI_INPUT_PRICE_MICROS: blankIsUnset(z.coerce.number().int().min(0).optional()),
   AI_OUTPUT_PRICE_MICROS: blankIsUnset(z.coerce.number().int().min(0).optional()),
+
+  /**
+   * The model that embeds posts for US-008's pre-filter, and the key it is
+   * reached with.
+   *
+   * Unset means the pre-filter runs its free keyword stage and sends
+   * everything that survives to the classifier. That is the expensive
+   * direction and the safe one: nothing is dropped by a stage that is not
+   * running. Anthropic has no embedding endpoint, so a deployment on our
+   * default provider has to name another one here to get the second stage.
+   *
+   * `AI_EMBEDDING_MODEL` must name a model of `embeddingDimensions` numbers,
+   * because that is the width the column stores. A narrower one is refused
+   * with a message rather than written.
+   */
+  AI_EMBEDDING_PROVIDER: blankIsUnset(z.enum(embeddingProviders).optional()),
+  AI_EMBEDDING_MODEL: blankIsUnset(z.string().min(1).optional()),
+  AI_EMBEDDING_API_KEY: blankIsUnset(z.string().min(1).optional()),
+  AI_EMBEDDING_BASE_URL: blankIsUnset(z.string().min(1).optional()),
+
+  /**
+   * Micro-dollars per million tokens for the embedding model.
+   *
+   * There is no built-in table for these, so an embedding call records no cost
+   * until this is set. Null on a bill page reads as "we cannot say", which is
+   * true, and a guessed price would read as a measurement.
+   */
+  AI_EMBEDDING_PRICE_MICROS: blankIsUnset(z.coerce.number().int().min(0).optional()),
 };
 
 export const aiEnvSchema = z.object(aiFields);

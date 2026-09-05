@@ -18,6 +18,7 @@ import {
   integer,
   jsonb,
   pgTable,
+  real,
   text,
   timestamp,
   unique,
@@ -64,7 +65,13 @@ export type Verdict = (typeof verdicts)[number];
  * matches OpenAI's `text-embedding-3-small`, the cheapest default, and it is
  * fixed rather than free because pgvector cannot index a dimensionless column.
  * A user who switches embedding provider re-embeds anyway, so changing this is
- * a migration plus a backfill either way. US-008 owns the index.
+ * a migration plus a backfill either way.
+ *
+ * There is no index on the column, and US-008 decided not to add one. The
+ * pre-filter compares the handful of post ids one poll returned against one
+ * monitor vector, which reads those rows and never searches the table. An
+ * index belongs to the first feature that asks "which posts are like this
+ * one", and nothing asks that yet.
  */
 export const embeddingDimensions = 1536;
 
@@ -102,6 +109,31 @@ export const minimumPollIntervalSeconds = 60;
  */
 export const defaultMinimumScore = 30;
 
+/**
+ * The similarity a post needs, by default, to survive the embedding stage.
+ *
+ * Permissive on purpose, and for the reason US-008 gives: a threshold set too
+ * high drops a good lead before anybody sees it, and nobody can tell that
+ * happened. A noisy inbox is visible; a silent false negative is not.
+ *
+ * **One run has measured it, over five posts.** On 2026-09-05
+ * `ai/fixtures/capture-embeddings.ts` embedded PLAN.md's example monitor and
+ * the five fake posts with OpenAI's `text-embedding-3-small`. The four posts
+ * about the monitor's subject scored 0.26 to 0.57, and the post about
+ * sourdough scored 0.09, so this number sits inside a gap of 0.18 with room on
+ * both sides. `ai/similarity.test.ts` replays those numbers and turns red if
+ * the threshold leaves the gap.
+ *
+ * That is one monitor and five posts, not a distribution. Every drop is
+ * written to `filter_drops` with the similarity that caused it, so real weeks
+ * of real posts are the instrument that moves it next.
+ */
+export const defaultSimilarityThreshold = 0.15;
+
+/** The two stages of the pre-filter, in the order they run. US-008. */
+export const filterStages = ["keyword", "embedding"] as const;
+export type FilterStage = (typeof filterStages)[number];
+
 /** How a call to the model ended. `ai/call.ts` owns the three outcomes. */
 export const modelCallOutcomes = ["scored", "rejected", "failed"] as const;
 export type ModelCallOutcome = (typeof modelCallOutcomes)[number];
@@ -115,8 +147,13 @@ export type ModelCallOutcome = (typeof modelCallOutcomes)[number];
  * keeps the classifier's own failure count honest: that count is "how many
  * times did this model refuse this post", and it must never include a call
  * about no post at all.
+ *
+ * US-008 added the third. An embedding is a different model, a different price
+ * and a different order of magnitude — about one hundredth of a classification
+ * — so a bill that could not tell them apart could not show that the
+ * pre-filter pays for itself.
  */
-export const modelCallPurposes = ["classification", "query_generation"] as const;
+export const modelCallPurposes = ["classification", "query_generation", "embedding"] as const;
 export type ModelCallPurpose = (typeof modelCallPurposes)[number];
 
 /** SQL fragment for a score column that must read 0 to 100. */
@@ -172,6 +209,38 @@ export const monitors = pgTable(
      * the default.
      */
     minScore: integer("min_score").notNull().default(defaultMinimumScore),
+    /**
+     * Whether the pre-filter runs at all for this monitor. US-008.
+     *
+     * Off means every collected post reaches the model, which is the expensive
+     * direction and the honest default for somebody who suspects the filter is
+     * dropping good leads. A person who cannot turn a filter off cannot find
+     * out what it was hiding.
+     */
+    preFilterEnabled: boolean("pre_filter_enabled").notNull().default(true),
+    /**
+     * The cosine similarity a post needs to reach the model, once it has
+     * passed the keyword stage.
+     *
+     * Per monitor, like `min_score`, because the right bar is a judgement
+     * about one product's market. Zero keeps everything the keyword stage
+     * kept, which is how a person turns the second stage off without turning
+     * the first one off.
+     */
+    similarityThreshold: real("similarity_threshold").notNull().default(defaultSimilarityThreshold),
+    /**
+     * The monitor's own description, embedded once, and the exact text that
+     * produced it.
+     *
+     * Two columns rather than one, so "has this been edited?" is answered by
+     * comparing the text we embedded against the text we would embed now. A
+     * timestamp could not answer it, and a writer that remembered to clear the
+     * vector on every edit would be a rule in one caller — which is the shape
+     * docs/testing.md warns about. The pre-filter re-embeds when they differ,
+     * and only then.
+     */
+    descriptionEmbedding: vector("description_embedding", { dimensions: embeddingDimensions }),
+    descriptionEmbeddingSource: text("description_embedding_source"),
     /** Per monitor, never a constant: US-007's whole point about the cost dial. */
     pollIntervalSeconds: integer("poll_interval_seconds")
       .notNull()
@@ -204,6 +273,10 @@ export const monitors = pgTable(
       sql.raw(`poll_interval_seconds >= ${minimumPollIntervalSeconds}`),
     ),
     check("monitors_min_score_range", scoreRange("min_score")),
+    // Cosine similarity between two embeddings of real text is never above 1,
+    // and a negative threshold would keep everything while reading as a
+    // setting somebody had chosen.
+    check("monitors_similarity_threshold_range", sql.raw("similarity_threshold BETWEEN 0 AND 1")),
   ],
 );
 
@@ -410,6 +483,52 @@ export const modelCalls = pgTable(
     index("model_calls_monitor_post_idx").on(table.monitorId, table.postId),
     check("model_calls_outcome_known", oneOf("outcome", modelCallOutcomes)),
     check("model_calls_purpose_known", oneOf("purpose", modelCallPurposes)),
+  ],
+);
+
+/**
+ * A post the pre-filter kept from the model, and what it was that stopped it.
+ *
+ * The whole point of the row is the number beside it. US-008's risk is a
+ * threshold set too high: it discards good leads before anybody sees them, and
+ * a silent false negative leaves no trace at all. So a drop is written down
+ * with the similarity that caused it, and a person can ask what a different
+ * threshold would have kept instead of guessing.
+ *
+ * Only drops are here. A post the filter kept keeps its embedding on the
+ * `posts` row, so its similarity can be computed again; a dropped post is the
+ * one whose evidence would otherwise be gone. `similarity` is null for a
+ * keyword-stage drop, which is the honest answer: nothing was embedded, so
+ * nothing was measured.
+ *
+ * `UNIQUE (monitor_id, post_id)` because a poll returns posts it has returned
+ * before. The row is updated rather than added to, so the count of drops is a
+ * count of posts and not a count of polls.
+ */
+export const filterDrops = pgTable(
+  "filter_drops",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    monitorId: uuid("monitor_id")
+      .notNull()
+      .references(() => monitors.id, { onDelete: "cascade" }),
+    postId: uuid("post_id")
+      .notNull()
+      .references(() => posts.id, { onDelete: "cascade" }),
+    stage: text("stage").$type<FilterStage>().notNull(),
+    /** Cosine similarity, 0 to 1. Null at the keyword stage: nothing was measured. */
+    similarity: real("similarity"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    unique("filter_drops_monitor_post_unique").on(table.monitorId, table.postId),
+    // The counter on the monitor list groups by this pair.
+    index("filter_drops_monitor_stage_idx").on(table.monitorId, table.stage),
+    check("filter_drops_stage_known", oneOf("stage", filterStages)),
+    check(
+      "filter_drops_similarity_range",
+      sql.raw("similarity IS NULL OR similarity BETWEEN -1 AND 1"),
+    ),
   ],
 );
 

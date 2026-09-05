@@ -6,7 +6,7 @@ priority: p1
 created: 2026-09-04T22:49+08:00
 parent:
 area:
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -29,7 +29,7 @@ already spent the money.
 The number that matters is the one the connector reports, not one derived from
 the post count. A search that returns 40 posts may have been billed for more,
 and a failed call may still have been billed. This is why
-[US-006](US-006-x-returns-candidate-posts-and-says-what-it-spent.md) reports
+[US-006](../../todo/US-006-x-returns-candidate-posts-and-says-what-it-spent.md) reports
 consumed units rather than letting the caller count rows.
 
 Our figure is an estimate and must be labelled one. The provider's invoice is
@@ -45,7 +45,7 @@ we cannot win.
       the cap
 - [x] A refused poll is visible in the UI with the reason, not silently skipped
 - [x] Spend to date and remaining budget show next to each monitor
-- [ ] Model and embedding costs are recorded alongside source costs, so the
+- [x] Model and embedding costs are recorded alongside source costs, so the
       total is the true total
 - [x] Figures are labelled as estimates, and the documentation says the
       provider's invoice is authoritative
@@ -53,25 +53,27 @@ we cannot win.
 
 ## Notes
 
-- Ships with [US-006](../todo/US-006-x-returns-candidate-posts-and-says-what-it-spent.md).
+- Ships with [US-006](../../todo/US-006-x-returns-candidate-posts-and-says-what-it-spent.md).
   A metered source without a cap discovers its first cursor bug on a user's
   invoice.
 - Depends on US-007 for the poll it guards.
 - STACK.md, *Budgets belong in the data model*.
 - `pg-boss` throttling makes the poll interval a second cost dial. Both belong
   on the same screen.
-- **The open box waits on [US-008](../todo/US-008-a-cheap-filter-runs-before-the-model.md).**
-  Model calls are recorded and summed — classification and query generation
-  alike, refusals included. Embeddings are not, because nothing embeds
-  anything yet. The table they will be written to is `model_calls`, and a row
-  written there lands in the total with no change to the guard. The box is
-  left open rather than ticked on a technicality: today's total is the true
-  total only because the missing half costs nothing.
+- **The last box waited on
+  [US-008](US-008-a-cheap-filter-runs-before-the-model.md), and
+  closed with it.** Model calls are recorded and summed — classification, query
+  generation and now the pre-filter's embeddings, refusals included. They land
+  in the same sum with no change to the guard, which is what the `model_calls`
+  design predicted. One caveat, stated rather than hidden: we carry no price
+  table for embedding models, so an embedding is recorded with a null cost
+  until `AI_EMBEDDING_PRICE_MICROS` is set, and null means "we cannot say" —
+  the same convention as an unpriced chat model. docs/costs.md says so.
 - The guard cannot forecast, so a cap can be overshot by one poll. That is not
   a defect in it. A page is billed when it is fetched, and the connector
   decides how many records a query collects, so the only place to tell a
   person the cost is before the query is written:
-  [US-014](../todo/US-014-a-querys-cost-is-known-before-it-runs.md).
+  [US-014](US-014-a-querys-cost-is-known-before-it-runs.md).
   `maxPagesPerPoll` bounds the overshoot meanwhile.
 - STACK.md sketches the money columns as cents. They are micro-dollars, for
   the reason `model_calls` already used them: one classification costs about a
@@ -107,3 +109,7 @@ we cannot win.
   declares — and neither has been checked against an invoice. docs/costs.md
   lists four ways the estimate is known to be wrong, starting with Bright
   Data's free allowance, which this code does not model at all.
+- 2026-09-05T12:33+08:00 — Closed. US-008 wrote the embedding calls into `model_calls`,
+  and `worker/filter.test.ts` asserts that one lands in `monitorSpend`, which
+  is where the guard reads it. That was the last open box. Nothing about the
+  guard changed; the missing half arrived, as the ticket said it would.

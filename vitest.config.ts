@@ -22,8 +22,18 @@ export default defineConfig({
      * one, and the classifier's own tests pass a stub model in. This makes
      * "no test spends money" a property of the setup rather than of the code
      * each test happens to call. docs/testing.md.
+     *
+     * The embedding key is blanked for the same reason and needs its own line:
+     * US-008's embedder falls back to `AI_API_KEY` only when both providers
+     * match, so `AI_EMBEDDING_API_KEY` is a second way a machine could pay for
+     * a test run. Both blank, and the pre-filter runs its free stage.
      */
-    env: { AI_API_KEY: "", AI_PROVIDER: "anthropic" },
+    env: {
+      AI_API_KEY: "",
+      AI_PROVIDER: "anthropic",
+      AI_EMBEDDING_API_KEY: "",
+      AI_EMBEDDING_PROVIDER: "",
+    },
     // Files that create their own Postgres database pay for it in setup.
     hookTimeout: 60_000,
   },

@@ -24,6 +24,8 @@ import {
   deleteMonitor,
   environmentVariableFor,
   exhaustedBehaviours,
+  type FilterDropCounts,
+  filterDropCounts,
   getMonitor,
   listMonitors,
   type Monitor,
@@ -32,6 +34,7 @@ import {
   maximumSubreddits,
   minimumPollIntervalSeconds,
   monitorQueries,
+  noFilterDrops,
   pauseMonitor,
   type QueryGenerator,
   recordModelCall,
@@ -93,6 +96,19 @@ const budgetSchema = z.object({
   onExhausted: z.enum(exhaustedBehaviours),
 });
 
+/**
+ * The pre-filter, as a person sets it.
+ *
+ * The threshold is a cosine similarity and not a percentage, because that is
+ * what `filter_drops` records and what a person comparing the two would read.
+ * Turning the filter off is here rather than implied by a threshold of zero:
+ * zero still runs the keyword stage, and "off" has to mean off.
+ */
+const preFilterSchema = z.object({
+  enabled: z.boolean(),
+  similarityThreshold: z.number().min(0).max(1),
+});
+
 const createBody = answersBody.extend({
   name: z.string().trim().min(1).max(80),
   ...planBody.shape,
@@ -110,6 +126,7 @@ const createBody = answersBody.extend({
   budget: budgetSchema.optional(),
   /** US-014: keep this plan, do not start it. The person was shown what it would cost. */
   startPaused: z.boolean().default(false),
+  preFilter: preFilterSchema.partial().optional(),
 });
 
 const updateBody = createBody.partial();
@@ -169,6 +186,16 @@ const monitorSchema = z.object({
   /** Null when no cap is set. A monitor with no cap still records what it spends. */
   budget: budgetSchema.nullable(),
   spend: spendSchema,
+  /**
+   * The pre-filter's settings and what it has dropped, all time.
+   *
+   * The counts are here so a person can see the stage working. A filter that
+   * drops most of what it sees is either saving a lot of money or hiding the
+   * inbox, and only the number says which question to ask.
+   */
+  preFilter: preFilterSchema.extend({
+    dropped: z.object({ keyword: z.number(), embedding: z.number() }),
+  }),
 });
 
 const problemSchema = z.object({
@@ -190,7 +217,22 @@ function monitorEnvironment(options: MonitorRoutesOptions): MonitorEnvironment {
   return { descriptors: options.sources, environment: options.environment };
 }
 
-function toResponse(monitor: Monitor, runtime: MonitorEnvironment, state: BudgetState) {
+/** The pre-filter settings, as the core write functions take them. */
+function filterSettings(body: { preFilter?: { enabled?: boolean; similarityThreshold?: number } }) {
+  return {
+    ...(body.preFilter?.enabled === undefined ? {} : { preFilterEnabled: body.preFilter.enabled }),
+    ...(body.preFilter?.similarityThreshold === undefined
+      ? {}
+      : { similarityThreshold: body.preFilter.similarityThreshold }),
+  };
+}
+
+function toResponse(
+  monitor: Monitor,
+  runtime: MonitorEnvironment,
+  state: BudgetState,
+  dropped: FilterDropCounts,
+) {
   return {
     id: monitor.id,
     name: monitor.name,
@@ -221,7 +263,27 @@ function toResponse(monitor: Monitor, runtime: MonitorEnvironment, state: Budget
       reason: state.reason,
       since: state.spend.since.toISOString(),
     },
+    preFilter: {
+      enabled: monitor.preFilterEnabled,
+      similarityThreshold: monitor.similarityThreshold,
+      dropped,
+    },
   };
+}
+
+/**
+ * One monitor, with everything the screen shows beside it.
+ *
+ * The list route reads its spend and its drop counts in bulk instead. Both
+ * paths end in `toResponse`, so neither can grow a field the other lacks.
+ */
+async function readResponse(db: Database, monitor: Monitor, runtime: MonitorEnvironment) {
+  const [state, drops] = await Promise.all([
+    checkBudget(db, monitor.id),
+    filterDropCounts(db, [monitor.id]),
+  ]);
+
+  return toResponse(monitor, runtime, state, drops.get(monitor.id) ?? noFilterDrops);
 }
 
 export async function registerMonitorRoutes(
@@ -374,17 +436,20 @@ export async function registerMonitorRoutes(
       // screen that shows this is a list, and a per-row query here would be
       // the list's cost growing with the number of monitors.
       const rows = await listMonitors(db);
-      const states = await budgetStates(db);
+      const [states, drops] = await Promise.all([budgetStates(db), filterDropCounts(db)]);
 
       return Promise.all(
         rows.map(async (monitor) =>
-          // A monitor created between the two reads is not in the map. It is
-          // read on its own rather than defaulted to zero: this is a bill
-          // page, and a zero nothing measured is the failure US-013 is about.
+          // A monitor created between the two reads is not in the map. Its
+          // spend is read on its own rather than defaulted to zero: this is a
+          // bill page, and a zero nothing measured is the failure US-013 is
+          // about. A missing drop count is different — it means this monitor
+          // has dropped nothing, which is what zero says.
           toResponse(
             monitor,
             runtime,
             states.get(monitor.id) ?? (await checkBudget(db, monitor.id)),
+            drops.get(monitor.id) ?? noFilterDrops,
           ),
         ),
       );
@@ -399,7 +464,11 @@ export async function registerMonitorRoutes(
       response: { 201: monitorSchema },
     },
     handler: async (request, reply) => {
-      const { monitor, missing } = await createMonitor(db, request.body, runtime);
+      const { monitor, missing } = await createMonitor(
+        db,
+        { ...request.body, ...filterSettings(request.body) },
+        runtime,
+      );
 
       if (request.body.budget) await setBudget(db, monitor.id, request.body.budget);
 
@@ -413,7 +482,7 @@ export async function registerMonitorRoutes(
         );
       }
 
-      return reply.code(201).send(toResponse(monitor, runtime, await checkBudget(db, monitor.id)));
+      return reply.code(201).send(await readResponse(db, monitor, runtime));
     },
   });
 
@@ -428,7 +497,7 @@ export async function registerMonitorRoutes(
       const monitor = await getMonitor(db, request.params.id);
       if (!monitor) return reply.code(404).send({ message: "No monitor has that id." });
 
-      return toResponse(monitor, runtime, await checkBudget(db, monitor.id));
+      return readResponse(db, monitor, runtime);
     },
   });
 
@@ -441,10 +510,13 @@ export async function registerMonitorRoutes(
       response: { 200: monitorSchema, 404: problemSchema },
     },
     handler: async (request, reply) => {
-      const monitor = await updateMonitor(db, request.params.id, request.body);
+      const monitor = await updateMonitor(db, request.params.id, {
+        ...request.body,
+        ...filterSettings(request.body),
+      });
       if (!monitor) return reply.code(404).send({ message: "No monitor has that id." });
 
-      return toResponse(monitor, runtime, await checkBudget(db, monitor.id));
+      return readResponse(db, monitor, runtime);
     },
   });
 
@@ -459,7 +531,7 @@ export async function registerMonitorRoutes(
       const monitor = await pauseMonitor(db, request.params.id);
       if (!monitor) return reply.code(404).send({ message: "No monitor has that id." });
 
-      return toResponse(monitor, runtime, await checkBudget(db, monitor.id));
+      return readResponse(db, monitor, runtime);
     },
   });
 
@@ -485,7 +557,7 @@ export async function registerMonitorRoutes(
         });
       }
 
-      return toResponse(result.monitor, runtime, await checkBudget(db, result.monitor.id));
+      return readResponse(db, result.monitor, runtime);
     },
   });
 
@@ -517,7 +589,7 @@ export async function registerMonitorRoutes(
 
       await setBudget(db, monitor.id, request.body);
 
-      return toResponse(monitor, runtime, await checkBudget(db, monitor.id));
+      return readResponse(db, monitor, runtime);
     },
   });
 
@@ -545,7 +617,7 @@ export async function registerMonitorRoutes(
 
       await clearBudget(db, monitor.id);
 
-      return toResponse(monitor, runtime, await checkBudget(db, monitor.id));
+      return readResponse(db, monitor, runtime);
     },
   });
 

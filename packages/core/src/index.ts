@@ -27,8 +27,24 @@ export {
   type AiProvider,
   aiConfigFromEnvironment,
   aiProviders,
+  canEmbed,
+  defaultEmbeddingModels,
+  type EmbeddingConfig,
+  type EmbeddingProvider,
+  embeddingConfigFromEnvironment,
+  embeddingNeedsApiKey,
+  embeddingProviders,
   needsApiKey,
 } from "./ai/config.js";
+export {
+  createEmbedder,
+  createEmbeddingModel,
+  type Embedder,
+  type EmbedderOptions,
+  type EmbedOutcome,
+  estimateEmbeddingCostMicros,
+  MissingEmbeddingKeyError,
+} from "./ai/embed.js";
 export {
   buildSystemPrompt,
   buildUserPrompt,
@@ -83,6 +99,7 @@ export {
   budgets,
   defaultMinimumScore,
   defaultPollIntervalSeconds,
+  defaultSimilarityThreshold,
   type EstimateProbeKind,
   type EstimateStatus,
   type ExhaustedBehaviour,
@@ -90,7 +107,10 @@ export {
   estimateProbeKinds,
   estimateStatuses,
   exhaustedBehaviours,
+  type FilterStage,
   feedback,
+  filterDrops,
+  filterStages,
   type IntentType,
   intentTypes,
   type ModelCallOutcome,
@@ -144,6 +164,27 @@ export {
   startEstimate,
   totalsFor,
 } from "./estimate/index.js";
+export {
+  type EmbeddablePost,
+  type MonitorDescription,
+  monitorDescriptionText,
+  postEmbeddingText,
+} from "./filter/description.js";
+export {
+  embeddingDropSimilarities,
+  type FilterDrop,
+  type FilterDropCounts,
+  filterDropCounts,
+  noFilterDrops,
+  recordFilterDrops,
+} from "./filter/drops.js";
+export {
+  type FilterablePost,
+  type KeywordRule,
+  keepsPost,
+  keywordRuleFor,
+  ruleIsEmpty,
+} from "./filter/keywords.js";
 export { createLogger, type Logger, type LoggerOptions } from "./logger.js";
 export {
   cursorFor,
@@ -169,6 +210,7 @@ export {
   type Monitor,
   type MonitorAnswers,
   type MonitorEnvironment,
+  type MonitorFilterSettings,
   type MonitorPlan,
   monitorQueries,
   pauseMonitor,
@@ -228,6 +270,7 @@ export {
   type EstimateOptions,
   maxSamplePagesPerProbe,
 } from "./worker/estimate.js";
+export { createFilterStep, type FilterOptions } from "./worker/filter.js";
 export {
   type JobSender,
   jobSenderFor,
@@ -271,7 +314,6 @@ export {
 } from "./worker/schedule.js";
 export {
   type PipelineSteps,
-  passThroughFilter,
   type Step,
   type StepContext,
   unconfiguredClassify,

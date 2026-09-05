@@ -12,7 +12,15 @@
  */
 import { PgBoss } from "pg-boss";
 import { type Classifier, createClassifier } from "../ai/classify.js";
-import { type AiConfig, aiConfigFromEnvironment, needsApiKey } from "../ai/config.js";
+import {
+  type AiConfig,
+  aiConfigFromEnvironment,
+  type EmbeddingConfig,
+  embeddingConfigFromEnvironment,
+  embeddingNeedsApiKey,
+  needsApiKey,
+} from "../ai/config.js";
+import { createEmbedder, type Embedder } from "../ai/embed.js";
 import { loadAiEnv } from "../config/env.js";
 import { createDatabase, type Database } from "../db/client.js";
 import type { Logger } from "../logger.js";
@@ -24,6 +32,7 @@ import { createClassifyStep } from "./classify.js";
 import { createCollectStep } from "./collect.js";
 import { type CredentialLookup, credentialsFromEnvironment } from "./credentials.js";
 import { createEstimateStep } from "./estimate.js";
+import { createFilterStep } from "./filter.js";
 import {
   type ClassifyPayload,
   classifyQueue,
@@ -44,7 +53,6 @@ import {
 } from "./queues.js";
 import { enqueueDuePolls } from "./schedule.js";
 import {
-  passThroughFilter,
   type Step,
   type StepContext,
   unconfiguredClassify,
@@ -67,7 +75,7 @@ export interface StartWorkerOptions {
   registry?: SourceRegistry;
   /** Where source keys come from. US-004 replaces the environment with the database. */
   credentialsFor?: CredentialLookup;
-  /** Replaces one or more steps. US-008 arrives through here. */
+  /** Replaces one or more steps. A test passes a fake; nothing else does. */
   steps?: Partial<WorkerSteps>;
   /**
    * Which model scores posts. Defaults to the one AI_PROVIDER and AI_MODEL
@@ -78,6 +86,14 @@ export interface StartWorkerOptions {
   classifier?: Classifier;
   /** The AI settings, when they do not come from the process environment. */
   aiConfig?: AiConfig;
+  /**
+   * Which model embeds posts for the pre-filter. Defaults to the one
+   * AI_EMBEDDING_PROVIDER and AI_EMBEDDING_MODEL name, and to none when they
+   * name nothing — the pre-filter then runs its free keyword stage only.
+   */
+  embedder?: Embedder;
+  /** The embedding settings, when they do not come from the process environment. */
+  embeddingConfig?: EmbeddingConfig;
   /** Retry and backoff settings, so a test does not wait out production's backoff. */
   retry?: RetryPolicy;
   /** False leaves the clock off, for a test that ticks the scheduler by hand. */
@@ -153,6 +169,40 @@ function classifierFromEnvironment(config: AiConfig, logger: Logger): Classifier
   return createClassifier({ config });
 }
 
+/**
+ * Build the embedder the environment describes, or none.
+ *
+ * None is a supported deployment and not a broken one, so it is an info line
+ * and not an error: Anthropic is our default provider and it does not embed,
+ * so the common install has a classifier and no embedder. The pre-filter then
+ * runs its free stage and sends everything it keeps to the model, which costs
+ * more and drops nothing.
+ *
+ * A provider that was named and cannot be reached is different. That is a
+ * mistake somebody made, so it names the variable that fixes it.
+ */
+function embedderFromEnvironment(
+  config: EmbeddingConfig | undefined,
+  logger: Logger,
+): Embedder | undefined {
+  if (!config) {
+    logger.info(
+      "no embedding model is configured: the pre-filter will match keywords only. Set AI_EMBEDDING_PROVIDER and AI_EMBEDDING_MODEL to add the similarity stage.",
+    );
+    return undefined;
+  }
+
+  if (embeddingNeedsApiKey(config.provider) && !config.apiKey) {
+    logger.error(
+      { provider: config.provider, model: config.model },
+      "the embedding provider has no key: set AI_EMBEDDING_API_KEY. The pre-filter will match keywords only.",
+    );
+    return undefined;
+  }
+
+  return createEmbedder({ config });
+}
+
 export async function startWorker({
   databaseUrl,
   logger,
@@ -161,6 +211,8 @@ export async function startWorker({
   steps = {},
   classifier,
   aiConfig,
+  embedder,
+  embeddingConfig,
   retry = defaultRetryPolicy,
   scheduleTicks = true,
 }: StartWorkerOptions): Promise<WorkerHandle> {
@@ -186,14 +238,29 @@ export async function startWorker({
 
   const context: StepContext = { db, boss, logger };
 
+  // Read at most once, and only when something still needs it. Two reads
+  // would be two chances for one environment to describe two deployments.
+  let aiEnvironment: ReturnType<typeof loadAiEnv> | undefined;
+  const readAiEnvironment = () => {
+    aiEnvironment ??= loadAiEnv();
+    return aiEnvironment;
+  };
+
   const model =
     classifier ??
-    classifierFromEnvironment(aiConfig ?? aiConfigFromEnvironment(loadAiEnv()), logger);
+    classifierFromEnvironment(aiConfig ?? aiConfigFromEnvironment(readAiEnvironment()), logger);
+
+  const embedding =
+    embedder ??
+    embedderFromEnvironment(
+      embeddingConfig ?? embeddingConfigFromEnvironment(readAiEnvironment()),
+      logger,
+    );
 
   const pipeline: WorkerSteps = {
     poll: steps.poll ?? createCollectStep({ registry: sources, credentialsFor }),
     estimate: steps.estimate ?? createEstimateStep({ registry: sources, credentialsFor }),
-    filter: steps.filter ?? passThroughFilter,
+    filter: steps.filter ?? createFilterStep({ embedder: embedding }),
     classify:
       steps.classify ?? (model ? createClassifyStep({ classifier: model }) : unconfiguredClassify),
     notify: steps.notify ?? unimplementedNotify,
@@ -239,6 +306,7 @@ export async function startWorker({
       queues: queueDefinitions(retry).map((queue) => queue.name),
       sources: sources.ids(),
       model: model ? `${model.provider}/${model.model}` : "none",
+      embedder: embedding ? `${embedding.provider}/${embedding.model}` : "none",
     },
     "worker ready",
   );

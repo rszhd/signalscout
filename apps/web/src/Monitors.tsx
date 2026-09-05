@@ -37,6 +37,12 @@ interface MissingCredential {
   environmentVariable: string;
 }
 
+interface PreFilter {
+  enabled: boolean;
+  similarityThreshold: number;
+  dropped: { keyword: number; embedding: number };
+}
+
 interface Monitor {
   id: string;
   name: string;
@@ -46,6 +52,7 @@ interface Monitor {
   missingCredentials: MissingCredential[];
   budget: Budget | null;
   spend: Spend;
+  preFilter: PreFilter;
 }
 
 type LoadState = "loading" | "ready" | "error";
@@ -220,6 +227,102 @@ function BudgetForm({ monitor, onSaved }: { monitor: Monitor; onSaved: () => Pro
   );
 }
 
+/**
+ * The pre-filter's two settings, and what it has dropped.
+ *
+ * The counts sit next to the controls on purpose. A threshold nobody can see
+ * the effect of is a number somebody guessed, and this is the only screen that
+ * can say "it dropped 340 posts" beside the box that decides it. The similarity
+ * is shown as the cosine value the database stores, not as a percentage,
+ * because that is what a person comparing it against a recorded drop reads.
+ */
+function PreFilterForm({ monitor, onSaved }: { monitor: Monitor; onSaved: () => Promise<void> }) {
+  const [threshold, setThreshold] = useState(String(monitor.preFilter.similarityThreshold));
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function save(preFilter: Partial<PreFilter>): Promise<void> {
+    setBusy(true);
+    setError(null);
+
+    try {
+      await requestJson(`/api/monitors/${monitor.id}`, {
+        method: "PATCH",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ preFilter }),
+      });
+      await onSaved();
+    } catch (cause) {
+      setError(messageFor(cause, "The pre-filter could not be changed."));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function saveThreshold(): void {
+    const similarityThreshold = Number(threshold);
+
+    if (
+      !Number.isFinite(similarityThreshold) ||
+      similarityThreshold < 0 ||
+      similarityThreshold > 1
+    ) {
+      setError("Type the similarity as a number between 0 and 1, such as 0.15.");
+      return;
+    }
+
+    void save({ similarityThreshold });
+  }
+
+  return (
+    <div className="budget-form">
+      <label className="budget-field">
+        <span className="budget-label">Similarity needed</span>
+        <input
+          aria-label={`Similarity needed for ${monitor.name}`}
+          inputMode="decimal"
+          value={threshold}
+          disabled={!monitor.preFilter.enabled}
+          onChange={(event) => setThreshold(event.target.value)}
+        />
+      </label>
+
+      <div className="budget-actions">
+        <button
+          type="button"
+          className="secondary-button"
+          disabled={busy || !monitor.preFilter.enabled}
+          onClick={saveThreshold}
+        >
+          Save threshold
+        </button>
+        <button
+          type="button"
+          className="text-button"
+          disabled={busy}
+          onClick={() => void save({ enabled: !monitor.preFilter.enabled })}
+        >
+          {monitor.preFilter.enabled ? "Turn the pre-filter off" : "Turn the pre-filter on"}
+        </button>
+      </div>
+
+      <p className="monitor-filter-counts">
+        {monitor.preFilter.enabled
+          ? `Kept from the model so far: ${monitor.preFilter.dropped.keyword} on words, ` +
+            `${monitor.preFilter.dropped.embedding} on similarity. Every post reaching the ` +
+            "model is classified, and every classification is billed."
+          : "The pre-filter is off. Every collected post is sent to the model and billed."}
+      </p>
+
+      {error && (
+        <p className="budget-error" role="alert">
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}
+
 export function Monitors() {
   const [monitors, setMonitors] = useState<Monitor[]>([]);
   const [state, setState] = useState<LoadState>("loading");
@@ -374,6 +477,7 @@ export function Monitors() {
 
               <div className="monitor-controls">
                 <BudgetForm monitor={monitor} onSaved={load} />
+                <PreFilterForm monitor={monitor} onSaved={load} />
                 <div className="monitor-card-actions">
                   <a className="text-link" href="#/">
                     View inbox

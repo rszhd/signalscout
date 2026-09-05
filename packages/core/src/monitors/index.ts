@@ -8,6 +8,7 @@ export {
   type Monitor,
   type MonitorAnswers,
   type MonitorEnvironment,
+  type MonitorFilterSettings,
   type MonitorPlan,
   monitorQueries,
   pauseMonitor,

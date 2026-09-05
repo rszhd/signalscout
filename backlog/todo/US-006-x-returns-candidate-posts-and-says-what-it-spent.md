@@ -24,7 +24,7 @@ pulls the same window twice.
 
 This connector therefore reports what it consumed on every call, and it must
 be exact rather than estimated. The budget guard in
-[US-013](US-013-a-monitor-cannot-spend-past-its-budget.md) is built on that
+[US-013](../done/2026-09/US-013-a-monitor-cannot-spend-past-its-budget.md) is built on that
 number, and a guard fed a guess is not a guard.
 
 **This ticket and US-013 ship together.** Shipping a metered source without a
@@ -55,7 +55,7 @@ spending cap means the first cursor bug is discovered on a user's invoice.
 ## Notes
 
 - Depends on [US-003](US-003-a-source-implements-one-interface.md).
-- Ships with [US-013](US-013-a-monitor-cannot-spend-past-its-budget.md). Not
+- Ships with [US-013](../done/2026-09/US-013-a-monitor-cannot-spend-past-its-budget.md). Not
   after it.
 - STACK.md, *Source economics*.
 - [docs/testing.md](../../docs/testing.md), *No test spends money* and *A

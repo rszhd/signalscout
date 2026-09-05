@@ -32,6 +32,11 @@ function monitor(overrides: Record<string, unknown> = {}) {
       reason: null,
       since: "2026-03-01T00:00:00.000Z",
     },
+    preFilter: {
+      enabled: true,
+      similarityThreshold: 0.15,
+      dropped: { keyword: 0, embedding: 0 },
+    },
     ...overrides,
   };
 }
@@ -160,6 +165,75 @@ describe("the monitor list", () => {
     await screen.unmount();
     await show([monitor({ budget: { monthlyCapMicros: 1_000_000, onExhausted: "pause" } })]);
     expect(button("Remove cap")).toBeTruthy();
+  });
+
+  it("says how many posts each pre-filter stage kept from the model", async () => {
+    // US-008 asks for this counter, and the reason is that the filter's own
+    // risk is invisible everywhere else: a threshold set too high empties the
+    // inbox and looks like a quiet week.
+    await show([
+      monitor({
+        preFilter: {
+          enabled: true,
+          similarityThreshold: 0.15,
+          dropped: { keyword: 340, embedding: 62 },
+        },
+      }),
+    ]);
+
+    expect(container.textContent).toContain("340 on words");
+    expect(container.textContent).toContain("62 on similarity");
+  });
+
+  it("sends the threshold a person typed", async () => {
+    await show([monitor()]);
+
+    setValue(field("Similarity needed for Teams replacing manual QA"), "0.4");
+    button("Save threshold").click();
+    await settle();
+
+    const [url, init] = fetchMock.mock.calls.at(-2) as [string, RequestInit];
+
+    expect(url).toBe(`/api/monitors/${monitorId}`);
+    expect(init.method).toBe("PATCH");
+    expect(JSON.parse(String(init.body))).toEqual({ preFilter: { similarityThreshold: 0.4 } });
+  });
+
+  it("refuses a similarity no cosine distance can produce, without asking the server", async () => {
+    await show([monitor()]);
+    const before = fetchMock.mock.calls.length;
+
+    setValue(field("Similarity needed for Teams replacing manual QA"), "40");
+    button("Save threshold").click();
+    await settle();
+
+    expect(fetchMock.mock.calls).toHaveLength(before);
+    expect(container.textContent).toContain("a number between 0 and 1");
+  });
+
+  it("turns the pre-filter off, and says what that costs", async () => {
+    await show([monitor()]);
+
+    button("Turn the pre-filter off").click();
+    await settle();
+
+    const [, init] = fetchMock.mock.calls.at(-2) as [string, RequestInit];
+    expect(JSON.parse(String(init.body))).toEqual({ preFilter: { enabled: false } });
+
+    await screen.unmount();
+    await show([
+      monitor({
+        preFilter: {
+          enabled: false,
+          similarityThreshold: 0.15,
+          dropped: { keyword: 0, embedding: 0 },
+        },
+      }),
+    ]);
+
+    expect(container.textContent).toContain(
+      "Every collected post is sent to the model and billed.",
+    );
   });
 
   it("offers to create one when there are no monitors", async () => {

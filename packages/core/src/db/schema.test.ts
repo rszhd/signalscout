@@ -253,6 +253,37 @@ describe("monitors", () => {
     await expect(insertMonitor({ min_score: -1 })).rejects.toThrow(/violates check constraint/);
   });
 
+  it("starts with the pre-filter on and its similarity bar low", async () => {
+    const monitorId = await insertMonitor();
+
+    const row = only(
+      (
+        await sql.query<{ pre_filter_enabled: boolean; similarity_threshold: number }>(
+          "SELECT pre_filter_enabled, similarity_threshold FROM monitors WHERE id = $1",
+          [monitorId],
+        )
+      ).rows,
+    );
+
+    // On, because the filter is what keeps the model bill low. Low, because a
+    // threshold that drops a good lead leaves no trace anybody can read.
+    expect(row.pre_filter_enabled).toBe(true);
+    expect(row.similarity_threshold).toBeCloseTo(0.15, 5);
+  });
+
+  it("accepts the ends of the similarity range and refuses either side", async () => {
+    // Zero is "keep everything the keyword stage kept", which is how a person
+    // turns the second stage off without turning the first one off.
+    await expect(insertMonitor({ similarity_threshold: 0 })).resolves.toEqual(expect.any(String));
+    await expect(insertMonitor({ similarity_threshold: 1 })).resolves.toEqual(expect.any(String));
+    await expect(insertMonitor({ similarity_threshold: 1.2 })).rejects.toThrow(
+      /violates check constraint/,
+    );
+    await expect(insertMonitor({ similarity_threshold: -0.1 })).rejects.toThrow(
+      /violates check constraint/,
+    );
+  });
+
   it("starts with no generated queries, so a new monitor is not silently searchable", async () => {
     const id = await insertMonitor({ name: "Fresh" });
 
@@ -291,6 +322,21 @@ describe("model calls", () => {
 
   it.each(["scored", "rejected", "failed"])("records a call that ended as %s", async (outcome) => {
     await expect(insertModelCall({ outcome })).resolves.toEqual(expect.any(String));
+  });
+
+  it.each(["classification", "query_generation", "embedding"])(
+    "records a call made for %s",
+    async (purpose) => {
+      // Three kinds of call and three prices. A bill that could not tell them
+      // apart could not answer "what was my key spent on".
+      await expect(insertModelCall({ purpose })).resolves.toEqual(expect.any(String));
+    },
+  );
+
+  it("refuses a purpose no caller has", async () => {
+    await expect(insertModelCall({ purpose: "summarising" })).rejects.toThrow(
+      /violates check constraint/,
+    );
   });
 
   it("refuses an outcome the classifier cannot produce", async () => {
@@ -337,6 +383,90 @@ describe("model calls", () => {
     );
 
     expect(row.estimated_cost_micros).toBeNull();
+  });
+});
+
+describe("filter drops", () => {
+  /** One post the pre-filter kept from the model. Returns its id. */
+  async function insertDrop(overrides: Record<string, unknown> = {}): Promise<string> {
+    const values = {
+      monitor_id: overrides.monitor_id ?? (await insertMonitor()),
+      post_id: overrides.post_id ?? (await insertPost()),
+      stage: "embedding",
+      similarity: 0.08,
+      ...overrides,
+    };
+    const columns = Object.keys(values);
+    const placeholders = columns.map((_, index) => `$${index + 1}`);
+    const result = await sql.query<{ id: string }>(
+      `INSERT INTO filter_drops (${columns.join(", ")}) VALUES (${placeholders.join(", ")}) RETURNING id`,
+      Object.values(values),
+    );
+    return only(result.rows).id;
+  }
+
+  it.each(["keyword", "embedding"])("records a drop made by the %s stage", async (stage) => {
+    await expect(insertDrop({ stage })).resolves.toEqual(expect.any(String));
+  });
+
+  it("refuses a stage the pre-filter does not have", async () => {
+    await expect(insertDrop({ stage: "vibes" })).rejects.toThrow(/violates check constraint/);
+  });
+
+  /** Nothing was embedded at the keyword stage, so nothing was measured. */
+  it("holds no similarity for a keyword drop", async () => {
+    const id = await insertDrop({ stage: "keyword", similarity: null });
+
+    const row = only(
+      (
+        await sql.query<{ similarity: number | null }>(
+          "SELECT similarity FROM filter_drops WHERE id = $1",
+          [id],
+        )
+      ).rows,
+    );
+
+    expect(row.similarity).toBeNull();
+  });
+
+  it("refuses a similarity no cosine distance can produce", async () => {
+    await expect(insertDrop({ similarity: 1.4 })).rejects.toThrow(/violates check constraint/);
+  });
+
+  /**
+   * A poll returns posts it has returned before. One row per post per monitor
+   * is what makes the counter on the monitor list a count of posts.
+   */
+  it("holds one drop per post per monitor", async () => {
+    const monitorId = await insertMonitor();
+    const postId = await insertPost();
+
+    await insertDrop({ monitor_id: monitorId, post_id: postId });
+
+    await expect(insertDrop({ monitor_id: monitorId, post_id: postId })).rejects.toThrow(
+      /duplicate key value/,
+    );
+  });
+
+  it("lets two monitors each drop the same post", async () => {
+    const postId = await insertPost();
+
+    await insertDrop({ post_id: postId });
+    await expect(insertDrop({ post_id: postId })).resolves.toEqual(expect.any(String));
+  });
+
+  /**
+   * Unlike `model_calls`, this row is evidence about a post and not about a
+   * bill. When the post goes, the evidence has nothing left to describe.
+   */
+  it("forgets the drop when the post it describes is deleted", async () => {
+    const postId = await insertPost();
+    await insertDrop({ post_id: postId });
+
+    await sql.query("DELETE FROM posts WHERE id = $1", [postId]);
+
+    const result = await sql.query("SELECT id FROM filter_drops WHERE post_id = $1", [postId]);
+    expect(result.rows).toHaveLength(0);
   });
 });
 

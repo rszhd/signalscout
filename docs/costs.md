@@ -20,8 +20,8 @@ the price the connector declares:
 | X | one post read | $0.005 |
 | A model call | one call | the provider's own token price |
 
-That arithmetic is wrong in at least four ways we already know about, and
-probably in a fifth we do not:
+That arithmetic is wrong in at least five ways we already know about, and
+probably in a sixth we do not:
 
 **The free allowance is not modelled.** Bright Data's first 5,000 records each
 month cost nothing. IntentWatch prices every record at the paid rate, so a
@@ -35,6 +35,13 @@ midnight UTC. Your provider's billing month starts wherever your account says.
 
 **A price changes without asking us.** The prices above are constants in this
 repository. A provider that raises one does not tell the code.
+
+**An embedding has no price until you set one.** The pre-filter embeds the
+monitor once and each post it keeps, and we carry no price table for embedding
+models. Until `AI_EMBEDDING_PRICE_MICROS` is set, those calls are recorded with
+no cost — which reads as *we cannot say*, not as *free*. The amount is small:
+an embedding costs about one hundredth of a classification, which is why the
+stage saves money at all.
 
 This is why every amount on a screen is labelled *estimated*, and why the
 figure is deliberately printed to four decimal places rather than rounded to
@@ -61,9 +68,14 @@ bills records and returns nothing. A ledger that skipped those could not tell
 "this monitor polled and cost nothing" from "this monitor never polled" — and
 the second is a bug while the first is a Tuesday.
 
-`model_calls` holds one row per call to a model, classification and query
-generation alike, including the ones that were refused. A refusal is billed
-like an answer.
+`model_calls` holds one row per call to a model — classification, query
+generation and the pre-filter's embeddings alike — including the ones that were
+refused. A refusal is billed like an answer.
+
+The `purpose` column is what makes the three tellable apart, and they are three
+different prices. One embedding call covers a batch of posts, so it carries the
+monitor and no single post: it is on the monitor's bill, which is where the cap
+reads it.
 
 `estimated_cost_micros` is null on a model call whose price is not configured.
 Null means *we cannot say*, and it is counted as nothing rather than guessed.
@@ -196,7 +208,9 @@ range is for, and the range is wide.
 **The model's half is not in it.** The figures here are what the *source*
 charges. Classifying the posts a plan collects costs about a tenth of a cent
 each, and the cost test does not add it. A plan that collects 7,200 records a
-month will also send some of them to a model.
+month will also send some of them to a model — how many depends on the
+pre-filter, which is exactly the number nobody can predict before the monitor
+runs.
 
 ### The flag
 
@@ -215,6 +229,31 @@ is a plan that stops collecting before the month ends.
 
 ---
 
+## The pre-filter is a cost control, and it is also a risk
+
+Between collection and the model sits a filter with two stages: a free keyword
+and subreddit match, then a similarity comparison that costs one embedding per
+post. Both exist to keep the model bill down, and the second one pays for
+itself as soon as it drops a few posts in a hundred.
+
+The risk runs the other way. **A threshold set too high drops good leads where
+nobody can see it.** An empty inbox looks the same whether the week was quiet
+or the filter ate it. So three things are true by design:
+
+- The threshold starts low — 0.15 cosine similarity. One run has measured it:
+  on 2026-09-05 a real embedding model put PLAN.md's four on-topic posts at
+  0.26 to 0.57 and a post about sourdough at 0.09, so 0.15 sits inside that gap
+  with room on both sides. **That is five posts, not a distribution.**
+- Every drop is written to `filter_drops` with the similarity that caused it,
+  so the threshold can be argued with using real data.
+- The Monitors screen shows how many posts each stage has kept from the model,
+  and the whole filter can be turned off per monitor.
+
+An embedding that fails never drops a post. The post goes to the model instead,
+which costs more and hides nothing.
+
+---
+
 ## Where to look
 
 - The cap and the spend are on the **Monitors** screen, next to the monitor
@@ -223,6 +262,9 @@ is a plan that stops collecting before the month ends.
 - The rule itself is `packages/core/src/budget/budget.ts`. It is one of the
   five correctness-critical surfaces in [testing.md](testing.md), so its
   assertions were written before it was.
+- The pre-filter is `packages/core/src/worker/filter.ts`, its keyword rule is
+  `packages/core/src/filter/keywords.ts`, and what it dropped is in
+  `filter_drops`.
 - The cost test's arithmetic is `packages/core/src/estimate/estimate.ts`, and
   its assertions were written first for the same reason: it puts a number in
   front of a person who is about to spend money. The samples are collected by

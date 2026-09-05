@@ -198,6 +198,13 @@ design: an embedding failure sends the post to the model rather than dropping it
 (US-008), and a source outage is not a deletion (US-015). Both are correct. Both
 need a test that goes red when the swallowed thing breaks.
 
+The first one now has that test, in `worker/filter.test.ts`, and writing it
+found the gap this rule is about. The pre-filter fails open twice — once when
+the monitor's own description cannot be embedded, once when the batch of posts
+cannot — and one case covered only the first branch. A mutation that dropped
+every post at the second branch left the suite green. Two cases, one per
+branch, is what it took. Count the branches of a swallow, not the swallows.
+
 **A rule is only as tested as its least-tested caller.** Four tickets in a row
 elsewhere shipped a correct rule that one caller never reached, with the
 assertion on the rule itself green every time. The symptom is always the same
@@ -246,7 +253,12 @@ number is right.
 
 Three of ours are exactly this shape:
 
-- the pre-filter similarity threshold (US-008)
+- the pre-filter similarity threshold (US-008) — the instrument is
+  `packages/core/src/ai/fixtures/capture-embeddings.ts`, and the numbers it
+  produced on 2026-09-05 are in the ticket and replayed by
+  `ai/similarity.test.ts`. Five posts is a gap, not a distribution, so the
+  second instrument is the `filter_drops` table: it records the similarity of
+  every post the threshold refused, which is what moves the number next
 - the minimum score that makes a match (US-009) — the instrument is
   `packages/core/src/ai/fixtures/capture.ts`, and the numbers it produced are
   in the ticket

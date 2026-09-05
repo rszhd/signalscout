@@ -1,0 +1,39 @@
+{
+  "provider": "openai",
+  "model": "text-embedding-3-small",
+  "capturedAt": "2026-09-05T04:40:19.861Z",
+  "note": "Cosine similarity between `exampleMonitor` and each of the fake source's five posts, measured by a live embedding model. The vectors are not kept: the similarity is the number the threshold is compared against and the number filter_drops stores.",
+  "dimensions": 1536,
+  "monitorText": "Product: A test runner for web apps. You record a browser flow once and it keeps working when the UI changes.\nIdeal customer: Small SaaS teams, two to twenty people, with no dedicated QA engineer, shipping every week.\nProblem it solves: End-to-end tests break whenever the UI changes, so teams stop trusting them and go back to testing by hand before every release.",
+  "similarities": [
+    {
+      "externalId": "fake-1",
+      "title": "Playwright is awesome",
+      "similarity": 0.263572
+    },
+    {
+      "externalId": "fake-2",
+      "title": "Tests break on every UI change",
+      "similarity": 0.532531
+    },
+    {
+      "externalId": "fake-3",
+      "title": "Is there something easier?",
+      "similarity": 0.297238
+    },
+    {
+      "externalId": "fake-4",
+      "title": "What are other small teams using?",
+      "similarity": 0.571642
+    },
+    {
+      "externalId": "fake-5",
+      "title": "My starter died",
+      "similarity": 0.087273
+    }
+  ],
+  "usage": {
+    "tokens": 176
+  },
+  "latencyMs": 4368
+}

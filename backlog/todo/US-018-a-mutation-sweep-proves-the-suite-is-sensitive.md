@@ -70,7 +70,7 @@ at face value.
 ## Notes
 
 - Depends on [US-009](US-009-the-model-scores-a-post-against-a-monitor.md) and
-  [US-013](US-013-a-monitor-cannot-spend-past-its-budget.md). There is nothing
+  [US-013](../done/2026-09/US-013-a-monitor-cannot-spend-past-its-budget.md). There is nothing
   to sweep before both exist.
 - Stryker is the runner for a TypeScript suite. Confirm the reporter setting
   against the Node version in use before the first run.

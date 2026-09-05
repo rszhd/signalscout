@@ -25,16 +25,36 @@ cap, and every billed page is written to `api_usage` as it comes back. US-014
 added the cost test, so the monitor form runs each query once against a small
 sample and says what a month of it would cost before the monitor starts.
 BUG-002, found by that test's first live run, stopped a seven-day window being
-bought as a month. Two
-steps are still placeholders: US-008 owns the pre-filter, so every post reaches
-the model, and US-016 owns the notification. `apps/web` now has three screens,
-the monitor form, the inbox and the monitor list, and no screen for
-connections.
+bought as a month. US-008 added the pre-filter, so a post now has to match a
+word or a subreddit, and then clear a similarity threshold, before the model is
+paid to read it — and its embedding calls closed US-013's last box, so the
+spend a cap counts is now every kind of call. One step is still a placeholder:
+US-016 owns the notification. `apps/web` now has three screens, the monitor
+form, the inbox and the monitor list, and no screen for connections.
 
 **Reddit's own API is closed to us.** Reddit ended self-serve app registration
 in November 2025. Reddit is reached through Bright Data instead, and X through
 its official pay-per-use API. Read STACK.md, *A source is not a provider*,
 before touching a connector: the interface does not change to suit a provider.
+
+**The embedder has met a real provider once.** On 2026-09-05
+`capture:embeddings` embedded PLAN.md's example monitor and the five fake posts
+with OpenAI's `text-embedding-3-small`, for 176 tokens. The provider path, the
+key fallback, the 1,536-number width and the cost recording are proven for the
+happy path. The failure paths are not: a real rate limit, a real timeout and a
+real refusal have only been simulated.
+
+That run also measured the threshold. The four on-topic posts scored 0.26 to
+0.57 and the sourdough post 0.09, so the default of 0.15 sits inside a gap of
+0.18, and `ai/similarity.test.ts` replays those numbers and goes red if it
+leaves. **That is one monitor and five posts, not a distribution.** The
+`filter_drops` rows are the instrument that moves it next.
+
+One thing follows for a deployment: Anthropic — our default model provider —
+publishes no embedding endpoint, so the common install runs the free keyword
+stage and sends everything it keeps to the model until `AI_EMBEDDING_PROVIDER`
+names something else. On OpenAI it needs nothing: the embedding provider, model
+and key all fall back to the ones the classifier uses.
 
 **The classifier has met a real model, and the Reddit connector a real
 provider.** `ai/fixtures/capture.ts` ran against a live provider on 2026-09-05,
@@ -101,6 +121,12 @@ red. What no test can prove is the input: the guard multiplies the units a
 connector reports by the price the connector declares, and neither figure has
 been checked against an invoice. Say the spend is an estimate, because
 [docs/costs.md](docs/costs.md) says so to the user in four specific ways.
+
+**An embedding has no price until somebody sets one.** `provider.ts` carries
+chat prices read from a provider's page; we have read no embedding price, so an
+embedding call is recorded with a null cost until `AI_EMBEDDING_PRICE_MICROS`
+is set. Null means "we cannot say", which is the same rule an unpriced chat
+model already follows. Do not fill that table from memory.
 
 **A cap can be overshot by one poll.** The guard runs before a poll, because a
 page is billed when it is fetched. It cannot know what that poll will cost, so
@@ -237,9 +263,10 @@ backlog/index.sh --check      # exit 1 if either list is stale
 
 pnpm --filter @intentwatch/core capture:classifier   # spends money; see below
 pnpm --filter @intentwatch/core capture:queries      # spends money; see below
+pnpm --filter @intentwatch/core capture:embeddings   # spends money; see below
 ```
 
-These two are the only commands here that spend money, and both are
+These three are the only commands here that spend money, and all three are
 instruments: they ask a real model something and record what it said, because
 an answer we wrote would be evidence about our own schema and none about the
 model.
@@ -253,8 +280,15 @@ records them. One short call. Read its output rather than trusting it: two
 failures are invisible to the schema, a subreddit that does not exist and eight
 queries that are one query written eight ways.
 
-Re-run either when its prompt, its schema or the model changes, and put the
-numbers in the ticket.
+`capture:embeddings` measures how near each of PLAN.md's five posts is to the
+example monitor, and records the similarities — not the vectors, which would be
+a quarter of a megabyte to re-prove arithmetic `pgvector` already does.
+`ai/similarity.test.ts` replays them and fails if the default threshold leaves
+the measured gap. Two short calls, well under a hundredth of a cent. It needs
+an embedding provider: Anthropic has none.
+
+Re-run any of them when its prompt, its schema or the model changes, and put
+the numbers in the ticket.
 
 Do not invent a command that does not exist yet — check `package.json` first.
 

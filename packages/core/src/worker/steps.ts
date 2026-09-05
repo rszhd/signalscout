@@ -7,8 +7,8 @@
  * what lets a test drive one step and assert that the step before it did not
  * run.
  *
- * Two of the four are placeholders. They are wired, logged and chained, and
- * they do no work, because the work belongs to tickets that have not been
+ * One of the four is still a placeholder. It is wired, logged and chained, and
+ * it does no work, because the work belongs to a ticket that has not been
  * done. A placeholder that passes its payload on is honest; one that quietly
  * dropped it would make the empty inbox look like a quiet day.
  */
@@ -17,7 +17,6 @@ import type { Database } from "../db/client.js";
 import type { Logger } from "../logger.js";
 import {
   type ClassifyPayload,
-  classifyQueue,
   type EstimatePayload,
   type FilterPayload,
   type NotifyPayload,
@@ -51,20 +50,6 @@ export interface PipelineSteps {
 export interface WorkerSteps extends PipelineSteps {
   readonly estimate: Step<EstimatePayload>;
 }
-
-/**
- * US-008 replaces this with the keyword stage and the pgvector similarity
- * stage. Until then every post reaches the classifier, which is the permissive
- * direction: a threshold that drops a good lead is invisible, and an extra
- * model call is only a cost.
- */
-export const passThroughFilter: Step<FilterPayload> = async (
-  { monitorId, postIds },
-  { boss, logger },
-) => {
-  logger.info({ monitorId, posts: postIds.length }, "pre-filter is not implemented yet (US-008)");
-  await boss.send(classifyQueue, { monitorId, postIds });
-};
 
 /**
  * What runs in place of the classifier when no model is configured.

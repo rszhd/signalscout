@@ -79,24 +79,26 @@ recorded.
 
 ## Acceptance
 
-- [ ] A triage stage runs before classification and returns one value from
+- [x] A triage stage runs before classification and returns one value from
       three — `no`, `maybe`, `yes` — and no reasons
-- [ ] Only `no` drops. A timeout, a refusal, a malformed answer or a rate limit
+- [x] Only `no` drops. A timeout, a refusal, a malformed answer or a rate limit
       passes the item to the classifier
-- [ ] Every drop is written with the item id, so a person can read what was
+- [x] Every drop is written with the item id, so a person can read what was
       dropped and judge the stage
-- [ ] The triage model is configured on its own and falls back to the
+- [x] The triage model is configured on its own and falls back to the
       classifier's provider, model, key and base URL, so a deployment that sets
       nothing keeps one stage and one bill
-- [ ] `triage` is added to `modelCallPurposes`, and a triage call is recorded
+- [x] `triage` is added to `modelCallPurposes`, and a triage call is recorded
       and priced like every other call
-- [ ] US-013's budget guard counts triage calls, and a test proves a monitor
+- [x] US-013's budget guard counts triage calls, and a test proves a monitor
       cannot spend past its cap through this stage
-- [ ] The fixtures the tests replay are captured from a real model through a
+- [x] The fixtures the tests replay are captured from a real model through a
       script named in `package.json`, never written by hand
 - [ ] The Log records the measured keep rate and the measured cost of one poll,
-      against the same poll with the stage off
-- [ ] On a comment this is the only paid stage in front of the classifier: no
+      against the same poll with the stage off — **the keep rate is measured, the
+      cost is not: `gpt-5.6-luna` has no price in `provider.ts` and none is set,
+      so every call is recorded with a null cost**
+- [x] On a comment this is the only paid stage in front of the classifier: no
       embedding runs, and the Log records the keep rate against that shape.
       US-029 answered it — see the Context above
 
@@ -133,3 +135,67 @@ recorded.
   settings. That makes this
   stage's keep rate the whole saving rather than half of it, and it makes a
   false negative here the only silent drop on the comment path.
+
+- 2026-09-06T02:38+08:00 — Built. The stage is `ai/triage.ts`, its prompt is
+  `ai/triage-prompt.ts`, and it runs inside the pre-filter's `pass` because
+  that step has five exits and every one of them has to reach it. `triage` is a
+  third `FilterStage` rather than a new table: a drop is a drop, the monitor
+  list already counts them, and a second table would be a second place to look.
+  Migration 0024 widens the two check constraints. `AI_TRIAGE_MODEL` and its
+  four companions fall back to the classifier's, so a deployment that sets
+  nothing still runs the stage.
+
+  Two design notes worth keeping. The price does **not** fall back once a
+  triage model is named, because a cheap model billed at the classifier's rate
+  would report a saving that did not happen. And a monitor with the pre-filter
+  switched off skips triage too: it is one of the filter's stages, and deciding
+  otherwise would be this product choosing which stage counts as filtering.
+
+  912 tests pass. `ai/triage.test.ts` holds nineteen, six of which exist only
+  to prove a failure keeps the item; `worker/triage.test.ts` holds eleven
+  against real Postgres, including the one that proves a triage call reaches
+  US-013's cap.
+
+- 2026-09-06T02:40+08:00 — Measured, and it found something. `capture:triage`
+  asked `openai/gpt-5.6-luna` about all 46 comments US-029 labelled by hand,
+  plus PLAN.md's four worked examples. Fifty calls, 29,999 input and 5,677
+  output tokens. **The cost is unknown**: `provider.ts` prices only the three
+  Claude models and no override is set for this one, so every call is recorded
+  with a null cost. That is the documented behaviour and it is why the cost box
+  above stays open.
+
+  | Class | Kept |
+  |---|---|
+  | People answering | 5 of 26 |
+  | Neither | 13 of 16 |
+  | People asking | 3 of 4 |
+  | All comments | **21 of 46** |
+
+  **It drops four fifths of the experts**, which is the saving this ticket was
+  written for, and it keeps all three worked examples PLAN.md scores as leads.
+
+  **It refused one person asking, and that refusal has to be read rather than
+  counted.** The comment is "I'm currently testing a native android app and am
+  looking for alternatives", and the example monitor sells a browser test
+  runner. So the label and the verdict disagree for a reason: US-029's `asking`
+  label answers "is this person asking?" and triage is asked "could this be a
+  person to reach?" A native-app buyer is the first and not the second. The
+  instrument said "must be all of them" on its first run and that claim was
+  wrong; it now prints the refused comment and says to read it against the
+  monitor. `ai/triage-examples.test.ts` asserts this case by name, so the next
+  person to edit the prompt finds it.
+
+  The uncomfortable half of the same table: **13 of 16 jokes and notices
+  survived**, including a `[deleted]` body and a moderator's vendor-spam
+  notice. The stage is lenient on noise and firm on experts. That is the safe
+  direction and it costs classifier calls, so it is the number to attack next —
+  in the prompt, not in the threshold, because there is no threshold here.
+
+  Two threads and one monitor is not a distribution, and none of these rates
+  may be written up as one.
+
+- 2026-09-06T02:41+08:00 — What is left. The cost box needs
+  `AI_INPUT_PRICE_MICROS` and `AI_OUTPUT_PRICE_MICROS` read from the provider's
+  page, and then one live poll run with the stage on and off. Neither is
+  blocked by anything here; both need a price nobody has read yet, and this
+  repository does not fill that table from memory.

@@ -160,8 +160,17 @@ export const defaultMinimumScore = 30;
  */
 export const defaultSimilarityThreshold = 0.15;
 
-/** The two stages of the pre-filter, in the order they run. US-008. */
-export const filterStages = ["keyword", "embedding"] as const;
+/**
+ * The stages of the pre-filter, in the order they run. US-008, then US-030.
+ *
+ * `triage` is a model call, unlike the two before it, and it is here rather
+ * than in its own table for one reason: a drop is a drop. The monitor list
+ * counts them, `filter_drops` already holds the post and the monitor, and a
+ * second table would mean a second place to look before answering "what did
+ * this monitor throw away". Its `similarity` is null, like the keyword
+ * stage's, because nothing was measured — a model was asked.
+ */
+export const filterStages = ["keyword", "embedding", "triage"] as const;
 export type FilterStage = (typeof filterStages)[number];
 
 /** How a call to the model ended. `ai/call.ts` owns the three outcomes. */
@@ -182,8 +191,19 @@ export type ModelCallOutcome = (typeof modelCallOutcomes)[number];
  * and a different order of magnitude — about one hundredth of a classification
  * — so a bill that could not tell them apart could not show that the
  * pre-filter pays for itself.
+ *
+ * US-030 added the fourth. Triage is the same kind of call as a classification
+ * and often the same model, so nothing but this column can tell them apart. A
+ * bill that could not would report the cheap stage's calls as the expensive
+ * stage's, and the one number this ticket exists to prove — what triage saved —
+ * could not be read at all.
  */
-export const modelCallPurposes = ["classification", "query_generation", "embedding"] as const;
+export const modelCallPurposes = [
+  "classification",
+  "query_generation",
+  "embedding",
+  "triage",
+] as const;
 export type ModelCallPurpose = (typeof modelCallPurposes)[number];
 
 /** SQL fragment for a score column that must read 0 to 100. */

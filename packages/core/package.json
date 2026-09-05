@@ -22,6 +22,7 @@
     "generate": "drizzle-kit generate",
     "rotate-key": "tsx --env-file-if-exists=../../.env src/secrets/rotate-cli.ts",
     "capture:classifier": "tsx src/ai/fixtures/capture.ts",
+    "capture:triage": "tsx src/ai/fixtures/capture-triage.ts",
     "capture:queries": "tsx src/ai/fixtures/capture-queries.ts",
     "capture:embeddings": "tsx src/ai/fixtures/capture-embeddings.ts",
     "capture:comment-filter": "tsx src/ai/fixtures/capture-comment-filter.ts",

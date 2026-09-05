@@ -19,8 +19,10 @@ import {
   embeddingConfigFromEnvironment,
   embeddingNeedsApiKey,
   needsApiKey,
+  triageConfigFromEnvironment,
 } from "../ai/config.js";
 import { createEmbedder, type Embedder } from "../ai/embed.js";
+import { createTriager, type Triager } from "../ai/triage.js";
 import { loadAiEnv, loadNotificationEnv } from "../config/env.js";
 import { createDatabase, type Database, poolOptions } from "../db/client.js";
 import type { Logger } from "../logger.js";
@@ -94,6 +96,18 @@ export interface StartWorkerOptions {
   embedder?: Embedder;
   /** The embedding settings, when they do not come from the process environment. */
   embeddingConfig?: EmbeddingConfig;
+  /**
+   * Which model triages before the classifier is paid to read anything.
+   *
+   * Unlike the embedder, this defaults to something rather than to nothing:
+   * `triageConfigFromEnvironment` falls every setting back to the classifier's,
+   * so a deployment that names no triage model still gets the stage. It is
+   * absent only when the classifier itself could not be built, because there is
+   * then no model to fall back to.
+   */
+  triager?: Triager;
+  /** The triage settings, when they do not come from the process environment. */
+  triageConfig?: AiConfig;
   /** Retry and backoff settings, so a test does not wait out production's backoff. */
   retry?: RetryPolicy;
   /** False leaves the clock off, for a test that ticks the scheduler by hand. */
@@ -204,6 +218,27 @@ function embedderFromEnvironment(
   return createEmbedder({ config });
 }
 
+/**
+ * Build the triager the environment describes.
+ *
+ * This returns none only when the model behind it cannot be built at all —
+ * usually a missing key — and in that case the classifier is unconfigured too,
+ * so nothing downstream would run either. There is no "triage is switched off"
+ * deployment on purpose: the settings fall back to the classifier's, so the
+ * question a deployment answers is which model triages, never whether one does.
+ */
+function triagerFromEnvironment(config: AiConfig, logger: Logger): Triager | undefined {
+  if (needsApiKey(config.provider) && !config.apiKey) {
+    logger.error(
+      { provider: config.provider, model: config.model },
+      "the triage provider has no key: set AI_TRIAGE_API_KEY, or AI_API_KEY if triage shares the classifier's provider. Nothing will be triaged.",
+    );
+    return undefined;
+  }
+
+  return createTriager({ config });
+}
+
 export async function startWorker({
   databaseUrl,
   logger,
@@ -214,6 +249,8 @@ export async function startWorker({
   aiConfig,
   embedder,
   embeddingConfig,
+  triager,
+  triageConfig,
   retry = defaultRetryPolicy,
   scheduleTicks = true,
   notificationTransport,
@@ -279,12 +316,19 @@ export async function startWorker({
       logger,
     );
 
+  const triage =
+    triager ??
+    triagerFromEnvironment(
+      triageConfig ?? triageConfigFromEnvironment(readAiEnvironment()),
+      logger,
+    );
+
   const pipeline: WorkerSteps = {
     reconcile:
       steps.reconcile ?? createReconcileStep({ registry: sources, credentialsFor: lookup }),
     poll: steps.poll ?? createCollectStep({ registry: sources, credentialsFor: lookup }),
     estimate: steps.estimate ?? createEstimateStep({ registry: sources, credentialsFor: lookup }),
-    filter: steps.filter ?? createFilterStep({ embedder: embedding }),
+    filter: steps.filter ?? createFilterStep({ embedder: embedding, triager: triage }),
     classify:
       steps.classify ?? (model ? createClassifyStep({ classifier: model }) : unconfiguredClassify),
     notify:
@@ -336,6 +380,7 @@ export async function startWorker({
       connectors: sources.keys().map((key) => `${key.platformId} via ${key.providerId}`),
       model: model ? `${model.provider}/${model.model}` : "none",
       embedder: embedding ? `${embedding.provider}/${embedding.model}` : "none",
+      triager: triage ? `${triage.provider}/${triage.model}` : "none",
     },
     "worker ready",
   );

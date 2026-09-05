@@ -75,6 +75,29 @@ const aiFields = {
    * true, and a guessed price would read as a measurement.
    */
   AI_EMBEDDING_PRICE_MICROS: blankIsUnset(z.coerce.number().int().min(0).optional()),
+
+  /**
+   * The model that triages, before the classifier is paid to read anything.
+   *
+   * Unset is a supported answer and it means the classifier's own model, not
+   * "no triage". US-030's stage always runs, because on a comment it is the
+   * only paid stage in front of the classifier and a stage that is off drops
+   * nothing but saves nothing either.
+   *
+   * Naming a cheaper model here is where the rest of the saving is taken. Most
+   * of it comes from the answer being one word instead of five scores and four
+   * reasons, and that happens whatever the model.
+   *
+   * The prices are separate from `AI_INPUT_PRICE_MICROS` and fall back to it
+   * only while no triage model is named. A cheaper model priced at the
+   * classifier's rate would report a saving that did not happen.
+   */
+  AI_TRIAGE_PROVIDER: blankIsUnset(z.enum(aiProviders).optional()),
+  AI_TRIAGE_MODEL: blankIsUnset(z.string().min(1).optional()),
+  AI_TRIAGE_API_KEY: blankIsUnset(z.string().min(1).optional()),
+  AI_TRIAGE_BASE_URL: blankIsUnset(z.string().min(1).optional()),
+  AI_TRIAGE_INPUT_PRICE_MICROS: blankIsUnset(z.coerce.number().int().min(0).optional()),
+  AI_TRIAGE_OUTPUT_PRICE_MICROS: blankIsUnset(z.coerce.number().int().min(0).optional()),
 };
 
 export const aiEnvSchema = z.object(aiFields);

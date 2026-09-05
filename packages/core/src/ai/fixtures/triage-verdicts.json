@@ -1,0 +1,834 @@
+{
+  "provider": "openai",
+  "model": "gpt-5.6-luna",
+  "capturedAt": "2026-09-05T18:32:44.508Z",
+  "note": "What a real triage model answered for every comment US-029 labelled by hand, plus PLAN.md's four worked example posts. `triage-examples.test.ts` replays these. The two numbers that decide the stage are here: how many people asking it kept, which must be all of them, and how many people answering it dropped, which is the saving. Two threads and 46 comments is not a distribution.",
+  "monitor": {
+    "product": "A test runner for web apps. You record a browser flow once and it keeps working when the UI changes.",
+    "idealCustomer": "Small SaaS teams, two to twenty people, with no dedicated QA engineer, shipping every week.",
+    "problem": "End-to-end tests break whenever the UI changes, so teams stop trusting them and go back to testing by hand before every release.",
+    "signals": [
+      "recommendation_request",
+      "problem",
+      "alternative_search"
+    ]
+  },
+  "counts": {
+    "items": 50,
+    "comments": 46,
+    "askingKept": 3,
+    "asking": 4,
+    "answeringKept": 5,
+    "answering": 26,
+    "neitherKept": 13,
+    "neither": 16,
+    "commentsKept": 21,
+    "unanswered": 0
+  },
+  "usage": {
+    "inputTokens": 29999,
+    "outputTokens": 5677
+  },
+  "answers": [
+    {
+      "kind": "comment",
+      "thread": "question-post",
+      "id": "p7rd166",
+      "role": "neither",
+      "item": {
+        "source": "reddit",
+        "channel": "softwaretesting",
+        "title": "Starting Automation from 0% as a QA Lead — How are you using AI, MCPs & Agents in QA?",
+        "excerpt": "I would start by reducing the AI slop when making these threads 🫠"
+      },
+      "verdict": "no",
+      "status": "scored",
+      "inputTokens": 583,
+      "outputTokens": 175
+    },
+    {
+      "kind": "comment",
+      "thread": "question-post",
+      "id": "p7rtn2e",
+      "role": "neither",
+      "item": {
+        "source": "reddit",
+        "channel": "softwaretesting",
+        "title": "Starting Automation from 0% as a QA Lead — How are you using AI, MCPs & Agents in QA?",
+        "excerpt": "That's great insight — and one worth considering."
+      },
+      "verdict": "maybe",
+      "status": "scored",
+      "inputTokens": 576,
+      "outputTokens": 142
+    },
+    {
+      "kind": "comment",
+      "thread": "question-post",
+      "id": "p7s25pl",
+      "role": "neither",
+      "item": {
+        "source": "reddit",
+        "channel": "softwaretesting",
+        "title": "Starting Automation from 0% as a QA Lead — How are you using AI, MCPs & Agents in QA?",
+        "excerpt": "want me guide you to step by step process on eliminating the AI slop in a post?"
+      },
+      "verdict": "maybe",
+      "status": "scored",
+      "inputTokens": 586,
+      "outputTokens": 189
+    },
+    {
+      "kind": "comment",
+      "thread": "question-post",
+      "id": "p7swsyg",
+      "role": "neither",
+      "item": {
+        "source": "reddit",
+        "channel": "softwaretesting",
+        "title": "Starting Automation from 0% as a QA Lead — How are you using AI, MCPs & Agents in QA?",
+        "excerpt": "Imagine asking a community for help and not having the decency to actually produce the question yourself."
+      },
+      "verdict": "yes",
+      "status": "scored",
+      "inputTokens": 586,
+      "outputTokens": 143
+    },
+    {
+      "kind": "comment",
+      "thread": "question-post",
+      "id": "p7t1t84",
+      "role": "neither",
+      "item": {
+        "source": "reddit",
+        "channel": "softwaretesting",
+        "title": "Starting Automation from 0% as a QA Lead — How are you using AI, MCPs & Agents in QA?",
+        "excerpt": "Maybe an AI bot got the job…"
+      },
+      "verdict": "maybe",
+      "status": "scored",
+      "inputTokens": 575,
+      "outputTokens": 198
+    },
+    {
+      "kind": "comment",
+      "thread": "question-post",
+      "id": "p7wcjlm",
+      "role": "neither",
+      "item": {
+        "source": "reddit",
+        "channel": "softwaretesting",
+        "title": "Starting Automation from 0% as a QA Lead — How are you using AI, MCPs & Agents in QA?",
+        "excerpt": "I wouldn't be surprised."
+      },
+      "verdict": "maybe",
+      "status": "scored",
+      "inputTokens": 572,
+      "outputTokens": 68
+    },
+    {
+      "kind": "comment",
+      "thread": "question-post",
+      "id": "p7rb4db",
+      "role": "answering",
+      "item": {
+        "source": "reddit",
+        "channel": "softwaretesting",
+        "title": "Starting Automation from 0% as a QA Lead — How are you using AI, MCPs & Agents in QA?",
+        "excerpt": "I would not start automation from day one as you say. I would start by understanding the product and business workflows. I would choose the critical/core functionalities to stat automation with.\nGood luck."
+      },
+      "verdict": "no",
+      "status": "scored",
+      "inputTokens": 605,
+      "outputTokens": 97
+    },
+    {
+      "kind": "comment",
+      "thread": "question-post",
+      "id": "p7rd4mj",
+      "role": "answering",
+      "item": {
+        "source": "reddit",
+        "channel": "softwaretesting",
+        "title": "Starting Automation from 0% as a QA Lead — How are you using AI, MCPs & Agents in QA?",
+        "excerpt": "second this. Once you've understood the product and business flows, start with the most critical cases and build out from there. Also understanding what not to automate will pay off in the long run"
+      },
+      "verdict": "maybe",
+      "status": "scored",
+      "inputTokens": 604,
+      "outputTokens": 189
+    },
+    {
+      "kind": "comment",
+      "thread": "question-post",
+      "id": "p7wehel",
+      "role": "answering",
+      "item": {
+        "source": "reddit",
+        "channel": "softwaretesting",
+        "title": "Starting Automation from 0% as a QA Lead — How are you using AI, MCPs & Agents in QA?",
+        "excerpt": "i’d say just focus on the business goals and don’t leave everything in hands of AI it can produce slop text like you have posted here"
+      },
+      "verdict": "no",
+      "status": "scored",
+      "inputTokens": 596,
+      "outputTokens": 102
+    },
+    {
+      "kind": "comment",
+      "thread": "question-post",
+      "id": "p7racsc",
+      "role": "answering",
+      "item": {
+        "source": "reddit",
+        "channel": "softwaretesting",
+        "title": "Starting Automation from 0% as a QA Lead — How are you using AI, MCPs & Agents in QA?",
+        "excerpt": "I’d put all my early energy into locator strategy and test data management, those two things will cause more headaches than any flaky test later on. Playwright’s got decent built-in locators but if you’re leaning on AI for generation you’ll want a strict naming convention or data attributes from the start, otherwise the AI will just latch onto fragile selectors and you’ll spend half your week fixing tests.\n\n For MCPs the Playwright one is obvious but hooking into your database for test data setup/teardown is where it really shines, you can prompt Claude to spin up a fresh account with specific flags and tear it down after the run without writing a ton of boilerplate. Agents for failure analysis are still mostly hype in my experience, they’ll confidently tell you a test failed because of a timeout when it was actually a bad selector, but they’re surprisingly useful for churning out repetitive spec files once you’ve got a solid template locked in."
+      },
+      "verdict": "no",
+      "status": "scored",
+      "inputTokens": 756,
+      "outputTokens": 106
+    },
+    {
+      "kind": "comment",
+      "thread": "question-post",
+      "id": "p7rgfxc",
+      "role": "answering",
+      "item": {
+        "source": "reddit",
+        "channel": "softwaretesting",
+        "title": "Starting Automation from 0% as a QA Lead — How are you using AI, MCPs & Agents in QA?",
+        "excerpt": "Analysis can be good if you give it access to extracted pw trace and application logs at aame time."
+      },
+      "verdict": "maybe",
+      "status": "scored",
+      "inputTokens": 588,
+      "outputTokens": 207
+    },
+    {
+      "kind": "comment",
+      "thread": "question-post",
+      "id": "p7x4ky0",
+      "role": "answering",
+      "item": {
+        "source": "reddit",
+        "channel": "softwaretesting",
+        "title": "Starting Automation from 0% as a QA Lead — How are you using AI, MCPs & Agents in QA?",
+        "excerpt": "I’m currently developing AI agents, bots, and MCPs that can be utilized in day-to-day QA operations as part of the Platform QE role. I believe it’s better to focus more on how we can leverage AI to simplify and automate our tasks, making our QA processes more efficient."
+      },
+      "verdict": "no",
+      "status": "scored",
+      "inputTokens": 625,
+      "outputTokens": 92
+    },
+    {
+      "kind": "comment",
+      "thread": "question-post",
+      "id": "p7x7fd6",
+      "role": "neither",
+      "item": {
+        "source": "reddit",
+        "channel": "softwaretesting",
+        "title": "Starting Automation from 0% as a QA Lead — How are you using AI, MCPs & Agents in QA?",
+        "excerpt": "I almost applied for a very similar job in Charlotte I wonder if this is the same one"
+      },
+      "verdict": "maybe",
+      "status": "scored",
+      "inputTokens": 585,
+      "outputTokens": 152
+    },
+    {
+      "kind": "comment",
+      "thread": "question-post",
+      "id": "p7xmg4v",
+      "role": "neither",
+      "item": {
+        "source": "reddit",
+        "channel": "softwaretesting",
+        "title": "Starting Automation from 0% as a QA Lead — How are you using AI, MCPs & Agents in QA?",
+        "excerpt": "I am building a test writing skill today, to get out of these absolute terrible written tests that check the copy text or variable config as fixed values.\n\n I'll give an update later!\n\n I have built a fully automation test/verify SaaS already, but the local \"Dev\" path was missing so far."
+      },
+      "verdict": "no",
+      "status": "scored",
+      "inputTokens": 628,
+      "outputTokens": 152
+    },
+    {
+      "kind": "comment",
+      "thread": "question-post",
+      "id": "p7xwpuu",
+      "role": "answering",
+      "item": {
+        "source": "reddit",
+        "channel": "softwaretesting",
+        "title": "Starting Automation from 0% as a QA Lead — How are you using AI, MCPs & Agents in QA?",
+        "excerpt": "I would start by ensuring they have a solid regression suite. Then I would go through the tests and determine which ones should be automated.\n\n If they don't have a Regression suite, I would find out whether they have a Regression team and/or does the Regression Testing.\n\n I would recommend waiting to set up all the ai stuff until you get your footing and what you have to work with.\n\n It would be a good idea to understand how the automation works before trying ai."
+      },
+      "verdict": "maybe",
+      "status": "scored",
+      "inputTokens": 659,
+      "outputTokens": 284
+    },
+    {
+      "kind": "comment",
+      "thread": "question-post",
+      "id": "p7t2vgu",
+      "role": "answering",
+      "item": {
+        "source": "reddit",
+        "channel": "softwaretesting",
+        "title": "Starting Automation from 0% as a QA Lead — How are you using AI, MCPs & Agents in QA?",
+        "excerpt": "Well I guess you can try this, Framework folder structure will grow from time to time, you should build a solid framework for one flow and then if you want the AI to follow it then you can create agents md files on basis of that.\n\n Basically, later on after doing an exploration with playwright MCP, AI should generate test cases automation code on your coding pattern.\n\n Also test case generation sounds good but you should maintain a knowledge base of the product for your AI, so that will be AI source of truth."
+      },
+      "verdict": "no",
+      "status": "scored",
+      "inputTokens": 669,
+      "outputTokens": 80
+    },
+    {
+      "kind": "comment",
+      "thread": "question-post",
+      "id": "p7vfr09",
+      "role": "answering",
+      "item": {
+        "source": "reddit",
+        "channel": "softwaretesting",
+        "title": "Starting Automation from 0% as a QA Lead — How are you using AI, MCPs & Agents in QA?",
+        "excerpt": "Tip N1. Don't use MCPs. MCPs return the schema together with the output which costs too much.\n\n Use CLIs e.g. the new Atlassian CLI `twg` but even this one costs unless you make your own cheaper versions with the data you need."
+      },
+      "verdict": "no",
+      "status": "scored",
+      "inputTokens": 624,
+      "outputTokens": 16
+    },
+    {
+      "kind": "comment",
+      "thread": "question-post",
+      "id": "p7s1stp",
+      "role": "answering",
+      "item": {
+        "source": "reddit",
+        "channel": "softwaretesting",
+        "title": "Starting Automation from 0% as a QA Lead — How are you using AI, MCPs & Agents in QA?",
+        "excerpt": "Toolwise you can mix and match. Figure out how code reviews work at scale and how to measure cost. Fundementally you have a generator so it's output becomes a commodity. Set the expectation that you can trash at any point and recreate so the review process and measurement at scale it it's design and expectation should be solved first."
+      },
+      "verdict": "no",
+      "status": "scored",
+      "inputTokens": 633,
+      "outputTokens": 84
+    },
+    {
+      "kind": "comment",
+      "thread": "question-post",
+      "id": "p7s270n",
+      "role": "answering",
+      "item": {
+        "source": "reddit",
+        "channel": "softwaretesting",
+        "title": "Starting Automation from 0% as a QA Lead — How are you using AI, MCPs & Agents in QA?",
+        "excerpt": "Focus on wherever the weak spots are with the current manual test suites per Fintech app/system under test and help whoever has developed those first, then use the tools available to help you draft a test plan including an automation development/implementation plan - ensure you get buy-in from product team/s and do research based on the infra/system/platform/app contexts, designs and requirements of your Fintech test targets.\nOnce you've developed automated (or even just semi-automated) unit test scripts locally on your dev machine, use agentic IDEs like Claude Code to help you build out your test suites in your CI pipeline. I've had success with setting up both Gitea and Forgejo Actions and runners in my homelab for personal projects which has helped me to understand Gitlab runners as part of my day job - but your team may use other tools. Basically, each time you commit and merge/push test code changes to your repo it can triggers your CI suite to run a set of automated functional API/unit tests, plus more E2E tests with Playwright (I'm using Python version as my codebase is mostly Python/Flask based) but quite often you'll need to work with developers and DevOps colleagues on how to 'hand over' fully/successfully validated code for promotion from dev/test to later environments."
+      },
+      "verdict": "no",
+      "status": "scored",
+      "inputTokens": 831,
+      "outputTokens": 188
+    },
+    {
+      "kind": "comment",
+      "thread": "question-post",
+      "id": "p7ru871",
+      "role": "neither",
+      "item": {
+        "source": "reddit",
+        "channel": "softwaretesting",
+        "title": "Starting Automation from 0% as a QA Lead — How are you using AI, MCPs & Agents in QA?",
+        "excerpt": "[deleted]"
+      },
+      "verdict": "yes",
+      "status": "scored",
+      "inputTokens": 570,
+      "outputTokens": 154
+    },
+    {
+      "kind": "comment",
+      "thread": "question-post",
+      "id": "p7rwl6t",
+      "role": "neither",
+      "item": {
+        "source": "reddit",
+        "channel": "softwaretesting",
+        "title": "Starting Automation from 0% as a QA Lead — How are you using AI, MCPs & Agents in QA?",
+        "excerpt": "Commercial links, self-promotion, and vendor spam are strictly prohibited and will result in Ban without warning! Do not post links to tools, training, corporate blogs, or book vendors. Name-only discussion of resources is permitted. Course instructors and industry professionals are welcome to contribute, but you must follow Reddit's 90/10 rule. Tool vendors and QA agency employees may not participate."
+      },
+      "verdict": "yes",
+      "status": "scored",
+      "inputTokens": 644,
+      "outputTokens": 142
+    },
+    {
+      "kind": "comment",
+      "thread": "statement-post",
+      "id": "ol92wq2",
+      "role": "answering",
+      "item": {
+        "source": "reddit",
+        "channel": "softwaretesting",
+        "title": "Playwright is significantly better than Selenium.",
+        "excerpt": "I remember when Selenium was the best, but yea the tech is going to keep changing and playwright is the one to use now. I did the Claude integration last week and ran a test. It was so easy and quick, eventhough I chose the difficult MCP setup, instead of the chrome extension.\n\n The same setup and tests would have take days to complete"
+      },
+      "verdict": "maybe",
+      "status": "scored",
+      "inputTokens": 623,
+      "outputTokens": 148
+    },
+    {
+      "kind": "comment",
+      "thread": "statement-post",
+      "id": "ol99cqq",
+      "role": "neither",
+      "item": {
+        "source": "reddit",
+        "channel": "softwaretesting",
+        "title": "Playwright is significantly better than Selenium.",
+        "excerpt": "managing every cent is the thing I'd tell every early founder to do. $70k in with a long runway and a product you believe in is honestly a better position than $650k in with bad financial visibility. you're ahead of where I was even if it doesn't feel like it. keep watching the numbers yourself"
+      },
+      "verdict": "maybe",
+      "status": "scored",
+      "inputTokens": 614,
+      "outputTokens": 159
+    },
+    {
+      "kind": "comment",
+      "thread": "statement-post",
+      "id": "ol8g335",
+      "role": "neither",
+      "item": {
+        "source": "reddit",
+        "channel": "softwaretesting",
+        "title": "Playwright is significantly better than Selenium.",
+        "excerpt": "yeah selenium after playwright feels like getting pegged at this point, pain only"
+      },
+      "verdict": "maybe",
+      "status": "scored",
+      "inputTokens": 566,
+      "outputTokens": 236
+    },
+    {
+      "kind": "comment",
+      "thread": "statement-post",
+      "id": "ol9t1o2",
+      "role": "neither",
+      "item": {
+        "source": "reddit",
+        "channel": "softwaretesting",
+        "title": "Playwright is significantly better than Selenium.",
+        "excerpt": "I don’t think you’re getting pegged correctly"
+      },
+      "verdict": "maybe",
+      "status": "scored",
+      "inputTokens": 561,
+      "outputTokens": 150
+    },
+    {
+      "kind": "comment",
+      "thread": "statement-post",
+      "id": "oldpow0",
+      "role": "neither",
+      "item": {
+        "source": "reddit",
+        "channel": "softwaretesting",
+        "title": "Playwright is significantly better than Selenium.",
+        "excerpt": "never been pegged b4 but its my understanding that the experience actually lands on the opposite end to “pain only”"
+      },
+      "verdict": "maybe",
+      "status": "scored",
+      "inputTokens": 575,
+      "outputTokens": 125
+    },
+    {
+      "kind": "comment",
+      "thread": "statement-post",
+      "id": "ol8x3k0",
+      "role": "answering",
+      "item": {
+        "source": "reddit",
+        "channel": "softwaretesting",
+        "title": "Playwright is significantly better than Selenium.",
+        "excerpt": "Personally, I don't like the fact that Playwright doesn't have the option of running tests on real Safari\n\n .\n\n WebKit\n\n is not the same as real Safari. It's like saying Edge, Chrome and Brave are identical because they use chromium, and yet everyone has seen bugs that only appear on one of them.\n\n I work at the software department of a major global airline, we can't risk not running regression tests on actual Safari, since a certain percentage of the paying users are on that browser.\n\n We were using Selenium until 2 years ago, and we never had any \"flaky\" situations, because we knew how to add waits correctly (without being wasteful). We were very happy with it.\n\n But the department director wanted us to move to one of those \"smart AI\" testing tools, we did a long POC, it turned out ok, and here we are.\n\n I miss writing Selenium code, but the upside is that now more devs and testers are contributing to the tests.\n\n If I were to change jobs and go to a smaller company that doesn't give a crap if their customers can't use their product on Safari, I'd be happy to work with Playwright."
+      },
+      "verdict": "no",
+      "status": "scored",
+      "inputTokens": 786,
+      "outputTokens": 88
+    },
+    {
+      "kind": "comment",
+      "thread": "statement-post",
+      "id": "olbbikf",
+      "role": "asking",
+      "item": {
+        "source": "reddit",
+        "channel": "softwaretesting",
+        "title": "Playwright is significantly better than Selenium.",
+        "excerpt": "What AI tool did you guys move to?"
+      },
+      "verdict": "yes",
+      "status": "scored",
+      "inputTokens": 560,
+      "outputTokens": 108
+    },
+    {
+      "kind": "comment",
+      "thread": "statement-post",
+      "id": "ol89mvy",
+      "role": "answering",
+      "item": {
+        "source": "reddit",
+        "channel": "softwaretesting",
+        "title": "Playwright is significantly better than Selenium.",
+        "excerpt": "No, Selenium is not better at anything."
+      },
+      "verdict": "no",
+      "status": "scored",
+      "inputTokens": 560,
+      "outputTokens": 43
+    },
+    {
+      "kind": "comment",
+      "thread": "statement-post",
+      "id": "ol8bgxg",
+      "role": "neither",
+      "item": {
+        "source": "reddit",
+        "channel": "softwaretesting",
+        "title": "Playwright is significantly better than Selenium.",
+        "excerpt": "I shall agree"
+      },
+      "verdict": "maybe",
+      "status": "scored",
+      "inputTokens": 554,
+      "outputTokens": 83
+    },
+    {
+      "kind": "comment",
+      "thread": "statement-post",
+      "id": "ol8d2zy",
+      "role": "answering",
+      "item": {
+        "source": "reddit",
+        "channel": "softwaretesting",
+        "title": "Playwright is significantly better than Selenium.",
+        "excerpt": "Yep, playwright you can wake up and check test results and not see 7 random stale element exceptions\n\n . Selenium is just a dud in comparison."
+      },
+      "verdict": "no",
+      "status": "scored",
+      "inputTokens": 581,
+      "outputTokens": 76
+    },
+    {
+      "kind": "comment",
+      "thread": "statement-post",
+      "id": "ol8q5io",
+      "role": "answering",
+      "item": {
+        "source": "reddit",
+        "channel": "softwaretesting",
+        "title": "Playwright is significantly better than Selenium.",
+        "excerpt": "The only benefit works be for mobile testing\n\n with native apps"
+      },
+      "verdict": "no",
+      "status": "scored",
+      "inputTokens": 563,
+      "outputTokens": 92
+    },
+    {
+      "kind": "comment",
+      "thread": "statement-post",
+      "id": "ol90pbe",
+      "role": "asking",
+      "item": {
+        "source": "reddit",
+        "channel": "softwaretesting",
+        "title": "Playwright is significantly better than Selenium.",
+        "excerpt": "I thought detox was useful there. Is it not?"
+      },
+      "verdict": "maybe",
+      "status": "scored",
+      "inputTokens": 562,
+      "outputTokens": 123
+    },
+    {
+      "kind": "comment",
+      "thread": "statement-post",
+      "id": "ol914sx",
+      "role": "answering",
+      "item": {
+        "source": "reddit",
+        "channel": "softwaretesting",
+        "title": "Playwright is significantly better than Selenium.",
+        "excerpt": "If the app is react yes but not older apps"
+      },
+      "verdict": "no",
+      "status": "scored",
+      "inputTokens": 561,
+      "outputTokens": 101
+    },
+    {
+      "kind": "comment",
+      "thread": "statement-post",
+      "id": "ol9yf8s",
+      "role": "asking",
+      "item": {
+        "source": "reddit",
+        "channel": "softwaretesting",
+        "title": "Playwright is significantly better than Selenium.",
+        "excerpt": "Can you please explain further, I'm currently testing a native android app and am looking for alternatives for auto testing native android apps"
+      },
+      "verdict": "no",
+      "status": "scored",
+      "inputTokens": 575,
+      "outputTokens": 60
+    },
+    {
+      "kind": "comment",
+      "thread": "statement-post",
+      "id": "ol9z4u7",
+      "role": "answering",
+      "item": {
+        "source": "reddit",
+        "channel": "softwaretesting",
+        "title": "Playwright is significantly better than Selenium.",
+        "excerpt": "playwright uses chrome and tests inside the browser so impossible to use. theres a tool called appium that lives on selenium that can be used for mobile native apps. detox is a newer testing tool but its only for react apps"
+      },
+      "verdict": "no",
+      "status": "scored",
+      "inputTokens": 596,
+      "outputTokens": 53
+    },
+    {
+      "kind": "comment",
+      "thread": "statement-post",
+      "id": "olagnxd",
+      "role": "answering",
+      "item": {
+        "source": "reddit",
+        "channel": "softwaretesting",
+        "title": "Playwright is significantly better than Selenium.",
+        "excerpt": "Just FYI, you can eliminate the issue of chrome version chromedriver mismatches by letting selenium handle that for you:\n\nfrom webdriver_manager.chrome import ChromeDriverManager\n\nChromeDriverManager.install()"
+      },
+      "verdict": "no",
+      "status": "scored",
+      "inputTokens": 589,
+      "outputTokens": 44
+    },
+    {
+      "kind": "comment",
+      "thread": "statement-post",
+      "id": "olb2kzv",
+      "role": "answering",
+      "item": {
+        "source": "reddit",
+        "channel": "softwaretesting",
+        "title": "Playwright is significantly better than Selenium.",
+        "excerpt": "Selenium is low level protocol, whereas pw is testing (yes) framework, wtf are you people even talking about  ."
+      },
+      "verdict": "no",
+      "status": "scored",
+      "inputTokens": 577,
+      "outputTokens": 130
+    },
+    {
+      "kind": "comment",
+      "thread": "statement-post",
+      "id": "ol8revd",
+      "role": "neither",
+      "item": {
+        "source": "reddit",
+        "channel": "softwaretesting",
+        "title": "Playwright is significantly better than Selenium.",
+        "excerpt": "Pretends to be surprised"
+      },
+      "verdict": "no",
+      "status": "scored",
+      "inputTokens": 556,
+      "outputTokens": 61
+    },
+    {
+      "kind": "comment",
+      "thread": "statement-post",
+      "id": "ol8rewp",
+      "role": "answering",
+      "item": {
+        "source": "reddit",
+        "channel": "softwaretesting",
+        "title": "Playwright is significantly better than Selenium.",
+        "excerpt": "You clearly just had no idea how to use selenium properly."
+      },
+      "verdict": "no",
+      "status": "scored",
+      "inputTokens": 563,
+      "outputTokens": 16
+    },
+    {
+      "kind": "comment",
+      "thread": "statement-post",
+      "id": "olae9yt",
+      "role": "answering",
+      "item": {
+        "source": "reddit",
+        "channel": "softwaretesting",
+        "title": "Playwright is significantly better than Selenium.",
+        "excerpt": "I can't tell if this is sarcasm or not, but I somewhat agree. I think people should just use the right tool for the job."
+      },
+      "verdict": "no",
+      "status": "scored",
+      "inputTokens": 580,
+      "outputTokens": 86
+    },
+    {
+      "kind": "comment",
+      "thread": "statement-post",
+      "id": "olb0mu5",
+      "role": "asking",
+      "item": {
+        "source": "reddit",
+        "channel": "softwaretesting",
+        "title": "Playwright is significantly better than Selenium.",
+        "excerpt": "How much time does it take to learn playwright?"
+      },
+      "verdict": "maybe",
+      "status": "scored",
+      "inputTokens": 561,
+      "outputTokens": 122
+    },
+    {
+      "kind": "comment",
+      "thread": "statement-post",
+      "id": "ole3xtg",
+      "role": "answering",
+      "item": {
+        "source": "reddit",
+        "channel": "softwaretesting",
+        "title": "Playwright is significantly better than Selenium.",
+        "excerpt": "Not very, especially if you're familiar with selenium, the docs for PW are very clear and easy to navigate."
+      },
+      "verdict": "no",
+      "status": "scored",
+      "inputTokens": 573,
+      "outputTokens": 91
+    },
+    {
+      "kind": "comment",
+      "thread": "statement-post",
+      "id": "olbiliu",
+      "role": "answering",
+      "item": {
+        "source": "reddit",
+        "channel": "softwaretesting",
+        "title": "Playwright is significantly better than Selenium.",
+        "excerpt": "Selenium requires you to know things like driver manager, waits e.t.c. PW is more noob friendly. But I think PW is faster, because of direct browser interaction"
+      },
+      "verdict": "no",
+      "status": "scored",
+      "inputTokens": 586,
+      "outputTokens": 41
+    },
+    {
+      "kind": "comment",
+      "thread": "statement-post",
+      "id": "olcb4w9",
+      "role": "answering",
+      "item": {
+        "source": "reddit",
+        "channel": "softwaretesting",
+        "title": "Playwright is significantly better than Selenium.",
+        "excerpt": "Having worked with both i agree, i can also add that tests seem a lot less flaky. Things selenium suddenly cant find one day and can find again the next day is something i have yet to experience in Playwright"
+      },
+      "verdict": "maybe",
+      "status": "scored",
+      "inputTokens": 594,
+      "outputTokens": 232
+    },
+    {
+      "kind": "comment",
+      "thread": "statement-post",
+      "id": "om7nsn8",
+      "role": "answering",
+      "item": {
+        "source": "reddit",
+        "channel": "softwaretesting",
+        "title": "Playwright is significantly better than Selenium.",
+        "excerpt": "Ultimately playwright is a Microsoft hack with lots of limitations: WebKit and not safari, browsers tied to playwright versions causing a lag, emulated mobile (not even simulated FFS) amongst others.\n\n Playwright is hobby grade useful for noobs and startups where quality is an after thought.\n\n Ultimately if you prefer playwright over selenium it's a skill issue. Hell I'd even go with selenium just because BiDi is w3c."
+      },
+      "verdict": "no",
+      "status": "scored",
+      "inputTokens": 635,
+      "outputTokens": 43
+    },
+    {
+      "kind": "post",
+      "thread": "plan-examples",
+      "id": "low-intent",
+      "role": null,
+      "item": {
+        "source": "reddit",
+        "channel": "webdev",
+        "title": "Playwright is awesome",
+        "excerpt": "Playwright is awesome."
+      },
+      "verdict": "maybe",
+      "status": "scored",
+      "inputTokens": 553,
+      "outputTokens": 91
+    },
+    {
+      "kind": "post",
+      "thread": "plan-examples",
+      "id": "mild-problem-signal",
+      "role": null,
+      "item": {
+        "source": "reddit",
+        "channel": "QualityAssurance",
+        "title": "Tests break on every UI change",
+        "excerpt": "Our Playwright tests break whenever the UI changes."
+      },
+      "verdict": "yes",
+      "status": "scored",
+      "inputTokens": 561,
+      "outputTokens": 83
+    },
+    {
+      "kind": "post",
+      "thread": "plan-examples",
+      "id": "strong-intent",
+      "role": null,
+      "item": {
+        "source": "reddit",
+        "channel": "QualityAssurance",
+        "title": "Is there something easier?",
+        "excerpt": "Our Playwright suite is becoming impossible to maintain. Is there something easier?"
+      },
+      "verdict": "yes",
+      "status": "scored",
+      "inputTokens": 564,
+      "outputTokens": 16
+    },
+    {
+      "kind": "post",
+      "thread": "plan-examples",
+      "id": "very-strong-intent",
+      "role": null,
+      "item": {
+        "source": "reddit",
+        "channel": "SaaS",
+        "title": "What are other small teams using?",
+        "excerpt": "We're a four-person SaaS and still manually test signup and checkout every release. What tools are other small teams using?"
+      },
+      "verdict": "yes",
+      "status": "scored",
+      "inputTokens": 575,
+      "outputTokens": 16
+    }
+  ]
+}

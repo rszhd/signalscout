@@ -169,6 +169,13 @@
       "when": 1788628729733,
       "tag": "0023_a_scored_post_records_its_monitor_version",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1788628789733,
+      "tag": "0024_add_triage_stage",
+      "breakpoints": true
     }
   ]
 }

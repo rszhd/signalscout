@@ -58,6 +58,19 @@ no cost — which reads as *we cannot say*, not as *free*. The amount is small:
 an embedding costs about one hundredth of a classification, which is why the
 stage saves money at all.
 
+**Triage is a model call, not a free stage.** The pre-filter's third stage asks
+a cheap model about every item the first two kept, so it spends money on the
+items it keeps as well as the ones it drops. It is worth it because its answer
+is one word: a classification returns about 95 output tokens and a triage
+answer about six, and output is priced roughly five times input. Measured over
+46 real comments it kept 21 and dropped 21 of the 26 people answering.
+
+It has the same "no price until you set one" behaviour as an embedding.
+`AI_TRIAGE_INPUT_PRICE_MICROS` and `AI_TRIAGE_OUTPUT_PRICE_MICROS` fall back to
+the classifier's prices only while no separate triage model is named. Once one
+is, they do not fall back, because a cheaper model billed at the classifier's
+rate would report a saving that never happened.
+
 This is why every amount on a screen is labelled *estimated*, and why the
 figure is deliberately printed to four decimal places rather than rounded to
 cents: ten Reddit records cost $0.015, and a page that rounded that to two
@@ -94,13 +107,19 @@ bills records and returns nothing. A ledger that skipped those could not tell
 the second is a bug while the first is a Tuesday.
 
 `model_calls` holds one row per call to a model — classification, query
-generation and the pre-filter's embeddings alike — including the ones that were
-refused. A refusal is billed like an answer.
+generation, triage and the pre-filter's embeddings alike — including the ones
+that were refused. A refusal is billed like an answer.
 
-The `purpose` column is what makes the three tellable apart, and they are three
+The `purpose` column is what makes the four tellable apart, and they are four
 different prices. One embedding call covers a batch of posts, so it carries the
 monitor and no single post: it is on the monitor's bill, which is where the cap
-reads it.
+reads it. A triage call is about one item and carries it, like a
+classification.
+
+Triage and classification are often the same model, so nothing but that column
+can tell them apart. Without it a bill would report the cheap stage's calls at
+the expensive stage's rate, and the one number the stage exists to prove — what
+it saved — could not be read at all.
 
 `estimated_cost_micros` is null on a model call whose price is not configured.
 Null means *we cannot say*, and it is counted as nothing rather than guessed.
@@ -256,10 +275,18 @@ is a plan that stops collecting before the month ends.
 
 ## The pre-filter is a cost control, and it is also a risk
 
-Between collection and the model sits a filter with two stages: a free keyword
-and subreddit match, then a similarity comparison that costs one embedding per
-post. Both exist to keep the model bill down, and the second one pays for
-itself as soon as it drops a few posts in a hundred.
+Between collection and the model sits a filter with three stages: a free
+keyword and subreddit match, then a similarity comparison that costs one
+embedding per post, then triage, which asks a cheap model one question about
+each item that survived. All three exist to keep the model bill down. The
+second pays for itself as soon as it drops a few posts in a hundred; the third
+is a model call, so it is cheap only next to a classification.
+
+The third stage exists because the first two measure *subject*, and under a
+post about the right subject the people answering it are on subject too. No
+similarity threshold separates a person asking from the experts replying — that
+was measured over two real threads — so the job falls to something that can
+read.
 
 The risk runs the other way. **A threshold set too high drops good leads where
 nobody can see it.** An empty inbox looks the same whether the week was quiet
@@ -272,7 +299,12 @@ or the filter ate it. So three things are true by design:
 - Every drop is written to `filter_drops` with the similarity that caused it,
   so the threshold can be argued with using real data.
 - The Monitors screen shows how many posts each stage has kept from the model,
-  and the whole filter can be turned off per monitor.
+  and the whole filter can be turned off per monitor. Turning it off turns
+  triage off too: it is one of the filter's stages.
+- Triage has no threshold to argue with, so its drops are the ones to read
+  rather than to count. Only an explicit refusal drops an item — a timeout, a
+  rate limit or an unreachable provider all pass it on — and every refusal is a
+  `filter_drops` row.
 
 An embedding that fails never drops a post. The post goes to the model instead,
 which costs more and hides nothing.

@@ -8,10 +8,28 @@
  * 2. **Embedding similarity.** One embedding of the monitor's description,
  *    reused until the monitor is edited, and one batch for the posts that got
  *    this far. `pgvector` measures the distance.
+ * 3. **Triage.** US-030. A cheap model reads what survived and answers one
+ *    question: could this author be a person to reach? `ai/triage.ts` holds
+ *    it.
  *
  * An embedding costs about one hundredth of a classification, so the second
  * stage pays for itself as soon as it drops a few posts in a hundred. That is
  * the arithmetic PLAN.md's bring-your-own-key promise rests on.
+ *
+ * The third stage is not that arithmetic and must not be read as it. Triage is
+ * a model call, so it is expensive next to an embedding and cheap only next to
+ * a classification. It is here because the two stages above it measure
+ * *subject*, and under a post about the right subject the people answering are
+ * on subject too. US-029 measured that: no similarity threshold separates a
+ * person asking from the experts replying, in either direction, so the job
+ * falls to something that can read.
+ *
+ * **Triage runs inside `pass`, and that is deliberate.** This step has five
+ * exits — no embedder, no monitor vector, an embedding call that failed, an
+ * empty keep list, and the ordinary end — and every one of them must reach the
+ * new stage. docs/testing.md: a rule is only as tested as its least-tested
+ * caller. Putting the stage at the one place they all go through leaves no
+ * caller to forget it.
  *
  * **Every failure here fails open.** No embedder configured, a provider
  * outage, a model of the wrong width, a monitor that vanished mid-job: the
@@ -27,8 +45,10 @@
  */
 import { and, eq, inArray, isNotNull, sql } from "drizzle-orm";
 import type { Embedder } from "../ai/embed.js";
+import type { MonitorProfile } from "../ai/prompt.js";
 import { recordModelCall } from "../ai/record.js";
-import { monitors, posts } from "../db/schema.js";
+import type { Triager } from "../ai/triage.js";
+import { monitors, posts, type Signal } from "../db/schema.js";
 import { monitorDescriptionText, postEmbeddingText } from "../filter/description.js";
 import { type FilterDrop, recordFilterDrops } from "../filter/drops.js";
 import { keepsPost, keywordRuleFor } from "../filter/keywords.js";
@@ -44,6 +64,16 @@ export interface FilterOptions {
    * still runs and everything it keeps reaches the classifier.
    */
   readonly embedder?: Embedder;
+  /**
+   * Absent only in a test that is not about triage.
+   *
+   * Unlike the embedder above, production always has one: `ai/config.ts` falls
+   * every triage setting back to the classifier's, so a deployment that
+   * configures nothing still gets the stage on the model it already has. A
+   * stage that is off drops nothing, which is safe, but it also saves nothing,
+   * and on a comment this is the only paid stage in front of the classifier.
+   */
+  readonly triager?: Triager;
 }
 
 /** A post as both stages read it, which is a row minus what neither needs. */
@@ -62,7 +92,7 @@ function vectorLiteral(embedding: readonly number[]): string {
   return `[${embedding.join(",")}]`;
 }
 
-export function createFilterStep({ embedder }: FilterOptions = {}): Step<FilterPayload> {
+export function createFilterStep({ embedder, triager }: FilterOptions = {}): Step<FilterPayload> {
   return async function filter(
     { monitorId, postIds },
     { db, boss, logger }: StepContext,
@@ -84,14 +114,89 @@ export function createFilterStep({ embedder }: FilterOptions = {}): Step<FilterP
     }
 
     /** Everything that is still going to the model, and why the rest is not. */
-    const pass = async (survivors: readonly string[], drops: readonly FilterDrop[]) => {
+    const deliver = async (survivors: readonly string[], drops: readonly FilterDrop[]) => {
       await recordFilterDrops(db, monitorId, drops);
       await boss.send(classifyQueue, { monitorId, postIds: [...survivors] });
     };
 
+    /**
+     * Triage, then deliver. Every exit below goes through here.
+     *
+     * **Only an explicit `no` drops.** `ai/triage.ts` decides that and this
+     * loop never second-guesses it: a timeout, a refusal, a rate limit or an
+     * unreachable provider all come back as `kept`, and the item goes on. The
+     * asymmetry is the same one the embedding stage above is built on, and it
+     * is sharper here because there is no threshold to inspect afterwards —
+     * a refused item leaves one `filter_drops` row and nothing else.
+     *
+     * The call is per item, because one item is one question and a batch would
+     * make one model answer decide several. That is the expensive shape and
+     * the honest one.
+     */
+    const pass = async (survivors: readonly Candidate[], drops: FilterDrop[]) => {
+      if (!triager || survivors.length === 0) {
+        if (!triager) {
+          logger.debug({ monitorId }, "the triage stage is not running: no triager was given");
+        }
+        await deliver(
+          survivors.map((candidate) => candidate.id),
+          drops,
+        );
+        return;
+      }
+
+      const profile: MonitorProfile = {
+        product: monitor.product,
+        idealCustomer: monitor.idealCustomer,
+        problem: monitor.problem,
+        signals: monitor.signals as readonly Signal[],
+      };
+
+      const survived: string[] = [];
+      let triageSpentMicros = 0;
+      let unanswered = 0;
+
+      for (const candidate of survivors) {
+        const outcome = await triager.triage({ monitor: profile, post: candidate });
+
+        triageSpentMicros += outcome.call.estimatedCostMicros ?? 0;
+        if (outcome.verdict === null) unanswered += 1;
+
+        await recordModelCall(db, {
+          purpose: "triage",
+          outcome: outcome.status,
+          call: outcome.call,
+          monitorId,
+          postId: candidate.id,
+          error: outcome.error ?? null,
+        });
+
+        if (outcome.kept) survived.push(candidate.id);
+        else drops.push({ postId: candidate.id, stage: "triage", similarity: null });
+      }
+
+      logger.info(
+        {
+          monitorId,
+          posts: survivors.length,
+          kept: survived.length,
+          droppedByTriage: survivors.length - survived.length,
+          unanswered,
+          spentMicros: triageSpentMicros,
+          model: triager.model,
+        },
+        "triage finished",
+      );
+
+      await deliver(survived, drops);
+    };
+
     if (!monitor.preFilterEnabled) {
+      // The person turned the pre-filter off, and triage is one of its stages.
+      // Running it anyway would be this product deciding that one of the three
+      // does not count as filtering, which is not a decision it gets to make.
       logger.info({ monitorId, posts: ids.length }, "pre-filter is off for this monitor");
-      await pass(ids, []);
+      await deliver(ids, []);
       return;
     }
 
@@ -154,7 +259,7 @@ export function createFilterStep({ embedder }: FilterOptions = {}): Step<FilterP
         { monitorId, posts: candidates.length, kept: kept.length, droppedByKeyword: drops.length },
         "pre-filter finished",
       );
-      await pass(keptIds, drops);
+      await pass(kept, drops);
       return;
     }
 
@@ -221,7 +326,7 @@ export function createFilterStep({ embedder }: FilterOptions = {}): Step<FilterP
         { monitorId, posts: candidates.length, kept: kept.length, droppedByKeyword: drops.length },
         "pre-filter finished without its embedding stage",
       );
-      await pass(keptIds, drops);
+      await pass(kept, drops);
       return;
     }
 
@@ -255,7 +360,7 @@ export function createFilterStep({ embedder }: FilterOptions = {}): Step<FilterP
           },
           "pre-filter finished without its embedding stage",
         );
-        await pass(keptIds, drops);
+        await pass(kept, drops);
         return;
       }
 
@@ -285,7 +390,7 @@ export function createFilterStep({ embedder }: FilterOptions = {}): Step<FilterP
       .where(and(inArray(posts.id, keptIds), isNotNull(posts.embedding)));
 
     const similarities = new Map(scored.map((row) => [row.id, Number(row.similarity)]));
-    const survivors: string[] = [];
+    const survivors: Candidate[] = [];
     let unmeasured = 0;
 
     for (const candidate of kept) {
@@ -295,11 +400,11 @@ export function createFilterStep({ embedder }: FilterOptions = {}): Step<FilterP
       // was skipped above. It goes to the model, like every other failure.
       if (similarity === undefined) {
         unmeasured += 1;
-        survivors.push(candidate.id);
+        survivors.push(candidate);
         continue;
       }
 
-      if (similarity >= monitor.similarityThreshold) survivors.push(candidate.id);
+      if (similarity >= monitor.similarityThreshold) survivors.push(candidate);
       else drops.push({ postId: candidate.id, stage: "embedding", similarity });
     }
 

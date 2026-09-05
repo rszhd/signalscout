@@ -35,6 +35,12 @@ export interface AiConfig {
 
 /** The environment variables this reads, named structurally so nothing cycles. */
 export interface AiEnvironment {
+  readonly AI_TRIAGE_MODEL?: string;
+  readonly AI_TRIAGE_PROVIDER?: AiProvider;
+  readonly AI_TRIAGE_API_KEY?: string;
+  readonly AI_TRIAGE_BASE_URL?: string;
+  readonly AI_TRIAGE_INPUT_PRICE_MICROS?: number;
+  readonly AI_TRIAGE_OUTPUT_PRICE_MICROS?: number;
   readonly AI_PROVIDER: AiProvider;
   readonly AI_MODEL: string;
   readonly AI_API_KEY?: string;
@@ -156,5 +162,49 @@ export function embeddingConfigFromEnvironment(env: AiEnvironment): EmbeddingCon
     // second variable would be one more thing to set for no decision.
     timeoutMs: env.AI_TIMEOUT_MS,
     pricePerMillionTokensMicros: env.AI_EMBEDDING_PRICE_MICROS,
+  };
+}
+
+/**
+ * The triage settings. Always present, because triage always runs.
+ *
+ * This is the one place US-030 deliberately differs from the embedding block
+ * above. An embedding stage that is not configured does not run, and that is
+ * safe: a stage which is off drops nothing. Triage is the opposite. On a
+ * comment it is the only paid stage in front of the classifier, so a
+ * deployment that has not configured it must still get the stage — on the
+ * classifier's own model, which is always configured.
+ *
+ * So every field falls back to the classifier's, and a deployment that sets
+ * nothing runs triage and classification on one model with one key. That is
+ * not a cost saving; the saving comes from the short answer, which is where
+ * most of it was anyway. Naming a cheaper model here is how the rest is taken.
+ *
+ * The key is reused only when the provider is the same, for the reason the
+ * embedding block gives: an Anthropic key sent to OpenAI fails every call and
+ * the sentence a person reads points at the wrong thing.
+ */
+export function triageConfigFromEnvironment(env: AiEnvironment): AiConfig {
+  const provider = env.AI_TRIAGE_PROVIDER ?? env.AI_PROVIDER;
+  const sameProvider = provider === env.AI_PROVIDER;
+
+  return {
+    provider,
+    model: env.AI_TRIAGE_MODEL ?? env.AI_MODEL,
+    apiKey: env.AI_TRIAGE_API_KEY ?? (sameProvider ? env.AI_API_KEY : undefined),
+    baseUrl: env.AI_TRIAGE_BASE_URL ?? (sameProvider ? env.AI_BASE_URL : undefined),
+    // The classifier's timeout. Triage is the shorter call of the two, so a
+    // limit that suits the long one suits this one, and a second variable
+    // would be one more thing to set for no decision.
+    timeoutMs: env.AI_TIMEOUT_MS,
+    // The price falls back only with the model. A cheaper triage model priced
+    // at the classifier's rate would report a saving that did not happen,
+    // which is the one number this stage exists to prove.
+    inputPriceMicros: env.AI_TRIAGE_MODEL
+      ? env.AI_TRIAGE_INPUT_PRICE_MICROS
+      : (env.AI_TRIAGE_INPUT_PRICE_MICROS ?? env.AI_INPUT_PRICE_MICROS),
+    outputPriceMicros: env.AI_TRIAGE_MODEL
+      ? env.AI_TRIAGE_OUTPUT_PRICE_MICROS
+      : (env.AI_TRIAGE_OUTPUT_PRICE_MICROS ?? env.AI_OUTPUT_PRICE_MICROS),
   };
 }

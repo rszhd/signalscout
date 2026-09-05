@@ -374,6 +374,43 @@ title's own 0.3892 — the same pure cost as before.
 Both threads and both label files are committed, and
 `capture:comment-filter statement-post` re-runs the second.
 
+**A cheap model now reads everything before the good one does.** US-030 built
+the triage stage on 2026-09-06. It is the pre-filter's third stage, it asks one
+question — could this author be a person to reach? — and it answers in one word
+with no reasons, because output tokens are priced about five times input and a
+classification spends 95 of them. It runs inside the filter step's `pass`,
+which is where all five of that step's exits go, so no exit can forget it.
+
+**Only an explicit `no` drops.** A timeout, a refusal, a malformed answer, a
+rate limit and an unreachable provider all pass the item on. This stage decides
+what the classifier never reads, so its failure is a lead deleted with no row,
+no inbox entry and nothing anyone would notice — the same asymmetry the
+embedding stage is built on, and sharper here because there is no threshold to
+inspect afterwards.
+
+`AI_TRIAGE_MODEL` and its four companions fall back to the classifier's, so a
+deployment that sets nothing still gets the stage on the model it already has.
+The price does not fall back once a triage model is named: a cheap model billed
+at the classifier's rate would report a saving that did not happen.
+
+**It has met a real model, over 46 hand-labelled comments.** `capture:triage`
+asked `openai/gpt-5.6-luna` about every comment US-029 labelled, plus PLAN.md's
+four worked examples: fifty calls, 29,999 input and 5,677 output tokens. It
+kept 21 of 46 comments, **dropped 21 of the 26 people answering**, and kept all
+three worked examples PLAN.md scores as leads. The cost is unknown, because
+`provider.ts` prices only the three Claude models and no override is set — the
+same "we cannot say" an unpriced embedding already records.
+
+Two findings travel with it. It refused one of the four people asking, and that
+one asks for a way to test a **native Android app** while the monitor sells a
+browser test runner — so the hand label and the verdict disagree for a reason,
+because `asking` answers "is this person asking?" and triage is asked "could
+this be a person to reach?". The instrument claimed those were the same question
+on its first run and was corrected. And 13 of 16 jokes and notices survived,
+including a `[deleted]` body and a moderator's vendor-spam notice: the stage is
+lenient on noise and firm on experts, which is the safe direction and the next
+thing to attack. Two threads and one monitor is not a distribution.
+
 **The classifier has met a real model, and its fixtures are current.**
 `capture:classifier` ran on 2026-09-05 against the system prompt US-010
 shipped, and recorded 7, 64, 86 and 96 for PLAN.md's four worked examples,
@@ -682,6 +719,7 @@ pnpm --filter @intentwatch/core capture:classifier   # spends money; see below
 pnpm --filter @intentwatch/core capture:queries      # spends money; see below
 pnpm --filter @intentwatch/core capture:embeddings   # spends money; see below
 pnpm --filter @intentwatch/core capture:comment-filter # spends money; see below
+pnpm --filter @intentwatch/core capture:triage        # spends money; see below
 pnpm --filter @intentwatch/core live:provider-switch # spends ~$0.08; see below
 pnpm --filter @intentwatch/core live:linkedin-poll   # spends ~$0.08 + model; see below
 pnpm capture:deletions                            # spends ~$0.02; see below
@@ -689,7 +727,7 @@ pnpm capture:deletions                            # spends ~$0.02; see below
 node packages/core/src/sources/providers/socialcrawl/linkedin-fixtures/capture.mjs   # ~30 credits
 ```
 
-These eight are the only commands here that spend money, and all eight are
+These nine are the only commands here that spend money, and all nine are
 instruments: they ask a real provider something and record what it said,
 because an answer we wrote would be evidence about our own schema and none
 about the provider.
@@ -702,6 +740,15 @@ justify the default `min_score`. Four short calls.
 records them. One short call. Read its output rather than trusting it: two
 failures are invisible to the schema, a subreddit that does not exist and eight
 queries that are one query written eight ways.
+
+`capture:triage` asks a real model to triage all 46 comments US-029 labelled by
+hand and PLAN.md's four worked examples, and records the answers as the fixtures
+`ai/triage-examples.test.ts` replays. Fifty short calls, one word back each. It
+prints the two numbers that decide the stage: how many people asking it kept and
+how many people answering it dropped. Read the first one rather than counting
+it — a person asking for a native-app tool is asking, and a monitor selling a
+browser test runner should not reach them, so a refusal there is not
+automatically a fault.
 
 `capture:embeddings` measures how near each of PLAN.md's five posts is to the
 example monitor, and records the similarities — not the vectors, which would be

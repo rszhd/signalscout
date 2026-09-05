@@ -21,7 +21,11 @@ server half added the query generator, the monitor writes and the routes, so a
 monitor is now an HTTP call rather than an `INSERT`. US-011 added the inbox, so
 a match is read back out, ordered by score and age together. US-013 added the
 budget guard, so a poll is refused before it spends past a monitor's monthly
-cap, and every billed page is written to `api_usage` as it comes back. Two
+cap, and every billed page is written to `api_usage` as it comes back. US-014
+added the cost test, so the monitor form runs each query once against a small
+sample and says what a month of it would cost before the monitor starts.
+BUG-002, found by that test's first live run, stopped a seven-day window being
+bought as a month. Two
 steps are still placeholders: US-008 owns the pre-filter, so every post reaches
 the model, and US-016 owns the notification. `apps/web` now has three screens,
 the monitor form, the inbox and the monitor list, and no screen for
@@ -86,7 +90,9 @@ That run also measured what nobody had measured. A monitor left at the
 60-second floor triggered a collection every minute, and each one billed 9 to
 11 records and returned no posts, because everything it found was older than
 the last poll. Poll frequency is a cost dial. US-013 turned half of that lesson
-into a limit; US-014 owns the other half.
+into a limit; US-014 turned the other half into arithmetic — polls a month is
+the multiplier, so the same query costs $10.80 a month polled hourly and $648
+polled every minute.
 
 **The budget guard has never refused a real poll.** US-013's arithmetic, its
 cap and its two exhausted behaviours are asserted against real Postgres and a
@@ -99,7 +105,27 @@ been checked against an invoice. Say the spend is an estimate, because
 **A cap can be overshot by one poll.** The guard runs before a poll, because a
 page is billed when it is fetched. It cannot know what that poll will cost, so
 a monitor at $9.99 of a $10.00 cap starts one more poll. `maxPagesPerPoll`
-bounds the overshoot; US-014 is what removes it.
+bounds the overshoot. US-014 does not remove it and was never going to: what
+the cost test changes is that a person is shown the size of the thing before
+they start it.
+
+**The cost test has run once, and the run corrected it.** On 2026-09-05 three
+samples were collected live for $0.042. The trigger, the wait, the cursor, the
+resume and the unattributed `api_usage` row all worked. The arithmetic did not:
+it projected from the posts a sample kept, and the provider bills the records
+it collects. A query that had just cost ten records was reported as free.
+
+It now projects from `unitsConsumed`, and reports a range whenever a sample was
+billed everything it asked for, because one sample of ten cannot say what a
+poll of fifty costs. **Cost comes from units and volume comes from posts. Never
+price anything from a post count** — that is the mistake, it cost $0.042 to
+find, and the interface has carried `unitsConsumed` for exactly this reason
+since US-003.
+
+A second run, after BUG-002 was fixed, verified the window: the same keyword
+kept all ten posts inside seven days, where it had kept none. What is still
+unproven is that a keyword sample of ten predicts a keyword poll of fifty. The
+range is an admission of that, not a measurement of it.
 
 ---
 

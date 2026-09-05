@@ -53,6 +53,10 @@ describe("the budget guard", () => {
   afterEach(async () => {
     await db.delete(modelCalls);
     await db.delete(monitors);
+    // A usage row that belongs to a monitor goes with it. One that belongs to
+    // no monitor — US-014's cost test — outlives every monitor, which is
+    // correct and is why this line exists.
+    await db.delete(apiUsage);
   });
 
   describe("recording what a source spent", () => {
@@ -93,6 +97,40 @@ describe("the budget guard", () => {
       expect(rows).toHaveLength(1);
       expect(rows[0]?.units).toBe(14);
       expect(rows[0]?.estimatedCostMicros).toBe(21_000);
+    });
+
+    it("records a call that belongs to no monitor, and keeps it off every cap", async () => {
+      // US-014's cost test runs before the monitor exists, which is the point
+      // of it. The row is on the bill and on no monitor's cap, the same as a
+      // query the model wrote from the same form.
+      const monitorId = await insertMonitor(database);
+
+      await recordSourceUsage(db, {
+        monitorId: null,
+        source: "reddit",
+        units: 10,
+        pricePerUnitMicros: redditPricePerRecord,
+        now: march,
+      });
+      await recordSourceUsage(db, {
+        monitorId: null,
+        source: "reddit",
+        units: 4,
+        pricePerUnitMicros: redditPricePerRecord,
+        now: march,
+      });
+
+      const rows = await db.select().from(apiUsage);
+
+      // One row, not two. Postgres counts two nulls as different unless the
+      // constraint says otherwise, and a row per press of a button would grow
+      // this table without limit.
+      expect(rows).toHaveLength(1);
+      expect(rows[0]?.monitorId).toBeNull();
+      expect(rows[0]?.units).toBe(14);
+
+      expect((await monitorSpend(db, monitorId, march)).totalMicros).toBe(0);
+      expect((await spendByMonitor(db, march)).get(monitorId)?.sourceMicros).toBe(0);
     });
 
     it("keeps a day, a source and a monitor apart", async () => {

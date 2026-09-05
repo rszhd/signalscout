@@ -348,6 +348,46 @@ describe("the monitor routes", () => {
       });
     });
 
+    it("sets the cap with the monitor, not a moment after it", async () => {
+      // US-014's form knows the cap before it creates anything: the cost test
+      // was measured against it. A monitor created and capped in a second
+      // request is a monitor the scheduler could poll in between, uncapped.
+      await withServer({}, async (app) => {
+        const response = await app.inject({
+          method: "POST",
+          url: "/api/monitors",
+          payload: {
+            ...newMonitor,
+            budget: { monthlyCapMicros: 10_000_000, onExhausted: "notify" },
+          },
+        });
+
+        expect(response.statusCode).toBe(201);
+        expect(response.json().budget).toEqual({
+          monthlyCapMicros: 10_000_000,
+          onExhausted: "notify",
+        });
+        expect(response.json().spend.remainingMicros).toBe(10_000_000);
+      });
+    });
+
+    it("keeps a plan without starting it when the person asks", async () => {
+      // The cost test said this plan would cost more than the cap. Keeping it
+      // and starting it are two decisions, and this is the first one.
+      await withServer({}, async (app) => {
+        const response = await app.inject({
+          method: "POST",
+          url: "/api/monitors",
+          payload: { ...newMonitor, startPaused: true },
+        });
+
+        expect(response.statusCode).toBe(201);
+        expect(response.json().paused).toBe(true);
+        // Not because anything is missing. The person chose it.
+        expect(response.json().missingCredentials).toEqual([]);
+      });
+    });
+
     it("creates it paused when the source has no credentials, and says which", async () => {
       await withServer({ environment: unconfigured }, async (app) => {
         const response = await app.inject({

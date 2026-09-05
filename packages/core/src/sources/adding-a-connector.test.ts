@@ -44,6 +44,7 @@ const exampleSourceDefinition: SourceDefinition = {
   displayName: "Example",
   billableUnit: "post read",
   pricePerUnitMicros: 5000,
+  maxUnitsPerQueryPoll: 100,
   credentialFields: [{ name: "apiKey", label: "API key", secret: true }],
 
   create(_runtime): SocialSource {

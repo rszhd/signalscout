@@ -1,4 +1,11 @@
-import type { createDatabase, Database, Env, Logger, WorkerHandle } from "@intentwatch/core";
+import type {
+  createDatabase,
+  Database,
+  Env,
+  JobSender,
+  Logger,
+  WorkerHandle,
+} from "@intentwatch/core";
 import { createLogger, loadEnv } from "@intentwatch/core";
 import { describe, expect, it, vi } from "vitest";
 import type { ApiServer } from "./server.js";
@@ -48,6 +55,19 @@ function fakeDatabase() {
   return { close, createDatabase: vi.fn(() => handle) };
 }
 
+/**
+ * The queue the cost test is sent to.
+ *
+ * Injected so these tests open no connection, and so "the API borrows the
+ * worker's queue when there is one" is an assertion rather than a comment.
+ */
+function fakeJobSender() {
+  const stop = vi.fn(async () => undefined);
+  const sender = { sendEstimate: vi.fn(async () => "job-1"), stop } as unknown as JobSender;
+
+  return { sender, stop, startJobSender: vi.fn(async () => sender) };
+}
+
 function fakeWorker() {
   const stop = vi.fn(async () => undefined);
   const handle = { boss: {}, stop } as unknown as WorkerHandle;
@@ -61,17 +81,23 @@ describe("startApi", () => {
     const worker = fakeWorker();
 
     const database = fakeDatabase();
+    const jobs = fakeJobSender();
 
     const handle = await startApi({
       env: envWith(true),
       logger,
       buildServer: server.buildServer,
       startWorker: worker.startWorker,
+      startJobSender: jobs.startJobSender,
       createDatabase: database.createDatabase,
     });
 
     expect(worker.startWorker).toHaveBeenCalledTimes(1);
     expect(handle.worker).not.toBeNull();
+
+    // The worker is here, so the cost test uses its queue. A second `pg-boss`
+    // would be a second maintenance loop against the same database.
+    expect(jobs.startJobSender).not.toHaveBeenCalled();
 
     await handle.stop();
     expect(worker.stop).toHaveBeenCalledTimes(1);
@@ -82,20 +108,28 @@ describe("startApi", () => {
     const worker = fakeWorker();
 
     const database = fakeDatabase();
+    const jobs = fakeJobSender();
 
     const handle = await startApi({
       env: envWith(false),
       logger,
       buildServer: server.buildServer,
       startWorker: worker.startWorker,
+      startJobSender: jobs.startJobSender,
       createDatabase: database.createDatabase,
     });
 
     expect(worker.startWorker).not.toHaveBeenCalled();
     expect(handle.worker).toBeNull();
 
+    // No worker in this process, so the API opens a queue connection of its
+    // own — otherwise the cost test would have nowhere to go.
+    expect(jobs.startJobSender).toHaveBeenCalledTimes(1);
+
     await handle.stop();
     expect(server.app.close).toHaveBeenCalledTimes(1);
+    // A connection the shutdown forgets keeps the process alive too.
+    expect(jobs.stop).toHaveBeenCalledTimes(1);
     // A pool the shutdown forgets keeps the process alive after it is asked
     // to exit.
     expect(database.close).toHaveBeenCalledTimes(1);

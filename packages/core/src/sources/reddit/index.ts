@@ -56,6 +56,8 @@ export const redditSourceDefinition: SourceDefinition = {
   billableUnit: "record",
   /** $1.50 per 1,000 records. STACK.md, *Source economics*. */
   pricePerUnitMicros: 1500,
+  /** `defaultRecordsPerInput`: what one keyword collects when nobody says otherwise. */
+  maxUnitsPerQueryPoll: defaultRecordsPerInput,
   credentialFields,
   create: (runtime) => new RedditSource(runtime),
 };
@@ -122,6 +124,7 @@ export class RedditSource implements SocialSource {
   readonly displayName = redditSourceDefinition.displayName;
   readonly billableUnit = redditSourceDefinition.billableUnit;
   readonly pricePerUnitMicros = redditSourceDefinition.pricePerUnitMicros;
+  readonly maxUnitsPerQueryPoll = redditSourceDefinition.maxUnitsPerQueryPoll;
   readonly credentialFields = credentialFields;
 
   constructor(private readonly runtime: SourceRuntime) {}

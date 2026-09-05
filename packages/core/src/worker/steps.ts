@@ -18,6 +18,7 @@ import type { Logger } from "../logger.js";
 import {
   type ClassifyPayload,
   classifyQueue,
+  type EstimatePayload,
   type FilterPayload,
   type NotifyPayload,
   notifyQueue,
@@ -37,6 +38,18 @@ export interface PipelineSteps {
   readonly filter: Step<FilterPayload>;
   readonly classify: Step<ClassifyPayload>;
   readonly notify: Step<NotifyPayload>;
+}
+
+/**
+ * Everything the worker serves, which is the pipeline and one more.
+ *
+ * US-014's cost test is not a pipeline step: nothing chains into it and
+ * nothing chains out of it. It is here because it runs on the same worker,
+ * with the same registry and the same keys, and a test replaces it the same
+ * way it replaces the poll.
+ */
+export interface WorkerSteps extends PipelineSteps {
+  readonly estimate: Step<EstimatePayload>;
 }
 
 /**

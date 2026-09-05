@@ -83,8 +83,12 @@ export {
   budgets,
   defaultMinimumScore,
   defaultPollIntervalSeconds,
+  type EstimateProbeKind,
+  type EstimateStatus,
   type ExhaustedBehaviour,
   embeddingDimensions,
+  estimateProbeKinds,
+  estimateStatuses,
   exhaustedBehaviours,
   feedback,
   type IntentType,
@@ -99,6 +103,8 @@ export {
   modelCalls,
   monitors,
   posts,
+  queryEstimateProbes,
+  queryEstimates,
   type Signal,
   type Source,
   signals,
@@ -107,6 +113,37 @@ export {
   type Verdict,
   verdicts,
 } from "./db/schema.js";
+export {
+  daysPerMonth,
+  type EstimateProbe,
+  type EstimateReport,
+  type EstimateRun,
+  type EstimateSample,
+  type EstimateTotals,
+  exceedsCap,
+  finishEstimate,
+  maxEstimateAttempts,
+  type PollShape,
+  type ProbeProgress,
+  type ProbeReport,
+  type ProbeRequest,
+  type Projection,
+  postsPerDay,
+  probesFor,
+  projectMonthly,
+  readEstimate,
+  recordProbeProgress,
+  refuseEstimate,
+  reportFor,
+  type StartEstimateInput,
+  sampleExcerptLength,
+  samplePostsPerProbe,
+  samplesKept,
+  sampleWindowDays,
+  shortestObservedSpanHours,
+  startEstimate,
+  totalsFor,
+} from "./estimate/index.js";
 export { createLogger, type Logger, type LoggerOptions } from "./logger.js";
 export {
   cursorFor,
@@ -187,10 +224,22 @@ export {
   missingCredentials,
 } from "./worker/credentials.js";
 export {
+  createEstimateStep,
+  type EstimateOptions,
+  maxSamplePagesPerProbe,
+} from "./worker/estimate.js";
+export {
+  type JobSender,
+  jobSenderFor,
+  startJobSender,
+} from "./worker/jobs.js";
+export {
   allQueues,
   type ClassifyPayload,
   classifyQueue,
   deadLetterQueue,
+  type EstimatePayload,
+  estimateQueue,
   type FilterPayload,
   filterQueue,
   heartbeatQueue,
@@ -227,4 +276,5 @@ export {
   type StepContext,
   unconfiguredClassify,
   unimplementedNotify,
+  type WorkerSteps,
 } from "./worker/steps.js";

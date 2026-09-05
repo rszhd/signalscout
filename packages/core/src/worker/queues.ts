@@ -30,6 +30,18 @@ export const notifyQueue = "notify";
 export const deadLetterQueue = "dead-letter";
 
 /**
+ * US-014's cost test: what a query would collect, and what it would cost.
+ *
+ * Not a fifth pipeline step. It runs when a person presses a button rather
+ * than when a monitor is due, it holds a run and not a monitor, and its
+ * failure is a sentence on a screen somebody is looking at. It is a queue for
+ * the same reason the poll is one: the sample is paid for when it is
+ * triggered and served about two minutes later, so the wait has to outlive
+ * the request that started it.
+ */
+export const estimateQueue = "estimate";
+
+/**
  * The scheduler's own tick. It is not a fifth pipeline step: it holds no
  * monitor and does no work beyond asking which monitors are due and sending
  * their poll jobs. It runs on a `pg-boss` cron schedule so the clock lives in
@@ -48,11 +60,17 @@ export const allQueues = [
   deadLetterQueue,
   heartbeatQueue,
   scheduleTickQueue,
+  estimateQueue,
   ...pipelineQueues,
 ] as const;
 
 export interface PollPayload {
   readonly monitorId: string;
+}
+
+/** A cost test names its run. There may be no monitor yet, which is the point of it. */
+export interface EstimatePayload {
+  readonly estimateId: string;
 }
 
 export interface FilterPayload {
@@ -135,6 +153,10 @@ export function queueDefinitions(retry: RetryPolicy = retryPolicy): readonly Que
     { name: heartbeatQueue },
     { name: scheduleTickQueue, policy: "stately", retryLimit: 0 },
     { name: pollQueue, policy: pollQueuePolicy, deadLetter: deadLetterQueue, ...retry },
+    // `stately` with the run as the key, like the poll: one active job per
+    // run, so two workers cannot sample the same query twice and bill for it
+    // twice, and one queued, so a resume booked twice is booked once.
+    { name: estimateQueue, policy: pollQueuePolicy, deadLetter: deadLetterQueue, ...retry },
     { name: filterQueue, deadLetter: deadLetterQueue, ...retry },
     { name: classifyQueue, deadLetter: deadLetterQueue, ...retry },
     { name: notifyQueue, deadLetter: deadLetterQueue, ...retry },

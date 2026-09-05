@@ -8,6 +8,7 @@ function sourceWith(id: string, fields: string[]): SocialSource {
     displayName: id,
     billableUnit: "record",
     pricePerUnitMicros: 0,
+    maxUnitsPerQueryPoll: 50,
     credentialFields: fields.map((name) => ({ name, label: name, secret: true })),
     validateCredentials: async () => ({ valid: true }),
     search: async () => ({ posts: [], unitsConsumed: 0, next: { status: "done" } }),

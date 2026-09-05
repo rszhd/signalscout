@@ -75,6 +75,17 @@ export function createSourceRegistry({
       );
     }
 
+    if (!Number.isInteger(definition.maxUnitsPerQueryPoll) || definition.maxUnitsPerQueryPoll < 1) {
+      // US-014 multiplies this by the polls in a month. A zero here would
+      // report every plan on this source as costing nothing, which is the one
+      // wrong answer a cost screen must never give.
+      throw new Error(
+        `Source "${definition.id}" says one query costs at most ` +
+          `${definition.maxUnitsPerQueryPoll} ${definition.billableUnit}s in a poll. ` +
+          "It has to be a whole number, and at least one.",
+      );
+    }
+
     sources.set(definition.id, definition.create(runtime));
   }
 

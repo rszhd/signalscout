@@ -6,6 +6,7 @@ import {
   createQueryGenerator,
   type Database,
   type Env,
+  type JobSender,
   type Logger,
   needsApiKey,
   type QueryGenerator,
@@ -23,6 +24,7 @@ import {
   type ZodTypeProvider,
 } from "fastify-type-provider-zod";
 import { z } from "zod";
+import { registerEstimateRoutes } from "./estimates.js";
 import { registerMatchRoutes } from "./matches.js";
 import { registerMonitorRoutes } from "./monitors.js";
 
@@ -65,6 +67,12 @@ export interface BuildServerOptions {
    * backed by a stub, because no test spends money.
    */
   queryGenerator?: QueryGenerator | null;
+  /**
+   * How the cost test reaches the worker. Null when this deployment has no
+   * queue to send to; the route says so rather than writing a run nothing
+   * will pick up. `start.ts` passes the worker's own queue when there is one.
+   */
+  jobs?: JobSender | null;
 }
 
 /**
@@ -97,6 +105,7 @@ export async function buildServer({
   sources = builtInSources,
   environment,
   queryGenerator,
+  jobs = null,
 }: BuildServerOptions): Promise<ApiServer> {
   const app = Fastify({ loggerInstance: logger }).withTypeProvider<ZodTypeProvider>();
 
@@ -125,6 +134,8 @@ export async function buildServer({
     environment,
     queryGenerator: queryGenerator === undefined ? queryGeneratorFor(env, logger) : queryGenerator,
   });
+
+  await registerEstimateRoutes(app, { db, sources, jobs });
 
   const webDist = resolveWebDist(env);
 

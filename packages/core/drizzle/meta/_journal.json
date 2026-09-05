@@ -57,6 +57,13 @@
       "when": 1788567223316,
       "tag": "0007_add_budgets_and_usage",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1788572056688,
+      "tag": "0008_add_query_estimates",
+      "breakpoints": true
     }
   ]
 }

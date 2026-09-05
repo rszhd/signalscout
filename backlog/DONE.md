@@ -2,12 +2,14 @@
 
 # Done
 
-8 finished.
+10 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
+| BUG-002 | [A seven-day window is bought as a month](done/2026-09/BUG-002-a-seven-day-window-is-bought-as-a-month.md) | bug | fixed | 2026-09 |
 | BUG-001 | [A pending Reddit collection is not resumed](done/2026-09/BUG-001-a-pending-reddit-collection-is-not-resumed.md) | bug | shipped | 2026-09 |
 | US-021 | [The application follows the product mockup](done/2026-09/US-021-the-application-follows-the-product-mockup.md) | feature | shipped | 2026-09 |
+| US-014 | [A query's cost is known before it runs](done/2026-09/US-014-a-querys-cost-is-known-before-it-runs.md) | feature | shipped | 2026-09 |
 | US-011 | [The inbox shows why a post matched](done/2026-09/US-011-the-inbox-shows-why-a-post-matched.md) | feature | shipped | 2026-09 |
 | US-009 | [The model scores a post against a monitor](done/2026-09/US-009-the-model-scores-a-post-against-a-monitor.md) | feature | shipped | 2026-09 |
 | US-007 | [The worker runs jobs on a schedule](done/2026-09/US-007-the-worker-runs-jobs-on-a-schedule.md) | feature | shipped | 2026-09 |

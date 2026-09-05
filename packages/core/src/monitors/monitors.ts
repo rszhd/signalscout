@@ -58,6 +58,15 @@ export interface CreateMonitorInput extends MonitorAnswers, MonitorPlan {
   readonly sources: readonly Source[];
   readonly minScore?: number;
   readonly pollIntervalSeconds?: number;
+  /**
+   * Save the monitor without starting it, even when it could start.
+   *
+   * US-014: a person whose cost test says the plan would cost more than the
+   * cap may still want to keep it. Keeping it and starting it are two
+   * decisions, and this is the first one on its own. `resumeMonitor` is the
+   * second, and it applies the credential rule the same as ever.
+   */
+  readonly startPaused?: boolean;
 }
 
 /** Everything the rules below need to know about the deployment. */
@@ -149,8 +158,9 @@ export async function createMonitor(
       ...(input.pollIntervalSeconds === undefined
         ? {}
         : { pollIntervalSeconds: input.pollIntervalSeconds }),
-      // Created paused exactly when it could not poll anyway.
-      pausedAt: missing.length > 0 ? new Date() : null,
+      // Created paused when it could not poll anyway, or when the person
+      // asked for it. Never started against either.
+      pausedAt: missing.length > 0 || input.startPaused ? new Date() : null,
     })
     .returning();
 

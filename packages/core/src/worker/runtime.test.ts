@@ -5,6 +5,7 @@ import { createTestDatabase, type TestDatabase } from "../testing/database.js";
 import {
   classifyQueue,
   deadLetterQueue,
+  estimateQueue,
   filterQueue,
   heartbeatQueue,
   notifyQueue,
@@ -75,7 +76,7 @@ describe("the worker's queues", () => {
     }
   });
 
-  it("creates the four pipeline queues, the heartbeat and the dead letter queue", async () => {
+  it("creates the four pipeline queues, the cost test, the heartbeat and the dead letter queue", async () => {
     const created = (await worker.boss.getQueues())
       .map((queue) => queue.name)
       // pg-boss keeps queues of its own. They are its business, not ours.
@@ -86,6 +87,9 @@ describe("the worker's queues", () => {
       [
         classifyQueue,
         deadLetterQueue,
+        // US-014's cost test. Not a pipeline step: it runs when a person
+        // presses a button, and it holds a run rather than a monitor.
+        estimateQueue,
         filterQueue,
         heartbeatQueue,
         notifyQueue,

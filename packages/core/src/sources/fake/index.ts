@@ -55,6 +55,8 @@ export interface FakeSourceOptions {
   /** Units billed per post returned. X bills this way. */
   readonly unitsPerPost?: number;
   readonly pricePerUnitMicros?: number;
+  /** What one query costs in one poll. US-014 projects a month from it. */
+  readonly maxUnitsPerQueryPoll?: number;
   readonly billableUnit?: string;
   readonly credentialFields?: readonly CredentialField[];
   /** Exact credentials that pass. Any non-empty value passes when this is unset. */
@@ -75,6 +77,7 @@ export function fakeSourceDefinition(options: FakeSourceOptions = {}): SourceDef
     displayName: options.displayName ?? "Fake",
     billableUnit: options.billableUnit ?? "call",
     pricePerUnitMicros: options.pricePerUnitMicros ?? 0,
+    maxUnitsPerQueryPoll: options.maxUnitsPerQueryPoll ?? 50,
     credentialFields: options.credentialFields ?? defaultCredentialFields,
     create: (runtime) => createFakeSource(runtime, options),
   };

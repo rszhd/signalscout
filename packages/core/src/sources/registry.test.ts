@@ -71,6 +71,22 @@ describe("the registry fails at startup, not at poll time", () => {
     ).not.toThrow();
   });
 
+  it("refuses a connector that says one query costs nothing to poll", () => {
+    // US-014 multiplies this by the polls in a month. A zero here reports
+    // every plan on this source as free, which is the one wrong answer a cost
+    // screen must never give — and it would be given at boot, quietly, to
+    // everybody.
+    expect(() => registryOf(fakeSourceDefinition({ id: "x", maxUnitsPerQueryPoll: 0 }))).toThrow(
+      /at least one/,
+    );
+    expect(() => registryOf(fakeSourceDefinition({ id: "x", maxUnitsPerQueryPoll: 2.5 }))).toThrow(
+      /whole number/,
+    );
+    expect(() =>
+      registryOf(fakeSourceDefinition({ id: "x", maxUnitsPerQueryPoll: 100 })),
+    ).not.toThrow();
+  });
+
   it("checks a whole list of wanted ids at once and names every missing one", () => {
     const registry = registryOf(fakeSourceDefinition({ id: "reddit" }));
 

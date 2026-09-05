@@ -1927,3 +1927,165 @@ a {
     transition-duration: 0.01ms;
   }
 }
+
+/* The cost test: what a plan would collect, and what it would cost. US-014. */
+
+.budget-section .budget-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+  gap: 13px;
+  margin-top: 9px;
+}
+
+.amount-input {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 11px;
+  border: 1px solid var(--line-dark);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.amount-input > span {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.amount-input input {
+  width: 100%;
+  padding: 9px 0;
+  border: 0;
+  background: none;
+  outline: none;
+}
+
+.cost-section .secondary-button {
+  flex: 0 0 auto;
+}
+
+.cost-waiting {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 13px 0 0;
+  color: var(--muted-strong);
+  font-size: 0.73rem;
+}
+
+.cost-table {
+  width: 100%;
+  margin-top: 13px;
+  border-collapse: collapse;
+  font-size: 0.73rem;
+}
+
+.cost-table caption {
+  margin-bottom: 9px;
+  color: var(--muted);
+  font-size: 0.68rem;
+  text-align: left;
+}
+
+.cost-table th,
+.cost-table td {
+  padding: 9px 11px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+
+.cost-table thead th {
+  color: var(--muted);
+  font-weight: 500;
+  font-size: 0.68rem;
+}
+
+.cost-table tbody th {
+  font-weight: 500;
+}
+
+.cost-table small {
+  display: block;
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 0.65rem;
+}
+
+.cost-table tr.over-cap {
+  background: #fff8e9;
+}
+
+.cost-table .over-cap-note {
+  color: var(--warning);
+}
+
+.cost-failed {
+  color: #8f3f39;
+}
+
+.cost-totals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 22px;
+  margin: 15px 0 0;
+}
+
+.cost-totals dt {
+  color: var(--muted);
+  font-size: 0.68rem;
+}
+
+.cost-totals dd {
+  margin: 3px 0 0;
+  font-size: 0.85rem;
+}
+
+.cost-caveat {
+  margin: 13px 0 0;
+  color: var(--muted);
+  font-size: 0.65rem;
+}
+
+.cost-samples {
+  margin-top: 15px;
+}
+
+.cost-samples summary {
+  cursor: pointer;
+  color: var(--muted-strong);
+  font-size: 0.73rem;
+}
+
+.cost-samples article {
+  margin-top: 11px;
+  padding: 11px 13px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-soft);
+}
+
+.cost-samples article a {
+  color: var(--ink);
+  font-size: 0.78rem;
+}
+
+.cost-samples article p {
+  margin: 5px 0 0;
+  color: var(--muted-strong);
+  font-size: 0.72rem;
+  line-height: 1.5;
+}
+
+.cost-samples article small {
+  display: block;
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 0.65rem;
+}
+
+@media (max-width: 720px) {
+  .budget-section .budget-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

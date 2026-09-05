@@ -102,9 +102,11 @@ So a monitor at $9.99 of a $10.00 cap will start one more poll, and that poll
 may cost more than a cent. What bounds the overshoot is `maxPagesPerPoll` in
 `worker/collect.ts` — five pages, one job — not the cap.
 
-Telling a person what a query will cost *before* it runs is
-[US-014](../backlog/todo/US-014-a-querys-cost-is-known-before-it-runs.md), and
-that is the ticket that closes this gap rather than bounding it.
+[The cost test](#what-a-plan-would-cost-before-it-runs) is the answer to this,
+and it is a different kind of answer: it does not stop the overshoot, it tells
+a person the size of the thing before they start it. A monitor whose plan was
+measured at $164 a month against a $10 cap was never going to be saved by a
+guard that runs one poll at a time.
 
 ### What a refused poll does with money already spent
 
@@ -117,6 +119,102 @@ rather than paying for the query again — if the provider still has it.
 
 ---
 
+## What a plan would cost, before it runs
+
+`api_usage` answers "what has this monitor spent". It cannot answer "what will
+this plan spend", and on a metered source that is the more expensive question:
+the money goes at fetch time, before any filter and before the model reads a
+word. No later stage can save a user from a query that is too broad. Only a
+narrower query can.
+
+So the monitor form has a **Test this plan** button. It runs each query once,
+against ten posts, and reports three things: how often that query finds a post,
+what a month of it would cost at this monitor's poll interval, and what the
+test itself just cost.
+
+**The test spends money.** That is the honest tension in it: the only way to
+find out what a query collects is to collect a little of it. Ten records a
+query is about a cent and a half at Reddit's rate, so testing a plan of eight
+queries costs about twelve cents. It runs when the button is pressed, never on
+a keystroke, and the answer says what the answer cost.
+
+**The test's own cost is recorded with no monitor against it.** The plan is
+usually still a plan — the whole point is to decide before committing — so the
+row in `api_usage` has a null `monitor_id`. It is on the bill and on no
+monitor's cap. `model_calls` already does this for the queries the model
+writes from the same form. A cap guards the worker, which spends at 02:00 with
+nobody watching; the cost test spends only when a person presses a button and
+is shown the price.
+
+### How the monthly figure is worked out
+
+    records a poll       what the source charged for one sample of this query
+    records a month      = records a poll x polls a month
+    estimated cost       = records a month x the source's price
+
+**The cost is counted from the records the source charged for, never from the
+posts we kept.** Those are different numbers, and the difference is the whole
+reason a connector reports `unitsConsumed` instead of letting the caller count
+rows.
+
+The first live run, on 2026-09-05, is why this page says so. A sample of "flaky
+end to end tests" was billed ten records and returned no posts at all: every
+post it found was three weeks old, outside the window the sample asked for. An
+earlier version of this arithmetic counted the posts and reported that query as
+costing nothing. It had just cost a cent and a half, and it would have cost
+that on every poll for ever, with nothing on the screen arguing for deleting
+it.
+
+Polling is still the multiplier, and still the biggest dial a person controls:
+the same query costs $10.80 a month polled hourly and $648.00 polled every
+minute.
+
+### Why some figures are a range
+
+A sample asks for ten records. When the source bills all ten, it had more to
+give, and a real poll asks for fifty — so a month is somewhere between $10.80
+and $54.00, and one sample of ten cannot say where. The screen shows both ends.
+
+A single figure invented from that would be a number nothing measured, which is
+what this page exists to refuse. The cap is checked against the high end,
+because a warning about money is worth giving early and the range is what lets
+a person disagree with it.
+
+### What this estimate is wrong about
+
+Everything in the list above, and three more of its own.
+
+**A week is not a month.** The sample looks back seven days and multiplies. A
+query about a product launched last week has no history to measure, and a quiet
+Tuesday will lie about a busy Friday.
+
+**A poll is not a sample.** The projection assumes a poll of one query costs
+what one sample of it cost. A poll asks for five times as many records, so a
+query with more to give costs more than the low end says — that is what the
+range is for, and the range is wide.
+
+**The model's half is not in it.** The figures here are what the *source*
+charges. Classifying the posts a plan collects costs about a tenth of a cent
+each, and the cost test does not add it. A plan that collects 7,200 records a
+month will also send some of them to a model.
+
+### The flag
+
+A plan projected to cost more than the monitor's cap is flagged before the
+monitor can start, line by line, so a person can see which query is the
+expensive one. "Your plan is too broad" is not an instruction; "this query
+costs $54 of your $10" is.
+
+Flagged, the form saves the monitor **without starting it**. Keeping a plan and
+starting it are two decisions, and the second one belongs to a person who has
+now seen the number. The Monitors screen starts it when they are ready.
+
+The flag counts *at* the cap, not past it, because US-013's guard does: a
+monitor is exhausted at `spend >= cap`, so a plan that lands exactly on its cap
+is a plan that stops collecting before the month ends.
+
+---
+
 ## Where to look
 
 - The cap and the spend are on the **Monitors** screen, next to the monitor
@@ -125,3 +223,7 @@ rather than paying for the query again — if the provider still has it.
 - The rule itself is `packages/core/src/budget/budget.ts`. It is one of the
   five correctness-critical surfaces in [testing.md](testing.md), so its
   assertions were written before it was.
+- The cost test's arithmetic is `packages/core/src/estimate/estimate.ts`, and
+  its assertions were written first for the same reason: it puts a number in
+  front of a person who is about to spend money. The samples are collected by
+  `packages/core/src/worker/estimate.ts`, on the `estimate` queue.

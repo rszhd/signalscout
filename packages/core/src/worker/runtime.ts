@@ -23,10 +23,13 @@ import { assertSourcesCanBeStored } from "../sources/storage.js";
 import { createClassifyStep } from "./classify.js";
 import { createCollectStep } from "./collect.js";
 import { type CredentialLookup, credentialsFromEnvironment } from "./credentials.js";
+import { createEstimateStep } from "./estimate.js";
 import {
   type ClassifyPayload,
   classifyQueue,
   retryPolicy as defaultRetryPolicy,
+  type EstimatePayload,
+  estimateQueue,
   type FilterPayload,
   filterQueue,
   heartbeatQueue,
@@ -41,12 +44,12 @@ import {
 } from "./queues.js";
 import { enqueueDuePolls } from "./schedule.js";
 import {
-  type PipelineSteps,
   passThroughFilter,
   type Step,
   type StepContext,
   unconfiguredClassify,
   unimplementedNotify,
+  type WorkerSteps,
 } from "./steps.js";
 
 export type HeartbeatPayload = Record<string, never>;
@@ -65,7 +68,7 @@ export interface StartWorkerOptions {
   /** Where source keys come from. US-004 replaces the environment with the database. */
   credentialsFor?: CredentialLookup;
   /** Replaces one or more steps. US-008 arrives through here. */
-  steps?: Partial<PipelineSteps>;
+  steps?: Partial<WorkerSteps>;
   /**
    * Which model scores posts. Defaults to the one AI_PROVIDER and AI_MODEL
    * name. A deployment with no key configured gets no classifier and says so
@@ -89,10 +92,17 @@ export interface StartWorkerOptions {
  * that throws can only be recorded by something outside it, and a duration
  * measured inside the step cannot include the failure that ended it.
  */
-function instrument<Payload extends { monitorId: string }>(
+function instrument<Payload>(
   queue: string,
   step: Step<Payload>,
   context: StepContext,
+  /**
+   * What this queue's log line calls the thing being worked on.
+   *
+   * A pipeline job names its monitor. A cost test names its run, because it
+   * may have no monitor at all — that is the case the feature exists for.
+   */
+  subject: (payload: Payload) => Record<string, unknown>,
 ): (payload: Payload, jobId: string) => Promise<void> {
   return async (payload, jobId) => {
     const startedAt = Date.now();
@@ -100,13 +110,7 @@ function instrument<Payload extends { monitorId: string }>(
     try {
       await step(payload, context);
       context.logger.info(
-        {
-          queue,
-          jobId,
-          monitorId: payload.monitorId,
-          durationMs: Date.now() - startedAt,
-          outcome: "ok",
-        },
+        { queue, jobId, ...subject(payload), durationMs: Date.now() - startedAt, outcome: "ok" },
         "job finished",
       );
     } catch (error) {
@@ -114,7 +118,7 @@ function instrument<Payload extends { monitorId: string }>(
         {
           queue,
           jobId,
-          monitorId: payload.monitorId,
+          ...subject(payload),
           durationMs: Date.now() - startedAt,
           outcome: "failed",
           err: error,
@@ -186,28 +190,37 @@ export async function startWorker({
     classifier ??
     classifierFromEnvironment(aiConfig ?? aiConfigFromEnvironment(loadAiEnv()), logger);
 
-  const pipeline: PipelineSteps = {
+  const pipeline: WorkerSteps = {
     poll: steps.poll ?? createCollectStep({ registry: sources, credentialsFor }),
+    estimate: steps.estimate ?? createEstimateStep({ registry: sources, credentialsFor }),
     filter: steps.filter ?? passThroughFilter,
     classify:
       steps.classify ?? (model ? createClassifyStep({ classifier: model }) : unconfiguredClassify),
     notify: steps.notify ?? unimplementedNotify,
   };
 
-  const work = async <Payload extends { monitorId: string }>(
+  const work = async <Payload>(
     queue: string,
     step: Step<Payload>,
+    subject: (payload: Payload) => Record<string, unknown>,
   ): Promise<void> => {
-    const run = instrument(queue, step, context);
+    const run = instrument(queue, step, context, subject);
     await boss.work<Payload>(queue, async (jobs) => {
       for (const job of jobs) await run(job.data, job.id);
     });
   };
 
-  await work<PollPayload>(pollQueue, pipeline.poll);
-  await work<FilterPayload>(filterQueue, pipeline.filter);
-  await work<ClassifyPayload>(classifyQueue, pipeline.classify);
-  await work<NotifyPayload>(notifyQueue, pipeline.notify);
+  const named = <Payload extends { monitorId: string }>(payload: Payload) => ({
+    monitorId: payload.monitorId,
+  });
+
+  await work<PollPayload>(pollQueue, pipeline.poll, named);
+  await work<FilterPayload>(filterQueue, pipeline.filter, named);
+  await work<ClassifyPayload>(classifyQueue, pipeline.classify, named);
+  await work<NotifyPayload>(notifyQueue, pipeline.notify, named);
+  await work<EstimatePayload>(estimateQueue, pipeline.estimate, ({ estimateId }) => ({
+    estimateId,
+  }));
 
   await boss.work<HeartbeatPayload>(heartbeatQueue, async (jobs) => {
     for (const job of jobs) logger.info({ jobId: job.id }, "heartbeat");

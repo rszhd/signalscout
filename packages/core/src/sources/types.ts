@@ -157,6 +157,21 @@ export interface SourceDescriptor {
    * STACK.md, *Source economics*, holds the table this came from.
    */
   readonly pricePerUnitMicros: number;
+  /**
+   * The most billable units one query can consume in one poll, when the caller
+   * asks for no limit of its own.
+   *
+   * US-014 needs it, and it is here rather than in the estimate for the reason
+   * the price is: the number belongs to the connector. A cost test that
+   * hard-coded Reddit's fifty records would report the wrong figure for every
+   * other source, and would go stale silently the day the connector's own
+   * default moved.
+   *
+   * It is the top of the range a cost test reports for a query whose sample
+   * came back full. A sample of ten that was billed ten says only "there was
+   * more", and this is how much more there could be.
+   */
+  readonly maxUnitsPerQueryPoll: number;
   readonly credentialFields: readonly CredentialField[];
 }
 

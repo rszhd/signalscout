@@ -1,5 +1,7 @@
-import { type FormEvent, useEffect, useMemo, useState } from "react";
+import { type FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { messageFor, requestJson } from "./api.js";
+import { CostTest, type EstimateReport, exceedsCap } from "./CostTest.js";
+import { toMicros } from "./Monitors.js";
 
 interface SignalOption {
   id: string;
@@ -55,6 +57,11 @@ type OptionsState =
 
 const emptyAnswers: Answers = { name: "", product: "", idealCustomer: "", problem: "" };
 
+/** What the plan says, for telling a tested plan from an edited one. */
+function planSignature(queries: readonly string[], subreddits: readonly string[]): string {
+  return JSON.stringify([cleanList(queries), cleanList(subreddits)]);
+}
+
 function cleanList(values: readonly string[]): string[] {
   return values.map((value) => value.trim()).filter(Boolean);
 }
@@ -83,6 +90,12 @@ export function MonitorForm() {
   const [created, setCreated] = useState<CreatedMonitor | null>(null);
   const [working, setWorking] = useState<"generating" | "creating" | null>(null);
   const [error, setError] = useState<string | null>(null);
+  /** Dollars, as typed. Empty means no cap, which is a decision and not an oversight. */
+  const [cap, setCap] = useState("");
+  const [onExhausted, setOnExhausted] = useState("pause");
+  const [estimate, setEstimate] = useState<EstimateReport | null>(null);
+  /** The plan the estimate measured. An edited plan makes the answer stale. */
+  const [testedPlan, setTestedPlan] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -118,6 +131,35 @@ export function MonitorForm() {
   const missingCredentials = selectedSourceOptions.flatMap((source) =>
     source.credentials.filter((credential) => !credential.configured),
   );
+
+  const capMicros = cap.trim() === "" ? null : toMicros(cap);
+  const queries = cleanList(plan.queries);
+  const subreddits = cleanList(plan.subreddits);
+  const signature = planSignature(plan.queries, plan.subreddits);
+  const stale = testedPlan !== null && testedPlan !== signature;
+
+  /**
+   * The plan may not start when the test says it would spend the budget
+   * before the month ends.
+   *
+   * Measured against the budget as it stands now, so raising it clears the
+   * flag without buying another sample. A stale answer does not block either:
+   * it measured a different plan, and refusing to start over a query the
+   * person has since deleted would push them into paying to prove it.
+   */
+  const overCap = !stale && exceedsCap(estimate?.totals.monthlyCostMicrosHigh ?? null, capMicros);
+
+  const takeReport = useCallback((report: EstimateReport | null) => {
+    setEstimate(report);
+    setTestedPlan(
+      report
+        ? planSignature(
+            report.queries.filter((probe) => probe.kind === "query").map((probe) => probe.term),
+            report.queries.filter((probe) => probe.kind === "channel").map((probe) => probe.term),
+          )
+        : null,
+    );
+  }, []);
 
   function setAnswer(field: keyof Answers, value: string): void {
     setAnswers((current) => ({ ...current, [field]: value }));
@@ -169,10 +211,13 @@ export function MonitorForm() {
     if (working) return;
     setError(null);
 
-    const queries = cleanList(plan.queries);
-    const subreddits = cleanList(plan.subreddits);
     if (queries.length === 0 && subreddits.length === 0) {
       setError("Keep at least one search query or subreddit.");
+      return;
+    }
+
+    if (cap.trim() !== "" && capMicros === null) {
+      setError("A monthly budget is an amount in dollars, such as 10.");
       return;
     }
 
@@ -187,6 +232,9 @@ export function MonitorForm() {
           queries,
           subreddits,
           sources: selectedSources,
+          ...(capMicros === null ? {} : { budget: { monthlyCapMicros: capMicros, onExhausted } }),
+          // Kept, not started. The person was shown what it would cost.
+          ...(overCap ? { startPaused: true } : {}),
         }),
       });
       setCreated(monitor);
@@ -205,6 +253,9 @@ export function MonitorForm() {
     setPlan({ queries: [], subreddits: [] });
     setCreated(null);
     setError(null);
+    setCap("");
+    setOnExhausted("pause");
+    takeReport(null);
     setStage("answers");
   }
 
@@ -564,6 +615,56 @@ export function MonitorForm() {
               </div>
             </section>
 
+            <fieldset className="choice-section budget-section">
+              <legend>How much may it spend a month?</legend>
+              <p>
+                The monitor stops when it reaches this. Leave it empty for no cap; what it spends is
+                recorded either way.
+              </p>
+              <div className="budget-row">
+                <label className="field">
+                  <span>Monthly budget</span>
+                  <div className="amount-input">
+                    <span aria-hidden="true">$</span>
+                    <input
+                      aria-label="Monthly budget"
+                      inputMode="decimal"
+                      placeholder="10.00"
+                      value={cap}
+                      onChange={(event) => setCap(event.target.value)}
+                    />
+                  </div>
+                </label>
+                <label className="field">
+                  <span>When it is reached</span>
+                  <select
+                    aria-label="When it is reached"
+                    value={onExhausted}
+                    onChange={(event) => setOnExhausted(event.target.value)}
+                  >
+                    <option value="pause">Pause the monitor</option>
+                    <option value="notify">Keep it, and start again next month</option>
+                  </select>
+                </label>
+              </div>
+            </fieldset>
+
+            <CostTest
+              monthlyCapMicros={capMicros}
+              queries={queries}
+              report={estimate}
+              sources={selectedSources}
+              subreddits={subreddits}
+              onReport={takeReport}
+            />
+
+            {stale && (
+              <div className="notice compact" role="status">
+                <strong>The plan has changed since this test.</strong>
+                <span>Test it again to see what the queries above would cost.</span>
+              </div>
+            )}
+
             {missingCredentials.length > 0 && (
               <div className="notice warning" role="status">
                 <strong>This monitor cannot start yet.</strong>
@@ -600,9 +701,11 @@ export function MonitorForm() {
                 <button className="primary-button" disabled={working !== null} type="submit">
                   {working === "creating"
                     ? "Saving…"
-                    : missingCredentials.length > 0
-                      ? "Save monitor paused"
-                      : "Start monitor"}
+                    : overCap
+                      ? "Save without starting"
+                      : missingCredentials.length > 0
+                        ? "Save monitor paused"
+                        : "Start monitor"}
                 </button>
               </div>
             </div>

@@ -25,16 +25,24 @@ export const redditSourceDefinition: SourceDefinition = {
   displayName: "Reddit",
   billableUnit: "record",
   pricePerUnitMicros: 1500,
+  maxUnitsPerQueryPoll: 50,
   credentialFields: [{ name: "apiKey", label: "Bright Data API key", secret: true }],
   create: (runtime) => new RedditSource(runtime),
 };
 ```
 
+`maxUnitsPerQueryPoll` is the most one query can collect in one poll when the
+caller sets no limit, and it belongs to the connector for the same reason the
+price does. US-014's cost test uses it as the top of the range it reports for a
+query whose sample came back full: a sample of ten that was billed ten says
+only "there was more", and this says how much more there could be.
+
 **3. Add one line to `builtInSources`** in `packages/core/src/sources/index.ts`.
 
 That is the whole change. Nothing that consumes a source needs a case for it:
 the collector pages it through `next`, the budget guard prices it from
-`pricePerUnitMicros`, and the settings form renders `credentialFields`.
+`pricePerUnitMicros`, the cost test projects a month from the units a search
+reports, and the settings form renders `credentialFields`.
 `packages/core/src/sources/adding-a-connector.test.ts` is that claim written as
 code — a complete connector, driven by caller code that never names it.
 

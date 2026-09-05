@@ -84,12 +84,32 @@ const planBody = z.object({
   subreddits: z.array(subredditSchema).max(maximumSubreddits).default([]),
 });
 
+/**
+ * A monthly cap, as the wire carries it. Micro-dollars, the unit the whole
+ * product counts in; the screen turns what a person typed in dollars into it.
+ */
+const budgetSchema = z.object({
+  monthlyCapMicros: z.number().int().min(0),
+  onExhausted: z.enum(exhaustedBehaviours),
+});
+
 const createBody = answersBody.extend({
   name: z.string().trim().min(1).max(80),
   ...planBody.shape,
   sources: z.array(z.enum(storableSources)).default([]),
   minScore: z.number().int().min(0).max(100).optional(),
   pollIntervalSeconds: z.number().int().min(minimumPollIntervalSeconds).optional(),
+  /**
+   * The cap, set with the monitor rather than a moment later.
+   *
+   * A monitor created and given its cap in a second request is a monitor the
+   * scheduler could poll in between, uncapped. US-014's form knows the cap
+   * before it creates anything, because the cost test was measured against
+   * it.
+   */
+  budget: budgetSchema.optional(),
+  /** US-014: keep this plan, do not start it. The person was shown what it would cost. */
+  startPaused: z.boolean().default(false),
 });
 
 const updateBody = createBody.partial();
@@ -123,11 +143,6 @@ const spendSchema = z.object({
   reason: z.string().nullable(),
   /** The first moment counted, so the screen can say what "this month" means. */
   since: z.string(),
-});
-
-const budgetSchema = z.object({
-  monthlyCapMicros: z.number(),
-  onExhausted: z.enum(exhaustedBehaviours),
 });
 
 const monitorSchema = z.object({
@@ -385,6 +400,8 @@ export async function registerMonitorRoutes(
     },
     handler: async (request, reply) => {
       const { monitor, missing } = await createMonitor(db, request.body, runtime);
+
+      if (request.body.budget) await setBudget(db, monitor.id, request.body.budget);
 
       if (missing.length > 0) {
         // Created, and paused, because four answers somebody just typed are

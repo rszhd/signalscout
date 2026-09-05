@@ -121,7 +121,12 @@ function toMicros(value: unknown): number {
 }
 
 export interface RecordSourceUsageInput {
-  readonly monitorId: string;
+  /**
+   * Null for a call made before any monitor existed — US-014's cost test.
+   * The row is on the bill and on no monitor's cap, which is what the column
+   * says and what docs/costs.md tells the user.
+   */
+  readonly monitorId: string | null;
   readonly source: Source;
   /** What the connector reported as `SearchResult.unitsConsumed`. Never a post count. */
   readonly units: number;
@@ -192,7 +197,12 @@ async function readSpend(
     )
     .groupBy(apiUsage.monitorId);
 
-  for (const row of sourceRows) entry(row.monitorId).sourceMicros = toMicros(row.micros);
+  for (const row of sourceRows) {
+    // A cost test run before its monitor existed carries no monitor id. It is
+    // on the bill and on no monitor, the same as a query generated from the
+    // form, so no monitor's cap counts it.
+    if (row.monitorId) entry(row.monitorId).sourceMicros = toMicros(row.micros);
+  }
 
   /**
    * A null `estimated_cost_micros` is a call whose price is not configured.

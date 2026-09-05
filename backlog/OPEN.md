@@ -2,14 +2,13 @@
 
 # Open tickets
 
-14 open — 3 doing, 11 todo, 0 parked (4 p1, 9 p2, 1 p3).
+13 open — 3 doing, 10 todo, 0 parked (3 p1, 9 p2, 1 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
 | p1 | US-001 | [The workspace runs with one command](doing/US-001-the-workspace-runs-with-one-command.md) | chore | doing | 2026-09-04T22:49+08:00 |
 | p1 | US-010 | [A monitor is created from four answers](doing/US-010-a-monitor-is-created-from-four-answers.md) | feature | doing | 2026-09-04T22:49+08:00 |
 | p1 | US-013 | [A monitor cannot spend past its budget](doing/US-013-a-monitor-cannot-spend-past-its-budget.md) | feature | doing | 2026-09-04T22:49+08:00 |
-| p1 | US-014 | [A query's cost is known before it runs](todo/US-014-a-querys-cost-is-known-before-it-runs.md) | feature | todo | 2026-09-04T22:49+08:00 |
 | p2 | US-004 | [A stored key is encrypted at rest](todo/US-004-a-stored-key-is-encrypted-at-rest.md) | feature | todo | 2026-09-04T22:49+08:00 |
 | p2 | US-006 | [X returns candidate posts and says what it spent](todo/US-006-x-returns-candidate-posts-and-says-what-it-spent.md) | feature | todo | 2026-09-04T22:49+08:00 |
 | p2 | US-008 | [A cheap filter runs before the model](todo/US-008-a-cheap-filter-runs-before-the-model.md) | feature | todo | 2026-09-04T22:49+08:00 |

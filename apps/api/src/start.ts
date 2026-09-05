@@ -1,5 +1,10 @@
-import type { Env, Logger, WorkerHandle } from "@intentwatch/core";
-import { createDatabase, startWorker as startWorkerDefault } from "@intentwatch/core";
+import type { Env, JobSender, Logger, WorkerHandle } from "@intentwatch/core";
+import {
+  createDatabase,
+  jobSenderFor,
+  startJobSender as startJobSenderDefault,
+  startWorker as startWorkerDefault,
+} from "@intentwatch/core";
 import { type ApiServer, buildServer as buildServerDefault } from "./server.js";
 
 export interface StartApiOptions {
@@ -8,12 +13,15 @@ export interface StartApiOptions {
   /** Injected in tests so no port is bound and no database is touched. */
   buildServer?: typeof buildServerDefault;
   startWorker?: typeof startWorkerDefault;
+  startJobSender?: typeof startJobSenderDefault;
   createDatabase?: typeof createDatabase;
 }
 
 export interface ApiHandle {
   app: ApiServer;
   worker: WorkerHandle | null;
+  /** How the cost test is handed to the worker. US-014. */
+  jobs: JobSender;
   stop: () => Promise<void>;
 }
 
@@ -29,6 +37,7 @@ export async function startApi({
   logger,
   buildServer = buildServerDefault,
   startWorker = startWorkerDefault,
+  startJobSender = startJobSenderDefault,
   createDatabase: openDatabase = createDatabase,
 }: StartApiOptions): Promise<ApiHandle> {
   const worker = env.WORKER_IN_PROCESS
@@ -45,14 +54,28 @@ export async function startApi({
   // for. Nothing connects until the first query.
   const { db, close } = openDatabase(env.DATABASE_URL);
 
-  const app = await buildServer({ env, logger, db });
+  /**
+   * The queue the cost test is sent to.
+   *
+   * The worker's own when there is one in this process, and a connection of
+   * our own when the worker is a separate container. One `pg-boss` fewer is
+   * one fewer maintenance loop against the same database, so the shared case
+   * is worth the branch.
+   */
+  const jobs = worker ? jobSenderFor(worker.boss) : await startJobSender(env.DATABASE_URL);
+
+  const app = await buildServer({ env, logger, db, jobs });
   await app.listen({ host: env.HOST, port: env.PORT });
 
   return {
     app,
     worker,
+    jobs,
     stop: async () => {
       await app.close();
+      // Before the worker: a sender that owns its connection has to close it,
+      // and one that borrowed the worker's does nothing here.
+      await jobs.stop();
       await worker?.stop();
       await close();
     },

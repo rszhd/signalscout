@@ -2,17 +2,20 @@
 
 # Open tickets
 
-8 open — 1 doing, 7 todo, 0 parked (1 p1, 6 p2, 1 p3).
+11 open — 1 doing, 10 todo, 0 parked (3 p1, 7 p2, 1 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
 | p1 | US-001 | [The workspace runs with one command](doing/US-001-the-workspace-runs-with-one-command.md) | chore | doing | 2026-09-04T22:49+08:00 |
+| p1 | US-024 | [A platform is separated from the provider that fetches it](todo/US-024-a-platform-is-separated-from-the-provider-that-fetches-it.md) | chore | todo | 2026-09-05T15:23+08:00 |
+| p1 | US-025 | [ScrapeCreators collects Reddit posts](todo/US-025-scrapecreators-collects-reddit-posts.md) | feature | todo | 2026-09-05T15:23+08:00 |
 | p2 | US-006 | [X returns candidate posts and says what it spent](todo/US-006-x-returns-candidate-posts-and-says-what-it-spent.md) | feature | todo | 2026-09-04T22:49+08:00 |
 | p2 | US-015 | [A deleted post stops being shown](todo/US-015-a-deleted-post-stops-being-shown.md) | feature | todo | 2026-09-04T22:49+08:00 |
 | p2 | US-016 | [A match reaches email or a webhook](todo/US-016-a-match-reaches-email-or-a-webhook.md) | feature | todo | 2026-09-04T22:49+08:00 |
 | p2 | US-017 | [A self-hosted instance has one account](todo/US-017-a-self-hosted-instance-has-one-account.md) | feature | todo | 2026-09-04T22:49+08:00 |
 | p2 | US-019 | [The project has a license](todo/US-019-the-project-has-a-license.md) | chore | todo | 2026-09-04T23:00+08:00 |
 | p2 | US-020 | [A monitor can include Reddit comments](todo/US-020-a-monitor-can-include-reddit-comments.md) | feature | todo | 2026-09-05T01:18+08:00 |
+| p2 | US-026 | [A person chooses which provider fetches a platform](todo/US-026-a-person-chooses-which-provider-fetches-a-platform.md) | feature | todo | 2026-09-05T15:23+08:00 |
 | p3 | US-018 | [A mutation sweep proves the suite is sensitive](todo/US-018-a-mutation-sweep-proves-the-suite-is-sensitive.md) | chore | todo | 2026-09-04T22:54+08:00 |
 
 Finished work is in [DONE.md](DONE.md). The rules and the ticket

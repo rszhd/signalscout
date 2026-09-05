@@ -26,6 +26,23 @@ cannot hold the claim up.
 The general form of that rule: **same feature, two tests, when the shortcut one
 layer takes lies about the thing the other must verify.**
 
+Say the lie out loud before writing the second test: name the failure it
+catches that the first one cannot. For ordinary CRUD, one test from the route
+to the database covers the routing and the persistence together. A second test
+in `packages/core` earns its place when the rule has a caller the first test
+never reaches — which is what US-012 found, with the monitor routes' counts
+asserted nowhere while the rule under them passed.
+
+**A screen is driven through the DOM a person uses.** `apps/web/src/testing.tsx`
+mounts a screen into a real document, finds an element by its label or by the
+words on its button, and sets a value through the native setter React listens
+to. A test that reaches into props can pass with the control unreachable on the
+screen.
+
+Spend that harness on the interactions that carry a decision: submitting the
+monitor form, giving a verdict, showing a failed request. A presentation change
+— a class, a heading, a colour — does not owe the suite a case.
+
 **Real Postgres from the first test file.** No in-memory stand-in.
 
 This is the one place we start where another project finished. That project ran
@@ -55,6 +72,12 @@ lets an assistant run everything after every change and correct itself without
 a person in the loop. A slow or flaky suite breaks that loop: it gets skipped,
 or a green run gets trusted that should not be.
 
+Measured on 2026-09-05: 615 tests in 42 files, 78.3 seconds, against a Postgres
+that was already running. That is the number this claim rests on, so re-measure
+it rather than assuming it holds. This is a reason to keep the suite hermetic.
+It is not an instruction to run all of it after every keystroke: run the files
+you touched while you work, and the whole suite before you call the work done.
+
 ---
 
 ## Working with an AI pair changes one thing
@@ -78,9 +101,30 @@ output is right, and never look at the code. A test that recomputes the
 expected value the way the code computes it proves nothing. Prefer a literal a
 human can check over one the test derives.
 
-**2. See it fail.** A test you have never watched fail is not trusted. Test-first
-gets this free. Test-alongside does not, so bolt it on: break the code on
-purpose and confirm the test goes red.
+**2. See it fail, where test-first did not already buy it.** A test you have
+never watched fail is not trusted. Test-first gets this free. Test-alongside
+does not, so on a test written beside or after the code, break that code on
+purpose and watch that one file go red.
+
+**This is a substitute for test-first, not an addition to it.** The tickets
+measured the difference. About seventy-five deliberate mutations have been applied
+across eight tickets. The three surfaces written test-first — credential
+encryption, the budget guard, cursor and deduplication — took twenty-three of
+them, and every one was caught the first time. Every gap came from a surface
+written alongside the code:
+
+| Ticket | What the breakage found |
+|---|---|
+| US-007 | A scheduler test that asserted nothing, because one monitor hid the dedup key |
+| US-008 | A fail-open branch nothing covered |
+| US-011 | Ordering expectations written from the constant, so they passed at any value |
+| US-012 | Two route call sites counted nowhere |
+| US-014 | A cost flag counting past the cap where the guard counts at it, and an unreachable branch |
+
+So flip one line on a test you wrote alongside the code, and skip it on a
+surface whose assertion was written and reviewed first. Mutating a finished
+feature nine ways is a sweep by hand, and the sweep is US-018's job, not a
+ticket's.
 
 **3. Test against the real thing, not the assistant's fake.** A fake written by
 the same author will agree with buggy code.
@@ -108,6 +152,13 @@ An expected value changes only when the behaviour was *meant* to change, and
 the commit says which and why. This forces every disagreement between code and
 test up to intent, instead of letting it be settled by editing whichever side
 is easier. It is the most important line in this file.
+
+There is one other way an expected value moves. The test never matched the
+ticket in the first place — the behaviour did not change, the assertion was
+wrong the day it was written. Correcting it is allowed, and the commit quotes
+the line of the ticket that says what was meant. Guard the shape of that
+exception: "the code looks right, so the test must be wrong" is the failure
+this whole section exists to prevent, and it wears the same words.
 
 ---
 
@@ -224,8 +275,11 @@ behaviour it protects is gone. The inputs that separate a guard from its absence
 are the ones that take a different code path, not the ones that look most
 malformed.
 
-The cheapest check in this whole practice: **if an assertion-first case passes
-immediately, it is wrong or it is incomplete.**
+The cheapest check in this whole practice: **an assertion-first case that
+passes immediately owes an explanation.** Usually it is wrong or incomplete.
+Sometimes it is a new caller of a rule that already exists, and it passes
+because the rule works. Write down which, in the ticket, before you keep the
+case.
 
 ---
 
@@ -295,9 +349,26 @@ Reach for it before reaching for concurrency flags.
   outage, and on X can be billed.
 - **Live model providers in CI.** Covered by recorded responses. The quality
   question is answered by the labelled set, by hand.
-- **Deep frontend interaction.** Components with logic are unit tested, and a
-  render smoke test catches breaks the build cannot see. Driving events and
-  full user journeys costs more harness than it returns at this size.
+- **Full user journeys, and a real browser.** A screen test mounts one screen
+  into jsdom and drives it, as *What we practice* describes. Nothing walks from
+  the monitor form through the worker to the inbox, and nothing runs in a
+  browser engine. That path is checked by hand against a live provider, and the
+  ticket that does it budgets for the run.
+
+---
+
+## When to stop
+
+A suite has no natural end, so name one. **Stop when every acceptance box is
+verified, when the changed behaviour has a test somebody has watched fail, and
+when no concrete concern is left unanswered.**
+
+Concrete is the word doing the work. "There could be an edge case" is not a
+concern. "The deletion job calls this rule and has no case" is. Write the
+concern down or stop.
+
+A test added because the suite felt thin proves nothing and is maintained
+forever. The cost of the wrong extra test is not the minute it takes to write.
 
 ---
 

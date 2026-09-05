@@ -22,7 +22,7 @@ import {
 } from "../ai/config.js";
 import { createEmbedder, type Embedder } from "../ai/embed.js";
 import { loadAiEnv, loadNotificationEnv } from "../config/env.js";
-import { createDatabase, type Database } from "../db/client.js";
+import { createDatabase, type Database, poolOptions } from "../db/client.js";
 import type { Logger } from "../logger.js";
 import type { NotificationTransport } from "../notifications/deliver.js";
 import { createNotificationTransport } from "../notifications/transport.js";
@@ -248,7 +248,7 @@ export async function startWorker({
   // process instead of failing one poll, quietly, every hour.
   assertSourcesCanBeStored(sources.platforms());
 
-  const boss = new PgBoss({ connectionString: databaseUrl });
+  const boss = new PgBoss({ connectionString: databaseUrl, ...poolOptions() });
   boss.on("error", (error) => logger.error({ err: error }, "pg-boss error"));
 
   await boss.start();

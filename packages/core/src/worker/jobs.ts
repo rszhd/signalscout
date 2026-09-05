@@ -15,6 +15,7 @@
  * refused, and at boot the two processes race.
  */
 import { PgBoss } from "pg-boss";
+import { poolOptions } from "../db/client.js";
 import { deadLetterQueue, estimateQueue, queueDefinitions } from "./queues.js";
 
 export interface JobSender {
@@ -35,7 +36,7 @@ export function jobSenderFor(boss: PgBoss): JobSender {
 
 /** Open a connection of our own, for an API that has no worker beside it. */
 export async function startJobSender(databaseUrl: string): Promise<JobSender> {
-  const boss = new PgBoss({ connectionString: databaseUrl });
+  const boss = new PgBoss({ connectionString: databaseUrl, ...poolOptions() });
 
   await boss.start();
 

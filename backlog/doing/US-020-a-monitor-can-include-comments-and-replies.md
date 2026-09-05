@@ -175,49 +175,50 @@ told that comments are unavailable, not quietly given none.
 
 ## Acceptance
 
-- [ ] `SourceQuery` carries an opt-in for replies, and a connector that cannot
+- [x] `SourceQuery` carries an opt-in for replies, and a connector that cannot
       fetch them ignores it rather than failing
-- [ ] A connector declares whether it can fetch replies, and the monitor form
+- [x] A connector declares whether it can fetch replies, and the monitor form
       reads that declaration per platform, so a person is told which of their
       platforms will return replies rather than being given none in silence
-- [ ] The fake source can be told to return a thread, so callers are tested
+- [x] The fake source can be told to return a thread, so callers are tested
       without a network and without a bill
 - [ ] One parser reads a reply from every SocialCrawl platform, because the
       provider's `CommentList` schema is shared, and a test proves it against
-      captured X and LinkedIn answers
-- [ ] The ScrapeCreators Reddit connector fetches a thread by post URL when the
+      captured X and LinkedIn answers — **deferred with the two connectors
+      below**
+- [x] The ScrapeCreators Reddit connector fetches a thread by post URL when the
       opt-in is set, and never when it is not
 - [ ] The SocialCrawl X connector fetches replies by post URL when the opt-in
       is set, and never when it is not
 - [ ] The SocialCrawl LinkedIn connector does the same, or the ticket records
       why it was left out
-- [ ] A reply is stored as its own row, keyed by the id its platform gives it,
+- [x] A reply is stored as its own row, keyed by the id its platform gives it,
       with a link to its parent post and to its parent reply. Reddit's `t1_`
       fullname and an X reply id are the same kind of key, and
       `UNIQUE (source, external_id)` needs no change
-- [ ] A thread is opened only for a post that survived the pre-filter, and the
+- [x] A thread is opened only for a post that survived the pre-filter, and the
       number of threads one poll may open is bounded
-- [ ] `num_comments` is stored on the post at collection, and a thread is
+- [x] `num_comments` is stored on the post at collection, and a thread is
       re-opened only when that number has grown
-- [ ] The classifier is given the parent post title and the immediate parent
+- [x] The classifier is given the parent post title and the immediate parent
       comment, and the prompt says the thread is context and the comment author
       is who is being scored
-- [ ] A monitor stores the opt-in, in a migration that keeps it off for every
+- [x] A monitor stores the opt-in, in a migration that keeps it off for every
       existing monitor
-- [ ] The monitor form shows the opt-in, says what it costs in model calls
+- [x] The monitor form shows the opt-in, says what it costs in model calls
       rather than in fetches, and leaves it off by default. The cost sentence
       is per platform, because the four prices above differ by a factor of
       twenty-two
-- [ ] The inbox shows the parent post title above a comment match and links to
+- [x] The inbox shows the parent post title above a comment match and links to
       the comment permalink, so a person sees the context the model saw
 - [ ] Tests replay comment payloads captured by
       `sources/providers/scrapecreators/fixtures/capture.mjs`, extended with a
       comments mode
-- [ ] One page is read per thread by default, and the number of pages a poll
+- [x] One page is read per thread by default, and the number of pages a poll
       may buy is bounded
-- [ ] A top-level `has_more: false` is never stored or logged as "the thread is
+- [x] A top-level `has_more: false` is never stored or logged as "the thread is
       complete", and a test proves a partly read thread is recorded as partial
-- [ ] The embedding stage does not run on a comment, and a test proves a
+- [x] The embedding stage does not run on a comment, and a test proves a
       comment reaches the next stage without one. US-029 measured it: see the
       Context above
 
@@ -333,3 +334,39 @@ join both from our own rows.
   LinkedIn, because every other platform on that list is a fourth network and
   PLAN.md's rule stands for the fourth. The file was renamed; the id did not
   change.
+
+- 2026-09-06T03:52+08:00 — Reddit is done, end to end, and X and LinkedIn are
+  deliberately not started. The owner asked to settle one platform before
+  spreading across three, and the interface was built for exactly that: a
+  connector without `fetchReplies` declares by its absence that it cannot, so
+  the two platforms left behind still poll and still return posts today.
+
+  **The shape.** `collect → filter → replies → filter → classify`. The replies
+  step is its own queue because it spends at a provider where the filter spends
+  at a model, and one job that could fail at either would be retried against
+  both. It runs after the classify job is booked, so a post reaches the inbox
+  without waiting on a thread.
+
+  **The two rules that decide what this costs**, and each has a test that goes
+  red if it is removed. A thread is opened only under a post the pre-filter
+  kept. And it is opened only when the platform's own reply count has grown,
+  unless we know we only half read it — without that second rule an hourly
+  monitor re-buys every conversation it has ever seen, for ever.
+
+  **What a reply skips.** Keyword and embedding both measure subject, and a
+  reply has none of its own. Triage remains, which is US-029's and US-030's
+  conclusion arriving in code: on a reply it is the only paid stage in front of
+  the classifier.
+
+  **What the classifier is told.** Two levels — the post, and the reply
+  directly above — and a sentence saying the thread is context and the reply's
+  own author is who is judged. Without that line the model scores whoever wrote
+  the post and every reply under a good post becomes a match.
+
+  936 tests pass. Eight of them drive the replies step against real Postgres,
+  and the connector tests replay the captured thread where ScrapeCreators says
+  `has_more: false` with 33 of 58 comments missing.
+
+  Nothing here has met a live provider. The connector is driven against
+  captured payloads only, so the whole path is unproven until one real poll runs
+  with `includeReplies` on.

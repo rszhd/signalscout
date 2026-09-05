@@ -6,7 +6,7 @@ priority: p2
 created: 2026-09-06T02:54+08:00
 parent: US-030
 area:
-resolution:
+resolution: shipped
 ---
 
 ## Context

@@ -2,13 +2,14 @@
 
 # Done
 
-26 finished.
+27 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
 | BUG-003 | [A post below the threshold is classified again on every poll](done/2026-09/BUG-003-a-post-below-the-threshold-is-classified-again-on-every-poll.md) | bug | fixed | 2026-09 |
 | BUG-002 | [A seven-day window is bought as a month](done/2026-09/BUG-002-a-seven-day-window-is-bought-as-a-month.md) | bug | fixed | 2026-09 |
 | BUG-001 | [A pending Reddit collection is not resumed](done/2026-09/BUG-001-a-pending-reddit-collection-is-not-resumed.md) | bug | shipped | 2026-09 |
+| US-032 | [The classifier reads with the careful model](done/2026-09/US-032-the-classifier-reads-with-the-careful-model.md) | chore | shipped | 2026-09 |
 | US-029 | [A measurement says which pre-filter fits a comment](done/2026-09/US-029-a-measurement-says-which-pre-filter-fits-a-comment.md) | spike | shipped | 2026-09 |
 | US-028 | [LinkedIn returns candidate posts through SocialCrawl](done/2026-09/US-028-linkedin-returns-candidate-posts.md) | feature | shipped | 2026-09 |
 | US-027 | [A query fits the platform it searches](done/2026-09/US-027-a-query-fits-the-platform-it-searches.md) | feature | shipped | 2026-09 |

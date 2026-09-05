@@ -2,7 +2,7 @@
 
 # Open tickets
 
-7 open — 3 doing, 4 todo, 0 parked (1 p1, 5 p2, 1 p3).
+8 open — 3 doing, 5 todo, 0 parked (1 p1, 6 p2, 1 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -12,6 +12,7 @@
 | p2 | US-017 | [A self-hosted instance has one account](todo/US-017-a-self-hosted-instance-has-one-account.md) | feature | todo | 2026-09-04T22:49+08:00 |
 | p2 | US-019 | [The project has a license](todo/US-019-the-project-has-a-license.md) | chore | todo | 2026-09-04T23:00+08:00 |
 | p2 | US-020 | [A monitor can include Reddit comments](todo/US-020-a-monitor-can-include-reddit-comments.md) | feature | todo | 2026-09-05T01:18+08:00 |
+| p2 | US-027 | [A query fits the platform it searches](todo/US-027-a-query-fits-the-platform-it-searches.md) | feature | todo | 2026-09-05T21:52+08:00 |
 | p3 | US-018 | [A mutation sweep proves the suite is sensitive](todo/US-018-a-mutation-sweep-proves-the-suite-is-sensitive.md) | chore | todo | 2026-09-04T22:54+08:00 |
 
 Finished work is in [DONE.md](DONE.md). The rules and the ticket

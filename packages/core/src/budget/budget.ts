@@ -160,7 +160,7 @@ export interface RecordSourceUsageInput {
  * never polled", and Bright Data's trigger call is exactly that shape.
  */
 export async function recordSourceUsage(
-  db: Database,
+  db: Pick<Database, "insert">,
   {
     monitorId,
     source,

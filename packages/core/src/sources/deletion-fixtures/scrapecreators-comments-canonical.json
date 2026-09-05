@@ -1,0 +1,549 @@
+{
+  "success": true,
+  "credits_remaining": 2079,
+  "credits_charged": 1,
+  "post": {
+    "id": "1w71bul",
+    "author": "captured-author",
+    "author_fullname": "captured-author",
+    "subreddit": "softwaretesting",
+    "title": "Starting Automation from 0% as a QA Lead — How are you using AI, MCPs & Agents in QA?",
+    "selftext": "Hey everyone, I’m joining a fintech organization on September 15 as an Automation QA Lead. They currently have 0% automation, so I’ll be responsible for building the framework, defining the automation process/strategy, selecting test cases and getting automation started from scratch. The interesting part: I won’t have additional automation resources initially. It’ll basically be me + Claude Desktop + AI tools. 😄 I have good experience with Playwright and Cypress, and I’m planning to use Playwright + JavaScript. Since AI is now such a big part of development, I want to build the automation process with AI in mind from Day 1, rather than adding it later. I’d love to hear from people already doing this in real projects: AI + Automation How are you using AI in your Playwright/automation workflow? What tasks are actually worth delegating to AI? Any useful AI workflows/prompts you recommend? MCPs Which MCPs have actually been useful for QA automation? For example: Playwright, GitHub, Jira, Confluence, Database, Browser/DevTools, API, or custom MCPs. AI Agents Are you using/building AI agents for QA? For example: Test case generation Automation/code generation Test data generation Failure analysis Locator maintenance Regression selection Test review Reporting Which ones have provided real value, and which are just hype? Starting from 0% If you had to build a Playwright framework and automation process from scratch today, what would you prioritize from Day 1? Anything that you wish you had designed differently when starting your own framework? GitHub Repos If you've built any GitHub repositories around Playwright + AI, AI agents, MCPs, self-healing automation, AI test generation, etc., please share them. Also, if you know any good open-source GitHub repos that I should study, please drop them in the comments. Basically, if you were in my position — one QA Automation Lead, 0% existing automation, Playwright + JavaScript, and AI available from Day 1 — how would you approach it? Would love to hear real-world experiences, useful tools/MCPs, GitHub repos, and lessons from things that didn't work. Thanks!",
+    "selftext_html": "\n      <p>\n      Hey everyone,\n    </p><p>\n      I’m joining a fintech organization on <strong>September 15 as an Automation QA Lead</strong>. They currently have <strong>0% automation</strong>, so I’ll be responsible for building the framework, defining the automation process/strategy, selecting test cases and getting automation started from scratch.\n    </p><p>\n      The interesting part: <strong>I won’t have additional automation resources initially.</strong> It’ll basically be <strong>me + Claude Desktop + AI tools</strong>. 😄\n    </p><p>\n      I have good experience with <strong>Playwright and Cypress</strong>, and I’m planning to use <strong>Playwright + JavaScript</strong>.\n    </p><p>\n      Since AI is now such a big part of development, I want to build the automation process with <strong>AI in mind from Day 1</strong>, rather than adding it later.\n    </p><p>\n      I’d love to hear from people already doing this in real projects:\n    </p><h1 class=\"text-24-scalable xs:text-20-scalable\">AI + Automation</h1><ul>\n        <li>\n      <p>\n      How are you using AI in your Playwright/automation workflow?\n    </p>\n    </li><li>\n      <p>\n      What tasks are actually worth delegating to AI?\n    </p>\n    </li><li>\n      <p>\n      Any useful AI workflows/prompts you recommend?\n    </p>\n    </li>\n      </ul><h1 class=\"text-24-scalable xs:text-20-scalable\">MCPs</h1><p>\n      Which MCPs have actually been useful for QA automation?\n    </p><p>\n      For example: <strong>Playwright, GitHub, Jira, Confluence, Database, Browser/DevTools, API</strong>, or custom MCPs.\n    </p><h1 class=\"text-24-scalable xs:text-20-scalable\">AI Agents</h1><p>\n      Are you using/building AI agents for QA?\n    </p><p>\n      For example:\n    </p><ul>\n        <li>\n      <p>\n      Test case generation\n    </p>\n    </li><li>\n      <p>\n      Automation/code generation\n    </p>\n    </li><li>\n      <p>\n      Test data generation\n    </p>\n    </li><li>\n      <p>\n      Failure analysis\n    </p>\n    </li><li>\n      <p>\n      Locator maintenance\n    </p>\n    </li><li>\n      <p>\n      Regression selection\n    </p>\n    </li><li>\n      <p>\n      Test review\n    </p>\n    </li><li>\n      <p>\n      Reporting\n    </p>\n    </li>\n      </ul><p>\n      Which ones have provided real value, and which are just hype?\n    </p><h1 class=\"text-24-scalable xs:text-20-scalable\">Starting from 0%</h1><p>\n      If you had to build a Playwright framework and automation process from scratch today, what would you prioritize from Day 1?\n    </p><p>\n      Anything that you wish you had designed differently when starting your own framework?\n    </p><h1 class=\"text-24-scalable xs:text-20-scalable\">GitHub Repos</h1><p>\n      If you've <strong>built any GitHub repositories</strong> around Playwright + AI, AI agents, MCPs, self-healing automation, AI test generation, etc., please share them.\n    </p><p>\n      Also, if you know any <strong>good open-source GitHub repos</strong> that I should study, please drop them in the comments.\n    </p><p>\n      Basically, if you were in my position — <strong>one QA Automation Lead, 0% existing automation, Playwright + JavaScript, and AI available from Day 1</strong> — how would you approach it?\n    </p><p>\n      Would love to hear <strong>real-world experiences, useful tools/MCPs, GitHub repos, and lessons from things that didn't work.</strong>\n    </p><p>\n      Thanks!\n    </p>\n    ",
+    "downs": 0,
+    "name": "t3_1w71bul",
+    "upvote_ratio": 0.6379310344827587,
+    "ups": 16,
+    "total_awards_received": 0,
+    "score": 16,
+    "created": 1788520116,
+    "created_utc": 1788520116,
+    "created_at_iso": "2026-09-04T11:08:36.000Z",
+    "num_comments": 22,
+    "url": "https://www.reddit.com/r/softwaretesting/comments/1w71bul/starting_automation_from_0_as_a_qa_lead_how_are/",
+    "permalink": "/r/softwaretesting/comments/1w71bul/starting_automation_from_0_as_a_qa_lead_how_are/",
+    "subreddit_subscribers": null,
+    "is_video": false,
+    "archived": false,
+    "locked": false,
+    "over_18": false,
+    "spoiler": false
+  },
+  "comments": [
+    {
+      "url": "https://www.reddit.com/r/softwaretesting/comments/1w71bul/comment/p7rd166/",
+      "created_utc": 1788521814,
+      "created_at_iso": "2026-09-04T11:36:54.000Z",
+      "id": "p7rd166",
+      "author": "captured-author",
+      "author_fullname": null,
+      "body": "I would start by reducing the AI slop when making these threads 🫠",
+      "body_html": "\n      <p>\n      I would start by reducing the AI slop when making these threads 🫠\n    </p>\n    ",
+      "collapsed": false,
+      "name": "t1_p7rd166",
+      "parent_id": "t3_1w71bul",
+      "permalink": "/r/softwaretesting/comments/1w71bul/comment/p7rd166/",
+      "ups": 53,
+      "downs": 0,
+      "score": 53,
+      "replies": {
+        "items": [
+          {
+            "url": "https://www.reddit.com/r/softwaretesting/comments/1w71bul/comment/p7rtn2e/",
+            "created_utc": 1788527262,
+            "created_at_iso": "2026-09-04T13:07:42.000Z",
+            "id": "p7rtn2e",
+            "author": "captured-author",
+            "author_fullname": null,
+            "body": "That's great insight — and one worth considering.",
+            "body_html": "\n      <p>\n      That's great insight — and one worth considering.\n    </p>\n    ",
+            "collapsed": false,
+            "name": "t1_p7rtn2e",
+            "parent_id": "t1_p7rd166",
+            "permalink": "/r/softwaretesting/comments/1w71bul/comment/p7rtn2e/",
+            "ups": 14,
+            "downs": 0,
+            "score": 14,
+            "replies": {
+              "items": [
+                {
+                  "url": "https://www.reddit.com/r/softwaretesting/comments/1w71bul/comment/p7s25pl/",
+                  "created_utc": 1788529707,
+                  "created_at_iso": "2026-09-04T13:48:27.000Z",
+                  "id": "p7s25pl",
+                  "author": "captured-author",
+                  "author_fullname": null,
+                  "body": "want me guide you to step by step process on eliminating the AI slop in a post?",
+                  "body_html": "\n      <p>\n      want me guide you to step by step process on eliminating the AI slop in a post?\n    </p>\n    ",
+                  "collapsed": false,
+                  "name": "t1_p7s25pl",
+                  "parent_id": "t1_p7rtn2e",
+                  "permalink": "/r/softwaretesting/comments/1w71bul/comment/p7s25pl/",
+                  "ups": 11,
+                  "downs": 0,
+                  "score": 11,
+                  "replies": {
+                    "items": [],
+                    "more": {
+                      "has_more": true,
+                      "cursor": "eyJ0eXBlIjoic2hyZWRkaXRfbW9yZV9jb21tZW50cyIsInNyYyI6Ii9zdmMvc2hyZWRkaXQvbW9yZS1jb21tZW50cy9zb2Z0d2FyZXRlc3RpbmcvdDNfMXc3MWJ1bD9zb3J0PUNPTkZJREVOQ0Umc3RhcnRpbmdEZXB0aD0zJmNvbW1lbnRQYXJlbnRQb3NpdGlvbnM9MCwwLDAiLCJjdXJzb3IiOiJZMjl0YldWdWRIUnlaV1U2TkRnNFlXTTNZakFzT2pvek9tUXhPblF4WDNBM2N6STFjR3c9Iiwic3VicmVkZGl0Ijoic29mdHdhcmV0ZXN0aW5nIiwicG9zdElkIjoiMXc3MWJ1bCIsInBhcmVudFRoaW5nSWQiOiJ0MV9wN3MyNXBsIn0"
+                    }
+                  }
+                }
+              ],
+              "more": {
+                "has_more": true,
+                "cursor": "p7s25pl"
+              }
+            }
+          }
+        ],
+        "more": {
+          "has_more": true,
+          "cursor": "p7s25pl"
+        }
+      }
+    },
+    {
+      "url": "https://www.reddit.com/r/softwaretesting/comments/1w71bul/comment/p7swsyg/",
+      "created_utc": 1788537857,
+      "created_at_iso": "2026-09-04T16:04:17.000Z",
+      "id": "p7swsyg",
+      "author": "captured-author",
+      "author_fullname": null,
+      "body": "Imagine asking a community for help and not having the decency to actually produce the question yourself.",
+      "body_html": "\n      <p>\n      Imagine asking a community for help and not having the decency to actually produce the question yourself.\n    </p>\n    ",
+      "collapsed": false,
+      "name": "t1_p7swsyg",
+      "parent_id": "t3_1w71bul",
+      "permalink": "/r/softwaretesting/comments/1w71bul/comment/p7swsyg/",
+      "ups": 10,
+      "downs": 0,
+      "score": 10,
+      "replies": {
+        "items": [
+          {
+            "url": "https://www.reddit.com/r/softwaretesting/comments/1w71bul/comment/p7t1t84/",
+            "created_utc": 1788539149,
+            "created_at_iso": "2026-09-04T16:25:49.000Z",
+            "id": "p7t1t84",
+            "author": "captured-author",
+            "author_fullname": null,
+            "body": "Maybe an AI bot got the job…",
+            "body_html": "\n      <p>\n      Maybe an AI bot got the job…\n    </p>\n    ",
+            "collapsed": false,
+            "name": "t1_p7t1t84",
+            "parent_id": "t1_p7swsyg",
+            "permalink": "/r/softwaretesting/comments/1w71bul/comment/p7t1t84/",
+            "ups": 3,
+            "downs": 0,
+            "score": 3,
+            "replies": {
+              "items": [
+                {
+                  "url": "https://www.reddit.com/r/softwaretesting/comments/1w71bul/comment/p7wcjlm/",
+                  "created_utc": 1788574026,
+                  "created_at_iso": "2026-09-05T02:07:06.000Z",
+                  "id": "p7wcjlm",
+                  "author": "captured-author",
+                  "author_fullname": null,
+                  "body": "I wouldn't be surprised.",
+                  "body_html": "\n      <p>\n      I wouldn't be surprised.\n    </p>\n    ",
+                  "collapsed": false,
+                  "name": "t1_p7wcjlm",
+                  "parent_id": "t1_p7t1t84",
+                  "permalink": "/r/softwaretesting/comments/1w71bul/comment/p7wcjlm/",
+                  "ups": 2,
+                  "downs": 0,
+                  "score": 2,
+                  "replies": {
+                    "items": [],
+                    "more": {
+                      "has_more": false,
+                      "cursor": null
+                    }
+                  }
+                }
+              ],
+              "more": {
+                "has_more": true,
+                "cursor": "p7t1t84"
+              }
+            }
+          }
+        ],
+        "more": {
+          "has_more": true,
+          "cursor": "p7t1t84"
+        }
+      }
+    },
+    {
+      "url": "https://www.reddit.com/r/softwaretesting/comments/1w71bul/comment/p7rb4db/",
+      "created_utc": 1788521095,
+      "created_at_iso": "2026-09-04T11:24:55.000Z",
+      "id": "p7rb4db",
+      "author": "captured-author",
+      "author_fullname": null,
+      "body": "I would not start automation from day one as you say. I would start by understanding the product and business workflows. I would choose the critical/core functionalities to stat automation with.\nGood luck.",
+      "body_html": "\n      <p>\n      I would not start automation from day one as you say. I would start by understanding the product and business workflows. I would choose the critical/core functionalities to stat automation with.<br>Good luck.\n    </p>\n    ",
+      "collapsed": false,
+      "name": "t1_p7rb4db",
+      "parent_id": "t3_1w71bul",
+      "permalink": "/r/softwaretesting/comments/1w71bul/comment/p7rb4db/",
+      "ups": 12,
+      "downs": 0,
+      "score": 12,
+      "replies": {
+        "items": [
+          {
+            "url": "https://www.reddit.com/r/softwaretesting/comments/1w71bul/comment/p7rd4mj/",
+            "created_utc": 1788521849,
+            "created_at_iso": "2026-09-04T11:37:29.000Z",
+            "id": "p7rd4mj",
+            "author": "captured-author",
+            "author_fullname": null,
+            "body": "second this. Once you've understood the product and business flows, start with the most critical cases and build out from there. Also understanding what not to automate will pay off in the long run",
+            "body_html": "\n      <p>\n      second this. Once you've understood the product and business flows, start with the most critical cases and build out from there. Also understanding what <em>not</em> to automate will pay off in the long run\n    </p>\n    ",
+            "collapsed": false,
+            "name": "t1_p7rd4mj",
+            "parent_id": "t1_p7rb4db",
+            "permalink": "/r/softwaretesting/comments/1w71bul/comment/p7rd4mj/",
+            "ups": 2,
+            "downs": 0,
+            "score": 2,
+            "replies": {
+              "items": [],
+              "more": {
+                "has_more": false,
+                "cursor": null
+              }
+            }
+          }
+        ],
+        "more": {
+          "has_more": true,
+          "cursor": "p7rb4db"
+        }
+      }
+    },
+    {
+      "url": "https://www.reddit.com/r/softwaretesting/comments/1w71bul/comment/p7wehel/",
+      "created_utc": 1788574738,
+      "created_at_iso": "2026-09-05T02:18:58.000Z",
+      "id": "p7wehel",
+      "author": "captured-author",
+      "author_fullname": null,
+      "body": "i’d say just focus on the business goals and don’t leave everything in hands of AI it can produce slop text like you have posted here",
+      "body_html": "\n      <p>\n      i’d say just focus on the business goals and don’t leave everything in hands of AI it can produce slop text like you have posted here\n    </p>\n    ",
+      "collapsed": false,
+      "name": "t1_p7wehel",
+      "parent_id": "t3_1w71bul",
+      "permalink": "/r/softwaretesting/comments/1w71bul/comment/p7wehel/",
+      "ups": 2,
+      "downs": 0,
+      "score": 2,
+      "replies": {
+        "items": [],
+        "more": {
+          "has_more": false,
+          "cursor": null
+        }
+      }
+    },
+    {
+      "url": "https://www.reddit.com/r/softwaretesting/comments/1w71bul/comment/p7racsc/",
+      "created_utc": 1788520798,
+      "created_at_iso": "2026-09-04T11:19:58.000Z",
+      "id": "p7racsc",
+      "author": "captured-author",
+      "author_fullname": null,
+      "body": "I’d put all my early energy into locator strategy and test data management, those two things will cause more headaches than any flaky test later on. Playwright’s got decent built-in locators but if you’re leaning on AI for generation you’ll want a strict naming convention or data attributes from the start, otherwise the AI will just latch onto fragile selectors and you’ll spend half your week fixing tests.\n\n For MCPs the Playwright one is obvious but hooking into your database for test data setup/teardown is where it really shines, you can prompt Claude to spin up a fresh account with specific flags and tear it down after the run without writing a ton of boilerplate. Agents for failure analysis are still mostly hype in my experience, they’ll confidently tell you a test failed because of a timeout when it was actually a bad selector, but they’re surprisingly useful for churning out repetitive spec files once you’ve got a solid template locked in.",
+      "body_html": "\n      <p>\n      I’d put all my early energy into locator strategy and test data management, those two things will cause more headaches than any flaky test later on. Playwright’s got decent built-in locators but if you’re leaning on AI for generation you’ll want a strict naming convention or data attributes from the start, otherwise the AI will just latch onto fragile selectors and you’ll spend half your week fixing tests.\n    </p><p>\n      For MCPs the Playwright one is obvious but hooking into your database for test data setup/teardown is where it really shines, you can prompt Claude to spin up a fresh account with specific flags and tear it down after the run without writing a ton of boilerplate. Agents for failure analysis are still mostly hype in my experience, they’ll confidently tell you a test failed because of a timeout when it was actually a bad selector, but they’re surprisingly useful for churning out repetitive spec files once you’ve got a solid template locked in.\n    </p>\n    ",
+      "collapsed": false,
+      "name": "t1_p7racsc",
+      "parent_id": "t3_1w71bul",
+      "permalink": "/r/softwaretesting/comments/1w71bul/comment/p7racsc/",
+      "ups": 5,
+      "downs": 0,
+      "score": 5,
+      "replies": {
+        "items": [
+          {
+            "url": "https://www.reddit.com/r/softwaretesting/comments/1w71bul/comment/p7rgfxc/",
+            "created_utc": 1788523028,
+            "created_at_iso": "2026-09-04T11:57:08.000Z",
+            "id": "p7rgfxc",
+            "author": "captured-author",
+            "author_fullname": null,
+            "body": "Analysis can be good if you give it access to extracted pw trace and application logs at aame time.",
+            "body_html": "\n      <p>\n      Analysis can be good if you give it access to extracted pw trace and application logs at aame time.\n    </p>\n    ",
+            "collapsed": false,
+            "name": "t1_p7rgfxc",
+            "parent_id": "t1_p7racsc",
+            "permalink": "/r/softwaretesting/comments/1w71bul/comment/p7rgfxc/",
+            "ups": 1,
+            "downs": 0,
+            "score": 1,
+            "replies": {
+              "items": [],
+              "more": {
+                "has_more": false,
+                "cursor": null
+              }
+            }
+          }
+        ],
+        "more": {
+          "has_more": true,
+          "cursor": "p7racsc"
+        }
+      }
+    },
+    {
+      "url": "https://www.reddit.com/r/softwaretesting/comments/1w71bul/comment/p7x4ky0/",
+      "created_utc": 1788585400,
+      "created_at_iso": "2026-09-05T05:16:40.000Z",
+      "id": "p7x4ky0",
+      "author": "captured-author",
+      "author_fullname": null,
+      "body": "I’m currently developing AI agents, bots, and MCPs that can be utilized in day-to-day QA operations as part of the Platform QE role. I believe it’s better to focus more on how we can leverage AI to simplify and automate our tasks, making our QA processes more efficient.",
+      "body_html": "\n      <p>\n      I’m currently developing AI agents, bots, and MCPs that can be utilized in day-to-day QA operations as part of the Platform QE role. I believe it’s better to focus more on how we can leverage AI to simplify and automate our tasks, making our QA processes more efficient.\n    </p>\n    ",
+      "collapsed": false,
+      "name": "t1_p7x4ky0",
+      "parent_id": "t3_1w71bul",
+      "permalink": "/r/softwaretesting/comments/1w71bul/comment/p7x4ky0/",
+      "ups": 1,
+      "downs": 0,
+      "score": 1,
+      "replies": {
+        "items": [],
+        "more": {
+          "has_more": false,
+          "cursor": null
+        }
+      }
+    },
+    {
+      "url": "https://www.reddit.com/r/softwaretesting/comments/1w71bul/comment/p7x7fd6/",
+      "created_utc": 1788586734,
+      "created_at_iso": "2026-09-05T05:38:54.000Z",
+      "id": "p7x7fd6",
+      "author": "captured-author",
+      "author_fullname": null,
+      "body": "I almost applied for a very similar job in Charlotte I wonder if this is the same one",
+      "body_html": "\n      <p>\n      I almost applied for a very similar job in Charlotte I wonder if this is the same one\n    </p>\n    ",
+      "collapsed": false,
+      "name": "t1_p7x7fd6",
+      "parent_id": "t3_1w71bul",
+      "permalink": "/r/softwaretesting/comments/1w71bul/comment/p7x7fd6/",
+      "ups": 1,
+      "downs": 0,
+      "score": 1,
+      "replies": {
+        "items": [],
+        "more": {
+          "has_more": false,
+          "cursor": null
+        }
+      }
+    },
+    {
+      "url": "https://www.reddit.com/r/softwaretesting/comments/1w71bul/comment/p7xmg4v/",
+      "created_utc": 1788594157,
+      "created_at_iso": "2026-09-05T07:42:37.000Z",
+      "id": "p7xmg4v",
+      "author": "captured-author",
+      "author_fullname": null,
+      "body": "I am building a test writing skill today, to get out of these absolute terrible written tests that check the copy text or variable config as fixed values.\n\n I'll give an update later!\n\n I have built a fully automation test/verify SaaS already, but the local \"Dev\" path was missing so far.",
+      "body_html": "\n      <p>\n      I am building a test writing skill today, to get out of these absolute terrible written tests that check the copy text or variable config as fixed values.&nbsp;\n    </p><p>\n      I'll give an update later!\n    </p><p>\n      I have built a fully automation test/verify SaaS already, but the local \"Dev\" path was missing so far.&nbsp;\n    </p>\n    ",
+      "collapsed": false,
+      "name": "t1_p7xmg4v",
+      "parent_id": "t3_1w71bul",
+      "permalink": "/r/softwaretesting/comments/1w71bul/comment/p7xmg4v/",
+      "ups": 1,
+      "downs": 0,
+      "score": 1,
+      "replies": {
+        "items": [],
+        "more": {
+          "has_more": false,
+          "cursor": null
+        }
+      }
+    },
+    {
+      "url": "https://www.reddit.com/r/softwaretesting/comments/1w71bul/comment/p7xwpuu/",
+      "created_utc": 1788599585,
+      "created_at_iso": "2026-09-05T09:13:05.000Z",
+      "id": "p7xwpuu",
+      "author": "captured-author",
+      "author_fullname": null,
+      "body": "I would start by ensuring they have a solid regression suite. Then I would go through the tests and determine which ones should be automated.\n\n If they don't have a Regression suite, I would find out whether they have a Regression team and/or does the Regression Testing.\n\n I would recommend waiting to set up all the ai stuff until you get your footing and what you have to work with.\n\n It would be a good idea to understand how the automation works before trying ai.",
+      "body_html": "\n      <p>\n      I would start by ensuring they have a solid regression suite. Then I would go through the tests and determine which ones should be automated.\n    </p><p>\n      If they don't have a Regression suite, I would find out whether they have a Regression team and/or does the Regression Testing.\n    </p><p>\n      I would recommend waiting to set up all the ai stuff until you get your footing and what you have to work with.\n    </p><p>\n      It would be a good idea to understand how the automation works before trying ai.\n    </p>\n    ",
+      "collapsed": false,
+      "name": "t1_p7xwpuu",
+      "parent_id": "t3_1w71bul",
+      "permalink": "/r/softwaretesting/comments/1w71bul/comment/p7xwpuu/",
+      "ups": 1,
+      "downs": 0,
+      "score": 1,
+      "replies": {
+        "items": [],
+        "more": {
+          "has_more": false,
+          "cursor": null
+        }
+      }
+    },
+    {
+      "url": "https://www.reddit.com/r/softwaretesting/comments/1w71bul/comment/p7t2vgu/",
+      "created_utc": 1788539423,
+      "created_at_iso": "2026-09-04T16:30:23.000Z",
+      "id": "p7t2vgu",
+      "author": "captured-author",
+      "author_fullname": null,
+      "body": "Well I guess you can try this, Framework folder structure will grow from time to time, you should build a solid framework for one flow and then if you want the AI to follow it then you can create agents md files on basis of that.\n\n Basically, later on after doing an exploration with playwright MCP, AI should generate test cases automation code on your coding pattern.\n\n Also test case generation sounds good but you should maintain a knowledge base of the product for your AI, so that will be AI source of truth.",
+      "body_html": "\n      <p>\n      Well I guess you can try this, Framework folder structure will grow from time to time, you should build a solid framework for one flow and then if you want the AI to follow it then you can create agents  md files on basis of that.\n    </p><p>\n      Basically, later on after doing an exploration with playwright MCP, AI should generate test cases automation code on your coding pattern.\n    </p><p>\n      Also test case generation sounds good but you should maintain a knowledge base of the product for your AI, so that will be AI source of truth.\n    </p>\n    ",
+      "collapsed": false,
+      "name": "t1_p7t2vgu",
+      "parent_id": "t3_1w71bul",
+      "permalink": "/r/softwaretesting/comments/1w71bul/comment/p7t2vgu/",
+      "ups": 0,
+      "downs": 0,
+      "score": 0,
+      "replies": {
+        "items": [],
+        "more": {
+          "has_more": false,
+          "cursor": null
+        }
+      }
+    },
+    {
+      "url": "https://www.reddit.com/r/softwaretesting/comments/1w71bul/comment/p7vfr09/",
+      "created_utc": 1788562598,
+      "created_at_iso": "2026-09-04T22:56:38.000Z",
+      "id": "p7vfr09",
+      "author": "captured-author",
+      "author_fullname": null,
+      "body": "Tip N1. Don't use MCPs. MCPs return the schema together with the output which costs too much.\n\n Use CLIs e.g. the new Atlassian CLI `twg` but even this one costs unless you make your own cheaper versions with the data you need.",
+      "body_html": "\n      <p>\n      Tip N1. Don't use MCPs. MCPs return the schema together with the output which costs too much.\n    </p><p>\n      Use CLIs e.g. the new Atlassian CLI `twg` but even this one costs unless you make your own cheaper versions with the data you need.\n    </p>\n    ",
+      "collapsed": false,
+      "name": "t1_p7vfr09",
+      "parent_id": "t3_1w71bul",
+      "permalink": "/r/softwaretesting/comments/1w71bul/comment/p7vfr09/",
+      "ups": 0,
+      "downs": 0,
+      "score": 0,
+      "replies": {
+        "items": [],
+        "more": {
+          "has_more": false,
+          "cursor": null
+        }
+      }
+    },
+    {
+      "url": "https://www.reddit.com/r/softwaretesting/comments/1w71bul/comment/p7s1stp/",
+      "created_utc": 1788529608,
+      "created_at_iso": "2026-09-04T13:46:48.000Z",
+      "id": "p7s1stp",
+      "author": "captured-author",
+      "author_fullname": null,
+      "body": "Toolwise you can mix and match. Figure out how code reviews work at scale and how to measure cost. Fundementally you have a generator so it's output becomes a commodity. Set the expectation that you can trash at any point and recreate so the review process and measurement at scale it it's design and expectation should be solved first.",
+      "body_html": "\n      <p>\n      Toolwise you can mix and match. Figure out how code reviews work at scale and how to measure cost. Fundementally you have a generator so it's output becomes a commodity. Set the expectation that you can trash at any point and recreate so the review process and measurement at scale it it's design and expectation should be solved first.\n    </p>\n    ",
+      "collapsed": false,
+      "name": "t1_p7s1stp",
+      "parent_id": "t3_1w71bul",
+      "permalink": "/r/softwaretesting/comments/1w71bul/comment/p7s1stp/",
+      "ups": -1,
+      "downs": 0,
+      "score": -1,
+      "replies": {
+        "items": [],
+        "more": {
+          "has_more": false,
+          "cursor": null
+        }
+      }
+    },
+    {
+      "url": "https://www.reddit.com/r/softwaretesting/comments/1w71bul/comment/p7s270n/",
+      "created_utc": 1788529718,
+      "created_at_iso": "2026-09-04T13:48:38.000Z",
+      "id": "p7s270n",
+      "author": "captured-author",
+      "author_fullname": null,
+      "body": "Focus on wherever the weak spots are with the current manual test suites per Fintech app/system under test and help whoever has developed those first, then use the tools available to help you draft a test plan including an automation development/implementation plan - ensure you get buy-in from product team/s and do research based on the infra/system/platform/app contexts, designs and requirements of your Fintech test targets.\nOnce you've developed automated (or even just semi-automated) unit test scripts locally on your dev machine, use agentic IDEs like Claude Code to help you build out your test suites in your CI pipeline. I've had success with setting up both Gitea and Forgejo Actions and runners in my homelab for personal projects which has helped me to understand Gitlab runners as part of my day job - but your team may use other tools. Basically, each time you commit and merge/push test code changes to your repo it can triggers your CI suite to run a set of automated functional API/unit tests, plus more E2E tests with Playwright (I'm using Python version as my codebase is mostly Python/Flask based) but quite often you'll need to work with developers and DevOps colleagues on how to 'hand over' fully/successfully validated code for promotion from dev/test to later environments.",
+      "body_html": "\n      <p>\n      Focus on wherever the weak spots are with the current manual test suites per Fintech app/system under test and help whoever has developed those first, then use the tools available to help you draft a test plan including an automation development/implementation plan - ensure you get buy-in from product team/s and do research based on the infra/system/platform/app contexts, designs and requirements of your Fintech test targets.<br>Once you've developed automated (or even just semi-automated) unit test scripts locally on your dev machine, use agentic IDEs like Claude Code to help you build out your test suites in your CI pipeline. I've had success with setting up both Gitea and Forgejo Actions and runners in my homelab for personal projects which has helped me to understand Gitlab runners as part of my day job - but your team may use other tools. Basically, each time you commit and merge/push test code changes to your repo it can triggers your CI suite to run a set of automated functional API/unit tests, plus more E2E tests with Playwright (I'm using Python version as my codebase is mostly Python/Flask based) but quite often you'll need to work with developers and DevOps colleagues on how to 'hand over' fully/successfully validated code for promotion from dev/test to later environments.\n    </p>\n    ",
+      "collapsed": false,
+      "name": "t1_p7s270n",
+      "parent_id": "t3_1w71bul",
+      "permalink": "/r/softwaretesting/comments/1w71bul/comment/p7s270n/",
+      "ups": -1,
+      "downs": 0,
+      "score": -1,
+      "replies": {
+        "items": [],
+        "more": {
+          "has_more": false,
+          "cursor": null
+        }
+      }
+    },
+    {
+      "url": "https://www.reddit.com/r/softwaretesting/comments/1w71bul/comment/p7ru871/",
+      "created_utc": 1788527439,
+      "created_at_iso": "2026-09-04T13:10:39.000Z",
+      "id": "p7ru871",
+      "author": "[deleted]",
+      "author_fullname": null,
+      "body": "[deleted]",
+      "body_html": null,
+      "collapsed": true,
+      "name": "t1_p7ru871",
+      "parent_id": "t3_1w71bul",
+      "permalink": "/r/softwaretesting/comments/1w71bul/comment/p7ru871/",
+      "ups": 1,
+      "downs": 0,
+      "score": 1,
+      "replies": {
+        "items": [
+          {
+            "url": "https://www.reddit.com/r/softwaretesting/comments/1w71bul/comment/p7rwl6t/",
+            "created_utc": 1788528133,
+            "created_at_iso": "2026-09-04T13:22:13.000Z",
+            "id": "p7rwl6t",
+            "author": "captured-author",
+            "author_fullname": null,
+            "body": "Commercial links, self-promotion, and vendor spam are strictly prohibited and will result in Ban without warning! Do not post links to tools, training, corporate blogs, or book vendors. Name-only discussion of resources is permitted. Course instructors and industry professionals are welcome to contribute, but you must follow Reddit's 90/10 rule. Tool vendors and QA agency employees may not participate.",
+            "body_html": "\n      <p>\n      Commercial links, self-promotion, and vendor spam are strictly prohibited and will result in Ban without warning! Do not post links to tools, training, corporate blogs, or book vendors. Name-only discussion of resources is permitted. Course instructors and industry professionals are welcome to contribute, but you must follow Reddit's 90/10 rule. Tool vendors and QA agency employees may not participate.\n    </p>\n    ",
+            "collapsed": false,
+            "name": "t1_p7rwl6t",
+            "parent_id": "t1_p7ru871",
+            "permalink": "/r/softwaretesting/comments/1w71bul/comment/p7rwl6t/",
+            "ups": 2,
+            "downs": 0,
+            "score": 2,
+            "replies": {
+              "items": [],
+              "more": {
+                "has_more": false,
+                "cursor": null
+              }
+            }
+          }
+        ],
+        "more": {
+          "has_more": true,
+          "cursor": "p7ru871"
+        }
+      }
+    }
+  ],
+  "more": {
+    "has_more": false,
+    "cursor": null
+  }
+}

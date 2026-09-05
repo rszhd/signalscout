@@ -28,6 +28,8 @@ import type {
   SourceCredentials,
   SourceQuery,
   SourceRuntime,
+  VerificationRequest,
+  VerificationResult,
 } from "../../types.js";
 import type { Page } from "./client.js";
 import { endpoints, ScrapeCreatorsClient, ScrapeCreatorsError, sortNewest } from "./client.js";
@@ -143,6 +145,10 @@ export class ScrapeCreatorsRedditSource implements SocialSource {
   readonly maxUnitsPerQueryPoll = scrapeCreatorsReddit.maxUnitsPerQueryPoll;
 
   constructor(private readonly runtime: SourceRuntime) {}
+
+  verify(request: VerificationRequest): Promise<VerificationResult> {
+    return this.client(request.credentials).verify(request);
+  }
 
   private client(credentials: SourceCredentials): ScrapeCreatorsClient {
     const apiKey = credentials.apiKey;

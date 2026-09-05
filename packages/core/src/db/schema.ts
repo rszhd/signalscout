@@ -355,6 +355,7 @@ export const posts = pgTable(
     /** When the author posted it, not when we read it. */
     postedAt: timestamp("posted_at", { withTimezone: true }).notNull(),
     fetchedAt: timestamp("fetched_at", { withTimezone: true }).notNull().defaultNow(),
+    deletedAt: timestamp("deleted_at", { withTimezone: true }),
     /** Null until the keyword stage keeps the post. An embedding call costs money. */
     embedding: vector("embedding", { dimensions: embeddingDimensions }),
     /**
@@ -1106,4 +1107,21 @@ export const notificationItems = pgTable(
     kind: text("kind").$type<"match" | "digest">().notNull(),
   },
   (table) => [primaryKey({ columns: [table.matchId, table.channel, table.kind] })],
+);
+
+/** Correctness-critical: a paid deletion check must resume at its original provider.
+ * One row per post prevents repeated checks across monitors. No content is copied.
+ */
+export const postVerifications = pgTable(
+  "post_verifications",
+  {
+    postId: uuid("post_id")
+      .primaryKey()
+      .references(() => posts.id, { onDelete: "cascade" }),
+    monitorId: uuid("monitor_id").references(() => monitors.id, { onDelete: "set null" }),
+    provider: text("provider").$type<Provider>().notNull(),
+    cursor: text("cursor"),
+    nextAttemptAt: timestamp("next_attempt_at", { withTimezone: true }).notNull(),
+  },
+  () => [check("post_verifications_provider_known", oneOf("provider", providers))],
 );

@@ -26,6 +26,8 @@ import type {
   SourceCredentials,
   SourceQuery,
   SourceRuntime,
+  VerificationRequest,
+  VerificationResult,
 } from "../../types.js";
 import { BrightDataClient, BrightDataError, datasets, dateRangeFor } from "./client.js";
 import { brightDataProvider } from "./provider.js";
@@ -120,6 +122,58 @@ export class RedditSource implements SocialSource {
   readonly maxUnitsPerQueryPoll = brightDataReddit.maxUnitsPerQueryPoll;
 
   constructor(private readonly runtime: SourceRuntime) {}
+
+  /** Correctness-critical: only a matching record with an explicit removal signal
+   * hides content. A missing record or failed snapshot leaves it visible.
+   * deletion-fixtures/verify.test.ts replays the live answers.
+   */
+  async verify(request: VerificationRequest): Promise<VerificationResult> {
+    const client = this.client(request.credentials);
+    if (!request.cursor) {
+      const cursor = await client.trigger({
+        dataset: datasets.posts,
+        inputs: [{ url: request.url }],
+        signal: request.signal,
+      });
+      return {
+        status: "pending",
+        cursor,
+        unitsConsumed: 0,
+        retryAfter: new Date(this.runtime.now().getTime() + 30000),
+      };
+    }
+    const snapshot = await client.snapshot(request.cursor, request.signal);
+    if (snapshot.status === "pending")
+      return {
+        status: "pending",
+        cursor: request.cursor,
+        unitsConsumed: 0,
+        retryAfter: snapshot.retryAfter,
+      };
+    const unitsConsumed = snapshot.billedRecords;
+    const id = request.externalId.replace(/^t3_/, "");
+    for (const value of snapshot.records) {
+      if (!value || typeof value !== "object") continue;
+      const row = value as Record<string, unknown>;
+      const input = row.input as { url?: unknown } | undefined;
+      if (
+        row.error_code === "dead_page" &&
+        row.error === "Reddit post was not found in JSON API response" &&
+        input?.url === request.url
+      )
+        return { status: "deleted", unitsConsumed };
+      if (typeof row.post_id !== "string" || row.post_id.replace(/^t3_/, "") !== id || row.error)
+        continue;
+      const deleted =
+        (row.user_posted === "[deleted]" && row.title === "[deleted by user]") ||
+        row.description === "[deleted]" ||
+        row.description === "[removed]";
+      if (deleted) return { status: "deleted", unitsConsumed };
+      if (typeof row.title === "string" && typeof row.date_posted === "string")
+        return { status: "available", unitsConsumed };
+    }
+    return { status: "unknown", unitsConsumed };
+  }
 
   private client(credentials: SourceCredentials): BrightDataClient {
     const apiKey = credentials.apiKey;

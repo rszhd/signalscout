@@ -1,0 +1,803 @@
+[
+  {
+    "timestamp": "2026-09-05T11:48:08.226Z",
+    "input": {
+      "url": "https://www.reddit.com/r/softwaretesting/comments/zzzzzzzzzz/"
+    },
+    "error": "Reddit post was not found in JSON API response",
+    "error_code": "dead_page"
+  },
+  {
+    "post_id": "1iyty7q",
+    "url": "https://www.reddit.com/r/CreatorsAdvice/comments/1iyty7q/removed/",
+    "user_posted": "[deleted]",
+    "title": "[deleted by user]",
+    "description": "[removed]",
+    "num_comments": 136,
+    "date_posted": "2025-02-26T18:07:32.000Z",
+    "community_name": "CreatorsAdvice",
+    "num_upvotes": 195,
+    "photos": null,
+    "videos": null,
+    "tag": null,
+    "related_posts": [
+      {
+        "community": "creatorsadvice",
+        "community_url": "https://www.reddit.com/r/CreatorsAdvice/comments/1w4pt4i/has_anyone_else_lost_interest_in_overly_horny_men/",
+        "title": "Has anyone else lost interest in overly horny men in real life since starting this work?",
+        "url": "https://www.reddit.com/r/CreatorsAdvice/comments/1w4pt4i/has_anyone_else_lost_interest_in_overly_horny_men/",
+        "thumbnail": null,
+        "num_upvotes": "96",
+        "num_comments": 40
+      },
+      {
+        "community": "creatorsadvice",
+        "community_url": "https://www.reddit.com/r/CreatorsAdvice/comments/1w4w0so/tips_for_beginners/",
+        "title": "Tips for beginners",
+        "url": "https://www.reddit.com/r/CreatorsAdvice/comments/1w4w0so/tips_for_beginners/",
+        "thumbnail": null,
+        "num_upvotes": "64",
+        "num_comments": 17
+      },
+      {
+        "community": "creatorsadvice",
+        "community_url": "https://www.reddit.com/r/CreatorsAdvice/comments/1w6d4sd/can_i_get_a_realistic_reality_check_from_creators/",
+        "title": "Can I get a realistic reality check from creators who started completely from scratch?",
+        "url": "https://www.reddit.com/r/CreatorsAdvice/comments/1w6d4sd/can_i_get_a_realistic_reality_check_from_creators/",
+        "thumbnail": null,
+        "num_upvotes": "30",
+        "num_comments": 42
+      },
+      {
+        "community": "creatorsadvice",
+        "community_url": "https://www.reddit.com/r/CreatorsAdvice/comments/1w2zoc0/why_are_we_mass_posting_ads_when_contributing/",
+        "title": "Why are we mass posting ‘ad’s’ when contributing organically to a community got me 2000% of the reach on a single post?",
+        "url": "https://www.reddit.com/r/CreatorsAdvice/comments/1w2zoc0/why_are_we_mass_posting_ads_when_contributing/",
+        "thumbnail": null,
+        "num_upvotes": "22",
+        "num_comments": 27
+      },
+      {
+        "community": "creatorsadvice",
+        "community_url": "https://www.reddit.com/r/CreatorsAdvice/comments/1w7lqjk/how_long_have_you_been_doing_content_and_what/",
+        "title": "🤔 How long have you been doing content? And what kind of 💰 are you making?",
+        "url": "https://www.reddit.com/r/CreatorsAdvice/comments/1w7lqjk/how_long_have_you_been_doing_content_and_what/",
+        "thumbnail": null,
+        "num_upvotes": "20",
+        "num_comments": 28
+      },
+      {
+        "community": "creatorsadvice",
+        "community_url": "https://www.reddit.com/r/CreatorsAdvice/comments/1w43y11/nsfw_platforms_with_internal_traffic/",
+        "title": "NSFW platforms with internal traffic",
+        "url": "https://www.reddit.com/r/CreatorsAdvice/comments/1w43y11/nsfw_platforms_with_internal_traffic/",
+        "thumbnail": null,
+        "num_upvotes": "20",
+        "num_comments": 30
+      },
+      {
+        "community": "creatorsadvice",
+        "community_url": "https://www.reddit.com/r/CreatorsAdvice/comments/1w6pjsm/thank_you_sweeties/",
+        "title": "Thank you sweeties 🫶🏻",
+        "url": "https://www.reddit.com/r/CreatorsAdvice/comments/1w6pjsm/thank_you_sweeties/",
+        "thumbnail": null,
+        "num_upvotes": "18",
+        "num_comments": 1
+      },
+      {
+        "community": "creatorsadvice",
+        "community_url": "https://www.reddit.com/r/CreatorsAdvice/comments/1w73s9m/opinions_about_c4s/",
+        "title": "Opinions about C4S+ ?",
+        "url": "https://www.reddit.com/r/CreatorsAdvice/comments/1w73s9m/opinions_about_c4s/",
+        "thumbnail": null,
+        "num_upvotes": "14",
+        "num_comments": 20
+      },
+      {
+        "community": "creatorsadvice",
+        "community_url": "https://www.reddit.com/r/CreatorsAdvice/comments/1w4cqxv/is_x_a_dud/",
+        "title": "Is X a dud?",
+        "url": "https://www.reddit.com/r/CreatorsAdvice/comments/1w4cqxv/is_x_a_dud/",
+        "thumbnail": null,
+        "num_upvotes": "14",
+        "num_comments": 24
+      },
+      {
+        "community": "creatorsadvice",
+        "community_url": "https://www.reddit.com/r/CreatorsAdvice/comments/1w1wrcm/twitter_x_engagement_has_died_for_me_anyone_else/",
+        "title": "Twitter / X engagement has died for me, anyone else?",
+        "url": "https://www.reddit.com/r/CreatorsAdvice/comments/1w1wrcm/twitter_x_engagement_has_died_for_me_anyone_else/",
+        "thumbnail": null,
+        "num_upvotes": "11",
+        "num_comments": 28
+      },
+      {
+        "community": "creatorsadvice",
+        "community_url": "https://www.reddit.com/r/CreatorsAdvice/comments/1w63zu6/twitter_x_is_really_doing_my_brain_in/",
+        "title": "Twitter X is really doing my brain in",
+        "url": "https://www.reddit.com/r/CreatorsAdvice/comments/1w63zu6/twitter_x_is_really_doing_my_brain_in/",
+        "thumbnail": null,
+        "num_upvotes": "9",
+        "num_comments": 17
+      },
+      {
+        "community": "creatorsadvice",
+        "community_url": "https://www.reddit.com/r/CreatorsAdvice/comments/1w5qrz9/question_about_ppv_am_i_wrong_for_this/",
+        "title": "Question about PPV, am I wrong for this?",
+        "url": "https://www.reddit.com/r/CreatorsAdvice/comments/1w5qrz9/question_about_ppv_am_i_wrong_for_this/",
+        "thumbnail": null,
+        "num_upvotes": "9",
+        "num_comments": 16
+      },
+      {
+        "community": "creatorsadvice",
+        "community_url": "https://www.reddit.com/r/CreatorsAdvice/comments/1w5dcyd/do_you_keep_the_good_stuff_off_the_wall_or_just/",
+        "title": "do you keep the good stuff off the wall or just post it and hope",
+        "url": "https://www.reddit.com/r/CreatorsAdvice/comments/1w5dcyd/do_you_keep_the_good_stuff_off_the_wall_or_just/",
+        "thumbnail": null,
+        "num_upvotes": "8",
+        "num_comments": 16
+      },
+      {
+        "community": "creatorsadvice",
+        "community_url": "https://www.reddit.com/r/CreatorsAdvice/comments/1w4md8j/does_anyone_else_get_really_uncomfortable_with/",
+        "title": "Does anyone else get really uncomfortable with random dick pics and calls on Snapchat?",
+        "url": "https://www.reddit.com/r/CreatorsAdvice/comments/1w4md8j/does_anyone_else_get_really_uncomfortable_with/",
+        "thumbnail": null,
+        "num_upvotes": "6",
+        "num_comments": 19
+      },
+      {
+        "community": "creatorsadvice",
+        "community_url": "https://www.reddit.com/r/CreatorsAdvice/comments/1w4lj85/i_need_strategies/",
+        "title": "I need strategies.",
+        "url": "https://www.reddit.com/r/CreatorsAdvice/comments/1w4lj85/i_need_strategies/",
+        "thumbnail": null,
+        "num_upvotes": "6",
+        "num_comments": 11
+      },
+      {
+        "community": "creatorsadvice",
+        "community_url": "https://www.reddit.com/r/CreatorsAdvice/comments/1w4wzy3/instagram_link_crackdown/",
+        "title": "Instagram Link Crackdown",
+        "url": "https://www.reddit.com/r/CreatorsAdvice/comments/1w4wzy3/instagram_link_crackdown/",
+        "thumbnail": null,
+        "num_upvotes": "5",
+        "num_comments": 14
+      },
+      {
+        "community": "creatorsadvice",
+        "community_url": "https://www.reddit.com/r/CreatorsAdvice/comments/1w3zlmz/videoaudio_call_advice/",
+        "title": "Video/audio call advice",
+        "url": "https://www.reddit.com/r/CreatorsAdvice/comments/1w3zlmz/videoaudio_call_advice/",
+        "thumbnail": null,
+        "num_upvotes": "5",
+        "num_comments": 10
+      },
+      {
+        "community": "creatorsadvice",
+        "community_url": "https://www.reddit.com/r/CreatorsAdvice/comments/1w3phwb/how_to_use_bluesky/",
+        "title": "How to use Bluesky?",
+        "url": "https://www.reddit.com/r/CreatorsAdvice/comments/1w3phwb/how_to_use_bluesky/",
+        "thumbnail": null,
+        "num_upvotes": "5",
+        "num_comments": 7
+      },
+      {
+        "community": "creatorsadvice",
+        "community_url": "https://www.reddit.com/r/CreatorsAdvice/comments/1w1l1wj/onlyfans_feed/",
+        "title": "Onlyfans Feed?",
+        "url": "https://www.reddit.com/r/CreatorsAdvice/comments/1w1l1wj/onlyfans_feed/",
+        "thumbnail": null,
+        "num_upvotes": "5",
+        "num_comments": 7
+      },
+      {
+        "community": "creatorsadvice",
+        "community_url": "https://www.reddit.com/r/CreatorsAdvice/comments/1w7regl/those_who_are_in_relationships_and_struggle_with/",
+        "title": "Those who are in relationships and struggle with jealousy (maybe)",
+        "url": "https://www.reddit.com/r/CreatorsAdvice/comments/1w7regl/those_who_are_in_relationships_and_struggle_with/",
+        "thumbnail": null,
+        "num_upvotes": "4",
+        "num_comments": 3
+      },
+      {
+        "community": "creatorsadvice",
+        "community_url": "https://www.reddit.com/r/CreatorsAdvice/comments/1w7514p/custom_content_advice/",
+        "title": "Custom content advice",
+        "url": "https://www.reddit.com/r/CreatorsAdvice/comments/1w7514p/custom_content_advice/",
+        "thumbnail": null,
+        "num_upvotes": "3",
+        "num_comments": 6
+      },
+      {
+        "community": "creatorsadvice",
+        "community_url": "https://www.reddit.com/r/CreatorsAdvice/comments/1w6koi6/how_to_build_on_snifffr/",
+        "title": "How to build on snifffr?",
+        "url": "https://www.reddit.com/r/CreatorsAdvice/comments/1w6koi6/how_to_build_on_snifffr/",
+        "thumbnail": null,
+        "num_upvotes": "3",
+        "num_comments": 7
+      },
+      {
+        "community": "creatorsadvice",
+        "community_url": "https://www.reddit.com/r/CreatorsAdvice/comments/1w39x70/how_does_promoting_your_profile_on_snap_work/",
+        "title": "How does promoting your profile on Snap work?",
+        "url": "https://www.reddit.com/r/CreatorsAdvice/comments/1w39x70/how_does_promoting_your_profile_on_snap_work/",
+        "thumbnail": null,
+        "num_upvotes": "3",
+        "num_comments": 8
+      },
+      {
+        "community": "creatorsadvice",
+        "community_url": "https://www.reddit.com/r/CreatorsAdvice/comments/1w7qax7/whats_your_favorite_way_to_make_money/",
+        "title": "What’s your favorite way to make money? 💰",
+        "url": "https://www.reddit.com/r/CreatorsAdvice/comments/1w7qax7/whats_your_favorite_way_to_make_money/",
+        "thumbnail": null,
+        "num_upvotes": "2",
+        "num_comments": 4
+      },
+      {
+        "community": "creatorsadvice",
+        "community_url": "https://www.reddit.com/r/CreatorsAdvice/comments/1w4ha79/gfe_no_face/",
+        "title": "Gfe (no face)",
+        "url": "https://www.reddit.com/r/CreatorsAdvice/comments/1w4ha79/gfe_no_face/",
+        "thumbnail": null,
+        "num_upvotes": "2",
+        "num_comments": 10
+      }
+    ],
+    "comments": [
+      {
+        "comment": "So that's why my posts on subreddits kept getting deleted out of nowhere. Amazing! And of course, it's annoying. I feel you 😫",
+        "url": "https://www.reddit.com/r/CreatorsAdvice/comments/1iyty7q/comment/my1e937/",
+        "user_commenting": "BarbaraLatigo",
+        "user_url": "captured-author",
+        "date_of_comment": "2025-06-16T06:27:45.405Z",
+        "num_upvotes": 2,
+        "num_replies": 0,
+        "replies": []
+      },
+      {
+        "comment": "I have been wondering why my posts are being auto deleted or getting banned when I haven't broken any rules. I have seriously been struggling as a new comer on Reddit. I feel like there is so much red tape every where. This is hard. Any suggestions?",
+        "url": "https://www.reddit.com/r/CreatorsAdvice/comments/1iyty7q/comment/mg6ss20/",
+        "user_commenting": "Prettymeowgirl",
+        "user_url": "captured-author",
+        "date_of_comment": "2025-03-05T18:24:25.893Z",
+        "num_upvotes": 2,
+        "num_replies": 1
+      },
+      {
+        "comment": "I would join too! Thought it was just me; so relieved to read this",
+        "url": "https://www.reddit.com/r/CreatorsAdvice/comments/1iyty7q/comment/mfcsrx7/",
+        "user_commenting": "bringasnorkel",
+        "user_url": "captured-author",
+        "date_of_comment": "2025-03-01T01:03:42.988Z",
+        "num_upvotes": 2,
+        "num_replies": 0,
+        "replies": []
+      },
+      {
+        "comment": "Yeah, this is the process called \"crapification\". New service starts, its great, not profitable or noticed, but over time worsens. After a place goes public too, its all profit motivated as well.",
+        "url": "https://www.reddit.com/r/CreatorsAdvice/comments/1iyty7q/comment/mfaysbf/",
+        "user_commenting": "Werkin-ITT7",
+        "user_url": "captured-author",
+        "date_of_comment": "2025-02-28T19:32:48.418Z",
+        "num_upvotes": 2,
+        "num_replies": 1
+      },
+      {
+        "comment": "My post was just taken down for exposing the kale app now for bad pay !",
+        "url": "https://www.reddit.com/r/CreatorsAdvice/comments/1iyty7q/comment/mf6fu86/",
+        "user_commenting": "[deleted]",
+        "user_url": "captured-author",
+        "date_of_comment": "2025-02-28T01:43:13.215Z",
+        "num_upvotes": 2,
+        "num_replies": 0,
+        "replies": []
+      },
+      {
+        "comment": "i literally just started my own subreddit community for this reason",
+        "url": "https://www.reddit.com/r/CreatorsAdvice/comments/1iyty7q/comment/mf5ddu0/",
+        "user_commenting": "executionergf",
+        "user_url": "captured-author",
+        "date_of_comment": "2025-02-27T22:12:53.747Z",
+        "num_upvotes": 2,
+        "num_replies": 2
+      },
+      {
+        "comment": "What kind of content do you post? I have a few femdom related subs if you want to post there without issue lmk",
+        "url": "https://www.reddit.com/r/CreatorsAdvice/comments/1iyty7q/comment/mf554xe/",
+        "user_commenting": "Sugar_Domme",
+        "user_url": "captured-author",
+        "date_of_comment": "2025-02-27T21:33:01.340Z",
+        "num_upvotes": 2,
+        "num_replies": 1
+      },
+      {
+        "comment": "And the ones that aren't, have toxic corrupt mod teams that are promoting themselves and don't want the competition 😭 It's really killing my spirit",
+        "url": "https://www.reddit.com/r/CreatorsAdvice/comments/1iyty7q/comment/mf4ozmx/",
+        "user_commenting": "MidnightNymphXoxo",
+        "user_url": "captured-author",
+        "date_of_comment": "2025-02-27T20:16:41.669Z",
+        "num_upvotes": 2,
+        "num_replies": 2
+      },
+      {
+        "comment": "For my comeback later this year this would be helpful!",
+        "url": "https://www.reddit.com/r/CreatorsAdvice/comments/1iyty7q/comment/mf33onf/",
+        "user_commenting": "LaFoxxOfficial",
+        "user_url": "captured-author",
+        "date_of_comment": "2025-02-27T15:46:17.776Z",
+        "num_upvotes": 2,
+        "num_replies": 0,
+        "replies": []
+      },
+      {
+        "comment": "I am so sad about these agencies I watch this thing about men running OF models and making millions off them… It’s gross pimp behaviour!! 🤮🤮",
+        "url": "https://www.reddit.com/r/CreatorsAdvice/comments/1iyty7q/comment/mf0qgw5/",
+        "user_commenting": "ThrowMeAwayLikeARubr",
+        "user_url": "captured-author",
+        "date_of_comment": "2025-02-27T04:47:03.746Z",
+        "num_upvotes": 6,
+        "num_replies": 1
+      },
+      {
+        "comment": "Here for this 🙌",
+        "url": "https://www.reddit.com/r/CreatorsAdvice/comments/1iyty7q/comment/mf0ftho/",
+        "user_commenting": "kruddminx321",
+        "user_url": "captured-author",
+        "date_of_comment": "2025-02-27T03:36:32.410Z",
+        "num_upvotes": 2,
+        "num_replies": 0,
+        "replies": []
+      },
+      {
+        "comment": null,
+        "url": "https://www.reddit.com/r/CreatorsAdvice/comments/1iyty7q/comment/mezna3g/",
+        "user_commenting": "[deleted]",
+        "user_url": "captured-author",
+        "date_of_comment": "2025-02-27T00:54:38.704Z",
+        "num_upvotes": 3,
+        "num_replies": 1
+      },
+      {
+        "comment": "So here’s how it goes in case anyone is wondering: Agencies will buy and create model pages and subreddits. They’re good at running the pages because well- it’s their job. They have all day to sit and do this, they’re not making content, etc. Lots of creators use agencies but also many don’t, the difference? Since the agency has all the time in the world to promote their model, they’ll even make 2-3 Reddit profiles for them. When one gets shut down, they’ll buy more. They’re good at growing followings and they do so quickly by farming karma and just having more time. Then comes their subreddits. They will post their models often, pinning them at the top and posting them at peek times, etc. They will DELETE, BLOCK and HIDE, independent creator’s content who are attractive because they don’t want the competition. They will purposely hide a good piece of content because you’re competition to their creators. Meanwhile they will keep the mid tier content. They know this is making their creators look better. If you’re scrolling through a Reddit page and you’re a buyer- you’re going to subscribe to the creators with the best content who you find attractive. They have a huge monopoly on these pages. They have the money to buy popular subreddits and the time to create them too.",
+        "url": "https://www.reddit.com/r/CreatorsAdvice/comments/1iyty7q/comment/mez4b0q/",
+        "user_commenting": "MissMommyMolly77",
+        "user_url": "captured-author",
+        "date_of_comment": "2025-02-26T23:11:38.098Z",
+        "num_upvotes": 12,
+        "num_replies": 0,
+        "replies": []
+      }
+    ],
+    "community_url": "https://www.reddit.com/r/CreatorsAdvice/",
+    "community_description": "This is a community for all nsfw creators in front of the camera. Here you can find advice, tips, support and discussions relating to being a spicy content creator.",
+    "community_members_num": 190213,
+    "community_rank": {
+      "community_rank_type": null,
+      "community_rank_value": null
+    },
+    "post_karma": null,
+    "bio_description": null,
+    "embedded_links": null,
+    "description_markdown": "[removed]",
+    "subreddit_icon_image": "https://styles.redditmedia.com/t5_4xgztn/styles/communityIcon_t9rufvmljri71.png?width=256&s=5aa8d4a2e2b2bd676b92483c583fcaa1b0bb6d56",
+    "author_icon": null,
+    "user_id": null,
+    "archived": "false",
+    "locked_post": false,
+    "timestamp": "2026-09-05T11:49:12.344Z",
+    "input": {
+      "url": "https://www.reddit.com/r/CreatorsAdvice/comments/1iyty7q/removed/"
+    }
+  },
+  {
+    "post_id": "1w71bul",
+    "url": "https://www.reddit.com/r/softwaretesting/comments/1w71bul/",
+    "user_posted": "captured-author",
+    "title": "Starting Automation from 0% as a QA Lead — How are you using AI, MCPs & Agents in QA?",
+    "description": "Hey everyone,\n\nI’m joining a fintech organization on **September 15 as an Automation QA Lead**. They currently have **0% automation**, so I’ll be responsible for building the framework, defining the automation process/strategy, selecting test cases and getting automation started from scratch.\n\nThe interesting part: **I won’t have additional automation resources initially.** It’ll basically be **me + Claude Desktop + AI tools**. 😄\n\nI have good experience with **Playwright and Cypress**, and I’m planning to use **Playwright + JavaScript**.\n\nSince AI is now such a big part of development, I want to build the automation process with **AI in mind from Day 1**, rather than adding it later.\n\nI’d love to hear from people already doing this in real projects:\n\n# AI + Automation\n\n* How are you using AI in your Playwright/automation workflow?\n* What tasks are actually worth delegating to AI?\n* Any useful AI workflows/prompts you recommend?\n\n# MCPs\n\nWhich MCPs have actually been useful for QA automation?\n\nFor example: **Playwright, GitHub, Jira, Confluence, Database, Browser/DevTools, API**, or custom MCPs.\n\n# AI Agents\n\nAre you using/building AI agents for QA?\n\nFor example:\n\n* Test case generation\n* Automation/code generation\n* Test data generation\n* Failure analysis\n* Locator maintenance\n* Regression selection\n* Test review\n* Reporting\n\nWhich ones have provided real value, and which are just hype?\n\n# Starting from 0%\n\nIf you had to build a Playwright framework and automation process from scratch today, what would you prioritize from Day 1?\n\nAnything that you wish you had designed differently when starting your own framework?\n\n# GitHub Repos\n\nIf you've **built any GitHub repositories** around Playwright + AI, AI agents, MCPs, self-healing automation, AI test generation, etc., please share them.\n\nAlso, if you know any **good open-source GitHub repos** that I should study, please drop them in the comments.\n\nBasically, if you were in my position — **one QA Automation Lead, 0% existing automation, Playwright + JavaScript, and AI available from Day 1** — how would you approach it?\n\nWould love to hear **real-world experiences, useful tools/MCPs, GitHub repos, and lessons from things that didn't work.**\n\nThanks!",
+    "num_comments": 22,
+    "date_posted": "2026-09-04T11:08:36.000Z",
+    "community_name": "softwaretesting",
+    "num_upvotes": 14,
+    "photos": null,
+    "videos": null,
+    "tag": null,
+    "related_posts": [
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1sh5cs6/when_did_qa_automation_become_competitive/",
+        "title": "When did QA automation become competitive programming?",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1sh5cs6/when_did_qa_automation_become_competitive/",
+        "thumbnail": null,
+        "num_upvotes": "189",
+        "num_comments": 110
+      },
+      {
+        "community": null,
+        "community_url": "https://www.reddit.com/user/shopify/",
+        "title": "The entrepreneur life is calling. Start for free on Shopify.",
+        "url": null,
+        "thumbnail": null,
+        "num_upvotes": null,
+        "num_comments": null
+      },
+      {
+        "community": "softwaretesting",
+        "community_url": "https://www.reddit.com/r/softwaretesting/comments/1pex3jc/where_should_i_start_with_qa_automation_selenium/",
+        "title": "Where should I start with QA automation? (Selenium, Playwright, Python, etc.)",
+        "url": "https://www.reddit.com/r/softwaretesting/comments/1pex3jc/where_should_i_start_with_qa_automation_selenium/",
+        "thumbnail": null,
+        "num_upvotes": "28",
+        "num_comments": 33
+      },
+      {
+        "community": "softwaretesting",
+        "community_url": "https://www.reddit.com/r/softwaretesting/comments/1swx0i5/how_are_you_integrating_ai_agents_into_your_qa/",
+        "title": "How are you integrating AI agents into your QA workflow? Looking for real-world experiences",
+        "url": "https://www.reddit.com/r/softwaretesting/comments/1swx0i5/how_are_you_integrating_ai_agents_into_your_qa/",
+        "thumbnail": null,
+        "num_upvotes": "10",
+        "num_comments": 25
+      },
+      {
+        "community": "softwaretesting",
+        "community_url": "https://www.reddit.com/r/softwaretesting/comments/1o9w0gq/qa_automation_getting_boring_what_do_you_actually/",
+        "title": "QA Automation getting boring? What do you actually do day to day?",
+        "url": "https://www.reddit.com/r/softwaretesting/comments/1o9w0gq/qa_automation_getting_boring_what_do_you_actually/",
+        "thumbnail": null,
+        "num_upvotes": "59",
+        "num_comments": 42
+      },
+      {
+        "community": "softwaretesting",
+        "community_url": "https://www.reddit.com/r/softwaretesting/comments/1rkra5c/how_do_you_evaluate_ai_agents_and_llm_outputs/",
+        "title": "How do you evaluate AI agents and LLM outputs from a QA/testing perspective?",
+        "url": "https://www.reddit.com/r/softwaretesting/comments/1rkra5c/how_do_you_evaluate_ai_agents_and_llm_outputs/",
+        "thumbnail": null,
+        "num_upvotes": "18",
+        "num_comments": 17
+      },
+      {
+        "community": "softwaretesting",
+        "community_url": "https://www.reddit.com/r/softwaretesting/comments/1ukr3yo/qa_team_started_using_ai_and_stopped_using_their/",
+        "title": "QA team started using AI and stopped using their own minds",
+        "url": "https://www.reddit.com/r/softwaretesting/comments/1ukr3yo/qa_team_started_using_ai_and_stopped_using_their/",
+        "thumbnail": null,
+        "num_upvotes": "92",
+        "num_comments": 32
+      },
+      {
+        "community": "softwaretesting",
+        "community_url": "https://www.reddit.com/r/softwaretesting/comments/1qxp37s/are_qa_positions_test_engineer_test_automation/",
+        "title": "Are QA positions (Test engineer, test automation engineer etc. ) are dissapearing?",
+        "url": "https://www.reddit.com/r/softwaretesting/comments/1qxp37s/are_qa_positions_test_engineer_test_automation/",
+        "thumbnail": null,
+        "num_upvotes": "34",
+        "num_comments": 45
+      },
+      {
+        "community": "softwaretesting",
+        "community_url": "https://www.reddit.com/r/softwaretesting/comments/1pj9sjm/explain_the_role_qa_automation_engineer/",
+        "title": "Explain the role 'QA Automation Engineer'",
+        "url": "https://www.reddit.com/r/softwaretesting/comments/1pj9sjm/explain_the_role_qa_automation_engineer/",
+        "thumbnail": null,
+        "num_upvotes": "14",
+        "num_comments": 33
+      },
+      {
+        "community": "softwaretesting",
+        "community_url": "https://www.reddit.com/r/softwaretesting/comments/1rebddh/qa_tester_with_a_lot_of_free_time_can_i_learn/",
+        "title": "QA tester with a lot of free time: can I learn automation on my own?",
+        "url": "https://www.reddit.com/r/softwaretesting/comments/1rebddh/qa_tester_with_a_lot_of_free_time_can_i_learn/",
+        "thumbnail": null,
+        "num_upvotes": "44",
+        "num_comments": 38
+      },
+      {
+        "community": "softwaretesting",
+        "community_url": "https://www.reddit.com/r/softwaretesting/comments/1pe4m6v/thinking_about_getting_into_qa_need_your_honest/",
+        "title": "Thinking about getting into QA — need your honest experiences",
+        "url": "https://www.reddit.com/r/softwaretesting/comments/1pe4m6v/thinking_about_getting_into_qa_need_your_honest/",
+        "thumbnail": null,
+        "num_upvotes": "8",
+        "num_comments": 19
+      },
+      {
+        "community": "softwaretesting",
+        "community_url": "https://www.reddit.com/r/softwaretesting/comments/1tkfrmu/is_there_a_future_of_qa_automation_testing/",
+        "title": "Is there a future of QA Automation Testing?",
+        "url": "https://www.reddit.com/r/softwaretesting/comments/1tkfrmu/is_there_a_future_of_qa_automation_testing/",
+        "thumbnail": null,
+        "num_upvotes": "39",
+        "num_comments": 43
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1tp15zu/what_realworld_qa_use_cases_do_you_have_with_aiai/",
+        "title": "What real-world QA use cases do you have with AI/AI agents?",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1tp15zu/what_realworld_qa_use_cases_do_you_have_with_aiai/",
+        "thumbnail": null,
+        "num_upvotes": "18",
+        "num_comments": 30
+      },
+      {
+        "community": "softwaretesting",
+        "community_url": "https://www.reddit.com/r/softwaretesting/comments/1vstrqv/so_does_anyone_here_also_actually_still_like/",
+        "title": "So does anyone here also actually still like their QA job (currently?)",
+        "url": "https://www.reddit.com/r/softwaretesting/comments/1vstrqv/so_does_anyone_here_also_actually_still_like/",
+        "thumbnail": null,
+        "num_upvotes": "62",
+        "num_comments": 56
+      },
+      {
+        "community": "softwaretesting",
+        "community_url": "https://www.reddit.com/r/softwaretesting/comments/1r9tqp1/why_are_there_so_many_negative_posts_about_the_qa/",
+        "title": "Why are there so many negative posts about the QA career?",
+        "url": "https://www.reddit.com/r/softwaretesting/comments/1r9tqp1/why_are_there_so_many_negative_posts_about_the_qa/",
+        "thumbnail": null,
+        "num_upvotes": "58",
+        "num_comments": 83
+      },
+      {
+        "community": "softwaretesting",
+        "community_url": "https://www.reddit.com/r/softwaretesting/comments/1ptq4t9/do_you_guys_actually_do_automation_in_your_jobs/",
+        "title": "do you guys actually do automation in your jobs?",
+        "url": "https://www.reddit.com/r/softwaretesting/comments/1ptq4t9/do_you_guys_actually_do_automation_in_your_jobs/",
+        "thumbnail": null,
+        "num_upvotes": "34",
+        "num_comments": 42
+      },
+      {
+        "community": "softwaretesting",
+        "community_url": "https://www.reddit.com/r/softwaretesting/comments/1oh81cm/switching_from_manual_testing_to_automation_best/",
+        "title": "Switching from Manual testing to Automation. Best path in age of AI?",
+        "url": "https://www.reddit.com/r/softwaretesting/comments/1oh81cm/switching_from_manual_testing_to_automation_best/",
+        "thumbnail": null,
+        "num_upvotes": "34",
+        "num_comments": 55
+      },
+      {
+        "community": "softwaretesting",
+        "community_url": "https://www.reddit.com/r/softwaretesting/comments/1t4d173/anyone_happy_in_their_current_qa_role/",
+        "title": "Anyone happy in their current QA role?",
+        "url": "https://www.reddit.com/r/softwaretesting/comments/1t4d173/anyone_happy_in_their_current_qa_role/",
+        "thumbnail": null,
+        "num_upvotes": "21",
+        "num_comments": 41
+      },
+      {
+        "community": "qualityassurance",
+        "community_url": "https://www.reddit.com/r/QualityAssurance/comments/1neohvh/how_do_you_test_ai_as_a_qa_or_what_are_the/",
+        "title": "How do you test AI as a QA? Or what are the resourced to learn that?",
+        "url": "https://www.reddit.com/r/QualityAssurance/comments/1neohvh/how_do_you_test_ai_as_a_qa_or_what_are_the/",
+        "thumbnail": null,
+        "num_upvotes": "3",
+        "num_comments": 29
+      },
+      {
+        "community": "softwaretesting",
+        "community_url": "https://www.reddit.com/r/softwaretesting/comments/1o3hnlp/looking_to_get_into_qa_where_to_start/",
+        "title": "Looking to get into QA... Where to start?",
+        "url": "https://www.reddit.com/r/softwaretesting/comments/1o3hnlp/looking_to_get_into_qa_where_to_start/",
+        "thumbnail": null,
+        "num_upvotes": "2",
+        "num_comments": 29
+      },
+      {
+        "community": "softwaretesting",
+        "community_url": "https://www.reddit.com/r/softwaretesting/comments/1vvlh3o/need_suggestions_for_switching_to_automation_from/",
+        "title": "Need suggestions for switching to automation from manual testing",
+        "url": "https://www.reddit.com/r/softwaretesting/comments/1vvlh3o/need_suggestions_for_switching_to_automation_from/",
+        "thumbnail": null,
+        "num_upvotes": "34",
+        "num_comments": 37
+      },
+      {
+        "community": "softwaretesting",
+        "community_url": "https://www.reddit.com/r/softwaretesting/comments/1tnx3l0/joining_as_a_qa_intern_with_no_prior_qa_experience/",
+        "title": "Joining as a QA Intern with no prior QA experience",
+        "url": "https://www.reddit.com/r/softwaretesting/comments/1tnx3l0/joining_as_a_qa_intern_with_no_prior_qa_experience/",
+        "thumbnail": null,
+        "num_upvotes": "16",
+        "num_comments": 16
+      },
+      {
+        "community": "softwaretesting",
+        "community_url": "https://www.reddit.com/r/softwaretesting/comments/1qb2ekx/what_is_the_future_of_qa_like_and_is_it_a_stable/",
+        "title": "What is the future of QA like and is it a stable field/career path?",
+        "url": "https://www.reddit.com/r/softwaretesting/comments/1qb2ekx/what_is_the_future_of_qa_like_and_is_it_a_stable/",
+        "thumbnail": null,
+        "num_upvotes": "9",
+        "num_comments": 33
+      },
+      {
+        "community": "softwaretesting",
+        "community_url": "https://www.reddit.com/r/softwaretesting/comments/1nr86pk/sdet_automation_engineer_qa_automation_engineer/",
+        "title": "SDET? Automation Engineer? QA Automation Engineer? Test Automation Engineer?",
+        "url": "https://www.reddit.com/r/softwaretesting/comments/1nr86pk/sdet_automation_engineer_qa_automation_engineer/",
+        "thumbnail": null,
+        "num_upvotes": "31",
+        "num_comments": 19
+      },
+      {
+        "community": "softwaretesting",
+        "community_url": "https://www.reddit.com/r/softwaretesting/comments/1ug7gud/burned_out_on_automation_but_have_deep/",
+        "title": "Burned out on automation, but have deep product/domain knowledge. What are my options outside of standard QA management?",
+        "url": "https://www.reddit.com/r/softwaretesting/comments/1ug7gud/burned_out_on_automation_but_have_deep/",
+        "thumbnail": null,
+        "num_upvotes": "26",
+        "num_comments": 12
+      },
+      {
+        "community": "softwaretesting",
+        "community_url": "https://www.reddit.com/r/softwaretesting/comments/1tbxwr5/the_qa_future/",
+        "title": "The QA future",
+        "url": "https://www.reddit.com/r/softwaretesting/comments/1tbxwr5/the_qa_future/",
+        "thumbnail": null,
+        "num_upvotes": "33",
+        "num_comments": 18
+      }
+    ],
+    "comments": [
+      {
+        "comment": "I would start by ensuring they have a solid regression suite. Then I would go through the tests and determine which ones should be automated. If they don't have a Regression suite, I would find out whether they have a Regression team and/or does the Regression Testing. I would recommend waiting to set up all the ai stuff until you get your footing and what you have to work with. It would be a good idea to understand how the automation works before trying ai.",
+        "url": "https://www.reddit.com/r/softwaretesting/comments/1w71bul/comment/p7xwpuu/",
+        "user_commenting": "Silly_Turn_4761",
+        "user_url": "captured-author",
+        "date_of_comment": "2026-09-05T09:13:05.947Z",
+        "num_upvotes": 1,
+        "num_replies": 0,
+        "replies": []
+      },
+      {
+        "comment": "I am building a test writing skill today, to get out of these absolute terrible written tests that check the copy text or variable config as fixed values. I'll give an update later! I have built a fully automation test/verify SaaS already, but the local \"Dev\" path was missing so far.",
+        "url": "https://www.reddit.com/r/softwaretesting/comments/1w71bul/comment/p7xmg4v/",
+        "user_commenting": "haukebr",
+        "user_url": "captured-author",
+        "date_of_comment": "2026-09-05T07:42:37.179Z",
+        "num_upvotes": 1,
+        "num_replies": 0,
+        "replies": []
+      },
+      {
+        "comment": "I almost applied for a very similar job in Charlotte I wonder if this is the same one",
+        "url": "https://www.reddit.com/r/softwaretesting/comments/1w71bul/comment/p7x7fd6/",
+        "user_commenting": "Money_Week_5137",
+        "user_url": "captured-author",
+        "date_of_comment": "2026-09-05T05:38:54.429Z",
+        "num_upvotes": 1,
+        "num_replies": 0,
+        "replies": []
+      },
+      {
+        "comment": "I’m currently developing AI agents, bots, and MCPs that can be utilized in day-to-day QA operations as part of the Platform QE role. I believe it’s better to focus more on how we can leverage AI to simplify and automate our tasks, making our QA processes more efficient.",
+        "url": "https://www.reddit.com/r/softwaretesting/comments/1w71bul/comment/p7x4ky0/",
+        "user_commenting": "ProfessionalBlock758",
+        "user_url": "captured-author",
+        "date_of_comment": "2026-09-05T05:16:40.457Z",
+        "num_upvotes": 1,
+        "num_replies": 0,
+        "replies": []
+      },
+      {
+        "comment": "i’d say just focus on the business goals and don’t leave everything in hands of AI it can produce slop text like you have posted here",
+        "url": "https://www.reddit.com/r/softwaretesting/comments/1w71bul/comment/p7wehel/",
+        "user_commenting": "kittypiggyx",
+        "user_url": "captured-author",
+        "date_of_comment": "2026-09-05T02:18:58.593Z",
+        "num_upvotes": 2,
+        "num_replies": 0,
+        "replies": []
+      },
+      {
+        "comment": "Tip N1. Don't use MCPs. MCPs return the schema together with the output which costs too much. Use CLIs e.g. the new Atlassian CLI `twg` but even this one costs unless you make your own cheaper versions with the data you need.",
+        "url": "https://www.reddit.com/r/softwaretesting/comments/1w71bul/comment/p7vfr09/",
+        "user_commenting": "Independent_Grab_242",
+        "user_url": "captured-author",
+        "date_of_comment": "2026-09-04T22:56:38.399Z",
+        "num_upvotes": 0,
+        "num_replies": 0,
+        "replies": []
+      },
+      {
+        "comment": "Well I guess you can try this, Framework folder structure will grow from time to time, you should build a solid framework for one flow and then if you want the AI to follow it then you can create agents md files on basis of that. Basically, later on after doing an exploration with playwright MCP, AI should generate test cases automation code on your coding pattern. Also test case generation sounds good but you should maintain a knowledge base of the product for your AI, so that will be AI source of truth.",
+        "url": "https://www.reddit.com/r/softwaretesting/comments/1w71bul/comment/p7t2vgu/",
+        "user_commenting": "Equal_Presentation_5",
+        "user_url": "captured-author",
+        "date_of_comment": "2026-09-04T16:30:23.641Z",
+        "num_upvotes": 0,
+        "num_replies": 0,
+        "replies": []
+      },
+      {
+        "comment": "Imagine asking a community for help and not having the decency to actually produce the question yourself.",
+        "url": "https://www.reddit.com/r/softwaretesting/comments/1w71bul/comment/p7swsyg/",
+        "user_commenting": "ign1tio",
+        "user_url": "captured-author",
+        "date_of_comment": "2026-09-04T16:04:17.275Z",
+        "num_upvotes": 10,
+        "num_replies": 1
+      },
+      {
+        "comment": "Focus on wherever the weak spots are with the current manual test suites per Fintech app/system under test and help whoever has developed those first, then use the tools available to help you draft a test plan including an automation development/implementation plan - ensure you get buy-in from product team/s and do research based on the infra/system/platform/app contexts, designs and requirements of your Fintech test targets. Once you've developed automated (or even just semi-automated) unit test scripts locally on your dev machine, use agentic IDEs like Claude Code to help you build out your test suites in your CI pipeline. I've had success with setting up both Gitea and Forgejo Actions and runners in my homelab for personal projects which has helped me to understand Gitlab runners as part of my day job - but your team may use other tools. Basically, each time you commit and merge/push test code changes to your repo it can triggers your CI suite to run a set of automated functional API/unit tests, plus more E2E tests with Playwright (I'm using Python version as my codebase is mostly Python/Flask based) but quite often you'll need to work with developers and DevOps colleagues on how to 'hand over' fully/successfully validated code for promotion from dev/test to later environments.",
+        "url": "https://www.reddit.com/r/softwaretesting/comments/1w71bul/comment/p7s270n/",
+        "user_commenting": "m4nf47",
+        "user_url": "captured-author",
+        "date_of_comment": "2026-09-04T13:48:38.259Z",
+        "num_upvotes": -1,
+        "num_replies": 0,
+        "replies": []
+      },
+      {
+        "comment": "Toolwise you can mix and match. Figure out how code reviews work at scale and how to measure cost. Fundementally you have a generator so it's output becomes a commodity. Set the expectation that you can trash at any point and recreate so the review process and measurement at scale it it's design and expectation should be solved first.",
+        "url": "https://www.reddit.com/r/softwaretesting/comments/1w71bul/comment/p7s1stp/",
+        "user_commenting": "Fit-Avocado-1880",
+        "user_url": "captured-author",
+        "date_of_comment": "2026-09-04T13:46:48.422Z",
+        "num_upvotes": -1,
+        "num_replies": 0,
+        "replies": []
+      },
+      {
+        "comment": null,
+        "url": "https://www.reddit.com/r/softwaretesting/comments/1w71bul/comment/p7ru871/",
+        "user_commenting": "[deleted]",
+        "user_url": "captured-author",
+        "date_of_comment": "2026-09-04T13:10:39.148Z",
+        "num_upvotes": 1,
+        "num_replies": 1
+      },
+      {
+        "comment": "I would start by reducing the AI slop when making these threads 🫠",
+        "url": "https://www.reddit.com/r/softwaretesting/comments/1w71bul/comment/p7rd166/",
+        "user_commenting": "Equal_Special4539",
+        "user_url": "captured-author",
+        "date_of_comment": "2026-09-04T11:36:54.248Z",
+        "num_upvotes": 53,
+        "num_replies": 1
+      },
+      {
+        "comment": "I would not start automation from day one as you say. I would start by understanding the product and business workflows. I would choose the critical/core functionalities to stat automation with. Good luck.",
+        "url": "https://www.reddit.com/r/softwaretesting/comments/1w71bul/comment/p7rb4db/",
+        "user_commenting": "Beginning_Channel_22",
+        "user_url": "captured-author",
+        "date_of_comment": "2026-09-04T11:24:55.621Z",
+        "num_upvotes": 12,
+        "num_replies": 1
+      },
+      {
+        "comment": "I’d put all my early energy into locator strategy and test data management, those two things will cause more headaches than any flaky test later on. Playwright’s got decent built-in locators but if you’re leaning on AI for generation you’ll want a strict naming convention or data attributes from the start, otherwise the AI will just latch onto fragile selectors and you’ll spend half your week fixing tests. For MCPs the Playwright one is obvious but hooking into your database for test data setup/teardown is where it really shines, you can prompt Claude to spin up a fresh account with specific flags and tear it down after the run without writing a ton of boilerplate. Agents for failure analysis are still mostly hype in my experience, they’ll confidently tell you a test failed because of a timeout when it was actually a bad selector, but they’re surprisingly useful for churning out repetitive spec files once you’ve got a solid template locked in.",
+        "url": "https://www.reddit.com/r/softwaretesting/comments/1w71bul/comment/p7racsc/",
+        "user_commenting": "petty_catfish",
+        "user_url": "captured-author",
+        "date_of_comment": "2026-09-04T11:19:58.959Z",
+        "num_upvotes": 5,
+        "num_replies": 1
+      }
+    ],
+    "community_url": "https://www.reddit.com/r/softwaretesting/",
+    "community_description": "Resources and discussions  in English about software testing and software quality assurance (QA).",
+    "community_members_num": 59769,
+    "community_rank": {
+      "community_rank_type": null,
+      "community_rank_value": null
+    },
+    "post_karma": null,
+    "bio_description": null,
+    "embedded_links": null,
+    "description_markdown": "Hey everyone,\n\nI’m joining a fintech organization on **September 15 as an Automation QA Lead**. They currently have **0% automation**, so I’ll be responsible for building the framework, defining the automation process/strategy, selecting test cases and getting automation started from scratch.\n\nThe interesting part: **I won’t have additional automation resources initially.** It’ll basically be **me + Claude Desktop + AI tools**. 😄\n\nI have good experience with **Playwright and Cypress**, and I’m planning to use **Playwright + JavaScript**.\n\nSince AI is now such a big part of development, I want to build the automation process with **AI in mind from Day 1**, rather than adding it later.\n\nI’d love to hear from people already doing this in real projects:\n\n# AI + Automation\n\n* How are you using AI in your Playwright/automation workflow?\n* What tasks are actually worth delegating to AI?\n* Any useful AI workflows/prompts you recommend?\n\n# MCPs\n\nWhich MCPs have actually been useful for QA automation?\n\nFor example: **Playwright, GitHub, Jira, Confluence, Database, Browser/DevTools, API**, or custom MCPs.\n\n# AI Agents\n\nAre you using/building AI agents for QA?\n\nFor example:\n\n* Test case generation\n* Automation/code generation\n* Test data generation\n* Failure analysis\n* Locator maintenance\n* Regression selection\n* Test review\n* Reporting\n\nWhich ones have provided real value, and which are just hype?\n\n# Starting from 0%\n\nIf you had to build a Playwright framework and automation process from scratch today, what would you prioritize from Day 1?\n\nAnything that you wish you had designed differently when starting your own framework?\n\n# GitHub Repos\n\nIf you've **built any GitHub repositories** around Playwright + AI, AI agents, MCPs, self-healing automation, AI test generation, etc., please share them.\n\nAlso, if you know any **good open-source GitHub repos** that I should study, please drop them in the comments.\n\nBasically, if you were in my position — **one QA Automation Lead, 0% existing automation, Playwright + JavaScript, and AI available from Day 1** — how would you approach it?\n\nWould love to hear **real-world experiences, useful tools/MCPs, GitHub repos, and lessons from things that didn't work.**\n\nThanks!",
+    "subreddit_icon_image": null,
+    "author_icon": null,
+    "user_id": "captured-author",
+    "archived": "false",
+    "locked_post": false,
+    "timestamp": "2026-09-05T11:49:31.765Z",
+    "input": {
+      "url": "https://www.reddit.com/r/softwaretesting/comments/1w71bul/"
+    }
+  }
+]

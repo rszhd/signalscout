@@ -52,9 +52,11 @@ import {
   pollQueue,
   queueDefinitions,
   type RetryPolicy,
+  reconcileQueue,
   scheduleTickCron,
   scheduleTickQueue,
 } from "./queues.js";
+import { createReconcileStep } from "./reconcile.js";
 import { enqueueDuePolls } from "./schedule.js";
 import { type Step, type StepContext, unconfiguredClassify, type WorkerSteps } from "./steps.js";
 
@@ -278,6 +280,8 @@ export async function startWorker({
     );
 
   const pipeline: WorkerSteps = {
+    reconcile:
+      steps.reconcile ?? createReconcileStep({ registry: sources, credentialsFor: lookup }),
     poll: steps.poll ?? createCollectStep({ registry: sources, credentialsFor: lookup }),
     estimate: steps.estimate ?? createEstimateStep({ registry: sources, credentialsFor: lookup }),
     filter: steps.filter ?? createFilterStep({ embedder: embedding }),
@@ -303,6 +307,7 @@ export async function startWorker({
     monitorId: payload.monitorId,
   });
 
+  await work(reconcileQueue, pipeline.reconcile, () => ({}));
   await work<PollPayload>(pollQueue, pipeline.poll, named);
   await work<FilterPayload>(filterQueue, pipeline.filter, named);
   await work<ClassifyPayload>(classifyQueue, pipeline.classify, named);
@@ -318,6 +323,7 @@ export async function startWorker({
   await boss.work(scheduleTickQueue, async () => {
     await enqueueDuePolls(db, boss, logger);
     await enqueueNotifications(db, boss);
+    await boss.send(reconcileQueue, {}, { singletonKey: "all" });
   });
 
   if (scheduleTicks) {

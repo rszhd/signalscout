@@ -251,6 +251,8 @@ export interface ConnectorDescriptor {
 export interface SocialSource extends ConnectorDescriptor {
   validateCredentials(credentials: SourceCredentials): Promise<CredentialCheck>;
   search(request: SearchRequest): Promise<SearchResult>;
+  /** Absent means verification is unsupported, never that a post is deleted. */
+  verify?(request: VerificationRequest): Promise<VerificationResult>;
 }
 
 /**
@@ -273,3 +275,20 @@ export interface SourceRuntime {
 export interface ConnectorDefinition extends ConnectorDescriptor {
   create(runtime: SourceRuntime): SocialSource;
 }
+
+/** US-015. A verification carries billing and durable continuation state. */
+export interface VerificationRequest {
+  readonly externalId: string;
+  readonly url: string;
+  readonly credentials: SourceCredentials;
+  readonly cursor?: string;
+  readonly signal?: AbortSignal;
+}
+export type VerificationResult =
+  | { readonly status: "available" | "deleted" | "unknown"; readonly unitsConsumed: number }
+  | {
+      readonly status: "pending";
+      readonly unitsConsumed: number;
+      readonly cursor?: string;
+      readonly retryAfter: Date;
+    };

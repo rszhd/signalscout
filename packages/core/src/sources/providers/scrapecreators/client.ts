@@ -1,4 +1,7 @@
 /**
+ * Correctness-critical: an unavailable URL is not proof of deletion.
+ * deletion-fixtures/verify.test.ts replays the captured counterexample.
+ *
  * The ScrapeCreators half of the Reddit connector.
  *
  * This file, its siblings and the fixtures beside them are the only places in
@@ -25,7 +28,7 @@
  *    timeframe is the thing we give up. `since` is applied here instead.
  */
 import type { Logger } from "../../../logger.js";
-import type { SourceRuntime } from "../../types.js";
+import type { SourceRuntime, VerificationRequest, VerificationResult } from "../../types.js";
 
 const apiBase = "https://api.scrapecreators.com/v1/reddit";
 
@@ -201,6 +204,39 @@ export class ScrapeCreatorsClient {
    * There is no snapshot and no waiting: the posts are in this answer. That is
    * a measured fact and not a simplification — see the header.
    */
+  /** Correctness-critical: a 404 also occurred for a live abbreviated URL.
+   * Only explicit content markers mean deletion. Captures are in deletion-fixtures.
+   */
+  async verify(request: VerificationRequest): Promise<VerificationResult> {
+    const answer = await this.call(`${apiBase}/post`, { url: request.url }, request.signal);
+    const body =
+      typeof answer.body === "object" && answer.body !== null
+        ? (answer.body as Record<string, unknown>)
+        : {};
+    const reported = body.credits_charged;
+    const unitsConsumed =
+      typeof reported === "number" && Number.isFinite(reported) && reported >= 0
+        ? reported
+        : answer.httpStatus === 200
+          ? this.chargeOf(body)
+          : 0;
+    if (answer.httpStatus === 429)
+      return {
+        status: "pending",
+        unitsConsumed,
+        retryAfter: this.retryAt(answer.retryAfterHeader),
+      };
+    if (
+      answer.httpStatus !== 200 ||
+      body.success !== true ||
+      body.name !== request.externalId ||
+      typeof body.selftext !== "string"
+    )
+      return { status: "unknown", unitsConsumed };
+    const deleted = ["[deleted]", "[removed]"].includes(body.selftext);
+    return { status: deleted ? "deleted" : "available", unitsConsumed };
+  }
+
   async fetchPage(
     endpoint: string,
     params: Record<string, string>,

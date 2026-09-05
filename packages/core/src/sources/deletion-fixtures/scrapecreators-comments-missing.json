@@ -1,0 +1,37 @@
+{
+  "success": true,
+  "credits_remaining": 2077,
+  "credits_charged": 1,
+  "post": {
+    "id": "zzzzzzzzzz",
+    "author": null,
+    "author_fullname": null,
+    "subreddit": "softwaretesting",
+    "title": null,
+    "selftext": null,
+    "selftext_html": null,
+    "downs": 0,
+    "name": "t3_zzzzzzzzzz",
+    "upvote_ratio": null,
+    "ups": 0,
+    "total_awards_received": 0,
+    "score": 0,
+    "created": null,
+    "created_utc": null,
+    "created_at_iso": null,
+    "num_comments": 0,
+    "url": "https://www.reddit.com/r/softwaretesting/comments/zzzzzzzzzz/",
+    "permalink": "/r/softwaretesting/comments/zzzzzzzzzz/",
+    "subreddit_subscribers": null,
+    "is_video": false,
+    "archived": false,
+    "locked": false,
+    "over_18": false,
+    "spoiler": false
+  },
+  "comments": [],
+  "more": {
+    "has_more": false,
+    "cursor": null
+  }
+}

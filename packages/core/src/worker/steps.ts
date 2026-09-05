@@ -45,6 +45,7 @@ export interface PipelineSteps {
  */
 export interface WorkerSteps extends PipelineSteps {
   readonly estimate: Step<EstimatePayload>;
+  readonly reconcile: Step<Record<string, never>>;
 }
 
 /**

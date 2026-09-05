@@ -204,7 +204,13 @@ hand, because Reddit answers 403 to an unauthenticated request, and
 it. What the plan is not proven to be is *useful* — a name that exists can
 still be the wrong place to look.
 
-One ticket is in `doing/`.
+Two tickets are in `doing/`.
+[US-015](backlog/doing/US-015-a-deleted-post-stops-being-shown.md) has the
+scheduled deletion job, budget guard, durable provider continuations and post
+tombstones. Bright Data returned explicit deletion evidence in live captures.
+ScrapeCreators returned ambiguous answers for both live and removed posts, so
+its uncertain checks leave matches visible. That acceptance box remains open.
+Read docs/deletions.md before changing verification.
 [US-001](backlog/doing/US-001-the-workspace-runs-with-one-command.md) waits on
 the first CI run, which needs a remote this repository does not have.
 
@@ -458,9 +464,10 @@ pnpm --filter @intentwatch/core capture:classifier   # spends money; see below
 pnpm --filter @intentwatch/core capture:queries      # spends money; see below
 pnpm --filter @intentwatch/core capture:embeddings   # spends money; see below
 pnpm --filter @intentwatch/core live:provider-switch # spends ~$0.08; see below
+pnpm capture:deletions                            # spends ~$0.02; see below
 ```
 
-These four are the only commands here that spend money, and all four are
+These five are the only commands here that spend money, and all five are
 instruments: they ask a real provider something and record what it said,
 because an answer we wrote would be evidence about our own schema and none
 about the provider.
@@ -488,6 +495,12 @@ that snapshot is still collecting, and reports which provider each resume went
 to and what each one billed. It spends about $0.08 and leaves behind a paused
 monitor and two `api_usage` rows, which are the evidence. Run it when
 `collect.ts` changes how a provider is chosen or resumed.
+
+`capture:deletions` checks known available, removed and missing Reddit URLs.
+It retains whole provider responses with author identity scrubbed. The default
+run asks both providers; `--comments` probes ScrapeCreators' alternate endpoint.
+It writes fixture files and a request manifest, never application rows. Read
+docs/deletions.md for what each provider has and has not proved.
 
 Re-run any of them when its prompt, its schema or the model changes, and put
 the numbers in the ticket.

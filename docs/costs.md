@@ -279,3 +279,13 @@ which costs more and hides nothing.
   its assertions were written first for the same reason: it puts a number in
   front of a person who is about to spend money. The samples are collected by
   `packages/core/src/worker/estimate.ts`, on the `estimate` queue.
+
+## Deletion checks
+
+US-015 re-checks matched posts through the selected provider. These calls are
+metered too. Each reported unit is written to `api_usage` under the monitor
+that started the check. A shared post is checked once for all its matches.
+The cap is checked before each call, and new checks yield to due or active
+polls and collections waiting on a snapshot. One final call can overshoot the cap; its price is known only afterwards.
+Pausing collection does not stop checks on the inbox within that budget.
+See [deletions.md](deletions.md) for frequency and provider limitations.

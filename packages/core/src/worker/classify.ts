@@ -1,4 +1,7 @@
 /**
+ * Correctness-critical: a deleted post must not be classified again.
+ * classify.test.ts pins the exclusion; migration 0019 protects late inserts.
+ *
  * The classify step: score every post this poll saw against the monitor, and
  * write a match for the ones that clear the monitor's threshold.
  *
@@ -20,7 +23,7 @@
  * would leave a post unscored with nothing to score it again: the next poll
  * asks the source for what is new, and a post from an hour ago is not.
  */
-import { and, count, eq, inArray, ne } from "drizzle-orm";
+import { and, count, eq, inArray, isNull, ne } from "drizzle-orm";
 import type { ModelCall } from "../ai/call.js";
 import { scoreColumns } from "../ai/classification.js";
 import type { Classifier } from "../ai/classify.js";
@@ -82,7 +85,10 @@ export function createClassifyStep({ classifier }: ClassifyOptions): Step<Classi
     const ids = [...postIds];
 
     const [candidates, scored, failures] = await Promise.all([
-      db.select().from(posts).where(inArray(posts.id, ids)),
+      db
+        .select()
+        .from(posts)
+        .where(and(inArray(posts.id, ids), isNull(posts.deletedAt))),
       db
         .select({ postId: matches.postId })
         .from(matches)

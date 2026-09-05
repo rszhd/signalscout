@@ -15,6 +15,7 @@ import {
   pollQueue,
   pollQueuePolicy,
   queueDefinitions,
+  reconcileQueue,
   retryPolicy,
   scheduleTickQueue,
 } from "./queues.js";
@@ -98,6 +99,7 @@ describe("the worker's queues", () => {
         notifyQueue,
         pollQueue,
         scheduleTickQueue,
+        reconcileQueue,
       ].sort(),
     );
   });

@@ -1,0 +1,12 @@
+{
+  "status": "ready",
+  "snapshot_id": "sd_mtobiiqwrze2leoz0",
+  "dataset_id": "gd_lvz8ah06191smkebj4",
+  "error_codes": {
+    "dead_page": 1
+  },
+  "records": 2,
+  "errors": 1,
+  "collection_duration": 145869,
+  "avg_duration_per_input": 48623
+}

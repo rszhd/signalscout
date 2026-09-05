@@ -355,3 +355,15 @@ describe("a post already scored for this monitor", () => {
     expect(await db.select().from(matches).where(eq(matches.monitorId, monitorId))).toHaveLength(1);
   }, 30_000);
 });
+
+it("does not pay the model to read a post already confirmed deleted", async () => {
+  const monitorId = await insertMonitor(database);
+  const postId = await insertPost(strongPost, "t3_confirmed_deleted");
+  await db.update(posts).set({ deletedAt: new Date() }).where(eq(posts.id, postId));
+  await worker.boss.send(classifyQueue, { monitorId, postIds: [postId] });
+  await until("the deleted post job to finish", () =>
+    notified.find((entry) => entry.monitorId === monitorId),
+  );
+  expect(calls).toEqual([]);
+  expect(await db.select().from(matches).where(eq(matches.postId, postId))).toEqual([]);
+});

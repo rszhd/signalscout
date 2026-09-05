@@ -1,4 +1,7 @@
 /**
+ * Correctness-critical: a feedback export must not expose a deleted title.
+ * worker/reconcile.test.ts asserts this while preserving verdict history.
+ *
  * What the user thought of a match.
  *
  * US-012 collects the answer and does not use it yet, on purpose. Two buttons
@@ -28,7 +31,7 @@
  * teaches the wrong lesson. Nothing replays them yet; the column is what makes
  * it possible to do that safely later.
  */
-import { and, count, desc, eq, inArray, isNull } from "drizzle-orm";
+import { and, count, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 import type { Database } from "../db/client.js";
 import { feedback, matches, monitors, posts, type Verdict } from "../db/schema.js";
 import { singleUserId } from "../monitors/monitors.js";
@@ -273,7 +276,10 @@ export async function exportFeedback(
       source: posts.source,
       externalId: posts.externalId,
       url: posts.url,
-      title: posts.title,
+      // Feedback history survives deletion, but the removed title is content.
+      title: sql<
+        string | null
+      >`CASE WHEN ${matches.hidden} OR ${posts.deletedAt} IS NOT NULL THEN NULL ELSE ${posts.title} END`,
       createdAt: feedback.createdAt,
       supersededAt: feedback.supersededAt,
     })

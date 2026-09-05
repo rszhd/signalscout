@@ -241,3 +241,22 @@ The fake source is the exception, and it is not one: its fixtures are
 downstream of a connector. It can be told to run out of allowance and to hand
 back a short page, so a caller can be tested against both without a network and
 without a bill.
+
+## Verifying deletion
+
+US-015 adds an optional `SocialSource.verify` method. It receives a post id,
+its URL, credentials, and an optional opaque cursor. It returns `available`,
+`deleted`, `unknown`, or `pending`, with `unitsConsumed` on every answer.
+`pending` supplies a retry time and may carry a cursor. The worker persists
+that cursor beside its provider and paying monitor, independently of search
+continuations. A provider switch cannot move it.
+
+Only a definite deletion may return `deleted`. An empty result, missing
+record, outage, inaccessible post, or unsupported method does not establish
+one. In particular, a ScrapeCreators 404 was captured for an available post
+with a shortened URL. See [deletions.md](deletions.md) and the committed
+`capture:deletions` instrument before changing a deletion rule.
+
+Verification currently uses the connector's existing billable unit and price.
+A provider whose verification endpoint bills differently must declare that
+price separately before it can be used; the worker must never guess one.

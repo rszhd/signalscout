@@ -18,7 +18,8 @@
     "db:up": "docker compose up -d postgres",
     "db:migrate": "pnpm --filter @intentwatch/core migrate",
     "db:generate": "pnpm --filter @intentwatch/core generate",
-    "db:rotate-key": "pnpm --filter @intentwatch/core rotate-key"
+    "db:rotate-key": "pnpm --filter @intentwatch/core rotate-key",
+    "capture:deletions": "node --env-file=.env packages/core/src/sources/deletion-fixtures/capture.mjs"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.12",

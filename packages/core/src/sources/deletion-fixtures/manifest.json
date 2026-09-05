@@ -1,0 +1,86 @@
+[
+  {
+    "name": "scrapecreators-canonical",
+    "url": "https://api.scrapecreators.com/v1/reddit/post?url=https%3A%2F%2Fwww.reddit.com%2Fr%2Fsoftwaretesting%2Fcomments%2F1w71bul%2Fstarting_automation_from_0_as_a_qa_lead_how_are%2F",
+    "status": 200,
+    "capturedAt": "2026-09-05T11:47:00.111Z"
+  },
+  {
+    "name": "scrapecreators-available",
+    "url": "https://api.scrapecreators.com/v1/reddit/post?url=https%3A%2F%2Fwww.reddit.com%2Fr%2Fsoftwaretesting%2Fcomments%2F1w71bul%2F",
+    "status": 404,
+    "capturedAt": "2026-09-05T11:47:01.128Z"
+  },
+  {
+    "name": "scrapecreators-removed",
+    "url": "https://api.scrapecreators.com/v1/reddit/post?url=https%3A%2F%2Fwww.reddit.com%2Fr%2FCreatorsAdvice%2Fcomments%2F1iyty7q%2Fremoved%2F",
+    "status": 404,
+    "capturedAt": "2026-09-05T11:47:03.494Z"
+  },
+  {
+    "name": "scrapecreators-missing",
+    "url": "https://api.scrapecreators.com/v1/reddit/post?url=https%3A%2F%2Fwww.reddit.com%2Fr%2Fsoftwaretesting%2Fcomments%2Fzzzzzzzzzz%2F",
+    "status": 404,
+    "capturedAt": "2026-09-05T11:47:04.609Z"
+  },
+  {
+    "name": "brightdata-trigger",
+    "url": "https://api.brightdata.com/datasets/v3/trigger?dataset_id=gd_lvz8ah06191smkebj4&include_errors=true",
+    "status": 200,
+    "capturedAt": "2026-09-05T11:47:06.145Z"
+  },
+  {
+    "name": "brightdata-progress",
+    "url": "https://api.brightdata.com/datasets/v3/progress/sd_mtobiiqwrze2leoz0",
+    "status": 200,
+    "capturedAt": "2026-09-05T11:47:37.787Z"
+  },
+  {
+    "name": "brightdata-progress",
+    "url": "https://api.brightdata.com/datasets/v3/progress/sd_mtobiiqwrze2leoz0",
+    "status": 200,
+    "capturedAt": "2026-09-05T11:48:09.141Z"
+  },
+  {
+    "name": "brightdata-progress",
+    "url": "https://api.brightdata.com/datasets/v3/progress/sd_mtobiiqwrze2leoz0",
+    "status": 200,
+    "capturedAt": "2026-09-05T11:48:40.356Z"
+  },
+  {
+    "name": "brightdata-progress",
+    "url": "https://api.brightdata.com/datasets/v3/progress/sd_mtobiiqwrze2leoz0",
+    "status": 200,
+    "capturedAt": "2026-09-05T11:49:11.487Z"
+  },
+  {
+    "name": "brightdata-progress",
+    "url": "https://api.brightdata.com/datasets/v3/progress/sd_mtobiiqwrze2leoz0",
+    "status": 200,
+    "capturedAt": "2026-09-05T11:49:42.926Z"
+  },
+  {
+    "name": "brightdata-records",
+    "url": "https://api.brightdata.com/datasets/v3/snapshot/sd_mtobiiqwrze2leoz0?format=json",
+    "status": 200,
+    "capturedAt": "2026-09-05T11:49:45.179Z"
+  },
+  {
+    "name": "scrapecreators-comments-canonical",
+    "url": "https://api.scrapecreators.com/v1/reddit/post/comments?url=https%3A%2F%2Fwww.reddit.com%2Fr%2Fsoftwaretesting%2Fcomments%2F1w71bul%2Fstarting_automation_from_0_as_a_qa_lead_how_are%2F",
+    "status": 200,
+    "capturedAt": "2026-09-05T11:52:55.843Z"
+  },
+  {
+    "name": "scrapecreators-comments-removed",
+    "url": "https://api.scrapecreators.com/v1/reddit/post/comments?url=https%3A%2F%2Fwww.reddit.com%2Fr%2FCreatorsAdvice%2Fcomments%2F1iyty7q%2Fremoved%2F",
+    "status": 200,
+    "capturedAt": "2026-09-05T11:52:58.037Z"
+  },
+  {
+    "name": "scrapecreators-comments-missing",
+    "url": "https://api.scrapecreators.com/v1/reddit/post/comments?url=https%3A%2F%2Fwww.reddit.com%2Fr%2Fsoftwaretesting%2Fcomments%2Fzzzzzzzzzz%2F",
+    "status": 200,
+    "capturedAt": "2026-09-05T11:52:59.337Z"
+  }
+]

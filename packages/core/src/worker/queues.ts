@@ -41,6 +41,9 @@ export const deadLetterQueue = "dead-letter";
  */
 export const estimateQueue = "estimate";
 
+/** US-015: one global job, deduplicating shared posts across monitors. */
+export const reconcileQueue = "reconcile";
+
 /**
  * The scheduler's own tick. It is not a fifth pipeline step: it holds no
  * monitor and does no work beyond asking which monitors are due and sending
@@ -61,6 +64,7 @@ export const allQueues = [
   heartbeatQueue,
   scheduleTickQueue,
   estimateQueue,
+  reconcileQueue,
   ...pipelineQueues,
 ] as const;
 
@@ -151,6 +155,7 @@ export function queueDefinitions(retry: RetryPolicy = retryPolicy): readonly Que
       retentionSeconds: 30 * 24 * 60 * 60,
     },
     { name: heartbeatQueue },
+    { name: reconcileQueue, policy: "stately", deadLetter: deadLetterQueue, ...retry },
     { name: scheduleTickQueue, policy: "stately", retryLimit: 0 },
     { name: pollQueue, policy: pollQueuePolicy, deadLetter: deadLetterQueue, ...retry },
     // `stately` with the run as the key, like the poll: one active job per

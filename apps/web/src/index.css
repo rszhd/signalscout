@@ -502,19 +502,14 @@ a {
   flex: 1;
   display: grid;
   grid-template-columns: minmax(360px, 0.92fr) minmax(420px, 1.08fr);
-  gap: 14px;
-  margin: 16px 18px 18px;
   overflow: hidden;
 }
 
 .match-list-column {
   min-width: 0;
   overflow: hidden;
-  padding: 8px 7px 8px 0;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-md);
+  border-right: 1px solid var(--line);
   background: var(--surface);
-  box-shadow: var(--shadow-soft);
 }
 
 .match-list {
@@ -671,18 +666,13 @@ a {
 .match-detail {
   min-width: 0;
   overflow: hidden;
-  padding: 8px 7px 8px 0;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-md);
   background: var(--surface-soft);
-  box-shadow: var(--shadow-soft);
 }
 
 .inbox-scroll-region {
   height: 100%;
   overflow-y: auto;
   overscroll-behavior-y: contain;
-  padding-right: 6px;
   scrollbar-color: #aeb5ae transparent;
   scrollbar-width: thin;
 }

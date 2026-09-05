@@ -45,7 +45,9 @@ connections and settings stay out until their own behaviour exists.
       post bodies are 17px and informational text is never smaller than 12px
 - [x] The shell, inbox panes, monitor cards and creation dialog use one clean,
       restrained theme with consistent spacing, radii and surface depth
-- [x] Each inbox scrollbar has space between the content and the pane edge
+- [x] Each inbox scrollbar sits directly on the pane edge without an inset
+- [x] The inbox list and reading pane form one continuous workspace without
+      an outer margin or gap between the columns
 - [x] Application chrome uses a light neutral palette with a conventional
       blue interaction accent; product lime is confined to the logo and
       source marks retain their identifying colours
@@ -112,3 +114,17 @@ connections and settings stay out until their own behaviour exists.
   by formatting in an unrelated uncommitted core test.
 - 2026-09-05T12:13+08:00 — Restored Reddit orange on Reddit source marks.
   Kept orange out of the application chrome and action palette.
+- 2026-09-05T12:51+08:00 — Replaced Ubuntu with locally bundled Inter at the
+  three interface weights. Kept the established type scale and layout.
+  Verified the inbox at desktop width. The web tests, scoped lint, typecheck
+  and production build pass.
+- 2026-09-05T12:59+08:00 — Removed the inbox workspace margin and column gap.
+  Replaced the separate rounded panels with one divider while keeping both
+  scroll regions independent.
+- 2026-09-05T13:01+08:00 — Removed the inset around both inbox scrollbars so
+  they sit directly on the pane edges. Verified the continuous desktop layout
+  in the browser. The web tests, scoped lint, typecheck and production build
+  pass.
+- 2026-09-05T13:03+08:00 — Restored locally bundled Ubuntu after comparing it
+  with Inter. Kept the established type scale and flush inbox layout. The web
+  tests, scoped lint, typecheck and production build pass.

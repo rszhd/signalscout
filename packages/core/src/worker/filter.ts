@@ -48,6 +48,7 @@ import type { Embedder } from "../ai/embed.js";
 import type { MonitorProfile } from "../ai/prompt.js";
 import { recordModelCall } from "../ai/record.js";
 import type { Triager } from "../ai/triage.js";
+import { createSpendMeter } from "../budget/budget.js";
 import { monitors, posts, type Signal } from "../db/schema.js";
 import { monitorDescriptionText, postEmbeddingText } from "../filter/description.js";
 import { type FilterDrop, recordFilterDrops } from "../filter/drops.js";
@@ -187,11 +188,30 @@ export function createFilterStep({ embedder, triager }: FilterOptions = {}): Ste
       const survived: string[] = [];
       let triageSpentMicros = 0;
       let unanswered = 0;
+      let unasked = 0;
+
+      /**
+       * BUG-004. Triage is a model call and is billed like one.
+       *
+       * When the money runs out this stage stops *calling*, and keeps every
+       * item it has not asked about. Running out of budget is not a `no`, and
+       * the rule this stage is built on is that only an explicit `no` drops.
+       * The classify step refuses the actual spend; letting these through
+       * costs nothing here and loses nothing there.
+       */
+      const meter = await createSpendMeter(db, monitorId);
 
       for (const candidate of survivors) {
+        if (await meter.exhausted()) {
+          unasked += 1;
+          survived.push(candidate.id);
+          continue;
+        }
+
         const outcome = await triager.triage({ monitor: profile, post: candidate });
 
         triageSpentMicros += outcome.call.estimatedCostMicros ?? 0;
+        meter.spent(outcome.call.estimatedCostMicros);
         if (outcome.verdict === null) unanswered += 1;
 
         await recordModelCall(db, {
@@ -214,6 +234,9 @@ export function createFilterStep({ embedder, triager }: FilterOptions = {}): Ste
           kept: survived.length,
           droppedByTriage: survivors.length - survived.length,
           unanswered,
+          // Items the cap stopped us asking about. They went on unfiltered,
+          // which is the expensive direction and the safe one.
+          unasked,
           spentMicros: triageSpentMicros,
           model: triager.model,
         },

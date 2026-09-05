@@ -19,7 +19,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { createClassifier } from "../ai/classify.js";
 import type { AiConfig } from "../ai/config.js";
 import { createDatabase, type Database } from "../db/client.js";
-import { apiUsage, matches, modelCalls, monitors, posts } from "../db/schema.js";
+import { apiUsage, budgets, matches, modelCalls, monitors, posts } from "../db/schema.js";
 import { createLogger } from "../logger.js";
 import { updateMonitor } from "../monitors/monitors.js";
 import { fakePosts } from "../sources/fake/fixtures.js";
@@ -182,6 +182,117 @@ async function classifyAndWait(monitorId: string, postIds: readonly string[]) {
     notified.find((entry) => entry.monitorId === monitorId),
   );
 }
+
+/**
+ * BUG-004. The cap can be crossed between a batch's first item and its last.
+ *
+ * `enforceBudget` answers "may this work start", and that is the right question
+ * for a poll: one poll buys one bounded set of pages. It is the wrong question
+ * for a batch of 123 classifications, and US-020's live run measured what that
+ * costs — a poll of 23 posts fanned out into 328 replies, 654 triage calls and
+ * 146 classifications, and the guard was asked nothing between any of them.
+ *
+ * The failure shape docs/testing.md names for this surface is "money spent past
+ * a cap, silently, at 02:00". These are the cases that go red if it comes back.
+ */
+describe("a monitor that runs out of money mid-batch", () => {
+  async function capped(capMicros: number): Promise<string> {
+    const monitorId = await insertMonitor(database);
+
+    await db
+      .insert(budgets)
+      .values({ monitorId, monthlyCapMicros: capMicros, onExhausted: "notify" });
+
+    return monitorId;
+  }
+
+  it("classifies nothing when the cap is already gone", async () => {
+    // A cap of zero is spent before anything starts, which is the state a
+    // monitor reaches partway through any month.
+    const monitorId = await capped(0);
+    const postId = await insertPost(strongPost, "cap-none-1");
+
+    answer = () => strongAnswer;
+    await classifyAndWait(monitorId, [postId]);
+
+    const calls = await db.select().from(modelCalls).where(eq(modelCalls.monitorId, monitorId));
+
+    expect(calls).toEqual([]);
+  }, 30_000);
+
+  it("stops part-way and does not classify the rest", async () => {
+    // One classification costs 1,500 micro-dollars here, so this cap pays for
+    // two and then runs out.
+    const monitorId = await capped(3_000);
+    const ids = await Promise.all([
+      insertPost(strongPost, "cap-part-1"),
+      insertPost(strongPost, "cap-part-2"),
+      insertPost(strongPost, "cap-part-3"),
+      insertPost(strongPost, "cap-part-4"),
+    ]);
+
+    answer = () => strongAnswer;
+    await classifyAndWait(monitorId, ids);
+
+    const calls = await db.select().from(modelCalls).where(eq(modelCalls.monitorId, monitorId));
+
+    expect(calls.length).toBeGreaterThan(0);
+    expect(calls.length).toBeLessThan(ids.length);
+  }, 30_000);
+
+  /**
+   * The difference between stopping and losing.
+   *
+   * A post the cap stopped us reaching has no `model_calls` row and no match,
+   * so it looks exactly like a post the model had never been shown — which is
+   * what makes a later poll pick it up. A post marked in any way here would be
+   * a lead deleted by an accounting decision.
+   */
+  it("leaves the posts it did not reach exactly as it found them", async () => {
+    const monitorId = await capped(0);
+    const postId = await insertPost(strongPost, "cap-keeps-1");
+
+    answer = () => strongAnswer;
+    await classifyAndWait(monitorId, [postId]);
+
+    expect(await db.select().from(matches).where(eq(matches.monitorId, monitorId))).toEqual([]);
+    expect(await db.select().from(modelCalls).where(eq(modelCalls.monitorId, monitorId))).toEqual(
+      [],
+    );
+  }, 30_000);
+
+  it("classifies them once there is room again", async () => {
+    const monitorId = await capped(0);
+    const postId = await insertPost(strongPost, "cap-later-1");
+
+    answer = () => strongAnswer;
+    await classifyAndWait(monitorId, [postId]);
+
+    expect(await db.select().from(matches).where(eq(matches.monitorId, monitorId))).toEqual([]);
+
+    // A person raises the cap. The post is still there and still unscored.
+    await db
+      .update(budgets)
+      .set({ monthlyCapMicros: 1_000_000 })
+      .where(eq(budgets.monitorId, monitorId));
+
+    await classifyAndWait(monitorId, [postId]);
+
+    const found = await db.select().from(matches).where(eq(matches.monitorId, monitorId));
+
+    expect(found).toHaveLength(1);
+  }, 30_000);
+
+  it("does not stop a monitor that has no cap at all", async () => {
+    const monitorId = await insertMonitor(database);
+    const postId = await insertPost(strongPost, "cap-free-1");
+
+    answer = () => strongAnswer;
+    await classifyAndWait(monitorId, [postId]);
+
+    expect(await db.select().from(matches).where(eq(matches.monitorId, monitorId))).toHaveLength(1);
+  }, 30_000);
+});
 
 describe("a post the model scores", () => {
   it("becomes a match carrying the model's scores and reasons, and is notified", async () => {

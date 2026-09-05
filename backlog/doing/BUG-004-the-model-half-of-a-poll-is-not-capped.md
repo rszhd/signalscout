@@ -51,20 +51,22 @@ is the failure this repository keeps writing down.
 
 ## Acceptance
 
-- [ ] The classify step refuses to start a batch when the monitor is at its cap,
+- [x] The classify step refuses to start a batch when the monitor is at its cap,
       and says so in one sentence a person can act on
-- [ ] It also stops part-way through a batch, because a batch of 123 items can
+- [x] It also stops part-way through a batch, because a batch of 123 items can
       cross the cap between its first item and its last
-- [ ] The filter step does the same for triage, which is a model call and is
+- [x] The filter step does the same for triage, which is a model call and is
       billed like one
-- [ ] A post left unclassified by a refusal keeps its place and is picked up by
+- [x] A post left unclassified by a refusal keeps its place and is picked up by
       a later poll once there is room, and a test proves it is not dropped
 - [ ] The monitor screen says the monitor stopped for money rather than for
-      lack of matches
-- [ ] A test drives a monitor over its cap through the reply path specifically,
+      lack of matches — **not done: the reason reaches the log and not yet a
+      screen**
+- [x] A test drives a monitor over its cap through the reply path specifically,
       because that is the path that made this large
 - [ ] The Log records what one capped poll costs against what an uncapped one
-      does, measured rather than argued
+      does, measured rather than argued — **not done: needs a live run, and the
+      one that found this bug has already been paid for**
 
 ## Notes
 
@@ -89,3 +91,31 @@ is the failure this repository keeps writing down.
   guessed the run had stopped for budget. It had not — nothing stops for budget
   there, which is the bug. The guess was right about the shape and wrong about
   the behaviour, and checking which turned a hunch into this ticket.
+
+- 2026-09-06T04:55+08:00 — Fixed, in the two steps that were missing it.
+  `createSpendMeter` reads the ledger once, subtracts what the loop reports as
+  it spends, and re-reads every twenty calls so a second worker on the same
+  monitor is noticed rather than assumed away. A monitor with no cap never
+  re-reads, so an uncapped deployment pays one query for a whole batch.
+
+  **The two steps stop differently, and the difference is deliberate.** Classify
+  refuses: it is where the money actually goes, and a post it does not reach is
+  left with no `model_calls` row and no match — indistinguishable from a post
+  the model was never shown, which is what makes a later poll pick it up. Triage
+  stops *calling* but keeps every item it did not ask about, because running out
+  of budget is not a `no` and the rule that stage is built on is that only an
+  explicit `no` drops. Passing them on costs nothing, since classify then
+  refuses the spend that matters.
+
+  Stopping at a cap does not throw. A dead-lettered job would turn a correct
+  refusal into an alarm and then retry it four more times against the same empty
+  budget.
+
+  Five cases in `classify.test.ts` hold it, and the one that matters most is the
+  last: a post the cap stopped is classified normally once a person raises the
+  cap. That is the difference between stopping and losing. 944 tests pass.
+
+  Two boxes stay open and neither is code in this step. The reason reaches the
+  log and not yet a screen, and the measured comparison needs another live run —
+  the one that found this bug cost $0.715 and there is nothing to learn from
+  repeating it at this hour.

@@ -81,6 +81,7 @@ export {
   budgetStates,
   checkBudget,
   clearBudget,
+  createSpendMeter,
   enforceBudget,
   formatMicros,
   getBudget,

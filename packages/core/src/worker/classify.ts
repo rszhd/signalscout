@@ -42,6 +42,7 @@ import { scoreColumns } from "../ai/classification.js";
 import type { Classifier } from "../ai/classify.js";
 import type { MonitorProfile, ThreadContext } from "../ai/prompt.js";
 import { recordModelCall } from "../ai/record.js";
+import { createSpendMeter } from "../budget/budget.js";
 import type { Database, Queryable } from "../db/client.js";
 import {
   type ModelCallOutcome,
@@ -153,6 +154,16 @@ export function createClassifyStep({ classifier }: ClassifyOptions): Step<Classi
     let retryable = 0;
     let dropped = 0;
     let spentMicros = 0;
+    /**
+     * BUG-004. The cap can be crossed between the first item and the last.
+     *
+     * `enforceBudget` answers "may this work start", which is the right
+     * question for a poll and the wrong one for a batch. A poll of 23 posts
+     * produced 328 replies and 123 classifications on 2026-09-06, and nothing
+     * between them asked whether there was any money left.
+     */
+    const meter = await createSpendMeter(db, monitorId);
+    let unspentFor = 0;
 
     const record = async (
       tx: Queryable,
@@ -162,6 +173,7 @@ export function createClassifyStep({ classifier }: ClassifyOptions): Step<Classi
       error?: string,
     ) => {
       spentMicros += call.estimatedCostMicros ?? 0;
+      meter.spent(call.estimatedCostMicros);
       await recordModelCall(tx, {
         purpose: "classification",
         outcome,
@@ -178,6 +190,19 @@ export function createClassifyStep({ classifier }: ClassifyOptions): Step<Classi
     // back-off in `sources/` cannot help with here.
     for (const post of candidates) {
       if (alreadyScored.has(post.id)) continue;
+
+      /**
+       * Out of money, so stop rather than finish the batch.
+       *
+       * The posts left are not dropped and not marked in any way: they have no
+       * `model_calls` row, so a later poll that sees them again classifies
+       * them, exactly as a post the model had never reached. That is the whole
+       * difference between stopping and losing.
+       */
+      if (await meter.exhausted()) {
+        unspentFor = candidates.length - matchIds.length - retryable - dropped;
+        break;
+      }
 
       const attempts = attemptsByPost.get(post.id) ?? 0;
 
@@ -249,9 +274,25 @@ export function createClassifyStep({ classifier }: ClassifyOptions): Step<Classi
         unclassified: retryable,
         spentMicros,
         model: classifier.model,
+        unspentFor,
       },
       "posts classified",
     );
+
+    if (unspentFor > 0) {
+      // A person has to be able to tell "the cap stopped this" from "there was
+      // nothing to find". A quiet inbox looks the same either way, which is the
+      // failure this whole surface is written against.
+      logger.warn(
+        {
+          monitorId,
+          left: unspentFor,
+          capMicros: meter.state.capMicros,
+          reason: meter.state.reason,
+        },
+        "classification stopped at the budget cap: the posts it did not reach keep their place",
+      );
+    }
 
     // Sent before the throw below, on purpose. The matches above are written
     // and a failure on a later post must not hold back the ones that worked.
@@ -262,6 +303,10 @@ export function createClassifyStep({ classifier }: ClassifyOptions): Step<Classi
         `${retryable} of ${candidates.length} posts were left unclassified by ${classifier.model}.`,
       );
     }
+
+    // Deliberately not a throw. Stopping at a cap is the guard working, and a
+    // dead-lettered job would turn a correct refusal into an alarm and then
+    // retry it against the same empty budget four more times.
   };
 }
 

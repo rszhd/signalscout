@@ -498,3 +498,79 @@ export async function enforceBudget(
 
   return state;
 }
+
+/**
+ * How many model calls may pass between two readings of the ledger.
+ *
+ * A reading per call would be a query per call, which doubles the round trips
+ * of the cheapest stage in the pipeline. A reading per batch would be wrong the
+ * moment two workers share a monitor. This is the compromise, and the number is
+ * small because the thing being bounded is money.
+ */
+const recheckEvery = 20;
+
+export interface SpendMeter {
+  /** True once the cap is reached. Ask before every call, not after. */
+  exhausted(): Promise<boolean>;
+  /** Record what one call cost. An unpriced call counts as nothing, honestly. */
+  spent(micros: number | undefined): void;
+  /** The state as last read, for a log line or a message to a person. */
+  readonly state: BudgetState;
+}
+
+/**
+ * A running budget check for a loop that spends per item.
+ *
+ * BUG-004. `enforceBudget` answers "may this work start", which is the right
+ * question for a poll: one poll buys one bounded set of pages. It is the wrong
+ * question for a batch of 123 classifications, because the cap can be crossed
+ * between the first item and the last, and nothing was asking.
+ *
+ * So this reads the ledger once, then subtracts what the loop reports as it
+ * goes, and re-reads every `recheckEvery` calls so a second worker's spend on
+ * the same monitor is noticed rather than assumed away. The re-read is what
+ * makes the estimate converge on the truth instead of drifting from it.
+ *
+ * A monitor with no cap is never exhausted and never re-reads, so an uncapped
+ * deployment pays one query for the whole batch.
+ */
+export async function createSpendMeter(
+  db: Database,
+  monitorId: string,
+  now: Date = new Date(),
+): Promise<SpendMeter> {
+  let state = await checkBudget(db, monitorId, now);
+  let sinceRead = 0;
+  let spentSinceRead = 0;
+
+  return {
+    get state() {
+      return state;
+    },
+
+    spent(micros) {
+      // Undefined means the model has no configured price. It is counted as
+      // nothing rather than guessed, which is the same rule the ledger follows
+      // and the reason an unpriced deployment is not protected by this at all.
+      spentSinceRead += micros ?? 0;
+      sinceRead += 1;
+    },
+
+    async exhausted() {
+      if (state.capMicros === null) return false;
+
+      if (sinceRead >= recheckEvery) {
+        state = await checkBudget(db, monitorId, new Date());
+        sinceRead = 0;
+        spentSinceRead = 0;
+      }
+
+      if (state.exhausted) return true;
+
+      // Between readings, the estimate is what the ledger said plus what this
+      // loop has spent since. Erring towards stopping early is the safe
+      // direction: a person can see an unfinished batch and raise the cap.
+      return spentSinceRead >= (state.remainingMicros ?? 0);
+    },
+  };
+}

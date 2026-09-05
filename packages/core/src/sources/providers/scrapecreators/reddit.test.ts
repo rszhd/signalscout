@@ -535,6 +535,22 @@ describe("reading the replies under a post", () => {
     expect(scrapeCreatorsReddit.replyPricePerUnitMicros).toBe(1880);
   });
 
+  /**
+   * The declaration has to reach the instance, not only the definition.
+   *
+   * Every screen and every step asks the connector the registry built, not the
+   * record it was built from. This was wrong once: the definition said it could
+   * read replies and the built connector said it could not, so the form would
+   * have told a person that Reddit returns none.
+   */
+  it("carries the declaration on the connector the registry builds", () => {
+    const built = new ScrapeCreatorsRedditSource(runtimeWith(unreachableFetch));
+
+    expect(built.canFetchReplies).toBe(true);
+    expect(built.replyPricePerUnitMicros).toBe(1880);
+    expect(typeof built.fetchReplies).toBe("function");
+  });
+
   it("asks the comments endpoint for the post's own URL", async () => {
     const { fetch: fetchStub, calls } = scrapeCreators([shallowThread]);
     const source = new ScrapeCreatorsRedditSource(runtimeWith(fetchStub));

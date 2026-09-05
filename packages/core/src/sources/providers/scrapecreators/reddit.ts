@@ -149,6 +149,11 @@ export class ScrapeCreatorsRedditSource implements SocialSource {
   readonly billableUnit = scrapeCreatorsReddit.billableUnit;
   readonly pricePerUnitMicros = scrapeCreatorsReddit.pricePerUnitMicros;
   readonly maxUnitsPerQueryPoll = scrapeCreatorsReddit.maxUnitsPerQueryPoll;
+  // The declaration has to reach the instance, not only the definition: every
+  // screen and every step asks the connector the registry built, not the
+  // record it was built from.
+  readonly canFetchReplies = scrapeCreatorsReddit.canFetchReplies;
+  readonly replyPricePerUnitMicros = scrapeCreatorsReddit.replyPricePerUnitMicros;
 
   constructor(private readonly runtime: SourceRuntime) {}
 

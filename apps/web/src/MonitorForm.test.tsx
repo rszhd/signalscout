@@ -49,6 +49,8 @@ const options = {
       search: { maxQueryWords: 8, note: "A Reddit post has a title and paragraphs." },
       missingCredentials: [],
       ready: true,
+      // US-020: whether the connector that runs here reads replies.
+      canFetchReplies: true,
     },
   ],
   canGenerateQueries: true,
@@ -159,6 +161,99 @@ describe("the monitor form", () => {
       sources: ["reddit"],
     });
     expect(container.textContent).toContain("Journeys is running");
+  });
+
+  /**
+   * US-020. The opt-in, and the sentence that stops it being a silent nothing.
+   *
+   * A monitor may ask for replies on a platform whose connector cannot read
+   * them — the poll still runs and still returns posts — so the form has to say
+   * which platforms will answer. Being given none without being told is the
+   * failure this control exists to avoid.
+   */
+  describe("reading the replies as well as the posts", () => {
+    function replyCheckbox(): HTMLInputElement {
+      const label = [...container.querySelectorAll("label")].find((element) =>
+        element.textContent?.includes("Include replies and comments"),
+      );
+      return label?.querySelector("input") as HTMLInputElement;
+    }
+
+    it("is off until it is asked for, because it multiplies what the model reads", () => {
+      expect(replyCheckbox().checked).toBe(false);
+      expect(container.textContent).toContain("multiply the model calls");
+    });
+
+    it("sends the answer with the monitor", async () => {
+      fetchMock.mockImplementation(async (request: string | URL | Request) => {
+        const url = typeof request === "string" ? request : request.toString();
+        if (url === "/api/monitor-options") return json(options);
+        if (url === "/api/monitors/queries") return json(generated);
+        if (url === "/api/monitors") {
+          return json({ id: "m", name: "Journeys", paused: false, missingCredentials: [] }, 201);
+        }
+        throw new Error(`Unexpected request: ${url}`);
+      });
+
+      await act(async () => {
+        setValue(input("Monitor name"), "Journeys");
+        setValue(input("What do you sell?"), "A test runner");
+        setValue(input("Who is most likely to buy it?"), "Small SaaS teams");
+        setValue(input("What problem does it solve?"), "Tests break after UI changes");
+      });
+
+      // Ticked before the plan is generated: the control sits with the
+      // "where should it look" question, which is answered on this stage.
+      await act(async () => replyCheckbox().click());
+
+      await act(async () => button("Generate search plan").click());
+      await settle();
+      await act(async () => button("Start monitor").click());
+      await settle();
+
+      const call = fetchMock.mock.calls.find(([url]) => url === "/api/monitors");
+      expect(JSON.parse(call?.[1]?.body as string)).toMatchObject({ includeReplies: true });
+    });
+
+    it("says nothing about platforms that will answer", async () => {
+      await act(async () => replyCheckbox().click());
+
+      expect(container.textContent).not.toContain("will not return replies");
+    });
+
+    /**
+     * The case the control exists for. A build may ship two connectors for one
+     * platform where only one reads replies, so an instance holding the other
+     * one's key must be told rather than given nothing.
+     */
+    it("warns when a ticked platform's own connector cannot read replies", async () => {
+      await screen.unmount();
+
+      fetchMock.mockImplementation(async (request: string | URL | Request) => {
+        const url = typeof request === "string" ? request : request.toString();
+        if (url === "/api/monitor-options") {
+          return json({
+            ...options,
+            sources: [{ ...options.sources[0], canFetchReplies: false }],
+          });
+        }
+        throw new Error(`Unexpected request: ${url}`);
+      });
+
+      screen = await mount(<MonitorForm />);
+      container = screen.container;
+
+      await act(async () => {
+        const label = [...container.querySelectorAll("label")].find((element) =>
+          element.textContent?.includes("Include replies and comments"),
+        );
+        const box = label?.querySelector("input");
+        (box as HTMLInputElement).click();
+      });
+
+      expect(container.textContent).toContain("Reddit will not return replies");
+      expect(container.textContent).toContain("The posts still arrive");
+    });
   });
 
   it("keeps a plan the cost test says would break the budget, without starting it", async () => {

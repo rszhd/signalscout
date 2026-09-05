@@ -45,6 +45,10 @@ function match(overrides: Record<string, unknown> = {}) {
     excerpt: "We're manually checking our major flows before every release.",
     url: "https://reddit.com/r/SaaS/comments/abc",
     postedAt: new Date(Date.now() - 12 * 60_000).toISOString(),
+    kind: "post",
+    parentTitle: null,
+    parentExcerpt: null,
+    parentUrl: null,
     ...overrides,
   };
 }
@@ -108,6 +112,53 @@ describe("the intent inbox", () => {
       "Explicit manual-testing pain",
       "Asking for solutions",
     ]);
+  });
+
+  /**
+   * A reply is judged against the thread above it, so the inbox has to show it.
+   *
+   * US-020. "We hit this too, what did you end up using?" is a strong lead or
+   * noise depending entirely on the post it answers, and an inbox showing only
+   * the reply would ask a person to judge it with less than the classifier had.
+   */
+  describe("a match that is a reply", () => {
+    const replyMatch = match({
+      id: "match-reply",
+      kind: "reply",
+      title: null,
+      excerpt: "We hit this too. What did you end up using?",
+      parentTitle: "Our end to end tests break every release",
+      parentExcerpt: "We are a four-person SaaS and the suite breaks whenever the UI changes.",
+      parentUrl: "https://reddit.com/r/SaaS/comments/abc",
+    });
+
+    it("shows the post it answers, and labels both halves", async () => {
+      await show({
+        "/api/matches?": { matches: [replyMatch], nextCursor: null, asOf: firstPage.asOf },
+      });
+
+      expect(container.textContent).toContain("Replying to");
+      expect(container.textContent).toContain("We are a four-person SaaS");
+      expect(container.textContent).toContain("The reply");
+      expect(container.textContent).toContain("We hit this too. What did you end up using?");
+    });
+
+    it("titles it with the thread, because a reply has no title of its own", async () => {
+      await show({
+        "/api/matches?": { matches: [replyMatch], nextCursor: null, asOf: firstPage.asOf },
+      });
+
+      expect(container.querySelector(".detail-title")?.textContent).toContain(
+        "Our end to end tests break every release",
+      );
+    });
+
+    it("shows no thread block on a post, so nothing is invented for one", async () => {
+      await show();
+
+      expect(container.textContent).toContain("We're manually checking our major flows");
+      expect(container.textContent).not.toContain("Replying to");
+    });
   });
 
   it("does not claim a negative observation is a reason it matched", async () => {

@@ -246,6 +246,51 @@ export function startBlockers(
 }
 
 /**
+ * Whether a platform will actually return replies on this deployment. US-020.
+ *
+ * The question the monitor form has to answer is not "does the build ship a
+ * connector that can read replies" but "will the connector that runs here read
+ * them". Those differ the moment a platform has two providers and only one of
+ * them can: a build shipping both Reddit connectors would otherwise promise
+ * replies to an instance holding the key of the one that cannot, and the person
+ * would tick the box and be given none, silently.
+ *
+ * So this follows the same narrowing `startBlockers` does — a recorded choice
+ * first, then the connectors whose credentials are present — and answers about
+ * those. A platform with nothing usable answers from the build instead, because
+ * a fresh install with no keys should still be told the truth about what it
+ * could do.
+ */
+export function canFetchRepliesFor(
+  sourceIds: readonly string[],
+  {
+    descriptors,
+    environment = process.env,
+    storedCredentials,
+    providerChoices = {},
+  }: MonitorEnvironment,
+): Record<string, boolean> {
+  const out: Record<string, boolean> = {};
+
+  for (const id of sourceIds) {
+    const all = descriptors.filter((candidate) => candidate.platform.id === id);
+    const chosen = providerChoices[id];
+    const connectors = chosen ? all.filter((candidate) => candidate.provider.id === chosen) : all;
+    const considered = connectors.length > 0 ? connectors : all;
+
+    const usable = considered.filter(
+      (connector) => missingCredentials(connector, environment, storedCredentials).length === 0,
+    );
+
+    out[id] = (usable.length > 0 ? usable : considered).some(
+      (connector) => connector.canFetchReplies === true,
+    );
+  }
+
+  return out;
+}
+
+/**
  * The missing credentials as one sentence fragment a person can act on.
  *
  * Fields of one provider are joined with "and", because that account needs

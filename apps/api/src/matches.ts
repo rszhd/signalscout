@@ -54,6 +54,18 @@ const matchSchema = z.object({
   excerpt: z.string(),
   url: z.string(),
   postedAt: z.string(),
+  /** "post" or "reply". US-020. */
+  kind: z.string(),
+  /**
+   * The thread above a reply, so the inbox can show what the model was shown.
+   *
+   * Null on a post, and on a reply whose post has since been deleted. A person
+   * asked to judge a reply with less context than the classifier had is being
+   * asked the wrong question.
+   */
+  parentTitle: z.string().nullable(),
+  parentExcerpt: z.string().nullable(),
+  parentUrl: z.string().nullable(),
 });
 
 const query = z.object({

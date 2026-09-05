@@ -50,6 +50,7 @@
  * match that was never delivered.
  */
 import { and, desc, eq, gte, isNull, or, type SQL, sql } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 import type { Database } from "../db/client.js";
 import {
   feedback,
@@ -61,6 +62,16 @@ import {
   type Verdict,
 } from "../db/schema.js";
 import { singleUserId } from "../monitors/monitors.js";
+
+/**
+ * `posts` a second time, as the thread above a reply.
+ *
+ * Named once here rather than inside the query so the two roles cannot be
+ * confused when reading it: `posts` is the thing being judged, `parentPost` is
+ * its context.
+ */
+const parentPost = alias(posts, "parent_post");
+
 import { intentTypeLabel } from "../monitors/signals.js";
 
 /**
@@ -112,6 +123,12 @@ export interface InboxMatch {
   readonly source: Source;
   /** The subreddit on Reddit, null on X where the author is the context. */
   readonly channel: string | null;
+  /** "post" or "reply". A reply carries the thread below. US-020. */
+  readonly kind: string;
+  /** The post a reply hangs under. Null on a post, and on an orphaned reply. */
+  readonly parentTitle: string | null;
+  readonly parentExcerpt: string | null;
+  readonly parentUrl: string | null;
   readonly author: string | null;
   readonly title: string | null;
   readonly excerpt: string;
@@ -265,9 +282,22 @@ export async function listMatches(
       excerpt: posts.excerpt,
       url: posts.url,
       postedAt: posts.postedAt,
+      kind: posts.kind,
+      /**
+       * The post above a reply, so a person reads what the model read. US-020.
+       *
+       * A left self-join rather than a second query: a reply is unreadable on
+       * its own — "we hit this too, what did you end up using?" names nothing
+       * — and an inbox that showed the reply alone would ask somebody to judge
+       * a lead with less context than the classifier had.
+       */
+      parentTitle: parentPost.title,
+      parentExcerpt: parentPost.excerpt,
+      parentUrl: parentPost.url,
     })
     .from(matches)
     .innerJoin(posts, eq(matches.postId, posts.id))
+    .leftJoin(parentPost, eq(posts.parentPostId, parentPost.id))
     .innerJoin(monitors, eq(matches.monitorId, monitors.id))
     .leftJoin(feedback, currentVerdict)
     .where(and(...conditions))

@@ -34,6 +34,12 @@ interface Match {
   author: string | null;
   title: string | null;
   excerpt: string;
+  /** "post" or "reply". US-020. */
+  kind: string;
+  /** The thread above a reply. Null on a post, and on an orphaned reply. */
+  parentTitle: string | null;
+  parentExcerpt: string | null;
+  parentUrl: string | null;
   url: string;
   postedAt: string;
 }
@@ -435,8 +441,18 @@ export function Inbox() {
                           </span>
                           <span className="match-origin">{ageLabel(match.postedAt)}</span>
                         </span>
-                        <strong className="match-title">{match.title ?? match.excerpt}</strong>
-                        {match.title && <span className="match-excerpt">{match.excerpt}</span>}
+                        <strong className="match-title">
+                          {match.kind === "reply" && (
+                            <span className="match-kind">
+                              <span className="visually-hidden">A reply: </span>
+                              <span aria-hidden="true">↳ </span>
+                            </span>
+                          )}
+                          {match.title ?? match.parentTitle ?? match.excerpt}
+                        </strong>
+                        {(match.title ?? match.parentTitle) && (
+                          <span className="match-excerpt">{match.excerpt}</span>
+                        )}
                         <span className="match-bottom">
                           <span className={`intent-pill ${tone.tone}`}>{tone.label}</span>
                           <span className="match-score">
@@ -487,14 +503,37 @@ export function Inbox() {
                 </div>
 
                 <h2 className="detail-title">
-                  {selectedMatch.title ?? "A conversation worth reading"}
+                  {selectedMatch.title ??
+                    selectedMatch.parentTitle ??
+                    "A conversation worth reading"}
                 </h2>
                 <p className="detail-author">
                   {selectedMatch.author ?? "Unknown author"} · matched by{" "}
                   {selectedMatch.monitorName}
                 </p>
 
+                {/*
+                  The thread above a reply, shown before it.
+
+                  A person judging a reply must see what the classifier saw:
+                  "we hit this too, what did you end up using?" is a good lead
+                  or noise depending entirely on the post above it, and an
+                  inbox that hid the post would be asking the wrong question.
+                */}
+                {selectedMatch.kind === "reply" && selectedMatch.parentExcerpt && (
+                  <div className="post-body">
+                    <p className="section-label">Replying to</p>
+                    <blockquote className="post-box thread-post">
+                      {selectedMatch.parentTitle && (
+                        <strong className="thread-post-title">{selectedMatch.parentTitle}</strong>
+                      )}
+                      {limitWords(selectedMatch.parentExcerpt).text}
+                    </blockquote>
+                  </div>
+                )}
+
                 <div className="post-body">
+                  {selectedMatch.kind === "reply" && <p className="section-label">The reply</p>}
                   <blockquote className="post-box">
                     {postIsExpanded ? selectedMatch.excerpt : limitedPost?.text}
                   </blockquote>

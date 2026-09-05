@@ -716,7 +716,8 @@ describe("the monitor routes", () => {
         expect(response.json().preFilter).toEqual({
           enabled: true,
           similarityThreshold: 0.15,
-          dropped: { keyword: 0, embedding: 0 },
+          // `triage` joined the stages in US-030.
+          dropped: { keyword: 0, embedding: 0, triage: 0 },
         });
       });
     });
@@ -802,7 +803,11 @@ describe("the monitor routes", () => {
 
         const response = await app.inject({ method: "GET", url: "/api/monitors" });
 
-        expect(response.json()[0].preFilter.dropped).toEqual({ keyword: 1, embedding: 1 });
+        expect(response.json()[0].preFilter.dropped).toEqual({
+          keyword: 1,
+          embedding: 1,
+          triage: 0,
+        });
       });
     });
   });

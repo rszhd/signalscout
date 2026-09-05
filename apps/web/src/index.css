@@ -744,6 +744,26 @@ a {
   line-height: 1.7;
 }
 
+/*
+ * The post above a reply. Quieter than the reply itself on purpose: it is
+ * there so a person can judge the reply, not to be read for its own sake.
+ */
+.thread-post {
+  border-left: 3px solid var(--line);
+  color: #6b706c;
+  background: #fbfbfa;
+}
+
+.thread-post-title {
+  display: block;
+  margin-bottom: 6px;
+  color: #3a403b;
+}
+
+.match-kind {
+  color: #6b706c;
+}
+
 .read-more-button {
   margin-top: 8px;
   padding: 5px 2px;

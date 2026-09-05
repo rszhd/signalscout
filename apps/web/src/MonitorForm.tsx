@@ -32,6 +32,8 @@ interface SourceOption {
   /** Empty when the platform can be collected. */
   missingCredentials: CredentialOption[];
   ready: boolean;
+  /** Whether the connector that would run here reads replies. US-020. */
+  canFetchReplies: boolean;
 }
 
 interface MonitorOptions {
@@ -161,6 +163,8 @@ export function MonitorForm() {
   const [answers, setAnswers] = useState<Answers>(emptyAnswers);
   const [selectedSignals, setSelectedSignals] = useState<string[]>([]);
   const [selectedSources, setSelectedSources] = useState<string[]>([]);
+  /** US-020. Off by default, because it multiplies what the model reads. */
+  const [includeReplies, setIncludeReplies] = useState(false);
   const [plan, setPlan] = useState<QueryPlan>(emptyPlan);
   const [stage, setStage] = useState<"answers" | "review" | "created">("answers");
   const [created, setCreated] = useState<CreatedMonitor | null>(null);
@@ -214,6 +218,15 @@ export function MonitorForm() {
     [options, selectedSources],
   );
   const missingCredentials = selectedSourceOptions.flatMap((source) => source.missingCredentials);
+  /**
+   * The platforms this person has ticked that will return no replies.
+   *
+   * The whole point of showing it: a monitor that asks for replies on a
+   * platform whose connector cannot read them still polls and still returns
+   * posts, and being given nothing without being told is the failure the
+   * acceptance names.
+   */
+  const repliesUnavailable = selectedSourceOptions.filter((source) => !source.canFetchReplies);
 
   const capMicros = cap.trim() === "" ? null : toMicros(cap);
   const queries = cleanQueries(plan.queries, selectedSources);
@@ -337,6 +350,7 @@ export function MonitorForm() {
           queries,
           subreddits,
           sources: selectedSources,
+          includeReplies,
           ...(capMicros === null ? {} : { budget: { monthlyCapMicros: capMicros, onExhausted } }),
           // Kept, not started. The person was shown what it would cost.
           ...(overCap ? { startPaused: true } : {}),
@@ -521,6 +535,46 @@ export function MonitorForm() {
                     </label>
                   ))}
                 </div>
+              </fieldset>
+
+              <fieldset className="choice-section">
+                <legend>Read the replies too?</legend>
+                <p>
+                  A person describing their problem underneath somebody else's post is the same
+                  lead. Fetching those replies is cheap; reading them is not.
+                </p>
+                <label className="source-card">
+                  <input
+                    checked={includeReplies}
+                    type="checkbox"
+                    onChange={() => setIncludeReplies(!includeReplies)}
+                  />
+                  <span className="source-symbol">💬</span>
+                  <span>
+                    <strong>Include replies and comments</strong>
+                    <small>
+                      A busy thread holds about twelve replies, so this can multiply the model calls
+                      this monitor makes by roughly ten. The fetch itself is about one cent per
+                      hundred threads.
+                    </small>
+                  </span>
+                </label>
+
+                {includeReplies && repliesUnavailable.length > 0 && (
+                  <div className="notice warning" role="status">
+                    <strong>
+                      {repliesUnavailable.length === 1
+                        ? `${repliesUnavailable[0]?.displayName} will not return replies.`
+                        : "Some of these will not return replies."}
+                    </strong>
+                    <span>
+                      {repliesUnavailable.map((source) => source.displayName).join(", ")} can be
+                      polled for posts here, but the connector this deployment uses for{" "}
+                      {repliesUnavailable.length === 1 ? "it" : "them"} cannot read replies. The
+                      posts still arrive.
+                    </span>
+                  </div>
+                )}
               </fieldset>
 
               {missingCredentials.length > 0 && (

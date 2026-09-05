@@ -2,6 +2,7 @@ export {
   allMonitorQueries,
   type CreatedMonitor,
   type CreateMonitorInput,
+  canFetchRepliesFor,
   createMonitor,
   deleteMonitor,
   describeMissingCredentials,

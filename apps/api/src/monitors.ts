@@ -18,6 +18,7 @@ import {
   type BudgetState,
   budgetStates,
   type ConnectorDescriptor,
+  canFetchRepliesFor,
   checkBudget,
   clearBudget,
   createMonitor,
@@ -186,6 +187,14 @@ const createBody = answersBody.extend({
   /** US-014: keep this plan, do not start it. The person was shown what it would cost. */
   startPaused: z.boolean().default(false),
   preFilter: preFilterSchema.partial().optional(),
+  /**
+   * US-020. Off unless asked for, here and in the column's own default.
+   *
+   * It is not in `preFilter` because it is not a filter setting: it decides
+   * what is collected, and it multiplies what the classifier reads rather than
+   * reducing it.
+   */
+  includeReplies: z.boolean().optional(),
 });
 
 /**
@@ -285,8 +294,10 @@ const monitorSchema = z.object({
    * inbox, and only the number says which question to ask.
    */
   preFilter: preFilterSchema.extend({
-    dropped: z.object({ keyword: z.number(), embedding: z.number() }),
+    dropped: z.object({ keyword: z.number(), embedding: z.number(), triage: z.number() }),
   }),
+  /** US-020. Whether this monitor reads the replies under the posts it finds. */
+  includeReplies: z.boolean(),
   /**
    * What the person thought of this monitor's matches, counting only the
    * verdicts in force.
@@ -337,6 +348,10 @@ function monitorEnvironment(
 }
 
 /** The pre-filter settings, as the core write functions take them. */
+function replySettings(body: { includeReplies?: boolean }) {
+  return body.includeReplies === undefined ? {} : { includeReplies: body.includeReplies };
+}
+
 function filterSettings(body: { preFilter?: { enabled?: boolean; similarityThreshold?: number } }) {
   return {
     ...(body.preFilter?.enabled === undefined ? {} : { preFilterEnabled: body.preFilter.enabled }),
@@ -395,6 +410,7 @@ function toResponse(
       similarityThreshold: monitor.similarityThreshold,
       dropped,
     },
+    includeReplies: monitor.includeReplies,
     feedback: verdicts,
     notificationIssues: [...notificationProblems],
   };
@@ -482,6 +498,15 @@ export async function registerMonitorRoutes(
               /** Empty when the platform can be collected. */
               missingCredentials: z.array(missingCredentialSchema),
               ready: z.boolean(),
+              /**
+               * Whether the connector that would run here reads replies.
+               *
+               * Per platform and per deployment, not per build. A build ships
+               * two Reddit connectors and only one of them reads replies, so
+               * an instance holding the other one's key must be told that
+               * ticking the box will give it nothing.
+               */
+              canFetchReplies: z.boolean(),
             }),
           ),
           /** False when no model key is set, so the form can say why. */
@@ -511,6 +536,7 @@ export async function registerMonitorRoutes(
          */
         sources: groupByPlatform(sources).map(({ platform }) => {
           const missing = startBlockers([platform.id], runtime);
+          const replies = canFetchRepliesFor([platform.id], runtime);
 
           return {
             id: platform.id,
@@ -524,6 +550,7 @@ export async function registerMonitorRoutes(
             // can be shown as needing one account or the other, never both.
             missingCredentials: missing,
             ready: missing.length === 0,
+            canFetchReplies: replies[platform.id] === true,
           };
         }),
         canGenerateQueries: queryGenerator !== null,
@@ -671,7 +698,7 @@ export async function registerMonitorRoutes(
 
       const { monitor, missing } = await createMonitor(
         db,
-        { ...request.body, ...filterSettings(request.body) },
+        { ...request.body, ...filterSettings(request.body), ...replySettings(request.body) },
         runtime,
       );
 
@@ -718,6 +745,7 @@ export async function registerMonitorRoutes(
       const monitor = await updateMonitor(db, request.params.id, {
         ...request.body,
         ...filterSettings(request.body),
+        ...replySettings(request.body),
       });
       if (!monitor) return reply.code(404).send({ message: "No monitor has that id." });
 

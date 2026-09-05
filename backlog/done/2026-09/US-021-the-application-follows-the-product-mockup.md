@@ -40,7 +40,7 @@ connections and settings stay out until their own behaviour exists.
 - [x] The IntentWatch wordmark uses the mockup's lime three-dot logo
 - [x] New monitor opens in the mockup's dialog layout over the monitor list
       and can be dismissed without losing the application shell
-- [x] The application uses Ubuntu for its interface typography
+- [x] The application uses Figtree for its interface typography
 - [x] Reading text, labels, helper copy and metadata use a consistent scale;
       post bodies are 17px and informational text is never smaller than 12px
 - [x] The shell, inbox panes, monitor cards and creation dialog use one clean,
@@ -128,3 +128,5 @@ connections and settings stay out until their own behaviour exists.
 - 2026-09-05T13:03+08:00 — Restored locally bundled Ubuntu after comparing it
   with Inter. Kept the established type scale and flush inbox layout. The web
   tests, scoped lint, typecheck and production build pass.
+- 2026-09-05T16:23+08:00 — Replaced Ubuntu with locally bundled Figtree at
+  weights 400, 500 and 700. The web production build and scoped lint pass.

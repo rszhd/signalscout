@@ -60,7 +60,7 @@ importers:
 
   apps/web:
     dependencies:
-      '@fontsource/ubuntu':
+      '@fontsource/figtree':
         specifier: ^5.3.0
         version: 5.3.0
       react:
@@ -803,8 +803,8 @@ packages:
   '@fastify/swagger@9.8.1':
     resolution: {integrity: sha512-VpHMnqZTY8iBZYJE8WWkbKPrXIYWy2rDfIf5qLr6DzZSpQYZ+KxQVcJFiq/AMlvNwI4gCBd66++iUlxXXGT0IQ==}
 
-  '@fontsource/ubuntu@5.3.0':
-    resolution: {integrity: sha512-LsjJXgE430QLs8LKfn1RIFbbdGAiZBU1gao8ASa4Z2kGNGh7lMb7Rzx09v3bLLuuK+3XA/JSLgPWTAbLD6r1fg==}
+  '@fontsource/figtree@5.3.0':
+    resolution: {integrity: sha512-/iTcTXL1eRBGhvD7NN9dnKzXzWqDLVZVEUFI9xIxAC1G/hXU8tCyYeXCAuPOuvSYPInFUP7H6KLGgygmDfy1SA==}
 
   '@jridgewell/gen-mapping@0.3.13':
     resolution: {integrity: sha512-2kkt/7niJ6MgEPxF0bYdQ6etZaA+fQvDcLKckhy1yIQOzaoKjBBjSj63/aLVjYE3qhRt5dvM+uUyfCg6UKCBbA==}
@@ -2638,7 +2638,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@fontsource/ubuntu@5.3.0': {}
+  '@fontsource/figtree@5.3.0': {}
 
   '@jridgewell/gen-mapping@0.3.13':
     dependencies:

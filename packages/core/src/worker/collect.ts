@@ -179,6 +179,14 @@ function toRow(sourceId: Source, providerId: Provider, post: CandidatePost) {
     title: post.title ?? null,
     excerpt: post.text.slice(0, excerptLength),
     postedAt: post.postedAt,
+    /**
+     * How many replies the platform says this post has. US-020.
+     *
+     * Null where the platform did not say, which is not zero. The re-open rule
+     * reads it, so a connector that omits it makes every thread look unchanged
+     * — see the `coalesce` below, which is the other half of the same rule.
+     */
+    replyCount: post.replyCount ?? null,
   };
 }
 
@@ -532,7 +540,26 @@ export function createCollectStep({ registry, credentialsFor }: CollectOptions):
       .values(rows)
       .onConflictDoUpdate({
         target: [posts.source, posts.externalId],
-        set: { fetchedAt: sql`now()` },
+        set: {
+          fetchedAt: sql`now()`,
+          /**
+           * The reply count is refreshed where the text is not, and the
+           * difference is the point. US-020's re-open rule buys a thread again
+           * only when this number has grown, so a column frozen at its first
+           * value makes the rule inert: a conversation that gained twenty
+           * replies looks exactly like one that gained none.
+           *
+           * Refreshing it is safe for the reason the excerpt is not. This is a
+           * counter, not content, so a later poll cannot resurrect words an
+           * author removed by writing it — which is the failure US-015 exists
+           * to prevent and the reason every other field here stays put.
+           *
+           * `coalesce` keeps what we know when a later fetch does not say. A
+           * connector that omits the count must not erase a number an earlier
+           * one gave us.
+           */
+          replyCount: sql`coalesce(excluded.reply_count, ${posts.replyCount})`,
+        },
       })
       .returning({ id: posts.id });
 

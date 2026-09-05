@@ -343,6 +343,76 @@ describe("the poll step", () => {
     expect(sentTo(secondBoss, filterQueue).postIds).toHaveLength(fakePosts.length);
   });
 
+  /**
+   * The one field a second collection refreshes, and why it is the only one.
+   *
+   * US-020's re-open rule buys a thread again only when the platform's reply
+   * count has grown. A live run on 2026-09-06 found the rule inert: the count
+   * was frozen at whatever the first collection stored, so a conversation that
+   * gained twenty replies looked exactly like one that gained none.
+   *
+   * Refreshing it is safe where refreshing the text is not. A counter cannot
+   * resurrect words an author removed, which is the failure US-015 exists to
+   * prevent and the reason every other field here stays put.
+   */
+  it("refreshes the reply count on a second collection, but not the text", async () => {
+    // Two monitors rather than two polls of one: the second poll of a monitor
+    // carries a `since` from the first, and the fake would return nothing.
+    const monitorId = await insertMonitor(database);
+    const later = await insertMonitor(database, { name: "Sees the thread later" });
+    const post = {
+      externalId: "growing-1",
+      url: "https://example.test/growing/1",
+      text: "The original words.",
+      postedAt: new Date("2026-08-10T09:00:00.000Z"),
+    };
+
+    await createCollectStep({
+      registry: fakeRegistry({ posts: [{ ...post, replyCount: 2 }] }),
+      credentialsFor: credentials,
+    })({ monitorId }, contextFor(db, stubBoss()));
+
+    await createCollectStep({
+      registry: fakeRegistry({
+        posts: [{ ...post, text: "Edited after the fact.", replyCount: 21 }],
+      }),
+      credentialsFor: credentials,
+    })({ monitorId: later }, contextFor(db, stubBoss()));
+
+    const [row] = await db.select().from(posts).where(eq(posts.externalId, "growing-1"));
+
+    expect(row?.replyCount).toBe(21);
+    // The text is deliberately stale. A poll that rewrote it could bring back
+    // something the author had already taken down.
+    expect(row?.excerpt).toBe("The original words.");
+  });
+
+  it("keeps a count an earlier collection gave us when a later one says nothing", async () => {
+    const monitorId = await insertMonitor(database);
+    const later = await insertMonitor(database, { name: "Sees it without a count" });
+    const post = {
+      externalId: "quiet-1",
+      url: "https://example.test/quiet/1",
+      text: "Words.",
+      postedAt: new Date("2026-08-10T09:00:00.000Z"),
+    };
+
+    await createCollectStep({
+      registry: fakeRegistry({ posts: [{ ...post, replyCount: 7 }] }),
+      credentialsFor: credentials,
+    })({ monitorId }, contextFor(db, stubBoss()));
+
+    // A connector that omits the count must not erase one we already hold.
+    await createCollectStep({
+      registry: fakeRegistry({ posts: [post] }),
+      credentialsFor: credentials,
+    })({ monitorId: later }, contextFor(db, stubBoss()));
+
+    const [row] = await db.select().from(posts).where(eq(posts.externalId, "quiet-1"));
+
+    expect(row?.replyCount).toBe(7);
+  });
+
   it("keeps an excerpt, not the whole post", async () => {
     // Reddit's terms require that content the author removed stops being
     // shown. The less we hold, the less there is to remove.

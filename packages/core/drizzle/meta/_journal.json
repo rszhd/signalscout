@@ -50,6 +50,13 @@
       "when": 1788562835462,
       "tag": "0006_add_match_inbox_index",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1788567223316,
+      "tag": "0007_add_budgets_and_usage",
+      "breakpoints": true
     }
   ]
 }

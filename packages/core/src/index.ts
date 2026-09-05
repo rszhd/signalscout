@@ -57,13 +57,35 @@ export {
   subredditSchema,
 } from "./ai/queries.js";
 export { type RecordModelCallInput, recordModelCall } from "./ai/record.js";
+export {
+  type BudgetState,
+  budgetState,
+  budgetStates,
+  checkBudget,
+  clearBudget,
+  enforceBudget,
+  formatMicros,
+  getBudget,
+  type MonitorBudget,
+  type MonitorSpend,
+  monitorSpend,
+  monthStart,
+  type RecordSourceUsageInput,
+  recordSourceUsage,
+  setBudget,
+  spendByMonitor,
+} from "./budget/index.js";
 export { aiEnvSchema, type Env, envSchema, loadAiEnv, loadEnv } from "./config/env.js";
 export { createDatabase, type Database } from "./db/client.js";
 export { migrationsFolder, runMigrations } from "./db/migrate.js";
 export {
+  apiUsage,
+  budgets,
   defaultMinimumScore,
   defaultPollIntervalSeconds,
+  type ExhaustedBehaviour,
   embeddingDimensions,
+  exhaustedBehaviours,
   feedback,
   type IntentType,
   intentTypes,

@@ -21,6 +21,7 @@ import {
   monitors,
   type QueryGenerator,
   type QueryPlanOutcome,
+  recordSourceUsage,
 } from "@intentwatch/core";
 import { createTestDatabase, type TestDatabase } from "@intentwatch/core/testing";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
@@ -128,6 +129,12 @@ describe("the monitor routes", () => {
     } finally {
       await app.close();
     }
+  }
+
+  /** Create a monitor through the route, and hand back its id. */
+  async function create(app: Awaited<ReturnType<typeof server>>, payload = newMonitor) {
+    const response = await app.inject({ method: "POST", url: "/api/monitors", payload });
+    return response.json().id as string;
   }
 
   describe("what the form needs to render itself", () => {
@@ -362,11 +369,6 @@ describe("the monitor routes", () => {
   });
 
   describe("editing, pausing and resuming", () => {
-    async function create(app: Awaited<ReturnType<typeof server>>, payload = newMonitor) {
-      const response = await app.inject({ method: "POST", url: "/api/monitors", payload });
-      return response.json().id as string;
-    }
-
     it("replaces the queries without touching the answers", async () => {
       await withServer({}, async (app) => {
         const id = await create(app);
@@ -448,6 +450,175 @@ describe("the monitor routes", () => {
         expect((await app.inject({ method: "GET", url: `/api/monitors/${id}` })).statusCode).toBe(
           404,
         );
+      });
+    });
+  });
+  describe("the budget", () => {
+    it("reports no cap and a zero spend for a monitor that has never polled", async () => {
+      await withServer({}, async (app) => {
+        const id = await create(app);
+        const monitor = (await app.inject({ method: "GET", url: `/api/monitors/${id}` })).json();
+
+        expect(monitor.budget).toBeNull();
+        expect(monitor.spend.totalMicros).toBe(0);
+        expect(monitor.spend.remainingMicros).toBeNull();
+        expect(monitor.spend.exhausted).toBe(false);
+      });
+    });
+
+    it("sets a cap, and replaces it rather than adding a second", async () => {
+      await withServer({}, async (app) => {
+        const id = await create(app);
+
+        await app.inject({
+          method: "PUT",
+          url: `/api/monitors/${id}/budget`,
+          payload: { monthlyCapMicros: 1_000_000, onExhausted: "pause" },
+        });
+        const response = await app.inject({
+          method: "PUT",
+          url: `/api/monitors/${id}/budget`,
+          payload: { monthlyCapMicros: 5_000_000, onExhausted: "notify" },
+        });
+
+        expect(response.statusCode).toBe(200);
+        expect(response.json().budget).toEqual({
+          monthlyCapMicros: 5_000_000,
+          onExhausted: "notify",
+        });
+      });
+    });
+
+    it("subtracts the recorded spend from the cap", async () => {
+      await withServer({}, async (app) => {
+        const id = await create(app);
+
+        // A dollar cap, and two hundred Reddit records at $1.50 per thousand
+        // against it. Thirty cents spent, seventy left.
+        await app.inject({
+          method: "PUT",
+          url: `/api/monitors/${id}/budget`,
+          payload: { monthlyCapMicros: 1_000_000, onExhausted: "pause" },
+        });
+        await recordSourceUsage(db, {
+          monitorId: id,
+          source: "reddit",
+          units: 200,
+          pricePerUnitMicros: 1500,
+        });
+
+        const monitor = (await app.inject({ method: "GET", url: `/api/monitors/${id}` })).json();
+
+        expect(monitor.spend.sourceMicros).toBe(300_000);
+        expect(monitor.spend.remainingMicros).toBe(700_000);
+        expect(monitor.spend.exhausted).toBe(false);
+        expect(monitor.spend.reason).toBeNull();
+      });
+    });
+
+    it("says why a monitor stopped polling, in a sentence a person can read", async () => {
+      await withServer({}, async (app) => {
+        const id = await create(app);
+
+        await app.inject({
+          method: "PUT",
+          url: `/api/monitors/${id}/budget`,
+          payload: { monthlyCapMicros: 200_000, onExhausted: "pause" },
+        });
+        await recordSourceUsage(db, {
+          monitorId: id,
+          source: "reddit",
+          units: 200,
+          pricePerUnitMicros: 1500,
+        });
+
+        const monitor = (await app.inject({ method: "GET", url: `/api/monitors/${id}` })).json();
+
+        expect(monitor.spend.exhausted).toBe(true);
+        expect(monitor.spend.reason).toBe(
+          "Polling stopped: this monitor has spent an estimated $0.30 of its $0.20 monthly budget.",
+        );
+      });
+    });
+
+    it("carries the spend on the list, so a screen needs one request", async () => {
+      await withServer({}, async (app) => {
+        const id = await create(app);
+
+        await recordSourceUsage(db, {
+          monitorId: id,
+          source: "reddit",
+          units: 10,
+          pricePerUnitMicros: 1500,
+        });
+
+        const [monitor] = (await app.inject({ method: "GET", url: "/api/monitors" })).json();
+
+        expect(monitor.spend.totalMicros).toBe(15_000);
+      });
+    });
+
+    it("removes the cap and keeps what was already recorded", async () => {
+      await withServer({}, async (app) => {
+        const id = await create(app);
+
+        await app.inject({
+          method: "PUT",
+          url: `/api/monitors/${id}/budget`,
+          payload: { monthlyCapMicros: 1_000, onExhausted: "pause" },
+        });
+        await recordSourceUsage(db, {
+          monitorId: id,
+          source: "reddit",
+          units: 10,
+          pricePerUnitMicros: 1500,
+        });
+
+        const response = await app.inject({
+          method: "DELETE",
+          url: `/api/monitors/${id}/budget`,
+        });
+
+        expect(response.statusCode).toBe(200);
+        expect(response.json().budget).toBeNull();
+        // The ledger is the answer to "what did this month cost". Removing the
+        // cap must not remove the answer.
+        expect(response.json().spend.totalMicros).toBe(15_000);
+        expect(response.json().spend.exhausted).toBe(false);
+      });
+    });
+
+    it("refuses a negative cap", async () => {
+      await withServer({}, async (app) => {
+        const id = await create(app);
+
+        const response = await app.inject({
+          method: "PUT",
+          url: `/api/monitors/${id}/budget`,
+          payload: { monthlyCapMicros: -1 },
+        });
+
+        expect(response.statusCode).toBe(400);
+      });
+    });
+
+    it("answers 404 for a budget on an id that is not there", async () => {
+      await withServer({}, async (app) => {
+        const missing = "00000000-0000-4000-8000-000000000000";
+
+        expect(
+          (
+            await app.inject({
+              method: "PUT",
+              url: `/api/monitors/${missing}/budget`,
+              payload: { monthlyCapMicros: 1_000 },
+            })
+          ).statusCode,
+        ).toBe(404);
+        expect(
+          (await app.inject({ method: "DELETE", url: `/api/monitors/${missing}/budget` }))
+            .statusCode,
+        ).toBe(404);
       });
     });
   });

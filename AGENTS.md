@@ -19,10 +19,13 @@ what it starts: an asynchronous collection is remembered in
 `source_continuations` and resumed, rather than triggered again. US-010's
 server half added the query generator, the monitor writes and the routes, so a
 monitor is now an HTTP call rather than an `INSERT`. US-011 added the inbox, so
-a match is read back out, ordered by score and age together. Two steps are
-still placeholders: US-008 owns the pre-filter, so every post reaches the
-model, and US-016 owns the notification. `apps/web` now has two screens, the
-monitor form and the inbox, and no screen for connections.
+a match is read back out, ordered by score and age together. US-013 added the
+budget guard, so a poll is refused before it spends past a monitor's monthly
+cap, and every billed page is written to `api_usage` as it comes back. Two
+steps are still placeholders: US-008 owns the pre-filter, so every post reaches
+the model, and US-016 owns the notification. `apps/web` now has three screens,
+the monitor form, the inbox and the monitor list, and no screen for
+connections.
 
 **Reddit's own API is closed to us.** Reddit ended self-serve app registration
 in November 2025. Reddit is reached through Bright Data instead, and X through
@@ -82,8 +85,21 @@ reports as failed, and a rate limit. The X connector has never run at all.
 That run also measured what nobody had measured. A monitor left at the
 60-second floor triggered a collection every minute, and each one billed 9 to
 11 records and returned no posts, because everything it found was older than
-the last poll. Poll frequency is a cost dial. US-013 and US-014 are what turn
-that from a lesson into a limit.
+the last poll. Poll frequency is a cost dial. US-013 turned half of that lesson
+into a limit; US-014 owns the other half.
+
+**The budget guard has never refused a real poll.** US-013's arithmetic, its
+cap and its two exhausted behaviours are asserted against real Postgres and a
+fake connector, and six deliberate mutations were confirmed to turn the suite
+red. What no test can prove is the input: the guard multiplies the units a
+connector reports by the price the connector declares, and neither figure has
+been checked against an invoice. Say the spend is an estimate, because
+[docs/costs.md](docs/costs.md) says so to the user in four specific ways.
+
+**A cap can be overshot by one poll.** The guard runs before a poll, because a
+page is billed when it is fetched. It cannot know what that poll will cost, so
+a monitor at $9.99 of a $10.00 cap starts one more poll. `maxPagesPerPoll`
+bounds the overshoot; US-014 is what removes it.
 
 ---
 
@@ -96,6 +112,9 @@ that from a lesson into a limit.
    almost always.
 4. Read [`docs/sources.md`](docs/sources.md) if the task touches a connector.
    It holds the steps and the three things connectors get wrong.
+5. Read [`docs/costs.md`](docs/costs.md) if the task touches money — a price, a
+   cap, a usage row, or a figure shown to a person. It holds what our estimate
+   is wrong about, and why it is never rounded to cents.
 
 The ticket's **Acceptance** list is the definition of done. Every box is true
 or false. Do not mark one done that you have not verified.

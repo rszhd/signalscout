@@ -1,7 +1,8 @@
 import { eq } from "drizzle-orm";
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
+import { setBudget } from "../budget/budget.js";
 import { createDatabase, type Database } from "../db/client.js";
-import { maxResumeAttempts, monitors, posts, sourceContinuations } from "../db/schema.js";
+import { apiUsage, maxResumeAttempts, monitors, posts, sourceContinuations } from "../db/schema.js";
 import { fakePosts } from "../sources/fake/fixtures.js";
 import type { CandidatePost, SearchRequest, SocialSource } from "../sources/types.js";
 import { createTestDatabase, type TestDatabase } from "../testing/database.js";
@@ -46,6 +47,11 @@ function pollSend(boss: ReturnType<typeof stubBoss>): [string, unknown, { startA
 
 function contextFor(db: Database, boss: ReturnType<typeof stubBoss>): StepContext {
   return { db, boss: boss as unknown as StepContext["boss"], logger: silentLogger };
+}
+
+/** Every search the fake served, in order. An empty list means it was never asked. */
+function callsOf(registry: ReturnType<typeof fakeRegistry>): readonly SearchRequest[] {
+  return (registry.get("reddit") as SocialSource & { calls: readonly SearchRequest[] }).calls;
 }
 
 describe("the poll step", () => {
@@ -121,9 +127,9 @@ describe("the poll step", () => {
       contextFor(db, stubBoss()),
     );
 
-    // The cap, not the forty posts behind it. The budget guard in US-013 is
-    // the real limit; this is the backstop that stops one poll running away
-    // before it exists.
+    // The cap, not the forty posts behind it. US-013's budget cap limits what
+    // a monitor spends in a month; this limits how far one poll can carry it
+    // past that, which is the part a monthly cap cannot do on its own.
     expect(source.calls).toHaveLength(maxPagesPerPoll);
     expect(await db.select().from(posts)).toHaveLength(maxPagesPerPoll);
   });
@@ -272,10 +278,6 @@ describe("the poll step", () => {
     /** Serves one post of the five, then reports a wait carrying its cursor. */
     function waitingRegistry() {
       return fakeRegistry({ pageSize: 1, callsBeforeRateLimit: 1 });
-    }
-
-    function callsOf(registry: ReturnType<typeof fakeRegistry>): readonly SearchRequest[] {
-      return (registry.get("reddit") as SocialSource & { calls: readonly SearchRequest[] }).calls;
     }
 
     /**
@@ -524,6 +526,130 @@ describe("the poll step", () => {
       expect(await continuationsFor(monitorId)).toHaveLength(0);
       expect(callsOf(registry)).toHaveLength(0);
       expect(boss.send).not.toHaveBeenCalled();
+    });
+  });
+  /**
+   * The budget guard, at its one call site.
+   *
+   * docs/testing.md: a rule is only as tested as its least-tested caller. The
+   * rule itself is asserted in `budget/budget.test.ts`; what these assert is
+   * that this step obeys it, and that it obeys it *before* it reaches a
+   * source. A guard that refused after the call would have spent the money.
+   */
+  describe("the budget guard", () => {
+    it("reaches no source once the monthly cap is spent", async () => {
+      const monitorId = await insertMonitor(database);
+      const registry = fakeRegistry();
+      const boss = stubBoss();
+
+      // A cap of nothing is a monitor that may spend nothing, and it is the
+      // cheapest way to say "the cap is reached" without spending first.
+      await setBudget(db, monitorId, { monthlyCapMicros: 0, onExhausted: "pause" });
+
+      await createCollectStep({ registry, credentialsFor: credentials })(
+        { monitorId },
+        contextFor(db, boss),
+      );
+
+      expect(callsOf(registry)).toHaveLength(0);
+      expect(await db.select().from(posts)).toHaveLength(0);
+      // Nothing reached the filter either. A refused poll that still sent an
+      // empty batch onward would spend model money on the way.
+      expect(boss.send).not.toHaveBeenCalled();
+    });
+
+    it("leaves the poll mark alone when it refuses, because nothing was polled", async () => {
+      const monitorId = await insertMonitor(database);
+
+      await setBudget(db, monitorId, { monthlyCapMicros: 0, onExhausted: "notify" });
+      await createCollectStep({ registry: fakeRegistry(), credentialsFor: credentials })(
+        { monitorId },
+        contextFor(db, stubBoss()),
+      );
+
+      const [monitor] = await db.select().from(monitors).where(eq(monitors.id, monitorId));
+
+      expect(monitor?.lastPolledAt).toBeNull();
+    });
+
+    it("polls a monitor that has a cap with room left in it", async () => {
+      const monitorId = await insertMonitor(database);
+
+      await setBudget(db, monitorId, { monthlyCapMicros: 1_000_000, onExhausted: "pause" });
+      await createCollectStep({ registry: fakeRegistry(), credentialsFor: credentials })(
+        { monitorId },
+        contextFor(db, stubBoss()),
+      );
+
+      expect(await db.select().from(posts)).toHaveLength(fakePosts.length);
+    });
+
+    it("records what each page was billed, against the monitor and the source", async () => {
+      // Two units a call, five posts, one post a page: five calls, ten units.
+      // At a thousand micro-dollars a unit that is one cent.
+      const monitorId = await insertMonitor(database);
+      const registry = fakeRegistry({ pageSize: 1, unitsPerCall: 2, pricePerUnitMicros: 1000 });
+
+      await createCollectStep({ registry, credentialsFor: credentials })(
+        { monitorId },
+        contextFor(db, stubBoss()),
+      );
+
+      const [usage] = await db.select().from(apiUsage);
+
+      expect(usage?.source).toBe("reddit");
+      expect(usage?.units).toBe(10);
+      expect(usage?.estimatedCostMicros).toBe(10_000);
+    });
+
+    it("records a poll that was billed and brought nothing back", async () => {
+      /**
+       * The lesson the live run of 2026-09-05 taught, as an assertion. A
+       * monitor at the sixty-second floor triggered a collection every minute,
+       * and each one billed records and returned no posts because everything
+       * it found was older than the last poll. A ledger that only recorded
+       * polls with posts in them would have shown that month as free.
+       */
+      const monitorId = await insertMonitor(database);
+      const registry = fakeRegistry({ posts: [], unitsPerCall: 9, pricePerUnitMicros: 1500 });
+
+      await createCollectStep({ registry, credentialsFor: credentials })(
+        { monitorId },
+        contextFor(db, stubBoss()),
+      );
+
+      const [usage] = await db.select().from(apiUsage);
+
+      expect(await db.select().from(posts)).toHaveLength(0);
+      expect(usage?.units).toBe(9);
+      expect(usage?.estimatedCostMicros).toBe(13_500);
+    });
+
+    it("records the pages a poll was billed for before it threw", async () => {
+      // The reason the ledger is written per page. Two pages came back and
+      // were billed; the third throws. Both are on the bill either way.
+      const monitorId = await insertMonitor(database);
+      const registry = fakeRegistry({ pageSize: 1, unitsPerCall: 4, pricePerUnitMicros: 1000 });
+      const source = registry.get("reddit") as SocialSource;
+      const search = source.search.bind(source);
+      let served = 0;
+
+      source.search = async (request: SearchRequest) => {
+        served += 1;
+        if (served > 2) throw new Error("the provider hung up");
+        return search(request);
+      };
+
+      await expect(
+        createCollectStep({ registry, credentialsFor: credentials })(
+          { monitorId },
+          contextFor(db, stubBoss()),
+        ),
+      ).rejects.toThrow("the provider hung up");
+
+      const [usage] = await db.select().from(apiUsage);
+
+      expect(usage?.units).toBe(8);
     });
   });
 });

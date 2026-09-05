@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { Inbox } from "./Inbox.js";
 import { MonitorForm } from "./MonitorForm.js";
+import { Monitors } from "./Monitors.js";
 
 /**
- * The shell: the header, and which of the two screens is on it.
+ * The shell: the header, and which of the three screens is on it.
  *
  * The route lives in the hash rather than the path. Fastify already serves
  * `index.html` for any path that is not an API route or a file, so a path
@@ -17,6 +18,7 @@ import { MonitorForm } from "./MonitorForm.js";
  */
 
 const newMonitorRoute = "#/monitors/new";
+const monitorsRoute = "#/monitors";
 
 function currentRoute(): string {
   return globalThis.location?.hash ?? "";
@@ -31,7 +33,11 @@ export function App() {
     return () => globalThis.removeEventListener("hashchange", onChange);
   }, []);
 
+  // The longer route is tested first: "#/monitors" is a prefix of
+  // "#/monitors/new", and testing the shorter one first would put the list on
+  // the screen for both.
   const creating = route.startsWith(newMonitorRoute);
+  const listing = !creating && route.startsWith(monitorsRoute);
 
   return (
     <main className="app-shell">
@@ -43,8 +49,11 @@ export function App() {
           <span>IntentWatch</span>
         </a>
         <nav className="site-nav" aria-label="Screens">
-          <a className={creating ? "" : "current"} href="#/">
+          <a className={creating || listing ? "" : "current"} href="#/">
             Inbox
+          </a>
+          <a className={listing ? "current" : ""} href={monitorsRoute}>
+            Monitors
           </a>
           <a className={creating ? "current" : ""} href={newMonitorRoute}>
             New monitor
@@ -52,7 +61,7 @@ export function App() {
         </nav>
       </header>
 
-      {creating ? <MonitorForm /> : <Inbox />}
+      {creating ? <MonitorForm /> : listing ? <Monitors /> : <Inbox />}
     </main>
   );
 }

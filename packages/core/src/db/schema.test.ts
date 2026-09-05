@@ -9,8 +9,10 @@
  * - Deletion reconciliation — `last_verified_at` and `hidden` on matches. The
  *   reconciliation job needs somewhere to record what it checked.
  *
- * `model_calls` joins them: it is what a user's spend is added up from, so a
- * deleted post must not take the record of what reading it cost with it.
+ * `model_calls`, `api_usage` and `budgets` carry a fourth: the budget guard.
+ * What a monitor spent is added up from those tables, so a deleted post must
+ * not take the record of what reading it cost with it, and a charge must not
+ * be able to be recorded twice for one day.
  *
  * The assertions here were written before the schema, and each guard is
  * separated from its absence: a value that must pass sits next to the value
@@ -114,6 +116,42 @@ async function insertMatch(overrides: Record<string, unknown> = {}): Promise<str
     Object.values(values),
   );
   return only(result.rows).id;
+}
+
+/** One day's usage at one source. Returns its id. */
+async function insertUsage(overrides: Record<string, unknown> = {}): Promise<string> {
+  const values = {
+    monitor_id: overrides.monitor_id ?? (await insertMonitor()),
+    source: "reddit",
+    day: "2026-03-14",
+    units: 10,
+    estimated_cost_micros: 15_000,
+    ...overrides,
+  };
+  const columns = Object.keys(values);
+  const placeholders = columns.map((_, index) => `$${index + 1}`);
+  const result = await sql.query<{ id: string }>(
+    `INSERT INTO api_usage (${columns.join(", ")}) VALUES (${placeholders.join(", ")}) RETURNING id`,
+    Object.values(values),
+  );
+  return only(result.rows).id;
+}
+
+/** One monitor's cap. Returns the monitor it belongs to. */
+async function insertBudget(overrides: Record<string, unknown> = {}): Promise<string> {
+  const values = {
+    monitor_id: overrides.monitor_id ?? (await insertMonitor()),
+    monthly_cap_micros: 5_000_000,
+    on_exhausted: "pause",
+    ...overrides,
+  };
+  const columns = Object.keys(values);
+  const placeholders = columns.map((_, index) => `$${index + 1}`);
+  const result = await sql.query<{ monitor_id: string }>(
+    `INSERT INTO budgets (${columns.join(", ")}) VALUES (${placeholders.join(", ")}) RETURNING monitor_id`,
+    Object.values(values),
+  );
+  return only(result.rows).monitor_id;
 }
 
 describe("posts", () => {
@@ -569,6 +607,101 @@ describe("source continuations", () => {
     ]);
 
     expect(remaining.rows).toHaveLength(0);
+  });
+});
+
+describe("usage and budgets", () => {
+  it("holds one row per monitor, source and day, so a poll adds rather than inserts", async () => {
+    // The guard sums this table before every poll. A row per page would make
+    // that sum grow without limit inside one month.
+    const monitorId = await insertMonitor();
+
+    await insertUsage({ monitor_id: monitorId, day: "2026-03-14" });
+
+    await expect(insertUsage({ monitor_id: monitorId, day: "2026-03-14" })).rejects.toThrow(
+      /duplicate key value/,
+    );
+  });
+
+  it("keeps a second day and a second source apart", async () => {
+    const monitorId = await insertMonitor();
+
+    await insertUsage({ monitor_id: monitorId, day: "2026-03-14", source: "reddit" });
+
+    await expect(
+      insertUsage({ monitor_id: monitorId, day: "2026-03-15", source: "reddit" }),
+    ).resolves.toEqual(expect.any(String));
+    await expect(
+      insertUsage({ monitor_id: monitorId, day: "2026-03-14", source: "x" }),
+    ).resolves.toEqual(expect.any(String));
+  });
+
+  it("refuses a source the schema cannot store posts for", async () => {
+    await expect(insertUsage({ source: "mastodon" })).rejects.toThrow(/api_usage_source_known/);
+  });
+
+  it("refuses a negative charge, which is a bug and never a refund", async () => {
+    await expect(insertUsage({ units: -1 })).rejects.toThrow(/api_usage_units_non_negative/);
+    await expect(insertUsage({ estimated_cost_micros: -1 })).rejects.toThrow(
+      /api_usage_cost_non_negative/,
+    );
+  });
+
+  it("holds an amount an integer column could not, because micros are small", async () => {
+    // Two thousand one hundred and forty-eight dollars is past a 32-bit
+    // integer of micro-dollars. A month can cost that, and the total has to be
+    // able to say so.
+    const id = await insertUsage({ estimated_cost_micros: 3_000_000_000 });
+    const row = only(
+      (
+        await sql.query<{ estimated_cost_micros: string }>(
+          "SELECT estimated_cost_micros FROM api_usage WHERE id = $1",
+          [id],
+        )
+      ).rows,
+    );
+
+    expect(Number(row.estimated_cost_micros)).toBe(3_000_000_000);
+  });
+
+  it("holds one cap per monitor, because two caps would disagree", async () => {
+    const monitorId = await insertMonitor();
+
+    await insertBudget({ monitor_id: monitorId });
+
+    await expect(insertBudget({ monitor_id: monitorId })).rejects.toThrow(/duplicate key value/);
+  });
+
+  it("allows a cap of nothing, and refuses one below it", async () => {
+    // "This monitor may spend nothing" is a real thing to ask for. A negative
+    // cap is not.
+    await expect(insertBudget({ monthly_cap_micros: 0 })).resolves.toEqual(expect.any(String));
+    await expect(insertBudget({ monthly_cap_micros: -1 })).rejects.toThrow(
+      /budgets_cap_non_negative/,
+    );
+  });
+
+  it("refuses a behaviour the product has no button for", async () => {
+    await expect(insertBudget({ on_exhausted: "delete_everything" })).rejects.toThrow(
+      /budgets_on_exhausted_known/,
+    );
+  });
+
+  it("forgets the usage and the cap when the monitor is deleted", async () => {
+    // Unlike `model_calls`, which survives its post. A monitor that is gone
+    // has no bill page to read, and nothing else joins to these rows.
+    const monitorId = await insertMonitor();
+
+    await insertUsage({ monitor_id: monitorId });
+    await insertBudget({ monitor_id: monitorId });
+    await sql.query("DELETE FROM monitors WHERE id = $1", [monitorId]);
+
+    expect(
+      (await sql.query("SELECT id FROM api_usage WHERE monitor_id = $1", [monitorId])).rows,
+    ).toHaveLength(0);
+    expect(
+      (await sql.query("SELECT monitor_id FROM budgets WHERE monitor_id = $1", [monitorId])).rows,
+    ).toHaveLength(0);
   });
 });
 

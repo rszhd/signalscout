@@ -15,10 +15,15 @@
  * "check your credentials" is not a sentence anybody can act on.
  */
 import {
+  type BudgetState,
+  budgetStates,
+  checkBudget,
+  clearBudget,
   createMonitor,
   type Database,
   deleteMonitor,
   environmentVariableFor,
+  exhaustedBehaviours,
   getMonitor,
   listMonitors,
   type Monitor,
@@ -33,6 +38,7 @@ import {
   resumeMonitor,
   type SourceDescriptor,
   searchQuerySchema,
+  setBudget,
   signals as signalIds,
   signalList,
   startBlockers,
@@ -96,6 +102,34 @@ const missingCredentialSchema = z.object({
   environmentVariable: z.string(),
 });
 
+/**
+ * What a monitor spent this month, and what it may still spend.
+ *
+ * Micro-dollars on the wire, because that is what the database holds and a
+ * rounded number here would be a second, disagreeing figure. The screen
+ * formats them. `reason` is the sentence that refused the poll, sent whole so
+ * the log and the screen say the same thing.
+ *
+ * Every figure is an estimate. See docs/costs.md: the provider's invoice is
+ * authoritative and this arithmetic is not.
+ */
+const spendSchema = z.object({
+  sourceMicros: z.number(),
+  modelMicros: z.number(),
+  totalMicros: z.number(),
+  /** Null when the monitor has no cap. */
+  remainingMicros: z.number().nullable(),
+  exhausted: z.boolean(),
+  reason: z.string().nullable(),
+  /** The first moment counted, so the screen can say what "this month" means. */
+  since: z.string(),
+});
+
+const budgetSchema = z.object({
+  monthlyCapMicros: z.number(),
+  onExhausted: z.enum(exhaustedBehaviours),
+});
+
 const monitorSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -117,6 +151,9 @@ const monitorSchema = z.object({
    * until US-004, so a monitor can become startable without its row changing.
    */
   missingCredentials: z.array(missingCredentialSchema),
+  /** Null when no cap is set. A monitor with no cap still records what it spends. */
+  budget: budgetSchema.nullable(),
+  spend: spendSchema,
 });
 
 const problemSchema = z.object({
@@ -138,7 +175,7 @@ function monitorEnvironment(options: MonitorRoutesOptions): MonitorEnvironment {
   return { descriptors: options.sources, environment: options.environment };
 }
 
-function toResponse(monitor: Monitor, runtime: MonitorEnvironment) {
+function toResponse(monitor: Monitor, runtime: MonitorEnvironment, state: BudgetState) {
   return {
     id: monitor.id,
     name: monitor.name,
@@ -156,6 +193,19 @@ function toResponse(monitor: Monitor, runtime: MonitorEnvironment) {
     lastPolledAt: monitor.lastPolledAt?.toISOString() ?? null,
     createdAt: monitor.createdAt.toISOString(),
     missingCredentials: startBlockers(monitor.sources, runtime),
+    budget:
+      state.capMicros === null || state.onExhausted === null
+        ? null
+        : { monthlyCapMicros: state.capMicros, onExhausted: state.onExhausted },
+    spend: {
+      sourceMicros: state.spend.sourceMicros,
+      modelMicros: state.spend.modelMicros,
+      totalMicros: state.spend.totalMicros,
+      remainingMicros: state.remainingMicros,
+      exhausted: state.exhausted,
+      reason: state.reason,
+      since: state.spend.since.toISOString(),
+    },
   };
 }
 
@@ -304,7 +354,26 @@ export async function registerMonitorRoutes(
     method: "GET",
     url: "/api/monitors",
     schema: { response: { 200: z.array(monitorSchema) } },
-    handler: async () => (await listMonitors(db)).map((monitor) => toResponse(monitor, runtime)),
+    handler: async () => {
+      // One read for every monitor's spend, rather than one per row. The
+      // screen that shows this is a list, and a per-row query here would be
+      // the list's cost growing with the number of monitors.
+      const rows = await listMonitors(db);
+      const states = await budgetStates(db);
+
+      return Promise.all(
+        rows.map(async (monitor) =>
+          // A monitor created between the two reads is not in the map. It is
+          // read on its own rather than defaulted to zero: this is a bill
+          // page, and a zero nothing measured is the failure US-013 is about.
+          toResponse(
+            monitor,
+            runtime,
+            states.get(monitor.id) ?? (await checkBudget(db, monitor.id)),
+          ),
+        ),
+      );
+    },
   });
 
   app.route({
@@ -327,7 +396,7 @@ export async function registerMonitorRoutes(
         );
       }
 
-      return reply.code(201).send(toResponse(monitor, runtime));
+      return reply.code(201).send(toResponse(monitor, runtime, await checkBudget(db, monitor.id)));
     },
   });
 
@@ -342,7 +411,7 @@ export async function registerMonitorRoutes(
       const monitor = await getMonitor(db, request.params.id);
       if (!monitor) return reply.code(404).send({ message: "No monitor has that id." });
 
-      return toResponse(monitor, runtime);
+      return toResponse(monitor, runtime, await checkBudget(db, monitor.id));
     },
   });
 
@@ -358,7 +427,7 @@ export async function registerMonitorRoutes(
       const monitor = await updateMonitor(db, request.params.id, request.body);
       if (!monitor) return reply.code(404).send({ message: "No monitor has that id." });
 
-      return toResponse(monitor, runtime);
+      return toResponse(monitor, runtime, await checkBudget(db, monitor.id));
     },
   });
 
@@ -373,7 +442,7 @@ export async function registerMonitorRoutes(
       const monitor = await pauseMonitor(db, request.params.id);
       if (!monitor) return reply.code(404).send({ message: "No monitor has that id." });
 
-      return toResponse(monitor, runtime);
+      return toResponse(monitor, runtime, await checkBudget(db, monitor.id));
     },
   });
 
@@ -399,7 +468,67 @@ export async function registerMonitorRoutes(
         });
       }
 
-      return toResponse(result.monitor, runtime);
+      return toResponse(result.monitor, runtime, await checkBudget(db, result.monitor.id));
+    },
+  });
+
+  /**
+   * Set this monitor's monthly cap, or replace the one it has.
+   *
+   * `PUT`, because one monitor has one budget and sending it twice must leave
+   * one cap. The amount is micro-dollars, the unit the whole product counts
+   * in; the screen turns what a person typed in dollars into this.
+   *
+   * A cap of zero is allowed. "This monitor may spend nothing" is a real thing
+   * to ask for, and it is the fastest way to stop a monitor billing while
+   * keeping everything it has already collected.
+   */
+  app.route({
+    method: "PUT",
+    url: "/api/monitors/:id/budget",
+    schema: {
+      params: z.object({ id: z.uuid() }),
+      body: z.object({
+        monthlyCapMicros: z.number().int().min(0),
+        onExhausted: z.enum(exhaustedBehaviours).default("pause"),
+      }),
+      response: { 200: monitorSchema, 404: problemSchema },
+    },
+    handler: async (request, reply) => {
+      const monitor = await getMonitor(db, request.params.id);
+      if (!monitor) return reply.code(404).send({ message: "No monitor has that id." });
+
+      await setBudget(db, monitor.id, request.body);
+
+      return toResponse(monitor, runtime, await checkBudget(db, monitor.id));
+    },
+  });
+
+  /**
+   * Remove the cap. The recorded usage stays.
+   *
+   * Deleting the spend with the cap would erase the answer to "what did this
+   * month cost", which is the question the ledger exists to answer. A monitor
+   * with no cap goes on recording every unit it spends.
+   *
+   * This does not resume a monitor the cap paused. Removing a limit and
+   * starting to spend again are two decisions, and the second one is a
+   * person's.
+   */
+  app.route({
+    method: "DELETE",
+    url: "/api/monitors/:id/budget",
+    schema: {
+      params: z.object({ id: z.uuid() }),
+      response: { 200: monitorSchema, 404: problemSchema },
+    },
+    handler: async (request, reply) => {
+      const monitor = await getMonitor(db, request.params.id);
+      if (!monitor) return reply.code(404).send({ message: "No monitor has that id." });
+
+      await clearBudget(db, monitor.id);
+
+      return toResponse(monitor, runtime, await checkBudget(db, monitor.id));
     },
   });
 

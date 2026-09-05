@@ -10,8 +10,10 @@
  */
 import { sql } from "drizzle-orm";
 import {
+  bigint,
   boolean,
   check,
+  date,
   index,
   integer,
   jsonb,
@@ -438,5 +440,90 @@ export const feedback = pgTable(
       .on(table.matchId, table.userId)
       .where(sql`superseded_at IS NULL`),
     check("feedback_verdict_known", oneOf("verdict", verdicts)),
+  ],
+);
+
+/** What a monitor does when its cap is reached. STACK.md, *Budgets belong in the data model*. */
+export const exhaustedBehaviours = ["pause", "notify"] as const;
+export type ExhaustedBehaviour = (typeof exhaustedBehaviours)[number];
+
+/**
+ * What one monitor spent at one source on one day.
+ *
+ * Correctness-critical: budget guard. This table is the guard's only evidence,
+ * so a call that is billed and not written here is money the cap cannot see.
+ * `worker/collect.ts` writes a row after every page rather than once per poll,
+ * because a poll that throws on its third page was billed for the first two.
+ *
+ * The unit is the source's own — Reddit bills a record, X bills a post read —
+ * so `units` is comparable only within a source. `source_descriptor.billableUnit`
+ * is the word for it, and the cost column is what makes two sources add up.
+ *
+ * STACK.md sketches this column as `estimated_cost_cents`. It is micro-dollars
+ * here, for the reason `model_calls` already uses them: one classification
+ * costs about $0.001, which is a tenth of a cent, and a cents column would
+ * record the classifier's whole month as zero. Micros, and an integer, so no
+ * total is a rounding artefact.
+ *
+ * `bigint` and not `integer`, because an `integer` of micros stops at $2,147.
+ * A monthly cap above that is a reasonable thing for somebody to type, and the
+ * running total has to be able to hold what a runaway actually spent.
+ */
+export const apiUsage = pgTable(
+  "api_usage",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    monitorId: uuid("monitor_id")
+      .notNull()
+      .references(() => monitors.id, { onDelete: "cascade" }),
+    source: text("source").$type<Source>().notNull(),
+    /** The UTC day. A provider's billing day may differ; this is one more reason the figure is an estimate. */
+    day: date("day").notNull(),
+    /** Billable units the source reported. Never a post count: `SearchResult.unitsConsumed`. */
+    units: bigint("units", { mode: "number" }).notNull().default(0),
+    estimatedCostMicros: bigint("estimated_cost_micros", { mode: "number" }).notNull().default(0),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    // One row per monitor per source per day, so a poll adds to a row rather
+    // than inserting one. The guard sums this table on every poll, and a row
+    // per page would make that sum grow without limit inside one month.
+    unique("api_usage_monitor_source_day_unique").on(table.monitorId, table.source, table.day),
+    index("api_usage_monitor_day_idx").on(table.monitorId, table.day),
+    check("api_usage_source_known", oneOf("source", sources)),
+    check("api_usage_units_non_negative", sql.raw(`units >= 0`)),
+    check("api_usage_cost_non_negative", sql.raw(`estimated_cost_micros >= 0`)),
+  ],
+);
+
+/**
+ * One monitor's monthly cap, and what to do when it is reached.
+ *
+ * The row is optional and its absence means "no cap". That is deliberate: a
+ * monitor with no budget row still records every unit it spends, so a person
+ * who never set a cap can still be told what the month cost. A default cap
+ * would be this software deciding how much of somebody else's key it may use.
+ *
+ * `monitor_id` is the primary key. One monitor has one budget, and a second
+ * row would be two caps that disagree.
+ */
+export const budgets = pgTable(
+  "budgets",
+  {
+    monitorId: uuid("monitor_id")
+      .primaryKey()
+      .references(() => monitors.id, { onDelete: "cascade" }),
+    /** Micro-dollars, for the reason `api_usage` gives. */
+    monthlyCapMicros: bigint("monthly_cap_micros", { mode: "number" }).notNull(),
+    onExhausted: text("on_exhausted").$type<ExhaustedBehaviour>().notNull().default("pause"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  () => [
+    check("budgets_on_exhausted_known", oneOf("on_exhausted", exhaustedBehaviours)),
+    // A cap of zero is a monitor that may spend nothing, which is a legal
+    // thing to ask for. A negative cap is not.
+    check("budgets_cap_non_negative", sql.raw(`monthly_cap_micros >= 0`)),
   ],
 );

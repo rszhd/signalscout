@@ -13,13 +13,18 @@
  * is what happens without it.
  *
  * Two limits here are deliberate, and neither is a performance setting.
- * `maxPagesPerPoll` bounds what one poll can spend, because the budget guard
- * does not exist yet (US-013) and an unbounded page loop against a metered
- * source is an invoice. `excerptLength` bounds what we keep, because Reddit's
- * terms require that content the author removed stops being shown, and the
- * less we hold, the less there is to remove.
+ * `maxPagesPerPoll` bounds what one poll can spend. `excerptLength` bounds
+ * what we keep, because Reddit's terms require that content the author removed
+ * stops being shown, and the less we hold, the less there is to remove.
+ *
+ * US-013's budget guard is the third limit and it sits above both. It runs
+ * before this step reaches a source, and it counts money rather than pages.
+ * The two caps are complementary and neither replaces the other: the guard
+ * cannot know what the next poll will cost, so the page cap is what bounds how
+ * far past the cap one poll can carry a monitor.
  */
 import { eq, sql } from "drizzle-orm";
+import { enforceBudget, recordSourceUsage } from "../budget/budget.js";
 import { maxResumeAttempts, monitors, posts, type Source } from "../db/schema.js";
 import { monitorQueries } from "../monitors/monitors.js";
 import type { SourceRegistry } from "../sources/registry.js";
@@ -43,8 +48,9 @@ import type { Step, StepContext } from "./steps.js";
  * How many pages one poll may fetch from one source.
  *
  * Five pages is a generous hour of conversation and a bill that one mistake
- * cannot make unbounded. When US-013 lands, the cap it enforces is the real
- * limit and this becomes the backstop behind it.
+ * cannot make unbounded. US-013's monthly cap is the limit on what a monitor
+ * may spend; this is the limit on how far one poll can carry it past that,
+ * because a page's cost is only known once the page has been fetched.
  *
  * It bounds one job, not one query. A source stopped here keeps its cursor in
  * `source_continuations` and the next poll reads on from it: the pages behind
@@ -96,7 +102,17 @@ async function readSource(
   source: SocialSource,
   query: SourceQuery,
   credentials: SourceCredentials,
-  startCursor?: string,
+  startCursor: string | undefined,
+  /**
+   * Write one page's units to the ledger, called as each page comes back
+   * rather than once at the end.
+   *
+   * A poll that throws on its third page was billed for the first two. A
+   * ledger that only heard about a whole poll would lose them, and the budget
+   * guard would let the next poll spend that money a second time inside the
+   * same cap.
+   */
+  bill: (units: number) => Promise<void>,
 ): Promise<SourceOutcome> {
   const collected: CandidatePost[] = [];
   let unitsConsumed = 0;
@@ -111,6 +127,7 @@ async function readSource(
     pages += 1;
     unitsConsumed += result.unitsConsumed;
     collected.push(...result.posts);
+    await bill(result.unitsConsumed);
 
     if (result.next.status === "done") {
       more = undefined;
@@ -166,6 +183,43 @@ export function createCollectStep({ registry, credentialsFor }: CollectOptions):
       // The monitor was deleted between the tick and the job. Not a failure:
       // retrying would never find it, and dead-lettering it says nothing.
       logger.warn({ monitorId }, "poll skipped: the monitor is gone");
+      return;
+    }
+
+    /**
+     * The budget guard, before anything is asked of a source.
+     *
+     * Correctness-critical: this is the check the whole of US-013 exists for,
+     * and it has to run here rather than after the call, because a page is
+     * billed when it is fetched. `enforceBudget` also applies what the monitor
+     * asked for — `pause` writes `paused_at`, so the scheduler stops queueing
+     * polls at all; `notify` leaves it running and each poll is refused here
+     * in turn, so the monitor starts again by itself next month.
+     *
+     * The poll is refused whole, including a collection this monitor has
+     * already paid for and not yet read. That snapshot is a loss the guard
+     * cannot recover: reading it would spend no more at the source but would
+     * send every post it holds to the classifier, which is money past the cap.
+     * The continuation row stays, so raising the cap reads it rather than
+     * paying for the query again. US-014 is the ticket that stops a query
+     * whose cost the person never saw.
+     *
+     * Logged as an error, not a warning. A monitor that has stopped collecting
+     * is the one thing about this product a person must not learn from an
+     * empty inbox. It is also on the monitor list, from the same sentence.
+     */
+    const budget = await enforceBudget(db, monitorId);
+
+    if (budget.exhausted) {
+      logger.error(
+        {
+          monitorId,
+          spentMicros: budget.spend.totalMicros,
+          capMicros: budget.capMicros,
+          onExhausted: budget.onExhausted,
+        },
+        budget.reason ?? "poll refused: this monitor has spent its monthly budget",
+      );
       return;
     }
 
@@ -259,6 +313,16 @@ export function createCollectStep({ registry, credentialsFor }: CollectOptions):
         { queries, channels, ...(window ? { since: window } : {}) },
         credentials,
         continuation?.cursor,
+        (units) =>
+          recordSourceUsage(db, {
+            monitorId,
+            // The registry's id space is wider than the schema's, and this
+            // narrowing is safe for the same reason `toRow`'s is: a monitor
+            // can only name a source the `monitors.sources` column accepts.
+            source: source.id as Source,
+            units,
+            pricePerUnitMicros: source.pricePerUnitMicros,
+          }),
       );
       outcomes.push(outcome);
 

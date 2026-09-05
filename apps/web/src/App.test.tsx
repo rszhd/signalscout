@@ -2,10 +2,12 @@
 /**
  * Which screen the shell shows.
  *
- * Two claims, and both are about what a person lands on. The inbox is the
- * product, so an empty hash is the inbox and not the setup form. And the
- * monitor form has to be reachable from the header, because the inbox's own
- * empty state sends people to it.
+ * Three claims, and all are about what a person lands on. The inbox is the
+ * product, so an empty hash is the inbox and not the setup form. The monitor
+ * form has to be reachable from the header, because the inbox's own empty
+ * state sends people to it. And the monitor list must not answer to the form's
+ * route, because "#/monitors" is a prefix of "#/monitors/new" and the shorter
+ * test would take both.
  */
 import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -44,7 +46,7 @@ async function go(hash: string): Promise<void> {
   await settle();
 }
 
-describe("the two screens", () => {
+describe("the three screens", () => {
   let screen: Screen;
 
   beforeEach(() => {
@@ -83,6 +85,20 @@ describe("the two screens", () => {
 
     await go("#/monitors/new");
 
+    expect(screen.container.textContent).toContain("What should this monitor find?");
+  });
+
+  it("reaches the monitor list from the header, and not the form's route", async () => {
+    screen = await mount(<App />);
+
+    expect(screen.container.querySelector('nav a[href="#/monitors"]')).not.toBeNull();
+
+    await go("#/monitors");
+    expect(screen.container.textContent).toContain("No monitors yet");
+
+    // The prefix. A shell that tested the shorter route first would put the
+    // list on the screen when a person asked for the form.
+    await go("#/monitors/new");
     expect(screen.container.textContent).toContain("What should this monitor find?");
   });
 

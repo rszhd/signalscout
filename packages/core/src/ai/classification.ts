@@ -24,7 +24,7 @@ const score = z
   .describe("0 to 100, where 100 is the strongest signal of this kind");
 
 /**
- * How many claims the inbox shows under "Why it matched".
+ * How many claims the inbox shows under "What the model saw".
  *
  * Two is the floor because one claim is an assertion and two are an argument.
  * Five is the ceiling because PLAN.md's inbox card shows a short list, and a

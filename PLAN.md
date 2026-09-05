@@ -271,12 +271,12 @@ Reddit · r/SaaS · 12 minutes ago
 testing? We're manually checking our major
 flows before every release."
 
-Why it matched
+What the model saw
 
-✓ Small SaaS team
-✓ Explicit manual-testing pain
-✓ Asking for solutions
-✓ Current problem
+• Small SaaS team
+• Explicit manual-testing pain
+• Asking for solutions
+• Current problem
 
 Problem fit       98
 ICP fit           91
@@ -286,6 +286,17 @@ Intent            94
 [Draft reply]
 [Not relevant]
 ```
+
+The heading was "Why it matched", with a tick on every claim. That is right
+for the 94 above and wrong for a 31. The classifier is asked for claims about
+the post, not for support for its own score, so on a weak post it writes what
+it saw and some of it is negative: "the post does not ask for a tool" is one
+of the most useful lines on the card, and a green tick beside it is a lie
+about what the model said.
+
+So the claims are neutral, and the score above them says how it went. A
+heading that only reads correctly on a good match hides exactly the matches a
+person most needs to dismiss quickly.
 
 The experience should feel like:
 

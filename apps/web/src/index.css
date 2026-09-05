@@ -1,10 +1,16 @@
+@import "@fontsource/ubuntu/400.css";
+@import "@fontsource/ubuntu/500.css";
+@import "@fontsource/ubuntu/700.css";
 @import "tailwindcss";
 
 :root {
   color: #1c211d;
   background: #f3f1e9;
+  /* Ubuntu is bundled with the app. The inbox should not change shape with the
+     fonts installed on its host, and a self-hosted instance should not reach a
+     font CDN to render it. The serif headings keep Georgia on purpose. */
   font-family:
-    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    Ubuntu, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
 }
@@ -816,6 +822,10 @@ button:disabled {
 }
 
 .inbox-page {
+  --inbox-copy: #303832;
+  --inbox-muted: #5f6961;
+  --inbox-accent: #426a49;
+
   width: min(860px, 92vw);
   margin: 0 auto;
   padding: clamp(2.4rem, 5vw, 4rem) 0 5rem;
@@ -833,15 +843,20 @@ button:disabled {
 .inbox-heading h1 {
   max-width: 22ch;
   margin: 0 0 0.7rem;
+  color: #18211a;
   font-size: clamp(1.7rem, 3.2vw, 2.3rem);
-  font-weight: 760;
+  font-weight: 700;
   letter-spacing: -0.03em;
   line-height: 1.12;
+  text-wrap: balance;
 }
 
 .inbox-heading .intro-copy {
   max-width: 46ch;
   margin: 0;
+  color: var(--inbox-muted);
+  line-height: 1.65;
+  text-wrap: pretty;
 }
 
 .inbox-filters {
@@ -855,10 +870,10 @@ button:disabled {
 }
 
 .filter > span {
-  color: #4c7654;
-  font-size: 0.72rem;
+  color: var(--inbox-accent);
+  font-size: 0.75rem;
   font-weight: 700;
-  letter-spacing: 0.09em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
@@ -887,8 +902,8 @@ button:disabled {
 
 .match-card {
   display: grid;
-  gap: 1rem;
-  padding: 1.5rem 1.6rem;
+  gap: 1.25rem;
+  padding: 1.7rem 1.8rem;
   border: 1px solid rgb(43 54 45 / 12%);
   border-radius: 16px;
   background: #fffefa;
@@ -908,7 +923,7 @@ button:disabled {
   gap: 0.5rem;
   align-items: baseline;
   margin: 0;
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -916,7 +931,7 @@ button:disabled {
 
 .intent-band strong {
   font-size: 1.5rem;
-  font-weight: 780;
+  font-weight: 700;
   letter-spacing: -0.02em;
 }
 
@@ -934,43 +949,52 @@ button:disabled {
 
 .match-origin {
   margin: 0;
-  color: #6e756f;
+  color: var(--inbox-muted);
   font-size: 0.82rem;
+  line-height: 1.45;
 }
 
 .match-quote {
+  max-width: 72ch;
   margin: 0;
-  padding-left: 1rem;
+  padding-left: 1.1rem;
   border-left: 3px solid rgb(44 88 53 / 25%);
 }
 
 .match-quote strong {
   display: block;
-  margin-bottom: 0.3rem;
-  font-size: 1rem;
-  font-weight: 680;
-  line-height: 1.35;
+  margin-bottom: 0.4rem;
+  color: #18211a;
+  font-size: 1.05rem;
+  font-weight: 500;
+  line-height: 1.4;
+  text-wrap: pretty;
 }
 
 .match-quote p {
   margin: 0;
-  color: #3c433d;
-  font-size: 0.95rem;
-  line-height: 1.55;
+  overflow-wrap: anywhere;
+  color: var(--inbox-copy);
+  font-size: 1rem;
+  line-height: 1.65;
 }
 
 .section-label {
-  margin: 0 0 0.5rem;
-  color: #4c7654;
-  font-size: 0.72rem;
+  margin: 0 0 0.65rem;
+  color: var(--inbox-accent);
+  font-size: 0.75rem;
   font-weight: 700;
-  letter-spacing: 0.09em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+
+.match-why {
+  max-width: 72ch;
 }
 
 .match-why ul {
   display: grid;
-  gap: 0.35rem;
+  gap: 0.45rem;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -978,15 +1002,18 @@ button:disabled {
 
 .match-why li {
   display: grid;
-  grid-template-columns: 1.1rem 1fr;
-  gap: 0.4rem;
-  color: #1c211d;
-  font-size: 0.92rem;
-  line-height: 1.45;
+  grid-template-columns: 0.75rem 1fr;
+  gap: 0.5rem;
+  color: var(--inbox-copy);
+  font-size: 0.95rem;
+  line-height: 1.55;
+  text-wrap: pretty;
 }
 
 .match-why li span {
-  color: #4c7654;
+  /* Grey, not the green of a tick. A claim here can be a reason the post is
+     weak, and the colour must not read as approval. */
+  color: #9aa29b;
   font-weight: 700;
 }
 
@@ -1001,16 +1028,16 @@ button:disabled {
   display: flex;
   gap: 0.5rem;
   align-items: baseline;
-  padding: 0.35rem 0.7rem;
+  padding: 0.4rem 0.75rem;
   border-radius: 999px;
   background: rgb(44 88 53 / 8%);
 }
 
 .match-scores dt {
-  color: #4c7654;
-  font-size: 0.74rem;
-  font-weight: 650;
-  letter-spacing: 0.04em;
+  color: var(--inbox-accent);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
@@ -1033,8 +1060,9 @@ button:disabled {
 }
 
 .match-meta {
-  color: #6e756f;
-  font-size: 0.8rem;
+  color: var(--inbox-muted);
+  font-size: 0.82rem;
+  line-height: 1.45;
 }
 
 .inbox-more {
@@ -1059,5 +1087,14 @@ button:disabled {
 
   .filter select {
     width: 100%;
+  }
+
+  .match-card {
+    gap: 1.1rem;
+    padding: 1.35rem 1.2rem;
+  }
+
+  .match-top {
+    align-items: start;
   }
 }

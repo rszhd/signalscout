@@ -129,9 +129,32 @@ browser turns that link into that hash.
   because of the filter, so the button clears it. Only a deployment with no
   monitor at all is offered the form.
 
+- 2026-09-05 — Renamed the reasons section from "Why it matched" to "What the
+  model saw", and replaced the green tick with a neutral bullet. The first
+  live scores showed why. On a post at 31 the model wrote "the post does not
+  ask for a testing tool, paid service, or automation solution" — an accurate
+  and useful claim, printed under a heading that said it was a reason the post
+  matched, with a tick beside it.
+
+  The prompt is not wrong. It asks for claims about the post, not for support
+  for the score, and that is the right thing to ask for: a model told to
+  justify its own number will find a way. The screen was wrong. A heading that
+  only reads correctly on a strong match hides exactly the matches a person
+  most needs to dismiss quickly. PLAN.md's mockup is updated with the same
+  reasoning.
+
 - 2026-09-05 — Broke five things on purpose and watched the suite. Dropping
   the age clamp, the hidden filter, the id half of the cursor and the score
   filter each turned a case red, and so did doubling the decay constant —
   after the ordering expectations were rewritten as literal numbers. Written
   from the constant, they had passed at any value, which is exactly the guard
   docs/testing.md warns about.
+
+- 2026-09-05 — Bundled Ubuntu instead of trusting the fonts installed on the
+  host. The inbox uses Ubuntu's real 400, 500 and 700 faces. Its prose is 16px
+  with a 72-character line and more leading. Labels and metadata share one
+  scale and two accessible colours. Removed the platform-dependent score
+  glyphs because the score colour and label already carry their meaning.
+
+  Rendered the four development matches in Chrome at 1440px and 390px. The
+  build, typecheck, lint and fourteen inbox cases pass.

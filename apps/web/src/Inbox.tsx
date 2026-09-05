@@ -67,10 +67,10 @@ const scoreFilters = [
  * match at all is the monitor's own `min_score`, decided when the monitor was
  * created. These three words only say how hard to look at it.
  */
-function band(score: number): { label: string; mark: string; tone: string } {
-  if (score >= 80) return { label: "High intent", mark: "🔥", tone: "high" };
-  if (score >= 55) return { label: "Worth reading", mark: "◆", tone: "medium" };
-  return { label: "Low intent", mark: "·", tone: "low" };
+function band(score: number): { label: string; tone: string } {
+  if (score >= 80) return { label: "High intent", tone: "high" };
+  if (score >= 55) return { label: "Worth reading", tone: "medium" };
+  return { label: "Low intent", tone: "low" };
 }
 
 /** "12 minutes ago", the way the mockup writes it. */
@@ -303,7 +303,6 @@ export function Inbox() {
               <li className="match-card" key={match.id}>
                 <div className="match-top">
                   <p className={`intent-band ${tone.tone}`}>
-                    <span aria-hidden="true">{tone.mark}</span>
                     <strong>{match.score}</strong>
                     <span>{tone.label}</span>
                   </p>
@@ -318,11 +317,22 @@ export function Inbox() {
                 </blockquote>
 
                 <div className="match-why">
-                  <p className="section-label">Why it matched</p>
+                  {/*
+                   * Not "Why it matched", and not a tick.
+                   *
+                   * The classifier is asked for claims about the post, not for
+                   * support for its own score, so on a weak post some of the
+                   * claims are negative — "the post does not ask for a tool"
+                   * is one of the most useful lines on the card. A tick beside
+                   * that is a lie about what the model said, and the heading
+                   * that only reads correctly on a strong match hides exactly
+                   * the matches a person most needs to dismiss quickly.
+                   */}
+                  <p className="section-label">What the model saw</p>
                   <ul>
                     {match.reasons.map((reason) => (
                       <li key={reason}>
-                        <span aria-hidden="true">✓</span>
+                        <span aria-hidden="true">•</span>
                         {reason}
                       </li>
                     ))}

@@ -87,7 +87,7 @@ describe("the intent inbox", () => {
     vi.unstubAllGlobals();
   });
 
-  it("shows the score, where it came from, the quote and the reasons", async () => {
+  it("shows the score, where it came from, the quote and the claims", async () => {
     await show();
 
     expect(container.textContent).toContain("94");
@@ -97,13 +97,39 @@ describe("the intent inbox", () => {
     expect(container.textContent).toContain("We're manually checking our major flows");
 
     const reasons = [...container.querySelectorAll(".match-why li")].map((item) =>
-      item.textContent?.replace("✓", "").trim(),
+      item.textContent?.replace("•", "").trim(),
     );
     expect(reasons).toEqual([
       "Small SaaS team",
       "Explicit manual-testing pain",
       "Asking for solutions",
     ]);
+  });
+
+  it("does not claim a negative observation is a reason it matched", async () => {
+    // The classifier writes claims about the post, not support for its own
+    // score, so a weak match carries lines like the second one below. A
+    // heading of "Why it matched" and a green tick would both say the model
+    // said something it did not.
+    await show({
+      "/api/matches?": {
+        matches: [
+          match({
+            score: 31,
+            reasons: [
+              "The author is seeking testers for their Android app",
+              "The post does not ask for a testing tool or paid service",
+            ],
+          }),
+        ],
+        nextCursor: null,
+        asOf: "2026-09-05T12:00:00.000Z",
+      },
+    });
+
+    expect(container.textContent).toContain("What the model saw");
+    expect(container.textContent).not.toContain("Why it matched");
+    expect(container.querySelector(".match-why")?.textContent).not.toContain("✓");
   });
 
   it("shows problem fit, ICP fit and intent", async () => {

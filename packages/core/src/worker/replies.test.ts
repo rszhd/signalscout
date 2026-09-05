@@ -1,0 +1,255 @@
+/**
+ * The replies step, driven the way the worker drives it.
+ *
+ * Real Postgres, a fake connector, no network and no bill. What is asserted
+ * here is the two rules that decide what this feature costs — a thread is
+ * opened only under a post the filter kept, and only when something new was
+ * said in it — and the one honesty rule that decides whether it is correct:
+ * a thread we half read is recorded as half read.
+ */
+import { and, eq } from "drizzle-orm";
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
+import { createDatabase, type Database } from "../db/client.js";
+import { apiUsage, posts } from "../db/schema.js";
+import { createLogger } from "../logger.js";
+import type { CandidateReply } from "../sources/types.js";
+import { createTestDatabase, type TestDatabase } from "../testing/database.js";
+import type { ClassifyPayload, FilterPayload } from "./queues.js";
+import { repliesQueue } from "./queues.js";
+import { startWorker, type WorkerHandle } from "./runtime.js";
+import { fakeRegistry, fastRetries, insertMonitor, until } from "./testing.js";
+
+const postedAt = new Date("2026-09-05T09:00:00.000Z");
+
+/**
+ * A two-reply thread whose ids belong to the post it hangs under.
+ *
+ * Derived rather than fixed so that two cases in this file never share a reply
+ * row: `posts` is keyed by `(source, external_id)`, and a shared id would make
+ * one case's insert the next case's conflict.
+ */
+function threadUnder(postExternalId: string): readonly CandidateReply[] {
+  const reply = (id: string, text: string, parentReply?: string): CandidateReply => ({
+    externalId: `t1_${postExternalId}_${id}`,
+    url: `https://www.reddit.com/r/SaaS/comments/${postExternalId}/comment/${id}/`,
+    author: "a-redditor",
+    channel: "SaaS",
+    text,
+    postedAt,
+    parentPostExternalId: postExternalId,
+    ...(parentReply ? { parentReplyExternalId: `t1_${postExternalId}_${parentReply}` } : {}),
+  });
+
+  return [
+    reply("one", "We hit this too. What did you end up using?"),
+    reply("two", "We moved to Playwright and it has been fine.", "one"),
+  ];
+}
+
+let database: TestDatabase;
+let worker: WorkerHandle;
+let db: Database;
+let closeDb: () => Promise<void>;
+const filtered: FilterPayload[] = [];
+const classified: ClassifyPayload[] = [];
+
+let nextId = 0;
+
+async function insertPost(
+  externalId: string,
+  overrides: Record<string, unknown> = {},
+): Promise<string> {
+  nextId += 1;
+
+  const [row] = await db
+    .insert(posts)
+    .values({
+      source: "reddit",
+      externalId: `${externalId}_${nextId}`,
+      url: "https://www.reddit.com/r/SaaS/comments/thread/",
+      channel: "SaaS",
+      title: "Our end to end tests break every release",
+      excerpt: "We are a four-person SaaS and the suite breaks whenever the UI changes.",
+      postedAt,
+      ...overrides,
+    })
+    .returning({ id: posts.id });
+
+  if (!row) throw new Error("the post was not inserted");
+  return row.id;
+}
+
+async function run(monitorId: string, postIds: string[]): Promise<void> {
+  await worker.boss.send(repliesQueue, { monitorId, postIds });
+}
+
+beforeAll(async () => {
+  database = await createTestDatabase("worker_replies");
+  ({ db, close: closeDb } = createDatabase(database.url));
+
+  worker = await startWorker({
+    databaseUrl: database.url,
+    logger: createLogger({ level: "silent", name: "test" }),
+    registry: fakeRegistry({ replies: threadUnder, unitsPerReplyCall: 1 }),
+    credentialsFor: () => ({ token: "test-token" }),
+    steps: {
+      filter: async (payload) => {
+        filtered.push(payload);
+      },
+      classify: async (payload) => {
+        classified.push(payload);
+      },
+    },
+    retry: fastRetries,
+    scheduleTicks: false,
+  });
+}, 60_000);
+
+afterAll(async () => {
+  await worker?.stop();
+  await closeDb?.();
+  await database?.drop();
+});
+
+beforeEach(() => {
+  filtered.length = 0;
+  classified.length = 0;
+});
+
+describe("opening a thread", () => {
+  it("stores each reply as its own row, linked to the post above it", async () => {
+    const monitorId = await insertMonitor(database, { includeReplies: true });
+    const postId = await insertPost("t3_thread", { replyCount: 2 });
+
+    await run(monitorId, [postId]);
+    await until("the replies to reach the filter", () => filtered[0]);
+
+    const stored = await db
+      .select()
+      .from(posts)
+      .where(and(eq(posts.kind, "reply"), eq(posts.parentPostId, postId)));
+
+    expect(stored).toHaveLength(2);
+
+    const first = stored.find((row) => row.externalId.endsWith("_one"));
+    const second = stored.find((row) => row.externalId.endsWith("_two"));
+
+    expect(first?.parentReplyExternalId).toBeNull();
+    // The nested one names the reply above it, which is what reaches the prompt.
+    expect(second?.parentReplyExternalId).toBe(first?.externalId);
+    // A reply has no title of its own: the post's title is read through the link.
+    expect(first?.title).toBeNull();
+  }, 20_000);
+
+  it("sends the replies back through the filter, not straight to the model", async () => {
+    const monitorId = await insertMonitor(database, { includeReplies: true });
+    const postId = await insertPost("t3_thread", { replyCount: 2 });
+
+    await run(monitorId, [postId]);
+    const payload = await until("the replies to reach the filter", () => filtered[0]);
+
+    expect(payload.postIds).toHaveLength(2);
+    // A reply meets triage there and nothing else. Going straight to the
+    // classifier would skip the only stage that can read it.
+    expect(classified).toEqual([]);
+  }, 20_000);
+
+  it("bills the reply page against the monitor, at the connector's reply price", async () => {
+    const monitorId = await insertMonitor(database, { includeReplies: true });
+    const postId = await insertPost("t3_thread", { replyCount: 2 });
+
+    await run(monitorId, [postId]);
+    await until("the replies to reach the filter", () => filtered[0]);
+
+    const usage = await db.select().from(apiUsage).where(eq(apiUsage.monitorId, monitorId));
+
+    expect(usage).toHaveLength(1);
+    expect(usage[0]?.units).toBe(1);
+  }, 20_000);
+
+  it("records the thread as partly read, because the provider cannot promise otherwise", async () => {
+    const monitorId = await insertMonitor(database, { includeReplies: true });
+    const postId = await insertPost("t3_thread", { replyCount: 2 });
+
+    await run(monitorId, [postId]);
+    await until("the replies to reach the filter", () => filtered[0]);
+
+    const [row] = await db.select().from(posts).where(eq(posts.id, postId));
+
+    // Not "done". A top-level has_more: false arrives on threads missing half
+    // their comments, so this is our own honesty and not the provider's.
+    expect(row?.repliesPartial).toBe(true);
+  }, 20_000);
+});
+
+describe("what is never bought", () => {
+  it("buys nothing for a monitor that does not read replies", async () => {
+    const monitorId = await insertMonitor(database, { includeReplies: false });
+    const postId = await insertPost("t3_thread", { replyCount: 2 });
+
+    await run(monitorId, [postId]);
+
+    // There is no signal for "the job ran and did nothing", so this waits
+    // rather than watching. It is why the cases after it carry a longer
+    // timeout: the queue is still working through what these left behind.
+    await new Promise((resolve) => setTimeout(resolve, 1_000));
+
+    const usage = await db.select().from(apiUsage).where(eq(apiUsage.monitorId, monitorId));
+
+    expect(usage).toEqual([]);
+    expect(filtered).toEqual([]);
+  }, 20_000);
+
+  /**
+   * The rule that stops a monitor re-buying every thread it has ever seen.
+   *
+   * Without it, an hourly poll pays for the same conversation every hour for
+   * the life of the monitor, and the second read stores nothing because the
+   * replies are already there.
+   */
+  it("does not re-open a thread that has been read fully and has not grown", async () => {
+    const monitorId = await insertMonitor(database, { includeReplies: true });
+    const postId = await insertPost("t3_thread", {
+      replyCount: 2,
+      repliesPartial: false,
+    });
+
+    await run(monitorId, [postId]);
+    await new Promise((resolve) => setTimeout(resolve, 1_000));
+
+    const usage = await db.select().from(apiUsage).where(eq(apiUsage.monitorId, monitorId));
+
+    expect(usage).toEqual([]);
+  }, 20_000);
+
+  it("re-opens a thread it only half read, even when the count has not moved", async () => {
+    const monitorId = await insertMonitor(database, { includeReplies: true });
+    const postId = await insertPost("t3_thread", { replyCount: 2, repliesPartial: true });
+
+    await run(monitorId, [postId]);
+    await until("the replies to reach the filter", () => filtered[0]);
+
+    const usage = await db.select().from(apiUsage).where(eq(apiUsage.monitorId, monitorId));
+
+    // The count was never the reason we stopped, so an unchanged count is no
+    // reason not to go back.
+    expect(usage).toHaveLength(1);
+  }, 20_000);
+
+  it("never opens a thread under a reply, which is what stops this looping", async () => {
+    const monitorId = await insertMonitor(database, { includeReplies: true });
+    const parentId = await insertPost("t3_parent_for_reply", { replyCount: 1 });
+    const replyId = await insertPost("t1_standalone", {
+      kind: "reply",
+      parentPostId: parentId,
+      title: null,
+    });
+
+    await run(monitorId, [replyId]);
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    const usage = await db.select().from(apiUsage).where(eq(apiUsage.monitorId, monitorId));
+
+    expect(usage).toEqual([]);
+  }, 20_000);
+});

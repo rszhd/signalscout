@@ -612,9 +612,7 @@ describe("a thread that is not fully read", () => {
     const { fetch: fetchStub } = scrapeCreators([truncatedThread]);
     const source = new ScrapeCreatorsRedditSource(runtimeWith(fetchStub));
 
-    const result = await source.fetchReplies(
-      replyRequest({ postExternalId: "t3_1tac8be" }),
-    );
+    const result = await source.fetchReplies(replyRequest({ postExternalId: "t3_1tac8be" }));
 
     // The captured answer says has_more: false and carries no cursor.
     expect(result.next).toEqual({ status: "done" });

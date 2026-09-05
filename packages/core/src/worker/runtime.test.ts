@@ -16,6 +16,7 @@ import {
   pollQueuePolicy,
   queueDefinitions,
   reconcileQueue,
+  repliesQueue,
   retryPolicy,
   scheduleTickQueue,
 } from "./queues.js";
@@ -98,6 +99,10 @@ describe("the worker's queues", () => {
         heartbeatQueue,
         notifyQueue,
         pollQueue,
+        // US-020. Opening the threads under posts the pre-filter kept, on its
+        // own queue because it spends at a provider where the filter spends at
+        // a model, and the two must retry apart.
+        repliesQueue,
         scheduleTickQueue,
         reconcileQueue,
       ].sort(),

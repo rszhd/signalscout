@@ -53,12 +53,15 @@ import {
   type PollPayload,
   pollQueue,
   queueDefinitions,
+  type RepliesPayload,
   type RetryPolicy,
   reconcileQueue,
+  repliesQueue,
   scheduleTickCron,
   scheduleTickQueue,
 } from "./queues.js";
 import { createReconcileStep } from "./reconcile.js";
+import { createRepliesStep } from "./replies.js";
 import { enqueueDuePolls } from "./schedule.js";
 import { type Step, type StepContext, unconfiguredClassify, type WorkerSteps } from "./steps.js";
 
@@ -358,6 +361,7 @@ export async function startWorker({
     poll: steps.poll ?? createCollectStep({ registry: sources, credentialsFor: lookup }),
     estimate: steps.estimate ?? createEstimateStep({ registry: sources, credentialsFor: lookup }),
     filter: steps.filter ?? createFilterStep({ embedder: embedding, triager: triage }),
+    replies: steps.replies ?? createRepliesStep({ registry: sources, credentialsFor: lookup }),
     classify:
       steps.classify ?? (model ? createClassifyStep({ classifier: model }) : unconfiguredClassify),
     notify:
@@ -383,6 +387,7 @@ export async function startWorker({
   await work(reconcileQueue, pipeline.reconcile, () => ({}));
   await work<PollPayload>(pollQueue, pipeline.poll, named);
   await work<FilterPayload>(filterQueue, pipeline.filter, named);
+  await work<RepliesPayload>(repliesQueue, pipeline.replies, named);
   await work<ClassifyPayload>(classifyQueue, pipeline.classify, named);
   await work<NotifyPayload>(notifyQueue, pipeline.notify, named);
   await work<EstimatePayload>(estimateQueue, pipeline.estimate, ({ estimateId }) => ({

@@ -18,6 +18,7 @@ import {
   type NotifyPayload,
   notifyQueue,
   type PollPayload,
+  type RepliesPayload,
 } from "./queues.js";
 
 export interface StepContext {
@@ -31,6 +32,7 @@ export type Step<Payload> = (payload: Payload, context: StepContext) => Promise<
 export interface PipelineSteps {
   readonly poll: Step<PollPayload>;
   readonly filter: Step<FilterPayload>;
+  readonly replies: Step<RepliesPayload>;
   readonly classify: Step<ClassifyPayload>;
   readonly notify: Step<NotifyPayload>;
 }

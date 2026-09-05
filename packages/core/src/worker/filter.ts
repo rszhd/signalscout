@@ -54,7 +54,7 @@ import { type FilterDrop, recordFilterDrops } from "../filter/drops.js";
 import { keepsPost, keywordRuleFor } from "../filter/keywords.js";
 import { monitorQueries } from "../monitors/monitors.js";
 import type { FilterPayload } from "./queues.js";
-import { classifyQueue } from "./queues.js";
+import { classifyQueue, repliesQueue } from "./queues.js";
 import type { Step, StepContext } from "./steps.js";
 
 export interface FilterOptions {
@@ -79,6 +79,17 @@ export interface FilterOptions {
 /** A post as both stages read it, which is a row minus what neither needs. */
 interface Candidate {
   readonly id: string;
+  /**
+   * A reply skips the first two stages. US-020, on US-029's measurement.
+   *
+   * Both of them measure *subject*, and a reply has no subject of its own — it
+   * borrows one from the post above it. Checking a reply against the monitor's
+   * keywords drops "same here, what did you switch to?" for missing words
+   * nobody said to it, and embedding it either drops it for the same reason or,
+   * with the parent's title restored, keeps every reply in the thread and costs
+   * money to decide nothing. Triage is the stage that can read.
+   */
+  readonly kind: string;
   /** The platform it came from, which decides the queries it is checked against. */
   readonly source: string;
   readonly channel: string | null;
@@ -114,9 +125,33 @@ export function createFilterStep({ embedder, triager }: FilterOptions = {}): Ste
     }
 
     /** Everything that is still going to the model, and why the rest is not. */
-    const deliver = async (survivors: readonly string[], drops: readonly FilterDrop[]) => {
+    const deliver = async (survivors: readonly Candidate[], drops: readonly FilterDrop[]) => {
       await recordFilterDrops(db, monitorId, drops);
-      await boss.send(classifyQueue, { monitorId, postIds: [...survivors] });
+      await boss.send(classifyQueue, {
+        monitorId,
+        postIds: survivors.map((candidate) => candidate.id),
+      });
+
+      if (!monitor.includeReplies) return;
+
+      /**
+       * The threads worth opening, which is only the posts.
+       *
+       * A reply has no thread of its own, and sending one here would open a
+       * second bill for the same words. The step checks `kind` again in SQL,
+       * because a queue payload is not a place to keep an invariant.
+       *
+       * This runs after the classify job is booked, not instead of it: the
+       * posts are leads in their own right and must not wait on a provider
+       * call to reach the inbox.
+       */
+      const threads = survivors.filter((candidate) => candidate.kind !== "reply");
+      if (threads.length === 0) return;
+
+      await boss.send(repliesQueue, {
+        monitorId,
+        postIds: threads.map((candidate) => candidate.id),
+      });
     };
 
     /**
@@ -138,10 +173,7 @@ export function createFilterStep({ embedder, triager }: FilterOptions = {}): Ste
         if (!triager) {
           logger.debug({ monitorId }, "the triage stage is not running: no triager was given");
         }
-        await deliver(
-          survivors.map((candidate) => candidate.id),
-          drops,
-        );
+        await deliver(survivors, drops);
         return;
       }
 
@@ -188,7 +220,10 @@ export function createFilterStep({ embedder, triager }: FilterOptions = {}): Ste
         "triage finished",
       );
 
-      await deliver(survived, drops);
+      await deliver(
+        survivors.filter((candidate) => survived.includes(candidate.id)),
+        drops,
+      );
     };
 
     if (!monitor.preFilterEnabled) {
@@ -196,7 +231,23 @@ export function createFilterStep({ embedder, triager }: FilterOptions = {}): Ste
       // Running it anyway would be this product deciding that one of the three
       // does not count as filtering, which is not a decision it gets to make.
       logger.info({ monitorId, posts: ids.length }, "pre-filter is off for this monitor");
-      await deliver(ids, []);
+
+      // The rows are read even with the filter off, because `deliver` needs to
+      // know which of them are posts before it books a thread for one.
+      const all: Candidate[] = await db
+        .select({
+          id: posts.id,
+          source: posts.source,
+          channel: posts.channel,
+          title: posts.title,
+          excerpt: posts.excerpt,
+          kind: posts.kind,
+          embedded: sql<boolean>`${posts.embedding} is not null`,
+        })
+        .from(posts)
+        .where(inArray(posts.id, ids));
+
+      await deliver(all, []);
       return;
     }
 
@@ -207,6 +258,7 @@ export function createFilterStep({ embedder, triager }: FilterOptions = {}): Ste
         channel: posts.channel,
         title: posts.title,
         excerpt: posts.excerpt,
+        kind: posts.kind,
         // The vector itself is never selected. It is a thousand numbers per
         // row that this step never reads: pgvector does the comparing.
         embedded: sql<boolean>`${posts.embedding} is not null`,
@@ -241,11 +293,16 @@ export function createFilterStep({ embedder, triager }: FilterOptions = {}): Ste
     const drops: FilterDrop[] = [];
 
     for (const candidate of candidates) {
-      if (keepsPost(ruleFor(candidate.source), candidate)) kept.push(candidate);
-      else drops.push({ postId: candidate.id, stage: "keyword", similarity: null });
+      // A reply is not checked against the monitor's words. It answers a post
+      // that already matched them, and the words are rarely repeated: "same
+      // here, what did you end up using?" shares nothing with the query that
+      // found the thread.
+      if (candidate.kind === "reply" || keepsPost(ruleFor(candidate.source), candidate)) {
+        kept.push(candidate);
+      } else {
+        drops.push({ postId: candidate.id, stage: "keyword", similarity: null });
+      }
     }
-
-    const keptIds = kept.map((candidate) => candidate.id);
 
     if (!embedder || kept.length === 0) {
       if (!embedder) {
@@ -330,10 +387,23 @@ export function createFilterStep({ embedder, triager }: FilterOptions = {}): Ste
       return;
     }
 
+    /**
+     * Replies never reach the embedding stage, so they are separated here
+     * rather than filtered out of each step below.
+     *
+     * US-029 measured both settings on two real threads. Embedded alone, a
+     * reply's similarity is about its own few words and the shipped threshold
+     * drops people who are asking. Embedded under the parent's title, all 46
+     * comments landed inside 0.2 of the title's own score and no threshold
+     * separated anything. Neither setting is worth an embedding call.
+     */
+    const embeddable = kept.filter((candidate) => candidate.kind !== "reply");
+    const skippedReplies = kept.filter((candidate) => candidate.kind === "reply");
+
     // Only what is not embedded yet. A post another monitor already embedded
     // costs nothing here, which is the reason the vector lives on the post and
     // not on the pair.
-    const toEmbed = kept.filter((candidate) => !candidate.embedded);
+    const toEmbed = embeddable.filter((candidate) => !candidate.embedded);
 
     if (toEmbed.length > 0) {
       const outcome = await embedder.embed(
@@ -387,13 +457,23 @@ export function createFilterStep({ embedder, triager }: FilterOptions = {}): Ste
         similarity: sql<number>`1 - (${posts.embedding} <=> ${vectorLiteral(monitorVector)}::vector)`,
       })
       .from(posts)
-      .where(and(inArray(posts.id, keptIds), isNotNull(posts.embedding)));
+      .where(
+        and(
+          inArray(
+            posts.id,
+            embeddable.map((candidate) => candidate.id),
+          ),
+          isNotNull(posts.embedding),
+        ),
+      );
 
     const similarities = new Map(scored.map((row) => [row.id, Number(row.similarity)]));
-    const survivors: Candidate[] = [];
+    // A reply arrives already past this stage. It was never embedded and was
+    // never going to be, so it is not "unmeasured" — it is not measured here.
+    const survivors: Candidate[] = [...skippedReplies];
     let unmeasured = 0;
 
-    for (const candidate of kept) {
+    for (const candidate of embeddable) {
       const similarity = similarities.get(candidate.id);
 
       // No similarity means the post has no vector: its embedding failed and

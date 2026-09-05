@@ -17,6 +17,21 @@ export const heartbeatQueue = "heartbeat";
 export const pollQueue = "poll";
 export const filterQueue = "filter";
 export const classifyQueue = "classify";
+/**
+ * Opening the threads under posts that survived the pre-filter. US-020.
+ *
+ * It is its own queue rather than work inside the filter step for two reasons.
+ * It spends money at a provider, so it must retry on its own schedule and
+ * dead-letter on its own, and the filter step spends money at a model — one
+ * job that could fail at either would be retried against both.
+ *
+ * It sits after the filter and not after the poll because a thread is only
+ * worth buying under a post somebody might read. Opening one under every
+ * collected post would multiply a poll's provider bill by the number of posts
+ * it collected, to read conversations under things the filter had already
+ * refused.
+ */
+export const repliesQueue = "replies";
 export const notifyQueue = "notify";
 
 /**
@@ -55,7 +70,13 @@ export const scheduleTickQueue = "schedule-tick";
 /** Once a minute. The poll interval floor is sixty seconds, so this is enough. */
 export const scheduleTickCron = "* * * * *";
 
-export const pipelineQueues = [pollQueue, filterQueue, classifyQueue, notifyQueue] as const;
+export const pipelineQueues = [
+  pollQueue,
+  filterQueue,
+  repliesQueue,
+  classifyQueue,
+  notifyQueue,
+] as const;
 export type PipelineQueue = (typeof pipelineQueues)[number];
 
 /** Every queue the worker creates, dead letter first: pg-boss needs it to exist. */
@@ -83,6 +104,16 @@ export interface FilterPayload {
   readonly postIds: readonly string[];
 }
 
+export interface RepliesPayload {
+  readonly monitorId: string;
+  /**
+   * Posts whose threads are worth opening. Only `kind = 'post'` rows reach
+   * here, which is what stops a reply's thread being opened in turn: a reply
+   * has no thread of its own, and a queue that allowed one would loop.
+   */
+  readonly postIds: readonly string[];
+}
+
 export interface ClassifyPayload {
   readonly monitorId: string;
   readonly postIds: readonly string[];
@@ -94,7 +125,12 @@ export interface NotifyPayload {
 }
 
 /** Every pipeline payload names its monitor, because every log line must. */
-export type PipelinePayload = PollPayload | FilterPayload | ClassifyPayload | NotifyPayload;
+export type PipelinePayload =
+  | PollPayload
+  | FilterPayload
+  | RepliesPayload
+  | ClassifyPayload
+  | NotifyPayload;
 
 export interface RetryPolicy {
   readonly retryLimit: number;
@@ -163,6 +199,7 @@ export function queueDefinitions(retry: RetryPolicy = retryPolicy): readonly Que
     // twice, and one queued, so a resume booked twice is booked once.
     { name: estimateQueue, policy: pollQueuePolicy, deadLetter: deadLetterQueue, ...retry },
     { name: filterQueue, deadLetter: deadLetterQueue, ...retry },
+    { name: repliesQueue, deadLetter: deadLetterQueue, ...retry },
     { name: classifyQueue, deadLetter: deadLetterQueue, ...retry },
     { name: notifyQueue, policy: "stately", deadLetter: deadLetterQueue, ...retry },
   ];

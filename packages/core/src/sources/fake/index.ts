@@ -1,8 +1,10 @@
 import type {
   CandidatePost,
+  CandidateReply,
   ConnectorDefinition,
   CredentialCheck,
   CredentialField,
+  ReplyRequest,
   SearchRequest,
   SearchResult,
   SocialSource,
@@ -71,11 +73,37 @@ export interface FakeSourceOptions {
   readonly credentialFields?: readonly CredentialField[];
   /** Exact credentials that pass. Any non-empty value passes when this is unset. */
   readonly validCredentials?: SourceCredentials;
+  /**
+   * The replies this fake serves, keyed by the post's `externalId`. US-020.
+   *
+   * Absent means this connector cannot read replies at all, which is the
+   * common case and the one worth being able to express: a monitor that asks
+   * for replies on such a platform must still poll and still return posts.
+   *
+   * A function answers for any post, which is what a test whose subject is the
+   * rule rather than the payload wants: it can build a thread whose ids belong
+   * to the post it hangs under, and two tests then never share a reply row.
+   */
+  readonly replies?:
+    | Readonly<Record<string, readonly CandidateReply[]>>
+    | ((postExternalId: string) => readonly CandidateReply[]);
+  /** Units billed for one call to `fetchReplies`. */
+  readonly unitsPerReplyCall?: number;
+  /**
+   * What the fake reports as `ReplyResult.partial`.
+   *
+   * Defaults to true, which is what both real providers report almost always:
+   * a top-level "no more" arrives on threads that are missing half their
+   * comments, so completeness is claimed only from positive evidence.
+   */
+  readonly repliesPartial?: boolean;
 }
 
 export interface FakeSource extends SocialSource {
   /** Every search, in order. A test asserts what was not called as well as what was. */
   readonly calls: readonly SearchRequest[];
+  /** Every reply fetch, in order, for the same reason. */
+  readonly replyCalls: readonly ReplyRequest[];
 }
 
 /** Build a connector definition the registry can hold. */
@@ -93,6 +121,7 @@ export function fakeSourceDefinition(options: FakeSourceOptions = {}): Connector
     billableUnit: options.billableUnit ?? "call",
     pricePerUnitMicros: options.pricePerUnitMicros ?? 0,
     maxUnitsPerQueryPoll: options.maxUnitsPerQueryPoll ?? 50,
+    canFetchReplies: options.replies !== undefined,
     create: (runtime) => createFakeSource(runtime, options),
   };
 }
@@ -111,6 +140,7 @@ export function createFakeSource(
   const unitsPerPost = options.unitsPerPost ?? 0;
 
   const calls: SearchRequest[] = [];
+  const replyCalls: ReplyRequest[] = [];
   let remaining = allowance;
   /** Set once the allowance is spent. The allowance returns when the clock passes it. */
   let windowEndsAt: Date | undefined;
@@ -132,8 +162,33 @@ export function createFakeSource(
   return {
     ...descriptor,
     calls,
+    replyCalls,
 
     validateCredentials: (credentials) => Promise.resolve(check(credentials)),
+
+    /**
+     * Present only when the fake was given replies, because absence is how a
+     * connector says it cannot read them and a test needs to drive that too.
+     */
+    ...(options.replies === undefined
+      ? {}
+      : {
+          fetchReplies: (request: ReplyRequest) => {
+            replyCalls.push(request);
+
+            const replies =
+              typeof options.replies === "function"
+                ? options.replies(request.postExternalId)
+                : (options.replies?.[request.postExternalId] ?? []);
+
+            return Promise.resolve({
+              replies,
+              unitsConsumed: options.unitsPerReplyCall ?? 1,
+              next: { status: "done" as const },
+              partial: options.repliesPartial ?? true,
+            });
+          },
+        }),
 
     async search(request: SearchRequest): Promise<SearchResult> {
       calls.push(request);

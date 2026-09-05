@@ -36,6 +36,32 @@ export interface PostForClassification {
   readonly title?: string | null;
   readonly excerpt: string;
   readonly postedAt: Date;
+  /**
+   * The thread above this item, when it is a reply. US-020.
+   *
+   * Absent on a post. Present on a reply, and then it is not decoration: "we
+   * hit this too, what did you end up using?" names no product and no problem,
+   * and a model given only those words scores noise. The prompt says plainly
+   * that the thread is context and that the reply's own author is the person
+   * being judged — without that line the model scores whoever wrote the post,
+   * and every reply under a good post becomes a match.
+   */
+  readonly thread?: ThreadContext;
+}
+
+/** What sits above a reply: the post, and the reply it answers. */
+export interface ThreadContext {
+  readonly postTitle?: string | null;
+  /** The parent post's body, already shortened by the caller. */
+  readonly postExcerpt?: string | null;
+  /**
+   * The reply directly above this one, when there is one.
+   *
+   * Two levels and no more. A thread is unbounded in depth and every level is
+   * billed as input tokens on every call, and two is enough for "same here" to
+   * mean something.
+   */
+  readonly parentReplyExcerpt?: string | null;
 }
 
 export function buildSystemPrompt(monitor: MonitorProfile): string {
@@ -80,12 +106,46 @@ export function buildSystemPrompt(monitor: MonitorProfile): string {
 }
 
 export function buildUserPrompt(post: PostForClassification): string {
+  const thread = post.thread;
+
+  if (!thread) {
+    return [
+      `Source: ${post.source}${post.channel ? ` (${post.channel})` : ""}`,
+      `Posted: ${post.postedAt.toISOString()}`,
+      post.title ? `Title: ${post.title}` : undefined,
+      "",
+      "Post:",
+      post.excerpt,
+    ]
+      .filter((line) => line !== undefined)
+      .join("\n");
+  }
+
+  /**
+   * A reply, with the thread above it and a sentence saying what to do with it.
+   *
+   * The order is deliberate: context first, then the instruction, then the
+   * words being judged. The instruction sits between them so it cannot be read
+   * as part of either, and the reply comes last because a model weighs the end
+   * of a prompt most.
+   */
   return [
     `Source: ${post.source}${post.channel ? ` (${post.channel})` : ""}`,
     `Posted: ${post.postedAt.toISOString()}`,
-    post.title ? `Title: ${post.title}` : undefined,
     "",
-    "Post:",
+    "THREAD, FOR CONTEXT ONLY",
+    thread.postTitle ? `The post says: ${thread.postTitle}` : undefined,
+    thread.postExcerpt ? thread.postExcerpt : undefined,
+    thread.parentReplyExcerpt
+      ? `\nThe reply directly above says: ${thread.parentReplyExcerpt}`
+      : undefined,
+    "",
+    "Judge the REPLY below, and the person who wrote it. Do not judge the",
+    "person who wrote the post above: they are a different person and they are",
+    "not on trial here. Most people replying under a post about this problem",
+    "are answering it, and an expert giving advice is not a buyer.",
+    "",
+    "REPLY:",
     post.excerpt,
   ]
     .filter((line) => line !== undefined)

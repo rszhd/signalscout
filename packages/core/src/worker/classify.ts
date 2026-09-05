@@ -40,9 +40,9 @@ import { and, count, eq, inArray, isNull, ne } from "drizzle-orm";
 import type { ModelCall } from "../ai/call.js";
 import { scoreColumns } from "../ai/classification.js";
 import type { Classifier } from "../ai/classify.js";
-import type { MonitorProfile } from "../ai/prompt.js";
+import type { MonitorProfile, ThreadContext } from "../ai/prompt.js";
 import { recordModelCall } from "../ai/record.js";
-import type { Queryable } from "../db/client.js";
+import type { Database, Queryable } from "../db/client.js";
 import {
   type ModelCallOutcome,
   matches,
@@ -109,6 +109,15 @@ export function createClassifyStep({ classifier }: ClassifyOptions): Step<Classi
       eq(modelCalls.purpose, "classification"),
     );
 
+    /**
+     * The thread above every reply in this batch, in one read.
+     *
+     * Per post would be one query each and the batch is the whole point of
+     * this step. A reply whose parent has since been deleted gets no context
+     * rather than a broken prompt: the classifier then sees a short comment
+     * with no thread, scores it low, and nobody is told a lie about who wrote
+     * what.
+     */
     const [candidates, scored, failures, matched] = await Promise.all([
       db
         .select()
@@ -132,6 +141,8 @@ export function createClassifyStep({ classifier }: ClassifyOptions): Step<Classi
         .from(matches)
         .where(and(eq(matches.monitorId, monitorId), inArray(matches.postId, ids))),
     ]);
+
+    const threads = await loadThreads(db, candidates);
 
     const alreadyScored = new Set(scored.map((row) => row.postId));
     const alreadyMatched = new Set(matched.map((row) => row.postId));
@@ -179,7 +190,10 @@ export function createClassifyStep({ classifier }: ClassifyOptions): Step<Classi
         continue;
       }
 
-      const outcome = await classifier.classify({ monitor: profile, post });
+      const outcome = await classifier.classify({
+        monitor: profile,
+        post: { ...post, ...(threads.get(post.id) ?? {}) },
+      });
 
       if (outcome.status !== "scored") {
         retryable += 1;
@@ -249,4 +263,75 @@ export function createClassifyStep({ classifier }: ClassifyOptions): Step<Classi
       );
     }
   };
+}
+
+/** How much of the parent post the classifier is shown. */
+const parentExcerptLength = 600;
+
+/**
+ * The thread above each reply in a batch, read in two queries however many
+ * replies there are.
+ *
+ * Two levels, and no more: the post, and the reply directly above. A thread is
+ * unbounded in depth and every level is billed as input tokens on every call,
+ * and two levels is enough for "same here" to mean something.
+ *
+ * The parent's body is cut to `parentExcerptLength`. A long post would
+ * otherwise crowd out the reply being judged, and a model weighs what it reads
+ * most of.
+ */
+async function loadThreads(
+  db: Database,
+  candidates: readonly (typeof posts.$inferSelect)[],
+): Promise<Map<string, { thread: ThreadContext }>> {
+  const replies = candidates.filter((row) => row.kind === "reply" && row.parentPostId !== null);
+  if (replies.length === 0) return new Map();
+
+  const parentIds = [...new Set(replies.map((row) => row.parentPostId as string))];
+  const parentReplyIds = [
+    ...new Set(
+      replies
+        .map((row) => row.parentReplyExternalId)
+        .filter((value): value is string => value !== null),
+    ),
+  ];
+
+  const [parents, parentReplies] = await Promise.all([
+    db
+      .select({ id: posts.id, title: posts.title, excerpt: posts.excerpt })
+      .from(posts)
+      .where(inArray(posts.id, parentIds)),
+    parentReplyIds.length === 0
+      ? Promise.resolve([] as { externalId: string; excerpt: string }[])
+      : db
+          .select({ externalId: posts.externalId, excerpt: posts.excerpt })
+          .from(posts)
+          .where(inArray(posts.externalId, parentReplyIds)),
+  ]);
+
+  const postById = new Map(parents.map((row) => [row.id, row]));
+  const replyByExternalId = new Map(parentReplies.map((row) => [row.externalId, row]));
+  const out = new Map<string, { thread: ThreadContext }>();
+
+  for (const reply of replies) {
+    const parent = postById.get(reply.parentPostId as string);
+    const above = reply.parentReplyExternalId
+      ? replyByExternalId.get(reply.parentReplyExternalId)
+      : undefined;
+
+    // A reply whose post has been deleted gets no context rather than a
+    // half-built one. The model then reads a short comment and scores it low,
+    // which is honest; a prompt naming a thread we cannot show would not be.
+    if (!parent) continue;
+
+    out.set(reply.id, {
+      thread: {
+        postTitle: parent.title,
+        postExcerpt: parent.excerpt.slice(0, parentExcerptLength),
+        ...(above ? { parentReplyExcerpt: above.excerpt.slice(0, parentExcerptLength) } : {}),
+      },
+    });
+  }
+
+  return out;
 }

@@ -93,7 +93,15 @@ export {
   setBudget,
   spendByMonitor,
 } from "./budget/index.js";
-export { aiEnvSchema, type Env, envSchema, loadAiEnv, loadEnv } from "./config/env.js";
+export {
+  aiEnvSchema,
+  type Env,
+  envSchema,
+  loadAiEnv,
+  loadEnv,
+  loadNotificationEnv,
+  type NotificationEnv,
+} from "./config/env.js";
 export { createDatabase, type Database } from "./db/client.js";
 export { migrationsFolder, runMigrations } from "./db/migrate.js";
 export {
@@ -243,6 +251,16 @@ export {
   type UpdateMonitorInput,
   updateMonitor,
 } from "./monitors/index.js";
+export { type NotificationTransport, processNotifications } from "./notifications/deliver.js";
+export {
+  type NotificationInput,
+  notificationDefaults,
+  notificationInputSchema,
+  notificationIssues,
+  readNotificationSettings,
+  saveNotificationSettings,
+} from "./notifications/settings.js";
+export { createNotificationTransport, notificationReadiness } from "./notifications/transport.js";
 export {
   decryptSecret,
   type EncryptionKey,
@@ -350,6 +368,7 @@ export {
   jobSenderFor,
   startJobSender,
 } from "./worker/jobs.js";
+export { createNotifyStep, enqueueNotifications } from "./worker/notify.js";
 export {
   allQueues,
   type ClassifyPayload,
@@ -391,6 +410,5 @@ export {
   type Step,
   type StepContext,
   unconfiguredClassify,
-  unimplementedNotify,
   type WorkerSteps,
 } from "./worker/steps.js";

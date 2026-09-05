@@ -70,6 +70,18 @@ describe("the monitor list", () => {
     vi.unstubAllGlobals();
   });
 
+  it("shows a disabled webhook and links to its settings", async () => {
+    await show([
+      monitor({ notificationIssues: ["Webhook disabled after repeated delivery failures."] }),
+    ]);
+    expect(container.querySelector('[role="alert"]')?.textContent).toContain("Webhook disabled");
+    expect(
+      container.querySelector(
+        'a[href="#/monitors/11111111-1111-4111-8111-111111111111/notifications"]',
+      ),
+    ).not.toBeNull();
+  });
+
   it("shows what a monitor spent this month, and calls it an estimate", async () => {
     await show([
       monitor({

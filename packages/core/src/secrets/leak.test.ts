@@ -40,6 +40,20 @@ function captureLines(): { logger: ReturnType<typeof createLogger>; text: () => 
 }
 
 describe("a credential never reaches a log line", () => {
+  it("redacts notification credentials at both supported nesting levels", () => {
+    const { logger, text } = captureLines();
+    logger.info(
+      {
+        SMTP_PASSWORD: secret,
+        WEBHOOK_SIGNING_SECRET: secret,
+        environment: { SMTP_PASSWORD: secret, WEBHOOK_SIGNING_SECRET: secret },
+      },
+      "notifications configured",
+    );
+    expect(text()).not.toContain(secret);
+    expect(text()).toContain("notifications configured");
+  });
+
   it("redacts a credential logged on its own", () => {
     const { logger, text } = captureLines();
 

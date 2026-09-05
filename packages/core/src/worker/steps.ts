@@ -7,10 +7,6 @@
  * what lets a test drive one step and assert that the step before it did not
  * run.
  *
- * One of the four is still a placeholder. It is wired, logged and chained, and
- * it does no work, because the work belongs to a ticket that has not been
- * done. A placeholder that passes its payload on is honest; one that quietly
- * dropped it would make the empty inbox look like a quiet day.
  */
 import type { PgBoss } from "pg-boss";
 import type { Database } from "../db/client.js";
@@ -73,15 +69,4 @@ export const unconfiguredClassify: Step<ClassifyPayload> = async (
     "classification skipped: no model is configured. Set AI_API_KEY, or AI_PROVIDER=ollama.",
   );
   await boss.send(notifyQueue, { monitorId, matchIds: [] });
-};
-
-/** US-016 replaces this with email and the webhook. */
-export const unimplementedNotify: Step<NotifyPayload> = async (
-  { monitorId, matchIds },
-  { logger },
-) => {
-  logger.info(
-    { monitorId, matches: matchIds.length },
-    "notification is not implemented yet (US-016)",
-  );
 };

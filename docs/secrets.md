@@ -199,3 +199,11 @@ Set the credentials again from the provider's dashboard, or move them back to
 - **A key in a container's environment.** `docker inspect` shows it, and so
   does `/proc`. Moving a credential into the database narrows who can read it
   to somebody with the database *and* the key; it does not narrow it to nobody.
+
+## Notification credentials
+
+`SMTP_PASSWORD` and `WEBHOOK_SIGNING_SECRET` stay in the environment, like model
+keys. The API returns readiness and missing variable names, never their values.
+The logger redacts both names. Provider error bodies are not retained because
+they may echo authentication values or message content. See
+[notifications.md](notifications.md) for configuration and signing-key rotation.

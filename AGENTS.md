@@ -36,8 +36,10 @@ history against the version of the monitor it judged, and a dismissed match
 leaves the inbox without leaving the database. US-022 then ran the whole path against real
 providers, and fixed the bug it found: a `PATCH` that carried one setting
 erased every field it did not carry, because the body schema filled the absent
-keys with its own defaults. One step is still a placeholder: US-016 owns the
-notification. US-004 added the encrypted credential store, so
+keys with its own defaults. US-016 added SMTP digests, optional immediate email alerts and signed
+webhooks. Delivery state survives restarts in Postgres. Nodemailer has sent
+through a local TLS SMTP receiver; Resend inbox delivery and a third-party
+webhook receiver remain unproven. Read docs/notifications.md for setup. US-004 added the encrypted credential store, so
 a key can live in the database rather than in `.env`, and US-023 added the
 screen that writes one: a key is tested with the provider before it is stored,
 and a key the provider refuses is never stored. That closed US-010's last box. `apps/web` has four

@@ -33,6 +33,7 @@
     "@ai-sdk/openai-compatible": "3.0.43",
     "ai": "7.0.92",
     "drizzle-orm": "0.45.2",
+    "nodemailer": "^10.0.0",
     "pg": "8.23.0",
     "pg-boss": "12.30.0",
     "pino": "10.1.0",
@@ -40,6 +41,7 @@
   },
   "devDependencies": {
     "@types/node": "26.4.1",
+    "@types/nodemailer": "^8.0.1",
     "@types/pg": "8.23.1",
     "drizzle-kit": "0.31.10",
     "tsx": "4.23.13",

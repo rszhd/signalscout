@@ -39,6 +39,7 @@ import {
   minimumPollIntervalSeconds,
   monitorQueries,
   noFilterDrops,
+  notificationIssues,
   noVerdicts,
   type ProviderChoices,
   pauseMonitor,
@@ -206,6 +207,7 @@ const spendSchema = z.object({
 });
 
 const monitorSchema = z.object({
+  notificationIssues: z.array(z.string()),
   id: z.string(),
   name: z.string(),
   product: z.string(),
@@ -315,6 +317,7 @@ function toResponse(
   dropped: FilterDropCounts,
   verdicts: VerdictCounts,
   collected: readonly LastCollection[],
+  notificationProblems: readonly string[],
 ) {
   return {
     id: monitor.id,
@@ -357,6 +360,7 @@ function toResponse(
       dropped,
     },
     feedback: verdicts,
+    notificationIssues: [...notificationProblems],
   };
 }
 
@@ -367,11 +371,12 @@ function toResponse(
  * paths end in `toResponse`, so neither can grow a field the other lacks.
  */
 async function readResponse(db: Database, monitor: Monitor, runtime: MonitorEnvironment) {
-  const [state, drops, verdicts, collected] = await Promise.all([
+  const [state, drops, verdicts, collected, notifications] = await Promise.all([
     checkBudget(db, monitor.id),
     filterDropCounts(db, [monitor.id]),
     verdictCounts(db, [monitor.id]),
     lastCollections(db),
+    notificationIssues(db),
   ]);
 
   return toResponse(
@@ -381,6 +386,7 @@ async function readResponse(db: Database, monitor: Monitor, runtime: MonitorEnvi
     drops.get(monitor.id) ?? noFilterDrops,
     verdicts.get(monitor.id) ?? noVerdicts,
     collected.get(monitor.id) ?? [],
+    notifications.get(monitor.id) ?? [],
   );
 }
 
@@ -559,11 +565,12 @@ export async function registerMonitorRoutes(
       // screen that shows this is a list, and a per-row query here would be
       // the list's cost growing with the number of monitors.
       const rows = await listMonitors(db);
-      const [states, drops, verdicts, collected] = await Promise.all([
+      const [states, drops, verdicts, collected, notifications] = await Promise.all([
         budgetStates(db),
         filterDropCounts(db),
         verdictCounts(db),
         lastCollections(db),
+        notificationIssues(db),
       ]);
 
       return Promise.all(
@@ -580,6 +587,7 @@ export async function registerMonitorRoutes(
             drops.get(monitor.id) ?? noFilterDrops,
             verdicts.get(monitor.id) ?? noVerdicts,
             collected.get(monitor.id) ?? [],
+            notifications.get(monitor.id) ?? [],
           ),
         ),
       );

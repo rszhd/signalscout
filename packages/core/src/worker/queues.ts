@@ -159,6 +159,6 @@ export function queueDefinitions(retry: RetryPolicy = retryPolicy): readonly Que
     { name: estimateQueue, policy: pollQueuePolicy, deadLetter: deadLetterQueue, ...retry },
     { name: filterQueue, deadLetter: deadLetterQueue, ...retry },
     { name: classifyQueue, deadLetter: deadLetterQueue, ...retry },
-    { name: notifyQueue, deadLetter: deadLetterQueue, ...retry },
+    { name: notifyQueue, policy: "stately", deadLetter: deadLetterQueue, ...retry },
   ];
 }

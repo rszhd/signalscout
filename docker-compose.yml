@@ -16,6 +16,13 @@ x-app-environment: &app-environment
   DATABASE_URL: postgres://${POSTGRES_USER:-intentwatch}:${POSTGRES_PASSWORD:-intentwatch}@postgres:5432/${POSTGRES_DB:-intentwatch}
   # Empty until a credential is stored in the database. docs/secrets.md.
   ENCRYPTION_KEY: ${ENCRYPTION_KEY:-}
+  SMTP_HOST: ${SMTP_HOST:-}
+  SMTP_PORT: ${SMTP_PORT:-587}
+  SMTP_SECURE: ${SMTP_SECURE:-false}
+  SMTP_USER: ${SMTP_USER:-}
+  SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+  SMTP_FROM: ${SMTP_FROM:-}
+  WEBHOOK_SIGNING_SECRET: ${WEBHOOK_SIGNING_SECRET:-}
 
 services:
   postgres:

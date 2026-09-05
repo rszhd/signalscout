@@ -29,6 +29,9 @@ export default defineConfig({
      * a test run. Both blank, and the pre-filter runs its free stage.
      */
     env: {
+      SMTP_HOST: "",
+      SMTP_PASSWORD: "",
+      WEBHOOK_SIGNING_SECRET: "",
       AI_API_KEY: "",
       AI_PROVIDER: "anthropic",
       AI_EMBEDDING_API_KEY: "",

@@ -79,6 +79,24 @@ const aiFields = {
 
 export const aiEnvSchema = z.object(aiFields);
 
+const notificationFields = {
+  SMTP_HOST: blankIsUnset(z.string().min(1).optional()),
+  SMTP_PORT: blankIsUnset(z.coerce.number().int().min(1).max(65535).default(587)),
+  SMTP_SECURE: blankIsUnset(booleanFromEnv.default(false)),
+  SMTP_USER: blankIsUnset(z.string().min(1).optional()),
+  SMTP_PASSWORD: blankIsUnset(z.string().min(1).optional()),
+  SMTP_FROM: blankIsUnset(z.email().optional()),
+  WEBHOOK_SIGNING_SECRET: blankIsUnset(z.string().min(32).optional()),
+};
+
+export const notificationEnvSchema = z.object(notificationFields);
+export type NotificationEnv = z.infer<typeof notificationEnvSchema>;
+export function loadNotificationEnv(
+  source: Record<string, string | undefined> = process.env,
+): NotificationEnv {
+  return notificationEnvSchema.parse(source);
+}
+
 export const envSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   LOG_LEVEL: z.enum(["fatal", "error", "warn", "info", "debug", "trace", "silent"]).default("info"),
@@ -124,6 +142,7 @@ export const envSchema = z.object({
   WEB_DIST_PATH: z.string().optional(),
 
   ...aiFields,
+  ...notificationFields,
 });
 
 export type Env = z.infer<typeof envSchema>;

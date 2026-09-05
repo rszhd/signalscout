@@ -292,3 +292,6 @@ tier.
 
 The argument is written out in
 [US-019](backlog/todo/US-019-the-project-has-a-license.md).
+
+Notification setup, including Resend SMTP and signed webhooks, is in
+[docs/notifications.md](docs/notifications.md).

@@ -57,6 +57,7 @@ interface LastCollection {
 }
 
 interface Monitor {
+  notificationIssues?: string[];
   id: string;
   name: string;
   sources: string[];
@@ -529,12 +530,22 @@ export function Monitors() {
                 </div>
               </dl>
 
+              {monitor.notificationIssues?.map((issue) => (
+                <p key={issue} className="monitor-stopped" role="alert">
+                  {issue}{" "}
+                  <a href={`#/monitors/${monitor.id}/notifications`}>Notification settings</a>
+                </p>
+              ))}
+
               <p className="monitor-feedback">{feedbackLabel(monitor.feedback)}</p>
 
               <div className="monitor-controls">
                 <BudgetForm monitor={monitor} onSaved={load} />
                 <PreFilterForm monitor={monitor} onSaved={load} />
                 <div className="monitor-card-actions">
+                  <a className="text-link" href={`#/monitors/${monitor.id}/notifications`}>
+                    Notifications
+                  </a>
                   <a className="text-link" href="#/">
                     View inbox
                   </a>

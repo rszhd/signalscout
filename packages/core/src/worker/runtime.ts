@@ -21,9 +21,11 @@ import {
   needsApiKey,
 } from "../ai/config.js";
 import { createEmbedder, type Embedder } from "../ai/embed.js";
-import { loadAiEnv } from "../config/env.js";
+import { loadAiEnv, loadNotificationEnv } from "../config/env.js";
 import { createDatabase, type Database } from "../db/client.js";
 import type { Logger } from "../logger.js";
+import type { NotificationTransport } from "../notifications/deliver.js";
+import { createNotificationTransport } from "../notifications/transport.js";
 import { assertStoredCredentialsAreReadable } from "../secrets/store.js";
 import { builtInSources } from "../sources/index.js";
 import { createSourceRegistry, type SourceRegistry } from "../sources/registry.js";
@@ -34,6 +36,7 @@ import { createCollectStep } from "./collect.js";
 import { type CredentialLookup, credentialsFromStore } from "./credentials.js";
 import { createEstimateStep } from "./estimate.js";
 import { createFilterStep } from "./filter.js";
+import { createNotifyStep, enqueueNotifications } from "./notify.js";
 import {
   type ClassifyPayload,
   classifyQueue,
@@ -53,13 +56,7 @@ import {
   scheduleTickQueue,
 } from "./queues.js";
 import { enqueueDuePolls } from "./schedule.js";
-import {
-  type Step,
-  type StepContext,
-  unconfiguredClassify,
-  unimplementedNotify,
-  type WorkerSteps,
-} from "./steps.js";
+import { type Step, type StepContext, unconfiguredClassify, type WorkerSteps } from "./steps.js";
 
 export type HeartbeatPayload = Record<string, never>;
 
@@ -99,6 +96,7 @@ export interface StartWorkerOptions {
   retry?: RetryPolicy;
   /** False leaves the clock off, for a test that ticks the scheduler by hand. */
   scheduleTicks?: boolean;
+  notificationTransport?: NotificationTransport;
 }
 
 /**
@@ -216,6 +214,7 @@ export async function startWorker({
   embeddingConfig,
   retry = defaultRetryPolicy,
   scheduleTicks = true,
+  notificationTransport,
 }: StartWorkerOptions): Promise<WorkerHandle> {
   const { db, close } = createDatabase(databaseUrl);
 
@@ -284,7 +283,9 @@ export async function startWorker({
     filter: steps.filter ?? createFilterStep({ embedder: embedding }),
     classify:
       steps.classify ?? (model ? createClassifyStep({ classifier: model }) : unconfiguredClassify),
-    notify: steps.notify ?? unimplementedNotify,
+    notify:
+      steps.notify ??
+      createNotifyStep(notificationTransport ?? createNotificationTransport(loadNotificationEnv())),
   };
 
   const work = async <Payload>(
@@ -316,6 +317,7 @@ export async function startWorker({
 
   await boss.work(scheduleTickQueue, async () => {
     await enqueueDuePolls(db, boss, logger);
+    await enqueueNotifications(db, boss);
   });
 
   if (scheduleTicks) {

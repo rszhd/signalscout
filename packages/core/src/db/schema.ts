@@ -1035,3 +1035,75 @@ export const sourceProviders = pgTable(
     check("source_providers_provider_known", oneOf("provider", providers)),
   ],
 );
+
+/** US-016. Settings begin with new matches; edits cancel pending deliveries. */
+export const notificationSettings = pgTable(
+  "notification_settings",
+  {
+    monitorId: uuid("monitor_id")
+      .primaryKey()
+      .references(() => monitors.id, { onDelete: "cascade" }),
+    revision: integer("revision").notNull().default(1),
+    emailEnabled: boolean("email_enabled").notNull().default(false),
+    emailTo: text("email_to").notNull().default(""),
+    digestHours: integer("digest_hours").notNull().default(24),
+    minScore: integer("min_score").notNull().default(50),
+    immediateScore: integer("immediate_score"),
+    webhookEnabled: boolean("webhook_enabled").notNull().default(false),
+    webhookUrl: text("webhook_url").notNull().default(""),
+    webhookMode: text("webhook_mode").$type<"match" | "digest">().notNull().default("digest"),
+    webhookFailures: integer("webhook_failures").notNull().default(0),
+    webhookError: text("webhook_error"),
+    emailError: text("email_error"),
+    enabledSince: timestamp("enabled_since", { withTimezone: true }).notNull().defaultNow(),
+    nextDigestAt: timestamp("next_digest_at", { withTimezone: true }).notNull(),
+  },
+  (table) => [
+    check("notification_digest_hours_range", sql`${table.digestHours} BETWEEN 1 AND 168`),
+    check("notification_min_score_range", sql`${table.minScore} BETWEEN 0 AND 100`),
+    check("notification_immediate_score_range", sql`${table.immediateScore} BETWEEN 0 AND 100`),
+    check("notification_webhook_mode_known", sql`${table.webhookMode} IN ('match', 'digest')`),
+  ],
+);
+
+/** A durable outbox. Content is read at delivery time, never copied here. */
+export const notificationDeliveries = pgTable(
+  "notification_deliveries",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    monitorId: uuid("monitor_id")
+      .notNull()
+      .references(() => monitors.id, { onDelete: "cascade" }),
+    revision: integer("revision").notNull(),
+    channel: text("channel").$type<"email" | "webhook">().notNull(),
+    kind: text("kind").$type<"match" | "digest">().notNull(),
+    status: text("status")
+      .$type<"pending" | "sent" | "failed" | "skipped">()
+      .notNull()
+      .default("pending"),
+    attempts: integer("attempts").notNull().default(0),
+    nextAttemptAt: timestamp("next_attempt_at", { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    sentAt: timestamp("sent_at", { withTimezone: true }),
+  },
+  (table) => [
+    index("notification_deliveries_due_idx")
+      .on(table.monitorId, table.nextAttemptAt)
+      .where(sql`status = 'pending'`),
+  ],
+);
+
+export const notificationItems = pgTable(
+  "notification_items",
+  {
+    deliveryId: uuid("delivery_id")
+      .notNull()
+      .references(() => notificationDeliveries.id, { onDelete: "cascade" }),
+    matchId: uuid("match_id")
+      .notNull()
+      .references(() => matches.id, { onDelete: "cascade" }),
+    channel: text("channel").$type<"email" | "webhook">().notNull(),
+    kind: text("kind").$type<"match" | "digest">().notNull(),
+  },
+  (table) => [primaryKey({ columns: [table.matchId, table.channel, table.kind] })],
+);

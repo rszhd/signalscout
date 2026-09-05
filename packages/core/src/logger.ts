@@ -19,6 +19,10 @@ export type Logger = ReturnType<typeof pino>;
  * that drifts from the field names the code uses.
  */
 export const redactedFields = [
+  "SMTP_PASSWORD",
+  "WEBHOOK_SIGNING_SECRET",
+  "*.SMTP_PASSWORD",
+  "*.WEBHOOK_SIGNING_SECRET",
   "apiKey",
   "apiSecret",
   "credentials",

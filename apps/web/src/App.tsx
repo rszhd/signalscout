@@ -3,6 +3,7 @@ import { Connections } from "./Connections.js";
 import { Inbox } from "./Inbox.js";
 import { MonitorForm } from "./MonitorForm.js";
 import { Monitors } from "./Monitors.js";
+import { Notifications } from "./Notifications.js";
 
 /**
  * The shell: the header, and which of the four screens is on it.
@@ -38,6 +39,7 @@ export function App() {
   // The longer route is tested first: "#/monitors" is a prefix of
   // "#/monitors/new", and testing the shorter one first would put the list on
   // the screen for both.
+  const notificationId = /^#\/monitors\/([0-9a-f-]+)\/notifications$/.exec(route)?.[1];
   const creating = route.startsWith(newMonitorRoute);
   const listing = !creating && route.startsWith(monitorsRoute);
   const connecting = route.startsWith(connectionsRoute);
@@ -102,7 +104,9 @@ export function App() {
       </aside>
 
       <main className="app-main">
-        {creating ? (
+        {notificationId ? (
+          <Notifications key={notificationId} monitorId={notificationId} />
+        ) : creating ? (
           <>
             <div className="dialog-underlay" aria-hidden="true" inert>
               <Monitors />

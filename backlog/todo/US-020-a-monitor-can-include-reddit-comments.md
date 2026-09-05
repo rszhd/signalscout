@@ -3,7 +3,7 @@ id: US-020
 title: A monitor can include Reddit comments
 type: feature
 priority: p2
-created: 2026-09-05
+created: 2026-09-05T01:18+08:00
 parent: US-005
 area:
 resolution:
@@ -74,5 +74,5 @@ the interface to fit Bright Data.
 
 ## Log
 
-- 2026-09-05 — Split from US-005. The interface change is the reason: three
+- 2026-09-05T01:18+08:00 — Split from US-005. The interface change is the reason: three
   fields are missing and the decision belonged in its own ticket.

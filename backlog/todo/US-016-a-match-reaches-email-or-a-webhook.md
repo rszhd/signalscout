@@ -3,7 +3,7 @@ id: US-016
 title: A match reaches email or a webhook
 type: feature
 priority: p2
-created: 2026-09-04
+created: 2026-09-04T22:49+08:00
 parent:
 area:
 resolution:
@@ -55,4 +55,4 @@ job instead of our ticket.
 
 ## Log
 
-- 2026-09-04 — Written from PLAN.md.
+- 2026-09-04T22:49+08:00 — Written from PLAN.md.

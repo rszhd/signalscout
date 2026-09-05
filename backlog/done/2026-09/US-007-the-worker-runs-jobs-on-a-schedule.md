@@ -3,7 +3,7 @@ id: US-007
 title: The worker runs jobs on a schedule
 type: feature
 priority: p1
-created: 2026-09-04
+created: 2026-09-04T22:49+08:00
 parent:
 area:
 resolution: shipped
@@ -68,8 +68,8 @@ singleton key, not a lock the code writes itself.
 
 ## Log
 
-- 2026-09-04 — Written from PLAN.md and STACK.md.
-- 2026-09-05 — Built. Notes on the decisions the code cannot hold:
+- 2026-09-04T22:49+08:00 — Written from PLAN.md and STACK.md.
+- 2026-09-05T01:41+08:00 — Built. Notes on the decisions the code cannot hold:
 
   **The poll queue's policy is `stately`, keyed on the monitor id.** It allows
   one job per state per key: one queued, one retrying, one active. *One active*
@@ -118,7 +118,7 @@ singleton key, not a lock the code writes itself.
   real snapshot expiry and a real rate limit are all still unproven. The
   scheduler now calls the connector, so the next run against a live key is what
   finds out.
-- 2026-09-05 — The first live poll reached Bright Data and exposed
+- 2026-09-05T03:27+08:00 — The first live poll reached Bright Data and exposed
   [BUG-001](BUG-001-a-pending-reddit-collection-is-not-resumed.md).
   Bright Data accepted the collection trigger, and the poll job completed with
   a wait cursor, zero posts and zero units. The collector did not persist or
@@ -126,12 +126,12 @@ singleton key, not a lock the code writes itself.
   active with six queries and five subreddits, and `last_polled_at` advanced,
   but the database held zero posts, zero matches and no classification call.
   The trigger is now proven against the provider. Snapshot retrieval is not.
-- 2026-09-05 — [BUG-001](BUG-001-a-pending-reddit-collection-is-not-resumed.md)
+- 2026-09-05T03:46+08:00 — [BUG-001](BUG-001-a-pending-reddit-collection-is-not-resumed.md)
   is fixed in code. The poll step now reads and writes `source_continuations`,
   so a wait keeps its cursor and the next poll resumes the collection instead
   of starting a second one. This ticket still waits on the same live run as
   BUG-001's last box: one poll that collects and reads a real snapshot.
-- 2026-09-05 — That run happened, and this ticket closes with it. The scheduler
+- 2026-09-05T06:55+08:00 — That run happened, and this ticket closes with it. The scheduler
   ticked, the poll triggered a collection, fifteen poll jobs carried it to a
   finished snapshot, and forty-nine real posts reached the pre-filter and the
   classify step. The chain in the Context — poll, pre-filter, classify, notify

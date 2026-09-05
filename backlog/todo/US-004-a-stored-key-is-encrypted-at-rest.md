@@ -3,7 +3,7 @@ id: US-004
 title: A stored key is encrypted at rest
 type: feature
 priority: p2
-created: 2026-09-04
+created: 2026-09-04T22:49+08:00
 parent:
 area:
 resolution:
@@ -57,6 +57,6 @@ that reaches a log line.
 
 ## Log
 
-- 2026-09-04 — Written from STACK.md. Deliberately kept out of the first
+- 2026-09-04T22:49+08:00 — Written from STACK.md. Deliberately kept out of the first
   release: env vars need no encryption, and pretending otherwise adds a key to
   manage for no gain.

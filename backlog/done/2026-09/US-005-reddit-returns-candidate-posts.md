@@ -3,7 +3,7 @@ id: US-005
 title: Reddit returns candidate posts
 type: feature
 priority: p1
-created: 2026-09-04
+created: 2026-09-04T22:49+08:00
 parent:
 area:
 resolution: shipped
@@ -100,58 +100,58 @@ a permanent full copy.
 
 ## Log
 
-- 2026-09-04 — Written from PLAN.md and STACK.md.
-- 2026-09-04 — Fixture requirement tightened from "recorded" to "captured
+- 2026-09-04T22:49+08:00 — Written from PLAN.md and STACK.md.
+- 2026-09-04T22:54+08:00 — Fixture requirement tightened from "recorded" to "captured
   by a committed script", after adopting docs/testing.md.
-- 2026-09-05 — Started against Reddit's own OAuth API. Wrote the capture script
+- 2026-09-05T00:46+08:00 — Started against Reddit's own OAuth API. Wrote the capture script
   first, so the parser would be written against real payloads.
-- 2026-09-05 — Blocked, then rewritten. Reddit refused to register a new app
+- 2026-09-05T00:46+08:00 — Blocked, then rewritten. Reddit refused to register a new app
   and pointed at the Responsible Builder Policy. The blocker is external and
   has no engineering answer: an approval we might not get, for a product whose
   users would each need their own. The Reddit OAuth capture script was deleted
   rather than kept, because a committed instrument for an API we do not call
   reads as a plan rather than as a dead end.
-- 2026-09-05 — Provider decision taken: Bright Data for Reddit, official API for
+- 2026-09-05T00:46+08:00 — Provider decision taken: Bright Data for Reddit, official API for
   X. Both load-bearing claims were checked before the rewrite. Bright Data does
   support discovery by keyword and by subreddit, and its free tier is 5,000
   records a month with no card. X's self-serve path is pay-per-use only since
   February 2026, with no free tier. Reddit therefore stays the free path and
   costs about a third of an X read.
-- 2026-09-05 — Two consequences the provider decision carries, recorded here so
+- 2026-09-05T00:46+08:00 — Two consequences the provider decision carries, recorded here so
   they are not rediscovered: comments cost a second call per post, and a large
   request is asynchronous. Neither needs a change to `SocialSource`.
-- 2026-09-05 — Fixtures captured from a live account. The first run proved why
+- 2026-09-05T01:18+08:00 — Fixtures captured from a live account. The first run proved why
   the rule exists: Bright Data's own documentation was wrong three times over.
   `date` is a named range ("Past month"), not the calendar date the docs show,
   and a calendar date is refused. Progress reports `running`, not the
   documented `collecting` and `digesting`. Snapshot ids are `sd_`, not `s_`.
   A parser written from the documentation would have been wrong in all three
   places and green in every test.
-- 2026-09-05 — Credentials are checked by triggering an empty input list. An
+- 2026-09-05T01:18+08:00 — Credentials are checked by triggering an empty input list. An
   empty list cannot start a collection, so the check is free however valid the
   key is. A bad key answers 401 before the input is read; a good one gets as
   far as "No data to trigger". Both answers are captured, so the branch is not
   a guess about which failure means which.
-- 2026-09-05 — Comments split out to US-020. They cannot be added without
+- 2026-09-05T01:18+08:00 — Comments split out to US-020. They cannot be added without
   changing the `SocialSource` interface US-003 settled: `SourceQuery` has no
   opt-in and no place for post URLs, and `unitsConsumed` is one number, so a
   second charge cannot be reported apart from the first. That is three missing
   fields, and the decision deserved its own ticket rather than being taken in
   passing. The comment fixtures are already captured and committed, so US-020
   starts with its evidence in hand.
-- 2026-09-05 — A gap found while checking the acceptance list rather than by a
+- 2026-09-05T01:18+08:00 — A gap found while checking the acceptance list rather than by a
   test: with both queries and subreddits set, the first version collected the
   keywords for ever and never asked for the subreddits. The cursor now names
   the phase, and the connector hands over to the subreddits when the keywords
   are exhausted. A caller that reads `next` cannot tell, which is the point.
-- 2026-09-05 — Every load-bearing line was broken on purpose and the suite went
+- 2026-09-05T01:18+08:00 — Every load-bearing line was broken on purpose and the suite went
   red for all ten: double billing, billing the page length, dropping the
   `since` filter, ignoring the cursor offset, reading a not-yet-servable
   snapshot as records, rounding the date window inwards, failing to recognise a
   rejected key, never handing over to the subreddit phase, accepting a cursor
   we never issued, and starting a phase without reporting it. Two of the ten
   survived at first; the tests were widened until they did not.
-- 2026-09-05 — **Unproven until it runs somewhere real.** `capture.mjs` drove
+- 2026-09-05T01:18+08:00 — **Unproven until it runs somewhere real.** `capture.mjs` drove
   the live trigger, progress and download endpoints, so the payload shapes are
   evidence. The connector's own code has only ever replayed them. Its handling
   of a failed collection, of a snapshot that expires, and of any rate limit has

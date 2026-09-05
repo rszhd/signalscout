@@ -3,7 +3,7 @@ id: US-014
 title: A query's cost is known before it runs
 type: feature
 priority: p1
-created: 2026-09-04
+created: 2026-09-04T22:49+08:00
 parent:
 area:
 resolution:
@@ -56,8 +56,8 @@ cost nothing. The screen should not invent a cost that does not exist.
 
 ## Log
 
-- 2026-09-04 — Written from STACK.md.
-- 2026-09-05 — Raised from p2 to p1, with US-013 and for the same reason: X
+- 2026-09-04T22:49+08:00 — Written from STACK.md.
+- 2026-09-05T00:46+08:00 — Raised from p2 to p1, with US-013 and for the same reason: X
   bills every read and has no free allowance. A user cannot consent to a cost
   they are shown only after it is spent. Reddit through Bright Data adds a
   second reason — asking for comments doubles a monitor's cost, so the estimate

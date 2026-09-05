@@ -251,6 +251,10 @@ diff already shows them.
 **A ticket body has four headings and no others:** Context, Acceptance, Notes,
 Log.
 
+**A ticket date carries a time.** `created` and every Log entry use
+`2026-09-05T07:31+08:00` — ISO 8601, to the minute, with the offset. Several
+entries land on one day, and only the time says which came first.
+
 ---
 
 ## What to do when you are unsure

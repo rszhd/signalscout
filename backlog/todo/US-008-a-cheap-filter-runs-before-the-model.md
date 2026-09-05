@@ -3,7 +3,7 @@ id: US-008
 title: A cheap filter runs before the model
 type: feature
 priority: p2
-created: 2026-09-04
+created: 2026-09-04T22:49+08:00
 parent:
 area:
 resolution:
@@ -60,4 +60,4 @@ what saves the source bill, and that is [US-014](US-014-a-querys-cost-is-known-b
 
 ## Log
 
-- 2026-09-04 — Written from PLAN.md and STACK.md.
+- 2026-09-04T22:49+08:00 — Written from PLAN.md and STACK.md.

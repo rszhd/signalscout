@@ -3,7 +3,7 @@ id: US-002
 title: The schema holds monitors, posts, matches and feedback
 type: feature
 priority: p1
-created: 2026-09-04
+created: 2026-09-04T22:49+08:00
 parent:
 area:
 resolution: shipped
@@ -65,8 +65,8 @@ anything.
 
 ## Log
 
-- 2026-09-04 — Written from PLAN.md and STACK.md.
-- 2026-09-04 — Built as migration 0001. The decisions the diff cannot say
+- 2026-09-04T22:49+08:00 — Written from PLAN.md and STACK.md.
+- 2026-09-04T23:44+08:00 — Built as migration 0001. The decisions the diff cannot say
   follow.
 - `last_verified_at` is `NOT NULL` and defaults to now. The Context said
   adding the column later forces someone to decide what a null means. So no

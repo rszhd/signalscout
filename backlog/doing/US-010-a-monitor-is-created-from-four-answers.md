@@ -3,7 +3,7 @@ id: US-010
 title: A monitor is created from four answers
 type: feature
 priority: p1
-created: 2026-09-04
+created: 2026-09-04T22:49+08:00
 parent:
 area:
 resolution:
@@ -88,8 +88,8 @@ numbers here before treating those scores as current.
 
 ## Log
 
-- 2026-09-04 — Written from PLAN.md.
-- 2026-09-05 — Built the server half: `monitors/signals.ts` as the one place
+- 2026-09-04T22:49+08:00 — Written from PLAN.md.
+- 2026-09-05T02:49+08:00 — Built the server half: `monitors/signals.ts` as the one place
   both prompts read, `ai/queries.ts` for the generated queries and subreddits,
   `monitors/monitors.ts` for the writes, and the routes in `apps/api`.
   Migration 0004 adds `monitors.paused_at` and `model_calls.purpose`.
@@ -105,7 +105,7 @@ numbers here before treating those scores as current.
 
   The form itself is the next pass, with the jsdom test harness docs/testing.md
   assumes. Two boxes stay open, and the Notes above say what each one needs.
-- 2026-09-05 — Built the React form and its jsdom harness. The form reads the
+- 2026-09-05T03:27+08:00 — Built the React form and its jsdom harness. The form reads the
   signal labels and source readiness from the API, sends the four answers to
   query generation, and shows every generated query and subreddit as an
   editable, removable field before creation. A deployment with no model offers

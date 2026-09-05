@@ -3,7 +3,7 @@ id: US-003
 title: A source implements one interface
 type: feature
 priority: p1
-created: 2026-09-04
+created: 2026-09-04T22:49+08:00
 parent:
 area:
 resolution: shipped
@@ -69,9 +69,9 @@ ticket tests the pipeline without spending money.
 
 ## Log
 
-- 2026-09-04 — Written from PLAN.md. The three additions to PLAN.md's sketch
+- 2026-09-04T22:49+08:00 — Written from PLAN.md. The three additions to PLAN.md's sketch
   are proposals; the work settles them.
-- 2026-09-04 — Shipped. All three proposals are in. `search` returns
+- 2026-09-05T00:00+08:00 — Shipped. All three proposals are in. `search` returns
   `unitsConsumed` in the source's own `billableUnit`, because Reddit bills one
   call for up to 100 posts and X bills every post read, so the same page costs
   differently and the caller cannot compute it. `pricePerUnitMicros` sits on
@@ -79,7 +79,7 @@ ticket tests the pipeline without spending money.
   Back-off is the connector's: `SourceRuntime` gives it `now` and `sleep`, and
   `NextPage` lets it hand the remainder up as `{ status: "wait", retryAfter }`
   without saying how it knew.
-- 2026-09-04 — Four further changes to PLAN.md's sketch, each one settled here
+- 2026-09-05T00:00+08:00 — Four further changes to PLAN.md's sketch, each one settled here
   rather than in the first connector.
   `validateCredentials` returns a reason instead of a boolean: this is a
   bring-your-own-keys product, and "your key is wrong" against "your key has
@@ -91,34 +91,34 @@ ticket tests the pipeline without spending money.
   without also reading whether it must wait first.
   `credentialFields` is declared by the connector, so the settings form stays
   generic and a new connector adds no UI case.
-- 2026-09-04 — The price is an integer count of micro-dollars, checked at
+- 2026-09-05T00:00+08:00 — The price is an integer count of micro-dollars, checked at
   registry construction. X's $0.005 is 5000. A connector that writes 0.005 has
   put dollars in a field that counts millionths, and every budget sum after it
   is wrong by a factor of a million. That mistake must not survive to the
   first invoice.
-- 2026-09-04 — Acceptance box six is met by the mechanism, not yet by a live
+- 2026-09-05T00:00+08:00 — Acceptance box six is met by the mechanism, not yet by a live
   caller. The registry runs every check at construction, which is process
   start, and `require()` exists for a boot-time list check. Nothing calls it
   yet because no connector and no collector exist. US-005 and US-007 wire it.
-- 2026-09-04 — Box seven has one honest caveat, and the document says it. A
+- 2026-09-05T00:00+08:00 — Box seven has one honest caveat, and the document says it. A
   connector needs one folder and one line in `builtInSources`, and no consumer
   needs a case for it. A connector whose posts are *stored* also needs a
   migration, because `posts.source` carries a check constraint.
   `assertSourcesCanBeStored` turns that into a failed boot rather than a
   failed insert inside a scheduled job at night.
-- 2026-09-04 — The fake's fixtures are PLAN.md's four worked examples, plus
+- 2026-09-05T00:00+08:00 — The fake's fixtures are PLAN.md's four worked examples, plus
   one post about sourdough that no monitor should ever match. Reusing them
   means the pipeline tests and the classifier's labelled set talk about the
   same posts from the start. They are written, not captured, and that is
   correct: they are `CandidatePost` values, our own shape. The capture rule
   applies one layer down, to the raw JSON the real connectors parse.
-- 2026-09-04 — Fifteen guards were checked by breaking each one and confirming
+- 2026-09-05T00:00+08:00 — Fifteen guards were checked by breaking each one and confirming
   a named test turned red. No mutation survived. The list covers the duplicate
   id, the id pattern, the price check, the unknown-id throw, `require`, the
   persistence check, the end-of-page signal, the page size, the cost
   arithmetic, the allowance, the back-off sleep, cursor validation, `since`,
   the credential check in `search`, and the abort signal.
-- 2026-09-04 — `unreachableFetch` is in `packages/core/src/testing`. Connector
+- 2026-09-05T00:00+08:00 — `unreachableFetch` is in `packages/core/src/testing`. Connector
   tests take it as their runtime's `fetch`, so "no network call" is an
   assertion and not a claim about the code we happened to write. The real
   connectors are unproven until they run against Reddit and X; nothing in this

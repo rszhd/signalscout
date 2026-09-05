@@ -3,7 +3,7 @@ id: US-019
 title: The project has a license
 type: chore
 priority: p2
-created: 2026-09-04
+created: 2026-09-04T23:00+08:00
 parent:
 area:
 resolution:
@@ -106,6 +106,6 @@ this ticket exists to make relicensing unnecessary.
 
 ## Log
 
-- 2026-09-04 — Written after the README shipped with the license deliberately
+- 2026-09-04T23:00+08:00 — Written after the README shipped with the license deliberately
   undecided. Left open rather than picked quietly, because the choice has money
   attached and belongs to the owner.

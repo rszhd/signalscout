@@ -3,7 +3,7 @@ id: US-006
 title: X returns candidate posts and says what it spent
 type: feature
 priority: p2
-created: 2026-09-04
+created: 2026-09-04T22:49+08:00
 parent:
 area:
 resolution:
@@ -67,11 +67,11 @@ spending cap means the first cursor bug is discovered on a user's invoice.
 
 ## Log
 
-- 2026-09-04 — Written after checking current X pricing: pay-per-use replaced
+- 2026-09-04T22:49+08:00 — Written after checking current X pricing: pay-per-use replaced
   the fixed tiers, and the $200 Basic tier was retired.
-- 2026-09-04 — Added the captured-fixture and injected-client requirements,
+- 2026-09-04T22:54+08:00 — Added the captured-fixture and injected-client requirements,
   after adopting docs/testing.md. The injected client is what makes "no test
   spends money" enforceable rather than a convention.
-- 2026-09-05 — Unchanged, but now sequenced behind US-013 and US-014, which were
+- 2026-09-05T00:46+08:00 — Unchanged, but now sequenced behind US-013 and US-014, which were
   raised to p1. X has no free allowance, so the cap and the estimate land before
   the first billed read, not after it.

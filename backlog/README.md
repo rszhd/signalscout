@@ -65,7 +65,7 @@ id: US-004
 title: Short sentence, present tense
 type: feature        # bug | feature | chore | spike
 priority: p1         # p0 urgent | p1 next | p2 later | p3 nice
-created: 2026-09-04
+created: 2026-09-04T22:49+08:00   # ISO 8601, to the minute, with the offset
 parent:              # id of the larger ticket, if this is a split part
 area:                # optional label; no generated view reads it yet
 resolution:          # shipped | dropped | duplicate — only in done/
@@ -73,6 +73,11 @@ resolution:          # shipped | dropped | duplicate — only in done/
 ```
 
 `index.sh` reads only this block. It must be correct on every ticket.
+
+`created` carries a time, not only a date. Two tickets written the same day
+are ordered by it, and a ticket's first Log entry can be checked against it.
+Write the local time to the minute and keep the offset, so the instant stays
+readable after a move.
 
 ## Body
 
@@ -82,7 +87,10 @@ Four headings, in this order. Write no other headings.
 - **Acceptance** — a list of checks. Each one is true or false, not a matter
   of opinion.
 - **Notes** — files, commands, links found while working.
-- **Log** — dated lines added as the work moves. Append only.
+- **Log** — timestamped lines added as the work moves. Append only. Each
+  entry starts with the same stamp `created` uses:
+  `- 2026-09-05T07:31+08:00 — Built the read side.` A day holds several
+  entries, and the times say which came first.
 
 A lesson that outlives the ticket goes to the document that owns the subject
 ([`PLAN.md`](../PLAN.md), [`STACK.md`](../STACK.md), a `docs/` page), never

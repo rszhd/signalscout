@@ -3,7 +3,7 @@ id: US-013
 title: A monitor cannot spend past its budget
 type: feature
 priority: p1
-created: 2026-09-04
+created: 2026-09-04T22:49+08:00
 parent:
 area:
 resolution:
@@ -80,12 +80,12 @@ we cannot win.
 
 ## Log
 
-- 2026-09-04 — Written from STACK.md.
-- 2026-09-05 — Raised from p2 to p1. X lost its free tier: since February 2026
+- 2026-09-04T22:49+08:00 — Written from STACK.md.
+- 2026-09-05T00:46+08:00 — Raised from p2 to p1. X lost its free tier: since February 2026
   pay-per-use is the only self-serve path, so the first X read a user makes is
   billed. A cap that lands after the connector is a cap that lands after the
   first surprise invoice. See STACK.md, *X*.
-- 2026-09-05 — Built. `api_usage` and `budgets` are migration 0007. The rule is
+- 2026-09-05T08:34+08:00 — Built. `api_usage` and `budgets` are migration 0007. The rule is
   `packages/core/src/budget/budget.ts`, written after its assertions because
   docs/testing.md names this one of the five correctness-critical surfaces. The
   guard runs at the top of `worker/collect.ts`, before any source is reached,
@@ -95,13 +95,13 @@ we cannot win.
   and one of the tests is that failure. `apps/web` gained a third screen, the
   monitor list, because two acceptance boxes ask for something to sit next to
   each monitor and nothing listed them.
-- 2026-09-05 — Six deliberate mutations of the guard and three of the poll step
+- 2026-09-05T08:34+08:00 — Six deliberate mutations of the guard and three of the poll step
   were each confirmed to turn the suite red, one at a time: the cap made
   exclusive, a negative remainder reported, a day's row replaced instead of
   added to, the month boundary dropped, the pause applied to a monitor that
   asked to be notified, and the pause never applied. Three more on the screen.
   379 tests pass.
-- 2026-09-05 — What is unproven. The guard has never refused a real poll, and
+- 2026-09-05T08:34+08:00 — What is unproven. The guard has never refused a real poll, and
   no usage row has been written from a live collection. The arithmetic is only
   as good as its two inputs — the units a connector reports and the price it
   declares — and neither has been checked against an invoice. docs/costs.md

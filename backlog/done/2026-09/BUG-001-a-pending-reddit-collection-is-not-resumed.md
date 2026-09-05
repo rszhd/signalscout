@@ -3,7 +3,7 @@ id: BUG-001
 title: A pending Reddit collection is not resumed
 type: bug
 priority: p0
-created: 2026-09-05
+created: 2026-09-05T03:27+08:00
 parent: US-007
 area: sources
 resolution: shipped
@@ -69,10 +69,10 @@ classification model calls. The only model call was query generation.
 
 ## Log
 
-- 2026-09-05 — Recorded from the first monitor created through the real UI and
+- 2026-09-05T03:27+08:00 — Recorded from the first monitor created through the real UI and
   run against a live Bright Data key. The monitor was active, the scheduler
   ticked and the poll job completed, but no continuation or post followed.
-- 2026-09-05 — Fixed, except the live run. Five boxes are true; the sixth needs
+- 2026-09-05T03:46+08:00 — Fixed, except the live run. Five boxes are true; the sixth needs
   a Bright Data key and is left open. Notes on the decisions the code cannot
   hold:
 
@@ -135,7 +135,7 @@ classification model calls. The only model call was query generation.
   connector with a `fetch` that cannot reach anything. A completed Bright Data
   snapshot, an expired one and a real rate limit have still never happened
   here. The next run against a live key is what finds out.
-- 2026-09-05 — It ran against a live key, and the whole cycle worked. A monitor
+- 2026-09-05T06:55+08:00 — It ran against a live key, and the whole cycle worked. A monitor
   with one keyword and no subreddits, polled by the worker on its own schedule:
 
   ```

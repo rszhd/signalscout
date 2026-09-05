@@ -3,7 +3,7 @@ id: US-009
 title: The model scores a post against a monitor
 type: feature
 priority: p1
-created: 2026-09-04
+created: 2026-09-04T22:49+08:00
 parent:
 area:
 resolution: shipped
@@ -89,21 +89,21 @@ structured output, so a parse failure is an expected path, not a crash.
 
 ## Log
 
-- 2026-09-04 — Written from PLAN.md and STACK.md.
-- 2026-09-04 — Added the happy-path assertion through the worker's entry
+- 2026-09-04T22:49+08:00 — Written from PLAN.md and STACK.md.
+- 2026-09-04T22:54+08:00 — Added the happy-path assertion through the worker's entry
   point, after adopting docs/testing.md. Without it the error handler is the
   only untested line in the file that matters most.
-- 2026-09-05 — Built. `ai/` holds the schema, the prompt, the provider and the
+- 2026-09-05T02:17+08:00 — Built. `ai/` holds the schema, the prompt, the provider and the
   classifier; `worker/classify.ts` is the step the scheduler already called.
   Migration 0003 adds `monitors.min_score` and the `model_calls` table.
-- 2026-09-05 — The restatement guard passed on the day it was written, which
+- 2026-09-05T02:17+08:00 — The restatement guard passed on the day it was written, which
   docs/testing.md says means it is wrong or incomplete. It was: the case fed
   the same bad reason twice, so the rule against repeating a claim rejected it
   and the restatement rule was never reached. Fixed the case, then removed the
   rule and watched five assertions go red. Five other guards were broken on
   purpose the same way: the score range, the narrow catch, the per-monitor
   threshold, the already-scored skip and the attempt cap. Each was caught.
-- 2026-09-05 — Ran `capture:classifier` against openai/gpt-5.6-luna. The bands
+- 2026-09-05T02:17+08:00 — Ran `capture:classifier` against openai/gpt-5.6-luna. The bands
   in `ai/fixtures/examples.ts` were written before it ran, and all four fall
   inside them. Lead scores, at the weights in `ai/classification.ts`:
 
@@ -127,6 +127,6 @@ structured output, so a parse failure is an expected path, not a crash.
   The run also showed that no price is configured for this model, so every
   `model_calls` row from it records a null cost. That is the honest answer,
   and the capture now says "unknown" rather than summing an unknown as zero.
-- 2026-09-05 — Unproven until it runs somewhere real: the failure paths. The
+- 2026-09-05T02:17+08:00 — Unproven until it runs somewhere real: the failure paths. The
   happy path met a live provider in the capture, but a real rate limit, a real
   refusal and a real timeout have only been simulated.

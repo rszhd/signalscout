@@ -3,7 +3,7 @@ id: US-011
 title: The inbox shows why a post matched
 type: feature
 priority: p1
-created: 2026-09-04
+created: 2026-09-04T22:49+08:00
 parent:
 area:
 resolution: shipped
@@ -84,8 +84,8 @@ browser turns that link into that hash.
 
 ## Log
 
-- 2026-09-04 — Written from PLAN.md.
-- 2026-09-05 — Built the read side, the route and the screen.
+- 2026-09-04T22:49+08:00 — Written from PLAN.md.
+- 2026-09-05T07:31+08:00 — Built the read side, the route and the screen.
 
   `packages/core/src/matches/matches.ts` holds the ordering rule, the hidden
   filter and the page boundary, for the reason `monitors.ts` gives: the
@@ -106,7 +106,7 @@ browser turns that link into that hash.
 
   Migration 0006 adds `matches_inbox_idx`, partial on `hidden = false`.
 
-- 2026-09-05 — Measured, on 5,000 matches for one monitor, on the development
+- 2026-09-05T07:31+08:00 — Measured, on 5,000 matches for one monitor, on the development
   Postgres:
 
   | What | Time |
@@ -121,7 +121,7 @@ browser turns that link into that hash.
   assertion: a budget of two seconds would pass today and would keep passing
   after somebody made the query fetch every row.
 
-- 2026-09-05 — Gave the empty inbox three answers instead of one. It had a
+- 2026-09-05T07:31+08:00 — Gave the empty inbox three answers instead of one. It had a
   single "Create a monitor" button under every empty list, which is the wrong
   offer twice out of three times. With monitors but no matches, the person is
   waiting for the worker and nothing on the screen updates itself, so the
@@ -129,7 +129,7 @@ browser turns that link into that hash.
   because of the filter, so the button clears it. Only a deployment with no
   monitor at all is offered the form.
 
-- 2026-09-05 — Renamed the reasons section from "Why it matched" to "What the
+- 2026-09-05T08:09+08:00 — Renamed the reasons section from "Why it matched" to "What the
   model saw", and replaced the green tick with a neutral bullet. The first
   live scores showed why. On a post at 31 the model wrote "the post does not
   ask for a testing tool, paid service, or automation solution" — an accurate
@@ -143,14 +143,14 @@ browser turns that link into that hash.
   most needs to dismiss quickly. PLAN.md's mockup is updated with the same
   reasoning.
 
-- 2026-09-05 — Broke five things on purpose and watched the suite. Dropping
+- 2026-09-05T07:31+08:00 — Broke five things on purpose and watched the suite. Dropping
   the age clamp, the hidden filter, the id half of the cursor and the score
   filter each turned a case red, and so did doubling the decay constant —
   after the ordering expectations were rewritten as literal numbers. Written
   from the constant, they had passed at any value, which is exactly the guard
   docs/testing.md warns about.
 
-- 2026-09-05 — Bundled Ubuntu instead of trusting the fonts installed on the
+- 2026-09-05T08:09+08:00 — Bundled Ubuntu instead of trusting the fonts installed on the
   host. The inbox uses Ubuntu's real 400, 500 and 700 faces. Its prose is 16px
   with a 72-character line and more leading. Labels and metadata share one
   scale and two accessible colours. Removed the platform-dependent score

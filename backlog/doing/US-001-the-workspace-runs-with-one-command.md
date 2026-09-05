@@ -3,7 +3,7 @@ id: US-001
 title: The workspace runs with one command
 type: chore
 priority: p1
-created: 2026-09-04
+created: 2026-09-04T22:49+08:00
 parent:
 area:
 resolution:
@@ -74,8 +74,8 @@ nothing. That cost an hour here.
 
 ## Log
 
-- 2026-09-04 — Written from PLAN.md and STACK.md.
-- 2026-09-04 — Code complete. Verified by running each claim, not by reading
+- 2026-09-04T22:49+08:00 — Written from PLAN.md and STACK.md.
+- 2026-09-04T23:30+08:00 — Code complete. Verified by running each claim, not by reading
   the code:
   `docker compose up` in both worker modes against the built image, `pnpm dev`
   on a checkout with no `node_modules` and no `.env`, and `psql` for the

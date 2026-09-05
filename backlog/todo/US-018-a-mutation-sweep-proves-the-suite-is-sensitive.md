@@ -3,7 +3,7 @@ id: US-018
 title: A mutation sweep proves the suite is sensitive
 type: chore
 priority: p3
-created: 2026-09-04
+created: 2026-09-04T22:54+08:00
 parent:
 area:
 resolution:
@@ -84,6 +84,6 @@ at face value.
 
 ## Log
 
-- 2026-09-04 — Written while adopting docs/testing.md. Deferred deliberately:
+- 2026-09-04T22:54+08:00 — Written while adopting docs/testing.md. Deferred deliberately:
   the traps above are worth nothing until there is a suite to sweep, and they
   will still be true then.

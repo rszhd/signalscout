@@ -3,7 +3,7 @@ id: US-012
 title: A match is marked good or not relevant
 type: feature
 priority: p2
-created: 2026-09-04
+created: 2026-09-04T22:49+08:00
 parent:
 area:
 resolution:
@@ -53,4 +53,4 @@ lesson.
 
 ## Log
 
-- 2026-09-04 — Written from PLAN.md.
+- 2026-09-04T22:49+08:00 — Written from PLAN.md.

@@ -19,11 +19,21 @@ sound. None of them tells anybody whether this product finds leads a person
 would act on.
 
 **The last time a human judged a match was five verdicts, on one monitor, on
-2026-09-05.** Those five said something that has never been followed up. The
-verdicts did not follow the scores: three posts at 50, 52 and 53 were refused
-as career questions rather than buyers, and the classifier had scored them like
-the two that were kept, at 59 and 71. So the score is not shown to be wrong. It
-is shown to be **untested**, which is worse, because nobody can act on it.
+2026-09-05.** They were re-read on 2026-09-06 and they say more than the
+earlier write-up claimed. AGENTS.md said the verdicts did not follow the
+scores. They follow them exactly: good at 71 and 59, not relevant at 53, 52 and
+50, so every kept post outscored every refused one.
+
+What is thin is the margin — six points across the boundary, all five inside a
+21-point band — and the sample. With two goods and three refusals a perfect
+split happens by chance one time in ten. So the score is **supported and
+untested**, not wrong, and the forty unjudged matches are what turn one into
+the other.
+
+One number is already actionable. **The boundary those five imply is near 56,
+and `defaultMinimumScore` is 30.** All three refused posts cleared the default
+and reached the inbox. US-022 reached the same conclusion by another route when
+it measured that 30 was too low inside a topical subreddit.
 
 **The evidence needed is already paid for.** The database holds 45 matches
 across six monitors and all three platforms, and **40 of them have no verdict**:
@@ -83,3 +93,12 @@ and is still not written.
   plan is on track: the answer was that execution is fine and the direction has
   drifted from PLAN.md's own priority. Forty matches are already sitting
   unjudged, so the cheapest useful thing this project can do next is read them.
+
+- 2026-09-06T03:08+08:00 — Re-read the five verdicts that already exist, before
+  judging anything new, and corrected the record. They rank perfectly: 71 and 59
+  kept, 53, 52 and 50 refused. AGENTS.md's claim that they do not follow the
+  scores was wrong and is fixed. The real weakness is the margin and the sample
+  size, not the ordering.
+
+  The forty are still unjudged. The dev stack is serving the inbox, and nothing
+  about this entry is a substitute for reading them.

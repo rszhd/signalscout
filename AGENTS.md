@@ -522,13 +522,30 @@ and a person can act on them. US-011's other measurement stands: the ordering
 rule — score, minus twelve points for every day since the post — at 12.7 ms for
 a first page over 5,000 matches.
 
-**Five verdicts have been given on real matches.** On 2026-09-05 a person
-read five of US-022's matches and answered: good at 71 and 59, not relevant at
-53, 52 and 50, every one against version 1. The verdicts do not follow the
-scores. The three refused posts ask how to learn test automation, which is a
-career question and not a buyer, and the classifier scored them like the two
-that were kept. **Five verdicts on one monitor is not a distribution**, and the
-score is not yet shown to be wrong — it is shown to be untested. The verdicts
+**Five verdicts have been given on real matches, and they rank perfectly.** On
+2026-09-05 a person read five of US-022's matches and answered: good at 71 and
+59, not relevant at 53, 52 and 50, every one against version 1.
+
+This paragraph said "the verdicts do not follow the scores" until 2026-09-06,
+and that was wrong. Every post the person kept scored above every post they
+refused. The ordering is exact.
+
+What is thin is the **margin**, and that is what the original sentence was
+reaching for: six points between the lowest good and the highest refusal, with
+all five inside a 21-point band. The three refused posts ask how to learn test
+automation, which is a career question and not a buyer, and the classifier
+scored them close to the two that were kept.
+
+**Two things follow.** With two goods and three refusals, a perfect split
+happens by chance one time in ten, so five verdicts support the idea that a
+higher score is a better lead without proving it. And **the boundary sits near
+56 while `defaultMinimumScore` is 30**: all three refused posts cleared the
+default and reached the inbox. US-022 found the same direction independently
+when it measured that 30 was too low inside a topical subreddit and 50 left
+nine matches that were all real.
+
+**Five verdicts on one monitor is not a distribution.** US-033 is the ticket
+that reads the other forty, which are already collected and cost nothing. The verdicts
 are still collected and not used: feeding them back into the classifier is a
 separate ticket that is not written, because a learning loop with nothing to
 learn from is speculation.

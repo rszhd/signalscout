@@ -154,3 +154,41 @@ up as one.
   US-020 and US-030 are updated. `capture:comment-filter` is committed and
   re-runnable: a second thread, especially one holding a real asker, is what
   would move this answer.
+
+- 2026-09-06T02:14+08:00 — Re-run against the second thread this Log asked for,
+  and **the answer holds**. The gap was that no comment in the first thread was
+  a person asking, because under a post that requests advice everybody
+  underneath is answering it. So a *statement* post was captured instead:
+  "Playwright is significantly better than Selenium", r/softwaretesting, 25
+  comments for one ScrapeCreators credit. Four are asking. One is the shape
+  this product exists to find — a person testing a native Android app who says
+  so and asks for alternatives.
+
+  `capture:comment-filter statement-post`, two calls, against
+  `openai/text-embedding-3-small`. The parent title alone scores 0.3892.
+
+  | | Comment alone | Under the parent title |
+  |---|---|---|
+  | Range | 0.0457 to 0.5681 | 0.3174 to 0.5270 |
+  | Kept at 0.15 | 19 of 25 | 25 of 25 |
+  | Asking against answering | no threshold separates them | no threshold separates them |
+  | About testing against not | no threshold separates them | no threshold separates them |
+
+  **The comparison the first run could not make now says the same thing.** The
+  highest similarity in the thread, 0.5681, is an expert answering about Safari
+  and WebKit. The real asker is seventh at 0.4377, and two more askers sit at
+  0.1898 and 0.1215. A threshold tuned to keep the asker keeps six people
+  answering above it.
+
+  Two facts harden the decision rather than merely repeating it. At the shipped
+  threshold of 0.15 the comment-alone setting **drops an asking comment**, the
+  0.1215 one, which is exactly the invisible false negative this stage was
+  suspected of and the first thread could not demonstrate. And thread one's
+  0.0103 subject gap **did not reproduce**: here the lowest topical comment is
+  0.1215 against an off-topic 0.2688, so subject is not separated at any
+  tuning. That gap was noise measured on one thread, not a narrow signal.
+
+  The instrument now takes a thread name and defaults to the first, so the
+  committed numbers of 09:24 still reproduce. The ticket stays closed: its
+  conclusion is unchanged and this is the evidence it asked for.
+

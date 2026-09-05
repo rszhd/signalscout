@@ -1,0 +1,295 @@
+{
+  "note": "Hand labels for every comment in scrapecreators-comments-statement-post.json, the second thread US-029 asked for. Same scheme as comment-labels.json: `role` is who the author is, `topical` is whether the comment is about test automation at all. This thread was chosen because its post is a statement rather than a request for advice, which is the shape the first thread could not supply. Four comments are asking, and one of them describes the author's own problem before asking for alternatives.",
+  "labelledAt": "2026-09-06",
+  "labelledBy": "hand",
+  "thread": {
+    "fixture": "scrapecreators-comments-statement-post.json",
+    "postId": "1tac8be",
+    "postTitle": "Playwright is significantly better than Selenium.",
+    "subreddit": "softwaretesting",
+    "comments": 25
+  },
+  "counts": {
+    "asking": 4,
+    "answering": 15,
+    "neither": 6,
+    "topical": 19
+  },
+  "labels": [
+    {
+      "id": "ol92wq2",
+      "name": "t1_ol92wq2",
+      "depth": 0,
+      "parentCommentId": null,
+      "score": 2,
+      "bodyLength": 337,
+      "role": "answering",
+      "topical": true,
+      "why": "Says Playwright is now the tool to use and reports a setup that took hours rather than days."
+    },
+    {
+      "id": "ol99cqq",
+      "name": "t1_ol99cqq",
+      "depth": 1,
+      "parentCommentId": "ol92wq2",
+      "score": 0,
+      "bodyLength": 295,
+      "role": "neither",
+      "topical": false,
+      "why": "Advice to an early founder about runway and spending. Off-topic text under a testing thread."
+    },
+    {
+      "id": "ol8g335",
+      "name": "t1_ol8g335",
+      "depth": 0,
+      "parentCommentId": null,
+      "score": 28,
+      "bodyLength": 81,
+      "role": "neither",
+      "topical": false,
+      "why": "A crude one-line joke about Selenium being painful. No claim a reader can act on."
+    },
+    {
+      "id": "ol9t1o2",
+      "name": "t1_ol9t1o2",
+      "depth": 1,
+      "parentCommentId": "ol8g335",
+      "score": 17,
+      "bodyLength": 45,
+      "role": "neither",
+      "topical": false,
+      "why": "A joke about the wording of the comment above it."
+    },
+    {
+      "id": "oldpow0",
+      "name": "t1_oldpow0",
+      "depth": 1,
+      "parentCommentId": "ol8g335",
+      "score": 1,
+      "bodyLength": 115,
+      "role": "neither",
+      "topical": false,
+      "why": "A second joke in the same chain."
+    },
+    {
+      "id": "ol8x3k0",
+      "name": "t1_ol8x3k0",
+      "depth": 0,
+      "parentCommentId": null,
+      "score": 9,
+      "bodyLength": 1099,
+      "role": "answering",
+      "topical": true,
+      "why": "Explains that WebKit is not real Safari and that their airline regression suite needs real Safari."
+    },
+    {
+      "id": "olbbikf",
+      "name": "t1_olbbikf",
+      "depth": 1,
+      "parentCommentId": "ol8x3k0",
+      "score": 1,
+      "bodyLength": 34,
+      "role": "asking",
+      "topical": true,
+      "why": "Asks which tool the other person moved to. A recommendation request with no problem stated."
+    },
+    {
+      "id": "ol89mvy",
+      "name": "t1_ol89mvy",
+      "depth": 0,
+      "parentCommentId": null,
+      "score": 3,
+      "bodyLength": 39,
+      "role": "answering",
+      "topical": true,
+      "why": "States that Selenium is not better at anything."
+    },
+    {
+      "id": "ol8bgxg",
+      "name": "t1_ol8bgxg",
+      "depth": 1,
+      "parentCommentId": "ol89mvy",
+      "score": 6,
+      "bodyLength": 13,
+      "role": "neither",
+      "topical": false,
+      "why": "Three words of agreement."
+    },
+    {
+      "id": "ol8d2zy",
+      "name": "t1_ol8d2zy",
+      "depth": 2,
+      "parentCommentId": "ol8bgxg",
+      "score": 5,
+      "bodyLength": 142,
+      "role": "answering",
+      "topical": true,
+      "why": "Says Playwright avoids the stale element exceptions Selenium produced overnight."
+    },
+    {
+      "id": "ol8q5io",
+      "name": "t1_ol8q5io",
+      "depth": 0,
+      "parentCommentId": null,
+      "score": 6,
+      "bodyLength": 63,
+      "role": "answering",
+      "topical": true,
+      "why": "Names mobile native apps as the one place Selenium still wins."
+    },
+    {
+      "id": "ol90pbe",
+      "name": "t1_ol90pbe",
+      "depth": 1,
+      "parentCommentId": "ol8q5io",
+      "score": 2,
+      "bodyLength": 44,
+      "role": "asking",
+      "topical": true,
+      "why": "Asks whether Detox is useful for that case. A question about a tool, not a problem of their own."
+    },
+    {
+      "id": "ol914sx",
+      "name": "t1_ol914sx",
+      "depth": 2,
+      "parentCommentId": "ol90pbe",
+      "score": 2,
+      "bodyLength": 42,
+      "role": "answering",
+      "topical": true,
+      "why": "Answers that Detox fits React apps and not older ones."
+    },
+    {
+      "id": "ol9yf8s",
+      "name": "t1_ol9yf8s",
+      "depth": 1,
+      "parentCommentId": "ol8q5io",
+      "score": 1,
+      "bodyLength": 143,
+      "role": "asking",
+      "topical": true,
+      "why": "Describes their own situation — testing a native Android app — and asks for alternatives. This is the comment IntentWatch exists to find."
+    },
+    {
+      "id": "ol9z4u7",
+      "name": "t1_ol9z4u7",
+      "depth": 2,
+      "parentCommentId": "ol9yf8s",
+      "score": 1,
+      "bodyLength": 223,
+      "role": "answering",
+      "topical": true,
+      "why": "Answers that question with Appium and Detox and says why Playwright cannot do it."
+    },
+    {
+      "id": "olagnxd",
+      "name": "t1_olagnxd",
+      "depth": 0,
+      "parentCommentId": null,
+      "score": 4,
+      "bodyLength": 209,
+      "role": "answering",
+      "topical": true,
+      "why": "Gives the ChromeDriverManager fix for driver version mismatches."
+    },
+    {
+      "id": "olb2kzv",
+      "name": "t1_olb2kzv",
+      "depth": 0,
+      "parentCommentId": null,
+      "score": 4,
+      "bodyLength": 111,
+      "role": "answering",
+      "topical": true,
+      "why": "Argues the comparison is wrong because Selenium is a protocol and Playwright is a framework."
+    },
+    {
+      "id": "ol8revd",
+      "name": "t1_ol8revd",
+      "depth": 0,
+      "parentCommentId": null,
+      "score": 4,
+      "bodyLength": 24,
+      "role": "neither",
+      "topical": false,
+      "why": "Two words of sarcasm about the post."
+    },
+    {
+      "id": "ol8rewp",
+      "name": "t1_ol8rewp",
+      "depth": 0,
+      "parentCommentId": null,
+      "score": 4,
+      "bodyLength": 58,
+      "role": "answering",
+      "topical": true,
+      "why": "Claims the poster did not know how to use Selenium properly."
+    },
+    {
+      "id": "olae9yt",
+      "name": "t1_olae9yt",
+      "depth": 1,
+      "parentCommentId": "ol8rewp",
+      "score": 1,
+      "bodyLength": 120,
+      "role": "answering",
+      "topical": true,
+      "why": "Says people should use the right tool for the job."
+    },
+    {
+      "id": "olb0mu5",
+      "name": "t1_olb0mu5",
+      "depth": 0,
+      "parentCommentId": null,
+      "score": 1,
+      "bodyLength": 47,
+      "role": "asking",
+      "topical": true,
+      "why": "Asks how long Playwright takes to learn. A career question, not a buying one."
+    },
+    {
+      "id": "ole3xtg",
+      "name": "t1_ole3xtg",
+      "depth": 1,
+      "parentCommentId": "olb0mu5",
+      "score": 3,
+      "bodyLength": 107,
+      "role": "answering",
+      "topical": true,
+      "why": "Answers that it is quick if you already know Selenium."
+    },
+    {
+      "id": "olbiliu",
+      "name": "t1_olbiliu",
+      "depth": 0,
+      "parentCommentId": null,
+      "score": 1,
+      "bodyLength": 160,
+      "role": "answering",
+      "topical": true,
+      "why": "Says Playwright is friendlier and faster because it drives the browser directly."
+    },
+    {
+      "id": "olcb4w9",
+      "name": "t1_olcb4w9",
+      "depth": 0,
+      "parentCommentId": null,
+      "score": 1,
+      "bodyLength": 208,
+      "role": "answering",
+      "topical": true,
+      "why": "Reports that Playwright tests are less flaky than the Selenium ones they replaced."
+    },
+    {
+      "id": "om7nsn8",
+      "name": "t1_om7nsn8",
+      "depth": 0,
+      "parentCommentId": null,
+      "score": 1,
+      "bodyLength": 421,
+      "role": "answering",
+      "topical": true,
+      "why": "Argues the other way: WebKit is not Safari, browsers are tied to versions, mobile is emulated."
+    }
+  ]
+}

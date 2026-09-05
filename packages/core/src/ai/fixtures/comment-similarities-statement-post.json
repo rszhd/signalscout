@@ -1,0 +1,255 @@
+{
+  "provider": "openai",
+  "model": "text-embedding-3-small",
+  "capturedAt": "2026-09-05T18:07:27.897Z",
+  "note": "Cosine similarity between PLAN.md's example monitor and every comment in one captured r/softwaretesting thread, measured three ways: the comment alone, the comment under its parent post's title, and the parent title by itself as the baseline. The vectors are not kept, for the reason capture-embeddings.ts gives. This is one thread and it is not a distribution.",
+  "dimensions": 1536,
+  "monitorText": "Product: A test runner for web apps. You record a browser flow once and it keeps working when the UI changes.\nIdeal customer: Small SaaS teams, two to twenty people, with no dedicated QA engineer, shipping every week.\nProblem it solves: End-to-end tests break whenever the UI changes, so teams stop trusting them and go back to testing by hand before every release.",
+  "thread": {
+    "fixture": "sources/deletion-fixtures/scrapecreators-comments-statement-post.json",
+    "labels": "sources/deletion-fixtures/comment-labels-statement-post.json",
+    "postId": "1tac8be",
+    "postTitle": "Playwright is significantly better than Selenium.",
+    "subreddit": "softwaretesting"
+  },
+  "defaultSimilarityThreshold": 0.15,
+  "parentTitleAlone": 0.389228,
+  "comments": [
+    {
+      "id": "ol92wq2",
+      "depth": 0,
+      "role": "answering",
+      "topical": true,
+      "alone": 0.462883,
+      "withParent": 0.448015
+    },
+    {
+      "id": "ol99cqq",
+      "depth": 1,
+      "role": "neither",
+      "topical": false,
+      "alone": 0.268822,
+      "withParent": 0.383714
+    },
+    {
+      "id": "ol8g335",
+      "depth": 0,
+      "role": "neither",
+      "topical": false,
+      "alone": 0.236357,
+      "withParent": 0.351105
+    },
+    {
+      "id": "ol9t1o2",
+      "depth": 1,
+      "role": "neither",
+      "topical": false,
+      "alone": 0.065498,
+      "withParent": 0.3174
+    },
+    {
+      "id": "oldpow0",
+      "depth": 1,
+      "role": "neither",
+      "topical": false,
+      "alone": 0.054382,
+      "withParent": 0.317626
+    },
+    {
+      "id": "ol8x3k0",
+      "depth": 0,
+      "role": "answering",
+      "topical": true,
+      "alone": 0.568139,
+      "withParent": 0.527016
+    },
+    {
+      "id": "olbbikf",
+      "depth": 1,
+      "role": "asking",
+      "topical": true,
+      "alone": 0.344502,
+      "withParent": 0.446336
+    },
+    {
+      "id": "ol89mvy",
+      "depth": 0,
+      "role": "answering",
+      "topical": true,
+      "alone": 0.241822,
+      "withParent": 0.328152
+    },
+    {
+      "id": "ol8bgxg",
+      "depth": 1,
+      "role": "neither",
+      "topical": false,
+      "alone": 0.045699,
+      "withParent": 0.340406
+    },
+    {
+      "id": "ol8d2zy",
+      "depth": 2,
+      "role": "answering",
+      "topical": true,
+      "alone": 0.44482,
+      "withParent": 0.421922
+    },
+    {
+      "id": "ol8q5io",
+      "depth": 0,
+      "role": "answering",
+      "topical": true,
+      "alone": 0.419773,
+      "withParent": 0.466979
+    },
+    {
+      "id": "ol90pbe",
+      "depth": 1,
+      "role": "asking",
+      "topical": true,
+      "alone": 0.121529,
+      "withParent": 0.358016
+    },
+    {
+      "id": "ol914sx",
+      "depth": 2,
+      "role": "answering",
+      "topical": true,
+      "alone": 0.298078,
+      "withParent": 0.426698
+    },
+    {
+      "id": "ol9yf8s",
+      "depth": 1,
+      "role": "asking",
+      "topical": true,
+      "alone": 0.437708,
+      "withParent": 0.458136
+    },
+    {
+      "id": "ol9z4u7",
+      "depth": 2,
+      "role": "answering",
+      "topical": true,
+      "alone": 0.510699,
+      "withParent": 0.458916
+    },
+    {
+      "id": "olagnxd",
+      "depth": 0,
+      "role": "answering",
+      "topical": true,
+      "alone": 0.270714,
+      "withParent": 0.327512
+    },
+    {
+      "id": "olb2kzv",
+      "depth": 0,
+      "role": "answering",
+      "topical": true,
+      "alone": 0.334765,
+      "withParent": 0.37803
+    },
+    {
+      "id": "ol8revd",
+      "depth": 0,
+      "role": "neither",
+      "topical": false,
+      "alone": 0.063386,
+      "withParent": 0.349403
+    },
+    {
+      "id": "ol8rewp",
+      "depth": 0,
+      "role": "answering",
+      "topical": true,
+      "alone": 0.2826,
+      "withParent": 0.342066
+    },
+    {
+      "id": "olae9yt",
+      "depth": 1,
+      "role": "answering",
+      "topical": true,
+      "alone": 0.121765,
+      "withParent": 0.326553
+    },
+    {
+      "id": "olb0mu5",
+      "depth": 0,
+      "role": "asking",
+      "topical": true,
+      "alone": 0.189762,
+      "withParent": 0.339691
+    },
+    {
+      "id": "ole3xtg",
+      "depth": 1,
+      "role": "answering",
+      "topical": true,
+      "alone": 0.263012,
+      "withParent": 0.336345
+    },
+    {
+      "id": "olbiliu",
+      "depth": 0,
+      "role": "answering",
+      "topical": true,
+      "alone": 0.333553,
+      "withParent": 0.363755
+    },
+    {
+      "id": "olcb4w9",
+      "depth": 0,
+      "role": "answering",
+      "topical": true,
+      "alone": 0.475724,
+      "withParent": 0.42842
+    },
+    {
+      "id": "om7nsn8",
+      "depth": 0,
+      "role": "answering",
+      "topical": true,
+      "alone": 0.442225,
+      "withParent": 0.418886
+    }
+  ],
+  "analysis": {
+    "alone": {
+      "lowest": 0.045699,
+      "highest": 0.568139,
+      "keptAtDefaultThreshold": 19,
+      "askingAgainstAnswering": {
+        "lowestKept": 0.121529,
+        "highestDropped": 0.568139,
+        "gap": -0.44661
+      },
+      "topicalAgainstOffTopic": {
+        "lowestKept": 0.121529,
+        "highestDropped": 0.268822,
+        "gap": -0.147293
+      }
+    },
+    "withParent": {
+      "lowest": 0.3174,
+      "highest": 0.527016,
+      "keptAtDefaultThreshold": 25,
+      "askingAgainstAnswering": {
+        "lowestKept": 0.339691,
+        "highestDropped": 0.527016,
+        "gap": -0.187325
+      },
+      "topicalAgainstOffTopic": {
+        "lowestKept": 0.326553,
+        "highestDropped": 0.383714,
+        "gap": -0.057161
+      }
+    }
+  },
+  "usage": {
+    "tokens": 2073
+  },
+  "latencyMs": 1425
+}

@@ -346,11 +346,33 @@ a relevant post the experts answering are on subject too. So a comment will go
 from the free keyword stage straight to US-030's triage model: one paid stage in
 front of the classifier, not two.
 
-Two limits travel with that. **Zero of the 21 comments was a person asking** —
-eleven answer, ten are jokes, a moderator notice and a deleted body — so the two
-classes were never weighed directly against each other, and the evidence is two
-indirect readings that point the same way. And it is one thread. A second
-thread, especially one holding a real asker, is what would move the answer.
+That first run had a hole in it: **zero of its 21 comments was a person
+asking**, because under a post that requests advice everybody underneath is
+answering it. So the two classes were never weighed, and the decision rested on
+two indirect readings.
+
+**The second thread closed that hole, and the answer did not move.** The same
+instrument ran on 2026-09-06 against a *statement* post — "Playwright is
+significantly better than Selenium", 25 comments — chosen because an opinion
+post draws people describing problems of their own. Four are asking, and one of
+them is the shape this product exists to find: a person testing a native
+Android app who asks for alternatives.
+
+**No threshold separates asking from answering, in either setting.** That is
+now measured and not inferred. The highest score in the thread, 0.5681, is an
+expert answering about Safari and WebKit; the real asker sits seventh at
+0.4377, and two other askers sit at the bottom on 0.1898 and 0.1215.
+
+Two further facts came with it, and both harden the decision. At the shipped
+threshold of 0.15 the comment-alone setting **drops an asking comment** — 0.1215
+— which is the silent false negative the stage was suspected of. And thread
+one's 0.0103 subject gap did not reproduce at all: here the lowest topical
+comment scores 0.1215 against an off-topic 0.2688, so that gap was noise and not
+a narrow signal. Under the parent title, 25 of 25 are kept inside 0.2 of the
+title's own 0.3892 — the same pure cost as before.
+
+Both threads and both label files are committed, and
+`capture:comment-filter statement-post` re-runs the second.
 
 **The classifier has met a real model, and its fixtures are current.**
 `capture:classifier` ran on 2026-09-05 against the system prompt US-010

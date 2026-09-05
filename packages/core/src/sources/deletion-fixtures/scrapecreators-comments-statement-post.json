@@ -1,0 +1,648 @@
+{
+  "success": true,
+  "credits_remaining": 2066,
+  "credits_charged": 1,
+  "post": {
+    "id": "1tac8be",
+    "author": "captured-author",
+    "author_fullname": "captured-author",
+    "subreddit": "softwaretesting",
+    "title": "Playwright is significantly better than Selenium.",
+    "selftext": "I genuinely wish I'd done it two years ago the driver version thing alone was worth it, if you've used Selenium for any length of time you know the specific frustration of pulling your hair out because your chrome driver version doesn't match your browser version and everything breaks in a way that has nothing to do with your actual tests. Playwright just doesn't have that problem, point it at your browser executable and move on with your life but that's the minor thing, the bigger difference is how it actually behaves during test execution. Playwright waits, properly, intelligently, instead of failing immediately when an element isn't there yet it keeps trying in a way that actually reflects how a real browser loads things with Selenium I was constantly sprinkling in waits and time, sleep calls to stop tests from failing on timing issues that weren't real failures, that whole category of problem basically disappeared Error messages are actually useful now, when something fails in Playwright I usually understand immediately what happened with Selenium I was often reverse engineering what the error was even telling me before I could start debugging the actual problem Setup was easy compared to what I remembered from Selenium, it just worked, no default profile configuration, no environment wrestling, just ran the import situation is also so much cleaner, Selenium had me importing things constantly. Playwright feels like it was designed by people who actually use it day to day To answer the question about whether Selenium is better at anything, honestly for most modern web testing use cases I'm struggling to think of one, it has a longer history and more Stack Overflow answers which counts for something when you're debugging edge cases but that gap is closing fast if you're on Selenium and you've been putting off switching the way I did, just do it",
+    "selftext_html": "\n      <p>\n      I genuinely wish I'd done it two years ago\n    </p><p>\n      the driver version thing alone was worth it, if you've used Selenium for any length of time you know the specific frustration of pulling your hair out because your chrome driver version doesn't match your browser version and everything breaks in a way that has nothing to do with your actual tests. Playwright just doesn't have that problem, point it at your browser executable and move on with your life\n    </p><p>\n      but that's the minor thing, the bigger difference is how it actually behaves during test execution. Playwright waits, properly, intelligently, instead of failing immediately when an element isn't there yet it keeps trying in a way that actually reflects how a real browser loads things with Selenium I was constantly sprinkling in waits and time, sleep calls to stop tests from failing on timing issues that weren't real failures, that whole category of problem basically disappeared\n    </p><p>\n      Error messages are actually useful now, when something fails in Playwright I usually understand immediately what happened with Selenium I was often reverse engineering what the error was even telling me before I could start debugging the actual problem\n    </p><p>\n      Setup was easy compared to what I remembered from Selenium, it just worked, no default profile configuration, no environment wrestling, just ran\n    </p><p>\n      the import situation is also so much cleaner, Selenium had me importing things constantly. Playwright feels like it was designed by people who actually use it day to day\n    </p><p>\n      To answer the question about whether Selenium is better at anything, honestly for most modern web testing use cases I'm struggling to think of one, it has a longer history and more Stack Overflow answers which counts for something when you're debugging edge cases but that gap is closing fast\n    </p><p>\n      if you're on Selenium and you've been putting off switching the way I did, just do it\n    </p>\n    ",
+    "downs": 0,
+    "name": "t3_1tac8be",
+    "upvote_ratio": 0.9215686274509803,
+    "ups": 86,
+    "total_awards_received": 0,
+    "score": 86,
+    "created": 1778524685,
+    "created_utc": 1778524685,
+    "created_at_iso": "2026-05-11T18:38:05.000Z",
+    "num_comments": 58,
+    "url": "https://www.reddit.com/r/softwaretesting/comments/1tac8be/playwright_is_significantly_better_than_selenium/",
+    "permalink": "/r/softwaretesting/comments/1tac8be/playwright_is_significantly_better_than_selenium/",
+    "subreddit_subscribers": null,
+    "is_video": false,
+    "archived": false,
+    "locked": false,
+    "over_18": false,
+    "spoiler": false
+  },
+  "comments": [
+    {
+      "url": "https://www.reddit.com/r/softwaretesting/comments/1tac8be/comment/ol92wq2/",
+      "created_utc": 1778533160,
+      "created_at_iso": "2026-05-11T20:59:20.000Z",
+      "id": "ol92wq2",
+      "author": "captured-author",
+      "author_fullname": null,
+      "body": "I remember when Selenium was the best, but yea the tech is going to keep changing and playwright is the one to use now. I did the Claude integration last week and ran a test. It was so easy and quick, eventhough I chose the difficult MCP setup, instead of the chrome extension.\n\n The same setup and tests would have take days to complete",
+      "body_html": "\n      <p>\n      I remember when Selenium was the best, but yea the tech is going to keep changing and playwright is the one to use now.  I did the Claude integration last week and ran a test.  It was so easy and quick, eventhough I chose the difficult MCP setup, instead of the chrome extension.\n    </p><p>\n      The same setup and tests would have take days to complete\n    </p>\n    ",
+      "collapsed": false,
+      "name": "t1_ol92wq2",
+      "parent_id": "t3_1tac8be",
+      "permalink": "/r/softwaretesting/comments/1tac8be/comment/ol92wq2/",
+      "ups": 2,
+      "downs": 0,
+      "score": 2,
+      "replies": {
+        "items": [
+          {
+            "url": "https://www.reddit.com/r/softwaretesting/comments/1tac8be/comment/ol99cqq/",
+            "created_utc": 1778535026,
+            "created_at_iso": "2026-05-11T21:30:26.000Z",
+            "id": "ol99cqq",
+            "author": "captured-author",
+            "author_fullname": null,
+            "body": "managing every cent is the thing I'd tell every early founder to do. $70k in with a long runway and a product you believe in is honestly a better position than $650k in with bad financial visibility. you're ahead of where I was even if it doesn't feel like it. keep watching the numbers yourself",
+            "body_html": "\n      <p>\n      managing every cent is the thing I'd tell every early founder to do. $70k in with a long runway and a product you believe in is honestly a better position than $650k in with bad financial visibility. you're ahead of where I was even if it doesn't feel like it. keep watching the numbers yourself\n    </p>\n    ",
+            "collapsed": false,
+            "name": "t1_ol99cqq",
+            "parent_id": "t1_ol92wq2",
+            "permalink": "/r/softwaretesting/comments/1tac8be/comment/ol99cqq/",
+            "ups": 0,
+            "downs": 0,
+            "score": 0,
+            "replies": {
+              "items": [],
+              "more": {
+                "has_more": false,
+                "cursor": null
+              }
+            }
+          }
+        ],
+        "more": {
+          "has_more": true,
+          "cursor": "ol92wq2"
+        }
+      }
+    },
+    {
+      "url": "https://www.reddit.com/r/softwaretesting/comments/1tac8be/comment/ol8g335/",
+      "created_utc": 1778526861,
+      "created_at_iso": "2026-05-11T19:14:21.000Z",
+      "id": "ol8g335",
+      "author": "captured-author",
+      "author_fullname": null,
+      "body": "yeah selenium after playwright feels like getting pegged at this point, pain only",
+      "body_html": "\n      <p>\n      yeah selenium after playwright feels like getting pegged at this point, pain only\n    </p>\n    ",
+      "collapsed": false,
+      "name": "t1_ol8g335",
+      "parent_id": "t3_1tac8be",
+      "permalink": "/r/softwaretesting/comments/1tac8be/comment/ol8g335/",
+      "ups": 28,
+      "downs": 0,
+      "score": 28,
+      "replies": {
+        "items": [
+          {
+            "url": "https://www.reddit.com/r/softwaretesting/comments/1tac8be/comment/ol9t1o2/",
+            "created_utc": 1778541411,
+            "created_at_iso": "2026-05-11T23:16:51.000Z",
+            "id": "ol9t1o2",
+            "author": "captured-author",
+            "author_fullname": null,
+            "body": "I don’t think you’re getting pegged correctly",
+            "body_html": "\n      <p>\n      I don’t think you’re getting pegged correctly\n    </p>\n    ",
+            "collapsed": false,
+            "name": "t1_ol9t1o2",
+            "parent_id": "t1_ol8g335",
+            "permalink": "/r/softwaretesting/comments/1tac8be/comment/ol9t1o2/",
+            "ups": 17,
+            "downs": 0,
+            "score": 17,
+            "replies": {
+              "items": [],
+              "more": {
+                "has_more": false,
+                "cursor": null
+              }
+            }
+          },
+          {
+            "url": "https://www.reddit.com/r/softwaretesting/comments/1tac8be/comment/oldpow0/",
+            "created_utc": 1778596991,
+            "created_at_iso": "2026-05-12T14:43:11.000Z",
+            "id": "oldpow0",
+            "author": "captured-author",
+            "author_fullname": null,
+            "body": "never been pegged b4 but its my understanding that the experience actually lands on the opposite end to “pain only”",
+            "body_html": "\n      <p>\n      never been pegged b4 but its my understanding that the experience actually lands on the opposite end to “pain only”\n    </p>\n    ",
+            "collapsed": false,
+            "name": "t1_oldpow0",
+            "parent_id": "t1_ol8g335",
+            "permalink": "/r/softwaretesting/comments/1tac8be/comment/oldpow0/",
+            "ups": 1,
+            "downs": 0,
+            "score": 1,
+            "replies": {
+              "items": [],
+              "more": {
+                "has_more": false,
+                "cursor": null
+              }
+            }
+          }
+        ],
+        "more": {
+          "has_more": true,
+          "cursor": "ol8g335"
+        }
+      }
+    },
+    {
+      "url": "https://www.reddit.com/r/softwaretesting/comments/1tac8be/comment/ol8x3k0/",
+      "created_utc": 1778531547,
+      "created_at_iso": "2026-05-11T20:32:27.000Z",
+      "id": "ol8x3k0",
+      "author": "captured-author",
+      "author_fullname": null,
+      "body": "Personally, I don't like the fact that Playwright doesn't have the option of running tests on real Safari\n\n .\n\n WebKit\n\n is not the same as real Safari. It's like saying Edge, Chrome and Brave are identical because they use chromium, and yet everyone has seen bugs that only appear on one of them.\n\n I work at the software department of a major global airline, we can't risk not running regression tests on actual Safari, since a certain percentage of the paying users are on that browser.\n\n We were using Selenium until 2 years ago, and we never had any \"flaky\" situations, because we knew how to add waits correctly (without being wasteful). We were very happy with it.\n\n But the department director wanted us to move to one of those \"smart AI\" testing tools, we did a long POC, it turned out ok, and here we are.\n\n I miss writing Selenium code, but the upside is that now more devs and testers are contributing to the tests.\n\n If I were to change jobs and go to a smaller company that doesn't give a crap if their customers can't use their product on Safari, I'd be happy to work with Playwright.",
+      "body_html": "\n      <p>\n      Personally, I don't like the fact that Playwright doesn't have the option of running tests on real <search-telemetry-tracker data-faceplate-tracking-context=\"{&quot;action_info&quot;:{&quot;type&quot;:&quot;search&quot;},&quot;comment&quot;:{&quot;id&quot;:&quot;t1_ol8x3k0&quot;,&quot;post_id&quot;:&quot;t3_1tac8be&quot;},&quot;meta_search&quot;:{&quot;display_query&quot;:&quot;Safari&quot;}}\" view-events=\"post_detail/view/highlight\"><search-telemetry-tracker data-faceplate-tracking-context=\"{&quot;action_info&quot;:{&quot;type&quot;:&quot;pdp_term&quot;},&quot;meta_search&quot;:{&quot;raw_query&quot;:&quot;Playwright Safari testing&quot;},&quot;search&quot;:{&quot;impression_id&quot;:&quot;849c44f3-2ab9-410f-8e8b-59fd3e5a7b91&quot;,&quot;origin_element&quot;:&quot;pdp_comment_highlighted_search_term&quot;,&quot;query&quot;:&quot;Playwright Safari testing&quot;,&quot;conversation_id&quot;:&quot;0171f4f1-a785-4f7a-b0ce-26e6ed32cfaa&quot;}}\" click-events=\"search/click/full_search_button\"><a rpl=\"\" class=\"border-[var(--color-a-default)] visited:border-[var(--color-a-visited)] hover:border-[var(--color-a-hover)] hover:visited:border-[var(--color-a-visited)] !no-underline border-dotted border-b-sm border-x-0 border-t-0 p-px a\n  \n  \n  \n  \n  no-underline hover:no-underline\n  \n  cursor-pointer\" href=\"/search/?q=Playwright+Safari+testing&amp;cId=0171f4f1-a785-4f7a-b0ce-26e6ed32cfaa&amp;iId=337c1657-1a1c-437b-8a4a-c03c8c0bfa74\">Safari<span class=\"ms-2xs inline-flex align-middle\"><svg rpl=\"\" fill=\"currentColor\" height=\"12\" icon-name=\"search\" viewBox=\"0 0 20 20\" width=\"12\" xmlns=\"http://www.w3.org/2000/svg\">\n      <path d=\"m18.736 17.464-3.483-3.483A7.961 7.961 0 0016.999 9 8 8 0 109 17a7.961 7.961 0 004.981-1.746l3.483 3.483a.9.9 0 101.272-1.273ZM9 15.2A6.207 6.207 0 012.8 9c0-3.419 2.781-6.2 6.2-6.2s6.2 2.781 6.2 6.2-2.781 6.2-6.2 6.2Z\"></path>\n    </svg></span></a></search-telemetry-tracker></search-telemetry-tracker>.\n    </p><p>\n      <search-telemetry-tracker data-faceplate-tracking-context=\"{&quot;action_info&quot;:{&quot;type&quot;:&quot;search&quot;},&quot;comment&quot;:{&quot;id&quot;:&quot;t1_ol8x3k0&quot;,&quot;post_id&quot;:&quot;t3_1tac8be&quot;},&quot;meta_search&quot;:{&quot;display_query&quot;:&quot;WebKit&quot;}}\" view-events=\"post_detail/view/highlight\"><search-telemetry-tracker data-faceplate-tracking-context=\"{&quot;action_info&quot;:{&quot;type&quot;:&quot;pdp_term&quot;},&quot;meta_search&quot;:{&quot;raw_query&quot;:&quot;WebKit vs Safari testing&quot;},&quot;search&quot;:{&quot;impression_id&quot;:&quot;849c44f3-2ab9-410f-8e8b-59fd3e5a7b91&quot;,&quot;origin_element&quot;:&quot;pdp_comment_highlighted_search_term&quot;,&quot;query&quot;:&quot;WebKit vs Safari testing&quot;,&quot;conversation_id&quot;:&quot;8dce0b19-28d7-4d4f-bf27-1e26e4fe5419&quot;}}\" click-events=\"search/click/full_search_button\"><a rpl=\"\" class=\"border-[var(--color-a-default)] visited:border-[var(--color-a-visited)] hover:border-[var(--color-a-hover)] hover:visited:border-[var(--color-a-visited)] !no-underline border-dotted border-b-sm border-x-0 border-t-0 p-px a\n  \n  \n  \n  \n  no-underline hover:no-underline\n  \n  cursor-pointer\" href=\"/search/?q=WebKit+vs+Safari+testing&amp;cId=8dce0b19-28d7-4d4f-bf27-1e26e4fe5419&amp;iId=4810be1b-321a-4754-b6f5-6ca5885c6d9d\">WebKit<span class=\"ms-2xs inline-flex align-middle\"><svg rpl=\"\" fill=\"currentColor\" height=\"12\" icon-name=\"search\" viewBox=\"0 0 20 20\" width=\"12\" xmlns=\"http://www.w3.org/2000/svg\">\n      <path d=\"m18.736 17.464-3.483-3.483A7.961 7.961 0 0016.999 9 8 8 0 109 17a7.961 7.961 0 004.981-1.746l3.483 3.483a.9.9 0 101.272-1.273ZM9 15.2A6.207 6.207 0 012.8 9c0-3.419 2.781-6.2 6.2-6.2s6.2 2.781 6.2 6.2-2.781 6.2-6.2 6.2Z\"></path>\n    </svg></span></a></search-telemetry-tracker></search-telemetry-tracker> is not the same as real Safari. It's like saying Edge, Chrome and Brave are identical because they use chromium, and yet everyone has seen bugs that only appear on one of them.\n    </p><p>\n      I work at the software department of a major global airline, we can't risk not running regression tests on actual Safari, since a certain percentage of the paying users are on that browser.\n    </p><p>\n      We were using Selenium until 2 years ago, and we never had any \"flaky\" situations, because we knew how to add waits correctly (without being wasteful). We were very happy with it.\n    </p><p>\n      But the department director wanted us to move to one of those \"smart AI\" testing tools, we did a long POC, it turned out ok, and here we are.\n    </p><p>\n      I miss writing Selenium code, but the upside is that now more devs and testers are contributing to the tests.\n    </p><p>\n      If I were to change jobs and go to a smaller company that doesn't give a crap if their customers can't use their product on Safari, I'd be happy to work with Playwright.\n    </p>\n    ",
+      "collapsed": false,
+      "name": "t1_ol8x3k0",
+      "parent_id": "t3_1tac8be",
+      "permalink": "/r/softwaretesting/comments/1tac8be/comment/ol8x3k0/",
+      "ups": 9,
+      "downs": 0,
+      "score": 9,
+      "replies": {
+        "items": [
+          {
+            "url": "https://www.reddit.com/r/softwaretesting/comments/1tac8be/comment/olbbikf/",
+            "created_utc": 1778561533,
+            "created_at_iso": "2026-05-12T04:52:13.000Z",
+            "id": "olbbikf",
+            "author": "captured-author",
+            "author_fullname": null,
+            "body": "What AI tool did you guys move to?",
+            "body_html": "\n      <p>\n      What AI tool did you guys move to?\n    </p>\n    ",
+            "collapsed": false,
+            "name": "t1_olbbikf",
+            "parent_id": "t1_ol8x3k0",
+            "permalink": "/r/softwaretesting/comments/1tac8be/comment/olbbikf/",
+            "ups": 1,
+            "downs": 0,
+            "score": 1,
+            "replies": {
+              "items": [],
+              "more": {
+                "has_more": false,
+                "cursor": null
+              }
+            }
+          }
+        ],
+        "more": {
+          "has_more": true,
+          "cursor": "ol8x3k0"
+        }
+      }
+    },
+    {
+      "url": "https://www.reddit.com/r/softwaretesting/comments/1tac8be/comment/ol89mvy/",
+      "created_utc": 1778525096,
+      "created_at_iso": "2026-05-11T18:44:56.000Z",
+      "id": "ol89mvy",
+      "author": "captured-author",
+      "author_fullname": null,
+      "body": "No, Selenium is not better at anything.",
+      "body_html": "\n      <p>\n      No, Selenium is not better at anything.\n    </p>\n    ",
+      "collapsed": false,
+      "name": "t1_ol89mvy",
+      "parent_id": "t3_1tac8be",
+      "permalink": "/r/softwaretesting/comments/1tac8be/comment/ol89mvy/",
+      "ups": 3,
+      "downs": 0,
+      "score": 3,
+      "replies": {
+        "items": [
+          {
+            "url": "https://www.reddit.com/r/softwaretesting/comments/1tac8be/comment/ol8bgxg/",
+            "created_utc": 1778525592,
+            "created_at_iso": "2026-05-11T18:53:12.000Z",
+            "id": "ol8bgxg",
+            "author": "captured-author",
+            "author_fullname": null,
+            "body": "I shall agree",
+            "body_html": "\n      <p>\n      I shall agree\n    </p>\n    ",
+            "collapsed": false,
+            "name": "t1_ol8bgxg",
+            "parent_id": "t1_ol89mvy",
+            "permalink": "/r/softwaretesting/comments/1tac8be/comment/ol8bgxg/",
+            "ups": 6,
+            "downs": 0,
+            "score": 6,
+            "replies": {
+              "items": [
+                {
+                  "url": "https://www.reddit.com/r/softwaretesting/comments/1tac8be/comment/ol8d2zy/",
+                  "created_utc": 1778526032,
+                  "created_at_iso": "2026-05-11T19:00:32.000Z",
+                  "id": "ol8d2zy",
+                  "author": "captured-author",
+                  "author_fullname": null,
+                  "body": "Yep, playwright you can wake up and check test results and not see 7 random stale element exceptions\n\n . Selenium is just a dud in comparison.",
+                  "body_html": "\n      <p>\n      Yep, playwright you can wake up and check test results and not see 7 random <search-telemetry-tracker data-faceplate-tracking-context=\"{&quot;action_info&quot;:{&quot;type&quot;:&quot;search&quot;},&quot;comment&quot;:{&quot;id&quot;:&quot;t1_ol8d2zy&quot;,&quot;post_id&quot;:&quot;t3_1tac8be&quot;},&quot;meta_search&quot;:{&quot;display_query&quot;:&quot;stale element exceptions&quot;}}\" view-events=\"post_detail/view/highlight\"><search-telemetry-tracker data-faceplate-tracking-context=\"{&quot;action_info&quot;:{&quot;type&quot;:&quot;pdp_term&quot;},&quot;meta_search&quot;:{&quot;raw_query&quot;:&quot;Selenium stale element exceptions&quot;},&quot;search&quot;:{&quot;impression_id&quot;:&quot;849c44f3-2ab9-410f-8e8b-59fd3e5a7b91&quot;,&quot;origin_element&quot;:&quot;pdp_comment_highlighted_search_term&quot;,&quot;query&quot;:&quot;Selenium stale element exceptions&quot;,&quot;conversation_id&quot;:&quot;1dd52df8-b7ca-4d95-8cf9-ebea2256763a&quot;}}\" click-events=\"search/click/full_search_button\"><a rpl=\"\" class=\"border-[var(--color-a-default)] visited:border-[var(--color-a-visited)] hover:border-[var(--color-a-hover)] hover:visited:border-[var(--color-a-visited)] !no-underline border-dotted border-b-sm border-x-0 border-t-0 p-px a\n  \n  \n  \n  \n  no-underline hover:no-underline\n  \n  cursor-pointer\" href=\"/search/?q=Selenium+stale+element+exceptions&amp;cId=1dd52df8-b7ca-4d95-8cf9-ebea2256763a&amp;iId=5a14b0fb-07c0-44e5-ae90-aa1fe9439ca0\">stale element exceptions<span class=\"ms-2xs inline-flex align-middle\"><svg rpl=\"\" fill=\"currentColor\" height=\"12\" icon-name=\"search\" viewBox=\"0 0 20 20\" width=\"12\" xmlns=\"http://www.w3.org/2000/svg\">\n      <path d=\"m18.736 17.464-3.483-3.483A7.961 7.961 0 0016.999 9 8 8 0 109 17a7.961 7.961 0 004.981-1.746l3.483 3.483a.9.9 0 101.272-1.273ZM9 15.2A6.207 6.207 0 012.8 9c0-3.419 2.781-6.2 6.2-6.2s6.2 2.781 6.2 6.2-2.781 6.2-6.2 6.2Z\"></path>\n    </svg></span></a></search-telemetry-tracker></search-telemetry-tracker>. Selenium is just a dud in comparison.\n    </p>\n    ",
+                  "collapsed": false,
+                  "name": "t1_ol8d2zy",
+                  "parent_id": "t1_ol8bgxg",
+                  "permalink": "/r/softwaretesting/comments/1tac8be/comment/ol8d2zy/",
+                  "ups": 5,
+                  "downs": 0,
+                  "score": 5,
+                  "replies": {
+                    "items": [],
+                    "more": {
+                      "has_more": true,
+                      "cursor": "eyJ0eXBlIjoic2hyZWRkaXRfbW9yZV9jb21tZW50cyIsInNyYyI6Ii9zdmMvc2hyZWRkaXQvbW9yZS1jb21tZW50cy9zb2Z0d2FyZXRlc3RpbmcvdDNfMXRhYzhiZT9zb3J0PUNPTkZJREVOQ0Umc3RhcnRpbmdEZXB0aD0zJmNvbW1lbnRQYXJlbnRQb3NpdGlvbnM9MywwLDAiLCJjdXJzb3IiOiJZMjl0YldWdWRIUnlaV1U2WkdFM01UUmpNV1VzT2pvek9tUXhPblF4WDI5c09HUXllbms9Iiwic3VicmVkZGl0Ijoic29mdHdhcmV0ZXN0aW5nIiwicG9zdElkIjoiMXRhYzhiZSIsInBhcmVudFRoaW5nSWQiOiJ0MV9vbDhkMnp5In0"
+                    }
+                  }
+                }
+              ],
+              "more": {
+                "has_more": true,
+                "cursor": "ol8d2zy"
+              }
+            }
+          }
+        ],
+        "more": {
+          "has_more": true,
+          "cursor": "ol8d2zy"
+        }
+      }
+    },
+    {
+      "url": "https://www.reddit.com/r/softwaretesting/comments/1tac8be/comment/ol8q5io/",
+      "created_utc": 1778529643,
+      "created_at_iso": "2026-05-11T20:00:43.000Z",
+      "id": "ol8q5io",
+      "author": "captured-author",
+      "author_fullname": null,
+      "body": "The only benefit works be for mobile testing\n\n with native apps",
+      "body_html": "\n      <p>\n      The only benefit works be for <search-telemetry-tracker data-faceplate-tracking-context=\"{&quot;action_info&quot;:{&quot;type&quot;:&quot;search&quot;},&quot;comment&quot;:{&quot;id&quot;:&quot;t1_ol8q5io&quot;,&quot;post_id&quot;:&quot;t3_1tac8be&quot;},&quot;meta_search&quot;:{&quot;display_query&quot;:&quot;mobile testing&quot;}}\" view-events=\"post_detail/view/highlight\"><search-telemetry-tracker data-faceplate-tracking-context=\"{&quot;action_info&quot;:{&quot;type&quot;:&quot;pdp_term&quot;},&quot;meta_search&quot;:{&quot;raw_query&quot;:&quot;mobile testing softwaretesting&quot;},&quot;search&quot;:{&quot;impression_id&quot;:&quot;849c44f3-2ab9-410f-8e8b-59fd3e5a7b91&quot;,&quot;origin_element&quot;:&quot;pdp_comment_highlighted_search_term&quot;,&quot;query&quot;:&quot;mobile testing softwaretesting&quot;,&quot;conversation_id&quot;:&quot;aaf47799-f96d-4840-944f-233d12372778&quot;}}\" click-events=\"search/click/full_search_button\"><a rpl=\"\" class=\"border-[var(--color-a-default)] visited:border-[var(--color-a-visited)] hover:border-[var(--color-a-hover)] hover:visited:border-[var(--color-a-visited)] !no-underline border-dotted border-b-sm border-x-0 border-t-0 p-px a\n  \n  \n  \n  \n  no-underline hover:no-underline\n  \n  cursor-pointer\" href=\"/search/?q=mobile+testing+softwaretesting&amp;cId=aaf47799-f96d-4840-944f-233d12372778&amp;iId=14fc9f18-0ac4-4eac-94bf-567cb6a67d47\">mobile testing<span class=\"ms-2xs inline-flex align-middle\"><svg rpl=\"\" fill=\"currentColor\" height=\"12\" icon-name=\"search\" viewBox=\"0 0 20 20\" width=\"12\" xmlns=\"http://www.w3.org/2000/svg\">\n      <path d=\"m18.736 17.464-3.483-3.483A7.961 7.961 0 0016.999 9 8 8 0 109 17a7.961 7.961 0 004.981-1.746l3.483 3.483a.9.9 0 101.272-1.273ZM9 15.2A6.207 6.207 0 012.8 9c0-3.419 2.781-6.2 6.2-6.2s6.2 2.781 6.2 6.2-2.781 6.2-6.2 6.2Z\"></path>\n    </svg></span></a></search-telemetry-tracker></search-telemetry-tracker> with native apps\n    </p>\n    ",
+      "collapsed": false,
+      "name": "t1_ol8q5io",
+      "parent_id": "t3_1tac8be",
+      "permalink": "/r/softwaretesting/comments/1tac8be/comment/ol8q5io/",
+      "ups": 6,
+      "downs": 0,
+      "score": 6,
+      "replies": {
+        "items": [
+          {
+            "url": "https://www.reddit.com/r/softwaretesting/comments/1tac8be/comment/ol90pbe/",
+            "created_utc": 1778532540,
+            "created_at_iso": "2026-05-11T20:49:00.000Z",
+            "id": "ol90pbe",
+            "author": "captured-author",
+            "author_fullname": null,
+            "body": "I thought detox was useful there. Is it not?",
+            "body_html": "\n      <p>\n      I thought detox was useful there. Is it not?\n    </p>\n    ",
+            "collapsed": false,
+            "name": "t1_ol90pbe",
+            "parent_id": "t1_ol8q5io",
+            "permalink": "/r/softwaretesting/comments/1tac8be/comment/ol90pbe/",
+            "ups": 2,
+            "downs": 0,
+            "score": 2,
+            "replies": {
+              "items": [
+                {
+                  "url": "https://www.reddit.com/r/softwaretesting/comments/1tac8be/comment/ol914sx/",
+                  "created_utc": 1778532660,
+                  "created_at_iso": "2026-05-11T20:51:00.000Z",
+                  "id": "ol914sx",
+                  "author": "captured-author",
+                  "author_fullname": null,
+                  "body": "If the app is react yes but not older apps",
+                  "body_html": "\n      <p>\n      If the app is react yes but not older apps\n    </p>\n    ",
+                  "collapsed": false,
+                  "name": "t1_ol914sx",
+                  "parent_id": "t1_ol90pbe",
+                  "permalink": "/r/softwaretesting/comments/1tac8be/comment/ol914sx/",
+                  "ups": 2,
+                  "downs": 0,
+                  "score": 2,
+                  "replies": {
+                    "items": [],
+                    "more": {
+                      "has_more": true,
+                      "cursor": "eyJ0eXBlIjoic2hyZWRkaXRfbW9yZV9jb21tZW50cyIsInNyYyI6Ii9zdmMvc2hyZWRkaXQvbW9yZS1jb21tZW50cy9zb2Z0d2FyZXRlc3RpbmcvdDNfMXRhYzhiZT9zb3J0PUNPTkZJREVOQ0Umc3RhcnRpbmdEZXB0aD0zJmNvbW1lbnRQYXJlbnRQb3NpdGlvbnM9NCwwLDAiLCJjdXJzb3IiOiJZMjl0YldWdWRIUnlaV1U2TXpoak9XSmpNV0lzT2pvek9tUXhPblF4WDI5c09URTBjM2c9Iiwic3VicmVkZGl0Ijoic29mdHdhcmV0ZXN0aW5nIiwicG9zdElkIjoiMXRhYzhiZSIsInBhcmVudFRoaW5nSWQiOiJ0MV9vbDkxNHN4In0"
+                    }
+                  }
+                }
+              ],
+              "more": {
+                "has_more": true,
+                "cursor": "ol914sx"
+              }
+            }
+          },
+          {
+            "url": "https://www.reddit.com/r/softwaretesting/comments/1tac8be/comment/ol9yf8s/",
+            "created_utc": 1778543249,
+            "created_at_iso": "2026-05-11T23:47:29.000Z",
+            "id": "ol9yf8s",
+            "author": "captured-author",
+            "author_fullname": null,
+            "body": "Can you please explain further, I'm currently testing a native android app and am looking for alternatives for auto testing native android apps",
+            "body_html": "\n      <p>\n      Can you please explain further, I'm currently testing a native android app and am looking for alternatives for auto testing native android apps\n    </p>\n    ",
+            "collapsed": false,
+            "name": "t1_ol9yf8s",
+            "parent_id": "t1_ol8q5io",
+            "permalink": "/r/softwaretesting/comments/1tac8be/comment/ol9yf8s/",
+            "ups": 1,
+            "downs": 0,
+            "score": 1,
+            "replies": {
+              "items": [
+                {
+                  "url": "https://www.reddit.com/r/softwaretesting/comments/1tac8be/comment/ol9z4u7/",
+                  "created_utc": 1778543496,
+                  "created_at_iso": "2026-05-11T23:51:36.000Z",
+                  "id": "ol9z4u7",
+                  "author": "captured-author",
+                  "author_fullname": null,
+                  "body": "playwright uses chrome and tests inside the browser so impossible to use. theres a tool called appium that lives on selenium that can be used for mobile native apps. detox is a newer testing tool but its only for react apps",
+                  "body_html": "\n      <p>\n      playwright uses chrome and tests inside the browser so impossible to use. theres a tool called appium that lives on selenium that can be used for mobile native apps. detox is a newer testing tool but its only for react apps\n    </p>\n    ",
+                  "collapsed": false,
+                  "name": "t1_ol9z4u7",
+                  "parent_id": "t1_ol9yf8s",
+                  "permalink": "/r/softwaretesting/comments/1tac8be/comment/ol9z4u7/",
+                  "ups": 1,
+                  "downs": 0,
+                  "score": 1,
+                  "replies": {
+                    "items": [],
+                    "more": {
+                      "has_more": true,
+                      "cursor": "eyJ0eXBlIjoic2hyZWRkaXRfbW9yZV9jb21tZW50cyIsInNyYyI6Ii9zdmMvc2hyZWRkaXQvbW9yZS1jb21tZW50cy9zb2Z0d2FyZXRlc3RpbmcvdDNfMXRhYzhiZT9zb3J0PUNPTkZJREVOQ0Umc3RhcnRpbmdEZXB0aD0zJmNvbW1lbnRQYXJlbnRQb3NpdGlvbnM9NCwxLDAiLCJjdXJzb3IiOiJZMjl0YldWdWRIUnlaV1U2T0RVeE1EQTRNamNzT2pvek9tUXhPblF4WDI5c09YbzBkVGM9Iiwic3VicmVkZGl0Ijoic29mdHdhcmV0ZXN0aW5nIiwicG9zdElkIjoiMXRhYzhiZSIsInBhcmVudFRoaW5nSWQiOiJ0MV9vbDl6NHU3In0"
+                    }
+                  }
+                }
+              ],
+              "more": {
+                "has_more": true,
+                "cursor": "ol9z4u7"
+              }
+            }
+          }
+        ],
+        "more": {
+          "has_more": true,
+          "cursor": "ol914sx"
+        }
+      }
+    },
+    {
+      "url": "https://www.reddit.com/r/softwaretesting/comments/1tac8be/comment/olagnxd/",
+      "created_utc": 1778549610,
+      "created_at_iso": "2026-05-12T01:33:30.000Z",
+      "id": "olagnxd",
+      "author": "captured-author",
+      "author_fullname": null,
+      "body": "Just FYI, you can eliminate the issue of chrome version chromedriver mismatches by letting selenium handle that for you:\n\nfrom webdriver_manager.chrome import ChromeDriverManager\n\nChromeDriverManager.install()",
+      "body_html": "\n      <p>\n      Just FYI, you can eliminate the issue of chrome version chromedriver mismatches by letting selenium handle that for you:\n    </p><pre>from webdriver_manager.chrome import ChromeDriverManager\n\nChromeDriverManager.install()</pre>\n    ",
+      "collapsed": false,
+      "name": "t1_olagnxd",
+      "parent_id": "t3_1tac8be",
+      "permalink": "/r/softwaretesting/comments/1tac8be/comment/olagnxd/",
+      "ups": 4,
+      "downs": 0,
+      "score": 4,
+      "replies": {
+        "items": [],
+        "more": {
+          "has_more": false,
+          "cursor": null
+        }
+      }
+    },
+    {
+      "url": "https://www.reddit.com/r/softwaretesting/comments/1tac8be/comment/olb2kzv/",
+      "created_utc": 1778557695,
+      "created_at_iso": "2026-05-12T03:48:15.000Z",
+      "id": "olb2kzv",
+      "author": "captured-author",
+      "author_fullname": null,
+      "body": "Selenium is low level protocol, whereas pw is testing (yes) framework, wtf are you people even talking about  .",
+      "body_html": "\n      <p>\n      Selenium is low level protocol, whereas pw is testing (yes) framework, wtf are you people even talking about&nbsp; .\n    </p>\n    ",
+      "collapsed": false,
+      "name": "t1_olb2kzv",
+      "parent_id": "t3_1tac8be",
+      "permalink": "/r/softwaretesting/comments/1tac8be/comment/olb2kzv/",
+      "ups": 4,
+      "downs": 0,
+      "score": 4,
+      "replies": {
+        "items": [],
+        "more": {
+          "has_more": false,
+          "cursor": null
+        }
+      }
+    },
+    {
+      "url": "https://www.reddit.com/r/softwaretesting/comments/1tac8be/comment/ol8revd/",
+      "created_utc": 1778529991,
+      "created_at_iso": "2026-05-11T20:06:31.000Z",
+      "id": "ol8revd",
+      "author": "captured-author",
+      "author_fullname": null,
+      "body": "Pretends to be surprised",
+      "body_html": "\n      <p>\n      Pretends to be surprised\n    </p>\n    ",
+      "collapsed": false,
+      "name": "t1_ol8revd",
+      "parent_id": "t3_1tac8be",
+      "permalink": "/r/softwaretesting/comments/1tac8be/comment/ol8revd/",
+      "ups": 4,
+      "downs": 0,
+      "score": 4,
+      "replies": {
+        "items": [],
+        "more": {
+          "has_more": false,
+          "cursor": null
+        }
+      }
+    },
+    {
+      "url": "https://www.reddit.com/r/softwaretesting/comments/1tac8be/comment/ol8rewp/",
+      "created_utc": 1778529991,
+      "created_at_iso": "2026-05-11T20:06:31.000Z",
+      "id": "ol8rewp",
+      "author": "captured-author",
+      "author_fullname": null,
+      "body": "You clearly just had no idea how to use selenium properly.",
+      "body_html": "\n      <p>\n      You clearly just had no idea how to use selenium properly.\n    </p>\n    ",
+      "collapsed": false,
+      "name": "t1_ol8rewp",
+      "parent_id": "t3_1tac8be",
+      "permalink": "/r/softwaretesting/comments/1tac8be/comment/ol8rewp/",
+      "ups": 4,
+      "downs": 0,
+      "score": 4,
+      "replies": {
+        "items": [
+          {
+            "url": "https://www.reddit.com/r/softwaretesting/comments/1tac8be/comment/olae9yt/",
+            "created_utc": 1778548770,
+            "created_at_iso": "2026-05-12T01:19:30.000Z",
+            "id": "olae9yt",
+            "author": "captured-author",
+            "author_fullname": null,
+            "body": "I can't tell if this is sarcasm or not, but I somewhat agree. I think people should just use the right tool for the job.",
+            "body_html": "\n      <p>\n      I can't tell if this is sarcasm or not,  but I somewhat agree. I think people should just use the right tool for the job.\n    </p>\n    ",
+            "collapsed": false,
+            "name": "t1_olae9yt",
+            "parent_id": "t1_ol8rewp",
+            "permalink": "/r/softwaretesting/comments/1tac8be/comment/olae9yt/",
+            "ups": 1,
+            "downs": 0,
+            "score": 1,
+            "replies": {
+              "items": [],
+              "more": {
+                "has_more": false,
+                "cursor": null
+              }
+            }
+          }
+        ],
+        "more": {
+          "has_more": true,
+          "cursor": "eyJ0eXBlIjoic2hyZWRkaXRfbW9yZV9jb21tZW50cyIsInNyYyI6Ii9zdmMvc2hyZWRkaXQvbW9yZS1jb21tZW50cy9zb2Z0d2FyZXRlc3RpbmcvdDNfMXRhYzhiZT9zb3J0PUNPTkZJREVOQ0Umc3RhcnRpbmdEZXB0aD0xJmNvbW1lbnRQb3NpdGlvbk9mZnNldD0xJmNvbW1lbnRQYXJlbnRQb3NpdGlvbnM9OCIsImN1cnNvciI6IlkyOXRiV1Z1ZEhSeVpXVTZNemt6WldSbE1ESXNPam94T21WNE9paGlXU2ttTHc9PSIsInN1YnJlZGRpdCI6InNvZnR3YXJldGVzdGluZyIsInBvc3RJZCI6IjF0YWM4YmUiLCJwYXJlbnRUaGluZ0lkIjoidDFfb2w4cmV3cCJ9"
+        }
+      }
+    },
+    {
+      "url": "https://www.reddit.com/r/softwaretesting/comments/1tac8be/comment/olb0mu5/",
+      "created_utc": 1778556899,
+      "created_at_iso": "2026-05-12T03:34:59.000Z",
+      "id": "olb0mu5",
+      "author": "captured-author",
+      "author_fullname": null,
+      "body": "How much time does it take to learn playwright?",
+      "body_html": "\n      <p>\n      How much time does it take to learn playwright?\n    </p>\n    ",
+      "collapsed": false,
+      "name": "t1_olb0mu5",
+      "parent_id": "t3_1tac8be",
+      "permalink": "/r/softwaretesting/comments/1tac8be/comment/olb0mu5/",
+      "ups": 1,
+      "downs": 0,
+      "score": 1,
+      "replies": {
+        "items": [
+          {
+            "url": "https://www.reddit.com/r/softwaretesting/comments/1tac8be/comment/ole3xtg/",
+            "created_utc": 1778600765,
+            "created_at_iso": "2026-05-12T15:46:05.000Z",
+            "id": "ole3xtg",
+            "author": "captured-author",
+            "author_fullname": null,
+            "body": "Not very, especially if you're familiar with selenium, the docs for PW are very clear and easy to navigate.",
+            "body_html": "\n      <p>\n      Not very, especially if you're familiar with selenium, the docs for PW are very clear and easy to navigate.\n    </p>\n    ",
+            "collapsed": false,
+            "name": "t1_ole3xtg",
+            "parent_id": "t1_olb0mu5",
+            "permalink": "/r/softwaretesting/comments/1tac8be/comment/ole3xtg/",
+            "ups": 3,
+            "downs": 0,
+            "score": 3,
+            "replies": {
+              "items": [],
+              "more": {
+                "has_more": false,
+                "cursor": null
+              }
+            }
+          }
+        ],
+        "more": {
+          "has_more": true,
+          "cursor": "olb0mu5"
+        }
+      }
+    },
+    {
+      "url": "https://www.reddit.com/r/softwaretesting/comments/1tac8be/comment/olbiliu/",
+      "created_utc": 1778564711,
+      "created_at_iso": "2026-05-12T05:45:11.000Z",
+      "id": "olbiliu",
+      "author": "captured-author",
+      "author_fullname": null,
+      "body": "Selenium requires you to know things like driver manager, waits e.t.c. PW is more noob friendly. But I think PW is faster, because of direct browser interaction",
+      "body_html": "\n      <p>\n      Selenium requires you to know things like driver manager, waits e.t.c. PW is more noob friendly. But I think PW is faster, because of direct browser interaction\n    </p>\n    ",
+      "collapsed": false,
+      "name": "t1_olbiliu",
+      "parent_id": "t3_1tac8be",
+      "permalink": "/r/softwaretesting/comments/1tac8be/comment/olbiliu/",
+      "ups": 1,
+      "downs": 0,
+      "score": 1,
+      "replies": {
+        "items": [],
+        "more": {
+          "has_more": false,
+          "cursor": null
+        }
+      }
+    },
+    {
+      "url": "https://www.reddit.com/r/softwaretesting/comments/1tac8be/comment/olcb4w9/",
+      "created_utc": 1778579548,
+      "created_at_iso": "2026-05-12T09:52:28.000Z",
+      "id": "olcb4w9",
+      "author": "captured-author",
+      "author_fullname": null,
+      "body": "Having worked with both i agree, i can also add that tests seem a lot less flaky. Things selenium suddenly cant find one day and can find again the next day is something i have yet to experience in Playwright",
+      "body_html": "\n      <p>\n      Having worked with both i agree, i can also add that tests seem a lot less flaky. Things selenium suddenly cant find one day and can find again the next day is something i have yet to experience in Playwright\n    </p>\n    ",
+      "collapsed": false,
+      "name": "t1_olcb4w9",
+      "parent_id": "t3_1tac8be",
+      "permalink": "/r/softwaretesting/comments/1tac8be/comment/olcb4w9/",
+      "ups": 1,
+      "downs": 0,
+      "score": 1,
+      "replies": {
+        "items": [],
+        "more": {
+          "has_more": false,
+          "cursor": null
+        }
+      }
+    },
+    {
+      "url": "https://www.reddit.com/r/softwaretesting/comments/1tac8be/comment/om7nsn8/",
+      "created_utc": 1778972426,
+      "created_at_iso": "2026-05-16T23:00:26.000Z",
+      "id": "om7nsn8",
+      "author": "captured-author",
+      "author_fullname": null,
+      "body": "Ultimately playwright is a Microsoft hack with lots of limitations: WebKit and not safari, browsers tied to playwright versions causing a lag, emulated mobile (not even simulated FFS) amongst others.\n\n Playwright is hobby grade useful for noobs and startups where quality is an after thought.\n\n Ultimately if you prefer playwright over selenium it's a skill issue. Hell I'd even go with selenium just because BiDi is w3c.",
+      "body_html": "\n      <p>\n      Ultimately playwright is a Microsoft hack with lots of limitations: WebKit and not safari, browsers tied to playwright versions causing a lag, emulated mobile (not even simulated FFS) amongst others.\n    </p><p>\n      Playwright is hobby grade useful for noobs and startups where quality is an after thought.\n    </p><p>\n      Ultimately if you prefer playwright over selenium it's a skill issue. Hell I'd even go with selenium just because BiDi is w3c.\n    </p>\n    ",
+      "collapsed": false,
+      "name": "t1_om7nsn8",
+      "parent_id": "t3_1tac8be",
+      "permalink": "/r/softwaretesting/comments/1tac8be/comment/om7nsn8/",
+      "ups": 1,
+      "downs": 0,
+      "score": 1,
+      "replies": {
+        "items": [],
+        "more": {
+          "has_more": false,
+          "cursor": null
+        }
+      }
+    }
+  ],
+  "more": {
+    "has_more": false,
+    "cursor": null
+  }
+}

@@ -30,7 +30,16 @@ advice about test plans and CI runners — higher than four of the five posts in
 `ai/fixtures/similarities.json`. With the parent post's title prepended all 21
 land inside 0.178 of each other and none is dropped at any threshold.
 
-Read the limit of that with the result. **Zero of the 21 comments was a person
+That limit was closed on 2026-09-06. A second thread, a statement post with
+four asking comments among twenty-five, put the two classes on a scale for the
+first time: **no threshold separates asking from answering**, in either
+embedding setting. The highest score in the thread is an expert answering, and
+the shipped threshold of 0.15 drops one of the askers. So this stage carries
+the whole job of telling a person asking from a person answering, and nothing
+cheaper stands in front of it.
+
+The original limit, kept because it explains why the first answer was indirect.
+**Zero of the 21 comments in the first thread was a person
 asking**, so the two classes were never put on a scale against each other. What
 was measured is that the stage's highest answer in the thread is an expert
 answering, and that the setting which restores a comment's topic drops nothing.

@@ -128,11 +128,49 @@ interface HandLabels {
   readonly labels: readonly HandLabel[];
 }
 
-const thread = JSON.parse(
-  readFileSync(`${fixtures}scrapecreators-comments-canonical.json`, "utf8"),
-) as CapturedThread;
+/**
+ * The threads this instrument can read, and why there is more than one.
+ *
+ * The first run measured `question-post` and could not answer its own central
+ * question: every commenter under a post that asks for advice is answering it,
+ * so `asking` was empty and the two classes were never weighed. US-029's Log
+ * asked for a thread holding a real asker. `statement-post` is that thread —
+ * its post is an opinion about two tools, so the people underneath it include
+ * some describing problems of their own.
+ *
+ * Name one on the command line. The default stays the first thread, so a
+ * re-run reproduces the committed numbers rather than overwriting them with a
+ * different subject.
+ */
+const threads = {
+  "question-post": {
+    thread: "scrapecreators-comments-canonical.json",
+    labels: "comment-labels.json",
+    output: "comment-similarities.json",
+  },
+  "statement-post": {
+    thread: "scrapecreators-comments-statement-post.json",
+    labels: "comment-labels-statement-post.json",
+    output: "comment-similarities-statement-post.json",
+  },
+} as const;
 
-const hand = JSON.parse(readFileSync(`${fixtures}comment-labels.json`, "utf8")) as HandLabels;
+type ThreadName = keyof typeof threads;
+
+function threadArgument(): ThreadName {
+  const asked = process.argv.slice(2).find((value) => !value.startsWith("-"));
+  if (asked === undefined) return "question-post";
+  if (asked in threads) return asked as ThreadName;
+
+  console.error(`Unknown thread "${asked}". Choose one of: ${Object.keys(threads).join(", ")}.`);
+  process.exit(1);
+}
+
+const chosen = threads[threadArgument()];
+
+const thread = JSON.parse(readFileSync(`${fixtures}${chosen.thread}`, "utf8")) as CapturedThread;
+
+const hand = JSON.parse(readFileSync(`${fixtures}${chosen.labels}`, "utf8")) as HandLabels;
 
 /** Every comment in the thread, top level and nested, in the order a reader meets them. */
 function flatten(comments: readonly CapturedComment[]): CapturedComment[] {
@@ -145,7 +183,7 @@ const parentTitle = thread.post.title;
 const labelOf = new Map(hand.labels.map((label) => [label.id, label]));
 for (const comment of comments) {
   if (!labelOf.has(comment.id)) {
-    throw new Error(`comment-labels.json has no label for ${comment.id}. Label it by hand first.`);
+    throw new Error(`${chosen.labels} has no label for ${comment.id}. Label it by hand first.`);
   }
 }
 
@@ -287,8 +325,8 @@ const record = {
   dimensions: monitorVector.length,
   monitorText,
   thread: {
-    fixture: "sources/deletion-fixtures/scrapecreators-comments-canonical.json",
-    labels: "sources/deletion-fixtures/comment-labels.json",
+    fixture: `sources/deletion-fixtures/${chosen.thread}`,
+    labels: `sources/deletion-fixtures/${chosen.labels}`,
     postId: thread.post.id,
     postTitle: parentTitle,
     subreddit: thread.post.subreddit,
@@ -302,7 +340,7 @@ const record = {
   estimatedCostMicros: costMicros,
 };
 
-writeFileSync(`${here}comment-similarities.json`, `${JSON.stringify(record, null, 2)}\n`);
+writeFileSync(`${here}${chosen.output}`, `${JSON.stringify(record, null, 2)}\n`);
 
 console.log(`The parent title on its own scores ${parentTitleAlone.toFixed(4)}.\n`);
 
@@ -343,6 +381,6 @@ for (const mode of modes) {
 
 console.log(
   costMicros === undefined
-    ? `\nWrote comment-similarities.json. The calls cost an unknown amount: no price is configured for ${config.model}. Set AI_EMBEDDING_PRICE_MICROS.`
-    : `\nWrote comment-similarities.json. ${tokens} tokens, about ${(costMicros / 1_000_000).toFixed(6)} US dollars.`,
+    ? `\nWrote ${chosen.output}. The calls cost an unknown amount: no price is configured for ${config.model}. Set AI_EMBEDDING_PRICE_MICROS.`
+    : `\nWrote ${chosen.output}. ${tokens} tokens, about ${(costMicros / 1_000_000).toFixed(6)} US dollars.`,
 );

@@ -148,7 +148,8 @@ captured thread, embedded against PLAN.md's example monitor two ways.
 Under the parent post's title the stage is a cost with no drop: all 21 land
 between 0.3715 and 0.5491, within 0.08 of the title's own 0.4187, and the
 moderator's vendor-spam notice outscores eight comments that are about testing.
-Alone it does separate topic, but the gap is 0.0103 wide against 0.18 on posts,
+Alone it separated topic on the first thread by 0.0103 against 0.18 on posts,
+and a second thread did not reproduce that gap at all,
 and it sits at 0.22, where the shipped threshold is 0.15.
 
 The reason that decides it is neither of those. The highest similarity in the

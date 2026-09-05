@@ -27,6 +27,22 @@ import type { z } from "zod";
 import type { AiConfig, AiProvider } from "./config.js";
 import { estimateCostMicros } from "./provider.js";
 
+/**
+ * Why a schema refused an answer, short enough to log and to show.
+ *
+ * Truncated because the cause can carry the model's whole reply, and an error
+ * message that is a page long is one nobody reads. It is a diagnostic, not the
+ * answer: the answer was refused.
+ */
+function schemaComplaint(cause: unknown): string | undefined {
+  if (cause === undefined || cause === null) return undefined;
+
+  const message = cause instanceof Error ? cause.message : String(cause);
+  const tidy = message.replace(/\s+/g, " ").trim();
+
+  return tidy === "" ? undefined : tidy.slice(0, 400);
+}
+
 /** What one call spent and how long it took. Recorded whatever the outcome. */
 export interface ModelCall {
   readonly provider: AiProvider;
@@ -115,9 +131,17 @@ export async function generateStructured<Value>({
     // The model answered, and the answer was not usable: prose around the
     // JSON, a refusal, or a value the schema refused.
     if (NoObjectGeneratedError.isInstance(error)) {
+      // The schema's own complaint, when there is one. Without it the message
+      // is "response did not match schema", which says that something was
+      // wrong and never what: US-027's first capture run was refused by a
+      // rule nobody could see, and the only way to find out was to add this.
+      const detail = schemaComplaint(error.cause);
+
       return {
         status: "rejected",
-        error: `${messageOf(error)} (finish reason: ${error.finishReason ?? "unknown"})`,
+        error:
+          `${messageOf(error)} (finish reason: ${error.finishReason ?? "unknown"})` +
+          (detail ? `: ${detail}` : ""),
         call: measure(error.usage),
       };
     }

@@ -576,6 +576,43 @@ if (wanted("empty")) {
   );
 }
 
+/**
+ * A query the model actually wrote, run against the real provider.
+ *
+ * This is the join between two instruments. `capture:queries` records what the
+ * prompt writes; this asks whether those words find anybody. US-027 exists
+ * because the answer used to be no: the generator wrote Reddit-length phrases
+ * and X returned unrelated posts or nothing at all.
+ *
+ * The query is read from the query plan rather than typed here, so this cannot
+ * quietly test a nicer query than the one that ships.
+ */
+if (wanted("generated")) {
+  const planPath = new URL("../../../../ai/fixtures/query-plan.json", import.meta.url);
+
+  let generated;
+  try {
+    const plan = JSON.parse(readFileSync(planPath, "utf8"));
+    generated = plan?.object?.queries?.x?.[0];
+  } catch {
+    generated = undefined;
+  }
+
+  if (typeof generated === "string" && generated !== "") {
+    await capture(
+      "search-generated-query",
+      endpoints.search,
+      { query: generated, sort: "latest" },
+      { note: `the first X query in ai/fixtures/query-plan.json: "${generated}"` },
+    );
+  } else {
+    failures.push(
+      "generated: ai/fixtures/query-plan.json holds no X query. Run " +
+        "`pnpm --filter @intentwatch/core capture:queries` first.",
+    );
+  }
+}
+
 // ------------------------------------------------------------- the record
 
 /**

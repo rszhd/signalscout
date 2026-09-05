@@ -215,10 +215,22 @@ and it ran against the development database: six monitors, every query kept,
 nothing rewritten. A monitor that names no platform keeps its array and still
 polls, and both worker steps read that older shape.
 
-What is not done: `ai/fixtures/query-plan.json` still holds a plan in the old
-shape, so `capture:queries` has to run again before the fixture is evidence
-about the prompt that ships. And no live search has been run with a query the
-new prompt wrote.
+**The new prompt has met a model and its query has met X.**
+`capture:queries` ran again on 2026-09-05: every X query it wrote is four words
+or fewer and every Reddit query eight or fewer, for 733 input and 540 output
+tokens. Then `capture.mjs --only=generated` took the first X query out of that
+plan — `UI changes break tests` — and searched it live: **6 posts for 1 credit
+in 5.6 seconds, three of them on topic**, about tests glued to a CSS class,
+brittle selectors and teams failing to keep tests alive.
+
+Read that number carefully. It says a generated four-word query finds real
+people describing the problem, at about half a page. It does not say the seam
+is wide: the hand-written `flaky tests` returned twenty posts inside three days
+where this one returned six across six weeks. **Precision and volume are two
+measurements and only the first has moved.**
+
+One cost note came with it. The model wrote eight X queries, which is the
+ceiling, and eight queries at two pages each is up to sixteen credits a poll.
 
 What is unproven: no X poll has run through the worker, so nothing has been
 stored, classified or shown from X. A real rate limit, a real timeout and a

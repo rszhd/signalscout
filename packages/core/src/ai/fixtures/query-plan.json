@@ -1,7 +1,7 @@
 {
   "provider": "openai",
   "model": "gpt-5.6-luna",
-  "capturedAt": "2026-09-05T05:52:56.407Z",
+  "capturedAt": "2026-09-05T14:03:04.574Z",
   "note": "The model's own answer for `exampleMonitor` in examples.ts, as the AI SDK parsed it.",
   "monitor": {
     "product": "A test runner for web apps. You record a browser flow once and it keeps working when the UI changes.",
@@ -14,26 +14,40 @@
     ]
   },
   "object": {
-    "queries": [
-      "end to end tests keep breaking",
-      "we stopped trusting our tests",
-      "manual testing before every release",
-      "how do small teams test releases",
-      "best alternative to Cypress",
-      "better than Playwright for UI tests",
-      "no QA engineer testing SaaS"
-    ],
+    "queries": {
+      "reddit": [
+        "e2e tests keep breaking",
+        "UI changes break tests",
+        "stopped trusting our tests",
+        "manual testing before every release",
+        "how do small teams test releases",
+        "best way to test web app without QA",
+        "Cypress alternative for changing UI",
+        "recommend browser testing tool"
+      ],
+      "x": [
+        "UI changes break tests",
+        "e2e tests keep breaking",
+        "stopped trusting e2e tests",
+        "manual testing every release",
+        "small team testing workflow",
+        "Cypress alternative",
+        "Playwright alternative",
+        "recommend browser testing"
+      ]
+    },
     "subreddits": [
       "SaaS",
       "startups",
       "webdev",
       "QualityAssurance",
-      "softwaretesting"
+      "softwaretesting",
+      "indiehackers"
     ]
   },
   "usage": {
-    "inputTokens": 538,
-    "outputTokens": 332
+    "inputTokens": 733,
+    "outputTokens": 540
   },
-  "latencyMs": 5409
+  "latencyMs": 8852
 }

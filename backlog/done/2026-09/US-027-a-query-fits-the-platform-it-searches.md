@@ -6,7 +6,7 @@ priority: p2
 created: 2026-09-05T21:52+08:00
 parent: US-010
 area:
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -54,13 +54,13 @@ junk.
       the fixtures show it
 - [x] A monitor watching two platforms gets a query set for each, and the
       monitor row keeps them apart
-- [ ] `capture:queries` records the plan for both platforms, so the fixtures
+- [x] `capture:queries` records the plan for both platforms, so the fixtures
       are evidence about the prompt that ships
 - [x] The cost test prices each platform's own queries, not one set priced
       twice
 - [x] A monitor written before this change still polls, and its queries are not
       silently rewritten
-- [ ] The measurement that started this is repeated: the new X queries are run
+- [x] The measurement that started this is repeated: the new X queries are run
       against the live provider once, and the Log holds what came back
 
 ## Notes
@@ -121,9 +121,38 @@ junk.
   them moved because the shape of the stored queries changed, which is what
   this ticket asked for.
 
-- 2026-09-05T22:26+08:00 — Two boxes stay open, and both need a small spend.
-  `ai/fixtures/query-plan.json` still holds a plan in the old shape, so the
-  fixture is not yet evidence about the prompt that ships: `capture:queries`
-  has to run again, which is one model call and a fraction of a cent. And no
-  live search has been run with a query the new prompt wrote, which is one or
-  two SocialCrawl credits from the free hundred.
+- 2026-09-05T22:41+08:00 — Both instruments have run, and the ticket closes.
+
+  `capture:queries` wrote a plan for both platforms with `openai/gpt-5.6-luna`,
+  for 733 input and 540 output tokens. Every X query is four words or fewer and
+  every Reddit query is eight or fewer, so the model obeyed a limit it was
+  given with a reason. Two of the eight X queries are also in the Reddit list,
+  which is not a fault: a short phrase that works on X works on Reddit too, and
+  the lists are allowed to overlap where the words suit both.
+
+  The first run of it was **rejected by the schema**, and the message said only
+  "response did not match schema". That is a hole this ticket had to fill
+  before it could see its own work: `call.ts` now carries the schema's own
+  complaint into the error, truncated. The second run passed and the first
+  cannot be attributed, so what is proven is that the guard refuses an answer
+  the rules do not allow, and not which rule that answer broke.
+
+  One cost note from the plan: the model wrote eight X queries, which is the
+  ceiling. Eight queries at two pages each is up to sixteen credits a poll, so
+  a person who keeps all eight and polls hourly is buying about 11,500 credits
+  a month. The form's own cost test does that arithmetic before anything runs.
+
+  Then the last box, live. `capture.mjs --only=generated` reads the first X
+  query out of the plan — so it cannot quietly test a nicer query than the one
+  that ships — and searched it at the provider. `UI changes break tests`
+  returned **6 posts for 1 credit** in 5.6 seconds. Three are on topic: tests
+  glued to a CSS class that break when a button is renamed, brittle selectors
+  breaking when the UI changes, and teams struggling to keep tests alive. Three
+  are not: a WireGuard panel, stacked diffs and a local model server.
+
+  So the fix works, and the honest reading of the number is narrower than
+  "solved". A generated four-word query finds real people describing this
+  problem, at about half the page. It is also a thinner seam than the hand-
+  written `flaky tests`, which returned twenty posts inside three days where
+  this one returned six across six weeks. **Precision and volume are two
+  measurements, and this ticket only moved the first.**

@@ -96,6 +96,14 @@
       "creditsUsed": 0,
       "creditsRemaining": 94,
       "note": "the long phrase in quotes, against search-posts.json unquoted"
+    },
+    {
+      "call": "search-generated-query",
+      "httpStatus": 200,
+      "elapsedMs": 5630,
+      "creditsUsed": 1,
+      "creditsRemaining": 93,
+      "note": "the first X query in ai/fixtures/query-plan.json: \"UI changes break tests\""
     }
   ]
 }

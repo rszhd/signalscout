@@ -16,20 +16,26 @@
  * field per registered connector. The name is derived, never listed, so adding
  * a connector adds no case here.
  *
- *     <SOURCE ID>_<FIELD NAME>, upper snake case
- *     reddit + apiKey     -> REDDIT_API_KEY
- *     x      + apiSecret  -> X_API_SECRET
+ *     <PROVIDER ID>_<FIELD NAME>, upper snake case
+ *     brightdata + apiKey     -> BRIGHTDATA_API_KEY
+ *     x-api      + apiSecret  -> X_API_API_SECRET
  *
- * The name is the *source*, not the provider behind it. A user connects
- * Reddit; that Reddit happens to arrive through Bright Data is a fact of
- * `sources/reddit/`, and STACK.md, *A source is not a provider*, keeps it
- * there. The field's own label already says whose key to paste.
+ * The name is the *provider*, and US-024 changed it. It used to be the
+ * platform, which was right while one provider served one platform: a user
+ * connects Reddit, and that Reddit arrives through Bright Data. It is wrong
+ * now. One Bright Data key serves Reddit, X and LinkedIn, so a platform-named
+ * variable would have to be set three times to the same value, and a person
+ * rotating that key would have three chances to leave one behind.
+ *
+ * `REDDIT_API_KEY` is still read, so an instance that is running keeps
+ * running, and reading it logs that it is going. The README says so.
  */
 import type { Database } from "../db/client.js";
-import type { Source } from "../db/schema.js";
+import type { Provider } from "../db/schema.js";
+import type { Logger } from "../logger.js";
 import { type EncryptionKey, optionalEncryptionKey } from "../secrets/cipher.js";
 import { credentialRecordName, readSourceCredential } from "../secrets/store.js";
-import type { SourceCredentials, SourceDescriptor } from "../sources/types.js";
+import type { ConnectorDescriptor, SourceCredentials } from "../sources/types.js";
 
 /**
  * What the poll step calls to get one source's credentials.
@@ -39,7 +45,7 @@ import type { SourceCredentials, SourceDescriptor } from "../sources/types.js";
  * should have to pretend to be the other.
  */
 export type CredentialLookup = (
-  source: SourceDescriptor,
+  connector: ConnectorDescriptor,
 ) => Promise<SourceCredentials | undefined> | SourceCredentials | undefined;
 
 /** `apiKey` -> `API_KEY`, `apiSecret` -> `API_SECRET`. */
@@ -50,8 +56,41 @@ function screamingSnakeCase(value: string): string {
     .toUpperCase();
 }
 
-export function environmentVariableFor(sourceId: string, fieldName: string): string {
-  return `${screamingSnakeCase(sourceId)}_${screamingSnakeCase(fieldName)}`;
+export function environmentVariableFor(providerId: string, fieldName: string): string {
+  return `${screamingSnakeCase(providerId)}_${screamingSnakeCase(fieldName)}`;
+}
+
+/**
+ * The name this field had before US-024, built from the platform.
+ *
+ * Read only when the provider's own variable is unset, so an instance that
+ * upgraded without editing `.env` keeps polling. It is a fallback and not a
+ * second supported name: reading it logs, once per process, which line to
+ * change.
+ */
+export function deprecatedEnvironmentVariableFor(platformId: string, fieldName: string): string {
+  return `${screamingSnakeCase(platformId)}_${screamingSnakeCase(fieldName)}`;
+}
+
+/**
+ * Read one field from the environment, preferring the provider's name.
+ *
+ * Every reader goes through here, so the fallback cannot be honoured in one
+ * place and forgotten in another — which would make a monitor that polls fine
+ * report itself as missing a key.
+ */
+function environmentValue(
+  connector: ConnectorDescriptor,
+  fieldName: string,
+  environment: Record<string, string | undefined>,
+): { value: string; deprecated: string | null } | undefined {
+  const current = environment[environmentVariableFor(connector.provider.id, fieldName)];
+  if (current) return { value: current, deprecated: null };
+
+  const old = deprecatedEnvironmentVariableFor(connector.platform.id, fieldName);
+  const value = environment[old];
+
+  return value ? { value, deprecated: old } : undefined;
 }
 
 /**
@@ -64,27 +103,63 @@ export function environmentVariableFor(sourceId: string, fieldName: string): str
  */
 export function credentialsFromEnvironment(
   environment: Record<string, string | undefined> = process.env,
+  logger?: Logger,
 ): CredentialLookup {
-  return (source) => {
+  return (connector) => {
     const credentials: Record<string, string> = {};
 
-    for (const field of source.credentialFields) {
-      const value = environment[environmentVariableFor(source.id, field.name)];
-      if (!value) return undefined;
-      credentials[field.name] = value;
+    for (const field of connector.provider.credentialFields) {
+      const found = environmentValue(connector, field.name, environment);
+      if (!found) return undefined;
+
+      if (found.deprecated) warnOnce(logger, found.deprecated, connector, field.name);
+      credentials[field.name] = found.value;
     }
 
     return credentials;
   };
 }
 
-/** One credential a source needs and the environment does not hold. */
+/**
+ * Say once per variable that its name is going.
+ *
+ * Once, because this runs on every poll of every monitor. A line per poll is a
+ * line nobody reads, and a deprecation nobody reads is a deprecation that
+ * surprises somebody the day the fallback is removed.
+ */
+const warnedVariables = new Set<string>();
+
+function warnOnce(
+  logger: Logger | undefined,
+  deprecated: string,
+  connector: ConnectorDescriptor,
+  fieldName: string,
+): void {
+  if (warnedVariables.has(deprecated)) return;
+  warnedVariables.add(deprecated);
+
+  logger?.warn(
+    {
+      deprecated,
+      use: environmentVariableFor(connector.provider.id, fieldName),
+      provider: connector.provider.id,
+    },
+    "this credential is named after the platform; the name after the provider replaces it",
+  );
+}
+
+/** One credential a connector needs and this deployment does not hold. */
 export interface MissingCredential {
+  /** The platform. "reddit": what the monitor names and the person ticked. */
   readonly sourceId: string;
   /** "Reddit", so the sentence a user reads names what they connected. */
   readonly sourceName: string;
+  /** The provider. "brightdata": whose account the key is on. */
+  readonly providerId: string;
+  /** "Bright Data", so the sentence names where to go and get one. */
+  readonly providerName: string;
   readonly field: string;
-  /** The connector's own label: "Bright Data API key". */
+  /** The provider's own label: "Bright Data API key". */
   readonly label: string;
   readonly environmentVariable: string;
 }
@@ -101,22 +176,24 @@ export interface MissingCredential {
  * about a variable the other is wrong about.
  */
 export function missingCredentials(
-  source: SourceDescriptor,
+  connector: ConnectorDescriptor,
   environment: Record<string, string | undefined> = process.env,
   stored: ReadonlySet<string> = new Set(),
 ): MissingCredential[] {
-  return source.credentialFields
+  return connector.provider.credentialFields
     .filter(
       (field) =>
-        !stored.has(credentialRecordName(source.id, field.name)) &&
-        !environment[environmentVariableFor(source.id, field.name)],
+        !stored.has(credentialRecordName(connector.provider.id, field.name)) &&
+        !environmentValue(connector, field.name, environment),
     )
     .map((field) => ({
-      sourceId: source.id,
-      sourceName: source.displayName,
+      sourceId: connector.platform.id,
+      sourceName: connector.platform.displayName,
+      providerId: connector.provider.id,
+      providerName: connector.provider.displayName,
       field: field.name,
       label: field.label,
-      environmentVariable: environmentVariableFor(source.id, field.name),
+      environmentVariable: environmentVariableFor(connector.provider.id, field.name),
     }));
 }
 
@@ -134,26 +211,39 @@ export function credentialsFromStore(
   db: Database,
   key: EncryptionKey | undefined = optionalEncryptionKey(),
   environment: Record<string, string | undefined> = process.env,
+  logger?: Logger,
 ): CredentialLookup {
-  const fromEnvironment = credentialsFromEnvironment(environment);
+  const fromEnvironment = credentialsFromEnvironment(environment, logger);
 
   if (!key) return fromEnvironment;
 
-  return async (source) => {
+  return async (connector) => {
     const credentials: Record<string, string> = {};
 
-    for (const field of source.credentialFields) {
+    for (const field of connector.provider.credentialFields) {
       // A stored row that cannot be decrypted throws here rather than falling
       // through to the environment. Silently polling with the old key is how a
       // rotation looks like it worked.
-      // The cast is safe by construction: `createSourceRegistry` refuses to
-      // boot on an id that `posts.source` does not accept, so a descriptor
-      // that reaches here is always one of them.
-      const stored = await readSourceCredential(db, key, source.id as Source, field.name);
-      const value = stored ?? environment[environmentVariableFor(source.id, field.name)];
+      // The cast is safe by construction: a provider that reaches here was
+      // registered, and `source_credentials.provider` accepts every registered
+      // provider or the boot check would have refused the row.
+      const stored = await readSourceCredential(
+        db,
+        key,
+        connector.provider.id as Provider,
+        field.name,
+      );
 
-      if (!value) return undefined;
-      credentials[field.name] = value;
+      if (stored) {
+        credentials[field.name] = stored;
+        continue;
+      }
+
+      const found = environmentValue(connector, field.name, environment);
+      if (!found) return undefined;
+
+      if (found.deprecated) warnOnce(logger, found.deprecated, connector, field.name);
+      credentials[field.name] = found.value;
     }
 
     return credentials;

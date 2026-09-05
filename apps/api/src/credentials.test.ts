@@ -54,7 +54,7 @@ describe("a stored credential and the API", () => {
   });
 
   async function storedSet() {
-    return new Set((await listCredentialHints(db)).map((hint) => `${hint.source}:${hint.field}`));
+    return new Set((await listCredentialHints(db)).map((hint) => `${hint.provider}:${hint.field}`));
   }
 
   async function server(options: {
@@ -73,7 +73,7 @@ describe("a stored credential and the API", () => {
 
   describe("what a response carries", () => {
     it("never carries a key that came from the environment", async () => {
-      const app = await server({ environment: { REDDIT_API_KEY: secret } });
+      const app = await server({ environment: { BRIGHTDATA_API_KEY: secret } });
 
       try {
         for (const url of [
@@ -92,7 +92,11 @@ describe("a stored credential and the API", () => {
     });
 
     it("never carries a key that came from the database", async () => {
-      await putSourceCredential(db, key, { source: "reddit", field: "apiKey", value: secret });
+      await putSourceCredential(db, key, {
+        provider: "brightdata",
+        field: "apiKey",
+        value: secret,
+      });
 
       const app = await server({ environment: {}, storedCredentials: storedSet });
 
@@ -108,7 +112,7 @@ describe("a stored credential and the API", () => {
     });
 
     it("says a source is configured without saying what with", async () => {
-      const app = await server({ environment: { REDDIT_API_KEY: secret } });
+      const app = await server({ environment: { BRIGHTDATA_API_KEY: secret } });
 
       try {
         const body = (await app.inject({ method: "GET", url: "/api/monitor-options" })).json();
@@ -118,7 +122,7 @@ describe("a stored credential and the API", () => {
           {
             name: "apiKey",
             label: expect.any(String),
-            environmentVariable: "REDDIT_API_KEY",
+            environmentVariable: "BRIGHTDATA_API_KEY",
             configured: true,
           },
         ]);
@@ -131,7 +135,11 @@ describe("a stored credential and the API", () => {
     it("counts a stored credential as configured, the same as an environment one", async () => {
       // Otherwise a person who moved a key into the database is told their
       // source is not set up, while the worker polls it happily.
-      await putSourceCredential(db, key, { source: "reddit", field: "apiKey", value: secret });
+      await putSourceCredential(db, key, {
+        provider: "brightdata",
+        field: "apiKey",
+        value: secret,
+      });
 
       const app = await server({ environment: {}, storedCredentials: storedSet });
 
@@ -166,7 +174,11 @@ describe("a stored credential and the API", () => {
     it("has no route that returns a stored credential", async () => {
       // Structural, not a sample: every route this build registers, by method
       // and path. A route added later that serves a key has to pass this.
-      await putSourceCredential(db, key, { source: "reddit", field: "apiKey", value: secret });
+      await putSourceCredential(db, key, {
+        provider: "brightdata",
+        field: "apiKey",
+        value: secret,
+      });
 
       const app = await server({ environment: {}, storedCredentials: storedSet });
 
@@ -187,7 +199,11 @@ describe("a stored credential and the API", () => {
 
   describe("the boot check", () => {
     it("refuses to start when a stored credential cannot be decrypted", async () => {
-      await putSourceCredential(db, key, { source: "reddit", field: "apiKey", value: secret });
+      await putSourceCredential(db, key, {
+        provider: "brightdata",
+        field: "apiKey",
+        value: secret,
+      });
 
       await expect(
         startApi({
@@ -205,7 +221,11 @@ describe("a stored credential and the API", () => {
     });
 
     it("refuses to start when a credential is stored and no key is set", async () => {
-      await putSourceCredential(db, key, { source: "reddit", field: "apiKey", value: secret });
+      await putSourceCredential(db, key, {
+        provider: "brightdata",
+        field: "apiKey",
+        value: secret,
+      });
 
       await expect(
         startApi({
@@ -219,7 +239,11 @@ describe("a stored credential and the API", () => {
     });
 
     it("never puts the value in the message it refuses with", async () => {
-      await putSourceCredential(db, key, { source: "reddit", field: "apiKey", value: secret });
+      await putSourceCredential(db, key, {
+        provider: "brightdata",
+        field: "apiKey",
+        value: secret,
+      });
 
       try {
         await startApi({
@@ -236,7 +260,7 @@ describe("a stored credential and the API", () => {
         expect.unreachable("startApi must refuse a credential it cannot read");
       } catch (error) {
         expect(String(error)).not.toContain(secret);
-        expect(String(error)).toContain("reddit:apiKey");
+        expect(String(error)).toContain("brightdata:apiKey");
       }
     });
   });

@@ -3,6 +3,7 @@ import fastifyStatic from "@fastify/static";
 import {
   aiConfigFromEnvironment,
   builtInSources,
+  type ConnectorDefinition,
   createQueryGenerator,
   type Database,
   type Env,
@@ -10,7 +11,6 @@ import {
   type Logger,
   needsApiKey,
   type QueryGenerator,
-  type SourceDefinition,
   storedCredentialNames,
 } from "@intentwatch/core";
 import Fastify, {
@@ -60,7 +60,7 @@ export interface BuildServerOptions {
    * without one existing, and so nothing here has to build a source runtime:
    * the API reads credential fields and never searches.
    */
-  sources?: readonly SourceDefinition[];
+  sources?: readonly ConnectorDefinition[];
   /** Where the source keys live when they are not in the database. */
   environment?: Record<string, string | undefined>;
   /**

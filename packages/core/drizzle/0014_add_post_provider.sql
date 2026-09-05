@@ -1,0 +1,2 @@
+ALTER TABLE "posts" ADD COLUMN "provider" text;--> statement-breakpoint
+ALTER TABLE "posts" ADD CONSTRAINT "posts_provider_known" CHECK (provider IS NULL OR provider IN ('brightdata', 'scrapecreators'));

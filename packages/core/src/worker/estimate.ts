@@ -19,6 +19,7 @@
  * ready. None of them is a performance setting.
  */
 import { checkBudget, recordSourceUsage } from "../budget/budget.js";
+import type { Provider } from "../db/schema.js";
 import {
   type EstimateSample,
   maxEstimateAttempts,
@@ -240,7 +241,7 @@ export function createEstimateStep({
 
       let source: SocialSource;
       try {
-        source = registry.get(probe.source);
+        source = registry.only(probe.source);
       } catch (error) {
         await recordProbeProgress(db, probe.id, {
           status: "failed",
@@ -257,7 +258,9 @@ export function createEstimateStep({
         // product.
         await recordProbeProgress(db, probe.id, {
           status: "failed",
-          error: `${source.displayName} has no credentials configured, so nothing can be sampled.`,
+          error:
+            `${source.platform.displayName} has no credentials configured, ` +
+            "so nothing can be sampled.",
         });
         continue;
       }
@@ -267,6 +270,7 @@ export function createEstimateStep({
           recordSourceUsage(db, {
             monitorId: run.monitorId,
             source: probe.source,
+            provider: source.provider.id as Provider,
             units,
             pricePerUnitMicros: source.pricePerUnitMicros,
           }),

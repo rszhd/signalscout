@@ -36,9 +36,11 @@ interface CredentialView {
   configured: boolean;
 }
 
-interface SourceView {
+interface ProviderView {
   id: string;
   displayName: string;
+  /** The platforms this one key unlocks: "Reddit". */
+  platforms: string[];
   ready: boolean;
   credentials: CredentialView[];
 }
@@ -46,12 +48,12 @@ interface SourceView {
 interface ConnectionsView {
   canStore: boolean;
   storeBlocker: string | null;
-  sources: SourceView[];
+  providers: ProviderView[];
 }
 
 type LoadState = "loading" | "ready" | "error";
 
-/** What a test or a save last said about one source. */
+/** What a test or a save last said about one provider. */
 interface Answer {
   tone: "good" | "bad";
   text: string;
@@ -76,14 +78,14 @@ function origin(credential: CredentialView): string {
   return "Not connected";
 }
 
-function SourceCard({
-  source,
+function ProviderCard({
+  provider,
   canStore,
   onChanged,
 }: {
-  source: SourceView;
+  provider: ProviderView;
   canStore: boolean;
-  onChanged: (source: SourceView) => void;
+  onChanged: (provider: ProviderView) => void;
 }) {
   const [typed, setTyped] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
@@ -100,7 +102,7 @@ function SourceCard({
 
     try {
       const result = await requestJson<{ valid: boolean; reason: string | null }>(
-        `/api/connections/${source.id}/test`,
+        `/api/connections/${provider.id}/test`,
         {
           method: "POST",
           headers: { "content-type": "application/json" },
@@ -112,8 +114,8 @@ function SourceCard({
 
       setAnswer(
         result.valid
-          ? { tone: "good", text: `${source.displayName} accepted this key.` }
-          : { tone: "bad", text: result.reason ?? `${source.displayName} refused this key.` },
+          ? { tone: "good", text: `${provider.displayName} accepted this key.` }
+          : { tone: "bad", text: result.reason ?? `${provider.displayName} refused this key.` },
       );
     } catch (cause) {
       // The server's own sentence. A provider that could not be reached says
@@ -130,7 +132,7 @@ function SourceCard({
     setAnswer(null);
 
     try {
-      const updated = await requestJson<SourceView>(`/api/connections/${source.id}`, {
+      const updated = await requestJson<ProviderView>(`/api/connections/${provider.id}`, {
         method: "PUT",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ credentials: filled() }),
@@ -140,7 +142,7 @@ function SourceCard({
       // person who mistyped one character should fix that character rather
       // than fetch the key again.
       setTyped({});
-      setAnswer({ tone: "good", text: `${source.displayName} is connected.` });
+      setAnswer({ tone: "good", text: `${provider.displayName} is connected.` });
       onChanged(updated);
     } catch (cause) {
       setAnswer({ tone: "bad", text: messageFor(cause, "The key could not be saved.") });
@@ -155,7 +157,7 @@ function SourceCard({
 
     try {
       onChanged(
-        await requestJson<SourceView>(`/api/connections/${source.id}/${field.name}`, {
+        await requestJson<ProviderView>(`/api/connections/${provider.id}/${field.name}`, {
           method: "DELETE",
         }),
       );
@@ -171,28 +173,31 @@ function SourceCard({
       <div className="monitor-top">
         <div className="monitor-identity">
           <span className="product-icon" aria-hidden="true">
-            {source.displayName.slice(0, 1).toUpperCase()}
+            {provider.displayName.slice(0, 1).toUpperCase()}
           </span>
           <div>
-            <h2>{source.displayName}</h2>
+            <h2>{provider.displayName}</h2>
             <p className="monitor-origin">
-              {source.credentials.length === 1 ? "One key" : `${source.credentials.length} keys`} ·
-              tested with the provider before it is saved
+              {provider.platforms.join(", ")} ·{" "}
+              {provider.credentials.length === 1
+                ? "one key"
+                : `${provider.credentials.length} keys`}
+              , tested with the provider before it is saved
             </p>
           </div>
         </div>
-        <span className={`monitor-status ${source.ready ? "running" : "stopped"}`}>
-          {source.ready ? "Connected" : "Needs a key"}
+        <span className={`monitor-status ${provider.ready ? "running" : "stopped"}`}>
+          {provider.ready ? "Connected" : "Needs a key"}
         </span>
       </div>
 
-      {source.credentials.map((credential) => (
+      {provider.credentials.map((credential) => (
         <div key={credential.name} className="connection-field">
           <label className="field">
             <span>{credential.label}</span>
             <small className="connection-origin">{origin(credential)}</small>
             <input
-              aria-label={`${credential.label} for ${source.displayName}`}
+              aria-label={`${credential.label} for ${provider.displayName}`}
               // The browser must not offer this back on another screen, and a
               // key on a shared screen must not be readable over a shoulder.
               type="password"
@@ -279,17 +284,19 @@ export function Connections() {
   }, [load]);
 
   /**
-   * Replace one source with what the write returned, rather than reloading.
+   * Replace one provider with what the write returned, rather than reloading.
    *
-   * The routes answer with the source's own refreshed view, so a reload would
-   * be a second round trip for an answer already in hand.
+   * The routes answer with the provider's own refreshed view, so a reload
+   * would be a second round trip for an answer already in hand.
    */
-  function replace(updated: SourceView): void {
+  function replace(updated: ProviderView): void {
     setView((current) =>
       current
         ? {
             ...current,
-            sources: current.sources.map((source) => (source.id === updated.id ? updated : source)),
+            providers: current.providers.map((provider) =>
+              provider.id === updated.id ? updated : provider,
+            ),
           }
         : current,
     );
@@ -341,10 +348,10 @@ export function Connections() {
       )}
 
       <ul className="monitor-list">
-        {view.sources.map((source) => (
-          <SourceCard
-            key={source.id}
-            source={source}
+        {view.providers.map((provider) => (
+          <ProviderCard
+            key={provider.id}
+            provider={provider}
             canStore={view.canStore}
             onChanged={replace}
           />

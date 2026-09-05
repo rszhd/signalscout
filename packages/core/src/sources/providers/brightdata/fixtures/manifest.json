@@ -1,5 +1,5 @@
 {
-  "capturedBy": "packages/core/src/sources/reddit/fixtures/capture.mjs",
+  "capturedBy": "packages/core/src/sources/providers/brightdata/fixtures/capture.mjs",
   "provider": "Bright Data, Reddit Scraper API, datasets v3",
   "note": "Author identity is replaced with stable pseudonyms. Everything else is whole.",
   "fixtures": [

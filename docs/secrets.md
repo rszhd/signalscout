@@ -12,15 +12,27 @@ first key has to move out of a file.
 
 Two places, and the store wins.
 
-**The environment.** Every instance today reads its source keys from `.env`,
-one variable per credential field, named `<SOURCE>_<FIELD>`. This needs no
+**The environment.** Every instance today reads its provider keys from `.env`,
+one variable per credential field, named `<PROVIDER>_<FIELD>`. This needs no
 encryption. The file is already outside the database and outside git, and a
 process environment is not a thing a database backup carries.
 
-**The `source_credentials` table.** Encrypted, and empty on a fresh install.
-The connections screen writes it. US-023 built that screen, and it stores a key
-only after the provider has said the key works — see *Testing before storing*
-below.
+US-024 changed that name. It used to be `<SOURCE>_<FIELD>`, which was right
+while one provider served one platform and wrong the moment one key serves
+three: `REDDIT_API_KEY` and `X_API_KEY` would hold the same Bright Data value,
+and rotating it would give a person three chances to leave one behind. The old
+name is still read, so an instance that upgrades keeps polling, and reading it
+logs which line to change, once per process.
+
+**The `source_credentials` table.** Encrypted, keyed by **provider** and field,
+and empty on a fresh install. The connections screen writes it. US-023 built
+that screen, and it stores a key only after the provider has said the key works
+— see *Testing before storing* below.
+
+Keyed by provider for the same reason the variable is named after one: a key
+belongs to the account it was issued for, not to the network it is used to
+fetch. US-024 re-keyed the table and moved the stored Bright Data key from
+`reddit` to `brightdata`, with nobody retyping it.
 
 `worker/credentials.ts` reads the store first and falls back to the
 environment, field by field. A half-migrated instance keeps polling.
@@ -45,8 +57,9 @@ picked, with the error naming the provider rather than the key.
 
 On Reddit the check is free. `SocialSource.validateCredentials` sends an empty
 input list, which cannot start a collection, so the provider refuses a bad key
-at 401 before it reads the input. `sources/reddit/fixtures/credentials-accepted.json`
-and `credentials-rejected.json` are the two real answers, captured, and
+at 401 before it reads the input.
+`sources/providers/brightdata/fixtures/credentials-accepted.json` and
+`credentials-rejected.json` are the two real answers, captured, and
 `reddit.test.ts` replays both.
 
 Two answers, not one. The provider **refusing** a key and the provider **not
@@ -76,14 +89,22 @@ provider as a key.
 **Each value has its own nonce**, stored with it. A nonce is not a secret;
 reusing one is what breaks GCM.
 
-**The record's name is authenticated with the value.** A row copied from
-Reddit's credential into X's does not decrypt. Without that, a swap inside the
+**The record's name is authenticated with the value.** A row copied from one
+credential into another does not decrypt. Without that, a swap inside the
 database is invisible.
+
+**The row carries the name it was sealed with.** `source_credentials.record`
+holds it, rather than the code deriving it from the provider and the field. The
+reason is US-024: a row written as `reddit:apiKey` cannot be opened as
+`brightdata:apiKey`, so a derived name would have refused to start on the very
+instance that had a working key. Every write sets the column to the current
+name, so a row normalises itself the first time it is replaced or the key is
+rotated.
 
 **A value that will not decrypt throws.** It is never an empty string. An empty
 credential is four failed calls to a provider and a dead-lettered job, about a
-problem nobody can see; a thrown error names `reddit:apiKey` and a person can
-act on it.
+problem nobody can see; a thrown error names `brightdata:apiKey` and a person
+can act on it.
 
 ---
 

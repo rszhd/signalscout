@@ -88,7 +88,7 @@ describe("a credential never reaches a log line", () => {
     // The list is only a guard while it matches the field names in use. A
     // connector added with a field nobody added here logs its key in full.
     for (const source of builtInSources) {
-      for (const field of source.credentialFields) {
+      for (const field of source.provider.credentialFields) {
         expect(redactedFields).toContain(field.name);
       }
     }

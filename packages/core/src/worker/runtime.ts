@@ -233,7 +233,8 @@ export async function startWorker({
     throw error;
   }
 
-  const lookup = credentialsFor ?? credentialsFromStore(db);
+  // The logger, so a key still read from its deprecated variable says so once.
+  const lookup = credentialsFor ?? credentialsFromStore(db, undefined, process.env, logger);
 
   const sources =
     registry ??
@@ -241,7 +242,7 @@ export async function startWorker({
 
   // At boot, so a connector whose posts the schema cannot hold stops the
   // process instead of failing one poll, quietly, every hour.
-  assertSourcesCanBeStored(sources.ids());
+  assertSourcesCanBeStored(sources.platforms());
 
   const boss = new PgBoss({ connectionString: databaseUrl });
   boss.on("error", (error) => logger.error({ err: error }, "pg-boss error"));
@@ -321,7 +322,7 @@ export async function startWorker({
   logger.info(
     {
       queues: queueDefinitions(retry).map((queue) => queue.name),
-      sources: sources.ids(),
+      connectors: sources.keys().map((key) => `${key.platformId} via ${key.providerId}`),
       model: model ? `${model.provider}/${model.model}` : "none",
       embedder: embedding ? `${embedding.provider}/${embedding.model}` : "none",
     },

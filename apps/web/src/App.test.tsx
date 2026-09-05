@@ -61,7 +61,7 @@ describe("the four screens", () => {
           return json({ matches: [], nextCursor: null, asOf: "2026-09-05T12:00:00.000Z" });
         }
         if (url === "/api/connections") {
-          return json({ canStore: true, storeBlocker: null, sources: [] });
+          return json({ canStore: true, storeBlocker: null, providers: [] });
         }
         throw new Error(`Unexpected request: ${url}`);
       }),

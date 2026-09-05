@@ -14,13 +14,38 @@
  * 3. **A source declares its own price.** The budget guard needs a number.
  *    Hard-coding X's $0.005 in the worker puts a pricing fact in the wrong
  *    file.
+ *
+ * US-024 split the word "source" into the two things it had been holding at
+ * once. Until then one provider served one platform, so one record could
+ * describe both. Two providers fetching Reddit cannot share a price, a
+ * billable unit or a key list, so the axes are separate here:
+ *
+ * * A **platform** is what a person ticks. It keys `posts.source`, it keys
+ *   deduplication, and a monitor names it.
+ * * A **provider** is who fetches, whose key it is, and what it bills.
+ * * A working **connector** is the pair, and it is what the registry holds.
+ *
+ * The rule underneath did not change. The interface is not weakened to suit a
+ * provider, and nothing downstream of a connector learns which provider
+ * answered. STACK.md, *A source is not a provider*.
  */
 import type { Logger } from "../logger.js";
 
-/** A connector's stable name. Lower-case, digits and hyphens: it reaches URLs and columns. */
-export type SourceId = string;
+/**
+ * A platform's stable name: "reddit", "x". Lower-case, digits and hyphens,
+ * because it reaches URLs and the `posts.source` column.
+ */
+export type PlatformId = string;
 
-export const sourceIdPattern = /^[a-z][a-z0-9-]*$/;
+/**
+ * A provider's stable name: "brightdata", "scrapecreators". Same alphabet, and
+ * it reaches `source_credentials.provider` and the environment variable that
+ * holds a key.
+ */
+export type ProviderId = string;
+
+/** Both ids are spelled the same way, so one pattern answers for both. */
+export const connectorIdPattern = /^[a-z][a-z0-9-]*$/;
 
 /**
  * One credential the user supplies. A connector declares its own list, so the
@@ -133,17 +158,53 @@ export interface SearchResult {
 }
 
 /**
- * The static facts about a source: everything the budget guard, the settings
- * form and the registry need before anything is instantiated.
+ * A platform: what a person ticks.
+ *
+ * This axis keys `posts.source` and the deduplication behind it, and it is
+ * what `monitors.sources` names. It holds nothing about money and nothing
+ * about keys, because the same Reddit post can arrive through two providers
+ * that agree about neither.
  */
-export interface SourceDescriptor {
-  readonly id: SourceId;
+export interface PlatformDescriptor {
+  readonly id: PlatformId;
   /** Shown to a person. "Reddit", not "reddit". */
   readonly displayName: string;
+}
+
+/**
+ * A provider: who fetches, and whose key it is.
+ *
+ * `credentialFields` belongs here and not to the platform. One Bright Data key
+ * serves Reddit, X and LinkedIn together, and a list kept on the platform
+ * would make a person paste that one key three times and rotate it three
+ * times.
+ */
+export interface ProviderDescriptor {
+  readonly id: ProviderId;
+  /** Shown to a person. "Bright Data", not "brightdata". */
+  readonly displayName: string;
+  readonly credentialFields: readonly CredentialField[];
+}
+
+/**
+ * A connector: the pair, and what the pair bills.
+ *
+ * The three money fields belong to the platform and the provider together,
+ * never to either alone. Bright Data bills a Reddit record at $0.0015 and
+ * ScrapeCreators will not bill the same unit at the same price for the same
+ * platform, so a price kept on the platform would be one provider's price
+ * charged to every provider.
+ *
+ * Everything the budget guard, the settings form and the registry need before
+ * anything is instantiated.
+ */
+export interface ConnectorDescriptor {
+  readonly platform: PlatformDescriptor;
+  readonly provider: ProviderDescriptor;
   /**
    * What one billable unit is, singular and lower-case: "call", "post read".
    * Without it the price below is ambiguous, because Reddit and X do not bill
-   * the same thing.
+   * the same thing, and neither do two providers fetching Reddit.
    */
   readonly billableUnit: string;
   /**
@@ -164,7 +225,7 @@ export interface SourceDescriptor {
    * US-014 needs it, and it is here rather than in the estimate for the reason
    * the price is: the number belongs to the connector. A cost test that
    * hard-coded Reddit's fifty records would report the wrong figure for every
-   * other source, and would go stale silently the day the connector's own
+   * other connector, and would go stale silently the day the connector's own
    * default moved.
    *
    * It is the top of the range a cost test reports for a query whose sample
@@ -172,10 +233,9 @@ export interface SourceDescriptor {
    * more", and this is how much more there could be.
    */
   readonly maxUnitsPerQueryPoll: number;
-  readonly credentialFields: readonly CredentialField[];
 }
 
-export interface SocialSource extends SourceDescriptor {
+export interface SocialSource extends ConnectorDescriptor {
   validateCredentials(credentials: SourceCredentials): Promise<CredentialCheck>;
   search(request: SearchRequest): Promise<SearchResult>;
 }
@@ -195,8 +255,8 @@ export interface SourceRuntime {
 /**
  * A connector as the registry holds it: the static facts, plus the one
  * function that turns them into a working source. Adding a connector means
- * exporting one of these.
+ * exporting one of these — a platform, a provider, and the pair's economics.
  */
-export interface SourceDefinition extends SourceDescriptor {
+export interface ConnectorDefinition extends ConnectorDescriptor {
   create(runtime: SourceRuntime): SocialSource;
 }

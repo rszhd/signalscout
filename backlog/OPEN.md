@@ -2,12 +2,11 @@
 
 # Open tickets
 
-11 open — 1 doing, 10 todo, 0 parked (3 p1, 7 p2, 1 p3).
+10 open — 1 doing, 9 todo, 0 parked (2 p1, 7 p2, 1 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
 | p1 | US-001 | [The workspace runs with one command](doing/US-001-the-workspace-runs-with-one-command.md) | chore | doing | 2026-09-04T22:49+08:00 |
-| p1 | US-024 | [A platform is separated from the provider that fetches it](todo/US-024-a-platform-is-separated-from-the-provider-that-fetches-it.md) | chore | todo | 2026-09-05T15:23+08:00 |
 | p1 | US-025 | [ScrapeCreators collects Reddit posts](todo/US-025-scrapecreators-collects-reddit-posts.md) | feature | todo | 2026-09-05T15:23+08:00 |
 | p2 | US-006 | [X returns candidate posts and says what it spent](todo/US-006-x-returns-candidate-posts-and-says-what-it-spent.md) | feature | todo | 2026-09-04T22:49+08:00 |
 | p2 | US-015 | [A deleted post stops being shown](todo/US-015-a-deleted-post-stops-being-shown.md) | feature | todo | 2026-09-04T22:49+08:00 |

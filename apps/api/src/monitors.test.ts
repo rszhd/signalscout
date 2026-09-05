@@ -36,7 +36,7 @@ import { buildServer } from "./server.js";
 const logger = createLogger({ level: "silent", name: "test" });
 
 /** A deployment with the Bright Data key Reddit needs, and one without. */
-const configured = { REDDIT_API_KEY: "bd-test-key" };
+const configured = { BRIGHTDATA_API_KEY: "bd-test-key" };
 const unconfigured = {};
 
 const call: ModelCall = {
@@ -174,7 +174,7 @@ describe("the monitor routes", () => {
           {
             name: "apiKey",
             label: "Bright Data API key",
-            environmentVariable: "REDDIT_API_KEY",
+            environmentVariable: "BRIGHTDATA_API_KEY",
             configured: false,
           },
         ]);
@@ -185,7 +185,7 @@ describe("the monitor routes", () => {
       await withServer({}, async (app) => {
         const response = await app.inject({ method: "GET", url: "/api/monitor-options" });
 
-        expect(response.body).toContain("REDDIT_API_KEY");
+        expect(response.body).toContain("BRIGHTDATA_API_KEY");
         // The name of the variable, never its value. US-004 encrypts these,
         // and an endpoint that echoed one would make that pointless.
         expect(response.body).not.toContain("bd-test-key");
@@ -411,7 +411,7 @@ describe("the monitor routes", () => {
         // The answers are kept. The monitor is off.
         expect(body.product).toBe(newMonitor.product);
         expect(body.paused).toBe(true);
-        expect(body.missingCredentials[0].environmentVariable).toBe("REDDIT_API_KEY");
+        expect(body.missingCredentials[0].environmentVariable).toBe("BRIGHTDATA_API_KEY");
         expect(body.missingCredentials[0].label).toBe("Bright Data API key");
       });
     });
@@ -499,7 +499,7 @@ describe("the monitor routes", () => {
         const response = await app.inject({ method: "POST", url: `/api/monitors/${id}/resume` });
 
         expect(response.statusCode).toBe(409);
-        expect(response.json().message).toContain("REDDIT_API_KEY");
+        expect(response.json().message).toContain("BRIGHTDATA_API_KEY");
         expect(response.json().missingCredentials).toHaveLength(1);
 
         // And the row still says paused, so the worker agrees with the answer.
@@ -761,6 +761,7 @@ describe("the monitor routes", () => {
         await recordSourceUsage(db, {
           monitorId: id,
           source: "reddit",
+          provider: "brightdata",
           units: 200,
           pricePerUnitMicros: 1500,
         });
@@ -786,6 +787,7 @@ describe("the monitor routes", () => {
         await recordSourceUsage(db, {
           monitorId: id,
           source: "reddit",
+          provider: "brightdata",
           units: 200,
           pricePerUnitMicros: 1500,
         });
@@ -806,6 +808,7 @@ describe("the monitor routes", () => {
         await recordSourceUsage(db, {
           monitorId: id,
           source: "reddit",
+          provider: "brightdata",
           units: 10,
           pricePerUnitMicros: 1500,
         });
@@ -828,6 +831,7 @@ describe("the monitor routes", () => {
         await recordSourceUsage(db, {
           monitorId: id,
           source: "reddit",
+          provider: "brightdata",
           units: 10,
           pricePerUnitMicros: 1500,
         });

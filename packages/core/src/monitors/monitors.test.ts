@@ -14,7 +14,7 @@ import { eq } from "drizzle-orm";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { createDatabase, type Database } from "../db/client.js";
 import { matches, monitors, posts } from "../db/schema.js";
-import { redditSourceDefinition } from "../sources/reddit/index.js";
+import { brightDataReddit } from "../sources/providers/brightdata/reddit.js";
 import { createTestDatabase, type TestDatabase } from "../testing/database.js";
 import { findDueMonitors } from "../worker/schedule.js";
 import {
@@ -26,10 +26,10 @@ import {
   updateMonitor,
 } from "./monitors.js";
 
-const descriptors = [redditSourceDefinition];
+const descriptors = [brightDataReddit];
 
 /** A deployment that has the Bright Data key Reddit needs. */
-const configured = { REDDIT_API_KEY: "bd-test-key" };
+const configured = { BRIGHTDATA_API_KEY: "bd-test-key" };
 /** A deployment that does not. */
 const unconfigured = {};
 
@@ -242,9 +242,11 @@ describe("a monitor whose source has no credentials", () => {
       {
         sourceId: "reddit",
         sourceName: "Reddit",
+        providerId: "brightdata",
+        providerName: "Bright Data",
         field: "apiKey",
         label: "Bright Data API key",
-        environmentVariable: "REDDIT_API_KEY",
+        environmentVariable: "BRIGHTDATA_API_KEY",
       },
     ]);
   });
@@ -262,7 +264,7 @@ describe("a monitor whose source has no credentials", () => {
 
     expect(result?.status).toBe("blocked");
     if (result?.status !== "blocked") return;
-    expect(result.missing[0]?.environmentVariable).toBe("REDDIT_API_KEY");
+    expect(result.missing[0]?.environmentVariable).toBe("BRIGHTDATA_API_KEY");
 
     // The answer a caller could ignore is not the guard. The row is.
     expect((await getMonitor(db, monitor.id))?.pausedAt).not.toBeNull();
@@ -289,20 +291,23 @@ describe("a monitor whose source has no credentials", () => {
     // A source with two fields, so a user who set one of them is told about
     // the other rather than being sent back to check the one that is right.
     const twoFields = {
-      ...redditSourceDefinition,
-      credentialFields: [
-        { name: "apiKey", label: "API key", secret: true },
-        { name: "apiSecret", label: "API secret", secret: true },
-      ],
+      ...brightDataReddit,
+      provider: {
+        ...brightDataReddit.provider,
+        credentialFields: [
+          { name: "apiKey", label: "API key", secret: true },
+          { name: "apiSecret", label: "API secret", secret: true },
+        ],
+      },
     };
 
     const { missing } = await createMonitor(db, input(), {
       descriptors: [twoFields],
-      environment: { REDDIT_API_KEY: "set" },
+      environment: { BRIGHTDATA_API_KEY: "set" },
     });
 
     expect(missing.map((credential) => credential.environmentVariable)).toEqual([
-      "REDDIT_API_SECRET",
+      "BRIGHTDATA_API_SECRET",
     ]);
   });
 });

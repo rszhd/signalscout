@@ -11,6 +11,7 @@
  * refreshing the screen cannot spend money.
  */
 import {
+  type ConnectorDescriptor,
   type Database,
   defaultPollIntervalSeconds,
   estimateProbeKinds,
@@ -25,7 +26,6 @@ import {
   readEstimate,
   refuseEstimate,
   reportFor,
-  type SourceDescriptor,
   searchQuerySchema,
   startEstimate,
   sources as storableSources,
@@ -122,7 +122,7 @@ const startBody = z.object({
 
 export interface EstimateRoutesOptions {
   readonly db: Database;
-  readonly sources: readonly SourceDescriptor[];
+  readonly sources: readonly ConnectorDescriptor[];
   /**
    * How the worker is told to run the test. Null when this deployment has no
    * queue to send to, which the route says rather than writing a run nothing
@@ -225,7 +225,7 @@ export async function registerEstimateRoutes(
 
 function toResponse(
   run: Awaited<ReturnType<typeof readEstimate>> & object,
-  sources: readonly SourceDescriptor[],
+  sources: readonly ConnectorDescriptor[],
 ) {
   const report = reportFor(run, sources);
 

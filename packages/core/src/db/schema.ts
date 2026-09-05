@@ -28,9 +28,34 @@ import {
   vector,
 } from "drizzle-orm/pg-core";
 
-/** The sources PLAN.md builds first. A third one is a migration, not a guess. */
+/**
+ * The platforms PLAN.md builds first. A third one is a migration, not a guess.
+ *
+ * This is the platform axis: what a person ticks, what `posts.source` stores,
+ * and what deduplication is keyed by. The same Reddit post fetched through two
+ * providers is one post and one row here. US-024 separated the axes;
+ * `sources/types.ts` says why.
+ */
 export const sources = ["reddit", "x"] as const;
 export type Source = (typeof sources)[number];
+
+/**
+ * The providers a key can belong to. A third one is a migration, not a guess.
+ *
+ * This is the other axis: who fetched, whose key it is, and what it bills. It
+ * is on `api_usage` and `source_continuations` because both describe work one
+ * provider did, on `posts` for attribution only, and it is what
+ * `source_credentials` is keyed by, because a key belongs to the account and
+ * not to the network.
+ *
+ * `scrapecreators` has no connector yet — US-025 writes it. It is here because
+ * US-024's own note says the re-key has to run first, or a ScrapeCreators key
+ * has nowhere to live, and because a column whose only legal value is
+ * "brightdata" cannot show that the keys above separate two providers at all.
+ * No route can write it while nothing is registered under it.
+ */
+export const providers = ["brightdata", "scrapecreators"] as const;
+export type Provider = (typeof providers)[number];
 
 /** The signals a user ticks in the monitor form. PLAN.md, *Monitor creation*. */
 export const signals = [
@@ -165,6 +190,13 @@ function scoreRange(column: string) {
 /** SQL fragment for a text column restricted to a fixed list. */
 function oneOf(column: string, values: readonly string[]) {
   return sql.raw(`${column} IN (${values.map((value) => `'${value}'`).join(", ")})`);
+}
+
+/** The same, for a nullable column, where null means "we cannot say". */
+function optionallyOneOf(column: string, values: readonly string[]) {
+  return sql.raw(
+    `${column} IS NULL OR ${column} IN (${values.map((value) => `'${value}'`).join(", ")})`,
+  );
 }
 
 /**
@@ -326,10 +358,24 @@ export const posts = pgTable(
     fetchedAt: timestamp("fetched_at", { withTimezone: true }).notNull().defaultNow(),
     /** Null until the keyword stage keeps the post. An embedding call costs money. */
     embedding: vector("embedding", { dimensions: embeddingDimensions }),
+    /**
+     * Which provider this copy came back from. Attribution, and nothing more.
+     *
+     * Deliberately outside `UNIQUE (source, external_id)`. The same Reddit
+     * post collected through two providers is one post, and putting this
+     * column in the key would make it two rows — the second of them a second
+     * classification, a second embedding and a second charge for the same
+     * conversation.
+     *
+     * Null for a row stored before US-024, and for a row whose first fetch we
+     * no longer know. Null means "we cannot say", not "no provider".
+     */
+    provider: text("provider").$type<Provider>(),
   },
   (table) => [
     unique("posts_source_external_id_unique").on(table.source, table.externalId),
     check("posts_source_known", oneOf("source", sources)),
+    check("posts_provider_known", optionallyOneOf("provider", providers)),
   ],
 );
 
@@ -358,9 +404,13 @@ export const maxResumeAttempts = 120;
  * sent, the next poll still finds this row and reads the snapshot instead of
  * triggering a second collection for it.
  *
- * `UNIQUE (monitor_id, source)` is what "one collection in flight per monitor
- * per source" means. It is a constraint rather than a rule in the collector
- * because two workers polling at once is a state this product expects.
+ * `UNIQUE (monitor_id, source, provider)` is what "one collection in flight
+ * per monitor per connector" means. It is a constraint rather than a rule in
+ * the collector because two workers polling at once is a state this product
+ * expects. The provider is in the key because a snapshot id belongs to the
+ * provider that issued it: two providers fetching one platform for one monitor
+ * are two collections, and a key without the provider would let one of them
+ * overwrite the other's cursor — money spent on records nobody reads.
  *
  * `since` is carried here and not read from `monitors.last_polled_at`. The poll
  * mark moves when the collection is triggered, so a resume that read the column
@@ -375,6 +425,8 @@ export const sourceContinuations = pgTable(
       .notNull()
       .references(() => monitors.id, { onDelete: "cascade" }),
     source: text("source").$type<Source>().notNull(),
+    /** Who is collecting. The cursor below means nothing without it. */
+    provider: text("provider").$type<Provider>().notNull(),
     /** Opaque to everything outside the connector that issued it. */
     cursor: text("cursor").notNull(),
     /** The `since` of the poll that started this collection. Null means all time. */
@@ -391,8 +443,13 @@ export const sourceContinuations = pgTable(
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [
-    unique("source_continuations_monitor_source_unique").on(table.monitorId, table.source),
+    unique("source_continuations_monitor_source_unique").on(
+      table.monitorId,
+      table.source,
+      table.provider,
+    ),
     check("source_continuations_source_known", oneOf("source", sources)),
+    check("source_continuations_provider_known", oneOf("provider", providers)),
     check("source_continuations_attempts_bounded", sql.raw(`attempts >= 0`)),
   ],
 );
@@ -613,9 +670,13 @@ export type ExhaustedBehaviour = (typeof exhaustedBehaviours)[number];
  * `worker/collect.ts` writes a row after every page rather than once per poll,
  * because a poll that throws on its third page was billed for the first two.
  *
- * The unit is the source's own — Reddit bills a record, X bills a post read —
- * so `units` is comparable only within a source. `source_descriptor.billableUnit`
- * is the word for it, and the cost column is what makes two sources add up.
+ * The unit is the connector's own — Bright Data bills a Reddit record, X bills
+ * a post read — so `units` is comparable only within one platform and provider
+ * together. `ConnectorDescriptor.billableUnit` is the word for it, and the cost
+ * column is what makes two connectors add up. That is why the provider is on
+ * this row and in its key: two providers fetching one platform do not bill the
+ * same unit at the same price, so a row that summed them would be adding
+ * records to post reads.
  *
  * STACK.md sketches this column as `estimated_cost_cents`. It is micro-dollars
  * here, for the reason `model_calls` already uses them: one classification
@@ -647,6 +708,8 @@ export const apiUsage = pgTable(
      */
     monitorId: uuid("monitor_id").references(() => monitors.id, { onDelete: "cascade" }),
     source: text("source").$type<Source>().notNull(),
+    /** Whose bill this lands on, and whose price computed the cost beside it. */
+    provider: text("provider").$type<Provider>().notNull(),
     /** The UTC day. A provider's billing day may differ; this is one more reason the figure is an estimate. */
     day: date("day").notNull(),
     /** Billable units the source reported. Never a post count: `SearchResult.unitsConsumed`. */
@@ -656,19 +719,20 @@ export const apiUsage = pgTable(
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [
-    // One row per monitor per source per day, so a poll adds to a row rather
-    // than inserting one. The guard sums this table on every poll, and a row
-    // per page would make that sum grow without limit inside one month.
+    // One row per monitor per connector per day, so a poll adds to a row
+    // rather than inserting one. The guard sums this table on every poll, and
+    // a row per page would make that sum grow without limit inside one month.
     //
     // `nullsNotDistinct` is what keeps that true for the rows with no monitor.
     // Postgres treats two nulls as different by default, so the unattributed
     // cost tests of one day would insert a row each instead of adding to one,
     // and the table would grow with every press of a button.
     unique("api_usage_monitor_source_day_unique")
-      .on(table.monitorId, table.source, table.day)
+      .on(table.monitorId, table.source, table.provider, table.day)
       .nullsNotDistinct(),
     index("api_usage_monitor_day_idx").on(table.monitorId, table.day),
     check("api_usage_source_known", oneOf("source", sources)),
+    check("api_usage_provider_known", oneOf("provider", providers)),
     check("api_usage_units_non_negative", sql.raw(`units >= 0`)),
     check("api_usage_cost_non_negative", sql.raw(`estimated_cost_micros >= 0`)),
   ],
@@ -870,7 +934,13 @@ export const queryEstimateProbes = pgTable(
  * and outside git. This table is for the second instance, and for the hosted
  * version, where a key reaches a database somebody else takes backups of.
  *
- * Three things about the columns.
+ * The row is keyed by *provider*, not by platform. A key belongs to the
+ * account it was issued for: one Bright Data key serves Reddit, X and
+ * LinkedIn, and a table keyed by platform would hold three copies of it and
+ * rotate three copies of it. US-024 re-keyed this table and moved the stored
+ * Bright Data key from "reddit" to "brightdata" without anybody retyping it.
+ *
+ * Four things about the columns.
  *
  * `ciphertext` is the whole encrypted payload, `v1.<nonce>.<value>.<tag>`, as
  * `secrets/cipher.ts` writes it. The nonce is stored with the value because a
@@ -883,6 +953,14 @@ export const queryEstimateProbes = pgTable(
  * it exists so that showing a person which key is set never decrypts one. The
  * API reads this column and never `ciphertext`.
  *
+ * `record` is the name the ciphertext was sealed with, and it is stored rather
+ * than computed because computing it would have locked every existing key out.
+ * The cipher authenticates the record name, so a row written as "reddit:apiKey"
+ * cannot be opened as "brightdata:apiKey" — the re-key would have refused to
+ * boot on the very instance that had a working key. A write always sets it to
+ * the current name, so a row normalises itself the first time it is replaced or
+ * rotated.
+ *
  * There is no `updated_by` and no history. A credential is replaced, not
  * versioned: keeping the old ciphertext keeps the old key working after
  * somebody rotates away from it, which is the opposite of the point.
@@ -890,19 +968,21 @@ export const queryEstimateProbes = pgTable(
 export const sourceCredentials = pgTable(
   "source_credentials",
   {
-    /** The source, never the provider behind it. STACK.md, *A source is not a provider*. */
-    source: text("source").$type<Source>().notNull(),
-    /** The connector's own field name: `apiKey`, `apiSecret`. */
+    /** Whose account the key is on. Never the platform it is used to fetch. */
+    provider: text("provider").$type<Provider>().notNull(),
+    /** The provider's own field name: `apiKey`, `apiSecret`. */
     field: text("field").notNull(),
     ciphertext: text("ciphertext").notNull(),
+    /** What the cipher authenticated. See the header: it is stored, not derived. */
+    record: text("record").notNull(),
     /** `••••1234`. What a person is shown, stored so nothing has to decrypt to show it. */
     hint: text("hint").notNull(),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [
-    primaryKey({ columns: [table.source, table.field] }),
-    check("source_credentials_source_known", oneOf("source", sources)),
+    primaryKey({ columns: [table.provider, table.field] }),
+    check("source_credentials_provider_known", oneOf("provider", providers)),
     // A value that is not in the cipher's format was never encrypted by us.
     // The database refuses it rather than handing it to a connector as a key.
     check("source_credentials_ciphertext_format", sql.raw(`ciphertext LIKE 'v1.%.%.%'`)),

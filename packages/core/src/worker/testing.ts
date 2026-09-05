@@ -1,11 +1,13 @@
 /**
  * Helpers the worker's test files share.
  *
- * The registry here is the fake connector under the id "reddit". The fake
- * because no test reaches Reddit, and under that id because `posts.source`
- * only accepts a source the schema knows: a registry holding "fake" is one no
- * deployment can have, and a test that stores its posts would prove nothing
- * about the poll a deployment actually runs.
+ * The registry here is the fake connector under the pair "reddit" and
+ * "brightdata". The fake because no test reaches Reddit; under that pair
+ * because the schema only accepts a platform and a provider it knows, on
+ * `posts.source`, `api_usage.provider` and `source_continuations.provider`
+ * alike. A registry holding "fake via fake-provider" is one no deployment can
+ * have, and a test that stored its rows would prove nothing about the poll a
+ * deployment actually runs.
  */
 import { createDatabase } from "../db/client.js";
 import { monitors } from "../db/schema.js";
@@ -26,7 +28,15 @@ export function fakeRegistry(
   logger: Logger = silentLogger,
 ): SourceRegistry {
   return createSourceRegistry({
-    definitions: [fakeSourceDefinition({ id: "reddit", displayName: "Reddit", ...options })],
+    definitions: [
+      fakeSourceDefinition({
+        id: "reddit",
+        displayName: "Reddit",
+        providerId: "brightdata",
+        providerName: "Bright Data",
+        ...options,
+      }),
+    ],
     // The real network is unreachable, not merely unused.
     runtime: createSourceRuntime({ fetch: unreachableFetch, logger }),
   });

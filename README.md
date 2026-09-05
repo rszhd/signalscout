@@ -58,7 +58,7 @@ before anything reaches a model, so you are not billed for reading noise.
 IntentWatch ships the integrations. You own the accounts.
 
 ```env
-REDDIT_API_KEY=          # Reddit, served by Bright Data
+BRIGHTDATA_API_KEY=      # Bright Data, which serves Reddit
 
 X_API_KEY=               # optional
 X_API_SECRET=
@@ -78,8 +78,17 @@ model's price, what it cost. Where we do not know the price, the record says so
 rather than guessing. Set `AI_INPUT_PRICE_MICROS` and `AI_OUTPUT_PRICE_MICROS`
 to teach it what your model costs.
 
-You only need keys for the sources you turn on. Reddit alone is a useful
-product, so `REDDIT_API_KEY` and an AI key are enough to start.
+A key is named after the **provider** it belongs to, not the platform it
+fetches. One Bright Data key serves every platform Bright Data fetches, so it is
+set once and rotated once.
+
+`REDDIT_API_KEY` was the old name and is still read, so an instance that
+upgrades keeps polling. It is going: rename it to `BRIGHTDATA_API_KEY` when you
+next edit `.env`. The application logs which line to change, once per start.
+
+You only need keys for the providers that serve the sources you turn on. Reddit
+alone is a useful product, so `BRIGHTDATA_API_KEY` and an AI key are enough to
+start.
 
 ### What that costs
 
@@ -129,8 +138,10 @@ There is no connector for it today. Open an issue if you want one.
 1. Create an account at [brightdata.com](https://brightdata.com). No card, no
    company verification.
 2. Open **Settings → API keys** and create a key.
-3. Put it in `.env` as `REDDIT_API_KEY=…`. The variable is named after the
-   source you connect, not the company that serves it.
+3. Put it in `.env` as `BRIGHTDATA_API_KEY=…`, or paste it on the Connections
+   screen, which tests it with Bright Data before it stores it. The variable is
+   named after Bright Data because the key is Bright Data's: the same key
+   serves every platform we fetch through them.
 
 That is all. You do not choose a dataset, a scraper or a plan; IntentWatch asks
 for the Reddit ones by name.

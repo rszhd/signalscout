@@ -51,7 +51,7 @@ function contextFor(db: Database, boss: ReturnType<typeof stubBoss>): StepContex
 
 /** Every search the fake served, in order. An empty list means it was never asked. */
 function callsOf(registry: ReturnType<typeof fakeRegistry>): readonly SearchRequest[] {
-  return (registry.get("reddit") as SocialSource & { calls: readonly SearchRequest[] }).calls;
+  return (registry.only("reddit") as SocialSource & { calls: readonly SearchRequest[] }).calls;
 }
 
 describe("the poll step", () => {
@@ -120,7 +120,7 @@ describe("the poll step", () => {
 
     const monitorId = await insertMonitor(database);
     const registry = fakeRegistry({ posts: many, pageSize: 1 });
-    const source = registry.get("reddit") as SocialSource & { calls: readonly unknown[] };
+    const source = registry.only("reddit") as SocialSource & { calls: readonly unknown[] };
 
     await createCollectStep({ registry, credentialsFor: credentials })(
       { monitorId },
@@ -138,7 +138,7 @@ describe("the poll step", () => {
     const monitorId = await insertMonitor(database);
     // One search, then the allowance is gone and the connector reports a wait.
     const registry = fakeRegistry({ pageSize: 1, callsBeforeRateLimit: 1 });
-    const source = registry.get("reddit") as SocialSource & { calls: readonly unknown[] };
+    const source = registry.only("reddit") as SocialSource & { calls: readonly unknown[] };
 
     await createCollectStep({ registry, credentialsFor: credentials })(
       { monitorId },
@@ -157,7 +157,7 @@ describe("the poll step", () => {
     // then bury the one sentence the user has to read in a dead letter queue.
     const monitorId = await insertMonitor(database);
     const registry = fakeRegistry();
-    const source = registry.get("reddit") as SocialSource & { calls: readonly unknown[] };
+    const source = registry.only("reddit") as SocialSource & { calls: readonly unknown[] };
     const boss = stubBoss();
 
     await expect(
@@ -175,7 +175,7 @@ describe("the poll step", () => {
   it("moves the poll mark forward and asks the next poll only for what is newer", async () => {
     const monitorId = await insertMonitor(database);
     const registry = fakeRegistry();
-    const source = registry.get("reddit") as SocialSource & {
+    const source = registry.only("reddit") as SocialSource & {
       calls: readonly { query: { since?: Date } }[];
     };
     const collect = createCollectStep({ registry, credentialsFor: credentials });
@@ -395,7 +395,7 @@ describe("the poll step", () => {
 
       await db
         .insert(sourceContinuations)
-        .values({ monitorId, source: "reddit", cursor: "1", resumeAfter });
+        .values({ monitorId, source: "reddit", provider: "brightdata", cursor: "1", resumeAfter });
 
       const registry = fakeRegistry();
       const boss = await poll(registry, monitorId);
@@ -421,6 +421,7 @@ describe("the poll step", () => {
       await db.insert(sourceContinuations).values({
         monitorId,
         source: "reddit",
+        provider: "brightdata",
         cursor: "1",
         resumeAfter: new Date(Date.now() - 1000),
       });
@@ -492,6 +493,7 @@ describe("the poll step", () => {
       await db.insert(sourceContinuations).values({
         monitorId,
         source: "reddit",
+        provider: "brightdata",
         cursor: "0",
         resumeAfter: new Date(Date.now() - 1000),
         attempts: maxResumeAttempts - 1,
@@ -511,6 +513,7 @@ describe("the poll step", () => {
       await db.insert(sourceContinuations).values({
         monitorId,
         source: "reddit",
+        provider: "brightdata",
         cursor: "1",
         resumeAfter: new Date(Date.now() - 1000),
         attempts: maxResumeAttempts,
@@ -630,7 +633,7 @@ describe("the poll step", () => {
       // were billed; the third throws. Both are on the bill either way.
       const monitorId = await insertMonitor(database);
       const registry = fakeRegistry({ pageSize: 1, unitsPerCall: 4, pricePerUnitMicros: 1000 });
-      const source = registry.get("reddit") as SocialSource;
+      const source = registry.only("reddit") as SocialSource;
       const search = source.search.bind(source);
       let served = 0;
 

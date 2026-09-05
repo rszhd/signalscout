@@ -11,7 +11,7 @@
  * first run: the documented `date` value, the documented progress statuses and
  * the documented snapshot id prefix were all wrong.
  */
-import type { SourceRuntime } from "../types.js";
+import type { SourceRuntime } from "../../types.js";
 
 const apiBase = "https://api.brightdata.com/datasets/v3";
 

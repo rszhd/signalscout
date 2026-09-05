@@ -2,9 +2,14 @@ import { describe, expect, it } from "vitest";
 import { createLogger } from "../logger.js";
 import { unreachableFetch } from "../testing/network.js";
 import { fakeSourceDefinition } from "./fake/index.js";
-import { createSourceRegistry, UnknownSourceError } from "./registry.js";
+import {
+  AmbiguousConnectorError,
+  createSourceRegistry,
+  UnknownConnectorError,
+  UnknownSourceError,
+} from "./registry.js";
 import { assertSourcesCanBeStored } from "./storage.js";
-import type { SourceDefinition, SourceRuntime } from "./types.js";
+import type { ConnectorDefinition, SourceRuntime } from "./types.js";
 
 const runtime: SourceRuntime = {
   fetch: unreachableFetch,
@@ -13,47 +18,109 @@ const runtime: SourceRuntime = {
   logger: createLogger({ level: "silent", name: "registry-test" }),
 };
 
-function registryOf(...definitions: SourceDefinition[]) {
+function registryOf(...definitions: ConnectorDefinition[]) {
   return createSourceRegistry({ definitions, runtime });
 }
 
-describe("the registry answers for a source", () => {
-  it("returns the source registered under an id", () => {
-    const registry = registryOf(fakeSourceDefinition({ id: "reddit", displayName: "Reddit" }));
+describe("the registry answers for a platform and a provider together", () => {
+  it("returns the connector registered under a pair", () => {
+    const registry = registryOf(
+      fakeSourceDefinition({ id: "reddit", displayName: "Reddit", providerId: "brightdata" }),
+    );
 
-    expect(registry.get("reddit").displayName).toBe("Reddit");
-    expect(registry.has("reddit")).toBe(true);
-    expect(registry.ids()).toEqual(["reddit"]);
+    expect(registry.get("reddit", "brightdata").platform.displayName).toBe("Reddit");
+    expect(registry.has("reddit", "brightdata")).toBe(true);
+    expect(registry.platforms()).toEqual(["reddit"]);
+    expect(registry.keys()).toEqual([{ platformId: "reddit", providerId: "brightdata" }]);
     expect(registry.list()).toHaveLength(1);
   });
 
-  it("throws for an id it does not know, and names what it does know", () => {
-    const registry = registryOf(fakeSourceDefinition({ id: "reddit" }));
+  it("refuses a pair nothing fetches, and names both halves of it", () => {
+    // The mistake this ticket's split makes possible: the platform is right,
+    // the provider is not, and a message naming only the platform would send
+    // the reader looking for a connector that is registered.
+    const registry = registryOf(fakeSourceDefinition({ id: "reddit", providerId: "brightdata" }));
 
-    expect(() => registry.get("bluesky")).toThrow(UnknownSourceError);
-    expect(() => registry.get("bluesky")).toThrow(
-      'Unknown source "bluesky". Registered sources: reddit.',
+    expect(() => registry.get("reddit", "scrapecreators")).toThrow(UnknownConnectorError);
+    expect(() => registry.get("reddit", "scrapecreators")).toThrow(
+      'No connector fetches "reddit" from "scrapecreators". ' +
+        "Registered connectors: reddit via brightdata.",
     );
   });
 
   it("says so plainly when nothing is registered at all", () => {
     const registry = registryOf();
 
-    expect(() => registry.get("reddit")).toThrow("Registered sources: (none).");
+    expect(() => registry.get("reddit", "brightdata")).toThrow("Registered connectors: (none).");
+  });
+});
+
+describe("a caller that has a platform and no provider", () => {
+  it("gets the one connector that fetches it", () => {
+    const registry = registryOf(
+      fakeSourceDefinition({ id: "reddit", displayName: "Reddit", providerId: "brightdata" }),
+    );
+
+    expect(registry.only("reddit").provider.id).toBe("brightdata");
+  });
+
+  it("throws for a platform it does not know, and names what it does know", () => {
+    const registry = registryOf(fakeSourceDefinition({ id: "reddit" }));
+
+    expect(() => registry.only("bluesky")).toThrow(UnknownSourceError);
+    expect(() => registry.only("bluesky")).toThrow(
+      'Unknown source "bluesky". Registered sources: reddit.',
+    );
+  });
+
+  it("refuses to choose when two providers fetch the platform", () => {
+    // Registration order is not a choice. Answering with the first would spend
+    // somebody's money at a provider they did not pick, and the day this
+    // happens the caller is what has to be given a choice.
+    const registry = registryOf(
+      fakeSourceDefinition({ id: "reddit", providerId: "brightdata" }),
+      fakeSourceDefinition({ id: "reddit", providerId: "scrapecreators" }),
+    );
+
+    expect(registry.forPlatform("reddit")).toHaveLength(2);
+    expect(() => registry.only("reddit")).toThrow(AmbiguousConnectorError);
+    expect(() => registry.only("reddit")).toThrow(
+      '"reddit" is fetched by brightdata and scrapecreators.',
+    );
   });
 });
 
 describe("the registry fails at startup, not at poll time", () => {
-  it("refuses two connectors claiming the same id", () => {
+  it("refuses two connectors claiming the same pair", () => {
     expect(() =>
-      registryOf(fakeSourceDefinition({ id: "x" }), fakeSourceDefinition({ id: "x" })),
-    ).toThrow('Two sources are registered as "x".');
+      registryOf(
+        fakeSourceDefinition({ id: "x", providerId: "brightdata" }),
+        fakeSourceDefinition({ id: "x", providerId: "brightdata" }),
+      ),
+    ).toThrow('Two connectors are registered as "x via brightdata".');
+  });
+
+  it("allows the same platform twice through different providers", () => {
+    expect(() =>
+      registryOf(
+        fakeSourceDefinition({ id: "x", providerId: "brightdata" }),
+        fakeSourceDefinition({ id: "x", providerId: "scrapecreators" }),
+      ),
+    ).not.toThrow();
   });
 
   it("refuses an id that cannot travel through a URL or a column", () => {
     expect(() => registryOf(fakeSourceDefinition({ id: "Reddit" }))).toThrow(/not usable/);
     expect(() => registryOf(fakeSourceDefinition({ id: "" }))).toThrow(/not usable/);
     expect(() => registryOf(fakeSourceDefinition({ id: "hacker news" }))).toThrow(/not usable/);
+  });
+
+  it("holds a provider id to the same alphabet", () => {
+    // It reaches `source_credentials.provider` and an environment variable
+    // name, so a space or a capital in it breaks the same two things.
+    expect(() => registryOf(fakeSourceDefinition({ providerId: "Bright Data" }))).toThrow(
+      /Provider id "Bright Data" is not usable/,
+    );
   });
 
   it("refuses a price that is not a whole number of micro-dollars", () => {

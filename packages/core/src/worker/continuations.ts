@@ -15,11 +15,18 @@
  */
 import { and, eq, sql } from "drizzle-orm";
 import type { Database } from "../db/client.js";
-import { type Source, sourceContinuations } from "../db/schema.js";
+import { type Provider, type Source, sourceContinuations } from "../db/schema.js";
 
 /** One collection in flight, as the poll step needs it. */
 export interface Continuation {
   readonly source: Source;
+  /**
+   * Who is collecting.
+   *
+   * A snapshot id belongs to the provider that issued it, so the pair is the
+   * key and neither half of it identifies a collection on its own.
+   */
+  readonly provider: Provider;
   /** Opaque. It came from the connector that issued it and means nothing here. */
   readonly cursor: string;
   /** The `since` of the poll that triggered the collection. */
@@ -40,6 +47,7 @@ export async function continuationsFor(
 
   return rows.map((row) => ({
     source: row.source,
+    provider: row.provider,
     cursor: row.cursor,
     ...(row.since ? { since: row.since } : {}),
     resumeAfter: row.resumeAfter,
@@ -49,6 +57,7 @@ export async function continuationsFor(
 
 export interface ContinuationRecord {
   readonly source: Source;
+  readonly provider: Provider;
   readonly cursor: string;
   readonly since?: Date;
   readonly resumeAfter: Date;
@@ -72,13 +81,17 @@ export interface ContinuationRecord {
 export async function rememberContinuation(
   db: Database,
   monitorId: string,
-  { source, cursor, since, resumeAfter, progressed }: ContinuationRecord,
+  { source, provider, cursor, since, resumeAfter, progressed }: ContinuationRecord,
 ): Promise<void> {
   await db
     .insert(sourceContinuations)
-    .values({ monitorId, source, cursor, since: since ?? null, resumeAfter })
+    .values({ monitorId, source, provider, cursor, since: since ?? null, resumeAfter })
     .onConflictDoUpdate({
-      target: [sourceContinuations.monitorId, sourceContinuations.source],
+      target: [
+        sourceContinuations.monitorId,
+        sourceContinuations.source,
+        sourceContinuations.provider,
+      ],
       set: {
         cursor,
         resumeAfter,
@@ -93,10 +106,15 @@ export async function forgetContinuation(
   db: Database,
   monitorId: string,
   source: Source,
+  provider: Provider,
 ): Promise<void> {
   await db
     .delete(sourceContinuations)
     .where(
-      and(eq(sourceContinuations.monitorId, monitorId), eq(sourceContinuations.source, source)),
+      and(
+        eq(sourceContinuations.monitorId, monitorId),
+        eq(sourceContinuations.source, source),
+        eq(sourceContinuations.provider, provider),
+      ),
     );
 }

@@ -20,7 +20,7 @@ import {
   queryEstimates,
   type Source,
 } from "../db/schema.js";
-import type { SourceDescriptor } from "../sources/types.js";
+import type { ConnectorDescriptor } from "../sources/types.js";
 import {
   type EstimateSample,
   type EstimateTotals,
@@ -315,19 +315,19 @@ export interface EstimateReport {
  *
  * The projection needs three facts from the connector — its price, what one
  * query may collect in a poll, and the shortest window it can be asked for —
- * and a probe whose source this build no longer ships has none of them. Such a
+ * and a probe whose platform this build no longer ships has none of them. Such a
  * probe reports what it measured and no cost at all, rather than a cost
  * computed from a price we made up.
  */
 export function reportFor(
   run: EstimateRun,
-  descriptors: readonly SourceDescriptor[],
+  descriptors: readonly ConnectorDescriptor[],
 ): EstimateReport {
   const window = { windowDays: sampleWindowDays };
   const projections: Projection[] = [];
 
   const queries = run.probes.map((probe): ProbeReport => {
-    const descriptor = descriptors.find((candidate) => candidate.id === probe.source);
+    const descriptor = descriptors.find((candidate) => candidate.platform.id === probe.source);
 
     const projection = descriptor
       ? projectMonthly(
@@ -367,7 +367,7 @@ export function reportFor(
 
     return {
       source: probe.source,
-      sourceName: descriptor?.displayName ?? probe.source,
+      sourceName: descriptor?.platform.displayName ?? probe.source,
       kind: probe.kind,
       term: probe.term,
       status: probe.status,

@@ -25,7 +25,7 @@
  */
 import { eq, sql } from "drizzle-orm";
 import { enforceBudget, recordSourceUsage } from "../budget/budget.js";
-import { maxResumeAttempts, monitors, posts, type Source } from "../db/schema.js";
+import { maxResumeAttempts, monitors, type Provider, posts, type Source } from "../db/schema.js";
 import { monitorQueries } from "../monitors/monitors.js";
 import type { SourceRegistry } from "../sources/registry.js";
 import type {
@@ -67,9 +67,10 @@ export interface CollectOptions {
   readonly credentialsFor: CredentialLookup;
 }
 
-/** What one source returned in one poll. US-013 records the units against a budget. */
+/** What one connector returned in one poll. US-013 records the units against a budget. */
 interface SourceOutcome {
   readonly sourceId: string;
+  readonly providerId: string;
   readonly pages: number;
   readonly posts: readonly CandidatePost[];
   readonly unitsConsumed: number;
@@ -140,7 +141,8 @@ async function readSource(
       // window, expires the job. The cursor travels back to the caller, which
       // writes it down before this job ends.
       return {
-        sourceId: source.id,
+        sourceId: source.platform.id,
+        providerId: source.provider.id,
         pages,
         posts: collected,
         unitsConsumed,
@@ -154,7 +156,8 @@ async function readSource(
   }
 
   return {
-    sourceId: source.id,
+    sourceId: source.platform.id,
+    providerId: source.provider.id,
     pages,
     posts: collected,
     unitsConsumed,
@@ -162,9 +165,12 @@ async function readSource(
   };
 }
 
-function toRow(sourceId: Source, post: CandidatePost) {
+function toRow(sourceId: Source, providerId: Provider, post: CandidatePost) {
   return {
     source: sourceId,
+    // Attribution only. `UNIQUE (source, external_id)` does not read it, so a
+    // post already stored keeps whichever provider first brought it back.
+    provider: providerId,
     externalId: post.externalId,
     url: post.url,
     author: post.author ?? null,
@@ -244,7 +250,7 @@ export function createCollectStep({ registry, credentialsFor }: CollectOptions):
      */
     const pending = new Map(
       (await continuationsFor(db, monitorId)).map((continuation) => [
-        continuation.source as string,
+        `${continuation.source}:${continuation.provider}`,
         continuation,
       ]),
     );
@@ -259,20 +265,29 @@ export function createCollectStep({ registry, credentialsFor }: CollectOptions):
     };
 
     for (const sourceId of monitor.sources) {
-      const source = registry.get(sourceId);
+      // `only` and not a provider choice, because a monitor names a platform
+      // and nothing yet records which provider it wants. It throws rather than
+      // guessing the day a platform has two, which is US-025's to answer.
+      const source = registry.only(sourceId);
+      const providerId = source.provider.id;
       const credentials = await credentialsFor(source);
 
       if (!credentials) {
         // A missing key is not transient. Retrying it four times and then
         // dead-lettering it buries the one sentence the user has to read.
         logger.error(
-          { monitorId, sourceId, needs: source.credentialFields.map((field) => field.name) },
+          {
+            monitorId,
+            sourceId,
+            providerId,
+            needs: source.provider.credentialFields.map((field) => field.name),
+          },
           "poll skipped for this source: no credentials are configured",
         );
         continue;
       }
 
-      const continuation: Continuation | undefined = pending.get(sourceId);
+      const continuation: Continuation | undefined = pending.get(`${sourceId}:${providerId}`);
 
       if (continuation && continuation.attempts >= maxResumeAttempts) {
         // The collection never became ready. Forgetting it lets the next
@@ -280,10 +295,10 @@ export function createCollectStep({ registry, credentialsFor }: CollectOptions):
         // monitor waiting on a snapshot for ever. Nothing is triggered in its
         // place here, because giving up must not itself spend money.
         logger.error(
-          { monitorId, sourceId, attempts: continuation.attempts },
+          { monitorId, sourceId, providerId, attempts: continuation.attempts },
           "collection abandoned: it was never ready to read",
         );
-        await forgetContinuation(db, monitorId, continuation.source);
+        await forgetContinuation(db, monitorId, continuation.source, continuation.provider);
         continue;
       }
 
@@ -292,7 +307,7 @@ export function createCollectStep({ registry, credentialsFor }: CollectOptions):
         // the branch a scheduler tick lands in, and reaching the source from
         // here is what triggered a second collection before BUG-001 was fixed.
         logger.debug(
-          { monitorId, sourceId, resumeAfter: continuation.resumeAfter },
+          { monitorId, sourceId, providerId, resumeAfter: continuation.resumeAfter },
           "source skipped: its collection is still running",
         );
         wakeNoLaterThan(continuation.resumeAfter);
@@ -318,9 +333,14 @@ export function createCollectStep({ registry, credentialsFor }: CollectOptions):
             monitorId,
             // The registry's id space is wider than the schema's, and this
             // narrowing is safe for the same reason `toRow`'s is: a monitor
-            // can only name a source the `monitors.sources` column accepts.
-            source: source.id as Source,
+            // can only name a source the `monitors.sources` column accepts,
+            // and a registered provider is one `api_usage` accepts.
+            source: source.platform.id as Source,
+            provider: providerId as Provider,
             units,
+            // The connector's price, which is the pair's and not the
+            // platform's. Two providers fetching one platform do not agree
+            // about it, and this is the multiplication that would be wrong.
             pricePerUnitMicros: source.pricePerUnitMicros,
           }),
       );
@@ -330,6 +350,7 @@ export function createCollectStep({ registry, credentialsFor }: CollectOptions):
         {
           monitorId,
           sourceId,
+          providerId,
           resumed: continuation !== undefined,
           pages: outcome.pages,
           posts: outcome.posts.length,
@@ -346,7 +367,8 @@ export function createCollectStep({ registry, credentialsFor }: CollectOptions):
 
         if (outcome.waitCursor) {
           await rememberContinuation(db, monitorId, {
-            source: source.id as Source,
+            source: source.platform.id as Source,
+            provider: providerId as Provider,
             cursor: outcome.waitCursor,
             ...(window ? { since: window } : {}),
             resumeAfter: outcome.waitUntil,
@@ -356,7 +378,7 @@ export function createCollectStep({ registry, credentialsFor }: CollectOptions):
           // A wait with no cursor is the interface saying "start this query
           // again from the beginning". The old cursor names a snapshot the
           // source no longer wants us to read.
-          await forgetContinuation(db, monitorId, continuation.source);
+          await forgetContinuation(db, monitorId, continuation.source, continuation.provider);
         }
       } else if (outcome.moreCursor) {
         /**
@@ -370,7 +392,8 @@ export function createCollectStep({ registry, credentialsFor }: CollectOptions):
          * spend.
          */
         await rememberContinuation(db, monitorId, {
-          source: source.id as Source,
+          source: source.platform.id as Source,
+          provider: providerId as Provider,
           cursor: outcome.moreCursor,
           ...(window ? { since: window } : {}),
           resumeAfter: now,
@@ -379,7 +402,7 @@ export function createCollectStep({ registry, credentialsFor }: CollectOptions):
         wakeNoLaterThan(now);
       } else if (continuation) {
         // Read to the end. Nothing left to come back for.
-        await forgetContinuation(db, monitorId, continuation.source);
+        await forgetContinuation(db, monitorId, continuation.source, continuation.provider);
       }
     }
 
@@ -408,7 +431,9 @@ export function createCollectStep({ registry, credentialsFor }: CollectOptions):
     }
 
     const rows = outcomes.flatMap((outcome) =>
-      outcome.posts.map((post) => toRow(outcome.sourceId as Source, post)),
+      outcome.posts.map((post) =>
+        toRow(outcome.sourceId as Source, outcome.providerId as Provider, post),
+      ),
     );
 
     if (rows.length === 0) return;

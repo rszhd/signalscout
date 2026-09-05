@@ -29,7 +29,7 @@
  */
 import { and, eq, sql } from "drizzle-orm";
 import type { Database } from "../db/client.js";
-import { type Source, sourceCredentials } from "../db/schema.js";
+import { type Provider, sourceCredentials } from "../db/schema.js";
 import {
   decryptSecret,
   type EncryptionKey,
@@ -40,25 +40,32 @@ import {
 } from "./cipher.js";
 
 /**
- * How a credential is named in an error, and what the cipher authenticates.
+ * How a credential is named in an error, and what a new ciphertext is
+ * authenticated with.
  *
  * One function so the name in the error and the name bound into the ciphertext
  * cannot drift apart. If they did, every row would fail to decrypt after a
  * change that looked like a rename.
+ *
+ * That is exactly what US-024 would have done. It re-keyed this table from the
+ * platform to the provider, and a row sealed as "reddit:apiKey" cannot be
+ * opened as "brightdata:apiKey". So a row carries the name it was sealed with
+ * in its own `record` column, and this function names only what is written
+ * from now on. A rewrite normalises the row.
  */
-export function credentialRecordName(source: string, field: string): string {
-  return `${source}:${field}`;
+export function credentialRecordName(provider: string, field: string): string {
+  return `${provider}:${field}`;
 }
 
 export interface StoredCredential {
-  readonly source: Source;
+  readonly provider: Provider;
   readonly field: string;
   readonly value: string;
 }
 
 /** What a person is shown: which key is set, and nothing more of it. */
 export interface CredentialHint {
-  readonly source: Source;
+  readonly provider: Provider;
   readonly field: string;
   /** `••••1234`. */
   readonly hint: string;
@@ -68,18 +75,19 @@ export interface CredentialHint {
 export async function putSourceCredential(
   db: Database,
   key: EncryptionKey,
-  { source, field, value }: StoredCredential,
+  { provider, field, value }: StoredCredential,
 ): Promise<void> {
   if (!value.trim()) {
     throw new Error(
-      `Refusing to store a blank credential for ${credentialRecordName(source, field)}.`,
+      `Refusing to store a blank credential for ${credentialRecordName(provider, field)}.`,
     );
   }
 
-  const record = credentialRecordName(source, field);
+  const record = credentialRecordName(provider, field);
   const row = {
-    source,
+    provider,
     field,
+    record,
     ciphertext: encryptSecret(key, value, record),
     hint: maskSecret(value),
     updatedAt: new Date(),
@@ -89,10 +97,16 @@ export async function putSourceCredential(
     .insert(sourceCredentials)
     .values(row)
     .onConflictDoUpdate({
-      target: [sourceCredentials.source, sourceCredentials.field],
+      target: [sourceCredentials.provider, sourceCredentials.field],
       // The old ciphertext is overwritten, never kept beside the new one. A
-      // second row would keep the replaced key working.
-      set: { ciphertext: row.ciphertext, hint: row.hint, updatedAt: row.updatedAt },
+      // second row would keep the replaced key working. `record` moves with
+      // it, so a row written under an older name stops carrying one.
+      set: {
+        ciphertext: row.ciphertext,
+        record: row.record,
+        hint: row.hint,
+        updatedAt: row.updatedAt,
+      },
     });
 }
 
@@ -105,15 +119,17 @@ export async function putSourceCredential(
 export async function readSourceCredential(
   db: Database,
   key: EncryptionKey,
-  source: Source,
+  provider: Provider,
   field: string,
 ): Promise<string | undefined> {
   const [row] = await db
-    .select({ ciphertext: sourceCredentials.ciphertext })
+    .select({ ciphertext: sourceCredentials.ciphertext, record: sourceCredentials.record })
     .from(sourceCredentials)
-    .where(and(eq(sourceCredentials.source, source), eq(sourceCredentials.field, field)));
+    .where(and(eq(sourceCredentials.provider, provider), eq(sourceCredentials.field, field)));
 
-  return row ? decryptSecret(key, row.ciphertext, credentialRecordName(source, field)) : undefined;
+  // The row's own record name, not one derived here. US-024 renamed what this
+  // is keyed by, and a derived name would refuse to open a key that works.
+  return row ? decryptSecret(key, row.ciphertext, row.record) : undefined;
 }
 
 /** Every credential this instance holds, encrypted, in one read. */
@@ -123,16 +139,17 @@ export async function readAllSourceCredentials(
 ): Promise<StoredCredential[]> {
   const rows = await db
     .select({
-      source: sourceCredentials.source,
+      provider: sourceCredentials.provider,
       field: sourceCredentials.field,
       ciphertext: sourceCredentials.ciphertext,
+      record: sourceCredentials.record,
     })
     .from(sourceCredentials);
 
   return rows.map((row) => ({
-    source: row.source,
+    provider: row.provider,
     field: row.field,
-    value: decryptSecret(key, row.ciphertext, credentialRecordName(row.source, row.field)),
+    value: decryptSecret(key, row.ciphertext, row.record),
   }));
 }
 
@@ -140,7 +157,7 @@ export async function readAllSourceCredentials(
 export async function listCredentialHints(db: Database): Promise<CredentialHint[]> {
   return db
     .select({
-      source: sourceCredentials.source,
+      provider: sourceCredentials.provider,
       field: sourceCredentials.field,
       hint: sourceCredentials.hint,
     })
@@ -148,7 +165,7 @@ export async function listCredentialHints(db: Database): Promise<CredentialHint[
 }
 
 /**
- * The stored credentials, as the `source:field` names readiness is judged by.
+ * The stored credentials, as the `provider:field` names readiness is judged by.
  *
  * `startApi` and the routes both need this set, and both used to build it by
  * mapping `listCredentialHints` through `credentialRecordName` themselves. Two
@@ -157,17 +174,17 @@ export async function listCredentialHints(db: Database): Promise<CredentialHint[
  */
 export async function storedCredentialNames(db: Database): Promise<ReadonlySet<string>> {
   const hints = await listCredentialHints(db);
-  return new Set(hints.map((hint) => credentialRecordName(hint.source, hint.field)));
+  return new Set(hints.map((hint) => credentialRecordName(hint.provider, hint.field)));
 }
 
 export async function deleteSourceCredential(
   db: Database,
-  source: Source,
+  provider: Provider,
   field: string,
 ): Promise<void> {
   await db
     .delete(sourceCredentials)
-    .where(and(eq(sourceCredentials.source, source), eq(sourceCredentials.field, field)));
+    .where(and(eq(sourceCredentials.provider, provider), eq(sourceCredentials.field, field)));
 }
 
 /**
@@ -208,23 +225,30 @@ export async function rotateEncryptionKey(
   return db.transaction(async (tx) => {
     const rows = await tx
       .select({
-        source: sourceCredentials.source,
+        provider: sourceCredentials.provider,
         field: sourceCredentials.field,
         ciphertext: sourceCredentials.ciphertext,
+        record: sourceCredentials.record,
       })
       .from(sourceCredentials);
 
     for (const row of rows) {
-      const record = credentialRecordName(row.source, row.field);
       // Decrypt every row before writing any. A row that cannot be read with
       // the old key aborts the transaction with its own name in the message.
-      const value = decryptSecret(from, row.ciphertext, record);
+      const value = decryptSecret(from, row.ciphertext, row.record);
+      // Sealed again under the current name. A rotation is the other moment a
+      // row written before US-024 stops carrying its old one.
+      const record = credentialRecordName(row.provider, row.field);
 
       await tx
         .update(sourceCredentials)
-        .set({ ciphertext: encryptSecret(to, value, record), updatedAt: new Date() })
+        .set({
+          ciphertext: encryptSecret(to, value, record),
+          record,
+          updatedAt: new Date(),
+        })
         .where(
-          and(eq(sourceCredentials.source, row.source), eq(sourceCredentials.field, row.field)),
+          and(eq(sourceCredentials.provider, row.provider), eq(sourceCredentials.field, row.field)),
         );
     }
 

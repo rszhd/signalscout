@@ -17,6 +17,7 @@
 import {
   type BudgetState,
   budgetStates,
+  type ConnectorDescriptor,
   checkBudget,
   clearBudget,
   createMonitor,
@@ -40,7 +41,6 @@ import {
   type QueryGenerator,
   recordModelCall,
   resumeMonitor,
-  type SourceDescriptor,
   searchQuerySchema,
   setBudget,
   signals as signalIds,
@@ -170,6 +170,8 @@ const updateBody = createBody.partial().extend({
 const missingCredentialSchema = z.object({
   sourceId: z.string(),
   sourceName: z.string(),
+  providerId: z.string(),
+  providerName: z.string(),
   field: z.string(),
   label: z.string(),
   environmentVariable: z.string(),
@@ -252,7 +254,7 @@ const problemSchema = z.object({
 export interface MonitorRoutesOptions {
   readonly db: Database;
   /** The connectors this build ships, read for their credential fields. */
-  readonly sources: readonly SourceDescriptor[];
+  readonly sources: readonly ConnectorDescriptor[];
   /** The environment half of where a source key lives. */
   readonly environment?: Record<string, string | undefined>;
   /**
@@ -415,20 +417,21 @@ export async function registerMonitorRoutes(
       return {
         signals: signalList.map(({ id, label, hint }) => ({ id, label, hint })),
         sources: sources.map((source) => {
-          const missing = startBlockers([source.id], runtime);
+          const missing = startBlockers([source.platform.id], runtime);
 
           return {
-            id: source.id,
-            displayName: source.displayName,
+            id: source.platform.id,
+            displayName: source.platform.displayName,
             billableUnit: source.billableUnit,
             pricePerUnitMicros: source.pricePerUnitMicros,
-            credentials: source.credentialFields.map((field) => ({
+            credentials: source.provider.credentialFields.map((field) => ({
               name: field.name,
               label: field.label,
               // The one naming rule, from the one file that holds it. A second
               // copy here would name a variable that does not exist the first
-              // time either rule changes.
-              environmentVariable: environmentVariableFor(source.id, field.name),
+              // time either rule changes. It names the provider, not the
+              // platform beside it: US-024 moved a key to the account it is on.
+              environmentVariable: environmentVariableFor(source.provider.id, field.name),
               // Never the value itself, set or not. US-004 encrypts these; an
               // endpoint that echoed one would make that pointless.
               configured: !missing.some((credential) => credential.field === field.name),

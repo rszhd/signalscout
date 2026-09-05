@@ -20,7 +20,9 @@
  * be reporting the overshoot as though the cap had been meant to allow it.
  *
  * **Every figure here is an estimate.** We multiply the units a connector
- * reported by the price the connector declares, and the model's own estimate
+ * reported by the price that connector declares — the platform and the
+ * provider together, because two providers fetching one platform bill
+ * differently — and the model's own estimate
  * on top. The provider's invoice is authoritative and ours is not: Bright
  * Data's first 5,000 records each month are free and this arithmetic does not
  * know it, a provider's billing month may not be ours, and a call that failed
@@ -35,13 +37,14 @@ import {
   type ExhaustedBehaviour,
   modelCalls,
   monitors,
+  type Provider,
   type Source,
 } from "../db/schema.js";
 import { pauseMonitor } from "../monitors/monitors.js";
 
 /** What one monitor spent since the start of the month, in micro-dollars. */
 export interface MonitorSpend {
-  /** Reddit and X reads, priced by the connector's own `pricePerUnitMicros`. */
+  /** Every connector's reads, priced by that connector's own `pricePerUnitMicros`. */
   readonly sourceMicros: number;
   /**
    * Classification and query generation, from `model_calls`. US-008's
@@ -127,10 +130,20 @@ export interface RecordSourceUsageInput {
    * says and what docs/costs.md tells the user.
    */
   readonly monitorId: string | null;
+  /** The platform. What was fetched. */
   readonly source: Source;
+  /** The provider. Who fetched it, whose bill it lands on, and whose price. */
+  readonly provider: Provider;
   /** What the connector reported as `SearchResult.unitsConsumed`. Never a post count. */
   readonly units: number;
-  /** The connector's declared price. The one multiplication lives here. */
+  /**
+   * The connector's declared price: the platform and the provider together.
+   *
+   * Never the platform's, because there is no such number. Bright Data prices
+   * a Reddit record and ScrapeCreators will not price the same record the
+   * same, so a caller that read a price off a platform would put one
+   * provider's arithmetic on every provider's bill.
+   */
   readonly pricePerUnitMicros: number;
   readonly now?: Date;
 }
@@ -148,15 +161,22 @@ export interface RecordSourceUsageInput {
  */
 export async function recordSourceUsage(
   db: Database,
-  { monitorId, source, units, pricePerUnitMicros, now = new Date() }: RecordSourceUsageInput,
+  {
+    monitorId,
+    source,
+    provider,
+    units,
+    pricePerUnitMicros,
+    now = new Date(),
+  }: RecordSourceUsageInput,
 ): Promise<void> {
   const estimatedCostMicros = units * pricePerUnitMicros;
 
   await db
     .insert(apiUsage)
-    .values({ monitorId, source, day: dayOf(now), units, estimatedCostMicros })
+    .values({ monitorId, source, provider, day: dayOf(now), units, estimatedCostMicros })
     .onConflictDoUpdate({
-      target: [apiUsage.monitorId, apiUsage.source, apiUsage.day],
+      target: [apiUsage.monitorId, apiUsage.source, apiUsage.provider, apiUsage.day],
       set: {
         units: sql`${apiUsage.units} + ${units}`,
         estimatedCostMicros: sql`${apiUsage.estimatedCostMicros} + ${estimatedCostMicros}`,
@@ -165,7 +185,14 @@ export async function recordSourceUsage(
     });
 }
 
-/** Both halves of the spend, for every monitor named, or for all of them. */
+/**
+ * Both halves of the spend, for every monitor named, or for all of them.
+ *
+ * Summed across connectors on purpose. `units` is comparable only inside one
+ * connector, and the cost column is what makes two of them add up — which is
+ * the whole reason the price is multiplied in when the row is written and not
+ * when it is read.
+ */
 async function readSpend(
   db: Database,
   since: Date,

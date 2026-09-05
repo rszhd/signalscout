@@ -17,7 +17,7 @@
 import { desc, eq, sql } from "drizzle-orm";
 import type { Database } from "../db/client.js";
 import { monitors, type Signal, type Source } from "../db/schema.js";
-import type { SourceDescriptor } from "../sources/types.js";
+import type { ConnectorDescriptor } from "../sources/types.js";
 import { type MissingCredential, missingCredentials } from "../worker/credentials.js";
 
 /** A monitor row, as Drizzle selects it. */
@@ -85,15 +85,15 @@ export interface CreateMonitorInput extends MonitorAnswers, MonitorPlan, Monitor
 
 /** Everything the rules below need to know about the deployment. */
 export interface MonitorEnvironment {
-  /** The connectors this build ships. Read for their credential fields. */
-  readonly descriptors: readonly SourceDescriptor[];
+  /** The connectors this build ships. Read for their providers' credential fields. */
+  readonly descriptors: readonly ConnectorDescriptor[];
   /**
    * The environment half of where a key lives. `source_credentials` is the
    * other half, and `storedCredentials` below is what it holds.
    */
   readonly environment?: Record<string, string | undefined>;
   /**
-   * Which credentials the database holds, as `source:field` names.
+   * Which credentials the database holds, as `provider:field` names.
    *
    * The set rather than the table, because these rules are synchronous and a
    * caller that is already loading a page can read the hints once instead of
@@ -137,8 +137,8 @@ export function monitorQueries(value: unknown): string[] {
 /**
  * Which credentials the named sources need and the deployment does not have.
  *
- * A source the build does not ship contributes nothing here. That is not a
- * shrug: `createSourceRegistry` refuses to boot on an unknown id and
+ * A platform the build has no connector for contributes nothing here. That is
+ * not a shrug: `createSourceRegistry` refuses to boot on an unknown id and
  * `posts.source` refuses to store one, so an unknown id cannot reach a poll,
  * and reporting it as a missing key would name a variable that would not help.
  */
@@ -147,8 +147,19 @@ export function startBlockers(
   { descriptors, environment = process.env, storedCredentials }: MonitorEnvironment,
 ): MissingCredential[] {
   return sourceIds.flatMap((id) => {
-    const descriptor = descriptors.find((candidate) => candidate.id === id);
-    return descriptor ? missingCredentials(descriptor, environment, storedCredentials) : [];
+    const connectors = descriptors.filter((candidate) => candidate.platform.id === id);
+    const blockers = connectors.map((connector) =>
+      missingCredentials(connector, environment, storedCredentials),
+    );
+
+    // One usable connector is enough to poll a platform, so a platform is
+    // blocked only when every connector for it is. With one provider per
+    // platform this is the old rule exactly; with two it is the rule that
+    // stays right, and it fails towards letting a monitor run rather than
+    // demanding a key for a provider the person does not use.
+    if (blockers.some((missing) => missing.length === 0)) return [];
+
+    return blockers.flat();
   });
 }
 

@@ -1,59 +1,117 @@
 # Adding a source
 
-A source is a connector: the code that turns one social network into
-`CandidatePost` values, reports what the fetch cost, and manages its own rate
-limit. `packages/core/src/sources/types.ts` holds the interface, and its
-comments say why each member exists.
+A source has two axes, and US-024 separated them.
 
-This page is the steps. It is short on purpose: if adding a connector needs
-more than this, the interface is wrong and the fix belongs in the interface.
+* A **platform** is what a person ticks: Reddit, X. It keys `posts.source`, it
+  keys deduplication, and a monitor names it.
+* A **provider** is who fetches, whose key it is, and what it bills: Bright
+  Data, ScrapeCreators. One provider key serves every platform that provider
+  fetches.
+* A **connector** is the pair, and it is what the registry holds.
+
+Until two providers fetched the same platform, one record could describe both.
+Two cannot share a price, a billable unit or a key list, so they are separate
+records now. `packages/core/src/sources/types.ts` holds the interface, and its
+comments say which axis owns each field.
+
+The two lists below are short on purpose: if adding either needs more than
+this, the interface is wrong and the fix belongs in the interface.
 
 ---
 
-## The steps
+## Adding a provider for a platform we already fetch
 
-**1. Make one folder.** `packages/core/src/sources/<id>/`. The id is lower-case
-letters, digits and hyphens, and it never changes: it reaches URLs, columns and
-saved monitors.
+This is the common case, and it touches no platform and no schema.
 
-**2. Export one `SourceDefinition`.** The static facts, plus a `create` that
-takes a `SourceRuntime` and returns a `SocialSource`.
+**1. Make one folder.** `packages/core/src/sources/providers/<provider id>/`.
+The id is lower-case letters, digits and hyphens, and it never changes: it
+reaches `source_credentials.provider` and the environment variable that holds
+the key.
+
+**2. Export one `ProviderDescriptor`.** Who the provider is, and the fields a
+person pastes. The list is the provider's, not the platform's — one key serves
+every platform this provider fetches, so it is written once and rotated once.
 
 ```ts
-export const redditSourceDefinition: SourceDefinition = {
-  id: "reddit",
-  displayName: "Reddit",
+export const brightDataProvider: ProviderDescriptor = {
+  id: "brightdata",
+  displayName: "Bright Data",
+  credentialFields: [{ name: "apiKey", label: "Bright Data API key", secret: true }],
+};
+```
+
+**3. Export one `ConnectorDefinition` per platform it fetches.** The pair, plus
+what that pair bills, plus a `create` that takes a `SourceRuntime` and returns
+a `SocialSource`.
+
+```ts
+export const brightDataReddit: ConnectorDefinition = {
+  platform: redditPlatform,
+  provider: brightDataProvider,
   billableUnit: "record",
   pricePerUnitMicros: 1500,
   maxUnitsPerQueryPoll: 50,
-  credentialFields: [{ name: "apiKey", label: "Bright Data API key", secret: true }],
   create: (runtime) => new RedditSource(runtime),
 };
 ```
 
-`maxUnitsPerQueryPoll` is the most one query can collect in one poll when the
-caller sets no limit, and it belongs to the connector for the same reason the
-price does. US-014's cost test uses it as the top of the range it reports for a
-query whose sample came back full: a sample of ten that was billed ten says
-only "there was more", and this says how much more there could be.
+The three money fields belong to the pair and never to the platform alone.
+Bright Data prices a Reddit record at $0.0015 and another provider will not
+price the same record the same, so a number kept on the platform would be one
+provider's arithmetic on every provider's bill.
 
-**3. Add one line to `builtInSources`** in `packages/core/src/sources/index.ts`.
+`maxUnitsPerQueryPoll` is the most one query can collect in one poll when the
+caller sets no limit. US-014's cost test uses it as the top of the range it
+reports for a query whose sample came back full: a sample of ten that was
+billed ten says only "there was more", and this says how much more there could
+be.
+
+**4. Add one line to `builtInSources`** in
+`packages/core/src/sources/index.ts`, per connector.
+
+**5. Add the provider id to `providers`** in
+`packages/core/src/db/schema.ts` and run `pnpm db:generate`. Four columns carry
+it — `api_usage`, `source_continuations`, `source_credentials` and `posts` —
+and each has a check constraint. One migration number, one file.
 
 That is the whole change. Nothing that consumes a source needs a case for it:
 the collector pages it through `next`, the budget guard prices it from
 `pricePerUnitMicros`, the cost test projects a month from the units a search
-reports, and the settings form renders `credentialFields`.
-`packages/core/src/sources/adding-a-connector.test.ts` is that claim written as
-code — a complete connector, driven by caller code that never names it.
+reports, and the connections screen renders the provider's
+`credentialFields`. `packages/core/src/sources/adding-a-connector.test.ts` is
+that claim written as code — a complete connector, driven by caller code that
+never names it.
 
-**4. If its posts are stored, write a migration.** `posts.source` carries a
-check constraint listing the sources the schema accepts. This is the one thing
-step 3 does not cover. Add the id to `sources` in
+---
+
+## Adding a platform
+
+**1. Describe it in `packages/core/src/sources/platforms.ts`.** An id and a
+display name, and nothing else. A platform holds nothing about money and
+nothing about keys, because two providers fetching it agree about neither.
+
+**2. Write a migration for `posts.source`.** It carries a check constraint
+listing the platforms the schema accepts. Add the id to `sources` in
 `packages/core/src/db/schema.ts`, run `pnpm db:generate`, and keep the rule:
 one migration number, one file.
 
 `assertSourcesCanBeStored` turns the mistake into a failed boot rather than a
 failed insert at 02:00. Call it where the connector is wired in.
+
+**3. Write at least one connector for it**, by the list above. A platform with
+no provider is a platform nothing can fetch.
+
+---
+
+## Two providers for one platform
+
+The registry holds a connector under the pair, so `registry.get(platform,
+provider)` is the exact address and `registry.only(platform)` is for a caller
+that has a platform and no choice recorded yet. `only` throws when a platform
+has two providers, because registration order is not a choice: answering with
+the first would spend somebody's money at a provider they did not pick. The day
+a second provider ships, `only`'s callers are the list of places that have to
+be given the choice.
 
 ---
 
@@ -105,7 +163,7 @@ case that proves it.
 payload is evidence about someone else's API; a formatter that rewrites it
 makes the file a record of our tooling instead.
 
-`sources/reddit/fixtures/capture.mjs` is the worked example. Its first run
+`sources/providers/brightdata/fixtures/capture.mjs` is the worked example. Its first run
 answered three questions the provider's own documentation got wrong, which is
 the whole argument for capturing rather than writing.
 

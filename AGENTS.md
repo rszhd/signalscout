@@ -44,7 +44,10 @@ and a key the provider refuses is never stored. That closed US-010's last box. `
 screens: the monitor form, the inbox, the monitor list and connections.
 
 **A real credential has been stored, tested and read back.** On 2026-09-05
-US-023 built the connections screen and ran it against Bright Data. A wrong key
+US-023 built the connections screen and ran it against Bright Data. US-024 then
+re-keyed that row from `reddit` to `brightdata`, and rehearsed the migration
+against a real database: a key stored the old way came back readable through
+the new code, with nobody retyping it. A wrong key
 was refused in 1.3 seconds, a `PUT` carrying it wrote no row, and the real key
 was accepted in 1.4 seconds and stored encrypted — hint `••••b3e7`, ciphertext
 93 characters, and no row anywhere containing the plaintext. Then the process
@@ -66,7 +69,9 @@ documented, and it means a process started before the key existed must be
 restarted.
 
 **A key is tested where it is pasted, not where it is used.** The connections
-screen calls `SocialSource.validateCredentials` before it stores anything. On
+screen calls `SocialSource.validateCredentials` before it stores anything. The
+screen is keyed by provider since US-024, so one card is one account and one
+rotation. On
 Reddit the probe is free: an empty input list cannot start a collection, so a
 bad key is refused at 401 before the input is read. A refusal and an unreachable
 provider are different answers — 200 with `valid: false` and the provider's own
@@ -77,6 +82,26 @@ docs/secrets.md, *Testing before storing*.
 in November 2025. Reddit is reached through Bright Data instead, and X through
 its official pay-per-use API. Read STACK.md, *A source is not a provider*,
 before touching a connector: the interface does not change to suit a provider.
+
+**A platform and a provider are separate things.** US-024 split them on
+2026-09-05, because two providers will fetch Reddit and they agree about
+neither the price nor the key. A *platform* is what a person ticks — it keys
+`posts.source` and deduplication, and a monitor names it. A *provider* is who
+fetches, whose key it is, and what it bills. A *connector* is the pair, and it
+is what the registry holds. Four columns carry the provider beside the platform:
+`api_usage`, `source_continuations`, `posts` (attribution only, and outside the
+deduplication key) and `source_credentials` (keyed by provider alone). An
+environment variable is named after the provider — `BRIGHTDATA_API_KEY`, with
+`REDDIT_API_KEY` read as a deprecated fallback — and the connections screen is
+keyed by provider too, because one key serves every platform behind it.
+
+The split changed no behaviour, and the suite is the evidence: no expected value
+moved except the ones the ticket asked to move. What it did not do is run live.
+
+**`registry.only(platform)` is where a provider choice will have to go.** A
+monitor names a platform and nothing records which provider it wants, so every
+caller with one and not the other goes through `only`, which refuses to choose
+when a platform has two providers. Registration order is not a choice.
 
 **The embedder has met a real provider once.** On 2026-09-05
 `capture:embeddings` embedded PLAN.md's example monitor and the five fake posts
@@ -253,7 +278,8 @@ screen's "about two minutes" is the fastest case and not the normal one.
 3. Read [`docs/testing.md`](docs/testing.md) if you will write a test, which is
    almost always.
 4. Read [`docs/sources.md`](docs/sources.md) if the task touches a connector.
-   It holds the steps and the three things connectors get wrong.
+   It holds two lists — adding a provider, and adding a platform — and the
+   three things connectors get wrong.
 5. Read [`docs/costs.md`](docs/costs.md) if the task touches money — a price, a
    cap, a usage row, or a figure shown to a person. It holds what our estimate
    is wrong about, and why it is never rounded to cents.
@@ -313,7 +339,15 @@ Do not reopen these without being asked. The reasoning is in
 | A managed auth service | Better Auth in our own Postgres |
 | An in-memory Postgres fake | Real Postgres, from the first test file |
 | A Reddit API key per user | Reddit through Bright Data |
-| A provider picker in the UI | One provider per source, named but not chosen |
+| One record describing a source | A platform and a provider, separate; a connector is the pair |
+
+**One row above was reversed on 2026-09-05.** It read: *a provider picker in the
+UI* against *one provider per source, named but not chosen*. That was right
+while Reddit had one usable provider and wrong the moment two fetch the same
+platform, so US-024 separated the axes and the connections screen is now keyed
+by provider. STACK.md, *A source is not a provider*, holds the reasoning. The
+rule underneath is unchanged: the interface is not weakened to suit a provider,
+and nothing downstream of a connector learns which one answered.
 
 If you believe one is wrong, say so in one paragraph and wait. Do not
 reintroduce it as part of another change.

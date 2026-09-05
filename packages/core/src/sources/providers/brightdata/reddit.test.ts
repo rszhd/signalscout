@@ -13,13 +13,15 @@
  */
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { createLogger } from "../../logger.js";
-import { unreachableFetch } from "../../testing/network.js";
-import { createSourceRegistry } from "../registry.js";
-import { assertSourcesCanBeStored } from "../storage.js";
-import type { SearchRequest, SourceRuntime } from "../types.js";
-import { dateRangeFor } from "./brightdata.js";
-import { RedditSource, redditSourceDefinition, redditSourceId, toCandidatePost } from "./index.js";
+import { createLogger } from "../../../logger.js";
+import { unreachableFetch } from "../../../testing/network.js";
+import { redditPlatformId } from "../../platforms.js";
+import { createSourceRegistry } from "../../registry.js";
+import { assertSourcesCanBeStored } from "../../storage.js";
+import type { SearchRequest, SourceRuntime } from "../../types.js";
+import { dateRangeFor } from "./client.js";
+import { brightDataProviderId } from "./provider.js";
+import { brightDataReddit, RedditSource, toCandidatePost } from "./reddit.js";
 
 function fixture(name: string): unknown {
   return JSON.parse(readFileSync(new URL(`./fixtures/${name}.json`, import.meta.url), "utf8"));
@@ -548,23 +550,24 @@ describe("a key is checked without spending anything", () => {
 describe("the connector is registered like any other", () => {
   it("ships in the build and prices itself per record", () => {
     const registry = createSourceRegistry({
-      definitions: [redditSourceDefinition],
+      definitions: [brightDataReddit],
       runtime: runtimeWith(unreachableFetch),
     });
 
-    const reddit = registry.get(redditSourceId);
+    const reddit = registry.get(redditPlatformId, brightDataProviderId);
 
-    expect(reddit.displayName).toBe("Reddit");
+    expect(reddit.platform.displayName).toBe("Reddit");
+    expect(reddit.provider.displayName).toBe("Bright Data");
     // $1.50 per 1,000 records, and the unit is a record because Bright Data
     // bills each one. STACK.md, *Source economics*.
     expect(reddit.billableUnit).toBe("record");
     expect(reddit.pricePerUnitMicros).toBe(1500);
-    expect(reddit.credentialFields).toEqual([
+    expect(reddit.provider.credentialFields).toEqual([
       { name: "apiKey", label: "Bright Data API key", secret: true },
     ]);
   });
 
   it("has a place in the posts table already, so it needs no migration", () => {
-    expect(() => assertSourcesCanBeStored([redditSourceId])).not.toThrow();
+    expect(() => assertSourcesCanBeStored([redditPlatformId])).not.toThrow();
   });
 });

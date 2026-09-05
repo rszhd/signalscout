@@ -94,7 +94,7 @@ export async function startApi({
   const configured = await storedCredentialNames(db);
   const unconfigured = builtInSources.filter(
     (source) =>
-      startBlockers([source.id], {
+      startBlockers([source.platform.id], {
         descriptors: builtInSources,
         storedCredentials: configured,
       }).length > 0,
@@ -102,7 +102,10 @@ export async function startApi({
 
   if (unconfigured.length > 0) {
     logger.warn(
-      { sources: unconfigured.map((source) => source.id) },
+      {
+        sources: unconfigured.map((source) => source.platform.id),
+        providers: [...new Set(unconfigured.map((source) => source.provider.id))],
+      },
       "some sources have no credentials; monitors that name them cannot start",
     );
   }

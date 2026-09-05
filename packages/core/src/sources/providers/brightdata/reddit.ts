@@ -7,34 +7,28 @@
  * collected pays for it again and returns the same posts. The cursor below is
  * what stops that, and `reddit.test.ts` pins it.
  *
- * A user connects *Reddit*. Nothing outside this folder names the provider.
- * STACK.md, *A source is not a provider*.
+ * This file is one connector: the Reddit platform and the Bright Data
+ * provider, and the price that pair bills. The platform is described in
+ * `sources/platforms.ts` and the provider in `./provider.ts`, so a second
+ * provider for Reddit adds a file beside this one and edits neither of them.
+ *
+ * A user connects *Reddit*. Nothing downstream of this folder learns which
+ * provider answered. STACK.md, *A source is not a provider*.
  */
+import { redditPlatform } from "../../platforms.js";
 import type {
   CandidatePost,
+  ConnectorDefinition,
   CredentialCheck,
-  CredentialField,
   SearchRequest,
   SearchResult,
   SocialSource,
   SourceCredentials,
-  SourceDefinition,
   SourceQuery,
   SourceRuntime,
-} from "../types.js";
-import { BrightDataClient, BrightDataError, datasets, dateRangeFor } from "./brightdata.js";
-
-export const redditSourceId = "reddit";
-
-/**
- * The user brings a Bright Data key, not a Reddit one. The label says so,
- * because a settings form that asks for "API key" next to the word Reddit
- * sends people to Reddit's developer portal, which is exactly where they
- * cannot get one any more.
- */
-const credentialFields: readonly CredentialField[] = [
-  { name: "apiKey", label: "Bright Data API key", secret: true },
-];
+} from "../../types.js";
+import { BrightDataClient, BrightDataError, datasets, dateRangeFor } from "./client.js";
+import { brightDataProvider } from "./provider.js";
 
 /**
  * How many records to collect per input when the caller sets no limit.
@@ -45,9 +39,9 @@ const credentialFields: readonly CredentialField[] = [
  */
 const defaultRecordsPerInput = 50;
 
-export const redditSourceDefinition: SourceDefinition = {
-  id: redditSourceId,
-  displayName: "Reddit",
+export const brightDataReddit: ConnectorDefinition = {
+  platform: redditPlatform,
+  provider: brightDataProvider,
   /**
    * Bright Data bills per record returned, not per call. This is the field
    * that stops the budget guard assuming Reddit's old one-call-per-page
@@ -58,7 +52,6 @@ export const redditSourceDefinition: SourceDefinition = {
   pricePerUnitMicros: 1500,
   /** `defaultRecordsPerInput`: what one keyword collects when nobody says otherwise. */
   maxUnitsPerQueryPoll: defaultRecordsPerInput,
-  credentialFields,
   create: (runtime) => new RedditSource(runtime),
 };
 
@@ -108,7 +101,7 @@ function decodeCursor(cursor: string): Cursor {
     !Number.isInteger(offset) ||
     offset < 0
   ) {
-    throw new Error(`${redditSourceId}: cursor "${cursor}" was not issued by this source.`);
+    throw new Error(`${redditPlatform.id}: cursor "${cursor}" was not issued by this source.`);
   }
 
   return { phase: phase as Phase, snapshotId, offset };
@@ -120,12 +113,11 @@ type Input =
   | { readonly url: string; readonly sort_by: string };
 
 export class RedditSource implements SocialSource {
-  readonly id = redditSourceDefinition.id;
-  readonly displayName = redditSourceDefinition.displayName;
-  readonly billableUnit = redditSourceDefinition.billableUnit;
-  readonly pricePerUnitMicros = redditSourceDefinition.pricePerUnitMicros;
-  readonly maxUnitsPerQueryPoll = redditSourceDefinition.maxUnitsPerQueryPoll;
-  readonly credentialFields = credentialFields;
+  readonly platform = brightDataReddit.platform;
+  readonly provider = brightDataReddit.provider;
+  readonly billableUnit = brightDataReddit.billableUnit;
+  readonly pricePerUnitMicros = brightDataReddit.pricePerUnitMicros;
+  readonly maxUnitsPerQueryPoll = brightDataReddit.maxUnitsPerQueryPoll;
 
   constructor(private readonly runtime: SourceRuntime) {}
 

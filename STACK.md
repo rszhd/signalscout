@@ -150,19 +150,48 @@ about a third of an X read, and starts free, so Reddit still carries the MVP.
 Reddit taught us this the hard way, so the rule is written down before it is
 needed again:
 
-> **The architecture supports replaceable providers. The product offers one
-> provider per source.**
+> **The architecture supports replaceable providers. A platform and a provider
+> are separate records, and a connector is the pair.**
 
-A user connects *Reddit*, not *a Bright Data Reddit scraper*. The UI names the
-provider in secondary text, because a user routed through a third party must be
-told so, but it never asks them to choose one. Internally the provider is a
-`SourceDefinition` like any other, so replacing it changes no monitor, no score,
-no match and no notification.
+**This reverses what this section said until 2026-09-05.** It read: *the product
+offers one provider per source*, and it said the UI never asks a person to
+choose one. That was right while Reddit had one usable provider. It is wrong now
+that a person may hold a ScrapeCreators account, a Bright Data account, or both.
+US-024 carried the reversal.
 
-This is why `SocialSource` already carries `unitsConsumed` and `next`: a
-provider that bills per record and answers asynchronously fits it without a new
-member. Do not weaken that interface to accommodate a provider. If a provider
-does not fit, it is the provider we describe wrongly, not the interface.
+What separates:
+
+* A **platform** is what a person ticks. It keys `posts.source`, it keys
+  deduplication, and a monitor names it.
+* A **provider** is who fetches, whose key it is, and what it bills. Price,
+  billable unit, poll ceiling and credential fields all belong here.
+* A **connector** is the pair, and it is what the registry holds.
+
+A user still connects *Reddit*. The connections screen is keyed by provider,
+because one Bright Data key serves Reddit, X and LinkedIn together and a screen
+keyed by platform would ask for it three times and rotate it three times. Each
+card names the platforms that key unlocks, so the person who set out to connect
+Reddit still sees Reddit.
+
+What does not change is the rule underneath. `SocialSource` already carries
+`unitsConsumed` and `next`, so a provider that bills per record and answers
+asynchronously fits it without a new member. Do not weaken that interface to
+accommodate a provider. If a provider does not fit, it is the provider we
+describe wrongly, not the interface. And nothing downstream of a connector
+learns which provider answered: replacing one changes no monitor, no score, no
+match and no notification.
+
+Two consequences are worth stating.
+
+**A price belongs to the pair, never to the platform.** Bright Data prices a
+Reddit record at $0.0015 and another provider will not price the same record the
+same. A number kept on the platform would be one provider's arithmetic on every
+provider's bill.
+
+**A post is one post however many providers fetched it.** `posts.provider` is
+attribution only and stays out of `UNIQUE (source, external_id)`. A key that
+read it would make the same Reddit conversation two rows: a second
+classification, a second embedding and a second charge.
 
 ## Reddit
 

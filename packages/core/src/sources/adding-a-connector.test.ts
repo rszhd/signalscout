@@ -6,14 +6,18 @@
  * This file is that claim, written as code. `exampleSource` below is a whole
  * connector, written from the document and from nothing else. `drain` and
  * `costMicros` are the two things a caller does with any source: page it to
- * the end, and total what it spent. Neither names a source.
+ * the end, and total what it spent. Neither names a platform or a provider.
+ *
+ * US-024 split a connector into that pair, and this file is where the claim is
+ * paid for: a contributor now writes a platform, a provider and the price the
+ * two of them bill, and every caller below is unchanged.
  */
 import { describe, expect, it } from "vitest";
 import { createLogger } from "../logger.js";
 import { unreachableFetch } from "../testing/network.js";
 import { fakeSourceDefinition } from "./fake/index.js";
 import { createSourceRegistry } from "./registry.js";
-import type { CandidatePost, SocialSource, SourceDefinition, SourceRuntime } from "./types.js";
+import type { CandidatePost, ConnectorDefinition, SocialSource, SourceRuntime } from "./types.js";
 
 const runtime: SourceRuntime = {
   fetch: unreachableFetch,
@@ -39,15 +43,18 @@ const examplePosts: readonly CandidatePost[] = [
   },
 ];
 
-const exampleSourceDefinition: SourceDefinition = {
-  id: "example",
-  displayName: "Example",
+const exampleSourceDefinition: ConnectorDefinition = {
+  platform: { id: "example", displayName: "Example" },
+  provider: {
+    id: "example-provider",
+    displayName: "Example Provider",
+    credentialFields: [{ name: "apiKey", label: "API key", secret: true }],
+  },
   billableUnit: "post read",
   pricePerUnitMicros: 5000,
   maxUnitsPerQueryPoll: 100,
-  credentialFields: [{ name: "apiKey", label: "API key", secret: true }],
 
-  create(_runtime): SocialSource {
+  create(_runtime: SourceRuntime): SocialSource {
     return {
       ...exampleSourceDefinition,
 
@@ -117,34 +124,41 @@ describe("adding a connector touches the registry and one new folder", () => {
     runtime,
   });
 
+  const example = registry.get("example", "example-provider");
+  const fake = registry.only("fake");
+
   it("registers beside the others with one line", () => {
-    expect(registry.ids()).toEqual(["fake", "example"]);
+    expect(registry.platforms()).toEqual(["fake", "example"]);
+    expect(registry.keys()).toEqual([
+      { platformId: "fake", providerId: "fake-provider" },
+      { platformId: "example", providerId: "example-provider" },
+    ]);
   });
 
   it("is paged by caller code that does not know it exists", async () => {
-    const drained = await drain(registry.get("example"), { apiKey: "key" });
+    const drained = await drain(example, { apiKey: "key" });
 
     expect(drained.posts.map((post) => post.externalId)).toEqual(["example-1", "example-2"]);
   });
 
   it("prices itself, so the budget guard needs no case for it", async () => {
-    const example = await drain(registry.get("example"), { apiKey: "key" });
-    const fake = await drain(registry.get("fake"), { token: "token" });
+    const drainedExample = await drain(example, { apiKey: "key" });
+    const drainedFake = await drain(fake, { token: "token" });
 
     // Two post reads at $0.005. The number comes from the connector's own
     // descriptor, not from a table of prices in the worker.
-    expect(costMicros(registry.get("example"), example.unitsConsumed)).toBe(10_000);
+    expect(costMicros(example, drainedExample.unitsConsumed)).toBe(10_000);
     // The fake bills a free call per page and returned five posts over three
     // pages, so the same generic arithmetic gives nothing.
-    expect(fake.unitsConsumed).toBe(3);
-    expect(costMicros(registry.get("fake"), fake.unitsConsumed)).toBe(0);
+    expect(drainedFake.unitsConsumed).toBe(3);
+    expect(costMicros(fake, drainedFake.unitsConsumed)).toBe(0);
   });
 
-  it("describes its own credentials, so the settings form needs no case for it", () => {
-    expect(registry.get("example").credentialFields).toEqual([
+  it("describes its provider's credentials, so the settings form needs no case for it", () => {
+    expect(example.provider.credentialFields).toEqual([
       { name: "apiKey", label: "API key", secret: true },
     ]);
-    expect(registry.get("fake").credentialFields).toEqual([
+    expect(fake.provider.credentialFields).toEqual([
       { name: "token", label: "Token", secret: true },
     ]);
   });

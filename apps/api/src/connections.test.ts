@@ -14,6 +14,7 @@
  * answers from memory.
  */
 import {
+  type ConnectorDefinition,
   createDatabase,
   createLogger,
   type Database,
@@ -25,7 +26,6 @@ import {
   putSourceCredential,
   readEncryptionKey,
   type SocialSource,
-  type SourceDefinition,
   sourceCredentials,
 } from "@intentwatch/core";
 import { createTestDatabase, type TestDatabase } from "@intentwatch/core/testing";
@@ -42,27 +42,29 @@ const key = readEncryptionKey(encryptionKey);
 const redditFields = [{ name: "apiKey", label: "Bright Data API key", secret: true }] as const;
 
 /**
- * A source with Reddit's id that answers the probe without a network.
+ * The Reddit-through-Bright-Data pair, answering the probe without a network.
  *
  * `validCredentials` makes the fake refuse anything but `goodKey`, so the
  * accepted and the refused case differ by the value alone.
  */
-function acceptsOnly(value: string): SourceDefinition {
+function acceptsOnly(value: string): ConnectorDefinition {
   return fakeSourceDefinition({
     id: "reddit",
     displayName: "Reddit",
+    providerId: "brightdata",
+    providerName: "Bright Data",
     credentialFields: [...redditFields],
     validCredentials: { apiKey: value },
   });
 }
 
 /** A source whose probe throws, the way an unreachable provider does. */
-function unreachable(): SourceDefinition {
+function unreachable(): ConnectorDefinition {
   const definition = acceptsOnly(goodKey);
 
   return {
     ...definition,
-    create: (runtime) => {
+    create: (runtime: Parameters<ConnectorDefinition["create"]>[0]) => {
       const source = definition.create(runtime);
       return {
         ...source,
@@ -93,7 +95,7 @@ describe("connecting a provider", () => {
   });
 
   async function server(options: {
-    sources?: readonly SourceDefinition[];
+    sources?: readonly ConnectorDefinition[];
     environment?: Record<string, string | undefined>;
     encryption?: Record<string, string | undefined>;
   }) {
@@ -120,16 +122,19 @@ describe("connecting a provider", () => {
         const body = (await app.inject({ method: "GET", url: "/api/connections" })).json();
 
         expect(body.canStore).toBe(true);
-        expect(body.sources).toEqual([
+        expect(body.providers).toEqual([
           {
-            id: "reddit",
-            displayName: "Reddit",
+            id: "brightdata",
+            displayName: "Bright Data",
+            // The platforms this one key unlocks, so a person reading "Bright
+            // Data" still knows it is Reddit they are connecting.
+            platforms: ["Reddit"],
             ready: false,
             credentials: [
               {
                 name: "apiKey",
                 label: "Bright Data API key",
-                environmentVariable: "REDDIT_API_KEY",
+                environmentVariable: "BRIGHTDATA_API_KEY",
                 storedHint: null,
                 fromEnvironment: false,
                 configured: false,
@@ -143,13 +148,17 @@ describe("connecting a provider", () => {
     });
 
     it("shows a stored key as a mask, and says it is stored", async () => {
-      await putSourceCredential(db, key, { source: "reddit", field: "apiKey", value: goodKey });
+      await putSourceCredential(db, key, {
+        provider: "brightdata",
+        field: "apiKey",
+        value: goodKey,
+      });
 
       const app = await server({ environment: {} });
 
       try {
         const response = await app.inject({ method: "GET", url: "/api/connections" });
-        const field = response.json().sources[0].credentials[0];
+        const field = response.json().providers[0].credentials[0];
 
         expect(field.storedHint).toBe("••••2d65");
         expect(field.configured).toBe(true);
@@ -163,11 +172,11 @@ describe("connecting a provider", () => {
       // The screen offers different actions for the two. A stored key can be
       // deleted; an environment one is changed by editing a file and
       // restarting, and a delete button beside it would do nothing.
-      const app = await server({ environment: { REDDIT_API_KEY: goodKey } });
+      const app = await server({ environment: { BRIGHTDATA_API_KEY: goodKey } });
 
       try {
         const field = (await app.inject({ method: "GET", url: "/api/connections" })).json()
-          .sources[0].credentials[0];
+          .providers[0].credentials[0];
 
         expect(field.fromEnvironment).toBe(true);
         expect(field.storedHint).toBe(null);
@@ -185,7 +194,7 @@ describe("connecting a provider", () => {
       try {
         const response = await app.inject({
           method: "POST",
-          url: "/api/connections/reddit/test",
+          url: "/api/connections/brightdata/test",
           payload: { credentials: { apiKey: goodKey } },
         });
 
@@ -203,7 +212,7 @@ describe("connecting a provider", () => {
       try {
         const response = await app.inject({
           method: "POST",
-          url: "/api/connections/reddit/test",
+          url: "/api/connections/brightdata/test",
           payload: { credentials: { apiKey: "brd_wrong" } },
         });
 
@@ -224,7 +233,7 @@ describe("connecting a provider", () => {
       try {
         const response = await app.inject({
           method: "POST",
-          url: "/api/connections/reddit/test",
+          url: "/api/connections/brightdata/test",
           payload: { credentials: { apiKey: goodKey } },
         });
 
@@ -236,12 +245,12 @@ describe("connecting a provider", () => {
     });
 
     it("tests what is already configured when no key is typed", async () => {
-      const app = await server({ environment: { REDDIT_API_KEY: goodKey } });
+      const app = await server({ environment: { BRIGHTDATA_API_KEY: goodKey } });
 
       try {
         const response = await app.inject({
           method: "POST",
-          url: "/api/connections/reddit/test",
+          url: "/api/connections/brightdata/test",
           payload: {},
         });
 
@@ -257,7 +266,7 @@ describe("connecting a provider", () => {
       try {
         const response = await app.inject({
           method: "POST",
-          url: "/api/connections/reddit/test",
+          url: "/api/connections/brightdata/test",
           payload: {},
         });
 
@@ -293,7 +302,7 @@ describe("connecting a provider", () => {
       try {
         const response = await app.inject({
           method: "PUT",
-          url: "/api/connections/reddit",
+          url: "/api/connections/brightdata",
           payload: { credentials: { apiKey: goodKey } },
         });
 
@@ -317,7 +326,7 @@ describe("connecting a provider", () => {
       try {
         const response = await app.inject({
           method: "PUT",
-          url: "/api/connections/reddit",
+          url: "/api/connections/brightdata",
           payload: { credentials: { apiKey: "brd_wrong" } },
         });
 
@@ -334,7 +343,7 @@ describe("connecting a provider", () => {
       try {
         const response = await app.inject({
           method: "PUT",
-          url: "/api/connections/reddit",
+          url: "/api/connections/brightdata",
           payload: { credentials: { apiKey: goodKey } },
         });
 
@@ -347,14 +356,18 @@ describe("connecting a provider", () => {
 
     it("replaces a stored key with a new one", async () => {
       const second = "brd_0000111122223333";
-      await putSourceCredential(db, key, { source: "reddit", field: "apiKey", value: goodKey });
+      await putSourceCredential(db, key, {
+        provider: "brightdata",
+        field: "apiKey",
+        value: goodKey,
+      });
 
       const app = await server({ sources: [acceptsOnly(second)] });
 
       try {
         const response = await app.inject({
           method: "PUT",
-          url: "/api/connections/reddit",
+          url: "/api/connections/brightdata",
           payload: { credentials: { apiKey: second } },
         });
 
@@ -366,14 +379,18 @@ describe("connecting a provider", () => {
     });
 
     it("deletes a stored key", async () => {
-      await putSourceCredential(db, key, { source: "reddit", field: "apiKey", value: goodKey });
+      await putSourceCredential(db, key, {
+        provider: "brightdata",
+        field: "apiKey",
+        value: goodKey,
+      });
 
       const app = await server({ environment: {} });
 
       try {
         const response = await app.inject({
           method: "DELETE",
-          url: "/api/connections/reddit/apiKey",
+          url: "/api/connections/brightdata/apiKey",
         });
 
         expect(response.statusCode).toBe(200);
@@ -390,7 +407,7 @@ describe("connecting a provider", () => {
       try {
         const response = await app.inject({
           method: "PUT",
-          url: "/api/connections/reddit",
+          url: "/api/connections/brightdata",
           payload: { credentials: { apiSecret: goodKey } },
         });
 
@@ -424,7 +441,7 @@ describe("connecting a provider", () => {
       try {
         const response = await app.inject({
           method: "PUT",
-          url: "/api/connections/reddit",
+          url: "/api/connections/brightdata",
           payload: { credentials: { apiKey: goodKey } },
         });
 
@@ -442,7 +459,7 @@ describe("connecting a provider", () => {
       try {
         const response = await app.inject({
           method: "POST",
-          url: "/api/connections/reddit/test",
+          url: "/api/connections/brightdata/test",
           payload: { credentials: { apiKey: goodKey } },
         });
 
@@ -479,18 +496,18 @@ describe("connecting a provider", () => {
         expect(created.statusCode).toBe(201);
         const monitorId = created.json().id;
         expect(created.json().paused).toBe(true);
-        expect(created.json().missingCredentials[0].environmentVariable).toBe("REDDIT_API_KEY");
+        expect(created.json().missingCredentials[0].environmentVariable).toBe("BRIGHTDATA_API_KEY");
 
         const refused = await app.inject({
           method: "POST",
           url: `/api/monitors/${monitorId}/resume`,
         });
         expect(refused.statusCode).toBe(409);
-        expect(refused.json().message).toContain("REDDIT_API_KEY");
+        expect(refused.json().message).toContain("BRIGHTDATA_API_KEY");
 
         await app.inject({
           method: "PUT",
-          url: "/api/connections/reddit",
+          url: "/api/connections/brightdata",
           payload: { credentials: { apiKey: goodKey } },
         });
 
@@ -522,7 +539,7 @@ describe("connecting a provider", () => {
 
         await app.inject({
           method: "PUT",
-          url: "/api/connections/reddit",
+          url: "/api/connections/brightdata",
           payload: { credentials: { apiKey: goodKey } },
         });
 
@@ -534,7 +551,11 @@ describe("connecting a provider", () => {
     });
 
     it("reports a key deleted in this process without a restart", async () => {
-      await putSourceCredential(db, key, { source: "reddit", field: "apiKey", value: goodKey });
+      await putSourceCredential(db, key, {
+        provider: "brightdata",
+        field: "apiKey",
+        value: goodKey,
+      });
 
       const app = await server({ environment: {} });
 
@@ -544,7 +565,7 @@ describe("connecting a provider", () => {
             .ready,
         ).toBe(true);
 
-        await app.inject({ method: "DELETE", url: "/api/connections/reddit/apiKey" });
+        await app.inject({ method: "DELETE", url: "/api/connections/brightdata/apiKey" });
 
         expect(
           (await app.inject({ method: "GET", url: "/api/monitor-options" })).json().sources[0]

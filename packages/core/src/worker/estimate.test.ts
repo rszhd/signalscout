@@ -55,7 +55,7 @@ function contextFor(db: Database, boss: ReturnType<typeof stubBoss>): StepContex
 }
 
 function callsOf(registry: ReturnType<typeof fakeRegistry>): readonly SearchRequest[] {
-  return (registry.get("reddit") as SocialSource & { calls: readonly SearchRequest[] }).calls;
+  return (registry.only("reddit") as SocialSource & { calls: readonly SearchRequest[] }).calls;
 }
 
 /** A connector that refuses one term and serves every other. */
@@ -65,19 +65,25 @@ function pickyRegistry(refuse: string) {
   return createSourceRegistry({
     definitions: [
       {
-        id: "reddit",
-        displayName: "Reddit",
+        platform: { id: "reddit", displayName: "Reddit" },
+        provider: {
+          id: "brightdata",
+          displayName: "Bright Data",
+          credentialFields: [{ name: "token", label: "Token", secret: true }],
+        },
         billableUnit: "record",
         pricePerUnitMicros: 1500,
         maxUnitsPerQueryPoll: 50,
-        credentialFields: [{ name: "token", label: "Token", secret: true }],
         create: (): SocialSource => ({
-          id: "reddit",
-          displayName: "Reddit",
+          platform: { id: "reddit", displayName: "Reddit" },
+          provider: {
+            id: "brightdata",
+            displayName: "Bright Data",
+            credentialFields: [{ name: "token", label: "Token", secret: true }],
+          },
           billableUnit: "record",
           pricePerUnitMicros: 1500,
           maxUnitsPerQueryPoll: 50,
-          credentialFields: [{ name: "token", label: "Token", secret: true }],
           validateCredentials: async () => ({ valid: true }),
           search: async (request) => {
             if ([...request.query.queries, ...request.query.channels].includes(refuse)) {
@@ -300,6 +306,8 @@ describe("the cost test", () => {
         fakeSourceDefinition({
           id: "reddit",
           displayName: "Reddit",
+          providerId: "brightdata",
+          providerName: "Bright Data",
           posts: recentPosts(4),
           callsBeforeRateLimit: 1,
           rateLimitWindowMs: 60_000,
@@ -353,19 +361,25 @@ describe("the cost test", () => {
     const registry = createSourceRegistry({
       definitions: [
         {
-          id: "reddit",
-          displayName: "Reddit",
+          platform: { id: "reddit", displayName: "Reddit" },
+          provider: {
+            id: "brightdata",
+            displayName: "Bright Data",
+            credentialFields: [{ name: "token", label: "Token", secret: true }],
+          },
           billableUnit: "record",
           pricePerUnitMicros: 1500,
           maxUnitsPerQueryPoll: 50,
-          credentialFields: [{ name: "token", label: "Token", secret: true }],
           create: (): SocialSource => ({
-            id: "reddit",
-            displayName: "Reddit",
+            platform: { id: "reddit", displayName: "Reddit" },
+            provider: {
+              id: "brightdata",
+              displayName: "Bright Data",
+              credentialFields: [{ name: "token", label: "Token", secret: true }],
+            },
             billableUnit: "record",
             pricePerUnitMicros: 1500,
             maxUnitsPerQueryPoll: 50,
-            credentialFields: [{ name: "token", label: "Token", secret: true }],
             validateCredentials: async () => ({ valid: true }),
             search: async (request) => {
               asked.push(request.cursor);
@@ -514,6 +528,7 @@ describe("the cost test", () => {
     await recordSourceUsage(db, {
       monitorId,
       source: "reddit",
+      provider: "brightdata",
       units: 10,
       pricePerUnitMicros: 1500,
     });

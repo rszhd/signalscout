@@ -56,7 +56,7 @@ the interface to fit Bright Data.
 - [ ] The monitor form shows the opt-in, says the cost roughly doubles, and
       leaves it off by default
 - [ ] Tests run against comment payloads captured by
-      `sources/reddit/fixtures/capture.mjs`, which already captures them
+      `sources/providers/brightdata/fixtures/capture.mjs`, which already captures them
 - [ ] The inline `comments` array on a post record is measured before the paid
       fetch is built, and what it contains is written in the Log
 
@@ -64,7 +64,7 @@ the interface to fit Bright Data.
 
 - Depends on [US-005](../done/2026-09/US-005-reddit-returns-candidate-posts.md).
 - The comment fixtures already exist:
-  `packages/core/src/sources/reddit/fixtures/comments-by-post-url-records.json`,
+  `packages/core/src/sources/providers/brightdata/fixtures/comments-by-post-url-records.json`,
   captured with `--only=comments`. The dataset id is in `brightdata.ts`.
 - US-010 owns the monitor form. The opt-in is one more control there, so build
   it after US-010 unless the form is still unwritten.

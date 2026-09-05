@@ -223,7 +223,7 @@ describe("a stored credential the worker cannot read", () => {
 
   async function store(value: string, key: EncryptionKey): Promise<void> {
     const { db, close } = createDatabase(database.url);
-    await putSourceCredential(db, key, { source: "reddit", field: "apiKey", value });
+    await putSourceCredential(db, key, { provider: "brightdata", field: "apiKey", value });
     await close();
   }
 

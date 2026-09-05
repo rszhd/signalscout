@@ -1,35 +1,51 @@
 import { describe, expect, it } from "vitest";
+import { createLogger } from "../logger.js";
 import type { SocialSource } from "../sources/types.js";
-import { credentialsFromEnvironment, environmentVariableFor } from "./credentials.js";
+import {
+  credentialsFromEnvironment,
+  deprecatedEnvironmentVariableFor,
+  environmentVariableFor,
+} from "./credentials.js";
 
-function sourceWith(id: string, fields: string[]): SocialSource {
+function connectorWith(platformId: string, providerId: string, fields: string[]): SocialSource {
   return {
-    id,
-    displayName: id,
+    platform: { id: platformId, displayName: platformId },
+    provider: {
+      id: providerId,
+      displayName: providerId,
+      credentialFields: fields.map((name) => ({ name, label: name, secret: true })),
+    },
     billableUnit: "record",
     pricePerUnitMicros: 0,
     maxUnitsPerQueryPoll: 50,
-    credentialFields: fields.map((name) => ({ name, label: name, secret: true })),
     validateCredentials: async () => ({ valid: true }),
     search: async () => ({ posts: [], unitsConsumed: 0, next: { status: "done" } }),
   };
 }
 
 describe("the environment variable a credential comes from", () => {
-  it("is named after the source and the field, never after the provider", () => {
-    // A user connects Reddit. That this Reddit arrives through Bright Data is
-    // a fact of sources/reddit/, and STACK.md keeps it there.
-    expect(environmentVariableFor("reddit", "apiKey")).toBe("REDDIT_API_KEY");
-    expect(environmentVariableFor("x", "apiSecret")).toBe("X_API_SECRET");
-    expect(environmentVariableFor("hacker-news", "token")).toBe("HACKER_NEWS_TOKEN");
+  it("is named after the provider and the field, never after the platform", () => {
+    // A key belongs to the account it was issued for. One Bright Data key
+    // serves Reddit, X and LinkedIn, so a name built from the platform would
+    // be set three times to the same value and rotated three times.
+    expect(environmentVariableFor("brightdata", "apiKey")).toBe("BRIGHTDATA_API_KEY");
+    expect(environmentVariableFor("scrapecreators", "apiSecret")).toBe("SCRAPECREATORS_API_SECRET");
+    expect(environmentVariableFor("x-api", "token")).toBe("X_API_TOKEN");
+  });
+
+  it("still knows the name US-024 replaced", () => {
+    expect(deprecatedEnvironmentVariableFor("reddit", "apiKey")).toBe("REDDIT_API_KEY");
   });
 });
 
 describe("reading credentials from the environment", () => {
-  it("collects every field a connector declares", () => {
-    const lookup = credentialsFromEnvironment({ X_API_KEY: "key", X_API_SECRET: "secret" });
+  it("collects every field a connector's provider declares", () => {
+    const lookup = credentialsFromEnvironment({
+      BRIGHTDATA_API_KEY: "key",
+      BRIGHTDATA_API_SECRET: "secret",
+    });
 
-    expect(lookup(sourceWith("x", ["apiKey", "apiSecret"]))).toEqual({
+    expect(lookup(connectorWith("x", "brightdata", ["apiKey", "apiSecret"]))).toEqual({
       apiKey: "key",
       apiSecret: "secret",
     });
@@ -39,14 +55,53 @@ describe("reading credentials from the environment", () => {
     // Half a key is a failed API call, and a failed API call retries four
     // times before it dead-letters. Four wrong answers to a question that can
     // be answered here for nothing.
-    const lookup = credentialsFromEnvironment({ X_API_KEY: "key" });
+    const lookup = credentialsFromEnvironment({ BRIGHTDATA_API_KEY: "key" });
 
-    expect(lookup(sourceWith("x", ["apiKey", "apiSecret"]))).toBeUndefined();
+    expect(lookup(connectorWith("x", "brightdata", ["apiKey", "apiSecret"]))).toBeUndefined();
   });
 
   it("treats an empty variable as unset", () => {
-    const lookup = credentialsFromEnvironment({ REDDIT_API_KEY: "" });
+    const lookup = credentialsFromEnvironment({ BRIGHTDATA_API_KEY: "" });
 
-    expect(lookup(sourceWith("reddit", ["apiKey"]))).toBeUndefined();
+    expect(lookup(connectorWith("reddit", "brightdata", ["apiKey"]))).toBeUndefined();
+  });
+
+  it("falls back to the platform's old name, so an instance that upgraded keeps polling", () => {
+    // The whole point of the fallback: nobody edits `.env` before the deploy,
+    // and a monitor that stopped collecting is the one thing a person must not
+    // learn from an empty inbox.
+    const lookup = credentialsFromEnvironment({ REDDIT_API_KEY: "old-key" });
+
+    expect(lookup(connectorWith("reddit", "brightdata", ["apiKey"]))).toEqual({
+      apiKey: "old-key",
+    });
+  });
+
+  it("prefers the provider's own name when both are set", () => {
+    const lookup = credentialsFromEnvironment({
+      REDDIT_API_KEY: "old-key",
+      BRIGHTDATA_API_KEY: "new-key",
+    });
+
+    expect(lookup(connectorWith("reddit", "brightdata", ["apiKey"]))).toEqual({
+      apiKey: "new-key",
+    });
+  });
+
+  it("says which line to change when it reads the old name", () => {
+    const lines: string[] = [];
+    const logger = createLogger({
+      level: "warn",
+      name: "credentials-test",
+      destination: { write: (line: string) => lines.push(line) },
+    });
+
+    // A fresh variable name, because the warning is given once per process and
+    // another case in this file may already have spent it.
+    const lookup = credentialsFromEnvironment({ BLUESKY_API_KEY: "old-key" }, logger);
+    lookup(connectorWith("bluesky", "someprovider", ["apiKey"]));
+
+    expect(lines.join("\n")).toContain("BLUESKY_API_KEY");
+    expect(lines.join("\n")).toContain("SOMEPROVIDER_API_KEY");
   });
 });

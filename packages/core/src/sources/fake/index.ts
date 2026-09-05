@@ -1,12 +1,12 @@
 import type {
   CandidatePost,
+  ConnectorDefinition,
   CredentialCheck,
   CredentialField,
   SearchRequest,
   SearchResult,
   SocialSource,
   SourceCredentials,
-  SourceDefinition,
   SourceRuntime,
 } from "../types.js";
 import { fakePosts } from "./fixtures.js";
@@ -23,14 +23,24 @@ import { fakePosts } from "./fixtures.js";
  */
 export const fakeSourceId = "fake";
 
+/**
+ * The fake's own provider. A test that says nothing about providers gets one,
+ * because a connector is a pair and a fake that was only half of one would
+ * make the registry's checks unreachable from a test.
+ */
+export const fakeProviderId = "fake-provider";
+
 const defaultCredentialFields: readonly CredentialField[] = [
   { name: "token", label: "Token", secret: true },
 ];
 
 export interface FakeSourceOptions {
-  /** Register the same fake twice under different ids to test a fan-out. */
+  /** The platform. Register the same fake twice under different ids to test a fan-out. */
   readonly id?: string;
   readonly displayName?: string;
+  /** The provider. Two fakes on one platform is what a provider choice looks like. */
+  readonly providerId?: string;
+  readonly providerName?: string;
   readonly posts?: readonly CandidatePost[];
   /**
    * Posts per page. Set it below the caller's `limit` to hand back a short
@@ -69,16 +79,20 @@ export interface FakeSource extends SocialSource {
 }
 
 /** Build a connector definition the registry can hold. */
-export function fakeSourceDefinition(options: FakeSourceOptions = {}): SourceDefinition {
-  const id = options.id ?? fakeSourceId;
-
+export function fakeSourceDefinition(options: FakeSourceOptions = {}): ConnectorDefinition {
   return {
-    id,
-    displayName: options.displayName ?? "Fake",
+    platform: {
+      id: options.id ?? fakeSourceId,
+      displayName: options.displayName ?? "Fake",
+    },
+    provider: {
+      id: options.providerId ?? fakeProviderId,
+      displayName: options.providerName ?? "Fake Provider",
+      credentialFields: options.credentialFields ?? defaultCredentialFields,
+    },
     billableUnit: options.billableUnit ?? "call",
     pricePerUnitMicros: options.pricePerUnitMicros ?? 0,
     maxUnitsPerQueryPoll: options.maxUnitsPerQueryPoll ?? 50,
-    credentialFields: options.credentialFields ?? defaultCredentialFields,
     create: (runtime) => createFakeSource(runtime, options),
   };
 }
@@ -102,7 +116,7 @@ export function createFakeSource(
   let windowEndsAt: Date | undefined;
 
   function check(credentials: SourceCredentials): CredentialCheck {
-    for (const field of descriptor.credentialFields) {
+    for (const field of descriptor.provider.credentialFields) {
       const value = credentials[field.name];
       if (!value) return { valid: false, reason: `Missing ${field.label}.` };
 
@@ -128,7 +142,7 @@ export function createFakeSource(
 
       const credentials = check(request.credentials);
       if (!credentials.valid) {
-        throw new Error(`${descriptor.id}: ${credentials.reason}`);
+        throw new Error(`${descriptor.platform.id}: ${credentials.reason}`);
       }
 
       const now = runtime.now();
@@ -167,7 +181,7 @@ export function createFakeSource(
       const since = request.query.since;
       const matching = since ? posts.filter((post) => post.postedAt > since) : posts;
 
-      const offset = readCursor(request.cursor, matching.length, descriptor.id);
+      const offset = readCursor(request.cursor, matching.length, descriptor.platform.id);
       const take = Math.min(pageSize, request.limit ?? Number.POSITIVE_INFINITY);
       const page = matching.slice(offset, offset + take);
       const nextOffset = offset + page.length;

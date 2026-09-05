@@ -24,7 +24,7 @@ import {
  * docs/testing.md names this one of the five correctness-critical surfaces,
  * and its failure shape is "money is spent past a cap, silently, while nobody
  * is watching". Every expected number below is a literal a person can check
- * against the price in `sources/reddit/index.ts` — $1.50 per 1,000 records,
+ * against the price in `sources/providers/brightdata/reddit.ts` — $1.50 per 1,000 records,
  * so 1,500 micro-dollars per record — and none of them is recomputed the way
  * the code computes it.
  */
@@ -66,6 +66,7 @@ describe("the budget guard", () => {
       await recordSourceUsage(db, {
         monitorId,
         source: "reddit",
+        provider: "brightdata",
         units: 10,
         pricePerUnitMicros: redditPricePerRecord,
         now: march,
@@ -85,6 +86,7 @@ describe("the budget guard", () => {
       const page = {
         monitorId,
         source: "reddit" as const,
+        provider: "brightdata" as const,
         pricePerUnitMicros: redditPricePerRecord,
         now: march,
       };
@@ -108,6 +110,7 @@ describe("the budget guard", () => {
       await recordSourceUsage(db, {
         monitorId: null,
         source: "reddit",
+        provider: "brightdata",
         units: 10,
         pricePerUnitMicros: redditPricePerRecord,
         now: march,
@@ -115,6 +118,7 @@ describe("the budget guard", () => {
       await recordSourceUsage(db, {
         monitorId: null,
         source: "reddit",
+        provider: "brightdata",
         units: 4,
         pricePerUnitMicros: redditPricePerRecord,
         now: march,
@@ -138,15 +142,34 @@ describe("the budget guard", () => {
       const second = await insertMonitor(database);
       const common = { pricePerUnitMicros: redditPricePerRecord, units: 1 };
 
-      await recordSourceUsage(db, { ...common, monitorId: first, source: "reddit", now: march });
-      await recordSourceUsage(db, { ...common, monitorId: first, source: "x", now: march });
       await recordSourceUsage(db, {
         ...common,
         monitorId: first,
         source: "reddit",
+        provider: "brightdata",
+        now: march,
+      });
+      await recordSourceUsage(db, {
+        ...common,
+        monitorId: first,
+        source: "x",
+        provider: "brightdata",
+        now: march,
+      });
+      await recordSourceUsage(db, {
+        ...common,
+        monitorId: first,
+        source: "reddit",
+        provider: "brightdata",
         now: new Date("2026-03-15T09:00:00.000Z"),
       });
-      await recordSourceUsage(db, { ...common, monitorId: second, source: "reddit", now: march });
+      await recordSourceUsage(db, {
+        ...common,
+        monitorId: second,
+        source: "reddit",
+        provider: "brightdata",
+        now: march,
+      });
 
       expect(await db.select().from(apiUsage)).toHaveLength(4);
     });
@@ -160,6 +183,7 @@ describe("the budget guard", () => {
       await recordSourceUsage(db, {
         monitorId,
         source: "reddit",
+        provider: "brightdata",
         units: 0,
         pricePerUnitMicros: redditPricePerRecord,
         now: march,
@@ -179,6 +203,7 @@ describe("the budget guard", () => {
       await recordSourceUsage(db, {
         monitorId,
         source: "reddit",
+        provider: "brightdata",
         units: 20,
         pricePerUnitMicros: redditPricePerRecord,
         now: march,
@@ -207,6 +232,7 @@ describe("the budget guard", () => {
       await recordSourceUsage(db, {
         monitorId,
         source: "reddit",
+        provider: "brightdata",
         units: 100,
         pricePerUnitMicros: redditPricePerRecord,
         now: february,
@@ -235,6 +261,7 @@ describe("the budget guard", () => {
       await recordSourceUsage(db, {
         monitorId: theirs,
         source: "reddit",
+        provider: "brightdata",
         units: 100,
         pricePerUnitMicros: redditPricePerRecord,
         now: march,
@@ -272,6 +299,7 @@ describe("the budget guard", () => {
       await recordSourceUsage(db, {
         monitorId: capped,
         source: "reddit",
+        provider: "brightdata",
         units: 1_000,
         pricePerUnitMicros: redditPricePerRecord,
         now: march,
@@ -292,6 +320,7 @@ describe("the budget guard", () => {
       await recordSourceUsage(db, {
         monitorId: first,
         source: "reddit",
+        provider: "brightdata",
         units: 2,
         pricePerUnitMicros: redditPricePerRecord,
         now: march,
@@ -388,6 +417,7 @@ describe("the budget guard", () => {
       await recordSourceUsage(db, {
         monitorId,
         source: "reddit",
+        provider: "brightdata",
         units: 600,
         pricePerUnitMicros: redditPricePerRecord,
         now: march,
@@ -445,6 +475,7 @@ describe("the budget guard", () => {
       await recordSourceUsage(db, {
         monitorId,
         source: "reddit",
+        provider: "brightdata",
         units: 2,
         pricePerUnitMicros: redditPricePerRecord,
         now: march,

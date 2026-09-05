@@ -123,6 +123,7 @@ async function insertUsage(overrides: Record<string, unknown> = {}): Promise<str
   const values = {
     monitor_id: overrides.monitor_id ?? (await insertMonitor()),
     source: "reddit",
+    provider: "brightdata",
     day: "2026-03-14",
     units: 10,
     estimated_cost_micros: 15_000,
@@ -184,6 +185,37 @@ describe("posts", () => {
 
   it("refuses a source PLAN.md's first version does not build", async () => {
     await expect(insertPost({ source: "mastodon" })).rejects.toThrow(/violates check constraint/);
+  });
+
+  it("keeps the provider out of the deduplication key", async () => {
+    // The same Reddit post fetched through two providers is one post. A key
+    // that read the provider would make it two rows, and the second one a
+    // second classification, a second embedding and a second charge for the
+    // same conversation.
+    await insertPost({ external_id: "t3_two_providers", provider: "brightdata" });
+
+    await expect(
+      insertPost({ external_id: "t3_two_providers", provider: "scrapecreators" }),
+    ).rejects.toThrow(/duplicate key value/);
+  });
+
+  it("stores a post whose provider we cannot say", async () => {
+    // Every row written before US-024. Null means "we cannot say", never "no
+    // provider".
+    const id = await insertPost({ external_id: "t3_unattributed", provider: null });
+
+    const result = await sql.query<{ provider: string | null }>(
+      "SELECT provider FROM posts WHERE id = $1",
+      [id],
+    );
+
+    expect(only(result.rows).provider).toBeNull();
+  });
+
+  it("refuses a provider this build has no connector for", async () => {
+    await expect(insertPost({ external_id: "t3_bad", provider: "mastodon" })).rejects.toThrow(
+      /posts_provider_known/,
+    );
   });
 
   it("stores and returns a pgvector embedding", async () => {
@@ -675,6 +707,7 @@ async function insertContinuation(overrides: Record<string, unknown> = {}): Prom
   const values = {
     monitor_id: overrides.monitor_id ?? (await insertMonitor()),
     source: "reddit",
+    provider: "brightdata",
     cursor: "keyword|s_abc123|0",
     resume_after: new Date("2026-09-05T10:00:30.000Z"),
     ...overrides,
@@ -712,9 +745,28 @@ describe("source continuations", () => {
     );
   });
 
+  it("lets two providers each collect the same source for one monitor", async () => {
+    // A snapshot id belongs to the provider that issued it. Without the
+    // provider in the key one of the two collections overwrites the other's
+    // cursor, and the records behind it are money spent on nothing.
+    const monitorId = await insertMonitor();
+
+    await insertContinuation({ monitor_id: monitorId, provider: "brightdata" });
+
+    await expect(
+      insertContinuation({ monitor_id: monitorId, provider: "scrapecreators" }),
+    ).resolves.toEqual(expect.any(String));
+  });
+
   it("refuses a source the schema cannot store posts for", async () => {
     await expect(insertContinuation({ source: "mastodon" })).rejects.toThrow(
       /source_continuations_source_known/,
+    );
+  });
+
+  it("refuses a provider this build has no connector for", async () => {
+    await expect(insertContinuation({ provider: "mastodon" })).rejects.toThrow(
+      /source_continuations_provider_known/,
     );
   });
 
@@ -774,8 +826,25 @@ describe("usage and budgets", () => {
     ).resolves.toEqual(expect.any(String));
   });
 
+  it("keeps two providers on one source and day apart", async () => {
+    // `units` is comparable only inside one connector, and two providers do
+    // not bill the same unit at the same price. One row for both would be
+    // adding records to post reads.
+    const monitorId = await insertMonitor();
+
+    await insertUsage({ monitor_id: monitorId, day: "2026-03-14", provider: "brightdata" });
+
+    await expect(
+      insertUsage({ monitor_id: monitorId, day: "2026-03-14", provider: "scrapecreators" }),
+    ).resolves.toEqual(expect.any(String));
+  });
+
   it("refuses a source the schema cannot store posts for", async () => {
     await expect(insertUsage({ source: "mastodon" })).rejects.toThrow(/api_usage_source_known/);
+  });
+
+  it("refuses a provider this build has no connector for", async () => {
+    await expect(insertUsage({ provider: "mastodon" })).rejects.toThrow(/api_usage_provider_known/);
   });
 
   it("refuses a negative charge, which is a bug and never a refund", async () => {

@@ -11,16 +11,17 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Connections } from "./Connections.js";
 import { button, field, json, mount, type Screen, settle, setValue } from "./testing.js";
 
-function reddit(overrides: Record<string, unknown> = {}) {
+function brightData(overrides: Record<string, unknown> = {}) {
   return {
-    id: "reddit",
-    displayName: "Reddit",
+    id: "brightdata",
+    displayName: "Bright Data",
+    platforms: ["Reddit"],
     ready: false,
     credentials: [
       {
         name: "apiKey",
         label: "Bright Data API key",
-        environmentVariable: "REDDIT_API_KEY",
+        environmentVariable: "BRIGHTDATA_API_KEY",
         storedHint: null,
         fromEnvironment: false,
         configured: false,
@@ -31,7 +32,7 @@ function reddit(overrides: Record<string, unknown> = {}) {
 }
 
 function connections(overrides: Record<string, unknown> = {}) {
-  return { canStore: true, storeBlocker: null, sources: [reddit()], ...overrides };
+  return { canStore: true, storeBlocker: null, providers: [brightData()], ...overrides };
 }
 
 describe("the connections screen", () => {
@@ -74,28 +75,31 @@ describe("the connections screen", () => {
     vi.unstubAllGlobals();
   });
 
-  it("names the source, the key it needs, and the variable behind it", async () => {
+  it("names the provider, the platform it unlocks, and the variable behind it", async () => {
     await show(connections());
 
+    // The card is the account a person holds. It still names Reddit, because
+    // Reddit is what they set out to connect.
+    expect(container.textContent).toContain("Bright Data");
     expect(container.textContent).toContain("Reddit");
     expect(container.textContent).toContain("Bright Data API key");
     // The environment stays a supported way to set a key. A screen that hid it
     // would make an existing deployment look broken.
-    expect(container.textContent).toContain("REDDIT_API_KEY");
+    expect(container.textContent).toContain("BRIGHTDATA_API_KEY");
     expect(container.textContent).toContain("Not connected");
   });
 
   it("shows a stored key as its mask and offers to remove it", async () => {
     await show(
       connections({
-        sources: [
-          reddit({
+        providers: [
+          brightData({
             ready: true,
             credentials: [
               {
                 name: "apiKey",
                 label: "Bright Data API key",
-                environmentVariable: "REDDIT_API_KEY",
+                environmentVariable: "BRIGHTDATA_API_KEY",
                 storedHint: "••••2d65",
                 fromEnvironment: false,
                 configured: true,
@@ -115,14 +119,14 @@ describe("the connections screen", () => {
     // no row. A person needs the file name, not a button that fails.
     await show(
       connections({
-        sources: [
-          reddit({
+        providers: [
+          brightData({
             ready: true,
             credentials: [
               {
                 name: "apiKey",
                 label: "Bright Data API key",
-                environmentVariable: "REDDIT_API_KEY",
+                environmentVariable: "BRIGHTDATA_API_KEY",
                 storedHint: null,
                 fromEnvironment: true,
                 configured: true,
@@ -133,29 +137,29 @@ describe("the connections screen", () => {
       }),
     );
 
-    expect(container.textContent).toContain("REDDIT_API_KEY");
+    expect(container.textContent).toContain("BRIGHTDATA_API_KEY");
     expect(() => button("Remove stored key")).toThrow();
   });
 
   it("tests a key and shows that the provider accepted it", async () => {
     await show(connections(), {
-      "POST /api/connections/reddit/test": () => json({ valid: true, reason: null }),
+      "POST /api/connections/brightdata/test": () => json({ valid: true, reason: null }),
     });
 
-    setValue(field("Bright Data API key for Reddit"), "brd_7f3a91c4e08b2d65");
+    setValue(field("Bright Data API key for Bright Data"), "brd_7f3a91c4e08b2d65");
     button("Test connection").click();
     await settle();
 
-    expect(container.textContent).toContain("Reddit accepted this key");
+    expect(container.textContent).toContain("Bright Data accepted this key");
   });
 
   it("shows the provider's own words when it refuses the key", async () => {
     await show(connections(), {
-      "POST /api/connections/reddit/test": () =>
+      "POST /api/connections/brightdata/test": () =>
         json({ valid: false, reason: "Bright Data API key is not accepted." }),
     });
 
-    setValue(field("Bright Data API key for Reddit"), "brd_wrong");
+    setValue(field("Bright Data API key for Bright Data"), "brd_wrong");
     button("Test connection").click();
     await settle();
 
@@ -166,11 +170,11 @@ describe("the connections screen", () => {
     // A refusal and an outage lead to different actions, so they must not read
     // the same on the screen.
     await show(connections(), {
-      "POST /api/connections/reddit/test": () =>
+      "POST /api/connections/brightdata/test": () =>
         json({ message: "Reddit could not be reached, so the key was not tested." }, 502),
     });
 
-    setValue(field("Bright Data API key for Reddit"), "brd_7f3a91c4e08b2d65");
+    setValue(field("Bright Data API key for Bright Data"), "brd_7f3a91c4e08b2d65");
     button("Test connection").click();
     await settle();
 
@@ -184,15 +188,15 @@ describe("the connections screen", () => {
     const secret = "brd_7f3a91c4e08b2d65";
 
     await show(connections(), {
-      "PUT /api/connections/reddit": () =>
+      "PUT /api/connections/brightdata": () =>
         json(
-          reddit({
+          brightData({
             ready: true,
             credentials: [
               {
                 name: "apiKey",
                 label: "Bright Data API key",
-                environmentVariable: "REDDIT_API_KEY",
+                environmentVariable: "BRIGHTDATA_API_KEY",
                 storedHint: "••••2d65",
                 fromEnvironment: false,
                 configured: true,
@@ -202,46 +206,46 @@ describe("the connections screen", () => {
         ),
     });
 
-    setValue(field("Bright Data API key for Reddit"), secret);
+    setValue(field("Bright Data API key for Bright Data"), secret);
     button("Save key").click();
     await settle();
 
     const put = calls.find((call) => call.method === "PUT");
-    expect(put?.url).toBe("/api/connections/reddit");
+    expect(put?.url).toBe("/api/connections/brightdata");
     expect(put?.url).not.toContain(secret);
     expect(JSON.parse(put?.body ?? "{}")).toEqual({ credentials: { apiKey: secret } });
 
     // The field is cleared once the key is stored. Leaving it filled invites a
     // second save of a value the person can no longer read back.
-    expect(field("Bright Data API key for Reddit").value).toBe("");
+    expect(field("Bright Data API key for Bright Data").value).toBe("");
     expect(container.textContent).toContain("••••2d65");
   });
 
   it("keeps the typed key on the screen when the save was refused", async () => {
     await show(connections(), {
-      "PUT /api/connections/reddit": () =>
+      "PUT /api/connections/brightdata": () =>
         json({ message: "Bright Data did not accept that key, so it was not saved." }, 400),
     });
 
-    setValue(field("Bright Data API key for Reddit"), "brd_wrong");
+    setValue(field("Bright Data API key for Bright Data"), "brd_wrong");
     button("Save key").click();
     await settle();
 
     expect(container.textContent).toContain("was not saved");
-    expect(field("Bright Data API key for Reddit").value).toBe("brd_wrong");
+    expect(field("Bright Data API key for Bright Data").value).toBe("brd_wrong");
   });
 
   it("removes a stored key", async () => {
     await show(
       connections({
-        sources: [
-          reddit({
+        providers: [
+          brightData({
             ready: true,
             credentials: [
               {
                 name: "apiKey",
                 label: "Bright Data API key",
-                environmentVariable: "REDDIT_API_KEY",
+                environmentVariable: "BRIGHTDATA_API_KEY",
                 storedHint: "••••2d65",
                 fromEnvironment: false,
                 configured: true,
@@ -250,7 +254,7 @@ describe("the connections screen", () => {
           }),
         ],
       }),
-      { "DELETE /api/connections/reddit/apiKey": () => json(reddit()) },
+      { "DELETE /api/connections/brightdata/apiKey": () => json(brightData()) },
     );
 
     button("Remove stored key").click();

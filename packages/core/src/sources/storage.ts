@@ -1,5 +1,5 @@
 import { sources as storableSourceIds } from "../db/schema.js";
-import type { SourceId } from "./types.js";
+import type { PlatformId } from "./types.js";
 
 /**
  * `posts.source` carries a check constraint listing the sources this schema
@@ -10,7 +10,7 @@ import type { SourceId } from "./types.js";
  * The collector calls this at boot, so the mistake surfaces as a process that
  * will not start. Extending the list is a migration; docs/sources.md says so.
  */
-export function assertSourcesCanBeStored(ids: Iterable<SourceId>): void {
+export function assertSourcesCanBeStored(ids: Iterable<PlatformId>): void {
   const known: readonly string[] = storableSourceIds;
   const unstorable = [...new Set(ids)].filter((id) => !known.includes(id));
 

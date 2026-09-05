@@ -11,8 +11,8 @@
  * Run it with your own key. It spends records from your Bright Data
  * allowance — a few dozen, against a free tier of 5,000 a month:
  *
- *     node packages/core/src/sources/reddit/fixtures/capture.mjs
- *     node packages/core/src/sources/reddit/fixtures/capture.mjs --only=comments
+ *     node packages/core/src/sources/providers/brightdata/fixtures/capture.mjs
+ *     node packages/core/src/sources/providers/brightdata/fixtures/capture.mjs --only=comments
  *
  * What it writes, into this folder:
  *
@@ -480,7 +480,7 @@ writeFileSync(
   `${here}manifest.json`,
   `${JSON.stringify(
     {
-      capturedBy: "packages/core/src/sources/reddit/fixtures/capture.mjs",
+      capturedBy: "packages/core/src/sources/providers/brightdata/fixtures/capture.mjs",
       provider: "Bright Data, Reddit Scraper API, datasets v3",
       note: "Author identity is replaced with stable pseudonyms. Everything else is whole.",
       fixtures,

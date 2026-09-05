@@ -85,6 +85,34 @@
       "when": 1788585766166,
       "tag": "0011_add_feedback_verdicts",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1788594819515,
+      "tag": "0012_add_api_usage_provider",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1788594820252,
+      "tag": "0013_add_continuation_provider",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1788594821007,
+      "tag": "0014_add_post_provider",
+      "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1788594829414,
+      "tag": "0015_rekey_credentials_by_provider",
+      "breakpoints": true
     }
   ]
 }

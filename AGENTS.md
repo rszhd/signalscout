@@ -417,6 +417,23 @@ a local model makes the money argument moot.
 OpenAI's published prices are in `provider.ts`, read 2026-09-06: luna $0.20 and
 $1.20 per million tokens, terra $2.00 and $12.00, sol $4.00 and $20.00.
 
+**US-032 then made the gap real.** This repository classifies with
+`gpt-5.6-terra` and triages with `gpt-5.6-luna`, ten to one on output, which is
+the pair US-030 measured at 48% cheaper. The two captures were re-run against
+terra for $0.018: it scored PLAN.md's four worked examples **10, 70, 84 and 93**
+where luna scored 7, 64, 86 and 96. The order holds, and the gap between the
+drop and the first match widened from 57 points to 60, so `defaultMinimumScore`
+stays at 30 and now sits in a wider gap. Terra is the stricter reader at the top
+and the more generous one at the bottom. Every query in the new plan is inside
+US-027's per-platform word limit, and no test assertion moved: every terra score
+landed in the band luna's had.
+
+**The shipped default still has no gap.** `.env.example` names
+`claude-haiku-4-5` and `provider.ts` carries nothing cheaper, so a deployment
+that keeps the default triages on the same model and pays for the stage. The
+worker warns, `.env.example` explains it, and changing the default is a product
+decision nobody has made.
+
 Three findings travel with it. The model is not deterministic: the same fifty
 items captured twice the same evening kept 21 comments and then 19, so the
 replay test asserts bands rather than exact counts. It refused one of the four

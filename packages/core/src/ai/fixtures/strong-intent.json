@@ -1,24 +1,25 @@
 {
   "slug": "strong-intent",
   "provider": "openai",
-  "model": "gpt-5.6-luna",
-  "capturedAt": "2026-09-05T05:53:33.058Z",
+  "model": "gpt-5.6-terra",
+  "capturedAt": "2026-09-05T18:54:47.227Z",
   "object": {
     "reasons": [
-      "Says their Playwright suite is becoming \"impossible to maintain.\"",
-      "Asks \"Is there something easier?\", indicating they are looking for an alternative now.",
-      "The post does not identify the team size, release cadence, or whether UI changes are causing the maintenance burden."
+      "Says their Playwright test suite is “becoming impossible to maintain.”",
+      "Asks whether there is “something easier,” indicating they are seeking an alternative.",
+      "Posts in the QualityAssurance subreddit, suggesting they are involved with software testing."
     ],
-    "relevance": 95,
-    "problemFit": 85,
-    "icpFit": 45,
-    "intent": 92,
-    "urgency": 88,
+    "relevance": 94,
+    "problemFit": 84,
+    "icpFit": 38,
+    "intent": 91,
+    "urgency": 83,
     "intentType": "alternative_search"
   },
   "usage": {
     "inputTokens": 681,
-    "outputTokens": 100
+    "outputTokens": 171
   },
-  "latencyMs": 3145
+  "latencyMs": 3070,
+  "estimatedCostMicros": 3414
 }

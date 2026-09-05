@@ -1,24 +1,26 @@
 {
   "slug": "very-strong-intent",
   "provider": "openai",
-  "model": "gpt-5.6-luna",
-  "capturedAt": "2026-09-05T05:53:34.763Z",
+  "model": "gpt-5.6-terra",
+  "capturedAt": "2026-09-05T18:54:51.259Z",
   "object": {
     "reasons": [
-      "Says they are a four-person SaaS team.",
-      "Says they manually test signup and checkout every release.",
-      "Asks what tools other small teams are using."
+      "The author says they are a \"four-person SaaS,\" matching a small software team.",
+      "They still \"manually test signup and checkout every release,\" which are critical end-to-end browser flows.",
+      "They ask, \"What tools are other small teams using?\"",
+      "The testing happens \"every release,\" indicating an ongoing current workflow."
     ],
-    "relevance": 98,
-    "problemFit": 95,
+    "relevance": 95,
+    "problemFit": 88,
     "icpFit": 98,
     "intent": 96,
-    "urgency": 93,
+    "urgency": 90,
     "intentType": "recommendation_request"
   },
   "usage": {
     "inputTokens": 692,
-    "outputTokens": 78
+    "outputTokens": 112
   },
-  "latencyMs": 1697
+  "latencyMs": 4031,
+  "estimatedCostMicros": 2728
 }

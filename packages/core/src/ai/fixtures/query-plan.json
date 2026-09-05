@@ -1,7 +1,7 @@
 {
   "provider": "openai",
-  "model": "gpt-5.6-luna",
-  "capturedAt": "2026-09-05T14:03:04.574Z",
+  "model": "gpt-5.6-terra",
+  "capturedAt": "2026-09-05T18:55:07.639Z",
   "note": "The model's own answer for `exampleMonitor` in examples.ts, as the AI SDK parsed it.",
   "monitor": {
     "product": "A test runner for web apps. You record a browser flow once and it keeps working when the UI changes.",
@@ -16,24 +16,33 @@
   "object": {
     "queries": {
       "reddit": [
-        "e2e tests keep breaking",
-        "UI changes break tests",
-        "stopped trusting our tests",
-        "manual testing before every release",
-        "how do small teams test releases",
-        "best way to test web app without QA",
-        "Cypress alternative for changing UI",
-        "recommend browser testing tool"
+        "e2e tests break after UI changes",
+        "how do you test before every release",
+        "manual testing every deploy",
+        "looking for better than Cypress",
+        "Playwright tests keep breaking",
+        "what do you use for regression testing",
+        "end to end tests too brittle",
+        "no dedicated QA manual testing"
       ],
       "x": [
-        "UI changes break tests",
-        "e2e tests keep breaking",
-        "stopped trusting e2e tests",
-        "manual testing every release",
-        "small team testing workflow",
+        "tests keep breaking",
+        "manual testing releases",
         "Cypress alternative",
-        "Playwright alternative",
-        "recommend browser testing"
+        "brittle e2e tests",
+        "regression testing help",
+        "Playwright tests breaking",
+        "testing before deploy"
+      ],
+      "linkedin": [
+        "end to end tests break after UI changes",
+        "we are back to manual testing before releases",
+        "how do small teams handle regression testing",
+        "looking for an alternative to Cypress",
+        "our Playwright tests are too brittle",
+        "no QA engineer and weekly releases",
+        "what do teams use for release testing",
+        "tests need constant maintenance"
       ]
     },
     "subreddits": [
@@ -41,13 +50,16 @@
       "startups",
       "webdev",
       "QualityAssurance",
-      "softwaretesting",
-      "indiehackers"
+      "ExperiencedDevs",
+      "indiehackers",
+      "Entrepreneur",
+      "cypressio"
     ]
   },
   "usage": {
-    "inputTokens": 733,
-    "outputTokens": 540
+    "inputTokens": 833,
+    "outputTokens": 435
   },
-  "latencyMs": 8852
+  "latencyMs": 6185,
+  "estimatedCostMicros": 6886
 }

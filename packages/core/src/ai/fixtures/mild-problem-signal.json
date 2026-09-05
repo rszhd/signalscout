@@ -1,25 +1,25 @@
 {
   "slug": "mild-problem-signal",
   "provider": "openai",
-  "model": "gpt-5.6-luna",
-  "capturedAt": "2026-09-05T05:53:29.913Z",
+  "model": "gpt-5.6-terra",
+  "capturedAt": "2026-09-05T18:54:44.156Z",
   "object": {
     "reasons": [
       "Says their Playwright tests break whenever the UI changes.",
-      "Describes the core problem of unreliable end-to-end tests after UI changes.",
-      "Does not state their team size, QA staffing, or release cadence.",
-      "Does not ask for a tool, recommendation, or alternative."
+      "Describes the exact instability that makes end-to-end tests difficult to maintain.",
+      "Posts in the QualityAssurance community, suggesting involvement with software testing."
     ],
-    "relevance": 95,
-    "problemFit": 95,
-    "icpFit": 35,
-    "intent": 30,
-    "urgency": 75,
+    "relevance": 98,
+    "problemFit": 98,
+    "icpFit": 45,
+    "intent": 38,
+    "urgency": 80,
     "intentType": "problem"
   },
   "usage": {
     "inputTokens": 678,
-    "outputTokens": 97
+    "outputTokens": 85
   },
-  "latencyMs": 2136
+  "latencyMs": 2068,
+  "estimatedCostMicros": 2376
 }

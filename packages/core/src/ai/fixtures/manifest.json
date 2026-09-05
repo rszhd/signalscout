@@ -1,7 +1,7 @@
 {
   "capturedBy": "packages/core/src/ai/fixtures/capture.ts",
   "provider": "openai",
-  "model": "gpt-5.6-luna",
+  "model": "gpt-5.6-terra",
   "note": "The model's own answers to PLAN.md's four worked examples, as the AI SDK parsed them. The monitor is `exampleMonitor` in examples.ts.",
   "monitor": {
     "product": "A test runner for web apps. You record a browser flow once and it keeps working when the UI changes.",
@@ -16,39 +16,43 @@
   "fixtures": [
     {
       "file": "low-intent.json",
-      "capturedAt": "2026-09-05T05:53:27.776Z",
+      "capturedAt": "2026-09-05T18:54:42.088Z",
       "usage": {
         "inputTokens": 670,
-        "outputTokens": 105
+        "outputTokens": 118
       },
-      "latencyMs": 2376
+      "latencyMs": 2381,
+      "estimatedCostMicros": 2756
     },
     {
       "file": "mild-problem-signal.json",
-      "capturedAt": "2026-09-05T05:53:29.913Z",
+      "capturedAt": "2026-09-05T18:54:44.156Z",
       "usage": {
         "inputTokens": 678,
-        "outputTokens": 97
+        "outputTokens": 85
       },
-      "latencyMs": 2136
+      "latencyMs": 2068,
+      "estimatedCostMicros": 2376
     },
     {
       "file": "strong-intent.json",
-      "capturedAt": "2026-09-05T05:53:33.058Z",
+      "capturedAt": "2026-09-05T18:54:47.227Z",
       "usage": {
         "inputTokens": 681,
-        "outputTokens": 100
+        "outputTokens": 171
       },
-      "latencyMs": 3145
+      "latencyMs": 3070,
+      "estimatedCostMicros": 3414
     },
     {
       "file": "very-strong-intent.json",
-      "capturedAt": "2026-09-05T05:53:34.763Z",
+      "capturedAt": "2026-09-05T18:54:51.259Z",
       "usage": {
         "inputTokens": 692,
-        "outputTokens": 78
+        "outputTokens": 112
       },
-      "latencyMs": 1697
+      "latencyMs": 4031,
+      "estimatedCostMicros": 2728
     }
   ]
 }

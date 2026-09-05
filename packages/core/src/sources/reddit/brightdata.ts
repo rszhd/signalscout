@@ -45,18 +45,40 @@ const rangeCoversMs: Record<DateRange, number> = {
 };
 
 /**
+ * How much older than a range's own width a `since` may be and still count as
+ * inside it.
+ *
+ * A caller works out `since` from one clock reading, and this compares it
+ * against another taken a moment later, so "the last seven days" arrives here
+ * as seven days and a few milliseconds — one millisecond too old for "Past
+ * week". Without this slack it falls through to "Past month".
+ *
+ * BUG-002 is that failure, seen live on 2026-09-05. A cost test asked for a
+ * week, was given "Past month", was billed ten records, and reported the query
+ * as finding nothing, because every post it bought was three weeks old and our
+ * own filter dropped them all.
+ *
+ * Five minutes is far narrower than the gap between two ranges — a day against
+ * a week — so it can never pick a range that misses a whole day. What it can
+ * miss is a post in the last five minutes of a window's far edge. That is the
+ * trade: a five-minute blind spot at one boundary, against buying four times
+ * the records.
+ */
+const rangeSlackMs = 5 * 60 * 1000;
+
+/**
  * The narrowest range that still reaches back to `since`.
  *
  * A range too narrow silently drops posts the caller asked for, and a silent
  * false negative is the failure nobody can see. So the comparison rounds
- * outwards: a `since` exactly one week old picks "Past week", and anything
- * older picks the next range up.
+ * outwards: a `since` a week old picks "Past week", and anything older picks
+ * the next range up.
  */
 export function dateRangeFor(since: Date | undefined, now: Date): DateRange {
   if (!since) return "All time";
 
   const age = now.getTime() - since.getTime();
-  return dateRanges.find((range) => age <= rangeCoversMs[range]) ?? "All time";
+  return dateRanges.find((range) => age - rangeSlackMs <= rangeCoversMs[range]) ?? "All time";
 }
 
 /** A snapshot that is still collecting, and when the provider says to return. */

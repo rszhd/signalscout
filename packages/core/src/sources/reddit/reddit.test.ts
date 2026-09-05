@@ -490,6 +490,23 @@ describe("the date range covers the caller's since", () => {
     // nobody would ever see what was lost.
     expect(dateRangeFor(new Date("2026-08-29T00:00:00.000Z"), now)).toBe("Past week");
   });
+
+  it("does not widen a week to a month over a few milliseconds", () => {
+    // BUG-002, seen live on 2026-09-05. A caller works out `since` from one
+    // clock reading and this compares it against another, so "the last seven
+    // days" arrives a moment over seven days. Without slack it bought a
+    // month: the collection was billed ten records and returned posts three
+    // weeks old, which the caller's own filter then dropped.
+    expect(dateRangeFor(new Date("2026-08-28T23:59:59.000Z"), now)).toBe("Past week");
+    expect(dateRangeFor(new Date("2026-08-28T23:56:00.000Z"), now)).toBe("Past week");
+  });
+
+  it("still widens for a window that is genuinely wider", () => {
+    // The slack is minutes. A day past the boundary is a day, and asking for
+    // "Past week" would silently drop everything between.
+    expect(dateRangeFor(new Date("2026-08-28T00:00:00.000Z"), now)).toBe("Past month");
+    expect(dateRangeFor(new Date("2026-09-03T23:00:00.000Z"), now)).toBe("Past week");
+  });
 });
 
 describe("a key is checked without spending anything", () => {

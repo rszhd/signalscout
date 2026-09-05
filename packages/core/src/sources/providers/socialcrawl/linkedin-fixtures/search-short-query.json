@@ -1,0 +1,456 @@
+{
+  "httpStatus": 200,
+  "body": {
+    "success": true,
+    "platform": "linkedin",
+    "endpoint": "/v1/linkedin/search/posts",
+    "data": {
+      "items": [
+        {
+          "id": "7496559082884018177",
+          "url": "https://www.linkedin.com/feed/update/urn:li:activity:7496559082884018177",
+          "title": "Flaky tests were always an annoying problem. With agentic coding, it's 100x worse. You run many more builds and tests passing are the feedback loop your agent needs.\n\nWith CloudBees Smart Tests, we can identify your flaky tests and allow you to quarantine them so they stop breaking your builds. Once you isolated them, you can focus on fixing those tests and if we observe that they stopped being flaky, we will automatically include them in your builds again.\n\nRead Jake's blog post to learn more. Fantastic new feature Naoto Samyak Yoshiori  👏 \n\nhttps://lnkd.in/gzhdAyhQ",
+          "activity": {
+            "num_likes": 113,
+            "num_comments": 3,
+            "num_shares": 17,
+            "reaction_counts": [
+              {
+                "count": 92,
+                "type": "LIKE"
+              },
+              {
+                "count": 12,
+                "type": "PRAISE"
+              },
+              {
+                "count": 5,
+                "type": "EMPATHY"
+              },
+              {
+                "count": 2,
+                "type": "APPRECIATION"
+              },
+              {
+                "count": 2,
+                "type": "INTEREST"
+              }
+            ]
+          },
+          "created_at": "2026-08-22T14:30:02.021Z",
+          "author": {
+            "name": "li-user-1",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "url": "https://www.linkedin.com/in/li-user-2",
+            "avatar": [
+              {
+                "width": 100,
+                "height": 100,
+                "url": "https://scrubbed.invalid/li-user-3",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 200,
+                "height": 200,
+                "url": "https://scrubbed.invalid/li-user-4",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 400,
+                "height": 400,
+                "url": "https://scrubbed.invalid/li-user-5",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 800,
+                "height": 800,
+                "url": "https://scrubbed.invalid/li-user-6",
+                "expires_at": 1790208000000
+              }
+            ]
+          }
+        },
+        {
+          "id": "7495482722384064512",
+          "url": "https://www.linkedin.com/feed/update/urn:li:activity:7495482722384064512",
+          "title": "We spent six months calling flaky tests \"just noise\" until one meeting changed how we treated every CI failure.\nHere's what we learned about finding the real cause and building a test suite people can actually trust.\n\n#testing #api #apitesting #ai #automation\nTotal Shift Left",
+          "activity": {
+            "num_likes": 6,
+            "num_comments": 1,
+            "num_shares": 0,
+            "reaction_counts": [
+              {
+                "count": 6,
+                "type": "LIKE"
+              }
+            ]
+          },
+          "created_at": "2026-08-22T14:30:02.021Z",
+          "author": {
+            "name": "li-user-7",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "url": "https://www.linkedin.com/in/li-user-8",
+            "avatar": [
+              {
+                "width": 400,
+                "height": 400,
+                "url": "https://scrubbed.invalid/li-user-9",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 200,
+                "height": 200,
+                "url": "https://scrubbed.invalid/li-user-10",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 800,
+                "height": 800,
+                "url": "https://scrubbed.invalid/li-user-11",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 100,
+                "height": 100,
+                "url": "https://scrubbed.invalid/li-user-12",
+                "expires_at": 1790208000000
+              }
+            ]
+          }
+        },
+        {
+          "id": "7495779447724457984",
+          "url": "https://www.linkedin.com/feed/update/urn:li:activity:7495779447724457984",
+          "title": "How Do You Handle Flaky AI-Generated Tests in CI/CD Pipelines?",
+          "activity": {
+            "num_likes": 5,
+            "num_comments": 0,
+            "num_shares": 0,
+            "reaction_counts": [
+              {
+                "count": 5,
+                "type": "LIKE"
+              }
+            ]
+          },
+          "created_at": "2026-08-22T14:30:02.021Z",
+          "author": {
+            "name": "li-user-13",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "url": "https://www.linkedin.com/company/li-user-14/posts"
+          }
+        },
+        {
+          "id": "7501600288085078019",
+          "url": "https://www.linkedin.com/feed/update/urn:li:activity:7501600288085078019",
+          "title": "A flaky test is useful only when the failure leaves enough evidence to classify it.\nIn my Playwright work, stability comes from three layers: user-facing locators, controlled test data, and API or trace evidence behind the UI result. That makes it possible to separate an application defect from timing, authentication, environment, or test-code problems before anyone reaches for rerun.\nA test suite should reduce debugging time, not create another system to debug.\n#Playwright #QualityEngineering #TestAutomation #SoftwareTesting",
+          "activity": {
+            "num_likes": 0,
+            "num_comments": 0,
+            "num_shares": 0,
+            "reaction_counts": []
+          },
+          "created_at": "2026-09-04T14:30:02.021Z",
+          "author": {
+            "name": "li-user-15",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "url": "https://www.linkedin.com/in/li-user-16",
+            "avatar": [
+              {
+                "width": 100,
+                "height": 100,
+                "url": "https://scrubbed.invalid/li-user-17",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 800,
+                "height": 800,
+                "url": "https://scrubbed.invalid/li-user-18",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 200,
+                "height": 200,
+                "url": "https://scrubbed.invalid/li-user-19",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 400,
+                "height": 400,
+                "url": "https://scrubbed.invalid/li-user-20",
+                "expires_at": 1790208000000
+              }
+            ]
+          }
+        },
+        {
+          "id": "7500190661334249473",
+          "url": "https://www.linkedin.com/feed/update/urn:li:activity:7500190661334249473",
+          "title": "I’ve learned to treat flaky tests as a signal, not just an annoyance.\n\nA test that fails intermittently may be exposing timing assumptions, shared state, unstable data, or a real race condition. Rerunning it until it passes hides the risk and weakens trust in the suite.\n\nThe better question is: what changed between the passing and failing runs?\n\nI’m curious where others draw the line between quarantine and investigation. Push back if your approach differs.",
+          "activity": {
+            "num_likes": 7,
+            "num_comments": 0,
+            "num_shares": 0,
+            "reaction_counts": [
+              {
+                "count": 7,
+                "type": "LIKE"
+              }
+            ]
+          },
+          "created_at": "2026-08-31T14:30:02.021Z",
+          "author": {
+            "name": "li-user-21",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "url": "https://www.linkedin.com/in/li-user-22",
+            "avatar": [
+              {
+                "width": 400,
+                "height": 400,
+                "url": "https://scrubbed.invalid/li-user-23",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 100,
+                "height": 100,
+                "url": "https://scrubbed.invalid/li-user-24",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 200,
+                "height": 200,
+                "url": "https://scrubbed.invalid/li-user-25",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 800,
+                "height": 800,
+                "url": "https://scrubbed.invalid/li-user-26",
+                "expires_at": 1790208000000
+              }
+            ]
+          }
+        },
+        {
+          "id": "7492876837518364672",
+          "url": "https://www.linkedin.com/feed/update/urn:li:activity:7492876837518364672",
+          "title": "🚀 Article 2 - Five Common Reasons Selenium Tests Become Flaky — And How to Fix Them — \nOne of the biggest challenges I’ve faced while working with Selenium automation is flaky tests — tests that pass sometimes, fail sometimes, and leave you wondering what actually went wrong. 😅\nSo, for my second blog article, I’ve covered:\n🔹 5 common reasons Selenium tests become flaky\n🔹 Why time.sleep() can cause problems\n🔹 Handling dynamic web elements with explicit waits\n🔹 Building stable locators\n🔹 Managing test data\n🔹 Avoiding test dependencies\n🔹 Practical ways to make Selenium tests more reliable\n🎯 The goal is simple: write automation that you can actually trust.\nIf you’re working with Selenium, Python, PyTest, or QA Automation, I hope you find it useful.\n👉 I’d love to hear your experiences too — what has been the biggest cause of flaky tests in your automation projects?\n#Selenium #Python #PyTest #TestAutomation #QA #SoftwareTesting #AutomationTesting #SeleniumWebDriver",
+          "activity": {
+            "num_likes": 4,
+            "num_comments": 4,
+            "num_shares": 1,
+            "reaction_counts": [
+              {
+                "count": 4,
+                "type": "LIKE"
+              }
+            ]
+          },
+          "created_at": "2026-08-15T14:30:02.021Z",
+          "author": {
+            "name": "li-user-27",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "url": "https://www.linkedin.com/in/li-user-28",
+            "avatar": [
+              {
+                "width": 200,
+                "height": 200,
+                "url": "https://scrubbed.invalid/li-user-29",
+                "expires_at": 1789225200000
+              },
+              {
+                "width": 800,
+                "height": 800,
+                "url": "https://scrubbed.invalid/li-user-30",
+                "expires_at": 1789225200000
+              },
+              {
+                "width": 100,
+                "height": 100,
+                "url": "https://scrubbed.invalid/li-user-31",
+                "expires_at": 1789225200000
+              },
+              {
+                "width": 400,
+                "height": 400,
+                "url": "https://scrubbed.invalid/li-user-32",
+                "expires_at": 1789225200000
+              }
+            ]
+          }
+        },
+        {
+          "id": "7500106623722475520",
+          "url": "https://www.linkedin.com/feed/update/urn:li:activity:7500106623722475520",
+          "title": "A test fails. You rerun it and it passes. Was there a defect? Was the test updated incorrectly? Or did the result change for no apparent reason?\n\nThat last case is flakiness: an automated test producing inconsistent results across executions on the same build, environment and inputs.\n\nThe issue is not one occasional false failure. When pass rates oscillate, every failure must be triaged twice: first to establish whether it is real, then to fix it if it is. The suite becomes harder to trust and harder to read.\n\nRead the blog to understand why flaky tests are a strategic problem, not just a tactical annoyance: https://lnkd.in/es8uGkjC\n\n#TestAutomation #SoftwareTesting #QualityAssurance",
+          "activity": {
+            "num_likes": 9,
+            "num_comments": 3,
+            "num_shares": 0,
+            "reaction_counts": [
+              {
+                "count": 9,
+                "type": "LIKE"
+              }
+            ]
+          },
+          "created_at": "2026-08-31T14:30:02.021Z",
+          "author": {
+            "name": "li-user-33",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "url": "https://www.linkedin.com/company/li-user-34/posts"
+          }
+        },
+        {
+          "id": "7501845797064556544",
+          "url": "https://www.linkedin.com/feed/update/urn:li:activity:7501845797064556544",
+          "title": "Most flaky tests aren't flaky.\n\nThey're timing bugs wearing a costume.\n\nWhen a suite \"randomly\" fails, the easy move is to retry until green. The useful move is to ask: what race did we paper over? What shared state leaked? What assumption about the network died under real traffic?\n\nRetries hide the problem. They don't fix it.\n\nNext time a test flakes twice in a week, treat it like a production incident — not a CI annoyance.\n\n#QA #SoftwareTesting #SDET #QualityEngineering #TestAutomation\n\n[AUTOMATED POST]",
+          "activity": {
+            "num_likes": 0,
+            "num_comments": 0,
+            "num_shares": 0,
+            "reaction_counts": []
+          },
+          "created_at": "2026-09-05T04:30:02.021Z",
+          "author": {
+            "name": "li-user-35",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "url": "https://www.linkedin.com/in/li-user-36",
+            "avatar": [
+              {
+                "width": 400,
+                "height": 400,
+                "url": "https://scrubbed.invalid/li-user-37",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 100,
+                "height": 100,
+                "url": "https://scrubbed.invalid/li-user-38",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 800,
+                "height": 800,
+                "url": "https://scrubbed.invalid/li-user-39",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 200,
+                "height": 200,
+                "url": "https://scrubbed.invalid/li-user-40",
+                "expires_at": 1790208000000
+              }
+            ]
+          }
+        },
+        {
+          "id": "7501701620469112832",
+          "url": "https://www.linkedin.com/feed/update/urn:li:activity:7501701620469112832",
+          "title": "Flaky tests erode trust faster than missing tests do. Once a test suite cries wolf enough times, engineers stop reading the red and start re-running until it goes green. At that point the suite is providing less signal than no suite at all, just more ceremony around ignoring it.\n\nFixing flakiness is unglamorous work. It rarely gets prioritized on its own, only after someone gets burned by a real bug that a flaky test also happened to be flagging that week.\n\nTreat flaky as a bug in the test, not a fact of life.\n\n#BuildInPublic #SoftwareTesting #QA #TestAutomation",
+          "activity": {
+            "num_likes": 0,
+            "num_comments": 0,
+            "num_shares": 0,
+            "reaction_counts": []
+          },
+          "created_at": "2026-09-04T18:30:02.021Z",
+          "author": {
+            "name": "li-user-41",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "url": "https://www.linkedin.com/in/li-user-42",
+            "avatar": [
+              {
+                "width": 100,
+                "height": 100,
+                "url": "https://scrubbed.invalid/li-user-43",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 200,
+                "height": 200,
+                "url": "https://scrubbed.invalid/li-user-44",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 400,
+                "height": 400,
+                "url": "https://scrubbed.invalid/li-user-45",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 800,
+                "height": 800,
+                "url": "https://scrubbed.invalid/li-user-46",
+                "expires_at": 1790208000000
+              }
+            ]
+          }
+        },
+        {
+          "id": "7493196911932428288",
+          "url": "https://www.linkedin.com/feed/update/urn:li:activity:7493196911932428288",
+          "title": "Flaky tests aren't bad luck. They're one of five things and all five are fixable.\n\nAfter years of hunting flakiness, it's almost always on this list:\n \n1. Hard waits. `waitForTimeout(3000)` is a bet that the app is ready in 3 seconds. Sometimes you lose. Use web-first assertions that auto-retry instead.\n\n2. Racing the network. The test acts before data arrives. Wait for the *state* you need, not a guessed delay.\n   \n3. Shared state. Test B depends on what test A left behind. Isolate every test. Assume nothing carries over.\n\n4. Fragile locators. Index-based or deeply-nested selectors break on the smallest UI change. Prefer role- and text-based locators.\n  \n5. The environment. Animations, CI machines under load, slow cold starts. Real, but usually the smallest slice once 1–4 are fixed.\n  \n#TestAutomation #Playwright #QA",
+          "activity": {
+            "num_likes": 13,
+            "num_comments": 8,
+            "num_shares": 2,
+            "reaction_counts": [
+              {
+                "count": 10,
+                "type": "LIKE"
+              },
+              {
+                "count": 3,
+                "type": "INTEREST"
+              }
+            ]
+          },
+          "created_at": "2026-08-15T14:30:02.021Z",
+          "author": {
+            "name": "li-user-47",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "url": "https://www.linkedin.com/in/li-user-48",
+            "avatar": [
+              {
+                "width": 100,
+                "height": 100,
+                "url": "https://scrubbed.invalid/li-user-49",
+                "expires_at": 1789225200000
+              },
+              {
+                "width": 400,
+                "height": 400,
+                "url": "https://scrubbed.invalid/li-user-50",
+                "expires_at": 1789225200000
+              },
+              {
+                "width": 200,
+                "height": 200,
+                "url": "https://scrubbed.invalid/li-user-51",
+                "expires_at": 1789225200000
+              },
+              {
+                "width": 800,
+                "height": 800,
+                "url": "https://scrubbed.invalid/li-user-52",
+                "expires_at": 1789225200000
+              }
+            ]
+          }
+        }
+      ],
+      "total": 495,
+      "dropped": 0
+    },
+    "credits_used": 5,
+    "request_id": "req-6txjEd2gLEtOGUU1",
+    "cached": false,
+    "pagination": {
+      "next_cursor": "sc.eyJ2IjoyLCJjIjoiMiIsImUiOiJsaW5rZWRpbi9zZWFyY2gvcG9zdHMiLCJwIjoicGFnZSJ9",
+      "has_more": true,
+      "page_size": 10
+    },
+    "credits_remaining": 61
+  }
+}

@@ -172,6 +172,75 @@ The whole run stored no new post. All 50 records and all 47 posts were already
 in the table from earlier runs, and `posts` stayed at 174: deduplication across
 two providers, again, live.
 
+**LinkedIn is the third platform, and PLAN.md said not to add one yet.**
+US-028 closed on 2026-09-05. The rule at PLAN.md's *Important rule* is that no
+third network is added until Reddit and X reliably produce useful matches, and
+that condition is not met: X has one poll and five verdicts behind it. The
+owner decided to add LinkedIn anyway. It is written here, in STACK.md and in
+the ticket so the next reader finds a decision rather than an oversight, and
+the rule still stands for the fourth.
+
+It runs through SocialCrawl, on the same key as X — the first time one provider
+fetches two platforms, which is what `ProviderDescriptor` was split out for. A
+person pastes that key once and rotates it once. **Sharing a key is not sharing
+a contract**: the capture asked the LinkedIn endpoint all nine questions, and
+four answers contradicted X.
+
+One call costs **five credits and returns ten posts**, where X is one credit for
+twenty — so a LinkedIn post costs about $0.0041, ten times an X post and
+twenty-seven times a Bright Data Reddit record. The connector therefore counts
+**credits, not requests**: at five to one the two words are different numbers,
+and a guard fed the wrong one lets a monitor spend five times its cap. One
+query polled hourly is about $58 a month.
+
+Three measured facts break rules the X connector relies on. The answer is
+ordered by **relevance, not date** — a captured page ran 22 August, 22 August, 4
+September, 31 August, 15 August — so X's "the whole page is older than `since`,
+stop paging" rule is wrong here and is deliberately absent. The window is a
+`date_posted` parameter with three fixed values and nothing finer, so the
+connector asks for the narrowest window covering `since` and makes the exact cut
+itself. And **a search that matches nothing is billed in full and does not come
+back empty**: a phrase that cannot occur returned ten unrelated posts and
+`total: 98`. A vague query here is full-price noise, not free silence.
+
+The documentation was wrong about pagination — it describes none, and page two
+came back with ten posts and none of page one's among them. It is also quiet
+about caching: the same query sent twice was flagged `cached: true` and cost
+zero. Nothing counts on that, because the window is undocumented.
+
+The first capture run corrected itself before anything was committed. The
+scrubber let real names and job headlines through, because it decided what a
+person was by sniffing for fields this provider does not use. **Read the
+fixtures your own script wrote before committing them.**
+
+**One LinkedIn poll has run through the worker.** On 2026-09-05 a monitor with
+the single query `flaky tests` collected **20 posts in 2 pages for 10 credits**,
+in 3.6 seconds. `api_usage` holds one row for the pair, 81,180 micro-dollars,
+which is 10 × the connector's own price. The pre-filter dropped none of the
+twenty — the third platform where that has been measured, and the same reason
+each time: a search that already matched the words leaves no cheap stage before
+the bill. Five matches came out, 69 down to 54.
+
+**LinkedIn's noise is a different kind.** The top match is a direct question
+about handling flaky tests in CI. The bottom two are articles *about* flaky
+tests, written to be seen — and the classifier scored them 55 and 54, only
+fifteen points below the real question. Reddit keyword search produced
+off-topic noise, which a pre-filter can catch. This is on-topic
+expertise-signalling, which it cannot. Say so before anyone reads five matches
+as five leads.
+
+**A real model timeout happened here, and it is the first one.** One of twenty
+answers was aborted on timeout, recorded as `failed`, no match written, the
+post kept its place, and the other nineteen finished. With US-006's malformed
+answer, that is two of the classifier's three failure paths proven live. A real
+rate limit is the one left.
+
+Still unproven for this connector: a real rate limit, a real outage, and a
+second poll proving deduplication on LinkedIn. Channel discovery is
+unimplemented on purpose — `from_member` and `from_company` are documented
+without saying whether they take a URL, a slug or an urn, and a wrong guess
+costs five credits to learn nothing.
+
 **X has one provider, and the reason is that only one of three can search
 it.** US-006 added SocialCrawl on 2026-09-05. Bright Data's X posts dataset
 answers a discovery trigger with `Available types: profile_url,
@@ -269,7 +338,7 @@ whose intents are 3, 50, 90 and 96. The order holds and the gap between the
 drop and the first match is 57 points. `ai/examples.test.ts` replays those
 answers.
 
-**One failure path is now real.** In US-006's live X poll, one of forty answers
+**Two failure paths are now real.** In US-006's live X poll, one of forty answers
 came back as broken JSON: an unterminated string with two Hebrew characters
 spliced into a reason. It was recorded as `rejected`, no match was written, the
 post kept its place and the poll finished. So a malformed answer is proven
@@ -278,6 +347,10 @@ handled. A real rate limit and a real timeout are still only simulated.
 That run also showed a hole worth remembering: the error said only "response
 did not match schema", which names nothing a person can act on. `call.ts` now
 carries the schema's own complaint into the message, truncated.
+
+US-028's live LinkedIn poll added the second: one of twenty answers was aborted
+on timeout, recorded as `failed`, with no match written and the post keeping its
+place. **A real rate limit is the last simulated one.**
 
 **The query generator has answered once.** `capture:queries` ran on the same
 day and `ai/fixtures/query-plan.json` holds the plan it wrote — seven queries
@@ -494,6 +567,7 @@ Do not reopen these without being asked. The reasoning is in
 | An in-memory Postgres fake | Real Postgres, from the first test file |
 | A Reddit API key per user | Reddit through a provider: Bright Data or ScrapeCreators |
 | X's own pay-per-use API | X through SocialCrawl, the one provider of three that can search X |
+| A platform's price kept on the platform | The price on the pair: one SocialCrawl key, one credit price, and a call that costs 1 on X and 5 on LinkedIn |
 | One record describing a source | A platform and a provider, separate; a connector is the pair |
 
 **One row above was reversed on 2026-09-05.** It read: *a provider picker in the
@@ -549,10 +623,13 @@ pnpm --filter @intentwatch/core capture:classifier   # spends money; see below
 pnpm --filter @intentwatch/core capture:queries      # spends money; see below
 pnpm --filter @intentwatch/core capture:embeddings   # spends money; see below
 pnpm --filter @intentwatch/core live:provider-switch # spends ~$0.08; see below
+pnpm --filter @intentwatch/core live:linkedin-poll   # spends ~$0.08 + model; see below
 pnpm capture:deletions                            # spends ~$0.02; see below
+
+node packages/core/src/sources/providers/socialcrawl/linkedin-fixtures/capture.mjs   # ~30 credits
 ```
 
-These five are the only commands here that spend money, and all five are
+These seven are the only commands here that spend money, and all five are
 instruments: they ask a real provider something and record what it said,
 because an answer we wrote would be evidence about our own schema and none
 about the provider.
@@ -581,6 +658,24 @@ to and what each one billed. It spends about $0.08 and leaves behind a paused
 monitor and two `api_usage` rows, which are the evidence. Run it when
 `collect.ts` changes how a provider is chosen or resumed.
 
+The LinkedIn capture is the sixth, and it has no `package.json` script because
+it is run by hand with a key: `node
+packages/core/src/sources/providers/socialcrawl/linkedin-fixtures/capture.mjs`.
+It makes five billed calls at five credits each, plus four probes that are free,
+and it writes `ledger.json` beside the fixtures recording what each one cost.
+Run it when the LinkedIn parser changes. Read the fixtures it writes before you
+commit them — its first run leaked real names past a scrubber that looked right.
+
+`live:linkedin-poll` is US-028's equivalent, and it is a whole pipeline rather
+than one connector: it creates a paused monitor with one LinkedIn query and a
+$0.20 cap, then drives collect, pre-filter and classify with a queue that runs
+the next step instead of enqueuing it. The steps are the real ones in the real
+order. It spends about $0.081 of SocialCrawl credit plus one model call per post
+that survives the filter, and it leaves a paused monitor, its posts, one
+`api_usage` row and its matches. Run it when the LinkedIn connector changes, or
+to prove deduplication — a second run inside the same window should store no new
+post and should bill again, because the provider charges for the search.
+
 `capture:deletions` checks known available, removed and missing Reddit URLs.
 It retains whole provider responses with author identity scrubbed. The default
 run asks both providers; `--comments` probes ScrapeCreators' alternate endpoint.
@@ -594,6 +689,13 @@ Do not invent a command that does not exist yet — check `package.json` first.
 
 `pnpm test` uses a real Postgres and creates a database per test file. If it
 cannot reach one it says so; it does not fall back to a fake.
+
+**It can go red without a broken test.** A database per file, run in parallel,
+outruns Postgres `max_connections` of 100: one or two files fail with "sorry,
+too many clients already", sometimes surfacing as a 500 from a route whose
+insert could not get a connection. The failing file moves between runs and
+passes alone. `pnpm vitest run --maxWorkers=3` passes all of it. Check that
+before reading a red run as a regression.
 
 ---
 

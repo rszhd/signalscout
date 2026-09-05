@@ -2,11 +2,11 @@
 
 A source has two axes, and US-024 separated them.
 
-* A **platform** is what a person ticks: Reddit, X. It keys `posts.source`, it
-  keys deduplication, and a monitor names it.
+* A **platform** is what a person ticks: Reddit, X, LinkedIn. It keys
+  `posts.source`, it keys deduplication, and a monitor names it.
 * A **provider** is who fetches, whose key it is, and what it bills: Bright
-  Data, ScrapeCreators. One provider key serves every platform that provider
-  fetches.
+  Data, ScrapeCreators, SocialCrawl. One provider key serves every platform
+  that provider fetches.
 * A **connector** is the pair, and it is what the registry holds.
 
 Until two providers fetched the same platform, one record could describe both.
@@ -103,6 +103,24 @@ no provider is a platform nothing can fetch.
 
 ---
 
+## One provider, two platforms
+
+SocialCrawl fetches X and LinkedIn since US-028, and that is the case
+`ProviderDescriptor` was split out for. The credential fields are written once
+and the connections screen shows one card, so a person pastes that key once and
+rotates it once however many platforms sit behind it.
+
+What is *not* shared is anything about money or shape. The two endpoints differ
+in their price per call, their cursor, their sort order, how they take a date
+window, and what they do with a search that matches nothing. `client.ts` holds
+one transport and an `EndpointProfile` per platform for the three things that
+differ; everything else is a connector's own business.
+
+The lesson is worth keeping when a fourth platform arrives at this provider:
+sharing a key is not sharing a contract. Ask the new endpoint every question
+the capture script asks, even the ones the sibling endpoint already answered.
+US-028 asked nine, and four of the answers contradicted the X connector.
+
 ## One platform, one provider — when only one can do the work
 
 X has one provider and it was chosen by elimination, which is worth writing
@@ -119,6 +137,13 @@ is at Reddit.
 Two consequences. `registry.only("x")` never has to choose, so no deployment is
 asked a question about X. And a second X provider is not a small change: it
 would have to search, and today two of the three cannot.
+
+**LinkedIn also has one provider, and for a different reason: nobody asked the
+others.** US-028 used SocialCrawl because it already had the key and documents
+`/v1/linkedin/search/posts`. Bright Data and ScrapeCreators were never asked
+what they can do with LinkedIn. So this is one provider by convenience, not by
+elimination, and the two must not be written down the same way — the X entry
+above is a closed question and this one is open.
 
 ## Two providers for one platform
 
@@ -179,14 +204,21 @@ for the split:
 
 | | Bright Data | ScrapeCreators | SocialCrawl |
 |---|---|---|---|
-| Fetches | Reddit | Reddit | X |
-| Billable unit | a record | a request | a request |
-| Price | $1.50 / 1,000 records | $1.88 / 1,000 requests | $8.12 / 1,000 requests |
-| One unit buys | one post | 7 to 23 posts, measured | 20 posts, measured |
-| A call that finds nothing | billed | billed | refunded, measured |
+| Fetches | Reddit | Reddit | X and LinkedIn |
+| Billable unit | a record | a request | a request on X, a credit on LinkedIn |
+| Price | $1.50 / 1,000 records | $1.88 / 1,000 requests | $8.12 / 1,000 credits |
+| One unit buys | one post | 7 to 23 posts, measured | X: 20 posts. LinkedIn: 2 posts, and a call spends 5 credits |
+| A call that finds nothing | billed | billed | X: refunded. LinkedIn: billed in full, and it returns unrelated posts rather than none |
 | Shape | trigger, then poll a snapshot | the posts are in the answer | the posts are in the answer |
-| A collection took | 8 minutes 40 seconds, and 2 minutes 13 on another day | 1.8 to 4.9 seconds | 1.5 to 5.3 seconds |
+| A collection took | 8 minutes 40 seconds, and 2 minutes 13 on another day | 1.8 to 4.9 seconds | 1.4 to 5.3 seconds |
 | A refused key says | `Invalid credentials`, as a bare string | `{"message":"Invalid API key"}` | `Invalid API key format. Keys start with 'sc_'.` |
+
+**One provider does not bill one way.** SocialCrawl is the row that proves the
+three money fields belong to the *pair* and never to the provider: the same key
+and the same credit price, and an X call spends one credit where a LinkedIn
+call spends five. That is why the X connector reports requests and the LinkedIn
+connector reports credits — one unit each, each the one its own price is
+written against.
 
 SocialCrawl prices in pounds and every figure in this product is in
 micro-dollars, so its price alone carries an exchange rate. `x.ts` names the
@@ -270,6 +302,14 @@ makes the file a record of our tooling instead.
 `sources/providers/brightdata/fixtures/capture.mjs` is the worked example. Its
 first run answered three questions the provider's own documentation got wrong,
 which is the whole argument for capturing rather than writing.
+
+`sources/providers/socialcrawl/linkedin-fixtures/capture.mjs` is the third, and
+its first run corrected itself before anything was committed: the scrubber let
+real names and real job headlines through, because it decided what a person was
+by sniffing for fields this provider does not use. It puts a person under
+`author` as `{ name, description, url, avatar }`, and none of those tripped the
+rule. Name the container, do not guess at its contents — and read the fixtures
+your own script wrote before you commit them.
 
 `sources/providers/scrapecreators/fixtures/capture.mjs` is the second, and it
 answered four more. Three were not in the documentation at all: the API is

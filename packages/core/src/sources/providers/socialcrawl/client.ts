@@ -1,10 +1,17 @@
 /**
- * The SocialCrawl half of the X connector.
+ * The SocialCrawl transport, shared by every platform we fetch through it.
  *
  * This file, its siblings and the fixtures beside them are the only places in
  * the repository that name SocialCrawl. STACK.md, *A source is not a
- * provider*: a user connects X, and replacing the provider must change no
- * monitor, no score and no match.
+ * provider*: a user connects X or LinkedIn, and replacing the provider must
+ * change no monitor, no score and no match.
+ *
+ * One provider means one key, one authentication header and one error
+ * vocabulary, so those live here and each platform supplies an
+ * `EndpointProfile` for the three things that differ: which URL to call, where
+ * that endpoint puts its cursor, and what one call costs when the answer does
+ * not say. US-028 added the second profile and changed nothing about the
+ * first.
  *
  * Every shape below was captured from a live account by `fixtures/capture.mjs`
  * on 2026-09-05, not read from the documentation. Four of the facts it settled
@@ -26,25 +33,121 @@
  *    posts may be read as "this query is finished for good" — only as "there
  *    was nothing this time".
  *
- * The API is synchronous: a search answered in 1.5 to 5.3 seconds with the
- * posts in the body. There is no snapshot and nothing to poll, so this
- * connector never returns `next: { status: "wait" }` on a healthy call.
+ * The LinkedIn capture on the same day settled three more, and none of them
+ * generalises from the X ones — which is the argument for a profile per
+ * endpoint rather than one client that assumes:
+ *
+ * 5. **This endpoint pages, and the documentation says it does not.** The
+ *    cursor is at `pagination.next_cursor`, `has_more` sits beside it, and
+ *    page two returned ten posts with none of page one's among them.
+ * 6. **A search that matches nothing is billed here, and is not empty.** A
+ *    phrase that cannot occur returned ten unrelated posts, `total: 98`, and
+ *    cost the full five credits. So an empty answer is not the signal on this
+ *    endpoint that it is on X's — there is no empty answer to read.
+ * 7. **The provider caches, and a cached answer is free.** The same query sent
+ *    twice came back flagged `cached: true`, in a third of the time, for zero
+ *    credits. No connector may count on it: the window is undocumented, and a
+ *    cap sized on cached prices is a cap sized on somebody else's luck.
+ *
+ * The API is synchronous: a search answered in 1.4 to 5.3 seconds with the
+ * posts in the body. There is no snapshot and nothing to poll, so these
+ * connectors never return `next: { status: "wait" }` on a healthy call.
  */
 import type { SourceRuntime } from "../../types.js";
 
-const apiBase = "https://www.socialcrawl.dev/v1/twitter";
+const apiBase = "https://www.socialcrawl.dev/v1";
 
 /**
- * One endpoint, and it is the reason this provider exists here. It is the only
- * keyword search across X that any of our three providers offers.
+ * The endpoints this provider gives us, one per platform.
  *
- * A monitor's channels are handles, and they reach the same endpoint through
- * X's own `from:` operator rather than through a second call. One endpoint for
- * both discovery modes is the provider's shape, not a simplification of ours.
+ * The X one is the reason this provider exists here: it is the only keyword
+ * search across X that any of our three providers offers. A monitor's channels
+ * are handles, and they reach the same endpoint through X's own `from:`
+ * operator rather than through a second call. One endpoint for both discovery
+ * modes is the provider's shape, not a simplification of ours.
+ *
+ * The LinkedIn one has no such operator, and no `sort` either. What it has
+ * instead is a `date_posted` window, which is why the LinkedIn connector is
+ * not the X connector with a different URL.
  */
 export const endpoints = {
-  search: `${apiBase}/search/tweets`,
+  search: `${apiBase}/twitter/search/tweets`,
+  linkedInPosts: `${apiBase}/linkedin/search/posts`,
 } as const;
+
+/**
+ * The three things one endpoint does differently from the next, at the same
+ * provider, behind the same key.
+ *
+ * They are named here rather than sensed from the answer because each one is a
+ * measurement. Reading a cursor "wherever it happens to be" would have picked
+ * the wrong one of the two X carries, and falling back to a credit count the
+ * answer did not give would misprice a whole poll.
+ */
+export interface EndpointProfile {
+  readonly endpoint: string;
+  /**
+   * What one standard call costs when the provider does not say.
+   *
+   * Every captured answer reported `credits_used`, so this is a fallback that
+   * has never been used. It is never 0: the guard's job is to refuse, and a
+   * call recorded as free that was not is how a cap is passed silently.
+   * Over-reporting stops a monitor early, which a person can see and undo.
+   */
+  readonly standardCallCredits: number;
+  /** Where this endpoint puts its cursor, and whether it has one at all. */
+  readonly cursorOf: (body: Record<string, unknown>) => string | undefined;
+}
+
+/**
+ * X: `data.next_cursor`, and one credit a call.
+ *
+ * The answer also carries `pagination.next_cursor`, a different string wrapping
+ * the same place. This is the one a live run followed to a second page.
+ */
+export const xSearchProfile: EndpointProfile = {
+  endpoint: endpoints.search,
+  standardCallCredits: 1,
+  cursorOf: (body) => {
+    const data = objectAt(body, "data");
+    return text(data?.next_cursor);
+  },
+};
+
+/**
+ * LinkedIn: `pagination.next_cursor`, and five credits a call.
+ *
+ * The documentation describes no pagination for this endpoint at all. The
+ * capture run found a cursor anyway, followed it, and got ten more posts with
+ * no overlap against page one — so the documentation is wrong rather than
+ * merely quiet, and a connector written from it would have paid for one page
+ * and called the query finished.
+ *
+ * `has_more` is read as well as the cursor. The two agreed on every captured
+ * answer, and believing the flag when they disagree is the safe direction:
+ * the cost of stopping early is a post found on the next poll, and the cost of
+ * paging on is five credits for nothing.
+ */
+export const linkedInPostSearchProfile: EndpointProfile = {
+  endpoint: endpoints.linkedInPosts,
+  standardCallCredits: 5,
+  cursorOf: (body) => {
+    const pagination = objectAt(body, "pagination");
+    if (pagination?.has_more === false) return undefined;
+    return text(pagination?.next_cursor);
+  },
+};
+
+function objectAt(body: Record<string, unknown>, key: string): Record<string, unknown> | undefined {
+  const value = body[key];
+  return typeof value === "object" && value !== null
+    ? (value as Record<string, unknown>)
+    : undefined;
+}
+
+function text(value: unknown): string | undefined {
+  return typeof value === "string" && value !== "" ? value : undefined;
+}
 
 /**
  * Newest first.
@@ -56,17 +159,6 @@ export const endpoints = {
  * first post older than `since` means every post after it is older too.
  */
 export const sortNewest = "latest";
-
-/**
- * What one standard call costs when the provider does not say.
- *
- * Every captured answer reported `credits_used`, so this is a fallback that
- * has never been used. It is 1 rather than 0 on purpose: the guard's job is to
- * refuse, and a call recorded as free that was not is how a cap is passed
- * silently. Over-reporting stops a monitor early, which a person can see and
- * undo.
- */
-const standardCallCredits = 1;
 
 /**
  * A refusal from SocialCrawl, already turned into a sentence a user can act
@@ -118,15 +210,22 @@ interface Answer {
 export interface SocialCrawlClientOptions {
   readonly runtime: SourceRuntime;
   readonly apiKey: string;
+  /**
+   * Which endpoint this client speaks to. It defaults to X's, so the connector
+   * US-006 shipped constructs a client the way it always did.
+   */
+  readonly profile?: EndpointProfile;
 }
 
 export class SocialCrawlClient {
   private readonly runtime: SourceRuntime;
   private readonly apiKey: string;
+  private readonly profile: EndpointProfile;
 
-  constructor({ runtime, apiKey }: SocialCrawlClientOptions) {
+  constructor({ runtime, apiKey, profile }: SocialCrawlClientOptions) {
     this.runtime = runtime;
     this.apiKey = apiKey;
+    this.profile = profile ?? xSearchProfile;
   }
 
   private async call(
@@ -227,7 +326,7 @@ export class SocialCrawlClient {
    * 100, which is the free-probe claim measured rather than argued.
    */
   async probe(signal?: AbortSignal): Promise<void> {
-    const answer = await this.call(endpoints.search, {}, signal);
+    const answer = await this.call(this.profile.endpoint, {}, signal);
 
     if (answer.httpStatus === 400) return;
     if (answer.httpStatus === 200) return;
@@ -242,7 +341,7 @@ export class SocialCrawlClient {
    * a measured fact and not a simplification — see the header.
    */
   async fetchPage(params: Record<string, string>, signal?: AbortSignal): Promise<Page> {
-    const answer = await this.call(endpoints.search, params, signal);
+    const answer = await this.call(this.profile.endpoint, params, signal);
 
     if (answer.httpStatus !== 200) throw this.fail(answer);
 
@@ -262,14 +361,11 @@ export class SocialCrawlClient {
         : {};
 
     const records = Array.isArray(data.items) ? data.items : [];
-    const cursor =
-      typeof data.next_cursor === "string" && data.next_cursor !== ""
-        ? data.next_cursor
-        : undefined;
+    const cursor = this.profile.cursorOf(body);
 
     return {
       records,
-      creditsUsed: creditsOf(body),
+      creditsUsed: creditsOf(body, this.profile.standardCallCredits),
       ...(cursor ? { cursor } : {}),
     };
   }
@@ -279,9 +375,16 @@ export class SocialCrawlClient {
  * What the answer says it cost.
  *
  * A missing or unreadable value falls back to the price of a standard call
- * rather than to nothing, for the reason `standardCallCredits` gives.
+ * rather than to nothing, for the reason `EndpointProfile.standardCallCredits`
+ * gives.
+ *
+ * A zero the provider *did* report is kept, and that is not the same thing. It
+ * refunds a search that matched nothing on X, and it charges nothing for an
+ * answer it served from its own cache — `cached: true`, measured on the
+ * LinkedIn endpoint. Both are real zeroes and recording them as anything else
+ * would overstate a monitor's spend.
  */
-function creditsOf(body: Record<string, unknown>): number {
+function creditsOf(body: Record<string, unknown>, standardCallCredits: number): number {
   const reported = body.credits_used;
 
   if (typeof reported === "number" && Number.isFinite(reported) && reported >= 0) {

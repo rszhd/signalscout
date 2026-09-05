@@ -9,7 +9,7 @@ answers a different question:
 > Who is publicly describing a problem my product can solve?
 
 You describe what you sell, who buys it, and what problems you solve.
-IntentWatch searches Reddit and X, and uses a model to read each conversation
+IntentWatch searches Reddit, X and LinkedIn, and uses a model to read each conversation
 and score it — relevance, problem fit, ICP fit, buyer intent, urgency. What you
 get is not a dashboard. It is an inbox of people who might need what you build.
 
@@ -298,6 +298,11 @@ and one registry entry.
 A product with two sources that surfaces five genuinely valuable conversations a
 day beats one with twenty sources generating hundreds of noisy alerts. Help with
 detection quality first.
+
+LinkedIn is in the build and it is the exception that proves the rule, not its
+repeal: the owner asked for it on 2026-09-05 while the condition was unmet, and
+US-028 records that. A pull request adding a fifth source still meets this
+answer.
 
 If you use an AI coding agent, read [AGENTS.md](AGENTS.md) before starting.
 

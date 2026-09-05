@@ -155,6 +155,13 @@
       "when": 1788615154261,
       "tag": "0021_queries_are_kept_per_platform",
       "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1788618887207,
+      "tag": "0022_add_linkedin_platform",
+      "breakpoints": true
     }
   ]
 }

@@ -580,6 +580,10 @@ a {
   background: #171918;
 }
 
+.source-linkedin .source-dot {
+  background: #0a66c2;
+}
+
 .match-origin {
   margin-left: auto;
   color: var(--muted);

@@ -139,6 +139,7 @@ design more than any framework choice.
 | Reddit read, Bright Data pay-as-you-go | $0.0015 ($1.50 per 1,000 records) |
 | Reddit read, ScrapeCreators | ~$0.00008 to $0.00027, measured |
 | X read, SocialCrawl | $0.008118 per request, and a request brought 20 posts |
+| LinkedIn read, SocialCrawl | $0.04059 per request — five credits — and a request brought 10 posts |
 | Embedding pre-filter | ~$0.00001 |
 | AI classification, cheap model | ~$0.001 |
 
@@ -153,6 +154,23 @@ record, and about one thirtieth of what X's own API charges for the same read.
 The catch is not price. It is that a request that finds nothing is refunded and
 a request that finds twenty is the same credit, so cost follows the number of
 *calls* a poll makes, never the number of posts it brings back.
+
+**LinkedIn is the expensive end of the same provider, and the same key.** One
+SocialCrawl credit costs the same whichever platform spends it; a LinkedIn
+search spends five of them and returns ten posts, where an X search spends one
+and returns twenty. So a LinkedIn post costs about $0.0041: ten times an X post
+and twenty-seven times a Bright Data Reddit record. Two consequences follow
+that a person setting a monitor should be told. A cap is not optional here —
+one query polled hourly at two pages is about $58 a month. And the connector
+reports its units in *credits* rather than in requests, because at five to one
+the two words are different numbers and a guard fed the wrong one lets a
+monitor spend five times its cap.
+
+**A LinkedIn search never comes back empty, and that costs money.** X refunds a
+search that matches nothing, so a dead query there is free. On LinkedIn a
+phrase that cannot occur returned ten unrelated posts and was billed in full.
+There is no empty answer to read, so a vague query is not cheap noise — it is
+full-price noise that the classifier is then paid to read.
 
 **The two Reddit providers do not bill the same thing, and the gap is large.**
 Bright Data bills a record, so a post costs $0.0015 whatever else happens.
@@ -290,6 +308,68 @@ no X price at all.
 **Per-read billing makes the budget guard a prerequisite, not a follow-up.**
 US-013 and US-014 landed before the X connector, which is the order this said
 was needed.
+
+## LinkedIn
+
+**LinkedIn is reached through SocialCrawl, on the same key as X.** US-028 added
+it on 2026-09-05. There is no elimination story here and none should be
+claimed: the provider documents `/v1/linkedin/search/posts`, we used it, and
+Bright Data and ScrapeCreators were never asked what they can do with LinkedIn.
+A second provider for this platform is an open question, not a closed one.
+
+**PLAN.md says not to add a third network yet, and this one was added anyway.**
+The rule is that detection quality outranks a new source, and it is not met:
+X has run one poll and five verdicts. The owner decided on 2026-09-05 to add
+LinkedIn regardless. It is recorded here so the next reader finds a decision
+rather than an oversight, and PLAN.md's rule still stands for the fourth.
+
+Three measured facts shape the connector, and each contradicts something the X
+connector does:
+
+**A call costs five credits and returns ten posts.** X is one credit for twenty.
+So the connector counts *credits*, not requests — at five to one the two words
+are different numbers, and a guard fed requests would let a monitor spend five
+times its cap.
+
+**The answer is ordered by relevance, not by date.** A captured page ran 22
+August, 22 August, 4 September, 31 August, 15 August. The X connector stops
+paging when a whole page falls before `since`, because that list is newest
+first. Copying that rule here would throw away a fresh post sitting behind an
+old one. The window is a `date_posted` parameter instead — `past_24h`,
+`past_week` or `past_month`, and nothing finer — so the connector asks for the
+narrowest window covering `since` and makes the exact cut itself.
+
+**A search that matches nothing is billed, and does not come back empty.** A
+phrase that cannot occur returned ten unrelated posts, `total: 98`, at full
+price. X refunds the same call. So this connector has no empty-page signal to
+read, and a vague query costs full price for noise.
+
+The documentation was wrong about one thing and quiet about another, which is
+the argument for capturing rather than reading. It describes no pagination for
+this endpoint; there is a cursor at `pagination.next_cursor` and page two
+returned ten posts with none of page one's among them. And it does not mention
+that the provider caches: the same query sent twice came back flagged
+`cached: true` for zero credits. Nothing counts on that — the window is
+undocumented, and a cap sized on cached prices is a cap sized on luck.
+
+One live poll has run: 20 posts, 2 pages, 10 credits, 3.6 seconds, one
+`api_usage` row at 81,180 micro-dollars, five matches from 69 down to 54.
+
+**The noise on LinkedIn is a different kind, and it is worse for us.** Reddit
+keyword search returned posts about other subjects entirely, which a pre-filter
+can drop. LinkedIn returned articles *about* the problem, written by people
+building an audience — on topic, well written, and not leads. The classifier
+scored two of those 55 and 54 against 69 for a genuine question, a gap of
+fifteen points. A platform where people post to be seen produces
+expertise-signalling rather than off-topic noise, and no cheap stage can tell
+the two apart.
+
+What is unproven: channel discovery is unimplemented — `from_member` and
+`from_company` are documented without saying whether they take a URL, a slug or
+an urn, and a wrong guess costs five credits to learn nothing. A rate limit and
+an outage are simulated only. A real model timeout is no longer simulated: one
+happened in that poll, was recorded as `failed`, and cost the post nothing but
+its place in the queue.
 
 ---
 

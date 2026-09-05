@@ -17,11 +17,26 @@ the price the connector declares:
 | | Billable unit | Price per unit |
 |---|---|---|
 | Reddit, through Bright Data | one record | $0.0015 |
-| X | one post read | $0.005 |
+| Reddit, through ScrapeCreators | one request | $0.00188 |
+| X, through SocialCrawl | one request | $0.008118 |
+| LinkedIn, through SocialCrawl | one credit, and a call costs five | $0.008118 |
 | A model call | one call | the provider's own token price |
 
 That arithmetic is wrong in at least five ways we already know about, and
 probably in a sixth we do not:
+
+**LinkedIn is the dearest platform here, by a wide margin.** One call costs
+five credits and returns ten posts, so a LinkedIn post costs about $0.0041 —
+ten times an X post and twenty-seven times a Bright Data Reddit record. One
+query polled hourly, at the two pages a poll allows, is about $58 a month
+before a single model call. Set a cap before you start one.
+
+**A LinkedIn search that matches nothing still costs the full five credits.**
+X refunds a search that finds no posts. LinkedIn does not, and worse, it does
+not come back empty: a phrase that cannot occur anywhere returned ten
+unrelated posts and billed in full. So a vague LinkedIn query is not a query
+that quietly finds nothing — it is a query that pays full price for noise, and
+then pays the classifier to read it.
 
 **The free allowance is not modelled.** Bright Data's first 5,000 records each
 month cost nothing. IntentWatch prices every record at the paid rate, so a

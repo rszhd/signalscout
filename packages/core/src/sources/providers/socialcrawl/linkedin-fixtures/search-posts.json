@@ -1,0 +1,479 @@
+{
+  "httpStatus": 200,
+  "body": {
+    "success": true,
+    "platform": "linkedin",
+    "endpoint": "/v1/linkedin/search/posts",
+    "data": {
+      "items": [
+        {
+          "id": "7500190661334249473",
+          "url": "https://www.linkedin.com/feed/update/urn:li:activity:7500190661334249473",
+          "title": "I’ve learned to treat flaky tests as a signal, not just an annoyance.\n\nA test that fails intermittently may be exposing timing assumptions, shared state, unstable data, or a real race condition. Rerunning it until it passes hides the risk and weakens trust in the suite.\n\nThe better question is: what changed between the passing and failing runs?\n\nI’m curious where others draw the line between quarantine and investigation. Push back if your approach differs.",
+          "activity": {
+            "num_likes": 7,
+            "num_comments": 0,
+            "num_shares": 0,
+            "reaction_counts": [
+              {
+                "count": 7,
+                "type": "LIKE"
+              }
+            ]
+          },
+          "created_at": "2026-08-31T14:30:00.552Z",
+          "author": {
+            "name": "li-user-1",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "url": "https://www.linkedin.com/in/li-user-2",
+            "avatar": [
+              {
+                "width": 400,
+                "height": 400,
+                "url": "https://scrubbed.invalid/li-user-3",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 100,
+                "height": 100,
+                "url": "https://scrubbed.invalid/li-user-4",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 200,
+                "height": 200,
+                "url": "https://scrubbed.invalid/li-user-5",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 800,
+                "height": 800,
+                "url": "https://scrubbed.invalid/li-user-6",
+                "expires_at": 1790208000000
+              }
+            ]
+          }
+        },
+        {
+          "id": "7500894349820432384",
+          "url": "https://www.linkedin.com/feed/update/urn:li:activity:7500894349820432384",
+          "title": "I’m tired of hearing, “You still learned something” after a failed A/B test.\n\nIf I’ve spent time researching a problem, building a hypothesis, designing the test and getting it live, of course I want to know WHY it failed.\n\nMaybe the hypothesis wasn’t strong enough.\nMaybe the problem wasn’t important enough.\nMaybe the change didn’t address the real friction.\n\nThat’s what I want to understand.\n\nYou’re not curious enough if you’re leaving the test without learning from it.\n\nIt’s an unsaid thing, my dear.\n\nAnd if this has to be repeated, then sorry, you’re probably not a good CRO specialist.\n\n#CRO #Marketing #Abtesting",
+          "activity": {
+            "num_likes": 10,
+            "num_comments": 2,
+            "num_shares": 0,
+            "reaction_counts": [
+              {
+                "count": 10,
+                "type": "LIKE"
+              }
+            ]
+          },
+          "created_at": "2026-09-02T14:30:00.552Z",
+          "author": {
+            "name": "li-user-7",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "url": "https://www.linkedin.com/in/li-user-8",
+            "avatar": [
+              {
+                "width": 100,
+                "height": 100,
+                "url": "https://scrubbed.invalid/li-user-9",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 200,
+                "height": 200,
+                "url": "https://scrubbed.invalid/li-user-10",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 400,
+                "height": 400,
+                "url": "https://scrubbed.invalid/li-user-11",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 800,
+                "height": 800,
+                "url": "https://scrubbed.invalid/li-user-12",
+                "expires_at": 1790208000000
+              }
+            ]
+          }
+        },
+        {
+          "id": "7500907910416433152",
+          "url": "https://www.linkedin.com/feed/update/urn:li:activity:7500907910416433152",
+          "title": "The tool that made my flaky tests confess: Allure Report. 📊\n\nWhat sold me isn't the pretty dashboard. It's the history — Allure shows how one test behaved over the last N nightly runs, not just tonight's red or green.\n\nA scenario that \"sometimes fails\" stops being a mystery when the trend shows it broke the same step 4 of the last 10 runs. That's a flake with a pattern, not bad luck. 🔍\n\nThe catch: that trend only exists if you carry the previous results folder between runs. A fresh CI checkout has amnesia — you have to persist history yourself (I keep mine on GitHub Pages).\n\nDo you actually read your test reports, or just check red vs green?\n\n#SDET #TestAutomation #Allure",
+          "activity": {
+            "num_likes": 0,
+            "num_comments": 0,
+            "num_shares": 0,
+            "reaction_counts": []
+          },
+          "created_at": "2026-09-02T14:30:00.552Z",
+          "author": {
+            "name": "li-user-13",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "url": "https://www.linkedin.com/in/li-user-14",
+            "avatar": [
+              {
+                "width": 400,
+                "height": 400,
+                "url": "https://scrubbed.invalid/li-user-15",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 100,
+                "height": 100,
+                "url": "https://scrubbed.invalid/li-user-16",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 800,
+                "height": 800,
+                "url": "https://scrubbed.invalid/li-user-17",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 200,
+                "height": 200,
+                "url": "https://scrubbed.invalid/li-user-18",
+                "expires_at": 1790208000000
+              }
+            ]
+          }
+        },
+        {
+          "id": "7500925928303288320",
+          "url": "https://www.linkedin.com/feed/update/urn:li:activity:7500925928303288320",
+          "title": "We put this diagnostic together after one too many calls that ended with \"the model was fine until the board asked something new.\"\n \nSwipe through — 5 questions, 2 minutes.\n \nComment \"SCORE\" or DM me and I'll send you the full breakdown.",
+          "activity": {
+            "num_likes": 4,
+            "num_comments": 2,
+            "num_shares": 1,
+            "reaction_counts": [
+              {
+                "count": 3,
+                "type": "LIKE"
+              },
+              {
+                "count": 1,
+                "type": "INTEREST"
+              }
+            ]
+          },
+          "created_at": "2026-09-03T14:30:00.552Z",
+          "author": {
+            "name": "li-user-19",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "url": "https://www.linkedin.com/in/li-user-20",
+            "avatar": [
+              {
+                "width": 399,
+                "height": 400,
+                "url": "https://scrubbed.invalid/li-user-21",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 99,
+                "height": 100,
+                "url": "https://scrubbed.invalid/li-user-22",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 799,
+                "height": 800,
+                "url": "https://scrubbed.invalid/li-user-23",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 199,
+                "height": 200,
+                "url": "https://scrubbed.invalid/li-user-24",
+                "expires_at": 1790208000000
+              }
+            ]
+          }
+        },
+        {
+          "id": "7500795924068331521",
+          "url": "https://www.linkedin.com/feed/update/urn:li:activity:7500795924068331521",
+          "title": "I used to think a passing test meant we were done.\nThis week reminded me that’s not always true.\nI’ve been working on UI automation — Playwright, Microsoft login, CRUD flows for machines and implements, running everything back-to-back in one browser session.\nOne test kept failing only when run after three others. Not in isolation. Only in the full suite.\nThe bug wasn’t in the feature — it was in how we handled logout → login again. After logout, the browser was already on the B2C login page. The next test navigated home anyway, and sometimes OAuth blew up with a chrome-error page.\nFix was small: if we’re already on B2C, don’t navigate again. Add retries when the browser hits an error page.\nThat’s the part I find interesting about testing — the failures that only show up in real workflows, not in a single happy-path run.\nAlso learned (again): cleanup matters. If UI delete fails, you need a fallback. Orphan test data is how you lose trust in your suite.\nStill learning. Still fixing. Still trying to make “green” actually mean something.\n\n#QA #TestAutomation #Playwright #SoftwareTesting #LearningInPublic",
+          "activity": {
+            "num_likes": 4,
+            "num_comments": 1,
+            "num_shares": 0,
+            "reaction_counts": [
+              {
+                "count": 4,
+                "type": "LIKE"
+              }
+            ]
+          },
+          "created_at": "2026-09-02T14:30:00.552Z",
+          "author": {
+            "name": "li-user-25",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "url": "https://www.linkedin.com/in/li-user-26",
+            "avatar": [
+              {
+                "width": 100,
+                "height": 100,
+                "url": "https://scrubbed.invalid/li-user-27",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 200,
+                "height": 200,
+                "url": "https://scrubbed.invalid/li-user-28",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 297,
+                "height": 297,
+                "url": "https://scrubbed.invalid/li-user-29",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 297,
+                "height": 297,
+                "url": "https://scrubbed.invalid/li-user-30",
+                "expires_at": 1790208000000
+              }
+            ]
+          }
+        },
+        {
+          "id": "7501590958992502784",
+          "url": "https://www.linkedin.com/feed/update/urn:li:activity:7501590958992502784",
+          "title": "A handheld gaming PC is reportedly being bricked by its own BIOS update, with repairs described as extremely expensive.\n\nSome operations have no undo, and we tend to test them exactly like the ones that do.\n\nFirmware flashes. Migrations that drop a column. A script that deletes records permanently. Key rotation. Anything overwriting the only copy of something.\n\nThe strategy for these has to be different in kind, not just more thorough.\n\nVerify preconditions before starting rather than handling failure afterwards, because afterwards does not exist. Check the artifact is valid before applying it. Confirm you can finish before you begin, including battery, disk space and connectivity. Make the operation resumable, or make partial application impossible.\n\nThen rehearse it on hardware or data you can afford to lose, which is the step teams drop first when the schedule tightens.\n\nWhich operations in your product cannot be undone, and are they tested differently from the ones that can?\n\n#SoftwareTesting #QA #TestStrategy #Reliability #TechNews",
+          "activity": {
+            "num_likes": 0,
+            "num_comments": 0,
+            "num_shares": 0,
+            "reaction_counts": []
+          },
+          "created_at": "2026-09-04T14:30:00.552Z",
+          "author": {
+            "name": "li-user-31",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "url": "https://www.linkedin.com/in/li-user-32",
+            "avatar": [
+              {
+                "width": 400,
+                "height": 400,
+                "url": "https://scrubbed.invalid/li-user-33",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 200,
+                "height": 200,
+                "url": "https://scrubbed.invalid/li-user-34",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 800,
+                "height": 800,
+                "url": "https://scrubbed.invalid/li-user-35",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 100,
+                "height": 100,
+                "url": "https://scrubbed.invalid/li-user-36",
+                "expires_at": 1790208000000
+              }
+            ]
+          }
+        },
+        {
+          "id": "7497949081848242177",
+          "url": "https://www.linkedin.com/feed/update/urn:li:activity:7497949081848242177",
+          "title": "I often wish I could quickly see exactly where my end-to-end test failed. Without setting up a test environment. Ideally, with just one click.\n\nThe good news is you can now do it with the integrated Playwright Test Viewer!\nI enjoyed building this feature for our clients, and now I use it myself almost every day.\n\nI’ve written a short article explaining how to do this with Qase: https://lnkd.in/eYZUjkrY",
+          "activity": {
+            "num_likes": 38,
+            "num_comments": 4,
+            "num_shares": 9,
+            "reaction_counts": [
+              {
+                "count": 31,
+                "type": "LIKE"
+              },
+              {
+                "count": 6,
+                "type": "PRAISE"
+              },
+              {
+                "count": 1,
+                "type": "EMPATHY"
+              }
+            ]
+          },
+          "created_at": "2026-08-29T14:30:00.552Z",
+          "author": {
+            "name": "li-user-37",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "url": "https://www.linkedin.com/in/li-user-38",
+            "avatar": [
+              {
+                "width": 100,
+                "height": 100,
+                "url": "https://scrubbed.invalid/li-user-39",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 200,
+                "height": 200,
+                "url": "https://scrubbed.invalid/li-user-40",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 400,
+                "height": 400,
+                "url": "https://scrubbed.invalid/li-user-41",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 800,
+                "height": 800,
+                "url": "https://scrubbed.invalid/li-user-42",
+                "expires_at": 1790208000000
+              }
+            ]
+          }
+        },
+        {
+          "id": "7500424877997256704",
+          "url": "https://www.linkedin.com/feed/update/urn:li:activity:7500424877997256704",
+          "title": "One thing I have learned from 're-testing' vulnerabilities:\nA fix should solve the vulnerability, not just the proof of concept we reported.\n\nA developer may fix the visible scenario, but as a tester, we need to check whether the actual root cause has been addressed.\n\nSometimes a vulnerability is fixed on the exact page or parameter mentioned in the report...but the same issue still exists in another part of the application. \n\nSometimes the original proof of concept stops working, but changing the request or approaching the functionality differently shows that the underlying problem is still there.\n\nThis is especially important with issues related to access control, privilege escalation, input validation, authentication and APIs. \n\nRe-testing is no longer just the last step of a VAPT project.\nIt is the point where we verify whether the security improvement actually happened.\n\n#WebVAPT #VAPT #CyberSecurity #PenetrationTesting #ApplicationSecurity #SecurityTesting #OWASP",
+          "activity": {
+            "num_likes": 10,
+            "num_comments": 0,
+            "num_shares": 0,
+            "reaction_counts": [
+              {
+                "count": 10,
+                "type": "LIKE"
+              }
+            ]
+          },
+          "created_at": "2026-09-01T14:30:00.552Z",
+          "author": {
+            "name": "li-user-43",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "url": "https://www.linkedin.com/in/li-user-44",
+            "avatar": [
+              {
+                "width": 200,
+                "height": 200,
+                "url": "https://scrubbed.invalid/li-user-45",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 400,
+                "height": 400,
+                "url": "https://scrubbed.invalid/li-user-46",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 100,
+                "height": 100,
+                "url": "https://scrubbed.invalid/li-user-47",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 800,
+                "height": 800,
+                "url": "https://scrubbed.invalid/li-user-48",
+                "expires_at": 1790208000000
+              }
+            ]
+          }
+        },
+        {
+          "id": "7501203642117500928",
+          "url": "https://www.linkedin.com/feed/update/urn:li:activity:7501203642117500928",
+          "title": "Some faults live in the current first.\n\nA cracking rotor bar shows as sidebands around the supply frequency in the current spectrum before it shows in vibration. Supply unbalance and stator winding problems belong to the electrical side altogether. So LAKE now reads the motor's current the way it reads vibration.\n\nThe new MCSA module scores every measurement on:\n\n1. Broken rotor bars\n2. Static, dynamic and mixed eccentricity, separated rather than lumped together\n3. Stator winding problems, from the symmetrical components of the three phases\n4. Supply unbalance\n5. Bearing damage as it appears in the current\n\nTwo details we are proud of. Slip is measured from the spectrum itself, not taken from the nameplate, because the nameplate speed lies under load. And the verdicts are not locked in a screen: the API and two MCP tools put them in front of AI assistants, including our Reliability Agent.\n\nCurrent is the second window onto the motor. It confirms what vibration suspects and sees what vibration cannot.\n\n#MCSA #PredictiveMaintenance #ConditionMonitoring #MotorCurrentSignatureAnalysis",
+          "activity": {
+            "num_likes": 5,
+            "num_comments": 0,
+            "num_shares": 0,
+            "reaction_counts": [
+              {
+                "count": 5,
+                "type": "LIKE"
+              }
+            ]
+          },
+          "created_at": "2026-09-03T14:30:00.552Z",
+          "author": {
+            "name": "li-user-49",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "url": "https://www.linkedin.com/company/li-user-50/posts"
+          }
+        },
+        {
+          "id": "7500172038414888960",
+          "url": "https://www.linkedin.com/feed/update/urn:li:activity:7500172038414888960",
+          "title": "I used to brag about one hundred percent test coverage, until a critical production bug slipped past every single line of that covered code.\n\nThe suite was green. Management was happy.\n\nThen a user crashed the checkout flow because our assertions only checked if the page loaded, not if the database transaction actually completed.\n\nWe had plenty of tests executing statements, but zero tests validating real business outcomes.\n\nThat false sense of security made us sloppy.\n\nNow, when writing test cases or reviewing scripts, I look at mutation testing scores instead of raw line coverage.\n\nIf your test suite passes when you deliberately break the core logic, your coverage numbers are lying to you.\n\nHow do you measure actual test effectiveness on your team without relying on vanity metrics?\n\n#SoftwareTesting #AgileTesting #QAAutomation #SoftwareEngineering",
+          "activity": {
+            "num_likes": 1,
+            "num_comments": 0,
+            "num_shares": 0,
+            "reaction_counts": [
+              {
+                "count": 1,
+                "type": "LIKE"
+              }
+            ]
+          },
+          "created_at": "2026-08-31T14:30:00.552Z",
+          "author": {
+            "name": "li-user-51",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "url": "https://www.linkedin.com/in/li-user-52",
+            "avatar": [
+              {
+                "width": 200,
+                "height": 200,
+                "url": "https://scrubbed.invalid/li-user-53",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 800,
+                "height": 800,
+                "url": "https://scrubbed.invalid/li-user-54",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 100,
+                "height": 100,
+                "url": "https://scrubbed.invalid/li-user-55",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 400,
+                "height": 400,
+                "url": "https://scrubbed.invalid/li-user-56",
+                "expires_at": 1790208000000
+              }
+            ]
+          }
+        }
+      ],
+      "total": 500,
+      "dropped": 0
+    },
+    "credits_used": 5,
+    "request_id": "req-xEmt6LVQBwuIH2XJ",
+    "cached": false,
+    "pagination": {
+      "next_cursor": "sc.eyJ2IjoyLCJjIjoiMiIsImUiOiJsaW5rZWRpbi9zZWFyY2gvcG9zdHMiLCJwIjoicGFnZSJ9",
+      "has_more": true,
+      "page_size": 10
+    },
+    "credits_remaining": 66
+  }
+}

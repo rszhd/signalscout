@@ -1,0 +1,430 @@
+{
+  "httpStatus": 200,
+  "body": {
+    "success": true,
+    "platform": "linkedin",
+    "endpoint": "/v1/linkedin/search/posts",
+    "data": {
+      "items": [
+        {
+          "id": "7501600288085078019",
+          "url": "https://www.linkedin.com/feed/update/urn:li:activity:7501600288085078019",
+          "title": "A flaky test is useful only when the failure leaves enough evidence to classify it.\nIn my Playwright work, stability comes from three layers: user-facing locators, controlled test data, and API or trace evidence behind the UI result. That makes it possible to separate an application defect from timing, authentication, environment, or test-code problems before anyone reaches for rerun.\nA test suite should reduce debugging time, not create another system to debug.\n#Playwright #QualityEngineering #TestAutomation #SoftwareTesting",
+          "activity": {
+            "num_likes": 0,
+            "num_comments": 0,
+            "num_shares": 0,
+            "reaction_counts": []
+          },
+          "created_at": "2026-09-04T14:30:05.571Z",
+          "author": {
+            "name": "li-user-1",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "url": "https://www.linkedin.com/in/li-user-2",
+            "avatar": [
+              {
+                "width": 100,
+                "height": 100,
+                "url": "https://scrubbed.invalid/li-user-3",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 800,
+                "height": 800,
+                "url": "https://scrubbed.invalid/li-user-4",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 200,
+                "height": 200,
+                "url": "https://scrubbed.invalid/li-user-5",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 400,
+                "height": 400,
+                "url": "https://scrubbed.invalid/li-user-6",
+                "expires_at": 1790208000000
+              }
+            ]
+          }
+        },
+        {
+          "id": "7500190661334249473",
+          "url": "https://www.linkedin.com/feed/update/urn:li:activity:7500190661334249473",
+          "title": "I’ve learned to treat flaky tests as a signal, not just an annoyance.\n\nA test that fails intermittently may be exposing timing assumptions, shared state, unstable data, or a real race condition. Rerunning it until it passes hides the risk and weakens trust in the suite.\n\nThe better question is: what changed between the passing and failing runs?\n\nI’m curious where others draw the line between quarantine and investigation. Push back if your approach differs.",
+          "activity": {
+            "num_likes": 7,
+            "num_comments": 0,
+            "num_shares": 0,
+            "reaction_counts": [
+              {
+                "count": 7,
+                "type": "LIKE"
+              }
+            ]
+          },
+          "created_at": "2026-08-31T14:30:05.571Z",
+          "author": {
+            "name": "li-user-7",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "url": "https://www.linkedin.com/in/li-user-8",
+            "avatar": [
+              {
+                "width": 400,
+                "height": 400,
+                "url": "https://scrubbed.invalid/li-user-9",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 100,
+                "height": 100,
+                "url": "https://scrubbed.invalid/li-user-10",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 200,
+                "height": 200,
+                "url": "https://scrubbed.invalid/li-user-11",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 800,
+                "height": 800,
+                "url": "https://scrubbed.invalid/li-user-12",
+                "expires_at": 1790208000000
+              }
+            ]
+          }
+        },
+        {
+          "id": "7500106623722475520",
+          "url": "https://www.linkedin.com/feed/update/urn:li:activity:7500106623722475520",
+          "title": "A test fails. You rerun it and it passes. Was there a defect? Was the test updated incorrectly? Or did the result change for no apparent reason?\n\nThat last case is flakiness: an automated test producing inconsistent results across executions on the same build, environment and inputs.\n\nThe issue is not one occasional false failure. When pass rates oscillate, every failure must be triaged twice: first to establish whether it is real, then to fix it if it is. The suite becomes harder to trust and harder to read.\n\nRead the blog to understand why flaky tests are a strategic problem, not just a tactical annoyance: https://lnkd.in/es8uGkjC\n\n#TestAutomation #SoftwareTesting #QualityAssurance",
+          "activity": {
+            "num_likes": 9,
+            "num_comments": 3,
+            "num_shares": 0,
+            "reaction_counts": [
+              {
+                "count": 9,
+                "type": "LIKE"
+              }
+            ]
+          },
+          "created_at": "2026-08-31T14:30:05.571Z",
+          "author": {
+            "name": "li-user-13",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "url": "https://www.linkedin.com/company/li-user-14/posts"
+          }
+        },
+        {
+          "id": "7501257472943435776",
+          "url": "https://www.linkedin.com/feed/update/urn:li:activity:7501257472943435776",
+          "title": "A small rant about flaky tests\n Nothing erodes a team's trust in automation faster than a test suite that cries wolf. Once developers start ignoring red builds because \"oh that one's always flaky,\" your safety net is gone - you just haven't noticed yet. Fixing flaky tests isn't glamorous work, but it's some of the highest-leverage work a QA team can do. Treat flakiness as a bug, not a nuisance.",
+          "activity": {
+            "num_likes": 1,
+            "num_comments": 0,
+            "num_shares": 1,
+            "reaction_counts": [
+              {
+                "count": 1,
+                "type": "LIKE"
+              }
+            ]
+          },
+          "created_at": "2026-09-03T14:30:05.571Z",
+          "author": {
+            "name": "li-user-15",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "url": "https://www.linkedin.com/company/li-user-16/posts"
+          }
+        },
+        {
+          "id": "7501845797064556544",
+          "url": "https://www.linkedin.com/feed/update/urn:li:activity:7501845797064556544",
+          "title": "Most flaky tests aren't flaky.\n\nThey're timing bugs wearing a costume.\n\nWhen a suite \"randomly\" fails, the easy move is to retry until green. The useful move is to ask: what race did we paper over? What shared state leaked? What assumption about the network died under real traffic?\n\nRetries hide the problem. They don't fix it.\n\nNext time a test flakes twice in a week, treat it like a production incident — not a CI annoyance.\n\n#QA #SoftwareTesting #SDET #QualityEngineering #TestAutomation\n\n[AUTOMATED POST]",
+          "activity": {
+            "num_likes": 0,
+            "num_comments": 0,
+            "num_shares": 0,
+            "reaction_counts": []
+          },
+          "created_at": "2026-09-05T04:30:05.571Z",
+          "author": {
+            "name": "li-user-17",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "url": "https://www.linkedin.com/in/li-user-18",
+            "avatar": [
+              {
+                "width": 400,
+                "height": 400,
+                "url": "https://scrubbed.invalid/li-user-19",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 100,
+                "height": 100,
+                "url": "https://scrubbed.invalid/li-user-20",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 800,
+                "height": 800,
+                "url": "https://scrubbed.invalid/li-user-21",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 200,
+                "height": 200,
+                "url": "https://scrubbed.invalid/li-user-22",
+                "expires_at": 1790208000000
+              }
+            ]
+          }
+        },
+        {
+          "id": "7501701620469112832",
+          "url": "https://www.linkedin.com/feed/update/urn:li:activity:7501701620469112832",
+          "title": "Flaky tests erode trust faster than missing tests do. Once a test suite cries wolf enough times, engineers stop reading the red and start re-running until it goes green. At that point the suite is providing less signal than no suite at all, just more ceremony around ignoring it.\n\nFixing flakiness is unglamorous work. It rarely gets prioritized on its own, only after someone gets burned by a real bug that a flaky test also happened to be flagging that week.\n\nTreat flaky as a bug in the test, not a fact of life.\n\n#BuildInPublic #SoftwareTesting #QA #TestAutomation",
+          "activity": {
+            "num_likes": 0,
+            "num_comments": 0,
+            "num_shares": 0,
+            "reaction_counts": []
+          },
+          "created_at": "2026-09-04T18:30:05.571Z",
+          "author": {
+            "name": "li-user-23",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "url": "https://www.linkedin.com/in/li-user-24",
+            "avatar": [
+              {
+                "width": 100,
+                "height": 100,
+                "url": "https://scrubbed.invalid/li-user-25",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 200,
+                "height": 200,
+                "url": "https://scrubbed.invalid/li-user-26",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 400,
+                "height": 400,
+                "url": "https://scrubbed.invalid/li-user-27",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 800,
+                "height": 800,
+                "url": "https://scrubbed.invalid/li-user-28",
+                "expires_at": 1790208000000
+              }
+            ]
+          }
+        },
+        {
+          "id": "7500466731325386752",
+          "url": "https://www.linkedin.com/feed/update/urn:li:activity:7500466731325386752",
+          "title": "The dangerous part of a flaky test isn't the false failure. It's what happens when teams stop investigating.\n\nGoogle found that 𝟴𝟰% 𝗼𝗳 𝘁𝗵𝗲 𝗽𝗮𝘀𝘀-𝘁𝗼-𝗳𝗮𝗶𝗹 𝘁𝗿𝗮𝗻𝘀𝗶𝘁𝗶𝗼𝗻𝘀 they observed involved a flaky test.\n\nAt Google's scale, 𝟭𝟲% 𝗼𝗳 𝘁𝗲𝘀𝘁𝘀 𝘀𝗵𝗼𝘄 𝘀𝗼𝗺𝗲 𝗹𝗲𝘃𝗲𝗹 𝗼𝗳 𝗳𝗹𝗮𝗸𝗶𝗻𝗲𝘀𝘀.\n\nSo \"probably just flaky\" becomes a reasonable assumption - right up until it's wrong.\n\nNobody ignores a defect on purpose. But when false alarms happen often enough, teams learn to dismiss them.\nAnd eventually, the excuse for a false alarm becomes indistinguishable from the excuse for a real regression.\n\nThat's where the risk sits.\n\nIf your release process can't distinguish the two, your test suite starts measuring confidence instead of quality.\n\nThe next time a test is labelled \"𝗳𝗹𝗮𝗸𝘆,\" ask one question:\nDid we prove it was flaky, or did it simply pass the second time?\n\n#FrugalTesting #QualityEngineering #SoftwareTesting #EngineeringLeadership #CTO #ReleaseManagement #WomenInTech",
+          "activity": {
+            "num_likes": 36,
+            "num_comments": 13,
+            "num_shares": 0,
+            "reaction_counts": [
+              {
+                "count": 35,
+                "type": "LIKE"
+              },
+              {
+                "count": 1,
+                "type": "PRAISE"
+              }
+            ]
+          },
+          "created_at": "2026-09-01T14:30:05.571Z",
+          "author": {
+            "name": "li-user-29",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "url": "https://www.linkedin.com/in/li-user-30",
+            "avatar": [
+              {
+                "width": 100,
+                "height": 100,
+                "url": "https://scrubbed.invalid/li-user-31",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 200,
+                "height": 200,
+                "url": "https://scrubbed.invalid/li-user-32",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 400,
+                "height": 400,
+                "url": "https://scrubbed.invalid/li-user-33",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 800,
+                "height": 800,
+                "url": "https://scrubbed.invalid/li-user-34",
+                "expires_at": 1790208000000
+              }
+            ]
+          }
+        },
+        {
+          "id": "7500907910416433152",
+          "url": "https://www.linkedin.com/feed/update/urn:li:activity:7500907910416433152",
+          "title": "The tool that made my flaky tests confess: Allure Report. 📊\n\nWhat sold me isn't the pretty dashboard. It's the history — Allure shows how one test behaved over the last N nightly runs, not just tonight's red or green.\n\nA scenario that \"sometimes fails\" stops being a mystery when the trend shows it broke the same step 4 of the last 10 runs. That's a flake with a pattern, not bad luck. 🔍\n\nThe catch: that trend only exists if you carry the previous results folder between runs. A fresh CI checkout has amnesia — you have to persist history yourself (I keep mine on GitHub Pages).\n\nDo you actually read your test reports, or just check red vs green?\n\n#SDET #TestAutomation #Allure",
+          "activity": {
+            "num_likes": 0,
+            "num_comments": 0,
+            "num_shares": 0,
+            "reaction_counts": []
+          },
+          "created_at": "2026-09-02T14:30:05.571Z",
+          "author": {
+            "name": "li-user-35",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "url": "https://www.linkedin.com/in/li-user-36",
+            "avatar": [
+              {
+                "width": 400,
+                "height": 400,
+                "url": "https://scrubbed.invalid/li-user-37",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 100,
+                "height": 100,
+                "url": "https://scrubbed.invalid/li-user-38",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 800,
+                "height": 800,
+                "url": "https://scrubbed.invalid/li-user-39",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 200,
+                "height": 200,
+                "url": "https://scrubbed.invalid/li-user-40",
+                "expires_at": 1790208000000
+              }
+            ]
+          }
+        },
+        {
+          "id": "7499578397501681664",
+          "url": "https://www.linkedin.com/feed/update/urn:li:activity:7499578397501681664",
+          "title": "FlakeyRadar: My Final Year Project \nA few weeks ago I said I'd share more about my final year project; here it is.\nFlakeyRadar is a tool I built alongside Gideon Babalola to detect, classify, and automatically repair flaky tests in JavaScript CI pipelines.\nQuick context for anyone who hasn't run into this pain: a flaky test is a test that sometimes passes and sometimes fails, with no code changes in between. No new bug introduced, but just a non-deterministic test. They quietly kill trust in CI pipelines. Teams start ignoring failed builds because \"oh that's probably just flaky,\" which is a dangerous habit to build.\n\nSo for FlakeyRadar, we:\nTrained a CodeBERT-based model to classify flaky tests based on 3 flaky test categories (async flaky tests, network-related flaky tests, and concurrency-related flaky tests because these were the flaky tests that occurred the most in the JavaScript environment).\nBuilt a pipeline that plugs into JS CI workflows to detect them automatically\nWent a step further with automated repair, not just flagging flaky tests, but attempting to fix them\nIt became more than just the project we had to submit to graduate. It turned into a genuine research problem we got attached to.\n\nTwo month from graduation, and this is one of the things I'm proudest of building. Shoutout to Gideon Babalola for grinding through this with me.\nWould love to hear from anyone who has dealt with flaky tests in their own CI pipelines, or anyone working in software testing.  Always up for a conversation.\n\nGithub Link: https://lnkd.in/e_WdFVjj",
+          "activity": {
+            "num_likes": 13,
+            "num_comments": 1,
+            "num_shares": 3,
+            "reaction_counts": [
+              {
+                "count": 13,
+                "type": "LIKE"
+              }
+            ]
+          },
+          "created_at": "2026-08-30T14:30:05.571Z",
+          "author": {
+            "name": "li-user-41",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "url": "https://www.linkedin.com/in/li-user-42",
+            "avatar": [
+              {
+                "width": 100,
+                "height": 100,
+                "url": "https://scrubbed.invalid/li-user-43",
+                "expires_at": 1789225200000
+              },
+              {
+                "width": 400,
+                "height": 400,
+                "url": "https://scrubbed.invalid/li-user-44",
+                "expires_at": 1789225200000
+              },
+              {
+                "width": 200,
+                "height": 200,
+                "url": "https://scrubbed.invalid/li-user-45",
+                "expires_at": 1789225200000
+              },
+              {
+                "width": 800,
+                "height": 800,
+                "url": "https://scrubbed.invalid/li-user-46",
+                "expires_at": 1789225200000
+              }
+            ]
+          }
+        },
+        {
+          "id": "7501590792252268544",
+          "url": "https://www.linkedin.com/feed/update/urn:li:activity:7501590792252268544",
+          "title": "A bug this week had Microsoft Defender flagging legitimate Google search links as malicious.\n\nConsider what that does to a security product over time.\n\nA false positive is not a neutral error. Its cost compounds. The first one gets investigated. The tenth gets dismissed. By the fiftieth, people have learned the warning is usually wrong and click through without reading it.\n\nYou have not only wasted their time. You have trained them to ignore you, and the training holds when the alert is finally real.\n\nTesters live the same dynamic with flaky tests. A suite failing for no reason two mornings a week is not a slightly worse suite. It is one that no longer changes anybody's behaviour, because red has stopped meaning anything.\n\nWhich is why a false positive rate deserves the same seriousness as a miss rate. Both destroy the value of a signal, just at different speeds.\n\nIf your alerts were wrong one time in ten, how long before your team stopped reading them?\n\n#SoftwareTesting #QA #FlakyTests #Monitoring #SoftwareEngineering",
+          "activity": {
+            "num_likes": 0,
+            "num_comments": 0,
+            "num_shares": 0,
+            "reaction_counts": []
+          },
+          "created_at": "2026-09-04T14:30:05.571Z",
+          "author": {
+            "name": "li-user-47",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "url": "https://www.linkedin.com/in/li-user-48",
+            "avatar": [
+              {
+                "width": 400,
+                "height": 400,
+                "url": "https://scrubbed.invalid/li-user-49",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 200,
+                "height": 200,
+                "url": "https://scrubbed.invalid/li-user-50",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 800,
+                "height": 800,
+                "url": "https://scrubbed.invalid/li-user-51",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 100,
+                "height": 100,
+                "url": "https://scrubbed.invalid/li-user-52",
+                "expires_at": 1790208000000
+              }
+            ]
+          }
+        }
+      ],
+      "total": 487,
+      "dropped": 0
+    },
+    "credits_used": 5,
+    "request_id": "req-BJ0jN6Y3kCfHcOf1",
+    "cached": false,
+    "pagination": {
+      "next_cursor": "sc.eyJ2IjoyLCJjIjoiMiIsImUiOiJsaW5rZWRpbi9zZWFyY2gvcG9zdHMiLCJwIjoicGFnZSJ9",
+      "has_more": true,
+      "page_size": 10
+    },
+    "credits_remaining": 51
+  }
+}

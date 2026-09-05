@@ -1,0 +1,322 @@
+{
+  "httpStatus": 200,
+  "body": {
+    "success": true,
+    "platform": "linkedin",
+    "endpoint": "/v1/linkedin/search/posts",
+    "data": {
+      "items": [
+        {
+          "id": "7501353369697927169",
+          "url": "https://www.linkedin.com/feed/update/urn:li:activity:7501353369697927169",
+          "title": "A closed ticket ≠ a fixed risk. ❌\n\nFinding a critical vulnerability is only half the battle. The real friction happens in the long road between discovery, remediation, and retesting—where manual handoffs and static reports slow teams down.\nIn his latest piece for The Hacker News, PlexTrac Founder Daniel DeCloss breaks down how automating administrative friction and connecting workflows helps security teams move faster from initial finding to verified fix.\nRead the full breakdown: https://lnkd.in/gcNvxQWX\n#Cybersecurity #Pentesting #SecOps #PlexTrac #offensivesecurity",
+          "activity": {
+            "num_likes": 5,
+            "num_comments": 0,
+            "num_shares": 1,
+            "reaction_counts": [
+              {
+                "count": 5,
+                "type": "LIKE"
+              }
+            ]
+          },
+          "created_at": "2026-09-04T14:30:03.390Z",
+          "author": {
+            "name": "li-user-1",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "url": "https://www.linkedin.com/company/li-user-2/posts"
+          }
+        },
+        {
+          "id": "7500074856231731200",
+          "url": "https://www.linkedin.com/feed/update/urn:li:activity:7500074856231731200",
+          "title": "A vulnerability can be fixed without actually fixing the vulnerability.\n\nWe’ve seen this pattern repeatedly during security testing:\n\nThe original payload gets blocked.\nThe developer verifies the fix.\nThe ticket gets closed.\n\nSo we retest differently.\n\nInstead of asking:\n\n“Does the original exploit still work?”\n\nWe ask:\n\n“Does the security assumption behind that exploit still hold?”\n\nSometimes the answer is no.\n\nA different endpoint, workflow, parameter, or sequence of actions can expose the same underlying flaw through a completely different path.\n\nThat’s why adversarial retesting isn't just replaying the original PoC.\n\nIt’s challenging the fix itself.\n\nBecause attackers don't have to use the same path we used to find the vulnerability.\n\nThey only need to find another path that reaches the same broken security assumption.\n\n#OffensiveSecurity #ApplicationSecurity #Pentesting #WebSecurity #AppSec #CyberSecurity #SecurityTesting #VulnerabilityManagement #kairainfosec",
+          "activity": {
+            "num_likes": 5,
+            "num_comments": 0,
+            "num_shares": 1,
+            "reaction_counts": [
+              {
+                "count": 5,
+                "type": "LIKE"
+              }
+            ]
+          },
+          "created_at": "2026-08-31T14:30:03.390Z",
+          "author": {
+            "name": "li-user-3",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "url": "https://www.linkedin.com/company/li-user-4/posts"
+          }
+        },
+        {
+          "id": "7500089482482860032",
+          "url": "https://www.linkedin.com/feed/update/urn:li:activity:7500089482482860032",
+          "title": "Why Are My IV-Curve and EL Test Results Disconnected from Daily Ops?",
+          "activity": {
+            "num_likes": 0,
+            "num_comments": 0,
+            "num_shares": 0,
+            "reaction_counts": []
+          },
+          "created_at": "2026-08-31T14:30:03.390Z",
+          "author": {
+            "name": "li-user-5",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "url": "https://www.linkedin.com/company/li-user-6/posts"
+          }
+        },
+        {
+          "id": "7499814020082769920",
+          "url": "https://www.linkedin.com/feed/update/urn:li:activity:7499814020082769920",
+          "title": "I failed CPENT today. 52.8%, needed 70%.\nNot writing this for sympathy — writing it because LinkedIn is full of wins and rarely shows the L's. And the L's are where the real growth happens.\nTruth is, I underestimated how different a full practical pentest exam is from solving boxes on TryHackMe or HackTheBox. Time management, chaining exploits, staying calm when nothing's working — that's a whole different skillset.\nNo excuses. Back to prep. Retake is happening.\nIf you've failed a cert exam and bounced back, drop it in the comments — need the motivation right now. 👇\n#CPENT #ECCouncil #CyberSecurity #PenTesting #RedTeam #Failure #Comeback",
+          "activity": {
+            "num_likes": 3,
+            "num_comments": 1,
+            "num_shares": 0,
+            "reaction_counts": [
+              {
+                "count": 3,
+                "type": "LIKE"
+              }
+            ]
+          },
+          "created_at": "2026-08-30T14:30:03.390Z",
+          "author": {
+            "name": "li-user-7",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "url": "https://www.linkedin.com/in/li-user-8",
+            "avatar": [
+              {
+                "width": 100,
+                "height": 100,
+                "url": "https://scrubbed.invalid/li-user-9",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 800,
+                "height": 800,
+                "url": "https://scrubbed.invalid/li-user-10",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 400,
+                "height": 400,
+                "url": "https://scrubbed.invalid/li-user-11",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 200,
+                "height": 200,
+                "url": "https://scrubbed.invalid/li-user-12",
+                "expires_at": 1790208000000
+              }
+            ]
+          }
+        },
+        {
+          "id": "7500138236162396160",
+          "url": "https://www.linkedin.com/feed/update/urn:li:activity:7500138236162396160",
+          "title": "New on the Keansa blog. Sarbajit Sen breaks down 20 years of EPM implementations, why the tool is never really the problem, and what separates the ones that work. \n\nWorth a read. 🔗 https://lnkd.in/g7vtFUEz",
+          "activity": {
+            "num_likes": 12,
+            "num_comments": 0,
+            "num_shares": 0,
+            "reaction_counts": [
+              {
+                "count": 12,
+                "type": "LIKE"
+              }
+            ]
+          },
+          "created_at": "2026-08-31T14:30:03.390Z",
+          "author": {
+            "name": "li-user-13",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "url": "https://www.linkedin.com/company/li-user-14/posts"
+          }
+        },
+        {
+          "id": "7501314149524877312",
+          "url": "https://www.linkedin.com/feed/update/urn:li:activity:7501314149524877312",
+          "title": "Myth: a red test means the feature is broken.\n\nReality: a red test means expected and actual stopped matching. That's it. The cause might be a real bug. It might also be a flaky wait, a moved locator, stale test data, or an environment that wasn't ready. On most suites, real bugs are the minority of failures.\n\nWhy it matters: when every red gets triaged as \"a bug,\" you either burn hours chasing ghosts or you train the team to shrug at red. Both are how a suite quietly dies.\n\nSo make failures explain themselves. Assert on one thing. Log the actual value, the URL, the element you looked for. Separate setup failures from assertion failures, so a bad environment never gets to wear a bug's clothes.\n\nA good failure tells you where it broke, not just that it broke.\n\n#TestAutomation #SoftwareTesting #QA",
+          "activity": {
+            "num_likes": 0,
+            "num_comments": 1,
+            "num_shares": 0,
+            "reaction_counts": []
+          },
+          "created_at": "2026-09-04T14:30:03.390Z",
+          "author": {
+            "name": "li-user-15",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "url": "https://www.linkedin.com/in/li-user-16",
+            "avatar": [
+              {
+                "width": 200,
+                "height": 200,
+                "url": "https://scrubbed.invalid/li-user-17",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 800,
+                "height": 800,
+                "url": "https://scrubbed.invalid/li-user-18",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 100,
+                "height": 100,
+                "url": "https://scrubbed.invalid/li-user-19",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 400,
+                "height": 400,
+                "url": "https://scrubbed.invalid/li-user-20",
+                "expires_at": 1790208000000
+              }
+            ]
+          }
+        },
+        {
+          "id": "7500047345091346432",
+          "url": "https://www.linkedin.com/feed/update/urn:li:activity:7500047345091346432",
+          "title": "VLSI Engineer's Life !! 👇 👇 \n\nThe Friday Evening Bug\nFriday 5:30 PM\nEngineer: “Everything is clean. I'm going home.”\nRegression: “New failure.”\nEngineer: “I'll check Monday.”\nRegression: “It's a tape-out blocker.”\nEngineer: \n\nMonday morning:\n“Who touched my code?”\nEveryone: 😐 😐 \n\nThoughts??\n\n#vlsi #electronics #electronicstudents #vlsistudents #students",
+          "activity": {
+            "num_likes": 1,
+            "num_comments": 1,
+            "num_shares": 0,
+            "reaction_counts": [
+              {
+                "count": 1,
+                "type": "LIKE"
+              }
+            ]
+          },
+          "created_at": "2026-08-31T14:30:03.390Z",
+          "author": {
+            "name": "li-user-21",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "url": "https://www.linkedin.com/company/li-user-22/posts"
+          }
+        },
+        {
+          "id": "7500902401122582528",
+          "url": "https://www.linkedin.com/feed/update/urn:li:activity:7500902401122582528",
+          "title": "Unit testing on the actual target board is where a lot of embedded teams quietly give up. Too much setup, too little time. This walkthrough runs it end to end on an STM32, step by step, so you can see what it actually takes.",
+          "activity": {
+            "num_likes": 0,
+            "num_comments": 0,
+            "num_shares": 0,
+            "reaction_counts": []
+          },
+          "created_at": "2026-09-02T14:30:03.390Z",
+          "author": {
+            "name": "li-user-23",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "url": "https://www.linkedin.com/in/li-user-24",
+            "avatar": [
+              {
+                "width": 100,
+                "height": 100,
+                "url": "https://scrubbed.invalid/li-user-25",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 200,
+                "height": 200,
+                "url": "https://scrubbed.invalid/li-user-26",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 400,
+                "height": 400,
+                "url": "https://scrubbed.invalid/li-user-27",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 800,
+                "height": 800,
+                "url": "https://scrubbed.invalid/li-user-28",
+                "expires_at": 1790208000000
+              }
+            ]
+          }
+        },
+        {
+          "id": "7501686451403665416",
+          "url": "https://www.linkedin.com/feed/update/urn:li:activity:7501686451403665416",
+          "title": "These four things tend to get skipped in the same order every year: the access review first, then the backup test, then the patch check — usually because nothing's broken yet. That's the actual problem with a checklist like this. It only feels necessary the day after something already went wrong, which is exactly the day it's too late to help. Comment \"CHECKLIST\" and we'll send the one we run for clients every September, before Q4 makes it harder to schedule.\n\n#ManagedIT #ElPasoBusiness #ITStrategy #SmallBusiness",
+          "activity": {
+            "num_likes": 0,
+            "num_comments": 0,
+            "num_shares": 0,
+            "reaction_counts": []
+          },
+          "created_at": "2026-09-04T17:30:03.390Z",
+          "author": {
+            "name": "li-user-29",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "url": "https://www.linkedin.com/company/li-user-30/posts"
+          }
+        },
+        {
+          "id": "7500582461966270465",
+          "url": "https://www.linkedin.com/feed/update/urn:li:activity:7500582461966270465",
+          "title": "🏦 100% test pass rate ≠ 100% confidence\nA banking release can have all tests passing and still fail in production.\nWhy?\n⚠️ Incomplete business scenarios\n⚠️ Data & reconciliation issues\n⚠️ Integration failures\n⚠️ Environment differences\n⚠️ Unidentified downstream impact\nThat's why risk-based testing + end-to-end validation matter more than simply counting passed test cases.\n🎯 Quality is about risk — not just test results.\n#Banking #TestStrategy #QualityEngineering #RiskBasedTesting #TestManagement",
+          "activity": {
+            "num_likes": 0,
+            "num_comments": 0,
+            "num_shares": 0,
+            "reaction_counts": []
+          },
+          "created_at": "2026-09-02T14:30:03.390Z",
+          "author": {
+            "name": "li-user-31",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "url": "https://www.linkedin.com/in/li-user-32",
+            "avatar": [
+              {
+                "width": 100,
+                "height": 100,
+                "url": "https://scrubbed.invalid/li-user-33",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 200,
+                "height": 200,
+                "url": "https://scrubbed.invalid/li-user-34",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 400,
+                "height": 400,
+                "url": "https://scrubbed.invalid/li-user-35",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 444,
+                "height": 444,
+                "url": "https://scrubbed.invalid/li-user-36",
+                "expires_at": 1790208000000
+              }
+            ]
+          }
+        }
+      ],
+      "total": 493,
+      "dropped": 0
+    },
+    "credits_used": 5,
+    "request_id": "req-ZrCq0cYMWACHclXE",
+    "cached": false,
+    "pagination": {
+      "next_cursor": "sc.eyJ2IjoyLCJjIjoiMyIsImUiOiJsaW5rZWRpbi9zZWFyY2gvcG9zdHMiLCJwIjoicGFnZSJ9",
+      "has_more": true,
+      "page_size": 10
+    },
+    "credits_remaining": 56
+  }
+}

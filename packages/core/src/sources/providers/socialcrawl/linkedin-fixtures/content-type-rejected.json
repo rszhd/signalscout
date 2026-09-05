@@ -1,0 +1,15 @@
+{
+  "httpStatus": 400,
+  "body": {
+    "success": false,
+    "error": {
+      "type": "INVALID_REQUEST",
+      "message": "Invalid value for 'content_type': 'this-is-not-a-type'. Allowed values: videos, photos, jobs, live_videos, documents, collaborative_articles.",
+      "status": 400,
+      "doc_url": "https://www.socialcrawl.dev/docs/errors#invalid-request"
+    },
+    "credits_used": 0,
+    "request_id": "req-k5lO5ILimXfVf2C2",
+    "credits_remaining": 71
+  }
+}

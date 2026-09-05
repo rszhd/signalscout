@@ -435,7 +435,6 @@ Potential sources:
 * Discourse
 * Facebook
 * Instagram
-* LinkedIn
 * TikTok
 * Other forums and communities
 
@@ -605,6 +604,13 @@ Early milestones:
 # Important rule
 
 **Do not add another social network until Reddit + X reliably produce useful matches.**
+
+**This rule was crossed once, deliberately.** On 2026-09-05 the owner asked for
+LinkedIn, and US-028 added it while the condition was still unmet: X had run one
+poll and collected five verdicts. The exception is recorded in the ticket and in
+STACK.md rather than being quietly absorbed here. The rule stands for the
+fourth network, and the argument below is unchanged by having been overruled
+once.
 
 The quality of the intent detection is more important than the number of integrations.
 

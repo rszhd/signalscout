@@ -1,0 +1,95 @@
+{
+  "note": "What each captured call cost, in the provider's own numbers. This is the evidence for the billable unit, for the 5-credit price the documentation claims, and for whether a credential probe is free.",
+  "calls": [
+    {
+      "call": "credentials-rejected",
+      "httpStatus": 401,
+      "elapsedMs": 376,
+      "creditsUsed": 0,
+      "creditsRemaining": null,
+      "cached": null,
+      "note": "sent with a deliberately invalid key"
+    },
+    {
+      "call": "credentials-accepted",
+      "httpStatus": 400,
+      "elapsedMs": 254,
+      "creditsUsed": 0,
+      "creditsRemaining": 71,
+      "cached": null,
+      "note": "a working key with no query: refused on the input, not on the key"
+    },
+    {
+      "call": "date-rejected",
+      "httpStatus": 400,
+      "elapsedMs": 255,
+      "creditsUsed": 0,
+      "creditsRemaining": 71,
+      "cached": null,
+      "note": "an invalid date_posted, to make the provider name the valid ones"
+    },
+    {
+      "call": "content-type-rejected",
+      "httpStatus": 400,
+      "elapsedMs": 303,
+      "creditsUsed": 0,
+      "creditsRemaining": 71,
+      "cached": null,
+      "note": "an invalid content_type; the documentation names no values for it"
+    },
+    {
+      "call": "search-posts",
+      "httpStatus": 200,
+      "elapsedMs": 1643,
+      "creditsUsed": 5,
+      "creditsRemaining": 66,
+      "cached": false,
+      "note": "the long phrase (6 words), as the generator writes them"
+    },
+    {
+      "call": "search-short-query",
+      "httpStatus": 200,
+      "elapsedMs": 1470,
+      "creditsUsed": 5,
+      "creditsRemaining": 61,
+      "cached": false,
+      "note": "the same question in 2 words"
+    },
+    {
+      "call": "search-page-2",
+      "httpStatus": 200,
+      "elapsedMs": 1393,
+      "creditsUsed": 5,
+      "creditsRemaining": 56,
+      "cached": false,
+      "note": "followed pagination.next_cursor from search-posts.json"
+    },
+    {
+      "call": "search-repeat",
+      "httpStatus": 200,
+      "elapsedMs": 673,
+      "creditsUsed": 0,
+      "creditsRemaining": null,
+      "cached": true,
+      "note": "the same query as search-posts.json, to compare ids across two calls"
+    },
+    {
+      "call": "search-past-week",
+      "httpStatus": 200,
+      "elapsedMs": 1413,
+      "creditsUsed": 5,
+      "creditsRemaining": 51,
+      "cached": false,
+      "note": "date_posted=past_week; compare the oldest post here with search-short-query.json"
+    },
+    {
+      "call": "search-no-results",
+      "httpStatus": 200,
+      "elapsedMs": 1553,
+      "creditsUsed": 5,
+      "creditsRemaining": 46,
+      "cached": false,
+      "note": "a phrase that cannot match; does it answer 200 and bill 5 credits for it?"
+    }
+  ]
+}

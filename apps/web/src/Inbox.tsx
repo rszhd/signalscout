@@ -93,14 +93,50 @@ export function ageLabel(postedAt: string, now: number = Date.now()): string {
   return `${days} day${days === 1 ? "" : "s"} ago`;
 }
 
-function whereItCameFrom(match: Match): string {
-  const source = match.source === "x" ? "X" : "Reddit";
-  const channel =
-    match.source === "x"
-      ? match.author && `@${match.author}`
-      : match.channel && `r/${match.channel}`;
+/**
+ * How each platform names itself, and how it names the place a post came from.
+ *
+ * A table rather than a branch, because a branch answers "not X, so Reddit"
+ * and that is wrong the moment a third platform exists. US-028 added LinkedIn
+ * and found exactly that: every LinkedIn match would have been labelled
+ * Reddit. A platform missing from here falls back to its own id, which is
+ * plain rather than wrong.
+ *
+ * `mark` is what goes in the little circle. It is decoration and it is hidden
+ * from a screen reader, so the sentence beside it carries the meaning.
+ */
+const platformLabels: Record<
+  string,
+  { name: string; mark: string; where: (match: Match) => string | undefined }
+> = {
+  reddit: {
+    name: "Reddit",
+    mark: "r/",
+    where: (match) => (match.channel ? `r/${match.channel}` : undefined),
+  },
+  x: {
+    name: "X",
+    mark: "X",
+    where: (match) => (match.author ? `@${match.author}` : undefined),
+  },
+  linkedin: {
+    name: "LinkedIn",
+    mark: "in",
+    // On LinkedIn the author is the context, as on X. The stored author is the
+    // profile slug out of the post URL, which is what identifies the account.
+    where: (match) => (match.author ? `@${match.author}` : undefined),
+  },
+};
 
-  return channel ? `${source} · ${channel}` : source;
+function platformLabel(source: string) {
+  return platformLabels[source] ?? { name: source, mark: "·", where: () => undefined };
+}
+
+function whereItCameFrom(match: Match): string {
+  const platform = platformLabel(match.source);
+  const channel = platform.where(match);
+
+  return channel ? `${platform.name} · ${channel}` : platform.name;
 }
 
 export function Inbox() {
@@ -393,7 +429,7 @@ export function Inbox() {
                         <span className="match-top">
                           <span className={`source-badge source-${match.source}`}>
                             <span className="source-dot" aria-hidden="true">
-                              {match.source === "x" ? "X" : "r/"}
+                              {platformLabel(match.source).mark}
                             </span>
                             {whereItCameFrom(match)}
                           </span>
@@ -443,7 +479,7 @@ export function Inbox() {
                 <div className="detail-top">
                   <span className={`source-badge source-${selectedMatch.source}`}>
                     <span className="source-dot" aria-hidden="true">
-                      {selectedMatch.source === "x" ? "X" : "r/"}
+                      {platformLabel(selectedMatch.source).mark}
                     </span>
                     {whereItCameFrom(selectedMatch)}
                   </span>

@@ -14,6 +14,8 @@ export {
 } from "./fake/index.js";
 export {
   groupByPlatform,
+  linkedInPlatform,
+  linkedInPlatformId,
   type PlatformConnectors,
   platforms,
   redditPlatform,
@@ -39,6 +41,11 @@ export {
   scrapeCreatorsReddit,
   toCandidatePost as toScrapeCreatorsCandidatePost,
 } from "./providers/scrapecreators/reddit.js";
+export {
+  SocialCrawlLinkedInSource,
+  socialCrawlLinkedIn,
+  toCandidatePost as toSocialCrawlLinkedInCandidatePost,
+} from "./providers/socialcrawl/linkedin.js";
 export {
   AmbiguousConnectorError,
   type ChoiceOptions,
@@ -77,6 +84,7 @@ export { connectorIdPattern } from "./types.js";
 
 import { brightDataReddit } from "./providers/brightdata/reddit.js";
 import { scrapeCreatorsReddit } from "./providers/scrapecreators/reddit.js";
+import { socialCrawlLinkedIn } from "./providers/socialcrawl/linkedin.js";
 import { socialCrawlX } from "./providers/socialcrawl/x.js";
 import type { ConnectorDefinition } from "./types.js";
 
@@ -84,9 +92,14 @@ import type { ConnectorDefinition } from "./types.js";
  * The connectors this build ships.
  *
  * A connector is a platform and a provider together. US-005 added Reddit
- * through Bright Data, US-025 added Reddit through ScrapeCreators, and US-006
- * adds X. The interface was settled before any of them existed so that the
- * second connector is not the one that argues about the shape.
+ * through Bright Data, US-025 added Reddit through ScrapeCreators, US-006
+ * added X and US-028 added LinkedIn. The interface was settled before any of
+ * them existed so that the second connector is not the one that argues about
+ * the shape.
+ *
+ * SocialCrawl now fetches two platforms on one key, which is the case
+ * `ProviderDescriptor` was split out for: a person pastes that key once and
+ * rotates it once, however many platforms sit behind it.
  *
  * Reddit now has two providers, so `registry.only("reddit")` may need a
  * recorded choice. `source_providers` holds it, `choices.ts` reads it, and a
@@ -101,4 +114,5 @@ export const builtInSources: readonly ConnectorDefinition[] = [
   brightDataReddit,
   scrapeCreatorsReddit,
   socialCrawlX,
+  socialCrawlLinkedIn,
 ];

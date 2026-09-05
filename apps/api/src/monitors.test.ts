@@ -87,9 +87,17 @@ const answers = {
 const newMonitor = {
   name: "Journeys",
   ...answers,
+  /**
+   * One key per platform this build ships, because that is what the route
+   * answers with. A monitor watching Reddit alone still carries the empty
+   * lists: the form renders a box for every platform, and a key that appeared
+   * only once something was typed in it would make the form's shape depend on
+   * its own history.
+   */
   queries: {
     reddit: ["flaky end to end tests", "manual qa before every release"],
     x: [],
+    linkedin: [],
   },
   subreddits: ["SaaS"],
   sources: ["reddit"],
@@ -211,12 +219,17 @@ describe("the monitor routes", () => {
 
         expect(builtInSources.filter((source) => source.platform.id === "reddit")).toHaveLength(2);
         expect(builtInSources.filter((source) => source.platform.id === "x")).toHaveLength(1);
+        expect(builtInSources.filter((source) => source.platform.id === "linkedin")).toHaveLength(
+          1,
+        );
 
-        // Two providers for Reddit and one for X, and three connectors make
-        // two rows. US-006 added the second platform, which is why this list
-        // grew; a platform appearing twice is the failure it guards.
+        // Two providers for Reddit and one each for X and LinkedIn, and four
+        // connectors make three rows. US-006 added the second platform and
+        // US-028 the third, which is why this list grew; a platform appearing
+        // twice is the failure it guards. SocialCrawl fetching two of the
+        // three is exactly the collapse this asserts.
         const ids = body.sources.map((source: { id: string }) => source.id);
-        expect(ids).toEqual(["reddit", "x"]);
+        expect(ids).toEqual(["reddit", "x", "linkedin"]);
         expect(new Set(ids).size).toBe(ids.length);
         // And no price beside it. Two providers do not agree about what a
         // Reddit record costs, so a figure printed here would be one
@@ -457,6 +470,9 @@ describe("the monitor routes", () => {
         expect(response.json().queries).toEqual({
           reddit: ["manual qa before every release"],
           x: ["flaky tests"],
+          // Named by no monitor here, and still its own list. The lists are
+          // kept apart by platform and not by what the monitor watches.
+          linkedin: [],
         });
       });
     });
@@ -536,6 +552,7 @@ describe("the monitor routes", () => {
         expect(response.json().queries).toEqual({
           reddit: ["regression testing takes too long"],
           x: [],
+          linkedin: [],
         });
         expect(response.json().product).toBe(newMonitor.product);
       });

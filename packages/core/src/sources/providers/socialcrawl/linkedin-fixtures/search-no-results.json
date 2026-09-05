@@ -1,0 +1,372 @@
+{
+  "httpStatus": 200,
+  "body": {
+    "success": true,
+    "platform": "linkedin",
+    "endpoint": "/v1/linkedin/search/posts",
+    "data": {
+      "items": [
+        {
+          "id": "7500430516114968576",
+          "url": "https://www.linkedin.com/feed/update/urn:li:activity:7500430516114968576",
+          "title": "FHESS POST 6 — THE RESEARCHER ENTERS THE FIELD\nZORGVERANTWOORDING OF THE INTERVENTION ITSELF\n \nFHESS POST 5 examined the interval between successive configurations within the fiels of war.\nWith Communication VI to the Office of the Prosecutor, FHESS moved from finding a possible institutional capacity to responsibly addressing that capacity.\n \nA researcher studies a field.\nThe researcher may also discover that an existing institutional capacity can responsibly be addressed.\nWhen that finding leads to an intervention, something changes.\nThe intervention itself enters the field.\n \nOn 1 September 2026, FHESS Communication VI — INTERIM ZORGVERANTWOORDING — UKRAINE was submitted to the Office of the Prosecutor of the International Criminal Court. The submission was received and assigned its own Submission ID.\n \nCommunication VI expressly submits its own intervention to ZORGVERANTWOORDING. It makes its preparatory FHESS research readable and relates the proposed interim actualisation to existing capacities under Articles 54, 56 and 57 of the Rome Statute.\n \nAN INTERVENTION DOES NOT ONLY ACT UPON A FIELD.\nIT ENTERS THE FIELD AS A NEW FACTUALITY. \n \nBefore the intervention:\n  \nC₁ — a configuration is being read\nThen:\n\nKNOWLEDGE POSITION ↓\nPOSSIBLE CAPACITY BECOMES READABLE ↓\nRESPONSIBLE INTERVENTION ↓\nZORGVERANTWOORDING\n \nAfter the intervention:\n\nC₂ — the intervention itself has become part of the configuration\n \nThe movement can therefore continue:\n \nNEW FACTUALITY ↓\nNEW KNOWLEDGE POSITION ↓\nNEW READABILITY ↓\nPOSSIBLE FURTHER ACTUALISATION\n \nThis also develops the interval examined in POST 5.\n \nBetween C₁ and C₂ we can ask:\n \nΔt — what changed through time?\nΔs — which step entered the configuration?\nΔv — which potentially relevant value became available through that step?\n \nCommunication VI does not determine its own Δv.\n \nIts possible contribution becomes readable only through what subsequently happens within the field: reception, examination, differentiation, correction, further investigation, or another responsible institutional response.\n \nThis is why ZORGVERANTWOORDING also applies to research itself.\n \nThe researcher can make readable:\n \nFROM WHICH POSITION DID I ACT?\nWHICH KNOWLEDGE POSITION WAS AVAILABLE?\nWHICH CAPACITY DID I ADDRESS?\nWHAT DID MY INTERVENTION ADD TO THE CONFIGURATION?\nWHAT REMAINS OPEN AFTER I ACTED?\n \nFHESS therefore does more than follow configurations before action.\n \nFHESS CAN FOLLOW ITS OWN INTERVENTIONS AFTER THEY ENTER THE FIELD.\nFIND → ACTUALISE → ACCOUNT → RE-READ\n \nThe research process becomes recursively readable.\n \nRESPONSIBLE INTERVENTION CAN BECOME A NEW FACTUALITY WITHIN THE FIELD IT\nSEEKS TO MAKE READABLE.\nCARE CAN BE ACCOUNTED FOR.\nTHE FIELD REMAINS OPEN.\nGRACES HAPPEN.\n\n \n#FHESS #FieldHybridity #Endocriminology #ZORGVERANTWOORDING #InterimZorgverantwoording #ActionGrammar #KnowledgeFactuality #CARE #VERWEER #LegalScience #RomeStatute #ICC #Ukraine #Peacecreation #GRACESHAPPEN",
+          "activity": {
+            "num_likes": 0,
+            "num_comments": 3,
+            "num_shares": 0,
+            "reaction_counts": []
+          },
+          "created_at": "2026-09-01T14:30:06.947Z",
+          "author": {
+            "name": "li-user-1",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "url": "https://www.linkedin.com/in/li-user-2",
+            "avatar": [
+              {
+                "width": 100,
+                "height": 100,
+                "url": "https://scrubbed.invalid/li-user-3",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 200,
+                "height": 200,
+                "url": "https://scrubbed.invalid/li-user-4",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 400,
+                "height": 400,
+                "url": "https://scrubbed.invalid/li-user-5",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 460,
+                "height": 460,
+                "url": "https://scrubbed.invalid/li-user-6",
+                "expires_at": 1790208000000
+              }
+            ]
+          }
+        },
+        {
+          "id": "7500550674909229056",
+          "url": "https://www.linkedin.com/feed/update/urn:li:activity:7500550674909229056",
+          "title": "Who watches the watchers?  \n\n#insiderrisk #counterintelligence #insiderthreat #irm #natsec #dia\nDefense Intelligence Agency ClearanceJobs",
+          "activity": {
+            "num_likes": 3,
+            "num_comments": 0,
+            "num_shares": 2,
+            "reaction_counts": [
+              {
+                "count": 3,
+                "type": "LIKE"
+              }
+            ]
+          },
+          "created_at": "2026-09-01T14:30:06.947Z",
+          "author": {
+            "name": "li-user-7",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "url": "https://www.linkedin.com/in/li-user-8",
+            "avatar": [
+              {
+                "width": 100,
+                "height": 100,
+                "url": "https://scrubbed.invalid/li-user-9",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 200,
+                "height": 200,
+                "url": "https://scrubbed.invalid/li-user-10",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 400,
+                "height": 400,
+                "url": "https://scrubbed.invalid/li-user-11",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 800,
+                "height": 800,
+                "url": "https://scrubbed.invalid/li-user-12",
+                "expires_at": 1790208000000
+              }
+            ]
+          }
+        },
+        {
+          "id": "7499905095694712832",
+          "url": "https://www.linkedin.com/feed/update/urn:li:activity:7499905095694712832",
+          "title": "إلحق الفرصة دي قبل ما تطير! 🚀 لو بتحلم بشغل في ألمانيا كـ Operational QA Manager.. دي فرصتك الذهبية!\n\n🌍 للمصريين في أوروبا (أو اللي بيخططوا للانتقال) — دي وظيفة استثنائية ممكن تكون بوابتك لمستقبل مهني قوي في قلب ميونخ. متفوّتش التفاصيل! 👇\n\n━━━━━━━━━━━━━━━\n📌 الوظيفة: Operational QA Manager for Application Software Development (m/w/x)\n🏢 الشركة: K-tronik GmbH\n📍 المكان: Munich, Germany (ألمانيا)\n🗂️ المجال: Engineering (هندسة وتطوير برمجيات)\n━━━━━━━━━━━━━━━\n\n🤔 إيه الحكاية بالظبط؟\nشركة K-tronik بتدور على Operational QA Manager قوي ومتحمس ينضم لفريقها في ميونخ. لو إنت شغوف بالتكنولوجيا وعندك خبرة في ضمان جودة البرمجيات خصوصًا في تطوير التطبيقات، ومستعد تشتغل في بيئة ديناميكية، الفرصة دي معمولالك!\n\n💼 هتعمل إيه لو اتقبلت؟\n*   **هتخطط وتراقب الجودة:** هتبقى مسؤول عن تخطيط ومراقبة جودة البرمجيات بشكل يومي مع فرق Scrum، وهتساعد في تحسين الـ Backlog وخطط الـ Sprint.\n*   **هتدير الاختبارات والإصدارات:** هتشرف على كل مراحل الاختبارات (من Unit Tests لحد Acceptance Tests)، وهتعمل خطط اختبار، وتتابع الإصدارات بشكل يومي.\n*   **هتكون نقطة وصل أساسية:** هتنسق بين فرق التطوير الداخلية، والشركاء الخارجيين، وحتى فرق الـ QA في سنغافورة والهند.\n*   **هتتابع العمليات وتدير الأخطاء:** هتتأكد إن الشغل ماشي صح ومعايير الجودة متطبقة، وهتدير دورة حياة تتبع الأخطاء عشان تتأكد إن الأولويات مظبوطة.\n*   **هتعمل مراجعات وتقارير:** هتراجع الأمور الفنية وهتعمل تقارير عن حالة الجودة باستمرار.\n\n✨ باختصار، لو إنت قائد حقيقي في مجال ضمان الجودة وعندك عين حادة للتفاصيل، وقادر تنسق بين فرق مختلفة وفي بلاد مختلفة، فالمكان ده مستنيك. شركة K-tronik بتقدم بيئة عمل تشجع على الشغف والتطور في مشاريع تكنولوجية مستقبلية.\n\n🌟 رابط التقديم في أول كومنت 👇\n\nمين من أصحابك ممكن يكون مناسب للوظيفة دي؟ اعملّه منشن أو شارك معاه الفرصة دي! 🤝\n\nشوف الوظيفة دي ووظايف تانية كتير في ألمانيا وأوروبا ممكن تغير مسيرتك المهنية بالكامل على منصتنا!\n\n#MunichJobs #QAManager #EngineeringJobs #CareerInGermany #SoftwareDevelopment\n\n━━━━━━━━━━━━━━━\n🔥 التقديم كله من مكان واحد — من غير واسطة ومن غير لف:\n👈 https://lnkd.in/e_giCSdk\n\n✅ تفاصيل الوظيفة كاملة + زرار التقديم المباشر\n✅ وظايف تانية شبهها بتتحدّث كل ساعة\n✅ فلتر بالدولة والمجال عشان توصل لفرصتك في ثواني\n\n⚠️ التقديم بيتقفل بسرعة — اللي هيتأخر هيلاقيها اتملت.\n👇 اللينك كمان في أول كومنت\n\n📩 أو ابعت الـCV على: info@instatech.site\n⚙️ خدمات الأتمتة والذكاء الاصطناعي للشركات: instatech.site\n— ━━━━━━━━━━━━━━━\nم. عبدالسلام أسامة\nAI Automation & RPA Engineer · باحث ماجستير في الذكاء الاصطناعي · مؤسس insta-tech-labs\n🤖 AI & AI Agents · ⚙️ Automation & RPA · 💻 Programming · 🎨 AI Design · 🎓 Courses & Consulting\n🌐 instatech.site\n🌐 insta-jobs.lovable.app",
+          "activity": {
+            "num_likes": 0,
+            "num_comments": 1,
+            "num_shares": 0,
+            "reaction_counts": []
+          },
+          "created_at": "2026-08-31T14:30:06.947Z",
+          "author": {
+            "name": "li-user-13",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "url": "https://www.linkedin.com/in/li-user-14",
+            "avatar": [
+              {
+                "width": 200,
+                "height": 200,
+                "url": "https://scrubbed.invalid/li-user-15",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 800,
+                "height": 800,
+                "url": "https://scrubbed.invalid/li-user-16",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 100,
+                "height": 100,
+                "url": "https://scrubbed.invalid/li-user-17",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 400,
+                "height": 400,
+                "url": "https://scrubbed.invalid/li-user-18",
+                "expires_at": 1790208000000
+              }
+            ]
+          }
+        },
+        {
+          "id": "7500235811573948416",
+          "url": "https://www.linkedin.com/feed/update/urn:li:activity:7500235811573948416",
+          "title": "APT addresses Brazil’s Supreme Federal Court on the need to preserve in-person custody hearings\n\nWe participated in a public hearing before Brazil’s Supreme Federal Court to address the constitutionality of the provision of the recently enacted Anti-Organised Crime Law that makes videoconferencing the default format for custody hearings. \n\nIn our intervention, we argued that in-person hearings in the first hours of detention are not simply a matter of procedural design. They are an essential safeguard for preventing torture and ill-treatment and ensuring effective judicial oversight following an arrest. International human rights bodies have repeatedly recognised the importance of physical presence in this context. \n\nOur own research also shows why this matters in practice. In observations of more than 110 virtual detention control hearings, we documented significant limitations in the ability to observe signs of violence and ensure privacy. Recent data, soon to be published in our Observa Custodia dashboard, shows that in 61% of the courts mapped, people participating in virtual hearings were connecting from a prison or police station rather than a judicial setting. \n\nMaking virtual hearings the rule therefore risks weakening an important safeguard against torture and ill-treatment and constitutes a setback in the protection of human rights \n\nAPT will continue to advocate for custody hearings that provide effective, independent and meaningful judicial oversight from the very first hours of detention.",
+          "activity": {
+            "num_likes": 17,
+            "num_comments": 0,
+            "num_shares": 1,
+            "reaction_counts": [
+              {
+                "count": 16,
+                "type": "LIKE"
+              },
+              {
+                "count": 1,
+                "type": "EMPATHY"
+              }
+            ]
+          },
+          "created_at": "2026-09-01T14:30:06.947Z",
+          "author": {
+            "name": "li-user-19",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "url": "https://www.linkedin.com/company/li-user-20/posts"
+          }
+        },
+        {
+          "id": "7500137899741315073",
+          "url": "https://www.linkedin.com/feed/update/urn:li:activity:7500137899741315073",
+          "title": "Colette McEachin said she did not believe there was \"criminal intent\" in the sergeant's conduct — despite the fact that police acknowledged he illegally shared Flock data with the FBI.",
+          "activity": {
+            "num_likes": 0,
+            "num_comments": 0,
+            "num_shares": 0,
+            "reaction_counts": []
+          },
+          "created_at": "2026-08-31T14:30:06.947Z",
+          "author": {
+            "name": "li-user-21",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "url": "https://www.linkedin.com/company/li-user-22/posts"
+          }
+        },
+        {
+          "id": "7501258438136537088",
+          "url": "https://www.linkedin.com/feed/update/urn:li:activity:7501258438136537088",
+          "title": "خدعوك فقالوا: Activity Hijacking ثغرة! 🚨\n\nهو أنا الوحيد اللي شايف إن موضوع Android Activity Hijacking ساعات بيتقدم كأنه ثغرة خطيرة من غير ما حد يسأل السؤال الأهم: الـ Impact إيه؟\n\nيعني لو عندي Activity معمولة exported، وقدرت من App تاني أعمل Intent وأفتحها… تمام، أنا قدرت أوصل لـ Activity معينة.\nوبعدين؟ 🤔\n\nالموبايل موبايلي، والـ App عندي أصلاً، وأنا كمستخدم أقدر أفتح الـ Activity دي من التطبيق نفسه.\nطيب المهاجم استفاد إيه لما يبعتلي malicious app، والتطبيق ده يدخلني على Activity معينة؟\n\nهل مجرد إن App تاني قدر ينادي Activity = Vulnerability؟\n\nولا لازم يكون فيه security impact حقيقي زي:\n\nتجاوز Authentication / Authorization\nالوصول لبيانات مش المفروض أوصلها\nتنفيذ Action بصلاحيات مش بتاعتي\nتغيير State حساس في التطبيق\nأو أي تأثير أمني واضح\n\nلأن لو الـ Impact هو:\n\"المهاجم يقدر يفتح Activity معينة\"\nفأنا مش شايف فين المشكلة لوحدها.\n\nخدعوك فقالوا: Attack Surface = Vulnerability.\n\nإن الحاجة موجودة على الـ Attack Surface مش معناها تلقائياً إنها ثغرة.\n\nوفي الـ Web لما تيجي تقول إنك قدرت توصل لـ Endpoint، أول سؤال هيتسألك: So what? What's the impact?\n\nليه في الـ Mobile ساعات الموضوع بيتعامل معاه كأن مجرد الوصول لـ exported component كفاية؟ 👀\nولا أنا فاهم الموضوع غلط؟",
+          "activity": {
+            "num_likes": 9,
+            "num_comments": 1,
+            "num_shares": 0,
+            "reaction_counts": [
+              {
+                "count": 5,
+                "type": "PRAISE"
+              },
+              {
+                "count": 3,
+                "type": "EMPATHY"
+              },
+              {
+                "count": 1,
+                "type": "LIKE"
+              }
+            ]
+          },
+          "created_at": "2026-09-03T14:30:06.947Z",
+          "author": {
+            "name": "li-user-23",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "url": "https://www.linkedin.com/in/li-user-24",
+            "avatar": [
+              {
+                "width": 400,
+                "height": 400,
+                "url": "https://scrubbed.invalid/li-user-25",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 200,
+                "height": 200,
+                "url": "https://scrubbed.invalid/li-user-26",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 800,
+                "height": 800,
+                "url": "https://scrubbed.invalid/li-user-27",
+                "expires_at": 1790208000000
+              },
+              {
+                "width": 100,
+                "height": 100,
+                "url": "https://scrubbed.invalid/li-user-28",
+                "expires_at": 1790208000000
+              }
+            ]
+          }
+        },
+        {
+          "id": "7501836263923150848",
+          "url": "https://www.linkedin.com/feed/update/urn:li:activity:7501836263923150848",
+          "title": "🟥 A PUBLIC SHOUT-OUT TO THE INTERNATIONAL ACCOUNTABILITY COMMUNITY\n\n5 September 2026\nOPS Ref: UKSUPP/0725\n\nTo the International Anti-Corruption Academy, the European Center for Whistleblower Rights, the Southeast Europe Coalition on Whistleblower Protection, and every organisation working in whistleblower protection, public-interest investigation, transparency, victim support and institutional accountability:\n\nI am asking you to look.\n\nA reported hit-and-run on 14 July 2019 has developed into an eight-year, cross-institutional accountability case involving conflicting official records, evidence handling, disclosure failures, unanswered questions and continuing proceedings.\n\nI am not asking anybody to accept my account without scrutiny.\n\nI am asking for independent eyes to examine the documentary record.\n\nFor years, I have had to locate the records, reconstruct the chronology, identify the decision-makers and connect information held across police, healthcare, insurance, legal, court, tribunal, regulatory and government systems.\n\nI am still doing that work alone while living with PTSD, post-traumatic brain-injury symptoms, ADHD and the continuing consequences of what happened.\n\nThe public record can be found by searching:\n\nOPSRefUKSUPP0725 Mark Paul Jones\n\nI can provide a concise press release, a one-page evidence summary and a controlled selection of core documents.\n\nIf your organisation investigates whistleblower disclosures, supports people exposing institutional failures, protects evidence or connects individuals with journalists, lawyers and public-interest advocates, I would welcome an independent conversation.\n\nThe request is simple:\n\nLOOK AT THE RECORD.\n\nTEST THE EVIDENCE.\n\nASK WHY THE MATERIAL QUESTIONS REMAIN UNANSWERED.\n\nNo allegation is made against any organisation named in this post. This is an open request for scrutiny, assistance and responsible engagement.\n\n#UKSUPP0725 #WhistleblowerProtection #AntiCorruption #PublicInterest #Accountability #Transparency #HumanRights #VictimsRights #InvestigativeJournalism #Evidence #InstitutionalAccountability #Wales",
+          "activity": {
+            "num_likes": 0,
+            "num_comments": 0,
+            "num_shares": 0,
+            "reaction_counts": []
+          },
+          "created_at": "2026-09-05T03:30:06.947Z",
+          "author": {
+            "name": "li-user-29",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "url": "https://www.linkedin.com/in/li-user-30",
+            "avatar": [
+              {
+                "width": 800,
+                "height": 800,
+                "url": "https://scrubbed.invalid/li-user-31",
+                "expires_at": 1789225200000
+              },
+              {
+                "width": 100,
+                "height": 100,
+                "url": "https://scrubbed.invalid/li-user-32",
+                "expires_at": 1789225200000
+              },
+              {
+                "width": 400,
+                "height": 400,
+                "url": "https://scrubbed.invalid/li-user-33",
+                "expires_at": 1789225200000
+              },
+              {
+                "width": 200,
+                "height": 200,
+                "url": "https://scrubbed.invalid/li-user-34",
+                "expires_at": 1789225200000
+              }
+            ]
+          }
+        },
+        {
+          "id": "7501141957012910081",
+          "url": "https://www.linkedin.com/feed/update/urn:li:activity:7501141957012910081",
+          "title": "/／\n製造現場の SCADA データをクラウドへ。\n両社の知見を組み合わせた\nIoT データの可視化・分析基盤構築事例を公開✨\n\\＼\n\n東京ガス株式会社様は、製造業のお客様向けに、生産設備やユーティリティ設備の監視を支える工程監視システム開発ツール「JoyWatcherSuite」を提供しています。\n\n本プロジェクトにおいて、KDDIアイレットは自社 IoT ソリューション「IoTpack for Factory」と AWS を活用し、「JoyCloudConnect」経由で転送された SCADA データをクラウド上で可視化・分析する基盤の構築を担当しました🌟",
+          "activity": {
+            "num_likes": 0,
+            "num_comments": 1,
+            "num_shares": 0,
+            "reaction_counts": []
+          },
+          "created_at": "2026-09-03T14:30:06.947Z",
+          "author": {
+            "name": "li-user-35",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "url": "https://www.linkedin.com/company/li-user-36/posts"
+          }
+        },
+        {
+          "id": "7500619235396837376",
+          "url": "https://www.linkedin.com/feed/update/urn:li:activity:7500619235396837376",
+          "title": "SHE LEFT THE REFUGE.\n\nNREC's #WalkWithHarshita campaign continues with the documented chronology of Harshita Brella's contacts with Northamptonshire Police.\n\nOn 20 September 2024, the chronology records indirect contact with police through the refuge.\n\nHarshita had left the refuge voluntarily and moved to a new address.\nThe refuge informed Northamptonshire Police, and her new address was recorded.\n\nThis entry follows the events of 19 September, when police had carried out a welfare check at the refuge and Harshita had said that she wanted to withdraw her complaint.\n\nWhy does following these individual entries matter?\n\nBecause the experience of domestic abuse — and someone's journey through safeguarding and criminal justice systems — cannot always be understood from one incident or one decision.\n\nBy placing each documented contact alongside the next, we can begin to understand the wider chronology and the interactions between Harshita and the agencies around her.\n\nWe will continue to distinguish between what the documented record tells us and what it does not.\n\nNo assumptions. No rewriting her experience.\n\nWe follow the facts. One date at a time.\n\n#WalkWithHarshita #Justice4Harshita #HarshitaBrella #NREC #NorthamptonshireREC #DomesticAbuse #VAWG #Safeguarding #WomensSafety #DomesticAbuseAwareness #PoliceAccountability #HumanRights #JusticeForHarshita",
+          "activity": {
+            "num_likes": 4,
+            "num_comments": 0,
+            "num_shares": 0,
+            "reaction_counts": [
+              {
+                "count": 2,
+                "type": "APPRECIATION"
+              },
+              {
+                "count": 2,
+                "type": "LIKE"
+              }
+            ]
+          },
+          "created_at": "2026-09-02T14:30:06.947Z",
+          "author": {
+            "name": "li-user-37",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "url": "https://www.linkedin.com/company/li-user-38/posts"
+          }
+        },
+        {
+          "id": "7501148623234048000",
+          "url": "https://www.linkedin.com/feed/update/urn:li:activity:7501148623234048000",
+          "title": "🔻سلام دوستان \rعرض ادب وقتتون بخیر\nشرکت داده‌ورزی سداد، SBU کارت و پرداخت در فرصت شغلی “QA Engineer“ دعوت به همکاری می نماید.\nبا باز نشر این پست، ما را در جذب نخبگان توسعه محصولات فناوری اطلاعات یاری نمایید.\n\r  در صورت تطابق نیازمندی ها لطفا رزومه خود را به آدرس ایمیل:mar.mohammadi@sadad.co.ir  ارسال کنید \nشایستگی‌های مورد نیاز QA Engineer:\n•\tتسلط بر انواع تست اعم از تستهای Functional و Non-Functional \n•\tتسلط برلود تست و استرس تست  ( Jmeter و یا هر ابزار مشابه دیگر)\n•\tتسلط بر test automation و ابزارهای مرتبط (  playwright, pytest و یا هر ابزار مشابه دیگر)\n•\tتسلط بر آزمون وب سرویس Rest و ابزارهای مرتبط مانند Postman \n•\tتسلط نسبی بر یک زبان برنامه نویسی  ترجیحا پایتون یا  js   \n•\tآشنایی با source control  \n•\tآشنایی با مانیتورینگ سرویس ها و ابزارهای مرتبط  (Prometheus، Grafana)\n•\tآشنایی با معماری نرم افزار و چرخه های SDLC و STLC فرآیندهای CI/CD\nشرح وظایف:\n•\tطراحی و پیاده‌سازی Test Plan و Test Caseها\n•\tانواع تست عملکردی(انجام تست اتوماتیک و تست دستی)  وغیرعملکردی(تست لود و استرس)\n•\tتهیه مستندات و گزارش‌های تست\n•\tثبت باگ و پیگیری حل شدن موارد و تست مجدد\n•\tبهبود مستمر و بهینه سازی فرآیندهای QA با شناسایی و پیاده سازی رویکردها، ابزارها و متدولوژیهای نوآورانه\n\nشایستگی‌های دارای امتیاز:\n•\tآشنایی با OWASP top 10\n•\tآشنایی با Docker و Kubernetes \n•\tآشنایی با ابزارهای مدیریت لاگ \r\n \r\r\n#بانک_ملی\n#داده_ورزی_سداد\n#QA\n#استخدام",
+          "activity": {
+            "num_likes": 96,
+            "num_comments": 10,
+            "num_shares": 3,
+            "reaction_counts": [
+              {
+                "count": 93,
+                "type": "LIKE"
+              },
+              {
+                "count": 2,
+                "type": "APPRECIATION"
+              },
+              {
+                "count": 1,
+                "type": "PRAISE"
+              }
+            ]
+          },
+          "created_at": "2026-09-03T14:30:06.947Z",
+          "author": {
+            "name": "li-user-39",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "url": "https://www.linkedin.com/in/li-user-40"
+          }
+        }
+      ],
+      "total": 98,
+      "dropped": 0
+    },
+    "credits_used": 5,
+    "request_id": "req-7fGYd8ecSvbkrZB0",
+    "cached": false,
+    "pagination": {
+      "next_cursor": "sc.eyJ2IjoyLCJjIjoiMiIsImUiOiJsaW5rZWRpbi9zZWFyY2gvcG9zdHMiLCJwIjoicGFnZSJ9",
+      "has_more": true,
+      "page_size": 10
+    },
+    "credits_remaining": 46
+  }
+}

@@ -113,6 +113,20 @@
       "when": 1788594829414,
       "tag": "0015_rekey_credentials_by_provider",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1788603557981,
+      "tag": "0016_add_source_providers",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1788603815561,
+      "tag": "0017_add_estimate_probe_provider",
+      "breakpoints": true
     }
   ]
 }

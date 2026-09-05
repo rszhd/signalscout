@@ -26,7 +26,6 @@ import { createDatabase, type Database } from "../db/client.js";
 import type { Logger } from "../logger.js";
 import { assertStoredCredentialsAreReadable } from "../secrets/store.js";
 import { builtInSources } from "../sources/index.js";
-import { redditPlatformId } from "../sources/platforms.js";
 import { createSourceRegistry, type SourceRegistry } from "../sources/registry.js";
 import { createSourceRuntime } from "../sources/runtime.js";
 import { assertSourcesCanBeStored } from "../sources/storage.js";
@@ -242,12 +241,6 @@ export async function startWorker({
     createSourceRegistry({
       definitions: builtInSources,
       runtime: createSourceRuntime({ logger }),
-      // The one platform with two providers. An unset variable leaves the
-      // entry out, and `only` answers by itself whenever a platform has a
-      // single connector — which is every deployment holding one key.
-      ...(process.env.REDDIT_PROVIDER
-        ? { defaultProviders: { [redditPlatformId]: process.env.REDDIT_PROVIDER } }
-        : {}),
     });
 
   // At boot, so a connector whose posts the schema cannot hold stops the

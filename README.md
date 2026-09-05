@@ -60,7 +60,6 @@ IntentWatch ships the integrations. You own the accounts.
 ```env
 BRIGHTDATA_API_KEY=      # Bright Data, which serves Reddit
 SCRAPECREATORS_API_KEY=  # ScrapeCreators, which also serves Reddit
-REDDIT_PROVIDER=         # only if you hold both keys
 
 X_API_KEY=               # optional
 X_API_SECRET=
@@ -96,10 +95,11 @@ bills a record, starting with 5,000 free each month. ScrapeCreators bills a
 request, and a request brought back 7 to 23 posts when we measured it, which
 makes it much cheaper per post; a new account gets 100 credits with no card.
 
-Set `REDDIT_PROVIDER` only if you hold both keys. With one, IntentWatch uses
-it and asks nothing. With both and no choice recorded, a poll refuses to start
-rather than pick for you — picking would spend money at a provider you did not
-choose.
+With one key, IntentWatch uses it and asks nothing. With both, the connections
+screen shows a row for Reddit and you pick which provider fetches it; the
+choice is stored, applies to every monitor, and takes effect on the next
+collection. Until you pick, a poll refuses to start rather than choose for you
+— choosing would spend money at a provider you did not pick.
 
 ### What that costs
 

@@ -16,16 +16,7 @@ import { json, mount, type Screen, settle } from "./testing.js";
 
 const options = {
   signals: [{ id: "problem", label: "Describing the problem", hint: "Clear pain" }],
-  sources: [
-    {
-      id: "reddit",
-      displayName: "Reddit",
-      billableUnit: "record",
-      pricePerUnitMicros: 0,
-      credentials: [],
-      ready: true,
-    },
-  ],
+  sources: [{ id: "reddit", displayName: "Reddit", missingCredentials: [], ready: true }],
   canGenerateQueries: true,
 };
 
@@ -61,7 +52,7 @@ describe("the four screens", () => {
           return json({ matches: [], nextCursor: null, asOf: "2026-09-05T12:00:00.000Z" });
         }
         if (url === "/api/connections") {
-          return json({ canStore: true, storeBlocker: null, providers: [] });
+          return json({ canStore: true, storeBlocker: null, providers: [], platforms: [] });
         }
         throw new Error(`Unexpected request: ${url}`);
       }),

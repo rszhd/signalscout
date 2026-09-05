@@ -3,6 +3,7 @@ export {
   type CreateMonitorInput,
   createMonitor,
   deleteMonitor,
+  describeMissingCredentials,
   getMonitor,
   listMonitors,
   type Monitor,

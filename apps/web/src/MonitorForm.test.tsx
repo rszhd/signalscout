@@ -37,23 +37,10 @@ const options = {
     { id: "purchase", label: "Ready to buy", hint: "Asking about price or trials" },
     { id: "hiring", label: "Looking to hire someone", hint: "Paying a person to solve it" },
   ],
-  sources: [
-    {
-      id: "reddit",
-      displayName: "Reddit",
-      billableUnit: "record",
-      pricePerUnitMicros: 0,
-      credentials: [
-        {
-          name: "apiKey",
-          label: "Bright Data API key",
-          environmentVariable: "REDDIT_API_KEY",
-          configured: true,
-        },
-      ],
-      ready: true,
-    },
-  ],
+  // One row per platform, never per connector. US-026: the form names
+  // networks, and which account fetches them is the connections screen's
+  // question.
+  sources: [{ id: "reddit", displayName: "Reddit", missingCredentials: [], ready: true }],
   canGenerateQueries: true,
 };
 

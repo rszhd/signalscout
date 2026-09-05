@@ -109,17 +109,47 @@ This is no longer hypothetical. US-025 gave Reddit a second provider on
 2026-09-05, and both fetch the same subreddits.
 
 The registry holds a connector under the pair, so `registry.get(platform,
-provider)` is the exact address and `registry.only(platform)` is for a caller
-that has a platform and no provider. `only` refuses to answer from registration
-order, because answering with the first would spend somebody's money at a
-provider they did not pick. It reads
-`CreateSourceRegistryOptions.defaultProviders` instead — a recorded choice,
-which is a different thing from a guess — and throws when nothing has chosen.
+provider)` is the exact address and `registry.only(platform, options)` is for a
+caller that has a platform and no provider.
 
-A platform with one provider needs no entry, which is every deployment holding
-one key. `REDDIT_PROVIDER` fills the entry today; US-026 replaces it with a
-stored choice per platform and a settings row that shows it. A default naming a
-provider that does not fetch the platform is refused, not ignored.
+`decideProvider` is the rule, and it is written once. Four branches, in order:
+
+1. **A recorded choice that can run wins.** `source_providers` holds one row
+   per platform, the connections screen writes it, and `readProviderChoices`
+   reads it. A choice is a decision and not a guess.
+2. **A recorded choice that cannot run is refused**, never replaced. A person
+   who chose ScrapeCreators and lost its key would otherwise have every poll
+   billed to Bright Data, which charges twenty times as much for the same
+   subreddit page.
+3. **One provider that can run is its own answer.** No question is asked. This
+   is every deployment holding one key, which is the common case.
+4. **Two that can run and no choice is an error.** Answering from registration
+   order would spend somebody's money at a provider they did not pick.
+
+"Can run" is the caller's word, passed as `ChoiceOptions.among`. The poll fills
+it with the providers it holds a key for, so the build shipping two Reddit
+connectors never makes a one-key deployment answer a question. A screen that is
+describing the build rather than running it leaves it out.
+
+A choice naming a provider that does not fetch the platform at all is a stale
+or mistyped row, so it decides nothing and the rules answer as if it were
+absent. It still cannot pick for a platform two providers can run.
+
+The choice is read **per poll**, not at boot, so changing it takes effect on
+the next collection and needs no restart. It never reaches a collection that is
+already running: `source_continuations` carries the provider that started one,
+and `collect.ts` resumes through that provider whatever the choice now says.
+The cursor is a snapshot id the other provider has never heard of, and on a
+provider that bills at collection time, re-running the query pays for it twice.
+`query_estimate_probes.provider` is the same rule for a cost test's sample.
+
+That was measured, not argued. On 2026-09-05 `live:provider-switch` started a
+Bright Data collection of r/softwaretesting, moved the recorded choice to
+ScrapeCreators one second later, and watched the snapshot finish. All four
+resumes went to Bright Data with Bright Data's own cursor; ScrapeCreators was
+asked nothing until the collection closed. Re-run that script when this rule
+changes — it spends about $0.08 and it is the only thing that can say whether
+two real providers still behave this way.
 
 Two connectors for one platform must agree about the id they give a post, or
 the same post becomes two rows. Both Reddit connectors read Reddit's own `t3_`
@@ -136,7 +166,7 @@ for the split:
 | Price | $1.50 / 1,000 records | $1.88 / 1,000 requests |
 | One unit buys | one post | 7 to 23 posts, measured |
 | Shape | trigger, then poll a snapshot | the posts are in the answer |
-| A collection took | 8 minutes 40 seconds | 1.8 to 4.9 seconds |
+| A collection took | 8 minutes 40 seconds, and 2 minutes 13 on another day | 1.8 to 4.9 seconds |
 | A refused key says | `Invalid credentials`, as a bare string | `{"message":"Invalid API key"}` |
 
 A connector reports `unitsConsumed` in its own unit and the budget guard prices

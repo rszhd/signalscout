@@ -5,6 +5,7 @@ import { fakeSourceDefinition } from "./fake/index.js";
 import {
   AmbiguousConnectorError,
   createSourceRegistry,
+  NoUsableProviderError,
   UnknownConnectorError,
   UnknownSourceError,
 } from "./registry.js";
@@ -99,10 +100,11 @@ describe("a caller that has a platform and no provider", () => {
         fakeSourceDefinition({ id: "reddit", providerId: "scrapecreators" }),
       ],
       runtime,
-      defaultProviders: { reddit: "scrapecreators" },
     });
 
-    expect(registry.only("reddit").provider.id).toBe("scrapecreators");
+    expect(registry.only("reddit", { choices: { reddit: "scrapecreators" } }).provider.id).toBe(
+      "scrapecreators",
+    );
   });
 
   it("still refuses when the recorded provider does not fetch the platform", () => {
@@ -115,22 +117,96 @@ describe("a caller that has a platform and no provider", () => {
         fakeSourceDefinition({ id: "reddit", providerId: "scrapecreators" }),
       ],
       runtime,
-      defaultProviders: { reddit: "a-provider-that-is-not-registered" },
     });
 
-    expect(() => registry.only("reddit")).toThrow(AmbiguousConnectorError);
+    expect(() =>
+      registry.only("reddit", { choices: { reddit: "a-provider-that-is-not-registered" } }),
+    ).toThrow(AmbiguousConnectorError);
   });
 
   it("ignores a recorded choice for a platform that has only one provider", () => {
     const registry = createSourceRegistry({
       definitions: [fakeSourceDefinition({ id: "reddit", providerId: "brightdata" })],
       runtime,
-      defaultProviders: { reddit: "scrapecreators" },
     });
 
     // One connector can run, so there is nothing to choose and a stale entry
     // must not turn a working deployment into a failing one.
-    expect(registry.only("reddit").provider.id).toBe("brightdata");
+    expect(registry.only("reddit", { choices: { reddit: "scrapecreators" } }).provider.id).toBe(
+      "brightdata",
+    );
+  });
+});
+
+/**
+ * `among` is the caller saying which providers it can actually run.
+ *
+ * US-026, and it is the difference between a build and a deployment. The build
+ * ships two Reddit connectors; the deployment usually holds one of the two
+ * keys. Asking a person to choose between an account they have and one they do
+ * not is the question this narrowing removes.
+ */
+describe("the registry answers for the providers a deployment can run", () => {
+  const bothProviders = [
+    fakeSourceDefinition({ id: "reddit", providerId: "brightdata" }),
+    fakeSourceDefinition({ id: "reddit", providerId: "scrapecreators" }),
+  ] as const;
+
+  it("asks nothing when one of the two providers has a key", () => {
+    const registry = registryOf(...bothProviders);
+
+    expect(registry.only("reddit", { among: ["brightdata"] }).provider.id).toBe("brightdata");
+  });
+
+  it("still refuses when both have a key and nobody has chosen", () => {
+    const registry = registryOf(...bothProviders);
+
+    expect(() => registry.only("reddit", { among: ["brightdata", "scrapecreators"] })).toThrow(
+      AmbiguousConnectorError,
+    );
+  });
+
+  it("obeys the choice when both have a key", () => {
+    const registry = registryOf(...bothProviders);
+
+    expect(
+      registry.only("reddit", {
+        among: ["brightdata", "scrapecreators"],
+        choices: { reddit: "scrapecreators" },
+      }).provider.id,
+    ).toBe("scrapecreators");
+  });
+
+  it("refuses rather than moving a choice to the other provider", () => {
+    /**
+     * The money case. A person chose ScrapeCreators and its key is gone —
+     * removed, or a rotation half done. Falling back to Bright Data would go
+     * on collecting, silently, at twenty times the price of the same subreddit
+     * page. So the poll stops and the message names both repairs.
+     */
+    const registry = registryOf(...bothProviders);
+
+    expect(() =>
+      registry.only("reddit", {
+        among: ["brightdata"],
+        choices: { reddit: "scrapecreators" },
+      }),
+    ).toThrow(NoUsableProviderError);
+    expect(() =>
+      registry.only("reddit", {
+        among: ["brightdata"],
+        choices: { reddit: "scrapecreators" },
+      }),
+    ).toThrow('"reddit" is set to fetch through "scrapecreators", which cannot run here.');
+  });
+
+  it("says nothing can fetch the platform when no provider has a key", () => {
+    const registry = registryOf(...bothProviders);
+
+    expect(() => registry.only("reddit", { among: [] })).toThrow(NoUsableProviderError);
+    expect(() => registry.only("reddit", { among: [] })).toThrow(
+      'No provider can fetch "reddit" here.',
+    );
   });
 });
 

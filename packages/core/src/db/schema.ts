@@ -864,6 +864,17 @@ export const queryEstimateProbes = pgTable(
       .notNull()
       .references(() => queryEstimates.id, { onDelete: "cascade" }),
     source: text("source").$type<Source>().notNull(),
+    /**
+     * Who took this sample. Null until the first call decides.
+     *
+     * A probe holds a cursor, so it has the same rule a continuation has: the
+     * sample belongs to the provider that started it, and a changed choice
+     * must not resume it through the other one. It is also what the report
+     * prices from — two providers charge different amounts for the same
+     * Reddit page, so a projection computed from the platform alone would be
+     * one provider's arithmetic on the other's bill.
+     */
+    provider: text("provider").$type<Provider>(),
     kind: text("kind").$type<EstimateProbeKind>().notNull(),
     /** The search phrase, or the channel name. What the person typed or kept. */
     term: text("term").notNull(),
@@ -916,6 +927,7 @@ export const queryEstimateProbes = pgTable(
     ),
     index("query_estimate_probes_estimate_idx").on(table.estimateId),
     check("query_estimate_probes_source_known", oneOf("source", sources)),
+    check("query_estimate_probes_provider_known", optionallyOneOf("provider", providers)),
     check("query_estimate_probes_kind_known", oneOf("kind", estimateProbeKinds)),
     check("query_estimate_probes_status_known", oneOf("status", estimateStatuses)),
     check("query_estimate_probes_units_non_negative", sql.raw(`units >= 0`)),
@@ -987,5 +999,39 @@ export const sourceCredentials = pgTable(
     check("source_credentials_ciphertext_format", sql.raw(`ciphertext LIKE 'v1.%.%.%'`)),
     // A hint that is longer than the mask is a hint that is leaking.
     check("source_credentials_hint_masked", sql.raw(`hint LIKE '••••%' AND length(hint) <= 8`)),
+  ],
+);
+
+/**
+ * Which provider fetches a platform, when more than one can.
+ *
+ * One row per platform, and a platform with nothing recorded has no row. That
+ * is the common deployment: it holds one provider's key, so there is one
+ * connector that can run and no question to ask. US-026 built this table for
+ * the deployment that holds both, where answering from registration order
+ * would spend money at a provider nobody picked.
+ *
+ * The choice is global, not per monitor. A person who wants Reddit through
+ * Bright Data wants it for every monitor. A per-monitor override is one column
+ * on `monitors` the day somebody asks for it.
+ *
+ * Nothing in flight reads this. A collection belongs to the provider that
+ * started it, and `source_continuations` carries that provider, so changing a
+ * row here takes effect on the next collection and never on the one already
+ * running.
+ */
+export const sourceProviders = pgTable(
+  "source_providers",
+  {
+    /** The platform. One row per platform, so this is the whole key. */
+    source: text("source").$type<Source>().primaryKey(),
+    /** Who fetches it. */
+    provider: text("provider").$type<Provider>().notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  () => [
+    check("source_providers_source_known", oneOf("source", sources)),
+    check("source_providers_provider_known", oneOf("provider", providers)),
   ],
 );

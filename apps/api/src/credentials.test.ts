@@ -118,14 +118,9 @@ describe("a stored credential and the API", () => {
         const body = (await app.inject({ method: "GET", url: "/api/monitor-options" })).json();
         const reddit = body.sources.find((source: { id: string }) => source.id === "reddit");
 
-        expect(reddit.credentials).toEqual([
-          {
-            name: "apiKey",
-            label: expect.any(String),
-            environmentVariable: "BRIGHTDATA_API_KEY",
-            configured: true,
-          },
-        ]);
+        // Nothing is missing, so nothing is named. The variable appears only
+        // when a person has to go and set it.
+        expect(reddit.missingCredentials).toEqual([]);
         expect(reddit.ready).toBe(true);
       } finally {
         await app.close();
@@ -147,7 +142,7 @@ describe("a stored credential and the API", () => {
         const body = (await app.inject({ method: "GET", url: "/api/monitor-options" })).json();
         const reddit = body.sources.find((source: { id: string }) => source.id === "reddit");
 
-        expect(reddit.credentials[0].configured).toBe(true);
+        expect(reddit.missingCredentials).toEqual([]);
         expect(reddit.ready).toBe(true);
       } finally {
         await app.close();
@@ -164,7 +159,7 @@ describe("a stored credential and the API", () => {
         const body = (await app.inject({ method: "GET", url: "/api/monitor-options" })).json();
         const reddit = body.sources.find((source: { id: string }) => source.id === "reddit");
 
-        expect(reddit.credentials[0].configured).toBe(false);
+        expect(reddit.missingCredentials[0].environmentVariable).toBe("BRIGHTDATA_API_KEY");
         expect(reddit.ready).toBe(false);
       } finally {
         await app.close();

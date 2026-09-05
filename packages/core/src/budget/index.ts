@@ -7,6 +7,8 @@ export {
   enforceBudget,
   formatMicros,
   getBudget,
+  type LastCollection,
+  lastCollections,
   type MonitorBudget,
   type MonitorSpend,
   monitorSpend,

@@ -44,6 +44,19 @@ export type PlatformId = string;
  */
 export type ProviderId = string;
 
+/**
+ * Which provider fetches each platform, as somebody recorded it.
+ *
+ * A platform with one usable connector is absent from here, and that is the
+ * common deployment: it holds one provider's key, so there is nothing to
+ * choose. An entry exists only where a person answered the question, and it is
+ * read rather than guessed — answering from registration order would spend
+ * money at a provider nobody picked.
+ *
+ * `source_providers` is where it is stored. US-026.
+ */
+export type ProviderChoices = Readonly<Partial<Record<PlatformId, ProviderId>>>;
+
 /** Both ids are spelled the same way, so one pattern answers for both. */
 export const connectorIdPattern = /^[a-z][a-z0-9-]*$/;
 

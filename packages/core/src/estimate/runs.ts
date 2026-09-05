@@ -16,6 +16,7 @@ import type { Database } from "../db/client.js";
 import {
   type EstimateProbeKind,
   type EstimateStatus,
+  type Provider,
   queryEstimateProbes,
   queryEstimates,
   type Source,
@@ -37,6 +38,8 @@ import {
 export interface EstimateProbe {
   readonly id: string;
   readonly source: Source;
+  /** Who took the sample. Null until the first call decides. */
+  readonly provider: Provider | null;
   readonly kind: EstimateProbeKind;
   readonly term: string;
   readonly status: EstimateStatus;
@@ -137,6 +140,7 @@ export async function readEstimate(db: Database, id: string): Promise<EstimateRu
     probes: probes.map((probe) => ({
       id: probe.id,
       source: probe.source,
+      provider: probe.provider,
       kind: probe.kind,
       term: probe.term,
       status: probe.status,
@@ -158,6 +162,8 @@ export async function readEstimate(db: Database, id: string): Promise<EstimateRu
 /** What one call to a source did to a probe. The step decides it; this writes it. */
 export interface ProbeProgress {
   readonly status: EstimateStatus;
+  /** Who took the sample, written by the first call that reaches a provider. */
+  readonly provider?: Provider;
   readonly cursor?: string | null;
   readonly resumeAfter?: Date | null;
   /** True for a resume that brought nothing back. Progress clears the count. */
@@ -189,6 +195,7 @@ export async function recordProbeProgress(
     .update(queryEstimateProbes)
     .set({
       status: progress.status,
+      ...(progress.provider === undefined ? {} : { provider: progress.provider }),
       ...(progress.cursor === undefined ? {} : { cursor: progress.cursor }),
       ...(progress.resumeAfter === undefined ? {} : { resumeAfter: progress.resumeAfter }),
       ...(progress.attempted === undefined
@@ -327,7 +334,21 @@ export function reportFor(
   const projections: Projection[] = [];
 
   const queries = run.probes.map((probe): ProbeReport => {
-    const descriptor = descriptors.find((candidate) => candidate.platform.id === probe.source);
+    // The pair, not the platform. Two providers fetch Reddit and price the
+    // same page differently, so a descriptor found by platform alone would
+    // project one provider's arithmetic onto the other's bill. A probe that
+    // has not run yet has no provider and no measurement, and projects zero.
+    const descriptor = descriptors.find(
+      (candidate) =>
+        candidate.platform.id === probe.source && candidate.provider.id === probe.provider,
+    );
+
+    // The name a person reads is the platform's, and every connector for a
+    // platform carries the same one. It is found separately so that a probe
+    // with no provider yet still reads as "Reddit" rather than as "reddit".
+    const platformName =
+      descriptors.find((candidate) => candidate.platform.id === probe.source)?.platform
+        .displayName ?? probe.source;
 
     const projection = descriptor
       ? projectMonthly(
@@ -367,7 +388,7 @@ export function reportFor(
 
     return {
       source: probe.source,
-      sourceName: descriptor?.platform.displayName ?? probe.source,
+      sourceName: platformName,
       kind: probe.kind,
       term: probe.term,
       status: probe.status,

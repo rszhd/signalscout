@@ -1,6 +1,7 @@
 import type {
   ConnectorDefinition,
   PlatformId,
+  ProviderChoices,
   ProviderId,
   SocialSource,
   SourceRuntime,
@@ -70,13 +71,13 @@ export class UnknownConnectorError extends Error {
 }
 
 /**
- * Thrown when a platform has more than one provider and nothing has said which
- * to use.
+ * Thrown when a platform has more than one usable provider and nothing has
+ * said which to use.
  *
  * The choice is demanded loudly, at the caller, rather than settled by
  * registration order: answering with the first would spend somebody's money at
- * a provider they did not pick. `CreateSourceRegistryOptions.defaultProviders`
- * is where the answer goes once somebody has made it.
+ * a provider they did not pick. `source_providers` is where the answer goes
+ * once somebody has made it, and the connections screen is where they make it.
  */
 export class AmbiguousConnectorError extends Error {
   constructor(
@@ -91,19 +92,122 @@ export class AmbiguousConnectorError extends Error {
   }
 }
 
+/**
+ * Thrown when no provider can fetch a platform here, and the build has one.
+ *
+ * Two states land on this, and both are a deployment's rather than a build's.
+ * Nothing can run the platform, because this deployment holds no key for any
+ * of its providers. Or the recorded choice names a provider that cannot run,
+ * because its key was removed or a rotation is half done.
+ *
+ * The second is not answered by quietly using the other provider. A person who
+ * chose ScrapeCreators and lost its key would then have every poll billed to
+ * Bright Data, which prices the same subreddit page at twenty times as much.
+ * The refusal names the choice and what is left, so both repairs — connect
+ * that provider, or choose another — are one action.
+ */
+export class NoUsableProviderError extends Error {
+  constructor(
+    readonly platformId: PlatformId,
+    /** The recorded choice, or null when nothing was chosen. */
+    readonly chosen: ProviderId | null,
+    readonly available: readonly ProviderId[],
+  ) {
+    super(
+      chosen
+        ? `"${platformId}" is set to fetch through "${chosen}", which cannot run here. ` +
+            `Available: ${available.join(", ") || "(none)"}. ` +
+            "Connect that provider, or choose one of these instead."
+        : `No provider can fetch "${platformId}" here. ` +
+            `This build fetches it through ${available.join(", ")}, and none of them can run. ` +
+            "Connect one on the connections screen.",
+    );
+    this.name = "NoUsableProviderError";
+  }
+}
+
+/**
+ * What the rules below decided about one platform.
+ *
+ * A value rather than a thrown error, because two callers need the same
+ * decision and only one of them is polling. `only` turns each branch into the
+ * error that names its repair; the connections screen turns the same branch
+ * into the sentence a person reads beside the platform.
+ */
+export type ProviderDecision =
+  /** One provider will fetch it. `recorded` is false when it was the only one that could. */
+  | { readonly status: "chosen"; readonly providerId: ProviderId; readonly recorded: boolean }
+  /** Two or more could, and nobody has said which. */
+  | { readonly status: "undecided"; readonly providers: readonly ProviderId[] }
+  /** None can. `chosen` names the recorded provider when that is the reason. */
+  | {
+      readonly status: "unavailable";
+      readonly chosen: ProviderId | null;
+      readonly available: readonly ProviderId[];
+    };
+
+/**
+ * Which provider fetches a platform, from what is registered, what can run,
+ * and what somebody chose.
+ *
+ * The one place the rule is written. `usable` is what this deployment holds a
+ * key for; passing `registered` as `usable` asks the question about the build
+ * rather than about the deployment.
+ */
+export function decideProvider(
+  platformId: PlatformId,
+  registered: readonly ProviderId[],
+  usable: readonly ProviderId[],
+  choices: ProviderChoices = {},
+): ProviderDecision {
+  const chosen = choices[platformId];
+
+  if (chosen && usable.includes(chosen)) {
+    return { status: "chosen", providerId: chosen, recorded: true };
+  }
+
+  // A choice that names a provider of this platform is obeyed or refused,
+  // never quietly replaced. Falling back to the other one would bill an
+  // account the person did not pick, at a price they never saw — a lost
+  // ScrapeCreators key would move every poll to Bright Data, which charges
+  // twenty times as much for the same subreddit page.
+  if (chosen && registered.includes(chosen)) {
+    return { status: "unavailable", chosen, available: usable };
+  }
+
+  // A choice naming a provider that does not fetch this platform at all is a
+  // stale or mistyped row rather than a decision about this platform, so it
+  // decides nothing and the rules below answer as if it were absent. It still
+  // cannot pick for a platform two providers can run.
+
+  // One provider that can run is its own answer, and that is the deployment
+  // holding a single key: no question is asked.
+  const only = usable[0];
+  if (usable.length === 1 && only) return { status: "chosen", providerId: only, recorded: false };
+
+  if (usable.length === 0) return { status: "unavailable", chosen: null, available: registered };
+
+  return { status: "undecided", providers: usable };
+}
+
 export interface SourceRegistry {
   /** The connector for this pair, or `UnknownConnectorError`. Never undefined. */
   get(platformId: PlatformId, providerId: ProviderId): SocialSource;
   has(platformId: PlatformId, providerId: ProviderId): boolean;
   /**
-   * The one connector for a platform.
+   * The one connector for a platform, given what this deployment can run and
+   * what somebody chose.
    *
-   * `UnknownSourceError` when nothing fetches the platform, and
-   * `AmbiguousConnectorError` when two things do. Every caller that has a
-   * platform and no provider goes through here, so the day a platform has two
-   * providers there is one list of callers to give a choice to.
+   * Every caller that has a platform and no provider goes through here, which
+   * is why US-026 had one list of callers to give a choice to.
+   *
+   * It throws rather than returning undefined, and each throw is a different
+   * repair. `UnknownSourceError`: nothing fetches this platform, so the build
+   * has no connector for it. `AmbiguousConnectorError`: two providers can run
+   * it and nobody has chosen. `NoUsableProviderError`: nothing can run it
+   * here, or the recorded choice names a provider that cannot.
    */
-  only(platformId: PlatformId): SocialSource;
+  only(platformId: PlatformId, options?: ChoiceOptions): SocialSource;
   /** Every connector for a platform, in the order the definitions were given. */
   forPlatform(platformId: PlatformId): readonly SocialSource[];
   /** Every registered platform, in the order the definitions were given. */
@@ -122,26 +226,33 @@ export interface SourceRegistry {
   require(platformIds: Iterable<PlatformId>): void;
 }
 
+/** What `only` needs beyond the platform, to answer a platform two providers fetch. */
+export interface ChoiceOptions {
+  /**
+   * Which provider fetches a platform, as somebody recorded it.
+   *
+   * A recorded choice is not a guess: the objection to answering with the
+   * first registration is that nobody chose it, and an entry here was chosen
+   * by a person on the connections screen. `readProviderChoices` reads them,
+   * and the caller reads them per poll rather than at boot — that is what
+   * makes a changed choice take effect on the next collection.
+   */
+  readonly choices?: ProviderChoices;
+  /**
+   * The providers this deployment can actually run, when the caller knows.
+   *
+   * The poll narrows to the ones it holds a key for, because "one provider
+   * connected" is the common deployment and it must not be asked a question it
+   * has only one answer to. Absent means "every registered one", which is the
+   * right answer for a caller that is describing the build rather than running
+   * it.
+   */
+  readonly among?: readonly ProviderId[];
+}
+
 export interface CreateSourceRegistryOptions {
   readonly definitions: readonly ConnectorDefinition[];
   readonly runtime: SourceRuntime;
-  /**
-   * Which provider fetches a platform, when more than one can.
-   *
-   * `only` consults this before it gives up. A recorded choice is not a guess:
-   * the objection to answering with the first registration is that nobody
-   * chose it, and an entry here was chosen by whoever configured the
-   * deployment.
-   *
-   * US-025 fills it from one environment variable, because a second provider
-   * for Reddit had to be reachable before there was any screen to reach it
-   * from. US-026 replaces that with a stored choice per platform and a
-   * settings row that shows it. This option is the seam between the two, and
-   * it is deliberately the whole mechanism: a platform with one provider needs
-   * no entry, and an entry naming a provider that does not fetch the platform
-   * is refused at boot rather than at poll time.
-   */
-  readonly defaultProviders?: Readonly<Record<PlatformId, ProviderId>>;
 }
 
 /**
@@ -151,7 +262,6 @@ export interface CreateSourceRegistryOptions {
 export function createSourceRegistry({
   definitions,
   runtime,
-  defaultProviders = {},
 }: CreateSourceRegistryOptions): SourceRegistry {
   const connectors = new Map<string, SocialSource>();
   const keys: ConnectorKey[] = [];
@@ -217,26 +327,35 @@ export function createSourceRegistry({
       return connector;
     },
     has: (platformId, providerId) => connectors.has(keyOf({ platformId, providerId })),
-    only(platformId) {
-      const found = forPlatform(platformId);
-      if (found.length === 0) throw new UnknownSourceError([platformId], platformIds);
-      if (found.length === 1) return found[0] as SocialSource;
+    only(platformId, { choices = {}, among }: ChoiceOptions = {}) {
+      const registered = forPlatform(platformId);
+      if (registered.length === 0) throw new UnknownSourceError([platformId], platformIds);
 
-      // More than one, so the answer has to come from a recorded choice. A
-      // default that names a provider this platform does not have is not
-      // honoured: silently falling back would spend money at a provider
-      // nobody picked, which is the exact failure `only` exists to prevent.
-      const chosen = defaultProviders[platformId];
-      const connector = chosen
-        ? found.find((candidate) => candidate.provider.id === chosen)
-        : undefined;
+      // What could run, which is not the same as what is registered. A build
+      // ships two Reddit connectors; a deployment usually holds one key.
+      const usable = among
+        ? registered.filter((candidate) => among.includes(candidate.provider.id))
+        : registered;
 
-      if (connector) return connector;
-
-      throw new AmbiguousConnectorError(
+      const decision = decideProvider(
         platformId,
-        found.map((candidate) => candidate.provider.id),
+        registered.map((candidate) => candidate.provider.id),
+        usable.map((candidate) => candidate.provider.id),
+        choices,
       );
+
+      if (decision.status === "unavailable") {
+        throw new NoUsableProviderError(platformId, decision.chosen, decision.available);
+      }
+
+      if (decision.status === "undecided") {
+        throw new AmbiguousConnectorError(platformId, decision.providers);
+      }
+
+      // Present by construction: the decision named one of these providers.
+      return usable.find(
+        (candidate) => candidate.provider.id === decision.providerId,
+      ) as SocialSource;
     },
     forPlatform,
     platforms: () => platformIds,

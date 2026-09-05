@@ -2,12 +2,13 @@
 
 # Done
 
-19 finished.
+20 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
 | BUG-002 | [A seven-day window is bought as a month](done/2026-09/BUG-002-a-seven-day-window-is-bought-as-a-month.md) | bug | fixed | 2026-09 |
 | BUG-001 | [A pending Reddit collection is not resumed](done/2026-09/BUG-001-a-pending-reddit-collection-is-not-resumed.md) | bug | shipped | 2026-09 |
+| US-026 | [A person chooses which provider fetches a platform](done/2026-09/US-026-a-person-chooses-which-provider-fetches-a-platform.md) | feature | done | 2026-09 |
 | US-025 | [ScrapeCreators collects Reddit posts](done/2026-09/US-025-scrapecreators-collects-reddit-posts.md) | feature | done | 2026-09 |
 | US-024 | [A platform is separated from the provider that fetches it](done/2026-09/US-024-a-platform-is-separated-from-the-provider-that-fetches-it.md) | chore | done | 2026-09 |
 | US-023 | [A provider key is pasted, tested and stored](done/2026-09/US-023-a-provider-key-is-pasted-tested-and-stored.md) | feature | shipped | 2026-09 |

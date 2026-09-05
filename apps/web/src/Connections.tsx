@@ -24,6 +24,13 @@ import { messageFor, requestJson } from "./api.js";
  * **Testing is offered even when storing is not.** The probe costs nothing and
  * writes nothing, so an instance with no `ENCRYPTION_KEY` can still check the
  * key it has in its environment.
+ *
+ * US-026 added the second half of the screen: which provider fetches which
+ * platform. It is here and not on the monitor form, because the choice is one
+ * a person makes once for every monitor, and because a form asking where to
+ * listen must not also ask which scraper to pay. The rows appear only for a
+ * platform this build fetches two ways, so the deployment holding one key sees
+ * nothing new.
  */
 
 interface CredentialView {
@@ -45,10 +52,26 @@ interface ProviderView {
   credentials: CredentialView[];
 }
 
+/** One platform, and which of its providers fetches it. */
+interface PlatformView {
+  id: string;
+  displayName: string;
+  providers: { id: string; displayName: string; connected: boolean }[];
+  /** The recorded choice, or null when nobody has made one. */
+  chosen: string | null;
+  /** Who would fetch it on the next collection, or null when nothing can. */
+  effective: string | null;
+  /** True when two providers could run it and nobody has chosen. */
+  needsChoice: boolean;
+  /** Null while the platform can be collected. Otherwise the sentence why not. */
+  blocker: string | null;
+}
+
 interface ConnectionsView {
   canStore: boolean;
   storeBlocker: string | null;
   providers: ProviderView[];
+  platforms: PlatformView[];
 }
 
 type LoadState = "loading" | "ready" | "error";
@@ -264,6 +287,122 @@ function ProviderCard({
   );
 }
 
+/**
+ * One row per platform, showing who fetches it.
+ *
+ * The row is hidden entirely when a platform has one provider in the build:
+ * there is no question, so there is nothing to show, and a row that said
+ * "Reddit is fetched by Bright Data, and that is your only option" would be
+ * furniture. US-026 is firm that the common deployment sees no choice at all.
+ *
+ * The buttons are radios and not a dropdown. Two options is a comparison, and
+ * a person deciding which account pays should be able to read both without
+ * opening anything.
+ */
+function PlatformRow({
+  platform,
+  onChanged,
+}: {
+  platform: PlatformView;
+  onChanged: (view: ConnectionsView) => void;
+}) {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function choose(providerId: string | null): Promise<void> {
+    setBusy(true);
+    setError(null);
+
+    try {
+      onChanged(
+        await requestJson<ConnectionsView>(`/api/platforms/${platform.id}/provider`, {
+          method: providerId === null ? "DELETE" : "PUT",
+          ...(providerId === null
+            ? {}
+            : {
+                headers: { "content-type": "application/json" },
+                body: JSON.stringify({ provider: providerId }),
+              }),
+        }),
+      );
+    } catch (cause) {
+      setError(messageFor(cause, "The choice could not be saved."));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  const effective = platform.providers.find((provider) => provider.id === platform.effective);
+
+  return (
+    <li className="monitor-card">
+      <div className="monitor-top">
+        <div className="monitor-identity">
+          <span className="product-icon" aria-hidden="true">
+            {platform.displayName.slice(0, 1).toUpperCase()}
+          </span>
+          <div>
+            <h2>{platform.displayName}</h2>
+            <p className="monitor-origin">
+              {effective ? `Fetched by ${effective.displayName}` : "Nothing is fetching this yet"}
+            </p>
+          </div>
+        </div>
+        <span className={`monitor-status ${effective ? "running" : "stopped"}`}>
+          {effective ? "Ready" : platform.needsChoice ? "Choose one" : "Unavailable"}
+        </span>
+      </div>
+
+      <fieldset className="provider-choice">
+        <legend className="visually-hidden">Provider for {platform.displayName}</legend>
+        {platform.providers.map((provider) => (
+          <label
+            className={provider.connected ? "provider-option" : "provider-option unavailable"}
+            key={provider.id}
+          >
+            <input
+              checked={platform.chosen === provider.id}
+              disabled={busy || !provider.connected}
+              name={`provider-for-${platform.id}`}
+              type="radio"
+              onChange={() => void choose(provider.id)}
+            />
+            <span>
+              <strong>{provider.displayName}</strong>
+              <small>{provider.connected ? "Connected" : "No key here"}</small>
+            </span>
+          </label>
+        ))}
+      </fieldset>
+
+      {platform.blocker && (
+        <p className="connection-hint" role="status">
+          {platform.blocker}
+        </p>
+      )}
+
+      {platform.chosen && (
+        <button
+          type="button"
+          className="text-button remove-key"
+          disabled={busy}
+          // Not a disconnect. The keys stay; the platform simply goes back to
+          // answering by itself whenever one provider can run.
+          onClick={() => void choose(null)}
+        >
+          Clear this choice
+        </button>
+      )}
+
+      {error && (
+        <p className="budget-error" role="alert">
+          {error}
+        </p>
+      )}
+    </li>
+  );
+}
+
 export function Connections() {
   const [view, setView] = useState<ConnectionsView | null>(null);
   const [state, setState] = useState<LoadState>("loading");
@@ -329,6 +468,10 @@ export function Connections() {
     );
   }
 
+  // Only a platform the build fetches two ways has a question to answer. With
+  // one provider there is nothing to choose, and a row saying so is furniture.
+  const choosable = view.platforms.filter((platform) => platform.providers.length > 1);
+
   return (
     <div className="product-page monitors-page">
       <ConnectionsHeader />
@@ -337,7 +480,7 @@ export function Connections() {
         <p>
           A key is tested with the provider before it is saved, so a monitor never starts on a key
           that does not work. A saved key is encrypted in this instance's database and is never
-          shown again.
+          shown again. You need one account per network, not all of them.
         </p>
       </div>
 
@@ -357,6 +500,25 @@ export function Connections() {
           />
         ))}
       </ul>
+
+      {choosable.length > 0 && (
+        <>
+          <div className="section-intro">
+            <h2>Which provider fetches what</h2>
+            <p>
+              These networks can be fetched by more than one of your accounts. The choice applies to
+              every monitor, and it takes effect on the next collection: a collection already
+              running finishes with the provider that started it.
+            </p>
+          </div>
+
+          <ul className="monitor-list">
+            {choosable.map((platform) => (
+              <PlatformRow key={platform.id} platform={platform} onChanged={setView} />
+            ))}
+          </ul>
+        </>
+      )}
     </div>
   );
 }

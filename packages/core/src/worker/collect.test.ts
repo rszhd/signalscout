@@ -2,15 +2,24 @@ import { eq } from "drizzle-orm";
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { setBudget } from "../budget/budget.js";
 import { createDatabase, type Database } from "../db/client.js";
-import { apiUsage, maxResumeAttempts, monitors, posts, sourceContinuations } from "../db/schema.js";
+import {
+  apiUsage,
+  maxResumeAttempts,
+  monitors,
+  posts,
+  sourceContinuations,
+  sourceProviders,
+} from "../db/schema.js";
+import { setProviderChoice } from "../sources/choices.js";
 import { fakePosts } from "../sources/fake/fixtures.js";
+import type { FakeSourceOptions } from "../sources/fake/index.js";
 import type { CandidatePost, SearchRequest, SocialSource } from "../sources/types.js";
 import { createTestDatabase, type TestDatabase } from "../testing/database.js";
 import { createCollectStep, excerptLength, maxPagesPerPoll } from "./collect.js";
 import type { CredentialLookup } from "./credentials.js";
 import { filterQueue, pollQueue } from "./queues.js";
 import type { StepContext } from "./steps.js";
-import { fakeRegistry, insertMonitor, silentLogger } from "./testing.js";
+import { fakeRegistry, insertMonitor, silentLogger, twoProviderRegistry } from "./testing.js";
 
 /**
  * The poll step, driven without a queue.
@@ -583,6 +592,230 @@ describe("the poll step", () => {
    * that this step obeys it, and that it obeys it *before* it reaches a
    * source. A guard that refused after the call would have spent the money.
    */
+  /**
+   * Which provider fetches a platform, and when a change to that takes effect.
+   *
+   * US-026. A monitor names a platform and its row records no provider, so the
+   * poll decides. Two rules carry money: the poll must not ask a question a
+   * deployment has one answer to, and a changed choice must never reach a
+   * collection that is already paid for and running.
+   */
+  describe("which provider fetches a platform", () => {
+    /** A key for these providers and no others. */
+    function keysFor(...providerIds: string[]): CredentialLookup {
+      return (connector) =>
+        providerIds.includes(connector.provider.id) ? { token: "test-token" } : undefined;
+    }
+
+    const brightDataPosts: CandidatePost[] = [
+      {
+        externalId: "t3_from_brightdata",
+        url: "https://www.reddit.com/r/softwaretesting/comments/t3_from_brightdata/",
+        text: "Collected through Bright Data.",
+        postedAt: new Date("2026-09-04T11:08:36.000Z"),
+      },
+    ];
+
+    const scrapeCreatorsPosts: CandidatePost[] = [
+      {
+        externalId: "t3_from_scrapecreators",
+        url: "https://www.reddit.com/r/softwaretesting/comments/t3_from_scrapecreators/",
+        text: "Collected through ScrapeCreators.",
+        postedAt: new Date("2026-09-04T11:09:36.000Z"),
+      },
+    ];
+
+    function bothProviders(overrides: Record<string, FakeSourceOptions> = {}) {
+      return twoProviderRegistry({
+        brightdata: { posts: brightDataPosts, ...overrides.brightdata },
+        scrapecreators: { posts: scrapeCreatorsPosts, ...overrides.scrapecreators },
+      });
+    }
+
+    /** Every search one provider's connector served, in order. */
+    function callsFor(
+      registry: ReturnType<typeof twoProviderRegistry>,
+      providerId: string,
+    ): readonly SearchRequest[] {
+      return (registry.get("reddit", providerId) as SocialSource & { calls: SearchRequest[] })
+        .calls;
+    }
+
+    async function poll(
+      registry: ReturnType<typeof twoProviderRegistry>,
+      credentialsFor: CredentialLookup,
+      monitorId: string,
+      boss = stubBoss(),
+    ) {
+      await createCollectStep({ registry, credentialsFor })({ monitorId }, contextFor(db, boss));
+      return boss;
+    }
+
+    afterEach(async () => {
+      await db.delete(sourceProviders);
+    });
+
+    it("uses the one provider that has a key, and asks nothing", async () => {
+      // The common deployment: the build ships two Reddit connectors and the
+      // person holds one of the two accounts. There is nothing to choose, so
+      // nothing is asked and nothing is stored in `source_providers`.
+      const monitorId = await insertMonitor(database);
+      const registry = bothProviders();
+
+      await poll(registry, keysFor("brightdata"), monitorId);
+
+      expect((await db.select().from(posts)).map((post) => post.externalId)).toEqual([
+        "t3_from_brightdata",
+      ]);
+      expect(callsFor(registry, "scrapecreators")).toHaveLength(0);
+      expect(await db.select().from(sourceProviders)).toHaveLength(0);
+    });
+
+    it("refuses the poll when both have a key and nobody has chosen", async () => {
+      // Picking would spend money at a provider nobody named. The poll stops
+      // instead, and it stops before either connector is reached, so the
+      // refusal costs nothing.
+      const monitorId = await insertMonitor(database);
+      const registry = bothProviders();
+
+      await poll(registry, keysFor("brightdata", "scrapecreators"), monitorId);
+
+      expect(await db.select().from(posts)).toHaveLength(0);
+      expect(await db.select().from(apiUsage)).toHaveLength(0);
+      expect(callsFor(registry, "brightdata")).toHaveLength(0);
+      expect(callsFor(registry, "scrapecreators")).toHaveLength(0);
+    });
+
+    it("uses the recorded provider when both have a key", async () => {
+      const monitorId = await insertMonitor(database);
+      const registry = bothProviders();
+
+      await setProviderChoice(db, "reddit", "scrapecreators");
+      await poll(registry, keysFor("brightdata", "scrapecreators"), monitorId);
+
+      expect((await db.select().from(posts)).map((post) => post.externalId)).toEqual([
+        "t3_from_scrapecreators",
+      ]);
+      expect(callsFor(registry, "brightdata")).toHaveLength(0);
+    });
+
+    it("takes effect on the next collection, with no restart", async () => {
+      /**
+       * The choice is read per poll and not at boot. One step, one registry,
+       * one process: only the row changes between the two polls, so what moved
+       * the collection is the row and nothing else.
+       */
+      const monitorId = await insertMonitor(database);
+      const registry = bothProviders();
+      const keys = keysFor("brightdata", "scrapecreators");
+
+      await setProviderChoice(db, "reddit", "brightdata");
+      await poll(registry, keys, monitorId);
+
+      // The poll mark, back where it was. The window is not what this test is
+      // about, and leaving it would make the second poll ask only for posts
+      // newer than the first poll — which is every fixture filtered away.
+      await db.update(monitors).set({ lastPolledAt: null }).where(eq(monitors.id, monitorId));
+
+      await setProviderChoice(db, "reddit", "scrapecreators");
+      await poll(registry, keys, monitorId);
+
+      expect(callsFor(registry, "brightdata")).toHaveLength(1);
+      expect(callsFor(registry, "scrapecreators")).toHaveLength(1);
+      expect((await db.select().from(posts)).map((post) => post.externalId).sort()).toEqual([
+        "t3_from_brightdata",
+        "t3_from_scrapecreators",
+      ]);
+    });
+
+    it("splits the month's spend by provider rather than merging it", async () => {
+      // `api_usage` is keyed by the pair, so a switch leaves two rows and each
+      // one is priced by the connector that ran. One row would price a month
+      // of two accounts at one account's rate.
+      const monitorId = await insertMonitor(database);
+      const registry = twoProviderRegistry({
+        brightdata: { posts: brightDataPosts, unitsPerCall: 4, pricePerUnitMicros: 1500 },
+        scrapecreators: { posts: scrapeCreatorsPosts, unitsPerCall: 1, pricePerUnitMicros: 3760 },
+      });
+      const keys = keysFor("brightdata", "scrapecreators");
+
+      await setProviderChoice(db, "reddit", "brightdata");
+      await poll(registry, keys, monitorId);
+
+      await setProviderChoice(db, "reddit", "scrapecreators");
+      await poll(registry, keys, monitorId);
+
+      const usage = await db.select().from(apiUsage).orderBy(apiUsage.provider);
+
+      expect(usage.map((row) => [row.provider, row.units, row.estimatedCostMicros])).toEqual([
+        ["brightdata", 4, 6000],
+        ["scrapecreators", 1, 3760],
+      ]);
+    });
+
+    it("resumes a collection through the provider that started it, whatever the choice now says", async () => {
+      /**
+       * Correctness-critical: cursor and deduplication. The cursor is a
+       * snapshot id and it means nothing to another provider. Resuming Bright
+       * Data's collection through ScrapeCreators would read a snapshot it has
+       * never heard of, and on a provider that bills at collection time it
+       * would also pay for the query a second time.
+       *
+       * So the switch takes effect on the *next* collection. The one already
+       * running finishes where it started.
+       */
+      const monitorId = await insertMonitor(database);
+      const keys = keysFor("brightdata", "scrapecreators");
+      const registry = bothProviders({
+        // One post of the collection, then a wait carrying the cursor.
+        brightdata: { pageSize: 1, callsBeforeRateLimit: 1, posts: [...fakePosts] },
+      });
+
+      await setProviderChoice(db, "reddit", "brightdata");
+      await poll(registry, keys, monitorId);
+
+      const [started] = await db
+        .select()
+        .from(sourceContinuations)
+        .where(eq(sourceContinuations.monitorId, monitorId));
+
+      expect(started?.provider).toBe("brightdata");
+      expect(started?.cursor).toBe("1");
+
+      // The person changes their mind while the snapshot is still collecting.
+      await setProviderChoice(db, "reddit", "scrapecreators");
+      await db
+        .update(sourceContinuations)
+        .set({ resumeAfter: new Date(Date.now() - 1000) })
+        .where(eq(sourceContinuations.monitorId, monitorId));
+
+      // A second process: new connectors, nothing carried in memory. What the
+      // resume knows about the provider it read from `source_continuations`.
+      const resumed = bothProviders({ brightdata: { posts: [...fakePosts] } });
+      await poll(resumed, keys, monitorId);
+
+      // Bright Data was asked again, with its own cursor. ScrapeCreators was
+      // never asked at all, so no cursor crossed a provider and nothing was
+      // collected twice.
+      expect(callsFor(resumed, "brightdata")[0]?.cursor).toBe("1");
+      expect(callsFor(resumed, "scrapecreators")).toHaveLength(0);
+      expect(await db.select().from(posts)).toHaveLength(fakePosts.length);
+    });
+
+    it("refuses rather than moving a running monitor to the other provider", async () => {
+      // The chosen provider's key is gone. Collecting through the other one
+      // would bill an account nobody picked, at a price nobody was shown.
+      const monitorId = await insertMonitor(database);
+      const registry = bothProviders();
+
+      await setProviderChoice(db, "reddit", "scrapecreators");
+      await poll(registry, keysFor("brightdata"), monitorId);
+
+      expect(await db.select().from(posts)).toHaveLength(0);
+      expect(callsFor(registry, "brightdata")).toHaveLength(0);
+    });
+  });
+
   describe("the budget guard", () => {
     it("reaches no source once the monthly cap is spent", async () => {
       const monitorId = await insertMonitor(database);

@@ -36,6 +36,7 @@ import {
   recordProbeProgress,
   refuseEstimate,
 } from "../estimate/runs.js";
+import { readProviderChoices } from "../sources/choices.js";
 import type { SourceRegistry } from "../sources/registry.js";
 import type { CandidatePost, SocialSource, SourceCredentials } from "../sources/types.js";
 import type { CredentialLookup } from "./credentials.js";
@@ -208,6 +209,10 @@ export function createEstimateStep({
       }
     }
 
+    // Read per run, like the poll reads it, so a choice made on the connections
+    // screen applies to the next sample rather than waiting for a restart.
+    const choices = await readProviderChoices(db);
+
     const now = new Date();
     const since = new Date(now.getTime() - sampleWindowDays * 24 * 60 * 60 * 1000);
 
@@ -239,9 +244,38 @@ export function createEstimateStep({
         continue;
       }
 
+      /**
+       * Which of this platform's providers could take the sample.
+       *
+       * The same rule the poll uses, and for the same two reasons. A
+       * deployment holding one key is asked nothing. And a sample already
+       * started belongs to the provider that started it: the cursor is a
+       * snapshot id the other provider has never heard of, and re-running the
+       * search through it would bill the sample a second time.
+       */
+      const keyed = new Map<string, SourceCredentials>();
+
+      for (const candidate of registry.forPlatform(probe.source)) {
+        const found = await credentialsFor(candidate);
+        if (found) keyed.set(candidate.provider.id, found);
+      }
+
+      if (keyed.size === 0) {
+        // Not transient, and not worth a retry. The sentence names what to
+        // set, which is the whole support channel in a bring-your-own-keys
+        // product.
+        await recordProbeProgress(db, probe.id, {
+          status: "failed",
+          error: `${probe.source} has no credentials configured, so nothing can be sampled.`,
+        });
+        continue;
+      }
+
       let source: SocialSource;
       try {
-        source = registry.only(probe.source);
+        source = probe.provider
+          ? registry.get(probe.source, probe.provider)
+          : registry.only(probe.source, { choices, among: [...keyed.keys()] });
       } catch (error) {
         await recordProbeProgress(db, probe.id, {
           status: "failed",
@@ -250,17 +284,17 @@ export function createEstimateStep({
         continue;
       }
 
-      const credentials = await credentialsFor(source);
+      // Present by construction, except for a resume whose provider lost its
+      // key. That reads as a failed probe with the provider's own name in it,
+      // which is the sentence a person can act on.
+      const credentials = keyed.get(source.provider.id);
 
       if (!credentials) {
-        // Not transient, and not worth a retry. The sentence names what to
-        // set, which is the whole support channel in a bring-your-own-keys
-        // product.
         await recordProbeProgress(db, probe.id, {
           status: "failed",
           error:
-            `${source.platform.displayName} has no credentials configured, ` +
-            "so nothing can be sampled.",
+            `This sample was started through ${source.provider.displayName}, ` +
+            "which no longer has a key here. Connect it, or run the test again.",
         });
         continue;
       }
@@ -277,6 +311,11 @@ export function createEstimateStep({
         );
 
         const spent = {
+          // Written with the first answer, so a resume comes back to the same
+          // provider and the report prices the sample from the pair that took
+          // it. Repeating it on every write costs nothing and means no branch
+          // can leave it unset.
+          provider: source.provider.id as Provider,
           units: sample.unitsConsumed,
           estimatedCostMicros: sample.unitsConsumed * source.pricePerUnitMicros,
         };

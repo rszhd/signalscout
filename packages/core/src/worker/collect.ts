@@ -27,6 +27,7 @@ import { eq, sql } from "drizzle-orm";
 import { enforceBudget, recordSourceUsage } from "../budget/budget.js";
 import { maxResumeAttempts, monitors, type Provider, posts, type Source } from "../db/schema.js";
 import { monitorQueries } from "../monitors/monitors.js";
+import { readProviderChoices } from "../sources/choices.js";
 import type { SourceRegistry } from "../sources/registry.js";
 import type {
   CandidatePost,
@@ -241,19 +242,33 @@ export function createCollectStep({ registry, credentialsFor }: CollectOptions):
     const channels = monitor.generatedSubreddits;
 
     /**
-     * Collections this monitor already has in flight, by source.
+     * Collections this monitor already has in flight, by platform.
      *
      * Read before anything is asked of a source. A source named here has been
      * paid for already — Bright Data bills a collection when it is triggered —
      * so starting its query again is the second charge BUG-001 was recorded
      * for.
+     *
+     * Keyed by platform and not by the pair, because a continuation is what
+     * decides the provider for this poll. A monitor has at most one collection
+     * per platform in flight: a poll resumes one before it starts another, so
+     * a second one is never triggered while the first is unread.
      */
     const pending = new Map(
       (await continuationsFor(db, monitorId)).map((continuation) => [
-        `${continuation.source}:${continuation.provider}`,
+        continuation.source as string,
         continuation,
       ]),
     );
+
+    /**
+     * Which provider fetches each platform, read here rather than at boot.
+     *
+     * Per poll, so a choice made on the connections screen takes effect on the
+     * next collection and needs no restart. It is one small select, and this
+     * job is about to make network calls that cost money.
+     */
+    const choices = await readProviderChoices(db);
 
     const now = new Date();
     const outcomes: SourceOutcome[] = [];
@@ -265,31 +280,84 @@ export function createCollectStep({ registry, credentialsFor }: CollectOptions):
     };
 
     for (const sourceId of monitor.sources) {
-      // `only` and not a provider choice, because a monitor names a platform
-      // and the row records no provider. Reddit has two since US-025, so a
-      // deployment holding both keys has to record which one to use; `only`
-      // reads that and throws when nothing has chosen. US-026 moves the
-      // choice from an environment variable to a stored one.
-      const source = registry.only(sourceId);
-      const providerId = source.provider.id;
-      const credentials = await credentialsFor(source);
+      /**
+       * Which of this platform's providers could run, and with what key.
+       *
+       * A monitor names a platform and its row records no provider, so the
+       * provider is decided here. Every candidate is asked for its key first,
+       * because "one provider connected" is the common deployment and it must
+       * not be asked a question it has one answer to. Reddit has two
+       * connectors in the build and most instances hold one of the two keys.
+       */
+      const keyed = new Map<string, SourceCredentials>();
 
-      if (!credentials) {
+      for (const candidate of registry.forPlatform(sourceId)) {
+        const found = await credentialsFor(candidate);
+        if (found) keyed.set(candidate.provider.id, found);
+      }
+
+      if (keyed.size === 0) {
         // A missing key is not transient. Retrying it four times and then
         // dead-lettering it buries the one sentence the user has to read.
         logger.error(
           {
             monitorId,
             sourceId,
-            providerId,
-            needs: source.provider.credentialFields.map((field) => field.name),
+            providers: registry.forPlatform(sourceId).map((candidate) => candidate.provider.id),
           },
-          "poll skipped for this source: no credentials are configured",
+          "poll skipped for this source: no provider for it has credentials configured",
         );
         continue;
       }
 
-      const continuation: Continuation | undefined = pending.get(`${sourceId}:${providerId}`);
+      /**
+       * A collection in flight belongs to the provider that started it.
+       *
+       * Correctness-critical, and US-026 is the ticket that made it possible
+       * to get wrong. The cursor is opaque and means nothing to another
+       * provider, so resuming a Bright Data snapshot through ScrapeCreators
+       * reads a snapshot id ScrapeCreators has never heard of — and on a
+       * provider that bills at collection time it also pays for the work
+       * twice. So a changed choice takes effect on the *next* collection, and
+       * the one already running finishes where it started.
+       */
+      const continuation: Continuation | undefined = pending.get(sourceId);
+
+      let source: SocialSource;
+
+      if (continuation) {
+        if (!keyed.has(continuation.provider)) {
+          // The key that started this collection is gone. Nothing else can
+          // read it, and the row stays so that putting the key back reads the
+          // snapshot rather than paying for the query again.
+          logger.error(
+            { monitorId, sourceId, providerId: continuation.provider },
+            "collection cannot be resumed: the provider that started it has no credentials",
+          );
+          continue;
+        }
+
+        source = registry.get(sourceId, continuation.provider);
+      } else {
+        try {
+          source = registry.only(sourceId, { choices, among: [...keyed.keys()] });
+        } catch (error) {
+          // Two providers can run and nobody has chosen, or the choice names
+          // one that cannot. Neither is fixed by retrying, and neither is
+          // fixed by picking for them: the point of the refusal is that
+          // spending somebody's money is not a default. The message names the
+          // repair.
+          logger.error(
+            { monitorId, sourceId, err: error },
+            "poll skipped for this source: no provider is chosen for it",
+          );
+          continue;
+        }
+      }
+
+      const providerId = source.provider.id;
+      // Present by construction: every branch above chose from this map.
+      const credentials = keyed.get(providerId) as SourceCredentials;
 
       if (continuation && continuation.attempts >= maxResumeAttempts) {
         // The collection never became ready. Forgetting it lets the next

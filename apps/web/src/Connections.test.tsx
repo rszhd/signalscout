@@ -31,8 +31,33 @@ function brightData(overrides: Record<string, unknown> = {}) {
   };
 }
 
+/**
+ * One platform row, as the server sends it.
+ *
+ * The default has one provider, which is the deployment that sees no choice at
+ * all: the screen hides the row entirely. A test about choosing passes two.
+ */
+function reddit(overrides: Record<string, unknown> = {}) {
+  return {
+    id: "reddit",
+    displayName: "Reddit",
+    providers: [{ id: "brightdata", displayName: "Bright Data", connected: true }],
+    chosen: null,
+    effective: "brightdata",
+    needsChoice: false,
+    blocker: null,
+    ...overrides,
+  };
+}
+
 function connections(overrides: Record<string, unknown> = {}) {
-  return { canStore: true, storeBlocker: null, providers: [brightData()], ...overrides };
+  return {
+    canStore: true,
+    storeBlocker: null,
+    providers: [brightData()],
+    platforms: [reddit()],
+    ...overrides,
+  };
 }
 
 describe("the connections screen", () => {
@@ -289,5 +314,92 @@ describe("the connections screen", () => {
     screen = await mount(<Connections />);
 
     expect(screen.container.textContent).toContain("The database is unreachable.");
+  });
+  /**
+   * Which provider fetches a platform.
+   *
+   * US-026 put the question here rather than on the monitor form. What this
+   * file owns is whether a person sees the question only when they have one,
+   * and whether pressing an answer sends the choice and nothing else.
+   */
+  describe("choosing which provider fetches a platform", () => {
+    const bothConnected = reddit({
+      providers: [
+        { id: "brightdata", displayName: "Bright Data", connected: true },
+        { id: "scrapecreators", displayName: "ScrapeCreators", connected: true },
+      ],
+      effective: null,
+      needsChoice: true,
+      blocker: "Bright Data and ScrapeCreators can both fetch Reddit. Choose one.",
+    });
+
+    it("shows no row at all when the platform has one provider", async () => {
+      // The common deployment. There is no question, so there is nothing to
+      // show, and a row saying "your only option is your only option" is
+      // furniture on a screen about keys.
+      await show(connections());
+
+      expect(container.textContent).not.toContain("Which provider fetches what");
+    });
+
+    it("asks which provider, and says why nothing is collecting yet", async () => {
+      await show(connections({ platforms: [bothConnected] }));
+
+      expect(container.textContent).toContain("Which provider fetches what");
+      expect(container.textContent).toContain("ScrapeCreators");
+      expect(container.textContent).toContain("Choose one");
+    });
+
+    it("sends the choice, and shows what the server sent back", async () => {
+      const chosen = {
+        ...bothConnected,
+        chosen: "scrapecreators",
+        effective: "scrapecreators",
+        needsChoice: false,
+        blocker: null,
+      };
+
+      await show(connections({ platforms: [bothConnected] }), {
+        "PUT /api/platforms/reddit/provider": () => json(connections({ platforms: [chosen] })),
+      });
+
+      const options = [...container.querySelectorAll("input[type=radio]")] as HTMLInputElement[];
+      const scrapeCreators = options[1];
+
+      if (!scrapeCreators) throw new Error("The second provider has no option to press.");
+
+      scrapeCreators.click();
+      await settle();
+
+      expect(calls).toContainEqual({
+        url: "/api/platforms/reddit/provider",
+        method: "PUT",
+        body: JSON.stringify({ provider: "scrapecreators" }),
+      });
+      expect(container.textContent).toContain("Fetched by ScrapeCreators");
+    });
+
+    it("offers no option for a provider with no key here", async () => {
+      // Choosing it would record a choice nothing can run. The row says the
+      // key is missing instead, which is the action.
+      await show(
+        connections({
+          platforms: [
+            reddit({
+              providers: [
+                { id: "brightdata", displayName: "Bright Data", connected: true },
+                { id: "scrapecreators", displayName: "ScrapeCreators", connected: false },
+              ],
+              needsChoice: false,
+            }),
+          ],
+        }),
+      );
+
+      const options = [...container.querySelectorAll("input[type=radio]")] as HTMLInputElement[];
+
+      expect(options.map((option) => option.disabled)).toEqual([false, true]);
+      expect(container.textContent).toContain("No key here");
+    });
   });
 });

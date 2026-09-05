@@ -21,6 +21,7 @@ function monitor(overrides: Record<string, unknown> = {}) {
     sources: ["reddit"],
     paused: false,
     lastPolledAt: "2026-03-14T08:00:00.000Z",
+    lastCollected: [],
     missingCredentials: [],
     budget: null,
     spend: {
@@ -265,6 +266,21 @@ describe("the monitor list", () => {
       anchor.textContent?.includes("Export feedback"),
     );
     expect(link?.getAttribute("href")).toBe("/api/feedback/export");
+  });
+
+  it("says which provider last collected each platform, and when", async () => {
+    // US-026. Once a person can change which provider fetches a platform, the
+    // list has to say which one actually did — the choice can move, and this
+    // is the record of what ran.
+    await show([
+      monitor({
+        lastCollected: [
+          { source: "reddit", provider: "scrapecreators", at: "2026-09-05T09:30:00.000Z" },
+        ],
+      }),
+    ]);
+
+    expect(container.textContent).toContain("reddit via scrapecreators");
   });
 });
 

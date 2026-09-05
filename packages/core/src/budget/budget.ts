@@ -304,6 +304,55 @@ export async function spendByMonitor(
   return spend;
 }
 
+/** Which provider last collected one platform for one monitor, and when. */
+export interface LastCollection {
+  readonly source: Source;
+  readonly provider: Provider;
+  readonly at: Date;
+}
+
+/**
+ * The last collection per platform, per monitor, read from the ledger.
+ *
+ * US-026 needs it: once a person can change which provider fetches a platform,
+ * the monitor list has to be able to say which one actually did, and when. The
+ * ledger is the honest place to read it from — a row is written as each page
+ * comes back, so its `updated_at` is the moment money was last spent on that
+ * pair rather than the moment a poll was scheduled.
+ *
+ * Rows with no monitor are skipped. Those are US-014's cost tests, which are
+ * on the bill and on no monitor.
+ */
+export async function lastCollections(db: Database): Promise<Map<string, LastCollection[]>> {
+  const rows = await db
+    .select({
+      monitorId: apiUsage.monitorId,
+      source: apiUsage.source,
+      provider: apiUsage.provider,
+      at: apiUsage.updatedAt,
+    })
+    .from(apiUsage)
+    .orderBy(apiUsage.updatedAt);
+
+  const latest = new Map<string, LastCollection[]>();
+
+  for (const row of rows) {
+    if (!row.monitorId) continue;
+
+    // Ascending, so a later row replaces an earlier one for the same platform.
+    const found = latest.get(row.monitorId) ?? [];
+    const entry: LastCollection = { source: row.source, provider: row.provider, at: row.at };
+    const at = found.findIndex((one) => one.source === row.source);
+
+    if (at === -1) found.push(entry);
+    else found[at] = entry;
+
+    latest.set(row.monitorId, found);
+  }
+
+  return latest;
+}
+
 /**
  * Every monitor's budget state in one read, for the screen that lists them.
  *

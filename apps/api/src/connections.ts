@@ -30,18 +30,26 @@
  */
 import {
   type ConnectorDefinition,
+  clearProviderChoice,
   createSourceRuntime,
   credentialRecordName,
   type Database,
+  decideProvider,
   deleteSourceCredential,
   environmentVariableFor,
+  groupByPlatform,
   type Logger,
   listCredentialHints,
   optionalEncryptionKey,
+  type PlatformConnectors,
   type Provider,
+  type ProviderChoices,
   putSourceCredential,
+  readProviderChoices,
   readSourceCredential,
+  type Source,
   type SourceCredentials,
+  setProviderChoice,
 } from "@intentwatch/core";
 import { z } from "zod";
 import type { ApiServer } from "./server.js";
@@ -94,6 +102,42 @@ const providerSchema = z.object({
   platforms: z.array(z.string()),
   ready: z.boolean(),
   credentials: z.array(fieldSchema),
+});
+
+/**
+ * One platform, and who fetches it.
+ *
+ * The second half of this screen, and US-026 added it. A person ticks
+ * platforms when they make a monitor; this is where they say, once, which
+ * account pays for each one. The monitor form never asks.
+ */
+const platformSchema = z.object({
+  id: z.string(),
+  displayName: z.string(),
+  providers: z.array(
+    z.object({
+      id: z.string(),
+      displayName: z.string(),
+      /** True when this deployment holds the provider's key. */
+      connected: z.boolean(),
+    }),
+  ),
+  /** The recorded choice, or null when nobody has made one. */
+  chosen: z.string().nullable(),
+  /** Who would fetch it on the next collection, or null when nothing can. */
+  effective: z.string().nullable(),
+  /** True when two providers could run it and nobody has chosen. */
+  needsChoice: z.boolean(),
+  /** Null while the platform can be collected. Otherwise the sentence why not. */
+  blocker: z.string().nullable(),
+});
+
+const connectionsSchema = z.object({
+  /** False when no `ENCRYPTION_KEY` is set. The screen offers no save. */
+  canStore: z.boolean(),
+  storeBlocker: z.string().nullable(),
+  providers: z.array(providerSchema),
+  platforms: z.array(platformSchema),
 });
 
 /** What a failed request answers with, the shape every screen already reads. */
@@ -156,6 +200,7 @@ export async function registerConnectionRoutes(
   const environment = options.environment ?? process.env;
   const encryption = options.encryption ?? process.env;
   const providers = providersOf(sources);
+  const platformEntries = groupByPlatform(sources);
 
   function find(id: string): ProviderEntry | undefined {
     return providers.find((provider) => provider.descriptor.id === id);
@@ -195,6 +240,92 @@ export async function registerConnectionRoutes(
       ready: credentials.every((field) => field.configured),
       credentials,
     };
+  }
+
+  /**
+   * Which providers this deployment holds a whole key for.
+   *
+   * One read of the hints for every provider, rather than one per card. The
+   * hints never decrypt, so this costs no encryption key.
+   */
+  async function connectedProviders(): Promise<Set<string>> {
+    const hints = await listCredentialHints(db);
+    const stored = new Set(hints.map((hint) => `${hint.provider}:${hint.field}`));
+    const connected = new Set<string>();
+
+    for (const { descriptor } of providers) {
+      const whole = descriptor.credentialFields.every(
+        (field) =>
+          stored.has(`${descriptor.id}:${field.name}`) ||
+          Boolean(environment[environmentVariableFor(descriptor.id, field.name)]),
+      );
+
+      if (whole) connected.add(descriptor.id);
+    }
+
+    return connected;
+  }
+
+  /**
+   * One platform, and who fetches it.
+   *
+   * The decision comes from `decideProvider`, the same function the poll goes
+   * through. A screen with its own copy of the rule is a screen that says a
+   * platform is ready while every poll of it is refused.
+   */
+  function platformView(
+    { platform, providers: fetchers }: PlatformConnectors,
+    choices: ProviderChoices,
+    connected: ReadonlySet<string>,
+  ) {
+    const registered = fetchers.map((provider) => provider.id);
+    const usable = registered.filter((id) => connected.has(id));
+    const decision = decideProvider(platform.id, registered, usable, choices);
+    const name = (id: string) => fetchers.find((provider) => provider.id === id)?.displayName ?? id;
+
+    return {
+      id: platform.id,
+      displayName: platform.displayName,
+      providers: fetchers.map((provider) => ({
+        id: provider.id,
+        displayName: provider.displayName,
+        connected: connected.has(provider.id),
+      })),
+      chosen: choices[platform.id] ?? null,
+      effective: decision.status === "chosen" ? decision.providerId : null,
+      needsChoice: decision.status === "undecided",
+      blocker:
+        decision.status === "chosen"
+          ? null
+          : decision.status === "undecided"
+            ? `${decision.providers.map(name).join(" and ")} can both fetch ` +
+              `${platform.displayName}. Choose one: a poll will not pick for you, ` +
+              "because picking would spend money at a provider you did not choose."
+            : decision.chosen
+              ? `${platform.displayName} is set to fetch through ${name(decision.chosen)}, ` +
+                "which has no key here. Connect it, or choose another provider."
+              : `No provider is connected for ${platform.displayName}, ` +
+                `so nothing can collect it. Connect ${registered.map(name).join(" or ")}.`,
+    };
+  }
+
+  /** The whole screen: the provider cards, and the platform rows under them. */
+  async function connectionsView() {
+    const canStore = Boolean(optionalEncryptionKey(encryption));
+
+    return {
+      canStore,
+      storeBlocker: canStore ? null : noEncryptionKey,
+      providers: await Promise.all(providers.map(view)),
+      platforms: await platformViews(),
+    };
+  }
+
+  /** Every platform, with the choices and the keys read once for all of them. */
+  async function platformViews() {
+    const [choices, connected] = await Promise.all([readProviderChoices(db), connectedProviders()]);
+
+    return platformEntries.map((platform) => platformView(platform, choices, connected));
   }
 
   /**
@@ -275,23 +406,101 @@ export async function registerConnectionRoutes(
     method: "GET",
     url: "/api/connections",
     schema: {
-      response: {
-        200: z.object({
-          /** False when no `ENCRYPTION_KEY` is set. The screen offers no save. */
-          canStore: z.boolean(),
-          storeBlocker: z.string().nullable(),
-          providers: z.array(providerSchema),
-        }),
-      },
+      response: { 200: connectionsSchema },
     },
-    handler: async () => {
-      const canStore = Boolean(optionalEncryptionKey(encryption));
+    handler: connectionsView,
+  });
 
-      return {
-        canStore,
-        storeBlocker: canStore ? null : noEncryptionKey,
-        providers: await Promise.all(providers.map(view)),
-      };
+  /**
+   * Record which provider fetches a platform.
+   *
+   * `PUT`, because one platform has one provider and sending it twice must
+   * leave one row. It answers with the whole screen rather than the one
+   * platform: a choice changes what the other platforms of the same provider
+   * are allowed to do, and a screen that patched one row would show a stale
+   * answer beside a fresh one.
+   *
+   * It does not touch a collection in flight. `source_continuations` carries
+   * the provider that started one, so this takes effect on the next
+   * collection and never resumes one provider's snapshot through the other.
+   */
+  app.route({
+    method: "PUT",
+    url: "/api/platforms/:platform/provider",
+    schema: {
+      params: z.object({ platform: z.string() }),
+      body: z.object({ provider: z.string() }),
+      response: { 200: connectionsSchema, 400: problemSchema, 404: problemSchema },
+    },
+    handler: async (request, reply) => {
+      const platform = platformEntries.find(
+        (entry) => entry.platform.id === request.params.platform,
+      );
+
+      if (!platform) {
+        return reply.code(404).send({
+          message:
+            `There is no platform "${request.params.platform}" in this build. ` +
+            `It has: ${platformEntries.map((entry) => entry.platform.id).join(", ") || "(none)"}.`,
+        });
+      }
+
+      // A pair no connector has is refused here rather than at the next poll.
+      // The database cannot check it — the pairs live in the registry, not in
+      // a constraint — so this is the check, and it names the alternatives.
+      if (!platform.providers.some((provider) => provider.id === request.body.provider)) {
+        return reply.code(400).send({
+          message:
+            `Nothing fetches ${platform.platform.displayName} through "${request.body.provider}". ` +
+            `It is fetched by: ${platform.providers.map((provider) => provider.id).join(", ")}.`,
+        });
+      }
+
+      await setProviderChoice(
+        db,
+        platform.platform.id as Source,
+        request.body.provider as Provider,
+      );
+
+      logger.info(
+        { platform: platform.platform.id, provider: request.body.provider },
+        "recorded which provider fetches a platform",
+      );
+
+      return connectionsView();
+    },
+  });
+
+  /**
+   * Forget the choice for a platform.
+   *
+   * The platform then answers by itself again whenever one provider can run,
+   * and asks again when two can. It is the undo for a choice, and it is not
+   * the same as disconnecting a provider: the keys stay.
+   */
+  app.route({
+    method: "DELETE",
+    url: "/api/platforms/:platform/provider",
+    schema: {
+      params: z.object({ platform: z.string() }),
+      response: { 200: connectionsSchema, 404: problemSchema },
+    },
+    handler: async (request, reply) => {
+      const platform = platformEntries.find(
+        (entry) => entry.platform.id === request.params.platform,
+      );
+
+      if (!platform) {
+        return reply.code(404).send({
+          message:
+            `There is no platform "${request.params.platform}" in this build. ` +
+            `It has: ${platformEntries.map((entry) => entry.platform.id).join(", ") || "(none)"}.`,
+        });
+      }
+
+      await clearProviderChoice(db, platform.platform.id as Source);
+
+      return connectionsView();
     },
   });
 

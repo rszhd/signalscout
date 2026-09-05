@@ -23,7 +23,8 @@
     "rotate-key": "tsx --env-file-if-exists=../../.env src/secrets/rotate-cli.ts",
     "capture:classifier": "tsx src/ai/fixtures/capture.ts",
     "capture:queries": "tsx src/ai/fixtures/capture-queries.ts",
-    "capture:embeddings": "tsx src/ai/fixtures/capture-embeddings.ts"
+    "capture:embeddings": "tsx src/ai/fixtures/capture-embeddings.ts",
+    "live:provider-switch": "tsx --env-file-if-exists=../../.env src/sources/live-provider-switch.ts"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "4.0.49",

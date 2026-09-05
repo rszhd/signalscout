@@ -42,6 +42,33 @@ export function fakeRegistry(
   });
 }
 
+/**
+ * Reddit under both of its providers, which is what a provider choice looks
+ * like.
+ *
+ * One fake per provider, each with its own posts, so a test can tell which one
+ * ran by what came back. US-026 needs it: every rule about choosing is a rule
+ * about a platform two connectors can fetch, and one connector cannot express
+ * it.
+ */
+export function twoProviderRegistry(
+  perProvider: Readonly<Record<string, FakeSourceOptions>> = {},
+  logger: Logger = silentLogger,
+): SourceRegistry {
+  return createSourceRegistry({
+    definitions: ["brightdata", "scrapecreators"].map((providerId) =>
+      fakeSourceDefinition({
+        id: "reddit",
+        displayName: "Reddit",
+        providerId,
+        providerName: providerId,
+        ...perProvider[providerId],
+      }),
+    ),
+    runtime: createSourceRuntime({ fetch: unreachableFetch, logger }),
+  });
+}
+
 export async function insertMonitor(
   database: TestDatabase,
   overrides: Record<string, unknown> = {},

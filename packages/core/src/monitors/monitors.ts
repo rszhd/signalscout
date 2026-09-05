@@ -17,7 +17,7 @@
 import { desc, eq, sql } from "drizzle-orm";
 import type { Database } from "../db/client.js";
 import { monitors, type Signal, type Source } from "../db/schema.js";
-import type { ConnectorDescriptor } from "../sources/types.js";
+import type { ConnectorDescriptor, ProviderChoices } from "../sources/types.js";
 import { type MissingCredential, missingCredentials } from "../worker/credentials.js";
 
 /** A monitor row, as Drizzle selects it. */
@@ -101,6 +101,15 @@ export interface MonitorEnvironment {
    * costs no key.
    */
   readonly storedCredentials?: ReadonlySet<string>;
+  /**
+   * Which provider fetches each platform, as somebody recorded it.
+   *
+   * Read so that this file and the poll agree. Without it a monitor whose
+   * platform is set to a provider with no key would look startable here and
+   * refuse at every poll, which is the failure US-010 wrote these rules to
+   * prevent, one axis further along.
+   */
+  readonly providerChoices?: ProviderChoices;
 }
 
 export interface CreatedMonitor {
@@ -144,11 +153,24 @@ export function monitorQueries(value: unknown): string[] {
  */
 export function startBlockers(
   sourceIds: readonly string[],
-  { descriptors, environment = process.env, storedCredentials }: MonitorEnvironment,
+  {
+    descriptors,
+    environment = process.env,
+    storedCredentials,
+    providerChoices = {},
+  }: MonitorEnvironment,
 ): MissingCredential[] {
   return sourceIds.flatMap((id) => {
-    const connectors = descriptors.filter((candidate) => candidate.platform.id === id);
-    const blockers = connectors.map((connector) =>
+    const all = descriptors.filter((candidate) => candidate.platform.id === id);
+
+    // A recorded choice narrows the question to one provider. Reading the
+    // other one's key as an answer here would report a monitor as startable
+    // that every poll then refuses, because `only` obeys the choice or
+    // refuses and never falls back to the provider nobody picked.
+    const chosen = providerChoices[id];
+    const connectors = chosen ? all.filter((candidate) => candidate.provider.id === chosen) : all;
+
+    const blockers = (connectors.length > 0 ? connectors : all).map((connector) =>
       missingCredentials(connector, environment, storedCredentials),
     );
 
@@ -161,6 +183,26 @@ export function startBlockers(
 
     return blockers.flat();
   });
+}
+
+/**
+ * The missing credentials as one sentence fragment a person can act on.
+ *
+ * Fields of one provider are joined with "and", because that account needs
+ * both. Providers are joined with "or", because a platform two providers fetch
+ * needs one of them and not both — and "and" there would tell a person to open
+ * an account they do not need. US-026.
+ */
+export function describeMissingCredentials(missing: readonly MissingCredential[]): string {
+  const byProvider = new Map<string, string[]>();
+
+  for (const credential of missing) {
+    const names = byProvider.get(credential.providerId) ?? [];
+    names.push(credential.environmentVariable);
+    byProvider.set(credential.providerId, names);
+  }
+
+  return [...byProvider.values()].map((names) => names.join(" and ")).join(" or ");
 }
 
 export async function listMonitors(db: Database): Promise<Monitor[]> {

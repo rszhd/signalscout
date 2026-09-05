@@ -49,12 +49,20 @@ interface Feedback {
   notRelevant: number;
 }
 
+/** Which provider last collected one platform for this monitor, and when. */
+interface LastCollection {
+  source: string;
+  provider: string;
+  at: string;
+}
+
 interface Monitor {
   id: string;
   name: string;
   sources: string[];
   paused: boolean;
   lastPolledAt: string | null;
+  lastCollected: LastCollection[];
   missingCredentials: MissingCredential[];
   budget: Budget | null;
   spend: Spend;
@@ -474,6 +482,21 @@ export function Monitors() {
                 </div>
                 <span className={`monitor-status ${running.tone}`}>{running.label}</span>
               </div>
+
+              {/* Who actually collected, which is not always who would collect
+                  now: the choice can be changed and this is the record of what
+                  ran. Read from the ledger, so the moment is when money was
+                  last spent on that pair. US-026. */}
+              {monitor.lastCollected.length > 0 && (
+                <p className="monitor-origin">
+                  {monitor.lastCollected
+                    .map(
+                      (one) =>
+                        `${one.source} via ${one.provider}, ${new Date(one.at).toLocaleString()}`,
+                    )
+                    .join(" · ")}
+                </p>
+              )}
 
               {/* The sentence that refused the poll, sent whole by the server,
                   so the screen and the worker's log say the same thing. */}

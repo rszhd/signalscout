@@ -1,3 +1,8 @@
+export {
+  clearProviderChoice,
+  readProviderChoices,
+  setProviderChoice,
+} from "./choices.js";
 export { fakePosts } from "./fake/fixtures.js";
 export {
   createFakeSource,
@@ -8,6 +13,8 @@ export {
   fakeSourceId,
 } from "./fake/index.js";
 export {
+  groupByPlatform,
+  type PlatformConnectors,
   platforms,
   redditPlatform,
   redditPlatformId,
@@ -34,9 +41,13 @@ export {
 } from "./providers/scrapecreators/reddit.js";
 export {
   AmbiguousConnectorError,
+  type ChoiceOptions,
   type ConnectorKey,
   type CreateSourceRegistryOptions,
   createSourceRegistry,
+  decideProvider,
+  NoUsableProviderError,
+  type ProviderDecision,
   type SourceRegistry,
   UnknownConnectorError,
   UnknownSourceError,
@@ -52,6 +63,7 @@ export type {
   NextPage,
   PlatformDescriptor,
   PlatformId,
+  ProviderChoices,
   ProviderDescriptor,
   ProviderId,
   SearchRequest,
@@ -75,8 +87,9 @@ import type { ConnectorDefinition } from "./types.js";
  * adds X. The interface was settled before any of them existed so that the
  * second connector is not the one that argues about the shape.
  *
- * Reddit now has two providers, so `registry.only("reddit")` needs a recorded
- * choice. `createSourceRegistry`'s `defaultProviders` is where it goes.
+ * Reddit now has two providers, so `registry.only("reddit")` may need a
+ * recorded choice. `source_providers` holds it, `choices.ts` reads it, and a
+ * deployment holding one provider's key needs no row.
  *
  * Adding a *provider* for a platform we already fetch is one new file under
  * `sources/providers/` and one line here. Adding a *platform* is a descriptor

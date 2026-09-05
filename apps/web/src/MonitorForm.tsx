@@ -10,16 +10,25 @@ interface SignalOption {
 }
 
 interface CredentialOption {
-  name: string;
+  providerId: string;
+  providerName: string;
   label: string;
   environmentVariable: string;
-  configured: boolean;
 }
 
+/**
+ * One platform, which is the only axis this form knows about.
+ *
+ * A person ticks networks to watch. Which account fetches them is a row on the
+ * connections screen, chosen once for every monitor, and US-026 is deliberate
+ * that it is not asked here: nobody picking where to listen wants to pick a
+ * scraper in the same breath.
+ */
 interface SourceOption {
   id: string;
   displayName: string;
-  credentials: CredentialOption[];
+  /** Empty when the platform can be collected. */
+  missingCredentials: CredentialOption[];
   ready: boolean;
 }
 
@@ -56,6 +65,32 @@ type OptionsState =
   | { state: "ready"; options: MonitorOptions };
 
 const emptyAnswers: Answers = { name: "", product: "", idealCustomer: "", problem: "" };
+
+/**
+ * The missing keys as one phrase, grouped by the account they belong to.
+ *
+ * Fields of one provider are joined with "and", because that account needs
+ * both. Providers are joined with "or", because a platform two providers fetch
+ * needs one of them — and "and" there would tell a person to open an account
+ * they do not need. The server's own sentence groups the same way.
+ */
+function describeMissing(missing: readonly CredentialOption[]): string {
+  const byProvider = new Map<string, { name: string; variables: string[] }>();
+
+  for (const credential of missing) {
+    const found = byProvider.get(credential.providerId) ?? {
+      name: credential.providerName,
+      variables: [],
+    };
+
+    found.variables.push(credential.environmentVariable);
+    byProvider.set(credential.providerId, found);
+  }
+
+  return [...byProvider.values()]
+    .map((provider) => `${provider.name} (${provider.variables.join(" and ")})`)
+    .join(" or ");
+}
 
 /** What the plan says, for telling a tested plan from an edited one. */
 function planSignature(queries: readonly string[], subreddits: readonly string[]): string {
@@ -137,9 +172,7 @@ export function MonitorForm() {
     () => options?.sources.filter((source) => selectedSources.includes(source.id)) ?? [],
     [options, selectedSources],
   );
-  const missingCredentials = selectedSourceOptions.flatMap((source) =>
-    source.credentials.filter((credential) => !credential.configured),
-  );
+  const missingCredentials = selectedSourceOptions.flatMap((source) => source.missingCredentials);
 
   const capMicros = cap.trim() === "" ? null : toMicros(cap);
   const queries = cleanList(plan.queries);
@@ -431,11 +464,8 @@ export function MonitorForm() {
                 <div className="notice warning" role="status">
                   <strong>This monitor will be saved paused.</strong>
                   <span>
-                    Set{" "}
-                    {missingCredentials
-                      .map((credential) => credential.environmentVariable)
-                      .join(" and ")}{" "}
-                    to start collecting. The answers will not be lost.
+                    Connect {describeMissing(missingCredentials)} to start collecting. The answers
+                    will not be lost.
                   </span>
                 </div>
               )}
@@ -661,11 +691,7 @@ export function MonitorForm() {
                 <div className="notice warning" role="status">
                   <strong>This monitor cannot start yet.</strong>
                   <span>
-                    It will be saved paused until{" "}
-                    {missingCredentials
-                      .map((credential) => credential.environmentVariable)
-                      .join(" and ")}{" "}
-                    is set.
+                    It will be saved paused until you connect {describeMissing(missingCredentials)}.
                   </span>
                 </div>
               )}
@@ -715,7 +741,7 @@ export function MonitorForm() {
               </h2>
               <p>
                 {created.paused
-                  ? `It will stay paused until ${created.missingCredentials.map((credential) => credential.environmentVariable).join(" and ")} is set.`
+                  ? `It will stay paused until you connect ${describeMissing(created.missingCredentials)}.`
                   : "IntentWatch will collect the first conversations on the monitor schedule."}
               </p>
               <button className="primary-button" type="button" onClick={reset}>

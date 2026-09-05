@@ -1,0 +1,2 @@
+ALTER TABLE "query_estimate_probes" ADD COLUMN "provider" text;--> statement-breakpoint
+ALTER TABLE "query_estimate_probes" ADD CONSTRAINT "query_estimate_probes_provider_known" CHECK (provider IS NULL OR provider IN ('brightdata', 'scrapecreators'));

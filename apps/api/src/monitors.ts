@@ -23,11 +23,14 @@ import {
   createMonitor,
   type Database,
   deleteMonitor,
-  environmentVariableFor,
+  describeMissingCredentials,
   exhaustedBehaviours,
   type FilterDropCounts,
   filterDropCounts,
   getMonitor,
+  groupByPlatform,
+  type LastCollection,
+  lastCollections,
   listMonitors,
   type Monitor,
   type MonitorEnvironment,
@@ -37,8 +40,10 @@ import {
   monitorQueries,
   noFilterDrops,
   noVerdicts,
+  type ProviderChoices,
   pauseMonitor,
   type QueryGenerator,
+  readProviderChoices,
   recordModelCall,
   resumeMonitor,
   searchQuerySchema,
@@ -221,6 +226,16 @@ const monitorSchema = z.object({
    * until US-004, so a monitor can become startable without its row changing.
    */
   missingCredentials: z.array(missingCredentialSchema),
+  /**
+   * Which provider last collected each platform, and when.
+   *
+   * US-026 added it, because a person who can change the provider has to be
+   * able to see which one ran. It is read from `api_usage`, so the moment is
+   * the last time money was spent on that pair rather than the last time a
+   * poll was scheduled — a poll refused by the budget guard moves nothing
+   * here, which is the honest answer.
+   */
+  lastCollected: z.array(z.object({ source: z.string(), provider: z.string(), at: z.string() })),
   /** Null when no cap is set. A monitor with no cap still records what it spends. */
   budget: budgetSchema.nullable(),
   spend: spendSchema,
@@ -273,8 +288,14 @@ export interface MonitorRoutesOptions {
 function monitorEnvironment(
   options: MonitorRoutesOptions,
   storedCredentials: ReadonlySet<string>,
+  providerChoices: ProviderChoices,
 ): MonitorEnvironment {
-  return { descriptors: options.sources, environment: options.environment, storedCredentials };
+  return {
+    descriptors: options.sources,
+    environment: options.environment,
+    storedCredentials,
+    providerChoices,
+  };
 }
 
 /** The pre-filter settings, as the core write functions take them. */
@@ -293,6 +314,7 @@ function toResponse(
   state: BudgetState,
   dropped: FilterDropCounts,
   verdicts: VerdictCounts,
+  collected: readonly LastCollection[],
 ) {
   return {
     id: monitor.id,
@@ -311,6 +333,11 @@ function toResponse(
     lastPolledAt: monitor.lastPolledAt?.toISOString() ?? null,
     createdAt: monitor.createdAt.toISOString(),
     missingCredentials: startBlockers(monitor.sources, runtime),
+    lastCollected: collected.map((one) => ({
+      source: one.source,
+      provider: one.provider,
+      at: one.at.toISOString(),
+    })),
     budget:
       state.capMicros === null || state.onExhausted === null
         ? null
@@ -340,10 +367,11 @@ function toResponse(
  * paths end in `toResponse`, so neither can grow a field the other lacks.
  */
 async function readResponse(db: Database, monitor: Monitor, runtime: MonitorEnvironment) {
-  const [state, drops, verdicts] = await Promise.all([
+  const [state, drops, verdicts, collected] = await Promise.all([
     checkBudget(db, monitor.id),
     filterDropCounts(db, [monitor.id]),
     verdictCounts(db, [monitor.id]),
+    lastCollections(db),
   ]);
 
   return toResponse(
@@ -352,6 +380,7 @@ async function readResponse(db: Database, monitor: Monitor, runtime: MonitorEnvi
     state,
     drops.get(monitor.id) ?? noFilterDrops,
     verdicts.get(monitor.id) ?? noVerdicts,
+    collected.get(monitor.id) ?? [],
   );
 }
 
@@ -372,7 +401,16 @@ export async function registerMonitorRoutes(
   const stored = options.storedCredentials ?? (() => new Set<string>());
 
   async function currentEnvironment(): Promise<MonitorEnvironment> {
-    return monitorEnvironment(options, await stored());
+    // Both halves per request, and for the same reason: the connections screen
+    // writes a key and a provider choice into this running process, and a
+    // value captured at registration would keep answering with the old one
+    // until a restart.
+    const [storedCredentials, providerChoices] = await Promise.all([
+      stored(),
+      readProviderChoices(db),
+    ]);
+
+    return monitorEnvironment(options, storedCredentials, providerChoices);
   }
 
   /**
@@ -393,16 +431,8 @@ export async function registerMonitorRoutes(
             z.object({
               id: z.string(),
               displayName: z.string(),
-              billableUnit: z.string(),
-              pricePerUnitMicros: z.number(),
-              credentials: z.array(
-                z.object({
-                  name: z.string(),
-                  label: z.string(),
-                  environmentVariable: z.string(),
-                  configured: z.boolean(),
-                }),
-              ),
+              /** Empty when the platform can be collected. */
+              missingCredentials: z.array(missingCredentialSchema),
               ready: z.boolean(),
             }),
           ),
@@ -416,26 +446,31 @@ export async function registerMonitorRoutes(
 
       return {
         signals: signalList.map(({ id, label, hint }) => ({ id, label, hint })),
-        sources: sources.map((source) => {
-          const missing = startBlockers([source.platform.id], runtime);
+        /**
+         * One row per platform, not per connector.
+         *
+         * US-026, and it is the whole of what this form knows about providers.
+         * A person ticks networks to watch; which account fetches them is one
+         * row on the connections screen, chosen once for every monitor. Two
+         * Reddit connectors listed here would put Reddit on the form twice and
+         * make the person pick a scraper.
+         *
+         * The price is gone from this response for the same reason. It belongs
+         * to the pair, and two providers do not agree about it, so a figure
+         * printed beside a platform would be one provider's arithmetic on the
+         * other's bill. The cost test reads it from the connector that took
+         * the sample.
+         */
+        sources: groupByPlatform(sources).map(({ platform }) => {
+          const missing = startBlockers([platform.id], runtime);
 
           return {
-            id: source.platform.id,
-            displayName: source.platform.displayName,
-            billableUnit: source.billableUnit,
-            pricePerUnitMicros: source.pricePerUnitMicros,
-            credentials: source.provider.credentialFields.map((field) => ({
-              name: field.name,
-              label: field.label,
-              // The one naming rule, from the one file that holds it. A second
-              // copy here would name a variable that does not exist the first
-              // time either rule changes. It names the provider, not the
-              // platform beside it: US-024 moved a key to the account it is on.
-              environmentVariable: environmentVariableFor(source.provider.id, field.name),
-              // Never the value itself, set or not. US-004 encrypts these; an
-              // endpoint that echoed one would make that pointless.
-              configured: !missing.some((credential) => credential.field === field.name),
-            })),
+            id: platform.id,
+            displayName: platform.displayName,
+            // What is still to be set, from whichever providers are blocked.
+            // Each entry names its provider, so a platform two providers fetch
+            // can be shown as needing one account or the other, never both.
+            missingCredentials: missing,
             ready: missing.length === 0,
           };
         }),
@@ -524,10 +559,11 @@ export async function registerMonitorRoutes(
       // screen that shows this is a list, and a per-row query here would be
       // the list's cost growing with the number of monitors.
       const rows = await listMonitors(db);
-      const [states, drops, verdicts] = await Promise.all([
+      const [states, drops, verdicts, collected] = await Promise.all([
         budgetStates(db),
         filterDropCounts(db),
         verdictCounts(db),
+        lastCollections(db),
       ]);
 
       return Promise.all(
@@ -543,6 +579,7 @@ export async function registerMonitorRoutes(
             states.get(monitor.id) ?? (await checkBudget(db, monitor.id)),
             drops.get(monitor.id) ?? noFilterDrops,
             verdicts.get(monitor.id) ?? noVerdicts,
+            collected.get(monitor.id) ?? [],
           ),
         ),
       );
@@ -646,12 +683,15 @@ export async function registerMonitorRoutes(
       if (!result) return reply.code(404).send({ message: "No monitor has that id." });
 
       if (result.status === "blocked") {
-        const names = result.missing.map((credential) => credential.environmentVariable);
+        // "and" inside one provider, "or" between providers. A platform two
+        // providers fetch needs one account, and a sentence that joined them
+        // with "and" would send a person to open the second one.
+        const names = describeMissingCredentials(result.missing);
 
         return reply.code(409).send({
           message:
-            `This monitor cannot start until ${names.join(" and ")} ` +
-            `${names.length === 1 ? "is" : "are"} set.`,
+            `This monitor cannot start until ${names} ` +
+            `${result.missing.length === 1 ? "is" : "are"} set.`,
           missingCredentials: [...result.missing],
         });
       }

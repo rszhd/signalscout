@@ -27,6 +27,7 @@ import {
   readEncryptionKey,
   type SocialSource,
   sourceCredentials,
+  sourceProviders,
 } from "@intentwatch/core";
 import { createTestDatabase, type TestDatabase } from "@intentwatch/core/testing";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
@@ -91,6 +92,7 @@ describe("connecting a provider", () => {
 
   afterEach(async () => {
     await db.delete(sourceCredentials);
+    await db.delete(sourceProviders);
     await db.delete(monitors);
   });
 
@@ -112,6 +114,28 @@ describe("connecting a provider", () => {
 
   async function stored() {
     return listCredentialHints(db);
+  }
+
+  /** Reddit through both of its providers, which is what a choice looks like. */
+  function bothRedditProviders(): ConnectorDefinition[] {
+    return [
+      acceptsOnly(goodKey),
+      fakeSourceDefinition({
+        id: "reddit",
+        displayName: "Reddit",
+        providerId: "scrapecreators",
+        providerName: "ScrapeCreators",
+        credentialFields: [{ name: "apiKey", label: "ScrapeCreators API key", secret: true }],
+        validCredentials: { apiKey: goodKey },
+      }),
+    ];
+  }
+
+  function platformIn(body: { platforms: { id: string }[] }, id = "reddit") {
+    const found = body.platforms.find((platform) => platform.id === id);
+    if (!found) throw new Error(`The response has no platform "${id}".`);
+
+    return found as Record<string, unknown>;
   }
 
   describe("what the screen is told", () => {
@@ -571,6 +595,217 @@ describe("connecting a provider", () => {
           (await app.inject({ method: "GET", url: "/api/monitor-options" })).json().sources[0]
             .ready,
         ).toBe(false);
+      } finally {
+        await app.close();
+      }
+    });
+  });
+  /**
+   * Which provider fetches a platform.
+   *
+   * US-026 put it on this screen and not on the monitor form: a person ticks
+   * networks to watch, and which account pays for each one is decided once,
+   * here, for every monitor. The rules are `decideProvider`'s, so what these
+   * cases own is the sentence a person reads and what the routes write.
+   */
+  describe("which provider fetches a platform", () => {
+    it("names the one provider, and asks nothing, when only one has a key", async () => {
+      // The common deployment: two connectors in the build, one account held.
+      const app = await server({
+        sources: bothRedditProviders(),
+        environment: { BRIGHTDATA_API_KEY: goodKey },
+      });
+
+      try {
+        const body = (await app.inject({ method: "GET", url: "/api/connections" })).json();
+        const reddit = platformIn(body);
+
+        expect(reddit.effective).toBe("brightdata");
+        expect(reddit.needsChoice).toBe(false);
+        expect(reddit.chosen).toBe(null);
+        expect(reddit.blocker).toBe(null);
+      } finally {
+        await app.close();
+      }
+    });
+
+    it("asks which one, once both have a key", async () => {
+      const app = await server({
+        sources: bothRedditProviders(),
+        environment: { BRIGHTDATA_API_KEY: goodKey, SCRAPECREATORS_API_KEY: goodKey },
+      });
+
+      try {
+        const body = (await app.inject({ method: "GET", url: "/api/connections" })).json();
+        const reddit = platformIn(body);
+
+        expect(reddit.needsChoice).toBe(true);
+        expect(reddit.effective).toBe(null);
+        expect(reddit.blocker).toContain("Choose one");
+        expect(reddit.providers).toEqual([
+          { id: "brightdata", displayName: "Bright Data", connected: true },
+          { id: "scrapecreators", displayName: "ScrapeCreators", connected: true },
+        ]);
+      } finally {
+        await app.close();
+      }
+    });
+
+    it("records the choice, and reads it back after the write", async () => {
+      const app = await server({
+        sources: bothRedditProviders(),
+        environment: { BRIGHTDATA_API_KEY: goodKey, SCRAPECREATORS_API_KEY: goodKey },
+      });
+
+      try {
+        const written = await app.inject({
+          method: "PUT",
+          url: "/api/platforms/reddit/provider",
+          payload: { provider: "scrapecreators" },
+        });
+
+        expect(written.statusCode).toBe(200);
+        expect(platformIn(written.json()).chosen).toBe("scrapecreators");
+
+        const reread = platformIn(
+          (await app.inject({ method: "GET", url: "/api/connections" })).json(),
+        );
+
+        expect(reread.chosen).toBe("scrapecreators");
+        expect(reread.effective).toBe("scrapecreators");
+        expect(reread.needsChoice).toBe(false);
+      } finally {
+        await app.close();
+      }
+    });
+
+    it("forgets a choice, and asks again", async () => {
+      const app = await server({
+        sources: bothRedditProviders(),
+        environment: { BRIGHTDATA_API_KEY: goodKey, SCRAPECREATORS_API_KEY: goodKey },
+      });
+
+      try {
+        await app.inject({
+          method: "PUT",
+          url: "/api/platforms/reddit/provider",
+          payload: { provider: "scrapecreators" },
+        });
+
+        const cleared = await app.inject({
+          method: "DELETE",
+          url: "/api/platforms/reddit/provider",
+        });
+
+        expect(cleared.statusCode).toBe(200);
+        expect(platformIn(cleared.json()).chosen).toBe(null);
+        expect(platformIn(cleared.json()).needsChoice).toBe(true);
+      } finally {
+        await app.close();
+      }
+    });
+
+    it("refuses a provider that does not fetch the platform, and names the ones that do", async () => {
+      // The database cannot check this: the pairs live in the registry, not in
+      // a constraint. So it is checked here, and refused rather than written
+      // to be discovered at the next poll.
+      const app = await server({
+        sources: bothRedditProviders(),
+        environment: { BRIGHTDATA_API_KEY: goodKey },
+      });
+
+      try {
+        const refused = await app.inject({
+          method: "PUT",
+          url: "/api/platforms/reddit/provider",
+          payload: { provider: "a-provider-that-does-not-fetch-reddit" },
+        });
+
+        expect(refused.statusCode).toBe(400);
+        expect(refused.json().message).toContain("brightdata, scrapecreators");
+        expect(
+          platformIn((await app.inject({ method: "GET", url: "/api/connections" })).json()).chosen,
+        ).toBe(null);
+      } finally {
+        await app.close();
+      }
+    });
+
+    it("says a platform is unavailable, with the reason, when nothing can fetch it", async () => {
+      const app = await server({ sources: bothRedditProviders(), environment: {} });
+
+      try {
+        const reddit = platformIn(
+          (await app.inject({ method: "GET", url: "/api/connections" })).json(),
+        );
+
+        expect(reddit.effective).toBe(null);
+        expect(reddit.needsChoice).toBe(false);
+        expect(reddit.blocker).toContain("No provider is connected for Reddit");
+        // One account or the other, never both. A sentence joining them with
+        // "and" would send a person to open a second account they do not need.
+        expect(reddit.blocker).toContain("Bright Data or ScrapeCreators");
+      } finally {
+        await app.close();
+      }
+    });
+
+    it("says a chosen provider that lost its key is the reason, not the missing one", async () => {
+      // Falling back to the connected provider would collect on an account the
+      // person did not pick, at a price they never saw. The screen names the
+      // choice and both repairs instead.
+      const app = await server({
+        sources: bothRedditProviders(),
+        environment: { BRIGHTDATA_API_KEY: goodKey, SCRAPECREATORS_API_KEY: goodKey },
+      });
+
+      try {
+        await app.inject({
+          method: "PUT",
+          url: "/api/platforms/reddit/provider",
+          payload: { provider: "scrapecreators" },
+        });
+      } finally {
+        await app.close();
+      }
+
+      const afterRotation = await server({
+        sources: bothRedditProviders(),
+        environment: { BRIGHTDATA_API_KEY: goodKey },
+      });
+
+      try {
+        const reddit = platformIn(
+          (await afterRotation.inject({ method: "GET", url: "/api/connections" })).json(),
+        );
+
+        expect(reddit.effective).toBe(null);
+        expect(reddit.blocker).toContain("set to fetch through ScrapeCreators");
+
+        // And the monitor form agrees: a monitor on Reddit cannot start.
+        const options = (
+          await afterRotation.inject({ method: "GET", url: "/api/monitor-options" })
+        ).json();
+
+        expect(options.sources[0].ready).toBe(false);
+        expect(options.sources[0].missingCredentials[0].providerId).toBe("scrapecreators");
+      } finally {
+        await afterRotation.close();
+      }
+    });
+
+    it("answers 404 for a platform this build does not have", async () => {
+      const app = await server({ sources: bothRedditProviders(), environment: {} });
+
+      try {
+        const answer = await app.inject({
+          method: "PUT",
+          url: "/api/platforms/bluesky/provider",
+          payload: { provider: "brightdata" },
+        });
+
+        expect(answer.statusCode).toBe(404);
+        expect(answer.json().message).toContain("reddit");
       } finally {
         await app.close();
       }

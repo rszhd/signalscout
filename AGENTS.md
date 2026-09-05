@@ -88,12 +88,15 @@ before touching a connector: the interface does not change to suit a provider.
 neither the price nor the key. A *platform* is what a person ticks — it keys
 `posts.source` and deduplication, and a monitor names it. A *provider* is who
 fetches, whose key it is, and what it bills. A *connector* is the pair, and it
-is what the registry holds. Four columns carry the provider beside the platform:
+is what the registry holds. Six columns carry the provider beside the platform:
 `api_usage`, `source_continuations`, `posts` (attribution only, and outside the
-deduplication key) and `source_credentials` (keyed by provider alone). An
-environment variable is named after the provider — `BRIGHTDATA_API_KEY`, with
-`REDDIT_API_KEY` read as a deprecated fallback — and the connections screen is
-keyed by provider too, because one key serves every platform behind it.
+deduplication key), `source_credentials` (keyed by provider alone),
+`query_estimate_probes` (a sample holds a cursor, so it belongs to the provider
+that took it, and its price comes from the pair) and `source_providers`
+(US-026's store of who fetches what). An environment variable is named after
+the provider — `BRIGHTDATA_API_KEY`, with `REDDIT_API_KEY` read as a deprecated
+fallback — and the connections screen is keyed by provider too, because one key
+serves every platform behind it.
 
 The split changed no behaviour, and the suite is the evidence: no expected value
 moved except the ones the ticket asked to move. What it did not do is run live.
@@ -123,13 +126,44 @@ What is still unproven for this connector: a real rate limit, a real timeout,
 and keyword discovery at any volume. The 429 branch is our half of a contract
 the provider has not yet shown us.
 
-**`registry.only(platform)` now reads a recorded choice.** A monitor names a
-platform and its row records no provider, so every caller with one and not the
-other goes through `only`. It refuses to answer from registration order, and
-reads `defaultProviders` instead — filled today from `REDDIT_PROVIDER`, and by
-US-026 from a stored choice per platform. A deployment holding one provider's
-key needs no entry, which is the common case. A default naming a provider that
-does not fetch the platform is refused, not ignored.
+**A person chooses which provider fetches a platform, and the common
+deployment is never asked.** US-026 closed on 2026-09-05. A monitor names a
+platform and its row records no provider, so `registry.only` decides, and
+`decideProvider` is the one rule it and every screen read. The order is: a
+recorded choice that can run wins; a recorded choice that cannot run is refused
+rather than replaced; one provider that can run is its own answer; two that can
+run and no choice is an error. "Can run" means this deployment holds the key,
+which is why a build shipping two Reddit connectors asks nothing of an instance
+holding one. `source_providers` is the store, one row per platform, and no row
+is the normal state. `REDDIT_PROVIDER` is gone.
+
+Three things follow, and each has a test. The choice is read per poll, so a
+change takes effect on the next collection with no restart. It never reaches a
+collection already running, because `source_continuations` carries the provider
+that started one and the poll resumes through that provider — a cursor is a
+snapshot id the other provider has never heard of. And `api_usage` is keyed by
+the pair, so a switch splits the month's spend across two rows rather than
+pricing one account's month at the other's rate.
+
+**The switch has been made live, mid-collection.** On 2026-09-05
+`live:provider-switch` triggered a Bright Data collection of r/softwaretesting,
+moved the recorded choice to ScrapeCreators one second later while the snapshot
+was still collecting, and watched what happened. All four resumes went back to
+Bright Data with Bright Data's own cursor
+(`subreddit|sd_mto9lmkh1w5v9syrux|0`); ScrapeCreators was never asked. The
+snapshot closed after 2 minutes 13 seconds with 50 records for $0.075. Only
+then did the next collection go to ScrapeCreators: 47 posts for 2 requests and
+$0.00376. `api_usage` holds two rows, one per provider, each priced by the
+connector that ran.
+
+Two numbers came with it. **The same subreddit cost twenty times less through
+ScrapeCreators**, measured back to back rather than on separate days. And
+**Bright Data's snapshot was ready in 2 minutes 13 seconds**, against US-022's
+8 minutes 40 — so that figure is a sample and not a constant.
+
+The whole run stored no new post. All 50 records and all 47 posts were already
+in the table from earlier runs, and `posts` stayed at 174: deduplication across
+two providers, again, live.
 
 **The embedder has met a real provider once.** On 2026-09-05
 `capture:embeddings` embedded PLAN.md's example monitor and the five fake posts
@@ -421,12 +455,13 @@ backlog/index.sh --check      # exit 1 if either list is stale
 pnpm --filter @intentwatch/core capture:classifier   # spends money; see below
 pnpm --filter @intentwatch/core capture:queries      # spends money; see below
 pnpm --filter @intentwatch/core capture:embeddings   # spends money; see below
+pnpm --filter @intentwatch/core live:provider-switch # spends ~$0.08; see below
 ```
 
-These three are the only commands here that spend money, and all three are
-instruments: they ask a real model something and record what it said, because
-an answer we wrote would be evidence about our own schema and none about the
-model.
+These four are the only commands here that spend money, and all four are
+instruments: they ask a real provider something and record what it said,
+because an answer we wrote would be evidence about our own schema and none
+about the provider.
 
 `capture:classifier` scores PLAN.md's four worked examples, records the answers
 as the fixtures `ai/examples.test.ts` replays, and prints the scores that
@@ -443,6 +478,14 @@ a quarter of a megabyte to re-prove arithmetic `pgvector` already does.
 `ai/similarity.test.ts` replays them and fails if the default threshold leaves
 the measured gap. Two short calls, well under a hundredth of a cent. It needs
 an embedding provider: Anthropic has none.
+
+`live:provider-switch` is the fourth, and it is different in kind: it asks two
+real social-data providers rather than a model, and it writes rows. It starts a
+Bright Data collection, moves the recorded provider to ScrapeCreators while
+that snapshot is still collecting, and reports which provider each resume went
+to and what each one billed. It spends about $0.08 and leaves behind a paused
+monitor and two `api_usage` rows, which are the evidence. Run it when
+`collect.ts` changes how a provider is chosen or resumed.
 
 Re-run any of them when its prompt, its schema or the model changes, and put
 the numbers in the ticket.

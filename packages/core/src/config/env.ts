@@ -1,6 +1,5 @@
 import { z } from "zod";
 import { aiProviders, embeddingProviders } from "../ai/config.js";
-import { providers } from "../db/schema.js";
 import { encryptionKeyIsWellFormed } from "../secrets/cipher.js";
 
 /**
@@ -111,19 +110,6 @@ export const envSchema = z.object({
       })
       .optional(),
   ),
-
-  /**
-   * Which provider fetches Reddit, when more than one is registered.
-   *
-   * US-025 gave Reddit a second provider, and `registry.only` refuses to
-   * choose: answering with whichever was registered first would spend money at
-   * a provider nobody picked. This is where the choice is recorded until
-   * US-026 stores one per platform and shows it in settings.
-   *
-   * Unset is correct for a deployment holding one provider's key, which is the
-   * common case: with one connector able to run there is nothing to choose.
-   */
-  REDDIT_PROVIDER: blankIsUnset(z.enum(providers).optional()),
 
   HOST: z.string().min(1).default("0.0.0.0"),
   PORT: z.coerce.number().int().min(1).max(65535).default(3000),

@@ -12,6 +12,7 @@
  */
 import {
   builtInSources,
+  clearProviderChoice,
   createDatabase,
   createLogger,
   type Database,
@@ -28,6 +29,7 @@ import {
   recordFilterDrops,
   recordSourceUsage,
   recordVerdict,
+  setProviderChoice,
 } from "@intentwatch/core";
 import { createTestDatabase, type TestDatabase } from "@intentwatch/core/testing";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
@@ -169,20 +171,51 @@ describe("the monitor routes", () => {
         const body = (await app.inject({ method: "GET", url: "/api/monitor-options" })).json();
         const reddit = body.sources.find((source: { id: string }) => source.id === "reddit");
 
+        // Both of Reddit's providers, because neither has a key here. Each
+        // entry names its own account, so the screen can offer one *or* the
+        // other: a person needs one Reddit provider, never both. US-026.
         expect(reddit.ready).toBe(false);
-        expect(reddit.credentials).toEqual([
-          {
-            name: "apiKey",
-            label: "Bright Data API key",
-            environmentVariable: "BRIGHTDATA_API_KEY",
-            configured: false,
-          },
-        ]);
+        expect(
+          reddit.missingCredentials.map((credential: { environmentVariable: string }) => [
+            credential.environmentVariable,
+          ]),
+        ).toEqual([["BRIGHTDATA_API_KEY"], ["SCRAPECREATORS_API_KEY"]]);
+        expect(reddit.missingCredentials[0]).toEqual({
+          sourceId: "reddit",
+          sourceName: "Reddit",
+          providerId: "brightdata",
+          providerName: "Bright Data",
+          field: "apiKey",
+          label: "Bright Data API key",
+          environmentVariable: "BRIGHTDATA_API_KEY",
+        });
+      });
+    });
+
+    it("lists one row per platform, whatever a platform's providers", async () => {
+      /**
+       * US-026. The build ships two Reddit connectors and the form must not
+       * show Reddit twice, or ask a person to pick a scraper while they are
+       * choosing where to listen. Which account fetches a platform is the
+       * connections screen's question, and it is answered once for every
+       * monitor.
+       */
+      await withServer({}, async (app) => {
+        const body = (await app.inject({ method: "GET", url: "/api/monitor-options" })).json();
+
+        expect(builtInSources.filter((source) => source.platform.id === "reddit")).toHaveLength(2);
+        expect(body.sources.map((source: { id: string }) => source.id)).toEqual(["reddit"]);
+        // And no price beside it. Two providers do not agree about what a
+        // Reddit record costs, so a figure printed here would be one
+        // provider's arithmetic on the other's bill.
+        expect(body.sources[0]).not.toHaveProperty("pricePerUnitMicros");
       });
     });
 
     it("never returns the credential itself", async () => {
-      await withServer({}, async (app) => {
+      // With no key set, so the variable is named. A configured deployment
+      // names nothing, which is the case above.
+      await withServer({ environment: unconfigured }, async (app) => {
         const response = await app.inject({ method: "GET", url: "/api/monitor-options" });
 
         expect(response.body).toContain("BRIGHTDATA_API_KEY");
@@ -516,6 +549,32 @@ describe("the monitor routes", () => {
         const [row] = await db.select().from(monitors);
         expect(row?.pausedAt).not.toBeNull();
       });
+    });
+
+    it("refuses to resume when the chosen provider is the one with no key", async () => {
+      /**
+       * US-026. Bright Data has a key and ScrapeCreators does not, so the old
+       * rule — a platform is blocked only when every connector for it is —
+       * would call this monitor startable. It is not: the poll obeys the
+       * choice or refuses, and it never moves the collection to the account
+       * nobody picked. The two have to agree, or a monitor starts and then
+       * refuses every poll for ever.
+       */
+      await setProviderChoice(db, "reddit", "scrapecreators");
+
+      try {
+        await withServer({ environment: configured }, async (app) => {
+          const id = await create(app);
+
+          const response = await app.inject({ method: "POST", url: `/api/monitors/${id}/resume` });
+
+          expect(response.statusCode).toBe(409);
+          expect(response.json().message).toContain("SCRAPECREATORS_API_KEY");
+          expect(response.json().message).not.toContain("BRIGHTDATA_API_KEY");
+        });
+      } finally {
+        await clearProviderChoice(db, "reddit");
+      }
     });
 
     it("lists what has been created", async () => {

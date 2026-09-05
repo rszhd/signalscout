@@ -80,10 +80,16 @@ provider are different answers — 200 with `valid: false` and the provider's ow
 sentence, against 502 — because they lead to different actions. Read
 docs/secrets.md, *Testing before storing*.
 
-**Reddit's own API is closed to us.** Reddit ended self-serve app registration
-in November 2025. Reddit is reached through Bright Data instead, and X through
-its official pay-per-use API. Read STACK.md, *A source is not a provider*,
-before touching a connector: the interface does not change to suit a provider.
+**Neither platform is reached through its own API.** Reddit ended self-serve
+app registration in November 2025. X's own API is pay-per-use with no free
+tier, and on 2026-09-05 the owner decided not to use it. Both platforms are
+reached through data providers, and the two we have are Bright Data and
+ScrapeCreators. Reddit runs through both. X runs through one of them, chosen in
+US-006 by a price we read from the provider that will send the bill. **No X
+price is measured yet, at either provider.** $0.005 per read is X's own price
+and it does not travel to anybody else. Read STACK.md, *A source is not a
+provider*, before touching a connector: the interface does not change to suit a
+provider.
 
 **A platform and a provider are separate things.** US-024 split them on
 2026-09-05, because two providers will fetch Reddit and they agree about
@@ -409,6 +415,7 @@ Do not reopen these without being asked. The reasoning is in
 | A managed auth service | Better Auth in our own Postgres |
 | An in-memory Postgres fake | Real Postgres, from the first test file |
 | A Reddit API key per user | Reddit through a provider: Bright Data or ScrapeCreators |
+| X's own pay-per-use API | X through the same providers: Bright Data or ScrapeCreators |
 | One record describing a source | A platform and a provider, separate; a connector is the pair |
 
 **One row above was reversed on 2026-09-05.** It read: *a provider picker in the

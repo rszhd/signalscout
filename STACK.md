@@ -138,13 +138,15 @@ design more than any framework choice.
 | Reddit read, Bright Data free allowance | $0, first 5,000 records each month |
 | Reddit read, Bright Data pay-as-you-go | $0.0015 ($1.50 per 1,000 records) |
 | Reddit read, ScrapeCreators | ~$0.00008 to $0.00027, measured |
-| X read, pay-per-use | $0.005 |
+| X read, Bright Data or ScrapeCreators | not measured; US-006 reads it |
 | Embedding pre-filter | ~$0.00001 |
 | AI classification, cheap model | ~$0.001 |
 
-**Fetching an X post costs about five times more than classifying it.** The money
-is spent before our code ever sees the text. Reddit through Bright Data costs
-about a third of an X read, and starts free, so Reddit still carries the MVP.
+**The money is spent before our code ever sees the text.** That holds for every
+row above, and it is what the budget guard is built on. Reddit through Bright
+Data starts free, so Reddit carries the MVP. What an X post costs is an open
+number: we no longer plan to buy X's own API, and neither provider's X price has
+been read or paid. US-006 records it from the provider that will send the bill.
 
 **The two Reddit providers do not bill the same thing, and the gap is large.**
 Bright Data bills a record, so a post costs $0.0015 whatever else happens.
@@ -261,12 +263,21 @@ one.
 
 ## X
 
-Pay-per-use, and since February 2026 that is the only self-serve path: Basic and
-Pro are closed to new signups, and there is no free tier. $0.005 per post read,
-no monthly minimum. Roughly $25 buys 5,000 reads, or about 165 posts per day.
+**X is reached through a data provider, not through X's own API.** The owner
+decided this on 2026-09-05, and it settles a question US-006 had left open.
+Bright Data and ScrapeCreators both offer X, so X uses the two accounts a user
+already holds for Reddit, and the connections screen asks for no third key.
 
-**No free tier plus per-read billing makes the budget guard a prerequisite, not
-a follow-up.** US-013 and US-014 land before the X connector, not after it.
+X's own API is the path we are not taking. Since February 2026 pay-per-use is
+its only self-serve tier: Basic and Pro are closed to new signups, there is no
+free tier, and a post read costs $0.005. That number describes X and nobody
+else. Do not copy it onto a provider descriptor. `pricePerUnitMicros` comes
+from the provider that will send the bill, and until US-006 reads one, we have
+no X price at all.
+
+**Per-read billing makes the budget guard a prerequisite, not a follow-up.**
+US-013 and US-014 landed before the X connector, which is the order this said
+was needed.
 
 ---
 
@@ -310,10 +321,12 @@ cost dial we can set from the UI.
 
 ## 4. Respect the provider's throttle
 
-Every provider says "slow down" in its own dialect. Reddit's own API sends
-`X-Ratelimit-Remaining` and `X-Ratelimit-Reset`; Bright Data answers a large
-request with a `snapshot_id` to poll; X sends neither. Read that signal in the
-connector and back off there. Do not poll on a fixed timer and hope.
+Every provider says "slow down" in its own dialect, and the dialect that
+matters is the one spoken by whoever bills us. Bright Data answers a large
+request with a `snapshot_id` to poll; ScrapeCreators answers synchronously and
+reports `credits_charged`. Neither has yet shown us a real rate limit. Read that
+signal in the connector and back off there. Do not poll on a fixed timer and
+hope.
 
 Put this in the connector's own folder, not in the worker, so every caller gets
 it and no caller learns how the connector found out. `NextPage` is the whole

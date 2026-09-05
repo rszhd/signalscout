@@ -108,17 +108,16 @@ Honest numbers, because a tool that spends your money should say what it spends.
 | | Cost |
 |---|---|
 | Reddit, via Bright Data | free for the first 5,000 posts each month, then $0.0015 per post |
-| X, pay-per-use | $0.005 per post read, no subscription, no free tier |
+| X, via Bright Data or ScrapeCreators | not measured yet; the X connector is not built |
 | Embedding pre-filter | roughly $0.00001 per post |
 | Classification | roughly $0.001 per post with a cheap model |
 
 **The money is spent at fetch time**, before any filter sees the text. So every
 monitor has a spending cap, every query can be cost-tested before it runs, and
-the app shows what it spent. About $25 of X credit buys roughly 5,000 post
-reads.
+the app shows what it spent.
 
-Reddit is the cheap source: free to start, and about a third the cost of X after
-that. Reddit alone is a useful product.
+Reddit is the cheap source: free to start through Bright Data. Reddit alone is a
+useful product, which is as well, because X is not built yet.
 
 ### Reddit comes through Bright Data, and you should know why
 
@@ -143,6 +142,13 @@ say it here than let you find it in an agreement you skimmed.
 
 If you have a Reddit client id issued before November 2025, it still works.
 There is no connector for it today. Open an issue if you want one.
+
+**X comes the same way.** X sells reads through its own API at $0.005 each,
+with no free tier, and we chose not to build on it. Bright Data and
+ScrapeCreators both offer X, so the key you already connected covers it, and
+the same warning applies: your X data arrives through a company that is not X,
+under an agreement that puts the compliance burden on you. The X connector is
+not built yet.
 
 #### Connecting it
 

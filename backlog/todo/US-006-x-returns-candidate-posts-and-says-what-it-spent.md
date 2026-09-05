@@ -19,16 +19,22 @@ the person's own bearer token, at $0.005 per post read, no free tier. About $25
 buys 5,000 reads, or roughly 165 posts a day. That is still true of X's own
 API, and it is no longer the only way to reach X.
 
-**X is now a platform with more than one provider.** US-024 separates the two
-axes, and both ScrapeCreators and Bright Data offer X. So this ticket delivers
-X through **one** provider, and which one is a measured decision rather than
-the assumption this ticket started with. Take the provider whose price and
-billable unit are known, record the price and the date it was read, and say in
-the Log why that provider went first. A second provider for X is a later
-ticket, and US-026 already decides how a person chooses between them.
+**X's own API is out of scope, by decision.** On 2026-09-05 the owner settled
+it: X is reached through a data provider, the same way Reddit is. We do not ask
+a user for an X bearer token and we do not build against X's endpoints. The
+reason is the one Reddit taught us — a per-user platform key is a door the
+platform can close, and X charges for every read behind it. This is now written
+in STACK.md, *X*, and in the settled-decisions table in AGENTS.md.
+
+**So this ticket delivers X through one provider, and which one is measured.**
+US-024 separated the two axes, and both Bright Data and ScrapeCreators offer X.
+Take the provider whose price and billable unit you can read, record the price,
+the page and the date, and say in the Log why that one went first. A second
+provider for X is a later ticket, and US-026 already decides how a person
+chooses between them.
 
 One number does not travel between providers. $0.005 is the price of one read
-from X's own API. It says nothing about what a scraping provider charges, and
+from X's own API. It says nothing about what a data provider charges, and
 copying it onto another provider's descriptor would feed the budget guard a
 figure nobody measured. `pricePerUnitMicros` comes from the provider that will
 send the bill.
@@ -46,7 +52,8 @@ US-013 shipped, so this ticket no longer waits on it.
 ## Acceptance
 
 - [ ] X is registered as a platform, with one provider fetching it through the
-      interface US-024 settled
+      interface US-024 settled, and that provider is Bright Data or
+      ScrapeCreators — never X's own API
 - [ ] The Log names the provider, its price, its billable unit, the page the
       price came from and the date it was read
 - [ ] An invalid credential fails validation with the provider's own sentence,
@@ -80,7 +87,8 @@ US-013 shipped, so this ticket no longer waits on it.
 - [US-013](../done/2026-09/US-013-a-monitor-cannot-spend-past-its-budget.md)
   and [US-014](../done/2026-09/US-014-a-querys-cost-is-known-before-it-runs.md)
   shipped. The cap and the estimate exist before the first billed X read.
-- STACK.md, *Source economics*, holds the X figures. They describe X's own API.
+- STACK.md, *X*, holds the decision and the one figure we have. $0.005 is X's
+  own price and describes no provider.
 - [docs/testing.md](../../docs/testing.md), *No test spends money* and *A
   fixture for someone else's API must be captured, not written*. The capture
   script costs a few reads once; a test loop against a live API bills
@@ -98,6 +106,15 @@ US-013 shipped, so this ticket no longer waits on it.
 - 2026-09-05T00:46+08:00 — Unchanged, but now sequenced behind US-013 and US-014, which were
   raised to p1. X has no free allowance, so the cap and the estimate land before
   the first billed read, not after it.
+
+- 2026-09-05T21:36+08:00 — Decision from the owner: X comes through Bright Data
+  or ScrapeCreators only. X's own API is out of scope, so no bearer token and
+  no X endpoints. Nothing was built. The Context, the first acceptance box and
+  one note were rewritten to say so, and AGENTS.md, STACK.md and README.md were
+  corrected: three of them still told a reader that X arrives through its
+  official pay-per-use API. No code carried an X price, so none was removed.
+  The price of an X read at either provider is still unread, and this ticket
+  reads it.
 - 2026-09-05T15:23+08:00 — Rewritten for the two-provider decision. X is a platform
   now, not a provider, and this ticket delivers one provider for it. The $0.005
   price belongs to X's own API and must not be copied onto another provider.

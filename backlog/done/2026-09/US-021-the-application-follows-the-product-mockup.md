@@ -40,9 +40,15 @@ connections and settings stay out until their own behaviour exists.
 - [x] The IntentWatch wordmark uses the mockup's lime three-dot logo
 - [x] New monitor opens in the mockup's dialog layout over the monitor list
       and can be dismissed without losing the application shell
-- [x] The application uses Manrope for its interface typography
+- [x] The application uses Ubuntu for its interface typography
 - [x] Reading text, labels, helper copy and metadata use a consistent scale;
       post bodies are 17px and informational text is never smaller than 12px
+- [x] The shell, inbox panes, monitor cards and creation dialog use one clean,
+      restrained theme with consistent spacing, radii and surface depth
+- [x] Each inbox scrollbar has space between the content and the pane edge
+- [x] Application chrome uses a light neutral palette with a conventional
+      blue interaction accent; product lime is confined to the logo and
+      source marks retain their identifying colours
 
 ## Notes
 
@@ -88,3 +94,21 @@ connections and settings stay out until their own behaviour exists.
   12px. Darkened muted text, reduced form-label weight, loosened heading
   tracking and added space between form groups. Verified the inbox and monitor
   dialog at desktop and mobile widths.
+- 2026-09-05T11:54+08:00 — Refined the visual system with warmer neutral
+  surfaces, softer depth, consistent radii and quieter accents. Separated the
+  inbox into two contained panes and centered the monitor grid. Removed the
+  mobile filter overflow. Verified the inbox, monitors and creation dialog at
+  desktop width, and the inbox at mobile width.
+- 2026-09-05T12:00+08:00 — Put each inbox scroller inside its pane so the
+  scrollbar has real space from both the content and panel edge. Kept
+  automatic overflow, so the space does not force a scrollbar to appear.
+- 2026-09-05T12:01+08:00 — Restored locally bundled Ubuntu at the requested
+  three weights. Kept the larger type scale and all layout changes.
+- 2026-09-05T12:10+08:00 — Replaced the dark, green and orange-led chrome
+  with light neutral surfaces, muted blue actions and neutral source badges.
+  Kept lime in the logo and kept warning and error colours semantic. Verified
+  the inbox at desktop and mobile widths. The web tests, scoped lint,
+  typecheck and production build pass. Repository-wide lint remains blocked
+  by formatting in an unrelated uncommitted core test.
+- 2026-09-05T12:13+08:00 — Restored Reddit orange on Reddit source marks.
+  Kept orange out of the application chrome and action palette.

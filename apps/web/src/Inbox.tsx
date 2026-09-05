@@ -297,140 +297,145 @@ export function Inbox() {
       {matches.length > 0 && selectedMatch && (
         <div className="inbox-layout">
           <div className="match-list-column">
-            <ol className="match-list" aria-label="Matches">
-              {matches.map((match) => {
-                const tone = band(match.score);
-                return (
-                  <li key={match.id}>
-                    <button
-                      className={`match-card ${selectedMatch.id === match.id ? "selected" : ""}`}
-                      type="button"
-                      onClick={() => {
-                        setSelectedMatchId(match.id);
-                        setMobileDetailOpen(true);
-                        setExpandedMatchId(null);
-                      }}
-                    >
-                      <span className="match-top">
-                        <span className={`source-badge source-${match.source}`}>
-                          <span className="source-dot" aria-hidden="true">
-                            {match.source === "x" ? "X" : "r/"}
+            <div className="inbox-scroll-region">
+              <ol className="match-list" aria-label="Matches">
+                {matches.map((match) => {
+                  const tone = band(match.score);
+                  return (
+                    <li key={match.id}>
+                      <button
+                        className={`match-card ${selectedMatch.id === match.id ? "selected" : ""}`}
+                        type="button"
+                        onClick={() => {
+                          setSelectedMatchId(match.id);
+                          setMobileDetailOpen(true);
+                          setExpandedMatchId(null);
+                        }}
+                      >
+                        <span className="match-top">
+                          <span className={`source-badge source-${match.source}`}>
+                            <span className="source-dot" aria-hidden="true">
+                              {match.source === "x" ? "X" : "r/"}
+                            </span>
+                            {whereItCameFrom(match)}
                           </span>
-                          {whereItCameFrom(match)}
+                          <span className="match-origin">{ageLabel(match.postedAt)}</span>
                         </span>
-                        <span className="match-origin">{ageLabel(match.postedAt)}</span>
-                      </span>
-                      <strong className="match-title">{match.title ?? match.excerpt}</strong>
-                      {match.title && <span className="match-excerpt">{match.excerpt}</span>}
-                      <span className="match-bottom">
-                        <span className={`intent-pill ${tone.tone}`}>{tone.label}</span>
-                        <span className="match-score">
-                          <strong>{match.score}</strong>
-                          <span>/ 100</span>
+                        <strong className="match-title">{match.title ?? match.excerpt}</strong>
+                        {match.title && <span className="match-excerpt">{match.excerpt}</span>}
+                        <span className="match-bottom">
+                          <span className={`intent-pill ${tone.tone}`}>{tone.label}</span>
+                          <span className="match-score">
+                            <strong>{match.score}</strong>
+                            <span>/ 100</span>
+                          </span>
                         </span>
-                      </span>
-                    </button>
-                  </li>
-                );
-              })}
-            </ol>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ol>
 
-            {page?.nextCursor && (
-              <div className="inbox-more">
-                <button
-                  className="secondary-button"
-                  disabled={state === "more"}
-                  type="button"
-                  onClick={() => void loadMore()}
-                >
-                  {state === "more" ? "Loading…" : "Show more"}
-                </button>
-              </div>
-            )}
+              {page?.nextCursor && (
+                <div className="inbox-more">
+                  <button
+                    className="secondary-button"
+                    disabled={state === "more"}
+                    type="button"
+                    onClick={() => void loadMore()}
+                  >
+                    {state === "more" ? "Loading…" : "Show more"}
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
 
           <aside className={`match-detail ${mobileDetailOpen ? "mobile-open" : ""}`}>
-            <div className="detail-inner">
-              <button
-                className="mobile-detail-back"
-                type="button"
-                onClick={() => setMobileDetailOpen(false)}
-              >
-                ← Back to inbox
-              </button>
-
-              <div className="detail-top">
-                <span className={`source-badge source-${selectedMatch.source}`}>
-                  <span className="source-dot" aria-hidden="true">
-                    {selectedMatch.source === "x" ? "X" : "r/"}
-                  </span>
-                  {whereItCameFrom(selectedMatch)}
-                </span>
-                <span className="match-origin">{ageLabel(selectedMatch.postedAt)}</span>
-              </div>
-
-              <h2 className="detail-title">
-                {selectedMatch.title ?? "A conversation worth reading"}
-              </h2>
-              <p className="detail-author">
-                {selectedMatch.author ?? "Unknown author"} · matched by {selectedMatch.monitorName}
-              </p>
-
-              <div className="post-body">
-                <blockquote className="post-box">
-                  {postIsExpanded ? selectedMatch.excerpt : limitedPost?.text}
-                </blockquote>
-                {limitedPost?.truncated && (
-                  <button
-                    className="read-more-button"
-                    type="button"
-                    onClick={() => setExpandedMatchId(postIsExpanded ? null : selectedMatch.id)}
-                  >
-                    {postIsExpanded ? "Show less" : "Read more"}
-                  </button>
-                )}
-              </div>
-
-              <div className="match-why">
-                <p className="section-label">What the model saw</p>
-                <ul>
-                  {selectedMatch.reasons.map((reason) => (
-                    <li key={reason}>
-                      <span aria-hidden="true">•</span>
-                      {reason}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="score-section">
-                <div className="score-heading">
-                  <h3>Intent signals</h3>
-                  <span>Overall score {selectedMatch.score}</span>
-                </div>
-                <dl className="match-scores">
-                  {scoreRows.map(([label, score]) => (
-                    <div key={label}>
-                      <dt>{label}</dt>
-                      <dd>{score}</dd>
-                      <span className="score-bar" aria-hidden="true">
-                        <i style={{ width: `${score}%` }} />
-                      </span>
-                    </div>
-                  ))}
-                </dl>
-              </div>
-
-              <div className="match-actions">
-                <a
-                  className="primary-button"
-                  href={selectedMatch.url}
-                  rel="noreferrer noopener"
-                  target="_blank"
+            <div className="inbox-scroll-region">
+              <div className="detail-inner">
+                <button
+                  className="mobile-detail-back"
+                  type="button"
+                  onClick={() => setMobileDetailOpen(false)}
                 >
-                  Open conversation ↗
-                </a>
-                <span className="match-meta">{selectedMatch.intentLabel}</span>
+                  ← Back to inbox
+                </button>
+
+                <div className="detail-top">
+                  <span className={`source-badge source-${selectedMatch.source}`}>
+                    <span className="source-dot" aria-hidden="true">
+                      {selectedMatch.source === "x" ? "X" : "r/"}
+                    </span>
+                    {whereItCameFrom(selectedMatch)}
+                  </span>
+                  <span className="match-origin">{ageLabel(selectedMatch.postedAt)}</span>
+                </div>
+
+                <h2 className="detail-title">
+                  {selectedMatch.title ?? "A conversation worth reading"}
+                </h2>
+                <p className="detail-author">
+                  {selectedMatch.author ?? "Unknown author"} · matched by{" "}
+                  {selectedMatch.monitorName}
+                </p>
+
+                <div className="post-body">
+                  <blockquote className="post-box">
+                    {postIsExpanded ? selectedMatch.excerpt : limitedPost?.text}
+                  </blockquote>
+                  {limitedPost?.truncated && (
+                    <button
+                      className="read-more-button"
+                      type="button"
+                      onClick={() => setExpandedMatchId(postIsExpanded ? null : selectedMatch.id)}
+                    >
+                      {postIsExpanded ? "Show less" : "Read more"}
+                    </button>
+                  )}
+                </div>
+
+                <div className="match-why">
+                  <p className="section-label">What the model saw</p>
+                  <ul>
+                    {selectedMatch.reasons.map((reason) => (
+                      <li key={reason}>
+                        <span aria-hidden="true">•</span>
+                        {reason}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="score-section">
+                  <div className="score-heading">
+                    <h3>Intent signals</h3>
+                    <span>Overall score {selectedMatch.score}</span>
+                  </div>
+                  <dl className="match-scores">
+                    {scoreRows.map(([label, score]) => (
+                      <div key={label}>
+                        <dt>{label}</dt>
+                        <dd>{score}</dd>
+                        <span className="score-bar" aria-hidden="true">
+                          <i style={{ width: `${score}%` }} />
+                        </span>
+                      </div>
+                    ))}
+                  </dl>
+                </div>
+
+                <div className="match-actions">
+                  <a
+                    className="primary-button"
+                    href={selectedMatch.url}
+                    rel="noreferrer noopener"
+                    target="_blank"
+                  >
+                    Open conversation ↗
+                  </a>
+                  <span className="match-meta">{selectedMatch.intentLabel}</span>
+                </div>
               </div>
             </div>
           </aside>

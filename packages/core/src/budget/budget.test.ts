@@ -210,6 +210,9 @@ describe("the budget guard", () => {
       });
       await db.insert(modelCalls).values({
         monitorId,
+        // The check constraint: a classification records the version it
+        // answered, so that BUG-003's skip can read it.
+        monitorVersion: 1,
         provider: "anthropic",
         model: "test-model",
         outcome: "scored",
@@ -239,6 +242,9 @@ describe("the budget guard", () => {
       });
       await db.insert(modelCalls).values({
         monitorId,
+        // The check constraint: a classification records the version it
+        // answered, so that BUG-003's skip can read it.
+        monitorVersion: 1,
         provider: "anthropic",
         model: "test-model",
         outcome: "scored",
@@ -278,6 +284,9 @@ describe("the budget guard", () => {
 
       await db.insert(modelCalls).values({
         monitorId,
+        // The check constraint: a classification records the version it
+        // answered, so that BUG-003's skip can read it.
+        monitorVersion: 1,
         provider: "ollama",
         model: "test-model",
         outcome: "scored",

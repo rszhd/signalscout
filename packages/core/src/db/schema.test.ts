@@ -337,6 +337,7 @@ describe("model calls", () => {
       provider: "anthropic",
       model: "claude-haiku-4-5",
       outcome: "scored",
+      monitor_version: 1,
       input_tokens: 900,
       output_tokens: 120,
       latency_ms: 1_400,
@@ -375,6 +376,25 @@ describe("model calls", () => {
     await expect(insertModelCall({ outcome: "maybe" })).rejects.toThrow(
       /violates check constraint/,
     );
+  });
+
+  /**
+   * BUG-003. The classify step skips a post it has already scored by reading
+   * this column, so a classification written without one is a call that will
+   * be made and paid for again on the next poll. The constraint is here rather
+   * than only in the writer because the cost of forgetting is silent.
+   */
+  it("refuses a classification that does not say which version it answered", async () => {
+    await expect(
+      insertModelCall({ purpose: "classification", monitor_version: null }),
+    ).rejects.toThrow(/violates check constraint/);
+  });
+
+  /** A call no version describes: the queries are written before the monitor. */
+  it("records a query generation with no version and no monitor", async () => {
+    await expect(
+      insertModelCall({ purpose: "query_generation", monitor_id: null, monitor_version: null }),
+    ).resolves.toEqual(expect.any(String));
   });
 
   /**

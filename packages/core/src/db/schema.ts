@@ -525,6 +525,11 @@ export const matches = pgTable(
  * failed a bounded number of times, which is a count of the rows here, so the
  * limit survives a restart instead of living in one job's memory.
  *
+ * BUG-003 added a fourth: this table is the record of what has been scored. A
+ * poll hands the classifier every post it saw, so the step needs to know which
+ * of them it has already paid for, and a post scored below the threshold
+ * leaves no other trace.
+ *
  * Both foreign keys are nullable and set null rather than cascade. A deleted
  * post must not erase what reading it cost: the bill outlives the row.
  *
@@ -548,6 +553,25 @@ export const modelCalls = pgTable(
      * ask any more, not for the ones being written now.
      */
     purpose: text("purpose").$type<ModelCallPurpose>().notNull().default("classification"),
+    /**
+     * `monitors.version` when the call was made. Never updated afterwards.
+     *
+     * The classifier skips a post it has already scored, and BUG-003 is what
+     * happens when that skip reads the wrong table: a post scored below the
+     * threshold writes no match, so a skip keyed on `matches` bought the same
+     * answer again on every poll. The skip reads this column instead.
+     *
+     * It has to be the version and not only the pair. The version counts edits
+     * to the four fields the system prompt is built from, so a post scored
+     * under version 1 has not been asked version 2's question. A skip that
+     * ignored the version would freeze a monitor's old answers in place after
+     * its owner rewrote what it looks for.
+     *
+     * Null for a call that no version describes: query generation runs before
+     * the monitor exists. A classification always has one, and the check makes
+     * a writer that forgets it fail loudly rather than pay twice in silence.
+     */
+    monitorVersion: integer("monitor_version"),
     inputTokens: integer("input_tokens"),
     outputTokens: integer("output_tokens"),
     latencyMs: integer("latency_ms").notNull(),
@@ -562,6 +586,10 @@ export const modelCalls = pgTable(
     index("model_calls_monitor_post_idx").on(table.monitorId, table.postId),
     check("model_calls_outcome_known", oneOf("outcome", modelCallOutcomes)),
     check("model_calls_purpose_known", oneOf("purpose", modelCallPurposes)),
+    check(
+      "model_calls_classification_versioned",
+      sql.raw("purpose <> 'classification' OR monitor_version IS NOT NULL"),
+    ),
   ],
 );
 

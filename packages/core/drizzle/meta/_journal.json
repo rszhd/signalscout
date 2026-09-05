@@ -162,6 +162,13 @@
       "when": 1788618887207,
       "tag": "0022_add_linkedin_platform",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1788628729733,
+      "tag": "0023_a_scored_post_records_its_monitor_version",
+      "breakpoints": true
     }
   ]
 }

@@ -19,8 +19,9 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { createClassifier } from "../ai/classify.js";
 import type { AiConfig } from "../ai/config.js";
 import { createDatabase, type Database } from "../db/client.js";
-import { matches, modelCalls, posts } from "../db/schema.js";
+import { apiUsage, matches, modelCalls, monitors, posts } from "../db/schema.js";
 import { createLogger } from "../logger.js";
+import { updateMonitor } from "../monitors/monitors.js";
 import { fakePosts } from "../sources/fake/fixtures.js";
 import { createTestDatabase, type TestDatabase } from "../testing/database.js";
 import { maxClassificationAttempts } from "./classify.js";
@@ -157,6 +158,30 @@ beforeEach(() => {
   notified.length = 0;
   lines.length = 0;
 });
+
+/** The classification calls recorded for one pair, oldest first. */
+async function callsFor(monitorId: string, postId: string) {
+  return db
+    .select({ outcome: modelCalls.outcome, monitorVersion: modelCalls.monitorVersion })
+    .from(modelCalls)
+    .where(
+      and(
+        eq(modelCalls.monitorId, monitorId),
+        eq(modelCalls.postId, postId),
+        eq(modelCalls.purpose, "classification"),
+      ),
+    )
+    .orderBy(modelCalls.createdAt);
+}
+
+/** Run one classify job and wait for the notification that ends it. */
+async function classifyAndWait(monitorId: string, postIds: readonly string[]) {
+  notified.length = 0;
+  await worker.boss.send(classifyQueue, { monitorId, postIds: [...postIds] });
+  await until("the classify job to finish", () =>
+    notified.find((entry) => entry.monitorId === monitorId),
+  );
+}
 
 describe("a post the model scores", () => {
   it("becomes a match carrying the model's scores and reasons, and is notified", async () => {
@@ -299,6 +324,7 @@ describe("a model that fails", () => {
     await db.insert(modelCalls).values(
       Array.from({ length: maxClassificationAttempts }, () => ({
         monitorId,
+        monitorVersion: 1,
         postId,
         provider: "anthropic",
         model: "claude-haiku-4-5",
@@ -331,6 +357,11 @@ describe("a model that fails", () => {
  * A poll hands on every post it saw, new and already stored, because a post
  * one monitor has seen is new to another. So this step is routinely given
  * posts it has already paid to classify.
+ *
+ * BUG-003 is what these cases pin. The skip used to ask `matches`, which is a
+ * different question: a post scored below the monitor's threshold writes no
+ * match, so nothing recorded the work and the next poll bought the same answer
+ * again. On the development database that was 72 of 229 pairs.
  */
 describe("a post already scored for this monitor", () => {
   it("is not sent to the model a second time", async () => {
@@ -354,7 +385,158 @@ describe("a post already scored for this monitor", () => {
     expect(calls).toHaveLength(1);
     expect(await db.select().from(matches).where(eq(matches.monitorId, monitorId))).toHaveLength(1);
   }, 30_000);
+
+  it("is not sent to the model a second time when it scored below the threshold", async () => {
+    const monitorId = await insertMonitor(database);
+    const postId = await insertPost(weakPost, "repeat-below-1");
+    answer = () => weakAnswer;
+
+    await classifyAndWait(monitorId, [postId]);
+
+    expect(calls).toHaveLength(1);
+    expect(await db.select().from(matches).where(eq(matches.monitorId, monitorId))).toHaveLength(0);
+
+    await classifyAndWait(monitorId, [postId]);
+
+    // The case the old skip could not see. There is no match to ask about, so
+    // the only record that this post was paid for is the call itself.
+    expect(calls).toHaveLength(1);
+    expect(await callsFor(monitorId, postId)).toHaveLength(1);
+  }, 30_000);
+
+  it("is scored again after the monitor's definition changes", async () => {
+    const monitorId = await insertMonitor(database);
+    const postId = await insertPost(weakPost, "repeat-version-1");
+    answer = () => weakAnswer;
+
+    await classifyAndWait(monitorId, [postId]);
+    expect(calls).toHaveLength(1);
+
+    // An edit to one of the four fields the system prompt is built from. The
+    // real writer, because the rule that moves the version lives in it.
+    const edited = await updateMonitor(db, monitorId, {
+      problem: "End-to-end suites that fail for reasons nobody can reproduce",
+    });
+    expect(edited?.version).toBe(2);
+
+    await classifyAndWait(monitorId, [postId]);
+
+    // A different question, so the old answer does not stand in for it.
+    expect(calls).toHaveLength(2);
+    expect((await callsFor(monitorId, postId)).map((row) => row.monitorVersion)).toEqual([1, 2]);
+  }, 30_000);
+
+  it("is not scored again for a rename, a new query or a moved threshold", async () => {
+    const monitorId = await insertMonitor(database);
+    const postId = await insertPost(weakPost, "repeat-version-2");
+    answer = () => weakAnswer;
+
+    await classifyAndWait(monitorId, [postId]);
+    expect(calls).toHaveLength(1);
+
+    // Three edits that change what is collected, or how it is ranked, and not
+    // what a good lead is. None of them moves the version.
+    const edited = await updateMonitor(db, monitorId, {
+      name: "Renamed monitor",
+      queries: { reddit: ["broken end to end tests"] },
+      minScore: 10,
+    });
+    expect(edited?.version).toBe(1);
+
+    await classifyAndWait(monitorId, [postId]);
+
+    expect(calls).toHaveLength(1);
+  }, 30_000);
+
+  it("is still scored for a second monitor that has never seen it", async () => {
+    const first = await insertMonitor(database);
+    const second = await insertMonitor(database, { name: "The other monitor" });
+    const postId = await insertPost(weakPost, "repeat-two-monitors-1");
+    answer = () => weakAnswer;
+
+    await classifyAndWait(first, [postId]);
+    await classifyAndWait(second, [postId]);
+
+    // The skip is per monitor. A post one monitor has paid for is new to the
+    // next one, which is the whole reason the poll hands on every post it saw.
+    expect(calls).toHaveLength(2);
+    expect(await callsFor(second, postId)).toHaveLength(1);
+  }, 30_000);
+
+  it("gets a fresh allowance of attempts when the monitor's definition changes", async () => {
+    const monitorId = await insertMonitor(database);
+    const postId = await insertPost(strongPost, "repeat-failures-1");
+
+    await db.insert(modelCalls).values(
+      Array.from({ length: maxClassificationAttempts }, () => ({
+        monitorId,
+        monitorVersion: 1,
+        postId,
+        provider: "anthropic",
+        model: "claude-haiku-4-5",
+        outcome: "failed" as const,
+        latencyMs: 10,
+        error: "overloaded_error",
+      })),
+    );
+
+    await classifyAndWait(monitorId, [postId]);
+    expect(calls).toHaveLength(0);
+
+    await updateMonitor(db, monitorId, { problem: "Tests that pass and fail on the same commit" });
+    await classifyAndWait(monitorId, [postId]);
+
+    // The limit counts what this question could not answer. A new question has
+    // not been asked yet, so the post gets its three chances again.
+    expect(calls).toHaveLength(1);
+  }, 30_000);
 });
+
+/**
+ * The end of BUG-003, measured where it was paid: a poll, and then the same
+ * poll again. The provider returns the page it returned last time, dedup stops
+ * a second post row, and nothing may buy a second answer about it.
+ */
+it("makes no classification call when a poll returns a page it has already seen", async () => {
+  // A bar the fake connector's post cannot clear, so the poll leaves no match.
+  // That is the shape the bug was measured in: 72 of the 75 pairs classified
+  // twice on the development database had no match row to skip on.
+  const monitorId = await insertMonitor(database, { minScore: 100 });
+
+  await worker.boss.send(pollQueue, { monitorId }, { singletonKey: monitorId });
+  // Waited on the notification and not on the model call: the notification is
+  // the last step of the poll, so nothing of the first poll is still running
+  // when the second one starts.
+  await until("the first poll to finish", () =>
+    notified.find((entry) => entry.monitorId === monitorId),
+  );
+
+  expect(calls).toHaveLength(1);
+  expect(
+    await db.select().from(modelCalls).where(eq(modelCalls.monitorId, monitorId)),
+  ).toHaveLength(1);
+
+  // The second poll asks for the same window as the first, so the connector
+  // hands back the page it handed back last time. That is not a contrivance:
+  // US-026's live ScrapeCreators run collected 47 posts and stored none.
+  await db.update(monitors).set({ lastPolledAt: null }).where(eq(monitors.id, monitorId));
+
+  calls.length = 0;
+  notified.length = 0;
+  await worker.boss.send(pollQueue, { monitorId }, { singletonKey: monitorId });
+  await until("the second poll to finish", () =>
+    notified.find((entry) => entry.monitorId === monitorId),
+  );
+
+  // The second poll ran and was billed for it. Asserting only "no model call"
+  // would pass just as well if nothing had polled at all, and the provider's
+  // bill is the half of this that does not go away: the search is paid for
+  // whether or not it brings back anything new.
+  const [usage] = await db.select().from(apiUsage).where(eq(apiUsage.monitorId, monitorId));
+  expect(usage?.units).toBe(2);
+  expect(calls).toEqual([]);
+  expect(await db.select().from(matches).where(eq(matches.monitorId, monitorId))).toHaveLength(0);
+}, 30_000);
 
 it("does not pay the model to read a post already confirmed deleted", async () => {
   const monitorId = await insertMonitor(database);

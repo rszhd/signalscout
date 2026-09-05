@@ -5,6 +5,18 @@ import * as schema from "./schema.js";
 export type Database = ReturnType<typeof createDatabase>["db"];
 
 /**
+ * The handle inside `db.transaction`, which is not the same type as the pool
+ * handle above.
+ *
+ * `Queryable` is what a helper takes when its caller may be either. The
+ * classify step needs one: BUG-003 made the model-call row the record of what
+ * has been scored, so that row and the match it produces have to be written
+ * together or not at all.
+ */
+export type Transaction = Parameters<Parameters<Database["transaction"]>[0]>[0];
+export type Queryable = Database | Transaction;
+
+/**
  * How many connections one pool may hold, when something says.
  *
  * `pg` and `pg-boss` both default to ten, which is right for the two

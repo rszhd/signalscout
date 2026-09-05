@@ -11,7 +11,7 @@
  * would be two places to forget the new column, and the column that gets
  * forgotten is always the one a bill page reads.
  */
-import type { Database } from "../db/client.js";
+import type { Queryable } from "../db/client.js";
 import { type ModelCallOutcome, type ModelCallPurpose, modelCalls } from "../db/schema.js";
 import type { ModelCall } from "./call.js";
 
@@ -21,6 +21,12 @@ export interface RecordModelCallInput {
   readonly call: ModelCall;
   /** Null before the monitor exists: the queries are written before it does. */
   readonly monitorId?: string | null;
+  /**
+   * `monitors.version` at the moment of the call. Required for a
+   * classification, because the classify step's skip reads it; null for a call
+   * no version describes. The check constraint holds the same rule.
+   */
+  readonly monitorVersion?: number | null;
   /** Null for a call that is not about one post. */
   readonly postId?: string | null;
   /** The provider's message, for a call that did not produce what was asked. */
@@ -28,11 +34,20 @@ export interface RecordModelCallInput {
 }
 
 export async function recordModelCall(
-  db: Database,
-  { purpose, outcome, call, monitorId = null, postId = null, error = null }: RecordModelCallInput,
+  db: Queryable,
+  {
+    purpose,
+    outcome,
+    call,
+    monitorId = null,
+    monitorVersion = null,
+    postId = null,
+    error = null,
+  }: RecordModelCallInput,
 ): Promise<void> {
   await db.insert(modelCalls).values({
     monitorId,
+    monitorVersion,
     postId,
     provider: call.provider,
     model: call.model,

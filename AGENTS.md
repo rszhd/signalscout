@@ -352,6 +352,22 @@ US-028's live LinkedIn poll added the second: one of twenty answers was aborted
 on timeout, recorded as `failed`, with no match written and the post keeping its
 place. **A real rate limit is the last simulated one.**
 
+**A post is scored once per monitor, per version, and until BUG-003 it was
+not.** The skip asked whether the post had a row in `matches`, which is a
+different question: a post scored below the monitor's `min_score` writes no
+match, so nothing the skip read recorded the work. On the development database
+77 of 230 pairs had been classified twice. The skip now reads the call ledger,
+and `model_calls.monitor_version` says which question each answer answered — a
+post scored under version 1 has not been asked version 2's. A check constraint
+refuses a classification without a version, because a writer that forgets one
+pays twice in silence.
+
+That bug had a second half, and it is worse than the money. Three of the
+repeats produced a match: the first call scored the post under the threshold
+and the second, minutes later, scored it 51 to 53 against a `min_score` of 50.
+**A post near the threshold got an answer per poll, and reached the inbox on
+the poll that happened to round up.** The inbox was not reproducible.
+
 **The query generator has answered once.** `capture:queries` ran on the same
 day and `ai/fixtures/query-plan.json` holds the plan it wrote — seven queries
 and five subreddits for the example monitor. The seven are seven angles and

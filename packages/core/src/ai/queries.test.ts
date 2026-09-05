@@ -15,9 +15,13 @@
 import { APICallError } from "ai";
 import { MockLanguageModelV4 } from "ai/test";
 import { describe, expect, it } from "vitest";
+import { redditPlatform, xPlatform } from "../sources/platforms.js";
 import type { AiConfig } from "./config.js";
 import type { MonitorProfile } from "./prompt.js";
-import { createQueryGenerator, queryPlanSchema } from "./queries.js";
+import { buildQuerySystemPrompt, createQueryGenerator, queryPlanSchemaFor } from "./queries.js";
+
+/** Both platforms the build ships, which is what a monitor may watch. */
+const bothPlatforms = [redditPlatform, xPlatform];
 
 const monitor: MonitorProfile = {
   product: "A test runner that records browser flows instead of coding them",
@@ -26,14 +30,23 @@ const monitor: MonitorProfile = {
   signals: ["recommendation_request", "problem"],
 };
 
-/** A plan a model could plausibly write for the monitor above. */
+/**
+ * A plan a model could plausibly write for the monitor above.
+ *
+ * One list per platform, and the two lists are not the same words. US-006
+ * measured why: the Reddit phrases below return nothing on X, and the X
+ * phrases are too short to be worth a Reddit collection.
+ */
 const goodPlan = {
-  queries: [
-    "playwright tests break every release",
-    "how do small teams handle regression testing",
-    "tired of manually testing signup and checkout",
-    "alternative to maintaining e2e tests",
-  ],
+  queries: {
+    reddit: [
+      "playwright tests break every release",
+      "how do small teams handle regression testing",
+      "tired of manually testing signup and checkout",
+      "alternative to maintaining e2e tests",
+    ],
+    x: ["flaky tests", "e2e suite broken", "regression testing pain"],
+  },
   subreddits: ["SaaS", "webdev", "QualityAssurance"],
 };
 
@@ -75,11 +88,17 @@ function modelThrowing(error: unknown) {
 
 /** What the schema does with one plan, without a model in the way. */
 function parse(plan: unknown) {
-  return queryPlanSchema.safeParse(plan);
+  return queryPlanSchemaFor(bothPlatforms).safeParse(plan);
 }
 
+/** A plan whose Reddit list is the one under test. */
 function withQueries(...queries: string[]) {
-  return { ...goodPlan, queries };
+  return { ...goodPlan, queries: { ...goodPlan.queries, reddit: queries } };
+}
+
+/** The same, for X, which has the shorter rule. */
+function withXQueries(...queries: string[]) {
+  return { ...goodPlan, queries: { ...goodPlan.queries, x: queries } };
 }
 
 describe("what a query may be", () => {
@@ -138,6 +157,75 @@ describe("what a query may be", () => {
   });
 });
 
+describe("a query is written for one platform", () => {
+  /**
+   * The rule US-027 exists for, and the numbers are measured rather than
+   * chosen. US-006 sent `end to end tests keep breaking` to a live X search
+   * twice: unquoted it returned anime, Bitcoin and a CIA story across three
+   * weeks, and quoted it matched nothing at all. Two words returned twenty
+   * posts, all on topic.
+   */
+  it("refuses a Reddit-length phrase on X", () => {
+    expect(parse(withXQueries("end to end tests keep breaking", "a b", "c d")).success).toBe(false);
+  });
+
+  it("accepts the same phrase on Reddit, where a post has paragraphs", () => {
+    expect(parse(withQueries("end to end tests keep breaking", "a b c", "d e f")).success).toBe(
+      true,
+    );
+  });
+
+  it("accepts a short phrase on X", () => {
+    expect(
+      parse(withXQueries("flaky tests", "ci keeps failing", "tests break daily")).success,
+    ).toBe(true);
+  });
+
+  it("holds each platform to its own ceiling and not to the other's", () => {
+    // Eight words is Reddit's limit and four is X's, so a plan that is legal
+    // on one side and not the other must fail as a whole rather than be
+    // trimmed to fit.
+    expect(redditPlatform.search?.maxQueryWords).toBe(8);
+    expect(xPlatform.search?.maxQueryWords).toBe(4);
+    expect(
+      parse(withQueries("one two three four five six seven eight nine", "a b", "c d")).success,
+    ).toBe(false);
+  });
+
+  it("asks only about the platforms it was given", () => {
+    const redditOnly = queryPlanSchemaFor([redditPlatform]);
+
+    // A monitor that watches Reddit alone must not be asked to invent X
+    // queries, and must not be billed for the tokens that writing them costs.
+    expect(
+      redditOnly.safeParse({ queries: { reddit: goodPlan.queries.reddit }, subreddits: [] })
+        .success,
+    ).toBe(true);
+    expect(parse({ queries: { reddit: goodPlan.queries.reddit }, subreddits: [] }).success).toBe(
+      false,
+    );
+  });
+});
+
+describe("the prompt the model is given", () => {
+  it("names each platform, its limit and the reason for it", () => {
+    const prompt = buildQuerySystemPrompt(bothPlatforms);
+
+    expect(prompt).toContain('REDDIT (key "reddit")');
+    expect(prompt).toContain('X (key "x")');
+    expect(prompt).toContain("At most 4 words per query.");
+    expect(prompt).toContain("At most 8 words per query.");
+
+    // The reason travels with the number. A model told only a limit talks
+    // itself out of it on the query it likes.
+    expect(prompt).toContain("a long phrase matches nothing at all");
+  });
+
+  it("does not describe a platform the monitor does not watch", () => {
+    expect(buildQuerySystemPrompt([redditPlatform])).not.toContain('X (key "x")');
+  });
+});
+
 describe("what a subreddit may be", () => {
   function subredditsOf(plan: unknown): string[] {
     const result = parse(plan);
@@ -168,7 +256,7 @@ describe("a model that answers", () => {
   it("returns the queries and the subreddits", async () => {
     const generator = createQueryGenerator({ config: config(), model: modelReturning(goodPlan) });
 
-    const outcome = await generator.generate(monitor);
+    const outcome = await generator.generate(monitor, bothPlatforms);
 
     expect(outcome.status).toBe("generated");
     if (outcome.status !== "generated") return;
@@ -180,7 +268,7 @@ describe("a model that answers", () => {
   it("records what the call cost", async () => {
     const generator = createQueryGenerator({ config: config(), model: modelReturning(goodPlan) });
 
-    const outcome = await generator.generate(monitor);
+    const outcome = await generator.generate(monitor, bothPlatforms);
 
     expect(outcome.call.inputTokens).toBe(400);
     expect(outcome.call.outputTokens).toBe(90);
@@ -197,7 +285,7 @@ describe("a model that answers badly", () => {
       model: modelReturning(withQueries("qa", "testing", "software")),
     });
 
-    const outcome = await generator.generate(monitor);
+    const outcome = await generator.generate(monitor, bothPlatforms);
 
     expect(outcome.status).toBe("rejected");
     expect(outcome).not.toHaveProperty("plan");
@@ -209,7 +297,7 @@ describe("a model that answers badly", () => {
       model: modelReturning("Here are some ideas for search queries you could try."),
     });
 
-    expect((await generator.generate(monitor)).status).toBe("rejected");
+    expect((await generator.generate(monitor, bothPlatforms)).status).toBe("rejected");
   });
 });
 
@@ -229,7 +317,7 @@ describe("a model that cannot be reached", () => {
       ),
     });
 
-    const outcome = await generator.generate(monitor);
+    const outcome = await generator.generate(monitor, bothPlatforms);
 
     expect(outcome.status).toBe("failed");
     if (outcome.status !== "failed") return;
@@ -246,6 +334,6 @@ describe("a model that cannot be reached", () => {
       model: modelThrowing(new TypeError("cannot read properties of undefined")),
     });
 
-    await expect(generator.generate(monitor)).rejects.toThrow(TypeError);
+    await expect(generator.generate(monitor, bothPlatforms)).rejects.toThrow(TypeError);
   });
 });

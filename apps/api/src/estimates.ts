@@ -22,11 +22,12 @@ import {
   maximumQueries,
   maximumSubreddits,
   minimumPollIntervalSeconds,
+  platforms,
   probesFor,
   readEstimate,
   refuseEstimate,
   reportFor,
-  searchQuerySchema,
+  searchQuerySchemaFor,
   startEstimate,
   sources as storableSources,
   subredditSchema,
@@ -55,6 +56,20 @@ const sampleSchema = z.object({
  * finished being measured. Neither is a zero, and a zero is what a reader would
  * take a missing number for.
  */
+/**
+ * The same per-platform shape the monitor routes take, and for the same
+ * reason: a cost test prices the queries a monitor will actually run, so it
+ * has to be given them the way the monitor holds them. US-027.
+ */
+const queriesField = z.object(
+  Object.fromEntries(
+    platforms.map((platform) => [
+      platform.id,
+      z.array(searchQuerySchemaFor(platform.search)).max(maximumQueries).default([]),
+    ]),
+  ),
+);
+
 const probeSchema = z.object({
   source: z.string(),
   sourceName: z.string(),
@@ -108,7 +123,7 @@ const problemSchema = z.object({ message: z.string() });
 const startBody = z.object({
   /** Set when an existing monitor is retested. Absent while the plan is a plan. */
   monitorId: z.uuid().optional(),
-  queries: z.array(searchQuerySchema).max(maximumQueries).default([]),
+  queries: queriesField.default({}),
   subreddits: z.array(subredditSchema).max(maximumSubreddits).default([]),
   sources: z.array(z.enum(storableSources)).min(1),
   pollIntervalSeconds: z

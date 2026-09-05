@@ -48,17 +48,17 @@ junk.
 
 ## Acceptance
 
-- [ ] The generator is told which platform each query is for, and writes
+- [x] The generator is told which platform each query is for, and writes
       queries that fit it
-- [ ] An X query is short enough to match a real post; the prompt says so and
+- [x] An X query is short enough to match a real post; the prompt says so and
       the fixtures show it
-- [ ] A monitor watching two platforms gets a query set for each, and the
+- [x] A monitor watching two platforms gets a query set for each, and the
       monitor row keeps them apart
 - [ ] `capture:queries` records the plan for both platforms, so the fixtures
       are evidence about the prompt that ships
-- [ ] The cost test prices each platform's own queries, not one set priced
+- [x] The cost test prices each platform's own queries, not one set priced
       twice
-- [ ] A monitor written before this change still polls, and its queries are not
+- [x] A monitor written before this change still polls, and its queries are not
       silently rewritten
 - [ ] The measurement that started this is repeated: the new X queries are run
       against the live provider once, and the Log holds what came back
@@ -85,3 +85,45 @@ junk.
   SocialCrawl. Three runs: the long phrase unquoted returned unrelated posts
   across three weeks, the same phrase quoted returned nothing twice, and a
   two-word query returned twenty posts that were all on topic.
+
+- 2026-09-05T22:26+08:00 — Built. The rule lives on the platform, because "an X
+  post is a few sentences" is a fact about X and not about SocialCrawl.
+  `PlatformDescriptor.search` carries a ceiling and the sentence that explains
+  it, and one number reaches every place a query is written or edited: the
+  model's schema, the API body, and the form. Four words on X, eight on Reddit.
+  The prompt gives the reason beside the number, because a model told only a
+  limit talks itself out of it on the query it likes.
+
+  `monitors.generated_queries` is now an object keyed by platform. The column
+  was already `jsonb`, so nothing about the schema moved and migration 0021 is
+  hand-written: it keys each row by the platforms its monitor watches and
+  rewrites no query. It ran against the development database — six monitors,
+  every query kept, no row left in the old shape. A monitor that names no
+  platform keeps its array, and both worker steps read that shape too, so it
+  still polls.
+
+  The poll asks each platform with its own list, inside the loop over sources.
+  The pre-filter builds one keyword rule per platform and checks a post against
+  the queries that could have found it: checking an X post against a Reddit
+  phrase would drop it for missing words nobody asked X for, and checking a
+  Reddit post against a two-word X query would keep almost everything and send
+  the bill to the model. The cost test prices each platform's own list, so a
+  query is no longer priced twice for two platforms when only one would run it.
+
+  The form asks for one list per platform, shows each platform's limit and its
+  reason, and marks a query that is too long before the button is pressed.
+
+  827 tests pass, with `pnpm lint`, `pnpm typecheck` and `pnpm build`. Four
+  deliberate mutations were confirmed to turn the suite red: filtering with
+  every platform's queries at once, polling with every platform's queries at
+  once, raising X's ceiling to eight, and dropping the platform from the
+  filter's rule. Expected values moved in five test files, and every one of
+  them moved because the shape of the stored queries changed, which is what
+  this ticket asked for.
+
+- 2026-09-05T22:26+08:00 — Two boxes stay open, and both need a small spend.
+  `ai/fixtures/query-plan.json` still holds a plan in the old shape, so the
+  fixture is not yet evidence about the prompt that ships: `capture:queries`
+  has to run again, which is one model call and a fraction of a cent. And no
+  live search has been run with a query the new prompt wrote, which is one or
+  two SocialCrawl credits from the free hundred.

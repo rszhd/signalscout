@@ -26,6 +26,7 @@
 import type { LanguageModel } from "ai";
 import { z } from "zod";
 import { describeSignals } from "../monitors/signals.js";
+import type { PlatformDescriptor, PlatformSearchStyle } from "../sources/types.js";
 import { generateStructured, type ModelCall } from "./call.js";
 import type { AiConfig, AiProvider } from "./config.js";
 import type { MonitorProfile } from "./prompt.js";
@@ -50,6 +51,19 @@ const minimumQueryWords = 2;
 const longestQuery = 80;
 
 /**
+ * The ceiling for a platform that declares none.
+ *
+ * Eight was the only rule until US-027, and it was written for Reddit without
+ * anybody saying so. It stays as the default because a longer phrase is safe
+ * where posts are long, and a platform where it is not says so itself.
+ */
+const defaultMaxQueryWords = 8;
+
+function wordsIn(value: string): number {
+  return value.split(/\s+/).filter(Boolean).length;
+}
+
+/**
  * Syntax the search does not understand.
  *
  * Upper-case `AND`, `OR` and `NOT` only: "how to test signup and checkout" is
@@ -70,7 +84,7 @@ export const searchQuerySchema = z
   .string()
   .trim()
   .max(longestQuery)
-  .refine((value) => value.split(/\s+/).filter(Boolean).length >= minimumQueryWords, {
+  .refine((value) => wordsIn(value) >= minimumQueryWords, {
     message: "a query is at least two words; one word collects the whole site",
   })
   .refine((value) => !booleanSyntax.test(value), {
@@ -78,6 +92,26 @@ export const searchQuerySchema = z
       "a query is plain words: no AND, OR, NOT, quotes, brackets or field operators. " +
       "The search matches the string literally, so this one would find nothing.",
   });
+
+/**
+ * The same rule, plus the ceiling the platform sets.
+ *
+ * A query is written for somewhere. US-006 measured what happens when it is
+ * not: `end to end tests keep breaking` returned unrelated posts on X
+ * unquoted and nothing at all quoted, while two words returned twenty posts
+ * that were all on topic. So the length rule belongs to the platform, and a
+ * person editing a query is held to the same one as the model — a rule the
+ * model must obey and a person may bypass is a suggestion with a test.
+ */
+export function searchQuerySchemaFor(style: PlatformSearchStyle | undefined) {
+  const ceiling = style?.maxQueryWords ?? defaultMaxQueryWords;
+
+  return searchQuerySchema.refine((value) => wordsIn(value) <= ceiling, {
+    message:
+      `a query here is at most ${ceiling} words: a longer phrase has to appear ` +
+      "inside a post to match one, and on a short platform it never does",
+  });
+}
 
 /**
  * A subreddit name, however the model wrote it.
@@ -109,27 +143,58 @@ function allDifferent(values: readonly string[]): boolean {
   return new Set(values.map((value) => value.toLowerCase())).size === values.length;
 }
 
-export const queryPlanSchema = z.object({
-  queries: z
-    .array(searchQuerySchema)
+/** One platform's list, held to that platform's own rule. */
+export function queryListSchemaFor(platform: PlatformDescriptor) {
+  return z
+    .array(searchQuerySchemaFor(platform.search))
     .min(minimumQueries)
     .max(maximumQueries)
     .refine(allDifferent, { message: "each query must be a different way in, not a rewording" })
-    .describe("Search phrases a person with this problem would type"),
-  subreddits: z
-    .array(subredditSchema)
-    .max(maximumSubreddits)
-    .refine(allDifferent, { message: "each subreddit must be named once" })
-    .describe("Subreddits where the ideal customer already posts. Bare names."),
-});
+    .describe(`Search phrases a person with this problem would type on ${platform.displayName}`);
+}
 
-export type QueryPlan = z.infer<typeof queryPlanSchema>;
+/**
+ * The plan the model returns: one list per platform the monitor watches, and
+ * the subreddits.
+ *
+ * The schema is built for the platforms asked about rather than fixed, so a
+ * monitor watching one platform is not asked to invent queries for another and
+ * is not billed for writing them. Adding a platform adds a key here and
+ * nothing else.
+ *
+ * `subreddits` is not keyed, because it is not a query: it is Reddit's own
+ * channel list, and a platform with no channel idea has nothing to put there.
+ */
+export function queryPlanSchemaFor(platforms: readonly PlatformDescriptor[]) {
+  return z.object({
+    queries: z.object(
+      Object.fromEntries(platforms.map((platform) => [platform.id, queryListSchemaFor(platform)])),
+    ),
+    subreddits: z
+      .array(subredditSchema)
+      .max(maximumSubreddits)
+      .refine(allDifferent, { message: "each subreddit must be named once" })
+      .describe("Subreddits where the ideal customer already posts. Bare names."),
+  });
+}
+
+/**
+ * A plan, once the platform keys are no longer known statically.
+ *
+ * `queries` is keyed by platform id. A caller reads its own platform's list
+ * and never the whole map, which is what stops one platform's phrasing
+ * reaching another's search.
+ */
+export interface QueryPlan {
+  readonly queries: Readonly<Record<string, readonly string[]>>;
+  readonly subreddits: readonly string[];
+}
 
 /**
  * The instructions, which do not change between monitors, so a provider can
  * cache this half. The monitor's own answers are the user prompt.
  */
-export function buildQuerySystemPrompt(): string {
+export function buildQuerySystemPrompt(platforms: readonly PlatformDescriptor[]): string {
   return [
     "You write the search phrases that find public posts from people who have",
     "a problem. Somebody else's product solves that problem; you are not",
@@ -141,15 +206,21 @@ export function buildQuerySystemPrompt(): string {
     "over the words of the category: 'tests break when the ui changes' finds",
     "people, 'test automation platform' finds vendors.",
     "",
-    `Write ${minimumQueries} to ${maximumQueries} queries. Each one is ${minimumQueryWords} to`,
-    "eight plain words. No quotes, no AND, no OR, no minus signs, and no",
-    "field operators such as subreddit: or site:. The search matches the",
-    "string it is given, so syntax finds nothing at all.",
+    `Write ${minimumQueries} to ${maximumQueries} queries for each platform below.`,
+    `Each one is at least ${minimumQueryWords} plain words. No quotes, no AND, no`,
+    "OR, no minus signs, and no field operators such as subreddit: or site:.",
+    "The search matches the string it is given, so syntax finds nothing at all.",
     "",
     "Each query is a different way in, not a rewording of the last one. Two",
     "queries that mean the same thing collect the same posts twice, and every",
     "post collected is paid for.",
     "",
+    "WRITE FOR THE PLATFORM",
+    "A query is written for one place. The same words do not work in two",
+    "places, because a post is a different length in each. Write a separate",
+    "list for every platform named here, and obey its own limit.",
+    "",
+    ...platforms.flatMap((platform) => describePlatform(platform)),
     "SUBREDDITS",
     "Name subreddits where the ideal customer already posts. Give the bare",
     `name, with no r/ and no URL, and name at most ${maximumSubreddits}.`,
@@ -157,6 +228,24 @@ export function buildQuerySystemPrompt(): string {
     "nothing and hides that a real one is missing, so fewer is better than",
     "more. None is a valid answer.",
   ].join("\n");
+}
+
+/**
+ * One platform's paragraph in the prompt.
+ *
+ * The limit is given with its reason. A model told only a number talks itself
+ * out of it on the query it likes; a model told that a long phrase has to
+ * appear inside a short post keeps the rule on every line.
+ */
+function describePlatform(platform: PlatformDescriptor): string[] {
+  const ceiling = platform.search?.maxQueryWords ?? defaultMaxQueryWords;
+
+  return [
+    `${platform.displayName.toUpperCase()} (key "${platform.id}")`,
+    `At most ${ceiling} words per query.`,
+    ...(platform.search ? [platform.search.note] : []),
+    "",
+  ];
 }
 
 /** The monitor's own answers. The half that differs between monitors. */
@@ -194,7 +283,15 @@ export type QueryPlanOutcome =
 export interface QueryGenerator {
   readonly provider: AiProvider;
   readonly model: string;
-  generate(monitor: MonitorProfile): Promise<QueryPlanOutcome>;
+  /**
+   * `platforms` is what the monitor watches. Asking about a platform a monitor
+   * does not watch buys queries nobody runs, and asking about none is a plan
+   * with nothing in it, so the caller passes exactly the ticked list.
+   */
+  generate(
+    monitor: MonitorProfile,
+    platforms: readonly PlatformDescriptor[],
+  ): Promise<QueryPlanOutcome>;
 }
 
 export interface QueryGeneratorOptions {
@@ -215,21 +312,24 @@ export function createQueryGenerator({
     provider: config.provider,
     model: config.model,
 
-    async generate(monitor: MonitorProfile): Promise<QueryPlanOutcome> {
+    async generate(
+      monitor: MonitorProfile,
+      platforms: readonly PlatformDescriptor[],
+    ): Promise<QueryPlanOutcome> {
       const result = await generateStructured({
         model: languageModel,
         config,
-        schema: queryPlanSchema,
+        schema: queryPlanSchemaFor(platforms),
         schemaName: "monitor_queries",
         schemaDescription: "The search phrases and subreddits this monitor will use",
-        system: buildQuerySystemPrompt(),
+        system: buildQuerySystemPrompt(platforms),
         prompt: buildQueryUserPrompt(monitor),
         now,
       });
 
       if (result.status !== "ok") return result;
 
-      return { status: "generated", plan: result.object, call: result.call };
+      return { status: "generated", plan: result.object as QueryPlan, call: result.call };
     },
   };
 }

@@ -44,7 +44,7 @@ const answers = {
 function input(overrides: Partial<CreateMonitorInput> = {}): CreateMonitorInput {
   return {
     ...answers,
-    queries: ["flaky end to end tests", "manual qa before every release"],
+    queries: { reddit: ["flaky end to end tests", "manual qa before every release"] },
     subreddits: ["SaaS", "webdev"],
     sources: ["reddit"],
     ...overrides,
@@ -83,10 +83,11 @@ describe("a monitor made from four answers", () => {
     expect(monitor.idealCustomer).toBe(answers.idealCustomer);
     expect(monitor.problem).toBe(answers.problem);
     expect(monitor.signals).toEqual(["recommendation_request", "problem"]);
-    expect(monitor.generatedQueries).toEqual([
-      "flaky end to end tests",
-      "manual qa before every release",
-    ]);
+    // Keyed by platform since US-027: a query is written for somewhere, and
+    // the column holds one list per platform the monitor watches.
+    expect(monitor.generatedQueries).toEqual({
+      reddit: ["flaky end to end tests", "manual qa before every release"],
+    });
     expect(monitor.generatedSubreddits).toEqual(["SaaS", "webdev"]);
   });
 
@@ -97,11 +98,11 @@ describe("a monitor made from four answers", () => {
     });
 
     const updated = await updateMonitor(db, monitor.id, {
-      queries: ["regression testing takes too long"],
+      queries: { reddit: ["regression testing takes too long"] },
       subreddits: [],
     });
 
-    expect(updated?.generatedQueries).toEqual(["regression testing takes too long"]);
+    expect(updated?.generatedQueries).toEqual({ reddit: ["regression testing takes too long"] });
     expect(updated?.generatedSubreddits).toEqual([]);
     expect(updated?.product).toBe(answers.product);
   });
@@ -183,7 +184,7 @@ describe("a monitor's version", () => {
     const updated = await updateMonitor(db, monitor.id, {
       name: "Journeys, renamed",
       pollIntervalSeconds: 7200,
-      queries: ["regression testing takes too long"],
+      queries: { reddit: ["regression testing takes too long"] },
       minScore: 60,
     });
 
@@ -399,9 +400,8 @@ describe("pausing a monitor", () => {
     expect(kept).toHaveLength(1);
     expect(kept[0]?.score).toBe(92);
     // And the monitor still holds what it was made from.
-    expect((await getMonitor(db, monitor.id))?.generatedQueries).toEqual([
-      "flaky end to end tests",
-      "manual qa before every release",
-    ]);
+    expect((await getMonitor(db, monitor.id))?.generatedQueries).toEqual({
+      reddit: ["flaky end to end tests", "manual qa before every release"],
+    });
   });
 });

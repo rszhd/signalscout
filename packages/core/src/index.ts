@@ -68,8 +68,10 @@ export {
   type QueryGeneratorOptions,
   type QueryPlan,
   type QueryPlanOutcome,
-  queryPlanSchema,
+  queryListSchemaFor,
+  queryPlanSchemaFor,
   searchQuerySchema,
+  searchQuerySchemaFor,
   subredditSchema,
 } from "./ai/queries.js";
 export { type RecordModelCallInput, recordModelCall } from "./ai/record.js";
@@ -224,6 +226,7 @@ export {
   UnusableCursorError,
 } from "./matches/index.js";
 export {
+  allMonitorQueries,
   type CreatedMonitor,
   type CreateMonitorInput,
   createMonitor,
@@ -239,6 +242,7 @@ export {
   type MonitorFilterSettings,
   type MonitorPlan,
   monitorQueries,
+  monitorQueryPlan,
   pauseMonitor,
   type ResumeResult,
   redefinesTheMonitor,

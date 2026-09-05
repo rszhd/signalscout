@@ -198,9 +198,27 @@ One product finding came with it, and it is not about the connector. On X a
 long generated phrase is useless in both directions: unquoted, `end to end
 tests keep breaking` returned anime, Bitcoin and a CIA story across three
 weeks; quoted, it matched nothing at all, twice. The two-word `flaky tests`
-returned twenty posts that were all on topic. **Our query generator writes long
-phrases**, so a monitor on X needs short queries, and nothing yet makes that
-happen. That is a ticket nobody has written.
+returned twenty posts that were all on topic. US-027 is the fix, and it is
+described below.
+
+**A query is now written for one platform.** US-027 keyed the queries by
+platform on 2026-09-05: `monitors.generated_queries` holds one list per
+platform, the generator is told which platforms a monitor watches and writes a
+list for each, and the poll hands a connector its own list and no other. A
+`PlatformDescriptor` carries the rule — four words on X, eight on Reddit — and
+one number is enforced everywhere a query is written or edited: the model's
+schema, the API, and the form. The prompt gives the reason beside the number,
+because a model told only a limit talks itself out of it.
+
+Migration 0021 keyed every existing row by the platforms its monitor watches,
+and it ran against the development database: six monitors, every query kept,
+nothing rewritten. A monitor that names no platform keeps its array and still
+polls, and both worker steps read that older shape.
+
+What is not done: `ai/fixtures/query-plan.json` still holds a plan in the old
+shape, so `capture:queries` has to run again before the fixture is evidence
+about the prompt that ships. And no live search has been run with a query the
+new prompt wrote.
 
 What is unproven: no X poll has run through the worker, so nothing has been
 stored, classified or shown from X. A real rate limit, a real timeout and a

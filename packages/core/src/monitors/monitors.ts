@@ -44,7 +44,7 @@ export interface MonitorAnswers {
 
 /** What the model wrote, after the person edited it. */
 export interface MonitorPlan {
-  readonly queries: readonly string[];
+  readonly queries: MonitorQueries;
   readonly subreddits: readonly string[];
 }
 
@@ -125,19 +125,79 @@ export interface CreatedMonitor {
   readonly missing: readonly MissingCredential[];
 }
 
+/**
+ * Queries as a caller supplies them: one list per platform, keyed by platform
+ * id. A platform with no key is a platform this monitor searches with nothing,
+ * which is what a monitor that watches only the other one wants.
+ */
+export type MonitorQueries = Readonly<Record<string, readonly string[]>>;
+
+/** Stored as a plain object, so a row is readable and a key is a platform id. */
+function queriesToStore(queries: MonitorQueries): Record<string, string[]> {
+  return Object.fromEntries(
+    Object.entries(queries).map(([platform, list]) => [platform, [...list]]),
+  );
+}
+
 export type ResumeResult =
   | { readonly status: "resumed"; readonly monitor: Monitor }
   | { readonly status: "blocked"; readonly missing: readonly MissingCredential[] };
 
 /**
- * The generated queries as strings.
+ * The generated queries, keyed by the platform they were written for.
  *
  * The column is `jsonb`, so its type is a promise rather than a fact, and
  * every reader has to make the same decision about a value that is not a
  * string. One reader, so the poll and the API cannot disagree about what a
  * malformed row means.
+ *
+ * Two shapes are accepted, and the older one is not a mistake to clean up
+ * later. Until US-027 the column held one list for every platform, and
+ * migration 0021 keys those rows by the platforms their monitor watches. A row
+ * the migration could not key — a monitor that names no platform — is still an
+ * array, and it still polls nothing, so reading it as "these queries are for
+ * whatever you asked about" costs nothing and loses nothing.
  */
-export function monitorQueries(value: unknown): string[] {
+export function monitorQueryPlan(value: unknown): Record<string, string[]> {
+  if (Array.isArray(value)) return {};
+  if (typeof value !== "object" || value === null) return {};
+
+  return Object.fromEntries(
+    Object.entries(value as Record<string, unknown>).map(([platform, list]) => [
+      platform,
+      stringsOf(list),
+    ]),
+  );
+}
+
+/**
+ * One platform's queries.
+ *
+ * The platform is required, because the whole point of US-027 is that a query
+ * belongs somewhere. A caller that wants every query for a person to read is
+ * asking a different question, and `allMonitorQueries` answers that one.
+ */
+export function monitorQueries(value: unknown, platform: string): string[] {
+  if (Array.isArray(value)) return stringsOf(value);
+
+  return monitorQueryPlan(value)[platform] ?? [];
+}
+
+/**
+ * Every query a monitor holds, in one list.
+ *
+ * For a reader that is describing the monitor rather than searching with it:
+ * a screen, a log line, a count. Never for building a search — one platform's
+ * phrasing sent to another platform's search is the bug this all exists to
+ * stop.
+ */
+export function allMonitorQueries(value: unknown): string[] {
+  if (Array.isArray(value)) return stringsOf(value);
+
+  return Object.values(monitorQueryPlan(value)).flat();
+}
+
+function stringsOf(value: unknown): string[] {
   return Array.isArray(value)
     ? value.filter((entry): entry is string => typeof entry === "string")
     : [];
@@ -230,7 +290,7 @@ export async function createMonitor(
       idealCustomer: input.idealCustomer,
       problem: input.problem,
       signals: [...input.signals],
-      generatedQueries: [...input.queries],
+      generatedQueries: queriesToStore(input.queries),
       generatedSubreddits: [...input.subreddits],
       sources: [...input.sources],
       ...(input.minScore === undefined ? {} : { minScore: input.minScore }),
@@ -311,7 +371,7 @@ export async function updateMonitor(
     ...(input.idealCustomer === undefined ? {} : { idealCustomer: input.idealCustomer }),
     ...(input.problem === undefined ? {} : { problem: input.problem }),
     ...(input.signals === undefined ? {} : { signals: [...input.signals] }),
-    ...(input.queries === undefined ? {} : { generatedQueries: [...input.queries] }),
+    ...(input.queries === undefined ? {} : { generatedQueries: queriesToStore(input.queries) }),
     ...(input.subreddits === undefined ? {} : { generatedSubreddits: [...input.subreddits] }),
     ...(input.sources === undefined ? {} : { sources: [...input.sources] }),
     ...(input.minScore === undefined ? {} : { minScore: input.minScore }),

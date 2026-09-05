@@ -1,4 +1,5 @@
 export {
+  allMonitorQueries,
   type CreatedMonitor,
   type CreateMonitorInput,
   createMonitor,
@@ -12,6 +13,7 @@ export {
   type MonitorFilterSettings,
   type MonitorPlan,
   monitorQueries,
+  monitorQueryPlan,
   pauseMonitor,
   type ResumeResult,
   redefinesTheMonitor,

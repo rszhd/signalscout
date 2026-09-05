@@ -26,6 +26,7 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { aiEnvSchema } from "../../config/env.js";
+import { platforms } from "../../sources/platforms.js";
 import { type AiConfig, aiConfigFromEnvironment } from "../config.js";
 import { createQueryGenerator } from "../queries.js";
 import { exampleMonitor } from "./examples.js";
@@ -75,7 +76,15 @@ const generator = createQueryGenerator({ config });
 
 console.log(`Writing queries for the example monitor with ${config.provider}/${config.model}\n`);
 
-const outcome = await generator.generate(exampleMonitor);
+/**
+ * Both platforms, in one call.
+ *
+ * US-027 is the reason this is a list rather than nothing. The plan holds one
+ * set of queries per platform, and the fixture is only evidence about the
+ * prompt that ships if it was written for the same platforms the product
+ * ships. A capture of Reddit alone would go on passing while the X rule rotted.
+ */
+const outcome = await generator.generate(exampleMonitor, platforms);
 
 if (outcome.status !== "generated") {
   console.error(`${outcome.status} — ${outcome.error}`);
@@ -97,7 +106,20 @@ const record = {
 writeFileSync(`${here}query-plan.json`, `${JSON.stringify(record, null, 2)}\n`);
 
 console.log("QUERIES");
-for (const query of outcome.plan.queries) console.log(`  ${query}`);
+for (const platform of platforms) {
+  const written = outcome.plan.queries[platform.id] ?? [];
+  const ceiling = platform.search?.maxQueryWords;
+
+  console.log(`  ${platform.displayName}${ceiling ? ` (at most ${ceiling} words)` : ""}`);
+
+  // The word count is printed beside each query on purpose. The schema already
+  // refuses one that is too long, so what a reader needs here is the shape of
+  // what came back: eight queries all at the ceiling is a model obeying the
+  // letter of the rule, and it reads differently from a spread.
+  for (const query of written) {
+    console.log(`    ${query}  [${query.split(/\s+/).filter(Boolean).length} words]`);
+  }
+}
 console.log("\nSUBREDDITS");
 for (const subreddit of outcome.plan.subreddits) console.log(`  r/${subreddit}`);
 

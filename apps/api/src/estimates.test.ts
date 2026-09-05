@@ -26,7 +26,7 @@ import { buildServer } from "./server.js";
 const logger = createLogger({ level: "silent", name: "test" });
 
 const plan = {
-  queries: ["flaky end to end tests", "manual qa before every release"],
+  queries: { reddit: ["flaky end to end tests", "manual qa before every release"] },
   subreddits: ["SaaS"],
   sources: ["reddit"],
 };
@@ -154,7 +154,7 @@ describe("the cost test routes", () => {
       const response = await app.inject({
         method: "POST",
         url: "/api/monitors/estimates",
-        payload: { queries: [], subreddits: [], sources: ["reddit"] },
+        payload: { queries: {}, subreddits: [], sources: ["reddit"] },
       });
 
       expect(response.statusCode).toBe(400);
@@ -245,7 +245,7 @@ describe("the cost test routes", () => {
       const response = await app.inject({
         method: "POST",
         url: "/api/monitors/estimates",
-        payload: { ...plan, queries: ['"flaky tests" AND ci'] },
+        payload: { ...plan, queries: { reddit: ['"flaky tests" AND ci'] } },
       });
 
       expect(response.statusCode).toBe(400);

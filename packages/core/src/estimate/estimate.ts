@@ -314,7 +314,7 @@ export interface ProbeRequest {
  */
 export function probesFor(
   sourceIds: readonly Source[],
-  queries: readonly string[],
+  queries: Readonly<Record<string, readonly string[]>>,
   channels: readonly string[],
 ): ProbeRequest[] {
   const seen = new Set<string>();
@@ -322,7 +322,10 @@ export function probesFor(
 
   for (const source of sourceIds) {
     for (const [kind, terms] of [
-      ["query", queries],
+      // US-027. Each platform is priced on its own queries. Pricing one shared
+      // list against two platforms charged a person twice for a query only one
+      // of them would ever run, and hid that the other had none.
+      ["query", queries[source] ?? []],
       ["channel", channels],
     ] as const) {
       for (const raw of terms) {

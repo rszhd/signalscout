@@ -238,7 +238,6 @@ export function createCollectStep({ registry, credentialsFor }: CollectOptions):
     // so a poll that runs long does not stretch the interval it was given.
     await db.update(monitors).set({ lastPolledAt: sql`now()` }).where(eq(monitors.id, monitorId));
 
-    const queries = monitorQueries(monitor.generatedQueries);
     const channels = monitor.generatedSubreddits;
 
     /**
@@ -392,6 +391,16 @@ export function createCollectStep({ registry, credentialsFor }: CollectOptions):
        * record the collection was paid for would be filtered away as old.
        */
       const window = continuation ? continuation.since : since;
+
+      /**
+       * This platform's own queries, and never another platform's.
+       *
+       * US-027. A phrase written for Reddit returns nothing on X, and a
+       * phrase written for X is too short to be worth a Reddit collection.
+       * Read inside the loop for that reason: one monitor holds a list per
+       * platform, and the platform being polled decides which list it is.
+       */
+      const queries = monitorQueries(monitor.generatedQueries, sourceId);
 
       const outcome = await readSource(
         source,

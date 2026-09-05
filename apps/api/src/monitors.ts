@@ -37,17 +37,18 @@ import {
   maximumQueries,
   maximumSubreddits,
   minimumPollIntervalSeconds,
-  monitorQueries,
+  monitorQueryPlan,
   noFilterDrops,
   notificationIssues,
   noVerdicts,
   type ProviderChoices,
   pauseMonitor,
+  platforms,
   type QueryGenerator,
   readProviderChoices,
   recordModelCall,
   resumeMonitor,
-  searchQuerySchema,
+  searchQuerySchemaFor,
   setBudget,
   signals as signalIds,
   signalList,
@@ -100,11 +101,34 @@ const answersBody = z.object({
  * of them and run the monitor on subreddits alone, which is a real way to use
  * it.
  */
-const queriesField = z.array(searchQuerySchema).max(maximumQueries);
+/**
+ * Queries, keyed by the platform each list is for.
+ *
+ * US-027. Every platform gets its own list and its own rule: the ceiling comes
+ * from `PlatformDescriptor.search`, so an X query is held to four words here
+ * exactly as it is in the prompt. A rule the model must obey and a person may
+ * bypass is a suggestion with a test, and this form is where a person edits.
+ *
+ * The keys are the platforms this build has. A key it does not know is
+ * dropped rather than stored, because `posts.source` could not hold posts
+ * found by it and the poll would never read it.
+ */
+const queriesField = z.object(
+  Object.fromEntries(
+    platforms.map((platform) => [
+      platform.id,
+      z.array(searchQuerySchemaFor(platform.search)).max(maximumQueries).default([]),
+    ]),
+  ),
+);
+
+/** The same shape on the way out, where the keys are whatever a row holds. */
+const queriesResponse = z.record(z.string(), z.array(z.string()));
+
 const subredditsField = z.array(subredditSchema).max(maximumSubreddits);
 
 const planBody = z.object({
-  queries: queriesField.default([]),
+  queries: queriesField.default({}),
   subreddits: subredditsField.default([]),
 });
 
@@ -131,6 +155,18 @@ const preFilterSchema = z.object({
 });
 
 const sourcesField = z.array(z.enum(storableSources));
+
+/**
+ * The generate route's body: the four answers, plus which platforms to write
+ * for. `sources` is new in US-027 and defaults to empty, which means "all of
+ * them" — an older client that does not send it keeps working.
+ */
+/** What a platform that declares no rule of its own is held to. */
+const defaultQueryWords = 8;
+
+const generateBody = answersBody.extend({
+  sources: sourcesField.default([]),
+});
 
 const createBody = answersBody.extend({
   name: z.string().trim().min(1).max(80),
@@ -214,7 +250,7 @@ const monitorSchema = z.object({
   idealCustomer: z.string(),
   problem: z.string(),
   signals: z.array(z.string()),
-  queries: z.array(z.string()),
+  queries: queriesResponse,
   subreddits: z.array(z.string()),
   sources: z.array(z.string()),
   minScore: z.number(),
@@ -326,7 +362,7 @@ function toResponse(
     idealCustomer: monitor.idealCustomer,
     problem: monitor.problem,
     signals: monitor.signals,
-    queries: monitorQueries(monitor.generatedQueries),
+    queries: monitorQueryPlan(monitor.generatedQueries),
     subreddits: monitor.generatedSubreddits,
     sources: monitor.sources,
     minScore: monitor.minScore,
@@ -437,6 +473,12 @@ export async function registerMonitorRoutes(
             z.object({
               id: z.string(),
               displayName: z.string(),
+              /**
+               * How a query has to be written for this platform. US-027: the
+               * form asks for one list per platform and holds each to its own
+               * rule, so it has to be able to say what the rule is.
+               */
+              search: z.object({ maxQueryWords: z.number(), note: z.string() }),
               /** Empty when the platform can be collected. */
               missingCredentials: z.array(missingCredentialSchema),
               ready: z.boolean(),
@@ -473,6 +515,10 @@ export async function registerMonitorRoutes(
           return {
             id: platform.id,
             displayName: platform.displayName,
+            search: {
+              maxQueryWords: platform.search?.maxQueryWords ?? defaultQueryWords,
+              note: platform.search?.note ?? "",
+            },
             // What is still to be set, from whichever providers are blocked.
             // Each entry names its provider, so a platform two providers fetch
             // can be shown as needing one account or the other, never both.
@@ -497,10 +543,10 @@ export async function registerMonitorRoutes(
     method: "POST",
     url: "/api/monitors/queries",
     schema: {
-      body: answersBody,
+      body: generateBody,
       response: {
         200: z.object({
-          queries: z.array(z.string()),
+          queries: queriesResponse,
           subreddits: z.array(z.string()),
           model: z.string(),
           estimatedCostMicros: z.number().nullable(),
@@ -520,7 +566,22 @@ export async function registerMonitorRoutes(
         });
       }
 
-      const outcome = await queryGenerator.generate(request.body);
+      /**
+       * Write for the platforms this monitor watches, and for no others.
+       *
+       * A monitor that watches one platform must not be billed for queries it
+       * will never run, and a plan written for a platform nobody ticked is a
+       * list a person has to read and delete. An empty list means the form has
+       * not asked the question yet, so every platform is written for: that is
+       * the old behaviour, and it is what an older client still gets.
+       */
+      const wanted = request.body.sources;
+      const wantedPlatforms =
+        wanted.length === 0
+          ? platforms
+          : platforms.filter((platform) => wanted.some((id) => id === platform.id));
+
+      const outcome = await queryGenerator.generate(request.body, wantedPlatforms);
 
       await recordModelCall(db, {
         purpose: "query_generation",
@@ -546,8 +607,12 @@ export async function registerMonitorRoutes(
       }
 
       return {
-        queries: outcome.plan.queries,
-        subreddits: outcome.plan.subreddits,
+        // Copied into plain arrays: the plan is readonly and the response
+        // schema is not, and a cast here would hide the next shape change.
+        queries: Object.fromEntries(
+          Object.entries(outcome.plan.queries).map(([platform, list]) => [platform, [...list]]),
+        ),
+        subreddits: [...outcome.plan.subreddits],
         model: queryGenerator.model,
         estimatedCostMicros: outcome.call.estimatedCostMicros ?? null,
       };

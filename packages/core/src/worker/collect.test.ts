@@ -13,8 +13,12 @@ import {
 import { setProviderChoice } from "../sources/choices.js";
 import { fakePosts } from "../sources/fake/fixtures.js";
 import type { FakeSourceOptions } from "../sources/fake/index.js";
+import { fakeSourceDefinition } from "../sources/fake/index.js";
+import { createSourceRegistry } from "../sources/registry.js";
+import { createSourceRuntime } from "../sources/runtime.js";
 import type { CandidatePost, SearchRequest, SocialSource } from "../sources/types.js";
 import { createTestDatabase, type TestDatabase } from "../testing/database.js";
+import { unreachableFetch } from "../testing/network.js";
 import { createCollectStep, excerptLength, maxPagesPerPoll } from "./collect.js";
 import type { CredentialLookup } from "./credentials.js";
 import { filterQueue, pollQueue } from "./queues.js";
@@ -103,6 +107,76 @@ describe("the poll step", () => {
 
     expect(boss.send).toHaveBeenCalledTimes(1);
     expect(sentTo(boss, filterQueue).postIds).toHaveLength(fakePosts.length);
+  });
+
+  it("asks each platform with the queries written for it", async () => {
+    /**
+     * US-027. A monitor holds one list of queries per platform, and the poll
+     * hands each connector its own list and no other.
+     *
+     * The measurement behind it: US-006 sent a six-word Reddit phrase to a
+     * live X search and got anime and Bitcoin posts unquoted, and nothing at
+     * all quoted. Two words returned twenty posts, all on topic. So a list
+     * that reaches the wrong platform either buys noise or buys nothing.
+     */
+    const registry = createSourceRegistry({
+      definitions: [
+        fakeSourceDefinition({
+          id: "reddit",
+          displayName: "Reddit",
+          providerId: "brightdata",
+          providerName: "Bright Data",
+        }),
+        fakeSourceDefinition({
+          id: "x",
+          displayName: "X",
+          providerId: "socialcrawl",
+          providerName: "SocialCrawl",
+        }),
+      ],
+      runtime: createSourceRuntime({ fetch: unreachableFetch, logger: silentLogger }),
+    });
+
+    const monitorId = await insertMonitor(database, {
+      sources: ["reddit", "x"],
+      generatedQueries: {
+        reddit: ["manual qa before every release"],
+        x: ["flaky tests"],
+      },
+      generatedSubreddits: [],
+    });
+
+    await createCollectStep({ registry, credentialsFor: credentials })(
+      { monitorId },
+      contextFor(db, stubBoss()),
+    );
+
+    const asked = (platform: string) =>
+      (registry.only(platform) as SocialSource & { calls: readonly SearchRequest[] }).calls;
+
+    expect(asked("reddit")[0]?.query.queries).toEqual(["manual qa before every release"]);
+    expect(asked("x")[0]?.query.queries).toEqual(["flaky tests"]);
+
+    // The point of the ticket, stated as the thing that must not happen.
+    expect(asked("x")[0]?.query.queries).not.toContain("manual qa before every release");
+  });
+
+  it("gives a monitor written before the split the same queries it had", async () => {
+    // Migration 0021 keys each row by the platforms its monitor watches, and a
+    // monitor naming none keeps its array. Such a row still polls, with
+    // exactly the queries a person last saw.
+    const registry = fakeRegistry();
+    const monitorId = await insertMonitor(database, {
+      generatedQueries: ["flaky end to end tests"],
+      generatedSubreddits: [],
+    });
+
+    await createCollectStep({ registry, credentialsFor: credentials })(
+      { monitorId },
+      contextFor(db, stubBoss()),
+    );
+
+    expect(callsOf(registry)[0]?.query.queries).toEqual(["flaky end to end tests"]);
   });
 
   it("stores one row for a post two providers both collected", async () => {

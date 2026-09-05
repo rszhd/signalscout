@@ -72,7 +72,7 @@ describe("the cost test", () => {
   let onReport: ReturnType<typeof vi.fn<(report: EstimateReport | null) => void>>;
 
   const plan = {
-    queries: ["flaky end to end tests"],
+    queries: { reddit: ["flaky end to end tests"] },
     subreddits: ["SaaS"],
     sources: ["reddit"],
     monthlyCapMicros: 10_000_000,
@@ -112,7 +112,7 @@ describe("the cost test", () => {
     expect(url).toBe("/api/monitors/estimates");
     expect(init.method).toBe("POST");
     expect(JSON.parse(init.body as string)).toEqual({
-      queries: ["flaky end to end tests"],
+      queries: { reddit: ["flaky end to end tests"] },
       subreddits: ["SaaS"],
       sources: ["reddit"],
       monthlyCapMicros: 10_000_000,

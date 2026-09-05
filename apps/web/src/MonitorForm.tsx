@@ -27,6 +27,8 @@ interface CredentialOption {
 interface SourceOption {
   id: string;
   displayName: string;
+  /** How a query has to be written here. US-027; the API reads it from the platform. */
+  search: { maxQueryWords: number; note: string };
   /** Empty when the platform can be collected. */
   missingCredentials: CredentialOption[];
   ready: boolean;
@@ -38,12 +40,21 @@ interface MonitorOptions {
   canGenerateQueries: boolean;
 }
 
+/**
+ * The plan, with one list of queries per platform.
+ *
+ * US-027. A query is written for somewhere: the same phrase that finds people
+ * on Reddit matches nothing on X, so the person edits a list per platform and
+ * each list is held to that platform's own limit.
+ */
 interface QueryPlan {
-  queries: string[];
+  queries: Record<string, string[]>;
   subreddits: string[];
   model?: string;
   estimatedCostMicros?: number | null;
 }
+
+const emptyPlan: QueryPlan = { queries: {}, subreddits: [] };
 
 interface CreatedMonitor {
   id: string;
@@ -93,11 +104,41 @@ function describeMissing(missing: readonly CredentialOption[]): string {
 }
 
 /** What the plan says, for telling a tested plan from an edited one. */
-function planSignature(queries: readonly string[], subreddits: readonly string[]): string {
-  return JSON.stringify([cleanList(queries), cleanList(subreddits)]);
+function planSignature(
+  queries: Readonly<Record<string, readonly string[]>>,
+  subreddits: readonly string[],
+): string {
+  // Sorted by platform so that two identical plans built in a different order
+  // are one signature, and a person is not asked to re-test a plan they did
+  // not change.
+  const byPlatform = Object.keys(queries)
+    .sort()
+    .map((platform) => [platform, cleanList(queries[platform] ?? [])] as const)
+    .filter(([, list]) => list.length > 0);
+
+  return JSON.stringify([byPlatform, cleanList(subreddits)]);
 }
 
-function cleanList(values: readonly string[]): string[] {
+/** Every query in the plan, for the "did you keep anything?" check. */
+function allQueries(queries: Readonly<Record<string, readonly string[]>>): string[] {
+  return Object.values(queries).flatMap((list) => cleanList(list));
+}
+
+/** One platform's list, cleaned, keyed for sending. */
+function cleanQueries(
+  queries: Readonly<Record<string, readonly string[]>>,
+  platforms: readonly string[],
+): Record<string, string[]> {
+  return Object.fromEntries(platforms.map((id) => [id, cleanList(queries[id] ?? [])]));
+}
+
+function cleanList(values: readonly string[] | undefined): string[] {
+  // A value that is not a list is not one query either. The API is typed, but
+  // an older server answering an older shape reaches this component as data,
+  // and a form that throws on it shows a person a blank screen instead of
+  // their four answers.
+  if (!Array.isArray(values)) return [];
+
   return values.map((value) => value.trim()).filter(Boolean);
 }
 
@@ -120,7 +161,7 @@ export function MonitorForm() {
   const [answers, setAnswers] = useState<Answers>(emptyAnswers);
   const [selectedSignals, setSelectedSignals] = useState<string[]>([]);
   const [selectedSources, setSelectedSources] = useState<string[]>([]);
-  const [plan, setPlan] = useState<QueryPlan>({ queries: [], subreddits: [] });
+  const [plan, setPlan] = useState<QueryPlan>(emptyPlan);
   const [stage, setStage] = useState<"answers" | "review" | "created">("answers");
   const [created, setCreated] = useState<CreatedMonitor | null>(null);
   const [working, setWorking] = useState<"generating" | "creating" | null>(null);
@@ -175,7 +216,7 @@ export function MonitorForm() {
   const missingCredentials = selectedSourceOptions.flatMap((source) => source.missingCredentials);
 
   const capMicros = cap.trim() === "" ? null : toMicros(cap);
-  const queries = cleanList(plan.queries);
+  const queries = cleanQueries(plan.queries, selectedSources);
   const subreddits = cleanList(plan.subreddits);
   const signature = planSignature(plan.queries, plan.subreddits);
   const stale = testedPlan !== null && testedPlan !== signature;
@@ -193,13 +234,30 @@ export function MonitorForm() {
 
   const takeReport = useCallback((report: EstimateReport | null) => {
     setEstimate(report);
+
+    if (!report) {
+      setTestedPlan(null);
+      return;
+    }
+
+    // The report carries one probe per platform and term, so the signature is
+    // rebuilt from it the way the plan builds one: a query tested for Reddit
+    // does not mark the same words tested for X.
+    const queriesByPlatform: Record<string, string[]> = {};
+
+    for (const probe of report.queries) {
+      if (probe.kind !== "query") continue;
+
+      const list = queriesByPlatform[probe.source] ?? [];
+      list.push(probe.term);
+      queriesByPlatform[probe.source] = list;
+    }
+
     setTestedPlan(
-      report
-        ? planSignature(
-            report.queries.filter((probe) => probe.kind === "query").map((probe) => probe.term),
-            report.queries.filter((probe) => probe.kind === "channel").map((probe) => probe.term),
-          )
-        : null,
+      planSignature(
+        queriesByPlatform,
+        report.queries.filter((probe) => probe.kind === "channel").map((probe) => probe.term),
+      ),
     );
   }, []);
 
@@ -222,7 +280,10 @@ export function MonitorForm() {
     }
 
     if (!options.canGenerateQueries) {
-      setPlan({ queries: [""], subreddits: [] });
+      setPlan({
+        queries: Object.fromEntries(selectedSources.map((id) => [id, [""]])),
+        subreddits: [],
+      });
       setStage("review");
       return;
     }
@@ -237,6 +298,8 @@ export function MonitorForm() {
           idealCustomer: answers.idealCustomer,
           problem: answers.problem,
           signals: selectedSignals,
+          // Written for the platforms this monitor watches, and no others.
+          sources: selectedSources,
         }),
       });
       setPlan(generated);
@@ -253,7 +316,7 @@ export function MonitorForm() {
     if (working) return;
     setError(null);
 
-    if (queries.length === 0 && subreddits.length === 0) {
+    if (allQueries(queries).length === 0 && subreddits.length === 0) {
       setError("Keep at least one search query or subreddit.");
       return;
     }
@@ -292,7 +355,7 @@ export function MonitorForm() {
     setAnswers(emptyAnswers);
     setSelectedSignals(options?.signals.map((signal) => signal.id) ?? []);
     setSelectedSources(options?.sources.map((source) => source.id) ?? []);
-    setPlan({ queries: [], subreddits: [] });
+    setPlan(emptyPlan);
     setCreated(null);
     setError(null);
     setCap("");
@@ -523,60 +586,102 @@ export function MonitorForm() {
                 </div>
               )}
 
-              <section className="plan-section">
-                <div className="section-title-row">
-                  <div>
-                    <h3>Search queries</h3>
-                    <p>Plain phrases, without AND, OR or quote syntax.</p>
-                  </div>
-                  <span>{cleanList(plan.queries).length} of 8</span>
-                </div>
-                <div className="query-list">
-                  {plan.queries.map((query, index) => (
-                    <div className="query-row" key={`query-${index.toString()}`}>
-                      <span className="query-number">{index + 1}</span>
-                      <input
-                        aria-label={`Search query ${index + 1}`}
-                        maxLength={80}
-                        placeholder="A phrase people might search for"
-                        value={query}
-                        onChange={(event) =>
-                          setPlan((current) => ({
-                            ...current,
-                            queries: current.queries.map((item, itemIndex) =>
-                              itemIndex === index ? event.target.value : item,
-                            ),
-                          }))
-                        }
-                      />
+              {selectedSourceOptions.map((source) => {
+                const list = plan.queries[source.id] ?? [];
+                const limit = source.search.maxQueryWords;
+
+                return (
+                  <section className="plan-section" key={`queries-${source.id}`}>
+                    <div className="section-title-row">
+                      <div>
+                        <h3>Search queries for {source.displayName}</h3>
+                        <p>
+                          Plain phrases, without AND, OR or quote syntax. At most {limit} words
+                          each.
+                          {source.search.note ? ` ${source.search.note}` : ""}
+                        </p>
+                      </div>
+                      <span>{cleanList(list).length} of 8</span>
+                    </div>
+                    <div className="query-list">
+                      {list.map((query, index) => {
+                        const words = query.trim().split(/\s+/).filter(Boolean).length;
+
+                        return (
+                          <div className="query-row" key={`query-${source.id}-${index.toString()}`}>
+                            <span className="query-number">{index + 1}</span>
+                            <input
+                              aria-label={`${source.displayName} search query ${index + 1}`}
+                              aria-invalid={words > limit}
+                              maxLength={80}
+                              placeholder="A phrase people might search for"
+                              value={query}
+                              onChange={(event) =>
+                                setPlan((current) => ({
+                                  ...current,
+                                  queries: {
+                                    ...current.queries,
+                                    [source.id]: (current.queries[source.id] ?? []).map(
+                                      (item, itemIndex) =>
+                                        itemIndex === index ? event.target.value : item,
+                                    ),
+                                  },
+                                }))
+                              }
+                            />
+                            <button
+                              aria-label={`Remove ${source.displayName} query ${index + 1}`}
+                              className="icon-button"
+                              type="button"
+                              onClick={() =>
+                                setPlan((current) => ({
+                                  ...current,
+                                  queries: {
+                                    ...current.queries,
+                                    [source.id]: (current.queries[source.id] ?? []).filter(
+                                      (_, itemIndex) => itemIndex !== index,
+                                    ),
+                                  },
+                                }))
+                              }
+                            >
+                              <span aria-hidden="true">×</span>
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    {/* A query longer than the platform takes is refused by the
+                        API, so the form says which one and why before the person
+                        presses a button that fails. */}
+                    {list.some(
+                      (query) => query.trim().split(/\s+/).filter(Boolean).length > limit,
+                    ) && (
+                      <p className="field-note">
+                        A query above is longer than {limit} words. On {source.displayName} a longer
+                        phrase has to appear inside a post to match one, and it will not.
+                      </p>
+                    )}
+                    {list.length < 8 && (
                       <button
-                        aria-label={`Remove query ${index + 1}`}
-                        className="icon-button"
+                        className="text-button"
                         type="button"
                         onClick={() =>
                           setPlan((current) => ({
                             ...current,
-                            queries: current.queries.filter((_, itemIndex) => itemIndex !== index),
+                            queries: {
+                              ...current.queries,
+                              [source.id]: [...(current.queries[source.id] ?? []), ""],
+                            },
                           }))
                         }
                       >
-                        <span aria-hidden="true">×</span>
+                        <span aria-hidden="true">+</span> Add query
                       </button>
-                    </div>
-                  ))}
-                </div>
-                {plan.queries.length < 8 && (
-                  <button
-                    className="text-button"
-                    type="button"
-                    onClick={() =>
-                      setPlan((current) => ({ ...current, queries: [...current.queries, ""] }))
-                    }
-                  >
-                    <span aria-hidden="true">+</span> Add query
-                  </button>
-                )}
-              </section>
+                    )}
+                  </section>
+                );
+              })}
 
               <section className="plan-section subreddit-section">
                 <div className="section-title-row">

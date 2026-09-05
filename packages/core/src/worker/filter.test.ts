@@ -123,11 +123,15 @@ let closeDb: () => Promise<void>;
 const classified: ClassifyPayload[] = [];
 const lines: Array<Record<string, unknown>> = [];
 
-async function insertPost(post: (typeof fakePosts)[number], externalId: string): Promise<string> {
+async function insertPost(
+  post: (typeof fakePosts)[number],
+  externalId: string,
+  source: "reddit" | "x" = "reddit",
+): Promise<string> {
   const [row] = await db
     .insert(posts)
     .values({
-      source: "reddit",
+      source,
       externalId,
       url: post.url,
       author: post.author ?? null,
@@ -246,6 +250,83 @@ describe("the keyword stage", () => {
 
     const embedded = batches.flat();
     expect(embedded).not.toContain(sourdoughPost.text);
+  }, 30_000);
+});
+
+describe("a post is checked against its own platform's queries", () => {
+  /**
+   * US-027. A monitor holds one list of queries per platform, because the same
+   * phrase does not work in two places: US-006 measured a six-word Reddit
+   * phrase returning nothing on X, and two words returning twenty posts that
+   * were all on topic.
+   *
+   * The pre-filter is where that becomes money. A post checked against the
+   * wrong platform's words is either dropped for missing words nobody asked
+   * its platform for, or kept and sent to the model at full price.
+   */
+  const perPlatform = {
+    reddit: ["flaky end to end tests", "playwright suite maintenance"],
+    x: ["sourdough starter"],
+  };
+
+  it("keeps an X post its own list matches, and drops the one only Reddit asked for", async () => {
+    const monitorId = await insertFilterMonitor(database, {
+      generatedQueries: perPlatform,
+      generatedSubreddits: [],
+      preFilterEnabled: true,
+      // The keyword stage is what these cases are about, so the stage after it
+      // is opened wide: a post dropped for being far from the monitor would
+      // look exactly like a post the keyword rule refused.
+      similarityThreshold: 0,
+    });
+
+    // The words are crossed on purpose: the sourdough post is what the X list
+    // asks for, and the broken-tests post is what the Reddit list asks for.
+    // Both arrive as X posts, so only the X list may decide.
+    const sourdoughId = await insertPost(sourdoughPost, "platform-x-sourdough", "x");
+    const testsId = await insertPost(brokenTestsPost, "platform-x-tests", "x");
+
+    const reached = await filterPosts(monitorId, [sourdoughId, testsId]);
+
+    expect(reached.postIds).toEqual([sourdoughId]);
+  }, 30_000);
+
+  it("uses the Reddit list for a Reddit post in the same monitor", async () => {
+    const monitorId = await insertFilterMonitor(database, {
+      generatedQueries: perPlatform,
+      generatedSubreddits: [],
+      preFilterEnabled: true,
+      // The keyword stage is what these cases are about, so the stage after it
+      // is opened wide: a post dropped for being far from the monitor would
+      // look exactly like a post the keyword rule refused.
+      similarityThreshold: 0,
+    });
+
+    const sourdoughId = await insertPost(sourdoughPost, "platform-reddit-sourdough", "reddit");
+    const testsId = await insertPost(brokenTestsPost, "platform-reddit-tests", "reddit");
+
+    const reached = await filterPosts(monitorId, [sourdoughId, testsId]);
+
+    expect(reached.postIds).toEqual([testsId]);
+  }, 30_000);
+
+  it("still filters a monitor whose queries were written before the split", async () => {
+    // Migration 0021 keys a row by the platforms its monitor watches, and a
+    // monitor that names none keeps its array. Such a row must go on polling
+    // rather than silently matching nothing.
+    const monitorId = await insertFilterMonitor(database, {
+      generatedQueries: ["flaky end to end tests", "playwright suite maintenance"],
+      generatedSubreddits: [],
+      preFilterEnabled: true,
+      similarityThreshold: 0,
+    });
+
+    const sourdoughId = await insertPost(sourdoughPost, "legacy-shape-sourdough", "x");
+    const testsId = await insertPost(brokenTestsPost, "legacy-shape-tests", "x");
+
+    const reached = await filterPosts(monitorId, [sourdoughId, testsId]);
+
+    expect(reached.postIds).toEqual([testsId]);
   }, 30_000);
 });
 

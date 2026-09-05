@@ -185,6 +185,31 @@ export interface PlatformDescriptor {
   readonly id: PlatformId;
   /** Shown to a person. "Reddit", not "reddit". */
   readonly displayName: string;
+  /**
+   * How a search behaves here, for the generator that writes the queries.
+   *
+   * This is a platform fact and not a provider one, which is why it sits on
+   * this axis. A Reddit post has a title and paragraphs, so a six-word phrase
+   * can appear inside it. An X post is a few sentences, so the same phrase
+   * matches nothing — US-006 measured both, and US-027 is the ticket that
+   * carries the fix.
+   *
+   * A platform that says nothing here gets the generator's default, which is
+   * the wider Reddit-shaped rule.
+   */
+  readonly search?: PlatformSearchStyle;
+}
+
+/**
+ * What a query has to look like to work on one platform.
+ *
+ * `maxQueryWords` is the number that was measured. `note` is the sentence the
+ * model is given, and it says *why*, because a limit with no reason is a limit
+ * a model talks itself out of.
+ */
+export interface PlatformSearchStyle {
+  readonly maxQueryWords: number;
+  readonly note: string;
 }
 
 /**

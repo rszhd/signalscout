@@ -199,6 +199,24 @@ table above.
 
 ---
 
+## A query belongs to a platform
+
+`SourceQuery.queries` is the list written for the platform being polled, and
+never the monitor's whole set. `monitors.generated_queries` holds one list per
+platform, `monitorQueries(value, platform)` reads one of them, and the poll
+calls it inside its loop over sources.
+
+The rule each platform holds a query to lives on its `PlatformDescriptor`:
+
+```ts
+search: { maxQueryWords: 4, note: "An X post is a few sentences, so a long phrase..." }
+```
+
+A connector never edits a person's words to fit. US-006 is why: on X the same
+six-word phrase returned unrelated posts unquoted and nothing at all quoted,
+and a connector that quietly shortened it would have hidden that from everyone.
+The generator writes for somewhere; the connector asks for what it was given.
+
 ## What the runtime is for
 
 Every side effect a connector has arrives through `SourceRuntime`: `fetch`,

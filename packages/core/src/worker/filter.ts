@@ -49,6 +49,8 @@ export interface FilterOptions {
 /** A post as both stages read it, which is a row minus what neither needs. */
 interface Candidate {
   readonly id: string;
+  /** The platform it came from, which decides the queries it is checked against. */
+  readonly source: string;
   readonly channel: string | null;
   readonly title: string | null;
   readonly excerpt: string;
@@ -96,6 +98,7 @@ export function createFilterStep({ embedder }: FilterOptions = {}): Step<FilterP
     const candidates: Candidate[] = await db
       .select({
         id: posts.id,
+        source: posts.source,
         channel: posts.channel,
         title: posts.title,
         excerpt: posts.excerpt,
@@ -106,16 +109,34 @@ export function createFilterStep({ embedder }: FilterOptions = {}): Step<FilterP
       .from(posts)
       .where(inArray(posts.id, ids));
 
-    const rule = keywordRuleFor({
-      queries: monitorQueries(monitor.generatedQueries),
-      subreddits: monitor.generatedSubreddits,
-    });
+    /**
+     * One rule per platform, built once and reused for every post from it.
+     *
+     * US-027. A post is checked against the queries that could have found it,
+     * and never against another platform's. Checking an X post against a
+     * Reddit phrase would drop it for missing words nobody asked X for, and
+     * checking a Reddit post against a two-word X query would keep almost
+     * everything and send the bill to the model.
+     */
+    const rules = new Map<string, ReturnType<typeof keywordRuleFor>>();
+
+    const ruleFor = (source: string) => {
+      const found = rules.get(source);
+      if (found) return found;
+
+      const rule = keywordRuleFor({
+        queries: monitorQueries(monitor.generatedQueries, source),
+        subreddits: monitor.generatedSubreddits,
+      });
+      rules.set(source, rule);
+      return rule;
+    };
 
     const kept: Candidate[] = [];
     const drops: FilterDrop[] = [];
 
     for (const candidate of candidates) {
-      if (keepsPost(rule, candidate)) kept.push(candidate);
+      if (keepsPost(ruleFor(candidate.source), candidate)) kept.push(candidate);
       else drops.push({ postId: candidate.id, stage: "keyword", similarity: null });
     }
 

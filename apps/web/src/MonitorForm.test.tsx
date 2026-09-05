@@ -40,16 +40,28 @@ const options = {
   // One row per platform, never per connector. US-026: the form names
   // networks, and which account fetches them is the connections screen's
   // question.
-  sources: [{ id: "reddit", displayName: "Reddit", missingCredentials: [], ready: true }],
+  sources: [
+    {
+      id: "reddit",
+      displayName: "Reddit",
+      // US-027: the form asks for one list per platform and shows each
+      // platform's own limit, so the options carry it.
+      search: { maxQueryWords: 8, note: "A Reddit post has a title and paragraphs." },
+      missingCredentials: [],
+      ready: true,
+    },
+  ],
   canGenerateQueries: true,
 };
 
 const generated = {
-  queries: [
-    "playwright tests break every release",
-    "manual qa before every release",
-    "flaky end to end tests",
-  ],
+  queries: {
+    reddit: [
+      "playwright tests break every release",
+      "manual qa before every release",
+      "flaky end to end tests",
+    ],
+  },
   subreddits: ["SaaS", "webdev"],
   model: "claude-haiku-4-5",
   estimatedCostMicros: 850,
@@ -123,10 +135,10 @@ describe("the monitor form", () => {
     await act(async () => button("Generate search plan").click());
     await settle();
 
-    expect(input("Search query 1").value).toBe("playwright tests break every release");
+    expect(input("Reddit search query 1").value).toBe("playwright tests break every release");
     await act(async () => {
-      setValue(input("Search query 1"), "browser tests break after every release");
-      button("Remove query 2").click();
+      setValue(input("Reddit search query 1"), "browser tests break after every release");
+      button("Remove Reddit query 2").click();
     });
     await act(async () => button("Start monitor").click());
     await settle();
@@ -142,7 +154,7 @@ describe("the monitor form", () => {
     expect(JSON.parse(createCall?.[1]?.body as string)).toMatchObject({
       name: "Journeys",
       product: "A test runner that records browser flows instead of coding them",
-      queries: ["browser tests break after every release", "flaky end to end tests"],
+      queries: { reddit: ["browser tests break after every release", "flaky end to end tests"] },
       subreddits: ["SaaS", "webdev"],
       sources: ["reddit"],
     });
@@ -161,7 +173,7 @@ describe("the monitor form", () => {
       testUnits: 30,
       testCostMicros: 45_000,
       queries: [
-        ...generated.queries.map((term) => ({
+        ...generated.queries.reddit.map((term) => ({
           source: "reddit",
           sourceName: "Reddit",
           kind: "query",
@@ -245,7 +257,9 @@ describe("the monitor form", () => {
     const testCall = fetchMock.mock.calls.find(([url]) => url === "/api/monitors/estimates");
     expect(JSON.parse(testCall?.[1]?.body as string)).toMatchObject({
       monthlyCapMicros: 10_000_000,
-      queries: generated.queries,
+      // The cost test prices each platform's own list, so the body carries the
+      // same keyed shape the monitor is created with. US-027.
+      queries: { reddit: generated.queries.reddit },
     });
 
     expect(container.textContent).toContain("spend its budget before the month ends");

@@ -73,7 +73,8 @@ export interface EstimateReport {
 }
 
 export interface CostTestProps {
-  queries: string[];
+  /** One list per platform, keyed by platform id. US-027. */
+  queries: Record<string, string[]>;
   subreddits: string[];
   sources: string[];
   /** The cap the answer is measured against. Null when no cap was set. */

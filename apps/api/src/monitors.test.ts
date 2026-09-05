@@ -51,11 +51,14 @@ const call: ModelCall = {
 };
 
 const plan = {
-  queries: [
-    "playwright tests break every release",
-    "how do small teams handle regression testing",
-    "tired of manually testing signup and checkout",
-  ],
+  queries: {
+    reddit: [
+      "playwright tests break every release",
+      "how do small teams handle regression testing",
+      "tired of manually testing signup and checkout",
+    ],
+    x: ["flaky tests", "e2e suite broken", "regression testing pain"],
+  },
   subreddits: ["SaaS", "webdev"],
 };
 
@@ -84,7 +87,10 @@ const answers = {
 const newMonitor = {
   name: "Journeys",
   ...answers,
-  queries: ["flaky end to end tests", "manual qa before every release"],
+  queries: {
+    reddit: ["flaky end to end tests", "manual qa before every release"],
+    x: [],
+  },
   subreddits: ["SaaS"],
   sources: ["reddit"],
 };
@@ -390,10 +396,68 @@ describe("the monitor routes", () => {
         const response = await app.inject({
           method: "POST",
           url: "/api/monitors",
-          payload: { ...newMonitor, queries: ["playwright AND flaky"] },
+          payload: { ...newMonitor, queries: { reddit: ["playwright AND flaky"] } },
         });
 
         expect(response.statusCode).toBe(400);
+      });
+    });
+
+    it("refuses a query too long for the platform it is written for", async () => {
+      /**
+       * US-027, and the numbers are measured. US-006 sent
+       * `end to end tests keep breaking` to a live X search twice: unquoted it
+       * returned anime, Bitcoin and a CIA story across three weeks, and quoted
+       * it matched nothing at all. Two words returned twenty posts, all on
+       * topic. So the ceiling is four words on X and eight on Reddit, and a
+       * person editing here is held to the same rule as the model.
+       */
+      await withServer({}, async (app) => {
+        const tooLongForX = await app.inject({
+          method: "POST",
+          url: "/api/monitors",
+          payload: {
+            ...newMonitor,
+            sources: ["x"],
+            queries: { x: ["end to end tests keep breaking"] },
+          },
+        });
+
+        expect(tooLongForX.statusCode).toBe(400);
+
+        const sameWordsOnReddit = await app.inject({
+          method: "POST",
+          url: "/api/monitors",
+          payload: {
+            ...newMonitor,
+            queries: { reddit: ["end to end tests keep breaking"] },
+          },
+        });
+
+        expect(sameWordsOnReddit.statusCode).toBe(201);
+      });
+    });
+
+    it("keeps each platform's queries apart, so one list cannot reach the other's search", async () => {
+      await withServer({}, async (app) => {
+        const response = await app.inject({
+          method: "POST",
+          url: "/api/monitors",
+          payload: {
+            ...newMonitor,
+            sources: ["reddit", "x"],
+            queries: {
+              reddit: ["manual qa before every release"],
+              x: ["flaky tests"],
+            },
+          },
+        });
+
+        expect(response.statusCode).toBe(201);
+        expect(response.json().queries).toEqual({
+          reddit: ["manual qa before every release"],
+          x: ["flaky tests"],
+        });
       });
     });
 
@@ -465,11 +529,14 @@ describe("the monitor routes", () => {
         const response = await app.inject({
           method: "PATCH",
           url: `/api/monitors/${id}`,
-          payload: { queries: ["regression testing takes too long"], subreddits: [] },
+          payload: { queries: { reddit: ["regression testing takes too long"] }, subreddits: [] },
         });
 
         expect(response.statusCode).toBe(200);
-        expect(response.json().queries).toEqual(["regression testing takes too long"]);
+        expect(response.json().queries).toEqual({
+          reddit: ["regression testing takes too long"],
+          x: [],
+        });
         expect(response.json().product).toBe(newMonitor.product);
       });
     });
@@ -510,7 +577,7 @@ describe("the monitor routes", () => {
         await app.inject({
           method: "PATCH",
           url: `/api/monitors/${id}`,
-          payload: { queries: ["regression testing takes too long"], subreddits: [] },
+          payload: { queries: { reddit: ["regression testing takes too long"] }, subreddits: [] },
         });
 
         const after = await getMonitor(db, id);

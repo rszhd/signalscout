@@ -211,6 +211,20 @@ export interface ReplyRequest {
   /** The platform id of that post, so a connector can check what came back. */
   readonly postExternalId: string;
   readonly credentials: SourceCredentials;
+  /**
+   * Return nothing said at or before this time.
+   *
+   * A thread outlives the post above it. US-034's live YouTube poll returned a
+   * comment written in **June 2021** — 1,915 days old — as a lead, because
+   * nothing here carried a window and the connector had nothing to cut on. A
+   * person who wanted a Cypress alternative five years ago chose one long ago.
+   *
+   * A connector applies this itself, because no provider we have offers a
+   * server-side date parameter for comments. Where the platform orders newest
+   * first, that is a cheap walk; where it does not, it is a filter over the
+   * page. Either way it must never be ignored.
+   */
+  readonly since?: Date;
   /** Opaque, from a previous `ReplyResult`. Absent starts at the first page. */
   readonly cursor?: string;
   readonly signal?: AbortSignal;

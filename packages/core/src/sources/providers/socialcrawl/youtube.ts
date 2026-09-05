@@ -263,9 +263,37 @@ export class SocialCrawlYouTubeSource implements SocialSource {
       request.signal,
     );
 
-    const replies = page.records
+    const parsed = page.records
       .map((record) => toCandidateReply(record, request.postExternalId))
       .filter((reply): reply is CandidateReply => reply !== undefined);
+
+    /**
+     * The date cut, and the reason it is a filter rather than a stop.
+     *
+     * The provider warns that the first row of the first page can be the
+     * video's pinned comment whatever the order, so a walk that stopped at the
+     * first out-of-window row could stop on row one and return nothing. Every
+     * row is tested instead. That is the trap the capture went looking for.
+     */
+    const replies = request.since
+      ? parsed.filter((reply) => reply.postedAt > (request.since as Date))
+      : parsed;
+
+    /**
+     * Whether paging on would buy anything.
+     *
+     * This is where the provider's ordering guarantee is finally spent: rows
+     * arrive newest-first and each page continues strictly older, so once a
+     * page's own oldest row is outside the window, every later page is too.
+     * Measured over one full thread on 2026-09-06.
+     */
+    const oldest = parsed.at(-1)?.postedAt;
+    const pastTheWindow =
+      request.since !== undefined && oldest !== undefined && oldest <= request.since;
+
+    if (pastTheWindow) {
+      return { replies, unitsConsumed: page.creditsUsed, next: { status: "done" }, partial: false };
+    }
 
     return {
       replies,

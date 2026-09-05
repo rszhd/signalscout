@@ -219,7 +219,21 @@ export class ScrapeCreatorsRedditSource implements SocialSource {
     const page = await client.fetchComments(request.postUrl, request.cursor, request.signal);
 
     const channel = textOf(page.post.subreddit);
-    const replies = toCandidateReplies(page.comments, request.postExternalId, channel);
+    const parsed = toCandidateReplies(page.comments, request.postExternalId, channel);
+
+    /**
+     * The date cut, applied here because the provider offers none.
+     *
+     * A thread outlives the post above it, so a comment can be years older
+     * than the poll that found its post. There is no ordering guarantee to
+     * lean on either: this endpoint returns a ranked tree, not a newest-first
+     * list, so every row is tested and paging is never stopped early on a
+     * date. US-020 measured what the ordering claims are worth here — a
+     * top-level `has_more: false` arrived with 33 of 58 comments missing.
+     */
+    const replies = request.since
+      ? parsed.filter((reply) => reply.postedAt > (request.since as Date))
+      : parsed;
 
     // The post's own count against what we hold. Equal or greater is the only
     // evidence that a thread was read to the end; anything else is partial,
@@ -229,7 +243,9 @@ export class ScrapeCreatorsRedditSource implements SocialSource {
       page.after === undefined &&
       typeof claimed === "number" &&
       Number.isFinite(claimed) &&
-      replies.length >= claimed;
+      // Against what arrived, not what survived the date cut: a thread read to
+      // the end is complete however few of its comments are recent.
+      parsed.length >= claimed;
 
     return {
       replies,

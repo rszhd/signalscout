@@ -90,6 +90,11 @@ export interface FakeSourceOptions {
   /** Units billed for one call to `fetchReplies`. */
   readonly unitsPerReplyCall?: number;
   /**
+   * Called with every reply request, so a caller's own arguments can be
+   * asserted — the date window most of all, which no returned value shows.
+   */
+  readonly onFetchReplies?: (request: ReplyRequest) => void;
+  /**
    * What the fake reports as `ReplyResult.partial`.
    *
    * Defaults to true, which is what both real providers report almost always:
@@ -175,6 +180,7 @@ export function createFakeSource(
       : {
           fetchReplies: (request: ReplyRequest) => {
             replyCalls.push(request);
+            options.onFetchReplies?.(request);
 
             const replies =
               typeof options.replies === "function"

@@ -382,6 +382,114 @@ describe("reading the comments under a video", () => {
     expect(result.partial).toBe(true);
   });
 
+  /**
+   * The failure a live run found, and the reason `since` reaches a connector at
+   * all.
+   *
+   * US-034's poll returned a comment written in **June 2021** as a lead —
+   * 1,915 days old. A person who wanted a Cypress alternative five years ago
+   * chose one long ago. Nothing carried a window, so the connector had nothing
+   * to cut on.
+   */
+  describe("a window on the comments", () => {
+    it("drops what was said before it", async () => {
+      const { fetch: fetchStub } = socialCrawl([{ status: 200, body: comments }]);
+      const source = new SocialCrawlYouTubeSource(runtimeWith(fetchStub));
+
+      const all = await source.fetchReplies(replyRequest);
+      const recent = await source.fetchReplies({
+        ...replyRequest,
+        since: new Date("2026-01-01T00:00:00.000Z"),
+      });
+
+      expect(recent.replies.length).toBeLessThan(all.replies.length);
+      expect(
+        recent.replies.every((reply) => reply.postedAt > new Date("2026-01-01T00:00:00.000Z")),
+      ).toBe(true);
+    });
+
+    it("keeps everything when no window is given", async () => {
+      const { fetch: fetchStub } = socialCrawl([{ status: 200, body: comments }]);
+      const source = new SocialCrawlYouTubeSource(runtimeWith(fetchStub));
+
+      const result = await source.fetchReplies(replyRequest);
+
+      expect(result.replies.length).toBeGreaterThan(40);
+    });
+
+    /**
+     * **The trap the provider warns about.** The first row of the first page
+     * can be the video's pinned comment whatever the order — so a walk that
+     * terminated on the first out-of-window row could stop on row one and
+     * return nothing at all. Every row is tested instead.
+     */
+    it("does not stop at a pinned comment older than the window", async () => {
+      const rows = itemsOf(comments);
+      const stale = {
+        comment: {
+          id: "pinned-1",
+          text: "Pinned years ago, still at the top.",
+          published_at: "2019-01-01T00:00:00.000Z",
+          parent_id: "8g7FvoRToGo",
+        },
+      };
+      const withPinned = {
+        ...comments,
+        data: { ...(comments.data as object), items: [stale, ...rows] },
+      };
+
+      const { fetch: fetchStub } = socialCrawl([{ status: 200, body: withPinned }]);
+      const source = new SocialCrawlYouTubeSource(runtimeWith(fetchStub));
+
+      const result = await source.fetchReplies({
+        ...replyRequest,
+        since: new Date("2025-01-01T00:00:00.000Z"),
+      });
+
+      // The pinned row is dropped and the rows behind it survive. Stopping on
+      // position would have returned an empty page.
+      expect(result.replies.length).toBeGreaterThan(0);
+      expect(result.replies.some((reply) => reply.externalId === "pinned-1")).toBe(false);
+    });
+
+    /**
+     * The other half of the ordering guarantee: rows arrive newest-first and
+     * each page continues strictly older, so once a page's own oldest row is
+     * outside the window, every later page is too. That is when paging stops.
+     */
+    it("stops paging once the page's oldest row is outside the window", async () => {
+      const withMore = {
+        ...comments,
+        pagination: { next_cursor: "sc.more", has_more: true, page_size: 51 },
+      };
+      const { fetch: fetchStub } = socialCrawl([{ status: 200, body: withMore }]);
+      const source = new SocialCrawlYouTubeSource(runtimeWith(fetchStub));
+
+      const result = await source.fetchReplies({
+        ...replyRequest,
+        since: new Date("2026-01-01T00:00:00.000Z"),
+      });
+
+      expect(result.next).toEqual({ status: "done" });
+    });
+
+    it("keeps paging while the page still reaches into the window", async () => {
+      const withMore = {
+        ...comments,
+        pagination: { next_cursor: "sc.more", has_more: true, page_size: 51 },
+      };
+      const { fetch: fetchStub } = socialCrawl([{ status: 200, body: withMore }]);
+      const source = new SocialCrawlYouTubeSource(runtimeWith(fetchStub));
+
+      const result = await source.fetchReplies({
+        ...replyRequest,
+        since: new Date("2000-01-01T00:00:00.000Z"),
+      });
+
+      expect(result.next).toEqual({ status: "ready", cursor: "sc.more" });
+    });
+  });
+
   it("tells a reply to a comment from a reply to the video", () => {
     const top = toCandidateReply(
       { comment: { id: "c1", text: "words", published_at: now.toISOString(), parent_id: "vid" } },

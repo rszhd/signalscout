@@ -52,6 +52,24 @@ import type { Step, StepContext } from "./steps.js";
  */
 export const maxThreadsPerJob = 25;
 
+/**
+ * How far back a reply may be, when nothing else says.
+ *
+ * A thread outlives the post above it, so `monitors.last_polled_at` is the
+ * wrong window here even when there is one: a video collected today can carry
+ * comments from 2015, and the poll mark says nothing about them.
+ *
+ * Ninety days is a judgement rather than a measurement, and it is made in the
+ * direction the evidence points. US-034's live YouTube poll returned a comment
+ * written in **June 2021** as a lead — 1,915 days old, a person who wanted a
+ * Cypress alternative five years ago and has long since chosen one. The mean
+ * video in that collection was 655 days old.
+ *
+ * A monitor's own window narrows this and never widens it: a monitor polled
+ * hourly wants what was said this hour, not this quarter.
+ */
+export const defaultReplyWindowDays = 90;
+
 /** A post as this step reads it: enough to open a thread and to skip one. */
 interface Thread {
   readonly id: string;
@@ -126,6 +144,17 @@ export function createRepliesStep({
      * answer to. `registry.only` refuses rather than guesses when two could
      * run and nobody has chosen.
      */
+    /**
+     * The window replies are read against.
+     *
+     * The later of the monitor's own poll mark and the default: a monitor
+     * polled hourly wants this hour, and a monitor polled for the first time
+     * still must not be handed a comment from 2015.
+     */
+    const floor = new Date(Date.now() - defaultReplyWindowDays * 86_400_000);
+    const replyWindow =
+      monitor.lastPolledAt && monitor.lastPolledAt > floor ? monitor.lastPolledAt : floor;
+
     const choices = await readProviderChoices(db);
     const sources = new Map<string, SocialSource | undefined>();
 
@@ -170,6 +199,27 @@ export function createRepliesStep({
       }
 
       /**
+       * The platform says there is nothing under this post.
+       *
+       * Found live on 2026-09-06, and it cost four credits to find: US-034's
+       * YouTube poll opened eleven threads and got seven comments back, having
+       * paid a credit for each. Half of those videos had a comment count of
+       * zero sitting on the row, unread.
+       *
+       * Zero is the only count worth refusing on. A thread with one comment may
+       * hold the lead — the best match of that run came from a thread with a
+       * handful — so anything above zero is bought.
+       *
+       * Null is not zero and is never refused here. It means the platform did
+       * not say, which is the normal state on Reddit and on half of YouTube's
+       * own search results.
+       */
+      if (post.replyCount === 0) {
+        skipped += 1;
+        continue;
+      }
+
+      /**
        * Nothing new was said, so nothing is bought.
        *
        * `repliesPartial` is the exception that keeps this honest. A thread we
@@ -202,6 +252,7 @@ export function createRepliesStep({
         postUrl: post.url,
         postExternalId: post.externalId,
         credentials,
+        since: replyWindow,
       });
 
       opened += 1;
@@ -255,6 +306,7 @@ export function createRepliesStep({
         threadsOpened: opened,
         threadsSkipped: skipped,
         replies: storedReplyIds.length,
+        since: replyWindow.toISOString(),
         spentUnits,
       },
       "replies finished",

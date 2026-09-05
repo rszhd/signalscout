@@ -51,6 +51,8 @@ let worker: WorkerHandle;
 let db: Database;
 let closeDb: () => Promise<void>;
 const filtered: FilterPayload[] = [];
+/** Every reply fetch the step made, so a case can assert what it asked for. */
+const replyRequests: { since?: Date }[] = [];
 const classified: ClassifyPayload[] = [];
 
 let nextId = 0;
@@ -90,7 +92,11 @@ beforeAll(async () => {
   worker = await startWorker({
     databaseUrl: database.url,
     logger: createLogger({ level: "silent", name: "test" }),
-    registry: fakeRegistry({ replies: threadUnder, unitsPerReplyCall: 1 }),
+    registry: fakeRegistry({
+      replies: threadUnder,
+      unitsPerReplyCall: 1,
+      onFetchReplies: (request) => replyRequests.push(request),
+    }),
     credentialsFor: () => ({ token: "test-token" }),
     steps: {
       filter: async (payload) => {
@@ -112,6 +118,7 @@ afterAll(async () => {
 });
 
 beforeEach(() => {
+  replyRequests.length = 0;
   filtered.length = 0;
   classified.length = 0;
 });
@@ -234,6 +241,77 @@ describe("what is never bought", () => {
     // The count was never the reason we stopped, so an unchanged count is no
     // reason not to go back.
     expect(usage).toHaveLength(1);
+  }, 20_000);
+
+  /**
+   * Found by a live run, not by this file.
+   *
+   * US-034's YouTube poll opened eleven threads for eleven credits and got
+   * seven comments back. Half those videos carried a comment count of zero on
+   * the row already, so the money bought answers the platform had already told
+   * us would be empty.
+   */
+  it("does not open a thread the platform says is empty", async () => {
+    const monitorId = await insertMonitor(database, { includeReplies: true });
+    const postId = await insertPost("t3_empty", { replyCount: 0 });
+
+    await run(monitorId, [postId]);
+    await new Promise((resolve) => setTimeout(resolve, 1_000));
+
+    const usage = await db.select().from(apiUsage).where(eq(apiUsage.monitorId, monitorId));
+
+    expect(usage).toEqual([]);
+  }, 20_000);
+
+  it("opens a thread with one comment, because that comment may be the lead", async () => {
+    const monitorId = await insertMonitor(database, { includeReplies: true });
+    const postId = await insertPost("t3_one_comment", { replyCount: 1 });
+
+    await run(monitorId, [postId]);
+    await until("the replies to reach the filter", () => filtered[0]);
+
+    const usage = await db.select().from(apiUsage).where(eq(apiUsage.monitorId, monitorId));
+
+    expect(usage).toHaveLength(1);
+  }, 20_000);
+
+  it("opens a thread whose count the platform never gave, because null is not zero", async () => {
+    const monitorId = await insertMonitor(database, { includeReplies: true });
+    const postId = await insertPost("t3_unknown_count");
+
+    await run(monitorId, [postId]);
+    await until("the replies to reach the filter", () => filtered[0]);
+
+    const usage = await db.select().from(apiUsage).where(eq(apiUsage.monitorId, monitorId));
+
+    expect(usage).toHaveLength(1);
+  }, 20_000);
+
+  /**
+   * The window, which a live run showed was missing entirely.
+   *
+   * US-034's YouTube poll returned a comment from June 2021 as a lead. A thread
+   * outlives the post above it, so a video collected today can carry comments
+   * from years ago and the monitor's poll mark says nothing about them.
+   */
+  it("gives the connector a window, so a five-year-old comment is not a lead", async () => {
+    const monitorId = await insertMonitor(database, { includeReplies: true });
+    const postId = await insertPost("t3_windowed", { replyCount: 2 });
+
+    await run(monitorId, [postId]);
+    await until("the replies to reach the filter", () => filtered[0]);
+
+    const [asked] = replyRequests;
+
+    expect(asked?.since).toBeInstanceOf(Date);
+
+    // Ninety days by default. A monitor polled hourly narrows it; a monitor
+    // polled for the first time still must not be handed 2015.
+    const since = asked?.since as Date;
+    const days = (Date.now() - since.getTime()) / 86_400_000;
+
+    expect(days).toBeGreaterThan(85);
+    expect(days).toBeLessThan(95);
   }, 20_000);
 
   it("never opens a thread under a reply, which is what stops this looping", async () => {

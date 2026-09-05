@@ -85,12 +85,12 @@ never terminate on position.
       pinned comment older than the window
 - [ ] `ReplyResult.partial` is reported from evidence, the same rule the Reddit
       connector follows
-- [ ] Fixtures are captured from a live account by a script under the
+- [x] Fixtures are captured from a live account by a script under the
       connector's own directory, with author identity scrubbed, and are read
       before they are committed
 - [ ] The Log records what one search and one comment page actually cost and
       returned, measured
-- [ ] The Log says whether `searchTerm` is worth using, with the number
+- [x] The Log says whether `searchTerm` is worth using, with the number
 - [ ] STACK.md and AGENTS.md record that the fourth network was added
       deliberately and that the rule stands for the fifth
 
@@ -121,3 +121,54 @@ never terminate on position.
   forward is that YouTube inverts the shape: the video is not the lead, the
   comment is, so this ticket is US-020 applied rather than a fresh connector
   with replies bolted on.
+
+- 2026-09-06T05:20+08:00 — Captured, for **10 credits and $0.081** across three
+  runs. Ten payloads are committed with a manifest and a ledger. Four of the
+  documentation's claims were wrong or incomplete, and one of my own rules was.
+
+  **`/v1/youtube/search/advanced` does not work as documented.** The catalogue
+  lists `published_after` among its parameters, and sending it with `order=date`
+  answers **400 INVALID_REQUEST** — refunded, so the refusal was free. The
+  ticket's Notes recommended preferring that endpoint. That recommendation is
+  withdrawn: the connector uses `/v1/youtube/search` with `includeExtras=true`,
+  and applies `since` itself.
+
+  **The approximate dates are worse than the warning says.** Comparing the same
+  45 results with and without `includeExtras`, the derived date drifts a
+  **median of 62 days and a maximum of 283**. The documentation said "up to four
+  months"; this is nine.
+
+  **There is a field the documentation never mentions, and it is the honest
+  one.** Every plain result carries `ext.published_precision` — `"year"`,
+  `"month"` or null — beside `ext.published_label` ("2 years ago"). So a
+  connector can tell exactly how much a date is worth rather than guessing.
+  `includeExtras=true` returns the exact instant and drops the precision field,
+  which is consistent: there is nothing to warn about.
+
+  **`includeExtras=true` is free.** It cost one credit, the same as the plain
+  search, so there is no reason to ever ask for the approximate dates.
+
+  **A search that matches nothing is not refunded and not empty.** A phrase that
+  cannot occur returned **12 unrelated videos and charged a credit** — the same
+  behaviour US-028 measured on LinkedIn, and the opposite of X, where an empty
+  search is refunded. A vague query here is full-price noise, not free silence.
+
+  **The comment endpoint's claims all hold.** One page returned **51 comments
+  for one credit**, every one with an exact per-second timestamp, and they were
+  strictly newest-first with no exception. `pagination.next_cursor` was null
+  with `has_more: false`, which agreed with `total`. That is the guarantee
+  ScrapeCreators claimed for Reddit and broke by 33 comments.
+
+  **`searchTerm` filters server-side and costs the same.** 51 comments became 8
+  for one credit. It is worth having and it is not the default: it would drop a
+  person describing the problem in words the monitor did not think of.
+
+  **The scrubber leaked twice and the audit caught both.** `authorDisplayName`
+  inside nested `preview_replies` used camel-case names my rules did not carry.
+  Worse, people write handles *inside* the text the classifier reads — "@X
+  thanks for the clarification" — and one creator put a real email address in a
+  video description. Field rules cannot catch either. The fix rewrites handles,
+  channel URLs and email local parts in place and leaves the sentence around
+  them, so the fixture still proves the parser reads the text. This is the
+  second capture in this repository to leak on its first run; the header now
+  says so twice.

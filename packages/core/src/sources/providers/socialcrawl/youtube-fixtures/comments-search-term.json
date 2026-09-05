@@ -1,0 +1,342 @@
+{
+  "success": true,
+  "platform": "youtube",
+  "endpoint": "/v1/youtube/video/comments",
+  "data": {
+    "items": [
+      {
+        "comment": {
+          "id": "Ugz2lmvQKkpwEVhovet4AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "Please make a video of BDD cucumber playwright js",
+          "author": {
+            "username": "yt-channel-1",
+            "display_name": "yt-channel-1",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-2",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 1,
+            "replies": 1
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2026-04-17T03:35:41.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3oybG12UUtrcHdFVmhvdmV0NEFhQUJBZyJ9",
+            "updated_at": "2026-04-17T03:35:41Z",
+            "author_channel_id": "UCGdq2LiDaJJr2duvZvs57XA",
+            "author_url": "http://www.youtube.com/yt-channel-1",
+            "viewer_rating": "none",
+            "text_original": "Please make a video of BDD cucumber playwright js"
+          }
+        },
+        "computed": {
+          "language": "en"
+        }
+      },
+      {
+        "comment": {
+          "id": "UgxVZ1VsAdY48q7Qvet4AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "i love this because sometimes even when you use built in methods like wait to be ready, visible or present still is not a good enough optioin to make reliable sometimes, we usually retry logic similar to this in java but made by our self but it is amazign that playwright found a real paint point and had their own solution for it.",
+          "author": {
+            "username": "yt-channel-8",
+            "display_name": "yt-channel-8",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-9",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 0,
+            "replies": 0
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2026-02-19T21:28:34.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3hWWjFWc0FkWTQ4cTdRdmV0NEFhQUJBZyJ9",
+            "updated_at": "2026-02-19T21:28:34Z",
+            "author_channel_id": "UCpjUKptLphesvUYNWml0Z7g",
+            "author_url": "http://www.youtube.com/yt-channel-8",
+            "viewer_rating": "none",
+            "text_original": "i love this because sometimes even when you use built in methods like wait to be ready, visible or present still is not a good enough optioin to make reliable sometimes, we usually retry logic similar to this in java but made by our self but it is amazign that playwright found a real paint point and had their own solution for it."
+          }
+        },
+        "computed": {
+          "language": "en"
+        }
+      },
+      {
+        "comment": {
+          "id": "UgzM0WBGHTZKUeACXNV4AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "Thanks for this information. I deal with Salesforce application testing, and my Playwright test script execution is often flaky because locator identification is usually very complex. Most of the time, the test execution fails due to timeouts caused by element identification issues. Please provide your suggestions.",
+          "author": {
+            "username": "yt-channel-18",
+            "display_name": "yt-channel-18",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-19",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 0,
+            "replies": 1
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2025-08-12T11:20:48.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3pNMFdCR0hUWktVZUFDWE5WNEFhQUJBZyJ9",
+            "updated_at": "2025-08-12T11:20:48Z",
+            "author_channel_id": "UC1v4gj3fhniupT3EolJDuIw",
+            "author_url": "http://www.youtube.com/yt-channel-18",
+            "viewer_rating": "none",
+            "text_original": "Thanks for this information. I deal with Salesforce application testing, and my Playwright test script execution is often flaky because locator identification is usually very complex. Most of the time, the test execution fails due to timeouts caused by element identification issues. Please provide your suggestions."
+          }
+        },
+        "computed": {
+          "language": "en"
+        }
+      },
+      {
+        "comment": {
+          "id": "Ugwf2PO3UQW3AmoqMup4AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "to pass() is great against poor hydration - playwright is too fast... great vid",
+          "author": {
+            "username": "yt-channel-28",
+            "display_name": "yt-channel-28",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-29",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 1,
+            "replies": 0
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2025-04-16T06:28:44.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3dmMlBPM1VRVzNBbW9xTXVwNEFhQUJBZyJ9",
+            "updated_at": "2025-04-16T06:28:44Z",
+            "author_channel_id": "UCLTWfq_gX_AQnMBbh4BjQWA",
+            "author_url": "http://www.youtube.com/yt-channel-28",
+            "viewer_rating": "none",
+            "text_original": "to pass() is great against poor hydration - playwright is too fast... great vid"
+          }
+        },
+        "computed": {
+          "language": "en"
+        }
+      },
+      {
+        "comment": {
+          "id": "UgytgYPR4XcYu5auaoR4AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "Thank you the video. However, it seems that there is no perfect solution if we only use automation script. Imagine if the network is super slow, all  the retries in the toPass assertion failed and the exceeded the timeout. Maybe the root solution is enhancing the frontend code.",
+          "author": {
+            "username": "yt-channel-44",
+            "display_name": "yt-channel-44",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-45",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 1,
+            "replies": 1
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2025-01-20T09:48:42.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3l0Z1lQUjRYY1l1NWF1YW9SNEFhQUJBZyJ9",
+            "updated_at": "2025-01-20T09:48:42Z",
+            "author_channel_id": "UC4vUXwDncl-jODBA91pe-4w",
+            "author_url": "http://www.youtube.com/yt-channel-44",
+            "viewer_rating": "none",
+            "text_original": "Thank you the video. However, it seems that there is no perfect solution if we only use automation script. Imagine if the network is super slow, all  the retries in the toPass assertion failed and the exceeded the timeout. Maybe the root solution is enhancing the frontend code.",
+            "preview_replies": [
+              {
+                "id": "UgytgYPR4XcYu5auaoR4AaABAg.ADWFlZonm1zADWUTZUfudL",
+                "channelId": "UCJ4R8axyKuPZdJ7lFll3SKQ",
+                "videoId": "8g7FvoRToGo",
+                "textDisplay": "I 100% agree. \n\nIf an application has a poor user experience under slow network conditions, this is a problem and should be fixed.\n\nIn the real world, though, and especially when testing and development are different teams, improving the Frontend is rarely prioritized. \n\nIt's the typical \"works on my machine\" and often, people state the \"Playwright is too fast\" argument, completely ignoring that the issue often is poor hydration patterns or a broken app under slow network conditions.\n\n`toPass` and other ways to come around test flakiness are workarounds for symptoms and not addressing the root course. But sometimes it is how it is. :) \n\nSo you're 100% right.",
+                "textOriginal": "I 100% agree. \n\nIf an application has a poor user experience under slow network conditions, this is a problem and should be fixed.\n\nIn the real world, though, and especially when testing and development are different teams, improving the Frontend is rarely prioritized. \n\nIt's the typical \"works on my machine\" and often, people state the \"Playwright is too fast\" argument, completely ignoring that the issue often is poor hydration patterns or a broken app under slow network conditions.\n\n`toPass` and other ways to come around test flakiness are workarounds for symptoms and not addressing the root course. But sometimes it is how it is. :) \n\nSo you're 100% right.",
+                "parentId": "UgytgYPR4XcYu5auaoR4AaABAg",
+                "authorDisplayName": "yt-channel-3",
+                "authorProfileImageUrl": "https://scrubbed.invalid/yt-channel-4",
+                "authorChannelUrl": "yt-channel-5",
+                "authorChannelId": {
+                  "value": "UCJ4R8axyKuPZdJ7lFll3SKQ"
+                },
+                "canRate": true,
+                "viewerRating": "none",
+                "likeCount": 0,
+                "publishedAt": "2025-01-20T11:57:11Z",
+                "updatedAt": "2025-01-20T11:57:11Z"
+              }
+            ]
+          }
+        },
+        "computed": {
+          "language": "en"
+        }
+      },
+      {
+        "comment": {
+          "id": "UgzzHDovLrsZ5tjfTO94AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "Thank you. this saved my running tests in playwright automation project 😀😃",
+          "author": {
+            "username": "yt-channel-62",
+            "display_name": "yt-channel-62",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-63",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 0,
+            "replies": 1
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2024-10-23T16:46:53.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3p6SERvdkxyc1o1dGpmVE85NEFhQUJBZyJ9",
+            "updated_at": "2024-10-23T16:46:53Z",
+            "author_channel_id": "UCaHSRs860TbOAXApHrrQmug",
+            "author_url": "http://www.youtube.com/yt-channel-62",
+            "viewer_rating": "none",
+            "text_original": "Thank you. this saved my running tests in playwright automation project 😀😃"
+          }
+        },
+        "computed": {
+          "language": "en"
+        }
+      },
+      {
+        "comment": {
+          "id": "UgweyXvfwhZgD4ACfMB4AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "That's really cool - I love Playwright 😍😍",
+          "author": {
+            "username": "yt-channel-88",
+            "display_name": "yt-channel-88",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-89",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 0,
+            "replies": 0
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2024-04-30T14:29:30.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3dleVh2ZndoWmdENEFDZk1CNEFhQUJBZyJ9",
+            "updated_at": "2024-04-30T14:29:30Z",
+            "author_channel_id": "UCfXPksDgCTWCSxeQ_s5hqLQ",
+            "author_url": "http://www.youtube.com/yt-channel-88",
+            "viewer_rating": "none",
+            "text_original": "That's really cool - I love Playwright 😍😍"
+          }
+        },
+        "computed": {
+          "language": "en"
+        }
+      },
+      {
+        "comment": {
+          "id": "Ugwc1MDZuH7XDT98tDJ4AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "Another great video; thank you.\n\nI’d possibly disagree with the “right fix” advice on Playwright’s docs to disable interactive controls until after hydration though, as that could cause confusion and frustration to screen reader users. They might attempt to interact with an element initially announced as being disabled/dimmed, and when that control was subsequently enabled via hydration then you’d have to manage how to update that state to the screen reader user.",
+          "author": {
+            "username": "yt-channel-115",
+            "display_name": "yt-channel-115",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-116",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 0,
+            "replies": 2
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2024-03-27T13:41:44.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3djMU1EWnVIN1hEVDk4dERKNEFhQUJBZyJ9",
+            "updated_at": "2024-03-27T13:41:44Z",
+            "author_channel_id": "UCCvlLcDrVJ5NyqvQ-zD6zPA",
+            "author_url": "http://www.youtube.com/yt-channel-115",
+            "viewer_rating": "none",
+            "text_original": "Another great video; thank you.\n\nI’d possibly disagree with the “right fix” advice on Playwright’s docs to disable interactive controls until after hydration though, as that could cause confusion and frustration to screen reader users. They might attempt to interact with an element initially announced as being disabled/dimmed, and when that control was subsequently enabled via hydration then you’d have to manage how to update that state to the screen reader user.",
+            "preview_replies": [
+              {
+                "id": "Ugwc1MDZuH7XDT98tDJ4AaABAg.A1Ulkdr1vbgA1UpojbI1eW",
+                "channelId": "UCJ4R8axyKuPZdJ7lFll3SKQ",
+                "videoId": "8g7FvoRToGo",
+                "textDisplay": "@yt-channel-117 you. It was more of an end-user issue I was highlighting (not necessarily Playwright operation); that it’s not great to set out a page as having x elements non-operable and to then amend that, as it’s something that then possibly has to be managed so the screen reader user is aware they can use those elements. It might be edge-case; that the page will hydrate and elements are enabled before a screen reader user attempts to use those elements, but it might be more of-a-thing in things like modals (where you often have a button default-focused).",
+                "textOriginal": "@yt-channel-117 you. It was more of an end-user issue I was highlighting (not necessarily Playwright operation); that it’s not great to set out a page as having x elements non-operable and to then amend that, as it’s something that then possibly has to be managed so the screen reader user is aware they can use those elements. It might be edge-case; that the page will hydrate and elements are enabled before a screen reader user attempts to use those elements, but it might be more of-a-thing in things like modals (where you often have a button default-focused).",
+                "parentId": "Ugwc1MDZuH7XDT98tDJ4AaABAg",
+                "authorDisplayName": "yt-channel-115",
+                "authorProfileImageUrl": "https://scrubbed.invalid/yt-channel-116",
+                "authorChannelUrl": "yt-channel-118",
+                "authorChannelId": {
+                  "value": "UCCvlLcDrVJ5NyqvQ-zD6zPA"
+                },
+                "canRate": true,
+                "viewerRating": "none",
+                "likeCount": 1,
+                "publishedAt": "2024-03-27T14:17:14Z",
+                "updatedAt": "2024-06-18T02:37:06Z"
+              }
+            ]
+          }
+        },
+        "computed": {
+          "language": "en"
+        }
+      }
+    ],
+    "total": null,
+    "dropped": 0
+  },
+  "credits_used": 0,
+  "request_id": "req-L8P8ZitJP7mZGo4G",
+  "cached": true,
+  "pagination": {
+    "next_cursor": null,
+    "has_more": false,
+    "page_size": 8
+  },
+  "credits_remaining": null
+}

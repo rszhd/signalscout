@@ -1,0 +1,24 @@
+[
+  {
+    "name": "search-plain",
+    "creditsUsed": 0,
+    "cached": true
+  },
+  {
+    "name": "search-with-extras",
+    "creditsUsed": 1,
+    "creditsRemaining": 19,
+    "cached": false
+  },
+  {
+    "name": "search-advanced",
+    "creditsUsed": 0,
+    "creditsRemaining": 19,
+    "cached": false
+  },
+  {
+    "name": "search-page-2",
+    "creditsUsed": 0,
+    "cached": true
+  }
+]

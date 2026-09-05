@@ -1,0 +1,1913 @@
+{
+  "success": true,
+  "platform": "youtube",
+  "endpoint": "/v1/youtube/search",
+  "data": {
+    "items": [
+      {
+        "post": {
+          "id": "8g7FvoRToGo",
+          "url": "https://www.youtube.com/watch?v=8g7FvoRToGo",
+          "content": {
+            "text": "Avoid flaky end-to-end tests due to poorly hydrated Frontends with Playwright's toPass()",
+            "media_urls": null,
+            "thumbnail_url": "https://i.ytimg.com/vi/8g7FvoRToGo/hq720.jpg?sqp=-oaymwEnCNAFEJQDSFryq4qpAxkIARUAAIhCGAHYAQHiAQoIGBACGAY4AUAB&rs=AOn4CLA-VpCC5hXB8uTI9ZLNGuJi5po4OQ",
+            "duration_seconds": 453
+          },
+          "author": {
+            "username": "yt-channel-7",
+            "display_name": "yt-channel-8",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-9",
+            "verified": null
+          },
+          "engagement": {
+            "views": 22607,
+            "likes": 880,
+            "comments": 89,
+            "shares": null,
+            "saves": null
+          },
+          "flags": {
+            "nsfw": null,
+            "spoiler": null,
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2024-03-27T13:05:25.000Z",
+          "ext": {
+            "content_type": "video",
+            "description": "In this video we'll dive into the world of flaky tests in Playwright and synthetic monitoring with Checkly. We examine a site with poor Frontend hydration patterns, their effect on test stability, and how to work around them. \n\nLearn how to avoid using artificial delays and implementing a retry mechanism with Playwright's 'toPass()' method to achieve stable testing instead.\n\n0:00 Intro\n0:38 Example of a poorly hydrated page\n2:17 Recommended fix for poor hydration\n3:32 Custom action retries with 'toPass()'\n5:18 'toPass()' options\n6:12 Running Playwright using the `--repeat-each` option\n6:43 Outro\n\nCheckly Synthetic Monitoring: https://www.checklyhq.com/product/syn...\nPlaywright 'toPass()' docs: https://playwright.dev/docs/test-asse...\n\n#playwright #testing #monitoring #syntheticmonitoring",
+            "channel_id": "UCJ4R8axyKuPZdJ7lFll3SKQ"
+          }
+        },
+        "computed": {
+          "engagement_rate": 0.042863,
+          "language": "en",
+          "content_category": "other",
+          "estimated_reach": 27128
+        }
+      },
+      {
+        "post": {
+          "id": "sGVbncoW8VI",
+          "url": "https://www.youtube.com/watch?v=sGVbncoW8VI",
+          "content": {
+            "text": "What is a Flaky Test? 🎲 — Quick QA & Dev Explanation",
+            "media_urls": null,
+            "thumbnail_url": "https://i.ytimg.com/vi/sGVbncoW8VI/hq720.jpg?sqp=-oaymwEnCNAFEJQDSFryq4qpAxkIARUAAIhCGAHYAQHiAQoIGBACGAY4AUAB&rs=AOn4CLB9-AZ2iuVbVGh45CUmOOKPDatN4w",
+            "duration_seconds": 51
+          },
+          "author": {
+            "username": "yt-channel-4",
+            "display_name": "yt-channel-5",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-6",
+            "verified": null
+          },
+          "engagement": {
+            "views": 522,
+            "likes": 4,
+            "comments": null,
+            "shares": null,
+            "saves": null
+          },
+          "flags": {
+            "nsfw": null,
+            "spoiler": null,
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2025-10-15T00:27:52.000Z",
+          "ext": {
+            "content_type": "video",
+            "description": "Learn why flaky tests happen, how they affect CI/CD, and why they create confusion for developers.\n\nIn this short video, we cover:\n✅ Violates repeatability — sometimes passes, sometimes fails ❌✅\n✅ No apparent pattern or reason behind failures\n✅ Impacts trust in CI/CD builds and automation\n✅ Creates false signals for developers\n\n👋 Inspired by Simon Stewart’s presentation at Testμ Conference: CI and the Great Flakiness Adventure\n\n#QA #AutomationTesting #FlakyTests #TestAutomation #CI #CD #SoftwareTesting #Selenium #Playwright #Cypress #Buildkite #CircleCI #QualityEngineering #TestingTips\n\n👉 Subscribe for more QA & Dev tips: @yt-channel-46",
+            "channel_id": "UCCOWOdXww5joJu7l8iOgrkw"
+          }
+        },
+        "computed": {
+          "engagement_rate": 0.007663,
+          "language": "en",
+          "content_category": "other",
+          "estimated_reach": 626
+        }
+      },
+      {
+        "post": {
+          "id": "I7jd5DcwA4s",
+          "url": "https://www.youtube.com/watch?v=I7jd5DcwA4s",
+          "content": {
+            "text": "How To Fix Flaky Tests In CI/CD Pipelines? - Cloud Stack Studio",
+            "media_urls": null,
+            "thumbnail_url": "https://i.ytimg.com/vi/I7jd5DcwA4s/hq720.jpg?sqp=-oaymwEnCNAFEJQDSFryq4qpAxkIARUAAIhCGAHYAQHiAQoIGBACGAY4AUAB&rs=AOn4CLDCMtt8MNdn1ZdF8nCs0OLBfYml3Q",
+            "duration_seconds": 240
+          },
+          "author": {
+            "username": "yt-channel-1",
+            "display_name": "yt-channel-2",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-3",
+            "verified": null
+          },
+          "engagement": {
+            "views": 120,
+            "likes": 1,
+            "comments": null,
+            "shares": null,
+            "saves": null
+          },
+          "flags": {
+            "nsfw": null,
+            "spoiler": null,
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2025-10-25T10:12:51.000Z",
+          "ext": {
+            "content_type": "video",
+            "description": "How To Fix Flaky Tests In CI/CD Pipelines? Are flaky tests causing instability in your CI/CD pipelines? In this video, we’ll walk you through effective strategies to identify, diagnose, and fix flaky tests that can disrupt your software delivery process. We’ll start by explaining how to monitor test results over time and set up alerts to catch unpredictable behavior early. You’ll learn how to analyze test failures in isolated environments, check logs for timing issues, and utilize debugging tools specific to your programming language. We’ll also cover best practices for making your tests more reliable, such as ensuring test independence, using mocks or stubs for external services, and running tests in clean, consistent environments like containers or virtual machines. \n\nAdditionally, we’ll discuss how to implement continuous monitoring and prioritize fixing flaky tests instead of ignoring failures. You’ll discover how leveraging cloud-native CI/CD services and automation scripts can help manage flaky tests efficiently, reducing wasted time and speeding up your delivery cycles. We’ll also share tips on educating your team to recognize and address flaky tests, ensuring your automation remains dependable. Whether you’re working with AWS, Azure, or Google Cloud, these methods will help you maintain a stable testing environment and improve overall pipeline reliability. \n\nSubscribe to our channel for more insights on cloud infrastructure, DevOps automation, and best practices for reliable software deployment!\n\n⬇️ Subscribe to our channel for more valuable insights.\n\n🔗Subscribe: https://www.youtube.com/yt-channel-47 \n\n#CloudInfrastructure #CICDPipelines #FlakyTests #DevOps #AutomationTools #CloudSecurity #AWS #Azure #GoogleCloud #TestAutomation #ContinuousIntegration #SoftwareTesting #CloudSecurityBestPractices #DevOpsTools #PipelineReliability \n\nAbout Us: Welcome to Cloud Stack Studio, your go-to channel for all things cloud infrastructure. We focus on key topics like AWS vs. Azure vs. Google Cloud, cloud security best practices, DevOps automation tools, and Kubernetes and containerization. Our mission is to provide informative content that helps you navigate cloud migration strategies, continuous integration and continuous deployment (CI/CD), and the culture of collaboration within DevOps.",
+            "channel_id": "UCrCtapaWTi6Oq7X8rw3hGTQ"
+          }
+        },
+        "computed": {
+          "engagement_rate": 0.008333,
+          "language": "en",
+          "content_category": "other",
+          "estimated_reach": 144
+        }
+      },
+      {
+        "post": {
+          "id": "CwfohDaRpig",
+          "url": "https://www.youtube.com/watch?v=CwfohDaRpig",
+          "content": {
+            "text": "3 Reasons for Playwright Flaky Tests (and How To Fix It)",
+            "media_urls": null,
+            "thumbnail_url": "https://i.ytimg.com/vi/CwfohDaRpig/hqdefault.jpg?sqp=-oaymwEnCOADEI4CSFryq4qpAxkIARUAAIhCGAHYAQHiAQoIGBACGAY4AUAB&rs=AOn4CLCukZXqploKpCUO02Jc1swrdcF6jg",
+            "duration_seconds": 642
+          },
+          "author": {
+            "username": "yt-channel-10",
+            "display_name": "yt-channel-11",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-12",
+            "verified": null
+          },
+          "engagement": {
+            "views": 9746,
+            "likes": 358,
+            "comments": 20,
+            "shares": null,
+            "saves": null
+          },
+          "flags": {
+            "nsfw": null,
+            "spoiler": null,
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2025-09-04T19:27:00.000Z",
+          "ext": {
+            "content_type": "video",
+            "description": "✉️ Sign up for my Newsletter: https://artembondar.kit.com/newslette...\n\nCourses I teach at Bondar Academy:\n\n🎭 Learn Microsoft Playwright from the beginning in the \"Playwright UI Testing Mastery\" Program here: 👉 https://bondaracademy.com/programs/pl...\n\n🎭 Master API Automation in the \"Playwright API Testing Mastery\" Program here: 👉 https://bondaracademy.com/programs/pl...\n\nLocators Assertions vs Generic Assertions:    • Playwright Assertions: Locator assertions ...  \n\n==================\n🤝 Connect with me!\n💼 LinkedIn:   / artem-bondar  \n🐦 X (Twitter): https://x.com/artembondar\n💻 GitHub: https://github.com/Bondar-Academy\n\n=======================\n🌟 About Bondar Academy\nBondar Academy offers practical online courses for QAs who want to learn test automation.\n\nMy goal is simple: to help you build real-world test automation skills you can use in your work. Whether you're just starting out or improving your automation skills.\n\nStart learning today at https://bondaracademy.com! 🚀",
+            "channel_id": "UCWY4aTVcItL6SjxKQwtiYQA"
+          }
+        },
+        "computed": {
+          "engagement_rate": 0.038785,
+          "language": null,
+          "content_category": "other",
+          "estimated_reach": 11695
+        }
+      },
+      {
+        "post": {
+          "id": "Mhe-quHWe60",
+          "url": "https://www.youtube.com/watch?v=Mhe-quHWe60",
+          "content": {
+            "text": "3 Steps to Fix Flaky Tests",
+            "media_urls": null,
+            "thumbnail_url": "https://i.ytimg.com/vi/Mhe-quHWe60/hq720.jpg?sqp=-oaymwEnCNAFEJQDSFryq4qpAxkIARUAAIhCGAHYAQHiAQoIGBACGAY4AUAB&rs=AOn4CLB3qw8cRjzMfa0aTitwYi2L8Yk6DA",
+            "duration_seconds": 495
+          },
+          "author": {
+            "username": "yt-channel-13",
+            "display_name": "yt-channel-14",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-15",
+            "verified": null
+          },
+          "engagement": {
+            "views": 1222,
+            "likes": 15,
+            "comments": 8,
+            "shares": null,
+            "saves": null
+          },
+          "flags": {
+            "nsfw": null,
+            "spoiler": null,
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2024-02-29T12:48:51.000Z",
+          "ext": {
+            "content_type": "video",
+            "description": "👩‍💻Ever found yourself stuck with a test that sometimes passes, sometimes fails, and just can't seem to figure out why? Welcome to the world of flaky tests! \n\nWhat's Inside:\n1️⃣ What are flaky tests?\n2️⃣ The different types you might encounter\n3️⃣ A 3-step plan to manage and fix them\n\nTimecodes:\n0:00 Intro\n0:40 What are Flaky Tests?\n3:50 How to fix Flaky Tests\n7:34 Outro\n\n🔗Links:\nWhat are Flaky Tests? How to Fix them? https://semaphoreci.com/community/tut...\nA Survey on How Test Flakiness Affects Developers and What Support They Need To Address It: https://arxiv.org/pdf/2203.00483.pdf\nTest reports in Semaphore CI: https://docs.semaphoreci.com/essentia...\nFlaky Tests in Semahore CI: https://docs.semaphoreci.com/essentia...\nTrunk-based development: https://trunkbaseddevelopment.com/\n\nStock pictures:\nhttps://www.pexels.com/photo/photo-of...\n\n#testing #flakytests #tdd #bdd #software #programming #development #tutorial",
+            "channel_id": "UCcz_P5ztha3Tn-qkcTvKgxQ"
+          }
+        },
+        "computed": {
+          "engagement_rate": 0.018822,
+          "language": null,
+          "content_category": "other",
+          "estimated_reach": 1466
+        }
+      },
+      {
+        "post": {
+          "id": "garmzTCQ_YI",
+          "url": "https://www.youtube.com/watch?v=garmzTCQ_YI",
+          "content": {
+            "text": "What Causes Flaky Tests In CI/CD Pipelines? - Server Logic Simplified",
+            "media_urls": null,
+            "thumbnail_url": "https://i.ytimg.com/vi/garmzTCQ_YI/hq720.jpg?sqp=-oaymwEnCNAFEJQDSFryq4qpAxkIARUAAIhCGAHYAQHiAQoIGBACGAY4AUAB&rs=AOn4CLBkbOrL1V7V54_i95Tr548WG8WcCg",
+            "duration_seconds": 221
+          },
+          "author": {
+            "username": "yt-channel-16",
+            "display_name": "yt-channel-17",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-18",
+            "verified": null
+          },
+          "engagement": {
+            "views": 18,
+            "likes": null,
+            "comments": null,
+            "shares": null,
+            "saves": null
+          },
+          "flags": {
+            "nsfw": null,
+            "spoiler": null,
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2025-09-07T23:01:09.000Z",
+          "ext": {
+            "content_type": "video",
+            "description": "What Causes Flaky Tests In CI/CD Pipelines? Are flaky tests causing headaches in your CI/CD pipelines? In this video, we explore the common reasons behind unpredictable test results that can slow down your development process. We’ll cover how timing and concurrency issues, environment inconsistencies, state contamination, external service dependencies, order dependencies, and poorly written tests contribute to flakiness. You’ll learn practical strategies to identify and manage flaky tests, such as isolating test environments, using mocks and stubs, handling timing with retries and waits, and monitoring failure patterns. We also discuss how improving test design to make tests more deterministic and resilient can significantly boost your pipeline’s reliability. Whether you’re working on APIs, databases, or server-side logic, understanding these causes will help you deliver more stable and trustworthy software. By addressing flaky tests effectively, your team can reduce unnecessary reruns, increase confidence in your testing process, and accelerate feature releases. Join us for this insightful discussion and learn how to keep your CI/CD pipelines running smoothly. Don’t forget to subscribe for more backend development tips and tricks! 🔗H\n\n⬇️ Subscribe to our channel for more valuable insights.\n\n🔗Subscribe: https://www.youtube.com/yt-channel-48 \n\n#BackendDevelopment #CICD #FlakyTests #TestAutomation #DevOps #ContinuousIntegration #ContinuousDelivery #TestingStrategies #APIDevelopment #DatabaseManagement #ServerSideLogic #TestReliability #SoftwareTesting #AutomationTools #DevelopmentTips \n\nAbout Us: Welcome to Server Logic Simplified! Our channel is dedicated to making backend development accessible and straightforward. We focus on topics such as APIs, databases, server-side logic, and more. Our content covers REST API, GraphQL, SQL, NoSQL, and popular backend frameworks like Node.js, Django, Flask, Ruby on Rails, and Java Spring Boot. Whether you're interested in authentication, cloud hosting, or mastering backend architecture and server management, we've got you covered with practical tutorials and essential tips.",
+            "channel_id": "UCInQuLpj1tj-oN3sYYro48w"
+          }
+        },
+        "computed": {
+          "engagement_rate": null,
+          "language": "en",
+          "content_category": "other",
+          "estimated_reach": 22
+        }
+      },
+      {
+        "post": {
+          "id": "18J2_4a4Cl4",
+          "url": "https://www.youtube.com/watch?v=18J2_4a4Cl4",
+          "content": {
+            "text": "Flaky tests by Andrei Solntsev",
+            "media_urls": null,
+            "thumbnail_url": "https://i.ytimg.com/vi/18J2_4a4Cl4/hq720.jpg?sqp=-oaymwFBCNAFEJQDSFryq4qpAzMIARUAAIhCGAHYAQHiAQoIGBACGAY4AUAB8AEB-AH-CYAC0AWKAgwIABABGDkgZShHMA8=&rs=AOn4CLCg_ajDr8rpZ3JVakDqJs_DV12jGw",
+            "duration_seconds": 3003
+          },
+          "author": {
+            "username": "yt-channel-49",
+            "display_name": "yt-channel-50",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-51",
+            "verified": null
+          },
+          "engagement": {
+            "views": 2145,
+            "likes": 46,
+            "comments": 2,
+            "shares": null,
+            "saves": null
+          },
+          "flags": {
+            "nsfw": null,
+            "spoiler": null,
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2023-02-21T13:08:53.000Z",
+          "ext": {
+            "content_type": "video",
+            "description": "\"How to fight with unstable tests\"\n\nThe talk is about flaky, or unstable tests – why it’s the biggest trouble in test automation and how to overcome it. I will show my collection of real-life examples of flaky tests from my experience. These are really tricky investigations that lasted many days, weeks and even years! I will show video recording from real tests in a very slow motion until you catch the bug. :)\n\nThe talk will be interesting to both testers and developers – anyone who loves to solve unsolvable puzzles.\n\nAndrei Solntsev, Codeborne\n\nRecorded at Jfokus 2023 in Stockholm 8th of february\nhttp://www.jfokus.se",
+            "channel_id": "UCDG4jVD88QEjB8UKLYZKiNA"
+          }
+        },
+        "computed": {
+          "engagement_rate": 0.022378,
+          "language": "en",
+          "content_category": "other",
+          "estimated_reach": 2574
+        }
+      },
+      {
+        "post": {
+          "id": "sEKb4ne7dVc",
+          "url": "https://www.youtube.com/watch?v=sEKb4ne7dVc",
+          "content": {
+            "text": "Common Mistakes that make test cases flaky and how to avoid them  - Maheshwari Ramu (Rently)",
+            "media_urls": null,
+            "thumbnail_url": "https://i.ytimg.com/vi/sEKb4ne7dVc/hq720.jpg?sqp=-oaymwEnCNAFEJQDSFryq4qpAxkIARUAAIhCGAHYAQHiAQoIGBACGAY4AUAB&rs=AOn4CLBwdcUbkkbE2KODKBxXZBdogeXIiQ",
+            "duration_seconds": 1762
+          },
+          "author": {
+            "username": "yt-channel-52",
+            "display_name": "yt-channel-53",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-54",
+            "verified": null
+          },
+          "engagement": {
+            "views": 796,
+            "likes": 29,
+            "comments": 3,
+            "shares": null,
+            "saves": null
+          },
+          "flags": {
+            "nsfw": null,
+            "spoiler": null,
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2023-09-15T11:46:54.000Z",
+          "ext": {
+            "content_type": "video",
+            "description": "Tired of flaky test cases causing frustration and delays? Imagine reliable, consistent tests with accurate results every time. Learn about test automation pitfalls and get practical strategies for a smoother software development process. Stop the frustration, embrace efficiency!\n\nLearn more about Maheshwari: \n  / maheshwari-ramu-b441001a6    \n  / maheshwariramu  \n\nFollow RubyConfIndia for updates on upcoming conferences:\n  / rubyconfindia  \n  / ruby.  .",
+            "channel_id": "UC1LpVNWURay00Cb0Oyu8_eQ"
+          }
+        },
+        "computed": {
+          "engagement_rate": 0.040201,
+          "language": "en",
+          "content_category": "other",
+          "estimated_reach": 955
+        }
+      },
+      {
+        "post": {
+          "id": "0dHDmSjx55o",
+          "url": "https://www.youtube.com/watch?v=0dHDmSjx55o",
+          "content": {
+            "text": "How to trigger flaky Playwright tests locally after they fail on CI",
+            "media_urls": null,
+            "thumbnail_url": "https://i.ytimg.com/vi/0dHDmSjx55o/hqdefault.jpg?sqp=-oaymwEnCOADEI4CSFryq4qpAxkIARUAAIhCGAHYAQHiAQoIGBACGAY4AUAB&rs=AOn4CLB6f38Dx5RBqrqor0LOEaIYP2SgxA",
+            "duration_seconds": 83
+          },
+          "author": {
+            "username": "yt-channel-19",
+            "display_name": "yt-channel-20",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-21",
+            "verified": null
+          },
+          "engagement": {
+            "views": 10641,
+            "likes": 423,
+            "comments": 11,
+            "shares": null,
+            "saves": null
+          },
+          "flags": {
+            "nsfw": null,
+            "spoiler": null,
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2025-02-19T18:46:31.000Z",
+          "ext": {
+            "content_type": "video",
+            "description": "Ever had a Playwright test pass locally but fail on CI? In this video, I’ll show you a trick to catch flaky tests before they ruin your PRs!\n\n🔹 Use `--repeat-each=100` to run the test 100 times and expose flakiness\n🔹 Max out your CPU cores with `workers=10` to stress test your system\n🔹 Save time with -`x` to stop on the first failure\nOnce your test passes consistently, you can push your code with confidence! 💪\n\nIf this helped, don’t forget to like 👍 and subscribe 🔔 for more Playwright testing tips. See you in the next one! 🚀\n\n🔗 Read the full blog post: https://dev.to/playwright/how-to-repr...\n\n#Playwright #Testing #CITips #FlakyTests",
+            "channel_id": "UC46Zj8pDH5tDosqm1gd7WTg"
+          }
+        },
+        "computed": {
+          "engagement_rate": 0.040786,
+          "language": "en",
+          "content_category": "other",
+          "estimated_reach": 12769
+        }
+      },
+      {
+        "post": {
+          "id": "iPzRnrLSZa0",
+          "url": "https://www.youtube.com/watch?v=iPzRnrLSZa0",
+          "content": {
+            "text": "How to Handle Flaky Tests - Software Testing Community Question No. 4",
+            "media_urls": null,
+            "thumbnail_url": "https://i.ytimg.com/vi/iPzRnrLSZa0/hq720.jpg?sqp=-oaymwEnCNAFEJQDSFryq4qpAxkIARUAAIhCGAHYAQHiAQoIGBACGAY4AUAB&rs=AOn4CLAwv5bv0TrC4Abr-hGj0IYRdVcgMw",
+            "duration_seconds": 617
+          },
+          "author": {
+            "username": "yt-channel-25",
+            "display_name": "yt-channel-26",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-27",
+            "verified": null
+          },
+          "engagement": {
+            "views": 8785,
+            "likes": 53,
+            "comments": 4,
+            "shares": null,
+            "saves": null
+          },
+          "flags": {
+            "nsfw": null,
+            "spoiler": null,
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2025-01-06T06:42:49.000Z",
+          "ext": {
+            "content_type": "video",
+            "description": "Today, there is the fourth community question on my channel. This time, Eric Jacobson asked a question about flaky tests in production and how to solve the flakiness of the test scripts.\n\nSee my answer to his question and enjoy the video.\n\nIn case you want to connect with Eric, follow the links\n\n🔗 Links:\n\n👉 https://club.ministryoftesting.com/u/...\n\n\nIf you want to ask your question, too, then send me a message to daniel /at/ adventuresinqa /dot/ com. I will send you further information about the format.\n\n\n❤️ List to my supporter ❤️\n===========================\n\nA big thank you to:\n\n🚀 beQualified: https://bequalified.de/ \n🚀 Ministry of Testing: https://www.ministryoftesting.com/\n🚀 AskUI: https://www.askui.com/\n🚀 Squish: Squish is a robust and versatile automated GUI testing tool designed to streamline the testing process for various application types. It excels in testing cross-platform desktop, mobile, embedded, and web applications. With Squish, you’re able to handle end-to-end test automation of your product with one tool. Try it yourself, for free: https://hubs.li/Q02T239C0\n\n\n🎗️ Become a channel member:\n👉    / @yt-channel-55  \n\n📚 My Book\n\n👉 https://leanpub.com/Mobileapptesting\n👉 https://www.amazon.com/dp/B0B2GMLVHY/\n\n👨🏽‍💻 Online course\n\n🧑🏼‍🏫 A Beginners Guide To Mobile Testing: https://www.ministryoftesting.com/doj... by Daniel Knott \n\nMy equipment:\n\n📸 Hardware:\n\n🔗 Sony ZV-1: https://www.amazon.de/dp/B088S2CNFC\n🔗 Mac mini: https://www.amazon.de/dp/B0BSHQM2KB\n🔗 Microphone: https://www.amazon.de/dp/B09MJ1N2D9\n🔗 LED Ring Light: https://www.amazon.de/dp/B0BKZRZ9GK\n🔗 LED Light: https://www.amazon.de/dp/B0BZ43HBS8\n🔗 LED Light: https://www.amazon.de/dp/B0BG4BN1TZ\n\n💿 Software:\n\n🔗 Camtasia https://www.techsmith.com/store/camtasia\n\n#softwaretesting #Testing #CommunityQuestion #FlakyTests Licensed Music: Shutterstock-ID: TTPH7IPEB99DGHI2",
+            "channel_id": "UCXB6zy4Pu9bPVQHvS8XKLUw"
+          }
+        },
+        "computed": {
+          "engagement_rate": 0.006488,
+          "language": "en",
+          "content_category": "other",
+          "estimated_reach": 10542
+        }
+      },
+      {
+        "post": {
+          "id": "2XpemZCUGmk",
+          "url": "https://www.youtube.com/watch?v=2XpemZCUGmk",
+          "content": {
+            "text": "6 Tips to Manage Flaky Tests in Playwright",
+            "media_urls": null,
+            "thumbnail_url": "https://i.ytimg.com/vi/2XpemZCUGmk/hq720.jpg?sqp=-oaymwEnCNAFEJQDSFryq4qpAxkIARUAAIhCGAHYAQHiAQoIGBACGAY4AUAB&rs=AOn4CLAMKgILC6qr4N6DghsdXRaz_WGTlQ",
+            "duration_seconds": 523
+          },
+          "author": {
+            "username": "yt-channel-13",
+            "display_name": "yt-channel-14",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-15",
+            "verified": null
+          },
+          "engagement": {
+            "views": 4532,
+            "likes": 128,
+            "comments": 6,
+            "shares": null,
+            "saves": null
+          },
+          "flags": {
+            "nsfw": null,
+            "spoiler": null,
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2024-03-12T23:00:01.000Z",
+          "ext": {
+            "content_type": "video",
+            "description": "Are your UI and End-To-End brittle? If you're having problems with Playwright,  this video is for you.\n\n🎭 Playwright is a modern UI and End-to-End testing framework that supports flaky test detection. Here are 6 tips to configuring and using Playwright in your tests.\n\n⏰ Timecodes\n0:00 Intro\n0:26 Configuring Playwright\n2:27 Run tests locally before commit\n3:17 Don't use waitForTimeout\n4:47 Selectors vs Locators\n6:32 Pay attention to locator.all()\n7:22 ElementHandles vs Locators\n8:21 Outro\n\n🔗 Useful links:\nRead the original blog: https://semaphoreci.com/blog/flaky-te...\nFlaky test dashboard:    • 3 Steps to Fix Flaky Tests  \nMetrics and observability:    • CICD Metrics and Observability - Flaky Tests  \n\n#endtoend #e2e #ui #tdd #testing #software #development #tutorial",
+            "channel_id": "UCcz_P5ztha3Tn-qkcTvKgxQ"
+          }
+        },
+        "computed": {
+          "engagement_rate": 0.029568,
+          "language": "en",
+          "content_category": "other",
+          "estimated_reach": 5438
+        }
+      },
+      {
+        "post": {
+          "id": "hmk1h40shaE",
+          "url": "https://www.youtube.com/watch?v=hmk1h40shaE",
+          "content": {
+            "text": "GTAC 2015: Your Tests Aren't Flaky",
+            "media_urls": null,
+            "thumbnail_url": "https://i.ytimg.com/vi/hmk1h40shaE/hq720.jpg?sqp=-oaymwFBCNAFEJQDSFryq4qpAzMIARUAAIhCGAHYAQHiAQoIGBACGAY4AUAB8AEB-AH-CYAC0AWKAgwIABABGF0gXShdMA8=&rs=AOn4CLA5tIACx6nLsnaWUe8TDLQz3_RgOA",
+            "duration_seconds": 1865
+          },
+          "author": {
+            "username": "yt-channel-28",
+            "display_name": "yt-channel-29",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-30",
+            "verified": null
+          },
+          "engagement": {
+            "views": 6502,
+            "likes": 59,
+            "comments": null,
+            "shares": null,
+            "saves": null
+          },
+          "flags": {
+            "nsfw": null,
+            "spoiler": null,
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2015-11-27T03:40:02.000Z",
+          "ext": {
+            "content_type": "video",
+            "description": "http://g.co/gtac\nSlides: https://docs.google.com/presentation/...\n\nAlister Scott (Automattic)\n\nFlaky tests are the bugbear of any automated test engineer; as someone (probably Alister) once said “insanity is running the same tests over and over again and getting different results”. Flaky tests cause no end of despair, but perhaps there’s no such thing as a flaky or non-flaky test, perhaps we need to look at this problem through a different lens. We should spend more time building more deterministic, more testable systems than spending time building resilient and persistent tests. Alister will share some examples of when test flakiness hid real problems underneath the system, and how it’s possible to solve test flakiness by building better systems.",
+            "channel_id": "UCtXKDgv1AVoG88PLl8nGXmw"
+          }
+        },
+        "computed": {
+          "engagement_rate": 0.009074,
+          "language": null,
+          "content_category": "other",
+          "estimated_reach": 7802
+        }
+      },
+      {
+        "post": {
+          "id": "Tlkrw3Ti4h4",
+          "url": "https://www.youtube.com/watch?v=Tlkrw3Ti4h4",
+          "content": {
+            "text": "What is Flaky test? Steps to resolve Test Flakiness||  Selenium Java",
+            "media_urls": null,
+            "thumbnail_url": "https://i.ytimg.com/vi/Tlkrw3Ti4h4/hq720.jpg?sqp=-oaymwFBCNAFEJQDSFryq4qpAzMIARUAAIhCGAHYAQHiAQoIGBACGAY4AUAB8AEB-AH-CYAC0AWKAgwIABABGGUgZShlMA8=&rs=AOn4CLAyoeP7icP5m5sX3KNTLXx33Hy3SQ",
+            "duration_seconds": 165
+          },
+          "author": {
+            "username": "yt-channel-34",
+            "display_name": "yt-channel-35",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-36",
+            "verified": null
+          },
+          "engagement": {
+            "views": 856,
+            "likes": 8,
+            "comments": null,
+            "shares": null,
+            "saves": null
+          },
+          "flags": {
+            "nsfw": null,
+            "spoiler": null,
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2024-02-13T20:23:27.000Z",
+          "ext": {
+            "content_type": "video",
+            "description": "What is Flaky test? Steps to resolve Test Flakiness||  Selenium Java\n\nhttps://www.mgnkjunction.com/post/wha...\n\nTechBlossom2020",
+            "channel_id": "UCSjyXZqBEjLUeAVQIF_2niA"
+          }
+        },
+        "computed": {
+          "engagement_rate": 0.009346,
+          "language": "en",
+          "content_category": "other",
+          "estimated_reach": 1027
+        }
+      },
+      {
+        "post": {
+          "id": "wamyRZTD34I",
+          "url": "https://www.youtube.com/watch?v=wamyRZTD34I",
+          "content": {
+            "text": "The Deadly Consequences of Flaky Tests: Delete Them Now!",
+            "media_urls": null,
+            "thumbnail_url": "https://i.ytimg.com/vi/wamyRZTD34I/hq720.jpg?sqp=-oaymwEnCNAFEJQDSFryq4qpAxkIARUAAIhCGAHYAQHiAQoIGBACGAY4AUAB&rs=AOn4CLAFC4zcXP9Ijgep2Byh8r0gda-xBA",
+            "duration_seconds": 286
+          },
+          "author": {
+            "username": "yt-channel-43",
+            "display_name": "yt-channel-44",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-45",
+            "verified": null
+          },
+          "engagement": {
+            "views": 932,
+            "likes": 51,
+            "comments": 7,
+            "shares": null,
+            "saves": null
+          },
+          "flags": {
+            "nsfw": null,
+            "spoiler": null,
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2023-08-28T23:00:23.000Z",
+          "ext": {
+            "content_type": "video",
+            "description": "Flaky Tests is one of the most dangerous things to your testing culture. That's why you should Delete them if you will not fix them.\n💎 Be a Patreon to get the source code:   / gsferreira  \n\n🚨 KEY LINKS\n🤝 Support me on Patreon (and get access to source code) here:   / gsferreira  \n\n👋 HEY FRIEND\nIf you're new to my Channel, my name is Guilherme, but you can call me Gui if Portuguese pronunciation is not your thing. \nI see myself as a Minimalist Software Craftsman. That says a lot of what I talk about here. \nSo, why this YouTube channel? To share with you to simplify your life as a Developer through knowledge, technology, and practices. \nIf you are into those things as I do, don't forget to subscribe for new videos. \n\n🔗 GET IN TOUCH\nLinkedIn:   / gferreira  \nTwitter:   / gsferreira  \nGitHub: https://github.com/gsferreira\nVisit my blog: https://gsferreira.com\n\n#softwaredeveloper #softwaredevelopment #devops",
+            "channel_id": "UCGd8ACZ918e3EjbWxiuyK-A"
+          }
+        },
+        "computed": {
+          "engagement_rate": 0.062232,
+          "language": null,
+          "content_category": "other",
+          "estimated_reach": 1118
+        }
+      },
+      {
+        "post": {
+          "id": "d51iWUljHYM",
+          "url": "https://www.youtube.com/watch?v=d51iWUljHYM",
+          "content": {
+            "text": "Flaky Tests Explained: What They Are, Why They Happen & How to Fix Them in CI/CD",
+            "media_urls": null,
+            "thumbnail_url": "https://i.ytimg.com/vi/d51iWUljHYM/hq720.jpg?sqp=-oaymwEnCNAFEJQDSFryq4qpAxkIARUAAIhCGAHYAQHiAQoIGBACGAY4AUAB&rs=AOn4CLAneJCWMQ90q2FcRLyN7z5ye1QUeQ",
+            "duration_seconds": 2366
+          },
+          "author": {
+            "username": "yt-channel-4",
+            "display_name": "yt-channel-5",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-6",
+            "verified": null
+          },
+          "engagement": {
+            "views": 97,
+            "likes": 3,
+            "comments": null,
+            "shares": null,
+            "saves": null
+          },
+          "flags": {
+            "nsfw": null,
+            "spoiler": null,
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2025-10-13T18:13:01.000Z",
+          "ext": {
+            "content_type": "video",
+            "description": "Inspired by Simon Stewart’s presentation at Testμ Conference: CI and the Great Flakiness Adventure\n\n🎥 Flaky Tests Explained — Everything you need to know about identifying, fixing, and preventing flaky tests in your CI/CD pipelines.\n\nIn this full 25-minute presentation, we cover:\n✅ What are flaky tests, and why do they destroy CI trust\n✅ Common causes like timing, data pollution, network issues, and version mismatches\n✅ How to detect, assign, resolve, and verify flaky tests\n✅ Smart retry strategies and prevention methods\n✅ Real-world stories — including the timezone bug that fooled global teams!\n\nWhether you’re using Playwright, Cypress, CircleCI, or Buildkite — this guide will help you tackle test instability head-on and regain team confidence.\n\n👋 Special mention: Simon Stewart (Selenium creator & WebDriver lead)\n💡 Bonus: Learn the “Spider-Man Rule” for ownership and how flaky tests can actually signal production issues!\n\n📘 Chapters:\n00:00 Intro  \n00:29 What Is a Flaky Test?  \n01:26 Qualities of a Good Test  \n03:54 Common Causes of Flakiness \n08:47 Why Flaky Tests Matter\n10:35 Flaky Test Lifecycle (Detect → Assign → Resolve → Verify)  \n12:07 Detection\n15:07 Assignment\n18:03 Resolution\n20:48 Prevention of Flakiness\n24:22 Rerun & Retry Strategies\n27:26 Smart Test Execution\n31:57 Test Size & Quality\n35:15 Verification\n37:11 Summary & Takeaways  \n\n#QA #AutomationTesting #FlakyTests #TestAutomation #TestingTools #Playwright #Cypress #CI #CD #SoftwareTesting #CircleCI #Buildkite #TestMute #SimonStewart #Selenium #QualityEngineering #TestingBestPractices\n\n👉 Subscribe for more QA & Dev tips: @yt-channel-46  \n🔗 Learn more: [add your blog or LinkedIn link]",
+            "channel_id": "UCCOWOdXww5joJu7l8iOgrkw"
+          }
+        },
+        "computed": {
+          "engagement_rate": 0.030928,
+          "language": "en",
+          "content_category": "other",
+          "estimated_reach": 116
+        }
+      },
+      {
+        "post": {
+          "id": "w5O4zTusyJ0",
+          "url": "https://www.youtube.com/watch?v=w5O4zTusyJ0",
+          "content": {
+            "text": "fix flaky tests with detect-test-pollution! (intermediate) anthony explains #403",
+            "media_urls": null,
+            "thumbnail_url": "https://i.ytimg.com/vi/w5O4zTusyJ0/hq720.jpg?sqp=-oaymwEnCNAFEJQDSFryq4qpAxkIARUAAIhCGAHYAQHiAQoIGBACGAY4AUAB&rs=AOn4CLCDeagS3YDiKCcJfGQ2YzTkklwwoA",
+            "duration_seconds": 613
+          },
+          "author": {
+            "username": "yt-channel-56",
+            "display_name": "yt-channel-57",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-58",
+            "verified": null
+          },
+          "engagement": {
+            "views": 1714,
+            "likes": 77,
+            "comments": 6,
+            "shares": null,
+            "saves": null
+          },
+          "flags": {
+            "nsfw": null,
+            "spoiler": null,
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2022-03-04T16:00:33.000Z",
+          "ext": {
+            "content_type": "video",
+            "description": "today I show off a brand new project we made on stream!  it automates detecting polluting tests\n\nhttps://github.com/asottile/detect-te...\nwhat is test pollution?    • finding and fixing test pollution! (interm...  \n\nplaylist:    • anthony explains  \n\n==========\n\ntwitch:   / anthonywritescode  \ndicsord:   / discord  \ntwitter:   / codewithanthony  \ngithub: https://github.com/asottile\nstream github: https://github.com/anthonywritescode\n\nI won't ask for subscriptions / likes / comments in videos but it really helps the channel.  If you have any suggestions or things you'd like to see please comment below!",
+            "channel_id": "UC46xhU1EH7aywEgvA9syS3w"
+          }
+        },
+        "computed": {
+          "engagement_rate": 0.048425,
+          "language": "en",
+          "content_category": "other",
+          "estimated_reach": 2057
+        }
+      },
+      {
+        "post": {
+          "id": "Yf5SctdvZLU",
+          "url": "https://www.youtube.com/watch?v=Yf5SctdvZLU",
+          "content": {
+            "text": "Cracking the Test Mystery: Understanding Flaky Tests | Cristiano Cunha | #softwaretesting #testing",
+            "media_urls": null,
+            "thumbnail_url": "https://i.ytimg.com/vi/Yf5SctdvZLU/hq720.jpg?sqp=-oaymwEnCNAFEJQDSFryq4qpAxkIARUAAIhCGAHYAQHiAQoIGBACGAY4AUAB&rs=AOn4CLDNarilxOgvM4uBaUdKtPup9VdKrw",
+            "duration_seconds": 101
+          },
+          "author": {
+            "username": "yt-channel-59",
+            "display_name": "yt-channel-60",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-61",
+            "verified": null
+          },
+          "engagement": {
+            "views": 978,
+            "likes": 16,
+            "comments": null,
+            "shares": null,
+            "saves": null
+          },
+          "flags": {
+            "nsfw": null,
+            "spoiler": null,
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2023-07-04T14:45:01.000Z",
+          "ext": {
+            "content_type": "video",
+            "description": "In this informative video, Cristiano Cunha, an experienced software testing professional, unravels the concept of \"flaky tests\" and their impact on test automation. Cristiano delves into the definition of flaky tests, discussing why they are considered a challenge in the testing world. Whether you're a software tester or test automation enthusiast, this video provides valuable insights into the world of flaky tests and equips you with the knowledge to tackle this common issue.\n\nAbout Speaker:\nCristiano Cunha, Solution Architect and Testing Advocate at Xray by Xblend\n\nCristiano Cunha is passionate about testing, automation, and delivery process improvement. He’s focused on helping teams reach the best process that is suitable for them. Taking advantage of his vast knowledge of the delivery lifecycle, he manages to identify challenges and help organizations surpass their challenges to deliver products. \n\nConnect with Cristiano on - \nLinkedIn -   / cristianomcunha  \n\nWatch the full session on “Flaky Test - Cause, Risk & Approaches\" by Cristiano Cunha -      • Flaky Test - Cause, Risk & Approaches | Cr...  \n\nMeet & Learn from the best Testing minds in-person at TribeQonf, Learn from industry experts with Thrive.now courses, grow your network with software testers at The Test Tribe events, and become a member of Asia's largest testing community on Discord.\n\nRegister for TribeQonf - https://www.thetesttribe.com/tribeqonf/\n\nUpskill yourself with Thrive.now courses: https://bit.ly/thrivettt\n\nGrow your network with software testers with the events at The Test Tribe: https://bit.ly/tttevents\n\nBecome a member of Asia's largest testing community: https://bit.ly/tttdiscord\n\nAbout The Test Tribe:\nThe Test Tribe is a leading global Software Testing Community (proudly Asia’s Largest) turned EdTech Startup. Started in 2018 with a mission to give Testing Craft the glory it deserves while we co-create Smarter, Prouder, more confident Testers. We take pride in creating unique global Events, Online Community spaces, and eLearning platforms where Software Testers across the globe collaborate, learn and grow. With around 200 Software Testing Events like Conferences, Hackathons, Meetups, Webinars, etc., and with other Community initiatives, we have reached a global footprint of over 70K+ Testers. We intend to be a one-stop destination of choice for Testers across the globe for their upskilling and community needs.",
+            "channel_id": "UC09Myr77xB6vAOZ7qky3MdQ"
+          }
+        },
+        "computed": {
+          "engagement_rate": 0.01636,
+          "language": "en",
+          "content_category": "other",
+          "estimated_reach": 1174
+        }
+      },
+      {
+        "post": {
+          "id": "iH9ae4jJgjQ",
+          "url": "https://www.youtube.com/watch?v=iH9ae4jJgjQ",
+          "content": {
+            "text": "How To Fix Flaky Automated Tests In CI/CD Pipelines? - Server Logic Simplified",
+            "media_urls": null,
+            "thumbnail_url": "https://i.ytimg.com/vi/iH9ae4jJgjQ/hq720.jpg?sqp=-oaymwEnCNAFEJQDSFryq4qpAxkIARUAAIhCGAHYAQHiAQoIGBACGAY4AUAB&rs=AOn4CLCZggldvgN1oJtUSDV7YH97TnS35A",
+            "duration_seconds": 196
+          },
+          "author": {
+            "username": "yt-channel-16",
+            "display_name": "yt-channel-17",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-18",
+            "verified": null
+          },
+          "engagement": {
+            "views": 77,
+            "likes": null,
+            "comments": null,
+            "shares": null,
+            "saves": null
+          },
+          "flags": {
+            "nsfw": null,
+            "spoiler": null,
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2025-09-07T21:40:01.000Z",
+          "ext": {
+            "content_type": "video",
+            "description": "How To Fix Flaky Automated Tests In CI/CD Pipelines? Are flaky tests causing instability in your CI/CD pipelines and slowing down your development workflow? In this video, we'll walk through practical steps to identify, analyze, and fix unreliable automated tests. You'll learn how to detect which tests are flaky by running them multiple times and tracking inconsistent results with the help of various tools. We’ll also cover how to analyze test histories to find patterns related to timing, concurrency, or environment differences. Discover common causes of flaky tests, such as external dependencies, shared resources, or poorly written test cases, and learn effective strategies to eliminate these issues. We'll show you how to isolate external services using mocking, improve test independence, and manage test data to prevent false failures. Additionally, you'll find tips for standardizing your CI environment to ensure consistent results and how to use retries thoughtfully to handle transient failures. With dashboards and logging tools, you can monitor flaky test patterns over time and make ongoing improvements. By applying these methods, you'll make your automated testing more trustworthy, saving time and reducing false failures. This approach is especially useful when testing APIs, databases, and server-side logic, ensuring your pipeline accurately reflects your application's health. Stay tuned and subscribe for more backend development tips and tricks. \n\n🔗H\n\n⬇️ Subscribe to our channel for more valuable insights.\n\n🔗Subscribe: https://www.youtube.com/yt-channel-48 \n\n#CI_CD #AutomationTesting #FlakyTests #BackendDevelopment #APITesting #DatabaseTesting #ServerSideLogic #TestAutomation #DevOps #ContinuousIntegration #TestReliability #QualityAssurance #SoftwareTesting #TestStrategies #DevelopmentTips \n\nAbout Us: Welcome to Server Logic Simplified! Our channel is dedicated to making backend development accessible and straightforward. We focus on topics such as APIs, databases, server-side logic, and more. Our content covers REST API, GraphQL, SQL, NoSQL, and popular backend frameworks like Node.js, Django, Flask, Ruby on Rails, and Java Spring Boot. Whether you're interested in authentication, cloud hosting, or mastering backend architecture and server management, we've got you covered with practical tutorials and essential tips.",
+            "channel_id": "UCInQuLpj1tj-oN3sYYro48w"
+          }
+        },
+        "computed": {
+          "engagement_rate": null,
+          "language": "en",
+          "content_category": "other",
+          "estimated_reach": 92
+        }
+      },
+      {
+        "post": {
+          "id": "Cx-KiKbaq0w",
+          "url": "https://www.youtube.com/watch?v=Cx-KiKbaq0w",
+          "content": {
+            "text": "Common Causes of Flaky Tests 🔍 | Why Automated Tests Fail",
+            "media_urls": null,
+            "thumbnail_url": "https://i.ytimg.com/vi/Cx-KiKbaq0w/hq720.jpg?sqp=-oaymwEnCNAFEJQDSFryq4qpAxkIARUAAIhCGAHYAQHiAQoIGBACGAY4AUAB&rs=AOn4CLAv-dK_sSYVdxI54NWZOQ5PIQDF7Q",
+            "duration_seconds": 313
+          },
+          "author": {
+            "username": "yt-channel-4",
+            "display_name": "yt-channel-5",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-6",
+            "verified": null
+          },
+          "engagement": {
+            "views": 9,
+            "likes": null,
+            "comments": null,
+            "shares": null,
+            "saves": null
+          },
+          "flags": {
+            "nsfw": null,
+            "spoiler": null,
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2025-10-15T11:42:20.000Z",
+          "ext": {
+            "content_type": "video",
+            "description": "Flaky tests can make even the most reliable CI/CD pipelines unpredictable. Learn the most common causes and how to prevent them.\n\nIn this video, we cover:\n✅ Timing issues — UI updates, network delays ⏱️\n✅ Unstable dependencies — databases, APIs, external services 🌐\n✅ Resource constraints — limited test environment capacity 💾\n✅ Version mismatches — protocol & dependency conflicts 📦\n✅ Rare framework bugs — occasional library glitches 🐛\n\n💡 Tip: Understanding these causes helps maintain CI/CD reliability and keeps your development team confident in test results.\n\n#QA #AutomationTesting #FlakyTests #TestAutomation #CI #CD #SoftwareTesting #Selenium #Playwright #Cypress #CircleCI #Buildkite #QualityEngineering #TestingBestPractices\n\n👉 Subscribe for more QA & Dev tips: @yt-channel-46",
+            "channel_id": "UCCOWOdXww5joJu7l8iOgrkw"
+          }
+        },
+        "computed": {
+          "engagement_rate": null,
+          "language": null,
+          "content_category": "other",
+          "estimated_reach": 11
+        }
+      },
+      {
+        "post": {
+          "id": "ZEDfaI-uNAk",
+          "url": "https://www.youtube.com/watch?v=ZEDfaI-uNAk",
+          "content": {
+            "text": "Flaky Tests Explained In A Minute! #shorts",
+            "media_urls": null,
+            "thumbnail_url": "https://img.youtube.com/vi/ZEDfaI-uNAk/maxresdefault.jpg",
+            "duration_seconds": 50
+          },
+          "author": {
+            "username": null,
+            "display_name": null,
+            "avatar_url": null,
+            "verified": null
+          },
+          "engagement": {
+            "views": 2292,
+            "likes": 49,
+            "comments": 1,
+            "shares": null,
+            "saves": null
+          },
+          "flags": {
+            "nsfw": null,
+            "spoiler": null,
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2025-07-01T14:16:28.000Z",
+          "ext": {
+            "content_type": "short",
+            "description": "🚨Are flaky tests impacting your workflow? 🚨\n\nFlaky tests are tests that generate inconsistent results - they can pass one time and fail the next, even when no changes were made to the test script.\n\nWatch this video to understand what flaky tests are and how they can complicate the testing process.\n\n#FlakyTests #TestAutomation #BugFixing #TestingChallenges #QualityAssurance\n\n𝐊𝐧𝐨𝐰 𝐦𝐨𝐫𝐞:\nhttps://www.testmuai.com/register/?ut...\n\n𝐄𝐱𝐩𝐥𝐨𝐫𝐞:\nHOME: https://bit.ly/4uOCPKK\nBLOG: https://bit.ly/4nlq87I\nLINKEDIN: https://bit.ly/438HIm2\nTWITTER: https://bit.ly/4eOI74s\nGITHUB: https://bit.ly/4ucseJI\nNEWSLETTER: https://bit.ly/4dI8Y0S\nCERTIFICATIONS: https://bit.ly/4tVdw9j",
+            "channel_id": null
+          }
+        },
+        "computed": {
+          "engagement_rate": 0.021815,
+          "language": null,
+          "content_category": "other",
+          "estimated_reach": 2750
+        }
+      },
+      {
+        "post": {
+          "id": "nb1J4wxwBss",
+          "url": "https://www.youtube.com/watch?v=nb1J4wxwBss",
+          "content": {
+            "text": "How to handle flaky tests: 5 quick solutions #AskRaghav",
+            "media_urls": null,
+            "thumbnail_url": "https://img.youtube.com/vi/nb1J4wxwBss/maxresdefault.jpg",
+            "duration_seconds": 49
+          },
+          "author": {
+            "username": null,
+            "display_name": null,
+            "avatar_url": null,
+            "verified": null
+          },
+          "engagement": {
+            "views": 21632,
+            "likes": 584,
+            "comments": 54,
+            "shares": null,
+            "saves": null
+          },
+          "flags": {
+            "nsfw": null,
+            "spoiler": null,
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2023-12-15T12:00:45.000Z",
+          "ext": {
+            "content_type": "short",
+            "description": "1. Identify and Reproduce the Culprit:\n2. Isolate and Debug Flaky Tests:\n3. Address the Root Cause:\nApplication issue\nPlatform issue\nCoding issue\nEnvironment stability\nTest Data\n\n4. Implement Preventative Measures:\n5. Continuous Monitoring and Alerts:\n\nAll Free Tutorials - https://automationstepbystep.com/\n\n#shorts #manualtesting #automationtesting #career \n\n\n---",
+            "channel_id": null
+          }
+        },
+        "computed": {
+          "engagement_rate": 0.029493,
+          "language": "en",
+          "content_category": "other",
+          "estimated_reach": 25958
+        }
+      },
+      {
+        "post": {
+          "id": "ND8o77spy08",
+          "url": "https://www.youtube.com/watch?v=ND8o77spy08",
+          "content": {
+            "text": "How to Handle Flaky Tests 🚨",
+            "media_urls": null,
+            "thumbnail_url": "https://img.youtube.com/vi/ND8o77spy08/maxresdefault.jpg",
+            "duration_seconds": 21
+          },
+          "author": {
+            "username": null,
+            "display_name": null,
+            "avatar_url": null,
+            "verified": null
+          },
+          "engagement": {
+            "views": 1439,
+            "likes": 17,
+            "comments": 1,
+            "shares": null,
+            "saves": null
+          },
+          "flags": {
+            "nsfw": null,
+            "spoiler": null,
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2024-08-29T14:00:17.000Z",
+          "ext": {
+            "content_type": "short",
+            "description": "Software Developers.\n\nFlaky tests can slow us down and reduce our confidence in our changes. Not doing anything about this, will hurt our productivity in the long run. It is better to take action and fix a flaky tests instead of having it continue to be a problem for you and other and potentially become a big bottleneck.\n\n#softwaredeveloper #softwaredevelopmentengineer #programmer",
+            "channel_id": null
+          }
+        },
+        "computed": {
+          "engagement_rate": 0.012509,
+          "language": null,
+          "content_category": "other",
+          "estimated_reach": 1727
+        }
+      },
+      {
+        "post": {
+          "id": "mBIUKMnmhTE",
+          "url": "https://www.youtube.com/watch?v=mBIUKMnmhTE",
+          "content": {
+            "text": "What is a Flaky Test? (And How to Find Them!)",
+            "media_urls": null,
+            "thumbnail_url": "https://img.youtube.com/vi/mBIUKMnmhTE/maxresdefault.jpg",
+            "duration_seconds": 28
+          },
+          "author": {
+            "username": null,
+            "display_name": null,
+            "avatar_url": null,
+            "verified": null
+          },
+          "engagement": {
+            "views": 1437,
+            "likes": 4,
+            "comments": null,
+            "shares": null,
+            "saves": null
+          },
+          "flags": {
+            "nsfw": null,
+            "spoiler": null,
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2025-11-24T15:38:29.000Z",
+          "ext": {
+            "content_type": "short",
+            "description": "Want the full session of François Martin and Brian Demers? Watch it here -    • Testing on Thin Ice: Chipping Away at Test...  \n\n#Developer #Productivity #DPESummit #Shorts #AI",
+            "channel_id": null
+          }
+        },
+        "computed": {
+          "engagement_rate": 0.002784,
+          "language": "en",
+          "content_category": "other",
+          "estimated_reach": 1724
+        }
+      },
+      {
+        "post": {
+          "id": "9hWKIFZEMtE",
+          "url": "https://www.youtube.com/watch?v=9hWKIFZEMtE",
+          "content": {
+            "text": "How do you handle flaky tests in automation??",
+            "media_urls": null,
+            "thumbnail_url": "https://img.youtube.com/vi/9hWKIFZEMtE/maxresdefault.jpg",
+            "duration_seconds": 5
+          },
+          "author": {
+            "username": null,
+            "display_name": null,
+            "avatar_url": null,
+            "verified": null
+          },
+          "engagement": {
+            "views": 3830,
+            "likes": 31,
+            "comments": null,
+            "shares": null,
+            "saves": null
+          },
+          "flags": {
+            "nsfw": null,
+            "spoiler": null,
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2024-10-26T11:47:31.000Z",
+          "ext": {
+            "content_type": "short",
+            "description": null,
+            "channel_id": null
+          }
+        },
+        "computed": {
+          "engagement_rate": 0.008094,
+          "language": "en",
+          "content_category": "other",
+          "estimated_reach": 4596
+        }
+      },
+      {
+        "post": {
+          "id": "_klagf5VHXU",
+          "url": "https://www.youtube.com/watch?v=_klagf5VHXU",
+          "content": {
+            "text": "How Flaky Tests Kill Trust in Your CI",
+            "media_urls": null,
+            "thumbnail_url": "https://img.youtube.com/vi/_klagf5VHXU/maxresdefault.jpg",
+            "duration_seconds": 37
+          },
+          "author": {
+            "username": null,
+            "display_name": null,
+            "avatar_url": null,
+            "verified": null
+          },
+          "engagement": {
+            "views": 15,
+            "likes": null,
+            "comments": null,
+            "shares": null,
+            "saves": null
+          },
+          "flags": {
+            "nsfw": null,
+            "spoiler": null,
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2026-07-27T13:04:26.000Z",
+          "ext": {
+            "content_type": "short",
+            "description": "POV: your team stopped trusting red builds — and honestly? they were right to 💀 One flaky test trains everyone to just hit re-run… until a real bug ships. BuildPulse catches flaky tests automatically and quarantines them, so red means broken again.\n\nTry BuildPulse free → https://buildpulse.io\n\n#DevTok #coding #CICD #flakytests #softwareengineering",
+            "channel_id": null
+          }
+        },
+        "computed": {
+          "engagement_rate": null,
+          "language": null,
+          "content_category": "other",
+          "estimated_reach": 18
+        }
+      },
+      {
+        "post": {
+          "id": "4stlZDnP3Co",
+          "url": "https://www.youtube.com/watch?v=4stlZDnP3Co",
+          "content": {
+            "text": "Playwright Interview Question #11 | How to Handle Flaky Tests in Playwright?",
+            "media_urls": null,
+            "thumbnail_url": "https://img.youtube.com/vi/4stlZDnP3Co/maxresdefault.jpg",
+            "duration_seconds": 14
+          },
+          "author": {
+            "username": null,
+            "display_name": null,
+            "avatar_url": null,
+            "verified": null
+          },
+          "engagement": {
+            "views": 403,
+            "likes": 23,
+            "comments": null,
+            "shares": null,
+            "saves": null
+          },
+          "flags": {
+            "nsfw": null,
+            "spoiler": null,
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2026-06-24T12:30:05.000Z",
+          "ext": {
+            "content_type": "short",
+            "description": "Learn how to reduce flaky tests in Playwright using a real-world airline booking example.\n\nA popular senior-level Playwright interview question for Automation Engineers and QA professionals.\n\n#playwright \n#playwrightinterviewquestions \n#flaky \n#automationtesting \n#softwaretesting \n#qaengineer \n#testautomation \n#typescript \n#LearnAutomationWithAI\n#testingcareer",
+            "channel_id": null
+          }
+        },
+        "computed": {
+          "engagement_rate": 0.057072,
+          "language": "en",
+          "content_category": "other",
+          "estimated_reach": 484
+        }
+      },
+      {
+        "post": {
+          "id": "lpKLXgFXqEA",
+          "url": "https://www.youtube.com/watch?v=lpKLXgFXqEA",
+          "content": {
+            "text": "How do you handle flaky tests in automation?",
+            "media_urls": null,
+            "thumbnail_url": "https://img.youtube.com/vi/lpKLXgFXqEA/maxresdefault.jpg",
+            "duration_seconds": 12
+          },
+          "author": {
+            "username": null,
+            "display_name": null,
+            "avatar_url": null,
+            "verified": null
+          },
+          "engagement": {
+            "views": 4597,
+            "likes": 89,
+            "comments": 1,
+            "shares": null,
+            "saves": null
+          },
+          "flags": {
+            "nsfw": null,
+            "spoiler": null,
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2024-09-08T17:50:59.000Z",
+          "ext": {
+            "content_type": "short",
+            "description": "👉 Crack SDET QA Interviews with a Powerful Self-Introduction 👉 https://topmate.io/qa_sdet_automation...\n👉 Top 50 SDET Behavioral Interview Questions & Answers 👉 https://topmate.io/qa_sdet_automation...\n\nLevel up your SDET and QA skills! 🚀 SDET Automation Testing Interview Questions & Answers https://stqatools.com/\n\nWe will be covering a wide range of topics including QA manual testing, automation testing, Selenium, Java, Jenkins, Cucumber, Maven, and various testing frameworks.\n\nHow do you handle flaky tests in automation?\n\nAnswer: Flaky tests, which pass or fail inconsistently, are usually caused by timing issues, dynamic elements, or test dependencies. I stabilize flaky tests by:\n\nImplementing explicit waits to ensure elements are interactable before performing actions.\nUsing retry mechanisms to re-run failed tests.\nIsolating the environment to avoid dependencies on external systems.\nExample: When testing a dynamic web element that loads with different IDs, I used a WebDriverWait to wait until the element was visible and ready for interaction, which stabilized the flaky tests.",
+            "channel_id": null
+          }
+        },
+        "computed": {
+          "engagement_rate": 0.019578,
+          "language": "en",
+          "content_category": "other",
+          "estimated_reach": 5516
+        }
+      },
+      {
+        "post": {
+          "id": "8gR0V9Q8o68",
+          "url": "https://www.youtube.com/watch?v=8gR0V9Q8o68",
+          "content": {
+            "text": "What Is a Flaky Test? | QA & Dev Tips",
+            "media_urls": null,
+            "thumbnail_url": "https://img.youtube.com/vi/8gR0V9Q8o68/maxresdefault.jpg",
+            "duration_seconds": 10
+          },
+          "author": {
+            "username": null,
+            "display_name": null,
+            "avatar_url": null,
+            "verified": null
+          },
+          "engagement": {
+            "views": 264,
+            "likes": null,
+            "comments": null,
+            "shares": null,
+            "saves": null
+          },
+          "flags": {
+            "nsfw": null,
+            "spoiler": null,
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2025-10-07T19:41:17.000Z",
+          "ext": {
+            "content_type": "short",
+            "description": "Ever seen a test fail, then pass again with no code changes? That’s a flaky test! 😩\n\nIn this quick QA Shorts, learn what a flaky test is, why it happens, and why it matters in software testing.\nUnderstanding flaky tests is the first step to improving your CI/CD and automation reliability.\n\n💡 Subscribe to QA and Dev Tips for short, practical insights on QA, automation, and software quality.\n\n#FlakyTests #QATips #AutomationTesting #SoftwareTesting #QAEngineer #DevTips #TestingTips #TestAutomation",
+            "channel_id": null
+          }
+        },
+        "computed": {
+          "engagement_rate": null,
+          "language": null,
+          "content_category": "other",
+          "estimated_reach": 317
+        }
+      },
+      {
+        "post": {
+          "id": "7PDo48ZagwY",
+          "url": "https://www.youtube.com/watch?v=7PDo48ZagwY",
+          "content": {
+            "text": "Flaky Tests Explained",
+            "media_urls": null,
+            "thumbnail_url": "https://img.youtube.com/vi/7PDo48ZagwY/maxresdefault.jpg",
+            "duration_seconds": 25
+          },
+          "author": {
+            "username": null,
+            "display_name": null,
+            "avatar_url": null,
+            "verified": null
+          },
+          "engagement": {
+            "views": 169,
+            "likes": null,
+            "comments": null,
+            "shares": null,
+            "saves": null
+          },
+          "flags": {
+            "nsfw": null,
+            "spoiler": null,
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2025-07-07T18:02:34.000Z",
+          "ext": {
+            "content_type": "short",
+            "description": "You don’t need to scale your team to scale your testing... this is how you fix flaky.",
+            "channel_id": null
+          }
+        },
+        "computed": {
+          "engagement_rate": null,
+          "language": null,
+          "content_category": "other",
+          "estimated_reach": 203
+        }
+      },
+      {
+        "post": {
+          "id": "XjIbs0_WCu0",
+          "url": "https://www.youtube.com/watch?v=XjIbs0_WCu0",
+          "content": {
+            "text": "The best way to manage flaky tests! (Light mode)",
+            "media_urls": null,
+            "thumbnail_url": "https://img.youtube.com/vi/XjIbs0_WCu0/maxresdefault.jpg",
+            "duration_seconds": 44
+          },
+          "author": {
+            "username": null,
+            "display_name": null,
+            "avatar_url": null,
+            "verified": null
+          },
+          "engagement": {
+            "views": 1532,
+            "likes": 8,
+            "comments": 1,
+            "shares": null,
+            "saves": null
+          },
+          "flags": {
+            "nsfw": null,
+            "spoiler": null,
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2025-06-03T16:57:48.000Z",
+          "ext": {
+            "content_type": "short",
+            "description": "Learn why quarantining flaky at runtime is the best way to manage flaky tests in your CI pipelines.\n\nEradicating flaky tests blog post: https://trunk.io/blog/eradicating-fla...",
+            "channel_id": null
+          }
+        },
+        "computed": {
+          "engagement_rate": 0.005875,
+          "language": "en",
+          "content_category": "other",
+          "estimated_reach": 1838
+        }
+      },
+      {
+        "post": {
+          "id": "ZVMUAna641E",
+          "url": "https://www.youtube.com/watch?v=ZVMUAna641E",
+          "content": {
+            "text": "Flaky Tests Are Signals..",
+            "media_urls": null,
+            "thumbnail_url": "https://img.youtube.com/vi/ZVMUAna641E/maxresdefault.jpg",
+            "duration_seconds": 72
+          },
+          "author": {
+            "username": null,
+            "display_name": null,
+            "avatar_url": null,
+            "verified": null
+          },
+          "engagement": {
+            "views": 12,
+            "likes": 1,
+            "comments": null,
+            "shares": null,
+            "saves": null
+          },
+          "flags": {
+            "nsfw": null,
+            "spoiler": null,
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2026-09-01T16:00:23.000Z",
+          "ext": {
+            "content_type": "short",
+            "description": "A flaky test isn’t just an annoying red mark on your dashboard. It can reveal problems with timing, test data, environments, synchronization, infrastructure, or even the application itself. Instead of rerunning until it turns green, learn to investigate the evidence and find the real cause.\n\n#shorts, #automationtesting , #SoftwareTesting, #TestAutomation, #QA, #AutomationEngineer, #QualityAssurance, #TestAutomationEngineer, #SoftwareTestingCareer, #Debugging",
+            "channel_id": null
+          }
+        },
+        "computed": {
+          "engagement_rate": 0.083333,
+          "language": null,
+          "content_category": "other",
+          "estimated_reach": 14
+        }
+      },
+      {
+        "post": {
+          "id": "aAcBZKph0F0",
+          "url": "https://www.youtube.com/watch?v=aAcBZKph0F0",
+          "content": {
+            "text": "How to Handle Flaky Tests in Automation Testing | Real Interview Answer 🚀",
+            "media_urls": null,
+            "thumbnail_url": "https://img.youtube.com/vi/aAcBZKph0F0/maxresdefault.jpg",
+            "duration_seconds": 37
+          },
+          "author": {
+            "username": null,
+            "display_name": null,
+            "avatar_url": null,
+            "verified": null
+          },
+          "engagement": {
+            "views": 566,
+            "likes": 8,
+            "comments": null,
+            "shares": null,
+            "saves": null
+          },
+          "flags": {
+            "nsfw": null,
+            "spoiler": null,
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2026-03-19T13:30:01.000Z",
+          "ext": {
+            "content_type": "short",
+            "description": "🚀 *How to Handle Flaky Tests in Automation Testing | Real Interview Answer | Selenium | Playwright | API Testing*\n\nFlaky tests are one of the most common and frustrating challenges in **automation testing**. These tests pass sometimes and fail randomly without any code changes—impacting your CI/CD pipeline, build stability, and team confidence.\n\n🔥 In this video, you’ll learn everything you need to confidently answer this *top QA interview question* and handle flaky tests like a pro:\n\n👉 What are Flaky Tests in Automation Testing?\n👉 Real Reasons Behind Flaky Tests (Timing Issues, Environment, Test Data, Network, etc.)\n👉 How to Identify Flaky Tests in Selenium, Playwright & API Automation\n👉 Best Practices to Fix Flaky Tests Step-by-Step\n👉 How to Handle Flaky Tests in CI/CD Pipelines (Jenkins, GitHub Actions)\n👉 Retry Logic – Good or Bad?\n👉 Real-Time Industry Solutions & Framework-Level Fixes\n\n💡 *Key Topics Covered:*\n✔ Synchronization Issues & Wait Strategies (Explicit Wait vs Hard Wait)\n✔ Test Data Management & Isolation\n✔ Handling Dynamic Elements\n✔ Parallel Execution Problems\n✔ Stable Locator Strategies\n✔ Logging & Debugging Techniques\n\n🎯 *Who Should Watch This Video?*\n\nAutomation Testers (Selenium, Playwright, Rest Assured)\nQA Engineers (Manual + Automation)\n2 to 8 Years Experienced Professionals\nFreshers Preparing for QA Interviews\nAnyone struggling with unstable test cases\n\n📈 *Why This Video is Important?*\nHandling flaky tests is a *must-know skill* in real projects and is frequently asked in *automation testing interviews* at companies like Capgemini, TCS, Infosys, Accenture, and product-based companies.\n\nIf you want to build a *robust automation framework* and improve your **test reliability**, this video will help you step-by-step.\n\n🔔 *Subscribe for more content on:*\nAutomation Testing | Selenium Java | Playwright | API Testing | Framework Design | Interview Questions & Answers\n\n👍 Like | 💬 Comment | 🔁 Share with your QA friends\n\n#FlakyTests #AutomationTesting #Selenium #Playwright #APITesting #RestAssured #CI_CD #Jenkins #SoftwareTesting #QAInterview #TestAutomation #TestingTips #InterviewPreparation #QACareer #AutomationFramework",
+            "channel_id": null
+          }
+        },
+        "computed": {
+          "engagement_rate": 0.014134,
+          "language": "en",
+          "content_category": "other",
+          "estimated_reach": 679
+        }
+      },
+      {
+        "post": {
+          "id": "4ENOkfaWYtM",
+          "url": "https://www.youtube.com/watch?v=4ENOkfaWYtM",
+          "content": {
+            "text": "Tackling Flaky Tests: Strategies for Reliability in Continuous Testing",
+            "media_urls": null,
+            "thumbnail_url": "https://img.youtube.com/vi/4ENOkfaWYtM/maxresdefault.jpg",
+            "duration_seconds": 20
+          },
+          "author": {
+            "username": null,
+            "display_name": null,
+            "avatar_url": null,
+            "verified": null
+          },
+          "engagement": {
+            "views": 66,
+            "likes": null,
+            "comments": null,
+            "shares": null,
+            "saves": null
+          },
+          "flags": {
+            "nsfw": null,
+            "spoiler": null,
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2025-01-21T23:00:46.000Z",
+          "ext": {
+            "content_type": "short",
+            "description": null,
+            "channel_id": null
+          }
+        },
+        "computed": {
+          "engagement_rate": null,
+          "language": "en",
+          "content_category": "other",
+          "estimated_reach": 79
+        }
+      },
+      {
+        "post": {
+          "id": "fsF7pwifNUs",
+          "url": "https://www.youtube.com/watch?v=fsF7pwifNUs",
+          "content": {
+            "text": "Pursuit of the flaky tests 😅 #test #develop #development #automation",
+            "media_urls": null,
+            "thumbnail_url": "https://img.youtube.com/vi/fsF7pwifNUs/maxresdefault.jpg",
+            "duration_seconds": 10
+          },
+          "author": {
+            "username": null,
+            "display_name": null,
+            "avatar_url": null,
+            "verified": null
+          },
+          "engagement": {
+            "views": 1524,
+            "likes": 5,
+            "comments": 1,
+            "shares": null,
+            "saves": null
+          },
+          "flags": {
+            "nsfw": null,
+            "spoiler": null,
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2025-08-04T09:08:24.000Z",
+          "ext": {
+            "content_type": "short",
+            "description": "Shop: https://yourdailyqadose.myshopify.com...",
+            "channel_id": null
+          }
+        },
+        "computed": {
+          "engagement_rate": 0.003937,
+          "language": null,
+          "content_category": "other",
+          "estimated_reach": 1829
+        }
+      },
+      {
+        "post": {
+          "id": "Khx85oaACM4",
+          "url": "https://www.youtube.com/watch?v=Khx85oaACM4",
+          "content": {
+            "text": "3 tips for stopping flaky tests",
+            "media_urls": null,
+            "thumbnail_url": "https://img.youtube.com/vi/Khx85oaACM4/maxresdefault.jpg",
+            "duration_seconds": 60
+          },
+          "author": {
+            "username": null,
+            "display_name": null,
+            "avatar_url": null,
+            "verified": null
+          },
+          "engagement": {
+            "views": 3242,
+            "likes": 80,
+            "comments": 2,
+            "shares": null,
+            "saves": null
+          },
+          "flags": {
+            "nsfw": null,
+            "spoiler": null,
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2026-05-13T16:00:27.000Z",
+          "ext": {
+            "content_type": "short",
+            "description": "We have all been there: your CI build fails yet again because of a test that doesn't consistently work. In this video, we explore three tips to stopping flaky tests in their tracks. From isolating your states to fixing internal dependencies, see how these tips can help you achieve a high quality code base with reliable signals. \n\nSubscribe to Google for Developers → https://goo.gle/developers \n\nSpeakers: Marily Nika",
+            "channel_id": null
+          }
+        },
+        "computed": {
+          "engagement_rate": 0.025293,
+          "language": "en",
+          "content_category": "other",
+          "estimated_reach": 3890
+        }
+      },
+      {
+        "post": {
+          "id": "ivAr4fr4elA",
+          "url": "https://www.youtube.com/watch?v=ivAr4fr4elA",
+          "content": {
+            "text": "How to Reduce Flaky Tests in Playwright | 5 Best Practices Every QA Engineer Should Know",
+            "media_urls": null,
+            "thumbnail_url": "https://img.youtube.com/vi/ivAr4fr4elA/maxresdefault.jpg",
+            "duration_seconds": 62
+          },
+          "author": {
+            "username": null,
+            "display_name": null,
+            "avatar_url": null,
+            "verified": null
+          },
+          "engagement": {
+            "views": 1323,
+            "likes": 16,
+            "comments": 8,
+            "shares": null,
+            "saves": null
+          },
+          "flags": {
+            "nsfw": null,
+            "spoiler": null,
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2026-07-30T17:33:41.000Z",
+          "ext": {
+            "content_type": "short",
+            "description": "Are your Playwright tests passing one day and failing the next without any code changes? That's a classic sign of flaky tests.\n\nIn this YouTube Short, I explain 5 practical ways to reduce flaky tests in Playwright using techniques that are commonly followed in real-world automation projects.\n\nYou'll learn:\n✅ Why flaky tests happen\n✅ How stable locators improve test reliability\n✅ Why you should avoid waitForTimeout()\n✅ How Playwright's Auto-Waiting and Auto-Retry Assertions help\n✅ Why test isolation is important\n✅ Why retries should not be your first solution\n\nThese tips will help you write more reliable automation tests, improve your CI/CD pipeline stability, and prepare for Playwright automation interviews.\n\nIf you're learning Playwright with TypeScript, Automation Testing, or preparing for QA interviews, this video is for you.\n\n👍 If you found this helpful, like the video, share it with your teammates, and subscribe for practical QA and Playwright content every week.\n\n#Playwright #AutomationTesting #SoftwareTesting #QA #SDET #PlaywrightInterview #TypeScript #Testing #QualityAssurance #AutomationEngineer",
+            "channel_id": null
+          }
+        },
+        "computed": {
+          "engagement_rate": 0.018141,
+          "language": "en",
+          "content_category": "other",
+          "estimated_reach": 1588
+        }
+      },
+      {
+        "post": {
+          "id": "L9EoSyX49Fk",
+          "url": "https://www.youtube.com/watch?v=L9EoSyX49Fk",
+          "content": {
+            "text": "Flaky Playwright Tests? The Secret is Out! #shorts",
+            "media_urls": null,
+            "thumbnail_url": "https://img.youtube.com/vi/L9EoSyX49Fk/maxresdefault.jpg",
+            "duration_seconds": 33
+          },
+          "author": {
+            "username": null,
+            "display_name": null,
+            "avatar_url": null,
+            "verified": null
+          },
+          "engagement": {
+            "views": 1040,
+            "likes": 9,
+            "comments": 2,
+            "shares": null,
+            "saves": null
+          },
+          "flags": {
+            "nsfw": null,
+            "spoiler": null,
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2025-09-24T15:56:00.000Z",
+          "ext": {
+            "content_type": "short",
+            "description": "Tired of those unreliable Playwright tests? Discover the tricks to banish flakiness for good! Think deterministic states, strategic mocks, and waiting smart—it's testing wizardry. Subscribe for more testing secrets! #Playwright #testing #automation #webtesting #flakytests",
+            "channel_id": null
+          }
+        },
+        "computed": {
+          "engagement_rate": 0.010577,
+          "language": null,
+          "content_category": "other",
+          "estimated_reach": 1248
+        }
+      },
+      {
+        "post": {
+          "id": "a3yQHAG94s0",
+          "url": "https://www.youtube.com/watch?v=a3yQHAG94s0",
+          "content": {
+            "text": "Mastering Flaky Tests -  A Beginner's Guide",
+            "media_urls": null,
+            "thumbnail_url": "https://img.youtube.com/vi/a3yQHAG94s0/maxresdefault.jpg",
+            "duration_seconds": 50
+          },
+          "author": {
+            "username": null,
+            "display_name": null,
+            "avatar_url": null,
+            "verified": null
+          },
+          "engagement": {
+            "views": 170,
+            "likes": 8,
+            "comments": 1,
+            "shares": null,
+            "saves": null
+          },
+          "flags": {
+            "nsfw": null,
+            "spoiler": null,
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2025-03-11T06:41:26.000Z",
+          "ext": {
+            "content_type": "short",
+            "description": "Mastering Flaky Tests -  A Beginner's Guide\n\n@yt-channel-62‬ #flakytests #facts #softwaretesting #manualtesting #automationtesting #youtube #youtubeshorts #audiopodcast",
+            "channel_id": null
+          }
+        },
+        "computed": {
+          "engagement_rate": 0.052941,
+          "language": null,
+          "content_category": "other",
+          "estimated_reach": 204
+        }
+      },
+      {
+        "post": {
+          "id": "eROMWUib49A",
+          "url": "https://www.youtube.com/watch?v=eROMWUib49A",
+          "content": {
+            "text": "Resolving Flaky Playwright End-to-End Tests With the `toPass` Assertion",
+            "media_urls": null,
+            "thumbnail_url": "https://img.youtube.com/vi/eROMWUib49A/maxresdefault.jpg",
+            "duration_seconds": 179
+          },
+          "author": {
+            "username": null,
+            "display_name": null,
+            "avatar_url": null,
+            "verified": null
+          },
+          "engagement": {
+            "views": 5517,
+            "likes": 171,
+            "comments": 16,
+            "shares": null,
+            "saves": null
+          },
+          "flags": {
+            "nsfw": null,
+            "spoiler": null,
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2025-04-14T12:46:59.000Z",
+          "ext": {
+            "content_type": "short",
+            "description": "Join Stefan Judis, Playwright ambassador, as he shows how Playwright's `toPass` assertion helps resolve flaky tests and test frontends with poor hydration.\n\n#shorts #playwright #softwaretesting #syntheticmonitoring #checkly",
+            "channel_id": null
+          }
+        },
+        "computed": {
+          "engagement_rate": 0.033895,
+          "language": "en",
+          "content_category": "other",
+          "estimated_reach": 6620
+        }
+      },
+      {
+        "post": {
+          "id": "J4hqhxCZwMI",
+          "url": "https://www.youtube.com/watch?v=J4hqhxCZwMI",
+          "content": {
+            "text": "Why Do Flaky Tests Happen?",
+            "media_urls": null,
+            "thumbnail_url": "https://img.youtube.com/vi/J4hqhxCZwMI/maxresdefault.jpg",
+            "duration_seconds": 105
+          },
+          "author": {
+            "username": null,
+            "display_name": null,
+            "avatar_url": null,
+            "verified": null
+          },
+          "engagement": {
+            "views": 688,
+            "likes": 25,
+            "comments": null,
+            "shares": null,
+            "saves": null
+          },
+          "flags": {
+            "nsfw": null,
+            "spoiler": null,
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2025-07-03T14:55:50.000Z",
+          "ext": {
+            "content_type": "short",
+            "description": "Flaky tests can slow down your QA process. In this video, we explore common causes like environment instability, test dependencies, timing issues, and UI instability.\n\nDiscover how TestMu AI's Test Intelligence can automatically identify and prioritize flaky tests, speeding up your QA cycles with clearer insights.\n\nTest Intelligence: https://www.testmuai.com/test-intelli...\n\n#FlakyTests #TestAutomation #TestMu AI #TestIntelligence #QA \n\n𝐊𝐧𝐨𝐰 𝐦𝐨𝐫𝐞:\nhttps://www.testmuai.com/register/?ut...\n\n𝐄𝐱𝐩𝐥𝐨𝐫𝐞:\nHOME: https://bit.ly/4uOCPKK\nBLOG: https://bit.ly/4nlq87I\nLINKEDIN: https://bit.ly/438HIm2\nTWITTER: https://bit.ly/4eOI74s\nGITHUB: https://bit.ly/4ucseJI\nNEWSLETTER: https://bit.ly/4dI8Y0S\nCERTIFICATIONS: https://bit.ly/4tVdw9j",
+            "channel_id": null
+          }
+        },
+        "computed": {
+          "engagement_rate": 0.036337,
+          "language": null,
+          "content_category": "other",
+          "estimated_reach": 826
+        }
+      },
+      {
+        "post": {
+          "id": "FNynlKC5xxY",
+          "url": "https://www.youtube.com/watch?v=FNynlKC5xxY",
+          "content": {
+            "text": "Your Flaky Tests Are Burning $50K+ Per Year",
+            "media_urls": null,
+            "thumbnail_url": "https://img.youtube.com/vi/FNynlKC5xxY/maxresdefault.jpg",
+            "duration_seconds": 51
+          },
+          "author": {
+            "username": null,
+            "display_name": null,
+            "avatar_url": null,
+            "verified": null
+          },
+          "engagement": {
+            "views": 55,
+            "likes": 1,
+            "comments": null,
+            "shares": null,
+            "saves": null
+          },
+          "flags": {
+            "nsfw": null,
+            "spoiler": null,
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2026-04-13T12:00:49.000Z",
+          "ext": {
+            "content_type": "short",
+            "description": "Every flaky test failure costs a developer 15-30 minutes. Multiply that by 5 failures a day and you're looking at 10-25 hours wasted per week. That's over $50,000 a year burned on tests that pass on retry.​​​​​​​​​​​​​​​​​​But the real cost isn't money — it's trust. When CI is flaky, developers stop checking. They merge without green checks. Real bugs slip through.​​​​​​​​​​​​​​​​​​I've seen teams where 70% of failures are just flakes.​​​​​​​​​​​​​​​​​​Quarantine them. Track your flake rate weekly. Stop tolerating flakes.​​​​​​​​​​​​​​​​​​#FlakyTests #TestAutomation #QAEngineering #SoftwareTesting #CICD #DevOps #CodeQuality",
+            "channel_id": null
+          }
+        },
+        "computed": {
+          "engagement_rate": 0.018182,
+          "language": null,
+          "content_category": "other",
+          "estimated_reach": 66
+        }
+      },
+      {
+        "post": {
+          "id": "tUO9LCdPXkQ",
+          "url": "https://www.youtube.com/watch?v=tUO9LCdPXkQ",
+          "content": {
+            "text": "CI/CD Flaky Tests: Why \"Just Hit Retry\" Kills Your Pipeline",
+            "media_urls": null,
+            "thumbnail_url": "https://img.youtube.com/vi/tUO9LCdPXkQ/maxresdefault.jpg",
+            "duration_seconds": 29
+          },
+          "author": {
+            "username": null,
+            "display_name": null,
+            "avatar_url": null,
+            "verified": null
+          },
+          "engagement": {
+            "views": 80,
+            "likes": 1,
+            "comments": 1,
+            "shares": null,
+            "saves": null
+          },
+          "flags": {
+            "nsfw": null,
+            "spoiler": null,
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2026-09-02T16:55:08.000Z",
+          "ext": {
+            "content_type": "short",
+            "description": "CI/CD flaky tests explained: how retrying a red build destroys your pipeline's signal.",
+            "channel_id": null
+          }
+        },
+        "computed": {
+          "engagement_rate": 0.025,
+          "language": null,
+          "content_category": "other",
+          "estimated_reach": 96
+        }
+      },
+      {
+        "post": {
+          "id": "47xLF7vOI38",
+          "url": "https://www.youtube.com/watch?v=47xLF7vOI38",
+          "content": {
+            "text": "Self-Healing Test Automation: Reducing Flaky Tests | Testrig Tech Talk Ep. 2 | Smarter QA with AI",
+            "media_urls": null,
+            "thumbnail_url": "https://img.youtube.com/vi/47xLF7vOI38/maxresdefault.jpg",
+            "duration_seconds": 88
+          },
+          "author": {
+            "username": null,
+            "display_name": null,
+            "avatar_url": null,
+            "verified": null
+          },
+          "engagement": {
+            "views": 1056,
+            "likes": 10,
+            "comments": null,
+            "shares": null,
+            "saves": null
+          },
+          "flags": {
+            "nsfw": null,
+            "spoiler": null,
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2025-10-21T11:30:04.000Z",
+          "ext": {
+            "content_type": "short",
+            "description": "Tired of chasing down flaky automation tests that fail without reason? 😫\nIn Episode 2 of Testrig Tech Talk, our QA Expert Jaideep dives into the power of Self-Healing Test Automation — an AI-driven approach that makes your test scripts smarter and more resilient!\n\nDiscover:\n✔ How self-healing automation detects and fixes broken test cases automatically\n✔ When and where AI-driven self-healing truly works\n✔ Why human testers are still crucial for complex logic and business rules\n✔ How this approach reduces maintenance and boosts test reliability\n\nAt Testrig Technologies, we’re helping teams stabilize their QA pipelines with intelligent automation that blends AI efficiency with human expertise.\n\n🎥 Watch till the end to see how self-healing automation is transforming QA efficiency—making flaky tests a thing of the past!\n\n📢 Subscribe for more insightful episodes on QA, automation, and AI-driven testing.\n🔔 Hit the bell icon to stay updated on upcoming episodes of Testrig Tech Talk!\n\n👇 Let’s Connect!\n🌐 Website: https://www.testrigtechnologies.com\n🔗 LinkedIn:   / testrig-technologies  \n🐦 Twitter:   / testrigqa  \n\nKeyword: \nSelf-Healing Automation, AI in Test Automation, Flaky Test Reduction, Self-Healing Test Scripts, Automated Testing with AI, AI-Powered Test Automation, Self-Healing Frameworks, QA Automation Trends, Intelligent Test Automation, Smart Test Maintenance, Continuous Testing Automation, Self-Healing Tools in QA, Reducing Test Failures, Automation Script Healing, AI in Software Testing, Resilient Test Suites, Test Reliability Improvement, Test Automation Stability, Testrig Tech Talk, Testrig Technologies, Testrig QA Automation, AI-Driven QA, Future of Software Testing, AI with Testers, Smarter QA Practices, QA Efficiency with AI\n\n#TestrigTechTalk #SelfHealingAutomation #AITesting #TestAutomation #SoftwareTesting #FlakyTests #QAFuture #AutomationTesting #AIinTesting #QualityAssurance #TestingTrends #AIinQA #TechTalk #TestrigTechnologies #SmartTesting",
+            "channel_id": null
+          }
+        },
+        "computed": {
+          "engagement_rate": 0.00947,
+          "language": "en",
+          "content_category": "tech",
+          "estimated_reach": 1267
+        }
+      },
+      {
+        "post": {
+          "id": "nndNQGgB3WY",
+          "url": "https://www.youtube.com/watch?v=nndNQGgB3WY",
+          "content": {
+            "text": "What Is a Flaky Test? #softwaretesting #flaky #locators #testautomation  #devops #webdevelopment",
+            "media_urls": null,
+            "thumbnail_url": "https://img.youtube.com/vi/nndNQGgB3WY/maxresdefault.jpg",
+            "duration_seconds": 48
+          },
+          "author": {
+            "username": null,
+            "display_name": null,
+            "avatar_url": null,
+            "verified": null
+          },
+          "engagement": {
+            "views": 258,
+            "likes": 5,
+            "comments": null,
+            "shares": null,
+            "saves": null
+          },
+          "flags": {
+            "nsfw": null,
+            "spoiler": null,
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2026-07-14T18:30:28.000Z",
+          "ext": {
+            "content_type": "short",
+            "description": null,
+            "channel_id": null
+          }
+        },
+        "computed": {
+          "engagement_rate": 0.01938,
+          "language": null,
+          "content_category": "other",
+          "estimated_reach": 310
+        }
+      }
+    ],
+    "next_cursor": "sc1.eyJjIjoiRXBFREVndG1iR0ZyZVNCMFpYTjBjeHItQWxOQ1UwTkJVWE0wV25wa1IyUnRPVk5XUnpsSVlqUkpRa016VGtoV2JVcDFXVEk1V0U5R1drcG5aMFZNVTFSa2NWcEVWa1ZaTTJSQ1RraFBRMEZSZEVSa01scDJZVVZTYUZWdVFuQmFORWxDUXpBeGIxcFRNWGhrVldoWVdsUlpkMmRuUlV4YU1rWjVZbGh3VlZFeFJtWlhWVzFEUVZGemVFOUZiM2xZZWxKb1RrVk9jMDVKU1VKRE0wNUdVekpKTUdKdFZUTmFSbHBxWjJkRlRFMUhVa2xTUnpGVVlXNW5NVTVYTFVOQlVYUndWVWh3VTJKdVNrMVZNWEJvVFVsSlFrTjZTbGxqUjFaMFYydE9WbEl5TVhKblowVk1ZVWN4Y2sxWFp6Qk5TRTV2V1ZWWFEwRlJkRlZpUjNSNVpIcE9WV0ZVVW05T1NVbENRek5rYUdKWWJGTlhiRkpGVFhwU1NtZG5SVXhhUkZWNFlWWmtWbUpIY0VsWFZUSkRRVkYwTTA1Vk9EQmxiRkl4WXpOc1MwMUpTVUpETVd4dFRsWk9hbVJIVWpKWGEzaFdaMmRGVEdGVlp6VlpWMVV3WVd0d2JtRnNSME5CVVhSRVpVTXhUR0ZWZEdsWldFVjNaRGRKUWtKbmIwVkRRbFZSUVhWdlFrSkJaME5GUW1zbE0wU2dBZ1FZZ2VEb0dDSUxjMlZoY21Ob0xXWmxaV1ElM0QiLCJzIjpbIjhnN0Z2b1JUb0dvIiwic0dWYm5jb1c4VkkiLCJJN2pkNURjd0E0cyIsIkN3Zm9oRGFScGlnIiwiTWhlLXF1SFdlNjAiLCJnYXJtelRDUV9ZSSIsIjE4SjJfNGE0Q2w0Iiwic0VLYjRuZTdkVmMiLCIwZEhEbVNqeDU1byIsImlQelJuckxTWmEwIiwiMlhwZW1aQ1VHbWsiLCJobWsxaDQwc2hhRSIsIlRsa3J3M1RpNGg0Iiwid2FteVJaVEQzNEkiLCJkNTFpV1VsakhZTSIsInc1TzR6VHVzeUowIiwiWWY1U2N0ZHZaTFUiLCJpSDlhZTRqSmdqUSIsIkN4LUtpS2JhcTB3IiwiWkVEZmFJLXVOQWsiLCJuYjFKNHd4d0JzcyIsIk5EOG83N3NweTA4IiwibUJJVUtNbm1oVEUiLCI5aFdLSUZaRU10RSIsIl9rbGFnZjVWSFhVIiwiNHN0bFpEblAzQ28iLCJscEtMWGdGWHFFQSIsIjhnUjBWOVE4bzY4IiwiN1BEbzQ4WmFnd1kiLCJYakliczBfV0N1MCIsIlpWTVVBbmE2NDFFIiwiYUFjQlpLcGgwRjAiLCI0RU5Pa2ZhV1l0TSIsImZzRjdwd2lmTlVzIiwiS2h4ODVvYUFDTTQiLCJpdkFyNGZyNGVsQSIsIkw5RW9TeVg0OUZrIiwiYTN5UUhBRzk0czAiLCJlUk9NV1VpYjQ5QSIsIko0aHFoeENad01JIiwiRk55bmxLQzV4eFkiLCJ0VU85TENkUFhrUSIsIjQ3eExGN3ZPSTM4Iiwibm5kTlFHZ0IzV1kiXX0",
+    "total": null,
+    "dropped": 0
+  },
+  "credits_used": 1,
+  "request_id": "req-zIRZ8BQRqBY7ZMac",
+  "cached": false,
+  "pagination": {
+    "next_cursor": "sc.eyJ2IjoyLCJjIjoic2MxLmV5SmpJam9pUlhCRlJFVm5kRzFpUjBaeVpWTkNNRnBZVGpCamVISXRRV3hPUTFVd1RrSlZXRTB3VjI1d2ExSXlVblJQVms1WFVucHNTVmxxVWtwUmEwMTZWR3RvVjJKVmNERlhWRWsxVjBVNVIxZHJjRzVhTUZaTlZURlNhMk5XY0VWV2ExWmFUVEpTUTFScmFGQlJNRVpTWkVWU2EwMXNjREpaVlZaVFlVWldkVkZ1UW1GT1JXeERVWHBCZUdJeGNGUk5XR2hyVmxkb1dWZHNVbHBrTW1SdVVsVjRZVTFyV2pWWmJHaDNWbFpGZUZKdFdsaFdWekZFVVZaR2VtVkZPVVppTTJ4WlpXeEtiMVJyVms5ak1EVktVMVZLUkUwd05VZFZla3BLVFVkS2RGWlVUbUZTYkhCeFdqSmtSbFJGTVVoVmEyeFRVbnBHVlZsWE5XNU5WVFZZVEZWT1FsVllVbmRXVldoM1ZUSktkVk5yTVZaTldFSnZWRlZzU2xGclRqWlRiR3hxVWpGYU1GWXlkRTlXYkVsNVRWaEtibG93VmsxWlZXTjRZMnN4V0ZwNlFrNVRSVFYyVjFaV1dGRXdSbEprUmxacFVqTlNOVnBJY0U5V1YwWlZWVzA1VDFOVmJFTlJlazVyWVVkS1dXSkdUbGhpUmtwR1ZGaHdVMU50Wkc1U1ZYaGhVa1pXTkZsV1dtdFdiVXBJWTBWc1dGWlVTa1JSVmtZd1RUQTFWazlFUW14aVJrbDRXWHBPYzFNd01VcFRWVXBFVFZkNGRGUnNXazloYlZKSVZXcEtXR0V6YUZkYU1tUkdWRWRHVmxwNlZscFdNVlYzV1ZkMGQySnRSbk5TTUU1Q1ZWaFNSVnBWVFhoVVIwWldaRWRzV2xkRlZqTmFSR1JLVVd0S2JtSXdWa1JSYkZaU1VWaFdkbEZyU2tKYU1FNUdVVzF6YkUwd1UyZEJaMUZaWjJWRWIwZERTVXhqTWxab1kyMU9iMHhYV214YVYxRWxNMFFpTENKeklqcGJJamhuTjBaMmIxSlViMGR2SWl3aWMwZFdZbTVqYjFjNFZra2lMQ0pKTjJwa05VUmpkMEUwY3lJc0lrTjNabTlvUkdGU2NHbG5JaXdpVFdobExYRjFTRmRsTmpBaUxDSm5ZWEp0ZWxSRFVWOVpTU0lzSWpFNFNqSmZOR0UwUTJ3MElpd2ljMFZMWWpSdVpUZGtWbU1pTENJd1pFaEViVk5xZURVMWJ5SXNJbWxRZWxKdWNreFRXbUV3SWl3aU1saHdaVzFhUTFWSGJXc2lMQ0pvYldzeGFEUXdjMmhoUlNJc0lsUnNhM0ozTTFScE5HZzBJaXdpZDJGdGVWSmFWRVF6TkVraUxDSmtOVEZwVjFWc2FraFpUU0lzSW5jMVR6UjZWSFZ6ZVVvd0lpd2lXV1kxVTJOMFpIWmFURlVpTENKcFNEbGhaVFJxU21kcVVTSXNJa040TFV0cFMySmhjVEIzSWl3aVdrVkVabUZKTFhWT1FXc2lMQ0p1WWpGS05IZDRkMEp6Y3lJc0lrNUVPRzgzTjNOd2VUQTRJaXdpYlVKSlZVdE5ibTFvVkVVaUxDSTVhRmRMU1VaYVJVMTBSU0lzSWw5cmJHRm5aalZXU0ZoVklpd2lOSE4wYkZwRWJsQXpRMjhpTENKc2NFdE1XR2RHV0hGRlFTSXNJamhuVWpCV09WRTRielk0SWl3aU4xQkVielE0V21GbmQxa2lMQ0pZYWtsaWN6QmZWME4xTUNJc0lscFdUVlZCYm1FMk5ERkZJaXdpWVVGalFscExjR2d3UmpBaUxDSTBSVTVQYTJaaFYxbDBUU0lzSW1aelJqZHdkMmxtVGxWeklpd2lTMmg0T0RWdllVRkRUVFFpTENKcGRrRnlOR1p5TkdWc1FTSXNJa3c1Ulc5VGVWZzBPVVpySWl3aVlUTjVVVWhCUnprMGN6QWlMQ0psVWs5TlYxVnBZalE1UVNJc0lrbzBhSEZvZUVOYWQwMUpJaXdpUms1NWJteExRelY0ZUZraUxDSjBWVTg1VEVOa1VGaHJVU0lzSWpRM2VFeEdOM1pQU1RNNElpd2libTVrVGxGSFowSXpWMWtpWFgwIiwiZSI6InlvdXR1YmUvc2VhcmNoIiwicCI6ImNvbnRpbnVhdGlvblRva2VuIn0",
+    "has_more": true,
+    "page_size": 44
+  },
+  "credits_remaining": 19
+}

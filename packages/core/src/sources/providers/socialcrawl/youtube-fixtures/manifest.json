@@ -1,0 +1,30 @@
+[
+  {
+    "name": "search-plain",
+    "url": "https://www.socialcrawl.dev/v1/youtube/search?query=flaky+tests",
+    "status": 200,
+    "elapsedMs": 465,
+    "capturedAt": "2026-09-05T21:05:55.766Z"
+  },
+  {
+    "name": "search-with-extras",
+    "url": "https://www.socialcrawl.dev/v1/youtube/search?query=flaky+tests&includeExtras=true",
+    "status": 200,
+    "elapsedMs": 6728,
+    "capturedAt": "2026-09-05T21:06:02.497Z"
+  },
+  {
+    "name": "search-advanced",
+    "url": "https://www.socialcrawl.dev/v1/youtube/search/advanced?query=flaky+tests&order=date&published_after=2026-08-06T21%3A06%3A02.497Z",
+    "status": 400,
+    "elapsedMs": 359,
+    "capturedAt": "2026-09-05T21:06:02.856Z"
+  },
+  {
+    "name": "search-page-2",
+    "url": "https://www.socialcrawl.dev/v1/youtube/search?query=flaky+tests&cursor=sc.eyJ2IjoyLCJjIjoic2MxLmV5SmpJam9pUlhGalJFVm5kRzFpUjBaeVpWTkNNRnBZVGpCamVIRlZRVEZPUTFVd1RrSlZXRkpMVkdwS2QyRXdOVlpWYlhCclRVVlZkMWw2VWtwUmEwMTZWR3RvVjJKVmNERlhWRWsxVjBVNVIxZHJjRzVhTUZaTlZEQmthazB4U25WWGJscFdZa1pLTWxWcVNYUlJNRVpTWkVWU2EwMXNjREpaVlZaVFlVWldkVkZ1UW1GT1JXeERVWHBCZUdJeGNGUk5XR2hyVmxkb1dWZHNVbHBrTW1SdVVsVjRUbUpIYUROWGJHTjRXVlpGZUZacmFHbFdNMVpFVVZaR01HSnNiRmxUYmxKc1lrWktSVlpXV1RWWGJFNWFVMVZLUkdWclNuSlZNRlpUWkVaVmVXTkVVazlXUmxveVdqSmtSbFJIVmtaaVJtaGhUV3hXTkZZd1ZsZFpWbkJaV2xWT1FsVllVbmRXVldoM1ZUSktkVk5yTVZaTldFSnZWRlZzU2xGclRYbGhTRkpvWld0YWRsUnJVa05sYlVaSVVtdGFibG93VmsxWGExSldaVWRHVjFwR1dtbFNNMEpLVmpGVmVWRXdSbEprUlZKcVltNUNNMWxVUWxwbFJYaFhWMjV3VWxkVmJFTlJla1pUWkd4WmVXUkZaR3RTUmxrd1dXMHhORlJ0Wkc1U1ZYaFhVak5vZVZreU5XcGxiRnBJWVhwQ2FGSkdUa1JSVmtZd1kwWk9SV0pIYUdGV1JrcDRWVEl4YTJOV1ZscFRWVXBFVFVSV1IxUlZWbTlpVlRWR1lVaHdWRkpIVWpKYU1tUkdWRVV3ZUU5WFJsVldSbGw0V1d0b2MxVlhTa1pXTUU1Q1ZWaFNjVlpXV1RWVlIwcFdZek5TYWxaWGVFNWFSRkpLVVd0TmVscEhhR2xYUjNoVVZqSjRVMUpWTVRaVmEzQjZXakJXU0ZFeVpGSlRWVnB2VVZWTk1sb3dWa1pSTUVaS1ZWVmtVa3BVVGtWS1ZFNUZiMEZKUlVkSlNHYzJRbWRwUXpOT2JGbFlTbXBoUXpGdFdsZFdheUlzSW5NaU9sc2lTVGRxWkRWRVkzZEJOSE1pTENKelIxWmlibU52VnpoV1NTSXNJamhuTjBaMmIxSlViMGR2SWl3aVEzZG1iMmhFWVZKd2FXY2lMQ0pOYUdVdGNYVklWMlUyTUNJc0lqSlljR1Z0V2tOVlIyMXJJaXdpWjJGeWJYcFVRMUZmV1VraUxDSXdaRWhFYlZOcWVEVTFieUlzSW5oSlYyZGxNVmhGV21WM0lpd2lhVkI2VW01eVRGTmFZVEFpTENKb2JXc3hhRFF3YzJoaFJTSXNJbVExTVdsWFZXeHFTRmxOSWl3aVEzSjZjR3RHTVMxV2MwRWlMQ0pVYjFkclJuUTFlRzVzVFNJc0lsUnNhM0ozTTFScE5HZzBJaXdpYVVnNVlXVTBha3BuYWxFaUxDSk9SVEJJWmpSSWMwZzNieUlzSWpOZldrMDFkV3g1VUd4Rklpd2lZMUZmVDIxTExYRkpUSGNpTENKM1lXMTVVbHBVUkRNMFNTSXNJbHBGUkdaaFNTMTFUa0ZySWl3aWJtSXhTalIzZUhkQ2MzTWlMQ0psVWs5TlYxVnBZalE1UVNJc0lrNUVPRzgzTjNOd2VUQTRJaXdpWVRONVVVaEJSemswY3pBaUxDSTBjM1JzV2tSdVVETkRieUlzSWpkUVJHODBPRnBoWjNkWklpd2lPR2RTTUZZNVVUaHZOamdpTENJNWFGZExTVVphUlUxMFJTSXNJbXh3UzB4WVowWlljVVZCSWl3aU5FVk9UMnRtWVZkWmRFMGlMQ0phVmsxVlFXNWhOalF4UlNJc0ltbHFOV2RNY2xCNE9UUkpJaXdpV0dwSlluTXdYMWREZFRBaUxDSk9XSFJxV0VoNVRsbDNjeUlzSWxwQllVaERlR0UzVW1rNElpd2lURGxGYjFONVdEUTVSbXNpTENKaVdraDRRbFF5VWtkbldTSXNJblpYZVhCQlgxWXRUVlZ2SWl3aVJrVXRVM2w1WjNnNFNVVWlMQ0psYmxnNWRWRlllVWRyZHlJc0lqZEJaWEJRTm5NMFQxbG5JaXdpYVhaQmNqUm1jalJsYkVFaUxDSlZZbE5JZEhZeWRqRk1keUlzSWtvMGFIRm9lRU5hZDAxSklsMTkiLCJlIjoieW91dHViZS9zZWFyY2giLCJwIjoiY29udGludWF0aW9uVG9rZW4ifQ",
+    "status": 200,
+    "elapsedMs": 368,
+    "capturedAt": "2026-09-05T21:06:03.226Z"
+  }
+]

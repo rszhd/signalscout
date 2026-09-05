@@ -1,0 +1,2593 @@
+{
+  "success": true,
+  "platform": "youtube",
+  "endpoint": "/v1/youtube/video/comments",
+  "data": {
+    "items": [
+      {
+        "comment": {
+          "id": "Ugz2lmvQKkpwEVhovet4AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "Please make a video of BDD cucumber playwright js",
+          "author": {
+            "username": "yt-channel-1",
+            "display_name": "yt-channel-1",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-2",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 1,
+            "replies": 1
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2026-04-17T03:35:41.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3oybG12UUtrcHdFVmhvdmV0NEFhQUJBZyJ9",
+            "updated_at": "2026-04-17T03:35:41Z",
+            "author_channel_id": "UCGdq2LiDaJJr2duvZvs57XA",
+            "author_url": "http://www.youtube.com/yt-channel-1",
+            "viewer_rating": "none",
+            "text_original": "Please make a video of BDD cucumber playwright js",
+            "preview_replies": [
+              {
+                "id": "Ugz2lmvQKkpwEVhovet4AaABAg.AVgSNwgh1HkAVk7YU2kPrH",
+                "channelId": "UCJ4R8axyKuPZdJ7lFll3SKQ",
+                "videoId": "8g7FvoRToGo",
+                "textDisplay": "Hey. Many people asked for this already, but unfortunately I don't think that we'll cover it anytime soon. Sorry.",
+                "textOriginal": "Hey. Many people asked for this already, but unfortunately I don't think that we'll cover it anytime soon. Sorry.",
+                "parentId": "Ugz2lmvQKkpwEVhovet4AaABAg",
+                "authorDisplayName": "yt-channel-3",
+                "authorProfileImageUrl": "https://scrubbed.invalid/yt-channel-4",
+                "authorChannelUrl": "yt-channel-5",
+                "authorChannelId": {
+                  "value": "UCJ4R8axyKuPZdJ7lFll3SKQ"
+                },
+                "canRate": true,
+                "viewerRating": "none",
+                "likeCount": 0,
+                "publishedAt": "2026-04-18T13:50:35Z",
+                "updatedAt": "2026-04-18T13:50:35Z"
+              }
+            ]
+          }
+        },
+        "computed": {
+          "language": "en"
+        }
+      },
+      {
+        "comment": {
+          "id": "UgxD_7B0ZmKHRRQxJfl4AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "I just discover this life saving too late.\nMany TC can be improved with this function.",
+          "author": {
+            "username": "yt-channel-6",
+            "display_name": "yt-channel-6",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-7",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 0,
+            "replies": 1
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2026-02-23T09:06:06.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3hEXzdCMFptS0hSUlF4SmZsNEFhQUJBZyJ9",
+            "updated_at": "2026-02-23T09:06:06Z",
+            "author_channel_id": "UC1vb-97UkpKJx7nXl_WEPiA",
+            "author_url": "http://www.youtube.com/yt-channel-6",
+            "viewer_rating": "none",
+            "text_original": "I just discover this life saving too late.\nMany TC can be improved with this function.",
+            "preview_replies": [
+              {
+                "id": "UgxD_7B0ZmKHRRQxJfl4AaABAg.ATZ_3h426g2AT_2DcBSa7o",
+                "channelId": "UCJ4R8axyKuPZdJ7lFll3SKQ",
+                "videoId": "8g7FvoRToGo",
+                "textDisplay": "Agreed. :)",
+                "textOriginal": "Agreed. :)",
+                "parentId": "UgxD_7B0ZmKHRRQxJfl4AaABAg",
+                "authorDisplayName": "yt-channel-3",
+                "authorProfileImageUrl": "https://scrubbed.invalid/yt-channel-4",
+                "authorChannelUrl": "yt-channel-5",
+                "authorChannelId": {
+                  "value": "UCJ4R8axyKuPZdJ7lFll3SKQ"
+                },
+                "canRate": true,
+                "viewerRating": "none",
+                "likeCount": 0,
+                "publishedAt": "2026-02-23T13:29:36Z",
+                "updatedAt": "2026-02-23T13:29:36Z"
+              }
+            ]
+          }
+        },
+        "computed": {
+          "language": "en"
+        }
+      },
+      {
+        "comment": {
+          "id": "UgxVZ1VsAdY48q7Qvet4AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "i love this because sometimes even when you use built in methods like wait to be ready, visible or present still is not a good enough optioin to make reliable sometimes, we usually retry logic similar to this in java but made by our self but it is amazign that playwright found a real paint point and had their own solution for it.",
+          "author": {
+            "username": "yt-channel-8",
+            "display_name": "yt-channel-8",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-9",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 0,
+            "replies": 0
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2026-02-19T21:28:34.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3hWWjFWc0FkWTQ4cTdRdmV0NEFhQUJBZyJ9",
+            "updated_at": "2026-02-19T21:28:34Z",
+            "author_channel_id": "UCpjUKptLphesvUYNWml0Z7g",
+            "author_url": "http://www.youtube.com/yt-channel-8",
+            "viewer_rating": "none",
+            "text_original": "i love this because sometimes even when you use built in methods like wait to be ready, visible or present still is not a good enough optioin to make reliable sometimes, we usually retry logic similar to this in java but made by our self but it is amazign that playwright found a real paint point and had their own solution for it."
+          }
+        },
+        "computed": {
+          "language": "en"
+        }
+      },
+      {
+        "comment": {
+          "id": "UgzEZ0mGGTEsbp5Qsm94AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "How do we manage the same in bdd cucumber framework?",
+          "author": {
+            "username": "yt-channel-10",
+            "display_name": "yt-channel-10",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-11",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 0,
+            "replies": 1
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2026-02-05T17:11:32.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3pFWjBtR0dURXNicDVRc205NEFhQUJBZyJ9",
+            "updated_at": "2026-02-05T17:11:32Z",
+            "author_channel_id": "UCFlcrpeoa5l_MNtEr70UX6w",
+            "author_url": "http://www.youtube.com/yt-channel-10",
+            "viewer_rating": "none",
+            "text_original": "How do we manage the same in bdd cucumber framework?",
+            "preview_replies": [
+              {
+                "id": "UgzEZ0mGGTEsbp5Qsm94AaABAg.ASr5JGZWVCqASr6TZ-MkUN",
+                "channelId": "UCJ4R8axyKuPZdJ7lFll3SKQ",
+                "videoId": "8g7FvoRToGo",
+                "textDisplay": "Unfortunately, I don't know because I don't use Cucumber. :/",
+                "textOriginal": "Unfortunately, I don't know because I don't use Cucumber. :/",
+                "parentId": "UgzEZ0mGGTEsbp5Qsm94AaABAg",
+                "authorDisplayName": "yt-channel-3",
+                "authorProfileImageUrl": "https://scrubbed.invalid/yt-channel-4",
+                "authorChannelUrl": "yt-channel-5",
+                "authorChannelId": {
+                  "value": "UCJ4R8axyKuPZdJ7lFll3SKQ"
+                },
+                "canRate": true,
+                "viewerRating": "none",
+                "likeCount": 0,
+                "publishedAt": "2026-02-05T17:21:40Z",
+                "updatedAt": "2026-02-05T17:21:40Z"
+              }
+            ]
+          }
+        },
+        "computed": {
+          "language": "en"
+        }
+      },
+      {
+        "comment": {
+          "id": "Ugw_u53i2Bvf9lVudFV4AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "Any idea why it's called hydration??",
+          "author": {
+            "username": "yt-channel-12",
+            "display_name": "yt-channel-12",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-13",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 0,
+            "replies": 1
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2026-01-20T15:07:24.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3dfdTUzaTJCdmY5bFZ1ZEZWNEFhQUJBZyJ9",
+            "updated_at": "2026-01-20T15:07:24Z",
+            "author_channel_id": "UC5UGCRIJ7-DD9DX75PUKgiw",
+            "author_url": "http://www.youtube.com/yt-channel-12",
+            "viewer_rating": "none",
+            "text_original": "Any idea why it's called hydration??",
+            "preview_replies": [
+              {
+                "id": "Ugw_u53i2Bvf9lVudFV4AaABAg.ASCfO3txeanATFZ5QGG0cW",
+                "channelId": "UCJ4R8axyKuPZdJ7lFll3SKQ",
+                "videoId": "8g7FvoRToGo",
+                "textDisplay": "This is what Claude tells me and I think it makes a lot of sense. 🫣\n\nThe term comes from a metaphor about adding \"water\" to something \"dry\" to bring it back to life. When a server renders HTML, it produces static, non-interactive markup — a \"dehydrated\" version of your app. It has the right structure and content, but none of the JavaScript event listeners, state, or interactivity are attached. It's like freeze-dried food: the shape is there, but the life is missing.\n\nHydration is the process of \"adding water back\" — the client-side JavaScript walks through that existing server-rendered DOM, attaches event handlers, initializes component state, and makes everything interactive again. You're rehydrating the dry HTML into a fully living application.",
+                "textOriginal": "This is what Claude tells me and I think it makes a lot of sense. 🫣\n\nThe term comes from a metaphor about adding \"water\" to something \"dry\" to bring it back to life. When a server renders HTML, it produces static, non-interactive markup — a \"dehydrated\" version of your app. It has the right structure and content, but none of the JavaScript event listeners, state, or interactivity are attached. It's like freeze-dried food: the shape is there, but the life is missing.\n\nHydration is the process of \"adding water back\" — the client-side JavaScript walks through that existing server-rendered DOM, attaches event handlers, initializes component state, and makes everything interactive again. You're rehydrating the dry HTML into a fully living application.",
+                "parentId": "Ugw_u53i2Bvf9lVudFV4AaABAg",
+                "authorDisplayName": "yt-channel-3",
+                "authorProfileImageUrl": "https://scrubbed.invalid/yt-channel-4",
+                "authorChannelUrl": "yt-channel-5",
+                "authorChannelId": {
+                  "value": "UCJ4R8axyKuPZdJ7lFll3SKQ"
+                },
+                "canRate": true,
+                "viewerRating": "none",
+                "likeCount": 0,
+                "publishedAt": "2026-02-15T14:32:48Z",
+                "updatedAt": "2026-02-15T14:32:48Z"
+              }
+            ]
+          }
+        },
+        "computed": {
+          "language": "en"
+        }
+      },
+      {
+        "comment": {
+          "id": "UgzE4iH7JhRkVRkpzCZ4AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "This is a game changer.",
+          "author": {
+            "username": "yt-channel-14",
+            "display_name": "yt-channel-14",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-15",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 0,
+            "replies": 0
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2025-10-28T12:48:42.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3pFNGlIN0poUmtWUmtwekNaNEFhQUJBZyJ9",
+            "updated_at": "2025-10-28T12:48:42Z",
+            "author_channel_id": "UCLOgjDVkhI3k1vln26qJJsA",
+            "author_url": "http://www.youtube.com/yt-channel-14",
+            "viewer_rating": "none",
+            "text_original": "This is a game changer."
+          }
+        },
+        "computed": {
+          "language": "en"
+        }
+      },
+      {
+        "comment": {
+          "id": "Ugz7ahF6Bu_wtYgQqL54AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "This helps... wait for page to finish loading before commencing with the next action:\nawait page.waitForLoadState('networkidle')",
+          "author": {
+            "username": "yt-channel-16",
+            "display_name": "yt-channel-16",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-17",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 0,
+            "replies": 0
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2025-09-04T15:37:10.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3o3YWhGNkJ1X3d0WWdRcUw1NEFhQUJBZyJ9",
+            "updated_at": "2025-09-04T15:37:10Z",
+            "author_channel_id": "UCBD0lRTuN121aDGh2AX460w",
+            "author_url": "http://www.youtube.com/yt-channel-16",
+            "viewer_rating": "none",
+            "text_original": "This helps... wait for page to finish loading before commencing with the next action:\nawait page.waitForLoadState('networkidle')"
+          }
+        },
+        "computed": {
+          "language": "en"
+        }
+      },
+      {
+        "comment": {
+          "id": "UgzM0WBGHTZKUeACXNV4AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "Thanks for this information. I deal with Salesforce application testing, and my Playwright test script execution is often flaky because locator identification is usually very complex. Most of the time, the test execution fails due to timeouts caused by element identification issues. Please provide your suggestions.",
+          "author": {
+            "username": "yt-channel-18",
+            "display_name": "yt-channel-18",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-19",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 0,
+            "replies": 1
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2025-08-12T11:20:48.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3pNMFdCR0hUWktVZUFDWE5WNEFhQUJBZyJ9",
+            "updated_at": "2025-08-12T11:20:48Z",
+            "author_channel_id": "UC1v4gj3fhniupT3EolJDuIw",
+            "author_url": "http://www.youtube.com/yt-channel-18",
+            "viewer_rating": "none",
+            "text_original": "Thanks for this information. I deal with Salesforce application testing, and my Playwright test script execution is often flaky because locator identification is usually very complex. Most of the time, the test execution fails due to timeouts caused by element identification issues. Please provide your suggestions.",
+            "preview_replies": [
+              {
+                "id": "UgzM0WBGHTZKUeACXNV4AaABAg.ALihTZMQT4KALt5eBH8oYH",
+                "channelId": "UCJ4R8axyKuPZdJ7lFll3SKQ",
+                "videoId": "8g7FvoRToGo",
+                "textDisplay": "I understand that it often can be challenging to fight flakiness. However, without knowing in detail what you're dealing with it's impossible to give advice going beyond \"best practices\". And unfortunately, YT comments aren't the right place for detailed coding discussions.\n\nBut I wish you good luck and I'm sure you'll figure it out!",
+                "textOriginal": "I understand that it often can be challenging to fight flakiness. However, without knowing in detail what you're dealing with it's impossible to give advice going beyond \"best practices\". And unfortunately, YT comments aren't the right place for detailed coding discussions.\n\nBut I wish you good luck and I'm sure you'll figure it out!",
+                "parentId": "UgzM0WBGHTZKUeACXNV4AaABAg",
+                "authorDisplayName": "yt-channel-3",
+                "authorProfileImageUrl": "https://scrubbed.invalid/yt-channel-4",
+                "authorChannelUrl": "yt-channel-5",
+                "authorChannelId": {
+                  "value": "UCJ4R8axyKuPZdJ7lFll3SKQ"
+                },
+                "canRate": true,
+                "viewerRating": "none",
+                "likeCount": 0,
+                "publishedAt": "2025-08-16T12:13:15Z",
+                "updatedAt": "2025-08-16T12:13:15Z"
+              }
+            ]
+          }
+        },
+        "computed": {
+          "language": "en"
+        }
+      },
+      {
+        "comment": {
+          "id": "Ugxm_wB_c6GH5x4Zqyd4AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "Great man!!",
+          "author": {
+            "username": "yt-channel-20",
+            "display_name": "yt-channel-20",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-21",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 0,
+            "replies": 0
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2025-08-05T04:06:07.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3htX3dCX2M2R0g1eDRacXlkNEFhQUJBZyJ9",
+            "updated_at": "2025-08-05T04:06:07Z",
+            "author_channel_id": "UCcQi5dpCpIdAuZNUmdTTatA",
+            "author_url": "http://www.youtube.com/yt-channel-20",
+            "viewer_rating": "none",
+            "text_original": "Great man!!"
+          }
+        },
+        "computed": {
+          "language": "en"
+        }
+      },
+      {
+        "comment": {
+          "id": "UgwUO7dapLY_Z_yfwS94AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "you saved my time. thank you",
+          "author": {
+            "username": "yt-channel-22",
+            "display_name": "yt-channel-22",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-23",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 0,
+            "replies": 0
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2025-08-04T15:49:15.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3dVTzdkYXBMWV9aX3lmd1M5NEFhQUJBZyJ9",
+            "updated_at": "2025-08-04T15:49:15Z",
+            "author_channel_id": "UC6zX4nmDw8lIbwNUUQa124g",
+            "author_url": "http://www.youtube.com/yt-channel-22",
+            "viewer_rating": "none",
+            "text_original": "you saved my time. thank you"
+          }
+        },
+        "computed": {
+          "language": "en"
+        }
+      },
+      {
+        "comment": {
+          "id": "UgzmnkwlZf5Hy4LOKAB4AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "Great video! Thanks a lot for sharing! I find your short very useful.",
+          "author": {
+            "username": "yt-channel-24",
+            "display_name": "yt-channel-24",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-25",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 0,
+            "replies": 0
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2025-05-21T14:36:56.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3ptbmt3bFpmNUh5NExPS0FCNEFhQUJBZyJ9",
+            "updated_at": "2025-05-21T14:36:56Z",
+            "author_channel_id": "UCLRJ_-icKbfqsJp42ZJaqOg",
+            "author_url": "http://www.youtube.com/yt-channel-24",
+            "viewer_rating": "none",
+            "text_original": "Great video! Thanks a lot for sharing! I find your short very useful."
+          }
+        },
+        "computed": {
+          "language": "en"
+        }
+      },
+      {
+        "comment": {
+          "id": "Ugys9LUtPuPpOSe_mEl4AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "nice",
+          "author": {
+            "username": "yt-channel-26",
+            "display_name": "yt-channel-26",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-27",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 0,
+            "replies": 0
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2025-05-01T11:39:25.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3lzOUxVdFB1UHBPU2VfbUVsNEFhQUJBZyJ9",
+            "updated_at": "2025-05-01T11:39:25Z",
+            "author_channel_id": "UC596LUIb8E6qkimfWiMHp3A",
+            "author_url": "http://www.youtube.com/yt-channel-26",
+            "viewer_rating": "none",
+            "text_original": "nice"
+          }
+        },
+        "computed": {
+          "language": null
+        }
+      },
+      {
+        "comment": {
+          "id": "Ugwf2PO3UQW3AmoqMup4AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "to pass() is great against poor hydration - playwright is too fast... great vid",
+          "author": {
+            "username": "yt-channel-28",
+            "display_name": "yt-channel-28",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-29",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 1,
+            "replies": 0
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2025-04-16T06:28:44.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3dmMlBPM1VRVzNBbW9xTXVwNEFhQUJBZyJ9",
+            "updated_at": "2025-04-16T06:28:44Z",
+            "author_channel_id": "UCLTWfq_gX_AQnMBbh4BjQWA",
+            "author_url": "http://www.youtube.com/yt-channel-28",
+            "viewer_rating": "none",
+            "text_original": "to pass() is great against poor hydration - playwright is too fast... great vid"
+          }
+        },
+        "computed": {
+          "language": "en"
+        }
+      },
+      {
+        "comment": {
+          "id": "UgzL2HIB2gZox2c_X9N4AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "Amazing tips Stefan! Thank you so much. Liked and subscribed!",
+          "author": {
+            "username": "yt-channel-30",
+            "display_name": "yt-channel-30",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-31",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 0,
+            "replies": 1
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2025-04-07T23:19:44.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3pMMkhJQjJnWm94MmNfWDlONEFhQUJBZyJ9",
+            "updated_at": "2025-04-07T23:19:44Z",
+            "author_channel_id": "UC3D9GgWLmqOVs30FEtaShrw",
+            "author_url": "http://www.youtube.com/yt-channel-30",
+            "viewer_rating": "none",
+            "text_original": "Amazing tips Stefan! Thank you so much. Liked and subscribed!",
+            "preview_replies": [
+              {
+                "id": "UgzL2HIB2gZox2c_X9N4AaABAg.AGcyn4JdMGGAGdt073BMuM",
+                "channelId": "UCJ4R8axyKuPZdJ7lFll3SKQ",
+                "videoId": "8g7FvoRToGo",
+                "textDisplay": "Thanks for watching! 🦝",
+                "textOriginal": "Thanks for watching! 🦝",
+                "parentId": "UgzL2HIB2gZox2c_X9N4AaABAg",
+                "authorDisplayName": "yt-channel-3",
+                "authorProfileImageUrl": "https://scrubbed.invalid/yt-channel-4",
+                "authorChannelUrl": "yt-channel-5",
+                "authorChannelId": {
+                  "value": "UCJ4R8axyKuPZdJ7lFll3SKQ"
+                },
+                "canRate": true,
+                "viewerRating": "none",
+                "likeCount": 0,
+                "publishedAt": "2025-04-08T07:48:28Z",
+                "updatedAt": "2025-04-08T07:48:28Z"
+              }
+            ]
+          }
+        },
+        "computed": {
+          "language": "en"
+        }
+      },
+      {
+        "comment": {
+          "id": "UgxhUzPUfapumLdaBqJ4AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "why we can't use page.waitForSelector(\"locator\", { state : 'visible',  timeout : 5000, poll : 500}) ?",
+          "author": {
+            "username": "yt-channel-32",
+            "display_name": "yt-channel-32",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-33",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 1,
+            "replies": 2
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2025-04-07T07:36:15.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3hoVXpQVWZhcHVtTGRhQnFKNEFhQUJBZyJ9",
+            "updated_at": "2025-04-07T07:36:28Z",
+            "author_channel_id": "UCGMy62CC97vti24D2TUOzTA",
+            "author_url": "http://www.youtube.com/yt-channel-32",
+            "viewer_rating": "none",
+            "text_original": "why we can't use page.waitForSelector(\"locator\", { state : 'visible',  timeout : 5000, poll : 500}) ?",
+            "preview_replies": [
+              {
+                "id": "UgxhUzPUfapumLdaBqJ4AaABAg.AGbHoqal1PgAGbJcgG4BL5",
+                "channelId": "UCJ4R8axyKuPZdJ7lFll3SKQ",
+                "videoId": "8g7FvoRToGo",
+                "textDisplay": "Great question. :) \n\nBecause waiting for an element to become visible is not the problem with these poor hydration patterns. The problem is that the UI looks ready but isn't, and PWT clicks something that doesn't do anything because JS isn't loaded yet.\n\nThe described approach recommends retrying actions and assertions with `toPass` so that `click` and `toBeVsisble` run in a loop and are retried for an element. It's pretty much trying a set of instructions multiple times.\n\nI hope this makes sense. :)",
+                "textOriginal": "Great question. :) \n\nBecause waiting for an element to become visible is not the problem with these poor hydration patterns. The problem is that the UI looks ready but isn't, and PWT clicks something that doesn't do anything because JS isn't loaded yet.\n\nThe described approach recommends retrying actions and assertions with `toPass` so that `click` and `toBeVsisble` run in a loop and are retried for an element. It's pretty much trying a set of instructions multiple times.\n\nI hope this makes sense. :)",
+                "parentId": "UgxhUzPUfapumLdaBqJ4AaABAg",
+                "authorDisplayName": "yt-channel-3",
+                "authorProfileImageUrl": "https://scrubbed.invalid/yt-channel-4",
+                "authorChannelUrl": "yt-channel-5",
+                "authorChannelId": {
+                  "value": "UCJ4R8axyKuPZdJ7lFll3SKQ"
+                },
+                "canRate": true,
+                "viewerRating": "none",
+                "likeCount": 1,
+                "publishedAt": "2025-04-07T07:52:04Z",
+                "updatedAt": "2025-04-07T07:52:04Z"
+              },
+              {
+                "id": "UgxhUzPUfapumLdaBqJ4AaABAg.AGbHoqal1PgAGbKcojyDBj",
+                "channelId": "UCJ4R8axyKuPZdJ7lFll3SKQ",
+                "videoId": "8g7FvoRToGo",
+                "textDisplay": "@yt-channel-34 Thanks for the clarification",
+                "textOriginal": "@yt-channel-34 Thanks for the clarification",
+                "parentId": "UgxhUzPUfapumLdaBqJ4AaABAg",
+                "authorDisplayName": "yt-channel-32",
+                "authorProfileImageUrl": "https://scrubbed.invalid/yt-channel-33",
+                "authorChannelUrl": "yt-channel-35",
+                "authorChannelId": {
+                  "value": "UCGMy62CC97vti24D2TUOzTA"
+                },
+                "canRate": true,
+                "viewerRating": "none",
+                "likeCount": 0,
+                "publishedAt": "2025-04-07T08:00:50Z",
+                "updatedAt": "2025-04-07T08:00:50Z"
+              }
+            ]
+          }
+        },
+        "computed": {
+          "language": "en"
+        }
+      },
+      {
+        "comment": {
+          "id": "UgwrwF0zax1tSTpuPQV4AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "Hey there, just wanted to say i tried this today and it seems to have worked. \n\nNo way are they gonna fix js not loading behind the buttons or disabling them while we're all under this much time pressure, for me this is a good solution to my automation issue, cannot thank you enough!",
+          "author": {
+            "username": "yt-channel-36",
+            "display_name": "yt-channel-36",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-37",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 1,
+            "replies": 1
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2025-03-13T10:21:16.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3dyd0YwemF4MXRTVHB1UFFWNEFhQUJBZyJ9",
+            "updated_at": "2025-03-13T16:46:26Z",
+            "author_channel_id": "UCRGKlWWnRKVfD3hGFHqViiA",
+            "author_url": "http://www.youtube.com/yt-channel-36",
+            "viewer_rating": "none",
+            "text_original": "Hey there, just wanted to say i tried this today and it seems to have worked. \n\nNo way are they gonna fix js not loading behind the buttons or disabling them while we're all under this much time pressure, for me this is a good solution to my automation issue, cannot thank you enough!",
+            "preview_replies": [
+              {
+                "id": "UgwrwF0zax1tSTpuPQV4AaABAg.AFbCpVg5RsmAFbSa-6iZ97",
+                "channelId": "UCJ4R8axyKuPZdJ7lFll3SKQ",
+                "videoId": "8g7FvoRToGo",
+                "textDisplay": "Great to hear that the video was helpful. Yeah, I can relate to the time pressure. Sometimes it is what it is. 🤷 But great you found a solution to fight the flake. :)",
+                "textOriginal": "Great to hear that the video was helpful. Yeah, I can relate to the time pressure. Sometimes it is what it is. 🤷 But great you found a solution to fight the flake. :)",
+                "parentId": "UgwrwF0zax1tSTpuPQV4AaABAg",
+                "authorDisplayName": "yt-channel-3",
+                "authorProfileImageUrl": "https://scrubbed.invalid/yt-channel-4",
+                "authorChannelUrl": "yt-channel-5",
+                "authorChannelId": {
+                  "value": "UCJ4R8axyKuPZdJ7lFll3SKQ"
+                },
+                "canRate": true,
+                "viewerRating": "none",
+                "likeCount": 1,
+                "publishedAt": "2025-03-13T12:38:57Z",
+                "updatedAt": "2025-03-13T12:38:57Z"
+              }
+            ]
+          }
+        },
+        "computed": {
+          "language": "en"
+        }
+      },
+      {
+        "comment": {
+          "id": "UgwE0YuwoWWcbKJWVDh4AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "One of the most helpful videos about PW! THANK U VERY MUCH !!! You helped me allot",
+          "author": {
+            "username": "yt-channel-38",
+            "display_name": "yt-channel-38",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-39",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 0,
+            "replies": 1
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2025-03-12T19:32:50.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3dFMFl1d29XV2NiS0pXVkRoNEFhQUJBZyJ9",
+            "updated_at": "2025-03-12T19:33:54Z",
+            "author_channel_id": "UCgwV5Ahiqtxpoys_IDjxwMw",
+            "author_url": "http://www.youtube.com/yt-channel-38",
+            "viewer_rating": "none",
+            "text_original": "One of the most helpful videos about PW! THANK U VERY MUCH !!! You helped me allot",
+            "preview_replies": [
+              {
+                "id": "UgwE0YuwoWWcbKJWVDh4AaABAg.AF_c9QvEYlXAFbSVHU0jwB",
+                "channelId": "UCJ4R8axyKuPZdJ7lFll3SKQ",
+                "videoId": "8g7FvoRToGo",
+                "textDisplay": "Glad it helped! And thanks for watching! 🦝",
+                "textOriginal": "Glad it helped! And thanks for watching! 🦝",
+                "parentId": "UgwE0YuwoWWcbKJWVDh4AaABAg",
+                "authorDisplayName": "yt-channel-3",
+                "authorProfileImageUrl": "https://scrubbed.invalid/yt-channel-4",
+                "authorChannelUrl": "yt-channel-5",
+                "authorChannelId": {
+                  "value": "UCJ4R8axyKuPZdJ7lFll3SKQ"
+                },
+                "canRate": true,
+                "viewerRating": "none",
+                "likeCount": 0,
+                "publishedAt": "2025-03-13T12:38:10Z",
+                "updatedAt": "2025-03-13T12:38:10Z"
+              }
+            ]
+          }
+        },
+        "computed": {
+          "language": "en"
+        }
+      },
+      {
+        "comment": {
+          "id": "UgzxzzBifh-G3Cz9Yz14AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "Thanks for a nice tip",
+          "author": {
+            "username": "yt-channel-40",
+            "display_name": "yt-channel-40",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-41",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 0,
+            "replies": 0
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2025-02-12T22:08:45.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3p4enpCaWZoLUczQ3o5WXoxNEFhQUJBZyJ9",
+            "updated_at": "2025-02-12T22:08:45Z",
+            "author_channel_id": "UC838x-3-NXKZXTsIAC3QNvg",
+            "author_url": "http://www.youtube.com/yt-channel-40",
+            "viewer_rating": "none",
+            "text_original": "Thanks for a nice tip"
+          }
+        },
+        "computed": {
+          "language": "en"
+        }
+      },
+      {
+        "comment": {
+          "id": "UgyW2Pah6liHfqh5sUB4AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "Amazing thank you very much.",
+          "author": {
+            "username": "yt-channel-42",
+            "display_name": "yt-channel-42",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-43",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 0,
+            "replies": 1
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2025-01-29T20:49:45.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3lXMlBhaDZsaUhmcWg1c1VCNEFhQUJBZyJ9",
+            "updated_at": "2025-01-29T20:49:45Z",
+            "author_channel_id": "UCcidt-rPlZ-i7roJI4GCc7Q",
+            "author_url": "http://www.youtube.com/yt-channel-42",
+            "viewer_rating": "none",
+            "text_original": "Amazing thank you very much.",
+            "preview_replies": [
+              {
+                "id": "UgyW2Pah6liHfqh5sUB4AaABAg.ADtb_4attnwADtirk0ddra",
+                "channelId": "UCJ4R8axyKuPZdJ7lFll3SKQ",
+                "videoId": "8g7FvoRToGo",
+                "textDisplay": "Thanks for watching! 🦝",
+                "textOriginal": "Thanks for watching! 🦝",
+                "parentId": "UgyW2Pah6liHfqh5sUB4AaABAg",
+                "authorDisplayName": "yt-channel-3",
+                "authorProfileImageUrl": "https://scrubbed.invalid/yt-channel-4",
+                "authorChannelUrl": "yt-channel-5",
+                "authorChannelId": {
+                  "value": "UCJ4R8axyKuPZdJ7lFll3SKQ"
+                },
+                "canRate": true,
+                "viewerRating": "none",
+                "likeCount": 0,
+                "publishedAt": "2025-01-29T21:53:28Z",
+                "updatedAt": "2025-01-29T21:53:28Z"
+              }
+            ]
+          }
+        },
+        "computed": {
+          "language": "en"
+        }
+      },
+      {
+        "comment": {
+          "id": "UgytgYPR4XcYu5auaoR4AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "Thank you the video. However, it seems that there is no perfect solution if we only use automation script. Imagine if the network is super slow, all  the retries in the toPass assertion failed and the exceeded the timeout. Maybe the root solution is enhancing the frontend code.",
+          "author": {
+            "username": "yt-channel-44",
+            "display_name": "yt-channel-44",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-45",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 1,
+            "replies": 1
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2025-01-20T09:48:42.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3l0Z1lQUjRYY1l1NWF1YW9SNEFhQUJBZyJ9",
+            "updated_at": "2025-01-20T09:48:42Z",
+            "author_channel_id": "UC4vUXwDncl-jODBA91pe-4w",
+            "author_url": "http://www.youtube.com/yt-channel-44",
+            "viewer_rating": "none",
+            "text_original": "Thank you the video. However, it seems that there is no perfect solution if we only use automation script. Imagine if the network is super slow, all  the retries in the toPass assertion failed and the exceeded the timeout. Maybe the root solution is enhancing the frontend code.",
+            "preview_replies": [
+              {
+                "id": "UgytgYPR4XcYu5auaoR4AaABAg.ADWFlZonm1zADWUTZUfudL",
+                "channelId": "UCJ4R8axyKuPZdJ7lFll3SKQ",
+                "videoId": "8g7FvoRToGo",
+                "textDisplay": "I 100% agree. \n\nIf an application has a poor user experience under slow network conditions, this is a problem and should be fixed.\n\nIn the real world, though, and especially when testing and development are different teams, improving the Frontend is rarely prioritized. \n\nIt's the typical \"works on my machine\" and often, people state the \"Playwright is too fast\" argument, completely ignoring that the issue often is poor hydration patterns or a broken app under slow network conditions.\n\n`toPass` and other ways to come around test flakiness are workarounds for symptoms and not addressing the root course. But sometimes it is how it is. :) \n\nSo you're 100% right.",
+                "textOriginal": "I 100% agree. \n\nIf an application has a poor user experience under slow network conditions, this is a problem and should be fixed.\n\nIn the real world, though, and especially when testing and development are different teams, improving the Frontend is rarely prioritized. \n\nIt's the typical \"works on my machine\" and often, people state the \"Playwright is too fast\" argument, completely ignoring that the issue often is poor hydration patterns or a broken app under slow network conditions.\n\n`toPass` and other ways to come around test flakiness are workarounds for symptoms and not addressing the root course. But sometimes it is how it is. :) \n\nSo you're 100% right.",
+                "parentId": "UgytgYPR4XcYu5auaoR4AaABAg",
+                "authorDisplayName": "yt-channel-3",
+                "authorProfileImageUrl": "https://scrubbed.invalid/yt-channel-4",
+                "authorChannelUrl": "yt-channel-5",
+                "authorChannelId": {
+                  "value": "UCJ4R8axyKuPZdJ7lFll3SKQ"
+                },
+                "canRate": true,
+                "viewerRating": "none",
+                "likeCount": 0,
+                "publishedAt": "2025-01-20T11:57:11Z",
+                "updatedAt": "2025-01-20T11:57:11Z"
+              }
+            ]
+          }
+        },
+        "computed": {
+          "language": "en"
+        }
+      },
+      {
+        "comment": {
+          "id": "UgyUDPPofnirxNyuHN14AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "The first comment is for you. works, you are the champion. THX.👍",
+          "author": {
+            "username": "yt-channel-46",
+            "display_name": "yt-channel-46",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-47",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 0,
+            "replies": 0
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2025-01-15T08:18:35.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3lVRFBQb2ZuaXJ4Tnl1SE4xNEFhQUJBZyJ9",
+            "updated_at": "2025-01-15T08:18:35Z",
+            "author_channel_id": "UCfJ-xEaZ4FTo73ZmE6kpP4Q",
+            "author_url": "http://www.youtube.com/yt-channel-46",
+            "viewer_rating": "none",
+            "text_original": "The first comment is for you. works, you are the champion. THX.👍"
+          }
+        },
+        "computed": {
+          "language": "en"
+        }
+      },
+      {
+        "comment": {
+          "id": "Ugxau_pBgdfv6Q8DXW54AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "Bro what the fuk, you just answered the wall that’s keeping me from progressing LMAO i was about to come and crash on the dev teams because they won’t fix slow sites😩",
+          "author": {
+            "username": "yt-channel-48",
+            "display_name": "yt-channel-48",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-49",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 0,
+            "replies": 1
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2025-01-06T11:38:25.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3hhdV9wQmdkZnY2UThEWFc1NEFhQUJBZyJ9",
+            "updated_at": "2025-01-06T11:38:25Z",
+            "author_channel_id": "UC75D4ouR_T4F7sBHL8incnA",
+            "author_url": "http://www.youtube.com/yt-channel-48",
+            "viewer_rating": "none",
+            "text_original": "Bro what the fuk, you just answered the wall that’s keeping me from progressing LMAO i was about to come and crash on the dev teams because they won’t fix slow sites😩",
+            "preview_replies": [
+              {
+                "id": "Ugxau_pBgdfv6Q8DXW54AaABAg.ACxPBr5PnN7AD2ABszjT8V",
+                "channelId": "UCJ4R8axyKuPZdJ7lFll3SKQ",
+                "videoId": "8g7FvoRToGo",
+                "textDisplay": "Happy to hear the video was able to help you out. 😉🦝",
+                "textOriginal": "Happy to hear the video was able to help you out. 😉🦝",
+                "parentId": "Ugxau_pBgdfv6Q8DXW54AaABAg",
+                "authorDisplayName": "yt-channel-3",
+                "authorProfileImageUrl": "https://scrubbed.invalid/yt-channel-4",
+                "authorChannelUrl": "yt-channel-5",
+                "authorChannelId": {
+                  "value": "UCJ4R8axyKuPZdJ7lFll3SKQ"
+                },
+                "canRate": true,
+                "viewerRating": "none",
+                "likeCount": 0,
+                "publishedAt": "2025-01-08T17:22:47Z",
+                "updatedAt": "2025-01-08T17:22:47Z"
+              }
+            ]
+          }
+        },
+        "computed": {
+          "language": "en"
+        }
+      },
+      {
+        "comment": {
+          "id": "Ugw1a8hC-djKpG7bsNF4AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "Man this just saved my life. It reminds me of recurse in Cypress, I think it does something similar. I was also trying try catch blocks but sometimes they'd fail. Using toPass() should be mandatory for the cases in which nothing else seems to work and I tried every single assertion and waitFor() in order to avoid waitForTimeouts.",
+          "author": {
+            "username": "yt-channel-50",
+            "display_name": "yt-channel-50",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-51",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 1,
+            "replies": 1
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2024-12-16T19:07:48.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3cxYThoQy1kaktwRzdic05GNEFhQUJBZyJ9",
+            "updated_at": "2024-12-16T19:07:48Z",
+            "author_channel_id": "UCJD01V9Ht3buGocvtszDXhg",
+            "author_url": "http://www.youtube.com/yt-channel-50",
+            "viewer_rating": "none",
+            "text_original": "Man this just saved my life. It reminds me of recurse in Cypress, I think it does something similar. I was also trying try catch blocks but sometimes they'd fail. Using toPass() should be mandatory for the cases in which nothing else seems to work and I tried every single assertion and waitFor() in order to avoid waitForTimeouts.",
+            "preview_replies": [
+              {
+                "id": "Ugw1a8hC-djKpG7bsNF4AaABAg.AC77vtO_3owAC8nztdsqHw",
+                "channelId": "UCJ4R8axyKuPZdJ7lFll3SKQ",
+                "videoId": "8g7FvoRToGo",
+                "textDisplay": "This is exaclty how I treat it. Relying on auto-waiting and web-first assertions first, but if there's flakiness in the application (and it's almost always the application) then I'm reaching for `toPass()`. 💪",
+                "textOriginal": "This is exaclty how I treat it. Relying on auto-waiting and web-first assertions first, but if there's flakiness in the application (and it's almost always the application) then I'm reaching for `toPass()`. 💪",
+                "parentId": "Ugw1a8hC-djKpG7bsNF4AaABAg",
+                "authorDisplayName": "yt-channel-3",
+                "authorProfileImageUrl": "https://scrubbed.invalid/yt-channel-4",
+                "authorChannelUrl": "yt-channel-5",
+                "authorChannelId": {
+                  "value": "UCJ4R8axyKuPZdJ7lFll3SKQ"
+                },
+                "canRate": true,
+                "viewerRating": "none",
+                "likeCount": 1,
+                "publishedAt": "2024-12-17T10:43:20Z",
+                "updatedAt": "2024-12-17T10:43:20Z"
+              }
+            ]
+          }
+        },
+        "computed": {
+          "language": "en"
+        }
+      },
+      {
+        "comment": {
+          "id": "UgxkvWIO4zA3QIyXj3l4AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "This helped me so much. Bless your soul",
+          "author": {
+            "username": "yt-channel-52",
+            "display_name": "yt-channel-52",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-53",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 0,
+            "replies": 1
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2024-11-26T22:05:01.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3hrdldJTzR6QTNRSXlYajNsNEFhQUJBZyJ9",
+            "updated_at": "2024-11-26T22:05:01Z",
+            "author_channel_id": "UCaNReMFF2HPurE_5h7qLxlw",
+            "author_url": "http://www.youtube.com/yt-channel-52",
+            "viewer_rating": "none",
+            "text_original": "This helped me so much. Bless your soul",
+            "preview_replies": [
+              {
+                "id": "UgxkvWIO4zA3QIyXj3l4AaABAg.ABJxJOUFGmVABLXilQqcai",
+                "channelId": "UCJ4R8axyKuPZdJ7lFll3SKQ",
+                "videoId": "8g7FvoRToGo",
+                "textDisplay": "Glad it helped! 🦝",
+                "textOriginal": "Glad it helped! 🦝",
+                "parentId": "UgxkvWIO4zA3QIyXj3l4AaABAg",
+                "authorDisplayName": "yt-channel-3",
+                "authorProfileImageUrl": "https://scrubbed.invalid/yt-channel-4",
+                "authorChannelUrl": "yt-channel-5",
+                "authorChannelId": {
+                  "value": "UCJ4R8axyKuPZdJ7lFll3SKQ"
+                },
+                "canRate": true,
+                "viewerRating": "none",
+                "likeCount": 0,
+                "publishedAt": "2024-11-27T12:51:11Z",
+                "updatedAt": "2024-11-27T12:51:11Z"
+              }
+            ]
+          }
+        },
+        "computed": {
+          "language": "en"
+        }
+      },
+      {
+        "comment": {
+          "id": "UgxbOOrdC95oNs6Vlpd4AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "Thanks a lot for this solution. I was stuck on this problem for almost 2 days.",
+          "author": {
+            "username": "yt-channel-54",
+            "display_name": "yt-channel-54",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-55",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 1,
+            "replies": 1
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2024-11-23T15:57:13.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3hiT09yZEM5NW9OczZWbHBkNEFhQUJBZyJ9",
+            "updated_at": "2024-11-23T15:57:13Z",
+            "author_channel_id": "UCa9AoYNDwmPtNdIK2c8Am9Q",
+            "author_url": "http://www.youtube.com/yt-channel-54",
+            "viewer_rating": "none",
+            "text_original": "Thanks a lot for this solution. I was stuck on this problem for almost 2 days.",
+            "preview_replies": [
+              {
+                "id": "UgxbOOrdC95oNs6Vlpd4AaABAg.ABBZpqJT9EnABBi7wfPnJh",
+                "channelId": "UCJ4R8axyKuPZdJ7lFll3SKQ",
+                "videoId": "8g7FvoRToGo",
+                "textDisplay": "Happy the video has been valuable! 🦝",
+                "textOriginal": "Happy the video has been valuable! 🦝",
+                "parentId": "UgxbOOrdC95oNs6Vlpd4AaABAg",
+                "authorDisplayName": "yt-channel-3",
+                "authorProfileImageUrl": "https://scrubbed.invalid/yt-channel-4",
+                "authorChannelUrl": "yt-channel-5",
+                "authorChannelId": {
+                  "value": "UCJ4R8axyKuPZdJ7lFll3SKQ"
+                },
+                "canRate": true,
+                "viewerRating": "none",
+                "likeCount": 0,
+                "publishedAt": "2024-11-23T17:18:28Z",
+                "updatedAt": "2024-11-23T17:18:28Z"
+              }
+            ]
+          }
+        },
+        "computed": {
+          "language": "en"
+        }
+      },
+      {
+        "comment": {
+          "id": "UgzZ_7STDKeFz4xcP914AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "This is gold !!    Thanks for the tip.",
+          "author": {
+            "username": "yt-channel-56",
+            "display_name": "yt-channel-56",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-57",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 0,
+            "replies": 1
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2024-11-06T02:06:51.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3paXzdTVERLZUZ6NHhjUDkxNEFhQUJBZyJ9",
+            "updated_at": "2024-11-06T02:06:51Z",
+            "author_channel_id": "UCLPoec7--csvVw3uXidZ-GQ",
+            "author_url": "http://www.youtube.com/yt-channel-56",
+            "viewer_rating": "none",
+            "text_original": "This is gold !!    Thanks for the tip.",
+            "preview_replies": [
+              {
+                "id": "UgzZ_7STDKeFz4xcP914AaABAg.AAUJI8LUMVEAAVO5PoX9Jy",
+                "channelId": "UCJ4R8axyKuPZdJ7lFll3SKQ",
+                "videoId": "8g7FvoRToGo",
+                "textDisplay": "Happy it's useful! 🦝",
+                "textOriginal": "Happy it's useful! 🦝",
+                "parentId": "UgzZ_7STDKeFz4xcP914AaABAg",
+                "authorDisplayName": "yt-channel-3",
+                "authorProfileImageUrl": "https://scrubbed.invalid/yt-channel-4",
+                "authorChannelUrl": "yt-channel-5",
+                "authorChannelId": {
+                  "value": "UCJ4R8axyKuPZdJ7lFll3SKQ"
+                },
+                "canRate": true,
+                "viewerRating": "none",
+                "likeCount": 0,
+                "publishedAt": "2024-11-06T12:08:02Z",
+                "updatedAt": "2024-11-06T12:08:02Z"
+              }
+            ]
+          }
+        },
+        "computed": {
+          "language": "en"
+        }
+      },
+      {
+        "comment": {
+          "id": "Ugw7sn3gAdNa0fG47Bx4AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "You, sir, are a gentleman and a scholar. Also, you've given me fuel to scold our front end team!",
+          "author": {
+            "username": "yt-channel-58",
+            "display_name": "yt-channel-58",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-59",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 8,
+            "replies": 1
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2024-11-05T09:29:12.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3c3c24zZ0FkTmEwZkc0N0J4NEFhQUJBZyJ9",
+            "updated_at": "2024-11-05T09:29:12Z",
+            "author_channel_id": "UC3xt3Bpk47pWNs4_ysMADNA",
+            "author_url": "http://www.youtube.com/yt-channel-58",
+            "viewer_rating": "none",
+            "text_original": "You, sir, are a gentleman and a scholar. Also, you've given me fuel to scold our front end team!",
+            "preview_replies": [
+              {
+                "id": "Ugw7sn3gAdNa0fG47Bx4AaABAg.AASX79mrEXWAAVO73djdUL",
+                "channelId": "UCJ4R8axyKuPZdJ7lFll3SKQ",
+                "videoId": "8g7FvoRToGo",
+                "textDisplay": "Happy to hear that!",
+                "textOriginal": "Happy to hear that!",
+                "parentId": "Ugw7sn3gAdNa0fG47Bx4AaABAg",
+                "authorDisplayName": "yt-channel-3",
+                "authorProfileImageUrl": "https://scrubbed.invalid/yt-channel-4",
+                "authorChannelUrl": "yt-channel-5",
+                "authorChannelId": {
+                  "value": "UCJ4R8axyKuPZdJ7lFll3SKQ"
+                },
+                "canRate": true,
+                "viewerRating": "none",
+                "likeCount": 0,
+                "publishedAt": "2024-11-06T12:08:16Z",
+                "updatedAt": "2024-11-06T12:08:16Z"
+              }
+            ]
+          }
+        },
+        "computed": {
+          "language": "en"
+        }
+      },
+      {
+        "comment": {
+          "id": "UgzcIjH--FdHcpNSyap4AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "I was stuck on how to resolve this issue for too long. Thank you for saving my sanity",
+          "author": {
+            "username": "yt-channel-60",
+            "display_name": "yt-channel-60",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-61",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 8,
+            "replies": 0
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2024-10-28T19:10:20.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3pjSWpILS1GZEhjcE5TeWFwNEFhQUJBZyJ9",
+            "updated_at": "2024-10-28T19:10:20Z",
+            "author_channel_id": "UChwdJGquh_CiF4Vv2LRRZ8g",
+            "author_url": "http://www.youtube.com/yt-channel-60",
+            "viewer_rating": "none",
+            "text_original": "I was stuck on how to resolve this issue for too long. Thank you for saving my sanity"
+          }
+        },
+        "computed": {
+          "language": "en"
+        }
+      },
+      {
+        "comment": {
+          "id": "UgzzHDovLrsZ5tjfTO94AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "Thank you. this saved my running tests in playwright automation project 😀😃",
+          "author": {
+            "username": "yt-channel-62",
+            "display_name": "yt-channel-62",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-63",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 0,
+            "replies": 1
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2024-10-23T16:46:53.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3p6SERvdkxyc1o1dGpmVE85NEFhQUJBZyJ9",
+            "updated_at": "2024-10-23T16:46:53Z",
+            "author_channel_id": "UCaHSRs860TbOAXApHrrQmug",
+            "author_url": "http://www.youtube.com/yt-channel-62",
+            "viewer_rating": "none",
+            "text_original": "Thank you. this saved my running tests in playwright automation project 😀😃",
+            "preview_replies": [
+              {
+                "id": "UgzzHDovLrsZ5tjfTO94AaABAg.A9wpsY_6YuYA9wqMS5b4ig",
+                "channelId": "UCJ4R8axyKuPZdJ7lFll3SKQ",
+                "videoId": "8g7FvoRToGo",
+                "textDisplay": "Whoop whoop! 🎉",
+                "textOriginal": "Whoop whoop! 🎉",
+                "parentId": "UgzzHDovLrsZ5tjfTO94AaABAg",
+                "authorDisplayName": "yt-channel-3",
+                "authorProfileImageUrl": "https://scrubbed.invalid/yt-channel-4",
+                "authorChannelUrl": "yt-channel-5",
+                "authorChannelId": {
+                  "value": "UCJ4R8axyKuPZdJ7lFll3SKQ"
+                },
+                "canRate": true,
+                "viewerRating": "none",
+                "likeCount": 0,
+                "publishedAt": "2024-10-23T16:51:07Z",
+                "updatedAt": "2024-10-23T16:51:07Z"
+              }
+            ]
+          }
+        },
+        "computed": {
+          "language": "en"
+        }
+      },
+      {
+        "comment": {
+          "id": "Ugyoz12wRYD-oamnEfF4AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "I love this tip. I have had so many banging-head-on-wall moments with this type of problem and trying to avoid adding Time.Delays. Thanks for sharing.",
+          "author": {
+            "username": "yt-channel-64",
+            "display_name": "yt-channel-64",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-65",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 4,
+            "replies": 1
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2024-10-14T15:16:01.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3lvejEyd1JZRC1vYW1uRWZGNEFhQUJBZyJ9",
+            "updated_at": "2024-10-14T15:16:01Z",
+            "author_channel_id": "UCuaB0oIeQSOV_ZGinO1Z76g",
+            "author_url": "http://www.youtube.com/yt-channel-64",
+            "viewer_rating": "none",
+            "text_original": "I love this tip. I have had so many banging-head-on-wall moments with this type of problem and trying to avoid adding Time.Delays. Thanks for sharing.",
+            "preview_replies": [
+              {
+                "id": "Ugyoz12wRYD-oamnEfF4AaABAg.A9_VK79OP_NA9eQJdkUGdH",
+                "channelId": "UCJ4R8axyKuPZdJ7lFll3SKQ",
+                "videoId": "8g7FvoRToGo",
+                "textDisplay": "Yes, 100%. If the frontend is untestable I usually reach for `toPass()` first. 💪",
+                "textOriginal": "Yes, 100%. If the frontend is untestable I usually reach for `toPass()` first. 💪",
+                "parentId": "Ugyoz12wRYD-oamnEfF4AaABAg",
+                "authorDisplayName": "yt-channel-3",
+                "authorProfileImageUrl": "https://scrubbed.invalid/yt-channel-4",
+                "authorChannelUrl": "yt-channel-5",
+                "authorChannelId": {
+                  "value": "UCJ4R8axyKuPZdJ7lFll3SKQ"
+                },
+                "canRate": true,
+                "viewerRating": "none",
+                "likeCount": 0,
+                "publishedAt": "2024-10-16T13:08:28Z",
+                "updatedAt": "2024-10-16T13:08:28Z"
+              }
+            ]
+          }
+        },
+        "computed": {
+          "language": "en"
+        }
+      },
+      {
+        "comment": {
+          "id": "UgxsjGcbghIaaqt1wHN4AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "Thank you again, nice tip! Did not know about it. Big thanks, that you are sharing it with community!",
+          "author": {
+            "username": "yt-channel-66",
+            "display_name": "yt-channel-66",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-67",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 0,
+            "replies": 0
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2024-09-24T14:18:47.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3hzakdjYmdoSWFhcXQxd0hONEFhQUJBZyJ9",
+            "updated_at": "2024-09-24T14:18:47Z",
+            "author_channel_id": "UCCieYIibXGUwTgUxHbi7rQQ",
+            "author_url": "http://www.youtube.com/yt-channel-66",
+            "viewer_rating": "none",
+            "text_original": "Thank you again, nice tip! Did not know about it. Big thanks, that you are sharing it with community!"
+          }
+        },
+        "computed": {
+          "language": "en"
+        }
+      },
+      {
+        "comment": {
+          "id": "Ugy-sUDcNiZpmMG4tIh4AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "Thank you again~ I faced this issue this morning, and you saved me again.",
+          "author": {
+            "username": "yt-channel-68",
+            "display_name": "yt-channel-68",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-69",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 0,
+            "replies": 0
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2024-09-16T12:10:28.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3ktc1VEY05pWnBtTUc0dEloNEFhQUJBZyJ9",
+            "updated_at": "2024-09-16T12:10:28Z",
+            "author_channel_id": "UCUk43vlAnSEl7wJc25CHaIA",
+            "author_url": "http://www.youtube.com/yt-channel-68",
+            "viewer_rating": "none",
+            "text_original": "Thank you again~ I faced this issue this morning, and you saved me again."
+          }
+        },
+        "computed": {
+          "language": "en"
+        }
+      },
+      {
+        "comment": {
+          "id": "UgyIqUSEuvTbnNPXb4J4AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "Oh it helps a lot! Our product is basically made of hydration problems.",
+          "author": {
+            "username": "yt-channel-70",
+            "display_name": "yt-channel-70",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-71",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 2,
+            "replies": 1
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2024-09-15T10:44:26.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3lJcVVTRXV2VGJuTlBYYjRKNEFhQUJBZyJ9",
+            "updated_at": "2024-09-15T10:44:26Z",
+            "author_channel_id": "UC-QqGqa4bBXuAtkEJoyWg2A",
+            "author_url": "http://www.youtube.com/yt-channel-70",
+            "viewer_rating": "none",
+            "text_original": "Oh it helps a lot! Our product is basically made of hydration problems.",
+            "preview_replies": [
+              {
+                "id": "UgyIqUSEuvTbnNPXb4J4AaABAg.A8PLB_wZDb2A8PLlQzxklm",
+                "channelId": "UCJ4R8axyKuPZdJ7lFll3SKQ",
+                "videoId": "8g7FvoRToGo",
+                "textDisplay": "Yeah — I'm used to this state, too. 😅",
+                "textOriginal": "Yeah — I'm used to this state, too. 😅",
+                "parentId": "UgyIqUSEuvTbnNPXb4J4AaABAg",
+                "authorDisplayName": "yt-channel-3",
+                "authorProfileImageUrl": "https://scrubbed.invalid/yt-channel-4",
+                "authorChannelUrl": "yt-channel-5",
+                "authorChannelId": {
+                  "value": "UCJ4R8axyKuPZdJ7lFll3SKQ"
+                },
+                "canRate": true,
+                "viewerRating": "none",
+                "likeCount": 0,
+                "publishedAt": "2024-09-15T10:49:28Z",
+                "updatedAt": "2024-09-15T10:49:28Z"
+              }
+            ]
+          }
+        },
+        "computed": {
+          "language": "en"
+        }
+      },
+      {
+        "comment": {
+          "id": "Ugz22-zr4jH2v7xVan94AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "cool",
+          "author": {
+            "username": "yt-channel-72",
+            "display_name": "yt-channel-72",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-73",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 0,
+            "replies": 0
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2024-09-07T08:29:30.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3oyMi16cjRqSDJ2N3hWYW45NEFhQUJBZyJ9",
+            "updated_at": "2024-09-07T08:29:30Z",
+            "author_channel_id": "UC1vMnbXVzB2t-ib57FiNfKA",
+            "author_url": "http://www.youtube.com/yt-channel-72",
+            "viewer_rating": "none",
+            "text_original": "cool"
+          }
+        },
+        "computed": {
+          "language": null
+        }
+      },
+      {
+        "comment": {
+          "id": "UgwyEEv5z0bUsXWFLNV4AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "This is great. Missed this function",
+          "author": {
+            "username": "yt-channel-74",
+            "display_name": "yt-channel-74",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-75",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 0,
+            "replies": 0
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2024-08-14T08:20:02.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3d5RUV2NXowYlVzWFdGTE5WNEFhQUJBZyJ9",
+            "updated_at": "2024-08-14T08:20:02Z",
+            "author_channel_id": "UC_DxyQDZscF8zInQSG-QRpQ",
+            "author_url": "http://www.youtube.com/yt-channel-74",
+            "viewer_rating": "none",
+            "text_original": "This is great. Missed this function"
+          }
+        },
+        "computed": {
+          "language": "en"
+        }
+      },
+      {
+        "comment": {
+          "id": "UgzsEMy79-4AY7VoFMl4AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "Crack! Im going crazy whit flakynes and you give me the solution",
+          "author": {
+            "username": "yt-channel-76",
+            "display_name": "yt-channel-76",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-77",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 0,
+            "replies": 1
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2024-08-10T21:15:45.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3pzRU15NzktNEFZN1ZvRk1sNEFhQUJBZyJ9",
+            "updated_at": "2024-08-10T21:15:45Z",
+            "author_channel_id": "UCcEQpg5499t7OexXuC9KRhA",
+            "author_url": "http://www.youtube.com/yt-channel-76",
+            "viewer_rating": "none",
+            "text_original": "Crack! Im going crazy whit flakynes and you give me the solution",
+            "preview_replies": [
+              {
+                "id": "UgzsEMy79-4AY7VoFMl4AaABAg.A6ylp2oPkX3A7--HKqyK8d",
+                "channelId": "UCJ4R8axyKuPZdJ7lFll3SKQ",
+                "videoId": "8g7FvoRToGo",
+                "textDisplay": "Yay! That's great to hear!",
+                "textOriginal": "Yay! That's great to hear!",
+                "parentId": "UgzsEMy79-4AY7VoFMl4AaABAg",
+                "authorDisplayName": "yt-channel-3",
+                "authorProfileImageUrl": "https://scrubbed.invalid/yt-channel-4",
+                "authorChannelUrl": "yt-channel-5",
+                "authorChannelId": {
+                  "value": "UCJ4R8axyKuPZdJ7lFll3SKQ"
+                },
+                "canRate": true,
+                "viewerRating": "none",
+                "likeCount": 0,
+                "publishedAt": "2024-08-11T08:41:20Z",
+                "updatedAt": "2024-08-11T08:41:20Z"
+              }
+            ]
+          }
+        },
+        "computed": {
+          "language": "en"
+        }
+      },
+      {
+        "comment": {
+          "id": "UgxFWfxk_DJpw2vXEsF4AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "Hello! I really appreciate that. Could you please create a video list focused solely on fighting flakiness in testing?  This is a critical area for all testers.",
+          "author": {
+            "username": "yt-channel-78",
+            "display_name": "yt-channel-78",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-79",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 0,
+            "replies": 1
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2024-07-10T10:50:01.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3hGV2Z4a19ESnB3MnZYRXNGNEFhQUJBZyJ9",
+            "updated_at": "2024-07-10T10:50:01Z",
+            "author_channel_id": "UCIL2K-wkpEeje3_WzVrHqaQ",
+            "author_url": "http://www.youtube.com/yt-channel-80",
+            "viewer_rating": "none",
+            "text_original": "Hello! I really appreciate that. Could you please create a video list focused solely on fighting flakiness in testing?  This is a critical area for all testers.",
+            "preview_replies": [
+              {
+                "id": "UgxFWfxk_DJpw2vXEsF4AaABAg.A5hpZtkzBM_A5iI4eyglP5",
+                "channelId": "UCJ4R8axyKuPZdJ7lFll3SKQ",
+                "videoId": "8g7FvoRToGo",
+                "textDisplay": "This is a great idea and I'll come to this in the upcoming weeks. I'll let you know here.",
+                "textOriginal": "This is a great idea and I'll come to this in the upcoming weeks. I'll let you know here.",
+                "parentId": "UgxFWfxk_DJpw2vXEsF4AaABAg",
+                "authorDisplayName": "yt-channel-3",
+                "authorProfileImageUrl": "https://scrubbed.invalid/yt-channel-4",
+                "authorChannelUrl": "yt-channel-5",
+                "authorChannelId": {
+                  "value": "UCJ4R8axyKuPZdJ7lFll3SKQ"
+                },
+                "canRate": true,
+                "viewerRating": "none",
+                "likeCount": 1,
+                "publishedAt": "2024-07-10T15:07:54Z",
+                "updatedAt": "2024-07-10T15:07:54Z"
+              }
+            ]
+          }
+        },
+        "computed": {
+          "language": "en"
+        }
+      },
+      {
+        "comment": {
+          "id": "UgxMOCsOPeB5hvJqgIp4AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "I am new in test automation, and I needed to test redirects after page reload, so I used \n    await page.waitForLoadState('load');\r\n    await page.waitForTimeout(500);\r\n    await page.reload();\r\n    await page.waitForLoadState('load');\r\n    await page.waitForTimeout(500);\r\n    await expect(page.locator('.product-card-wrapper').first()).toContainText('PLN');\nbut  .toPass() is much faster and stable, thank you a lot",
+          "author": {
+            "username": "yt-channel-81",
+            "display_name": "yt-channel-81",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-82",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 1,
+            "replies": 2
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2024-05-21T12:53:00.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3hNT0NzT1BlQjVodkpxZ0lwNEFhQUJBZyJ9",
+            "updated_at": "2024-05-21T12:53:00Z",
+            "author_channel_id": "UC1neSheZDTd_24pSBBAK-EA",
+            "author_url": "http://www.youtube.com/yt-channel-81",
+            "viewer_rating": "none",
+            "text_original": "I am new in test automation, and I needed to test redirects after page reload, so I used \n    await page.waitForLoadState('load');\r\n    await page.waitForTimeout(500);\r\n    await page.reload();\r\n    await page.waitForLoadState('load');\r\n    await page.waitForTimeout(500);\r\n    await expect(page.locator('.product-card-wrapper').first()).toContainText('PLN');\nbut  .toPass() is much faster and stable, thank you a lot",
+            "preview_replies": [
+              {
+                "id": "UgxMOCsOPeB5hvJqgIp4AaABAg.A3hItvN1QMoA4amkq6HHDf",
+                "channelId": "UCJ4R8axyKuPZdJ7lFll3SKQ",
+                "videoId": "8g7FvoRToGo",
+                "textDisplay": "Yay! Happy the video has been valuable. 💙",
+                "textOriginal": "Yay! Happy the video has been valuable. 💙",
+                "parentId": "UgxMOCsOPeB5hvJqgIp4AaABAg",
+                "authorDisplayName": "yt-channel-3",
+                "authorProfileImageUrl": "https://scrubbed.invalid/yt-channel-4",
+                "authorChannelUrl": "yt-channel-5",
+                "authorChannelId": {
+                  "value": "UCJ4R8axyKuPZdJ7lFll3SKQ"
+                },
+                "canRate": true,
+                "viewerRating": "none",
+                "likeCount": 0,
+                "publishedAt": "2024-06-12T20:39:22Z",
+                "updatedAt": "2024-06-12T20:39:22Z"
+              },
+              {
+                "id": "UgxMOCsOPeB5hvJqgIp4AaABAg.A3hItvN1QMoA8i5kDSiKfp",
+                "channelId": "UCJ4R8axyKuPZdJ7lFll3SKQ",
+                "videoId": "8g7FvoRToGo",
+                "textDisplay": "Thanks nick, you give an idea to solve an issue with  await page.waitForTimeout(500);",
+                "textOriginal": "Thanks nick, you give an idea to solve an issue with  await page.waitForTimeout(500);",
+                "parentId": "UgxMOCsOPeB5hvJqgIp4AaABAg",
+                "authorDisplayName": "yt-channel-83",
+                "authorProfileImageUrl": "https://scrubbed.invalid/yt-channel-84",
+                "authorChannelUrl": "yt-channel-85",
+                "authorChannelId": {
+                  "value": "UCNnbncaywlo21kTWCircNRw"
+                },
+                "canRate": true,
+                "viewerRating": "none",
+                "likeCount": 0,
+                "publishedAt": "2024-09-23T02:54:18Z",
+                "updatedAt": "2024-09-23T02:54:18Z"
+              }
+            ]
+          }
+        },
+        "computed": {
+          "language": "en"
+        }
+      },
+      {
+        "comment": {
+          "id": "UgwL2lgXD4QUhigF0Jd4AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "Unfortunately this solution works 50% of the time. I used it in 2 tests, in one of them it works, and in the other it doesn't. I have 2 assertions inside (toBeVisible and toHaveText) followed by page reload. The 'page reload' part is not executed for some reason...\nI had to wrap it in try-catch block, with 'expect' part inside 'try', and the page reload inside 'catch'",
+          "author": {
+            "username": "yt-channel-86",
+            "display_name": "yt-channel-86",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-87",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 0,
+            "replies": 1
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2024-05-14T10:57:32.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3dMMmxnWEQ0UVVoaWdGMEpkNEFhQUJBZyJ9",
+            "updated_at": "2024-05-14T11:20:38Z",
+            "author_channel_id": "UCsiDWhGJOUfbrwN2GBc7Chw",
+            "author_url": "http://www.youtube.com/yt-channel-86",
+            "viewer_rating": "none",
+            "text_original": "Unfortunately this solution works 50% of the time. I used it in 2 tests, in one of them it works, and in the other it doesn't. I have 2 assertions inside (toBeVisible and toHaveText) followed by page reload. The 'page reload' part is not executed for some reason...\nI had to wrap it in try-catch block, with 'expect' part inside 'try', and the page reload inside 'catch'",
+            "preview_replies": [
+              {
+                "id": "UgwL2lgXD4QUhigF0Jd4AaABAg.A3Q470xlq2GA3QCOLWTi6-",
+                "channelId": "UCJ4R8axyKuPZdJ7lFll3SKQ",
+                "videoId": "8g7FvoRToGo",
+                "textDisplay": "Happy you figured it out. :)",
+                "textOriginal": "Happy you figured it out. :)",
+                "parentId": "UgwL2lgXD4QUhigF0Jd4AaABAg",
+                "authorDisplayName": "yt-channel-3",
+                "authorProfileImageUrl": "https://scrubbed.invalid/yt-channel-4",
+                "authorChannelUrl": "yt-channel-5",
+                "authorChannelId": {
+                  "value": "UCJ4R8axyKuPZdJ7lFll3SKQ"
+                },
+                "canRate": true,
+                "viewerRating": "none",
+                "likeCount": 0,
+                "publishedAt": "2024-05-14T12:09:48Z",
+                "updatedAt": "2024-05-14T12:09:48Z"
+              }
+            ]
+          }
+        },
+        "computed": {
+          "language": "en"
+        }
+      },
+      {
+        "comment": {
+          "id": "UgweyXvfwhZgD4ACfMB4AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "That's really cool - I love Playwright 😍😍",
+          "author": {
+            "username": "yt-channel-88",
+            "display_name": "yt-channel-88",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-89",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 0,
+            "replies": 0
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2024-04-30T14:29:30.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3dleVh2ZndoWmdENEFDZk1CNEFhQUJBZyJ9",
+            "updated_at": "2024-04-30T14:29:30Z",
+            "author_channel_id": "UCfXPksDgCTWCSxeQ_s5hqLQ",
+            "author_url": "http://www.youtube.com/yt-channel-88",
+            "viewer_rating": "none",
+            "text_original": "That's really cool - I love Playwright 😍😍"
+          }
+        },
+        "computed": {
+          "language": "en"
+        }
+      },
+      {
+        "comment": {
+          "id": "UgxRX03xXP1EGFHw3rF4AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "hi acutally , when my inner expect get failed , it fails my test case ,  it dont retry for 3 minutes \n\nthis is my code -> \n await expect(async()=>{\n            await this.page.locator('//*[@yt-channel-90=\"helm-configure-link\"]').click();\n            await this.deploymentHistoryTab.click();\n            await expect(this.successfullDeployment).toHaveCount(count,{timeout:12000,});\n            console.log('deep');\n        }).toPass({timeout:3*1000*60})",
+          "author": {
+            "username": "yt-channel-91",
+            "display_name": "yt-channel-91",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-92",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 0,
+            "replies": 1
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2024-04-29T06:26:26.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3hSWDAzeFhQMUVHRkh3M3JGNEFhQUJBZyJ9",
+            "updated_at": "2024-04-29T06:26:26Z",
+            "author_channel_id": "UCIqj0_Zpdu8xi1pVMFMEyNA",
+            "author_url": "http://www.youtube.com/yt-channel-91",
+            "viewer_rating": "none",
+            "text_original": "hi acutally , when my inner expect get failed , it fails my test case ,  it dont retry for 3 minutes \n\nthis is my code -> \n await expect(async()=>{\n            await this.page.locator('//*[@yt-channel-90=\"helm-configure-link\"]').click();\n            await this.deploymentHistoryTab.click();\n            await expect(this.successfullDeployment).toHaveCount(count,{timeout:12000,});\n            console.log('deep');\n        }).toPass({timeout:3*1000*60})",
+            "preview_replies": [
+              {
+                "id": "UgxRX03xXP1EGFHw3rF4AaABAg.A2nyAHHzl_mA2umqCBI_a-",
+                "channelId": "UCJ4R8axyKuPZdJ7lFll3SKQ",
+                "videoId": "8g7FvoRToGo",
+                "textDisplay": "Hmm... Ja don't know. The code looks correct for me. Without looking into specifics, it's hard to tell why `toPass` isn't catching and retrying it. :)",
+                "textOriginal": "Hmm... Ja don't know. The code looks correct for me. Without looking into specifics, it's hard to tell why `toPass` isn't catching and retrying it. :)",
+                "parentId": "UgxRX03xXP1EGFHw3rF4AaABAg",
+                "authorDisplayName": "yt-channel-3",
+                "authorProfileImageUrl": "https://scrubbed.invalid/yt-channel-4",
+                "authorChannelUrl": "yt-channel-5",
+                "authorChannelId": {
+                  "value": "UCJ4R8axyKuPZdJ7lFll3SKQ"
+                },
+                "canRate": true,
+                "viewerRating": "none",
+                "likeCount": 0,
+                "publishedAt": "2024-05-01T22:02:07Z",
+                "updatedAt": "2024-05-01T22:02:07Z"
+              }
+            ]
+          }
+        },
+        "computed": {
+          "language": "en"
+        }
+      },
+      {
+        "comment": {
+          "id": "UgzFJiX7gMsm-D_Lb6h4AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "Great video and explained very clean. Thank you!",
+          "author": {
+            "username": "yt-channel-93",
+            "display_name": "yt-channel-93",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-94",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 0,
+            "replies": 1
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2024-04-25T13:07:10.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3pGSmlYN2dNc20tRF9MYjZoNEFhQUJBZyJ9",
+            "updated_at": "2024-04-25T13:07:10Z",
+            "author_channel_id": "UCM-tY998qPE6v-x1EscpX_A",
+            "author_url": "http://www.youtube.com/yt-channel-93",
+            "viewer_rating": "none",
+            "text_original": "Great video and explained very clean. Thank you!",
+            "preview_replies": [
+              {
+                "id": "UgzFJiX7gMsm-D_Lb6h4AaABAg.A2eNqvIJH7uA2eOoGuXqs1",
+                "channelId": "UCJ4R8axyKuPZdJ7lFll3SKQ",
+                "videoId": "8g7FvoRToGo",
+                "textDisplay": "Glad it was helpful!",
+                "textOriginal": "Glad it was helpful!",
+                "parentId": "UgzFJiX7gMsm-D_Lb6h4AaABAg",
+                "authorDisplayName": "yt-channel-3",
+                "authorProfileImageUrl": "https://scrubbed.invalid/yt-channel-4",
+                "authorChannelUrl": "yt-channel-5",
+                "authorChannelId": {
+                  "value": "UCJ4R8axyKuPZdJ7lFll3SKQ"
+                },
+                "canRate": true,
+                "viewerRating": "none",
+                "likeCount": 0,
+                "publishedAt": "2024-04-25T13:15:33Z",
+                "updatedAt": "2024-04-25T13:15:33Z"
+              }
+            ]
+          }
+        },
+        "computed": {
+          "language": "en"
+        }
+      },
+      {
+        "comment": {
+          "id": "UgwZxrQGDKa6CJ_waK54AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "thanks for the tip! Will it be the same if we use page.waitForSelector() to wait until racoon appears? Frequently e2e test is a sequence of clicks and waitings, so we used to use waitFor.. set of methods.",
+          "author": {
+            "username": "yt-channel-95",
+            "display_name": "yt-channel-95",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-96",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 0,
+            "replies": 0
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2024-04-18T08:05:02.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3daeHJRR0RLYTZDSl93YUs1NEFhQUJBZyJ9",
+            "updated_at": "2024-04-18T08:05:02Z",
+            "author_channel_id": "UC1keoSifeuGmBL1dmk_B36g",
+            "author_url": "http://www.youtube.com/yt-channel-95",
+            "viewer_rating": "none",
+            "text_original": "thanks for the tip! Will it be the same if we use page.waitForSelector() to wait until racoon appears? Frequently e2e test is a sequence of clicks and waitings, so we used to use waitFor.. set of methods."
+          }
+        },
+        "computed": {
+          "language": "en"
+        }
+      },
+      {
+        "comment": {
+          "id": "UgxExI_hlcIUXQy_VvF4AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "Great video.\nThis is really helpful in my daily work. Thanks for sharing this.",
+          "author": {
+            "username": "yt-channel-97",
+            "display_name": "yt-channel-97",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-98",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 2,
+            "replies": 0
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2024-04-08T01:53:56.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3hFeElfaGxjSVVYUXlfVnZGNEFhQUJBZyJ9",
+            "updated_at": "2024-04-08T01:53:56Z",
+            "author_channel_id": "UCD7a0UrmJqJYIIBogfkftJg",
+            "author_url": "http://www.youtube.com/yt-channel-97",
+            "viewer_rating": "none",
+            "text_original": "Great video.\nThis is really helpful in my daily work. Thanks for sharing this."
+          }
+        },
+        "computed": {
+          "language": "en"
+        }
+      },
+      {
+        "comment": {
+          "id": "Ugz1yEQoopcO3LXHymV4AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "This appears to be a better workaround than Webdriverio where I struggle with. This is very helpful in my case. Thanks for sharing!",
+          "author": {
+            "username": "yt-channel-99",
+            "display_name": "yt-channel-99",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-100",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 0,
+            "replies": 1
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2024-04-01T15:09:34.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3oxeUVRb29wY08zTFhIeW1WNEFhQUJBZyJ9",
+            "updated_at": "2024-04-01T15:09:34Z",
+            "author_channel_id": "UCxmca7NFMFsdBDVrJDt4Hug",
+            "author_url": "http://www.youtube.com/yt-channel-99",
+            "viewer_rating": "none",
+            "text_original": "This appears to be a better workaround than Webdriverio where I struggle with. This is very helpful in my case. Thanks for sharing!",
+            "preview_replies": [
+              {
+                "id": "Ugz1yEQoopcO3LXHymV4AaABAg.A1gnmKG4dkrA1kqeQ0akSJ",
+                "channelId": "UCJ4R8axyKuPZdJ7lFll3SKQ",
+                "videoId": "8g7FvoRToGo",
+                "textDisplay": "Yeah, testing poor hydration is tricky, but this turned out to be valuable for me. Happy the video was helpful!",
+                "textOriginal": "Yeah, testing poor hydration is tricky, but this turned out to be valuable for me. Happy the video was helpful!",
+                "parentId": "Ugz1yEQoopcO3LXHymV4AaABAg",
+                "authorDisplayName": "yt-channel-3",
+                "authorProfileImageUrl": "https://scrubbed.invalid/yt-channel-4",
+                "authorChannelUrl": "yt-channel-5",
+                "authorChannelId": {
+                  "value": "UCJ4R8axyKuPZdJ7lFll3SKQ"
+                },
+                "canRate": true,
+                "viewerRating": "none",
+                "likeCount": 1,
+                "publishedAt": "2024-04-03T04:51:40Z",
+                "updatedAt": "2024-04-03T04:51:40Z"
+              }
+            ]
+          }
+        },
+        "computed": {
+          "language": "en"
+        }
+      },
+      {
+        "comment": {
+          "id": "UgzWTNs4HcWLQjUTgH94AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "Fantastic video! I'm curious: how did you create the demo app to force a hydration error for your test to fall?",
+          "author": {
+            "username": "yt-channel-101",
+            "display_name": "yt-channel-101",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-102",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 0,
+            "replies": 1
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2024-03-30T00:01:47.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3pXVE5zNEhjV0xRalVUZ0g5NEFhQUJBZyJ9",
+            "updated_at": "2024-03-30T00:01:47Z",
+            "author_channel_id": "UCpqngtGCh5QZf6mKDKAOMyg",
+            "author_url": "http://www.youtube.com/yt-channel-101",
+            "viewer_rating": "none",
+            "text_original": "Fantastic video! I'm curious: how did you create the demo app to force a hydration error for your test to fall?",
+            "preview_replies": [
+              {
+                "id": "UgzWTNs4HcWLQjUTgH94AaABAg.A1a1InSAqHoA1b-Ivdrv0Z",
+                "channelId": "UCJ4R8axyKuPZdJ7lFll3SKQ",
+                "videoId": "8g7FvoRToGo",
+                "textDisplay": "Hah — that's a great question! For this example I only delayed adding the event listeners via a `setTimeout`. 🫣 But the same problem could appear because of various reasons. :)",
+                "textOriginal": "Hah — that's a great question! For this example I only delayed adding the event listeners via a `setTimeout`. 🫣 But the same problem could appear because of various reasons. :)",
+                "parentId": "UgzWTNs4HcWLQjUTgH94AaABAg",
+                "authorDisplayName": "yt-channel-3",
+                "authorProfileImageUrl": "https://scrubbed.invalid/yt-channel-4",
+                "authorChannelUrl": "yt-channel-5",
+                "authorChannelId": {
+                  "value": "UCJ4R8axyKuPZdJ7lFll3SKQ"
+                },
+                "canRate": true,
+                "viewerRating": "none",
+                "likeCount": 1,
+                "publishedAt": "2024-03-30T09:03:34Z",
+                "updatedAt": "2024-03-30T09:03:34Z"
+              }
+            ]
+          }
+        },
+        "computed": {
+          "language": "en"
+        }
+      },
+      {
+        "comment": {
+          "id": "UgzoR0Xo6XFfzPsHKfV4AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "great explanation!",
+          "author": {
+            "username": "yt-channel-103",
+            "display_name": "yt-channel-103",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-104",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 0,
+            "replies": 1
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2024-03-28T19:03:52.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3pvUjBYbzZYRmZ6UHNIS2ZWNEFhQUJBZyJ9",
+            "updated_at": "2024-03-28T19:03:52Z",
+            "author_channel_id": "UCt9BBxcDOeRET1rnBkxU0JQ",
+            "author_url": "http://www.youtube.com/yt-channel-103",
+            "viewer_rating": "none",
+            "text_original": "great explanation!",
+            "preview_replies": [
+              {
+                "id": "UgzoR0Xo6XFfzPsHKfV4AaABAg.A1XvPv5nagJA1ZM7Evt8Cy",
+                "channelId": "UCJ4R8axyKuPZdJ7lFll3SKQ",
+                "videoId": "8g7FvoRToGo",
+                "textDisplay": "Glad it was helpful! 💙",
+                "textOriginal": "Glad it was helpful! 💙",
+                "parentId": "UgzoR0Xo6XFfzPsHKfV4AaABAg",
+                "authorDisplayName": "yt-channel-3",
+                "authorProfileImageUrl": "https://scrubbed.invalid/yt-channel-4",
+                "authorChannelUrl": "yt-channel-5",
+                "authorChannelId": {
+                  "value": "UCJ4R8axyKuPZdJ7lFll3SKQ"
+                },
+                "canRate": true,
+                "viewerRating": "none",
+                "likeCount": 0,
+                "publishedAt": "2024-03-29T08:25:13Z",
+                "updatedAt": "2024-03-29T08:25:13Z"
+              }
+            ]
+          }
+        },
+        "computed": {
+          "language": "en"
+        }
+      },
+      {
+        "comment": {
+          "id": "UgwvVO2Y32xUZen3vad4AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "Super nice !!",
+          "author": {
+            "username": "yt-channel-105",
+            "display_name": "yt-channel-105",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-106",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 0,
+            "replies": 1
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2024-03-28T08:08:52.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3d2Vk8yWTMyeFVaZW4zdmFkNEFhQUJBZyJ9",
+            "updated_at": "2024-03-28T08:08:52Z",
+            "author_channel_id": "UCF4Kz0xzylSY0ylzUTuf6oQ",
+            "author_url": "http://www.youtube.com/yt-channel-105",
+            "viewer_rating": "none",
+            "text_original": "Super nice !!",
+            "preview_replies": [
+              {
+                "id": "UgwvVO2Y32xUZen3vad4AaABAg.A1WkSWryNKcA1Wl-r_0A-y",
+                "channelId": "UCJ4R8axyKuPZdJ7lFll3SKQ",
+                "videoId": "8g7FvoRToGo",
+                "textDisplay": "Thanks. Happy it's been valuable. 🎉",
+                "textOriginal": "Thanks. Happy it's been valuable. 🎉",
+                "parentId": "UgwvVO2Y32xUZen3vad4AaABAg",
+                "authorDisplayName": "yt-channel-3",
+                "authorProfileImageUrl": "https://scrubbed.invalid/yt-channel-4",
+                "authorChannelUrl": "yt-channel-5",
+                "authorChannelId": {
+                  "value": "UCJ4R8axyKuPZdJ7lFll3SKQ"
+                },
+                "canRate": true,
+                "viewerRating": "none",
+                "likeCount": 0,
+                "publishedAt": "2024-03-28T08:13:41Z",
+                "updatedAt": "2024-03-28T08:13:41Z"
+              }
+            ]
+          }
+        },
+        "computed": {
+          "language": null
+        }
+      },
+      {
+        "comment": {
+          "id": "UgxXAUBtw_hHHa3C40Z4AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "Thanks for the awesome video and tips! Keep up the good work ",
+          "author": {
+            "username": "yt-channel-107",
+            "display_name": "yt-channel-107",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-108",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 0,
+            "replies": 1
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2024-03-27T21:56:28.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3hYQVVCdHdfaEhIYTNDNDBaNEFhQUJBZyJ9",
+            "updated_at": "2024-03-27T21:56:28Z",
+            "author_channel_id": "UC59VnVjBVUHdLUiwDoQIcSQ",
+            "author_url": "http://www.youtube.com/yt-channel-107",
+            "viewer_rating": "none",
+            "text_original": "Thanks for the awesome video and tips! Keep up the good work ",
+            "preview_replies": [
+              {
+                "id": "UgxXAUBtw_hHHa3C40Z4AaABAg.A1VeNB4vSFRA1Vf-IdRvC0",
+                "channelId": "UCJ4R8axyKuPZdJ7lFll3SKQ",
+                "videoId": "8g7FvoRToGo",
+                "textDisplay": "Thanks for the kind words. Happy the videos are valuable. :)",
+                "textOriginal": "Thanks for the kind words. Happy the videos are valuable. :)",
+                "parentId": "UgxXAUBtw_hHHa3C40Z4AaABAg",
+                "authorDisplayName": "yt-channel-3",
+                "authorProfileImageUrl": "https://scrubbed.invalid/yt-channel-4",
+                "authorChannelUrl": "yt-channel-5",
+                "authorChannelId": {
+                  "value": "UCJ4R8axyKuPZdJ7lFll3SKQ"
+                },
+                "canRate": true,
+                "viewerRating": "none",
+                "likeCount": 1,
+                "publishedAt": "2024-03-27T22:01:56Z",
+                "updatedAt": "2024-03-27T22:01:56Z"
+              }
+            ]
+          }
+        },
+        "computed": {
+          "language": "en"
+        }
+      },
+      {
+        "comment": {
+          "id": "UgxrkXTKdh9U6VqyawV4AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "Creepy I exactly faced this poor hydration behavior on the tested web app few days ago for the first time. What a timing, Thank you for showing that option! 🙏",
+          "author": {
+            "username": "yt-channel-109",
+            "display_name": "yt-channel-109",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-110",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 0,
+            "replies": 3
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2024-03-27T14:09:22.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3hya1hUS2RoOVU2VnF5YXdWNEFhQUJBZyJ9",
+            "updated_at": "2024-03-27T14:09:22Z",
+            "author_channel_id": "UCXvRtelKf15dJBqbLYPVqiw",
+            "author_url": "http://www.youtube.com/yt-channel-109",
+            "viewer_rating": "none",
+            "text_original": "Creepy I exactly faced this poor hydration behavior on the tested web app few days ago for the first time. What a timing, Thank you for showing that option! 🙏",
+            "preview_replies": [
+              {
+                "id": "UgxrkXTKdh9U6VqyawV4AaABAg.A1Uov723hmaA1UpJsXjhpf",
+                "channelId": "UCJ4R8axyKuPZdJ7lFll3SKQ",
+                "videoId": "8g7FvoRToGo",
+                "textDisplay": "Great! 🎉 Happy this video came at the right time. Let us know how it goes. ;)",
+                "textOriginal": "Great! 🎉 Happy this video came at the right time. Let us know how it goes. ;)",
+                "parentId": "UgxrkXTKdh9U6VqyawV4AaABAg",
+                "authorDisplayName": "yt-channel-3",
+                "authorProfileImageUrl": "https://scrubbed.invalid/yt-channel-4",
+                "authorChannelUrl": "yt-channel-5",
+                "authorChannelId": {
+                  "value": "UCJ4R8axyKuPZdJ7lFll3SKQ"
+                },
+                "canRate": true,
+                "viewerRating": "none",
+                "likeCount": 0,
+                "publishedAt": "2024-03-27T14:12:54Z",
+                "updatedAt": "2024-03-27T14:12:54Z"
+              },
+              {
+                "id": "UgxrkXTKdh9U6VqyawV4AaABAg.A1Uov723hmaA1VS-avHUXz",
+                "channelId": "UCJ4R8axyKuPZdJ7lFll3SKQ",
+                "videoId": "8g7FvoRToGo",
+                "textDisplay": "To further this incredible timing I literally ran into this issue today! Great vid thank you Checkly!",
+                "textOriginal": "To further this incredible timing I literally ran into this issue today! Great vid thank you Checkly!",
+                "parentId": "UgxrkXTKdh9U6VqyawV4AaABAg",
+                "authorDisplayName": "yt-channel-111",
+                "authorProfileImageUrl": "https://scrubbed.invalid/yt-channel-112",
+                "authorChannelUrl": "yt-channel-113",
+                "authorChannelId": {
+                  "value": "UCAup-QP2k9tA56UFqsELS1g"
+                },
+                "canRate": true,
+                "viewerRating": "none",
+                "likeCount": 0,
+                "publishedAt": "2024-03-27T19:59:39Z",
+                "updatedAt": "2024-03-27T19:59:39Z"
+              },
+              {
+                "id": "UgxrkXTKdh9U6VqyawV4AaABAg.A1Uov723hmaA1VSPXk_kJc",
+                "channelId": "UCJ4R8axyKuPZdJ7lFll3SKQ",
+                "videoId": "8g7FvoRToGo",
+                "textDisplay": "@yt-channel-114!  🎉",
+                "textOriginal": "@yt-channel-114!  🎉",
+                "parentId": "UgxrkXTKdh9U6VqyawV4AaABAg",
+                "authorDisplayName": "yt-channel-3",
+                "authorProfileImageUrl": "https://scrubbed.invalid/yt-channel-4",
+                "authorChannelUrl": "yt-channel-5",
+                "authorChannelId": {
+                  "value": "UCJ4R8axyKuPZdJ7lFll3SKQ"
+                },
+                "canRate": true,
+                "viewerRating": "none",
+                "likeCount": 0,
+                "publishedAt": "2024-03-27T20:03:11Z",
+                "updatedAt": "2024-03-27T20:03:11Z"
+              }
+            ]
+          }
+        },
+        "computed": {
+          "language": "en"
+        }
+      },
+      {
+        "comment": {
+          "id": "Ugwc1MDZuH7XDT98tDJ4AaABAg",
+          "url": null,
+          "parent_id": null,
+          "post_id": "8g7FvoRToGo",
+          "text": "Another great video; thank you.\n\nI’d possibly disagree with the “right fix” advice on Playwright’s docs to disable interactive controls until after hydration though, as that could cause confusion and frustration to screen reader users. They might attempt to interact with an element initially announced as being disabled/dimmed, and when that control was subsequently enabled via hydration then you’d have to manage how to update that state to the screen reader user.",
+          "author": {
+            "username": "yt-channel-115",
+            "display_name": "yt-channel-115",
+            "avatar_url": "https://scrubbed.invalid/yt-channel-116",
+            "verified": null
+          },
+          "engagement": {
+            "likes": 0,
+            "replies": 2
+          },
+          "flags": {
+            "pinned": null,
+            "deleted": false
+          },
+          "published_at": "2024-03-27T13:41:44.000Z",
+          "ext": {
+            "replies_token": "sc2.eyJzIjoiYSIsImMiOiJVZ3djMU1EWnVIN1hEVDk4dERKNEFhQUJBZyJ9",
+            "updated_at": "2024-03-27T13:41:44Z",
+            "author_channel_id": "UCCvlLcDrVJ5NyqvQ-zD6zPA",
+            "author_url": "http://www.youtube.com/yt-channel-115",
+            "viewer_rating": "none",
+            "text_original": "Another great video; thank you.\n\nI’d possibly disagree with the “right fix” advice on Playwright’s docs to disable interactive controls until after hydration though, as that could cause confusion and frustration to screen reader users. They might attempt to interact with an element initially announced as being disabled/dimmed, and when that control was subsequently enabled via hydration then you’d have to manage how to update that state to the screen reader user.",
+            "preview_replies": [
+              {
+                "id": "Ugwc1MDZuH7XDT98tDJ4AaABAg.A1Ulkdr1vbgA1UmtVgs-ib",
+                "channelId": "UCJ4R8axyKuPZdJ7lFll3SKQ",
+                "videoId": "8g7FvoRToGo",
+                "textDisplay": "Love this comment! You make a great point. I followed the PWT docs for the sake of the storyline of the video. But I think you're correct. Disabled controls aren't focusable and won't trigger validations — and generally in the UX/a11y community it's advised to not disable controls for these reasons. But yeah, the topic of poor hydration + disabled controls is probably for another day and/or video. Thanks! 💙",
+                "textOriginal": "Love this comment! You make a great point. I followed the PWT docs for the sake of the storyline of the video. But I think you're correct. Disabled controls aren't focusable and won't trigger validations — and generally in the UX/a11y community it's advised to not disable controls for these reasons. But yeah, the topic of poor hydration + disabled controls is probably for another day and/or video. Thanks! 💙",
+                "parentId": "Ugwc1MDZuH7XDT98tDJ4AaABAg",
+                "authorDisplayName": "yt-channel-3",
+                "authorProfileImageUrl": "https://scrubbed.invalid/yt-channel-4",
+                "authorChannelUrl": "yt-channel-5",
+                "authorChannelId": {
+                  "value": "UCJ4R8axyKuPZdJ7lFll3SKQ"
+                },
+                "canRate": true,
+                "viewerRating": "none",
+                "likeCount": 1,
+                "publishedAt": "2024-03-27T13:51:41Z",
+                "updatedAt": "2024-03-27T13:51:41Z"
+              },
+              {
+                "id": "Ugwc1MDZuH7XDT98tDJ4AaABAg.A1Ulkdr1vbgA1UpojbI1eW",
+                "channelId": "UCJ4R8axyKuPZdJ7lFll3SKQ",
+                "videoId": "8g7FvoRToGo",
+                "textDisplay": "@yt-channel-117 you. It was more of an end-user issue I was highlighting (not necessarily Playwright operation); that it’s not great to set out a page as having x elements non-operable and to then amend that, as it’s something that then possibly has to be managed so the screen reader user is aware they can use those elements. It might be edge-case; that the page will hydrate and elements are enabled before a screen reader user attempts to use those elements, but it might be more of-a-thing in things like modals (where you often have a button default-focused).",
+                "textOriginal": "@yt-channel-117 you. It was more of an end-user issue I was highlighting (not necessarily Playwright operation); that it’s not great to set out a page as having x elements non-operable and to then amend that, as it’s something that then possibly has to be managed so the screen reader user is aware they can use those elements. It might be edge-case; that the page will hydrate and elements are enabled before a screen reader user attempts to use those elements, but it might be more of-a-thing in things like modals (where you often have a button default-focused).",
+                "parentId": "Ugwc1MDZuH7XDT98tDJ4AaABAg",
+                "authorDisplayName": "yt-channel-115",
+                "authorProfileImageUrl": "https://scrubbed.invalid/yt-channel-116",
+                "authorChannelUrl": "yt-channel-118",
+                "authorChannelId": {
+                  "value": "UCCvlLcDrVJ5NyqvQ-zD6zPA"
+                },
+                "canRate": true,
+                "viewerRating": "none",
+                "likeCount": 1,
+                "publishedAt": "2024-03-27T14:17:14Z",
+                "updatedAt": "2024-06-18T02:37:06Z"
+              }
+            ]
+          }
+        },
+        "computed": {
+          "language": "en"
+        }
+      }
+    ],
+    "total": null,
+    "dropped": 0
+  },
+  "credits_used": 0,
+  "request_id": "req-z6GlU3cXPiwgkLee",
+  "cached": true,
+  "pagination": {
+    "next_cursor": null,
+    "has_more": false,
+    "page_size": 51
+  },
+  "credits_remaining": null
+}

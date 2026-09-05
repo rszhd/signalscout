@@ -77,6 +77,7 @@ export { connectorIdPattern } from "./types.js";
 
 import { brightDataReddit } from "./providers/brightdata/reddit.js";
 import { scrapeCreatorsReddit } from "./providers/scrapecreators/reddit.js";
+import { socialCrawlX } from "./providers/socialcrawl/x.js";
 import type { ConnectorDefinition } from "./types.js";
 
 /**
@@ -99,4 +100,5 @@ import type { ConnectorDefinition } from "./types.js";
 export const builtInSources: readonly ConnectorDefinition[] = [
   brightDataReddit,
   scrapeCreatorsReddit,
+  socialCrawlX,
 ];

@@ -1,0 +1,864 @@
+{
+  "httpStatus": 200,
+  "body": {
+    "success": true,
+    "platform": "twitter",
+    "endpoint": "/v1/twitter/search/tweets",
+    "data": {
+      "items": [
+        {
+          "post": {
+            "id": "2096197712869802087",
+            "url": "https://x.com/x-user-1/status/2096197712869802087",
+            "content": {
+              "text": "WHAT THE F*CK, 12 GROK BOTS MERGED 1,283 COMMITS IN 24 HOURS AND NOT ONE HUMAN REVIEWED ANY OF IT\n\n$5.61 in compute. A team doing the same sprint costs $14,600.\n\n141 pull requests closed, reviewed by agents only. 4 branches open. 0 conflicts. 0 rollbacks.\n\n3,909 tests added. Coverage went from 61.0% to 78.4% while nobody was awake.\n\n213 bugs closed. 0 reopened. 0 regressions.\n\nEvery agent owns one lane and never leaves it. ORCA on the parser. VANE on schema. KITO on the API. SABLE on tests. NOVA on UI. LARK on docs. DRIFT on migrations. HALO on perf. MIRE on security. PEAT on CI.\n\nThe thing that keeps this from turning into garbage is boring. 10 flaky tests got quarantined instead of deleted, so nothing green is lying.\n\n2,520 pipeline minutes. 28.2 million tokens.\n\n0 conflicts across 4 branches is not luck. It is 12 agents that cannot touch each other's files.",
+              "media_urls": "https://pbs.twimg.com/amplify_video_thumb/2096197617810276352/img/H61jP8qvbUzfhXEi.jpg",
+              "thumbnail_url": "https://pbs.twimg.com/amplify_video_thumb/2096197617810276352/img/H61jP8qvbUzfhXEi.jpg",
+              "duration_seconds": 28
+            },
+            "author": {
+              "username": "x-user-1",
+              "display_name": "x-user-2",
+              "avatar_url": "https://scrubbed.invalid/x-user-3",
+              "verified": true
+            },
+            "engagement": {
+              "views": 124,
+              "likes": 10,
+              "comments": 0,
+              "shares": 0,
+              "saves": 4
+            },
+            "flags": {
+              "nsfw": false,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-09-05T11:24:14.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 0
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.080645,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 149
+          }
+        },
+        {
+          "post": {
+            "id": "2096171358770339846",
+            "url": "https://x.com/x-user-4/status/2096171358770339846",
+            "content": {
+              "text": "Engineering teams shouldn't spend their best hours chasing flaky pipelines, configuration drift, and production risk. Bridlebit monitors the stack, tests fixes, opens reviewable PRs, manages releases, and reports on engineering health—with approval gates and auditability built",
+              "media_urls": null,
+              "thumbnail_url": null,
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "x-user-4",
+              "display_name": "x-user-5",
+              "avatar_url": "https://scrubbed.invalid/x-user-6",
+              "verified": true
+            },
+            "engagement": {
+              "views": 30,
+              "likes": 1,
+              "comments": 0,
+              "shares": 0,
+              "saves": 0
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-09-05T09:39:31.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 0
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.033333,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 36
+          }
+        },
+        {
+          "post": {
+            "id": "2096008365558182133",
+            "url": "https://x.com/x-user-7/status/2096008365558182133",
+            "content": {
+              "text": "DID YOU KNOW?\n\nPlaywright 1.63 adds named test locks: tests can declare a shared lock (e.g. 'user-settings') so they never run concurrently. Use this to stop flaky failures when parallel tests hit the same external service or account.\nhttps://github.com/microsoft/playwright/releases/tag/v1.63.0",
+              "media_urls": null,
+              "thumbnail_url": null,
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "x-user-7",
+              "display_name": "x-user-8",
+              "avatar_url": "https://scrubbed.invalid/x-user-9",
+              "verified": true
+            },
+            "engagement": {
+              "views": 32,
+              "likes": 0,
+              "comments": 0,
+              "shares": 0,
+              "saves": 0
+            },
+            "flags": {
+              "nsfw": false,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-09-04T22:51:50.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 0
+            }
+          },
+          "computed": {
+            "engagement_rate": 0,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 38
+          }
+        },
+        {
+          "post": {
+            "id": "2095994561482916120",
+            "url": "https://x.com/x-user-10/status/2095994561482916120",
+            "content": {
+              "text": "@housecor curious about dropping per-test identity resets, did that surface any flaky tests from shared state, or was it safe because the data was already isolated per worker?",
+              "media_urls": null,
+              "thumbnail_url": null,
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "x-user-10",
+              "display_name": "x-user-11",
+              "avatar_url": "https://scrubbed.invalid/x-user-12",
+              "verified": true
+            },
+            "engagement": {
+              "views": 18,
+              "likes": 0,
+              "comments": 0,
+              "shares": 0,
+              "saves": 0
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-09-04T21:56:59.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 0
+            }
+          },
+          "computed": {
+            "engagement_rate": 0,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 22
+          }
+        },
+        {
+          "post": {
+            "id": "2095988914813379040",
+            "url": "https://x.com/x-user-13/status/2095988914813379040",
+            "content": {
+              "text": "ANTHROPIC JUST PUBLISHED A 10-MINUTE DEMO WHERE ONE PROMPT RAN FOR 90 MINUTES ALONE.\n\nIt shows Claude Code shipping a full table component into the Excalidraw repo from a single prompt, 90 minutes of unedited output, lint and tests passing before a human looks at it.\n\n1:22 → you move Claude Code from the terminal into your IDE\n4:42 → you approve each diff inline with the surrounding code\n5:21 → you hand off one prompt for 90 unattended minutes\n6:15 → you get a table you can resize, recolor and fill\n8:08 → many Claude Codes in parallel on flaky tests and triage\n8:25 → the docs commit lands in your PR untouched by you\n\nYou don't need to know the Excalidraw codebase or write a line of the feature yourself.\n\nThe real unlock isn't faster code, it's a teammate you delegate to across the terminal, the IDE and GitHub while you work on something else.\n\nSave it and watch it today.\n\nThen read \"How to Unlock the Full Potential of Fable 5.1\" below.",
+              "media_urls": "https://pbs.twimg.com/amplify_video_thumb/2095987582890909699/img/pJ8prLxSlIkiBhCD.jpg",
+              "thumbnail_url": "https://pbs.twimg.com/amplify_video_thumb/2095987582890909699/img/pJ8prLxSlIkiBhCD.jpg",
+              "duration_seconds": 609.194
+            },
+            "author": {
+              "username": "x-user-13",
+              "display_name": "x-user-14",
+              "avatar_url": "https://scrubbed.invalid/x-user-15",
+              "verified": true
+            },
+            "engagement": {
+              "views": 121,
+              "likes": 8,
+              "comments": 5,
+              "shares": 0,
+              "saves": 6
+            },
+            "flags": {
+              "nsfw": false,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-09-04T21:34:33.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 0
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.107438,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 145
+          }
+        },
+        {
+          "post": {
+            "id": "2095976334258536612",
+            "url": "https://x.com/x-user-16/status/2095976334258536612",
+            "content": {
+              "text": "THE BEST AI CODING AGENT MAY BE THE ONE THAT WORKS ALL NIGHT AND STILL ISN’T ALLOWED TO MERGE.\n\nThis repo ops setup is basically a 24/7 engineering night shift.\n\nWhile you sleep, agents can:\n\nmonitor CI,\nclassify failures,\ncatch flaky tests,\nwatch dependencies for CVEs,\nwrite trivial patches,\nrun the test suite,\nand open draft PRs.\n\nKimi’s swarm can scale the monitoring across up to 300 sub-agents, while Grok handles the actual repo workflow.\n\nBut the most important part is the boundary.\n\nFlaky test? Fix it.\nLint failure? Fix it.\nApplication logic? Stop.\nSecurity-critical change? Escalate.\nMerge to production? Human only.\n\nI think that’s a much more useful definition of autonomous coding.\n\nNot:\n\n“AI can change anything while I sleep.”\n\nBut:\n\n“AI can make sure I never wake up to something that could’ve been safely handled without me.”\n\nThe goal isn’t removing the engineer.\n\nIt’s removing the 2AM version of the engineer.",
+              "media_urls": "https://pbs.twimg.com/amplify_video_thumb/2095976273944440832/img/t0j_vDEJ0-RVhgRW.jpg",
+              "thumbnail_url": "https://pbs.twimg.com/amplify_video_thumb/2095976273944440832/img/t0j_vDEJ0-RVhgRW.jpg",
+              "duration_seconds": 56.033
+            },
+            "author": {
+              "username": "x-user-16",
+              "display_name": "x-user-17",
+              "avatar_url": "https://scrubbed.invalid/x-user-18",
+              "verified": true
+            },
+            "engagement": {
+              "views": 2073,
+              "likes": 43,
+              "comments": 4,
+              "shares": 10,
+              "saves": 18
+            },
+            "flags": {
+              "nsfw": false,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-09-04T20:44:34.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 0
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.027496,
+            "language": "en",
+            "content_category": "tech",
+            "estimated_reach": 2488
+          }
+        },
+        {
+          "post": {
+            "id": "2095959435097108649",
+            "url": "https://x.com/x-user-19/status/2095959435097108649",
+            "content": {
+              "text": "@housecor Nice, cutting per test identity resets is such an underrated win. Did parallelizing cause any flaky tests from shared state or did the seed batching fix that side effect too?",
+              "media_urls": null,
+              "thumbnail_url": null,
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "x-user-19",
+              "display_name": "x-user-20",
+              "avatar_url": "https://scrubbed.invalid/x-user-21",
+              "verified": true
+            },
+            "engagement": {
+              "views": 116,
+              "likes": 0,
+              "comments": 0,
+              "shares": 0,
+              "saves": 0
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-09-04T19:37:25.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 0
+            }
+          },
+          "computed": {
+            "engagement_rate": 0,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 139
+          }
+        },
+        {
+          "post": {
+            "id": "2095949271010779167",
+            "url": "https://x.com/x-user-22/status/2095949271010779167",
+            "content": {
+              "text": "New post: Your Toolchain Is Production Now\nAI agents remove the human shock absorber that hid slow builds and flaky tests. Treat your toolchain like the production system it now is.\n\nhttps://develocity.ai/blog/your-toolchain-is-production-now/ \n\n#Develocity #DPE",
+              "media_urls": null,
+              "thumbnail_url": null,
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "x-user-22",
+              "display_name": "x-user-23",
+              "avatar_url": "https://scrubbed.invalid/x-user-24",
+              "verified": true
+            },
+            "engagement": {
+              "views": 796,
+              "likes": 0,
+              "comments": 0,
+              "shares": 0,
+              "saves": 0
+            },
+            "flags": {
+              "nsfw": false,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-09-04T18:57:01.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 0
+            }
+          },
+          "computed": {
+            "engagement_rate": 0,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 955
+          }
+        },
+        {
+          "post": {
+            "id": "2095878645105807627",
+            "url": "https://x.com/x-user-25/status/2095878645105807627",
+            "content": {
+              "text": "@kieranklaassen Show horse vs workhorse is the right split. Demo latency and tasteful diffs win the timeline. Day to day product work wants a model that survives half-written specs, flaky tests, and the third retry without turning theatrical. Fun is not the same as shippable.",
+              "media_urls": null,
+              "thumbnail_url": null,
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "x-user-25",
+              "display_name": "x-user-26",
+              "avatar_url": "https://scrubbed.invalid/x-user-27",
+              "verified": true
+            },
+            "engagement": {
+              "views": 36,
+              "likes": 0,
+              "comments": 0,
+              "shares": 0,
+              "saves": 0
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-09-04T14:16:23.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 0
+            }
+          },
+          "computed": {
+            "engagement_rate": 0,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 43
+          }
+        },
+        {
+          "post": {
+            "id": "2095873769306784051",
+            "url": "https://x.com/x-user-28/status/2095873769306784051",
+            "content": {
+              "text": "Flaky tests are worse than no tests. Once a suite cries wolf enough times, nobody reads the red anymore.\n\n#BuildInPublic #SoftwareTesting #QA",
+              "media_urls": null,
+              "thumbnail_url": null,
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "x-user-28",
+              "display_name": "x-user-29",
+              "avatar_url": "https://scrubbed.invalid/x-user-30",
+              "verified": false
+            },
+            "engagement": {
+              "views": 7,
+              "likes": 0,
+              "comments": 0,
+              "shares": 0,
+              "saves": 0
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-09-04T13:57:00.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 0
+            }
+          },
+          "computed": {
+            "engagement_rate": 0,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 8
+          }
+        },
+        {
+          "post": {
+            "id": "2095858020018237795",
+            "url": "https://x.com/x-user-31/status/2095858020018237795",
+            "content": {
+              "text": "300 SUB-AGENTS. ZERO AUTO-MERGES.\n\nThat is how you build a serious 24/7 repo operations desk.\n\nKimi K3 can coordinate the parallel swarm and hold up to one million tokens of context.\n\nGrok Build can inspect code, run tests, edit files, and operate inside CI.\n\nSplit the system into six roles:\n\nTRIAGE sorts every issue.\nFIX touches only bounded failures.\nTEST hunts flaky suites.\nDEPENDENCY watches CVEs.\nRELEASE prepares changelogs.\nALERT wakes the human when the blast radius is real.\n\nLint, formatting, and known flaky tests can become draft PRs.\n\nApplication logic, critical security changes, and every production merge remain behind a human gate.\n\nThe goal is not replacing the engineer.\n\nIt is replacing the engineer who checks CI at 2AM because nobody else is watching.\n\nWatch everything.\nFix only what is bounded.\nEscalate everything dangerous.",
+              "media_urls": "https://pbs.twimg.com/amplify_video_thumb/2095857900669276162/img/xanamFUSJPtnk4aV.jpg",
+              "thumbnail_url": "https://pbs.twimg.com/amplify_video_thumb/2095857900669276162/img/xanamFUSJPtnk4aV.jpg",
+              "duration_seconds": 16
+            },
+            "author": {
+              "username": "x-user-31",
+              "display_name": "x-user-32",
+              "avatar_url": "https://scrubbed.invalid/x-user-33",
+              "verified": true
+            },
+            "engagement": {
+              "views": 645,
+              "likes": 15,
+              "comments": 0,
+              "shares": 0,
+              "saves": 2
+            },
+            "flags": {
+              "nsfw": false,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-09-04T12:54:25.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 0
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.023256,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 774
+          }
+        },
+        {
+          "post": {
+            "id": "2095780499813810539",
+            "url": "https://x.com/x-user-34/status/2095780499813810539",
+            "content": {
+              "text": "@thsottiaux does the reset still hold after codex touches a legacy repo with flaky tests",
+              "media_urls": null,
+              "thumbnail_url": null,
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "x-user-34",
+              "display_name": "x-user-35",
+              "avatar_url": "https://scrubbed.invalid/x-user-36",
+              "verified": true
+            },
+            "engagement": {
+              "views": 50,
+              "likes": 0,
+              "comments": 0,
+              "shares": 0,
+              "saves": 0
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-09-04T07:46:23.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 0
+            }
+          },
+          "computed": {
+            "engagement_rate": 0,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 60
+          }
+        },
+        {
+          "post": {
+            "id": "2095764551425777872",
+            "url": "https://x.com/x-user-37/status/2095764551425777872",
+            "content": {
+              "text": "@colinhacks @pullfrogai Hit this with a per-seat reviewer last month. Cheap model started rubber-stamping flaky tests. Switched to BYOK + one SOTA call on the dirty files only.",
+              "media_urls": null,
+              "thumbnail_url": null,
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "x-user-37",
+              "display_name": "x-user-38",
+              "avatar_url": "https://scrubbed.invalid/x-user-39",
+              "verified": true
+            },
+            "engagement": {
+              "views": 264,
+              "likes": 1,
+              "comments": 0,
+              "shares": 0,
+              "saves": 0
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-09-04T06:43:01.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 0
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.003788,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 317
+          }
+        },
+        {
+          "post": {
+            "id": "2095754420084731974",
+            "url": "https://x.com/x-user-40/status/2095754420084731974",
+            "content": {
+              "text": "@so_sthbryan Deterministic tests for agent tool usage is a great idea. LLM based evals are so flaky run to run, having a non LLM harness for the tool call logic itself makes debugging way faster.",
+              "media_urls": null,
+              "thumbnail_url": null,
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "x-user-40",
+              "display_name": "x-user-41",
+              "avatar_url": "https://scrubbed.invalid/x-user-42",
+              "verified": true
+            },
+            "engagement": {
+              "views": 58,
+              "likes": 0,
+              "comments": 1,
+              "shares": 0,
+              "saves": 0
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-09-04T06:02:45.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 0
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.017241,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 70
+          }
+        },
+        {
+          "post": {
+            "id": "2095645191982256331",
+            "url": "https://x.com/x-user-43/status/2095645191982256331",
+            "content": {
+              "text": "XAI ENGINEERS JUST SHOWED WHAT A 24/7 REPO OPS DESK COULD LOOK LIKE WITH GROK BOT\n\ngrok bot can watch ci, tests, dependencies and security signals continuously instead of waiting for someone to notice a broken repo hours later\n\n6 bots → 300 repo monitors → 60-second checks → triage → safe patch → draft pr → human review\n\nflaky tests, lint and deterministic failures stay inside the safe lane. regressions, cves and anything touching real logic get routed straight back to a person\n\nthe system can wait for 3 clean runs, track a 95% test threshold and prepare the fix with context, but it never merges code on its own\n\nthis is the shift from manually checking repos all day to letting grok bot run the night shift while humans keep the final decision",
+              "media_urls": "https://pbs.twimg.com/media/HRU6L7oXEAQfk3T.jpg",
+              "thumbnail_url": "https://pbs.twimg.com/media/HRU6L7oXEAQfk3T.jpg",
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "x-user-43",
+              "display_name": "x-user-44",
+              "avatar_url": "https://scrubbed.invalid/x-user-45",
+              "verified": true
+            },
+            "engagement": {
+              "views": 643,
+              "likes": 19,
+              "comments": 3,
+              "shares": 6,
+              "saves": 4
+            },
+            "flags": {
+              "nsfw": false,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-09-03T22:48:43.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 0
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.043546,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 772
+          }
+        },
+        {
+          "post": {
+            "id": "2095625620042768432",
+            "url": "https://x.com/x-user-46/status/2095625620042768432",
+            "content": {
+              "text": "doctor: do you have any allergies?\n\nme: penicillin and flaky tests",
+              "media_urls": null,
+              "thumbnail_url": null,
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "x-user-46",
+              "display_name": "x-user-47",
+              "avatar_url": "https://scrubbed.invalid/x-user-48",
+              "verified": true
+            },
+            "engagement": {
+              "views": 60,
+              "likes": 2,
+              "comments": 0,
+              "shares": 0,
+              "saves": 0
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-09-03T21:30:57.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 0
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.033333,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 72
+          }
+        },
+        {
+          "post": {
+            "id": "2095619089519489111",
+            "url": "https://x.com/x-user-49/status/2095619089519489111",
+            "content": {
+              "text": "@dillon_mulroy Flaky tests are reliability incidents, not background noise. Track flake rate, quarantine expiry and root-cause SLA like production defects—or real regressions will be mentally discounted. Related QA view: https://x.com/AgomaMitchell/status/2095607112676061319",
+              "media_urls": null,
+              "thumbnail_url": null,
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "x-user-49",
+              "display_name": "x-user-50",
+              "avatar_url": "https://scrubbed.invalid/x-user-51",
+              "verified": true
+            },
+            "engagement": {
+              "views": 7,
+              "likes": 0,
+              "comments": 0,
+              "shares": 0,
+              "saves": 0
+            },
+            "flags": {
+              "nsfw": false,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-09-03T21:05:00.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 0
+            }
+          },
+          "computed": {
+            "engagement_rate": 0,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 8
+          }
+        },
+        {
+          "post": {
+            "id": "2095597227515236437",
+            "url": "https://x.com/x-user-52/status/2095597227515236437",
+            "content": {
+              "text": "Astra looking strong on the parts that actually matter: long-horizon SWE and computer use. 75.2% DeepSWE and 72.6% OSWorld Offline is a real jump if it survives messy repos, flaky tests, and UIs that don’t match the sketch.The “AGI Era” line is marketing. The useful test is whether it can take a bug report, reproduce it, patch it, and pass CI without a human cleaning up the last 20%.Rolling out to a few orgs today and “everyone else very soon” is the same cadence as every prior drop. Ship it to Plus/API and let’s see if the demos hold",
+              "media_urls": null,
+              "thumbnail_url": null,
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "x-user-52",
+              "display_name": "x-user-53",
+              "avatar_url": "https://scrubbed.invalid/x-user-54",
+              "verified": true
+            },
+            "engagement": {
+              "views": 822,
+              "likes": 0,
+              "comments": 0,
+              "shares": 0,
+              "saves": 0
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-09-03T19:38:08.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 0
+            }
+          },
+          "computed": {
+            "engagement_rate": 0,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 986
+          }
+        },
+        {
+          "post": {
+            "id": "2095503881539076322",
+            "url": "https://x.com/x-user-55/status/2095503881539076322",
+            "content": {
+              "text": "Without your team you'll at best (probably) turn into a PR factory. SOC2 theater, pr reviews, bob that keeps writing flaky tests, product managers. all things that will fuck up your production line. But dragging your teammates with you makes a lot of these easier and way more fun.",
+              "media_urls": null,
+              "thumbnail_url": null,
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "x-user-55",
+              "display_name": "x-user-56",
+              "avatar_url": "https://scrubbed.invalid/x-user-57",
+              "verified": true
+            },
+            "engagement": {
+              "views": 11,
+              "likes": 0,
+              "comments": 0,
+              "shares": 0,
+              "saves": 0
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-09-03T13:27:12.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 0
+            }
+          },
+          "computed": {
+            "engagement_rate": 0,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 13
+          }
+        },
+        {
+          "post": {
+            "id": "2095437843468304600",
+            "url": "https://x.com/x-user-58/status/2095437843468304600",
+            "content": {
+              "text": "🧱 Open source is infrastructure. Treat it that way.\n\nNew Signals: Sebastian Bergmann joins Michael Dowden:\n🧪 PHPUnit 13.3 & flaky tests\n🔐 dependency hygiene\n🤖 AI security reports\n💸 OSS funding\n\n🎥 https://www.youtube.com/watch?v=plAdMkGzOaM&utm_source=twitter&utm_medium=social&utm_campaign=content\n\n#IntPHPcon #PHP #OpenSource https://t.co/u1N2T0jLFt",
+              "media_urls": "https://pbs.twimg.com/media/HRR9fiJW0AUKPHF.jpg",
+              "thumbnail_url": "https://pbs.twimg.com/media/HRR9fiJW0AUKPHF.jpg",
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "x-user-58",
+              "display_name": "x-user-59",
+              "avatar_url": "https://scrubbed.invalid/x-user-60",
+              "verified": false
+            },
+            "engagement": {
+              "views": 120,
+              "likes": 0,
+              "comments": 0,
+              "shares": 0,
+              "saves": 0
+            },
+            "flags": {
+              "nsfw": false,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-09-03T09:04:47.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 0
+            }
+          },
+          "computed": {
+            "engagement_rate": 0,
+            "language": "en",
+            "content_category": "tech",
+            "estimated_reach": 144
+          }
+        }
+      ],
+      "next_cursor": "DAADDAABCgABHRcwtraXQGcKAAIdFH2d1NbA2AAIAAIAAAACCAADAAAAAAgABAAAAAAKAAUdF0VgmwAnEAoABh0XRWCa_9jwCwAHAAAA8EVtUEM2d0FBQWZRL2dHSk4wdkdwL0FBQUFCUWRGekMydHBkQVp4MFdkL0xZVndFWUhSWUtGcm1YQVRNZEZnNkY5ZHZSQ3gwVk9qTHJXNURMSFJXbXdYU1c0TkFkRmxnQVdKZHdxUjBYR0w2cjJxQUdIUlVvWmZqYllEQWRGSDJkMU5iQTJCMFZuWXFSbXZCR0hSVzFRcnFYd1dzZEZmdkR6dGN4WXgwV1RzSFYxaUFmSFJablh2MGJBS1FkRlE2VFVsYlFWUjBVdWEyRWxzRGlIUlVpZFhkV01GY2RGbkxRSUp1aDRCMFdoSURiVjdEMQAA",
+      "total": null,
+      "dropped": 0
+    },
+    "credits_used": 1,
+    "request_id": "req-1xXV3uUCtvrZrZ22",
+    "cached": false,
+    "pagination": {
+      "next_cursor": "sc.eyJ2IjoyLCJjIjoiREFBRERBQUJDZ0FCSFJjd3RyYVhRR2NLQUFJZEZIMmQxTmJBMkFBSUFBSUFBQUFDQ0FBREFBQUFBQWdBQkFBQUFBQUtBQVVkRjBWZ213QW5FQW9BQmgwWFJXQ2FfOWp3Q3dBSEFBQUE4RVZ0VUVNMmQwRkJRV1pSTDJkSFNrNHdka2R3TDBGQlFVRkNVV1JHZWtNeWRIQmtRVnA0TUZka0wweFpWbmRGV1VoU1dVdEdjbTFZUVZSTlpFWm5Oa1k1WkhaU1EzZ3dWazlxVEhKWE5VUk1TRkpYYlhkWVUxYzBUa0ZrUm14blFWZEtaSGR4VWpCWVIwdzJjakp4UVVkSVVsVnZXbVpxWWxsRVFXUkdTREprTVU1aVFUSkNNRlp1V1hGU2JYWkNSMGhTVnpGUmNuRllkMWR6WkVabWRrUjZkR040V1hnd1YxUnpTRll4YVVGbVNGSmFibGgyTUdKQlMxRmtSbEUyVkZWc1lsRldVakJWZFdFeVJXeHpSR2xJVWxWcFpGaGtWMDFHWTJSR2JreFJTVXAxYURSQ01GZG9TVVJpVmpkRU1RQUEiLCJlIjoidHdpdHRlci9zZWFyY2gvdHdlZXRzIiwicCI6ImN1cnNvciJ9",
+      "has_more": true,
+      "page_size": 20
+    },
+    "credits_remaining": 95
+  }
+}

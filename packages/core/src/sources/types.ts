@@ -5,15 +5,16 @@
  * Three facts about how Reddit and X actually bill and throttle are missing
  * from that sketch, and each one, left out, ends up copied into the worker:
  *
- * 1. **A page carries a cost as well as a cursor.** Reddit bills one call and
- *    returns up to 100 posts. X bills every post read. The caller cannot work
- *    the charge out from the post count, so `search` reports it.
- * 2. **Back-off belongs to the connector.** Reddit sends `X-Ratelimit-*`
- *    headers and X does not. The caller learns only *when* to come back, never
- *    how the connector found out.
- * 3. **A source declares its own price.** The budget guard needs a number.
- *    Hard-coding X's $0.005 in the worker puts a pricing fact in the wrong
- *    file.
+ * 1. **A page carries a cost as well as a cursor.** One provider bills a call
+ *    that returns up to 100 posts, another bills every record, and a third
+ *    refunds the call that found nothing. The caller cannot work the charge out
+ *    from the post count, so `search` reports it.
+ * 2. **Back-off belongs to the connector.** Every provider says "slow down" in
+ *    its own dialect, and one of ours has never said it at all. The caller
+ *    learns only *when* to come back, never how the connector found out.
+ * 3. **A source declares its own price.** The budget guard needs a number, and
+ *    the three we ship differ by a factor of five. Hard-coding one in the
+ *    worker puts a pricing fact in the wrong file.
  *
  * US-024 split the word "source" into the two things it had been holding at
  * once. Until then one provider served one platform, so one record could
@@ -163,8 +164,10 @@ export interface SearchResult {
    * Billable units this call consumed, in the source's own unit. Zero is a
    * legal answer: Reddit's free tier costs nothing.
    *
-   * This is not the post count. Reddit bills one call for up to 100 posts, and
-   * X bills each post read. That is the whole reason the field exists.
+   * This is not the post count. One request bought 7 posts at one provider, 23
+   * at the same provider on another query, and 20 at a third — and a request
+   * that matched nothing was refunded. That is the whole reason the field
+   * exists.
    */
   readonly unitsConsumed: number;
   readonly next: NextPage;

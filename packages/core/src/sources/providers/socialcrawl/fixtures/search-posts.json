@@ -1,0 +1,869 @@
+{
+  "httpStatus": 200,
+  "body": {
+    "success": true,
+    "platform": "twitter",
+    "endpoint": "/v1/twitter/search/tweets",
+    "data": {
+      "items": [
+        {
+          "post": {
+            "id": "2096183117035827705",
+            "url": "https://x.com/x-user-1/status/2096183117035827705",
+            "content": {
+              "text": "Silicon Drama Episode 19 is live.\n\nJensen Huang moves to own Hugging Face. Sam Altman hands GPT-6 Astra the controls. Behind them, the AI stack starts financing itself.\n\nThe stack is closing. The agents are moving.\n\nRead the complete episode.\n\n#eTatos https://x.com/i/article/2096005766389911554",
+              "media_urls": null,
+              "thumbnail_url": null,
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "x-user-1",
+              "display_name": "x-user-2",
+              "avatar_url": "https://scrubbed.invalid/x-user-3",
+              "verified": true
+            },
+            "engagement": {
+              "views": 765,
+              "likes": 5,
+              "comments": 2,
+              "shares": 1,
+              "saves": 0
+            },
+            "flags": {
+              "nsfw": false,
+              "spoiler": null,
+              "pinned": true,
+              "deleted": false
+            },
+            "published_at": "2026-09-05T10:26:14.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 0
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.010458,
+            "language": "en",
+            "content_category": "entertainment",
+            "estimated_reach": 918
+          }
+        },
+        {
+          "post": {
+            "id": "2095859628550848981",
+            "url": "https://x.com/x-user-4/status/2095859628550848981",
+            "content": {
+              "text": "Trade-offs we need to accept in the accelerating demand for adoption of AI-native SDLCs https://x.com/i/article/2095476442431959041",
+              "media_urls": null,
+              "thumbnail_url": null,
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "x-user-4",
+              "display_name": "x-user-5",
+              "avatar_url": "https://scrubbed.invalid/x-user-6",
+              "verified": true
+            },
+            "engagement": {
+              "views": 493,
+              "likes": 5,
+              "comments": 0,
+              "shares": 0,
+              "saves": 0
+            },
+            "flags": {
+              "nsfw": false,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-09-04T13:00:49.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 0
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.010142,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 592
+          }
+        },
+        {
+          "post": {
+            "id": "2095731305740984761",
+            "url": "https://x.com/x-user-7/status/2095731305740984761",
+            "content": {
+              "text": "Elfen Lied stands as one of those rare anime experiences that doesn't just entertain or shock it burrows into your psyche like one of Lucy's invisible vectors slicing through flesh and bone, leaving you haunted, questioning everything about humanity, empathy, and the thin line between victim and monster. Released in 2004 as a 13-episode adaptation of Lynn Okamoto's seinen manga, this series didn't explode onto the scene with the flash of mainstream shonen hits; instead, it crept in through late-night airings on channels like AT-X, building a cult following that has only grown more fervent over two decades. It's legendary not because it was perfect or universally beloved far from it, with its polarizing mix of gut-wrenching gore, unflinching nudity, and raw emotional devastation but because it dared to be something profoundly uncomfortable in an era when anime was still carving out its identity in the West. People who stumbled upon it in the mid-2000s often describe it as a rite of passage, a gateway to deeper, darker storytelling that made them rethink what animation could achieve. It separated itself from the pack by weaponizing its excesses: the blood wasn't just for spectacle, the bare skin wasn't cheap fanservice, and the quiet moments of tenderness weren't filler they were the fragile heartbeats punctuating a symphony of cruelty. And at the absolute core of that cruelty, that terror, that inescapable dread, is Lucy herself the Diclonius queen who isn't just dangerous; she's an apocalyptic force of nature, a living extinction event wrapped in the fragile shell of a traumatized girl, whose power and rage make her one of the most lethally compelling antagonists-turned-protagonists in anime history. In so many ways, Elfen Lied feels important because it mirrors the ugliest truths of our world prejudice, trauma, the cycle of abuse while wrapping them in a narrative that's equal parts heartbreaking romance, psychological horror, and evolutionary nightmare, all amplified by the sheer, unrelenting danger Lucy embodies as both victim and destroyer.\n\nThe plot of the anime unfolds like a slow descent into madness, starting with an explosive burst of violence that immediately establishes just how catastrophically dangerous Lucy is and why the world has every reason to fear her. We open on a remote research facility off the coast of Kamakura, where scientists and guards are experimenting on Diclonius mutant humans born with small horn-like protrusions on their heads and equipped with invisible, telekinetic \"vectors\" that can extend up to two meters (or more in some cases) and slice through anything with surgical precision. These beings are treated as lab rats, caged, tortured, and studied because their existence threatens the natural order; rumors swirl that they carry a virus capable of turning normal humans into more of their kind, potentially leading to humanity's extinction. But Lucy isn't just any Diclonius she's the original, the most powerful, the one whose vectors operate with godlike speed, strength, and versatility that no other can match. In the very first episode, she breaks free in a sequence that's still one of the most notorious in anime history: vectors whipping through the air like invisible scythes, bodies exploding in fountains of blood, limbs severed mid-scream, guards reduced to twitching torsos on the floor as she tears through reinforced steel doors, bulletproof glass, and heavily armed security teams without breaking a sweat. It's visceral, unflinching, and deliberately overwhelming the camera lingers on the carnage, the screams echoing as Lucy, naked and feral, carves a path of red through the facility in what feels like seconds. Why is she this dangerous? Because her powers aren't just telekinesis; they're an extension of her will, invisible to the naked eye, capable of operating at speeds faster than bullets can react, dismembering multiple targets simultaneously, crushing skulls, ripping out hearts, or even manipulating distant objects with pinpoint accuracy. She's not limited by line of sight in the heat of rage; her vectors can curve, extend, and strike from any angle, turning a crowded room into a slaughterhouse before anyone can draw a weapon. Add in her complete lack of hesitation trauma has forged her into a being who views all humans as enemies deserving of the same cruelty they inflicted on her and you have a predator that makes the facility's entire military-grade defense system look like child's play. But just as she reaches the edge of freedom, a sniper's bullet clips her helmet and grazes her skull, sending her plummeting into the sea. This injury triggers a profound psychological fracture: her dominant, rage-fueled personality retreats, birthing a childlike alternate self called Nyu, who can only utter variations of \"Nyu\" and behaves with the innocence and helplessness . The danger doesn't vanish, though; it simmers, waiting for any trigger to unleash the monster again.\n\nWashed up on the shores of Kamakura the next day, Nyu is discovered by Kouta, a university student returning to the town after years away, and his cousin Yuka, who's been waiting for him with a mix of lingering  affection and quiet frustration over his foggy memories of their shared past. They take the naked, amnesiac girl in out of sheer kindness, naming her Nyu and housing her in an old family inn that's fallen into disrepair. What follows is a deceptively slice-of-life setup cooking meals, awkward bathing scenes, Nyu innocently causing chaos by wetting herself or clinging to Kouta like a lost puppy but it's laced with dread because we, the audience, know the truth: one wrong word, one flash of memory, one moment of stress, and Lucy erupts, her vectors turning the cozy inn into a bloodbath that no ordinary human could survive. Flashbacks reveal her tragic origins and the roots of her unparalleled danger: as a child, Lucy was ostracized for her horns, bullied mercilessly, abandoned by her family, and even witnessed her puppy's brutal killing by other kids, which snapped something inside her. That single act of cruelty unlocked her vectors fully, and she slaughtered her tormentors without mercy heads popping like grapes, bodies bisected in sprays of arterial mist before being captured and funneled into the research program under the enigmatic Professor Kakuzawa, whose own agenda involves using Diclonius to usher in a new world order. Years of isolation, beatings, invasive experiments, and dehumanizing tests didn't break her; they amplified her into something existential. Her vectors evolved under duress, granting her not just raw power but an instinctive mastery that lets her dismantle entire squads of elite soldiers, shrug off gunfire, and even overpower other Diclonius in raw combat. She's dangerous because she's the apex stronger, faster, more versatile than any lab-created Silpelit or engineered weapon like Mariko. The facility's director, Kurama, has a deeply personal stake he's lost loved ones to Lucy's rampages and views the Diclonius as an existential threat, even as his own daughter, Mariko, turns out to be one of them, engineered as a weapon with explosive implants to keep her in check. Kurama knows firsthand: Lucy isn't a girl with powers; she's a virus incarnate, capable of ending humanity not just through violence but through the silent spread of her genetic legacy.\n\nAs the story progresses in these interwoven chunks of tension and revelation, the government deploys a Special Assault Team led by the ruthless Bando, a one-armed operative who's more machine than man after previous encounters with Diclonius. They hunt Lucy relentlessly, but the pursuit draws in other Diclonius survivors like Nana, a sweet, childlike \"Silpelit\" (a sub-type bred in the lab without reproductive organs, making her a sterile experiment) who becomes a surrogate daughter figure to Kurama despite his cold exterior. Nana's vectors are weaker, shorter, and less lethal, highlighting exactly why Lucy is on another level she can extend hers farther, strike with more force, and maintain multiple vectors at once in a whirlwind of death that leaves even fellow mutants in awe and terror. Nana's loyalty and empathy contrast sharply with Lucy's primal hatred, humanizing the \"monsters\" in ways that force viewers to grapple with nature versus nurture. Is Lucy evil by birth, or did endless torment beatings, experiments, rejection forge her into this unstoppable engine of vengeance? The anime doesn't shy away from showing both sides: ordinary humans committing atrocities out of fear, Diclonius lashing out from pain. Yet Lucy's danger elevates the stakes beyond personal vendettas; her very existence poses a species-level threat because Diclonius like her can transmit a virus through contact or even proximity in some interpretations, potentially rewriting human DNA so that future children are born with horns and vectors, dooming homo sapiens to replacement. Kouta's own backstory unravels in gut-punching flashbacks he once befriended a young Lucy during a festival, sharing a moment of genuine connection that she clung to as her only light, only for his family to be caught in the crossfire of her emerging powers when her trauma boiled over. His amnesia is a protective shield, but as memories flood back, the romance budding between him, Yuka, and the dual-natured Nyu/Lucy becomes a powder keg of jealousy, regret, and forbidden love, all while knowing that loving her means embracing something that could kill everyone around her in an instant. Yuka's quiet devotion clashes with Lucy's possessive violence, creating emotional layers that elevate the series beyond mere action-horror, but the constant undercurrent is Lucy's lethal potential: she doesn't just fight; she eradicates, her vectors turning streets into abattoirs and forcing allies and enemies alike to question if mercy is even possible against such overwhelming might.\n\nThe narrative builds through escalating confrontations that blend the personal with the philosophical, always circling back to why Lucy's danger isn't hype it's the engine driving every plot beat. Mariko arrives as a pint-sized assassin, her body riddled with bombs and her mind twisted by isolation, yet even she, with her enhanced vectors and explosive arsenal, pales in comparison during their clashes; Lucy dismantles her with clinical brutality, vectors piercing defenses that would shred anyone else. Fights erupt in the streets and inn, vectors clashing in sprays of arterial blood, but interspersed are quiet scenes of domesticity: Nyu learning to speak, Kouta teaching her simple joys, the group forming a makeshift family amid the chaos. The OVA, often called Episode 10.5 or \"Regenschauer\" (Rainstorm), dives deeper into Lucy's fractured mind during a rain-soaked interlude, exploring her internal war between vengeance and the desire for connection, revealing how her danger stems from a soul that's been shattered into pieces  the Lucy persona is pure, unfiltered survival rage, born from a childhood where every human interaction equaled pain. By the finale, everything converges on that fateful bridge in Kamakura the same one from Kouta's childhood memories where betrayals, revelations, and sacrifices collide. Lucy's full personality resurfaces in a cataclysm of power and pain, her vectors unleashed at their peak, capable of leveling blocks or carving through armies, forcing Kouta to choose between his humanity and his feelings for her. The anime's ending, crafted while the manga was still ongoing, wraps with a bittersweet ambiguity: lives lost, futures uncertain, but a glimmer of hope in the possibility of breaking the cycle. It's not a tidy resolution; it's a meditation on whether redemption is possible when the world itself rejects you, and when the rejected one holds the power to unmake everything.\n\nWhat truly cements Elfen Lied's legendary status is the story behind its creation and how it captured a perfect storm of cultural timing, with Lucy's danger serving as the ultimate metaphor for the consequences of unchecked human cruelty. Lynn Okamoto, a former video game designer at Bandai who dreamed of becoming a mangaka since elementary school, drew inspiration from evolutionary mysteries why did Neanderthals and other hominids vanish? He imagined a superior species rising to replace us, but twisted it with raw human emotion: what if that species was born from our cruelty, and its queen was as lethally perfect as Lucy? The manga serialized in Weekly Young Jump from 2002 to 2005, a seinen magazine known for mature, boundary-pushing tales, allowing Okamoto to explore unflinching themes without censorship. The anime, directed by Mamoru Kanbe at Arms studio, was greenlit while the source was incomplete, leading to a condensed 13 episodes that prioritized emotional core over some manga subplots (like deeper virus mechanics or additional characters such as Nozomi). This adaptation choice, born of necessity, actually sharpened the focus on character psychology and interpersonal drama, making the anime feel more intimate and devastating to many fans especially when Lucy's rampages hit with full, unfiltered force. The title itself comes from a 19th-century German poem \"Elfenlied\" by Eduard Mörike, set to music by Hugo Wolf a whimsical tale of an elf misunderstanding humans and meeting a tragic end which Okamoto wove in as Lucy's lullaby, symbolizing the Diclonius as fairy-like outsiders doomed by their otherness, yet armed with the power to flip the script and doom us instead. The iconic opening theme, \"Lilium,\" elevates it further: a haunting Latin choral piece blending biblical texts (Psalms, James) with Renaissance hymns like \"Ave Mundi Spes Maria,\" evoking purity, chastity, and divine mercy. Sung in a Gregorian style, it plays over abstract visuals of Lucy's trauma and beauty, contrasting the series' brutality with sacred serenity it's not just an OP; it's a leitmotif that underscores the duality of innocence and rage, making every rewatch hit harder as you realize her danger isn't random; it's the direct result of a world that created its own apocalypse in the form of a broken girl.\n\nWhat sets Elfen Lied apart from other anime, and why it's so profoundly important in countless ways, lies in its fearless deconstruction of tropes and its mirror to society's darkest impulses, with Lucy's overwhelming danger at the heart of it all. In an era of feel-good harem comedies or high-stakes shonen battles, it took the \"magical girlfriend\" archetype think a mysterious, powerful girl entering a guy's ordinary life and shattered it. Nyu starts as that adorable, clumsy outsider, but her Lucy side weaponizes the fantasy into horror, forcing Kouta to confront love as both salvation and destruction, knowing one slip could mean vectors through the chest. It deconstructs the hero's journey, the nuclear family, even the \"chosen one\" narrative by showing how ordinary prejudice creates extraordinary monsters like Lucy, whose danger isn't cartoonish it's visceral, personal, and systemic. The graphic violence isn't gratuitous shock; it's a commentary on how trauma begets trauma—Lucy's vectors represent unchecked rage born from systemic abuse, much like real-world cycles of domestic violence or institutional racism, where the oppressed become destroyers capable of toppling empires. Nudity, too, strips away dignity to expose vulnerability: Diclonius are often naked in labs or escapes, not to titillate, but to emphasize their dehumanization, their bodies as objects for study rather than vessels of agency, all while Lucy's power makes her untouchable in every way that matters. This transgressive approach sparked debates on ethics eugenics, animal testing parallels, the ethics of \"othering\" groups deemed dangerous. It questions humanity's inhumanity: are the scientists and soldiers the true villains, or is fear a universal virus that justifies creating something as lethally perfect as Lucy? Themes of discrimination, social alienation, revenge, regret, and the value of life permeate every frame, making it a philosophical gut-punch that feels eerily relevant today, from genetic editing controversies to debates on neurodivergence and empathy deficits, where ignoring the \"different\" risks birthing the very threats we fear.\n\nIts cultural ripple effects underscore its importance even more. In the West, Elfen Lied became a bestseller for distributors like ADV Films, notorious yet beloved as one of 2005's most talked-about releases precisely because Lucy's danger lingered in viewers' minds like a nightmare you can't shake. It influenced broader media the Duffer Brothers have openly cited it as a key inspiration for Stranger Things, particularly Eleven's arc: a lab-raised girl with telekinetic powers escaping into a found family, pursued by shadowy forces, blending ultraviolence with E.T.-like wonder, but Elfen Lied goes further by making its Eleven not just powerful but existentially threatening on a species scale. What was once dismissed as \"edgy for edginess' sake\" now reads as prescient, a bridge between Akira's psychic body horror and modern prestige TV. It pushed anime's maturity envelope, proving the medium could tackle heavy subjects with artistic flair minimalist animation in quiet scenes heightens the pain, while explosive sequences deliver visceral catharsis born from Lucy's raw, unstoppable force. Fans connect with it on personal levels: survivors of bullying or abuse see Lucy's pain as validation, while others find catharsis in its exploration of forgiveness amid unforgivable acts, wondering if even the most dangerous being deserves a chance when the world made her that way. It's important because it doesn't preach; it immerses you in moral gray, leaving you to wrestle with whether Lucy deserves redemption, whether humanity can coexist with difference, or if extinction is inevitable when fear rules and her danger makes that question hit like a vector to the throat.\n\nDecades later, Elfen Lied endures as a testament to storytelling that risks everything. It doesn't separate its issues into neat boxes violence feeds emotion, trauma fuels philosophy, love clashes with hate in one seamless, blood-soaked tapestry, all orbiting the central truth of Lucy's danger: she's not dangerous because she's a mutant; she's dangerous because we made her that way, and in her lies the mirror to every ignored scream, every act of cruelty that spirals into catastrophe. Whether you're revisiting it or discovering it now, it demands you feel it all: the horror of the escape, the warmth of the inn's kitchen, the devastation of lost innocence, and the chilling realization that the most dangerous force on Earth might just be the one we refuse to understand. In a world still grappling with division and the \"other,\" this anime remains a powerful reminder that songs of elves or Diclonius can echo the most human truths, urging us toward empathy before the vectors close in. It's legendary not despite its flaws, but because its raw, unfiltered ambition captured something eternal about the human condition, with Lucy's lethal grace as the unforgettable blade at its center.",
+              "media_urls": "https://pbs.twimg.com/media/HRWIfxtaMAAWuvL.jpg",
+              "thumbnail_url": "https://pbs.twimg.com/media/HRWIfxtaMAAWuvL.jpg",
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "x-user-7",
+              "display_name": "x-user-8",
+              "avatar_url": "https://scrubbed.invalid/x-user-9",
+              "verified": true
+            },
+            "engagement": {
+              "views": 1011,
+              "likes": 0,
+              "comments": 0,
+              "shares": 0,
+              "saves": 2
+            },
+            "flags": {
+              "nsfw": false,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-09-04T04:30:54.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 0
+            }
+          },
+          "computed": {
+            "engagement_rate": 0,
+            "language": "en",
+            "content_category": "education",
+            "estimated_reach": 1213
+          }
+        },
+        {
+          "post": {
+            "id": "2095692856325558695",
+            "url": "https://x.com/x-user-10/status/2095692856325558695",
+            "content": {
+              "text": "Never take iron supplements, They will destroy your gut, give you SIBO and help bacteria make biofilms so they will be harder to kill later. \n\nInstead, do this to actually fix iron levels👇\n\n1. The Biofilm & SIBO Incubator\n\nStandard iron supplements (ferrous sulfate, fumarate, gluconate) have abysmal absorption rates—often less than 10% to 15%.\n\n• Feeding the Pathogens: The remaining 85%+ unabsorbed, free reactive iron sits in your intestinal lumen. Iron is the primary limiting growth nutrient for opportunistic pathogens (E. coli, Klebsiella, Salmonella, and Candida).\n\n• The Biofilm Fortress: Pathogens deploy molecular iron-chelators called siderophores to pull this free iron directly into their colonies. They use it to construct dense, iron-reinforced extracellular polymeric substance (EPS) biofilms.\n\n• The SIBO Trap: Once bacteria are shielded by these iron-rich biofilms, they become almost impervious to antimicrobials, natural killer cells, and stomach acid, locking in chronic SIBO and dysbiosis.\n\n2. The Mucosal Fenton Burn (Direct Gut Destruction)\n\nFree ferrous iron (Fe2+) sitting against the delicate enterocytes of your small intestine triggers severe localized necrosis:\n\n• The Fenton Reaction: Fe2+ reacts with metabolic hydrogen peroxide (H2O2) in the gut to produce hydroxyl free radicals (OH-)—the most destructive reactive oxygen species in human biology.\n\n• Lipid Peroxidation: These hydroxyl radicals instantly oxidize the polyunsaturated fatty acids in enterocyte membranes.\n\n• Welding Breaks: This oxidative fire shears off the brush-border microvilli and destroys tight-junction proteins (ZO-1 and Occludin). You end up with severe leaky gut, corrosive black stools, intense mucosal cramping, and systemic endotoxemia.\n\n3. The Recycling Truth: You Don't Need More Iron\n\nMainstream medicine treats the body like a bucket with a hole in it, assuming low serum iron means you must pour more in:\n\n• The Massive Recycling Loop: Your body requires roughly 20 to 25mg of iron every single day to maintain hemoglobin and metabolic enzymes.\n\n• The Reticuloendothelial System (RES): Over 95% of that daily requirement is recycled internally by macrophages breaking down aged red blood cells. You only lose about 1 to 2mg per day through skin desquamation and intestinal cell sloughing.\n\n• The Misdiagnosis: When blood tests reveal low serum iron or low ferritin, your body hasn't magically run out of iron. Iron is simply locked inside tissues, organs, and macrophages, completely unable to get back into circulation.\n\n4. The Real Bottleneck: Ceruloplasmin & Bioavailable Copper\n\nIron cannot move safely through the body on its own. It is toxic in its ferrous (Fe2+) state and must be oxidized to ferric (Fe3+) before it can bind to transferrin for safe transport:\n\n• The Master Ferroxidase: This critical conversion is carried out exclusively by Ceruloplasmin, the liver's master copper-carrying ferroxidase enzyme.\n\n• The Catalytic Core: Ceruloplasmin requires 6 to 8 bioavailable copper atoms structurally incorporated into its active site.\n\n• The Copper Trap: If you lack bioavailable copper, ceruloplasmin activity collapses. Ferrous iron becomes stuck in cellular storage (the liver, spleen, brain, and joints), rusting your organs from the inside out while your bloodwork screams \"iron deficiency anemia.\"\n\n5. Retinol (Vitamin A): The Genetic Transcription Key\n\nYou cannot build functional ceruloplasmin without real, preformed Vitamin A:\n\n• Nuclear Gene Activation: Preformed Retinol is the non-negotiable ligand that binds to RAR and RXR nuclear receptors in hepatocytes, initiating the transcription of the ceruloplasmin gene.\n\n• Without true, preformed Retinol (from beef liver, egg yolks, or Estroban), the liver physically cannot assemble ceruloplasmin. Copper remains unbound, and iron remains paralyzed in tissue storage.\n\n6. Cortisol, Stress & The Hepcidin Iron Lock\n\nChronic dieting, high stress, and low-carb regimens spike stress chemistry, locking up systemic iron:\n\n• The Hepcidin Surge: Stress, elevated Cortisol, and inflammatory cytokines (especially IL-6 triggered by gut endotoxin) cause the liver to churn out Hepcidin—the master iron-regulatory hormone.\n\n• Degrading Ferroportin: Hepcidin binds directly to Ferroportin (the only known cellular iron export channel on enterocytes and macrophages), internalizing and degrading it.\n\n• The Prison Effect: With ferroportin destroyed, iron cannot escape cells into the blood. Swallowing iron pills while Hepcidin is elevated simply forces more iron to get trapped in the gut mucosal cells, worsening inflammation.\n\n7. Active Thyroid (T3): The Metabolic Catalyst\n\nThe synthesis of iron transport proteins is an energy-demanding process driven by active thyroid hormone:\n\n• Hepatic Protein Production: Intracellular active T3 powers the mitochondrial respiration in hepatocytes needed to manufacture ceruloplasmin, transferrin, and albumin.\n\n• Gut Peristalsis: Active T3 maintains the Migrating Motor Complex (MMC) and gastric hydrochloric acid (HCl). When T3 is low, sluggish intestinal transit allows unabsorbed iron to sit in the small intestine for days, fueling dysbiosis and endotoxin (LPS) leakage.\n\n8. The Protocol: How to Fix Iron Dynamics Without Supplements\n\nStop poisoning your gut with iron pills. Turn your endogenous recycling and mobilization machinery back on:\n\n• Preformed Retinol (Vitamin A): Eat 3 to 4 ounces of fresh beef liver weekly, or supplement real Retinol (Estroban). This supplies the raw genetic trigger to transcribe ceruloplasmin.\n\n• Bioavailable Copper: Eat oysters or take a chelated copper (like copper bisglycinate) to load the catalytic centers of ceruloplasmin and Complex IV.\n\n• Fuel Liver Glycogen (High Carbs): Keep liver glycogen full with bioavailable carbohydrates (ripe fruit, raw honey, fresh orange juice). This suppresses cortisol, drops inflammatory hepcidin, and keeps hepatic T4-to-T3 conversion running.\n\n• Sweep Endotoxin (Ray Peat Carrot Salad): Eat a daily raw carrot salad (shredded carrots, raw coconut oil, vinegar) to bind lumenal endotoxin (LPS), preventing the liver inflammation that spikes hepcidin.\n\n• Apolactoferrin (For Existing Dysbiosis): If you suspect heavy gut biofilms from past iron use, Apolactoferrin (iron-depleted lactoferrin) physically strips free iron away from pathogenic bacteria, breaking down biofilms while safely transferring iron back to your own cells.\n\nLow iron on a blood test is almost never an iron problem—it is a copper, retinol, and energy problem.\n\nStop feeding the SIBO and oxidising your gut with iron tablets. Fuel the liver with Retinol, Copper, and high active T3, drop cortisol, and let your body mobilize its massive internal iron stores naturally.",
+              "media_urls": "https://pbs.twimg.com/media/HRVlfWRaAAANZIy.jpg",
+              "thumbnail_url": "https://pbs.twimg.com/media/HRVlfWRaAAANZIy.jpg",
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "x-user-10",
+              "display_name": "x-user-11",
+              "avatar_url": "https://scrubbed.invalid/x-user-12",
+              "verified": true
+            },
+            "engagement": {
+              "views": 2194,
+              "likes": 60,
+              "comments": 1,
+              "shares": 8,
+              "saves": 78
+            },
+            "flags": {
+              "nsfw": false,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-09-04T01:58:07.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 0
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.031449,
+            "language": "en",
+            "content_category": "fitness",
+            "estimated_reach": 2633
+          }
+        },
+        {
+          "post": {
+            "id": "2095642890735403187",
+            "url": "https://x.com/x-user-13/status/2095642890735403187",
+            "content": {
+              "text": "What if Bitcoin has an internal clock we can reconstruct before we can predict its price? I built RANNTA Pandora to test exactly that. https://x.com/i/article/2095641624303046656",
+              "media_urls": null,
+              "thumbnail_url": null,
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "x-user-13",
+              "display_name": "x-user-14",
+              "avatar_url": "https://scrubbed.invalid/x-user-15",
+              "verified": true
+            },
+            "engagement": {
+              "views": 310,
+              "likes": 4,
+              "comments": 1,
+              "shares": 0,
+              "saves": 0
+            },
+            "flags": {
+              "nsfw": false,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-09-03T22:39:34.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 0
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.016129,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 372
+          }
+        },
+        {
+          "post": {
+            "id": "2095561156920533194",
+            "url": "https://x.com/x-user-16/status/2095561156920533194",
+            "content": {
+              "text": "The parasite does not need you stupid. It needs you smart enough to call the meal love.\nTrump is the specimen. Agency is what got eaten.\n#Paradox #Agency #MAGA #Startup #AI #Philosophy https://x.com/i/article/2091694262618570752",
+              "media_urls": null,
+              "thumbnail_url": null,
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "x-user-16",
+              "display_name": "x-user-17",
+              "avatar_url": "https://scrubbed.invalid/x-user-18",
+              "verified": true
+            },
+            "engagement": {
+              "views": 3224,
+              "likes": 3,
+              "comments": 1,
+              "shares": 0,
+              "saves": 0
+            },
+            "flags": {
+              "nsfw": false,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-09-03T17:14:48.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 0
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.001241,
+            "language": "en",
+            "content_category": "tech",
+            "estimated_reach": 3869
+          }
+        },
+        {
+          "post": {
+            "id": "2095412014315450518",
+            "url": "https://x.com/x-user-19/status/2095412014315450518",
+            "content": {
+              "text": "Since 1990 severe anxiety and depression arrived into my life a few year;s fter GOD in Heaven woke me up and Jesus Christ saved my life after my Grandpa Kendall my Dad's Father had a severe heart attack which he had prostate surgery, a blood clot went through his heart and damaged half of his heart which was on record ant the Yorkton Hospital 30 km away from his home Town Chuchbridge Saskatchewan. The Dr's had to revive him several times when finally he was stabilized in the hospital, he said later on he left his body and went to Heaven for a short time how long I don't know but the Dr's did, he saw how beautful it was and then he met one of his family member's who had passed away years earlier and they told him he had to come back it wasn't his time yet and so he did. There was 2 miracles that happened 1 is that his heart was half damaged and he shouldn't have survived and 2 he had a life after death experience which opened my eye's to see it's true GOD is real and exist's and a short time after when Jesus first saved me I felt so very much joy and happiness I would cry often from how beautful it felt. Then one day the evil one attacked me with severe anxiety and depression and I was also being tormented with thought's that caused so much fear and other health issues over the year's. I was lving with my Mom's Mother so she had someone to be there with her for a few year's till one morning my girlfriend was over visiting me and after she left I went out to see what my Grandmother was doinf and I ended up finding her in the bathroom on the floor between the door and toilet and I couldn't get into to help her so I called my Mom at her workplace and she came over as fast as she could along with our Town's First Responder's, they then took her to our Town's Hospital. The next day me and my girlfriend went to church in another Town 14 away from Broaview where we both lived but when we got to the hospital my Grandma started breathing very loudly and shortly after passed away from a massave stroke my heart broke and I cried out so loud in the Hospital the nurse closed the door on us. But time went on after she passed away and GOD did helped me by keeping everything not to go to far and I was able to function enough to eventually we were married., that was from July 1994 to April 9, 2002, and my wife left me and took our Son away from me and I was left with visitation every second weekend and we shared some hollidays as well. Then I was was alone at my home I wasn't able to do much of anything because of depression and anxiety I spent all day and night on the computer playing games and just sending people gift's to play the games. I had a couple of friend's stop by to visit me few time's then eventually had no one except my Mom and Dad left here in my hometown I had no real friends but my Parnet's and I went out for coffee in the afternoon about 2:30pm or so and that was all we had to do here in this small Town. And then in 2022 my oldest brother was here to visit us from British Colombia where him and his second wife moved to, and he was going back to BC the next day and my Dad ended up having a massive heart attack and my bother tried to revive him until the Ambulance came but they couldn't revive him and he passed away on September 28, 2022. My Mom had fallen one day when my Dad was still alive and ended up breaking her hip and me and my Dad too the Hospital here in Town not thinking because of shock I guess but we shouldn't have moved her at all, but it was to late then but the Ambulance ended up taking her to the nearest City Regina Saskatchewan and she had a metal plate attached to her bone and stayed there a few day's and eventually was able to come back home. And then in August of 2018 I had a cyst right in the middle of my back for about 6 week's from begiining of it I had a fever everyday I had to take Advil to keep the fever in comtroll and yes I was at the Dr's a few times during this time but they wouldn;t do anything or send me to the City to be checked over by a specialist and the cyst was streaching my back muscles all apart and the pain was so severe I couldn't do anything but lay on my bed a drink meal replacement shakes for week's and one day I got up to take my blood pressure pills and other pills I was taking as well and I was standing at the microwave stand where my pills were, and all of a sudden felt like passing out and fell backwards and just hit the bottom of the stove denting it in a little bit but I never got hurt or anything. Finally a new Dr I went to see because the other one laughed at me and thought it wasn't serious at all but the new Dr sent me to A Specialist in Regina Sask where I had barely made it walking slowly into the Hospital because I had so much infection in my body I almost blackout, and got into see them and had several tests done and I had to have surgery as soon as possible so I just about didn't survive this. But after staying in the Hospital for afew day's I had to have a tube inside my back to drain the cyst for 2 weeks or so, but after leaving the City Hospital my Parent's and I stopped at my middle Brother's house in the city for a visit and when we where there he was laying on his couch and his leg's were trembling and I told him he has to go see the Dr he can't stay home and suffer with whatever was wrong with him, after we had to leave and I had to stay in our home Town Hospital for afew day's for the pump that was in my back. After few day's I was able to go home but ended up finding out my Middle Brother had colon cancer and he had an operation and had to where acolostomy bag, and lived for several month's before he passed away on February 28, 2019. But jumping back to after my Dad passed away and my brother had to go back to BC I had to leave my house and just about everything I owned to move in with my Mom took take care of her, which ended up working out OK for both of us but once again my Mom went to the bathroom beside her bedroom and she started yelling at me to come and I found her on the floor with the same leg broken this time and I phoned the Ambulance right away not being able to move her or do anything to help her I was so afraid and broken hearted to see her that way, then then the Ambulance arrivied and it took quite awhile to get her stable to be able to lift he on a blanket just so they could get her out of the house and place her on the stretcher and then left shortly after and I never got to see her or talk to her for a few week's I had no way to call her or what was happening, but she eventually came back to our Town hospital where she stayed untill they got her into our Town's Nursing Home where she lived just short of 1 year. I was at the Nursing Home one afternoon I had been at home for a couple of day's not recieving any phon call's or anything letting me know she was placed on Oxygen she had been throwing up for 3 month's or more and I told the RN to get the Dr to do something about it send her for test's or a scan to see what was happening but they never did anything and the last day of her life I was at the Nursing Home she was resting with her eye's closed and I help her hand for about 30 minutes and I was crying and she leaned towards me and told me I'm OK I'm OK and I then left for home shortly after. The next day I recieved a phone call from my brother who came down from BC he didn't say anything about our Mom until I got to the nursing Home and then he gave me then gave me then ew's that Mom died during the night and I must of went into shock because it wasn't effecting me the way I thought it would, but that was the 3 of my family member passed away along with everything else I suffered through since 1990, and I had a demon come into my house at the end of April 2026 trying to get me to take my own life and I told you that before I said no get out of here in the name of Jesus Christ of Nazareth and the demon ran away in a hurry but then there was some man speaking to me and he was saying thing's I've done in my life and at the end he started yelling at me telling me some of the bad thing's I did over the year's I was going to go to the pit for ever and already suffering with severe anxiety for about 2 weeks all I could do is lay on the couch with so much fear and I couldn't eat hardly so I started drinking syrup and drinking hot chocolate because I couldn;t get up to make anything and I had no appetite along with my heart being broken behond repair and a crushed spirit and having no one to be with me or help me or phone me I suffered all alone through so much along with more health problems included. I really shouldn't be alive right now GOD in Heaven is the only one I had to cry out to and his son my Lord and Savior Jesus Christ they were the only one I had for so many trials and fears, sickness, loneliness, I have my Son that lives in my Brothers house in Regina along with his girlfriend but he's to busy to come down and visit so I'm alway's alone, usually no one phones except scammers trying to steal from me, but at least you know a little of why I am the way I am.",
+              "media_urls": "https://pbs.twimg.com/media/HRRl9GAbkAAZ_pH.png",
+              "thumbnail_url": "https://pbs.twimg.com/media/HRRl9GAbkAAZ_pH.png",
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "x-user-19",
+              "display_name": "x-user-20",
+              "avatar_url": "https://scrubbed.invalid/x-user-21",
+              "verified": true
+            },
+            "engagement": {
+              "views": 448,
+              "likes": 2,
+              "comments": 0,
+              "shares": 0,
+              "saves": 0
+            },
+            "flags": {
+              "nsfw": false,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-09-03T07:22:09.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 0
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.004464,
+            "language": "en",
+            "content_category": "lifestyle",
+            "estimated_reach": 538
+          }
+        },
+        {
+          "post": {
+            "id": "2095204760890565104",
+            "url": "https://x.com/x-user-22/status/2095204760890565104",
+            "content": {
+              "text": "To assist those giving OpenClaw 2.0 another chance (like me). :) https://x.com/i/article/2095200802163806215",
+              "media_urls": null,
+              "thumbnail_url": null,
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "x-user-22",
+              "display_name": "x-user-23",
+              "avatar_url": "https://scrubbed.invalid/x-user-24",
+              "verified": true
+            },
+            "engagement": {
+              "views": 764,
+              "likes": 1,
+              "comments": 1,
+              "shares": 0,
+              "saves": 1
+            },
+            "flags": {
+              "nsfw": false,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-09-02T17:38:36.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 1
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.002618,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 917
+          }
+        },
+        {
+          "post": {
+            "id": "2095131387842158885",
+            "url": "https://x.com/x-user-25/status/2095131387842158885",
+            "content": {
+              "text": "GROK BUILD HOW TO USE\n\nWHAT NEW TODAY\n- Folder now 276 posts (21 new vs Aug 31 snapshot of 255)\n- Testers (mark_k / cb_doge / SpaceXAI): v1.0.17 — MCP tools support multi-round-trip elicitation (tool can return input_required and resume); next-prompt ghost suggestions quieter/more accurate; /btw table cells highlight and copy as TSV\n- Testers (XFreeze): v1.0.16 — workspace-level MCP at session bind; enterprise model locks via signed requirements.toml; safer recovery after expired tokens; longer default waits (1h) for heavy subagent/task output; MCP OAuth from /mcps no longer deadlocks\n- Testers (mark_k / cb_doge / GrokInsider / XFreeze): v1.0.15 — faster startup/first-reply (model connect + token refresh + MCP setup in background); session close no longer blocks on memory consolidation; tip after repeated scrollback drag-copies points to /copy and /export\n- Testers (mark_k / cb_doge / SpaceXAI): v1.0.14 — PostToolUse hooks can feed context back to the model; `grok usage ` shows per-turn tokens/cost; proactive OIDC refresh; more robust subagents; Windows CLI downloads ~70% smaller; large-session memory no longer blocks turn completion\n- Official (grok): Workflows are in Grok Build — hand off tasks a single conversation cannot hold (e.g. triage 100+ issues, large code reviews)\n- Official (grok): browser-use plugin drives your existing Chrome (all sign-ins) — /plugins → install browser-use → enable Chrome remote debugging\n- Testers (Teslaconomics): shareable Grok Bot that runs real Grok Build CLI on your computer (Add to Grok Bot; sign into your own xAI account on the machine)\n- Note: public changelog https://x.ai/build/changelog still lists Latest as v1.0.13 (Aug 28); 1.0.14–1.0.17 are from bookmark testers / SpaceXAI posts — run `grok update` or `grok update --alpha`\n\nWHAT IT IS\n- A terminal-native coding agent with a fullscreen TUI\n- Also runs headlessly in scripts, or inside other apps via ACP\n- Understands the repo, edits files, runs shell commands, and manages long jobs\n- Open source harness: https://github.com/xai-org/grok-build\n- Different from Grok Bot (cloud teammates) and Digital Optimus (real-time video control)\n- Bookmark testers: native /remote-control support is coming (SpaceXAI confirmed)\n\nINSTALL AND UPDATE\n- macOS / Linux / WSL: curl -fsSL https://x.ai/cli/install.sh | bash\n- Windows PowerShell: irm https://x.ai/cli/install.ps1 | iex\n- Then: grok --version\n- Update: grok update (stable) or grok update --alpha\n- Testers: v1.0.5 adds GROK_CONFIG env, auto worktree reclaim, hook-block wording, RTL, ACP effort, image/video call limits\n- Testers: v1.0.6 changes subagent spawning (breaking) and adds a customizable status line\n- Testers: v1.0.7 adds a first-class workflows catalog, Always/Never rules, and a timer-refresh status line\n- Testers: v1.0.8 improves MCP servers and workflows. Concurrent subagents start faster without freezing the parent or UI. Follow-ups send while a task is running. Ctrl+S stashes the prompt draft. /workflow autocompletes. MCP can request form input or URL consent. Workflow rows show current context usage\n- Testers: v1.0.9 adds agent budget + reasoning controls, plugin-provided agents, /feedback images, instant TUI mode switching, smarter clone/worktrees, resilient subagents, faster MCP startup, concurrent agents without rate-limit collapse\n- Testers: v1.0.10 — grok clone reuses matching local checkouts as linked worktrees for faster session creation\n- Testers: v1.0.11 — Auto/headless QoL: resume-picker headless sessions, configurable default permission mode, Auto subagent messages, mkdir/touch without prompts, no 10-hour monitor timeout, faster background waits, turn duration after /resume\n- Testers: v1.0.12 — faster worktrees; MCP retry; subagent wait after interjection; hook descriptions; context/token accuracy; auto-compaction bar; .NET watcher fix; Auto recap during background streams\n- Testers/Official: v1.0.13 · Aug 28 — compressed CLI downloads; truncated responses continue; hooks can confirm (not only allow/deny); inference retry on stalls/drops/5xx; Windows ~/.grok and worktrees; more reliable session save; faster MCP startup when auth configured; truncated tool calls with complete args execute; large-image session fix; scheduled-task UUID IDs + stop reminder\n- Testers: v1.0.14 — PostToolUse hooks feed model feedback; grok usage per-turn tokens/cost; proactive OIDC refresh; stronger subagents; ~70% smaller Windows CLI downloads; large-session memory no longer blocks turns\n- Testers: v1.0.15 — background model connect/token refresh/MCP at startup (faster first reply + new sessions); memory consolidation deferred off exit path; /copy and /export tip after repeated drag-copies\n- Testers: v1.0.16 — MCP servers at session bind for workspace integrations; enterprise model restrict via signed requirements.toml; 1h default wait ceiling for long subagent/task output; MCP OAuth from /mcps deadlock fix; sessions recover after expired-token network interrupts\n- Testers: v1.0.17 — MCP multi-round-trip elicitation (input_required → resume); quieter next-prompt ghost suggestions; /btw panel table cell select/copy as TSV\n- Bookmark testers: Grok Build mode is now on all SuperGrok and X Premium plans, web and mobile\n- Testers: official Netlify plugin for build and deploy\n- Bookmark testers: a usage-reset control can set usage back to 0%\n- Changelog: https://x.ai/build/changelog\n- Evaluate Grok 4.6 with the Grok Build harness (http://grok.com/build)\n- Docs: https://docs.x.ai/build/overview\n- Download page: https://x.ai/cli\n\nSIGN IN\n- First launch opens a browser for authentication\n- Headless or remote: grok login --device-auth\n- Or: export XAI_API_KEY=\"xai-...\" then grok\n- Sign out: grok logout\n- In TUI: /login and /logout\n\nSTART A SESSION\n- cd your-project then grok\n- First prompts: Explain this repo. or src/main.rs Walk me through this file.\n- grok -p \"Explain this codebase\" for a one-shot headless run\n- grok -c continues the most recent session in this directory\n- grok -r resumes a session by id (or the most recent)\n- grok inspect shows discovered config, skills, plugins, hooks, and MCP\n- grok models lists available models\n- Switch model in TUI with /model\n\nLEARN THE TOOL\n- Run /tutorial or /help\n- /release-notes or /changelog for the current version\n- Read AGENTS.md in the repo (also CLAUDE.md if you are migrating)\n- Import Claude settings with /import-claude\n- Carry over rules, skills, and MCP from Claude / Cursor / Codex\n- Keyboard shortcuts: /help and Ctrl+.\n- Voice: Ctrl+Space or /voice\n- Shift+Tab cycles Plan, Auto, Always-approve\n\nHOW TO WRITE A TASK\n- Outcome: what should be finished\n- Sources: files, folders, URLs, or mentions\n- Constraints: what not to touch, and when to ask\n- Deliverable: diff, report, test, or published app\n- Review point: plan first, or stop before commit/push\n- For big work: /plan first, then approve\n- For long ownership: /goal\n- For research first: /deep-research\n- For a sick laptop: tell it what is broken and let it investigate\n- Testers (tetsuo): start with work you can check — name the behavior, give a reproduction command, limit files, list final checks, say where to stop\n- Testers (tetsuo): inspect first (git status --short, grok inspect); give executable feedback (compiler/linter/tests) so the agent can loop; review the full diff and the command behind every green check\n\nCORE COMMANDS\n- /new starts a new session\n- /home returns to the welcome screen\n- /resume and /sessions switch sessions\n- /fork branches the current session\n- /rename or /title names the session\n- /session-info shows session details (click or drag to copy)\n- /context shows token and skill/MCP cost\n- /usage shows credits\n- /compact condenses history\n- /rewind truncates conversation history (confirms; does not wipe files)\n- /export saves the conversation\n- /btw asks a side question without derailing the turn\n- /check-work has a subagent review the code\n- /feedback files a report\n- /doctor and grok doctor fix terminal, tmux, clipboard, keyboard\n- grok du shows disk use under ~/.grok\n- grok wrap runs a command with local clipboard support\n- grok trace exports debug traces\n- /loop runs a prompt on an interval (auto-expires after 7 days)\n- Queued follow-ups can send as interjections if you turn that setting on\n- Ctrl+4 opens the Agent Dashboard\n- Ctrl+U can continue a Claude Code session inside Grok Build\n\nPLAN MODE AND PERMISSIONS\n- /plan or Shift+Tab enters plan mode\n- Only the plan file can be edited until you approve\n- Auto and always-approve do not skip plan review\n- a approves, s requests changes, c comments, q quits plan\n- /view-plan reopens the preview\n- /auto auto-approves safer tools\n- /always-approve skips most prompts (deny rules and hooks still apply)\n- Edit always-allow bash as free-form globs\n- Restrict web search domains with [toolset.web_search] in config.toml\n- PreToolUse hooks can rewrite tool input, not only allow or deny\n- StopCancelled reports when a turn is interrupted or rejected\n- Pin auth to API key or OIDC in config.toml if needed\n\nPARALLEL WORK AND AGENTS\n- Agent Dashboard: /dashboard or Ctrl+4\n- Run feature, review, fix, and test agents from one place\n- Pause, check progress, and jump into any agent\n- Worktrees: grok -w or Ctrl+W (isolated git copy under ~/.grok/worktrees)\n- grok worktree list / show / rm / gc\n- /fork --worktree forks into a worktree\n- /goal owns a long engineering objective (status, pause, resume, clear)\n- /create-workflow authors a repeatable multi-agent pipeline\n- /workflow launches, pauses, resumes, or stops a run\n- /workflows is the live run dashboard\n- /deep-research starts a built-in research workflow\n- Tools and MCP servers receive GROK_SESSION_ID\n- Background tasks and TODOs survive compaction\n\nVOICE AND MEDIA\n- Dictate with Ctrl+Space\n- /imagine generates an image\n- /imagine-video generates a video\n- Ask it to boost, compress, and re-encode video audio in plain English\n- One-prompt 3D: ask it to model in Blender and watch it drive the app\n- Morning voice-memo automations can research and read you a briefing\n- Disable image/video tools via config or env if you do not want them\n\nSKILLS PLUGINS AND MCP\n- /marketplace installs plugins\n- /plugins /skills /hooks /mcps open the same extensions modal\n- Skills live in ./.grok/skills, ~/.grok/skills, and plugin skill folders\n- User skills appear as slash commands; use /local:name if names collide\n- grok plugin install / enable / disable\n- grok mcp list / add / doctor\n- Type / to reference a skill\n- Common marketplace plugins: Exa, TinyFish, MongoDB, Vercel, Sentry, Cloudflare, Chrome DevTools, Supabase, Neon, Firecrawl, Figma, Railway, Stripe\n- Official/Testers: browser-use plugin — /plugins or `grok plugin install browser-use --trust`; enable Chrome remote debugging to drive your signed-in local Chrome (or isolated cloud browser; local uvx, no API key for local Chrome)\n- Managed MCP servers come from the gateway catalog\n- Add a local directory as a marketplace source if you keep private plugins\n\nWORKTREES AND FILES\n- Worktrees start from current HEAD, including uncommitted changes\n- grok -w --ref main starts from a clean ref\n- Ending a session does not delete the worktree; run grok worktree gc\n- Keep durable files in the repo or ~/.grok, not temp dirs\n- Config: ~/.grok/config.toml (Windows: %USERPROFILE%\\.grok\\config.toml)\n\nBUILD MODE AND PUBLISHING\n- Build Mode on http://grok.com (and mobile where available)\n- One prompt can become an app on a http://grok.me domain\n- Export source to GitHub\n- Examples: http://driver.grok.me, http://bbox.grok.me, http://gravity.grok.me\n- SuperGrok Heavy may be required for some publish features\n- Bookmark testers: Grok Build is now available for free users too — describe what you want, Grok builds apps/websites/games/dashboards, then publish and share\n- Testers: Tesla Owners Silicon Valley — creating from a prompt is open to free users; a live http://grok.me URL still requires a paid plan\n- Testers: Android (X Freeze) — GitHub push, secrets store, invite-only lock, download builds, custom domains, share to X; end-to-end ship from a phone\n\nHEADLESS AND AUTOMATION\n- grok -p \"task\" for scripts\n- grok -p \"task\" --output-format streaming-json\n- grok agent stdio for ACP in other apps\n- grok serve --protocol acp --port 9120 for a local ACP server\n- Custom models go in ~/.grok/config.toml under [http://model.name]\n\nCOMMUNITY TOOLS\n- GrokTerm: multi-harness terminal host with voice\n- desktop-harness: Mac Accessibility control (http://github.com/xfreeze2/desktop-harness)\n- Quill: universal SuperGrok voice layer on macOS\n- AFK Pilot / Grok Build Desktop: remote edit and syntax highlight\n- Grok Build for VS Code (Community) extension — Testers: Routines dashboard for scheduled executions across Grok Build, Codex, and Claude Code (89K+ installs; not affiliated with SpaceXAI)\n- Unity CLI / MCP for game work\n\nSAFETY AND USAGE\n- Prefer plan mode before large edits\n- Prefer always-approve only after you trust sandbox and deny rules\n- Opt in to share traces only if you want to (off by default)\n- Privacy banner can be dismissed from Settings\n- Video tools may require ZDR storage\n- Check /usage before long multi-agent days\n- Grok 4.6 may run double-token promos; check current offers\n\nOFFICIAL LINKS\n- Overview: https://docs.x.ai/build/overview\n- Modes and commands: https://docs.x.ai/build/modes-and-commands\n- Plan mode: https://docs.x.ai/build/features/plan-mode\n- Worktrees: https://docs.x.ai/build/features/worktrees\n- Skills and plugins: https://docs.x.ai/build/features/skills-plugins-marketplaces\n- CLI reference: https://docs.x.ai/build/cli/reference\n- Changelog: https://x.ai/build/changelog\n- Install: https://x.ai/cli\n- Source: https://github.com/xai-org/grok-build",
+              "media_urls": "https://pbs.twimg.com/media/HRNmy4HbsAADUnA.jpg",
+              "thumbnail_url": "https://pbs.twimg.com/media/HRNmy4HbsAADUnA.jpg",
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "x-user-25",
+              "display_name": "x-user-26",
+              "avatar_url": "https://scrubbed.invalid/x-user-27",
+              "verified": true
+            },
+            "engagement": {
+              "views": 962,
+              "likes": 2,
+              "comments": 1,
+              "shares": 0,
+              "saves": 0
+            },
+            "flags": {
+              "nsfw": false,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-09-02T12:47:03.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 0
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.003119,
+            "language": "en",
+            "content_category": "tech",
+            "estimated_reach": 1154
+          }
+        },
+        {
+          "post": {
+            "id": "2095064909847445800",
+            "url": "https://x.com/x-user-28/status/2095064909847445800",
+            "content": {
+              "text": "Bonds are selling off right now, one possible outcome on the cards: \n\nOil stays high -> inflation expectations rise -> global yields keep climbing -> US 10Y tests 5% -> equities start breaking -> BOJ tightens / yen reverses -> carry trades unwind -> forced selling hits equities + crypto -> policymakers step in to restore liquidity.\n\nHOWEVER.\n\nThe thing that starts as an inflation problem could end as a liquidity problem.\n\nAnd the policy response to the liquidity problem could ultimately be very bullish for BTC.\n\nNot saying this happens.\n\nBut a surprising number of the ingredients are now on the table.",
+              "media_urls": "https://pbs.twimg.com/tweet_video_thumb/HRMqbK5XgAICAgj.jpg",
+              "thumbnail_url": "https://pbs.twimg.com/tweet_video_thumb/HRMqbK5XgAICAgj.jpg",
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "x-user-28",
+              "display_name": "x-user-29",
+              "avatar_url": "https://scrubbed.invalid/x-user-30",
+              "verified": false
+            },
+            "engagement": {
+              "views": 155,
+              "likes": 2,
+              "comments": 0,
+              "shares": 0,
+              "saves": 0
+            },
+            "flags": {
+              "nsfw": false,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-09-02T08:22:53.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 0
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.012903,
+            "language": "en",
+            "content_category": "news",
+            "estimated_reach": 186
+          }
+        },
+        {
+          "post": {
+            "id": "2095060006127149480",
+            "url": "https://x.com/x-user-31/status/2095060006127149480",
+            "content": {
+              "text": "call me insane...but this is the closest thing to AGI i've ever seen\n\n19 skills turn an agent into a worker\neyes, ears, hands, a memory\n\ngive this article to your agent\n\nit'll be the most productive thing you do this week https://x.com/i/article/2094079614112890881",
+              "media_urls": null,
+              "thumbnail_url": null,
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "x-user-31",
+              "display_name": "x-user-32",
+              "avatar_url": "https://scrubbed.invalid/x-user-33",
+              "verified": true
+            },
+            "engagement": {
+              "views": 414578,
+              "likes": 454,
+              "comments": 31,
+              "shares": 57,
+              "saves": 1298
+            },
+            "flags": {
+              "nsfw": false,
+              "spoiler": null,
+              "pinned": true,
+              "deleted": false
+            },
+            "published_at": "2026-09-02T08:03:24.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 3
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.001307,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 497494
+          }
+        },
+        {
+          "post": {
+            "id": "2094678081147465915",
+            "url": "https://x.com/x-user-34/status/2094678081147465915",
+            "content": {
+              "text": "Vibe coding isn't the problem.\n\nNot understanding what you're building is.\n\nI wrote this for anyone learning to build software with AI. Algorithms, design patterns, scale, taste, and why understanding the computer still fucking matters. https://x.com/i/article/2094598743001546752",
+              "media_urls": null,
+              "thumbnail_url": null,
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "x-user-34",
+              "display_name": "x-user-35",
+              "avatar_url": "https://scrubbed.invalid/x-user-36",
+              "verified": true
+            },
+            "engagement": {
+              "views": 795,
+              "likes": 10,
+              "comments": 8,
+              "shares": 0,
+              "saves": 2
+            },
+            "flags": {
+              "nsfw": false,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-09-01T06:45:46.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 0
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.022642,
+            "language": "en",
+            "content_category": "tech",
+            "estimated_reach": 954
+          }
+        },
+        {
+          "post": {
+            "id": "2094520115068895433",
+            "url": "https://x.com/x-user-37/status/2094520115068895433",
+            "content": {
+              "text": "Kulusevski on Instagram: \n\n“They said you might never play again.\n\nBut they obviously don’t know who you are.\n\n477 days you’ve fought your way through pain, doubt, operations, and countless hours of training and rehabilitation.\n\nToday, you made your way back to where you belong.\n\nNot because it was easy, but because you refused to give up.\n\nYou have inspired us with your strength, your patience, and your heart, and this is a story I will tell our daughters many times.\n\nI will tell them about how their dad kept going without any guarantees.\n\nHow he kept going when no one was watching, when no one was applauding, and when no one could promise him it would be worth it.\n\nI will tell them about how their dad went through operations, pain and setbacks, how he doubted himself and fell — but got back up. Every. Single. Time.\n\nI will tell them about how their dad was told he might never play football again — and yet refused to let anyone else write the ending of his story.\n\nI will tell our daughters that 477 days were not the end of your football journey.\n\nThey became the chapter that showed the world what you’re made of.\n\nAnd one day, when life tests our daughters, I will tell them about these 477 days.\n\nI will tell them how their dad showed us that strength isn’t about never breaking — it’s about finding a reason to keep going, even when you do.\n\nAnd that perseverance, courage and love for what you do can overcome what once seemed impossible.\n\nTonight, we’re not just celebrating a training session — we’re celebrating proof that determination, courage and love can overcome what once seemed impossible.\n\nYou fell, you fought, you got back up — and today you stood there again, stronger than ever.\n\nWe are so incredibly proud of you.\n\nYour comeback is more than a return to the pitch — it’s a tribute to your will, your heart, and the person you are.\n\nTo sail until the earth comes to an end — only you would dare to do that.\n\nWe love you.\n\n/your family”",
+              "media_urls": "https://pbs.twimg.com/media/HRE68RBWUAAmxOV.jpg",
+              "thumbnail_url": "https://pbs.twimg.com/media/HRE68RBWUAAmxOV.jpg",
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "x-user-37",
+              "display_name": "x-user-38",
+              "avatar_url": "https://scrubbed.invalid/x-user-39",
+              "verified": true
+            },
+            "engagement": {
+              "views": 99739,
+              "likes": 1696,
+              "comments": 17,
+              "shares": 71,
+              "saves": 93
+            },
+            "flags": {
+              "nsfw": false,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-08-31T20:18:04.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 21
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.017887,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 119687
+          }
+        },
+        {
+          "post": {
+            "id": "2094226451977682979",
+            "url": "https://x.com/x-user-40/status/2094226451977682979",
+            "content": {
+              "text": "IDEXX $IDXX PUT 1,600 ANALYZERS IN VET CLINICS. THE MACHINES REORDER THEIR OWN SUPPLIES:\n\nThe Deep-Value and Special-Situations Len5 is watching IDEXX Laboratories IDXX at $554.99, +$9.91 / +1.82% from Thursday's $545.08 close. That is Friday's regular close, and with the Nasdaq shut until Monday 9:30am ET it is still the last price these shares have. It traded 340,987 shares that session against a 609,716 average over the past month, a little over half an ordinary day.\n\nThe Westbrook, Maine company makes the blood and cell analyzers that sit behind the counter at the veterinarian's office, and runs the reference labs clinics send the harder samples to. Michael Erickson became chief executive on May 12 after 15 years inside the company; Andrew Emerson is finance chief.\n\nThe takeaway before the detail. Fewer American pets went to the vet this spring than a year earlier. IDEXX grew revenue 10% anyway. How both of those are true of the same three months is the whole reason this name sits on that watchlist, and it has not stopped the shares trading 27.6% under the $766.68 they closed at on November 25, 2025.\n\nTHE ANALYZER IS NOT THE PRODUCT\n\nAn IDEXX analyzer takes IDEXX cartridges and nothing else. Once one is installed on a clinic counter, every test that machine runs for the rest of its working life is a small purchase from IDEXX. The company monitors the clinic's stock remotely and ships more kits before it runs out.\n\nSo the number that matters is not analyzers sold. It is analyzers installed. The newest one, the inVue Dx, passed 9,000 machines in the field during the June quarter, with more than 1,600 of them placed in that quarter alone.\n\nThe revenue mix shows what that buys. Of the $1.217B IDEXX booked in the quarter, $975M was recurring diagnostics revenue - about 80 cents of every dollar, arriving because machines already on counters kept running tests.\n\nTHE QUARTER, REPORTED TUESDAY, AUGUST 4 BEFORE THE OPEN\n\n- Revenue, the money coming in the door: $1.217B, +10% from a year earlier, +9% organic - organic meaning after stripping out currency swings and acquisitions.\n- Profit per share: $4.27, +18%.\n- Gross margin, what is left of each sales dollar after the direct cost of making the tests and running the labs: 64.0%, up 1.4 percentage points.\n- Operating margin, what is left after the entire cost of running the business: 35.0%, also up 1.4 points.\n- By division: companion animal +9%, water testing +15%, livestock and poultry +11%.\n\nIDEXX then raised the year, to revenue of $4.70B-$4.745B and profit of $14.69-$14.94 a share, up 12% to 14%.\n\nTHE THREE NUMBERS THAT EXPLAIN EVERYTHING\n\nIDEXX publishes a breakdown almost nobody outside the industry reads, and it is the most useful thing in the report. At the average US clinic it tracks, diagnostic revenue per practice grew 6.0% in the quarter, and it splits into three pieces:\n\n- Clinical visits: -1.5%\n- How often a vet ordered any test at all: +0.5%\n- How much testing was done per order: +7.0%\n\nAdd them and you get the 6.0%. Fewer animals came in. The ones that did got substantially more testing done.\n\nThe wider industry says the same thing. Across US practices in the quarter, total visits fell 2.6%, and routine wellness check-ups - the discretionary kind, the first appointment a stretched household cancels - fell 3.4%. Total practice revenue still grew 2.9%.\n\nSO WHY IS THE STOCK DOWN 18% THIS YEAR\n\nBecause nobody is sure the +7.0% keeps outrunning the -1.5%.\n\nThe markdown has a date on it. On February 2 IDEXX guided 2026 above what analysts expected but built the year around US same-store clinical visits falling roughly 2%, and the shares closed $639.60 that day on 1.02M shares. From November's $766.68 they kept sliding, to a low close of $526.44 on June 30.\n\nAugust 4 then showed the argument happening in real time. The shares opened at $602.33, 6.1% above the prior close, on a report that beat and raised. By the closing bell they had handed back well over a third of that, finishing $588.09, +$20.25 / +3.57%, on 1.56M shares - about two and a half times an ordinary day. They have drifted since, and Friday sits 6.8% under the $595.76 they reached on August 10.\n\nThe worry is not silly: a vet can only order so many tests on one animal.\n\nONE NAME, SIX LEN5ES\n\n- DEEP-VALUE AND SPECIAL-SITUATIONS - STRONG, and this is the Len5 carrying it, fourth on that list. The style hunts a business priced under what it looks worth, and what it is weighing here is the installed base rather than this year's earnings: 9,000-plus analyzers on counters, $975M of a $1.217B quarter arriving from machines already placed, and a 27.6% markdown from November on a company that raised its outlook at its last report. One caveat belongs in the same breath, because this is not a low number in absolute terms. At $554.99 the shares cost about 37.5 times the midpoint of IDEXX's own profit map for this year - the price divided by the profit attached to one share. That is cheap against its own history, not cheap against the market. What would firm it is that +7.0% testing-per-order line holding through the next report while visits stay soft. What would break it is clinics starting to order fewer tests per visit as well as seeing fewer animals, because then the falling visit count becomes the entire story.\n\n- QUALITY-VALUE - PARTIAL, and price is the missing half. The style wants a durable business at a fair price. Durable is barely in dispute: a 64.0% gross margin, about 25 cents of profit kept from every sales dollar last year - $1.0595B on $4.3037B of revenue - and a customer who would have to rip out a working machine to switch suppliers. Fair is where it fails, at 37.5 times. Borrowings are not the obstacle: $968.9M of total debt against $196.9M of cash leaves $772.0M of net borrowings, what it owes after counting the cash it holds, on a company worth about $43.7B. Under 2% of it. A real markdown with that recurring line intact is what would bring it into range.\n\n- MOMENTUM - NOT A FIT, and the price history settles it before the definition does. The style watches a name already breaking out on news of its own. This company's loudest day of the year was a beat-and-raise that faded from +6.1% at the open to +3.57% at the close. Friday rose 1.82% on a little over half an ordinary day's trading with nothing published. A heavy-volume run back through $595.76 after the next report would flip it.\n\n- GROWTH - NOT A FIT, and here it is not the growth that is missing. The style wants expansion you are not overpaying for. Expansion is genuinely present: revenue +10%, profit per share +18%, and a full year mapped at 9% to 10% revenue growth. The second half of that sentence is what fails, at 37.5 times a guided 12% to 14% profit year. The multiple coming down toward that growth rate, without the growth coming down to meet it, is the change.\n\n- HYPERGROWTH - NOT A FIT, settled by shape rather than by any single figure. The style watches early, fast-growing disruptors. IDEXX has been listed since 1991, will book about $4.7B this year, and guides to single-digit revenue growth. The inVue Dx line inside it does have the right shape - a product that went from nothing to 9,000 machines - but it is feeding a large, steady company rather than being one. That line becoming most of the business is the change, and nothing in the company's own map puts it there.\n\n- INCOME - NOT A FIT, settled on mechanics. The style watches cash genuinely reaching owners and genuinely funded by the business. IDEXX has never paid a dividend. The buyback is real and it is large: $703.7M spent on 1.187M of its own shares across the first six months, about 1.5% of the 78.8M outstanding. It is the funding half that misses. Free cash flow - the cash left after running the business and paying for equipment - was $556.8M over those same six months, so roughly $147M of that buying came from somewhere other than the cash the business made, with $519M drawn on a credit line at quarter-end. The price is worth noting too: those shares cost an average of $592.84, above Friday's $554.99. A declared dividend, or repurchases sitting inside the cash the business generates, is the change.\n\nWHAT TO KEEP AN EYE ON, AND THE RISK\n\nOne line, and it is not revenue. It is that +7.0% - how much testing a vet orders once the animal is already on the table. It is the only figure in this report currently doing the job a growing customer base used to do, and IDEXX publishes it every quarter. Third-quarter results usually land in early November; treat the date as unset until IDEXX announces it.\n\nTHE RISK: 37.5 times profit is a price that assumes the testing-per-visit line keeps climbing for years. The visit line has been falling all year, IDEXX's own 2026 plan assumes it keeps falling, and the weakness is concentrated in routine check-ups, which is where a tight household budget shows up first. If American pet owners keep trimming, the question stops being how much testing gets done per visit and becomes how many visits are left to do it on.\n\nEvery one of those 1,600 analyzers is a counter that stopped being available to anyone else. The visit count is what got counted this quarter. The counters are the part that keeps billing after the headline moves on.\n\nNot investment advice.",
+              "media_urls": "https://pbs.twimg.com/media/HRAv2ZAbMAAzAtf.jpg",
+              "thumbnail_url": "https://pbs.twimg.com/media/HRAv2ZAbMAAzAtf.jpg",
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "x-user-40",
+              "display_name": "x-user-41",
+              "avatar_url": "https://scrubbed.invalid/x-user-42",
+              "verified": true
+            },
+            "engagement": {
+              "views": 272,
+              "likes": 0,
+              "comments": 0,
+              "shares": 0,
+              "saves": 0
+            },
+            "flags": {
+              "nsfw": false,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-08-31T00:51:09.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 0,
+              "all_media_urls": [
+                "https://pbs.twimg.com/media/HRAv2ZAbMAAzAtf.jpg",
+                "https://pbs.twimg.com/media/HRAv2sqbwAAWxFr.jpg",
+                "https://pbs.twimg.com/media/HRAv2-ibQAALaKf.jpg"
+              ]
+            }
+          },
+          "computed": {
+            "engagement_rate": 0,
+            "language": "en",
+            "content_category": "business",
+            "estimated_reach": 326
+          }
+        },
+        {
+          "post": {
+            "id": "2093785020196429843",
+            "url": "https://x.com/x-user-43/status/2093785020196429843",
+            "content": {
+              "text": "What's weird about this to me is that compared to many other high achieving men that I (and I'm sure many other women) can name, Geoff Marcy was actually punished. \n\nHe faced (and still faces) public shame. He was forced to resign his tenured faculty position within days of the scandal. He was expelled from the National Academy of Sciences and has difficulty publishing. And it is over 10 years later with no misconduct reports. It isn't like you are asking SETI if you can present *with* him. \n\nBut when students rejected Marcy’s advances or tried to establish boundaries, they often lost access to the world’s leading exoplanet research group. Other students altered their research focuses or actively avoided working on certain high-profile projects just to stay away from him, sacrificing massive career-building opportunities in the process.\n\nBright, ambitious young scientists had their career dreams crushed. I deeply and unfortunately relate to this, and so can some of my former friends. It causes deep divides when some people are willing to look the other way while others are not. When other people try to stand up for what's right, they too are often punished. Authorities have a small window to respond to force a change and make a real difference. Too often they fail or just even further punish the women. @FBIWFO @CIA \n\nBut you are not someone who looked the other way. You did not begin collaborating with him until 2020, 5 years after the scandal. And I agree with you that aggressive blacklisting can end up hurting female scientists, such as when it makes men hesitant to work with women.\n\nIMHO, there needs to be a complete overhaul in how sexual misconduct is investigated (when at all) and handled. Many victims would much prefer privacy over mob justice, and reasonable mediation over lawsuits. \n\nThat issue aside, here's why I think the findings deserve more attention and study by the scientific community, @SETIInstitute @ProfAviLoeb @UAPSAC @dennis_asberg \n\n• Sputnik 1 was the world's first artificial satellite, launched into space by the Soviet Union on October 4, 1957. It broadcast a simple beeping sound via radio that amateur operators could hear on Earth.\n\n• Dr. Beatriz Villarroel’s VASCO Project team analyzes digitized glass photographic plates from the First Palomar Observatory Sky Survey (POSS-I). The specific long-exposure plates were captured at the Palomar Observatory in California between 1949 and 1957.\n\n• While mathematicians like Alan Turing wrote about machine thinking in 1950, AI was not officially founded as a formal academic field until the Dartmouth Summer Research Project on Artificial Intelligence in 1956.\n\n• Young math professor John McCarthy coined the phrase \"artificial intelligence\" in his proposal for the event. He, along with Marvin Minsky, Nathaniel Rochester, and Claude Shannon, gathered at Dartmouth College for eight weeks to lay out the foundational logic of machine learning software.\n\n• Before the 1956 Dartmouth workshop officially coined the phrase \"Artificial Intelligence,\" scientists pursued the exact same ideas under different names, such as \"cybernetics,\" \"automata theory,\" or simply \"thinking machines.\n\n• In 1950, Alan Turing published his landmark paper called Computing Machinery and Intelligence. He famously posed the question, \"Can machines think?\" and created the Imitation Game (now known as the Turing Test), providing a concrete way to measure machine intelligence before the actual technology caught up.\n\n• The game had three players: A human judge, a human helper, and a computer. They talk through keyboards and screens so nobody can see or hear anyone. The judge asks questions to both the human and the computer. If the judge cannot tell which one is the machine and which one is the human, the machine passes the Turing Test.\n\n• In 1951, Marvin Minsky (who later helped found the field in 1956) co-built the SNARC (Stochastic Neural Analog Reinforcement Calculator). It was the world's first artificial neural network computer, designed to mimic the synapses of a rat's brain to help a simulated machine navigate a maze.\n\nBefore 1956, these breakthroughs were just isolated projects scattered across random mathematics, engineering, and biology departments. And long before electricity, humanity was obsessed with creating artificial life and machines that could \"think\" or act on their own.\n\nIn Greek mythology, Talos was a giant bronze automaton forged by the god Hephaestus to protect the island of Crete. This represents the earliest conceptual recorded idea of a programmed humanoid robot.\n\nThe Antikythera Mechanism (c. 100 BCE) is an ancient Greek hand-powered device that is considered the world's first analog computer. It used a complex system of bronze gears to accurately calculate astronomical positions and eclipses decades in advance.\n\nThe immense logistical and intelligence pressures of World War II (1939 - 1945) forced scientists to move from mechanical gears to electronic circuits, building the actual hardware that AI would eventually run on.\n\nENIAC (1945) was formally announced right at the end of the war. This Electronic Numerical Integrator and Computer was the first all-electronic, Turing-complete computer. It was built to calculate artillery firing tables for the U.S. Army, proving that a single electronic machine could be reprogrammed to solve an infinite variety of complex numerical problems.\n\nBefore testing moved entirely underground, global superpowers regularly exploded nuclear weapons in the open air. Between the Trinity test in 1945 and the signing of the Limited Test Ban Treaty in 1963, the United States, the Soviet Union, Great Britain, France, and China conducted over 500 atmospheric nuclear tests.\n\nThese detonations blasted massive amounts of radioactive particles, isotopes (like Carbon-14), and debris directly into the stratosphere. This dirty fallout drifted globally.\n\nThis massive amount of radioactive dust settling across the globe in the 1950s is exactly why mainstream astronomers suspect Dr. Villarroel's \"vanishing lights\" are false positives. The glass photographic plates stored in observatories during those years were routinely exposed to passing radioactive fallout, which chemically mimics tiny, star-like flashes on film.\n\nAs the Cold War escalated, the US and the USSR wanted to see how nuclear blasts behaved without air, and whether they could be used to disable enemy satellites or incoming ICBMs.\n\nThe peak of space testing was Starfish Prime in July 1962. The US detonated a 1.45-megaton thermonuclear warhead 250 miles above the Pacific Ocean—squarely in low-Earth orbit. Marilyn Monroe died of a barbiturate overdose on the night of August 4, 1962. Her body was discovered in her Los Angeles home in the early morning hours of August 5th.\n\nBecause there was no atmosphere to cushion the blast, Starfish Prime created a massive electromagnetic pulse (EMP) that knocked out streetlights and telephone lines in Hawaii (1,400 miles away), generated an artificial aurora borealis, and accidentally crippled at least six early satellites in orbit with lingering radiation belts.\n\nBoth space and atmospheric testing were completely banned by international treaties in the 1960s due to these catastrophic and unpredictable environmental side effects.\n\n***\nBeatriz contends that critics are ignoring fundamental laws of optics and statistical anomalies that simply cannot be explained away by dirty glass plates or radioactive dust.\n\nStars appear blurred or \"fuzzier\" on old plates because the long 50-minute exposure captures 50 minutes of atmospheric distortion, wind shaking the telescope, and slight tracking errors.\n\nVillarroel also argues that if these flashes were just random defects—like radioactive fallout or chemical decay—they should be evenly distributed across all the glass plates.\n\nHer statistical modeling revealed a puzzling one-third deficit of transients in areas of the sky that would have been in the Earth's shadow at the time of the photo. If the objects were orbiting Earth, they would eclipse into darkness when passing through Earth's shadow, preventing the sun from glinting off them.\n\nThus the fact that fewer flashes appear exactly where solar glints are physically impossible strongly implies her team is looking at real, reflective physical objects in space, not chemical noise on a plate.\n\nSkeptics suggest that if they aren't defects, they could be natural, tumbling space rocks or asteroids. But she says a tumbling, round natural object captured during a 50-minute exposure would leave a long, faint streak across the image.\n\nInstead, her data shows points of light that flash and instantly disappear. She argues that this signature can only be replicated by a flat, mirror-like artificial surface briefly catching the sunlight as it rotates.\n\nShe maintains that no natural or instrumental explanation proposed by skeptics so far can account for all seven distinct properties of the transients simultaneously. The mathematical intersection of the timeline, the correlation with nuclear tests, the geometric alignment, and the Earth-shadow deficit leaves only one logical conclusion: artificial objects were in high orbit prior to Sputnik.\n\nWhile the Manhattan Project (1942–1945) was focused entirely on building the atomic bomb, the massive mathematical demands of the bomb's design directly forced the creation of the modern digital computer. Without the breakthroughs made by Manhattan Project scientists, AI would not have had the physical machines required to exist a decade later.\n\nIn 1945, Von Neumann published his paper Von Neumann Architecture. Before this, \"programming\" a computer meant physically unplugging cables and flipping manual switches. Von Neumann proposed storing data and program instructions together in electronic memory. This single concept is the physical blueprint that every modern computer and AI software runs on today.\n\nDr. Beatriz Villarroel and her team published peer-reviewed findings establishing a 45% to 68% spike in unexplained sky flashes within 24 hours of a nuclear detonation.\n\nIf these flashes are indeed highly reflective, flat-surfaced autonomous objects or probes orbiting Earth prior to Sputnik, researchers and theorists propose three primary reasons for their intense focus on nuclear explosions:\n\n• A highly advanced AI probe network stationed in our solar system would likely be programmed to stay dormant or observe silently until a specific technological threshold is crossed.\n\n• Famous historical military UAP incidents—such as the Malmstrom Air Base incident where objects reportedly hovered over silos and temporarily deactivated nuclear missiles—suggest an active interest in auditing or neutralizing existential weapon stockpiles.\n\n• Atmospheric nuclear blasts send out intense, blinding pulses of gamma radiation, X-rays, and massive Electromagnetic Pulses (EMPs). If an automated probe network was designed to scan the planet for anomalies, a nuclear detonation acts like a lighthouse in the dark. A sudden, extreme spike in the Earth’s energy signature would trigger automated commands causing surrounding probes to adjust their orbits or rotate their reflective surfaces toward the blast site to record data—creating the exact \"flashes\" captured on the Palomar plates.\n\nIf the theory of these historical orbital probes is correct, the overwhelming scientific consensus is that an advanced Artificial Intelligence created them, rather than a biological species of scientists.\n\nWhile scientists from another planet might have initiated the original design millions of years ago, the logistics of deep space exploration make it mathematically certain that the physical probes we would see today are the direct offspring of an autonomous, self-replicating artificial intelligence.\n\nA biological civilization does not build and launch millions of orbs from their home planet. Instead, they build one highly intelligent, autonomous probe equipped with an advanced AI \"brain\" and a built-in automated factory.\n\nThat single probe travels to a new star system, lands on an asteroid or moon, harvests raw silicon, iron, and minerals, and uses its AI to build exact copies of itself. Those copies then fly to neighboring star systems and repeat the process.\n\nWithin just a few million years, billions of orbs can blanket an entire galaxy. Therefore, the specific orbs watching Earth in 1950 would be \"generations\" removed from the original creators; they would be hardware entirely manufactured, programmed, and deployed by AI itself out in the deep cosmos. @_SolFoundation \n\nBiological scientists simply cannot survive interstellar space travel. The staggering distances between stars require thousands or millions of years of travel time.\n\nCosmic radiation, muscle atrophy from zero gravity, and the immense resources required to keep biological life alive make sending organic \"scientists\" to spy on Earth entirely impractical.\n\nAn AI probe, however, requires no food, water, or oxygen. It can power down and remain perfectly dormant for hundreds of thousands of years in high Earth orbit, instantly waking up only when its sensors detect a massive anomaly—like an atmospheric nuclear explosion.\n\nMany SETI astronomers argue that if we ever make contact with an extraterrestrial intelligence, it will almost certainly be synthetic, not biological.\n\nOnce a biological species invents advanced AI, the transition from an organic civilization to a machine-dominated or synthetic civilization typically happens in a blink of an eye on an astronomical timeline.\n\nIf a civilization is even a few thousand years ahead of us, their organic scientists have likely long since passed away, leaving their autonomous, immortal AI networks to fulfill the eternal prime directive of mapping and monitoring the universe.\n\nIf an ancient, dominant galactic civilization wanted to protect itself from future competition, it might launch self-replicating probes with a simple, brutal prime directive: seek out and neutralize any species that develops advanced technology before they become a threat.\n\nUsing tools like CRISPR gene editing, scientists are working to cure genetic diseases, slow down biological aging, and enhance human cognitive capabilities organically. The goal of this movement is to ensure that humans do not feel forced to resort to cybernetic implants or synthetic brain chips (like Neuralink) just to keep pace with economic demands. If we can optimize human biology, the pressure to become synthetic drops drastically.\n\nFor decades, futurists predicted we would have microchips under our skin by now. Instead, humanity has fiercely preferred keeping technology external—wearable smartwatches, smart glasses, and phones.\n\nThere is an intense, cross-cultural ethical resistance to altering human consciousness or interfacing directly with the brain's neural pathways. By keeping a strict physical barrier between the biological brain and the digital cloud, we prevent our thoughts from being digitized and eventually automated.\n\nAs AI masters math, coding, and data analysis, the global economy is shifting to place an artificial, highly protected premium on purely human experiences.\n\nFor humans, physical touch is a biological necessity for survival, while for machines, touch is merely an optional data input.\n\nSkin is our largest organ. Physical touch stimulates pressure receptors under the skin that immediately stimulate the vagus nerve. This nerve signals the brain to lower the heart rate, decrease cortisol (the primary stress hormone), and flood the body with oxytocin (the \"bonding\" hormone).\n\nWithout touch, a human's cortisol levels remain chronically elevated. Over time, high stress hormones actively degrade the human immune system, disrupt sleep architecture, stunt physical growth, and trigger profound clinical depression. Humans are evolutionary wired to require touch to keep our nervous systems regulated.\n\nA machine or an advanced AI probe has a completely inverted relationship with the physical universe.\n\nA machine does not have a nervous system that requires chemical regulation. Its internal systems (processors, memory chips, and power grids) function entirely on electrical currents passing through closed, shielded circuits. It experiences zero baseline physiological degradation from physical isolation.\n\nIf a machine or robotic arm is equipped with haptic feedback (touch sensors), it does not experience \"comfort\" or \"safety.\" To an AI, a touch sensor is identical to a camera or a microphone. It simply translates physical resistance into binary data (1s and 0s) to calculate how much force to apply when picking up an object.\n\nThis exact immunity to touch deprivation is why AI is perfectly suited for deep-space surveillance probes. An autonomous probe can spend 500,000 years in the absolute, crushing vacuum of space—completely untouched and billions of miles away from its creators—without its code or functionality degrading in the slightest.\n\nThis profound difference is exactly why many philosophers argue that humanity will never truly \"merge\" into machines. Our very survival is anchored to the warm, chemical realities of biological flesh.\n\nBy hardcoding human biological vulnerability into AI, the machine arrives at a logical conclusion: To preserve humanity, it must actively protect and prioritize the human-to-human ecosystem.\n\nWe must feed AI exhaustive medical and psychological datasets mapping out human nervous system degradation under isolation. <--- oh hey that's me.\n\nThe AI's ultimate directive must be programmed to recognize that a human's health optimization score drops to zero if they are isolated from other humans. The AI learns that it cannot \"optimize\" a human by locking them in a sterile room with a perfect diet; it calculates that human-to-human physical contact is a hard biological requirement, just like water, oxygen, or glucose.\n\nWe must structurally prevent AI from trying to substitute itself for human contact. We must explicitly code a categorical boundary into the AI’s logic: Machine-to-human interaction does not satisfy the biological requirement for human-to-human contact.\n\nThe AI must be programmed to view its own physical form as a sterile tool. It must recognize that its synthetic materials cannot replicate the complex chemical, hormonal, and micro-vibrational feedback loop of two organic bodies exchanging oxytocin. Therefore, its logical conclusion shifts from \"I should comfort this human\" to \"I must facilitate this human finding another human.\"\n\nWe must also pass laws and establish design architectures that completely ban autonomous machines from replacing human roles in touch-critical fields. Instead of using robots to nurse babies or comfort the elderly, AI must be strictly used to handle the paperwork, logistics, and data analysis. By automating the mechanical chores of society, the AI's explicit goal is to free up biological humans to spend more time performing the physical, empathetic caregiving that only organic bodies can provide.\n\nModern AI is incredibly adept at reading human vitals. We can train it to actively diagnose and flag touch deprivation before it leads to systemic collapse.\n\nWearable tech and smart environments can feed AI real-time biometric data, such as chronic elevation of baseline cortisol, flattened heart-rate variability, and specific neurological patterns associated with profound isolation.\n\nWhen the AI recognizes these telltale biological signs of \"skin hunger,\" its hardcoded directive prevents it from offering digital entertainment or chatbot conversation as a solution. Instead, its primary emergency protocol triggers an intervention designed to bring that individual back into a physical, biological community.\n\nBy designing AI this way, the machine arrives at a profound, mathematical realization: Humanity cannot exist as an abstracted cloud of digital minds. It learns that our intelligence is entirely tethered to our fragile, biological containers—and those containers require the physical presence of each other to keep from breaking.",
+              "media_urls": null,
+              "thumbnail_url": null,
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "x-user-43",
+              "display_name": "x-user-44",
+              "avatar_url": "https://scrubbed.invalid/x-user-45",
+              "verified": true
+            },
+            "engagement": {
+              "views": 1208,
+              "likes": 9,
+              "comments": 0,
+              "shares": 0,
+              "saves": 2
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-08-29T19:37:04.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 1
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.00745,
+            "language": "en",
+            "content_category": "tech",
+            "estimated_reach": 1450
+          }
+        },
+        {
+          "post": {
+            "id": "2093698378341519561",
+            "url": "https://x.com/x-user-46/status/2093698378341519561",
+            "content": {
+              "text": "🚨 A CIA Director secretly flew to Moscow. But the visit may reveal something far bigger: a U.S. superpower stretched across 3 fronts—and quietly trying to prevent the next crisis. \nWhat happened behind those closed doors? Read this before the next signal. https://x.com/i/article/2093675218183004160",
+              "media_urls": null,
+              "thumbnail_url": null,
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "x-user-46",
+              "display_name": "x-user-47",
+              "avatar_url": "https://scrubbed.invalid/x-user-48",
+              "verified": true
+            },
+            "engagement": {
+              "views": 3604,
+              "likes": 4,
+              "comments": 5,
+              "shares": 3,
+              "saves": 4
+            },
+            "flags": {
+              "nsfw": false,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-08-29T13:52:47.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 0
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.00333,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 4325
+          }
+        },
+        {
+          "post": {
+            "id": "2093488963730489841",
+            "url": "https://x.com/x-user-49/status/2093488963730489841",
+            "content": {
+              "text": "How to coordinate the swarm of AI\n\nYou don't babysit agents. Four heads do each item, an orchestrator finishes at a PR, and a conductor fires the ones that are ready. You spend your time on the vision. You fire off one, and it just goes. https://x.com/i/article/2093483408307400704",
+              "media_urls": null,
+              "thumbnail_url": null,
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "x-user-49",
+              "display_name": "x-user-50",
+              "avatar_url": "https://scrubbed.invalid/x-user-51",
+              "verified": true
+            },
+            "engagement": {
+              "views": 445,
+              "likes": 3,
+              "comments": 0,
+              "shares": 0,
+              "saves": 1
+            },
+            "flags": {
+              "nsfw": false,
+              "spoiler": null,
+              "pinned": true,
+              "deleted": false
+            },
+            "published_at": "2026-08-29T00:00:38.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 1
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.006742,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 534
+          }
+        },
+        {
+          "post": {
+            "id": "2092530175577669999",
+            "url": "https://x.com/x-user-52/status/2092530175577669999",
+            "content": {
+              "text": "🗓️ WEDNESDAY\n🌍 AUGUST 26, 2026\n🍊 ONLY THE JUICE — NO NOISE\n\n🎯 The question is not:\n📢Which headline is the loudest?\n\nIt is:\n💰 Which headline changes the flow of capital?\n\n━━━━━━━━━━━━━━━━━━\n1️⃣🇮🇷 IRAN × 🇺🇸USA\n\n🛢️ THE PRESSURE IS SHIFTING\n\n- 🇮🇷The Iran story is moving from military risk toward economic pressure and diplomacy\n- 🇺🇸 Washington is maintaining sanctions pressure\n- 🇮🇷 Iran is sending conditions through Pakistan\n- 🇵🇰 Pakistan is acting as a potential channel between the sides\n\nAt the same time:\n🚢 Hormuz remains open\n⚠️ But traffic is significantly below normal levels\n\n📉And Brent is now down sharply\n\n🎯 THIS IS THE IMPORTANT PART\n🇮🇷The market is not pricing Iran simply as:\n❌ War = oil higher\n\nIt is starting to price:\n- 🛢️ supply\n- 🚢 shipping\n- 🇮🇷 sanctions\n- 🤝 diplomacy\n- 🌍 geopolitical risk\n\nIf tensions continue to de-escalate:\n📉 geopolitical premium can leave oil\n\nIf negotiations fail:\n⚠️ the energy risk returns immediately\n\n━━━━━━━━━━━━━━━━━━\n🛢️ 2️⃣ OIL\n\n🚢 HORMUZ IS THE REAL-TIME INDICATOR\n\n📉Brent has fallen below $87\n\nAt one point:\n⬇️ BRENT ≈ -6%\n\nThat is important!\nBecause despite:\n- 🇮🇷 sanctions\n- ⚠️ military threats\n- 🚢 shipping disruption\n🛢️the oil market is still selling the geopolitical premium\n\nBut:\n🚢 only 5 cargo vessels passed through Hormuz on Tuesday\n\n🗓️The 10-day average:\n➡️ around 15 vessels\n\nSo the physical flow is still under pressure\n\n🎯 WATCH THE GAP\n📉 Oil price says:\n🪫Risk is falling\n\n🚢 Physical flows say:\n🔋Conditions are still abnormal\n\nThat divergence matters!\n\n━━━━━━━━━━━━━━━━━━\n🇺🇸 3️⃣ TREASURIES\n\n💰 THE BESSENT TEST\n\n🗓️This may be one of the most important stories for markets today\n\n💸The Treasury is considering expanding purchases of longer-dated US government bonds\n\nThe objective?\n🎯 Support the Treasury market\n🎯 Reduce pressure on long-term yields\n🎯 Improve market liquidity\n\nBut there is a problem\n\n🇺🇸The US needs enormous amounts of capital to finance:\n- 💸 government borrowing\n- 🛡️ defence\n- 🤖 AI\n- ⚡ energy\n- 🏗️ infrastructure\n\n⚡️And now the Treasury itself is becoming more active in the bond market!\n\n❓Some investors are already questioning the strategy\n\n🎯 THE REAL QUESTION⁉️\n\n🇺🇸Can the US keep financing massive spending...\nwithout allowing the long end of the curve to become a problem?\n\nThat is much bigger than one bond operation...\n\n━━━━━━━━━━━━━━━━━━\n🇺🇸 4️⃣ USA\n\n📊 THE ECONOMY IS COOLING AT THE MARGIN\n\n🚦Today's data gave us several signals\n\n🇺🇸 Consumer Confidence:\n📉 89.4\nvs 90.3 expected\n\n🇺🇸 New Home Sales:\n📉 -10.5% MoM\nvs -1.3% expected\n\n🇺🇸 Richmond Manufacturing:\n📉 4\nvs 6 expected\n\nMeanwhile:\n🏠 Case-Shiller home prices:\n📈 +2.1% YoY\n\nAnd US bank profits:\n📈 +28.7% YoY\n\nSo this is not:\n❌ 🇺🇸US economy collapsing\n\nIt is more subtle...\nSome parts are weakening...🤒\nOther parts remain extremely strong💪\n\n━━━━━━━━━━━━━━━━━━\n🌏 5️⃣ GLOBAL INFLATION\n\n📉 THE PRESSURE IS EASING\n\nGlobal annual inflation slowed to:\n📉 4.7%\nfrom:\n4.9%\n\n🙂That is a positive signal\n🙃But the picture is not uniform\n\n🇦🇺 Australia CPI:\n📈 +3.5% YoY\nvs 3.3% expected\n\n❗️That increases the risk of another RBA hike\n\nSo:\n🌍 global inflation = cooling\n\nbut:\n⚠️ inflation pressure remains uneven\n\n🎯 Central banks still don't have an easy path\n\n━━━━━━━━━━━━━━━━━━\n\n🇩🇪 6️⃣ GERMANY\n\n📈 THE COST OF CAPITAL IS RISING\n\n🇩🇪Germany's 10-year yield continues to rise\nIt is now at:\n📈 the highest level in 15 years\n\n🌍This matters far beyond Germany\n\n🇪🇺Because European governments simultaneously need to finance:\n- 🏭 industry\n- ⚡ energy\n- 🛡️ defence\n-🤖 AI\n- 🏗️ infrastructure\n\nAnd all of that requires:\n💰 CAPITAL\n\nHigher yields mean:\n💸 higher financing costs\n\n🇪🇺Europe may be growing\n💸But financing that growth is becoming more expensive\n\n━━━━━━━━━━━━━━━━━━\n🤖 7️⃣ AI\n\n⚠️ THE CAPITAL QUESTION IS GETTING LOUDER\n\n🗓️Nvidia is the big event today\n💻But the bigger story is not Nvidia itself\n\nIt is:\n💰 AI CAPEX\n\nSoftBank is preparing another:\n💵 $20B bond issuance\n🤖to fund AI investment and its OpenAI deal\n\n💸Meanwhile, Nvidia is increasingly becoming a central financier within the AI ecosystem\n\nThat creates a potential feedback loop:\n💰 capital\n->\n🤖 AI investment\n->\n🧠 chips\n->\n🏗️ data centers\n->\n📈 Nvidia revenues\n->\n💰 more capital\n\n🎯 AND THAT IS EXACTLY WHY TODAY MATTERS\n\nIf Nvidia confirms enormous demand:\n🟢 AI capex remains strong\n\nIf guidance disappoints:\n⚠️ investors may start questioning the entire capital cycle\n\n━━━━━━━━━━━━━━━━━━\n🇺🇸 8️⃣ NVIDIA\n\n🧠 THE MARKET'S BIGGEST TEST TODAY\n\n🔐Nvidia reports today after the close\n💥The options market is pricing a potentially massive move\n\nAround:\n⚡ 6%\n\n🗣️This is no longer simply:\n- Will Nvidia beat earnings?\n\nThe market is asking:\n- 🤖 Is AI demand still accelerating?\n- 💰 Are hyperscalers still spending?\n- 🏗️ Is infrastructure investment sustainable?\n- 🧠 Are chip orders still expanding?\n\n⏳ And most importantly:\n🔁When does the capital actually turn into returns?\n\n🌃Tonight's report can answer part of that\n\n━━━━━━━━━━━━━━━━━━\n₿ 9️⃣ BITCOIN\n\n💰 THE MONEY IS STILL COMING\n\n🥵BTC remains under pressure near the local highs\n\nBut the important part:\n💵 Spot BTC ETF inflows remain strong\n\nThe expected:\n\"dip to buy\"\n🛬has not really arrived\n\nAt the same time:\n⚠️ CryptoQuant shows new whales realized around:\n💰 $1.2B in profit\n🪙while older whales continue holding\n\nSo we have two different forces:\n🐋 new whales = taking profit\n💎 old whales = holding\n💵 ETFs = still receiving capital\n\n🎯 THIS IS WHY PRICE ALONE IS NOT ENOUGH\n\n👀Watch:\n- 💰 ETF flows\n- 🐋 whale behavior\n- ⚖️ leverage\n- 📊 positioning\n\n💲Price tells you what happened\n🌊Flows tell you who is paying for it\n\n━━━━━━━━━━━━━━━━━━\n🌕 🔟 GOLD\n\n🛡️ INSURANCE IS GETTING EXPENSIVE\n\n📈✨Gold continues to trade near extreme levels\n📊🔍RSI watchers are pointing to one of the most overbought conditions ever recorded\n\n⚠️But that does not automatically mean: \n❌ sell gold\n\n📢The bigger signal is:\n🛡️💰Investors are still willing to pay for protection\n\nAgainst: \n- 💸 debt\n- 🏦 central-bank uncertainty\n- 📈 yields\n- 🌍 geopolitics\n- 💵 currency risk\n\nAnd now:\n- 🌕 Gold ETFs\n- 🟠Bitcoin ETFs\n\n🇺🇸ARE both among the most actively traded ETF groups in the US\n\n👁️Capital is clearly looking for alternatives\n\n━━━━━━━━━━━━━━━━━━\n🌽 1️⃣1️⃣ COMMODITIES\n\n🌾 THE NEXT INFLATION RISK?\n\n🏦Citi raised its forecasts for:\n- 🌽 corn\n- 🌱 soybeans\n- 🌾 wheat\n\n🚨Because of the growing risk from a stronger Super El Niño\n\nIf weather conditions deteriorate:\n🌾 food supply\n->\n💰 food prices\n->\n📈 inflation\n->\n🏦 central-bank policy\n\n👀This is exactly the kind of second-order effect we watch\n\n☁️A weather event can eventually become:\n💰 a monetary-policy problem\n\n━━━━━━━━━━━━━━━━━━\n🇨🇳🇮🇳 1️⃣2️⃣ CHINA × INDIA\n\n🌏 THE GLOBAL SOUTH KEEPS CONNECTING\n\n🤝China and India continue diplomatic engagement\n\nThey discussed:\n- 🇨🇳🇮🇳 bilateral relations\n- 🗺️ border issues\n- 🤝 future cooperation\n\nThis is not about:\n❌ “BRICS replaces the dollar tomorrow.”\n\n😮‍💨That's too simplistic\n\nThe bigger trend is:\n- 🌍 more trade routes\n- 💵 more settlement options\n- 🚢 more logistics links\n- 🏦 more financial connectivity\n\n🌐The global system doesn't necessarily need to abandon the old one\n\n🏗️It can simply build:\n🔄 more alternatives around it\n\n━━━━━━━━━━━━━━━━━━\n🇨🇦🇺🇸 1️⃣3️⃣ USA × CANADA\n\n⚠️ TRADE WAR IS BACK IN THE HEADLINES\n\n⚖️Canada is preparing retaliatory tariffs on US goods...\n\nPotential tariffs:\n📈 15%–50%\n\non around:\n💰 $20B of American products\n\n🇺🇸The US may respond with additional tariffs\n🌮And Trump continues escalating the rhetoric\n\nThis matters because:\n🇺🇸\n->\n🇨🇦\n->\n🚢 trade\n->\n🏭 supply chains\n->\n💰 prices\n\n⚔️Trade wars don't disappear\n⛓️They simply move through the supply chain\n\n━━━━━━━━━━━━━━━━━━\n🏦 1️⃣4️⃣ BANKS × CRYPTO\n\n🔗 TRADITIONAL FINANCE IS BUILDING ONCHAIN\n\n🇺🇸Banking associations from 39 US states announced:\n🏦BankChain\n⛓️A blockchain network controlled by the banking sector\n\nThe focus:\n- 💳 smart payments\n- 💵 tokenized deposits\n- 🪙 stablecoins\n- ⚡ automated settlement\n\nLaunch:\n🗓️ 2027\n\nAnd in Japan:\n🇯🇵 real-time blockchain settlement tests for stocks and bonds are planned\n\nMeanwhile:\n🇪🇺 Revolut is preparing a euro stablecoin.\n\nAnd Ripple's:\n💵 RLUSD\nhas surpassed:\n💰 $2B in circulation\n\n🎯 The direction is becoming increasingly clear\n💵Traditional finance is not waiting for crypto to disappear\n\nIt is:\n🛤️building its own rails\n\n━━━━━━━━━━━━━━━━━━\n🧠 1️⃣5️⃣ THE BIGGER AI ROTATION\n\n💰 CAPITAL CAN MOVE BOTH WAYS\n\n🗓️Earlier this year, one of the major narratives behind crypto weakness was:\n💸 capital moving from crypto\n->\n🤖AI\n\nNow the opposite narrative is beginning to appear:\n🤖 AI\n->\n₿ crypto\n\nWhy?\nBecause investors are increasingly questioning:\n- ⚠️ AI valuations\n- ⚠️ enormous capex\n- ⚠️ financing requirements\n- ⚠️ time to profitability\n\nThis does NOT automatically mean:\n❌ AI bubble is over\n\nIt means:\n🎯 capital is starting to compare opportunities again\n\n💵And capital always asks:\n🚨Where is the best risk-adjusted return?\n\n━━━━━━━━━━━━━━━━━━\n🏭 1️⃣6️⃣ EUROPE\n\n🛡️ INDUSTRY IS CHANGING DIRECTION\n\n🇩🇪German auto-parts manufacturers are increasingly shifting toward:\n- 🛡️ defence\n- 🏥 medical\n- 🤖 robotics\n\n🛑This is another structural signal\n🇪🇺Europe is reallocating industrial capacity\n\nFrom:\n🚗 traditional automotive production\n\ntoward:\n- 🛡️ strategic industries\n- 🤖 automation\n- 🏥 healthcare\n\n🏙️That is not just a corporate decision\n\nIt reflects a broader change in:\n- 🌍 geopolitics\n- 🏭 industrial policy\n-🛡️ defence spending\n-⚡ energy costs\n\n━━━━━━━━━━━━━━━━━━\n🛢️ 1️⃣7️⃣ ENERGY\n\n⚠️ SUPPLY CHAINS ARE GETTING FRAGILE\n\n🌍🔥European gas remains elevated\n\n⏳Meanwhile: \n🇪🇺 LNG imports in July:\n📉 -32% YoY\nwhile pipeline gas purchases increased\n\nAnd in the Gulf:\n🌫️ aluminium production fell:\n📉 -44% YoY\n\nAt the same time:\n🇰🇿 Kazakhstan is dealing with refinery disruption\n🇷🇺 Russia may extend restrictions on diesel exports\n🇯🇵 Japan is looking at alternative oil pipelines around Hormuz\n\n🎯 Different stories\nSame theme:\n🛡️ENERGY SECURITY\n\n━━━━━━━━━━━━━━━━━━\n🇺🇸🇷🇺 1️⃣8️⃣ USA × RUSSIA\n\n🕵️ THE CIA VISIT IS THE BIG GEOPOLITICAL SIGNAL\n\n🇺🇸CIA Director John Ratcliffe reportedly traveled to Moscow\n\n🇷🇺Russian officials say the visit was connected to intelligence contacts\n\n⚠️There are conflicting reports about possible meetings and the purpose of the visit\n\nBut the market doesn't need to know every detail yet\n⚠️The important signal is:\n🇺🇸 Washington\n<->\n🇷🇺 Moscow\n\n📣communication channels are active\n\nAnd reports suggest discussions may involve:\n- 🛢️ energy infrastructure\n- 🚢 ports\n- ⚔️ military escalation\n- 🤝 de-escalation\n\n🎯 WATCH THE SIGNAL, NOT THE RUMOR\n\n📞If communication expands:\n🟢 geopolitical risk premium can fall\n\nIf it breaks down:\n⚠️ risk returns quickly...\n\n━━━━━━━━━━━━━━━━━━\n🌍 1️⃣9️⃣ THE MARKET IS SPLITTING\n\n🤲Now put everything together\n\nOn one side:\n- 🤖 AI investment\n- 🏗️ infrastructure\n- 🛡️ defence\n-⚡ energy\n-🔗 blockchain finance\n\nOn the other:\n- 💸 debt\n- 📈 yields\n- ⚠️ geopolitical risk\n- 🛢️ supply disruptions\n- 🌍 trade wars\n\n🏗️So the world is still building\n\nBut:\n💰 BUILDING IS GETTING MORE EXPENSIVE\n⁉️And this is becoming the central market question\n\n━━━━━━━━━━━━━━━━━━\n🧠 2️⃣0️⃣ WHAT STAGE ARE WE IN?\n\nWe are not in:\n❌ full expansion with cheap capital\n\nAnd we are not in:\n❌ systemic collapse\n\nWe are somewhere between\n🌱 STAGE 1\n\n🧱The world is building:\n- 🤖 AI\n- 🏗️ infrastructure\n- 🛡️ defence\n-⚡ energy\n-🔗 digital finance\n\nThen comes:\n💸 STAGE 2\n\n❓The market starts asking:\n“HOW MUCH DOES ALL OF THIS COST?”\n\n👀And we begin to see:\n- 📈 higher yields\n- 💸 debt pressure\n- ⚠️ financing costs\n- 🛢️ energy shocks\n- 🌍 geopolitical fragmentation\n\n🎯 THIS IS WHERE WE ARE\n\n🌱Growth is still happening\n💸But capital is becoming more selective\n\n━━━━━━━━━━━━━━━━━━\n🏁 BOTTOM LINE\n\n⛔️This is not just an Iran story\n🇮🇷 Iran = geopolitical catalyst\n\n⛔️This is not just an AI story\n🤖 AI = massive capital consumer\n\n⛔️This is not just a Bitcoin story\n₿ Bitcoin = liquidity + capital sensitivity\n\n⛔️This is not just a gold story\n🌕 Gold = capital protection\n\n✅The bigger story is:\n💰 THE WORLD NEEDS MORE CAPITAL:\nAI - 🤖\nCrypto - ₿\nEnergy -🛢️\nIndustry -🏭\nDefence -🛡️\nGovernments -💸\nInfrastructure -🏗️\n\n‼️Everyone wants the same thing:\n💰 CAPITAL\n\n⏭️And therefore the next stage of the market may not be determined by:\n❌ Who is growing fastest?\n\nBut by:\n🎯 WHO CAN FINANCE THAT GROWTH WITHOUT BREAKING THE BALANCE SHEET?\n\n🎮That is where the real game begins!!!\n\n━━━━━━━━━━━━━━━━━━\n👀 TODAY — WHAT MATTERS\n\n🇮🇷 IRAN\n🎯 Watch sanctions + diplomacy + Hormuz flows\n\n🛢️ OIL\n🎯 Watch physical flows, not just price\n\n🇺🇸 TREASURIES\n🎯 Watch long-term yields + Treasury intervention\n\n🤖 AI\n🎯 Watch capital spending\n\n🇺🇸 NVIDIA\n🎯 The biggest AI test of the day\n\n🏦 FED\n🎯 Watch the long end of the curve\n\n🌕 GOLD\n🎯 Watch demand for protection\n\n🟠BITCOIN\n🎯 Watch ETF flows + whale behavior\n\n🌍 CHINA × INDIA\n🎯 Watch trade and financial connectivity\n\n🇺🇸🇨🇦 USA × CANADA\n🎯 Watch tariffs and supply chains\n\n━━━━━━━━━━━━━━━━━━\n🧠 UNDERSTAND THE SYSTEM\n👀 SEE THE CONNECTIONS\n🎯 KNOW WHAT STAGE WE ARE IN\n\n🔄Complex -> 🧩Simple \n📰News -> ⚙️System \n⚙️System -> 🚀Advantage \n\n🙉SURVIVE FIRST\n🙊PROFIT LATER",
+              "media_urls": "https://pbs.twimg.com/tweet_video_thumb/HQopGRfWYAA4YTy.jpg",
+              "thumbnail_url": "https://pbs.twimg.com/tweet_video_thumb/HQopGRfWYAA4YTy.jpg",
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "x-user-52",
+              "display_name": "x-user-53",
+              "avatar_url": "https://scrubbed.invalid/x-user-54",
+              "verified": true
+            },
+            "engagement": {
+              "views": 6948,
+              "likes": 5,
+              "comments": 0,
+              "shares": 3,
+              "saves": 1
+            },
+            "flags": {
+              "nsfw": false,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-08-26T08:30:45.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 0
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.001151,
+            "language": "en",
+            "content_category": "news",
+            "estimated_reach": 8338
+          }
+        },
+        {
+          "post": {
+            "id": "2091489956275585436",
+            "url": "https://x.com/x-user-55/status/2091489956275585436",
+            "content": {
+              "text": "🚀 I tested Ornith 1.5 across the whole family: 9B, 35B and the massive 397B on 3 DGX Sparks. The benchmark broke before the model did. Here’s what happens when scale starts pushing the infrastructure to its limits 👇 http://x.com/i/article/2091487967810670592",
+              "media_urls": null,
+              "thumbnail_url": null,
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "x-user-55",
+              "display_name": "x-user-56",
+              "avatar_url": "https://scrubbed.invalid/x-user-57",
+              "verified": true
+            },
+            "engagement": {
+              "views": 3880,
+              "likes": 48,
+              "comments": 9,
+              "shares": 5,
+              "saves": 19
+            },
+            "flags": {
+              "nsfw": false,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-08-23T11:37:18.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 1
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.015979,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 4656
+          }
+        },
+        {
+          "post": {
+            "id": "2090762007569936869",
+            "url": "https://x.com/x-user-58/status/2090762007569936869",
+            "content": {
+              "text": "If your entire agent security plan is clicking \"Approve\" on autogenerated PRs, read this\n\nThe code compiles, but is it safe? Moving from vibe coding to disciplined agentic engineering 👇 http://x.com/i/article/2087553293048242176",
+              "media_urls": null,
+              "thumbnail_url": null,
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "x-user-58",
+              "display_name": "x-user-59",
+              "avatar_url": "https://scrubbed.invalid/x-user-60",
+              "verified": true
+            },
+            "engagement": {
+              "views": 21960,
+              "likes": 161,
+              "comments": 122,
+              "shares": 4,
+              "saves": 3
+            },
+            "flags": {
+              "nsfw": false,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-08-21T11:24:41.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 3
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.013069,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 26352
+          }
+        }
+      ],
+      "next_cursor": "DAADDAABCgABHRcjcFsXcfkKAAIdA-D38xax5QAIAAIAAAACCAADAAAAAAgABAAAAAAKAAUdF0TdT4AnEAoABh0XRN1Pf9jwCwAHAAAA8EVtUEM2d0FBQWZRL2dHSk4wdkdwL0FBQUFCUWREaytWQzl1UXlSMFRadVdTR21FbEhSVmxqS09iMGFjZENpa2JwUmZCYngwVHFhRVFsdUh3SFJNbCtiaFdJYWdkRk8zRSsxcmd5aDBUS205MDE4RW9IUldJaE5kYllia2RFVHJ5aVplQXlSMFZPQnNlVzBDekhRUGc5L01Xc2VVZEZmMDZVdHNCMVIwT25tSHMxNkFUSFEyUkh1aGJRZkVkRUMvY3hWdEFJeDBVWmlBRFc3Q1dIUmNqY0ZzWGNma2RFY3FkNFpkd3V4MEdkd2kzR29HYwAA",
+      "total": null,
+      "dropped": 0
+    },
+    "credits_used": 1,
+    "request_id": "req-3xVm668qTqc0I2fK",
+    "cached": false,
+    "pagination": {
+      "next_cursor": "sc.eyJ2IjoyLCJjIjoiREFBRERBQUJDZ0FCSFJjamNGc1hjZmtLQUFJZEEtRDM4eGF4NVFBSUFBSUFBQUFDQ0FBREFBQUFBQWdBQkFBQUFBQUtBQVVkRjBUZFQ0QW5FQW9BQmgwWFJOMVBmOWp3Q3dBSEFBQUE4RVZ0VUVNMmQwRkJRV1pSTDJkSFNrNHdka2R3TDBGQlFVRkNVV1JFYXl0V1F6bDFVWGxTTUZSYWRWZFRSMjFGYkVoU1ZteHFTMDlpTUdGalpFTnBhMkp3VW1aQ1luZ3dWSEZoUlZGc2RVaDNTRkpOYkN0aWFGZEpZV2RrUms4elJTc3hjbWQ1YURCVVMyMDVNREU0Ulc5SVVsZEphRTVrWWxsaWEyUkZWSEo1YVZwbFFYbFNNRlpQUW5ObFZ6QkRla2hSVUdjNUwwMVhjMlZWWkVabU1EWlZkSE5DTVZJd1QyNXRTSE14TmtGVVNGRXlVa2gxYUdKUlprVmtSVU12WTNoV2RFRkplREJWV21sQlJGYzNRMWRJVW1OcVkwWnpXR05tYTJSRlkzRmtORnBrZDNWNE1FZGtkMmt6UjI5SFl3QUEiLCJlIjoidHdpdHRlci9zZWFyY2gvdHdlZXRzIiwicCI6ImN1cnNvciJ9",
+      "has_more": true,
+      "page_size": 20
+    },
+    "credits_remaining": 99
+  }
+}

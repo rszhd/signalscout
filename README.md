@@ -108,7 +108,7 @@ Honest numbers, because a tool that spends your money should say what it spends.
 | | Cost |
 |---|---|
 | Reddit, via Bright Data | free for the first 5,000 posts each month, then $0.0015 per post |
-| X, via Bright Data or ScrapeCreators | not measured yet; the X connector is not built |
+| X, via SocialCrawl | £15 buys 2,500 searches; one search returned 20 posts, and a search that finds nothing is refunded |
 | Embedding pre-filter | roughly $0.00001 per post |
 | Classification | roughly $0.001 per post with a cheap model |
 
@@ -116,8 +116,17 @@ Honest numbers, because a tool that spends your money should say what it spends.
 monitor has a spending cap, every query can be cost-tested before it runs, and
 the app shows what it spent.
 
-Reddit is the cheap source: free to start through Bright Data. Reddit alone is a
-useful product, which is as well, because X is not built yet.
+Reddit is free to start through Bright Data. X is cheaper per post than either
+Reddit provider, because a search is charged once whether it brings back twenty
+posts or none — so on X the cost follows how often you poll, not how much you
+find.
+
+**What one X monitor costs.** One query costs at most two searches per poll.
+Polled every six hours that is 240 searches a month, which is £1.44 of the £15
+pack — about $1.95. Polled every hour it is £8.64, and polled every minute it
+is £518. Three queries cost three times each figure. The poll interval is the
+dial, and the cost test on the monitor form does this arithmetic for the
+queries you actually wrote before anything starts.
 
 ### Reddit comes through Bright Data, and you should know why
 
@@ -143,12 +152,19 @@ say it here than let you find it in an agreement you skimmed.
 If you have a Reddit client id issued before November 2025, it still works.
 There is no connector for it today. Open an issue if you want one.
 
-**X comes the same way.** X sells reads through its own API at $0.005 each,
-with no free tier, and we chose not to build on it. Bright Data and
-ScrapeCreators both offer X, so the key you already connected covers it, and
-the same warning applies: your X data arrives through a company that is not X,
-under an agreement that puts the compliance burden on you. The X connector is
-not built yet.
+**X comes the same way, through SocialCrawl.** X sells the same searches
+through its own API at $0.005 per post read, with no free tier, and we chose
+not to build on it.
+
+It is a third account, and we would rather it were not. The two providers that
+fetch Reddit both offer X, and neither can search it: they fetch the posts of
+accounts you name. A monitor exists to find people you have never heard of, so
+searching is the whole point. SocialCrawl gives 100 credits free with no card,
+which is enough to try X before you decide it is worth another key to look
+after.
+
+The same warning applies as for Reddit: your X data arrives through a company
+that is not X, under an agreement that puts the compliance burden on you.
 
 #### Connecting it
 

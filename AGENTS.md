@@ -61,9 +61,9 @@ accepts: proven end to end, on one source.
 Five probes billed nothing. `api_usage` recorded no row for any of them, which
 is the free-check claim measured rather than argued.
 
-Two things stay unproven. The X connector has never run, so its probe is
-unmeasured. And no real browser has rendered the screen — it is driven through
-jsdom only.
+Two things stay unproven. No X poll has run through the worker and stored a
+post — the connector has met the provider, but only through its capture script.
+And no real browser has rendered the screen — it is driven through jsdom only.
 
 One consequence bites on any machine that has stored a credential: the process
 refuses to boot without `ENCRYPTION_KEY`. That is US-004's check working as
@@ -83,13 +83,13 @@ docs/secrets.md, *Testing before storing*.
 **Neither platform is reached through its own API.** Reddit ended self-serve
 app registration in November 2025. X's own API is pay-per-use with no free
 tier, and on 2026-09-05 the owner decided not to use it. Both platforms are
-reached through data providers, and the two we have are Bright Data and
-ScrapeCreators. Reddit runs through both. X runs through one of them, chosen in
-US-006 by a price we read from the provider that will send the bill. **No X
-price is measured yet, at either provider.** $0.005 per read is X's own price
-and it does not travel to anybody else. Read STACK.md, *A source is not a
-provider*, before touching a connector: the interface does not change to suit a
-provider.
+reached through data providers. Reddit runs through Bright Data and
+ScrapeCreators; **X runs through SocialCrawl**, which US-006 added because
+neither of the other two can search X — Bright Data's X dataset discovers only
+by profile, and ScrapeCreators has no X search endpoint at all. $0.005 per read
+is X's own price and it travels to nobody else. Read STACK.md, *A source is not
+a provider*, before touching a connector: the interface does not change to suit
+a provider.
 
 **A platform and a provider are separate things.** US-024 split them on
 2026-09-05, because two providers will fetch Reddit and they agree about
@@ -172,6 +172,39 @@ ScrapeCreators**, measured back to back rather than on separate days. And
 The whole run stored no new post. All 50 records and all 47 posts were already
 in the table from earlier runs, and `posts` stayed at 174: deduplication across
 two providers, again, live.
+
+**X has one provider, and the reason is that only one of three can search
+it.** US-006 added SocialCrawl on 2026-09-05. Bright Data's X posts dataset
+answers a discovery trigger with `Available types: profile_url,
+profiles_array`, and ScrapeCreators publishes six X endpoints and no search
+among them. Both fetch the posts of an account you name; neither finds a
+stranger describing a problem. Both refusals came from the providers' own APIs,
+not from their documentation, and both probes were free.
+
+SocialCrawl bills a request and refunds one that matches nothing — measured
+twice, at `credits_used: 0`. A request carried 20 posts, so an X post costs
+about $0.0004: cheaper than a Bright Data Reddit record, and about one
+thirtieth of X's own API. Its price is the only one here that carries an
+exchange rate, because the provider bills in pounds.
+
+Its capture answered four things the documentation did not. The cursor is at
+`data.next_cursor` *and* at `pagination.next_cursor`, and the two strings
+differ. `sort` takes `latest` or `top` and the documentation names only `top`.
+A search that matches nothing is free. And **an empty answer is not always the
+truth**: the same query returned nothing at 20:12 and twenty posts at 20:31,
+both free, so no empty page may be read as a query being finished for good.
+
+One product finding came with it, and it is not about the connector. On X a
+long generated phrase is useless in both directions: unquoted, `end to end
+tests keep breaking` returned anime, Bitcoin and a CIA story across three
+weeks; quoted, it matched nothing at all, twice. The two-word `flaky tests`
+returned twenty posts that were all on topic. **Our query generator writes long
+phrases**, so a monitor on X needs short queries, and nothing yet makes that
+happen. That is a ticket nobody has written.
+
+What is unproven: no X poll has run through the worker, so nothing has been
+stored, classified or shown from X. A real rate limit, a real timeout and a
+real outage have only been simulated.
 
 **The embedder has met a real provider once.** On 2026-09-05
 `capture:embeddings` embedded PLAN.md's example monitor and the five fake posts
@@ -267,7 +300,7 @@ wait, the cursor, the snapshot read and the storage are proven for the keyword
 phase and the subreddit phase alike.
 
 Three things are still unproven: an expired snapshot, a collection the provider
-reports as failed, and a rate limit. The X connector has never run at all.
+reports as failed, and a rate limit.
 
 That run also measured what nobody had measured. A monitor left at the
 60-second floor triggered a collection every minute, and each one billed 9 to
@@ -415,7 +448,7 @@ Do not reopen these without being asked. The reasoning is in
 | A managed auth service | Better Auth in our own Postgres |
 | An in-memory Postgres fake | Real Postgres, from the first test file |
 | A Reddit API key per user | Reddit through a provider: Bright Data or ScrapeCreators |
-| X's own pay-per-use API | X through the same providers: Bright Data or ScrapeCreators |
+| X's own pay-per-use API | X through SocialCrawl, the one provider of three that can search X |
 | One record describing a source | A platform and a provider, separate; a connector is the pair |
 
 **One row above was reversed on 2026-09-05.** It read: *a provider picker in the

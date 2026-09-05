@@ -204,7 +204,14 @@ describe("the monitor routes", () => {
         const body = (await app.inject({ method: "GET", url: "/api/monitor-options" })).json();
 
         expect(builtInSources.filter((source) => source.platform.id === "reddit")).toHaveLength(2);
-        expect(body.sources.map((source: { id: string }) => source.id)).toEqual(["reddit"]);
+        expect(builtInSources.filter((source) => source.platform.id === "x")).toHaveLength(1);
+
+        // Two providers for Reddit and one for X, and three connectors make
+        // two rows. US-006 added the second platform, which is why this list
+        // grew; a platform appearing twice is the failure it guards.
+        const ids = body.sources.map((source: { id: string }) => source.id);
+        expect(ids).toEqual(["reddit", "x"]);
+        expect(new Set(ids).size).toBe(ids.length);
         // And no price beside it. Two providers do not agree about what a
         // Reddit record costs, so a figure printed here would be one
         // provider's arithmetic on the other's bill.

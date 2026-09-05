@@ -40,7 +40,7 @@ export const sources = ["reddit", "x"] as const;
 export type Source = (typeof sources)[number];
 
 /**
- * The providers a key can belong to. A third one is a migration, not a guess.
+ * The providers a key can belong to. A fourth one is a migration, not a guess.
  *
  * This is the other axis: who fetched, whose key it is, and what it bills. It
  * is on `api_usage` and `source_continuations` because both describe work one
@@ -52,8 +52,13 @@ export type Source = (typeof sources)[number];
  * run first and a ScrapeCreators key would have somewhere to live. US-025 then
  * wrote the connector, and both values are now reachable: one Reddit poll has
  * been billed to each provider.
+ *
+ * US-006 added `socialcrawl` with its connector, for X. It is the first
+ * provider here that fetches a platform the others cannot: Bright Data
+ * discovers X posts only by profile, and ScrapeCreators has no X search at
+ * all, so neither can find a stranger describing a problem.
  */
-export const providers = ["brightdata", "scrapecreators"] as const;
+export const providers = ["brightdata", "scrapecreators", "socialcrawl"] as const;
 export type Provider = (typeof providers)[number];
 
 /** The signals a user ticks in the monitor form. PLAN.md, *Monitor creation*. */
@@ -670,9 +675,9 @@ export type ExhaustedBehaviour = (typeof exhaustedBehaviours)[number];
  * `worker/collect.ts` writes a row after every page rather than once per poll,
  * because a poll that throws on its third page was billed for the first two.
  *
- * The unit is the connector's own — Bright Data bills a Reddit record, X bills
- * a post read — so `units` is comparable only within one platform and provider
- * together. `ConnectorDescriptor.billableUnit` is the word for it, and the cost
+ * The unit is the connector's own — Bright Data bills a Reddit record, and
+ * ScrapeCreators and SocialCrawl each bill the request — so `units` is
+ * comparable only within one platform and provider together. `ConnectorDescriptor.billableUnit` is the word for it, and the cost
  * column is what makes two connectors add up. That is why the provider is on
  * this row and in its key: two providers fetching one platform do not bill the
  * same unit at the same price, so a row that summed them would be adding

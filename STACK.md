@@ -138,15 +138,21 @@ design more than any framework choice.
 | Reddit read, Bright Data free allowance | $0, first 5,000 records each month |
 | Reddit read, Bright Data pay-as-you-go | $0.0015 ($1.50 per 1,000 records) |
 | Reddit read, ScrapeCreators | ~$0.00008 to $0.00027, measured |
-| X read, Bright Data or ScrapeCreators | not measured; US-006 reads it |
+| X read, SocialCrawl | $0.008118 per request, and a request brought 20 posts |
 | Embedding pre-filter | ~$0.00001 |
 | AI classification, cheap model | ~$0.001 |
 
 **The money is spent before our code ever sees the text.** That holds for every
 row above, and it is what the budget guard is built on. Reddit through Bright
-Data starts free, so Reddit carries the MVP. What an X post costs is an open
-number: we no longer plan to buy X's own API, and neither provider's X price has
-been read or paid. US-006 records it from the provider that will send the bill.
+Data starts free, so Reddit still carries the MVP.
+
+**X is now the cheapest row per post, and that is a surprise worth stating.** A
+SocialCrawl request costs about eight tenths of a cent and returned twenty
+posts, so an X post costs about $0.0004 — a quarter of a Bright Data Reddit
+record, and about one thirtieth of what X's own API charges for the same read.
+The catch is not price. It is that a request that finds nothing is refunded and
+a request that finds twenty is the same credit, so cost follows the number of
+*calls* a poll makes, never the number of posts it brings back.
 
 **The two Reddit providers do not bill the same thing, and the gap is large.**
 Bright Data bills a record, so a post costs $0.0015 whatever else happens.
@@ -265,8 +271,14 @@ one.
 
 **X is reached through a data provider, not through X's own API.** The owner
 decided this on 2026-09-05, and it settles a question US-006 had left open.
-Bright Data and ScrapeCreators both offer X, so X uses the two accounts a user
-already holds for Reddit, and the connections screen asks for no third key.
+
+**The provider is SocialCrawl, and it was chosen by elimination.** The two
+accounts a user already holds for Reddit cannot do the job: Bright Data's X
+dataset answered a discovery trigger with `Available types: profile_url,
+profiles_array`, and ScrapeCreators publishes no X search endpoint at all. Both
+can fetch the posts of an account you name. Neither can find a stranger
+describing a problem, which is the product. So X costs a third key, and that
+was the price of keyword discovery rather than a preference.
 
 X's own API is the path we are not taking. Since February 2026 pay-per-use is
 its only self-serve tier: Basic and Pro are closed to new signups, there is no

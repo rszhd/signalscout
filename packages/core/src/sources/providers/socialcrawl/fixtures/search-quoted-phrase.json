@@ -1,0 +1,22 @@
+{
+  "httpStatus": 200,
+  "body": {
+    "success": true,
+    "platform": "twitter",
+    "endpoint": "/v1/twitter/search/tweets",
+    "data": {
+      "items": [],
+      "total": 0,
+      "dropped": 0
+    },
+    "credits_used": 0,
+    "request_id": "req-Dq5JGj4THSVa2vZq",
+    "cached": false,
+    "pagination": {
+      "next_cursor": null,
+      "has_more": false,
+      "page_size": 0
+    },
+    "credits_remaining": 94
+  }
+}

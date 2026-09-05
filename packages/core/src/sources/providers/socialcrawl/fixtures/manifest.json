@@ -1,0 +1,126 @@
+{
+  "capturedBy": "packages/core/src/sources/providers/socialcrawl/fixtures/capture.mjs",
+  "provider": "SocialCrawl, X (Twitter) API v1",
+  "note": "Author identity is replaced with stable pseudonyms. Everything else is whole.",
+  "fixtures": [
+    {
+      "file": "credentials-accepted.json",
+      "request": {
+        "method": "GET",
+        "url": "https://www.socialcrawl.dev/v1/twitter/search/tweets?",
+        "note": "a working key with no query: refused on the input, not on the key"
+      },
+      "capturedAt": "2026-09-05T12:52:15.180Z",
+      "identitiesReplaced": 0
+    },
+    {
+      "file": "credentials-rejected.json",
+      "request": {
+        "method": "GET",
+        "url": "https://www.socialcrawl.dev/v1/twitter/search/tweets?query=flaky+tests",
+        "note": "sent with a deliberately invalid key"
+      },
+      "capturedAt": "2026-09-05T12:52:14.879Z",
+      "identitiesReplaced": 0
+    },
+    {
+      "file": "search-from-handle.json",
+      "request": {
+        "method": "GET",
+        "url": "https://www.socialcrawl.dev/v1/twitter/search/tweets?query=from%3Agithub",
+        "note": "the from: operator, for a monitor that watches one account"
+      },
+      "capturedAt": "2026-09-05T12:52:36.493Z",
+      "identitiesReplaced": 3
+    },
+    {
+      "file": "search-latest.json",
+      "request": {
+        "method": "GET",
+        "url": "https://www.socialcrawl.dev/v1/twitter/search/tweets?query=flaky+tests&sort=latest",
+        "note": "sort=latest, one of the two values sort-rejected.json listed"
+      },
+      "capturedAt": "2026-09-05T12:54:32.379Z",
+      "identitiesReplaced": 60
+    },
+    {
+      "file": "search-no-results.json",
+      "request": {
+        "method": "GET",
+        "url": "https://www.socialcrawl.dev/v1/twitter/search/tweets?query=%22intentwatch-no-such-phrase-9a3f7c21%22",
+        "note": "a phrase that cannot match; does it answer 200 and bill for it?"
+      },
+      "capturedAt": "2026-09-05T12:52:37.567Z",
+      "identitiesReplaced": 0
+    },
+    {
+      "file": "search-page-2.json",
+      "request": {
+        "method": "GET",
+        "url": "https://www.socialcrawl.dev/v1/twitter/search/tweets?query=end+to+end+tests+keep+breaking&cursor=DAADDAABCgABHRcjcFsXcfkKAAIdA-D38xax5QAIAAIAAAACCAADAAAAAAgABAAAAAAKAAUdF0TdT4AnEAoABh0XRN1Pf9jwCwAHAAAA8EVtUEM2d0FBQWZRL2dHSk4wdkdwL0FBQUFCUWREaytWQzl1UXlSMFRadVdTR21FbEhSVmxqS09iMGFjZENpa2JwUmZCYngwVHFhRVFsdUh3SFJNbCtiaFdJYWdkRk8zRSsxcmd5aDBUS205MDE4RW9IUldJaE5kYllia2RFVHJ5aVplQXlSMFZPQnNlVzBDekhRUGc5L01Xc2VVZEZmMDZVdHNCMVIwT25tSHMxNkFUSFEyUkh1aGJRZkVkRUMvY3hWdEFJeDBVWmlBRFc3Q1dIUmNqY0ZzWGNma2RFY3FkNFpkd3V4MEdkd2kzR29HYwAA",
+        "note": "followed data.next_cursor from search-posts.json"
+      },
+      "capturedAt": "2026-09-05T12:52:26.570Z",
+      "identitiesReplaced": 47
+    },
+    {
+      "file": "search-posts.json",
+      "request": {
+        "method": "GET",
+        "url": "https://www.socialcrawl.dev/v1/twitter/search/tweets?query=end+to+end+tests+keep+breaking"
+      },
+      "capturedAt": "2026-09-05T12:52:18.572Z",
+      "identitiesReplaced": 60
+    },
+    {
+      "file": "search-quoted-phrase.json",
+      "request": {
+        "method": "GET",
+        "url": "https://www.socialcrawl.dev/v1/twitter/search/tweets?query=%22end+to+end+tests+keep+breaking%22&sort=latest",
+        "note": "the long phrase in quotes, against search-posts.json unquoted"
+      },
+      "capturedAt": "2026-09-05T12:55:23.603Z",
+      "identitiesReplaced": 0
+    },
+    {
+      "file": "search-short-query-repeat.json",
+      "request": {
+        "method": "GET",
+        "url": "https://www.socialcrawl.dev/v1/twitter/search/tweets?query=flaky+tests",
+        "note": "the same bare query as search-short-query.json, run again later"
+      },
+      "capturedAt": "2026-09-05T12:54:36.470Z",
+      "identitiesReplaced": 60
+    },
+    {
+      "file": "search-short-query.json",
+      "request": {
+        "method": "GET",
+        "url": "https://www.socialcrawl.dev/v1/twitter/search/tweets?query=flaky+tests",
+        "note": "a shorter query, in case a long phrase matches nothing on X"
+      },
+      "capturedAt": "2026-09-05T12:52:22.574Z",
+      "identitiesReplaced": 0
+    },
+    {
+      "file": "search-since.json",
+      "request": {
+        "method": "GET",
+        "url": "https://www.socialcrawl.dev/v1/twitter/search/tweets?query=flaky+tests+since%3A2026-09-03",
+        "note": "the since: operator, asking for the last two days (since:2026-09-03)"
+      },
+      "capturedAt": "2026-09-05T12:52:31.186Z",
+      "identitiesReplaced": 60
+    },
+    {
+      "file": "sort-rejected.json",
+      "request": {
+        "method": "GET",
+        "url": "https://www.socialcrawl.dev/v1/twitter/search/tweets?query=flaky+tests&sort=this-is-not-a-sort",
+        "note": "an invalid sort, to make the provider name the valid ones"
+      },
+      "capturedAt": "2026-09-05T12:52:15.410Z",
+      "identitiesReplaced": 0
+    }
+  ]
+}

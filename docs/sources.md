@@ -103,6 +103,23 @@ no provider is a platform nothing can fetch.
 
 ---
 
+## One platform, one provider — when only one can do the work
+
+X has one provider and it was chosen by elimination, which is worth writing
+down because the next person will assume it was preference.
+
+US-006 asked all three. Bright Data's X posts dataset answers a discovery
+trigger with `Available types: profile_url, profiles_array`, so it can fetch
+the posts of accounts you name and cannot search. ScrapeCreators publishes six
+X endpoints and none of them is a search. SocialCrawl has
+`/v1/twitter/search/tweets`. A monitor exists to find a stranger describing a
+problem, so a provider that cannot search cannot serve X here, however good it
+is at Reddit.
+
+Two consequences. `registry.only("x")` never has to choose, so no deployment is
+asked a question about X. And a second X provider is not a small change: it
+would have to search, and today two of the three cannot.
+
 ## Two providers for one platform
 
 This is no longer hypothetical. US-025 gave Reddit a second provider on
@@ -160,14 +177,21 @@ subreddit Bright Data had already collected, and stored no new row.
 **The two providers agree about almost nothing else**, which is the argument
 for the split:
 
-| | Bright Data | ScrapeCreators |
-|---|---|---|
-| Billable unit | a record | a request |
-| Price | $1.50 / 1,000 records | $1.88 / 1,000 requests |
-| One unit buys | one post | 7 to 23 posts, measured |
-| Shape | trigger, then poll a snapshot | the posts are in the answer |
-| A collection took | 8 minutes 40 seconds, and 2 minutes 13 on another day | 1.8 to 4.9 seconds |
-| A refused key says | `Invalid credentials`, as a bare string | `{"message":"Invalid API key"}` |
+| | Bright Data | ScrapeCreators | SocialCrawl |
+|---|---|---|---|
+| Fetches | Reddit | Reddit | X |
+| Billable unit | a record | a request | a request |
+| Price | $1.50 / 1,000 records | $1.88 / 1,000 requests | $8.12 / 1,000 requests |
+| One unit buys | one post | 7 to 23 posts, measured | 20 posts, measured |
+| A call that finds nothing | billed | billed | refunded, measured |
+| Shape | trigger, then poll a snapshot | the posts are in the answer | the posts are in the answer |
+| A collection took | 8 minutes 40 seconds, and 2 minutes 13 on another day | 1.8 to 4.9 seconds | 1.5 to 5.3 seconds |
+| A refused key says | `Invalid credentials`, as a bare string | `{"message":"Invalid API key"}` | `Invalid API key format. Keys start with 'sc_'.` |
+
+SocialCrawl prices in pounds and every figure in this product is in
+micro-dollars, so its price alone carries an exchange rate. `x.ts` names the
+rate and the day it was read. [costs.md](costs.md) already says the spend is an
+estimate; this is one more reason it is.
 
 A connector reports `unitsConsumed` in its own unit and the budget guard prices
 it from the connector's own `pricePerUnitMicros`. Nothing downstream reads the
@@ -187,12 +211,14 @@ X or a model provider. See [testing.md](testing.md).
 
 ## The three things connectors get wrong
 
-**Cost is not the post count.** Reddit bills one call and returns up to 100
-posts. X bills every post read. `unitsConsumed` is the connector's answer, in
+**Cost is not the post count.** One provider bills a call that returns up to
+100 posts; another bills every record; a third refunds the call that finds
+nothing. `unitsConsumed` is the connector's answer, in
 its own `billableUnit`, and the caller must not compute it.
 
-**The rate limit is yours, not the caller's.** Reddit sends `X-Ratelimit-*`
-headers; X does not. Read them here and back off here. When the wait is longer
+**The rate limit is yours, not the caller's.** Every provider says it
+differently, and one of ours has never said it at all. Read the signal here and
+back off here. When the wait is longer
 than you are willing to hold the job, return
 `next: { status: "wait", retryAfter, cursor }` and let the scheduler do
 something else. The caller learns *when* to come back and never *how* you knew.

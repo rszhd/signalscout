@@ -1,0 +1,864 @@
+{
+  "httpStatus": 200,
+  "body": {
+    "success": true,
+    "platform": "twitter",
+    "endpoint": "/v1/twitter/search/tweets",
+    "data": {
+      "items": [
+        {
+          "post": {
+            "id": "2096026652606370172",
+            "url": "https://x.com/x-user-1/status/2096026652606370172",
+            "content": {
+              "text": "⭐ Track a repo's star growth over time with the new star history REST API endpoint without exposing stargazer identities.\n\nStargazer listing endpoints were restricted to admins and collaborators to protect user privacy. But now you can get insights with this privacy-safe alternative.\n\nThe details 👇 \nhttps://github.blog/changelog/2026-09-04-new-api-endpoint-provides-privacy-safe-star-history-data/",
+              "media_urls": null,
+              "thumbnail_url": null,
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "x-user-1",
+              "display_name": "x-user-2",
+              "avatar_url": "https://scrubbed.invalid/x-user-3",
+              "verified": true
+            },
+            "engagement": {
+              "views": 41516,
+              "likes": 100,
+              "comments": 11,
+              "shares": 12,
+              "saves": 20
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-09-05T00:04:30.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 3
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.002963,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 49819
+          }
+        },
+        {
+          "post": {
+            "id": "2095971389190885815",
+            "url": "https://x.com/x-user-1/status/2095971389190885815",
+            "content": {
+              "text": "🌌 GPT-6 Astra from @OpenAIDevs is now generally available in GitHub Copilot.\n\nThis new model is designed for long-horizon, autonomous coding and agentic tasks. \n\nOur internal testing shows it plans and validates as it goes, batches diagnosis with verification, and independently confirms its results before declaring a task done. That translated into stronger performance on extensive coding jobs with fewer steps than prior OpenAI models.\n\nTry it out in the GitHub Copilot app, CLI, or @code. 🚀\nhttps://github.blog/changelog/2026-09-04-gpt-6-astra-is-generally-available-in-github-copilot/",
+              "media_urls": "https://pbs.twimg.com/amplify_video_thumb/2095971059346604032/img/lbQcQHe61SgIghFr.jpg",
+              "thumbnail_url": "https://pbs.twimg.com/amplify_video_thumb/2095971059346604032/img/lbQcQHe61SgIghFr.jpg",
+              "duration_seconds": 80.513
+            },
+            "author": {
+              "username": "x-user-1",
+              "display_name": "x-user-2",
+              "avatar_url": "https://scrubbed.invalid/x-user-3",
+              "verified": true
+            },
+            "engagement": {
+              "views": 83467,
+              "likes": 535,
+              "comments": 34,
+              "shares": 55,
+              "saves": 69
+            },
+            "flags": {
+              "nsfw": false,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-09-04T20:24:55.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 9
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.007476,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 100160
+          }
+        },
+        {
+          "post": {
+            "id": "2095907115143459174",
+            "url": "https://x.com/x-user-1/status/2095907115143459174",
+            "content": {
+              "text": "Try HydraFusion through /experimental in GitHub Copilot CLI. https://t.co/LBMBJCb9iL",
+              "media_urls": "https://pbs.twimg.com/amplify_video_thumb/2095906441643311104/img/9bAJQV1duxG1c-e5.jpg",
+              "thumbnail_url": "https://pbs.twimg.com/amplify_video_thumb/2095906441643311104/img/9bAJQV1duxG1c-e5.jpg",
+              "duration_seconds": 93.718
+            },
+            "author": {
+              "username": "x-user-1",
+              "display_name": "x-user-2",
+              "avatar_url": "https://scrubbed.invalid/x-user-3",
+              "verified": true
+            },
+            "engagement": {
+              "views": 9501,
+              "likes": 15,
+              "comments": 1,
+              "shares": 0,
+              "saves": 3
+            },
+            "flags": {
+              "nsfw": false,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-09-04T16:09:30.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 0
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.001684,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 11401
+          }
+        },
+        {
+          "post": {
+            "id": "2095907113201496216",
+            "url": "https://x.com/x-user-1/status/2095907113201496216",
+            "content": {
+              "text": "4.9 percentage points higher verified task quality. 67% lower estimated cost.\n\nProject HydraFusion delivered those results against Claude Opus 5 on Terminal-Bench 2.1 in controlled offline evaluations.\n\nHydraFusion orchestrates the models and workflow for each coding task. You select it like any other model. ⬇️\nhttps://github.blog/ai-and-ml/github-copilot/project-hydrafusion-frontier-quality-via-multi-model-orchestration/?utm_source=x-launch&utm_medium=social&utm_campaign=project-hydrafusion-sep-2026",
+              "media_urls": null,
+              "thumbnail_url": null,
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "x-user-1",
+              "display_name": "x-user-2",
+              "avatar_url": "https://scrubbed.invalid/x-user-3",
+              "verified": true
+            },
+            "engagement": {
+              "views": 81667,
+              "likes": 369,
+              "comments": 34,
+              "shares": 46,
+              "saves": 150
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": true,
+              "deleted": false
+            },
+            "published_at": "2026-09-04T16:09:30.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 16
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.005498,
+            "language": "en",
+            "content_category": "tech",
+            "estimated_reach": 98000
+          }
+        },
+        {
+          "post": {
+            "id": "2095886870592802842",
+            "url": "https://x.com/x-user-1/status/2095886870592802842",
+            "content": {
+              "text": "https://www.youtube.com/watch?v=kHL3XzjpT5w",
+              "media_urls": null,
+              "thumbnail_url": null,
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "x-user-1",
+              "display_name": "x-user-2",
+              "avatar_url": "https://scrubbed.invalid/x-user-3",
+              "verified": true
+            },
+            "engagement": {
+              "views": 11068,
+              "likes": 12,
+              "comments": 0,
+              "shares": 2,
+              "saves": 2
+            },
+            "flags": {
+              "nsfw": false,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-09-04T14:49:04.000Z",
+            "ext": {
+              "content_language": null,
+              "quote_count": 0
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.001265,
+            "language": null,
+            "content_category": "other",
+            "estimated_reach": 13282
+          }
+        },
+        {
+          "post": {
+            "id": "2095885214954213576",
+            "url": "https://x.com/x-user-1/status/2095885214954213576",
+            "content": {
+              "text": "The Story of VS @Code premieres today 🍿",
+              "media_urls": null,
+              "thumbnail_url": null,
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "x-user-1",
+              "display_name": "x-user-2",
+              "avatar_url": "https://scrubbed.invalid/x-user-3",
+              "verified": true
+            },
+            "engagement": {
+              "views": 81546,
+              "likes": 485,
+              "comments": 12,
+              "shares": 36,
+              "saves": 98
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-09-04T14:42:29.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 4
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.006536,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 97855
+          }
+        },
+        {
+          "post": {
+            "id": "2095593682871394409",
+            "url": "https://x.com/x-user-1/status/2095593682871394409",
+            "content": {
+              "text": "⚡️ @GoogleAI's Gemini 3.8 Flash is now available in GitHub Copilot. \n\nOur early testing shows:\n• it performed strongly on complex terminal-based coding tasks\n• it demonstrated rigorous validation and persistent recovery from actionable failures\n\nTry it out in the GitHub Copilot app, CLI, or @code.\nhttps://github.blog/changelog/2026-09-03-gemini-3-8-flash-is-now-available-in-github-copilot/",
+              "media_urls": null,
+              "thumbnail_url": null,
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "x-user-1",
+              "display_name": "x-user-2",
+              "avatar_url": "https://scrubbed.invalid/x-user-3",
+              "verified": true
+            },
+            "engagement": {
+              "views": 76961,
+              "likes": 483,
+              "comments": 22,
+              "shares": 34,
+              "saves": 51
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-09-03T19:24:02.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 3
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.007004,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 92353
+          }
+        },
+        {
+          "post": {
+            "id": "2095290003718799380",
+            "url": "https://x.com/x-user-1/status/2095290003718799380",
+            "content": {
+              "text": "🆕 On September 10, we're kicking off the first-ever GitHub Copilot Day! 🎉 \n\nHear directly from the people building Copilot and the developers putting it to work. Learn the most effective ways to use Copilot, from agents and model choice to working across GitHub, Copilot app, CLI, and @code.\n\nYou can expect technical demos, practical workflows, product announcements, and a few special guests along the way. 👀\n\n🔔 Set your reminder\nhttp://gh.io/GitHubCopilotDay",
+              "media_urls": "https://pbs.twimg.com/media/HRP3Iz0WsAAQi1c.jpg",
+              "thumbnail_url": "https://pbs.twimg.com/media/HRP3Iz0WsAAQi1c.jpg",
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "x-user-1",
+              "display_name": "x-user-2",
+              "avatar_url": "https://scrubbed.invalid/x-user-3",
+              "verified": true
+            },
+            "engagement": {
+              "views": 72715,
+              "likes": 261,
+              "comments": 20,
+              "shares": 40,
+              "saves": 56
+            },
+            "flags": {
+              "nsfw": false,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-09-02T23:17:20.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 6
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.004414,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 87258
+          }
+        },
+        {
+          "post": {
+            "id": "2095248954133016876",
+            "url": "https://x.com/x-user-1/status/2095248954133016876",
+            "content": {
+              "text": "What’s new in GitHub? 👀\n\nGitHub Copilot is now in Slack and Microsoft Teams, new models are available, code review has a new Balanced depth, and more.\n\nHere’s what shipped in August ⬇️ https://x.com/i/article/2095240317981315072",
+              "media_urls": null,
+              "thumbnail_url": null,
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "x-user-1",
+              "display_name": "x-user-2",
+              "avatar_url": "https://scrubbed.invalid/x-user-3",
+              "verified": true
+            },
+            "engagement": {
+              "views": 64774,
+              "likes": 114,
+              "comments": 18,
+              "shares": 17,
+              "saves": 30
+            },
+            "flags": {
+              "nsfw": false,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-09-02T20:34:13.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 1
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.0023,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 77729
+          }
+        },
+        {
+          "post": {
+            "id": "2095240769669902567",
+            "url": "https://x.com/x-user-1/status/2095240769669902567",
+            "content": {
+              "text": "If you’re not using a harness with your squad to do loop engineering, are you falling behind?\n\nIf that sentence made you go 🤯, you’ll want to check out the latest GitHub Podcast episode, where we break down the AI lingo developers are hearing right now.\n\nGet it wherever you listen to podcasts or find it here https://the-github-podcast.simplecast.com/episodes/decoding-the-new-ai-lingo-loops-harnesses-squads-and-hill-climbing",
+              "media_urls": "https://pbs.twimg.com/media/HRPKXGPWMAAld39.jpg",
+              "thumbnail_url": "https://pbs.twimg.com/media/HRPKXGPWMAAld39.jpg",
+              "duration_seconds": 46.166
+            },
+            "author": {
+              "username": "x-user-1",
+              "display_name": "x-user-2",
+              "avatar_url": "https://scrubbed.invalid/x-user-3",
+              "verified": true
+            },
+            "engagement": {
+              "views": 72889,
+              "likes": 143,
+              "comments": 24,
+              "shares": 16,
+              "saves": 88
+            },
+            "flags": {
+              "nsfw": false,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-09-02T20:01:41.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 5
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.002511,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 87467
+          }
+        },
+        {
+          "post": {
+            "id": "2094938017509294265",
+            "url": "https://x.com/x-user-1/status/2094938017509294265",
+            "content": {
+              "text": "Zero data retention access is available to eligible enterprise customers under a time-bound exception while Anthropic rolls out Enterprise Frontier Safeguards.\nhttps://www.anthropic.com/news/enterprise-frontier-safeguards",
+              "media_urls": null,
+              "thumbnail_url": null,
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "x-user-1",
+              "display_name": "x-user-2",
+              "avatar_url": "https://scrubbed.invalid/x-user-3",
+              "verified": true
+            },
+            "engagement": {
+              "views": 11780,
+              "likes": 24,
+              "comments": 0,
+              "shares": 2,
+              "saves": 4
+            },
+            "flags": {
+              "nsfw": false,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-09-01T23:58:40.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 1
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.002207,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 14136
+          }
+        },
+        {
+          "post": {
+            "id": "2094936357718417564",
+            "url": "https://x.com/x-user-1/status/2094936357718417564",
+            "content": {
+              "text": "Unlike other Claude models in GitHub Copilot, Claude Fable 5.1 requires data retention by default to operate Anthropic's safety classifiers. \nhttps://support.claude.com/en/articles/15425996-data-retention-practices-for-covered-models",
+              "media_urls": null,
+              "thumbnail_url": null,
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "x-user-1",
+              "display_name": "x-user-2",
+              "avatar_url": "https://scrubbed.invalid/x-user-3",
+              "verified": true
+            },
+            "engagement": {
+              "views": 15754,
+              "likes": 40,
+              "comments": 6,
+              "shares": 4,
+              "saves": 7
+            },
+            "flags": {
+              "nsfw": false,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-09-01T23:52:04.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 1
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.003174,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 18905
+          }
+        },
+        {
+          "post": {
+            "id": "2094936182945886329",
+            "url": "https://x.com/x-user-1/status/2094936182945886329",
+            "content": {
+              "text": "Claude Fable 5.1, the latest in @AnthropicAI's Mythos model class, is now generally available in GitHub Copilot.\n\nIn our testing it showed strong performance on\n➡️ long-running coding tasks\n➡️ deep codebase research\n➡️ complex agentic workflows\n\nTry it out in the GitHub Copilot app, CLI or @code.\nhttps://github.blog/changelog/2026-09-01-claude-fable-5-1-generally-available-in-github-copilot/",
+              "media_urls": "https://pbs.twimg.com/amplify_video_thumb/2094935346639458306/img/oYYbZ-hxrg56c4dY.jpg",
+              "thumbnail_url": "https://pbs.twimg.com/amplify_video_thumb/2094935346639458306/img/oYYbZ-hxrg56c4dY.jpg",
+              "duration_seconds": 122.763
+            },
+            "author": {
+              "username": "x-user-1",
+              "display_name": "x-user-2",
+              "avatar_url": "https://scrubbed.invalid/x-user-3",
+              "verified": true
+            },
+            "engagement": {
+              "views": 149668,
+              "likes": 713,
+              "comments": 63,
+              "shares": 94,
+              "saves": 74
+            },
+            "flags": {
+              "nsfw": false,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-09-01T23:51:22.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 11
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.005813,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 179602
+          }
+        },
+        {
+          "post": {
+            "id": "2094891879959539773",
+            "url": "https://x.com/x-user-1/status/2094891879959539773",
+            "content": {
+              "text": "Sometimes it's easier to show than tell. We're sure this update will help with that. 👀\n\nGitHub CLI now has a repeatable --attach flag that uploads a local image or video. Reference it inline in an issue, pull request, or comment body.\n\nAvailable now to all users on GitHub across all plans. 🎉\nhttps://github.blog/changelog/2026-09-01-github-cli-media-in-issues-pull-requests-and-comments/",
+              "media_urls": "https://pbs.twimg.com/media/HRKNC7UXoAAzXcc.jpg",
+              "thumbnail_url": "https://pbs.twimg.com/media/HRKNC7UXoAAzXcc.jpg",
+              "duration_seconds": 10.048
+            },
+            "author": {
+              "username": "x-user-1",
+              "display_name": "x-user-2",
+              "avatar_url": "https://scrubbed.invalid/x-user-3",
+              "verified": true
+            },
+            "engagement": {
+              "views": 998075,
+              "likes": 2780,
+              "comments": 116,
+              "shares": 332,
+              "saves": 1287
+            },
+            "flags": {
+              "nsfw": false,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-09-01T20:55:20.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 234
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.003234,
+            "language": "en",
+            "content_category": "entertainment",
+            "estimated_reach": 1197690
+          }
+        },
+        {
+          "post": {
+            "id": "2094608833255493900",
+            "url": "https://x.com/x-user-1/status/2094608833255493900",
+            "content": {
+              "text": "So you've opened another chat to talk to AI.\n\nInstead of switching surfaces to go from chats to development, do it all in the GitHub Copilot app.\n\nYou can start projects, run multiple agent sessions, use Quick Chat, and preview your app with a browser canvas.\n\nHere's how to get started 👇\nhttps://github.blog/ai-and-ml/github-copilot/github-copilot-app-for-beginners-getting-started/?utm_source=x-beginners-getting-started&utm_medium=social&utm_campaign=github-app-cli-Q1-push",
+              "media_urls": "https://pbs.twimg.com/media/HRGLncwWYAAcT35.jpg",
+              "thumbnail_url": "https://pbs.twimg.com/media/HRGLncwWYAAcT35.jpg",
+              "duration_seconds": 462.634
+            },
+            "author": {
+              "username": "x-user-1",
+              "display_name": "x-user-2",
+              "avatar_url": "https://scrubbed.invalid/x-user-3",
+              "verified": true
+            },
+            "engagement": {
+              "views": 89089,
+              "likes": 247,
+              "comments": 33,
+              "shares": 26,
+              "saves": 64
+            },
+            "flags": {
+              "nsfw": false,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-09-01T02:10:36.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 5
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.003435,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 106907
+          }
+        },
+        {
+          "post": {
+            "id": "2094532695544193179",
+            "url": "https://x.com/x-user-1/status/2094532695544193179",
+            "content": {
+              "text": "🦞 @openclaw 2.0 has arrived! But what did it take to get here? 👀\n\nFind out how creator @steipete and its maintainers built, scaled, and secured the fastest-growing open source project in GitHub history. 🚀\nhttps://youtu.be/5VSwaUXtPIE?si=vdegRI2eH4wXo2lG",
+              "media_urls": null,
+              "thumbnail_url": null,
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "x-user-1",
+              "display_name": "x-user-2",
+              "avatar_url": "https://scrubbed.invalid/x-user-3",
+              "verified": true
+            },
+            "engagement": {
+              "views": 156633,
+              "likes": 248,
+              "comments": 26,
+              "shares": 33,
+              "saves": 69
+            },
+            "flags": {
+              "nsfw": false,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-08-31T21:08:03.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 7
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.00196,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 187960
+          }
+        },
+        {
+          "post": {
+            "id": "2094492960268116217",
+            "url": "https://x.com/x-user-1/status/2094492960268116217",
+            "content": {
+              "text": "GitHub wants to learn about the tools, product settings, and personal adaptations developers use to do their best work. You don't need to identify as someone with disabilities or already consider yourself an accessibility-tool user to participate.\n\nSubmit your response by September 30 ⬇️\nhttp://gh.io/2026-accesscats-survey",
+              "media_urls": "https://pbs.twimg.com/media/HREiOxsWIAAxVAF.jpg",
+              "thumbnail_url": "https://pbs.twimg.com/media/HREiOxsWIAAxVAF.jpg",
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "x-user-1",
+              "display_name": "x-user-2",
+              "avatar_url": "https://scrubbed.invalid/x-user-3",
+              "verified": true
+            },
+            "engagement": {
+              "views": 61076,
+              "likes": 168,
+              "comments": 15,
+              "shares": 23,
+              "saves": 25
+            },
+            "flags": {
+              "nsfw": false,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-08-31T18:30:10.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 2
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.003373,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 73291
+          }
+        },
+        {
+          "post": {
+            "id": "2094141607083716809",
+            "url": "https://x.com/x-user-1/status/2094141607083716809",
+            "content": {
+              "text": "A dozen Dependabot pull requests on a Monday morning is how important updates get ignored. On Microsoft's GCToolkit, roughly one in six commits were single-dependency version bumps.\n\nThree small changes to dependabot.yml fixed it 👇\nhttps://github.blog/security/supply-chain-security/tame-dependabot-group-your-updates-slow-the-cadence-keep-security-fast/",
+              "media_urls": null,
+              "thumbnail_url": null,
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "x-user-1",
+              "display_name": "x-user-2",
+              "avatar_url": "https://scrubbed.invalid/x-user-3",
+              "verified": true
+            },
+            "engagement": {
+              "views": 79426,
+              "likes": 230,
+              "comments": 23,
+              "shares": 34,
+              "saves": 52
+            },
+            "flags": {
+              "nsfw": false,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-08-30T19:14:01.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 3
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.003613,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 95311
+          }
+        },
+        {
+          "post": {
+            "id": "2093825400178917519",
+            "url": "https://x.com/x-user-1/status/2093825400178917519",
+            "content": {
+              "text": "🚀 New updates in GitHub Issues\n• Pin views in the Issues sidebar\n• See profile avatars for reactions\n• Adjust dashboard density \n• Hide closed sub-issues\n• Scope-aware Issue dependency REST API https://t.co/jbHz4M6IDu",
+              "media_urls": "https://pbs.twimg.com/amplify_video_thumb/2093824517986533376/img/JsVkjvxmSBeOgfQ3.jpg",
+              "thumbnail_url": "https://pbs.twimg.com/amplify_video_thumb/2093824517986533376/img/JsVkjvxmSBeOgfQ3.jpg",
+              "duration_seconds": 44.014
+            },
+            "author": {
+              "username": "x-user-1",
+              "display_name": "x-user-2",
+              "avatar_url": "https://scrubbed.invalid/x-user-3",
+              "verified": true
+            },
+            "engagement": {
+              "views": 85485,
+              "likes": 333,
+              "comments": 47,
+              "shares": 44,
+              "saves": 41
+            },
+            "flags": {
+              "nsfw": false,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-08-29T22:17:31.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 10
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.00496,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 102582
+          }
+        },
+        {
+          "post": {
+            "id": "2093474503988801605",
+            "url": "https://x.com/x-user-1/status/2093474503988801605",
+            "content": {
+              "text": "Grab your pass to join us for #GitHubUniverse in San Francisco October 28-29 🌁 \nhttps://githubuniverse.com/?utm_source=Twitter&utm_medium=Social&utm_campaign=sun_short https://t.co/gkFhzpFSSv",
+              "media_urls": "https://pbs.twimg.com/media/HQ2D8yQXAAABc7i.jpg",
+              "thumbnail_url": "https://pbs.twimg.com/media/HQ2D8yQXAAABc7i.jpg",
+              "duration_seconds": 5.633
+            },
+            "author": {
+              "username": "x-user-1",
+              "display_name": "x-user-2",
+              "avatar_url": "https://scrubbed.invalid/x-user-3",
+              "verified": true
+            },
+            "engagement": {
+              "views": 64969,
+              "likes": 119,
+              "comments": 19,
+              "shares": 21,
+              "saves": 8
+            },
+            "flags": {
+              "nsfw": false,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-08-28T23:03:11.000Z",
+            "ext": {
+              "content_language": "en",
+              "quote_count": 7
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.002447,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 77963
+          }
+        }
+      ],
+      "next_cursor": "DAADDAABCgABHRaVIqRakXwKAAIdDYP4PJbwRQAIAAIAAAACCAADAAAAAAgABAAAAAAKAAUdF0TvgEAnEAoABh0XRO-AP9jwCwAHAAAA8EVtUEM2d0FBQWZRL2dHSk4wdkdwL0FBQUFCUWRGbUxmb0JyUnR4MFN0d2NJR2tDNUhSVUxXZ1VhSUdrZERZUDRQSmJ3UlIwUklrQVJWbUQ1SFJLMWhKVGJZSndkRW8wUXk5YXdQUjBTdFZ2am1qQjVIUllXQVJzVzBCb2RGaFIvbjFiUXlCMFR5bUVERnpEbkhSUFIwcHNiY1N3ZEUvY29OUllBRkIwUmk2TFpsdEVNSFE3REc1OWF3SThkRnBVaXBGcVJmQjBXS0dvMGx2Q1lIUS9pc2tlWE1Na2RGaWhxcUZieFpoMFJSbU9vV21DYgAA",
+      "total": null,
+      "dropped": 0
+    },
+    "credits_used": 1,
+    "request_id": "req-S1LFhp62Zig2OHFV",
+    "cached": false,
+    "pagination": {
+      "next_cursor": "sc.eyJ2IjoyLCJjIjoiREFBRERBQUJDZ0FCSFJhVklxUmFrWHdLQUFJZERZUDRQSmJ3UlFBSUFBSUFBQUFDQ0FBREFBQUFBQWdBQkFBQUFBQUtBQVVkRjBUdmdFQW5FQW9BQmgwWFJPLUFQOWp3Q3dBSEFBQUE4RVZ0VUVNMmQwRkJRV1pSTDJkSFNrNHdka2R3TDBGQlFVRkNVV1JHYlV4bWIwSnlVblI0TUZOMGQyTkpSMnRETlVoU1ZVeFhaMVZoU1VkclpFUlpVRFJRU21KM1VsSXdVa2xyUVZKV2JVUTFTRkpMTVdoS1ZHSlpTbmRrUlc4d1VYazVZWGRRVWpCVGRGWjJhbTFxUWpWSVVsbFhRVkp6VnpCQ2IyUkdhRkl2YmpGaVVYbENNRlI1YlVWRVJucEVia2hTVUZJd2NITmlZMU4zWkVVdlkyOU9VbGxCUmtJd1VtazJURnBzZEVWTlNGRTNSRWMxT1dGM1NUaGtSbkJWYVhCR2NWSm1RakJYUzBkdk1HeDJRMWxJVVM5cGMydGxXRTFOYTJSR2FXaHhjVVppZUZwb01GSlNiVTl2VjIxRFlnQUEiLCJlIjoidHdpdHRlci9zZWFyY2gvdHdlZXRzIiwicCI6ImN1cnNvciJ9",
+      "has_more": true,
+      "page_size": 20
+    },
+    "credits_remaining": 96
+  }
+}

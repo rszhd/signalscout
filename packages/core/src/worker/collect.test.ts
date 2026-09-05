@@ -96,6 +96,50 @@ describe("the poll step", () => {
     expect(sentTo(boss, filterQueue).postIds).toHaveLength(fakePosts.length);
   });
 
+  it("stores one row for a post two providers both collected", async () => {
+    /**
+     * Correctness-critical: deduplication. `posts` is keyed by
+     * `(source, external_id)` and the provider sits outside that key, so the
+     * same Reddit post fetched through Bright Data and through ScrapeCreators
+     * is one row and is classified once.
+     *
+     * US-025 made this reachable: until Reddit had a second provider, no
+     * deployment could collect one post twice. Both connectors read Reddit's
+     * own `t3_` fullname as the id, which is what makes the keys collide —
+     * `providers/scrapecreators/reddit.test.ts` asserts that half against the
+     * captured payloads of both providers.
+     */
+    const monitorId = await insertMonitor(database);
+
+    const collected: CandidatePost[] = [
+      {
+        externalId: "t3_1w71bul",
+        url: "https://www.reddit.com/r/softwaretesting/comments/1w71bul/",
+        text: "Starting automation from zero as a QA lead.",
+        postedAt: new Date("2026-09-04T11:08:36.000Z"),
+      },
+    ];
+
+    for (const providerId of ["brightdata", "scrapecreators"]) {
+      const registry = fakeRegistry({ posts: collected, providerId });
+
+      await createCollectStep({ registry, credentialsFor: credentials })(
+        { monitorId },
+        contextFor(db, stubBoss()),
+      );
+    }
+
+    const stored = await db.select().from(posts);
+
+    expect(stored).toHaveLength(1);
+    expect(stored[0]?.source).toBe("reddit");
+    expect(stored[0]?.externalId).toBe("t3_1w71bul");
+    // Attribution keeps whichever provider stored it first. It is outside the
+    // key on purpose: it says where the row came from, and it must never
+    // decide whether the row is the same post.
+    expect(stored[0]?.provider).toBe("brightdata");
+  });
+
   it("pages until the source says it is done, and never on the page length", async () => {
     // Two posts a page, five posts. A caller that stopped when a page came
     // back shorter than the last would keep two of the five.

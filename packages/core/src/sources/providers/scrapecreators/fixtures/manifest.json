@@ -1,0 +1,75 @@
+{
+  "capturedBy": "packages/core/src/sources/providers/scrapecreators/fixtures/capture.mjs",
+  "provider": "ScrapeCreators, Reddit API v1",
+  "note": "Author identity is replaced with stable pseudonyms. Everything else is whole.",
+  "fixtures": [
+    {
+      "file": "credentials-accepted.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v1/reddit/search?",
+        "note": "a working key with no query: refused on the input, not on the key"
+      },
+      "capturedAt": "2026-09-05T09:35:47.479Z",
+      "identitiesReplaced": 0
+    },
+    {
+      "file": "credentials-rejected.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v1/reddit/search?query=end+to+end+tests+keep+breaking",
+        "note": "sent with a deliberately invalid key"
+      },
+      "capturedAt": "2026-09-05T09:35:46.767Z",
+      "identitiesReplaced": 0
+    },
+    {
+      "file": "search-posts-page-2.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v1/reddit/search?query=end+to+end+tests+keep+breaking&filter=posts&sort=new&timeframe=month&after=eyJjYW5kaWRhdGVzX3JldHVybmVkIjoie1wic2VjdGlvbl8xX3BpcGVsaW5lXzBfZ2xvYmFsX21vZGlmaWVyc1wiOlwiMlwiLFwic2VjdGlvbl8xX3BpcGVsaW5lXzFfbG9jYWxfbW9kaWZpZXJzXCI6XCIyXCIsXCJzZWN0aW9uXzJfcGlwZWxpbmVfOF9wb3N0X3NlYXJjaFwiOlwiN1wiLFwic2VjdGlvbl8zX3BpcGVsaW5lXzBfc3VicmVkZGl0X3NlYXJjaFwiOlwiNVwiLFwic2VjdGlvbl8zX3BpcGVsaW5lXzFfYXV0aG9yX3NlYXJjaFwiOlwiNVwifSIsImV4cGVyaWVuY2Vfc2VsZWN0aW9uIjoicG9zdF93aXRoX3NpZGViYXIiLCJleHBlcmllbmNlX3ZlcnNpb24iOiJkZWZhdWx0Iiwic2VjdGlvbl8yX3BpcGVsaW5lXzhfcG9zdF9zZWFyY2giOiI3In0%3D",
+        "note": "followed the cursor \"eyJjYW5kaWRhdGVzX3JldHVybmVkIjoie1wic2VjdGlvbl8xX3BpcGVsaW5lXzBfZ2xvYmFsX21vZGlmaWVyc1wiOlwiMlwiLFwic2VjdGlvbl8xX3BpcGVsaW5lXzFfbG9jYWxfbW9kaWZpZXJzXCI6XCIyXCIsXCJzZWN0aW9uXzJfcGlwZWxpbmVfOF9wb3N0X3NlYXJjaFwiOlwiN1wiLFwic2VjdGlvbl8zX3BpcGVsaW5lXzBfc3VicmVkZGl0X3NlYXJjaFwiOlwiNVwiLFwic2VjdGlvbl8zX3BpcGVsaW5lXzFfYXV0aG9yX3NlYXJjaFwiOlwiNVwifSIsImV4cGVyaWVuY2Vfc2VsZWN0aW9uIjoicG9zdF93aXRoX3NpZGViYXIiLCJleHBlcmllbmNlX3ZlcnNpb24iOiJkZWZhdWx0Iiwic2VjdGlvbl8yX3BpcGVsaW5lXzhfcG9zdF9zZWFyY2giOiI3In0=\" from search-posts.json"
+      },
+      "capturedAt": "2026-09-05T09:35:55.979Z",
+      "identitiesReplaced": 14
+    },
+    {
+      "file": "search-posts.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v1/reddit/search?query=end+to+end+tests+keep+breaking&filter=posts&sort=new&timeframe=month"
+      },
+      "capturedAt": "2026-09-05T09:35:51.095Z",
+      "identitiesReplaced": 14
+    },
+    {
+      "file": "subreddit-posts.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v1/reddit/subreddit?subreddit=softwaretesting&sort=new"
+      },
+      "capturedAt": "2026-09-05T09:35:57.824Z",
+      "identitiesReplaced": 44
+    },
+    {
+      "file": "timeframe-rejected.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v1/reddit/subreddit?subreddit=softwaretesting&sort=new&timeframe=month",
+        "note": "a timeframe beside sort=new, which the provider refuses"
+      },
+      "capturedAt": "2026-09-05T09:35:58.475Z",
+      "identitiesReplaced": 0
+    },
+    {
+      "file": "unknown-subreddit.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v1/reddit/subreddit?subreddit=this-subreddit-does-not-exist-intentwatch&sort=new",
+        "note": "a subreddit that does not exist; answers 200 with no posts, and bills for it"
+      },
+      "capturedAt": "2026-09-05T09:36:00.691Z",
+      "identitiesReplaced": 0
+    }
+  ]
+}

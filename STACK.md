@@ -137,6 +137,7 @@ design more than any framework choice.
 |---|---|
 | Reddit read, Bright Data free allowance | $0, first 5,000 records each month |
 | Reddit read, Bright Data pay-as-you-go | $0.0015 ($1.50 per 1,000 records) |
+| Reddit read, ScrapeCreators | ~$0.00008 to $0.00027, measured |
 | X read, pay-per-use | $0.005 |
 | Embedding pre-filter | ~$0.00001 |
 | AI classification, cheap model | ~$0.001 |
@@ -144,6 +145,20 @@ design more than any framework choice.
 **Fetching an X post costs about five times more than classifying it.** The money
 is spent before our code ever sees the text. Reddit through Bright Data costs
 about a third of an X read, and starts free, so Reddit still carries the MVP.
+
+**The two Reddit providers do not bill the same thing, and the gap is large.**
+Bright Data bills a record, so a post costs $0.0015 whatever else happens.
+ScrapeCreators bills a request at $0.00188 — the $47 pack of 25,000 credits,
+read on 2026-09-05 — and one request returned 7 posts on a keyword search and
+23 on a subreddit when we measured it. So the same subreddit page cost $0.075
+through Bright Data and $0.00376 through ScrapeCreators: **about twenty times
+less for a comparable page**.
+
+Two things stop that being the whole story. The per-post figure is a division,
+not a price, and it moves with how many posts a request happens to return — a
+subreddit with four new posts costs the same request as one with twenty-three.
+And ScrapeCreators bills a request that finds nothing: a misspelled subreddit
+answers 200 with an empty list and takes the credit anyway.
 
 ## A source is not a provider
 

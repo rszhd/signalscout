@@ -266,8 +266,10 @@ export function createCollectStep({ registry, credentialsFor }: CollectOptions):
 
     for (const sourceId of monitor.sources) {
       // `only` and not a provider choice, because a monitor names a platform
-      // and nothing yet records which provider it wants. It throws rather than
-      // guessing the day a platform has two, which is US-025's to answer.
+      // and the row records no provider. Reddit has two since US-025, so a
+      // deployment holding both keys has to record which one to use; `only`
+      // reads that and throws when nothing has chosen. US-026 moves the
+      // choice from an environment variable to a stored one.
       const source = registry.only(sourceId);
       const providerId = source.provider.id;
       const credentials = await credentialsFor(source);

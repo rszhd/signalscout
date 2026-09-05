@@ -48,11 +48,10 @@ export type Source = (typeof sources)[number];
  * `source_credentials` is keyed by, because a key belongs to the account and
  * not to the network.
  *
- * `scrapecreators` has no connector yet — US-025 writes it. It is here because
- * US-024's own note says the re-key has to run first, or a ScrapeCreators key
- * has nowhere to live, and because a column whose only legal value is
- * "brightdata" cannot show that the keys above separate two providers at all.
- * No route can write it while nothing is registered under it.
+ * US-024 added `scrapecreators` before it had a connector, so the re-key could
+ * run first and a ScrapeCreators key would have somewhere to live. US-025 then
+ * wrote the connector, and both values are now reachable: one Reddit poll has
+ * been billed to each provider.
  */
 export const providers = ["brightdata", "scrapecreators"] as const;
 export type Provider = (typeof providers)[number];

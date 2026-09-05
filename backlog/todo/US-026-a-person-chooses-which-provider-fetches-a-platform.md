@@ -62,8 +62,8 @@ monitor form does not mention it.
 
 ## Notes
 
-- Depends on [US-024](US-024-a-platform-is-separated-from-the-provider-that-fetches-it.md)
-  and [US-025](US-025-scrapecreators-collects-reddit-posts.md). Before US-025
+- Depends on [US-024](../done/2026-09/US-024-a-platform-is-separated-from-the-provider-that-fetches-it.md)
+  and [US-025](../done/2026-09/US-025-scrapecreators-collects-reddit-posts.md). Before US-025
   there is nothing to choose between.
 - The store is one small table, platform to provider. It does not need a row
   per platform: an absent row means the only connected provider.
@@ -71,8 +71,17 @@ monitor form does not mention it.
   the credential screen. This extends them; it does not start a second screen.
 - A per-monitor override is deliberately out of scope. Write a ticket when
   somebody asks.
+- The seam already exists. US-025 gave `createSourceRegistry` a
+  `defaultProviders` option, because a second Reddit connector made
+  `registry.only` ambiguous and the live proof needed a way to choose. It is
+  filled from `REDDIT_PROVIDER` today. This ticket fills it from the store
+  instead and deletes the variable from `env.ts`, `.env.example` and the
+  README; it does not need a new mechanism.
 
 ## Log
 
 - 2026-09-05T15:23+08:00 — Written with the provider decision. Global per
   platform, because it is the simpler thing that answers the question asked.
+- 2026-09-05T18:10+08:00 — Unblocked: US-025 shipped the second provider, so
+  there is now something to choose between. It also left `REDDIT_PROVIDER`
+  behind as the temporary answer, which this ticket removes.

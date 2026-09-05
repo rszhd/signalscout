@@ -59,6 +59,8 @@ IntentWatch ships the integrations. You own the accounts.
 
 ```env
 BRIGHTDATA_API_KEY=      # Bright Data, which serves Reddit
+SCRAPECREATORS_API_KEY=  # ScrapeCreators, which also serves Reddit
+REDDIT_PROVIDER=         # only if you hold both keys
 
 X_API_KEY=               # optional
 X_API_SECRET=
@@ -87,8 +89,17 @@ upgrades keeps polling. It is going: rename it to `BRIGHTDATA_API_KEY` when you
 next edit `.env`. The application logs which line to change, once per start.
 
 You only need keys for the providers that serve the sources you turn on. Reddit
-alone is a useful product, so `BRIGHTDATA_API_KEY` and an AI key are enough to
-start.
+alone is a useful product, so one Reddit key and an AI key are enough to start.
+
+**Reddit has two providers, and you need one of them, not both.** Bright Data
+bills a record, starting with 5,000 free each month. ScrapeCreators bills a
+request, and a request brought back 7 to 23 posts when we measured it, which
+makes it much cheaper per post; a new account gets 100 credits with no card.
+
+Set `REDDIT_PROVIDER` only if you hold both keys. With one, IntentWatch uses
+it and asks nothing. With both and no choice recorded, a poll refuses to start
+rather than pick for you — picking would spend money at a provider you did not
+choose.
 
 ### What that costs
 

@@ -73,9 +73,10 @@ export class UnknownConnectorError extends Error {
  * Thrown when a platform has more than one provider and nothing has said which
  * to use.
  *
- * It cannot happen while each platform ships one connector. It is here so that
- * the day a second one is registered the choice is demanded loudly, at the
- * caller, rather than settled by registration order.
+ * The choice is demanded loudly, at the caller, rather than settled by
+ * registration order: answering with the first would spend somebody's money at
+ * a provider they did not pick. `CreateSourceRegistryOptions.defaultProviders`
+ * is where the answer goes once somebody has made it.
  */
 export class AmbiguousConnectorError extends Error {
   constructor(
@@ -84,7 +85,7 @@ export class AmbiguousConnectorError extends Error {
   ) {
     super(
       `"${platformId}" is fetched by ${providers.join(" and ")}. ` +
-        "Name the provider: this caller has to be told which one to use.",
+        "Record which one to use: nothing has chosen, and registration order is not a choice.",
     );
     this.name = "AmbiguousConnectorError";
   }
@@ -124,6 +125,23 @@ export interface SourceRegistry {
 export interface CreateSourceRegistryOptions {
   readonly definitions: readonly ConnectorDefinition[];
   readonly runtime: SourceRuntime;
+  /**
+   * Which provider fetches a platform, when more than one can.
+   *
+   * `only` consults this before it gives up. A recorded choice is not a guess:
+   * the objection to answering with the first registration is that nobody
+   * chose it, and an entry here was chosen by whoever configured the
+   * deployment.
+   *
+   * US-025 fills it from one environment variable, because a second provider
+   * for Reddit had to be reachable before there was any screen to reach it
+   * from. US-026 replaces that with a stored choice per platform and a
+   * settings row that shows it. This option is the seam between the two, and
+   * it is deliberately the whole mechanism: a platform with one provider needs
+   * no entry, and an entry naming a provider that does not fetch the platform
+   * is refused at boot rather than at poll time.
+   */
+  readonly defaultProviders?: Readonly<Record<PlatformId, ProviderId>>;
 }
 
 /**
@@ -133,6 +151,7 @@ export interface CreateSourceRegistryOptions {
 export function createSourceRegistry({
   definitions,
   runtime,
+  defaultProviders = {},
 }: CreateSourceRegistryOptions): SourceRegistry {
   const connectors = new Map<string, SocialSource>();
   const keys: ConnectorKey[] = [];
@@ -201,13 +220,23 @@ export function createSourceRegistry({
     only(platformId) {
       const found = forPlatform(platformId);
       if (found.length === 0) throw new UnknownSourceError([platformId], platformIds);
-      if (found.length > 1) {
-        throw new AmbiguousConnectorError(
-          platformId,
-          found.map((connector) => connector.provider.id),
-        );
-      }
-      return found[0] as SocialSource;
+      if (found.length === 1) return found[0] as SocialSource;
+
+      // More than one, so the answer has to come from a recorded choice. A
+      // default that names a provider this platform does not have is not
+      // honoured: silently falling back would spend money at a provider
+      // nobody picked, which is the exact failure `only` exists to prevent.
+      const chosen = defaultProviders[platformId];
+      const connector = chosen
+        ? found.find((candidate) => candidate.provider.id === chosen)
+        : undefined;
+
+      if (connector) return connector;
+
+      throw new AmbiguousConnectorError(
+        platformId,
+        found.map((candidate) => candidate.provider.id),
+      );
     },
     forPlatform,
     platforms: () => platformIds,

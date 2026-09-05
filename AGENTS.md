@@ -98,10 +98,38 @@ keyed by provider too, because one key serves every platform behind it.
 The split changed no behaviour, and the suite is the evidence: no expected value
 moved except the ones the ticket asked to move. What it did not do is run live.
 
-**`registry.only(platform)` is where a provider choice will have to go.** A
-monitor names a platform and nothing records which provider it wants, so every
-caller with one and not the other goes through `only`, which refuses to choose
-when a platform has two providers. Registration order is not a choice.
+**Reddit has two providers, and one live poll has run through each.** US-025
+added ScrapeCreators on 2026-09-05. It is a different shape from Bright Data in
+every way except the interface: the API is synchronous, so a search returns its
+posts in 1.8 to 4.9 seconds and the connector never waits on a snapshot; it
+bills a *request* rather than a record, and reports `credits_charged` on every
+answer, so `unitsConsumed` is measured and not assumed. A subreddit page cost
+$0.075 through Bright Data and $0.00376 through ScrapeCreators.
+
+Three of its facts were not in the provider's documentation, and the capture
+script found all three: a `timeframe` is refused beside `sort=new`, so `since`
+is applied by us; a subreddit that does not exist answers 200 with an empty list
+and bills a credit for it; and the credential probe is free, measured against
+the account's own credit balance and against `api_usage`, which held no row for
+it.
+
+**Deduplication across two providers is proven, live.** A ScrapeCreators poll
+collected 47 posts from a subreddit Bright Data had already collected, and
+stored no new row. Both connectors read Reddit's own `t3_` fullname —
+`post_id` at one provider and `name` at the other — and `posts` is keyed by
+`(source, external_id)` with the provider outside the key.
+
+What is still unproven for this connector: a real rate limit, a real timeout,
+and keyword discovery at any volume. The 429 branch is our half of a contract
+the provider has not yet shown us.
+
+**`registry.only(platform)` now reads a recorded choice.** A monitor names a
+platform and its row records no provider, so every caller with one and not the
+other goes through `only`. It refuses to answer from registration order, and
+reads `defaultProviders` instead — filled today from `REDDIT_PROVIDER`, and by
+US-026 from a stored choice per platform. A deployment holding one provider's
+key needs no entry, which is the common case. A default naming a provider that
+does not fetch the platform is refused, not ignored.
 
 **The embedder has met a real provider once.** On 2026-09-05
 `capture:embeddings` embedded PLAN.md's example monitor and the five fake posts
@@ -338,7 +366,7 @@ Do not reopen these without being asked. The reasoning is in
 | Python | TypeScript |
 | A managed auth service | Better Auth in our own Postgres |
 | An in-memory Postgres fake | Real Postgres, from the first test file |
-| A Reddit API key per user | Reddit through Bright Data |
+| A Reddit API key per user | Reddit through a provider: Bright Data or ScrapeCreators |
 | One record describing a source | A platform and a provider, separate; a connector is the pair |
 
 **One row above was reversed on 2026-09-05.** It read: *a provider picker in the

@@ -500,7 +500,17 @@ describe("the monitor routes", () => {
 
         expect(response.statusCode).toBe(409);
         expect(response.json().message).toContain("BRIGHTDATA_API_KEY");
-        expect(response.json().missingCredentials).toHaveLength(1);
+
+        // Both of Reddit's providers, because either one would unblock the
+        // monitor and the person gets to pick which account to open. US-025
+        // gave Reddit a second provider; before it there was one row here, and
+        // the rule that produced both — a platform is blocked only when every
+        // connector for it is — did not change.
+        expect(
+          response
+            .json()
+            .missingCredentials.map((missing: { providerId: string }) => missing.providerId),
+        ).toEqual(["brightdata", "scrapecreators"]);
 
         // And the row still says paused, so the worker agrees with the answer.
         const [row] = await db.select().from(monitors);

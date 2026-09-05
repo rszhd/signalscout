@@ -26,7 +26,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
 const here = fileURLToPath(new URL(".", import.meta.url));
-const root = fileURLToPath(new URL("../../../../../../", import.meta.url));
+const root = fileURLToPath(new URL("../../../../../../../", import.meta.url));
 
 const api = "https://api.brightdata.com/datasets/v3";
 

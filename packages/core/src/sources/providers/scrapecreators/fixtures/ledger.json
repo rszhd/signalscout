@@ -1,0 +1,61 @@
+{
+  "note": "What each captured call cost, in the provider's own numbers. This is the evidence for the billable unit and for whether a credential probe is free.",
+  "calls": [
+    {
+      "call": "credentials-rejected",
+      "httpStatus": 401,
+      "elapsedMs": 759,
+      "creditsCharged": null,
+      "creditsRemaining": null,
+      "note": "sent with a deliberately invalid key"
+    },
+    {
+      "call": "credentials-accepted",
+      "httpStatus": 400,
+      "elapsedMs": 712,
+      "creditsCharged": 0,
+      "creditsRemaining": 2095,
+      "note": "a working key with no query: refused on the input, not on the key"
+    },
+    {
+      "call": "search-posts",
+      "httpStatus": 200,
+      "elapsedMs": 3614,
+      "creditsCharged": 1,
+      "creditsRemaining": 2094,
+      "note": null
+    },
+    {
+      "call": "search-posts-page-2",
+      "httpStatus": 200,
+      "elapsedMs": 4884,
+      "creditsCharged": 1,
+      "creditsRemaining": 2093,
+      "note": "followed the cursor \"eyJjYW5kaWRhdGVzX3JldHVybmVkIjoie1wic2VjdGlvbl8xX3BpcGVsaW5lXzBfZ2xvYmFsX21vZGlmaWVyc1wiOlwiMlwiLFwic2VjdGlvbl8xX3BpcGVsaW5lXzFfbG9jYWxfbW9kaWZpZXJzXCI6XCIyXCIsXCJzZWN0aW9uXzJfcGlwZWxpbmVfOF9wb3N0X3NlYXJjaFwiOlwiN1wiLFwic2VjdGlvbl8zX3BpcGVsaW5lXzBfc3VicmVkZGl0X3NlYXJjaFwiOlwiNVwiLFwic2VjdGlvbl8zX3BpcGVsaW5lXzFfYXV0aG9yX3NlYXJjaFwiOlwiNVwifSIsImV4cGVyaWVuY2Vfc2VsZWN0aW9uIjoicG9zdF93aXRoX3NpZGViYXIiLCJleHBlcmllbmNlX3ZlcnNpb24iOiJkZWZhdWx0Iiwic2VjdGlvbl8yX3BpcGVsaW5lXzhfcG9zdF9zZWFyY2giOiI3In0=\" from search-posts.json"
+    },
+    {
+      "call": "subreddit-posts",
+      "httpStatus": 200,
+      "elapsedMs": 1843,
+      "creditsCharged": 1,
+      "creditsRemaining": 2092,
+      "note": null
+    },
+    {
+      "call": "timeframe-rejected",
+      "httpStatus": 400,
+      "elapsedMs": 650,
+      "creditsCharged": 0,
+      "creditsRemaining": 2092,
+      "note": "a timeframe beside sort=new, which the provider refuses"
+    },
+    {
+      "call": "unknown-subreddit",
+      "httpStatus": 200,
+      "elapsedMs": 2216,
+      "creditsCharged": 1,
+      "creditsRemaining": 2091,
+      "note": "a subreddit that does not exist; answers 200 with no posts, and bills for it"
+    }
+  ]
+}

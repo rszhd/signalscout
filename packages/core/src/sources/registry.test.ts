@@ -88,6 +88,50 @@ describe("a caller that has a platform and no provider", () => {
       '"reddit" is fetched by brightdata and scrapecreators.',
     );
   });
+
+  it("answers with the provider a deployment recorded", () => {
+    // A recorded choice is not a guess. The objection to registration order is
+    // that nobody chose it; an entry here was chosen by whoever configured the
+    // deployment. US-025 fills it from one variable, US-026 from a stored row.
+    const registry = createSourceRegistry({
+      definitions: [
+        fakeSourceDefinition({ id: "reddit", providerId: "brightdata" }),
+        fakeSourceDefinition({ id: "reddit", providerId: "scrapecreators" }),
+      ],
+      runtime,
+      defaultProviders: { reddit: "scrapecreators" },
+    });
+
+    expect(registry.only("reddit").provider.id).toBe("scrapecreators");
+  });
+
+  it("still refuses when the recorded provider does not fetch the platform", () => {
+    // Falling back to one of the two would spend money at a provider nobody
+    // picked, which is the failure `only` exists to prevent. A misconfigured
+    // choice has to be as loud as no choice at all.
+    const registry = createSourceRegistry({
+      definitions: [
+        fakeSourceDefinition({ id: "reddit", providerId: "brightdata" }),
+        fakeSourceDefinition({ id: "reddit", providerId: "scrapecreators" }),
+      ],
+      runtime,
+      defaultProviders: { reddit: "a-provider-that-is-not-registered" },
+    });
+
+    expect(() => registry.only("reddit")).toThrow(AmbiguousConnectorError);
+  });
+
+  it("ignores a recorded choice for a platform that has only one provider", () => {
+    const registry = createSourceRegistry({
+      definitions: [fakeSourceDefinition({ id: "reddit", providerId: "brightdata" })],
+      runtime,
+      defaultProviders: { reddit: "scrapecreators" },
+    });
+
+    // One connector can run, so there is nothing to choose and a stale entry
+    // must not turn a working deployment into a failing one.
+    expect(registry.only("reddit").provider.id).toBe("brightdata");
+  });
 });
 
 describe("the registry fails at startup, not at poll time", () => {

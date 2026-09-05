@@ -105,13 +105,43 @@ no provider is a platform nothing can fetch.
 
 ## Two providers for one platform
 
+This is no longer hypothetical. US-025 gave Reddit a second provider on
+2026-09-05, and both fetch the same subreddits.
+
 The registry holds a connector under the pair, so `registry.get(platform,
 provider)` is the exact address and `registry.only(platform)` is for a caller
-that has a platform and no choice recorded yet. `only` throws when a platform
-has two providers, because registration order is not a choice: answering with
-the first would spend somebody's money at a provider they did not pick. The day
-a second provider ships, `only`'s callers are the list of places that have to
-be given the choice.
+that has a platform and no provider. `only` refuses to answer from registration
+order, because answering with the first would spend somebody's money at a
+provider they did not pick. It reads
+`CreateSourceRegistryOptions.defaultProviders` instead — a recorded choice,
+which is a different thing from a guess — and throws when nothing has chosen.
+
+A platform with one provider needs no entry, which is every deployment holding
+one key. `REDDIT_PROVIDER` fills the entry today; US-026 replaces it with a
+stored choice per platform and a settings row that shows it. A default naming a
+provider that does not fetch the platform is refused, not ignored.
+
+Two connectors for one platform must agree about the id they give a post, or
+the same post becomes two rows. Both Reddit connectors read Reddit's own `t3_`
+fullname — Bright Data calls it `post_id` and ScrapeCreators calls it `name`.
+That was proven live: a poll through ScrapeCreators collected 47 posts from a
+subreddit Bright Data had already collected, and stored no new row.
+
+**The two providers agree about almost nothing else**, which is the argument
+for the split:
+
+| | Bright Data | ScrapeCreators |
+|---|---|---|
+| Billable unit | a record | a request |
+| Price | $1.50 / 1,000 records | $1.88 / 1,000 requests |
+| One unit buys | one post | 7 to 23 posts, measured |
+| Shape | trigger, then poll a snapshot | the posts are in the answer |
+| A collection took | 8 minutes 40 seconds | 1.8 to 4.9 seconds |
+| A refused key says | `Invalid credentials`, as a bare string | `{"message":"Invalid API key"}` |
+
+A connector reports `unitsConsumed` in its own unit and the budget guard prices
+it from the connector's own `pricePerUnitMicros`. Nothing downstream reads the
+table above.
 
 ---
 
@@ -163,9 +193,18 @@ case that proves it.
 payload is evidence about someone else's API; a formatter that rewrites it
 makes the file a record of our tooling instead.
 
-`sources/providers/brightdata/fixtures/capture.mjs` is the worked example. Its first run
-answered three questions the provider's own documentation got wrong, which is
-the whole argument for capturing rather than writing.
+`sources/providers/brightdata/fixtures/capture.mjs` is the worked example. Its
+first run answered three questions the provider's own documentation got wrong,
+which is the whole argument for capturing rather than writing.
+
+`sources/providers/scrapecreators/fixtures/capture.mjs` is the second, and it
+answered four more. Three were not in the documentation at all: the API is
+synchronous, a `timeframe` is refused beside `sort=new`, and a subreddit that
+does not exist answers 200 with an empty list and bills for it. The fourth is
+what a credential probe costs, and that one is not a thing a connector may
+assume — so the script writes `ledger.json` beside the fixtures, recording what
+each captured call did to the account's credit balance. A claim that a check is
+free is a claim about somebody's bill, and the ledger is the evidence for it.
 
 The fake source is the exception, and it is not one: its fixtures are
 `CandidatePost` values, which is our own shape. Use it to test everything

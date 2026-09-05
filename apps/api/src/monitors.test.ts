@@ -98,6 +98,7 @@ const newMonitor = {
     reddit: ["flaky end to end tests", "manual qa before every release"],
     x: [],
     linkedin: [],
+    youtube: [],
   },
   subreddits: ["SaaS"],
   sources: ["reddit"],
@@ -223,13 +224,13 @@ describe("the monitor routes", () => {
           1,
         );
 
-        // Two providers for Reddit and one each for X and LinkedIn, and four
-        // connectors make three rows. US-006 added the second platform and
-        // US-028 the third, which is why this list grew; a platform appearing
-        // twice is the failure it guards. SocialCrawl fetching two of the
-        // three is exactly the collapse this asserts.
+        // Two providers for Reddit and one each for X, LinkedIn and YouTube:
+        // five connectors make four rows. US-006 added the second platform,
+        // US-028 the third and US-034 the fourth, which is why this list grew;
+        // a platform appearing twice is the failure it guards. SocialCrawl
+        // fetching three of the four is exactly the collapse this asserts.
         const ids = body.sources.map((source: { id: string }) => source.id);
-        expect(ids).toEqual(["reddit", "x", "linkedin"]);
+        expect(ids).toEqual(["reddit", "x", "linkedin", "youtube"]);
         expect(new Set(ids).size).toBe(ids.length);
         // And no price beside it. Two providers do not agree about what a
         // Reddit record costs, so a figure printed here would be one
@@ -473,6 +474,7 @@ describe("the monitor routes", () => {
           // Named by no monitor here, and still its own list. The lists are
           // kept apart by platform and not by what the monitor watches.
           linkedin: [],
+          youtube: [],
         });
       });
     });
@@ -553,6 +555,7 @@ describe("the monitor routes", () => {
           reddit: ["regression testing takes too long"],
           x: [],
           linkedin: [],
+          youtube: [],
         });
         expect(response.json().product).toBe(newMonitor.product);
       });

@@ -73,6 +73,17 @@ const apiBase = "https://www.socialcrawl.dev/v1";
 export const endpoints = {
   search: `${apiBase}/twitter/search/tweets`,
   linkedInPosts: `${apiBase}/linkedin/search/posts`,
+  /**
+   * YouTube. US-034.
+   *
+   * `/v1/youtube/search/advanced` is the endpoint the provider's own catalogue
+   * says to prefer for date filtering, and it answers 400 INVALID_REQUEST to
+   * the `published_after` parameter that catalogue lists. The refusal is
+   * refunded, so learning it was free — but it is why the plain search is here
+   * and the advanced one is not.
+   */
+  youTubeSearch: `${apiBase}/youtube/search`,
+  youTubeComments: `${apiBase}/youtube/video/comments`,
 } as const;
 
 /**
@@ -128,6 +139,47 @@ export const xSearchProfile: EndpointProfile = {
  * the cost of stopping early is a post found on the next poll, and the cost of
  * paging on is five credits for nothing.
  */
+/**
+ * YouTube search: `pagination.next_cursor`, and one credit a call.
+ *
+ * A page carried 45 results for one credit, which is the most items per credit
+ * of any search this product makes. The cursor is a long base64 blob and page
+ * two returned 25 more with none of page one's among them.
+ *
+ * A search that matches nothing is billed in full and does not come back
+ * empty: a phrase that cannot occur returned twelve unrelated videos. Same as
+ * LinkedIn, opposite of X, and it is why nothing here treats an empty answer
+ * as a finished query.
+ */
+export const youTubeSearchProfile: EndpointProfile = {
+  endpoint: endpoints.youTubeSearch,
+  standardCallCredits: 1,
+  cursorOf: (body) => {
+    const pagination = objectAt(body, "pagination");
+    if (pagination?.has_more === false) return undefined;
+    return text(pagination?.next_cursor);
+  },
+};
+
+/**
+ * YouTube comments: the same cursor and the same price as the search.
+ *
+ * One page returned 51 comments for one credit — twice ScrapeCreators' Reddit
+ * page for the same money — and every row carried an exact per-second
+ * timestamp. With `order=newest` they arrived strictly newest-first with no
+ * exception, which is the guarantee ScrapeCreators claimed for Reddit and
+ * broke by 33 comments. Measured on 2026-09-06; `youtube-fixtures/` holds it.
+ */
+export const youTubeCommentsProfile: EndpointProfile = {
+  endpoint: endpoints.youTubeComments,
+  standardCallCredits: 1,
+  cursorOf: (body) => {
+    const pagination = objectAt(body, "pagination");
+    if (pagination?.has_more === false) return undefined;
+    return text(pagination?.next_cursor);
+  },
+};
+
 export const linkedInPostSearchProfile: EndpointProfile = {
   endpoint: endpoints.linkedInPosts,
   standardCallCredits: 5,

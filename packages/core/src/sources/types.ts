@@ -150,6 +150,22 @@ export interface CandidatePost {
   /** When the author posted it, not when we read it. */
   readonly postedAt: Date;
   /**
+   * Set when the platform will not stand behind the date above.
+   *
+   * US-034. YouTube derives a search result's date from a relative label —
+   * "2 years ago" — unless asked otherwise, and it says so in a field of its
+   * own. Measured drift: a median of 62 days and a maximum of 283.
+   *
+   * A caller must not apply a `since` cut to such a date. Dropping a video
+   * because the provider was vague about when it was published loses a lead
+   * nobody can tell was lost; keeping it costs one model call.
+   *
+   * Absent means the date is exact, which is the normal case on every
+   * connector. This is not a general "we are unsure" flag and must not become
+   * one: it says the provider itself declared the value approximate.
+   */
+  readonly postedAtIsApproximate?: boolean;
+  /**
    * How many replies the platform says this post has.
    *
    * The poll stores it and compares it on the next pass, because that is what

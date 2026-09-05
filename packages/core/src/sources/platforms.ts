@@ -89,11 +89,48 @@ export const linkedInPlatform: PlatformDescriptor = {
   },
 };
 
+export const youTubePlatformId = "youtube";
+
+export const youTubePlatform: PlatformDescriptor = {
+  id: youTubePlatformId,
+  displayName: "YouTube",
+  search: {
+    /**
+     * Six words. Measured, and the number matters less here than on the other
+     * three platforms because of what a YouTube search returns.
+     *
+     * US-034 searched `flaky tests` live: 45 results, and **every one of the
+     * first twelve was a tutorial** — "How To Fix Flaky Tests In CI/CD", "3
+     * Steps to Fix Flaky Tests", a conference talk. Not one was a person with
+     * the problem. That is not a bad query; it is what the platform is. A
+     * video is something somebody published to be seen.
+     *
+     * So on YouTube a query is aimed at the *conversation*, not the video: the
+     * lead is in the comments underneath, which is why this platform is only
+     * useful with replies switched on. A title is a headline, so six words is
+     * enough to name a topic and short enough not to demand a sentence.
+     *
+     * A search that matches nothing is billed in full and comes back wrong
+     * rather than empty — a phrase that cannot occur returned twelve unrelated
+     * videos. Same as LinkedIn, opposite of X.
+     */
+    maxQueryWords: 6,
+    note:
+      "A YouTube search returns videos people published, not people with a " +
+      "problem — every result for a topic is a tutorial about it. The lead is " +
+      "in the comments, so this platform needs replies switched on to be " +
+      "worth polling. Name the topic a person would search for when stuck. A " +
+      "vague query is not refused here; it returns unrelated videos at full " +
+      "price.",
+  },
+};
+
 /** Every platform the schema accepts, for a screen that lists them. */
 export const platforms: readonly PlatformDescriptor[] = [
   redditPlatform,
   xPlatform,
   linkedInPlatform,
+  youTubePlatform,
 ];
 
 /** One platform, with every provider a build has for it. */

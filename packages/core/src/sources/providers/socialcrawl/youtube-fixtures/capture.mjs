@@ -182,7 +182,7 @@ function scrubHandlesInText(value, pseudonym) {
   // text without hiding anybody — so a mention is recognised only where the
   // `@` opens a word.
   return value.replace(
-    /(^|[\s\u202a-\u202e\u2066-\u2069(\[])[\u202a-\u202e\u2066-\u2069]*@([A-Za-z0-9_.-]{3,})/g,
+    /(^|[\s\u202a-\u202e\u2066-\u2069([])[\u202a-\u202e\u2066-\u2069]*@([A-Za-z0-9_.-]{3,})/g,
     (_, before, handle) => `${before}@${pseudonym(handle)}`,
   );
 }
@@ -214,7 +214,9 @@ function isAvatarUrl(value) {
  * connector stores and deduplicates on, so it is kept whole.
  */
 function scrubChannelUrl(value, pseudonym) {
-  const match = value.match(/^(https?:\/\/(?:www\.)?youtube\.com)\/(@[^/?#]+|channel\/[^/?#]+|c\/[^/?#]+|user\/[^/?#]+)(.*)$/i);
+  const match = value.match(
+    /^(https?:\/\/(?:www\.)?youtube\.com)\/(@[^/?#]+|channel\/[^/?#]+|c\/[^/?#]+|user\/[^/?#]+)(.*)$/i,
+  );
   if (!match) return undefined;
 
   const [, origin, path, tail] = match;

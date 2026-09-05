@@ -2,12 +2,12 @@
 /**
  * Which screen the shell shows.
  *
- * Three claims, and all are about what a person lands on. The inbox is the
+ * Four claims, and all are about what a person lands on. The inbox is the
  * product, so an empty hash is the inbox and not the setup form. The monitor
  * form has to be reachable from the header, because the inbox's own empty
- * state sends people to it. And the monitor list must not answer to the form's
+ * state sends people to it. The monitor list must not answer to the form's
  * route, because "#/monitors" is a prefix of "#/monitors/new" and the shorter
- * test would take both.
+ * test would take both. And the nav offers only screens that are built.
  */
 import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -46,7 +46,7 @@ async function go(hash: string): Promise<void> {
   await settle();
 }
 
-describe("the three screens", () => {
+describe("the four screens", () => {
   let screen: Screen;
 
   beforeEach(() => {
@@ -59,6 +59,9 @@ describe("the three screens", () => {
         if (url === "/api/monitors") return json([]);
         if (url.startsWith("/api/matches")) {
           return json({ matches: [], nextCursor: null, asOf: "2026-09-05T12:00:00.000Z" });
+        }
+        if (url === "/api/connections") {
+          return json({ canStore: true, storeBlocker: null, sources: [] });
         }
         throw new Error(`Unexpected request: ${url}`);
       }),
@@ -135,14 +138,24 @@ describe("the three screens", () => {
     expect(screen.container.querySelector('[role="dialog"]')).toBeNull();
   });
 
+  it("shows the connections screen on its own route", async () => {
+    screen = await mount(<App />);
+
+    await go("#/connections");
+
+    expect(screen.container.textContent).toContain("Connections");
+  });
+
   it("does not expose mockup routes whose behaviour is not built", async () => {
     screen = await mount(<App />);
 
     const links = [...screen.container.querySelectorAll("nav a")].map((link) =>
       link.getAttribute("href"),
     );
-    expect(links).toEqual(["#/", "#/monitors", "#/monitors/new"]);
-    expect(screen.container.textContent).not.toContain("Connections");
+    // Connections joined this list in US-023, when the screen behind it was
+    // built. Settings is still a mockup route and must stay off the nav: a
+    // link that leads nowhere is worse than no link.
+    expect(links).toEqual(["#/", "#/monitors", "#/connections", "#/monitors/new"]);
     expect(screen.container.textContent).not.toContain("Settings");
   });
 });

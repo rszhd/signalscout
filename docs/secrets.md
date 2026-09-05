@@ -18,13 +18,42 @@ encryption. The file is already outside the database and outside git, and a
 process environment is not a thing a database backup carries.
 
 **The `source_credentials` table.** Encrypted, and empty on a fresh install.
-Nothing in the product writes a row yet: the screen that would is deferred, in
-US-010's Notes, until a connection can be tested against a provider. What
-exists now is the storage, the guards around it, and the reading path — so that
-the screen is a screen and not a design argument.
+The connections screen writes it. US-023 built that screen, and it stores a key
+only after the provider has said the key works — see *Testing before storing*
+below.
 
 `worker/credentials.ts` reads the store first and falls back to the
 environment, field by field. A half-migrated instance keeps polling.
+
+Storing a key needs `ENCRYPTION_KEY`. Without one the connections screen says
+which variable to set and how to generate it, and offers no save; the
+environment path still works, and so does testing a key, because a test stores
+nothing.
+
+---
+
+## Testing before storing
+
+A key is checked with the provider before it reaches the database, and a key
+the provider refuses is never stored.
+
+The reason is a failure that is otherwise invisible. A key that is absent
+pauses the monitor and names the variable. A key that is present and *wrong*
+passes every check we can make on our own side, starts a monitor, and fails at
+the first poll — four retries and a dead letter, at whatever hour the schedule
+picked, with the error naming the provider rather than the key.
+
+On Reddit the check is free. `SocialSource.validateCredentials` sends an empty
+input list, which cannot start a collection, so the provider refuses a bad key
+at 401 before it reads the input. `sources/reddit/fixtures/credentials-accepted.json`
+and `credentials-rejected.json` are the two real answers, captured, and
+`reddit.test.ts` replays both.
+
+Two answers, not one. The provider **refusing** a key and the provider **not
+answering at all** lead to different actions, so the routes keep them apart: a
+refusal is a 200 carrying `valid: false` and the provider's own sentence, and
+an unreachable provider is a 502. A key that could not be tested is not stored
+either — the environment variable is the way through a provider outage.
 
 ---
 
@@ -66,8 +95,14 @@ even that below eight characters.
 The mask is stored in its own column. Showing which key is set therefore
 decrypts nothing, and there is no route in the API that returns a stored
 credential. `apps/api/src/credentials.test.ts` asserts that against every route
-this build registers, and `packages/core/src/secrets/leak.test.ts` asserts that
-a credential logged by mistake is redacted by the logger before it is written.
+this build registers — the connections routes included — and
+`packages/core/src/secrets/leak.test.ts` asserts that a credential logged by
+mistake is redacted by the logger before it is written.
+
+The screen sends a typed key in the request body, never in a URL. A key in a
+query string reaches the server's access log, the browser history and every
+proxy between; `apps/web/src/Connections.test.tsx` asserts it stays out of all
+three.
 
 ---
 

@@ -38,18 +38,40 @@ providers, and fixed the bug it found: a `PATCH` that carried one setting
 erased every field it did not carry, because the body schema filled the absent
 keys with its own defaults. One step is still a placeholder: US-016 owns the
 notification. US-004 added the encrypted credential store, so
-a key can live in the database rather than in `.env`; nothing writes one yet,
-because that is the connection screen US-010 defers. `apps/web` now has three
-screens, the monitor form, the inbox and the monitor list, and no screen for
-connections.
+a key can live in the database rather than in `.env`, and US-023 added the
+screen that writes one: a key is tested with the provider before it is stored,
+and a key the provider refuses is never stored. That closed US-010's last box. `apps/web` has four
+screens: the monitor form, the inbox, the monitor list and connections.
 
-**No credential has ever been stored.** US-004's cipher, its boot check, its
-masking and its rotation are asserted against real Postgres, and eight
-deliberate mutations were confirmed to turn the suite red. What has not
-happened is a person putting a real provider key through it: every instance
-still reads `REDDIT_API_KEY` from the environment, and `worker/credentials.ts`
-prefers a stored credential only when a row exists. Say the store is unused
-until a connection screen writes to it.
+**A real credential has been stored, tested and read back.** On 2026-09-05
+US-023 built the connections screen and ran it against Bright Data. A wrong key
+was refused in 1.3 seconds, a `PUT` carrying it wrote no row, and the real key
+was accepted in 1.4 seconds and stored encrypted — hint `••••b3e7`, ciphertext
+93 characters, and no row anywhere containing the plaintext. Then the process
+was restarted with `REDDIT_API_KEY` unset, so the database held the only copy,
+and a test with an empty body decrypted the stored value and Bright Data
+accepted it. Paste, test, encrypt, store, boot-check, decrypt, provider
+accepts: proven end to end, on one source.
+
+Five probes billed nothing. `api_usage` recorded no row for any of them, which
+is the free-check claim measured rather than argued.
+
+Two things stay unproven. The X connector has never run, so its probe is
+unmeasured. And no real browser has rendered the screen — it is driven through
+jsdom only.
+
+One consequence bites on any machine that has stored a credential: the process
+refuses to boot without `ENCRYPTION_KEY`. That is US-004's check working as
+documented, and it means a process started before the key existed must be
+restarted.
+
+**A key is tested where it is pasted, not where it is used.** The connections
+screen calls `SocialSource.validateCredentials` before it stores anything. On
+Reddit the probe is free: an empty input list cannot start a collection, so a
+bad key is refused at 401 before the input is read. A refusal and an unreachable
+provider are different answers — 200 with `valid: false` and the provider's own
+sentence, against 502 — because they lead to different actions. Read
+docs/secrets.md, *Testing before storing*.
 
 **Reddit's own API is closed to us.** Reddit ended self-serve app registration
 in November 2025. Reddit is reached through Bright Data instead, and X through
@@ -93,22 +115,21 @@ hand, because Reddit answers 403 to an unauthenticated request, and
 it. What the plan is not proven to be is *useful* — a name that exists can
 still be the wrong place to look.
 
-Two tickets are in `doing/`.
+One ticket is in `doing/`.
 [US-001](backlog/doing/US-001-the-workspace-runs-with-one-command.md) waits on
 the first CI run, which needs a remote this repository does not have.
-[US-010](backlog/doing/US-010-a-monitor-is-created-from-four-answers.md) waits
-on a connection-testing screen; see below.
 
 US-007 and
 [BUG-001](backlog/done/2026-09/BUG-001-a-pending-reddit-collection-is-not-resumed.md)
 closed together on 2026-09-05, when one live run carried a collection from the
 trigger through fifteen poll jobs to forty-nine stored posts.
 
-[US-010](backlog/doing/US-010-a-monitor-is-created-from-four-answers.md) has
-the server routes and the React form, with the jsdom harness that drives the
-form through the DOM. One acceptance box stays open: credentials are present
-or missing, but are not validated with the provider. The ticket's Notes keep
-that open for a connection-testing screen on purpose.
+US-010 closed with US-023. It has the server routes, the React form and the
+jsdom harness that drives the form through the DOM. Its last box — a monitor
+with no *valid* credential cannot start — is met by the connections screen and
+not by the form: the form still asks only whether a key exists, because a
+resume that called a provider would be refused by an outage that has nothing to
+do with the key.
 
 **The inbox has shown real matches.** On 2026-09-05 US-022 carried one
 monitor from the form to twenty matches, scored by a live model and read on the
@@ -237,8 +258,8 @@ screen's "about two minutes" is the fastest case and not the normal one.
    cap, a usage row, or a figure shown to a person. It holds what our estimate
    is wrong about, and why it is never rounded to cents.
 6. Read [`docs/secrets.md`](docs/secrets.md) if the task touches a credential.
-   It holds where a key lives, what the encryption guarantees, and the rotation
-   steps.
+   It holds where a key lives, what the encryption guarantees, why a key is
+   tested before it is stored, and the rotation steps.
 
 The ticket's **Acceptance** list is the definition of done. Every box is true
 or false. Do not mark one done that you have not verified.

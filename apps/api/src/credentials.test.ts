@@ -59,7 +59,7 @@ describe("a stored credential and the API", () => {
 
   async function server(options: {
     environment?: Record<string, string | undefined>;
-    storedCredentials?: ReadonlySet<string>;
+    storedCredentials?: () => Promise<ReadonlySet<string>>;
   }) {
     return buildServer({
       env: loadEnv({ DATABASE_URL: database.url }),
@@ -94,7 +94,7 @@ describe("a stored credential and the API", () => {
     it("never carries a key that came from the database", async () => {
       await putSourceCredential(db, key, { source: "reddit", field: "apiKey", value: secret });
 
-      const app = await server({ environment: {}, storedCredentials: await storedSet() });
+      const app = await server({ environment: {}, storedCredentials: storedSet });
 
       try {
         for (const url of ["/api/monitor-options", "/api/monitors", "/api/matches"]) {
@@ -133,7 +133,7 @@ describe("a stored credential and the API", () => {
       // source is not set up, while the worker polls it happily.
       await putSourceCredential(db, key, { source: "reddit", field: "apiKey", value: secret });
 
-      const app = await server({ environment: {}, storedCredentials: await storedSet() });
+      const app = await server({ environment: {}, storedCredentials: storedSet });
 
       try {
         const body = (await app.inject({ method: "GET", url: "/api/monitor-options" })).json();
@@ -150,7 +150,7 @@ describe("a stored credential and the API", () => {
       // The pass and the fail of the rule above have to differ, or it is
       // asserting nothing. docs/testing.md, *A guard whose pass and fail share
       // an answer is guarding nothing*.
-      const app = await server({ environment: {}, storedCredentials: new Set() });
+      const app = await server({ environment: {}, storedCredentials: async () => new Set() });
 
       try {
         const body = (await app.inject({ method: "GET", url: "/api/monitor-options" })).json();
@@ -168,7 +168,7 @@ describe("a stored credential and the API", () => {
       // and path. A route added later that serves a key has to pass this.
       await putSourceCredential(db, key, { source: "reddit", field: "apiKey", value: secret });
 
-      const app = await server({ environment: {}, storedCredentials: await storedSet() });
+      const app = await server({ environment: {}, storedCredentials: storedSet });
 
       try {
         const routes = app

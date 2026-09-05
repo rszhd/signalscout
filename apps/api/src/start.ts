@@ -1,12 +1,13 @@
 import type { Env, JobSender, Logger, WorkerHandle } from "@intentwatch/core";
 import {
   assertStoredCredentialsAreReadable,
+  builtInSources,
   createDatabase,
-  credentialRecordName,
   jobSenderFor,
-  listCredentialHints,
+  startBlockers,
   startJobSender as startJobSenderDefault,
   startWorker as startWorkerDefault,
+  storedCredentialNames,
 } from "@intentwatch/core";
 import { type ApiServer, buildServer as buildServerDefault } from "./server.js";
 
@@ -58,27 +59,52 @@ export async function startApi({
   const { db, close } = openDatabase(env.DATABASE_URL);
 
   /**
-   * The credential store, read once, before the first request.
+   * The credential store, checked before the first request.
    *
-   * The check first: the API answers "is this source configured?", and a
-   * stored credential it cannot decrypt would answer "no" — a wrong answer
-   * that reads like a true one. Then the hints, which name which credentials
-   * exist and never what they are.
+   * The API answers "is this source configured?", and a stored credential it
+   * cannot decrypt would answer "no" — a wrong answer that reads like a true
+   * one. So every row is decrypted here, and a key that cannot open one stops
+   * the process. US-004.
    *
-   * A snapshot, because the environment beside it is one too: a self-hoster
-   * who edits `.env` restarts. Making one half live and the other stale would
-   * be a worse answer than a consistent one. US-004.
+   * Which credentials exist is *not* snapshotted here any more. US-004's
+   * reasoning was that the environment beside it is a snapshot too, so a
+   * consistent stale answer beat a mixed one. US-023 made that wrong: the
+   * connections screen writes a credential into this running process, and a
+   * set taken here would go on reporting it missing until a restart. The
+   * environment half is still read at boot, because changing it still means
+   * editing a file and restarting.
    */
-  let storedCredentials: ReadonlySet<string>;
-
   try {
     await assertStoredCredentialsAreReadable(db, { ENCRYPTION_KEY: env.ENCRYPTION_KEY });
-    storedCredentials = new Set(
-      (await listCredentialHints(db)).map((hint) => credentialRecordName(hint.source, hint.field)),
-    );
   } catch (error) {
     await close();
     throw error;
+  }
+
+  /**
+   * What this deployment cannot poll, said once at boot.
+   *
+   * Here rather than beside the routes, and US-023 moved it. A source's
+   * readiness now depends on the credential store, so asking the question
+   * where the routes are registered would make registering a route a database
+   * query — and `buildServer` is called by tests that never open a connection.
+   * Boot is where the database is already known to be reachable, because the
+   * check above just read every row of it.
+   */
+  const configured = await storedCredentialNames(db);
+  const unconfigured = builtInSources.filter(
+    (source) =>
+      startBlockers([source.id], {
+        descriptors: builtInSources,
+        storedCredentials: configured,
+      }).length > 0,
+  );
+
+  if (unconfigured.length > 0) {
+    logger.warn(
+      { sources: unconfigured.map((source) => source.id) },
+      "some sources have no credentials; monitors that name them cannot start",
+    );
   }
 
   /**
@@ -91,7 +117,13 @@ export async function startApi({
    */
   const jobs = worker ? jobSenderFor(worker.boss) : await startJobSender(env.DATABASE_URL);
 
-  const app = await buildServer({ env, logger, db, jobs, storedCredentials });
+  const app = await buildServer({
+    env,
+    logger,
+    db,
+    jobs,
+    storedCredentials: () => storedCredentialNames(db),
+  });
   await app.listen({ host: env.HOST, port: env.PORT });
 
   return {

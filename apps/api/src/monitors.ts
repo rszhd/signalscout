@@ -259,12 +259,11 @@ export interface MonitorRoutesOptions {
    * The stored half: which credentials `source_credentials` holds, as
    * `source:field` names.
    *
-   * Injected rather than read here, so registering a route needs no database
-   * round trip, and so the snapshot is taken at the same moment as the
-   * environment beside it. `startApi` builds it; a test that describes a
-   * deployment passes one directly. US-004.
+   * A function, so it is read when a request asks. `startApi` passes one that
+   * reads `source_credentials`; a test that describes a deployment passes one
+   * that answers from memory. US-004, US-023.
    */
-  readonly storedCredentials?: ReadonlySet<string>;
+  readonly storedCredentials?: () => Promise<ReadonlySet<string>> | ReadonlySet<string>;
   /** Null when this deployment has no model key. The form says so. */
   readonly queryGenerator: QueryGenerator | null;
 }
@@ -359,9 +358,20 @@ export async function registerMonitorRoutes(
   options: MonitorRoutesOptions,
 ): Promise<void> {
   const { db, sources, queryGenerator } = options;
-  const environment = options.environment ?? process.env;
 
-  const runtime = monitorEnvironment(options, options.storedCredentials ?? new Set());
+  /**
+   * Which credentials exist, read when a request asks rather than at boot.
+   *
+   * US-023 is why this is a call and not a constant. The connections screen
+   * stores a key while this process runs, and a set captured at registration
+   * would go on reporting that key as missing until a restart. One small table
+   * per request is the price of the two screens agreeing.
+   */
+  const stored = options.storedCredentials ?? (() => new Set<string>());
+
+  async function currentEnvironment(): Promise<MonitorEnvironment> {
+    return monitorEnvironment(options, await stored());
+  }
 
   /**
    * Everything the form needs to render itself.
@@ -399,32 +409,36 @@ export async function registerMonitorRoutes(
         }),
       },
     },
-    handler: async () => ({
-      signals: signalList.map(({ id, label, hint }) => ({ id, label, hint })),
-      sources: sources.map((source) => {
-        const missing = startBlockers([source.id], runtime);
+    handler: async () => {
+      const runtime = await currentEnvironment();
 
-        return {
-          id: source.id,
-          displayName: source.displayName,
-          billableUnit: source.billableUnit,
-          pricePerUnitMicros: source.pricePerUnitMicros,
-          credentials: source.credentialFields.map((field) => ({
-            name: field.name,
-            label: field.label,
-            // The one naming rule, from the one file that holds it. A second
-            // copy here would name a variable that does not exist the first
-            // time either rule changes.
-            environmentVariable: environmentVariableFor(source.id, field.name),
-            // Never the value itself, set or not. US-004 encrypts these; an
-            // endpoint that echoed one would make that pointless.
-            configured: !missing.some((credential) => credential.field === field.name),
-          })),
-          ready: missing.length === 0,
-        };
-      }),
-      canGenerateQueries: queryGenerator !== null,
-    }),
+      return {
+        signals: signalList.map(({ id, label, hint }) => ({ id, label, hint })),
+        sources: sources.map((source) => {
+          const missing = startBlockers([source.id], runtime);
+
+          return {
+            id: source.id,
+            displayName: source.displayName,
+            billableUnit: source.billableUnit,
+            pricePerUnitMicros: source.pricePerUnitMicros,
+            credentials: source.credentialFields.map((field) => ({
+              name: field.name,
+              label: field.label,
+              // The one naming rule, from the one file that holds it. A second
+              // copy here would name a variable that does not exist the first
+              // time either rule changes.
+              environmentVariable: environmentVariableFor(source.id, field.name),
+              // Never the value itself, set or not. US-004 encrypts these; an
+              // endpoint that echoed one would make that pointless.
+              configured: !missing.some((credential) => credential.field === field.name),
+            })),
+            ready: missing.length === 0,
+          };
+        }),
+        canGenerateQueries: queryGenerator !== null,
+      };
+    },
   });
 
   /**
@@ -501,6 +515,8 @@ export async function registerMonitorRoutes(
     url: "/api/monitors",
     schema: { response: { 200: z.array(monitorSchema) } },
     handler: async () => {
+      const runtime = await currentEnvironment();
+
       // One read for every monitor's spend, rather than one per row. The
       // screen that shows this is a list, and a per-row query here would be
       // the list's cost growing with the number of monitors.
@@ -538,6 +554,8 @@ export async function registerMonitorRoutes(
       response: { 201: monitorSchema },
     },
     handler: async (request, reply) => {
+      const runtime = await currentEnvironment();
+
       const { monitor, missing } = await createMonitor(
         db,
         { ...request.body, ...filterSettings(request.body) },
@@ -571,7 +589,7 @@ export async function registerMonitorRoutes(
       const monitor = await getMonitor(db, request.params.id);
       if (!monitor) return reply.code(404).send({ message: "No monitor has that id." });
 
-      return readResponse(db, monitor, runtime);
+      return readResponse(db, monitor, await currentEnvironment());
     },
   });
 
@@ -590,7 +608,7 @@ export async function registerMonitorRoutes(
       });
       if (!monitor) return reply.code(404).send({ message: "No monitor has that id." });
 
-      return readResponse(db, monitor, runtime);
+      return readResponse(db, monitor, await currentEnvironment());
     },
   });
 
@@ -605,7 +623,7 @@ export async function registerMonitorRoutes(
       const monitor = await pauseMonitor(db, request.params.id);
       if (!monitor) return reply.code(404).send({ message: "No monitor has that id." });
 
-      return readResponse(db, monitor, runtime);
+      return readResponse(db, monitor, await currentEnvironment());
     },
   });
 
@@ -617,6 +635,10 @@ export async function registerMonitorRoutes(
       response: { 200: monitorSchema, 404: problemSchema, 409: problemSchema },
     },
     handler: async (request, reply) => {
+      // Read now, not at boot. A key stored on the connections screen a moment
+      // ago is what makes this resume the one that succeeds.
+      const runtime = await currentEnvironment();
+
       const result = await resumeMonitor(db, request.params.id, runtime);
       if (!result) return reply.code(404).send({ message: "No monitor has that id." });
 
@@ -663,7 +685,7 @@ export async function registerMonitorRoutes(
 
       await setBudget(db, monitor.id, request.body);
 
-      return readResponse(db, monitor, runtime);
+      return readResponse(db, monitor, await currentEnvironment());
     },
   });
 
@@ -691,7 +713,7 @@ export async function registerMonitorRoutes(
 
       await clearBudget(db, monitor.id);
 
-      return readResponse(db, monitor, runtime);
+      return readResponse(db, monitor, await currentEnvironment());
     },
   });
 
@@ -709,18 +731,4 @@ export async function registerMonitorRoutes(
       return reply.code(204).send(null);
     },
   });
-
-  // Read once at boot, so a deployment that set no key learns it here rather
-  // than from a monitor that quietly never polls.
-  const unconfigured = sources.filter((source) => startBlockers([source.id], runtime).length > 0);
-
-  if (unconfigured.length > 0) {
-    app.log.warn(
-      {
-        sources: unconfigured.map((source) => source.id),
-        set: Object.keys(environment).filter((name) => name.endsWith("_API_KEY")).length,
-      },
-      "some sources have no credentials; monitors that name them cannot start",
-    );
-  }
 }

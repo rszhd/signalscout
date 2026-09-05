@@ -6,7 +6,7 @@ priority: p1
 created: 2026-09-04T22:49+08:00
 parent:
 area:
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -44,7 +44,7 @@ subreddits from the ideal-customer answer.
 - [x] The selected signals reach both the query generator and the classifier
       prompt from one place
 - [x] A monitor can be paused and resumed without losing its history
-- [ ] A monitor with no valid credentials for its source cannot be started,
+- [x] A monitor with no valid credentials for its source cannot be started,
       and says which credential is missing
 
 ## Notes
@@ -56,21 +56,24 @@ subreddits from the ideal-customer answer.
   without it on Reddit, where reads are free.
 - PLAN.md, *Monitor creation*, for the questions and the signal list.
 
-### Present, not valid
+### Present, not valid — closed by the connections screen
 
-The credential box stays open on purpose. What is built refuses to start a
-monitor whose source has no credentials and names the environment variable to
-set. It does not ask the provider whether the key works.
+This box stayed open because the form checked that a key was *present*, not
+that it *worked*, and the argument for leaving it that way still holds: a
+resume that validated with the provider would be refused by a provider outage
+that has nothing to do with the key.
 
-`SocialSource.validateCredentials` can answer that, and on Reddit it is free:
-the probe sends an empty input list, which cannot start a collection. Two
-reasons it is not called here. A resume would then make a network call, so a
-provider outage would refuse a resume that has nothing wrong with it. And the
-answer belongs where a person can act on it, next to the field they paste the
-key into, which is the connections screen and not this form.
+[US-023](../done/2026-09/US-023-a-provider-key-is-pasted-tested-and-stored.md)
+built the screen the answer belongs on. A key is now tested with the provider
+where a person pastes it, and a key the provider refuses is never stored. So
+"valid" is enforced at the only moment a person can act on the answer, and this
+form still asks the cheap question — is there a key at all — without making a
+network call.
 
-Close this box when that screen exists, or when the form gains a "test this
-connection" step.
+The path was run live on 2026-09-05: a monitor created with no credential was
+paused, its resume was refused naming `REDDIT_API_KEY`, the key was stored
+through the connections screen, and the same resume then succeeded in the same
+process.
 
 ### Query generation has never met a model
 
@@ -113,3 +116,8 @@ numbers here before treating those scores as current.
   paused monitor and names the environment variable, but does not validate the
   key with the provider. The credential acceptance box stays open for the
   connection-testing screen described above.
+- 2026-09-05T15:16+08:00 — Closed. The last box was waiting for a place to test a
+  credential with the provider, and US-023 built it. Nothing in this ticket's
+  code changed; what changed is that "valid" now has a screen that enforces it,
+  and the reasoning for keeping the probe out of the resume path is written in
+  the Notes above rather than left as an open box.

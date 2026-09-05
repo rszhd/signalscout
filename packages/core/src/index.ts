@@ -263,6 +263,7 @@ export {
   readSourceCredential,
   rotateEncryptionKey,
   type StoredCredential,
+  storedCredentialNames,
 } from "./secrets/store.js";
 export {
   assertSourcesCanBeStored,

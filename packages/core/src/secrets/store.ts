@@ -147,6 +147,19 @@ export async function listCredentialHints(db: Database): Promise<CredentialHint[
     .from(sourceCredentials);
 }
 
+/**
+ * The stored credentials, as the `source:field` names readiness is judged by.
+ *
+ * `startApi` and the routes both need this set, and both used to build it by
+ * mapping `listCredentialHints` through `credentialRecordName` themselves. Two
+ * copies of one join is how a set ends up holding names the store does not
+ * use, so the join lives here.
+ */
+export async function storedCredentialNames(db: Database): Promise<ReadonlySet<string>> {
+  const hints = await listCredentialHints(db);
+  return new Set(hints.map((hint) => credentialRecordName(hint.source, hint.field)));
+}
+
 export async function deleteSourceCredential(
   db: Database,
   source: Source,

@@ -10,7 +10,8 @@ import {
   type Logger,
   needsApiKey,
   type QueryGenerator,
-  type SourceDescriptor,
+  type SourceDefinition,
+  storedCredentialNames,
 } from "@intentwatch/core";
 import Fastify, {
   type FastifyInstance,
@@ -24,6 +25,7 @@ import {
   type ZodTypeProvider,
 } from "fastify-type-provider-zod";
 import { z } from "zod";
+import { registerConnectionRoutes } from "./connections.js";
 import { registerEstimateRoutes } from "./estimates.js";
 import { registerMatchRoutes } from "./matches.js";
 import { registerMonitorRoutes } from "./monitors.js";
@@ -58,16 +60,25 @@ export interface BuildServerOptions {
    * without one existing, and so nothing here has to build a source runtime:
    * the API reads credential fields and never searches.
    */
-  sources?: readonly SourceDescriptor[];
-  /** Where the source keys live until US-004 encrypts them. */
+  sources?: readonly SourceDefinition[];
+  /** Where the source keys live when they are not in the database. */
   environment?: Record<string, string | undefined>;
   /**
-   * Which credentials the database holds, as `source:field` names. `startApi`
-   * reads them once at boot; a test that describes a deployment passes its
-   * own. Empty means every key comes from the environment, which is what
-   * every instance does today. US-004.
+   * Where `ENCRYPTION_KEY` is read from, kept apart from the provider keys
+   * above so a test can describe an instance that cannot store one.
    */
-  storedCredentials?: ReadonlySet<string>;
+  encryption?: Record<string, string | undefined>;
+  /**
+   * Which credentials the database holds, as `source:field` names.
+   *
+   * A function and not a set, and US-023 is why. `startApi` used to read the
+   * names once at boot and hand them over, which was correct while nothing
+   * could write one. The connections screen writes one, and a snapshot taken
+   * at boot then tells the monitor form a key is missing until the process
+   * restarts. This is read per request instead: one small table, and the one
+   * answer both screens get. US-004, US-023.
+   */
+  storedCredentials?: () => Promise<ReadonlySet<string>> | ReadonlySet<string>;
   /**
    * How the monitor form writes its queries. Undefined builds one from the
    * environment, which is null when no model key is set. A test passes one
@@ -111,6 +122,7 @@ export async function buildServer({
   db,
   sources = builtInSources,
   environment,
+  encryption,
   storedCredentials,
   queryGenerator,
   jobs = null,
@@ -136,11 +148,13 @@ export async function buildServer({
 
   await registerMatchRoutes(app, { db });
 
+  await registerConnectionRoutes(app, { db, sources, environment, encryption, logger });
+
   await registerMonitorRoutes(app, {
     db,
     sources,
     environment,
-    storedCredentials,
+    storedCredentials: storedCredentials ?? (() => storedCredentialNames(db)),
     queryGenerator: queryGenerator === undefined ? queryGeneratorFor(env, logger) : queryGenerator,
   });
 

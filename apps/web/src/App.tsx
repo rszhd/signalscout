@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
+import { Connections } from "./Connections.js";
 import { Inbox } from "./Inbox.js";
 import { MonitorForm } from "./MonitorForm.js";
 import { Monitors } from "./Monitors.js";
 
 /**
- * The shell: the header, and which of the three screens is on it.
+ * The shell: the header, and which of the four screens is on it.
  *
  * The route lives in the hash rather than the path. Fastify already serves
  * `index.html` for any path that is not an API route or a file, so a path
@@ -19,6 +20,7 @@ import { Monitors } from "./Monitors.js";
 
 const newMonitorRoute = "#/monitors/new";
 const monitorsRoute = "#/monitors";
+const connectionsRoute = "#/connections";
 
 function currentRoute(): string {
   return globalThis.location?.hash ?? "";
@@ -38,6 +40,7 @@ export function App() {
   // the screen for both.
   const creating = route.startsWith(newMonitorRoute);
   const listing = !creating && route.startsWith(monitorsRoute);
+  const connecting = route.startsWith(connectionsRoute);
 
   return (
     <div className="app-shell">
@@ -60,7 +63,10 @@ export function App() {
         </div>
 
         <nav className="site-nav" aria-label="Screens">
-          <a className={creating || listing ? "nav-item" : "nav-item current"} href="#/">
+          <a
+            className={creating || listing || connecting ? "nav-item" : "nav-item current"}
+            href="#/"
+          >
             <span className="nav-icon" aria-hidden="true">
               ▤
             </span>
@@ -71,6 +77,12 @@ export function App() {
               ◎
             </span>
             <span>Monitors</span>
+          </a>
+          <a className={connecting ? "nav-item current" : "nav-item"} href={connectionsRoute}>
+            <span className="nav-icon" aria-hidden="true">
+              ⚿
+            </span>
+            <span>Connections</span>
           </a>
           <a
             className={creating ? "nav-item new-monitor-nav current" : "nav-item new-monitor-nav"}
@@ -97,6 +109,8 @@ export function App() {
             </div>
             <MonitorForm />
           </>
+        ) : connecting ? (
+          <Connections />
         ) : listing ? (
           <Monitors />
         ) : (

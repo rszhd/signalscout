@@ -250,6 +250,13 @@ hiring
 
 Avoid building a traditional social-listening analytics dashboard.
 
+Use [`mockup/`](mockup/) as the visual reference for application UI. New
+screens should feel like the same product through their navigation,
+typography, spacing, colour and responsive behaviour. Treat it as inspiration,
+not a pixel specification. Real product behaviour and ticket acceptance stay
+authoritative, and a mockup control does not appear in the application until
+the behaviour behind it exists.
+
 No need initially for:
 
 * Sentiment charts
@@ -632,4 +639,3 @@ The cheap hosted version monetizes convenience.
 And the product succeeds if users regularly look at a match and think:
 
 > “This is exactly the kind of person I wanted to find.”
-

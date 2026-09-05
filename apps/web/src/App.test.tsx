@@ -113,4 +113,15 @@ describe("the three screens", () => {
 
     expect(screen.container.textContent).toContain("Intent inbox");
   });
+
+  it("does not expose mockup routes whose behaviour is not built", async () => {
+    screen = await mount(<App />);
+
+    const links = [...screen.container.querySelectorAll("nav a")].map((link) =>
+      link.getAttribute("href"),
+    );
+    expect(links).toEqual(["#/", "#/monitors", "#/monitors/new"]);
+    expect(screen.container.textContent).not.toContain("Connections");
+    expect(screen.container.textContent).not.toContain("Settings");
+  });
 });

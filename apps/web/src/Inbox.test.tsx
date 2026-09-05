@@ -141,6 +141,53 @@ describe("the intent inbox", () => {
     expect(scores).toEqual(["Problem fit98", "ICP fit91", "Intent94"]);
   });
 
+  it("opens a selected match in the reading pane", async () => {
+    await show({
+      "/api/matches?": {
+        matches: [
+          match(),
+          match({
+            id: "match-2",
+            title: "A second conversation",
+            excerpt: "This is the conversation selected from the compact list.",
+            url: "https://reddit.com/r/SaaS/comments/def",
+          }),
+        ],
+        nextCursor: null,
+        asOf: "2026-09-05T12:00:00.000Z",
+      },
+    });
+
+    const cards = container.querySelectorAll<HTMLButtonElement>(".match-card");
+    await act(async () => cards[1]?.click());
+
+    expect(container.querySelector(".detail-title")?.textContent).toBe("A second conversation");
+    expect(container.querySelector(".match-detail a.primary-button")?.getAttribute("href")).toBe(
+      "https://reddit.com/r/SaaS/comments/def",
+    );
+  });
+
+  it("collapses a long post body until a person asks to read more", async () => {
+    const longBody = Array.from({ length: 90 }, (_, index) => `word${index + 1}`).join(" ");
+    await show({
+      "/api/matches?": {
+        matches: [match({ excerpt: longBody })],
+        nextCursor: null,
+        asOf: "2026-09-05T12:00:00.000Z",
+      },
+    });
+
+    const post = container.querySelector(".post-box");
+    expect(post?.textContent).toContain("word80…");
+    expect(post?.textContent).not.toContain("word81");
+
+    await act(async () => button("Read more").click());
+    expect(post?.textContent).toContain("word90");
+
+    await act(async () => button("Show less").click());
+    expect(post?.textContent).not.toContain("word81");
+  });
+
   it("opens the original conversation in a new tab, in one click", async () => {
     await show();
 

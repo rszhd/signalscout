@@ -4,20 +4,9 @@ import { messageFor, requestJson } from "./api.js";
 /**
  * The intent inbox.
  *
- * PLAN.md's mockup is the specification, and the part that makes it a product
- * rather than a saved search is the reasons. A person decides in about two
- * seconds whether to open a conversation, and they decide on the claims, not
- * on the number. So the reasons are the largest thing on a card and the
- * sub-scores are the smallest.
- *
- * PLAN.md also lists what this screen must never become: sentiment charts,
- * share of voice, word clouds, competitor analytics. There is nothing here to
- * turn off, which is the point — the list is worth honouring while the screen
- * still looks empty, because a dashboard is what everyone reaches for then.
- *
- * The ordering is the server's rule and this screen only says what it is.
- * `packages/core/src/matches/matches.ts` holds it: score, minus twelve points
- * for every day since the post was written.
+ * The server owns ranking and filtering. This screen keeps the mockup's
+ * compact list-and-detail reading flow while showing only behaviour the
+ * application has: filters, pagination and a link to the conversation.
  */
 
 interface Match {
@@ -52,7 +41,6 @@ interface MonitorSummary {
 
 type LoadState = "loading" | "more" | "ready" | "error";
 
-/** The thresholds the filter offers. A person picks a bar, not a number. */
 const scoreFilters = [
   { value: 0, label: "Any score" },
   { value: 50, label: "50 and above" },
@@ -60,23 +48,26 @@ const scoreFilters = [
   { value: 85, label: "85 and above" },
 ];
 
-/**
- * The band printed above the score.
- *
- * A reading aid over the number and never a second threshold: what becomes a
- * match at all is the monitor's own `min_score`, decided when the monitor was
- * created. These three words only say how hard to look at it.
- */
+const postPreviewWordLimit = 80;
+
+function limitWords(body: string): { text: string; truncated: boolean } {
+  const words = body.trim().split(/\s+/).filter(Boolean);
+  if (words.length <= postPreviewWordLimit) return { text: body, truncated: false };
+
+  return {
+    text: `${words.slice(0, postPreviewWordLimit).join(" ")}…`,
+    truncated: true,
+  };
+}
+
 function band(score: number): { label: string; tone: string } {
   if (score >= 80) return { label: "High intent", tone: "high" };
   if (score >= 55) return { label: "Worth reading", tone: "medium" };
   return { label: "Low intent", tone: "low" };
 }
 
-/** "12 minutes ago", the way the mockup writes it. */
 export function ageLabel(postedAt: string, now: number = Date.now()): string {
   const minutes = Math.round((now - new Date(postedAt).getTime()) / 60_000);
-
   if (minutes < 1) return "just now";
   if (minutes < 60) return `${minutes} minute${minutes === 1 ? "" : "s"} ago`;
 
@@ -87,7 +78,6 @@ export function ageLabel(postedAt: string, now: number = Date.now()): string {
   return `${days} day${days === 1 ? "" : "s"} ago`;
 }
 
-/** "Reddit · r/SaaS" on Reddit, "X · @handle" on X. */
 function whereItCameFrom(match: Match): string {
   const source = match.source === "x" ? "X" : "Reddit";
   const channel =
@@ -106,17 +96,16 @@ export function Inbox() {
   const [page, setPage] = useState<{ nextCursor: string | null; asOf: string } | null>(null);
   const [state, setState] = useState<LoadState>("loading");
   const [error, setError] = useState<string | null>(null);
+  const [selectedMatchId, setSelectedMatchId] = useState<string | null>(null);
+  const [mobileDetailOpen, setMobileDetailOpen] = useState(false);
+  const [expandedMatchId, setExpandedMatchId] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
-
     requestJson<MonitorSummary[]>("/api/monitors")
       .then((rows) => {
         if (!cancelled) setMonitors(rows.map(({ id, name }) => ({ id, name })));
       })
-      // A failed monitor list costs the filter, not the inbox. The matches
-      // request below reports its own failure, and reporting this one too
-      // would put two alerts on the screen for one outage.
       .catch(() => undefined);
 
     return () => {
@@ -124,13 +113,6 @@ export function Inbox() {
     };
   }, []);
 
-  /**
-   * The first page for the current filters, ranked against a fresh clock.
-   *
-   * Every later page carries that clock back, so a match cannot slip between
-   * two pages while somebody reads. The server explains why; this is the half
-   * that has to remember it.
-   */
   const loadFirstPage = useCallback(async (): Promise<void> => {
     setState("loading");
     setError(null);
@@ -142,6 +124,9 @@ export function Inbox() {
     try {
       const answer = await requestJson<MatchPage>(`/api/matches?${query}`);
       setMatches(answer.matches);
+      setSelectedMatchId(answer.matches[0]?.id ?? null);
+      setMobileDetailOpen(false);
+      setExpandedMatchId(null);
       setPage({ nextCursor: answer.nextCursor, asOf: answer.asOf });
       setState("ready");
     } catch (cause) {
@@ -156,7 +141,6 @@ export function Inbox() {
 
   async function loadMore(): Promise<void> {
     if (!page?.nextCursor) return;
-
     setState("more");
     setError(null);
 
@@ -175,18 +159,17 @@ export function Inbox() {
     }
   }
 
-  /**
-   * What an empty list means depends on why it is empty, and the three
-   * answers need three different buttons.
-   *
-   * With no monitors, the only useful action is to make one. With a filter
-   * set, the list may be empty because of the filter, so offering to make
-   * another monitor answers a question nobody asked — clearing the filter is
-   * what shows whether anything is there. With neither, the person is waiting
-   * for the worker, and nothing on this screen updates itself, so the useful
-   * button is the one that asks again.
-   */
   const filtered = monitorId !== "" || minScore > 0;
+  const selectedMatch = matches.find((match) => match.id === selectedMatchId) ?? matches[0] ?? null;
+  const scoreRows: Array<[string, number]> = selectedMatch
+    ? [
+        ["Problem fit", selectedMatch.problemFit],
+        ["ICP fit", selectedMatch.icpFit],
+        ["Intent", selectedMatch.intent],
+      ]
+    : [];
+  const limitedPost = selectedMatch ? limitWords(selectedMatch.excerpt) : null;
+  const postIsExpanded = selectedMatch?.id === expandedMatchId;
 
   function clearFilters(): void {
     setMonitorId("");
@@ -194,17 +177,28 @@ export function Inbox() {
   }
 
   return (
-    <div className="inbox-page">
-      <div className="inbox-heading">
+    <div className="product-page inbox-page">
+      <header className="topbar">
         <div>
-          <p className="eyebrow">Intent inbox</p>
-          <h1>People who might need your product.</h1>
-          <p className="intro-copy">
-            Sorted by score, minus twelve points for every day since the post was written. A fresh
-            conversation is still open; a good one from last week is not.
-          </p>
+          <p className="eyebrow">Conversations ranked by buying signal</p>
+          <h1>Intent inbox</h1>
         </div>
+        {(matches.length > 0 || monitors.length === 0) && (
+          <a className="top-primary-button" href="#/monitors/new">
+            <span aria-hidden="true">+</span> New monitor
+          </a>
+        )}
+      </header>
 
+      <div className="inbox-toolbar">
+        <p>
+          {matches.length > 0
+            ? "Showing " +
+              matches.length +
+              " scored conversation" +
+              (matches.length === 1 ? "" : "s")
+            : "Filter conversations as matches arrive"}
+        </p>
         <div className="inbox-filters">
           <label className="filter">
             <span>Monitor</span>
@@ -240,7 +234,7 @@ export function Inbox() {
       </div>
 
       {state === "loading" && (
-        <div className="center-state" role="status">
+        <div className="center-state page-state" role="status">
           <span className="spinner" aria-hidden="true" />
           <h2>Loading the inbox</h2>
           <p>Reading the matches your monitors have scored.</p>
@@ -248,7 +242,7 @@ export function Inbox() {
       )}
 
       {state === "error" && (
-        <div className="center-state error-state" role="alert">
+        <div className="center-state page-state error-state" role="alert">
           <span className="state-icon">!</span>
           <h2>The inbox could not be loaded</h2>
           <p>{error}</p>
@@ -259,9 +253,12 @@ export function Inbox() {
       )}
 
       {state !== "loading" && state !== "error" && matches.length === 0 && (
-        <div className="center-state" role="status">
+        <div className="center-state page-state" role="status">
           {monitors.length === 0 ? (
             <>
+              <span className="empty-mark" aria-hidden="true">
+                ✦
+              </span>
               <h2>No monitors yet</h2>
               <p>Create a monitor and IntentWatch will start collecting conversations.</p>
               <a className="primary-button" href="#/monitors/new">
@@ -278,6 +275,9 @@ export function Inbox() {
             </>
           ) : (
             <>
+              <span className="empty-mark" aria-hidden="true">
+                ✦
+              </span>
               <h2>Nothing has matched yet</h2>
               <p>
                 Your monitors collect on their own schedule. Matches appear here as they are scored.
@@ -294,102 +294,153 @@ export function Inbox() {
         </div>
       )}
 
-      {matches.length > 0 && (
-        <ol className="match-list" aria-label="Matches">
-          {matches.map((match) => {
-            const tone = band(match.score);
+      {matches.length > 0 && selectedMatch && (
+        <div className="inbox-layout">
+          <div className="match-list-column">
+            <ol className="match-list" aria-label="Matches">
+              {matches.map((match) => {
+                const tone = band(match.score);
+                return (
+                  <li key={match.id}>
+                    <button
+                      className={`match-card ${selectedMatch.id === match.id ? "selected" : ""}`}
+                      type="button"
+                      onClick={() => {
+                        setSelectedMatchId(match.id);
+                        setMobileDetailOpen(true);
+                        setExpandedMatchId(null);
+                      }}
+                    >
+                      <span className="match-top">
+                        <span className={`source-badge source-${match.source}`}>
+                          <span className="source-dot" aria-hidden="true">
+                            {match.source === "x" ? "X" : "r/"}
+                          </span>
+                          {whereItCameFrom(match)}
+                        </span>
+                        <span className="match-origin">{ageLabel(match.postedAt)}</span>
+                      </span>
+                      <strong className="match-title">{match.title ?? match.excerpt}</strong>
+                      {match.title && <span className="match-excerpt">{match.excerpt}</span>}
+                      <span className="match-bottom">
+                        <span className={`intent-pill ${tone.tone}`}>{tone.label}</span>
+                        <span className="match-score">
+                          <strong>{match.score}</strong>
+                          <span>/ 100</span>
+                        </span>
+                      </span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ol>
 
-            return (
-              <li className="match-card" key={match.id}>
-                <div className="match-top">
-                  <p className={`intent-band ${tone.tone}`}>
-                    <strong>{match.score}</strong>
-                    <span>{tone.label}</span>
-                  </p>
-                  <p className="match-origin">
-                    {whereItCameFrom(match)} · {ageLabel(match.postedAt)}
-                  </p>
-                </div>
+            {page?.nextCursor && (
+              <div className="inbox-more">
+                <button
+                  className="secondary-button"
+                  disabled={state === "more"}
+                  type="button"
+                  onClick={() => void loadMore()}
+                >
+                  {state === "more" ? "Loading…" : "Show more"}
+                </button>
+              </div>
+            )}
+          </div>
 
-                <blockquote className="match-quote">
-                  {match.title && <strong>{match.title}</strong>}
-                  <p>{match.excerpt}</p>
-                </blockquote>
+          <aside className={`match-detail ${mobileDetailOpen ? "mobile-open" : ""}`}>
+            <div className="detail-inner">
+              <button
+                className="mobile-detail-back"
+                type="button"
+                onClick={() => setMobileDetailOpen(false)}
+              >
+                ← Back to inbox
+              </button>
 
-                <div className="match-why">
-                  {/*
-                   * Not "Why it matched", and not a tick.
-                   *
-                   * The classifier is asked for claims about the post, not for
-                   * support for its own score, so on a weak post some of the
-                   * claims are negative — "the post does not ask for a tool"
-                   * is one of the most useful lines on the card. A tick beside
-                   * that is a lie about what the model said, and the heading
-                   * that only reads correctly on a strong match hides exactly
-                   * the matches a person most needs to dismiss quickly.
-                   */}
-                  <p className="section-label">What the model saw</p>
-                  <ul>
-                    {match.reasons.map((reason) => (
-                      <li key={reason}>
-                        <span aria-hidden="true">•</span>
-                        {reason}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <dl className="match-scores">
-                  <div>
-                    <dt>Problem fit</dt>
-                    <dd>{match.problemFit}</dd>
-                  </div>
-                  <div>
-                    <dt>ICP fit</dt>
-                    <dd>{match.icpFit}</dd>
-                  </div>
-                  <div>
-                    <dt>Intent</dt>
-                    <dd>{match.intent}</dd>
-                  </div>
-                </dl>
-
-                <div className="match-actions">
-                  <a
-                    className="primary-button"
-                    href={match.url}
-                    rel="noreferrer noopener"
-                    target="_blank"
-                  >
-                    Open conversation
-                  </a>
-                  <span className="match-meta">
-                    {match.intentLabel} · {match.monitorName}
+              <div className="detail-top">
+                <span className={`source-badge source-${selectedMatch.source}`}>
+                  <span className="source-dot" aria-hidden="true">
+                    {selectedMatch.source === "x" ? "X" : "r/"}
                   </span>
+                  {whereItCameFrom(selectedMatch)}
+                </span>
+                <span className="match-origin">{ageLabel(selectedMatch.postedAt)}</span>
+              </div>
+
+              <h2 className="detail-title">
+                {selectedMatch.title ?? "A conversation worth reading"}
+              </h2>
+              <p className="detail-author">
+                {selectedMatch.author ?? "Unknown author"} · matched by {selectedMatch.monitorName}
+              </p>
+
+              <div className="post-body">
+                <blockquote className="post-box">
+                  {postIsExpanded ? selectedMatch.excerpt : limitedPost?.text}
+                </blockquote>
+                {limitedPost?.truncated && (
+                  <button
+                    className="read-more-button"
+                    type="button"
+                    onClick={() => setExpandedMatchId(postIsExpanded ? null : selectedMatch.id)}
+                  >
+                    {postIsExpanded ? "Show less" : "Read more"}
+                  </button>
+                )}
+              </div>
+
+              <div className="match-why">
+                <p className="section-label">What the model saw</p>
+                <ul>
+                  {selectedMatch.reasons.map((reason) => (
+                    <li key={reason}>
+                      <span aria-hidden="true">•</span>
+                      {reason}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="score-section">
+                <div className="score-heading">
+                  <h3>Intent signals</h3>
+                  <span>Overall score {selectedMatch.score}</span>
                 </div>
-              </li>
-            );
-          })}
-        </ol>
+                <dl className="match-scores">
+                  {scoreRows.map(([label, score]) => (
+                    <div key={label}>
+                      <dt>{label}</dt>
+                      <dd>{score}</dd>
+                      <span className="score-bar" aria-hidden="true">
+                        <i style={{ width: `${score}%` }} />
+                      </span>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+
+              <div className="match-actions">
+                <a
+                  className="primary-button"
+                  href={selectedMatch.url}
+                  rel="noreferrer noopener"
+                  target="_blank"
+                >
+                  Open conversation ↗
+                </a>
+                <span className="match-meta">{selectedMatch.intentLabel}</span>
+              </div>
+            </div>
+          </aside>
+        </div>
       )}
 
       {error && state === "ready" && (
-        <p className="form-error" role="alert">
+        <p className="form-error floating-error" role="alert">
           {error}
         </p>
-      )}
-
-      {page?.nextCursor && (
-        <div className="inbox-more">
-          <button
-            className="secondary-button"
-            disabled={state === "more"}
-            type="button"
-            onClick={() => void loadMore()}
-          >
-            {state === "more" ? "Loading…" : "Show more"}
-          </button>
-        </div>
       )}
     </div>
   );

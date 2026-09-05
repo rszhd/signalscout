@@ -98,6 +98,20 @@ function status(monitor: Monitor): { label: string; tone: string } {
   return { label: "Running", tone: "running" };
 }
 
+function MonitorsHeader() {
+  return (
+    <header className="topbar">
+      <div>
+        <p className="eyebrow">Tracking setup</p>
+        <h1>Monitors</h1>
+      </div>
+      <a className="top-primary-button" href="#/monitors/new">
+        <span aria-hidden="true">+</span> New monitor
+      </a>
+    </header>
+  );
+}
+
 function BudgetForm({ monitor, onSaved }: { monitor: Monitor; onSaved: () => Promise<void> }) {
   const [cap, setCap] = useState(
     monitor.budget ? String(monitor.budget.monthlyCapMicros / 1_000_000) : "",
@@ -240,48 +254,61 @@ export function Monitors() {
 
   if (state === "loading") {
     return (
-      <div className="center-state">
-        <div className="spinner" aria-hidden="true" />
-        <p>Reading your monitors.</p>
+      <div className="product-page monitors-page">
+        <MonitorsHeader />
+        <div className="center-state page-state">
+          <div className="spinner" aria-hidden="true" />
+          <p>Reading your monitors.</p>
+        </div>
       </div>
     );
   }
 
   if (state === "error") {
     return (
-      <div className="center-state">
-        <h2>The monitors could not be loaded</h2>
-        <p>{error}</p>
-        <button type="button" className="primary-button" onClick={() => void load()}>
-          Try again
-        </button>
+      <div className="product-page monitors-page">
+        <MonitorsHeader />
+        <div className="center-state page-state">
+          <h2>The monitors could not be loaded</h2>
+          <p>{error}</p>
+          <button type="button" className="primary-button" onClick={() => void load()}>
+            Try again
+          </button>
+        </div>
       </div>
     );
   }
 
   if (monitors.length === 0) {
     return (
-      <div className="center-state">
-        <h2>No monitors yet</h2>
-        <p>Create a monitor and IntentWatch will start collecting conversations.</p>
-        <a className="primary-button" href="#/monitors/new">
-          Create a monitor
-        </a>
+      <div className="product-page monitors-page">
+        <MonitorsHeader />
+        <div className="center-state page-state">
+          <span className="empty-mark" aria-hidden="true">
+            ◎
+          </span>
+          <h2>No monitors yet</h2>
+          <p>Create a monitor and IntentWatch will start collecting conversations.</p>
+          <a className="primary-button" href="#/monitors/new">
+            Create a monitor
+          </a>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="inbox-page">
-      <div className="inbox-heading">
-        <div>
-          <p className="eyebrow">Monitors</p>
-          <h1>What each monitor is collecting, and what it costs</h1>
-          <p className="intro-copy">
-            Every amount below is an estimate: IntentWatch prices the units each source reports
-            against that source's own rate. Your provider's invoice is the authority.
-          </p>
-        </div>
+    <div className="product-page monitors-page">
+      <MonitorsHeader />
+      <div className="section-intro">
+        <p>
+          Each monitor describes one audience and the conversations worth finding. Spend is an
+          estimate; your provider's invoice is the authority.
+        </p>
+        <span>
+          {monitors.filter((monitor) => status(monitor).tone === "running").length} of{" "}
+          {monitors.length} active
+        </span>
       </div>
 
       {error && (
@@ -297,14 +324,19 @@ export function Monitors() {
           return (
             <li key={monitor.id} className="monitor-card">
               <div className="monitor-top">
-                <div>
-                  <h2>{monitor.name}</h2>
-                  <p className="monitor-origin">
-                    {monitor.sources.length > 0 ? monitor.sources.join(" · ") : "No source"}
-                    {monitor.lastPolledAt
-                      ? ` · last polled ${new Date(monitor.lastPolledAt).toLocaleString()}`
-                      : " · never polled"}
-                  </p>
+                <div className="monitor-identity">
+                  <span className="product-icon" aria-hidden="true">
+                    {monitor.name.slice(0, 1).toUpperCase()}
+                  </span>
+                  <div>
+                    <h2>{monitor.name}</h2>
+                    <p className="monitor-origin">
+                      {monitor.sources.length > 0 ? monitor.sources.join(" · ") : "No source"}
+                      {monitor.lastPolledAt
+                        ? ` · last polled ${new Date(monitor.lastPolledAt).toLocaleString()}`
+                        : " · never polled"}
+                    </p>
+                  </div>
                 </div>
                 <span className={`monitor-status ${running.tone}`}>{running.label}</span>
               </div>
@@ -342,13 +374,18 @@ export function Monitors() {
 
               <div className="monitor-controls">
                 <BudgetForm monitor={monitor} onSaved={load} />
-                <button
-                  type="button"
-                  className="secondary-button"
-                  onClick={() => void setPaused(monitor, !monitor.paused)}
-                >
-                  {monitor.paused ? "Resume" : "Pause"}
-                </button>
+                <div className="monitor-card-actions">
+                  <a className="text-link" href="#/">
+                    View inbox
+                  </a>
+                  <button
+                    type="button"
+                    className="secondary-button"
+                    onClick={() => void setPaused(monitor, !monitor.paused)}
+                  >
+                    {monitor.paused ? "Resume" : "Pause"}
+                  </button>
+                </div>
               </div>
             </li>
           );

@@ -40,28 +40,58 @@ export function App() {
   const listing = !creating && route.startsWith(monitorsRoute);
 
   return (
-    <main className="app-shell">
-      <header className="site-header">
+    <div className="app-shell">
+      <aside className="sidebar">
         <a className="brand" href="#/" aria-label="IntentWatch home">
           <span className="brand-mark" aria-hidden="true">
-            iw
+            <i />
+            <i />
+            <i />
           </span>
-          <span>IntentWatch</span>
+          <span>intentwatch</span>
         </a>
+
+        <div className="product-note">
+          <span className="product-note-mark">✦</span>
+          <span>
+            <strong>Intent monitoring</strong>
+            <small>Find conversations worth joining</small>
+          </span>
+        </div>
+
         <nav className="site-nav" aria-label="Screens">
-          <a className={creating || listing ? "" : "current"} href="#/">
-            Inbox
+          <a className={creating || listing ? "nav-item" : "nav-item current"} href="#/">
+            <span className="nav-icon" aria-hidden="true">
+              ▤
+            </span>
+            <span>Intent inbox</span>
           </a>
-          <a className={listing ? "current" : ""} href={monitorsRoute}>
-            Monitors
+          <a className={listing ? "nav-item current" : "nav-item"} href={monitorsRoute}>
+            <span className="nav-icon" aria-hidden="true">
+              ◎
+            </span>
+            <span>Monitors</span>
           </a>
-          <a className={creating ? "current" : ""} href={newMonitorRoute}>
-            New monitor
+          <a
+            className={creating ? "nav-item new-monitor-nav current" : "nav-item new-monitor-nav"}
+            href={newMonitorRoute}
+          >
+            <span className="nav-icon" aria-hidden="true">
+              +
+            </span>
+            <span>New monitor</span>
           </a>
         </nav>
-      </header>
 
-      {creating ? <MonitorForm /> : listing ? <Monitors /> : <Inbox />}
-    </main>
+        <div className="sidebar-bottom">
+          <span className="local-pill">Self-hosted</span>
+          <p>Your data and provider keys stay in this deployment.</p>
+        </div>
+      </aside>
+
+      <main className="app-main">
+        {creating ? <MonitorForm /> : listing ? <Monitors /> : <Inbox />}
+      </main>
+    </div>
   );
 }

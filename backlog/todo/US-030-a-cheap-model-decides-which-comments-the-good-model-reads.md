@@ -23,6 +23,26 @@ small model can read "what did you end up using?" and tell it from "we use
 Playwright, here is why". That is a job no cheaper stage in the pipeline can
 do.
 
+**US-029 measured the claim above, and it holds.** It embedded all 21 comments
+of one real r/softwaretesting thread against PLAN.md's example monitor. The
+highest similarity in the thread, 0.5504, is nine hundred characters of expert
+advice about test plans and CI runners — higher than four of the five posts in
+`ai/fixtures/similarities.json`. With the parent post's title prepended all 21
+land inside 0.178 of each other and none is dropped at any threshold.
+
+Read the limit of that with the result. **Zero of the 21 comments was a person
+asking**, so the two classes were never put on a scale against each other. What
+was measured is that the stage's highest answer in the thread is an expert
+answering, and that the setting which restores a comment's topic drops nothing.
+Both point the same way and neither is the direct comparison. The decision is
+that the embedding stage does not run on a comment, and **this stage is the only
+paid stage in front of the classifier there.**
+
+That zero is also worth designing against. Eleven of the 21 were experts
+answering and ten were jokes, a moderator notice and a deleted body. One thread
+cannot carry a rate, but it says what this stage will mostly see and mostly have
+to answer `no` to.
+
 **What the price actually is.** `ai/fixtures/manifest.json` holds four real
 calls: a classification is 680 input and 95 output tokens. Against the table in
 `ai/provider.ts`:
@@ -67,15 +87,16 @@ recorded.
       script named in `package.json`, never written by hand
 - [ ] The Log records the measured keep rate and the measured cost of one poll,
       against the same poll with the stage off
-- [ ] Whether the embedding stage still runs on a comment follows
-      [US-029](US-029-a-measurement-says-which-pre-filter-fits-a-comment.md)'s
-      answer, and the Log names which it was
+- [ ] On a comment this is the only paid stage in front of the classifier: no
+      embedding runs, and the Log records the keep rate against that shape.
+      US-029 answered it — see the Context above
 
 ## Notes
 
-- Depends on [US-029](US-029-a-measurement-says-which-pre-filter-fits-a-comment.md),
-  which decides whether this is the second paid stage or the only one.
-- Related to [US-020](US-020-a-monitor-can-include-reddit-comments.md), which
+- [US-029](../done/2026-09/US-029-a-measurement-says-which-pre-filter-fits-a-comment.md)
+  answered that on 2026-09-06: on a comment this is the only one. On a post the
+  embedding stage stays, unchanged.
+- Related to [US-020](US-020-a-monitor-can-include-comments-and-replies.md), which
   is what makes the volume real. The stage is useful on posts too, but posts
   arrive from a search that already matched the words, so the saving there is
   small.
@@ -97,3 +118,9 @@ recorded.
   for cost. The measurement says the saving is about half, and the stronger
   reason is that no existing stage can separate a person asking from a person
   answering.
+- 2026-09-06T09:31+08:00 — US-029 answered the stage order. On a comment this is
+  the only paid stage: no embedding runs in front of it. The evidence is
+  indirect — that thread held no asker — and it points one way in both embedding
+  settings. That makes this
+  stage's keep rate the whole saving rather than half of it, and it makes a
+  false negative here the only silent drop on the comment path.

@@ -59,7 +59,7 @@ a permanent full copy.
 - [x] A search accepts subreddits and a query, and discovers posts by both
 - [ ] Comments are opt-in per search, and the request that fetches them is
       counted and reported separately, because it is a second charge
-      — moved to [US-020](../../todo/US-020-a-monitor-can-include-reddit-comments.md)
+      — moved to [US-020](../../todo/US-020-a-monitor-can-include-comments-and-replies.md)
 - [x] `unitsConsumed` is the number of records the provider billed, and it is
       never derived from `posts.length` by the caller
 - [x] A request too large to answer synchronously returns

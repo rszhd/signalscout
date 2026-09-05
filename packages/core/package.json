@@ -24,6 +24,7 @@
     "capture:classifier": "tsx src/ai/fixtures/capture.ts",
     "capture:queries": "tsx src/ai/fixtures/capture-queries.ts",
     "capture:embeddings": "tsx src/ai/fixtures/capture-embeddings.ts",
+    "capture:comment-filter": "tsx src/ai/fixtures/capture-comment-filter.ts",
     "live:provider-switch": "tsx --env-file-if-exists=../../.env src/sources/live-provider-switch.ts",
     "live:linkedin-poll": "tsx --env-file-if-exists=../../.env src/sources/live-linkedin-poll.ts"
   },

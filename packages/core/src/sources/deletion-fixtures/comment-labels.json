@@ -1,0 +1,251 @@
+{
+  "note": "Hand labels for every comment in scrapecreators-comments-canonical.json, written for US-029. `role` is who the author is: `asking` describes their own problem or asks for a recommendation, which is the comment IntentWatch exists to find; `answering` gives advice; `neither` is neither. The third value is not in US-029's acceptance text, which says asking or answering. It was added because ten of these twenty-one are jokes, a moderator notice and a deleted body, and calling those `answering` would have measured a class that does not exist. `topical` is a separate question: is the comment about test automation at all. It is what the embedding stage can actually measure.",
+  "labelledAt": "2026-09-06",
+  "labelledBy": "hand",
+  "thread": {
+    "fixture": "scrapecreators-comments-canonical.json",
+    "postId": "1w71bul",
+    "postTitle": "Starting Automation from 0% as a QA Lead — How are you using AI, MCPs & Agents in QA?",
+    "subreddit": "softwaretesting",
+    "comments": 21
+  },
+  "counts": {
+    "asking": 0,
+    "answering": 11,
+    "neither": 10,
+    "topical": 12
+  },
+  "labels": [
+    {
+      "id": "p7rd166",
+      "name": "t1_p7rd166",
+      "depth": 0,
+      "parentCommentId": null,
+      "score": 53,
+      "bodyLength": 66,
+      "role": "neither",
+      "topical": false,
+      "why": "Complains that the post was written by a model. It is about the post, not about testing."
+    },
+    {
+      "id": "p7rtn2e",
+      "name": "t1_p7rtn2e",
+      "depth": 1,
+      "parentCommentId": "p7rd166",
+      "score": 14,
+      "bodyLength": 49,
+      "role": "neither",
+      "topical": false,
+      "why": "A one-line sarcastic reply inside that complaint."
+    },
+    {
+      "id": "p7s25pl",
+      "name": "t1_p7s25pl",
+      "depth": 2,
+      "parentCommentId": "p7rtn2e",
+      "score": 11,
+      "bodyLength": 79,
+      "role": "neither",
+      "topical": false,
+      "why": "A sarcastic offer to explain how to write a post. Shaped like a question, about nothing we sell."
+    },
+    {
+      "id": "p7swsyg",
+      "name": "t1_p7swsyg",
+      "depth": 0,
+      "parentCommentId": null,
+      "score": 10,
+      "bodyLength": 105,
+      "role": "neither",
+      "topical": false,
+      "why": "Same complaint as p7rd166, from another person."
+    },
+    {
+      "id": "p7t1t84",
+      "name": "t1_p7t1t84",
+      "depth": 1,
+      "parentCommentId": "p7swsyg",
+      "score": 3,
+      "bodyLength": 28,
+      "role": "neither",
+      "topical": false,
+      "why": "A joke about a bot taking the job."
+    },
+    {
+      "id": "p7wcjlm",
+      "name": "t1_p7wcjlm",
+      "depth": 2,
+      "parentCommentId": "p7t1t84",
+      "score": 2,
+      "bodyLength": 24,
+      "role": "neither",
+      "topical": false,
+      "why": "A two-word agreement with that joke."
+    },
+    {
+      "id": "p7rb4db",
+      "name": "t1_p7rb4db",
+      "depth": 0,
+      "parentCommentId": null,
+      "score": 12,
+      "bodyLength": 205,
+      "role": "answering",
+      "topical": true,
+      "why": "Advice: understand the product first, automate the critical flows."
+    },
+    {
+      "id": "p7rd4mj",
+      "name": "t1_p7rd4mj",
+      "depth": 1,
+      "parentCommentId": "p7rb4db",
+      "score": 2,
+      "bodyLength": 197,
+      "role": "answering",
+      "topical": true,
+      "why": "Seconds p7rb4db and adds what not to automate."
+    },
+    {
+      "id": "p7wehel",
+      "name": "t1_p7wehel",
+      "depth": 0,
+      "parentCommentId": null,
+      "score": 2,
+      "bodyLength": 133,
+      "role": "answering",
+      "topical": true,
+      "why": "Advice to follow business goals, with the AI-slop complaint attached."
+    },
+    {
+      "id": "p7racsc",
+      "name": "t1_p7racsc",
+      "depth": 0,
+      "parentCommentId": null,
+      "score": 5,
+      "bodyLength": 959,
+      "role": "answering",
+      "topical": true,
+      "why": "The longest answer in the thread. Locator strategy, test data, MCPs, agents. It names flaky tests and fragile selectors, but as a warning to somebody else, not as its author's own problem."
+    },
+    {
+      "id": "p7rgfxc",
+      "name": "t1_p7rgfxc",
+      "depth": 1,
+      "parentCommentId": "p7racsc",
+      "score": 1,
+      "bodyLength": 99,
+      "role": "answering",
+      "topical": true,
+      "why": "Adds one condition to p7racsc's advice about failure analysis."
+    },
+    {
+      "id": "p7x4ky0",
+      "name": "t1_p7x4ky0",
+      "depth": 0,
+      "parentCommentId": null,
+      "score": 1,
+      "bodyLength": 270,
+      "role": "answering",
+      "topical": true,
+      "why": "Describes the tooling its author already builds, then advises the same direction."
+    },
+    {
+      "id": "p7x7fd6",
+      "name": "t1_p7x7fd6",
+      "depth": 0,
+      "parentCommentId": null,
+      "score": 1,
+      "bodyLength": 85,
+      "role": "neither",
+      "topical": false,
+      "why": "Wonders whether this is a job the author almost applied for."
+    },
+    {
+      "id": "p7xmg4v",
+      "name": "t1_p7xmg4v",
+      "depth": 0,
+      "parentCommentId": null,
+      "score": 1,
+      "bodyLength": 288,
+      "role": "neither",
+      "topical": true,
+      "why": "The hardest one to label. Its author describes badly written tests as a real problem, which reads like a lead, then says he has already built a SaaS that solves it. He is a builder, not a buyer, and he asks nothing."
+    },
+    {
+      "id": "p7xwpuu",
+      "name": "t1_p7xwpuu",
+      "depth": 0,
+      "parentCommentId": null,
+      "score": 1,
+      "bodyLength": 468,
+      "role": "answering",
+      "topical": true,
+      "why": "Advice: get a regression suite first, add AI later."
+    },
+    {
+      "id": "p7t2vgu",
+      "name": "t1_p7t2vgu",
+      "depth": 0,
+      "parentCommentId": null,
+      "score": 0,
+      "bodyLength": 514,
+      "role": "answering",
+      "topical": true,
+      "why": "Advice on framework structure and generating tests from a coding pattern."
+    },
+    {
+      "id": "p7vfr09",
+      "name": "t1_p7vfr09",
+      "depth": 0,
+      "parentCommentId": null,
+      "score": 0,
+      "bodyLength": 227,
+      "role": "answering",
+      "topical": true,
+      "why": "Advice against MCPs on token cost, with a CLI named instead."
+    },
+    {
+      "id": "p7s1stp",
+      "name": "t1_p7s1stp",
+      "depth": 0,
+      "parentCommentId": null,
+      "score": -1,
+      "bodyLength": 336,
+      "role": "answering",
+      "topical": true,
+      "why": "Advice on reviewing and measuring generated tests at scale."
+    },
+    {
+      "id": "p7s270n",
+      "name": "t1_p7s270n",
+      "depth": 0,
+      "parentCommentId": null,
+      "score": -1,
+      "bodyLength": 1301,
+      "role": "answering",
+      "topical": true,
+      "why": "Long advice on test plans, buy-in and CI runners."
+    },
+    {
+      "id": "p7ru871",
+      "name": "t1_p7ru871",
+      "depth": 0,
+      "parentCommentId": null,
+      "score": 1,
+      "bodyLength": 9,
+      "role": "neither",
+      "topical": false,
+      "why": "The body is `[deleted]`. It is kept because a real page holds rows like it and the stage will be asked to score them."
+    },
+    {
+      "id": "p7rwl6t",
+      "name": "t1_p7rwl6t",
+      "depth": 1,
+      "parentCommentId": "p7ru871",
+      "score": 2,
+      "bodyLength": 405,
+      "role": "neither",
+      "topical": false,
+      "why": "The subreddit's automated rule notice about vendor spam."
+    }
+  ]
+}

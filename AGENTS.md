@@ -331,6 +331,27 @@ stage and sends everything it keeps to the model until `AI_EMBEDDING_PROVIDER`
 names something else. On OpenAI it needs nothing: the embedding provider, model
 and key all fall back to the ones the classifier uses.
 
+**The embedding stage does not fit a comment, and that is measured.** US-029
+closed on 2026-09-06. It embedded all 21 comments of one real
+r/softwaretesting thread against PLAN.md's example monitor, two ways. Under the
+parent post's title every comment lands within 0.08 of the title's own 0.4187,
+so nothing is dropped at any threshold and the stage is a pure cost. Alone the
+comments do separate by subject, but the gap is **0.0103 wide** against the 0.18
+measured on posts, and it sits at 0.22 where the shipped threshold is 0.15.
+
+The number that settles it is neither of those. **The highest similarity in the
+thread, 0.5504, is nine hundred characters of expert advice** — higher than four
+of the five posts in `similarities.json`. The stage measures subject, and under
+a relevant post the experts answering are on subject too. So a comment will go
+from the free keyword stage straight to US-030's triage model: one paid stage in
+front of the classifier, not two.
+
+Two limits travel with that. **Zero of the 21 comments was a person asking** —
+eleven answer, ten are jokes, a moderator notice and a deleted body — so the two
+classes were never weighed directly against each other, and the evidence is two
+indirect readings that point the same way. And it is one thread. A second
+thread, especially one holding a real asker, is what would move the answer.
+
 **The classifier has met a real model, and its fixtures are current.**
 `capture:classifier` ran on 2026-09-05 against the system prompt US-010
 shipped, and recorded 7, 64, 86 and 96 for PLAN.md's four worked examples,
@@ -638,6 +659,7 @@ backlog/index.sh --check      # exit 1 if either list is stale
 pnpm --filter @intentwatch/core capture:classifier   # spends money; see below
 pnpm --filter @intentwatch/core capture:queries      # spends money; see below
 pnpm --filter @intentwatch/core capture:embeddings   # spends money; see below
+pnpm --filter @intentwatch/core capture:comment-filter # spends money; see below
 pnpm --filter @intentwatch/core live:provider-switch # spends ~$0.08; see below
 pnpm --filter @intentwatch/core live:linkedin-poll   # spends ~$0.08 + model; see below
 pnpm capture:deletions                            # spends ~$0.02; see below
@@ -645,7 +667,7 @@ pnpm capture:deletions                            # spends ~$0.02; see below
 node packages/core/src/sources/providers/socialcrawl/linkedin-fixtures/capture.mjs   # ~30 credits
 ```
 
-These seven are the only commands here that spend money, and all five are
+These eight are the only commands here that spend money, and all eight are
 instruments: they ask a real provider something and record what it said,
 because an answer we wrote would be evidence about our own schema and none
 about the provider.
@@ -665,6 +687,14 @@ a quarter of a megabyte to re-prove arithmetic `pgvector` already does.
 `ai/similarity.test.ts` replays them and fails if the default threshold leaves
 the measured gap. Two short calls, well under a hundredth of a cent. It needs
 an embedding provider: Anthropic has none.
+
+`capture:comment-filter` asks what the embedding stage would do to a Reddit
+comment. It reads the thread already committed in
+`sources/deletion-fixtures/`, and the hand labels beside it, and embeds every
+comment twice — alone, and under its parent post's title. Two short calls, 3,009
+tokens. Run it when `filter/description.ts` changes, or against a second thread.
+US-029's answer is recorded in its Log and it is the reason the stage is off for
+comments.
 
 `live:provider-switch` is the fourth, and it is different in kind: it asks two
 real social-data providers rather than a model, and it writes rows. It starts a

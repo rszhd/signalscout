@@ -1,6 +1,6 @@
 ---
 id: US-020
-title: A monitor can include Reddit comments
+title: A monitor can include comments and replies
 type: feature
 priority: p2
 created: 2026-09-05T01:18+08:00
@@ -16,9 +16,57 @@ because they cannot be added without changing the `SocialSource` interface that
 US-003 settled, and that change deserved its own decision rather than being
 made in passing.
 
-This ticket was rewritten on 2026-09-06. It was written against Bright Data.
-It now builds on ScrapeCreators, and three of its original conclusions were
-wrong for that provider.
+This ticket was rewritten twice on 2026-09-06. It was written against Bright
+Data, and three of its conclusions were wrong once Reddit moved to
+ScrapeCreators. It was then widened from Reddit to every platform, because the
+reply is not a Reddit feature.
+
+**A reply is a platform-neutral thing, and it is now the whole ticket.** A
+person describing a problem underneath somebody else's post is the same lead on
+every network. STACK.md's rule already points this way — the interface is not
+shaped to suit one provider — and US-020's own first draft said it: "X has
+replies and Hacker News has comments, so 'include the replies to a thing' is a
+question every source can be asked."
+
+The catalogue makes it concrete. SocialCrawl publishes **17 comment endpoints
+across 12 platforms**, every one with the archetype `CommentList` and every one
+pointing at the same schema, `socialcrawl.dev/schemas/comment.json`. That was
+tested rather than believed: an X reply and a SocialCrawl Reddit comment came
+back with identical field names — `id`, `url`, `parent_id`, `post_id`, `text`,
+`author`, `engagement`, `flags`, `published_at`. **One parser reads both.**
+
+So the capability is one interface change and one storage shape, and a
+connector implements it or declares that it cannot.
+
+**Ship it on the three platforms this product already has.** Reddit, X and
+LinkedIn add no network, so PLAN.md's *Important rule* is untouched. The prices
+below are per platform and they are not close to each other, so a monitor's
+arithmetic is per connector even though its interface is not.
+
+| Platform | Endpoint | Price | Measured |
+|---|---|---|---|
+| Reddit | ScrapeCreators `post/comments` | 1 credit, $0.00188 | 25 comments a page |
+| Reddit | SocialCrawl `post/comments` | 5 credits, $0.041 | 92 comments, 7 levels |
+| X | SocialCrawl `tweet/replies` | 1 credit, $0.0081 | 29 replies a page |
+| LinkedIn | SocialCrawl `post/comments` | 5 credits, $0.041 | not measured |
+
+**X is where a reply is worth most, and that was not obvious.** An X search
+page carries about 20 posts, and the conversation happens underneath them. One
+credit bought 29 replies of a claimed 71, which is about the same price per
+item as an X post — so on X the replies roughly double what a poll can see, at
+no change in unit cost. US-006 already measured X's other half: a search that
+matches nothing is refunded, and a good query is four words.
+
+**YouTube, Instagram, TikTok, Threads, Hacker News and GitHub are out of
+scope**, and deliberately. Each is a fourth network, and PLAN.md's *Important
+rule* says not to add one until Reddit and X reliably produce useful matches.
+That condition is still unmet: X has one poll and five verdicts behind it. The
+rule was crossed once for LinkedIn, on the owner's decision, and PLAN.md records
+that the rule stands for the fourth. The catalogue rows are written into the
+Notes so the next reader finds a decision and not an oversight.
+
+Three of the original conclusions about Reddit were wrong for ScrapeCreators,
+and they are corrected below.
 
 **A comment cannot be searched. It is reached through its thread.**
 ScrapeCreators publishes `search` and `subreddit` for posts and
@@ -93,6 +141,27 @@ on every post — checked in `scrapecreators/fixtures/search-posts.json` and
 on the next poll, and skip a thread whose count has not moved. Without it,
 every poll re-buys every thread for the life of the monitor.
 
+**The embedding stage does not run on a comment. US-029 measured it.**
+`ai/fixtures/comment-similarities.json` holds every comment in this ticket's own
+captured thread, embedded against PLAN.md's example monitor two ways.
+
+Under the parent post's title the stage is a cost with no drop: all 21 land
+between 0.3715 and 0.5491, within 0.08 of the title's own 0.4187, and the
+moderator's vendor-spam notice outscores eight comments that are about testing.
+Alone it does separate topic, but the gap is 0.0103 wide against 0.18 on posts,
+and it sits at 0.22, where the shipped threshold is 0.15.
+
+The reason that decides it is neither of those. The highest similarity in the
+thread, 0.5504, is nine hundred characters of expert advice — higher than four
+of the five posts in `similarities.json`. The stage measures topic, and under a
+relevant post every expert is on topic. So a comment goes from the free keyword
+stage to [US-030](US-030-a-cheap-model-decides-which-comments-the-good-model-reads.md)'s
+triage model, and there is one paid stage in front of the classifier, not two.
+
+What the measurement did not cover: the free keyword stage. A comment collected
+because its parent post matched a subreddit has matched nothing itself, and
+nobody has decided what that stage asks of a comment.
+
 **The charge is not split, and the interface should not be either.** The
 original acceptance list asked `SearchResult` to report each kind of read
 apart. That existed to make Bright Data's second charge visible. Here there is
@@ -105,17 +174,26 @@ told that comments are unavailable, not quietly given none.
 
 ## Acceptance
 
-- [ ] `SourceQuery` carries an opt-in for comments, and a connector that cannot
+- [ ] `SourceQuery` carries an opt-in for replies, and a connector that cannot
       fetch them ignores it rather than failing
-- [ ] A connector declares whether it can fetch comments, and the monitor form
-      reads that declaration, so a deployment whose Reddit provider cannot
-      fetch comments is told so instead of being given none
+- [ ] A connector declares whether it can fetch replies, and the monitor form
+      reads that declaration per platform, so a person is told which of their
+      platforms will return replies rather than being given none in silence
 - [ ] The fake source can be told to return a thread, so callers are tested
       without a network and without a bill
+- [ ] One parser reads a reply from every SocialCrawl platform, because the
+      provider's `CommentList` schema is shared, and a test proves it against
+      captured X and LinkedIn answers
 - [ ] The ScrapeCreators Reddit connector fetches a thread by post URL when the
       opt-in is set, and never when it is not
-- [ ] A comment is stored as its own row, keyed by its `t1_` fullname, with a
-      link to its parent post and to its parent comment
+- [ ] The SocialCrawl X connector fetches replies by post URL when the opt-in
+      is set, and never when it is not
+- [ ] The SocialCrawl LinkedIn connector does the same, or the ticket records
+      why it was left out
+- [ ] A reply is stored as its own row, keyed by the id its platform gives it,
+      with a link to its parent post and to its parent reply. Reddit's `t1_`
+      fullname and an X reply id are the same kind of key, and
+      `UNIQUE (source, external_id)` needs no change
 - [ ] A thread is opened only for a post that survived the pre-filter, and the
       number of threads one poll may open is bounded
 - [ ] `num_comments` is stored on the post at collection, and a thread is
@@ -126,7 +204,9 @@ told that comments are unavailable, not quietly given none.
 - [ ] A monitor stores the opt-in, in a migration that keeps it off for every
       existing monitor
 - [ ] The monitor form shows the opt-in, says what it costs in model calls
-      rather than in fetches, and leaves it off by default
+      rather than in fetches, and leaves it off by default. The cost sentence
+      is per platform, because the four prices above differ by a factor of
+      twenty-two
 - [ ] The inbox shows the parent post title above a comment match and links to
       the comment permalink, so a person sees the context the model saw
 - [ ] Tests replay comment payloads captured by
@@ -136,15 +216,16 @@ told that comments are unavailable, not quietly given none.
       may buy is bounded
 - [ ] A top-level `has_more: false` is never stored or logged as "the thread is
       complete", and a test proves a partly read thread is recorded as partial
-- [ ] Whether the embedding stage runs on a comment follows
-      [US-029](US-029-a-measurement-says-which-pre-filter-fits-a-comment.md)
+- [ ] The embedding stage does not run on a comment, and a test proves a
+      comment reaches the next stage without one. US-029 measured it: see the
+      Context above
 
 ## Notes
 
 - Depends on [US-005](../done/2026-09/US-005-reddit-returns-candidate-posts.md)
-  and [US-025](../done/2026-09/US-025-reddit-has-a-second-provider.md).
-- Blocked on [US-029](US-029-a-measurement-says-which-pre-filter-fits-a-comment.md)
-  for the stage order only. Everything else can be built before it answers.
+  and [US-025](../done/2026-09/US-025-scrapecreators-collects-reddit-posts.md).
+- [US-029](../done/2026-09/US-029-a-measurement-says-which-pre-filter-fits-a-comment.md)
+  answered the stage order on 2026-09-06. Nothing here is blocked any more.
 - [US-030](US-030-a-cheap-model-decides-which-comments-the-good-model-reads.md)
   is what makes the 280 model calls affordable. This ticket is the reason that
   one exists.
@@ -196,6 +277,16 @@ join both from our own rows.
 - Bright Data's comments dataset is left unbuilt. Its price is also unread: the
   posts dataset is $1.50 per 1,000 records and nobody has checked whether the
   comments dataset matches. Do not fill that number in from the other one.
+- The platforms this ticket does not touch, with their catalogue prices, so the
+  next reader does not have to re-derive them: TikTok 1, YouTube 1, Threads 1,
+  Snapchat 1, Rumble 1, Hacker News 1, GitHub 1, Facebook 1, Instagram 5.
+  Adding any of them is a new network and PLAN.md's *Important rule* applies.
+- Two schema details that a shared parser must not assume away. A post reports
+  its reply count at `engagement.comments` and a reply reports its own at
+  `engagement.replies`, so the same word means two fields. And the envelope
+  differs: Reddit's answer carries `truncated`, X's carries `next_cursor`.
+- SocialCrawl returned a Reddit comment with a null author and an X reply with
+  a full one. Author presence is a per-platform fact, not a schema fact.
 - US-013 prices a monitor from `pricePerUnitMicros`. Opening threads must reach
   the budget guard, or a monitor with comments spends past its cap.
   docs/testing.md: a rule is only as tested as its least-tested caller.
@@ -225,3 +316,19 @@ join both from our own rows.
   wrong choice: twenty-two times the price on the median thread, and the half
   it adds is the half a reader ranks last. Recorded as the escape hatch. Its
   catalogue is free to read, which is how the endpoint was found.
+- 2026-09-06T09:31+08:00 — US-029 answered the stage order. The embedding stage
+  does not run on a comment: under the parent title it drops nothing, and alone
+  it ranks a long expert answer above every post it was tuned on. The acceptance
+  box now names the answer instead of pointing at the ticket. One question came
+  out of it that nobody has answered: what the free keyword stage asks of a
+  comment whose parent matched a subreddit.
+- 2026-09-06T02:02+08:00 — Widened from Reddit to every platform, on the
+  owner's point that a reply is not a Reddit feature. The free catalogue lists
+  17 comment endpoints over 12 platforms on one shared schema, and a live X
+  reply proved the schema is really shared: identical field names to a
+  SocialCrawl Reddit comment, so one parser reads both. One credit bought 29 X
+  replies, which is about the price of an X post, so replies roughly double
+  what an X poll sees at no change in unit cost. Scope is held to Reddit, X and
+  LinkedIn, because every other platform on that list is a fourth network and
+  PLAN.md's rule stands for the fourth. The file was renamed; the id did not
+  change.

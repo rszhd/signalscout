@@ -1,0 +1,215 @@
+{
+  "provider": "openai",
+  "model": "text-embedding-3-small",
+  "capturedAt": "2026-09-05T17:58:11.517Z",
+  "note": "Cosine similarity between PLAN.md's example monitor and every comment in one captured r/softwaretesting thread, measured three ways: the comment alone, the comment under its parent post's title, and the parent title by itself as the baseline. The vectors are not kept, for the reason capture-embeddings.ts gives. This is one thread and it is not a distribution.",
+  "dimensions": 1536,
+  "monitorText": "Product: A test runner for web apps. You record a browser flow once and it keeps working when the UI changes.\nIdeal customer: Small SaaS teams, two to twenty people, with no dedicated QA engineer, shipping every week.\nProblem it solves: End-to-end tests break whenever the UI changes, so teams stop trusting them and go back to testing by hand before every release.",
+  "thread": {
+    "fixture": "sources/deletion-fixtures/scrapecreators-comments-canonical.json",
+    "labels": "sources/deletion-fixtures/comment-labels.json",
+    "postId": "1w71bul",
+    "postTitle": "Starting Automation from 0% as a QA Lead — How are you using AI, MCPs & Agents in QA?",
+    "subreddit": "softwaretesting"
+  },
+  "defaultSimilarityThreshold": 0.15,
+  "parentTitleAlone": 0.41866,
+  "comments": [
+    {
+      "id": "p7rd166",
+      "depth": 0,
+      "role": "neither",
+      "topical": false,
+      "alone": 0.146879,
+      "withParent": 0.402665
+    },
+    {
+      "id": "p7rtn2e",
+      "depth": 1,
+      "role": "neither",
+      "topical": false,
+      "alone": 0.134839,
+      "withParent": 0.405315
+    },
+    {
+      "id": "p7s25pl",
+      "depth": 2,
+      "role": "neither",
+      "topical": false,
+      "alone": 0.17944,
+      "withParent": 0.403086
+    },
+    {
+      "id": "p7swsyg",
+      "depth": 0,
+      "role": "neither",
+      "topical": false,
+      "alone": 0.135632,
+      "withParent": 0.379095
+    },
+    {
+      "id": "p7t1t84",
+      "depth": 1,
+      "role": "neither",
+      "topical": false,
+      "alone": 0.155574,
+      "withParent": 0.394438
+    },
+    {
+      "id": "p7wcjlm",
+      "depth": 2,
+      "role": "neither",
+      "topical": false,
+      "alone": 0.077137,
+      "withParent": 0.39107
+    },
+    {
+      "id": "p7rb4db",
+      "depth": 0,
+      "role": "answering",
+      "topical": true,
+      "alone": 0.340174,
+      "withParent": 0.403414
+    },
+    {
+      "id": "p7rd4mj",
+      "depth": 1,
+      "role": "answering",
+      "topical": true,
+      "alone": 0.347229,
+      "withParent": 0.443056
+    },
+    {
+      "id": "p7wehel",
+      "depth": 0,
+      "role": "answering",
+      "topical": true,
+      "alone": 0.250907,
+      "withParent": 0.403506
+    },
+    {
+      "id": "p7racsc",
+      "depth": 0,
+      "role": "answering",
+      "topical": true,
+      "alone": 0.450632,
+      "withParent": 0.478222
+    },
+    {
+      "id": "p7rgfxc",
+      "depth": 1,
+      "role": "answering",
+      "topical": true,
+      "alone": 0.231953,
+      "withParent": 0.4213
+    },
+    {
+      "id": "p7x4ky0",
+      "depth": 0,
+      "role": "answering",
+      "topical": true,
+      "alone": 0.39511,
+      "withParent": 0.393974
+    },
+    {
+      "id": "p7x7fd6",
+      "depth": 0,
+      "role": "neither",
+      "topical": false,
+      "alone": 0.130189,
+      "withParent": 0.371475
+    },
+    {
+      "id": "p7xmg4v",
+      "depth": 0,
+      "role": "neither",
+      "topical": true,
+      "alone": 0.460102,
+      "withParent": 0.468652
+    },
+    {
+      "id": "p7xwpuu",
+      "depth": 0,
+      "role": "answering",
+      "topical": true,
+      "alone": 0.365672,
+      "withParent": 0.376015
+    },
+    {
+      "id": "p7t2vgu",
+      "depth": 0,
+      "role": "answering",
+      "topical": true,
+      "alone": 0.347852,
+      "withParent": 0.420119
+    },
+    {
+      "id": "p7vfr09",
+      "depth": 0,
+      "role": "answering",
+      "topical": true,
+      "alone": 0.230472,
+      "withParent": 0.427311
+    },
+    {
+      "id": "p7s1stp",
+      "depth": 0,
+      "role": "answering",
+      "topical": true,
+      "alone": 0.399645,
+      "withParent": 0.461719
+    },
+    {
+      "id": "p7s270n",
+      "depth": 0,
+      "role": "answering",
+      "topical": true,
+      "alone": 0.55038,
+      "withParent": 0.549131
+    },
+    {
+      "id": "p7ru871",
+      "depth": 0,
+      "role": "neither",
+      "topical": false,
+      "alone": 0.080176,
+      "withParent": 0.41618
+    },
+    {
+      "id": "p7rwl6t",
+      "depth": 1,
+      "role": "neither",
+      "topical": false,
+      "alone": 0.220202,
+      "withParent": 0.392832
+    }
+  ],
+  "analysis": {
+    "alone": {
+      "lowest": 0.077137,
+      "highest": 0.55038,
+      "keptAtDefaultThreshold": 15,
+      "askingAgainstAnswering": null,
+      "topicalAgainstOffTopic": {
+        "lowestKept": 0.230472,
+        "highestDropped": 0.220202,
+        "gap": 0.01027
+      }
+    },
+    "withParent": {
+      "lowest": 0.371475,
+      "highest": 0.549131,
+      "keptAtDefaultThreshold": 21,
+      "askingAgainstAnswering": null,
+      "topicalAgainstOffTopic": {
+        "lowestKept": 0.376015,
+        "highestDropped": 0.41618,
+        "gap": -0.040165
+      }
+    }
+  },
+  "usage": {
+    "tokens": 3009
+  },
+  "latencyMs": 3487
+}

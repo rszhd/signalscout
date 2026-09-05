@@ -40,6 +40,9 @@ connections and settings stay out until their own behaviour exists.
 - [x] The IntentWatch wordmark uses the mockup's lime three-dot logo
 - [x] New monitor opens in the mockup's dialog layout over the monitor list
       and can be dismissed without losing the application shell
+- [x] The application uses Manrope for its interface typography
+- [x] Reading text, labels, helper copy and metadata use a consistent scale;
+      post bodies are 17px and informational text is never smaller than 12px
 
 ## Notes
 
@@ -78,3 +81,10 @@ connections and settings stay out until their own behaviour exists.
   mockup's modal layout over the monitor list. Added the close link, Escape
   handling and compact progress header. Verified the scrollable dialog at
   desktop and mobile widths.
+- 2026-09-05T11:40+08:00 — Replaced Ubuntu with locally bundled Manrope at
+  the three interface weights. Kept monospace labels unchanged.
+- 2026-09-05T11:48+08:00 — Added a five-level type scale. Raised post bodies
+  to 17px, regular copy to 15px, labels to 14px and secondary copy to at least
+  12px. Darkened muted text, reduced form-label weight, loosened heading
+  tracking and added space between form groups. Verified the inbox and monitor
+  dialog at desktop and mobile widths.

@@ -1,12 +1,12 @@
-@import "@fontsource/ubuntu/400.css";
-@import "@fontsource/ubuntu/500.css";
-@import "@fontsource/ubuntu/700.css";
+@import "@fontsource/manrope/latin-400.css";
+@import "@fontsource/manrope/latin-500.css";
+@import "@fontsource/manrope/latin-700.css";
 @import "tailwindcss";
 
 :root {
   --ink: #191c1a;
-  --muted: #707771;
-  --muted-strong: #535b55;
+  --muted: #616962;
+  --muted-strong: #444c46;
   --background: #f3f4f0;
   --surface: #fff;
   --surface-soft: #fafbf8;
@@ -19,10 +19,15 @@
   --green-soft: #e9f4ec;
   --warning: #8f4c26;
   --shadow: 0 20px 55px rgb(25 28 26 / 10%);
+  --text-xs: 0.75rem;
+  --text-sm: 0.8125rem;
+  --text-label: 0.875rem;
+  --text-body: 0.9375rem;
+  --text-reading: 1.0625rem;
   color: var(--ink);
   background: var(--background);
   font-family:
-    Ubuntu, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    Manrope, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
 }
@@ -41,6 +46,8 @@ body {
   min-height: 100vh;
   margin: 0;
   background: var(--background);
+  font-size: var(--text-body);
+  line-height: 1.55;
 }
 
 button,
@@ -152,14 +159,14 @@ a {
 }
 
 .product-note strong {
-  font-size: 0.78rem;
+  font-size: var(--text-sm);
 }
 
 .product-note small {
   margin-top: 3px;
   color: #9fa6a1;
-  font-size: 0.7rem;
-  line-height: 1.45;
+  font-size: var(--text-xs);
+  line-height: 1.5;
 }
 
 .site-nav {
@@ -177,7 +184,7 @@ a {
   padding: 0 11px;
   border-radius: 8px;
   color: #aeb5b0;
-  font-size: 0.82rem;
+  font-size: var(--text-label);
   font-weight: 500;
   text-decoration: none;
   transition:
@@ -235,7 +242,7 @@ a {
   border: 1px solid #485449;
   border-radius: 999px;
   color: #bad0bd;
-  font-size: 0.68rem;
+  font-size: var(--text-xs);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.07em;
@@ -244,7 +251,7 @@ a {
 .sidebar-bottom p {
   margin: 9px 0 0;
   color: #898f8b;
-  font-size: 0.7rem;
+  font-size: var(--text-xs);
   line-height: 1.5;
 }
 
@@ -272,9 +279,9 @@ a {
 
 .eyebrow {
   margin: 0 0 5px;
-  color: #8a918b;
+  color: var(--muted);
   font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
-  font-size: 0.68rem;
+  font-size: var(--text-xs);
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -284,7 +291,7 @@ a {
   margin: 0;
   font-size: 1.55rem;
   line-height: 1.1;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.02em;
 }
 
 .primary-button,
@@ -297,7 +304,7 @@ a {
   justify-content: center;
   border-radius: 8px;
   padding: 0 14px;
-  font-size: 0.8rem;
+  font-size: var(--text-label);
   font-weight: 700;
   text-decoration: none;
 }
@@ -363,7 +370,7 @@ a {
   max-width: 430px;
   margin: 8px 0 20px;
   color: var(--muted);
-  font-size: 0.84rem;
+  font-size: var(--text-body);
   line-height: 1.6;
 }
 
@@ -440,7 +447,7 @@ a {
 .inbox-toolbar > p {
   margin: 0;
   color: var(--muted);
-  font-size: 0.76rem;
+  font-size: var(--text-sm);
 }
 
 .inbox-filters {
@@ -470,7 +477,7 @@ a {
   outline: none;
   color: var(--muted-strong);
   background: #fff;
-  font-size: 0.76rem;
+  font-size: var(--text-sm);
 }
 
 .filter select:focus,
@@ -546,7 +553,7 @@ a {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  font-size: 0.74rem;
+  font-size: var(--text-sm);
   font-weight: 700;
 }
 
@@ -569,22 +576,22 @@ a {
 .match-origin {
   margin-left: auto;
   color: var(--muted);
-  font-size: 0.72rem;
+  font-size: var(--text-xs);
 }
 
 .match-title {
   color: #222624;
-  font-size: 0.98rem;
-  line-height: 1.4;
-  letter-spacing: -0.015em;
+  font-size: 1rem;
+  line-height: 1.45;
+  letter-spacing: -0.01em;
 }
 
 .match-excerpt {
   display: -webkit-box;
   overflow: hidden;
   color: #687069;
-  font-size: 0.82rem;
-  line-height: 1.55;
+  font-size: var(--text-label);
+  line-height: 1.6;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
 }
@@ -602,7 +609,7 @@ a {
   color: #a43f1d;
   background: var(--orange-soft);
   font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
-  font-size: 0.66rem;
+  font-size: var(--text-xs);
   font-weight: 700;
   letter-spacing: 0.03em;
   text-transform: uppercase;
@@ -635,12 +642,12 @@ a {
 
 .match-score strong {
   font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
-  font-size: 0.85rem;
+  font-size: var(--text-label);
 }
 
 .match-score span {
   color: var(--muted);
-  font-size: 0.65rem;
+  font-size: var(--text-xs);
 }
 
 .inbox-more {
@@ -682,15 +689,15 @@ a {
 .detail-title {
   max-width: 30ch;
   margin: 22px 0 7px;
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   line-height: 1.38;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
 }
 
 .detail-author {
   margin: 0;
   color: var(--muted);
-  font-size: 0.74rem;
+  font-size: var(--text-sm);
 }
 
 .post-body {
@@ -698,14 +705,15 @@ a {
 }
 
 .post-box {
+  max-width: 68ch;
   margin: 0;
   padding: 18px 19px;
   border: 1px solid var(--line);
   border-radius: 10px;
   color: #3a403b;
   background: #fff;
-  font-size: 0.88rem;
-  line-height: 1.65;
+  font-size: var(--text-reading);
+  line-height: 1.7;
 }
 
 .read-more-button {
@@ -714,7 +722,7 @@ a {
   border: 0;
   color: var(--green);
   background: transparent;
-  font-size: 0.75rem;
+  font-size: var(--text-sm);
   font-weight: 700;
 }
 
@@ -735,7 +743,7 @@ a {
 .section-label {
   margin: 0 0 12px;
   color: #c7de6b;
-  font-size: 0.72rem;
+  font-size: var(--text-xs);
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -755,8 +763,8 @@ a {
   grid-template-columns: 9px 1fr;
   gap: 6px;
   color: #d6dad7;
-  font-size: 0.78rem;
-  line-height: 1.45;
+  font-size: var(--text-sm);
+  line-height: 1.55;
 }
 
 .match-why :where(li > span) {
@@ -775,12 +783,12 @@ a {
 
 .score-heading h3 {
   margin: 0;
-  font-size: 0.8rem;
+  font-size: var(--text-label);
 }
 
 .score-heading > span {
   color: var(--muted);
-  font-size: 0.7rem;
+  font-size: var(--text-xs);
 }
 
 .match-scores {
@@ -799,13 +807,13 @@ a {
 
 .match-scores dt {
   color: #59615b;
-  font-size: 0.72rem;
+  font-size: var(--text-sm);
 }
 
 .match-scores dd {
   margin: 0;
   font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
-  font-size: 0.76rem;
+  font-size: var(--text-sm);
   font-weight: 700;
 }
 
@@ -837,7 +845,7 @@ a {
 
 .match-meta {
   color: var(--muted);
-  font-size: 0.7rem;
+  font-size: var(--text-xs);
 }
 
 .floating-error {
@@ -863,7 +871,7 @@ a {
   max-width: 720px;
   margin: 0;
   color: var(--muted);
-  font-size: 0.86rem;
+  font-size: var(--text-body);
   line-height: 1.6;
 }
 
@@ -874,7 +882,7 @@ a {
   color: var(--muted-strong);
   background: #e7e9e4;
   font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
-  font-size: 0.7rem;
+  font-size: var(--text-xs);
 }
 
 .monitor-list {
@@ -927,15 +935,15 @@ a {
 
 .monitor-top h2 {
   margin: 0 0 4px;
-  font-size: 0.87rem;
-  letter-spacing: -0.015em;
+  font-size: 1rem;
+  letter-spacing: -0.01em;
 }
 
 .monitor-origin {
   margin: 0;
   overflow-wrap: anywhere;
   color: var(--muted);
-  font-size: 0.72rem;
+  font-size: var(--text-sm);
   line-height: 1.5;
 }
 
@@ -944,7 +952,7 @@ a {
   padding: 5px 7px;
   border-radius: 6px;
   font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
-  font-size: 0.65rem;
+  font-size: var(--text-xs);
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -972,7 +980,7 @@ a {
   border-radius: 7px;
   color: #733826;
   background: #fbeee9;
-  font-size: 0.78rem;
+  font-size: var(--text-sm);
   line-height: 1.5;
 }
 
@@ -1004,7 +1012,7 @@ a {
 .monitor-spend dt {
   min-height: 28px;
   color: var(--muted);
-  font-size: 0.68rem;
+  font-size: var(--text-xs);
   line-height: 1.4;
 }
 
@@ -1012,7 +1020,7 @@ a {
   margin: 4px 0 0;
   overflow-wrap: anywhere;
   font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
-  font-size: 0.82rem;
+  font-size: var(--text-label);
   font-weight: 700;
 }
 
@@ -1035,8 +1043,8 @@ a {
 
 .budget-label {
   color: var(--muted);
-  font-size: 0.68rem;
-  font-weight: 700;
+  font-size: var(--text-sm);
+  font-weight: 500;
 }
 
 .budget-field input {
@@ -1066,7 +1074,7 @@ a {
   padding: 5px 0;
   color: var(--green);
   background: transparent;
-  font-size: 0.75rem;
+  font-size: var(--text-sm);
   font-weight: 700;
   text-decoration: none;
 }
@@ -1075,7 +1083,7 @@ a {
   flex-basis: 100%;
   margin: 0;
   color: #923e2c;
-  font-size: 0.75rem;
+  font-size: var(--text-sm);
 }
 
 .monitor-card-actions {
@@ -1145,7 +1153,7 @@ a {
   margin: 0 42px 9px 0;
   color: var(--orange);
   font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
-  font-size: 0.72rem;
+  font-size: var(--text-xs);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -1195,29 +1203,29 @@ a {
 .form-card .center-state h2 {
   margin: 0;
   font-size: clamp(1.4rem, 2.6vw, 2rem);
-  letter-spacing: -0.035em;
+  letter-spacing: -0.02em;
 }
 
 .card-heading > p:last-child,
 .card-heading > div > p:last-child {
   margin: 7px 0 0;
   color: var(--muted);
-  font-size: 0.78rem;
-  line-height: 1.55;
+  font-size: var(--text-sm);
+  line-height: 1.6;
 }
 
 .field-stack {
   display: grid;
-  gap: 17px;
-  padding: 23px 0;
+  gap: 20px;
+  padding: 26px 0;
 }
 
 .field > span,
 .choice-section legend {
   display: block;
   color: #343a35;
-  font-size: 0.82rem;
-  font-weight: 700;
+  font-size: var(--text-label);
+  font-weight: 500;
 }
 
 .field > small,
@@ -1225,9 +1233,9 @@ a {
 .section-title-row p {
   display: block;
   margin: 3px 0 7px;
-  color: #878e88;
-  font-size: 0.73rem;
-  line-height: 1.45;
+  color: var(--muted);
+  font-size: var(--text-sm);
+  line-height: 1.5;
 }
 
 .field input,
@@ -1245,7 +1253,7 @@ a {
 .field input,
 .field textarea {
   padding: 10px 11px;
-  font-size: 0.84rem;
+  font-size: var(--text-body);
 }
 
 .field textarea {
@@ -1268,7 +1276,7 @@ a {
 
 .choice-section {
   margin: 0;
-  padding: 22px 0;
+  padding: 26px 0;
   border: 0;
   border-top: 1px solid var(--line);
 }
@@ -1328,16 +1336,17 @@ a {
 .signal-card strong,
 .source-card strong {
   color: #303631;
-  font-size: 0.78rem;
-  line-height: 1.35;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  line-height: 1.4;
 }
 
 .signal-card small,
 .source-card small {
   margin-top: 3px;
   color: var(--muted);
-  font-size: 0.7rem;
-  line-height: 1.4;
+  font-size: var(--text-xs);
+  line-height: 1.5;
 }
 
 .source-list {
@@ -1366,7 +1375,7 @@ a {
   border-radius: 8px;
   color: #fff;
   background: #ff5722;
-  font-size: 0.66rem;
+  font-size: var(--text-xs);
   font-weight: 700;
 }
 
@@ -1374,7 +1383,7 @@ a {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  font-size: 0.68rem;
+  font-size: var(--text-xs);
   font-weight: 700;
 }
 
@@ -1403,7 +1412,7 @@ a {
   border-radius: 8px;
   color: #4f6848;
   background: #f5faef;
-  font-size: 0.75rem;
+  font-size: var(--text-sm);
   line-height: 1.5;
 }
 
@@ -1423,7 +1432,7 @@ a {
   border-radius: 8px;
   color: #8f3f39;
   background: #fff0ed;
-  font-size: 0.75rem;
+  font-size: var(--text-sm);
 }
 
 .form-actions {
@@ -1441,8 +1450,8 @@ a {
 
 .form-actions > p {
   margin: 0 auto 0 0;
-  color: #90958f;
-  font-size: 0.68rem;
+  color: var(--muted);
+  font-size: var(--text-xs);
 }
 
 .plan-heading {
@@ -1459,7 +1468,7 @@ a {
   border-radius: 999px;
   color: #627166;
   background: #eff3ec;
-  font-size: 0.68rem;
+  font-size: var(--text-xs);
 }
 
 .plan-section {
@@ -1479,12 +1488,12 @@ a {
 
 .section-title-row h3 {
   margin: 0;
-  font-size: 0.8rem;
+  font-size: var(--text-label);
 }
 
 .section-title-row > span {
   color: var(--muted);
-  font-size: 0.68rem;
+  font-size: var(--text-xs);
 }
 
 .query-list {
@@ -1508,7 +1517,7 @@ a {
   border-radius: 7px;
   color: #6a776b;
   background: #edf1eb;
-  font-size: 0.68rem;
+  font-size: var(--text-xs);
   font-weight: 700;
 }
 
@@ -1516,7 +1525,7 @@ a {
 .subreddit-row input {
   height: 39px;
   padding: 0 10px;
-  font-size: 0.8rem;
+  font-size: var(--text-label);
 }
 
 .icon-button {
@@ -1541,7 +1550,7 @@ a {
   padding: 5px 0;
   color: var(--green);
   background: transparent;
-  font-size: 0.75rem;
+  font-size: var(--text-sm);
   font-weight: 700;
 }
 
@@ -1571,7 +1580,7 @@ a {
   border-radius: 8px;
   color: var(--muted);
   background: #fff;
-  font-size: 0.75rem;
+  font-size: var(--text-sm);
 }
 
 .subreddit-row input {
@@ -1604,7 +1613,7 @@ a {
   max-width: 165px;
   overflow: hidden;
   color: var(--muted);
-  font-size: 0.7rem;
+  font-size: var(--text-xs);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -1676,7 +1685,7 @@ a {
     padding: 3px;
     border: 0;
     text-align: center;
-    font-size: 0.68rem;
+    font-size: var(--text-xs);
   }
 
   .nav-icon {
@@ -1748,7 +1757,7 @@ a {
     border: 0;
     color: var(--muted);
     background: transparent;
-    font-size: 0.76rem;
+    font-size: var(--text-sm);
     font-weight: 700;
   }
 
@@ -1927,7 +1936,7 @@ a {
 
 .amount-input > span {
   color: var(--muted);
-  font-size: 0.8rem;
+  font-size: var(--text-sm);
 }
 
 .amount-input input {
@@ -1948,20 +1957,20 @@ a {
   gap: 9px;
   margin: 13px 0 0;
   color: var(--muted-strong);
-  font-size: 0.73rem;
+  font-size: var(--text-sm);
 }
 
 .cost-table {
   width: 100%;
   margin-top: 13px;
   border-collapse: collapse;
-  font-size: 0.73rem;
+  font-size: var(--text-sm);
 }
 
 .cost-table caption {
   margin-bottom: 9px;
   color: var(--muted);
-  font-size: 0.68rem;
+  font-size: var(--text-xs);
   text-align: left;
 }
 
@@ -1976,7 +1985,7 @@ a {
 .cost-table thead th {
   color: var(--muted);
   font-weight: 500;
-  font-size: 0.68rem;
+  font-size: var(--text-xs);
 }
 
 .cost-table tbody th {
@@ -1987,7 +1996,7 @@ a {
   display: block;
   margin-top: 3px;
   color: var(--muted);
-  font-size: 0.65rem;
+  font-size: var(--text-xs);
 }
 
 .cost-table tr.over-cap {
@@ -2011,18 +2020,18 @@ a {
 
 .cost-totals dt {
   color: var(--muted);
-  font-size: 0.68rem;
+  font-size: var(--text-xs);
 }
 
 .cost-totals dd {
   margin: 3px 0 0;
-  font-size: 0.85rem;
+  font-size: var(--text-label);
 }
 
 .cost-caveat {
   margin: 13px 0 0;
   color: var(--muted);
-  font-size: 0.65rem;
+  font-size: var(--text-xs);
 }
 
 .cost-samples {
@@ -2032,7 +2041,7 @@ a {
 .cost-samples summary {
   cursor: pointer;
   color: var(--muted-strong);
-  font-size: 0.73rem;
+  font-size: var(--text-sm);
 }
 
 .cost-samples article {
@@ -2045,21 +2054,21 @@ a {
 
 .cost-samples article a {
   color: var(--ink);
-  font-size: 0.78rem;
+  font-size: var(--text-label);
 }
 
 .cost-samples article p {
   margin: 5px 0 0;
   color: var(--muted-strong);
-  font-size: 0.72rem;
-  line-height: 1.5;
+  font-size: var(--text-sm);
+  line-height: 1.55;
 }
 
 .cost-samples article small {
   display: block;
   margin-top: 6px;
   color: var(--muted);
-  font-size: 0.65rem;
+  font-size: var(--text-xs);
 }
 
 @media (max-width: 720px) {

@@ -87,20 +87,17 @@ happened.
 **The query generator has answered once.** `capture:queries` ran on the same
 day and `ai/fixtures/query-plan.json` holds the plan it wrote — seven queries
 and five subreddits for the example monitor. The seven are seven angles and
-not one query written seven ways. Four of the five subreddit names are
-unverified: Reddit answers 403 to an unauthenticated request, so only
-`softwaretesting` is proven, by a collection that returned fifty posts from
-it.
+not one query written seven ways. All five subreddit names exist: four were opened by
+hand, because Reddit answers 403 to an unauthenticated request, and
+`softwaretesting` was proven by a collection that returned fifty posts from
+it. What the plan is not proven to be is *useful* — a name that exists can
+still be the wrong place to look.
 
-Three tickets are in `doing/`.
+Two tickets are in `doing/`.
 [US-001](backlog/doing/US-001-the-workspace-runs-with-one-command.md) waits on
 the first CI run, which needs a remote this repository does not have.
 [US-010](backlog/doing/US-010-a-monitor-is-created-from-four-answers.md) waits
 on a connection-testing screen; see below.
-[US-022](backlog/doing/US-022-a-real-match-reaches-the-inbox.md) ran the whole
-path on 2026-09-05 and has two boxes open: four of the five recorded subreddit
-names are unverified, and the run's `api_usage` rows have not been compared
-against Bright Data's own figure.
 
 US-007 and
 [BUG-001](backlog/done/2026-09/BUG-001-a-pending-reddit-collection-is-not-resumed.md)
@@ -181,8 +178,11 @@ it. Refusing is the half that no live run has reached. US-013's arithmetic, its
 cap and its two exhausted behaviours are asserted against real Postgres and a
 fake connector, and six deliberate mutations were confirmed to turn the suite
 red. What no test can prove is the input: the guard multiplies the units a
-connector reports by the price the connector declares, and neither figure has
-been checked against an invoice. Say the spend is an estimate, because
+connector reports by the price the connector declares. One day has now been
+compared against the provider's dashboard: on 2026-09-05 Bright Data reported
+95 records and $0.14, and `api_usage` held 98 records and $0.147 — 3.2% high,
+not low. That is one day against a dashboard, not a reconciliation against an
+invoice. Say the spend is an estimate, because
 [docs/costs.md](docs/costs.md) says so to the user in four specific ways.
 
 **An embedding has no price until somebody sets one.** `provider.ts` carries

@@ -2,13 +2,12 @@
 
 # Open tickets
 
-10 open — 3 doing, 7 todo, 0 parked (3 p1, 6 p2, 1 p3).
+9 open — 2 doing, 7 todo, 0 parked (2 p1, 6 p2, 1 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
 | p1 | US-001 | [The workspace runs with one command](doing/US-001-the-workspace-runs-with-one-command.md) | chore | doing | 2026-09-04T22:49+08:00 |
 | p1 | US-010 | [A monitor is created from four answers](doing/US-010-a-monitor-is-created-from-four-answers.md) | feature | doing | 2026-09-04T22:49+08:00 |
-| p1 | US-022 | [A real match reaches the inbox](doing/US-022-a-real-match-reaches-the-inbox.md) | chore | doing | 2026-09-05T13:52+08:00 |
 | p2 | US-006 | [X returns candidate posts and says what it spent](todo/US-006-x-returns-candidate-posts-and-says-what-it-spent.md) | feature | todo | 2026-09-04T22:49+08:00 |
 | p2 | US-015 | [A deleted post stops being shown](todo/US-015-a-deleted-post-stops-being-shown.md) | feature | todo | 2026-09-04T22:49+08:00 |
 | p2 | US-016 | [A match reaches email or a webhook](todo/US-016-a-match-reaches-email-or-a-webhook.md) | feature | todo | 2026-09-04T22:49+08:00 |

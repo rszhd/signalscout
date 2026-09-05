@@ -2,12 +2,13 @@
 
 # Done
 
-14 finished.
+15 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
 | BUG-002 | [A seven-day window is bought as a month](done/2026-09/BUG-002-a-seven-day-window-is-bought-as-a-month.md) | bug | fixed | 2026-09 |
 | BUG-001 | [A pending Reddit collection is not resumed](done/2026-09/BUG-001-a-pending-reddit-collection-is-not-resumed.md) | bug | shipped | 2026-09 |
+| US-022 | [A real match reaches the inbox](done/2026-09/US-022-a-real-match-reaches-the-inbox.md) | chore | shipped | 2026-09 |
 | US-021 | [The application follows the product mockup](done/2026-09/US-021-the-application-follows-the-product-mockup.md) | feature | shipped | 2026-09 |
 | US-014 | [A query's cost is known before it runs](done/2026-09/US-014-a-querys-cost-is-known-before-it-runs.md) | feature | shipped | 2026-09 |
 | US-013 | [A monitor cannot spend past its budget](done/2026-09/US-013-a-monitor-cannot-spend-past-its-budget.md) | feature | shipped | 2026-09 |

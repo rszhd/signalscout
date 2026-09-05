@@ -51,6 +51,16 @@ cents could not be reconciled against anything.
 Use our figure to notice a monitor running away. Use the invoice to know what
 you owe.
 
+**One day has been compared, once.** On 2026-09-05 Bright Data's dashboard
+reported 95 records and $0.14. `api_usage` held 98 records and $0.147 for the
+same day: three records more, 3.2%, and high rather than low. The cause is not
+identified. The likeliest candidate is that a collection is triggered with
+`include_errors=true` and we count every record the snapshot reports, while the
+provider does not bill a record that failed. Two things this does not prove: a
+dashboard is not an invoice, and one day is not a reconciliation. Their $0.14
+is 95 × $0.0015 = $0.1425, rounded to cents — which is the rounding this
+document refuses to do.
+
 ---
 
 ## What is recorded

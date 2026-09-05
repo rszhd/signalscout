@@ -6,7 +6,7 @@ priority: p1
 created: 2026-09-05T13:52+08:00
 parent:
 area:
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -40,7 +40,7 @@ breaks.
 
 - [x] `capture:queries` has run against a live model and the queries are
       recorded
-- [ ] The recorded queries were read, not trusted: no subreddit that does not
+- [x] The recorded queries were read, not trusted: no subreddit that does not
       exist, and not one query written eight ways
 - [x] `capture:classifier` has run against the prompt US-010 shipped, so
       `ai/examples.test.ts` no longer replays answers older than the prompt
@@ -53,7 +53,7 @@ breaks.
 - [x] That match was read on the inbox screen, and the reason shown was written
       by the model
 - [x] A verdict was given on that match through the screen
-- [ ] The run's `api_usage` rows are compared against the provider's own
+- [x] The run's `api_usage` rows are compared against the provider's own
       figure, and the difference is recorded in the Log
 - [x] Every claim in AGENTS.md that this run settles is rewritten, whichever way
       it turns out
@@ -155,3 +155,17 @@ breaks.
   of fifty, because it was built for keyword noise; with subreddit discovery
   every collected post costs a model call, and that is the arithmetic a cost
   line has to show.
+- 2026-09-05T15:02+08:00 — The provider's own figure. Bright Data reports 95
+  records and $0.14 for 2026-09-05. `api_usage` holds 98 records and $0.147 for
+  the same day, in two rows: 48 unattributed records from the three cost tests,
+  and 50 for this run's poll. We over-count by three records, 3.2%, and we
+  over-count rather than under-count, which is the safe direction for a cap.
+  The cause is not identified; the likeliest candidate is that a collection is
+  triggered with `include_errors=true` and the snapshot reports records the
+  provider does not bill. The earlier 49-post collection wrote no `api_usage`
+  row at all, because it ran before US-013 existed, so it is outside this
+  comparison. `docs/costs.md` now carries the measurement.
+- 2026-09-05T15:14+08:00 — The four remaining subreddit names were opened by
+  hand. `SaaS`, `startups`, `webdev` and `QualityAssurance` all exist, and none
+  is banned or private. With `softwaretesting` proven by the poll, all five
+  names the model wrote are real. The last box is closed and the ticket ships.

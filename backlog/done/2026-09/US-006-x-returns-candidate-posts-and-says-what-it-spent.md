@@ -6,7 +6,7 @@ priority: p2
 created: 2026-09-04T22:49+08:00
 parent:
 area:
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -74,7 +74,7 @@ US-013 shipped, so this ticket no longer waits on it.
 - [x] The connector takes an injected HTTP client, and the test setup makes the
       real one unreachable — a test that would spend money fails rather than
       spending it
-- [ ] One live collection stores real posts; the Log holds the count, the cost
+- [x] One live collection stores real posts; the Log holds the count, the cost
       and the elapsed time
 - [x] The setup documentation states the per-unit price and what a typical
       monitor costs per month
@@ -177,6 +177,44 @@ US-013 shipped, so this ticket no longer waits on it.
   open box. A real rate limit, a real timeout and a real outage have only been
   simulated: every captured failure charged 0 credits, so no measured case
   loses spend, but a 5xx after billing has not been seen.
+
+- 2026-09-05T22:58+08:00 — The last box closes: **one live poll ran through the
+  worker and stored real X posts.** A monitor with one query, `flaky tests`,
+  under a $2 cap, polled once.
+
+  The numbers. Two pages, **40 posts, 2 credits, 12.4 seconds** from trigger to
+  stored. `api_usage` holds one row for the pair — platform `x`, provider
+  `socialcrawl`, 2 units, 16,236 micro-dollars — and the arithmetic is the
+  connector's own price rather than anybody's assumption: 2 × 8,118.
+
+  The pre-filter dropped nothing. All 40 posts came back from a search for
+  those words, so all 40 were sent to the model, which is the cost fact US-022
+  measured on a Reddit subreddit and it holds here for the same reason. On X
+  there is no cheap stage between the search and the bill.
+
+  Two matches, at 66 and 53, against a `min_score` of 50. Both are people
+  asking whether something handles flaky tests — one about test suite coverage
+  being the bottleneck, one asking a QA-agent vendor whether it flakes as much
+  as the tests it replaces. The reasons name the words in the post. Two leads
+  out of forty posts for about a sixth of a cent of collection is the shape of
+  this platform: cheap to fetch, and the model call is what it costs.
+
+  **A real model failure happened, and it is the first one.** One of the forty
+  answers came back as broken JSON — an unterminated string with two Hebrew
+  characters spliced into the middle of a reason. It was recorded as
+  `rejected`, no match was written, the post kept its place and the poll
+  finished. Until today every refusal in this repository was simulated. The
+  error that reported it is the one written an hour earlier for US-027: it
+  carries the model's own value, so the malformed answer is in the log instead
+  of the words "response did not match schema".
+
+  The model's spend is recorded as null, because `gpt-5.6-luna` has no price in
+  `provider.ts`. 29,943 input and 7,691 output tokens were counted. Null means
+  "we cannot say", which is the rule an unpriced model already follows.
+
+  The monitor is left paused, so it spends nothing further. What is still
+  unproven for this connector: a real rate limit, a real timeout, a real
+  outage, and a second poll proving deduplication on X.
 
 - 2026-09-04T22:49+08:00 — Written after checking current X pricing: pay-per-use replaced
   the fixed tiers, and the $200 Basic tier was retired.

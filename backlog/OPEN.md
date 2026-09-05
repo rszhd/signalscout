@@ -2,12 +2,11 @@
 
 # Open tickets
 
-7 open — 3 doing, 4 todo, 0 parked (1 p1, 5 p2, 1 p3).
+6 open — 2 doing, 4 todo, 0 parked (1 p1, 4 p2, 1 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
 | p1 | US-001 | [The workspace runs with one command](doing/US-001-the-workspace-runs-with-one-command.md) | chore | doing | 2026-09-04T22:49+08:00 |
-| p2 | US-006 | [X returns candidate posts and says what it spent](doing/US-006-x-returns-candidate-posts-and-says-what-it-spent.md) | feature | doing | 2026-09-04T22:49+08:00 |
 | p2 | US-015 | [A deleted post stops being shown](doing/US-015-a-deleted-post-stops-being-shown.md) | feature | doing | 2026-09-04T22:49+08:00 |
 | p2 | US-017 | [A self-hosted instance has one account](todo/US-017-a-self-hosted-instance-has-one-account.md) | feature | todo | 2026-09-04T22:49+08:00 |
 | p2 | US-019 | [The project has a license](todo/US-019-the-project-has-a-license.md) | chore | todo | 2026-09-04T23:00+08:00 |

@@ -61,9 +61,8 @@ accepts: proven end to end, on one source.
 Five probes billed nothing. `api_usage` recorded no row for any of them, which
 is the free-check claim measured rather than argued.
 
-Two things stay unproven. No X poll has run through the worker and stored a
-post — the connector has met the provider, but only through its capture script.
-And no real browser has rendered the screen — it is driven through jsdom only.
+One thing stays unproven: no real browser has rendered the screen — it is
+driven through jsdom only.
 
 One consequence bites on any machine that has stored a credential: the process
 refuses to boot without `ENCRYPTION_KEY`. That is US-004's check working as
@@ -232,9 +231,17 @@ measurements and only the first has moved.**
 One cost note came with it. The model wrote eight X queries, which is the
 ceiling, and eight queries at two pages each is up to sixteen credits a poll.
 
-What is unproven: no X poll has run through the worker, so nothing has been
-stored, classified or shown from X. A real rate limit, a real timeout and a
-real outage have only been simulated.
+**One X poll has run through the worker.** On 2026-09-05 a monitor with the
+single query `flaky tests` collected **40 posts in 2 pages for 2 credits**, in
+12.4 seconds. `api_usage` holds one row for the pair, 16,236 micro-dollars,
+which is the connector's own price and not an assumption. The pre-filter
+dropped none of the forty: they all came back from a search for those words, so
+every one bought a model call — the same cost fact US-022 measured on a
+subreddit. Two matches came out, at 66 and 53, both people asking whether
+something handles flaky tests.
+
+Still unproven for this connector: a real rate limit, a real timeout, a real
+outage, and a second poll proving deduplication on X.
 
 **The embedder has met a real provider once.** On 2026-09-05
 `capture:embeddings` embedded PLAN.md's example monitor and the five fake posts
@@ -260,9 +267,17 @@ and key all fall back to the ones the classifier uses.
 shipped, and recorded 7, 64, 86 and 96 for PLAN.md's four worked examples,
 whose intents are 3, 50, 90 and 96. The order holds and the gap between the
 drop and the first match is 57 points. `ai/examples.test.ts` replays those
-answers. The failure paths are still not proven: a real rate limit, a real
-refusal and a real timeout have only been simulated. Say so until one has
-happened.
+answers.
+
+**One failure path is now real.** In US-006's live X poll, one of forty answers
+came back as broken JSON: an unterminated string with two Hebrew characters
+spliced into a reason. It was recorded as `rejected`, no match was written, the
+post kept its place and the poll finished. So a malformed answer is proven
+handled. A real rate limit and a real timeout are still only simulated.
+
+That run also showed a hole worth remembering: the error said only "response
+did not match schema", which names nothing a person can act on. `call.ts` now
+carries the schema's own complaint into the message, truncated.
 
 **The query generator has answered once.** `capture:queries` ran on the same
 day and `ai/fixtures/query-plan.json` holds the plan it wrote — seven queries

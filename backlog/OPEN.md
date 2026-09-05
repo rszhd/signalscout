@@ -2,12 +2,13 @@
 
 # Open tickets
 
-9 open — 4 doing, 5 todo, 0 parked (2 p1, 6 p2, 1 p3).
+10 open — 4 doing, 6 todo, 0 parked (3 p1, 6 p2, 1 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
 | p1 | US-001 | [The workspace runs with one command](doing/US-001-the-workspace-runs-with-one-command.md) | chore | doing | 2026-09-04T22:49+08:00 |
 | p1 | US-033 | [Thirty verdicts say whether the score is right](todo/US-033-thirty-verdicts-say-whether-the-score-is-right.md) | chore | todo | 2026-09-06T03:02+08:00 |
+| p1 | BUG-004 | [The model half of a poll is not capped](todo/BUG-004-the-model-half-of-a-poll-is-not-capped.md) | bug | todo | 2026-09-06T04:42+08:00 |
 | p2 | US-015 | [A deleted post stops being shown](doing/US-015-a-deleted-post-stops-being-shown.md) | feature | doing | 2026-09-04T22:49+08:00 |
 | p2 | US-020 | [A monitor can include comments and replies](doing/US-020-a-monitor-can-include-comments-and-replies.md) | feature | doing | 2026-09-05T01:18+08:00 |
 | p2 | US-030 | [A cheap model decides which comments the good model reads](doing/US-030-a-cheap-model-decides-which-comments-the-good-model-reads.md) | feature | doing | 2026-09-06T01:32+08:00 |

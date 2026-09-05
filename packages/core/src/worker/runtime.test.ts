@@ -1,6 +1,9 @@
-import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
+import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { createDatabase } from "../db/client.js";
+import { sourceCredentials } from "../db/schema.js";
 import type { Logger } from "../logger.js";
+import { type EncryptionKey, generateEncryptionKey, readEncryptionKey } from "../secrets/cipher.js";
+import { putSourceCredential } from "../secrets/store.js";
 import { createTestDatabase, type TestDatabase } from "../testing/database.js";
 import {
   classifyQueue,
@@ -191,4 +194,61 @@ describe("a job that always fails", () => {
     await new Promise((resolve) => setTimeout(resolve, 500));
     expect(attempts).toHaveBeenCalledTimes(fastRetries.retryLimit + 1);
   }, 30_000);
+});
+
+/**
+ * The second caller of US-004's boot check. `apps/api/src/credentials.test.ts`
+ * covers the first.
+ *
+ * docs/testing.md: a rule is only as tested as its least-tested caller, and
+ * two calls written apart are two features. Deleting the call from either site
+ * has to turn something red.
+ */
+describe("a stored credential the worker cannot read", () => {
+  let database: TestDatabase;
+
+  beforeAll(async () => {
+    database = await createTestDatabase("worker_credential_boot");
+  }, 60_000);
+
+  afterAll(async () => {
+    await database?.drop();
+  });
+
+  afterEach(async () => {
+    const { db, close } = createDatabase(database.url);
+    await db.delete(sourceCredentials);
+    await close();
+  });
+
+  async function store(value: string, key: EncryptionKey): Promise<void> {
+    const { db, close } = createDatabase(database.url);
+    await putSourceCredential(db, key, { source: "reddit", field: "apiKey", value });
+    await close();
+  }
+
+  it("refuses to start rather than polling with a key it cannot decrypt", async () => {
+    const key = readEncryptionKey(generateEncryptionKey());
+    await store("brd_stored_value", key);
+
+    await expect(
+      startWorker({
+        databaseUrl: database.url,
+        logger: silentLogger,
+        registry: fakeRegistry(),
+        credentialsFor: () => ({ token: "test-token" }),
+        retry: fastRetries,
+        scheduleTicks: false,
+        // A different key from the one the row was written with.
+        // `requireEncryptionKey` reads process.env, which the suite leaves
+        // without one, so this is the missing-key half of the same check.
+      }),
+    ).rejects.toThrow(/ENCRYPTION_KEY/);
+  });
+
+  it("starts when nothing is stored, which is every deployment today", async () => {
+    // The pass and the fail of the check must differ, or it guards nothing.
+    const worker = await startTestWorker(database);
+    await worker.stop();
+  });
 });

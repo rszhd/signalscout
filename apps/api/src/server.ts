@@ -62,6 +62,13 @@ export interface BuildServerOptions {
   /** Where the source keys live until US-004 encrypts them. */
   environment?: Record<string, string | undefined>;
   /**
+   * Which credentials the database holds, as `source:field` names. `startApi`
+   * reads them once at boot; a test that describes a deployment passes its
+   * own. Empty means every key comes from the environment, which is what
+   * every instance does today. US-004.
+   */
+  storedCredentials?: ReadonlySet<string>;
+  /**
    * How the monitor form writes its queries. Undefined builds one from the
    * environment, which is null when no model key is set. A test passes one
    * backed by a stub, because no test spends money.
@@ -104,6 +111,7 @@ export async function buildServer({
   db,
   sources = builtInSources,
   environment,
+  storedCredentials,
   queryGenerator,
   jobs = null,
 }: BuildServerOptions): Promise<ApiServer> {
@@ -132,6 +140,7 @@ export async function buildServer({
     db,
     sources,
     environment,
+    storedCredentials,
     queryGenerator: queryGenerator === undefined ? queryGeneratorFor(env, logger) : queryGenerator,
   });
 

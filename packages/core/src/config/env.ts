@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { aiProviders, embeddingProviders } from "../ai/config.js";
+import { encryptionKeyIsWellFormed } from "../secrets/cipher.js";
 
 /**
  * Every environment variable the application reads is declared here, once.
@@ -83,6 +84,32 @@ export const envSchema = z.object({
   LOG_LEVEL: z.enum(["fatal", "error", "warn", "info", "debug", "trace", "silent"]).default("info"),
 
   DATABASE_URL: z.string().min(1),
+
+  /**
+   * The key that encrypts a stored credential, base64 of 32 bytes.
+   *
+   * Optional, and that is deliberate. Every instance today reads its source
+   * keys from this same environment, and an environment variable needs no
+   * encryption: it is already outside the database and outside git. Demanding
+   * a key for a table nothing writes would only make `pnpm dev` fail on a
+   * clean checkout.
+   *
+   * It stops being optional the moment a credential is in the database.
+   * `assertStoredCredentialsAreReadable` runs at boot, decrypts every stored
+   * row, and refuses to start if it cannot — so a missing or changed key is
+   * found before the first poll rather than during it.
+   *
+   * The shape is checked here whenever a value is present, because a truncated
+   * paste is the common mistake and it must not survive to the first encrypt.
+   */
+  ENCRYPTION_KEY: blankIsUnset(
+    z
+      .string()
+      .refine((value) => encryptionKeyIsWellFormed(value), {
+        message: "must be base64 of exactly 32 bytes. Generate one with `openssl rand -base64 32`.",
+      })
+      .optional(),
+  ),
 
   HOST: z.string().min(1).default("0.0.0.0"),
   PORT: z.coerce.number().int().min(1).max(65535).default(3000),

@@ -129,6 +129,7 @@ export {
   type Source,
   signals,
   sourceContinuations,
+  sourceCredentials,
   sources,
   type Verdict,
   verdicts,
@@ -185,7 +186,7 @@ export {
   keywordRuleFor,
   ruleIsEmpty,
 } from "./filter/keywords.js";
-export { createLogger, type Logger, type LoggerOptions } from "./logger.js";
+export { createLogger, type Logger, type LoggerOptions, redactedFields } from "./logger.js";
 export {
   cursorFor,
   cursorPattern,
@@ -225,6 +226,33 @@ export {
   updateMonitor,
 } from "./monitors/index.js";
 export {
+  decryptSecret,
+  type EncryptionKey,
+  encryptionKeyIsWellFormed,
+  encryptSecret,
+  generateEncryptionKey,
+  InvalidEncryptionKeyError,
+  MissingEncryptionKeyError,
+  maskSecret,
+  optionalEncryptionKey,
+  readEncryptionKey,
+  requireEncryptionKey,
+  secretsMatch,
+  UndecryptableSecretError,
+} from "./secrets/cipher.js";
+export {
+  assertStoredCredentialsAreReadable,
+  type CredentialHint,
+  credentialRecordName,
+  deleteSourceCredential,
+  listCredentialHints,
+  putSourceCredential,
+  readAllSourceCredentials,
+  readSourceCredential,
+  rotateEncryptionKey,
+  type StoredCredential,
+} from "./secrets/store.js";
+export {
   assertSourcesCanBeStored,
   builtInSources,
   type CandidatePost,
@@ -261,6 +289,7 @@ export { createCollectStep, excerptLength, maxPagesPerPoll } from "./worker/coll
 export {
   type CredentialLookup,
   credentialsFromEnvironment,
+  credentialsFromStore,
   environmentVariableFor,
   type MissingCredential,
   missingCredentials,

@@ -249,7 +249,7 @@ export function createEstimateStep({
         continue;
       }
 
-      const credentials = credentialsFor(source);
+      const credentials = await credentialsFor(source);
 
       if (!credentials) {
         // Not transient, and not worth a retry. The sentence names what to

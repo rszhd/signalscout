@@ -50,7 +50,17 @@ function fakeServer() {
 function fakeDatabase() {
   const close = vi.fn(async () => undefined);
 
-  const handle = { db: {}, pool: {}, close } as unknown as ReturnType<typeof createDatabase>;
+  /**
+   * Enough of Drizzle for the two reads `startApi` makes before it listens:
+   * the credential count, and the hints behind it. Both answer "nothing
+   * stored", which is every deployment today. That US-004's boot check must
+   * pass here at all is the point — a check nothing reaches guards nothing.
+   */
+  const db = {
+    select: () => ({ from: async () => [{ rows: 0 }] }),
+  };
+
+  const handle = { db, pool: {}, close } as unknown as ReturnType<typeof createDatabase>;
 
   return { close, createDatabase: vi.fn(() => handle) };
 }

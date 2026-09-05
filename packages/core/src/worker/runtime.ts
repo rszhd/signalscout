@@ -24,13 +24,14 @@ import { createEmbedder, type Embedder } from "../ai/embed.js";
 import { loadAiEnv } from "../config/env.js";
 import { createDatabase, type Database } from "../db/client.js";
 import type { Logger } from "../logger.js";
+import { assertStoredCredentialsAreReadable } from "../secrets/store.js";
 import { builtInSources } from "../sources/index.js";
 import { createSourceRegistry, type SourceRegistry } from "../sources/registry.js";
 import { createSourceRuntime } from "../sources/runtime.js";
 import { assertSourcesCanBeStored } from "../sources/storage.js";
 import { createClassifyStep } from "./classify.js";
 import { createCollectStep } from "./collect.js";
-import { type CredentialLookup, credentialsFromEnvironment } from "./credentials.js";
+import { type CredentialLookup, credentialsFromStore } from "./credentials.js";
 import { createEstimateStep } from "./estimate.js";
 import { createFilterStep } from "./filter.js";
 import {
@@ -207,7 +208,7 @@ export async function startWorker({
   databaseUrl,
   logger,
   registry,
-  credentialsFor = credentialsFromEnvironment(),
+  credentialsFor,
   steps = {},
   classifier,
   aiConfig,
@@ -217,6 +218,22 @@ export async function startWorker({
   scheduleTicks = true,
 }: StartWorkerOptions): Promise<WorkerHandle> {
   const { db, close } = createDatabase(databaseUrl);
+
+  // Before anything is queued. A stored credential this process cannot read
+  // is a poll that would fail at 02:00 with a message about a provider, so it
+  // is found here instead, with a message about a key.
+  //
+  // The pool is closed on the way out. A refusal that leaves connections open
+  // is a process that will not exit, and a container that will not exit reads
+  // as a hang rather than as the configuration error it is.
+  try {
+    await assertStoredCredentialsAreReadable(db);
+  } catch (error) {
+    await close();
+    throw error;
+  }
+
+  const lookup = credentialsFor ?? credentialsFromStore(db);
 
   const sources =
     registry ??
@@ -258,8 +275,8 @@ export async function startWorker({
     );
 
   const pipeline: WorkerSteps = {
-    poll: steps.poll ?? createCollectStep({ registry: sources, credentialsFor }),
-    estimate: steps.estimate ?? createEstimateStep({ registry: sources, credentialsFor }),
+    poll: steps.poll ?? createCollectStep({ registry: sources, credentialsFor: lookup }),
+    estimate: steps.estimate ?? createEstimateStep({ registry: sources, credentialsFor: lookup }),
     filter: steps.filter ?? createFilterStep({ embedder: embedding }),
     classify:
       steps.classify ?? (model ? createClassifyStep({ classifier: model }) : unconfiguredClassify),

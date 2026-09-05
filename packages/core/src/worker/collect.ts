@@ -260,7 +260,7 @@ export function createCollectStep({ registry, credentialsFor }: CollectOptions):
 
     for (const sourceId of monitor.sources) {
       const source = registry.get(sourceId);
-      const credentials = credentialsFor(source);
+      const credentials = await credentialsFor(source);
 
       if (!credentials) {
         // A missing key is not transient. Retrying it four times and then

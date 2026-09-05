@@ -2,7 +2,7 @@
 
 # Done
 
-12 finished.
+13 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
@@ -16,6 +16,7 @@
 | US-008 | [A cheap filter runs before the model](done/2026-09/US-008-a-cheap-filter-runs-before-the-model.md) | feature | shipped | 2026-09 |
 | US-007 | [The worker runs jobs on a schedule](done/2026-09/US-007-the-worker-runs-jobs-on-a-schedule.md) | feature | shipped | 2026-09 |
 | US-005 | [Reddit returns candidate posts](done/2026-09/US-005-reddit-returns-candidate-posts.md) | feature | shipped | 2026-09 |
+| US-004 | [A stored key is encrypted at rest](done/2026-09/US-004-a-stored-key-is-encrypted-at-rest.md) | feature | shipped | 2026-09 |
 | US-003 | [A source implements one interface](done/2026-09/US-003-a-source-implements-one-interface.md) | feature | shipped | 2026-09 |
 | US-002 | [The schema holds monitors, posts, matches and feedback](done/2026-09/US-002-the-schema-holds-monitors-posts-matches-and-feedback.md) | feature | shipped | 2026-09 |
 

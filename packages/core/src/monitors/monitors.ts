@@ -87,8 +87,20 @@ export interface CreateMonitorInput extends MonitorAnswers, MonitorPlan, Monitor
 export interface MonitorEnvironment {
   /** The connectors this build ships. Read for their credential fields. */
   readonly descriptors: readonly SourceDescriptor[];
-  /** Where the keys live until US-004 encrypts them in the database. */
+  /**
+   * The environment half of where a key lives. `source_credentials` is the
+   * other half, and `storedCredentials` below is what it holds.
+   */
   readonly environment?: Record<string, string | undefined>;
+  /**
+   * Which credentials the database holds, as `source:field` names.
+   *
+   * The set rather than the table, because these rules are synchronous and a
+   * caller that is already loading a page can read the hints once instead of
+   * once per source. `listCredentialHints` never decrypts, so building this
+   * costs no key.
+   */
+  readonly storedCredentials?: ReadonlySet<string>;
 }
 
 export interface CreatedMonitor {
@@ -132,11 +144,11 @@ export function monitorQueries(value: unknown): string[] {
  */
 export function startBlockers(
   sourceIds: readonly string[],
-  { descriptors, environment = process.env }: MonitorEnvironment,
+  { descriptors, environment = process.env, storedCredentials }: MonitorEnvironment,
 ): MissingCredential[] {
   return sourceIds.flatMap((id) => {
     const descriptor = descriptors.find((candidate) => candidate.id === id);
-    return descriptor ? missingCredentials(descriptor, environment) : [];
+    return descriptor ? missingCredentials(descriptor, environment, storedCredentials) : [];
   });
 }
 

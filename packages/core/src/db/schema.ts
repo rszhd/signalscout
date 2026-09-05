@@ -18,6 +18,7 @@ import {
   integer,
   jsonb,
   pgTable,
+  primaryKey,
   real,
   text,
   timestamp,
@@ -820,5 +821,54 @@ export const queryEstimateProbes = pgTable(
     check("query_estimate_probes_cost_non_negative", sql.raw(`estimated_cost_micros >= 0`)),
     check("query_estimate_probes_posts_non_negative", sql.raw(`posts_found >= 0`)),
     check("query_estimate_probes_attempts_bounded", sql.raw(`attempts >= 0`)),
+  ],
+);
+
+/**
+ * One credential, encrypted, for the day a key stops living in `.env`.
+ *
+ * US-004. Today every instance reads its keys from the environment, and an
+ * environment variable needs no encryption: it is already outside the database
+ * and outside git. This table is for the second instance, and for the hosted
+ * version, where a key reaches a database somebody else takes backups of.
+ *
+ * Three things about the columns.
+ *
+ * `ciphertext` is the whole encrypted payload, `v1.<nonce>.<value>.<tag>`, as
+ * `secrets/cipher.ts` writes it. The nonce is stored with the value because a
+ * nonce is not a secret; reusing one is what breaks GCM, so each value carries
+ * its own. The check constraint refuses anything that is not in that format,
+ * which is what stops a plaintext key being pasted in by hand at 02:00 and
+ * read back as though it had been encrypted.
+ *
+ * `hint` is the masked form — four trailing characters and nothing else — and
+ * it exists so that showing a person which key is set never decrypts one. The
+ * API reads this column and never `ciphertext`.
+ *
+ * There is no `updated_by` and no history. A credential is replaced, not
+ * versioned: keeping the old ciphertext keeps the old key working after
+ * somebody rotates away from it, which is the opposite of the point.
+ */
+export const sourceCredentials = pgTable(
+  "source_credentials",
+  {
+    /** The source, never the provider behind it. STACK.md, *A source is not a provider*. */
+    source: text("source").$type<Source>().notNull(),
+    /** The connector's own field name: `apiKey`, `apiSecret`. */
+    field: text("field").notNull(),
+    ciphertext: text("ciphertext").notNull(),
+    /** `••••1234`. What a person is shown, stored so nothing has to decrypt to show it. */
+    hint: text("hint").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.source, table.field] }),
+    check("source_credentials_source_known", oneOf("source", sources)),
+    // A value that is not in the cipher's format was never encrypted by us.
+    // The database refuses it rather than handing it to a connector as a key.
+    check("source_credentials_ciphertext_format", sql.raw(`ciphertext LIKE 'v1.%.%.%'`)),
+    // A hint that is longer than the mask is a hint that is leaking.
+    check("source_credentials_hint_masked", sql.raw(`hint LIKE '••••%' AND length(hint) <= 8`)),
   ],
 );

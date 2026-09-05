@@ -14,6 +14,8 @@ x-app-environment: &app-environment
   HOST: 0.0.0.0
   PORT: ${PORT:-3000}
   DATABASE_URL: postgres://${POSTGRES_USER:-intentwatch}:${POSTGRES_PASSWORD:-intentwatch}@postgres:5432/${POSTGRES_DB:-intentwatch}
+  # Empty until a credential is stored in the database. docs/secrets.md.
+  ENCRYPTION_KEY: ${ENCRYPTION_KEY:-}
 
 services:
   postgres:

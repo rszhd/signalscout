@@ -42,7 +42,7 @@ Three rules follow from these:
 | Schemas | Zod | AI structured output, API input, and env vars from one definition. |
 | Auth | Better Auth | Sessions in our own Postgres. No external service. |
 | Email | Nodemailer over SMTP | Self-hosters need SMTP. Hosted providers are just another SMTP target. |
-| Secrets at rest | Node `crypto`, AES-256-GCM | User API keys are encrypted with a key from `ENCRYPTION_KEY`. |
+| Secrets at rest | Node `crypto`, AES-256-GCM | User API keys are encrypted with a key from `ENCRYPTION_KEY`. Optional while keys live in `.env`; see [docs/secrets.md](docs/secrets.md). |
 | Tests | Vitest + Playwright | Vitest for core logic. Playwright for the inbox flow. |
 | Lint + format | Biome | One tool, one config file. |
 | Packaging | pnpm workspaces | Add Turborepo only when builds get slow. |

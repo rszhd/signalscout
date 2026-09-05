@@ -207,14 +207,27 @@ export interface MonitorRoutesOptions {
   readonly db: Database;
   /** The connectors this build ships, read for their credential fields. */
   readonly sources: readonly SourceDescriptor[];
-  /** Where the keys live until US-004 encrypts them in the database. */
+  /** The environment half of where a source key lives. */
   readonly environment?: Record<string, string | undefined>;
+  /**
+   * The stored half: which credentials `source_credentials` holds, as
+   * `source:field` names.
+   *
+   * Injected rather than read here, so registering a route needs no database
+   * round trip, and so the snapshot is taken at the same moment as the
+   * environment beside it. `startApi` builds it; a test that describes a
+   * deployment passes one directly. US-004.
+   */
+  readonly storedCredentials?: ReadonlySet<string>;
   /** Null when this deployment has no model key. The form says so. */
   readonly queryGenerator: QueryGenerator | null;
 }
 
-function monitorEnvironment(options: MonitorRoutesOptions): MonitorEnvironment {
-  return { descriptors: options.sources, environment: options.environment };
+function monitorEnvironment(
+  options: MonitorRoutesOptions,
+  storedCredentials: ReadonlySet<string>,
+): MonitorEnvironment {
+  return { descriptors: options.sources, environment: options.environment, storedCredentials };
 }
 
 /** The pre-filter settings, as the core write functions take them. */
@@ -291,8 +304,9 @@ export async function registerMonitorRoutes(
   options: MonitorRoutesOptions,
 ): Promise<void> {
   const { db, sources, queryGenerator } = options;
-  const runtime = monitorEnvironment(options);
   const environment = options.environment ?? process.env;
+
+  const runtime = monitorEnvironment(options, options.storedCredentials ?? new Set());
 
   /**
    * Everything the form needs to render itself.

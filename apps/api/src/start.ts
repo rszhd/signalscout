@@ -1,7 +1,10 @@
 import type { Env, JobSender, Logger, WorkerHandle } from "@intentwatch/core";
 import {
+  assertStoredCredentialsAreReadable,
   createDatabase,
+  credentialRecordName,
   jobSenderFor,
+  listCredentialHints,
   startJobSender as startJobSenderDefault,
   startWorker as startWorkerDefault,
 } from "@intentwatch/core";
@@ -55,6 +58,30 @@ export async function startApi({
   const { db, close } = openDatabase(env.DATABASE_URL);
 
   /**
+   * The credential store, read once, before the first request.
+   *
+   * The check first: the API answers "is this source configured?", and a
+   * stored credential it cannot decrypt would answer "no" — a wrong answer
+   * that reads like a true one. Then the hints, which name which credentials
+   * exist and never what they are.
+   *
+   * A snapshot, because the environment beside it is one too: a self-hoster
+   * who edits `.env` restarts. Making one half live and the other stale would
+   * be a worse answer than a consistent one. US-004.
+   */
+  let storedCredentials: ReadonlySet<string>;
+
+  try {
+    await assertStoredCredentialsAreReadable(db, { ENCRYPTION_KEY: env.ENCRYPTION_KEY });
+    storedCredentials = new Set(
+      (await listCredentialHints(db)).map((hint) => credentialRecordName(hint.source, hint.field)),
+    );
+  } catch (error) {
+    await close();
+    throw error;
+  }
+
+  /**
    * The queue the cost test is sent to.
    *
    * The worker's own when there is one in this process, and a connection of
@@ -64,7 +91,7 @@ export async function startApi({
    */
   const jobs = worker ? jobSenderFor(worker.boss) : await startJobSender(env.DATABASE_URL);
 
-  const app = await buildServer({ env, logger, db, jobs });
+  const app = await buildServer({ env, logger, db, jobs, storedCredentials });
   await app.listen({ host: env.HOST, port: env.PORT });
 
   return {

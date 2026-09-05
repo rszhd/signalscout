@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { generateEncryptionKey } from "../secrets/cipher.js";
 import { loadEnv } from "./env.js";
 
 const minimal = { DATABASE_URL: "postgres://user:pw@localhost:5432/intentwatch" };
@@ -63,5 +64,34 @@ describe("the AI provider", () => {
     expect(env.AI_API_KEY).toBeUndefined();
     expect(env.AI_MODEL).toBe("claude-haiku-4-5");
     expect(env.AI_INPUT_PRICE_MICROS).toBeUndefined();
+  });
+
+  describe("ENCRYPTION_KEY", () => {
+    it("accepts a generated key", () => {
+      const key = generateEncryptionKey();
+
+      expect(loadEnv({ ...minimal, ENCRYPTION_KEY: key }).ENCRYPTION_KEY).toBe(key);
+    });
+
+    it("is optional, because a key in .env needs no key to encrypt it", () => {
+      expect(loadEnv(minimal).ENCRYPTION_KEY).toBeUndefined();
+      expect(loadEnv({ ...minimal, ENCRYPTION_KEY: "" }).ENCRYPTION_KEY).toBeUndefined();
+    });
+
+    it("refuses a key of the wrong length at boot, and says how to make one", () => {
+      // Half a paste. It must not survive to the first encrypt.
+      const half = generateEncryptionKey().slice(0, 22);
+
+      expect(() => loadEnv({ ...minimal, ENCRYPTION_KEY: half })).toThrow(/ENCRYPTION_KEY/);
+      expect(() => loadEnv({ ...minimal, ENCRYPTION_KEY: half })).toThrow(
+        /openssl rand -base64 32/,
+      );
+    });
+
+    it("refuses a key that is not base64", () => {
+      expect(() => loadEnv({ ...minimal, ENCRYPTION_KEY: "not a key at all" })).toThrow(
+        /ENCRYPTION_KEY/,
+      );
+    });
   });
 });

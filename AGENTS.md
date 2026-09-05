@@ -29,8 +29,19 @@ bought as a month. US-008 added the pre-filter, so a post now has to match a
 word or a subreddit, and then clear a similarity threshold, before the model is
 paid to read it — and its embedding calls closed US-013's last box, so the
 spend a cap counts is now every kind of call. One step is still a placeholder:
-US-016 owns the notification. `apps/web` now has three screens, the monitor
-form, the inbox and the monitor list, and no screen for connections.
+US-016 owns the notification. US-004 added the encrypted credential store, so
+a key can live in the database rather than in `.env`; nothing writes one yet,
+because that is the connection screen US-010 defers. `apps/web` now has three
+screens, the monitor form, the inbox and the monitor list, and no screen for
+connections.
+
+**No credential has ever been stored.** US-004's cipher, its boot check, its
+masking and its rotation are asserted against real Postgres, and eight
+deliberate mutations were confirmed to turn the suite red. What has not
+happened is a person putting a real provider key through it: every instance
+still reads `REDDIT_API_KEY` from the environment, and `worker/credentials.ts`
+prefers a stored credential only when a row exists. Say the store is unused
+until a connection screen writes to it.
 
 **Reddit's own API is closed to us.** Reddit ended self-serve app registration
 in November 2025. Reddit is reached through Bright Data instead, and X through
@@ -167,6 +178,9 @@ range is an admission of that, not a measurement of it.
 5. Read [`docs/costs.md`](docs/costs.md) if the task touches money — a price, a
    cap, a usage row, or a figure shown to a person. It holds what our estimate
    is wrong about, and why it is never rounded to cents.
+6. Read [`docs/secrets.md`](docs/secrets.md) if the task touches a credential.
+   It holds where a key lives, what the encryption guarantees, and the rotation
+   steps.
 
 The ticket's **Acceptance** list is the definition of done. Every box is true
 or false. Do not mark one done that you have not verified.
@@ -257,6 +271,8 @@ pnpm db:migrate               # apply migrations to DATABASE_URL, read from .env
 pnpm db:generate              # drizzle-kit generate, after a schema change
 
 docker compose up             # the published image: Postgres, migrations, the app
+
+pnpm db:rotate-key            # re-encrypt stored credentials under a new key
 
 backlog/index.sh              # rebuild OPEN.md and DONE.md — run after any ticket change
 backlog/index.sh --check      # exit 1 if either list is stale

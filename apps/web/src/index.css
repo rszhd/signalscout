@@ -873,6 +873,54 @@ a {
   font-size: var(--text-xs);
 }
 
+/* The two buttons US-012 puts on every match. The chosen one is filled in,
+   because a person has to be able to see what they already answered. */
+.verdict-actions {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+
+.verdict-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.verdict-button {
+  flex: 1;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  color: var(--ink);
+  background: var(--surface);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.verdict-button:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+
+.verdict-button:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.verdict-button.chosen {
+  border-color: var(--accent);
+  color: var(--accent-text);
+  background: var(--surface-soft);
+}
+
+.verdict-note {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: var(--text-xs);
+  line-height: 1.5;
+}
+
 .floating-error {
   position: fixed;
   right: 24px;
@@ -1061,6 +1109,16 @@ a {
   font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
   font-size: var(--text-label);
   font-weight: 700;
+}
+
+.monitor-feedback {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+
+.monitor-export {
+  margin: -4px 0 0;
 }
 
 .monitor-controls {

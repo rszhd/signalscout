@@ -33,6 +33,7 @@ interface Seed {
 interface Card {
   id: string;
   monitorName: string;
+  verdict: "good" | "not_relevant" | null;
   score: number;
   problemFit: number;
   icpFit: number;
@@ -142,6 +143,19 @@ describe("the inbox route", () => {
     }
   }
 
+  async function judge(matchId: string, verdict: "good" | "not_relevant") {
+    const app = await server();
+    try {
+      return await app.inject({
+        method: "PUT",
+        url: `/api/matches/${matchId}/verdict`,
+        payload: { verdict },
+      });
+    } finally {
+      await app.close();
+    }
+  }
+
   beforeAll(async () => {
     database = await createTestDatabase("api_matches");
     ({ db, close } = createDatabase(database.url));
@@ -226,5 +240,91 @@ describe("the inbox route", () => {
     const response = await get("/api/matches?cursor=nonsense");
 
     expect(response.statusCode).toBe(400);
+  });
+
+  describe("the two buttons on a match", () => {
+    it("stores a verdict and puts it on the card", async () => {
+      const matchId = await seed({ monitorId, score: 94, minutesOld: 12 });
+
+      const saved = await judge(matchId, "good");
+
+      expect(saved.statusCode).toBe(200);
+      expect(saved.json()).toMatchObject({ matchId, verdict: "good", changed: false });
+      expect(inserted((await get("/api/matches")).json<Page>().matches).verdict).toBe("good");
+    });
+
+    it("takes a not-relevant match out of the inbox, and gives it back on request", async () => {
+      await seed({ monitorId, score: 50, minutesOld: 5 });
+      const dismissed = await seed({ monitorId, score: 99, minutesOld: 1 });
+
+      await judge(dismissed, "not_relevant");
+
+      // The route is a second call site of the rule core asserts, and this is
+      // the query string the screen actually sends.
+      expect(scores((await get("/api/matches")).json<Page>())).toEqual([50]);
+      expect(scores((await get("/api/matches?includeNotRelevant=true")).json<Page>())).toEqual([
+        99, 50,
+      ]);
+    });
+
+    it("says a verdict changed when it replaced a different one", async () => {
+      const matchId = await seed({ monitorId, score: 94, minutesOld: 12 });
+
+      await judge(matchId, "good");
+      const changed = await judge(matchId, "not_relevant");
+
+      expect(changed.json()).toMatchObject({ verdict: "not_relevant", changed: true });
+    });
+
+    it("answers 404 for a match that does not exist", async () => {
+      const response = await judge("00000000-0000-4000-8000-000000000000", "good");
+
+      expect(response.statusCode).toBe(404);
+    });
+
+    it("refuses a verdict that is not one of the two", async () => {
+      const matchId = await seed({ monitorId, score: 94, minutesOld: 12 });
+      const app = await server();
+
+      try {
+        const response = await app.inject({
+          method: "PUT",
+          url: `/api/matches/${matchId}/verdict`,
+          payload: { verdict: "maybe" },
+        });
+
+        expect(response.statusCode).toBe(400);
+      } finally {
+        await app.close();
+      }
+    });
+  });
+
+  describe("the export", () => {
+    it("hands back every verdict, history included, as a file", async () => {
+      const matchId = await seed({ monitorId, score: 91, minutesOld: 12 });
+
+      await judge(matchId, "good");
+      await judge(matchId, "not_relevant");
+
+      const response = await get("/api/feedback/export");
+      const body = response.json<{
+        exportedAt: string;
+        verdicts: Array<{ verdict: string; supersededAt: string | null; externalId: string }>;
+      }>();
+
+      expect(response.statusCode).toBe(200);
+      expect(response.headers["content-disposition"]).toContain("intentwatch-feedback.json");
+      expect(body.verdicts).toHaveLength(2);
+      expect(body.verdicts.filter((row) => row.supersededAt === null)).toHaveLength(1);
+      expect(body.verdicts.every((row) => row.externalId.startsWith("t3_"))).toBe(true);
+    });
+
+    it("is an empty list, not an error, before anybody has judged anything", async () => {
+      const response = await get("/api/feedback/export");
+
+      expect(response.statusCode).toBe(200);
+      expect(response.json<{ verdicts: unknown[] }>().verdicts).toEqual([]);
+    });
   });
 });

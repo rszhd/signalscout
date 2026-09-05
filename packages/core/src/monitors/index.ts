@@ -13,6 +13,7 @@ export {
   monitorQueries,
   pauseMonitor,
   type ResumeResult,
+  redefinesTheMonitor,
   resumeMonitor,
   singleUserId,
   startBlockers,

@@ -6,8 +6,16 @@ import { messageFor, requestJson } from "./api.js";
  *
  * The server owns ranking and filtering. This screen keeps the mockup's
  * compact list-and-detail reading flow while showing only behaviour the
- * application has: filters, pagination and a link to the conversation.
+ * application has: filters, pagination, a link to the conversation, and the
+ * two buttons US-012 asks for.
+ *
+ * Marking a match not relevant removes it from this list here, in the browser,
+ * rather than by reloading the page. The rank depends on a clock, so a reload
+ * would move every other row while somebody is reading — and the row they just
+ * dismissed is the only one that changed.
  */
+
+type Verdict = "good" | "not_relevant";
 
 interface Match {
   id: string;
@@ -19,6 +27,8 @@ interface Match {
   intent: number;
   intentLabel: string;
   reasons: string[];
+  /** Null when this person has not judged the match yet. */
+  verdict: Verdict | null;
   source: string;
   channel: string | null;
   author: string | null;
@@ -46,6 +56,11 @@ const scoreFilters = [
   { value: 50, label: "50 and above" },
   { value: 70, label: "70 and above" },
   { value: 85, label: "85 and above" },
+];
+
+const dismissedFilters = [
+  { value: "hide", label: "Hidden" },
+  { value: "show", label: "Shown" },
 ];
 
 const postPreviewWordLimit = 80;
@@ -99,6 +114,8 @@ export function Inbox() {
   const [selectedMatchId, setSelectedMatchId] = useState<string | null>(null);
   const [mobileDetailOpen, setMobileDetailOpen] = useState(false);
   const [expandedMatchId, setExpandedMatchId] = useState<string | null>(null);
+  const [showDismissed, setShowDismissed] = useState(false);
+  const [judging, setJudging] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -120,6 +137,7 @@ export function Inbox() {
     const query = new URLSearchParams();
     if (monitorId) query.set("monitorId", monitorId);
     if (minScore > 0) query.set("minScore", String(minScore));
+    if (showDismissed) query.set("includeNotRelevant", "true");
 
     try {
       const answer = await requestJson<MatchPage>(`/api/matches?${query}`);
@@ -133,7 +151,7 @@ export function Inbox() {
       setError(messageFor(cause, "The inbox could not be loaded."));
       setState("error");
     }
-  }, [monitorId, minScore]);
+  }, [monitorId, minScore, showDismissed]);
 
   useEffect(() => {
     void loadFirstPage();
@@ -147,6 +165,7 @@ export function Inbox() {
     const query = new URLSearchParams({ cursor: page.nextCursor, asOf: page.asOf });
     if (monitorId) query.set("monitorId", monitorId);
     if (minScore > 0) query.set("minScore", String(minScore));
+    if (showDismissed) query.set("includeNotRelevant", "true");
 
     try {
       const answer = await requestJson<MatchPage>(`/api/matches?${query}`);
@@ -157,6 +176,50 @@ export function Inbox() {
       setError(messageFor(cause, "The next page could not be loaded."));
       setState("ready");
     }
+  }
+
+  /**
+   * Give a verdict, and keep the list honest about it.
+   *
+   * A dismissed match leaves the list unless the person is looking at the
+   * dismissed ones, in which case it stays and the button reads as pressed —
+   * that is what makes a dismissal undoable. Nothing is removed until the
+   * server has stored the verdict: a row that vanished from a failed request
+   * would look like a verdict that was kept.
+   */
+  async function judge(match: Match, verdict: Verdict): Promise<void> {
+    setJudging(true);
+    setError(null);
+
+    try {
+      await requestJson(`/api/matches/${match.id}/verdict`, {
+        method: "PUT",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ verdict }),
+      });
+    } catch (cause) {
+      setError(messageFor(cause, "The verdict could not be saved."));
+      return;
+    } finally {
+      setJudging(false);
+    }
+
+    if (verdict === "not_relevant" && !showDismissed) {
+      setMatches((current) => {
+        const index = current.findIndex((row) => row.id === match.id);
+        const remaining = current.filter((row) => row.id !== match.id);
+        // The next match down, or the last one when this was the bottom of
+        // the list. Selecting nothing would send a reader back to the top.
+        setSelectedMatchId(remaining[index]?.id ?? remaining.at(-1)?.id ?? null);
+        return remaining;
+      });
+      setExpandedMatchId(null);
+      return;
+    }
+
+    setMatches((current) =>
+      current.map((row) => (row.id === match.id ? { ...row, verdict } : row)),
+    );
   }
 
   const filtered = monitorId !== "" || minScore > 0;
@@ -224,6 +287,21 @@ export function Inbox() {
               onChange={(event) => setMinScore(Number(event.target.value))}
             >
               {scoreFilters.map((filter) => (
+                <option key={filter.value} value={filter.value}>
+                  {filter.label}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="filter">
+            <span>Not relevant</span>
+            <select
+              aria-label="Not relevant"
+              value={showDismissed ? "show" : "hide"}
+              onChange={(event) => setShowDismissed(event.target.value === "show")}
+            >
+              {dismissedFilters.map((filter) => (
                 <option key={filter.value} value={filter.value}>
                   {filter.label}
                 </option>
@@ -435,6 +513,38 @@ export function Inbox() {
                     Open conversation ↗
                   </a>
                   <span className="match-meta">{selectedMatch.intentLabel}</span>
+                </div>
+
+                <div className="verdict-actions">
+                  <p className="section-label">Was this a good lead?</p>
+                  <div className="verdict-buttons">
+                    <button
+                      aria-pressed={selectedMatch.verdict === "good"}
+                      className={`verdict-button ${
+                        selectedMatch.verdict === "good" ? "chosen" : ""
+                      }`}
+                      disabled={judging}
+                      type="button"
+                      onClick={() => void judge(selectedMatch, "good")}
+                    >
+                      Good lead
+                    </button>
+                    <button
+                      aria-pressed={selectedMatch.verdict === "not_relevant"}
+                      className={`verdict-button ${
+                        selectedMatch.verdict === "not_relevant" ? "chosen" : ""
+                      }`}
+                      disabled={judging}
+                      type="button"
+                      onClick={() => void judge(selectedMatch, "not_relevant")}
+                    >
+                      Not relevant
+                    </button>
+                  </div>
+                  <p className="verdict-note">
+                    Marking a match not relevant takes it out of this list. It is kept, and the “Not
+                    relevant” filter above brings it back.
+                  </p>
                 </div>
               </div>
             </div>

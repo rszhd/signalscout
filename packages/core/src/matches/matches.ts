@@ -28,6 +28,19 @@
  * Age is clamped at zero. A post dated in the future is a clock difference at
  * the source, and it must not rank above its own score.
  *
+ * ## What a verdict does to the list
+ *
+ * A match the user marked not relevant leaves the default view and stays in
+ * the table. US-012 is firm that it is not deleted: the verdict is the data
+ * the feedback loop is being collected for, and a row that was removed to
+ * tidy a screen cannot teach anything later. `includeNotRelevant` is how a
+ * person looks at what they dismissed.
+ *
+ * The verdict is read here rather than by a second query from the screen, for
+ * the reason the hidden filter is here: both are the same question about the
+ * same page, and a caller that asked separately could show a page whose
+ * buttons disagree with its rows.
+ *
  * ## Why the clock is a parameter
  *
  * `asOf` is passed in and defaults to now. Page two is then ranked against the
@@ -36,9 +49,18 @@
  * a rank that moves with the clock skips rows, and the failure looks like a
  * match that was never delivered.
  */
-import { and, desc, eq, gte, or, type SQL, sql } from "drizzle-orm";
+import { and, desc, eq, gte, isNull, or, type SQL, sql } from "drizzle-orm";
 import type { Database } from "../db/client.js";
-import { type IntentType, matches, monitors, posts, type Source } from "../db/schema.js";
+import {
+  feedback,
+  type IntentType,
+  matches,
+  monitors,
+  posts,
+  type Source,
+  type Verdict,
+} from "../db/schema.js";
+import { singleUserId } from "../monitors/monitors.js";
 import { intentTypeLabel } from "../monitors/signals.js";
 
 /**
@@ -84,6 +106,8 @@ export interface InboxMatch {
   /** Specific claims about this post. The part that is not a keyword alert. */
   readonly reasons: readonly string[];
   readonly saved: boolean;
+  /** The verdict this user has in force, or null when they have not judged it. */
+  readonly verdict: Verdict | null;
   readonly readAt: Date | null;
   readonly source: Source;
   /** The subreddit on Reddit, null on X where the author is the context. */
@@ -106,6 +130,13 @@ export interface ListMatchesOptions {
   readonly limit?: number;
   /** `nextCursor` from the page before, or null for the first page. */
   readonly cursor?: string | null;
+  /**
+   * Whose verdicts to read, and whose not-relevant matches to hide. The single
+   * self-hosted account until US-017 brings real sessions.
+   */
+  readonly userId?: string;
+  /** Show the matches this user marked not relevant. Default false. */
+  readonly includeNotRelevant?: boolean;
 }
 
 export interface MatchPage {
@@ -171,9 +202,26 @@ export async function listMatches(
 ): Promise<MatchPage> {
   const asOf = options.asOf ?? new Date();
   const limit = Math.min(Math.max(options.limit ?? defaultPageSize, 1), maximumPageSize);
+  const userId = options.userId ?? singleUserId;
   const rank = rankExpression(asOf);
 
   const conditions: SQL[] = [eq(matches.hidden, false)];
+
+  // At most one verdict is in force per match per user — the partial unique
+  // index on `feedback` is what guarantees it — so this join cannot turn one
+  // match into two rows of a page.
+  const currentVerdict = and(
+    eq(feedback.matchId, matches.id),
+    eq(feedback.userId, userId),
+    isNull(feedback.supersededAt),
+  );
+
+  if (!options.includeNotRelevant) {
+    // `IS DISTINCT FROM` and not `<>`: an unjudged match has no feedback row,
+    // so the column is null here, and null compared with `<>` would drop every
+    // match nobody has judged yet.
+    conditions.push(sql`${feedback.verdict} IS DISTINCT FROM 'not_relevant'`);
+  }
 
   if (options.monitorId) conditions.push(eq(matches.monitorId, options.monitorId));
   if (options.minScore !== undefined) conditions.push(gte(matches.score, options.minScore));
@@ -208,6 +256,7 @@ export async function listMatches(
       intentType: matches.intentType,
       reasons: matches.reasons,
       saved: matches.saved,
+      verdict: feedback.verdict,
       readAt: matches.readAt,
       source: posts.source,
       channel: posts.channel,
@@ -220,6 +269,7 @@ export async function listMatches(
     .from(matches)
     .innerJoin(posts, eq(matches.postId, posts.id))
     .innerJoin(monitors, eq(matches.monitorId, monitors.id))
+    .leftJoin(feedback, currentVerdict)
     .where(and(...conditions))
     .orderBy(desc(rank), desc(matches.id))
     .limit(limit + 1);

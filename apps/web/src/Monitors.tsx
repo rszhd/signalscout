@@ -43,6 +43,12 @@ interface PreFilter {
   dropped: { keyword: number; embedding: number };
 }
 
+/** The verdicts in force on this monitor's matches. US-012. */
+interface Feedback {
+  good: number;
+  notRelevant: number;
+}
+
 interface Monitor {
   id: string;
   name: string;
@@ -53,6 +59,7 @@ interface Monitor {
   budget: Budget | null;
   spend: Spend;
   preFilter: PreFilter;
+  feedback: Feedback;
 }
 
 type LoadState = "loading" | "ready" | "error";
@@ -88,6 +95,21 @@ function monthLabel(since: string): string {
     year: "numeric",
     timeZone: "UTC",
   });
+}
+
+/**
+ * What the person thought of this monitor's matches, in one sentence.
+ *
+ * PLAN.md sets the ratio as the real measure of success, so the sentence says
+ * the ratio and not only the counts. A monitor nobody has judged says so
+ * rather than showing two zeros, because "0 good" reads as a verdict about the
+ * monitor and it is a verdict about nothing.
+ */
+function feedbackLabel({ good, notRelevant }: Feedback): string {
+  const judged = good + notRelevant;
+  if (judged === 0) return "No matches judged yet";
+
+  return `${good} good, ${notRelevant} not relevant of ${judged} judged`;
 }
 
 /**
@@ -414,6 +436,15 @@ export function Monitors() {
         </span>
       </div>
 
+      {/* A plain link, so the browser saves the file the route already names.
+          US-012 asks for feedback that survives a reinstall, and a screen that
+          only showed the verdicts would not be that. */}
+      <p className="monitor-export">
+        <a className="text-link" href="/api/feedback/export">
+          Export feedback as JSON
+        </a>
+      </p>
+
       {error && (
         <p className="budget-error" role="alert">
           {error}
@@ -474,6 +505,8 @@ export function Monitors() {
                   </dd>
                 </div>
               </dl>
+
+              <p className="monitor-feedback">{feedbackLabel(monitor.feedback)}</p>
 
               <div className="monitor-controls">
                 <BudgetForm monitor={monitor} onSaved={load} />

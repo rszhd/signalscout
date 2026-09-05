@@ -37,6 +37,7 @@ function monitor(overrides: Record<string, unknown> = {}) {
       similarityThreshold: 0.15,
       dropped: { keyword: 0, embedding: 0 },
     },
+    feedback: { good: 0, notRelevant: 0 },
     ...overrides,
   };
 }
@@ -240,6 +241,30 @@ describe("the monitor list", () => {
     await show([]);
 
     expect(container.textContent).toContain("No monitors yet");
+  });
+
+  it("says how the matches were judged, and how many were judged at all", async () => {
+    // PLAN.md's real measure of success. Nine tenths negative is a product
+    // failure no other figure on this page would show.
+    await show([monitor({ feedback: { good: 2, notRelevant: 18 } })]);
+
+    expect(container.textContent).toContain("2 good, 18 not relevant of 20 judged");
+  });
+
+  it("does not report a monitor nobody judged as a monitor judged badly", async () => {
+    await show([monitor()]);
+
+    expect(container.textContent).toContain("No matches judged yet");
+    expect(container.textContent).not.toContain("0 good");
+  });
+
+  it("offers the feedback as a file, so it survives a reinstall", async () => {
+    await show([monitor()]);
+
+    const link = [...container.querySelectorAll("a")].find((anchor) =>
+      anchor.textContent?.includes("Export feedback"),
+    );
+    expect(link?.getAttribute("href")).toBe("/api/feedback/export");
   });
 });
 

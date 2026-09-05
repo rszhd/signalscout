@@ -242,6 +242,22 @@ export const monitors = pgTable(
      */
     descriptionEmbedding: vector("description_embedding", { dimensions: embeddingDimensions }),
     descriptionEmbeddingSource: text("description_embedding_source"),
+    /**
+     * Which version of this monitor's definition is in force.
+     *
+     * A verdict in `feedback` records the version it was given against, and
+     * that is the whole reason this column exists. US-012's Context: feedback
+     * collected against one definition and later replayed against a different
+     * one teaches the wrong lesson.
+     *
+     * It counts edits to the definition the classifier reads — the product,
+     * the ideal customer, the problem and the signals, which are exactly the
+     * fields `ai/prompt.ts` puts in the system prompt. A rename, a new poll
+     * interval, an edited query or a moved threshold change what is collected
+     * or how often, not what a good lead is, so they leave the version alone.
+     * `updateMonitor` is the only writer.
+     */
+    version: integer("version").notNull().default(1),
     /** Per monitor, never a constant: US-007's whole point about the cost dial. */
     pollIntervalSeconds: integer("poll_interval_seconds")
       .notNull()
@@ -540,6 +556,16 @@ export const filterDrops = pgTable(
  * inserts a new one, so the record shows what the user thought and when
  * (US-012). The partial unique index is what makes "one verdict" true: only
  * the rows still in force are counted.
+ *
+ * `monitor_id` is written here as well as reachable through the match. Two
+ * reasons, and neither is speed. The counts on the monitor list are a question
+ * about a monitor, and a count that has to join through matches is a count
+ * that goes wrong the first time a match is filtered. And US-012's Context
+ * asks for the verdict to be stored with the monitor, not merely near it.
+ *
+ * `monitor_version` is the version the verdict was given against. It is what
+ * stops a later ticket replaying "this is a good lead" against a monitor that
+ * now describes a different product.
  */
 export const feedback = pgTable(
   "feedback",
@@ -548,6 +574,11 @@ export const feedback = pgTable(
     matchId: uuid("match_id")
       .notNull()
       .references(() => matches.id, { onDelete: "cascade" }),
+    monitorId: uuid("monitor_id")
+      .notNull()
+      .references(() => monitors.id, { onDelete: "cascade" }),
+    /** `monitors.version` when the verdict was given. Never updated afterwards. */
+    monitorVersion: integer("monitor_version").notNull(),
     /** No foreign key until Better Auth owns the user table. US-017. */
     userId: text("user_id").notNull(),
     verdict: text("verdict").$type<Verdict>().notNull(),
@@ -559,7 +590,14 @@ export const feedback = pgTable(
     uniqueIndex("feedback_current_verdict_unique")
       .on(table.matchId, table.userId)
       .where(sql`superseded_at IS NULL`),
+    // The monitor list counts the verdicts still in force, one group per
+    // monitor. Partial for the same reason the index above is: the superseded
+    // rows are history, and no count includes them.
+    index("feedback_monitor_current_idx")
+      .on(table.monitorId, table.verdict)
+      .where(sql`superseded_at IS NULL`),
     check("feedback_verdict_known", oneOf("verdict", verdicts)),
+    check("feedback_monitor_version_positive", sql.raw("monitor_version >= 1")),
   ],
 );
 

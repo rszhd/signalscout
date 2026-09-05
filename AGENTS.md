@@ -28,7 +28,10 @@ BUG-002, found by that test's first live run, stopped a seven-day window being
 bought as a month. US-008 added the pre-filter, so a post now has to match a
 word or a subreddit, and then clear a similarity threshold, before the model is
 paid to read it — and its embedding calls closed US-013's last box, so the
-spend a cap counts is now every kind of call. One step is still a placeholder:
+spend a cap counts is now every kind of call. US-012 added the feedback loop's
+first half, so a match is marked good or not relevant, the verdict is kept as
+history against the version of the monitor it judged, and a dismissed match
+leaves the inbox without leaving the database. One step is still a placeholder:
 US-016 owns the notification. US-004 added the encrypted credential store, so
 a key can live in the database rather than in `.env`; nothing writes one yet,
 because that is the connection screen US-010 defers. `apps/web` now has three
@@ -107,6 +110,20 @@ is that the list renders what the database holds, and the ordering rule —
 score, minus twelve points for every day since the post — measured at 12.7 ms
 for a first page over 5,000 matches. What is not proven is that the reasons
 read well to a person.
+
+**No verdict has been given on a real match either.** US-012's rows, history,
+counts and export are asserted against real Postgres, and thirteen deliberate
+mutations were confirmed to turn the suite red. But every verdict so far was
+given against a seeded row, so nobody has yet pressed "not relevant" on a
+reason a model actually wrote. The verdicts are also collected and not used:
+feeding them back into the classifier is a separate ticket that is not written,
+because a learning loop with nothing to learn from is speculation.
+
+One rule from that ticket is easy to get wrong later. `monitors.version` counts
+edits to the four fields `ai/prompt.ts` puts in the system prompt — the
+product, the ideal customer, the problem and the signals — and nothing else. It
+is the version a verdict was given against. A rename, an edited query or a
+moved threshold must not move it.
 
 **The Reddit connector has collected once, live.** On 2026-09-05 a monitor
 with one keyword triggered a collection, waited through fourteen resumes over

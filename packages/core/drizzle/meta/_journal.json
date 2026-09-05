@@ -78,6 +78,13 @@
       "when": 1788584233586,
       "tag": "0010_add_source_credentials",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1788585766166,
+      "tag": "0011_add_feedback_verdicts",
+      "breakpoints": true
     }
   ]
 }

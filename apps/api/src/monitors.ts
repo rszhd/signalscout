@@ -35,6 +35,7 @@ import {
   minimumPollIntervalSeconds,
   monitorQueries,
   noFilterDrops,
+  noVerdicts,
   pauseMonitor,
   type QueryGenerator,
   recordModelCall,
@@ -48,6 +49,8 @@ import {
   sources as storableSources,
   subredditSchema,
   updateMonitor,
+  type VerdictCounts,
+  verdictCounts,
 } from "@intentwatch/core";
 import { z } from "zod";
 import type { ApiServer } from "./server.js";
@@ -196,6 +199,16 @@ const monitorSchema = z.object({
   preFilter: preFilterSchema.extend({
     dropped: z.object({ keyword: z.number(), embedding: z.number() }),
   }),
+  /**
+   * What the person thought of this monitor's matches, counting only the
+   * verdicts in force.
+   *
+   * PLAN.md sets this as the real measure of success. A monitor whose feedback
+   * is nine tenths negative is a product failure that no other figure on this
+   * page would show: it can be running, inside its cap and filling an inbox
+   * while being wrong about every post it finds.
+   */
+  feedback: z.object({ good: z.number(), notRelevant: z.number() }),
 });
 
 const problemSchema = z.object({
@@ -245,6 +258,7 @@ function toResponse(
   runtime: MonitorEnvironment,
   state: BudgetState,
   dropped: FilterDropCounts,
+  verdicts: VerdictCounts,
 ) {
   return {
     id: monitor.id,
@@ -281,6 +295,7 @@ function toResponse(
       similarityThreshold: monitor.similarityThreshold,
       dropped,
     },
+    feedback: verdicts,
   };
 }
 
@@ -291,12 +306,19 @@ function toResponse(
  * paths end in `toResponse`, so neither can grow a field the other lacks.
  */
 async function readResponse(db: Database, monitor: Monitor, runtime: MonitorEnvironment) {
-  const [state, drops] = await Promise.all([
+  const [state, drops, verdicts] = await Promise.all([
     checkBudget(db, monitor.id),
     filterDropCounts(db, [monitor.id]),
+    verdictCounts(db, [monitor.id]),
   ]);
 
-  return toResponse(monitor, runtime, state, drops.get(monitor.id) ?? noFilterDrops);
+  return toResponse(
+    monitor,
+    runtime,
+    state,
+    drops.get(monitor.id) ?? noFilterDrops,
+    verdicts.get(monitor.id) ?? noVerdicts,
+  );
 }
 
 export async function registerMonitorRoutes(
@@ -450,7 +472,11 @@ export async function registerMonitorRoutes(
       // screen that shows this is a list, and a per-row query here would be
       // the list's cost growing with the number of monitors.
       const rows = await listMonitors(db);
-      const [states, drops] = await Promise.all([budgetStates(db), filterDropCounts(db)]);
+      const [states, drops, verdicts] = await Promise.all([
+        budgetStates(db),
+        filterDropCounts(db),
+        verdictCounts(db),
+      ]);
 
       return Promise.all(
         rows.map(async (monitor) =>
@@ -464,6 +490,7 @@ export async function registerMonitorRoutes(
             runtime,
             states.get(monitor.id) ?? (await checkBudget(db, monitor.id)),
             drops.get(monitor.id) ?? noFilterDrops,
+            verdicts.get(monitor.id) ?? noVerdicts,
           ),
         ),
       );

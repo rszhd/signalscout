@@ -2,7 +2,7 @@
 
 # Done
 
-13 finished.
+14 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
@@ -11,6 +11,7 @@
 | US-021 | [The application follows the product mockup](done/2026-09/US-021-the-application-follows-the-product-mockup.md) | feature | shipped | 2026-09 |
 | US-014 | [A query's cost is known before it runs](done/2026-09/US-014-a-querys-cost-is-known-before-it-runs.md) | feature | shipped | 2026-09 |
 | US-013 | [A monitor cannot spend past its budget](done/2026-09/US-013-a-monitor-cannot-spend-past-its-budget.md) | feature | shipped | 2026-09 |
+| US-012 | [A match is marked good or not relevant](done/2026-09/US-012-a-match-is-marked-good-or-not-relevant.md) | feature | — | 2026-09 |
 | US-011 | [The inbox shows why a post matched](done/2026-09/US-011-the-inbox-shows-why-a-post-matched.md) | feature | shipped | 2026-09 |
 | US-009 | [The model scores a post against a monitor](done/2026-09/US-009-the-model-scores-a-post-against-a-monitor.md) | feature | shipped | 2026-09 |
 | US-008 | [A cheap filter runs before the model](done/2026-09/US-008-a-cheap-filter-runs-before-the-model.md) | feature | shipped | 2026-09 |

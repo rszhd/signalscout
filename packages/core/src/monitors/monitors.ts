@@ -14,7 +14,7 @@
  * what lets `regenerate` replace the queries without a person retyping
  * anything. That separation is in the schema; this file is where it is used.
  */
-import { desc, eq } from "drizzle-orm";
+import { desc, eq, sql } from "drizzle-orm";
 import type { Database } from "../db/client.js";
 import { monitors, type Signal, type Source } from "../db/schema.js";
 import type { SourceDescriptor } from "../sources/types.js";
@@ -215,6 +215,38 @@ export interface UpdateMonitorInput
   readonly pollIntervalSeconds?: number;
 }
 
+/**
+ * Whether an edit changes the definition the classifier judges against.
+ *
+ * The four fields here are exactly what `ai/prompt.ts` puts in the system
+ * prompt. An edit to any of them means a later verdict is about a different
+ * question from an earlier one, and `monitors.version` is how the two are told
+ * apart. A rename, a new poll interval, an edited query or a moved threshold
+ * change what is collected or how often, not what a good lead is.
+ *
+ * A field sent back unchanged is not a change. The monitor form sends every
+ * field it holds, so comparing values rather than counting keys is what keeps
+ * "save" without an edit from invalidating the feedback already collected.
+ */
+export function redefinesTheMonitor(monitor: Monitor, input: UpdateMonitorInput): boolean {
+  if (input.product !== undefined && input.product !== monitor.product) return true;
+  if (input.idealCustomer !== undefined && input.idealCustomer !== monitor.idealCustomer) {
+    return true;
+  }
+  if (input.problem !== undefined && input.problem !== monitor.problem) return true;
+
+  if (input.signals !== undefined) {
+    // Order is not meaning: a form that re-sends the same ticked boxes in a
+    // different order has changed nothing.
+    const before = [...monitor.signals].sort();
+    const after = [...input.signals].sort();
+    if (before.length !== after.length) return true;
+    if (before.some((signal, index) => signal !== after[index])) return true;
+  }
+
+  return false;
+}
+
 export async function updateMonitor(
   db: Database,
   id: string,
@@ -241,9 +273,18 @@ export async function updateMonitor(
 
   if (Object.keys(changes).length === 0) return getMonitor(db, id);
 
+  const current = await getMonitor(db, id);
+  if (!current) return undefined;
+
   const [monitor] = await db
     .update(monitors)
-    .set({ ...changes, updatedAt: new Date() })
+    .set({
+      ...changes,
+      // Incremented in SQL rather than from the row above, so two edits that
+      // read the same version still leave two versions behind them.
+      ...(redefinesTheMonitor(current, input) ? { version: sql`${monitors.version} + 1` } : {}),
+      updatedAt: new Date(),
+    })
     .where(eq(monitors.id, id))
     .returning();
 

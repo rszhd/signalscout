@@ -1,23 +1,30 @@
 /**
- * The HTTP side of the inbox.
+ * The HTTP side of the inbox, and the two buttons on a match.
  *
- * One route, and it holds no rules. The ordering, the hidden filter and the
- * page boundary all live in `@intentwatch/core`, for the reason `monitors.ts`
- * gives: the worker and the deletion job read the same rows, and a rule
- * written in a handler is a rule one caller obeys.
+ * These routes hold no rules. The ordering, the hidden filter, the page
+ * boundary and what a verdict does to the list all live in
+ * `@intentwatch/core`, for the reason `monitors.ts` gives: the worker and the
+ * deletion job read the same rows, and a rule written in a handler is a rule
+ * one caller obeys.
  *
- * Two decisions are this file's own. `asOf` is accepted from the client and
+ * Three decisions are this file's own. `asOf` is accepted from the client and
  * echoed back, because a page after the first must be ranked against the clock
- * the first page used, and the browser is what carries it between requests. And
- * a cursor is validated by shape here, so a hand-edited one answers 400 rather
- * than reaching the database as a comparison against nothing.
+ * the first page used, and the browser is what carries it between requests. A
+ * cursor is validated by shape here, so a hand-edited one answers 400 rather
+ * than reaching the database as a comparison against nothing. And a verdict is
+ * `PUT` rather than `POST`: one person has one verdict on one match, so
+ * sending it twice must leave one, and a retried request after a dropped
+ * connection must not read as a change of mind.
  */
 import {
   cursorPattern,
   type Database,
   defaultPageSize,
+  exportFeedback,
   listMatches,
   maximumPageSize,
+  recordVerdict,
+  verdicts,
 } from "@intentwatch/core";
 import { z } from "zod";
 import type { ApiServer } from "./server.js";
@@ -37,6 +44,8 @@ const matchSchema = z.object({
   intentLabel: z.string(),
   reasons: z.array(z.string()),
   saved: z.boolean(),
+  /** Null when this person has not judged the match. Not a third verdict. */
+  verdict: z.enum(verdicts).nullable(),
   readAt: z.string().nullable(),
   source: z.string(),
   channel: z.string().nullable(),
@@ -54,6 +63,12 @@ const query = z.object({
   cursor: z.string().regex(cursorPattern).optional(),
   /** The clock the first page was ranked against. Omitted on the first page. */
   asOf: z.iso.datetime().optional(),
+  /**
+   * Show the matches this person marked not relevant. They are hidden by
+   * default and never deleted, so this is how somebody reviews what they
+   * dismissed — and how they undo one.
+   */
+  includeNotRelevant: z.stringbool().default(false),
 });
 
 export interface MatchRoutesOptions {
@@ -78,13 +93,14 @@ export async function registerMatchRoutes(
       },
     },
     handler: async (request) => {
-      const { monitorId, minScore, limit, cursor, asOf } = request.query;
+      const { monitorId, minScore, limit, cursor, asOf, includeNotRelevant } = request.query;
 
       const page = await listMatches(db, {
         monitorId,
         minScore,
         limit,
         cursor,
+        includeNotRelevant,
         asOf: asOf ? new Date(asOf) : undefined,
       });
 
@@ -97,6 +113,103 @@ export async function registerMatchRoutes(
         })),
         nextCursor: page.nextCursor,
         asOf: page.asOf.toISOString(),
+      };
+    },
+  });
+
+  /**
+   * Give a verdict on a match, or change the one already given.
+   *
+   * The response is the verdict now in force, not the match. The screen turns
+   * the button on from this and removes the row itself; re-reading the page
+   * would move every other row under the person's cursor, because the rank
+   * depends on a clock.
+   */
+  app.route({
+    method: "PUT",
+    url: "/api/matches/:id/verdict",
+    schema: {
+      params: z.object({ id: z.uuid() }),
+      body: z.object({ verdict: z.enum(verdicts) }),
+      response: {
+        200: z.object({
+          matchId: z.string(),
+          monitorId: z.string(),
+          monitorVersion: z.number(),
+          verdict: z.enum(verdicts),
+          createdAt: z.string(),
+          /** True when this replaced a different verdict. */
+          changed: z.boolean(),
+        }),
+        404: z.object({ message: z.string() }),
+      },
+    },
+    handler: async (request, reply) => {
+      const recorded = await recordVerdict(db, {
+        matchId: request.params.id,
+        verdict: request.body.verdict,
+      });
+
+      if (!recorded) return reply.code(404).send({ message: "No match has that id." });
+
+      return {
+        matchId: recorded.matchId,
+        monitorId: recorded.monitorId,
+        monitorVersion: recorded.monitorVersion,
+        verdict: recorded.verdict,
+        createdAt: recorded.createdAt.toISOString(),
+        changed: recorded.changed,
+      };
+    },
+  });
+
+  /**
+   * Every verdict this instance holds, as a file.
+   *
+   * US-012 asks for feedback that survives a reinstall, so this is a download
+   * and not a page: `Content-Disposition` is what makes a browser keep it. The
+   * superseded rows are in it, and so are the post's source and external id,
+   * because the ids of an instance that no longer exists mean nothing.
+   */
+  app.route({
+    method: "GET",
+    url: "/api/feedback/export",
+    schema: {
+      response: {
+        200: z.object({
+          exportedAt: z.string(),
+          verdicts: z.array(
+            z.object({
+              matchId: z.string(),
+              monitorId: z.string(),
+              monitorName: z.string(),
+              monitorVersion: z.number(),
+              userId: z.string(),
+              verdict: z.enum(verdicts),
+              score: z.number(),
+              source: z.string(),
+              externalId: z.string(),
+              url: z.string(),
+              title: z.string().nullable(),
+              createdAt: z.string(),
+              supersededAt: z.string().nullable(),
+            }),
+          ),
+        }),
+      },
+    },
+    handler: async (_request, reply) => {
+      const rows = await exportFeedback(db);
+
+      reply.header("content-disposition", 'attachment; filename="intentwatch-feedback.json"');
+
+      return {
+        exportedAt: new Date().toISOString(),
+        verdicts: rows.map((row) => ({
+          ...row,
+          createdAt: row.createdAt.toISOString(),
+          supersededAt: row.supersededAt?.toISOString() ?? null,
+        })),
       };
     },
   });

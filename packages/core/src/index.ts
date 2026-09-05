@@ -166,6 +166,17 @@ export {
   totalsFor,
 } from "./estimate/index.js";
 export {
+  currentVerdicts,
+  type ExportedVerdict,
+  exportFeedback,
+  noVerdicts,
+  type RecordedVerdict,
+  type RecordVerdictInput,
+  recordVerdict,
+  type VerdictCounts,
+  verdictCounts,
+} from "./feedback/feedback.js";
+export {
   type EmbeddablePost,
   type MonitorDescription,
   monitorDescriptionText,
@@ -216,6 +227,7 @@ export {
   monitorQueries,
   pauseMonitor,
   type ResumeResult,
+  redefinesTheMonitor,
   resumeMonitor,
   type SignalDescription,
   signalDescriptions,

@@ -568,9 +568,17 @@ describe("matches", () => {
 });
 
 describe("feedback", () => {
+  // The monitor and its version are read from the match rather than passed
+  // in, so a case here cannot record a verdict against a monitor the match
+  // does not belong to. `feedback.ts` reads them the same way.
   async function insertVerdict(matchId: string, userId: string, verdict: string) {
     const result = await sql.query<{ id: string }>(
-      "INSERT INTO feedback (match_id, user_id, verdict) VALUES ($1, $2, $3) RETURNING id",
+      `INSERT INTO feedback (match_id, monitor_id, monitor_version, user_id, verdict)
+       SELECT match.id, match.monitor_id, monitor.version, $2, $3
+       FROM matches match
+       JOIN monitors monitor ON monitor.id = match.monitor_id
+       WHERE match.id = $1
+       RETURNING id`,
       [matchId, userId, verdict],
     );
     return only(result.rows).id;
@@ -892,7 +900,13 @@ describe("the Drizzle schema and the tables agree", () => {
       const verdict = only(
         await db
           .insert(schema.feedback)
-          .values({ matchId: match.id, userId: "user-1", verdict: "good" })
+          .values({
+            matchId: match.id,
+            monitorId: monitor.id,
+            monitorVersion: monitor.version,
+            userId: "user-1",
+            verdict: "good",
+          })
           .returning(),
       );
 
@@ -903,6 +917,8 @@ describe("the Drizzle schema and the tables agree", () => {
       expect(match.hidden).toBe(false);
       expect(match.readAt).toBeNull();
       expect(match.lastVerifiedAt).toBeInstanceOf(Date);
+      expect(monitor.version).toBe(1);
+      expect(verdict.monitorVersion).toBe(1);
       expect(verdict.supersededAt).toBeNull();
     } finally {
       await close();

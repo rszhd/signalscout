@@ -118,6 +118,94 @@ describe("a monitor made from four answers", () => {
   });
 });
 
+/**
+ * The version, which is what a verdict in `feedback` is given against.
+ *
+ * The rule is narrow and worth stating twice: the version counts edits to the
+ * definition the classifier judges by — the product, the ideal customer, the
+ * problem and the signals — and nothing else. A version that moved on a rename
+ * would throw away feedback nobody has invalidated, and one that stood still
+ * through a rewritten problem statement would keep feedback that is now about
+ * a different question.
+ */
+describe("a monitor's version", () => {
+  let database: TestDatabase;
+  let db: Database;
+  let close: () => Promise<void>;
+
+  async function create() {
+    const { monitor } = await createMonitor(db, input(), {
+      descriptors,
+      environment: configured,
+    });
+    return monitor;
+  }
+
+  beforeAll(async () => {
+    database = await createTestDatabase("monitor-version");
+    ({ db, close } = createDatabase(database.url));
+  }, 60_000);
+
+  afterAll(async () => {
+    await close?.();
+    await database?.drop();
+  });
+
+  afterEach(async () => {
+    await db.delete(monitors);
+  });
+
+  it("starts at one", async () => {
+    expect((await create()).version).toBe(1);
+  });
+
+  it("moves when the problem it watches for changes", async () => {
+    const monitor = await create();
+
+    const updated = await updateMonitor(db, monitor.id, {
+      problem: "Nobody can tell which release broke the checkout flow",
+    });
+
+    expect(updated?.version).toBe(2);
+  });
+
+  it("moves when the signals change", async () => {
+    const monitor = await create();
+
+    const updated = await updateMonitor(db, monitor.id, { signals: ["problem"] });
+
+    expect(updated?.version).toBe(2);
+  });
+
+  it("stands still on a rename, a new interval and an edited query", async () => {
+    const monitor = await create();
+
+    const updated = await updateMonitor(db, monitor.id, {
+      name: "Journeys, renamed",
+      pollIntervalSeconds: 7200,
+      queries: ["regression testing takes too long"],
+      minScore: 60,
+    });
+
+    // None of these change what a good lead is, so no verdict already given
+    // is about a different question than it was.
+    expect(updated?.version).toBe(1);
+  });
+
+  it("stands still when the form sends back what it was given", async () => {
+    const monitor = await create();
+
+    // The monitor form sends every field it holds, edited or not. A save with
+    // no edit must not invalidate the feedback collected so far.
+    const updated = await updateMonitor(db, monitor.id, {
+      ...answers,
+      signals: ["problem", "recommendation_request"],
+    });
+
+    expect(updated?.version).toBe(1);
+  });
+});
+
 describe("a monitor whose source has no credentials", () => {
   let database: TestDatabase;
   let db: Database;

@@ -19,6 +19,7 @@ import {
   getMonitor,
   loadEnv,
   type ModelCall,
+  matches,
   modelCalls,
   monitors,
   posts,
@@ -26,6 +27,7 @@ import {
   type QueryPlanOutcome,
   recordFilterDrops,
   recordSourceUsage,
+  recordVerdict,
 } from "@intentwatch/core";
 import { createTestDatabase, type TestDatabase } from "@intentwatch/core/testing";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
@@ -103,6 +105,7 @@ describe("the monitor routes", () => {
   afterEach(async () => {
     await db.delete(filterDrops);
     await db.delete(modelCalls);
+    await db.delete(matches);
     await db.delete(monitors);
     await db.delete(posts);
   });
@@ -596,6 +599,70 @@ describe("the monitor routes", () => {
         const response = await app.inject({ method: "GET", url: "/api/monitors" });
 
         expect(response.json()[0].preFilter.dropped).toEqual({ keyword: 1, embedding: 1 });
+      });
+    });
+  });
+
+  describe("the feedback counts", () => {
+    /** One match on this monitor, so there is something to judge. */
+    async function seedMatch(monitorId: string, externalId: string): Promise<string> {
+      const [post] = await db
+        .insert(posts)
+        .values({
+          source: "reddit",
+          externalId,
+          url: `https://example.test/${externalId}`,
+          excerpt: "We're manually checking our major flows before every release.",
+          postedAt: new Date("2026-09-01T10:00:00Z"),
+        })
+        .returning({ id: posts.id });
+
+      const [match] = await db
+        .insert(matches)
+        .values({
+          monitorId,
+          postId: post?.id as string,
+          score: 88,
+          relevance: 90,
+          problemFit: 98,
+          icpFit: 91,
+          intent: 94,
+          urgency: 70,
+          intentType: "problem",
+          reasons: ["Small SaaS team"],
+        })
+        .returning({ id: matches.id });
+
+      return match?.id as string;
+    }
+
+    it("reports nothing judged on a monitor nobody has judged", async () => {
+      await withServer({}, async (app) => {
+        const id = await create(app);
+
+        const response = await app.inject({ method: "GET", url: `/api/monitors/${id}` });
+
+        expect(response.json().feedback).toEqual({ good: 0, notRelevant: 0 });
+      });
+    });
+
+    it("counts the verdicts in force, on the list a screen reads", async () => {
+      await withServer({}, async (app) => {
+        const id = await create(app);
+
+        await recordVerdict(db, { matchId: await seedMatch(id, "judged-1"), verdict: "good" });
+        await recordVerdict(db, {
+          matchId: await seedMatch(id, "judged-2"),
+          verdict: "not_relevant",
+        });
+
+        const list = await app.inject({ method: "GET", url: "/api/monitors" });
+        const one = await app.inject({ method: "GET", url: `/api/monitors/${id}` });
+
+        // Both reads, because the list and the single monitor are two call
+        // sites and only one of them counts in bulk.
+        expect(list.json()[0].feedback).toEqual({ good: 1, notRelevant: 1 });
+        expect(one.json().feedback).toEqual({ good: 1, notRelevant: 1 });
       });
     });
   });

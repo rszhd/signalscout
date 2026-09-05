@@ -13,6 +13,7 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { createDatabase, type Database } from "../db/client.js";
 import { type IntentType, matches, monitors, posts } from "../db/schema.js";
+import { recordVerdict } from "../feedback/feedback.js";
 import { createTestDatabase, type TestDatabase } from "../testing/database.js";
 import {
   cursorFor,
@@ -212,6 +213,77 @@ describe("the inbox list", () => {
     it("counts a hidden match as absent when deciding there is another page", async () => {
       await seed({ monitorId, score: 50, postedAt: minutesAgo(5) });
       await seed({ monitorId, score: 99, postedAt: minutesAgo(1), hidden: true });
+
+      const page = await listMatches(db, { asOf: now, limit: 1 });
+
+      expect(page.nextCursor).toBeNull();
+    });
+  });
+
+  describe("a match the person marked not relevant", () => {
+    it("leaves the default list", async () => {
+      const kept = await seed({ monitorId, score: 50, postedAt: minutesAgo(5) });
+      const dismissed = await seed({ monitorId, score: 99, postedAt: minutesAgo(1) });
+
+      await recordVerdict(db, { matchId: dismissed, verdict: "not_relevant" });
+
+      const page = await listMatches(db, { asOf: now });
+
+      expect(page.matches.map((match) => match.id)).toEqual([kept]);
+    });
+
+    it("is still there, and comes back when asked for", async () => {
+      const dismissed = await seed({ monitorId, score: 99, postedAt: minutesAgo(1) });
+
+      await recordVerdict(db, { matchId: dismissed, verdict: "not_relevant" });
+
+      // US-012 is firm that it is not deleted. This is the assertion: the row
+      // a person dismissed is the row the feedback loop was collected for.
+      const page = await listMatches(db, { asOf: now, includeNotRelevant: true });
+
+      expect(page.matches.map((match) => match.id)).toEqual([dismissed]);
+      expect(at(page, 0).verdict).toBe("not_relevant");
+    });
+
+    it("comes back when the person changes their mind", async () => {
+      const matchId = await seed({ monitorId, score: 99, postedAt: minutesAgo(1) });
+
+      await recordVerdict(db, { matchId, verdict: "not_relevant" });
+      await recordVerdict(db, { matchId, verdict: "good" });
+
+      const page = await listMatches(db, { asOf: now });
+
+      expect(page.matches.map((match) => match.id)).toEqual([matchId]);
+      expect(at(page, 0).verdict).toBe("good");
+    });
+
+    it("hides nothing when another person dismissed it", async () => {
+      const matchId = await seed({ monitorId, score: 99, postedAt: minutesAgo(1) });
+
+      await recordVerdict(db, { matchId, userId: "someone-else", verdict: "not_relevant" });
+
+      const page = await listMatches(db, { asOf: now });
+
+      expect(page.matches.map((match) => match.id)).toEqual([matchId]);
+      expect(at(page, 0).verdict).toBeNull();
+    });
+
+    it("shows a match nobody has judged, with no verdict on it", async () => {
+      await seed({ monitorId, score: 70, postedAt: minutesAgo(5) });
+
+      // The one that would break first: an unjudged match has no feedback row,
+      // so a comparison that is not null-safe drops the whole inbox.
+      const page = await listMatches(db, { asOf: now });
+
+      expect(page.matches).toHaveLength(1);
+      expect(at(page, 0).verdict).toBeNull();
+    });
+
+    it("counts as absent when deciding there is another page", async () => {
+      await seed({ monitorId, score: 50, postedAt: minutesAgo(5) });
+      const dismissed = await seed({ monitorId, score: 99, postedAt: minutesAgo(1) });
+
+      await recordVerdict(db, { matchId: dismissed, verdict: "not_relevant" });
 
       const page = await listMatches(db, { asOf: now, limit: 1 });
 

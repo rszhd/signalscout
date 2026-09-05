@@ -36,6 +36,7 @@ function match(overrides: Record<string, unknown> = {}) {
     intentLabel: "Describing the problem",
     reasons: ["Small SaaS team", "Explicit manual-testing pain", "Asking for solutions"],
     saved: false,
+    verdict: null,
     readAt: null,
     source: "reddit",
     channel: "SaaS",
@@ -63,6 +64,9 @@ describe("the intent inbox", () => {
     fetchMock.mockImplementation(async (request: string | URL | Request) => {
       const url = typeof request === "string" ? request : request.toString();
       if (url === "/api/monitors") return json(monitorRows);
+      // Checked before the list, because a verdict's URL starts with the
+      // list's. The body is what the assertions below read.
+      if (url.endsWith("/verdict")) return json({ verdict: "good", changed: false });
       if (url.startsWith("/api/matches")) {
         const answer = Object.entries(pages).find(([key]) => url.includes(key));
         return json(answer ? answer[1] : firstPage);
@@ -255,6 +259,107 @@ describe("the intent inbox", () => {
     // would look like paging and read like losing your place.
     expect(container.textContent).toContain("How are small teams handling regression testing?");
     expect(container.textContent).toContain("Second page post");
+  });
+
+  describe("the two buttons on a match", () => {
+    const twoMatches = {
+      matches: [
+        match(),
+        match({
+          id: "match-2",
+          title: "A second conversation",
+          url: "https://reddit.com/r/SaaS/comments/def",
+        }),
+      ],
+      nextCursor: null,
+      asOf: "2026-09-05T12:00:00.000Z",
+    };
+
+    /** The verdict requests the screen sent, in order. */
+    function verdictCalls(): Array<{ url: string; body: unknown }> {
+      return fetchMock.mock.calls
+        .filter(([url]) => String(url).endsWith("/verdict"))
+        .map(([url, init]) => ({
+          url: String(url),
+          body: JSON.parse(String((init as RequestInit).body)),
+        }));
+    }
+
+    it("sends the verdict a person chose", async () => {
+      await show();
+
+      await act(async () => button("Good lead").click());
+      await settle();
+
+      expect(verdictCalls()).toEqual([
+        { url: "/api/matches/match-1/verdict", body: { verdict: "good" } },
+      ]);
+    });
+
+    it("shows the verdict already given as the one in force", async () => {
+      await show({
+        "/api/matches?": {
+          matches: [match({ verdict: "good" })],
+          nextCursor: null,
+          asOf: "2026-09-05T12:00:00.000Z",
+        },
+      });
+
+      expect(button("Good lead").getAttribute("aria-pressed")).toBe("true");
+      expect(button("Not relevant").getAttribute("aria-pressed")).toBe("false");
+    });
+
+    it("takes a dismissed match out of the list and reads on", async () => {
+      await show({ "/api/matches?": twoMatches });
+
+      await act(async () => button("Not relevant").click());
+      await settle();
+
+      // The row is gone and the next one is open. A reload would have been
+      // the easy way to do this, and it would move every other row: the rank
+      // depends on a clock.
+      expect(container.textContent).not.toContain(
+        "How are small teams handling regression testing?",
+      );
+      expect(container.querySelector(".detail-title")?.textContent).toBe("A second conversation");
+      expect(container.querySelectorAll(".match-card")).toHaveLength(1);
+
+      const listRequests = fetchMock.mock.calls
+        .map(([url]) => String(url))
+        .filter((url) => url.startsWith("/api/matches?"));
+      expect(listRequests).toHaveLength(1);
+    });
+
+    it("keeps the match on the screen when the verdict could not be saved", async () => {
+      await show({ "/api/matches?": twoMatches });
+
+      fetchMock.mockImplementation(async () => json({ message: "The database is down." }, 500));
+
+      await act(async () => button("Not relevant").click());
+      await settle();
+
+      // A row that vanished from a failed request would look like a verdict
+      // that was kept, and the person would never give it again.
+      expect(container.querySelectorAll(".match-card")).toHaveLength(2);
+      expect(container.textContent).toContain("The database is down.");
+    });
+
+    it("asks the server for the dismissed matches when the filter says so", async () => {
+      await show();
+
+      await act(async () => setValue(select("Not relevant"), "show"));
+      await settle();
+
+      const asked = fetchMock.mock.calls.map(([url]) => String(url));
+      expect(asked.some((url) => url.includes("includeNotRelevant=true"))).toBe(true);
+    });
+
+    it("does not ask for them when the filter is on hidden", async () => {
+      await show();
+
+      const asked = fetchMock.mock.calls.map(([url]) => String(url));
+      expect(asked.some((url) => url.includes("includeNotRelevant"))).toBe(false);
+    });
   });
 
   it("offers the form when there is nothing to read and no monitor yet", async () => {

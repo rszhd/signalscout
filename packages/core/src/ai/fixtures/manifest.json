@@ -16,39 +16,39 @@
   "fixtures": [
     {
       "file": "low-intent.json",
-      "capturedAt": "2026-09-04T18:12:20.486Z",
+      "capturedAt": "2026-09-05T05:53:27.776Z",
       "usage": {
-        "inputTokens": 604,
-        "outputTokens": 88
+        "inputTokens": 670,
+        "outputTokens": 105
       },
-      "latencyMs": 3539
+      "latencyMs": 2376
     },
     {
       "file": "mild-problem-signal.json",
-      "capturedAt": "2026-09-04T18:12:29.813Z",
+      "capturedAt": "2026-09-05T05:53:29.913Z",
       "usage": {
-        "inputTokens": 612,
+        "inputTokens": 678,
         "outputTokens": 97
       },
-      "latencyMs": 9326
+      "latencyMs": 2136
     },
     {
       "file": "strong-intent.json",
-      "capturedAt": "2026-09-04T18:12:32.111Z",
+      "capturedAt": "2026-09-05T05:53:33.058Z",
       "usage": {
-        "inputTokens": 615,
-        "outputTokens": 97
+        "inputTokens": 681,
+        "outputTokens": 100
       },
-      "latencyMs": 2298
+      "latencyMs": 3145
     },
     {
       "file": "very-strong-intent.json",
-      "capturedAt": "2026-09-04T18:12:34.665Z",
+      "capturedAt": "2026-09-05T05:53:34.763Z",
       "usage": {
-        "inputTokens": 626,
+        "inputTokens": 692,
         "outputTokens": 78
       },
-      "latencyMs": 2554
+      "latencyMs": 1697
     }
   ]
 }

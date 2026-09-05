@@ -67,12 +67,21 @@ const longestAnswer = 2000;
 
 const answerText = z.string().trim().min(shortestAnswer).max(longestAnswer);
 
+/**
+ * The list fields, without their defaults.
+ *
+ * A create fills an absent list with an empty one. An edit must not: absent
+ * has to mean "leave it alone", or a screen that changes one setting erases
+ * the rest. `updateBody` re-declares these four for exactly that reason.
+ */
+const signalsField = z.array(z.enum(signalIds)).max(signalIds.length);
+
 /** The four answers PLAN.md's form asks for. */
 const answersBody = z.object({
   product: answerText,
   idealCustomer: answerText,
   problem: answerText,
-  signals: z.array(z.enum(signalIds)).max(signalIds.length).default([]),
+  signals: signalsField.default([]),
 });
 
 /**
@@ -85,9 +94,12 @@ const answersBody = z.object({
  * of them and run the monitor on subreddits alone, which is a real way to use
  * it.
  */
+const queriesField = z.array(searchQuerySchema).max(maximumQueries);
+const subredditsField = z.array(subredditSchema).max(maximumSubreddits);
+
 const planBody = z.object({
-  queries: z.array(searchQuerySchema).max(maximumQueries).default([]),
-  subreddits: z.array(subredditSchema).max(maximumSubreddits).default([]),
+  queries: queriesField.default([]),
+  subreddits: subredditsField.default([]),
 });
 
 /**
@@ -112,10 +124,12 @@ const preFilterSchema = z.object({
   similarityThreshold: z.number().min(0).max(1),
 });
 
+const sourcesField = z.array(z.enum(storableSources));
+
 const createBody = answersBody.extend({
   name: z.string().trim().min(1).max(80),
   ...planBody.shape,
-  sources: z.array(z.enum(storableSources)).default([]),
+  sources: sourcesField.default([]),
   minScore: z.number().int().min(0).max(100).optional(),
   pollIntervalSeconds: z.number().int().min(minimumPollIntervalSeconds).optional(),
   /**
@@ -132,7 +146,26 @@ const createBody = answersBody.extend({
   preFilter: preFilterSchema.partial().optional(),
 });
 
-const updateBody = createBody.partial();
+/**
+ * What an edit carries: only the fields it changes.
+ *
+ * `.partial()` makes every key optional, and a key that is optional and
+ * defaulted is still filled in when it is absent. So a body of one setting
+ * arrived carrying empty answers for everything else, and the route wrote
+ * them: no signals for the prompt, no source to poll, and a version bump that
+ * told the feedback already collected it was given against an older monitor.
+ * The pre-filter form on the monitor list sends one setting, which is how a
+ * live run found it.
+ *
+ * The four list fields are re-declared here without their defaults, so absent
+ * means absent and `updateMonitor` leaves the column alone.
+ */
+const updateBody = createBody.partial().extend({
+  signals: signalsField.optional(),
+  queries: queriesField.optional(),
+  subreddits: subredditsField.optional(),
+  sources: sourcesField.optional(),
+});
 
 const missingCredentialSchema = z.object({
   sourceId: z.string(),

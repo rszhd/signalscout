@@ -2,23 +2,23 @@
   "slug": "very-strong-intent",
   "provider": "openai",
   "model": "gpt-5.6-luna",
-  "capturedAt": "2026-09-04T18:12:34.665Z",
+  "capturedAt": "2026-09-05T05:53:34.763Z",
   "object": {
     "reasons": [
-      "The author says they are a four-person SaaS team.",
-      "They manually test signup and checkout on every release.",
-      "They ask what tools other small teams are using."
+      "Says they are a four-person SaaS team.",
+      "Says they manually test signup and checkout every release.",
+      "Asks what tools other small teams are using."
     ],
-    "relevance": 95,
-    "problemFit": 92,
+    "relevance": 98,
+    "problemFit": 95,
     "icpFit": 98,
-    "intent": 95,
-    "urgency": 90,
+    "intent": 96,
+    "urgency": 93,
     "intentType": "recommendation_request"
   },
   "usage": {
-    "inputTokens": 626,
+    "inputTokens": 692,
     "outputTokens": 78
   },
-  "latencyMs": 2554
+  "latencyMs": 1697
 }

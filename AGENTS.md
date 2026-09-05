@@ -7,7 +7,9 @@ IntentWatch finds public conversations from people describing a problem your
 product solves. Read [PLAN.md](PLAN.md) for the product and
 [STACK.md](STACK.md) for the stack before proposing anything structural.
 
-**The pipeline scores posts; nothing shows them yet.** US-001 built the
+**The pipeline works end to end, and US-022 ran it.** On 2026-09-05 one
+monitor went from the form to fifty collected posts, twenty scored matches and
+five verdicts, all live. US-001 built the
 skeleton: four packages, Postgres with `pgvector`, migrations, the queue, and a
 page that proves the bundle is served. US-002 added the four tables. US-003
 settled the `SocialSource` interface and shipped a fake connector. US-005 added
@@ -31,8 +33,11 @@ paid to read it — and its embedding calls closed US-013's last box, so the
 spend a cap counts is now every kind of call. US-012 added the feedback loop's
 first half, so a match is marked good or not relevant, the verdict is kept as
 history against the version of the monitor it judged, and a dismissed match
-leaves the inbox without leaving the database. One step is still a placeholder:
-US-016 owns the notification. US-004 added the encrypted credential store, so
+leaves the inbox without leaving the database. US-022 then ran the whole path against real
+providers, and fixed the bug it found: a `PATCH` that carried one setting
+erased every field it did not carry, because the body schema filled the absent
+keys with its own defaults. One step is still a placeholder: US-016 owns the
+notification. US-004 added the encrypted credential store, so
 a key can live in the database rather than in `.env`; nothing writes one yet,
 because that is the connection screen US-010 defers. `apps/web` now has three
 screens, the monitor form, the inbox and the monitor list, and no screen for
@@ -70,26 +75,32 @@ stage and sends everything it keeps to the model until `AI_EMBEDDING_PROVIDER`
 names something else. On OpenAI it needs nothing: the embedding provider, model
 and key all fall back to the ones the classifier uses.
 
-**The classifier has met a real model, and the Reddit connector a real
-provider.** `ai/fixtures/capture.ts` ran against a live provider on 2026-09-05,
-so the prompt, the schema and the cost recording are proven for the happy path,
-and the four answers it recorded are replayed in CI for nothing. The failure
-paths are not proven: a real rate limit, a real refusal and a real timeout have
-only been simulated. Say so until one has happened.
+**The classifier has met a real model, and its fixtures are current.**
+`capture:classifier` ran on 2026-09-05 against the system prompt US-010
+shipped, and recorded 7, 64, 86 and 96 for PLAN.md's four worked examples,
+whose intents are 3, 50, 90 and 96. The order holds and the gap between the
+drop and the first match is 57 points. `ai/examples.test.ts` replays those
+answers. The failure paths are still not proven: a real rate limit, a real
+refusal and a real timeout have only been simulated. Say so until one has
+happened.
 
-Two things moved after that run. US-010 changed the classifier's system prompt
-— the signals now arrive as a labelled line each — so the recorded answers
-predate the prompt they are replayed against. And US-010 added a second model
-call, the query generator, which no model has ever answered.
-`capture:classifier` and `capture:queries` are the two commands that close
-those gaps. Until they run, say the recorded scores are stale and the query
-generation unproven.
+**The query generator has answered once.** `capture:queries` ran on the same
+day and `ai/fixtures/query-plan.json` holds the plan it wrote — seven queries
+and five subreddits for the example monitor. The seven are seven angles and
+not one query written seven ways. Four of the five subreddit names are
+unverified: Reddit answers 403 to an unauthenticated request, so only
+`softwaretesting` is proven, by a collection that returned fifty posts from
+it.
 
-Two tickets are in `doing/`.
+Three tickets are in `doing/`.
 [US-001](backlog/doing/US-001-the-workspace-runs-with-one-command.md) waits on
 the first CI run, which needs a remote this repository does not have.
 [US-010](backlog/doing/US-010-a-monitor-is-created-from-four-answers.md) waits
 on a connection-testing screen; see below.
+[US-022](backlog/doing/US-022-a-real-match-reaches-the-inbox.md) ran the whole
+path on 2026-09-05 and has two boxes open: four of the five recorded subreddit
+names are unverified, and the run's `api_usage` rows have not been compared
+against Bright Data's own figure.
 
 US-007 and
 [BUG-001](backlog/done/2026-09/BUG-001-a-pending-reddit-collection-is-not-resumed.md)
@@ -102,22 +113,24 @@ form through the DOM. One acceptance box stays open: credentials are present
 or missing, but are not validated with the provider. The ticket's Notes keep
 that open for a connection-testing screen on purpose.
 
-**The inbox has never shown a real match.** US-011 closed on 2026-09-05
-against seeded rows and stubbed responses. No match in this product has been
-produced by a live classification and then read on the screen, because the
-live run stored posts and never scored them with a real model. What is proven
-is that the list renders what the database holds, and the ordering rule —
-score, minus twelve points for every day since the post — measured at 12.7 ms
-for a first page over 5,000 matches. What is not proven is that the reasons
-read well to a person.
+**The inbox has shown real matches.** On 2026-09-05 US-022 carried one
+monitor from the form to twenty matches, scored by a live model and read on the
+screen. The top one scored 71: a QA lead joining a company with no automation,
+who asks what to prioritise from day one. The reasons are specific to the post
+and a person can act on them. US-011's other measurement stands: the ordering
+rule — score, minus twelve points for every day since the post — at 12.7 ms for
+a first page over 5,000 matches.
 
-**No verdict has been given on a real match either.** US-012's rows, history,
-counts and export are asserted against real Postgres, and thirteen deliberate
-mutations were confirmed to turn the suite red. But every verdict so far was
-given against a seeded row, so nobody has yet pressed "not relevant" on a
-reason a model actually wrote. The verdicts are also collected and not used:
-feeding them back into the classifier is a separate ticket that is not written,
-because a learning loop with nothing to learn from is speculation.
+**Five verdicts have been given on real matches.** On 2026-09-05 a person
+read five of US-022's matches and answered: good at 71 and 59, not relevant at
+53, 52 and 50, every one against version 1. The verdicts do not follow the
+scores. The three refused posts ask how to learn test automation, which is a
+career question and not a buyer, and the classifier scored them like the two
+that were kept. **Five verdicts on one monitor is not a distribution**, and the
+score is not yet shown to be wrong — it is shown to be untested. The verdicts
+are still collected and not used: feeding them back into the classifier is a
+separate ticket that is not written, because a learning loop with nothing to
+learn from is speculation.
 
 One rule from that ticket is easy to get wrong later. `monitors.version` counts
 edits to the four fields `ai/prompt.ts` puts in the system prompt — the
@@ -125,11 +138,14 @@ product, the ideal customer, the problem and the signals — and nothing else. I
 is the version a verdict was given against. A rename, an edited query or a
 moved threshold must not move it.
 
-**The Reddit connector has collected once, live.** On 2026-09-05 a monitor
-with one keyword triggered a collection, waited through fourteen resumes over
-7.6 minutes, and stored forty-nine real posts. The trigger, the wait, the
-cursor, the snapshot read and the storage are proven against the provider. A
-real DNS failure hit a poll job in the same run, and the retry recovered it.
+**The Reddit connector has collected twice, live, and both discovery modes
+are proven.** On 2026-09-05 a monitor with one keyword triggered a collection,
+waited through fourteen resumes over 7.6 minutes, and stored forty-nine real
+posts. A real DNS failure hit a poll job in that run, and the retry recovered
+it. Later the same day US-022 collected one subreddit: fifty records for
+$0.075, with the snapshot ready after 8 minutes 40 seconds. The trigger, the
+wait, the cursor, the snapshot read and the storage are proven for the keyword
+phase and the subreddit phase alike.
 
 Three things are still unproven: an expired snapshot, a collection the provider
 reports as failed, and a rate limit. The X connector has never run at all.
@@ -142,7 +158,26 @@ into a limit; US-014 turned the other half into arithmetic — polls a month is
 the multiplier, so the same query costs $10.80 a month polled hourly and $648
 polled every minute.
 
-**The budget guard has never refused a real poll.** US-013's arithmetic, its
+**Keyword discovery returns noise. A subreddit does not.** On 2026-09-05
+US-022 collected the same monitor both ways, for the same $0.075. The model's
+own keyword, "end to end tests keep breaking", brought back "failed both exams
+and don't know what to do" from r/AllFinraExams and "A never ending test" from
+r/islam: Bright Data matched "test" and "end" as ordinary words. One subreddit,
+r/softwaretesting, brought back fifty posts that are all on topic. The
+forty-nine posts the earlier keyword run stored are the same noise, and so are
+the four matches they produced.
+
+Two numbers came with that. A `min_score` of 30 is too low for a subreddit:
+"Dev memes" scored 33 and reached the inbox, because inside a topical subreddit
+every post is somewhat relevant and the scores compress upward. At 50 the same
+poll leaves nine matches and all nine are real. And the pre-filter dropped one
+post of fifty, because it was built for keyword noise — with subreddit
+discovery every collected post costs a model call, and that belongs in any
+arithmetic shown to a person.
+
+**The budget guard has never refused a real poll.** It has now allowed one
+and counted it: US-022's poll ran under a $0.20 cap and recorded $0.075 against
+it. Refusing is the half that no live run has reached. US-013's arithmetic, its
 cap and its two exhausted behaviours are asserted against real Postgres and a
 fake connector, and six deliberate mutations were confirmed to turn the suite
 red. What no test can prove is the input: the guard multiplies the units a
@@ -163,8 +198,8 @@ bounds the overshoot. US-014 does not remove it and was never going to: what
 the cost test changes is that a person is shown the size of the thing before
 they start it.
 
-**The cost test has run once, and the run corrected it.** On 2026-09-05 three
-samples were collected live for $0.042. The trigger, the wait, the cursor, the
+**The cost test has run three times, and the first run corrected it.** On
+2026-09-05 three samples were collected live for $0.042. The trigger, the wait, the cursor, the
 resume and the unattributed `api_usage` row all worked. The arithmetic did not:
 it projected from the posts a sample kept, and the provider bills the records
 it collects. A query that had just cost ten records was reported as free.
@@ -180,6 +215,12 @@ A second run, after BUG-002 was fixed, verified the window: the same keyword
 kept all ten posts inside seven days, where it had kept none. What is still
 unproven is that a keyword sample of ten predicts a keyword poll of fifty. The
 range is an admission of that, not a measurement of it.
+
+A third run, in US-022, billed ten records for $0.015 and projected $10.80 to
+$54.00 a month for one keyword polled hourly, which is over a $0.20 cap, so the
+form offered to save the plan without starting it. **The three live tests took
+1 minute 41 seconds, 8 minutes 8 seconds and 2 minutes 45 seconds**, so the
+screen's "about two minutes" is the fastest case and not the normal one.
 
 ---
 

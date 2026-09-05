@@ -434,6 +434,50 @@ describe("the monitor routes", () => {
       });
     });
 
+    it("leaves alone every field the edit does not carry", async () => {
+      // The pre-filter form on the monitor list sends `preFilter` and nothing
+      // else, which is what a screen editing one setting should send. A body
+      // schema that fills the absent keys with its own defaults erases the
+      // monitor's definition on the way past: no signals for the prompt, no
+      // source to poll, and a plan that collects nothing.
+      await withServer({}, async (app) => {
+        const id = await create(app);
+
+        const response = await app.inject({
+          method: "PATCH",
+          url: `/api/monitors/${id}`,
+          payload: { preFilter: { similarityThreshold: 0.4 } },
+        });
+
+        expect(response.statusCode).toBe(200);
+
+        const body = response.json();
+        expect(body.signals).toEqual(newMonitor.signals);
+        expect(body.sources).toEqual(newMonitor.sources);
+        expect(body.queries).toEqual(newMonitor.queries);
+        expect(body.subreddits).toEqual(newMonitor.subreddits);
+      });
+    });
+
+    it("does not move the version when only the plan changes", async () => {
+      // `monitors.version` is the definition a verdict was given against. An
+      // edited query changes what is collected, not what a good lead is, so a
+      // verdict already collected still answers the same question.
+      await withServer({}, async (app) => {
+        const id = await create(app);
+        const before = await getMonitor(db, id);
+
+        await app.inject({
+          method: "PATCH",
+          url: `/api/monitors/${id}`,
+          payload: { queries: ["regression testing takes too long"], subreddits: [] },
+        });
+
+        const after = await getMonitor(db, id);
+        expect(after?.version).toBe(before?.version);
+      });
+    });
+
     it("pauses and resumes", async () => {
       await withServer({}, async (app) => {
         const id = await create(app);

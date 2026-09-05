@@ -37,6 +37,9 @@ connections and settings stay out until their own behaviour exists.
 - [x] A post body longer than 80 words is collapsed behind a working read-more
       control
 - [x] An inbox pane without overflow does not reserve or show a scrollbar
+- [x] The IntentWatch wordmark uses the mockup's lime three-dot logo
+- [x] New monitor opens in the mockup's dialog layout over the monitor list
+      and can be dismissed without losing the application shell
 
 ## Notes
 
@@ -68,3 +71,10 @@ connections and settings stay out until their own behaviour exists.
 - 2026-09-05T09:12+08:00 — Removed the stable scrollbar gutter. Each inbox
   pane keeps automatic overflow, so its scrollbar appears only when its own
   content is taller than the pane.
+- 2026-09-05T11:26+08:00 — Replaced the approximate orange bars with the
+  mockup's lime speech-bubble mark and three offset dots. Kept the IntentWatch
+  name. Verified the combined mark and wordmark in the browser.
+- 2026-09-05T11:35+08:00 — Moved the two-stage monitor workflow into the
+  mockup's modal layout over the monitor list. Added the close link, Escape
+  handling and compact progress header. Verified the scrollable dialog at
+  desktop and mobile widths.

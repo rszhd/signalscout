@@ -90,7 +90,18 @@ export function App() {
       </aside>
 
       <main className="app-main">
-        {creating ? <MonitorForm /> : listing ? <Monitors /> : <Inbox />}
+        {creating ? (
+          <>
+            <div className="dialog-underlay" aria-hidden="true" inert>
+              <Monitors />
+            </div>
+            <MonitorForm />
+          </>
+        ) : listing ? (
+          <Monitors />
+        ) : (
+          <Inbox />
+        )}
       </main>
     </div>
   );

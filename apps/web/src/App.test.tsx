@@ -86,6 +86,11 @@ describe("the three screens", () => {
     await go("#/monitors/new");
 
     expect(screen.container.textContent).toContain("What should this monitor find?");
+    const dialog = screen.container.querySelector('[role="dialog"]');
+    expect(dialog?.getAttribute("aria-modal")).toBe("true");
+    expect(dialog?.querySelector('a[href="#/monitors"]')?.getAttribute("aria-label")).toBe(
+      "Close new monitor",
+    );
   });
 
   it("reaches the monitor list from the header, and not the form's route", async () => {
@@ -96,10 +101,13 @@ describe("the three screens", () => {
     await go("#/monitors");
     expect(screen.container.textContent).toContain("No monitors yet");
 
-    // The prefix. A shell that tested the shorter route first would put the
-    // list on the screen when a person asked for the form.
+    expect(screen.container.querySelector('[role="dialog"]')).toBeNull();
+
+    // The new-monitor route intentionally keeps the monitor list behind its
+    // dialog. The dialog itself distinguishes the longer route.
     await go("#/monitors/new");
     expect(screen.container.textContent).toContain("What should this monitor find?");
+    expect(screen.container.querySelector('[role="dialog"]')).not.toBeNull();
   });
 
   it("comes back to the inbox from the header", async () => {
@@ -112,6 +120,19 @@ describe("the three screens", () => {
     await go("#/");
 
     expect(screen.container.textContent).toContain("Intent inbox");
+  });
+
+  it("closes the new monitor dialog with Escape", async () => {
+    globalThis.location.hash = "#/monitors/new";
+    screen = await mount(<App />);
+
+    await act(async () => {
+      globalThis.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
+    });
+    await settle();
+
+    expect(globalThis.location.hash).toBe("#/monitors");
+    expect(screen.container.querySelector('[role="dialog"]')).toBeNull();
   });
 
   it("does not expose mockup routes whose behaviour is not built", async () => {

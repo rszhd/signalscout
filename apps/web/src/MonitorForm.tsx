@@ -94,6 +94,15 @@ export function MonitorForm() {
   const [cap, setCap] = useState("");
   const [onExhausted, setOnExhausted] = useState("pause");
   const [estimate, setEstimate] = useState<EstimateReport | null>(null);
+
+  useEffect(() => {
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") globalThis.location.hash = "#/monitors";
+    };
+
+    globalThis.addEventListener("keydown", closeOnEscape);
+    return () => globalThis.removeEventListener("keydown", closeOnEscape);
+  }, []);
   /** The plan the estimate measured. An edited plan makes the answer stale. */
   const [testedPlan, setTestedPlan] = useState<string | null>(null);
 
@@ -260,477 +269,461 @@ export function MonitorForm() {
   }
 
   return (
-    <div className="page-grid">
-      <aside className="intro-panel">
-        <p className="eyebrow">New monitor</p>
-        <h1>Find the conversations worth joining.</h1>
-        <p className="intro-copy">
-          Tell us what matters. IntentWatch turns your answers into a search plan you can inspect
-          before it runs.
-        </p>
-
-        <ol className="steps" aria-label="Monitor creation progress">
-          <li className={stage === "answers" ? "current" : "done"}>
-            <span className={`step-number ${stage === "answers" ? "active" : "complete"}`}>1</span>
-            <div>
-              <strong>Define the intent</strong>
-              <small>Product, customer, problem and signals</small>
-            </div>
-          </li>
-          <li className={stage === "review" ? "current" : stage === "created" ? "done" : ""}>
-            <span
-              className={`step-number ${stage === "review" ? "active" : stage === "created" ? "complete" : ""}`}
-            >
-              2
+    <div className="monitor-dialog-backdrop">
+      <section
+        aria-label="Create a new monitor"
+        aria-modal="true"
+        className="monitor-dialog"
+        role="dialog"
+      >
+        <a className="monitor-dialog-close" href="#/monitors" aria-label="Close new monitor">
+          ×
+        </a>
+        <header className="monitor-dialog-header">
+          <p className="monitor-dialog-kicker">
+            <span>New monitor</span>
+            <span>
+              {stage === "created" ? "Complete" : `Step ${stage === "answers" ? 1 : 2} of 2`}
             </span>
-            <div>
-              <strong>Review the search plan</strong>
-              <small>Edit every query before it runs</small>
-            </div>
-          </li>
-          <li className={stage === "created" ? "current done" : ""}>
-            <span className={`step-number ${stage === "created" ? "active complete" : ""}`}>3</span>
-            <div>
-              <strong>Start watching</strong>
-              <small>The worker collects on its schedule</small>
-            </div>
-          </li>
-        </ol>
-      </aside>
-
-      <section className="form-card">
-        {optionsState.state === "loading" && (
-          <div className="center-state" role="status">
-            <span className="spinner" aria-hidden="true" />
-            <h2>Loading monitor options</h2>
-            <p>Checking the sources and signals available in this deployment.</p>
+          </p>
+          <div className="monitor-dialog-progress" aria-hidden="true">
+            <i className="active" />
+            <i className={stage === "review" || stage === "created" ? "active" : ""} />
           </div>
-        )}
+        </header>
 
-        {optionsState.state === "error" && (
-          <div className="center-state error-state" role="alert">
-            <span className="state-icon">!</span>
-            <h2>The API did not answer</h2>
-            <p>{optionsState.message}</p>
-            <button className="secondary-button" type="button" onClick={() => location.reload()}>
-              Try again
-            </button>
-          </div>
-        )}
-
-        {options && stage === "answers" && (
-          <form onSubmit={generatePlan}>
-            <div className="card-heading">
-              <p className="step-label">Step 1 of 2</p>
-              <h2>What should this monitor find?</h2>
-              <p>Specific answers produce narrower searches and fewer irrelevant posts.</p>
+        <div className="form-card">
+          {optionsState.state === "loading" && (
+            <div className="center-state" role="status">
+              <span className="spinner" aria-hidden="true" />
+              <h2>Loading monitor options</h2>
+              <p>Checking the sources and signals available in this deployment.</p>
             </div>
+          )}
 
-            <div className="field-stack">
-              <label className="field">
-                <span>Monitor name</span>
-                <small>A short label only you will see.</small>
-                <input
-                  aria-label="Monitor name"
-                  autoComplete="off"
-                  maxLength={80}
-                  placeholder="e.g. Teams replacing manual QA"
-                  required
-                  value={answers.name}
-                  onChange={(event) => setAnswer("name", event.target.value)}
-                />
-              </label>
-
-              <label className="field">
-                <span>What do you sell?</span>
-                <small>Name the product and what it does.</small>
-                <textarea
-                  aria-label="What do you sell?"
-                  maxLength={2000}
-                  minLength={10}
-                  placeholder="A test runner that records browser flows instead of coding them"
-                  required
-                  rows={2}
-                  value={answers.product}
-                  onChange={(event) => setAnswer("product", event.target.value)}
-                />
-              </label>
-
-              <label className="field">
-                <span>Who is most likely to buy it?</span>
-                <small>Describe the team, role or kind of company.</small>
-                <textarea
-                  aria-label="Who is most likely to buy it?"
-                  maxLength={2000}
-                  minLength={10}
-                  placeholder="Small SaaS teams without a dedicated QA engineer"
-                  required
-                  rows={2}
-                  value={answers.idealCustomer}
-                  onChange={(event) => setAnswer("idealCustomer", event.target.value)}
-                />
-              </label>
-
-              <label className="field">
-                <span>What problem does it solve?</span>
-                <small>Use the words a customer might use in a post.</small>
-                <textarea
-                  aria-label="What problem does it solve?"
-                  maxLength={2000}
-                  minLength={10}
-                  placeholder="End-to-end tests break whenever the UI changes"
-                  required
-                  rows={2}
-                  value={answers.problem}
-                  onChange={(event) => setAnswer("problem", event.target.value)}
-                />
-              </label>
-            </div>
-
-            <fieldset className="choice-section">
-              <legend>Which signals matter?</legend>
-              <p>Select the ways a promising conversation might begin.</p>
-              <div className="signal-grid">
-                {options.signals.map((signal) => (
-                  <label className="signal-card" key={signal.id}>
-                    <input
-                      checked={selectedSignals.includes(signal.id)}
-                      name="signals"
-                      type="checkbox"
-                      value={signal.id}
-                      onChange={() => setSelectedSignals(toggle(selectedSignals, signal.id))}
-                    />
-                    <span className="checkmark" aria-hidden="true" />
-                    <span>
-                      <strong>{signal.label}</strong>
-                      <small>{signal.hint}</small>
-                    </span>
-                  </label>
-                ))}
-              </div>
-            </fieldset>
-
-            <fieldset className="choice-section source-section">
-              <legend>Where should it look?</legend>
-              <p>This deployment currently has these source connectors.</p>
-              <div className="source-list">
-                {options.sources.map((source) => (
-                  <label className="source-card" key={source.id}>
-                    <input
-                      checked={selectedSources.includes(source.id)}
-                      type="checkbox"
-                      onChange={() => setSelectedSources(toggle(selectedSources, source.id))}
-                    />
-                    <span className="source-symbol">r/</span>
-                    <span>
-                      <strong>{source.displayName}</strong>
-                      <small>{source.ready ? "Ready to collect" : "Connection required"}</small>
-                    </span>
-                    <span className={`status-dot ${source.ready ? "ready" : "missing"}`}>
-                      {source.ready ? "Ready" : "Not connected"}
-                    </span>
-                  </label>
-                ))}
-              </div>
-            </fieldset>
-
-            {missingCredentials.length > 0 && (
-              <div className="notice warning" role="status">
-                <strong>This monitor will be saved paused.</strong>
-                <span>
-                  Set{" "}
-                  {missingCredentials
-                    .map((credential) => credential.environmentVariable)
-                    .join(" and ")}{" "}
-                  to start collecting. The answers will not be lost.
-                </span>
-              </div>
-            )}
-
-            {!options.canGenerateQueries && (
-              <div className="notice" role="status">
-                <strong>Query generation is unavailable.</strong>
-                <span>
-                  Set AI_API_KEY or use a local Ollama model. You can type the plan yourself now.
-                </span>
-              </div>
-            )}
-
-            {error && (
-              <p className="form-error" role="alert">
-                {error}
-              </p>
-            )}
-
-            <div className="form-actions end">
-              <p>Your answers are stored separately from the search plan.</p>
-              <button className="primary-button" disabled={working !== null} type="submit">
-                {working === "generating"
-                  ? "Generating…"
-                  : options.canGenerateQueries
-                    ? "Generate search plan"
-                    : "Review search plan"}
+          {optionsState.state === "error" && (
+            <div className="center-state error-state" role="alert">
+              <span className="state-icon">!</span>
+              <h2>The API did not answer</h2>
+              <p>{optionsState.message}</p>
+              <button className="secondary-button" type="button" onClick={() => location.reload()}>
+                Try again
               </button>
             </div>
-          </form>
-        )}
+          )}
 
-        {options && stage === "review" && (
-          <form onSubmit={createMonitor}>
-            <div className="card-heading plan-heading">
-              <div>
-                <p className="step-label">Step 2 of 2</p>
-                <h2>Review the search plan</h2>
-                <p>Edit anything that feels too broad. Each query becomes a separate search.</p>
+          {options && stage === "answers" && (
+            <form onSubmit={generatePlan}>
+              <div className="card-heading">
+                <h2>What should this monitor find?</h2>
+                <p>Specific answers produce narrower searches and fewer irrelevant posts.</p>
               </div>
-              {plan.model && (
-                <span className="model-note">
-                  Written by {plan.model}
-                  {priceLabel(plan.estimatedCostMicros) &&
-                    ` · ${priceLabel(plan.estimatedCostMicros)}`}
-                </span>
-              )}
-            </div>
 
-            {!options.canGenerateQueries && (
-              <div className="notice compact">
-                <strong>Write your own plan.</strong>
-                <span>
-                  Use plain phrases of at least two words. Boolean operators are not supported.
-                </span>
+              <div className="field-stack">
+                <label className="field">
+                  <span>Monitor name</span>
+                  <small>A short label only you will see.</small>
+                  <input
+                    aria-label="Monitor name"
+                    autoComplete="off"
+                    maxLength={80}
+                    placeholder="e.g. Teams replacing manual QA"
+                    required
+                    value={answers.name}
+                    onChange={(event) => setAnswer("name", event.target.value)}
+                  />
+                </label>
+
+                <label className="field">
+                  <span>What do you sell?</span>
+                  <small>Name the product and what it does.</small>
+                  <textarea
+                    aria-label="What do you sell?"
+                    maxLength={2000}
+                    minLength={10}
+                    placeholder="A test runner that records browser flows instead of coding them"
+                    required
+                    rows={2}
+                    value={answers.product}
+                    onChange={(event) => setAnswer("product", event.target.value)}
+                  />
+                </label>
+
+                <label className="field">
+                  <span>Who is most likely to buy it?</span>
+                  <small>Describe the team, role or kind of company.</small>
+                  <textarea
+                    aria-label="Who is most likely to buy it?"
+                    maxLength={2000}
+                    minLength={10}
+                    placeholder="Small SaaS teams without a dedicated QA engineer"
+                    required
+                    rows={2}
+                    value={answers.idealCustomer}
+                    onChange={(event) => setAnswer("idealCustomer", event.target.value)}
+                  />
+                </label>
+
+                <label className="field">
+                  <span>What problem does it solve?</span>
+                  <small>Use the words a customer might use in a post.</small>
+                  <textarea
+                    aria-label="What problem does it solve?"
+                    maxLength={2000}
+                    minLength={10}
+                    placeholder="End-to-end tests break whenever the UI changes"
+                    required
+                    rows={2}
+                    value={answers.problem}
+                    onChange={(event) => setAnswer("problem", event.target.value)}
+                  />
+                </label>
               </div>
-            )}
 
-            <section className="plan-section">
-              <div className="section-title-row">
-                <div>
-                  <h3>Search queries</h3>
-                  <p>Plain phrases, without AND, OR or quote syntax.</p>
+              <fieldset className="choice-section">
+                <legend>Which signals matter?</legend>
+                <p>Select the ways a promising conversation might begin.</p>
+                <div className="signal-grid">
+                  {options.signals.map((signal) => (
+                    <label className="signal-card" key={signal.id}>
+                      <input
+                        checked={selectedSignals.includes(signal.id)}
+                        name="signals"
+                        type="checkbox"
+                        value={signal.id}
+                        onChange={() => setSelectedSignals(toggle(selectedSignals, signal.id))}
+                      />
+                      <span className="checkmark" aria-hidden="true" />
+                      <span>
+                        <strong>{signal.label}</strong>
+                        <small>{signal.hint}</small>
+                      </span>
+                    </label>
+                  ))}
                 </div>
-                <span>{cleanList(plan.queries).length} of 8</span>
-              </div>
-              <div className="query-list">
-                {plan.queries.map((query, index) => (
-                  <div className="query-row" key={`query-${index.toString()}`}>
-                    <span className="query-number">{index + 1}</span>
-                    <input
-                      aria-label={`Search query ${index + 1}`}
-                      maxLength={80}
-                      placeholder="A phrase people might search for"
-                      value={query}
-                      onChange={(event) =>
-                        setPlan((current) => ({
-                          ...current,
-                          queries: current.queries.map((item, itemIndex) =>
-                            itemIndex === index ? event.target.value : item,
-                          ),
-                        }))
-                      }
-                    />
-                    <button
-                      aria-label={`Remove query ${index + 1}`}
-                      className="icon-button"
-                      type="button"
-                      onClick={() =>
-                        setPlan((current) => ({
-                          ...current,
-                          queries: current.queries.filter((_, itemIndex) => itemIndex !== index),
-                        }))
-                      }
-                    >
-                      <span aria-hidden="true">×</span>
-                    </button>
-                  </div>
-                ))}
-              </div>
-              {plan.queries.length < 8 && (
-                <button
-                  className="text-button"
-                  type="button"
-                  onClick={() =>
-                    setPlan((current) => ({ ...current, queries: [...current.queries, ""] }))
-                  }
-                >
-                  <span aria-hidden="true">+</span> Add query
+              </fieldset>
+
+              <fieldset className="choice-section source-section">
+                <legend>Where should it look?</legend>
+                <p>This deployment currently has these source connectors.</p>
+                <div className="source-list">
+                  {options.sources.map((source) => (
+                    <label className="source-card" key={source.id}>
+                      <input
+                        checked={selectedSources.includes(source.id)}
+                        type="checkbox"
+                        onChange={() => setSelectedSources(toggle(selectedSources, source.id))}
+                      />
+                      <span className="source-symbol">r/</span>
+                      <span>
+                        <strong>{source.displayName}</strong>
+                        <small>{source.ready ? "Ready to collect" : "Connection required"}</small>
+                      </span>
+                      <span className={`status-dot ${source.ready ? "ready" : "missing"}`}>
+                        {source.ready ? "Ready" : "Not connected"}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+
+              {missingCredentials.length > 0 && (
+                <div className="notice warning" role="status">
+                  <strong>This monitor will be saved paused.</strong>
+                  <span>
+                    Set{" "}
+                    {missingCredentials
+                      .map((credential) => credential.environmentVariable)
+                      .join(" and ")}{" "}
+                    to start collecting. The answers will not be lost.
+                  </span>
+                </div>
+              )}
+
+              {!options.canGenerateQueries && (
+                <div className="notice" role="status">
+                  <strong>Query generation is unavailable.</strong>
+                  <span>
+                    Set AI_API_KEY or use a local Ollama model. You can type the plan yourself now.
+                  </span>
+                </div>
+              )}
+
+              {error && (
+                <p className="form-error" role="alert">
+                  {error}
+                </p>
+              )}
+
+              <div className="form-actions end">
+                <p>Your answers are stored separately from the search plan.</p>
+                <button className="primary-button" disabled={working !== null} type="submit">
+                  {working === "generating"
+                    ? "Generating…"
+                    : options.canGenerateQueries
+                      ? "Generate search plan"
+                      : "Review search plan"}
                 </button>
-              )}
-            </section>
-
-            <section className="plan-section subreddit-section">
-              <div className="section-title-row">
-                <div>
-                  <h3>Suggested subreddits</h3>
-                  <p>Keep the names only. We add the r/ prefix.</p>
-                </div>
-                <span>{cleanList(plan.subreddits).length} of 8</span>
               </div>
-              <div className="subreddit-list">
-                {plan.subreddits.map((subreddit, index) => (
-                  <div className="subreddit-row" key={`subreddit-${index.toString()}`}>
-                    <span>r/</span>
-                    <input
-                      aria-label={`Subreddit ${index + 1}`}
-                      placeholder="SaaS"
-                      value={subreddit}
-                      onChange={(event) =>
-                        setPlan((current) => ({
-                          ...current,
-                          subreddits: current.subreddits.map((item, itemIndex) =>
-                            itemIndex === index ? event.target.value : item,
-                          ),
-                        }))
-                      }
-                    />
-                    <button
-                      aria-label={`Remove subreddit ${index + 1}`}
-                      className="icon-button"
-                      type="button"
-                      onClick={() =>
-                        setPlan((current) => ({
-                          ...current,
-                          subreddits: current.subreddits.filter(
-                            (_, itemIndex) => itemIndex !== index,
-                          ),
-                        }))
-                      }
-                    >
-                      <span aria-hidden="true">×</span>
-                    </button>
-                  </div>
-                ))}
-                {plan.subreddits.length < 8 && (
-                  <button
-                    className="subreddit-add"
-                    type="button"
-                    onClick={() =>
-                      setPlan((current) => ({
-                        ...current,
-                        subreddits: [...current.subreddits, ""],
-                      }))
-                    }
-                  >
-                    + Add subreddit
-                  </button>
+            </form>
+          )}
+
+          {options && stage === "review" && (
+            <form onSubmit={createMonitor}>
+              <div className="card-heading plan-heading">
+                <div>
+                  <h2>Review the search plan</h2>
+                  <p>Edit anything that feels too broad. Each query becomes a separate search.</p>
+                </div>
+                {plan.model && (
+                  <span className="model-note">
+                    Written by {plan.model}
+                    {priceLabel(plan.estimatedCostMicros) &&
+                      ` · ${priceLabel(plan.estimatedCostMicros)}`}
+                  </span>
                 )}
               </div>
-            </section>
 
-            <fieldset className="choice-section budget-section">
-              <legend>How much may it spend a month?</legend>
-              <p>
-                The monitor stops when it reaches this. Leave it empty for no cap; what it spends is
-                recorded either way.
-              </p>
-              <div className="budget-row">
-                <label className="field">
-                  <span>Monthly budget</span>
-                  <div className="amount-input">
-                    <span aria-hidden="true">$</span>
-                    <input
-                      aria-label="Monthly budget"
-                      inputMode="decimal"
-                      placeholder="10.00"
-                      value={cap}
-                      onChange={(event) => setCap(event.target.value)}
-                    />
+              {!options.canGenerateQueries && (
+                <div className="notice compact">
+                  <strong>Write your own plan.</strong>
+                  <span>
+                    Use plain phrases of at least two words. Boolean operators are not supported.
+                  </span>
+                </div>
+              )}
+
+              <section className="plan-section">
+                <div className="section-title-row">
+                  <div>
+                    <h3>Search queries</h3>
+                    <p>Plain phrases, without AND, OR or quote syntax.</p>
                   </div>
-                </label>
-                <label className="field">
-                  <span>When it is reached</span>
-                  <select
-                    aria-label="When it is reached"
-                    value={onExhausted}
-                    onChange={(event) => setOnExhausted(event.target.value)}
+                  <span>{cleanList(plan.queries).length} of 8</span>
+                </div>
+                <div className="query-list">
+                  {plan.queries.map((query, index) => (
+                    <div className="query-row" key={`query-${index.toString()}`}>
+                      <span className="query-number">{index + 1}</span>
+                      <input
+                        aria-label={`Search query ${index + 1}`}
+                        maxLength={80}
+                        placeholder="A phrase people might search for"
+                        value={query}
+                        onChange={(event) =>
+                          setPlan((current) => ({
+                            ...current,
+                            queries: current.queries.map((item, itemIndex) =>
+                              itemIndex === index ? event.target.value : item,
+                            ),
+                          }))
+                        }
+                      />
+                      <button
+                        aria-label={`Remove query ${index + 1}`}
+                        className="icon-button"
+                        type="button"
+                        onClick={() =>
+                          setPlan((current) => ({
+                            ...current,
+                            queries: current.queries.filter((_, itemIndex) => itemIndex !== index),
+                          }))
+                        }
+                      >
+                        <span aria-hidden="true">×</span>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                {plan.queries.length < 8 && (
+                  <button
+                    className="text-button"
+                    type="button"
+                    onClick={() =>
+                      setPlan((current) => ({ ...current, queries: [...current.queries, ""] }))
+                    }
                   >
-                    <option value="pause">Pause the monitor</option>
-                    <option value="notify">Keep it, and start again next month</option>
-                  </select>
-                </label>
-              </div>
-            </fieldset>
+                    <span aria-hidden="true">+</span> Add query
+                  </button>
+                )}
+              </section>
 
-            <CostTest
-              monthlyCapMicros={capMicros}
-              queries={queries}
-              report={estimate}
-              sources={selectedSources}
-              subreddits={subreddits}
-              onReport={takeReport}
-            />
+              <section className="plan-section subreddit-section">
+                <div className="section-title-row">
+                  <div>
+                    <h3>Suggested subreddits</h3>
+                    <p>Keep the names only. We add the r/ prefix.</p>
+                  </div>
+                  <span>{cleanList(plan.subreddits).length} of 8</span>
+                </div>
+                <div className="subreddit-list">
+                  {plan.subreddits.map((subreddit, index) => (
+                    <div className="subreddit-row" key={`subreddit-${index.toString()}`}>
+                      <span>r/</span>
+                      <input
+                        aria-label={`Subreddit ${index + 1}`}
+                        placeholder="SaaS"
+                        value={subreddit}
+                        onChange={(event) =>
+                          setPlan((current) => ({
+                            ...current,
+                            subreddits: current.subreddits.map((item, itemIndex) =>
+                              itemIndex === index ? event.target.value : item,
+                            ),
+                          }))
+                        }
+                      />
+                      <button
+                        aria-label={`Remove subreddit ${index + 1}`}
+                        className="icon-button"
+                        type="button"
+                        onClick={() =>
+                          setPlan((current) => ({
+                            ...current,
+                            subreddits: current.subreddits.filter(
+                              (_, itemIndex) => itemIndex !== index,
+                            ),
+                          }))
+                        }
+                      >
+                        <span aria-hidden="true">×</span>
+                      </button>
+                    </div>
+                  ))}
+                  {plan.subreddits.length < 8 && (
+                    <button
+                      className="subreddit-add"
+                      type="button"
+                      onClick={() =>
+                        setPlan((current) => ({
+                          ...current,
+                          subreddits: [...current.subreddits, ""],
+                        }))
+                      }
+                    >
+                      + Add subreddit
+                    </button>
+                  )}
+                </div>
+              </section>
 
-            {stale && (
-              <div className="notice compact" role="status">
-                <strong>The plan has changed since this test.</strong>
-                <span>Test it again to see what the queries above would cost.</span>
-              </div>
-            )}
+              <fieldset className="choice-section budget-section">
+                <legend>How much may it spend a month?</legend>
+                <p>
+                  The monitor stops when it reaches this. Leave it empty for no cap; what it spends
+                  is recorded either way.
+                </p>
+                <div className="budget-row">
+                  <label className="field">
+                    <span>Monthly budget</span>
+                    <div className="amount-input">
+                      <span aria-hidden="true">$</span>
+                      <input
+                        aria-label="Monthly budget"
+                        inputMode="decimal"
+                        placeholder="10.00"
+                        value={cap}
+                        onChange={(event) => setCap(event.target.value)}
+                      />
+                    </div>
+                  </label>
+                  <label className="field">
+                    <span>When it is reached</span>
+                    <select
+                      aria-label="When it is reached"
+                      value={onExhausted}
+                      onChange={(event) => setOnExhausted(event.target.value)}
+                    >
+                      <option value="pause">Pause the monitor</option>
+                      <option value="notify">Keep it, and start again next month</option>
+                    </select>
+                  </label>
+                </div>
+              </fieldset>
 
-            {missingCredentials.length > 0 && (
-              <div className="notice warning" role="status">
-                <strong>This monitor cannot start yet.</strong>
-                <span>
-                  It will be saved paused until{" "}
-                  {missingCredentials
-                    .map((credential) => credential.environmentVariable)
-                    .join(" and ")}{" "}
-                  is set.
-                </span>
-              </div>
-            )}
+              <CostTest
+                monthlyCapMicros={capMicros}
+                queries={queries}
+                report={estimate}
+                sources={selectedSources}
+                subreddits={subreddits}
+                onReport={takeReport}
+              />
 
-            {error && (
-              <p className="form-error" role="alert">
-                {error}
-              </p>
-            )}
+              {stale && (
+                <div className="notice compact" role="status">
+                  <strong>The plan has changed since this test.</strong>
+                  <span>Test it again to see what the queries above would cost.</span>
+                </div>
+              )}
 
-            <div className="form-actions">
-              <button
-                className="secondary-button"
-                disabled={working !== null}
-                type="button"
-                onClick={() => {
-                  setError(null);
-                  setStage("answers");
-                }}
-              >
-                Back to answers
-              </button>
-              <div className="action-copy">
-                <small>{answers.name}</small>
-                <button className="primary-button" disabled={working !== null} type="submit">
-                  {working === "creating"
-                    ? "Saving…"
-                    : overCap
-                      ? "Save without starting"
-                      : missingCredentials.length > 0
-                        ? "Save monitor paused"
-                        : "Start monitor"}
+              {missingCredentials.length > 0 && (
+                <div className="notice warning" role="status">
+                  <strong>This monitor cannot start yet.</strong>
+                  <span>
+                    It will be saved paused until{" "}
+                    {missingCredentials
+                      .map((credential) => credential.environmentVariable)
+                      .join(" and ")}{" "}
+                    is set.
+                  </span>
+                </div>
+              )}
+
+              {error && (
+                <p className="form-error" role="alert">
+                  {error}
+                </p>
+              )}
+
+              <div className="form-actions">
+                <button
+                  className="secondary-button"
+                  disabled={working !== null}
+                  type="button"
+                  onClick={() => {
+                    setError(null);
+                    setStage("answers");
+                  }}
+                >
+                  Back to answers
                 </button>
+                <div className="action-copy">
+                  <small>{answers.name}</small>
+                  <button className="primary-button" disabled={working !== null} type="submit">
+                    {working === "creating"
+                      ? "Saving…"
+                      : overCap
+                        ? "Save without starting"
+                        : missingCredentials.length > 0
+                          ? "Save monitor paused"
+                          : "Start monitor"}
+                  </button>
+                </div>
               </div>
-            </div>
-          </form>
-        )}
+            </form>
+          )}
 
-        {options && stage === "created" && created && (
-          <div className="center-state success-state" role="status">
-            <span className="success-mark" aria-hidden="true">
-              ✓
-            </span>
-            <p className="eyebrow">Monitor created</p>
-            <h2>
-              {created.name} is {created.paused ? "saved" : "running"}
-            </h2>
-            <p>
-              {created.paused
-                ? `It will stay paused until ${created.missingCredentials.map((credential) => credential.environmentVariable).join(" and ")} is set.`
-                : "IntentWatch will collect the first conversations on the monitor schedule."}
-            </p>
-            <button className="primary-button" type="button" onClick={reset}>
-              Create another monitor
-            </button>
-          </div>
-        )}
+          {options && stage === "created" && created && (
+            <div className="center-state success-state" role="status">
+              <span className="success-mark" aria-hidden="true">
+                ✓
+              </span>
+              <p className="eyebrow">Monitor created</p>
+              <h2>
+                {created.name} is {created.paused ? "saved" : "running"}
+              </h2>
+              <p>
+                {created.paused
+                  ? `It will stay paused until ${created.missingCredentials.map((credential) => credential.environmentVariable).join(" and ")} is set.`
+                  : "IntentWatch will collect the first conversations on the monitor schedule."}
+              </p>
+              <button className="primary-button" type="button" onClick={reset}>
+                Create another monitor
+              </button>
+            </div>
+          )}
+        </div>
       </section>
     </div>
   );

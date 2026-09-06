@@ -407,3 +407,28 @@ join both from our own rows.
   is an operation the capture already performs, so nothing about what they prove
   changed, and re-capturing would have spent ten credits for different posts and
   the same lesson.
+
+- 2026-09-06T12:13+08:00 — The worker pages a thread now. It called
+  `fetchReplies` once and never read `next`, so a video with three thousand
+  comments gave us the newest fifty-one and stopped — recorded as a gap in this
+  Log at 03:52 and closed here.
+
+  The walk ends on whichever comes first, and all three are needed:
+
+  * the connector says `done`;
+  * `maxPagesPerThread`, which is four — a page is 25 comments at
+    ScrapeCreators and 51 at SocialCrawl, so four is 100 to 200 replies from one
+    thread, already more than a person reads;
+  * **a page that came back empty**, which is not redundant. US-020 measured an
+    X thread whose `has_more: true` led to nothing. A cursor is not a promise
+    that anything is behind it, and paging on from silence buys the same silence
+    again.
+
+  A thread stopped by our own bound is recorded `repliesPartial: true` whatever
+  the provider said about the page we stopped on. The provider's answer is about
+  its page; the honest answer is about the thread.
+
+  The fake grew two options for this — `replyPages` and `repliesRunDryAfter` —
+  and the second is shaped from that X measurement rather than imagined. 1,010
+  tests pass.
+

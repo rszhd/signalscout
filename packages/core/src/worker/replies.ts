@@ -53,6 +53,27 @@ import type { Step, StepContext } from "./steps.js";
 export const maxThreadsPerJob = 25;
 
 /**
+ * The most pages one thread may buy in one job.
+ *
+ * Found missing by reading US-034's live YouTube run rather than by the suite:
+ * this step called `fetchReplies` once and never read `next`, so a video with
+ * three thousand comments gave us the newest fifty-one and stopped. The window
+ * above hides that in the quiet case and not in the busy one — a thread where
+ * five hundred comments landed this week returned one page of them, silently.
+ *
+ * Four is a judgement and the shape of the guess is deliberate. A page is 25
+ * comments at ScrapeCreators and 51 at SocialCrawl, so four pages is 100 to 200
+ * replies from one thread, which is already more than a person reads. Against
+ * the 90-day window most threads end well inside it, and the connectors say so:
+ * `next.status === "done"` ends the walk before this number is reached.
+ *
+ * It bounds the damage rather than solving the problem. A thread busier than
+ * this is read in part and recorded as partial, which is the honest answer and
+ * the one `repliesPartial` exists to carry.
+ */
+export const maxPagesPerThread = 4;
+
+/**
  * How far back a reply may be, when nothing else says.
  *
  * A thread outlives the post above it, so `monitors.last_polled_at` is the
@@ -186,6 +207,7 @@ export function createRepliesStep({
     };
     let opened = 0;
     let skipped = 0;
+    let pagesBought = 0;
     let spentUnits = 0;
     const storedReplyIds: string[] = [];
 
@@ -248,55 +270,93 @@ export function createRepliesStep({
         continue;
       }
 
-      const result = await connector.fetchReplies({
-        postUrl: post.url,
-        postExternalId: post.externalId,
-        credentials,
-        since: replyWindow,
-      });
+      /**
+       * One thread, up to `maxPagesPerThread` pages.
+       *
+       * The walk ends on whichever comes first: the connector saying `done`,
+       * the page bound, or a page that returned nothing. The last is not
+       * redundant — US-020 measured an X thread whose `has_more: true` led to
+       * an empty page, so a cursor is not a promise that anything is behind it.
+       */
+      let cursor: string | undefined;
+      let pages = 0;
+      let partial = true;
+
+      while (pages < maxPagesPerThread) {
+        const result = await connector.fetchReplies({
+          postUrl: post.url,
+          postExternalId: post.externalId,
+          credentials,
+          since: replyWindow,
+          ...(cursor ? { cursor } : {}),
+        });
+
+        pages += 1;
+        spentUnits += result.unitsConsumed;
+        partial = result.partial;
+
+        await recordSourceUsage(db, {
+          monitorId,
+          source: post.source as Source,
+          provider: connector.provider.id as Provider,
+          units: result.unitsConsumed,
+          // The pair's own price for a reply page, which is not always the
+          // price of a search. US-028's lesson: a guard fed the wrong unit
+          // price lets a monitor spend a multiple of its cap.
+          pricePerUnitMicros: connector.replyPricePerUnitMicros ?? connector.pricePerUnitMicros,
+        });
+
+        if (result.replies.length > 0) {
+          const stored = await db
+            .insert(posts)
+            .values(
+              result.replies.map((reply) =>
+                toReplyRow(
+                  post.id,
+                  post.source as Source,
+                  connector.provider.id as Provider,
+                  reply,
+                ),
+              ),
+            )
+            .onConflictDoUpdate({
+              target: [posts.source, posts.externalId],
+              // The same rule the poll follows: refreshing the text here would
+              // let a second read resurrect words the author had removed.
+              set: { fetchedAt: sql`now()` },
+            })
+            .returning({ id: posts.id });
+
+          storedReplyIds.push(...stored.map((row) => row.id));
+        }
+
+        if (result.next.status !== "ready") break;
+        // A cursor that led nowhere. Paging on would ask the same question
+        // again and be charged for the same silence.
+        if (result.replies.length === 0) break;
+
+        cursor = result.next.cursor;
+      }
 
       opened += 1;
-      spentUnits += result.unitsConsumed;
-
-      await recordSourceUsage(db, {
-        monitorId,
-        source: post.source as Source,
-        provider: connector.provider.id as Provider,
-        units: result.unitsConsumed,
-        // The pair's own price for a reply page, which is not always the price
-        // of a search. US-028's lesson: a guard fed the wrong unit price lets a
-        // monitor spend a multiple of its cap.
-        pricePerUnitMicros: connector.replyPricePerUnitMicros ?? connector.pricePerUnitMicros,
-      });
+      pagesBought += pages;
 
       /**
        * What was read, and how honestly.
        *
-       * `repliesPartial` is written from the connector's own answer and never
-       * from "we ran out of cursors". A top-level `has_more: false` arrives on
-       * threads that are missing half their comments, so recording that as
-       * "complete" would mean never coming back for the rest.
+       * Written from the last answer the connector gave and never from "we ran
+       * out of cursors" or "we hit our own page bound". A top-level
+       * `has_more: false` arrives on threads missing half their comments, so
+       * recording that as complete would mean never coming back for the rest —
+       * and a thread this job stopped reading is partial whatever the provider
+       * said about the page it stopped on.
        */
-      await db.update(posts).set({ repliesPartial: result.partial }).where(eq(posts.id, post.id));
+      const stoppedEarly = pages >= maxPagesPerThread && partial;
 
-      if (result.replies.length === 0) continue;
-
-      const stored = await db
-        .insert(posts)
-        .values(
-          result.replies.map((reply) =>
-            toReplyRow(post.id, post.source as Source, connector.provider.id as Provider, reply),
-          ),
-        )
-        .onConflictDoUpdate({
-          target: [posts.source, posts.externalId],
-          // The same rule the poll follows: refreshing the text here would let
-          // a second read resurrect words the author had already removed.
-          set: { fetchedAt: sql`now()` },
-        })
-        .returning({ id: posts.id });
-
-      storedReplyIds.push(...stored.map((row) => row.id));
+      await db
+        .update(posts)
+        .set({ repliesPartial: stoppedEarly ? true : partial })
+        .where(eq(posts.id, post.id));
     }
 
     logger.info(
@@ -305,6 +365,7 @@ export function createRepliesStep({
         posts: candidates.length,
         threadsOpened: opened,
         threadsSkipped: skipped,
+        pagesBought,
         replies: storedReplyIds.length,
         since: replyWindow.toISOString(),
         spentUnits,

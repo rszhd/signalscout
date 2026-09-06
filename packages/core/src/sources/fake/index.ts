@@ -90,6 +90,22 @@ export interface FakeSourceOptions {
   /** Units billed for one call to `fetchReplies`. */
   readonly unitsPerReplyCall?: number;
   /**
+   * How many pages one thread serves before it says `done`.
+   *
+   * One by default, which is what every case wanted before US-020 taught this
+   * step to page. Set it above one to drive a caller that must stop somewhere:
+   * a thread that never ends is the shape a page bound exists for.
+   */
+  readonly replyPages?: number;
+  /**
+   * Serve an empty page while still offering another cursor.
+   *
+   * The shape US-020 measured on X: a page of 28 replies reported
+   * `has_more: true`, and following that cursor returned nothing. A cursor is
+   * not a promise that anything is behind it.
+   */
+  readonly repliesRunDryAfter?: number;
+  /**
    * Called with every reply request, so a caller's own arguments can be
    * asserted — the date window most of all, which no returned value shows.
    */
@@ -182,15 +198,40 @@ export function createFakeSource(
             replyCalls.push(request);
             options.onFetchReplies?.(request);
 
-            const replies =
+            const all =
               typeof options.replies === "function"
                 ? options.replies(request.postExternalId)
                 : (options.replies?.[request.postExternalId] ?? []);
 
+            /**
+             * Which page this is, from the cursor the caller handed back.
+             *
+             * The cursor is this fake's own and means nothing outside it,
+             * which is the point: a caller that invented one, or reused a
+             * cursor from another thread, would land on page one and the
+             * assertion about paging would pass while the walk was broken.
+             */
+            const page = request.cursor ? Number(request.cursor.split(":")[1] ?? 0) : 0;
+            const pages = options.replyPages ?? 1;
+            const last = page + 1 >= pages;
+
+            // A distinct reply per page, so a test can tell a real second page
+            // from the same page served twice.
+            const dry =
+              options.repliesRunDryAfter !== undefined && page >= options.repliesRunDryAfter;
+
+            const replies = dry
+              ? []
+              : page === 0
+                ? all
+                : all.map((reply) => ({ ...reply, externalId: `${reply.externalId}-p${page}` }));
+
             return Promise.resolve({
               replies,
               unitsConsumed: options.unitsPerReplyCall ?? 1,
-              next: { status: "done" as const },
+              next: last
+                ? ({ status: "done" } as const)
+                : ({ status: "ready", cursor: `page:${page + 1}` } as const),
               partial: options.repliesPartial ?? true,
             });
           },

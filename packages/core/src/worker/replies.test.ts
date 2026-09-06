@@ -16,6 +16,7 @@ import type { CandidateReply } from "../sources/types.js";
 import { createTestDatabase, type TestDatabase } from "../testing/database.js";
 import type { ClassifyPayload, FilterPayload } from "./queues.js";
 import { repliesQueue } from "./queues.js";
+import { maxPagesPerThread } from "./replies.js";
 import { startWorker, type WorkerHandle } from "./runtime.js";
 import { fakeRegistry, fastRetries, insertMonitor, until } from "./testing.js";
 
@@ -187,6 +188,187 @@ describe("opening a thread", () => {
     // their comments, so this is our own honesty and not the provider's.
     expect(row?.repliesPartial).toBe(true);
   }, 20_000);
+});
+
+/** A worker whose fake serves `pages` pages before it says done. */
+async function workerServing(pages: number, dryAfter?: number) {
+  const database = await createTestDatabase(
+    `worker_replies_p${pages}${dryAfter === undefined ? "" : `d${dryAfter}`}`,
+  );
+  const { db, close } = createDatabase(database.url);
+  const seen: FilterPayload[] = [];
+
+  const worker = await startWorker({
+    databaseUrl: database.url,
+    logger: createLogger({ level: "silent", name: "test" }),
+    registry: fakeRegistry({
+      replies: threadUnder,
+      unitsPerReplyCall: 1,
+      replyPages: pages,
+      ...(dryAfter === undefined ? {} : { repliesRunDryAfter: dryAfter }),
+    }),
+    credentialsFor: () => ({ token: "test-token" }),
+    steps: {
+      filter: async (payload) => {
+        seen.push(payload);
+      },
+      classify: async () => {},
+    },
+    retry: fastRetries,
+    scheduleTicks: false,
+  });
+
+  return {
+    db,
+    seen,
+    async run(monitorId: string, postIds: string[]) {
+      await worker.boss.send(repliesQueue, { monitorId, postIds });
+    },
+    async stop() {
+      await worker.stop();
+      await close();
+      await database.drop();
+    },
+    database,
+  };
+}
+
+/**
+ * Paging one thread, and the bound on it.
+ *
+ * Found missing by reading US-034's live YouTube run rather than by this file:
+ * the step called `fetchReplies` once and never read `next`, so a video with
+ * three thousand comments gave us the newest fifty-one and stopped. The
+ * ninety-day window hides that on a quiet thread and not on a busy one.
+ */
+describe("a thread with more than one page", () => {
+  it("follows the cursor rather than stopping at page one", async () => {
+    const harness = await workerServing(3);
+
+    try {
+      const monitorId = await insertMonitor(harness.database, { includeReplies: true });
+      const [row] = await harness.db
+        .insert(posts)
+        .values({
+          source: "reddit",
+          externalId: "t3_paged",
+          url: "https://www.reddit.com/r/SaaS/comments/paged/",
+          excerpt: "A busy thread.",
+          postedAt,
+          replyCount: 40,
+        })
+        .returning({ id: posts.id });
+
+      await harness.run(monitorId, [row?.id as string]);
+      await until("the replies to reach the filter", () => harness.seen[0]);
+
+      const usage = await harness.db
+        .select()
+        .from(apiUsage)
+        .where(eq(apiUsage.monitorId, monitorId));
+
+      // Three pages, three credits, and every page's replies stored.
+      expect(usage[0]?.units).toBe(3);
+      expect(
+        (
+          await harness.db
+            .select()
+            .from(posts)
+            .where(and(eq(posts.kind, "reply"), eq(posts.parentPostId, row?.id as string)))
+        ).length,
+      ).toBe(6);
+    } finally {
+      await harness.stop();
+    }
+  }, 60_000);
+
+  /**
+   * A thread that never ends is the shape this bound exists for. Without it a
+   * busy video would page until the monitor's whole cap was gone.
+   */
+  it("stops at the page bound and records the thread as partly read", async () => {
+    const harness = await workerServing(50);
+
+    try {
+      const monitorId = await insertMonitor(harness.database, { includeReplies: true });
+      const [row] = await harness.db
+        .insert(posts)
+        .values({
+          source: "reddit",
+          externalId: "t3_endless",
+          url: "https://www.reddit.com/r/SaaS/comments/endless/",
+          excerpt: "A thread with no end.",
+          postedAt,
+          replyCount: 5_000,
+        })
+        .returning({ id: posts.id });
+
+      await harness.run(monitorId, [row?.id as string]);
+      await until("the replies to reach the filter", () => harness.seen[0]);
+
+      const usage = await harness.db
+        .select()
+        .from(apiUsage)
+        .where(eq(apiUsage.monitorId, monitorId));
+
+      expect(usage[0]?.units).toBe(maxPagesPerThread);
+
+      // Stopped by our own bound, so it is partly read whatever the provider
+      // said about the page we stopped on. Recording it complete would mean
+      // never coming back.
+      const [post] = await harness.db
+        .select()
+        .from(posts)
+        .where(eq(posts.id, row?.id as string));
+
+      expect(post?.repliesPartial).toBe(true);
+    } finally {
+      await harness.stop();
+    }
+  }, 60_000);
+});
+
+/**
+ * A cursor that leads nowhere, which is measured rather than imagined.
+ *
+ * US-020 asked SocialCrawl for an X thread: 28 replies, `has_more: true`, and
+ * the cursor returned zero items. It was refunded, so trusting the flag cost a
+ * round trip and no money — but paging on from an empty page would ask the same
+ * question again and be charged for the same silence.
+ */
+describe("a cursor with nothing behind it", () => {
+  it("stops on the first empty page rather than paging into silence", async () => {
+    const harness = await workerServing(50, 1);
+
+    try {
+      const monitorId = await insertMonitor(harness.database, { includeReplies: true });
+      const [row] = await harness.db
+        .insert(posts)
+        .values({
+          source: "reddit",
+          externalId: "t3_dry",
+          url: "https://www.reddit.com/r/SaaS/comments/dry/",
+          excerpt: "A thread that promises more than it has.",
+          postedAt,
+          replyCount: 40,
+        })
+        .returning({ id: posts.id });
+
+      await harness.run(monitorId, [row?.id as string]);
+      await until("the replies to reach the filter", () => harness.seen[0]);
+
+      const usage = await harness.db
+        .select()
+        .from(apiUsage)
+        .where(eq(apiUsage.monitorId, monitorId));
+
+      // Page one had replies, page two was empty and ended the walk. Not the
+      // four the bound would have allowed.
+      expect(usage[0]?.units).toBe(2);
+    } finally {
+      await harness.stop();
+    }
+  }, 60_000);
 });
 
 describe("what is never bought", () => {

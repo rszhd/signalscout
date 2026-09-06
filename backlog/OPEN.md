@@ -2,7 +2,7 @@
 
 # Open tickets
 
-20 open — 6 doing, 13 todo, 1 parked (5 p1, 13 p2, 2 p3).
+19 open — 6 doing, 12 todo, 1 parked (5 p1, 12 p2, 2 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -23,7 +23,6 @@
 | p2 | US-042 | [A search without a monitor](todo/US-042-a-search-without-a-monitor.md) | feature | todo | 2026-09-06T12:35+08:00 |
 | p2 | US-045 | [A project holds what every monitor repeats](todo/US-045-a-project-holds-what-every-monitor-repeats.md) | feature | todo | 2026-09-06T13:42+08:00 |
 | p2 | US-046 | [A reply is posted from the inbox](todo/US-046-a-reply-is-posted-from-the-inbox.md) | feature | todo | 2026-09-06T15:12+08:00 |
-| p2 | US-047 | [Every comment link is opened once](todo/US-047-every-comment-link-is-opened-once.md) | chore | todo | 2026-09-06T15:32+08:00 |
 | p3 | US-018 | [A mutation sweep proves the suite is sensitive](todo/US-018-a-mutation-sweep-proves-the-suite-is-sensitive.md) | chore | todo | 2026-09-04T22:54+08:00 |
 | p3 | US-038 | [Instagram, TikTok and Threads](parked/US-038-instagram-tiktok-and-threads.md) | feature | parked | 2026-09-06T11:56+08:00 |
 

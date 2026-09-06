@@ -221,6 +221,19 @@ scored correctly with English reasons — the first non-English classification
 this product has made. And below about 60 the matches become "where do you buy
 it", which is purchase intent for somebody else's product.
 
+**Every comment link has been pressed, and one of the four was wrong.** US-047
+opened one comment link per platform on 2026-09-06, in a signed-in browser.
+
+| Platform | Where the link comes from | Result |
+|---|---|---|
+| Reddit | the provider returns it | opens the comment |
+| X | the provider returns it, a `status` URL | opens the reply |
+| YouTube | **we build** `&lc=` | opens it **highlighted** |
+| TikTok | **we build** `?cid=` | opens the comment |
+
+The two we build are the two worth watching, and TikTok's was broken until that
+day. Signed-out behaviour is untested on all four.
+
 **A TikTok comment does have a link, and it is `?cid=`** — the decimal comment
 id in URL-safe base64 with the padding stripped, which is the format TikTok
 puts in its own comment notification. The connector shipped `?comment_id=`
@@ -372,6 +385,16 @@ dropped none of the forty: they all came back from a search for those words, so
 every one bought a model call — the same cost fact US-022 measured on a
 subreddit. Two matches came out, at 66 and 53, both people asking whether
 something handles flaky tests.
+
+**An X thread with no replies is not free, and it does not answer empty.**
+Measured on 2026-09-06: `/v1/twitter/tweet/replies` on a post with 28 replies
+returns 28 correct ones, and on a post with none it returns **one unrelated
+recent post** — a different one each call — for one credit, with a cursor
+inviting more. The item's `post_id` is its own id, which is the signature of a
+top-level post rather than a comment. The refund this file records for X
+*search* is a property of that endpoint and does not travel here. BUG-007 is
+the parser's defence: a comment whose `post_id` is not the post asked about is
+dropped.
 
 Still unproven for this connector: a real rate limit, a real timeout, a real
 outage, and a second poll proving deduplication on X.

@@ -39,15 +39,36 @@ and TikTok fixtures — so a comment whose `post_id` disagrees with the post we
 asked about is dropped. A comment that omits the field is kept: absence is not
 disagreement, and no captured page has shown one.
 
-**What this does not explain is why the provider returned it.** The request was
-correct — `/v1/twitter/tweet/replies?url=<the post>` — and the answer was not.
-The post may genuinely have no replies, with the endpoint falling back to
-something else rather than returning an empty list. That is the third
-completeness or correctness claim from this provider to be wrong, after X's
-`has_more: true` leading to an empty page and ScrapeCreators' Reddit
-`has_more: false` with 33 comments missing. Our half is now defensive; the
-provider's half is unexplained and is worth one more probe before X replies are
-trusted at volume.
+**Why the provider did it is now measured, and it is a billing fact as much as
+a correctness one.** Two posts were probed against the same endpoint:
+
+| Thread | Items | `post_id` | `parent_id` | Credits |
+|---|---|---|---|---|
+| has replies | 28 | the post asked for | the post asked for | 1 |
+| has none | 1 | **the item's own id** | absent | **1** |
+
+So `/v1/twitter/tweet/replies` does not answer an empty thread with an empty
+list. It returns **one unrelated recent post** — a different one on each call,
+hair care and then a knowledge-business pitch — and bills a credit for it. The
+signature is unmistakable once looked for: `post_id` equal to the item's own
+id means the item is a top-level post whose parent is itself, which is not a
+comment by any reading.
+
+Two consequences beyond this fix. **An empty X thread is not free**, which
+contradicts the refund this repository has measured twice on X *search* and
+recorded in AGENTS.md — that refund is a property of the search endpoint and
+does not travel to this one. And the answer carried `next.status: "ready"`
+with `partial: true`, so a caller that trusts the cursor pages on through
+nothing; `maxPagesPerThread` bounds that at four credits per empty thread.
+
+This is the fourth completeness or correctness claim from a provider to be
+wrong here, after X search's `has_more: true` leading to an empty page,
+ScrapeCreators' Reddit `has_more: false` with 33 comments missing, and
+YouTube's two flags lying in opposite directions.
+
+The same run proved the fix does not overreach: all 28 genuine replies under
+the busy post pass the check, each with the reply author's own handle in the
+URL the provider supplies.
 
 **One test in `x.test.ts` had to be corrected as part of this**, and the reason
 is worth keeping. It refused a comment with a missing field while passing
@@ -72,7 +93,7 @@ is the same "green for the wrong reason" trap this session already hit once.
       none orphaned — but that proves the foreign key, not the parentage.
       Closing this means re-fetching a sample of threads and comparing, which
       costs credits, or accepting the rows as they are
-- [ ] One more probe says why `/twitter/tweet/replies` answered a post with a
+- [x] One more probe says why `/twitter/tweet/replies` answered a post with a
       non-reply — whether an empty thread falls back to something else, and
       whether it bills for it
 
@@ -99,3 +120,14 @@ is the same "green for the wrong reason" trap this session already hit once.
   URL; what was wrong was that the thing it pointed at was not a reply. Fixed
   in the parser, with the live probe re-run as evidence: same post, same
   request, and the stray item is now dropped.
+
+- 2026-09-06T15:52+08:00 — The provider's half is answered. An X thread with no
+  replies returns one unrelated top-level post, different every call, billed at
+  one credit, with a cursor that invites paging. A thread with 28 replies
+  returns 28 correct ones. So the endpoint has no empty answer, and the
+  `post_id` check is what separates the two — it is not a guard against a rare
+  glitch but against this endpoint's normal behaviour on a quiet thread.
+
+  It also produced what US-047's last box needs: 28 real reply URLs, each
+  carrying its own author's handle, supplied by the provider rather than built
+  by us. Pressing one is still that ticket's box and not this one's.

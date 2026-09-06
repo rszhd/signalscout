@@ -6,7 +6,7 @@ priority: p2
 created: 2026-09-06T15:32+08:00
 parent: US-020
 area:
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -20,15 +20,15 @@ turned out to be `?cid=`, which TikTok puts in its own comment notification,
 and it was confirmed by building one from a comment the pipeline had collected
 and opening it.
 
-Three platforms are now confirmed by a person pressing the button, including
-the one built exactly the way the broken one was. One is left.
+All four are now confirmed by a person pressing the button, including the one
+built exactly the way the broken one was.
 
 | Platform | Where the link comes from | Opened? |
 |---|---|---|
 | Reddit | the provider returns it | yes, 2026-09-06 |
 | TikTok | we build `?cid=`, TikTok's own format | yes, 2026-09-06 |
 | YouTube | we build `&lc=`, YouTube's own format | yes, 2026-09-06 |
-| X | the provider returns it, a `status` URL | **no** |
+| X | the provider returns it, a `status` URL | yes, 2026-09-06 |
 
 **YouTube is confirmed and it was the one at risk**, because it is the same
 shape as the mistake: a parameter this repository appends to a watch URL. It
@@ -62,22 +62,21 @@ found here is a one-line change plus the truth on the screen, not a redesign.
 - [x] A YouTube comment link is opened by a person and the Log says whether it
       landed on the comment. Use a stored one rather than a hand-made URL, so
       what is tested is what the pipeline produces
-- [ ] An X reply link is opened by a person, same rule. This one needs a live
-      `fetchReplies` first, because no X reply has ever been stored — about one
-      credit, $0.008
-- [ ] Any link that does not reach its comment is either replaced with the
+- [x] An X reply link is opened by a person, same rule. This one needed a live
+      `fetchReplies` first, because no X reply had ever been stored
+- [x] Any link that does not reach its comment is either replaced with the
       platform's own format — read off the platform, not remembered — or the
       platform is marked `commentLink: "thread"` so the screen stops promising
       it
-- [ ] A replacement format is pinned in the connector's tests against a string
+- [x] A replacement format is pinned in the connector's tests against a string
       the platform itself produced, written out as a literal. `tiktok.test.ts`
       is the pattern: a test that encodes and decodes with the same function
       proves our arithmetic and nothing about the platform
-- [ ] Stored rows are backfilled if a format changes, and the backfilled URL is
+- [x] Stored rows are backfilled if a format changes, and the backfilled URL is
       compared against the one that was opened
-- [ ] AGENTS.md records, per platform, where the comment link comes from and
+- [x] AGENTS.md records, per platform, where the comment link comes from and
       whether anyone has opened one
-- [ ] The Log says whether each link was opened signed in or signed out.
+- [x] The Log says whether each link was opened signed in or signed out.
       TikTok's `?cid=` is confirmed signed in only, and a link that needs a
       session is a different promise from one that does not
 
@@ -122,3 +121,38 @@ found here is a one-line change plus the truth on the screen, not a redesign.
 
   The link check itself is still open. No X reply link has been pressed,
   because the one item this probe found was not an X reply.
+
+- 2026-09-06T15:52+08:00 — A real X reply link exists to press at last, and
+  getting one took [BUG-007](BUG-007-a-comment-is-stored-under-a-post-it-is-not-under.md)
+  being understood first. The earlier probe had asked a post with no replies,
+  and that endpoint answers such a post with an unrelated top-level post rather
+  than with nothing. A post with 28 replies returns 28 real ones:
+
+      https://x.com/m13v_/status/2066217164928077884
+
+  The URL is the provider's, not ours, and it carries the reply author's own
+  handle rather than the parent author's — which was the other thing the first
+  probe left ambiguous.
+
+- 2026-09-06T15:55+08:00 — **All four confirmed.** The X link was opened and it
+  reaches the reply. Every platform this product reads comments from now has a
+  comment link a person has pressed:
+
+  | Platform | Built by | Confirmed |
+  |---|---|---|
+  | Reddit | the provider | yes |
+  | X | the provider | yes |
+  | YouTube | us, `&lc=` | yes, renders the comment highlighted |
+  | TikTok | us, `?cid=` | yes |
+
+  All four were opened in a signed-in browser. Nobody has tried one signed out,
+  and that is the one thing this ticket leaves unproven rather than unanswered.
+
+  The ticket cost more than it was meant to and returned more. It was written
+  to press two buttons. It found that the TikTok link was broken and what the
+  real format was, that YouTube's is not merely tolerated but understood, and —
+  through the X probe — [BUG-007](BUG-007-a-comment-is-stored-under-a-post-it-is-not-under.md),
+  which is the larger finding of the two: comments were being attributed to
+  posts they were not under.
+
+  `x-reply-link-probe.ts` stays until BUG-007's last box closes, then goes.

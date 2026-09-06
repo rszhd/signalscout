@@ -39,10 +39,25 @@ if (!externalId) {
 
 // Print the request, so a wrong answer can be told from a wrong question.
 const originalFetch = globalThis.fetch;
-globalThis.fetch = ((input: Parameters<typeof fetch>[0], init?: RequestInit) => {
+globalThis.fetch = (async (input: Parameters<typeof fetch>[0], init?: RequestInit) => {
   console.log(`request: ${String(input)}`);
-  return originalFetch(input, init);
+
+  const response = await originalFetch(input, init);
+  const body = await response.clone().text();
+
+  try {
+    const parsed = JSON.parse(body) as { data?: { items?: unknown[]; total?: unknown } };
+    raw.push(...(parsed.data?.items ?? []));
+    console.log(`answer says total: ${String(parsed.data?.total ?? "(absent)")}`);
+  } catch {
+    console.log("the answer was not JSON");
+  }
+
+  return response;
 }) as typeof fetch;
+
+/** Every item the page carried, before the parser judged any of it. */
+const raw: unknown[] = [];
 
 const source = new SocialCrawlXSource(
   createSourceRuntime({ logger: createLogger({ level: "warn", name: "probe" }) }),
@@ -56,6 +71,35 @@ const result = await source.fetchReplies({
 
 console.log(`replies: ${result.replies.length}, credits: ${result.unitsConsumed}`);
 console.log(`next: ${result.next.status}, partial: ${result.partial}`);
+console.log("");
+
+/**
+ * What the parser dropped, and why.
+ *
+ * BUG-007's open box. The parser now refuses a comment whose `post_id` is not
+ * the post asked about, and a refusal that leaves no trace cannot say whether
+ * the endpoint returned nothing or returned the wrong thing. Those are
+ * different provider behaviours and only one of them is our problem.
+ */
+console.log(`raw items on the page: ${raw.length}`);
+
+for (const item of raw) {
+  const comment = (item as { comment?: Record<string, unknown> }).comment ?? item;
+  const record = comment as Record<string, unknown>;
+  const belongs = String(record.post_id ?? "");
+
+  console.log(
+    `  id ${String(record.id)} post_id ${belongs || "(absent)"} ` +
+      `parent_id ${String(record.parent_id ?? "(absent)")} ` +
+      `${belongs === externalId ? "— under the post asked for" : "— NOT under it"}`,
+  );
+  console.log(
+    `     ${String(record.text ?? "")
+      .replace(/\s+/g, " ")
+      .slice(0, 80)}`,
+  );
+}
+
 console.log("");
 
 for (const reply of result.replies.slice(0, 5)) {

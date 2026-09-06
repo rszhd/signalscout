@@ -521,6 +521,22 @@ export const posts = pgTable(
      * False may be written only from positive evidence that the thread ended.
      */
     repliesPartial: boolean("replies_partial"),
+    /**
+     * When this thread was last read, which is the window the next read uses.
+     *
+     * BUG-006. The window belonged to the monitor before this column existed,
+     * and `monitors.last_polled_at` is set by the collect step of the same
+     * poll — so the replies step that ran four minutes later asked every
+     * provider for comments written after the poll had already started, and
+     * every comment ever written was older than that. A live TikTok run bought
+     * twenty-five threads and stored nothing.
+     *
+     * A thread is not a poll. It outlives the post above it and we may meet it
+     * for the first time on any poll, so the mark that says how much of it we
+     * have read has to sit on the post. Null means never read, and the default
+     * window applies.
+     */
+    repliesReadAt: timestamp("replies_read_at", { withTimezone: true }),
   },
   (table) => [
     unique("posts_source_external_id_unique").on(table.source, table.externalId),

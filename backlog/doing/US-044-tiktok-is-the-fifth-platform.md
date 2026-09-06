@@ -235,3 +235,40 @@ they parse.
   non-English comment, which this platform will produce — one captured page of
   49 held French and Spanish at full length.
 
+
+- 2026-09-06T14:10+08:00 — **The first live poll ran, and it found a bug rather
+  than a comment.** A paused monitor for a skincare product — not the QA one,
+  which was the wrong test for this platform — with the single query `best
+  skincare for acne scars` and a $1.00 cap, driven through collect, filter,
+  classify and replies in the real order.
+
+  **60 videos in 6.7 seconds for 2 credits.** The pre-filter kept 33. 25
+  threads were opened, 25 comment pages were bought, and `api_usage` holds one
+  row: 27 units, 219,186 micro-dollars. The whole run took 4 minutes 24
+  seconds, of which the classifier was 2 minutes.
+
+  **Three matches, all videos, none of them comments** — and no comment was
+  even stored. That is BUG-006: the reply window was the later of a ninety-day
+  floor and `monitors.last_polled_at`, and `collect.ts` sets that mark to now
+  in the same poll, so every provider was asked for comments newer than the
+  moment the poll began. One of the 25 threads was re-read by hand afterwards:
+  8 comments, written January to July 2026, one of them inside the correct
+  window. The step was working exactly as written and could never have stored
+  anything.
+
+  So the claim this integration rests on is still untested. What the run does
+  prove is the rest of the path: search, price, dedupe against an empty table,
+  triage, classification, and a comment page bought and parsed.
+
+  **The three video matches are people, not vendors, which the capture did not
+  predict.** At 70, a person describing their own body acne and post-acne
+  marks, mid-routine, asking viewers what they have tried. At 64, "What routine
+  should I build next?" with five brands tagged. At 50, a person reviewing
+  every dark-spot serum they have tried and asking for a recommendation because
+  none of them worked. All three name products they have already bought.
+
+  That is the correction to this ticket's first conclusion recorded in full.
+  The captured `flaky tests` thread said a TikTok comment cannot carry a lead;
+  what it actually measured is that a QA product has no audience here. A
+  consumer monitor finds people on this platform, and finds them in the
+  captions — which is the opposite of the shape predicted for it.

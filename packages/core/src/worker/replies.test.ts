@@ -496,6 +496,79 @@ describe("what is never bought", () => {
     expect(days).toBeLessThan(95);
   }, 20_000);
 
+  /**
+   * BUG-006, and the live run that found it.
+   *
+   * The window used to be the later of the default and the monitor's poll
+   * mark. `collect.ts` sets that mark to `now()` when a collection finishes,
+   * and the replies step runs after it in the same poll — so every provider
+   * was asked for comments written after the poll had already started. On
+   * 2026-09-06 a TikTok poll opened twenty-five threads, paid for twenty-five
+   * pages, and stored no comment at all.
+   */
+  it("reads a thread it has never read from the default window, however recently the monitor polled", async () => {
+    const monitorId = await insertMonitor(database, {
+      includeReplies: true,
+      lastPolledAt: new Date(),
+    });
+    const postId = await insertPost("t3_polled_just_now", { replyCount: 2 });
+
+    await run(monitorId, [postId]);
+    await until("the replies to reach the filter", () => filtered[0]);
+
+    const since = replyRequests.at(-1)?.since as Date;
+    const days = (Date.now() - since.getTime()) / 86_400_000;
+
+    expect(days).toBeGreaterThan(85);
+
+    // And the replies are stored, which is the half the old assertion missed:
+    // asking the wrong question returned an empty page, not an error.
+    const stored = await db
+      .select()
+      .from(posts)
+      .where(and(eq(posts.parentPostId, postId), eq(posts.kind, "reply")));
+
+    expect(stored).toHaveLength(2);
+  }, 20_000);
+
+  it("narrows the window to this thread's own last read, so the same comments are not bought twice", async () => {
+    const monitorId = await insertMonitor(database, { includeReplies: true });
+    const readAt = new Date("2026-09-05T12:00:00.000Z");
+    const postId = await insertPost("t3_read_before", {
+      replyCount: 2,
+      repliesReadAt: readAt,
+      repliesPartial: true,
+    });
+
+    const seen = replyRequests.length;
+
+    await run(monitorId, [postId]);
+    await until("the thread to be opened", () =>
+      replyRequests.length > seen ? replyRequests.at(-1) : undefined,
+    );
+
+    // The thread's mark, not the ninety-day floor, because it is later.
+    expect(replyRequests.at(-1)?.since?.getTime()).toBe(readAt.getTime());
+  }, 20_000);
+
+  it("writes the mark from before the fetch, so a comment written during the walk is not skipped", async () => {
+    const monitorId = await insertMonitor(database, { includeReplies: true });
+    const postId = await insertPost("t3_marks_itself", { replyCount: 2 });
+    const before = new Date();
+
+    await run(monitorId, [postId]);
+    await until("the replies to reach the filter", () => filtered.at(-1));
+
+    const [row] = await db
+      .select({ readAt: posts.repliesReadAt })
+      .from(posts)
+      .where(eq(posts.id, postId));
+
+    expect(row?.readAt).toBeInstanceOf(Date);
+    expect(row?.readAt?.getTime()).toBeGreaterThanOrEqual(before.getTime());
+    expect(row?.readAt?.getTime()).toBeLessThanOrEqual(Date.now());
+  }, 20_000);
+
   it("never opens a thread under a reply, which is what stops this looping", async () => {
     const monitorId = await insertMonitor(database, { includeReplies: true });
     const parentId = await insertPost("t3_parent_for_reply", { replyCount: 1 });

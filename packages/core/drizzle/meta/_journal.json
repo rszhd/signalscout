@@ -218,6 +218,13 @@
       "when": 1788629149733,
       "tag": "0030_add_tiktok_platform",
       "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1788673704930,
+      "tag": "0031_a_thread_remembers_when_it_was_read",
+      "breakpoints": true
     }
   ]
 }

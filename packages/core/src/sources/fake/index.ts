@@ -220,11 +220,24 @@ export function createFakeSource(
             const dry =
               options.repliesRunDryAfter !== undefined && page >= options.repliesRunDryAfter;
 
-            const replies = dry
+            const page_ = dry
               ? []
               : page === 0
                 ? all
                 : all.map((reply) => ({ ...reply, externalId: `${reply.externalId}-p${page}` }));
+
+            /**
+             * The window, applied the way every real connector applies it.
+             *
+             * BUG-006 is the reason this fake honours it. It used to return
+             * the whole thread whatever it was asked for, so the suite proved
+             * what the caller asked and never what came back — and a live run
+             * bought twenty-five threads whose every comment fell outside the
+             * window the caller had computed wrong.
+             */
+            const replies = request.since
+              ? page_.filter((reply) => reply.postedAt > (request.since as Date))
+              : page_;
 
             return Promise.resolve({
               replies,

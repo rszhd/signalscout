@@ -74,7 +74,7 @@ export const maxThreadsPerJob = 25;
 export const maxPagesPerThread = 4;
 
 /**
- * How far back a reply may be, when nothing else says.
+ * How far back a reply may be, when this thread has never been read.
  *
  * A thread outlives the post above it, so `monitors.last_polled_at` is the
  * wrong window here even when there is one: a video collected today can carry
@@ -86,8 +86,10 @@ export const maxPagesPerThread = 4;
  * Cypress alternative five years ago and has long since chosen one. The mean
  * video in that collection was 655 days old.
  *
- * A monitor's own window narrows this and never widens it: a monitor polled
- * hourly wants what was said this hour, not this quarter.
+ * Only this thread's own last read narrows it. BUG-006 is what happens when
+ * the monitor's poll mark is allowed to: the collect step of the same poll had
+ * already set that mark to now, so every provider was asked for comments
+ * written after the poll started, and no comment on earth is.
  */
 export const defaultReplyWindowDays = 90;
 
@@ -99,6 +101,7 @@ interface Thread {
   readonly url: string;
   readonly replyCount: number | null;
   readonly repliesPartial: boolean | null;
+  readonly repliesReadAt: Date | null;
 }
 
 export function createRepliesStep({
@@ -150,6 +153,7 @@ export function createRepliesStep({
         url: posts.url,
         replyCount: posts.replyCount,
         repliesPartial: posts.repliesPartial,
+        repliesReadAt: posts.repliesReadAt,
       })
       .from(posts)
       // `kind = 'post'` is what stops this looping. A reply has no thread of
@@ -166,15 +170,14 @@ export function createRepliesStep({
      * run and nobody has chosen.
      */
     /**
-     * The window replies are read against.
+     * The oldest a reply may be on a thread nobody has read yet.
      *
-     * The later of the monitor's own poll mark and the default: a monitor
-     * polled hourly wants this hour, and a monitor polled for the first time
-     * still must not be handed a comment from 2015.
+     * Each thread narrows this with its own `repliesReadAt`, below. The
+     * monitor's poll mark is deliberately not consulted: it belongs to the
+     * search, and this step opens threads the search has just met for the
+     * first time.
      */
     const floor = new Date(Date.now() - defaultReplyWindowDays * 86_400_000);
-    const replyWindow =
-      monitor.lastPolledAt && monitor.lastPolledAt > floor ? monitor.lastPolledAt : floor;
 
     const choices = await readProviderChoices(db);
     const sources = new Map<string, SocialSource | undefined>();
@@ -282,12 +285,23 @@ export function createRepliesStep({
       let pages = 0;
       let partial = true;
 
+      /**
+       * This thread's own window, and the mark the next read will use.
+       *
+       * The later of the default and the last time we read this thread. Taken
+       * before the first page rather than after the last, so a comment written
+       * while the walk was running is read on the next pass instead of being
+       * skipped by a mark that had already moved past it.
+       */
+      const readAt = new Date();
+      const since = post.repliesReadAt && post.repliesReadAt > floor ? post.repliesReadAt : floor;
+
       while (pages < maxPagesPerThread) {
         const result = await connector.fetchReplies({
           postUrl: post.url,
           postExternalId: post.externalId,
           credentials,
-          since: replyWindow,
+          since,
           ...(cursor ? { cursor } : {}),
         });
 
@@ -355,7 +369,7 @@ export function createRepliesStep({
 
       await db
         .update(posts)
-        .set({ repliesPartial: stoppedEarly ? true : partial })
+        .set({ repliesPartial: stoppedEarly ? true : partial, repliesReadAt: readAt })
         .where(eq(posts.id, post.id));
     }
 
@@ -367,7 +381,7 @@ export function createRepliesStep({
         threadsSkipped: skipped,
         pagesBought,
         replies: storedReplyIds.length,
-        since: replyWindow.toISOString(),
+        floor: floor.toISOString(),
         spentUnits,
       },
       "replies finished",

@@ -86,8 +86,10 @@ function ConnectionsHeader() {
   return (
     <header className="topbar">
       <div>
-        <p className="eyebrow">Providers</p>
         <h1>Connections</h1>
+        <p className="page-subtitle">
+          Connect your accounts. Choose where conversations come from.
+        </p>
       </div>
     </header>
   );
@@ -192,88 +194,96 @@ function ProviderCard({
   }
 
   return (
-    <li className="monitor-card">
-      <div className="monitor-top">
-        <div className="monitor-identity">
-          <span className="product-icon" aria-hidden="true">
+    <li className="connection-row">
+      <details className="connection-account">
+        <summary className="connection-summary">
+          <span className="connection-avatar" aria-hidden="true">
             {provider.displayName.slice(0, 1).toUpperCase()}
           </span>
-          <div>
-            <h2>{provider.displayName}</h2>
-            <p className="monitor-origin">
-              {provider.platforms.join(", ")} ·{" "}
-              {provider.credentials.length === 1
-                ? "one key"
-                : `${provider.credentials.length} keys`}
-              , tested with the provider before it is saved
-            </p>
-          </div>
-        </div>
-        <span className={`monitor-status ${provider.ready ? "running" : "stopped"}`}>
-          {provider.ready ? "Connected" : "Needs a key"}
-        </span>
-      </div>
-
-      {provider.credentials.map((credential) => (
-        <div key={credential.name} className="connection-field">
-          <label className="field">
-            <span>{credential.label}</span>
-            <small className="connection-origin">{origin(credential)}</small>
-            <input
-              aria-label={`${credential.label} for ${provider.displayName}`}
-              // The browser must not offer this back on another screen, and a
-              // key on a shared screen must not be readable over a shoulder.
-              type="password"
-              autoComplete="off"
-              spellCheck={false}
-              placeholder={
-                credential.configured ? "Paste a new key to replace it" : "Paste the key"
-              }
-              value={typed[credential.name] ?? ""}
-              onChange={(event) =>
-                setTyped((current) => ({ ...current, [credential.name]: event.target.value }))
-              }
-            />
-          </label>
-
-          <p className="connection-hint">
-            Or set <code>{credential.environmentVariable}</code> in this instance's environment and
-            restart.
+          <span className="connection-identity">
+            <strong>{provider.displayName}</strong>
+            <span>{provider.platforms.join(" · ")}</span>
+            {provider.ready && <small>{provider.credentials.map(origin).join(" · ")}</small>}
+          </span>
+          <span className={`connection-status ${provider.ready ? "connected" : "missing"}`}>
+            {provider.ready ? "Connected" : "Not connected"}
+          </span>
+          <span className="connection-expand">
+            {provider.ready ? "Manage" : "Connect"}
+            <span aria-hidden="true">⌄</span>
+          </span>
+        </summary>
+        <div className="connection-editor">
+          <p className="connection-editor-note">
+            {provider.ready
+              ? "Test the current connection or paste a replacement key."
+              : "Paste your provider key to connect this account."}{" "}
+            Keys are tested before saving.
           </p>
+          {provider.credentials.map((credential) => (
+            <div key={credential.name} className="connection-field">
+              <label className="field">
+                <span>{credential.label}</span>
+                <small className="connection-origin">{origin(credential)}</small>
+                <input
+                  aria-label={`${credential.label} for ${provider.displayName}`}
+                  // The browser must not offer this back on another screen, and a
+                  // key on a shared screen must not be readable over a shoulder.
+                  type="password"
+                  autoComplete="off"
+                  spellCheck={false}
+                  disabled={busy}
+                  placeholder={
+                    credential.configured ? "Paste a new key to replace it" : "Paste the key"
+                  }
+                  value={typed[credential.name] ?? ""}
+                  onChange={(event) => {
+                    setAnswer(null);
+                    setTyped((current) => ({ ...current, [credential.name]: event.target.value }));
+                  }}
+                />
+              </label>
 
-          {credential.storedHint && (
+              <p className="connection-hint">
+                Or set <code>{credential.environmentVariable}</code> in this instance's environment
+                and restart.
+              </p>
+
+              {credential.storedHint && (
+                <button
+                  type="button"
+                  className="text-button remove-key"
+                  disabled={busy}
+                  onClick={() => void remove(credential)}
+                >
+                  Remove stored key
+                </button>
+              )}
+            </div>
+          ))}
+
+          <div className="connection-actions">
             <button
               type="button"
-              className="text-button remove-key"
+              className="secondary-button"
               disabled={busy}
-              onClick={() => void remove(credential)}
+              onClick={() => void test()}
             >
-              Remove stored key
+              Test connection
             </button>
-          )}
+            {canStore && (
+              <button
+                type="button"
+                className="primary-button"
+                disabled={busy}
+                onClick={() => void save()}
+              >
+                Save key
+              </button>
+            )}
+          </div>
         </div>
-      ))}
-
-      <div className="monitor-card-actions">
-        <button
-          type="button"
-          className="secondary-button"
-          disabled={busy}
-          onClick={() => void test()}
-        >
-          Test connection
-        </button>
-        {canStore && (
-          <button
-            type="button"
-            className="primary-button"
-            disabled={busy}
-            onClick={() => void save()}
-          >
-            Save key
-          </button>
-        )}
-      </div>
+      </details>
 
       {answer && (
         <p
@@ -335,70 +345,74 @@ function PlatformRow({
   const effective = platform.providers.find((provider) => provider.id === platform.effective);
 
   return (
-    <li className="monitor-card">
-      <div className="monitor-top">
-        <div className="monitor-identity">
-          <span className="product-icon" aria-hidden="true">
+    <li className="connection-row">
+      <details className="platform-connection" open={platform.needsChoice || !!platform.blocker}>
+        <summary className="connection-summary">
+          <span className="connection-avatar" aria-hidden="true">
             {platform.displayName.slice(0, 1).toUpperCase()}
           </span>
-          <div>
-            <h2>{platform.displayName}</h2>
-            <p className="monitor-origin">
-              {effective ? `Fetched by ${effective.displayName}` : "Nothing is fetching this yet"}
-            </p>
-          </div>
-        </div>
-        <span className={`monitor-status ${effective ? "running" : "stopped"}`}>
-          {effective ? "Ready" : platform.needsChoice ? "Choose one" : "Unavailable"}
-        </span>
-      </div>
-
-      <fieldset className="provider-choice">
-        <legend className="visually-hidden">Provider for {platform.displayName}</legend>
-        {platform.providers.map((provider) => (
-          <label
-            className={provider.connected ? "provider-option" : "provider-option unavailable"}
-            key={provider.id}
-          >
-            <input
-              checked={platform.chosen === provider.id}
-              disabled={busy || !provider.connected}
-              name={`provider-for-${platform.id}`}
-              type="radio"
-              onChange={() => void choose(provider.id)}
-            />
+          <span className="connection-identity">
+            <strong>{platform.displayName}</strong>
             <span>
-              <strong>{provider.displayName}</strong>
-              <small>{provider.connected ? "Connected" : "No key here"}</small>
+              {effective ? `Fetched by ${effective.displayName}` : "Nothing is fetching this yet"}
             </span>
-          </label>
-        ))}
-      </fieldset>
+          </span>
+          <span className={`connection-status ${effective ? "connected" : "missing"}`}>
+            {effective ? "Ready" : platform.needsChoice ? "Choose one" : "Unavailable"}
+          </span>
+          <span className="connection-expand">
+            Change<span aria-hidden="true">⌄</span>
+          </span>
+        </summary>
+        <div className="connection-editor">
+          <fieldset className="provider-choice">
+            <legend className="visually-hidden">Provider for {platform.displayName}</legend>
+            {platform.providers.map((provider) => (
+              <label
+                className={provider.connected ? "provider-option" : "provider-option unavailable"}
+                key={provider.id}
+              >
+                <input
+                  checked={platform.chosen === provider.id}
+                  disabled={busy || !provider.connected}
+                  name={`provider-for-${platform.id}`}
+                  type="radio"
+                  onChange={() => void choose(provider.id)}
+                />
+                <span>
+                  <strong>{provider.displayName}</strong>
+                  <small>{provider.connected ? "Connected" : "No key here"}</small>
+                </span>
+              </label>
+            ))}
+          </fieldset>
 
-      {platform.blocker && (
-        <p className="connection-hint" role="status">
-          {platform.blocker}
-        </p>
-      )}
+          {platform.blocker && (
+            <p className="connection-hint" role="status">
+              {platform.blocker}
+            </p>
+          )}
 
-      {platform.chosen && (
-        <button
-          type="button"
-          className="text-button remove-key"
-          disabled={busy}
-          // Not a disconnect. The keys stay; the platform simply goes back to
-          // answering by itself whenever one provider can run.
-          onClick={() => void choose(null)}
-        >
-          Clear this choice
-        </button>
-      )}
+          {platform.chosen && (
+            <button
+              type="button"
+              className="text-button remove-key"
+              disabled={busy}
+              // Not a disconnect. The keys stay; the platform simply goes back to
+              // answering by itself whenever one provider can run.
+              onClick={() => void choose(null)}
+            >
+              Clear this choice
+            </button>
+          )}
 
-      {error && (
-        <p className="budget-error" role="alert">
-          {error}
-        </p>
-      )}
+          {error && (
+            <p className="budget-error" role="alert">
+              {error}
+            </p>
+          )}
+        </div>
+      </details>
     </li>
   );
 }
@@ -443,9 +457,9 @@ export function Connections() {
 
   if (state === "loading") {
     return (
-      <div className="product-page monitors-page">
+      <div className="product-page connections-page">
         <ConnectionsHeader />
-        <div className="center-state page-state">
+        <div className="center-state page-state" role="status">
           <div className="spinner" aria-hidden="true" />
           <p>Reading your connections.</p>
         </div>
@@ -455,9 +469,9 @@ export function Connections() {
 
   if (state === "error" || !view) {
     return (
-      <div className="product-page monitors-page">
+      <div className="product-page connections-page">
         <ConnectionsHeader />
-        <div className="center-state page-state">
+        <div className="center-state page-state" role="alert">
           <h2>The connections could not be loaded</h2>
           <p>{error}</p>
           <button type="button" className="primary-button" onClick={() => void load()}>
@@ -473,52 +487,82 @@ export function Connections() {
   const choosable = view.platforms.filter((platform) => platform.providers.length > 1);
 
   return (
-    <div className="product-page monitors-page">
+    <div className="product-page connections-page">
       <ConnectionsHeader />
 
-      <div className="section-intro">
-        <p>
-          A key is tested with the provider before it is saved, so a monitor never starts on a key
-          that does not work. A saved key is encrypted in this instance's database and is never
-          shown again. You need one account per network, not all of them.
-        </p>
-      </div>
-
-      {!view.canStore && (
-        <div className="notice warning">
-          <span>{view.storeBlocker}</span>
-        </div>
-      )}
-
-      <ul className="monitor-list">
-        {view.providers.map((provider) => (
-          <ProviderCard
-            key={provider.id}
-            provider={provider}
-            canStore={view.canStore}
-            onChanged={replace}
-          />
-        ))}
-      </ul>
-
-      {choosable.length > 0 && (
-        <>
-          <div className="section-intro">
-            <h2>Which provider fetches what</h2>
-            <p>
-              These networks can be fetched by more than one of your accounts. The choice applies to
-              every monitor, and it takes effect on the next collection: a collection already
-              running finishes with the provider that started it.
-            </p>
+      <div className="connections-content">
+        <section className="connections-section" aria-labelledby="accounts-heading">
+          <div className="connections-section-heading">
+            <div>
+              <h2 id="accounts-heading">Provider accounts</h2>
+              <p>
+                One provider account can connect several platforms. Connect only the ones you need.
+              </p>
+            </div>
+            <span>
+              {view.providers.filter((provider) => provider.ready).length} of{" "}
+              {view.providers.length} connected
+            </span>
           </div>
+          {!view.canStore && (
+            <div className="notice warning" role="status">
+              <strong>Key storage needs setup</strong>
+              <span>{view.storeBlocker}</span>
+            </div>
+          )}
 
-          <ul className="monitor-list">
-            {choosable.map((platform) => (
-              <PlatformRow key={platform.id} platform={platform} onChanged={setView} />
+          <ul className="connection-list">
+            {view.providers.map((provider) => (
+              <ProviderCard
+                key={provider.id}
+                provider={provider}
+                canStore={view.canStore}
+                onChanged={replace}
+              />
             ))}
           </ul>
-        </>
-      )}
+
+          {view.providers.length === 0 && (
+            <div className="connections-empty" role="status">
+              <h3>No providers available</h3>
+              <p>This deployment has no provider accounts to configure.</p>
+            </div>
+          )}
+        </section>
+        {choosable.length > 0 && (
+          <section className="connections-section" aria-labelledby="platforms-heading">
+            <div className="connections-section-heading">
+              <div>
+                <h2 id="platforms-heading">Which provider fetches what</h2>
+                <p>
+                  Choose the account each platform uses. Changes apply to every monitor on its next
+                  collection.
+                </p>
+              </div>
+            </div>
+
+            <ul className="connection-list">
+              {choosable.map((platform) => (
+                <PlatformRow key={platform.id} platform={platform} onChanged={setView} />
+              ))}
+            </ul>
+            <p className="connections-footnote">
+              Collections already running finish with the provider that started them.
+            </p>
+          </section>
+        )}
+        <details className="disclosure connections-help">
+          <summary>How keys are stored</summary>
+          <p>
+            Saved keys are encrypted in this instance’s database. Only a masked hint is shown after
+            saving. Environment variables remain supported; each account lists the variable to set.
+          </p>
+          <p>
+            Connecting an account does not start a monitor. Choose platforms and a schedule when you
+            create one.
+          </p>
+        </details>
+      </div>
     </div>
   );
 }

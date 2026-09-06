@@ -61,9 +61,8 @@ preview truncation and mobile reading pane remain page-specific.
 
 ## Migrating the remaining pages
 
-Shared tokens, headers and buttons already apply across the site. Monitors,
-Connections and Notifications still have older page-specific
-layout and styling. Update them one at a time; this foundation does not claim
+Shared tokens, headers and buttons already apply across the site. Monitors
+and Notifications still have older page-specific layout and styling. Update them one at a time; this foundation does not claim
 those pages have been redesigned.
 
 For each page, adopt the shared patterns, replace local neutral colors and
@@ -88,3 +87,16 @@ Each platform's plan expands independently. Invalid queries open their section
 before asking for correction. Schedule, cap and the optional paid sample test
 are together on the final step. A quote for a different schedule or edited
 plan is marked stale. Creation is always an explicit final action.
+
+## Connections
+
+Connections lists provider accounts as compact native disclosures. The closed
+row names the platforms, configuration status and masked key origin. Testing,
+pasting, replacing and removing keys stay inside the account being managed.
+Opening a row makes no API call. Responses remain visible beneath the account
+if its controls are collapsed, and editing a key clears the previous test result.
+
+Platform choices are separate from accounts. Rows with a blocker or an unresolved
+choice start expanded; healthy rows start compact. Keep the server’s provider
+selection rules, environment-key fallback and test-before-save behavior intact.
+`styles/connections.css` owns this page layout and uses the shared theme.

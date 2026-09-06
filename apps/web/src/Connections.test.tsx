@@ -7,6 +7,7 @@
  * can see which key is set, act on it, and tell a wrong key from an
  * unreachable provider — and whether a typed key stays out of the URL.
  */
+import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Connections } from "./Connections.js";
 import { button, field, json, mount, type Screen, settle, setValue } from "./testing.js";
@@ -89,6 +90,11 @@ describe("the connections screen", () => {
     container = screen.container;
   }
 
+  async function openAccount() {
+    const account = container.querySelector<HTMLDetailsElement>(".connection-account");
+    if (!account?.open) await act(async () => account?.querySelector("summary")?.click());
+  }
+
   beforeEach(() => {
     calls = [];
     fetchMock = vi.fn();
@@ -98,6 +104,17 @@ describe("the connections screen", () => {
   afterEach(async () => {
     await screen?.unmount();
     vi.unstubAllGlobals();
+  });
+
+  it("opens one account's controls without testing or saving a key", async () => {
+    await show(connections());
+    const account = container.querySelector<HTMLDetailsElement>(".connection-account");
+    expect(account).not.toBeNull();
+    expect(account?.open).toBe(false);
+    await act(async () => account?.querySelector("summary")?.click());
+    expect(account?.open).toBe(true);
+    expect(field("Bright Data API key for Bright Data").type).toBe("password");
+    expect(calls.map((call) => call.method)).toEqual(["GET"]);
   });
 
   it("names the provider, the platform it unlocks, and the variable behind it", async () => {
@@ -136,6 +153,7 @@ describe("the connections screen", () => {
     );
 
     expect(container.textContent).toContain("••••2d65");
+    await openAccount();
     expect(() => button("Remove stored key")).not.toThrow();
   });
 
@@ -171,11 +189,15 @@ describe("the connections screen", () => {
       "POST /api/connections/brightdata/test": () => json({ valid: true, reason: null }),
     });
 
+    await openAccount();
     setValue(field("Bright Data API key for Bright Data"), "brd_7f3a91c4e08b2d65");
     button("Test connection").click();
     await settle();
 
     expect(container.textContent).toContain("Bright Data accepted this key");
+    setValue(field("Bright Data API key for Bright Data"), "a_different_key");
+    await settle();
+    expect(container.textContent).not.toContain("Bright Data accepted this key");
   });
 
   it("shows the provider's own words when it refuses the key", async () => {
@@ -184,6 +206,7 @@ describe("the connections screen", () => {
         json({ valid: false, reason: "Bright Data API key is not accepted." }),
     });
 
+    await openAccount();
     setValue(field("Bright Data API key for Bright Data"), "brd_wrong");
     button("Test connection").click();
     await settle();
@@ -199,6 +222,7 @@ describe("the connections screen", () => {
         json({ message: "Reddit could not be reached, so the key was not tested." }, 502),
     });
 
+    await openAccount();
     setValue(field("Bright Data API key for Bright Data"), "brd_7f3a91c4e08b2d65");
     button("Test connection").click();
     await settle();
@@ -231,6 +255,7 @@ describe("the connections screen", () => {
         ),
     });
 
+    await openAccount();
     setValue(field("Bright Data API key for Bright Data"), secret);
     button("Save key").click();
     await settle();
@@ -252,6 +277,7 @@ describe("the connections screen", () => {
         json({ message: "Bright Data did not accept that key, so it was not saved." }, 400),
     });
 
+    await openAccount();
     setValue(field("Bright Data API key for Bright Data"), "brd_wrong");
     button("Save key").click();
     await settle();
@@ -282,6 +308,7 @@ describe("the connections screen", () => {
       { "DELETE /api/connections/brightdata/apiKey": () => json(brightData()) },
     );
 
+    await openAccount();
     button("Remove stored key").click();
     await settle();
 
@@ -348,6 +375,7 @@ describe("the connections screen", () => {
       expect(container.textContent).toContain("Which provider fetches what");
       expect(container.textContent).toContain("ScrapeCreators");
       expect(container.textContent).toContain("Choose one");
+      expect(container.querySelector<HTMLDetailsElement>(".platform-connection")?.open).toBe(true);
     });
 
     it("sends the choice, and shows what the server sent back", async () => {

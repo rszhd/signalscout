@@ -135,6 +135,85 @@ describe("the projects screen", () => {
     });
   });
 
+  /**
+   * Drafting from a document. US-050.
+   *
+   * What is asserted is that a draft is a draft: the fields are filled in, the
+   * gaps the model admits to are shown, and nothing is written. These four
+   * fields are the ones the classifier reads, so a screen that saved them on
+   * somebody's behalf would put words nobody wrote into every later verdict.
+   */
+  it("fills the four fields from a page, and saves nothing", async () => {
+    respond([]);
+    fetchMock.mockImplementation(async (url: string, init?: RequestInit) => {
+      if (String(url).startsWith("/api/monitor-options")) {
+        return json({ signals: signalOptions, sources: [] });
+      }
+      if (String(url) === "/api/projects/describe") {
+        return json({
+          name: "Acme QA",
+          product: "A test runner for small teams",
+          idealCustomer: "Small SaaS teams",
+          problem: "Tests break on every UI change",
+          signals: ["problem"],
+          missing: ["how it is priced"],
+          charactersRead: 1200,
+          truncated: false,
+        });
+      }
+      void init;
+      return json({ projects: [] });
+    });
+
+    screen = await mount(<Projects />);
+    container = screen.container;
+
+    setValue(field("Your product's address"), "https://acme.test");
+    await settle();
+
+    await act(async () => button("Read this page").click());
+    await settle();
+
+    expect(field("What is the product?").value).toBe("A test runner for small teams");
+    expect(field("What problem does it solve?").value).toBe("Tests break on every UI change");
+
+    // The gap the model admits to, shown rather than swallowed.
+    expect(container.textContent).toContain("how it is priced");
+
+    // Nothing was written. The person still has to press the button.
+    const writes = fetchMock.mock.calls.filter(
+      ([url, init]) =>
+        (init as RequestInit | undefined)?.method === "POST" && String(url) === "/api/projects",
+    );
+    expect(writes).toEqual([]);
+  });
+
+  it("shows the server's own sentence when a page cannot be read", async () => {
+    respond([]);
+    fetchMock.mockImplementation(async (url: string) => {
+      if (String(url).startsWith("/api/monitor-options")) {
+        return json({ signals: signalOptions, sources: [] });
+      }
+      if (String(url) === "/api/projects/describe") {
+        return json({ message: "example.test resolves to an address on this network." }, 400);
+      }
+      return json({ projects: [] });
+    });
+
+    screen = await mount(<Projects />);
+    container = screen.container;
+
+    setValue(field("Your product's address"), "https://example.test");
+    await settle();
+
+    await act(async () => button("Read this page").click());
+    await settle();
+
+    // The server named the reason; a screen that said "could not analyse"
+    // would throw away the part a person can act on.
+    expect(container.textContent).toContain("resolves to an address on this network");
+  });
+
   it("lists a project with how many monitors came out of it", async () => {
     await show([
       project(),

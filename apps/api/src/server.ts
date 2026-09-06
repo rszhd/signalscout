@@ -4,12 +4,14 @@ import {
   aiConfigFromEnvironment,
   builtInSources,
   type ConnectorDefinition,
+  createProjectDescriber,
   createQueryGenerator,
   type Database,
   type Env,
   type JobSender,
   type Logger,
   needsApiKey,
+  type ProjectDescriber,
   type QueryGenerator,
   storedCredentialNames,
 } from "@intentwatch/core";
@@ -88,6 +90,14 @@ export interface BuildServerOptions {
    */
   queryGenerator?: QueryGenerator | null;
   /**
+   * The project describer. US-050.
+   *
+   * Injectable for the same reason the query generator is: a test drives every
+   * outcome — a refusal, a timeout, a missing key — without a model and
+   * without spending anything.
+   */
+  describer?: ProjectDescriber | null;
+  /**
    * How the cost test reaches the worker. Null when this deployment has no
    * queue to send to; the route says so rather than writing a run nothing
    * will pick up. `start.ts` passes the worker's own queue when there is one.
@@ -102,6 +112,25 @@ export interface BuildServerOptions {
  * working product: they type the queries themselves, and the form says so.
  * Refusing to boot would take the whole UI away over an optional feature.
  */
+/**
+ * The project describer, or null when this deployment has no model key.
+ *
+ * Null rather than a throw, for `queryGeneratorFor`'s reason: drafting the
+ * four answers from a document is a convenience, and refusing to boot over one
+ * would take the whole UI away.
+ */
+export function describerFor(env: Env, logger: Logger): ProjectDescriber | null {
+  if (needsApiKey(env.AI_PROVIDER) && !env.AI_API_KEY) {
+    logger.warn(
+      { provider: env.AI_PROVIDER },
+      "no AI_API_KEY: a project cannot be drafted from a document",
+    );
+    return null;
+  }
+
+  return createProjectDescriber({ config: aiConfigFromEnvironment(env) });
+}
+
 export function queryGeneratorFor(env: Env, logger: Logger): QueryGenerator | null {
   if (needsApiKey(env.AI_PROVIDER) && !env.AI_API_KEY) {
     logger.warn(
@@ -127,6 +156,7 @@ export async function buildServer({
   encryption,
   storedCredentials,
   queryGenerator,
+  describer,
   jobs = null,
 }: BuildServerOptions): Promise<ApiServer> {
   const app = Fastify({ loggerInstance: logger }).withTypeProvider<ZodTypeProvider>();
@@ -149,7 +179,10 @@ export async function buildServer({
   });
 
   await registerMatchRoutes(app, { db });
-  await registerProjectRoutes(app, { db });
+  await registerProjectRoutes(app, {
+    db,
+    describer: describer === undefined ? describerFor(env, logger) : describer,
+  });
   await registerNotificationRoutes(app, { db, env });
 
   await registerConnectionRoutes(app, { db, sources, environment, encryption, logger });

@@ -15,8 +15,13 @@ import {
   createProject,
   type Database,
   deleteProject,
+  fetchDocument,
   getProject,
   listProjects,
+  maximumDocumentCharacters,
+  type ProjectDescriber,
+  readUploadedDocument,
+  recordModelCall,
   signals as signalIds,
   singleUserId,
   updateProject,
@@ -26,6 +31,14 @@ import type { ApiServer } from "./server.js";
 
 export interface ProjectRoutesOptions {
   readonly db: Database;
+  /**
+   * Null when this deployment has no model key. US-050.
+   *
+   * The screen asks rather than assuming: a self-hoster with no key still has
+   * a working product and types the four answers themselves, so the drafting
+   * button is absent rather than broken.
+   */
+  readonly describer?: ProjectDescriber | null;
 }
 
 const signal = z.enum(signalIds);
@@ -73,10 +86,132 @@ function serialise(project: Awaited<ReturnType<typeof createProject>>) {
   };
 }
 
+/**
+ * A document, named one of two ways, and never both.
+ *
+ * The file half arrives as text rather than as multipart: the browser reads
+ * what somebody picked and posts its contents, which keeps this route to one
+ * shape and adds no upload plugin. It also means the only thing that ever
+ * reaches the server is the text — no filename to sanitise, no temp file.
+ */
+const describeBody = z
+  .object({
+    url: z.string().max(2000).optional(),
+    text: z.string().max(2_000_000).optional(),
+    contentType: z.string().max(120).optional(),
+    filename: z.string().max(200).optional(),
+  })
+  .refine((body) => (body.url === undefined) !== (body.text === undefined), {
+    message: "Give a URL or a document, not both.",
+  });
+
+const draftSchema = z.object({
+  name: z.string(),
+  product: z.string(),
+  idealCustomer: z.string(),
+  problem: z.string(),
+  signals: z.array(signal),
+  /** What the document did not say. Shown beside the fields, not hidden. */
+  missing: z.array(z.string()),
+  /** How much was read, so the screen can say a long page was cut. */
+  charactersRead: z.number(),
+  truncated: z.boolean(),
+});
+
 export async function registerProjectRoutes(
   app: ApiServer,
-  { db }: ProjectRoutesOptions,
+  { db, describer = null }: ProjectRoutesOptions,
 ): Promise<void> {
+  /**
+   * Draft the four answers from a URL or an uploaded document.
+   *
+   * Four different refusals, because a person's next action differs: a URL we
+   * will not fetch, a page that would not answer, a document with no words in
+   * it, and a model that refused or broke. "Could not analyse" is none of
+   * them.
+   */
+  app.route({
+    method: "POST",
+    url: "/api/projects/describe",
+    schema: {
+      body: describeBody,
+      response: {
+        200: draftSchema,
+        400: problemSchema,
+        // A model that refused is not a model that broke: 422 says the
+        // document was the problem, 502 says the provider was.
+        422: problemSchema,
+        502: problemSchema,
+        503: problemSchema,
+      },
+    },
+    handler: async (request, reply) => {
+      if (!describer) {
+        return reply
+          .code(503)
+          .send({ message: "This instance has no model key, so it cannot read a document." });
+      }
+
+      const { url, text, contentType, filename } = request.body;
+
+      const document = url
+        ? await fetchDocument(url)
+        : readUploadedDocument(text ?? "", contentType ?? "text/plain");
+
+      if (!document.ok) {
+        // The reader's own sentence, which names the host, the status or the
+        // type. A route that replaced it would throw away the actionable part.
+        return reply.code(400).send({ message: document.failure.message });
+      }
+
+      /**
+       * A blank document is refused here, before the model.
+       *
+       * `describeProject` refuses one too, for any other caller. This check is
+       * the route's own because it is the one that decides whether a request
+       * costs anything: paying a provider to be told a blank file is blank
+       * would be paying for our own missing check.
+       */
+      if (document.text.trim() === "") {
+        return reply
+          .code(400)
+          .send({ message: "That document has no text in it, so there was nothing to read." });
+      }
+
+      const result = await describer.describe(document.text, url ?? filename);
+
+      if (result.status === "empty") {
+        return reply
+          .code(400)
+          .send({ message: "That document has no text in it, so there was nothing to read." });
+      }
+
+      await recordModelCall(db, {
+        purpose: "project_analysis",
+        outcome: result.status === "ok" ? "scored" : result.status,
+        call: result.call,
+        // No monitor and no version: this runs before either exists.
+        monitorId: null,
+        monitorVersion: null,
+        ...(result.status === "ok" ? {} : { error: result.error }),
+      });
+
+      if (result.status === "rejected") {
+        return reply.code(422).send({ message: result.error });
+      }
+
+      if (result.status !== "ok") {
+        return reply.code(502).send({ message: result.error });
+      }
+
+      return {
+        ...result.object,
+        charactersRead: Math.min(document.text.length, maximumDocumentCharacters),
+        truncated: document.truncated || document.text.length > maximumDocumentCharacters,
+      };
+    },
+  });
+
   app.route({
     method: "GET",
     url: "/api/projects",

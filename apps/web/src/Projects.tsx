@@ -41,6 +41,110 @@ interface Draft {
 
 const empty: Draft = { name: "", product: "", idealCustomer: "", problem: "", signals: [] };
 
+interface DraftedProject extends Draft {
+  missing: string[];
+  charactersRead: number;
+  truncated: boolean;
+}
+
+/**
+ * Draft the four answers from a page or a file. US-050.
+ *
+ * The file is read here rather than uploaded, so the only thing that reaches
+ * the server is its text: no multipart, no filename to sanitise, no temp file.
+ *
+ * **What comes back is a draft and not a decision.** These four fields are the
+ * ones the classifier reads and `monitors.version` counts, so they are filled
+ * in for a person to read, edit and save — nothing here writes anything.
+ */
+function DraftFromDocument({
+  onDrafted,
+  disabled,
+}: {
+  onDrafted: (draft: DraftedProject) => void;
+  disabled: boolean;
+}) {
+  const [url, setUrl] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [problem, setProblem] = useState<string | null>(null);
+
+  async function draft(body: Record<string, string>) {
+    setBusy(true);
+    setProblem(null);
+
+    try {
+      onDrafted(
+        await requestJson<DraftedProject>("/api/projects/describe", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify(body),
+        }),
+      );
+    } catch (cause) {
+      // The server's own sentence: it names the host, the status or the file
+      // type. "Could not analyse" would throw away the part a person can act
+      // on.
+      setProblem(messageFor(cause, "The document could not be read."));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function fromFile(file: File | undefined) {
+    if (!file) return;
+
+    const type =
+      file.type ||
+      (file.name.endsWith(".md")
+        ? "text/markdown"
+        : file.name.endsWith(".html")
+          ? "text/html"
+          : "text/plain");
+
+    await draft({ text: await file.text(), contentType: type, filename: file.name });
+  }
+
+  return (
+    <div className="draft-from-document">
+      <p className="setup-progress-note">
+        Or start from something you have already written: paste your site's address, or add a text
+        or Markdown file. The answers are filled in for you to check — nothing is saved until you
+        press the button below.
+      </p>
+
+      {problem && <p className="form-error">{problem}</p>}
+
+      <div className="draft-controls">
+        <input
+          aria-label="Your product's address"
+          placeholder="https://example.com"
+          value={url}
+          disabled={disabled || busy}
+          onChange={(event) => setUrl(event.target.value)}
+        />
+        <button
+          className="secondary-button"
+          type="button"
+          disabled={disabled || busy || url.trim() === ""}
+          onClick={() => void draft({ url: url.trim() })}
+        >
+          {busy ? "Reading…" : "Read this page"}
+        </button>
+        <label className="secondary-button draft-file">
+          Add a file
+          <input
+            aria-label="A document about your product"
+            type="file"
+            accept=".txt,.md,.markdown,.html,text/plain,text/markdown,text/html"
+            disabled={disabled || busy}
+            onChange={(event) => void fromFile(event.target.files?.[0])}
+          />
+        </label>
+      </div>
+    </div>
+  );
+}
+
 export function Projects() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [signals, setSignals] = useState<SignalOption[]>([]);
@@ -50,6 +154,8 @@ export function Projects() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  /** What the model said it could not find. Shown, not swallowed. US-050. */
+  const [missing, setMissing] = useState<string[]>([]);
 
   const load = useCallback(async () => {
     try {
@@ -136,6 +242,31 @@ export function Projects() {
         </p>
 
         {error && <p className="form-error">{error}</p>}
+
+        <DraftFromDocument
+          disabled={busy}
+          onDrafted={(drafted) => {
+            setDraft({
+              name: drafted.name,
+              product: drafted.product,
+              idealCustomer: drafted.idealCustomer,
+              problem: drafted.problem,
+              signals: drafted.signals,
+            });
+            setMissing(drafted.missing);
+          }}
+        />
+
+        {missing.length > 0 && (
+          <div className="draft-missing">
+            <p>The document did not say, so these were guessed — check them first:</p>
+            <ul>
+              {missing.map((gap) => (
+                <li key={gap}>{gap}</li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         <label className="field">
           <span>Name</span>

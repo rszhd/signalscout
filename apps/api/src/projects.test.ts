@@ -6,7 +6,15 @@
  * — a `PATCH` that fills the fields a request did not carry, and a refusal that
  * answers 200 with nothing in it.
  */
-import { createDatabase, createLogger, type Database, loadEnv } from "@intentwatch/core";
+import {
+  createDatabase,
+  createLogger,
+  type Database,
+  type DescribeResult,
+  loadEnv,
+  modelCalls,
+  type ProjectDescriber,
+} from "@intentwatch/core";
 import { createTestDatabase, type TestDatabase } from "@intentwatch/core/testing";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { buildServer } from "./server.js";
@@ -36,9 +44,38 @@ describe("the project routes", () => {
     await database?.drop();
   });
 
-  async function server() {
+  /** A describer that answers whatever a case needs, without a model. */
+  function describerAnswering(result: DescribeResult): ProjectDescriber {
+    return {
+      provider: "anthropic",
+      model: "test",
+      describe: async () => result,
+    };
+  }
+
+  const draft = {
+    status: "ok" as const,
+    object: {
+      name: "Acme QA",
+      product: "A test runner for small teams",
+      idealCustomer: "Small SaaS teams",
+      problem: "Tests break on every UI change",
+      signals: ["problem" as const],
+      missing: ["how it is priced"],
+    },
+    call: {
+      provider: "anthropic" as const,
+      model: "test",
+      latencyMs: 12,
+      inputTokens: 100,
+      outputTokens: 50,
+      estimatedCostMicros: 900,
+    },
+  };
+
+  async function server(describer: ProjectDescriber | null = describerAnswering(draft)) {
     const env = loadEnv({ DATABASE_URL: database.url });
-    return buildServer({ env, logger, db, queryGenerator: null });
+    return buildServer({ env, logger, db, queryGenerator: null, describer });
   }
 
   async function post(url: string, body: Record<string, unknown>) {
@@ -168,5 +205,141 @@ describe("the project routes", () => {
 
     expect(response.statusCode).toBe(204);
     expect((await send("GET", `/api/projects/${created.id}`)).statusCode).toBe(404);
+  });
+});
+
+describe("drafting a project from a document", () => {
+  let database: TestDatabase;
+  let db: Database;
+  let close: () => Promise<void>;
+
+  beforeAll(async () => {
+    database = await createTestDatabase("api_projects_describe");
+    ({ db, close } = createDatabase(database.url));
+  }, 60_000);
+
+  afterAll(async () => {
+    await close?.();
+    await database?.drop();
+  });
+
+  const good = {
+    status: "ok" as const,
+    object: {
+      name: "Acme QA",
+      product: "A test runner",
+      idealCustomer: "Small SaaS teams",
+      problem: "Tests break on every UI change",
+      signals: ["problem" as const],
+      missing: ["how it is priced"],
+    },
+    call: {
+      provider: "anthropic" as const,
+      model: "test",
+      latencyMs: 12,
+      inputTokens: 100,
+      outputTokens: 50,
+      estimatedCostMicros: 900,
+    },
+  };
+
+  beforeEach(async () => {
+    // One case counts the calls it caused, so it must not count another's.
+    await db.delete(modelCalls);
+  });
+
+  async function describing(result: DescribeResult | null, body: Record<string, unknown>) {
+    const env = loadEnv({ DATABASE_URL: database.url });
+    const app = await buildServer({
+      env,
+      logger,
+      db,
+      queryGenerator: null,
+      describer:
+        result === null
+          ? null
+          : { provider: "anthropic", model: "test", describe: async () => result },
+    });
+
+    try {
+      return await app.inject({ method: "POST", url: "/api/projects/describe", payload: body });
+    } finally {
+      await app.close();
+    }
+  }
+
+  it("drafts the four answers from an uploaded document", async () => {
+    const response = await describing(good, {
+      text: "Acme QA is a test runner for small teams whose tests break on every UI change.",
+      contentType: "text/markdown",
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.json()).toMatchObject({
+      name: "Acme QA",
+      product: "A test runner",
+      // Shown rather than swallowed: a person needs to know which field was
+      // guessed at before they save it.
+      missing: ["how it is priced"],
+    });
+  });
+
+  it("records the call, because no monitor and no budget will", async () => {
+    await describing(good, { text: "Acme QA is a test runner.", contentType: "text/plain" });
+
+    const calls = await db.select().from(modelCalls);
+    const analysis = calls.filter((call) => call.purpose === "project_analysis");
+
+    expect(analysis).toHaveLength(1);
+    // No monitor exists yet, which is why the column is nullable.
+    expect(analysis[0]?.monitorId).toBeNull();
+    expect(analysis[0]?.estimatedCostMicros).toBe(900);
+  });
+
+  it("refuses a document with no words rather than paying to be told so", async () => {
+    const response = await describing(good, { text: "   ", contentType: "text/plain" });
+
+    expect(response.statusCode).toBe(400);
+    // Nothing was called, so nothing was billed.
+    expect(await db.select().from(modelCalls)).toHaveLength(0);
+  });
+
+  it("refuses a URL this server must not fetch, naming why", async () => {
+    const response = await describing(good, { url: "http://169.254.169.254/latest/meta-data/" });
+
+    expect(response.statusCode).toBe(400);
+    // The scheme is refused before anything resolves or connects.
+    expect(response.json().message).toContain("https");
+  });
+
+  it("will not take a URL and a document at once", async () => {
+    const response = await describing(good, { url: "https://example.test/", text: "hello" });
+
+    expect(response.statusCode).toBe(400);
+  });
+
+  it("says so when this instance has no model key", async () => {
+    const response = await describing(null, { text: "hello", contentType: "text/plain" });
+
+    expect(response.statusCode).toBe(503);
+    expect(response.json().message).toContain("no model key");
+  });
+
+  it("tells a model that refused apart from one that broke", async () => {
+    const refused = await describing(
+      { status: "rejected", error: "That is not a product page.", call: good.call },
+      { text: "a shopping list", contentType: "text/plain" },
+    );
+
+    expect(refused.statusCode).toBe(422);
+
+    const broke = await describing(
+      { status: "failed", error: "the provider timed out", call: good.call },
+      { text: "a page", contentType: "text/plain" },
+    );
+
+    // 422 is about the document; 502 is about the provider. A person's next
+    // action differs, so the codes do.
+    expect(broke.statusCode).toBe(502);
   });
 });

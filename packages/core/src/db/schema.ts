@@ -230,6 +230,14 @@ export const modelCallPurposes = [
   "query_generation",
   "embedding",
   "triage",
+  /**
+   * Drafting a project's four answers from a document. US-050.
+   *
+   * Its own purpose because it is the first call with no monitor behind it:
+   * `monitor_id` is null, no budget is keyed to it, and `docs/costs.md`'s
+   * answer to "what did my key pay for" would be wrong without a name for it.
+   */
+  "project_analysis",
 ] as const;
 export type ModelCallPurpose = (typeof modelCallPurposes)[number];
 

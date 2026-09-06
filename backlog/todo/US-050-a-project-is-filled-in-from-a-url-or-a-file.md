@@ -61,23 +61,26 @@ every verdict afterwards would be measured against a description nobody wrote.
 
 ## Acceptance
 
-- [ ] On the project form, a person can paste a URL **or** upload a file and
+- [x] On the project form, a person can paste a URL **or** upload a file and
       ask for the four answers to be drafted
-- [ ] The four fields are filled in, editable, and clearly the model's draft
+- [x] The four fields are filled in, editable, and clearly the model's draft
       rather than saved values. Nothing is written until the person saves
-- [ ] The answer is a structured object with a fixed schema, so a page that
+- [x] The answer is a structured object with a fixed schema, so a page that
       contains instructions can fill fields with nonsense and can do nothing
       else. The prompt says what it is reading and that it is not a request
-- [ ] The fetch is `https` only, with a timeout, a response size cap, a
+- [x] The fetch is `https` only, with a timeout, a response size cap, a
       redirect limit, and a refusal for private, loopback and link-local
       addresses **checked after DNS resolution**
-- [ ] Uploads are limited to plain text, Markdown and PDF, with a size cap and,
-      for PDF, a page cap. An unsupported file is refused with its type named
-- [ ] The call is recorded in `model_calls` with its own purpose and its cost,
+- [x] Uploads are limited to plain text, Markdown and HTML, with a size cap. An
+      unsupported file is refused with its type named — **PDF is deliberately
+      not supported**, see the Log
+- [ ] PDF. It needs a parsing dependency, which was not added unasked. The
+      refusal names the type and says what to do instead
+- [x] The call is recorded in `model_calls` with its own purpose and its cost,
       so `docs/costs.md`'s answer to "what did my key pay for" stays true
 - [ ] One analysis at a time per person, and a second request is refused with a
       reason rather than queued invisibly
-- [ ] A refusal from the model, a page that is unreachable, and a page that
+- [x] A refusal from the model, a page that is unreachable, and a page that
       says nothing useful are three different messages. "Could not analyse" is
       not one of them
 - [ ] Fixtures replay a real model's answers, captured by a script named in
@@ -108,3 +111,43 @@ every verdict afterwards would be measured against a description nobody wrote.
 - 2026-09-06T23:05+08:00 — Written at the owner's request, straight after
   US-045 shipped the project form. The blank page is the friction that remains
   once the repetition is gone.
+
+- 2026-09-06T23:59+08:00 — Built, except PDF.
+
+  **Three modules, and they are separate on purpose.** `projects/document.ts`
+  decides what this server will go and fetch; `ai/describe.ts` decides what a
+  model does with text; the route joins them. What our server can be talked
+  into reaching is a different problem from what a model says, and mixing them
+  is how one becomes an excuse for the other.
+
+  **The SSRF guard is the part with real teeth**, and `document.test.ts` is
+  marked correctness-critical for it. https only, a timeout, a size cap, a
+  redirect limit, and every address checked **after DNS resolution at every
+  hop** — a public host answering 302 to `169.254.169.254` is the whole attack,
+  and `redirect: "follow"` would take it. Redirects are therefore walked by
+  hand.
+
+  One test there is honest about its own limit. A fake `fetch` cannot follow a
+  redirect, so no case can tell `redirect: "manual"` from `"follow"` by its
+  result — the difference only shows against a real network. What is assertable
+  is what we ask for, so a case asserts the option, and flipping it turns that
+  case red.
+
+  **The prompt-injection defence is two things and neither is enough alone.**
+  The answer is a fixed schema, so the worst a hostile page achieves is four
+  fields of nonsense a person reads. And the system prompt says outright that
+  the document is content rather than a request. `ai/prompt.ts` uses the same
+  technique for a post's text.
+
+  **PDF is not supported and that is a decision.** Parsing one needs a
+  dependency, and AGENTS.md is explicit that adding one to avoid a hard problem
+  is the wrong move — so the refusal names the type and says to paste the
+  address or save as text instead. The box stays open rather than being quietly
+  dropped.
+
+  Also deliberate: the file is read in the browser and posted as text. No
+  multipart plugin, no filename to sanitise, no temporary file, and the only
+  thing that reaches the server is the words.
+
+  Still open: one analysis at a time is not enforced, and nothing has run
+  against a real model, so the Log has no measured cost yet.

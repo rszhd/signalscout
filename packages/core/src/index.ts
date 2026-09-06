@@ -37,6 +37,14 @@ export {
   needsApiKey,
 } from "./ai/config.js";
 export {
+  createProjectDescriber,
+  type DescribeResult,
+  describeProject,
+  maximumDocumentCharacters,
+  type ProjectDescriber,
+  type ProjectDraft,
+} from "./ai/describe.js";
+export {
   createEmbedder,
   createEmbeddingModel,
   type Embedder,
@@ -268,6 +276,15 @@ export {
   saveNotificationSettings,
 } from "./notifications/settings.js";
 export { createNotificationTransport, notificationReadiness } from "./notifications/transport.js";
+export {
+  acceptedTextTypes,
+  type DocumentFailure,
+  type DocumentResult,
+  fetchDocument,
+  isPrivateAddress,
+  maximumDocumentBytes,
+  readUploadedDocument,
+} from "./projects/document.js";
 export {
   type CreateProjectInput,
   createProject,

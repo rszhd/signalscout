@@ -2402,6 +2402,54 @@ a {
   font-weight: 400;
 }
 
+/*
+  Drafting a project from a document. US-050.
+
+  It sits above the four fields because it is what a person does before typing,
+  and its own note says nothing is saved — the fields it fills are a draft.
+*/
+.draft-from-document {
+  display: grid;
+  gap: 10px;
+  margin: 18px 0 6px;
+  padding: 16px;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius-lg);
+}
+.draft-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+.draft-controls input[type="text"],
+.draft-controls input:not([type]) {
+  flex: 1 1 260px;
+  min-width: 0;
+}
+/* The input is the control; the label is the button a person sees. */
+.draft-file {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+.draft-file input[type="file"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.draft-missing {
+  margin: 12px 0;
+  color: var(--muted);
+  font-size: var(--text-xs);
+  line-height: 1.7;
+}
+.draft-missing ul {
+  margin: 4px 0 0;
+  padding-left: 18px;
+}
+
 .project-name {
   font-size: var(--text-md);
 }

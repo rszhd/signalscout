@@ -6,7 +6,7 @@ priority: p1
 created: 2026-09-06T14:05+08:00
 parent: US-020
 area:
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -65,11 +65,28 @@ re-read.
       page in a test the way it did in production.
 - [x] Reverting the rule turns both new cases red, and the first one red by
       timing out with no reply reaching the filter — the live failure.
-- [ ] A live poll stores a comment. US-044's run must be repeated, because
-      the claim the TikTok integration rests on has still never been tested:
-      nothing has yet classified a TikTok comment.
+- [x] A live poll stores a comment. The second TikTok poll stored **678**
+      under 25 threads, where the first stored none. Sixty of them were then
+      classified and seven matched, the top at 82.
 
 ## Notes
+
+**The bug left state behind, and the fix does not clear it.** A thread whose
+page came back with no cursor was recorded `replies_partial = false` — read to
+the end — on the strength of a page the wrong window had emptied. The re-open
+rule skips a thread that is complete and whose count has not grown, so those
+threads would never be opened again. Of US-044's 25, twelve were in that state.
+
+They were cleared by hand on the development database before the second poll:
+
+    update posts set replies_partial = null, replies_read_at = null
+    where source = 'tiktok' and kind = 'post' and replies_partial is not null;
+
+No migration does this, and that is a decision rather than an oversight. The
+rows are only wrong where a monitor ran with `include_replies` on between
+US-020 and this fix, which is this machine and no released version. A migration
+that reset every thread on every instance would make each of them re-buy every
+thread it has ever read, which is the more expensive mistake.
 
 Migration 0031 adds one nullable column and backfills nothing. Every existing
 thread reads as never read, which is right: no thread's true read mark is
@@ -86,3 +103,15 @@ generated diff will be correct.
 - 2026-09-06T14:05+08:00 — Found by US-044's live TikTok poll: 25 threads
   opened, 25 pages bought, 0 comments stored. Cause found, fixed, and covered
   by three cases. One box open: no live run has stored a comment yet.
+
+- 2026-09-06T14:58+08:00 — Fixed and proven live. The second TikTok poll stored
+  678 comments where the first stored zero, and a sample of 60 produced seven
+  matches — one at 82, higher than any video that monitor has matched. US-044's
+  Log holds the numbers.
+
+  One thing this fix does not do, and a reader should know it. The 25 threads
+  the first poll recorded were cleared by hand, as the Notes describe. Nothing
+  in the code finds a thread wrongly marked complete, because nothing can: a
+  false `replies_partial` is indistinguishable from a true one after the fact.
+  That is why the safe direction is to record a thread as partial unless there
+  is positive evidence it ended.

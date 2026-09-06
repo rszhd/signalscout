@@ -197,6 +197,26 @@ TikTok is also the first platform here to return comments in other languages —
 French and Spanish at full length in one page of 49 — and every prompt in this
 product is English.
 
+**The pipeline has now read those comments, and they outscore the videos.** On
+2026-09-06, 60 stored comments were triaged and classified against a skincare
+monitor: **seven matched at or above 50, and the top one scored 82** against
+the best video's 70. It is a person saying one moisturiser broke them out,
+asking why, and naming a second to ask whether it would be better. Two more at
+68 and 66 are the same shape.
+
+Two findings sit beside that. **The pre-filter has almost nothing to cut here**:
+triage dropped 4 of 60, where US-030 measured it dropping 20 of 26 answerers on
+a Reddit thread. Under a product-recommendation video nobody is an expert
+answering — everybody is a potential customer — so the cheap stage saves little
+and the classifier reads nearly everything. And **two of the seven matches are
+Spanish**, scored correctly with the reasons written in English, which is the
+first non-English classification this product has made.
+
+The quality is not uniform, and the middle of the list says what to expect.
+Below about 60 the matches turn into "where do you buy it" — purchase intent
+for somebody else's product, not a person describing a problem. On this
+platform `min_score` earns its keep.
+
 **YouTube is the fourth network, and PLAN.md said not to add one.** US-034
 closed on 2026-09-06. The rule at PLAN.md's *Important rule* is that no further
 network is added until Reddit and X reliably produce useful matches, and that

@@ -285,6 +285,18 @@ for whenever you want to. The caller reads `next`, never `posts.length`. Every
 connector must be able to prove this, which is why the fake can be told to do
 it.
 
+**A thread's window is not the poll's window.** `ReplyRequest.since` is how far
+back this *thread* has been read, and it has nothing to do with when the
+monitor last searched. The two were the same value until BUG-006, and the
+result was that every provider was asked for comments written after the poll
+had already started: 25 threads bought, nothing stored. A post found today can
+carry comments from 2015, and `posts.replies_read_at` is the only mark that
+says how much of one we hold.
+
+Apply it yourself, and say so in the connector. Two of the four providers offer
+no date parameter on a comment endpoint at all, so the cut is ours in every
+case and the bill is the same either way.
+
 ---
 
 ## Testing a connector

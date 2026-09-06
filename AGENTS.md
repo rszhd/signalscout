@@ -193,6 +193,39 @@ replies on purpose — its comment endpoint is 5 credits against ScrapeCreators'
 for the same thread — and `canFetchReplies: false` is what tells the monitor form
 to say so.
 
+**TikTok is the fifth platform, and its leads are in the comments.** US-044
+closed on 2026-09-06, the third crossing of PLAN.md's *Important rule* and
+again on the owner's decision. The rule stands for the sixth. It runs through
+SocialCrawl on the key that already fetches X, LinkedIn, YouTube and Reddit.
+
+Two live runs and one comment run measured it. A search returned **60 videos in
+6.7 seconds for 2 credits**, and three videos matched — people mid-routine
+asking what to try next, each naming products they had already bought. Then 60
+of the stored comments were read: **seven matched, and the top scored 82**
+against the best video's 70. It is a person saying one moisturiser broke them
+out, asking why, and naming a second to ask whether it would be better.
+
+**The product decides whether this platform is worth polling.** The first
+capture searched `flaky tests` and returned dandruff and school exams, because
+here *flaky* means flakes and *test* means an exam — and the first conclusion
+written from it, that TikTok cannot carry a lead, was wrong. It had measured a
+QA product's audience, not the platform. A monitor whose customers must
+describe a condition to get a useful answer finds them; one selling to
+engineers does not.
+
+Three facts follow for anyone changing this connector. **The pre-filter has
+almost nothing to cut**: triage dropped 4 of 60 comments, where US-030 measured
+20 of 26 dropped on a Reddit thread, because under a product-recommendation
+video nobody is an expert answering. **Two of the seven matches are Spanish**,
+scored correctly with English reasons — the first non-English classification
+this product has made. And below about 60 the matches become "where do you buy
+it", which is purchase intent for somebody else's product.
+
+Still unproven for this connector: a rate limit, an outage, and a second poll
+proving deduplication of *comments* — the second video poll proved it for
+videos, storing 14 new against 44 already held. The `?comment_id=` deep link
+remains unverified: nobody has opened one and landed on the comment.
+
 **LinkedIn is the third platform, and PLAN.md said not to add one yet.**
 US-028 closed on 2026-09-05. The rule at PLAN.md's *Important rule* is that no
 third network is added until Reddit and X reliably produce useful matches, and
@@ -797,12 +830,14 @@ pnpm --filter @intentwatch/core capture:comment-filter # spends money; see below
 pnpm --filter @intentwatch/core capture:triage        # spends money; see below
 pnpm --filter @intentwatch/core live:provider-switch # spends ~$0.08; see below
 pnpm --filter @intentwatch/core live:linkedin-poll   # spends ~$0.08 + model; see below
+pnpm --filter @intentwatch/core live:tiktok-poll     # spends ~$0.20 + model; see below
+pnpm --filter @intentwatch/core live:tiktok-comments # spends model only; see below
 pnpm capture:deletions                            # spends ~$0.02; see below
 
 node packages/core/src/sources/providers/socialcrawl/linkedin-fixtures/capture.mjs   # ~30 credits
 ```
 
-These nine are the only commands here that spend money, and all nine are
+These eleven are the only commands here that spend money, and all eleven are
 instruments: they ask a real provider something and record what it said,
 because an answer we wrote would be evidence about our own schema and none
 about the provider.
@@ -865,6 +900,20 @@ that survives the filter, and it leaves a paused monitor, its posts, one
 `api_usage` row and its matches. Run it when the LinkedIn connector changes, or
 to prove deduplication — a second run inside the same window should store no new
 post and should bill again, because the provider charges for the search.
+
+`live:tiktok-poll` is the TikTok equivalent of `live:linkedin-poll`, and it
+turns replies on. Read its cost before running it: the search is 2 credits, but
+25 threads is 25 more, and 678 comments then buy a triage call each and a
+classification for most of them. The provider half is about $0.37 and the model
+half is several times that. It is capped, and both paid stages stop at the cap.
+
+`live:tiktok-comments` is the cheap half of that question. It reads comments
+**already stored** — no search, no thread, no provider call at all — and puts a
+sample through triage and classification in the real order. Sixty comments cost
+$0.198 on 2026-09-06. It skips any comment the monitor has already paid to
+read, so a second run with a larger sample buys no answer twice. Use it rather
+than a second poll whenever the question is about the classifier and not about
+the connector.
 
 `capture:deletions` checks known available, removed and missing Reddit URLs.
 It retains whole provider responses with author identity scrubbed. The default

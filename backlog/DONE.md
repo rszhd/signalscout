@@ -2,14 +2,16 @@
 
 # Done
 
-32 finished.
+34 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
+| BUG-006 | [The first poll of a monitor stores no replies](done/2026-09/BUG-006-the-first-poll-of-a-monitor-stores-no-replies.md) | bug | shipped | 2026-09 |
 | BUG-005 | [The cost test prices every monitor as hourly](done/2026-09/BUG-005-the-cost-test-prices-every-monitor-as-hourly.md) | bug | shipped | 2026-09 |
 | BUG-003 | [A post below the threshold is classified again on every poll](done/2026-09/BUG-003-a-post-below-the-threshold-is-classified-again-on-every-poll.md) | bug | fixed | 2026-09 |
 | BUG-002 | [A seven-day window is bought as a month](done/2026-09/BUG-002-a-seven-day-window-is-bought-as-a-month.md) | bug | fixed | 2026-09 |
 | BUG-001 | [A pending Reddit collection is not resumed](done/2026-09/BUG-001-a-pending-reddit-collection-is-not-resumed.md) | bug | shipped | 2026-09 |
+| US-044 | [TikTok is the fifth platform](done/2026-09/US-044-tiktok-is-the-fifth-platform.md) | feature | shipped | 2026-09 |
 | US-034 | [YouTube is the fourth platform](done/2026-09/US-034-youtube-is-the-fourth-platform.md) | feature | shipped | 2026-09 |
 | US-032 | [The classifier reads with the careful model](done/2026-09/US-032-the-classifier-reads-with-the-careful-model.md) | chore | shipped | 2026-09 |
 | US-031 | [SocialCrawl is measured as a third Reddit provider](done/2026-09/US-031-socialcrawl-is-measured-as-a-third-reddit-provider.md) | spike | shipped | 2026-09 |

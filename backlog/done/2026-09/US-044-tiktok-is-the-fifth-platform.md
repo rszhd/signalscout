@@ -6,7 +6,7 @@ priority: p2
 created: 2026-09-06T13:25+08:00
 parent: US-038
 area:
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -80,7 +80,7 @@ they parse.
       measured
 - [x] **The Log says whether a TikTok comment is long enough to be a lead**,
       judged by reading them rather than by counting rows
-- [ ] STACK.md and AGENTS.md record the fifth network as a decision, and that
+- [x] STACK.md and AGENTS.md record the fifth network as a decision, and that
       the rule stands for the sixth
 
 ## Notes
@@ -272,3 +272,55 @@ they parse.
   what it actually measured is that a QA product has no audience here. A
   consumer monitor finds people on this platform, and finds them in the
   captions — which is the opposite of the shape predicted for it.
+
+- 2026-09-06T14:58+08:00 — **A TikTok comment scores higher than any TikTok
+  video, and that is the finding this ticket was opened to get.**
+
+  With BUG-006 fixed, the second poll stored **678 comments** under 25 threads
+  where the first stored none. It also proved deduplication on videos: the
+  search returned 58, of which 44 were already held and 14 were new.
+
+  That poll was stopped part way through triage. The estimate given before it
+  ran counted the comment pages and forgot the model half, which is $0.177 of
+  triage plus about $3 per hundred classifications on `gpt-5.6-terra`. The cap
+  would have held it at $1.00 — both paid stages read the spend meter — but
+  $1.00 was five times what was quoted, so it was stopped and the question was
+  asked a cheaper way.
+
+  `live:tiktok-comments` is that cheaper way, and it is new. It reads comments
+  already stored, so it calls no provider: the pages were bought once and a
+  stored comment is bought for ever. **60 comments, $0.198, and seven matches at
+  or above 50.**
+
+  The top scored **82**, against 70 for the best video:
+
+  > the althea one broke me out 😔does anyone have any idea why that might be?
+  > Would the yumu one be better?
+
+  That is a person naming a product that failed them, asking why, and asking
+  whether a specific alternative is better — under a video listing moisturisers
+  for acne-prone skin. Two more at 68 and 66 are the same shape: one describing
+  a product giving them "sooo many little pimples", one asking whether La
+  Roche-Posay helps cystic acne.
+
+  **Three measurements come with it.**
+
+  *The pre-filter has almost nothing to cut here.* Triage dropped 4 of 60. On
+  US-030's Reddit thread it dropped 20 of 26 people answering. The reason is
+  structural: under a post asking for advice the crowd is experts answering, and
+  under a product-recommendation video the crowd is customers. So on this
+  platform the cheap stage saves little and nearly every comment buys a
+  classification, which is what makes a full poll expensive.
+
+  *Two of the seven matches are Spanish*, scored correctly with reasons written
+  in English — "Donde las compráis ???" and "En Amazon se puede comprar??". That
+  closes the open item about non-English comments, on two examples.
+
+  *Below about 60 the matches change kind.* Those two Spanish ones, at 56 and
+  54, ask where to buy somebody else's product. That is purchase intent and not
+  a problem being described, so `min_score` does real work here rather than
+  trimming a tail.
+
+  All seven came from **two videos**. Sixty comments and two threads is not a
+  distribution, and the concentration is itself a result: the value is in
+  finding the right video, not in reading more comments under the wrong one.

@@ -232,6 +232,13 @@
       "when": 1788683387788,
       "tag": "0032_a_reply_remembers_where_it_sat",
       "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1788686520285,
+      "tag": "0033_a_thread_is_read_in_batches",
+      "breakpoints": true
     }
   ]
 }

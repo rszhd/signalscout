@@ -31,9 +31,9 @@
  * harmful there. Triage still runs, and on a reply it is the only paid stage in
  * front of the classifier.
  */
-import { and, eq, inArray, sql } from "drizzle-orm";
+import { and, eq, gte, inArray, sql } from "drizzle-orm";
 import { enforceBudget, recordSourceUsage } from "../budget/budget.js";
-import { monitors, type Provider, posts, type Source } from "../db/schema.js";
+import { matches, monitors, type Provider, posts, type Source } from "../db/schema.js";
 import { readProviderChoices } from "../sources/choices.js";
 import type { CandidateReply, SocialSource, SourceCredentials } from "../sources/types.js";
 import type { CollectOptions } from "./collect.js";
@@ -74,6 +74,56 @@ export const maxThreadsPerJob = 25;
 export const maxPagesPerThread = 4;
 
 /**
+ * How many comments one batch buys before the threshold is consulted.
+ *
+ * Fifty, and the number is chosen with `maxEmptyBatches` rather than alone.
+ *
+ * It is about one page. The TikTok comment pages measured on 2026-09-06 came
+ * back 48, 49, 45, 49, 48, 50, 50, 50, 50, so a batch is roughly one credit and
+ * one call at SocialCrawl and two at ScrapeCreators. A batch of 50
+ * classifications is $0.15, so a thread nobody wants is dropped after $0.30
+ * rather than after $0.60.
+ *
+ * Counted in **comments** and not in provider pages, which is a fix of its
+ * own: four pages means 100 comments through one provider and 204 through
+ * another, and nobody chose that difference.
+ */
+export const replyBatchSize = 50;
+
+/**
+ * Consecutive batches with no match before a thread is abandoned.
+ *
+ * Two, and at a batch of 50 this is load-bearing rather than cautious. The
+ * chance a batch of 50 holds no match, by the thread's true lead rate:
+ *
+ *     rate 30%  ->  0.000%      rate 5%  ->   7.7%
+ *     rate 10%  ->  0.515%      rate 2%  ->  36.4%
+ *
+ * With a single empty batch ending the read, a thread with a 5% lead rate
+ * would be abandoned about one time in three over a long walk. Requiring two
+ * in a row takes that to one in ten, and at the 10% rate US-048 measured in a
+ * thread's *weakest* band, to one in two thousand.
+ */
+export const maxEmptyBatches = 2;
+
+/**
+ * The most comments one thread may ever buy, across every batch.
+ *
+ * **This is what protects the bill, not the threshold.** US-048 measured that
+ * the threshold almost never fires on a thread worth reading — which is what
+ * makes it safe, and also what makes it useless as a spending limit. A
+ * classification is 2,975 micro-dollars, so an unbounded read is $2.98 a
+ * thousand comments and $297 on a hundred thousand. One thread.
+ *
+ * Five hundred is a judgement. It is $1.49 of classification at today's
+ * prices, it is five times what `maxPagesPerThread` allowed before, and the
+ * measurement is the reason it is not smaller: leads sat three times denser at
+ * position 400 than at position 0, so a ceiling of 100 would have cut this
+ * product off from the better half of a thread.
+ */
+export const maxCommentsPerThread = 500;
+
+/**
  * How far back a reply may be, when this thread has never been read.
  *
  * A thread outlives the post above it, so `monitors.last_polled_at` is the
@@ -102,6 +152,13 @@ interface Thread {
   readonly replyCount: number | null;
   readonly repliesPartial: boolean | null;
   readonly repliesReadAt: Date | null;
+  /** Where the walk resumes. Null on a thread nobody has opened. US-048. */
+  readonly repliesCursor: string | null;
+  /** The position the last batch began at, so its yield can be counted. */
+  readonly repliesBatchStart: number | null;
+  readonly repliesEmptyBatches: number;
+  readonly repliesStopped: string | null;
+  readonly repliesStoppedAtCount: number | null;
 }
 
 export function createRepliesStep({
@@ -154,6 +211,11 @@ export function createRepliesStep({
         replyCount: posts.replyCount,
         repliesPartial: posts.repliesPartial,
         repliesReadAt: posts.repliesReadAt,
+        repliesCursor: posts.repliesCursor,
+        repliesBatchStart: posts.repliesBatchStart,
+        repliesEmptyBatches: posts.repliesEmptyBatches,
+        repliesStopped: posts.repliesStopped,
+        repliesStoppedAtCount: posts.repliesStoppedAtCount,
       })
       .from(posts)
       // `kind = 'post'` is what stops this looping. A reply has no thread of
@@ -245,6 +307,52 @@ export function createRepliesStep({
       }
 
       /**
+       * Reading this thread has already been ended, and by what.
+       *
+       * `threshold`, `ceiling` and `end` are decisions and they hold. `budget`
+       * is not a decision about the thread — it is a decision about the month
+       * — so a thread stopped by money is picked up again once there is money,
+       * and `enforceBudget` above is what stops that being a loop.
+       */
+      /**
+       * More has been said since reading stopped, so the thread opens again.
+       *
+       * Without this `repliesStopped` is a life sentence. A thread abandoned
+       * on two empty batches in March would never be read again however busy
+       * it became, which is the case a monitor exists to catch. The count is
+       * the platform's own and `collect.ts` refreshes it on every poll.
+       */
+      const grewSinceStopping =
+        post.repliesStopped !== null &&
+        post.replyCount !== null &&
+        post.repliesStoppedAtCount !== null &&
+        post.replyCount > post.repliesStoppedAtCount;
+
+      if (post.repliesStopped !== null && post.repliesStopped !== "budget" && !grewSinceStopping) {
+        skipped += 1;
+        continue;
+      }
+
+      /**
+       * The batch before this one held no lead, twice running.
+       *
+       * US-048's rule, and the arithmetic is under `maxEmptyBatches`. The
+       * count is of *consecutive* empty batches, so a thread that goes quiet
+       * for fifty comments and then produces a lead has its counter reset
+       * rather than carrying a grudge.
+       */
+      if (!grewSinceStopping && post.repliesEmptyBatches >= maxEmptyBatches) {
+        await db.update(posts).set({ repliesStopped: "threshold" }).where(eq(posts.id, post.id));
+
+        logger.info(
+          { monitorId, postId: post.id, emptyBatches: post.repliesEmptyBatches },
+          "thread closed: two batches in a row held no lead",
+        );
+        skipped += 1;
+        continue;
+      }
+
+      /**
        * Nothing new was said, so nothing is bought.
        *
        * `repliesPartial` is the exception that keeps this honest. A thread we
@@ -274,16 +382,25 @@ export function createRepliesStep({
       }
 
       /**
-       * One thread, up to `maxPagesPerThread` pages.
+       * One **batch**, which is pages until `replyBatchSize` comments are held.
        *
-       * The walk ends on whichever comes first: the connector saying `done`,
-       * the page bound, or a page that returned nothing. The last is not
-       * redundant — US-020 measured an X thread whose `has_more: true` led to
-       * an empty page, so a cursor is not a promise that anything is behind it.
+       * The walk ends on whichever comes first: the batch being full, the
+       * connector saying `done`, the page bound, or a page that returned
+       * nothing. The last is not redundant — US-020 measured an X thread whose
+       * `has_more: true` led to an empty page, so a cursor is not a promise
+       * that anything is behind it.
+       *
+       * `maxPagesPerThread` survives as a bound on one job rather than on one
+       * thread: a batch of 50 is normally one page, and a provider handing
+       * back tiny pages must not be able to spend a batch's worth of credits
+       * reaching fifty comments.
        */
-      let cursor: string | undefined;
+      let cursor: string | undefined = grewSinceStopping
+        ? undefined
+        : (post.repliesCursor ?? undefined);
       let pages = 0;
       let partial = true;
+      let readThisBatch = 0;
       /**
        * How many items the provider has returned for this thread so far.
        *
@@ -303,9 +420,64 @@ export function createRepliesStep({
        * skipped by a mark that had already moved past it.
        */
       const readAt = new Date();
-      const since = post.repliesReadAt && post.repliesReadAt > floor ? post.repliesReadAt : floor;
 
-      while (pages < maxPagesPerThread) {
+      /**
+       * A fresh walk, or the continuation of one.
+       *
+       * A thread that grew after being closed starts over: its cursor belongs
+       * to a walk that has ended, and its batch counter would otherwise carry
+       * the old walk's depth into the new one.
+       */
+      const restarting = grewSinceStopping;
+      const firstBatch = restarting || post.repliesBatchStart === null;
+
+      /**
+       * The window, and why it is applied **only to the first batch**.
+       *
+       * Found by a test on 2026-09-06, and it would have been near-invisible
+       * live. `repliesReadAt` is written when a walk starts, so a second batch
+       * computing `since` from it asks the provider for comments newer than
+       * the moment batch one ran — and every comment in the thread is older
+       * than that. The batch comes back empty, the threshold reads the empty
+       * batch as "nobody here", and a thread is abandoned after two batches
+       * having actually been read once.
+       *
+       * A batch walk is not a search for new comments. It is paging through
+       * comments that already exist, from a cursor the provider issued, and
+       * the provider decides what is behind that cursor. So the date cut
+       * belongs to the start of a walk and nowhere else.
+       */
+      const since = firstBatch
+        ? post.repliesReadAt && post.repliesReadAt > floor
+          ? post.repliesReadAt
+          : floor
+        : floor;
+
+      /**
+       * Where this batch starts in the thread, and how much room is left.
+       *
+       * `repliesBatchStart` is written before the reading, because the
+       * threshold counts matches at or after it and a mark written afterwards
+       * would count the batch that has just finished.
+       */
+      const batchStart = restarting ? 0 : (post.repliesBatchStart ?? 0);
+      positionOffset = batchStart;
+
+      const roomLeft = maxCommentsPerThread - batchStart;
+
+      if (roomLeft <= 0) {
+        await db.update(posts).set({ repliesStopped: "ceiling" }).where(eq(posts.id, post.id));
+        logger.info(
+          { monitorId, postId: post.id, ceiling: maxCommentsPerThread },
+          "thread closed: it has had as many comments as one thread may buy",
+        );
+        skipped += 1;
+        continue;
+      }
+
+      const wantThisBatch = Math.min(replyBatchSize, roomLeft);
+
+      while (pages < maxPagesPerThread && readThisBatch < wantThisBatch) {
         const result = await connector.fetchReplies({
           postUrl: post.url,
           postExternalId: post.externalId,
@@ -319,6 +491,7 @@ export function createRepliesStep({
         spentUnits += result.unitsConsumed;
         partial = result.partial;
         positionOffset += result.itemsReturned;
+        readThisBatch += result.itemsReturned;
 
         await recordSourceUsage(db, {
           monitorId,
@@ -378,10 +551,81 @@ export function createRepliesStep({
        */
       const stoppedEarly = pages >= maxPagesPerThread && partial;
 
+      /**
+       * Whether the last batch found anybody, and what that decides.
+       *
+       * Counted from `matches` over this thread's replies at or after the
+       * batch's own start, because that is the question the threshold asks:
+       * did *this* fifty hold a lead. A count over the whole thread would let
+       * one good comment at position 3 keep a dead thread alive for ever.
+       *
+       * The first batch of a thread is not judged here — it has not been
+       * classified yet when this runs. It is judged on the next pass, which is
+       * what makes this a loop rather than a decision made too early.
+       */
+      const [yielded] = await db
+        .select({ found: sql<number>`count(*)::int` })
+        .from(matches)
+        .innerJoin(posts, eq(posts.id, matches.postId))
+        .where(
+          and(
+            eq(matches.monitorId, monitorId),
+            eq(posts.parentPostId, post.id),
+            gte(posts.threadPosition, batchStart),
+          ),
+        );
+
+      const foundInBatch = yielded?.found ?? 0;
+
+      /**
+       * The end of the thread, said by the connector rather than by us.
+       *
+       * `partial === false` is positive evidence that there is no more, which
+       * is a different claim from having run out of cursors. Only that closes
+       * a thread as `end`.
+       */
+      const reachedTheEnd = !partial;
+      const reachedTheCeiling = positionOffset >= maxCommentsPerThread;
+
+      const emptyBatches = firstBatch ? 0 : foundInBatch > 0 ? 0 : post.repliesEmptyBatches + 1;
+
+      const stopped = reachedTheEnd
+        ? "end"
+        : reachedTheCeiling
+          ? "ceiling"
+          : emptyBatches >= maxEmptyBatches
+            ? "threshold"
+            : null;
+
       await db
         .update(posts)
-        .set({ repliesPartial: stoppedEarly ? true : partial, repliesReadAt: readAt })
+        .set({
+          repliesPartial: stoppedEarly ? true : partial,
+          // Written when a walk begins and left alone while it runs, so the
+          // next walk's window is the moment this one started rather than the
+          // moment it happened to finish.
+          ...(firstBatch ? { repliesReadAt: readAt } : {}),
+          repliesCursor: cursor ?? null,
+          repliesBatchStart: positionOffset,
+          repliesEmptyBatches: emptyBatches,
+          repliesStopped: stopped,
+          // The count reading stopped at, so growth can re-open the thread.
+          ...(stopped === null ? {} : { repliesStoppedAtCount: post.replyCount ?? null }),
+        })
         .where(eq(posts.id, post.id));
+
+      logger.debug(
+        {
+          monitorId,
+          postId: post.id,
+          batchStart,
+          readTo: positionOffset,
+          foundInBatch,
+          emptyBatches,
+          stopped,
+        },
+        "batch read",
+      );
     }
 
     logger.info(

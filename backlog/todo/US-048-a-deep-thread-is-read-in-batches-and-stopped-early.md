@@ -103,13 +103,13 @@ would cost. `estimate/` already turns units and prices into money and
 
 ## Acceptance
 
-- [ ] A thread is read in batches of a configurable size, defaulting to **50**
+- [x] A thread is read in batches of a configurable size, defaulting to **50**
       comments, rather than a fixed number of provider pages. The batch is
       counted in comments so it means the same thing on every provider
-- [ ] After a batch has been through triage and classification, reading
+- [x] After a batch has been through triage and classification, reading
       continues only if that batch produced **at least one** match. The
       threshold is a setting; its default is 1
-- [ ] Reading stops after **two consecutive** empty batches rather than one,
+- [x] Reading stops after **two consecutive** empty batches rather than one,
       unless the setting says otherwise. One empty batch mid-thread is a dead
       patch; two is a dead thread. At a batch of 50 this is not a nicety: a
       single-empty-batch rule would stop a genuinely good thread about one time
@@ -120,10 +120,10 @@ would cost. `estimate/` already turns units and prices into money and
       whether leads spread evenly, cluster at the top, or cluster at the bottom
 - [x] The comment's position in the page the provider returned is stored, so
       this question can be asked again without buying the thread twice
-- [ ] A ceiling bounds the total comments one thread may buy, and it is the
+- [x] A ceiling bounds the total comments one thread may buy, and it is the
       control that actually protects the bill. A monitor's budget cap still
       refuses a batch before it is bought
-- [ ] The decision is recorded per thread: how many comments were read, how
+- [x] The decision is recorded per thread: how many comments were read, how
       many matched, and whether reading stopped because of the threshold, the
       ceiling, the budget, or the end of the thread. A person asking "why did
       it stop" gets an answer
@@ -131,7 +131,7 @@ would cost. `estimate/` already turns units and prices into money and
       comments were read of how many exist, and how many became matches
 - [ ] What continuing would cost is shown as money, priced from
       `unitsConsumed` and the model's own prices, never from a comment count
-- [ ] `repliesPartial` keeps its current meaning. A thread stopped by this rule
+- [x] `repliesPartial` keeps its current meaning. A thread stopped by this rule
       is partial, and that is not the same claim as the provider saying there
       is more
 - [ ] The Log records the first few live runs: how deep threads were read, how
@@ -381,3 +381,39 @@ would cost. `estimate/` already turns units and prices into money and
   in two thousand. At a batch of 100 the same rule is safer still. So the pair
   — batch size and consecutive-empties — must be chosen together, and neither
   number means anything alone.
+
+- 2026-09-06T17:55+08:00 — **The loop is built.** A thread is read fifty
+  comments at a time; the batch goes through the filter and the classifier;
+  `classify` hands the thread back to `replies`; `replies` decides whether to
+  buy the next fifty. The rule lives in `replies.ts` alone — `classify` says
+  only "these threads have been judged", because a step that scores posts must
+  not also own how deep a thread is read.
+
+  Four columns carry the walk across jobs, since it now outlives one:
+  `replies_cursor`, `replies_batch_start`, `replies_empty_batches` and
+  `replies_stopped`, plus `replies_stopped_at_count`. Migration 0033.
+
+  **Two bugs were found by writing the tests, and both would have been close to
+  invisible live.**
+
+  The first is the window. `replies_read_at` is written when a walk starts, so
+  a second batch computing `since` from it asked the provider for comments
+  newer than the moment batch one ran — and every comment in the thread is
+  older than that. The batch came back empty, the threshold read that as
+  "nobody here", and a thread would have been abandoned after two batches
+  having actually been read once. A batch walk is not a search for new
+  comments: it pages through comments that already exist, from a cursor the
+  provider issued. So the date cut now applies to the first batch of a walk and
+  nowhere else.
+
+  The second is that `replies_stopped` was a life sentence. A thread abandoned
+  on two empty batches in March would never be read again however busy it
+  became — which is the case a monitor exists to catch. `replies_stopped_at_count`
+  is the fix: when the platform's own count passes what it was when reading
+  stopped, the walk starts fresh, cursor and depth and empty-counter all reset.
+
+  Both have tests, and removing either rule turns one red.
+
+  What is left: the screen. Nothing yet shows how much of a thread was read, of
+  how many, and why reading stopped — and the reason for stopping is the part a
+  person cannot guess. `replies_stopped` holds the answer; no view reads it.

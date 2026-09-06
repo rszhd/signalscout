@@ -93,6 +93,7 @@ let worker: WorkerHandle;
 let db: Database;
 let closeDb: () => Promise<void>;
 const notified: Array<{ monitorId: string; matchIds: readonly string[] }> = [];
+const continued: { monitorId: string; postIds: readonly string[] }[] = [];
 const lines: Array<Record<string, unknown>> = [];
 
 async function insertPost(post: (typeof fakePosts)[number], externalId = post.externalId) {
@@ -140,6 +141,12 @@ beforeAll(async () => {
       notify: async ({ monitorId, matchIds }) => {
         notified.push({ monitorId, matchIds });
       },
+      // US-048's loop. A thread is read fifty comments at a time and the
+      // decision to buy the next fifty needs the verdicts on the last fifty,
+      // which exist only when this step has finished.
+      replies: async ({ monitorId, postIds }) => {
+        continued.push({ monitorId, postIds: [...postIds] });
+      },
     },
     retry: fastRetries,
     scheduleTicks: false,
@@ -156,6 +163,7 @@ beforeEach(() => {
   answer = () => strongAnswer;
   calls = [];
   notified.length = 0;
+  continued.length = 0;
   lines.length = 0;
 });
 
@@ -659,4 +667,59 @@ it("does not pay the model to read a post already confirmed deleted", async () =
   );
   expect(calls).toEqual([]);
   expect(await db.select().from(matches).where(eq(matches.postId, postId))).toEqual([]);
+});
+
+/**
+ * US-048's loop, closed from this end.
+ *
+ * A thread is read fifty comments at a time, and whether to buy the next fifty
+ * needs the verdicts on the last fifty — which exist only when this step has
+ * finished. So this step sends the thread back to `replies`, and `replies`
+ * owns the rule. A step that scores posts must not also decide how deep a
+ * thread is read, which is why what is asserted here is only that the thread
+ * is offered, never what happens to it.
+ */
+describe("continuing a thread after its batch has been judged", () => {
+  it("sends the parent thread back once per batch of replies", async () => {
+    const monitorId = await insertMonitor(database, {});
+    const parentId = await insertPost(fakePosts[0] as (typeof fakePosts)[number], "t3_loop_parent");
+
+    const asReply = async (externalId: string) => {
+      const [row] = await db
+        .insert(posts)
+        .values({
+          source: "reddit",
+          externalId,
+          url: `https://www.reddit.com/r/SaaS/comments/loop/${externalId}/`,
+          excerpt: "We hit this too. What did you end up using?",
+          postedAt: new Date("2026-09-05T09:00:00.000Z"),
+          kind: "reply" as const,
+          parentPostId: parentId,
+        })
+        .returning({ id: posts.id });
+
+      if (!row) throw new Error("the reply was not inserted");
+      return row.id;
+    };
+
+    const replyIds = [await asReply("t1_loop_a"), await asReply("t1_loop_b")];
+
+    await worker.boss.send(classifyQueue, { monitorId, postIds: replyIds });
+    await until("the thread to be offered again", () => continued[0]);
+
+    // One job for the thread, not one per reply: two replies of the same
+    // thread are one batch and one decision.
+    expect(continued).toHaveLength(1);
+    expect(continued[0]?.postIds).toEqual([parentId]);
+  }, 30_000);
+
+  it("offers nothing when the batch held no replies, because a post has no thread", async () => {
+    const monitorId = await insertMonitor(database, {});
+    const postId = await insertPost(fakePosts[0] as (typeof fakePosts)[number], "t3_loop_plain");
+
+    await worker.boss.send(classifyQueue, { monitorId, postIds: [postId] });
+    await until("the notification", () => notified[0]);
+
+    expect(continued).toEqual([]);
+  }, 30_000);
 });

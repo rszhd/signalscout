@@ -53,7 +53,7 @@ import {
   type Signal,
 } from "../db/schema.js";
 import type { ClassifyPayload } from "./queues.js";
-import { notifyQueue } from "./queues.js";
+import { notifyQueue, repliesQueue } from "./queues.js";
 import type { Step, StepContext } from "./steps.js";
 
 /**
@@ -297,6 +297,31 @@ export function createClassifyStep({ classifier }: ClassifyOptions): Step<Classi
     // Sent before the throw below, on purpose. The matches above are written
     // and a failure on a later post must not hold back the ones that worked.
     await boss.send(notifyQueue, { monitorId, matchIds });
+
+    /**
+     * The threads whose next batch is now decidable. US-048.
+     *
+     * A thread is read fifty comments at a time and the decision to buy the
+     * next fifty needs the verdicts on the last fifty — which exist only here,
+     * at the end of classification. So this closes the loop: replies buys a
+     * batch, the filter and this step judge it, and this sends the thread back
+     * for another.
+     *
+     * The rule itself is deliberately not here. This step knows nothing about
+     * batches, thresholds or ceilings; it says "these threads have been
+     * judged" and `replies.ts` decides what that is worth. A step that scores
+     * posts should not also own how deep a thread is read.
+     */
+    const parents = await db
+      .selectDistinct({ id: posts.parentPostId })
+      .from(posts)
+      .where(and(inArray(posts.id, ids), eq(posts.kind, "reply")));
+
+    const threadIds = parents.map((row) => row.id).filter((id): id is string => id !== null);
+
+    if (threadIds.length > 0) {
+      await boss.send(repliesQueue, { monitorId, postIds: threadIds });
+    }
 
     if (retryable > 0) {
       throw new Error(

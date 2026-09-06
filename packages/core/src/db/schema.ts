@@ -73,6 +73,18 @@ export type Provider = (typeof providers)[number];
  * from the post above it and no similarity threshold separates the person
  * asking from the experts answering.
  */
+/**
+ * Why a thread stopped being read. US-048.
+ *
+ * Four answers and they lead to different actions. `threshold` means two
+ * batches in a row held no lead, so this thread is probably not one to read —
+ * a person who disagrees can say so. `ceiling` and `budget` mean money, not
+ * judgement, and a thread stopped by either has more to read the moment there
+ * is more to spend. `end` means the provider ran out of thread.
+ */
+export const repliesStoppedReasons = ["threshold", "ceiling", "budget", "end"] as const;
+export type RepliesStoppedReason = (typeof repliesStoppedReasons)[number];
+
 export const postKinds = ["post", "reply"] as const;
 export type PostKind = (typeof postKinds)[number];
 
@@ -554,12 +566,42 @@ export const posts = pgTable(
      * the bottom, stopping early throws away the best part.
      */
     threadPosition: integer("thread_position"),
+    /**
+     * Where to resume reading this thread, and what happened last time.
+     *
+     * US-048. A thread is read in batches of `replyBatchSize`, and the
+     * decision to buy the next batch is made after the last one has been
+     * classified — so the walk outlives a single job and its place has to be
+     * written down.
+     *
+     * `repliesCursor` is the provider's own cursor, opaque and only meaningful
+     * to the connector that issued it. `repliesBatchStart` is the position the
+     * current batch began at, which is how the threshold knows which comments
+     * to count. `repliesEmptyBatches` counts *consecutive* batches that
+     * produced no match, and reading ends at two — one empty batch is a dead
+     * patch, two is a dead thread. `repliesStopped` records why reading ended,
+     * so a person asking "why did it stop" gets an answer rather than a guess.
+     */
+    repliesCursor: text("replies_cursor"),
+    repliesBatchStart: integer("replies_batch_start"),
+    repliesEmptyBatches: smallint("replies_empty_batches").notNull().default(0),
+    repliesStopped: text("replies_stopped"),
+    /**
+     * The platform's comment count when reading stopped.
+     *
+     * What lets a closed thread open again. Without it `repliesStopped` is a
+     * life sentence: a thread abandoned on two empty batches would never be
+     * read again however many comments arrived afterwards, which is exactly
+     * the case a monitor exists to catch.
+     */
+    repliesStoppedAtCount: integer("replies_stopped_at_count"),
   },
   (table) => [
     unique("posts_source_external_id_unique").on(table.source, table.externalId),
     check("posts_source_known", oneOf("source", sources)),
     check("posts_provider_known", optionallyOneOf("provider", providers)),
     check("posts_kind_known", oneOf("kind", postKinds)),
+    check("posts_replies_stopped_known", optionallyOneOf("replies_stopped", repliesStoppedReasons)),
     // A reply has a parent and a post does not. Without this the two columns
     // drift apart and a reply with no thread reaches the classifier as if it
     // were a post, which is the one thing US-020 exists to prevent.

@@ -16,7 +16,12 @@ import type { CandidateReply } from "../sources/types.js";
 import { createTestDatabase, type TestDatabase } from "../testing/database.js";
 import type { ClassifyPayload, FilterPayload } from "./queues.js";
 import { repliesQueue } from "./queues.js";
-import { maxPagesPerThread } from "./replies.js";
+import {
+  maxCommentsPerThread,
+  maxEmptyBatches,
+  maxPagesPerThread,
+  replyBatchSize,
+} from "./replies.js";
 import { startWorker, type WorkerHandle } from "./runtime.js";
 import { fakeRegistry, fastRetries, insertMonitor, until } from "./testing.js";
 
@@ -645,4 +650,316 @@ describe("what is never bought", () => {
 
     expect(usage).toEqual([]);
   }, 20_000);
+});
+
+/**
+ * US-048's batching, which is the rule that decides what a deep thread costs.
+ *
+ * Correctness-critical in the money sense: a thread with a hundred thousand
+ * comments is $297 of classification if nothing stops it, and a rule that
+ * stops too eagerly throws away the better half of a thread — US-048 measured
+ * leads sitting three times denser at position 400 than at position 0.
+ *
+ * These cases drive the fake at fifty replies a page, so one page is one
+ * batch and the arithmetic under test is the rule rather than the paging.
+ */
+describe("reading a thread in batches", () => {
+  /** A page-sized thread, so `replyBatchSize` is reached in one page. */
+  function bigThreadUnder(postExternalId: string): readonly CandidateReply[] {
+    return Array.from({ length: replyBatchSize }, (_, index) => ({
+      externalId: `t1_${postExternalId}_${index}`,
+      url: `https://www.reddit.com/r/SaaS/comments/${postExternalId}/comment/${index}/`,
+      author: "a-redditor",
+      channel: "SaaS",
+      text: `Comment number ${index}.`,
+      postedAt,
+      parentPostExternalId: postExternalId,
+    }));
+  }
+
+  async function deepHarness(name: string) {
+    const database = await createTestDatabase(`worker_replies_batch_${name}`);
+    const { db, close } = createDatabase(database.url);
+    const seen: FilterPayload[] = [];
+
+    const worker = await startWorker({
+      databaseUrl: database.url,
+      logger: createLogger({ level: "silent", name: "test" }),
+      registry: fakeRegistry({
+        replies: bigThreadUnder,
+        unitsPerReplyCall: 1,
+        // Endless, so nothing but our own rules can stop the walk.
+        replyPages: 100,
+      }),
+      credentialsFor: () => ({ token: "test-token" }),
+      steps: {
+        filter: async (payload) => {
+          seen.push(payload);
+        },
+        classify: async () => {},
+      },
+      retry: fastRetries,
+      scheduleTicks: false,
+    });
+
+    return {
+      database,
+      db,
+      seen,
+      async run(monitorId: string, postIds: string[]) {
+        await worker.boss.send(repliesQueue, { monitorId, postIds });
+      },
+      async stop() {
+        await worker.stop();
+        await close();
+        await database.drop();
+      },
+    };
+  }
+
+  async function insertThread(db: Database, externalId: string, overrides = {}) {
+    const [row] = await db
+      .insert(posts)
+      .values({
+        source: "reddit",
+        externalId,
+        url: `https://www.reddit.com/r/SaaS/comments/${externalId}/`,
+        excerpt: "A very busy thread.",
+        postedAt,
+        replyCount: 5000,
+        ...overrides,
+      })
+      .returning({ id: posts.id });
+
+    if (!row) throw new Error("the thread was not inserted");
+    return row.id;
+  }
+
+  it("buys one batch, not the whole thread, and remembers where to resume", async () => {
+    const harness = await deepHarness("one");
+
+    try {
+      const monitorId = await insertMonitor(harness.database, { includeReplies: true });
+      const postId = await insertThread(harness.db, "t3_batch_one");
+
+      await harness.run(monitorId, [postId]);
+      await until("the replies to reach the filter", () => harness.seen[0]);
+
+      const stored = await harness.db
+        .select({ id: posts.id })
+        .from(posts)
+        .where(and(eq(posts.kind, "reply"), eq(posts.parentPostId, postId)));
+
+      // One batch. Not the 100 pages the fake would happily have sold.
+      expect(stored.length).toBe(replyBatchSize);
+
+      const [thread] = await harness.db
+        .select({
+          cursor: posts.repliesCursor,
+          batchStart: posts.repliesBatchStart,
+          empty: posts.repliesEmptyBatches,
+          stopped: posts.repliesStopped,
+        })
+        .from(posts)
+        .where(eq(posts.id, postId));
+
+      expect(thread?.cursor).not.toBeNull();
+      expect(thread?.batchStart).toBe(replyBatchSize);
+      // The first batch is never judged: nothing has classified it yet.
+      expect(thread?.empty).toBe(0);
+      expect(thread?.stopped).toBeNull();
+    } finally {
+      await harness.stop();
+    }
+  }, 60_000);
+
+  it("closes a thread after two batches in a row with no lead", async () => {
+    const harness = await deepHarness("empty");
+
+    try {
+      const monitorId = await insertMonitor(harness.database, { includeReplies: true });
+      const postId = await insertThread(harness.db, "t3_batch_empty");
+
+      // Batch one.
+      await harness.run(monitorId, [postId]);
+      await until("batch one", () => harness.seen[0]);
+
+      // Batch two. Nothing matched batch one, because nothing classifies here.
+      await harness.run(monitorId, [postId]);
+      await until("batch two", () => harness.seen[1]);
+
+      const [afterTwo] = await harness.db
+        .select({ empty: posts.repliesEmptyBatches, stopped: posts.repliesStopped })
+        .from(posts)
+        .where(eq(posts.id, postId));
+
+      expect(afterTwo?.empty).toBe(1);
+      expect(afterTwo?.stopped).toBeNull();
+
+      // Batch three: the second empty one, which closes the thread.
+      await harness.run(monitorId, [postId]);
+      await until("batch three", () => harness.seen[2]);
+
+      const [afterThree] = await harness.db
+        .select({ empty: posts.repliesEmptyBatches, stopped: posts.repliesStopped })
+        .from(posts)
+        .where(eq(posts.id, postId));
+
+      expect(afterThree?.empty).toBe(maxEmptyBatches);
+      expect(afterThree?.stopped).toBe("threshold");
+
+      // And a fourth job buys nothing at all.
+      const before = await harness.db
+        .select({ id: posts.id })
+        .from(posts)
+        .where(and(eq(posts.kind, "reply"), eq(posts.parentPostId, postId)));
+
+      await harness.run(monitorId, [postId]);
+      await new Promise((resolve) => setTimeout(resolve, 700));
+
+      const after = await harness.db
+        .select({ id: posts.id })
+        .from(posts)
+        .where(and(eq(posts.kind, "reply"), eq(posts.parentPostId, postId)));
+
+      expect(after.length).toBe(before.length);
+    } finally {
+      await harness.stop();
+    }
+  }, 90_000);
+
+  /**
+   * The window bug, which a test found and a live run would have hidden.
+   *
+   * `repliesReadAt` is written when a walk starts. A second batch computing
+   * `since` from it asks for comments newer than the moment batch one ran, and
+   * every comment in the thread is older than that — so the batch comes back
+   * empty, the threshold reads that as "nobody here", and the thread is
+   * abandoned having actually been read once.
+   */
+  it("does not apply the poll window to a batch that is continuing a walk", async () => {
+    const harness = await deepHarness("window");
+
+    try {
+      const monitorId = await insertMonitor(harness.database, { includeReplies: true });
+      const postId = await insertThread(harness.db, "t3_batch_window");
+
+      await harness.run(monitorId, [postId]);
+      await until("batch one", () => harness.seen[0]);
+
+      await harness.run(monitorId, [postId]);
+      await until("batch two", () => harness.seen[1]);
+
+      const stored = await harness.db
+        .select({ id: posts.id })
+        .from(posts)
+        .where(and(eq(posts.kind, "reply"), eq(posts.parentPostId, postId)));
+
+      // Two batches of fifty. One would mean the second was filtered to
+      // nothing by a window that has no business inside a walk.
+      expect(stored.length).toBe(replyBatchSize * 2);
+    } finally {
+      await harness.stop();
+    }
+  }, 90_000);
+
+  /**
+   * A closed thread is not closed for ever.
+   *
+   * Without this, `repliesStopped` is a life sentence: a thread abandoned on
+   * two empty batches in March would never be read again however busy it
+   * became, which is the case a monitor exists to catch.
+   */
+  it("opens a closed thread again when the platform says more was said", async () => {
+    const harness = await deepHarness("reopen");
+
+    try {
+      const monitorId = await insertMonitor(harness.database, { includeReplies: true });
+      /**
+       * Closed on the threshold at 900 comments, and the platform now says
+       * 1,200. The two counts are the whole rule, so they are set up rather
+       * than produced: a phase that first proved "unchanged buys nothing" and
+       * then changed the count raced under load, because the first job could
+       * land after the change and read a batch of its own. The
+       * unchanged-count case is covered by the ceiling test below.
+       */
+      const postId = await insertThread(harness.db, "t3_batch_reopen", {
+        replyCount: 1200,
+        repliesStopped: "threshold",
+        repliesStoppedAtCount: 900,
+        repliesBatchStart: 200,
+        repliesEmptyBatches: maxEmptyBatches,
+      });
+
+      await harness.run(monitorId, [postId]);
+      await until("the re-opened thread", () => harness.seen[0]);
+
+      const [thread] = await harness.db
+        .select({
+          stopped: posts.repliesStopped,
+          batchStart: posts.repliesBatchStart,
+          empty: posts.repliesEmptyBatches,
+        })
+        .from(posts)
+        .where(eq(posts.id, postId));
+
+      // A fresh walk: the old cursor belonged to a walk that ended, and the
+      // old depth would carry into the new one.
+      expect(thread?.stopped).toBeNull();
+      expect(thread?.batchStart).toBe(replyBatchSize);
+      expect(thread?.empty).toBe(0);
+    } finally {
+      await harness.stop();
+    }
+  }, 90_000);
+
+  it("stops at the ceiling, however well the thread is doing", async () => {
+    const harness = await deepHarness("ceiling");
+
+    try {
+      const monitorId = await insertMonitor(harness.database, { includeReplies: true });
+      // Start one batch below the ceiling, so the next batch reaches it.
+      const postId = await insertThread(harness.db, "t3_batch_ceiling", {
+        repliesBatchStart: maxCommentsPerThread - replyBatchSize,
+      });
+
+      await harness.run(monitorId, [postId]);
+      await until("the last allowed batch", () => harness.seen[0]);
+
+      const [thread] = await harness.db
+        .select({ stopped: posts.repliesStopped, batchStart: posts.repliesBatchStart })
+        .from(posts)
+        .where(eq(posts.id, postId));
+
+      expect(thread?.batchStart).toBe(maxCommentsPerThread);
+      // The ceiling is what protects the bill, and it outranks a good yield.
+      expect(thread?.stopped).toBe("ceiling");
+    } finally {
+      await harness.stop();
+    }
+  }, 60_000);
+
+  it("never re-reads a thread the ceiling already closed", async () => {
+    const harness = await deepHarness("ceiling_again");
+
+    try {
+      const monitorId = await insertMonitor(harness.database, { includeReplies: true });
+      const postId = await insertThread(harness.db, "t3_batch_ceiling_done", {
+        repliesBatchStart: maxCommentsPerThread,
+      });
+
+      await harness.run(monitorId, [postId]);
+      await new Promise((resolve) => setTimeout(resolve, 700));
+
+      const usage = await harness.db
+        .select()
+        .from(apiUsage)
+        .where(eq(apiUsage.monitorId, monitorId));
+
+      // Not one credit. A thread at its ceiling is not asked about again.
+      expect(usage).toEqual([]);
+    } finally {
+      await harness.stop();
+    }
+  }, 60_000);
 });

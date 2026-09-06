@@ -264,6 +264,9 @@ describe("the monitor form", () => {
       monitorId: null,
       status: "ready",
       pollIntervalSeconds: 3600,
+      // BUG-005. The response carries the days it priced, so the sentence under
+      // the table can say what was assumed rather than implying every day.
+      pollDays: [0, 1, 2, 3, 4, 5, 6],
       windowDays: 7,
       testUnits: 30,
       testCostMicros: 45_000,

@@ -126,6 +126,7 @@ describe("the cost test", () => {
   ): Promise<string> {
     return startEstimate(db, {
       monitorId: options.monitorId ?? null,
+      pollDays: [0, 1, 2, 3, 4, 5, 6],
       pollIntervalSeconds: options.pollIntervalSeconds ?? 3600,
       monthlyCapMicros: options.capMicros ?? null,
       probes,

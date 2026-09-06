@@ -231,6 +231,19 @@ Polling is still the multiplier, and still the biggest dial a person controls:
 the same query costs $10.80 a month polled hourly and $648.00 polled every
 minute.
 
+**The projection uses the schedule you chose, including the days.** A monitor
+set to weekdays makes five sevenths of the polls a daily one does, and is
+quoted five sevenths as much. That was not true until 2026-09-06: the estimate
+assumed hourly and every day for as long as every monitor *was* hourly and every
+day, and the first version of the schedule control quoted a weekly monitor a
+month of hourly polling — 730 polls where it makes about four. Wrong by roughly
+180 times, in the direction that frightens somebody away from a monitor costing
+pennies.
+
+An estimate records the schedule it priced. Change the schedule afterwards and
+the old estimate is stale rather than silently re-priced, because a quote is a
+record of what you were told rather than a live query.
+
 ### Why some figures are a range
 
 A sample asks for ten records. When the source bills all ten, it had more to

@@ -884,6 +884,8 @@ export function MonitorForm() {
 
               <CostTest
                 monthlyCapMicros={capMicros}
+                pollDays={schedule.pollDays}
+                pollIntervalSeconds={schedule.pollIntervalSeconds}
                 queries={queries}
                 report={estimate}
                 sources={selectedSources}

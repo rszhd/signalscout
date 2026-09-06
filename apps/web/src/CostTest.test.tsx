@@ -46,6 +46,7 @@ function report(overrides: Partial<EstimateReport> = {}): EstimateReport {
     monitorId: null,
     status: "ready",
     pollIntervalSeconds: 3600,
+    pollDays: [0, 1, 2, 3, 4, 5, 6],
     windowDays: 7,
     testUnits: 10,
     testCostMicros: 15_000,
@@ -72,6 +73,8 @@ describe("the cost test", () => {
   let onReport: ReturnType<typeof vi.fn<(report: EstimateReport | null) => void>>;
 
   const plan = {
+    pollIntervalSeconds: 3600,
+    pollDays: [0, 1, 2, 3, 4, 5, 6],
     queries: { reddit: ["flaky end to end tests"] },
     subreddits: ["SaaS"],
     sources: ["reddit"],
@@ -116,6 +119,11 @@ describe("the cost test", () => {
       subreddits: ["SaaS"],
       sources: ["reddit"],
       monthlyCapMicros: 10_000_000,
+      // BUG-005. The schedule is sent rather than left to the API's default of
+      // hourly and every day: a weekly monitor quoted at hourly is 180 times
+      // too expensive, with the schedule control on the same screen saying so.
+      pollIntervalSeconds: 3600,
+      pollDays: [0, 1, 2, 3, 4, 5, 6],
     });
     expect(onReport).toHaveBeenCalledWith(report());
   });

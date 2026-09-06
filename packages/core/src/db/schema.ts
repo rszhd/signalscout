@@ -1022,6 +1022,16 @@ export const queryEstimates = pgTable(
      * not written down is a figure nobody can check later.
      */
     pollIntervalSeconds: integer("poll_interval_seconds").notNull(),
+    /**
+     * The days the monitor would poll on. US-041, stored here by BUG-005.
+     *
+     * Kept beside the interval rather than read from the monitor, for the same
+     * reason the interval is: an estimate is made before a monitor exists, and
+     * a projection is a record of what was quoted rather than a live query. A
+     * person who changes their schedule afterwards gets a stale estimate, not a
+     * silently re-priced one.
+     */
+    pollDays: smallint("poll_days").array().notNull().default(sql`'{0,1,2,3,4,5,6}'`),
     /** The cap this run was measured against, in micro-dollars. Null when there is none. */
     monthlyCapMicros: bigint("monthly_cap_micros", { mode: "number" }),
     /** What the test itself consumed and cost. The sum of its probes. */

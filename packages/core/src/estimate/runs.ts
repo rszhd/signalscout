@@ -63,6 +63,8 @@ export interface EstimateRun {
   readonly monitorId: string | null;
   readonly status: EstimateStatus;
   readonly pollIntervalSeconds: number;
+  /** The days it would poll on. US-041. */
+  readonly pollDays: readonly number[];
   readonly monthlyCapMicros: number | null;
   /** What the test itself consumed and cost, summed from its probes. */
   readonly units: number;
@@ -76,6 +78,8 @@ export interface EstimateRun {
 export interface StartEstimateInput {
   readonly monitorId?: string | null;
   readonly pollIntervalSeconds: number;
+  /** The days it would poll on. US-041. */
+  readonly pollDays: readonly number[];
   readonly monthlyCapMicros?: number | null;
   readonly probes: readonly ProbeRequest[];
 }
@@ -94,7 +98,13 @@ function readSamples(value: unknown): EstimateSample[] {
 
 export async function startEstimate(
   db: Database,
-  { monitorId = null, pollIntervalSeconds, monthlyCapMicros = null, probes }: StartEstimateInput,
+  {
+    monitorId = null,
+    pollIntervalSeconds,
+    pollDays,
+    monthlyCapMicros = null,
+    probes,
+  }: StartEstimateInput,
 ): Promise<string> {
   if (probes.length === 0) {
     throw new Error("A cost test needs at least one query or subreddit to run.");
@@ -102,7 +112,7 @@ export async function startEstimate(
 
   const [run] = await db
     .insert(queryEstimates)
-    .values({ monitorId, pollIntervalSeconds, monthlyCapMicros })
+    .values({ monitorId, pollIntervalSeconds, pollDays: [...pollDays], monthlyCapMicros })
     .returning({ id: queryEstimates.id });
 
   if (!run) throw new Error("The cost test was not inserted.");
@@ -131,6 +141,7 @@ export async function readEstimate(db: Database, id: string): Promise<EstimateRu
     monitorId: row.monitorId,
     status: row.status,
     pollIntervalSeconds: row.pollIntervalSeconds,
+    pollDays: row.pollDays,
     monthlyCapMicros: row.monthlyCapMicros,
     units: row.units,
     estimatedCostMicros: row.estimatedCostMicros,
@@ -306,6 +317,8 @@ export interface EstimateReport {
   readonly monitorId: string | null;
   readonly status: EstimateStatus;
   readonly pollIntervalSeconds: number;
+  /** The days it would poll on. US-041. */
+  readonly pollDays: readonly number[];
   /** The days a sample looked back over, so the screen can say what it measured. */
   readonly windowDays: number;
   /** What the test itself consumed and cost. Estimated, like every figure here. */
@@ -364,6 +377,7 @@ export function reportFor(
           },
           {
             pollIntervalSeconds: run.pollIntervalSeconds,
+            pollDays: run.pollDays,
             maxUnitsPerQueryPoll: descriptor.maxUnitsPerQueryPoll,
             pricePerUnitMicros: descriptor.pricePerUnitMicros,
           },
@@ -415,6 +429,7 @@ export function reportFor(
     id: run.id,
     monitorId: run.monitorId,
     status: run.status,
+    pollDays: run.pollDays,
     pollIntervalSeconds: run.pollIntervalSeconds,
     windowDays: sampleWindowDays,
     // Summed from the probes rather than read from the run, so a person

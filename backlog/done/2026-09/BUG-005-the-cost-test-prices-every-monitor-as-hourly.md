@@ -6,7 +6,7 @@ priority: p2
 created: 2026-09-06T12:57+08:00
 parent: US-041
 area:
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -31,15 +31,17 @@ sentence has to be added — and reading the schedule is the honest one.
 
 ## Acceptance
 
-- [ ] The estimate projects from the schedule the person chose, not from an
+- [x] The estimate projects from the schedule the person chose, not from an
       hourly assumption
-- [ ] A monitor whose schedule names days polls fewer times a month than one
+- [x] A monitor whose schedule names days polls fewer times a month than one
       that does not, and the projection says so
-- [ ] The form's schedule control and its cost estimate agree. A test drives
+- [x] The form's schedule control and its cost estimate agree. A test drives
       one screen and asserts both
-- [ ] Changing the schedule after an estimate re-prices it, or the screen says
-      the estimate is stale
-- [ ] docs/costs.md says what the projection assumes now, in the same voice as
+- [x] Changing the schedule after an estimate re-prices it, or the screen says
+      the estimate is stale — **the second, deliberately.** An estimate records
+      the schedule it priced, and a quote is a record of what somebody was told
+      rather than a live query. docs/costs.md says so
+- [x] docs/costs.md says what the projection assumes now, in the same voice as
       the four things it already admits
 
 ## Notes
@@ -58,3 +60,30 @@ sentence has to be added — and reading the schedule is the honest one.
 - 2026-09-06T12:57+08:00 — Written the moment US-041 made it true. The estimate
   was correct for as long as every monitor was hourly, which was until this
   afternoon.
+
+- 2026-09-06T13:08+08:00 — Fixed, and the shape of the fix mattered more than
+  the arithmetic.
+
+  **`pollDays` is required on `PollShape`, not optional.** An optional one with
+  a sensible default is exactly how this bug existed: the projection assumed
+  every day, and nothing made a caller think about it. Required meant the
+  compiler listed every caller — two in production, two in tests — and none of
+  them could be forgotten. The fix itself is one line: polls a month now
+  multiplies by `pollDays.length / 7`.
+
+  **The estimate row stores the days**, beside the interval it already stored,
+  for the same reason: an estimate is made before a monitor exists, and a
+  projection is a record of what was quoted. A person who changes their schedule
+  gets a stale estimate rather than a silently re-priced one.
+
+  **The screen was the other half and it was worse.** `CostTest` never sent a
+  schedule at all, so the API applied its default — hourly, every day — no
+  matter what the control beside it said. It sends both now, and the sentence
+  under the table names the days when they are not all seven.
+
+  Two tests carry it: one asserts a weekdays monitor is quoted five sevenths of
+  a daily one, and one asserts the number from this ticket's own title — hourly
+  against weekly is more than 150 times, where it used to be 1.
+
+  1,034 tests pass. Migration 0029.
+

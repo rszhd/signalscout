@@ -136,6 +136,19 @@ export interface SampleWindow {
 /** Everything about a source and a monitor that decides what a poll costs. */
 export interface PollShape {
   readonly pollIntervalSeconds: number;
+  /**
+   * The days this monitor polls on. US-041, and required rather than optional.
+   *
+   * BUG-005 is what an optional one costs. The projection assumed every day for
+   * as long as every monitor polled every day, and the moment a person could
+   * choose weekdays the estimate quoted them a month of polls they would never
+   * make. A default here would have hidden that again in the next caller.
+   *
+   * Postgres numbering, 0 is Sunday, the same as `monitors.poll_days`. Only the
+   * count is used, but the days are carried whole so a projection can be
+   * checked against the monitor it was made for.
+   */
+  readonly pollDays: readonly number[];
   readonly maxUnitsPerQueryPoll: number;
   readonly pricePerUnitMicros: number;
 }
@@ -188,7 +201,7 @@ export function postsPerDay(sample: SampleMeasurement, { windowDays }: SampleWin
 }
 
 /**
- * What one query would cost in a month at this monitor's poll interval.
+ * What one query would cost in a month on this monitor's schedule.
  *
  * One sample is one search, and the source said what it charged for it. That
  * charge, times the polls in a month, is the whole projection. Nothing here
@@ -213,7 +226,16 @@ export function projectMonthly(
   const unitsPerPollLow = Math.min(shape.maxUnitsPerQueryPoll, sample.unitsBilled);
   const unitsPerPollHigh = capped ? shape.maxUnitsPerQueryPoll : unitsPerPollLow;
 
-  const pollsPerMonth = (daysPerMonth * secondsPerDay) / shape.pollIntervalSeconds;
+  /**
+   * Polls in a month, and the day fraction is the half BUG-005 was missing.
+   *
+   * A monitor polling hourly on five days of seven makes five sevenths of the
+   * polls, so it costs five sevenths as much. Without this a weekly monitor was
+   * quoted 730 polls where it makes 4 — wrong by about 180 times, in the
+   * direction that frightens somebody out of a monitor costing almost nothing.
+   */
+  const dayFraction = shape.pollDays.length / 7;
+  const pollsPerMonth = (daysPerMonth * dayFraction * secondsPerDay) / shape.pollIntervalSeconds;
   const monthlyUnitsLow = Math.round(unitsPerPollLow * pollsPerMonth);
   const monthlyUnitsHigh = Math.round(unitsPerPollHigh * pollsPerMonth);
   const priced = (units: number) =>

@@ -21,6 +21,8 @@ const redditPrice = 1500;
 
 /** Reddit's shape: fifty records is the most one query collects in a poll. */
 const redditHourly: PollShape = {
+  // Every day, which is what every projection assumed before US-041.
+  pollDays: [0, 1, 2, 3, 4, 5, 6],
   pollIntervalSeconds: 3600,
   maxUnitsPerQueryPoll: 50,
   pricePerUnitMicros: redditPrice,
@@ -151,6 +153,42 @@ describe("what a query would cost in a month", () => {
     expect(hourly.monthlyCostMicrosLow).toBe(10_800_000);
     expect(everyMinute.monthlyUnitsLow).toBe(432_000);
     expect(everyMinute.monthlyCostMicrosLow).toBe(648_000_000);
+  });
+
+  /**
+   * BUG-005. The projection assumed every day for as long as every monitor
+   * polled every day, and the moment US-041 let a person choose weekdays it
+   * quoted them a month of polls they would never make.
+   */
+  it("charges for the days a monitor runs on, not for seven", () => {
+    const sample = { postsFound: 1, capped: false, unitsBilled: 10, unitsAsked: asked };
+
+    const everyDay = projectMonthly(sample, redditHourly, week);
+    const onWeekdays = projectMonthly(sample, { ...redditHourly, pollDays: [1, 2, 3, 4, 5] }, week);
+
+    // Five days of seven, so five sevenths of the polls and five sevenths of
+    // the bill. A B2B monitor buys the weekend at full price without this.
+    expect(onWeekdays.monthlyUnitsLow).toBe(Math.round((everyDay.monthlyUnitsLow * 5) / 7));
+  });
+
+  /**
+   * The number in BUG-005's own title, checked rather than described. A weekly
+   * monitor was quoted a month of hourly polling — 730 polls where it makes 4.
+   */
+  it("does not quote a weekly monitor for a month of hourly polls", () => {
+    const sample = { postsFound: 1, capped: false, unitsBilled: 10, unitsAsked: asked };
+
+    const hourly = projectMonthly(sample, redditHourly, week);
+    const weekly = projectMonthly(
+      sample,
+      { ...redditHourly, pollIntervalSeconds: 7 * 86_400 },
+      week,
+    );
+
+    // 730 polls a month against about 4: the estimate was 180 times too high,
+    // in the direction that frightens somebody off a monitor costing pennies.
+    expect(hourly.monthlyUnitsLow / weekly.monthlyUnitsLow).toBeGreaterThan(150);
+    expect(weekly.monthlyCostMicrosLow).toBeLessThan(100_000);
   });
 
   it("never projects more per poll than the connector can collect", () => {

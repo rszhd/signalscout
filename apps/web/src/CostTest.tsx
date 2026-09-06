@@ -55,6 +55,8 @@ export interface EstimateReport {
   monitorId: string | null;
   status: "collecting" | "ready" | "failed";
   pollIntervalSeconds: number;
+  /** The days the quote assumed. US-041. */
+  pollDays: number[];
   windowDays: number;
   testUnits: number;
   testCostMicros: number;
@@ -79,6 +81,16 @@ export interface CostTestProps {
   sources: string[];
   /** The cap the answer is measured against. Null when no cap was set. */
   monthlyCapMicros: number | null;
+  /**
+   * The schedule the person chose, which the projection multiplies by. US-041,
+   * priced by BUG-005.
+   *
+   * Sent rather than left to the API's default, which is hourly and every day.
+   * A weekly monitor quoted at hourly is 180 times too expensive, and the
+   * schedule control sits on the same screen saying something else.
+   */
+  pollIntervalSeconds: number;
+  pollDays: readonly number[];
   report: EstimateReport | null;
   onReport: (report: EstimateReport | null) => void;
 }
@@ -143,11 +155,38 @@ function intervalLabel(seconds: number): string {
   return minutes === 1 ? "every minute" : `every ${minutes} minutes`;
 }
 
+/**
+ * How the days read in the sentence under the table, or nothing.
+ *
+ * Silent on seven days, because "every hour, every day" is noise — the reader
+ * only needs telling when the answer is narrower than they might assume, and
+ * that is the case BUG-005 got wrong by pricing it as if it were not.
+ */
+function dayLabel(days: readonly number[]): string {
+  if (days.length >= 7) return "";
+
+  const weekdays = [1, 2, 3, 4, 5].join(",");
+  const weekends = [0, 6].join(",");
+  const chosen = [...days].sort((left, right) => left - right).join(",");
+
+  if (chosen === weekdays) return ", on weekdays";
+  if (chosen === weekends) return ", at weekends";
+
+  const names = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+  return `, on ${[...days]
+    .sort((left, right) => left - right)
+    .map((day) => names[day] ?? "?")
+    .join(", ")}`;
+}
+
 export function CostTest({
   queries,
   subreddits,
   sources,
   monthlyCapMicros,
+  pollIntervalSeconds,
+  pollDays,
   report,
   onReport,
 }: CostTestProps) {
@@ -202,7 +241,14 @@ export function CostTest({
       const started = await requestJson<EstimateReport>("/api/monitors/estimates", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ queries, subreddits, sources, monthlyCapMicros }),
+        body: JSON.stringify({
+          queries,
+          subreddits,
+          sources,
+          monthlyCapMicros,
+          pollIntervalSeconds,
+          pollDays: [...pollDays],
+        }),
       });
       onReport(started);
     } catch (cause) {
@@ -257,7 +303,8 @@ export function CostTest({
           <table className="cost-table">
             <caption>
               Measured over the last {report.windowDays} days. The monthly figures assume this
-              monitor polls {intervalLabel(report.pollIntervalSeconds)}.
+              monitor polls {intervalLabel(report.pollIntervalSeconds)}
+              {dayLabel(report.pollDays)}.
             </caption>
             <thead>
               <tr>

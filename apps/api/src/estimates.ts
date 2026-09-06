@@ -99,6 +99,8 @@ const reportSchema = z.object({
   status: z.enum(estimateStatuses),
   /** What the projection assumes. The same plan costs more the faster it polls. */
   pollIntervalSeconds: z.number(),
+  /** The days the quote assumed. US-041. */
+  pollDays: z.array(z.number()),
   windowDays: z.number(),
   /** What the test itself consumed and cost. Estimated, like every figure here. */
   testUnits: z.number(),
@@ -131,6 +133,14 @@ const startBody = z.object({
     .int()
     .min(minimumPollIntervalSeconds)
     .default(defaultPollIntervalSeconds),
+  /**
+   * The days the monitor would poll on. US-041, priced by BUG-005.
+   *
+   * Defaults to every day, which is what every estimate assumed before a
+   * schedule could be chosen. A quote for a monitor that runs on weekdays must
+   * not be a quote for one that runs every day: it would be 40% too high.
+   */
+  pollDays: z.array(z.number().int().min(0).max(6)).min(1).max(7).default([0, 1, 2, 3, 4, 5, 6]),
   /** The cap to measure against. Read from the monitor when one is named. */
   monthlyCapMicros: z.number().int().min(0).nullable().default(null),
 });
@@ -189,6 +199,7 @@ export async function registerEstimateRoutes(
       // something: the number a person is warned against is the number the
       // budget guard will refuse them at.
       let pollIntervalSeconds = request.body.pollIntervalSeconds;
+      let pollDays: number[] = request.body.pollDays;
       let monthlyCapMicros = request.body.monthlyCapMicros;
 
       if (monitorId) {
@@ -196,12 +207,17 @@ export async function registerEstimateRoutes(
         if (!monitor) return reply.code(404).send({ message: "No monitor has that id." });
 
         pollIntervalSeconds = monitor.pollIntervalSeconds;
+        // The monitor's own schedule, for the same reason as its interval: the
+        // number a person is warned against has to be the number they will be
+        // billed, not the one their browser guessed.
+        pollDays = [...monitor.pollDays];
         monthlyCapMicros = (await getBudget(db, monitorId))?.monthlyCapMicros ?? null;
       }
 
       const estimateId = await startEstimate(db, {
         monitorId: monitorId ?? null,
         pollIntervalSeconds,
+        pollDays,
         monthlyCapMicros,
         probes,
       });
@@ -246,6 +262,7 @@ function toResponse(
 
   return {
     ...report,
+    pollDays: [...report.pollDays],
     queries: report.queries.map((probe) => ({ ...probe, samples: [...probe.samples] })),
     finishedAt: report.finishedAt?.toISOString() ?? null,
   };

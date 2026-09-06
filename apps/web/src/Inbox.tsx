@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { messageFor, requestJson } from "./api.js";
 import { BrandIcon } from "./BrandIcon.js";
-import { routeParam } from "./route.js";
+import { projectSuffix, routeParam } from "./route.js";
 
 /**
  * The intent inbox.
@@ -479,7 +479,7 @@ export function Inbox() {
           <p className="page-subtitle">Find your next conversation.</p>
         </div>
         {(matches.length > 0 || monitors.length === 0) && (
-          <a className="top-secondary-link" href="#/monitors/new">
+          <a className="top-secondary-link" href={`#/monitors/new${projectSuffix()}`}>
             <span aria-hidden="true">+ </span>New monitor
           </a>
         )}
@@ -591,7 +591,7 @@ export function Inbox() {
               </span>
               <h2>No monitors yet</h2>
               <p>Create a monitor and IntentWatch will start collecting conversations.</p>
-              <a className="primary-button" href="#/monitors/new">
+              <a className="primary-button" href={`#/monitors/new${projectSuffix()}`}>
                 Create a monitor
               </a>
             </>

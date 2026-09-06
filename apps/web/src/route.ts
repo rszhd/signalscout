@@ -33,3 +33,20 @@ export function routeParam(name: string, hash?: string): string | null {
 export function routePath(hash = globalThis.location?.hash ?? ""): string {
   return hash.split("?")[0] ?? "";
 }
+
+/**
+ * The current project as a query suffix, or an empty string.
+ *
+ * `#/monitors${projectSuffix()}` keeps a link inside the project a person is
+ * looking at. Read live rather than passed down: a link is rendered wherever
+ * it is rendered, and threading the project through every component that draws
+ * one is how a single missed prop becomes a link that silently leaves the
+ * project.
+ *
+ * `App.tsx` refuses the unscoped routes outright, so this is what stops that
+ * refusal being reached rather than what enforces it.
+ */
+export function projectSuffix(hash?: string): string {
+  const project = routeParam("project", hash);
+  return project === null ? "" : `?project=${project}`;
+}

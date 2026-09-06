@@ -15,10 +15,19 @@ import { routeParam, routePath } from "./route.js";
  * router would work — but it would also need history handling this app has no
  * use for yet, and a hash is one listener.
  *
- * The inbox is the default. PLAN.md is firm that the product *is* the inbox,
- * and a fresh install that lands there is told it has no monitors and offered
- * the form. Landing on the form instead would put the setup screen in front of
- * everyone who already finished setting up.
+ * **The inbox was the default until US-045, and now the projects list is.**
+ * That reverses a decision this comment used to state, so it is written down
+ * rather than quietly changed. PLAN.md is firm that the product *is* the
+ * inbox, and it still is — but an inbox is a question about one business, and
+ * once monitors belong to projects there is no honest answer to "show me the
+ * inbox" with no project named. Answering for every project at once is exactly
+ * what grouping was added to stop.
+ *
+ * So a person with no project chosen is sent to choose one. Somebody with a
+ * single project pays one click; somebody with several gets an inbox that
+ * means something. The original reasoning holds inside a project: landing on
+ * its inbox rather than on the setup form is still right, and a project with
+ * no monitors is told so and offered the form.
  */
 
 const newMonitorRoute = "#/monitors/new";
@@ -61,10 +70,30 @@ export function App() {
   const projectId = routeParam("project", route);
   const scoped = projectId === null ? "" : `?project=${projectId}`;
 
+  /**
+   * The screens that mean nothing without a project, and the guard for them.
+   *
+   * The inbox, the monitor list and the monitor form are all questions about
+   * one business. Reached without a project they would answer for every
+   * business at once, which is what grouping exists to remove — and it is not
+   * enough to scope the links, because a bookmark, a typed address or a link
+   * somebody forgot to update all arrive here too.
+   *
+   * So the requirement lives in the router: no project, no inbox. A person is
+   * sent to choose one, and the address is corrected to match what they are
+   * looking at rather than left saying something untrue.
+   */
+  const needsProject = !projecting && !connecting && !notificationId;
+  const withoutProject = needsProject && projectId === null;
+
+  useEffect(() => {
+    if (withoutProject) globalThis.location.hash = projectsRoute;
+  }, [withoutProject]);
+
   return (
     <div className="app-shell">
       <aside className="sidebar">
-        <a className="brand" href="#/" aria-label="IntentWatch home">
+        <a className="brand" href={projectsRoute} aria-label="IntentWatch home">
           <span className="brand-mark" aria-hidden="true">
             <i />
             <i />
@@ -134,7 +163,9 @@ export function App() {
       </aside>
 
       <main className="app-main">
-        {notificationId ? (
+        {withoutProject ? (
+          <Projects />
+        ) : notificationId ? (
           <Notifications key={notificationId} monitorId={notificationId} />
         ) : creating ? (
           <MonitorForm />

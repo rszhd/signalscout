@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { messageFor, requestJson } from "./api.js";
+import { projectSuffix } from "./route.js";
 
 interface Settings {
   emailEnabled: boolean;
@@ -73,7 +74,7 @@ export function Notifications({ monitorId }: { monitorId: string }) {
           <p className="eyebrow">Monitor settings</p>
           <h1>Notifications</h1>
         </div>
-        <a className="text-link" href="#/monitors">
+        <a className="text-link" href={`#/monitors${projectSuffix()}`}>
           Back to monitors
         </a>
       </header>

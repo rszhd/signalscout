@@ -65,19 +65,35 @@ describe("the four screens", () => {
     globalThis.location.hash = "";
   });
 
-  it("opens on the inbox", async () => {
+  /**
+   * The default screen changed in US-045, and this case is where that is
+   * recorded. PLAN.md is firm that the product is the inbox — but an inbox is
+   * a question about one business, and with no project named there is no
+   * honest answer to it.
+   */
+  it("opens on the projects list, because an inbox needs a project", async () => {
     screen = await mount(<App />);
 
-    expect(screen.container.textContent).toContain("Intent inbox");
+    expect(screen.container.textContent).toContain("Projects");
     expect(screen.container.textContent).not.toContain("What should this monitor find?");
   });
 
-  it("reaches the monitor form from the header", async () => {
+  it("opens on the inbox once a project is named", async () => {
+    globalThis.location.hash = "#/?project=p1";
     screen = await mount(<App />);
 
-    expect(screen.container.querySelector('nav a[href="#/monitors/new"]')).not.toBeNull();
+    expect(screen.container.textContent).toContain("Intent inbox");
+  });
 
-    await go("#/monitors/new");
+  it("reaches the monitor form from the header", async () => {
+    globalThis.location.hash = "#/?project=p1";
+    screen = await mount(<App />);
+
+    expect(
+      screen.container.querySelector('nav a[href="#/monitors/new?project=p1"]'),
+    ).not.toBeNull();
+
+    await go("#/monitors/new?project=p1");
 
     expect(screen.container.textContent).toContain("What should this monitor find?");
     expect(screen.container.querySelector('[role="dialog"]')).toBeNull();
@@ -86,35 +102,36 @@ describe("the four screens", () => {
   });
 
   it("reaches the monitor list from the header, and not the form's route", async () => {
+    globalThis.location.hash = "#/?project=p1";
     screen = await mount(<App />);
 
-    expect(screen.container.querySelector('nav a[href="#/monitors"]')).not.toBeNull();
+    expect(screen.container.querySelector('nav a[href="#/monitors?project=p1"]')).not.toBeNull();
 
-    await go("#/monitors");
+    await go("#/monitors?project=p1");
     expect(screen.container.textContent).toContain("No monitors yet");
 
     expect(screen.container.querySelector('[role="dialog"]')).toBeNull();
 
     // Setup owns the whole page; the monitor list is not mounted underneath.
-    await go("#/monitors/new");
+    await go("#/monitors/new?project=p1");
     expect(screen.container.textContent).toContain("What should this monitor find?");
     expect(screen.container.querySelector(".setup-page")).not.toBeNull();
   });
 
   it("comes back to the inbox from the header", async () => {
-    globalThis.location.hash = "#/monitors/new";
+    globalThis.location.hash = "#/monitors/new?project=p1";
     screen = await mount(<App />);
     expect(screen.container.textContent).toContain("What should this monitor find?");
 
-    expect(screen.container.querySelector('nav a[href="#/"]')).not.toBeNull();
+    expect(screen.container.querySelector('nav a[href="#/?project=p1"]')).not.toBeNull();
 
-    await go("#/");
+    await go("#/?project=p1");
 
     expect(screen.container.textContent).toContain("Intent inbox");
   });
 
   it("keeps page setup open on Escape", async () => {
-    globalThis.location.hash = "#/monitors/new";
+    globalThis.location.hash = "#/monitors/new?project=p1";
     screen = await mount(<App />);
 
     await act(async () => {
@@ -122,7 +139,7 @@ describe("the four screens", () => {
     });
     await settle();
 
-    expect(globalThis.location.hash).toBe("#/monitors/new");
+    expect(globalThis.location.hash).toBe("#/monitors/new?project=p1");
     expect(screen.container.querySelector('[role="dialog"]')).toBeNull();
   });
 
@@ -172,7 +189,40 @@ describe("the four screens", () => {
     expect(links).toContain("#/monitors/new?project=p1");
   });
 
+  /**
+   * The rule that does not depend on any link being right. US-045.
+   *
+   * Scoping every href keeps a person inside their project, but a bookmark, a
+   * typed address or a link somebody forgot to update all arrive here too. So
+   * the requirement lives in the router: no project, no inbox and no monitors.
+   */
+  it("sends a person to choose a project rather than answering for all of them", async () => {
+    for (const hash of ["#/", "#/monitors", "#/monitors/new"]) {
+      globalThis.location.hash = hash;
+      screen = await mount(<App />);
+
+      expect(screen.container.textContent).toContain("Projects");
+      // Not the inbox, and not the form: neither means anything yet.
+      expect(screen.container.textContent).not.toContain("Ranked by score & age");
+      expect(screen.container.textContent).not.toContain("What should this monitor find?");
+
+      // And the address is corrected, so it stops saying something untrue.
+      expect(globalThis.location.hash).toBe("#/projects");
+
+      await screen.unmount();
+    }
+  });
+
+  it("shows the inbox once a project is chosen", async () => {
+    globalThis.location.hash = "#/?project=p1";
+    screen = await mount(<App />);
+
+    expect(screen.container.textContent).toContain("Intent inbox");
+    expect(globalThis.location.hash).toBe("#/?project=p1");
+  });
+
   it("does not expose mockup routes whose behaviour is not built", async () => {
+    globalThis.location.hash = "#/?project=p1";
     screen = await mount(<App />);
 
     const links = [...screen.container.querySelectorAll("nav a")].map((link) =>
@@ -181,7 +231,13 @@ describe("the four screens", () => {
     // Connections joined this list in US-023 and Projects in US-045, each when
     // the screen behind it was built. Settings is still a mockup route and must
     // stay off the nav: a link that leads nowhere is worse than no link.
-    expect(links).toEqual(["#/projects", "#/", "#/monitors", "#/connections", "#/monitors/new"]);
+    expect(links).toEqual([
+      "#/projects",
+      "#/?project=p1",
+      "#/monitors?project=p1",
+      "#/connections",
+      "#/monitors/new?project=p1",
+    ]);
     expect(screen.container.textContent).not.toContain("Settings");
   });
 });

@@ -3,6 +3,7 @@ import { messageFor, requestJson } from "./api.js";
 import { BrandIcon } from "./BrandIcon.js";
 import { CostTest, type EstimateReport, exceedsCap } from "./CostTest.js";
 import { formatMicros, toMicros } from "./Monitors.js";
+import { projectSuffix } from "./route.js";
 import { browserTimezone, type ScheduleChoice, scheduleChoices } from "./schedule.js";
 
 interface SignalOption {
@@ -533,7 +534,7 @@ export function MonitorForm() {
           <h1>New monitor</h1>
           <p className="page-subtitle">A focused search for people you can help.</p>
         </div>
-        <a className="top-secondary-link" href="#/monitors">
+        <a className="top-secondary-link" href={`#/monitors${projectSuffix()}`}>
           Exit setup
         </a>
       </header>
@@ -655,7 +656,7 @@ export function MonitorForm() {
               </div>
 
               <div className="setup-actions">
-                <a className="secondary-button" href="#/monitors">
+                <a className="secondary-button" href={`#/monitors${projectSuffix()}`}>
                   Cancel
                 </a>
                 <button className="primary-button" type="submit" disabled={working !== null}>
@@ -1171,7 +1172,7 @@ export function MonitorForm() {
                     : "Your plan is saved without collecting. Adjust the budget or search plan before starting it from Monitors."
                   : "IntentWatch will collect the first conversations on the monitor schedule."}
               </p>
-              <a className="primary-button" href="#/monitors">
+              <a className="primary-button" href={`#/monitors${projectSuffix()}`}>
                 View monitors
               </a>
               <button className="text-button" type="button" onClick={reset}>

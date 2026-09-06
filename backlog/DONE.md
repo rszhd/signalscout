@@ -2,10 +2,11 @@
 
 # Done
 
-36 finished.
+37 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
+| BUG-008 | [The inbox crashes on a comment match](done/2026-09/BUG-008-the-inbox-crashes-on-a-comment-match.md) | bug | shipped | 2026-09 |
 | BUG-007 | [A comment is stored under a post it is not under](done/2026-09/BUG-007-a-comment-is-stored-under-a-post-it-is-not-under.md) | bug | shipped | 2026-09 |
 | BUG-006 | [The first poll of a monitor stores no replies](done/2026-09/BUG-006-the-first-poll-of-a-monitor-stores-no-replies.md) | bug | shipped | 2026-09 |
 | BUG-005 | [The cost test prices every monitor as hourly](done/2026-09/BUG-005-the-cost-test-prices-every-monitor-as-hourly.md) | bug | shipped | 2026-09 |

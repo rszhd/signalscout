@@ -368,6 +368,35 @@ describe("the intent inbox", () => {
       expect(container.textContent).not.toContain("comments read");
     });
 
+    /**
+     * The crash, and the shape that caused it.
+     *
+     * An API older than this build sends a row with the depth fields absent
+     * rather than null. `undefined` slips past a `=== null` check and
+     * `.toLocaleString()` throws, which takes down the whole inbox rather than
+     * one line of it — a person clicking a comment saw a blank screen.
+     *
+     * The row here is built without those keys on purpose. Do not "fix" it by
+     * adding them: their absence is the test.
+     */
+    it("survives a row from an API that has never heard of thread depth", async () => {
+      const { parentRepliesRead, parentReplyCount, parentRepliesStopped, ...older } = match({
+        ...replyMatch,
+        id: "match-older-api",
+      });
+
+      await show({
+        "/api/matches?": {
+          matches: [older as unknown as ReturnType<typeof match>],
+          nextCursor: null,
+          asOf: firstPage.asOf,
+        },
+      });
+
+      expect(container.textContent).toContain("We hit this too");
+      expect(container.textContent).not.toContain("comments read");
+    });
+
     it("keeps the ordinary wording on a post, which has no comment to reach", async () => {
       await show();
 

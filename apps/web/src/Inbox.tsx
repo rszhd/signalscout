@@ -41,10 +41,18 @@ interface Match {
   parentTitle: string | null;
   parentExcerpt: string | null;
   parentUrl: string | null;
-  /** How deep the thread above a reply was read, and why it stopped. US-048. */
-  parentRepliesRead: number | null;
-  parentReplyCount: number | null;
-  parentRepliesStopped: string | null;
+  /**
+   * How deep the thread above a reply was read, and why it stopped. US-048.
+   *
+   * Optional rather than nullable, and that is the honest type rather than a
+   * hedge: a browser holding this build can be talking to an API that predates
+   * it, and then these keys are simply absent. Marking them optional makes the
+   * compiler ask about that at every use site, which is what would have caught
+   * the crash this shape caused.
+   */
+  parentRepliesRead?: number | null;
+  parentReplyCount?: number | null;
+  parentRepliesStopped?: string | null;
   /** Kept for later. US-043. Not a verdict; a person's intention. */
   saved: boolean;
   url: string;
@@ -195,11 +203,21 @@ const platformLabels: Record<
 function threadDepth(match: Match): string | undefined {
   if (match.kind !== "reply") return undefined;
 
+  /**
+   * `== null`, not `=== null`, and the difference crashed the screen.
+   *
+   * The type says `number | null` and the runtime can still hand back
+   * `undefined`: a browser holding this build against an API that predates it
+   * receives a row with the field absent, `undefined` slips past a `=== null`
+   * check, and `.toLocaleString()` throws — taking the whole inbox down rather
+   * than one line of it. A field this component did not exist to show
+   * yesterday must be treated as optional whatever the type says.
+   */
   const read = match.parentRepliesRead;
-  if (read === null || read === 0) return undefined;
+  if (read == null || read === 0) return undefined;
 
   const total = match.parentReplyCount;
-  const of = total !== null && total > read ? ` of ${total.toLocaleString()}` : "";
+  const of = total != null && total > read ? ` of ${total.toLocaleString()}` : "";
   const counted = `${read.toLocaleString()}${of} comment${read === 1 ? "" : "s"} read`;
 
   switch (match.parentRepliesStopped) {

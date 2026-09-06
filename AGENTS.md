@@ -690,6 +690,8 @@ or false. Do not mark one done that you have not verified.
 
 ## Rules that are easy to break
 
+**The UI shares one theme.** Read [docs/design.md](docs/design.md) before changing a screen. Colors and sizing live in `apps/web/src/styles/tokens.css`; shared controls live in `styles/theme.css`. Keep page layout separate, and migrate the remaining screens one at a time.
+
 **`packages/core` imports neither Fastify nor React.** The API and the worker
 both call into it. This is the one architectural rule in the repository. If a
 change seems to need it, the change is wrong.

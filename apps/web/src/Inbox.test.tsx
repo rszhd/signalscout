@@ -165,7 +165,7 @@ describe("the intent inbox", () => {
       // succeeded — without the route mocked above this passed on the error
       // path, which is the kind of green this repository warns about.
       const after = [...container.querySelectorAll("button")].find(
-        (element) => element.textContent?.trim() === "Saved",
+        (element) => element.textContent?.trim() === "Saved" && !element.closest(".inbox-views"),
       );
 
       expect(after?.getAttribute("aria-pressed")).toBe("true");
@@ -181,7 +181,7 @@ describe("the intent inbox", () => {
       });
 
       const save = [...container.querySelectorAll("button")].find(
-        (element) => element.textContent?.trim() === "Saved",
+        (element) => element.textContent?.trim() === "Saved" && !element.closest(".inbox-views"),
       );
 
       expect(save?.getAttribute("aria-pressed")).toBe("true");
@@ -190,9 +190,9 @@ describe("the intent inbox", () => {
     it("asks the server for the saved list, which it orders differently", async () => {
       await show();
 
-      const picker = select("Which matches");
+      const picker = container.querySelector(".inbox-views button:last-child") as HTMLButtonElement;
 
-      await act(async () => setValue(picker, "saved"));
+      await act(async () => picker.click());
       await settle();
 
       expect(fetchMock.mock.calls.some(([url]) => String(url).includes("saved=true"))).toBe(true);
@@ -343,6 +343,9 @@ describe("the intent inbox", () => {
   it("asks the server for a minimum score when the filter sets one", async () => {
     await show();
 
+    expect(document.querySelector("#inbox-extra-filters")?.hasAttribute("hidden")).toBe(true);
+    await act(async () => button("Filters").click());
+    expect(document.querySelector("#inbox-extra-filters")?.hasAttribute("hidden")).toBe(false);
     await act(async () => setValue(select("Minimum score"), "70"));
     await settle();
 
@@ -476,6 +479,7 @@ describe("the intent inbox", () => {
     it("asks the server for the dismissed matches when the filter says so", async () => {
       await show();
 
+      await act(async () => button("Filters").click());
       await act(async () => setValue(select("Not relevant"), "show"));
       await settle();
 
@@ -523,6 +527,7 @@ describe("the intent inbox", () => {
   it("offers to clear the filters when the filters are what is empty", async () => {
     await show({ "/api/matches?": { matches: [], nextCursor: null, asOf: "x" } });
 
+    await act(async () => button("Filters").click());
     await act(async () => setValue(select("Minimum score"), "85"));
     await settle();
 

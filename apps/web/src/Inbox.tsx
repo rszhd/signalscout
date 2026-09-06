@@ -158,6 +158,7 @@ export function Inbox() {
   const [selectedMatchId, setSelectedMatchId] = useState<string | null>(null);
   const [mobileDetailOpen, setMobileDetailOpen] = useState(false);
   const [expandedMatchId, setExpandedMatchId] = useState<string | null>(null);
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const [showDismissed, setShowDismissed] = useState(false);
   /**
    * The saved list. US-043.
@@ -305,7 +306,7 @@ export function Inbox() {
     );
   }
 
-  const filtered = monitorId !== "" || minScore > 0;
+  const filtered = monitorId !== "" || minScore > 0 || showDismissed;
   const selectedMatch = matches.find((match) => match.id === selectedMatchId) ?? matches[0] ?? null;
   const scoreRows: Array<[string, number]> = selectedMatch
     ? [
@@ -320,31 +321,32 @@ export function Inbox() {
   function clearFilters(): void {
     setMonitorId("");
     setMinScore(0);
+    setShowDismissed(false);
   }
 
   return (
     <div className="product-page inbox-page">
       <header className="topbar">
         <div>
-          <p className="eyebrow">Conversations ranked by buying signal</p>
           <h1>Intent inbox</h1>
+          <p className="page-subtitle">Find your next conversation.</p>
         </div>
         {(matches.length > 0 || monitors.length === 0) && (
-          <a className="top-primary-button" href="#/monitors/new">
-            <span aria-hidden="true">+</span> New monitor
+          <a className="top-secondary-link" href="#/monitors/new">
+            <span aria-hidden="true">+ </span>New monitor
           </a>
         )}
       </header>
 
       <div className="inbox-toolbar">
-        <p>
-          {matches.length > 0
-            ? "Showing " +
-              matches.length +
-              " scored conversation" +
-              (matches.length === 1 ? "" : "s")
-            : "Filter conversations as matches arrive"}
-        </p>
+        <fieldset className="view-switch inbox-views" aria-label="Which matches">
+          <button type="button" aria-pressed={!showSaved} onClick={() => setShowSaved(false)}>
+            Inbox
+          </button>
+          <button type="button" aria-pressed={showSaved} onClick={() => setShowSaved(true)}>
+            Saved
+          </button>
+        </fieldset>
         <div className="inbox-filters">
           <label className="filter">
             <span>Monitor</span>
@@ -353,7 +355,7 @@ export function Inbox() {
               value={monitorId}
               onChange={(event) => setMonitorId(event.target.value)}
             >
-              <option value="">Every monitor</option>
+              <option value="">All monitors</option>
               {monitors.map((monitor) => (
                 <option key={monitor.id} value={monitor.id}>
                   {monitor.name}
@@ -362,53 +364,56 @@ export function Inbox() {
             </select>
           </label>
 
-          <label className="filter">
-            <span>Minimum score</span>
-            <select
-              aria-label="Minimum score"
-              value={String(minScore)}
-              onChange={(event) => setMinScore(Number(event.target.value))}
-            >
-              {scoreFilters.map((filter) => (
-                <option key={filter.value} value={filter.value}>
-                  {filter.label}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <label className="filter">
-            <span>Not relevant</span>
-            <select
-              aria-label="Not relevant"
-              value={showDismissed ? "show" : "hide"}
-              onChange={(event) => setShowDismissed(event.target.value === "show")}
-            >
-              {dismissedFilters.map((filter) => (
-                <option key={filter.value} value={filter.value}>
-                  {filter.label}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          {/*
-            A view rather than a filter: the saved list comes back newest-kept
-            first, where the inbox ranks by score and age. Something kept on
-            purpose does not get less kept overnight.
-          */}
-          <label className="filter">
-            <span>Show</span>
-            <select
-              aria-label="Which matches"
-              value={showSaved ? "saved" : "inbox"}
-              onChange={(event) => setShowSaved(event.target.value === "saved")}
-            >
-              <option value="inbox">Inbox</option>
-              <option value="saved">Saved</option>
-            </select>
-          </label>
+          <button
+            className={`compact-button filter-toggle ${filtered ? "active" : ""}`}
+            type="button"
+            aria-expanded={filtersOpen}
+            aria-controls="inbox-extra-filters"
+            onClick={() => setFiltersOpen(!filtersOpen)}
+          >
+            Filters
+            {filtered
+              ? ` · ${Number(minScore > 0) + Number(showDismissed) + Number(monitorId !== "")}`
+              : ""}
+          </button>
         </div>
+      </div>
+      <div className="inbox-extra-filters" id="inbox-extra-filters" hidden={!filtersOpen}>
+        <label className="filter">
+          <span>Minimum score</span>
+          <select
+            aria-label="Minimum score"
+            value={String(minScore)}
+            onChange={(event) => setMinScore(Number(event.target.value))}
+          >
+            {scoreFilters.map((filter) => (
+              <option key={filter.value} value={filter.value}>
+                {filter.label}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label className="filter">
+          <span>Not relevant</span>
+          <select
+            aria-label="Not relevant"
+            value={showDismissed ? "show" : "hide"}
+            onChange={(event) => setShowDismissed(event.target.value === "show")}
+          >
+            {dismissedFilters.map((filter) => (
+              <option key={filter.value} value={filter.value}>
+                {filter.label}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        {filtered && (
+          <button className="read-more-button" type="button" onClick={clearFilters}>
+            Clear filters
+          </button>
+        )}
       </div>
 
       {state === "loading" && (
@@ -451,6 +456,21 @@ export function Inbox() {
                 Clear filters
               </button>
             </>
+          ) : showSaved ? (
+            <>
+              <span className="empty-mark" aria-hidden="true">
+                ☆
+              </span>
+              <h2>No saved conversations yet</h2>
+              <p>Save a conversation from your inbox to come back to it here.</p>
+              <button
+                className="secondary-button"
+                type="button"
+                onClick={() => setShowSaved(false)}
+              >
+                Back to inbox
+              </button>
+            </>
           ) : (
             <>
               <span className="empty-mark" aria-hidden="true">
@@ -472,9 +492,16 @@ export function Inbox() {
         </div>
       )}
 
-      {matches.length > 0 && selectedMatch && (
+      {state !== "loading" && state !== "error" && matches.length > 0 && selectedMatch && (
         <div className="inbox-layout">
           <div className="match-list-column">
+            <div className="list-heading">
+              <span>
+                {matches.length}
+                {page?.nextCursor ? "+" : ""} conversations
+              </span>
+              <span>{showSaved ? "Recently saved" : "Ranked by score & age"}</span>
+            </div>
             <div className="inbox-scroll-region">
               <ol className="match-list" aria-label="Matches">
                 {matches.map((match) => {
@@ -483,6 +510,7 @@ export function Inbox() {
                     <li key={match.id}>
                       <button
                         className={`match-card ${selectedMatch.id === match.id ? "selected" : ""}`}
+                        aria-current={selectedMatch.id === match.id ? "true" : undefined}
                         type="button"
                         onClick={() => {
                           setSelectedMatchId(match.id);
@@ -513,6 +541,9 @@ export function Inbox() {
                         )}
                         <span className="match-bottom">
                           <span className={`intent-pill ${tone.tone}`}>{tone.label}</span>
+                          <span className="match-list-status">
+                            {match.saved ? "Saved" : match.verdict === "good" ? "Good lead" : ""}
+                          </span>
                           <span className="match-score">
                             <strong>{match.score}</strong>
                             <span>/ 100</span>
@@ -541,7 +572,7 @@ export function Inbox() {
 
           <aside className={`match-detail ${mobileDetailOpen ? "mobile-open" : ""}`}>
             <div className="inbox-scroll-region">
-              <div className="detail-inner">
+              <div className="detail-inner" key={selectedMatch.id}>
                 <button
                   className="mobile-detail-back"
                   type="button"
@@ -606,36 +637,6 @@ export function Inbox() {
                   )}
                 </div>
 
-                <div className="match-why">
-                  <p className="section-label">What the model saw</p>
-                  <ul>
-                    {selectedMatch.reasons.map((reason) => (
-                      <li key={reason}>
-                        <span aria-hidden="true">•</span>
-                        {reason}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div className="score-section">
-                  <div className="score-heading">
-                    <h3>Intent signals</h3>
-                    <span>Overall score {selectedMatch.score}</span>
-                  </div>
-                  <dl className="match-scores">
-                    {scoreRows.map(([label, score]) => (
-                      <div key={label}>
-                        <dt>{label}</dt>
-                        <dd>{score}</dd>
-                        <span className="score-bar" aria-hidden="true">
-                          <i style={{ width: `${score}%` }} />
-                        </span>
-                      </div>
-                    ))}
-                  </dl>
-                </div>
-
                 <div className="match-actions">
                   <a
                     className="primary-button"
@@ -656,6 +657,36 @@ export function Inbox() {
                   </button>
                   <span className="match-meta">{selectedMatch.intentLabel}</span>
                 </div>
+
+                <div className="match-why">
+                  <p className="section-label">What the model saw</p>
+                  <ul>
+                    {selectedMatch.reasons.map((reason) => (
+                      <li key={reason}>
+                        <span aria-hidden="true">•</span>
+                        {reason}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <details className="disclosure score-section">
+                  <summary>
+                    Score breakdown <span>{selectedMatch.score} / 100</span>
+                  </summary>
+
+                  <dl className="match-scores">
+                    {scoreRows.map(([label, score]) => (
+                      <div key={label}>
+                        <dt>{label}</dt>
+                        <dd>{score}</dd>
+                        <span className="score-bar" aria-hidden="true">
+                          <i style={{ width: `${score}%` }} />
+                        </span>
+                      </div>
+                    ))}
+                  </dl>
+                </details>
 
                 <div className="verdict-actions">
                   <p className="section-label">Was this a good lead?</p>
@@ -684,8 +715,7 @@ export function Inbox() {
                     </button>
                   </div>
                   <p className="verdict-note">
-                    Marking a match not relevant takes it out of this list. It is kept, and the “Not
-                    relevant” filter above brings it back.
+                    Dismissed a conversation? Bring it back with Filters → Not relevant → Shown.
                   </p>
                 </div>
               </div>

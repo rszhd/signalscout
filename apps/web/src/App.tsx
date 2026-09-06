@@ -56,14 +56,6 @@ export function App() {
           <span>intentwatch</span>
         </a>
 
-        <div className="product-note">
-          <span className="product-note-mark">✦</span>
-          <span>
-            <strong>Intent monitoring</strong>
-            <small>Find conversations worth joining</small>
-          </span>
-        </div>
-
         <nav className="site-nav" aria-label="Screens">
           <a
             className={creating || listing || connecting ? "nav-item" : "nav-item current"}
@@ -99,7 +91,6 @@ export function App() {
 
         <div className="sidebar-bottom">
           <span className="local-pill">Self-hosted</span>
-          <p>Your data and provider keys stay in this deployment.</p>
         </div>
       </aside>
 

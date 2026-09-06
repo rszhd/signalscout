@@ -1,0 +1,153 @@
+/* Shared UI primitives. Page styles own layout, never a second theme. */
+.topbar {
+  min-height: 108px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-6);
+  padding: 25px var(--page-gutter);
+  border: 0;
+  background: var(--surface);
+}
+
+.topbar h1 {
+  margin: 0;
+  font-size: var(--text-title);
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+}
+
+.primary-button,
+.secondary-button,
+.top-primary-button,
+.top-secondary-link {
+  min-height: var(--control-height);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  padding: 0 14px;
+  font-size: var(--text-label);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.primary-button,
+.top-primary-button {
+  border: 0;
+  color: var(--text-on-accent);
+  background: var(--accent);
+  box-shadow: none;
+}
+
+.primary-button:hover,
+.top-primary-button:hover {
+  background: var(--accent-hover);
+}
+
+.top-primary-button {
+  gap: 7px;
+}
+
+.top-primary-button span {
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+.secondary-button,
+.top-secondary-link {
+  border: 1px solid var(--line-dark);
+  color: var(--muted-strong);
+  background: var(--surface);
+}
+
+.secondary-button:hover,
+.top-secondary-link:hover {
+  border-color: var(--muted);
+  color: var(--ink);
+}
+
+.page-subtitle {
+  margin: 7px 0 0;
+  color: var(--muted);
+  font-size: var(--text-label);
+}
+
+.view-switch {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+  display: flex;
+  align-self: stretch;
+  gap: var(--space-6);
+}
+
+.view-switch button {
+  padding: 0 2px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  font-size: var(--text-label);
+  font-weight: 500;
+}
+
+.view-switch button[aria-pressed="true"] {
+  color: var(--accent-text);
+  border-bottom-color: var(--accent);
+}
+
+:where(button, a, summary):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.top-secondary-link {
+  gap: 5px;
+}
+@media (max-width: 820px) {
+  .topbar {
+    min-height: 95px;
+    padding: var(--space-5) var(--page-gutter);
+  }
+}
+@media (max-width: 600px) {
+  .top-primary-button,
+  .top-secondary-link {
+    min-height: var(--control-height-compact);
+    padding-inline: 10px;
+  }
+}
+
+.compact-button {
+  min-height: var(--control-height-compact);
+  padding: 0 13px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--muted-strong);
+  font-size: var(--text-sm);
+}
+
+.compact-button.active {
+  color: var(--accent-text);
+  background: var(--accent-soft);
+}
+
+.disclosure summary {
+  cursor: pointer;
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+
+.disclosure summary > span {
+  float: right;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 440px) {
+  .view-switch {
+    gap: 14px;
+  }
+}

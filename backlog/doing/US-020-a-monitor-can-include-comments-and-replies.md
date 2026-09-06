@@ -182,13 +182,13 @@ told that comments are unavailable, not quietly given none.
       platforms will return replies rather than being given none in silence
 - [x] The fake source can be told to return a thread, so callers are tested
       without a network and without a bill
-- [ ] One parser reads a reply from every SocialCrawl platform, because the
+- [x] One parser reads a reply from every SocialCrawl platform, because the
       provider's `CommentList` schema is shared, and a test proves it against
       captured X and LinkedIn answers — **deferred with the two connectors
       below**
 - [x] The ScrapeCreators Reddit connector fetches a thread by post URL when the
       opt-in is set, and never when it is not
-- [ ] The SocialCrawl X connector fetches replies by post URL when the opt-in
+- [x] The SocialCrawl X connector fetches replies by post URL when the opt-in
       is set, and never when it is not
 - [ ] The SocialCrawl LinkedIn connector does the same, or the ticket records
       why it was left out
@@ -370,3 +370,40 @@ join both from our own rows.
   Nothing here has met a live provider. The connector is driven against
   captured payloads only, so the whole path is unproven until one real poll runs
   with `includeReplies` on.
+
+- 2026-09-06T11:18+08:00 — X replies, and the shared parser the last box asked
+  for. Three credits: one to find a post with a thread, one for its first page,
+  and a second page that was refunded.
+
+  **The shared schema is real, and now proven rather than assumed.** An X reply
+  and a YouTube comment carry the same nine field names — `author`,
+  `engagement`, `flags`, `id`, `parent_id`, `post_id`, `published_at`, `text`,
+  `url`. YouTube adds `ext`, a bag of platform extras nothing reads. So
+  `comments.ts` is one parser and the connectors keep only what genuinely
+  differs: which endpoint to call, and that YouTube leaves `url` null while X
+  fills it in. A test compares the two payloads field by field rather than
+  trusting the provider's archetype name.
+
+  **A third completeness claim measured wrong, and this one over-promises.** The
+  captured page of 28 replies reported `has_more: true` with a cursor; following
+  it returned zero items. After ScrapeCreators' `has_more: false` with 33
+  comments missing, that is two providers whose flags cannot be believed — but
+  X's is the harmless direction and it is refunded, so trusting it costs a round
+  trip and no money. The connector over-reports `partial` for the same reason: a
+  thread wrongly called partial is read again for a credit, and one wrongly
+  called complete is never revisited.
+
+  The post claimed 71 replies and the page returned 28. That gap is unexplained
+  and is the provider's business; what is asserted here is that the connector
+  reports what arrived.
+
+- 2026-09-06T11:18+08:00 — Found while capturing, and fixed before the feature:
+  **the X fixtures had carried real handles since US-006 committed them.** Eight
+  files, individual developers as often as companies. No field rule reaches it —
+  a post's `text` is what the classifier reads, so it cannot be replaced, and
+  people write "@someone" inside it constantly. The same leak the YouTube
+  capture had, found the same way, by auditing rather than by reading. The
+  committed payloads were rewritten in place rather than re-fetched: scrubbing
+  is an operation the capture already performs, so nothing about what they prove
+  changed, and re-capturing would have spent ten credits for different posts and
+  the same lesson.

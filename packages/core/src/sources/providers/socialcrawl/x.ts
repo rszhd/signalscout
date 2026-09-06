@@ -18,8 +18,11 @@
 import { xPlatform } from "../../platforms.js";
 import type {
   CandidatePost,
+  CandidateReply,
   ConnectorDefinition,
   CredentialCheck,
+  ReplyRequest,
+  ReplyResult,
   SearchRequest,
   SearchResult,
   SocialSource,
@@ -27,8 +30,9 @@ import type {
   SourceQuery,
   SourceRuntime,
 } from "../../types.js";
-import type { Page } from "./client.js";
-import { SocialCrawlClient, SocialCrawlError, sortNewest } from "./client.js";
+import type { EndpointProfile, Page } from "./client.js";
+import { SocialCrawlClient, SocialCrawlError, sortNewest, xRepliesProfile } from "./client.js";
+import { toCandidateReply } from "./comments.js";
 import { socialCrawlProvider } from "./provider.js";
 
 /**
@@ -78,6 +82,9 @@ export const socialCrawlX: ConnectorDefinition = {
   pricePerUnitMicros: 8118,
   /** `maxPagesPerInput`: what one query or handle costs in one poll. */
   maxUnitsPerQueryPoll: maxPagesPerInput,
+  canFetchReplies: true,
+  /** A reply page is one credit, the same as a search. Measured, not assumed. */
+  replyPricePerUnitMicros: 8118,
   create: (runtime) => new SocialCrawlXSource(runtime),
 };
 
@@ -151,15 +158,24 @@ export class SocialCrawlXSource implements SocialSource {
   readonly billableUnit = socialCrawlX.billableUnit;
   readonly pricePerUnitMicros = socialCrawlX.pricePerUnitMicros;
   readonly maxUnitsPerQueryPoll = socialCrawlX.maxUnitsPerQueryPoll;
+  // The declaration reaches the instance, not only the definition: every screen
+  // and every step asks the connector the registry built, not the record it was
+  // built from. US-034 found that wrong on the ScrapeCreators connector.
+  readonly canFetchReplies = socialCrawlX.canFetchReplies;
+  readonly replyPricePerUnitMicros = socialCrawlX.replyPricePerUnitMicros;
 
   constructor(private readonly runtime: SourceRuntime) {}
 
-  private client(credentials: SourceCredentials): SocialCrawlClient {
+  private client(credentials: SourceCredentials, profile?: EndpointProfile): SocialCrawlClient {
     const apiKey = credentials.apiKey;
     if (!apiKey) {
       throw new SocialCrawlError("credentials", "No SocialCrawl API key was given.", 0);
     }
-    return new SocialCrawlClient({ runtime: this.runtime, apiKey });
+    return new SocialCrawlClient({
+      runtime: this.runtime,
+      apiKey,
+      ...(profile ? { profile } : {}),
+    });
   }
 
   /**
@@ -190,6 +206,64 @@ export class SocialCrawlXSource implements SocialSource {
     }
 
     return { valid: true };
+  }
+
+  /**
+   * One page of the replies under one post.
+   *
+   * On X this is where the lead usually is not, and occasionally is. A post is
+   * somebody's own words, so unlike YouTube the post itself is often the
+   * lead — US-006's live poll found two matches among forty posts. The replies
+   * are the other half of a conversation, and a person answering "same, ours
+   * broke after every deploy" is exactly what this product looks for.
+   *
+   * **The provider's `has_more` is wrong here and it is wrong for free.** A
+   * captured page of 28 replies claimed another page and the cursor returned
+   * nothing, refunded. So this connector follows the cursor the profile gives
+   * it and lets an empty page end the walk, rather than trusting a flag that
+   * has already been measured lying.
+   */
+  async fetchReplies(request: ReplyRequest): Promise<ReplyResult> {
+    const client = this.client(request.credentials, xRepliesProfile);
+
+    const page = await client.fetchPage(
+      {
+        url: request.postUrl,
+        ...(request.cursor ? { cursor: request.cursor } : {}),
+      },
+      request.signal,
+    );
+
+    const parsed = page.records
+      .map((record) => toCandidateReply(record, { parentPostExternalId: request.postExternalId }))
+      .filter((reply): reply is CandidateReply => reply !== undefined);
+
+    /**
+     * The date cut, applied here because the provider offers none.
+     *
+     * A thread outlives the post above it, so a reply can be far older than
+     * the poll that found its post. Every row is tested rather than the walk
+     * being stopped at the first old one: this endpoint gives no ordering
+     * guarantee, so an old reply says nothing about the next one.
+     */
+    const replies = request.since
+      ? parsed.filter((reply) => reply.postedAt > (request.since as Date))
+      : parsed;
+
+    return {
+      replies,
+      unitsConsumed: page.creditsUsed,
+      next: page.cursor ? { status: "ready", cursor: page.cursor } : { status: "done" },
+      /**
+       * Partial while the provider offers another page, and it over-reports.
+       *
+       * The measured `has_more: true` that led nowhere means a thread read to
+       * its end can still be recorded as partial. That is the safe direction:
+       * a thread wrongly called partial is read again for one credit, and a
+       * thread wrongly called complete is never revisited.
+       */
+      partial: page.cursor !== undefined,
+    };
   }
 
   /**

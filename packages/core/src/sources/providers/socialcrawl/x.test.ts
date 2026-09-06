@@ -19,6 +19,7 @@ import { unreachableFetch } from "../../../testing/network.js";
 import { xPlatformId } from "../../platforms.js";
 import { assertSourcesCanBeStored } from "../../storage.js";
 import type { SearchRequest, SourceRuntime } from "../../types.js";
+import { toCandidateReply } from "./comments.js";
 import { socialCrawlProviderId } from "./provider.js";
 import { SocialCrawlXSource, socialCrawlX, toCandidatePost } from "./x.js";
 
@@ -517,5 +518,160 @@ describe("checking a key", () => {
     await expect(source.search(request({ credentials: {} }))).rejects.toThrow(
       /No SocialCrawl API key/,
     );
+  });
+});
+
+const repliesPage1 = fixture("replies-page-1");
+const repliesPage2 = fixture("replies-page-2");
+
+/**
+ * Replies, driven against the thread captured on 2026-09-06.
+ *
+ * The post claimed 71 replies and the first page returned 28 of them. That gap
+ * is the provider's business; what this file asserts is that the connector
+ * reports what arrived rather than what was promised.
+ */
+describe("reading the replies under a post", () => {
+  const replyRequest = {
+    postUrl: "https://x.com/x-user-1/status/2066207953355432118",
+    postExternalId: "2066207953355432118",
+    credentials,
+  };
+
+  it("declares that it can, on the connector the registry builds", () => {
+    const built = new SocialCrawlXSource(runtimeWith(unreachableFetch));
+
+    expect(socialCrawlX.canFetchReplies).toBe(true);
+    expect(built.canFetchReplies).toBe(true);
+    expect(built.replyPricePerUnitMicros).toBe(8118);
+    expect(typeof built.fetchReplies).toBe("function");
+  });
+
+  it("asks the replies endpoint for that post", async () => {
+    const { fetch: fetchStub, calls } = socialCrawl([repliesPage1]);
+    const source = new SocialCrawlXSource(runtimeWith(fetchStub));
+
+    await source.fetchReplies(replyRequest);
+
+    expect(calls[0]?.url).toContain("/v1/twitter/tweet/replies");
+    expect(calls[0]?.url).toContain(encodeURIComponent(replyRequest.postUrl));
+  });
+
+  it("returns the page it was given, linked to the post above", async () => {
+    const { fetch: fetchStub } = socialCrawl([repliesPage1]);
+    const source = new SocialCrawlXSource(runtimeWith(fetchStub));
+
+    const result = await source.fetchReplies(replyRequest);
+
+    expect(result.replies.length).toBeGreaterThan(20);
+    expect(
+      result.replies.every((reply) => reply.parentPostExternalId === replyRequest.postExternalId),
+    ).toBe(true);
+    expect(result.unitsConsumed).toBe(1);
+  });
+
+  it("keeps the provider's own link, because X gives one", async () => {
+    const { fetch: fetchStub } = socialCrawl([repliesPage1]);
+    const source = new SocialCrawlXSource(runtimeWith(fetchStub));
+
+    const [reply] = (await source.fetchReplies(replyRequest)).replies;
+
+    // Not a built link. YouTube needs one built; X does not, and a connector
+    // that overrode a working url would break the only way to open the lead.
+    expect(reply?.url).toContain("/status/");
+  });
+
+  it("drops what was said before the window", async () => {
+    const { fetch: fetchStub } = socialCrawl([repliesPage1]);
+    const source = new SocialCrawlXSource(runtimeWith(fetchStub));
+
+    const all = await source.fetchReplies(replyRequest);
+    const since = new Date("2026-07-01T00:00:00.000Z");
+    const recent = await source.fetchReplies({ ...replyRequest, since });
+
+    expect(recent.replies.length).toBeLessThan(all.replies.length);
+    expect(recent.replies.every((reply) => reply.postedAt > since)).toBe(true);
+  });
+
+  /**
+   * **The provider's `has_more` is wrong, and this is the evidence.**
+   *
+   * Page one reported another page and carried a cursor. Following it returned
+   * zero replies — and cost nothing, because the provider refunds a call that
+   * matches nothing. So the flag over-promises and the connector's honesty
+   * costs a round trip rather than a credit.
+   */
+  it("reports partial when the provider claims another page", async () => {
+    const { fetch: fetchStub } = socialCrawl([repliesPage1]);
+    const source = new SocialCrawlXSource(runtimeWith(fetchStub));
+
+    const result = await source.fetchReplies(replyRequest);
+
+    expect(result.next.status).toBe("ready");
+    expect(result.partial).toBe(true);
+  });
+
+  it("ends the walk on the empty page that claim led to, for nothing", async () => {
+    const { fetch: fetchStub } = socialCrawl([repliesPage2]);
+    const source = new SocialCrawlXSource(runtimeWith(fetchStub));
+
+    const result = await source.fetchReplies({ ...replyRequest, cursor: "sc.whatever" });
+
+    expect(result.replies).toEqual([]);
+    expect(result.next).toEqual({ status: "done" });
+    // Refunded. Trusting a wrong flag cost a round trip and no money.
+    expect(result.unitsConsumed).toBe(0);
+  });
+});
+
+/**
+ * The claim US-020's last acceptance box makes: one parser, every platform.
+ *
+ * The provider gives its comment endpoints the archetype `CommentList` and
+ * points them at one schema. A shared name is not a shared shape, so this
+ * compares the two captured payloads field by field rather than trusting the
+ * catalogue.
+ */
+describe("one parser reads every SocialCrawl platform's replies", () => {
+  function firstComment(captured: Captured): Record<string, unknown> {
+    const items = (bodyOf(captured).data as { items?: readonly unknown[] }).items ?? [];
+    const item = items[0] as { comment?: Record<string, unknown> };
+    return item.comment ?? (item as Record<string, unknown>);
+  }
+
+  it("finds the same fields on an X reply and a YouTube comment", () => {
+    const youTube = JSON.parse(
+      readFileSync(new URL("./youtube-fixtures/comments-newest.json", import.meta.url), "utf8"),
+    ) as { data: { items: readonly { comment: Record<string, unknown> }[] } };
+
+    const x = Object.keys(firstComment(repliesPage1)).sort();
+    const yt = Object.keys(youTube.data.items[0]?.comment ?? {}).sort();
+
+    // YouTube adds `ext`, a bag of platform extras nothing here reads. Every
+    // field the parser touches is on both.
+    expect(yt.filter((key) => key !== "ext")).toEqual(x);
+  });
+
+  it("parses an X reply through the shared parser with no platform hints", () => {
+    const reply = toCandidateReply(firstComment(repliesPage1), {
+      parentPostExternalId: "2066207953355432118",
+    });
+
+    expect(reply?.externalId).toBe("2066217164928077884");
+    expect(reply?.url).toContain("/status/");
+    expect(reply?.text.length).toBeGreaterThan(0);
+    expect(reply?.postedAt).toEqual(new Date("2026-06-14T17:52:15.000Z"));
+  });
+
+  it("refuses a comment missing any of the four fields it cannot invent", () => {
+    const real = firstComment(repliesPage1);
+
+    for (const missing of ["id", "url", "text", "published_at"]) {
+      const { [missing]: _gone, ...rest } = real;
+
+      // No `urlFor`, so a missing url has no fallback either — which is the
+      // shape X uses.
+      expect(toCandidateReply(rest, { parentPostExternalId: "p" })).toBeUndefined();
+    }
   });
 });

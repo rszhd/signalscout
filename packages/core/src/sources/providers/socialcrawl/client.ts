@@ -72,6 +72,8 @@ const apiBase = "https://www.socialcrawl.dev/v1";
  */
 export const endpoints = {
   search: `${apiBase}/twitter/search/tweets`,
+  /** The replies under one post, by URL. One credit and a cursor. US-020. */
+  xReplies: `${apiBase}/twitter/tweet/replies`,
   linkedInPosts: `${apiBase}/linkedin/search/posts`,
   /**
    * YouTube. US-034.
@@ -139,6 +141,29 @@ export const xSearchProfile: EndpointProfile = {
  * the cost of stopping early is a post found on the next poll, and the cost of
  * paging on is five credits for nothing.
  */
+/**
+ * X replies: the same cursor and the same price as an X search.
+ *
+ * **Its `has_more` cannot be trusted, and that is measured.** A captured page
+ * of 28 replies reported `has_more: true` with a cursor; following that cursor
+ * returned zero items. This is the third ordering-or-completeness claim in this
+ * repository to be wrong, after ScrapeCreators' Reddit `has_more: false` with
+ * 33 comments missing.
+ *
+ * It is the cheap kind of wrong, though: the empty page cost nothing, because
+ * the provider refunds a call that matches nothing. So a connector that follows
+ * the cursor one page too far pays for its trust in nothing but time.
+ */
+export const xRepliesProfile: EndpointProfile = {
+  endpoint: endpoints.xReplies,
+  standardCallCredits: 1,
+  cursorOf: (body) => {
+    const pagination = objectAt(body, "pagination");
+    if (pagination?.has_more === false) return undefined;
+    return text(pagination?.next_cursor);
+  },
+};
+
 /**
  * YouTube search: `pagination.next_cursor`, and one credit a call.
  *

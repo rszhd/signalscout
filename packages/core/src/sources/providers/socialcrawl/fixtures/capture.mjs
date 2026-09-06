@@ -203,7 +203,7 @@ const textFields = new Set(["text", "full_text", "content"]);
 
 function scrubHandlesInText(value, pseudonym) {
   return value.replace(
-    /(^|[\s(\[])@([A-Za-z0-9_]{2,15})\b/g,
+    /(^|[\s([])@([A-Za-z0-9_]{2,15})\b/g,
     (_, before, handle) => `${before}@${pseudonym(handle)}`,
   );
 }
@@ -657,9 +657,7 @@ if (wanted("replies")) {
         "nothing to read. Re-run; the search is ranked and its top result moves.",
     );
   } else {
-    console.log(
-      `  reading replies under ${busiest.url} (${busiest.engagement.comments} claimed)`,
-    );
+    console.log(`  reading replies under ${busiest.url} (${busiest.engagement.comments} claimed)`);
 
     const first = await capture(
       "replies-page-1",
@@ -669,9 +667,7 @@ if (wanted("replies")) {
     );
 
     if (itemCount(first.body) === 0) {
-      failures.push(
-        "replies: the endpoint returned nothing for a post that claims replies.",
-      );
+      failures.push("replies: the endpoint returned nothing for a post that claims replies.");
     }
 
     const cursor = nextCursor(first.body);

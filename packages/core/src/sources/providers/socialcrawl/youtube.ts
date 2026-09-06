@@ -57,6 +57,7 @@ import {
   youTubeCommentsProfile,
   youTubeSearchProfile,
 } from "./client.js";
+import { toCandidateReply } from "./comments.js";
 import { socialCrawlProvider } from "./provider.js";
 
 /**
@@ -264,7 +265,14 @@ export class SocialCrawlYouTubeSource implements SocialSource {
     );
 
     const parsed = page.records
-      .map((record) => toCandidateReply(record, request.postExternalId))
+      .map((record) =>
+        toCandidateReply(record, {
+          parentPostExternalId: request.postExternalId,
+          // YouTube leaves `url` null on every comment, so this builds the
+          // deep link its own Share button produces. `&lc=` names the comment.
+          urlFor: (id) => `https://www.youtube.com/watch?v=${request.postExternalId}&lc=${id}`,
+        }),
+      )
       .filter((reply): reply is CandidateReply => reply !== undefined);
 
     /**
@@ -416,55 +424,6 @@ export function toCandidatePost(record: unknown): CandidatePost | undefined {
     ...(typeof comments === "number" && Number.isFinite(comments) && comments >= 0
       ? { replyCount: comments }
       : {}),
-  };
-}
-
-/**
- * One comment to one `CandidateReply`.
- *
- * YouTube's comment ids are opaque strings rather than Reddit's `t1_`
- * fullnames, and that changes nothing: `UNIQUE (source, external_id)` keys
- * whatever the platform calls its own id.
- */
-export function toCandidateReply(
-  record: unknown,
-  parentPostExternalId: string,
-): CandidateReply | undefined {
-  const item = objectOf(record);
-  const comment = objectOf(item?.comment) ?? item;
-  if (!comment) return undefined;
-
-  const externalId = text(comment.id);
-  const body = text(comment.text);
-  const postedAt = dateOf(comment.published_at);
-
-  if (!externalId || !body || !postedAt) return undefined;
-
-  const author = objectOf(comment.author);
-  const ext = objectOf(comment.ext);
-
-  // A top-level comment names the video in `parent_id`, or names nothing. A
-  // reply to a comment names that comment, and that distinction reaches the
-  // classifier's prompt.
-  const parent = text(comment.parent_id);
-  const parentReply = parent && parent !== parentPostExternalId ? parent : undefined;
-
-  return {
-    externalId,
-    // The provider leaves `url` null on a comment, so it is built from the
-    // video and the comment id — which is the link a person needs to reach it.
-    url:
-      text(comment.url) ??
-      `https://www.youtube.com/watch?v=${parentPostExternalId}&lc=${externalId}`,
-    text: body,
-    postedAt,
-    parentPostExternalId,
-    ...(text(author?.display_name) ? { author: text(author?.display_name) } : {}),
-    ...(parentReply ? { parentReplyExternalId: parentReply } : {}),
-    ...(typeof objectOf(comment.engagement)?.replies === "number"
-      ? { replyCount: objectOf(comment.engagement)?.replies as number }
-      : {}),
-    ...(ext ? {} : {}),
   };
 }
 

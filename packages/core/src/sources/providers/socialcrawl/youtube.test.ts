@@ -17,13 +17,9 @@ import { createLogger } from "../../../logger.js";
 import { unreachableFetch } from "../../../testing/network.js";
 import { youTubePlatformId } from "../../platforms.js";
 import type { SearchRequest, SourceRuntime } from "../../types.js";
+import { toCandidateReply } from "./comments.js";
 import { socialCrawlProviderId } from "./provider.js";
-import {
-  SocialCrawlYouTubeSource,
-  socialCrawlYouTube,
-  toCandidatePost,
-  toCandidateReply,
-} from "./youtube.js";
+import { SocialCrawlYouTubeSource, socialCrawlYouTube, toCandidatePost } from "./youtube.js";
 
 function fixture(name: string): unknown {
   return JSON.parse(
@@ -491,13 +487,14 @@ describe("reading the comments under a video", () => {
   });
 
   it("tells a reply to a comment from a reply to the video", () => {
+    const options = { parentPostExternalId: "vid", urlFor: (id: string) => `https://x.test/${id}` };
     const top = toCandidateReply(
       { comment: { id: "c1", text: "words", published_at: now.toISOString(), parent_id: "vid" } },
-      "vid",
+      options,
     );
     const nested = toCandidateReply(
       { comment: { id: "c2", text: "words", published_at: now.toISOString(), parent_id: "c1" } },
-      "vid",
+      options,
     );
 
     expect(top?.parentReplyExternalId).toBeUndefined();

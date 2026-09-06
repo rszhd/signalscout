@@ -299,6 +299,9 @@ const monitorSchema = z.object({
   notificationIssues: z.array(z.string()),
   id: z.string(),
   name: z.string(),
+  /** The project this monitor came out of, for grouping. Null is normal. */
+  projectId: z.string().nullable(),
+  projectName: z.string().nullable(),
   product: z.string(),
   idealCustomer: z.string(),
   problem: z.string(),
@@ -409,7 +412,7 @@ function filterSettings(body: { preFilter?: { enabled?: boolean; similarityThres
 }
 
 function toResponse(
-  monitor: Monitor,
+  monitor: Monitor & { projectName?: string | null },
   runtime: MonitorEnvironment,
   state: BudgetState,
   dropped: FilterDropCounts,
@@ -420,6 +423,10 @@ function toResponse(
   return {
     id: monitor.id,
     name: monitor.name,
+    projectId: monitor.projectId,
+    // Absent on the single-monitor path, which does not join. Null there means
+    // "not loaded", and the list is the only screen that groups.
+    projectName: monitor.projectName ?? null,
     product: monitor.product,
     idealCustomer: monitor.idealCustomer,
     problem: monitor.problem,

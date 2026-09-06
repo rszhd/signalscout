@@ -62,6 +62,16 @@ interface Monitor {
   notificationIssues?: string[];
   id: string;
   name: string;
+  /**
+   * The project this monitor came out of. US-045.
+   *
+   * Optional as well as nullable, for the reason BUG-008 taught: a browser
+   * holds a build for as long as its tab is open and talks to whatever API is
+   * deployed, so a field this screen did not show yesterday can simply be
+   * absent.
+   */
+  projectId?: string | null;
+  projectName?: string | null;
   sources: string[];
   paused: boolean;
   lastPolledAt: string | null;
@@ -543,120 +553,195 @@ export function Monitors() {
         </p>
       )}
 
-      <ul className="monitor-list">
-        {monitors.map((monitor) => {
-          const running = status(monitor);
+      {groupsOf(monitors).map((group) => (
+        <section className="monitor-group" key={group.key}>
+          {group.name !== null && (
+            <h2 className="monitor-group-heading">
+              {group.name}
+              <span className="monitor-group-count">
+                {group.monitors.length} monitor{group.monitors.length === 1 ? "" : "s"}
+              </span>
+            </h2>
+          )}
+          <MonitorCards monitors={group.monitors} load={load} setPaused={setPaused} />
+        </section>
+      ))}
+    </div>
+  );
+}
 
-          return (
-            <li key={monitor.id} className="monitor-card">
-              <div className="monitor-top">
-                <div className="monitor-identity">
-                  <span className="product-icon" aria-hidden="true">
-                    {monitor.name.slice(0, 1).toUpperCase()}
-                  </span>
-                  <div>
-                    <h2>{monitor.name}</h2>
-                    <p className="monitor-origin">
-                      {monitor.sources.length > 0
-                        ? monitor.sources.map((source, index) => (
-                            <span key={source}>
-                              {index > 0 ? " · " : ""}
-                              <span className="brand-label">
-                                <BrandIcon brand={source} size={16} />
-                                {source}
-                              </span>
+/**
+ * The monitors of one project, or the ones belonging to none. US-045.
+ *
+ * Grouped in the order the monitors already arrive in — newest first — so a
+ * project's position is its newest monitor's, and the list does not reorder
+ * itself when a project is renamed.
+ *
+ * **A monitor with no project is a group with no heading**, at the end. The
+ * alternative is a heading somebody has to read as "the rest", which is a name
+ * for a thing they never made. Grouping must not make a monitor harder to
+ * find than a flat list did.
+ */
+interface MonitorGroup {
+  key: string;
+  name: string | null;
+  monitors: Monitor[];
+}
+
+export function groupsOf(monitors: Monitor[]): MonitorGroup[] {
+  const groups: MonitorGroup[] = [];
+  const loose: Monitor[] = [];
+
+  for (const monitor of monitors) {
+    const id = monitor.projectId ?? null;
+    const name = monitor.projectName ?? null;
+
+    // Both, not either: an id with no name is a project the API did not join,
+    // and a heading reading a uuid helps nobody.
+    if (id === null || name === null) {
+      loose.push(monitor);
+      continue;
+    }
+
+    const found = groups.find((group) => group.key === id);
+    if (found) found.monitors.push(monitor);
+    else groups.push({ key: id, name, monitors: [monitor] });
+  }
+
+  if (loose.length > 0) groups.push({ key: "none", name: null, monitors: loose });
+
+  return groups;
+}
+
+/**
+ * The cards for one group.
+ *
+ * `load` and `setPaused` belong to the page, so they are passed in rather than
+ * reached for: this is one list among several on the screen, and a component
+ * that closed over the page's state could only ever render one of them.
+ */
+function MonitorCards({
+  monitors,
+  load,
+  setPaused,
+}: {
+  monitors: Monitor[];
+  load: () => Promise<void>;
+  setPaused: (monitor: Monitor, paused: boolean) => Promise<void>;
+}) {
+  return (
+    <ul className="monitor-list">
+      {monitors.map((monitor) => {
+        const running = status(monitor);
+
+        return (
+          <li key={monitor.id} className="monitor-card">
+            <div className="monitor-top">
+              <div className="monitor-identity">
+                <span className="product-icon" aria-hidden="true">
+                  {monitor.name.slice(0, 1).toUpperCase()}
+                </span>
+                <div>
+                  <h2>{monitor.name}</h2>
+                  <p className="monitor-origin">
+                    {monitor.sources.length > 0
+                      ? monitor.sources.map((source, index) => (
+                          <span key={source}>
+                            {index > 0 ? " · " : ""}
+                            <span className="brand-label">
+                              <BrandIcon brand={source} size={16} />
+                              {source}
                             </span>
-                          ))
-                        : "No source"}
-                      {monitor.lastPolledAt
-                        ? ` · last polled ${new Date(monitor.lastPolledAt).toLocaleString()}`
-                        : " · never polled"}
-                    </p>
-                  </div>
+                          </span>
+                        ))
+                      : "No source"}
+                    {monitor.lastPolledAt
+                      ? ` · last polled ${new Date(monitor.lastPolledAt).toLocaleString()}`
+                      : " · never polled"}
+                  </p>
                 </div>
-                <span className={`monitor-status ${running.tone}`}>{running.label}</span>
               </div>
+              <span className={`monitor-status ${running.tone}`}>{running.label}</span>
+            </div>
 
-              {/* Who actually collected, which is not always who would collect
+            {/* Who actually collected, which is not always who would collect
                   now: the choice can be changed and this is the record of what
                   ran. Read from the ledger, so the moment is when money was
                   last spent on that pair. US-026. */}
-              {monitor.lastCollected.length > 0 && (
-                <p className="monitor-origin">
-                  {monitor.lastCollected
-                    .map(
-                      (one) =>
-                        `${one.source} via ${one.provider}, ${new Date(one.at).toLocaleString()}`,
-                    )
-                    .join(" · ")}
-                </p>
-              )}
+            {monitor.lastCollected.length > 0 && (
+              <p className="monitor-origin">
+                {monitor.lastCollected
+                  .map(
+                    (one) =>
+                      `${one.source} via ${one.provider}, ${new Date(one.at).toLocaleString()}`,
+                  )
+                  .join(" · ")}
+              </p>
+            )}
 
-              {/* The sentence that refused the poll, sent whole by the server,
+            {/* The sentence that refused the poll, sent whole by the server,
                   so the screen and the worker's log say the same thing. */}
-              {monitor.spend.reason && (
-                <p className="monitor-stopped" role="status">
-                  {monitor.spend.reason}
-                </p>
-              )}
+            {monitor.spend.reason && (
+              <p className="monitor-stopped" role="status">
+                {monitor.spend.reason}
+              </p>
+            )}
 
-              <ScheduleForm monitor={monitor} onSaved={load} />
+            <ScheduleForm monitor={monitor} onSaved={load} />
 
-              <dl className="monitor-spend">
-                <div>
-                  <dt>Spent in {monthLabel(monitor.spend.since)} (estimated)</dt>
-                  <dd>{formatMicros(monitor.spend.totalMicros)}</dd>
-                </div>
-                <div>
-                  <dt>Sources</dt>
-                  <dd>{formatMicros(monitor.spend.sourceMicros)}</dd>
-                </div>
-                <div>
-                  <dt>Model</dt>
-                  <dd>{formatMicros(monitor.spend.modelMicros)}</dd>
-                </div>
-                <div>
-                  <dt>Left this month</dt>
-                  <dd>
-                    {monitor.spend.remainingMicros === null
-                      ? "No cap set"
-                      : formatMicros(monitor.spend.remainingMicros)}
-                  </dd>
-                </div>
-              </dl>
-
-              {monitor.notificationIssues?.map((issue) => (
-                <p key={issue} className="monitor-stopped" role="alert">
-                  {issue}{" "}
-                  <a href={`#/monitors/${monitor.id}/notifications`}>Notification settings</a>
-                </p>
-              ))}
-
-              <p className="monitor-feedback">{feedbackLabel(monitor.feedback)}</p>
-
-              <div className="monitor-controls">
-                <BudgetForm monitor={monitor} onSaved={load} />
-                <PreFilterForm monitor={monitor} onSaved={load} />
-                <div className="monitor-card-actions">
-                  <a className="text-link" href={`#/monitors/${monitor.id}/notifications`}>
-                    Notifications
-                  </a>
-                  <a className="text-link" href="#/">
-                    View inbox
-                  </a>
-                  <button
-                    type="button"
-                    className="secondary-button"
-                    onClick={() => void setPaused(monitor, !monitor.paused)}
-                  >
-                    {monitor.paused ? "Resume" : "Pause"}
-                  </button>
-                </div>
+            <dl className="monitor-spend">
+              <div>
+                <dt>Spent in {monthLabel(monitor.spend.since)} (estimated)</dt>
+                <dd>{formatMicros(monitor.spend.totalMicros)}</dd>
               </div>
-            </li>
-          );
-        })}
-      </ul>
-    </div>
+              <div>
+                <dt>Sources</dt>
+                <dd>{formatMicros(monitor.spend.sourceMicros)}</dd>
+              </div>
+              <div>
+                <dt>Model</dt>
+                <dd>{formatMicros(monitor.spend.modelMicros)}</dd>
+              </div>
+              <div>
+                <dt>Left this month</dt>
+                <dd>
+                  {monitor.spend.remainingMicros === null
+                    ? "No cap set"
+                    : formatMicros(monitor.spend.remainingMicros)}
+                </dd>
+              </div>
+            </dl>
+
+            {monitor.notificationIssues?.map((issue) => (
+              <p key={issue} className="monitor-stopped" role="alert">
+                {issue} <a href={`#/monitors/${monitor.id}/notifications`}>Notification settings</a>
+              </p>
+            ))}
+
+            <p className="monitor-feedback">{feedbackLabel(monitor.feedback)}</p>
+
+            <div className="monitor-controls">
+              <BudgetForm monitor={monitor} onSaved={load} />
+              <PreFilterForm monitor={monitor} onSaved={load} />
+              <div className="monitor-card-actions">
+                <a className="text-link" href={`#/monitors/${monitor.id}/notifications`}>
+                  Notifications
+                </a>
+                <a className="text-link" href="#/">
+                  View inbox
+                </a>
+                <button
+                  type="button"
+                  className="secondary-button"
+                  onClick={() => void setPaused(monitor, !monitor.paused)}
+                >
+                  {monitor.paused ? "Resume" : "Pause"}
+                </button>
+              </div>
+            </div>
+          </li>
+        );
+      })}
+    </ul>
   );
 }

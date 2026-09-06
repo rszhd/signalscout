@@ -6,7 +6,7 @@ priority: p2
 created: 2026-09-06T13:42+08:00
 parent:
 area:
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -57,7 +57,7 @@ and four answers. It is not a workspace, and this instance has one account until
       classifier reads: product, ideal customer, problem, signals
 - [x] Creating a monitor inside a project prefills those four, and the person
       can still change them for that monitor
-- [ ] The monitor list groups by project, and a monitor without one still
+- [x] The monitor list groups by project, and a monitor without one still
       appears rather than disappearing into a group nobody made
 - [x] Whether a project's answers are copied or linked is decided in the Log,
       with the reason, and the version rule follows from it
@@ -138,3 +138,25 @@ and four answers. It is not a workspace, and this instance has one account until
 
   What is not: the monitor **list** does not group by project yet. That box
   stays open, and it is the one thing between this and the ticket being done.
+
+- 2026-09-06T23:40+08:00 — The monitor list groups by project, which was the
+  last box.
+
+  A monitor with no project keeps a group of its own with **no heading**, at the
+  end. "Other" would be a name for a thing nobody made, and reads as a project
+  they forgot creating. The rule that governed the whole change is that
+  grouping must not make a monitor harder to find than the flat list did, and
+  every monitor made before today has no project.
+
+  Groups keep the monitors' own order — newest first — so a project sits where
+  its newest monitor does and renaming one never reorders the page. An id
+  arriving with no name is treated as ungrouped rather than shown as a uuid,
+  which is the BUG-008 shape: an older API joins nothing.
+
+  Two mistakes worth recording. Splitting the card markup into its own
+  component left `load` and `setPaused` out of scope, and they are now passed
+  in rather than closed over — one list among several cannot close over the
+  page. And `messageFor` takes a fallback, which `Projects.tsx` was calling
+  without; that had been committed already, because the command used to check
+  types filtered on `^apps` while `tsc` prints paths relative to the package.
+  A filter that hides its own failures reads exactly like success.

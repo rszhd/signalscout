@@ -10,7 +10,7 @@
  */
 import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { formatMicros, Monitors, toMicros } from "./Monitors.js";
+import { formatMicros, groupsOf, Monitors, toMicros } from "./Monitors.js";
 import { scheduleChoices } from "./schedule.js";
 import { button, field, json, mount, type Screen, select, settle, setValue } from "./testing.js";
 
@@ -395,5 +395,61 @@ describe("the money on the screen", () => {
     expect(toMicros("0")).toBe(0);
     expect(toMicros("lots")).toBeNull();
     expect(toMicros("-1")).toBeNull();
+  });
+});
+
+/**
+ * Grouping the list by project. US-045.
+ *
+ * The rule that matters is the one about monitors with no project: grouping
+ * must not make a monitor harder to find than the flat list did, and every
+ * monitor that existed before projects has none.
+ */
+describe("grouping monitors by project", () => {
+  const inProject = (id: string, name: string, monitorName: string) =>
+    ({ id: monitorName, projectId: id, projectName: name, name: monitorName }) as never;
+
+  it("keeps a monitor with no project visible, in a group with no heading", () => {
+    const groups = groupsOf([
+      inProject("p1", "Acme QA", "reddit weekly"),
+      { id: "loose", name: "an old monitor" } as never,
+    ]);
+
+    expect(groups).toHaveLength(2);
+    expect(groups[0]?.name).toBe("Acme QA");
+    // Null, not "Other": a heading nobody made is a name for a thing that does
+    // not exist, and it reads as a project the person forgot creating.
+    expect(groups[1]?.name).toBeNull();
+    expect(groups[1]?.monitors).toHaveLength(1);
+  });
+
+  it("puts the ungrouped monitors last, however they arrived", () => {
+    const groups = groupsOf([
+      { id: "loose", name: "an old monitor" } as never,
+      inProject("p1", "Acme QA", "reddit weekly"),
+    ]);
+
+    expect(groups.map((group) => group.name)).toEqual(["Acme QA", null]);
+  });
+
+  it("gathers a project's monitors under one heading", () => {
+    const groups = groupsOf([
+      inProject("p1", "Acme QA", "reddit"),
+      inProject("p2", "Beta", "x"),
+      inProject("p1", "Acme QA", "tiktok"),
+    ]);
+
+    expect(groups.map((group) => group.monitors.length)).toEqual([2, 1]);
+    // Order is the monitors' own — newest first — so a project sits where its
+    // newest monitor does and a rename never reorders the page.
+    expect(groups.map((group) => group.name)).toEqual(["Acme QA", "Beta"]);
+  });
+
+  it("treats an id with no name as ungrouped rather than showing a uuid", () => {
+    // An older API joins nothing, so a name can be absent while an id is not.
+    const groups = groupsOf([{ id: "m", name: "one", projectId: "p1" } as never]);
+
+    expect(groups).toHaveLength(1);
+    expect(groups[0]?.name).toBeNull();
   });
 });

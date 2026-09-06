@@ -16,7 +16,7 @@
  */
 import { desc, eq, sql } from "drizzle-orm";
 import type { Database } from "../db/client.js";
-import { monitors, type Signal, type Source } from "../db/schema.js";
+import { monitors, projects, type Signal, type Source } from "../db/schema.js";
 import type { ConnectorDescriptor, ProviderChoices } from "../sources/types.js";
 import { type MissingCredential, missingCredentials } from "../worker/credentials.js";
 
@@ -322,8 +322,26 @@ export function describeMissingCredentials(missing: readonly MissingCredential[]
   return [...byProvider.values()].map((names) => names.join(" and ")).join(" or ");
 }
 
-export async function listMonitors(db: Database): Promise<Monitor[]> {
-  return db.select().from(monitors).orderBy(desc(monitors.createdAt));
+/**
+ * A monitor with the name of the project it came out of, when it has one.
+ *
+ * US-045. The name rather than only the id, because the list groups by project
+ * and a heading reading a uuid helps nobody. Null on a monitor made before
+ * projects existed, or made outside one — which is the normal state and must
+ * stay visible rather than disappearing into a group nobody made.
+ */
+export interface MonitorWithProject extends Monitor {
+  readonly projectName: string | null;
+}
+
+export async function listMonitors(db: Database): Promise<MonitorWithProject[]> {
+  const rows = await db
+    .select({ monitor: monitors, projectName: projects.name })
+    .from(monitors)
+    .leftJoin(projects, eq(projects.id, monitors.projectId))
+    .orderBy(desc(monitors.createdAt));
+
+  return rows.map((row) => ({ ...row.monitor, projectName: row.projectName }));
 }
 
 export async function getMonitor(db: Database, id: string): Promise<Monitor | undefined> {

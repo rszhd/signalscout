@@ -56,7 +56,7 @@ export function Projects() {
       const answer = await requestJson<{ projects: Project[] }>("/api/projects");
       setProjects(answer.projects);
     } catch (cause) {
-      setError(messageFor(cause));
+      setError(messageFor(cause, "The projects could not be loaded."));
     } finally {
       setLoading(false);
     }
@@ -101,7 +101,7 @@ export function Projects() {
       setEditing(null);
       await load();
     } catch (cause) {
-      setError(messageFor(cause));
+      setError(messageFor(cause, "The project could not be saved."));
     } finally {
       setBusy(false);
     }

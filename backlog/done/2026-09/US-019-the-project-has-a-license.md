@@ -6,7 +6,7 @@ priority: p2
 created: 2026-09-04T23:00+08:00
 parent:
 area:
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -72,17 +72,17 @@ to be settled at the same time:
 
 ## Acceptance
 
-- [ ] A LICENSE file at the repository root holds the full, unmodified text of
+- [x] A LICENSE file at the repository root holds the full, unmodified text of
       the chosen license
-- [ ] The README's license section states the license and links to the file
-- [ ] `package.json` carries a matching `license` field when it exists
-- [ ] Contribution terms are decided — DCO, CLA or neither — and stated in
+- [x] The README's license section states the license and links to the file
+- [x] `package.json` carries a matching `license` field when it exists
+- [x] Contribution terms are decided — DCO, CLA or neither — and stated in
       `CONTRIBUTING.md`
-- [ ] The licenses of the dependencies in STACK.md are checked as compatible
+- [x] The licenses of the dependencies in STACK.md are checked as compatible
       with the choice, and the check is a command that can be re-run
-- [ ] The decision and the reason are recorded in this ticket's Log, so the
+- [x] The decision and the reason are recorded in this ticket's Log, so the
       argument is not had a second time
-- [ ] No per-file license header is added unless the chosen license requires one
+- [x] No per-file license header is added unless the chosen license requires one
 
 ## Notes
 
@@ -109,3 +109,38 @@ this ticket exists to make relicensing unnecessary.
 - 2026-09-04T23:00+08:00 — Written after the README shipped with the license deliberately
   undecided. Left open rather than picked quietly, because the choice has money
   attached and belongs to the owner.
+
+- 2026-09-06T12:10+08:00 — **Apache-2.0, with the DCO.** The owner decided, on
+  the trade this ticket had already written out.
+
+  The two facts in the Context carried it. This product's moat is convenience
+  rather than code — PLAN.md is explicit that the hosted version charges for not
+  running a server, not for features the open build lacks — so a network clause
+  would protect nothing a competitor could take anyway. And the distribution
+  plan is companies self-hosting, which is exactly the population that bans AGPL
+  by policy. A license that shuts out the people the plan depends on is a cost
+  paid for a protection that does not exist.
+
+  Apache over MIT for the patent grant. It is the term MIT lacks, and it is the
+  term company lawyers ask about when the software is going to run inside their
+  network.
+
+  DCO over a CLA, and the refusal is worth recording: a CLA would keep the
+  freedom to relicense later without asking anybody, and that convenience is not
+  worth deterring the contributors PLAN.md invites. `CONTRIBUTING.md` says so in
+  those words rather than presenting the DCO as the only option.
+
+  **The dependency check found no copyleft at all.** 120 production packages:
+  90 MIT, 11 Apache-2.0, 7 ISC, 5 BlueOak, 3 BSD-3-Clause, one font license and
+  three dual-licensed, every arm permissive. No GPL, LGPL, AGPL or SSPL.
+
+  `pnpm check:licenses` is the re-runnable form. It is an **allow** list rather
+  than a deny list, which is the decision inside the decision: a deny list is a
+  guess about which licenses exist, and an allow list is a statement about which
+  ones somebody has read. A new license fails the check and a person looks at
+  it.
+
+  No per-file headers. Apache-2.0 does not require them, the appendix is a
+  template rather than an instruction, and adding one to every file would put a
+  copyright notice above code that is mostly explanation.
+

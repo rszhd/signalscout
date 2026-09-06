@@ -2,6 +2,7 @@
   "name": "intentwatch",
   "version": "0.0.0",
   "private": true,
+  "license": "Apache-2.0",
   "type": "module",
   "packageManager": "pnpm@10.20.0",
   "engines": {
@@ -14,6 +15,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "biome check .",
+    "check:licenses": "node scripts/check-licenses.mjs",
     "format": "biome check --write .",
     "db:up": "docker compose up -d postgres",
     "db:migrate": "pnpm --filter @intentwatch/core migrate",

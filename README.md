@@ -310,15 +310,20 @@ If you use an AI coding agent, read [AGENTS.md](AGENTS.md) before starting.
 
 ## License
 
-Not chosen yet. It will be settled before this repository is made public.
+[Apache-2.0](LICENSE). Use it, change it, run it inside your company, sell a
+service built on it. The license adds an express patent grant, which MIT does
+not have.
 
-The trade to weigh: a permissive license (MIT, Apache-2.0) maximises adoption,
-while a copyleft one (AGPL-3.0) stops a cloud provider running this as a service
-without contributing back. Both are defensible for a project with a cheap hosted
-tier.
+Copyleft was considered and refused, and the reason is worth stating rather than
+implying: this product's moat is convenience and not code. The hosted version
+charges for not running a server, not for features the self-hosted build lacks,
+so a network clause would protect nothing — while many companies ban AGPL
+software by policy, which would shut out the exact people meant to be running
+this. The argument in full is in
+[US-019](backlog/done/2026-09/US-019-the-project-has-a-license.md).
 
-The argument is written out in
-[US-019](backlog/todo/US-019-the-project-has-a-license.md).
+Contributions come in under the [DCO](CONTRIBUTING.md): one `Signed-off-by`
+line, no paperwork.
 
 Notification setup, including Resend SMTP and signed webhooks, is in
 [docs/notifications.md](docs/notifications.md).

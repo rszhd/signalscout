@@ -2,7 +2,7 @@
 
 # Done
 
-29 finished.
+30 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
@@ -21,6 +21,7 @@
 | US-023 | [A provider key is pasted, tested and stored](done/2026-09/US-023-a-provider-key-is-pasted-tested-and-stored.md) | feature | shipped | 2026-09 |
 | US-022 | [A real match reaches the inbox](done/2026-09/US-022-a-real-match-reaches-the-inbox.md) | chore | shipped | 2026-09 |
 | US-021 | [The application follows the product mockup](done/2026-09/US-021-the-application-follows-the-product-mockup.md) | feature | shipped | 2026-09 |
+| US-019 | [The project has a license](done/2026-09/US-019-the-project-has-a-license.md) | chore | shipped | 2026-09 |
 | US-016 | [A match reaches email or a webhook](done/2026-09/US-016-a-match-reaches-email-or-a-webhook.md) | feature | — | 2026-09 |
 | US-014 | [A query's cost is known before it runs](done/2026-09/US-014-a-querys-cost-is-known-before-it-runs.md) | feature | shipped | 2026-09 |
 | US-013 | [A monitor cannot spend past its budget](done/2026-09/US-013-a-monitor-cannot-spend-past-its-budget.md) | feature | shipped | 2026-09 |

@@ -669,9 +669,41 @@ describe("one parser reads every SocialCrawl platform's replies", () => {
     for (const missing of ["id", "url", "text", "published_at"]) {
       const { [missing]: _gone, ...rest } = real;
 
-      // No `urlFor`, so a missing url has no fallback either — which is the
-      // shape X uses.
-      expect(toCandidateReply(rest, { parentPostExternalId: "p" })).toBeUndefined();
+      // The real parent, so the refusal is caused by the missing field and not
+      // by the `post_id` check below — which would make this pass for the
+      // wrong reason and stop testing anything.
+      expect(
+        toCandidateReply(rest, { parentPostExternalId: "2066207953355432118" }),
+      ).toBeUndefined();
     }
+  });
+
+  /**
+   * The reply that is not a reply, found live on 2026-09-06.
+   *
+   * `/twitter/tweet/replies` was asked for the replies under one post and
+   * returned a later post by the same account about an unrelated subject. It
+   * carried no `parent_id`, no leading @mention, and a `post_id` that was not
+   * the post requested. The owner opened it and said it was not a reply.
+   *
+   * Before this check the parent came from our own request, so the stray item
+   * would have been stored as a reply to a post it was never under. That
+   * reaches the classifier as context — a comment is judged against the post
+   * above it — so a wrong parent makes the model read real words against a
+   * conversation they had nothing to do with.
+   */
+  it("drops a comment that says it belongs to another post", () => {
+    const real = firstComment(repliesPage1);
+
+    expect(toCandidateReply(real, { parentPostExternalId: "2066207953355432118" })).toBeDefined();
+    expect(toCandidateReply(real, { parentPostExternalId: "9999999999999999999" })).toBeUndefined();
+  });
+
+  it("keeps a comment that does not say which post it is under", () => {
+    // Absence is not disagreement, and no captured page has shown one: all 137
+    // comments across the X, YouTube and TikTok fixtures carry `post_id`.
+    const { post_id: _gone, ...rest } = firstComment(repliesPage1);
+
+    expect(toCandidateReply(rest, { parentPostExternalId: "2066207953355432118" })).toBeDefined();
   });
 });

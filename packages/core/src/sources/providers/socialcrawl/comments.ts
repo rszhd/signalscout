@@ -56,6 +56,31 @@ export function toCandidateReply(
 
   if (!externalId || !url || !body || !postedAt) return undefined;
 
+  /**
+   * The comment must say it belongs to the post we asked about.
+   *
+   * **Found live on 2026-09-06, on X.** `/twitter/tweet/replies` was asked for
+   * the replies under one post and returned a later post by the same account
+   * on an unrelated subject — no `parent_id`, no leading @mention, and a
+   * `post_id` that was not the one requested. The owner opened it and said it
+   * was not a reply.
+   *
+   * Until this check, `parentPostExternalId` came from the *request* and the
+   * payload's own `post_id` was never read, so whatever the endpoint returned
+   * became a reply to the post we had asked about. That is worse than dropping
+   * it. A comment reaches the classifier with its parent post as context — the
+   * whole reason US-020 stores the link — so a wrong parent makes the model
+   * judge real words against a conversation they were never part of, and the
+   * inbox then shows "Replying to" above a post the person never saw.
+   *
+   * Every platform sends the field: 137 comments across the X, YouTube and
+   * TikTok fixtures, all with `post_id`. A comment that omits it is kept,
+   * because absence is not disagreement and no captured page has shown one.
+   */
+  const belongsTo = text(comment.post_id);
+
+  if (belongsTo && belongsTo !== parentPostExternalId) return undefined;
+
   const author = objectOf(comment.author);
   const engagement = objectOf(comment.engagement);
 

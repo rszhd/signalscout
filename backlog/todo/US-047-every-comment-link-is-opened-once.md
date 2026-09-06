@@ -109,3 +109,16 @@ found here is a one-line change plus the truth on the screen, not a redesign.
 
   Three of four are now confirmed by a person pressing the button. X is left,
   and it is the only one that cannot be checked from stored data.
+
+- 2026-09-06T15:40+08:00 — The X box is not closed and the reason is a
+  different bug. A live `fetchReplies` returned one item, and it was not a
+  reply: a later post by the same account on an unrelated subject, with a
+  `post_id` that was not the post requested. The owner opened it and said so.
+
+  That is [BUG-007](BUG-007-a-comment-is-stored-under-a-post-it-is-not-under.md),
+  and it is worth more than this ticket was: the parser took a comment's parent
+  from our own request and never read the payload's own, so anything an
+  endpoint returned became a reply to the post we asked about.
+
+  The link check itself is still open. No X reply link has been pressed,
+  because the one item this probe found was not an X reply.

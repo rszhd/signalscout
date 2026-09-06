@@ -97,6 +97,13 @@ buyer" — because a model told only to "write a reply" writes a landing page.
   somebody wants it.
 - US-012 stores verdicts against the monitor version that earned them. A draft
   is not a verdict and must not touch that, or the feedback sample splits.
+- **The boundary above was reversed on 2026-09-06.** The owner asked for a send
+  button, and
+  [US-046](US-046-a-reply-is-posted-from-the-inbox.md) holds that decision and
+  its reasoning. This ticket is unchanged: it still ends at the clipboard, and
+  it is still the half that works on every platform whether or not a posting
+  credential exists. Build it first — a send button with nothing to send is not
+  a feature.
 
 ## Log
 

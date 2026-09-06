@@ -1,0 +1,44 @@
+[
+  {
+    "name": "search-keyword",
+    "creditsUsed": 1,
+    "creditsRemaining": 99,
+    "cached": false
+  },
+  {
+    "name": "search-top",
+    "creditsUsed": 1,
+    "creditsRemaining": 98,
+    "cached": false
+  },
+  {
+    "name": "search-spoken",
+    "creditsUsed": 1,
+    "creditsRemaining": 97,
+    "cached": false
+  },
+  {
+    "name": "search-page-2",
+    "creditsUsed": 1,
+    "creditsRemaining": 96,
+    "cached": false
+  },
+  {
+    "name": "comments-page-1",
+    "creditsUsed": 1,
+    "creditsRemaining": 95,
+    "cached": false
+  },
+  {
+    "name": "comments-page-2",
+    "creditsUsed": 1,
+    "creditsRemaining": 94,
+    "cached": false
+  },
+  {
+    "name": "credentials-rejected",
+    "creditsUsed": 0,
+    "creditsRemaining": null,
+    "cached": false
+  }
+]

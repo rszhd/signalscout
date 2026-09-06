@@ -1,0 +1,203 @@
+{
+  "httpStatus": 200,
+  "body": {
+    "success": true,
+    "platform": "tiktok",
+    "endpoint": "/v1/tiktok/post/comments",
+    "data": {
+      "items": [
+        {
+          "comment": {
+            "id": "6764073431689494533",
+            "url": null,
+            "parent_id": null,
+            "post_id": "6756744559671168262",
+            "text": "@ãnnalisã hahaha",
+            "author": {
+              "username": "tiktok-user-458",
+              "display_name": "tiktok-user-459",
+              "avatar_url": "https://scrubbed.invalid/tiktok-user-460",
+              "verified": false
+            },
+            "engagement": {
+              "likes": 0,
+              "replies": 0
+            },
+            "flags": {
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2019-11-27T19:39:32.000Z",
+            "ext": {
+              "published_at_epoch": 1574883572
+            }
+          },
+          "computed": {
+            "language": null
+          }
+        },
+        {
+          "comment": {
+            "id": "7019213353512338182",
+            "url": null,
+            "parent_id": null,
+            "post_id": "6756744559671168262",
+            "text": "😂😂😂",
+            "author": {
+              "username": "tiktok-user-461",
+              "display_name": "tiktok-user-462",
+              "avatar_url": "https://scrubbed.invalid/tiktok-user-463",
+              "verified": false
+            },
+            "engagement": {
+              "likes": 0,
+              "replies": 0
+            },
+            "flags": {
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2021-10-15T08:52:56.000Z",
+            "ext": {
+              "published_at_epoch": 1634287976
+            }
+          },
+          "computed": {
+            "language": null
+          }
+        },
+        {
+          "comment": {
+            "id": "6764036206604206085",
+            "url": null,
+            "parent_id": null,
+            "post_id": "6756744559671168262",
+            "text": "@tiktok-user-464",
+            "author": {
+              "username": "tiktok-user-465",
+              "display_name": "tiktok-user-466",
+              "avatar_url": "https://scrubbed.invalid/tiktok-user-467",
+              "verified": false
+            },
+            "engagement": {
+              "likes": 1,
+              "replies": 0
+            },
+            "flags": {
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2019-11-27T17:15:05.000Z",
+            "ext": {
+              "published_at_epoch": 1574874905
+            }
+          },
+          "computed": {
+            "language": null
+          }
+        },
+        {
+          "comment": {
+            "id": "6764019255857315845",
+            "url": null,
+            "parent_id": null,
+            "post_id": "6756744559671168262",
+            "text": "@tiktok-user-468 same",
+            "author": {
+              "username": "tiktok-user-469",
+              "display_name": "tiktok-user-470",
+              "avatar_url": "https://scrubbed.invalid/tiktok-user-471",
+              "verified": false
+            },
+            "engagement": {
+              "likes": 1,
+              "replies": 1
+            },
+            "flags": {
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2019-11-27T16:09:18.000Z",
+            "ext": {
+              "published_at_epoch": 1574870958
+            }
+          },
+          "computed": {
+            "language": null
+          }
+        },
+        {
+          "comment": {
+            "id": "6764013896472182789",
+            "url": null,
+            "parent_id": null,
+            "post_id": "6756744559671168262",
+            "text": "@tiktok-user-472 XDDD",
+            "author": {
+              "username": "tiktok-user-473",
+              "display_name": "tiktok-user-474",
+              "avatar_url": "https://scrubbed.invalid/tiktok-user-475",
+              "verified": false
+            },
+            "engagement": {
+              "likes": 0,
+              "replies": 0
+            },
+            "flags": {
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2019-11-27T15:48:31.000Z",
+            "ext": {
+              "published_at_epoch": 1574869711
+            }
+          },
+          "computed": {
+            "language": null
+          }
+        },
+        {
+          "comment": {
+            "id": "6972256413092070149",
+            "url": null,
+            "parent_id": null,
+            "post_id": "6756744559671168262",
+            "text": "I cheated on my chemistry test and failed the class because of it. funny thing is i would easly pass without cheating 😃",
+            "author": {
+              "username": "tiktok-user-476",
+              "display_name": "tiktok-user-477",
+              "avatar_url": "https://scrubbed.invalid/tiktok-user-478",
+              "verified": false
+            },
+            "engagement": {
+              "likes": 1,
+              "replies": 0
+            },
+            "flags": {
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2021-06-10T19:55:50.000Z",
+            "ext": {
+              "published_at_epoch": 1623354950
+            }
+          },
+          "computed": {
+            "language": "en"
+          }
+        }
+      ],
+      "total": 375,
+      "dropped": 0
+    },
+    "credits_used": 1,
+    "request_id": "req-QnF2hZ5tcoYPh0ZI",
+    "cached": false,
+    "pagination": {
+      "next_cursor": null,
+      "has_more": false,
+      "page_size": 6
+    },
+    "credits_remaining": 94
+  }
+}

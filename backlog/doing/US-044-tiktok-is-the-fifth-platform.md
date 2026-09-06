@@ -3,7 +3,7 @@ id: US-044
 title: TikTok is the fifth platform
 type: feature
 priority: p2
-created: 2026-09-06T13:26+08:00
+created: 2026-09-06T13:25+08:00
 parent: US-038
 area:
 resolution:
@@ -61,10 +61,10 @@ they parse.
 - [ ] `tiktok` is a platform in `db/schema.ts`, in a migration, and
       `PlatformDescriptor` carries its own query rule and a note saying the
       lead is in the comments
-- [ ] Fixtures are captured from a live account by a script under the
+- [x] Fixtures are captured from a live account by a script under the
       connector's own directory, with author identity scrubbed, and are read
       before they are committed
-- [ ] The Log says what `/search` and `/search/top` each returned, and which
+- [x] The Log says what `/search` and `/search/top` each returned, and which
       one this connector uses, with the reason
 - [ ] The connector searches by keyword and pages by cursor, and a test replays
       a captured answer
@@ -78,7 +78,7 @@ they parse.
       three connectors follow
 - [ ] The Log records what one search and one comment page cost and returned,
       measured
-- [ ] **The Log says whether a TikTok comment is long enough to be a lead**,
+- [x] **The Log says whether a TikTok comment is long enough to be a lead**,
       judged by reading them rather than by counting rows
 - [ ] STACK.md and AGENTS.md record the fifth network as a decision, and that
       the rule stands for the sixth
@@ -101,8 +101,55 @@ they parse.
 
 ## Log
 
-- 2026-09-06T13:26+08:00 — Written at the owner's request, and split from
+- 2026-09-06T13:25+08:00 — Written at the owner's request, and split from
   US-038 rather than unparking all three. The framing that matters is US-034's:
   a video is published to be seen, so the lead is underneath it — and TikTok is
   further from text than YouTube, so the question the capture must answer is
   whether its comments say enough to be leads at all.
+
+- 2026-09-06T13:32+08:00 — Captured, six credits, $0.049. **The capture answered
+  the question the ticket asked it to, and the answer is no.** Nothing has been
+  built and the connector should not be, on this evidence.
+
+  **The words mean something else here.** A search for `flaky tests` returned
+  30 videos, and the platform's reading of both words is not ours:
+
+  * *flaky* means **dandruff**. Scalp treatment, psoriasis, "sideburn flakes",
+    an ASMR scalp examination, dandruff removal.
+  * *test* means **a school exam**. The second query, `my tests keep failing`,
+    returned nothing else at all: studying, failing, ChatGPT-for-homework.
+
+  `/search` and `/search/top` returned the same shape of noise, so which one
+  this connector would use is moot.
+
+  **The on-topic results are vendors, not people.** Two of thirty were about CI
+  — "Drive consistent CI success and maintain a high-quality codebase" and "Your
+  flaky tests are burning $50K+ a year, and nobody is tracking it 💸". Both are
+  marketing. US-034 measured that a YouTube search returns publishers rather
+  than people; on TikTok the same is true and the publishers are selling the
+  thing this monitor sells.
+
+  **The comments cannot carry a lead.** The busiest video in the result set
+  claimed 377 comments, and a page of 50 has a **median length of 19
+  characters** with exactly one over 80. The longest is *"oh God.. I have a
+  chemistry test tomorrow and I think that is gonna be easy"*. YouTube's comment
+  match was a person asking for a Cypress alternative, in a sentence. There is
+  no sentence here.
+
+  So the honest possibility the ticket named is the measured answer: **this
+  platform is cheap because there is little text in it.** Not for want of a
+  connector — the endpoints work, they are one credit each, they page, and the
+  payload is the same envelope the other three read.
+
+  The fixtures and the capture script are committed anyway. They cost real money
+  and they are the evidence for this decision; the next person to propose TikTok
+  should find them rather than spend the credits again. The audit flagged
+  `@tiktok` in six files and it was a false positive — my own `@tiktok-user-N`
+  pseudonyms matching the pattern that looks for handles.
+
+- 2026-09-06T13:32+08:00 — Recommendation: **do not build the connector.**
+  Reconsider if a monitor exists whose customers are consumers rather than
+  engineers, because nothing here says TikTok has no intent — it says TikTok has
+  no *this product's* intent, at a median of 19 characters. That is a different
+  claim and the fixtures support only the second.
+

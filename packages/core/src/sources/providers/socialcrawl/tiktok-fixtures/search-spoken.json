@@ -1,0 +1,1459 @@
+{
+  "httpStatus": 200,
+  "body": {
+    "success": true,
+    "platform": "tiktok",
+    "endpoint": "/v1/tiktok/search",
+    "data": {
+      "items": [
+        {
+          "post": {
+            "id": "7605457509939219725",
+            "url": "https://www.tiktok.com/@tiktok-user-147/video/7605457509939219725",
+            "content": {
+              "text": "I’m basically doing all this studying for no reason and it’s draining me on top of everything else🫩#fyp #viral? #failinggrades #failingmath #drained ",
+              "media_urls": "https://v16m.tiktokcdn-us.com/d2a5eda41f486c4407dd9a682cbe8317/6a9d4df1/video/tos/useast5/tos-useast5-ve-0068c002-tx/oQAbkLGxjIHjeII3iYIQgCCABggAtdFlGTeae0/?a=1233&bti=NEBzNTY6QGo6OjZALnAjNDQuYCMxNDNg&&bt=548&ft=gKfIn8buoTfR12NvOxWEzIxRP_PhZQ_45SY&mime_type=video_mp4&rc=Omg0OmY7ZzM3OmdmNzlnM0Bpamk4aHE5cnAzOTMzZzczNEBhYzAwYC1gNS8xYDUwLzJiYSMzZC5fMmRzLTNhLS1kMS9zcw%3D%3D&vvpl=1&l=20260906052602D51063AE1D40007828C7&btag=e00088000",
+              "thumbnail_url": "https://p19-common-sign.tiktokcdn-us.com/tos-useast5-p-0068-tx/oMtBxA0IM4PB4AJAwtp1gfiKiCAImAx32NYWoE~tplv-tiktokx-cropcenter:500:800.jpeg?biz_tag=musically_video.video_cover&dr=9638&idc=useast8&ps=13740610&refresh_token=bf2e172d&shcp=9b759fb9&shp=c1333099&t=4d5b0474&x-expires=1788692400&x-signature=ut5BgVXBtkXkI1Dk9Z6J123BpK8%3D",
+              "duration_seconds": 38.367
+            },
+            "author": {
+              "username": "tiktok-user-147",
+              "display_name": "tiktok-user-148",
+              "avatar_url": "https://scrubbed.invalid/tiktok-user-149",
+              "verified": false
+            },
+            "engagement": {
+              "views": 21909,
+              "likes": 2268,
+              "comments": 6,
+              "shares": 67,
+              "saves": 490
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-02-11T04:19:42.000Z",
+            "ext": {
+              "music_id": "6936242947046246402",
+              "author_id": "7567969541758960653",
+              "author_followers": 53,
+              "download_count": 31,
+              "published_at_epoch": 1770783582,
+              "on_screen_texts": [
+                "Me when I look at my test scores after really trying and still end up failing which makes me rethink my future:"
+              ]
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.106851,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 26291
+          }
+        },
+        {
+          "post": {
+            "id": "7652528845781863700",
+            "url": "https://www.tiktok.com/@tiktok-user-150/video/7652528845781863700",
+            "content": {
+              "text": "first mistake = not using eightball 😳 #studywithme #studytok #failed #exam #studymotivation ",
+              "media_urls": "https://v16m.tiktokcdn-us.com/18df325ba739da29b7d84fa1ca269992/6a9d4dd3/video/tos/alisg/tos-alisg-pve-0037c001/oAKwfJQfRqEz4UBcBLDzC1FzxozMgAwI5kP2EE/?a=1233&bti=NEBzNTY6QGo6OjZALnAjNDQuYCMxNDNg&&bt=669&ft=gKfIn8buoTfR12NvOxWEzIxRP_PhZQ_45SY&mime_type=video_mp4&rc=NDU8ZGlpOjtpNjo8aDw8aUBpM2pmaXI5cmxtOzMzODczNEA2YWEtMzVgXmMxNmMyLjYvYSM1Mm1iMmRjbm1hLS1kMTFzcw%3D%3D&vvpl=1&l=20260906052602D51063AE1D40007828C7&btag=e000b0000",
+              "thumbnail_url": "https://p16-common-sign.tiktokcdn-us.com/tos-alisg-p-0037/o411Ha9FAAA1AIDEwEidGPKBAfK7soZiACBAzI~tplv-tiktokx-cropcenter:500:800.jpeg?biz_tag=musically_video.video_cover&dr=9638&idc=useast8&ps=13740610&refresh_token=a125e170&shcp=9b759fb9&shp=c1333099&t=4d5b0474&x-expires=1788692400&x-signature=ouJEXwyNdjdcasntns1nJA5rhHU%3D",
+              "duration_seconds": 8.3
+            },
+            "author": {
+              "username": "tiktok-user-150",
+              "display_name": "tiktok-user-150",
+              "avatar_url": "https://scrubbed.invalid/tiktok-user-151",
+              "verified": false
+            },
+            "engagement": {
+              "views": 8845,
+              "likes": 463,
+              "comments": 6,
+              "shares": 9,
+              "saves": 50
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-06-18T00:40:35.000Z",
+            "ext": {
+              "music_id": "7478932302249510928",
+              "author_id": "7624787101275816980",
+              "author_followers": 76,
+              "download_count": 0,
+              "published_at_epoch": 1781743235,
+              "on_screen_texts": [
+                "u memorized, but didn’t LEARN\n\nu can’t put down that damn phone \n\nu don’t use \neightball to study\n\nu don’t sleep the night before a test\n\nu didn’t actively listen in class",
+                "5 reasons you keep \nfailing your exams⚠️"
+              ]
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.054042,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 10614
+          }
+        },
+        {
+          "post": {
+            "id": "7606506107908918542",
+            "url": "https://www.tiktok.com/@tiktok-user-152/video/7606506107908918542",
+            "content": {
+              "text": "I miss it #usedtobesmart #canttry #school #failing #fyp",
+              "media_urls": "https://v16m.tiktokcdn-us.com/1c0caef1d95b9a8cc297aaa2189537ab/6a9d4dd2/video/tos/useast5/tos-useast5-ve-0068c003-tx/ooEvei71ARrIIB4pElvB9kMCasiCx0OpwLAPIa/?a=1233&bti=NEBzNTY6QGo6OjZALnAjNDQuYCMxNDNg&&bt=714&ft=gKfIn8buoTfR12NvOxWEzIxRP_PhZQ_45SY&mime_type=video_mp4&rc=ZTc4Omc2aDk4NTQ3aDQ1NkBpajxkOXI5cnd1OTMzZzczNEBfYTFgYjQ2XmMxXmA0NWMzYSNma2RmMmRrazRhLS1kMS9zcw%3D%3D&vvpl=1&l=20260906052602D51063AE1D40007828C7&btag=e000b0000",
+              "thumbnail_url": "https://p19-common-sign.tiktokcdn-us.com/tos-useast5-p-0068-tx/ooeCaxCSkirlAAphC049IzwT7iIYvBpBIPvQ9y~tplv-tiktokx-cropcenter:500:800.jpeg?biz_tag=musically_video.video_cover&dr=9638&idc=useast8&ps=13740610&refresh_token=48ed3906&shcp=9b759fb9&shp=c1333099&t=4d5b0474&x-expires=1788692400&x-signature=sGabDnE8qAsu5DhEfgbBwk9ypN0%3D",
+              "duration_seconds": 7.934
+            },
+            "author": {
+              "username": "tiktok-user-152",
+              "display_name": "tiktok-user-153",
+              "avatar_url": "https://scrubbed.invalid/tiktok-user-154",
+              "verified": false
+            },
+            "engagement": {
+              "views": 1131575,
+              "likes": 301633,
+              "comments": 339,
+              "shares": 10750,
+              "saves": 31272
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-02-14T00:08:44.000Z",
+            "ext": {
+              "music_id": "7568535110765595414",
+              "author_id": "7427226291173950510",
+              "author_followers": 2503,
+              "download_count": 874,
+              "published_at_epoch": 1771027724,
+              "on_screen_texts": [
+                "“I used to be smart” I say as I \ncan’t bring myself to study, \nI’m failing simple tests, \nhaving to plug my ears to read, \nre-read a question over and\n over again to understand it "
+              ]
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.27636,
+            "language": null,
+            "content_category": "other",
+            "estimated_reach": 1357890
+          }
+        },
+        {
+          "post": {
+            "id": "7606084415827086605",
+            "url": "https://www.tiktok.com/@tiktok-user-155/video/7606084415827086605",
+            "content": {
+              "text": null,
+              "media_urls": "https://v16m.tiktokcdn-us.com/e63b10635ea52f6f7b56e87878848a99/6a9d4dd3/video/tos/useast5/tos-useast5-pve-0068-tx/oEAHAxI4eBTR8ClGwoMHtg1xkHejQpWA1IvI8e/?a=1233&bti=NEBzNTY6QGo6OjZALnAjNDQuYCMxNDNg&&bt=1757&ft=gKfIn8buoTfR12NvOxWEzIxRP_PhZQ_45SY&mime_type=video_mp4&rc=PGY4aTM6OjxnZGY3Ozo6O0BpamxpNnA5cmg2OTMzZzczNEA2YjJjXi9jX2AxYTJiMi0vYSM0anEtMmRrbjRhLS1kMS9zcw%3D%3D&vvpl=1&l=20260906052602D51063AE1D40007828C7&btag=e000b0000",
+              "thumbnail_url": "https://p19-common-sign.tiktokcdn-us.com/tos-useast5-p-0068-tx/oQAUQOISOiyg9Y4PBrNPk4ZYE2iBN7PdCaAvE~tplv-tiktokx-cropcenter:500:800.jpeg?biz_tag=musically_video.video_cover&dr=9638&idc=useast8&ps=13740610&refresh_token=5545e940&shcp=9b759fb9&shp=c1333099&t=4d5b0474&x-expires=1788692400&x-signature=U5osPNJ1DGun4aJyLrl8Hfz0bss%3D",
+              "duration_seconds": 7.967
+            },
+            "author": {
+              "username": "tiktok-user-155",
+              "display_name": "tiktok-user-156",
+              "avatar_url": "https://scrubbed.invalid/tiktok-user-157",
+              "verified": false
+            },
+            "engagement": {
+              "views": 820,
+              "likes": 85,
+              "comments": 0,
+              "shares": 0,
+              "saves": 3
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-02-12T20:52:23.000Z",
+            "ext": {
+              "music_id": "7560811887047297805",
+              "author_id": "6999348011592352773",
+              "author_followers": 295,
+              "download_count": 0,
+              "published_at_epoch": 1770929543,
+              "on_screen_texts": [
+                "Me because I keep failing my tests:"
+              ]
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.103659,
+            "language": null,
+            "content_category": null,
+            "estimated_reach": 984
+          }
+        },
+        {
+          "post": {
+            "id": "7486573166563790123",
+            "url": "https://www.tiktok.com/@tiktok-user-158/video/7486573166563790123",
+            "content": {
+              "text": "help me hit 65k!!!! (chatgpt is my savior) #chatgpt #cheating #school #ihateschool #test #fail #homework ",
+              "media_urls": "https://v16m.tiktokcdn-us.com/c021b760880d3f3107933d30d0887034/6a9d4dd2/video/tos/useast5/tos-useast5-ve-0068c001-tx/oMEyXDaII6FaDNgfEgelMSnrpPRp5AKIEEcBPZ/?a=1233&bti=NEBzNTY6QGo6OjZALnAjNDQuYCMxNDNg&&bt=1110&ft=gKfIn8buoTfR12NvOxWEzIxRP_PhZQ_45SY&mime_type=video_mp4&rc=ZDQ2aDw3OjxlPDpkaTU4NUBpMzdsNng5cjt0eTMzZzczNEBeXjNeMzQvXi4xMi5hMWBiYSMxZjBtMmQ0YWZgLS1kMS9zcw%3D%3D&vvpl=1&l=20260906052602D51063AE1D40007828C7&btag=e000b0000",
+              "thumbnail_url": "https://p16-common-sign.tiktokcdn-us.com/tos-useast5-p-0068-tx/oYqED5gSdIAaEqIMpNpalfB8IgEeyBDXnEcRzF~tplv-tiktokx-cropcenter:500:800.jpeg?biz_tag=musically_video.video_cover&dr=9638&idc=useast8&ps=13740610&refresh_token=2d97e74d&shcp=9b759fb9&shp=c1333099&t=4d5b0474&x-expires=1788692400&x-signature=fgKw5POzQxQiWRQvs%2BM5zf%2B4ZRM%3D",
+              "duration_seconds": 7.337
+            },
+            "author": {
+              "username": "tiktok-user-158",
+              "display_name": "tiktok-user-159",
+              "avatar_url": "https://scrubbed.invalid/tiktok-user-160",
+              "verified": false
+            },
+            "engagement": {
+              "views": 1598851,
+              "likes": 418038,
+              "comments": 611,
+              "shares": 26082,
+              "saves": 16802
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2025-03-27T19:27:44.000Z",
+            "ext": {
+              "music_id": "7464787684733602590",
+              "author_id": "7385805461331248170",
+              "author_followers": 109996,
+              "download_count": 667,
+              "published_at_epoch": 1743103664,
+              "on_screen_texts": [
+                "when i get 100% on my homework but fail every test so my teacher thinks im cheating (i am)"
+              ]
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.278157,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 1918621
+          }
+        },
+        {
+          "post": {
+            "id": "7551091666124410126",
+            "url": "https://www.tiktok.com/@tiktok-user-161/video/7551091666124410126",
+            "content": {
+              "text": "i swear i’m trying #fyp #4u #LanguageLearning #school #xyzbca ",
+              "media_urls": "https://v16m.tiktokcdn-us.com/283a252650feea49bae28c2eb059ddb1/6a9d4dda/video/tos/useast5/tos-useast5-pve-0068-tx/ownB7jBCiCMqZ3KynI0NAASC04wIEpQfw0W1ti/?a=1233&bti=NEBzNTY6QGo6OjZALnAjNDQuYCMxNDNg&&bt=1425&ft=gKfIn8buoTfR12NvOxWEzIxRP_PhZQ_45SY&mime_type=video_mp4&rc=aWQ7Nzs6M2U3aDU7ZmdkNUBpamY0Z3I5cm9nNjMzZzczNEA2MDAuLTMuXl8xX2E1L182YSMzMWJuMmRjbzJhLS1kMS9zcw%3D%3D&vvpl=1&l=20260906052602D51063AE1D40007828C7&btag=e000b8000",
+              "thumbnail_url": "https://p19-common-sign.tiktokcdn-us.com/tos-useast5-p-0068-tx/oUa3vISDoB3xY3kFEMetXAQpEDgKfy0grRQivV~tplv-tiktokx-cropcenter:500:800.jpeg?biz_tag=musically_video.video_cover&dr=9638&idc=useast8&ps=13740610&refresh_token=80765858&shcp=9b759fb9&shp=c1333099&t=4d5b0474&x-expires=1788692400&x-signature=8PUyvyT8Co8MmUGb08Uj%2BBdwyAY%3D",
+              "duration_seconds": 15.046
+            },
+            "author": {
+              "username": "tiktok-user-161",
+              "display_name": "tiktok-user-162",
+              "avatar_url": "https://scrubbed.invalid/tiktok-user-163",
+              "verified": false
+            },
+            "engagement": {
+              "views": 627811,
+              "likes": 103584,
+              "comments": 383,
+              "shares": 4305,
+              "saves": 15594
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2025-09-17T16:13:31.000Z",
+            "ext": {
+              "music_id": "7539269652150094606",
+              "author_id": "7547831097457083405",
+              "author_followers": 411,
+              "download_count": 239,
+              "published_at_epoch": 1758125611,
+              "on_screen_texts": [
+                "why do i have to be so fucking stupid bro why do i fail every test i take"
+              ]
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.17246,
+            "language": null,
+            "content_category": "other",
+            "estimated_reach": 753373
+          }
+        },
+        {
+          "post": {
+            "id": "7446317344449776928",
+            "url": "https://www.tiktok.com/@tiktok-user-164/video/7446317344449776928",
+            "content": {
+              "text": "As if! #tests #revision #fail ",
+              "media_urls": "https://v16m.tiktokcdn-us.com/9bd77499f5e5011a8961a993045d786e/6a9d4dd3/video/tos/useast2a/tos-useast2a-ve-68c810-euttp/ogL1kPUEIGizwxWB3xhokZiTBwL0IaWAlEZFB/?a=1233&bti=NEBzNTY6QGo6OjZALnAjNDQuYCMxNDNg&&bt=665&ft=gKfIn8buoTfR12NvOxWEzIxRP_PhZQ_45SY&mime_type=video_mp4&rc=NDVoO2g2N2c2Omc1O2g8OEBpajt4a2s5cmpkdzMzZjczM0BiLWAzMWFgXjQxNV4yLWFjYSMtNWptMmQ0MF9gLS1kMWNzcw%3D%3D&vvpl=1&l=20260906052602D51063AE1D40007828C7&btag=e000b0000",
+              "thumbnail_url": "https://p19-common-sign.tiktokcdn-us.com/tos-useast2a-p-0037-euttp/o8ajiwAoW03A5dQiAEBBaNBPiZA4A13kIHE9k~tplv-tiktokx-cropcenter:500:800.jpeg?biz_tag=musically_video.video_cover&dr=9638&idc=useast8&ps=13740610&refresh_token=ac7d29b2&shcp=9b759fb9&shp=c1333099&t=4d5b0474&x-expires=1788692400&x-signature=PrI0rJTgKCGVJe1S8yzYKJrLtWw%3D",
+              "duration_seconds": 8.709
+            },
+            "author": {
+              "username": "tiktok-user-164",
+              "display_name": "tiktok-user-165",
+              "avatar_url": "https://scrubbed.invalid/tiktok-user-166",
+              "verified": false
+            },
+            "engagement": {
+              "views": 206062,
+              "likes": 34139,
+              "comments": 40,
+              "shares": 2791,
+              "saves": 1868
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2024-12-09T07:54:42.000Z",
+            "ext": {
+              "music_id": "7443819676722039574",
+              "author_id": "7227475895115809818",
+              "author_followers": 256,
+              "download_count": 33,
+              "published_at_epoch": 1733730882,
+              "on_screen_texts": [
+                "“I keep failing my tests”",
+                "“You could always revise”"
+              ]
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.179412,
+            "language": null,
+            "content_category": "other",
+            "estimated_reach": 247274
+          }
+        },
+        {
+          "post": {
+            "id": "7609916344896687392",
+            "url": "https://www.tiktok.com/@tiktok-user-167/video/7609916344896687392",
+            "content": {
+              "text": "#fypシ゚ #school #relatable #viral #blowthisup ",
+              "media_urls": "https://v16m.tiktokcdn-us.com/048a5b685e43c4e12a9185f7632fd1bd/6a9d4dd1/video/tos/useast2a/tos-useast2a-ve-68c810-euttp/okkRpmEcaBDfx3mgE3rrtGQQDfA7FDdoZB0p9I/?a=1233&bti=NEBzNTY6QGo6OjZALnAjNDQuYCMxNDNg&&bt=1135&ft=gKfIn8buoTfR12NvOxWEzIxRP_PhZQ_45SY&mime_type=video_mp4&rc=Ojo1ODc4ZTVlNzM8ZWZlZUBpM25ueG45cnR3OTMzZjczNUBgXjI2NTBjXi4xYjMyYzQvYSM2bXFkMmRzaWFhLS1kMTNzcw%3D%3D&vvpl=1&l=20260906052602D51063AE1D40007828C7&btag=e000b0000",
+              "thumbnail_url": "https://p19-common-sign.tiktokcdn-us.com/tos-useast2a-p-0037-euttp/ocDDbwfrHao9pF6EGkpBArmkEmQD2Q3QRZifSM~tplv-tiktokx-cropcenter:500:800.jpeg?biz_tag=musically_video.video_cover&dr=9638&idc=useast8&ps=13740610&refresh_token=59bad0f0&shcp=9b759fb9&shp=c1333099&t=4d5b0474&x-expires=1788692400&x-signature=51VpSk21ber59wqgmkcz9yLyPaA%3D",
+              "duration_seconds": 6.547
+            },
+            "author": {
+              "username": "tiktok-user-167",
+              "display_name": "tiktok-user-168",
+              "avatar_url": "https://scrubbed.invalid/tiktok-user-169",
+              "verified": false
+            },
+            "engagement": {
+              "views": 4054975,
+              "likes": 853575,
+              "comments": 544,
+              "shares": 31502,
+              "saves": 80994
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-02-23T04:43:46.000Z",
+            "ext": {
+              "music_id": "7372954880410175504",
+              "author_id": "7573987170933146646",
+              "author_followers": 31902,
+              "download_count": 849,
+              "published_at_epoch": 1771821826,
+              "on_screen_texts": [
+                "“i used to be smart”\ni say as i can’t bring \nmyself to study, im failing\n simple tests, can’t \nfocus on anything, re reading \na question over and \nover again to \nunderstand it"
+              ]
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.218404,
+            "language": "ja",
+            "content_category": "other",
+            "estimated_reach": 4865970
+          }
+        },
+        {
+          "post": {
+            "id": "7647307286335081742",
+            "url": "https://www.tiktok.com/@tiktok-user-170/video/7647307286335081742",
+            "content": {
+              "text": "I actually tried but still failed 😭 #ishowspeed #relatablememes #relatablevideos #viral #fyp ",
+              "media_urls": "https://v16m.tiktokcdn-us.com/09948a351733dc2e136b603e86fc163b/6a9d4dd7/video/tos/useast5/tos-useast5-ve-0068c003-tx/oEVbfADQRsUHZFjeURqPfNkIAIUgCTvECNjVEK/?a=1233&bti=NTY6QGo0QHM6OjZANDQuYCMucCMxNDNg&&bt=519&ft=gKfIn8buoTfR12NvOxWEzIxRP_PhZQ_45SY&mime_type=video_mp4&rc=NzQ2ZWlmOGlpaWZlOWk2Z0BpamRyZGs5cm1kOzMzZzczNEBfLTA0NDM0Xy4xYjAvX2I0YSM1aWNoMmRzc2RhLS1kMS9zcw%3D%3D&vvpl=1&l=20260906052602D51063AE1D40007828C7&btag=e000b0000",
+              "thumbnail_url": "https://p16-common-sign.tiktokcdn-us.com/tos-useast5-p-0068-tx/oEINgUKIWCVBxAjTjeIAMFEHfsDOqQCbRfRPZk~tplv-tiktokx-cropcenter:500:800.jpeg?biz_tag=musically_video.video_cover&dr=9638&idc=useast8&ps=13740610&refresh_token=97115e2d&shcp=9b759fb9&shp=c1333099&t=4d5b0474&x-expires=1788692400&x-signature=JYGl%2BrJufU4DbCZ5j5lKG0%2FQsPw%3D",
+              "duration_seconds": 12.834
+            },
+            "author": {
+              "username": "tiktok-user-170",
+              "display_name": "tiktok-user-170",
+              "avatar_url": "https://scrubbed.invalid/tiktok-user-171",
+              "verified": false
+            },
+            "engagement": {
+              "views": 744498,
+              "likes": 132707,
+              "comments": 309,
+              "shares": 32217,
+              "saves": 11339
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-06-03T22:58:28.000Z",
+            "ext": {
+              "music_id": "7513173995359111941",
+              "author_id": "6926648975877899270",
+              "author_followers": 66975,
+              "download_count": 885,
+              "published_at_epoch": 1780527508,
+              "on_screen_texts": [
+                "When I’ve spent the whole night studying before my test just for me to genuinely fail the next day"
+              ]
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.221939,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 893398
+          }
+        },
+        {
+          "post": {
+            "id": "7660217751306390806",
+            "url": "https://www.tiktok.com/@tiktok-user-172/video/7660217751306390806",
+            "content": {
+              "text": "3 reasons you keep failing your driving test.  #drivingtest #fail #drivingtips #drivinganxiety ",
+              "media_urls": "https://v16m.tiktokcdn-us.com/31a9534a1412ab25f4cbc759e891021e/6a9d4e23/video/tos/no1a/tos-no1a-ve-0068-no/oEYABjEa0uEBkIiO7Vv5Pvr5sQivbBRP6sZ97/?a=1233&bti=NEBzNTY6QGo6OjZALnAjNDQuYCMxNDNg&&bt=1460&ft=gKfIn8buoTfR12NvOxWEzIxRP_PhZQ_45SY&mime_type=video_mp4&rc=ODU6ZWc7ZzNpZDw8Z2Q6NkBpanV4N3c5cnU7PDMzbzczNUBfNS0tLV5jNjQxNV5jYjJjYSNwbWFrMmRrcjRhLS1kMTFzcw%3D%3D&vvpl=1&l=20260906052602D51063AE1D40007828C7&btag=e00090000",
+              "thumbnail_url": "https://p19-common-sign.tiktokcdn-us.com/tos-no1a-p-0037-no/oYI9oAkDqCHyBfNFEAAo6AI7EF7dfTcgMRQvC7~tplv-tiktokx-cropcenter:500:800.jpeg?biz_tag=musically_video.video_cover&dr=9638&idc=useast8&ps=13740610&refresh_token=0326db45&shcp=9b759fb9&shp=c1333099&t=4d5b0474&x-expires=1788692400&x-signature=iljUiAUVKrdF4FArjS4inJFRtZg%3D",
+              "duration_seconds": 88.767
+            },
+            "author": {
+              "username": "tiktok-user-172",
+              "display_name": "tiktok-user-173",
+              "avatar_url": "https://scrubbed.invalid/tiktok-user-174",
+              "verified": false
+            },
+            "engagement": {
+              "views": 38163,
+              "likes": 1483,
+              "comments": 62,
+              "shares": 102,
+              "saves": 440
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-07-08T17:57:16.000Z",
+            "ext": {
+              "music_id": "7660680144336358166",
+              "author_id": "7326627843588097057",
+              "author_followers": 46469,
+              "download_count": 46,
+              "published_at_epoch": 1783533436
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.043157,
+            "language": "fr",
+            "content_category": "other",
+            "estimated_reach": 45796
+          }
+        },
+        {
+          "post": {
+            "id": "7676977811243945230",
+            "url": "https://www.tiktok.com/@tiktok-user-175/video/7676977811243945230",
+            "content": {
+              "text": "I got a 46% on my nursing school exam 😭  #nursingstudents #futurenurse #nursingstudentmotivation #failingnursingschool #failednursingexam ",
+              "media_urls": "https://v16m.tiktokcdn-us.com/d6b8b9dfcbe8bff26b7dfa0c5b34c8fb/6a9d4e55/video/tos/useast5/tos-useast5-ve-0068c004-tx/oUqxScKZWBoQhAFR8DIITwbgYiExglfeOqGDEW/?a=1233&bti=NTY6QGo0QHM6OjZANDQuYCMucCMxNDNg&&bt=735&ft=gKfIn8buoTfR12NvOxWEzIxRP_PhZQ_45SY&mime_type=video_mp4&rc=M2QzO2U2NDxmNzYzOzg8OEBpam41ZHg5cjg0ZDMzZzczNEBjNTMxNWI0NWAxYF4uXjMtYSMyNWMzMmRraTJhLS1kMS9zcw%3D%3D&vvpl=1&l=20260906052602D51063AE1D40007828C7&btag=e00090000",
+              "thumbnail_url": "https://p16-common-sign.tiktokcdn-us.com/tos-useast5-p-0068-tx/o0SDWWgfECuIQrFgq9oAxGhfZq8RBWEiKQDBTI~tplv-tiktokx-cropcenter:500:800.jpeg?biz_tag=musically_video.video_cover&dr=9638&idc=useast8&ps=13740610&refresh_token=2d1a654f&shcp=9b759fb9&shp=c1333099&t=4d5b0474&x-expires=1788692400&x-signature=YFginr4T4waMcsFvw%2F9Nu%2BSW5GI%3D",
+              "duration_seconds": 138.067
+            },
+            "author": {
+              "username": "tiktok-user-175",
+              "display_name": "tiktok-user-176",
+              "avatar_url": "https://scrubbed.invalid/tiktok-user-177",
+              "verified": false
+            },
+            "engagement": {
+              "views": 48097,
+              "likes": 6274,
+              "comments": 74,
+              "shares": 192,
+              "saves": 1005
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-08-22T21:55:09.000Z",
+            "ext": {
+              "music_id": "6857174923719231489",
+              "author_id": "7397633668103963694",
+              "author_followers": 98627,
+              "download_count": 33,
+              "published_at_epoch": 1787435709,
+              "on_screen_texts": [
+                "* I failed nursing school. Can I still become a nurse?\n* can you still become a nurse if you failed?\n* can I still get into nursing school if I failed?\n* nurses that failed and still became a nurse\n* stories of nurses that failed\n* I failed my nursing school exam and don’t know what to do\n* I failed my nursing school class and need help\n* I need a high grade on my nursing school final to pass the class\n* how to pass nursing school exams after failing\n* why am I failing my nursing school exams\n* nursing school coach\n* nursing school tutor\n* what to do if you’re failing nursing school\n* how to stop failing nursing school exams\n* how to study when you keep failing exams in nursing school\n* I study for hours and still fail\n* I feel stupid in nursing school\n* how to bring up my nursing grade\n* I failed my first nursing school exam\n* can I pass nursing school if I failed\n* should I quit nursing school\n* I’m behind in nursing school\n* I have to retake a class in nursing school",
+                "I got a 46% on my nursing \nschool exam 😭"
+              ]
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.135975,
+            "language": "sv",
+            "content_category": "other",
+            "estimated_reach": 57716
+          }
+        },
+        {
+          "post": {
+            "id": "7681504938588966174",
+            "url": "https://www.tiktok.com/@tiktok-user-178/video/7681504938588966174",
+            "content": {
+              "text": "I failed 2 of my math test and my english quiz like i’m so done. || #realkatieb #realkatiebedit #relatable #failing #fyp",
+              "media_urls": "https://v16m.tiktokcdn-us.com/13accf387c921a7d2c16c951659123d3/6a9d4dd6/video/tos/useast8/tos-useast8-ve-0068c004-tx2/okXaRiT8qIVtEcE6MBmFkO9EEWDEOcAd5AfkCe/?a=1233&bti=NEBzNTY6QGo6OjZALnAjNDQuYCMxNDNg&&bt=213&ft=gKfIn8buoTfR12NvOxWEzIxRP_PhZQ_45SY&mime_type=video_mp4&rc=ZDU3ZTs6ZTM6ZmY7OzpmZkBpanFzcXc5cng1ZDMzaTczNEAuYmAwLzYtNWAxNDUzYy4yYSM2bmYwMmRjcmFhLS1kMTJzcw%3D%3D&vvpl=1&l=20260906052602D51063AE1D40007828C7&btag=e000b0000",
+              "thumbnail_url": "https://p16-common-sign.tiktokcdn-us.com/tos-useast8-p-0068-tx2/ooBEEm5VFQAiuex867M9afCrmAE6OBDSqIsRPF~tplv-tiktokx-cropcenter:500:800.jpeg?biz_tag=musically_video.video_cover&dr=9638&idc=useast8&ps=13740610&refresh_token=5c00f25e&shcp=9b759fb9&shp=c1333099&t=4d5b0474&x-expires=1788692400&x-signature=Oklnlq0ffVX8ZLcl2hkj%2Fau6omg%3D",
+              "duration_seconds": 11.3
+            },
+            "author": {
+              "username": "tiktok-user-178",
+              "display_name": "tiktok-user-179",
+              "avatar_url": "https://scrubbed.invalid/tiktok-user-180",
+              "verified": false
+            },
+            "engagement": {
+              "views": 12418,
+              "likes": 3515,
+              "comments": 17,
+              "shares": 328,
+              "saves": 427
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-09-04T02:42:34.000Z",
+            "ext": {
+              "music_id": "7681505288377076510",
+              "author_id": "7505899265037124654",
+              "author_followers": 13600,
+              "download_count": 5,
+              "published_at_epoch": 1788489754,
+              "on_screen_texts": [
+                "Me because it hasn’t even been a month into the school year and i’m already failing a class"
+              ]
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.310839,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 14902
+          }
+        },
+        {
+          "post": {
+            "id": "7679533484246879495",
+            "url": "https://www.tiktok.com/@tiktok-user-181/video/7679533484246879495",
+            "content": {
+              "text": "GUYS I CANT EVEN CHOOSE A SOUND SO I HAVE TO CHOOSE THIS— anyways Abbie is literally me.. :O #fyp #fpe #abbiefpe #makethisviral #failing",
+              "media_urls": "https://v16m.tiktokcdn-us.com/3a2a81e27dfc8d10c3b2ee39362cb58f/6a9d4dd9/video/tos/alisg/tos-alisg-pve-0037c001/o00IzBfEGgkxq6bUHEB6RVAHJtIyFhEIDeCyLT/?a=1233&bti=NEBzNTY6QGo6OjZALnAjNDQuYCMxNDNg&&bt=291&ft=gKfIn8buoTfR12NvOxWEzIxRP_PhZQ_45SY&mime_type=video_mp4&rc=ODw6OjZkODc1NWg6NTtpOUBpam04dXg5cmhsZDMzODczNEAtYF4xLTNfNWIxYDYuLjNgYSNhX2AwMmRrcTZhLS1kMTFzcw%3D%3D&vvpl=1&l=20260906052602D51063AE1D40007828C7&btag=e000b0000",
+              "thumbnail_url": "https://p19-common-sign.tiktokcdn-us.com/tos-alisg-p-0037/oszTRybMqIUNE4BeLBkFpC6EIhDBHPAV6gfSxt~tplv-tiktokx-cropcenter:500:800.jpeg?biz_tag=musically_video.video_cover&dr=9638&idc=useast8&ps=13740610&refresh_token=e637bcc0&shcp=9b759fb9&shp=c1333099&t=4d5b0474&x-expires=1788692400&x-signature=NOoj%2FNeS3nKwJGdHzERWr0yGSpE%3D",
+              "duration_seconds": 14.3
+            },
+            "author": {
+              "username": "tiktok-user-181",
+              "display_name": "tiktok-user-182",
+              "avatar_url": "https://scrubbed.invalid/tiktok-user-183",
+              "verified": false
+            },
+            "engagement": {
+              "views": 384,
+              "likes": 23,
+              "comments": 4,
+              "shares": 3,
+              "saves": 5
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-08-29T19:12:18.000Z",
+            "ext": {
+              "music_id": "7661184909117082389",
+              "author_id": "7521460320284771334",
+              "author_followers": 109,
+              "download_count": 0,
+              "published_at_epoch": 1788030738,
+              "on_screen_texts": [
+                "POV: You keep failing in every math tests ",
+                "——"
+              ]
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.078125,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 461
+          }
+        },
+        {
+          "post": {
+            "id": "7670122235620838670",
+            "url": "https://www.tiktok.com/@tiktok-user-184/video/7670122235620838670",
+            "content": {
+              "text": "I also think I should add I ran out of time on my first section of the test. #fyp #socialwork #aswbexam ",
+              "media_urls": "https://v16m.tiktokcdn-us.com/3903549930297c03a664008f6639105d/6a9d4e06/video/tos/useast5/tos-useast5-pve-0068-tx/oI8GDwfDSI8xRfqEVvrNRcXbxB6AtEu8FQJBEg/?a=1233&bti=NEBzNTY6QGo6OjZALnAjNDQuYCMxNDNg&&bt=1379&ft=gKfIn8buoTfR12NvOxWEzIxRP_PhZQ_45SY&mime_type=video_mp4&rc=ZTo6PGY7PDU2ZTg4ODhlaUBpanE0O3g5cjN1PDMzZzczNEAwNWFgMjQ2NWIxYWNfM2BiYSMzcm8yMmRja2xhLS1kMS9zcw%3D%3D&vvpl=1&l=20260906052602D51063AE1D40007828C7&btag=e00088000",
+              "thumbnail_url": "https://p19-common-sign.tiktokcdn-us.com/tos-useast5-p-0068-tx/oAc4Ge4DIIDkgyfcqDUALCNGQlj3AF90HHf8hr~tplv-tiktokx-cropcenter:500:800.jpeg?biz_tag=musically_video.video_cover&dr=9638&idc=useast8&ps=13740610&refresh_token=8206d899&shcp=9b759fb9&shp=c1333099&t=4d5b0474&x-expires=1788692400&x-signature=tgBBLCTouKsIYZQn7keO%2F%2BoYDBU%3D",
+              "duration_seconds": 59.034
+            },
+            "author": {
+              "username": "tiktok-user-184",
+              "display_name": "tiktok-user-185",
+              "avatar_url": "https://scrubbed.invalid/tiktok-user-186",
+              "verified": false
+            },
+            "engagement": {
+              "views": 14082,
+              "likes": 1218,
+              "comments": 156,
+              "shares": 10,
+              "saves": 91
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-08-04T10:31:51.000Z",
+            "ext": {
+              "music_id": "7670122286573161229",
+              "author_id": "6812645330817123334",
+              "author_followers": 5655,
+              "download_count": 0,
+              "published_at_epoch": 1785839511,
+              "on_screen_texts": [
+                "SOCIAL WORK UPDATE: I FAILED MY EXAM. I FAILED BY 8 POINTS."
+              ]
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.098281,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 16898
+          }
+        },
+        {
+          "post": {
+            "id": "7336004586148285738",
+            "url": "https://www.tiktok.com/@tiktok-user-187/video/7336004586148285738",
+            "content": {
+              "text": "I am sick and tired of these results smh #nursingschool #nursingmajor #nursingstudent #nursingexams #nursingschooltests #nursingschoolexam #strugglesofanursingstudent #nursingstudentproblems #bsnstudent #bsnmajor #nursing #CapCut ",
+              "media_urls": "https://v16m.tiktokcdn-us.com/947df81f891d13f9ad9dc10803388bb1/6a9d4dd3/video/tos/useast5/tos-useast5-ve-0068c004-tx/oIUctPSEILiBg2OBo64uWZiUByH4Y6vA7EZsD/?a=1233&bti=NEBzNTY6QGo6OjZALnAjNDQuYCMxNDNg&&bt=438&ft=gKfIn8buoTfR12NvOxWEzIxRP_PhZQ_45SY&mime_type=video_mp4&rc=aTRlNmhkZTVoODVlOzo7Z0BpanI1bHA5cmxlcTMzZzczNEBiXzEtYjBiNS0xMzAtXy1iYSMubnEtMmQ0ZTRgLS1kMS9zcw%3D%3D&vvpl=1&l=20260906052602D51063AE1D40007828C7&btag=e000b0000",
+              "thumbnail_url": "https://p19-common-sign.tiktokcdn-us.com/tos-useast5-p-0068-tx/o8nAMCIXsUGojfAgGEr1LIdHeYkFeLgIciQRuv~tplv-tiktokx-cropcenter:500:800.jpeg?biz_tag=musically_video.video_cover&dr=9638&idc=useast8&ps=13740610&refresh_token=9535ac8e&shcp=9b759fb9&shp=c1333099&t=4d5b0474&x-expires=1788692400&x-signature=C5p5crDs9OF8wNRheiiqcmKsdJM%3D",
+              "duration_seconds": 8.522
+            },
+            "author": {
+              "username": "tiktok-user-187",
+              "display_name": "tiktok-user-187",
+              "avatar_url": "https://scrubbed.invalid/tiktok-user-188",
+              "verified": false
+            },
+            "engagement": {
+              "views": 36296,
+              "likes": 705,
+              "comments": 12,
+              "shares": 250,
+              "saves": 93
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2024-02-16T01:24:50.000Z",
+            "ext": {
+              "music_id": "7336004668021017386",
+              "author_id": "6812264706318959622",
+              "author_followers": 26057,
+              "download_count": 43,
+              "published_at_epoch": 1708046690,
+              "on_screen_texts": [
+                "POV: You Tried Your Best On An ATI Exam And Still Failed"
+              ]
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.026642,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 43555
+          }
+        },
+        {
+          "post": {
+            "id": "7639466478315621662",
+            "url": "https://www.tiktok.com/@tiktok-user-189/video/7639466478315621662",
+            "content": {
+              "text": "I failed my drivers test again- loser theorem STRAIGHT to my playlist 😂✌️ requested by my goat and moot @tiktok-user-190 🍫  #fypシ #scarshaveameaning #lyrics #ifailedmydriverstestagain #losertheorem ",
+              "media_urls": "https://v16m.tiktokcdn-us.com/f79522cc53feeae56151b6719035ec55/6a9d4dda/video/tos/useast8/tos-useast8-ve-0068c001-tx2/oAAgEFYVXBUmD1zCRfDBNaE4AVEVEYeIPqaQQS/?a=1233&bti=NEBzNTY6QGo6OjZALnAjNDQuYCMxNDNg&&bt=768&ft=gKfIn8buoTfR12NvOxWEzIxRP_PhZQ_45SY&mime_type=video_mp4&rc=NmdkZzpmOjozNDY8Ojc7NEBpajozM3Y5cm9nOzMzaTczNEAxLS0wMzZiNi8xLmEyMV8tYSNobGEyMmRjXy9hLS1kMTJzcw%3D%3D&vvpl=1&l=20260906052602D51063AE1D40007828C7&btag=e000b8000",
+              "thumbnail_url": "https://p16-common-sign.tiktokcdn-us.com/tos-useast8-p-0068-tx2/oArEyESDAPPBQXYFfKqREEA4QUJDLBQpNVeYKV~tplv-tiktokx-cropcenter:500:800.jpeg?biz_tag=musically_video.video_cover&dr=9638&idc=useast8&ps=13740610&refresh_token=33e50bb4&shcp=9b759fb9&shp=c1333099&t=4d5b0474&x-expires=1788692400&x-signature=g1ldybsACzLUwfijeYwjmvIFrVQ%3D",
+              "duration_seconds": 15.719
+            },
+            "author": {
+              "username": "tiktok-user-189",
+              "display_name": "tiktok-user-191",
+              "avatar_url": "https://scrubbed.invalid/tiktok-user-192",
+              "verified": false
+            },
+            "engagement": {
+              "views": 200181,
+              "likes": 35032,
+              "comments": 83,
+              "shares": 2157,
+              "saves": 7180
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-05-13T19:51:57.000Z",
+            "ext": {
+              "music_id": "7639466498091797278",
+              "author_id": "6846696275732595717",
+              "author_followers": 3442,
+              "download_count": 3,
+              "published_at_epoch": 1778701917
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.186191,
+            "language": "ja",
+            "content_category": "other",
+            "estimated_reach": 240217
+          }
+        },
+        {
+          "post": {
+            "id": "7644611046988123405",
+            "url": "https://www.tiktok.com/@tiktok-user-193/video/7644611046988123405",
+            "content": {
+              "text": "Can smby let me drive they car bro🫤 I promise ik how to drive it’s just idk #fyp",
+              "media_urls": "https://v16m.tiktokcdn-us.com/5f4235546c7b7e0e52344600d1af9aa2/6a9d4dd7/video/tos/useast5/tos-useast5-ve-0068c001-tx/o8IXEQBwIH3CAgB1gioVfiYFK58C5iBwpU4WAc/?a=1233&bti=NEBzNTY6QGo6OjZALnAjNDQuYCMxNDNg&&bt=1167&ft=gKfIn8buoTfR12NvOxWEzIxRP_PhZQ_45SY&mime_type=video_mp4&rc=O2czZmY8OGY5ZWY4PDlnZkBpMzV3NHY5cnZrOzMzZzczNEAvLl5iNDFfXjUxYDY2XjVgYSMyNmJkMmRzbV9hLS1kMS9zcw%3D%3D&vvpl=1&l=20260906052602D51063AE1D40007828C7&btag=e000b0000",
+              "thumbnail_url": "https://p19-common-sign.tiktokcdn-us.com/tos-useast5-p-0068-tx/ogI0X1UCUA4PmwIF83IAoiiB5HBniCCBgfK5Wp~tplv-tiktokx-cropcenter:500:800.jpeg?biz_tag=musically_video.video_cover&dr=9638&idc=useast8&ps=13740610&refresh_token=b8479ed7&shcp=9b759fb9&shp=c1333099&t=4d5b0474&x-expires=1788692400&x-signature=9J7vtcNOGMEgK02tID5%2BueAXomo%3D",
+              "duration_seconds": 12.352
+            },
+            "author": {
+              "username": "tiktok-user-193",
+              "display_name": "tiktok-user-194",
+              "avatar_url": "https://scrubbed.invalid/tiktok-user-195",
+              "verified": false
+            },
+            "engagement": {
+              "views": 177458,
+              "likes": 27574,
+              "comments": 384,
+              "shares": 436,
+              "saves": 1271
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-05-27T16:35:41.000Z",
+            "ext": {
+              "music_id": "7638183849259780894",
+              "author_id": "6621987011770007558",
+              "author_followers": 11993,
+              "download_count": 29,
+              "published_at_epoch": 1779899741,
+              "on_screen_texts": [
+                "Just failed my drivers test for the 4th time idk maybe it’s not meant to be "
+              ]
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.160004,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 212950
+          }
+        },
+        {
+          "post": {
+            "id": "7667949443303410958",
+            "url": "https://www.tiktok.com/@tiktok-user-196/video/7667949443303410958",
+            "content": {
+              "text": "i failed my school test but alissa had my back#robloxshorts #roblox",
+              "media_urls": "https://v16m.tiktokcdn-us.com/b7ef6a7fcde936f11c3fab6a9b14aaee/6a9d4dea/video/tos/useast5/tos-useast5-ve-0068c004-tx/ow1MQaBRUq4GgGyqhEPB4CLHbmhBIALiEiaoP/?a=1233&bti=NEBzNTY6QGo6OjZALnAjNDQuYCMxNDNg&&bt=1714&ft=gKfIn8buoTfR12NvOxWEzIxRP_PhZQ_45SY&mime_type=video_mp4&rc=NzQ8OTNoOjY7NDZlZzMzO0BpM2tuOWw5cmUzPDMzZzczNEA1MjAvXmBhNl8xLjMvL2FeYSMuanIzMmQ0YmlhLS1kMS9zcw%3D%3D&vvpl=1&l=20260906052602D51063AE1D40007828C7&btag=e00088000",
+              "thumbnail_url": "https://p16-common-sign.tiktokcdn-us.com/tos-useast5-p-0068-tx/oggiULCLLbBEmByMiBBDRaqWpHI413EPpAoEL~tplv-tiktokx-cropcenter:500:800.jpeg?biz_tag=musically_video.video_cover&dr=9638&idc=useast8&ps=13740610&refresh_token=9714056f&shcp=9b759fb9&shp=c1333099&t=4d5b0474&x-expires=1788692400&x-signature=RHfKxXy5Az8uzVA%2F7ffJh%2F4fk28%3D",
+              "duration_seconds": 31.835
+            },
+            "author": {
+              "username": "tiktok-user-196",
+              "display_name": "tiktok-user-196",
+              "avatar_url": "https://scrubbed.invalid/tiktok-user-197",
+              "verified": false
+            },
+            "engagement": {
+              "views": 18339,
+              "likes": 1301,
+              "comments": 79,
+              "shares": 42,
+              "saves": 358
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-07-29T14:00:19.000Z",
+            "ext": {
+              "music_id": "7667949515445521165",
+              "author_id": "7622569994959012878",
+              "author_followers": 57479,
+              "download_count": 21,
+              "published_at_epoch": 1785333619
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.07754,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 22007
+          }
+        },
+        {
+          "post": {
+            "id": "7675471258808519966",
+            "url": "https://www.tiktok.com/@tiktok-user-198/video/7675471258808519966",
+            "content": {
+              "text": "Holding tears back ",
+              "media_urls": "https://v16m.tiktokcdn-us.com/8df3f8edecfcceda5273cf9b8ae6139d/6a9d4ddb/video/tos/useast8/tos-useast8-ve-0068c004-tx2/oken7Av9qQEQtwIuCxAcIgiirKBlx1EJBcilAL/?a=1233&bti=NEBzNTY6QGo6OjZALnAjNDQuYCMxNDNg&&bt=861&ft=gKfIn8buoTfR12NvOxWEzIxRP_PhZQ_45SY&mime_type=video_mp4&rc=aWk7OGg7NWVmPDRlOjQzNUBpajhseXU5cmtlZDMzaTczNEAzM142MWBgXzMxYy8yMV9gYSNqLl9nMmRrcS9hLS1kMTJzcw%3D%3D&vvpl=1&l=20260906052602D51063AE1D40007828C7&btag=e000b8000",
+              "thumbnail_url": "https://p16-common-sign.tiktokcdn-us.com/tos-useast8-p-0068-tx2/oMIIBK1AmIvmWCiEBiEJ3QiC7AABkAf1iwCARI~tplv-tiktokx-cropcenter:500:800.jpeg?biz_tag=musically_video.video_cover&dr=9638&idc=useast8&ps=13740610&refresh_token=09aaa756&shcp=9b759fb9&shp=c1333099&t=4d5b0474&x-expires=1788692400&x-signature=F%2BJyBtlVys6u%2F9ajJY%2Fratb9A3s%3D",
+              "duration_seconds": 16.903
+            },
+            "author": {
+              "username": "tiktok-user-198",
+              "display_name": "tiktok-user-199",
+              "avatar_url": "https://scrubbed.invalid/tiktok-user-200",
+              "verified": false
+            },
+            "engagement": {
+              "views": 2801589,
+              "likes": 565972,
+              "comments": 2234,
+              "shares": 25430,
+              "saves": 55859
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-08-18T20:28:54.000Z",
+            "ext": {
+              "music_id": "7550911223533996813",
+              "author_id": "6587526432645545990",
+              "author_followers": 30426,
+              "download_count": 945,
+              "published_at_epoch": 1787084934,
+              "on_screen_texts": [
+                "POV: you failed a test miserably and you’re trying to keep it together"
+              ]
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.211893,
+            "language": null,
+            "content_category": "other",
+            "estimated_reach": 3361907
+          }
+        },
+        {
+          "post": {
+            "id": "7639588733750168853",
+            "url": "https://www.tiktok.com/@tiktok-user-201/video/7639588733750168853",
+            "content": {
+              "text": "i’m giving up atp",
+              "media_urls": "https://v16m.tiktokcdn-us.com/1253c468e7e3917dc148f98f89a148c1/6a9d4dd8/video/tos/alisg/tos-alisg-ve-0068c800-sg/ooEm6fIgcvAiiiUR82Rk9BfHMSB9BBBElQYq0F/?a=1233&bti=NEBzNTY6QGo6OjZALnAjNDQuYCMxNDNg&&bt=705&ft=gKfIn8buoTfR12NvOxWEzIxRP_PhZQ_45SY&mime_type=video_mp4&rc=NjZmNDczOmRkOmRkOGczNkBpMzd0NHc5cmluOzMzODczNEAxLi40Y2A1NjExNS1hMTYzYSNlX3BuMmRzNi9hLS1kMWBzcw%3D%3D&vvpl=1&l=20260906052602D51063AE1D40007828C7&btag=e000b0000",
+              "thumbnail_url": "https://p19-common-sign.tiktokcdn-us.com/tos-alisg-p-0037/okmFfkgBfAIobSgZFBRqHYBiRiBciEgl0UHIw9~tplv-tiktokx-cropcenter:500:800.jpeg?biz_tag=musically_video.video_cover&dr=9638&idc=useast8&ps=13740610&refresh_token=0dc22cf0&shcp=9b759fb9&shp=c1333099&t=4d5b0474&x-expires=1788692400&x-signature=Vp3elPzCMhvDH%2Bvy1OfAprqV40k%3D",
+              "duration_seconds": 13.954
+            },
+            "author": {
+              "username": "tiktok-user-201",
+              "display_name": "tiktok-user-202",
+              "avatar_url": "https://scrubbed.invalid/tiktok-user-203",
+              "verified": false
+            },
+            "engagement": {
+              "views": 10401,
+              "likes": 934,
+              "comments": 37,
+              "shares": 78,
+              "saves": 90
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-05-14T03:46:15.000Z",
+            "ext": {
+              "music_id": "7479275792847096618",
+              "author_id": "7004706985715663874",
+              "author_followers": 4390,
+              "download_count": 0,
+              "published_at_epoch": 1778730375,
+              "on_screen_texts": [
+                "just failed my drivers test for the SECOND time. maybe the passenger princess life has truly chosen me"
+              ]
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.100856,
+            "language": null,
+            "content_category": "other",
+            "estimated_reach": 12481
+          }
+        },
+        {
+          "post": {
+            "id": "7557490479361838349",
+            "url": "https://www.tiktok.com/@tiktok-user-204/video/7557490479361838349",
+            "content": {
+              "text": "All that studying for nun🙃 #fyp #viral #test ",
+              "media_urls": "https://v16m.tiktokcdn-us.com/25bd8428b3476fff8e1c77974c5002ed/6a9d4dd4/video/tos/useast5/tos-useast5-ve-0068c002-tx/oYjrWHTZA4vEfJbRzykFEe3wICVfVVQhtADmI8/?a=1233&bti=NEBzNTY6QGo6OjZALnAjNDQuYCMxNDNg&&bt=509&ft=gKfIn8buoTfR12NvOxWEzIxRP_PhZQ_45SY&mime_type=video_mp4&rc=NzVlaDtmNDhnNjdpODdoO0BpanltNXY5cjdzNjMzZzczNEBgYl4zNC9iX2ExNTYwMF4wYSNta2ljMmRzY2RhLS1kMS9zcw%3D%3D&vvpl=1&l=20260906052602D51063AE1D40007828C7&btag=e000b0000",
+              "thumbnail_url": "https://p19-common-sign.tiktokcdn-us.com/tos-useast5-p-0068-tx/oIfgRiiMgvAiKhJAgGmYIPOflfMI5HjDeOr4F2~tplv-tiktokx-cropcenter:500:800.jpeg?biz_tag=musically_video.video_cover&dr=9638&idc=useast8&ps=13740610&refresh_token=7d0352fa&shcp=9b759fb9&shp=c1333099&t=4d5b0474&x-expires=1788692400&x-signature=jHnAsyIaCAgbskalswx5zxxDfBo%3D",
+              "duration_seconds": 9.38
+            },
+            "author": {
+              "username": "tiktok-user-204",
+              "display_name": "tiktok-user-205",
+              "avatar_url": "https://scrubbed.invalid/tiktok-user-206",
+              "verified": false
+            },
+            "engagement": {
+              "views": 1218153,
+              "likes": 119298,
+              "comments": 556,
+              "shares": 9525,
+              "saves": 23437
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2025-10-04T22:03:28.000Z",
+            "ext": {
+              "music_id": "7455429800573487873",
+              "author_id": "7456964431780578347",
+              "author_followers": 916,
+              "download_count": 2563,
+              "published_at_epoch": 1759615408,
+              "on_screen_texts": [
+                "When I check my grades after trying my hardest to pass a test and I genuinely fail ts so i start to rethink my future"
+              ]
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.106209,
+            "language": null,
+            "content_category": "other",
+            "estimated_reach": 1461784
+          }
+        },
+        {
+          "post": {
+            "id": "7681556084313640214",
+            "url": "https://www.tiktok.com/@tiktok-user-207/video/7681556084313640214",
+            "content": {
+              "text": "eugh not again #studytok #university #college #study #studying ",
+              "media_urls": "https://v16m.tiktokcdn-us.com/b3fac874990b9ca577394744fcdd7e09/6a9d4dd2/video/tos/no1a/tos-no1a-ve-0068-no/o0eOvLpINDLLOLEgjQafR9Aea70AUVnqGIj0IM/?a=1233&bti=NEBzNTY6QGo6OjZALnAjNDQuYCMxNDNg&&bt=603&ft=gKfIn8buoTfR12NvOxWEzIxRP_PhZQ_45SY&mime_type=video_mp4&rc=ZWZmN2g0ODc2OTlpOmZnOkBpajloaG45cjg4ZDMzbzczNUBjYmJhNi4uNl4xYmFeLzY1YSNkYWhjMmQ0cWFhLS1kMTFzcw%3D%3D&vvpl=1&l=20260906052602D51063AE1D40007828C7&btag=e000b0000",
+              "thumbnail_url": "https://p16-common-sign.tiktokcdn-us.com/tos-no1a-p-0037-no/ooaERLDjIGVONOI0XAeqAsqaQeap7KLIkSgeLE~tplv-tiktokx-cropcenter:500:800.jpeg?biz_tag=musically_video.video_cover&dr=9638&idc=useast8&ps=13740610&refresh_token=241ca35b&shcp=9b759fb9&shp=c1333099&t=4d5b0474&x-expires=1788692400&x-signature=s6ZeiJLx55eKwELiQv3pCOTHdIk%3D",
+              "duration_seconds": 7.625
+            },
+            "author": {
+              "username": "tiktok-user-207",
+              "display_name": "tiktok-user-207",
+              "avatar_url": "https://scrubbed.invalid/tiktok-user-208",
+              "verified": false
+            },
+            "engagement": {
+              "views": 614,
+              "likes": 60,
+              "comments": 0,
+              "shares": 0,
+              "saves": 1
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-09-04T06:01:06.000Z",
+            "ext": {
+              "music_id": "7591768223603821368",
+              "author_id": "7678886870126380054",
+              "author_followers": 1,
+              "download_count": 0,
+              "published_at_epoch": 1788501666,
+              "on_screen_texts": [
+                "me after I get my math \ntest back and see that I\nFAILED again\n"
+              ]
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.09772,
+            "language": null,
+            "content_category": "education",
+            "estimated_reach": 737
+          }
+        },
+        {
+          "post": {
+            "id": "7563689504985369886",
+            "url": "https://www.tiktok.com/@tiktok-user-209/video/7563689504985369886",
+            "content": {
+              "text": "AND IVE BEEN STUDYING ALL WEEK IT DOESNR MAKE SENSEEEE #fypシ゚viral #imgoingcrazy ",
+              "media_urls": "https://v16m.tiktokcdn-us.com/8f19d3c17caecb6163a3a6ab41eeec91/6a9d4dd1/video/tos/useast8/tos-useast8-ve-0068c004-tx2/o4jDnIeMAtNEAQ6RRzqFEiK7ICdfcBW37ADnIf/?a=1233&bti=NEBzNTY6QGo6OjZALnAjNDQuYCMxNDNg&&bt=1522&ft=gKfIn8buoTfR12NvOxWEzIxRP_PhZQ_45SY&mime_type=video_mp4&rc=Mzs3NzpmNzM2NTo6OmQ2M0BpajNqcXA5cnFzNjMzaTczNEBeNDU0MTYxNjMxYl5eLjNjYSM1aDZzMmRrbG9hLS1kMTJzcw%3D%3D&vvpl=1&l=20260906052602D51063AE1D40007828C7&btag=e000b0000",
+              "thumbnail_url": "https://p16-common-sign.tiktokcdn-us.com/tos-useast8-p-0068-tx2/o0ebReB0GILRLfwI93Inztg67Cqg9EoAbRjViA~tplv-tiktokx-cropcenter:500:800.jpeg?biz_tag=musically_video.video_cover&dr=9638&idc=useast8&ps=13740610&refresh_token=b5b5d51f&shcp=9b759fb9&shp=c1333099&t=4d5b0474&x-expires=1788692400&x-signature=n02nkHa6hbiuFqDbIcTFeGP9G6E%3D",
+              "duration_seconds": 6.477
+            },
+            "author": {
+              "username": "tiktok-user-209",
+              "display_name": "tiktok-user-210",
+              "avatar_url": "https://scrubbed.invalid/tiktok-user-211",
+              "verified": false
+            },
+            "engagement": {
+              "views": 1741,
+              "likes": 311,
+              "comments": 5,
+              "shares": 1,
+              "saves": 5
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2025-10-21T14:58:41.000Z",
+            "ext": {
+              "music_id": "7470211968331287339",
+              "author_id": "6903599262673060869",
+              "author_followers": 5860,
+              "download_count": 0,
+              "published_at_epoch": 1761058721,
+              "on_screen_texts": [
+                "Me gaslighting myself that it doesn’t matter I failed my math test the 2nd time in a row "
+              ]
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.182079,
+            "language": "ja",
+            "content_category": "other",
+            "estimated_reach": 2089
+          }
+        },
+        {
+          "post": {
+            "id": "7636546875008486687",
+            "url": "https://www.tiktok.com/@tiktok-user-212/video/7636546875008486687",
+            "content": {
+              "text": "hiiii. 🤍 i only need 4 points. we’re so close; we can’t give up now! 😮‍💨🙌🏽  #MentalHealth #lcswstudying #futurelcsw #LCSWExam #christiansocialworker ✨",
+              "media_urls": "https://v16m.tiktokcdn-us.com/130c34d2e2792d5466425c262de8a3e6/6a9d4e20/video/tos/useast8/tos-useast8-ve-0068c001-tx2/o8qCeT9ALnoDwqusQHojyNfZIMIF6dETAIjEft/?a=1233&bti=NEBzNTY6QGo6OjZALnAjNDQuYCMxNDNg&&bt=727&ft=gKfIn8buoTfR12NvOxWEzIxRP_PhZQ_45SY&mime_type=video_mp4&rc=ODk2aDc3NGU8NDU4OzhmaUBpamZrcXE5cm06OjMzaTczNEBgLzYvYjQtXzAxNjAvXzNeYSNlcmpeMmRjYHFhLS1kMTJzcw%3D%3D&vvpl=1&l=20260906052602D51063AE1D40007828C7&btag=e00090000",
+              "thumbnail_url": "https://p19-common-sign.tiktokcdn-us.com/tos-useast8-p-0068-tx2/ogo6NMAefAEDQZ7hADjT9wCjdEIqFIjfqn5I0u~tplv-tiktokx-cropcenter:500:800.jpeg?biz_tag=musically_video.video_cover&dr=9638&idc=useast8&ps=13740610&refresh_token=561694c3&shcp=9b759fb9&shp=c1333099&t=4d5b0474&x-expires=1788692400&x-signature=0R6EupzLS%2F3LOl5r%2Bi7V%2BtyuXZw%3D",
+              "duration_seconds": 85.9
+            },
+            "author": {
+              "username": "tiktok-user-212",
+              "display_name": "tiktok-user-213",
+              "avatar_url": "https://scrubbed.invalid/tiktok-user-214",
+              "verified": false
+            },
+            "engagement": {
+              "views": 6868,
+              "likes": 552,
+              "comments": 137,
+              "shares": 8,
+              "saves": 29
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-05-05T23:02:24.000Z",
+            "ext": {
+              "music_id": "7636546903408216862",
+              "author_id": "7506872670203462699",
+              "author_followers": 2387,
+              "download_count": 0,
+              "published_at_epoch": 1778022144,
+              "on_screen_texts": [
+                "I FAILED AGAIN!"
+              ]
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.101485,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 8242
+          }
+        },
+        {
+          "post": {
+            "id": "7640670085996121357",
+            "url": "https://www.tiktok.com/@tiktok-user-215/video/7640670085996121357",
+            "content": {
+              "text": "I failed the SPI and I’ve cried multiple times since. I think what hurts the most is that I did really good in my physics class but I waited too long to take it. I didn’t want to share this ugly version of me but its part of my journey, part of the dream I’m chasing, and also because it isn’t the end of the line for me. I will come back stronger. I will have those letters behind my name. #sonographystudent #ultrasound #studymotivation #donotbeafraid #fypシ ",
+              "media_urls": "https://v16m.tiktokcdn-us.com/3d5c279fcee5d55f221a02923314c899/6a9d4de0/video/tos/useast5/tos-useast5-v-0068-tx/oI7cfABB0GABtiIc1QLq1ApCwERJAiUEAAyIiM/?a=1233&bti=NEBzNTY6QGo6OjZALnAjNDQuYCMxNDNg&&bt=10624&ft=gKfIn8buoTfR12NvOxWEzIxRP_PhZQ_45SY&mime_type=video_mp4&rc=M2VqO2w5cm9rOzMzZzczNEBpM2VqO2w5cm9rOzMzZzczNEBubGc1MmRjaTFhLS1kMS9zYSNubGc1MmRjaTFhLS1kMS9zcw%3D%3D&vvpl=1&l=20260906052602D51063AE1D40007828C7&btag=e00070000",
+              "thumbnail_url": "https://p19-common-sign.tiktokcdn-us.com/tos-useast5-p-0068-tx/o0oicHMTIQyCpWBALJFBfB0I1qAiFVIwFUb1Ii~tplv-tiktokx-cropcenter:500:800.jpeg?biz_tag=musically_video.video_cover&dr=9638&idc=useast8&ps=13740610&refresh_token=3e2cbf24&shcp=9b759fb9&shp=c1333099&t=4d5b0474&x-expires=1788692400&x-signature=5OSI62VVYGVnxykK5%2BSfuCIY9ck%3D",
+              "duration_seconds": 21.084
+            },
+            "author": {
+              "username": "tiktok-user-215",
+              "display_name": "tiktok-user-216",
+              "avatar_url": "https://scrubbed.invalid/tiktok-user-217",
+              "verified": false
+            },
+            "engagement": {
+              "views": 62750,
+              "likes": 5414,
+              "comments": 159,
+              "shares": 67,
+              "saves": 288
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-05-17T01:42:38.000Z",
+            "ext": {
+              "music_id": "7637615369750039326",
+              "author_id": "6807908394739123205",
+              "author_followers": 174,
+              "download_count": 0,
+              "published_at_epoch": 1778982158,
+              "on_screen_texts": [
+                "Raw footage of me \nfinding out I failed "
+              ]
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.08988,
+            "language": "ja",
+            "content_category": "other",
+            "estimated_reach": 75300
+          }
+        },
+        {
+          "post": {
+            "id": "7607836933619780886",
+            "url": "https://www.tiktok.com/@tiktok-user-218/video/7607836933619780886",
+            "content": {
+              "text": "I failed my theory test 4 times!!❌❌ #thetheorygirluk #theorytestpractice #drivingtheory #theorytest #theory ",
+              "media_urls": "https://v16m.tiktokcdn-us.com/b6832b6446db37088a4369ad886224b9/6a9d4dec/video/tos/useast2a/tos-useast2a-ve-68c810-euttp/ogQjLKijgSehzGMYDA8RWZAIAsAdejfBLOKTuI/?a=1233&bti=NTY6QGo0QHM6OjZANDQuYCMucCMxNDNg&&bt=1101&ft=gKfIn8buoTfR12NvOxWEzIxRP_PhZQ_45SY&mime_type=video_mp4&rc=Njg1M2c5Ojs4ZWQ5NDU1aUBpMzY4bW45cjM6OTMzbzczNUAyLjQwXy1fXzUxYjJhYmMtYSNpai4uMmQ0X15hLS1kMTFzcw%3D%3D&vvpl=1&l=20260906052602D51063AE1D40007828C7&btag=e00088000",
+              "thumbnail_url": "https://p16-common-sign.tiktokcdn-us.com/tos-no1a-p-0037-no/ogUVqgAbiB1uRM0ZBYv2aDdiIDGB2PDJPZI7E~tplv-tiktokx-cropcenter:500:800.jpeg?biz_tag=musically_video.video_cover&dr=9638&idc=useast8&ps=13740610&refresh_token=36927147&shcp=9b759fb9&shp=c1333099&t=4d5b0474&x-expires=1788692400&x-signature=iyYhC%2BP1UI2LDSke1IIX%2BrWly0o%3D",
+              "duration_seconds": 33.273
+            },
+            "author": {
+              "username": "tiktok-user-218",
+              "display_name": "tiktok-user-219",
+              "avatar_url": "https://scrubbed.invalid/tiktok-user-220",
+              "verified": false
+            },
+            "engagement": {
+              "views": 143322,
+              "likes": 3154,
+              "comments": 2406,
+              "shares": 466,
+              "saves": 723
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-02-17T14:12:56.000Z",
+            "ext": {
+              "music_id": "7607836936980695830",
+              "author_id": "7600139089824138262",
+              "author_followers": 105008,
+              "download_count": 24,
+              "published_at_epoch": 1771337576,
+              "on_screen_texts": [
+                "I failed my theory test 4 times!!❌❌"
+              ]
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.042045,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 171986
+          }
+        },
+        {
+          "post": {
+            "id": "7675329741318147349",
+            "url": "https://www.tiktok.com/@tiktok-user-221/video/7675329741318147349",
+            "content": {
+              "text": "#disappointment #studying #school #fyp ",
+              "media_urls": "https://v16m.tiktokcdn-us.com/da59e797ba2e05dce4939bd236772c3d/6a9d4dd5/video/tos/alisg/tos-alisg-pve-0037c001/oENEcPghfAIicfGnHBRqZ8BtPiBciEp7ZDGE9y/?a=1233&bti=NEBzNTY6QGo6OjZALnAjNDQuYCMxNDNg&&bt=334&ft=gKfIn8buoTfR12NvOxWEzIxRP_PhZQ_45SY&mime_type=video_mp4&rc=M2doZTU0NDplODk5aGdnNkBpamlxcGw5cmg2ZDMzODczNEAwMF9iNmEvX18xLV5hLzZeYSNqajZgMmRjcy9hLS1kMWBzcw%3D%3D&vvpl=1&l=20260906052602D51063AE1D40007828C7&btag=e000b0000",
+              "thumbnail_url": "https://p19-common-sign.tiktokcdn-us.com/tos-alisg-p-0037/oYDEZhDqZi7tABctNqycRpggfiI5fBPBIEP8QP~tplv-tiktokx-cropcenter:500:800.jpeg?biz_tag=musically_video.video_cover&dr=9638&idc=useast8&ps=13740610&refresh_token=d6ad3dc4&shcp=9b759fb9&shp=c1333099&t=4d5b0474&x-expires=1788692400&x-signature=Dqapq7xiLQ18GGnXP5IzXJoBG5A%3D",
+              "duration_seconds": 10.867
+            },
+            "author": {
+              "username": "tiktok-user-221",
+              "display_name": "tiktok-user-222",
+              "avatar_url": "https://scrubbed.invalid/tiktok-user-223",
+              "verified": false
+            },
+            "engagement": {
+              "views": 23190,
+              "likes": 3480,
+              "comments": 4,
+              "shares": 212,
+              "saves": 285
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-08-18T11:19:30.000Z",
+            "ext": {
+              "music_id": "7653555057216637728",
+              "author_id": "7374385125927126023",
+              "author_followers": 25186,
+              "download_count": 10,
+              "published_at_epoch": 1787051970,
+              "on_screen_texts": [
+                "the disappointment you feel after failing a test you studied so hard for is unmatchable "
+              ]
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.159379,
+            "language": null,
+            "content_category": "other",
+            "estimated_reach": 27828
+          }
+        },
+        {
+          "post": {
+            "id": "7564782698582101262",
+            "url": "https://www.tiktok.com/@tiktok-user-224/video/7564782698582101262",
+            "content": {
+              "text": "am i stupid..? #fyp #math #ihateithere #viral #xyzbca ",
+              "media_urls": "https://v16m.tiktokcdn-us.com/0a1bc3eda5044b8e2ffc72e4e6f50ad0/6a9d4dd1/video/tos/useast5/tos-useast5-pve-0068-tx/o0Q27RBIBC3OzAjb2rIAfFEH0gDnneMRlfcyhk/?a=1233&bti=NEBzNTY6QGo6OjZALnAjNDQuYCMxNDNg&&bt=476&ft=gKfIn8buoTfR12NvOxWEzIxRP_PhZQ_45SY&mime_type=video_mp4&rc=OWg7ZTZlaGhnM2g0NGk6aEBpM21wZXU5cmZxNjMzZzczNEBhYTVfMjAvNTQxNmEuMGM1YSNrLmI2MmRrbnFhLS1kMS9zcw%3D%3D&vvpl=1&l=20260906052602D51063AE1D40007828C7&btag=e000b0000",
+              "thumbnail_url": "https://p19-common-sign.tiktokcdn-us.com/tos-useast5-p-0068-tx/oIIgBuFv9ACi71HEaMtBPBS7gUiIghJ4zbutO~tplv-tiktokx-cropcenter:500:800.jpeg?biz_tag=musically_video.video_cover&dr=9638&idc=useast8&ps=13740610&refresh_token=248cff86&shcp=9b759fb9&shp=c1333099&t=4d5b0474&x-expires=1788692400&x-signature=FGcSuHGgSWF82Tx0PdUwlCVKG9U%3D",
+              "duration_seconds": 6.57
+            },
+            "author": {
+              "username": "tiktok-user-224",
+              "display_name": "tiktok-user-225",
+              "avatar_url": "https://scrubbed.invalid/tiktok-user-226",
+              "verified": false
+            },
+            "engagement": {
+              "views": 238722,
+              "likes": 36603,
+              "comments": 108,
+              "shares": 1082,
+              "saves": 4938
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2025-10-24T13:41:36.000Z",
+            "ext": {
+              "music_id": "7100291436377721606",
+              "author_id": "6934839131873199110",
+              "author_followers": 6187,
+              "download_count": 212,
+              "published_at_epoch": 1761313296,
+              "on_screen_texts": [
+                "no matter how hard i study, pay attention, and write down everything the teacher says/writes in math, i still fail. everyone around me seems to understand it. why don’t i?"
+              ]
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.158314,
+            "language": null,
+            "content_category": "other",
+            "estimated_reach": 286466
+          }
+        },
+        {
+          "post": {
+            "id": "7444990531832204575",
+            "url": "https://www.tiktok.com/@tiktok-user-227/video/7444990531832204575",
+            "content": {
+              "text": "But like also please don’t ask how my day is and also im sorry😅🫠 #insurancetiktok #failedtest #iwanttocry #happythursday #happydads #shouldsaysaddad ",
+              "media_urls": "https://v16m.tiktokcdn-us.com/93bf85f85bd846c6dfd5e1e3de3f0a38/6a9d4de3/video/tos/useast8/tos-useast8-ve-0068c004-tx2/oQZQIf9CEFAJiogAIjmDqomke66Ip8ORbIQfC4/?a=1233&bti=NTY6QGo0QHM6OjZANDQuYCMucCMxNDNg&&bt=1517&ft=gKfIn8buoTfR12NvOxWEzIxRP_PhZQ_45SY&mime_type=video_mp4&rc=NDhoM2lnaTxpaTw6NmU3ZUBpandnZHg5cnR4dzMzaTczNEBiYTFjNGA0NS4xXl5iMTQzYSMtMS8vMmQ0aDVgLS1kMTJzcw%3D%3D&vvpl=1&l=20260906052602D51063AE1D40007828C7&btag=e000b8000",
+              "thumbnail_url": "https://p19-common-sign.tiktokcdn-us.com/tos-useast8-p-0068-tx2/osxfeFpFA3SjuDedIB6IoEnT1HEIoOFqABCREo~tplv-tiktokx-cropcenter:500:800.jpeg?biz_tag=musically_video.video_cover&dr=9638&idc=useast8&ps=13740610&refresh_token=baa76fd4&shcp=9b759fb9&shp=c1333099&t=4d5b0474&x-expires=1788692400&x-signature=bgSJGBDEpP9n3fztPTDlg%2BqkhZE%3D",
+              "duration_seconds": 24.241
+            },
+            "author": {
+              "username": "tiktok-user-227",
+              "display_name": "tiktok-user-228",
+              "avatar_url": "https://scrubbed.invalid/tiktok-user-229",
+              "verified": false
+            },
+            "engagement": {
+              "views": 4897,
+              "likes": 179,
+              "comments": 42,
+              "shares": 5,
+              "saves": 18
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2024-12-05T18:05:49.000Z",
+            "ext": {
+              "music_id": "7444990428547533599",
+              "author_id": "6791352244572832774",
+              "author_followers": 1049,
+              "download_count": 2,
+              "published_at_epoch": 1733421949,
+              "on_screen_texts": [
+                "POV: you fail your test for the 4th time ((:"
+              ]
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.046151,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 5876
+          }
+        },
+        {
+          "post": {
+            "id": "7612889258600271112",
+            "url": "https://www.tiktok.com/@tiktok-user-230/video/7612889258600271112",
+            "content": {
+              "text": "Yho kunzima bafazi ayy ngeke #learnerdriver #driving ",
+              "media_urls": "https://v16m.tiktokcdn-us.com/2b44be1a86272185de76373684e7229b/6a9d4dda/video/tos/alisg/tos-alisg-ve-0068c800-sg/oYAbBEopcEmQBR3EnlmfBFap2DuEBmIeR5gtqg/?a=1233&bti=NEBzNTY6QGo6OjZALnAjNDQuYCMxNDNg&&bt=770&ft=gKfIn8buoTfR12NvOxWEzIxRP_PhZQ_45SY&mime_type=video_mp4&rc=N2k4Zjw8ODc8ZDo4NDk0OUBpamtwdHg5cnM5OTMzODczNEAvLi5jMGJeNTQxLzYuNTFiYSNmLWktMmRrZ2dhLS1kMWBzcw%3D%3D&vvpl=1&l=20260906052602D51063AE1D40007828C7&btag=e000b8000",
+              "thumbnail_url": "https://p16-common-sign.tiktokcdn-us.com/tos-alisg-p-0037/oE1mesw0vAEqdUCdABI0BnBKaiAOiCAQFzAIT1~tplv-tiktokx-cropcenter:500:800.jpeg?biz_tag=musically_video.video_cover&dr=9638&idc=useast8&ps=13740610&refresh_token=7e73f9ff&shcp=9b759fb9&shp=c1333099&t=4d5b0474&x-expires=1788692400&x-signature=5rJLz%2FYNdqoCFyclq%2B8anZeH2wk%3D",
+              "duration_seconds": 15.255
+            },
+            "author": {
+              "username": "tiktok-user-230",
+              "display_name": "tiktok-user-231",
+              "avatar_url": "https://scrubbed.invalid/tiktok-user-232",
+              "verified": false
+            },
+            "engagement": {
+              "views": 635706,
+              "likes": 68319,
+              "comments": 2498,
+              "shares": 1216,
+              "saves": 2633
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2026-03-03T04:58:36.000Z",
+            "ext": {
+              "music_id": "7311649478897158917",
+              "author_id": "6788446937651102725",
+              "author_followers": 12520,
+              "download_count": 1161,
+              "published_at_epoch": 1772513916,
+              "on_screen_texts": [
+                "Pov: you just failed your learners test for the 3rd time 🥹💀"
+              ]
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.113312,
+            "language": null,
+            "content_category": "other",
+            "estimated_reach": 762847
+          }
+        }
+      ],
+      "next_cursor": "sc2.eyJzIjoiaCIsImMiOiJzYzEuZXlKaklqb2lNekFpTENKeklqcGJJamMyTURVME5UYzFNRGs1TXpreU1UazNNalVpTENJM05qVXlOVEk0T0RRMU56Z3hPRFl6TnpBd0lpd2lOell3TmpVd05qRXdOemt3T0RreE9EVTBNaUlzSWpjMk1EWXdPRFEwTVRVNE1qY3dPRFkyTURVaUxDSTNORGcyTlRjek1UWTJOVFl6Tnprd01USXpJaXdpTnpVMU1UQTVNVFkyTmpFeU5EUXhNREV5TmlJc0lqYzBORFl6TVRjek5EUTBORGszTnpZNU1qZ2lMQ0kzTmpBNU9URTJNelEwT0RrMk5qZzNNemt5SWl3aU56WTBOek13TnpJNE5qTXpOVEE0TVRjME1pSXNJamMyTmpBeU1UYzNOVEV6TURZek9UQTRNRFlpTENJM05qYzJPVGMzT0RFeE1qUXpPVFExTWpNd0lpd2lOelk0TVRVd05Ea3pPRFU0T0RrMk5qRTNOQ0lzSWpjMk56azFNek0wT0RReU5EWTROemswT1RVaUxDSTNOamN3TVRJeU1qTTFOakl3T0RNNE5qY3dJaXdpTnpNek5qQXdORFU0TmpFME9ESTROVGN6T0NJc0lqYzJNemswTmpZME56Z3pNVFUyTWpFMk5qSWlMQ0kzTmpRME5qRXhNRFEyT1RnNE1USXpOREExSWl3aU56WTJOemswT1RRME16TXdNelF4TURrMU9DSXNJamMyTnpVME56RXlOVGc0TURnMU1UazVOallpTENJM05qTTVOVGc0TnpNek56VXdNVFk0T0RVeklpd2lOelUxTnpRNU1EUTNPVE0yTVRnek9ETTBPU0lzSWpjMk9ERTFOVFl3T0RRek1UTTJOREF5TVRRaUxDSTNOVFl6TmpnNU5UQTBPVGcxTXpZNU9EZzJJaXdpTnpZek5qVTBOamczTlRBd09EUTROalk0TnlJc0lqYzJOREEyTnpBd09EVTVPVFl4TWpFek5UY2lMQ0kzTmpBM09ETTJPVE16TmpFNU56Z3dPRGcySWl3aU56WTNOVE15T1RjME1UTXhPREUwTnpNME9TSXNJamMxTmpRM09ESTJPVGcxT0RJeE1ERXlOaklpTENJM05EUTBPVGt3TlRNeE9ETXlNakEwTlRjMUlpd2lOell4TWpnNE9USTFPRFl3TURJM01URXhNaUpkZlEifQ",
+      "total": null,
+      "dropped": 0
+    },
+    "credits_used": 1,
+    "request_id": "req-YXXR9ITuewrChAcZ",
+    "cached": false,
+    "pagination": {
+      "next_cursor": "sc.eyJ2IjoyLCJjIjoic2MyLmV5SnpJam9pYUNJc0ltTWlPaUp6WXpFdVpYbEtha2xxYjJsTmVrRnBURU5LZWtscWNHSkphbU15VFVSVk1FNVVZekZOUkdzMVRYcHJlVTFVYXpOTmFsVnBURU5KTTA1cVZYbE9WRWswVDBSUk1VNTZaM2hQUkZsNlRucEJkMGxwZDJsT2VsbDNUbXBWZDA1cVJYZE9lbXQzVDBScmVFOUVWVEJOYVVselNXcGpNazFFV1hkUFJGRXdUVlJWTkUxcVkzZFBSRmt5VFVSVmFVeERTVE5PUkdjeVRsUmplazFVV1RKT1ZGbDZUbnByZDAxVVNYcEphWGRwVG5wVk1VMVVRVFZOVkZreVRtcEZlVTVFVVhoTlJFVjVUbWxKYzBscVl6Qk9SRmw2VFZSamVrNUVVVEJPUkdzelRucFpOVTFxWjJsTVEwa3pUbXBCTlU5VVJUSk5lbEV3VDBSck1rNXFaek5OZW10NVNXbDNhVTU2V1RCT2VrMTNUbnBKTkU1cVRYcE9WRUUwVFZSak1FMXBTWE5KYW1NeVRtcEJlVTFVWXpOT1ZFVjZUVVJaZWs5VVFUUk5SRmxwVEVOSk0wNXFZekpQVkdNelQwUkZlRTFxVVhwUFZGRXhUV3BOZDBscGQybE9lbGswVFZSVmQwNUVhM3BQUkZVMFQwUnJNazVxUlROT1EwbHpTV3BqTWs1NmF6Rk5lazB3VDBSUmVVNUVXVFJPZW1zd1QxUlZhVXhEU1ROT2FtTjNUVlJKZVUxcVRURk9ha2wzVDBSTk5FNXFZM2RKYVhkcFRucE5lazVxUVhkT1JGVTBUbXBGTUU5RVNUUk9WR042VDBOSmMwbHFZekpOZW1zd1RtcFpNRTU2WjNwTlZGVXlUV3BGTWs1cVNXbE1RMGt6VG1wUk1FNXFSWGhOUkZFeVQxUm5ORTFVU1hwT1JFRXhTV2wzYVU1NldUSk9lbXN3VDFSUk1FMTZUWGROZWxGNFRVUnJNVTlEU1hOSmFtTXlUbnBWTUU1NlJYbE9WR2MwVFVSbk1VMVVhelZPYWxscFRFTkpNMDVxVFRWT1ZHYzBUbnBOZWs1NlZYZE5WRmswVDBSVmVrbHBkMmxPZWxVeFRucFJOVTFFVVROUFZFMHlUVlJuZWs5RVRUQlBVMGx6U1dwak1rOUVSVEZPVkZsM1QwUlJlazFVVFRKT1JFRjVUVlJSYVV4RFNUTk9WRmw2VG1wbk5VNVVRVEJQVkdjeFRYcFpOVTlFWnpKSmFYZHBUbnBaZWs1cVZUQk9hbWN6VGxSQmQwOUVVVFJPYWxrMFRubEpjMGxxWXpKT1JFRXlUbnBCZDA5RVZUVlBWRmw0VFdwRmVrNVVZMmxNUTBrelRtcEJNMDlFVFRKUFZFMTZUbXBGTlU1NlozZFBSR2N5U1dsM2FVNTZXVE5PVkUxNVQxUmpNRTFVVFhoUFJFVXdUbnBOTUU5VFNYTkphbU14VG1wUk0wOUVTVEpQVkdjeFQwUkplRTFFUlhsT2FrbHBURU5KTTA1RVVUQlBWR3QzVGxSTmVFOUVUWGxOYWtFd1RsUmpNVWxwZDJsT2VsbDRUV3BuTkU5VVNURlBSRmwzVFVSSk0wMVVSWGhOYVVwa1psRWlmUSIsImUiOiJ0aWt0b2svc2VhcmNoIiwicCI6ImN1cnNvciJ9",
+      "has_more": true,
+      "page_size": 30
+    },
+    "credits_remaining": 97
+  }
+}

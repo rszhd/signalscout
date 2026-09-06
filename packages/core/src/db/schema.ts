@@ -38,7 +38,7 @@ import {
  * providers is one post and one row here. US-024 separated the axes;
  * `sources/types.ts` says why.
  */
-export const sources = ["reddit", "x", "linkedin", "youtube", "tiktok"] as const;
+export const sources = ["reddit", "x", "linkedin", "youtube", "tiktok", "instagram"] as const;
 export type Source = (typeof sources)[number];
 
 /**

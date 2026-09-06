@@ -1,7 +1,13 @@
 /**
  * US-044's last question, asked on comments that are already bought.
  *
- *     pnpm --filter @intentwatch/core live:tiktok-comments
+ *     pnpm --filter @intentwatch/core live:tiktok-comments [sample]
+ *     pnpm --filter @intentwatch/core live:instagram-comments [sample]
+ *
+ * **US-049 made it take a platform.** The question it asks is not TikTok's — it
+ * is "can a comment on this platform read as a lead", and Instagram raised it
+ * more sharply than TikTok did. `--platform=<id>` chooses; the default is
+ * TikTok, so the command US-044 documented behaves as it did.
  *
  * **Why this exists beside `live-tiktok-poll.ts`.** That script answers the
  * whole path and BUG-006 stopped it answering the end of it: its first run
@@ -42,13 +48,13 @@ import { createEmbedder } from "../ai/embed.js";
 import { createTriager } from "../ai/triage.js";
 import { loadAiEnv } from "../config/env.js";
 import { createDatabase } from "../db/client.js";
-import { matches, modelCalls, monitors, posts } from "../db/schema.js";
+import { matches, modelCalls, monitors, posts, type Source } from "../db/schema.js";
 import { createLogger } from "../logger.js";
 import { createClassifyStep } from "../worker/classify.js";
 import { createFilterStep } from "../worker/filter.js";
 import { classifyQueue, filterQueue, notifyQueue } from "../worker/queues.js";
 import type { StepContext } from "../worker/steps.js";
-import { tikTokPlatformId } from "./platforms.js";
+import { instagramPlatformId, tikTokPlatformId } from "./platforms.js";
 
 const databaseUrl = process.env.DATABASE_URL;
 
@@ -65,9 +71,36 @@ if (!databaseUrl) {
  * classifications cost about eight times what sixty do to answer the same
  * question. Override it with the first argument.
  */
-const sampleSize = Number(process.argv[2] ?? 60);
+const args = process.argv.slice(2);
+const sampleSize = Number(args.find((arg) => !arg.startsWith("--")) ?? 60);
 
-const logger = createLogger({ level: "warn", name: "live-tiktok-comments" });
+/**
+ * Which platform's stored comments to read.
+ *
+ * One instrument rather than one per platform, because the question is the same
+ * on every video platform and the answer is the thing that differs. The default
+ * keeps US-044's documented command working unchanged.
+ */
+const platforms: Record<string, Source> = {
+  tiktok: tikTokPlatformId,
+  instagram: instagramPlatformId,
+};
+
+function chosenPlatform(): Source {
+  const named = args.find((arg) => arg.startsWith("--platform="))?.split("=")[1] ?? "tiktok";
+  const found = platforms[named];
+
+  if (!found) {
+    console.error(`Unknown platform "${named}". Use one of: ${Object.keys(platforms).join(", ")}.`);
+    process.exit(1);
+  }
+
+  return found;
+}
+
+const platformId = chosenPlatform();
+
+const logger = createLogger({ level: "warn", name: `live-${platformId}-comments` });
 const { db, close } = createDatabase(databaseUrl);
 
 const started = Date.now();
@@ -152,7 +185,7 @@ async function main(): Promise<void> {
   const [monitor] = await db
     .select()
     .from(monitors)
-    .where(sql`${monitors.sources} @> ARRAY[${tikTokPlatformId}]::text[]`)
+    .where(sql`${monitors.sources} @> ARRAY[${platformId}]::text[]`)
     .orderBy(desc(monitors.createdAt))
     .limit(1);
 
@@ -181,7 +214,7 @@ async function main(): Promise<void> {
     .from(posts)
     .where(
       and(
-        eq(posts.source, tikTokPlatformId),
+        eq(posts.source, platformId),
         eq(posts.kind, "reply"),
         isNull(posts.deletedAt),
         sql`not exists (
@@ -197,11 +230,11 @@ async function main(): Promise<void> {
   const stored = await db
     .select({ total: sql<number>`count(*)::int` })
     .from(posts)
-    .where(and(eq(posts.source, tikTokPlatformId), eq(posts.kind, "reply")));
+    .where(and(eq(posts.source, platformId), eq(posts.kind, "reply")));
 
   say(`monitor ${monitorId} — "${monitor.name}"`);
   say(
-    `stored TikTok comments: ${stored[0]?.total ?? 0}; unread by this monitor, sampling ${sample.length}`,
+    `stored ${platformId} comments: ${stored[0]?.total ?? 0}; unread by this monitor, sampling ${sample.length}`,
   );
   say(`classifier ${aiConfig.model}, triage ${triageConfig.model}, min score ${monitor.minScore}`);
   say("no provider is called: every comment below was bought once already");

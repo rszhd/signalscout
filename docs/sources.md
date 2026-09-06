@@ -103,10 +103,11 @@ no provider is a platform nothing can fetch.
 
 ---
 
-## One provider, two platforms
+## One provider, five platforms
 
-SocialCrawl fetches X and LinkedIn since US-028, and that is the case
-`ProviderDescriptor` was split out for. The credential fields are written once
+SocialCrawl fetches X and LinkedIn since US-028, Reddit since US-031, YouTube
+since US-034, TikTok since US-044 and Instagram since US-049, and that is the
+case `ProviderDescriptor` was split out for. The credential fields are written once
 and the connections screen shows one card, so a person pastes that key once and
 rotates it once however many platforms sit behind it.
 
@@ -116,10 +117,34 @@ window, and what they do with a search that matches nothing. `client.ts` holds
 one transport and an `EndpointProfile` per platform for the three things that
 differ; everything else is a connector's own business.
 
-The lesson is worth keeping when a fourth platform arrives at this provider:
+The lesson is worth keeping every time a platform arrives at this provider:
 sharing a key is not sharing a contract. Ask the new endpoint every question
 the capture script asks, even the ones the sibling endpoint already answered.
 US-028 asked nine, and four of the answers contradicted the X connector.
+
+**US-049 is the strongest case for that rule so far**, because Instagram broke
+three things its four siblings agree on, and each would have shipped as a silent
+fault:
+
+* **A search with no date window returns five years of posts.** Thirty results
+  ran from 2021 to 2026 in relevance order and the newest was five months old,
+  so a monitor's `since` would have thrown away everything it was billed for,
+  every poll. Instagram is the one connector here that always sends a window;
+  LinkedIn deliberately sends none in the same situation.
+* **`has_more` is true beside an empty page.** The cursor from a full first page
+  returned zero items, zero credits and another `has_more: true`. Reading the
+  flag is an endless walk over nothing.
+* **Three of the nine comment fields are null on every comment**: `url`,
+  `post_id` and `author.display_name`, against 137 captured comments from X,
+  YouTube and TikTok that fill all three. So the shared parser now falls back to
+  the handle for a name, and BUG-007's wrong-parent check is **inert on
+  Instagram** — there is no `post_id` to disagree with.
+
+The prices differ inside one platform too, which is new here. A reel search is
+1 credit and a comment page is 5, so this connector declares
+`replyPricePerUnitMicros` separately from `pricePerUnitMicros`. US-028 found
+that trap on LinkedIn: where a request and a credit are different numbers, a
+guard fed the wrong one lets a monitor spend five times its cap.
 
 ## One platform, one provider — when only one can do the work
 
@@ -204,11 +229,11 @@ for the split:
 
 | | Bright Data | ScrapeCreators | SocialCrawl |
 |---|---|---|---|
-| Fetches | Reddit | Reddit | X and LinkedIn |
-| Billable unit | a record | a request | a request on X, a credit on LinkedIn |
+| Fetches | Reddit | Reddit | X, LinkedIn, Reddit, YouTube, TikTok and Instagram |
+| Billable unit | a record | a request | a request on X, a credit on LinkedIn and Instagram |
 | Price | $1.50 / 1,000 records | $1.88 / 1,000 requests | $8.12 / 1,000 credits |
-| One unit buys | one post | 7 to 23 posts, measured | X: 20 posts. LinkedIn: 2 posts, and a call spends 5 credits |
-| A call that finds nothing | billed | billed | X: refunded. LinkedIn: billed in full, and it returns unrelated posts rather than none |
+| One unit buys | one post | 7 to 23 posts, measured | X: 20 posts. LinkedIn: 2 posts, and a call spends 5 credits. Instagram: 30 reels for 1 credit, and a comment page of 15 for 5 |
+| A call that finds nothing | billed | billed | X: refunded. LinkedIn: billed in full, and it returns unrelated posts rather than none. Instagram: an empty page is refunded, and it still claims `has_more` |
 | Shape | trigger, then poll a snapshot | the posts are in the answer | the posts are in the answer |
 | A collection took | 8 minutes 40 seconds, and 2 minutes 13 on another day | 1.8 to 4.9 seconds | 1.4 to 5.3 seconds |
 | A refused key says | `Invalid credentials`, as a bare string | `{"message":"Invalid API key"}` | `Invalid API key format. Keys start with 'sc_'.` |

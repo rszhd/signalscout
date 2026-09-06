@@ -1,0 +1,429 @@
+{
+  "httpStatus": 200,
+  "body": {
+    "success": true,
+    "platform": "instagram",
+    "endpoint": "/v1/instagram/post/comments",
+    "data": {
+      "items": [
+        {
+          "comment": {
+            "id": "18047529779658999",
+            "url": null,
+            "parent_id": null,
+            "post_id": null,
+            "text": "The results are amazing 😍",
+            "author": {
+              "username": "instagram-user-116",
+              "display_name": null,
+              "avatar_url": "https://scrubbed.invalid/instagram-user-164",
+              "verified": true
+            },
+            "engagement": {
+              "likes": 1,
+              "replies": 0
+            },
+            "flags": {
+              "pinned": null,
+              "deleted": false
+            },
+            "published_at": "2025-09-28T23:07:49.000Z"
+          },
+          "computed": {
+            "language": "en"
+          }
+        },
+        {
+          "comment": {
+            "id": "18054599339242516",
+            "url": null,
+            "parent_id": null,
+            "post_id": null,
+            "text": "ANG LINIS TALAGA ALWAYS NG VIDEOS MO ATEEE!!!",
+            "author": {
+              "username": "instagram-user-165",
+              "display_name": null,
+              "avatar_url": "https://scrubbed.invalid/instagram-user-166",
+              "verified": false
+            },
+            "engagement": {
+              "likes": 1,
+              "replies": 1
+            },
+            "flags": {
+              "pinned": null,
+              "deleted": false
+            },
+            "published_at": "2025-09-29T01:14:05.000Z"
+          },
+          "computed": {
+            "language": null
+          }
+        },
+        {
+          "comment": {
+            "id": "18059319635145065",
+            "url": null,
+            "parent_id": null,
+            "post_id": null,
+            "text": "u lowkey look like camille trinidad, babe!!! gorggg",
+            "author": {
+              "username": "instagram-user-167",
+              "display_name": null,
+              "avatar_url": "https://scrubbed.invalid/instagram-user-168",
+              "verified": false
+            },
+            "engagement": {
+              "likes": 1,
+              "replies": 1
+            },
+            "flags": {
+              "pinned": null,
+              "deleted": false
+            },
+            "published_at": "2025-09-27T12:54:10.000Z"
+          },
+          "computed": {
+            "language": null
+          }
+        },
+        {
+          "comment": {
+            "id": "17962049546986019",
+            "url": null,
+            "parent_id": null,
+            "post_id": null,
+            "text": "Addream lineeee❤️😍",
+            "author": {
+              "username": "instagram-user-169",
+              "display_name": null,
+              "avatar_url": "https://scrubbed.invalid/instagram-user-170",
+              "verified": false
+            },
+            "engagement": {
+              "likes": 0,
+              "replies": 0
+            },
+            "flags": {
+              "pinned": null,
+              "deleted": false
+            },
+            "published_at": "2025-09-30T21:05:32.000Z"
+          },
+          "computed": {
+            "language": "en"
+          }
+        },
+        {
+          "comment": {
+            "id": "18071522513245396",
+            "url": null,
+            "parent_id": null,
+            "post_id": null,
+            "text": "Love abib sm!❤️",
+            "author": {
+              "username": "instagram-user-171",
+              "display_name": null,
+              "avatar_url": "https://scrubbed.invalid/instagram-user-172",
+              "verified": false
+            },
+            "engagement": {
+              "likes": 0,
+              "replies": 0
+            },
+            "flags": {
+              "pinned": null,
+              "deleted": false
+            },
+            "published_at": "2025-09-30T02:57:45.000Z"
+          },
+          "computed": {
+            "language": null
+          }
+        },
+        {
+          "comment": {
+            "id": "18070305020242118",
+            "url": null,
+            "parent_id": null,
+            "post_id": null,
+            "text": "love your skin 😍",
+            "author": {
+              "username": "instagram-user-173",
+              "display_name": null,
+              "avatar_url": "https://scrubbed.invalid/instagram-user-174",
+              "verified": false
+            },
+            "engagement": {
+              "likes": 0,
+              "replies": 0
+            },
+            "flags": {
+              "pinned": null,
+              "deleted": false
+            },
+            "published_at": "2025-09-29T16:08:44.000Z"
+          },
+          "computed": {
+            "language": "en"
+          }
+        },
+        {
+          "comment": {
+            "id": "17926001478120727",
+            "url": null,
+            "parent_id": null,
+            "post_id": null,
+            "text": "So gooood❤️",
+            "author": {
+              "username": "instagram-user-175",
+              "display_name": null,
+              "avatar_url": "https://scrubbed.invalid/instagram-user-176",
+              "verified": false
+            },
+            "engagement": {
+              "likes": 0,
+              "replies": 0
+            },
+            "flags": {
+              "pinned": null,
+              "deleted": false
+            },
+            "published_at": "2025-09-29T11:40:48.000Z"
+          },
+          "computed": {
+            "language": null
+          }
+        },
+        {
+          "comment": {
+            "id": "17861342817491283",
+            "url": null,
+            "parent_id": null,
+            "post_id": null,
+            "text": "Been wanting to try this skincare line😍",
+            "author": {
+              "username": "instagram-user-177",
+              "display_name": null,
+              "avatar_url": "https://scrubbed.invalid/instagram-user-178",
+              "verified": false
+            },
+            "engagement": {
+              "likes": 0,
+              "replies": 0
+            },
+            "flags": {
+              "pinned": null,
+              "deleted": false
+            },
+            "published_at": "2025-09-29T08:53:14.000Z"
+          },
+          "computed": {
+            "language": "en"
+          }
+        },
+        {
+          "comment": {
+            "id": "18081066472960204",
+            "url": null,
+            "parent_id": null,
+            "post_id": null,
+            "text": "I wanna try abib!",
+            "author": {
+              "username": "instagram-user-179",
+              "display_name": null,
+              "avatar_url": "https://scrubbed.invalid/instagram-user-180",
+              "verified": false
+            },
+            "engagement": {
+              "likes": 0,
+              "replies": 0
+            },
+            "flags": {
+              "pinned": null,
+              "deleted": false
+            },
+            "published_at": "2025-09-28T22:20:47.000Z"
+          },
+          "computed": {
+            "language": null
+          }
+        },
+        {
+          "comment": {
+            "id": "18179895091343689",
+            "url": null,
+            "parent_id": null,
+            "post_id": null,
+            "text": "love your routine! 😍",
+            "author": {
+              "username": "instagram-user-181",
+              "display_name": null,
+              "avatar_url": "https://scrubbed.invalid/instagram-user-182",
+              "verified": false
+            },
+            "engagement": {
+              "likes": 0,
+              "replies": 0
+            },
+            "flags": {
+              "pinned": null,
+              "deleted": false
+            },
+            "published_at": "2025-09-28T15:23:58.000Z"
+          },
+          "computed": {
+            "language": "en"
+          }
+        },
+        {
+          "comment": {
+            "id": "18128129872467619",
+            "url": null,
+            "parent_id": null,
+            "post_id": null,
+            "text": "your skin so glowy sis! 😍",
+            "author": {
+              "username": "instagram-user-183",
+              "display_name": null,
+              "avatar_url": "https://scrubbed.invalid/instagram-user-184",
+              "verified": false
+            },
+            "engagement": {
+              "likes": 0,
+              "replies": 0
+            },
+            "flags": {
+              "pinned": null,
+              "deleted": false
+            },
+            "published_at": "2025-09-28T11:48:36.000Z"
+          },
+          "computed": {
+            "language": "en"
+          }
+        },
+        {
+          "comment": {
+            "id": "17867771550451106",
+            "url": null,
+            "parent_id": null,
+            "post_id": null,
+            "text": "Perfect for sensitive skin❤️",
+            "author": {
+              "username": "instagram-user-185",
+              "display_name": null,
+              "avatar_url": "https://scrubbed.invalid/instagram-user-186",
+              "verified": false
+            },
+            "engagement": {
+              "likes": 0,
+              "replies": 0
+            },
+            "flags": {
+              "pinned": null,
+              "deleted": false
+            },
+            "published_at": "2025-09-28T10:21:44.000Z"
+          },
+          "computed": {
+            "language": "en"
+          }
+        },
+        {
+          "comment": {
+            "id": "18066562916049690",
+            "url": null,
+            "parent_id": null,
+            "post_id": null,
+            "text": "Wow gsto ko rin nito 😍 ❤️",
+            "author": {
+              "username": "instagram-user-187",
+              "display_name": null,
+              "avatar_url": "https://scrubbed.invalid/instagram-user-188",
+              "verified": false
+            },
+            "engagement": {
+              "likes": 0,
+              "replies": 0
+            },
+            "flags": {
+              "pinned": null,
+              "deleted": false
+            },
+            "published_at": "2025-09-28T07:31:02.000Z"
+          },
+          "computed": {
+            "language": null
+          }
+        },
+        {
+          "comment": {
+            "id": "18151853266399381",
+            "url": null,
+            "parent_id": null,
+            "post_id": null,
+            "text": "I love the toner! Wish to complete this line 😍",
+            "author": {
+              "username": "instagram-user-189",
+              "display_name": null,
+              "avatar_url": "https://scrubbed.invalid/instagram-user-190",
+              "verified": false
+            },
+            "engagement": {
+              "likes": 0,
+              "replies": 1
+            },
+            "flags": {
+              "pinned": null,
+              "deleted": false
+            },
+            "published_at": "2025-09-28T02:29:11.000Z"
+          },
+          "computed": {
+            "language": "en"
+          }
+        },
+        {
+          "comment": {
+            "id": "17984900777889422",
+            "url": null,
+            "parent_id": null,
+            "post_id": null,
+            "text": "Love the improvement!!",
+            "author": {
+              "username": "instagram-user-191",
+              "display_name": null,
+              "avatar_url": "https://scrubbed.invalid/instagram-user-192",
+              "verified": false
+            },
+            "engagement": {
+              "likes": 0,
+              "replies": 0
+            },
+            "flags": {
+              "pinned": null,
+              "deleted": false
+            },
+            "published_at": "2025-09-27T14:00:19.000Z"
+          },
+          "computed": {
+            "language": "en"
+          }
+        }
+      ],
+      "next_cursor": "sc2.eyJzIjoiaSIsImMiOiJzYzEuZXlKaklqb2llMXdpWTJGamFHVmtYMk52YlcxbGJuUnpYMk4xY25OdmNsd2lPbHdpTVRnd05UUTNOekEwTmpVeU1UazFNRFJjSWl4Y0ltSnBabWxzZEdWeVgzUnZhMlZ1WENJNlhDSkhaMWxaWlZGQmFtOXhMVTlaT1VGZlFVNVVWVGg2WmpCTk1FRkJlSFZwTW5ZNVozbFJRVUZZZEZab01tMXhPRjlCUmsxYU1tWklUR1JFT0VGR1NGRjBYMGs0YTFGQlJETkJTbVkxU1ZJMVFVRk5lbmRTTVdscFVFVkJRVk5VU0RWeVNWTlhVVUZEYW14dU1HeGpSMlJCUVV0S1JrMWpRMnRsYWpoQlIyMVFjMlZJUlhaUlFVTldZMUJYZEVFek1VRkJTVGRQVEhkWmN6VlVPRUZoWmtjNFFUbHpiMUZCUVVGY0luMGlMQ0p6SWpwYklqRTRNRFEzTlRJNU56YzVOalU0T1RrNUlpd2lNVGd3TlRRMU9Ua3pNemt5TkRJMU1UWWlMQ0l4T0RBMU9UTXhPVFl6TlRFME5UQTJOU0lzSWpFM09UWXlNRFE1TlRRMk9UZzJNREU1SWl3aU1UZ3dOekUxTWpJMU1UTXlORFV6T1RZaUxDSXhPREEzTURNd05UQXlNREkwTWpFeE9DSXNJakUzT1RJMk1EQXhORGM0TVRJd056STNJaXdpTVRjNE5qRXpOREk0TVRjME9URXlPRE1pTENJeE9EQTRNVEEyTmpRM01qazJNREl3TkNJc0lqRTRNVGM1T0RrMU1Ea3hNelF6TmpnNUlpd2lNVGd4TWpneE1qazROekkwTmpjMk1Ua2lMQ0l4TnpnMk56YzNNVFUxTURRMU1URXdOaUlzSWpFNE1EWTJOVFl5T1RFMk1EUTVOamt3SWl3aU1UZ3hOVEU0TlRNeU5qWXpPVGt6T0RFaUxDSXhOems0TkRrd01EYzNOemc0T1RReU1pSmRmUSJ9",
+      "total": 71,
+      "dropped": 0
+    },
+    "credits_used": 5,
+    "request_id": "req-2u2eqHZsTT3slU2O",
+    "cached": false,
+    "pagination": {
+      "next_cursor": "sc.eyJ2IjoyLCJjIjoic2MyLmV5SnpJam9pYVNJc0ltTWlPaUp6WXpFdVpYbEtha2xxYjJsbE1YZHBXVEpHYW1GSFZtdFlNazUyWWxjeGJHSnVVbnBZTWs0eFkyNU9kbU5zZDJsUGJIZHBUVlJuZDA1VVVUTk9la0V3VG1wVmVVMVVhekZOUkZKalNXbDRZMGx0U25CYWJXeHpaRWRXZVZnelVuWmhNbFoxV0VOSk5saERTa2hhTVd4YVdsWkdRbUZ0T1hoTVZUbGFUMVZHWmxGVk5WVldWR2cyV21wQ1RrMUZSa0psU0Zad1RXNVpOVm96YkZKUlZVWlpaRVphYjAxdE1YaFBSamxDVW1zeFlVMXRXa2xVUjFKRlQwVkdSMU5HUmpCWU1HczBZVEZHUWxKRVRrSlRiVmt4VTFaSk1WRlZSazVsYm1SVFRWZHNjRlZGVmtKUlZrNVZVMFJXZVZOV1RsaFZWVVpFWVcxNGRVMUhlR3BTTWxKQ1VWVjBTMUpyTVdwUk1uUnNZV3BvUWxJeU1WRmpNbFpKVWxoYVVsRlZUbGRaTVVKWVpFVkZlazFWUmtKVFZHUlFWRWhrV21ONlZsVlBSVVpvV210ak5GRlViSHBpTVVaQ1VWVkdZMGx1TUdsTVEwcDZTV3B3WWtscVJUUk5SRkV6VGxSSk5VNTZZelZPYWxVMFQxUnJOVWxwZDJsTlZHZDNUbFJSTVU5VWEzcE5lbXQ1VGtSSk1VMVVXV2xNUTBsNFQwUkJNVTlVVFhoUFZGbDZUbFJGTUU1VVFUSk9VMGx6U1dwRk0wOVVXWGxOUkZFMVRsUlJNazlVWnpKTlJFVTFTV2wzYVUxVVozZE9la1V4VFdwSk1VMVVUWGxPUkZWNlQxUlphVXhEU1hoUFJFRXpUVVJOZDA1VVFYbE5SRWt3VFdwRmVFOURTWE5KYWtVelQxUkpNazFFUVhoT1JHTTBUVlJKZDA1NlNUTkphWGRwVFZSak5FNXFSWHBPUkVrMFRWUmpNRTlVUlhsUFJFMXBURU5KZUU5RVFUUk5WRUV5VG1wUk0wMXFhekpOUkVsM1RrTkpjMGxxUlRSTlZHTTFUMFJyTVUxRWEzaE5lbEY2VG1wbk5VbHBkMmxOVkdkNFRXcG5lRTFxYXpST2Vra3dUbXBqTWsxVWEybE1RMGw0VG5wbk1rNTZZek5OVkZVeFRVUlJNVTFVUlhkT2FVbHpTV3BGTkUxRVdUSk9WRmw1VDFSRk1rMUVVVFZPYW10M1NXbDNhVTFVWjNoT1ZFVTBUbFJOZVU1cVdYcFBWR3Q2VDBSRmFVeERTWGhPZW1zMFRrUnJkMDFFWXpOT2VtYzBUMVJSZVUxcFNtUm1VU0o5IiwiZSI6Imluc3RhZ3JhbS9wb3N0L2NvbW1lbnRzIiwicCI6ImN1cnNvciJ9",
+      "has_more": true,
+      "page_size": 15
+    },
+    "credits_remaining": 2476
+  }
+}

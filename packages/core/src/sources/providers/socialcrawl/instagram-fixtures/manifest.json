@@ -1,0 +1,51 @@
+[
+  {
+    "name": "search-keyword",
+    "url": "https://www.socialcrawl.dev/v1/instagram/search/reels?query=flaky+tests",
+    "status": 200,
+    "elapsedMs": 6683,
+    "note": "the words five other connectors were polled with"
+  },
+  {
+    "name": "search-consumer",
+    "url": "https://www.socialcrawl.dev/v1/instagram/search/reels?query=skincare+for+acne+scars",
+    "status": 200,
+    "elapsedMs": 6043,
+    "note": "a query whose customers must describe a condition"
+  },
+  {
+    "name": "search-page-2",
+    "url": "https://www.socialcrawl.dev/v1/instagram/search/reels?query=skincare+for+acne+scars&cursor=sc.eyJ2IjoyLCJjIjoic2MxLmV5SmpJam9pTWlJc0luTWlPbHNpTXpJME56VTJPREUwTWpJNU1Ua3lNRFExTUNJc0lqTTROekE0TWpVME1UZ3pPRGMwT1RBMk16UWlMQ0l6TWpreU5UY3lNakV6TURnME5EazFOalEwSWl3aU16YzFORFF4T1RJek1USTFPRGN5TmpFNE1TSXNJak14TlRRNU5USXpNVGN6TmpJNU5qVTJOVE1pTENJek5qa3pPVGszTlRVNE5UWTROekE1TURjeElpd2lNelkwTVRFd056VTNNRFV6TXpRek56TTRPQ0lzSWpNMk9EZzVOemc0TXpFeU9USTJNamM1TmpFaUxDSXpOamcxT0RjM056TTRNRGsyT1RZNU5qTTJJaXdpTXpjNE1UazBNek0wTnpjNE9ETTJORFF5TWlJc0lqTXhOVEU1TkRZMk9EUTNNVEUyTXpneE16TWlMQ0l6TWpNd05EVXlOekV3TWpBeE1UUTFNRFV5SWl3aU1qY3pOalUyTkRFeU9ERXhNVEkzT1RRek1DSXNJak0zTnpZMk5USXhNalk0T1RreU5EYzFOekVpTENJek5EZ3dOelk1TURBMk5UVTVNelV3TlRJM0lpd2lNekkyTlRJNU9ESXpPRGs1T1RnNE5qVXlOeUlzSWpJM016VXpOalk0TlRjME5qWTBPREkxTVRnaUxDSXpNalExTURreE56YzBNVFkxTlRnMU56WXlJaXdpTXpNNE1EQTBORGMwTVRJMU1UYzVPRFF5TUNJc0lqTTNNekF3TXpnek5URTFNemcxTVRVM016UWlMQ0l6TWpnME9URTROamcwTURBME56STROVGMxSWl3aU16QTFPVGMxTWprM016STFNakk0TkRZd05TSXNJakk1TURZNU5ESXpNVFUwT1RNMk16azROVEVpTENJeU56TTRPVGcxTlRnM09UYzFNREV6TmpJeElpd2lNamM0TnpBd01qUTJORGd4TURBNE56UTNNaUlzSWpNMU5UTTBNRFEzT1RNMk5ETTFPVGcwTlRBaUxDSXpOekk1TVRrMU1qZ3lOVEF4TmpFMU16UTBJaXdpTXpjek5EVTNOall4TkRRME5UazFNekU1TVNJc0lqSTNORFV5TlRJMU1EazJPRGN3TlRJNU1Ea2lMQ0l5T0RFNU5UZ3pOVGswTlRVNE1EY3hPVFF4SWwxOSIsImUiOiJpbnN0YWdyYW0vc2VhcmNoL3JlZWxzIiwicCI6InBhZ2UiLCJzIjoiaSJ9",
+    "status": 200,
+    "elapsedMs": 7603,
+    "note": null
+  },
+  {
+    "name": "search-dated",
+    "url": "https://www.socialcrawl.dev/v1/instagram/search/reels?query=skincare+for+acne+scars&date_posted=last-month",
+    "status": 200,
+    "elapsedMs": 20412,
+    "note": "the catalogue says a filtered search comes from a different surface"
+  },
+  {
+    "name": "comments-top",
+    "url": "https://www.socialcrawl.dev/v1/instagram/post/comments?url=https%3A%2F%2Fwww.instagram.com%2Freel%2FDPDwh4-CW8W%2F&sort=top",
+    "status": 200,
+    "elapsedMs": 2321,
+    "note": null
+  },
+  {
+    "name": "comments-recent",
+    "url": "https://www.socialcrawl.dev/v1/instagram/post/comments?url=https%3A%2F%2Fwww.instagram.com%2Freel%2FDPDwh4-CW8W%2F&sort=recent",
+    "status": 200,
+    "elapsedMs": 1727,
+    "note": "newest-first, which the catalogue says to use for a whole walk"
+  },
+  {
+    "name": "credentials-rejected",
+    "url": "https://www.socialcrawl.dev/v1/instagram/search/reels?query=flaky+tests",
+    "status": 401,
+    "elapsedMs": 215,
+    "note": "expected free"
+  }
+]

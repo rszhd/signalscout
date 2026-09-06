@@ -1,0 +1,1321 @@
+{
+  "httpStatus": 200,
+  "body": {
+    "success": true,
+    "platform": "instagram",
+    "endpoint": "/v1/instagram/search/reels",
+    "data": {
+      "items": [
+        {
+          "post": {
+            "id": "3247568142291920450",
+            "url": "https://www.instagram.com/reel/C0RrgThL2ZC/",
+            "content": {
+              "text": "Axis-y has the best products for acne scars and blemishes. I can post more products for getting rid of scars. Overall, I think Korean skincare is the best for treating acne. \n.\nLink in bio\ud83d\udc97\n.\n#skincareroutine #skincareroutinetips #skincareugc #acnescarsremoval #acnescarstreatment #blemishedskin #acneproneskincare #acneproblems #skincareforacnescars #axisy #koreanskincare #koreanskincareproducts",
+              "media_urls": "https://scontent-hel3-1.cdninstagram.com/o1/v/t2/f2/m82/AQNSY5ck1htPLlgoKpVbe5bOXnwuEznmSWxawLb2mEVKmnJCXnGzFgacG58LP_7kSxl_sERNi7-TDzrhVR-02iunJH8s8d8PhHlU3hk.mp4?_nc_cat=106&_nc_sid=5e9851&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_ohc=rFieIWqA594Q7kNvwHQY8eq&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5JTlNUQUdSQU0uQ0xJUFMuQzMuNzIwLmRhc2hfYmFzZWxpbmVfMV92MSIsInhwdl9hc3NldF9pZCI6MTM1ODUyNjEzNDc4Mjk3NSwiYXNzZXRfYWdlX2RheXMiOjEwMTAsInZpX3VzZWNhc2VfaWQiOjEwMDk5LCJkdXJhdGlvbl9zIjo4LCJ1cmxnZW5fc291cmNlIjoid3d3In0%3D&ccb=17-1&vs=35a2c312cf55c0c&_nc_vs=HBksFQIYT2lnX3hwdl9yZWVsc19wZXJtYW5lbnRfcHJvZC82QjQzMEI4MDQyMTZGRkE0QjQ2NkEyNTQ4OEMwQTc4RF92aWRlb19kYXNoaW5pdC5tcDQVAALIARIAFQIYOnBhc3N0aHJvdWdoX2V2ZXJzdG9yZS9HQ3RyUHhoaUJEcXBia3dCQUQ5V3hidFg0UDRXYnFfRUFBQUYVAgLIARIAKAAYABsCiAd1c2Vfb2lsATEScHJvZ3Jlc3NpdmVfcmVjaXBlATEVAAAm_q_0utDk6QQVAigCQzMsF0AgEOVgQYk3GBJkYXNoX2Jhc2VsaW5lXzFfdjERAHX-B2XmnQEA&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_zt=28&_nc_ss=7a3ba&oh=00_AQI8ONqMi-9obh6BNDprtS2PBMhMluLEH3huaKu9hc07hA&oe=6A9F5BC3",
+              "thumbnail_url": "https://scontent-hel3-1.cdninstagram.com/v/t51.71878-15/501831312_1717562708879314_660693470849198089_n.jpg?stp=dst-jpg_e15_p240x240_tt6&_nc_cat=107&ig_cache_key=MzI0NzU2ODE0MjI5MTkyMDQ1MA%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNMSVBTLnhwaWRzLjcyMC5zZHIudmlkZW9fZGVmYXVsdF9jb3Zlcl9mcmFtZS5DMyJ9&_nc_ohc=H4vi0cljCTIQ7kNvwEA_gFx&_nc_oc=Ado3ZFxmU4rw5Nfo2vtuBg69_fz6DD7_KIafFdocUSlPL26f3KIrWMKrZVlN8tZGQuE&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_ss=7a3ba&oh=00_AQKfGsz1LFzd75qjUIJ7AYL0LPYOLAun78c5oLb1_O3JNw&oe=6AA31BFD",
+              "duration_seconds": 8.079
+            },
+            "author": {
+              "username": "instagram-user-64",
+              "display_name": null,
+              "avatar_url": "https://scrubbed.invalid/instagram-user-65",
+              "verified": false
+            },
+            "engagement": {
+              "views": 295,
+              "likes": null,
+              "comments": 0,
+              "shares": null,
+              "saves": null
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false,
+              "likes_hidden": true
+            },
+            "published_at": "2023-11-30T16:05:23.000Z",
+            "ext": {
+              "author_id": "63019136454",
+              "published_at_epoch": 1701360323,
+              "coauthors": []
+            }
+          },
+          "computed": {
+            "engagement_rate": 0,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 354
+          }
+        },
+        {
+          "post": {
+            "id": "3870825418387490634",
+            "url": "https://www.instagram.com/reel/DW37zWiigdK/",
+            "content": {
+              "text": "\u201cBest skincare routine for dry skin and oily skin with acne scars \ud83d\udca7\u2728\nIf you\u2019re struggling with acne marks, uneven texture, or confused skin type, this routine works for BOTH oily and dry skin. These products help fade acne scars, repair skin barrier, and give you clear glowing skin.\u201d\n\n\t\u2022\tskincare for acne scars\n\t\u2022\troutine for oily skin acne scars\n\t\u2022\troutine for dry skin acne scars\n\t\u2022\thow to remove acne marks\n\t\u2022\tglowing skin routine\n\t\u2022\tskin barrier repair\n\n#skincareforacnescars #oilyskincare #dryskinskincare #acnemarksremoval glowingskintips skincareroutine\nskincareforacnescars oilyskincare dryskinskincare acnemarksremoval glowingskintips skincareroutine",
+              "media_urls": "https://scontent-hel3-1.cdninstagram.com/o1/v/t2/f2/m367/AQPu_TXugR7iiPrBauGxsB1cWzi_FDg6bQqTvyMUULbSWcpvTFl4ZoCNsSt8TAccaWv4liJmY0KEvFDnzztLcTF9_43yAsuqeCagFgc.mp4?_nc_cat=102&_nc_sid=5e9851&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_ohc=gl4BZw3Ovi4Q7kNvwHY6L4A&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5JTlNUQUdSQU0uQ0xJUFMuQzMuNzIwLmRhc2hfYmFzZWxpbmVfMV92MSIsInhwdl9hc3NldF9pZCI6MTgwNzYwMDA3MTIyNDcxMjIsImFzc2V0X2FnZV9kYXlzIjoxNTAsInZpX3VzZWNhc2VfaWQiOjEwMDk5LCJkdXJhdGlvbl9zIjo4LCJ1cmxnZW5fc291cmNlIjoid3d3In0%3D&ccb=17-1&vs=e3cc5f4715c03ddf&_nc_vs=HBksFQIYQGlnX2VwaGVtZXJhbC8zMzQzRTAyQTYzOUY5OEYwQTVEODkzNTIzOTQ4QzM5Ml92aWRlb19kYXNoaW5pdC5tcDQVAALIARIAFQIYUWlnX3hwdl9wbGFjZW1lbnRfcGVybWFuZW50X3YyLzkzNEVERUYxMjBEMzdDNjc0NjJBQzk5QUNBODI5NEFCX2F1ZGlvX2Rhc2hpbml0Lm1wNBUCAsgBEgAoABgAGwKIB3VzZV9vaWwBMRJwcm9ncmVzc2l2ZV9yZWNpcGUBMRUAACaknc6W3IGcQBUCKAJDMywXQCAAAAAAAAAYEmRhc2hfYmFzZWxpbmVfMV92MREAdf4HZeadAQA&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_ss=7a3ba&_nc_zt=28&oh=00_AQJDpnTEmMFt42kZK0B5JIErByUsKWxPucxtqLiqkgVodA&oe=6AA3484B",
+              "thumbnail_url": "https://scontent-hel3-1.cdninstagram.com/v/t51.71878-15/658598982_1689200219162151_8779392019948507425_n.jpg?stp=dst-jpg_e15_p240x240_tt6&_nc_cat=107&ig_cache_key=Mzg3MDgyNTQxODM4NzQ5MDYzNDE4MDc2MDAwOTg4MjQ3MTIy.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNMSVBTLnhwaWRzLjY0MC5zZHIudmlkZW9fbmZyYW1lX2NvdmVyX2ZyYW1lLkMzIn0%3D&_nc_ohc=I4fmNxUlMTUQ7kNvwGpQd4A&_nc_oc=AdqmGxIpEzGCdSZmeTmkjDJWVUec6IiFz6CEDrEsBTJuG9ihmbr4zU2K8N-Mq-lagL0&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_ss=7a3ba&oh=00_AQJQ14s0tHZnXKvuJdMv-w4LzcD1wNXSdK9mTzt_pFy64w&oe=6AA33F3D",
+              "duration_seconds": 8.009
+            },
+            "author": {
+              "username": "instagram-user-66",
+              "display_name": null,
+              "avatar_url": "https://scrubbed.invalid/instagram-user-67",
+              "verified": false
+            },
+            "engagement": {
+              "views": 151,
+              "likes": null,
+              "comments": 0,
+              "shares": null,
+              "saves": null
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false,
+              "likes_hidden": true,
+              "shares_hidden": true
+            },
+            "published_at": "2026-04-08T14:26:43.000Z",
+            "ext": {
+              "author_id": "37295087121",
+              "published_at_epoch": 1775658403,
+              "coauthors": []
+            }
+          },
+          "computed": {
+            "engagement_rate": 0,
+            "language": "en",
+            "content_category": "beauty",
+            "estimated_reach": 181
+          }
+        },
+        {
+          "post": {
+            "id": "3292572213084495644",
+            "url": "https://www.instagram.com/reel/C2xkPumOR8c/",
+            "content": {
+              "text": "Treat your self !!! Learn more about our Valentine\u2019s Day facial !!! #facials #skincareformen #skincareroutine #skincareforacnescars #springfieldva",
+              "media_urls": "https://scontent-hel3-1.cdninstagram.com/o1/v/t2/f2/m82/AQNT36CtouEApmuPUKybP4oI5frjmCr3siLmbXtWK3mnPh9CuGwSKOWMS55p6oJdp8LHjZp-m1C2kGakHkwl_KUiSHnOirxvZmhjq1Q.mp4?_nc_cat=107&_nc_sid=5e9851&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_ohc=tf7LM1lSbesQ7kNvwF7Q3K8&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5JTlNUQUdSQU0uQ0xJUFMuQzMuNzIwLmRhc2hfYmFzZWxpbmVfMV92MSIsInhwdl9hc3NldF9pZCI6MTQzMzIzNjY0NDA2OTQ5NCwiYXNzZXRfYWdlX2RheXMiOjk0OCwidmlfdXNlY2FzZV9pZCI6MTAwOTksImR1cmF0aW9uX3MiOjQsInVybGdlbl9zb3VyY2UiOiJ3d3cifQ%3D%3D&ccb=17-1&vs=ec3b92afd410cebf&_nc_vs=HBksFQIYT2lnX3hwdl9yZWVsc19wZXJtYW5lbnRfcHJvZC9ERjQ3RDBEMjkzQkQwRUI3QzZEMUQ4MTRDMUI4QzU5OF92aWRlb19kYXNoaW5pdC5tcDQVAALIARIAFQIYOnBhc3N0aHJvdWdoX2V2ZXJzdG9yZS9HS1dMT0JtSGZ6VHQwSTRIQUYtSFVXNzBLeHRpYnFfRUFBQUYVAgLIARIAKAAYABsCiAd1c2Vfb2lsATEScHJvZ3Jlc3NpdmVfcmVjaXBlATEVAAAm7IHkkK3hiwUVAigCQzMsF0ATmZmZmZmaGBJkYXNoX2Jhc2VsaW5lXzFfdjERAHX-B2XmnQEA&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_ss=7a3ba&_nc_zt=28&oh=00_AQKk7r9Kl6pV4a7QUunVFERWrwYAUdNxvMVqxzapA4VstA&oe=6A9F3474",
+              "thumbnail_url": "https://scontent-hel3-1.cdninstagram.com/v/t51.71878-15/502944686_1751955972197558_990904233669932221_n.jpg?stp=dst-jpg_e15_p240x240_tt6&_nc_cat=101&ig_cache_key=MzI5MjU3MjIxMzA4NDQ5NTY0NA%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNMSVBTLnhwaWRzLjcyMC5zZHIudmlkZW9fZGVmYXVsdF9jb3Zlcl9mcmFtZS5DMyJ9&_nc_ohc=mDGMpgjmGj0Q7kNvwH1BIFa&_nc_oc=AdoCnCCjSg9OxS1UbnfgrwPYABC3KkTEK7UMwaoqf4H7GmWToimaFC69_F0PyaNkFCI&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_ss=7a3ba&oh=00_AQKsCFvqJa68y8OG9B5WLZZUiv3-OSdgIAJ-7uJgbsqUiw&oe=6AA31CB4",
+              "duration_seconds": 4.921
+            },
+            "author": {
+              "username": "instagram-user-68",
+              "display_name": null,
+              "avatar_url": "https://scrubbed.invalid/instagram-user-69",
+              "verified": false
+            },
+            "engagement": {
+              "views": 1592,
+              "likes": 11,
+              "comments": 1,
+              "shares": null,
+              "saves": null
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2024-01-31T18:22:56.000Z",
+            "ext": {
+              "author_id": "45537366649",
+              "published_at_epoch": 1706725376,
+              "coauthors": []
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.007538,
+            "language": "fr",
+            "content_category": "other",
+            "estimated_reach": 1910
+          }
+        },
+        {
+          "post": {
+            "id": "3754419231258726181",
+            "url": "https://www.instagram.com/reel/DQaYGYpEk8l/",
+            "content": {
+              "text": "Exfoliating skin care routine!! (All products are linked in my LTK in my bio) \n\nExfoliating is a must in my routine, I exfoliate about 1-2 times a week and it has made such an incredible difference in my skin. \n\nHaving suffered with acne and acne scars, exfoliating became an essential part in helping clear my skin as well as brighten in! I also just love the feeling of it! \n\n@instagram-user-70 @instagram-user-71 @instagram-user-72 @instagram-user-73 @instagram-user-74 @instagram-user-75 @instagram-user-76 @instagram-user-77 \n\n#skincare #skincareroutine #exfoliating #bestskincareproducts #acnescars #darkspots #acne #skincareforacnescars #skincareforacne #skin1004 \n#olehenriksen #osea #laneige #kiehls #medicube #pdrn #goodmolecules #paulaschoice",
+              "media_urls": "https://scontent-hel3-1.cdninstagram.com/o1/v/t2/f2/m86/AQPqcAU3PYdBTXjJppMfDtgysgyvN08DscmURZ1IQrJVCBH688OMcTQqVqYqD8wKSKtT_E9-hZgND1KvGJ5scx6nu9UsKoGO6Hpc-Jk.mp4?_nc_cat=106&_nc_sid=5e9851&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_ohc=Wq--3rNttUcQ7kNvwHWALnV&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5JTlNUQUdSQU0uQ0xJUFMuQzMuMzYwLmRhc2hfYmFzZWxpbmVfM192MSIsInhwdl9hc3NldF9pZCI6MTQ5NjM1MDYwMTU4Mjk3MiwiYXNzZXRfYWdlX2RheXMiOjMxMSwidmlfdXNlY2FzZV9pZCI6MTAwOTksImR1cmF0aW9uX3MiOjM3LCJ1cmxnZW5fc291cmNlIjoid3d3In0%3D&ccb=17-1&vs=17fa983a07b30d2a&_nc_vs=HBksFQIYUmlnX3hwdl9yZWVsc19wZXJtYW5lbnRfc3JfcHJvZC84MTQ5RDY3QURCNjg5OUI0Nzg4OTQ5OEJEMTg3MUJCQ192aWRlb19kYXNoaW5pdC5tcDQVAALIARIAFQIYRmlnX3hwdl9yZWVsc19wZXJtYW5lbnRfc3JfcHJvZC84NDA3Mjk4OTE3OTgzODFfNTQwNDE4ODkyNjMwNDE1NzE4NS5tcDQVAgLIARIAKAAYABsCiAd1c2Vfb2lsATEScHJvZ3Jlc3NpdmVfcmVjaXBlATEVAAAm-OWI4Yi7qAUVAigCQzMsF0BCxDlYEGJOGBJkYXNoX2Jhc2VsaW5lXzNfdjERAHX-B2XmnQEA&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_ss=7a3ba&_nc_zt=28&oh=00_AQKM8SSn0qkmtJ_HAGn-xskdDHZKRYk1YlVWXGz5JOxPIA&oe=6A9F4EB7",
+              "thumbnail_url": "https://scontent-hel3-1.cdninstagram.com/v/t51.71878-15/572884436_1070086178412210_4947652786340522444_n.jpg?stp=dst-jpg_e15_p240x240_tt6&_nc_cat=110&ig_cache_key=Mzc1NDQxOTIzMTI1ODcyNjE4MTE0OTYzNTIwNjgyNDk0OTI%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNMSVBTLnhwaWRzLjY0MC5zZHIudmlkZW9fbmZyYW1lX2NvdmVyX2ZyYW1lLkMzIn0%3D&_nc_ohc=ooALFBkIJawQ7kNvwFPZccX&_nc_oc=Adp3PJsHuE1FXAmFMpDf6OhnNK1GnrGHiK82kARjAAyLkBtIY1-DHHcxADhl43kVg7A&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_ss=7a3ba&oh=00_AQLXGVwcNCmkRtB6taWe10Dn38Qfmkz1u_GHTMk5DTNlaw&oe=6AA324DA",
+              "duration_seconds": 37.533
+            },
+            "author": {
+              "username": "instagram-user-78",
+              "display_name": null,
+              "avatar_url": "https://scrubbed.invalid/instagram-user-79",
+              "verified": false
+            },
+            "engagement": {
+              "views": 149,
+              "likes": 7,
+              "comments": 4,
+              "shares": null,
+              "saves": null
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2025-10-29T23:51:20.000Z",
+            "ext": {
+              "author_id": "55485466506",
+              "published_at_epoch": 1761781880,
+              "coauthors": []
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.073826,
+            "language": "en",
+            "content_category": "beauty",
+            "estimated_reach": 179
+          }
+        },
+        {
+          "post": {
+            "id": "3154952317362965653",
+            "url": "https://www.instagram.com/reel/CvIpGq_twyV/",
+            "content": {
+              "text": "Rise and shine, beauties! \ud83c\udf05 \n\nThis is my quick and effective morning skincare routine that enhances my natural beauty effortlessly while hydrating my skin and helping me with my acne scars, hyperpigmentation, and acne! \ud83c\udf3a \n\nProducts \nClindamycin Phosphate Topical Solution USP 1%\n@instagram-user-80 Alpha Arbutin 2% + HA \n@instagram-user-81 Black Tea Reverse Eye Cream \n@instagram-user-82 PM Facial Moisturizing Lotion \n@instagram-user-83 Daily UV Defense Invisible Broad Spectrum SPF 36 Sunscren \n\n#MorningSkincareRoutine #SimpleSkincareRoutine #SkincareForAcneScars #HydratingSkincareProducts#SkincareForHyperpigmentation #SkincareForAcne #HydratingSkinCare #SkincareRoutine #AcneScarsTreatment #SkincareProducts#hyperpigmentationsolution #billieeilish",
+              "media_urls": "https://scontent-hel3-1.cdninstagram.com/o1/v/t2/f2/m82/AQMU6iwLVdBYI_sczy1dWcZt5q83ea39llo--jNPms7Ty_LX--Ke29z-Crx9MQokc1eDzFxWPB6YAZX34r8EW1pAfMvhbZnXg1BKKII.mp4?_nc_cat=106&_nc_sid=5e9851&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_ohc=6lr1qSGtUbsQ7kNvwEKgvIo&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5JTlNUQUdSQU0uQ0xJUFMuQzMuNzIwLmRhc2hfYmFzZWxpbmVfMV92MSIsInhwdl9hc3NldF9pZCI6OTk3Nzg2MTg3OTIxNDQzLCJhc3NldF9hZ2VfZGF5cyI6MTEzOCwidmlfdXNlY2FzZV9pZCI6MTAwOTksImR1cmF0aW9uX3MiOjEzLCJ1cmxnZW5fc291cmNlIjoid3d3In0%3D&ccb=17-1&vs=fc46de8901eebba3&_nc_vs=HBksFQIYT2lnX3hwdl9yZWVsc19wZXJtYW5lbnRfcHJvZC85NzRFQjQwQkY0M0RGNjlGMUFGNDNDRUE2MjRENTg4MV92aWRlb19kYXNoaW5pdC5tcDQVAALIARIAFQIYOnBhc3N0aHJvdWdoX2V2ZXJzdG9yZS9HT244cHhVLXV0dXlDQm9DQUhwcWRPQmZta1FfYnFfRUFBQUYVAgLIARIAKAAYABsCiAd1c2Vfb2lsATEScHJvZ3Jlc3NpdmVfcmVjaXBlATEVAAAmxuDXtObexQMVAigCQzMsF0AqiDEm6XjVGBJkYXNoX2Jhc2VsaW5lXzFfdjERAHX-B2XmnQEA&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_ss=7a3ba&_nc_zt=28&oh=00_AQKRwY45J9TTxOZDmyIFbnutTSSHkG0Q-8lWiUN-7_tplQ&oe=6A9F35AB",
+              "thumbnail_url": "https://scontent-hel3-1.cdninstagram.com/v/t51.71878-15/499662104_1411534189879972_1552334206137166339_n.jpg?stp=dst-jpg_e15_p240x240_tt6&_nc_cat=109&ig_cache_key=MzE1NDk1MjMxNzM2Mjk2NTY1Mw%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNMSVBTLnhwaWRzLjcyMC5zZHIudmlkZW9fZGVmYXVsdF9jb3Zlcl9mcmFtZS5DMyJ9&_nc_ohc=pSzDjYAej-AQ7kNvwG7LPVv&_nc_oc=AdqxQZ0KXmfttDE06nXDcYWRAtQ0YDzc2ht7KNN_P-D0goUy2KBgmchtZSr29NHfFag&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_ss=7a3ba&oh=00_AQIbz__AP6zMWa0ECElrHI0ynbl8T7dugByQZ7oG9uq2WQ&oe=6AA319D8",
+              "duration_seconds": 13.266
+            },
+            "author": {
+              "username": "instagram-user-84",
+              "display_name": null,
+              "avatar_url": "https://scrubbed.invalid/instagram-user-85",
+              "verified": false
+            },
+            "engagement": {
+              "views": 1897,
+              "likes": 61,
+              "comments": 24,
+              "shares": null,
+              "saves": null
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2023-07-25T21:17:04.000Z",
+            "ext": {
+              "author_id": "4617487510",
+              "published_at_epoch": 1690319824,
+              "coauthors": []
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.044808,
+            "language": "en",
+            "content_category": "beauty",
+            "estimated_reach": 2276
+          }
+        },
+        {
+          "post": {
+            "id": "3693997558568709071",
+            "url": "https://www.instagram.com/reel/DNDtzU3pevP/",
+            "content": {
+              "text": "\u09ae\u09c1\u0996\u09c7 \u09a6\u09be\u0997 \u0997\u09b0\u09cd\u09a4 (Acne Scar) \u0995\u09ae\u09be\u09a4\u09c7 \u0995\u09c0 \u0995\u09b0\u09ac\u09cb ?\n\n#EmartwaySkincare #emartwaylife #Acne #scar #acnescars #acnescartreatment #skincareforacnescars #acneholes  #skincarecommunity #clearskintips #postacnemarks #hyperpigmentation #retinolforacne #skincare",
+              "media_urls": "https://scontent-hel3-1.cdninstagram.com/o1/v/t2/f2/m86/AQOaqc-zrPQWZOT3noCdVrgUqkN3lrUdoG0SebpK1pgVvfHPI89mgsSDFE5234n1z6c7WyXUD1l65RxVLFg8S-Br04oZf9594RDAy1U.mp4?_nc_cat=100&_nc_sid=5e9851&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_ohc=oLSEhLcaFToQ7kNvwHIGdxC&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5JTlNUQUdSQU0uQ0xJUFMuQzMuMzYwLmRhc2hfYmFzZWxpbmVfM192MSIsInhwdl9hc3NldF9pZCI6MTA5NDgxNTA3OTI3OTQ0NSwiYXNzZXRfYWdlX2RheXMiOjM5NCwidmlfdXNlY2FzZV9pZCI6MTAwOTksImR1cmF0aW9uX3MiOjUwLCJ1cmxnZW5fc291cmNlIjoid3d3In0%3D&ccb=17-1&vs=24e86ea3b3ff58a7&_nc_vs=HBksFQIYUmlnX3hwdl9yZWVsc19wZXJtYW5lbnRfc3JfcHJvZC84QTQ3M0VDQzIwQTI1NTc1MUQ1MjUyRTgxODFBN0Y5RF92aWRlb19kYXNoaW5pdC5tcDQVAALIARIAFQIYRmlnX3hwdl9yZWVsc19wZXJtYW5lbnRfc3JfcHJvZC82MDQxOTgxNTkyMjc1ODRfMjk4MzQzNDk2Njg0NDE2MTA0NC5tcDQVAgLIARIAKAAYABsCiAd1c2Vfb2lsATEScHJvZ3Jlc3NpdmVfcmVjaXBlATEVAAAmqq2p_s_u8QMVAigCQzMsF0BJEQYk3S8bGBJkYXNoX2Jhc2VsaW5lXzNfdjERAHX-B2XmnQEA&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_ss=7a3ba&_nc_zt=28&oh=00_AQIZI7nz-AkY1ONiNjOXT20jYTMeuYZZ11XGALur8pFPDQ&oe=6A9F521D",
+              "thumbnail_url": "https://scontent-hel3-1.cdninstagram.com/v/t51.82787-15/529671730_18054331172611858_6087145088992957645_n.jpg?stp=dst-jpg_e15_p240x240_tt6&_nc_cat=102&ig_cache_key=MzY5Mzk5NzU1ODU2ODcwOTA3MTE4MDU0MzMxMTY2NjExODU4.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNMSVBTLnhwaWRzLjEwODAuc2RyLnZpZGVvX2RlZmF1bHRfY292ZXJfZnJhbWUuQzMifQ%3D%3D&_nc_ohc=d9MN-QbJlWcQ7kNvwFlKxFb&_nc_oc=AdovzAhQA8j4Qr2i21wBAMkF_v0FVWKyToLtg5VvT5prJ0uu-5k3sOf4_M5xW-tXhbA&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_ss=7a3ba&oh=00_AQJ6qJm-RVewDdHOPPCsoHkbkoa-78QGT25GATP25WQysQ&oe=6AA339C3",
+              "duration_seconds": 50.155
+            },
+            "author": {
+              "username": "instagram-user-86",
+              "display_name": null,
+              "avatar_url": "https://scrubbed.invalid/instagram-user-87",
+              "verified": false
+            },
+            "engagement": {
+              "views": 363,
+              "likes": 2,
+              "comments": 0,
+              "shares": null,
+              "saves": null
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2025-08-07T15:01:24.000Z",
+            "ext": {
+              "author_id": "48249579857",
+              "published_at_epoch": 1754578884,
+              "coauthors": []
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.00551,
+            "language": null,
+            "content_category": "other",
+            "estimated_reach": 436
+          }
+        },
+        {
+          "post": {
+            "id": "3641107570533437388",
+            "url": "https://www.instagram.com/reel/DKH0AtCoY_M/",
+            "content": {
+              "text": "\u2728 Best serum for dark spots and hyperpigmentation? THIS.\nIf you\u2019re dealing with dark spots, acne scars, or dull skin\u2014this is your sign.\n\ud83c\udf4b 6% Niacinamide + 4% Tranexamic Acid + Yuja = glass skin glow\n\u2705 Fades pigmentation\n\u2705 Brightens uneven skin tone\n\u2705 Lightweight & gentle for daily use\nThis serum is my new holy grail. \ud83d\udc9b\n\n#darkspotsremoval #hyperpigmentationserum #niacinamide #tranexamicacid #blabserum #koreanskincare #yujaserum #glassskinroutine #skincareforacnescars #glowingskin #skincareroutine #skincarethatworks #skincarehacks #skincaretips",
+              "media_urls": "https://scontent-hel3-1.cdninstagram.com/o1/v/t2/f2/m412/AQO3Yz-FyhXhPSdE9SclPw_mVPRf3xCAlmfssp0iQHCk35CEKFY7Xwx-iw6n6F4LbdjBDUTSwpGK66yt81wgG3P4Xj4yLKzbgqQAn0DkT6r90A.mp4?_nc_cat=104&_nc_sid=5e9851&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_ohc=V7F4w6Oa_pcQ7kNvwFeRvMv&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5JTlNUQUdSQU0uQ0xJUFMuQzMuMTA4MC5kYXNoX2gyNjQtYmFzaWMtZ2VuMl8xMDgwcCIsInhwdl9hc3NldF9pZCI6NzA2NjMwMjc4NjE2OTM3LCJhc3NldF9hZ2VfZGF5cyI6NDY3LCJ2aV91c2VjYXNlX2lkIjoxMDgyNywiZHVyYXRpb25fcyI6MTEsInVybGdlbl9zb3VyY2UiOiJ3d3cifQ%3D%3D&ccb=17-1&vs=c6578912c85b6ffb&_nc_vs=HBksFQIYRWZiX3Blcm1hbmVudC8yMjRCOUVFNzU4RjFGOEE1NkMyOEU3NEVDOTU4Rjg4Q19tdF8wX3ZpZGVvX2Rhc2hpbml0Lm1wNBUAAsgBEgAVAhg6cGFzc3Rocm91Z2hfZXZlcnN0b3JlL0dMcEN4eDNRSXR5NGU1SUNBRzFja2xKV0piY3hicV9FQUFBRhUCAsgBEgAoABgAGwKIB3VzZV9vaWwBMRJwcm9ncmVzc2l2ZV9yZWNpcGUBMRUAACbS3fTrpavBAhUCKAJDMywXQCeqfvnbItEYGmRhc2hfaDI2NC1iYXNpYy1nZW4yXzEwODBwEQB1_gdllqkBAA&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_ss=7a3ba&_nc_zt=28&oh=00_AQJIRJ-shw3KAdkU9JamOIf0xkOp6fadPp3xmSOz2Tmlcg&oe=6AA31D10",
+              "thumbnail_url": "https://scontent-hel3-1.cdninstagram.com/v/t51.75761-15/500535078_18065644766057923_693943562832765122_n.jpg?stp=dst-jpg_e15_p240x240_tt6&_nc_cat=109&ig_cache_key=MzY0MTEwNzU3MDUzMzQzNzM4OA%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNMSVBTLnhwaWRzLjE0NDAuc2RyLnZpZGVvX2RlZmF1bHRfY292ZXJfZnJhbWUuQzMifQ%3D%3D&_nc_ohc=xyU7p00ayFsQ7kNvwG6QYdj&_nc_oc=AdoqxznZohuP2oofnuo4fY0zg9y7xGBHizU696DL2RYqSCZ--gq1PlILjjayEy9arIY&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_ss=7a3ba&oh=00_AQJI4YYAn4Aib8_pbZb2aLcO9TF6gUgfLAPOz2qSXsGraA&oe=6AA31A87",
+              "duration_seconds": 11.833
+            },
+            "author": {
+              "username": "instagram-user-88",
+              "display_name": null,
+              "avatar_url": "https://scrubbed.invalid/instagram-user-89",
+              "verified": false
+            },
+            "engagement": {
+              "views": 1175,
+              "likes": null,
+              "comments": 26,
+              "shares": null,
+              "saves": null
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false,
+              "likes_hidden": true
+            },
+            "published_at": "2025-05-26T15:42:07.000Z",
+            "ext": {
+              "author_id": "31852225922",
+              "published_at_epoch": 1748274127,
+              "coauthors": []
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.022128,
+            "language": "en",
+            "content_category": "beauty",
+            "estimated_reach": 1410
+          }
+        },
+        {
+          "post": {
+            "id": "3688978831292627961",
+            "url": "https://www.instagram.com/reel/DMx4rO3Ifv5/",
+            "content": {
+              "text": "*Limited Time Offer: Exclusive Discounts at Skinology Laser and Aesthetics!*\n\nGet ready to glow without breaking the bank! Skinology Laser and Aesthetics, led by Dr. Rizwana Hanif, is offering exclusive discounts on our premium skincare and aesthetic treatments.\n\n*Book Now and Save:*\n\nDon't miss out on this amazing opportunity to achieve your skin goals. \n\n\ud83d\udcdeContact us at +00 0000 0000 to book your appointment and redeem your discount!\n\n\ud83d\udccd*Visit Us:*\n\nSkinology Laser and Aesthetics\nOpposite The Mall Plaza, Mall Road, Multan Cantt.\n\n*Hurry! Offer valid for a limited time only.*\n\n - #AcneScarsTreatment\n - #SkinologyLaserAesthetics\n - #MultanSkincare\n - #MultanAesthetics\n - #LaserTherapyForAcneScars\n - #ChemicalPeelsForAcneScars\n - #MicroneedlingForAcneScars\n - #HydrafacialForAcneScars\n - #FadeAcneScars\n - #SmoothSkin\n - #ClearSkin\n - #GlowingSkin\n - #MultanBeauty\n - #MultanSkincareClinic\n - #SkinologyPk\n - #DrRizwanaHanif\n - #SkinologyExpert\n- #AcneScarsSolution\n- #AcneScarsTreatmentMultan\n- #BestAcneScarsTreatment\n- #SkinCareForAcneScars\n- #AestheticsForAcneScars",
+              "media_urls": "https://scontent-hel3-1.cdninstagram.com/o1/v/t2/f2/m86/AQMMdyKt6nH9IwQFuCIkhQxZjTKk4JEjdOYkShUwI2kUAdGY-Hejy-7bzrg_6IucZR5Bn56LKh1FwSFCL0B2GixLUqc7ax4O0bnATig.mp4?_nc_cat=101&_nc_sid=5e9851&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_ohc=6Nw4K6qkllcQ7kNvwFzH8zk&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5JTlNUQUdSQU0uQ0xJUFMuQzMuMzYwLmRhc2hfYmFzZWxpbmVfM192MSIsInhwdl9hc3NldF9pZCI6MTMwNjUxNDYxMDgwNDQ4MywiYXNzZXRfYWdlX2RheXMiOjQwMSwidmlfdXNlY2FzZV9pZCI6MTAwOTksImR1cmF0aW9uX3MiOjUsInVybGdlbl9zb3VyY2UiOiJ3d3cifQ%3D%3D&ccb=17-1&vs=7219a90da522a705&_nc_vs=HBksFQIYUmlnX3hwdl9yZWVsc19wZXJtYW5lbnRfc3JfcHJvZC82RTQzOUVGNTY2OTk5NjI2RTNDRURCNjBGNjEyOTc4NV92aWRlb19kYXNoaW5pdC5tcDQVAALIARIAFQIYRmlnX3hwdl9yZWVsc19wZXJtYW5lbnRfc3JfcHJvZC83NTY4OTExNjM0OTAxMzFfNTY5MDY5ODUyNTk3MDk2OTI4MS5tcDQVAgLIARIAKAAYABsCiAd1c2Vfb2lsATEScHJvZ3Jlc3NpdmVfcmVjaXBlATEVAAAmhtyqtJSR0gQVAigCQzMsF0AUAAAAAAAAGBJkYXNoX2Jhc2VsaW5lXzNfdjERAHX-B2XmnQEA&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_ss=7a3ba&_nc_zt=28&oh=00_AQKv2MbJri7iSYn4bSjHGz7JGc-yRjQ6Xkf-SGFTynNhbA&oe=6A9F272A",
+              "thumbnail_url": "https://scontent-hel3-1.cdninstagram.com/v/t51.71878-15/526234588_726949740229793_2133520517505788196_n.jpg?stp=dst-jpg_e15_p240x240_tt6&_nc_cat=103&ig_cache_key=MzY4ODk3ODgzMTI5MjYyNzk2MQ%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNMSVBTLnhwaWRzLjY0MC5zZHIudmlkZW9fZGVmYXVsdF9jb3Zlcl9mcmFtZS5DMyJ9&_nc_ohc=Dzc1OakQ1NcQ7kNvwE95Xly&_nc_oc=AdoF0rU8O0-nxUi10jNqE1vCXdFwnp3uP_Zw7-GFOiotywzysfYHacvatdxGL_hz1XA&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_ss=7a3ba&oh=00_AQJmL424TIe18nqDEvxRUVXNYuRQu5uE-9bXBlU85jX8Sw&oe=6AA34B43",
+              "duration_seconds": 5.015
+            },
+            "author": {
+              "username": "instagram-user-90",
+              "display_name": null,
+              "avatar_url": "https://scrubbed.invalid/instagram-user-91",
+              "verified": false
+            },
+            "engagement": {
+              "views": 401,
+              "likes": 5,
+              "comments": 0,
+              "shares": null,
+              "saves": null
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2025-07-31T16:53:24.000Z",
+            "ext": {
+              "author_id": "75722033810",
+              "published_at_epoch": 1753980804,
+              "coauthors": []
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.012469,
+            "language": "en",
+            "content_category": "beauty",
+            "estimated_reach": 481
+          }
+        },
+        {
+          "post": {
+            "id": "3685877738096969636",
+            "url": "https://www.instagram.com/reel/DMm3kYwykek/",
+            "content": {
+              "text": "#skinrejuvenation #AcneScarTreatment\n\n#AcneScarRemoval\n\n#AcneScarSolutions\n\n#AcneFreeSkin\n\n#ClearSkinJourney\n\n#ByeByeAcneScars\n\n#SkinCareForAcneScars\n\n#FadingScars\n\n#TreatAcneScars\n#AzfareLaser \nBenifits of Microneedling \ud83e\udef4\ud83e\udef4\ud83e\udef4\nReduces acne scars\n\nImproves skin texture and tone\n\nMinimizes fine lines and wrinkles\n\nFades pigmentation and dark spots\n\nShrinks enlarged pores\n\nBoosts collagen and elastin production\n\nEnhances absorption of skincare products\n\nImproves stretch marks and mild scars\n\nSafe for most skin types\n\nPromotes natural skin rejuvenation",
+              "media_urls": "https://scontent-hel3-1.cdninstagram.com/o1/v/t2/f2/m367/AQPTY568V6y58_DN9PFQfff52_iBkrvknbBNdNnQ6VhussBe_slJeCTYh2upEUtCu-aF8HsvC75KN3psm5c0xkDhdlma7LH4zhKFQVc.mp4?_nc_cat=108&_nc_sid=5e9851&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_ohc=NI27aMihEqUQ7kNvwFJOJTF&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5JTlNUQUdSQU0uQ0xJUFMuQzMuNzIwLmRhc2hfYmFzZWxpbmVfMV92MSIsInhwdl9hc3NldF9pZCI6MjgzMTIxNDQxNzA3MzUzNSwiYXNzZXRfYWdlX2RheXMiOjQwNiwidmlfdXNlY2FzZV9pZCI6MTAwOTksImR1cmF0aW9uX3MiOjEyLCJ1cmxnZW5fc291cmNlIjoid3d3In0%3D&ccb=17-1&vs=cc153f3f5f5e7965&_nc_vs=HBksFQIYQGlnX2VwaGVtZXJhbC82QzQ1MzZDN0Y5OUQ3RDI2RjEyRTA5ODBGOUNGNjc5Ml92aWRlb19kYXNoaW5pdC5tcDQVAALIARIAFQIYRmlnX3hwdl9yZWVsc19wZXJtYW5lbnRfc3JfcHJvZC83NDk3NDM0Mjc0MTg3ODZfMzI1NTM2NzA2NzI2NzU5NTY0My5tcDQVAgLIARIAKAAYABsCiAd1c2Vfb2lsATEScHJvZ3Jlc3NpdmVfcmVjaXBlATEVAAAm_tXmma--hwoVAigCQzMsF0ApzMzMzMzNGBJkYXNoX2Jhc2VsaW5lXzFfdjERAHX-B2XmnQEA&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_ss=7a3ba&_nc_zt=28&oh=00_AQKDA1Gopmw7ucaHwpxa9kEMLQp1vO1gPCeU6X2p9KkzyA&oe=6AA32581",
+              "thumbnail_url": "https://scontent-hel3-1.cdninstagram.com/v/t51.71878-15/524897688_1843383876228125_4769393824168628227_n.jpg?stp=dst-jpg_e15_p240x240_tt6&_nc_cat=102&ig_cache_key=MzY4NTg3NzczODA5Njk2OTYzNg%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNMSVBTLnhwaWRzLjY0MC5zZHIudmlkZW9fZGVmYXVsdF9jb3Zlcl9mcmFtZS5DMyJ9&_nc_ohc=SpflubJHjN4Q7kNvwEHvtmB&_nc_oc=Adqykbfs4G0EgMEKehvZIBN5Elkmq2cORcouQ9o8tv1PbQkjr4yLA1ui4l7ob3sHwI0&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_ss=7a3ba&oh=00_AQIn9VV-ygSA8kE-kh_6GG3DzQLlVeiHujCUpfezl8vEXg&oe=6AA33E18",
+              "duration_seconds": 12.91
+            },
+            "author": {
+              "username": "instagram-user-92",
+              "display_name": null,
+              "avatar_url": "https://scrubbed.invalid/instagram-user-93",
+              "verified": false
+            },
+            "engagement": {
+              "views": 1245,
+              "likes": 32,
+              "comments": 0,
+              "shares": null,
+              "saves": null
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2025-07-27T10:10:36.000Z",
+            "ext": {
+              "author_id": "3552953783",
+              "published_at_epoch": 1753611036,
+              "coauthors": []
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.025703,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 1494
+          }
+        },
+        {
+          "post": {
+            "id": "3781943347788364422",
+            "url": "https://www.instagram.com/reel/DR8KW_tk7qG/",
+            "content": {
+              "text": "If you\u2019re fighting dark spots, dullness, redness, or post-acne marks, this one is a game-changer. \ud83d\udc9a\n\nThis cream is packed with Centella Asiatica, brightening capsules, and soothing ingredients that melt into the skin to target pigmentation without irritation. The micro-capsules burst as you apply, delivering fresh actives that help even out your skin tone and strengthen your barrier.\n\nWhat I love most?\n\ud83c\udf3f Soothes instantly \u2014 perfect for sensitive or acne-prone skin\n\u2728 Visibly brightens dull, uneven texture\n\ud83e\udee7 Lightweight but nourishing\n\ud83d\udc9b Fades dark spots over time for that clean, glowing look\n\nIf your skin feels irritated, blotchy, or just tired, this cream is such a good addition to your routine. Pair it with sunscreen during the day for best results! \u2600\ufe0f\n\nHave you tried Centellian24 before? \ud83d\udc47\ud83d\udcac\nLet me know if you want a full routine to pair with it!\n\n#centellian24 #melacapsulecream #melaCaptureCream #centellacream #centellaasiatica #madecassoside #kbeautyproducts #kbeautyskincare #hyperpigmentationtreatment #darkspotcorrector #acnescarsremoval #brighteningskincare #glassskinjourney\n#evenoutskintone #fadeacnescars #skincareroutine2025 #skincareforacnescars",
+              "media_urls": "https://scontent-hel3-1.cdninstagram.com/o1/v/t2/f2/m86/AQNHSGE_1hWRpOC43fzav6w_ItKJz-t58WFpTLQpXO8aLWMmfCxBod2Mxf7LeueLy6ZVus7OEvIM2OYvpCtF4LYhlNxT2JHZD_xx58k.mp4?_nc_cat=101&_nc_sid=5e9851&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_ohc=DjGZ4KDu-NEQ7kNvwH0c5Ry&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5JTlNUQUdSQU0uQ0xJUFMuQzMuMzYwLmRhc2hfYmFzZWxpbmVfM192MSIsInhwdl9hc3NldF9pZCI6MTI2MDczMzkyOTUxNDQwMiwiYXNzZXRfYWdlX2RheXMiOjI3MywidmlfdXNlY2FzZV9pZCI6MTAwOTksImR1cmF0aW9uX3MiOjYwLCJ1cmxnZW5fc291cmNlIjoid3d3In0%3D&ccb=17-1&vs=bcba1e2fc4dd7e7c&_nc_vs=HBksFQIYUmlnX3hwdl9yZWVsc19wZXJtYW5lbnRfc3JfcHJvZC9DODQ0NEY0ODk3NjE3M0FDQkYxREU1NzM0OEJENjZBQ192aWRlb19kYXNoaW5pdC5tcDQVAALIARIAFQIYR2lnX3hwdl9yZWVsc19wZXJtYW5lbnRfc3JfcHJvZC8xMzg5MDM4ODU5MjUwODE2XzE3Njg2MTI5NDcwMjcyNjY5MDgubXA0FQICyAESACgAGAAbAogHdXNlX29pbAExEnByb2dyZXNzaXZlX3JlY2lwZQExFQAAJsSWs-CvqL0EFQIoAkMzLBdATgQ5WBBiThgSZGFzaF9iYXNlbGluZV8zX3YxEQB1_gdl5p0BAA&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_ss=7a3ba&_nc_zt=28&oh=00_AQKYRGXoVXqzvOOrtUtTNPQVYpuTTg2bx3Up3hTfotUd5g&oe=6A9F41BA",
+              "thumbnail_url": "https://scontent-hel3-1.cdninstagram.com/v/t51.71878-15/590404339_1566116014516631_3744108412927506127_n.jpg?stp=dst-jpg_e15_p240x240_tt6&_nc_cat=109&ig_cache_key=Mzc4MTk0MzM0Nzc4ODM2NDQyMjEyNjA3MzQzODI4NDc2OTA%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNMSVBTLnhwaWRzLjY0MC5zZHIudmlkZW9fbmZyYW1lX2NvdmVyX2ZyYW1lLkMzIn0%3D&_nc_ohc=46m0h00KT78Q7kNvwFWafRO&_nc_oc=AdpaWGVqXgoNjOIqtCBl8IHi9vpDiYpQBn5Pc7ZweAR08oYG1DlwQ04B8FPH_1wlTNg&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_ss=7a3ba&oh=00_AQIbqqsNyujxPWmb1PAEAg0EZ8WR2hW-IP8dRsU4tqlbXA&oe=6AA31E00",
+              "duration_seconds": 60.033
+            },
+            "author": {
+              "username": "instagram-user-94",
+              "display_name": null,
+              "avatar_url": "https://scrubbed.invalid/instagram-user-95",
+              "verified": false
+            },
+            "engagement": {
+              "views": 89,
+              "likes": 1,
+              "comments": 0,
+              "shares": null,
+              "saves": null
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2025-12-06T23:14:21.000Z",
+            "ext": {
+              "author_id": "70090965254",
+              "published_at_epoch": 1765062861,
+              "coauthors": []
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.011236,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 107
+          }
+        },
+        {
+          "post": {
+            "id": "3151946684711638133",
+            "url": "https://www.instagram.com/reel/Cu99s9dNRR1/",
+            "content": {
+              "text": "Redeem your free consultation by sending a Dm.\n\n#skinconsultation #skincareforacnescars #icepickscars #icepickscartreatment #aestheticianinjamaica #facesbyven",
+              "media_urls": "https://scontent-hel3-1.cdninstagram.com/o1/v/t2/f2/m82/AQOP3atQdn-BNb0c5U2AdjdcMKsY5dTQINeh7RV3Hn4N6PpNwCVxvZss2Jf-463q9d89IIapRJHVrL2HwMsTfMOUZCsI8oJVBTwoOHc.mp4?_nc_cat=105&_nc_sid=5e9851&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_ohc=5EKRtQE5cLsQ7kNvwHYqLks&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5JTlNUQUdSQU0uQ0xJUFMuQzMuNDgwLmRhc2hfYmFzZWxpbmVfMl92MSIsInhwdl9hc3NldF9pZCI6NjE0MDkwNjE0MDQ1NTAwLCJhc3NldF9hZ2VfZGF5cyI6MTE0MiwidmlfdXNlY2FzZV9pZCI6MTAwOTksImR1cmF0aW9uX3MiOjQ2LCJ1cmxnZW5fc291cmNlIjoid3d3In0%3D&ccb=17-1&vs=5b30f8bc4763e1a4&_nc_vs=HBksFQIYT2lnX3hwdl9yZWVsc19wZXJtYW5lbnRfcHJvZC8yMjRBRjg2OTFCMDY0RTBDQTQyNTY0QUI4OUY1RDhBMV92aWRlb19kYXNoaW5pdC5tcDQVAALIARIAFQIYOnBhc3N0aHJvdWdoX2V2ZXJzdG9yZS9HTEZJbXhVTU9zeS10SndEQUppQzNRRElfX05xYnFfRUFBQUYVAgLIARIAKAAYABsCiAd1c2Vfb2lsATEScHJvZ3Jlc3NpdmVfcmVjaXBlATEVAAAm-OzHzuOglwIVAigCQzMsF0BHCHKwIMScGBJkYXNoX2Jhc2VsaW5lXzJfdjERAHX-B2XmnQEA&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_ss=7a3ba&_nc_zt=28&oh=00_AQKrYuXyev-gQoSSqYuc45fRt86hqwhkNRt_CHyfCAlaqQ&oe=6A9F2F6E",
+              "thumbnail_url": "https://scontent-hel3-1.cdninstagram.com/v/t51.71878-15/498545312_1016926050428619_822192798183280541_n.jpg?stp=dst-jpg_e15_p240x240_tt6&_nc_cat=105&ig_cache_key=MzE1MTk0NjY4NDcxMTYzODEzMw%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNMSVBTLnhwaWRzLjU0MC5zZHIudmlkZW9fZGVmYXVsdF9jb3Zlcl9mcmFtZS5DMyJ9&_nc_ohc=NeVvJbJw6AoQ7kNvwF8vfbQ&_nc_oc=AdpRRgQwQWREUkNyxKdbYgVv-3WoNT69ti3Ii_WAFQZ-vFeCVvLK4OoqmIjy-xzAIGo&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_ss=7a3ba&oh=00_AQK95dPomR8312QJVyqAK72oGGLDaWiM2vAl-2putZ3c4Q&oe=6AA34A13",
+              "duration_seconds": 46.138
+            },
+            "author": {
+              "username": "instagram-user-96",
+              "display_name": null,
+              "avatar_url": "https://scrubbed.invalid/instagram-user-97",
+              "verified": false
+            },
+            "engagement": {
+              "views": 353,
+              "likes": 37,
+              "comments": 2,
+              "shares": null,
+              "saves": null
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2023-07-21T17:43:28.000Z",
+            "ext": {
+              "author_id": "2054802504",
+              "published_at_epoch": 1689961408,
+              "coauthors": []
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.110482,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 424
+          }
+        },
+        {
+          "post": {
+            "id": "3230452710201145052",
+            "url": "https://www.instagram.com/reel/CzU35_PPLbc/",
+            "content": {
+              "text": "WHICH ONE DO YOU CHOOSE?\n\nDrop \ud83d\udc9b for vitamin C serum and \ud83e\ude76 for niacinamide serum\ud83d\udc47\ud83c\udffb\ud83d\udc47\ud83c\udffb\ud83d\udc47\ud83c\udffb\n\n#skincarewithvitaminc #skincareforacnescars #skincarewithniacinamide #vitamincserum #niacninamideserum #koreanserum #kbeauty #koreanskincare",
+              "media_urls": "https://scontent-hel3-1.cdninstagram.com/o1/v/t2/f2/m82/AQNXU35rS_94oZowSp9BDx0CjrHC0HFIcHC5cGhDZ5E7soYgkje8rOzbOJnrWC4dX2osz2lBtTGPcGTFzFGCO6VOwzGikx61kItvGsM.mp4?_nc_cat=100&_nc_sid=5e9851&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_ohc=9ESCU5U5slwQ7kNvwFB3usT&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5JTlNUQUdSQU0uQ0xJUFMuQzMuNzIwLmRhc2hfYmFzZWxpbmVfMV92MSIsInhwdl9hc3NldF9pZCI6MjI3NzMyNzAwNTc5MTU0MSwiYXNzZXRfYWdlX2RheXMiOjEwMzQsInZpX3VzZWNhc2VfaWQiOjEwMDk5LCJkdXJhdGlvbl9zIjo0NywidXJsZ2VuX3NvdXJjZSI6Ind3dyJ9&ccb=17-1&vs=169d9468c43b6576&_nc_vs=HBksFQIYT2lnX3hwdl9yZWVsc19wZXJtYW5lbnRfcHJvZC8zQjQ0MjVDNzhEOThGQTZCNjQ2NUI5NDM1RjM5MTY4M192aWRlb19kYXNoaW5pdC5tcDQVAALIARIAFQIYOnBhc3N0aHJvdWdoX2V2ZXJzdG9yZS9HSEpjekJjV1Zjb05ZajhCQUVTMDV4LW9senAxYnFfRUFBQUYVAgLIARIAKAAYABsCiAd1c2Vfb2lsATEScHJvZ3Jlc3NpdmVfcmVjaXBlATEVAAAm6tS9s_DNiwgVAigCQzMsF0BHrtkWhysCGBJkYXNoX2Jhc2VsaW5lXzFfdjERAHX-B2XmnQEA&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_ss=7a3ba&_nc_zt=28&oh=00_AQIv-8zVL3XH6zr1uGU6a6MimrRTTwk1tnWgWRod568NFg&oe=6A9F31E9",
+              "thumbnail_url": "https://scontent-hel3-1.cdninstagram.com/v/t51.71878-15/502243434_2720666051457632_1019175567403731008_n.jpg?stp=dst-jpg_e15_p240x240_tt6&_nc_cat=108&ig_cache_key=MzIzMDQ1MjcxMDIwMTE0NTA1Mg%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNMSVBTLnhwaWRzLjEyOTAuc2RyLnZpZGVvX2RlZmF1bHRfY292ZXJfZnJhbWUuQzMifQ%3D%3D&_nc_ohc=E9XKApgxf44Q7kNvwHVcZgE&_nc_oc=AdrYf0Sr2oz5bdJrVIRwclBy6yOu0tBtHl3HsBL-k_Hbn1ariUPmJkg4O4NGd3wrFho&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_ss=7a3ba&oh=00_AQL7ihjJ8JUr-BSCyxaUOVgd_t0vznJBqeJvaG_YaPi7WQ&oe=6AA343A1",
+              "duration_seconds": 47.413
+            },
+            "author": {
+              "username": "instagram-user-98",
+              "display_name": null,
+              "avatar_url": "https://scrubbed.invalid/instagram-user-99",
+              "verified": false
+            },
+            "engagement": {
+              "views": 2436,
+              "likes": null,
+              "comments": 4,
+              "shares": null,
+              "saves": null
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false,
+              "likes_hidden": true
+            },
+            "published_at": "2023-11-07T01:21:14.000Z",
+            "ext": {
+              "author_id": "7018802546",
+              "published_at_epoch": 1699320074,
+              "coauthors": []
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.001642,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 2923
+          }
+        },
+        {
+          "post": {
+            "id": "2736564128111279430",
+            "url": "https://www.instagram.com/reel/CX6OpNZJj1G/",
+            "content": {
+              "text": "Match the holiday \u2728sparkle\u2728 with glowy skin. \ud83e\udd70\n\nAs an oily, acne-prone woman, products with centella asiatica and vitamin C are staples in my morning and night routines. So I\u2019m pretty excited to try @instagram-user-100 \u2018s centella asiatica and revisit @instagram-user-100 Freshly Juiced Vitamin Drop (Vitamin C) to keep my skin in check amidst the hustle and bustle of this season. \ud83d\ude0d\n\n#curatedbeautyclutter \n\nThank you. @instagram-user-101 \ud83d\udc99",
+              "media_urls": "https://scontent-hel3-1.cdninstagram.com/o1/v/t2/f2/m86/AQP8OfozNlpjQAZjP4h5C0-Qd8zWPrn_SqqkyyLGNNiaJKUnrXXbMvXEiTjimLJE7SixoOSIn4eWSjWbXY6hl2E1pPNfX_c1B_6Fjwc.mp4?_nc_cat=108&_nc_sid=5e9851&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_ohc=t21m-Ov-eMkQ7kNvwG7dT9h&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5JTlNUQUdSQU0uQ0xJUFMuQzMuNzIwLmRhc2hfYmFzZWxpbmVfMV92MSIsInhwdl9hc3NldF9pZCI6MjU0Mzk1MDI2NjQ0OTEzLCJhc3NldF9hZ2VfZGF5cyI6MTcxNSwidmlfdXNlY2FzZV9pZCI6MTAwOTksImR1cmF0aW9uX3MiOjE3LCJ1cmxnZW5fc291cmNlIjoid3d3In0%3D&ccb=17-1&vs=77d08c9722b63aaa&_nc_vs=HBksFQIYUmlnX3hwdl9yZWVsc19wZXJtYW5lbnRfc3JfcHJvZC80QjRDMkEzOUVBODU2QTc5Mjg0NjM5QzAxRjY4QzY4OF92aWRlb19kYXNoaW5pdC5tcDQVAALIARIAFQIYOnBhc3N0aHJvdWdoX2V2ZXJzdG9yZS9HUGJGR0JCckYwSUxqNlVEQU9WNXVtbU9jaTBGYnFfRUFBQUYVAgLIARIAKAAYABsCiAd1c2Vfb2lsATEScHJvZ3Jlc3NpdmVfcmVjaXBlATEVAAAm4v6Q097XcxUCKAJDMywXQDEQ5WBBiTcYEmRhc2hfYmFzZWxpbmVfMV92MREAdf4HZeadAQA&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_ss=7a3ba&_nc_zt=28&oh=00_AQILHEcROAuXTKhmbEJUlTVWXaquysWI7itQcSKsq1S9sg&oe=6A9F5111",
+              "thumbnail_url": "https://scontent-hel3-1.cdninstagram.com/v/t51.71878-15/500769652_959394512811624_4121851865998832238_n.jpg?stp=dst-jpg_e15_p240x240_tt6&_nc_cat=101&ig_cache_key=MjczNjU2NDEyODExMTI3OTQzMA%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNMSVBTLnhwaWRzLjIyNjguc2RyLnZpZGVvX2RlZmF1bHRfY292ZXJfZnJhbWUuQzMifQ%3D%3D&_nc_ohc=HwPzKEe0VdMQ7kNvwGHqMAb&_nc_oc=AdrMb5G6KL1Xh6iBtxjR-6tQ124doyYLJu5ymPemE5lOyZCO0reveyy5zKPKiuGGw7M&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_ss=7a3ba&oh=00_AQL0BfNOJ74Dj_B-5pa3rlEDUBewyLE8zTMT6X_Bf0OVoQ&oe=6AA33C21",
+              "duration_seconds": 17.086
+            },
+            "author": {
+              "username": "instagram-user-102",
+              "display_name": null,
+              "avatar_url": "https://scrubbed.invalid/instagram-user-103",
+              "verified": false
+            },
+            "engagement": {
+              "views": 1518,
+              "likes": 30,
+              "comments": 9,
+              "shares": null,
+              "saves": null
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2021-12-25T14:53:19.000Z",
+            "ext": {
+              "author_id": "6029572245",
+              "published_at_epoch": 1640443999,
+              "coauthors": []
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.025692,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 1822
+          }
+        },
+        {
+          "post": {
+            "id": "3776652126899247571",
+            "url": "https://www.instagram.com/reel/DRpXRmQDZnT/",
+            "content": {
+              "text": "Can You Really Heal Scars Faster with Natural Oils? #ScarCare\n\nBurns, cuts, and stubborn scars don\u2019t have to stay forever \u2014 discover how powerful natural oils can support faster skin repair and boost your skin\u2019s natural recovery process \u2728 Whether you\u2019re dealing with fresh marks or old scars, this skincare essential helps soothe, nourish, and promote healthier-looking skin. Perfect for daily use if you want smoother, clearer, more confident skin \ud83d\udc9b\nThis scar recovery oil is enriched with gentle ingredients that calm inflammation, hydrate deeply, and strengthen your skin barrier \u2014 making it ideal for sensitive skin, post-injury care, and long-term scar fading. Say goodbye to dull, uneven texture and hello to renewed, glowing skin \u2728\ud83c\udf3f\n\n#scarcare#postopscarcare#scarcareroutine#scarcareaftersurgery#skincareforscars#skincareforacnescars#skincaretipsforscars#scars#skincareforscarsonlegs#skincareforscarsandacne#skincareproductsforscars#scarcream#preventscars#scar#bestskincareproductsforscars#surgicalscars#acnescars#siliconescarsheetsforacnescars#howtotreatscars#breastliftscars#howtoremovescars#noscar#keloidscars#removescarsonlegs#scarremoval#scarrevison#lightenscars",
+              "media_urls": "https://scontent-hel3-1.cdninstagram.com/o1/v/t2/f2/m86/AQMpbL5-PKfH2rrMZ0R_pihKP7bXVs9I1vRoxJmLTLIHxIkoRw_1_SsMHBu0WRE2MEEQJT7HWKi-5BB6HrMmtNok_UV1KgL6g1HnUwo.mp4?_nc_cat=103&_nc_sid=5e9851&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_ohc=Ru7nbD2LlH4Q7kNvwF5zC8x&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5JTlNUQUdSQU0uQ0xJUFMuQzMuMzYwLmRhc2hfYmFzZWxpbmVfM192MSIsInhwdl9hc3NldF9pZCI6ODA5ODU0NTM4NTI3Nzg3LCJhc3NldF9hZ2VfZGF5cyI6MjgwLCJ2aV91c2VjYXNlX2lkIjoxMDA5OSwiZHVyYXRpb25fcyI6MTksInVybGdlbl9zb3VyY2UiOiJ3d3cifQ%3D%3D&ccb=17-1&vs=a6c1f8c1ab75b1df&_nc_vs=HBksFQIYUmlnX3hwdl9yZWVsc19wZXJtYW5lbnRfc3JfcHJvZC84RjRDMUJENkZGNEFGRDIzOTc3QzkwNjVERDFGNjNBNF92aWRlb19kYXNoaW5pdC5tcDQVAALIARIAFQIYR2lnX3hwdl9yZWVsc19wZXJtYW5lbnRfc3JfcHJvZC8xNTI2NzkxNjExOTc5OTMxXzMzNTk0ODc2NTE4MjE1OTM0OTUubXA0FQICyAESACgAGAAbAogHdXNlX29pbAExEnByb2dyZXNzaXZlX3JlY2lwZQExFQAAJtbQtcHeo_ACFQIoAkMzLBdAM6p--dsi0RgSZGFzaF9iYXNlbGluZV8zX3YxEQB1_gdl5p0BAA&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_ss=7a3ba&_nc_zt=28&oh=00_AQL56zHsBHf5J3a5E3Q5aWHuhM512gzm9oxsECGhYE8tCw&oe=6A9F5574",
+              "thumbnail_url": "https://scontent-hel3-1.cdninstagram.com/v/t51.82787-15/587778813_17979860696925847_3420510811642918196_n.jpg?stp=dst-jpg_e15_p240x240_tt6&_nc_cat=102&ig_cache_key=Mzc3NjY1MjEyNjg5OTI0NzU3MTE3OTc5ODYwNjkwOTI1ODQ3.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNMSVBTLnhwaWRzLjEwODAuc2RyLnZpZGVvX2RlZmF1bHRfY292ZXJfZnJhbWUuQzMifQ%3D%3D&_nc_ohc=ti-QrNm37MYQ7kNvwF7y76x&_nc_oc=AdoISdOSgXwL7Tlhlw7_hXkZ3IEHsBk8F2vibzmFcTk2SFNR6cFGjJYaNrhZx_qMv8U&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_ss=7a3ba&oh=00_AQLuA2bH9fvAfHaEbUe3oPc4EtbM8RYo72Ni8TdjZnciUw&oe=6AA3207F",
+              "duration_seconds": 19.69
+            },
+            "author": {
+              "username": "instagram-user-104",
+              "display_name": null,
+              "avatar_url": "https://scrubbed.invalid/instagram-user-105",
+              "verified": false
+            },
+            "engagement": {
+              "views": 71,
+              "likes": 1,
+              "comments": 0,
+              "shares": null,
+              "saves": null
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2025-11-29T16:01:03.000Z",
+            "ext": {
+              "author_id": "57815205846",
+              "published_at_epoch": 1764432063,
+              "coauthors": []
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.014085,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 85
+          }
+        },
+        {
+          "post": {
+            "id": "3480769006559350527",
+            "url": "https://www.instagram.com/reel/DBOLPg1KM7_/",
+            "content": {
+              "text": "Just a chat while I try out the exfoliating mask \u2728\n\n#skincareroutine #skinexfoliatingtreatment #skincareforacnescars",
+              "media_urls": "https://scontent-hel3-1.cdninstagram.com/o1/v/t16/f2/m69/AQOb7uOMCnSodHVKZGeaB0AlK0vjHxzCowcQFl8NojMBxdYhJW3LQPFC22UP3FFHvp2rfH4hGsp0fMLwITB7a2Pk.mp4?strext=1&_nc_cat=107&_nc_sid=5e9851&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_ohc=43RWAkxYj94Q7kNvwE85QLH&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5JTlNUQUdSQU0uQ0xJUFMuQzMuNDMyLmRhc2hfYmFzZWxpbmVfM192MSIsInhwdl9hc3NldF9pZCI6NTM2MzUzMjk5MzM1MDYzLCJhc3NldF9hZ2VfZGF5cyI6Njg5LCJ2aV91c2VjYXNlX2lkIjoxMDEwMiwiZHVyYXRpb25fcyI6MTE0MywidXJsZ2VuX3NvdXJjZSI6Ind3dyJ9&ccb=17-1&vs=a6f0cfbfcdf1eae3&_nc_vs=HBksFQIYOnBhc3N0aHJvdWdoX2V2ZXJzdG9yZS9HT084bnh2WTV3X0ZTdmdCQUNWZGlKLWNuc1kxYnFDQkFBQUYVAALIARIAFQIYOnBhc3N0aHJvdWdoX2V2ZXJzdG9yZS9HSXJnbnh2bkdKdTIyUjBNQUlMbUhsZnRIdVFZYnFDQkFBQUYVAgLIARIAKAAYABsCiAd1c2Vfb2lsATEScHJvZ3Jlc3NpdmVfcmVjaXBlATEVAAAmrp6Mvu_z8wEVAigCQzMsF0CR3R2yLQ5WGBJkYXNoX2Jhc2VsaW5lXzNfdjERAHX-B2XsnQEA&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_ss=7a3ba&_nc_zt=28&oh=00_AQKoSKrQZU3ONkmP7TEG5iZU6WwX_f3eh68NC6MFArtWcg&oe=6AA32D2D",
+              "thumbnail_url": "https://scontent-hel3-1.cdninstagram.com/v/t51.71878-15/501968744_705274752442916_8875887685143604303_n.jpg?stp=dst-jpg_e15_p240x240_tt6&_nc_cat=100&ig_cache_key=MzQ4MDc2OTAwNjU1OTM1MDUyNw%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNMSVBTLnhwaWRzLjQ4MC5zZHIudmlkZW9fZGVmYXVsdF9jb3Zlcl9mcmFtZS5DMyJ9&_nc_ohc=r7MDBRWiPAwQ7kNvwEFWx5m&_nc_oc=AdpGhVz8ihkmQ2KPU9YccizR07lHsmf0vwsZp3T10yapOg0fTMsOEaTHtlls-ngG-Xw&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_ss=7a3ba&oh=00_AQJKQcHHhDd-vMMyDQk8DprrY38_E7z6Utq9-6H3lWbHDA&oe=6AA33892",
+              "duration_seconds": 1143.413
+            },
+            "author": {
+              "username": "instagram-user-106",
+              "display_name": null,
+              "avatar_url": "https://scrubbed.invalid/instagram-user-107",
+              "verified": false
+            },
+            "engagement": {
+              "views": 94,
+              "likes": 3,
+              "comments": 0,
+              "shares": null,
+              "saves": null
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2024-10-17T10:13:57.000Z",
+            "ext": {
+              "author_id": "62233324554",
+              "published_at_epoch": 1729160037,
+              "coauthors": []
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.031915,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 113
+          }
+        },
+        {
+          "post": {
+            "id": "3265298238999886527",
+            "url": "https://www.instagram.com/reel/C1Qq3K1S_q_/",
+            "content": {
+              "text": "\u2763\ufe0f\u2763\ufe0f #skincare #skincareforacnescars",
+              "media_urls": "https://scontent-hel3-1.cdninstagram.com/o1/v/t2/f2/m82/AQMWPTZggiQlqBSFjtVpwcEjTMvP2QU7hknjiivVw7wx_JYFiSTa17kbvCnWCcv9eAMWofd_DdjRsEwj8ixTqohFrKclrS-LVqU5dLI.mp4?_nc_cat=111&_nc_sid=5e9851&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_ohc=f49lX_zLwnIQ7kNvwEI0_Hp&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5JTlNUQUdSQU0uQ0xJUFMuQzMuNzIwLmRhc2hfYmFzZWxpbmVfMV92MSIsInhwdl9hc3NldF9pZCI6MzcxNzA4MDk4NzM2MDE2LCJhc3NldF9hZ2VfZGF5cyI6OTg2LCJ2aV91c2VjYXNlX2lkIjoxMDA5OSwiZHVyYXRpb25fcyI6MTYsInVybGdlbl9zb3VyY2UiOiJ3d3cifQ%3D%3D&ccb=17-1&vs=c309bc6ff0237e9d&_nc_vs=HBksFQIYT2lnX3hwdl9yZWVsc19wZXJtYW5lbnRfcHJvZC8wODQ0MEUwRTk1MTAyRkRGRTBGODJFNkRGNkY4MjU4Rl92aWRlb19kYXNoaW5pdC5tcDQVAALIARIAFQIYOnBhc3N0aHJvdWdoX2V2ZXJzdG9yZS9HT0F4bEJqdEV0NEQwTlFEQUJFdzM0WWVjdXg1YnFfRUFBQUYVAgLIARIAKAAYABsCiAd1c2Vfb2lsATEScHJvZ3Jlc3NpdmVfcmVjaXBlATEVAAAmoL77kqGEqQEVAigCQzMsF0Aw1T987ZFoGBJkYXNoX2Jhc2VsaW5lXzFfdjERAHX-B2XmnQEA&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_ss=7a3ba&_nc_zt=28&oh=00_AQKZDCCagX4GlRSAgaqgtmMsG60VG_-drifr8cmyBx3JSA&oe=6A9F2DF0",
+              "thumbnail_url": "https://scontent-hel3-1.cdninstagram.com/v/t51.71878-15/501880541_713608427879313_2635369370039962783_n.jpg?stp=dst-jpg_e15_p240x240_tt6&_nc_cat=101&ig_cache_key=MzI2NTI5ODIzODk5OTg4NjUyNw%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNMSVBTLnhwaWRzLjEwODAuc2RyLnZpZGVvX2RlZmF1bHRfY292ZXJfZnJhbWUuQzMifQ%3D%3D&_nc_ohc=6Oq-RBEgDF0Q7kNvwFLCOCv&_nc_oc=AdoeqG93QGSITmk1UOH1AcQHWPKeK4bgX8i-QOLoh0DAs9Zbo3iR1QVc_9eYgAUIEO8&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_ss=7a3ba&oh=00_AQKJpX9IFyUgQplvdY1xLIfnNhExXyD5Sd9TrIFEtWeXXA&oe=6AA349BC",
+              "duration_seconds": 16.833
+            },
+            "author": {
+              "username": "instagram-user-108",
+              "display_name": null,
+              "avatar_url": "https://scrubbed.invalid/instagram-user-109",
+              "verified": false
+            },
+            "engagement": {
+              "views": 2146,
+              "likes": 40,
+              "comments": 1,
+              "shares": null,
+              "saves": null
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2023-12-25T03:12:22.000Z",
+            "ext": {
+              "author_id": "1219278666",
+              "published_at_epoch": 1703473942,
+              "coauthors": []
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.019105,
+            "language": null,
+            "content_category": "other",
+            "estimated_reach": 2575
+          }
+        },
+        {
+          "post": {
+            "id": "2735366857466482518",
+            "url": "https://www.instagram.com/reel/CX1-aoNqo9W/",
+            "content": {
+              "text": "First order of business in our new Nature collection:\n\nNature\u2019s Nectar!!\n\nIf you\u2019ve been a Nature Bae, you\u2019d know that we\u2019ve never had a cleanser with suds because most of them are stripping. But I promise you this one won\u2019t strip your skin and calms inflamed skin. \n\nSome of the ingredients:\n\u2b50\ufe0f Collodial Oats \n\u2b50\ufe0f Turmeric\n\u2b50\ufe0f Yogurt Extract\n\u2b50\ufe0f Glycerin\n\nWe keep is simple and effective because that\u2019s what sensitive skin loves!!\n\nThese ingredients ensure your sensitive skin is cleansed properly and gently. The suds hug your skin and give a nourishing kiss goodnight or good morning!! \n\nNature\u2019s Nectar will be available Jan 1st. New Year\u2019s Day \ud83e\udd17\n\n#naturalskincare #naturalskincareforacneskin #naturalskincareproductsthatwork #naturalskincareproducts #naturalskincaretips #skincarethatwork #naturalskincareforacne #naturalproducts #clearskin #clearskintip #cleansingclaymask #moisturizer #toner #serum #oil #allskintypes #oilyskin #acneicskin #skincarefordryskin #skincareforoilyskin #skincareforacneicskin #skincareforwomen #skincareforacneproneskin #skincareforacnescars #clearskintipsandthreads #nobreakouts #breakoutfree #allureofnaturellc #allureofnature",
+              "media_urls": "https://scontent-hel3-1.cdninstagram.com/o1/v/t2/f2/m86/AQPIm3WJVFb_mlgW2GiPZPi_pItUWFolBWxbtJOohgat4Fiuy7gDRUug12e6l_sr-8KGTqZgkmvxlMD3JD77-BLXq8VtjkDS2hSQWV8.mp4?_nc_cat=110&_nc_sid=5e9851&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_ohc=9UW605-E6BoQ7kNvwG1EFfY&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5JTlNUQUdSQU0uQ0xJUFMuQzMuNzIwLmRhc2hfYmFzZWxpbmVfMV92MSIsInhwdl9hc3NldF9pZCI6NTMzOTY1NzAzMjcxNjYxOCwiYXNzZXRfYWdlX2RheXMiOjE3MTcsInZpX3VzZWNhc2VfaWQiOjEwMDk5LCJkdXJhdGlvbl9zIjoyOSwidXJsZ2VuX3NvdXJjZSI6Ind3dyJ9&ccb=17-1&vs=28daa9a06bd97f40&_nc_vs=HBksFQIYUmlnX3hwdl9yZWVsc19wZXJtYW5lbnRfc3JfcHJvZC8yMDQ4MEQ2RTcyQUQ5Njc5MkIxNEI5MkFEODk2RTVBQl92aWRlb19kYXNoaW5pdC5tcDQVAALIARIAFQIYOnBhc3N0aHJvdWdoX2V2ZXJzdG9yZS9HRFU4RmhDVzVWcmdQSkFBQVBCYWVVX21wUUprYnFfRUFBQUYVAgLIARIAKAAYABsCiAd1c2Vfb2lsATEScHJvZ3Jlc3NpdmVfcmVjaXBlATEVAAAmlMXCivmY_BIVAigCQzMsF0A9ogxJul41GBJkYXNoX2Jhc2VsaW5lXzFfdjERAHX-B2XmnQEA&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_ss=7a3ba&_nc_zt=28&oh=00_AQKhfhJMAQsLq1LizdGHsPBTjkC0cUsUJQeQ7y-WCXezNQ&oe=6A9F2973",
+              "thumbnail_url": "https://scontent-hel3-1.cdninstagram.com/v/t51.71878-15/504510719_24708032708785761_3223943468016101849_n.jpg?stp=dst-jpg_e15_p240x240_tt6&_nc_cat=109&ig_cache_key=MjczNTM2Njg1NzQ2NjQ4MjUxOA%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNMSVBTLnhwaWRzLjcyMC5zZHIudmlkZW9fZGVmYXVsdF9jb3Zlcl9mcmFtZS5DMyJ9&_nc_ohc=8VGaPn-KKawQ7kNvwE9j5hp&_nc_oc=Adqcq2E4v8gS7n4k-_WBDjDGvI--51A8rpzNT5X7RZo4LKG-yrXI2RPX3NhWm4Um0I4&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_ss=7a3ba&oh=00_AQKDlUnLmd1iSNQDeBd3R_nztv3RdRveIYXQs3geI8_nsQ&oe=6AA3493E",
+              "duration_seconds": 29.648
+            },
+            "author": {
+              "username": "instagram-user-110",
+              "display_name": null,
+              "avatar_url": "https://scrubbed.invalid/instagram-user-111",
+              "verified": false
+            },
+            "engagement": {
+              "views": 1366,
+              "likes": 17,
+              "comments": 1,
+              "shares": null,
+              "saves": null
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2021-12-23T23:13:03.000Z",
+            "ext": {
+              "author_id": "11219977303",
+              "published_at_epoch": 1640301183,
+              "coauthors": []
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.013177,
+            "language": "en",
+            "content_category": "beauty",
+            "estimated_reach": 1639
+          }
+        },
+        {
+          "post": {
+            "id": "3245091774165585762",
+            "url": "https://www.instagram.com/reel/C0I4cZ-ro9i/",
+            "content": {
+              "text": "\ud835\udc12\ud835\udc27\ud835\udc1a\ud835\udc22\ud835\udc25 \ud835\udc0c\ud835\udc2e\ud835\udc1c\ud835\udc22\ud835\udc27 \ud835\udc22\ud835\udc27 \ud835\udc2d\ud835\udc21\ud835\udc1e \ud835\udc1c\ud835\udc2b\ud835\udc1e\ud835\udc1a\ud835\udc26 \ud835\udc1c\ud835\udc1a\ud835\udc27 \ud835\udc2b\ud835\udc1e\ud835\udc26\ud835\udc28\ud835\udc2f\ud835\udc1e \ud835\udc2c\ud835\udc2d\ud835\udc2e\ud835\udc1b\ud835\udc1b\ud835\udc28\ud835\udc2b\ud835\udc27 \ud835\udc1a\ud835\udc1c\ud835\udc27\ud835\udc1e \ud835\udc2c\ud835\udc1c\ud835\udc1a\ud835\udc2b\ud835\udc2c \ud83d\udc0c\u2728\n\nSaint Blanc is an Acne Specialized Cosmetics company from Korea, Saint Blanc. They launched their brand in 2021 and hit 2022 sales of US$ 3.7 million in Korea & Japan. All of their products are Suitable for Acne-prone Skin Use and Hypoallergenic.\n\n\ud835\udc6a\ud835\udc8d\ud835\udc82\ud835\udc8a\ud835\udc8e\ud835\udc94:\n\u274f Soothes damaged skin\n\u274f Improves acne scars\n\u274f Brightening\n\nSaint Blanc Snail Moisturizer provides an innovative, highly effective three-step acne and scar care system.\n\n\ud835\udc74\ud835\udc82\ud835\udc8a\ud835\udc8f \ud835\udc70\ud835\udc8f\ud835\udc88\ud835\udc93\ud835\udc86\ud835\udc85\ud835\udc8a\ud835\udc86\ud835\udc8f\ud835\udc95\ud835\udc94:\n\u2713 \ud835\udde0\ud835\ude02\ud835\uddf0\ud835\uddf6\ud835\uddfb to enhance the skin\u2019s self-metabolizing ability. \n\u2713 \ud835\uddd6\ud835\uddf2\ud835\uddfb\ud835\ude01\ud835\uddf2\ud835\uddf9\ud835\uddf9\ud835\uddee \ud835\uddd4\ud835\ude00\ud835\uddf6\ud835\uddee\ud835\ude01\ud835\uddf6\ud835\uddf0\ud835\uddee help soothe and heal the skin, reduce redness and irritation, and improve skin elasticity.\n\u2713 \ud835\udde7\ud835\udde2\ud835\udddb \ud835\uddd6\ud835\uddfc\ud835\uddfa\ud835\uddfd\ud835\uddf9\ud835\uddf2\ud835\ude05 (\ud835\ude17\ud835\ude2a\ud835\ude2f\ud835\ude26 \ud835\ude1b\ud835\ude33\ud835\ude26\ud835\ude26 \ud835\ude22\ud835\ude2f\ud835\ude25 \ud835\ude08\ud835\ude2a\ud835\ude2d\ud835\ude22\ud835\ude2f\ud835\ude35\ud835\ude29\ud835\ude36\ud835\ude34 \ud835\ude08\ud835\ude2d\ud835\ude35\ud835\ude2a\ud835\ude34\ud835\ude34\ud835\ude2a\ud835\ude2e\ud835\ude22 \ud835\ude09\ud835\ude22\ud835\ude33\ud835\ude2c \ud835\ude0c\ud835\ude39\ud835\ude35\ud835\ude33\ud835\ude22\ud835\ude24\ud835\ude35) to brighten your skin and brings back your youth.\n\nIt has a serum-like cream texture, doesn\u2019t leaves greasy or sticky feeling. It has a subtle green tea scent. When I used this cream, I was amazed because the texture was very soft just like I used lotion and it absorbed very quickly into the skin. It also has a pump dispenser type which one pump is more than sufficient for the entire face. After I used this cream for a few days, I started to feel the texture of my skin improve, the pores on my skin became smaller, brighter, kept moist and the acne scars on my skin faded! It turned out that this cream can really get rid of acne scars, even I\u2019ve only been using it for a few days and I can already see the results. Suitable for all skin type. So, this cream can effectively brightens skin, removes acne scars, improves skin tone, and enhances skin texture.\n\nOverall, this cream gives my skin balanced moisture, is able to improve skin texture damaged by acne, treat skin pores and eliminate acne scars. Highly recommended for acne-prone and sensitive skin type. have problems with pores and those who want to get rid of acne scars which are very difficult to remove.\n\nThis product is available on Amazon.\n\n#saintblanccosmetics #snailmoisturizer #skincareforpimples #skincareforacnescars",
+              "media_urls": "https://scontent-hel3-1.cdninstagram.com/o1/v/t2/f2/m82/AQPBDa5vStF-jaBlSzQo0dK7UKVjfkuZDhUvuwYX3l_7CtObGaFBAdrcc6AhMIs4NiGbAORrZX1LNme5wF2kdMsIqFG2V8NAmTykxSk.mp4?_nc_cat=108&_nc_sid=5e9851&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_ohc=CDs-hAdtDJUQ7kNvwHK9BXo&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5JTlNUQUdSQU0uQ0xJUFMuQzMuNzIwLmRhc2hfYmFzZWxpbmVfMV92MSIsInhwdl9hc3NldF9pZCI6MTQ2MDcwODQ2NzgyODE2NywiYXNzZXRfYWdlX2RheXMiOjEwMTQsInZpX3VzZWNhc2VfaWQiOjEwMDk5LCJkdXJhdGlvbl9zIjozNywidXJsZ2VuX3NvdXJjZSI6Ind3dyJ9&ccb=17-1&vs=49f043575c0ad6c1&_nc_vs=HBksFQIYT2lnX3hwdl9yZWVsc19wZXJtYW5lbnRfcHJvZC9DNjRCNkEwMzZBREE3QUYwRjc1NzMzNkVEN0E2QTJBOV92aWRlb19kYXNoaW5pdC5tcDQVAALIARIAFQIYOnBhc3N0aHJvdWdoX2V2ZXJzdG9yZS9HRE5ESlJqLWpLOV9JanNMQUtxNk9zUi1UZkpzYnFfRUFBQUYVAgLIARIAKAAYABsCiAd1c2Vfb2lsATEScHJvZ3Jlc3NpdmVfcmVjaXBlATEVAAAmjpfDlbagmAUVAigCQzMsF0BCiHKwIMScGBJkYXNoX2Jhc2VsaW5lXzFfdjERAHX-B2XmnQEA&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_zt=28&_nc_ss=7a3ba&oh=00_AQJ0onpl9VMV5o2sZoPeQO8YTbLdRKxt_b4OBXq2ynqfAw&oe=6A9F274D",
+              "thumbnail_url": "https://scontent-hel3-1.cdninstagram.com/v/t51.71878-15/503807935_1822077775024566_1548615116033795176_n.jpg?stp=dst-jpg_e15_p240x240_tt6&_nc_cat=105&ig_cache_key=MzI0NTA5MTc3NDE2NTU4NTc2Mg%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNMSVBTLnhwaWRzLjEwODAuc2RyLnZpZGVvX2RlZmF1bHRfY292ZXJfZnJhbWUuQzMifQ%3D%3D&_nc_ohc=I8_bue1-ZWMQ7kNvwG5R7cc&_nc_oc=Ado1oPXZbAG0vZ2r9JMsIgWVZoskZ-3sgLrr1gc71NPawMwbWmBE5M42dbFPvKDBQdw&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_ss=7a3ba&oh=00_AQJG0yMx3tRolnbl1AhSPD4WmJvXYk7s3h-4WLkEwtmhBw&oe=6AA34618",
+              "duration_seconds": 37.08
+            },
+            "author": {
+              "username": "instagram-user-112",
+              "display_name": null,
+              "avatar_url": "https://scrubbed.invalid/instagram-user-113",
+              "verified": false
+            },
+            "engagement": {
+              "views": 1436,
+              "likes": null,
+              "comments": 2,
+              "shares": null,
+              "saves": null
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false,
+              "likes_hidden": true
+            },
+            "published_at": "2023-11-27T06:07:22.000Z",
+            "ext": {
+              "author_id": "45945261895",
+              "published_at_epoch": 1701065242,
+              "coauthors": []
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.001393,
+            "language": "en",
+            "content_category": "beauty",
+            "estimated_reach": 1723
+          }
+        },
+        {
+          "post": {
+            "id": "3380044741251798420",
+            "url": "https://www.instagram.com/reel/C7oVMivPZWU/",
+            "content": {
+              "text": "Retinol , niacinamide and vitamin C , nak pakai mana satu ni ? You also can include both ingredients for better result tau\ud83d\ude0d\n\nBut for beginner please start dengan low percentage first okay \ud83d\udc83\ud83c\udffb\n\n #skincaretips #skincareroutine #brighteningserumshahalam #brighteningskincareroutine #brighteningskincareshahalam #brightendarkspots #darkspotssolution #darkspotsskincare #skincarefordarkspots #skincareforacnescars #acnescarsskincare",
+              "media_urls": "https://scontent-hel3-1.cdninstagram.com/o1/v/t2/f2/m82/AQMqT0kGTc8PmOccRTg9elerVDKjOUr5O-ohoHe_KFgfYOjSe0sYWeTqQ69leGyaPWuVc6Gl_PbccajHW9ZELQ1tUgGwvKgzd-78cUw.mp4?_nc_cat=102&_nc_sid=5e9851&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_ohc=MoGInUpLTCwQ7kNvwEElN7J&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5JTlNUQUdSQU0uQ0xJUFMuQzMuNTc2LmRhc2hfYmFzZWxpbmVfMV92MSIsInhwdl9hc3NldF9pZCI6Mzg0NTIyMzc0NTU5ODI3LCJhc3NldF9hZ2VfZGF5cyI6ODI4LCJ2aV91c2VjYXNlX2lkIjoxMDA5OSwiZHVyYXRpb25fcyI6MTUsInVybGdlbl9zb3VyY2UiOiJ3d3cifQ%3D%3D&ccb=17-1&vs=b56358a2383d0cf9&_nc_vs=HBksFQIYT2lnX3hwdl9yZWVsc19wZXJtYW5lbnRfcHJvZC9DMzQzMEZGM0RCOUE1NDI5MTE0Qjk2RTlDOTVBMzlBRV92aWRlb19kYXNoaW5pdC5tcDQVAALIARIAFQIYR2lnX3hwdl9yZWVsc19wZXJtYW5lbnRfc3JfcHJvZC8xMDMyNjQ2NDQ4NDI5MTY0XzczNDc4NTY5MTQ5Mjg5Nzc3MTEubXA0FQICyAESACgAGAAbAogHdXNlX29pbAExEnByb2dyZXNzaXZlX3JlY2lwZQExFQAAJqbh2fiS7q4BFQIoAkMzLBdALiHKwIMSbxgSZGFzaF9iYXNlbGluZV8xX3YxEQB1_gdl5p0BAA&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_ss=7a3ba&_nc_zt=28&oh=00_AQKCIOdFOHAzcrjIN1f7YcUocngXepAbWdcfCHcbO06eyw&oe=6A9F575B",
+              "thumbnail_url": "https://scontent-hel3-1.cdninstagram.com/v/t51.71878-15/499582683_630111536667575_1659619865945925526_n.jpg?stp=dst-jpg_e15_p240x240_tt6&_nc_cat=100&ig_cache_key=MzM4MDA0NDc0MTI1MTc5ODQyMA%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNMSVBTLnhwaWRzLjU3Ni5zZHIudmlkZW9fZGVmYXVsdF9jb3Zlcl9mcmFtZS5DMyJ9&_nc_ohc=gC-hbI4-9VEQ7kNvwHXqXea&_nc_oc=Adrb75iym4DRaJXt7DheC9AoTTfNpLRhBx2YEJEog2nnB-71yh9aHXzxUIeaEAfaZJQ&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_ss=7a3ba&oh=00_AQImJRq6zOXXKB14Mts45UtYalM29IrBKguo0UzCGXOKVw&oe=6AA339B2",
+              "duration_seconds": 15.066
+            },
+            "author": {
+              "username": "instagram-user-114",
+              "display_name": null,
+              "avatar_url": "https://scrubbed.invalid/instagram-user-115",
+              "verified": false
+            },
+            "engagement": {
+              "views": 213,
+              "likes": 3,
+              "comments": 0,
+              "shares": null,
+              "saves": null
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2024-05-31T10:53:24.000Z",
+            "ext": {
+              "author_id": "4643437704",
+              "published_at_epoch": 1717152804,
+              "coauthors": []
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.014085,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 256
+          }
+        },
+        {
+          "post": {
+            "id": "3730038351538515734",
+            "url": "https://www.instagram.com/reel/DPDwh4-CW8W/",
+            "content": {
+              "text": "Dark spots & acne marks don\u2019t stand a chance \nI\u2019ve been using the full Abib Glutathiosome line in my night routine from toner to cream and my skin feels brighter, smoother, and so much more even. \ud83d\udc95\n\n\u2728 Key ingredients like Glutathione + Niacinamide work to fade dark spots, while Peptides + Hyaluronic Acid keep my skin hydrated and plump overnight.\n\nConsistent care = clearer skin \u2728\nWho else loves a glow-up while they sleep? \n\n@instagram-user-116 @instagram-user-117 \n\n#abib #yesstyle #abibserum #darkspots #hyperpigmentation #brightening #glutathione #vitaminc #niacinamide #kbeauty #abib #abibglutathiosome #glutathione #niacinamide #kbeautyskincare #abibskincare #nightskincareroutine #darkspotremover #acnemarks #fadeacnescars #brighteningskincare #hydratingcream #koreanskincareproducts #serumforskin #skincareroutineatnight #clearandbrightskin #acneskincareroutine #brighteningserum #skincareforacnescars",
+              "media_urls": "https://scontent-hel3-1.cdninstagram.com/o1/v/t2/f2/m367/AQMZSkjEYXoVL_a8uG05FuFhCxWSVLFNUfnphdaoKlH8STWN6heLoBAefTP5Gm7yxJPu_vrSiQzzW9DA277hCUEq4SvOOH3Fqfj-igs.mp4?_nc_cat=104&_nc_sid=5e9851&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_ohc=j8UJcU_Wd-gQ7kNvwE0OGVV&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5JTlNUQUdSQU0uQ0xJUFMuQzMuNzIwLmRhc2hfYmFzZWxpbmVfMV92MSIsInhwdl9hc3NldF9pZCI6MTE0NDYwNzMxNzU5Njg0NywiYXNzZXRfYWdlX2RheXMiOjM0NSwidmlfdXNlY2FzZV9pZCI6MTAwOTksImR1cmF0aW9uX3MiOjQyLCJ1cmxnZW5fc291cmNlIjoid3d3In0%3D&ccb=17-1&vs=c9e3f135cfdebc5f&_nc_vs=HBksFQIYQGlnX2VwaGVtZXJhbC83QzQ1MEFDQTgzQTVGNDBDNUJBNTUxNzgwNzkzMEVCRV92aWRlb19kYXNoaW5pdC5tcDQVAALIARIAFQIYRmlnX3hwdl9yZWVsc19wZXJtYW5lbnRfc3JfcHJvZC82Njc0MDQ0Mjk3MzUzODBfODk2Nzg3MTQ3NjkyMTkxMTYzMi5tcDQVAgLIARIAKAAYABsCiAd1c2Vfb2lsATEScHJvZ3Jlc3NpdmVfcmVjaXBlATEVAAAm3uqUifXAiAQVAigCQzMsF0BFAAAAAAAAGBJkYXNoX2Jhc2VsaW5lXzFfdjERAHX-B2XmnQEA&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_ss=7a3ba&_nc_zt=28&oh=00_AQJvugZmMAABYEtpzCtubeo90BxTD6wnxlDBcFrAYcP31A&oe=6AA331A9",
+              "thumbnail_url": "https://scontent-hel3-1.cdninstagram.com/v/t51.71878-15/553235612_3612116898938603_3641765235937637628_n.jpg?stp=dst-jpg_e15_p240x240_tt6&_nc_cat=110&ig_cache_key=MzczMDAzODM1MTUzODUxNTczNDExNDQ2MDg4Mjc1OTY2OTY%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNMSVBTLnhwaWRzLjY0MC5zZHIudmlkZW9fbmZyYW1lX2NvdmVyX2ZyYW1lLkMzIn0%3D&_nc_ohc=S2vnLHmSnTAQ7kNvwHtaZ-_&_nc_oc=AdrBSeBczw_4bSmju6aaJWu_xtj-yqjvStz9H4-qTOWS0xbckABJeHKO-TKFZ5e0Fzs&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_ss=7a3ba&oh=00_AQL4_iX9KB2aTlxvq24mmSvXAqO_Vm-gG0x73KQgrjaDJw&oe=6AA33B27",
+              "duration_seconds": 42.004
+            },
+            "author": {
+              "username": "instagram-user-118",
+              "display_name": null,
+              "avatar_url": "https://scrubbed.invalid/instagram-user-119",
+              "verified": false
+            },
+            "engagement": {
+              "views": 1070,
+              "likes": 83,
+              "comments": 71,
+              "shares": null,
+              "saves": null
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2025-09-26T08:30:09.000Z",
+            "ext": {
+              "author_id": "6802970824",
+              "published_at_epoch": 1758875409,
+              "coauthors": []
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.143925,
+            "language": "en",
+            "content_category": "beauty",
+            "estimated_reach": 1284
+          }
+        },
+        {
+          "post": {
+            "id": "3284918684004728575",
+            "url": "https://www.instagram.com/reel/C2WYCOMJT7_/",
+            "content": {
+              "text": "I can finally share this with you guys\ud83d\ude0d this is the Pure Treatment Set from Depelle Skincare  @instagram-user-120 \u2728\ud83c\uddf2\ud83c\uddfe\n\nHere\u2019s why you should try this:\n\u2022 Saves your time from going facial\n\u2022 It\u2019s a home treatment with much simpler routines\n\u2022 Saves cost from laser treatment \n\u2022 This skincare DOES NOT damage your skin\n\u2022 It can lighten your hyperpigmentation\n\nThe main ingredients are plant extracts & herbs so no harsh chemicals that can damage your skin \u274c and this has been my go-to, to lighten and reduce my dark spots & softens fine lines. \n\nDefinitely hydrating, moisturizing, firming & brightening! \u2728\n\nYou should check them out @instagram-user-120 \n.\n#depelleskin #depelleskincare #skincareset #skincaresets #skincareforacne #skincareforacnescars #skincareforsensitive #skincareforpigmentation #skincarelokal #localskincare #localskincaremalaysia #localskincarebrand #produklokal #ugccreator #ugccommunity #contentcreator #contentcreatorcommunity",
+              "media_urls": "https://scontent-hel3-1.cdninstagram.com/o1/v/t2/f2/m82/AQNniZuGK4wEuSMq9pGnRT6ivxkAvtqA3vyU_CmOF1Bws41x7Bde5DGRwU8Xlt8-Qg4VCf-QCMRasLC66imWi6QTOuSGYVKmkQk2XSI.mp4?_nc_cat=100&_nc_sid=5e9851&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_ohc=DYFBwBkwrKUQ7kNvwFqLFca&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5JTlNUQUdSQU0uQ0xJUFMuQzMuNzIwLmRhc2hfYmFzZWxpbmVfMV92MSIsInhwdl9hc3NldF9pZCI6NzAyNTI0MzI4NTM3NzY2LCJhc3NldF9hZ2VfZGF5cyI6OTU5LCJ2aV91c2VjYXNlX2lkIjoxMDA5OSwiZHVyYXRpb25fcyI6NTAsInVybGdlbl9zb3VyY2UiOiJ3d3cifQ%3D%3D&ccb=17-1&vs=cdaeff770ffe9da7&_nc_vs=HBksFQIYT2lnX3hwdl9yZWVsc19wZXJtYW5lbnRfcHJvZC8xNTQ5MTU4NkMyQjYxMTRBQUJCNjA1ODA2NzI3NDBCNV92aWRlb19kYXNoaW5pdC5tcDQVAALIARIAFQIYOnBhc3N0aHJvdWdoX2V2ZXJzdG9yZS9HT3h0R3hsVDkzSkdGY2tDQUxGTFBxamVqZ0pLYnFfRUFBQUYVAgLIARIAKAAYABsCiAd1c2Vfb2lsATEScHJvZ3Jlc3NpdmVfcmVjaXBlATEVAAAmzLrjkKa8vwIVAigCQzMsF0BJJHrhR64UGBJkYXNoX2Jhc2VsaW5lXzFfdjERAHX-B2XmnQEA&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_ss=7a3ba&_nc_zt=28&oh=00_AQIBrcINNkz4PPbB0PbKqAqw5XBHD4qFd2_wQh5DPUVo9w&oe=6A9F5845",
+              "thumbnail_url": "https://scontent-hel3-1.cdninstagram.com/v/t51.71878-15/495968950_1008505484606314_6484692948705226398_n.jpg?stp=dst-jpg_e15_p240x240_tt6&_nc_cat=111&ig_cache_key=MzI4NDkxODY4NDAwNDcyODU3NQ%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNMSVBTLnhwaWRzLjEwODAuc2RyLnZpZGVvX2RlZmF1bHRfY292ZXJfZnJhbWUuQzMifQ%3D%3D&_nc_ohc=9LMLH8VcoDEQ7kNvwHMS-48&_nc_oc=AdpIvyQxnn6NRBwXQsKACkAB0w3BBL39GJR3c0xNHlUSmz0t_M-vBISgapBloRltKHo&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_ss=7a3ba&oh=00_AQKtuMdv5pfETUhxbLN8Zksmw3V8tuH-QThoHM4Fz7ilMw&oe=6AA31AAB",
+              "duration_seconds": 50.292
+            },
+            "author": {
+              "username": "instagram-user-121",
+              "display_name": null,
+              "avatar_url": "https://scrubbed.invalid/instagram-user-122",
+              "verified": false
+            },
+            "engagement": {
+              "views": 387,
+              "likes": null,
+              "comments": 2,
+              "shares": null,
+              "saves": null
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false,
+              "likes_hidden": true
+            },
+            "published_at": "2024-01-21T05:03:01.000Z",
+            "ext": {
+              "author_id": "48897748182",
+              "published_at_epoch": 1705813381,
+              "coauthors": []
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.005168,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 464
+          }
+        },
+        {
+          "post": {
+            "id": "3059752973252284605",
+            "url": "https://www.instagram.com/reel/Cp2bR4vJdC9/",
+            "content": {
+              "text": "Here are some of my current fav SKINCARE products. I\u2019ve been loving these brands (mostly locals), they\u2019re super affordable compared to european or korean brands, but their performance are nothing less. Fyi, my skin is combination (normal to oily), so if you have oily skin, these products will probably work on you too. But remember that our skin is different and will react differently.\n.\nPRODUCTS mentioned in the video\n.\n.\n#skincare #skincarevideo #skincarereels #skincarelocal #skincarelokal #skincareforoilyskin #skincareforcombinationskin #skincareforacnescars #localbrand #proudlocal #localpride",
+              "media_urls": "https://scontent-hel3-1.cdninstagram.com/o1/v/t2/f2/m82/AQOmll2v-_VCN28oH85Bw1vpvNkudca4o6m-9S4FwcXOkmKKz0yN31qyCFXgIfEKyzFJGmvUYRMQxgYsfVReRuSCBWxIslfP1mheg8M.mp4?_nc_cat=100&_nc_sid=5e9851&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_ohc=vsSJwRAJHZEQ7kNvwEUuJr-&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5JTlNUQUdSQU0uQ0xJUFMuQzMuNzIwLmRhc2hfYmFzZWxpbmVfMV92MSIsInhwdl9hc3NldF9pZCI6NTMwNDI2Nzk1OTE0MTM2LCJhc3NldF9hZ2VfZGF5cyI6MTI3MCwidmlfdXNlY2FzZV9pZCI6MTAwOTksImR1cmF0aW9uX3MiOjQyLCJ1cmxnZW5fc291cmNlIjoid3d3In0%3D&ccb=17-1&vs=f3e95abc098943e4&_nc_vs=HBksFQIYT2lnX3hwdl9yZWVsc19wZXJtYW5lbnRfcHJvZC8xMzRGOTY4RjFEQkU0MDAyMjlDMzE0NTg4NDg5MDg4OV92aWRlb19kYXNoaW5pdC5tcDQVAALIARIAFQIYOnBhc3N0aHJvdWdoX2V2ZXJzdG9yZS9HT0VERGhRejE5YndOc1FGQUl6RHZ3RHQybHhaYnFfRUFBQUYVAgLIARIAKAAYABsCiAd1c2Vfb2lsATEScHJvZ3Jlc3NpdmVfcmVjaXBlATEVAAAmsM7_y_Oa8QEVAigCQzMsF0BFFT987ZFoGBJkYXNoX2Jhc2VsaW5lXzFfdjERAHX-B2XmnQEA&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_ss=7a3ba&_nc_zt=28&oh=00_AQJL0P4-ZCFpdKEGvwGAuC7_M1g4nZ3zJz8L4KiWp8V5cw&oe=6A9F48F1",
+              "thumbnail_url": "https://scontent-hel3-1.cdninstagram.com/v/t51.71878-15/503025496_1016588040631340_656885367042077461_n.jpg?stp=dst-jpg_e15_p240x240_tt6&_nc_cat=102&ig_cache_key=MzA1OTc1Mjk3MzI1MjI4NDYwNQ%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNMSVBTLnhwaWRzLjExNzAuc2RyLnZpZGVvX2RlZmF1bHRfY292ZXJfZnJhbWUuQzMifQ%3D%3D&_nc_ohc=FIk7bFaI6lkQ7kNvwE1tOGb&_nc_oc=Adpmo6ZGNYCMfNJLpuiAZCV_Zg_sifrofoXx3bqIMkrnfMa9vlI1PIg3GJ06FVofZl4&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_ss=7a3ba&oh=00_AQKS1yoRsdB4X7DZS8RFcofh1UXmdK15LkxxqkOh3djedg&oe=6AA34285",
+              "duration_seconds": 42.166
+            },
+            "author": {
+              "username": "instagram-user-123",
+              "display_name": null,
+              "avatar_url": "https://scrubbed.invalid/instagram-user-124",
+              "verified": false
+            },
+            "engagement": {
+              "views": 1366,
+              "likes": 25,
+              "comments": 6,
+              "shares": null,
+              "saves": null
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2023-03-16T12:50:30.000Z",
+            "ext": {
+              "author_id": "1482069706",
+              "published_at_epoch": 1678971030,
+              "coauthors": []
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.022694,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 1639
+          }
+        },
+        {
+          "post": {
+            "id": "2906942315493639851",
+            "url": "https://www.instagram.com/reel/ChXiKJhjMar/",
+            "content": {
+              "text": "In depth review for this cleanser and some of the other @instagram-user-125 products for acne-prone skin will be up on my Youtube channel soon! \ud83d\udc9a\n\n*All products purchased myself. Opinions are always honest and my own! When it comes to skincare, I like to show before and after results so you can decide if you think the product looks like it works rather than just listening to my thoughts. (Before & After pictures will be in my upcoming Youtube video about @instagram-user-125's 30 Days Miracle line! My goal is to help you with the content that I create. \u263a\ufe0f\n\nThe copyright to this content belongs solely to me, @instagram-user-126. (EXCEPT THE MUSIC) Please do not repost/reuse this content in any way without my explicit permission. Hashtags and tags do not give permission. Please feel free to DM me if you would like to use this content. \u263a\ufe0f\n\n#somebymi #somebymi30days #somebymi30daysmiracle #somebymi30dayschallenge #somebymi30daysmiracletoner #somebymi30daysmiracleserum #somebymiacneclearfoam #somebymiacne #koreanskincareforacne #koreanskincare #kskincare #skincareforacneproneskin #skincareforacne #acneproneskincare #acneproneskincareroutine #acneprone #skincareblogger #kskincareblogger #koreanskincarereview #skincareforacnescars #hyperpigmentationtreatment #acnescars #darkspots #getridoftexture #somebymiahabhapha",
+              "media_urls": "https://scontent-hel3-1.cdninstagram.com/o1/v/t2/f2/m86/AQMo7OfpHV5ct3yjaAXXBN3_i5rP8uJ2QmOyNt-DthgI77hWJgUTAE5RN4S-IKn1g4TYCGn5x0NnOYoYC3lyIuF5oLZZWQUS83Dr7KI.mp4?_nc_cat=109&_nc_sid=5e9851&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_ohc=UjvP6htrU1sQ7kNvwGtSBWU&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5JTlNUQUdSQU0uQ0xJUFMuQzMuNzIwLmRhc2hfYmFzZWxpbmVfMV92MSIsInhwdl9hc3NldF9pZCI6NzQ4NTg0MjM2MTk4MjIxLCJhc3NldF9hZ2VfZGF5cyI6MTQ4MCwidmlfdXNlY2FzZV9pZCI6MTAwOTksImR1cmF0aW9uX3MiOjE0LCJ1cmxnZW5fc291cmNlIjoid3d3In0%3D&ccb=17-1&vs=332fa64e4040ab00&_nc_vs=HBksFQIYUmlnX3hwdl9yZWVsc19wZXJtYW5lbnRfc3JfcHJvZC8yMjQ5NkVDODk3OTk5QjEyRDNGRDQ5NzIyQkRDRDdBOV92aWRlb19kYXNoaW5pdC5tcDQVAALIARIAFQIYOnBhc3N0aHJvdWdoX2V2ZXJzdG9yZS9HSHJqMXhGTlN4U0oyZWtEQUhQSXFyMkJiRnNaYnFfRUFBQUYVAgLIARIAKAAYABsCiAd1c2Vfb2lsATEScHJvZ3Jlc3NpdmVfcmVjaXBlATEVAAAmmqXdl6u11AIVAigCQzMsF0AsmZmZmZmaGBJkYXNoX2Jhc2VsaW5lXzFfdjERAHX-B2XmnQEA&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_ss=7a3ba&_nc_zt=28&oh=00_AQKxCKTeXr4icMdGkhlqPfyOdlyhMRTED6HQYp0f6cxCDw&oe=6A9F32F6",
+              "thumbnail_url": "https://scontent-hel3-1.cdninstagram.com/v/t51.71878-15/497528582_1350914825965156_772064854942574096_n.jpg?stp=dst-jpg_e15_p240x240_tt6&_nc_cat=101&ig_cache_key=MjkwNjk0MjMxNTQ5MzYzOTg1MQ%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNMSVBTLnhwaWRzLjU0MC5zZHIudmlkZW9fZGVmYXVsdF9jb3Zlcl9mcmFtZS5DMyJ9&_nc_ohc=o_Iyykt9JGsQ7kNvwEfGw2a&_nc_oc=AdoyEkdMWu34svThkjZ4LYxdd8_OFGkVz49H5qeLrW39oVzUFTVEwyPxeM5qAEVTB34&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_ss=7a3ba&oh=00_AQK6bQqjFLzjN3Bc0UvnZsHwtMJ8_-20BaOvTl-SvuS5sQ&oe=6AA347E9",
+              "duration_seconds": 14.512
+            },
+            "author": {
+              "username": "instagram-user-127",
+              "display_name": null,
+              "avatar_url": "https://scrubbed.invalid/instagram-user-128",
+              "verified": false
+            },
+            "engagement": {
+              "views": 6690,
+              "likes": 50,
+              "comments": 3,
+              "shares": null,
+              "saves": null
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2022-08-17T16:50:57.000Z",
+            "ext": {
+              "author_id": "8580823037",
+              "published_at_epoch": 1660755057,
+              "coauthors": []
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.007922,
+            "language": "en",
+            "content_category": "entertainment",
+            "estimated_reach": 8028
+          }
+        },
+        {
+          "post": {
+            "id": "2738985587975013621",
+            "url": "https://www.instagram.com/reel/CYC1OFoKkT1/",
+            "content": {
+              "text": "Nature\u2019s Hydration lives up to it\u2019s name wholeheartedly!\n\n\ud83d\udc9a If your skin is shiny and tight, you\u2019re lacking hydration! Lucky for you Nature\u2019s Hydration will be in stock next week!\n\n\ud83d\udc9a The ingredients within promote giving your skin the moisture and TLC that it deserves. This hydration will heal damaged, sensitive skin as well as provide your skin with the ability to retain moisture and a healthy glow!\n\n\ud83d\udc9a We\u2019re sure to have your skin hydrated all day long. \n\n\ud83d\udc9aHydration fades dark spots, reduces wrinkles, and is healing on so many levels. We have calming ingredients in there as well so you\u2019re all covered!\n\n\ud83d\udc9a There\u2019s only one necessary step after hydration. Stay tuned!\n\n\u203c\ufe0f The Nature Collection will be available for purchase January 1st, 2022\n\n#naturalskincare #naturalskincareforacneskin #naturalskincareproductsthatwork #naturalskincareproducts #naturalskincaretips #skincarethatwork #naturalskincareforacne #naturalproducts #clearskin #clearskintip #cleansingclaymask #moisturizer #toner #serum #oil #allskintypes #oilyskin #acneicskin #skincarefordryskin #skincareforoilyskin #skincareforacneicskin #skincareforwomen #skincareforacneproneskin #skincareforacnescars #clearskintipsandthreads #nobreakouts #breakoutfree #allureofnaturellc #allureofnature",
+              "media_urls": "https://scontent-hel3-1.cdninstagram.com/o1/v/t2/f2/m86/AQMLrZ72oEpG8C9PC70MADXNtIreciBzcMcYVrHblPf5GcxLPKxWki9WF5OLc_M5T_aM5wkDVXbJgrFXYY6zDfbC3MiO0Gb_G7QhS-E.mp4?_nc_cat=110&_nc_sid=5e9851&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_ohc=HczG7vn4aEsQ7kNvwGX6vpM&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5JTlNUQUdSQU0uQ0xJUFMuQzMuNzIwLmRhc2hfYmFzZWxpbmVfMV92MSIsInhwdl9hc3NldF9pZCI6NTExMjAzMDQ2NzUzMTE3LCJhc3NldF9hZ2VfZGF5cyI6MTcxMiwidmlfdXNlY2FzZV9pZCI6MTAwOTksImR1cmF0aW9uX3MiOjMwLCJ1cmxnZW5fc291cmNlIjoid3d3In0%3D&ccb=17-1&vs=5eb97ae2f6a94ba3&_nc_vs=HBksFQIYUmlnX3hwdl9yZWVsc19wZXJtYW5lbnRfc3JfcHJvZC80RTQzMjAyQ0E0NkRDMjdBQjBDQkMzM0IwRkI1MDNCNV92aWRlb19kYXNoaW5pdC5tcDQVAALIARIAFQIYOnBhc3N0aHJvdWdoX2V2ZXJzdG9yZS9HQnRjSXhDUEVSbDlRNUVCQUR2amczQ3ZEUXdjYnFfRUFBQUYVAgLIARIAKAAYABsCiAd1c2Vfb2lsATEScHJvZ3Jlc3NpdmVfcmVjaXBlATEVAAAmuo2UwPe76AEVAigCQzMsF0A-GZmZmZmaGBJkYXNoX2Jhc2VsaW5lXzFfdjERAHX-B2XmnQEA&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_ss=7a3ba&_nc_zt=28&oh=00_AQLw1hgOF2PACZmqkGZeu1nmiKpE7PE7uE9ePNkbVuTaJA&oe=6A9F41C3",
+              "thumbnail_url": "https://scontent-hel3-1.cdninstagram.com/v/t51.71878-15/495054324_1204234794116602_4475085218864213970_n.jpg?stp=dst-jpg_e15_p240x240_tt6&_nc_cat=100&ig_cache_key=MjczODk4NTU4Nzk3NTAxMzYyMQ%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNMSVBTLnhwaWRzLjcyMC5zZHIudmlkZW9fZGVmYXVsdF9jb3Zlcl9mcmFtZS5DMyJ9&_nc_ohc=uRE_Ev8t_TkQ7kNvwGAwCCH&_nc_oc=Adogw1AMYVFA9oBCHp9Q0WH3e6E8j5VXIIz302bVArLFm9ylsptia2wJ5XKTs9rvHT8&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_ss=7a3ba&oh=00_AQJ-dCW2BrDA5vGOp6ZAzcRtrLkaREXAACIIy4nYnMWyhw&oe=6AA34443",
+              "duration_seconds": 30.1
+            },
+            "author": {
+              "username": "instagram-user-110",
+              "display_name": null,
+              "avatar_url": "https://scrubbed.invalid/instagram-user-111",
+              "verified": false
+            },
+            "engagement": {
+              "views": 1263,
+              "likes": 17,
+              "comments": 0,
+              "shares": null,
+              "saves": null
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2021-12-28T23:02:58.000Z",
+            "ext": {
+              "author_id": "11219977303",
+              "published_at_epoch": 1640732578,
+              "coauthors": []
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.01346,
+            "language": "en",
+            "content_category": "beauty",
+            "estimated_reach": 1516
+          }
+        },
+        {
+          "post": {
+            "id": "2787002464810087472",
+            "url": "https://www.instagram.com/reel/Cata_m_JLQw/",
+            "content": {
+              "text": "#skincare #skincare101education #skincare101 #skincareforacnescars #reelsinstagram #reelsviral",
+              "media_urls": "https://scontent-hel3-1.cdninstagram.com/o1/v/t2/f2/m86/AQMCWPya8-32Hk4Uzocv6qLdj9hJoJPn6ziJiNDYjgD1inCg2123GxX8hdl6f6Eac4Y3nmGepR1b8m6sIe5C5TWmx3iAWwGfXWgF1bw.mp4?_nc_cat=107&_nc_sid=5e9851&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_ohc=xl1UOXj_VuIQ7kNvwG1naIN&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5JTlNUQUdSQU0uQ0xJUFMuQzMuNzIwLmRhc2hfYmFzZWxpbmVfMV92MSIsInhwdl9hc3NldF9pZCI6MzI4NTM4MzE1OTYxMzU5LCJhc3NldF9hZ2VfZGF5cyI6MTY0NiwidmlfdXNlY2FzZV9pZCI6MTAwOTksImR1cmF0aW9uX3MiOjExLCJ1cmxnZW5fc291cmNlIjoid3d3In0%3D&ccb=17-1&vs=e1689a588bd2d355&_nc_vs=HBksFQIYUmlnX3hwdl9yZWVsc19wZXJtYW5lbnRfc3JfcHJvZC85MjQxMjVFNjkxRjI1MTg3NzIzQ0MzNzJGQzc4Rjc4RV92aWRlb19kYXNoaW5pdC5tcDQVAALIARIAFQIYOnBhc3N0aHJvdWdoX2V2ZXJzdG9yZS9HRmZ4WWhDcUE1elNpUWNIQUhDdnVIZko0d05zYnFfRUFBQUYVAgLIARIAKAAYABsCiAd1c2Vfb2lsATEScHJvZ3Jlc3NpdmVfcmVjaXBlATEVAAAmntDxmbmzlQEVAigCQzMsF0AnAAAAAAAAGBJkYXNoX2Jhc2VsaW5lXzFfdjERAHX-B2XmnQEA&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_ss=7a3ba&_nc_zt=28&oh=00_AQIzgZPy0DPE3l9nn_Xgps1-CVUenVfmgjsQ2P3zXneNww&oe=6A9F41A4",
+              "thumbnail_url": "https://scontent-hel3-1.cdninstagram.com/v/t51.71878-15/503987148_1126201136195069_7794169167420310755_n.jpg?stp=dst-jpg_e15_p240x240_tt6&_nc_cat=103&ig_cache_key=Mjc4NzAwMjQ2NDgxMDA4NzQ3Mg%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNMSVBTLnhwaWRzLjcyMC5zZHIudmlkZW9fZGVmYXVsdF9jb3Zlcl9mcmFtZS5DMyJ9&_nc_ohc=u9ucMpppFEEQ7kNvwGoppZO&_nc_oc=Adqo-WGvrCetbggvBsJErxdsgnr0LkNpSOLdYj0owoV8dfOZGActu6qZZKemOhsXXn4&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_ss=7a3ba&oh=00_AQL1Z3wwTfk7G11I25VSqOXI01qi9CC4h_gAT3vVq6ThQg&oe=6AA31C64",
+              "duration_seconds": 11.563
+            },
+            "author": {
+              "username": "instagram-user-129",
+              "display_name": null,
+              "avatar_url": "https://scrubbed.invalid/instagram-user-130",
+              "verified": false
+            },
+            "engagement": {
+              "views": 8,
+              "likes": 2,
+              "comments": 0,
+              "shares": null,
+              "saves": null
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2022-03-05T05:04:42.000Z",
+            "ext": {
+              "author_id": "34969677449",
+              "published_at_epoch": 1646456682,
+              "coauthors": []
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.25,
+            "language": null,
+            "content_category": "other",
+            "estimated_reach": 10
+          }
+        },
+        {
+          "post": {
+            "id": "3553404793643598450",
+            "url": "https://www.instagram.com/reel/DFQOtVETAJy/",
+            "content": {
+              "text": "\"Post-inflammatory erythema: The red marks left behind by acne. \ud83d\udc94 Post acne scars \ud83d\udc94\n\n #skincarejourney, #skincaretips, #hyperpigmentation\n#postacnemarks\n#inflammatoryacnemarks\n * #postinflammatoryerythema\n * #pigmentation\n * #fadingredmarks\n * #skincareforhyperpigmentation\n * #skincareforacnescars\n#fypppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp\n#acnejourneytoclearskin",
+              "media_urls": "https://scontent-hel3-1.cdninstagram.com/o1/v/t2/f2/m86/AQNr9R5iu_0roZEM15YjCtIj8-jolrbQ4uaETBA93LZ8BziSrR2cFmdGbyucmd9NXBVbGVfgU-NWgNX4eWlO4kUguddLDzQuDknYhK0.mp4?_nc_cat=103&_nc_sid=5e9851&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_ohc=XZ4jE5GdZh0Q7kNvwHmGLCZ&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5JTlNUQUdSQU0uQ0xJUFMuQzMuMzYwLmRhc2hfYmFzZWxpbmVfM192MSIsInhwdl9hc3NldF9pZCI6MTI4NzI2NzA5NTY4NjU5MCwiYXNzZXRfYWdlX2RheXMiOjU4OCwidmlfdXNlY2FzZV9pZCI6MTAwOTksImR1cmF0aW9uX3MiOjQsInVybGdlbl9zb3VyY2UiOiJ3d3cifQ%3D%3D&ccb=17-1&vs=d7457eadb149e26d&_nc_vs=HBksFQIYUmlnX3hwdl9yZWVsc19wZXJtYW5lbnRfc3JfcHJvZC9ENzQ1NDY1QzEwQUZFQ0E1NkM1QzM3OUZDMTZBQjI4OV92aWRlb19kYXNoaW5pdC5tcDQVAALIARIAFQIYOnBhc3N0aHJvdWdoX2V2ZXJzdG9yZS9HSkRSVXh5ek1GNlo0Mm9HQUhQSzQ2MVhReWthYnFfRUFBQUYVAgLIARIAKAAYABsCiAd1c2Vfb2lsATEScHJvZ3Jlc3NpdmVfcmVjaXBlATEVAAAm_LbBn-ewyQQVAigCQzMsF0AREGJN0vGqGBJkYXNoX2Jhc2VsaW5lXzNfdjERAHX-B2XmnQEA&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_ss=7a3ba&_nc_zt=28&oh=00_AQKM9BgZhNiNN2VHRCwGY1WJSNZO1V41mA4d5NjJe0RQHA&oe=6A9F414C",
+              "thumbnail_url": "https://scontent-hel3-1.cdninstagram.com/v/t51.75761-15/475015892_17864668788317130_4919723634136562278_n.jpg?stp=dst-jpg_e15_p240x240_tt6&_nc_cat=106&ig_cache_key=MzU1MzQwNDc5MzY0MzU5ODQ1MA%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNMSVBTLnhwaWRzLjU0MC5zZHIudmlkZW9fZGVmYXVsdF9jb3Zlcl9mcmFtZS5DMyJ9&_nc_ohc=JzfSfiNsucMQ7kNvwG68HoE&_nc_oc=AdpTLUZPed2WMqq9bVixhDlR_ytS8AK2kGkLfca1w5rqCrMl1iNMsR998oZ8Sd-irOI&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_ss=7a3ba&oh=00_AQLrIkoq4qUThvg53umZr65T9ryjdfJeaadahGx6vCmX_w&oe=6AA31ACB",
+              "duration_seconds": 4.318
+            },
+            "author": {
+              "username": "instagram-user-131",
+              "display_name": null,
+              "avatar_url": "https://scrubbed.invalid/instagram-user-132",
+              "verified": false
+            },
+            "engagement": {
+              "views": 3210,
+              "likes": null,
+              "comments": 4,
+              "shares": null,
+              "saves": null
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false,
+              "likes_hidden": true
+            },
+            "published_at": "2025-01-25T15:29:16.000Z",
+            "ext": {
+              "author_id": "69529925129",
+              "published_at_epoch": 1737818956,
+              "coauthors": []
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.001246,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 3852
+          }
+        },
+        {
+          "post": {
+            "id": "3729195282501615344",
+            "url": "https://www.instagram.com/reel/DPAw1nvkj7w/",
+            "content": {
+              "text": "Struggling with pitted scars, large pores, or rough skin texture? \ud83d\ude31\u2728\nJust look at these transformations and let the results speak for themselves!\nThis set has Refine scrub & pore minimizer. Together, they help improve acne scars, refine uneven texture, and reveal radiant, glowing skin \ud83c\udf38\nDM me to see if you want more details about this set \ud83d\udc95\n\n#microdermabrasion\n#skincareforacnescars\n#reduceporesnaturally\n#pittedscars\n#postacnescars\n#unevenskin \n#largepores\n#skincaremalaysia \n#acnemarks \n#acnescars",
+              "media_urls": "https://scontent-hel3-1.cdninstagram.com/o1/v/t2/f2/m367/AQPHQ9rcARA748i4DEtIpSHSRixyRm67PawqWshvJECY9PwDCAzh6PKKVb66zI03E9YhjHFDxVrBKOkYUVO_1c4aWUYdBa527i8LyAk.mp4?_nc_cat=109&_nc_sid=5e9851&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_ohc=BJNUBFtLERUQ7kNvwFimKGt&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5JTlNUQUdSQU0uQ0xJUFMuQzMuNzIwLmRhc2hfYmFzZWxpbmVfMV92MSIsInhwdl9hc3NldF9pZCI6MTQ1NzEwNDExNTUxNDUwMywiYXNzZXRfYWdlX2RheXMiOjM0NiwidmlfdXNlY2FzZV9pZCI6MTAwOTksImR1cmF0aW9uX3MiOjQwLCJ1cmxnZW5fc291cmNlIjoid3d3In0%3D&ccb=17-1&vs=2b70267f21e1d25d&_nc_vs=HBksFQIYQGlnX2VwaGVtZXJhbC9ENjQwQTBGMDFFMkRFRTNFNDIyREJDMTE2NkVCODdBNV92aWRlb19kYXNoaW5pdC5tcDQVAALIARIAFQIYR2lnX3hwdl9yZWVsc19wZXJtYW5lbnRfc3JfcHJvZC8xMzg4NTk1NzgzMjY2MTQxXzQ1MDA2Njg0OTQyMDUzMTkxODEubXA0FQICyAESACgAGAAbAogHdXNlX29pbAExEnByb2dyZXNzaXZlX3JlY2lwZQExFQAAJo7ypdPPzpYFFQIoAkMzLBdARBEGJN0vGxgSZGFzaF9iYXNlbGluZV8xX3YxEQB1_gdl5p0BAA&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_ss=7a3ba&_nc_zt=28&oh=00_AQLiXmUs15yhSuXwSp56fT4WwCvVy49BrrFFZD6DyQFtwg&oe=6AA34ABA",
+              "thumbnail_url": "https://scontent-hel3-1.cdninstagram.com/v/t51.71878-15/554777092_1329776431890240_1654040273655013161_n.jpg?stp=dst-jpg_e15_p240x240_tt6&_nc_cat=100&ig_cache_key=MzcyOTE5NTI4MjUwMTYxNTM0NA%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNMSVBTLnhwaWRzLjY0MC5zZHIudmlkZW9fZGVmYXVsdF9jb3Zlcl9mcmFtZS5DMyJ9&_nc_ohc=cNJePYfX1ecQ7kNvwFdsX5-&_nc_oc=Adp80LN984K3dWop3UXu5-Awp3cxi640j5UFYYBvqOVe-Q20VLBUAWoQLsZBToYlBCk&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_ss=7a3ba&oh=00_AQJsr3WLQnBpfMjdlrlO-UGwl9vfTMZ3n5dPnN-C27-WVQ&oe=6AA342B6",
+              "duration_seconds": 40.193
+            },
+            "author": {
+              "username": "instagram-user-133",
+              "display_name": null,
+              "avatar_url": "https://scrubbed.invalid/instagram-user-134",
+              "verified": false
+            },
+            "engagement": {
+              "views": 222,
+              "likes": 2,
+              "comments": 0,
+              "shares": null,
+              "saves": null
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2025-09-25T04:32:51.000Z",
+            "ext": {
+              "author_id": "54197188865",
+              "published_at_epoch": 1758774771,
+              "coauthors": []
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.009009,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 266
+          }
+        },
+        {
+          "post": {
+            "id": "3734576614445953191",
+            "url": "https://www.instagram.com/reel/DPT4aTqiDCn/",
+            "content": {
+              "text": "Brightens complexion\nReduces fine lines & wrinkles\nMinimizes pores & evens skin tone. \n . @instagram-user-135\n . @instagram-user-136 \n. \nFor uneven skin tone \nAnd acne scars\n  Get glowing, healthy-looking skin with the power of Niacinamide!  DermaCo #NiacinamideSerum #GlowingSkin #SkincareLovers\u201d Here are some relevant hashtags for Niacinamide serum:\n\n #NiacinamideSerum\n #EvenSkinTone\n #AcneScarTreatment\n #GlowingSkin\n #SkinBrightening\n #HyperPigmentationSolution\n #AcneScarCare\n#SkinToneCorrector\n #SkincareForAcneScars\n #UnevenSkinToneSolution\n#RadiantSkin\n #SkinCareEssentials\n #SerumForSkin\n #DermaCoNiacinamide\n\n- #SkincareLovers\n- #SkinCareCommunity\n- #GlowUp\n- #SkinGoals\n- #BeautyProducts",
+              "media_urls": "https://scontent-hel3-1.cdninstagram.com/o1/v/t2/f2/m367/AQOgkbJopV9lF0eSSNohan6dCl7BpwA1z4m_8-9uzRu_P4S_J-vGVr74fIbJevliSgU8IpuIsKwvoZAtAnXN9xfY2bGNTPTMELt1RIc.mp4?_nc_cat=103&_nc_sid=5e9851&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_ohc=BYtx0f4Iy_8Q7kNvwFwFzH9&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5JTlNUQUdSQU0uQ0xJUFMuQzMuNzIwLmRhc2hfYmFzZWxpbmVfMV92MSIsInhwdl9hc3NldF9pZCI6ODI2MTI5OTE5NzU5MTYwLCJhc3NldF9hZ2VfZGF5cyI6MzM4LCJ2aV91c2VjYXNlX2lkIjoxMDA5OSwiZHVyYXRpb25fcyI6MTcsInVybGdlbl9zb3VyY2UiOiJ3d3cifQ%3D%3D&ccb=17-1&vs=23c40db540dd3707&_nc_vs=HBksFQIYQGlnX2VwaGVtZXJhbC82MDQ3QTkxRUYyRDVGMDI2NkZCMTM4NDA5M0JFM0NCOF92aWRlb19kYXNoaW5pdC5tcDQVAALIARIAFQIYR2lnX3hwdl9yZWVsc19wZXJtYW5lbnRfc3JfcHJvZC8xMTI2MTQwMjMyNDQyNzU1XzE5NjkwODkyODEwMjUwNTEzMDUubXA0FQICyAESACgAGAAbAogHdXNlX29pbAExEnByb2dyZXNzaXZlX3JlY2lwZQExFQAAJvDMvsaL1_cCFQIoAkMzLBdAMd2yLQ5WBBgSZGFzaF9iYXNlbGluZV8xX3YxEQB1_gdl5p0BAA&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_ss=7a3ba&_nc_zt=28&oh=00_AQIuvRsWJV6hFTdGN4PcB4GLrn8tUe8vYhVdgsDCclgCxQ&oe=6AA32F98",
+              "thumbnail_url": "https://scontent-hel3-1.cdninstagram.com/v/t51.82787-15/558889374_18372471094147208_3738494522100718164_n.jpg?stp=dst-jpg_e15_p240x240_tt6&_nc_cat=110&ig_cache_key=MzczNDU3NjYxNDQ0NTk1MzE5MTE4MzcyNDcxMDg4MTQ3MjA4.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNMSVBTLnhwaWRzLjExNzAuc2RyLnZpZGVvX2RlZmF1bHRfY292ZXJfZnJhbWUuQzMifQ%3D%3D&_nc_ohc=rFfxLwL_mT0Q7kNvwFiHMGE&_nc_oc=Adpc0hGsrkK52KvGps5wmoLciGBZJ7qvRD9As828XD9uzSsdHh1-2bqfw8OsT-p1N2k&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_ss=7a3ba&oh=00_AQKR3NxLv6gPpg47g_l_9z2Ucg8ZcgBRftWAQ2UUXYg_dw&oe=6AA3412E",
+              "duration_seconds": 17.877
+            },
+            "author": {
+              "username": "instagram-user-137",
+              "display_name": null,
+              "avatar_url": "https://scrubbed.invalid/instagram-user-138",
+              "verified": false
+            },
+            "engagement": {
+              "views": 2280,
+              "likes": 59,
+              "comments": 7,
+              "shares": null,
+              "saves": null
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2025-10-02T14:48:10.000Z",
+            "ext": {
+              "author_id": "4445395207",
+              "published_at_epoch": 1759416490,
+              "coauthors": []
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.028947,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": 2736
+          }
+        },
+        {
+          "post": {
+            "id": "2745252509687052909",
+            "url": "https://www.instagram.com/reel/CYZGJzSpXpt/",
+            "content": {
+              "text": "\u2728How to treat acne marks\u2728\nHey guys! \ud83d\ude4b\ud83c\udffb\u200d\u2640\ufe0f\nSo recently I got my hands on few products from @instagram-user-139 which includes AHA BHA foaming facewash, 10% Niacinamide Serum, 1% Hyaluronic Sunscreen which i have included in my skincare for acne free skin. \u2705\n\ud83d\udfe6Benefits of AHA BHA foaming facewash is that it controls acne, is oil free and gently exfoliates the skin\n\ud83d\udfeaBenefits of 10% Niacinamide Serum is that it Fights Acne, Fades Acne Marks, Controls Sebum Production \n\ud83d\udfe8Benefits of 1% Hyaluronic sunscreen is that it protects skin against blue light and provides broad spectrum protection and is non greasy and fragrance free. \n.\nTo get your hands on these products do check their website: www.thedermaco.com\n\n#NiacinAwayAcneMarks \n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n#makeupandhairbysurbhi #thedermaco #thedermacoindia #thedermacoskincare #acnefreeskin #acneproneskincare #ahabhafacewash #ahabhafoamingcleanser #niacinamideserum #hyaluronicsunscreen #thedermacosunscreen #thedermaconiacinamideserum #thedermacoahabhagel #acneproneskincareroutine #acneproneskintype #acneproneskinsolution #thedermacoregimen #thedermacoproductreview #thedermacoproducts #thedermacoreview #skincareforacne #skincareforacneproneskin #skincareforacneskin #skincareforacnescars",
+              "media_urls": "https://scontent-hel3-1.cdninstagram.com/o1/v/t2/f2/m86/AQMvJuntnP3FSA2ITlqwcYzprLKg6tX3gW5AP1TvG2YvRAidMfCmUohwWxJpSfqEZuVsubH9So9NBM4u-6ZEDOqtyCdmBDrSWp-yQzs.mp4?_nc_cat=106&_nc_sid=5e9851&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_ohc=n9zR-4YIBPMQ7kNvwF3rZm6&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5JTlNUQUdSQU0uQ0xJUFMuQzMuNzIwLmRhc2hfYmFzZWxpbmVfMV92MSIsInhwdl9hc3NldF9pZCI6NzAyNDkzNjkxMTYwMTkzLCJhc3NldF9hZ2VfZGF5cyI6MTcwMywidmlfdXNlY2FzZV9pZCI6MTAwOTksImR1cmF0aW9uX3MiOjQwLCJ1cmxnZW5fc291cmNlIjoid3d3In0%3D&ccb=17-1&vs=132021fad543df5f&_nc_vs=HBksFQIYUmlnX3hwdl9yZWVsc19wZXJtYW5lbnRfc3JfcHJvZC8xOTRFNEVBRkQ0RTAzRDY4MTFGMTdCMkIyQjQ5QjFCRV92aWRlb19kYXNoaW5pdC5tcDQVAALIARIAFQIYOnBhc3N0aHJvdWdoX2V2ZXJzdG9yZS9HQmdKTGhCN1ZqOUx3aEFCQURYQ0NmZm5yOElhYnFfRUFBQUYVAgLIARIAKAAYABsCiAd1c2Vfb2lsATEScHJvZ3Jlc3NpdmVfcmVjaXBlATEVAAAmgprZ7sG6vwIVAigCQzMsF0BEMzMzMzMzGBJkYXNoX2Jhc2VsaW5lXzFfdjERAHX-B2XmnQEA&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_ss=7a3ba&_nc_zt=28&oh=00_AQLGIlnqTjQQ4EUO3Y7gpQxhy7mW0mDizgNDBvKoSG9pfg&oe=6A9F2C67",
+              "thumbnail_url": "https://scontent-hel3-1.cdninstagram.com/v/t51.71878-15/491456178_1497287911680763_6791113902348190988_n.jpg?stp=dst-jpg_e15_p240x240_tt6&_nc_cat=105&ig_cache_key=Mjc0NTI1MjUwOTY4NzA1MjkwOQ%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNMSVBTLnhwaWRzLjgyOC5zZHIudmlkZW9fZGVmYXVsdF9jb3Zlcl9mcmFtZS5DMyJ9&_nc_ohc=mc3Ulrkt_J4Q7kNvwEqU4eS&_nc_oc=AdprCmPcYClpeo1829KHZ2GhMWMmfMXRhClNAHRlRSjBvxtsvHzM2OAN-qbEDLwHGBE&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_ss=7a3ba&oh=00_AQKeTz9De4G-mr23JCeWZ9NVe-wxhq13nR1kunG3fWTyxg&oe=6AA334CE",
+              "duration_seconds": 40.4
+            },
+            "author": {
+              "username": "instagram-user-140",
+              "display_name": null,
+              "avatar_url": "https://scrubbed.invalid/instagram-user-141",
+              "verified": false
+            },
+            "engagement": {
+              "views": 1045,
+              "likes": 50,
+              "comments": 0,
+              "shares": null,
+              "saves": null
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2022-01-06T14:34:34.000Z",
+            "ext": {
+              "author_id": "1351751717",
+              "published_at_epoch": 1641479674,
+              "coauthors": []
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.047847,
+            "language": "en",
+            "content_category": "beauty",
+            "estimated_reach": 1254
+          }
+        },
+        {
+          "post": {
+            "id": "2819583594558071941",
+            "url": "https://www.instagram.com/reel/CchLFcoJySF/",
+            "content": {
+              "text": "#skincare #skincareforacnescars #skincare101education #skincare101 #skincaretips #reelsinstagram #reelsviral",
+              "media_urls": "https://scontent-hel3-1.cdninstagram.com/o1/v/t2/f2/m86/AQOpZ-ujk34-MGYukYIBiLHk0YclGrBKCrq7r1jIvo3VUPrEOf95ydRPVmYqc6Q8JBsgmnGMpDAAfL2EudvVlvDvGORQD33zdsRB6uU.mp4?_nc_cat=102&_nc_sid=5e9851&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_ohc=ND6EF9V8YEUQ7kNvwF3doLd&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5JTlNUQUdSQU0uQ0xJUFMuQzMuNzIwLmRhc2hfYmFzZWxpbmVfMV92MSIsInhwdl9hc3NldF9pZCI6MzA2MzAyMDQ4NzI5ODMzMCwiYXNzZXRfYWdlX2RheXMiOjE2MDEsInZpX3VzZWNhc2VfaWQiOjEwMDk5LCJkdXJhdGlvbl9zIjoxMiwidXJsZ2VuX3NvdXJjZSI6Ind3dyJ9&ccb=17-1&vs=31e9f25d41b4672d&_nc_vs=HBksFQIYUmlnX3hwdl9yZWVsc19wZXJtYW5lbnRfc3JfcHJvZC8wNjREMjRGMTRENjEzMzFFMzk0MjQxNDNEQURBMUQ5M192aWRlb19kYXNoaW5pdC5tcDQVAALIARIAFQIYRmlnX3hwdl9yZWVsc19wZXJtYW5lbnRfc3JfcHJvZC81MzI1NjY5ODUxNjQ4MzFfNjU0NzIwNjg5OTc3OTEzODM4OS5tcDQVAgLIARIAKAAYABsCiAd1c2Vfb2lsATEScHJvZ3Jlc3NpdmVfcmVjaXBlATEVAAAmtLSugaHz8AoVAigCQzMsF0AoAAAAAAAAGBJkYXNoX2Jhc2VsaW5lXzFfdjERAHX-B2XmnQEA&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_ss=7a3ba&_nc_zt=28&oh=00_AQJnHXtn_dBF3rV5LvoDO8CgjB0Pr1z-a9DZXkjsV1jmRg&oe=6A9F4D93",
+              "thumbnail_url": "https://scontent-hel3-1.cdninstagram.com/v/t51.71878-15/491894583_3876539169279787_1931567414965940936_n.jpg?stp=dst-jpg_e15_p240x240_tt6&_nc_cat=109&ig_cache_key=MjgxOTU4MzU5NDU1ODA3MTk0MQ%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNMSVBTLnhwaWRzLjYwMC5zZHIudmlkZW9fZGVmYXVsdF9jb3Zlcl9mcmFtZS5DMyJ9&_nc_ohc=z9HtYuAm7JYQ7kNvwFdxRhW&_nc_oc=AdqgzBM8cWVX76oRp07bWYmf2ioyAFBBwScyvTteZm8FT6rKjiUJxIIctAkTvUMG-TU&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent-hel3-1.cdninstagram.com&_nc_gid=PX5Qb7-R2CD-ZZxmwUXacw&_nc_ss=7a3ba&oh=00_AQLIV0BYycFJddpyjv8Ms8P5wwog6Y3H2tIjpepGFRh08Q&oe=6AA31E15",
+              "duration_seconds": 12.051
+            },
+            "author": {
+              "username": "instagram-user-129",
+              "display_name": null,
+              "avatar_url": "https://scrubbed.invalid/instagram-user-130",
+              "verified": false
+            },
+            "engagement": {
+              "views": 19,
+              "likes": 2,
+              "comments": 0,
+              "shares": null,
+              "saves": null
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": false,
+              "deleted": false
+            },
+            "published_at": "2022-04-19T03:57:03.000Z",
+            "ext": {
+              "author_id": "34969677449",
+              "published_at_epoch": 1650340623,
+              "coauthors": []
+            }
+          },
+          "computed": {
+            "engagement_rate": 0.105263,
+            "language": null,
+            "content_category": "other",
+            "estimated_reach": 23
+          }
+        }
+      ],
+      "total": null,
+      "dropped": 0
+    },
+    "credits_used": 1,
+    "request_id": "req-P6OQKN3ZKhb3JWsP",
+    "cached": false,
+    "pagination": {
+      "next_cursor": "sc.eyJ2IjoyLCJjIjoic2MxLmV5SmpJam9pTWlJc0luTWlPbHNpTXpJME56VTJPREUwTWpJNU1Ua3lNRFExTUNJc0lqTTROekE0TWpVME1UZ3pPRGMwT1RBMk16UWlMQ0l6TWpreU5UY3lNakV6TURnME5EazFOalEwSWl3aU16YzFORFF4T1RJek1USTFPRGN5TmpFNE1TSXNJak14TlRRNU5USXpNVGN6TmpJNU5qVTJOVE1pTENJek5qa3pPVGszTlRVNE5UWTROekE1TURjeElpd2lNelkwTVRFd056VTNNRFV6TXpRek56TTRPQ0lzSWpNMk9EZzVOemc0TXpFeU9USTJNamM1TmpFaUxDSXpOamcxT0RjM056TTRNRGsyT1RZNU5qTTJJaXdpTXpjNE1UazBNek0wTnpjNE9ETTJORFF5TWlJc0lqTXhOVEU1TkRZMk9EUTNNVEUyTXpneE16TWlMQ0l6TWpNd05EVXlOekV3TWpBeE1UUTFNRFV5SWl3aU1qY3pOalUyTkRFeU9ERXhNVEkzT1RRek1DSXNJak0zTnpZMk5USXhNalk0T1RreU5EYzFOekVpTENJek5EZ3dOelk1TURBMk5UVTVNelV3TlRJM0lpd2lNekkyTlRJNU9ESXpPRGs1T1RnNE5qVXlOeUlzSWpJM016VXpOalk0TlRjME5qWTBPREkxTVRnaUxDSXpNalExTURreE56YzBNVFkxTlRnMU56WXlJaXdpTXpNNE1EQTBORGMwTVRJMU1UYzVPRFF5TUNJc0lqTTNNekF3TXpnek5URTFNemcxTVRVM016UWlMQ0l6TWpnME9URTROamcwTURBME56STROVGMxSWl3aU16QTFPVGMxTWprM016STFNakk0TkRZd05TSXNJakk1TURZNU5ESXpNVFUwT1RNMk16azROVEVpTENJeU56TTRPVGcxTlRnM09UYzFNREV6TmpJeElpd2lNamM0TnpBd01qUTJORGd4TURBNE56UTNNaUlzSWpNMU5UTTBNRFEzT1RNMk5ETTFPVGcwTlRBaUxDSXpOekk1TVRrMU1qZ3lOVEF4TmpFMU16UTBJaXdpTXpjek5EVTNOall4TkRRME5UazFNekU1TVNJc0lqSTNORFV5TlRJMU1EazJPRGN3TlRJNU1Ea2lMQ0l5T0RFNU5UZ3pOVGswTlRVNE1EY3hPVFF4SWwxOSIsImUiOiJpbnN0YWdyYW0vc2VhcmNoL3JlZWxzIiwicCI6InBhZ2UiLCJzIjoiaSJ9",
+      "has_more": true,
+      "page_size": 30
+    },
+    "credits_remaining": 2482
+  }
+}

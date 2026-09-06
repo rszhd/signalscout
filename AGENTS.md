@@ -249,6 +249,71 @@ proving deduplication of *comments* — the second video poll proved it for
 videos, storing 14 new against 44 already held — and `?cid=` in a logged-out
 browser, which nobody has tried.
 
+**Instagram is the sixth platform, and it is the dearest place to read a
+comment.** US-049 closed on 2026-09-06, the fourth crossing of PLAN.md's
+*Important rule* and again on the owner's decision. The rule stands for the
+seventh. Threads is the last of US-038's three and is still parked. It runs
+through SocialCrawl on the key that already fetches X, LinkedIn, YouTube, Reddit
+and TikTok.
+
+**Its two halves are priced ten places apart.** A reel search is 1 credit for 30
+reels — the cheapest search this product makes. A comment page is **5 credits
+for 15 comments** — the dearest. The lead here is in the comments, as on YouTube
+and TikTok, so everything worth reading is behind the expensive endpoint. The
+connector declares `replyPricePerUnitMicros` separately for the reason US-028
+found on LinkedIn: where a request and a credit are different numbers, a guard
+fed the wrong one lets a monitor spend five times its cap.
+
+**The comments are also shorter, measured against TikTok on the same kind of
+thread.** US-044's acne moisturiser video ran a median of 54 characters with 22
+of 49 over sixty. An Instagram skincare reel ran a **median of 26 characters,
+with none of 29 over sixty**. Half the words at five times the price. That is
+one thread each and not a distribution, and it is enough to tell somebody
+ticking this box to expect a higher cost per lead than either video platform
+beside it.
+
+**Three of the provider's own claims were wrong, and the free catalogue was
+right about none of them.** A search with **no date window returns five years**
+— thirty results ran 2021 to 2026 and the newest was five months old, so a
+monitor's `since` would discard everything it was billed for, every poll. This
+is therefore the one connector that always sends a window, where LinkedIn
+deliberately sends none in the same case. **`has_more` came back true beside a
+page of zero items**, with a fresh cursor pointing at more nothing, so the walk
+ends on an empty page rather than on the flag. And **`url`, `post_id` and
+`author.display_name` are null on every comment** — 29 of 29, against 137 from X,
+YouTube and TikTok that fill all three. The shared parser now falls back to the
+handle for a name, and **BUG-007's wrong-parent check is inert on Instagram**:
+there is no `post_id` to disagree with.
+
+All three were free to discover. The empty page was refunded, and so was the
+refused key.
+
+**The live poll ran, and it answered the platform's question yes.** 20 reels and
+89 comments collected; the first run then spent its whole cap on the provider
+before the classifier read a single comment, so its zero matches measured the
+budget rather than the platform. Read afterwards on credit already spent,
+**five comments matched at or above 50 and the top scored 90** — the highest any
+comment has scored on any platform here, against TikTok's 82. It is a person
+whose skin barrier retinol destroyed, asking how to treat acne scars safely,
+which is the monitor's own problem statement said back to it.
+
+**The leads are entirely in the tail, so a median describes this platform
+badly.** Of 89 comments, 56 were under ten characters and the median was four;
+twelve passed sixty, and **the two best matches are the two longest comments in
+the run**. About one comment in seven carries words, and that seventh holds
+every lead. The first version of `platforms.ts` read this as a poor platform and
+was corrected: it is sparse and dear, not poor.
+
+**Triage keeps 86 of 89 here**, the weakest cut yet — against 4 of 60 dropped on
+TikTok and 20 of 26 on a Reddit thread. Under a product-recommendation video
+nobody is an expert answering, so the stage costs more than it saves and the
+argument for it is a Reddit argument.
+
+Still unproven for this connector: nobody has opened one of its comment links,
+and the hashtag search was never called — the capture ran lean at 13 credits and
+left that question open. `--lean` is the flag; running it without one answers
+both remaining questions.
+
 **LinkedIn is the third platform, and PLAN.md said not to add one yet.**
 US-028 closed on 2026-09-05. The rule at PLAN.md's *Important rule* is that no
 third network is added until Reddit and X reliably produce useful matches, and
@@ -725,7 +790,14 @@ post of fifty, because it was built for keyword noise — with subreddit
 discovery every collected post costs a model call, and that belongs in any
 arithmetic shown to a person.
 
-**The budget guard has never refused a real poll.** It has now allowed one
+**The budget guard has now refused a real poll, and US-049 is when.** On
+2026-09-06 an Instagram poll under a $1.00 cap spent $1.6317 and both paid
+stages refused: `classify` stopped with 89 comments unread — BUG-004's
+mid-batch branch, reached live for the first time — and `replies` refused to
+open four more threads. **The overshoot was 63%**, larger than anything
+recorded before, because each overshoot step on that platform is a 5-credit
+comment page rather than a 1-credit one. Read the rest of this paragraph as the
+history it now is. It has now allowed one
 and counted it: US-022's poll ran under a $0.20 cap and recorded $0.075 against
 it. Refusing is the half that no live run has reached. US-013's arithmetic, its
 cap and its two exhausted behaviours are asserted against real Postgres and a
@@ -910,11 +982,14 @@ pnpm --filter @intentwatch/core live:provider-switch # spends ~$0.08; see below
 pnpm --filter @intentwatch/core live:linkedin-poll   # spends ~$0.08 + model; see below
 pnpm --filter @intentwatch/core live:tiktok-poll     # spends ~$0.20 + model; see below
 pnpm --filter @intentwatch/core live:tiktok-comments # spends model only; see below
+pnpm --filter @intentwatch/core live:instagram-poll   # spends ~$1.65 + model; see below
+pnpm --filter @intentwatch/core live:instagram-comments # spends model only; see below
 pnpm --filter @intentwatch/core live:thread-loop      # spends up to a cap you pass; see below
 pnpm --filter @intentwatch/core measure:lead-position # spends ~$0.40; see below
 pnpm capture:deletions                            # spends ~$0.02; see below
 
 node packages/core/src/sources/providers/socialcrawl/linkedin-fixtures/capture.mjs   # ~30 credits
+node packages/core/src/sources/providers/socialcrawl/instagram-fixtures/capture.mjs  # 24 credits, or 14 with --lean
 ```
 
 These eleven are the only commands here that spend money, and all eleven are
@@ -995,6 +1070,19 @@ read, so a second run with a larger sample buys no answer twice. Use it rather
 than a second poll whenever the question is about the classifier and not about
 the connector.
 
+`live:instagram-poll` is the Instagram equivalent, and it is the **most
+expensive poll here**. A search page is 1 credit and a comment page is 5, so the
+provider half dominates: one run spent $1.6317 with SocialCrawl against $0.3336
+with the model, which is the reverse of every other platform. Pass it a cap you
+mean, and expect it to be exceeded — the first run overshot $1.00 by 63%.
+
+`live:instagram-comments` is the cheap half of that question and it is the same
+script as `live:tiktok-comments`, which US-049 taught to take `--platform=`. It
+reads comments **already stored**, calls no provider, and skips any the monitor
+has already paid to read. Use it rather than a second poll whenever the question
+is about the classifier and not about the connector — on Instagram that is
+almost always, because the connector's half is the expensive one.
+
 `live:thread-loop` reads one deep thread through the **real loop** rather than
 one batch at a time. It sends a single job and everything after it is
 `classify` handing the thread back to `replies`, which is the only way to see
@@ -1009,6 +1097,14 @@ platform ranks highest. It pages a thread cheaply and classifies only the
 positions asked for, because fetching is a credit for fifty comments and a
 classification is 2,975 micro-dollars. `--report-only` re-reads a run that the
 budget stopped, buying nothing.
+
+The Instagram capture is run by hand with a key, like LinkedIn's, and it takes
+`--lean`. The full run is 24 credits and answers nine questions; `--lean` is 14
+and drops the two 5-credit calls that answer a question rather than feed the
+parser — the hashtag search, and the second `top` comment page that tests whether
+a `top` walk repeats itself. **The committed fixtures came from a lean run**, so
+those two questions are open rather than answered. It prints the two numbers the
+platform is judged on: whether paging buys new posts, and how long a comment is.
 
 `capture:deletions` checks known available, removed and missing Reddit URLs.
 It retains whole provider responses with author identity scrubbed. The default

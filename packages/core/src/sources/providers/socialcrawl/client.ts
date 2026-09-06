@@ -94,6 +94,18 @@ export const endpoints = {
    */
   youTubeSearch: `${apiBase}/youtube/search`,
   youTubeComments: `${apiBase}/youtube/video/comments`,
+  /**
+   * Instagram. US-049, and the first endpoint pair here whose two halves are
+   * priced differently: a reel search is 1 credit and a comment page is 5.
+   *
+   * `/search/reels` rather than `/search/hashtag` because the second is five
+   * times the price for a mode a monitor did not ask for — a hashtag is a
+   * publisher's label, and the product looks for a stranger describing a
+   * problem. `/search/profiles` is 1 credit and is not a discovery mode at all:
+   * it is a Google-backed lookup returning accounts.
+   */
+  instagramSearch: `${apiBase}/instagram/search/reels`,
+  instagramComments: `${apiBase}/instagram/post/comments`,
 } as const;
 
 /**
@@ -236,6 +248,57 @@ export const youTubeSearchProfile: EndpointProfile = {
 export const youTubeCommentsProfile: EndpointProfile = {
   endpoint: endpoints.youTubeComments,
   standardCallCredits: 1,
+  cursorOf: (body) => {
+    const pagination = objectAt(body, "pagination");
+    if (pagination?.has_more === false) return undefined;
+    return text(pagination?.next_cursor);
+  },
+};
+
+/**
+ * Instagram search: `pagination.next_cursor`, one credit a call.
+ *
+ * **`has_more` is wrong here, and it was measured wrong on the first run.**
+ * Page one of `skincare for acne scars` returned 30 reels with
+ * `has_more: true` and a cursor. Following that cursor returned **zero items,
+ * `page_size: 0`, and another `has_more: true` with another cursor**. So the
+ * flag does not mean there is more, and the cursor it comes with can lead
+ * nowhere. That is the fourth completeness claim from a provider to be measured
+ * wrong in this repository, after ScrapeCreators' Reddit `has_more: false` with
+ * 33 comments missing and X's replies cursor to an empty page.
+ *
+ * It is the cheap kind of wrong: the empty page reported `credits_used: 0`. So
+ * the connector stops on an empty page rather than on the flag, and pays
+ * nothing to learn it.
+ *
+ * The flag is still read where it says `false`, on the same reasoning the other
+ * profiles use — a stop it reports is a stop we can take for free.
+ */
+export const instagramSearchProfile: EndpointProfile = {
+  endpoint: endpoints.instagramSearch,
+  standardCallCredits: 1,
+  cursorOf: (body) => {
+    const pagination = objectAt(body, "pagination");
+    if (pagination?.has_more === false) return undefined;
+    return text(pagination?.next_cursor);
+  },
+};
+
+/**
+ * Instagram comments: the same cursor, and **five times the price**.
+ *
+ * 5 credits a page against 1 for the search beside it, 1 for a TikTok comment
+ * page and 1 for a YouTube one. That is the same trap US-028 found on LinkedIn:
+ * where a request and a credit are different numbers, a guard fed the wrong one
+ * lets a monitor spend five times its cap. The connector declares this price
+ * separately from its search price for exactly that reason.
+ *
+ * A page held 15 comments on a thread the provider said had 71, so a whole
+ * thread here is several pages at 5 credits each.
+ */
+export const instagramCommentsProfile: EndpointProfile = {
+  endpoint: endpoints.instagramComments,
+  standardCallCredits: 5,
   cursorOf: (body) => {
     const pagination = objectAt(body, "pagination");
     if (pagination?.has_more === false) return undefined;

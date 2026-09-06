@@ -156,6 +156,57 @@ export const tikTokPlatform: PlatformDescriptor = {
   },
 };
 
+export const instagramPlatformId = "instagram";
+
+export const instagramPlatform: PlatformDescriptor = {
+  id: instagramPlatformId,
+  displayName: "Instagram",
+  search: {
+    /**
+     * Five words, the same as TikTok and for the same reason: this is a place
+     * people speak rather than write, and a technical phrase is not what it
+     * indexes.
+     *
+     * What US-049 measured here is not the word count, though. It is the
+     * **age** of what a search returns. Thirty results for `skincare for acne
+     * scars`, ranked by relevance, ran from 2021 to 2026 and the newest was
+     * **five months old** — not one post from the last month. A monitor asking
+     * "what was said since I last looked" would have been billed a credit a
+     * poll for nothing, forever.
+     *
+     * The same query with the provider's date window returned eight reels and
+     * every one was inside it. So on this platform the window is not a filter,
+     * it is the thing that makes the search work, and the connector always
+     * sends one.
+     *
+     * The second measurement decides whether to tick this box at all, and the
+     * live poll corrected what the capture suggested about it.
+     *
+     * **The comments are mostly not words**: 56 of 89 collected were under ten
+     * characters, and the median was four. But **the leads are all in the
+     * tail**. The two highest-scoring matches, 90 and 77, are the two longest
+     * comments in the run at 233 and 289 characters — a person whose barrier
+     * retinol destroyed asking how to treat scars safely, and a person on
+     * tretinoin for years still getting comedones. The 90 is the highest score
+     * any comment has reached on any platform here; TikTok's best was 82.
+     *
+     * So a median is the wrong statistic for this platform. About one comment
+     * in seven carries words at all, and that seventh is where every lead is.
+     */
+    maxQueryWords: 5,
+    note:
+      "An Instagram search returns creators, not people with problems, and it " +
+      "is ranked by relevance rather than by date — so it suits a topic that " +
+      "keeps being discussed, not a phrase somebody used this week. The lead " +
+      "is in the comments, and they are worth reading: the best one a live " +
+      "poll found scored higher than any comment on any other platform here. " +
+      "But most comments are emoji — about one in seven carries words — and a " +
+      "comment page costs five times TikTok's, so the provider bill here is " +
+      "several times the model bill, which is true nowhere else. Budget for " +
+      "the reading, not for the searching.",
+  },
+};
+
 /** Every platform the schema accepts, for a screen that lists them. */
 export const platforms: readonly PlatformDescriptor[] = [
   redditPlatform,
@@ -163,6 +214,7 @@ export const platforms: readonly PlatformDescriptor[] = [
   linkedInPlatform,
   youTubePlatform,
   tikTokPlatform,
+  instagramPlatform,
 ];
 
 /** One platform, with every provider a build has for it. */

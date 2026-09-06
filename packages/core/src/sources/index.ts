@@ -14,6 +14,8 @@ export {
 } from "./fake/index.js";
 export {
   groupByPlatform,
+  instagramPlatform,
+  instagramPlatformId,
   linkedInPlatform,
   linkedInPlatformId,
   type PlatformConnectors,
@@ -41,6 +43,11 @@ export {
   scrapeCreatorsReddit,
   toCandidatePost as toScrapeCreatorsCandidatePost,
 } from "./providers/scrapecreators/reddit.js";
+export {
+  SocialCrawlInstagramSource,
+  socialCrawlInstagram,
+  toCandidatePost as toSocialCrawlInstagramCandidatePost,
+} from "./providers/socialcrawl/instagram.js";
 export {
   SocialCrawlLinkedInSource,
   socialCrawlLinkedIn,
@@ -84,6 +91,7 @@ export { connectorIdPattern } from "./types.js";
 
 import { brightDataReddit } from "./providers/brightdata/reddit.js";
 import { scrapeCreatorsReddit } from "./providers/scrapecreators/reddit.js";
+import { socialCrawlInstagram } from "./providers/socialcrawl/instagram.js";
 import { socialCrawlLinkedIn } from "./providers/socialcrawl/linkedin.js";
 import { socialCrawlReddit } from "./providers/socialcrawl/reddit.js";
 import { socialCrawlTikTok } from "./providers/socialcrawl/tiktok.js";
@@ -121,4 +129,5 @@ export const builtInSources: readonly ConnectorDefinition[] = [
   socialCrawlLinkedIn,
   socialCrawlYouTube,
   socialCrawlTikTok,
+  socialCrawlInstagram,
 ];

@@ -17,6 +17,13 @@
  * YouTube leaves it null on every comment, so its connector builds one. That
  * is a fallback rather than a repair: a reply nobody can open is a lead nobody
  * can act on.
+ *
+ * **US-049 found the shared shape is shared in name more than in fill.**
+ * Instagram sends all nine field names and leaves three of them null on every
+ * comment: `url`, `post_id` and `author.display_name`. Measured over 29
+ * comments, against 129 from X, YouTube and TikTok that fill all three. So a
+ * field this file requires must be one a platform actually sends, and the two
+ * that are merely *usually* sent are read with a fallback rather than demanded.
  */
 import type { CandidateReply } from "../../types.js";
 
@@ -81,9 +88,13 @@ export function toCandidateReply(
    * judge real words against a conversation they were never part of, and the
    * inbox then shows "Replying to" above a post the person never saw.
    *
-   * Every platform sends the field: 137 comments across the X, YouTube and
-   * TikTok fixtures, all with `post_id`. A comment that omits it is kept,
-   * because absence is not disagreement and no captured page has shown one.
+   * Three platforms send the field: 137 comments across the X, YouTube and
+   * TikTok fixtures, all with `post_id`. **Instagram sends it null on every
+   * comment** — 29 of 29, US-049 — so a comment that omits it is kept, because
+   * absence is not disagreement. The consequence is worth naming rather than
+   * leaving to be rediscovered: this check defends X, YouTube and TikTok, and
+   * on Instagram it is inert. Nothing there stops the endpoint returning a
+   * comment from another post.
    */
   const belongsTo = text(comment.post_id);
 
@@ -91,6 +102,18 @@ export function toCandidateReply(
 
   const author = objectOf(comment.author);
   const engagement = objectOf(comment.engagement);
+
+  /**
+   * The name to show, falling back to the handle.
+   *
+   * X, YouTube and TikTok fill `display_name` on every captured comment — 129
+   * of 129. Instagram fills it on none of 29 and puts the identity in
+   * `username` instead. Both name the same person, and a reply shown with no
+   * author at all is a lead a person cannot judge, so the handle is used where
+   * there is no display name. It is never used *instead* of one: a platform
+   * that sends both keeps sending the name it chose.
+   */
+  const authorName = text(author?.display_name) ?? text(author?.username);
 
   /**
    * A reply to the post names the post; a reply to a reply names that reply.
@@ -110,7 +133,7 @@ export function toCandidateReply(
     text: body,
     postedAt,
     parentPostExternalId,
-    ...(text(author?.display_name) ? { author: text(author?.display_name) } : {}),
+    ...(authorName ? { author: authorName } : {}),
     ...(channel ? { channel } : {}),
     ...(position === undefined ? {} : { threadPosition: position }),
     ...(parentReply ? { parentReplyExternalId: parentReply } : {}),

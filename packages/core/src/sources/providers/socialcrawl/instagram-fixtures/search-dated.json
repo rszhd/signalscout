@@ -1,0 +1,359 @@
+{
+  "httpStatus": 200,
+  "body": {
+    "success": true,
+    "platform": "instagram",
+    "endpoint": "/v1/instagram/search/reels",
+    "data": {
+      "items": [
+        {
+          "post": {
+            "id": "3976403303394260056",
+            "url": "https://www.instagram.com/reel/DcvBbyOgTRY/",
+            "content": {
+              "text": "COMMENT 'Acne' \u2b07\ufe0f Still dealing with acne marks even after the breakouts are gone? \ud83d\ude2d\n\nThese are 5 serums I being a dermatologist look at if you\u2019re trying to fade post-acne marks and get more even looking skin.\n\nSave this for your next skincare shopping trip \ud83e\udef6\ud83c\udffb\n\nJust remember: acne scars and acne marks aren\u2019t the same thing, and what works for one person might not work for another. Consistency + sunscreen are key\ud83d\ude4c\ud83c\udffb\n\nWhich one have you tried? \ud83d\udc40\n\n#acnescars #acnemarks #acne #derma #explore \n\n(Dermatologist recommends,best serum for acne scars,how to remove acne scars,acne problems)",
+              "media_urls": "https://scontent-sjc6-1.cdninstagram.com/o1/v/t2/f2/m86/AQM65xPVISeE-rWL1c-xx_ovyHaVxHJz2G5z31BoBYwZuN9E2hIsZggyfFc7OGtSi9ygrVUb7W1lUdPMGAhaEKyNRh4IovTnHq3TpNo.mp4?_nc_cat=107&_nc_sid=5e9851&_nc_ht=scontent-sjc6-1.cdninstagram.com&_nc_ohc=LqWcmCqKZbMQ7kNvwGPOHRq&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5JTlNUQUdSQU0uQ0xJUFMuQzMuNzIwLmRhc2hfYmFzZWxpbmVfMV92MSIsInhwdl9hc3NldF9pZCI6MTgxNDkxMzY5MDE1MjQxMzUsImFzc2V0X2FnZV9kYXlzIjo1LCJ2aV91c2VjYXNlX2lkIjoxMDA5OSwiZHVyYXRpb25fcyI6MTIsInVybGdlbl9zb3VyY2UiOiJ3d3cifQ%3D%3D&ccb=17-1&vs=bac35707b0b2d5b7&_nc_vs=HBksFQIYUmlnX3hwdl9yZWVsc19wZXJtYW5lbnRfc3JfcHJvZC85MzQ2MTVGM0JERkU0N0NBQjNFNjUxMTM4RTBDNjY4Nl92aWRlb19kYXNoaW5pdC5tcDQVAALIARIAFQIYUWlnX3hwdl9wbGFjZW1lbnRfcGVybWFuZW50X3YyL0RBNDZDOTBDRTlCN0E4NThGODBBQTM1NEUxOUQ5REI2X2F1ZGlvX2Rhc2hpbml0Lm1wNBUCAsgBEgAoABgAGwKIB3VzZV9vaWwBMRJwcm9ncmVzc2l2ZV9yZWNpcGUBMRUAACbOqvaf56K9QBUCKAJDMywXQCjdsi0OVgQYEmRhc2hfYmFzZWxpbmVfMV92MREAdf4HZeadAQA&_nc_gid=imseiJ-YTtc-X0DNnFbKIg&_nc_ss=7fa8c&_nc_zt=28&oh=00_AQJjK5kMJraUqqBybFnYAcjrpFTbflH1wD6nmcuQlOWvKw&oe=6A9F4128",
+              "thumbnail_url": "https://scontent-sjc6-1.cdninstagram.com/v/t51.82787-15/791820638_18149137093524135_576422158067185004_n.jpg?stp=dst-jpg_e15_tt6&_nc_cat=101&ig_cache_key=Mzk3NjQwMzMwMzM5NDI2MDA1NjE4MTQ5MTM3MDg3NTI0MTM1.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNMSVBTLnhwaWRzLjEwODAuc2RyLnZpZGVvX2RlZmF1bHRfY292ZXJfZnJhbWUuQzMifQ%3D%3D&_nc_ohc=2s5QkXRTv64Q7kNvwH2Iiab&_nc_oc=AdqCDq928a3dGoOzN5kZXyer_TRELX_BO_4q42Ob9vB68MeaeQEONWa1svDa40NLJ_E&_nc_zt=23&_nc_ht=scontent-sjc6-1.cdninstagram.com&_nc_gid=imseiJ-YTtc-X0DNnFbKIg&_nc_ss=7fa8c&oh=00_AQJODtPHavgjh5-TweFzo4TP-zEpivN-e_xJoOKhHuk0aQ&oe=6AA32737",
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "instagram-user-142",
+              "display_name": "instagram-user-143",
+              "avatar_url": "https://scrubbed.invalid/instagram-user-144",
+              "verified": true
+            },
+            "engagement": {
+              "views": null,
+              "likes": 137,
+              "comments": 19,
+              "shares": null,
+              "saves": null
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": null,
+              "deleted": false
+            },
+            "published_at": "2026-09-01T06:30:56.000Z",
+            "ext": {
+              "author_id": "15733140134",
+              "author_followers": null
+            }
+          },
+          "computed": {
+            "engagement_rate": null,
+            "language": "en",
+            "content_category": "beauty",
+            "estimated_reach": null
+          }
+        },
+        {
+          "post": {
+            "id": "3976549134240172545",
+            "url": "https://www.instagram.com/reel/Dcvil5yRcoB/",
+            "content": {
+              "text": "Those flat red marks left behind after acne are NOT acne scars\n\nHere is what they actually are and what can help them!\n\nHave you had these spots before? Let me know what has worked for you \u2b07\ufe0f\n\nOriginal vid: zoematisha on \u23f0\n\n#PIE #dermarkologist #acnescars #skincaretips",
+              "media_urls": "https://scontent-bos5-1.cdninstagram.com/o1/v/t2/f2/m86/AQOR10afPeikHYvmU6OHkkTOgU6g__0L22D25f31S7eGSAkl7f7HfkAEUjPqYVLUx_ZUwOGAVnxMNC9bCHXhCXwN2_ftqOhVo7aoOKw.mp4?_nc_cat=102&_nc_sid=5e9851&_nc_ht=scontent-bos5-1.cdninstagram.com&_nc_ohc=O2xKmkguqUsQ7kNvwETtztf&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5JTlNUQUdSQU0uQ0xJUFMuQzMuNzIwLmRhc2hfYmFzZWxpbmVfMV92MSIsInhwdl9hc3NldF9pZCI6OTEwNzYyNjI4MzU5Mzg0LCJhc3NldF9hZ2VfZGF5cyI6NSwidmlfdXNlY2FzZV9pZCI6MTAwOTksImR1cmF0aW9uX3MiOjcxLCJ1cmxnZW5fc291cmNlIjoid3d3In0%3D&ccb=17-1&vs=ab3af4c7b707fc5b&_nc_vs=HBksFQIYUmlnX3hwdl9yZWVsc19wZXJtYW5lbnRfc3JfcHJvZC8wRTQ1MTQ4OTc3NTQzQzhFNERCMjIxNEVBNTAyRTRBMV92aWRlb19kYXNoaW5pdC5tcDQVAALIARIAFQIYUWlnX3hwdl9wbGFjZW1lbnRfcGVybWFuZW50X3YyL0ExNEY3OTVFNjJBODRGQzgwQzdDRUQ5RDg4QzMwQ0FFX2F1ZGlvX2Rhc2hpbml0Lm1wNBUCAsgBEgAoABgAGwKIB3VzZV9vaWwBMRJwcm9ncmVzc2l2ZV9yZWNpcGUBMRUAACawk4GvrpWeAxUCKAJDMywXQFHTMzMzMzMYEmRhc2hfYmFzZWxpbmVfMV92MREAdf4HZeadAQA&_nc_gid=aALhlR0ekofBbawOtHL1Jg&_nc_ss=7fa8c&_nc_zt=28&oh=00_AQIEmykiXHnL82VNM_bOLkRF1rgA5X2Cu2paQaF_8IEpvw&oe=6A9F26FB",
+              "thumbnail_url": "https://scontent-bos5-1.cdninstagram.com/v/t51.82787-15/790969596_18096728237411538_3441740754131976560_n.jpg?stp=dst-jpg_e15_tt6&_nc_cat=109&ig_cache_key=Mzk3NjU0OTEzNDI0MDE3MjU0NTE4MDk2NzI4MjMxNDExNTM4.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNMSVBTLnhwaWRzLjExNzkuc2RyLnZpZGVvX2RlZmF1bHRfY292ZXJfZnJhbWUuQzMifQ%3D%3D&_nc_ohc=xy758bnTp64Q7kNvwFSARWT&_nc_oc=AdoRG1pp7yxg64xIFhoKrULzIKseaUdn0FSI4-uUluq4oTLmfkHSAANEBQpq-uVt7NQ&_nc_zt=23&_nc_ht=scontent-bos5-1.cdninstagram.com&_nc_gid=aALhlR0ekofBbawOtHL1Jg&_nc_ss=7fa8c&oh=00_AQJg341wBt7xTHoZkb_cPspQR5wluacMjHdb4l37G-NSTQ&oe=6AA341C7",
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "instagram-user-145",
+              "display_name": "instagram-user-146",
+              "avatar_url": "https://scrubbed.invalid/instagram-user-147",
+              "verified": true
+            },
+            "engagement": {
+              "views": null,
+              "likes": 1286,
+              "comments": 22,
+              "shares": null,
+              "saves": null
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": null,
+              "deleted": false
+            },
+            "published_at": "2026-09-01T11:28:38.000Z",
+            "ext": {
+              "author_id": "42268731537",
+              "author_followers": null
+            }
+          },
+          "computed": {
+            "engagement_rate": null,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": null
+          }
+        },
+        {
+          "post": {
+            "id": "3964049577513540228",
+            "url": "https://www.instagram.com/reel/DcDIhabu1qE/",
+            "content": {
+              "text": "Stop spending hundreds on skincare trying to fix acne scars, you are wasting your money\u2026. \n\nIf you\u2019ve been following my progress, my biggest lesson after 10 years of acne scar treatments: identify your scar type FIRST, then choose the treatment. Different acne scars require completely different approaches, for most of the scars, it can see a huge improvement after doing subcision with a filler like PLLA, followed by a few session of resurfacing laser that stimulates collagen.\n\nComment \u201cSCAR\u201d and I\u2019ll share where I get my treatments done.\n\n#acnescars #acnescartreatment #subcision",
+              "media_urls": "https://instagram.fsac1-1.fna.fbcdn.net/o1/v/t2/f2/m86/AQO74YHZBd3dXwI9gYQVGzVYTmBUPu5KdWClreY_oTSGNDNiTNLlR0N43J2Y_cXLwNmmnnWr3OYQ6XhaLfH3MvG2TsZQTQC6no3I-Qg.mp4?_nc_cat=104&_nc_oc=Adr0Sdvp65-aMcSlFwpBOk7qGjgaOdGuO8NjSv2bkLYVCefWKpThHZG9AtFiYRNXrv8&_nc_sid=5e9851&_nc_ht=instagram.fsac1-1.fna.fbcdn.net&_nc_ohc=SEfSaIBc1dwQ7kNvwHeBgEd&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5JTlNUQUdSQU0uQ0xJUFMuQzMuNzIwLmRhc2hfYmFzZWxpbmVfMV92MSIsInhwdl9hc3NldF9pZCI6MjExNjE1MTIwMjYzOTQ5NSwiYXNzZXRfYWdlX2RheXMiOjIyLCJ2aV91c2VjYXNlX2lkIjoxMDA5OSwiZHVyYXRpb25fcyI6OTUsInVybGdlbl9zb3VyY2UiOiJ3d3cifQ%3D%3D&ccb=17-1&vs=c82d4c75a97975de&_nc_vs=HBksFQIYUmlnX3hwdl9yZWVsc19wZXJtYW5lbnRfc3JfcHJvZC81QTQ3QTY3NjEzN0IyN0Y4RjQ4NjYyODVFMEJBRTk4Nl92aWRlb19kYXNoaW5pdC5tcDQVAALIARIAFQIYUWlnX3hwdl9wbGFjZW1lbnRfcGVybWFuZW50X3YyLzg2NEZGMjAzRTJEQkUxQzEyQzYxRkVGMEFFNjdFQ0E4X2F1ZGlvX2Rhc2hpbml0Lm1wNBUCAsgBEgAoABgAGwKIB3VzZV9vaWwBMRJwcm9ncmVzc2l2ZV9yZWNpcGUBMRUAACaOusuLm6jCBxUCKAJDMywXQFfiHKwIMScYEmRhc2hfYmFzZWxpbmVfMV92MREAdf4HZeadAQA&_nc_gid=xCocpxiMoE786bpn_39ubQ&_nc_ss=7fa8c&_nc_map=urlgen_bucketless&_nc_zt=28&oh=00_AQLA1M2WkD6hsarbhfuw625GW1E9j46E3aH0qHAY3X41qQ&oe=6A9F3035",
+              "thumbnail_url": "https://instagram.fsac1-2.fna.fbcdn.net/v/t51.82787-15/776100995_18614340907058763_3339647656377970887_n.jpg?stp=dst-jpg_e15_tt6&_nc_cat=102&_nc_map=urlgen_bucketless&ig_cache_key=Mzk2NDA0OTU3NzUxMzU0MDIyODE4NjE0MzQwOTA0MDU4NzYz.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNMSVBTLnhwaWRzLjcyMC5zZHIudmlkZW9fZGVmYXVsdF9jb3Zlcl9mcmFtZS5DMyJ9&_nc_ohc=vZXaYZyWXW8Q7kNvwHOjO2N&_nc_oc=Adr4Z42y5lQKja_5S0PNHHY5joeXmz0ZKJkolb2AMoZPMAj0tujBvG3A6MjLZW7bFB4&_nc_zt=23&_nc_ht=instagram.fsac1-2.fna&_nc_gid=xCocpxiMoE786bpn_39ubQ&_nc_ss=7fa8c&oh=00_AQJN6-Qnv5BHzODE6HS_KjYinwvfpACrOoPPwDVvFGKLPw&oe=6AA329EB",
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "instagram-user-148",
+              "display_name": "instagram-user-149",
+              "avatar_url": "https://scrubbed.invalid/instagram-user-150",
+              "verified": true
+            },
+            "engagement": {
+              "views": null,
+              "likes": 17,
+              "comments": 2,
+              "shares": null,
+              "saves": null
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": null,
+              "deleted": false
+            },
+            "published_at": "2026-08-15T05:27:09.000Z",
+            "ext": {
+              "author_id": "24186762",
+              "author_followers": null
+            }
+          },
+          "computed": {
+            "engagement_rate": null,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": null
+          }
+        },
+        {
+          "post": {
+            "id": "3973021681961547258",
+            "url": "https://www.instagram.com/reel/DcjAit2PjX6/",
+            "content": {
+              "text": "What are some active ingredients in skincare products for treating ACNE SCARS VS. HYPERPIGMENTATION used by estheticians? \n\n#domosthetics #skincare #acnescars #esthetician\n#hyperpigmentation",
+              "media_urls": "https://scontent-mia3-2.cdninstagram.com/o1/v/t2/f2/m86/AQMa1oEWrIhoIESUwyIR1PXa4auUttbwpHoNqKEQA-0OYQCiKFhG5RfaQTZcRJSm96gvobVlPfZRYlnlMa2ztuyuHPT0dEtopaNKz94.mp4?_nc_cat=105&_nc_sid=5e9851&_nc_ht=scontent-mia3-2.cdninstagram.com&_nc_ohc=1chn1TrPjXEQ7kNvwGpyyWA&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5JTlNUQUdSQU0uQ0xJUFMuQzMuNzIwLmRhc2hfYmFzZWxpbmVfMV92MSIsInhwdl9hc3NldF9pZCI6MTc5MjUyMTMyODc2ODEzMiwiYXNzZXRfYWdlX2RheXMiOjksInZpX3VzZWNhc2VfaWQiOjEwMDk5LCJkdXJhdGlvbl9zIjoyMiwidXJsZ2VuX3NvdXJjZSI6Ind3dyJ9&ccb=17-1&vs=fcb276686534e5cc&_nc_vs=HBksFQIYUmlnX3hwdl9yZWVsc19wZXJtYW5lbnRfc3JfcHJvZC85QzRENEUyRDU3RjQwMTFGQ0RBQjc3Q0MzODFBMURCNl92aWRlb19kYXNoaW5pdC5tcDQVAALIARIAFQIYUWlnX3hwdl9wbGFjZW1lbnRfcGVybWFuZW50X3YyLzlENEY4QTk2QzY1RjJGNEJCRTZCQjAzN0FCQjY1RTgxX2F1ZGlvX2Rhc2hpbml0Lm1wNBUCAsgBEgAoABgAGwKIB3VzZV9vaWwBMRJwcm9ncmVzc2l2ZV9yZWNpcGUBMRUAACaI0u3QvJKvBhUCKAJDMywXQDaZmZmZmZoYEmRhc2hfYmFzZWxpbmVfMV92MREAdf4HZeadAQA&_nc_gid=Kw14FpshIy8GAHpwi7yc3w&_nc_ss=7fa8c&_nc_zt=28&oh=00_AQKVFNIUoO81e-Z4gfggA3Lf4ty_9TTsQCUW9AlMqbzqEw&oe=6A9F597A",
+              "thumbnail_url": "https://scontent-mia3-2.cdninstagram.com/v/t51.82787-15/786924846_17949245277255012_4735327612973194798_n.jpg?stp=dst-jpg_e15_tt6&_nc_cat=105&ig_cache_key=Mzk3MzAyMTY4MTk2MTU0NzI1ODE3OTQ5MjQ1MjcxMjU1MDEy.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNMSVBTLnhwaWRzLjEyMDYuc2RyLnZpZGVvX2RlZmF1bHRfY292ZXJfZnJhbWUuQzMifQ%3D%3D&_nc_ohc=qaCRQlSVhNgQ7kNvwGwlJRa&_nc_oc=AdodNfu-Abyn_e62WrnlJxaMbf9oFZpYbAwh5l9JOXs2vznOSM-LZ2QFK4I8Ii-4I1k&_nc_zt=23&_nc_ht=scontent-mia3-2.cdninstagram.com&_nc_gid=Kw14FpshIy8GAHpwi7yc3w&_nc_ss=7fa8c&oh=00_AQJlBz_f7M7gLL03ZNKV4NZqk2ea7qLeTtEay23pf3WrYA&oe=6AA32882",
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "instagram-user-151",
+              "display_name": "instagram-user-152",
+              "avatar_url": "https://scrubbed.invalid/instagram-user-153",
+              "verified": false
+            },
+            "engagement": {
+              "views": null,
+              "likes": 3,
+              "comments": 3,
+              "shares": null,
+              "saves": null
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": null,
+              "deleted": false
+            },
+            "published_at": "2026-08-27T14:37:09.000Z",
+            "ext": {
+              "author_id": "67635599011",
+              "author_followers": null
+            }
+          },
+          "computed": {
+            "engagement_rate": null,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": null
+          }
+        },
+        {
+          "post": {
+            "id": "3965380898627407026",
+            "url": "https://www.instagram.com/reel/DcH3Or1zkyy/",
+            "content": {
+              "text": "The best acne scar treatment after 10 years of trying to fade them\u2026\n\nIf you\u2019ve been following my progress, my biggest lesson after 10 years of acne scar treatments: identify your scar type FIRST, then choose the treatment. Different acne scars require completely different approaches, for most of the scars, it can see a huge improvement after doing subcision with a filler like PLLA, followed by a few session of resurfacing laser that stimulates collagen.\n\nComment \u201cSCAR\u201d and I\u2019ll share where I get my treatments done.\n\n#acnescars #acnescartreatment #subcision",
+              "media_urls": "https://scontent-sjc6-1.cdninstagram.com/o1/v/t2/f2/m86/AQONZx4T-UcplurpIW8R9_gnx5HrjRwGe4sEyMfvmb1jp5I0NkFLaBa8ZnX2v6zrPzFKO1PjADyxXEKa0YMf8GZ8Rw0v8z89Uqm1eeE.mp4?_nc_cat=109&_nc_sid=5e9851&_nc_ht=scontent-sjc6-1.cdninstagram.com&_nc_ohc=troleLtyICMQ7kNvwFYrxBm&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5JTlNUQUdSQU0uQ0xJUFMuQzMuNzIwLmRhc2hfYmFzZWxpbmVfMV92MSIsInhwdl9hc3NldF9pZCI6MjkyMDI5OTI2ODMwNzg0MywiYXNzZXRfYWdlX2RheXMiOjIwLCJ2aV91c2VjYXNlX2lkIjoxMDA5OSwiZHVyYXRpb25fcyI6ODUsInVybGdlbl9zb3VyY2UiOiJ3d3cifQ%3D%3D&ccb=17-1&vs=11f7342837aba250&_nc_vs=HBksFQIYUmlnX3hwdl9yZWVsc19wZXJtYW5lbnRfc3JfcHJvZC9GMzQ1RDZCRjE1M0Q1RkQ2MEJEMUNBMTExNzEyNjY4NF92aWRlb19kYXNoaW5pdC5tcDQVAALIARIAFQIYUWlnX3hwdl9wbGFjZW1lbnRfcGVybWFuZW50X3YyLzI5NDhGOUFDNjI2RjJCNTUxODMyRkMxNTNENDQxQjkxX2F1ZGlvX2Rhc2hpbml0Lm1wNBUCAsgBEgAoABgAGwKIB3VzZV9vaWwBMRJwcm9ncmVzc2l2ZV9yZWNpcGUBMRUAACaG7rOI5f-vChUCKAJDMywXQFVogxJul40YEmRhc2hfYmFzZWxpbmVfMV92MREAdf4HZeadAQA&_nc_gid=wofpmVNHVNPKLgrpo0x2uA&_nc_ss=7fa8c&_nc_zt=28&oh=00_AQJZ9lxdZCzjaZOPQauu71SnmaowPoP5_nV5bP0fGxGdlA&oe=6A9F3E5A",
+              "thumbnail_url": "https://scontent-sjc3-1.cdninstagram.com/v/t51.82787-15/774136660_18615108163058763_7141632199788643228_n.jpg?stp=dst-jpg_e15_tt6&_nc_cat=110&ig_cache_key=Mzk2NTM4MDg5ODYyNzQwNzAyNjE4NjE1MTA4MTYwMDU4NzYz.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNMSVBTLnhwaWRzLjcyMC5zZHIudmlkZW9fZGVmYXVsdF9jb3Zlcl9mcmFtZS5DMyJ9&_nc_ohc=H702zR9UJ7oQ7kNvwFAJuX9&_nc_oc=Adp0S5tULOMqlzktpr38rtR8H-qmbkVvht_7Q7G_ehAvlwi66YAQfzQ7w9XJm7FLdTU&_nc_zt=23&_nc_ht=scontent-sjc3-1.cdninstagram.com&_nc_gid=wofpmVNHVNPKLgrpo0x2uA&_nc_ss=7fa8c&oh=00_AQIADvxwrxqmkRCBBUJ0IFn_KVEwLvg1TweGwmyYfFjlJg&oe=6AA3272D",
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "instagram-user-148",
+              "display_name": "instagram-user-149",
+              "avatar_url": "https://scrubbed.invalid/instagram-user-154",
+              "verified": true
+            },
+            "engagement": {
+              "views": null,
+              "likes": 31,
+              "comments": 12,
+              "shares": null,
+              "saves": null
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": null,
+              "deleted": false
+            },
+            "published_at": "2026-08-17T01:33:19.000Z",
+            "ext": {
+              "author_id": "24186762",
+              "author_followers": null
+            }
+          },
+          "computed": {
+            "engagement_rate": null,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": null
+          }
+        },
+        {
+          "post": {
+            "id": "3962099811008556502",
+            "url": "https://www.instagram.com/reel/Db8NMk3zq3W/",
+            "content": {
+              "text": "Acne may heal. The scars it leaves behind often need a more personalised approach.\n\nAt The Image, acne scar treatments are selected based on the type, depth and severity of the scarring. From advanced laser procedures to collagen-stimulating treatments and targeted scar correction, the goal is to improve skin texture and support smoother, more even-looking skin.\n\nBecause no two acne scars are exactly the same, the right treatment plan starts with the right assessment.\n\nBook your consultation with The Image.\n\n\ud83d\udccd Sarjapura | Sahakara Nagar | Whitefield\n\ud83d\udcde +00 0000 0000\n\n#AcneScarTreatment #AcneScars #SkinTreatment #Dermatology",
+              "media_urls": "https://scontent-ord5-2.cdninstagram.com/o1/v/t2/f2/m86/AQNhTHsjMZ7HRK1d-23omFgvPbzuwBPgzW4ZTR5VkpkapEX_9X2TNZVRhiVYeCh4PvYXl9PO5UWCngV1O3ctFQ3pJcLC1Mz4LbkQP4s.mp4?_nc_cat=110&_nc_sid=5e9851&_nc_ht=scontent-ord5-2.cdninstagram.com&_nc_ohc=zrVs0J9ZltIQ7kNvwHr-Pi3&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5JTlNUQUdSQU0uQ0xJUFMuQzMuNzIwLmRhc2hfYmFzZWxpbmVfMV92MSIsInhwdl9hc3NldF9pZCI6MzEwMzMzMzkyOTg2OTY4NCwiYXNzZXRfYWdlX2RheXMiOjI0LCJ2aV91c2VjYXNlX2lkIjoxMDA5OSwiZHVyYXRpb25fcyI6ODgsInVybGdlbl9zb3VyY2UiOiJ3d3cifQ%3D%3D&ccb=17-1&vs=929a0befd66c29ce&_nc_vs=HBksFQIYUmlnX3hwdl9yZWVsc19wZXJtYW5lbnRfc3JfcHJvZC9CQjQ3Q0E4RDYwRjgxN0IyMDdGREIxQzM1NTI3RTA4NF92aWRlb19kYXNoaW5pdC5tcDQVAALIARIAFQIYUWlnX3hwdl9wbGFjZW1lbnRfcGVybWFuZW50X3YyLzlGNDc0MEE1MEVGMUIxMDE4M0VERkVEREIxQzlGQUI2X2F1ZGlvX2Rhc2hpbml0Lm1wNBUCAsgBEgAoABgAGwKIB3VzZV9vaWwBMRJwcm9ncmVzc2l2ZV9yZWNpcGUBMRUAACbohZPI552DCxUCKAJDMywXQFYmZmZmZmYYEmRhc2hfYmFzZWxpbmVfMV92MREAdf4HZeadAQA&_nc_gid=oaPROs-Xk0a4enupdBhK7w&_nc_ss=7fa8c&_nc_zt=28&oh=00_AQJhQz2wGqkJJEdd5SsDDVU12gjaYjfnP3jE6Fec4Eg0XQ&oe=6A9F2EF3",
+              "thumbnail_url": "https://scontent-ord5-2.cdninstagram.com/v/t51.82787-15/772696772_18099803444624994_4896238630182935250_n.jpg?stp=dst-jpg_e15_tt6&_nc_cat=110&ig_cache_key=Mzk2MjA5OTgxMTAwODU1NjUwMjE4MDk5ODAzNDM4NjI0OTk0.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNMSVBTLnhwaWRzLjEwODAuc2RyLnZpZGVvX2RlZmF1bHRfY292ZXJfZnJhbWUuQzMifQ%3D%3D&_nc_ohc=JvwIOVAxiYsQ7kNvwFlVAhw&_nc_oc=Adqk_jLimrGYgAvzn306meEe3h3vK85CLRZNv9Eb649cA-oqdq9bFOQdelTXcUTA4EM&_nc_zt=23&_nc_ht=scontent-ord5-2.cdninstagram.com&_nc_gid=oaPROs-Xk0a4enupdBhK7w&_nc_ss=7fa8c&oh=00_AQKmFrC6MvJDRuwyWxS0GyvsFUqzTkAARvt4B3tYnsX_WQ&oe=6AA341DF",
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "instagram-user-155",
+              "display_name": "instagram-user-156",
+              "avatar_url": "https://scrubbed.invalid/instagram-user-157",
+              "verified": true
+            },
+            "engagement": {
+              "views": null,
+              "likes": 40,
+              "comments": 2,
+              "shares": null,
+              "saves": null
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": null,
+              "deleted": false
+            },
+            "published_at": "2026-08-12T13:06:29.000Z",
+            "ext": {
+              "author_id": "48912304993",
+              "author_followers": null
+            }
+          },
+          "computed": {
+            "engagement_rate": null,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": null
+          }
+        },
+        {
+          "post": {
+            "id": "3970738470250642665",
+            "url": "https://www.instagram.com/reel/Dca5ZnPRHzp/",
+            "content": {
+              "text": "When Acne Needs More Than Skincare\n\nAcne can sometimes improve with appropriate skincare, but persistent, recurrent or severe acne may require medical treatment.\n\nSeeking treatment early can help address three common problems:\n\nRecurring breakouts \u2013 treating the underlying acne can help reduce the cycle of new breakouts appearing week after week.\nSkincare trial and error \u2013 using multiple products without understanding your acne type may irritate the skin or make it difficult to identify what is actually helping.\nAcne marks and scars \u2013 prolonged inflammation, particularly from cystic or nodular acne, increases the risk of pigmentation and permanent indented scarring.\n\nOnce an indented acne scar has formed, restoring the damaged skin becomes considerably more difficult than treating the active acne that caused it and often requires multiple treatments over time.\n\nAcne treatment does not always have to be complicated. Depending on its severity, early management may begin with appropriate skincare and topical medications, while more severe acne may require a more comprehensive medical approach.\n\n\ud83c\udfa5 In this video, Dr Chiam explains why treating persistent or severe acne early can help reduce breakouts and minimise the risk of permanent scarring.\n\n#acne #acnetreatment #acnescars #cysticacne #teenageacne #skinhealth #doctorexplains #ensoulclinic\n\nTel: +00 0000 0000\nWhatsapp: +00 0000 0000\nEmail: contact@scrubbed.invalid\nFor more information, visit www.ensoulclinic.com",
+              "media_urls": "https://scontent-iad3-1.cdninstagram.com/o1/v/t2/f2/m86/AQPRAKq1tawNL68SofcRwbQYQcelsrnsjtF9iAdJTCFnqDlXlAhQQVBcNAs2YMqNsWR3CDyGqEdcmKvjGIVav7ERXSwKavuw95RJDeI.mp4?_nc_cat=108&_nc_sid=5e9851&_nc_ht=scontent-iad3-1.cdninstagram.com&_nc_ohc=x_TW9H6IAzIQ7kNvwGVsmM3&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5JTlNUQUdSQU0uQ0xJUFMuQzMuNzIwLmRhc2hfYmFzZWxpbmVfMV92MSIsInhwdl9hc3NldF9pZCI6MjUxNjQxOTc2MjE1NDYwNywiYXNzZXRfYWdlX2RheXMiOjEzLCJ2aV91c2VjYXNlX2lkIjoxMDA5OSwiZHVyYXRpb25fcyI6MTEwLCJ1cmxnZW5fc291cmNlIjoid3d3In0%3D&ccb=17-1&vs=ffabb43bf4651167&_nc_vs=HBksFQIYUmlnX3hwdl9yZWVsc19wZXJtYW5lbnRfc3JfcHJvZC84ODQyNTE2MDEwMTg2NTU3NURGODk4RDE3QUIwMDg5OF92aWRlb19kYXNoaW5pdC5tcDQVAALIARIAFQIYUWlnX3hwdl9wbGFjZW1lbnRfcGVybWFuZW50X3YyLzQ5NEVGM0ExMzdDRDMxMDAyRjQ5NDg5MUQ5MENDNkFCX2F1ZGlvX2Rhc2hpbml0Lm1wNBUCAsgBEgAoABgAGwKIB3VzZV9vaWwBMRJwcm9ncmVzc2l2ZV9yZWNpcGUBMRUAACbesbug9Kr4CBUCKAJDMywXQFuEOVgQYk4YEmRhc2hfYmFzZWxpbmVfMV92MREAdf4HZeadAQA&_nc_gid=g6wIEnNP6tZvfHDEdsSZNg&_nc_ss=7fa8c&_nc_zt=28&oh=00_AQKJJOPW_AV0Zm5SOx4WomEjbPlrZ7UJ9wESz20GrFLQrw&oe=6A9F247D",
+              "thumbnail_url": "https://scontent-iad3-1.cdninstagram.com/v/t51.82787-15/784621172_18389861308203106_6993141022828982692_n.jpg?stp=dst-jpg_e15_tt6&_nc_cat=104&ig_cache_key=Mzk3MDczODQ3MDI1MDY0MjY2NTE4Mzg5ODYxMzA1MjAzMTA2.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNMSVBTLnhwaWRzLjEwODAuc2RyLnZpZGVvX2RlZmF1bHRfY292ZXJfZnJhbWUuQzMifQ%3D%3D&_nc_ohc=FTlnfc-XmeYQ7kNvwFxfW4e&_nc_oc=AdqiXhPzLPWuoRWd-oED4rTfPYV6oIoE0e4V5BdyzRmX6jobQx6TTmy5_2K9KVX-_as&_nc_zt=23&_nc_ht=scontent-iad3-1.cdninstagram.com&_nc_gid=g6wIEnNP6tZvfHDEdsSZNg&_nc_ss=7fa8c&oh=00_AQJgarbzyAwfsVb1h7EjYYVIjYM9yITsgZxLzGrXYzKtbA&oe=6AA34975",
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "instagram-user-158",
+              "display_name": "instagram-user-159",
+              "avatar_url": "https://scrubbed.invalid/instagram-user-160",
+              "verified": false
+            },
+            "engagement": {
+              "views": null,
+              "likes": 7,
+              "comments": 0,
+              "shares": null,
+              "saves": null
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": null,
+              "deleted": false
+            },
+            "published_at": "2026-08-24T10:57:04.000Z",
+            "ext": {
+              "author_id": "6226931105",
+              "author_followers": null
+            }
+          },
+          "computed": {
+            "engagement_rate": null,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": null
+          }
+        },
+        {
+          "post": {
+            "id": "3972994126935483520",
+            "url": "https://www.instagram.com/reel/Dci6RvOs-SA/",
+            "content": {
+              "text": "\u2728 Up to 45% OFF on Acne Scar Treatments!\n\nAcne scars don\u2019t have to be permanent. Give your skin the right treatment and the right care. \u2728\n\nGet up to 45% OFF on acne scar treatments and take the first step towards smoother, healthier-looking skin.\n\n\ud83d\udcf2 Book your appointment today!\nTerms & conditions apply.",
+              "media_urls": "https://scontent-hou1-1.cdninstagram.com/o1/v/t2/f2/m86/AQNeWE8r5IXHvWtHbtJLM0ze-pExi0BorYHkaGrfW6QkuxFDGn4kZ7sWg7S60vjf5UhcjhhvUujKHAeJDF9N45ryC-121L0sMCAHNdU.mp4?_nc_cat=111&_nc_sid=5e9851&_nc_ht=scontent-hou1-1.cdninstagram.com&_nc_ohc=7hh-kMTmFY8Q7kNvwGB2jCT&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5JTlNUQUdSQU0uQUQuQzMuNzIwLmRhc2hfYmFzZWxpbmVfMV92MSIsInhwdl9hc3NldF9pZCI6MTA3MzI4OTAzMTgyNTMyNCwiYXNzZXRfYWdlX2RheXMiOjksInZpX3VzZWNhc2VfaWQiOjEwMDk5LCJkdXJhdGlvbl9zIjo1LCJ1cmxnZW5fc291cmNlIjoid3d3In0%3D&ccb=17-1&vs=9f656296572bf898&_nc_vs=HBksFQIYUmlnX3hwdl9yZWVsc19wZXJtYW5lbnRfc3JfcHJvZC9DQTQ1MDJGNkU5OUY0RTYyREY5N0Y4NkVCODA0OTM4OV92aWRlb19kYXNoaW5pdC5tcDQVAALIARIAFQIYUWlnX3hwdl9wbGFjZW1lbnRfcGVybWFuZW50X3YyLzM3NEI3QTlEQTcxMUEyRDhBRkVENjE1MkQ3RUFFRDgxX2F1ZGlvX2Rhc2hpbml0Lm1wNBUCAsgBEgAoABgAGwKIB3VzZV9vaWwBMRJwcm9ncmVzc2l2ZV9yZWNpcGUBMRUAACbY3t230onoAxUCKAJDMywXQBeZmZmZmZoYEmRhc2hfYmFzZWxpbmVfMV92MREAdfAHZeadAQA&_nc_gid=0rHsfzX9pzho6Iu-d_AyYA&_nc_ss=7fa8c&_nc_zt=28&oh=00_AQLO6x54iaj8rRkApc6DHzKYgViliaKSgn8j6Ridfe7iCA&oe=6A9F4F44",
+              "thumbnail_url": "https://scontent-hou1-1.cdninstagram.com/v/t51.82787-15/785857382_18247871710308446_1343055006268683960_n.jpg?stp=dst-jpg_e15_tt6&_nc_cat=109&ig_cache_key=Mzk3Mjk5NDEyNjkzNTQ4MzUyMDE4MjQ3ODcxNzA0MzA4NDQ2.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNMSVBTLnhwaWRzLjExNzAuc2RyLnZpZGVvX2RlZmF1bHRfY292ZXJfZnJhbWUuQzMifQ%3D%3D&_nc_ohc=VbRqTdRbA0EQ7kNvwEmq_XG&_nc_oc=AdrvOncIknORaRIMXAQZSaKu0VS5sfr9NQ6vyhdWl3Shd2S_Y81C66RqJzCchutEVkE&_nc_zt=23&_nc_ht=scontent-hou1-1.cdninstagram.com&_nc_gid=0rHsfzX9pzho6Iu-d_AyYA&_nc_ss=7fa8c&oh=00_AQKIVYWBW-ruJ760Cx5RDUJDdMe-ipICDY667_LrObSV-A&oe=6AA33460",
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "instagram-user-161",
+              "display_name": "instagram-user-162",
+              "avatar_url": "https://scrubbed.invalid/instagram-user-163",
+              "verified": false
+            },
+            "engagement": {
+              "views": null,
+              "likes": 72,
+              "comments": 1,
+              "shares": null,
+              "saves": null
+            },
+            "flags": {
+              "nsfw": null,
+              "spoiler": null,
+              "pinned": null,
+              "deleted": false
+            },
+            "published_at": "2026-08-27T13:37:20.000Z",
+            "ext": {
+              "author_id": "9214588445",
+              "author_followers": null
+            }
+          },
+          "computed": {
+            "engagement_rate": null,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": null
+          }
+        }
+      ],
+      "total": null,
+      "dropped": 0
+    },
+    "credits_used": 1,
+    "request_id": "req-KBhkV5AAMJIEv03k",
+    "cached": false,
+    "pagination": {
+      "next_cursor": "sc.eyJ2IjoyLCJjIjoic2MxLmV5SmpJam9pTWlJc0luTWlPbHNpTXprM05qUXdNek13TXpNNU5ESTJNREExTmlJc0lqTTVOelkxTkRreE16UXlOREF4TnpJMU5EVWlMQ0l6T1RZME1EUTVOVGMzTlRFek5UUXdNakk0SWl3aU16azNNekF5TVRZNE1UazJNVFUwTnpJMU9DSXNJak01TmpVek9EQTRPVGcyTWpjME1EY3dNallpTENJek9UWXlNRGs1T0RFeE1EQTROVFUyTlRBeUlpd2lNemszTURjek9EUTNNREkxTURZME1qWTJOU0lzSWpNNU56STVPVFF4TWpZNU16VTBPRE0xTWpBaVhYMCIsImUiOiJpbnN0YWdyYW0vc2VhcmNoL3JlZWxzIiwicCI6InBhZ2UiLCJzIjoiYiJ9",
+      "has_more": true,
+      "page_size": 8
+    },
+    "credits_remaining": 2481
+  }
+}

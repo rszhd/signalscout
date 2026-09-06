@@ -145,6 +145,8 @@ design more than any framework choice.
 | Reddit read, SocialCrawl | $0.008118 per request, and a request brought 25 posts |
 | TikTok read, SocialCrawl | $0.008118 per request, and a request brought 30 videos |
 | TikTok comments, SocialCrawl | $0.008118 per request, and a request brought 50 comments |
+| Instagram read, SocialCrawl | $0.008118 per request, and a request brought 30 reels |
+| Instagram comments, SocialCrawl | $0.04059 per request — five credits — and a request brought 15 comments |
 | Embedding pre-filter | ~$0.00001 |
 | AI classification, cheap model | ~$0.001 |
 
@@ -224,8 +226,48 @@ condition is not met: five verdicts exist and forty-seven matches sit unjudged.
 The owner decided to add it anyway. It is written here, in AGENTS.md and in the
 ticket so the next reader finds a decision rather than an oversight — the same
 way LinkedIn's crossing was recorded — and **the rule still stands for the
-fifth**. Instagram, TikTok and Threads are parked in US-038 against exactly that
-rule.
+fifth**. Instagram, TikTok and Threads were parked in US-038 against exactly
+that rule; TikTok was unparked by US-044 and Instagram by US-049, each as its
+own recorded decision, and Threads is still parked.
+
+**Instagram is the sixth network, and it is the dearest place to read a
+comment.** US-049 closed on 2026-09-06, the fourth crossing of PLAN.md's rule
+and again on the owner's decision. The rule stands for the seventh. Threads is
+the last of US-038's three and is still parked.
+
+It inverts TikTok's economics exactly. A reel search is 1 credit for 30 reels,
+which is the cheapest search this product makes; **a comment page is 5 credits
+for 15 comments**, which is the dearest. On this platform the lead is in the
+comments, as it is on YouTube and TikTok — so everything worth reading sits
+behind the expensive endpoint and the cheap one is the part that does not carry
+it.
+
+**The comments are sparse, not poor, and the live poll corrected the capture on
+this.** Of 89 comments collected, 56 were under ten characters and the median
+was four. Twelve passed sixty — and **the two highest-scoring matches of the run
+are the two longest comments in it**, at 233 and 289 characters. Five comments
+matched at or above 50 and **the top scored 90**, which is the highest any
+comment has reached on any platform in this product; TikTok's best was 82. It is
+a person whose skin barrier retinol destroyed, asking how to treat acne scars
+safely.
+
+So a median describes this platform badly. About one comment in seven carries
+words, and that seventh holds every lead. What is true about the cost stands:
+**the provider half is five times the model half** — $1.6317 against $0.3336 on
+one poll — which is the reverse of every other platform here. Budget for the
+reading rather than the searching.
+
+**The budget guard refused its first real poll here.** The run was capped at
+$1.00, spent $1.6317, and both paid stages stopped: classification with 89
+comments unread, and the reply step before it opened four more threads. The
+overshoot is 63% because each step of it is a 5-credit comment page.
+
+**Two provider behaviours here are wrong in ways no other endpoint is.** A
+search with no date window returns relevance-ranked posts across five years —
+thirty results ran 2021 to 2026 and the newest was five months old — so this is
+the one connector that always sends a window. And `has_more` came back true
+beside a page holding zero items, with a fresh cursor pointing at more nothing.
+Both were free to discover and both would have been expensive to ship.
 
 **A LinkedIn search never comes back empty, and that costs money.** X refunds a
 search that matches nothing, so a dead query there is free. On LinkedIn a

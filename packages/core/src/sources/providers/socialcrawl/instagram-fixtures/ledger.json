@@ -1,0 +1,44 @@
+[
+  {
+    "name": "search-keyword",
+    "creditsUsed": 1,
+    "creditsRemaining": 2483,
+    "cached": false
+  },
+  {
+    "name": "search-consumer",
+    "creditsUsed": 1,
+    "creditsRemaining": 2482,
+    "cached": false
+  },
+  {
+    "name": "search-page-2",
+    "creditsUsed": 0,
+    "creditsRemaining": 2482,
+    "cached": false
+  },
+  {
+    "name": "search-dated",
+    "creditsUsed": 1,
+    "creditsRemaining": 2481,
+    "cached": false
+  },
+  {
+    "name": "comments-top",
+    "creditsUsed": 5,
+    "creditsRemaining": 2476,
+    "cached": false
+  },
+  {
+    "name": "comments-recent",
+    "creditsUsed": 5,
+    "creditsRemaining": 2471,
+    "cached": false
+  },
+  {
+    "name": "credentials-rejected",
+    "creditsUsed": 0,
+    "creditsRemaining": null,
+    "cached": false
+  }
+]

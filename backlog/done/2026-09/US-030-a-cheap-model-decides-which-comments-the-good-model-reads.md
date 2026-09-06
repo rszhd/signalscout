@@ -6,7 +6,7 @@ priority: p2
 created: 2026-09-06T01:32+08:00
 parent: US-009
 area:
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -250,3 +250,14 @@ recorded.
   classifier to terra makes the cascade pay and is its own ticket, because
   `ai/fixtures/*.json` were captured with luna and `capture:classifier` and
   `capture:queries` would both have to run again.
+
+- 2026-09-06T12:03+08:00 — Closed. Every box was ticked when US-032 priced the
+  models and the live YouTube poll exercised the stage on a fourth platform:
+  triage dropped **60 of 71 videos**, an 85% drop rate and the highest measured,
+  on the platform where most search results are tutorials rather than people.
+
+  The stage has now run on Reddit posts, Reddit replies, YouTube videos and
+  YouTube comments, and the shape held every time: it drops most of what it
+  reads, it keeps the worked examples PLAN.md scores as leads, and it is the
+  only paid stage in front of the classifier on a reply.
+

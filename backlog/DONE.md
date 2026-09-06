@@ -2,7 +2,7 @@
 
 # Done
 
-28 finished.
+29 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
@@ -11,6 +11,7 @@
 | BUG-001 | [A pending Reddit collection is not resumed](done/2026-09/BUG-001-a-pending-reddit-collection-is-not-resumed.md) | bug | shipped | 2026-09 |
 | US-032 | [The classifier reads with the careful model](done/2026-09/US-032-the-classifier-reads-with-the-careful-model.md) | chore | shipped | 2026-09 |
 | US-031 | [SocialCrawl is measured as a third Reddit provider](done/2026-09/US-031-socialcrawl-is-measured-as-a-third-reddit-provider.md) | spike | shipped | 2026-09 |
+| US-030 | [A cheap model decides which comments the good model reads](done/2026-09/US-030-a-cheap-model-decides-which-comments-the-good-model-reads.md) | feature | shipped | 2026-09 |
 | US-029 | [A measurement says which pre-filter fits a comment](done/2026-09/US-029-a-measurement-says-which-pre-filter-fits-a-comment.md) | spike | shipped | 2026-09 |
 | US-028 | [LinkedIn returns candidate posts through SocialCrawl](done/2026-09/US-028-linkedin-returns-candidate-posts.md) | feature | shipped | 2026-09 |
 | US-027 | [A query fits the platform it searches](done/2026-09/US-027-a-query-fits-the-platform-it-searches.md) | feature | shipped | 2026-09 |

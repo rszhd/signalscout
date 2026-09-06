@@ -102,3 +102,18 @@ and is still not written.
 
   The forty are still unjudged. The dev stack is serving the inbox, and nothing
   about this entry is a substitute for reading them.
+
+- 2026-09-06T12:02+08:00 — Started and put back. The inbox was checked and the
+  work is ready: all **47** unjudged matches are reachable on one screen,
+  paused monitors included, across all four platforms. The owner has not got a
+  clear hour to read them, which is the whole cost of this ticket and cannot be
+  delegated.
+
+  Two of the 47 are new tonight and worth judging first when the hour comes: a
+  Reddit reply at 56 and a YouTube reply at 65. They are the first **replies**
+  ever put in front of a person, and whether a comment under somebody else's
+  post is a real lead is the premise US-020 and US-034 were both built on.
+
+  Nothing about the ticket changed. It still costs no money and still blocks
+  PLAN.md's first meaningful question.
+

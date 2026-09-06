@@ -406,7 +406,9 @@ describe("the budget guard", () => {
       });
 
       expect(state.reason).toBe(
-        "Polling stopped: this monitor has spent an estimated $1.02 of its $1.00 monthly budget.",
+        "Stopped at the budget: this monitor has spent an estimated $1.02 of its $1.00 monthly " +
+          "budget. It is not collecting, and posts it already collected are not being scored. " +
+          "Raise the cap to start both again.",
       );
     });
   });

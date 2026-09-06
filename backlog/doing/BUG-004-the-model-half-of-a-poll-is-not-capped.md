@@ -59,9 +59,8 @@ is the failure this repository keeps writing down.
       billed like one
 - [x] A post left unclassified by a refusal keeps its place and is picked up by
       a later poll once there is room, and a test proves it is not dropped
-- [ ] The monitor screen says the monitor stopped for money rather than for
-      lack of matches — **not done: the reason reaches the log and not yet a
-      screen**
+- [x] The monitor screen says the monitor stopped for money rather than for
+      lack of matches
 - [x] A test drives a monitor over its cap through the reply path specifically,
       because that is the path that made this large
 - [ ] The Log records what one capped poll costs against what an uncapped one
@@ -119,3 +118,29 @@ is the failure this repository keeps writing down.
   log and not yet a screen, and the measured comparison needs another live run —
   the one that found this bug cost $0.715 and there is nothing to learn from
   repeating it at this hour.
+
+- 2026-09-06T12:26+08:00 — The screen box closes, and the work was smaller than
+  the box implied because most of it already existed. The monitor list already
+  showed a "Budget spent" badge and printed the guard's own sentence, so a
+  stopped monitor never looked like a quiet week.
+
+  What was wrong was the sentence. It said **"Polling stopped"**, and since this
+  bug's fix two things stop at a cap rather than one: the poll collects nothing
+  further, and posts already collected — already paid for at a provider — are
+  not scored. A person told only that polling stopped would not know that
+  raising the cap buys them something they had already bought.
+
+  It now says so, and names the repair. Three assertions moved with it, in the
+  guard's own test, the API's and the screen's, because the sentence is sent
+  whole by the server so that the screen and the worker's log cannot drift.
+
+  **One thing a person still cannot see, and it is worth writing down rather
+  than leaving as a silence.** The screen says the cap stopped the scoring; it
+  does not say *how much* is waiting behind it. That number is not cheaply
+  computable today: a post is shared across monitors, and the only durable links
+  between a monitor and a post are `matches`, `model_calls` and `filter_drops` —
+  all of which record something that happened. A post that was collected, passed
+  the filter and was never reached has no row anywhere. Making "40 posts are
+  waiting" answerable is a schema change, and it belongs to a ticket that wants
+  it rather than to this one.
+

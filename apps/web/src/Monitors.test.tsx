@@ -122,14 +122,18 @@ describe("the monitor list", () => {
           remainingMicros: 0,
           exhausted: true,
           reason:
-            "Polling stopped: this monitor has spent an estimated $0.30 of its $0.20 monthly budget.",
+            "Stopped at the budget: this monitor has spent an estimated $0.30 of its $0.20 monthly " +
+            "budget. It is not collecting, and posts it already collected are not being scored. " +
+            "Raise the cap to start both again.",
           since: "2026-03-01T00:00:00.000Z",
         },
       }),
     ]);
 
     expect(container.textContent).toContain(
-      "Polling stopped: this monitor has spent an estimated $0.30 of its $0.20 monthly budget.",
+      "Stopped at the budget: this monitor has spent an estimated $0.30 of its $0.20 monthly " +
+        "budget. It is not collecting, and posts it already collected are not being scored. " +
+        "Raise the cap to start both again.",
     );
     // And not merely "Paused", which would send a person looking for a button
     // somebody pressed.

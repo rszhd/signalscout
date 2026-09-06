@@ -970,7 +970,9 @@ describe("the monitor routes", () => {
 
         expect(monitor.spend.exhausted).toBe(true);
         expect(monitor.spend.reason).toBe(
-          "Polling stopped: this monitor has spent an estimated $0.30 of its $0.20 monthly budget.",
+          "Stopped at the budget: this monitor has spent an estimated $0.30 of its $0.20 monthly " +
+            "budget. It is not collecting, and posts it already collected are not being scored. " +
+            "Raise the cap to start both again.",
         );
       });
     });

@@ -452,9 +452,22 @@ export function budgetState(spend: MonitorSpend, budget: MonitorBudget | null): 
     remainingMicros: Math.max(0, budget.monthlyCapMicros - spend.totalMicros),
     exhausted,
     onExhausted: budget.onExhausted,
+    /**
+     * The sentence a person reads, and it names both halves on purpose.
+     *
+     * It said "Polling stopped" until 2026-09-06, when BUG-004 taught the
+     * classify step to stop mid-batch. Two things stop at a cap now, and only
+     * one of them is obvious: the poll collects nothing further, and posts
+     * already collected and already paid for are not read. A person told only
+     * that polling stopped would not know that raising the cap buys them
+     * something they have already bought.
+     */
     reason: exhausted
-      ? `Polling stopped: this monitor has spent an estimated ${formatMicros(spend.totalMicros)} ` +
-        `of its ${formatMicros(budget.monthlyCapMicros)} monthly budget.`
+      ? `Stopped at the budget: this monitor has spent an estimated ${formatMicros(
+          spend.totalMicros,
+        )} of its ${formatMicros(budget.monthlyCapMicros)} monthly budget. It is not ` +
+        "collecting, and posts it already collected are not being scored. Raise the cap " +
+        "to start both again."
       : null,
   };
 }

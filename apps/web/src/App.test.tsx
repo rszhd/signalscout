@@ -80,11 +80,9 @@ describe("the four screens", () => {
     await go("#/monitors/new");
 
     expect(screen.container.textContent).toContain("What should this monitor find?");
-    const dialog = screen.container.querySelector('[role="dialog"]');
-    expect(dialog?.getAttribute("aria-modal")).toBe("true");
-    expect(dialog?.querySelector('a[href="#/monitors"]')?.getAttribute("aria-label")).toBe(
-      "Close new monitor",
-    );
+    expect(screen.container.querySelector('[role="dialog"]')).toBeNull();
+    expect(screen.container.querySelector(".setup-page")).not.toBeNull();
+    expect(screen.container.textContent).not.toContain("No monitors yet");
   });
 
   it("reaches the monitor list from the header, and not the form's route", async () => {
@@ -97,11 +95,10 @@ describe("the four screens", () => {
 
     expect(screen.container.querySelector('[role="dialog"]')).toBeNull();
 
-    // The new-monitor route intentionally keeps the monitor list behind its
-    // dialog. The dialog itself distinguishes the longer route.
+    // Setup owns the whole page; the monitor list is not mounted underneath.
     await go("#/monitors/new");
     expect(screen.container.textContent).toContain("What should this monitor find?");
-    expect(screen.container.querySelector('[role="dialog"]')).not.toBeNull();
+    expect(screen.container.querySelector(".setup-page")).not.toBeNull();
   });
 
   it("comes back to the inbox from the header", async () => {
@@ -116,7 +113,7 @@ describe("the four screens", () => {
     expect(screen.container.textContent).toContain("Intent inbox");
   });
 
-  it("closes the new monitor dialog with Escape", async () => {
+  it("keeps page setup open on Escape", async () => {
     globalThis.location.hash = "#/monitors/new";
     screen = await mount(<App />);
 
@@ -125,7 +122,7 @@ describe("the four screens", () => {
     });
     await settle();
 
-    expect(globalThis.location.hash).toBe("#/monitors");
+    expect(globalThis.location.hash).toBe("#/monitors/new");
     expect(screen.container.querySelector('[role="dialog"]')).toBeNull();
   });
 

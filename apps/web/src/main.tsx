@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import { App } from "./App.js";
 import "./index.css";
 import "./styles/theme.css";
+import "./styles/monitor-setup.css";
 
 const container = document.getElementById("root");
 

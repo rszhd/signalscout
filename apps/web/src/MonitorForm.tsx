@@ -1,7 +1,7 @@
-import { type FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { type FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { messageFor, requestJson } from "./api.js";
 import { CostTest, type EstimateReport, exceedsCap } from "./CostTest.js";
-import { toMicros } from "./Monitors.js";
+import { formatMicros, toMicros } from "./Monitors.js";
 import { browserTimezone, type ScheduleChoice, scheduleChoices } from "./schedule.js";
 
 interface SignalOption {
@@ -78,6 +78,40 @@ type OptionsState =
   | { state: "error"; message: string }
   | { state: "ready"; options: MonitorOptions };
 
+const steps = [
+  {
+    id: "answers",
+    label: "Product",
+    title: "What should this monitor find?",
+    hint: "Tell us what you sell and who you help.",
+  },
+  {
+    id: "signals",
+    label: "Signals",
+    title: "What does a promising conversation sound like?",
+    hint: "Choose the reasons someone might need your product.",
+  },
+  {
+    id: "sources",
+    label: "Sources",
+    title: "Where should we listen?",
+    hint: "Choose the platforms and conversations to watch.",
+  },
+  {
+    id: "review",
+    label: "Search plan",
+    title: "Review the search plan",
+    hint: "Keep the searches focused. You can edit every phrase.",
+  },
+  {
+    id: "launch",
+    label: "Schedule & budget",
+    title: "Set the pace and the budget",
+    hint: "Choose when to collect, then start when you’re ready.",
+  },
+] as const;
+type SetupStage = (typeof steps)[number]["id"] | "created";
+
 const emptyAnswers: Answers = { name: "", product: "", idealCustomer: "", problem: "" };
 
 /**
@@ -145,19 +179,12 @@ function cleanList(values: readonly string[] | undefined): string[] {
   return values.map((value) => value.trim()).filter(Boolean);
 }
 
-function priceLabel(micros: number | null | undefined): string | null {
-  if (micros === null || micros === undefined) return null;
-  if (micros < 10_000) return "Less than $0.01";
-  return `$${(micros / 1_000_000).toFixed(2)}`;
-}
-
 /**
  * Four answers become a visible search plan.
  *
  * The API owns the signal wording and the validation rules. This component
  * owns the sequence, and keeps the generated plan editable before anything
- * starts. It renders one screen and not the page: `App` holds the header and
- * decides which screen is shown.
+ * starts. Each step owns one decision; App routes here as a dedicated page.
  */
 export function MonitorForm() {
   const [optionsState, setOptionsState] = useState<OptionsState>({ state: "loading" });
@@ -173,7 +200,7 @@ export function MonitorForm() {
   const [scheduleId, setScheduleId] = useState(scheduleChoices[0]?.id ?? "hourly");
   const [timezone, setTimezone] = useState(browserTimezone());
   const [plan, setPlan] = useState<QueryPlan>(emptyPlan);
-  const [stage, setStage] = useState<"answers" | "review" | "created">("answers");
+  const [stage, setStage] = useState<SetupStage>("answers");
   const [created, setCreated] = useState<CreatedMonitor | null>(null);
   const [working, setWorking] = useState<"generating" | "creating" | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -182,14 +209,25 @@ export function MonitorForm() {
   const [onExhausted, setOnExhausted] = useState("pause");
   const [estimate, setEstimate] = useState<EstimateReport | null>(null);
 
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const [generatedFor, setGeneratedFor] = useState<string | null>(null);
+  const generationSignature = JSON.stringify([
+    answers.product,
+    answers.idealCustomer,
+    answers.problem,
+    [...selectedSignals].sort(),
+    [...selectedSources].sort(),
+  ]);
+  const currentStep = steps.findIndex((step) => step.id === stage);
   useEffect(() => {
-    const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") globalThis.location.hash = "#/monitors";
-    };
+    // Moving between steps should put keyboard and screen-reader users at the new heading.
+    if (stage !== "created") headingRef.current?.focus();
+  }, [stage]);
+  function goTo(next: SetupStage) {
+    setError(null);
+    setStage(next);
+  }
 
-    globalThis.addEventListener("keydown", closeOnEscape);
-    return () => globalThis.removeEventListener("keydown", closeOnEscape);
-  }, []);
   /** The plan the estimate measured. An edited plan makes the answer stale. */
   const [testedPlan, setTestedPlan] = useState<string | null>(null);
 
@@ -240,9 +278,13 @@ export function MonitorForm() {
 
   const capMicros = cap.trim() === "" ? null : toMicros(cap);
   const queries = cleanQueries(plan.queries, selectedSources);
-  const subreddits = cleanList(plan.subreddits);
-  const signature = planSignature(plan.queries, plan.subreddits);
-  const stale = testedPlan !== null && testedPlan !== signature;
+  const subreddits = selectedSources.includes("reddit") ? cleanList(plan.subreddits) : [];
+  const signature = planSignature(queries, subreddits);
+  const stale =
+    testedPlan !== null &&
+    (testedPlan !== signature ||
+      estimate?.pollIntervalSeconds !== schedule.pollIntervalSeconds ||
+      [...(estimate?.pollDays ?? [])].sort().join() !== [...schedule.pollDays].sort().join());
 
   /**
    * The plan may not start when the test says it would spend the budget
@@ -302,11 +344,17 @@ export function MonitorForm() {
       return;
     }
 
+    if (generatedFor === generationSignature) {
+      goTo("review");
+      return;
+    }
+    takeReport(null);
     if (!options.canGenerateQueries) {
       setPlan({
         queries: Object.fromEntries(selectedSources.map((id) => [id, [""]])),
         subreddits: [],
       });
+      setGeneratedFor(generationSignature);
       setStage("review");
       return;
     }
@@ -325,6 +373,7 @@ export function MonitorForm() {
           sources: selectedSources,
         }),
       });
+      setGeneratedFor(generationSignature);
       setPlan(generated);
       setStage("review");
     } catch (cause) {
@@ -332,6 +381,36 @@ export function MonitorForm() {
     } finally {
       setWorking(null);
     }
+  }
+
+  function reviewPlan(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (allQueries(queries).length === 0 && subreddits.length === 0) {
+      setError("Keep at least one search query or subreddit.");
+      return;
+    }
+    for (const source of selectedSourceOptions) {
+      if (
+        (queries[source.id] ?? []).some((query) => {
+          const count = query.split(/\s+/).length;
+          return count < 2 || count > source.search.maxQueryWords;
+        })
+      ) {
+        for (const group of event.currentTarget.querySelectorAll<HTMLDetailsElement>(
+          ".platform-plan",
+        )) {
+          if (group.dataset.platform === source.id) {
+            group.open = true;
+            group.querySelector<HTMLInputElement>('[aria-invalid="true"]')?.focus();
+          }
+        }
+        setError(
+          `Use 2 to ${source.search.maxQueryWords} words in each ${source.displayName} query.`,
+        );
+        return;
+      }
+    }
+    goTo("launch");
   }
 
   async function createMonitor(event: FormEvent<HTMLFormElement>): Promise<void> {
@@ -388,34 +467,46 @@ export function MonitorForm() {
     setCap("");
     setOnExhausted("pause");
     takeReport(null);
+    setIncludeReplies(false);
+    setScheduleId(scheduleChoices[0]?.id ?? "hourly");
+    setTimezone(browserTimezone());
+    setGeneratedFor(null);
     setStage("answers");
   }
 
   return (
-    <div className="monitor-dialog-backdrop">
-      <section
-        aria-label="Create a new monitor"
-        aria-modal="true"
-        className="monitor-dialog"
-        role="dialog"
-      >
-        <a className="monitor-dialog-close" href="#/monitors" aria-label="Close new monitor">
-          ×
+    <div className="product-page setup-page">
+      <header className="topbar">
+        <div>
+          <h1>New monitor</h1>
+          <p className="page-subtitle">A focused search for people you can help.</p>
+        </div>
+        <a className="top-secondary-link" href="#/monitors">
+          Exit setup
         </a>
-        <header className="monitor-dialog-header">
-          <p className="monitor-dialog-kicker">
-            <span>New monitor</span>
-            <span>
-              {stage === "created" ? "Complete" : `Step ${stage === "answers" ? 1 : 2} of 2`}
-            </span>
+      </header>
+      <div className="setup-layout">
+        <aside className="setup-progress" aria-label="Setup progress">
+          <p className="setup-progress-label">
+            {stage === "created" ? "Setup complete" : `Step ${currentStep + 1} of ${steps.length}`}
           </p>
-          <div className="monitor-dialog-progress" aria-hidden="true">
-            <i className="active" />
-            <i className={stage === "review" || stage === "created" ? "active" : ""} />
-          </div>
-        </header>
-
-        <div className="form-card">
+          <ol>
+            {steps.map((step, index) => (
+              <li
+                key={step.id}
+                aria-current={stage === step.id ? "step" : undefined}
+                className={stage === "created" || index < currentStep ? "complete" : ""}
+              >
+                <span aria-hidden="true">
+                  {stage === "created" || index < currentStep ? "✓" : index + 1}
+                </span>
+                <span>{step.label}</span>
+              </li>
+            ))}
+          </ol>
+          <p className="setup-progress-note">Nothing starts collecting until you finish setup.</p>
+        </aside>
+        <section className="setup-content" aria-label="Create a new monitor">
           {optionsState.state === "loading" && (
             <div className="center-state" role="status">
               <span className="spinner" aria-hidden="true" />
@@ -435,13 +526,21 @@ export function MonitorForm() {
             </div>
           )}
 
+          {options && stage !== "created" && (
+            <div className="setup-heading">
+              <h2 ref={headingRef} tabIndex={-1}>
+                {steps[currentStep]?.title}
+              </h2>
+              <p>{steps[currentStep]?.hint}</p>
+            </div>
+          )}
           {options && stage === "answers" && (
-            <form onSubmit={generatePlan}>
-              <div className="card-heading">
-                <h2>What should this monitor find?</h2>
-                <p>Specific answers produce narrower searches and fewer irrelevant posts.</p>
-              </div>
-
+            <form
+              onSubmit={(event) => {
+                event.preventDefault();
+                goTo("signals");
+              }}
+            >
               <div className="field-stack">
                 <label className="field">
                   <span>Monitor name</span>
@@ -503,6 +602,27 @@ export function MonitorForm() {
                 </label>
               </div>
 
+              <div className="setup-actions">
+                <a className="secondary-button" href="#/monitors">
+                  Cancel
+                </a>
+                <button className="primary-button" type="submit" disabled={working !== null}>
+                  Continue
+                </button>
+              </div>
+            </form>
+          )}
+          {options && stage === "signals" && (
+            <form
+              onSubmit={(event) => {
+                event.preventDefault();
+                if (!selectedSignals.length) {
+                  setError("Choose at least one signal.");
+                  return;
+                }
+                goTo("sources");
+              }}
+            >
               <fieldset className="choice-section">
                 <legend>Which signals matter?</legend>
                 <p>Select the ways a promising conversation might begin.</p>
@@ -526,9 +646,31 @@ export function MonitorForm() {
                 </div>
               </fieldset>
 
+              {error && (
+                <p className="form-error" role="alert">
+                  {error}
+                </p>
+              )}
+              <div className="setup-actions">
+                <button
+                  className="secondary-button"
+                  type="button"
+                  disabled={working !== null}
+                  onClick={() => goTo("answers")}
+                >
+                  Back
+                </button>
+                <button className="primary-button" type="submit" disabled={working !== null}>
+                  Continue
+                </button>
+              </div>
+            </form>
+          )}
+          {options && stage === "sources" && (
+            <form onSubmit={generatePlan}>
               <fieldset className="choice-section source-section">
                 <legend>Where should it look?</legend>
-                <p>This deployment currently has these source connectors.</p>
+                <p>Pick at least one platform. You can save now and connect an account later.</p>
                 <div className="source-list">
                   {options.sources.map((source) => (
                     <label className="source-card" key={source.id}>
@@ -537,10 +679,15 @@ export function MonitorForm() {
                         type="checkbox"
                         onChange={() => setSelectedSources(toggle(selectedSources, source.id))}
                       />
-                      <span className="source-symbol">r/</span>
+                      <span className="source-symbol" aria-hidden="true">
+                        {source.id === "reddit"
+                          ? "r/"
+                          : source.id === "linkedin"
+                            ? "in"
+                            : source.displayName.slice(0, 2)}
+                      </span>
                       <span>
                         <strong>{source.displayName}</strong>
-                        <small>{source.ready ? "Ready to collect" : "Connection required"}</small>
                       </span>
                       <span className={`status-dot ${source.ready ? "ready" : "missing"}`}>
                         {source.ready ? "Ready" : "Not connected"}
@@ -548,45 +695,6 @@ export function MonitorForm() {
                     </label>
                   ))}
                 </div>
-              </fieldset>
-
-              <fieldset className="choice-section">
-                <legend>How often should it look?</legend>
-                <p>
-                  This is the biggest thing you control about what a monitor costs. Every poll is
-                  billed whether it finds anything or not.
-                </p>
-                <div className="signal-list">
-                  {scheduleChoices.map((choice) => (
-                    <label className="signal-card" key={choice.id}>
-                      <input
-                        checked={scheduleId === choice.id}
-                        name="schedule"
-                        type="radio"
-                        onChange={() => setScheduleId(choice.id)}
-                      />
-                      <span>
-                        <strong>{choice.label}</strong>
-                        <small>{choice.hint}</small>
-                      </span>
-                    </label>
-                  ))}
-                </div>
-
-                {/*
-                  The days are counted where the person is, not where the
-                  database is. In UTC a Monday in Kuala Lumpur starts at 8am on
-                  Sunday, so "weekdays" would be wrong by a day for most of the
-                  world.
-                */}
-                <label className="field">
-                  <span>Time zone</span>
-                  <input onChange={(event) => setTimezone(event.target.value)} value={timezone} />
-                  <small>
-                    Used to work out which day it is. Guessed from this browser; change it if the
-                    monitor should follow somewhere else.
-                  </small>
-                </label>
               </fieldset>
 
               <fieldset className="choice-section">
@@ -605,9 +713,8 @@ export function MonitorForm() {
                   <span>
                     <strong>Include replies and comments</strong>
                     <small>
-                      A busy thread holds about twelve replies, so this can multiply the model calls
-                      this monitor makes by roughly ten. The fetch itself is about one cent per
-                      hundred threads.
+                      Replies can reveal more people asking for help, but they multiply the model
+                      calls and collection costs.
                     </small>
                   </span>
                 </label>
@@ -653,36 +760,29 @@ export function MonitorForm() {
                   {error}
                 </p>
               )}
-
-              <div className="form-actions end">
-                <p>Your answers are stored separately from the search plan.</p>
-                <button className="primary-button" disabled={working !== null} type="submit">
+              <div className="setup-actions">
+                <button
+                  className="secondary-button"
+                  type="button"
+                  disabled={working !== null}
+                  onClick={() => goTo("signals")}
+                >
+                  Back
+                </button>
+                <button className="primary-button" type="submit" disabled={working !== null}>
                   {working === "generating"
                     ? "Generating…"
-                    : options.canGenerateQueries
-                      ? "Generate search plan"
-                      : "Review search plan"}
+                    : generatedFor === generationSignature
+                      ? "Continue to search plan"
+                      : options.canGenerateQueries
+                        ? "Generate search plan"
+                        : "Review search plan"}
                 </button>
               </div>
             </form>
           )}
-
           {options && stage === "review" && (
-            <form onSubmit={createMonitor}>
-              <div className="card-heading plan-heading">
-                <div>
-                  <h2>Review the search plan</h2>
-                  <p>Edit anything that feels too broad. Each query becomes a separate search.</p>
-                </div>
-                {plan.model && (
-                  <span className="model-note">
-                    Written by {plan.model}
-                    {priceLabel(plan.estimatedCostMicros) &&
-                      ` · ${priceLabel(plan.estimatedCostMicros)}`}
-                  </span>
-                )}
-              </div>
-
+            <form onSubmit={reviewPlan}>
               {!options.canGenerateQueries && (
                 <div className="notice compact">
                   <strong>Write your own plan.</strong>
@@ -697,18 +797,20 @@ export function MonitorForm() {
                 const limit = source.search.maxQueryWords;
 
                 return (
-                  <section className="plan-section" key={`queries-${source.id}`}>
-                    <div className="section-title-row">
-                      <div>
-                        <h3>Search queries for {source.displayName}</h3>
-                        <p>
-                          Plain phrases, without AND, OR or quote syntax. At most {limit} words
-                          each.
-                          {source.search.note ? ` ${source.search.note}` : ""}
-                        </p>
-                      </div>
+                  <details
+                    className="plan-section platform-plan"
+                    data-platform={source.id}
+                    key={`queries-${source.id}`}
+                    open={source.id === selectedSourceOptions[0]?.id}
+                  >
+                    <summary>
+                      <span>Search queries for {source.displayName}</span>
                       <span>{cleanList(list).length} of 8</span>
-                    </div>
+                    </summary>
+                    <p className="platform-plan-hint">
+                      Plain phrases, without AND, OR or quote syntax. Use 2 to {limit} words each.
+                      {source.search.note ? ` ${source.search.note}` : ""}
+                    </p>
                     <div className="query-list">
                       {list.map((query, index) => {
                         const words = query.trim().split(/\s+/).filter(Boolean).length;
@@ -718,7 +820,7 @@ export function MonitorForm() {
                             <span className="query-number">{index + 1}</span>
                             <input
                               aria-label={`${source.displayName} search query ${index + 1}`}
-                              aria-invalid={words > limit}
+                              aria-invalid={words > limit || words === 1}
                               maxLength={80}
                               placeholder="A phrase people might search for"
                               value={query}
@@ -785,74 +887,148 @@ export function MonitorForm() {
                         <span aria-hidden="true">+</span> Add query
                       </button>
                     )}
-                  </section>
+                  </details>
                 );
               })}
 
-              <section className="plan-section subreddit-section">
-                <div className="section-title-row">
-                  <div>
-                    <h3>Suggested subreddits</h3>
-                    <p>Keep the names only. We add the r/ prefix.</p>
+              {selectedSources.includes("reddit") && (
+                <section className="plan-section subreddit-section">
+                  <div className="section-title-row">
+                    <div>
+                      <h3>Suggested subreddits</h3>
+                      <p>Keep the names only. We add the r/ prefix.</p>
+                    </div>
+                    <span>{cleanList(plan.subreddits).length} of 8</span>
                   </div>
-                  <span>{cleanList(plan.subreddits).length} of 8</span>
-                </div>
-                <div className="subreddit-list">
-                  {plan.subreddits.map((subreddit, index) => (
-                    <div className="subreddit-row" key={`subreddit-${index.toString()}`}>
-                      <span>r/</span>
-                      <input
-                        aria-label={`Subreddit ${index + 1}`}
-                        placeholder="SaaS"
-                        value={subreddit}
-                        onChange={(event) =>
-                          setPlan((current) => ({
-                            ...current,
-                            subreddits: current.subreddits.map((item, itemIndex) =>
-                              itemIndex === index ? event.target.value : item,
-                            ),
-                          }))
-                        }
-                      />
+                  <div className="subreddit-list">
+                    {plan.subreddits.map((subreddit, index) => (
+                      <div className="subreddit-row" key={`subreddit-${index.toString()}`}>
+                        <span>r/</span>
+                        <input
+                          aria-label={`Subreddit ${index + 1}`}
+                          placeholder="SaaS"
+                          value={subreddit}
+                          onChange={(event) =>
+                            setPlan((current) => ({
+                              ...current,
+                              subreddits: current.subreddits.map((item, itemIndex) =>
+                                itemIndex === index ? event.target.value : item,
+                              ),
+                            }))
+                          }
+                        />
+                        <button
+                          aria-label={`Remove subreddit ${index + 1}`}
+                          className="icon-button"
+                          type="button"
+                          onClick={() =>
+                            setPlan((current) => ({
+                              ...current,
+                              subreddits: current.subreddits.filter(
+                                (_, itemIndex) => itemIndex !== index,
+                              ),
+                            }))
+                          }
+                        >
+                          <span aria-hidden="true">×</span>
+                        </button>
+                      </div>
+                    ))}
+                    {plan.subreddits.length < 8 && (
                       <button
-                        aria-label={`Remove subreddit ${index + 1}`}
-                        className="icon-button"
+                        className="subreddit-add"
                         type="button"
                         onClick={() =>
                           setPlan((current) => ({
                             ...current,
-                            subreddits: current.subreddits.filter(
-                              (_, itemIndex) => itemIndex !== index,
-                            ),
+                            subreddits: [...current.subreddits, ""],
                           }))
                         }
                       >
-                        <span aria-hidden="true">×</span>
+                        + Add subreddit
                       </button>
-                    </div>
-                  ))}
-                  {plan.subreddits.length < 8 && (
-                    <button
-                      className="subreddit-add"
-                      type="button"
-                      onClick={() =>
-                        setPlan((current) => ({
-                          ...current,
-                          subreddits: [...current.subreddits, ""],
-                        }))
-                      }
-                    >
-                      + Add subreddit
-                    </button>
-                  )}
-                </div>
-              </section>
-
+                    )}
+                  </div>
+                </section>
+              )}
+              {error && (
+                <p className="form-error" role="alert">
+                  {error}
+                </p>
+              )}
+              {plan.model && (
+                <details className="disclosure generation-details">
+                  <summary>Generation details</summary>
+                  <p>
+                    Written by {plan.model}
+                    {plan.estimatedCostMicros != null
+                      ? ` · estimated ${formatMicros(plan.estimatedCostMicros)}`
+                      : ""}
+                  </p>
+                </details>
+              )}
+              <div className="setup-actions">
+                <button
+                  className="secondary-button"
+                  type="button"
+                  disabled={working !== null}
+                  onClick={() => goTo("sources")}
+                >
+                  Back
+                </button>
+                <button className="primary-button" type="submit" disabled={working !== null}>
+                  Continue to schedule
+                </button>
+              </div>
+            </form>
+          )}
+          {options && stage === "launch" && (
+            <form onSubmit={createMonitor}>
+              <div className="setup-summary">
+                <strong>{answers.name}</strong>
+                <span>
+                  {selectedSourceOptions.map((source) => source.displayName).join(" · ")} ·{" "}
+                  {allQueries(queries).length} queries
+                  {subreddits.length > 0 ? ` · ${subreddits.length} subreddits` : ""}
+                </span>
+              </div>
+              <fieldset className="choice-section">
+                <legend>How often should it look?</legend>
+                <p>More frequent searches mean more provider calls.</p>
+                <label className="field">
+                  <span>Collection schedule</span>
+                  <select
+                    aria-label="Collection schedule"
+                    value={scheduleId}
+                    onChange={(event) => setScheduleId(event.target.value)}
+                  >
+                    {scheduleChoices.map((choice) => (
+                      <option key={choice.id} value={choice.id}>
+                        {choice.label}
+                      </option>
+                    ))}
+                  </select>
+                  <small>{schedule.hint}</small>
+                </label>
+                <details className="disclosure timezone-setting">
+                  <summary>Time zone · {timezone}</summary>
+                  <label className="field">
+                    <span>Time zone</span>
+                    <input
+                      aria-label="Time zone"
+                      required
+                      value={timezone}
+                      onChange={(event) => setTimezone(event.target.value)}
+                    />
+                  </label>
+                  <p>Days follow this time zone. We started with your browser’s setting.</p>
+                </details>
+              </fieldset>{" "}
               <fieldset className="choice-section budget-section">
                 <legend>How much may it spend a month?</legend>
                 <p>
-                  The monitor stops when it reaches this. Leave it empty for no cap; what it spends
-                  is recorded either way.
+                  Leave it empty for no cap. The final call can overshoot the cap; its price is
+                  known only afterwards. Spending is recorded either way.
                 </p>
                 <div className="budget-row">
                   <label className="field">
@@ -881,7 +1057,6 @@ export function MonitorForm() {
                   </label>
                 </div>
               </fieldset>
-
               <CostTest
                 monthlyCapMicros={capMicros}
                 pollDays={schedule.pollDays}
@@ -892,14 +1067,12 @@ export function MonitorForm() {
                 subreddits={subreddits}
                 onReport={takeReport}
               />
-
               {stale && (
                 <div className="notice compact" role="status">
-                  <strong>The plan has changed since this test.</strong>
-                  <span>Test it again to see what the queries above would cost.</span>
+                  <strong>The plan or schedule has changed since this test.</strong>
+                  <span>Test again to estimate the current plan and schedule.</span>
                 </div>
               )}
-
               {missingCredentials.length > 0 && (
                 <div className="notice warning" role="status">
                   <strong>This monitor cannot start yet.</strong>
@@ -908,41 +1081,32 @@ export function MonitorForm() {
                   </span>
                 </div>
               )}
-
               {error && (
                 <p className="form-error" role="alert">
                   {error}
                 </p>
               )}
-
-              <div className="form-actions">
+              <div className="setup-actions">
                 <button
                   className="secondary-button"
-                  disabled={working !== null}
                   type="button"
-                  onClick={() => {
-                    setError(null);
-                    setStage("answers");
-                  }}
+                  disabled={working !== null}
+                  onClick={() => goTo("review")}
                 >
-                  Back to answers
+                  Back
                 </button>
-                <div className="action-copy">
-                  <small>{answers.name}</small>
-                  <button className="primary-button" disabled={working !== null} type="submit">
-                    {working === "creating"
-                      ? "Saving…"
-                      : overCap
-                        ? "Save without starting"
-                        : missingCredentials.length > 0
-                          ? "Save monitor paused"
-                          : "Start monitor"}
-                  </button>
-                </div>
+                <button className="primary-button" type="submit" disabled={working !== null}>
+                  {working === "creating"
+                    ? "Saving…"
+                    : overCap
+                      ? "Save without starting"
+                      : missingCredentials.length > 0
+                        ? "Save monitor paused"
+                        : "Start monitor"}
+                </button>
               </div>
             </form>
           )}
-
           {options && stage === "created" && created && (
             <div className="center-state success-state" role="status">
               <span className="success-mark" aria-hidden="true">
@@ -954,16 +1118,21 @@ export function MonitorForm() {
               </h2>
               <p>
                 {created.paused
-                  ? `It will stay paused until you connect ${describeMissing(created.missingCredentials)}.`
+                  ? created.missingCredentials.length > 0
+                    ? `It will stay paused until you connect ${describeMissing(created.missingCredentials)}.`
+                    : "Your plan is saved without collecting. Adjust the budget or search plan before starting it from Monitors."
                   : "IntentWatch will collect the first conversations on the monitor schedule."}
               </p>
-              <button className="primary-button" type="button" onClick={reset}>
+              <a className="primary-button" href="#/monitors">
+                View monitors
+              </a>
+              <button className="text-button" type="button" onClick={reset}>
                 Create another monitor
               </button>
             </div>
           )}
-        </div>
-      </section>
+        </section>
+      </div>
     </div>
   );
 }

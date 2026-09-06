@@ -74,6 +74,23 @@ describe("the monitor form", () => {
   let container: HTMLDivElement;
   let fetchMock: ReturnType<typeof vi.fn>;
 
+  async function toSources() {
+    if (!container.querySelector('[aria-label="Monitor name"]')) return;
+    await act(async () => {
+      for (const [label, value] of [
+        ["Monitor name", "Journeys"],
+        ["What do you sell?", "A browser test runner"],
+        ["Who is most likely to buy it?", "Small SaaS teams"],
+        ["What problem does it solve?", "Tests break after UI changes"],
+      ]) {
+        const field = input(label as string);
+        if (!field.value) setValue(field, value as string);
+      }
+      button("Continue").click();
+    });
+    await act(async () => button("Continue").click());
+  }
+
   beforeEach(async () => {
     fetchMock = vi.fn(async (request: string | URL | Request) => {
       const url = typeof request === "string" ? request : request.toString();
@@ -91,15 +108,87 @@ describe("the monitor form", () => {
     vi.unstubAllGlobals();
   });
 
-  it("collects the three written answers and all seven server-defined signals", () => {
+  it("collects written answers before asking for signals", async () => {
     expect(input("What do you sell?").required).toBe(true);
     expect(input("Who is most likely to buy it?").required).toBe(true);
     expect(input("What problem does it solve?").required).toBe(true);
 
+    await act(async () => {
+      setValue(input("Monitor name"), "Journeys");
+      setValue(input("What do you sell?"), "A browser test runner");
+      setValue(input("Who is most likely to buy it?"), "Small SaaS teams");
+      setValue(input("What problem does it solve?"), "Tests break after UI changes");
+      button("Continue").click();
+    });
     const checkboxes = [...document.querySelectorAll('input[name="signals"]')];
     expect(checkboxes).toHaveLength(7);
     expect(container.textContent).toContain("Asking for recommendations");
     expect(container.textContent).toContain("Looking to hire someone");
+  });
+
+  it("preserves edited queries when going back without paying to generate again", async () => {
+    fetchMock.mockImplementation(async (request: string | URL | Request) => {
+      const url = String(request);
+      if (url === "/api/monitor-options") return json(options);
+      if (url === "/api/monitors/queries") return json(generated);
+      throw new Error(`Unexpected request: ${url}`);
+    });
+    await toSources();
+    await act(async () => button("Generate search plan").click());
+    await act(async () => setValue(input("Reddit search query 1"), "keep this edited query"));
+    await act(async () => button("Back").click());
+    await act(async () => button("Back").click());
+    await act(async () => button("Back").click());
+    expect(input("Monitor name").value).toBe("Journeys");
+    await toSources();
+    await act(async () => button("Continue to search plan").click());
+    expect(input("Reddit search query 1").value).toBe("keep this edited query");
+    expect(fetchMock.mock.calls.filter(([url]) => url === "/api/monitors/queries")).toHaveLength(1);
+    expect(document.activeElement?.textContent).toBe("Review the search plan");
+  });
+
+  it("keeps an invalid query on the step where it can be corrected", async () => {
+    fetchMock.mockImplementation(async (request: string | URL | Request) => {
+      if (String(request) === "/api/monitor-options") return json(options);
+      return json(generated);
+    });
+    await toSources();
+    await act(async () => button("Generate search plan").click());
+    await act(async () => setValue(input("Reddit search query 1"), "one"));
+    const group = container.querySelector(".platform-plan") as HTMLDetailsElement;
+    group.open = false;
+    await act(async () => button("Continue to schedule").click());
+    expect(container.querySelector('[role="alert"]')?.textContent).toContain("Use 2 to 8 words");
+    expect(container.querySelector('[aria-label="Monthly budget"]')).toBeNull();
+    expect(group.open).toBe(true);
+    expect(document.activeElement).toBe(input("Reddit search query 1"));
+    await act(async () => setValue(input("Reddit search query 1"), "browser testing"));
+    await act(async () => button("Continue to schedule").click());
+    expect(input("Monthly budget")).toBeDefined();
+  });
+
+  it("requires a source before generating a plan", async () => {
+    await toSources();
+    const source = container.querySelector(".source-section input") as HTMLInputElement;
+    await act(async () => source.click());
+    await act(async () => button("Generate search plan").click());
+    expect(container.querySelector('[role="alert"]')?.textContent).toContain(
+      "Choose at least one source",
+    );
+    expect(fetchMock.mock.calls.some(([url]) => url === "/api/monitors/queries")).toBe(false);
+  });
+
+  it("allows a manual plan when query generation is unavailable", async () => {
+    await screen.unmount();
+    fetchMock.mockImplementation(async () => json({ ...options, canGenerateQueries: false }));
+    screen = await mount(<MonitorForm />);
+    container = screen.container;
+    await toSources();
+    await act(async () => button("Review search plan").click());
+    await act(async () => setValue(input("Reddit search query 1"), "browser testing"));
+    await act(async () => button("Continue to schedule").click());
+    expect(input("Monthly budget")).toBeDefined();
+    expect(fetchMock.mock.calls.some(([url]) => url === "/api/monitors/queries")).toBe(false);
   });
 
   it("stores the answers with the queries a person edited and kept", async () => {
@@ -134,6 +223,7 @@ describe("the monitor form", () => {
       );
     });
 
+    await toSources();
     await act(async () => button("Generate search plan").click());
     await settle();
 
@@ -142,6 +232,7 @@ describe("the monitor form", () => {
       setValue(input("Reddit search query 1"), "browser tests break after every release");
       button("Remove Reddit query 2").click();
     });
+    await act(async () => button("Continue to schedule").click());
     await act(async () => button("Start monitor").click());
     await settle();
 
@@ -179,7 +270,8 @@ describe("the monitor form", () => {
       return label?.querySelector("input") as HTMLInputElement;
     }
 
-    it("is off until it is asked for, because it multiplies what the model reads", () => {
+    it("is off until it is asked for, because it multiplies what the model reads", async () => {
+      await toSources();
       expect(replyCheckbox().checked).toBe(false);
       expect(container.textContent).toContain("multiply the model calls");
     });
@@ -204,10 +296,13 @@ describe("the monitor form", () => {
 
       // Ticked before the plan is generated: the control sits with the
       // "where should it look" question, which is answered on this stage.
+      await toSources();
       await act(async () => replyCheckbox().click());
 
+      await toSources();
       await act(async () => button("Generate search plan").click());
       await settle();
+      await act(async () => button("Continue to schedule").click());
       await act(async () => button("Start monitor").click());
       await settle();
 
@@ -216,6 +311,7 @@ describe("the monitor form", () => {
     });
 
     it("says nothing about platforms that will answer", async () => {
+      await toSources();
       await act(async () => replyCheckbox().click());
 
       expect(container.textContent).not.toContain("will not return replies");
@@ -242,6 +338,7 @@ describe("the monitor form", () => {
 
       screen = await mount(<MonitorForm />);
       container = screen.container;
+      await toSources();
 
       await act(async () => {
         const label = [...container.querySelectorAll("label")].find((element) =>
@@ -344,9 +441,11 @@ describe("the monitor form", () => {
       setValue(input("What problem does it solve?"), "Their tests break after UI changes");
     });
 
+    await toSources();
     await act(async () => button("Generate search plan").click());
     await settle();
 
+    await act(async () => button("Continue to schedule").click());
     await act(async () => setValue(input("Monthly budget"), "10"));
     await act(async () => button("Test this plan").click());
     await settle();
@@ -361,6 +460,14 @@ describe("the monitor form", () => {
     });
 
     expect(container.textContent).toContain("spend its budget before the month ends");
+
+    const schedulePicker = container.querySelector(
+      '[aria-label="Collection schedule"]',
+    ) as HTMLSelectElement;
+    await act(async () => setValue(schedulePicker, "daily"));
+    expect(container.textContent).toContain("The plan or schedule has changed since this test.");
+    expect(button("Start monitor")).toBeDefined();
+    await act(async () => setValue(schedulePicker, "hourly"));
 
     await act(async () => button("Save without starting").click());
     await settle();
@@ -395,9 +502,11 @@ describe("the monitor form", () => {
       setValue(input("What problem does it solve?"), "Their tests break after UI changes");
     });
 
+    await toSources();
     await act(async () => button("Generate search plan").click());
     await settle();
 
+    await act(async () => button("Continue to schedule").click());
     await act(async () => button("Start monitor").click());
     await settle();
 

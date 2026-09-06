@@ -98,12 +98,7 @@ export function App() {
         {notificationId ? (
           <Notifications key={notificationId} monitorId={notificationId} />
         ) : creating ? (
-          <>
-            <div className="dialog-underlay" aria-hidden="true" inert>
-              <Monitors />
-            </div>
-            <MonitorForm />
-          </>
+          <MonitorForm />
         ) : connecting ? (
           <Connections />
         ) : listing ? (

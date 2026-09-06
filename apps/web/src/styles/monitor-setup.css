@@ -1,0 +1,292 @@
+/* The monitor setup page. Shared colors and controls come from the site theme. */
+.setup-page {
+  background: var(--surface);
+}
+.setup-layout {
+  display: grid;
+  grid-template-columns: 210px minmax(0, 720px);
+  gap: var(--space-12);
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: var(--space-8) var(--page-gutter) var(--space-12);
+  border-top: 1px solid var(--line);
+}
+.setup-progress {
+  align-self: start;
+  position: sticky;
+  top: var(--space-8);
+}
+.setup-progress-label {
+  margin: 0 0 var(--space-6);
+  color: var(--muted);
+  font-size: var(--text-xs);
+}
+.setup-progress ol {
+  display: grid;
+  gap: var(--space-2);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.setup-progress li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  color: var(--muted);
+  font-size: var(--text-label);
+}
+.setup-progress li > span:first-child {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  font-size: var(--text-xs);
+  flex-shrink: 0;
+}
+.setup-progress li[aria-current="step"] {
+  color: var(--accent-text);
+  font-weight: 500;
+}
+.setup-progress li[aria-current="step"] > span:first-child {
+  color: var(--text-on-accent);
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.setup-progress li.complete > span:first-child {
+  background: var(--accent-soft);
+  border-color: transparent;
+  color: var(--accent-text);
+}
+.setup-progress-note {
+  max-width: 180px;
+  margin-top: var(--space-8);
+  color: var(--muted);
+  font-size: var(--text-sm);
+  line-height: 1.7;
+}
+.setup-content {
+  min-width: 0;
+}
+.setup-heading {
+  margin-bottom: var(--space-8);
+}
+.setup-heading h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  line-height: 1.4;
+  outline: none;
+}
+.setup-heading p {
+  margin: var(--space-2) 0 0;
+  color: var(--muted);
+  font-size: var(--text-label);
+}
+.setup-content .field-stack {
+  padding-top: 0;
+  gap: var(--space-6);
+}
+.setup-content .field {
+  display: block;
+}
+.setup-content .field input,
+.setup-content .field textarea,
+.setup-content .field select {
+  width: 100%;
+  min-height: var(--control-height);
+  color: var(--ink);
+  border: 1px solid var(--line-dark);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  background: var(--surface);
+  font: inherit;
+}
+.setup-content .field textarea {
+  min-height: 90px;
+}
+.setup-content .field > span {
+  margin-bottom: var(--space-1);
+}
+.setup-content .choice-section {
+  padding: 0 0 var(--space-8);
+  border: 0;
+}
+.setup-content .choice-section + .choice-section {
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--line);
+}
+.setup-content .signal-grid {
+  grid-template-columns: 1fr;
+  gap: var(--space-2);
+}
+.setup-content .signal-card {
+  min-height: 66px;
+  align-items: center;
+  padding: var(--space-4);
+  background: var(--surface);
+  border-color: var(--line);
+}
+.setup-content .signal-card:has(input:checked),
+.setup-content .source-card:has(input:checked) {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+.setup-content .signal-card:has(input:focus-visible) {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+.setup-content .signal-card input:checked + .checkmark {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.setup-content .source-card {
+  padding: var(--space-4);
+  background: var(--surface);
+}
+.setup-content .source-symbol {
+  background: var(--surface-soft);
+  color: var(--muted-strong);
+}
+.setup-content .plan-section {
+  padding-top: 0;
+  margin-bottom: var(--space-6);
+}
+.setup-content .plan-section + .plan-section {
+  padding-top: var(--space-6);
+}
+.setup-content .query-number {
+  background: var(--surface-soft);
+}
+.setup-summary {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-4);
+  margin-bottom: var(--space-8);
+  background: var(--surface-soft);
+  border-radius: var(--radius-sm);
+  overflow-wrap: anywhere;
+}
+.setup-content .setup-summary span {
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+.timezone-setting {
+  margin-top: var(--space-4);
+}
+.timezone-setting .field {
+  margin-top: var(--space-4);
+}
+.timezone-setting p {
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+.setup-content .amount-input input {
+  border: 0;
+  padding-inline: 0;
+}
+.setup-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-top: var(--space-8);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--line);
+}
+.setup-content .cost-section {
+  overflow-x: auto;
+}
+.setup-content .center-state {
+  min-height: 400px;
+}
+@media (max-width: 1100px) {
+  .setup-layout {
+    grid-template-columns: 170px minmax(0, 1fr);
+    gap: var(--space-6);
+  }
+}
+@media (max-width: 820px) {
+  .setup-layout {
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+    padding-top: var(--space-6);
+  }
+  .setup-progress {
+    position: static;
+  }
+  .setup-progress-label {
+    margin-bottom: var(--space-3);
+  }
+  .setup-progress ol {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: var(--space-1);
+  }
+  .setup-progress li {
+    flex-direction: column;
+    padding: 0;
+    gap: var(--space-2);
+    text-align: center;
+    font-size: var(--text-xs);
+  }
+  .setup-progress-note {
+    display: none;
+  }
+  .setup-heading {
+    margin-bottom: var(--space-6);
+  }
+  .setup-heading h2 {
+    font-size: 1.3rem;
+  }
+}
+@media (max-width: 440px) {
+  .setup-page .topbar {
+    gap: var(--space-3);
+  }
+  .setup-page .top-secondary-link {
+    flex-shrink: 0;
+  }
+  .setup-actions {
+    gap: var(--space-2);
+  }
+  .setup-actions .primary-button {
+    padding-inline: 10px;
+  }
+}
+
+.setup-content .notice {
+  overflow-wrap: anywhere;
+}
+.setup-content .generation-details {
+  margin-top: var(--space-6);
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+
+.setup-content .platform-plan {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: var(--space-4);
+  margin-bottom: var(--space-3);
+}
+.platform-plan summary {
+  cursor: pointer;
+  color: var(--ink);
+  font-size: var(--text-label);
+}
+.platform-plan summary > span:last-child {
+  float: right;
+  color: var(--muted);
+  font-size: var(--text-xs);
+}
+.platform-plan-hint {
+  margin: var(--space-4) 0 var(--space-3);
+  color: var(--muted);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+}
+.setup-content .source-section .source-card {
+  min-height: 64px;
+}

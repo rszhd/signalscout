@@ -62,7 +62,7 @@ preview truncation and mobile reading pane remain page-specific.
 ## Migrating the remaining pages
 
 Shared tokens, headers and buttons already apply across the site. Monitors,
-Connections, the monitor form and Notifications still have older page-specific
+Connections and Notifications still have older page-specific
 layout and styling. Update them one at a time; this foundation does not claim
 those pages have been redesigned.
 
@@ -75,3 +75,16 @@ page's controls.
 Check the changed page at desktop and phone sizes, plus its loading, empty and
 error states. Run the existing web tests, typecheck and production build.
 Presentation-only changes do not need tests that assert CSS values.
+
+## New monitor
+
+New monitor is a full page with five steps: Product, Signals, Sources, Search
+plan, and Schedule & budget. `styles/monitor-setup.css` owns the step layout and
+reads the shared theme. Back retains answers and query edits during setup;
+unchanged generation inputs reuse the current plan. Navigating away or
+refreshing does not save a draft. Escape does not leave the page.
+
+Each platform's plan expands independently. Invalid queries open their section
+before asking for correction. Schedule, cap and the optional paid sample test
+are together on the final step. A quote for a different schedule or edited
+plan is marked stale. Creation is always an explicit final action.

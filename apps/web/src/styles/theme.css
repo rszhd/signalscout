@@ -151,3 +151,25 @@
     gap: 14px;
   }
 }
+
+/* Provider and social-platform identities share local image assets. */
+.brand-icon {
+  display: inline-block;
+  flex-shrink: 0;
+  object-fit: contain;
+  vertical-align: middle;
+}
+.brand-icon-fallback {
+  display: inline-grid;
+  place-items: center;
+  border-radius: var(--radius-sm);
+  background: var(--surface-soft);
+  color: var(--muted);
+  font-size: 10px;
+}
+.brand-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  vertical-align: middle;
+}

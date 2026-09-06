@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { messageFor, requestJson } from "./api.js";
+import { BrandIcon } from "./BrandIcon.js";
 
 /**
  * The intent inbox.
@@ -110,14 +111,12 @@ export function ageLabel(postedAt: string, now: number = Date.now()): string {
  * Reddit. A platform missing from here falls back to its own id, which is
  * plain rather than wrong.
  *
- * `mark` is what goes in the little circle. It is decoration and it is hidden
- * from a screen reader, so the sentence beside it carries the meaning.
+ * BrandIcon supplies the decorative platform image; the adjacent text names it.
  */
 const platformLabels: Record<
   string,
   {
     name: string;
-    mark: string;
     where: (match: Match) => string | undefined;
     /**
      * Whether this platform's own link opens the comment, or only the thread.
@@ -140,19 +139,16 @@ const platformLabels: Record<
 > = {
   reddit: {
     name: "Reddit",
-    mark: "r/",
     where: (match) => (match.channel ? `r/${match.channel}` : undefined),
     commentLink: "comment",
   },
   x: {
     name: "X",
-    mark: "X",
     where: (match) => (match.author ? `@${match.author}` : undefined),
     commentLink: "comment",
   },
   linkedin: {
     name: "LinkedIn",
-    mark: "in",
     // On LinkedIn the author is the context, as on X. The stored author is the
     // profile slug out of the post URL, which is what identifies the account.
     where: (match) => (match.author ? `@${match.author}` : undefined),
@@ -160,13 +156,11 @@ const platformLabels: Record<
   },
   youtube: {
     name: "YouTube",
-    mark: "▶",
     where: (match) => (match.channel ? match.channel : undefined),
     commentLink: "comment",
   },
   tiktok: {
     name: "TikTok",
-    mark: "♪",
     // The creator, which is what a TikTok URL is keyed by and the only context
     // a video carries: there is no title and no description, only a caption.
     where: (match) => (match.author ? `@${match.author}` : undefined),
@@ -181,7 +175,6 @@ function platformLabel(source: string) {
   return (
     platformLabels[source] ?? {
       name: source,
-      mark: "·",
       where: () => undefined,
       // An unknown platform promises nothing, which is the safe direction: a
       // button that over-promises sends a person scrolling for something that
@@ -571,9 +564,7 @@ export function Inbox() {
                       >
                         <span className="match-top">
                           <span className={`source-badge source-${match.source}`}>
-                            <span className="source-dot" aria-hidden="true">
-                              {platformLabel(match.source).mark}
-                            </span>
+                            <BrandIcon brand={match.source} />
                             {whereItCameFrom(match)}
                           </span>
                           <span className="match-origin">{ageLabel(match.postedAt)}</span>
@@ -634,9 +625,7 @@ export function Inbox() {
 
                 <div className="detail-top">
                   <span className={`source-badge source-${selectedMatch.source}`}>
-                    <span className="source-dot" aria-hidden="true">
-                      {platformLabel(selectedMatch.source).mark}
-                    </span>
+                    <BrandIcon brand={selectedMatch.source} />
                     {whereItCameFrom(selectedMatch)}
                   </span>
                   <span className="match-origin">{ageLabel(selectedMatch.postedAt)}</span>

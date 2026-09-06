@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { messageFor, requestJson } from "./api.js";
+import { BrandIcon } from "./BrandIcon.js";
 import { choiceFor, describeSchedule, scheduleChoices } from "./schedule.js";
 
 /**
@@ -556,7 +557,17 @@ export function Monitors() {
                   <div>
                     <h2>{monitor.name}</h2>
                     <p className="monitor-origin">
-                      {monitor.sources.length > 0 ? monitor.sources.join(" · ") : "No source"}
+                      {monitor.sources.length > 0
+                        ? monitor.sources.map((source, index) => (
+                            <span key={source}>
+                              {index > 0 ? " · " : ""}
+                              <span className="brand-label">
+                                <BrandIcon brand={source} size={16} />
+                                {source}
+                              </span>
+                            </span>
+                          ))
+                        : "No source"}
                       {monitor.lastPolledAt
                         ? ` · last polled ${new Date(monitor.lastPolledAt).toLocaleString()}`
                         : " · never polled"}

@@ -1,5 +1,6 @@
 import { type FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { messageFor, requestJson } from "./api.js";
+import { BrandIcon } from "./BrandIcon.js";
 import { CostTest, type EstimateReport, exceedsCap } from "./CostTest.js";
 import { formatMicros, toMicros } from "./Monitors.js";
 import { browserTimezone, type ScheduleChoice, scheduleChoices } from "./schedule.js";
@@ -680,11 +681,7 @@ export function MonitorForm() {
                         onChange={() => setSelectedSources(toggle(selectedSources, source.id))}
                       />
                       <span className="source-symbol" aria-hidden="true">
-                        {source.id === "reddit"
-                          ? "r/"
-                          : source.id === "linkedin"
-                            ? "in"
-                            : source.displayName.slice(0, 2)}
+                        <BrandIcon brand={source.id} size={22} />
                       </span>
                       <span>
                         <strong>{source.displayName}</strong>

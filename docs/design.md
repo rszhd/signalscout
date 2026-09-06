@@ -100,3 +100,12 @@ Platform choices are separate from accounts. Rows with a blocker or an unresolve
 choice start expanded; healthy rows start compact. Keep the server’s provider
 selection rules, environment-key fallback and test-before-save behavior intact.
 `styles/connections.css` owns this page layout and uses the shared theme.
+
+## Provider and platform icons
+
+Use `BrandIcon` with the provider/platform ID (or a platform display name).
+Original downloaded favicons live in `apps/web/public/brands`; that folder's
+README records their source URLs and ownership. Icons are served locally and
+remain decorative beside a visible name. Unknown or failed images fall back to
+initials. Use 16px beside metadata, 20–24px beside platform names, and 26px in
+provider account avatars. Do not use a third-party favicon service at runtime.

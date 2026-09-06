@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { messageFor, requestJson } from "./api.js";
+import { BrandIcon } from "./BrandIcon.js";
 
 /**
  * Where a provider key is pasted, tested and stored.
@@ -81,6 +82,13 @@ interface Answer {
   tone: "good" | "bad";
   text: string;
 }
+
+// Official account websites. Unknown providers remain plain text.
+const providerWebsites: Record<string, string> = {
+  brightdata: "https://brightdata.com/",
+  scrapecreators: "https://scrapecreators.com/",
+  socialcrawl: "https://www.socialcrawl.dev/",
+};
 
 function ConnectionsHeader() {
   return (
@@ -198,11 +206,35 @@ function ProviderCard({
       <details className="connection-account">
         <summary className="connection-summary">
           <span className="connection-avatar" aria-hidden="true">
-            {provider.displayName.slice(0, 1).toUpperCase()}
+            <BrandIcon brand={provider.id} size={26} />
           </span>
           <span className="connection-identity">
-            <strong>{provider.displayName}</strong>
-            <span>{provider.platforms.join(" · ")}</span>
+            <strong>
+              {providerWebsites[provider.id] ? (
+                <a
+                  className="connection-website"
+                  href={providerWebsites[provider.id]}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`${provider.displayName} website (opens in a new tab)`}
+                >
+                  {provider.displayName}{" "}
+                  <span className="connection-external" aria-hidden="true">
+                    ↗
+                  </span>
+                </a>
+              ) : (
+                provider.displayName
+              )}
+            </strong>
+            <span className="connection-platforms">
+              {provider.platforms.map((platform) => (
+                <span className="brand-label" key={platform}>
+                  <BrandIcon brand={platform} size={16} />
+                  {platform}
+                </span>
+              ))}
+            </span>
             {provider.ready && <small>{provider.credentials.map(origin).join(" · ")}</small>}
           </span>
           <span className={`connection-status ${provider.ready ? "connected" : "missing"}`}>
@@ -349,7 +381,7 @@ function PlatformRow({
       <details className="platform-connection" open={platform.needsChoice || !!platform.blocker}>
         <summary className="connection-summary">
           <span className="connection-avatar" aria-hidden="true">
-            {platform.displayName.slice(0, 1).toUpperCase()}
+            <BrandIcon brand={platform.id} size={24} />
           </span>
           <span className="connection-identity">
             <strong>{platform.displayName}</strong>

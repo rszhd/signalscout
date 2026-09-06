@@ -77,6 +77,50 @@ describe("the monitor list", () => {
     vi.unstubAllGlobals();
   });
 
+  it("combines status and search filters and lets a person clear an empty result", async () => {
+    await show([
+      monitor(),
+      monitor({ id: "paused", name: "Customer questions", paused: true, sources: ["youtube"] }),
+      monitor({
+        id: "attention",
+        name: "Delivery issues",
+        notificationIssues: ["Webhook disabled."],
+      }),
+    ]);
+    await act(async () => button("Needs attention 1").click());
+    expect(container.querySelectorAll(".monitor-card")).toHaveLength(1);
+    expect(container.querySelector(".monitor-card")?.textContent).toContain("Delivery issues");
+    await act(async () => setValue(field("Search monitors"), "youtube"));
+    expect(container.querySelectorAll(".monitor-card")).toHaveLength(0);
+    expect(container.textContent).toContain("No monitors match these filters");
+    await act(async () => button("Clear filters").click());
+    expect(container.querySelectorAll(".monitor-card")).toHaveLength(3);
+    await act(async () => setValue(field("Search monitors"), " YOUTUBE "));
+    expect(container.querySelectorAll(".monitor-card")).toHaveLength(1);
+    expect(container.querySelector(".monitor-card")?.textContent).toContain("Customer questions");
+  });
+
+  it("scopes the overview to the project and explains a project with no monitors", async () => {
+    const original = location.hash;
+    try {
+      location.hash = "#/monitors?project=one";
+      await show([
+        monitor({ projectId: "one", projectName: "First project" }),
+        monitor({ id: "other", paused: true, projectId: "two", projectName: "Second project" }),
+      ]);
+      expect(container.textContent).toContain("1 of 1 active");
+      expect(container.querySelectorAll(".monitor-card")).toHaveLength(1);
+      await act(async () => {
+        location.hash = "#/monitors?project=empty";
+        globalThis.dispatchEvent(new HashChangeEvent("hashchange"));
+      });
+      expect(container.textContent).toContain("No monitors in this project yet");
+      expect(container.querySelector('a[href="#/monitors/new?project=empty"]')).not.toBeNull();
+    } finally {
+      location.hash = original;
+    }
+  });
+
   it("shows a disabled webhook and links to its settings", async () => {
     await show([
       monitor({ notificationIssues: ["Webhook disabled after repeated delivery failures."] }),

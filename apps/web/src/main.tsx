@@ -6,6 +6,7 @@ import "./styles/theme.css";
 import "./styles/monitor-setup.css";
 import "./styles/connections.css";
 import "./styles/projects.css";
+import "./styles/monitors.css";
 
 const container = document.getElementById("root");
 

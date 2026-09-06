@@ -61,8 +61,7 @@ preview truncation and mobile reading pane remain page-specific.
 
 ## Migrating the remaining pages
 
-Shared tokens, headers and buttons already apply across the site. Monitors
-and Notifications still have older page-specific layout and styling. Update them one at a time; this foundation does not claim
+Shared tokens, headers and buttons already apply across the site. Notifications still has older page-specific layout and styling. Update them one at a time; this foundation does not claim
 those pages have been redesigned.
 
 For each page, adopt the shared patterns, replace local neutral colors and
@@ -121,3 +120,12 @@ are optional disclosures. Saving returns to the list, while a failed save
 retains the answers. Cancel clears the draft. Changes apply to future monitors;
 existing monitors keep their copied answers. `styles/projects.css` owns the
 layout and uses the shared theme.
+
+## Monitors
+
+Monitors groups compact cards by project, with search across names, projects and
+platforms and a status filter. The overview and filter counts follow the selected
+project. Status, estimated spending, remaining budget and feedback stay visible;
+schedule, budget, pre-filter controls and collection history sit behind a native
+disclosure. Budget, credential and notification issues remain outside it.
+`styles/monitors.css` owns the responsive layout and uses the shared theme.

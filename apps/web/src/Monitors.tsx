@@ -157,8 +157,8 @@ function MonitorsHeader() {
   return (
     <header className="topbar">
       <div>
-        <p className="eyebrow">Tracking setup</p>
         <h1>Monitors</h1>
+        <p className="page-subtitle">Keep an eye on the conversations that matter.</p>
       </div>
       <a className="top-primary-button" href={`#/monitors/new${projectSuffix()}`}>
         <span aria-hidden="true">+</span> New monitor
@@ -450,6 +450,9 @@ function PreFilterForm({ monitor, onSaved }: { monitor: Monitor; onSaved: () => 
 
 export function Monitors() {
   const [monitors, setMonitors] = useState<Monitor[]>([]);
+  const [search, setSearch] = useState("");
+  const [view, setView] = useState("all");
+  const [pending, setPending] = useState<string[]>([]);
   const [state, setState] = useState<LoadState>("loading");
   const [error, setError] = useState<string | null>(null);
 
@@ -471,6 +474,7 @@ export function Monitors() {
   const load = useCallback(async (): Promise<void> => {
     try {
       setMonitors(await requestJson<Monitor[]>("/api/monitors"));
+      setError(null);
       setState("ready");
     } catch (cause) {
       setError(messageFor(cause, "The monitors could not be loaded."));
@@ -483,6 +487,8 @@ export function Monitors() {
   }, [load]);
 
   async function setPaused(monitor: Monitor, paused: boolean): Promise<void> {
+    setPending((ids) => [...ids, monitor.id]);
+    setError(null);
     try {
       await requestJson(`/api/monitors/${monitor.id}/${paused ? "pause" : "resume"}`, {
         method: "POST",
@@ -492,6 +498,8 @@ export function Monitors() {
       // The server's own sentence, because a resume that is refused names the
       // variable that has to be set, and "request failed" names nothing.
       setError(messageFor(cause, "That monitor could not be changed."));
+    } finally {
+      setPending((ids) => ids.filter((id) => id !== monitor.id));
     }
   }
 
@@ -540,52 +548,130 @@ export function Monitors() {
     );
   }
 
+  const scoped =
+    projectId === null ? monitors : monitors.filter((monitor) => monitor.projectId === projectId);
+  const needsAttention = (monitor: Monitor) =>
+    status(monitor).tone === "stopped" || !!monitor.notificationIssues?.length;
+  const counts = {
+    all: scoped.length,
+    running: scoped.filter((monitor) => status(monitor).tone === "running").length,
+    paused: scoped.filter((monitor) => status(monitor).tone === "paused").length,
+    attention: scoped.filter(needsAttention).length,
+  };
+  const visible = scoped.filter(
+    (monitor) =>
+      (view === "all" ||
+        (view === "attention" ? needsAttention(monitor) : status(monitor).tone === view)) &&
+      [monitor.name, monitor.projectName, ...monitor.sources]
+        .join(" ")
+        .toLowerCase()
+        .includes(search.trim().toLowerCase()),
+  );
+
   return (
     <div className="product-page monitors-page">
       <MonitorsHeader />
-      <div className="section-intro">
-        <p>
-          Each monitor describes one audience and the conversations worth finding. Spend is an
-          estimate; your provider's invoice is the authority.
-        </p>
-        <span>
-          {monitors.filter((monitor) => status(monitor).tone === "running").length} of{" "}
-          {monitors.length} active
-        </span>
-      </div>
-
-      {/* A plain link, so the browser saves the file the route already names.
-          US-012 asks for feedback that survives a reinstall, and a screen that
-          only showed the verdicts would not be that. */}
-      <p className="monitor-export">
-        <a className="text-link" href="/api/feedback/export">
-          Export feedback as JSON
-        </a>
-      </p>
-
-      {error && (
-        <p className="budget-error" role="alert">
-          {error}
-        </p>
-      )}
-
-      {groupsOf(
-        projectId === null
-          ? monitors
-          : monitors.filter((monitor) => monitor.projectId === projectId),
-      ).map((group) => (
-        <section className="monitor-group" key={group.key}>
-          {group.name !== null && (
-            <h2 className="monitor-group-heading">
-              {group.name}
-              <span className="monitor-group-count">
-                {group.monitors.length} monitor{group.monitors.length === 1 ? "" : "s"}
-              </span>
+      <div className="monitors-content">
+        <div className="monitors-overview">
+          <div>
+            <h2>
+              {counts.running} of {counts.all} active
             </h2>
-          )}
-          <MonitorCards monitors={group.monitors} load={load} setPaused={setPaused} />
-        </section>
-      ))}
+            <p>
+              {counts.attention > 0
+                ? `${counts.attention} monitor${counts.attention === 1 ? " needs" : "s need"} attention. Review the issues below.`
+                : "Manage your schedules, spending and search quality in one place."}
+            </p>
+          </div>
+          <a className="text-link" href="/api/feedback/export">
+            Export feedback as JSON
+          </a>
+        </div>
+        <div className="monitors-toolbar">
+          <fieldset className="view-switch" aria-label="Filter monitors by status">
+            {(
+              [
+                ["all", "All"],
+                ["running", "Running"],
+                ["paused", "Paused"],
+                ["attention", "Needs attention"],
+              ] as const
+            ).map(([id, label]) => (
+              <button type="button" key={id} aria-pressed={view === id} onClick={() => setView(id)}>
+                {label} <span>{counts[id]}</span>
+              </button>
+            ))}
+          </fieldset>
+          <input
+            className="monitor-search"
+            type="search"
+            aria-label="Search monitors"
+            placeholder="Search monitors…"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+          />
+        </div>
+        {error && (
+          <p className="budget-error" role="alert">
+            {error}
+          </p>
+        )}
+        <p className="monitors-result-count" role="status">
+          Showing {visible.length} of {scoped.length} monitors{projectId ? " in this project" : ""}
+        </p>
+        {visible.length === 0 && (
+          <div className="monitor-empty-results">
+            <h2>
+              {scoped.length === 0
+                ? "No monitors in this project yet"
+                : "No monitors match these filters"}
+            </h2>
+            <p>
+              {scoped.length === 0
+                ? "Create a monitor to start finding conversations for this project."
+                : "Try another name, project or platform, or clear your filters."}
+            </p>
+            {scoped.length === 0 ? (
+              <a className="primary-button" href={`#/monitors/new${projectSuffix()}`}>
+                Create a monitor
+              </a>
+            ) : (
+              <button
+                className="secondary-button"
+                type="button"
+                onClick={() => {
+                  setSearch("");
+                  setView("all");
+                }}
+              >
+                Clear filters
+              </button>
+            )}
+          </div>
+        )}
+        {groupsOf(visible).map((group) => (
+          <section className="monitor-group" key={group.key}>
+            {group.name !== null && (
+              <h2 className="monitor-group-heading">
+                {group.name}
+                <span className="monitor-group-count">
+                  {group.monitors.length} monitor{group.monitors.length === 1 ? "" : "s"}
+                </span>
+              </h2>
+            )}
+            <MonitorCards
+              monitors={group.monitors}
+              load={load}
+              setPaused={setPaused}
+              pending={pending}
+            />
+          </section>
+        ))}
+        <p className="monitors-cost-note">
+          Spend is estimated; your provider’s invoice is the authority. Amounts include source and
+          model calls.
+        </p>
+      </div>
     </div>
   );
 }
@@ -644,8 +730,10 @@ function MonitorCards({
   monitors,
   load,
   setPaused,
+  pending,
 }: {
   monitors: Monitor[];
+  pending: string[];
   load: () => Promise<void>;
   setPaused: (monitor: Monitor, paused: boolean) => Promise<void>;
 }) {
@@ -684,21 +772,6 @@ function MonitorCards({
               <span className={`monitor-status ${running.tone}`}>{running.label}</span>
             </div>
 
-            {/* Who actually collected, which is not always who would collect
-                  now: the choice can be changed and this is the record of what
-                  ran. Read from the ledger, so the moment is when money was
-                  last spent on that pair. US-026. */}
-            {monitor.lastCollected.length > 0 && (
-              <p className="monitor-origin">
-                {monitor.lastCollected
-                  .map(
-                    (one) =>
-                      `${one.source} via ${one.provider}, ${new Date(one.at).toLocaleString()}`,
-                  )
-                  .join(" · ")}
-              </p>
-            )}
-
             {/* The sentence that refused the poll, sent whole by the server,
                   so the screen and the worker's log say the same thing. */}
             {monitor.spend.reason && (
@@ -707,7 +780,19 @@ function MonitorCards({
               </p>
             )}
 
-            <ScheduleForm monitor={monitor} onSaved={load} />
+            {monitor.missingCredentials.length > 0 && (
+              <p className="monitor-stopped">
+                Connect a provider to resume collecting. Missing:{" "}
+                {monitor.missingCredentials
+                  .map((credential) => credential.environmentVariable)
+                  .join(", ")}
+                . <a href="#/connections">Open connections</a>
+              </p>
+            )}
+            <p className="monitor-schedule-summary">
+              {describeSchedule(monitor.pollIntervalSeconds, monitor.pollDays)}{" "}
+              <span>· {monitor.pollTimezone}</span>
+            </p>
 
             <dl className="monitor-spend">
               <div>
@@ -740,22 +825,63 @@ function MonitorCards({
 
             <p className="monitor-feedback">{feedbackLabel(monitor.feedback)}</p>
 
-            <div className="monitor-controls">
-              <BudgetForm monitor={monitor} onSaved={load} />
-              <PreFilterForm monitor={monitor} onSaved={load} />
+            <details className="disclosure monitor-settings">
+              <summary>
+                Schedule & settings <span>Budget · filtering · activity</span>
+              </summary>
+              <div className="monitor-controls">
+                <section>
+                  <h3>Schedule</h3>
+                  <ScheduleForm monitor={monitor} onSaved={load} />
+                </section>
+                <section>
+                  <h3>Monthly budget (USD)</h3>
+                  <BudgetForm monitor={monitor} onSaved={load} />
+                </section>
+                <section>
+                  <h3>Pre-filter</h3>
+                  <PreFilterForm monitor={monitor} onSaved={load} />
+                </section>
+                <section>
+                  <h3>Last collection</h3>{" "}
+                  {/* Who actually collected, which is not always who would collect
+                  now: the choice can be changed and this is the record of what
+                  ran. Read from the ledger, so the moment is when money was
+                  last spent on that pair. US-026. */}
+                  {monitor.lastCollected.length > 0 && (
+                    <p className="monitor-origin">
+                      {monitor.lastCollected
+                        .map(
+                          (one) =>
+                            `${one.source} via ${one.provider}, ${new Date(one.at).toLocaleString()}`,
+                        )
+                        .join(" · ")}
+                    </p>
+                  )}
+                  {monitor.lastCollected.length === 0 && (
+                    <p className="monitor-origin">No collections recorded yet.</p>
+                  )}
+                </section>
+              </div>
+            </details>
+            <div>
               <div className="monitor-card-actions">
                 <a className="text-link" href={`#/monitors/${monitor.id}/notifications`}>
                   Notifications
                 </a>
-                <a className="text-link" href={`#/${projectSuffix()}`}>
+                <a
+                  className="text-link"
+                  href={`#/${monitor.projectId ? `?project=${encodeURIComponent(monitor.projectId)}` : ""}`}
+                >
                   View inbox
                 </a>
                 <button
                   type="button"
                   className="secondary-button"
+                  disabled={pending.includes(monitor.id)}
                   onClick={() => void setPaused(monitor, !monitor.paused)}
                 >
-                  {monitor.paused ? "Resume" : "Pause"}
+                  {pending.includes(monitor.id) ? "Updating…" : monitor.paused ? "Resume" : "Pause"}
                 </button>
               </div>
             </div>

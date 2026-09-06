@@ -41,6 +41,10 @@ interface Match {
   parentTitle: string | null;
   parentExcerpt: string | null;
   parentUrl: string | null;
+  /** How deep the thread above a reply was read, and why it stopped. US-048. */
+  parentRepliesRead: number | null;
+  parentReplyCount: number | null;
+  parentRepliesStopped: string | null;
   /** Kept for later. US-043. Not a verdict; a person's intention. */
   saved: boolean;
   url: string;
@@ -170,6 +174,48 @@ const platformLabels: Record<
     commentLink: "comment",
   },
 };
+
+/**
+ * How much of a thread was read, in a sentence, or nothing.
+ *
+ * US-048. A comment reaches the inbox as a sample of a conversation: threads
+ * are read fifty comments at a time and abandoned when two batches in a row
+ * hold no lead. How big that sample was, against how big the thread is,
+ * changes what it means — and a person cannot guess any of it.
+ *
+ * The reason for stopping is the half nobody could infer. "We read 100 of
+ * 1,713 and stopped because two batches held nothing" and "we read 100 of
+ * 1,713 and ran out of budget" look identical on the screen otherwise, and
+ * they call for different actions: one is a judgement about the thread, the
+ * other is a bill.
+ *
+ * Nothing is said while a thread is still being read, because a number that
+ * moves on its own invites a person to read meaning into it.
+ */
+function threadDepth(match: Match): string | undefined {
+  if (match.kind !== "reply") return undefined;
+
+  const read = match.parentRepliesRead;
+  if (read === null || read === 0) return undefined;
+
+  const total = match.parentReplyCount;
+  const of = total !== null && total > read ? ` of ${total.toLocaleString()}` : "";
+  const counted = `${read.toLocaleString()}${of} comment${read === 1 ? "" : "s"} read`;
+
+  switch (match.parentRepliesStopped) {
+    case "threshold":
+      return `${counted}. Stopped: two batches in a row held no lead.`;
+    case "ceiling":
+      return `${counted}. Stopped: this is as deep as one thread is read.`;
+    case "budget":
+      return `${counted}. Stopped: the monitor reached its budget.`;
+    case "end":
+      return `${counted} — the whole thread.`;
+    default:
+      // Still being read. A count that moves is worse than no count.
+      return undefined;
+  }
+}
 
 function platformLabel(source: string) {
   return (
@@ -658,6 +704,9 @@ export function Inbox() {
                       )}
                       {limitWords(selectedMatch.parentExcerpt).text}
                     </blockquote>
+                    {threadDepth(selectedMatch) && (
+                      <p className="thread-depth">{threadDepth(selectedMatch)}</p>
+                    )}
                   </div>
                 )}
 

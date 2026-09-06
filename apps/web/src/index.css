@@ -2311,6 +2311,20 @@ a {
   button rather than below it, so it is read before the press rather than
   after the scrolling.
 */
+/*
+  How much of a thread was read, under the post a reply hangs from.
+
+  Muted and small: it qualifies the quote above it rather than competing with
+  it. A person only needs it when they wonder why there is one lead here and
+  not five.
+*/
+.thread-depth {
+  margin-top: var(--space-2);
+  color: var(--muted);
+  font-size: var(--text-xs);
+  line-height: 1.6;
+}
+
 .link-caveat {
   margin-top: 26px;
   margin-bottom: -8px;

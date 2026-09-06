@@ -67,6 +67,15 @@ const matchSchema = z.object({
   parentTitle: z.string().nullable(),
   parentExcerpt: z.string().nullable(),
   parentUrl: z.string().nullable(),
+  /**
+   * How much of the thread was read, of how much there is, and why it ended.
+   *
+   * US-048. A comment is read as a sample of a conversation, and the size of
+   * the sample changes what the absence of other leads means.
+   */
+  parentRepliesRead: z.number().nullable(),
+  parentReplyCount: z.number().nullable(),
+  parentRepliesStopped: z.string().nullable(),
 });
 
 const query = z.object({

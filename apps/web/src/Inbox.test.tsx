@@ -49,6 +49,9 @@ function match(overrides: Record<string, unknown> = {}) {
     parentTitle: null,
     parentExcerpt: null,
     parentUrl: null,
+    parentRepliesRead: null,
+    parentReplyCount: null,
+    parentRepliesStopped: null,
     ...overrides,
   };
 }
@@ -292,6 +295,77 @@ describe("the intent inbox", () => {
       expect(container.textContent).toContain("@someone");
       expect(container.textContent).toContain("Open the post");
       expect(container.textContent).not.toContain("Open conversation");
+    });
+
+    /**
+     * US-048. A comment is a sample of a conversation, and the size of the
+     * sample changes what the absence of other leads means. The reason for
+     * stopping is the half nobody can infer: "we read 100 of 1,713 and two
+     * batches held nothing" and "we read 100 of 1,713 and ran out of money"
+     * look identical otherwise, and they call for different actions.
+     */
+    it("says how much of the thread was read and why reading stopped", async () => {
+      await show({
+        "/api/matches?": {
+          matches: [
+            match({
+              ...replyMatch,
+              id: "match-depth",
+              parentRepliesRead: 100,
+              parentReplyCount: 1713,
+              parentRepliesStopped: "threshold",
+            }),
+          ],
+          nextCursor: null,
+          asOf: firstPage.asOf,
+        },
+      });
+
+      expect(container.textContent).toContain("100 of 1,713 comments read");
+      expect(container.textContent).toContain("two batches in a row held no lead");
+    });
+
+    it("tells a budget stop apart from a judgement about the thread", async () => {
+      await show({
+        "/api/matches?": {
+          matches: [
+            match({
+              ...replyMatch,
+              id: "match-depth-budget",
+              parentRepliesRead: 50,
+              parentReplyCount: 1713,
+              parentRepliesStopped: "budget",
+            }),
+          ],
+          nextCursor: null,
+          asOf: firstPage.asOf,
+        },
+      });
+
+      expect(container.textContent).toContain("reached its budget");
+      expect(container.textContent).not.toContain("held no lead");
+    });
+
+    it("says nothing about depth while the thread is still being read", async () => {
+      // A number that moves on its own invites a person to read meaning into
+      // it. Silence is the honest state until reading has ended.
+      await show({
+        "/api/matches?": {
+          matches: [
+            match({
+              ...replyMatch,
+              id: "match-depth-running",
+              parentRepliesRead: 50,
+              parentReplyCount: 1713,
+              parentRepliesStopped: null,
+            }),
+          ],
+          nextCursor: null,
+          asOf: firstPage.asOf,
+        },
+      });
+
+      expect(container.textContent).not.toContain("comments read");
     });
 
     it("keeps the ordinary wording on a post, which has no comment to reach", async () => {

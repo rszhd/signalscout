@@ -127,8 +127,8 @@ would cost. `estimate/` already turns units and prices into money and
       many matched, and whether reading stopped because of the threshold, the
       ceiling, the budget, or the end of the thread. A person asking "why did
       it stop" gets an answer
-- [ ] The inbox, or the monitor's page, shows for a deep thread how many
-      comments were read of how many exist, and how many became matches
+- [x] The inbox shows, under the post a reply hangs from, how many comments
+      were read of how many the platform claims, and why reading ended
 - [ ] What continuing would cost is shown as money, priced from
       `unitsConsumed` and the model's own prices, never from a comment count
 - [x] `repliesPartial` keeps its current meaning. A thread stopped by this rule
@@ -417,3 +417,25 @@ would cost. `estimate/` already turns units and prices into money and
   What is left: the screen. Nothing yet shows how much of a thread was read, of
   how many, and why reading stopped — and the reason for stopping is the part a
   person cannot guess. `replies_stopped` holds the answer; no view reads it.
+
+- 2026-09-06T18:05+08:00 — **The inbox says what it read.** Under the post a
+  reply hangs from: "100 of 1,713 comments read. Stopped: two batches in a row
+  held no lead."
+
+  The reason is the half nobody could infer, and it is why this is a sentence
+  rather than a number. "100 of 1,713, two batches held nothing" and "100 of
+  1,713, the monitor ran out of budget" look identical as a fraction, and they
+  call for opposite actions — one is a judgement about the thread, the other is
+  a bill to raise.
+
+  Nothing is shown while a thread is still being read. A count that moves on
+  its own invites a person to read meaning into it, and "still going" is not a
+  fact worth a line.
+
+  `parentRepliesRead` is `replies_batch_start`, which counts what the provider
+  handed over rather than what survived storage — the depth reached, not the
+  harvest. Showing the harvest would make a thread look shallower than it was
+  read, which is the wrong direction for a person deciding whether the quiet
+  means anything.
+
+  Three tests, and removing the sentence turns two of them red.

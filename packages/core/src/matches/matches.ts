@@ -129,6 +129,22 @@ export interface InboxMatch {
   readonly parentTitle: string | null;
   readonly parentExcerpt: string | null;
   readonly parentUrl: string | null;
+  /**
+   * How much of the thread above a reply was read, and why reading ended.
+   *
+   * US-048. A thread is read fifty comments at a time and abandoned when two
+   * batches in a row hold no lead, so a person looking at one comment is
+   * looking at a sample of a conversation — and how big a sample, of how much,
+   * is not something they can guess.
+   *
+   * `parentRepliesRead` counts what the provider handed over rather than what
+   * was stored, so it is the depth reached and not the harvest.
+   * `parentReplyCount` is the platform's own claim about the thread's size.
+   * `parentRepliesStopped` is null while a thread is still being read.
+   */
+  readonly parentRepliesRead: number | null;
+  readonly parentReplyCount: number | null;
+  readonly parentRepliesStopped: string | null;
   readonly author: string | null;
   readonly title: string | null;
   readonly excerpt: string;
@@ -316,6 +332,9 @@ export async function listMatches(
       parentTitle: parentPost.title,
       parentExcerpt: parentPost.excerpt,
       parentUrl: parentPost.url,
+      parentRepliesRead: parentPost.repliesBatchStart,
+      parentReplyCount: parentPost.replyCount,
+      parentRepliesStopped: parentPost.repliesStopped,
     })
     .from(matches)
     .innerJoin(posts, eq(matches.postId, posts.id))

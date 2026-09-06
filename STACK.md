@@ -140,6 +140,9 @@ design more than any framework choice.
 | Reddit read, ScrapeCreators | ~$0.00008 to $0.00027, measured |
 | X read, SocialCrawl | $0.008118 per request, and a request brought 20 posts |
 | LinkedIn read, SocialCrawl | $0.04059 per request — five credits — and a request brought 10 posts |
+| YouTube read, SocialCrawl | $0.008118 per request, and a request brought 45 videos |
+| YouTube comments, SocialCrawl | $0.008118 per request, and a request brought 51 comments |
+| Reddit read, SocialCrawl | $0.008118 per request, and a request brought 25 posts |
 | Embedding pre-filter | ~$0.00001 |
 | AI classification, cheap model | ~$0.001 |
 
@@ -166,11 +169,44 @@ reports its units in *credits* rather than in requests, because at five to one
 the two words are different numbers and a guard fed the wrong one lets a
 monitor spend five times its cap.
 
+**YouTube is the fourth network, and PLAN.md said not to add one.** US-034
+closed on 2026-09-06. The rule at PLAN.md's *Important rule* is that no further
+network is added until Reddit and X reliably produce useful matches, and that
+condition is not met: five verdicts exist and forty-seven matches sit unjudged.
+The owner decided to add it anyway. It is written here, in AGENTS.md and in the
+ticket so the next reader finds a decision rather than an oversight — the same
+way LinkedIn's crossing was recorded — and **the rule still stands for the
+fifth**. Instagram, TikTok and Threads are parked in US-038 against exactly that
+rule.
+
 **A LinkedIn search never comes back empty, and that costs money.** X refunds a
 search that matches nothing, so a dead query there is free. On LinkedIn a
 phrase that cannot occur returned ten unrelated posts and was billed in full.
 There is no empty answer to read, so a vague query is not cheap noise — it is
 full-price noise that the classifier is then paid to read.
+
+**YouTube is the cheapest read and the emptiest.** One credit buys 45 videos —
+229 micro-dollars each, the least this product pays for anything — and one buys
+51 comments, twice ScrapeCreators' Reddit page for the same money. But US-034's
+live poll opened eleven threads and got **seven comments back**, so the cheap
+page is often a page of nothing. The bill that matters on this platform is the
+model's: 71 videos bought 71 triage calls, and triage refused 60 of them.
+
+**A YouTube search returns publishers, not people.** Every one of the first
+twelve results for `flaky tests` was a tutorial — "How To Fix Flaky Tests In
+CI/CD", a conference talk. A video is something somebody made to be seen. The
+lead is in the comments underneath, which is why this platform is the first one
+here that is not worth polling without replies switched on.
+
+**Reddit now has three providers, and the third is bought for precision.**
+SocialCrawl costs 4.3 times a ScrapeCreators request, and it has the one
+endpoint neither other provider offers: a keyword *inside* a subreddit. US-031
+measured what that buys. `flaky tests` across all of Reddit returned 25 posts
+from r/TIdaL, r/AskVet and r/RedditLaqueristaSwap — a watch app whose audio was
+"still flaky with 3+ devices", a dog with a skin issue. The same words inside
+r/softwaretesting returned **7 posts, every one on topic**. So the expensive
+provider is not the wasteful one: it is the one that does not make the
+classifier read twenty-five wrong posts.
 
 **The two Reddit providers do not bill the same thing, and the gap is large.**
 Bright Data bills a record, so a post costs $0.0015 whatever else happens.

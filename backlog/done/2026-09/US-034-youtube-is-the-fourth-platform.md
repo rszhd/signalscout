@@ -6,7 +6,7 @@ priority: p2
 created: 2026-09-06T04:58+08:00
 parent:
 area:
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -80,11 +80,9 @@ never terminate on position.
 - [x] The connector reads comments through `fetchReplies`, declares
       `canFetchReplies`, and stores them as `kind = 'reply'` rows under their
       video exactly as Reddit does
-- [ ] A comment walk filters by timestamp rather than stopping at the first
+- [x] A comment walk filters by timestamp rather than stopping at the first
       out-of-window row, and a test drives a captured page whose first row is a
-      pinned comment older than the window — **not done: the connector reads
-      one page and never walks, so there is no walk to get wrong yet. It
-      becomes real the day a monitor asks for a window longer than a page.**
+      pinned comment older than the window
 - [x] `ReplyResult.partial` is reported from evidence, the same rule the Reddit
       connector follows
 - [x] Fixtures are captured from a live account by a script under the
@@ -93,7 +91,7 @@ never terminate on position.
 - [x] The Log records what one search and one comment page actually cost and
       returned, measured
 - [x] The Log says whether `searchTerm` is worth using, with the number
-- [ ] STACK.md and AGENTS.md record that the fourth network was added
+- [x] STACK.md and AGENTS.md record that the fourth network was added
       deliberately and that the rule stands for the fifth
 
 ## Notes
@@ -269,3 +267,27 @@ never terminate on position.
   format YouTube's own Share button produces, and what the inbox opens. Nobody
   has watched YouTube honour it. One click settles it and this note is here so
   the next person knows it was not done.
+
+- 2026-09-06T12:18+08:00 — Closed. The last two boxes were finished by work
+  done for other tickets, which is worth saying rather than quietly ticking.
+
+  The comment-walk box was left open at 05:47 with an honest reason: the
+  connector filtered every row by timestamp, but the worker read one page and
+  never walked, so there was no walk to get wrong. US-020's paging loop made the
+  walk real on 2026-09-06, and the connector was already correct for it —
+  including the pinned-comment case the provider warns about, which
+  `youtube.test.ts` drives with a page whose first row is pinned and stale.
+
+  STACK.md now carries the fourth network as a decision beside LinkedIn's, the
+  three new price rows, and the two findings a reader needs before choosing this
+  platform: **a YouTube search returns publishers rather than people**, and its
+  pages are the cheapest and often the emptiest — eleven threads returned seven
+  comments.
+
+  What is measured and what is not, one last time. Measured: 71 videos for 2
+  credits, 11 threads for 4, one comment match at 65 and one video match at 62,
+  $0.049 of provider spend and $0.68 of model spend. Not measured: a second
+  poll proving deduplication, a rate limit, an outage, and whether the `&lc=`
+  deep link actually lands on the comment — the browser extension was not
+  connected when that was tried.
+

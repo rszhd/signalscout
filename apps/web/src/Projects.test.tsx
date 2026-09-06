@@ -79,6 +79,7 @@ describe("the projects screen", () => {
    */
   it("says an edit reaches the next monitor and not the ones that exist", async () => {
     await show([]);
+    await act(async () => button("New project").click());
 
     expect(container.textContent).toContain("takes a copy");
     expect(container.textContent).toContain("leaves the monitors you already have");
@@ -86,6 +87,7 @@ describe("the projects screen", () => {
 
   it("will not create a project until every answer is filled in", async () => {
     await show([]);
+    await act(async () => button("New project").click());
 
     expect(button("Create project").disabled).toBe(true);
 
@@ -105,6 +107,7 @@ describe("the projects screen", () => {
 
   it("posts the four answers and the signals that were ticked", async () => {
     await show([]);
+    await act(async () => button("New project").click());
 
     setValue(field("Name"), "Acme QA");
     setValue(field("What is the product?"), "A test runner");
@@ -112,6 +115,9 @@ describe("the projects screen", () => {
     setValue(field("What problem does it solve?"), "Tests break on every UI change");
     await settle();
 
+    await act(async () => {
+      container.querySelector<HTMLElement>(".project-signals summary")?.click();
+    });
     const tick = container.querySelector<HTMLInputElement>('.signal-card input[type="checkbox"]');
     await act(async () => tick?.click());
     await settle();
@@ -168,6 +174,8 @@ describe("the projects screen", () => {
     screen = await mount(<Projects />);
     container = screen.container;
 
+    await act(async () => button("New project").click());
+    await act(async () => container.querySelector<HTMLElement>("details summary")?.click());
     setValue(field("Your product's address"), "https://acme.test");
     await settle();
 
@@ -203,6 +211,8 @@ describe("the projects screen", () => {
     screen = await mount(<Projects />);
     container = screen.container;
 
+    await act(async () => button("New project").click());
+    await act(async () => container.querySelector<HTMLElement>("details summary")?.click());
     setValue(field("Your product's address"), "https://example.test");
     await settle();
 
@@ -232,6 +242,31 @@ describe("the projects screen", () => {
 
     expect(links).toContain("#/?project=11111111-1111-4111-8111-111111111111");
     expect(links).toContain("#/monitors/new?project=11111111-1111-4111-8111-111111111111");
+  });
+
+  it("keeps the list separate from editing and clears a cancelled draft", async () => {
+    await show([project()]);
+    expect(container.querySelector('input[aria-label="Name"]')).toBeNull();
+    await act(async () => button("Edit").click());
+    expect(field("Name").value).toBe("Acme QA");
+    expect(document.activeElement).toBe(field("Name"));
+    setValue(field("Name"), "Unsaved name");
+    await settle();
+    await act(async () => button("Cancel").click());
+    expect(container.textContent).toContain("Acme QA");
+    await act(async () => button("New project").click());
+    expect(field("Name").value).toBe("");
+    expect(fetchMock.mock.calls.some(([, init]) => (init as RequestInit)?.method)).toBe(false);
+  });
+
+  it("retains edits when saving fails", async () => {
+    await show([project()]);
+    await act(async () => button("Edit").click());
+    fetchMock.mockResolvedValueOnce(json({ message: "Please try again." }, 500));
+    await act(async () => button("Save changes").click());
+    expect(container.querySelector('[role="alert"]')?.textContent).toContain("Please try again.");
+    expect(field("Name").value).toBe("Acme QA");
+    expect(button("Save changes").disabled).toBe(false);
   });
 
   it("edits with PATCH rather than making a second project", async () => {

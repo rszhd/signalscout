@@ -109,3 +109,15 @@ README records their source URLs and ownership. Icons are served locally and
 remain decorative beside a visible name. Unknown or failed images fall back to
 initials. Use 16px beside metadata, 20–24px beside platform names, and 26px in
 provider account avatars. Do not use a third-party favicon service at runtime.
+
+## Projects
+
+Projects opens on a two-column grid of businesses, product and audience summaries,
+and monitor counts. Cards stack on phones. Each card links to its inbox and a
+prefilled new monitor. Creating or
+editing switches to a white form surface with brief guidance alongside it on
+desktop; document import and conversation signals
+are optional disclosures. Saving returns to the list, while a failed save
+retains the answers. Cancel clears the draft. Changes apply to future monitors;
+existing monitors keep their copied answers. `styles/projects.css` owns the
+layout and uses the shared theme.

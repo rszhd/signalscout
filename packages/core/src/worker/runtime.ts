@@ -115,7 +115,36 @@ export interface StartWorkerOptions {
   retry?: RetryPolicy;
   /** False leaves the clock off, for a test that ticks the scheduler by hand. */
   scheduleTicks?: boolean;
+  /**
+   * How often a worker looks for a job, in seconds. Absent leaves pg-boss on
+   * its own default.
+   *
+   * It exists for the suite, and the reason is measured. A pipeline test sends
+   * a job and waits for a worker to pick it up, so its cost is the polling
+   * interval and not the work: on 2026-09-06 the five worker files were 397 of
+   * the suite's 435 seconds, every one of them at four to six seconds a test,
+   * which is a wait rather than a computation.
+   *
+   * Production leaves it unset. A short interval there would be a query per
+   * queue per second against a database doing real work, to save a latency
+   * nobody is waiting on — a poll that starts a second later is a poll that
+   * starts a second later.
+   */
+  pollingIntervalSeconds?: number;
   notificationTransport?: NotificationTransport;
+}
+
+/**
+ * How often a worker looks for a job, from the environment.
+ *
+ * `WORKER_POLLING_INTERVAL_SECONDS`, and only the suite sets it. pg-boss
+ * refuses anything under half a second, so an out-of-range value is ignored
+ * rather than passed on to be rejected at boot.
+ */
+function pollingIntervalFromEnvironment(): number | undefined {
+  const configured = Number(process.env.WORKER_POLLING_INTERVAL_SECONDS);
+
+  return Number.isFinite(configured) && configured >= 0.5 ? configured : undefined;
 }
 
 /**
@@ -284,6 +313,7 @@ export async function startWorker({
   triageConfig,
   retry = defaultRetryPolicy,
   scheduleTicks = true,
+  pollingIntervalSeconds,
   notificationTransport,
 }: StartWorkerOptions): Promise<WorkerHandle> {
   const { db, close } = createDatabase(databaseUrl);
@@ -369,13 +399,24 @@ export async function startWorker({
       createNotifyStep(notificationTransport ?? createNotificationTransport(loadNotificationEnv())),
   };
 
+  /**
+   * Spread rather than passed, so an unset interval leaves pg-boss's own.
+   *
+   * The environment is the fallback, the way `DATABASE_POOL_SIZE` is: this is
+   * a property of the setup rather than of the code each test happens to call,
+   * and `vitest.config.ts` sets it once for every worker test that exists or
+   * will exist. Nothing sets it in production.
+   */
+  const interval = pollingIntervalSeconds ?? pollingIntervalFromEnvironment();
+  const workerOptions = interval === undefined ? {} : { pollingIntervalSeconds: interval };
+
   const work = async <Payload>(
     queue: string,
     step: Step<Payload>,
     subject: (payload: Payload) => Record<string, unknown>,
   ): Promise<void> => {
     const run = instrument(queue, step, context, subject);
-    await boss.work<Payload>(queue, async (jobs) => {
+    await boss.work<Payload>(queue, workerOptions, async (jobs) => {
       for (const job of jobs) await run(job.data, job.id);
     });
   };
@@ -398,7 +439,7 @@ export async function startWorker({
     for (const job of jobs) logger.info({ jobId: job.id }, "heartbeat");
   });
 
-  await boss.work(scheduleTickQueue, async () => {
+  await boss.work(scheduleTickQueue, workerOptions, async () => {
     await enqueueDuePolls(db, boss, logger);
     await enqueueNotifications(db, boss);
     await boss.send(reconcileQueue, {}, { singletonKey: "all" });

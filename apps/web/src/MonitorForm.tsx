@@ -4,7 +4,8 @@ import { BrandIcon } from "./BrandIcon.js";
 import { CostTest, type EstimateReport, exceedsCap } from "./CostTest.js";
 import { formatMicros, toMicros } from "./Monitors.js";
 import { projectSuffix } from "./route.js";
-import { browserTimezone, type ScheduleChoice, scheduleChoices } from "./schedule.js";
+import { ScheduleField } from "./ScheduleField.js";
+import { browserTimezone, defaultRate, everyDay } from "./schedule.js";
 
 interface SignalOption {
   id: string;
@@ -199,7 +200,15 @@ export function MonitorForm() {
    * When it runs. US-041, and the default is the one that was implicit before
    * this control existed: every hour, every day.
    */
-  const [scheduleId, setScheduleId] = useState(scheduleChoices[0]?.id ?? "hourly");
+  /**
+   * The schedule as the two things the scheduler reads. US-041, rewritten.
+   *
+   * A rate and a set of days rather than the id of a combined choice: the
+   * control asks two questions now, and holding an id would mean only the
+   * pairs somebody thought to name are reachable.
+   */
+  const [pollIntervalSeconds, setPollIntervalSeconds] = useState(defaultRate);
+  const [pollDays, setPollDays] = useState<number[]>([...everyDay]);
   const [timezone, setTimezone] = useState(browserTimezone());
   const [plan, setPlan] = useState<QueryPlan>(emptyPlan);
   const [stage, setStage] = useState<SetupStage>("answers");
@@ -322,9 +331,7 @@ export function MonitorForm() {
    * acceptance names.
    */
   const repliesUnavailable = selectedSourceOptions.filter((source) => !source.canFetchReplies);
-  const schedule =
-    scheduleChoices.find((choice) => choice.id === scheduleId) ??
-    (scheduleChoices[0] as ScheduleChoice);
+  const schedule = { pollIntervalSeconds, pollDays };
 
   const capMicros = cap.trim() === "" ? null : toMicros(cap);
   const queries = cleanQueries(plan.queries, selectedSources);
@@ -521,7 +528,8 @@ export function MonitorForm() {
     setOnExhausted("pause");
     takeReport(null);
     setIncludeReplies(false);
-    setScheduleId(scheduleChoices[0]?.id ?? "hourly");
+    setPollIntervalSeconds(defaultRate);
+    setPollDays([...everyDay]);
     setTimezone(browserTimezone());
     setGeneratedFor(null);
     setStage("answers");
@@ -1044,21 +1052,14 @@ export function MonitorForm() {
               <fieldset className="choice-section">
                 <legend>How often should it look?</legend>
                 <p>More frequent searches mean more provider calls.</p>
-                <label className="field">
-                  <span>Collection schedule</span>
-                  <select
-                    aria-label="Collection schedule"
-                    value={scheduleId}
-                    onChange={(event) => setScheduleId(event.target.value)}
-                  >
-                    {scheduleChoices.map((choice) => (
-                      <option key={choice.id} value={choice.id}>
-                        {choice.label}
-                      </option>
-                    ))}
-                  </select>
-                  <small>{schedule.hint}</small>
-                </label>
+                <ScheduleField
+                  pollIntervalSeconds={pollIntervalSeconds}
+                  pollDays={pollDays}
+                  onChange={(next) => {
+                    setPollIntervalSeconds(next.pollIntervalSeconds);
+                    setPollDays(next.pollDays);
+                  }}
+                />
                 <details className="disclosure timezone-setting">
                   <summary>Time zone · {timezone}</summary>
                   <label className="field">

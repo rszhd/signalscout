@@ -11,7 +11,7 @@
 import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { formatMicros, groupsOf, Monitors, toMicros } from "./Monitors.js";
-import { scheduleChoices } from "./schedule.js";
+import { everyDay, summarise, weekdays } from "./schedule.js";
 import { button, field, json, mount, type Screen, select, settle, setValue } from "./testing.js";
 
 const monitorId = "11111111-1111-4111-8111-111111111111";
@@ -363,46 +363,98 @@ describe("the monitor list", () => {
      * disagreement at a larger scale, and the first draft of this list said
      * "about 240 polls a month" where the arithmetic gives 244.
      */
-    it("says what each choice costs, from the arithmetic rather than by hand", () => {
-      const byId = new Map(scheduleChoices.map((choice) => [choice.id, choice]));
-
-      expect(byId.get("hourly")?.hint).toContain("731");
-      expect(byId.get("three-hourly")?.hint).toContain("244");
-      expect(byId.get("six-hourly")?.hint).toContain("122");
-      expect(byId.get("twelve-hourly")?.hint).toContain("61");
+    it("says what a schedule costs, from the arithmetic rather than by hand", () => {
+      expect(summarise(3_600, everyDay)).toContain("731");
+      expect(summarise(3 * 3_600, everyDay)).toContain("244");
+      expect(summarise(6 * 3_600, everyDay)).toContain("122");
+      expect(summarise(12 * 3_600, everyDay)).toContain("61");
       // Five sevenths of hourly, which is the whole reason days exist.
-      expect(byId.get("hourly-weekdays")?.hint).toContain("522");
+      expect(summarise(3_600, weekdays)).toContain("522");
+      // And a set no rule names, which the old control could not express.
+      expect(summarise(3_600, [1, 3, 5])).toContain("313");
     });
 
-    it("shows the schedule and says what each choice costs", async () => {
+    it("reads a day set back as a phrase rather than as numbers", () => {
+      expect(summarise(3_600, everyDay)).toBe("Polls every hour — about 731 polls a month.");
+      expect(summarise(86_400, weekdays)).toContain("on weekdays");
+      expect(summarise(86_400, [0, 6])).toContain("at weekends");
+      expect(summarise(86_400, [1, 3, 5])).toContain("on Mon, Wed and Fri");
+      expect(summarise(86_400, [2])).toContain("on Tues");
+    });
+
+    it("asks how often and which days as two questions", async () => {
       await show([monitor()]);
 
-      const picker = select(`How often ${monitor().name} runs`);
+      expect(select("How often")).toBeDefined();
+      expect(select("Which days")).toBeDefined();
 
-      expect(picker).toBeDefined();
-      // The hints are in polls a month, because that is the unit a person
+      // The count is in polls a month, because that is the unit a person
       // spends. Leaving them to work it out is how a monitor ends up hourly.
       expect(container.textContent).toContain("polls a month");
     });
 
-    it("sends both the interval and the days, because a day list is the point", async () => {
-      await show([monitor()]);
-
-      const picker = select(`How often ${monitor().name} runs`);
-
-      await act(async () => setValue(picker, "daily-weekdays"));
-      await settle();
-
+    function patchBody() {
       const call = fetchMock.mock.calls.find(
         ([url, init]) =>
           String(url).includes("/api/monitors/") && (init as RequestInit)?.method === "PATCH",
       );
-      const init = call?.[1] as RequestInit;
 
-      expect(JSON.parse(String(init.body))).toEqual({
-        pollIntervalSeconds: 86_400,
+      const [, init] = call as [string, RequestInit];
+
+      return JSON.parse(String(init.body));
+    }
+
+    it("sends both the interval and the days, because a day list is the point", async () => {
+      await show([monitor()]);
+
+      await act(async () => setValue(select("Which days"), "weekdays"));
+      await settle();
+
+      expect(patchBody()).toEqual({
+        pollIntervalSeconds: 3_600,
         pollDays: [1, 2, 3, 4, 5],
       });
+    });
+
+    it("changes the rate without touching the days", async () => {
+      await show([monitor({ pollIntervalSeconds: 3_600, pollDays: [1, 3, 5] })]);
+
+      await act(async () => setValue(select("How often"), "86400"));
+      await settle();
+
+      // The two questions are independent: picking a rate must not quietly
+      // reset a day set somebody chose.
+      expect(patchBody()).toEqual({ pollIntervalSeconds: 86_400, pollDays: [1, 3, 5] });
+    });
+
+    /**
+     * A day set no named rule covers. US-041's control could not express one at
+     * all — nine welded pairs, none of them Monday, Wednesday and Friday.
+     */
+    it("lets a person tick the days themselves", async () => {
+      await show([monitor({ pollDays: [1, 2, 3, 4, 5] })]);
+
+      const saturday = container.querySelector<HTMLButtonElement>('[aria-label="Saturday"]');
+      await act(async () => saturday?.click());
+      await settle();
+
+      expect(patchBody()).toEqual({
+        pollIntervalSeconds: 3_600,
+        pollDays: [1, 2, 3, 4, 5, 6],
+      });
+    });
+
+    /**
+     * A monitor with no days is never due, and the API refuses one — so the
+     * last tick cannot be cleared here either. Turning a click into an error
+     * nobody asked for is the alternative.
+     */
+    it("will not let the last day be turned off", async () => {
+      await show([monitor({ pollDays: [3] })]);
+
+      const wednesday = container.querySelector<HTMLButtonElement>('[aria-label="Wednesday"]');
+
+      expect(wednesday?.disabled).toBe(true);
     });
 
     /**

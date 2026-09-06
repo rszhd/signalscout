@@ -15,15 +15,6 @@ export const everyDay = [0, 1, 2, 3, 4, 5, 6];
 export const weekdays = [1, 2, 3, 4, 5];
 export const weekends = [0, 6];
 
-export interface ScheduleChoice {
-  readonly id: string;
-  readonly label: string;
-  /** What it costs, said in the units a person spends: polls a month. */
-  readonly hint: string;
-  readonly pollIntervalSeconds: number;
-  readonly pollDays: readonly number[];
-}
-
 /**
  * The same month the projection uses, so the two cannot disagree.
  *
@@ -43,11 +34,6 @@ function pollsPerMonth(pollIntervalSeconds: number, pollDays: readonly number[])
   return Math.round((daysPerMonth * dayFraction * 86_400) / pollIntervalSeconds);
 }
 
-/** The hint under a choice, computed rather than written. */
-function hintFor(pollIntervalSeconds: number, pollDays: readonly number[], note = ""): string {
-  return `about ${pollsPerMonth(pollIntervalSeconds, pollDays)} polls a month${note}`;
-}
-
 /**
  * Ordered from most expensive to least, so the cheap answers are not hidden
  * below the fold. A person who does not read the hints still reads the order.
@@ -57,89 +43,117 @@ function hintFor(pollIntervalSeconds: number, pollDays: readonly number[], note 
  * every seven hours wants a cron field, and a cron field is a support burden
  * they get wrong silently and expensively.
  */
-export const scheduleChoices: readonly ScheduleChoice[] = [
-  {
-    id: "hourly",
-    label: "Every hour",
-    hint: hintFor(hour, everyDay, " — the most this will cost"),
-    pollIntervalSeconds: hour,
-    pollDays: everyDay,
-  },
-  {
-    id: "hourly-weekdays",
-    label: "Every hour, weekdays",
-    hint: hintFor(hour, weekdays, ", and it skips the weekend"),
-    pollIntervalSeconds: hour,
-    pollDays: weekdays,
-  },
-  {
-    id: "three-hourly",
-    label: "Every 3 hours",
-    hint: hintFor(3 * hour, everyDay),
-    pollIntervalSeconds: 3 * hour,
-    pollDays: everyDay,
-  },
-  {
-    id: "six-hourly",
-    label: "Every 6 hours",
-    hint: hintFor(6 * hour, everyDay),
-    pollIntervalSeconds: 6 * hour,
-    pollDays: everyDay,
-  },
-  {
-    id: "twelve-hourly",
-    label: "Every 12 hours",
-    hint: hintFor(12 * hour, everyDay),
-    pollIntervalSeconds: 12 * hour,
-    pollDays: everyDay,
-  },
-  {
-    id: "daily",
-    label: "Once a day",
-    hint: hintFor(day, everyDay),
-    pollIntervalSeconds: day,
-    pollDays: everyDay,
-  },
-  {
-    id: "daily-weekdays",
-    label: "Once a day, weekdays",
-    hint: hintFor(day, weekdays),
-    pollIntervalSeconds: day,
-    pollDays: weekdays,
-  },
-  {
-    id: "weekly",
-    label: "Once a week",
-    hint: hintFor(7 * day, everyDay, " — the least this will cost"),
-    pollIntervalSeconds: 7 * day,
-    pollDays: everyDay,
-  },
-];
-
 /**
- * Which choice a monitor's stored settings correspond to, or none.
+ * How often, as its own question. US-041, rewritten for US-051.
  *
- * A monitor edited by hand may sit between two choices, and the screen must
- * say so rather than round it to the nearest and silently change it on the
- * next save.
+ * The nine combined choices below are kept for the monitors a person already
+ * has, but the control now asks two questions rather than one. A schedule
+ * answers *how often* and *which days*, and every combined choice was one pair
+ * of answers: "Every hour, weekdays" is the hourly rate on a set of five.
+ *
+ * Separating them makes far more schedules reachable with one fewer thing to
+ * read. Mondays, Wednesdays and Fridays at six-hourly is a schedule this
+ * product could not express at all, and it is a third of the cost of the same
+ * rate every day.
  */
-export function choiceFor(
-  pollIntervalSeconds: number,
-  pollDays: readonly number[],
-): ScheduleChoice | undefined {
-  const days = [...pollDays].sort((left, right) => left - right).join(",");
-
-  return scheduleChoices.find(
-    (choice) =>
-      choice.pollIntervalSeconds === pollIntervalSeconds &&
-      [...choice.pollDays].sort((left, right) => left - right).join(",") === days,
-  );
+export interface PollRate {
+  readonly seconds: number;
+  readonly label: string;
 }
 
-/** How a schedule reads when no choice matches it. */
+/**
+ * Where a new monitor starts: hourly, every day.
+ *
+ * The most expensive answer, deliberately. A monitor that finds nothing on its
+ * first day looks broken, and a person who wants it cheaper is shown the count
+ * under the control the moment they touch it — where the old list buried the
+ * same number inside an option label.
+ */
+export const defaultRate = hour;
+
+export const pollRates: readonly PollRate[] = [
+  { seconds: hour, label: "Every hour" },
+  { seconds: 3 * hour, label: "Every 3 hours" },
+  { seconds: 6 * hour, label: "Every 6 hours" },
+  { seconds: 12 * hour, label: "Every 12 hours" },
+  { seconds: day, label: "Once a day" },
+  { seconds: 7 * day, label: "Once a week" },
+];
+
+/** The day sets that have a name. The set is the truth; a rule is a shortcut. */
+export const dayRules = [
+  { key: "every", label: "Every day", days: everyDay },
+  { key: "weekdays", label: "Weekdays", days: weekdays },
+  { key: "weekends", label: "Weekends", days: weekends },
+] as const;
+
+export type DayRuleKey = (typeof dayRules)[number]["key"] | "chosen";
+
+/** Sunday first, matching Postgres numbering, so the chips read left to right. */
+export const dayNames = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];
+export const dayInitials = ["S", "M", "T", "W", "T", "F", "S"];
+
+/**
+ * Which rule a set of days adds up to, read back off the set itself.
+ *
+ * The set is what the scheduler reads, so the rule is derived rather than
+ * stored: unticking one day of "Weekdays" moves the answer to "Chosen days"
+ * without anything having to remember that it did.
+ */
+export function dayRuleOf(days: readonly number[]): DayRuleKey {
+  const set = [...days].sort((a, b) => a - b).join();
+
+  for (const rule of dayRules) if (rule.days.join() === set) return rule.key;
+
+  return "chosen";
+}
+
+/** The days as a phrase, or empty when it is every day and says nothing. */
+export function daysPhrase(days: readonly number[]): string {
+  const rule = dayRuleOf(days);
+
+  if (rule === "every") return "";
+  if (rule === "weekdays") return "on weekdays";
+  if (rule === "weekends") return "at weekends";
+
+  const named = [...days].sort((a, b) => a - b).map((index) => dayNames[index]?.slice(0, 3) ?? "");
+
+  if (named.length === 1) return `on ${named[0]}s`;
+
+  return `on ${named.slice(0, -1).join(", ")} and ${named.at(-1)}`;
+}
+
+/**
+ * The whole schedule as one sentence, under the controls that made it.
+ *
+ * **The count is the point, not the prose.** Poll frequency is the largest
+ * cost dial in this product — the same query is $10.80 a month polled hourly
+ * and $648 polled every minute — and the old control buried that number inside
+ * an option label, where it was read once and never compared. Here it sits
+ * under both controls and moves as either is touched.
+ */
+export function summarise(pollIntervalSeconds: number, days: readonly number[]): string {
+  const rate = pollRates.find((one) => one.seconds === pollIntervalSeconds);
+  const how = (rate?.label ?? describeSchedule(pollIntervalSeconds, everyDay)).toLowerCase();
+  const phrase = daysPhrase(days);
+  const when = phrase ? `${how} ${phrase}` : how;
+
+  return `Polls ${when} — about ${pollsPerMonth(pollIntervalSeconds, days)} polls a month.`;
+}
+
 export function describeSchedule(pollIntervalSeconds: number, pollDays: readonly number[]): string {
-  const known = choiceFor(pollIntervalSeconds, pollDays);
-  if (known) return known.label;
+  const rate = pollRates.find((one) => one.seconds === pollIntervalSeconds);
+  const phrase = daysPhrase(pollDays);
+
+  if (rate) return phrase ? `${rate.label}, ${phrase.replace(/^(on|at) /, "")}` : rate.label;
 
   const names = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   const hours = Math.round(pollIntervalSeconds / hour);

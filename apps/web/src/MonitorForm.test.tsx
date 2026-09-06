@@ -461,13 +461,12 @@ describe("the monitor form", () => {
 
     expect(container.textContent).toContain("spend its budget before the month ends");
 
-    const schedulePicker = container.querySelector(
-      '[aria-label="Collection schedule"]',
-    ) as HTMLSelectElement;
-    await act(async () => setValue(schedulePicker, "daily"));
+    // The rate, which is one of the two questions the schedule control asks.
+    const ratePicker = container.querySelector('[aria-label="How often"]') as HTMLSelectElement;
+    await act(async () => setValue(ratePicker, "86400"));
     expect(container.textContent).toContain("The plan or schedule has changed since this test.");
     expect(button("Start monitor")).toBeDefined();
-    await act(async () => setValue(schedulePicker, "hourly"));
+    await act(async () => setValue(ratePicker, "3600"));
 
     await act(async () => button("Save without starting").click());
     await settle();

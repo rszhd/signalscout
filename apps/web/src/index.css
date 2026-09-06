@@ -2449,6 +2449,74 @@ a {
   padding-left: 18px;
 }
 
+/*
+  How often a monitor runs, and on which days. US-041, rewritten.
+
+  The two selects sit side by side because they are two answers to one
+  question, and the chips sit under both because the day rule above is a
+  shortcut into them — unticking one moves the select to "Chosen days" and the
+  chips are where that becomes visible.
+*/
+.schedule-field {
+  display: grid;
+  gap: 12px;
+}
+.schedule-controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+.day-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.day-chip {
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--muted);
+  font: inherit;
+  font-size: var(--text-xs);
+  cursor: pointer;
+  transition:
+    border-color 140ms ease,
+    background 140ms ease,
+    color 140ms ease;
+}
+.day-chip:hover:not(:disabled) {
+  border-color: var(--accent-text);
+}
+.day-chip[aria-pressed="true"] {
+  border-color: var(--accent-text);
+  background: var(--accent-soft, var(--surface));
+  color: var(--accent-text);
+  font-weight: 600;
+}
+/* The last day on cannot be turned off: a monitor with no days never runs. */
+.day-chip:disabled {
+  cursor: default;
+}
+.day-chip:disabled[aria-pressed="true"] {
+  opacity: 0.85;
+}
+/*
+  The count is the reason this line exists. Poll frequency is the largest cost
+  dial in the product, and it used to sit inside an option label where it was
+  read once and never compared.
+*/
+.schedule-summary {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--text-xs);
+  line-height: 1.7;
+}
+
 .project-name {
   font-size: var(--text-md);
 }

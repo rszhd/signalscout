@@ -2,7 +2,8 @@ import { useCallback, useEffect, useState } from "react";
 import { messageFor, requestJson } from "./api.js";
 import { BrandIcon } from "./BrandIcon.js";
 import { projectSuffix, routeParam } from "./route.js";
-import { choiceFor, describeSchedule, scheduleChoices } from "./schedule.js";
+import { ScheduleField } from "./ScheduleField.js";
+import { describeSchedule } from "./schedule.js";
 
 /**
  * The monitor list: what each monitor is doing, what it has spent, and what it
@@ -297,12 +298,8 @@ function BudgetForm({ monitor, onSaved }: { monitor: Monitor; onSaved: () => Pro
 function ScheduleForm({ monitor, onSaved }: { monitor: Monitor; onSaved: () => Promise<void> }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const current = choiceFor(monitor.pollIntervalSeconds, monitor.pollDays);
 
-  async function choose(id: string): Promise<void> {
-    const choice = scheduleChoices.find((one) => one.id === id);
-    if (!choice) return;
-
+  async function save(next: { pollIntervalSeconds: number; pollDays: number[] }): Promise<void> {
     setBusy(true);
     setError(null);
 
@@ -310,10 +307,7 @@ function ScheduleForm({ monitor, onSaved }: { monitor: Monitor; onSaved: () => P
       await requestJson(`/api/monitors/${monitor.id}`, {
         method: "PATCH",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          pollIntervalSeconds: choice.pollIntervalSeconds,
-          pollDays: [...choice.pollDays],
-        }),
+        body: JSON.stringify(next),
       });
       await onSaved();
     } catch (cause) {
@@ -325,32 +319,13 @@ function ScheduleForm({ monitor, onSaved }: { monitor: Monitor; onSaved: () => P
 
   return (
     <div className="monitor-schedule">
-      <label className="field">
-        <span>Runs</span>
-        <select
-          aria-label={`How often ${monitor.name} runs`}
-          disabled={busy}
-          value={current?.id ?? "custom"}
-          onChange={(event) => void choose(event.target.value)}
-        >
-          {current === undefined && (
-            /*
-              A monitor edited by hand can sit between two choices. The screen
-              says what it actually does rather than rounding it to the nearest
-              and changing it silently the next time anybody saves.
-            */
-            <option value="custom">
-              {describeSchedule(monitor.pollIntervalSeconds, monitor.pollDays)}
-            </option>
-          )}
-          {scheduleChoices.map((choice) => (
-            <option key={choice.id} value={choice.id}>
-              {choice.label} — {choice.hint}
-            </option>
-          ))}
-        </select>
-        <small>Days are counted in {monitor.pollTimezone}.</small>
-      </label>
+      <ScheduleField
+        pollIntervalSeconds={monitor.pollIntervalSeconds}
+        pollDays={monitor.pollDays}
+        timezone={monitor.pollTimezone}
+        disabled={busy}
+        onChange={(next) => void save(next)}
+      />
 
       {error && (
         <p className="notice warning" role="status">

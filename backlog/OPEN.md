@@ -2,7 +2,7 @@
 
 # Open tickets
 
-11 open — 4 doing, 6 todo, 1 parked (3 p1, 6 p2, 2 p3).
+13 open — 4 doing, 8 todo, 1 parked (3 p1, 8 p2, 2 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -15,6 +15,8 @@
 | p2 | US-035 | [A monitor is told where people are talking](todo/US-035-a-monitor-is-told-where-people-are-talking.md) | spike | todo | 2026-09-06T11:40+08:00 |
 | p2 | US-036 | [A provider is rated per platform, from measurements](todo/US-036-a-provider-is-rated-per-platform-from-measurements.md) | spike | todo | 2026-09-06T11:48+08:00 |
 | p2 | US-037 | [One subscription is enough](todo/US-037-one-subscription-is-enough.md) | feature | todo | 2026-09-06T11:48+08:00 |
+| p2 | US-039 | [A thread that ranks on Google is a lead for years](todo/US-039-a-thread-that-ranks-on-google-is-a-lead-for-years.md) | spike | todo | 2026-09-06T12:32+08:00 |
+| p2 | US-040 | [A draft reply the person sends themselves](todo/US-040-a-draft-reply-the-person-sends-themselves.md) | feature | todo | 2026-09-06T12:32+08:00 |
 | p3 | US-018 | [A mutation sweep proves the suite is sensitive](todo/US-018-a-mutation-sweep-proves-the-suite-is-sensitive.md) | chore | todo | 2026-09-04T22:54+08:00 |
 | p3 | US-038 | [Instagram, TikTok and Threads](parked/US-038-instagram-tiktok-and-threads.md) | feature | parked | 2026-09-06T11:56+08:00 |
 

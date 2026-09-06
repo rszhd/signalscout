@@ -9,7 +9,12 @@ import {
 } from "./schedule.js";
 
 /**
- * When a monitor runs: how often, and which days. US-041, rewritten.
+ * When a monitor runs: how often, and which days. US-041, rewritten by US-051.
+ *
+ * A third question is coming and is deliberately absent: US-052 adds the hours
+ * of the day a monitor may poll in, because a lead found at 03:00 is eight
+ * hours old by the time anybody reads it. That is a scheduler change before it
+ * is a control, so the control waits for it.
  *
  * One component for the monitor form and the monitor list, so the two can
  * never offer different schedules — the same reason patrol keeps its own in

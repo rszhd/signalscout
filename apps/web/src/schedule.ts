@@ -44,7 +44,7 @@ function pollsPerMonth(pollIntervalSeconds: number, pollDays: readonly number[])
  * they get wrong silently and expensively.
  */
 /**
- * How often, as its own question. US-041, rewritten for US-051.
+ * How often, as its own question. US-041, rewritten by US-051.
  *
  * The nine combined choices below are kept for the monitors a person already
  * has, but the control now asks two questions rather than one. A schedule

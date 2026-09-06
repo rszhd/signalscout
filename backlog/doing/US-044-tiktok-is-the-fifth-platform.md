@@ -147,9 +147,56 @@ they parse.
   `@tiktok` in six files and it was a false positive — my own `@tiktok-user-N`
   pseudonyms matching the pattern that looks for handles.
 
-- 2026-09-06T13:32+08:00 — Recommendation: **do not build the connector.**
-  Reconsider if a monitor exists whose customers are consumers rather than
-  engineers, because nothing here says TikTok has no intent — it says TikTok has
-  no *this product's* intent, at a median of 19 characters. That is a different
-  claim and the fixtures support only the second.
+- 2026-09-06T13:32+08:00 — First recommendation, **later withdrawn**: do not
+  build the connector. See the entry below.
+
+- 2026-09-06T13:38+08:00 — **The entry above tested the wrong thing, and the
+  owner said so.** PLAN.md's example monitor sells a QA tool, and `flaky tests`
+  is close to the worst query that could be sent to TikTok: both words are
+  homonyms there. The measurement was sound and the conclusion drawn from it was
+  too broad — "not a platform for this product" was a claim about one product on
+  one query.
+
+  Four more searches and three comment pages, four credits. **TikTok holds
+  leads, and whether it does depends on the category rather than the platform.**
+
+  A consumer query returns exactly what it should. `budgeting app
+  recommendations`, `what app do you use to edit videos` and `best skincare for
+  acne scars` each returned 30 on-topic videos with comment counts of 89, 321,
+  1081, 2618, 4933.
+
+  The videos are still publishers, as US-034 found on YouTube — "I tried a bunch
+  of budgeting apps so you don't have to" is a creator, not a buyer. So the lead
+  is underneath, and that is where the categories separate:
+
+  | Video | Comments | Median chars | Over 60 |
+  |---|---|---|---|
+  | Meal planning, 2,618 comments | 48 | **16** | 6 |
+  | School exam (first run) | 50 | **19** | 1 |
+  | Acne moisturiser, 1,165 comments | 49 | **54** | **22 of 49** |
+
+  And the acne thread's top comment is the shape this product exists to find:
+  *"Is it safe to use for someone who has fungal acne, redness, sensitive skin,
+  and oily skin? I badly want to try it, but…"* — a person listing their own
+  condition and asking whether the product suits them. That is a lead by any
+  reading.
+
+  **So the finding is not about TikTok. It is about what people go to a comment
+  section to do.** Under a recipe they say "code?" and "and its called?". Under a
+  skincare product they describe their skin at length, because they have to in
+  order to get a useful answer. A monitor whose customers have a condition they
+  must describe will find people here. A monitor whose customers are engineers
+  will not, and neither will one selling a recipe app.
+
+  **One thing nothing else in this product has met: the comments are
+  multilingual.** French and Spanish in one page of 49, at full length. Every
+  prompt here is English and no connector has ever returned a language the
+  classifier was not written for. That is not a blocker and it is not free
+  either — it belongs in the Log before somebody meets it as a surprise.
+
+- 2026-09-06T13:38+08:00 — Recommendation, revised: **build it.** The endpoints
+  work, page, cost one credit each and return the envelope the shared parser
+  already reads. The platform's own note should say what the measurement says —
+  that the lead is in the comments, and that this platform suits a monitor whose
+  customers describe a condition rather than one selling to engineers.
 

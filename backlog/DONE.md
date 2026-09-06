@@ -2,10 +2,11 @@
 
 # Done
 
-35 finished.
+36 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
+| BUG-007 | [A comment is stored under a post it is not under](done/2026-09/BUG-007-a-comment-is-stored-under-a-post-it-is-not-under.md) | bug | shipped | 2026-09 |
 | BUG-006 | [The first poll of a monitor stores no replies](done/2026-09/BUG-006-the-first-poll-of-a-monitor-stores-no-replies.md) | bug | shipped | 2026-09 |
 | BUG-005 | [The cost test prices every monitor as hourly](done/2026-09/BUG-005-the-cost-test-prices-every-monitor-as-hourly.md) | bug | shipped | 2026-09 |
 | BUG-003 | [A post below the threshold is classified again on every poll](done/2026-09/BUG-003-a-post-below-the-threshold-is-classified-again-on-every-poll.md) | bug | fixed | 2026-09 |

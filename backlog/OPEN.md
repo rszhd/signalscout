@@ -2,7 +2,7 @@
 
 # Open tickets
 
-19 open — 6 doing, 12 todo, 1 parked (5 p1, 12 p2, 2 p3).
+19 open — 6 doing, 12 todo, 1 parked (4 p1, 13 p2, 2 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -10,7 +10,6 @@
 | p1 | US-041 | [A person chooses when a monitor runs](doing/US-041-a-person-chooses-when-a-monitor-runs.md) | feature | doing | 2026-09-06T12:31+08:00 |
 | p1 | BUG-004 | [The model half of a poll is not capped](doing/BUG-004-the-model-half-of-a-poll-is-not-capped.md) | bug | doing | 2026-09-06T04:42+08:00 |
 | p1 | US-033 | [Thirty verdicts say whether the score is right](todo/US-033-thirty-verdicts-say-whether-the-score-is-right.md) | chore | todo | 2026-09-06T03:02+08:00 |
-| p1 | BUG-007 | [A comment is stored under a post it is not under](todo/BUG-007-a-comment-is-stored-under-a-post-it-is-not-under.md) | bug | todo | 2026-09-06T15:40+08:00 |
 | p2 | US-015 | [A deleted post stops being shown](doing/US-015-a-deleted-post-stops-being-shown.md) | feature | doing | 2026-09-04T22:49+08:00 |
 | p2 | US-020 | [A monitor can include comments and replies](doing/US-020-a-monitor-can-include-comments-and-replies.md) | feature | doing | 2026-09-05T01:18+08:00 |
 | p2 | US-043 | [A match is kept for something to be done about it](doing/US-043-a-match-is-kept-for-something-to-be-done-about-it.md) | feature | doing | 2026-09-06T12:36+08:00 |
@@ -23,6 +22,7 @@
 | p2 | US-042 | [A search without a monitor](todo/US-042-a-search-without-a-monitor.md) | feature | todo | 2026-09-06T12:35+08:00 |
 | p2 | US-045 | [A project holds what every monitor repeats](todo/US-045-a-project-holds-what-every-monitor-repeats.md) | feature | todo | 2026-09-06T13:42+08:00 |
 | p2 | US-046 | [A reply is posted from the inbox](todo/US-046-a-reply-is-posted-from-the-inbox.md) | feature | todo | 2026-09-06T15:12+08:00 |
+| p2 | US-048 | [A deep thread is read in batches and stopped early](todo/US-048-a-deep-thread-is-read-in-batches-and-stopped-early.md) | feature | todo | 2026-09-06T16:20+08:00 |
 | p3 | US-018 | [A mutation sweep proves the suite is sensitive](todo/US-018-a-mutation-sweep-proves-the-suite-is-sensitive.md) | chore | todo | 2026-09-04T22:54+08:00 |
 | p3 | US-038 | [Instagram, TikTok and Threads](parked/US-038-instagram-tiktok-and-threads.md) | feature | parked | 2026-09-06T11:56+08:00 |
 

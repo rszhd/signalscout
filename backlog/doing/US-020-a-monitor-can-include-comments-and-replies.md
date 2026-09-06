@@ -224,6 +224,14 @@ told that comments are unavailable, not quietly given none.
 
 ## Notes
 
+- **Depth becomes a decision rather than a bound in
+  [US-048](../todo/US-048-a-deep-thread-is-read-in-batches-and-stopped-early.md).**
+  `maxPagesPerThread` stops at four provider pages, which is 100 comments at
+  ScrapeCreators and 204 at SocialCrawl — so how deep this reads depends on
+  which provider answered. That ticket replaces it with batches counted in
+  comments, and a yield threshold that decides whether to buy the next one.
+
+
 - Depends on [US-005](../done/2026-09/US-005-reddit-returns-candidate-posts.md)
   and [US-025](../done/2026-09/US-025-scrapecreators-collects-reddit-posts.md).
 - [US-029](../done/2026-09/US-029-a-measurement-says-which-pre-filter-fits-a-comment.md)

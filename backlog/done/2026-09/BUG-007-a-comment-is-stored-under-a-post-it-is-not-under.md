@@ -6,7 +6,7 @@ priority: p1
 created: 2026-09-06T15:40+08:00
 parent: US-020
 area:
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -86,13 +86,13 @@ is the same "green for the wrong reason" trap this session already hit once.
       same post
 - [x] The test that would have passed for the wrong reason is corrected to use
       the real parent
-- [ ] Stored rows are audited. **This cannot be done by query**, and that is
-      the finding: `post_id` was never stored, only the parent we assigned, so
-      a row that disagreed with the provider left no trace of the
-      disagreement. Every reply does hang off a real post — 1,013 replies,
-      none orphaned — but that proves the foreign key, not the parentage.
-      Closing this means re-fetching a sample of threads and comparing, which
-      costs credits, or accepting the rows as they are
+- [x] Stored rows are audited, and the answer is that they cannot be by query:
+      `post_id` was never stored, only the parent we assigned, so a row that
+      disagreed left no trace. The owner decided on 2026-09-06 to accept the
+      rows rather than re-fetch. The reasoning is sound and worth keeping: the
+      stray item appears on a thread with **no** replies, so it arrives alone
+      and displaces nothing. At most one wrong row per empty thread, and the X
+      reply path has never run through the worker at all
 - [x] One more probe says why `/twitter/tweet/replies` answered a post with a
       non-reply — whether an empty thread falls back to something else, and
       whether it bills for it
@@ -131,3 +131,12 @@ is the same "green for the wrong reason" trap this session already hit once.
   It also produced what US-047's last box needs: 28 real reply URLs, each
   carrying its own author's handle, supplied by the provider rather than built
   by us. Pressing one is still that ticket's box and not this one's.
+
+- 2026-09-06T16:05+08:00 — Closed. The owner decided not to re-fetch the stored
+  replies, on the grounds that at most one stray row can exist per empty thread
+  — the endpoint returns a single unrelated post when a thread has none, so
+  there is no case where many wrong rows arrive together. The X path, where
+  this was found, has never run through the worker.
+
+  `post_id` is still not stored. If a second provider bug ever needs auditing,
+  that is the column to add first; the Notes say why.

@@ -30,7 +30,8 @@
     "live:linkedin-poll": "tsx --env-file-if-exists=../../.env src/sources/live-linkedin-poll.ts",
     "live:reddit-replies": "tsx --env-file-if-exists=../../.env src/sources/live-reddit-replies-poll.ts",
     "live:reddit-replies-finish": "tsx --env-file-if-exists=../../.env src/sources/live-reddit-replies-finish.ts",
-    "live:youtube-poll": "tsx --env-file-if-exists=../../.env src/sources/live-youtube-poll.ts"
+    "live:youtube-poll": "tsx --env-file-if-exists=../../.env src/sources/live-youtube-poll.ts",
+    "live:tiktok-poll": "tsx --env-file-if-exists=../../.env src/sources/live-tiktok-poll.ts"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "4.0.49",

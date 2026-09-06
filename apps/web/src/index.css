@@ -9,12 +9,10 @@
 }
 
 html {
-  min-width: 320px;
   min-height: 100%;
 }
 
 body {
-  min-width: 320px;
   min-height: 100vh;
   margin: 0;
   background: var(--background);
@@ -149,7 +147,7 @@ a {
 }
 
 .nav-item {
-  min-height: 42px;
+  min-height: 48px;
   display: grid;
   grid-template-columns: 27px 1fr;
   gap: 8px;
@@ -2245,8 +2243,8 @@ a {
   flex: 1;
 }
 .match-card {
-  padding: 19px 22px;
-  gap: 8px;
+  padding: 24px;
+  gap: 12px;
   background: transparent;
   border-bottom-color: var(--line);
 }
@@ -2270,6 +2268,7 @@ a {
 }
 .match-top {
   align-items: flex-start;
+  flex-wrap: wrap;
 }
 .source-badge {
   min-width: 0;
@@ -2323,7 +2322,7 @@ a {
 .detail-inner {
   max-width: var(--reading-width);
   margin: 0 auto;
-  padding: 32px clamp(24px, 3.5vw, 60px) 48px;
+  padding: 40px clamp(24px, 3.5vw, 60px) 48px;
   overflow-wrap: anywhere;
 }
 .detail-title {
@@ -2345,7 +2344,7 @@ a {
   border-radius: 0;
   color: var(--text-reading-color);
   background: transparent;
-  font-size: 1rem;
+  font-size: var(--text-reading);
   line-height: 1.85;
   white-space: pre-wrap;
 }
@@ -2568,6 +2567,9 @@ a {
   .site-nav {
     margin: 0;
     grid-template-columns: repeat(4, 1fr);
+  }
+  .site-nav .new-monitor-nav {
+    display: none;
   }
   .inbox-toolbar {
     padding: 0 20px;

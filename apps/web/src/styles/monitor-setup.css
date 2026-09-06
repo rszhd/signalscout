@@ -88,7 +88,7 @@
 }
 .setup-content .field-stack {
   padding-top: 0;
-  gap: var(--space-6);
+  gap: var(--space-8);
 }
 .setup-content .field {
   display: block;
@@ -230,6 +230,14 @@
     gap: var(--space-2);
     text-align: center;
     font-size: var(--text-xs);
+  }
+  /* Keep the current step prominent; the numbers show the rest of the path. */
+  .setup-progress li:not([aria-current="step"]) > span:last-child {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
   }
   .setup-progress-note {
     display: none;

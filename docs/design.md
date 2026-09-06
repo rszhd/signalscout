@@ -45,6 +45,14 @@ preview truncation and mobile reading pane remain page-specific.
 
 ## Layout and interaction rules
 
+- Typography uses rem-based tokens: supporting metadata starts at 14px,
+  secondary copy at 15px, labels and body text at 16px, and conversation reading
+  text at 17px with the browser's default font size. Keep smaller sizes only
+  for decorative icon glyphs. Let controls and rows grow or wrap with the text.
+- Pair readable type with space: separate card sections by 24px and use 32px
+  card padding on desktop. Stack project cards before their summaries become
+  cramped. On phones, setup progress shows every step number and only the
+  current step's label; all labels remain available to assistive technology.
 - Give content more visual weight than metadata. Use body text for the content
   and smaller muted text for source, age and supporting context.
 - Use `--surface` for reading, `--background` for the shell, `--surface-soft`

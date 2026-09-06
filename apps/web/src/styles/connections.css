@@ -77,7 +77,7 @@
   min-width: 0;
   flex: 1;
   display: grid;
-  gap: var(--space-1);
+  gap: var(--space-2);
 }
 .connection-identity strong {
   font-weight: 500;

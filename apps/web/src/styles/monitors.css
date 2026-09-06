@@ -87,12 +87,12 @@
   padding: 0;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-5);
+  gap: var(--space-6);
   align-items: start;
 }
 .monitors-content .monitor-card {
-  padding: var(--space-6);
-  gap: var(--space-4);
+  padding: var(--space-8);
+  gap: var(--space-6);
   box-shadow: none;
   transition: none;
 }
@@ -112,6 +112,8 @@
   border-radius: var(--radius-md);
 }
 .monitors-content .monitor-top h2 {
+  font-size: var(--text-md);
+  font-weight: 500;
   line-height: 1.5;
   overflow-wrap: anywhere;
 }
@@ -145,9 +147,9 @@
 }
 .monitors-content .monitor-spend {
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-4);
-  padding: var(--space-4);
-  background: var(--surface-soft);
+  gap: var(--space-6);
+  padding: var(--space-2) 0;
+  background: transparent;
   border: 0;
   border-radius: var(--radius-md);
 }
@@ -283,7 +285,7 @@
     font-size: var(--text-sm);
   }
   .monitors-content .monitor-card {
-    padding: var(--space-4);
+    padding: var(--space-5);
   }
   .monitors-content .monitor-top {
     flex-wrap: wrap;

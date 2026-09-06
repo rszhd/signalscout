@@ -11,6 +11,7 @@
 import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { formatMicros, Monitors, toMicros } from "./Monitors.js";
+import { scheduleChoices } from "./schedule.js";
 import { button, field, json, mount, type Screen, select, settle, setValue } from "./testing.js";
 
 const monitorId = "11111111-1111-4111-8111-111111111111";
@@ -312,6 +313,23 @@ describe("the monitor list", () => {
    * in the product.
    */
   describe("choosing when a monitor runs", () => {
+    /**
+     * The hints are computed from the same arithmetic the projection uses, so
+     * a hint and a quote cannot disagree. BUG-005 was exactly that
+     * disagreement at a larger scale, and the first draft of this list said
+     * "about 240 polls a month" where the arithmetic gives 244.
+     */
+    it("says what each choice costs, from the arithmetic rather than by hand", () => {
+      const byId = new Map(scheduleChoices.map((choice) => [choice.id, choice]));
+
+      expect(byId.get("hourly")?.hint).toContain("731");
+      expect(byId.get("three-hourly")?.hint).toContain("244");
+      expect(byId.get("six-hourly")?.hint).toContain("122");
+      expect(byId.get("twelve-hourly")?.hint).toContain("61");
+      // Five sevenths of hourly, which is the whole reason days exist.
+      expect(byId.get("hourly-weekdays")?.hint).toContain("522");
+    });
+
     it("shows the schedule and says what each choice costs", async () => {
       await show([monitor()]);
 

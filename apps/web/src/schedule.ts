@@ -24,53 +24,93 @@ export interface ScheduleChoice {
   readonly pollDays: readonly number[];
 }
 
+/**
+ * The same month the projection uses, so the two cannot disagree.
+ *
+ * `daysPerMonth` in the core is 30.44, and this screen must not carry its own
+ * idea of a month — BUG-005 was a hint and a projection disagreeing, and a
+ * hand-written hint is the same bug at a smaller scale. My first draft of this
+ * file said "about 240 polls a month" where the arithmetic gives 244.
+ */
 const hour = 3_600;
 const day = 86_400;
+
+const daysPerMonth = 30.44;
+
+function pollsPerMonth(pollIntervalSeconds: number, pollDays: readonly number[]): number {
+  const dayFraction = pollDays.length / 7;
+
+  return Math.round((daysPerMonth * dayFraction * 86_400) / pollIntervalSeconds);
+}
+
+/** The hint under a choice, computed rather than written. */
+function hintFor(pollIntervalSeconds: number, pollDays: readonly number[], note = ""): string {
+  return `about ${pollsPerMonth(pollIntervalSeconds, pollDays)} polls a month${note}`;
+}
 
 /**
  * Ordered from most expensive to least, so the cheap answers are not hidden
  * below the fold. A person who does not read the hints still reads the order.
+ *
+ * Nine choices rather than a free-text interval. Each one is a shape somebody
+ * asked for, and the gaps between them are deliberate — a person who wants
+ * every seven hours wants a cron field, and a cron field is a support burden
+ * they get wrong silently and expensively.
  */
 export const scheduleChoices: readonly ScheduleChoice[] = [
   {
     id: "hourly",
     label: "Every hour",
-    hint: "about 730 polls a month — the most this will cost",
+    hint: hintFor(hour, everyDay, " — the most this will cost"),
     pollIntervalSeconds: hour,
     pollDays: everyDay,
   },
   {
     id: "hourly-weekdays",
     label: "Every hour, weekdays",
-    hint: "about 520 polls a month, and it skips the weekend",
+    hint: hintFor(hour, weekdays, ", and it skips the weekend"),
     pollIntervalSeconds: hour,
     pollDays: weekdays,
   },
   {
-    id: "four-hourly",
-    label: "Every four hours",
-    hint: "about 180 polls a month",
-    pollIntervalSeconds: 4 * hour,
+    id: "three-hourly",
+    label: "Every 3 hours",
+    hint: hintFor(3 * hour, everyDay),
+    pollIntervalSeconds: 3 * hour,
+    pollDays: everyDay,
+  },
+  {
+    id: "six-hourly",
+    label: "Every 6 hours",
+    hint: hintFor(6 * hour, everyDay),
+    pollIntervalSeconds: 6 * hour,
+    pollDays: everyDay,
+  },
+  {
+    id: "twelve-hourly",
+    label: "Every 12 hours",
+    hint: hintFor(12 * hour, everyDay),
+    pollIntervalSeconds: 12 * hour,
     pollDays: everyDay,
   },
   {
     id: "daily",
     label: "Once a day",
-    hint: "about 30 polls a month",
+    hint: hintFor(day, everyDay),
     pollIntervalSeconds: day,
     pollDays: everyDay,
   },
   {
     id: "daily-weekdays",
     label: "Once a day, weekdays",
-    hint: "about 22 polls a month",
+    hint: hintFor(day, weekdays),
     pollIntervalSeconds: day,
     pollDays: weekdays,
   },
   {
     id: "weekly",
     label: "Once a week",
-    hint: "about 4 polls a month — the least this will cost",
+    hint: hintFor(7 * day, everyDay, " — the least this will cost"),
     pollIntervalSeconds: 7 * day,
     pollDays: everyDay,
   },

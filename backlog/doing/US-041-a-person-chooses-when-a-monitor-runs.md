@@ -144,3 +144,15 @@ form should offer.
   estimate does not. That deserves its own ticket rather than being folded in
   here quietly.
 
+- 2026-09-06T13:15+08:00 — Three more intervals, at the owner's request: every
+  3, 6 and 12 hours. Nine choices now, and the gaps between them are still
+  deliberate — somebody who wants every seven hours wants a cron field, and a
+  cron field is the support burden this ticket was written to avoid.
+
+  **The hints are computed rather than written, and that is the part worth
+  keeping.** My first draft of the three new ones said 240, 120 and 60 polls a
+  month where the arithmetic gives 244, 122 and 61. That is BUG-005 in
+  miniature: a number on a screen disagreeing with the number the projection
+  uses. So every hint now derives from the same days-per-month the core does,
+  and a test pins the values so a hand-edit cannot creep back in.
+

@@ -221,9 +221,10 @@ export class SocialCrawlTikTokSource implements SocialSource {
     );
 
     const parsed = page.records
-      .map((record) =>
+      .map((record, index) =>
         toCandidateReply(record, {
           parentPostExternalId: request.postExternalId,
+          position: (request.positionOffset ?? 0) + index,
           /**
            * **`?cid=` is TikTok's own comment link, and it opens the comment.**
            *
@@ -260,6 +261,7 @@ export class SocialCrawlTikTokSource implements SocialSource {
 
     return {
       replies,
+      itemsReturned: page.records.length,
       unitsConsumed: page.creditsUsed,
       next: page.cursor ? { status: "ready", cursor: page.cursor } : { status: "done" },
       /**

@@ -282,6 +282,42 @@ describe("a thread with more than one page", () => {
     }
   }, 60_000);
 
+  it("numbers the second page after the first, not from zero again", async () => {
+    const harness = await workerServing(3);
+
+    try {
+      const monitorId = await insertMonitor(harness.database, { includeReplies: true });
+      const [row] = await harness.db
+        .insert(posts)
+        .values({
+          source: "reddit",
+          externalId: "t3_paged_positions",
+          url: "https://www.reddit.com/r/SaaS/comments/paged-positions/",
+          excerpt: "A busy thread whose positions must not collide.",
+          postedAt,
+          replyCount: 40,
+        })
+        .returning({ id: posts.id });
+
+      await harness.run(monitorId, [row?.id as string]);
+      await until("the replies to reach the filter", () => harness.seen[0]);
+
+      const stored = await harness.db
+        .select({ position: posts.threadPosition })
+        .from(posts)
+        .where(and(eq(posts.kind, "reply"), eq(posts.parentPostId, row?.id as string)));
+
+      const positions = stored.map((entry) => entry.position ?? -1).sort((a, b) => a - b);
+
+      // Three pages of two. Each page continues the count instead of starting
+      // again, which is what the offset taken from `itemsReturned` buys — and
+      // without it every page would be numbered 0 and 1.
+      expect(positions).toEqual([0, 1, 2, 3, 4, 5]);
+    } finally {
+      await harness.stop();
+    }
+  }, 60_000);
+
   /**
    * A thread that never ends is the shape this bound exists for. Without it a
    * busy video would page until the monitor's whole cap was gone.
@@ -567,6 +603,30 @@ describe("what is never bought", () => {
     expect(row?.readAt).toBeInstanceOf(Date);
     expect(row?.readAt?.getTime()).toBeGreaterThanOrEqual(before.getTime());
     expect(row?.readAt?.getTime()).toBeLessThanOrEqual(Date.now());
+  }, 20_000);
+
+  /**
+   * US-048's instrument, and the reason it is not array order.
+   *
+   * The position has to be the provider's, counting everything it returned.
+   * The measurement it exists for asks whether this product's leads sit where
+   * the platform ranks highest, and an ordering that quietly closed the gaps
+   * over dropped items would answer a different question.
+   */
+  it("stores the position the provider put each reply at, and keeps counting across pages", async () => {
+    const monitorId = await insertMonitor(database, { includeReplies: true });
+    const postId = await insertPost("t3_positions", { replyCount: 2 });
+
+    await run(monitorId, [postId]);
+    await until("the replies to reach the filter", () => filtered.at(-1));
+
+    const stored = await db
+      .select({ externalId: posts.externalId, position: posts.threadPosition })
+      .from(posts)
+      .where(and(eq(posts.parentPostId, postId), eq(posts.kind, "reply")));
+
+    expect(stored).toHaveLength(2);
+    expect(stored.map((row) => row.position).sort()).toEqual([0, 1]);
   }, 20_000);
 
   it("never opens a thread under a reply, which is what stops this looping", async () => {

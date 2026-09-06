@@ -537,6 +537,23 @@ export const posts = pgTable(
      * window applies.
      */
     repliesReadAt: timestamp("replies_read_at", { withTimezone: true }),
+    /**
+     * Where the provider put this reply in its thread, counting from zero.
+     *
+     * US-048. Null on a post, and on a reply stored before this column
+     * existed. The provider's own order, counting every item it returned
+     * including the ones the connector dropped — so positions have gaps, and a
+     * gap says something was refused there rather than that the numbering is
+     * broken.
+     *
+     * It is kept to answer one question that cannot be asked afterwards
+     * without buying a thread twice: **do this product's leads sit where the
+     * platform ranks highest?** A platform ranks for engagement, and a person
+     * asking a question collects no likes. If leads spread evenly, reading a
+     * deep thread in batches can stop early on a poor batch. If they sit at
+     * the bottom, stopping early throws away the best part.
+     */
+    threadPosition: integer("thread_position"),
   },
   (table) => [
     unique("posts_source_external_id_unique").on(table.source, table.externalId),

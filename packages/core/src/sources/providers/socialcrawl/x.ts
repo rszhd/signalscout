@@ -235,7 +235,12 @@ export class SocialCrawlXSource implements SocialSource {
     );
 
     const parsed = page.records
-      .map((record) => toCandidateReply(record, { parentPostExternalId: request.postExternalId }))
+      .map((record, index) =>
+        toCandidateReply(record, {
+          parentPostExternalId: request.postExternalId,
+          position: (request.positionOffset ?? 0) + index,
+        }),
+      )
       .filter((reply): reply is CandidateReply => reply !== undefined);
 
     /**
@@ -252,6 +257,7 @@ export class SocialCrawlXSource implements SocialSource {
 
     return {
       replies,
+      itemsReturned: page.records.length,
       unitsConsumed: page.creditsUsed,
       next: page.cursor ? { status: "ready", cursor: page.cursor } : { status: "done" },
       /**

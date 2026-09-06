@@ -298,6 +298,19 @@ export class ScrapeCreatorsClient {
     cursor: string | undefined,
     signal?: AbortSignal,
   ): Promise<CommentPage> {
+    /**
+     * No `sort`, and that is not an omission.
+     *
+     * This endpoint accepts one and it is broken. Measured on 2026-09-06:
+     * `sort=new` and `sort=top` both return **zero comments** and still bill a
+     * credit, on a post that returns nine without them. A value the provider
+     * does not recognise is ignored and answers normally, so the failure is
+     * not validation — the parameter is understood and it empties the result.
+     *
+     * US-048 wanted newest-first everywhere it could be had, because leads sit
+     * three times deeper in a thread than the top of an engagement ranking.
+     * Here the cost of asking is the whole thread, so it is not asked.
+     */
     const answer = await this.call(
       endpoints.postComments,
       { url, ...(cursor ? { cursor } : {}) },

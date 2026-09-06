@@ -285,6 +285,30 @@ for whenever you want to. The caller reads `next`, never `posts.length`. Every
 connector must be able to prove this, which is why the fake can be told to do
 it.
 
+**Ask the provider before you pay it.** Two techniques cost nothing and both
+were found late, after captures had paid to answer questions that were already
+written down.
+
+An **invalid parameter value** makes a provider name its own vocabulary. A
+rejected call bills nothing, and `Invalid value for 'order': ... Allowed
+values: top, newest` is a complete answer for free. Use it whenever the
+documentation is silent about what a parameter accepts.
+
+SocialCrawl goes further and publishes a guide per endpoint:
+
+    GET /v1/utility/endpoint?id=tiktok/post/comments
+
+It returns every required and optional parameter, the credit cost, the paging
+style, the caching rule and the billing rules, at **zero credits**. Read it
+before writing a connector, and before believing anything a capture inferred.
+
+**A parameter a provider accepts is not a parameter that works.**
+ScrapeCreators' Reddit comments endpoint takes `sort`, understands `new` and
+`top`, and answers both with **zero comments while billing a credit** — where
+the same call without it returns the thread. An unrecognised value is ignored
+and behaves correctly, so the broken case is the one the provider knows. Test
+a parameter's effect on real output, not on the status code.
+
 **A thread's window is not the poll's window.** `ReplyRequest.since` is how far
 back this *thread* has been read, and it has nothing to do with when the
 monitor last searched. The two were the same value until BUG-006, and the

@@ -235,12 +235,19 @@ export function createFakeSource(
              * bought twenty-five threads whose every comment fell outside the
              * window the caller had computed wrong.
              */
-            const replies = request.since
+            const replies: readonly CandidateReply[] = request.since
               ? page_.filter((reply) => reply.postedAt > (request.since as Date))
               : page_;
 
             return Promise.resolve({
-              replies,
+              replies: replies.map((reply, index) => ({
+                ...reply,
+                threadPosition: (request.positionOffset ?? 0) + index,
+              })),
+              // What the fake "returned", before its own window cut — so a
+              // caller's position bookkeeping is exercised rather than
+              // accidentally correct because nothing was ever dropped.
+              itemsReturned: page_.length,
               unitsConsumed: options.unitsPerReplyCall ?? 1,
               next: last
                 ? ({ status: "done" } as const)

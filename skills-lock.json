@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "socialcrawl": {
+      "source": "socialcrawl/skills",
+      "sourceType": "github",
+      "skillPath": "socialcrawl/SKILL.md",
+      "computedHash": "efa40459811cd5278dca8375caca2b049142240026f710c15c782d3b9f823223"
+    }
+  }
+}

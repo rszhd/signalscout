@@ -23,3 +23,10 @@ coverage/
 .idea/
 .vscode/*
 !.vscode/extensions.json
+
+# Third-party agent skills. `skills-lock.json` is committed and the installed
+# files are not, the way a lockfile is committed and `node_modules` is not:
+# `npx skills add` restores them from the lock. `.claude/skills/` holds only
+# symlinks into `.agents/`, which would be broken links for anyone else.
+.agents/
+.claude/skills/

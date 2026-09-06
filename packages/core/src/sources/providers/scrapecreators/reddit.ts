@@ -219,7 +219,12 @@ export class ScrapeCreatorsRedditSource implements SocialSource {
     const page = await client.fetchComments(request.postUrl, request.cursor, request.signal);
 
     const channel = textOf(page.post.subreddit);
-    const parsed = toCandidateReplies(page.comments, request.postExternalId, channel);
+    const { replies: parsed, itemsReturned } = toCandidateReplies(
+      page.comments,
+      request.postExternalId,
+      channel,
+      request.positionOffset ?? 0,
+    );
 
     /**
      * The date cut, applied here because the provider offers none.
@@ -249,6 +254,7 @@ export class ScrapeCreatorsRedditSource implements SocialSource {
 
     return {
       replies,
+      itemsReturned,
       unitsConsumed: page.creditsCharged,
       next: page.after ? { status: "ready", cursor: page.after } : { status: "done" },
       partial: !complete,
@@ -478,12 +484,26 @@ export function toCandidateReplies(
   comments: readonly unknown[],
   parentPostExternalId: string,
   channel: string | undefined,
-): CandidateReply[] {
+  positionOffset = 0,
+): { replies: CandidateReply[]; itemsReturned: number } {
   const out: CandidateReply[] = [];
+
+  /**
+   * Every node the provider sent, whether or not it became a reply.
+   *
+   * The position has to count the removed comments too. They occupy a place in
+   * Reddit's ranking, and a position that closed the gap over them would say a
+   * comment sat higher in the thread than it did — which is the one thing
+   * US-048's measurement reads.
+   */
+  let seen = 0;
 
   const walk = (nodes: readonly unknown[]) => {
     for (const node of nodes) {
       if (typeof node !== "object" || node === null) continue;
+
+      const position = positionOffset + seen;
+      seen += 1;
 
       const row = node as Record<string, unknown>;
       const externalId = text(row.name) ?? (text(row.id) ? `t1_${text(row.id)}` : undefined);
@@ -511,6 +531,7 @@ export function toCandidateReplies(
           parentPostExternalId,
           ...(author ? { author } : {}),
           ...(channel ? { channel } : {}),
+          threadPosition: position,
           ...(parentReply ? { parentReplyExternalId: parentReply } : {}),
         });
       }
@@ -525,7 +546,7 @@ export function toCandidateReplies(
   };
 
   walk(comments);
-  return out;
+  return { replies: out, itemsReturned: seen };
 }
 
 /**

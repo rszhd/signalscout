@@ -265,9 +265,10 @@ export class SocialCrawlYouTubeSource implements SocialSource {
     );
 
     const parsed = page.records
-      .map((record) =>
+      .map((record, index) =>
         toCandidateReply(record, {
           parentPostExternalId: request.postExternalId,
+          position: (request.positionOffset ?? 0) + index,
           // YouTube leaves `url` null on every comment, so this builds the
           // deep link its own Share button produces. `&lc=` names the comment.
           urlFor: (id) => `https://www.youtube.com/watch?v=${request.postExternalId}&lc=${id}`,
@@ -300,11 +301,18 @@ export class SocialCrawlYouTubeSource implements SocialSource {
       request.since !== undefined && oldest !== undefined && oldest <= request.since;
 
     if (pastTheWindow) {
-      return { replies, unitsConsumed: page.creditsUsed, next: { status: "done" }, partial: false };
+      return {
+        replies,
+        itemsReturned: page.records.length,
+        unitsConsumed: page.creditsUsed,
+        next: { status: "done" },
+        partial: false,
+      };
     }
 
     return {
       replies,
+      itemsReturned: page.records.length,
       unitsConsumed: page.creditsUsed,
       next: page.cursor ? { status: "ready", cursor: page.cursor } : { status: "done" },
       /**

@@ -284,6 +284,15 @@ export function createRepliesStep({
       let cursor: string | undefined;
       let pages = 0;
       let partial = true;
+      /**
+       * How many items the provider has returned for this thread so far.
+       *
+       * Counted from `itemsReturned` rather than from the replies we kept, so
+       * a page whose items were dropped still moves the numbering on. US-048
+       * reads these positions, and a position that closed the gap over a
+       * dropped item would say a comment sat higher in the thread than it did.
+       */
+      let positionOffset = 0;
 
       /**
        * This thread's own window, and the mark the next read will use.
@@ -302,12 +311,14 @@ export function createRepliesStep({
           postExternalId: post.externalId,
           credentials,
           since,
+          positionOffset,
           ...(cursor ? { cursor } : {}),
         });
 
         pages += 1;
         spentUnits += result.unitsConsumed;
         partial = result.partial;
+        positionOffset += result.itemsReturned;
 
         await recordSourceUsage(db, {
           monitorId,
@@ -415,6 +426,7 @@ function toReplyRow(
     postedAt: reply.postedAt,
     kind: "reply" as const,
     parentPostId,
+    threadPosition: reply.threadPosition ?? null,
     parentReplyExternalId: reply.parentReplyExternalId ?? null,
   };
 }

@@ -32,6 +32,14 @@ export interface ReplyParseOptions {
   readonly urlFor?: (externalId: string) => string;
   /** The subreddit, the channel, whatever the platform calls its container. */
   readonly channel?: string;
+  /**
+   * Where the provider put this comment, counting from zero across the walk.
+   *
+   * Passed in rather than counted here, because this function sees one comment
+   * and the position is a property of the page it arrived on. US-048 says why
+   * it is kept.
+   */
+  readonly position?: number;
 }
 
 /**
@@ -43,7 +51,7 @@ export interface ReplyParseOptions {
  */
 export function toCandidateReply(
   record: unknown,
-  { parentPostExternalId, urlFor, channel }: ReplyParseOptions,
+  { parentPostExternalId, urlFor, channel, position }: ReplyParseOptions,
 ): CandidateReply | undefined {
   const item = objectOf(record);
   const comment = objectOf(item?.comment) ?? item;
@@ -104,6 +112,7 @@ export function toCandidateReply(
     parentPostExternalId,
     ...(text(author?.display_name) ? { author: text(author?.display_name) } : {}),
     ...(channel ? { channel } : {}),
+    ...(position === undefined ? {} : { threadPosition: position }),
     ...(parentReply ? { parentReplyExternalId: parentReply } : {}),
     ...(typeof replies === "number" && Number.isFinite(replies) && replies >= 0
       ? { replyCount: replies }

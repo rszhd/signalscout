@@ -203,6 +203,26 @@ export interface CandidateReply extends CandidatePost {
    * shared comment schema.
    */
   readonly parentReplyExternalId?: string;
+  /**
+   * Where the provider put this reply in the thread, counting from zero.
+   *
+   * **The provider's own order, not ours, and not the order of what we kept.**
+   * It counts every item the provider returned, including the ones a
+   * connector then dropped for being out of window or belonging to another
+   * post — so the stored positions have gaps, and a gap is honest evidence
+   * rather than a defect.
+   *
+   * US-048 exists because nobody knows what this order is worth. A platform
+   * ranks a comment for a general viewer, by likes and replies and recency.
+   * This product wants intent, and a person asking a question has no likes,
+   * because nobody likes a question. Whether our leads sit at the top of that
+   * ordering, the bottom, or evenly through it decides whether reading a deep
+   * thread in batches should ever stop early — and it cannot be asked at all
+   * unless the position is kept.
+   *
+   * Absent where a connector cannot say.
+   */
+  readonly threadPosition?: number;
 }
 
 export interface ReplyRequest {
@@ -227,11 +247,35 @@ export interface ReplyRequest {
   readonly since?: Date;
   /** Opaque, from a previous `ReplyResult`. Absent starts at the first page. */
   readonly cursor?: string;
+  /**
+   * How many items the provider has already returned for this thread.
+   *
+   * Added to each item's index so `threadPosition` counts through the whole
+   * walk rather than restarting at every page. The caller keeps the running
+   * total from `ReplyResult.itemsReturned`, because only the connector can see
+   * what it dropped.
+   *
+   * Absent means this is the first page of the walk.
+   */
+  readonly positionOffset?: number;
   readonly signal?: AbortSignal;
 }
 
 export interface ReplyResult {
   readonly replies: readonly CandidateReply[];
+  /**
+   * How many items the provider put on this page, before the connector
+   * dropped any.
+   *
+   * Not `replies.length`. A connector drops what falls outside the window and
+   * what says it belongs to another post, so the two numbers differ whenever
+   * either happened — and the caller needs the provider's count to know where
+   * the next page starts. BUG-007 is why this is worth reporting rather than
+   * inferring: an X thread with no replies answers with one unrelated post,
+   * which is dropped, and a caller reading only `replies.length` would see an
+   * empty page and never learn it had been sold something.
+   */
+  readonly itemsReturned: number;
   /** Billable units this call consumed, in the source's own unit. */
   readonly unitsConsumed: number;
   readonly next: NextPage;

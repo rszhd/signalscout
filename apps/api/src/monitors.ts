@@ -155,6 +155,46 @@ const preFilterSchema = z.object({
   similarityThreshold: z.number().min(0).max(1),
 });
 
+/**
+ * When a monitor runs. US-041.
+ *
+ * An interval plus the days it applies on, which expresses hourly, daily,
+ * weekly, weekdays, weekends and any chosen set without a cron field. A cron
+ * field would move the problem to a person who gets it wrong silently and
+ * expensively, and poll frequency is this product's largest cost dial: the
+ * same query costs $10.80 a month polled hourly and $648 polled every minute.
+ */
+const pollDaysField = z
+  .array(z.number().int().min(0).max(6))
+  .min(1, "A monitor needs at least one day to poll on. To stop it, pause it.")
+  .max(7)
+  // Postgres numbering, 0 is Sunday. Sorted and de-duplicated so two people who
+  // tick the same days store the same row.
+  .transform((days) => [...new Set(days)].sort((left, right) => left - right));
+
+/**
+ * An IANA zone name, checked here because it cannot be checked in the database.
+ *
+ * `now() AT TIME ZONE` throws on a name Postgres does not know, and that call
+ * is inside the scheduler's single query — so one bad row would stop every
+ * monitor rather than its own. `Intl` holds the same list the database does.
+ */
+const pollTimezoneField = z
+  .string()
+  .min(1)
+  .max(64)
+  .refine(
+    (zone) => {
+      try {
+        new Intl.DateTimeFormat("en-US", { timeZone: zone });
+        return true;
+      } catch {
+        return false;
+      }
+    },
+    { message: "That is not a timezone name. Use an IANA name such as Asia/Kuala_Lumpur." },
+  );
+
 const sourcesField = z.array(z.enum(storableSources));
 
 /**
@@ -175,6 +215,8 @@ const createBody = answersBody.extend({
   sources: sourcesField.default([]),
   minScore: z.number().int().min(0).max(100).optional(),
   pollIntervalSeconds: z.number().int().min(minimumPollIntervalSeconds).optional(),
+  pollDays: pollDaysField.optional(),
+  pollTimezone: pollTimezoneField.optional(),
   /**
    * The cap, set with the monitor rather than a moment later.
    *
@@ -264,6 +306,9 @@ const monitorSchema = z.object({
   sources: z.array(z.string()),
   minScore: z.number(),
   pollIntervalSeconds: z.number(),
+  /** Postgres numbering, 0 is Sunday. US-041. */
+  pollDays: z.array(z.number()),
+  pollTimezone: z.string(),
   paused: z.boolean(),
   pausedAt: z.string().nullable(),
   lastPolledAt: z.string().nullable(),
@@ -382,6 +427,8 @@ function toResponse(
     sources: monitor.sources,
     minScore: monitor.minScore,
     pollIntervalSeconds: monitor.pollIntervalSeconds,
+    pollDays: monitor.pollDays,
+    pollTimezone: monitor.pollTimezone,
     paused: monitor.pausedAt !== null,
     pausedAt: monitor.pausedAt?.toISOString() ?? null,
     lastPolledAt: monitor.lastPolledAt?.toISOString() ?? null,

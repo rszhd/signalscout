@@ -100,6 +100,144 @@ describe("which monitors are due", () => {
  * on the monitor id, is what makes the second send a no-op — not a lock this
  * repository wrote.
  */
+/**
+ * Which days a monitor polls on. US-041.
+ *
+ * A filter on the interval rather than a replacement for it, so a person can
+ * say "hourly, on weekdays" without this product growing a cron parser. The
+ * reason it exists is money: a B2B monitor polled on Saturday buys the weekend
+ * at full price and finds the weekend's conversation.
+ */
+describe("the days a monitor polls on", () => {
+  let database: TestDatabase;
+  let db: Database;
+  let close: () => Promise<void>;
+
+  beforeAll(async () => {
+    database = await createTestDatabase("worker_due_days");
+    ({ db, close } = createDatabase(database.url));
+  }, 60_000);
+
+  afterAll(async () => {
+    await close?.();
+    await database?.drop();
+  });
+
+  afterEach(async () => {
+    await db.delete(monitors);
+  });
+
+  /** What day it is in Postgres's own clock, which is what the query reads. */
+  async function todayInUtc(): Promise<number> {
+    const [row] = (await db.execute(sql.raw("select extract(dow from now()) as dow"))).rows as {
+      dow: string;
+    }[];
+
+    return Number(row?.dow);
+  }
+
+  it("polls every day unless somebody says otherwise", async () => {
+    const id = await insertMonitor(database);
+
+    // The default is all seven, so a monitor made before this column existed
+    // behaves exactly as it did.
+    expect((await findDueMonitors(db)).map((monitor) => monitor.id)).toEqual([id]);
+  });
+
+  it("does not poll on a day it was not asked to", async () => {
+    const today = await todayInUtc();
+    const id = await insertMonitor(database);
+
+    // Every day except this one.
+    await db
+      .update(monitors)
+      .set({ pollDays: [0, 1, 2, 3, 4, 5, 6].filter((day) => day !== today) })
+      .where(eq(monitors.id, id));
+
+    expect(await findDueMonitors(db)).toEqual([]);
+  });
+
+  it("polls on a day it was asked to, even if that is the only one", async () => {
+    const today = await todayInUtc();
+    const id = await insertMonitor(database);
+
+    await db
+      .update(monitors)
+      .set({ pollDays: [today] })
+      .where(eq(monitors.id, id));
+
+    expect((await findDueMonitors(db)).map((monitor) => monitor.id)).toEqual([id]);
+  });
+
+  /**
+   * The reason the timezone column exists. A person who chose weekdays meant
+   * their weekdays, and in UTC a Monday in Kuala Lumpur starts at 8am on
+   * Sunday.
+   */
+  it("counts the day in the monitor's own timezone", async () => {
+    const id = await insertMonitor(database);
+
+    // Kiritimati is UTC+14 and Niue is UTC-11: 25 hours apart, so they are
+    // never on the same weekday at the same instant. Whichever day the monitor
+    // is set to, exactly one of the two zones agrees.
+    const [row] = (
+      await db.execute(
+        sql.raw(
+          "select extract(dow from (now() AT TIME ZONE 'Pacific/Kiritimati')) as ahead," +
+            " extract(dow from (now() AT TIME ZONE 'Pacific/Niue')) as behind",
+        ),
+      )
+    ).rows as { ahead: string; behind: string }[];
+
+    const ahead = Number(row?.ahead);
+    const behind = Number(row?.behind);
+
+    expect(ahead).not.toBe(behind);
+
+    await db
+      .update(monitors)
+      .set({ pollDays: [ahead], pollTimezone: "Pacific/Kiritimati" })
+      .where(eq(monitors.id, id));
+
+    expect((await findDueMonitors(db)).map((monitor) => monitor.id)).toEqual([id]);
+
+    // The same day, read in a zone where it is not that day yet.
+    await db.update(monitors).set({ pollTimezone: "Pacific/Niue" }).where(eq(monitors.id, id));
+
+    expect(await findDueMonitors(db)).toEqual([]);
+  });
+
+  /**
+   * A missed window is not owed.
+   *
+   * The query asks whether now is inside the schedule, never how many windows
+   * have passed, so a monitor whose worker was down over a weekend polls once
+   * when it returns rather than three times to catch up.
+   */
+  it("does not owe a poll for a day it missed", async () => {
+    const today = await todayInUtc();
+    const id = await insertMonitor(database, { pollIntervalSeconds: 3600 });
+
+    await db
+      .update(monitors)
+      .set({ pollDays: [today], lastPolledAt: new Date(Date.now() - 30 * 86_400_000) })
+      .where(eq(monitors.id, id));
+
+    // Thirty days of missed hourly polls behind it, and it is due exactly once.
+    expect((await findDueMonitors(db)).map((monitor) => monitor.id)).toEqual([id]);
+  });
+
+  it("refuses a monitor that can never poll", async () => {
+    const id = await insertMonitor(database);
+
+    // An empty day list reads as broken rather than as off. A person who wants
+    // a monitor to stop presses pause, and pause says so on the screen.
+    await expect(
+      db.update(monitors).set({ pollDays: [] }).where(eq(monitors.id, id)),
+    ).rejects.toThrow();
+  });
+});
+
 describe("two workers ticking at once", () => {
   let database: TestDatabase;
   let firstWorker: WorkerHandle;

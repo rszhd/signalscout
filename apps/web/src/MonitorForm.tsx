@@ -2,6 +2,7 @@ import { type FormEvent, useCallback, useEffect, useMemo, useState } from "react
 import { messageFor, requestJson } from "./api.js";
 import { CostTest, type EstimateReport, exceedsCap } from "./CostTest.js";
 import { toMicros } from "./Monitors.js";
+import { browserTimezone, type ScheduleChoice, scheduleChoices } from "./schedule.js";
 
 interface SignalOption {
   id: string;
@@ -165,6 +166,12 @@ export function MonitorForm() {
   const [selectedSources, setSelectedSources] = useState<string[]>([]);
   /** US-020. Off by default, because it multiplies what the model reads. */
   const [includeReplies, setIncludeReplies] = useState(false);
+  /**
+   * When it runs. US-041, and the default is the one that was implicit before
+   * this control existed: every hour, every day.
+   */
+  const [scheduleId, setScheduleId] = useState(scheduleChoices[0]?.id ?? "hourly");
+  const [timezone, setTimezone] = useState(browserTimezone());
   const [plan, setPlan] = useState<QueryPlan>(emptyPlan);
   const [stage, setStage] = useState<"answers" | "review" | "created">("answers");
   const [created, setCreated] = useState<CreatedMonitor | null>(null);
@@ -227,6 +234,9 @@ export function MonitorForm() {
    * acceptance names.
    */
   const repliesUnavailable = selectedSourceOptions.filter((source) => !source.canFetchReplies);
+  const schedule =
+    scheduleChoices.find((choice) => choice.id === scheduleId) ??
+    (scheduleChoices[0] as ScheduleChoice);
 
   const capMicros = cap.trim() === "" ? null : toMicros(cap);
   const queries = cleanQueries(plan.queries, selectedSources);
@@ -351,6 +361,9 @@ export function MonitorForm() {
           subreddits,
           sources: selectedSources,
           includeReplies,
+          pollIntervalSeconds: schedule.pollIntervalSeconds,
+          pollDays: [...schedule.pollDays],
+          pollTimezone: timezone,
           ...(capMicros === null ? {} : { budget: { monthlyCapMicros: capMicros, onExhausted } }),
           // Kept, not started. The person was shown what it would cost.
           ...(overCap ? { startPaused: true } : {}),
@@ -535,6 +548,45 @@ export function MonitorForm() {
                     </label>
                   ))}
                 </div>
+              </fieldset>
+
+              <fieldset className="choice-section">
+                <legend>How often should it look?</legend>
+                <p>
+                  This is the biggest thing you control about what a monitor costs. Every poll is
+                  billed whether it finds anything or not.
+                </p>
+                <div className="signal-list">
+                  {scheduleChoices.map((choice) => (
+                    <label className="signal-card" key={choice.id}>
+                      <input
+                        checked={scheduleId === choice.id}
+                        name="schedule"
+                        type="radio"
+                        onChange={() => setScheduleId(choice.id)}
+                      />
+                      <span>
+                        <strong>{choice.label}</strong>
+                        <small>{choice.hint}</small>
+                      </span>
+                    </label>
+                  ))}
+                </div>
+
+                {/*
+                  The days are counted where the person is, not where the
+                  database is. In UTC a Monday in Kuala Lumpur starts at 8am on
+                  Sunday, so "weekdays" would be wrong by a day for most of the
+                  world.
+                */}
+                <label className="field">
+                  <span>Time zone</span>
+                  <input onChange={(event) => setTimezone(event.target.value)} value={timezone} />
+                  <small>
+                    Used to work out which day it is. Guessed from this browser; change it if the
+                    monitor should follow somewhere else.
+                  </small>
+                </label>
               </fieldset>
 
               <fieldset className="choice-section">

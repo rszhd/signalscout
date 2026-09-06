@@ -72,6 +72,10 @@ export interface CreateMonitorInput extends MonitorAnswers, MonitorPlan, Monitor
   readonly sources: readonly Source[];
   readonly minScore?: number;
   readonly pollIntervalSeconds?: number;
+  /** Which days it may poll on. Postgres numbering, 0 is Sunday. US-041. */
+  readonly pollDays?: readonly number[];
+  /** The IANA zone the days are counted in. US-041. */
+  readonly pollTimezone?: string;
   /**
    * Save the monitor without starting it, even when it could start.
    *
@@ -339,9 +343,13 @@ export async function createMonitor(
       generatedSubreddits: [...input.subreddits],
       sources: [...input.sources],
       ...(input.minScore === undefined ? {} : { minScore: input.minScore }),
+      ...(input.pollDays === undefined ? {} : { pollDays: [...input.pollDays] }),
+      ...(input.pollTimezone === undefined ? {} : { pollTimezone: input.pollTimezone }),
       ...(input.pollIntervalSeconds === undefined
         ? {}
         : { pollIntervalSeconds: input.pollIntervalSeconds }),
+      ...(input.pollDays === undefined ? {} : { pollDays: [...input.pollDays] }),
+      ...(input.pollTimezone === undefined ? {} : { pollTimezone: input.pollTimezone }),
       ...(input.preFilterEnabled === undefined ? {} : { preFilterEnabled: input.preFilterEnabled }),
       ...(input.similarityThreshold === undefined
         ? {}
@@ -371,6 +379,10 @@ export interface UpdateMonitorInput
   readonly sources?: readonly Source[];
   readonly minScore?: number;
   readonly pollIntervalSeconds?: number;
+  /** Which days it may poll on. Postgres numbering, 0 is Sunday. US-041. */
+  readonly pollDays?: readonly number[];
+  /** The IANA zone the days are counted in. US-041. */
+  readonly pollTimezone?: string;
 }
 
 /**
@@ -420,6 +432,8 @@ export async function updateMonitor(
     ...(input.subreddits === undefined ? {} : { generatedSubreddits: [...input.subreddits] }),
     ...(input.sources === undefined ? {} : { sources: [...input.sources] }),
     ...(input.minScore === undefined ? {} : { minScore: input.minScore }),
+    ...(input.pollDays === undefined ? {} : { pollDays: [...input.pollDays] }),
+    ...(input.pollTimezone === undefined ? {} : { pollTimezone: input.pollTimezone }),
     ...(input.pollIntervalSeconds === undefined
       ? {}
       : { pollIntervalSeconds: input.pollIntervalSeconds }),

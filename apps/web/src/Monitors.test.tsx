@@ -8,9 +8,10 @@
  * itself belongs to `packages/core` and is asserted there; what this owns is
  * whether a person can see it and act on it.
  */
+import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { formatMicros, Monitors, toMicros } from "./Monitors.js";
-import { button, field, json, mount, type Screen, settle, setValue } from "./testing.js";
+import { button, field, json, mount, type Screen, select, settle, setValue } from "./testing.js";
 
 const monitorId = "11111111-1111-4111-8111-111111111111";
 
@@ -21,6 +22,11 @@ function monitor(overrides: Record<string, unknown> = {}) {
     sources: ["reddit"],
     paused: false,
     lastPolledAt: "2026-03-14T08:00:00.000Z",
+    // US-041. Hourly, every day: what every monitor did before there was a
+    // control for it.
+    pollIntervalSeconds: 3600,
+    pollDays: [0, 1, 2, 3, 4, 5, 6],
+    pollTimezone: "UTC",
     lastCollected: [],
     missingCredentials: [],
     budget: null,
@@ -297,6 +303,63 @@ describe("the monitor list", () => {
     ]);
 
     expect(container.textContent).toContain("reddit via scrapecreators");
+  });
+  /**
+   * When a monitor runs. US-041.
+   *
+   * The column existed since US-007 and no screen ever wrote to it, so every
+   * monitor anybody made polled hourly for ever. It is the largest cost dial
+   * in the product.
+   */
+  describe("choosing when a monitor runs", () => {
+    it("shows the schedule and says what each choice costs", async () => {
+      await show([monitor()]);
+
+      const picker = select(`How often ${monitor().name} runs`);
+
+      expect(picker).toBeDefined();
+      // The hints are in polls a month, because that is the unit a person
+      // spends. Leaving them to work it out is how a monitor ends up hourly.
+      expect(container.textContent).toContain("polls a month");
+    });
+
+    it("sends both the interval and the days, because a day list is the point", async () => {
+      await show([monitor()]);
+
+      const picker = select(`How often ${monitor().name} runs`);
+
+      await act(async () => setValue(picker, "daily-weekdays"));
+      await settle();
+
+      const call = fetchMock.mock.calls.find(
+        ([url, init]) =>
+          String(url).includes("/api/monitors/") && (init as RequestInit)?.method === "PATCH",
+      );
+      const init = call?.[1] as RequestInit;
+
+      expect(JSON.parse(String(init.body))).toEqual({
+        pollIntervalSeconds: 86_400,
+        pollDays: [1, 2, 3, 4, 5],
+      });
+    });
+
+    /**
+     * A monitor edited by hand can sit between two choices. The screen says
+     * what it actually does rather than rounding it to the nearest and
+     * changing it silently the next time anybody saves.
+     */
+    it("describes a schedule that matches no choice rather than rounding it", async () => {
+      await show([monitor({ pollIntervalSeconds: 900, pollDays: [2, 4] })]);
+
+      expect(container.textContent).toContain("Custom: every 15 minutes");
+      expect(container.textContent).toContain("Tue, Thu");
+    });
+
+    it("says which timezone the days are counted in", async () => {
+      await show([monitor({ pollTimezone: "Asia/Kuala_Lumpur" })]);
+
+      expect(container.textContent).toContain("Asia/Kuala_Lumpur");
+    });
   });
 });
 

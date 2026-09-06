@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { messageFor, requestJson } from "./api.js";
+import { choiceFor, describeSchedule, scheduleChoices } from "./schedule.js";
 
 /**
  * The monitor list: what each monitor is doing, what it has spent, and what it
@@ -63,6 +64,10 @@ interface Monitor {
   sources: string[];
   paused: boolean;
   lastPolledAt: string | null;
+  /** When it runs. US-041. */
+  pollIntervalSeconds: number;
+  pollDays: number[];
+  pollTimezone: string;
   lastCollected: LastCollection[];
   missingCredentials: MissingCredential[];
   budget: Budget | null;
@@ -267,6 +272,83 @@ function BudgetForm({ monitor, onSaved }: { monitor: Monitor; onSaved: () => Pro
  * is shown as the cosine value the database stores, not as a percentage,
  * because that is what a person comparing it against a recorded drop reads.
  */
+/**
+ * When a monitor runs, and a way to change it. US-041.
+ *
+ * This was unreachable until now: `poll_interval_seconds` has existed since
+ * US-007 and no screen ever wrote to it, so every monitor anybody made polled
+ * hourly for ever. It is the largest cost dial in the product — the same query
+ * costs $10.80 a month polled hourly and $648 polled every minute — so the
+ * hints say what each choice costs in polls rather than leaving a person to
+ * work it out.
+ */
+function ScheduleForm({ monitor, onSaved }: { monitor: Monitor; onSaved: () => Promise<void> }) {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const current = choiceFor(monitor.pollIntervalSeconds, monitor.pollDays);
+
+  async function choose(id: string): Promise<void> {
+    const choice = scheduleChoices.find((one) => one.id === id);
+    if (!choice) return;
+
+    setBusy(true);
+    setError(null);
+
+    try {
+      await requestJson(`/api/monitors/${monitor.id}`, {
+        method: "PATCH",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          pollIntervalSeconds: choice.pollIntervalSeconds,
+          pollDays: [...choice.pollDays],
+        }),
+      });
+      await onSaved();
+    } catch (cause) {
+      setError(messageFor(cause, "The schedule could not be changed."));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="monitor-schedule">
+      <label className="field">
+        <span>Runs</span>
+        <select
+          aria-label={`How often ${monitor.name} runs`}
+          disabled={busy}
+          value={current?.id ?? "custom"}
+          onChange={(event) => void choose(event.target.value)}
+        >
+          {current === undefined && (
+            /*
+              A monitor edited by hand can sit between two choices. The screen
+              says what it actually does rather than rounding it to the nearest
+              and changing it silently the next time anybody saves.
+            */
+            <option value="custom">
+              {describeSchedule(monitor.pollIntervalSeconds, monitor.pollDays)}
+            </option>
+          )}
+          {scheduleChoices.map((choice) => (
+            <option key={choice.id} value={choice.id}>
+              {choice.label} — {choice.hint}
+            </option>
+          ))}
+        </select>
+        <small>Days are counted in {monitor.pollTimezone}.</small>
+      </label>
+
+      {error && (
+        <p className="notice warning" role="status">
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}
+
 function PreFilterForm({ monitor, onSaved }: { monitor: Monitor; onSaved: () => Promise<void> }) {
   const [threshold, setThreshold] = useState(String(monitor.preFilter.similarityThreshold));
   const [busy, setBusy] = useState(false);
@@ -506,6 +588,8 @@ export function Monitors() {
                   {monitor.spend.reason}
                 </p>
               )}
+
+              <ScheduleForm monitor={monitor} onSaved={load} />
 
               <dl className="monitor-spend">
                 <div>

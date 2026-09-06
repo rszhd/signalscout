@@ -24,12 +24,20 @@ export interface DueMonitor {
 }
 
 /**
- * Monitors whose last poll started at least their own interval ago, plus
- * those that have never been polled, minus the paused ones.
+ * Monitors whose last poll started at least their own interval ago, on a day
+ * they poll, plus those that have never been polled, minus the paused ones.
  *
  * `now()` is Postgres's clock, not the worker's. Two workers on two machines
  * with two slightly wrong clocks would otherwise disagree about what is due,
- * and the disagreement would show up as a poll that runs early.
+ * and the disagreement would show up as a poll that runs early. US-041's day
+ * check is in the same query for the same reason: a worker that decided the
+ * day in TypeScript would decide it in its own timezone.
+ *
+ * **A missed window is not owed.** The question is "is now inside this
+ * monitor's schedule", never "how many windows have passed", so a monitor whose
+ * worker was down over a weekend polls once when it comes back rather than
+ * three times to catch up. That falls out of asking about now rather than about
+ * history, and it is the behaviour a person expects from a pause.
  *
  * Pausing is enforced here and nowhere else. A pause that only hid the monitor
  * in the UI would keep collecting and keep billing, which is the opposite of
@@ -45,6 +53,14 @@ export async function findDueMonitors(db: Database): Promise<DueMonitor[]> {
         sql`cardinality(${monitors.sources}) > 0`,
         // A paused monitor keeps its history and collects nothing.
         isNull(monitors.pausedAt),
+        /**
+         * Today, where the monitor lives. US-041.
+         *
+         * `AT TIME ZONE` reads the monitor's own zone, because a person who
+         * chose weekdays meant their weekdays — in UTC a Monday in Kuala Lumpur
+         * starts at 8am on Sunday.
+         */
+        sql`extract(dow from (now() AT TIME ZONE ${monitors.pollTimezone})) = ANY(${monitors.pollDays})`,
         or(
           isNull(monitors.lastPolledAt),
           sql`${monitors.lastPolledAt} + make_interval(secs => ${monitors.pollIntervalSeconds}) <= now()`,

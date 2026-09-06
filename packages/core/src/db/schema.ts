@@ -21,6 +21,7 @@ import {
   pgTable,
   primaryKey,
   real,
+  smallint,
   text,
   timestamp,
   unique,
@@ -345,6 +346,40 @@ export const monitors = pgTable(
      */
     version: integer("version").notNull().default(1),
     /** Per monitor, never a constant: US-007's whole point about the cost dial. */
+    /**
+     * Which days of the week this monitor may poll on. US-041.
+     *
+     * Postgres numbering, so 0 is Sunday and 6 is Saturday, because the check
+     * is `extract(dow ...)` and a second numbering would be a translation
+     * somebody eventually gets wrong by one.
+     *
+     * Every day by default, which is what every monitor did before this column
+     * existed. It is a filter on the interval rather than a replacement for it:
+     * a monitor polls every `poll_interval_seconds`, but only on these days.
+     * That covers hourly, daily, weekly, weekdays and weekends without a cron
+     * parser, and a cron parser is a support burden somebody gets wrong
+     * silently and expensively.
+     *
+     * **Why days at all, when an interval is simpler.** A B2B monitor polled on
+     * Saturday buys the weekend at full price and finds the weekend's
+     * conversation, which is mostly not work. Five days of seven is about 71%
+     * of the spend for close to all of the value, and nothing in this product
+     * could express that.
+     */
+    pollDays: smallint("poll_days").array().notNull().default(sql`'{0,1,2,3,4,5,6}'`),
+    /**
+     * The timezone the days above are counted in. US-041.
+     *
+     * A person choosing "weekdays" means their weekdays. The database stores
+     * UTC, so without this the choice is wrong for most of the world — a
+     * monitor in Kuala Lumpur would start its Monday at 8am on Sunday.
+     *
+     * An IANA name, validated where it is written rather than here: Postgres
+     * throws on an unknown zone, and `now() AT TIME ZONE` is inside the
+     * scheduler's one query, so a bad row would stop every monitor rather than
+     * one. The API refuses a name `Intl` does not know.
+     */
+    pollTimezone: text("poll_timezone").notNull().default("UTC"),
     pollIntervalSeconds: integer("poll_interval_seconds")
       .notNull()
       .default(defaultPollIntervalSeconds),
@@ -376,6 +411,17 @@ export const monitors = pgTable(
       sql.raw(`poll_interval_seconds >= ${minimumPollIntervalSeconds}`),
     ),
     check("monitors_min_score_range", scoreRange("min_score")),
+    /**
+     * A day is 0 to 6, and there is at least one.
+     *
+     * The floor matters more than the range. An empty array is a monitor that
+     * can never poll, which reads as "broken" and not as "off" — a person who
+     * wants that presses pause, and pause says so on the screen.
+     */
+    check(
+      "monitors_poll_days_valid",
+      sql.raw("cardinality(poll_days) > 0 AND poll_days <@ ARRAY[0,1,2,3,4,5,6]::smallint[]"),
+    ),
     // Cosine similarity between two embeddings of real text is never above 1,
     // and a negative threshold would keep everything while reading as a
     // setting somebody had chosen.

@@ -871,6 +871,57 @@ a {
   font-size: var(--text-xs);
 }
 
+/*
+  Projects: a name, the product line under it, and what can be done with it.
+  US-045.
+
+  A row rather than a card. A project carries four sentences and a person
+  scanning the list wants the name and the count, not the whole business
+  description repeated down the page.
+*/
+.project-list {
+  width: min(1280px, calc(100% - 76px));
+  display: grid;
+  gap: 12px;
+  margin: 0 auto;
+  padding: 0 0 48px;
+  list-style: none;
+}
+
+.project-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+
+.project-identity {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.project-identity span {
+  color: var(--text-reading-color);
+  font-size: var(--text-sm);
+}
+
+.project-identity small {
+  color: var(--muted);
+  font-size: var(--text-xs);
+}
+
+.project-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .monitor-list {
   width: min(1280px, calc(100% - 76px));
   display: grid;
@@ -2318,6 +2369,29 @@ a {
   it. A person only needs it when they wonder why there is one lead here and
   not five.
 */
+/*
+  A project row's name, product and monitor count. US-045.
+
+  It sits inside a `.monitor-card`, so the card itself is already styled: this
+  is only the stack of three lines inside it.
+*/
+.project-identity {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+.project-name {
+  font-size: var(--text-md);
+}
+.project-product {
+  color: var(--text-reading-color);
+  overflow-wrap: anywhere;
+}
+.project-count {
+  color: var(--muted);
+  font-size: var(--text-xs);
+}
+
 .thread-depth {
   margin-top: var(--space-2);
   color: var(--muted);

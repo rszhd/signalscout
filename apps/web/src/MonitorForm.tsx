@@ -232,8 +232,56 @@ export function MonitorForm() {
   /** The plan the estimate measured. An edited plan makes the answer stale. */
   const [testedPlan, setTestedPlan] = useState<string | null>(null);
 
+  /**
+   * The project this monitor is being made in, from `#/monitors/new?project=`.
+   *
+   * US-045. Read once from the hash rather than held in state: the form is
+   * mounted fresh at that route, and a project chosen after typing has begun
+   * would have to decide whether to overwrite what was typed. Arriving with
+   * one is the only case worth serving.
+   */
+  const projectId = new URLSearchParams((globalThis.location?.hash ?? "").split("?")[1] ?? "").get(
+    "project",
+  );
+
   useEffect(() => {
     let cancelled = false;
+
+    /**
+     * The project's answers, which prefill the four fields.
+     *
+     * A copy, not a link: a monitor made here keeps whatever is on the screen
+     * when it is saved, and later edits to the project never reach it. The
+     * signals come from the project too, so a person who narrowed them once
+     * does not narrow them again.
+     */
+    if (projectId) {
+      requestJson<{
+        name: string;
+        product: string;
+        idealCustomer: string;
+        problem: string;
+        signals: string[];
+      }>(`/api/projects/${projectId}`)
+        .then((project) => {
+          if (cancelled) return;
+          setAnswers((current) => ({
+            // The monitor's own name is left alone: a project is a business
+            // and a monitor is one search inside it, so they are not the same
+            // name and prefilling one with the other invites a list of
+            // identical rows.
+            name: current.name,
+            product: project.product,
+            idealCustomer: project.idealCustomer,
+            problem: project.problem,
+          }));
+          if (project.signals.length > 0) setSelectedSignals(project.signals);
+        })
+        .catch(() => {
+          // A project that has gone leaves an ordinary empty form, which is
+          // what a person can act on. Nothing here is worth an error banner.
+        });
+    }
 
     requestJson<MonitorOptions>("/api/monitor-options")
       .then((options) => {
@@ -241,7 +289,7 @@ export function MonitorForm() {
         setOptionsState({ state: "ready", options });
         // PLAN.md shows every signal checked. It is the broad, explicit first
         // run; a person can narrow it before generation.
-        setSelectedSignals(options.signals.map((signal) => signal.id));
+        if (!projectId) setSelectedSignals(options.signals.map((signal) => signal.id));
         setSelectedSources(options.sources.map((source) => source.id));
       })
       .catch((cause: unknown) => {
@@ -256,7 +304,7 @@ export function MonitorForm() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [projectId]);
 
   const options = optionsState.state === "ready" ? optionsState.options : null;
   const selectedSourceOptions = useMemo(
@@ -436,6 +484,9 @@ export function MonitorForm() {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           ...answers,
+          // Where the answers came from, for grouping. The answers themselves
+          // are already copied into the body above.
+          ...(projectId ? { projectId } : {}),
           signals: selectedSignals,
           queries,
           subreddits,

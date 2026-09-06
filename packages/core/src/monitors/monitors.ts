@@ -70,6 +70,14 @@ export interface CreateMonitorInput extends MonitorAnswers, MonitorPlan, Monitor
    * column is the narrower one.
    */
   readonly sources: readonly Source[];
+  /**
+   * The project these answers were copied from. US-045.
+   *
+   * Provenance and grouping, not a link: the four answers are already on this
+   * input, and the monitor keeps whatever they were when it was made. Absent
+   * is the normal state.
+   */
+  readonly projectId?: string;
   readonly minScore?: number;
   readonly pollIntervalSeconds?: number;
   /** Which days it may poll on. Postgres numbering, 0 is Sunday. US-041. */
@@ -342,6 +350,7 @@ export async function createMonitor(
       generatedQueries: queriesToStore(input.queries),
       generatedSubreddits: [...input.subreddits],
       sources: [...input.sources],
+      ...(input.projectId === undefined ? {} : { projectId: input.projectId }),
       ...(input.minScore === undefined ? {} : { minScore: input.minScore }),
       ...(input.pollDays === undefined ? {} : { pollDays: [...input.pollDays] }),
       ...(input.pollTimezone === undefined ? {} : { pollTimezone: input.pollTimezone }),

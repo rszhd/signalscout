@@ -255,6 +255,41 @@ function optionallyOneOf(column: string, values: readonly string[]) {
  * generated queries beside them. They are separate columns on purpose: a query
  * is regenerated when the prompt improves, and nobody retypes an answer.
  */
+/**
+ * A business, so its answers are typed once rather than once per monitor.
+ *
+ * US-045. The product, the ideal customer, the problem and the signals
+ * describe a *business*; the queries, platforms, schedule and budget describe
+ * a *search*. A person with three monitors was typing the first four three
+ * times, and typing them slightly differently each time — which
+ * `monitors.version` faithfully recorded as an edit, leaving two monitors
+ * judged against two descriptions of the same business.
+ *
+ * **A monitor takes a copy of these, and is not bound to them.** That was
+ * decided rather than discovered, and the reason is `monitors.version`: US-012
+ * records every verdict against the version that earned it, so a project the
+ * monitors *followed* would re-version all of them on one edit and discard the
+ * comparability of every verdict already given. Editing a project changes what
+ * the next monitor starts from and nothing that already exists. The screen has
+ * to say so.
+ *
+ * It is a name and four answers. Not a workspace, not members, not stages —
+ * PLAN.md's NOT list has *CRM platform* on it and this is how that starts.
+ */
+export const projects = pgTable("projects", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  /** Text and no foreign key, for the reason `monitors.user_id` gives. */
+  userId: text("user_id").notNull(),
+  name: text("name").notNull(),
+  /** The same four the classifier reads. `ai/prompt.ts` owns the list. */
+  product: text("product").notNull(),
+  idealCustomer: text("ideal_customer").notNull(),
+  problem: text("problem").notNull(),
+  signals: text("signals").array().notNull().default(sql`'{}'`),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
 export const monitors = pgTable(
   "monitors",
   {
@@ -264,6 +299,18 @@ export const monitors = pgTable(
      * no foreign key yet. Text, because Better Auth ids are text.
      */
     userId: text("user_id").notNull(),
+    /**
+     * The project this monitor was created from, for grouping. US-045.
+     *
+     * Null is the normal state: every monitor that existed before projects has
+     * none, and a monitor may be made without one. It records where the four
+     * answers below came from — they are a copy, so this is provenance and
+     * grouping rather than a link the monitor reads at poll time.
+     *
+     * `set null` on delete: removing a project must not remove the monitors
+     * that came out of it, and their answers are their own.
+     */
+    projectId: uuid("project_id").references(() => projects.id, { onDelete: "set null" }),
     name: text("name").notNull(),
     /** The four answers. PLAN.md, *Monitor creation*. */
     product: text("product").notNull(),

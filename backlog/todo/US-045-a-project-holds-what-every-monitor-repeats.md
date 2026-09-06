@@ -53,20 +53,22 @@ and four answers. It is not a workspace, and this instance has one account until
 
 ## Acceptance
 
-- [ ] A person can create a project with a name and the four answers the
+- [x] A person can create a project with a name and the four answers the
       classifier reads: product, ideal customer, problem, signals
-- [ ] Creating a monitor inside a project prefills those four, and the person
+- [x] Creating a monitor inside a project prefills those four, and the person
       can still change them for that monitor
 - [ ] The monitor list groups by project, and a monitor without one still
       appears rather than disappearing into a group nobody made
-- [ ] Whether a project's answers are copied or linked is decided in the Log,
+- [x] Whether a project's answers are copied or linked is decided in the Log,
       with the reason, and the version rule follows from it
-- [ ] If they are linked: editing a project says how many monitors it will
+- [x] If they are linked: editing a project says how many monitors it will
       re-version **before** it is saved, because a verdict is recorded against
-      the version that earned it
-- [ ] Every monitor that exists keeps working with no project, in a migration
+      the version that earned it — **not applicable, and the screen says the
+      opposite instead**: an edit reaches the next monitor and leaves the ones
+      that exist alone. A test holds that sentence
+- [x] Every monitor that exists keeps working with no project, in a migration
       that needs no answer from anybody
-- [ ] `monitors.version` still counts only the four fields. A rename, a moved
+- [x] `monitors.version` still counts only the four fields. A rename, a moved
       threshold or a changed schedule must not move it, whether it happens on a
       monitor or on a project
 
@@ -85,9 +87,54 @@ and four answers. It is not a workspace, and this instance has one account until
   schedule later. Do not add either now — the ticket is about the answers, and
   a project that starts collecting settings ends up a workspace.
 
+- **The blank page is the friction that remains.**
+  [US-050](US-050-a-project-is-filled-in-from-a-url-or-a-file.md) drafts the
+  four answers from a URL or an uploaded file. It depends on this ticket's form
+  and it does not change this ticket's decision: the model proposes and the
+  person saves.
+
 ## Log
 
 - 2026-09-06T13:42+08:00 — Written at the owner's request. The decision the
   ticket refuses to make for the implementer is copy against link, because it is
   the difference between removing some typing and changing what a verdict is
   recorded against.
+
+## Log
+
+- 2026-09-06T22:35+08:00 — **Copy, not link, and the reason is `monitors.version`.**
+
+  The ticket asked for this to be decided rather than discovered, so: a project
+  holds the four answers and a monitor takes a **copy** when it is created.
+  Editing a project changes what the next monitor starts from and nothing that
+  already exists.
+
+  Link was the tempting one — improve the problem statement once and every
+  monitor follows. What it costs is US-012. A verdict is recorded against the
+  version that earned it, and `monitors.version` counts edits to exactly these
+  four fields. So one project edit would re-version every monitor under it and
+  discard the comparability of every verdict already given — a large,
+  irreversible action, built before anybody asked for it, against a feedback
+  sample that currently stands at five judged matches.
+
+  Copy solves what was actually described: typing the same answers repeatedly,
+  and the drift that causes. And it does not foreclose the other choice —
+  adding inheritance later is possible; un-cascading versions is not.
+
+  **The screen says so**, because a copy that looked like a link would be a lie
+  by omission about somebody's verdicts. `Projects.test.tsx` holds that
+  sentence, and if projects ever become a link that test is the first thing
+  that has to change.
+
+  **A project also has its own inbox**, which the owner asked for and which was
+  nearly free: the inbox already filters by monitor, so `projectId` is the same
+  query one join wider — matches whose monitor belongs to the project.
+  `monitors.project_id` is provenance and grouping, not something the poll
+  reads.
+
+  What is built: migration 0036, `projects/projects.ts`, five routes,
+  `Projects.tsx` with its own nav entry, and the monitor form reading
+  `?project=` to prefill. Ten core cases, seven route cases, seven DOM cases.
+
+  What is not: the monitor **list** does not group by project yet. That box
+  stays open, and it is the one thing between this and the ticket being done.

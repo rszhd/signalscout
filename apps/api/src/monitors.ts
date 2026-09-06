@@ -213,6 +213,8 @@ const createBody = answersBody.extend({
   name: z.string().trim().min(1).max(80),
   ...planBody.shape,
   sources: sourcesField.default([]),
+  /** Where the answers were copied from, for grouping. US-045. */
+  projectId: z.uuid().optional(),
   minScore: z.number().int().min(0).max(100).optional(),
   pollIntervalSeconds: z.number().int().min(minimumPollIntervalSeconds).optional(),
   pollDays: pollDaysField.optional(),

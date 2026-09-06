@@ -4,6 +4,7 @@ import { Inbox } from "./Inbox.js";
 import { MonitorForm } from "./MonitorForm.js";
 import { Monitors } from "./Monitors.js";
 import { Notifications } from "./Notifications.js";
+import { Projects } from "./Projects.js";
 
 /**
  * The shell: the header, and which of the four screens is on it.
@@ -22,6 +23,7 @@ import { Notifications } from "./Notifications.js";
 const newMonitorRoute = "#/monitors/new";
 const monitorsRoute = "#/monitors";
 const connectionsRoute = "#/connections";
+const projectsRoute = "#/projects";
 
 function currentRoute(): string {
   return globalThis.location?.hash ?? "";
@@ -43,6 +45,7 @@ export function App() {
   const creating = route.startsWith(newMonitorRoute);
   const listing = !creating && route.startsWith(monitorsRoute);
   const connecting = route.startsWith(connectionsRoute);
+  const projecting = route.startsWith(projectsRoute);
 
   return (
     <div className="app-shell">
@@ -58,13 +61,21 @@ export function App() {
 
         <nav className="site-nav" aria-label="Screens">
           <a
-            className={creating || listing || connecting ? "nav-item" : "nav-item current"}
+            className={
+              creating || listing || connecting || projecting ? "nav-item" : "nav-item current"
+            }
             href="#/"
           >
             <span className="nav-icon" aria-hidden="true">
               ▤
             </span>
             <span>Intent inbox</span>
+          </a>
+          <a className={projecting ? "nav-item current" : "nav-item"} href={projectsRoute}>
+            <span className="nav-icon" aria-hidden="true">
+              ▦
+            </span>
+            <span>Projects</span>
           </a>
           <a className={listing ? "nav-item current" : "nav-item"} href={monitorsRoute}>
             <span className="nav-icon" aria-hidden="true">
@@ -99,6 +110,8 @@ export function App() {
           <Notifications key={notificationId} monitorId={notificationId} />
         ) : creating ? (
           <MonitorForm />
+        ) : projecting ? (
+          <Projects />
         ) : connecting ? (
           <Connections />
         ) : listing ? (

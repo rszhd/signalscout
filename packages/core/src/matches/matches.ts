@@ -156,6 +156,19 @@ export interface InboxMatch {
 export interface ListMatchesOptions {
   /** One monitor, or every monitor when undefined. */
   readonly monitorId?: string;
+  /**
+   * Every monitor in one project. US-045.
+   *
+   * A project is a business, so its inbox is the conversations found for that
+   * business — one filter wider than a monitor and narrower than everything.
+   * It reads `monitors.project_id`, which is where a monitor was created, and
+   * a monitor moved out of a project leaves that project's inbox with it.
+   *
+   * Combined with `monitorId` it narrows further rather than conflicting: a
+   * monitor that is not in the project simply matches nothing, which is the
+   * honest answer to a contradictory question.
+   */
+  readonly projectId?: string;
   /** The lowest score to show. The monitor's own `min_score` already applied. */
   readonly minScore?: number;
   /** The clock every rank on this page is measured against. */
@@ -266,6 +279,7 @@ export async function listMatches(
   }
 
   if (options.monitorId) conditions.push(eq(matches.monitorId, options.monitorId));
+  if (options.projectId) conditions.push(eq(monitors.projectId, options.projectId));
 
   /**
    * The saved list. US-043.

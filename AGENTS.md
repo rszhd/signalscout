@@ -1121,11 +1121,29 @@ Do not invent a command that does not exist yet — check `package.json` first.
 cannot reach one it says so; it does not fall back to a fake.
 
 **It can go red without a broken test.** A database per file, run in parallel,
-outruns Postgres `max_connections` of 100: one or two files fail with "sorry,
-too many clients already", sometimes surfacing as a 500 from a route whose
-insert could not get a connection. The failing file moves between runs and
-passes alone. `pnpm vitest run --maxWorkers=3` passes all of it. Check that
-before reading a red run as a regression.
+can outrun Postgres `max_connections` of 100: a file fails with "sorry, too
+many clients already", sometimes surfacing as a 500 from a route whose insert
+could not get a connection. The failing file moves between runs and passes
+alone, so it reads as flakiness rather than as what it is. Check that before
+reading a red run as a regression.
+
+Two settings hold it off and both live in `vitest.config.ts`:
+`DATABASE_POOL_SIZE` caps each pool at three, and `maxWorkers` caps the run at
+six. Measured on 2026-09-06, six workers peak at 57 connections of the 100.
+**Pass `--maxWorkers` by hand only to go lower**; the advice to run at three is
+older than the pool cap and costs about thirty seconds.
+
+**The suite takes about 40 seconds, and it used to take 170.** Almost all of
+that was one number. Five pg-boss worker files were 397 of the 435 seconds of
+file time, every test costing four to six seconds to do milliseconds of work,
+because a pipeline test sends a job and then waits for a worker to poll for it.
+`WORKER_POLLING_INTERVAL_SECONDS` is set to pg-boss's floor of 0.5 for the
+suite alone, and nothing sets it in production — a poll that starts a second
+later is a poll that starts a second later, and a query per queue per second
+against a working database buys nothing.
+
+If a worker file starts costing seconds a test again, that is the number to
+look at first, and `--reporter=json` gives the per-file timings that show it.
 
 ---
 

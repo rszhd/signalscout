@@ -80,6 +80,8 @@ const matchSchema = z.object({
 
 const query = z.object({
   monitorId: z.uuid().optional(),
+  /** Every monitor in one project. US-045: a project has its own inbox. */
+  projectId: z.uuid().optional(),
   minScore: z.coerce.number().int().min(0).max(100).optional(),
   limit: z.coerce.number().int().min(1).max(maximumPageSize).default(defaultPageSize),
   /**
@@ -123,10 +125,12 @@ export async function registerMatchRoutes(
       },
     },
     handler: async (request) => {
-      const { monitorId, minScore, limit, cursor, asOf, includeNotRelevant, saved } = request.query;
+      const { monitorId, projectId, minScore, limit, cursor, asOf, includeNotRelevant, saved } =
+        request.query;
 
       const page = await listMatches(db, {
         monitorId,
+        projectId,
         minScore,
         limit,
         cursor,

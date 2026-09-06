@@ -140,10 +140,10 @@ describe("the four screens", () => {
     const links = [...screen.container.querySelectorAll("nav a")].map((link) =>
       link.getAttribute("href"),
     );
-    // Connections joined this list in US-023, when the screen behind it was
-    // built. Settings is still a mockup route and must stay off the nav: a
-    // link that leads nowhere is worse than no link.
-    expect(links).toEqual(["#/", "#/monitors", "#/connections", "#/monitors/new"]);
+    // Connections joined this list in US-023 and Projects in US-045, each when
+    // the screen behind it was built. Settings is still a mockup route and must
+    // stay off the nav: a link that leads nowhere is worse than no link.
+    expect(links).toEqual(["#/", "#/projects", "#/monitors", "#/connections", "#/monitors/new"]);
     expect(screen.container.textContent).not.toContain("Settings");
   });
 });

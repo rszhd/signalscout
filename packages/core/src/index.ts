@@ -269,6 +269,17 @@ export {
 } from "./notifications/settings.js";
 export { createNotificationTransport, notificationReadiness } from "./notifications/transport.js";
 export {
+  type CreateProjectInput,
+  createProject,
+  deleteProject,
+  getProject,
+  listProjects,
+  type Project,
+  type ProjectAnswers,
+  type UpdateProjectInput,
+  updateProject,
+} from "./projects/projects.js";
+export {
   decryptSecret,
   type EncryptionKey,
   encryptionKeyIsWellFormed,

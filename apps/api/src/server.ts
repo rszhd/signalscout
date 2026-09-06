@@ -30,6 +30,7 @@ import { registerEstimateRoutes } from "./estimates.js";
 import { registerMatchRoutes } from "./matches.js";
 import { registerMonitorRoutes } from "./monitors.js";
 import { registerNotificationRoutes } from "./notifications.js";
+import { registerProjectRoutes } from "./projects.js";
 
 /**
  * Where the built UI lives. In the image and in a local `pnpm build` this is
@@ -148,6 +149,7 @@ export async function buildServer({
   });
 
   await registerMatchRoutes(app, { db });
+  await registerProjectRoutes(app, { db });
   await registerNotificationRoutes(app, { db, env });
 
   await registerConnectionRoutes(app, { db, sources, environment, encryption, logger });

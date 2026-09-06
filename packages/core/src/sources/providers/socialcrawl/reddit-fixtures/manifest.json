@@ -1,0 +1,37 @@
+[
+  {
+    "name": "search-keyword",
+    "url": "https://www.socialcrawl.dev/v1/reddit/search?query=flaky+tests&sort=new",
+    "status": 200,
+    "elapsedMs": 7124,
+    "note": null
+  },
+  {
+    "name": "search-keyword-page-2",
+    "url": "https://www.socialcrawl.dev/v1/reddit/search?query=flaky+tests&sort=new&cursor=sc.eyJ2IjoyLCJjIjoic2MyLmV5SnpJam9pY0NJc0ltTWlPaUpOYWxFOUluMCIsImUiOiJyZWRkaXQvc2VhcmNoIiwicCI6ImFmdGVyIn0",
+    "status": 200,
+    "elapsedMs": 2156,
+    "note": null
+  },
+  {
+    "name": "subreddit-posts",
+    "url": "https://www.socialcrawl.dev/v1/reddit/subreddit?subreddit=softwaretesting&sort=new",
+    "status": 200,
+    "elapsedMs": 2441,
+    "note": null
+  },
+  {
+    "name": "subreddit-search",
+    "url": "https://www.socialcrawl.dev/v1/reddit/subreddit/search?subreddit=softwaretesting&query=flaky+tests&sort=new",
+    "status": 200,
+    "elapsedMs": 2877,
+    "note": null
+  },
+  {
+    "name": "credentials-rejected",
+    "url": "https://www.socialcrawl.dev/v1/reddit/search?query=flaky+tests",
+    "status": 401,
+    "elapsedMs": 194,
+    "note": "expected free: refused before the query is read"
+  }
+]

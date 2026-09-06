@@ -172,6 +172,27 @@ The whole run stored no new post. All 50 records and all 47 posts were already
 in the table from earlier runs, and `posts` stayed at 174: deduplication across
 two providers, again, live.
 
+**Reddit has three providers, and the third is for precision rather than
+price.** US-031 added SocialCrawl on 2026-09-06, on the key that already fetches
+X, LinkedIn and YouTube. It is the expensive one — a credit is 8,118
+micro-dollars against a ScrapeCreators request's 1,880 — and it exists for one
+endpoint the other two do not have: `/v1/reddit/subreddit/search`, a keyword
+*inside* a subreddit.
+
+The capture measured why that matters. `flaky tests` across all of Reddit
+returned 25 posts from r/TIdaL, r/RedditLaqueristaSwap, r/Euphoria_HBO, r/AskVet
+and r/snapmaker — a watch app's audio was "still flaky with 3+ devices" and a dog
+had a skin issue. The same words inside r/softwaretesting returned **7 posts, all
+on topic and all from that subreddit**. That is the discovery mode US-022 showed
+was missing.
+
+So this connector inverts the usual order: scoped first where a monitor names
+both a query and a channel, a bare subreddit sweep only where there is no query,
+and the keyword-across-Reddit search only where there is no channel. It reads no
+replies on purpose — its comment endpoint is 5 credits against ScrapeCreators' 1
+for the same thread — and `canFetchReplies: false` is what tells the monitor form
+to say so.
+
 **LinkedIn is the third platform, and PLAN.md said not to add one yet.**
 US-028 closed on 2026-09-05. The rule at PLAN.md's *Important rule* is that no
 third network is added until Reddit and X reliably produce useful matches, and
@@ -713,7 +734,7 @@ Do not reopen these without being asked. The reasoning is in
 | Python | TypeScript |
 | A managed auth service | Better Auth in our own Postgres |
 | An in-memory Postgres fake | Real Postgres, from the first test file |
-| A Reddit API key per user | Reddit through a provider: Bright Data or ScrapeCreators |
+| A Reddit API key per user | Reddit through a provider: Bright Data, ScrapeCreators or SocialCrawl |
 | X's own pay-per-use API | X through SocialCrawl, the one provider of three that can search X |
 | A platform's price kept on the platform | The price on the pair: one SocialCrawl key, one credit price, and a call that costs 1 on X and 5 on LinkedIn |
 | One record describing a source | A platform and a provider, separate; a connector is the pair |

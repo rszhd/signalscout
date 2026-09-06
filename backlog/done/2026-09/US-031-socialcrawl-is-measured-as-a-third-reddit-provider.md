@@ -6,7 +6,7 @@ priority: p2
 created: 2026-09-06T01:50+08:00
 parent:
 area:
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -63,21 +63,25 @@ pair. A third Reddit connector is a connector, not an architecture change.
 
 ## Acceptance
 
-- [ ] `/v1/reddit/search` and `/v1/reddit/subreddit` are each called once with
+- [x] `/v1/reddit/search` and `/v1/reddit/subreddit` are each called once with
       the same terms a ScrapeCreators call was given, and the Log records posts
       returned, credits charged, seconds taken and cost per post for both
       providers
-- [ ] `/v1/reddit/subreddit/search` is called with a monitor-shaped keyword
+- [x] `/v1/reddit/subreddit/search` is called with a monitor-shaped keyword
       inside a topical subreddit, and the Log says how many of the returned
       posts are on topic, counted by reading them
 - [ ] `/v1/reddit/omni-search` is called once, and the Log records what it
       cost after refunds, how long it took, and whether its inline comments
-      carry anything the post did not
-- [ ] The answers are written as fixtures through a capture script, with author
+      carry anything the post did not — **not done: it is metered from five
+      credits and the balance was eleven. The three search endpoints answered
+      the question this ticket asked.**
+- [x] The answers are written as fixtures through a capture script, with author
       identity scrubbed, and the fixtures are read before they are committed
-- [ ] The Log states a decision in one sentence: build the connector, or do not
-- [ ] If the decision is to build, a separate ticket is written. This one does
-      not add a connector
+- [x] The Log states a decision in one sentence: build the connector, or do not
+- [x] ~~If the decision is to build, a separate ticket is written. This one does
+      not add a connector~~ — **overtaken.** The owner asked for the connector
+      directly, so the spike and the build closed together. The measurement
+      still came first and it still decided the shape
 
 ## Notes
 
@@ -108,3 +112,54 @@ pair. A third Reddit connector is a connector, not an architecture change.
   mode US-022 showed is missing, and no other provider offers it. The price
   runs the wrong way at 4.3 times a ScrapeCreators call, so relevance is what
   has to pay for it.
+
+
+- 2026-09-06T11:35+08:00 — Measured, then built, in that order. Four billed
+  calls at one credit each, $0.032, plus a free refusal.
+
+  **The decision: build it, and the reason is one endpoint.**
+
+  | Mode | Endpoint | Returned |
+  |---|---|---|
+  | Keyword across Reddit | `/v1/reddit/search` | 25 posts, **noise** |
+  | One subreddit | `/v1/reddit/subreddit` | 23 posts |
+  | Keyword *inside* a subreddit | `/v1/reddit/subreddit/search` | **7 posts, all on topic** |
+
+  `flaky tests` across all of Reddit brought back r/TIdaL, r/RedditLaqueristaSwap,
+  r/Euphoria_HBO, r/AskVet and r/snapmaker — a watch app whose audio was "still
+  flaky with 3+ devices", and a dog with a skin issue. The same two words inside
+  r/softwaretesting brought back seven posts about flaky test suites, and the
+  capture checked the scope directly: **every one from the subreddit asked
+  for.** No leak.
+
+  That is the mode US-022 showed was missing, and neither Bright Data nor
+  ScrapeCreators has it.
+
+  **So the connector inverts the usual order.** Scoped first wherever a monitor
+  names both a query and a channel; a bare subreddit sweep only when there is no
+  query; and the keyword-across-Reddit search only when there is no channel at
+  all. The other two Reddit connectors treat those as equal discovery modes.
+  Here the capture says they are not.
+
+  **It costs 4.3 times a ScrapeCreators call and buys precision, not volume.**
+  Seven right posts against twenty-five wrong ones. A monitor that wants cheap
+  breadth still uses ScrapeCreators; this is for a monitor that knows where its
+  people are.
+
+  **It does not read replies, and that is a decision rather than an omission.**
+  SocialCrawl's Reddit comment endpoint is 5 credits against ScrapeCreators' 1
+  for the same thread, measured in US-020. `canFetchReplies: false`, so the
+  monitor form tells a person who picks this provider that replies will not
+  arrive — rather than leaving them to notice.
+
+  One detail worth keeping: this provider reports a bare post id where the other
+  two report Reddit's `t3_` fullname. The parser rebuilds the prefix, because
+  deduplication is keyed on it and one provider's copy of a post must match
+  another's.
+
+  Speed: 7.1 seconds for the first call and 2.2 to 2.9 after. The provider warns
+  of a 10 to 12 second median with a tail past 30. Four calls is not a
+  distribution, but nothing here was slow enough to need a longer timeout.
+
+  1,007 tests pass. Three expected values moved, all of them counting Reddit's
+  providers, which is now three.

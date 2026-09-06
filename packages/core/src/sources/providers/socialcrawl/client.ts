@@ -74,6 +74,11 @@ export const endpoints = {
   search: `${apiBase}/twitter/search/tweets`,
   /** The replies under one post, by URL. One credit and a cursor. US-020. */
   xReplies: `${apiBase}/twitter/tweet/replies`,
+  /** Reddit, US-031. Three discovery modes, one credit each. */
+  redditSearch: `${apiBase}/reddit/search`,
+  redditSubreddit: `${apiBase}/reddit/subreddit`,
+  /** The one no other provider has: a keyword inside one subreddit. */
+  redditSubredditSearch: `${apiBase}/reddit/subreddit/search`,
   linkedInPosts: `${apiBase}/linkedin/search/posts`,
   /**
    * YouTube. US-034.
@@ -163,6 +168,26 @@ export const xRepliesProfile: EndpointProfile = {
     return text(pagination?.next_cursor);
   },
 };
+
+/**
+ * Reddit, all three modes: `pagination.next_cursor`, one credit a call.
+ *
+ * They share a profile shape because they share an envelope — the difference
+ * between them is which parameters go in, which is the connector's business.
+ */
+const redditProfile = (endpoint: string): EndpointProfile => ({
+  endpoint,
+  standardCallCredits: 1,
+  cursorOf: (body) => {
+    const pagination = objectAt(body, "pagination");
+    if (pagination?.has_more === false) return undefined;
+    return text(pagination?.next_cursor);
+  },
+});
+
+export const redditSearchProfile = redditProfile(endpoints.redditSearch);
+export const redditSubredditProfile = redditProfile(endpoints.redditSubreddit);
+export const redditSubredditSearchProfile = redditProfile(endpoints.redditSubredditSearch);
 
 /**
  * YouTube search: `pagination.next_cursor`, and one credit a call.

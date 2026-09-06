@@ -1,0 +1,32 @@
+[
+  {
+    "name": "search-keyword",
+    "creditsUsed": 1,
+    "creditsRemaining": 10,
+    "cached": false
+  },
+  {
+    "name": "search-keyword-page-2",
+    "creditsUsed": 1,
+    "creditsRemaining": 9,
+    "cached": false
+  },
+  {
+    "name": "subreddit-posts",
+    "creditsUsed": 1,
+    "creditsRemaining": 8,
+    "cached": false
+  },
+  {
+    "name": "subreddit-search",
+    "creditsUsed": 1,
+    "creditsRemaining": 7,
+    "cached": false
+  },
+  {
+    "name": "credentials-rejected",
+    "creditsUsed": 0,
+    "creditsRemaining": null,
+    "cached": false
+  }
+]

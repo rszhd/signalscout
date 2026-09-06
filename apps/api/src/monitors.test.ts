@@ -194,7 +194,13 @@ describe("the monitor routes", () => {
           reddit.missingCredentials.map((credential: { environmentVariable: string }) => [
             credential.environmentVariable,
           ]),
-        ).toEqual([["BRIGHTDATA_API_KEY"], ["SCRAPECREATORS_API_KEY"]]);
+        ).toEqual([
+          ["BRIGHTDATA_API_KEY"],
+          ["SCRAPECREATORS_API_KEY"],
+          // US-031 gave Reddit a third provider. One key of the three is
+          // enough to poll it, so all three are offered and none is demanded.
+          ["SOCIALCRAWL_API_KEY"],
+        ]);
         expect(reddit.missingCredentials[0]).toEqual({
           sourceId: "reddit",
           sourceName: "Reddit",
@@ -218,7 +224,7 @@ describe("the monitor routes", () => {
       await withServer({}, async (app) => {
         const body = (await app.inject({ method: "GET", url: "/api/monitor-options" })).json();
 
-        expect(builtInSources.filter((source) => source.platform.id === "reddit")).toHaveLength(2);
+        expect(builtInSources.filter((source) => source.platform.id === "reddit")).toHaveLength(3);
         expect(builtInSources.filter((source) => source.platform.id === "x")).toHaveLength(1);
         expect(builtInSources.filter((source) => source.platform.id === "linkedin")).toHaveLength(
           1,
@@ -630,14 +636,14 @@ describe("the monitor routes", () => {
 
         // Both of Reddit's providers, because either one would unblock the
         // monitor and the person gets to pick which account to open. US-025
-        // gave Reddit a second provider; before it there was one row here, and
-        // the rule that produced both — a platform is blocked only when every
-        // connector for it is — did not change.
+        // gave Reddit a second provider and US-031 a third; before them there
+        // was one row here, and the rule that produced all three — a platform
+        // is blocked only when every connector for it is — did not change.
         expect(
           response
             .json()
             .missingCredentials.map((missing: { providerId: string }) => missing.providerId),
-        ).toEqual(["brightdata", "scrapecreators"]);
+        ).toEqual(["brightdata", "scrapecreators", "socialcrawl"]);
 
         // And the row still says paused, so the worker agrees with the answer.
         const [row] = await db.select().from(monitors);

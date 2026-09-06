@@ -1,0 +1,356 @@
+{
+  "httpStatus": 200,
+  "body": {
+    "success": true,
+    "platform": "reddit",
+    "endpoint": "/v1/reddit/subreddit/search",
+    "data": {
+      "items": [
+        {
+          "post": {
+            "id": "1v26s8v",
+            "url": "https://www.reddit.com/r/softwaretesting/comments/1v26s8v/i_built_flakeharbor_a_local_cli_that_finds_flaky/",
+            "content": {
+              "text": "I built FlakeHarbor, a local CLI that finds flaky tests from JUnit history",
+              "media_urls": null,
+              "thumbnail_url": null,
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "redditor-162",
+              "display_name": "redditor-163",
+              "avatar_url": null,
+              "verified": null
+            },
+            "engagement": {
+              "views": null,
+              "likes": 0,
+              "comments": 1,
+              "shares": null,
+              "saves": null
+            },
+            "flags": {
+              "nsfw": false,
+              "spoiler": false,
+              "pinned": null,
+              "deleted": false
+            },
+            "published_at": "2026-07-21T03:24:33.000Z",
+            "ext": {
+              "subreddit": "softwaretesting",
+              "title": "I built FlakeHarbor, a local CLI that finds flaky tests from JUnit history",
+              "selftext": null,
+              "upvote_ratio": null,
+              "flair": null,
+              "content_language": null,
+              "published_at_epoch": 1784604273
+            }
+          },
+          "computed": {
+            "engagement_rate": null,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": null
+          }
+        },
+        {
+          "post": {
+            "id": "1uvb175",
+            "url": "https://www.reddit.com/r/softwaretesting/comments/1uvb175/are_teams_reaching_for_ai_agents_instead_of/",
+            "content": {
+              "text": "Are teams reaching for AI agents instead of fixing basic QA fundamentals first?",
+              "media_urls": null,
+              "thumbnail_url": null,
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "redditor-164",
+              "display_name": "redditor-165",
+              "avatar_url": null,
+              "verified": null
+            },
+            "engagement": {
+              "views": null,
+              "likes": 10,
+              "comments": 13,
+              "shares": null,
+              "saves": null
+            },
+            "flags": {
+              "nsfw": false,
+              "spoiler": false,
+              "pinned": null,
+              "deleted": false
+            },
+            "published_at": "2026-07-13T13:05:51.000Z",
+            "ext": {
+              "subreddit": "softwaretesting",
+              "title": "Are teams reaching for AI agents instead of fixing basic QA fundamentals first?",
+              "selftext": null,
+              "upvote_ratio": null,
+              "flair": null,
+              "content_language": null,
+              "published_at_epoch": 1783947951
+            }
+          },
+          "computed": {
+            "engagement_rate": null,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": null
+          }
+        },
+        {
+          "post": {
+            "id": "1uuiuy7",
+            "url": "https://www.reddit.com/r/softwaretesting/comments/1uuiuy7/automation_use_case_in_the_real_world/",
+            "content": {
+              "text": "Automation use case in the real world?",
+              "media_urls": null,
+              "thumbnail_url": null,
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "redditor-166",
+              "display_name": "redditor-167",
+              "avatar_url": null,
+              "verified": null
+            },
+            "engagement": {
+              "views": null,
+              "likes": 5,
+              "comments": 8,
+              "shares": null,
+              "saves": null
+            },
+            "flags": {
+              "nsfw": false,
+              "spoiler": false,
+              "pinned": null,
+              "deleted": false
+            },
+            "published_at": "2026-07-12T15:40:52.000Z",
+            "ext": {
+              "subreddit": "softwaretesting",
+              "title": "Automation use case in the real world?",
+              "selftext": null,
+              "upvote_ratio": null,
+              "flair": null,
+              "content_language": null,
+              "published_at_epoch": 1783870852
+            }
+          },
+          "computed": {
+            "engagement_rate": null,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": null
+          }
+        },
+        {
+          "post": {
+            "id": "1urie8l",
+            "url": "https://www.reddit.com/r/softwaretesting/comments/1urie8l/i_built_a_way_to_test_race_conditions_in_angular/",
+            "content": {
+              "text": "I built a way to test race conditions in Angular without flaky e2e tests — ngx-testbox v2 is out",
+              "media_urls": null,
+              "thumbnail_url": null,
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "redditor-168",
+              "display_name": "redditor-169",
+              "avatar_url": null,
+              "verified": null
+            },
+            "engagement": {
+              "views": null,
+              "likes": 1,
+              "comments": 0,
+              "shares": null,
+              "saves": null
+            },
+            "flags": {
+              "nsfw": false,
+              "spoiler": false,
+              "pinned": null,
+              "deleted": false
+            },
+            "published_at": "2026-07-09T06:44:30.000Z",
+            "ext": {
+              "subreddit": "softwaretesting",
+              "title": "I built a way to test race conditions in Angular without flaky e2e tests — ngx-testbox v2 is out",
+              "selftext": null,
+              "upvote_ratio": null,
+              "flair": null,
+              "content_language": null,
+              "published_at_epoch": 1783579470
+            }
+          },
+          "computed": {
+            "engagement_rate": null,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": null
+          }
+        },
+        {
+          "post": {
+            "id": "1ulc2gz",
+            "url": "https://www.reddit.com/r/softwaretesting/comments/1ulc2gz/mobile_qa_engineers_how_long_would_this_test_take/",
+            "content": {
+              "text": "Mobile QA Engineers: How long would this test take you to automate?",
+              "media_urls": null,
+              "thumbnail_url": null,
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "redditor-170",
+              "display_name": "redditor-171",
+              "avatar_url": null,
+              "verified": null
+            },
+            "engagement": {
+              "views": null,
+              "likes": 1,
+              "comments": 34,
+              "shares": null,
+              "saves": null
+            },
+            "flags": {
+              "nsfw": false,
+              "spoiler": false,
+              "pinned": null,
+              "deleted": false
+            },
+            "published_at": "2026-07-02T08:10:34.000Z",
+            "ext": {
+              "subreddit": "softwaretesting",
+              "title": "Mobile QA Engineers: How long would this test take you to automate?",
+              "selftext": null,
+              "upvote_ratio": null,
+              "flair": null,
+              "content_language": null,
+              "published_at_epoch": 1782979834
+            }
+          },
+          "computed": {
+            "engagement_rate": null,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": null
+          }
+        },
+        {
+          "post": {
+            "id": "1u8oajk",
+            "url": "https://www.reddit.com/r/softwaretesting/comments/1u8oajk/do_you_use_pertest_seed_data_for_e2eapi_tests/",
+            "content": {
+              "text": "Do you use per-test seed data for E2E/API tests?",
+              "media_urls": null,
+              "thumbnail_url": null,
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "redditor-172",
+              "display_name": "redditor-173",
+              "avatar_url": null,
+              "verified": null
+            },
+            "engagement": {
+              "views": null,
+              "likes": 7,
+              "comments": 15,
+              "shares": null,
+              "saves": null
+            },
+            "flags": {
+              "nsfw": false,
+              "spoiler": false,
+              "pinned": null,
+              "deleted": false
+            },
+            "published_at": "2026-06-17T22:10:38.000Z",
+            "ext": {
+              "subreddit": "softwaretesting",
+              "title": "Do you use per-test seed data for E2E/API tests?",
+              "selftext": null,
+              "upvote_ratio": null,
+              "flair": null,
+              "content_language": null,
+              "published_at_epoch": 1781734238
+            }
+          },
+          "computed": {
+            "engagement_rate": null,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": null
+          }
+        },
+        {
+          "post": {
+            "id": "1u5b9bf",
+            "url": "https://www.reddit.com/r/softwaretesting/comments/1u5b9bf/built_a_qa_automation_tool_that_doesnt_rely_on/",
+            "content": {
+              "text": "Built a QA automation tool that doesn't rely on screenshots. Looking for feedback.",
+              "media_urls": null,
+              "thumbnail_url": null,
+              "duration_seconds": null
+            },
+            "author": {
+              "username": "redditor-174",
+              "display_name": "redditor-175",
+              "avatar_url": null,
+              "verified": null
+            },
+            "engagement": {
+              "views": null,
+              "likes": 0,
+              "comments": 10,
+              "shares": null,
+              "saves": null
+            },
+            "flags": {
+              "nsfw": false,
+              "spoiler": false,
+              "pinned": null,
+              "deleted": false
+            },
+            "published_at": "2026-06-14T04:21:38.000Z",
+            "ext": {
+              "subreddit": "softwaretesting",
+              "title": "Built a QA automation tool that doesn't rely on screenshots. Looking for feedback.",
+              "selftext": null,
+              "upvote_ratio": null,
+              "flair": null,
+              "content_language": null,
+              "published_at_epoch": 1781410898
+            }
+          },
+          "computed": {
+            "engagement_rate": null,
+            "language": "en",
+            "content_category": "other",
+            "estimated_reach": null
+          }
+        }
+      ],
+      "next_cursor": "eyJjYW5kaWRhdGVzX3JldHVybmVkIjoie1wic2VjdGlvbl8xX3BpcGVsaW5lXzBfZ2xvYmFsX21vZGlmaWVyc1wiOlwiMlwiLFwic2VjdGlvbl8xX3BpcGVsaW5lXzFfbG9jYWxfbW9kaWZpZXJzXCI6XCIyXCIsXCJzZWN0aW9uXzJfcGlwZWxpbmVfN19zY29wZV9zd2l0Y2hlclwiOlwiMFwiLFwic2VjdGlvbl8yX3BpcGVsaW5lXzhfcG9zdF9zZWFyY2hcIjpcIjdcIixcInNlY3Rpb25fM19waXBlbGluZV8wX3NpZGViYXJfY29tbXVuaXR5X2luZm9cIjpcIjBcIn0iLCJleHBlcmllbmNlX3NlbGVjdGlvbiI6InBvc3Rfd2l0aF9jb21tdW5pdHlfc2lkZWJhciIsImV4cGVyaWVuY2VfdmVyc2lvbiI6ImRlZmF1bHQiLCJzZWN0aW9uXzJfcGlwZWxpbmVfOF9wb3N0X3NlYXJjaCI6IjcifQ==",
+      "total": null,
+      "dropped": 0,
+      "_warnings": [
+        "This upstream surface returns titles without post bodies, so ext.selftext is null on every row here. /v1/reddit/search?query=subreddit:softwaretesting flaky tests returns subreddit-scoped results WITH bodies for the same 1 credit, but it reads a different index: expect a different set of posts rather than this page with bodies added (measured, the two surfaces shared 10 of 42 rows across six subjects). The operator needs search terms beside it; on its own it errors. Use include_body=true on this endpoint only if you need this endpoint's sort and cursor: it costs 1 extra credit per hydrated post."
+      ]
+    },
+    "credits_used": 1,
+    "request_id": "req-NZS73hohg9S1dRbG",
+    "cached": false,
+    "pagination": {
+      "next_cursor": "sc.eyJ2IjoyLCJjIjoiZXlKallXNWthV1JoZEdWelgzSmxkSFZ5Ym1Wa0lqb2llMXdpYzJWamRHbHZibDh4WDNCcGNHVnNhVzVsWHpCZloyeHZZbUZzWDIxdlpHbG1hV1Z5YzF3aU9sd2lNbHdpTEZ3aWMyVmpkR2x2Ymw4eFgzQnBjR1ZzYVc1bFh6RmZiRzlqWVd4ZmJXOWthV1pwWlhKelhDSTZYQ0l5WENJc1hDSnpaV04wYVc5dVh6SmZjR2x3Wld4cGJtVmZOMTl6WTI5d1pWOXpkMmwwWTJobGNsd2lPbHdpTUZ3aUxGd2ljMlZqZEdsdmJsOHlYM0JwY0dWc2FXNWxYemhmY0c5emRGOXpaV0Z5WTJoY0lqcGNJamRjSWl4Y0luTmxZM1JwYjI1Zk0xOXdhWEJsYkdsdVpWOHdYM05wWkdWaVlYSmZZMjl0YlhWdWFYUjVYMmx1Wm05Y0lqcGNJakJjSW4waUxDSmxlSEJsY21sbGJtTmxYM05sYkdWamRHbHZiaUk2SW5CdmMzUmZkMmwwYUY5amIyMXRkVzVwZEhsZmMybGtaV0poY2lJc0ltVjRjR1Z5YVdWdVkyVmZkbVZ5YzJsdmJpSTZJbVJsWm1GMWJIUWlMQ0p6WldOMGFXOXVYekpmY0dsd1pXeHBibVZmT0Y5d2IzTjBYM05sWVhKamFDSTZJamNpZlE9PSIsImUiOiJyZWRkaXQvc3VicmVkZGl0L3NlYXJjaCIsInAiOiJjdXJzb3IifQ",
+      "has_more": true,
+      "page_size": 7
+    },
+    "credits_remaining": 7
+  }
+}

@@ -17,20 +17,26 @@ export default defineConfig({
     include: ["{apps,packages}/*/src/**/*.test.{ts,tsx}"],
     environment: "node",
     /**
-     * Six, and the number comes from Postgres rather than from the CPU.
+     * Four, and the number is bounded by contention rather than by cores.
      *
      * A test file holds its own pool and often a `pg-boss` one beside it, so
-     * concurrency is bounded by `max_connections` — 100 by default. Measured
-     * on 2026-09-06: six workers peak at 57 connections, and eight are no
-     * faster because five worker files dominate the run and there are only
-     * five of them.
+     * concurrency is limited by `max_connections` long before it is limited by
+     * the sixteen CPUs here. Measured on 2026-09-06: six workers peak at 57
+     * connections of the hundred and run in 39 seconds, and eight are no
+     * faster because five worker files carry the whole run.
+     *
+     * **Six was tried and reverted.** It made `classify.test.ts` fail two runs
+     * in four — a `until()` wait exceeding its twenty seconds under load, not
+     * a broken assertion. Four runs in 41 seconds and passed three for three.
+     * Two seconds is not worth a suite that cries wolf, and a flaky run costs
+     * far more than it saves the moment somebody starts ignoring it.
      *
      * Set here rather than left to the caller, because the number that used to
-     * be passed by hand was three, from a time before `DATABASE_POOL_SIZE`
-     * capped each pool. A default that has to be remembered on the command
-     * line is a default nobody has.
+     * be passed by hand was three, from before `DATABASE_POOL_SIZE` capped each
+     * pool. A default that must be remembered on the command line is a default
+     * nobody has.
      */
-    maxWorkers: 6,
+    maxWorkers: 4,
     /**
      * No test reaches a model provider, so the suite runs with no key even on
      * a machine that has one exported. The worker builds no classifier without

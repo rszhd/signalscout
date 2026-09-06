@@ -1129,11 +1129,17 @@ reading a red run as a regression.
 
 Two settings hold it off and both live in `vitest.config.ts`:
 `DATABASE_POOL_SIZE` caps each pool at three, and `maxWorkers` caps the run at
-six. Measured on 2026-09-06, six workers peak at 57 connections of the 100.
-**Pass `--maxWorkers` by hand only to go lower**; the advice to run at three is
-older than the pool cap and costs about thirty seconds.
+four. **Pass `--maxWorkers` by hand only to go lower**; the advice to run at
+three is older than the pool cap and costs about ten seconds.
 
-**The suite takes about 40 seconds, and it used to take 170.** Almost all of
+**Six workers were tried and reverted, and the reason is worth keeping.** They
+peak at 57 connections of the hundred and finish in 39 seconds against four's
+41 — but `classify.test.ts` then failed two runs in four, an `until()` wait
+exceeding its twenty seconds under load rather than a broken assertion. Two
+seconds is not worth a suite that cries wolf: a flaky run costs far more than
+it saves the moment somebody starts ignoring it.
+
+**The suite takes about 41 seconds, and it used to take 170.** Almost all of
 that was one number. Five pg-boss worker files were 397 of the 435 seconds of
 file time, every test costing four to six seconds to do milliseconds of work,
 because a pipeline test sends a job and then waits for a worker to poll for it.

@@ -2,7 +2,7 @@
 
 # Open tickets
 
-15 open — 4 doing, 10 todo, 1 parked (4 p1, 9 p2, 2 p3).
+16 open — 4 doing, 11 todo, 1 parked (4 p1, 10 p2, 2 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -19,6 +19,7 @@
 | p2 | US-039 | [A thread that ranks on Google is a lead for years](todo/US-039-a-thread-that-ranks-on-google-is-a-lead-for-years.md) | spike | todo | 2026-09-06T12:32+08:00 |
 | p2 | US-040 | [A draft reply the person sends themselves](todo/US-040-a-draft-reply-the-person-sends-themselves.md) | feature | todo | 2026-09-06T12:32+08:00 |
 | p2 | US-042 | [A search without a monitor](todo/US-042-a-search-without-a-monitor.md) | feature | todo | 2026-09-06T12:35+08:00 |
+| p2 | US-043 | [A match is kept for something to be done about it](todo/US-043-a-match-is-kept-for-something-to-be-done-about-it.md) | feature | todo | 2026-09-06T12:36+08:00 |
 | p3 | US-018 | [A mutation sweep proves the suite is sensitive](todo/US-018-a-mutation-sweep-proves-the-suite-is-sensitive.md) | chore | todo | 2026-09-04T22:54+08:00 |
 | p3 | US-038 | [Instagram, TikTok and Threads](parked/US-038-instagram-tiktok-and-threads.md) | feature | parked | 2026-09-06T11:56+08:00 |
 

@@ -74,6 +74,9 @@ export const endpoints = {
   search: `${apiBase}/twitter/search/tweets`,
   /** The replies under one post, by URL. One credit and a cursor. US-020. */
   xReplies: `${apiBase}/twitter/tweet/replies`,
+  /** TikTok, US-044. Search and comments, one credit each. */
+  tikTokSearch: `${apiBase}/tiktok/search`,
+  tikTokComments: `${apiBase}/tiktok/post/comments`,
   /** Reddit, US-031. Three discovery modes, one credit each. */
   redditSearch: `${apiBase}/reddit/search`,
   redditSubreddit: `${apiBase}/reddit/subreddit`,
@@ -184,6 +187,16 @@ const redditProfile = (endpoint: string): EndpointProfile => ({
     return text(pagination?.next_cursor);
   },
 });
+
+/**
+ * TikTok, both endpoints: `pagination.next_cursor`, one credit a call.
+ *
+ * The same shape as every other SocialCrawl endpoint, which is what makes the
+ * shared reply parser work here without a line of its own. US-044 measured a
+ * search page at 30 videos and a comment page at up to 50.
+ */
+export const tikTokSearchProfile = redditProfile(endpoints.tikTokSearch);
+export const tikTokCommentsProfile = redditProfile(endpoints.tikTokComments);
 
 export const redditSearchProfile = redditProfile(endpoints.redditSearch);
 export const redditSubredditProfile = redditProfile(endpoints.redditSubreddit);

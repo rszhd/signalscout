@@ -58,7 +58,7 @@ they parse.
 
 ## Acceptance
 
-- [ ] `tiktok` is a platform in `db/schema.ts`, in a migration, and
+- [x] `tiktok` is a platform in `db/schema.ts`, in a migration, and
       `PlatformDescriptor` carries its own query rule and a note saying the
       lead is in the comments
 - [x] Fixtures are captured from a live account by a script under the
@@ -66,17 +66,17 @@ they parse.
       before they are committed
 - [x] The Log says what `/search` and `/search/top` each returned, and which
       one this connector uses, with the reason
-- [ ] The connector searches by keyword and pages by cursor, and a test replays
+- [x] The connector searches by keyword and pages by cursor, and a test replays
       a captured answer
-- [ ] `since` is applied from a date the provider stands behind, and the Log
+- [x] `since` is applied from a date the provider stands behind, and the Log
       says whether it publishes one
-- [ ] The connector reads comments through `fetchReplies`, declares
+- [x] The connector reads comments through `fetchReplies`, declares
       `canFetchReplies`, and stores them as `kind = 'reply'` rows under their
       video — through the shared parser, which US-020 proved reads every
       SocialCrawl `CommentList`
-- [ ] `ReplyResult.partial` is reported from evidence, the same rule the other
+- [x] `ReplyResult.partial` is reported from evidence, the same rule the other
       three connectors follow
-- [ ] The Log records what one search and one comment page cost and returned,
+- [x] The Log records what one search and one comment page cost and returned,
       measured
 - [x] **The Log says whether a TikTok comment is long enough to be a lead**,
       judged by reading them rather than by counting rows
@@ -199,4 +199,39 @@ they parse.
   already reads. The platform's own note should say what the measurement says —
   that the lead is in the comments, and that this platform suits a monitor whose
   customers describe a condition rather than one selling to engineers.
+
+- 2026-09-06T13:52+08:00 — Built. Ten credits across both capture runs, $0.081,
+  and 1,054 tests pass.
+
+  **The shared parser read a fourth platform without a line of its own.** That
+  is the claim US-020 made and this is the strongest evidence for it: TikTok's
+  comment carries the same nine field names as X, YouTube and LinkedIn, and
+  `comments.ts` needed no change.
+
+  **Dates are exact.** `published_at` is a real per-second instant, unlike
+  YouTube's derived ones — so `since` is applied directly and there is no
+  `postedAtIsApproximate` here.
+
+  **The one platform-specific decision is the comment link.** TikTok leaves
+  `url` null on every comment, as YouTube does. YouTube's `&lc=` is a format its
+  own Share button produces; TikTok's is not something anybody here has checked.
+  So the fallback appends `?comment_id=` and the code says plainly that it is
+  unverified: if TikTok honours it the reader lands on the comment, and if it
+  does not the link is still the video, which is where the comment is. A reply
+  nobody can open is a lead nobody can act on.
+
+  **A video with no caption is dropped.** TikTok has no title and no
+  description, so the caption is the only text a video carries — storing one
+  without it would buy a classification to score silence.
+
+  One test pins what the platform is rather than what the code does: the median
+  comment on the captured thread is under 40 characters. The platform note says
+  the lead is in the comments, and a reader who saw only that sentence would
+  expect more text than there is.
+
+- 2026-09-06T13:52+08:00 — Unproven, and it is the same list every connector
+  starts with: no live poll through the worker, no rate limit, no outage, no
+  second poll proving deduplication. And nothing has yet classified a
+  non-English comment, which this platform will produce — one captured page of
+  49 held French and Spanish at full length.
 

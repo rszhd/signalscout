@@ -143,6 +143,8 @@ design more than any framework choice.
 | YouTube read, SocialCrawl | $0.008118 per request, and a request brought 45 videos |
 | YouTube comments, SocialCrawl | $0.008118 per request, and a request brought 51 comments |
 | Reddit read, SocialCrawl | $0.008118 per request, and a request brought 25 posts |
+| TikTok read, SocialCrawl | $0.008118 per request, and a request brought 30 videos |
+| TikTok comments, SocialCrawl | $0.008118 per request, and a request brought 50 comments |
 | Embedding pre-filter | ~$0.00001 |
 | AI classification, cheap model | ~$0.001 |
 
@@ -168,6 +170,32 @@ one query polled hourly at two pages is about $58 a month. And the connector
 reports its units in *credits* rather than in requests, because at five to one
 the two words are different numbers and a guard fed the wrong one lets a
 monitor spend five times its cap.
+
+**TikTok is the fifth network, and it is worth polling only for some
+products.** US-044 closed on 2026-09-06, the third crossing of PLAN.md's rule
+and again on the owner's decision. The rule stands for the sixth.
+
+What the capture measured is not about TikTok so much as about comment sections.
+A search returns creators — "I tried a bunch of budgeting apps so you don't have
+to" — so the lead is underneath, as it is on YouTube. But whether there *is* a
+lead underneath depends on the category, and the gap is large:
+
+| Video | Median comment |
+|---|---|
+| Meal planning, 2,618 comments | 16 characters |
+| Acne moisturiser, 1,165 comments | **54 characters**, 22 of 49 over sixty |
+
+Under a recipe people write "code?". Under a skincare product they write out
+their whole condition, because they have to in order to get a useful answer —
+and the top comment there listed somebody's fungal acne, redness, sensitive and
+oily skin and asked whether the product suited them. **A monitor whose customers
+must describe something will find people here. One selling to engineers will
+not**, and the first capture proved that too: `flaky tests` returned dandruff and
+school exams, because on TikTok *flaky* means flakes and *test* means an exam.
+
+TikTok is also the first platform here to return comments in other languages —
+French and Spanish at full length in one page of 49 — and every prompt in this
+product is English.
 
 **YouTube is the fourth network, and PLAN.md said not to add one.** US-034
 closed on 2026-09-06. The rule at PLAN.md's *Important rule* is that no further

@@ -96,7 +96,13 @@ const identityFields = new Set([
   "display_name",
   "handle",
 ]);
-const identityUrlFields = new Set(["avatar_url", "avatarUrl", "avatar", "profile_url", "author_url"]);
+const identityUrlFields = new Set([
+  "avatar_url",
+  "avatarUrl",
+  "avatar",
+  "profile_url",
+  "author_url",
+]);
 const personContainers = new Set(["author", "user", "creator", "owner"]);
 const textFields = new Set(["text", "caption", "description", "content", "desc"]);
 
@@ -112,7 +118,7 @@ function createScrubber() {
   // A mention opens a word, so an email address is left whole.
   const scrubHandles = (value) =>
     value.replace(
-      /(^|[\s(\[])@([A-Za-z0-9_.]{2,24})\b/g,
+      /(^|[\s([])@([A-Za-z0-9_.]{2,24})\b/g,
       (_, before, handle) => `${before}@${pseudonym(handle)}`,
     );
 
@@ -196,12 +202,22 @@ async function capture(name, endpoint, params, { key = apiKey, note } = {}) {
 console.log(`\nCapturing SocialCrawl TikTok payloads into ${here}\n`);
 
 const plain = await capture("search-keyword", endpoints.search, { query: keyword });
-await capture("search-top", endpoints.searchTop, { query: keyword }, {
-  note: "the other search endpoint, to see how it differs",
-});
-await capture("search-spoken", endpoints.search, { query: spoken }, {
-  note: "a phrase closer to how somebody talks here",
-});
+await capture(
+  "search-top",
+  endpoints.searchTop,
+  { query: keyword },
+  {
+    note: "the other search endpoint, to see how it differs",
+  },
+);
+await capture(
+  "search-spoken",
+  endpoints.search,
+  { query: spoken },
+  {
+    note: "a phrase closer to how somebody talks here",
+  },
+);
 
 const cursor = plain?.pagination?.next_cursor ?? plain?.data?.next_cursor;
 if (typeof cursor === "string" && cursor !== "") {
@@ -234,10 +250,15 @@ if (!busiest) {
   }
 }
 
-await capture("credentials-rejected", endpoints.search, { query: keyword }, {
-  key: "this-key-is-not-real",
-  note: "expected free",
-});
+await capture(
+  "credentials-rejected",
+  endpoints.search,
+  { query: keyword },
+  {
+    key: "this-key-is-not-real",
+    note: "expected free",
+  },
+);
 
 writeFileSync(`${here}manifest.json`, `${JSON.stringify(manifest, null, 2)}\n`);
 writeFileSync(`${here}ledger.json`, `${JSON.stringify(ledger, null, 2)}\n`);

@@ -125,12 +125,44 @@ export const youTubePlatform: PlatformDescriptor = {
   },
 };
 
+export const tikTokPlatformId = "tiktok";
+
+export const tikTokPlatform: PlatformDescriptor = {
+  id: tikTokPlatformId,
+  displayName: "TikTok",
+  search: {
+    /**
+     * Five words. The number matters less here than what the query is *about*,
+     * and US-044 measured that the hard way.
+     *
+     * A search for `flaky tests` returned dandruff and school exams, because on
+     * TikTok *flaky* means flakes and *test* means an exam. The words a person
+     * uses in a technical field are not the words this platform indexes. Two
+     * consumer queries — `budgeting app recommendations`, `best skincare for
+     * acne scars` — returned thirty on-topic videos each.
+     *
+     * Five words is enough for the way people phrase a question out loud here
+     * and short enough to stop a sentence.
+     */
+    maxQueryWords: 5,
+    note:
+      "A TikTok search returns creators, not people with problems, and the " +
+      "lead is in the comments — so this platform needs replies switched on to " +
+      "be worth polling. It suits a monitor whose customers have something they " +
+      "must describe to get a useful answer: under a skincare video people " +
+      "write out their whole condition, and under a recipe they write 'code?'. " +
+      "Words also mean something else here, so prefer the words a person says " +
+      "out loud over the words of a trade.",
+  },
+};
+
 /** Every platform the schema accepts, for a screen that lists them. */
 export const platforms: readonly PlatformDescriptor[] = [
   redditPlatform,
   xPlatform,
   linkedInPlatform,
   youTubePlatform,
+  tikTokPlatform,
 ];
 
 /** One platform, with every provider a build has for it. */

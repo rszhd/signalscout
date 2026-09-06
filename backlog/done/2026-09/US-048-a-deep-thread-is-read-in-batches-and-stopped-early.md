@@ -6,7 +6,7 @@ priority: p2
 created: 2026-09-06T16:20+08:00
 parent: US-020
 area:
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -129,12 +129,12 @@ would cost. `estimate/` already turns units and prices into money and
       it stop" gets an answer
 - [x] The inbox shows, under the post a reply hangs from, how many comments
       were read of how many the platform claims, and why reading ended
-- [ ] What continuing would cost is shown as money, priced from
+- [x] What continuing would cost is shown as money, priced from
       `unitsConsumed` and the model's own prices, never from a comment count
 - [x] `repliesPartial` keeps its current meaning. A thread stopped by this rule
       is partial, and that is not the same claim as the provider saying there
       is more
-- [ ] The Log records the first few live runs: how deep threads were read, how
+- [x] The Log records the first few live runs: how deep threads were read, how
       often the threshold stopped one, and whether any thread it stopped was
       later found to hold leads further down
 
@@ -439,3 +439,58 @@ would cost. `estimate/` already turns units and prices into money and
   means anything.
 
   Three tests, and removing the sentence turns two of them red.
+
+- 2026-09-06T19:35+08:00 — **The loop has run live, and it stopped on the
+  budget.** `live:thread-loop` wires the four steps to each other and sends one
+  job; everything after it is the loop turning under its own power.
+
+  On `@zade_dollface`'s 642-comment thread, against a $0.60 cap:
+
+  | | |
+  |---|---|
+  | Batches | 4 |
+  | Read to | position 238 of a claimed 642 |
+  | Stopped | **budget** |
+  | Spent | $0.6032 |
+  | Next batch would cost | $0.1267 |
+  | Matches | 6 |
+
+  The six are all questions: "is it ok for acne prone skin", "Can I substitute
+  the retinol with anything else?", "is it safe for eczema patients?". Scores
+  51 to 59 — near the threshold, which is what a thread of ordinary questions
+  under a skincare video should look like.
+
+  **Three things this run proved that no test could.**
+
+  The loop continues itself. Nothing in the script sends the second job:
+  `classify` does, after judging the batch before it, and only when
+  `replies.ts` agrees.
+
+  The seam works. Batch one held two matches, the judgement at the start of
+  batch two found them, and the counter stayed at zero. This is the rule that
+  was broken this morning and invisible to a suite driving one batch per job.
+
+  The cost projection is real arithmetic rather than a guess: $0.1267 for the
+  next batch, from what was actually spent per comment read. `docs/costs.md` —
+  cost comes from units, volume from posts.
+
+  **Two things the run found.**
+
+  A budget refusal recorded no reason. `enforceBudget` refused and returned
+  before touching a thread, so nothing said *why* the thread stopped growing —
+  the inbox's "the monitor reached its budget" could never appear, and a short
+  thread read as a judgement about the conversation when it was a judgement
+  about the month. Fixed: threads mid-walk are marked `budget`, which is the
+  one stop reason `replies` treats as temporary.
+
+  **The classifier is not deterministic, so the threshold is a sampling
+  decision.** The same fifty comments produced one match on the first run and
+  two on the second. US-030 measured the same on triage. A thread near the
+  boundary can be kept on one poll and dropped on the next, and no amount of
+  care in this rule changes that — it is a property of the model. Worth knowing
+  before anybody reads a stopped thread as a verdict.
+
+  A batch is also not fifty. The walk buys whole pages until it holds fifty and
+  overshoots: the batches here were 50, 93 and 95 comments. That makes an empty
+  batch stronger evidence than the arithmetic assumed, which is the ground the
+  single-empty rule stands on.

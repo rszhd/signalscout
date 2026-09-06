@@ -461,6 +461,51 @@ title's own 0.3892 — the same pure cost as before.
 Both threads and both label files are committed, and
 `capture:comment-filter statement-post` re-runs the second.
 
+**A deep thread is read fifty comments at a time, and stops when a batch holds
+no lead.** US-048 closed on 2026-09-06. A thread of a hundred thousand comments
+is $297 of classification if nothing stops it, and the reply step had only a
+page bound — four pages, which is 100 comments through one provider and 204
+through another, a difference nobody chose.
+
+Reading is a **loop across the pipeline**, because the decision needs verdicts
+that do not exist until a batch has been classified. `replies` buys fifty,
+`filter` and `classify` judge them, `classify` hands the thread back, `replies`
+decides whether to buy more. The rule lives in `replies.ts` alone: `classify`
+says only that these threads have been judged. Five columns carry the walk
+between jobs, since it now outlives one, and `replies_judged_to` is the seam —
+the judgement covers the range it and `replies_batch_start` bound, which is the
+batch bought last time and scored since.
+
+**The first version judged the batch it had just bought**, which nothing had
+scored yet. It counted zero every time, so every thread would have died after
+three batches however good it was. A live run found it; the suite could not,
+because every case drove one batch per job and two batches never met.
+
+**Leads sit deeper in a thread than the platform's own ranking suggests, and
+that is measured.** On one TikTok thread of 1,713 comments, positions 0-49
+matched at **10.2%** and positions 400-449 at **30.6%** — three times the rate,
+p = 0.011. A platform ranks a comment for engagement and this product wants
+intent, and a question collects no likes, so questions sink. The first draft of
+US-048 assumed the opposite and was corrected before it was built. Only YouTube
+offers an ordering that would sidestep this (`order=newest`, asked for since
+US-034); TikTok, X and SocialCrawl Reddit have no sort at all, and
+ScrapeCreators' Reddit `sort` is understood and broken — it returns zero
+comments and bills for them.
+
+**One live run, and it stopped on the budget.** `live:thread-loop` drove four
+batches over a 642-comment thread, read to position 238, found six matches and
+stopped at $0.6032 of a $0.60 cap. It also found that a budget refusal recorded
+no reason at all, so a short thread read as a judgement about the conversation
+when it was a judgement about the month.
+
+Two facts belong beside any reading of a stopped thread. **A batch is not
+fifty**: the walk buys whole pages until it holds fifty and overshoots, so the
+batches in that run were 50, 93 and 95 comments — which makes an empty batch
+stronger evidence than fifty would. And **the classifier is not deterministic**,
+so the threshold is a sampling decision: the same fifty comments produced one
+match on one run and two on the next. A thread near the boundary can be kept on
+one poll and dropped on the next.
+
 **A cheap model now reads everything before the good one does.** US-030 built
 the triage stage on 2026-09-06. It is the pre-filter's third stage, it asks one
 question — could this author be a person to reach? — and it answers in one word
@@ -865,6 +910,8 @@ pnpm --filter @intentwatch/core live:provider-switch # spends ~$0.08; see below
 pnpm --filter @intentwatch/core live:linkedin-poll   # spends ~$0.08 + model; see below
 pnpm --filter @intentwatch/core live:tiktok-poll     # spends ~$0.20 + model; see below
 pnpm --filter @intentwatch/core live:tiktok-comments # spends model only; see below
+pnpm --filter @intentwatch/core live:thread-loop      # spends up to a cap you pass; see below
+pnpm --filter @intentwatch/core measure:lead-position # spends ~$0.40; see below
 pnpm capture:deletions                            # spends ~$0.02; see below
 
 node packages/core/src/sources/providers/socialcrawl/linkedin-fixtures/capture.mjs   # ~30 credits
@@ -947,6 +994,21 @@ $0.198 on 2026-09-06. It skips any comment the monitor has already paid to
 read, so a second run with a larger sample buys no answer twice. Use it rather
 than a second poll whenever the question is about the classifier and not about
 the connector.
+
+`live:thread-loop` reads one deep thread through the **real loop** rather than
+one batch at a time. It sends a single job and everything after it is
+`classify` handing the thread back to `replies`, which is the only way to see
+the loop turn: every test drives one batch per job and two batches never meet.
+Pass the cap in dollars — the budget is what ends it on a thread that keeps
+producing leads, and that is itself a stop reason worth seeing. It leaves a
+paused monitor of its own, so it never skips comments an older monitor has
+already classified.
+
+`measure:lead-position` answers whether this product's leads sit where the
+platform ranks highest. It pages a thread cheaply and classifies only the
+positions asked for, because fetching is a credit for fifty comments and a
+classification is 2,975 micro-dollars. `--report-only` re-reads a run that the
+budget stopped, buying nothing.
 
 `capture:deletions` checks known available, removed and missing Reddit URLs.
 It retains whole provider responses with author identity scrubbed. The default

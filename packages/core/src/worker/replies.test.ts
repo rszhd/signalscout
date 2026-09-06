@@ -10,7 +10,7 @@
 import { and, eq } from "drizzle-orm";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { createDatabase, type Database } from "../db/client.js";
-import { apiUsage, posts } from "../db/schema.js";
+import { apiUsage, budgets, matches, posts } from "../db/schema.js";
 import { createLogger } from "../logger.js";
 import type { CandidateReply } from "../sources/types.js";
 import { createTestDatabase, type TestDatabase } from "../testing/database.js";
@@ -773,56 +773,65 @@ describe("reading a thread in batches", () => {
     }
   }, 60_000);
 
-  it("closes a thread after two batches in a row with no lead", async () => {
+  it("closes a thread on a batch that held no lead, without buying another", async () => {
     const harness = await deepHarness("empty");
 
     try {
       const monitorId = await insertMonitor(harness.database, { includeReplies: true });
       const postId = await insertThread(harness.db, "t3_batch_empty");
 
-      // Batch one.
+      // Batch one, which is bought and never judged: nothing has scored it.
       await harness.run(monitorId, [postId]);
       await until("batch one", () => harness.seen[0]);
 
-      // Batch two. Nothing matched batch one, because nothing classifies here.
-      await harness.run(monitorId, [postId]);
-      await until("batch two", () => harness.seen[1]);
-
-      const [afterTwo] = await harness.db
-        .select({ empty: posts.repliesEmptyBatches, stopped: posts.repliesStopped })
-        .from(posts)
-        .where(eq(posts.id, postId));
-
-      expect(afterTwo?.empty).toBe(1);
-      expect(afterTwo?.stopped).toBeNull();
-
-      // Batch three: the second empty one, which closes the thread.
-      await harness.run(monitorId, [postId]);
-      await until("batch three", () => harness.seen[2]);
-
-      const [afterThree] = await harness.db
-        .select({ empty: posts.repliesEmptyBatches, stopped: posts.repliesStopped })
-        .from(posts)
-        .where(eq(posts.id, postId));
-
-      expect(afterThree?.empty).toBe(maxEmptyBatches);
-      expect(afterThree?.stopped).toBe("threshold");
-
-      // And a fourth job buys nothing at all.
-      const before = await harness.db
+      const bought = await harness.db
         .select({ id: posts.id })
         .from(posts)
         .where(and(eq(posts.kind, "reply"), eq(posts.parentPostId, postId)));
 
+      expect(bought.length).toBe(replyBatchSize);
+
+      /**
+       * The second job judges batch one and closes the thread, buying nothing.
+       *
+       * The judgement happens before the purchase, so a thread nobody is
+       * talking in costs one batch to rule out — about $0.16 — rather than
+       * two. That is what `maxEmptyBatches` of one buys.
+       */
       await harness.run(monitorId, [postId]);
-      await new Promise((resolve) => setTimeout(resolve, 700));
+      await until("the thread to close", async () => {
+        const [row] = await harness.db
+          .select({ stopped: posts.repliesStopped })
+          .from(posts)
+          .where(eq(posts.id, postId));
+        return row?.stopped ?? undefined;
+      });
+
+      const [closed] = await harness.db
+        .select({ empty: posts.repliesEmptyBatches, stopped: posts.repliesStopped })
+        .from(posts)
+        .where(eq(posts.id, postId));
+
+      expect(closed?.empty).toBe(maxEmptyBatches);
+      expect(closed?.stopped).toBe("threshold");
 
       const after = await harness.db
         .select({ id: posts.id })
         .from(posts)
         .where(and(eq(posts.kind, "reply"), eq(posts.parentPostId, postId)));
 
-      expect(after.length).toBe(before.length);
+      expect(after.length).toBe(bought.length);
+
+      // And a further job buys nothing at all.
+      await harness.run(monitorId, [postId]);
+      await new Promise((resolve) => setTimeout(resolve, 700));
+
+      const later = await harness.db
+        .select({ id: posts.id })
+        .from(posts)
+        .where(and(eq(posts.kind, "reply"), eq(posts.parentPostId, postId)));
+
+      expect(later.length).toBe(bought.length);
     } finally {
       await harness.stop();
     }
@@ -846,6 +855,26 @@ describe("reading a thread in batches", () => {
 
       await harness.run(monitorId, [postId]);
       await until("batch one", () => harness.seen[0]);
+
+      // A lead in batch one, so the threshold lets the walk continue and this
+      // case is about the window rather than about the rule above it.
+      const [first] = await harness.db
+        .select({ id: posts.id })
+        .from(posts)
+        .where(and(eq(posts.parentPostId, postId), eq(posts.threadPosition, 0)));
+
+      await harness.db.insert(matches).values({
+        monitorId,
+        postId: first?.id as string,
+        score: 80,
+        relevance: 80,
+        problemFit: 80,
+        icpFit: 80,
+        intent: 80,
+        urgency: 50,
+        intentType: "problem",
+        reasons: ["A person describing the problem."],
+      });
 
       await harness.run(monitorId, [postId]);
       await until("batch two", () => harness.seen[1]);
@@ -913,6 +942,151 @@ describe("reading a thread in batches", () => {
     }
   }, 90_000);
 
+  /**
+   * The bug a live run found and this file did not.
+   *
+   * The judgement asks "did the batch we bought last time hold a lead", and
+   * the first version asked it of the batch it had *just* bought — which
+   * nothing had classified yet. It counted zero every time, so every thread
+   * died after three batches however good it was.
+   *
+   * No case here could see it, because each drove one batch and asserted the
+   * row. The fault only appears when a batch is judged while a **later** batch
+   * exists, so this case puts a match in batch one and then reads two more.
+   */
+  it("judges the batch that was classified, not the one it has just bought", async () => {
+    const harness = await deepHarness("judging");
+
+    try {
+      const monitorId = await insertMonitor(harness.database, { includeReplies: true });
+      const postId = await insertThread(harness.db, "t3_batch_judging");
+
+      await harness.run(monitorId, [postId]);
+      await until("batch one", () => harness.seen[0]);
+
+      // A lead in batch one, which is what the next pass must find.
+      const [first] = await harness.db
+        .select({ id: posts.id })
+        .from(posts)
+        .where(and(eq(posts.parentPostId, postId), eq(posts.threadPosition, 0)));
+
+      await harness.db.insert(matches).values({
+        monitorId,
+        postId: first?.id as string,
+        score: 80,
+        relevance: 80,
+        problemFit: 80,
+        icpFit: 80,
+        intent: 80,
+        urgency: 50,
+        intentType: "problem",
+        reasons: ["A person describing the problem."],
+      });
+
+      await harness.run(monitorId, [postId]);
+      await until("batch two", () => harness.seen[1]);
+
+      const [afterTwo] = await harness.db
+        .select({ empty: posts.repliesEmptyBatches, judged: posts.repliesJudgedTo })
+        .from(posts)
+        .where(eq(posts.id, postId));
+
+      // Batch one held a lead, so the counter is zero and the mark has moved.
+      expect(afterTwo?.empty).toBe(0);
+      expect(afterTwo?.judged).toBe(replyBatchSize);
+
+      // Batch two held none, so the next pass closes the thread. What this
+      // case is really asserting is the pass before it: batch one's match was
+      // found, which is the seam the first version of the rule got wrong.
+      await harness.run(monitorId, [postId]);
+      await until("the thread to close", async () => {
+        const [row] = await harness.db
+          .select({ stopped: posts.repliesStopped })
+          .from(posts)
+          .where(eq(posts.id, postId));
+        return row?.stopped ?? undefined;
+      });
+
+      const [afterThree] = await harness.db
+        .select({ empty: posts.repliesEmptyBatches, stopped: posts.repliesStopped })
+        .from(posts)
+        .where(eq(posts.id, postId));
+
+      expect(afterThree?.empty).toBe(maxEmptyBatches);
+      expect(afterThree?.stopped).toBe("threshold");
+    } finally {
+      await harness.stop();
+    }
+  }, 90_000);
+
+  /**
+   * Why a thread stopped growing, when the answer is money.
+   *
+   * Found by the first live run of the loop: the guard refused a batch and
+   * returned, so nothing recorded the reason. A short thread then reads as a
+   * judgement about the conversation when it was a judgement about the month,
+   * which is the confusion the inbox sentence exists to prevent.
+   */
+  it("records a budget refusal on the threads it was reading", async () => {
+    const harness = await deepHarness("budget");
+
+    try {
+      const monitorId = await insertMonitor(harness.database, { includeReplies: true });
+      const postId = await insertThread(harness.db, "t3_batch_budget");
+      const untouched = await insertThread(harness.db, "t3_batch_budget_untouched");
+
+      // One batch in, then the money runs out.
+      await harness.run(monitorId, [postId]);
+      await until("batch one", () => harness.seen[0]);
+
+      /**
+       * A cap and enough recorded spend to pass it.
+       *
+       * The spend is written rather than incurred: the fake connector bills
+       * nothing, so a cap alone would never be reached and the case would pass
+       * for the wrong reason.
+       */
+      await harness.db
+        .insert(budgets)
+        .values({ monitorId, monthlyCapMicros: 1_000, onExhausted: "pause" });
+
+      await harness.db.insert(apiUsage).values({
+        monitorId,
+        source: "reddit",
+        provider: "scrapecreators",
+        day: new Date().toISOString().slice(0, 10),
+        units: 1,
+        estimatedCostMicros: 5_000,
+      });
+
+      await harness.run(monitorId, [postId, untouched]);
+      await until("the budget to be recorded", async () => {
+        const [row] = await harness.db
+          .select({ stopped: posts.repliesStopped })
+          .from(posts)
+          .where(eq(posts.id, postId));
+        return row?.stopped ?? undefined;
+      });
+
+      const [read] = await harness.db
+        .select({ stopped: posts.repliesStopped })
+        .from(posts)
+        .where(eq(posts.id, postId));
+
+      expect(read?.stopped).toBe("budget");
+
+      // A thread this job never opened has nothing to explain.
+      const [other] = await harness.db
+        .select({ stopped: posts.repliesStopped })
+        .from(posts)
+        .where(eq(posts.id, untouched));
+
+      expect(other?.stopped).toBeNull();
+    } finally {
+      await harness.stop();
+    }
+  }, 90_000);
+
   it("stops at the ceiling, however well the thread is doing", async () => {
     const harness = await deepHarness("ceiling");
 
@@ -921,6 +1095,9 @@ describe("reading a thread in batches", () => {
       // Start one batch below the ceiling, so the next batch reaches it.
       const postId = await insertThread(harness.db, "t3_batch_ceiling", {
         repliesBatchStart: maxCommentsPerThread - replyBatchSize,
+        // Already judged up to here, so the threshold has nothing to say and
+        // the ceiling is the only rule this case tests.
+        repliesJudgedTo: maxCommentsPerThread - replyBatchSize,
       });
 
       await harness.run(monitorId, [postId]);

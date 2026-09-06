@@ -33,6 +33,7 @@
     "live:youtube-poll": "tsx --env-file-if-exists=../../.env src/sources/live-youtube-poll.ts",
     "live:tiktok-poll": "tsx --env-file-if-exists=../../.env src/sources/live-tiktok-poll.ts",
     "live:tiktok-comments": "tsx --env-file-if-exists=../../.env src/sources/live-tiktok-comments.ts",
+    "live:thread-loop": "tsx --env-file-if-exists=../../.env src/sources/live-thread-loop.ts",
     "measure:lead-position": "tsx --env-file-if-exists=../../.env src/sources/measure-lead-position.ts"
   },
   "dependencies": {

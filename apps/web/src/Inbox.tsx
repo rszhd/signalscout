@@ -187,8 +187,8 @@ const platformLabels: Record<
  * How much of a thread was read, in a sentence, or nothing.
  *
  * US-048. A comment reaches the inbox as a sample of a conversation: threads
- * are read fifty comments at a time and abandoned when two batches in a row
- * hold no lead. How big that sample was, against how big the thread is,
+ * are read fifty comments at a time and abandoned when a batch holds no
+ * lead. How big that sample was, against how big the thread is,
  * changes what it means — and a person cannot guess any of it.
  *
  * The reason for stopping is the half nobody could infer. "We read 100 of
@@ -222,7 +222,7 @@ function threadDepth(match: Match): string | undefined {
 
   switch (match.parentRepliesStopped) {
     case "threshold":
-      return `${counted}. Stopped: two batches in a row held no lead.`;
+      return `${counted}. Stopped: the last batch held no lead.`;
     case "ceiling":
       return `${counted}. Stopped: this is as deep as one thread is read.`;
     case "budget":

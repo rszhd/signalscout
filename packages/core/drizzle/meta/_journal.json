@@ -239,6 +239,13 @@
       "when": 1788686520285,
       "tag": "0033_a_thread_is_read_in_batches",
       "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1788690091092,
+      "tag": "0034_a_thread_remembers_what_it_judged",
+      "breakpoints": true
     }
   ]
 }

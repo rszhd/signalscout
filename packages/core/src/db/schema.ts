@@ -595,6 +595,21 @@ export const posts = pgTable(
      * the case a monitor exists to catch.
      */
     repliesStoppedAtCount: integer("replies_stopped_at_count"),
+    /**
+     * The position up to which the threshold has already judged this thread.
+     *
+     * Reading and judging happen in different jobs, and this is the seam. A
+     * batch is bought, and only after the classifier has finished can anyone
+     * say whether it held a lead — so the judgement is made at the start of
+     * the *next* job, over the range this mark and `repliesBatchStart` bound.
+     *
+     * Without it there is no way to name the batch being judged. The first
+     * version of US-048 counted matches from `repliesBatchStart` after
+     * reading, which is the batch that had just been bought and not yet
+     * scored: it always counted zero, so every thread died after three batches
+     * however good it was.
+     */
+    repliesJudgedTo: integer("replies_judged_to").notNull().default(0),
   },
   (table) => [
     unique("posts_source_external_id_unique").on(table.source, table.externalId),

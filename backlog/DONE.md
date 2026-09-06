@@ -2,7 +2,7 @@
 
 # Done
 
-37 finished.
+38 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
@@ -13,6 +13,7 @@
 | BUG-003 | [A post below the threshold is classified again on every poll](done/2026-09/BUG-003-a-post-below-the-threshold-is-classified-again-on-every-poll.md) | bug | fixed | 2026-09 |
 | BUG-002 | [A seven-day window is bought as a month](done/2026-09/BUG-002-a-seven-day-window-is-bought-as-a-month.md) | bug | fixed | 2026-09 |
 | BUG-001 | [A pending Reddit collection is not resumed](done/2026-09/BUG-001-a-pending-reddit-collection-is-not-resumed.md) | bug | shipped | 2026-09 |
+| US-048 | [A deep thread is read in batches and stopped early](done/2026-09/US-048-a-deep-thread-is-read-in-batches-and-stopped-early.md) | feature | shipped | 2026-09 |
 | US-047 | [Every comment link is opened once](done/2026-09/US-047-every-comment-link-is-opened-once.md) | chore | shipped | 2026-09 |
 | US-044 | [TikTok is the fifth platform](done/2026-09/US-044-tiktok-is-the-fifth-platform.md) | feature | shipped | 2026-09 |
 | US-034 | [YouTube is the fourth platform](done/2026-09/US-034-youtube-is-the-fourth-platform.md) | feature | shipped | 2026-09 |

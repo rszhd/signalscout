@@ -31,7 +31,7 @@
  * harmful there. Triage still runs, and on a reply it is the only paid stage in
  * front of the classifier.
  */
-import { and, eq, gte, inArray, sql } from "drizzle-orm";
+import { and, eq, gte, inArray, isNotNull, isNull, lt, sql } from "drizzle-orm";
 import { enforceBudget, recordSourceUsage } from "../budget/budget.js";
 import { matches, monitors, type Provider, posts, type Source } from "../db/schema.js";
 import { readProviderChoices } from "../sources/choices.js";
@@ -93,18 +93,32 @@ export const replyBatchSize = 50;
 /**
  * Consecutive batches with no match before a thread is abandoned.
  *
- * Two, and at a batch of 50 this is load-bearing rather than cautious. The
- * chance a batch of 50 holds no match, by the thread's true lead rate:
+ * **One.** The owner chose it on 2026-09-06, after seeing the case for two,
+ * and the first live run of the loop supports them for a reason the
+ * arithmetic on paper had missed.
  *
- *     rate 30%  ->  0.000%      rate 5%  ->   7.7%
- *     rate 10%  ->  0.515%      rate 2%  ->  36.4%
+ * That arithmetic assumed a batch is exactly `replyBatchSize`. It is not: the
+ * walk buys whole pages until it holds fifty, so it overshoots. The live run
+ * read positions 50 to 133 in one batch — eighty-four comments, not fifty. An
+ * empty batch is therefore stronger evidence than the table below suggests.
  *
- * With a single empty batch ending the read, a thread with a 5% lead rate
- * would be abandoned about one time in three over a long walk. Requiring two
- * in a row takes that to one in ten, and at the 10% rate US-048 measured in a
- * thread's *weakest* band, to one in two thousand.
+ * The chance a batch holds no match, by the thread's true lead rate:
+ *
+ *     rate      50 comments   84 comments
+ *     10%           0.5%          0.02%
+ *      5%           7.7%           1.4%
+ *      2%          36.4%          18.2%
+ *
+ * So on a thread worth reading this rule almost never fires, and on a thread
+ * running at 2% it fires often — which is the intent. What it costs is the
+ * middle: a 5% thread is now abandoned about one batch in seventy rather than
+ * one in seven hundred. That is the trade the owner made, and it buys a
+ * decision after a single batch — about $0.16 — instead of two.
+ *
+ * A thread abandoned this way is not abandoned for good: `repliesStoppedAtCount`
+ * reopens it when the platform says more has been said.
  */
-export const maxEmptyBatches = 2;
+export const maxEmptyBatches = 1;
 
 /**
  * The most comments one thread may ever buy, across every batch.
@@ -159,6 +173,7 @@ interface Thread {
   readonly repliesEmptyBatches: number;
   readonly repliesStopped: string | null;
   readonly repliesStoppedAtCount: number | null;
+  readonly repliesJudgedTo: number;
 }
 
 export function createRepliesStep({
@@ -195,6 +210,33 @@ export function createRepliesStep({
     const budget = await enforceBudget(db, monitorId);
 
     if (budget.exhausted) {
+      /**
+       * Say so on the threads that were mid-walk, then stop.
+       *
+       * Found by the first live run of the loop: the guard refused a batch and
+       * returned, so no thread recorded *why* it had stopped growing. The
+       * inbox's "the monitor reached its budget" could never appear, and a
+       * short thread read as a judgement about the conversation when it was a
+       * judgement about the month — the exact confusion that sentence exists
+       * to prevent.
+       *
+       * Only threads already being read are marked. A thread this job never
+       * opened has nothing to explain. And `budget` is the one stop reason
+       * `replies` treats as temporary: the check above lets a thread stopped
+       * this way resume, because the money runs out, not the conversation.
+       */
+      await db
+        .update(posts)
+        .set({ repliesStopped: "budget" })
+        .where(
+          and(
+            inArray(posts.id, ids),
+            eq(posts.kind, "post"),
+            isNotNull(posts.repliesBatchStart),
+            isNull(posts.repliesStopped),
+          ),
+        );
+
       logger.warn(
         { monitorId, capMicros: budget.capMicros, reason: budget.reason },
         "replies refused: the monitor is at its budget cap",
@@ -216,6 +258,7 @@ export function createRepliesStep({
         repliesEmptyBatches: posts.repliesEmptyBatches,
         repliesStopped: posts.repliesStopped,
         repliesStoppedAtCount: posts.repliesStoppedAtCount,
+        repliesJudgedTo: posts.repliesJudgedTo,
       })
       .from(posts)
       // `kind = 'post'` is what stops this looping. A reply has no thread of
@@ -341,15 +384,71 @@ export function createRepliesStep({
        * for fifty comments and then produces a lead has its counter reset
        * rather than carrying a grudge.
        */
-      if (!grewSinceStopping && post.repliesEmptyBatches >= maxEmptyBatches) {
-        await db.update(posts).set({ repliesStopped: "threshold" }).where(eq(posts.id, post.id));
+      /**
+       * Judge the batch that has been classified, **before** buying another.
+       *
+       * This is the seam between two jobs, and getting it wrong is invisible.
+       * `replies` buys a batch and can say nothing about it: the verdicts
+       * arrive later, from the classifier. So the judgement is made here, at
+       * the start of the next pass, over the range `repliesJudgedTo` and
+       * `repliesBatchStart` bound — the comments bought last time and scored
+       * since.
+       *
+       * The first version of this counted matches **after** reading, from the
+       * batch it had just bought, which nothing had scored yet. It counted
+       * zero every time, so every thread would have died after three batches
+       * however good it was. A live run found it before the suite did, because
+       * the suite drove one batch per job and never let two batches meet.
+       */
+      const judgedTo = grewSinceStopping ? 0 : post.repliesJudgedTo;
+      const readTo = grewSinceStopping ? 0 : (post.repliesBatchStart ?? 0);
+      let emptyBatches = grewSinceStopping ? 0 : post.repliesEmptyBatches;
 
-        logger.info(
-          { monitorId, postId: post.id, emptyBatches: post.repliesEmptyBatches },
-          "thread closed: two batches in a row held no lead",
+      if (readTo > judgedTo) {
+        const [judged] = await db
+          .select({ found: sql<number>`count(*)::int` })
+          .from(matches)
+          .innerJoin(posts, eq(posts.id, matches.postId))
+          .where(
+            and(
+              eq(matches.monitorId, monitorId),
+              eq(posts.parentPostId, post.id),
+              gte(posts.threadPosition, judgedTo),
+              lt(posts.threadPosition, readTo),
+            ),
+          );
+
+        const found = judged?.found ?? 0;
+
+        // Consecutive, so a thread that goes quiet and then produces a lead
+        // has its counter reset rather than carrying a grudge. At
+        // `maxEmptyBatches` of one that reset never gets the chance to matter,
+        // and it is kept because the number is a setting rather than a law.
+        emptyBatches = found > 0 ? 0 : emptyBatches + 1;
+
+        logger.debug(
+          { monitorId, postId: post.id, from: judgedTo, to: readTo, found, emptyBatches },
+          "batch judged",
         );
-        skipped += 1;
-        continue;
+
+        if (emptyBatches >= maxEmptyBatches) {
+          await db
+            .update(posts)
+            .set({
+              repliesStopped: "threshold",
+              repliesEmptyBatches: emptyBatches,
+              repliesJudgedTo: readTo,
+              repliesStoppedAtCount: post.replyCount ?? null,
+            })
+            .where(eq(posts.id, post.id));
+
+          logger.info(
+            { monitorId, postId: post.id, emptyBatches },
+            "thread closed: a batch held no lead",
+          );
+          skipped += 1;
+          continue;
+        }
       }
 
       /**
@@ -552,32 +651,6 @@ export function createRepliesStep({
       const stoppedEarly = pages >= maxPagesPerThread && partial;
 
       /**
-       * Whether the last batch found anybody, and what that decides.
-       *
-       * Counted from `matches` over this thread's replies at or after the
-       * batch's own start, because that is the question the threshold asks:
-       * did *this* fifty hold a lead. A count over the whole thread would let
-       * one good comment at position 3 keep a dead thread alive for ever.
-       *
-       * The first batch of a thread is not judged here — it has not been
-       * classified yet when this runs. It is judged on the next pass, which is
-       * what makes this a loop rather than a decision made too early.
-       */
-      const [yielded] = await db
-        .select({ found: sql<number>`count(*)::int` })
-        .from(matches)
-        .innerJoin(posts, eq(posts.id, matches.postId))
-        .where(
-          and(
-            eq(matches.monitorId, monitorId),
-            eq(posts.parentPostId, post.id),
-            gte(posts.threadPosition, batchStart),
-          ),
-        );
-
-      const foundInBatch = yielded?.found ?? 0;
-
-      /**
        * The end of the thread, said by the connector rather than by us.
        *
        * `partial === false` is positive evidence that there is no more, which
@@ -587,15 +660,7 @@ export function createRepliesStep({
       const reachedTheEnd = !partial;
       const reachedTheCeiling = positionOffset >= maxCommentsPerThread;
 
-      const emptyBatches = firstBatch ? 0 : foundInBatch > 0 ? 0 : post.repliesEmptyBatches + 1;
-
-      const stopped = reachedTheEnd
-        ? "end"
-        : reachedTheCeiling
-          ? "ceiling"
-          : emptyBatches >= maxEmptyBatches
-            ? "threshold"
-            : null;
+      const stopped = reachedTheEnd ? "end" : reachedTheCeiling ? "ceiling" : null;
 
       await db
         .update(posts)
@@ -607,6 +672,7 @@ export function createRepliesStep({
           ...(firstBatch ? { repliesReadAt: readAt } : {}),
           repliesCursor: cursor ?? null,
           repliesBatchStart: positionOffset,
+          repliesJudgedTo: readTo,
           repliesEmptyBatches: emptyBatches,
           repliesStopped: stopped,
           // The count reading stopped at, so growth can re-open the thread.
@@ -620,7 +686,6 @@ export function createRepliesStep({
           postId: post.id,
           batchStart,
           readTo: positionOffset,
-          foundInBatch,
           emptyBatches,
           stopped,
         },

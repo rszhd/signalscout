@@ -221,10 +221,20 @@ scored correctly with English reasons — the first non-English classification
 this product has made. And below about 60 the matches become "where do you buy
 it", which is purchase intent for somebody else's product.
 
-Still unproven for this connector: a rate limit, an outage, and a second poll
+**A TikTok comment does have a link, and it is `?cid=`** — the decimal comment
+id in URL-safe base64 with the padding stripped, which is the format TikTok
+puts in its own comment notification. The connector shipped `?comment_id=`
+first, which it invented; the owner opened one and got the video. Then a link
+built this way from a comment the pipeline had collected was opened and it
+landed on the comment. **A URL format we invent is evidence about our own
+string building and none about the platform** — the same rule that already
+governs fixtures, and `?comment_id=` survived a capture, two live polls and a
+code comment admitting it was a guess because nobody clicked it.
+
+Still unproven for this connector: a rate limit, an outage, a second poll
 proving deduplication of *comments* — the second video poll proved it for
-videos, storing 14 new against 44 already held. The `?comment_id=` deep link
-remains unverified: nobody has opened one and landed on the comment.
+videos, storing 14 new against 44 already held — and `?cid=` in a logged-out
+browser, which nobody has tried.
 
 **LinkedIn is the third platform, and PLAN.md said not to add one yet.**
 US-028 closed on 2026-09-05. The rule at PLAN.md's *Important rule* is that no

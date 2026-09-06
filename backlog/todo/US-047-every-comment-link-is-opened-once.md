@@ -1,0 +1,111 @@
+---
+id: US-047
+title: Every comment link is opened once
+type: chore
+priority: p2
+created: 2026-09-06T15:32+08:00
+parent: US-020
+area:
+resolution:
+---
+
+## Context
+
+**This ticket exists because a link nobody clicks is not a link.** On
+2026-09-06 the TikTok connector shipped `?comment_id=`, a parameter it invented
+on the argument that it could only help. It survived a fixture capture, two
+live polls and a code comment that openly said it was unverified. The owner
+pressed it and got the video with the comment section closed. The real format
+turned out to be `?cid=`, which TikTok puts in its own comment notification,
+and it was confirmed by building one from a comment the pipeline had collected
+and opening it.
+
+Three platforms are now confirmed by a person pressing the button, including
+the one built exactly the way the broken one was. One is left.
+
+| Platform | Where the link comes from | Opened? |
+|---|---|---|
+| Reddit | the provider returns it | yes, 2026-09-06 |
+| TikTok | we build `?cid=`, TikTok's own format | yes, 2026-09-06 |
+| YouTube | we build `&lc=`, YouTube's own format | yes, 2026-09-06 |
+| X | the provider returns it, a `status` URL | **no** |
+
+**YouTube is confirmed and it was the one at risk**, because it is the same
+shape as the mistake: a parameter this repository appends to a watch URL. It
+works, and it gives the clearest evidence of the four — YouTube renders the
+comment highlighted, so the link is not merely accepted, it is understood.
+
+That leaves one, and it needs a live fetch rather than a click on something
+already stored. **No X reply has ever been stored.** US-006's poll collected
+posts, and `fetchReplies` for X was added later by US-020 and has not run
+against a real thread.
+
+**X is the one least likely to be wrong and still worth one press.** The
+provider returns a URL for every reply and it is an ordinary `status` link,
+which is X's permalink for any post. Nothing is invented. A press costs
+nothing and turns "should be fine" into "checked".
+
+**There is nothing to build unless a link is broken.** This is a verification
+ticket. If both open the comment, the outcome is four ticked rows and a
+sentence in AGENTS.md; if one does not, the fix follows the TikTok pattern —
+find the platform's own format, build from a comment this product collected,
+open it, and only then write it down.
+
+**The screen is already honest about the failure case.** `platformLabels` in
+`Inbox.tsx` carries `commentLink: "comment" | "thread"` per platform. A
+platform whose link cannot reach the comment says so above the button, names
+the author to look for, and the button reads "Open the post". So a broken link
+found here is a one-line change plus the truth on the screen, not a redesign.
+
+## Acceptance
+
+- [x] A YouTube comment link is opened by a person and the Log says whether it
+      landed on the comment. Use a stored one rather than a hand-made URL, so
+      what is tested is what the pipeline produces
+- [ ] An X reply link is opened by a person, same rule. This one needs a live
+      `fetchReplies` first, because no X reply has ever been stored — about one
+      credit, $0.008
+- [ ] Any link that does not reach its comment is either replaced with the
+      platform's own format — read off the platform, not remembered — or the
+      platform is marked `commentLink: "thread"` so the screen stops promising
+      it
+- [ ] A replacement format is pinned in the connector's tests against a string
+      the platform itself produced, written out as a literal. `tiktok.test.ts`
+      is the pattern: a test that encodes and decodes with the same function
+      proves our arithmetic and nothing about the platform
+- [ ] Stored rows are backfilled if a format changes, and the backfilled URL is
+      compared against the one that was opened
+- [ ] AGENTS.md records, per platform, where the comment link comes from and
+      whether anyone has opened one
+- [ ] The Log says whether each link was opened signed in or signed out.
+      TikTok's `?cid=` is confirmed signed in only, and a link that needs a
+      session is a different promise from one that does not
+
+## Notes
+
+- LinkedIn is absent from the table because its replies are not built. US-020
+  holds that box.
+- One link per platform is enough. This is not a sample of behaviour, it is a
+  check that a format is real.
+- YouTube had 7 stored comments and one of them settled it. X has none: the
+  reply path there is built and tested against captured fixtures, but it has
+  never run live, so this box carries a second claim with it — the first live
+  proof of X replies.
+- Do not let this grow into a link checker that runs on a schedule. A format is
+  stable or it is not, and a job that opens strangers' comment pages on a timer
+  is a different thing with a different cost.
+
+## Log
+
+- 2026-09-06T15:32+08:00 — Written after the TikTok comment link was found
+  broken and then fixed on the same day. The owner asked for the other
+  platforms to be checked later, and named Reddit and TikTok as the two that
+  work so far.
+
+- 2026-09-06T15:38+08:00 — YouTube confirmed. A stored comment link opened and
+  YouTube rendered the comment **highlighted**, which is stronger than the
+  other two: the platform is not merely tolerating the parameter, it is acting
+  on it. `&lc=` is ours to build and it is correct.
+
+  Three of four are now confirmed by a person pressing the button. X is left,
+  and it is the only one that cannot be checked from stored data.

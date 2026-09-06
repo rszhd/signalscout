@@ -324,3 +324,51 @@ they parse.
   All seven came from **two videos**. Sixty comments and two threads is not a
   distribution, and the concentration is itself a result: the value is in
   finding the right video, not in reading more comments under the wrong one.
+- 2026-09-06T15:10+08:00 — **The `?comment_id=` deep link does not work.** The
+  owner opened one: TikTok ignores the parameter and the video opens with the
+  comment section closed.
+
+  The argument for adding it was that it could only help — honoured, the reader
+  lands on the comment; ignored, the link is still the video. That missed a
+  direction. A URL carrying a comment id reads as a deep link, so a person
+  presses it expecting the comment and gets the video with no warning.
+
+- 2026-09-06T15:20+08:00 — **TikTok does have a comment link, and the owner
+  recognised it.** It is `?cid=`, and it arrives in the notification TikTok
+  sends when somebody comments:
+
+      .../video/7179206402840202522?cid=NzE3OTk1NzM4NDU1MDcyODQ3NA
+
+  `NzE3OTk1NzM4NDU1MDcyODQ3NA` decodes to `7179957384550728474`, the comment's
+  own id. So `cid` is the decimal comment id in URL-safe base64 with the
+  padding stripped, and the provider already returns ids in exactly that form.
+
+  It was verified before it was written, which is the part that matters. A link
+  was built from a comment **this product collected** — the 82-scoring match
+  under `@janehchuu` — and opened. It lands on the comment. A format read off
+  the platform and then opened is a different kind of claim from the one this
+  connector shipped in the morning.
+
+  The 678 stored comments were backfilled, and the backfilled URL matches the
+  one that was opened character for character.
+
+  `tiktok.test.ts` pins the encoding against the notification link itself,
+  written out rather than computed: a test that encoded and decoded with the
+  same function would prove our arithmetic and nothing about TikTok.
+
+  **What is proven is a signed-in browser.** Nobody has opened one logged out,
+  and that is recorded in the connector rather than assumed either way.
+
+  Two things stay from the wrong version. `platformLabels` in the inbox gained
+  the `tiktok` and `youtube` rows it never had, so a TikTok match no longer
+  falls through to the default and shows less context than a Reddit one. And
+  the screen can now say that a platform has no comment link, name the author
+  to look for, and label the button "Open the post" — no shipped platform needs
+  it today, and the next one added inherits the honest default instead of a
+  button that over-promises.
+
+  The rule underneath, which this ticket has now demonstrated in both
+  directions: a URL format we invented is evidence about our own string
+  building and none about the platform. `?comment_id=` survived a capture, two
+  live polls and a code comment admitting it was a guess, because nobody
+  clicked it.

@@ -225,16 +225,31 @@ export class SocialCrawlTikTokSource implements SocialSource {
         toCandidateReply(record, {
           parentPostExternalId: request.postExternalId,
           /**
-           * TikTok leaves `url` null on every comment, so one is built — and
-           * unlike YouTube's `&lc=`, this is not a deep link anybody has
-           * verified. `comment_id` is appended because it can only help: if
-           * TikTok honours it the reader lands on the comment, and if it does
-           * not the link is still the video, which is where the comment is.
+           * **`?cid=` is TikTok's own comment link, and it opens the comment.**
            *
-           * A reply nobody can open is a lead nobody can act on, so the
-           * fallback is the video rather than nothing.
+           * TikTok leaves `url` null on every comment, so one is built. The
+           * format is not ours: it is what TikTok puts in the notification a
+           * person gets when somebody comments, and the owner recognised it
+           * there on 2026-09-06. `commentLink()` holds the encoding.
+           *
+           * It replaces `?comment_id=`, which this connector invented on the
+           * argument that it could only help — honoured, the reader lands on
+           * the comment; ignored, the link is still the video. The owner
+           * opened one and TikTok ignored it, which is the direction that
+           * argument missed: a URL carrying a comment id reads as a deep link,
+           * so a person presses it expecting the comment and gets the video
+           * with no warning.
+           *
+           * The rule that produced both outcomes is the one already written
+           * for fixtures. A URL format we invented is evidence about our own
+           * string building and none about the platform. This one was read off
+           * the platform and then opened, on a comment found by a poll rather
+           * than by a notification.
+           *
+           * What is proven is a signed-in browser. Nobody has opened one
+           * logged out.
            */
-          urlFor: (id) => `${request.postUrl}?comment_id=${id}`,
+          urlFor: (id) => commentLink(request.postUrl, id),
         }),
       )
       .filter((reply): reply is CandidateReply => reply !== undefined);
@@ -286,6 +301,31 @@ export class SocialCrawlTikTokSource implements SocialSource {
  * `content.text` is the caption and it is the only text a video carries. That
  * is why this platform's leads live in the comments rather than in the posts.
  */
+/**
+ * The link to one comment, in TikTok's own format.
+ *
+ *     https://www.tiktok.com/@user/video/7656532107921001759?cid=NzY3OTM5...
+ *
+ * `cid` is the comment's decimal id, base64 in the URL-safe alphabet, with the
+ * padding removed. That is not a guess: it is the shape of the link TikTok
+ * sends in a comment notification, and a link built this way from a comment
+ * this product collected was opened on 2026-09-06 and landed on the comment.
+ *
+ * The id is used exactly as the provider gives it. It is a decimal string of
+ * about nineteen digits, and it is not read as a number anywhere — a
+ * nineteen-digit integer does not survive a double, and the last digits are
+ * the ones that identify the comment.
+ *
+ * A query string already on the video URL is preserved, because a video URL
+ * that arrived with one is still that video.
+ */
+export function commentLink(postUrl: string, commentId: string): string {
+  const cid = Buffer.from(commentId, "utf8").toString("base64url");
+  const separator = postUrl.includes("?") ? "&" : "?";
+
+  return `${postUrl}${separator}cid=${cid}`;
+}
+
 export function toCandidatePost(record: unknown): CandidatePost | undefined {
   const item = objectOf(record);
   const post = objectOf(item?.post) ?? item;

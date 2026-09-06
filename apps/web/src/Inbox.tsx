@@ -115,17 +115,40 @@ export function ageLabel(postedAt: string, now: number = Date.now()): string {
  */
 const platformLabels: Record<
   string,
-  { name: string; mark: string; where: (match: Match) => string | undefined }
+  {
+    name: string;
+    mark: string;
+    where: (match: Match) => string | undefined;
+    /**
+     * Whether this platform's own link opens the comment, or only the thread.
+     *
+     * A per-platform fact rather than a per-match one, and it decides what the
+     * button may promise. Every platform here currently reaches the comment,
+     * and each does it with a format that platform produces itself — YouTube's
+     * `&lc=` from its Share button, TikTok's `?cid=` from its comment
+     * notification.
+     *
+     * The field exists because that was not always true and may not stay true.
+     * TikTok's connector invented `?comment_id=`, which looked like a deep link
+     * and opened the video; for one afternoon this read "thread" and the screen
+     * told a person to scroll. An unknown platform defaults to "thread" for the
+     * same reason: a button that over-promises sends somebody looking for
+     * something that was never there.
+     */
+    commentLink: "comment" | "thread";
+  }
 > = {
   reddit: {
     name: "Reddit",
     mark: "r/",
     where: (match) => (match.channel ? `r/${match.channel}` : undefined),
+    commentLink: "comment",
   },
   x: {
     name: "X",
     mark: "X",
     where: (match) => (match.author ? `@${match.author}` : undefined),
+    commentLink: "comment",
   },
   linkedin: {
     name: "LinkedIn",
@@ -133,11 +156,39 @@ const platformLabels: Record<
     // On LinkedIn the author is the context, as on X. The stored author is the
     // profile slug out of the post URL, which is what identifies the account.
     where: (match) => (match.author ? `@${match.author}` : undefined),
+    commentLink: "comment",
+  },
+  youtube: {
+    name: "YouTube",
+    mark: "▶",
+    where: (match) => (match.channel ? match.channel : undefined),
+    commentLink: "comment",
+  },
+  tiktok: {
+    name: "TikTok",
+    mark: "♪",
+    // The creator, which is what a TikTok URL is keyed by and the only context
+    // a video carries: there is no title and no description, only a caption.
+    where: (match) => (match.author ? `@${match.author}` : undefined),
+    // `?cid=`, which is the link TikTok puts in a comment notification. It read
+    // "thread" for one afternoon on 2026-09-06, while the only known link was
+    // one this product had invented and the owner had found it did nothing.
+    commentLink: "comment",
   },
 };
 
 function platformLabel(source: string) {
-  return platformLabels[source] ?? { name: source, mark: "·", where: () => undefined };
+  return (
+    platformLabels[source] ?? {
+      name: source,
+      mark: "·",
+      where: () => undefined,
+      // An unknown platform promises nothing, which is the safe direction: a
+      // button that over-promises sends a person scrolling for something that
+      // was never there.
+      commentLink: "thread" as const,
+    }
+  );
 }
 
 function whereItCameFrom(match: Match): string {
@@ -637,6 +688,30 @@ export function Inbox() {
                   )}
                 </div>
 
+                {/*
+                  What the link can and cannot do, said before it is pressed.
+
+                  On TikTok the comment has no address. The provider returns
+                  none, the platform publishes none, and the `?comment_id=` we
+                  invented was opened on 2026-09-06 and ignored — the video
+                  opens with the comment section closed. Nothing in this
+                  product can fix that, so the honest thing is to say it here
+                  and hand over the one thing that makes the scrolling shorter:
+                  the handle to look for. The text above is the other half,
+                  which is why it is shown in full rather than summarised.
+                */}
+                {selectedMatch.kind === "reply" &&
+                  platformLabel(selectedMatch.source).commentLink === "thread" && (
+                    <p className="link-caveat">
+                      {platformLabel(selectedMatch.source).name} has no link to a single comment.
+                      This opens the post — open the comments and look for{" "}
+                      <strong>
+                        {selectedMatch.author ? `@${selectedMatch.author}` : "the author"}
+                      </strong>
+                      .
+                    </p>
+                  )}
+
                 <div className="match-actions">
                   <a
                     className="primary-button"
@@ -644,7 +719,10 @@ export function Inbox() {
                     rel="noreferrer noopener"
                     target="_blank"
                   >
-                    Open conversation ↗
+                    {selectedMatch.kind === "reply" &&
+                    platformLabel(selectedMatch.source).commentLink === "thread"
+                      ? "Open the post ↗"
+                      : "Open conversation ↗"}
                   </a>
                   <button
                     aria-pressed={selectedMatch.saved}

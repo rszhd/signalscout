@@ -2304,6 +2304,25 @@ a {
   color: var(--muted);
   font-size: var(--text-label);
 }
+/*
+  What the link cannot do, sitting directly above the link.
+
+  Muted and small, because it is a caveat and not a warning — but above the
+  button rather than below it, so it is read before the press rather than
+  after the scrolling.
+*/
+.link-caveat {
+  margin-top: 26px;
+  margin-bottom: -8px;
+  color: var(--muted);
+  font-size: var(--text-xs);
+  line-height: 1.6;
+}
+.link-caveat strong {
+  color: var(--text-reading-color);
+  font-weight: 600;
+}
+
 .match-actions {
   flex-wrap: wrap;
   margin-top: 26px;

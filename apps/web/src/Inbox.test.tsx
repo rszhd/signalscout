@@ -237,6 +237,69 @@ describe("the intent inbox", () => {
       expect(container.textContent).toContain("We're manually checking our major flows");
       expect(container.textContent).not.toContain("Replying to");
     });
+
+    it("promises the comment on a platform whose link reaches it", async () => {
+      const tikTokReply = match({
+        id: "match-tiktok",
+        kind: "reply",
+        source: "tiktok",
+        author: "janehchuu",
+        title: null,
+        excerpt: "the althea one broke me out 😔 would the yumu one be better?",
+        parentTitle: null,
+        parentExcerpt: "my fav acne prone moisturizers!!",
+        parentUrl: "https://www.tiktok.com/@janehchuu/video/7656532107921001759",
+        url: "https://www.tiktok.com/@janehchuu/video/7656532107921001759?cid=NzY3OTM5NjAwMTYyMzE4MDA2NQ",
+      });
+
+      await show({
+        "/api/matches?": { matches: [tikTokReply], nextCursor: null, asOf: firstPage.asOf },
+      });
+
+      expect(container.textContent).toContain("Open conversation");
+      expect(container.textContent).not.toContain("no link to a single comment");
+    });
+
+    /**
+     * The caveat, on a platform this build does not know.
+     *
+     * Every platform shipped today reaches the comment, so this branch has no
+     * live subject — and it is kept tested rather than deleted because the
+     * afternoon it was written was the afternoon TikTok did not. A screen that
+     * silently promises a link it cannot deliver sends a person scrolling for
+     * something that was never there, and the next platform added inherits the
+     * safe default rather than that.
+     */
+    it("says so, and gives the handle to look for, when the link cannot reach the comment", async () => {
+      const unknownReply = match({
+        id: "match-unknown",
+        kind: "reply",
+        source: "threads",
+        author: "someone",
+        title: null,
+        excerpt: "which one did you end up using?",
+        parentTitle: null,
+        parentExcerpt: "my favourite moisturisers",
+        parentUrl: "https://example.test/post/1",
+        url: "https://example.test/post/1",
+      });
+
+      await show({
+        "/api/matches?": { matches: [unknownReply], nextCursor: null, asOf: firstPage.asOf },
+      });
+
+      expect(container.textContent).toContain("no link to a single comment");
+      expect(container.textContent).toContain("@someone");
+      expect(container.textContent).toContain("Open the post");
+      expect(container.textContent).not.toContain("Open conversation");
+    });
+
+    it("keeps the ordinary wording on a post, which has no comment to reach", async () => {
+      await show();
+
+      expect(container.textContent).toContain("Open conversation");
+      expect(container.textContent).not.toContain("no link to a single comment");
+    });
   });
 
   it("does not claim a negative observation is a reason it matched", async () => {

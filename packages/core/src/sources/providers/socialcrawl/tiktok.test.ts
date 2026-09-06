@@ -16,7 +16,12 @@ import { tikTokPlatformId } from "../../platforms.js";
 import { assertSourcesCanBeStored } from "../../storage.js";
 import type { SearchRequest, SourceRuntime } from "../../types.js";
 import { socialCrawlProviderId } from "./provider.js";
-import { SocialCrawlTikTokSource, socialCrawlTikTok, toCandidatePost } from "./tiktok.js";
+import {
+  commentLink,
+  SocialCrawlTikTokSource,
+  socialCrawlTikTok,
+  toCandidatePost,
+} from "./tiktok.js";
 
 interface Captured {
   readonly httpStatus: number;
@@ -227,6 +232,57 @@ describe("reading the comments under a video", () => {
     ).toBe(true);
     expect(result.replies.every((reply) => reply.text.length > 0)).toBe(true);
     expect(result.unitsConsumed).toBe(1);
+  });
+
+  /**
+   * The comment link, against the one example TikTok itself produced.
+   *
+   * This is the anchor of the whole format and it is why the string below is
+   * written out rather than computed. TikTok sent the owner this link in a
+   * comment notification on 2026-09-06:
+   *
+   *     .../video/7179206402840202522?cid=NzE3OTk1NzM4NDU1MDcyODQ3NA
+   *
+   * and `NzE3OTk1NzM4NDU1MDcyODQ3NA` decodes to `7179957384550728474`, the
+   * comment's own id. So `cid` is the decimal id in URL-safe base64 with the
+   * padding removed. A test that encoded and decoded with the same function
+   * would prove our arithmetic and nothing about TikTok; this one fails if the
+   * encoding ever stops reproducing the platform's own string.
+   *
+   * The predecessor is the reason for the care. This connector invented
+   * `?comment_id=`, argued it could only help, shipped it through a capture and
+   * two live polls, and the owner opened one and got the video.
+   */
+  it("builds the comment link TikTok itself produced", () => {
+    expect(
+      commentLink(
+        "https://www.tiktok.com/@fendymojo/video/7179206402840202522",
+        "7179957384550728474",
+      ),
+    ).toBe(
+      "https://www.tiktok.com/@fendymojo/video/7179206402840202522?cid=NzE3OTk1NzM4NDU1MDcyODQ3NA",
+    );
+  });
+
+  it("keeps a query string the video URL already had", () => {
+    expect(commentLink("https://www.tiktok.com/@a/video/1?lang=en", "7179957384550728474")).toBe(
+      "https://www.tiktok.com/@a/video/1?lang=en&cid=NzE3OTk1NzM4NDU1MDcyODQ3NA",
+    );
+  });
+
+  it("links every comment to itself, not to the video", async () => {
+    const { fetch: fetchStub } = socialCrawl([comments]);
+    const source = new SocialCrawlTikTokSource(runtimeWith(fetchStub));
+
+    const result = await source.fetchReplies(replyRequest);
+
+    expect(
+      result.replies.every((reply) => reply.url.startsWith(`${replyRequest.postUrl}?cid=`)),
+    ).toBe(true);
+    // The id is carried, so two comments under one video do not share a link.
+    expect(new Set(result.replies.map((reply) => reply.url)).size).toBe(result.replies.length);
+    // The invented parameter is gone and must not come back.
+    expect(result.replies.every((reply) => !reply.url.includes("comment_id"))).toBe(true);
   });
 
   it("drops what was said before the window, testing every row", async () => {

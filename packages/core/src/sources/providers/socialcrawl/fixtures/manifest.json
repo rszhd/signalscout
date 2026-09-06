@@ -24,6 +24,36 @@
       "identitiesReplaced": 0
     },
     {
+      "file": "replies-page-1.json",
+      "request": {
+        "method": "GET",
+        "url": "https://www.socialcrawl.dev/v1/twitter/tweet/replies?url=https%3A%2F%2Fx.com%2Fplutos_eth%2Fstatus%2F2066207953355432118",
+        "note": "replies under a post claiming 71"
+      },
+      "capturedAt": "2026-09-06T03:12:16.795Z",
+      "identitiesReplaced": 70
+    },
+    {
+      "file": "replies-page-2.json",
+      "request": {
+        "method": "GET",
+        "url": "https://www.socialcrawl.dev/v1/twitter/tweet/replies?url=https%3A%2F%2Fx.com%2Fplutos_eth%2Fstatus%2F2066207953355432118&cursor=DAAKCgABHRgJszB__uULAAIAAAFQRW1QQzZ3QUFBZlEvZ0dKTjB2R3AvQUFBQUIwY3JUZytLaHZRSmh5dGQ2eUJHeEdhSEt5dGtIQmFVRHdjclZiZFpSb3dCUnlzcFMrejFtQzJISzFSdDB0WHNZb2NyTTExZkJzQWh4eXRPZk4yMmdFa0hLMVF1eDRhQUprY3JUUFpkQnRCdVJ5dFVnYmlXNEF3SEsxZEVuZWJ3WDhjclZaNy9Wcng2eHlzeWlvdG1zRWVISzBvbGk2YUlGVWNyVlBnSWRxUVZCeXRRWHVmV3RCVEhLMVZTdmFiUU5zY3JWZTZwcHB4VVJ5dGJrY0tHMURtSEsxTUNubGJRYWtjclRQL1o1clJ4aHl0dFpqS0cxRFZISzAwL1p0YThETWN5cmhmU1Zzd2NoeXROT2w2MmtBa0hLMDRzZGRiWUJzY3JWVUpkcHNCRnh5dE1oL0EyN0JjCAADAAAAAgsABAAAAAZCb3R0b20AAA",
+        "note": "the cursor followed, to see whether page two is new content"
+      },
+      "capturedAt": "2026-09-06T03:12:18.687Z",
+      "identitiesReplaced": 0
+    },
+    {
+      "file": "replies-source-search.json",
+      "request": {
+        "method": "GET",
+        "url": "https://www.socialcrawl.dev/v1/twitter/search/tweets?query=flaky+tests&sort=top",
+        "note": "finding a post with replies under it, rather than hard-coding one"
+      },
+      "capturedAt": "2026-09-06T03:12:14.793Z",
+      "identitiesReplaced": 57
+    },
+    {
       "file": "search-from-handle.json",
       "request": {
         "method": "GET",

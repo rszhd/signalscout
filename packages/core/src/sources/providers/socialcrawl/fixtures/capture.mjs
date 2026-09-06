@@ -70,6 +70,15 @@ const api = "https://www.socialcrawl.dev/v1/twitter";
  */
 const endpoints = {
   search: `${api}/search/tweets`,
+  /**
+   * The replies under one post, by URL. US-020's X half.
+   *
+   * One credit and a cursor, the same as a search. The catalogue calls it a
+   * `CommentList`, which is the archetype the YouTube and LinkedIn comment
+   * endpoints share — so this capture is also the evidence for whether one
+   * parser can read all three, or whether the shared name is only a name.
+   */
+  replies: `${api}/tweet/replies`,
 };
 
 /**
@@ -174,6 +183,31 @@ const identityUrlFields = new Set([
 /** Free text a person wrote about themselves. Not parsed, and not ours to keep. */
 const personalTextFields = new Set(["description", "bio", "location", "profile_bio"]);
 
+/**
+ * Free text where somebody wrote another person's handle.
+ *
+ * This is the leak no field rule catches, and it was in this repository for a
+ * day before anybody looked: an X post's own `text` is the field the classifier
+ * reads, so it cannot be replaced wholesale — and people put "@someone" inside
+ * it constantly. The first commit of these fixtures carried real handles of
+ * real developers.
+ *
+ * So the handle is rewritten in place and the sentence around it survives. The
+ * fixture still proves what the parser must prove, which is that it reads this
+ * text and stores it.
+ *
+ * The leading boundary keeps an email address whole: rewriting only the half
+ * after the `@` mangles text without hiding anybody.
+ */
+const textFields = new Set(["text", "full_text", "content"]);
+
+function scrubHandlesInText(value, pseudonym) {
+  return value.replace(
+    /(^|[\s(\[])@([A-Za-z0-9_]{2,15})\b/g,
+    (_, before, handle) => `${before}@${pseudonym(handle)}`,
+  );
+}
+
 const scrubbedText = "Scrubbed by capture.mjs. See docs/testing.md.";
 
 /**
@@ -233,6 +267,10 @@ function createScrubber() {
 
           const url = scrubXUrl(child, pseudonym);
           if (url) return [key, url];
+
+          if (textFields.has(key) && child.includes("@")) {
+            return [key, scrubHandlesInText(child, pseudonym)];
+          }
         }
 
         // A person's fields stay a person's fields one level down: an author
@@ -587,6 +625,70 @@ if (wanted("empty")) {
  * The query is read from the query plan rather than typed here, so this cannot
  * quietly test a nicer query than the one that ships.
  */
+/**
+ * The replies under a real post, and the page after them.
+ *
+ * A post is found first rather than hard-coded: a tweet URL written into this
+ * script would rot, and the run has to work a year from now. The search that
+ * finds it is captured too, so the fixture says where the post came from.
+ *
+ * Two calls, and the second is the one that matters. A thread is where a
+ * person answers somebody else's post with a problem of their own, so a
+ * connector that reads one page and calls a thread finished loses the rest —
+ * and a documented cursor is not a tested one.
+ */
+if (wanted("replies")) {
+  const found = await capture(
+    "replies-source-search",
+    endpoints.search,
+    { query: shortKeyword, sort: "top" },
+    { note: "finding a post with replies under it, rather than hard-coding one" },
+  );
+
+  const posts = found.body?.data?.items ?? [];
+  const busiest = posts
+    .map((item) => item?.post)
+    .filter((post) => post?.url && (post?.engagement?.comments ?? 0) > 2)
+    .sort((left, right) => (right.engagement.comments ?? 0) - (left.engagement.comments ?? 0))[0];
+
+  if (!busiest) {
+    failures.push(
+      "replies: no post in the search had more than two replies, so there was " +
+        "nothing to read. Re-run; the search is ranked and its top result moves.",
+    );
+  } else {
+    console.log(
+      `  reading replies under ${busiest.url} (${busiest.engagement.comments} claimed)`,
+    );
+
+    const first = await capture(
+      "replies-page-1",
+      endpoints.replies,
+      { url: busiest.url },
+      { note: `replies under a post claiming ${busiest.engagement.comments}` },
+    );
+
+    if (itemCount(first.body) === 0) {
+      failures.push(
+        "replies: the endpoint returned nothing for a post that claims replies.",
+      );
+    }
+
+    const cursor = nextCursor(first.body);
+
+    if (cursor) {
+      await capture(
+        "replies-page-2",
+        endpoints.replies,
+        { url: busiest.url, cursor },
+        { note: "the cursor followed, to see whether page two is new content" },
+      );
+    } else {
+      console.log("  (no cursor: one page was the whole thread)");
+    }
+  }
+}
+
 if (wanted("generated")) {
   const planPath = new URL("../../../../ai/fixtures/query-plan.json", import.meta.url);
 

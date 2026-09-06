@@ -137,7 +137,7 @@
             "id": "2095994561482916120",
             "url": "https://x.com/x-user-10/status/2095994561482916120",
             "content": {
-              "text": "@housecor curious about dropping per-test identity resets, did that surface any flaky tests from shared state, or was it safe because the data was already isolated per worker?",
+              "text": "@x-user-61 curious about dropping per-test identity resets, did that surface any flaky tests from shared state, or was it safe because the data was already isolated per worker?",
               "media_urls": null,
               "thumbnail_url": null,
               "duration_seconds": null
@@ -263,7 +263,7 @@
             "id": "2095959435097108649",
             "url": "https://x.com/x-user-19/status/2095959435097108649",
             "content": {
-              "text": "@housecor Nice, cutting per test identity resets is such an underrated win. Did parallelizing cause any flaky tests from shared state or did the seed batching fix that side effect too?",
+              "text": "@x-user-61 Nice, cutting per test identity resets is such an underrated win. Did parallelizing cause any flaky tests from shared state or did the seed batching fix that side effect too?",
               "media_urls": null,
               "thumbnail_url": null,
               "duration_seconds": null
@@ -347,7 +347,7 @@
             "id": "2095878645105807627",
             "url": "https://x.com/x-user-25/status/2095878645105807627",
             "content": {
-              "text": "@kieranklaassen Show horse vs workhorse is the right split. Demo latency and tasteful diffs win the timeline. Day to day product work wants a model that survives half-written specs, flaky tests, and the third retry without turning theatrical. Fun is not the same as shippable.",
+              "text": "@x-user-62 Show horse vs workhorse is the right split. Demo latency and tasteful diffs win the timeline. Day to day product work wants a model that survives half-written specs, flaky tests, and the third retry without turning theatrical. Fun is not the same as shippable.",
               "media_urls": null,
               "thumbnail_url": null,
               "duration_seconds": null
@@ -473,7 +473,7 @@
             "id": "2095780499813810539",
             "url": "https://x.com/x-user-34/status/2095780499813810539",
             "content": {
-              "text": "@thsottiaux does the reset still hold after codex touches a legacy repo with flaky tests",
+              "text": "@x-user-63 does the reset still hold after codex touches a legacy repo with flaky tests",
               "media_urls": null,
               "thumbnail_url": null,
               "duration_seconds": null
@@ -515,7 +515,7 @@
             "id": "2095764551425777872",
             "url": "https://x.com/x-user-37/status/2095764551425777872",
             "content": {
-              "text": "@colinhacks @pullfrogai Hit this with a per-seat reviewer last month. Cheap model started rubber-stamping flaky tests. Switched to BYOK + one SOTA call on the dirty files only.",
+              "text": "@x-user-64 @x-user-65 Hit this with a per-seat reviewer last month. Cheap model started rubber-stamping flaky tests. Switched to BYOK + one SOTA call on the dirty files only.",
               "media_urls": null,
               "thumbnail_url": null,
               "duration_seconds": null
@@ -557,7 +557,7 @@
             "id": "2095754420084731974",
             "url": "https://x.com/x-user-40/status/2095754420084731974",
             "content": {
-              "text": "@so_sthbryan Deterministic tests for agent tool usage is a great idea. LLM based evals are so flaky run to run, having a non LLM harness for the tool call logic itself makes debugging way faster.",
+              "text": "@x-user-66 Deterministic tests for agent tool usage is a great idea. LLM based evals are so flaky run to run, having a non LLM harness for the tool call logic itself makes debugging way faster.",
               "media_urls": null,
               "thumbnail_url": null,
               "duration_seconds": null
@@ -683,7 +683,7 @@
             "id": "2095619089519489111",
             "url": "https://x.com/x-user-49/status/2095619089519489111",
             "content": {
-              "text": "@dillon_mulroy Flaky tests are reliability incidents, not background noise. Track flake rate, quarantine expiry and root-cause SLA like production defects—or real regressions will be mentally discounted. Related QA view: https://x.com/AgomaMitchell/status/2095607112676061319",
+              "text": "@x-user-67 Flaky tests are reliability incidents, not background noise. Track flake rate, quarantine expiry and root-cause SLA like production defects—or real regressions will be mentally discounted. Related QA view: https://x.com/AgomaMitchell/status/2095607112676061319",
               "media_urls": null,
               "thumbnail_url": null,
               "duration_seconds": null

@@ -1,6 +1,11 @@
+import { ChevronDownIcon, ExternalLinkIcon, KeyRoundIcon } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { messageFor, requestJson } from "./api.js";
 import { BrandIcon } from "./BrandIcon.js";
+import { Badge } from "./components/ui/badge.js";
+import { Button } from "./components/ui/button.js";
+import { Input } from "./components/ui/input.js";
+import { Label } from "./components/ui/label.js";
 
 /**
  * Where a provider key is pasted, tested and stored.
@@ -96,7 +101,7 @@ function ConnectionsHeader() {
       <div>
         <h1>Connections</h1>
         <p className="page-subtitle">
-          Connect your accounts. Choose where conversations come from.
+          Connect provider accounts and decide which one powers each platform.
         </p>
       </div>
     </header>
@@ -219,9 +224,7 @@ function ProviderCard({
                   aria-label={`${provider.displayName} website (opens in a new tab)`}
                 >
                   {provider.displayName}{" "}
-                  <span className="connection-external" aria-hidden="true">
-                    ↗
-                  </span>
+                  <ExternalLinkIcon className="connection-external" aria-hidden="true" />
                 </a>
               ) : (
                 provider.displayName
@@ -237,27 +240,38 @@ function ProviderCard({
             </span>
             {provider.ready && <small>{provider.credentials.map(origin).join(" · ")}</small>}
           </span>
-          <span className={`connection-status ${provider.ready ? "connected" : "missing"}`}>
+          <Badge
+            variant="secondary"
+            className={`connection-status ${provider.ready ? "connected" : "missing"}`}
+          >
             {provider.ready ? "Connected" : "Not connected"}
-          </span>
+          </Badge>
           <span className="connection-expand">
-            {provider.ready ? "Manage" : "Connect"}
-            <span aria-hidden="true">⌄</span>
+            <span>{provider.ready ? "Manage" : "Connect"}</span>
+            <ChevronDownIcon className="connection-chevron" aria-hidden="true" />
           </span>
         </summary>
         <div className="connection-editor">
-          <p className="connection-editor-note">
-            {provider.ready
-              ? "Test the current connection or paste a replacement key."
-              : "Paste your provider key to connect this account."}{" "}
-            Keys are tested before saving.
-          </p>
+          <div className="connection-editor-intro">
+            <span className="connection-editor-icon" aria-hidden="true">
+              <KeyRoundIcon />
+            </span>
+            <div>
+              <strong>{provider.ready ? "Manage credential" : "Connect this account"}</strong>
+              <p className="connection-editor-note">
+                {provider.ready
+                  ? "Test the current connection or paste a replacement key."
+                  : "Paste your provider key to connect this account."}{" "}
+                Keys are tested before saving.
+              </p>
+            </div>
+          </div>
           {provider.credentials.map((credential) => (
             <div key={credential.name} className="connection-field">
-              <label className="field">
+              <Label className="field">
                 <span>{credential.label}</span>
                 <small className="connection-origin">{origin(credential)}</small>
-                <input
+                <Input
                   aria-label={`${credential.label} for ${provider.displayName}`}
                   // The browser must not offer this back on another screen, and a
                   // key on a shared screen must not be readable over a shoulder.
@@ -274,7 +288,7 @@ function ProviderCard({
                     setTyped((current) => ({ ...current, [credential.name]: event.target.value }));
                   }}
                 />
-              </label>
+              </Label>
 
               <p className="connection-hint">
                 Or set <code>{credential.environmentVariable}</code> in this instance's environment
@@ -282,37 +296,39 @@ function ProviderCard({
               </p>
 
               {credential.storedHint && (
-                <button
+                <Button
+                  variant="link"
                   type="button"
                   className="text-button remove-key"
                   disabled={busy}
                   onClick={() => void remove(credential)}
                 >
                   Remove stored key
-                </button>
+                </Button>
               )}
             </div>
           ))}
 
           <div className="connection-actions">
-            <button
-              type="button"
-              className="secondary-button"
-              disabled={busy}
-              onClick={() => void test()}
-            >
-              Test connection
-            </button>
             {canStore && (
-              <button
+              <Button
                 type="button"
                 className="primary-button"
                 disabled={busy}
                 onClick={() => void save()}
               >
                 Save key
-              </button>
+              </Button>
             )}
+            <Button
+              variant="outline"
+              type="button"
+              className="secondary-button"
+              disabled={busy}
+              onClick={() => void test()}
+            >
+              Test connection
+            </Button>
           </div>
         </div>
       </details>
@@ -389,21 +405,32 @@ function PlatformRow({
               {effective ? `Fetched by ${effective.displayName}` : "Nothing is fetching this yet"}
             </span>
           </span>
-          <span className={`connection-status ${effective ? "connected" : "missing"}`}>
+          <Badge
+            variant="secondary"
+            className={`connection-status ${effective ? "connected" : "missing"}`}
+          >
             {effective ? "Ready" : platform.needsChoice ? "Choose one" : "Unavailable"}
-          </span>
+          </Badge>
           <span className="connection-expand">
-            Change<span aria-hidden="true">⌄</span>
+            <span>Change</span>
+            <ChevronDownIcon className="connection-chevron" aria-hidden="true" />
           </span>
         </summary>
         <div className="connection-editor">
           <fieldset className="provider-choice">
             <legend className="visually-hidden">Provider for {platform.displayName}</legend>
             {platform.providers.map((provider) => (
-              <label
+              <Label
                 className={provider.connected ? "provider-option" : "provider-option unavailable"}
                 key={provider.id}
               >
+                <span className="provider-option-icon" aria-hidden="true">
+                  <BrandIcon brand={provider.id} size={20} />
+                </span>
+                <span>
+                  <strong>{provider.displayName}</strong>
+                  <small>{provider.connected ? "Connected" : "No key here"}</small>
+                </span>
                 <input
                   checked={platform.chosen === provider.id}
                   disabled={busy || !provider.connected}
@@ -411,11 +438,7 @@ function PlatformRow({
                   type="radio"
                   onChange={() => void choose(provider.id)}
                 />
-                <span>
-                  <strong>{provider.displayName}</strong>
-                  <small>{provider.connected ? "Connected" : "No key here"}</small>
-                </span>
-              </label>
+              </Label>
             ))}
           </fieldset>
 
@@ -426,7 +449,8 @@ function PlatformRow({
           )}
 
           {platform.chosen && (
-            <button
+            <Button
+              variant="link"
               type="button"
               className="text-button remove-key"
               disabled={busy}
@@ -435,7 +459,7 @@ function PlatformRow({
               onClick={() => void choose(null)}
             >
               Clear this choice
-            </button>
+            </Button>
           )}
 
           {error && (
@@ -506,9 +530,9 @@ export function Connections() {
         <div className="center-state page-state" role="alert">
           <h2>The connections could not be loaded</h2>
           <p>{error}</p>
-          <button type="button" className="primary-button" onClick={() => void load()}>
+          <Button type="button" className="primary-button" onClick={() => void load()}>
             Try again
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -531,10 +555,10 @@ export function Connections() {
                 One provider account can connect several platforms. Connect only the ones you need.
               </p>
             </div>
-            <span>
+            <Badge variant="outline" className="connections-count">
               {view.providers.filter((provider) => provider.ready).length} of{" "}
               {view.providers.length} connected
-            </span>
+            </Badge>
           </div>
           {!view.canStore && (
             <div className="notice warning" role="status">

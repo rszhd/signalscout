@@ -1,5 +1,9 @@
 import { useEffect, useState } from "react";
 import { messageFor, requestJson } from "./api.js";
+import { Button } from "./components/ui/button.js";
+import { Input } from "./components/ui/input.js";
+import { Label } from "./components/ui/label.js";
+import { NativeSelect } from "./components/ui/native-select.js";
 import { projectSuffix } from "./route.js";
 
 interface Settings {
@@ -91,9 +95,9 @@ export function Notifications({ monitorId }: { monitorId: string }) {
             {data.webhookError && <p role="alert">{data.webhookError}</p>}
             <fieldset disabled={busy}>
               <legend>Digest</legend>
-              <label>
+              <Label>
                 Digest interval (hours)
-                <input
+                <Input
                   type="number"
                   min="1"
                   max="168"
@@ -101,10 +105,10 @@ export function Notifications({ monitorId }: { monitorId: string }) {
                   value={settings.digestHours}
                   onChange={(event) => update({ digestHours: Number(event.target.value) })}
                 />
-              </label>
-              <label>
+              </Label>
+              <Label>
                 Minimum score
-                <input
+                <Input
                   type="number"
                   min="0"
                   max="100"
@@ -112,7 +116,7 @@ export function Notifications({ monitorId }: { monitorId: string }) {
                   value={settings.minScore}
                   onChange={(event) => update({ minScore: Number(event.target.value) })}
                 />
-              </label>
+              </Label>
               <p>Quiet periods send nothing. Immediate alerts also appear in the next digest.</p>
             </fieldset>
             <fieldset disabled={busy}>
@@ -123,7 +127,7 @@ export function Notifications({ monitorId }: { monitorId: string }) {
                   worker. The inbox still works.
                 </p>
               )}
-              <label className="notification-check">
+              <Label className="notification-check">
                 <input
                   type="checkbox"
                   checked={settings.emailEnabled}
@@ -131,28 +135,28 @@ export function Notifications({ monitorId }: { monitorId: string }) {
                   onChange={(event) => update({ emailEnabled: event.target.checked })}
                 />
                 Email digest
-              </label>
-              <label>
+              </Label>
+              <Label>
                 Recipient email
-                <input
+                <Input
                   type="email"
                   required={settings.emailEnabled}
                   value={settings.emailTo}
                   onChange={(event) => update({ emailTo: event.target.value })}
                 />
-              </label>
-              <label className="notification-check">
+              </Label>
+              <Label className="notification-check">
                 <input
                   type="checkbox"
                   checked={settings.immediateScore !== null}
                   onChange={(event) => update({ immediateScore: event.target.checked ? 90 : null })}
                 />
                 Immediate email alerts
-              </label>
+              </Label>
               {settings.immediateScore !== null && (
-                <label>
+                <Label>
                   Immediate alert score
-                  <input
+                  <Input
                     type="number"
                     min="0"
                     max="100"
@@ -160,7 +164,7 @@ export function Notifications({ monitorId }: { monitorId: string }) {
                     value={settings.immediateScore}
                     onChange={(event) => update({ immediateScore: Number(event.target.value) })}
                   />
-                </label>
+                </Label>
               )}
             </fieldset>
             <fieldset disabled={busy}>
@@ -171,7 +175,7 @@ export function Notifications({ monitorId }: { monitorId: string }) {
                   signed webhooks.
                 </p>
               )}
-              <label className="notification-check">
+              <Label className="notification-check">
                 <input
                   type="checkbox"
                   checked={settings.webhookEnabled}
@@ -179,20 +183,20 @@ export function Notifications({ monitorId }: { monitorId: string }) {
                   onChange={(event) => update({ webhookEnabled: event.target.checked })}
                 />
                 Enable webhook
-              </label>
-              <label>
+              </Label>
+              <Label>
                 Webhook URL
-                <input
+                <Input
                   type="url"
                   placeholder="https://example.com/webhook"
                   required={settings.webhookEnabled}
                   value={settings.webhookUrl}
                   onChange={(event) => update({ webhookUrl: event.target.value })}
                 />
-              </label>
-              <label>
+              </Label>
+              <Label>
                 Webhook delivery
-                <select
+                <NativeSelect
                   value={settings.webhookMode}
                   onChange={(event) =>
                     update({ webhookMode: event.target.value as Settings["webhookMode"] })
@@ -200,8 +204,8 @@ export function Notifications({ monitorId }: { monitorId: string }) {
                 >
                   <option value="digest">Digest</option>
                   <option value="match">Each match above the minimum score</option>
-                </select>
-              </label>
+                </NativeSelect>
+              </Label>
             </fieldset>
             <p>
               Saving starts a new period with future matches and cancels pending deliveries from the
@@ -210,9 +214,9 @@ export function Notifications({ monitorId }: { monitorId: string }) {
             {data.nextDigestAt && (
               <p>Next digest: {new Date(data.nextDigestAt).toLocaleString()}</p>
             )}
-            <button className="primary-button" disabled={busy} type="submit">
+            <Button className="primary-button" disabled={busy} type="submit">
               {busy ? "Saving…" : "Save notifications"}
-            </button>
+            </Button>
             {saved && <p role="status">Notification settings saved.</p>}
           </form>
         )}

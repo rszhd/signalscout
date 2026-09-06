@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
 import { messageFor, requestJson } from "./api.js";
 import { BrandIcon } from "./BrandIcon.js";
+import { Badge } from "./components/ui/badge.js";
+import { Button } from "./components/ui/button.js";
+import { Label } from "./components/ui/label.js";
+import { NativeSelect } from "./components/ui/native-select.js";
 import { projectSuffix, routeParam } from "./route.js";
 
 /**
@@ -479,9 +483,11 @@ export function Inbox() {
           <p className="page-subtitle">Find your next conversation.</p>
         </div>
         {(matches.length > 0 || monitors.length === 0) && (
-          <a className="top-secondary-link" href={`#/monitors/new${projectSuffix()}`}>
-            <span aria-hidden="true">+ </span>New monitor
-          </a>
+          <Button asChild variant="outline">
+            <a className="top-secondary-link" href={`#/monitors/new${projectSuffix()}`}>
+              <span aria-hidden="true">+ </span>New monitor
+            </a>
+          </Button>
         )}
       </header>
 
@@ -495,9 +501,9 @@ export function Inbox() {
           </button>
         </fieldset>
         <div className="inbox-filters">
-          <label className="filter">
+          <Label className="filter">
             <span>Monitor</span>
-            <select
+            <NativeSelect
               aria-label="Monitor"
               value={monitorId}
               onChange={(event) => setMonitorId(event.target.value)}
@@ -508,10 +514,12 @@ export function Inbox() {
                   {monitor.name}
                 </option>
               ))}
-            </select>
-          </label>
+            </NativeSelect>
+          </Label>
 
-          <button
+          <Button
+            variant="outline"
+            size="sm"
             className={`compact-button filter-toggle ${filtered ? "active" : ""}`}
             type="button"
             aria-expanded={filtersOpen}
@@ -522,13 +530,13 @@ export function Inbox() {
             {filtered
               ? ` · ${Number(minScore > 0) + Number(showDismissed) + Number(monitorId !== "")}`
               : ""}
-          </button>
+          </Button>
         </div>
       </div>
       <div className="inbox-extra-filters" id="inbox-extra-filters" hidden={!filtersOpen}>
-        <label className="filter">
+        <Label className="filter">
           <span>Minimum score</span>
-          <select
+          <NativeSelect
             aria-label="Minimum score"
             value={String(minScore)}
             onChange={(event) => setMinScore(Number(event.target.value))}
@@ -538,12 +546,12 @@ export function Inbox() {
                 {filter.label}
               </option>
             ))}
-          </select>
-        </label>
+          </NativeSelect>
+        </Label>
 
-        <label className="filter">
+        <Label className="filter">
           <span>Not relevant</span>
-          <select
+          <NativeSelect
             aria-label="Not relevant"
             value={showDismissed ? "show" : "hide"}
             onChange={(event) => setShowDismissed(event.target.value === "show")}
@@ -553,13 +561,13 @@ export function Inbox() {
                 {filter.label}
               </option>
             ))}
-          </select>
-        </label>
+          </NativeSelect>
+        </Label>
 
         {filtered && (
-          <button className="read-more-button" type="button" onClick={clearFilters}>
+          <Button variant="link" className="read-more-button" type="button" onClick={clearFilters}>
             Clear filters
-          </button>
+          </Button>
         )}
       </div>
 
@@ -576,9 +584,14 @@ export function Inbox() {
           <span className="state-icon">!</span>
           <h2>The inbox could not be loaded</h2>
           <p>{error}</p>
-          <button className="secondary-button" type="button" onClick={() => void loadFirstPage()}>
+          <Button
+            variant="outline"
+            className="secondary-button"
+            type="button"
+            onClick={() => void loadFirstPage()}
+          >
             Try again
-          </button>
+          </Button>
         </div>
       )}
 
@@ -591,17 +604,24 @@ export function Inbox() {
               </span>
               <h2>No monitors yet</h2>
               <p>Create a monitor and IntentWatch will start collecting conversations.</p>
-              <a className="primary-button" href={`#/monitors/new${projectSuffix()}`}>
-                Create a monitor
-              </a>
+              <Button asChild>
+                <a className="primary-button" href={`#/monitors/new${projectSuffix()}`}>
+                  Create a monitor
+                </a>
+              </Button>
             </>
           ) : filtered ? (
             <>
               <h2>No matches with these filters</h2>
               <p>There may be matches the monitor or the minimum score is hiding.</p>
-              <button className="secondary-button" type="button" onClick={clearFilters}>
+              <Button
+                variant="outline"
+                className="secondary-button"
+                type="button"
+                onClick={clearFilters}
+              >
                 Clear filters
-              </button>
+              </Button>
             </>
           ) : showSaved ? (
             <>
@@ -610,13 +630,14 @@ export function Inbox() {
               </span>
               <h2>No saved conversations yet</h2>
               <p>Save a conversation from your inbox to come back to it here.</p>
-              <button
+              <Button
+                variant="outline"
                 className="secondary-button"
                 type="button"
                 onClick={() => setShowSaved(false)}
               >
                 Back to inbox
-              </button>
+              </Button>
             </>
           ) : (
             <>
@@ -627,13 +648,14 @@ export function Inbox() {
               <p>
                 Your monitors collect on their own schedule. Matches appear here as they are scored.
               </p>
-              <button
+              <Button
+                variant="outline"
                 className="secondary-button"
                 type="button"
                 onClick={() => void loadFirstPage()}
               >
                 Check again
-              </button>
+              </Button>
             </>
           )}
         </div>
@@ -666,10 +688,13 @@ export function Inbox() {
                         }}
                       >
                         <span className="match-top">
-                          <span className={`source-badge source-${match.source}`}>
+                          <Badge
+                            variant="secondary"
+                            className={`source-badge source-${match.source}`}
+                          >
                             <BrandIcon brand={match.source} />
                             {whereItCameFrom(match)}
-                          </span>
+                          </Badge>
                           <span className="match-origin">{ageLabel(match.postedAt)}</span>
                         </span>
                         <strong className="match-title">
@@ -685,7 +710,9 @@ export function Inbox() {
                           <span className="match-excerpt">{match.excerpt}</span>
                         )}
                         <span className="match-bottom">
-                          <span className={`intent-pill ${tone.tone}`}>{tone.label}</span>
+                          <Badge variant="secondary" className={`intent-pill ${tone.tone}`}>
+                            {tone.label}
+                          </Badge>
                           <span className="match-list-status">
                             {match.saved ? "Saved" : match.verdict === "good" ? "Good lead" : ""}
                           </span>
@@ -702,14 +729,15 @@ export function Inbox() {
 
               {page?.nextCursor && (
                 <div className="inbox-more">
-                  <button
+                  <Button
+                    variant="outline"
                     className="secondary-button"
                     disabled={state === "more"}
                     type="button"
                     onClick={() => void loadMore()}
                   >
                     {state === "more" ? "Loading…" : "Show more"}
-                  </button>
+                  </Button>
                 </div>
               )}
             </div>
@@ -727,10 +755,13 @@ export function Inbox() {
                 </button>
 
                 <div className="detail-top">
-                  <span className={`source-badge source-${selectedMatch.source}`}>
+                  <Badge
+                    variant="secondary"
+                    className={`source-badge source-${selectedMatch.source}`}
+                  >
                     <BrandIcon brand={selectedMatch.source} />
                     {whereItCameFrom(selectedMatch)}
-                  </span>
+                  </Badge>
                   <span className="match-origin">{ageLabel(selectedMatch.postedAt)}</span>
                 </div>
 
@@ -773,13 +804,14 @@ export function Inbox() {
                     {postIsExpanded ? selectedMatch.excerpt : limitedPost?.text}
                   </blockquote>
                   {limitedPost?.truncated && (
-                    <button
+                    <Button
+                      variant="link"
                       className="read-more-button"
                       type="button"
                       onClick={() => setExpandedMatchId(postIsExpanded ? null : selectedMatch.id)}
                     >
                       {postIsExpanded ? "Show less" : "Read more"}
-                    </button>
+                    </Button>
                   )}
                 </div>
 
@@ -808,18 +840,21 @@ export function Inbox() {
                   )}
 
                 <div className="match-actions">
-                  <a
-                    className="primary-button"
-                    href={selectedMatch.url}
-                    rel="noreferrer noopener"
-                    target="_blank"
-                  >
-                    {selectedMatch.kind === "reply" &&
-                    platformLabel(selectedMatch.source).commentLink === "thread"
-                      ? "Open the post ↗"
-                      : "Open conversation ↗"}
-                  </a>
-                  <button
+                  <Button asChild>
+                    <a
+                      className="primary-button"
+                      href={selectedMatch.url}
+                      rel="noreferrer noopener"
+                      target="_blank"
+                    >
+                      {selectedMatch.kind === "reply" &&
+                      platformLabel(selectedMatch.source).commentLink === "thread"
+                        ? "Open the post ↗"
+                        : "Open conversation ↗"}
+                    </a>
+                  </Button>
+                  <Button
+                    variant="outline"
                     aria-pressed={selectedMatch.saved}
                     className={`secondary-button ${selectedMatch.saved ? "chosen" : ""}`}
                     disabled={saving}
@@ -827,7 +862,7 @@ export function Inbox() {
                     onClick={() => void keep(selectedMatch, !selectedMatch.saved)}
                   >
                     {selectedMatch.saved ? "Saved" : "Save for later"}
-                  </button>
+                  </Button>
                   <span className="match-meta">{selectedMatch.intentLabel}</span>
                 </div>
 
@@ -864,7 +899,8 @@ export function Inbox() {
                 <div className="verdict-actions">
                   <p className="section-label">Was this a good lead?</p>
                   <div className="verdict-buttons">
-                    <button
+                    <Button
+                      variant="outline"
                       aria-pressed={selectedMatch.verdict === "good"}
                       className={`verdict-button ${
                         selectedMatch.verdict === "good" ? "chosen" : ""
@@ -874,8 +910,9 @@ export function Inbox() {
                       onClick={() => void judge(selectedMatch, "good")}
                     >
                       Good lead
-                    </button>
-                    <button
+                    </Button>
+                    <Button
+                      variant="outline"
                       aria-pressed={selectedMatch.verdict === "not_relevant"}
                       className={`verdict-button ${
                         selectedMatch.verdict === "not_relevant" ? "chosen" : ""
@@ -885,7 +922,7 @@ export function Inbox() {
                       onClick={() => void judge(selectedMatch, "not_relevant")}
                     >
                       Not relevant
-                    </button>
+                    </Button>
                   </div>
                   <p className="verdict-note">
                     Dismissed a conversation? Bring it back with Filters → Not relevant → Shown.

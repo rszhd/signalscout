@@ -1,6 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 import { messageFor, requestJson } from "./api.js";
 import { BrandIcon } from "./BrandIcon.js";
+import { Badge } from "./components/ui/badge.js";
+import { Button } from "./components/ui/button.js";
+import { Input } from "./components/ui/input.js";
+import { Label } from "./components/ui/label.js";
+import { NativeSelect } from "./components/ui/native-select.js";
 import { projectSuffix, routeParam } from "./route.js";
 import { ScheduleField } from "./ScheduleField.js";
 import { describeSchedule } from "./schedule.js";
@@ -161,9 +166,11 @@ function MonitorsHeader() {
         <h1>Monitors</h1>
         <p className="page-subtitle">Keep an eye on the conversations that matter.</p>
       </div>
-      <a className="top-primary-button" href={`#/monitors/new${projectSuffix()}`}>
-        <span aria-hidden="true">+</span> New monitor
-      </a>
+      <Button asChild>
+        <a className="top-primary-button" href={`#/monitors/new${projectSuffix()}`}>
+          <span aria-hidden="true">+</span> New monitor
+        </a>
+      </Button>
     </header>
   );
 }
@@ -220,20 +227,20 @@ function BudgetForm({ monitor, onSaved }: { monitor: Monitor; onSaved: () => Pro
 
   return (
     <div className="budget-form">
-      <label className="budget-field">
+      <Label className="budget-field">
         <span className="budget-label">Monthly cap</span>
-        <input
+        <Input
           aria-label={`Monthly cap for ${monitor.name}`}
           inputMode="decimal"
           placeholder="No cap"
           value={cap}
           onChange={(event) => setCap(event.target.value)}
         />
-      </label>
+      </Label>
 
-      <label className="budget-field">
+      <Label className="budget-field">
         <span className="budget-label">When it is spent</span>
-        <select
+        <NativeSelect
           aria-label={`When the budget for ${monitor.name} is spent`}
           value={onExhausted}
           onChange={(event) => setOnExhausted(event.target.value as Budget["onExhausted"])}
@@ -243,27 +250,29 @@ function BudgetForm({ monitor, onSaved }: { monitor: Monitor; onSaved: () => Pro
               collecting again by itself when the spend resets. */}
           <option value="pause">Pause the monitor</option>
           <option value="notify">Tell me, and stop polling until next month</option>
-        </select>
-      </label>
+        </NativeSelect>
+      </Label>
 
       <div className="budget-actions">
-        <button
+        <Button
+          variant="outline"
           type="button"
           className="secondary-button"
           disabled={busy}
           onClick={() => void save()}
         >
           Save cap
-        </button>
+        </Button>
         {monitor.budget && (
-          <button
+          <Button
+            variant="link"
             type="button"
             className="text-button"
             disabled={busy}
             onClick={() => void remove()}
           >
             Remove cap
-          </button>
+          </Button>
         )}
       </div>
 
@@ -376,34 +385,36 @@ function PreFilterForm({ monitor, onSaved }: { monitor: Monitor; onSaved: () => 
 
   return (
     <div className="budget-form">
-      <label className="budget-field">
+      <Label className="budget-field">
         <span className="budget-label">Similarity needed</span>
-        <input
+        <Input
           aria-label={`Similarity needed for ${monitor.name}`}
           inputMode="decimal"
           value={threshold}
           disabled={!monitor.preFilter.enabled}
           onChange={(event) => setThreshold(event.target.value)}
         />
-      </label>
+      </Label>
 
       <div className="budget-actions">
-        <button
+        <Button
+          variant="outline"
           type="button"
           className="secondary-button"
           disabled={busy || !monitor.preFilter.enabled}
           onClick={saveThreshold}
         >
           Save threshold
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="link"
           type="button"
           className="text-button"
           disabled={busy}
           onClick={() => void save({ enabled: !monitor.preFilter.enabled })}
         >
           {monitor.preFilter.enabled ? "Turn the pre-filter off" : "Turn the pre-filter on"}
-        </button>
+        </Button>
       </div>
 
       <p className="monitor-filter-counts">
@@ -497,9 +508,9 @@ export function Monitors() {
         <div className="center-state page-state">
           <h2>The monitors could not be loaded</h2>
           <p>{error}</p>
-          <button type="button" className="primary-button" onClick={() => void load()}>
+          <Button type="button" className="primary-button" onClick={() => void load()}>
             Try again
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -515,9 +526,11 @@ export function Monitors() {
           </span>
           <h2>No monitors yet</h2>
           <p>Create a monitor and IntentWatch will start collecting conversations.</p>
-          <a className="primary-button" href={`#/monitors/new${projectSuffix()}`}>
-            Create a monitor
-          </a>
+          <Button asChild>
+            <a className="primary-button" href={`#/monitors/new${projectSuffix()}`}>
+              Create a monitor
+            </a>
+          </Button>
         </div>
       </div>
     );
@@ -577,7 +590,7 @@ export function Monitors() {
               </button>
             ))}
           </fieldset>
-          <input
+          <Input
             className="monitor-search"
             type="search"
             aria-label="Search monitors"
@@ -607,11 +620,14 @@ export function Monitors() {
                 : "Try another name, project or platform, or clear your filters."}
             </p>
             {scoped.length === 0 ? (
-              <a className="primary-button" href={`#/monitors/new${projectSuffix()}`}>
-                Create a monitor
-              </a>
+              <Button asChild>
+                <a className="primary-button" href={`#/monitors/new${projectSuffix()}`}>
+                  Create a monitor
+                </a>
+              </Button>
             ) : (
-              <button
+              <Button
+                variant="outline"
                 className="secondary-button"
                 type="button"
                 onClick={() => {
@@ -620,7 +636,7 @@ export function Monitors() {
                 }}
               >
                 Clear filters
-              </button>
+              </Button>
             )}
           </div>
         )}
@@ -744,7 +760,9 @@ function MonitorCards({
                   </p>
                 </div>
               </div>
-              <span className={`monitor-status ${running.tone}`}>{running.label}</span>
+              <Badge variant="secondary" className={`monitor-status ${running.tone}`}>
+                {running.label}
+              </Badge>
             </div>
 
             {/* The sentence that refused the poll, sent whole by the server,
@@ -850,14 +868,15 @@ function MonitorCards({
                 >
                   View inbox
                 </a>
-                <button
+                <Button
+                  variant="outline"
                   type="button"
                   className="secondary-button"
                   disabled={pending.includes(monitor.id)}
                   onClick={() => void setPaused(monitor, !monitor.paused)}
                 >
                   {pending.includes(monitor.id) ? "Updating…" : monitor.paused ? "Resume" : "Pause"}
-                </button>
+                </Button>
               </div>
             </div>
           </li>

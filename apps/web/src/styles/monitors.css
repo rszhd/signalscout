@@ -199,16 +199,6 @@
 .monitor-controls .field {
   margin: 0;
 }
-.monitor-controls :is(input, select) {
-  max-width: 100%;
-  min-height: var(--control-height);
-  border: 1px solid var(--line-dark);
-  border-radius: var(--radius-sm);
-  background: var(--surface);
-  padding: var(--space-2);
-  color: var(--ink);
-  font-size: var(--text-sm);
-}
 .monitor-controls .budget-field {
   min-width: 0;
   max-width: 100%;
@@ -224,10 +214,6 @@
 }
 .monitors-content .monitor-card-actions a {
   font-weight: 500;
-}
-.monitors-content :is(input, select):focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 3px;
 }
 .monitors-content button:disabled {
   opacity: 0.5;

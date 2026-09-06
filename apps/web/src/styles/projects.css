@@ -137,8 +137,6 @@
   padding-top: var(--space-4);
   border-top: 1px solid var(--line);
 }
-.project-text-button,
-.project-edit-button,
 .project-inbox-link {
   border: 0;
   padding: var(--space-2) 0;
@@ -149,26 +147,12 @@
   cursor: pointer;
   text-decoration: none;
 }
-.project-edit-button {
-  color: var(--muted);
-  padding: var(--space-2);
-  border-radius: var(--radius-sm);
-}
-.project-edit-button:hover {
-  background: var(--surface-soft);
-  color: var(--ink);
-}
 .project-inbox-link {
   color: var(--accent-text);
   font-weight: 500;
 }
-.project-text-button:hover,
 .project-inbox-link:hover {
   text-decoration: underline;
-}
-.project-text-button:disabled {
-  opacity: 0.5;
-  cursor: default;
 }
 .project-empty {
   max-width: 500px;
@@ -291,11 +275,6 @@
   display: grid;
   gap: var(--space-2);
   margin: 0 0 var(--space-5);
-}
-.project-editor .field input,
-.project-editor .field textarea {
-  background: var(--surface);
-  width: 100%;
 }
 .project-editor .choice-section {
   padding: var(--space-4);

@@ -1,3 +1,5 @@
+import { Label } from "./components/ui/label.js";
+import { NativeSelect } from "./components/ui/native-select.js";
 import {
   dayInitials,
   dayNames,
@@ -64,9 +66,9 @@ export function ScheduleField({
   return (
     <div className="schedule-field">
       <div className="schedule-controls">
-        <label className="field">
+        <Label className="field">
           <span>How often</span>
-          <select
+          <NativeSelect
             aria-label="How often"
             value={known ? String(pollIntervalSeconds) : "custom"}
             disabled={disabled}
@@ -85,12 +87,12 @@ export function ScheduleField({
                 {rate.label}
               </option>
             ))}
-          </select>
-        </label>
+          </NativeSelect>
+        </Label>
 
-        <label className="field">
+        <Label className="field">
           <span>Which days</span>
-          <select
+          <NativeSelect
             aria-label="Which days"
             value={rule}
             disabled={disabled}
@@ -111,8 +113,8 @@ export function ScheduleField({
               next save would store that.
             */}
             {rule === "chosen" && <option value="chosen">Chosen days</option>}
-          </select>
-        </label>
+          </NativeSelect>
+        </Label>
       </div>
 
       {/* A fieldset rather than role="group": the same grouping, said in HTML. */}

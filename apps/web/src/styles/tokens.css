@@ -33,6 +33,22 @@
   --text-on-accent: #fff;
   --text-reading-color: #333b46;
   --border: var(--line);
+  /* shadcn semantic roles. Existing accent/muted names retain their meaning. */
+  --foreground: var(--ink);
+  --primary: var(--accent);
+  --primary-foreground: var(--text-on-accent);
+  --secondary: var(--surface-soft);
+  --secondary-foreground: var(--muted-strong);
+  --muted-foreground: var(--muted);
+  --accent-foreground: var(--accent-text);
+  --card: var(--surface);
+  --card-foreground: var(--ink);
+  --popover: var(--surface);
+  --popover-foreground: var(--ink);
+  --input: var(--line-dark);
+  --ring: var(--accent);
+  --destructive: #a12e2e;
+  --radius: 12px;
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;

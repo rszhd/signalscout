@@ -4,6 +4,33 @@
 @import "tailwindcss";
 @import "./styles/tokens.css";
 
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--surface-soft);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent-soft);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-destructive: var(--destructive);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+}
+
 * {
   box-sizing: border-box;
 }
@@ -20,18 +47,18 @@ body {
   line-height: 1.55;
 }
 
-button,
-input,
-select,
-textarea {
+button:not([data-slot]),
+input:not([data-slot]),
+select:not([data-slot]),
+textarea:not([data-slot]) {
   font: inherit;
 }
 
-button {
+button:not([data-slot]) {
   cursor: pointer;
 }
 
-button:disabled {
+button:not([data-slot]):disabled {
   cursor: wait;
   opacity: 0.6;
 }
@@ -248,12 +275,6 @@ a {
   text-transform: uppercase;
 }
 
-.text-button,
-.subreddit-add,
-.icon-button {
-  border: 0;
-}
-
 .center-state {
   min-height: 540px;
   display: flex;
@@ -369,26 +390,6 @@ a {
   height: 1px;
   overflow: hidden;
   clip-path: inset(50%);
-}
-
-.filter select,
-.budget-field input,
-.budget-field select {
-  min-height: 36px;
-  padding: 0 30px 0 10px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
-  outline: none;
-  color: var(--muted-strong);
-  background: var(--surface);
-  font-size: var(--text-sm);
-}
-
-.filter select:focus,
-.budget-field input:focus,
-.budget-field select:focus {
-  border-color: #8c958c;
-  box-shadow: 0 0 0 3px rgb(25 28 26 / 6%);
 }
 
 .inbox-layout {
@@ -652,18 +653,6 @@ a {
 
 .read-more-button {
   margin-top: 8px;
-  padding: 5px 2px;
-  border: 0;
-  color: var(--accent-text);
-  background: transparent;
-  font-size: var(--text-sm);
-  font-weight: 700;
-}
-
-.read-more-button:hover {
-  color: var(--ink);
-  text-decoration: underline;
-  text-underline-offset: 3px;
 }
 
 .match-why {
@@ -798,24 +787,6 @@ a {
 
 .verdict-button {
   flex: 1;
-  min-height: 40px;
-  padding: 0 14px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-md);
-  color: var(--ink);
-  background: var(--surface);
-  font-size: var(--text-sm);
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.verdict-button:hover:not(:disabled) {
-  border-color: var(--accent);
-}
-
-.verdict-button:disabled {
-  cursor: default;
-  opacity: 0.6;
 }
 
 .verdict-button.chosen {
@@ -1122,12 +1093,6 @@ a {
   gap: 8px;
 }
 
-.budget-form .secondary-button,
-.monitor-card-actions .secondary-button {
-  min-height: 36px;
-}
-
-.text-button,
 .text-link {
   padding: 5px 0;
   color: var(--accent-text);
@@ -1310,39 +1275,8 @@ a {
 }
 
 .field input,
-.field textarea,
-.query-row input,
-.subreddit-row input {
+.field textarea {
   width: 100%;
-  border: 1px solid var(--line-dark);
-  border-radius: var(--radius-sm);
-  outline: none;
-  color: var(--ink);
-  background: var(--surface);
-}
-
-.field input,
-.field textarea {
-  padding: 10px 11px;
-  font-size: var(--text-body);
-}
-
-.field textarea {
-  min-height: 68px;
-  resize: vertical;
-  line-height: 1.5;
-}
-
-.field input:focus,
-.field textarea:focus,
-.query-row input:focus,
-.subreddit-row input:focus {
-  border-color: #848d85;
-  box-shadow: 0 0 0 3px rgb(25 28 26 / 6%);
-}
-
-::placeholder {
-  color: #abb0ab;
 }
 
 .choice-section {
@@ -1592,30 +1526,6 @@ a {
   font-weight: 700;
 }
 
-.query-row input,
-.subreddit-row input {
-  height: 39px;
-  padding: 0 10px;
-  font-size: var(--text-label);
-}
-
-.icon-button {
-  width: 30px;
-  height: 30px;
-  display: grid;
-  place-items: center;
-  border-radius: 7px;
-  color: #8d948e;
-  background: transparent;
-  font-size: 1rem;
-}
-
-.icon-button:hover {
-  color: #993e38;
-  background: #fff0ed;
-}
-
-.text-button,
 .subreddit-add {
   margin-top: 10px;
   padding: 5px 0;
@@ -1623,16 +1533,6 @@ a {
   background: transparent;
   font-size: var(--text-sm);
   font-weight: 700;
-}
-
-.text-button span {
-  width: 18px;
-  height: 18px;
-  display: inline-grid;
-  place-items: center;
-  margin-right: 4px;
-  border-radius: 5px;
-  background: #f3efe9;
 }
 
 .subreddit-list {
@@ -1659,11 +1559,6 @@ a {
   padding: 0 2px;
   border: 0;
   box-shadow: none;
-}
-
-.subreddit-row .icon-button {
-  width: 27px;
-  height: 27px;
 }
 
 .subreddit-add {
@@ -1836,12 +1731,6 @@ a {
 }
 
 @media (max-width: 600px) {
-  .top-primary-button,
-  .top-secondary-link {
-    min-height: 36px;
-    padding: 0 10px;
-  }
-
   .inbox-toolbar {
     overflow-x: auto;
     padding: 9px 12px;
@@ -2138,14 +2027,6 @@ a {
   display: grid;
   gap: 8px;
   margin: 16px 0;
-}
-.notification-panel input:not([type="checkbox"]),
-.notification-panel select {
-  width: 100%;
-  padding: 10px 12px;
-  border: 1px solid var(--border, #e6e8eb);
-  border-radius: 6px;
-  font: inherit;
 }
 .notification-panel .notification-check {
   display: flex;

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { messageFor, requestJson } from "./api.js";
+import { Button } from "./components/ui/button.js";
 import { formatMicros } from "./Monitors.js";
 
 /**
@@ -268,14 +269,15 @@ export function CostTest({
             result says how much.
           </p>
         </div>
-        <button
+        <Button
+          variant="outline"
           className="secondary-button"
           disabled={running || collecting}
           type="button"
           onClick={start}
         >
           {running || collecting ? "Testing…" : report ? "Test again" : "Test this plan"}
-        </button>
+        </Button>
       </div>
 
       {error && (

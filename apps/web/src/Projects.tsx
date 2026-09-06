@@ -1,5 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { messageFor, requestJson } from "./api.js";
+import { Button, buttonVariants } from "./components/ui/button.js";
+import { Input } from "./components/ui/input.js";
+import { Label } from "./components/ui/label.js";
+import { Textarea } from "./components/ui/textarea.js";
 
 /**
  * Projects: the answers that describe a business, typed once. US-045.
@@ -126,22 +130,23 @@ function DraftFromDocument({
       )}
 
       <div className="draft-controls">
-        <input
+        <Input
           aria-label="Your product's address"
           placeholder="https://example.com"
           value={url}
           disabled={disabled || busy}
           onChange={(event) => setUrl(event.target.value)}
         />
-        <button
+        <Button
+          variant="outline"
           className="secondary-button"
           type="button"
           disabled={disabled || busy || url.trim() === ""}
           onClick={() => void draft({ url: url.trim() })}
         >
           {busy ? "Reading…" : "Read this page"}
-        </button>
-        <label className="secondary-button draft-file">
+        </Button>
+        <Label className={buttonVariants({ variant: "outline", className: "draft-file" })}>
           Add a file
           <input
             aria-label="A document about your product"
@@ -150,7 +155,7 @@ function DraftFromDocument({
             disabled={disabled || busy}
             onChange={(event) => void fromFile(event.target.files?.[0])}
           />
-        </label>
+        </Label>
       </div>
     </div>
   );
@@ -272,7 +277,7 @@ export function Projects() {
           </p>
         </div>
         {!editorOpen && (
-          <button
+          <Button
             ref={newButton}
             className="primary-button"
             type="button"
@@ -286,7 +291,7 @@ export function Projects() {
             }}
           >
             New project
-          </button>
+          </Button>
         )}
       </header>
 
@@ -300,22 +305,28 @@ export function Projects() {
           <div className="form-error" role="alert">
             {error}
             {!editorOpen && (
-              <button className="secondary-button" type="button" onClick={() => void load()}>
+              <Button
+                variant="outline"
+                className="secondary-button"
+                type="button"
+                onClick={() => void load()}
+              >
                 Try again
-              </button>
+              </Button>
             )}
           </div>
         )}
         {editorOpen ? (
           <section className="project-editor" aria-label="Project details">
-            <button
+            <Button
+              variant="link"
               className="project-text-button"
               type="button"
               disabled={busy || reading}
               onClick={closeEditor}
             >
               ← All projects
-            </button>
+            </Button>
             <div className="project-editor-layout">
               <aside className="project-editor-guide">
                 <span className="project-guide-label">PROJECT PROFILE</span>
@@ -375,9 +386,9 @@ export function Projects() {
 
                 <fieldset className="project-fields" disabled={busy || reading}>
                   <legend className="project-section-title">About your business</legend>
-                  <label className="field">
+                  <Label className="field">
                     <span>Project name</span>
-                    <input
+                    <Input
                       ref={nameInput}
                       required
                       aria-label="Name"
@@ -385,11 +396,11 @@ export function Projects() {
                       placeholder="Acme QA"
                       onChange={(event) => change("name")(event.target.value)}
                     />
-                  </label>
+                  </Label>
 
-                  <label className="field">
+                  <Label className="field">
                     <span>What is the product?</span>
-                    <textarea
+                    <Textarea
                       required
                       aria-label="What is the product?"
                       rows={2}
@@ -397,11 +408,11 @@ export function Projects() {
                       placeholder="A test runner for small teams"
                       onChange={(event) => change("product")(event.target.value)}
                     />
-                  </label>
+                  </Label>
 
-                  <label className="field">
+                  <Label className="field">
                     <span>Who is it for?</span>
-                    <textarea
+                    <Textarea
                       required
                       aria-label="Who is it for?"
                       rows={2}
@@ -409,11 +420,11 @@ export function Projects() {
                       placeholder="Small SaaS teams with no dedicated QA"
                       onChange={(event) => change("idealCustomer")(event.target.value)}
                     />
-                  </label>
+                  </Label>
 
-                  <label className="field">
+                  <Label className="field">
                     <span>What problem does it solve?</span>
-                    <textarea
+                    <Textarea
                       required
                       aria-label="What problem does it solve?"
                       rows={2}
@@ -421,7 +432,7 @@ export function Projects() {
                       placeholder="Their end to end tests break on every UI change"
                       onChange={(event) => change("problem")(event.target.value)}
                     />
-                  </label>
+                  </Label>
 
                   {signals.length > 0 && (
                     <details className="disclosure project-signals">
@@ -436,7 +447,7 @@ export function Projects() {
                         <p>Select the ways a promising conversation might begin.</p>
                         <div className="signal-grid">
                           {signals.map((signal) => (
-                            <label className="signal-card" key={signal.id}>
+                            <Label className="signal-card" key={signal.id}>
                               <input
                                 type="checkbox"
                                 checked={draft.signals.includes(signal.id)}
@@ -447,7 +458,7 @@ export function Projects() {
                                 <strong>{signal.label}</strong>
                                 <small>{signal.hint}</small>
                               </span>
-                            </label>
+                            </Label>
                           ))}
                         </div>
                       </fieldset>
@@ -460,21 +471,22 @@ export function Projects() {
                 </p>
 
                 <div className="form-actions">
-                  <button
+                  <Button
                     className="primary-button"
                     type="submit"
                     disabled={!complete || busy || reading}
                   >
                     {busy ? "Saving…" : editing ? "Save changes" : "Create project"}
-                  </button>
-                  <button
+                  </Button>
+                  <Button
+                    variant="outline"
                     className="secondary-button"
                     type="button"
                     disabled={busy || reading}
                     onClick={closeEditor}
                   >
                     Cancel
-                  </button>
+                  </Button>
                 </div>
               </form>
             </div>
@@ -495,13 +507,13 @@ export function Projects() {
                   No projects yet. Add your product, audience and the problem you solve. Your next
                   monitor starts with its answers filled in.
                 </p>
-                <button
+                <Button
                   className="primary-button"
                   type="button"
                   onClick={() => setEditorOpen(true)}
                 >
                   Create your first project
-                </button>
+                </Button>
               </div>
             ) : (
               <>
@@ -529,13 +541,14 @@ export function Projects() {
                               : `${project.monitorCount} monitor${project.monitorCount === 1 ? "" : "s"}`}
                           </small>
                         </div>
-                        <button
+                        <Button
+                          variant="ghost"
                           className="project-edit-button"
                           type="button"
                           onClick={() => edit(project)}
                         >
                           Edit
-                        </button>
+                        </Button>
                       </div>
                       <p className="project-product">{project.product}</p>
                       <div className="project-audience">
@@ -546,12 +559,14 @@ export function Projects() {
                         <a className="project-inbox-link" href={`#/?project=${project.id}`}>
                           Open inbox →
                         </a>
-                        <a
-                          className="secondary-button"
-                          href={`#/monitors/new?project=${project.id}`}
-                        >
-                          New monitor
-                        </a>
+                        <Button asChild variant="outline">
+                          <a
+                            className="secondary-button"
+                            href={`#/monitors/new?project=${project.id}`}
+                          >
+                            New monitor
+                          </a>
+                        </Button>
                       </div>
                     </li>
                   ))}

@@ -769,7 +769,7 @@ describe("the intent inbox", () => {
       expect(text).not.toContain(excluded);
     }
     expect(container.querySelector("canvas")).toBeNull();
-    expect(container.querySelector("svg")).toBeNull();
+    expect(container.querySelector("svg:not([data-slot='native-select-icon'])")).toBeNull();
   });
 });
 

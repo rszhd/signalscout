@@ -8,6 +8,7 @@
     "lib": ["es2023", "dom", "dom.iterable"],
     "module": "preserve",
     "moduleResolution": "bundler",
+    "paths": { "@/*": ["./src/*"] },
     "jsx": "react-jsx",
     "types": ["vite/client"]
   },

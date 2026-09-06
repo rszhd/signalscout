@@ -9,11 +9,12 @@ secondary information available on demand.
 
 - `apps/web/src/styles/tokens.css`: semantic colors, Figtree typography, spacing,
   radii, control heights, page gutters, navigation sizes and reading width.
-- `apps/web/src/styles/theme.css`: shared headers, buttons, view switches,
-  disclosures and keyboard focus treatment.
+- `apps/web/src/components/ui`: the owned shadcn/ui primitives used by screens.
+  Their standard Tailwind classes own variants, sizing, invalid states and
+  keyboard focus treatment.
+- `apps/web/src/styles/theme.css`: shared headers, view switches and disclosures.
 - `apps/web/src/index.css`: base layout, navigation and existing page styles.
-  It imports the tokens. `main.tsx` imports the shared theme after page styles
-  so ordinary page rules cannot accidentally restore the older control theme.
+  It imports the tokens and maps their semantic roles into Tailwind's theme.
 
 Use tokens rather than introducing another gray, blue, radius or shadow in a
 page. Platform brand colors and semantic warning/success colors may differ
@@ -24,9 +25,9 @@ from the site accent. The theme is currently light only.
 | Pattern | Use |
 | --- | --- |
 | `.topbar`, `.page-subtitle` | One page title, a short supporting sentence, and an optional action. Responsive gutters are shared. |
-| `.primary-button` / `.top-primary-button` | The main action, solid blue, without a decorative shadow. Use a button for an action and an anchor for navigation. |
-| `.secondary-button` / `.top-secondary-link` | Supporting actions, with a quiet outline. |
-| `.compact-button` | Toolbar actions such as Filters. Use `aria-expanded` and `aria-controls` when revealing a panel. |
+| `Button` | The main action uses the default variant; supporting actions use `outline`; quiet actions use `ghost` or `link`. Use `asChild` when an anchor is the control. |
+| `Input`, `Textarea`, `NativeSelect`, `Label` | Native form controls with one size, border, focus ring and invalid state. Keep checkboxes and radio buttons native. |
+| `Badge` | Compact source, intent, connection and monitor status. Page classes still own semantic status colors. |
 | `.view-switch` | A labelled fieldset of buttons switching views. Mark the active button with `aria-pressed`. These are buttons, not ARIA tabs. |
 | `.disclosure` | Native `details` / `summary` for optional detail. A span in the summary can carry a trailing value. |
 
@@ -39,7 +40,7 @@ preview truncation and mobile reading pane remain page-specific.
     <h1>Page title</h1>
     <p className="page-subtitle">A short explanation of this page.</p>
   </div>
-  <button className="primary-button" type="button">Main action</button>
+  <Button type="button">Main action</Button>
 </header>
 ```
 
@@ -69,14 +70,14 @@ preview truncation and mobile reading pane remain page-specific.
 
 ## Migrating the remaining pages
 
-Shared tokens, headers and buttons already apply across the site. Notifications still has older page-specific layout and styling. Update them one at a time; this foundation does not claim
-those pages have been redesigned.
+Shared tokens, headers and shadcn/ui controls apply across the site. Page layout
+remains page-specific; adopting the primitives does not claim a screen has been
+redesigned.
 
-For each page, adopt the shared patterns, replace local neutral colors and
-control styling with tokens, and remove obsolete overrides. Change a shared
-pattern in `theme.css` when every page should benefit; keep content arrangement
-in the page styles. Do not duplicate an inbox-prefixed selector to build a new
-page's controls.
+For each page, use a primitive from `components/ui` before adding a native
+general-purpose control, and add a variant there when every page should benefit.
+Keep content arrangement in the page styles. Do not duplicate an inbox-prefixed
+selector to build a new page's controls.
 
 Check the changed page at desktop and phone sizes, plus its loading, empty and
 error states. Run the existing web tests, typecheck and production build.
@@ -97,15 +98,17 @@ plan is marked stale. Creation is always an explicit final action.
 
 ## Connections
 
-Connections lists provider accounts as compact native disclosures. The closed
-row names the platforms, configuration status and masked key origin. Testing,
-pasting, replacing and removing keys stay inside the account being managed.
+Connections lists provider accounts as separate cards built on compact native
+disclosures. The closed card names the platforms, configuration status and
+masked key origin. Testing, pasting, replacing and removing keys stay inside a
+contained editor for the account being managed.
 Opening a row makes no API call. Responses remain visible beneath the account
 if its controls are collapsed, and editing a key clears the previous test result.
 
-Platform choices are separate from accounts. Rows with a blocker or an unresolved
-choice start expanded; healthy rows start compact. Keep the server’s provider
-selection rules, environment-key fallback and test-before-save behavior intact.
+Platform choices form a visually secondary section below the accounts. Rows
+with a blocker or an unresolved choice start expanded; healthy rows start
+compact. Keep the server’s provider selection rules, environment-key fallback
+and test-before-save behavior intact.
 `styles/connections.css` owns this page layout and uses the shared theme.
 
 ## Provider and platform icons

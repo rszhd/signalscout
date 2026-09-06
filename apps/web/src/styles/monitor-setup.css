@@ -93,21 +93,6 @@
 .setup-content .field {
   display: block;
 }
-.setup-content .field input,
-.setup-content .field textarea,
-.setup-content .field select {
-  width: 100%;
-  min-height: var(--control-height);
-  color: var(--ink);
-  border: 1px solid var(--line-dark);
-  border-radius: var(--radius-sm);
-  padding: 10px 12px;
-  background: var(--surface);
-  font: inherit;
-}
-.setup-content .field textarea {
-  min-height: 90px;
-}
 .setup-content .field > span {
   margin-bottom: var(--space-1);
 }

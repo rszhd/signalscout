@@ -2,6 +2,11 @@ import { type FormEvent, useCallback, useEffect, useMemo, useRef, useState } fro
 import { messageFor, requestJson } from "./api.js";
 import { BrandIcon } from "./BrandIcon.js";
 import { CostTest, type EstimateReport, exceedsCap } from "./CostTest.js";
+import { Button } from "./components/ui/button.js";
+import { Input } from "./components/ui/input.js";
+import { Label } from "./components/ui/label.js";
+import { NativeSelect } from "./components/ui/native-select.js";
+import { Textarea } from "./components/ui/textarea.js";
 import { formatMicros, toMicros } from "./Monitors.js";
 import { projectSuffix } from "./route.js";
 import { ScheduleField } from "./ScheduleField.js";
@@ -542,9 +547,11 @@ export function MonitorForm() {
           <h1>New monitor</h1>
           <p className="page-subtitle">A focused search for people you can help.</p>
         </div>
-        <a className="top-secondary-link" href={`#/monitors${projectSuffix()}`}>
-          Exit setup
-        </a>
+        <Button asChild variant="outline">
+          <a className="top-secondary-link" href={`#/monitors${projectSuffix()}`}>
+            Exit setup
+          </a>
+        </Button>
       </header>
       <div className="setup-layout">
         <aside className="setup-progress" aria-label="Setup progress">
@@ -581,9 +588,14 @@ export function MonitorForm() {
               <span className="state-icon">!</span>
               <h2>The API did not answer</h2>
               <p>{optionsState.message}</p>
-              <button className="secondary-button" type="button" onClick={() => location.reload()}>
+              <Button
+                variant="outline"
+                className="secondary-button"
+                type="button"
+                onClick={() => location.reload()}
+              >
                 Try again
-              </button>
+              </Button>
             </div>
           )}
 
@@ -603,10 +615,10 @@ export function MonitorForm() {
               }}
             >
               <div className="field-stack">
-                <label className="field">
+                <Label className="field">
                   <span>Monitor name</span>
                   <small>A short label only you will see.</small>
-                  <input
+                  <Input
                     aria-label="Monitor name"
                     autoComplete="off"
                     maxLength={80}
@@ -615,12 +627,12 @@ export function MonitorForm() {
                     value={answers.name}
                     onChange={(event) => setAnswer("name", event.target.value)}
                   />
-                </label>
+                </Label>
 
-                <label className="field">
+                <Label className="field">
                   <span>What do you sell?</span>
                   <small>Name the product and what it does.</small>
-                  <textarea
+                  <Textarea
                     aria-label="What do you sell?"
                     maxLength={2000}
                     minLength={10}
@@ -630,12 +642,12 @@ export function MonitorForm() {
                     value={answers.product}
                     onChange={(event) => setAnswer("product", event.target.value)}
                   />
-                </label>
+                </Label>
 
-                <label className="field">
+                <Label className="field">
                   <span>Who is most likely to buy it?</span>
                   <small>Describe the team, role or kind of company.</small>
-                  <textarea
+                  <Textarea
                     aria-label="Who is most likely to buy it?"
                     maxLength={2000}
                     minLength={10}
@@ -645,12 +657,12 @@ export function MonitorForm() {
                     value={answers.idealCustomer}
                     onChange={(event) => setAnswer("idealCustomer", event.target.value)}
                   />
-                </label>
+                </Label>
 
-                <label className="field">
+                <Label className="field">
                   <span>What problem does it solve?</span>
                   <small>Use the words a customer might use in a post.</small>
-                  <textarea
+                  <Textarea
                     aria-label="What problem does it solve?"
                     maxLength={2000}
                     minLength={10}
@@ -660,16 +672,18 @@ export function MonitorForm() {
                     value={answers.problem}
                     onChange={(event) => setAnswer("problem", event.target.value)}
                   />
-                </label>
+                </Label>
               </div>
 
               <div className="setup-actions">
-                <a className="secondary-button" href={`#/monitors${projectSuffix()}`}>
-                  Cancel
-                </a>
-                <button className="primary-button" type="submit" disabled={working !== null}>
+                <Button asChild variant="outline">
+                  <a className="secondary-button" href={`#/monitors${projectSuffix()}`}>
+                    Cancel
+                  </a>
+                </Button>
+                <Button className="primary-button" type="submit" disabled={working !== null}>
                   Continue
-                </button>
+                </Button>
               </div>
             </form>
           )}
@@ -689,7 +703,7 @@ export function MonitorForm() {
                 <p>Select the ways a promising conversation might begin.</p>
                 <div className="signal-grid">
                   {options.signals.map((signal) => (
-                    <label className="signal-card" key={signal.id}>
+                    <Label className="signal-card" key={signal.id}>
                       <input
                         checked={selectedSignals.includes(signal.id)}
                         name="signals"
@@ -702,7 +716,7 @@ export function MonitorForm() {
                         <strong>{signal.label}</strong>
                         <small>{signal.hint}</small>
                       </span>
-                    </label>
+                    </Label>
                   ))}
                 </div>
               </fieldset>
@@ -713,17 +727,18 @@ export function MonitorForm() {
                 </p>
               )}
               <div className="setup-actions">
-                <button
+                <Button
+                  variant="outline"
                   className="secondary-button"
                   type="button"
                   disabled={working !== null}
                   onClick={() => goTo("answers")}
                 >
                   Back
-                </button>
-                <button className="primary-button" type="submit" disabled={working !== null}>
+                </Button>
+                <Button className="primary-button" type="submit" disabled={working !== null}>
                   Continue
-                </button>
+                </Button>
               </div>
             </form>
           )}
@@ -734,7 +749,7 @@ export function MonitorForm() {
                 <p>Pick at least one platform. You can save now and connect an account later.</p>
                 <div className="source-list">
                   {options.sources.map((source) => (
-                    <label className="source-card" key={source.id}>
+                    <Label className="source-card" key={source.id}>
                       <input
                         checked={selectedSources.includes(source.id)}
                         type="checkbox"
@@ -749,7 +764,7 @@ export function MonitorForm() {
                       <span className={`status-dot ${source.ready ? "ready" : "missing"}`}>
                         {source.ready ? "Ready" : "Not connected"}
                       </span>
-                    </label>
+                    </Label>
                   ))}
                 </div>
               </fieldset>
@@ -760,7 +775,7 @@ export function MonitorForm() {
                   A person describing their problem underneath somebody else's post is the same
                   lead. Fetching those replies is cheap; reading them is not.
                 </p>
-                <label className="source-card">
+                <Label className="source-card">
                   <input
                     checked={includeReplies}
                     type="checkbox"
@@ -774,7 +789,7 @@ export function MonitorForm() {
                       calls and collection costs.
                     </small>
                   </span>
-                </label>
+                </Label>
 
                 {includeReplies && repliesUnavailable.length > 0 && (
                   <div className="notice warning" role="status">
@@ -818,15 +833,16 @@ export function MonitorForm() {
                 </p>
               )}
               <div className="setup-actions">
-                <button
+                <Button
+                  variant="outline"
                   className="secondary-button"
                   type="button"
                   disabled={working !== null}
                   onClick={() => goTo("signals")}
                 >
                   Back
-                </button>
-                <button className="primary-button" type="submit" disabled={working !== null}>
+                </Button>
+                <Button className="primary-button" type="submit" disabled={working !== null}>
                   {working === "generating"
                     ? "Generating…"
                     : generatedFor === generationSignature
@@ -834,7 +850,7 @@ export function MonitorForm() {
                       : options.canGenerateQueries
                         ? "Generate search plan"
                         : "Review search plan"}
-                </button>
+                </Button>
               </div>
             </form>
           )}
@@ -875,7 +891,7 @@ export function MonitorForm() {
                         return (
                           <div className="query-row" key={`query-${source.id}-${index.toString()}`}>
                             <span className="query-number">{index + 1}</span>
-                            <input
+                            <Input
                               aria-label={`${source.displayName} search query ${index + 1}`}
                               aria-invalid={words > limit || words === 1}
                               maxLength={80}
@@ -894,7 +910,9 @@ export function MonitorForm() {
                                 }))
                               }
                             />
-                            <button
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
                               aria-label={`Remove ${source.displayName} query ${index + 1}`}
                               className="icon-button"
                               type="button"
@@ -911,7 +929,7 @@ export function MonitorForm() {
                               }
                             >
                               <span aria-hidden="true">×</span>
-                            </button>
+                            </Button>
                           </div>
                         );
                       })}
@@ -928,7 +946,8 @@ export function MonitorForm() {
                       </p>
                     )}
                     {list.length < 8 && (
-                      <button
+                      <Button
+                        variant="link"
                         className="text-button"
                         type="button"
                         onClick={() =>
@@ -942,7 +961,7 @@ export function MonitorForm() {
                         }
                       >
                         <span aria-hidden="true">+</span> Add query
-                      </button>
+                      </Button>
                     )}
                   </details>
                 );
@@ -961,7 +980,7 @@ export function MonitorForm() {
                     {plan.subreddits.map((subreddit, index) => (
                       <div className="subreddit-row" key={`subreddit-${index.toString()}`}>
                         <span>r/</span>
-                        <input
+                        <Input
                           aria-label={`Subreddit ${index + 1}`}
                           placeholder="SaaS"
                           value={subreddit}
@@ -974,7 +993,9 @@ export function MonitorForm() {
                             }))
                           }
                         />
-                        <button
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
                           aria-label={`Remove subreddit ${index + 1}`}
                           className="icon-button"
                           type="button"
@@ -988,7 +1009,7 @@ export function MonitorForm() {
                           }
                         >
                           <span aria-hidden="true">×</span>
-                        </button>
+                        </Button>
                       </div>
                     ))}
                     {plan.subreddits.length < 8 && (
@@ -1025,17 +1046,18 @@ export function MonitorForm() {
                 </details>
               )}
               <div className="setup-actions">
-                <button
+                <Button
+                  variant="outline"
                   className="secondary-button"
                   type="button"
                   disabled={working !== null}
                   onClick={() => goTo("sources")}
                 >
                   Back
-                </button>
-                <button className="primary-button" type="submit" disabled={working !== null}>
+                </Button>
+                <Button className="primary-button" type="submit" disabled={working !== null}>
                   Continue to schedule
-                </button>
+                </Button>
               </div>
             </form>
           )}
@@ -1062,15 +1084,15 @@ export function MonitorForm() {
                 />
                 <details className="disclosure timezone-setting">
                   <summary>Time zone · {timezone}</summary>
-                  <label className="field">
+                  <Label className="field">
                     <span>Time zone</span>
-                    <input
+                    <Input
                       aria-label="Time zone"
                       required
                       value={timezone}
                       onChange={(event) => setTimezone(event.target.value)}
                     />
-                  </label>
+                  </Label>
                   <p>Days follow this time zone. We started with your browser’s setting.</p>
                 </details>
               </fieldset>{" "}
@@ -1081,11 +1103,11 @@ export function MonitorForm() {
                   known only afterwards. Spending is recorded either way.
                 </p>
                 <div className="budget-row">
-                  <label className="field">
+                  <Label className="field">
                     <span>Monthly budget</span>
                     <div className="amount-input">
                       <span aria-hidden="true">$</span>
-                      <input
+                      <Input
                         aria-label="Monthly budget"
                         inputMode="decimal"
                         placeholder="10.00"
@@ -1093,18 +1115,18 @@ export function MonitorForm() {
                         onChange={(event) => setCap(event.target.value)}
                       />
                     </div>
-                  </label>
-                  <label className="field">
+                  </Label>
+                  <Label className="field">
                     <span>When it is reached</span>
-                    <select
+                    <NativeSelect
                       aria-label="When it is reached"
                       value={onExhausted}
                       onChange={(event) => setOnExhausted(event.target.value)}
                     >
                       <option value="pause">Pause the monitor</option>
                       <option value="notify">Keep it, and start again next month</option>
-                    </select>
-                  </label>
+                    </NativeSelect>
+                  </Label>
                 </div>
               </fieldset>
               <CostTest
@@ -1137,15 +1159,16 @@ export function MonitorForm() {
                 </p>
               )}
               <div className="setup-actions">
-                <button
+                <Button
+                  variant="outline"
                   className="secondary-button"
                   type="button"
                   disabled={working !== null}
                   onClick={() => goTo("review")}
                 >
                   Back
-                </button>
-                <button className="primary-button" type="submit" disabled={working !== null}>
+                </Button>
+                <Button className="primary-button" type="submit" disabled={working !== null}>
                   {working === "creating"
                     ? "Saving…"
                     : overCap
@@ -1153,7 +1176,7 @@ export function MonitorForm() {
                       : missingCredentials.length > 0
                         ? "Save monitor paused"
                         : "Start monitor"}
-                </button>
+                </Button>
               </div>
             </form>
           )}
@@ -1173,12 +1196,14 @@ export function MonitorForm() {
                     : "Your plan is saved without collecting. Adjust the budget or search plan before starting it from Monitors."
                   : "IntentWatch will collect the first conversations on the monitor schedule."}
               </p>
-              <a className="primary-button" href={`#/monitors${projectSuffix()}`}>
-                View monitors
-              </a>
-              <button className="text-button" type="button" onClick={reset}>
+              <Button asChild>
+                <a className="primary-button" href={`#/monitors${projectSuffix()}`}>
+                  View monitors
+                </a>
+              </Button>
+              <Button variant="link" className="text-button" type="button" onClick={reset}>
                 Create another monitor
-              </button>
+              </Button>
             </div>
           )}
         </section>

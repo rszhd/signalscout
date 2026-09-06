@@ -8,5 +8,6 @@ export {
   type MatchPage,
   maximumPageSize,
   rankDecayPointsPerDay,
+  setMatchSaved,
   UnusableCursorError,
 } from "./matches.js";

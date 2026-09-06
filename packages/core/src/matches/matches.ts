@@ -49,7 +49,7 @@
  * a rank that moves with the clock skips rows, and the failure looks like a
  * match that was never delivered.
  */
-import { and, desc, eq, gte, isNull, or, type SQL, sql } from "drizzle-orm";
+import { and, desc, eq, gte, isNotNull, isNull, or, type SQL, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import type { Database } from "../db/client.js";
 import {
@@ -154,6 +154,15 @@ export interface ListMatchesOptions {
   readonly userId?: string;
   /** Show the matches this user marked not relevant. Default false. */
   readonly includeNotRelevant?: boolean;
+  /**
+   * Only the matches this person kept. US-043.
+   *
+   * A different list rather than a filter on the same one, and the ordering
+   * says why: the inbox ranks by score and age together, subtracting twelve
+   * points a day, and something kept on purpose does not get less kept
+   * overnight. When this is set the page is ordered by when it was saved.
+   */
+  readonly savedOnly?: boolean;
 }
 
 export interface MatchPage {
@@ -233,7 +242,7 @@ export async function listMatches(
     isNull(feedback.supersededAt),
   );
 
-  if (!options.includeNotRelevant) {
+  if (!options.includeNotRelevant && !options.savedOnly) {
     // `IS DISTINCT FROM` and not `<>`: an unjudged match has no feedback row,
     // so the column is null here, and null compared with `<>` would drop every
     // match nobody has judged yet.
@@ -241,6 +250,17 @@ export async function listMatches(
   }
 
   if (options.monitorId) conditions.push(eq(matches.monitorId, options.monitorId));
+
+  /**
+   * The saved list. US-043.
+   *
+   * A different list rather than a filter, because it answers a different
+   * question: the inbox asks "what should I read", and this asks "what did I
+   * say I would come back to". Kept matches are shown whatever their verdict,
+   * including the ones marked not relevant — somebody who judged a match weak
+   * and kept it anyway meant both, and hiding it would overrule them.
+   */
+  if (options.savedOnly) conditions.push(isNotNull(matches.savedAt));
   if (options.minScore !== undefined) conditions.push(gte(matches.score, options.minScore));
 
   if (options.cursor) {
@@ -272,7 +292,9 @@ export async function listMatches(
       urgency: matches.urgency,
       intentType: matches.intentType,
       reasons: matches.reasons,
-      saved: matches.saved,
+      // Derived, so a screen keeps asking one simple question while the
+      // column carries the ordering the saved list needs.
+      saved: sql<boolean>`${matches.savedAt} is not null`,
       verdict: feedback.verdict,
       readAt: matches.readAt,
       source: posts.source,
@@ -301,7 +323,18 @@ export async function listMatches(
     .innerJoin(monitors, eq(matches.monitorId, monitors.id))
     .leftJoin(feedback, currentVerdict)
     .where(and(...conditions))
-    .orderBy(desc(rank), desc(matches.id))
+    /**
+     * Newest first on the saved list, and by rank everywhere else.
+     *
+     * US-011's rank subtracts twelve points a day, which is right for an inbox
+     * — an old lead is a colder one — and wrong for a list somebody built on
+     * purpose. Something kept does not get less kept overnight.
+     */
+    .orderBy(
+      ...(options.savedOnly
+        ? [desc(matches.savedAt), desc(matches.id)]
+        : [desc(rank), desc(matches.id)]),
+    )
     .limit(limit + 1);
 
   const page = rows.slice(0, limit).map((row) => ({
@@ -316,4 +349,40 @@ export async function listMatches(
     nextCursor: rows.length > limit && last ? cursorFor(last) : null,
     asOf,
   };
+}
+
+/**
+ * Keep a match, or stop keeping it. US-043.
+ *
+ * **This is not a verdict and must not become one.** A verdict is a judgement
+ * about the model — was this worth showing me — and `feedback` stores it
+ * against the monitor version that earned it, because that is what makes the
+ * sample mean anything. Saving is a statement about intent: somebody is going
+ * to do something here. They come apart in both directions, and a good catch
+ * that needs no reply is as common as a weak match worth answering.
+ *
+ * So it writes one boolean on the match and touches nothing else. It does not
+ * move `monitors.version`, it does not write to `feedback`, and re-classifying
+ * a saved match under a new monitor version leaves it saved: the person's
+ * intent is theirs, the way their verdict is.
+ *
+ * Returns undefined when no match has that id, so a caller can answer 404
+ * rather than reporting a write that did not happen.
+ */
+export async function setMatchSaved(
+  db: Database,
+  matchId: string,
+  saved: boolean,
+  now: Date = new Date(),
+): Promise<{ readonly matchId: string; readonly savedAt: Date | null } | undefined> {
+  const [row] = await db
+    .update(matches)
+    // Saving again does not move the time. A list worked through top to bottom
+    // would otherwise reshuffle under somebody's cursor when they pressed a
+    // button they had already pressed.
+    .set({ savedAt: saved ? sql`coalesce(${matches.savedAt}, ${now})` : null })
+    .where(eq(matches.id, matchId))
+    .returning({ id: matches.id, savedAt: matches.savedAt });
+
+  return row ? { matchId: row.id, savedAt: row.savedAt } : undefined;
 }

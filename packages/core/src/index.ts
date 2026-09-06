@@ -224,6 +224,7 @@ export {
   type MatchPage,
   maximumPageSize,
   rankDecayPointsPerDay,
+  setMatchSaved,
   UnusableCursorError,
 } from "./matches/index.js";
 export {

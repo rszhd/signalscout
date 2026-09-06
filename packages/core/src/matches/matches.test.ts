@@ -21,6 +21,7 @@ import {
   listMatches,
   type MatchPage,
   rankDecayPointsPerDay,
+  setMatchSaved,
   UnusableCursorError,
 } from "./matches.js";
 
@@ -288,6 +289,109 @@ describe("the inbox list", () => {
       const page = await listMatches(db, { asOf: now, limit: 1 });
 
       expect(page.nextCursor).toBeNull();
+    });
+  });
+
+  /**
+   * Keeping a match, which is a different thing from judging one. US-043.
+   *
+   * A verdict says whether the model was right. Saving says somebody will do
+   * something. The cases here are the ones where those two come apart, because
+   * if they never did this product would need one flag and not two.
+   */
+  describe("a match the person kept", () => {
+    it("appears on the saved list and not by accident on the inbox", async () => {
+      const kept = await seed({ monitorId, score: 70, postedAt: minutesAgo(5) });
+      await seed({ monitorId, score: 90, postedAt: minutesAgo(1) });
+
+      await setMatchSaved(db, kept, true);
+
+      const saved = await listMatches(db, { savedOnly: true });
+
+      expect(saved.matches.map((match) => match.id)).toEqual([kept]);
+      // And the inbox is unchanged: keeping something does not remove it.
+      expect((await listMatches(db, {})).matches).toHaveLength(2);
+    });
+
+    it("says so on the card, so a screen can show the button pressed", async () => {
+      const kept = await seed({ monitorId, score: 70, postedAt: minutesAgo(5) });
+
+      await setMatchSaved(db, kept, true);
+
+      const [match] = (await listMatches(db, {})).matches;
+
+      expect(match?.saved).toBe(true);
+    });
+
+    it("can be let go again", async () => {
+      const kept = await seed({ monitorId, score: 70, postedAt: minutesAgo(5) });
+
+      await setMatchSaved(db, kept, true);
+      await setMatchSaved(db, kept, false);
+
+      expect((await listMatches(db, { savedOnly: true })).matches).toEqual([]);
+    });
+
+    /**
+     * The ordering the timestamp exists for. US-011's rank subtracts twelve
+     * points a day, which is right for an inbox and wrong for a list somebody
+     * built: a thing kept on purpose does not get less kept overnight.
+     */
+    it("is ordered by when it was kept, not by score and age", async () => {
+      const weak = await seed({ monitorId, score: 40, postedAt: minutesAgo(5) });
+      const strong = await seed({ monitorId, score: 95, postedAt: minutesAgo(1) });
+
+      await setMatchSaved(db, weak, true, new Date("2026-09-01T00:00:00.000Z"));
+      await setMatchSaved(db, strong, true, new Date("2026-08-01T00:00:00.000Z"));
+
+      const saved = await listMatches(db, { savedOnly: true });
+
+      // The weak one was kept later, so it is first — the inbox would put the
+      // 95 above the 40 every time.
+      expect(saved.matches.map((match) => match.id)).toEqual([weak, strong]);
+    });
+
+    it("does not move when it is kept twice", async () => {
+      const first = await seed({ monitorId, score: 70, postedAt: minutesAgo(5) });
+      const second = await seed({ monitorId, score: 70, postedAt: minutesAgo(5) });
+
+      await setMatchSaved(db, first, true, new Date("2026-09-01T00:00:00.000Z"));
+      await setMatchSaved(db, second, true, new Date("2026-09-02T00:00:00.000Z"));
+      // Pressing a button somebody already pressed. A slow connection does this.
+      await setMatchSaved(db, first, true, new Date("2026-09-03T00:00:00.000Z"));
+
+      const saved = await listMatches(db, { savedOnly: true });
+
+      expect(saved.matches.map((match) => match.id)).toEqual([second, first]);
+    });
+
+    /**
+     * The case that decides whether these are two flags or one. Somebody who
+     * judged a match weak and kept it anyway meant both, and a list that hid it
+     * would be overruling them.
+     */
+    it("stays on the list after being marked not relevant", async () => {
+      const kept = await seed({ monitorId, score: 70, postedAt: minutesAgo(5) });
+
+      await setMatchSaved(db, kept, true);
+      await recordVerdict(db, { matchId: kept, verdict: "not_relevant" });
+
+      expect((await listMatches(db, {})).matches).toEqual([]);
+      expect((await listMatches(db, { savedOnly: true })).matches.map((m) => m.id)).toEqual([kept]);
+    });
+
+    it("is not a verdict, and leaves the feedback sample alone", async () => {
+      const kept = await seed({ monitorId, score: 70, postedAt: minutesAgo(5) });
+
+      await setMatchSaved(db, kept, true);
+
+      const [match] = (await listMatches(db, {})).matches;
+
+      expect(match?.verdict).toBeNull();
+    });
+
+    it("answers nothing for a match that does not exist", async () => {
+      expect(await setMatchSaved(db, "00000000-0000-0000-0000-000000000000", true)).toBeUndefined();
     });
   });
 

@@ -24,6 +24,7 @@ import {
   listMatches,
   maximumPageSize,
   recordVerdict,
+  setMatchSaved,
   verdicts,
 } from "@intentwatch/core";
 import { z } from "zod";
@@ -72,6 +73,14 @@ const query = z.object({
   monitorId: z.uuid().optional(),
   minScore: z.coerce.number().int().min(0).max(100).optional(),
   limit: z.coerce.number().int().min(1).max(maximumPageSize).default(defaultPageSize),
+  /**
+   * Only what this person kept. US-043.
+   *
+   * A separate list rather than a filter on the inbox: it is ordered by when
+   * things were saved, and it shows a kept match whatever its verdict, because
+   * somebody who judged a match weak and kept it anyway meant both.
+   */
+  saved: z.stringbool().default(false),
   cursor: z.string().regex(cursorPattern).optional(),
   /** The clock the first page was ranked against. Omitted on the first page. */
   asOf: z.iso.datetime().optional(),
@@ -105,7 +114,7 @@ export async function registerMatchRoutes(
       },
     },
     handler: async (request) => {
-      const { monitorId, minScore, limit, cursor, asOf, includeNotRelevant } = request.query;
+      const { monitorId, minScore, limit, cursor, asOf, includeNotRelevant, saved } = request.query;
 
       const page = await listMatches(db, {
         monitorId,
@@ -113,6 +122,7 @@ export async function registerMatchRoutes(
         limit,
         cursor,
         includeNotRelevant,
+        savedOnly: saved,
         asOf: asOf ? new Date(asOf) : undefined,
       });
 
@@ -125,6 +135,47 @@ export async function registerMatchRoutes(
         })),
         nextCursor: page.nextCursor,
         asOf: page.asOf.toISOString(),
+      };
+    },
+  });
+
+  /**
+   * Keep a match, or stop keeping it. US-043.
+   *
+   * A `PUT` of the state rather than a `POST` of an action, so pressing the
+   * button twice is the same as pressing it once — a person on a slow
+   * connection who taps again must not toggle themselves back off.
+   *
+   * It is deliberately not the verdict route wearing a different name. A
+   * verdict is a judgement about the model and is stored against the monitor
+   * version that earned it; this is an intention, and it survives a
+   * re-classification because the person's intention is theirs.
+   */
+  app.route({
+    method: "PUT",
+    url: "/api/matches/:id/saved",
+    schema: {
+      params: z.object({ id: z.uuid() }),
+      body: z.object({ saved: z.boolean() }),
+      response: {
+        200: z.object({
+          matchId: z.string(),
+          saved: z.boolean(),
+          /** When it was kept, or null. The saved list is ordered by it. */
+          savedAt: z.string().nullable(),
+        }),
+        404: z.object({ message: z.string() }),
+      },
+    },
+    handler: async (request, reply) => {
+      const result = await setMatchSaved(db, request.params.id, request.body.saved);
+
+      if (!result) return reply.code(404).send({ message: "No match has that id." });
+
+      return {
+        matchId: result.matchId,
+        saved: result.savedAt !== null,
+        savedAt: result.savedAt?.toISOString() ?? null,
       };
     },
   });

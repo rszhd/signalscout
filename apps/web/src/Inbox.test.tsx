@@ -71,6 +71,9 @@ describe("the intent inbox", () => {
       // Checked before the list, because a verdict's URL starts with the
       // list's. The body is what the assertions below read.
       if (url.endsWith("/verdict")) return json({ verdict: "good", changed: false });
+      if (url.endsWith("/saved")) {
+        return json({ matchId: "match-1", saved: true, savedAt: "2026-09-06T12:00:00.000Z" });
+      }
       if (url.startsWith("/api/matches")) {
         const answer = Object.entries(pages).find(([key]) => url.includes(key));
         return json(answer ? answer[1] : firstPage);
@@ -121,6 +124,81 @@ describe("the intent inbox", () => {
    * noise depending entirely on the post it answers, and an inbox showing only
    * the reply would ask a person to judge it with less than the classifier had.
    */
+  /**
+   * Keeping a match. US-043.
+   *
+   * The row stays on screen either way, unlike a "not relevant" verdict. Saving
+   * is somebody saying they will come back to it, and removing it when they say
+   * so would be the opposite of helpful.
+   */
+  describe("saving a match for later", () => {
+    it("offers the action, and says when it has been taken", async () => {
+      await show();
+
+      const save = [...container.querySelectorAll("button")].find((element) =>
+        element.textContent?.includes("Save for later"),
+      );
+
+      expect(save).toBeDefined();
+      expect(save?.getAttribute("aria-pressed")).toBe("false");
+    });
+
+    it("keeps the match on screen once it is saved", async () => {
+      await show();
+
+      const save = [...container.querySelectorAll("button")].find((element) =>
+        element.textContent?.includes("Save for later"),
+      ) as HTMLButtonElement;
+
+      await act(async () => save.click());
+      await settle();
+
+      const call = fetchMock.mock.calls.find(([url]) => String(url).endsWith("/saved"));
+
+      const init = call?.[1] as RequestInit;
+
+      expect(JSON.parse(String(init.body))).toEqual({ saved: true });
+      // Still there. A verdict of "not relevant" removes a row; this must not.
+      expect(container.textContent).toContain("We're manually checking our major flows");
+
+      // And the button now says so, which only happens if the request
+      // succeeded — without the route mocked above this passed on the error
+      // path, which is the kind of green this repository warns about.
+      const after = [...container.querySelectorAll("button")].find(
+        (element) => element.textContent?.trim() === "Saved",
+      );
+
+      expect(after?.getAttribute("aria-pressed")).toBe("true");
+    });
+
+    it("shows a saved match as saved", async () => {
+      await show({
+        "/api/matches?": {
+          matches: [match({ saved: true })],
+          nextCursor: null,
+          asOf: firstPage.asOf,
+        },
+      });
+
+      const save = [...container.querySelectorAll("button")].find(
+        (element) => element.textContent?.trim() === "Saved",
+      );
+
+      expect(save?.getAttribute("aria-pressed")).toBe("true");
+    });
+
+    it("asks the server for the saved list, which it orders differently", async () => {
+      await show();
+
+      const picker = select("Which matches");
+
+      await act(async () => setValue(picker, "saved"));
+      await settle();
+
+      expect(fetchMock.mock.calls.some(([url]) => String(url).includes("saved=true"))).toBe(true);
+    });
+  });
+
   describe("a match that is a reply", () => {
     const replyMatch = match({
       id: "match-reply",

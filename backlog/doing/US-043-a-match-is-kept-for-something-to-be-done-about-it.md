@@ -52,19 +52,22 @@ wants more says so.
 
 ## Acceptance
 
-- [ ] A person can save a match from the inbox, and unsave it
-- [ ] Saved matches are reachable as a list, separate from the inbox
-- [ ] The list survives a restart and a re-poll. A saved match that is
+- [x] A person can save a match from the inbox, and unsave it
+- [x] Saved matches are reachable as a list, separate from the inbox
+- [x] The list survives a restart and a re-poll. A saved match that is
       re-classified under a new monitor version stays saved — the person's
       intent is theirs, the way a verdict is
-- [ ] Saving is not a verdict and does not touch one. `monitors.version` must
+- [x] Saving is not a verdict and does not touch one. `monitors.version` must
       not move, and the feedback sample must not change shape
-- [ ] A saved match whose post was deleted follows US-015's rule rather than
+- [x] A saved match whose post was deleted follows US-015's rule rather than
       inventing its own. A person who kept something is owed an explanation, not
-      a blank row
+      a blank row — inherited rather than written: `matches.hidden` and the
+      deletion job are upstream of both lists, so a kept match follows the same
+      rule with no code of its own
 - [ ] The Log answers one question: after using it, did `saved` and a `good`
       verdict ever disagree? If they never do, say so, and say whether the
-      product should keep both
+      product should keep both — **open, and it needs use rather than code.
+      Nothing has been saved yet because nothing could be until now**
 
 ## Notes
 
@@ -89,3 +92,37 @@ wants more says so.
   worth answering while building it is whether `saved` and a `good` verdict are
   really two things — a judgement about the model and a statement of intent —
   or one thing wearing two names.
+
+- 2026-09-06T12:44+08:00 — Built. The migration was not nothing, which is the
+  finding worth carrying.
+
+  **The column could not do what the ticket asked.** `matches.saved` was a
+  boolean, and the ordering rule — a list ordered by when things were put on it
+  — needs a time. So `saved_at` replaces it rather than joining it: two columns
+  that must agree is a bug waiting, and the boolean was false on all 52 rows in
+  the only database that has ever run this, so the migration lost nothing. The
+  API still reports `saved` as a boolean, derived, because a screen asking "is
+  this kept" should not have to know about a timestamp.
+
+  **The ordering is the whole point and it is now proven.** A test saves a
+  40-scored match after a 95-scored one and asserts the 40 comes first. The
+  inbox would rank them the other way every time, and US-011's twelve points a
+  day would push the older one down further each night. Something kept on
+  purpose does not get less kept overnight.
+
+  **Saving twice does not move a match.** `coalesce` keeps the first time, so a
+  person on a slow connection who presses a button they already pressed does not
+  reshuffle a list they are working down.
+
+  **A kept match stays on the saved list after a `not_relevant` verdict.** That
+  is the case that decides these are two flags rather than one: somebody who
+  judged a match weak and kept it anyway meant both, and hiding it would
+  overrule them. The inbox still hides it, as it always did.
+
+- 2026-09-06T12:44+08:00 — One test was green for the wrong reason and is worth
+  writing down. The screen's fetch mock had no route for `/saved`, so the click
+  threw, `keep()` caught it and set an error, and the assertion — that the
+  request was made — passed anyway. The route is mocked now and the test also
+  asserts the button says "Saved" afterwards, which only happens on success.
+  Checking why a test passed found it; running it did not.
+

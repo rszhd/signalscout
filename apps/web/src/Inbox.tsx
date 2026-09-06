@@ -40,6 +40,8 @@ interface Match {
   parentTitle: string | null;
   parentExcerpt: string | null;
   parentUrl: string | null;
+  /** Kept for later. US-043. Not a verdict; a person's intention. */
+  saved: boolean;
   url: string;
   postedAt: string;
 }
@@ -157,7 +159,16 @@ export function Inbox() {
   const [mobileDetailOpen, setMobileDetailOpen] = useState(false);
   const [expandedMatchId, setExpandedMatchId] = useState<string | null>(null);
   const [showDismissed, setShowDismissed] = useState(false);
+  /**
+   * The saved list. US-043.
+   *
+   * A view of the same screen rather than a second page, because the card, the
+   * reasons and the buttons are all the same — what changes is which matches
+   * are in the list and the order they come in. The server does both.
+   */
+  const [showSaved, setShowSaved] = useState(false);
   const [judging, setJudging] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -180,6 +191,7 @@ export function Inbox() {
     if (monitorId) query.set("monitorId", monitorId);
     if (minScore > 0) query.set("minScore", String(minScore));
     if (showDismissed) query.set("includeNotRelevant", "true");
+    if (showSaved) query.set("saved", "true");
 
     try {
       const answer = await requestJson<MatchPage>(`/api/matches?${query}`);
@@ -193,7 +205,7 @@ export function Inbox() {
       setError(messageFor(cause, "The inbox could not be loaded."));
       setState("error");
     }
-  }, [monitorId, minScore, showDismissed]);
+  }, [monitorId, minScore, showDismissed, showSaved]);
 
   useEffect(() => {
     void loadFirstPage();
@@ -208,6 +220,7 @@ export function Inbox() {
     if (monitorId) query.set("monitorId", monitorId);
     if (minScore > 0) query.set("minScore", String(minScore));
     if (showDismissed) query.set("includeNotRelevant", "true");
+    if (showSaved) query.set("saved", "true");
 
     try {
       const answer = await requestJson<MatchPage>(`/api/matches?${query}`);
@@ -229,6 +242,34 @@ export function Inbox() {
    * server has stored the verdict: a row that vanished from a failed request
    * would look like a verdict that was kept.
    */
+  /**
+   * Keep a match, or let it go. US-043.
+   *
+   * The row is not removed either way, unlike a "not relevant" verdict. Saving
+   * is not a judgement about the match; it is somebody saying they will come
+   * back to it, and taking it off the screen when they say so would be the
+   * opposite of helpful.
+   */
+  async function keep(match: Match, saved: boolean): Promise<void> {
+    setSaving(true);
+    setError(null);
+
+    try {
+      await requestJson(`/api/matches/${match.id}/saved`, {
+        method: "PUT",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ saved }),
+      });
+    } catch (cause) {
+      setError(messageFor(cause, "The match could not be saved."));
+      return;
+    } finally {
+      setSaving(false);
+    }
+
+    setMatches((current) => current.map((row) => (row.id === match.id ? { ...row, saved } : row)));
+  }
+
   async function judge(match: Match, verdict: Verdict): Promise<void> {
     setJudging(true);
     setError(null);
@@ -348,6 +389,23 @@ export function Inbox() {
                   {filter.label}
                 </option>
               ))}
+            </select>
+          </label>
+
+          {/*
+            A view rather than a filter: the saved list comes back newest-kept
+            first, where the inbox ranks by score and age. Something kept on
+            purpose does not get less kept overnight.
+          */}
+          <label className="filter">
+            <span>Show</span>
+            <select
+              aria-label="Which matches"
+              value={showSaved ? "saved" : "inbox"}
+              onChange={(event) => setShowSaved(event.target.value === "saved")}
+            >
+              <option value="inbox">Inbox</option>
+              <option value="saved">Saved</option>
             </select>
           </label>
         </div>
@@ -587,6 +645,15 @@ export function Inbox() {
                   >
                     Open conversation ↗
                   </a>
+                  <button
+                    aria-pressed={selectedMatch.saved}
+                    className={`secondary-button ${selectedMatch.saved ? "chosen" : ""}`}
+                    disabled={saving}
+                    type="button"
+                    onClick={() => void keep(selectedMatch, !selectedMatch.saved)}
+                  >
+                    {selectedMatch.saved ? "Saved" : "Save for later"}
+                  </button>
                   <span className="match-meta">{selectedMatch.intentLabel}</span>
                 </div>
 

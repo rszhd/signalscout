@@ -604,7 +604,24 @@ export const matches = pgTable(
     hidden: boolean("hidden").notNull().default(false),
     /** Null until the user opens it. Drives the unread filter and the re-check rate. */
     readAt: timestamp("read_at", { withTimezone: true }),
-    saved: boolean("saved").notNull().default(false),
+    /**
+     * When somebody kept this match, or null. US-043.
+     *
+     * A timestamp rather than the boolean this replaced, and the reason is the
+     * ordering. A saved list is worked through rather than read, so it is
+     * ordered by when things were put on it — the inbox's rank subtracts twelve
+     * points a day, and something kept on purpose does not get less kept
+     * overnight. A boolean cannot say when.
+     *
+     * The boolean it replaced was added for a screen nobody built and was false
+     * on every row in every database, so nothing was lost in the migration.
+     *
+     * **This is not a verdict.** `feedback` holds a judgement about the model,
+     * against the monitor version that earned it. This holds an intention, and
+     * it survives a re-classification untouched, because the person's intention
+     * is theirs.
+     */
+    savedAt: timestamp("saved_at", { withTimezone: true }),
     lastVerifiedAt: timestamp("last_verified_at", { withTimezone: true }).notNull().defaultNow(),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },

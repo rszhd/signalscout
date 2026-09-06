@@ -110,15 +110,22 @@ export function App() {
             </span>
             <span>Connections</span>
           </a>
-          <a
-            className={creating ? "nav-item new-monitor-nav current" : "nav-item new-monitor-nav"}
-            href={`${newMonitorRoute}${scoped}`}
-          >
-            <span className="nav-icon" aria-hidden="true">
-              +
-            </span>
-            <span>New monitor</span>
-          </a>
+          {/*
+            Also only inside a project: a monitor is made in one, and the form
+            prefills its four answers from it. Offered here it would make an
+            unfiled monitor, which is the state migration 0038 emptied out.
+          */}
+          {!projecting && (
+            <a
+              className={creating ? "nav-item new-monitor-nav current" : "nav-item new-monitor-nav"}
+              href={`${newMonitorRoute}${scoped}`}
+            >
+              <span className="nav-icon" aria-hidden="true">
+                +
+              </span>
+              <span>New monitor</span>
+            </a>
+          )}
         </nav>
 
         <div className="sidebar-bottom">

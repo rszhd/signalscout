@@ -141,7 +141,7 @@ describe("the four screens", () => {
    * shown pointing at everything — a link that silently means "every business
    * at once" is the thing grouping exists to remove.
    */
-  it("hides the inbox and the monitors while no project is chosen", async () => {
+  it("hides the inbox, the monitors and new-monitor while no project is chosen", async () => {
     screen = await mount(<App />);
 
     await go("#/projects");
@@ -150,7 +150,10 @@ describe("the four screens", () => {
       link.getAttribute("href"),
     );
 
-    expect(links).toEqual(["#/projects", "#/connections", "#/monitors/new"]);
+    // A monitor is made inside a project and prefills its four answers from
+    // one, so offering the form here would make an unfiled monitor — the state
+    // migration 0038 emptied out.
+    expect(links).toEqual(["#/projects", "#/connections"]);
   });
 
   it("carries the project through every link once one is chosen", async () => {

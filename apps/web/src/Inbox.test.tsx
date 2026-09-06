@@ -18,7 +18,11 @@ const hiringMonitor = {
   id: "22222222-2222-4222-8222-222222222222",
   name: "Agencies hiring for QA",
 };
-const monitors = [qaMonitor, hiringMonitor];
+/** Typed, so a case can add the project a monitor belongs to. US-045. */
+const monitors: { id: string; name: string; projectId?: string | null }[] = [
+  qaMonitor,
+  hiringMonitor,
+];
 
 function match(overrides: Record<string, unknown> = {}) {
   return {
@@ -403,6 +407,42 @@ describe("the intent inbox", () => {
       expect(container.textContent).toContain("Open conversation");
       expect(container.textContent).not.toContain("no link to a single comment");
     });
+  });
+
+  /**
+   * The monitor filter belongs to the project too. US-045.
+   *
+   * A dropdown holding another project's monitors offers a filter that empties
+   * the inbox and names no reason for it.
+   */
+  it("offers only the monitors of the project being looked at", async () => {
+    globalThis.location.hash = "#/?project=p1";
+
+    await show({}, [
+      { id: "m1", name: "Reddit weekly", projectId: "p1" },
+      { id: "m2", name: "Somebody else's", projectId: "p2" },
+      { id: "m3", name: "Unfiled", projectId: null },
+    ]);
+
+    const options = [...container.querySelectorAll("option")].map((option) => option.textContent);
+
+    expect(options).toContain("Reddit weekly");
+    expect(options).not.toContain("Somebody else's");
+    expect(options).not.toContain("Unfiled");
+
+    globalThis.location.hash = "";
+  });
+
+  it("offers every monitor when no project is chosen", async () => {
+    await show({}, [
+      { id: "m1", name: "Reddit weekly", projectId: "p1" },
+      { id: "m2", name: "Another", projectId: "p2" },
+    ]);
+
+    const options = [...container.querySelectorAll("option")].map((option) => option.textContent);
+
+    expect(options).toContain("Reddit weekly");
+    expect(options).toContain("Another");
   });
 
   it("does not claim a negative observation is a reason it matched", async () => {

@@ -69,6 +69,8 @@ interface MatchPage {
 interface MonitorSummary {
   id: string;
   name: string;
+  /** Optional, for BUG-008's reason: an older API does not send it. US-045. */
+  projectId?: string | null;
 }
 
 type LoadState = "loading" | "more" | "ready" | "error";
@@ -295,18 +297,37 @@ export function Inbox() {
   const [judging, setJudging] = useState(false);
   const [saving, setSaving] = useState(false);
 
+  /**
+   * The monitors this filter offers: the project's own, and no others.
+   *
+   * Re-read when the project changes rather than once on mount, for the same
+   * reason the matches are: moving between projects remounts nothing, and a
+   * dropdown left holding another project's monitors offers a filter that
+   * empties the inbox for no visible reason.
+   */
   useEffect(() => {
     let cancelled = false;
     requestJson<MonitorSummary[]>("/api/monitors")
       .then((rows) => {
-        if (!cancelled) setMonitors(rows.map(({ id, name }) => ({ id, name })));
+        if (cancelled) return;
+
+        const mine = projectId === null ? rows : rows.filter((row) => row.projectId === projectId);
+
+        setMonitors(mine.map(({ id, name }) => ({ id, name })));
+
+        // The monitor filter can outlive the project it belonged to. Clearing
+        // it is the honest reset: keeping it would show an empty inbox and
+        // name no reason.
+        setMonitorId((current) =>
+          current !== "" && !mine.some((row) => row.id === current) ? "" : current,
+        );
       })
       .catch(() => undefined);
 
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [projectId]);
 
   const loadFirstPage = useCallback(async (): Promise<void> => {
     setState("loading");

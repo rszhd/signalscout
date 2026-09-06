@@ -2,7 +2,7 @@
 
 # Open tickets
 
-11 open — 6 doing, 5 todo, 0 parked (3 p1, 7 p2, 1 p3).
+13 open — 6 doing, 7 todo, 0 parked (3 p1, 9 p2, 1 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -16,6 +16,8 @@
 | p2 | US-017 | [A self-hosted instance has one account](todo/US-017-a-self-hosted-instance-has-one-account.md) | feature | todo | 2026-09-04T22:49+08:00 |
 | p2 | US-019 | [The project has a license](todo/US-019-the-project-has-a-license.md) | chore | todo | 2026-09-04T23:00+08:00 |
 | p2 | US-035 | [A monitor is told where people are talking](todo/US-035-a-monitor-is-told-where-people-are-talking.md) | spike | todo | 2026-09-06T11:40+08:00 |
+| p2 | US-036 | [A provider is rated per platform, from measurements](todo/US-036-a-provider-is-rated-per-platform-from-measurements.md) | spike | todo | 2026-09-06T11:48+08:00 |
+| p2 | US-037 | [One subscription is enough](todo/US-037-one-subscription-is-enough.md) | feature | todo | 2026-09-06T11:48+08:00 |
 | p3 | US-018 | [A mutation sweep proves the suite is sensitive](todo/US-018-a-mutation-sweep-proves-the-suite-is-sensitive.md) | chore | todo | 2026-09-04T22:54+08:00 |
 
 Finished work is in [DONE.md](DONE.md). The rules and the ticket

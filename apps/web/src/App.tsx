@@ -110,8 +110,15 @@ export function App() {
             <span>Projects</span>
           </a>
 
-          {/* Only inside a project: both answer a question about one business. */}
-          {!projecting && (
+          {/*
+            Only when a project is in the route.
+            
+            Not "everywhere except the projects page": Connections is a
+            machine-level screen — one key, every project — so it carries no
+            project either, and offering an inbox link there would offer one
+            that answers for all of them.
+          */}
+          {projectId !== null && (
             <>
               <a
                 className={creating || listing || connecting ? "nav-item" : "nav-item current"}
@@ -140,11 +147,11 @@ export function App() {
             <span>Connections</span>
           </a>
           {/*
-            Also only inside a project: a monitor is made in one, and the form
-            prefills its four answers from it. Offered here it would make an
-            unfiled monitor, which is the state migration 0038 emptied out.
+            Also only with a project: a monitor is made in one, and the form
+            prefills its four answers from it. Offered without one it would
+            make an unfiled monitor, the state migration 0038 emptied out.
           */}
-          {!projecting && (
+          {projectId !== null && (
             <a
               className={creating ? "nav-item new-monitor-nav current" : "nav-item new-monitor-nav"}
               href={`${newMonitorRoute}${scoped}`}

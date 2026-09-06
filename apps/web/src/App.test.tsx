@@ -152,6 +152,25 @@ describe("the four screens", () => {
   });
 
   /**
+   * Connections is machine-level: one key serves every project. US-045.
+   *
+   * So it carries no project, and the project-scoped links are hidden there
+   * for the same reason they are hidden on the projects page — an inbox link
+   * with no project answers for all of them.
+   */
+  it("hides the project-scoped links on connections", async () => {
+    screen = await mount(<App />);
+
+    await go("#/connections");
+
+    const links = [...screen.container.querySelectorAll("nav a")].map((link) =>
+      link.getAttribute("href"),
+    );
+
+    expect(links).toEqual(["#/projects", "#/connections"]);
+  });
+
+  /**
    * The inbox and the monitor list are questions about one business. US-045.
    *
    * On the projects page no project is chosen, so both are hidden rather than

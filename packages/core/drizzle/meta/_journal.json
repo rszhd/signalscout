@@ -267,6 +267,13 @@
       "when": 1788707618110,
       "tag": "0037_a_document_can_draft_a_project",
       "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "7",
+      "when": 1788707618111,
+      "tag": "0038_every_monitor_has_a_project",
+      "breakpoints": true
     }
   ]
 }

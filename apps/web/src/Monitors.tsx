@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { messageFor, requestJson } from "./api.js";
 import { BrandIcon } from "./BrandIcon.js";
+import { routeParam } from "./route.js";
 import { choiceFor, describeSchedule, scheduleChoices } from "./schedule.js";
 
 /**
@@ -452,6 +453,21 @@ export function Monitors() {
   const [state, setState] = useState<LoadState>("loading");
   const [error, setError] = useState<string | null>(null);
 
+  /**
+   * The project this list is scoped to, from `#/monitors?project=<id>`.
+   *
+   * Filtered here rather than on the server: the list is small, the response
+   * already carries the project on every row, and a query parameter would be a
+   * second place for the same rule to live.
+   */
+  const [projectId, setProjectId] = useState(() => routeParam("project"));
+
+  useEffect(() => {
+    const onChange = () => setProjectId(routeParam("project"));
+    globalThis.addEventListener("hashchange", onChange);
+    return () => globalThis.removeEventListener("hashchange", onChange);
+  }, []);
+
   const load = useCallback(async (): Promise<void> => {
     try {
       setMonitors(await requestJson<Monitor[]>("/api/monitors"));
@@ -553,7 +569,11 @@ export function Monitors() {
         </p>
       )}
 
-      {groupsOf(monitors).map((group) => (
+      {groupsOf(
+        projectId === null
+          ? monitors
+          : monitors.filter((monitor) => monitor.projectId === projectId),
+      ).map((group) => (
         <section className="monitor-group" key={group.key}>
           {group.name !== null && (
             <h2 className="monitor-group-heading">

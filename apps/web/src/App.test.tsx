@@ -134,6 +134,41 @@ describe("the four screens", () => {
     expect(screen.container.textContent).toContain("Connections");
   });
 
+  /**
+   * The inbox and the monitor list are questions about one business. US-045.
+   *
+   * On the projects page no project is chosen, so both are hidden rather than
+   * shown pointing at everything — a link that silently means "every business
+   * at once" is the thing grouping exists to remove.
+   */
+  it("hides the inbox and the monitors while no project is chosen", async () => {
+    screen = await mount(<App />);
+
+    await go("#/projects");
+
+    const links = [...screen.container.querySelectorAll("nav a")].map((link) =>
+      link.getAttribute("href"),
+    );
+
+    expect(links).toEqual(["#/projects", "#/connections", "#/monitors/new"]);
+  });
+
+  it("carries the project through every link once one is chosen", async () => {
+    screen = await mount(<App />);
+
+    await go("#/?project=p1");
+
+    const links = [...screen.container.querySelectorAll("nav a")].map((link) =>
+      link.getAttribute("href"),
+    );
+
+    // The inbox, the monitors and the new-monitor form all stay inside the
+    // project a person is looking at.
+    expect(links).toContain("#/?project=p1");
+    expect(links).toContain("#/monitors?project=p1");
+    expect(links).toContain("#/monitors/new?project=p1");
+  });
+
   it("does not expose mockup routes whose behaviour is not built", async () => {
     screen = await mount(<App />);
 
@@ -143,7 +178,7 @@ describe("the four screens", () => {
     // Connections joined this list in US-023 and Projects in US-045, each when
     // the screen behind it was built. Settings is still a mockup route and must
     // stay off the nav: a link that leads nowhere is worse than no link.
-    expect(links).toEqual(["#/", "#/projects", "#/monitors", "#/connections", "#/monitors/new"]);
+    expect(links).toEqual(["#/projects", "#/", "#/monitors", "#/connections", "#/monitors/new"]);
     expect(screen.container.textContent).not.toContain("Settings");
   });
 });

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { messageFor, requestJson } from "./api.js";
 import { BrandIcon } from "./BrandIcon.js";
+import { routeParam } from "./route.js";
 
 /**
  * The intent inbox.
@@ -257,6 +258,21 @@ function whereItCameFrom(match: Match): string {
 
 export function Inbox() {
   const [monitors, setMonitors] = useState<MonitorSummary[]>([]);
+  /**
+   * The project this inbox is scoped to, from `#/?project=<id>`. US-045.
+   *
+   * Held in state and refreshed on `hashchange`, because moving between
+   * projects does not remount this screen — a value read once would keep
+   * showing the project a person had navigated away from.
+   */
+  const [projectId, setProjectId] = useState(() => routeParam("project"));
+
+  useEffect(() => {
+    const onChange = () => setProjectId(routeParam("project"));
+    globalThis.addEventListener("hashchange", onChange);
+    return () => globalThis.removeEventListener("hashchange", onChange);
+  }, []);
+
   const [monitorId, setMonitorId] = useState("");
   const [minScore, setMinScore] = useState(0);
   const [matches, setMatches] = useState<Match[]>([]);
@@ -297,6 +313,7 @@ export function Inbox() {
     setError(null);
 
     const query = new URLSearchParams();
+    if (projectId) query.set("projectId", projectId);
     if (monitorId) query.set("monitorId", monitorId);
     if (minScore > 0) query.set("minScore", String(minScore));
     if (showDismissed) query.set("includeNotRelevant", "true");
@@ -314,7 +331,7 @@ export function Inbox() {
       setError(messageFor(cause, "The inbox could not be loaded."));
       setState("error");
     }
-  }, [monitorId, minScore, showDismissed, showSaved]);
+  }, [projectId, monitorId, minScore, showDismissed, showSaved]);
 
   useEffect(() => {
     void loadFirstPage();
@@ -326,6 +343,7 @@ export function Inbox() {
     setError(null);
 
     const query = new URLSearchParams({ cursor: page.nextCursor, asOf: page.asOf });
+    if (projectId) query.set("projectId", projectId);
     if (monitorId) query.set("monitorId", monitorId);
     if (minScore > 0) query.set("minScore", String(minScore));
     if (showDismissed) query.set("includeNotRelevant", "true");

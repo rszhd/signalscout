@@ -5,6 +5,7 @@ import { MonitorForm } from "./MonitorForm.js";
 import { Monitors } from "./Monitors.js";
 import { Notifications } from "./Notifications.js";
 import { Projects } from "./Projects.js";
+import { routeParam, routePath } from "./route.js";
 
 /**
  * The shell: the header, and which of the four screens is on it.
@@ -41,11 +42,24 @@ export function App() {
   // The longer route is tested first: "#/monitors" is a prefix of
   // "#/monitors/new", and testing the shorter one first would put the list on
   // the screen for both.
-  const notificationId = /^#\/monitors\/([0-9a-f-]+)\/notifications$/.exec(route)?.[1];
-  const creating = route.startsWith(newMonitorRoute);
-  const listing = !creating && route.startsWith(monitorsRoute);
-  const connecting = route.startsWith(connectionsRoute);
-  const projecting = route.startsWith(projectsRoute);
+  const path = routePath(route);
+  const notificationId = /^#\/monitors\/([0-9a-f-]+)\/notifications$/.exec(path)?.[1];
+  const creating = path.startsWith(newMonitorRoute);
+  const listing = !creating && path.startsWith(monitorsRoute);
+  const connecting = path.startsWith(connectionsRoute);
+  const projecting = path.startsWith(projectsRoute);
+
+  /**
+   * The project everything else is about, carried in the route. US-045.
+   *
+   * An inbox and a list of monitors are questions about *a business*, so they
+   * mean nothing until one is chosen. On the projects page there is no project
+   * yet, and the two links are hidden rather than shown pointing at everything
+   * — a link that silently means "all businesses at once" is the thing this
+   * grouping exists to remove.
+   */
+  const projectId = routeParam("project", route);
+  const scoped = projectId === null ? "" : `?project=${projectId}`;
 
   return (
     <div className="app-shell">
@@ -60,29 +74,36 @@ export function App() {
         </a>
 
         <nav className="site-nav" aria-label="Screens">
-          <a
-            className={
-              creating || listing || connecting || projecting ? "nav-item" : "nav-item current"
-            }
-            href="#/"
-          >
-            <span className="nav-icon" aria-hidden="true">
-              ▤
-            </span>
-            <span>Intent inbox</span>
-          </a>
           <a className={projecting ? "nav-item current" : "nav-item"} href={projectsRoute}>
             <span className="nav-icon" aria-hidden="true">
               ▦
             </span>
             <span>Projects</span>
           </a>
-          <a className={listing ? "nav-item current" : "nav-item"} href={monitorsRoute}>
-            <span className="nav-icon" aria-hidden="true">
-              ◎
-            </span>
-            <span>Monitors</span>
-          </a>
+
+          {/* Only inside a project: both answer a question about one business. */}
+          {!projecting && (
+            <>
+              <a
+                className={creating || listing || connecting ? "nav-item" : "nav-item current"}
+                href={`#/${scoped}`}
+              >
+                <span className="nav-icon" aria-hidden="true">
+                  ▤
+                </span>
+                <span>Intent inbox</span>
+              </a>
+              <a
+                className={listing ? "nav-item current" : "nav-item"}
+                href={`${monitorsRoute}${scoped}`}
+              >
+                <span className="nav-icon" aria-hidden="true">
+                  ◎
+                </span>
+                <span>Monitors</span>
+              </a>
+            </>
+          )}
           <a className={connecting ? "nav-item current" : "nav-item"} href={connectionsRoute}>
             <span className="nav-icon" aria-hidden="true">
               ⚿
@@ -91,7 +112,7 @@ export function App() {
           </a>
           <a
             className={creating ? "nav-item new-monitor-nav current" : "nav-item new-monitor-nav"}
-            href={newMonitorRoute}
+            href={`${newMonitorRoute}${scoped}`}
           >
             <span className="nav-icon" aria-hidden="true">
               +

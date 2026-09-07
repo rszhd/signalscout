@@ -91,6 +91,16 @@ export const scrapeCreatorsReddit: ConnectorDefinition = {
   canFetchReplies: true,
   /** A comment page is one credit, the same as a search. Measured, not assumed. */
   replyPricePerUnitMicros: 1880,
+  /**
+   * The provider returns the comment's own URL, and US-047 opened one: it
+   * lands on the comment.
+   *
+   * Nothing is built here, which is the difference from YouTube and TikTok —
+   * `toCandidateReplies` reads `url`, falling back to the `permalink` Reddit
+   * supplies. A URL we invent is evidence about our own string building and
+   * none about the platform, and this is not one.
+   */
+  linksToComments: true,
   create: (runtime) => new ScrapeCreatorsRedditSource(runtime),
 };
 

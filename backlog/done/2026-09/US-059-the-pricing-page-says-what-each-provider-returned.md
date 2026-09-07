@@ -147,3 +147,24 @@ rather than filling it with matches and calling them leads.
   Left ready and empty on purpose: cost per *good* lead. The page says a match
   is our guess and a verdict is the person's, and names how many verdicts exist.
   There are five.
+
+- 2026-09-07T15:44+08:00 — Corrected a declaration this ticket got wrong, found
+  by the owner asking whether ScrapeCreators reads Reddit comments.
+
+  It does — `canFetchReplies: true`, a `fetchReplies`, and US-020 measured a
+  credit buying a page of 25. What was wrong is the new field beside it:
+  `linksToComments` was left absent, so the page printed **"links unproven"**
+  for the one Reddit connector whose links US-047 actually opened. The provider
+  returns the comment's own URL and `toCandidateReplies` reads it, falling back
+  to Reddit's `permalink`; nothing is built, which is the difference from
+  YouTube and TikTok.
+
+  All four platforms US-047 proved now say so, and Instagram alone stays
+  unproven, which is right.
+
+  **No test could have caught this**, and it is worth being clear why: the
+  field records what a person measured somewhere else. A suite can check that a
+  declared value reaches the screen, and this one does. It cannot check that
+  the value matches a measurement written in another ticket. That is what
+  reading the page against AGENTS.md is for, and one question found it in a
+  minute.

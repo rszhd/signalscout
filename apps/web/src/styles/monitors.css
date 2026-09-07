@@ -187,19 +187,36 @@
 }
 .monitor-settings .monitor-controls {
   margin-top: var(--space-5);
-  gap: var(--space-5);
+  gap: 0;
 }
-.monitor-controls section {
+.monitor-settings-section {
   min-width: 0;
+  padding: var(--space-5) 0;
+  border-bottom: 1px solid var(--line);
+}
+.monitor-settings-section:first-child {
+  padding-top: 0;
+}
+.monitor-settings-section:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
 }
 .monitor-controls h3 {
   margin: 0 0 var(--space-3);
   font-size: var(--text-sm);
 }
 .monitor-controls .field {
+  min-width: 0;
+  display: grid;
+  gap: var(--space-2);
   margin: 0;
 }
+.monitors-content .monitor-controls .field > span {
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
 .monitor-controls :is(input, select) {
+  width: 100%;
   max-width: 100%;
   min-height: var(--control-height);
   border: 1px solid var(--line-dark);
@@ -211,10 +228,36 @@
 }
 .monitor-controls .budget-field {
   min-width: 0;
-  max-width: 100%;
+  max-width: none;
+}
+.monitor-controls .budget-settings-form,
+.monitor-controls .prefilter-settings-form {
+  display: grid;
+  column-gap: var(--space-3);
+  row-gap: var(--space-3);
+  align-items: end;
+}
+.monitor-controls .budget-settings-form {
+  grid-template-columns: minmax(104px, 0.7fr) minmax(190px, 2fr);
+}
+.monitor-controls .prefilter-settings-form {
+  grid-template-columns: minmax(104px, 140px) minmax(0, 1fr);
+}
+.budget-settings-form .budget-actions,
+.prefilter-settings-form :is(.monitor-filter-counts, .budget-error) {
+  grid-column: 1 / -1;
 }
 .monitor-controls .budget-actions {
   flex-wrap: wrap;
+}
+.prefilter-settings-form .budget-actions {
+  min-height: var(--control-height);
+}
+.monitor-settings .schedule-controls {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.collection-settings-section .monitor-origin {
+  overflow-wrap: anywhere;
 }
 .monitors-content .monitor-card-actions {
   border: 0;
@@ -292,5 +335,14 @@
   }
   .monitors-content .monitor-settings summary > span {
     display: none;
+  }
+  .monitor-settings .schedule-controls,
+  .monitor-controls .budget-settings-form,
+  .monitor-controls .prefilter-settings-form {
+    grid-template-columns: 1fr;
+  }
+  .prefilter-settings-form .budget-actions {
+    grid-column: 1;
+    min-height: 0;
   }
 }

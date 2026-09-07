@@ -784,6 +784,32 @@ export function Inbox() {
                 </div>
 
                 {/*
+                  The three sub-scores sit under the post, open.
+
+                  They explain the number the list was ordered by, so they are
+                  read while the post is still in view. Behind a disclosure they
+                  were a click nobody made.
+                */}
+                <section className="score-section">
+                  <div className="score-heading">
+                    <h3>Score breakdown</h3>
+                    <span>{selectedMatch.score} / 100</span>
+                  </div>
+
+                  <dl className="match-scores">
+                    {scoreRows.map(([label, score]) => (
+                      <div key={label}>
+                        <dt>{label}</dt>
+                        <dd>{score}</dd>
+                        <span className="score-bar" aria-hidden="true">
+                          <i style={{ width: `${score}%` }} />
+                        </span>
+                      </div>
+                    ))}
+                  </dl>
+                </section>
+
+                {/*
                   What the link can and cannot do, said before it is pressed.
 
                   On TikTok the comment has no address. The provider returns
@@ -842,24 +868,6 @@ export function Inbox() {
                     ))}
                   </ul>
                 </div>
-
-                <details className="disclosure score-section">
-                  <summary>
-                    Score breakdown <span>{selectedMatch.score} / 100</span>
-                  </summary>
-
-                  <dl className="match-scores">
-                    {scoreRows.map(([label, score]) => (
-                      <div key={label}>
-                        <dt>{label}</dt>
-                        <dd>{score}</dd>
-                        <span className="score-bar" aria-hidden="true">
-                          <i style={{ width: `${score}%` }} />
-                        </span>
-                      </div>
-                    ))}
-                  </dl>
-                </details>
 
                 <div className="verdict-actions">
                   <p className="section-label">Was this a good lead?</p>

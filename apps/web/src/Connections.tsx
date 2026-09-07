@@ -405,6 +405,7 @@ function PlatformRow({
                 key={provider.id}
               >
                 <input
+                  className="visually-hidden"
                   checked={platform.chosen === provider.id}
                   disabled={busy || !provider.connected}
                   name={`provider-for-${platform.id}`}

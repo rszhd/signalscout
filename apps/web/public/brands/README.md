@@ -1,9 +1,10 @@
 # Brand icons
 
-Downloaded from official websites on 2026-09-06. Original favicon files, used
-to identify the provider or platform; their respective owners retain rights
-to their logos and trademarks. These assets are not covered by the project’s
-Apache-2.0 license. Served locally; the UI makes no external favicon requests.
+Downloaded from official websites on 2026-09-06, and `instagram.png` on
+2026-09-07. Original favicon files, used to identify the provider or
+platform; their respective owners retain rights to their logos and
+trademarks. These assets are not covered by the project’s Apache-2.0
+license. Served locally; the UI makes no external favicon requests.
 
 | File | Source |
 | --- | --- |
@@ -15,3 +16,4 @@ Apache-2.0 license. Served locally; the UI makes no external favicon requests.
 | `linkedin.ico` | https://static.licdn.com/aero-v1/sc/h/al2o9zrvru7aqj8e1x2rzsrca |
 | `youtube.png` | https://www.youtube.com/s/desktop/f82dea74/img/favicon_96x96.png |
 | `tiktok.png` | https://www.tiktok.com/favicon.ico |
+| `instagram.png` | https://www.instagram.com/favicon.ico |

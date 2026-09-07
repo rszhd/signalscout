@@ -10,6 +10,7 @@ const icons: Record<string, string> = {
   linkedin: "linkedin.ico",
   youtube: "youtube.png",
   tiktok: "tiktok.png",
+  instagram: "instagram.png",
 };
 
 /** Decorative: callers keep the provider/platform name alongside the icon. */

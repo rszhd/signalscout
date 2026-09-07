@@ -219,7 +219,7 @@ function BudgetForm({ monitor, onSaved }: { monitor: Monitor; onSaved: () => Pro
   }
 
   return (
-    <div className="budget-form">
+    <div className="budget-form budget-settings-form">
       <label className="budget-field">
         <span className="budget-label">Monthly cap</span>
         <input
@@ -375,7 +375,7 @@ function PreFilterForm({ monitor, onSaved }: { monitor: Monitor; onSaved: () => 
   }
 
   return (
-    <div className="budget-form">
+    <div className="budget-form prefilter-settings-form">
       <label className="budget-field">
         <span className="budget-label">Similarity needed</span>
         <input
@@ -805,20 +805,20 @@ function MonitorCards({
                 Schedule & settings <span>Budget · filtering · activity</span>
               </summary>
               <div className="monitor-controls">
-                <section>
+                <section className="monitor-settings-section">
                   <h3>Schedule</h3>
                   <ScheduleForm monitor={monitor} onSaved={load} />
                 </section>
-                <section>
+                <section className="monitor-settings-section">
                   <h3>Monthly budget (USD)</h3>
                   <BudgetForm monitor={monitor} onSaved={load} />
                 </section>
-                <section>
+                <section className="monitor-settings-section">
                   <h3>Pre-filter</h3>
                   <PreFilterForm monitor={monitor} onSaved={load} />
                 </section>
-                <section>
-                  <h3>Last collection</h3>{" "}
+                <section className="monitor-settings-section collection-settings-section">
+                  <h3>Last collection</h3>
                   {/* Who actually collected, which is not always who would collect
                   now: the choice can be changed and this is the record of what
                   ran. Read from the ledger, so the moment is when money was

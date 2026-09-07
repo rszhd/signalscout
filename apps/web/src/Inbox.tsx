@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { messageFor, requestJson } from "./api.js";
 import { BrandIcon } from "./BrandIcon.js";
 import { ageLabel } from "./labels.js";
+import { ReplyDraft } from "./ReplyDraft.js";
 import { projectSuffix, routeParam } from "./route.js";
 
 /**
@@ -857,6 +858,8 @@ export function Inbox() {
                     ))}
                   </ul>
                 </div>
+
+                <ReplyDraft key={selectedMatch.id} matchId={selectedMatch.id} />
 
                 <div className="verdict-actions">
                   <p className="section-label">Was this a good lead?</p>

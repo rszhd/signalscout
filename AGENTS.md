@@ -834,6 +834,46 @@ hand, because Reddit answers 403 to an unauthenticated request, and
 it. What the plan is not proven to be is *useful* — a name that exists can
 still be the wrong place to look.
 
+**A reply can be drafted, and this product still never posts.** US-040 closed
+on 2026-09-07. A match has a Draft reply button; pressing it asks the model
+once, and the draft arrives in a textarea with a copy action and a line saying
+nothing is posted from here. PLAN.md puts social publishing on the *not
+building* list and the panel ends at the clipboard.
+
+**Nothing is generated on a schedule.** No draft at poll time, at classify
+time, or in advance, and no cache — pressing the button twice asks twice,
+because that is what pressing it twice means. A draft costs a model call and a
+person's reputation.
+
+**The prompt is the product decision, and `ai/reply.ts` holds it in words**:
+never open with the product, mention it once at most and preferably not at all,
+never invent a fact about it, never claim to be a customer, and write any doubt
+*into the draft* as `[check: …]` where somebody editing will see it. A model
+told only to "write a reply" writes a landing page.
+
+**A person saves reply instructions on their account, several of them, and
+picks one when drafting.** Not per project: a voice is how one person writes,
+so a copy per project would be the same words drifting apart. An instruction is
+appended as a preference and the prompt says which rules it may not override —
+"always open by naming our product" is the thing the prompt exists to prevent.
+
+**One live draft is the evidence.** On a Reddit post asking how to reach a
+first customer the model wrote practical advice, **mentioned the product not at
+all** — which the prompt permits — and ended with a bracketed check because the
+post never said what the product does. $0.005134 and 5.6 seconds on
+`gpt-5.6-terra`.
+
+**That run found a bug 1,335 tests could not, and it is the same one US-057
+shipped.** `draft_reply` was added to `modelCallPurposes` in TypeScript and not
+to the database's check constraint, so the call succeeded, the money was spent,
+and *recording it* failed. Migration 0042 adds it. **A value added to an array
+in `schema.ts` is not a value the database accepts** — twice in one day now,
+after `apify`. Check the constraint.
+
+Its fixtures are not captured from a real model:
+[US-062](backlog/todo/US-062-a-real-model-s-drafts-are-replayed.md) is that
+gap, and `ai/reply.test.ts` asserts the prompt's words meanwhile.
+
 Two tickets are in `doing/`.
 [US-015](backlog/doing/US-015-a-deleted-post-stops-being-shown.md) has the
 scheduled deletion job, budget guard, durable provider continuations and post

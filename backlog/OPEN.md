@@ -19,12 +19,12 @@
 | p2 | US-036 | [A provider is rated per platform, from measurements](todo/US-036-a-provider-is-rated-per-platform-from-measurements.md) | spike | todo | 2026-09-06T11:48+08:00 |
 | p2 | US-037 | [One subscription is enough](todo/US-037-one-subscription-is-enough.md) | feature | todo | 2026-09-06T11:48+08:00 |
 | p2 | US-039 | [A thread that ranks on Google is a lead for years](todo/US-039-a-thread-that-ranks-on-google-is-a-lead-for-years.md) | spike | todo | 2026-09-06T12:32+08:00 |
-| p2 | US-040 | [A draft reply the person sends themselves](todo/US-040-a-draft-reply-the-person-sends-themselves.md) | feature | todo | 2026-09-06T12:32+08:00 |
 | p2 | US-042 | [A search without a monitor](todo/US-042-a-search-without-a-monitor.md) | feature | todo | 2026-09-06T12:35+08:00 |
 | p2 | US-046 | [A reply is posted from the inbox](todo/US-046-a-reply-is-posted-from-the-inbox.md) | feature | todo | 2026-09-06T15:12+08:00 |
 | p2 | US-050 | [A project is filled in from a URL or a file](todo/US-050-a-project-is-filled-in-from-a-url-or-a-file.md) | feature | todo | 2026-09-06T23:05+08:00 |
 | p2 | US-052 | [A monitor does not poll overnight](todo/US-052-a-monitor-does-not-poll-overnight.md) | feature | todo | 2026-09-07T00:25+08:00 |
 | p2 | US-053 | [A connector ships without being offered](todo/US-053-a-connector-ships-without-being-offered.md) | feature | todo | 2026-09-07T12:55+08:00 |
+| p2 | US-062 | [A real model's drafts are replayed](todo/US-062-a-real-model-s-drafts-are-replayed.md) | chore | todo | 2026-09-07T20:30+08:00 |
 | p3 | US-018 | [A mutation sweep proves the suite is sensitive](todo/US-018-a-mutation-sweep-proves-the-suite-is-sensitive.md) | chore | todo | 2026-09-04T22:54+08:00 |
 | p3 | US-038 | [Instagram, TikTok and Threads](parked/US-038-instagram-tiktok-and-threads.md) | feature | parked | 2026-09-06T11:56+08:00 |
 

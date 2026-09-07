@@ -44,6 +44,8 @@ export {
   type ProjectDescriber,
   type ProjectDraft,
 } from "./ai/describe.js";
+export { createDrafter, type Drafter, type DraftOutcome, type DraftRequest } from "./ai/draft.js";
+export { type DraftContext, draftContext } from "./ai/draft-context.js";
 export {
   createEmbedder,
   createEmbeddingModel,
@@ -87,6 +89,24 @@ export {
   type RecordModelCallInput,
   recordModelCall,
 } from "./ai/record.js";
+export {
+  buildReplySystemPrompt,
+  buildReplyUserPrompt,
+  type Draft,
+  draftSchema,
+  type ReplyVoice,
+} from "./ai/reply.js";
+export {
+  type CreateReplyPromptInput,
+  createReplyPrompt,
+  DuplicateReplyPromptName,
+  deleteReplyPrompt,
+  listReplyPrompts,
+  type ReplyPrompt,
+  replyPromptInstruction,
+  type UpdateReplyPromptInput,
+  updateReplyPrompt,
+} from "./ai/reply-prompts.js";
 export {
   type BudgetState,
   budgetState,
@@ -152,6 +172,7 @@ export {
   providers,
   queryEstimateProbes,
   queryEstimates,
+  replyPrompts,
   type Signal,
   type Source,
   signals,

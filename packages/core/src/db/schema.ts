@@ -256,6 +256,14 @@ export const modelCallPurposes = [
    * answer to "what did my key pay for" would be wrong without a name for it.
    */
   "project_analysis",
+  /**
+   * Drafting a reply to one match. US-040.
+   *
+   * Its own purpose because a person asking "what did my key pay for" must be
+   * able to tell a draft from a classification: a draft is one call a person
+   * chose to make, where a classification is one the poll made for them.
+   */
+  "draft_reply",
 ] as const;
 export type ModelCallPurpose = (typeof modelCallPurposes)[number];
 
@@ -315,6 +323,48 @@ export const projects = pgTable("projects", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
+
+/**
+ * The reply instructions a person has saved. US-040.
+ *
+ * **Owned by the account, not by a project.** The owner asked for it that way
+ * and the reason is reuse: a voice is how *this person* writes, so the same
+ * instruction serves every project they run. A copy per project would be the
+ * same words typed twice and drifting apart from the moment one is edited.
+ *
+ * Several rather than one, because a person replies differently in different
+ * rooms — short and technical under a subreddit question, longer under a
+ * LinkedIn post — and the choice belongs at the moment of drafting rather than
+ * in a setting somewhere.
+ *
+ * Nothing here outranks `ai/reply.ts`'s rules. An instruction is appended as
+ * the person's preference, and the prompt says which of its rules a preference
+ * may not override — "always open by naming our product" is the thing that
+ * prompt exists to prevent.
+ */
+export const replyPrompts = pgTable(
+  "reply_prompts",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    /** Text and no foreign key, for the reason `monitors.user_id` gives. */
+    userId: text("user_id").notNull(),
+    /** What the person calls it, so a list of several is choosable. */
+    name: text("name").notNull(),
+    instruction: text("instruction").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    // A blank name is unchoosable and a blank instruction is not an
+    // instruction. Both are refused in the database rather than only in a
+    // route, because a route is one of the ways a row arrives.
+    check("reply_prompts_name_not_blank", sql`length(btrim(${table.name})) > 0`),
+    check("reply_prompts_instruction_not_blank", sql`length(btrim(${table.instruction})) > 0`),
+    // Two prompts called the same thing are a person choosing blind. Compared
+    // case-insensitively, because "Short" and "short" read as one name.
+    uniqueIndex("reply_prompts_user_name_unique").on(table.userId, sql`lower(${table.name})`),
+  ],
+);
 
 export const monitors = pgTable(
   "monitors",

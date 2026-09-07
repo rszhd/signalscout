@@ -2,7 +2,7 @@
 
 # Done
 
-48 finished.
+49 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
@@ -26,6 +26,7 @@
 | US-047 | [Every comment link is opened once](done/2026-09/US-047-every-comment-link-is-opened-once.md) | chore | shipped | 2026-09 |
 | US-045 | [A project holds what every monitor repeats](done/2026-09/US-045-a-project-holds-what-every-monitor-repeats.md) | feature | shipped | 2026-09 |
 | US-044 | [TikTok is the fifth platform](done/2026-09/US-044-tiktok-is-the-fifth-platform.md) | feature | shipped | 2026-09 |
+| US-040 | [A draft reply the person sends themselves](done/2026-09/US-040-a-draft-reply-the-person-sends-themselves.md) | feature | shipped | 2026-09 |
 | US-034 | [YouTube is the fourth platform](done/2026-09/US-034-youtube-is-the-fourth-platform.md) | feature | shipped | 2026-09 |
 | US-032 | [The classifier reads with the careful model](done/2026-09/US-032-the-classifier-reads-with-the-careful-model.md) | chore | shipped | 2026-09 |
 | US-031 | [SocialCrawl is measured as a third Reddit provider](done/2026-09/US-031-socialcrawl-is-measured-as-a-third-reddit-provider.md) | spike | shipped | 2026-09 |

@@ -1,6 +1,7 @@
 import { existsSync } from "node:fs";
 import fastifyStatic from "@fastify/static";
 import {
+  type AiConfig,
   aiConfigFromEnvironment,
   builtInSources,
   type ConnectorDefinition,
@@ -28,6 +29,7 @@ import {
 } from "fastify-type-provider-zod";
 import { z } from "zod";
 import { registerConnectionRoutes } from "./connections.js";
+import { registerDraftRoutes, registerReplyPromptRoutes } from "./drafts.js";
 import { registerEstimateRoutes } from "./estimates.js";
 import { registerMatchRoutes } from "./matches.js";
 import { registerMonitorRoutes } from "./monitors.js";
@@ -132,6 +134,23 @@ export function describerFor(env: Env, logger: Logger): ProjectDescriber | null 
   return createProjectDescriber({ config: aiConfigFromEnvironment(env) });
 }
 
+/**
+ * The model a draft is written with, or null when this deployment has none.
+ *
+ * Null rather than a throw, for the same reason as the two above: a draft is a
+ * button a person may never press, and refusing to boot over a missing key
+ * would take the inbox away with it. The route says so in words a person can
+ * act on.
+ */
+export function draftConfigFor(env: Env, logger: Logger): AiConfig | null {
+  if (needsApiKey(env.AI_PROVIDER) && !env.AI_API_KEY) {
+    logger.warn({ provider: env.AI_PROVIDER }, "no AI_API_KEY: replies cannot be drafted");
+    return null;
+  }
+
+  return aiConfigFromEnvironment(env);
+}
+
 export function queryGeneratorFor(env: Env, logger: Logger): QueryGenerator | null {
   if (needsApiKey(env.AI_PROVIDER) && !env.AI_API_KEY) {
     logger.warn(
@@ -188,6 +207,8 @@ export async function buildServer({
 
   await registerConnectionRoutes(app, { db, sources, environment, encryption, logger });
   await registerPricingRoutes(app, { db, sources, environment });
+  await registerDraftRoutes(app, { db, ai: draftConfigFor(env, logger) });
+  await registerReplyPromptRoutes(app, { db });
 
   await registerMonitorRoutes(app, {
     db,

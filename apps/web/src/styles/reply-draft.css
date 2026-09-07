@@ -1,0 +1,109 @@
+/*
+ * The draft panel in the inbox. US-040.
+ *
+ * It sits between what the model saw and the verdict buttons, which is the
+ * order a person works in: read why this matched, write a reply, say whether
+ * it was a good lead. docs/design.md — every colour and radius here is a token.
+ */
+
+.reply-draft {
+  margin-top: var(--space-6, 1rem);
+  padding-top: var(--space-6, 1rem);
+  border-top: 1px solid var(--line);
+}
+
+.reply-draft-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.reply-draft-controls .filter {
+  flex: 1 1 10rem;
+  min-width: 0;
+}
+
+.reply-draft-prompts,
+.reply-draft-result {
+  margin-top: 0.75rem;
+}
+
+.reply-draft-prompts textarea,
+.reply-draft-result textarea {
+  width: 100%;
+  padding: 0.5rem 0.625rem;
+  border: 1px solid var(--line-dark);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: var(--text-xs);
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.reply-draft-prompts .field span,
+.reply-draft-result .field span {
+  display: block;
+  margin-bottom: 0.375rem;
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+.reply-draft-prompt-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.reply-draft-prompt-actions input {
+  flex: 1 1 8rem;
+  min-width: 0;
+  padding: 0.375rem 0.5rem;
+  border: 1px solid var(--line-dark);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: var(--text-xs);
+}
+
+/*
+ * What the model was unsure of, under the draft rather than beside it.
+ *
+ * The same doubts are written into the draft itself as `[check: …]`, because
+ * that is where somebody editing is looking. This list is for the ones who
+ * scan, and it is why the duplication is deliberate.
+ */
+.reply-draft-checks {
+  margin-top: 0.75rem;
+  padding: 0.625rem 0.75rem;
+  border-radius: var(--radius-sm);
+  background: var(--surface-soft);
+  border: 1px solid var(--line);
+}
+
+.reply-draft-checks ul {
+  margin: 0.375rem 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.8125rem;
+  color: var(--muted-strong);
+}
+
+.reply-draft-checks li {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.reply-draft-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.625rem;
+  margin-top: 0.625rem;
+}

@@ -175,3 +175,30 @@ enum: 1,228 tests passed and it could not have stored a single row.
 
   Still unproven: a real rate limit, a real 402, and a second poll proving
   deduplication on X.
+
+- 2026-09-07T18:22+08:00 — **Deduplication is proven on X, and a rate limit is
+  still not.**
+
+  A second poll of the same query with the same 24-hour window collected **8
+  posts, billed 8 units and $0.0016, and stored 1 new**. Seven of the eight
+  were already held and were not stored again. The one new row is a tweet
+  written in the twenty-four minutes between the two runs, which is the
+  connector working rather than failing.
+
+  **The cost matched the provider's balance exactly for the second time**:
+  `api_usage` holds 1,600 micro-dollars and the account moved $0.066 to
+  $0.0644. Two polls, two exact matches.
+
+  **The rate limit was not provoked.** Twenty-five searches fired back to back
+  all answered 200. So the limit is above that rate and the 429 branch remains
+  our half of a contract the provider has not shown us. That is the same state
+  every connector in this repository is in, and it is worth saying that trying
+  and failing to trigger one is not evidence there is none.
+
+  The attempt cost $0.0044 and corrected a finding in
+  [US-060](US-060-x-is-measured-at-socialdata.md): an empty search is free only
+  inside the three-requests-a-minute allowance, and costs $0.0002 outside it.
+
+  Still unproven: a real rate limit, and a real 402. The 402 is not worth
+  forcing — it costs the whole balance — so it should be captured when the
+  account runs out on its own.

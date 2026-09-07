@@ -182,3 +182,25 @@ here.
   wrong key, and the budget guard cannot see somebody else's balance. And the
   **post URL is ours to build**, which US-047 says is the kind worth
   re-checking whenever the parser changes.
+
+- 2026-09-07T18:20+08:00 — **Correcting this ticket's own finding: an empty
+  search is not free.**
+
+  The capture measured one impossible-phrase search and the balance did not
+  move, and this Log recorded it as measured-free while noting it might be the
+  free allowance. It was the free allowance. Twenty-five empty searches fired
+  back to back cost **$0.0044**, which is 22 charged at $0.0002 and **3 free** —
+  exactly the three requests a minute the documentation describes.
+
+  So the rule is: an empty search costs a fifth of a tweet, and the first three
+  calls a minute are free whatever they return. That matters to a monitor with
+  several queries that match nothing — it pays for each of them, every poll.
+  SocialCrawl still refunds an empty X search outright, which is a real
+  difference between the two providers and the one place the incumbent is
+  cheaper.
+
+  **The lesson is about the instrument, not the provider.** One call inside a
+  free allowance measures the allowance, not the price. A capture that fires a
+  single request cannot tell the two apart, and this one said so at the time
+  rather than claiming more than it knew — which is why the correction is a
+  paragraph and not a bug.

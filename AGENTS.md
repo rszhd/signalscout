@@ -510,9 +510,23 @@ The poll found zero matches. Six posts mentioning flaky tests in one day on X
 is a thin sample of a narrow query, and it says nothing about the connector,
 which returned what it was asked for.
 
-Still unproven: a real rate limit, a real 402, and a second poll proving
-deduplication on X. `canFetchReplies` is false because nobody has measured the
-provider's comment endpoint or whether its links open.
+**Deduplication is proven, and the cost matched twice.** A second poll of the
+same query collected 8 posts, billed 8 units, and stored **1 new** — seven were
+already held, and the one new row is a tweet written between the two runs.
+`api_usage` matched the account's own balance to the micro-dollar on both polls.
+
+**An empty search is free only inside the free allowance.** The capture read
+one and the balance did not move; twenty-five fired back to back cost $0.0044,
+which is 22 charged at $0.0002 and 3 free — the documented three requests a
+minute. SocialCrawl refunds an empty X search outright, which is the one place
+the incumbent is cheaper. **One call inside a free allowance measures the
+allowance, not the price.**
+
+Still unproven: a real rate limit — twenty-five back-to-back searches all
+answered 200, so the limit is above that rate and trying without triggering one
+is not evidence there is none — and a real 402, which is not worth forcing
+because it costs the whole balance. `canFetchReplies` is false because nobody
+has measured the provider's comment endpoint or whether its links open.
 
 **X had one provider, and the reason was that only one of three could search
 it.** US-006 added SocialCrawl on 2026-09-05. Bright Data's X posts dataset

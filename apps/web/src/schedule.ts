@@ -189,3 +189,32 @@ export function browserTimezone(): string {
     return "UTC";
   }
 }
+
+/**
+ * Every time zone this browser knows, with the chosen one guaranteed present.
+ *
+ * `Intl.supportedValuesOf` is the browser's own list, so nothing here is a
+ * table of names that goes stale when a country moves its clocks. Two things
+ * are defended against, and both would be silent:
+ *
+ * A browser too old to have the function leaves an empty list, and a `select`
+ * with no matching option shows blank and posts something nobody chose. So the
+ * fallback is the current zone and UTC — a short list, but never a wrong one.
+ *
+ * A stored zone the browser does not know — an old name like `Asia/Calcutta`,
+ * or a build newer than the browser — is put at the front rather than dropped,
+ * for the same reason: opening a form must not change what it is editing.
+ */
+export function timezoneOptions(current: string): string[] {
+  let supported: string[] = [];
+
+  try {
+    supported = Intl.supportedValuesOf("timeZone");
+  } catch {
+    supported = [];
+  }
+
+  if (supported.length === 0) return current === "UTC" ? ["UTC"] : [current, "UTC"];
+
+  return supported.includes(current) ? supported : [current, ...supported];
+}

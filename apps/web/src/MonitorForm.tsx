@@ -5,7 +5,7 @@ import { CostTest, type EstimateReport, exceedsCap } from "./CostTest.js";
 import { formatMicros, toMicros } from "./Monitors.js";
 import { projectSuffix } from "./route.js";
 import { ScheduleField } from "./ScheduleField.js";
-import { browserTimezone, defaultRate, everyDay } from "./schedule.js";
+import { browserTimezone, defaultRate, everyDay, timezoneOptions } from "./schedule.js";
 
 interface SignalOption {
   id: string;
@@ -1071,14 +1071,23 @@ export function MonitorForm() {
                 />
                 <details className="disclosure timezone-setting">
                   <summary>Time zone · {timezone}</summary>
+                  {/* A list rather than a text field. The scheduler reads an
+                      IANA name, and a typed one that is not a name is a monitor
+                      whose days mean something else than the person meant. */}
                   <label className="field">
                     <span>Time zone</span>
-                    <input
+                    <select
                       aria-label="Time zone"
                       required
                       value={timezone}
                       onChange={(event) => setTimezone(event.target.value)}
-                    />
+                    >
+                      {timezoneOptions(timezone).map((zone) => (
+                        <option key={zone} value={zone}>
+                          {zone}
+                        </option>
+                      ))}
+                    </select>
                   </label>
                   <p>Days follow this time zone. We started with your browser’s setting.</p>
                 </details>

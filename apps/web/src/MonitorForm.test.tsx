@@ -9,7 +9,17 @@
 import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { MonitorForm } from "./MonitorForm.js";
-import { button, field as input, json, mount, type Screen, settle, setValue } from "./testing.js";
+import { browserTimezone } from "./schedule.js";
+import {
+  button,
+  field as input,
+  json,
+  mount,
+  select as pick,
+  type Screen,
+  settle,
+  setValue,
+} from "./testing.js";
 
 const options = {
   signals: [
@@ -325,6 +335,48 @@ describe("the monitor form", () => {
       sources: ["reddit"],
     });
     expect(container.textContent).toContain("Journeys is running");
+  });
+
+  /**
+   * The time zone is chosen from a list, not typed.
+   *
+   * The scheduler reads an IANA name. A typed one that is not a name is a
+   * monitor whose days mean something other than the person meant, and nothing
+   * on this screen would say so.
+   */
+  it("offers the time zones the browser knows, and sends the one chosen", async () => {
+    fetchMock.mockImplementation(async (request: string | URL | Request) => {
+      const url = String(request);
+      if (url === "/api/monitor-options") return json(options);
+      if (url === "/api/monitors/queries") return json(generated);
+      if (url === "/api/monitors") {
+        return json({ id: "m", name: "Journeys", paused: false, missingCredentials: [] }, 201);
+      }
+      throw new Error(`Unexpected request: ${url}`);
+    });
+
+    await toSources();
+    await act(async () => button("Generate search plan").click());
+    await act(async () => button("Continue to schedule").click());
+
+    const zones = pick("Time zone");
+
+    expect(zones.tagName).toBe("SELECT");
+    // The browser's own zone is the default, and it is in the list rather than
+    // only in the value: a select showing nothing posts something nobody chose.
+    expect(zones.value).toBe(browserTimezone());
+    expect([...zones.options].some((option) => option.value === browserTimezone())).toBe(true);
+    expect(zones.options.length).toBeGreaterThan(50);
+
+    await act(async () => setValue(zones, "Asia/Tokyo"));
+    await act(async () => button("Start monitor").click());
+    await settle();
+
+    const created = fetchMock.mock.calls.find(([url]) => url === "/api/monitors");
+
+    expect(JSON.parse(created?.[1]?.body as string)).toMatchObject({
+      pollTimezone: "Asia/Tokyo",
+    });
   });
 
   /**

@@ -180,9 +180,14 @@
 .timezone-setting .field {
   margin-top: var(--space-4);
 }
+/* The note under the field, not a paragraph of prose: the browser's own
+   1em above and below left a hole between it and the select, and a second one
+   at the foot of the panel. */
 .timezone-setting p {
+  margin: var(--space-2) 0 0;
   color: var(--muted);
   font-size: var(--text-sm);
+  line-height: 1.5;
 }
 .setup-content .amount-input input {
   border: 0;

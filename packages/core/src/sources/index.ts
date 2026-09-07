@@ -26,6 +26,12 @@ export {
   xPlatformId,
 } from "./platforms.js";
 export {
+  ApifyLinkedInSource,
+  apifyLinkedIn,
+  toCandidatePost as toApifyLinkedInCandidatePost,
+} from "./providers/apify/linkedin.js";
+export { apifyProvider, apifyProviderId } from "./providers/apify/provider.js";
+export {
   brightDataProvider,
   brightDataProviderId,
 } from "./providers/brightdata/provider.js";
@@ -89,6 +95,7 @@ export type {
 } from "./types.js";
 export { connectorIdPattern } from "./types.js";
 
+import { apifyLinkedIn } from "./providers/apify/linkedin.js";
 import { brightDataReddit } from "./providers/brightdata/reddit.js";
 import { scrapeCreatorsReddit } from "./providers/scrapecreators/reddit.js";
 import { socialCrawlInstagram } from "./providers/socialcrawl/instagram.js";
@@ -126,7 +133,12 @@ export const builtInSources: readonly ConnectorDefinition[] = [
   scrapeCreatorsReddit,
   socialCrawlReddit,
   socialCrawlX,
+  // Grouped by platform, not by provider. `groupByPlatform` keeps registration
+  // order, and that order is what the monitor form and the connections screen
+  // show — so a new provider goes beside the others for its platform, or it
+  // moves the platform up the screen for everybody. US-055 found that out.
   socialCrawlLinkedIn,
+  apifyLinkedIn,
   socialCrawlYouTube,
   socialCrawlTikTok,
   socialCrawlInstagram,

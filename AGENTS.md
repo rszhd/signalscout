@@ -314,6 +314,62 @@ and the hashtag search was never called — the capture ran lean at 13 credits a
 left that question open. `--lean` is the flag; running it without one answers
 both remaining questions.
 
+**LinkedIn has two providers, and the second one was chosen for freshness
+rather than price.** US-057 added HarvestAPI's actor on Apify on 2026-09-07,
+after US-056 measured three providers for one platform and US-055 built and
+dropped one of them.
+
+**Every post the measurement returned was under ninety minutes old** — ten
+posts across a 71-minute page. ScrapeCreators' newest was three days old and
+SocialCrawl orders by relevance across weeks. That is the number this connector
+exists for, and it is not the cheap one: fifty posts cost **$0.10** on a free
+Apify plan, against $0.0094 through ScrapeCreators and $0.2030 through
+SocialCrawl.
+
+**Apify is a marketplace, not a data API.** What we call is one actor somebody
+else publishes, so the actor can change under us without the API changing at
+all — a reason to re-run the capture rather than to trust a fixture for ever.
+The credential field is `apiToken`, which is what makes
+`environmentVariableFor` produce `APIFY_API_TOKEN`; a field called `apiKey`
+would have silently asked for a variable nobody sets. `logger.ts` redacts
+`apiToken` too, and the leak test is what caught that it did not.
+
+**The bill settles after the run ends, and that is the trap.** A run that had
+just returned ten posts reported `usageTotalUsd: 0.00005` — its start event
+alone — and $0.02005 a few seconds later. A budget guard fed the first number
+would price every poll at five thousandths of a cent and refuse nothing, for
+ever, silently. `client.ts` waits for the total to stop moving, and
+`unitsConsumed` is that total divided by the price of a post rather than the
+item count: a run that matches nothing returns no posts and still costs
+$0.00105.
+
+Three more measured facts. **`sortBy: "date"` selects recent posts but does not
+order them**, so no page may be read as older than the next — the same
+early-stop rule that is absent from the SocialCrawl LinkedIn connector, absent
+here for a different reason. **The id is the activity id**, the same number
+SocialCrawl returns, so the two providers deduplicate against each other. And
+**the run is asynchronous**, 3 to 11 seconds, so the run id travels in the
+cursor: a resumed poll that started a second run would buy the same posts
+again, which is BUG-001's lesson at a per-post price.
+
+Still unproven: the window. `postedLimit` was sent and could not be shown to
+narrow anything, because a week cannot narrow an answer that is already 71
+minutes wide. Its seven values come from the actor's input schema, where its
+store page lists four. Comments are available on the same actor at the same
+price as a post, with a `commentsPostedLimit` filter no other provider here
+offers — and nothing has measured whether a LinkedIn comment carries a lead, so
+`canFetchReplies` is false.
+
+**One LinkedIn provider was built and dropped without shipping.** US-055 wrote
+the ScrapeCreators connector, passed 34 tests, and stopped: that endpoint finds
+posts through Google's index and then scrapes them. US-054 had measured
+freshness and not coverage — it proved a one-day-old post was findable and
+never asked how many matching posts the index never held. The work is in a
+named stash. Three of its findings outlive it: the activity id read out of a
+post URL, a 404 `not_found` that means an empty page, and that
+**`builtInSources` order is the order every screen shows platforms in**,
+because `groupByPlatform` keeps registration order.
+
 **LinkedIn is the third platform, and PLAN.md said not to add one yet.**
 US-028 closed on 2026-09-05. The rule at PLAN.md's *Important rule* is that no
 third network is added until Reddit and X reliably produce useful matches, and

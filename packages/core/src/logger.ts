@@ -24,12 +24,18 @@ export const redactedFields = [
   "*.SMTP_PASSWORD",
   "*.WEBHOOK_SIGNING_SECRET",
   "apiKey",
+  // US-057. Apify calls its credential a token, not a key, and the connector's
+  // field name is what builds `APIFY_API_TOKEN` — so the field really is
+  // `apiToken` and `apiKey` above would not have covered it. `token` below
+  // matches a key called exactly that and not this one.
+  "apiToken",
   "apiSecret",
   "credentials",
   "password",
   "token",
   "ENCRYPTION_KEY",
   "*.apiKey",
+  "*.apiToken",
   "*.apiSecret",
   "*.credentials",
   "*.password",

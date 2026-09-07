@@ -24,6 +24,12 @@ import { messageFor, requestJson } from "./api.js";
  * person replies differently in different rooms, and the choice is made here —
  * at the moment of writing — rather than in a setting somewhere.
  *
+ * **What is in the instruction box is what the model is told.** US-063: a
+ * saved prompt fills that box and editing it afterwards steers this draft and
+ * nothing else, because a person looking at one awkward post wants to say
+ * "answer the pricing question first, this one time" and press the button. The
+ * dialog is where a voice is saved, updated or deleted — a separate act.
+ *
  * **A new match is a new panel.** The inbox mounts this with `key={match.id}`,
  * so opening another match discards this state rather than resetting it. That
  * matters more than it looks: a draft left over from the previous match, shown
@@ -114,7 +120,7 @@ export function ReplyDraft({ matchId }: { matchId: string }) {
       const body = await requestJson<Draft>(`/api/matches/${matchId}/draft`, {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ promptId: promptId || null }),
+        body: JSON.stringify({ instruction: instruction.trim() || null }),
       });
 
       setDraft(body);
@@ -284,6 +290,29 @@ export function ReplyDraft({ matchId }: { matchId: string }) {
           )}
         </button>
       </div>
+
+      {/*
+        The box is what is sent, and the library only fills it. US-063: a saved
+        prompt's id cannot express "answer the pricing question first, this one
+        time", which is the common case for one awkward post. Choosing a prompt
+        copies its words here; editing them steers this draft alone; saving is
+        a separate act, in the dialog, that a person takes on purpose.
+      */}
+      <label className="field reply-draft-instruction">
+        <span>Instruction for this draft</span>
+        <small>
+          Optional. Edits here steer this reply only — open Edit prompts to save one for next time.
+          It changes the wording; it cannot make the draft open with your product or invent facts
+          about it.
+        </small>
+        <textarea
+          aria-label="Instruction for this draft"
+          rows={3}
+          value={instruction}
+          placeholder="Answer the pricing question first, and keep it to three sentences."
+          onChange={(event) => setInstruction(event.target.value)}
+        />
+      </label>
 
       {managing && (
         <div className="reply-draft-dialog-backdrop">

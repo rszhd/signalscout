@@ -211,7 +211,7 @@ describe("the saved prompts", () => {
     expect(text()).toContain("Short and plain");
   });
 
-  it("sends the chosen one with the draft request", async () => {
+  it("sends the chosen one's words with the draft request", async () => {
     // A prompt that is stored and never sent is the failure nobody notices.
     const saved = prompt();
     const { calls } = server({ prompts: { prompts: [saved] } });
@@ -222,16 +222,16 @@ describe("the saved prompts", () => {
     await press("Draft reply");
 
     const drafted = calls.find((call) => call.url.includes("/draft"));
-    expect(drafted?.body).toEqual({ promptId: saved.id });
+    expect(drafted?.body).toEqual({ instruction: saved.instruction });
   });
 
-  it("sends no prompt when none is chosen", async () => {
+  it("sends no instruction when the box is empty", async () => {
     const { calls } = server({ prompts: { prompts: [prompt()] } });
     screen = await mount(<ReplyDraft matchId={matchId} />);
 
     await press("Draft reply");
 
-    expect(calls.find((call) => call.url.includes("/draft"))?.body).toEqual({ promptId: null });
+    expect(calls.find((call) => call.url.includes("/draft"))?.body).toEqual({ instruction: null });
   });
 
   it("saves a new one, so a voice can be reused on the next match", async () => {
@@ -283,6 +283,51 @@ describe("the saved prompts", () => {
     await press("Edit prompts");
 
     expect(text()).toContain("cannot make the draft open with your product");
+  });
+});
+
+describe("an instruction for this post only", () => {
+  it("sends what was typed, without anything being saved", async () => {
+    // The case the owner asked for: one awkward post, one steer, no library
+    // entry. Nothing is written to /api/reply-prompts.
+    const { calls } = server({ prompts: { prompts: [] } });
+    screen = await mount(<ReplyDraft matchId={matchId} />);
+
+    setValue(field("Instruction for this draft"), "Answer the pricing question first.");
+    await settle();
+    await press("Draft reply");
+
+    expect(calls.find((call) => call.url.includes("/draft"))?.body).toEqual({
+      instruction: "Answer the pricing question first.",
+    });
+    expect(
+      calls.some((call) => call.method === "POST" && call.url.endsWith("/reply-prompts")),
+    ).toBe(false);
+  });
+
+  it("edits a chosen prompt for this draft without changing the saved one", async () => {
+    const saved = prompt();
+    const { calls } = server({ prompts: { prompts: [saved] } });
+    screen = await mount(<ReplyDraft matchId={matchId} />);
+
+    setValue(select("Saved prompt"), saved.id);
+    await settle();
+    setValue(field("Instruction for this draft"), `${saved.instruction} Keep it to two lines.`);
+    await settle();
+    await press("Draft reply");
+
+    expect(calls.find((call) => call.url.includes("/draft"))?.body).toEqual({
+      instruction: `${saved.instruction} Keep it to two lines.`,
+    });
+    // Nothing was updated: saving is a separate act, in the dialog.
+    expect(calls.some((call) => call.method === "PATCH")).toBe(false);
+  });
+
+  it("says an edit is for this draft unless it is saved", async () => {
+    server({ prompts: { prompts: [] } });
+    screen = await mount(<ReplyDraft matchId={matchId} />);
+
+    expect(text()).toContain("steer this reply only");
   });
 });
 

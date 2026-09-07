@@ -851,6 +851,13 @@ never invent a fact about it, never claim to be a customer, and write any doubt
 *into the draft* as `[check: …]` where somebody editing will see it. A model
 told only to "write a reply" writes a landing page.
 
+**The instruction box is what the model is told, and the library only fills
+it.** US-063: choosing a saved voice copies its words into the box, editing
+them steers that one draft, and saving is a separate act in the prompt dialog.
+A person looking at one awkward post can say "answer the pricing question
+first, this one time" and press the button — measured live, an instruction of
+"exactly two sentences, do not ask anything back" produced exactly that.
+
 **A person saves reply instructions on their account, several of them, and
 picks one when drafting.** Not per project: a voice is how one person writes,
 so a copy per project would be the same words drifting apart. An instruction is

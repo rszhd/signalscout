@@ -165,24 +165,3 @@ export async function deleteReplyPrompt(
 
   return rows.length > 0;
 }
-
-/**
- * One prompt's instruction, or nothing.
- *
- * Scoped by user like every read here, so a draft cannot be steered by a
- * prompt belonging to somebody else — which matters more the day US-017 makes
- * more than one account possible.
- */
-export async function replyPromptInstruction(
-  db: Database,
-  userId: string,
-  id: string,
-): Promise<string | undefined> {
-  const [row] = await db
-    .select({ instruction: replyPrompts.instruction })
-    .from(replyPrompts)
-    .where(and(eq(replyPrompts.id, id), eq(replyPrompts.userId, userId)))
-    .limit(1);
-
-  return row?.instruction;
-}

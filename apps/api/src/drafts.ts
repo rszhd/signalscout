@@ -22,7 +22,6 @@ import {
   draftContext,
   listReplyPrompts,
   recordModelCall,
-  replyPromptInstruction,
   singleUserId,
   updateReplyPrompt,
 } from "@intentwatch/core";
@@ -55,13 +54,17 @@ export async function registerDraftRoutes(
     schema: {
       params: z.object({ id: z.uuid() }),
       /**
-       * Which saved prompt to steer with, if any.
+       * The instruction to steer this draft with, in the person's own words.
        *
-       * Chosen per draft rather than read from a setting, because a person
-       * replies differently in different rooms and the choice belongs at the
-       * moment of writing. Absent means draft the way the prompt says.
+       * Text rather than the id of a saved prompt, and US-063 made the change:
+       * an id cannot express "answer the pricing question first, this one
+       * time", which is the common case. The screen fills this box from the
+       * library and lets it be edited; a saved instruction and a typed one are
+       * the same thing by the time they reach the prompt.
+       *
+       * Absent or empty means draft the way `ai/reply.ts` says.
        */
-      body: z.object({ promptId: z.uuid().nullish() }).optional(),
+      body: z.object({ instruction: z.string().max(4000).nullish() }).optional(),
       response: {
         200: z.object({
           reply: z.string(),
@@ -109,27 +112,7 @@ export async function registerDraftRoutes(
         });
       }
 
-      /**
-       * The saved instruction the person chose, when they chose one.
-       *
-       * A prompt id that names nothing is a 404 rather than a silent draft
-       * without it: the person asked for a particular voice, and giving them a
-       * different one without saying so is the kind of quiet wrongness that
-       * makes a feature untrustworthy.
-       */
-      const promptId = request.body?.promptId ?? null;
-
-      let instruction = "";
-
-      if (promptId) {
-        const saved = await replyPromptInstruction(db, singleUserId, promptId);
-
-        if (saved === undefined) {
-          return reply.code(404).send({ message: "No saved prompt has that id." });
-        }
-
-        instruction = saved.trim();
-      }
+      const instruction = (request.body?.instruction ?? "").trim();
 
       const drafter = createDrafter({ config: ai });
 

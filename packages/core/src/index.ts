@@ -103,7 +103,6 @@ export {
   deleteReplyPrompt,
   listReplyPrompts,
   type ReplyPrompt,
-  replyPromptInstruction,
   type UpdateReplyPromptInput,
   updateReplyPrompt,
 } from "./ai/reply-prompts.js";

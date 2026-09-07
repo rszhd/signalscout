@@ -1,0 +1,855 @@
+[
+  {
+    "type": "post",
+    "id": "7502587310513893376",
+    "linkedinUrl": "https://www.linkedin.com/posts/li-user-1_playwright-selenium-sdet-activity-7502587310513893376-GeqC",
+    "content": "Selenium to Playwright migration — Part 1\nI started this project assuming the obvious approach: hand an AI the old Selenium framework, tell it to migrate to Playwright, done.\n\nFirst session of my mentor Pramod Dutta's course talked me out of that in the first twenty minutes, with a ratio that stuck with me: 95% planning, 5% code writing.\n\nThe plan itself is a 4-phase rollout, not a one-shot conversion:\n\nPilot — pick 5-10 high-value test cases, stand up the new Playwright project with real conventions from day one.\n\nParallel Run & Baseline — keep the old Selenium suite running, add a Playwright CI job alongside it, and compare flake rate and duration between the two. Not a guess about whether the migration is better — actual data, side by side.\n\nScale Conversion — once that baseline holds up, new feature work goes Playwright-only, and you convert the flaky/slow Selenium tests first, since that's where migration proves its value fastest.\n\nSunset Selenium — retire the legacy suite only once coverage and stability thresholds are actually met, not before.\n\nThe detail that made it click for me: \n→\"flaky\" isn't a feeling, it's a number. \n\n→Run a test N times before labeling it anything — say 10 runs, 3 failures. \n\n→Only once you've quantified that can \"deflaky after migration\" mean something you can actually prove happened.\n\n\nMore from this series soon.\n\nLearning this from my mentor Pramod Dutta's course.\n\n#Playwright #Selenium #SDET #TestAutomation #QAAutomation",
+    "contentAttributes": [
+      {
+        "start": 1399,
+        "length": 12,
+        "type": "PROFILE_MENTION",
+        "hyperlink": null,
+        "textLink": null,
+        "profile": {
+          "id": "li-user-2",
+          "firstName": "li-user-3",
+          "lastName": "li-user-4",
+          "linkedinUrl": "https://www.linkedin.com/in/li-user-5",
+          "publicIdentifier": "li-user-5"
+        }
+      }
+    ],
+    "author": {
+      "id": "li-user-6",
+      "universalName": null,
+      "publicIdentifier": "li-user-1",
+      "type": "profile",
+      "name": "li-user-7",
+      "linkedinUrl": "https://www.linkedin.com/in/li-user-1?miniProfileUrn=urn%3Ali%3Afsd_profile%3Ali-user-6",
+      "info": "Scrubbed by capture.mjs. See docs/testing.md.",
+      "website": null,
+      "websiteLabel": null,
+      "avatar": {
+        "url": "https://scrubbed.invalid/li-user-8",
+        "width": 800,
+        "height": 800
+      },
+      "urn": "738171115",
+      "profileId": "li-user-6"
+    },
+    "postedAt": {
+      "timestamp": 1788756206158,
+      "date": "2026-09-07T04:43:26.158Z",
+      "postedAgoShort": "57m",
+      "postedAgoText": "57 minutes ago • Visible to anyone on or off LinkedIn"
+    },
+    "postImages": [
+      {
+        "url": "https://media.licdn.com/dms/image/v2/D5622AQFTzsTTMi4VGg/feedshare-shrink_1280/B56aB6LZwjJ0AM-/0/1788756204805?e=1790208000&v=beta&t=ZYZYnrX3_IxnOhkOCjL2iz1BcUwN2RxtYbVG109ETCM",
+        "width": 1182,
+        "height": 648
+      }
+    ],
+    "socialContent": {
+      "hideCommentsCount": false,
+      "hideReactionsCount": false,
+      "hideSocialActivityCounts": false,
+      "hideShareAction": true,
+      "hideSendAction": true,
+      "hideRepostsCount": false,
+      "hideViewsCount": false,
+      "trustInterventionBanner": null,
+      "hideReactAction": false,
+      "hideCommentAction": false,
+      "shareUrl": "https://www.linkedin.com/posts/li-user-1_playwright-selenium-sdet-activity-7502587310513893376-GeqC?",
+      "showContributionExperience": false,
+      "showSocialDetail": true
+    },
+    "comments": [],
+    "header": {
+      "text": null
+    },
+    "entityId": "7502587310513893376",
+    "shareUrn": "urn:li:share:7502587307276017664",
+    "shareLinkedinUrl": "https://www.linkedin.com/feed/update/urn:li:share:7502587307276017664",
+    "engagement": {
+      "id": "7502587310513893376",
+      "likes": 0,
+      "comments": 0,
+      "shares": 0,
+      "reactions": []
+    },
+    "reactions": [],
+    "reactionIds": [],
+    "commentIds": [],
+    "query": {
+      "sortBy": "date",
+      "page": 1,
+      "search": "flaky tests"
+    }
+  },
+  {
+    "type": "post",
+    "id": "7502584032971595776",
+    "linkedinUrl": "https://www.linkedin.com/posts/li-user-9_if-your-dream-is-to-work-as-a-qa-engineer-activity-7502584032971595776-XWGs",
+    "content": "If your dream is to work as a QA Engineer in companies like TCS , Accenture , Infosys ,  Deloitte , EY or Capgemini …\n\nMost companies are following a 3-round interview process in 2026.\n\nHere's what interviewers are asking:\n\nRound 1 — QA Fundamentals\n\n1- Explain your project and testing process end-to-end.\n2- Smoke vs Sanity vs Regression vs Retesting.\n3- How do you write effective test cases?\n4- Explain STLC, SDLC and Defect Life Cycle.\n5- Severity vs Priority — with examples.\n6- Verification vs Validation.\n7- How do you perform API testing using Postman?\n\nRound 2 — Scenario & Functional Round\n\n1- A critical production bug is reported. What will you do?\n2- How would you test a login page?\n3- How would you test an online payment feature?\n4- Developer says, \"It's working as expected.\" How will you handle it?\n5- How do you test an API with incomplete documentation?\n6- How do you validate UI data against the database using SQL?\n7- You have 2 hours and 200 test cases. What will you test first?\n\nRound 3 — Automation / Advanced QA\n\n1- Explain your automation framework.\n2- What is Page Object Model?\n3- How do you handle dynamic elements and flaky tests?\n4- How do you integrate automation with CI/CD?\n5- What should and shouldn't be automated?\n6- How do you approach API + UI + database testing together?\n7- Tell me about a challenging bug you found and how you identified its root cause.\n\nThese are the types of questions that test real-world QA skills, not just theoretical knowledge.\n\nPreparation beats luck.\n\n𝐈 𝐜𝐨𝐦𝐩𝐢𝐥𝐞𝐝 𝐞𝐯𝐞𝐫𝐲𝐭𝐡𝐢𝐧𝐠 𝐈 𝐰𝐢𝐬𝐡 𝐈 𝐡𝐚𝐝 𝐰𝐡𝐞𝐧 𝐩𝐫𝐞𝐩𝐚𝐫𝐢𝐧𝐠 𝐟𝐨𝐫 𝐐𝐀 𝐚𝐧𝐝 𝐒𝐃𝐄𝐓 𝐢𝐧𝐭𝐞𝐫𝐯𝐢𝐞𝐰𝐬 𝐢𝐧𝐭𝐨 𝐚 𝐬𝐢𝐧𝐠𝐥𝐞 𝐐𝐀 𝐈𝐧𝐭𝐞𝐫𝐯𝐢𝐞𝐰 𝐃𝐨𝐬𝐬𝐢𝐞𝐫.\n\n𝐆𝐞𝐭 𝐲𝐨𝐮𝐫 𝐐𝐀 𝐈𝐧𝐭𝐞𝐫𝐯𝐢𝐞𝐰 𝐃𝐨𝐬𝐬𝐢𝐞𝐫 𝐇𝐞𝐫𝐞:\n\nhttps://lnkd.in/gyXp9g5V\n\nDo Follow Chitra Malode For More Content",
+    "contentAttributes": [
+      {
+        "start": 60,
+        "length": 3,
+        "type": "COMPANY_NAME",
+        "hyperlink": null,
+        "textLink": null,
+        "company": {
+          "id": "2290213",
+          "name": "li-user-10",
+          "linkedinUrl": "https://www.linkedin.com/company/li-user-11/"
+        }
+      },
+      {
+        "start": 66,
+        "length": 9,
+        "type": "COMPANY_NAME",
+        "hyperlink": null,
+        "textLink": null,
+        "company": {
+          "id": "1033",
+          "name": "li-user-12",
+          "linkedinUrl": "https://www.linkedin.com/company/li-user-13/"
+        }
+      },
+      {
+        "start": 78,
+        "length": 7,
+        "type": "COMPANY_NAME",
+        "hyperlink": null,
+        "textLink": null,
+        "company": {
+          "id": "1283",
+          "name": "li-user-14",
+          "linkedinUrl": "https://www.linkedin.com/company/li-user-15/"
+        }
+      },
+      {
+        "start": 89,
+        "length": 8,
+        "type": "COMPANY_NAME",
+        "hyperlink": null,
+        "textLink": null,
+        "company": {
+          "id": "1038",
+          "name": "li-user-16",
+          "linkedinUrl": "https://www.linkedin.com/company/li-user-17/"
+        }
+      },
+      {
+        "start": 100,
+        "length": 2,
+        "type": "COMPANY_NAME",
+        "hyperlink": null,
+        "textLink": null,
+        "company": {
+          "id": "1073",
+          "name": "li-user-18",
+          "linkedinUrl": "https://www.linkedin.com/company/li-user-19/"
+        }
+      },
+      {
+        "start": 106,
+        "length": 9,
+        "type": "COMPANY_NAME",
+        "hyperlink": null,
+        "textLink": null,
+        "company": {
+          "id": "157240",
+          "name": "li-user-20",
+          "linkedinUrl": "https://www.linkedin.com/company/li-user-21/"
+        }
+      },
+      {
+        "start": 1710,
+        "length": 13,
+        "type": "PROFILE_MENTION",
+        "hyperlink": null,
+        "textLink": null,
+        "profile": {
+          "id": "li-user-22",
+          "firstName": "li-user-23",
+          "lastName": "li-user-24",
+          "linkedinUrl": "https://www.linkedin.com/in/li-user-9",
+          "publicIdentifier": "li-user-9"
+        }
+      }
+    ],
+    "author": {
+      "id": "li-user-22",
+      "universalName": null,
+      "publicIdentifier": "li-user-9",
+      "type": "profile",
+      "name": "li-user-25",
+      "linkedinUrl": "https://www.linkedin.com/in/li-user-9?miniProfileUrn=urn%3Ali%3Afsd_profile%3Ali-user-22",
+      "info": "Scrubbed by capture.mjs. See docs/testing.md.",
+      "website": null,
+      "websiteLabel": null,
+      "avatar": {
+        "url": "https://scrubbed.invalid/li-user-26",
+        "width": 800,
+        "height": 800
+      },
+      "urn": "692995553",
+      "profileId": "li-user-22"
+    },
+    "postedAt": {
+      "timestamp": 1788755424731,
+      "date": "2026-09-07T04:30:24.731Z",
+      "postedAgoShort": "1h",
+      "postedAgoText": "1 hour ago • Visible to anyone on or off LinkedIn"
+    },
+    "postImages": [],
+    "socialContent": {
+      "hideCommentsCount": false,
+      "hideReactionsCount": false,
+      "hideSocialActivityCounts": false,
+      "hideShareAction": true,
+      "hideSendAction": true,
+      "hideRepostsCount": false,
+      "hideViewsCount": false,
+      "trustInterventionBanner": null,
+      "hideReactAction": false,
+      "hideCommentAction": false,
+      "shareUrl": "https://www.linkedin.com/posts/li-user-9_if-your-dream-is-to-work-as-a-qa-engineer-activity-7502584032971595776-XWGs?",
+      "showContributionExperience": false,
+      "showSocialDetail": true
+    },
+    "comments": [],
+    "header": {
+      "text": null
+    },
+    "entityId": "7502584032971595776",
+    "shareUrn": "urn:li:share:7502029800279130113",
+    "shareLinkedinUrl": "https://www.linkedin.com/feed/update/urn:li:share:7502029800279130113",
+    "engagement": {
+      "id": "7502584032971595776",
+      "likes": 3,
+      "comments": 2,
+      "shares": 1,
+      "reactions": [
+        {
+          "type": "LIKE",
+          "count": 3
+        }
+      ]
+    },
+    "reactions": [],
+    "reactionIds": [],
+    "commentIds": [],
+    "query": {
+      "sortBy": "date",
+      "page": 1,
+      "search": "flaky tests"
+    }
+  },
+  {
+    "type": "post",
+    "id": "7502583757250408448",
+    "linkedinUrl": "https://www.linkedin.com/posts/li-user-27_login-login-login-activity-7502583757250408448-hfSJ",
+    "content": "🎭 PLAYWRIGHT SERIES — DAY 4\n\n⏳ Auto-Waiting & Assertions — Making Tests More Stable\n\nOne thing every automation tester has probably experienced:\n\n“The element is there… so why did my test fail?” 😅\n\nSometimes the application is still loading, an element isn’t ready for interaction, or the UI hasn’t reached the expected state yet.\n\nThat’s where Playwright’s auto-waiting and web-first assertions become really useful.\n\n🔹 Auto-Waiting\n\nPlaywright automatically waits for elements to be ready before performing actions.\n\nInstead of adding unnecessary waits:\n\n❌\n\nawait page.waitForSelector('#login');\nawait page.locator('#login').click();\n\nWe can simply write:\n\n✅\n\nawait page.locator('#login').click();\n\nPlaywright waits for the element to satisfy the necessary actionability conditions before interacting with it.\n\n🔹 Web-First Assertions\n\nAssertions can also wait and retry until the expected condition is met:\n\nawait expect(\n  page.getByRole('button', { name: 'Login' })\n).toBeVisible();\nawait expect(page).toHaveURL(/dashboard/);\n\nThis helps us avoid writing unnecessary timing logic into our tests.\n\n💡 My takeaway\n\nStable automation isn’t about adding more waits.\n\nIt’s about having the right synchronization strategy. 🎯\n\nWhat I liked while exploring Playwright today:\n\n✅ Less manual waiting\n✅ Cleaner test code\n✅ Built-in retrying assertions\n✅ Better synchronization\n✅ Easier-to-read tests\n\nComing from Selenium, this is one of the areas I’m particularly interested in comparing through real-world examples.\n\nDay 4 ✅ — Auto-Waiting & Assertions\n\nNext → Day 5: Dropdowns, Checkboxes & Radio Buttons 🎯\n\n💬 QA/Automation folks:\nWhat’s the most common reason your UI automation tests become flaky?\n\n#Playwright #TestAutomation #AutomationTesting #SoftwareTesting #QA #SDET #QualityEngineering #Selenium #LearningInPublic",
+    "contentAttributes": [],
+    "author": {
+      "id": "li-user-28",
+      "universalName": null,
+      "publicIdentifier": "li-user-27",
+      "type": "profile",
+      "name": "li-user-29",
+      "linkedinUrl": "https://www.linkedin.com/in/li-user-27?miniProfileUrn=urn%3Ali%3Afsd_profile%3Ali-user-28",
+      "info": "Scrubbed by capture.mjs. See docs/testing.md.",
+      "website": null,
+      "websiteLabel": null,
+      "avatar": {
+        "url": "https://scrubbed.invalid/li-user-30",
+        "width": 800,
+        "height": 800
+      },
+      "urn": "862828062",
+      "profileId": "li-user-28"
+    },
+    "postedAt": {
+      "timestamp": 1788755358994,
+      "date": "2026-09-07T04:29:18.994Z",
+      "postedAgoShort": "1h",
+      "postedAgoText": "1 hour ago • Visible to anyone on or off LinkedIn"
+    },
+    "postImages": [
+      {
+        "url": "https://media.licdn.com/dms/image/v2/D5622AQGRxke7jxC_IQ/feedshare-image-high-res/B56aB6IK7cG0AY-/0/1788755357702?e=1790208000&v=beta&t=TfvwQQv65EHPbMobsdQc3RcZefucR4n94Y49-UIHYPk",
+        "width": 1402,
+        "height": 1122
+      }
+    ],
+    "socialContent": {
+      "hideCommentsCount": false,
+      "hideReactionsCount": false,
+      "hideSocialActivityCounts": false,
+      "hideShareAction": true,
+      "hideSendAction": true,
+      "hideRepostsCount": false,
+      "hideViewsCount": false,
+      "trustInterventionBanner": null,
+      "hideReactAction": false,
+      "hideCommentAction": false,
+      "shareUrl": "https://www.linkedin.com/posts/li-user-27_login-login-login-activity-7502583757250408448-hfSJ?",
+      "showContributionExperience": false,
+      "showSocialDetail": true
+    },
+    "comments": [],
+    "header": {
+      "text": null
+    },
+    "entityId": "7502583757250408448",
+    "shareUrn": "urn:li:share:7502583756000514048",
+    "shareLinkedinUrl": "https://www.linkedin.com/feed/update/urn:li:share:7502583756000514048",
+    "engagement": {
+      "id": "7502583757250408448",
+      "likes": 1,
+      "comments": 0,
+      "shares": 0,
+      "reactions": [
+        {
+          "type": "LIKE",
+          "count": 1
+        }
+      ]
+    },
+    "reactions": [],
+    "reactionIds": [],
+    "commentIds": [],
+    "query": {
+      "sortBy": "date",
+      "page": 1,
+      "search": "flaky tests"
+    }
+  },
+  {
+    "type": "post",
+    "id": "7502595301078282240",
+    "linkedinUrl": "https://www.linkedin.com/posts/li-user-31_testautomation-qualityassurance-selenium-activity-7502595301078282240-pQIo",
+    "content": "𝗜𝗳 𝗜 𝗵𝗮𝗱 𝘁𝗼 𝗮𝘂𝘁𝗼𝗺𝗮𝘁𝗲 𝗮 𝗻𝗲𝘄 𝗽𝗿𝗼𝗷𝗲𝗰𝘁 𝗳𝗿𝗼𝗺 𝘇𝗲𝗿𝗼, 𝗜 𝘄𝗼𝘂𝗹𝗱𝗻'𝘁 𝘀𝘁𝗮𝗿𝘁 𝗯𝘆 𝘄𝗿𝗶𝘁𝗶𝗻𝗴 𝘀𝗰𝗿𝗶𝗽𝘁𝘀.\nI'd start by understanding the product.\n\nMy approach would be:\n1. 𝗨𝗻𝗱𝗲𝗿𝘀𝘁𝗮𝗻𝗱\nLearn the product, users, business-critical workflows, and major risks.\n\n2. 𝗣𝗿𝗶𝗼𝗿𝗶𝘁𝗶𝘇𝗲\nIdentify the scenarios that are repetitive, stable, high-risk, and worth automating.\n\n3. 𝗦𝘁𝗮𝗯𝗶𝗹𝗶𝘇𝗲\nMake sure the application, test data, and environment are reliable enough for automation.\n\n4. 𝗔𝘂𝘁𝗼𝗺𝗮𝘁𝗲\nStart with the tests that provide the highest value — not simply the easiest ones to automate.\n\n5. 𝗜𝗻𝘁𝗲𝗴𝗿𝗮𝘁𝗲\nConnect the suite with CI/CD so tests provide continuous feedback.\n\n𝟲. 𝗠𝗼𝗻𝗶𝘁𝗼𝗿 & 𝗜𝗺𝗽𝗿𝗼𝘃𝗲\nTrack failures, remove flaky tests, maintain the framework, and adapt as the product changes.\n\nBecause automation isn't successful just because you have hundreds of scripts.\n\nIt's successful when those scripts consistently give the team useful confidence.\n\nThe goal isn't:\n“How much can we automate?”\nIt's:\n“𝗪𝗵𝗲𝗿𝗲 𝗰𝗮𝗻 𝗮𝘂𝘁𝗼𝗺𝗮𝘁𝗶𝗼𝗻 𝗰𝗿𝗲𝗮𝘁𝗲 𝘁𝗵𝗲 𝗺𝗼𝘀𝘁 𝘃𝗮𝗹𝘂𝗲?”\n\n💬 If you were starting automation on a new project, what would your first step be?\n#TestAutomation #QualityAssurance #Selenium #QAEngineer #QualityEngineering #AutomationStrategy #SoftwareTesting",
+    "contentAttributes": [],
+    "author": {
+      "id": "li-user-32",
+      "universalName": null,
+      "publicIdentifier": "li-user-31",
+      "type": "profile",
+      "name": "li-user-33",
+      "linkedinUrl": "https://www.linkedin.com/in/li-user-31?miniProfileUrn=urn%3Ali%3Afsd_profile%3Ali-user-32",
+      "info": "Scrubbed by capture.mjs. See docs/testing.md.",
+      "website": null,
+      "websiteLabel": null,
+      "avatar": {
+        "url": "https://scrubbed.invalid/li-user-34",
+        "width": 800,
+        "height": 800
+      },
+      "urn": "972650229",
+      "profileId": "li-user-32"
+    },
+    "postedAt": {
+      "timestamp": 1788758111257,
+      "date": "2026-09-07T05:15:11.257Z",
+      "postedAgoShort": "25m",
+      "postedAgoText": "25 minutes ago • Visible to anyone on or off LinkedIn"
+    },
+    "postImages": [
+      {
+        "url": "https://media.licdn.com/dms/image/v2/D4D22AQHK05o4TSOapg/feedshare-shrink_1280/B4DaA_NtSgJIAM-/0/1787766953438?e=1790208000&v=beta&t=h0cYYyFuaCsHaWiVUbDzj-QhtNNGmES_0Gyy5KjFUp8",
+        "width": 1149,
+        "height": 1369
+      }
+    ],
+    "socialContent": {
+      "hideCommentsCount": false,
+      "hideReactionsCount": false,
+      "hideSocialActivityCounts": false,
+      "hideShareAction": true,
+      "hideSendAction": true,
+      "hideRepostsCount": false,
+      "hideViewsCount": false,
+      "trustInterventionBanner": null,
+      "hideReactAction": false,
+      "hideCommentAction": false,
+      "shareUrl": "https://www.linkedin.com/posts/li-user-31_testautomation-qualityassurance-selenium-activity-7502595301078282240-pQIo?",
+      "showContributionExperience": false,
+      "showSocialDetail": true
+    },
+    "comments": [],
+    "header": {
+      "text": null
+    },
+    "entityId": "7502595301078282240",
+    "shareUrn": "urn:li:share:7498438087878995968",
+    "shareLinkedinUrl": "https://www.linkedin.com/feed/update/urn:li:share:7498438087878995968",
+    "engagement": {
+      "id": "7502595301078282240",
+      "likes": 0,
+      "comments": 0,
+      "shares": 0,
+      "reactions": []
+    },
+    "reactions": [],
+    "reactionIds": [],
+    "commentIds": [],
+    "query": {
+      "sortBy": "date",
+      "page": 1,
+      "search": "flaky tests"
+    }
+  },
+  {
+    "type": "post",
+    "id": "7502595192219222016",
+    "linkedinUrl": "https://www.linkedin.com/feed/update/urn:li:activity:7502595192219222016",
+    "content": "Say goodbye to flaky tests and expensive AI subscriptions forever! 🚫💸\n\nWhat if your automated tests could **HEAL THEMSELVES** in real-time when UI selectors change—without paying a single dollar to cloud AI providers? 🤯\n\nMeet the **Agentic Self-Healing Playwright + TypeScript Framework** powered 100% LOCALLY on your own machine using **LM Studio**! ⚡💻\n\nHere’s why this changes everything for QA & Devs:\n\n🟢 **ZERO SUBSCRIPTIONS NEEDED**: 100% FREE & offline. Powered entirely by your locally hosted LLM in LM Studio (Gemma, Llama, Qwen). No OpenAI credit card bills, no subscription fees, and no token limits!\n\n🟢 **100% DATA PRIVACY**: Your application DOM, credentials, and test flows never leave your laptop. Zero data sent to third-party cloud APIs—completely enterprise & security safe!\n\n🟢 **IN-FLIGHT AI AUTO-HEALING**: When a locator breaks or a developer renames an ID, the agent intercepts the failure, extracts the live DOM snapshot, diagnoses the element with local AI, and continues the test without failing CI/CD!\n\n🟢 **ZERO-LATENCY CACHE REPLAY**: Once an element is healed, the mapping is cached instantly. Future test runs resolve previous mutations in **0ms** without re-invoking AI!\n\n🟢 **INTERACTIVE AUDIT DASHBOARD**: Automatically generates an interactive Self-Healing HTML report with before/after selector diffs, confidence scores, and AI diagnostic reasoning.\n\n🟢 **PRODUCTION-READY ARCHITECTURE**: Built with strict TypeScript, clean Page Object Models (POM), and standard Playwright fixtures. Write normal tests—let the agent handle the breaks!\n\n#playwright, #localllm #lmstudio, #selfhealing\n               https://lnkd.in/d5zJ4dd7",
+    "contentAttributes": [],
+    "author": {
+      "id": "li-user-35",
+      "universalName": null,
+      "publicIdentifier": "li-user-36",
+      "type": "profile",
+      "name": "li-user-37",
+      "linkedinUrl": "https://www.linkedin.com/in/li-user-36?miniProfileUrn=urn%3Ali%3Afsd_profile%3Ali-user-35",
+      "info": "Scrubbed by capture.mjs. See docs/testing.md.",
+      "website": null,
+      "websiteLabel": null,
+      "avatar": null,
+      "urn": "964078241",
+      "profileId": "li-user-35"
+    },
+    "postedAt": {
+      "timestamp": 1788758085303,
+      "date": "2026-09-07T05:14:45.303Z",
+      "postedAgoShort": "26m",
+      "postedAgoText": "26 minutes ago • Visible to anyone on or off LinkedIn"
+    },
+    "postImages": [],
+    "article": {
+      "title": "Madhusudhan| Test Architect on Instagram: \"Say goodbye to flaky tests and expensive AI subscriptions forever! 🚫💸 What if your automated tests could **HEAL THEMSELVES** in real-time when UI selectors change—without paying a single dollar to cloud AI providers? 🤯 Meet the **Agentic Self-Healing Playwright + TypeScript Framework** powered 100% LOCALLY on your own machine using **LM Studio**! ⚡💻 H",
+      "subtitle": "instagram.com",
+      "link": "https://www.instagram.com/reel/Dc3Vo9iP8K5/?stkn=MWczcXdmYmN4N29oNQ==",
+      "linkLabel": "Open article: Madhusudhan| Test Architect on Instagram: \"Say goodbye to flaky tests and expensive AI subscriptions forever! 🚫💸 What if your automated tests could **HEAL THEMSELVES** in real-time when UI selectors change—without paying a single dollar to cloud AI providers? 🤯 Meet the **Agentic Self-Healing Playwright + TypeScript Framework** powered 100% LOCALLY on your own machine using **LM Studio**! ⚡💻 H by instagram.com",
+      "description": null,
+      "image": null
+    },
+    "socialContent": {
+      "hideCommentsCount": false,
+      "hideReactionsCount": false,
+      "hideSocialActivityCounts": false,
+      "hideShareAction": true,
+      "hideSendAction": true,
+      "hideRepostsCount": false,
+      "hideViewsCount": false,
+      "trustInterventionBanner": null,
+      "hideReactAction": false,
+      "hideCommentAction": false,
+      "shareUrl": "https://www.linkedin.com/feed/update/urn:li:activity:7502595192219222016?",
+      "showContributionExperience": false,
+      "showSocialDetail": true
+    },
+    "comments": [],
+    "header": {
+      "linkedinUrl": "https://www.linkedin.com/feed/update/urn:li:activity:7502595192219222016?updateEntityUrn=urn%3Ali%3Afsd_update%3A%28urn%3Ali%3Aactivity%3A7502595192219222016%2CBLENDED_SEARCH_FEED%2CEMPTY%2CDEFAULT%2Cfalse%29",
+      "text": "New post in AI QA Engineer"
+    },
+    "entityId": "7502595192219222016",
+    "shareUrn": "urn:li:groupPost:12254182-7502595191195791360",
+    "shareLinkedinUrl": "https://www.linkedin.com/feed/update/urn:li:groupPost:12254182-7502595191195791360",
+    "engagement": {
+      "id": "12254182-7502595191195791360",
+      "likes": 0,
+      "comments": 0,
+      "shares": 0,
+      "reactions": []
+    },
+    "reactions": [],
+    "reactionIds": [],
+    "commentIds": [],
+    "query": {
+      "sortBy": "date",
+      "page": 1,
+      "search": "flaky tests"
+    }
+  },
+  {
+    "type": "post",
+    "id": "7502588508042305536",
+    "linkedinUrl": "https://www.linkedin.com/posts/li-user-38",
+    "content": "AI can write 200 test cases before my coffee gets cold.\n \nIt still can't tell me if this failure is a real bug or just Tuesday.\n \nThat's the part nobody automated. Writing tests was never the hard problem. Reading a failure and knowing whether it's a genuine regression, a flaky environment, a timing issue, or someone's test data quietly rotting — that's the actual job.\n \nAI generates coverage in seconds now. Confidence still takes hours.\n \nSo the backlog changed shape. Less \"write more tests.\" More \"why did 40 tests fail and only 2 of them mean anything.\"\n \nWe didn't remove the bottleneck. We just moved it from typing to triage.\n \nThe SDETs who'll matter most going forward aren't the ones prompting AI to generate suites. They're the ones who can look at a red pipeline and say, calmly, which 2 failures to actually worry about.\n\n#SoftwareEngineering #QualityEngineering #TestAutomation #SDET #SoftwareTesting #QA #QualityAssurance #AI #AIinTesting #TestingCommunity #DevOps #CodeQuality #TechCareers #EngineeringLeadership #TechLife",
+    "contentAttributes": [],
+    "author": {
+      "id": "li-user-39",
+      "universalName": null,
+      "publicIdentifier": "li-user-40",
+      "type": "profile",
+      "name": "li-user-41",
+      "linkedinUrl": "https://www.linkedin.com/in/li-user-40?miniProfileUrn=urn%3Ali%3Afsd_profile%3Ali-user-39",
+      "info": "Scrubbed by capture.mjs. See docs/testing.md.",
+      "website": null,
+      "websiteLabel": null,
+      "avatar": {
+        "url": "https://scrubbed.invalid/li-user-42",
+        "width": 800,
+        "height": 800
+      },
+      "urn": "190016975",
+      "profileId": "li-user-39"
+    },
+    "postedAt": {
+      "timestamp": 1788756491671,
+      "date": "2026-09-07T04:48:11.671Z",
+      "postedAgoShort": "52m",
+      "postedAgoText": "52 minutes ago • Visible to anyone on or off LinkedIn"
+    },
+    "postImages": [],
+    "socialContent": {
+      "hideCommentsCount": false,
+      "hideReactionsCount": false,
+      "hideSocialActivityCounts": false,
+      "hideShareAction": true,
+      "hideSendAction": true,
+      "hideRepostsCount": false,
+      "hideViewsCount": false,
+      "trustInterventionBanner": null,
+      "hideReactAction": false,
+      "hideCommentAction": false,
+      "shareUrl": "https://www.linkedin.com/posts/li-user-38?",
+      "showContributionExperience": false,
+      "showSocialDetail": true
+    },
+    "comments": [],
+    "header": {
+      "text": null
+    },
+    "entityId": "7502588508042305536",
+    "shareUrn": "urn:li:share:7502588507106893824",
+    "shareLinkedinUrl": "https://www.linkedin.com/feed/update/urn:li:share:7502588507106893824",
+    "engagement": {
+      "id": "7502588508042305536",
+      "likes": 3,
+      "comments": 0,
+      "shares": 0,
+      "reactions": [
+        {
+          "type": "LIKE",
+          "count": 3
+        }
+      ]
+    },
+    "reactions": [],
+    "reactionIds": [],
+    "commentIds": [],
+    "query": {
+      "sortBy": "date",
+      "page": 1,
+      "search": "flaky tests"
+    }
+  },
+  {
+    "type": "post",
+    "id": "7502585789848018944",
+    "linkedinUrl": "https://www.linkedin.com/posts/li-user-43_softwaretesting-qualityassurance-shiftleft-activity-7502585789848018944-t9rv",
+    "content": "Testing that starts late increases cost and delays releases.\n\nTo prevent this, embed testing activities in planning and design rather than leaving them for the end. Invite QA to backlog refinement, pair testers with developers on stories, and define small measurable acceptance criteria and lightweight exit gates.\n\nAutomate fast feedback on every pull request. Prioritize unit and integration tests that run in seconds to minutes. Add contract and targeted end-to-end tests to protect critical flows. Use feature flags to decouple deployment from release and to exercise behavior safely in production. Enforce CI pipeline gating and maintain reliable synthetic test data to avoid flaky results.\n\nFocus testing on risk. Map features to business impact and concentrate exploratory and manual testing where automation cannot cover uncertainty. Track defect escape rate, mean time to detect, and lead time for changes so that improvements are measurable.\n\nMake testing a team responsibility, not a phase. When everyone owns quality, defects are detected earlier and fixes are cheaper.\n\nTakeaway: Shift testing left by integrating QA into planning, automating fast feedback, and measuring outcomes.\n\n#SoftwareTesting #QualityAssurance #ShiftLeft #TestAutomation #DevOps",
+    "contentAttributes": [],
+    "author": {
+      "id": "li-user-44",
+      "universalName": null,
+      "publicIdentifier": "li-user-43",
+      "type": "profile",
+      "name": "li-user-45",
+      "linkedinUrl": "https://www.linkedin.com/in/li-user-43?miniProfileUrn=urn%3Ali%3Afsd_profile%3Ali-user-44",
+      "info": "Scrubbed by capture.mjs. See docs/testing.md.",
+      "website": null,
+      "websiteLabel": null,
+      "avatar": {
+        "url": "https://scrubbed.invalid/li-user-46",
+        "width": 449,
+        "height": 450
+      },
+      "urn": "379686486",
+      "profileId": "li-user-44"
+    },
+    "postedAt": {
+      "timestamp": 1788755843603,
+      "date": "2026-09-07T04:37:23.603Z",
+      "postedAgoShort": "1h",
+      "postedAgoText": "1 hour ago • Visible to anyone on or off LinkedIn"
+    },
+    "postImages": [
+      {
+        "url": "https://media.licdn.com/dms/image/v2/D4D10AQFDmWj-PaOlAg/image-shrink_1280/B4DaB6KBX3HUAc-/0/1788755842874?e=1789365600&v=beta&t=anGnl9D3dX0PYeQABcwUDEox4v5yA5dBgY-BetI5dfU",
+        "width": 1024,
+        "height": 1024
+      }
+    ],
+    "socialContent": {
+      "hideCommentsCount": false,
+      "hideReactionsCount": false,
+      "hideSocialActivityCounts": false,
+      "hideShareAction": true,
+      "hideSendAction": true,
+      "hideRepostsCount": false,
+      "hideViewsCount": false,
+      "trustInterventionBanner": null,
+      "hideReactAction": false,
+      "hideCommentAction": false,
+      "shareUrl": "https://www.linkedin.com/posts/li-user-43_softwaretesting-qualityassurance-shiftleft-activity-7502585789848018944-t9rv?",
+      "showContributionExperience": false,
+      "showSocialDetail": true
+    },
+    "comments": [],
+    "header": {
+      "text": null
+    },
+    "entityId": "7502585789848018944",
+    "shareUrn": "urn:li:share:7502585786576384000",
+    "shareLinkedinUrl": "https://www.linkedin.com/feed/update/urn:li:share:7502585786576384000",
+    "engagement": {
+      "id": "7502585789848018944",
+      "likes": 0,
+      "comments": 0,
+      "shares": 0,
+      "reactions": []
+    },
+    "reactions": [],
+    "reactionIds": [],
+    "commentIds": [],
+    "query": {
+      "sortBy": "date",
+      "page": 1,
+      "search": "flaky tests"
+    }
+  },
+  {
+    "type": "post",
+    "id": "7502579241629306880",
+    "linkedinUrl": "https://www.linkedin.com/posts/li-user-47_sdet-automationtesting-softwaretesting-activity-7502579241629306880-bE87",
+    "content": "🚨 SDET INTERVIEWS ARE NOT ABOUT TOOLS ANYMORE.\nIf you’re still preparing “What is Selenium?”…\n❌ You’re already OUT.\n\nTop companies like Big4, Accenture, Wipro, Cognizant are asking REAL THINKING QUESTIONS, not theory.\n\nHere are 20 QUESTIONS which you should know before interview 👇\n\n🧪 MANUAL TESTING (They test your thinking)\n1️⃣ How do you decide what NOT to test when timelines are impossible?\n2️⃣ How do you find missing requirements in an incomplete SRS?\n3️⃣ Defect works in QA but fails in PROD — root cause?\n4️⃣ How do you design test cases when requirements change daily?\n5️⃣ Which metrics actually prove testing value to management?\n\n🤖 AUTOMATION (They test depth, not syntax)\n6️⃣ What should never be automated and why?\n7️⃣ How do you handle flaky Selenium tests?\n8️⃣ Automating OTP / Captcha flows — how?\n9️⃣ Parallel execution — benefits & real challenges?\n🔟 Suite is slow + unstable — how do you fix it?\n\n🏗️ FRAMEWORK (They test architecture skills)\n1️⃣1️⃣ Design a scalable automation framework from scratch\n1️⃣2️⃣ POM vs Screenplay — which one, when, and why?\n1️⃣3️⃣ How do you manage test data & configs across environments?\n1️⃣4️⃣ UI + API + DB testing — framework structure?\n1️⃣5️⃣ CI/CD integration — handling failures smartly\n\n🔥 REAL SCENARIOS (This is where most fail)\n1️⃣6️⃣ Critical bug before release — business wants to go live\n1️⃣7️⃣ Dev says: “Works on my machine” — your response?\n1️⃣8️⃣ New project, no tests, no automation — 90-day plan?\n1️⃣9️⃣ Testing a banking / high-traffic app — approach?\n2️⃣0️⃣ What truly separates an SDET from an automation tester?\n\n💣 Truth:\n👉 If you can’t explain your answers with logic + experience, tools won’t save you.\n👉 Follow me for more testing updates\n\n👀 Be honest: How many of these can you confidently answer?\n\n📌 Save this post\n🔁 Share with your QA circle\n❤️ Like so more testers see this\n\n#SDET #AutomationTesting #SoftwareTesting\n#QAJobs #InterviewPreparation #TestingCommunity\n#Big4 #Accenture #Wipro #Cognizant",
+    "contentAttributes": [],
+    "author": {
+      "id": "li-user-48",
+      "universalName": null,
+      "publicIdentifier": "li-user-47",
+      "type": "profile",
+      "name": "li-user-49",
+      "linkedinUrl": "https://www.linkedin.com/in/li-user-47?miniProfileUrn=urn%3Ali%3Afsd_profile%3Ali-user-48",
+      "info": "Scrubbed by capture.mjs. See docs/testing.md.",
+      "website": null,
+      "websiteLabel": null,
+      "avatar": {
+        "url": "https://scrubbed.invalid/li-user-50",
+        "width": 800,
+        "height": 800
+      },
+      "urn": "690050585",
+      "profileId": "li-user-48"
+    },
+    "postedAt": {
+      "timestamp": 1788754282386,
+      "date": "2026-09-07T04:11:22.386Z",
+      "postedAgoShort": "1h",
+      "postedAgoText": "1 hour ago • Visible to anyone on or off LinkedIn"
+    },
+    "postImages": [
+      {
+        "url": "https://media.licdn.com/dms/image/v2/D5622AQEQIA4uHup-Lw/feedshare-shrink_1280/B56aB6EENSGsAM-/0/1788754281536?e=1790208000&v=beta&t=HNLjhHYaJD1IBC8973g-Mwh2sgYGJ67VB0Utwdu62AM",
+        "width": 1080,
+        "height": 568
+      }
+    ],
+    "socialContent": {
+      "hideCommentsCount": false,
+      "hideReactionsCount": false,
+      "hideSocialActivityCounts": false,
+      "hideShareAction": true,
+      "hideSendAction": true,
+      "hideRepostsCount": false,
+      "hideViewsCount": false,
+      "trustInterventionBanner": null,
+      "hideReactAction": false,
+      "hideCommentAction": false,
+      "shareUrl": "https://www.linkedin.com/posts/li-user-47_sdet-automationtesting-softwaretesting-activity-7502579241629306880-bE87?",
+      "showContributionExperience": false,
+      "showSocialDetail": true
+    },
+    "comments": [],
+    "header": {
+      "text": null
+    },
+    "entityId": "7502579241629306880",
+    "shareUrn": "urn:li:share:7502579240417173504",
+    "shareLinkedinUrl": "https://www.linkedin.com/feed/update/urn:li:share:7502579240417173504",
+    "engagement": {
+      "id": "7502579241629306880",
+      "likes": 1,
+      "comments": 0,
+      "shares": 0,
+      "reactions": [
+        {
+          "type": "LIKE",
+          "count": 1
+        }
+      ]
+    },
+    "reactions": [],
+    "reactionIds": [],
+    "commentIds": [],
+    "query": {
+      "sortBy": "date",
+      "page": 1,
+      "search": "flaky tests"
+    }
+  },
+  {
+    "type": "post",
+    "id": "7502577530261008384",
+    "linkedinUrl": "https://www.linkedin.com/posts/li-user-51_qa-qualityassurance-testautomation-activity-7502577530261008384-JIIG",
+    "content": "Flaky Tests: The Coworker Who Says “Maybe” to Everything\n\nTest run #102: ❌ Failed\nTest run #103: ✅ Passed\nTest run #104: ❌ Failed\n\nQA: “So… is the build broken?”\nAutomation: “Maybe.” 😐😂\n\nFlaky tests are dangerous because they slowly destroy trust in the test suite.\n\nOnce the team starts thinking, “That test is probably flaky,” a real failure can get ignored along with the noise.\n\nThe fix isn’t to keep rerunning the test until it turns green.\n\nInvestigate. Stabilize. Then trust the signal again.\n\nBecause a test suite that cries wolf 17 times a day eventually gets muted. 🐺🔇\n\n#QA #QualityAssurance #TestAutomation #SoftwareTesting #QALife #QualityEngineering #AutomationTesting #SoftwareQuality #Testing",
+    "contentAttributes": [],
+    "author": {
+      "id": "li-user-52",
+      "universalName": null,
+      "publicIdentifier": "li-user-51",
+      "type": "profile",
+      "name": "li-user-53",
+      "linkedinUrl": "https://www.linkedin.com/in/li-user-51?miniProfileUrn=urn%3Ali%3Afsd_profile%3Ali-user-52",
+      "info": "Scrubbed by capture.mjs. See docs/testing.md.",
+      "website": null,
+      "websiteLabel": null,
+      "avatar": {
+        "url": "https://scrubbed.invalid/li-user-54",
+        "width": 800,
+        "height": 800
+      },
+      "urn": "67642531",
+      "profileId": "li-user-52"
+    },
+    "postedAt": {
+      "timestamp": 1788753874364,
+      "date": "2026-09-07T04:04:34.364Z",
+      "postedAgoShort": "1h",
+      "postedAgoText": "1 hour ago • Visible to anyone on or off LinkedIn"
+    },
+    "postImages": [
+      {
+        "url": "https://media.licdn.com/dms/image/v2/D4D22AQFI-wY41p3skA/feedshare-image-high-res/B4DaB6CgZHKsAU-/0/1788753872854?e=1790208000&v=beta&t=S3YCeoa6nNLtJ5DX0xCBg07rmPOUElZVERSIiqANTB0",
+        "width": 1254,
+        "height": 1254
+      }
+    ],
+    "socialContent": {
+      "hideCommentsCount": false,
+      "hideReactionsCount": false,
+      "hideSocialActivityCounts": false,
+      "hideShareAction": true,
+      "hideSendAction": true,
+      "hideRepostsCount": false,
+      "hideViewsCount": false,
+      "trustInterventionBanner": null,
+      "hideReactAction": false,
+      "hideCommentAction": false,
+      "shareUrl": "https://www.linkedin.com/posts/li-user-51_qa-qualityassurance-testautomation-activity-7502577530261008384-JIIG?",
+      "showContributionExperience": false,
+      "showSocialDetail": true
+    },
+    "comments": [],
+    "header": {
+      "text": null
+    },
+    "entityId": "7502577530261008384",
+    "shareUrn": "urn:li:share:7502577528931315713",
+    "shareLinkedinUrl": "https://www.linkedin.com/feed/update/urn:li:share:7502577528931315713",
+    "engagement": {
+      "id": "7502577530261008384",
+      "likes": 0,
+      "comments": 0,
+      "shares": 0,
+      "reactions": []
+    },
+    "reactions": [],
+    "reactionIds": [],
+    "commentIds": [],
+    "query": {
+      "sortBy": "date",
+      "page": 1,
+      "search": "flaky tests"
+    }
+  },
+  {
+    "type": "post",
+    "id": "7502594743164416000",
+    "linkedinUrl": "https://www.linkedin.com/posts/li-user-55_qaautomationengineer-automationtesting-softwaretesting-activity-7502594743164416000-7Uz_",
+    "content": "🚀 Preparing for a QA Automation Engineer interview?\nHere are 30 important Automation Framework interview questions to strengthen your preparation.\nPerfect for QA Engineers working with Playwright, Selenium, Java, JavaScript & TypeScript.\nSave this post, practice these questions, and share it with fellow QA professionals!\n\n#QAAutomationEngineer #AutomationTesting #SoftwareTesting #Selenium #Playwright #Java #JavaScript #TypeScript #ManualTesting #QualityAssurance #Testing #InterviewPreparation #QAEngineer #TestAutomation #SoftwareEngineer\n🟨 1. Explain your automation testing framework architecture.\n🟨 2. How did you design your automation framework from scratch?\n🟨 3. What type of automation framework have you used in your project?\n🟨 4. Explain the folder structure of your automation framework.\n🟨 5. How do you implement Page Object Model in your framework?\n🟨 6. How do you manage locators in your framework?\n🟨 7. How do you manage test data in your framework?\n🟨 8. How do you manage different environments in your framework?\n🟨 9. How do you implement reusable methods?\n🟨 10. How do you handle setup and teardown?\n🟨 11. How do you implement screenshots, videos, and traces?\n🟨 12. How do you implement reporting?\n🟨 13. How do you handle failed and flaky test cases?\n🟨 14. How do you implement retry logic?\n🟨 15. How do you execute tests in parallel?\n🟨 16. How do you implement cross-browser testing?\n🟨 17. How do you integrate the framework with GitHub?\n🟨 18. How do you integrate the framework with Jenkins or CI/CD?\n🟨 19. How do you manage secrets and environment variables?\n🟨 20. How do you implement data-driven testing?\n🟨 21. How do you handle dynamic elements and locators?\n🟨 22. How do you reduce code duplication?\n🟨 23. How do you debug a failed automation test?\n🟨 24. How do you decide which test cases should be automated?\n🟨 25. How do you maintain the framework when the application UI changes?\n🟨 26. How do you make your framework scalable and maintainable?\n🟨 27. Explain the complete execution flow of your automation framework.\n🟨 28. What challenges did you face while developing your framework?\n🟨 29. If you join a new project, how would you design the automation framework?\n🟨 30. Explain your automation framework with a real project example.",
+    "contentAttributes": [],
+    "author": {
+      "id": "li-user-56",
+      "universalName": null,
+      "publicIdentifier": "li-user-55",
+      "type": "profile",
+      "name": "li-user-57",
+      "linkedinUrl": "https://www.linkedin.com/in/li-user-55?miniProfileUrn=urn%3Ali%3Afsd_profile%3Ali-user-56",
+      "info": "Scrubbed by capture.mjs. See docs/testing.md.",
+      "website": null,
+      "websiteLabel": null,
+      "avatar": {
+        "url": "https://scrubbed.invalid/li-user-58",
+        "width": 800,
+        "height": 800
+      },
+      "urn": "1471378771",
+      "profileId": "li-user-56"
+    },
+    "postedAt": {
+      "timestamp": 1788757978240,
+      "date": "2026-09-07T05:12:58.240Z",
+      "postedAgoShort": "28m",
+      "postedAgoText": "28 minutes ago • Visible to anyone on or off LinkedIn"
+    },
+    "postImages": [],
+    "socialContent": {
+      "hideCommentsCount": false,
+      "hideReactionsCount": false,
+      "hideSocialActivityCounts": false,
+      "hideShareAction": true,
+      "hideSendAction": true,
+      "hideRepostsCount": false,
+      "hideViewsCount": false,
+      "trustInterventionBanner": null,
+      "hideReactAction": false,
+      "hideCommentAction": false,
+      "shareUrl": "https://www.linkedin.com/posts/li-user-55_qaautomationengineer-automationtesting-softwaretesting-activity-7502594743164416000-7Uz_?",
+      "showContributionExperience": false,
+      "showSocialDetail": true
+    },
+    "comments": [],
+    "header": {
+      "text": null
+    },
+    "entityId": "7502594743164416000",
+    "shareUrn": "urn:li:share:7502594740459266048",
+    "shareLinkedinUrl": "https://www.linkedin.com/feed/update/urn:li:share:7502594740459266048",
+    "engagement": {
+      "id": "7502594743164416000",
+      "likes": 0,
+      "comments": 0,
+      "shares": 0,
+      "reactions": []
+    },
+    "reactions": [],
+    "reactionIds": [],
+    "commentIds": [],
+    "query": {
+      "sortBy": "date",
+      "page": 1,
+      "search": "flaky tests"
+    }
+  }
+]

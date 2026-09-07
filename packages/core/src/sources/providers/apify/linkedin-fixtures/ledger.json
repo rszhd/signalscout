@@ -1,0 +1,87 @@
+{
+  "note": "What each run was charged, in the provider's own numbers. Prices are tiered by Apify plan; this account is on FREE, where a post is $0.002 and a zero-result query is $0.001.",
+  "totalUsd": 0.04115,
+  "runs": [
+    {
+      "run": "credentials-rejected",
+      "httpStatus": 401,
+      "note": "sent with a deliberately invalid token; no run should have started"
+    },
+    {
+      "run": "search-by-date",
+      "input": {
+        "searchQueries": [
+          "flaky tests"
+        ],
+        "maxPosts": 10,
+        "sortBy": "date"
+      },
+      "runId": "DsYU0MFTyyxGSMY5c",
+      "status": "SUCCEEDED",
+      "elapsedMs": null,
+      "itemsReturned": 10,
+      "chargedEventCounts": {
+        "apify-actor-start": 1,
+        "post": 10,
+        "main-profile": 0,
+        "full-profile": 0,
+        "reaction": 0,
+        "comment": 0,
+        "no-result": 0
+      },
+      "chargedTotalUsd": null,
+      "usageTotalUsd": 0.020050000000000002
+    },
+    {
+      "run": "search-past-week",
+      "input": {
+        "searchQueries": [
+          "flaky tests"
+        ],
+        "maxPosts": 10,
+        "sortBy": "date",
+        "postedLimit": "week"
+      },
+      "runId": "EoO5MEFVNbq8Dui5B",
+      "status": "SUCCEEDED",
+      "elapsedMs": null,
+      "itemsReturned": 10,
+      "chargedEventCounts": {
+        "apify-actor-start": 1,
+        "post": 10,
+        "main-profile": 0,
+        "full-profile": 0,
+        "reaction": 0,
+        "comment": 0,
+        "no-result": 0
+      },
+      "chargedTotalUsd": null,
+      "usageTotalUsd": 0.020050000000000002
+    },
+    {
+      "run": "search-no-results",
+      "input": {
+        "searchQueries": [
+          "kumquat velocipede telemetry brunch"
+        ],
+        "maxPosts": 10,
+        "sortBy": "date"
+      },
+      "runId": "lqcKy7sKtQxzEA5QU",
+      "status": "SUCCEEDED",
+      "elapsedMs": null,
+      "itemsReturned": 0,
+      "chargedEventCounts": {
+        "apify-actor-start": 1,
+        "post": 0,
+        "main-profile": 0,
+        "full-profile": 0,
+        "reaction": 0,
+        "comment": 0,
+        "no-result": 1
+      },
+      "chargedTotalUsd": null,
+      "usageTotalUsd": 0.00105
+    }
+  ]
+}

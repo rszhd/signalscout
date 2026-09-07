@@ -1,0 +1,66 @@
+{
+  "note": "Which run produced each file. Captured from the live API; see docs/testing.md on why these are captured and never written.",
+  "provider": "apify",
+  "actor": "harvestapi/linkedin-post-search",
+  "platform": "linkedin",
+  "files": [
+    {
+      "file": "search-by-date.json",
+      "request": {
+        "input": {
+          "searchQueries": [
+            "flaky tests"
+          ],
+          "maxPosts": 10,
+          "sortBy": "date"
+        },
+        "runId": "DsYU0MFTyyxGSMY5c",
+        "phase": "dataset"
+      },
+      "capturedAt": "2026-09-07T05:44:54.409Z",
+      "identitiesReplaced": 58
+    },
+    {
+      "file": "search-past-week.json",
+      "request": {
+        "input": {
+          "searchQueries": [
+            "flaky tests"
+          ],
+          "maxPosts": 10,
+          "sortBy": "date",
+          "postedLimit": "week"
+        },
+        "runId": "EoO5MEFVNbq8Dui5B",
+        "phase": "dataset"
+      },
+      "capturedAt": "2026-09-07T05:44:54.971Z",
+      "identitiesReplaced": 58
+    },
+    {
+      "file": "search-no-results.json",
+      "request": {
+        "input": {
+          "searchQueries": [
+            "kumquat velocipede telemetry brunch"
+          ],
+          "maxPosts": 10,
+          "sortBy": "date"
+        },
+        "runId": "lqcKy7sKtQxzEA5QU",
+        "phase": "dataset"
+      },
+      "capturedAt": "2026-09-07T05:44:55.527Z",
+      "identitiesReplaced": 0
+    },
+    {
+      "file": "credentials-rejected.json",
+      "request": {
+        "phase": "start",
+        "note": "invalid token"
+      },
+      "capturedAt": "2026-09-07T05:44:43.191Z",
+      "identitiesReplaced": 0
+    }
+  ]
+}

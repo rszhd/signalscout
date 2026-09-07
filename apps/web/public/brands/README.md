@@ -1,10 +1,11 @@
 # Brand icons
 
-Downloaded from official websites on 2026-09-06, and `instagram.png` and
-`apify.png` on 2026-09-07. Original favicon files, used to identify the
-provider or platform; their respective owners retain rights to their logos
-and trademarks. These assets are not covered by the project’s Apache-2.0
-license. Served locally; the UI makes no external favicon requests.
+Downloaded from official websites on 2026-09-06, and `instagram.png`,
+`apify.png` and `socialdata.png` on 2026-09-07. Original favicon files,
+used to identify the provider or platform; their respective owners retain
+rights to their logos and trademarks. These assets are not covered by the
+project’s Apache-2.0 license. Served locally; the UI makes no external
+favicon requests.
 
 | File | Source |
 | --- | --- |
@@ -12,6 +13,7 @@ license. Served locally; the UI makes no external favicon requests.
 | `scrapecreators.png` | https://scrapecreators.com/favicon-48x48.png |
 | `socialcrawl.png` | https://www.socialcrawl.dev/icon.png |
 | `apify.png` | https://apify.com/icon5.png |
+| `socialdata.png` | https://socialdata.tools/apple-touch-icon.png |
 | `reddit.png` | https://www.redditstatic.com/desktop2x/img/favicon/favicon-96x96.png |
 | `x.png` | https://x.com/favicon.ico |
 | `linkedin.ico` | https://static.licdn.com/aero-v1/sc/h/al2o9zrvru7aqj8e1x2rzsrca |

@@ -29,6 +29,7 @@ const providerNames: Record<string, string> = {
   scrapecreators: "ScrapeCreators",
   socialcrawl: "SocialCrawl",
   apify: "Apify",
+  socialdata: "SocialData",
   fake: "Fake source",
 };
 

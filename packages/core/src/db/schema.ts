@@ -60,6 +60,10 @@ export type Source = (typeof sources)[number];
  * discovers X posts only by profile, and ScrapeCreators has no X search at
  * all, so neither can find a stranger describing a problem.
  *
+ * US-061 added `socialdata`, the second provider that can search X — and the
+ * first competition the platform has had since US-006, which found that two of
+ * the three providers asked could not search it at all.
+ *
  * US-057 added `apify`, and it is the first that is a marketplace rather than
  * a data API: what we call is an actor somebody else publishes, so the thing
  * that can change under us is not the provider's API but the actor's output.
@@ -68,7 +72,13 @@ export type Source = (typeof sources)[number];
  * providers, so a connector can be registered, tested and unable to store a
  * single row. The live poll is what found it.
  */
-export const providers = ["brightdata", "scrapecreators", "socialcrawl", "apify"] as const;
+export const providers = [
+  "brightdata",
+  "scrapecreators",
+  "socialcrawl",
+  "apify",
+  "socialdata",
+] as const;
 export type Provider = (typeof providers)[number];
 
 /**

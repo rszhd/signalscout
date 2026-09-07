@@ -59,6 +59,12 @@ export {
   socialCrawlLinkedIn,
   toCandidatePost as toSocialCrawlLinkedInCandidatePost,
 } from "./providers/socialcrawl/linkedin.js";
+export { socialDataProvider, socialDataProviderId } from "./providers/socialdata/provider.js";
+export {
+  SocialDataXSource,
+  socialDataX,
+  toCandidatePost as toSocialDataXCandidatePost,
+} from "./providers/socialdata/x.js";
 export {
   AmbiguousConnectorError,
   type ChoiceOptions,
@@ -105,6 +111,7 @@ import { socialCrawlReddit } from "./providers/socialcrawl/reddit.js";
 import { socialCrawlTikTok } from "./providers/socialcrawl/tiktok.js";
 import { socialCrawlX } from "./providers/socialcrawl/x.js";
 import { socialCrawlYouTube } from "./providers/socialcrawl/youtube.js";
+import { socialDataX } from "./providers/socialdata/x.js";
 import type { ConnectorDefinition } from "./types.js";
 
 /**
@@ -134,6 +141,7 @@ export const builtInSources: readonly ConnectorDefinition[] = [
   scrapeCreatorsReddit,
   socialCrawlReddit,
   socialCrawlX,
+  socialDataX,
   // Grouped by platform, not by provider. `groupByPlatform` keeps registration
   // order, and that order is what the monitor form and the connections screen
   // show — so a new provider goes beside the others for its platform, or it

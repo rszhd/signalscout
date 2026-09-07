@@ -228,7 +228,10 @@ describe("the monitor routes", () => {
         const body = (await app.inject({ method: "GET", url: "/api/monitor-options" })).json();
 
         expect(builtInSources.filter((source) => source.platform.id === "reddit")).toHaveLength(3);
-        expect(builtInSources.filter((source) => source.platform.id === "x")).toHaveLength(1);
+        // Two since US-061. X had one provider until then, which was the
+        // thinnest dependency in the product: US-006 asked three and only one
+        // could search X at all.
+        expect(builtInSources.filter((source) => source.platform.id === "x")).toHaveLength(2);
         // Two since US-057, which added the fresher of them. LinkedIn is now
         // the second platform that has to collapse, and the first one where the
         // two providers agree about neither the price nor the billable unit:
@@ -238,8 +241,8 @@ describe("the monitor routes", () => {
           2,
         );
 
-        // Three providers for Reddit, two for LinkedIn and one each for the
-        // rest: nine connectors make six rows. US-006 added the second platform, US-028
+        // Three providers for Reddit, two each for LinkedIn and X, and one
+        // each for the rest: ten connectors make six rows. US-006 added the second platform, US-028
         // the third, US-034 the fourth, US-044 the fifth and US-049 the sixth,
         // which is why this list grew; a platform appearing twice is the
         // failure it guards. SocialCrawl fetching five of the six is exactly

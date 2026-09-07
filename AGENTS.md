@@ -459,7 +459,48 @@ unimplemented on purpose — `from_member` and `from_company` are documented
 without saying whether they take a URL, a slug or an urn, and a wrong guess
 costs five credits to learn nothing.
 
-**X has one provider, and the reason is that only one of three can search
+**X has two providers, and the second exists because one was a single point of
+failure.** US-061 added SocialData on 2026-09-07. Until then every X poll this
+product made depended on one account at one company, and nothing measured what
+happened when that account was refused.
+
+**The window goes to the provider, and that is the reason rather than the
+price.** `since_time:` inside the query takes a UNIX timestamp and it works: a
+24-hour window returned **7 tweets for $0.0014** where the same query
+unwindowed returned **20 for $0.0040**. `socialcrawl/x.ts` has no window at all
+— it buys everything older than `since` and discards it here. This is the only
+connector in the product that stops paying for what it will throw away.
+
+It is also half the price: **200 micro-dollars a tweet** against SocialCrawl's
+406, so fifty posts cost $0.0100 against $0.0203. It bills the **tweet**, not
+the request — twenty tweets moved the balance $0.0040 and seven moved it
+$0.0014 — so a connector counting requests would let a monitor spend twenty
+times its cap.
+
+**`type=Latest` really orders newest first, measured across a whole page**, so
+the early-stop rule rests on a measurement rather than on a documented claim.
+The id is the bare tweet id, the same number `socialcrawl/x.ts` reads, so the
+two providers deduplicate against each other. There is **no URL field**: one is
+built as `x.com/<handle>/status/<id>` and US-060 opened one — it lands on the
+post, and it is the same string SocialCrawl returns.
+
+**This provider is prepaid, which no other one here is.** An empty balance
+answers **402**, which is not a wrong key and not a rate limit: retrying will
+not help and the repair is on the provider's website. `SocialDataError` gives it
+its own kind, and `validateCredentials` probes the free balance endpoint rather
+than a search — so a person with an empty account is told to top it up rather
+than to replace a key that is fine.
+
+**The key can contain a pipe character.** An unquoted `SOCIALDATA_API_KEY=…`
+line makes a shell run the second half as a command and load an empty key,
+which looks exactly like a missing one. `.env` must quote it.
+
+Still unproven: this connector has never polled live. A real rate limit, a real
+402, and a second poll proving deduplication on X are all untested, and
+`canFetchReplies` is false because nobody has measured the provider's comment
+endpoint or whether its links open.
+
+**X had one provider, and the reason was that only one of three could search
 it.** US-006 added SocialCrawl on 2026-09-05. Bright Data's X posts dataset
 answers a discovery trigger with `Available types: profile_url,
 profiles_array`, and ScrapeCreators publishes six X endpoints and no search

@@ -281,6 +281,13 @@
       "when": 1788707618112,
       "tag": "0039_add_apify_provider",
       "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1788707618113,
+      "tag": "0040_add_socialdata_provider",
+      "breakpoints": true
     }
   ]
 }

@@ -358,15 +358,19 @@ describe("the monitor list", () => {
     // US-026. Once a person can change which provider fetches a platform, the
     // list has to say which one actually did — the choice can move, and this
     // is the record of what ran.
+    const at = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
     await show([
-      monitor({
-        lastCollected: [
-          { source: "reddit", provider: "scrapecreators", at: "2026-09-05T09:30:00.000Z" },
-        ],
-      }),
+      monitor({ lastCollected: [{ source: "reddit", provider: "scrapecreators", at }] }),
     ]);
 
-    expect(container.textContent).toContain("reddit via scrapecreators");
+    const row = container.querySelector(".collection-list li");
+
+    expect(row?.textContent).toContain("Reddit");
+    expect(row?.textContent).toContain("ScrapeCreators");
+    // Relative, because the question here is "did it run recently?". The exact
+    // moment is the tooltip, for the person reconciling a bill.
+    expect(row?.textContent).toContain("2 hours ago");
+    expect(row?.querySelector("time")?.getAttribute("title")).toBe(new Date(at).toLocaleString());
   });
   /**
    * When a monitor runs. US-041.

@@ -10,7 +10,8 @@
  */
 import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { ageLabel, Inbox } from "./Inbox.js";
+import { Inbox } from "./Inbox.js";
+import { ageLabel } from "./labels.js";
 import { button, json, mount, type Screen, select, settle, setValue } from "./testing.js";
 
 const qaMonitor = { id: "11111111-1111-4111-8111-111111111111", name: "Teams replacing manual QA" };

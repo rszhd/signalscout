@@ -101,15 +101,10 @@
   box-shadow: none;
   border-color: var(--line-dark);
 }
+/* One column: the monitor's name over what it watches. The letter tile that
+   stood beside them was decoration — the name is already the identity. */
 .monitors-content .monitor-identity {
-  grid-template-columns: 40px minmax(0, 1fr);
-  gap: var(--space-3);
-}
-.monitors-content .product-icon {
-  color: var(--accent-text);
-  background: var(--accent-soft);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-md);
+  grid-template-columns: minmax(0, 1fr);
 }
 .monitors-content .monitor-top h2 {
   font-size: var(--text-md);
@@ -293,6 +288,40 @@
 .collection-settings-section .monitor-origin {
   overflow-wrap: anywhere;
 }
+.collection-list {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.collection-list li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--line);
+  font-size: var(--text-sm);
+}
+.collection-list li:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+.collection-provider {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+.collection-list time {
+  color: var(--muted);
+  font-size: var(--text-xs);
+  white-space: nowrap;
+}
 .monitors-content .monitor-card-actions {
   border: 0;
   padding: 0;
@@ -374,5 +403,12 @@
   .monitor-controls .budget-settings-form,
   .reading-options {
     grid-template-columns: 1fr;
+  }
+  .collection-list li {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .collection-provider {
+    grid-column: 1 / -1;
+    grid-row: 2;
   }
 }

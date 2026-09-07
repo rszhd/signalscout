@@ -964,21 +964,6 @@ a {
 .monitor-identity {
   min-width: 0;
   display: grid;
-  grid-template-columns: 40px 1fr;
-  gap: 11px;
-  align-items: center;
-}
-
-.product-icon {
-  width: 40px;
-  height: 40px;
-  display: grid;
-  place-items: center;
-  border-radius: var(--radius-sm);
-  color: var(--surface);
-  background: var(--accent);
-  font-size: 0.86rem;
-  font-weight: 700;
 }
 
 .monitor-top h2 {

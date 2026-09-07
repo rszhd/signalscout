@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { messageFor, requestJson } from "./api.js";
 import { BrandIcon } from "./BrandIcon.js";
+import { ageLabel, platformName, providerName } from "./labels.js";
 import { projectSuffix, routeParam } from "./route.js";
 import { ScheduleField } from "./ScheduleField.js";
 import { describeSchedule } from "./schedule.js";
@@ -756,28 +757,23 @@ function MonitorCards({
           <li key={monitor.id} className="monitor-card">
             <div className="monitor-top">
               <div className="monitor-identity">
-                <span className="product-icon" aria-hidden="true">
-                  {monitor.name.slice(0, 1).toUpperCase()}
-                </span>
-                <div>
-                  <h2>{monitor.name}</h2>
-                  <p className="monitor-origin">
-                    {monitor.sources.length > 0
-                      ? monitor.sources.map((source, index) => (
-                          <span key={source}>
-                            {index > 0 ? " · " : ""}
-                            <span className="brand-label">
-                              <BrandIcon brand={source} size={16} />
-                              {source}
-                            </span>
+                <h2>{monitor.name}</h2>
+                <p className="monitor-origin">
+                  {monitor.sources.length > 0
+                    ? monitor.sources.map((source, index) => (
+                        <span key={source}>
+                          {index > 0 ? " · " : ""}
+                          <span className="brand-label">
+                            <BrandIcon brand={source} size={16} />
+                            {source}
                           </span>
-                        ))
-                      : "No source"}
-                    {monitor.lastPolledAt
-                      ? ` · last polled ${new Date(monitor.lastPolledAt).toLocaleString()}`
-                      : " · never polled"}
-                  </p>
-                </div>
+                        </span>
+                      ))
+                    : "No source"}
+                  {monitor.lastPolledAt
+                    ? ` · last polled ${new Date(monitor.lastPolledAt).toLocaleString()}`
+                    : " · never polled"}
+                </p>
               </div>
               <span className={`monitor-status ${running.tone}`}>{running.label}</span>
             </div>
@@ -858,18 +854,30 @@ function MonitorCards({
                   now: the choice can be changed and this is the record of what
                   ran. Read from the ledger, so the moment is when money was
                   last spent on that pair. US-026. */}
-                  {monitor.lastCollected.length > 0 && (
-                    <p className="monitor-origin">
-                      {monitor.lastCollected
-                        .map(
-                          (one) =>
-                            `${one.source} via ${one.provider}, ${new Date(one.at).toLocaleString()}`,
-                        )
-                        .join(" · ")}
-                    </p>
-                  )}
-                  {monitor.lastCollected.length === 0 && (
+                  {monitor.lastCollected.length === 0 ? (
                     <p className="monitor-origin">No collections recorded yet.</p>
+                  ) : (
+                    <ul className="collection-list">
+                      {monitor.lastCollected.map((one) => (
+                        <li key={`${one.source}-${one.provider}`}>
+                          <span className="brand-label">
+                            <BrandIcon brand={one.source} size={16} />
+                            {platformName(one.source)}
+                          </span>
+                          <span className="collection-provider">
+                            <BrandIcon brand={one.provider} size={14} />
+                            {providerName(one.provider)}
+                          </span>
+                          {/* The exact moment stays in the tooltip. "2 hours
+                              ago" answers "did it run this morning?", and the
+                              timestamp answers "which row on the invoice?" —
+                              two questions, and only the first is asked here. */}
+                          <time dateTime={one.at} title={new Date(one.at).toLocaleString()}>
+                            {ageLabel(one.at)}
+                          </time>
+                        </li>
+                      ))}
+                    </ul>
                   )}
                 </section>
               </div>

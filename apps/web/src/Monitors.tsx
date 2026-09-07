@@ -43,8 +43,18 @@ interface MissingCredential {
 
 interface PreFilter {
   enabled: boolean;
+  /**
+   * Sent by the API and no longer edited here. It is a research dial: the
+   * default of 0.15 came from one monitor and five posts, a value set too high
+   * drops leads with no row and no bill to notice, and on every platform
+   * measured so far the stage has dropped almost nothing — 0 of 40 posts on X,
+   * 0 of 20 on LinkedIn, 1 of 50 in a subreddit. `PATCH /api/monitors/:id`
+   * still carries it for whoever is tuning one.
+   */
   similarityThreshold: number;
-  dropped: { keyword: number; embedding: number };
+  dropped: { keyword: number; embedding: number; triage: number };
+  /** Posts the classifier has read. With the drops it makes the total. */
+  read: number;
 }
 
 /** The verdicts in force on this monitor's matches. US-012. */
@@ -336,12 +346,60 @@ function ScheduleForm({ monitor, onSaved }: { monitor: Monitor; onSaved: () => P
   );
 }
 
+/**
+ * What this monitor has read and what it skipped, in one sentence.
+ *
+ * Read plus skipped is not a count of anything: `posts` has no monitor column,
+ * because one row serves every monitor that found it and the same conversation
+ * must not be classified and billed twice. The total is therefore the two
+ * numbers the monitor does own, added together — every post it has decided
+ * about. A stage that dropped nothing is left out rather than reported as
+ * zero, which would invite a question about a stage that did nothing.
+ */
+function countsSentence(preFilter: PreFilter): string {
+  const { keyword, embedding, triage } = preFilter.dropped;
+  const skipped = keyword + embedding + triage;
+  const decided = preFilter.read + skipped;
+
+  if (!preFilter.enabled) {
+    return "Every post this monitor collects is read by the AI, and every one is billed.";
+  }
+
+  if (decided === 0) return "This monitor has not found any posts yet.";
+  if (skipped === 0) return `The AI read all ${decided} posts found. Nothing was skipped.`;
+
+  const reasons = [
+    keyword > 0 ? `${keyword} did not use your words` : undefined,
+    embedding > 0 ? `${embedding} were not about your subject` : undefined,
+    triage > 0 ? `${triage} read as someone answering rather than asking` : undefined,
+  ].filter((reason) => reason !== undefined);
+
+  return (
+    `The AI read ${preFilter.read} of ${decided} posts found. ` +
+    `The other ${skipped} were skipped: ${reasons.join(", ")}.`
+  );
+}
+
+/**
+ * Which posts the AI reads: one choice, in the words the person pays in.
+ *
+ * This asked for a similarity threshold as a decimal, and a person who does
+ * not know what cosine similarity is could not answer it — nor could they see
+ * what a wrong answer did, because a threshold set too high deletes leads
+ * before anything records them. What is left is the half that is a real
+ * decision: money against missed leads.
+ *
+ * The counts stay, and they are the instrument. A filter dropping most of what
+ * it sees is either saving a lot of money or emptying the inbox, and only the
+ * number says which question to ask.
+ */
 function PreFilterForm({ monitor, onSaved }: { monitor: Monitor; onSaved: () => Promise<void> }) {
-  const [threshold, setThreshold] = useState(String(monitor.preFilter.similarityThreshold));
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function save(preFilter: Partial<PreFilter>): Promise<void> {
+  async function save(enabled: boolean): Promise<void> {
+    if (enabled === monitor.preFilter.enabled) return;
+
     setBusy(true);
     setError(null);
 
@@ -349,70 +407,47 @@ function PreFilterForm({ monitor, onSaved }: { monitor: Monitor; onSaved: () => 
       await requestJson(`/api/monitors/${monitor.id}`, {
         method: "PATCH",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ preFilter }),
+        body: JSON.stringify({ preFilter: { enabled } }),
       });
       await onSaved();
     } catch (cause) {
-      setError(messageFor(cause, "The pre-filter could not be changed."));
+      setError(messageFor(cause, "That could not be changed."));
     } finally {
       setBusy(false);
     }
   }
 
-  function saveThreshold(): void {
-    const similarityThreshold = Number(threshold);
-
-    if (
-      !Number.isFinite(similarityThreshold) ||
-      similarityThreshold < 0 ||
-      similarityThreshold > 1
-    ) {
-      setError("Type the similarity as a number between 0 and 1, such as 0.15.");
-      return;
-    }
-
-    void save({ similarityThreshold });
-  }
-
   return (
-    <div className="budget-form prefilter-settings-form">
-      <label className="budget-field">
-        <span className="budget-label">Similarity needed</span>
-        <input
-          aria-label={`Similarity needed for ${monitor.name}`}
-          inputMode="decimal"
-          value={threshold}
-          disabled={!monitor.preFilter.enabled}
-          onChange={(event) => setThreshold(event.target.value)}
-        />
-      </label>
+    <div className="reading-choice">
+      <fieldset className="reading-options" disabled={busy}>
+        <legend className="visually-hidden">Which posts the AI reads</legend>
 
-      <div className="budget-actions">
-        <button
-          type="button"
-          className="secondary-button"
-          disabled={busy || !monitor.preFilter.enabled}
-          onClick={saveThreshold}
-        >
-          Save threshold
-        </button>
-        <button
-          type="button"
-          className="text-button"
-          disabled={busy}
-          onClick={() => void save({ enabled: !monitor.preFilter.enabled })}
-        >
-          {monitor.preFilter.enabled ? "Turn the pre-filter off" : "Turn the pre-filter on"}
-        </button>
-      </div>
+        <label className="reading-option">
+          <input
+            className="visually-hidden"
+            type="radio"
+            name={`reading-${monitor.id}`}
+            checked={monitor.preFilter.enabled}
+            onChange={() => void save(true)}
+          />
+          <strong>Only the promising ones</strong>
+          <small>Cheaper. A few real leads may be missed.</small>
+        </label>
 
-      <p className="monitor-filter-counts">
-        {monitor.preFilter.enabled
-          ? `Kept from the model so far: ${monitor.preFilter.dropped.keyword} on words, ` +
-            `${monitor.preFilter.dropped.embedding} on similarity. Every post reaching the ` +
-            "model is classified, and every classification is billed."
-          : "The pre-filter is off. Every collected post is sent to the model and billed."}
-      </p>
+        <label className="reading-option">
+          <input
+            className="visually-hidden"
+            type="radio"
+            name={`reading-${monitor.id}`}
+            checked={!monitor.preFilter.enabled}
+            onChange={() => void save(false)}
+          />
+          <strong>Every post found</strong>
+          <small>Costs more. Misses nothing.</small>
+        </label>
+      </fieldset>
+
+      <p className="monitor-filter-counts">{countsSentence(monitor.preFilter)}</p>
 
       {error && (
         <p className="budget-error" role="alert">
@@ -814,7 +849,7 @@ function MonitorCards({
                   <BudgetForm monitor={monitor} onSaved={load} />
                 </section>
                 <section className="monitor-settings-section">
-                  <h3>Pre-filter</h3>
+                  <h3>Which posts the AI reads</h3>
                   <PreFilterForm monitor={monitor} onSaved={load} />
                 </section>
                 <section className="monitor-settings-section collection-settings-section">

@@ -43,7 +43,8 @@ function monitor(overrides: Record<string, unknown> = {}) {
     preFilter: {
       enabled: true,
       similarityThreshold: 0.15,
-      dropped: { keyword: 0, embedding: 0 },
+      dropped: { keyword: 0, embedding: 0, triage: 0 },
+      read: 0,
     },
     feedback: { good: 0, notRelevant: 0 },
     ...overrides,
@@ -236,54 +237,71 @@ describe("the monitor list", () => {
     expect(button("Remove cap")).toBeTruthy();
   });
 
-  it("says how many posts each pre-filter stage kept from the model", async () => {
-    // US-008 asks for this counter, and the reason is that the filter's own
-    // risk is invisible everywhere else: a threshold set too high empties the
-    // inbox and looks like a quiet week.
+  /**
+   * The counter US-008 asked for, in words a person who did not build it can
+   * read. The stage's own risk is invisible everywhere else: a filter dropping
+   * most of what it finds empties the inbox and looks like a quiet week.
+   */
+  it("says what was skipped before the AI read it, and why", async () => {
     await show([
       monitor({
         preFilter: {
           enabled: true,
           similarityThreshold: 0.15,
-          dropped: { keyword: 340, embedding: 62 },
+          dropped: { keyword: 340, embedding: 62, triage: 8 },
+          read: 46,
         },
       }),
     ]);
 
-    expect(container.textContent).toContain("340 on words");
-    expect(container.textContent).toContain("62 on similarity");
+    expect(container.textContent).toContain("The AI read 46 of 456 posts found");
+    expect(container.textContent).toContain("The other 410 were skipped");
+    expect(container.textContent).toContain("340 did not use your words");
+    expect(container.textContent).toContain("62 were not about your subject");
+    expect(container.textContent).toContain("8 read as someone answering rather than asking");
   });
 
-  it("sends the threshold a person typed", async () => {
-    await show([monitor()]);
+  /** A stage that dropped nothing is left out rather than reported as zero. */
+  it("names only the stages that skipped something", async () => {
+    await show([
+      monitor({
+        preFilter: {
+          enabled: true,
+          similarityThreshold: 0.15,
+          dropped: { keyword: 12, embedding: 0, triage: 0 },
+          read: 3,
+        },
+      }),
+    ]);
 
-    setValue(field("Similarity needed for Teams replacing manual QA"), "0.4");
-    button("Save threshold").click();
-    await settle();
-
-    const [url, init] = fetchMock.mock.calls.at(-2) as [string, RequestInit];
-
-    expect(url).toBe(`/api/monitors/${monitorId}`);
-    expect(init.method).toBe("PATCH");
-    expect(JSON.parse(String(init.body))).toEqual({ preFilter: { similarityThreshold: 0.4 } });
+    expect(container.textContent).toContain("The AI read 3 of 15 posts found");
+    expect(container.textContent).toContain("12 did not use your words");
+    expect(container.textContent).not.toContain("0 were not about your subject");
   });
 
-  it("refuses a similarity no cosine distance can produce, without asking the server", async () => {
+  /**
+   * The threshold left the screen, and this is the case that keeps it off.
+   *
+   * It is a research dial: 0.15 came from one monitor and five posts, a value
+   * set too high deletes leads with no row and no bill, and on every platform
+   * measured the stage has dropped almost nothing. It stays editable through
+   * the API, where the person changing it knows what it is.
+   */
+  it("asks for no similarity number", async () => {
     await show([monitor()]);
-    const before = fetchMock.mock.calls.length;
 
-    setValue(field("Similarity needed for Teams replacing manual QA"), "40");
-    button("Save threshold").click();
-    await settle();
-
-    expect(fetchMock.mock.calls).toHaveLength(before);
-    expect(container.textContent).toContain("a number between 0 and 1");
+    expect(container.textContent).not.toContain("Similarity");
+    expect(document.querySelector('[aria-label^="Similarity needed"]')).toBeNull();
+    expect(() => button("Save threshold")).toThrow();
   });
 
   it("turns the pre-filter off, and says what that costs", async () => {
     await show([monitor()]);
 
-    button("Turn the pre-filter off").click();
+    const everyPost = [...document.querySelectorAll<HTMLLabelElement>(".reading-option")].find(
+      (option) => option.textContent?.includes("Every post found"),
+    );
+    everyPost?.querySelector("input")?.click();
     await settle();
 
     const [, init] = fetchMock.mock.calls.at(-2) as [string, RequestInit];
@@ -295,13 +313,14 @@ describe("the monitor list", () => {
         preFilter: {
           enabled: false,
           similarityThreshold: 0.15,
-          dropped: { keyword: 0, embedding: 0 },
+          dropped: { keyword: 0, embedding: 0, triage: 0 },
+          read: 9,
         },
       }),
     ]);
 
     expect(container.textContent).toContain(
-      "Every collected post is sent to the model and billed.",
+      "Every post this monitor collects is read by the AI, and every one is billed.",
     );
   });
 

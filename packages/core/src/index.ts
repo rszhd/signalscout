@@ -82,7 +82,11 @@ export {
   searchQuerySchemaFor,
   subredditSchema,
 } from "./ai/queries.js";
-export { type RecordModelCallInput, recordModelCall } from "./ai/record.js";
+export {
+  classifiedPostCounts,
+  type RecordModelCallInput,
+  recordModelCall,
+} from "./ai/record.js";
 export {
   type BudgetState,
   budgetState,

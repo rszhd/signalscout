@@ -27,6 +27,7 @@ import {
   type QueryGenerator,
   type QueryPlanOutcome,
   recordFilterDrops,
+  recordModelCall,
   recordSourceUsage,
   recordVerdict,
   setProviderChoice,
@@ -734,6 +735,8 @@ describe("the monitor routes", () => {
           similarityThreshold: 0.15,
           // `triage` joined the stages in US-030.
           dropped: { keyword: 0, embedding: 0, triage: 0 },
+          // The other half of the sentence the screen writes from these.
+          read: 0,
         });
       });
     });
@@ -824,6 +827,54 @@ describe("the monitor routes", () => {
           embedding: 1,
           triage: 0,
         });
+      });
+    });
+
+    /**
+     * The count beside the drops, on the wire.
+     *
+     * `posts` has no monitor column, so the total the screen shows is this
+     * number plus the drops. A route that sent one without the other would
+     * make that total wrong rather than missing.
+     */
+    it("says how many posts the classifier has read", async () => {
+      await withServer({}, async (app) => {
+        const id = await create(app);
+
+        const [post] = await db
+          .insert(posts)
+          .values({
+            source: "reddit",
+            externalId: "classified-1",
+            url: "https://example.test/3",
+            excerpt: "Our end to end tests break on every UI change.",
+            postedAt: new Date("2026-09-01T12:00:00Z"),
+          })
+          .returning({ id: posts.id });
+
+        // Two calls about one post, as a re-scored post produces. The screen
+        // counts posts, so this is one.
+        for (const monitorVersion of [1, 2]) {
+          await recordModelCall(db, {
+            purpose: "classification",
+            outcome: "scored",
+            monitorId: id,
+            monitorVersion,
+            postId: post?.id as string,
+            call: {
+              provider: "anthropic",
+              model: "test",
+              latencyMs: 10,
+              inputTokens: 100,
+              outputTokens: 20,
+              estimatedCostMicros: 250,
+            },
+          });
+        }
+
+        const response = await app.inject({ method: "GET", url: "/api/monitors" });
+
+        expect(response.json()[0].preFilter.read).toBe(1);
       });
     });
   });

@@ -18,6 +18,7 @@ import { and, eq } from "drizzle-orm";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { createClassifier } from "../ai/classify.js";
 import type { AiConfig } from "../ai/config.js";
+import { classifiedPostCounts } from "../ai/record.js";
 import { createDatabase, type Database } from "../db/client.js";
 import { apiUsage, budgets, matches, modelCalls, monitors, posts } from "../db/schema.js";
 import { createLogger } from "../logger.js";
@@ -543,6 +544,24 @@ describe("a post already scored for this monitor", () => {
     // A different question, so the old answer does not stand in for it.
     expect(calls).toHaveLength(2);
     expect((await callsFor(monitorId, postId)).map((row) => row.monitorVersion)).toEqual([1, 2]);
+  }, 30_000);
+
+  /**
+   * The count the monitor screen puts beside the drops. It says how many posts
+   * the AI read, so a post re-scored under a new version is one post and not
+   * two — the same distinction BUG-003 turned on.
+   */
+  it("counts as one post read, however many times it was scored", async () => {
+    const monitorId = await insertMonitor(database);
+    const postId = await insertPost(weakPost, "counted-once");
+    answer = () => weakAnswer;
+
+    await classifyAndWait(monitorId, [postId]);
+    await updateMonitor(db, monitorId, { problem: "Suites that fail for no reason" });
+    await classifyAndWait(monitorId, [postId]);
+
+    expect(await callsFor(monitorId, postId)).toHaveLength(2);
+    expect((await classifiedPostCounts(db, [monitorId])).get(monitorId)).toBe(1);
   }, 30_000);
 
   it("is not scored again for a rename, a new query or a moved threshold", async () => {

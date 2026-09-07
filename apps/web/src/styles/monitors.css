@@ -230,8 +230,7 @@
   min-width: 0;
   max-width: none;
 }
-.monitor-controls .budget-settings-form,
-.monitor-controls .prefilter-settings-form {
+.monitor-controls .budget-settings-form {
   display: grid;
   column-gap: var(--space-3);
   row-gap: var(--space-3);
@@ -240,18 +239,53 @@
 .monitor-controls .budget-settings-form {
   grid-template-columns: minmax(104px, 0.7fr) minmax(190px, 2fr);
 }
-.monitor-controls .prefilter-settings-form {
-  grid-template-columns: minmax(104px, 140px) minmax(0, 1fr);
-}
-.budget-settings-form .budget-actions,
-.prefilter-settings-form :is(.monitor-filter-counts, .budget-error) {
+.budget-settings-form .budget-actions {
   grid-column: 1 / -1;
 }
 .monitor-controls .budget-actions {
   flex-wrap: wrap;
 }
-.prefilter-settings-form .budget-actions {
-  min-height: var(--control-height);
+.reading-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.reading-option {
+  position: relative;
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  cursor: pointer;
+}
+.reading-option:has(input:checked) {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.reading-option:has(input:focus-visible) {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+.reading-options:disabled .reading-option {
+  cursor: default;
+  opacity: 0.6;
+}
+.reading-option strong {
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+.reading-option small {
+  color: var(--muted);
+  font-size: var(--text-xs);
+  line-height: 1.5;
+}
+.reading-choice .monitor-filter-counts {
+  margin-top: var(--space-3);
 }
 .monitor-settings .schedule-controls {
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -338,11 +372,7 @@
   }
   .monitor-settings .schedule-controls,
   .monitor-controls .budget-settings-form,
-  .monitor-controls .prefilter-settings-form {
+  .reading-options {
     grid-template-columns: 1fr;
-  }
-  .prefilter-settings-form .budget-actions {
-    grid-column: 1;
-    min-height: 0;
   }
 }

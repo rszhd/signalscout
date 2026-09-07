@@ -20,6 +20,7 @@ import {
   type ConnectorDescriptor,
   canFetchRepliesFor,
   checkBudget,
+  classifiedPostCounts,
   clearBudget,
   createMonitor,
   type Database,
@@ -345,6 +346,16 @@ const monitorSchema = z.object({
    */
   preFilter: preFilterSchema.extend({
     dropped: z.object({ keyword: z.number(), embedding: z.number(), triage: z.number() }),
+    /**
+     * How many posts the classifier has read for this monitor.
+     *
+     * Beside the drops it makes the whole sentence: read plus skipped is every
+     * post this monitor has decided about, which is the total a person can
+     * check the filter against. `posts` has no monitor column — one row serves
+     * every monitor that found it — so the total is these two added up rather
+     * than a count of anything.
+     */
+    read: z.number(),
   }),
   /** US-020. Whether this monitor reads the replies under the posts it finds. */
   includeReplies: z.boolean(),
@@ -416,6 +427,7 @@ function toResponse(
   runtime: MonitorEnvironment,
   state: BudgetState,
   dropped: FilterDropCounts,
+  read: number,
   verdicts: VerdictCounts,
   collected: readonly LastCollection[],
   notificationProblems: readonly string[],
@@ -465,6 +477,7 @@ function toResponse(
       enabled: monitor.preFilterEnabled,
       similarityThreshold: monitor.similarityThreshold,
       dropped,
+      read,
     },
     includeReplies: monitor.includeReplies,
     feedback: verdicts,
@@ -479,9 +492,10 @@ function toResponse(
  * paths end in `toResponse`, so neither can grow a field the other lacks.
  */
 async function readResponse(db: Database, monitor: Monitor, runtime: MonitorEnvironment) {
-  const [state, drops, verdicts, collected, notifications] = await Promise.all([
+  const [state, drops, read, verdicts, collected, notifications] = await Promise.all([
     checkBudget(db, monitor.id),
     filterDropCounts(db, [monitor.id]),
+    classifiedPostCounts(db, [monitor.id]),
     verdictCounts(db, [monitor.id]),
     lastCollections(db),
     notificationIssues(db),
@@ -492,6 +506,7 @@ async function readResponse(db: Database, monitor: Monitor, runtime: MonitorEnvi
     runtime,
     state,
     drops.get(monitor.id) ?? noFilterDrops,
+    read.get(monitor.id) ?? 0,
     verdicts.get(monitor.id) ?? noVerdicts,
     collected.get(monitor.id) ?? [],
     notifications.get(monitor.id) ?? [],
@@ -713,9 +728,10 @@ export async function registerMonitorRoutes(
       // screen that shows this is a list, and a per-row query here would be
       // the list's cost growing with the number of monitors.
       const rows = await listMonitors(db);
-      const [states, drops, verdicts, collected, notifications] = await Promise.all([
+      const [states, drops, read, verdicts, collected, notifications] = await Promise.all([
         budgetStates(db),
         filterDropCounts(db),
+        classifiedPostCounts(db),
         verdictCounts(db),
         lastCollections(db),
         notificationIssues(db),
@@ -733,6 +749,7 @@ export async function registerMonitorRoutes(
             runtime,
             states.get(monitor.id) ?? (await checkBudget(db, monitor.id)),
             drops.get(monitor.id) ?? noFilterDrops,
+            read.get(monitor.id) ?? 0,
             verdicts.get(monitor.id) ?? noVerdicts,
             collected.get(monitor.id) ?? [],
             notifications.get(monitor.id) ?? [],

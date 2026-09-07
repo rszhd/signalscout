@@ -50,10 +50,7 @@ probes are free at both providers. So the matrix is mostly research, and the
 credits go only where a claim has to be tested.
 
 **One thing this ticket must not become: a rating invented from
-documentation.** invented from documentation. This repository has caught
-four documented claims wrong in one month: `published_after` that answers 400,
-dates drifting 283 days against a documented 120, and two completeness flags
-that lied in opposite directions. This repository has caught four documented claims wrong in one
+documentation.** This repository has caught four documented claims wrong in one
 month: a `published_after` that answers 400, dates drifting 283 days against a
 documented 120, and two completeness flags that lied in opposite directions.
 **Every cell carries how it was established** — measured here, read from the

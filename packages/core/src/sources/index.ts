@@ -72,6 +72,7 @@ export {
   UnknownConnectorError,
   UnknownSourceError,
 } from "./registry.js";
+export { type ProviderReturn, providerReturns, verdictCount } from "./returns.js";
 export { createSourceRuntime } from "./runtime.js";
 export { assertSourcesCanBeStored } from "./storage.js";
 export type {

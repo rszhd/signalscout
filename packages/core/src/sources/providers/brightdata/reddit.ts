@@ -58,6 +58,8 @@ export const brightDataReddit: ConnectorDefinition = {
    * post. It is the only connector here where that is true.
    */
   postsPerUnit: 1,
+  /** Keywords across Reddit, and a subreddit listing. Both proven live in US-022. */
+  discovery: ["keyword", "channel"],
   /** `defaultRecordsPerInput`: what one keyword collects when nobody says otherwise. */
   maxUnitsPerQueryPoll: defaultRecordsPerInput,
   create: (runtime) => new RedditSource(runtime),

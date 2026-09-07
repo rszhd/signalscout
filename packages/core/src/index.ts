@@ -364,7 +364,9 @@ export {
   type ProviderDecision,
   type ProviderDescriptor,
   type ProviderId,
+  type ProviderReturn,
   platforms,
+  providerReturns,
   readProviderChoices,
   redditPlatform,
   redditPlatformId,
@@ -378,6 +380,7 @@ export {
   setProviderChoice,
   UnknownConnectorError,
   UnknownSourceError,
+  verdictCount,
   xPlatform,
   xPlatformId,
 } from "./sources/index.js";

@@ -88,6 +88,10 @@ export const socialCrawlInstagram: ConnectorDefinition = {
    * `replyPricePerUnitMicros` beside it.
    */
   postsPerUnit: 30,
+  discovery: ["keyword"],
+  // `linksToComments` is deliberately absent: nobody has opened one of this
+  // connector's comment links. US-049 left that question open and guessing at
+  // it here would answer it wrongly.
   maxUnitsPerQueryPoll: maxPagesPerInput,
   canFetchReplies: true,
   /**

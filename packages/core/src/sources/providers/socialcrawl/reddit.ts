@@ -66,6 +66,12 @@ export const socialCrawlReddit: ConnectorDefinition = {
   pricePerUnitMicros: 8118,
   /** About 25 posts a request, the page size measured for this endpoint. */
   postsPerUnit: 25,
+  /**
+   * Both — and uniquely, both at once. `/v1/reddit/subreddit/search` is a
+   * keyword *inside* a subreddit, which no other Reddit connector has, and it
+   * is the reason this expensive one exists. US-031.
+   */
+  discovery: ["keyword", "channel"],
   maxUnitsPerQueryPoll: maxPagesPerInput,
   /**
    * False, and measured rather than unimplemented. Its comment endpoint works

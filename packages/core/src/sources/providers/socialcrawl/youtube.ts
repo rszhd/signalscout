@@ -96,6 +96,9 @@ export const socialCrawlYouTube: ConnectorDefinition = {
    * video, the cheapest item this product fetches.
    */
   postsPerUnit: 45,
+  discovery: ["keyword"],
+  /** We build `&lc=`, and US-047 opened one: it lands on the comment, highlighted. */
+  linksToComments: true,
   maxUnitsPerQueryPoll: maxPagesPerInput,
   canFetchReplies: true,
   /** A comment page is one credit, the same as a search. Measured, not assumed. */

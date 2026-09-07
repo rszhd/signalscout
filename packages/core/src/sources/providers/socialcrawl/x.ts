@@ -86,6 +86,10 @@ export const socialCrawlX: ConnectorDefinition = {
    * after a YouTube video.
    */
   postsPerUnit: 20,
+  /** Keywords only. Bright Data and ScrapeCreators cannot search X at all. */
+  discovery: ["keyword"],
+  /** The provider returns a `status` URL, and US-047 opened one: it works. */
+  linksToComments: true,
   /** `maxPagesPerInput`: what one query or handle costs in one poll. */
   maxUnitsPerQueryPoll: maxPagesPerInput,
   canFetchReplies: true,

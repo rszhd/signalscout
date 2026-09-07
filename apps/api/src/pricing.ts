@@ -35,10 +35,23 @@ import {
   environmentVariableFor,
   groupByPlatform,
   listCredentialHints,
+  providerReturns,
   readProviderChoices,
+  verdictCount,
 } from "@intentwatch/core";
 import { z } from "zod";
 import type { ApiServer } from "./server.js";
+
+/**
+ * Below this many posts, a percentage is noise dressed as a measurement.
+ *
+ * US-059's own example: LinkedIn matched at 25.0% through one provider and
+ * 8.0% through another, over twenty and twenty-five posts. Two matches either
+ * way. The screen marks a row this thin rather than hiding it — the number is
+ * still the only one there is, and a person who knows it rests on twenty posts
+ * can weigh it themselves.
+ */
+export const thinSample = 50;
 
 /**
  * The quantity every connector is priced for, so the column is one comparison
@@ -81,6 +94,32 @@ const connectorView = z.object({
   /** Whether a poll of this platform would actually go through this provider. */
   inUse: z.boolean(),
   spent: z.object({ units: z.number(), cost: money }),
+  /** What this pair can find, and whether a comment it returns can be opened. */
+  can: z.object({
+    keyword: z.boolean(),
+    channel: z.boolean(),
+    replies: z.boolean(),
+    /** Null where nobody has opened one of this connector's comment links. */
+    commentLinks: z.boolean().nullable(),
+  }),
+  /**
+   * What this pair actually brought back, from this deployment's own rows.
+   *
+   * The half that answers whether the money was well spent. Every figure here
+   * is counted rather than projected, and `thin` says when there is too little
+   * of it to lean on.
+   */
+  returned: z.object({
+    posts: z.number(),
+    matches: z.number(),
+    /** Null when nothing was collected: 0 of 0 is not zero per cent. */
+    matchRate: z.number().nullable(),
+    /** Hours, median, of the posts collected through this pair. Null when none. */
+    medianAgeHours: z.number().nullable(),
+    /** What one match cost through this pair. Null with no spend or no matches. */
+    costPerMatch: money.nullable(),
+    thin: z.boolean(),
+  }),
 });
 
 const platformView = z.object({
@@ -140,6 +179,17 @@ export async function registerPricingRoutes(
       response: {
         200: z.object({
           comparedPosts: z.number(),
+          thinSample: z.number(),
+          /**
+           * How many verdicts this instance holds, in total.
+           *
+           * The page says a match is our guess and a verdict is the person's
+           * judgement, and this number is what makes that concrete. With five
+           * verdicts on one monitor, "cost per good lead" is not a figure
+           * anybody may compute, and the screen says so rather than showing
+           * matches and calling them leads.
+           */
+          verdicts: z.number(),
           platforms: z.array(platformView),
         }),
       },
@@ -181,6 +231,23 @@ export async function registerPricingRoutes(
           micros: running.micros + Number(row.micros ?? 0),
         });
       }
+
+      /**
+       * What each pair collected, and how much of it became a match.
+       *
+       * One query rather than one per row, and it counts `posts` rather than
+       * anything a connector reported: this is what is in the table, which is
+       * what a person can check.
+       *
+       * `posts.provider` is null on rows collected before US-024 split the
+       * platform from the provider — 126 Reddit posts on this instance. They
+       * belong to no pair and are excluded rather than being attributed to
+       * whichever provider happens to be listed first.
+       */
+      const returns = await providerReturns(db);
+      const returnedBy = new Map(returns.map((row) => [`${row.source}:${row.provider}`, row]));
+
+      const verdicts = await verdictCount(db);
 
       /** Which credential fields this deployment is missing for one provider. */
       function missingFor(connector: ConnectorDescriptor): string[] {
@@ -227,6 +294,14 @@ export async function registerPricingRoutes(
               micros: 0,
             };
             const estimate = estimateFor(connector);
+            const back = returnedBy.get(`${platform.id}:${connector.provider.id}`);
+
+            const collected = back?.posts ?? 0;
+            const matched = back?.matches ?? 0;
+            const median =
+              back?.medianAgeHours === null || back?.medianAgeHours === undefined
+                ? null
+                : Math.round(Number(back.medianAgeHours) * 10) / 10;
 
             return {
               providerId: connector.provider.id,
@@ -247,6 +322,31 @@ export async function registerPricingRoutes(
               missingEnvironmentVariables: missing,
               inUse: chosen === connector.provider.id,
               spent: { units: spent.units, cost: moneyOf(spent.micros) },
+              can: {
+                keyword: connector.discovery?.includes("keyword") ?? false,
+                channel: connector.discovery?.includes("channel") ?? false,
+                replies: connector.canFetchReplies === true,
+                commentLinks: connector.linksToComments ?? null,
+              },
+              returned: {
+                posts: collected,
+                matches: matched,
+                // 0 of 0 is not zero per cent. A pair that has collected
+                // nothing has no rate, and showing one would read as a
+                // measurement of a provider nobody has used.
+                matchRate: collected === 0 ? null : Math.round((matched / collected) * 1000) / 10,
+                medianAgeHours: median,
+                // What one match cost through this pair. Undefined rather than
+                // infinite when nothing matched: a provider that produced no
+                // lead has no cost per lead, and dividing by zero would print
+                // the most expensive provider as blank and the second most as
+                // a number.
+                costPerMatch:
+                  matched === 0 || spent.micros === 0
+                    ? null
+                    : moneyOf(Math.round(spent.micros / matched)),
+                thin: collected > 0 && collected < thinSample,
+              },
             };
           }),
         };
@@ -254,6 +354,8 @@ export async function registerPricingRoutes(
 
       return {
         comparedPosts,
+        thinSample,
+        verdicts,
         platforms: platforms.map(({ platform }) => viewOf(platform)),
       };
     },

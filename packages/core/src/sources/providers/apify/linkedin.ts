@@ -115,6 +115,12 @@ export const apifyLinkedIn: ConnectorDefinition = {
    * here where that is true.
    */
   postsPerUnit: 1,
+  /**
+   * Keywords only. The actor takes `authorUrls` and `authorsCompanies`, which
+   * narrow a search to accounts a person already knows — not the channel
+   * discovery a monitor means, and untested here besides.
+   */
+  discovery: ["keyword"],
   /** `postsPerRun`: what one query costs in one poll. */
   maxUnitsPerQueryPoll: postsPerRun,
   /**

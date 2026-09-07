@@ -4,8 +4,8 @@ import { Inbox } from "./Inbox.js";
 import { MonitorForm } from "./MonitorForm.js";
 import { Monitors } from "./Monitors.js";
 import { Notifications } from "./Notifications.js";
-import { Pricing } from "./Pricing.js";
 import { Projects } from "./Projects.js";
+import { Providers } from "./Providers.js";
 import { routeParam, routePath } from "./route.js";
 
 /**
@@ -35,7 +35,7 @@ const newMonitorRoute = "#/monitors/new";
 const monitorsRoute = "#/monitors";
 const connectionsRoute = "#/connections";
 const projectsRoute = "#/projects";
-const pricingRoute = "#/pricing";
+const providersRoute = "#/providers";
 
 function currentRoute(): string {
   return globalThis.location?.hash ?? "";
@@ -59,7 +59,7 @@ export function App() {
   const listing = !creating && path.startsWith(monitorsRoute);
   const connecting = path.startsWith(connectionsRoute);
   const projecting = path.startsWith(projectsRoute);
-  const pricing = path.startsWith(pricingRoute);
+  const comparing = path.startsWith(providersRoute);
 
   /**
    * The project everything else is about, carried in the route. US-045.
@@ -89,7 +89,7 @@ export function App() {
   // Pricing joins Connections as a machine-level screen: one set of keys, one
   // set of prices, every project. Asking it to pick a project first would ask a
   // question it has no use for.
-  const needsProject = !projecting && !connecting && !pricing && !notificationId;
+  const needsProject = !projecting && !connecting && !comparing && !notificationId;
   const withoutProject = needsProject && projectId === null;
 
   useEffect(() => {
@@ -152,11 +152,11 @@ export function App() {
             </span>
             <span>Connections</span>
           </a>
-          <a className={pricing ? "nav-item current" : "nav-item"} href={pricingRoute}>
+          <a className={comparing ? "nav-item current" : "nav-item"} href={providersRoute}>
             <span className="nav-icon" aria-hidden="true">
               ⌗
             </span>
-            <span>Pricing</span>
+            <span>Providers</span>
           </a>
           {/*
             Also only with a project: a monitor is made in one, and the form
@@ -192,8 +192,8 @@ export function App() {
           <Projects />
         ) : connecting ? (
           <Connections />
-        ) : pricing ? (
-          <Pricing />
+        ) : comparing ? (
+          <Providers />
         ) : listing ? (
           <Monitors />
         ) : (

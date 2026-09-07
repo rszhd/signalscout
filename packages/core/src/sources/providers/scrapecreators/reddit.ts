@@ -84,6 +84,8 @@ export const scrapeCreatorsReddit: ConnectorDefinition = {
    * is worth knowing before choosing a discovery mode.
    */
   postsPerUnit: 7,
+  /** Both, and measured in one capture: 7 posts on a keyword, 23 on a subreddit. */
+  discovery: ["keyword", "channel"],
   /** `maxPagesPerInput`: what one keyword or subreddit costs in one poll. */
   maxUnitsPerQueryPoll: maxPagesPerInput,
   canFetchReplies: true,

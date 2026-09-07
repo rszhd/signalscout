@@ -72,6 +72,13 @@ export const socialCrawlTikTok: ConnectorDefinition = {
   pricePerUnitMicros: 8118,
   /** A search page is 30 videos for one credit. Measured in US-044. */
   postsPerUnit: 30,
+  discovery: ["keyword"],
+  /**
+   * We build `?cid=`, and US-047 opened one: it lands on the comment. The
+   * connector shipped `?comment_id=` first, which it invented, and that
+   * survived a capture and two live polls because nobody clicked it.
+   */
+  linksToComments: true,
   maxUnitsPerQueryPoll: maxPagesPerInput,
   canFetchReplies: true,
   /** A comment page is one credit, the same as a search. Measured. */

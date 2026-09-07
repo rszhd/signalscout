@@ -445,6 +445,35 @@ export interface ConnectorDescriptor {
    */
   readonly postsPerUnit?: number;
   /**
+   * How this connector can find a stranger: by words, by a channel, or both.
+   *
+   * A capability rather than a scale, and the reason is US-059's: "cannot
+   * search" is not a one out of five. Bright Data's X and LinkedIn datasets
+   * discover only by profile URL, which is why neither is shipped — a
+   * connector that cannot find somebody it was not already told about cannot
+   * serve this product at all.
+   *
+   * `keyword` is words across the platform. `channel` is inside a place a
+   * person named — a subreddit, a company. A connector with both can do them
+   * separately; SocialCrawl's Reddit connector is the only one that can do
+   * them *together*, and that is a note in its own file rather than a third
+   * value here.
+   */
+  readonly discovery?: readonly ("keyword" | "channel")[];
+  /**
+   * Whether a comment this connector returns can be linked to.
+   *
+   * Not the same as `canFetchReplies`. US-047 opened one comment link per
+   * platform and found that a match needs a URL that opens the comment
+   * itself — and ScrapeCreators' LinkedIn search returns comments carrying
+   * only the commenter's profile, which is a link to the wrong thing.
+   *
+   * Absent means nobody has checked. It is left absent rather than guessed:
+   * `?comment_id=` survived a capture, two live polls and a code comment
+   * admitting it was invented, because nobody clicked it.
+   */
+  readonly linksToComments?: boolean;
+  /**
    * The most billable units one query can consume in one poll, when the caller
    * asks for no limit of its own.
    *

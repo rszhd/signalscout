@@ -1,12 +1,12 @@
 ---
 id: US-059
-title: The pricing page says what each provider returned
+title: The providers page says what each one returned
 type: feature
 priority: p2
 created: 2026-09-07T15:00+08:00
 parent: US-058
 area:
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -62,24 +62,24 @@ rather than filling it with matches and calling them leads.
 
 ## Acceptance
 
-- [ ] Each connector row shows the median age of the posts collected through
+- [x] Each connector row shows the median age of the posts collected through
       it, from `posts`, so freshness sits beside price
-- [ ] Each row shows how many posts were collected and how many became
+- [x] Each row shows how many posts were collected and how many became
       matches, with the rate
-- [ ] Each row shows cost per match, derived from that pair's real spend and
+- [x] Each row shows cost per match, derived from that pair's real spend and
       its real match count
-- [ ] Every returned figure carries the number of posts behind it, and a row
+- [x] Every returned figure carries the number of posts behind it, and a row
       under about fifty posts is marked as too small to lean on
-- [ ] A pair that has collected nothing says so, rather than showing 0% or a
+- [x] A pair that has collected nothing says so, rather than showing 0% or a
       division by zero
-- [ ] Match rate is never compared across platforms on the screen, and nothing
+- [x] Match rate is never compared across platforms on the screen, and nothing
       combines these numbers into a single score or star rating
-- [ ] The page says plainly that a match is our guess and a verdict is the
+- [x] The page says plainly that a match is our guess and a verdict is the
       person's judgement, and names how many verdicts exist
-- [ ] Capabilities are shown as facts rather than scales: whether the connector
+- [x] Capabilities are shown as facts rather than scales: whether the connector
       searches by keyword, searches inside a channel, reads comments, and can
       link to a comment
-- [ ] `pnpm test`, `pnpm lint` and `pnpm typecheck` pass
+- [x] `pnpm test`, `pnpm lint` and `pnpm typecheck` pass
 
 ## Notes
 
@@ -105,3 +105,45 @@ rather than filling it with matches and calling them leads.
   and then doubted it. The doubt was right: their own numbers rank the worse
   LinkedIn provider three times higher on match rate. The measurements go on
   the page; the score does not.
+
+- 2026-09-07T15:35+08:00 — Built and closed. 1,267 tests pass, lint and
+  typecheck clean, and a real browser rendered it. **The page is renamed from
+  Pricing to Providers**, at the owner's request and because the old name
+  stopped being true: it now answers what a provider charges, what it returned,
+  and what it can find at all.
+
+  **Reddit is the comparison that proves the ticket's point**, and it is the
+  reverse of the LinkedIn one that prompted it:
+
+  | Provider | Posts | Median age | Matches | Cost per match |
+  |---|---|---|---|---|
+  | ScrapeCreators | 792 | 7 days | 61 · 7.7% | **$0.0024** |
+  | SocialCrawl | 187 | 39 days | 40 · **21.4%** | $0.0501 |
+
+  SocialCrawl matches at nearly three times the rate and costs **twenty times
+  more per match**. A score built on either number alone picks a different
+  provider, which is the whole argument against a score.
+
+  Two new declarations carry the capability half: `discovery` — keywords,
+  channels or both — and `linksToComments`. Both are set from what was already
+  measured, and Instagram's is deliberately absent because US-049 never opened
+  one of its comment links. The page prints "links unproven" for it rather than
+  guessing.
+
+  The query lives in `packages/core/src/sources/returns.ts`, not in the API:
+  `apps/api` imports no `drizzle-orm` and core is where the database is
+  reached.
+
+  Three things the build found. The header row was replaced in one edit and the
+  body cells in another, and **the two fell out of step** — six headers over
+  eight columns, so every figure sat under the wrong label until a browser
+  showed it. The **fake connector did not pass the new fields through**, so an
+  API test asserted a capability the route could never have reported. And a
+  provider can now show **money spent against no posts**: Bright Data's Reddit
+  spend predates `posts.provider`, those rows are attributed to nobody, and the
+  page says so in a footnote rather than crediting them to whichever provider
+  is listed first.
+
+  Left ready and empty on purpose: cost per *good* lead. The page says a match
+  is our guess and a verdict is the person's, and names how many verdicts exist.
+  There are five.

@@ -9,7 +9,7 @@
  * `apps/api/src/pricing.test.ts`.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { Pricing } from "./Pricing.js";
+import { Providers } from "./Providers.js";
 import { json, mount, type Screen, settle } from "./testing.js";
 
 function money(micros: number) {
@@ -30,6 +30,15 @@ function connector(overrides: Record<string, unknown> = {}) {
     missingEnvironmentVariables: [],
     inUse: true,
     spent: { units: 10, cost: money(81180) },
+    can: { keyword: true, channel: false, replies: false, commentLinks: null },
+    returned: {
+      posts: 20,
+      matches: 5,
+      matchRate: 25,
+      medianAgeHours: 195.8,
+      costPerMatch: money(16236),
+      thin: true,
+    },
     ...overrides,
   };
 }
@@ -52,13 +61,27 @@ function linkedIn() {
         ceilingPerQueryPoll: money(50000),
         inUse: false,
         spent: { units: 26, cost: money(52000) },
+        returned: {
+          posts: 25,
+          matches: 2,
+          matchRate: 8,
+          medianAgeHours: 2.8,
+          costPerMatch: money(26000),
+          thin: true,
+        },
       }),
     ],
   };
 }
 
 function view(overrides: Record<string, unknown> = {}) {
-  return { comparedPosts: 50, platforms: [linkedIn()], ...overrides };
+  return {
+    comparedPosts: 50,
+    thinSample: 50,
+    verdicts: 5,
+    platforms: [linkedIn()],
+    ...overrides,
+  };
 }
 
 let screen: Screen;
@@ -78,7 +101,7 @@ afterEach(async () => {
 
 async function show(body: unknown) {
   vi.spyOn(globalThis, "fetch").mockResolvedValue(json(body));
-  screen = await mount(<Pricing />);
+  screen = await mount(<Providers />);
   await settle();
 }
 
@@ -254,9 +277,9 @@ describe("when the prices cannot be read", () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValue(
       json({ message: "The database is unreachable." }, 500),
     );
-    screen = await mount(<Pricing />);
+    screen = await mount(<Providers />);
 
-    expect(text()).toContain("The prices could not be loaded");
+    expect(text()).toContain("This page could not be loaded");
     expect(text()).toContain("The database is unreachable.");
   });
 });
@@ -292,8 +315,175 @@ describe("the shape of one row", () => {
 describe("while it is loading", () => {
   it("names itself rather than showing a blank page", async () => {
     vi.spyOn(globalThis, "fetch").mockReturnValue(new Promise(() => {}) as Promise<Response>);
-    screen = await mount(<Pricing />);
+    screen = await mount(<Providers />);
 
-    expect(text()).toContain("Provider pricing");
+    expect(text()).toContain("Providers");
+  });
+});
+
+describe("what each provider actually returned", () => {
+  it("shows freshness, which no price on the page says", async () => {
+    // The number that decided LinkedIn: 2.8 hours against 196. Hours under two
+    // days, days after that, because "8 days" is the fact and "196 h" is a
+    // division somebody has to do.
+    await show(view());
+
+    expect(text()).toContain("median age 3 h");
+    expect(text()).toContain("median age 8 days");
+  });
+
+  it("shows how many posts became matches, with the count behind the rate", async () => {
+    await show(view());
+
+    expect(text()).toContain("25%");
+    expect(text()).toContain("of 20 posts");
+    expect(text()).toContain("of 25 posts");
+  });
+
+  it("marks a rate that rests on too few posts", async () => {
+    // Twenty posts is two matches either way. A percentage over it should read
+    // as fragile, because it is.
+    await show(view());
+
+    expect(text()).toContain("too few to lean on");
+  });
+
+  it("shows cost per match, which is value where cost per post is price", async () => {
+    await show(view());
+
+    expect(text()).toContain("$0.0162");
+    expect(text()).toContain("$0.0260");
+  });
+
+  it("says nothing to judge rather than nought per cent for an unused provider", async () => {
+    // 0 of 0 is not zero per cent, and printing one would read as a
+    // measurement of a provider nobody has used.
+    await show(
+      view({
+        platforms: [
+          {
+            id: "x",
+            displayName: "X",
+            comparable: false,
+            connectors: [
+              connector({
+                returned: {
+                  posts: 0,
+                  matches: 0,
+                  matchRate: null,
+                  medianAgeHours: null,
+                  costPerMatch: null,
+                  thin: false,
+                },
+              }),
+            ],
+          },
+        ],
+      }),
+    );
+
+    expect(text()).toContain("none collected");
+    expect(text()).toContain("nothing to judge yet");
+  });
+});
+
+describe("what the page refuses to claim", () => {
+  it("says a match is our guess and a verdict is the person's", async () => {
+    await show(view());
+
+    expect(text()).toContain("A match is our guess. A verdict is yours.");
+  });
+
+  it("names how many verdicts there are, so the caveat is concrete", async () => {
+    await show(view({ verdicts: 5 }));
+
+    expect(text()).toContain("5 so far");
+  });
+
+  it("says match rate is comparable only inside one platform", async () => {
+    // Across platforms it measures the monitor and its threshold. Reddit
+    // through SocialCrawl matches at 21.4% and YouTube through the same
+    // provider at 2.6%, which says nothing about SocialCrawl.
+    await show(view());
+
+    expect(text()).toContain("between two providers of one platform");
+  });
+
+  it("shows no score, grade or stars anywhere", async () => {
+    // The reason is in US-059: on this instance's own data a score built from
+    // match rate ranks the worse LinkedIn provider three times higher.
+    await show(view());
+
+    expect(text()).not.toMatch(/\b\d(\.\d)?\s*\/\s*5\b/);
+    expect(text()).not.toMatch(/★|rating|grade [A-F]\b/i);
+  });
+});
+
+describe("what a connector can find at all", () => {
+  it("says how it discovers, in words", async () => {
+    await show(
+      view({
+        platforms: [
+          {
+            id: "reddit",
+            displayName: "Reddit",
+            comparable: false,
+            connectors: [
+              connector({
+                can: { keyword: true, channel: true, replies: true, commentLinks: true },
+              }),
+            ],
+          },
+        ],
+      }),
+    );
+
+    expect(text()).toContain("Finds by keywords and channels");
+    expect(text()).toContain("reads and links comments");
+  });
+
+  it("separates reading a comment from being able to link to one", async () => {
+    // US-047's rule: a match needs a URL that opens the comment. A connector
+    // that reads comments and returns a link to the commenter's profile has
+    // not met it.
+    await show(
+      view({
+        platforms: [
+          {
+            id: "linkedin",
+            displayName: "LinkedIn",
+            comparable: false,
+            connectors: [
+              connector({
+                can: { keyword: true, channel: false, replies: true, commentLinks: false },
+              }),
+            ],
+          },
+        ],
+      }),
+    );
+
+    expect(text()).toContain("reads comments, cannot link them");
+  });
+
+  it("says links are unproven rather than guessing", async () => {
+    await show(
+      view({
+        platforms: [
+          {
+            id: "instagram",
+            displayName: "Instagram",
+            comparable: false,
+            connectors: [
+              connector({
+                can: { keyword: true, channel: false, replies: true, commentLinks: null },
+              }),
+            ],
+          },
+        ],
+      }),
+    );
+
+    expect(text()).toContain("links unproven");
   });
 });

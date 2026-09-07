@@ -33,6 +33,22 @@ interface Money {
   display: string;
 }
 
+interface Capabilities {
+  keyword: boolean;
+  channel: boolean;
+  replies: boolean;
+  commentLinks: boolean | null;
+}
+
+interface Returned {
+  posts: number;
+  matches: number;
+  matchRate: number | null;
+  medianAgeHours: number | null;
+  costPerMatch: Money | null;
+  thin: boolean;
+}
+
 interface ConnectorView {
   providerId: string;
   providerName: string;
@@ -46,6 +62,8 @@ interface ConnectorView {
   missingEnvironmentVariables: string[];
   inUse: boolean;
   spent: { units: number; cost: Money };
+  can: Capabilities;
+  returned: Returned;
 }
 
 interface PlatformView {
@@ -55,9 +73,31 @@ interface PlatformView {
   connectors: ConnectorView[];
 }
 
-interface PricingView {
+interface ProvidersView {
   comparedPosts: number;
+  thinSample: number;
+  verdicts: number;
   platforms: PlatformView[];
+}
+
+/**
+ * An age in the unit a person would say it in.
+ *
+ * Hours up to two days, then days. "196 h" is a number somebody has to divide;
+ * "8 days" is the fact — and against "3 h" it is the whole argument for one
+ * provider over another.
+ */
+function age(hours: number | null): string {
+  if (hours === null) return "—";
+  if (hours < 1) return `${Math.round(hours * 60)} min`;
+  if (hours < 48) return `${Math.round(hours)} h`;
+  return `${Math.round(hours / 24)} days`;
+}
+
+/** What a connector can find, as words rather than ticks. */
+function findsWith(can: Capabilities): string {
+  const modes = [can.keyword && "keywords", can.channel && "channels"].filter(Boolean);
+  return modes.length > 0 ? modes.join(" and ") : "nothing on its own";
 }
 
 /**
@@ -77,35 +117,36 @@ function cheapestOf(platform: PlatformView): number | undefined {
   return priced.length > 1 ? Math.min(...priced) : undefined;
 }
 
-function PricingHeader() {
+function ProvidersHeader() {
   return (
     <header className="topbar">
       <div>
-        <h1>Provider pricing</h1>
+        <h1>Providers</h1>
         <p className="page-subtitle">
-          What each provider charges, and what the same amount of posts costs through each one.
+          What each provider charges, what it has actually returned here, and what it can find at
+          all.
         </p>
       </div>
     </header>
   );
 }
 
-export function Pricing() {
-  const [view, setView] = useState<PricingView | null>(null);
+export function Providers() {
+  const [view, setView] = useState<ProvidersView | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    requestJson<PricingView>("/api/pricing")
+    requestJson<ProvidersView>("/api/pricing")
       .then(setView)
-      .catch((cause: unknown) => setError(messageFor(cause, "The prices could not be loaded.")));
+      .catch((cause: unknown) => setError(messageFor(cause, "This page could not be loaded.")));
   }, []);
 
   if (error) {
     return (
-      <div className="product-page pricing-page">
-        <PricingHeader />
+      <div className="product-page providers-page">
+        <ProvidersHeader />
         <div className="center-state page-state" role="alert">
-          <h2>The prices could not be loaded</h2>
+          <h2>This page could not be loaded</h2>
           <p>{error}</p>
         </div>
       </div>
@@ -114,8 +155,8 @@ export function Pricing() {
 
   if (!view) {
     return (
-      <div className="product-page pricing-page">
-        <PricingHeader />
+      <div className="product-page providers-page">
+        <ProvidersHeader />
         <div className="center-state page-state" role="status">
           <div className="spinner" aria-hidden="true" />
           <p>Reading what each provider charges.</p>
@@ -129,44 +170,46 @@ export function Pricing() {
     .reduce((sum, connector) => sum + connector.spent.cost.micros, 0);
 
   return (
-    <div className="product-page pricing-page">
-      <PricingHeader />
+    <div className="product-page providers-page">
+      <ProvidersHeader />
 
-      <div className="pricing-content">
+      <div className="providers-content">
         {view.platforms.map((platform) => {
           const cheapest = cheapestOf(platform);
 
           return (
-            <article className="pricing-platform" key={platform.id}>
+            <article className="providers-platform" key={platform.id}>
               <h2>
                 <BrandIcon brand={platform.id} />
                 <span>{platform.displayName}</span>
                 {platform.comparable && (
-                  <span className="pricing-count">{platform.connectors.length} providers</span>
+                  <span className="providers-count">{platform.connectors.length} providers</span>
                 )}
               </h2>
 
               <div className="table-scroll">
-                <table className="pricing-table">
+                <table className="providers-table">
                   <thead>
                     <tr>
                       <th scope="col">Provider</th>
                       <th scope="col">Price</th>
                       <th scope="col">One unit brings</th>
                       <th scope="col">Est. {view.comparedPosts} posts</th>
-                      <th scope="col">Max per query, per poll</th>
                       <th scope="col">Spent so far</th>
+                      <th scope="col">Posts, and how fresh</th>
+                      <th scope="col">Matches</th>
+                      <th scope="col">Cost per match</th>
                     </tr>
                   </thead>
                   <tbody>
                     {platform.connectors.map((connector) => (
                       <tr
                         key={connector.providerId}
-                        className={connector.inUse ? "pricing-row in-use" : "pricing-row"}
+                        className={connector.inUse ? "providers-row in-use" : "providers-row"}
                       >
                         <th scope="row">
-                          <span className="pricing-provider">{connector.providerName}</span>
-                          <span className="pricing-tags">
+                          <span className="providers-provider">{connector.providerName}</span>
+                          <span className="providers-tags">
                             {/*
                             "In use" is what a poll would really do, not what a
                             row in the database says: a recorded choice that
@@ -184,23 +227,39 @@ export function Pricing() {
                               </span>
                             )}
                           </span>
+                          {/*
+                            Capabilities as facts, not scales. "Cannot search"
+                            is not a one out of five, and a connector that reads
+                            comments it cannot link to is a different thing from
+                            one that can.
+                          */}
+                          <span className="providers-can">
+                            Finds by {findsWith(connector.can)}
+                            {connector.can.replies
+                              ? connector.can.commentLinks === true
+                                ? " · reads and links comments"
+                                : connector.can.commentLinks === false
+                                  ? " · reads comments, cannot link them"
+                                  : " · reads comments, links unproven"
+                              : " · no comments"}
+                          </span>
                         </th>
                         <td>
-                          <span className="pricing-money">{connector.pricePerUnit.display}</span>
-                          <span className="pricing-note">per {connector.billableUnit}</span>
+                          <span className="providers-money">{connector.pricePerUnit.display}</span>
+                          <span className="providers-note">per {connector.billableUnit}</span>
                           {connector.replyPricePerUnit && (
-                            <span className="pricing-note">
+                            <span className="providers-note">
                               {connector.replyPricePerUnit.display} per comment page
                             </span>
                           )}
                         </td>
                         <td>
                           {connector.postsPerUnit === null ? (
-                            <span className="pricing-note">not measured</span>
+                            <span className="providers-note">not measured</span>
                           ) : (
                             <>
-                              <span className="pricing-money">{connector.postsPerUnit}</span>
-                              <span className="pricing-note">
+                              <span className="providers-money">{connector.postsPerUnit}</span>
+                              <span className="providers-note">
                                 post{connector.postsPerUnit === 1 ? "" : "s"} per{" "}
                                 {connector.billableUnit}
                               </span>
@@ -209,7 +268,7 @@ export function Pricing() {
                         </td>
                         <td>
                           {connector.estimatedPerComparedPosts === null ? (
-                            <span className="pricing-note">
+                            <span className="providers-note">
                               no yield measured, so nothing to compare
                             </span>
                           ) : (
@@ -217,13 +276,13 @@ export function Pricing() {
                               <span
                                 className={
                                   connector.estimatedPerComparedPosts.micros === cheapest
-                                    ? "pricing-money pricing-best"
-                                    : "pricing-money"
+                                    ? "providers-money providers-best"
+                                    : "providers-money"
                                 }
                               >
                                 {connector.estimatedPerComparedPosts.display}
                               </span>
-                              <span className="pricing-note">
+                              <span className="providers-note">
                                 {connector.estimatedPerComparedPosts.micros === cheapest
                                   ? "estimated — cheapest here"
                                   : "estimated"}
@@ -232,20 +291,66 @@ export function Pricing() {
                           )}
                         </td>
                         <td>
-                          <span className="pricing-money">
-                            {connector.ceilingPerQueryPoll.display}
-                          </span>
-                          <span className="pricing-note">ceiling</span>
-                        </td>
-                        <td>
                           {connector.spent.cost.micros === 0 ? (
-                            <span className="pricing-note">nothing yet</span>
+                            <span className="providers-note">nothing yet</span>
                           ) : (
                             <>
-                              <span className="pricing-money">{connector.spent.cost.display}</span>
-                              <span className="pricing-note">
+                              <span className="providers-money">
+                                {connector.spent.cost.display}
+                              </span>
+                              <span className="providers-note">
                                 {connector.spent.units} {connector.billableUnit}
                                 {connector.spent.units === 1 ? "" : "s"} billed
+                              </span>
+                            </>
+                          )}
+                        </td>
+                        <td>
+                          {connector.returned.posts === 0 ? (
+                            <span className="providers-note">none collected</span>
+                          ) : (
+                            <>
+                              <span className="providers-money">{connector.returned.posts}</span>
+                              {/*
+                                Freshness, and the reason this column exists. A
+                                median of 3 hours against 8 days is the whole
+                                argument for one provider over another, and no
+                                price on this page says it.
+                              */}
+                              <span className="providers-note">
+                                median age {age(connector.returned.medianAgeHours)}
+                              </span>
+                            </>
+                          )}
+                        </td>
+                        <td>
+                          {connector.returned.matchRate === null ? (
+                            // 0 of 0 is not zero per cent, and printing one
+                            // would read as a measurement of a provider nobody
+                            // has used.
+                            <span className="providers-note">nothing to judge yet</span>
+                          ) : (
+                            <>
+                              <span className="providers-money">
+                                {connector.returned.matches} · {connector.returned.matchRate}%
+                              </span>
+                              <span className="providers-note">
+                                of {connector.returned.posts} posts
+                                {connector.returned.thin ? " — too few to lean on" : ""}
+                              </span>
+                            </>
+                          )}
+                        </td>
+                        <td>
+                          {connector.returned.costPerMatch === null ? (
+                            <span className="providers-note">—</span>
+                          ) : (
+                            <>
+                              <span className="providers-money">
+                                {connector.returned.costPerMatch.display}
+                              </span>
+                              <span className="providers-note">
+                                {connector.returned.thin ? "over a thin sample" : "measured"}
                               </span>
                             </>
                           )}
@@ -260,11 +365,31 @@ export function Pricing() {
         })}
       </div>
 
-      <footer className="pricing-footnotes">
+      <footer className="providers-footnotes">
         <p>
           <strong>Spent so far, everything: {`$${(totalSpent / 1_000_000).toFixed(4)}`}.</strong>{" "}
           This is what this instance has recorded against every provider, all time. It is our count
           of what you were charged, not a bill — read it beside your provider's own dashboard.
+        </p>
+        <p>
+          <strong>A match is our guess. A verdict is yours.</strong> The classifier scores a post
+          against your monitor, and a match only means it scored above the threshold — the two
+          matches this instance found on one LinkedIn provider were marketing. Only a verdict says a
+          lead was any good, and there {view.verdicts === 1 ? "is" : "are"}{" "}
+          {view.verdicts === 0 ? "none" : view.verdicts} so far. Until there are more, read “cost
+          per match” as the cost of something worth reading, not the cost of a customer.
+        </p>
+        <p>
+          A provider can show money spent and no posts. Rows collected before this instance started
+          recording <em>which</em> provider fetched them carry no provider, and they are left out
+          rather than credited to whichever one is listed first — so the spend is real and the posts
+          are counted under nobody.
+        </p>
+        <p>
+          Match rate is only comparable <em>between two providers of one platform</em>. Across
+          platforms it measures the monitor and its threshold rather than the provider. Anything
+          under {view.thinSample} posts is marked, because a percentage over twenty posts is two
+          matches either way.
         </p>
         <p>
           The estimate multiplies a provider's published price by how many posts one unit brought

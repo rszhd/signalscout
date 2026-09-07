@@ -39,6 +39,7 @@ function socialCrawlLinkedIn(): ConnectorDefinition {
     billableUnit: "credit",
     postsPerUnit: 2,
     maxUnitsPerQueryPoll: 2,
+    discovery: ["keyword"],
   });
 }
 
@@ -72,6 +73,8 @@ function unmeasured(): ConnectorDefinition {
 
 interface PricingBody {
   comparedPosts: number;
+  thinSample: number;
+  verdicts: number;
   platforms: {
     id: string;
     comparable: boolean;
@@ -85,6 +88,15 @@ interface PricingBody {
       connected: boolean;
       inUse: boolean;
       spent: { units: number; cost: { micros: number } };
+      can: { keyword: boolean; channel: boolean; replies: boolean; commentLinks: boolean | null };
+      returned: {
+        posts: number;
+        matches: number;
+        matchRate: number | null;
+        medianAgeHours: number | null;
+        costPerMatch: { micros: number } | null;
+        thin: boolean;
+      };
     }[];
   }[];
 }
@@ -293,6 +305,97 @@ describe("what the deployment has really spent", () => {
         units: 0,
         cost: { micros: 0, display: "$0.0000" },
       });
+    } finally {
+      await app.close();
+    }
+  });
+});
+
+describe("what each pair returned", () => {
+  let database: TestDatabase;
+  let db: Database;
+  let close: (() => Promise<void>) | undefined;
+
+  beforeAll(async () => {
+    database = await createTestDatabase("api_pricing_returns");
+    ({ db, close } = createDatabase(database.url));
+  }, 60_000);
+
+  afterAll(async () => {
+    await close?.();
+    await database?.drop();
+  });
+
+  it("reports no rate for a pair that has collected nothing", async () => {
+    // 0 of 0 is not zero per cent. A rate here would read as a measurement of
+    // a provider nobody has used.
+    const app = await buildServer({
+      env: loadEnv({ DATABASE_URL: database.url }),
+      logger,
+      db,
+      sources: [apifyLinkedIn()],
+      environment: {},
+      queryGenerator: null,
+    });
+
+    try {
+      const body = (await app.inject({ method: "GET", url: "/api/pricing" })).json() as PricingBody;
+      const returned = body.platforms[0]?.connectors[0]?.returned;
+
+      expect(returned).toEqual({
+        posts: 0,
+        matches: 0,
+        matchRate: null,
+        medianAgeHours: null,
+        costPerMatch: null,
+        thin: false,
+      });
+    } finally {
+      await app.close();
+    }
+  });
+
+  it("reports what a connector can find, from its own declaration", async () => {
+    const app = await buildServer({
+      env: loadEnv({ DATABASE_URL: database.url }),
+      logger,
+      db,
+      sources: [socialCrawlLinkedIn()],
+      environment: {},
+      queryGenerator: null,
+    });
+
+    try {
+      const body = (await app.inject({ method: "GET", url: "/api/pricing" })).json() as PricingBody;
+
+      expect(body.platforms[0]?.connectors[0]?.can).toEqual({
+        keyword: true,
+        channel: false,
+        replies: false,
+        // Absent on the connector means nobody checked, and null is how the
+        // page is told to say "unproven" rather than "no".
+        commentLinks: null,
+      });
+    } finally {
+      await app.close();
+    }
+  });
+
+  it("counts the verdicts, so the page can say how far to trust a match", async () => {
+    const app = await buildServer({
+      env: loadEnv({ DATABASE_URL: database.url }),
+      logger,
+      db,
+      sources: [apifyLinkedIn()],
+      environment: {},
+      queryGenerator: null,
+    });
+
+    try {
+      const body = (await app.inject({ method: "GET", url: "/api/pricing" })).json() as PricingBody;
+
+      expect(body.verdicts).toBe(0);
+      expect(body.thinSample).toBeGreaterThan(0);
     } finally {
       await app.close();
     }

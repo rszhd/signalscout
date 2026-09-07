@@ -97,6 +97,13 @@ export const socialCrawlLinkedIn: ConnectorDefinition = {
    * a screen comparing providers cannot show a credit price alone.
    */
   postsPerUnit: 2,
+  /**
+   * Keywords only. Channel discovery is unimplemented on purpose:
+   * `from_member` and `from_company` are documented without saying whether
+   * they take a URL, a slug or an urn, and a wrong guess costs five credits to
+   * learn nothing.
+   */
+  discovery: ["keyword"],
   /** Two pages, five credits each. */
   maxUnitsPerQueryPoll: maxPagesPerQuery * creditsPerCall,
   create: (runtime) => new SocialCrawlLinkedInSource(runtime),

@@ -72,6 +72,10 @@ export interface FakeSourceOptions {
   readonly billableUnit?: string;
   /** What one unit brings back, for the pricing comparison. US-058. */
   readonly postsPerUnit?: number;
+  /** How this connector can find a stranger. US-059. */
+  readonly discovery?: readonly ("keyword" | "channel")[];
+  /** Whether a comment it returns can be linked to. US-059. */
+  readonly linksToComments?: boolean;
   readonly credentialFields?: readonly CredentialField[];
   /** Exact credentials that pass. Any non-empty value passes when this is unset. */
   readonly validCredentials?: SourceCredentials;
@@ -145,6 +149,8 @@ export function fakeSourceDefinition(options: FakeSourceOptions = {}): Connector
     pricePerUnitMicros: options.pricePerUnitMicros ?? 0,
     maxUnitsPerQueryPoll: options.maxUnitsPerQueryPoll ?? 50,
     ...(options.postsPerUnit === undefined ? {} : { postsPerUnit: options.postsPerUnit }),
+    ...(options.discovery === undefined ? {} : { discovery: options.discovery }),
+    ...(options.linksToComments === undefined ? {} : { linksToComments: options.linksToComments }),
     canFetchReplies: options.replies !== undefined,
     create: (runtime) => createFakeSource(runtime, options),
   };

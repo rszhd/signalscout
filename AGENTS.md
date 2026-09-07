@@ -352,6 +352,26 @@ SocialCrawl returns, so the two providers deduplicate against each other. And
 cursor: a resumed poll that started a second run would buy the same posts
 again, which is BUG-001's lesson at a per-post price.
 
+**One live poll has run, and the freshness claim now has worker evidence.** On
+2026-09-07 a monitor with the query `flaky tests` collected **25 posts in 13.1
+seconds** through one wait and one resume, billing **26 units, $0.052** — the
+posts plus the start event rounded up into a whole post. In `posts` the two
+LinkedIn providers now sit side by side: Apify's 25 run from **3.0 hours to 33
+minutes old**, SocialCrawl's 20 from 543 hours to 50. Twenty-two days against
+three hours.
+
+**That poll found a bug the whole suite could not.** `apify` was not in the
+database's provider enum, so nothing the connector collected could be stored,
+and 1,228 tests passed anyway: `assertSourcesCanBeStored` checks platforms and
+**nothing checks providers**. Migration 0039 adds it. A connector can be
+registered, tested and unable to write a row.
+
+**Two matches came out, both at exactly 50, and neither is a lead.** One is a
+retry-policy tip ending in an engagement question; the other opens "Brittle
+tests killing your sprint velocity?" and links to an article. US-028's finding
+stands and a fresher provider does not touch it: **a fresh page of thought
+leadership is still thought leadership.**
+
 Still unproven: the window. `postedLimit` was sent and could not be shown to
 narrow anything, because a week cannot narrow an answer that is already 71
 minutes wide. Its seven values come from the actor's input schema, where its
@@ -1036,6 +1056,7 @@ pnpm --filter @intentwatch/core capture:comment-filter # spends money; see below
 pnpm --filter @intentwatch/core capture:triage        # spends money; see below
 pnpm --filter @intentwatch/core live:provider-switch # spends ~$0.08; see below
 pnpm --filter @intentwatch/core live:linkedin-poll   # spends ~$0.08 + model; see below
+pnpm --filter @intentwatch/core live:apify-linkedin-poll # spends ~$0.05 + model; see below
 pnpm --filter @intentwatch/core live:tiktok-poll     # spends ~$0.20 + model; see below
 pnpm --filter @intentwatch/core live:tiktok-comments # spends model only; see below
 pnpm --filter @intentwatch/core live:instagram-poll   # spends ~$1.65 + model; see below
@@ -1111,6 +1132,13 @@ that survives the filter, and it leaves a paused monitor, its posts, one
 `api_usage` row and its matches. Run it when the LinkedIn connector changes, or
 to prove deduplication — a second run inside the same window should store no new
 post and should bill again, because the provider charges for the search.
+
+`live:apify-linkedin-poll` is the same script with `--provider=apify`, and it
+is the one that exercises a waiting collection: the Apify connector starts an
+actor run, hands the wait back, and is resumed to read it. One run is 25 posts
+for about $0.052, plus a model call for each — the pre-filter drops none on this
+platform. It records the provider choice, so a build with two LinkedIn
+connectors does not refuse.
 
 `live:tiktok-poll` is the TikTok equivalent of `live:linkedin-poll`, and it
 turns replies on. Read its cost before running it: the search is 2 credits, but

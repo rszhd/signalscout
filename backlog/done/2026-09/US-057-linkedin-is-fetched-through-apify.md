@@ -128,3 +128,50 @@ must not be stored again through this one.
   the settle wait and the refusals are all driven from captured payloads. A real
   run through the worker, a real rate limit, a real timeout and a second poll
   proving deduplication are all unproven.
+
+- 2026-09-07T14:32+08:00 — **One live poll has run through the worker, and it
+  found a bug the whole suite could not.**
+
+  `apify` was not in the database's provider enum, so nothing this connector
+  collected could have been stored. 1,228 tests passed anyway:
+  `assertSourcesCanBeStored` checks platforms and **nothing checks providers**,
+  so a connector can be registered, tested and unable to write a single row. The
+  schema's own comment said "a fourth one is a migration, not a guess" and the
+  connector shipped without one. Migration 0039 adds it to the seven tables that
+  carry the constraint.
+
+  **The poll: 25 posts in 13.1 seconds, one wait and one resume.** The first
+  call started the run and billed nothing; the resume five seconds later read it
+  and billed **26 units, $0.052** — 25 posts plus the start event rounded up into
+  a whole post, which is what `unitsOf` is for. `source_continuations` is empty
+  afterwards, so the wait was written down and cleared rather than leaked. The
+  pre-filter dropped none of the 25, the same as every other LinkedIn poll and
+  for the same reason: a search that already matched the words leaves no cheap
+  stage before the bill. Classification cost $0.1046 on `gpt-5.6-terra`, so the
+  run was $0.157 against a $0.20 cap.
+
+  **The freshness claim now has worker evidence, not capture evidence.** In
+  `posts`, the two LinkedIn providers sit side by side:
+
+  | Provider | Posts | Oldest | Newest |
+  |---|---|---|---|
+  | apify | 25 | 3.0 hours | 33 minutes |
+  | socialcrawl | 20 | 543 hours | 50 hours |
+
+  Twenty-two days against three hours. That is the reason this connector exists,
+  and it is now measured through the pipeline rather than through a script.
+
+  **Two matches, both scoring exactly 50, and neither is a lead.** One is a
+  retry-policy tip ending in an engagement question, the other is marketing that
+  opens "Brittle tests killing your sprint velocity?" and links to an article.
+  US-028 named this exactly: LinkedIn's noise is on-topic expertise-signalling,
+  which a pre-filter cannot catch — and a fresher provider does not change it.
+  **A fresh page of thought leadership is still thought leadership.** Anyone
+  reading two matches here as two leads should read those two posts first.
+
+  `live:apify-linkedin-poll` is the script, which is `live:linkedin-poll` with a
+  `--provider=` flag. It now resumes a waiting collection inline, which the
+  SocialCrawl path never needed because that connector never waits.
+
+  Still unproven: a real rate limit, a real timeout, a run that fails, and a
+  second poll proving deduplication.

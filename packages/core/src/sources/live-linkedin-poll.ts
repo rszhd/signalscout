@@ -43,6 +43,7 @@ import {
 import { createEmbedder } from "../ai/embed.js";
 import { loadAiEnv } from "../config/env.js";
 import { createDatabase } from "../db/client.js";
+import type { Provider } from "../db/schema.js";
 import { apiUsage, budgets, matches, monitors, posts } from "../db/schema.js";
 import { createLogger } from "../logger.js";
 import { singleUserId } from "../monitors/monitors.js";
@@ -50,8 +51,9 @@ import { createClassifyStep } from "../worker/classify.js";
 import { createCollectStep } from "../worker/collect.js";
 import { credentialsFromStore } from "../worker/credentials.js";
 import { createFilterStep } from "../worker/filter.js";
-import { classifyQueue, filterQueue, notifyQueue } from "../worker/queues.js";
+import { classifyQueue, filterQueue, notifyQueue, pollQueue } from "../worker/queues.js";
 import type { StepContext } from "../worker/steps.js";
+import { setProviderChoice } from "./choices.js";
 import { builtInSources } from "./index.js";
 import { linkedInPlatformId } from "./platforms.js";
 import { createSourceRegistry } from "./registry.js";
@@ -81,6 +83,31 @@ const query = "flaky tests";
  * poll and refuses a second one that ran away.
  */
 const capMicros = 200_000;
+
+/**
+ * Which provider fetches LinkedIn for this run.
+ *
+ * LinkedIn has had two since US-057, and they are not alternatives that happen
+ * to differ in price: SocialCrawl bills five credits for ten relevance-ranked
+ * posts, and Apify bills every post it returns and answers with the last hour.
+ * Naming one is therefore part of the measurement, not a detail. Without the
+ * flag the first registered wins, which is what this script always did.
+ */
+const wantedProvider = process.argv
+  .filter((argument) => argument.startsWith("--provider="))
+  .map((argument) => argument.slice("--provider=".length))[0];
+
+/**
+ * How many times a poll may be resumed before this script gives up.
+ *
+ * Apify's runs are asynchronous, so a collection is started, waited for and
+ * read across separate poll jobs. Ten resumes at a few seconds each is far
+ * beyond the 3 to 11 seconds measured, and it stops a stuck run turning this
+ * into an unbounded loop.
+ */
+const maxResumes = 10;
+
+let resumes = 0;
 
 const logger = createLogger({ level: "info", name: "live-linkedin" });
 const { db, close } = createDatabase(databaseUrl);
@@ -142,7 +169,7 @@ function inlineQueue(context: () => StepContext) {
   const seen: string[] = [];
 
   const boss = {
-    send: async (queue: string, payload: unknown) => {
+    send: async (queue: string, payload: unknown, options?: unknown) => {
       seen.push(queue);
 
       if (queue === filterQueue) {
@@ -167,6 +194,31 @@ function inlineQueue(context: () => StepContext) {
           unscored = error instanceof Error ? error.message : String(error);
         }
 
+        return "inline";
+      }
+
+      // Apify's runs are asynchronous, so `collect` hands back a wait and books
+      // itself again. In the worker that is a delayed job; here it is this
+      // branch, and without it the run would be started, paid for and never
+      // read. `startAfter` is honoured rather than ignored, because resuming
+      // early costs a wasted status call and the connector already chose the
+      // interval.
+      if (queue === pollQueue) {
+        resumes += 1;
+
+        if (resumes > maxResumes) {
+          say(`giving up after ${maxResumes} resumes; the run never finished`);
+          return "inline";
+        }
+
+        const wakeAt = (options as { startAfter?: Date } | undefined)?.startAfter;
+        const waitMs = wakeAt ? Math.max(0, wakeAt.getTime() - Date.now()) : 0;
+
+        say(`collect: resume ${resumes} in ${(waitMs / 1000).toFixed(1)}s`);
+        await new Promise((resolve) => setTimeout(resolve, waitMs));
+
+        const { monitorId } = payload as { monitorId: string };
+        await collect({ monitorId }, context());
         return "inline";
       }
 
@@ -239,14 +291,33 @@ async function main(): Promise<void> {
 
   // Before anything is spent. A key missing here would otherwise be found
   // after the provider had already been paid for a page.
-  const [connector] = registry.forPlatform(linkedInPlatformId);
+  const registered = registry.forPlatform(linkedInPlatformId);
+  const connector = wantedProvider
+    ? registered.find((candidate) => candidate.provider.id === wantedProvider)
+    : registered[0];
 
-  if (!connector) throw new Error("No LinkedIn connector is registered.");
-  if (!(await credentialsFor(connector))) {
+  if (!connector) {
     throw new Error(
-      `No credentials for ${connector.provider.id}. Set SOCIALCRAWL_API_KEY, or store one on the connections screen.`,
+      wantedProvider
+        ? `No LinkedIn connector for provider "${wantedProvider}". ` +
+            `Registered: ${registered.map((one) => one.provider.id).join(", ") || "(none)"}.`
+        : "No LinkedIn connector is registered.",
     );
   }
+
+  if (!(await credentialsFor(connector))) {
+    throw new Error(
+      `No credentials for ${connector.provider.id}. Set its key in .env, or store one on the connections screen.`,
+    );
+  }
+
+  // The poll asks the registry rather than this script, so a build with two
+  // LinkedIn connectors has to be told which one to use or it refuses. Writing
+  // the choice down is what a person would do on the connections screen.
+  // The id came from the connector the registry built, so it is a real
+  // provider by construction; the cast is only telling the compiler what the
+  // registry already guarantees.
+  await setProviderChoice(db, linkedInPlatformId, connector.provider.id as Provider);
 
   const before = await storedPosts();
 

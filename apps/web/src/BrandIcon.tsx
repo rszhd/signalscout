@@ -5,6 +5,7 @@ const icons: Record<string, string> = {
   brightdata: "brightdata.png",
   scrapecreators: "scrapecreators.png",
   socialcrawl: "socialcrawl.png",
+  apify: "apify.png",
   reddit: "reddit.png",
   x: "x.png",
   linkedin: "linkedin.ico",

@@ -28,6 +28,7 @@ const providerNames: Record<string, string> = {
   brightdata: "Bright Data",
   scrapecreators: "ScrapeCreators",
   socialcrawl: "SocialCrawl",
+  apify: "Apify",
   fake: "Fake source",
 };
 

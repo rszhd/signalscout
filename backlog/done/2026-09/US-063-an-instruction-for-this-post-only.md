@@ -36,11 +36,12 @@ one no longer means committing to it.
 
 - [x] The draft request carries the instruction text, and the route no longer
       resolves a saved prompt by id
-- [x] The instruction box is visible without opening anything, because a
-      one-off steer is the common case and not an advanced one
+- [x] The instruction box is reached through Customize, without entering saved
+      prompt management; the composer stays compact until somebody needs it
 - [x] Choosing a saved prompt fills the box, and editing it afterwards changes
       only this draft
-- [x] The screen says plainly that an edit is for this draft unless it is saved
+- [x] The screen says plainly that an edit is for this draft only; account-wide
+      voice management lives on its own page
 - [x] Saving is unchanged: a new prompt, an update to the chosen one, or a
       delete
 - [x] A test drives a typed instruction through to the request, and another
@@ -87,3 +88,9 @@ one no longer means committing to it.
   first attempt at this change was applied to the older shape and broke the
   file; it was reverted to `HEAD` and reapplied against the real structure. A
   file that changed under you is a file to re-read before editing.
+
+- 2026-09-07T23:00+08:00 — The instruction moved behind Customize after the
+  shipped panel proved too dense. The dialog now stages the selected voice and
+  instruction, Apply commits them to this draft, and Cancel discards them.
+  Saved-voice management moved to an account-level Reply voices page, so a
+  one-off steer and a library edit cannot look like the same action.

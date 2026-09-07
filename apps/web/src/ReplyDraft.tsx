@@ -27,8 +27,9 @@ import { messageFor, requestJson } from "./api.js";
  * **What is in the instruction box is what the model is told.** US-063: a
  * saved prompt fills that box and editing it afterwards steers this draft and
  * nothing else, because a person looking at one awkward post wants to say
- * "answer the pricing question first, this one time" and press the button. The
- * dialog is where a voice is saved, updated or deleted — a separate act.
+ * "answer the pricing question first, this one time" and press the button.
+ * Saved voices are chosen here, but their library is managed elsewhere: a
+ * conversation is the wrong context for account-level administration.
  *
  * **A new match is a new panel.** The inbox mounts this with `key={match.id}`,
  * so opening another match discards this state rather than resetting it. That
@@ -61,16 +62,16 @@ export function ReplyDraft({ matchId }: { matchId: string }) {
   const [prompts, setPrompts] = useState<SavedPrompt[]>([]);
   const [promptId, setPromptId] = useState("");
   const [instruction, setInstruction] = useState("");
-  const [name, setName] = useState("");
+  const [customizing, setCustomizing] = useState(false);
+  const [dialogPromptId, setDialogPromptId] = useState("");
+  const [dialogInstruction, setDialogInstruction] = useState("");
   const [draft, setDraft] = useState<Draft | null>(null);
   const [reply, setReply] = useState("");
   const [drafting, setDrafting] = useState(false);
-  const [saving, setSaving] = useState(false);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [managing, setManaging] = useState(false);
-  const manageButton = useRef<HTMLButtonElement>(null);
-  const instructionField = useRef<HTMLTextAreaElement>(null);
+  const customizeButton = useRef<HTMLButtonElement>(null);
+  const customInstructionField = useRef<HTMLTextAreaElement>(null);
   const headingId = `reply-draft-heading-${matchId}`;
   const promptDialogTitleId = `reply-prompt-dialog-${matchId}`;
 
@@ -84,31 +85,46 @@ export function ReplyDraft({ matchId }: { matchId: string }) {
   }, []);
 
   useEffect(() => {
-    if (!managing) return;
+    if (!customizing) return;
 
-    queueMicrotask(() => instructionField.current?.focus());
+    queueMicrotask(() => customInstructionField.current?.focus());
 
     function closeOnEscape(event: KeyboardEvent): void {
       if (event.key !== "Escape") return;
-      setManaging(false);
-      queueMicrotask(() => manageButton.current?.focus());
+      setCustomizing(false);
+      queueMicrotask(() => customizeButton.current?.focus());
     }
 
     globalThis.addEventListener("keydown", closeOnEscape);
     return () => globalThis.removeEventListener("keydown", closeOnEscape);
-  }, [managing]);
-
-  const selected = prompts.find((prompt) => prompt.id === promptId);
+  }, [customizing]);
 
   function choose(id: string): void {
     setPromptId(id);
     setInstruction(prompts.find((prompt) => prompt.id === id)?.instruction ?? "");
-    setName("");
   }
 
-  function closePromptManager(): void {
-    setManaging(false);
-    queueMicrotask(() => manageButton.current?.focus());
+  function chooseDialogVoice(id: string): void {
+    setDialogPromptId(id);
+    setDialogInstruction(prompts.find((prompt) => prompt.id === id)?.instruction ?? "");
+  }
+
+  function openCustomizer(): void {
+    setError(null);
+    setDialogPromptId(promptId);
+    setDialogInstruction(instruction);
+    setCustomizing(true);
+  }
+
+  function closeDialog(): void {
+    setCustomizing(false);
+    queueMicrotask(() => customizeButton.current?.focus());
+  }
+
+  function applyCustomization(): void {
+    setPromptId(dialogPromptId);
+    setInstruction(dialogInstruction);
+    closeDialog();
   }
 
   async function generate(): Promise<void> {
@@ -140,74 +156,6 @@ export function ReplyDraft({ matchId }: { matchId: string }) {
       // A browser that refuses the clipboard leaves the text selectable, which
       // is why the draft is a textarea and not a paragraph.
       setError("This browser would not copy. Select the text and copy it yourself.");
-    }
-  }
-
-  async function reload(): Promise<void> {
-    const body = await requestJson<{ prompts: SavedPrompt[] }>("/api/reply-prompts");
-    setPrompts(body.prompts);
-  }
-
-  async function saveNew(): Promise<void> {
-    setSaving(true);
-    setError(null);
-
-    try {
-      const created = await requestJson<SavedPrompt>("/api/reply-prompts", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ name, instruction }),
-      });
-
-      await reload();
-      setPromptId(created.id);
-      setName("");
-      closePromptManager();
-    } catch (cause) {
-      setError(messageFor(cause, "The prompt could not be saved."));
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  async function saveExisting(): Promise<void> {
-    if (!selected) return;
-
-    setSaving(true);
-    setError(null);
-
-    try {
-      await requestJson(`/api/reply-prompts/${selected.id}`, {
-        method: "PATCH",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ instruction }),
-      });
-
-      await reload();
-      closePromptManager();
-    } catch (cause) {
-      setError(messageFor(cause, "The prompt could not be saved."));
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  async function remove(): Promise<void> {
-    if (!selected) return;
-
-    setSaving(true);
-    setError(null);
-
-    try {
-      await requestJson(`/api/reply-prompts/${selected.id}`, { method: "DELETE" });
-      await reload();
-      setPromptId("");
-      setInstruction("");
-      closePromptManager();
-    } catch (cause) {
-      setError(messageFor(cause, "The prompt could not be deleted."));
-    } finally {
-      setSaving(false);
     }
   }
 
@@ -247,18 +195,18 @@ export function ReplyDraft({ matchId }: { matchId: string }) {
         </label>
 
         <button
-          ref={manageButton}
-          aria-label="Edit prompts"
+          ref={customizeButton}
+          aria-label={instruction.trim() ? "Edit guidance" : "Customize"}
           className="reply-draft-manage"
           type="button"
-          aria-expanded={managing}
+          aria-expanded={customizing}
           aria-haspopup="dialog"
-          onClick={() => setManaging(true)}
+          onClick={openCustomizer}
         >
           <span className="reply-draft-button-icon" aria-hidden="true">
             ☷
           </span>
-          Edit prompts
+          {instruction.trim() ? "Edit guidance" : "Customize"}
         </button>
 
         <button
@@ -291,30 +239,7 @@ export function ReplyDraft({ matchId }: { matchId: string }) {
         </button>
       </div>
 
-      {/*
-        The box is what is sent, and the library only fills it. US-063: a saved
-        prompt's id cannot express "answer the pricing question first, this one
-        time", which is the common case for one awkward post. Choosing a prompt
-        copies its words here; editing them steers this draft alone; saving is
-        a separate act, in the dialog, that a person takes on purpose.
-      */}
-      <label className="field reply-draft-instruction">
-        <span>Instruction for this draft</span>
-        <small>
-          Optional. Edits here steer this reply only — open Edit prompts to save one for next time.
-          It changes the wording; it cannot make the draft open with your product or invent facts
-          about it.
-        </small>
-        <textarea
-          aria-label="Instruction for this draft"
-          rows={3}
-          value={instruction}
-          placeholder="Answer the pricing question first, and keep it to three sentences."
-          onChange={(event) => setInstruction(event.target.value)}
-        />
-      </label>
-
-      {managing && (
+      {customizing && (
         <div className="reply-draft-dialog-backdrop">
           <div
             aria-labelledby={promptDialogTitleId}
@@ -324,23 +249,23 @@ export function ReplyDraft({ matchId }: { matchId: string }) {
           >
             <header className="reply-draft-dialog-heading">
               <div>
-                <h3 id={promptDialogTitleId}>Reply prompts</h3>
-                <p>Save writing voices you can reuse across every project.</p>
+                <h3 id={promptDialogTitleId}>Customize this draft</h3>
+                <p>Choose a voice or add guidance for this conversation.</p>
               </div>
-              <button aria-label="Close prompt editor" type="button" onClick={closePromptManager}>
+              <button aria-label="Close dialog" type="button" onClick={closeDialog}>
                 ×
               </button>
             </header>
 
             <div className="reply-draft-dialog-body">
               <label className="reply-dialog-select">
-                <span>Prompt to edit</span>
+                <span>Writing voice</span>
                 <select
-                  aria-label="Prompt to edit"
-                  value={promptId}
-                  onChange={(event) => choose(event.target.value)}
+                  aria-label="Writing voice for this draft"
+                  value={dialogPromptId}
+                  onChange={(event) => chooseDialogVoice(event.target.value)}
                 >
-                  <option value="">Create a new prompt</option>
+                  <option value="">No saved prompt</option>
                   {prompts.map((prompt) => (
                     <option key={prompt.id} value={prompt.id}>
                       {prompt.name}
@@ -350,83 +275,41 @@ export function ReplyDraft({ matchId }: { matchId: string }) {
               </label>
 
               <label className="field">
-                <span>Voice instructions</span>
+                <span>Instructions for this draft</span>
                 <small>
-                  Steer the wording and tone. Your voice cannot make the draft open with your
-                  product or invent facts about it.
+                  Optional. Adjust the voice or tell the model what matters in this reply. It cannot
+                  make the draft open with your product or invent facts about it.
                 </small>
                 <textarea
-                  ref={instructionField}
-                  aria-label="Instruction"
+                  ref={customInstructionField}
+                  aria-label="Instruction for this draft"
                   rows={5}
-                  value={instruction}
-                  placeholder="Write plainly, no exclamation marks, and always ask one question back."
-                  onChange={(event) => setInstruction(event.target.value)}
+                  value={dialogInstruction}
+                  placeholder="Answer the pricing question first, and keep it to three sentences."
+                  onChange={(event) => setDialogInstruction(event.target.value)}
                 />
               </label>
 
-              {!selected && (
-                <label className="field reply-prompt-name">
-                  <span>Prompt name</span>
-                  <input
-                    aria-label="New prompt name"
-                    placeholder="For example, Short and plain"
-                    value={name}
-                    onChange={(event) => setName(event.target.value)}
-                  />
-                </label>
-              )}
-
-              {error && (
-                <p className="form-error" role="alert">
-                  {error}
-                </p>
-              )}
+              <p className="reply-draft-dialog-note">
+                Changes apply to this draft only. Your saved voice will not change.
+              </p>
             </div>
 
-            <footer className="reply-draft-dialog-actions">
-              {selected ? (
-                <button
-                  className="reply-draft-delete"
-                  disabled={saving}
-                  type="button"
-                  onClick={() => void remove()}
-                >
-                  Delete prompt
-                </button>
-              ) : (
-                <span />
-              )}
+            <footer className="reply-draft-dialog-actions reply-draft-dialog-actions-end">
               <div>
-                <button className="secondary-button" type="button" onClick={closePromptManager}>
+                <button className="secondary-button" type="button" onClick={closeDialog}>
                   Cancel
                 </button>
-                {selected ? (
-                  <button
-                    className="primary-button"
-                    disabled={saving || !instruction.trim()}
-                    type="button"
-                    onClick={() => void saveExisting()}
-                  >
-                    Save “{selected.name}”
-                  </button>
-                ) : (
-                  <button
-                    className="primary-button"
-                    disabled={saving || !name.trim() || !instruction.trim()}
-                    type="button"
-                    onClick={() => void saveNew()}
-                  >
-                    Save as new
-                  </button>
-                )}
+                <button className="primary-button" type="button" onClick={applyCustomization}>
+                  Apply
+                </button>
               </div>
             </footer>
           </div>
         </div>
       )}
 
-      {error && !managing && (
+      {error && !customizing && (
         <p className="form-error" role="alert">
           {error}
         </p>

@@ -6,6 +6,7 @@ import { Monitors } from "./Monitors.js";
 import { Notifications } from "./Notifications.js";
 import { Projects } from "./Projects.js";
 import { Providers } from "./Providers.js";
+import { ReplyVoices } from "./ReplyVoices.js";
 import { routeParam, routePath } from "./route.js";
 
 /**
@@ -36,6 +37,7 @@ const monitorsRoute = "#/monitors";
 const connectionsRoute = "#/connections";
 const projectsRoute = "#/projects";
 const providersRoute = "#/providers";
+const replyVoicesRoute = "#/reply-voices";
 
 function currentRoute(): string {
   return globalThis.location?.hash ?? "";
@@ -60,6 +62,7 @@ export function App() {
   const connecting = path.startsWith(connectionsRoute);
   const projecting = path.startsWith(projectsRoute);
   const comparing = path.startsWith(providersRoute);
+  const voicing = path.startsWith(replyVoicesRoute);
 
   /**
    * The project everything else is about, carried in the route. US-045.
@@ -89,7 +92,7 @@ export function App() {
   // Pricing joins Connections as a machine-level screen: one set of keys, one
   // set of prices, every project. Asking it to pick a project first would ask a
   // question it has no use for.
-  const needsProject = !projecting && !connecting && !comparing && !notificationId;
+  const needsProject = !projecting && !connecting && !comparing && !voicing && !notificationId;
   const withoutProject = needsProject && projectId === null;
 
   useEffect(() => {
@@ -158,6 +161,12 @@ export function App() {
             </span>
             <span>Providers</span>
           </a>
+          <a className={voicing ? "nav-item current" : "nav-item"} href={replyVoicesRoute}>
+            <span className="nav-icon" aria-hidden="true">
+              ✎
+            </span>
+            <span>Reply voices</span>
+          </a>
           {/*
             Also only with a project: a monitor is made in one, and the form
             prefills its four answers from it. Offered without one it would
@@ -194,6 +203,8 @@ export function App() {
           <Connections />
         ) : comparing ? (
           <Providers />
+        ) : voicing ? (
+          <ReplyVoices />
         ) : listing ? (
           <Monitors />
         ) : (

@@ -9,6 +9,7 @@ import "./styles/projects.css";
 import "./styles/monitors.css";
 import "./styles/providers.css";
 import "./styles/reply-draft.css";
+import "./styles/reply-voices.css";
 
 const container = document.getElementById("root");
 

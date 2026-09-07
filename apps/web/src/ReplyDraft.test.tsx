@@ -59,10 +59,11 @@ function server(routes: { prompts?: unknown; draft?: { status: number; body: unk
 
   const fetchStub = vi.fn((input: unknown, init?: RequestInit) => {
     const url = String(input);
+    const body = init?.body ? JSON.parse(String(init.body)) : undefined;
     calls.push({
       url,
       method: init?.method ?? "GET",
-      body: init?.body ? JSON.parse(String(init.body)) : undefined,
+      body,
     });
 
     if (url.includes("/api/reply-prompts")) {
@@ -192,15 +193,16 @@ describe("the saved prompts", () => {
     server({ prompts: { prompts: [] } });
     screen = await mount(<ReplyDraft matchId={matchId} />);
 
-    await press("Edit prompts");
+    await press("Customize");
 
     const dialog = screen.container.querySelector('[role="dialog"]');
     expect(dialog?.getAttribute("aria-modal")).toBe("true");
+    expect(text()).toContain("Customize this draft");
 
     await press("Cancel");
 
     expect(screen.container.querySelector('[role="dialog"]')).toBeNull();
-    expect(document.activeElement).toBe(button("Edit prompts"));
+    expect(document.activeElement).toBe(button("Customize"));
   });
 
   it("offers the ones the account has, and none by default", async () => {
@@ -234,32 +236,6 @@ describe("the saved prompts", () => {
     expect(calls.find((call) => call.url.includes("/draft"))?.body).toEqual({ instruction: null });
   });
 
-  it("saves a new one, so a voice can be reused on the next match", async () => {
-    const { calls } = server({ prompts: { prompts: [] } });
-    screen = await mount(<ReplyDraft matchId={matchId} />);
-
-    await press("Edit prompts");
-    setValue(field("Instruction"), "Never use exclamation marks.");
-    setValue(field("New prompt name"), "Plain");
-    await settle();
-    await press("Save as new");
-
-    const created = calls.find(
-      (call) => call.url.endsWith("/api/reply-prompts") && call.method === "POST",
-    );
-
-    expect(created?.body).toEqual({ name: "Plain", instruction: "Never use exclamation marks." });
-  });
-
-  it("will not save a prompt with no name or no instruction", async () => {
-    server({ prompts: { prompts: [] } });
-    screen = await mount(<ReplyDraft matchId={matchId} />);
-
-    await press("Edit prompts");
-
-    expect(button("Save as new").disabled).toBe(true);
-  });
-
   it("shows the chosen prompt's words, so editing starts from what is saved", async () => {
     const saved = prompt();
     server({ prompts: { prompts: [saved] } });
@@ -267,10 +243,10 @@ describe("the saved prompts", () => {
 
     setValue(select("Saved prompt"), saved.id);
     await settle();
-    await press("Edit prompts");
+    await press("Edit guidance");
 
     const area = screen.container.querySelector<HTMLTextAreaElement>(
-      'textarea[aria-label="Instruction"]',
+      'textarea[aria-label="Instruction for this draft"]',
     );
 
     expect(area?.value).toBe(saved.instruction);
@@ -280,21 +256,38 @@ describe("the saved prompts", () => {
     server({ prompts: { prompts: [] } });
     screen = await mount(<ReplyDraft matchId={matchId} />);
 
-    await press("Edit prompts");
+    await press("Customize");
 
     expect(text()).toContain("cannot make the draft open with your product");
   });
 });
 
 describe("an instruction for this post only", () => {
+  it("discards dialog edits when somebody cancels", async () => {
+    const { calls } = server({ prompts: { prompts: [] } });
+    screen = await mount(<ReplyDraft matchId={matchId} />);
+
+    await press("Customize");
+    setValue(field("Instruction for this draft"), "Do not keep this instruction.");
+    await settle();
+    await press("Cancel");
+    await press("Draft reply");
+
+    expect(calls.find((call) => call.url.includes("/draft"))?.body).toEqual({
+      instruction: null,
+    });
+  });
+
   it("sends what was typed, without anything being saved", async () => {
     // The case the owner asked for: one awkward post, one steer, no library
     // entry. Nothing is written to /api/reply-prompts.
     const { calls } = server({ prompts: { prompts: [] } });
     screen = await mount(<ReplyDraft matchId={matchId} />);
 
+    await press("Customize");
     setValue(field("Instruction for this draft"), "Answer the pricing question first.");
     await settle();
+    await press("Apply");
     await press("Draft reply");
 
     expect(calls.find((call) => call.url.includes("/draft"))?.body).toEqual({
@@ -312,22 +305,26 @@ describe("an instruction for this post only", () => {
 
     setValue(select("Saved prompt"), saved.id);
     await settle();
+    await press("Edit guidance");
     setValue(field("Instruction for this draft"), `${saved.instruction} Keep it to two lines.`);
     await settle();
+    await press("Apply");
     await press("Draft reply");
 
     expect(calls.find((call) => call.url.includes("/draft"))?.body).toEqual({
       instruction: `${saved.instruction} Keep it to two lines.`,
     });
-    // Nothing was updated: saving is a separate act, in the dialog.
+    // Nothing was updated: saved voices are managed on their own page.
     expect(calls.some((call) => call.method === "PATCH")).toBe(false);
   });
 
-  it("says an edit is for this draft unless it is saved", async () => {
+  it("says an edit is for this draft only", async () => {
     server({ prompts: { prompts: [] } });
     screen = await mount(<ReplyDraft matchId={matchId} />);
 
-    expect(text()).toContain("steer this reply only");
+    await press("Customize");
+
+    expect(text()).toContain("Changes apply to this draft only");
   });
 });
 

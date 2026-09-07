@@ -2,7 +2,7 @@
 /**
  * Which screen the shell shows.
  *
- * Four claims, and all are about what a person lands on. The inbox is the
+ * These claims are about what a person lands on. The inbox is the
  * product, so an empty hash is the inbox and not the setup form. The monitor
  * form has to be reachable from the header, because the inbox's own empty
  * state sends people to it. The monitor list must not answer to the form's
@@ -37,7 +37,7 @@ async function go(hash: string): Promise<void> {
   await settle();
 }
 
-describe("the four screens", () => {
+describe("the application screens", () => {
   let screen: Screen;
 
   beforeEach(() => {
@@ -54,6 +54,7 @@ describe("the four screens", () => {
         if (url === "/api/connections") {
           return json({ canStore: true, storeBlocker: null, providers: [], platforms: [] });
         }
+        if (url === "/api/reply-prompts") return json({ prompts: [] });
         throw new Error(`Unexpected request: ${url}`);
       }),
     );
@@ -170,7 +171,7 @@ describe("the four screens", () => {
     // Pricing joins Connections here, and for the same reason: both are
     // machine-level screens — one set of keys, one set of prices, every
     // project — so neither carries one. US-058.
-    expect(links).toEqual(["#/projects", "#/connections", "#/providers"]);
+    expect(links).toEqual(["#/projects", "#/connections", "#/providers", "#/reply-voices"]);
   });
 
   /**
@@ -192,7 +193,7 @@ describe("the four screens", () => {
     // A monitor is made inside a project and prefills its four answers from
     // one, so offering the form here would make an unfiled monitor — the state
     // migration 0038 emptied out.
-    expect(links).toEqual(["#/projects", "#/connections", "#/providers"]);
+    expect(links).toEqual(["#/projects", "#/connections", "#/providers", "#/reply-voices"]);
   });
 
   it("carries the project through every link once one is chosen", async () => {
@@ -259,8 +260,19 @@ describe("the four screens", () => {
       "#/monitors?project=p1",
       "#/connections",
       "#/providers",
+      "#/reply-voices",
       "#/monitors/new?project=p1",
     ]);
     expect(screen.container.textContent).not.toContain("Settings");
+  });
+
+  it("opens account-level reply voices without asking for a project", async () => {
+    screen = await mount(<App />);
+
+    await go("#/reply-voices");
+
+    expect(globalThis.location.hash).toBe("#/reply-voices");
+    expect(screen.container.textContent).toContain("Reusable writing guidance for every project.");
+    expect(screen.container.textContent).toContain("Create your first reply voice");
   });
 });

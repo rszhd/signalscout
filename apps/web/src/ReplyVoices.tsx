@@ -38,8 +38,61 @@ function ReplyVoicesHeader({ disabled = false, onNew }: { disabled?: boolean; on
   );
 }
 
+/** A voice somebody can start from, as the server offers it. US-065. */
+interface VoicePreset {
+  id: string;
+  name: string;
+  instruction: string;
+  why: string;
+}
+
+/**
+ * Voices to start from.
+ *
+ * Shown wherever a person is making a *new* voice — the empty state and the
+ * new-voice form both. The first version put them only on the empty state,
+ * which hid them from the one person most likely to want them: somebody who
+ * has written one voice and wants a few more.
+ *
+ * Never shown while editing a saved voice, because there the button would
+ * silently replace words somebody already wrote.
+ */
+function VoicePresets({
+  presets,
+  onChoose,
+}: {
+  presets: VoicePreset[];
+  onChoose: (preset: VoicePreset) => void;
+}) {
+  if (presets.length === 0) return null;
+
+  return (
+    <div className="reply-voice-presets">
+      <p className="section-label">Or start from one of these</p>
+      <ul>
+        {presets.map((preset) => (
+          <li key={preset.id}>
+            <button type="button" onClick={() => onChoose(preset)}>
+              <span className="reply-voice-preset-name">{preset.name}</span>
+              {/*
+                Each says why it exists. A preset somebody does not understand
+                is one they cannot edit sensibly.
+              */}
+              <span className="reply-voice-preset-why">{preset.why}</span>
+            </button>
+          </li>
+        ))}
+      </ul>
+      <p className="reply-voice-preset-note">
+        Each one lands in the form as a new voice. Edit it before you save it.
+      </p>
+    </div>
+  );
+}
+
 export function ReplyVoices() {
   const [voices, setVoices] = useState<ReplyVoice[] | null>(null);
+  const [presets, setPresets] = useState<VoicePreset[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState("");
@@ -65,6 +118,15 @@ export function ReplyVoices() {
       .catch((cause: unknown) =>
         setError(messageFor(cause, "The reply voices could not be loaded.")),
       );
+
+    // Separately, and its failure is silent: presets are a way to start, not a
+    // way to work. Losing them must not take the blank form away.
+    requestJson<{ presets: VoicePreset[] }>("/api/reply-prompts/presets")
+      // The shape is checked rather than trusted. A route answering something
+      // unexpected must leave the blank form working, not throw inside a
+      // render — presets are a way to start and not a way to work.
+      .then(({ presets: offered }) => setPresets(Array.isArray(offered) ? offered : []))
+      .catch(() => {});
   }, []);
 
   function choose(voice: ReplyVoice): void {
@@ -81,6 +143,24 @@ export function ReplyVoices() {
     setSelectedId(null);
     setName("");
     setInstruction("");
+    setEditing(true);
+    setConfirmingDelete(false);
+    setError(null);
+    setNotice(null);
+  }
+
+  /**
+   * Fill the form from a preset, and save nothing.
+   *
+   * A preset is a starting point: it lands in the fields as an unsaved new
+   * voice, so a person edits it before it exists rather than after. The name
+   * is copied too, and a name that collides is refused on save with the
+   * server's own sentence — which is the honest moment to find out.
+   */
+  function startFromPreset(preset: VoicePreset): void {
+    setSelectedId(null);
+    setName(preset.name);
+    setInstruction(preset.instruction);
     setEditing(true);
     setConfirmingDelete(false);
     setError(null);
@@ -283,6 +363,12 @@ export function ReplyVoices() {
                   invent facts about it.
                 </p>
 
+                {/*
+                  Only while making a new one. On a saved voice this button
+                  would quietly overwrite words somebody already wrote.
+                */}
+                {!selected && <VoicePresets presets={presets} onChoose={startFromPreset} />}
+
                 {error && (
                   <p className="form-error" role="alert">
                     {error}
@@ -353,6 +439,16 @@ export function ReplyVoices() {
               <button className="primary-button" type="button" onClick={startNew}>
                 Create a voice
               </button>
+
+              {/*
+                Presets, on the empty state where they are needed most. US-065.
+                A person who has never written an instruction does not know what
+                a good one looks like, and the ones they guess at tend to ask
+                for the thing the prompt refuses. Each says why it exists,
+                because a preset somebody does not understand is one they cannot
+                edit sensibly.
+              */}
+              <VoicePresets presets={presets} onChoose={startFromPreset} />
             </div>
           )}
         </section>

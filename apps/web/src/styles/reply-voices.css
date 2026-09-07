@@ -347,3 +347,64 @@
     justify-content: flex-end;
   }
 }
+
+/*
+ * Voices to start from. US-065.
+ *
+ * On the empty state, because a person who has never written an instruction is
+ * the one who needs them. Each carries its reason: a preset somebody does not
+ * understand is one they cannot edit sensibly.
+ */
+.reply-voice-presets {
+  width: 100%;
+  max-width: 34rem;
+  margin-top: 2rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--line);
+  text-align: left;
+}
+
+.reply-voice-presets ul {
+  margin: 0.5rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.reply-voice-presets button {
+  display: block;
+  width: 100%;
+  padding: 0.625rem 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  text-align: left;
+  cursor: pointer;
+}
+
+.reply-voice-presets button:hover {
+  border-color: var(--line-dark);
+  background: var(--surface-soft);
+}
+
+.reply-voice-preset-name {
+  display: block;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.reply-voice-preset-why {
+  display: block;
+  margin-top: 0.125rem;
+  font-size: 0.75rem;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.reply-voice-preset-note {
+  margin: 0.625rem 0 0;
+  font-size: 0.75rem;
+  color: var(--muted);
+}

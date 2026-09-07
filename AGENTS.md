@@ -883,6 +883,17 @@ question first, this one time" and press the button — measured live, an
 instruction of "exactly two sentences, do not ask anything back" produced
 exactly that.
 
+**Five voices ship with the product, as starting points.** US-065. The voices
+page opened on a blank box, which is the hardest screen here to answer: a
+person who has never written an instruction does not know what a good one looks
+like, and the ones they guess at ask for what the prompt refuses. Each preset
+carries the measurement it came from — `Reddit regular` because a subreddit
+treats a promotional reply as an advertisement, `Technical detail` because
+LinkedIn's noise is expertise-signalling, `Short comment` because a TikTok
+comment runs a median of 54 characters and an Instagram one 26. Choosing one
+fills the form and saves nothing; they are offered wherever a *new* voice is
+made and never while editing a saved one.
+
 **A person saves reply instructions on their account, several of them, and
 picks one when drafting.** Not per project: a voice is how one person writes,
 so a copy per project would be the same words drifting apart. An instruction is

@@ -22,6 +22,7 @@ import {
   draftContext,
   listReplyPrompts,
   recordModelCall,
+  replyVoicePresets,
   singleUserId,
   updateReplyPrompt,
 } from "@intentwatch/core";
@@ -210,6 +211,34 @@ export async function registerReplyPromptRoutes(
       updatedAt: prompt.updatedAt.toISOString(),
     };
   }
+
+  /**
+   * Voices somebody can start from. US-065.
+   *
+   * Static text, served rather than bundled, because the web app talks to the
+   * API and imports no core — the one architectural rule in the repository.
+   * Nothing here is stored: choosing one fills the form, and saving it makes
+   * an ordinary row.
+   */
+  app.route({
+    method: "GET",
+    url: "/api/reply-prompts/presets",
+    schema: {
+      response: {
+        200: z.object({
+          presets: z.array(
+            z.object({
+              id: z.string(),
+              name: z.string(),
+              instruction: z.string(),
+              why: z.string(),
+            }),
+          ),
+        }),
+      },
+    },
+    handler: async () => ({ presets: [...replyVoicePresets] }),
+  });
 
   app.route({
     method: "GET",

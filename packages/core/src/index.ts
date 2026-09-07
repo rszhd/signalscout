@@ -106,6 +106,7 @@ export {
   type UpdateReplyPromptInput,
   updateReplyPrompt,
 } from "./ai/reply-prompts.js";
+export { type ReplyVoicePreset, replyVoicePresets } from "./ai/reply-voices.js";
 export {
   type BudgetState,
   budgetState,

@@ -1,0 +1,325 @@
+{
+  "httpStatus": 200,
+  "body": {
+    "success": true,
+    "credits_remaining": 2022,
+    "credits_charged": 1,
+    "query": "flaky tests",
+    "posts": [
+      {
+        "url": "https://www.linkedin.com/posts/li-user-1_flaky-tests-causes-detection-and-how-to-activity-7500106623722475520-u_64",
+        "datePublished": "2026-08-31T08:26:04.318Z",
+        "description": "A test fails. You rerun it and it passes. Was there a defect? Was the test updated incorrectly? Or did the result change for no apparent reason?\n\nThat last case is flakiness: an automated test producing inconsistent results across executions on the same build, environment and inputs.\n\nThe issue is not one occasional false failure. When pass rates oscillate, every failure must be triaged twice: first to establish whether it is real, then to fix it if it is. The suite becomes harder to trust and harder to read.\n\nRead the blog to understand why flaky tests are a strategic problem, not just a tactical annoyance: https://lnkd.in/es8uGkjC\n\n#TestAutomation #SoftwareTesting #QualityAssurance",
+        "media": null,
+        "images": [],
+        "image": null,
+        "author": {
+          "name": "li-user-2",
+          "url": "https://uk.linkedin.com/company/li-user-1",
+          "image": "https://scrubbed.invalid/li-user-3",
+          "followers": 35748
+        },
+        "comments": [
+          {
+            "author": "li-user-4",
+            "text": "Flakiness creates a hidden tax on delivery: engineers stop treating red builds as actionable, and QA spends time separating product defects from automation noise. The answer is not simply more retries; it is deterministic data, isolated environments, observable failure evidence and ownership of flaky checks as defects in their own right. I explored the related risk of ‘ghost tests’ here: https://www.linkedin.com/feed/update/urn:li:activity:7500498135803228161/",
+            "linkedinUrl": "https://uk.linkedin.com/in/li-user-5"
+          },
+          {
+            "author": "li-user-4",
+            "text": "The loss of trust is the real cost. Even “same build, environment and inputs” can conceal mutable shared records, expired accounts or collisions between parallel workers. Capturing the data-factory version, entity IDs and cleanup outcome with each trace turns many mystery reruns into a diagnosable system. I explored this here:\n\nhttps://www.linkedin.com/feed/update/urn:li:share:7501257663578562561/",
+            "linkedinUrl": "https://uk.linkedin.com/in/li-user-5"
+          },
+          {
+            "author": "li-user-6",
+            "text": "Don't use Selenium...",
+            "linkedinUrl": "https://www.linkedin.com/in/li-user-7"
+          }
+        ],
+        "likeCount": 9,
+        "commentCount": 3
+      },
+      {
+        "url": "https://www.linkedin.com/posts/li-user-8_flaky-tests-were-always-an-annoying-problem-activity-7496559082884018177-y1fs",
+        "name": "Flaky Tests Identified and Quarantined with CloudBees Smart Tests | Moritz Plassnig posted on the topic | LinkedIn",
+        "thumbnailUrl": "https://media.licdn.com/dms/image/v2/D5605AQG8ZsTVtkrolg/videocover-high/B56aAkguBNHABM-/0/1787318954361?e=2147483647&v=beta&t=CJZKdYLWNUe6iQLE68h95JVEvqXfPw7pFuJjuikVznw",
+        "datePublished": "2026-08-21T13:29:24.639Z",
+        "uploadDate": "2026-08-21T13:29:24.639Z",
+        "description": "Flaky tests were always an annoying problem. With agentic coding, it's 100x worse. You run many more builds and tests passing are the feedback loop your agent needs.\n\nWith CloudBees Smart Tests, we can identify your flaky tests and allow you to quarantine them so they stop breaking your builds. Once you isolated them, you can focus on fixing those tests and if we observe that they stopped being flaky, we will automatically include them in your builds again.\n\nRead Jake's blog post to learn more. Fantastic new feature Naoto Samyak Yoshiori 👏\n\nhttps://lnkd.in/gzhdAyhQ",
+        "media": "https://dms.licdn.com/playlist/vid/v2/D5605AQG8ZsTVtkrolg/mp4-640p-30fp-crf28/B56aAkguBNHABk-/0/1787318958572?e=2147483647&v=beta&t=4KbHZ_b52mm-KAnL6e2_QOIyvjHSVXcjFc0irNzYyMU",
+        "images": [],
+        "image": null,
+        "author": {
+          "name": "li-user-9",
+          "url": "https://www.linkedin.com/in/li-user-8/en",
+          "image": "https://scrubbed.invalid/li-user-10",
+          "followers": 5907
+        },
+        "comments": [
+          {
+            "author": "li-user-11",
+            "text": "Fantastic to see this feature continue to evolve and make an impact. Congratulations Naoto Ono, Yoshiori Shoji, Samyak Rai and a huge kudos to the entire team 🚀",
+            "linkedinUrl": "https://in.linkedin.com/in/li-user-12"
+          }
+        ],
+        "likeCount": 114,
+        "commentCount": 3
+      },
+      {
+        "url": "https://www.linkedin.com/posts/li-user-13_fighting-flaky-tests-in-playwright-end-to-end-activity-7317534802570596352-w6zq",
+        "name": "🎭 Fighting flaky tests in Playwright end-to-end testing should be one of your primary goals because tests that only &quot;sometimes&quot; work won&#39;t lead to a cozy trust and safety feeling.\n\nBut very often… | Stefan Judis | 16 comments",
+        "thumbnailUrl": "https://media.licdn.com/dms/image/v2/D4E05AQHD6aDM5i1aug/videocover-high/B4EZY0aqYoG0Bw-/0/1744636189853?e=2147483647&v=beta&t=3YFWhicX9iQZkxMXVzyU_dG64Zq9OrneNDPmKtPbjzc",
+        "datePublished": "2025-04-14T13:10:50.119Z",
+        "uploadDate": "2025-04-14T13:10:50.119Z",
+        "description": "🎭 Fighting flaky tests in Playwright end-to-end testing should be one of your primary goals because tests that only \"sometimes\" work won't lead to a cozy trust and safety feeling.\n\nBut very often, and especially when dealing with complex applications, you'll run into situations when \"Playwright is just too fast!\". It will click buttons and interact with forms before the underlying application is ready. What if I told you that this isn't Playwright's fault but rather a UX issue?\n\nToday, it's super common to ship UIs that look functional but are actually entirely broken until JavaScript is loaded. This behavior is commonly known as \"poor hydration.\" And when testing poorly hydrated apps, you'll never know when they will be ready because the network sits in the middle. These are the situations in which \"Playwright is too fast!\" and your tests become flaky.\n\nLet me tell you a secret: \"real humans\" on slow internet connections will also be \"too fast\", wondering why your application doesn't work. Now, ideally, we could all fix these UX issues and bet on progressive enhancement or disable/hide UI that doesn't work (yet). But what if you can't change the application behavior?\n\nIn these cases, I usually bet on Playwright's `toPass()` assertion to implement action and assertion retries. Using `toPass()`, you can define a code block that will be retried if something fails. If Playwright is clicking something too quickly because it's visible and enabled (but not yet functional), it will try again and run the same code until everything's ready or a timeout is reached.\n\nThis helps me avoid arbitrary timeouts and makes my tests more stable.\n\nYou can learn more about this approach below. 👇",
+        "transcript": "When you test your sides adapts with playwright, you probably know the problem of flaky tests and sometimes it looks like the playwright is just too fast, which leads to flaky tests. Let me show you in this video a very common problem and how to solve it. Here we have a quick demo site that really just includes this button that disappears when I click it and it then shows this headline that tells me that this was a great click. The end to end test for it is very straightforward. So we navigate to local host, we click the button and then we expect that there will be a heading. That includes these substring great click. But when we now run the tests, we will discover that this won't work. So what's the problem here? When we reload the page, if we press the button very quickly, you'll see that it's not always working and that it takes a moment until the button behavior kicks in. This is a behavior commonly known as poor hydration, and it's a very common in the modern web. Many websites out there ship HTML that looks like it's doing anything, but actually it is waiting for JavaScript to be loaded and it only works. Once the JavaScript is there, this behavior usually leads to pretty poor user experience because you never know when the JavaScript will arrive and poor UX often leads to hard to test websites or test flakiness. So how can we solve this problem? If you're also developing the front end, you could first of all make everything work without JS too. So when playwright is then too fast clicking a button or filling out a form, it will just work. You could also show some placeholders until the JavaScript is loaded or disable the button, because it's not. Doing anything. After all, Playwright will then wait until this button is enabled. Or if none of these options work, you could show a loading spinner signaling that something is happening and you play. Your tests could wait for this spinner to disappear to then click the button. But what can you do when you cannot change the website or application? Let me show you a simple trick to make your enter and test still pass. The problem with this test case is that when Playwright clicks this button, the JavaScript isn't loaded yet, which means that this heading here will never be. Some visible and we could now add a hard coded timeout here, but timeouts are rarely a good solution. So instead of waiting an arbitrary amount of time, we can go in here and we can say expect to pass. And I will explain that in a second. And we can pass a callback function that will be asynchronous. And now we can move this action and the assertion into the two paths assertion. When we're now rerun the test, we will have a nice and green playwright test case. But what is this magic to pass? Allows us to define code blocks in this async function here that will be retried if they're failing. So when player clicks the button and this heading won't become visible, it will just time out and it will try it again until it works. So when you're trying to test the UI that only becomes functional after a moment of time, you can implement your own retry logic and this usually helps me to solve these playwright is too fast cases.",
+        "media": "https://dms.licdn.com/playlist/vid/v2/D4E05AQHD6aDM5i1aug/mp4-720p-30fp-crf28/B4EZY0aqYoG0Bk-/0/1744636211402?e=2147483647&v=beta&t=BQlzsgCBFTkwb7Gpnvt0YRpS8jOnQfc5NvrqD9wyG-M",
+        "images": [],
+        "image": null,
+        "author": {
+          "name": "li-user-14",
+          "url": "https://de.linkedin.com/in/li-user-13",
+          "image": "https://scrubbed.invalid/li-user-15",
+          "followers": 8383
+        },
+        "comments": [
+          {
+            "author": "li-user-16",
+            "text": "Similarly, there's `expect.poll()`",
+            "linkedinUrl": "https://www.linkedin.com/in/li-user-17"
+          },
+          {
+            "author": "li-user-18",
+            "text": "Thanks for sharing, Stefan...it's helpful",
+            "linkedinUrl": "https://in.linkedin.com/in/li-user-19"
+          },
+          {
+            "author": "li-user-20",
+            "text": "Tried this and was extremely helpful👌👏",
+            "linkedinUrl": "https://lk.linkedin.com/in/li-user-21"
+          },
+          {
+            "author": "li-user-22",
+            "text": "Helpful insight and another interesting YouTube channel discovered, thanks Stefan!",
+            "linkedinUrl": "https://pl.linkedin.com/in/li-user-23"
+          },
+          {
+            "author": "li-user-24",
+            "text": "Nice trick 👏",
+            "linkedinUrl": "https://in.linkedin.com/in/li-user-25"
+          },
+          {
+            "author": "li-user-26",
+            "text": "I didn't know about this assertion. Thanks!",
+            "linkedinUrl": "https://dk.linkedin.com/in/li-user-27"
+          },
+          {
+            "author": "li-user-28",
+            "text": "Good tip Stefan Judis! Thanks for sharing!",
+            "linkedinUrl": "https://nl.linkedin.com/in/li-user-29"
+          },
+          {
+            "author": "li-user-30",
+            "text": "Very helpful!",
+            "linkedinUrl": "https://ar.linkedin.com/in/li-user-31"
+          },
+          {
+            "author": "li-user-32",
+            "text": "Insightful",
+            "linkedinUrl": "https://in.linkedin.com/in/li-user-33"
+          }
+        ],
+        "likeCount": 174,
+        "commentCount": 16
+      },
+      {
+        "url": "https://www.linkedin.com/posts/li-user-34_flaky-tests-causes-examples-and-how-to-activity-7498569521595760640-88k5",
+        "datePublished": "2026-08-27T02:38:10.615Z",
+        "description": "Flaky tests are one of the fastest ways to lose trust in test automation.\nA test fails.\nYou run it again.\nIt passes.\nRun it again.\nIt fails.\nEventually someone says:\n\"Probably flaky. Just rerun it.\"\nThat's the dangerous part.\nBecause sometimes a flaky-looking failure is actually a real intermittent product defect.\nA flaky test can be caused by:\n🔹 Timing issues\n🔹 Race conditions\n🔹 Unstable selectors\n🔹 Network instability\n🔹 Shared test data\n🔹 Environment problems\n🔹 External dependencies\n🔹 Random test data\n🔹 Test-order dependencies\n🔹 Poor cleanup\n🔹 Asynchronous application behavior\nAnd simply adding:\n`retry = 3`\ndoesn't actually fix the underlying problem.\nA better approach is to investigate what the failure means.\nIs it:\n→ Product defect?\n→ Automation defect?\n→ Environment problem?\n→ Test-data problem?\n→ External dependency?\n→ Genuine test flakiness?\nThis matters because a regression suite is only useful if engineers trust its results.\nA suite with 5,000 tests that nobody believes can be less valuable than 500 reliable tests.\nI wrote a detailed guide covering:\n• What flaky tests are\n• Why browser tests fail randomly\n• Timing and synchronization problems\n• Test data issues\n• Environment instability\n• Selector problems\n• CI/CD flakiness\n• Quarantining flaky tests\n• AI-assisted flaky-test detection\n• How to build a more reliable regression suite\nThe goal isn't to make every test pass.\nThe goal is:\n**When a test fails, make the failure meaningful.**\nThat's what makes automation trustworthy.\nhttps://lnkd.in/grCm2uUT\n#SoftwareTesting #FlakyTests #TestAutomation #QA #RegressionTesting #QualityAssurance #CI #CICD #QualityEngineering #AITesting",
+        "media": null,
+        "images": [],
+        "image": null,
+        "author": {
+          "name": "li-user-35",
+          "url": "https://in.linkedin.com/in/li-user-34",
+          "image": "https://scrubbed.invalid/li-user-36",
+          "followers": 1599
+        },
+        "comments": [
+          {
+            "author": "li-user-37",
+            "text": "The \"5,000 untrusted tests vs 500 reliable ones\" framing is spot on - I've seen teams chase coverage percentage and lose the plot on whether a failure even means anything. What does your AI-assisted flaky-test detection actually flag on - pass/fail variance, or something closer to real root-cause clustering?",
+            "linkedinUrl": "https://in.linkedin.com/in/li-user-38"
+          },
+          {
+            "author": "li-user-37",
+            "text": "\"500 reliable tests beat 5,000 nobody trusts\" - the retry=3 band-aid is exactly the pattern I've had to walk teams back from, since it just launders a real intermittent defect into \"known flaky.\"",
+            "linkedinUrl": "https://in.linkedin.com/in/li-user-38"
+          },
+          {
+            "author": "li-user-39",
+            "text": "The hardest part is often figuring out whether the failure is actually flaky or pointing to a real issue. That distinction can save a lot of wasted retries and debugging time.",
+            "linkedinUrl": "https://in.linkedin.com/in/li-user-40"
+          }
+        ],
+        "likeCount": 2,
+        "commentCount": 7
+      },
+      {
+        "url": "https://www.linkedin.com/posts/li-user-41_qa-outsourcing-test-automation-testyrai-activity-7497007067895955456-ObwI",
+        "datePublished": "2026-08-22T19:09:32.619Z",
+        "description": "A passing test suite can still be a warning sign.\n\nOne of the most frustrating problems in test automation isn’t a failed test.\nIt’s a test that fails randomly.\n\nRun it again it passes.\n\nNothing changed.\n\nEventually the team stops trusting the results. That’s when automation starts losing its value.\n\nWhen a test fails, an engineer should be able to assume there’s something worth investigating not wonder whether the test itself is broken.\n\nA reliable automation strategy means treating flaky tests as engineering problems:\n- Identify and track recurring flaky tests\n- Remove unnecessary timing dependencies\n- Use stable selectors and predictable test data\n- Isolate tests so one failure doesn’t affect another\n- Fix unreliable tests instead of simply rerunning them until they pass.\n\nThe goal isn’t to build the largest automated test suite. It’s to build one your engineering team trusts enough to make release decisions with.\n\nThat’s an important part of how Testyr.ai approaches test automation and releases confidence.\n\nDoes your team treat flaky tests as defects or just rerun them?\n\n#TestAutomation #SoftwareTesting #TestyrAI #DevOps #CICD",
+        "media": null,
+        "images": [],
+        "image": null,
+        "author": {
+          "name": "li-user-42",
+          "url": "https://www.linkedin.com/company/li-user-41",
+          "followers": 9
+        },
+        "comments": [
+          {
+            "author": "li-user-43",
+            "text": "Treating flaky tests as defects instead of just rerunning them is the line most teams skip, and it is exactly why their suites slowly get ignored.",
+            "linkedinUrl": "https://in.linkedin.com/in/li-user-44"
+          }
+        ],
+        "likeCount": 1,
+        "commentCount": 2
+      },
+      {
+        "url": "https://www.linkedin.com/posts/li-user-45_playwright-debugging-confession-your-tests-activity-7333829746725699586-VwD6",
+        "datePublished": "2025-05-29T12:21:07.566Z",
+        "description": "Playwright Debugging Confession\nYour tests aren't flaky because of Playwright. They're flaky because you're racing against time itself.\n\nA classic mistake I see with customers: The click occurs, but the success message takes 200ms to appear.\n\nSometimes your assertion wins the race, sometimes it doesn't.\nPro tip: If you're using page.waitForTimeout() more than once in your entire test suite, you're doing it wrong.\n\nTime is not a reliable testing strategy.",
+        "media": "https://media.licdn.com/dms/image/v2/D4E10AQHBEs26npANOQ/image-shrink_800/B4EZcb_SegHIAs-/0/1748521265444?e=2147483647&v=beta&t=MtMDhI3sMsAcm6OUAYxz6ijN16etO8n1N_V4BxHLtYQ",
+        "images": [
+          "https://media.licdn.com/dms/image/v2/D4E10AQHBEs26npANOQ/image-shrink_800/B4EZcb_SegHIAs-/0/1748521265444?e=2147483647&v=beta&t=MtMDhI3sMsAcm6OUAYxz6ijN16etO8n1N_V4BxHLtYQ"
+        ],
+        "image": "https://media.licdn.com/dms/image/v2/D4E10AQHBEs26npANOQ/image-shrink_800/B4EZcb_SegHIAs-/0/1748521265444?e=2147483647&v=beta&t=MtMDhI3sMsAcm6OUAYxz6ijN16etO8n1N_V4BxHLtYQ",
+        "author": {
+          "name": "li-user-46",
+          "url": "https://www.linkedin.com/in/li-user-45",
+          "followers": 12303
+        },
+        "comments": [
+          {
+            "author": "li-user-47",
+            "text": "This is something I constantly remind engineers about: check the expected effect of your interactions.\n\nI don't work with web apps but with video games, and this issue is even more common in my field. \n\nWhat I recommend is using a pattern I call guarded interactions: before executing an interaction make sure a condition is fulfilled (the button can be interacted with for example), and after the interaction is executed, check for the expected effect with another condition to be fulfilled (the menu you wanted to open via the button is active).\n\nNot only does it catch race conditions like you described but also, if it fails, it fails fast and with proper context.",
+            "linkedinUrl": "https://de.linkedin.com/in/li-user-48"
+          },
+          {
+            "author": "li-user-49",
+            "text": "I agree with replacing waitForTimeout() calls with what Playwright calls \"Web-first assertions\" which is exactly what you did.\n\nHowever, I could still see two issues in your corrected version of the test:\n\n1. Note that page.click() is already deprecated, along with several other page functions listed in the \"Deprecated\" section in the Playwright docs: https://playwright.dev/docs/api/class-page#page-click. The correct approach now is to use locator.click() instead.\n\n2. You explicitly specified a timeout of 5 seconds for asserting the visibility of success-message. Why? The expect timeout in Playwright is already set to 5 sec by default. Why the need to explicitly write it?",
+            "linkedinUrl": "https://ph.linkedin.com/in/li-user-50"
+          },
+          {
+            "author": "li-user-51",
+            "text": "This is so true. Switching to Locator Assertions drastically improves the stability of the tests.\nI have recorded a video not so long time ago explaining this concept: https://youtu.be/e11z1kyLzDM\n\nBy the way, why did you use the 5000 timeout for the toBeVisible()?\n5 seconds is the default timeout for the Locator Assertions. Or your framework have this configuration updated?",
+            "linkedinUrl": "https://www.linkedin.com/in/li-user-52"
+          },
+          {
+            "author": "li-user-53",
+            "text": "Let's go one more level deep in reason ( true experience)\n\nWhat if there is one more layer ( element) between that click and success message.\n\nAnd that element can take 2-2000 seconds ( the database write race condition)",
+            "linkedinUrl": "https://www.linkedin.com/in/li-user-54"
+          },
+          {
+            "author": "li-user-16",
+            "text": "`expect.poll` and `await expect(async ()=>{}).toPass()` are your friends. Know them, use them.",
+            "linkedinUrl": "https://www.linkedin.com/in/li-user-17"
+          }
+        ],
+        "likeCount": 120,
+        "commentCount": 34
+      },
+      {
+        "url": "https://www.linkedin.com/posts/li-user-55_what-are-flaky-tests-how-to-identify-prevent-activity-7369370254663266305-N0BA",
+        "datePublished": "2025-09-04T14:06:24.963Z",
+        "description": "Flaky tests are one of the biggest headaches in QA. They slow down releases, eat up engineering time, and erode trust in your automation suite. But the truth is, flaky tests aren’t just a nuisance, they’re a signal.\n\nIn our latest post, we break down:\n✅ Why flaky tests happen\n✅ The real cost to teams and product velocity\n✅ Practical ways to manage and reduce them\n\nhttps://lnkd.in/eWZ3hMHv\n\n#softwarequality #testautomation #flakytests",
+        "media": null,
+        "images": [],
+        "image": null,
+        "author": {
+          "name": "li-user-56",
+          "url": "https://www.linkedin.com/company/li-user-55",
+          "image": "https://scrubbed.invalid/li-user-57",
+          "followers": 3826
+        },
+        "comments": [],
+        "likeCount": 9,
+        "commentCount": 0
+      },
+      {
+        "url": "https://www.linkedin.com/posts/li-user-58_one-flaky-test-got-fixed-twelve-times-activity-7493351780211220480-Vthh",
+        "datePublished": "2026-08-12T17:04:44.127Z",
+        "description": "One flaky test got \"fixed\" twelve times. We've got problems. I'm telling the story on stage at WeAreDevelopers World Congress in San José.\n\nThe talk grew out of a blog post (https://lnkd.in/gE7PzqRu): how we drove our E2E flake rate from 100% of PRs to under 15% in six weeks.\n\nThen agents created many more PRs, increasing load in our test environment and driving flakes back up. We've since iterated:\n\n𝗠𝗮𝗸𝗲 𝘁𝗵𝗲 𝘀𝘆𝘀𝘁𝗲𝗺 𝗿𝗲𝗺𝗲𝗺𝗯𝗲𝗿. A flaky-test ticket marked Done wasn't true about one time in seven. We're now tracking fix-survival windows, including prior failed attempts as context, and maintain a knowledge base indexed by root-cause mechanism. That twelve-fix test? One mechanism the whole time, root-caused in a day once the agent finally saw all twelve together.\n\n𝗦𝘁𝗼𝗽 𝗿𝘂𝗻𝗻𝗶𝗻𝗴 𝘁𝗲𝘀𝘁𝘀 𝘆𝗼𝘂 𝘀𝗵𝗼𝘂𝗹𝗱𝗻'𝘁. Once the above was working, we re-measured the tests themselves . Roughly 1,250 staging E2E jobs a day were buying us about four genuine bug catches a month, three of them from a single test. We cut full-suite runs 86%, running only critical path tests on PRs and during deploy and moving the rest to a scheduled run with automated fixers.\n\nFaster fixing was never the goal. Trustworthy verification at vastly increased agent load is, and sometimes the highest-leverage fix is deciding not to run the tests at all.\n\nWith flakiness subsiding, we're pushing the scheduled E2E tests down the pyramid to integration and contract tests so we can return them to the PR and deploy hot path.\n\nIf you'll be in San José, come say hi.",
+        "media": "https://media.licdn.com/dms/image/v2/D5622AQGsi7EZIr0Hlg/feedshare-shrink_1280/B56Z_27vJ0KYAM-/0/1786554282906?e=2147483647&v=beta&t=QLrO8NcRp0EgrZl5nalr-oJPXzXwvDhlCmhuGixa8bk",
+        "images": [
+          "https://media.licdn.com/dms/image/v2/D5622AQGsi7EZIr0Hlg/feedshare-shrink_1280/B56Z_27vJ0KYAM-/0/1786554282906?e=2147483647&v=beta&t=QLrO8NcRp0EgrZl5nalr-oJPXzXwvDhlCmhuGixa8bk"
+        ],
+        "image": "https://media.licdn.com/dms/image/v2/D5622AQGsi7EZIr0Hlg/feedshare-shrink_1280/B56Z_27vJ0KYAM-/0/1786554282906?e=2147483647&v=beta&t=QLrO8NcRp0EgrZl5nalr-oJPXzXwvDhlCmhuGixa8bk",
+        "author": {
+          "name": "li-user-59",
+          "url": "https://www.linkedin.com/in/li-user-58",
+          "followers": 1653
+        },
+        "comments": [
+          {
+            "author": "li-user-60",
+            "text": "Wow, guess I’ll need to come down to San Jose for this one!",
+            "linkedinUrl": "https://www.linkedin.com/in/li-user-61"
+          }
+        ],
+        "likeCount": 38,
+        "commentCount": 1
+      },
+      {
+        "url": "https://www.linkedin.com/posts/li-user-62_a-flaky-test-is-frustrating-a-test-suite-activity-7501625111817654272-Dvgl",
+        "datePublished": "2026-09-04T13:00:00.031Z",
+        "description": "🧩 A flaky test is frustrating. A test suite full of them becomes a management problem.\n\nSmall teams can often investigate failures one at a time, using CI logs, spreadsheets, dashboards, and institutional knowledge to decide which results deserve attention. As the suite grows, that approach makes it harder to see broader patterns and distinguish an unstable test from a genuine product regression.\n\nThe result is declining confidence in test results, more frustration for engineers, and greater release risk for the business.\n\nIn his latest blog post, Leapwork CTO Rohit Raghuvansi explains why managing flakiness at scale requires more than fixing individual tests. He explores:\n💡 Why organization-wide flakiness demands a more strategic approach\n💡 How limited context makes recurring patterns difficult to identify\n💡 Why ownership and governance are essential to sustainable test management\n\nRead Rohit’s full post: https://lnkd.in/d7WW8XyB.",
+        "media": "https://media.licdn.com/dms/image/v2/D4D22AQEHAKWRuJzAWw/feedshare-shrink_800/B4DaBgJNRsIEAc-/0/1788319422029?e=2147483647&v=beta&t=D9nJpCVZqGiv8JtWlPM10vKK2odcw6Cb9SHaSuxIhVI",
+        "images": [
+          "https://media.licdn.com/dms/image/v2/D4D22AQEHAKWRuJzAWw/feedshare-shrink_800/B4DaBgJNRsIEAc-/0/1788319422029?e=2147483647&v=beta&t=D9nJpCVZqGiv8JtWlPM10vKK2odcw6Cb9SHaSuxIhVI"
+        ],
+        "image": "https://media.licdn.com/dms/image/v2/D4D22AQEHAKWRuJzAWw/feedshare-shrink_800/B4DaBgJNRsIEAc-/0/1788319422029?e=2147483647&v=beta&t=D9nJpCVZqGiv8JtWlPM10vKK2odcw6Cb9SHaSuxIhVI",
+        "author": {
+          "name": "li-user-63",
+          "url": "https://dk.linkedin.com/company/li-user-62",
+          "image": "https://scrubbed.invalid/li-user-64",
+          "followers": 20452
+        },
+        "comments": [],
+        "likeCount": 20,
+        "commentCount": 0
+      },
+      {
+        "url": "https://www.linkedin.com/posts/li-user-65_selenium-java-testng-activity-7348689500572708864-LqPa",
+        "datePublished": "2025-07-09T12:28:28.960Z",
+        "description": "5 Ways I Tackle Flaky Tests in Selenium + Java + TestNG (With Examples)\n🧪 Flaky tests are every QA engineer’s nightmare. One minute they pass, the next minute they fail — and your pipeline turns red for no good reason. 😤\nIf you're using Selenium + Java + TestNG, here are 5 proven ways I’ve reduced flakiness in real-world projects — with examples. 👇\n\n1️⃣ Use Explicit Waits (Smart Timing Handling)\nAvoid Thread.sleep() — it's unreliable and slows down tests.\n✅ Instead, use WebDriverWait:\nWebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));\nWebElement button = wait.until(ExpectedConditions.elementToBeClickable(By.id(\"submitBtn\")));\nbutton.click();\n\n✔️ This waits only as long as needed, improving stability and speed.\n\n2️⃣ Implement Retry Logic with IRetryAnalyzer\nSome flakiness is environmental. Retrying a failed test once can help without masking real bugs.\n✅ Create a Retry Analyzer:\npublic class RetryAnalyzer implements IRetryAnalyzer {\n    private int attempt = 0;\n    private static final int MAX_RETRIES = 2;\n\n    @Override\n    public boolean retry(ITestResult result) {\n        if (attempt < MAX_RETRIES) {\n            attempt++;\n            return true;\n        }\n        return false;\n    }\n}\n\n✅ Apply it to your test:\n@Test(retryAnalyzer = RetryAnalyzer.class)\npublic void flakyTest() {\n    // test code\n}\n\n3️⃣ Isolate Test Data & Avoid Interdependencies\nFlaky tests often share state or depend on execution order.\n✅ Example: Don't do this\n@Test\npublic void login() {\n    // logs in and sets user session\n}\n\n@Test(dependsOnMethods = \"login\")\npublic void placeOrder() {\n    // assumes user is logged in\n}\n\n✅ Instead, isolate logic:\n@Test\npublic void loginAndPlaceOrder() {\n    loginUser();  // reusable method\n    placeOrder();\n}\n\n✔️ Each test should stand alone, with its own setup and teardown.\n\n4️⃣ Use Robust & Stable Locators\nUnstable selectors are a top cause of flakiness in UI tests.\n❌ Avoid this:\ndriver.findElement(By.xpath(\"//div[4]/button[2]\")).click();  // brittle\n\n✅ Prefer this:\ndriver.findElement(By.cssSelector(\"[data-test='submit-button']\")).click();\n\nOr, use id/name when possible:\ndriver.findElement(By.id(\"submitBtn\")).click();\n\n✔️ Ask devs to add test-friendly attributes like data-test.\n\n5️⃣ Tag and Quarantine Flaky Tests\nKeep flaky tests from polluting your main test suite.\n✅ Tag using TestNG groups:\n@Test(groups = \"flaky\", retryAnalyzer = RetryAnalyzer.class)\npublic void sometimesFails() {\n    // test logic\n}\n\n✅ Run stable tests only in CI:\n\n    \n        \n    \n\n✔️ Run flaky tests separately on a nightly or sandbox job.\n💡 Final Tip: Track flaky test patterns over time (via Allure, Jenkins, or even a spreadsheet). Fixing 5% of tests can boost reliability 50%.\n🙋‍♂️ How do you handle flaky tests in Selenium or TestNG? Let’s exchange ideas 👇\n#Selenium #Java #TestNG #AutomationTesting #FlakyTests #QATips #DevOps #SoftwareTesting #TestAutomation",
+        "media": null,
+        "images": [],
+        "image": null,
+        "author": {
+          "name": "li-user-66",
+          "url": "https://in.linkedin.com/in/li-user-65",
+          "image": "https://scrubbed.invalid/li-user-67",
+          "followers": 226
+        },
+        "comments": [
+          {
+            "author": "li-user-68",
+            "text": "Sixth way is to avoid using actions class (often seeing flakiness in multi threaded environment) instead can use the keys class to perform mouse or keyboard operations.",
+            "linkedinUrl": "https://in.linkedin.com/in/li-user-69"
+          },
+          {
+            "author": "li-user-70",
+            "text": "DO NOT RETRY FAILED TESTS - A test failure needs to tell you what the state of the SUT is. It's a signal that should not be pushed under the rug. If the environment is flaky then fix the environment - if your framework or test is flaky then you fix them.",
+            "linkedinUrl": "https://uk.linkedin.com/in/li-user-71"
+          }
+        ],
+        "likeCount": 43,
+        "commentCount": 7
+      }
+    ],
+    "cursor": "2"
+  }
+}

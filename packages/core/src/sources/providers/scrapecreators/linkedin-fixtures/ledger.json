@@ -1,0 +1,64 @@
+{
+  "note": "What each captured call cost, in the provider's own numbers. This is the evidence for the billable unit and for whether a probe is free.",
+  "creditsCharged": 3,
+  "balanceBefore": 2023,
+  "balanceAfter": 2020,
+  "calls": [
+    {
+      "call": "credentials-rejected",
+      "httpStatus": 401,
+      "elapsedMs": 875,
+      "creditsCharged": null,
+      "creditsRemaining": null,
+      "note": "sent with a deliberately invalid key"
+    },
+    {
+      "call": "credentials-accepted",
+      "httpStatus": 400,
+      "elapsedMs": 731,
+      "creditsCharged": 0,
+      "creditsRemaining": 2023,
+      "note": "a working key with no query: refused on the input, not on the key"
+    },
+    {
+      "call": "date-rejected",
+      "httpStatus": 400,
+      "elapsedMs": 391,
+      "creditsCharged": 0,
+      "creditsRemaining": 2023,
+      "note": "an invalid date_posted, to make the provider name the valid ones"
+    },
+    {
+      "call": "search-posts",
+      "httpStatus": 200,
+      "elapsedMs": 9828,
+      "creditsCharged": 1,
+      "creditsRemaining": 2022,
+      "note": null
+    },
+    {
+      "call": "search-page-2",
+      "httpStatus": 200,
+      "elapsedMs": 9228,
+      "creditsCharged": 1,
+      "creditsRemaining": 2021,
+      "note": "the second page"
+    },
+    {
+      "call": "search-last-week",
+      "httpStatus": 200,
+      "elapsedMs": 9408,
+      "creditsCharged": 1,
+      "creditsRemaining": 2020,
+      "note": "date_posted=last-week, named by the refusal"
+    },
+    {
+      "call": "search-no-results",
+      "httpStatus": 404,
+      "elapsedMs": 2047,
+      "creditsCharged": 0,
+      "creditsRemaining": 2020,
+      "note": "a phrase that cannot occur"
+    }
+  ]
+}

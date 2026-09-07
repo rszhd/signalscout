@@ -1,0 +1,337 @@
+{
+  "httpStatus": 200,
+  "body": {
+    "success": true,
+    "credits_remaining": 2021,
+    "credits_charged": 1,
+    "query": "flaky tests",
+    "posts": [
+      {
+        "url": "https://www.linkedin.com/posts/li-user-1_your-qa-environment-needs-cattle-not-activity-7396952288357031936-SyYd",
+        "datePublished": "2025-11-19T16:47:34.243Z",
+        "description": "Your QA tests aren’t flaky because of “bad tests.”\n\nThey’re flaky because of bad data.\n\nMost teams don’t realize how much their QA environment is working against them — long run times, inconsistent results, random failures… all of it usually comes back to one thing:\n\n👉  The way you seed your test data.\n\nAfter reviewing hundreds of customer setups at Rainforest, one pattern became impossible to ignore:\n\n🐄 Teams that treat their test data like cattle scale.\n🐕 Teams that treat it like pets don’t.\n\nWe broke down the most common mistakes (and the fixes) in this carousel.\n\nTell us: Do you find this to be true in your QA environment?\n\nP.S. If you want the full deep dive, check out Keith Johnson's post on our blog.",
+        "media": "https://media.licdn.com/dms/image/v2/D4E1FAQEVgwUWjoNTgw/feedshare-document-images_800/B4EZqdAmVUIwAc-/1/1763570776115?e=1789603200&v=beta&t=kq8HOnH3wC-G3lUhO4Wz7Zbr7mau2oLNJvYuKV2BKe4",
+        "images": [
+          "https://media.licdn.com/dms/image/v2/D4E1FAQEVgwUWjoNTgw/feedshare-document-images_800/B4EZqdAmVUIwAc-/1/1763570776115?e=1789603200&v=beta&t=kq8HOnH3wC-G3lUhO4Wz7Zbr7mau2oLNJvYuKV2BKe4",
+          "https://media.licdn.com/dms/image/v2/D4E1FAQEVgwUWjoNTgw/feedshare-document-images_800/B4EZqdAmVUIwAc-/2/1763570776115?e=1789603200&v=beta&t=5bCw0kfSaKfvzsyw6JeQMw9xc4O2kZWlwkumdnr0uw4",
+          "https://media.licdn.com/dms/image/v2/D4E1FAQEVgwUWjoNTgw/feedshare-document-images_800/B4EZqdAmVUIwAc-/3/1763570776115?e=1789603200&v=beta&t=z7zgn73lI_-7MMKcbfT9u-7sXoUCvH_g9ubdakbV23c",
+          "https://media.licdn.com/dms/image/v2/D4E1FAQEVgwUWjoNTgw/feedshare-document-images_800/B4EZqdAmVUIwAc-/4/1763570776115?e=1789603200&v=beta&t=W4ioLnyccfy0g5fJfW68_KurrI8sw0brq60ytcPO-ts",
+          "https://media.licdn.com/dms/image/v2/D4E1FAQEVgwUWjoNTgw/feedshare-document-images_800/B4EZqdAmVUIwAc-/5/1763570776115?e=1789603200&v=beta&t=YegkP09l2KDaoLy5UvgWIL6niuS2B2lwF2xgEtFxTrU",
+          "https://media.licdn.com/dms/image/v2/D4E1FAQEVgwUWjoNTgw/feedshare-document-images_800/B4EZqdAmVUIwAc-/6/1763570776115?e=1789603200&v=beta&t=uXES5ElaU137dke_KjOzryzZ2KDV0j-os_tp4uEDHTE",
+          "https://media.licdn.com/dms/image/v2/D4E1FAQEVgwUWjoNTgw/feedshare-document-images_800/B4EZqdAmVUIwAc-/7/1763570776115?e=1789603200&v=beta&t=7HUIG2dV6BCu9gn5ZTnTnOSOEScjMdDmzJLw08IEu3M",
+          "https://media.licdn.com/dms/image/v2/D4E1FAQEVgwUWjoNTgw/feedshare-document-images_800/B4EZqdAmVUIwAc-/8/1763570776115?e=1789603200&v=beta&t=n6DdXwVbcqrJ3fNRcQpOUPt34DPpHIqrlpsQzkebNpk",
+          "https://media.licdn.com/dms/image/v2/D4E1FAQEVgwUWjoNTgw/feedshare-document-images_800/B4EZqdAmVUIwAc-/9/1763570776115?e=1789603200&v=beta&t=EeDHk5QIo_2eUiKP5O1eEwWw_4mTtEVacobQ4kVkfio",
+          "https://media.licdn.com/dms/image/v2/D4E1FAQEVgwUWjoNTgw/feedshare-document-images_800/B4EZqdAmVUIwAc-/10/1763570776115?e=1789603200&v=beta&t=fCJSVWd6X4yxKKAZTzVW5AHhu8LvuVGsqeGRcQOVsag",
+          "https://media.licdn.com/dms/image/v2/D4E1FAQEVgwUWjoNTgw/feedshare-document-images_800/B4EZqdAmVUIwAc-/11/1763570776115?e=1789603200&v=beta&t=dCYjpWgaF5Ei4lY75UEuPFW2zKo7Vm-GBeDuSFVdAxU",
+          "https://media.licdn.com/dms/image/v2/D4E1FAQEVgwUWjoNTgw/feedshare-document-images_800/B4EZqdAmVUIwAc-/12/1763570776115?e=1789603200&v=beta&t=RPvmn5JUZXFIKGJOR03y95krqWP3tSK6m-yRnUvt7hI",
+          "https://media.licdn.com/dms/image/v2/D4E1FAQEVgwUWjoNTgw/feedshare-document-images_800/B4EZqdAmVUIwAc-/13/1763570776115?e=1789603200&v=beta&t=ysXVPo3UQr9sRhe3wiNexzbUD-G8eeC53Ed0Pu-5K4w",
+          "https://media.licdn.com/dms/image/v2/D4E1FAQEVgwUWjoNTgw/feedshare-document-images_800/B4EZqdAmVUIwAc-/14/1763570776115?e=1789603200&v=beta&t=xEVY2ky3euLt3Aoq9UHBzDhH5uyPB8w9Aqjo5c0scuQ"
+        ],
+        "image": "https://media.licdn.com/dms/image/v2/D4E1FAQEVgwUWjoNTgw/feedshare-document-images_800/B4EZqdAmVUIwAc-/1/1763570776115?e=1789603200&v=beta&t=kq8HOnH3wC-G3lUhO4Wz7Zbr7mau2oLNJvYuKV2BKe4",
+        "author": {
+          "name": "li-user-2",
+          "url": "https://www.linkedin.com/company/li-user-1",
+          "image": "https://scrubbed.invalid/li-user-3",
+          "followers": 6525
+        },
+        "comments": [
+          {
+            "author": "li-user-4",
+            "text": "It’s surprising how often flaky tests come from data issues rather than the tests themselves. When the environment isn’t predictable, even the best-written scenarios fall apart. \n\nTreating test data as something disposable makes scaling so much easier. This idea shows why stable automation depends more on data discipline than tooling.",
+            "linkedinUrl": "https://nl.linkedin.com/in/li-user-5"
+          }
+        ],
+        "likeCount": 18,
+        "commentCount": 1
+      },
+      {
+        "url": "https://www.linkedin.com/posts/li-user-6_heres-how-functional-testing-keeps-your-activity-7369036485880180741-cIPh",
+        "name": "Here’s how functional testing keeps your app from falling apart, one mock at a time. | Uma Abu",
+        "thumbnailUrl": "https://media.licdn.com/dms/image/v2/D5605AQFirJ_of2zunA/videocover-high/B56ZkF9vtBIACM-/0/1756741727188?e=2147483647&v=beta&t=VOVGyGdA6aG2qnabAv11RPJs4vtJqFi_1pfj5cZ6XOA",
+        "datePublished": "2025-09-03T16:00:08.279Z",
+        "uploadDate": "2025-09-03T16:00:08.279Z",
+        "description": "Here’s how functional testing keeps your app from falling apart, one mock at a time.",
+        "transcript": "Software testing generally falls under 2 broad categories, functional and nonfunctional testing. Let's start with the first functional testing. Functional testing checks that the software behaves the way it's supposed to. It's about making sure inputs produce the right outputs and that feature is work according to their requirement. Let's say we're building a file sharing approval app for team. Users should be able to log in, upload documents, trigger an approval workflow, and eventually archive the file. Functional testing would verify that users can log in with the valid credentials. Upload files, review them, kick off approvals, and archive the document. When they're done, each step is validated to make sure it does what it's supposed to do. Now let's look at some type of functional testing. The 1st is unit test. Unit test at the foundation. They focus on the smallest piece of code, individual functions, methods, or modules, and verify that they work in isolation. For example, you might have a function like this that checks whether a document upload is valid. The function checks the file name, file extension, and the file size. Unit test for the function might look. Something like this where we check various combinations of the file name and sizes to confirm the logic is correct and working how we expect it to. Unit tests are written by developers during development. They allow bugs to be caught early and make it easier to debug issues since failure the scope to just a specific piece of code. But not everything should be unit tested. A common mistake is writing unit tests that incorporate external systems like API calls, databases, or file storage. This is an anti pattern because those systems can introduce flaky tests tests that can sometimes. Or sometimes fail, often due to things outside your control like networking stability or service downtime. To avoid this, we use mocking. Mock simulate the behavior of external systems so you can focus on the logic in your code instead of connecting to a real database. To test login logic, you can mark a database call to return a valid user or an error and test how your code responds. Now once the individual units work, the next step is to make sure they work together. And that's where integration testing comes in. It checks that components interact correctly for our file sharing. Up. We might write integration tests to verify that after uploading a file, the system kicks off an approval workflow and logs the event in the activity log O I'm. Integration tests can also include interactions with external systems, like calling third party APIs and making sure the response is processed correctly. It's all about making sure the seams between the parts of your systems work correctly.",
+        "media": "https://dms.licdn.com/playlist/vid/v2/D5605AQFirJ_of2zunA/mp4-720p-30fp-crf28/B56ZkF9vtBIAB0-/0/1756741739598?e=2147483647&v=beta&t=lH_8FACUutpiHeB87TPzk2xmfZn0slp2FPyE6CN5ox4",
+        "images": [],
+        "image": null,
+        "author": {
+          "name": "li-user-7",
+          "url": "https://www.linkedin.com/in/li-user-6",
+          "image": "https://scrubbed.invalid/li-user-8",
+          "followers": 12734
+        },
+        "comments": [
+          {
+            "author": "li-user-9",
+            "text": "flaky test - learnt something",
+            "linkedinUrl": "https://uk.linkedin.com/in/li-user-10"
+          }
+        ],
+        "likeCount": 41,
+        "commentCount": 1
+      },
+      {
+        "url": "https://www.linkedin.com/posts/li-user-11_playwright-qaengineer-testautomation-activity-7498069090503127041-Y9mM",
+        "datePublished": "2026-08-25T17:29:38.537Z",
+        "description": "🚀 QA/Automation Engineer\nFlaky Playwright tests are not just a testing problem — they are a confidence problem.\nIn real-world automation, a test that passes 9/10 times can be more dangerous than an obvious failure because it creates noise, wasted debugging time, and unreliable CI/CD feedback.\n\nHere are the techniques I use to make Playwright automation more stable:\n🔹 1. Use Playwright auto-waiting instead of unnecessary hard waits\n🔹 2. Use resilient locators like getByRole(), getByLabel() and getByTestId()\n🔹 3. Handle dynamic content with condition-based waits\n🔹 4. Control external dependencies using API mocking/routing\n🔹 5. Keep tests isolated with independent test data and fixtures\n🔹 6. Use retries wisely — retries should diagnose noise, not hide defects\n🔹 7. Write user-focused assertions instead of implementation-dependent assertions\n🔹 8. Capture traces, screenshots, videos and logs for faster RCA\n🔹 9. Stabilize the test environment — browser, data, network and services\n🔹 10. Use Claude as an AI pair for automation — refactoring flaky tests, analysing failures, improving locators and suggesting better waits/assertions.\n\n🤖 Example Claude prompt\n“Analyze this failed Playwright test, trace, error log and screenshot. Identify the likely root cause of flakiness, explain why it happens intermittently, and refactor the test using Playwright best practices. Do not simply add a timeout.”\n\nThe goal isn't simply to make tests green.\nThe goal is to build automation that is:\n✅ Reliable\n✅ Maintainable\n✅ Debug\n✅ Fast\n✅ CI/CD friendly\n✅ Trustworthy\n\nGood automation doesn't just pass tests — it builds confidence in every release.\n🎯 What recruiters can see from this\nThis approach demonstrates practical experience with:\nPlaywright + TypeScript/JavaScript + CI/CD + Test Design + Debugging + API Mocking + Test Stability + AI-assisted Automation\n\nI'm continuously exploring how AI + modern automation practices can improve software quality and reduce repetitive QA effort.\nWhat is the most common cause of flaky tests in your automation framework? 👇\n\n#Playwright #QAEngineer #TestAutomation #AutomationTesting #QualityEngineering #SoftwareTesting #TypeScript #JavaScript #ClaudeAI #AIinTesting #AITesting #SDET #QualityAssurance #CICD #TestAutomationEngineer",
+        "media": "https://media.licdn.com/dms/image/v2/D5622AQGumXy_gnT4mg/feedshare-shrink_1280/B56aA5.GdzJ8AM-/0/1787678976107?e=2147483647&v=beta&t=VY-els5THlq9cYdgcZAFyDfo66mm6w1IvAcBZsehleg",
+        "images": [
+          "https://media.licdn.com/dms/image/v2/D5622AQGumXy_gnT4mg/feedshare-shrink_1280/B56aA5.GdzJ8AM-/0/1787678976107?e=2147483647&v=beta&t=VY-els5THlq9cYdgcZAFyDfo66mm6w1IvAcBZsehleg"
+        ],
+        "image": "https://media.licdn.com/dms/image/v2/D5622AQGumXy_gnT4mg/feedshare-shrink_1280/B56aA5.GdzJ8AM-/0/1787678976107?e=2147483647&v=beta&t=VY-els5THlq9cYdgcZAFyDfo66mm6w1IvAcBZsehleg",
+        "author": {
+          "name": "li-user-12",
+          "url": "https://in.linkedin.com/in/li-user-11",
+          "image": "https://scrubbed.invalid/li-user-13",
+          "followers": 884
+        },
+        "comments": [],
+        "likeCount": 17,
+        "commentCount": 0
+      },
+      {
+        "url": "https://www.linkedin.com/posts/li-user-14_qualityassurance-testautomation-softwaretesting-activity-7498650617754845187-XgFC",
+        "datePublished": "2026-08-27T08:00:25.389Z",
+        "description": "A flaky test does not only waste time.\n\nIt teaches the team to ignore failures.\n\nThe first time a test fails unexpectedly, someone investigates.\n\nThe fifth time, someone simply clicks “rerun.”\n\nAnd when it passes, everyone moves on.\n\nThat is where the real risk begins.\n\nA flaky test slowly changes the team’s behaviour:\n\n• red pipelines stop feeling urgent\n• reruns replace investigation\n• release decisions become less reliable\n• real product bugs can be dismissed as “probably flaky”\n\nFirst rerun: investigation.\nFifth rerun: team ritual.\n\nIn my experience, flaky tests need the same things as product bugs:\n\n• a clear owner\n• a documented reason for failure\n• a deadline for fixing or removing them\n• separation between test instability and actual product behaviour\n\nTemporarily isolating a test may be necessary.\n\nLeaving it forgotten is not.\n\nThe most important automation metric is not how many tests passed.\n\nIt is whether the team still trusts a failure when one appears.\n\nHow does your team handle flaky tests: fix, quarantine, or keep rerunning until they turn green?\n\n#QualityAssurance #TestAutomation #SoftwareTesting",
+        "media": "https://media.licdn.com/dms/image/v2/D4D22AQF5gZ56h5KzYQ/feedshare-shrink_1280/B4DaAyiBRWHsAM-/0/1787554174488?e=2147483647&v=beta&t=L4XFWL_BWDEuOTbZIf3kuTHP-Ekol0l03cnbDu4PWxQ",
+        "images": [
+          "https://media.licdn.com/dms/image/v2/D4D22AQF5gZ56h5KzYQ/feedshare-shrink_1280/B4DaAyiBRWHsAM-/0/1787554174488?e=2147483647&v=beta&t=L4XFWL_BWDEuOTbZIf3kuTHP-Ekol0l03cnbDu4PWxQ"
+        ],
+        "image": "https://media.licdn.com/dms/image/v2/D4D22AQF5gZ56h5KzYQ/feedshare-shrink_1280/B4DaAyiBRWHsAM-/0/1787554174488?e=2147483647&v=beta&t=L4XFWL_BWDEuOTbZIf3kuTHP-Ekol0l03cnbDu4PWxQ",
+        "author": {
+          "name": "li-user-15",
+          "url": "https://ua.linkedin.com/in/li-user-14/en",
+          "image": "https://scrubbed.invalid/li-user-16",
+          "followers": 1619
+        },
+        "comments": [
+          {
+            "author": "li-user-17",
+            "text": "https://www.linkedin.com/posts/li-user-18_testautomation-aitesting-qualityassurance-activity-7498644664070156288-UyEO?utm_source=share&utm_medium=member_desktop&rcm=ACoAAANzGiUB74faaYQANQingqZmXgsWKWnfVSk",
+            "linkedinUrl": "https://in.linkedin.com/in/li-user-19"
+          },
+          {
+            "author": "li-user-20",
+            "text": "Exactly, flaky tests don’t just waste time, they erode trust in the entire test suite.",
+            "linkedinUrl": "https://pk.linkedin.com/in/li-user-21"
+          }
+        ],
+        "likeCount": 2,
+        "commentCount": 2
+      },
+      {
+        "url": "https://www.linkedin.com/posts/li-user-22_dont-do-e2e-testing-activity-7328509413990858752-Zq6S",
+        "datePublished": "2025-05-14T20:00:01.390Z",
+        "description": "“End-to-end testing is one of the more common approaches to testing software, but it is complex, fragile expensive and low quality. As soon as we accept that the best way to test our system is to deploy it all together, with everything else that it interacts with and then try broad-brush interactions with the whole lot, we have lost control. To do a great job of testing we need much finer-grained control, and so need to reject E2E testing. Great automated testing depends on us controlling the variables, and ATDD, TDD and BDD rely on our ability to synthesize inputs and collect outputs from our system so that we can test it. E2E testing stops us from doing that.”\n\nhttps://lnkd.in/dGkrVaJY\n\n‘In this episode, Dave Farley, author of best-selling books “Continuous Delivery” and \"Modern Software Engineering” describes the problems of end-to-end testing and how best to overcome them with a more effective and more efficient approach.’\n\nContinuous Delivery Ltd\nBernard McCarty\nModern Software Engineering\n#ModernSoftwareEngineering",
+        "media": null,
+        "images": [],
+        "image": null,
+        "author": {
+          "name": "li-user-23",
+          "url": "https://www.linkedin.com/in/li-user-22",
+          "image": "https://scrubbed.invalid/li-user-24",
+          "followers": 15563
+        },
+        "comments": [
+          {
+            "author": "li-user-25",
+            "text": "yes and i don't think there's a real path to atdd tdd and bdd without devs understanding the domain model they're working on, and without isolating that behaviour implementing some kind of hexagonal/onion architecture. Many would like to do better testing and understand why, and even try to get AI assistants help with the tests, but what often gets lost is that the key to get there is domain modelling and isolation of the domain layer, otherwise little makes sense.",
+            "linkedinUrl": "https://es.linkedin.com/in/li-user-26"
+          },
+          {
+            "author": "li-user-27",
+            "text": "People who advocate for more E2E probably haven't worked on anything large and had operational ownership. E2E tests on anything remotely complicated become job programs for dedicated testers. I've seen SO many examples where money is dumped into those efforts, but never once have I seen one stable enough that people trusted it. It's much better to architect for testability than to pretend that the best way to test an application is to automate user interaction.",
+            "linkedinUrl": "https://www.linkedin.com/in/li-user-28"
+          },
+          {
+            "author": "li-user-29",
+            "text": "I’m not a fan of E2E/Integration testing. It creates dependencies that make the tested code not reusable, or difficult to reuse.\n\nBig fan of unit testing specifically. This method does this one thing. Mock the dependencies.\n\nThen when you want to reuse, it’s much more modular. But you’re also not getting caught in a web of logical assumptions that everything is actually doing what you expect.",
+            "linkedinUrl": "https://www.linkedin.com/in/li-user-30"
+          },
+          {
+            "author": "li-user-31",
+            "text": "From an OM point of view, something I try to stress to organizations: Whatever your bottleneck is, you can divide your entire annual revenue into the unit flow rate of your bottleneck. That's how valuable it is. \n\nEvery defect that is discovered *after* the final stage of production, whether by a customer or a \"PROD QA tester\", represents one unit that you have to pay *TWICE* to pass through the bottleneck. \n\nAND, time lost at the bottleneck can never be recovered. Each defect pushes the entire queue of all future work \"back by one unit\". This count accumulates permanently for as long as you're in business. You can never get that queue time back. Ever. \n\nThe only solution is to move QA so far \"to the left\" that you put it *before* the production process. Which is to say — TDD.",
+            "linkedinUrl": "https://www.linkedin.com/in/li-user-32"
+          }
+        ],
+        "likeCount": 163,
+        "commentCount": 42
+      },
+      {
+        "url": "https://www.linkedin.com/posts/li-user-33_how-to-overcome-flaky-ui-tests-activity-7059926656236314624-bG9F",
+        "datePublished": "2023-05-04T16:28:01.917Z",
+        "description": "Typical functional tests do a poor job capturing all visual changes, leaving you with lengthy and flaky code. In this recent blog post by Robert McNeil, Senior PMM at SmartBear, he discusses the issue with flaky tests and how SmartBear tool, VisualTest, can help. https://bit.ly/3HjyZTU",
+        "media": null,
+        "images": [],
+        "image": null,
+        "author": {
+          "name": "li-user-34",
+          "url": "https://www.linkedin.com/company/li-user-33",
+          "image": "https://scrubbed.invalid/li-user-35",
+          "followers": 110207
+        },
+        "comments": [],
+        "likeCount": 5,
+        "commentCount": 0
+      },
+      {
+        "url": "https://www.linkedin.com/posts/li-user-36_is-a-random-flaky-test-blocking-your-pipeline-activity-7490759281693327360-vPTP",
+        "datePublished": "2026-08-05T13:23:04.304Z",
+        "description": "Are flaky tests blocking your GitHub Actions pipeline? 🛑\n\nWhen a build goes red, the easiest fix is usually to just hit re-run. But relying on re-runs makes it hard for the team to actually trust the test results.\n\nInstead of manually re-running builds, we use an auto-quarantine workflow. It isolates the flaky tests so they don't block the PR, but it still saves the trace logs so you can debug them later.\n\nWe documented the exact Playwright and GitHub Actions config here 👇\n\n#Playwright #SoftwareTesting #TestAutomation",
+        "media": null,
+        "images": [],
+        "image": null,
+        "author": {
+          "name": "li-user-37",
+          "url": "https://in.linkedin.com/in/li-user-36",
+          "image": "https://scrubbed.invalid/li-user-38",
+          "followers": 15683
+        },
+        "comments": [
+          {
+            "author": "li-user-39",
+            "text": "Auto detecting and quarantining flaky tests beats the rerun gamble because you finally get data on which ones to actually fix.",
+            "linkedinUrl": "https://in.linkedin.com/in/li-user-40"
+          }
+        ],
+        "likeCount": 9,
+        "commentCount": 1
+      },
+      {
+        "url": "https://www.linkedin.com/posts/li-user-41_%F0%9D%97%A1%F0%9D%97%BC%F0%9D%98%81%F0%9D%97%B5%F0%9D%97%B6%F0%9D%97%BB%F0%9D%97%B4-%F0%9D%97%B1%F0%9D%97%B2%F0%9D%98%80%F0%9D%98%81%F0%9D%97%BF%F0%9D%97%BC%F0%9D%98%86%F0%9D%98%80-%F0%9D%97%B0%F0%9D%97%BC%F0%9D%97%BB%F0%9D%97%B3%F0%9D%97%B6%F0%9D%97%B1%F0%9D%97%B2%F0%9D%97%BB%F0%9D%97%B0%F0%9D%97%B2-activity-7498736846701551616-lCdY",
+        "datePublished": "2026-08-27T13:43:04.018Z",
+        "description": "𝗡𝗼𝘁𝗵𝗶𝗻𝗴 𝗱𝗲𝘀𝘁𝗿𝗼𝘆𝘀 𝗰𝗼𝗻𝗳𝗶𝗱𝗲𝗻𝗰𝗲 𝗳𝗮𝘀𝘁𝗲𝗿 𝘁𝗵𝗮𝗻 𝗳𝗹𝗮𝗸𝘆 𝗮𝘂𝘁𝗼𝗺𝗮𝘁𝗶𝗼𝗻.\n\nA failed test should reveal a software problem.\n\nFlaky tests reveal process problems.\n\nEngineers stop trusting results.\nTeams rerun pipelines.\nRelease decisions become delayed.\nEventually people ignore automation altogether.\n\nReliable automation is built through stable environments, proper synchronization, isolated test data, and disciplined coding practices.\n\nConsistency matters more than volume.\nEvery reliable test increases confidence.\nEvery flaky test decreases it.\n\n𝗔𝘂𝘁𝗼𝗺𝗮𝘁𝗶𝗼𝗻 𝗼𝗻𝗹𝘆 𝗰𝗿𝗲𝗮𝘁𝗲𝘀 𝘃𝗮𝗹𝘂𝗲 𝘄𝗵𝗲𝗻 𝗽𝗲𝗼𝗽𝗹𝗲 𝗯𝗲𝗹𝗶𝗲𝘃𝗲 𝗶𝘁𝘀 𝗿𝗲𝘀𝘂𝗹𝘁𝘀.",
+        "media": "https://media.licdn.com/dms/image/v2/D4E22AQGqQIL9gnscqw/feedshare-image-high-res/B4EaAu6ms7K4AU-/0/1787493510202?e=2147483647&v=beta&t=Q9HegE_FhBxd3UXghShWs6d3SfgarBzwEWmmZTYNzSs",
+        "images": [
+          "https://media.licdn.com/dms/image/v2/D4E22AQGqQIL9gnscqw/feedshare-image-high-res/B4EaAu6ms7K4AU-/0/1787493510202?e=2147483647&v=beta&t=Q9HegE_FhBxd3UXghShWs6d3SfgarBzwEWmmZTYNzSs"
+        ],
+        "image": "https://media.licdn.com/dms/image/v2/D4E22AQGqQIL9gnscqw/feedshare-image-high-res/B4EaAu6ms7K4AU-/0/1787493510202?e=2147483647&v=beta&t=Q9HegE_FhBxd3UXghShWs6d3SfgarBzwEWmmZTYNzSs",
+        "author": {
+          "name": "li-user-42",
+          "url": "https://www.linkedin.com/in/li-user-41",
+          "image": "https://scrubbed.invalid/li-user-43",
+          "followers": 2200
+        },
+        "comments": [],
+        "likeCount": null,
+        "commentCount": 0
+      },
+      {
+        "url": "https://www.linkedin.com/posts/li-user-44_flaky-tests-overhaul-at-uber-activity-7226279561313837059-ZpFI",
+        "datePublished": "2024-08-05T17:35:05.171Z",
+        "description": "From Chaos to Clarity: How Testopedia Tackles Flaky Tests Across Monorepos\n\nA few years ago, we embarked on a journey to eliminate flaky code tests at Uber, with the goals of stabilizing continuous integration across mono-repos, raising the quality bar, and resolving  Bermuda Triangles of unclear test accountabilities. Flaky tests are insidious. At best, they cause developers to toil over logs for each release, and at worst, obscure meaningful signals with excessive noise.\n\nTestopedia, a tool built at Uber, has helped us to fix such issues, as described in the Uber blog. Testopedia analyzes testing logs and statistics, dashboards insights, and alerts teams of regressions and problems. The tool has led to fixes for thousands of flaky tests in our Go and Java monorepos, reduced developer toil, and raised the level of pre-production and production stability.\n\nLearn more about reducing flaky tests and some other cool stuff we’re doing at Uber. Reach out to Anshuman Chadha to discuss opportunities to join us.\nhttps://lnkd.in/gngj8CvB\n\nSergey Balabanov Xiaoyang Tan Yushan L. Sai To Yeung Hani Loza\n\n#Testing #FlakyTests #QualityAssurance #SoftwareTesting #TestAutomation #DeveloperTools #CodeQuality #QA",
+        "media": null,
+        "images": [],
+        "image": null,
+        "author": {
+          "name": "li-user-45",
+          "url": "https://www.linkedin.com/in/li-user-44",
+          "followers": 18746
+        },
+        "comments": [
+          {
+            "author": "li-user-46",
+            "text": "Albert, how does the Uber platform prevent people from doing things like the one in the image below? When a driver gets deactivated due to an issue with their license, insurance, or background check, they simply pay another guy and are back driving. What kind of security is this offered to your riders?",
+            "linkedinUrl": "https://www.linkedin.com/in/li-user-47"
+          },
+          {
+            "author": "li-user-48",
+            "text": "Fantastic idea",
+            "linkedinUrl": "https://www.linkedin.com/in/li-user-49"
+          },
+          {
+            "author": "li-user-50",
+            "text": "If I'm not mistaken, Uber exceeded 52 billion trips last year, so you can believe that there are several ways to monetize and earn more and more in an infinite way: \n\n\n1- Through direct negotiation with the big partner brand.\n\n2- Through views on YouTube, 52 billion annual views for each big partner brand in every commercial shown in the vehicle during their trips.\n\n3- Directly with customers, giving access to remote interactivity with the vehicle's multimedia to control music and air conditioning while the commercials run.",
+            "linkedinUrl": "https://be.linkedin.com/in/li-user-51"
+          },
+          {
+            "author": "li-user-50",
+            "text": "Albert Greenberg We could increase everyone's financial income if we brought customers closer to big brands through commercials running on the vehicle's multimedia during trips.",
+            "linkedinUrl": "https://be.linkedin.com/in/li-user-51"
+          },
+          {
+            "author": "li-user-52",
+            "text": "Just sent you a message Albert! I would be so thankful if you could read it brother !",
+            "linkedinUrl": "https://www.linkedin.com/in/li-user-53"
+          },
+          {
+            "author": "li-user-54",
+            "text": "Congratulations on your progress with Testopedia and the valuable insights shared. The impact of reducing flaky tests cannot be overstated, especially in maintaining team morale and enhancing productivity. It would be interesting to hear more about any specific challenges you faced during implementation and how you overcame them. This discussion is beneficial for many in the industry looking to improve their testing processes.",
+            "linkedinUrl": "https://www.linkedin.com/company/li-user-55"
+          }
+        ],
+        "likeCount": 265,
+        "commentCount": 7
+      },
+      {
+        "url": "https://www.linkedin.com/posts/li-user-56_mendral-yc-w26-keeps-your-ci-green-and-activity-7422292414415056896-Wl3U",
+        "name": "Mendral: Fix Flaky Tests and Slow Pipelines with Automated CI/CD Diagnosis | Y Combinator posted on the topic | LinkedIn",
+        "thumbnailUrl": "https://media.licdn.com/dms/image/v2/D5605AQFwx4iuIwo2SA/videocover-high/B56ZwE.yuhIcBU-/0/1769610103227?e=2147483647&v=beta&t=hDA1nD6RC2cVEuUwtOjNas20i5ALg824MyLtuTD4b4M",
+        "datePublished": "2026-01-28T15:00:11.103Z",
+        "uploadDate": "2026-01-28T15:00:11.103Z",
+        "description": "Mendral (YC W26) keeps your CI green and fast by finding what broke, why it broke, and helping ship the fix.\n\nTeams lose huge amounts of time to flaky tests, slow pipelines, and recurring build failures. Most tooling tells you what happened. Engineers still have to dig through logs, rerun jobs, and patch brittle CI over and over. With more code being produced than ever, that drag only gets worse.\n\nMendral watches your CI/CD, diagnoses failures, flags flaky tests, finds slowdowns, and opens PRs with concrete fixes. It is already running in production for 15 teams, including PostHog. We are founding engineers from Docker and later co-founded Dagger. We built delivery tooling for years, and we are opinionated about one thing: teams should not need dedicated platform headcount just to keep shipping.\n\nCongrats on the launch Sam Alba & Andrea Luzzardi!\n\nhttps://lnkd.in/gD5RP3DH",
+        "transcript": "Hi I'm Sam, cofounder of Mandrel. Mandrel is in the eye DevOps engineer that manages your CI CD. It improves. Build, fixez sur test improve. With the security and performance of your software delivery, let me show you a demo. As time is one of our early customers and Mandrel is looking at every CII logs, every commits, every configuration changes from past hug and look for opportunities to help improve the speed and improve the overall reliability and security. Let's look at one example with a flaky test. Flaky tests are hard to spot because they they don't. Always fail and so in order to spot that the taste is flaky, the agent needs to look at the failure but also at historical data. So here it's spotted the flaky test by looking at all the data available and gathered over time. It won't accomplish root cause analysis about what the problem happens and also proposed remediation options. The team from Post Hog accepted one of the remediation and the agent. Jumped in and open a pull request and then it was merged to the repo. The agent is also available on Slack. He joins your Slack channel exactly like a human software engineer would do, and it stopped telling you. When it finds something to do. You can then jump into the thread and trigger an implementation directly from the Slack app. You can even ask manual questions like do I have any flaky test? And manual will run an analysis for you and answer directly on Slack to them and. Deployed in 15 different companies. If you would like to be one of them, we would love to give you a quick demo an onboard you in few minutes. Thanks for watching.",
+        "media": "https://dms.licdn.com/playlist/vid/v2/D5605AQFwx4iuIwo2SA/mp4-720p-30fp-crf28/B56ZwE.yuhIcCE-/0/1769610115835?e=2147483647&v=beta&t=_ckYj8KvMSRIuOwLSZ4BBVYYKw9UPNICnrr2LV81e4Y",
+        "images": [],
+        "image": null,
+        "author": {
+          "name": "li-user-57",
+          "url": "https://www.linkedin.com/school/li-user-56/",
+          "image": "https://scrubbed.invalid/li-user-58",
+          "followers": 1809797
+        },
+        "comments": [
+          {
+            "author": "li-user-59",
+            "text": "This hits a real pain point most teams quietly normalize. CI tools explain failures, but Mendral actually helps close the loop. Reducing flaky tests without adding platform overhead is real leverage. Shipping faster by default should not require heroics.",
+            "linkedinUrl": "https://in.linkedin.com/in/li-user-60"
+          },
+          {
+            "author": "li-user-61",
+            "text": "Auto‑PR fixes keep pipelines green—great daily efficiency boost 🚀 ⍢",
+            "linkedinUrl": "https://ie.linkedin.com/company/li-user-62"
+          },
+          {
+            "author": "li-user-63",
+            "text": "🤘",
+            "linkedinUrl": "https://www.linkedin.com/in/li-user-64"
+          },
+          {
+            "author": "li-user-65",
+            "text": "I'll check it out. Congratulations",
+            "linkedinUrl": "https://ke.linkedin.com/in/li-user-66"
+          },
+          {
+            "author": "li-user-67",
+            "text": "Bravo pour ce lancement! \nTrès belle démonstration d’un alumni #Epitech sur des sujets tech très concrets et à forte valeur pour les équipes. Hâte de suivre la suite! \nY Combinator x Epitech - L'école de l'excellence informatique",
+            "linkedinUrl": "https://fr.linkedin.com/in/li-user-68"
+          },
+          {
+            "author": "li-user-69",
+            "text": "Most teams debug CI more than features.",
+            "linkedinUrl": "https://bd.linkedin.com/company/li-user-70"
+          },
+          {
+            "author": "li-user-71",
+            "text": "Mendral is incredibly helpful in our stack",
+            "linkedinUrl": "https://www.linkedin.com/in/li-user-72"
+          },
+          {
+            "author": "li-user-73",
+            "text": "👋 Sam Alba",
+            "linkedinUrl": "https://fr.linkedin.com/in/li-user-74"
+          },
+          {
+            "author": "li-user-75",
+            "text": "Bravo 👏",
+            "linkedinUrl": "https://fr.linkedin.com/in/li-user-76/en"
+          }
+        ],
+        "likeCount": 172,
+        "commentCount": 28
+      }
+    ],
+    "cursor": "3"
+  }
+}

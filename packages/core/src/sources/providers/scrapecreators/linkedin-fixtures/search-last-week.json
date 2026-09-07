@@ -1,0 +1,316 @@
+{
+  "httpStatus": 200,
+  "body": {
+    "success": true,
+    "credits_remaining": 2020,
+    "credits_charged": 1,
+    "query": "flaky tests",
+    "posts": [
+      {
+        "url": "https://www.linkedin.com/posts/li-user-1_flaky-tests-causes-detection-and-how-to-activity-7500106623722475520-u_64",
+        "datePublished": "2026-08-31T08:26:04.318Z",
+        "description": "A test fails. You rerun it and it passes. Was there a defect? Was the test updated incorrectly? Or did the result change for no apparent reason?\n\nThat last case is flakiness: an automated test producing inconsistent results across executions on the same build, environment and inputs.\n\nThe issue is not one occasional false failure. When pass rates oscillate, every failure must be triaged twice: first to establish whether it is real, then to fix it if it is. The suite becomes harder to trust and harder to read.\n\nRead the blog to understand why flaky tests are a strategic problem, not just a tactical annoyance: https://lnkd.in/es8uGkjC\n\n#TestAutomation #SoftwareTesting #QualityAssurance",
+        "media": null,
+        "images": [],
+        "image": null,
+        "author": {
+          "name": "li-user-2",
+          "url": "https://uk.linkedin.com/company/li-user-1",
+          "image": "https://scrubbed.invalid/li-user-3",
+          "followers": 35748
+        },
+        "comments": [
+          {
+            "author": "li-user-4",
+            "text": "Flakiness creates a hidden tax on delivery: engineers stop treating red builds as actionable, and QA spends time separating product defects from automation noise. The answer is not simply more retries; it is deterministic data, isolated environments, observable failure evidence and ownership of flaky checks as defects in their own right. I explored the related risk of ‘ghost tests’ here: https://www.linkedin.com/feed/update/urn:li:activity:7500498135803228161/",
+            "linkedinUrl": "https://uk.linkedin.com/in/li-user-5"
+          },
+          {
+            "author": "li-user-4",
+            "text": "The loss of trust is the real cost. Even “same build, environment and inputs” can conceal mutable shared records, expired accounts or collisions between parallel workers. Capturing the data-factory version, entity IDs and cleanup outcome with each trace turns many mystery reruns into a diagnosable system. I explored this here:\n\nhttps://www.linkedin.com/feed/update/urn:li:share:7501257663578562561/",
+            "linkedinUrl": "https://uk.linkedin.com/in/li-user-5"
+          },
+          {
+            "author": "li-user-6",
+            "text": "Don't use Selenium...",
+            "linkedinUrl": "https://www.linkedin.com/in/li-user-7"
+          }
+        ],
+        "likeCount": 9,
+        "commentCount": 3
+      },
+      {
+        "url": "https://www.linkedin.com/posts/li-user-8_a-flaky-test-is-frustrating-a-test-suite-activity-7501625111817654272-Dvgl",
+        "datePublished": "2026-09-04T13:00:00.031Z",
+        "description": "🧩 A flaky test is frustrating. A test suite full of them becomes a management problem.\n\nSmall teams can often investigate failures one at a time, using CI logs, spreadsheets, dashboards, and institutional knowledge to decide which results deserve attention. As the suite grows, that approach makes it harder to see broader patterns and distinguish an unstable test from a genuine product regression.\n\nThe result is declining confidence in test results, more frustration for engineers, and greater release risk for the business.\n\nIn his latest blog post, Leapwork CTO Rohit Raghuvansi explains why managing flakiness at scale requires more than fixing individual tests. He explores:\n💡 Why organization-wide flakiness demands a more strategic approach\n💡 How limited context makes recurring patterns difficult to identify\n💡 Why ownership and governance are essential to sustainable test management\n\nRead Rohit’s full post: https://lnkd.in/d7WW8XyB.",
+        "media": "https://media.licdn.com/dms/image/v2/D4D22AQEHAKWRuJzAWw/feedshare-shrink_800/B4DaBgJNRsIEAc-/0/1788319422029?e=2147483647&v=beta&t=D9nJpCVZqGiv8JtWlPM10vKK2odcw6Cb9SHaSuxIhVI",
+        "images": [
+          "https://media.licdn.com/dms/image/v2/D4D22AQEHAKWRuJzAWw/feedshare-shrink_800/B4DaBgJNRsIEAc-/0/1788319422029?e=2147483647&v=beta&t=D9nJpCVZqGiv8JtWlPM10vKK2odcw6Cb9SHaSuxIhVI"
+        ],
+        "image": "https://media.licdn.com/dms/image/v2/D4D22AQEHAKWRuJzAWw/feedshare-shrink_800/B4DaBgJNRsIEAc-/0/1788319422029?e=2147483647&v=beta&t=D9nJpCVZqGiv8JtWlPM10vKK2odcw6Cb9SHaSuxIhVI",
+        "author": {
+          "name": "li-user-9",
+          "url": "https://dk.linkedin.com/company/li-user-8",
+          "image": "https://scrubbed.invalid/li-user-10",
+          "followers": 20452
+        },
+        "comments": [],
+        "likeCount": 20,
+        "commentCount": 0
+      },
+      {
+        "url": "https://www.linkedin.com/posts/li-user-11_softwaretesting-ci-devops-activity-7500416569940869120-OgdC",
+        "datePublished": "2026-09-01T04:57:41.256Z",
+        "description": "Every engineer has argued with a flaky test at some point. Re-run it, it passes, nobody investigates further, everyone moves on. That habit is a bigger problem than most of us treat it as.\n\nFlaky tests rarely stay contained to where they started either. A single unstable test in a shared dependency can show up as random failures in projects that have nothing to do with where the actual problem lives. Same test, different behavior depending on where and when it runs. That's what makes it so easy to write off as \"just flaky\" instead of actually debugging it, because the failure doesn't reproduce the same way twice.\n\nNobody treats a flaky test like a real bug. It gets re-run, it gets tagged \"known flaky,\" eventually it gets skipped in CI entirely. Nobody traces it back to what's actually causing the instability, because it technically passes if you just try again.\n\nMost of the time it's not exotic. Async waits are usually the biggest cause, a test reads a result before it's actually ready. Concurrency issues come next, almost always two threads fighting over the same in-memory object, not a file or a database like you'd expect. It's mostly a timing assumption that was wrong from the start, just wrong in a way that only shows up sometimes.\n\nWhat's actually worked for teams I've seen handle this well: standardize the CI environment so runs are genuinely comparable, get serious about dependency management instead of letting versions drift, and flag flaky tests early instead of letting them quietly pile up as \"just re-run it.\"\n\nWhat's the flakiest test you've ever fought with, and did you ever actually find the root cause?\n\n#SoftwareTesting #CI #DevOps #SoftwareEngineering #TestAutomation #Backend",
+        "media": null,
+        "images": [],
+        "image": null,
+        "author": {
+          "name": "li-user-12",
+          "url": "https://pk.linkedin.com/in/li-user-11",
+          "image": "https://scrubbed.invalid/li-user-13",
+          "followers": 3094
+        },
+        "comments": [],
+        "likeCount": 10,
+        "commentCount": 0
+      },
+      {
+        "url": "https://www.linkedin.com/posts/li-user-14_i-dont-use-claude-anymore-in-my-test-automation-activity-7501150329913143297-jeho",
+        "datePublished": "2026-09-03T05:33:23.269Z",
+        "description": "I don't use CLAUDE anymore in my test automation.\n\nThat's what I'd would have written couple a months ago.\nAI broke all my tests and this was the point where I needed to handle CLAUDE better.\n\nHere is what happended: Claude helped me get a suite green.\nIt was green. Fast. Perhaps too fast.\n\nThan I looked closer on the Diff, on the changes.\nWhat has happened? CLAUDE removed the assertions that stood in the way of making the suite green.\nIt has soften the tests, not fixed them.\n\nIt as well added hard waits, where it did not understand the business context, what was happening.\nSo no more flaky tests, green all the way.\n\nBut the critical code section in the test was soften so much, that it more or less did nothing the test.\n\nThis was my aha moment.\nQuitting on AI was not an option. Every client wants it, needs it.\nBut understanding it better, the tools, the setup, how it works, this actually was the way.\n\nSometimes AI without boundaries and guards is too powerful.\n\nThe reason for this behavior is of course the limited context window, hallucinations and the drive to always reach the goal. No matter what. Green over truth.\n\nHere are the rules I use now:\nAlways use a CLAUDE.md that defines what a test looks like and what not. That describes the coding standards and even explains the business logic where needed.\nAs well the usage of before and after hooks that enforce a controlled state. A guard script for these hooks which validates the assertions, so that a weakened check gets caught. (more on this on the next post).\nAnd of course, always review the changes. Always!\n\nWhat happened? What where the results?\n\nCLAUDE is back in my test automations.\nFaster and better than before.\nNo more weakening tests.\n\nSo no, I didn't stop using AI\nBut I stopped using CLAUDE without guardrails.\n\nThat was a big lesson for me to learn.\n\n👉 Have you ever got such AI surprises? How did you handle it?",
+        "media": "https://media.licdn.com/dms/image/v2/D4E22AQGvmCWZwgoR4w/feedshare-image-high-res/B4EaBlweZXIkAU-/0/1788413601789?e=2147483647&v=beta&t=Wl97dkxXZ3vghF5Vpso9bN0mMysxFk35zbM52lIiwWo",
+        "images": [
+          "https://media.licdn.com/dms/image/v2/D4E22AQGvmCWZwgoR4w/feedshare-image-high-res/B4EaBlweZXIkAU-/0/1788413601789?e=2147483647&v=beta&t=Wl97dkxXZ3vghF5Vpso9bN0mMysxFk35zbM52lIiwWo"
+        ],
+        "image": "https://media.licdn.com/dms/image/v2/D4E22AQGvmCWZwgoR4w/feedshare-image-high-res/B4EaBlweZXIkAU-/0/1788413601789?e=2147483647&v=beta&t=Wl97dkxXZ3vghF5Vpso9bN0mMysxFk35zbM52lIiwWo",
+        "author": {
+          "name": "li-user-15",
+          "url": "https://de.linkedin.com/in/li-user-14",
+          "image": "https://scrubbed.invalid/li-user-16",
+          "followers": 2316
+        },
+        "comments": [],
+        "likeCount": 5,
+        "commentCount": 0
+      },
+      {
+        "url": "https://www.linkedin.com/posts/li-user-17_ai-driven-test-automation-architecture-from-activity-7502162368026554368-pKBC",
+        "datePublished": "2026-09-06T00:34:51.916Z",
+        "description": "5,000 tests. A 0.1% flake rate per test.\n\nThat sounds excellent. It isn't.\nRun the numbers.\n0.1% per test across 5,000 tests produces 5 spurious failures per full run.\nIf the pipeline fails on any red test, the odds a clean build passes end to end are 0.999^5000.\nThat's 0.7%.\nYour team will never see a green build caused by correctness. Only green builds caused by luck and retries.\nAnd then the real damage starts.\nOnce engineers learn that red doesn't mean broken, the suite stops being a signal and becomes a tax.\nReal defects hide in the noise. Escape rate climbs. Leadership concludes automation doesn't work. The investment gets cut. The escape rate climbs further.\nThis is the actual problem AI in testing should be solving.\nNot \"write my tests for me.\" That's the least valuable thing it does.\nThe expensive part was never authoring. It was years of maintenance, daily triage, and the slow erosion of trust.\nIn most orgs, time-to-triage dominates MTTR by a factor of five. That's the component worth attacking first, which is why failure classification and flake scoring pay off long before test generation does.\nBut here's the trap.\nYou're inserting a probabilistic component into a system whose entire job is producing a trustworthy binary signal.\nGet that wrong and you haven't improved the suite. You've added a more confusing source of noise, harder to debug because its reasoning lives outside the source code.\nOne sentence governs the whole architecture:\nProbabilistic components propose. Deterministic components verify. Humans approve anything irreversible.\nIf you can draw an arrow from your model straight to a merged commit, the architecture is broken.\nFull breakdown below: 👇\n\n#TestAutomation #QualityEngineering #SDET #CICD #AIinTesting",
+        "media": null,
+        "images": [],
+        "image": null,
+        "author": {
+          "name": "li-user-18",
+          "url": "https://in.linkedin.com/in/li-user-17",
+          "image": "https://scrubbed.invalid/li-user-19",
+          "followers": 9468
+        },
+        "comments": [
+          {
+            "author": "li-user-20",
+            "text": "I structure my own agents around that propose and verify line. Scoring flakiness is the deterministic half: ten runs, then measure the drift. The model earns its keep on triage.",
+            "linkedinUrl": "https://www.linkedin.com/in/li-user-21"
+          }
+        ],
+        "likeCount": 2,
+        "commentCount": 1
+      },
+      {
+        "url": "https://www.linkedin.com/posts/li-user-22_your-mabl-dashboard-just-got-a-refresh-activity-7500639646339584000-vEhP",
+        "datePublished": "2026-09-01T19:44:06.832Z",
+        "description": "Your mabl dashboard just got a refresh.\n\nWe've consolidated the top of your workspace dashboard into four cards: tests, test runs, latest pass rate, and flaky tests. Pass rate and flaky tests are now front and center, right where they should be.\n\nHover over any card for a breakdown by test type — browser, mobile, API, performance — then click any row to land in a pre-filtered report. No more digging through menus to find what's actually failing.\n\nBuilding or debugging tests with Claude Code, Codex, or another coding agent? A new panel on the dashboard walks you through connecting your agent to mabl in as little as one step, linking straight to mabl's skills repository on GitHub.\n\nSee what's new: https://lnkd.in/et8H-fsF",
+        "media": "https://media.licdn.com/dms/image/v2/D4E22AQFwQxAS7vYCvg/feedshare-shrink_800/B4EaBegAtWG4Ac-/0/1788291845630?e=2147483647&v=beta&t=GE0WalY1N2svxctR7c238FyUX9yUoVsylXJfDiBQpTE",
+        "images": [
+          "https://media.licdn.com/dms/image/v2/D4E22AQFwQxAS7vYCvg/feedshare-shrink_800/B4EaBegAtWG4Ac-/0/1788291845630?e=2147483647&v=beta&t=GE0WalY1N2svxctR7c238FyUX9yUoVsylXJfDiBQpTE"
+        ],
+        "image": "https://media.licdn.com/dms/image/v2/D4E22AQFwQxAS7vYCvg/feedshare-shrink_800/B4EaBegAtWG4Ac-/0/1788291845630?e=2147483647&v=beta&t=GE0WalY1N2svxctR7c238FyUX9yUoVsylXJfDiBQpTE",
+        "author": {
+          "name": "li-user-22",
+          "url": "https://www.linkedin.com/company/li-user-22",
+          "image": "https://scrubbed.invalid/li-user-23",
+          "followers": 11904
+        },
+        "comments": [
+          {
+            "author": "li-user-24",
+            "text": "Putting flaky tests next to pass rate is the right call. A 94 percent pass rate reads fine until you notice the same six tests are the ones failing, and an average hides that completely.\n\nThe agent panel is the interesting part. An agent debugging a failing test usually only sees the assertion that blew up, not whether that test failed differently on the last three runs. Run history is what turns a guess into a fix.",
+            "linkedinUrl": "https://www.linkedin.com/company/li-user-25"
+          }
+        ],
+        "likeCount": 13,
+        "commentCount": 1
+      },
+      {
+        "url": "https://www.linkedin.com/posts/li-user-26_frugaltesting-qualityengineering-softwaretesting-activity-7500466731325386752-5zXO",
+        "datePublished": "2026-09-01T08:17:00.643Z",
+        "description": "The dangerous part of a flaky test isn't the false failure. It's what happens when teams stop investigating.\n\nGoogle found that 𝟴𝟰% 𝗼𝗳 𝘁𝗵𝗲 𝗽𝗮𝘀𝘀-𝘁𝗼-𝗳𝗮𝗶𝗹 𝘁𝗿𝗮𝗻𝘀𝗶𝘁𝗶𝗼𝗻𝘀 they observed involved a flaky test.\n\nAt Google's scale, 𝟭𝟲% 𝗼𝗳 𝘁𝗲𝘀𝘁𝘀 𝘀𝗵𝗼𝘄 𝘀𝗼𝗺𝗲 𝗹𝗲𝘃𝗲𝗹 𝗼𝗳 𝗳𝗹𝗮𝗸𝗶𝗻𝗲𝘀𝘀.\n\nSo \"probably just flaky\" becomes a reasonable assumption - right up until it's wrong.\n\nNobody ignores a defect on purpose. But when false alarms happen often enough, teams learn to dismiss them.\nAnd eventually, the excuse for a false alarm becomes indistinguishable from the excuse for a real regression.\n\nThat's where the risk sits.\n\nIf your release process can't distinguish the two, your test suite starts measuring confidence instead of quality.\n\nThe next time a test is labelled \"𝗳𝗹𝗮𝗸𝘆,\" ask one question:\nDid we prove it was flaky, or did it simply pass the second time?\n\n#FrugalTesting #QualityEngineering #SoftwareTesting #EngineeringLeadership #CTO #ReleaseManagement #WomenInTech",
+        "media": "https://media.licdn.com/dms/image/v2/D4D22AQEbU56Vq0hhUA/feedshare-shrink_800/B4DaBcCvzxJEAc-/0/1788250619418?e=2147483647&v=beta&t=6OKs2xtRGDDVn2LlSj8GS2zArtOub4c_NiT-OO3EfU8",
+        "images": [
+          "https://media.licdn.com/dms/image/v2/D4D22AQEbU56Vq0hhUA/feedshare-shrink_800/B4DaBcCvzxJEAc-/0/1788250619418?e=2147483647&v=beta&t=6OKs2xtRGDDVn2LlSj8GS2zArtOub4c_NiT-OO3EfU8"
+        ],
+        "image": "https://media.licdn.com/dms/image/v2/D4D22AQEbU56Vq0hhUA/feedshare-shrink_800/B4DaBcCvzxJEAc-/0/1788250619418?e=2147483647&v=beta&t=6OKs2xtRGDDVn2LlSj8GS2zArtOub4c_NiT-OO3EfU8",
+        "author": {
+          "name": "li-user-27",
+          "url": "https://in.linkedin.com/in/li-user-26",
+          "image": "https://scrubbed.invalid/li-user-28",
+          "followers": 25340
+        },
+        "comments": [
+          {
+            "author": "li-user-29",
+            "text": "This is such an important distinction. A test passing on the second run doesn't necessarily make the first failure flaky. Proving the cause behind the failure is what helps teams maintain trust in their test suite and avoid normalizing real regressions.",
+            "linkedinUrl": "https://in.linkedin.com/in/li-user-30"
+          },
+          {
+            "author": "li-user-31",
+            "text": "A flaky test suite erodes developer trust faster than actual software bugs. If a test failure can't be reliably reproduced and diagnosed, it should be quarantined immediately so it doesn't mask real regressions.",
+            "linkedinUrl": "https://in.linkedin.com/in/li-user-32"
+          },
+          {
+            "author": "li-user-33",
+            "text": "Flaky tests can seriously impact release confidence by creating false positives. A strong test strategy should distinguish genuine regressions from test instability through failure analysis, retries, and consistent monitoring of flaky-test patterns.",
+            "linkedinUrl": "https://in.linkedin.com/in/li-user-34"
+          },
+          {
+            "author": "li-user-35",
+            "text": "That gap between assumption and reality is brutal, plenty of real regressions get quietly retired as flaky just to keep the pipeline green.",
+            "linkedinUrl": "https://in.linkedin.com/in/li-user-36"
+          },
+          {
+            "author": "li-user-37",
+            "text": "This is such an important distinction. A flaky test should be investigated, not automatically dismissed. Re-running until it passes can hide the very regression we're trying to catch.",
+            "linkedinUrl": "https://in.linkedin.com/in/li-user-38"
+          },
+          {
+            "author": "li-user-39",
+            "text": "This is exactly the kind of quality problem teams underestimate until it starts affecting release confidence. Well said, Bharti.",
+            "linkedinUrl": "https://in.linkedin.com/in/li-user-40"
+          },
+          {
+            "author": "li-user-41",
+            "text": "#cfbr",
+            "linkedinUrl": "https://in.linkedin.com/in/li-user-42"
+          }
+        ],
+        "likeCount": 36,
+        "commentCount": 13
+      },
+      {
+        "url": "https://www.linkedin.com/posts/li-user-43_devops-qa-playwright-activity-7502272939577368576-IPrI",
+        "datePublished": "2026-09-06T07:54:14.284Z",
+        "description": "\"Works on my machine\" is an answer. \"Works in local, fails in CI\" is a symptom.\n\nThe moment a developer sees a red pipeline and says \"Ah, it's just a flaky QA test, just re-run it,\" the test suite has officially lost its value.\n\nQuality isn't a gate at the end of the sprint that QA guards with a whip. If developers don't trust the automated suite, they won't look at the failures. And if they don't look at the failures, your CI pipeline is just an expensive electricity consumer.\n\nThree rules to restore trust in your test suite:\nDelete boat-anchor tests: If a test has been failing for two weeks and nobody cares, delete it. Git remembers.\nShift setup to API: Stop wasting 15 seconds per test clicking through login screens.\nZero tolerance for flakiness: Quarantine flaky tests immediately until they are fixed.\n\nA suite of 20 reliable tests beats 200 flaky tests every single day.\nHow do you handle flaky builds in your team? Quarantine or infinite re-runs?\n\n#DevOps #QA #Playwright #SoftwareQuality #Agile",
+        "media": null,
+        "images": [],
+        "image": null,
+        "author": {
+          "name": "li-user-44",
+          "url": "https://il.linkedin.com/in/li-user-43",
+          "image": "https://scrubbed.invalid/li-user-45",
+          "followers": 2240
+        },
+        "comments": [
+          {
+            "author": "li-user-46",
+            "text": "The \"boat anchor\" test point hits harder here than in code. A flaky test nobody trusts is worse than no test; it's actively teaching the team to ignore red. We run something similar: any test failing twice with no fix in progress gets deleted or quarantined, no exceptions. 20 tests people actually trust beat 200 they've learned to click through.",
+            "linkedinUrl": "https://il.linkedin.com/in/li-user-47"
+          },
+          {
+            "author": "li-user-48",
+            "text": "The point about 20 reliable tests beating 200 flaky ones really stands out. We often measure process quality by volume, more tests, more controls, more checks, when the real question is whether people trust the signal enough to act on it.",
+            "linkedinUrl": "https://ca.linkedin.com/in/li-user-49"
+          },
+          {
+            "author": "li-user-50",
+            "text": "Completely agree. In embedded regressions, \"flaky\" behavior is especially dangerous because timing bugs and race conditions can look exactly like unstable tests. I would quarantine the test - but always with an owner and a deadline - because infinite re-runs only hide the signal.",
+            "linkedinUrl": "https://il.linkedin.com/in/li-user-51"
+          },
+          {
+            "author": "li-user-52",
+            "text": "This is such an important point. Reliability builds trust faster than coverage. I’d take 20 tests the team actually believes over 200 tests everyone has learned to ignore.",
+            "linkedinUrl": "https://il.linkedin.com/in/li-user-53"
+          },
+          {
+            "author": "li-user-54",
+            "text": "Yes, we’ve seen the same in RevOps: once alerts get noisy, people stop trusting the signal, and flaky tests do exactly that to CI.",
+            "linkedinUrl": "https://me.linkedin.com/in/li-user-55"
+          },
+          {
+            "author": "li-user-56",
+            "text": "Very true, Vadim. Once people stop trusting test results, the pipeline becomes noise instead of a safety net. Reliable tests are much more valuable than a large test suite that nobody believes in.",
+            "linkedinUrl": "https://il.linkedin.com/in/li-user-57"
+          },
+          {
+            "author": "li-user-58",
+            "text": "This is a good reminder that a control system only has value while people trust its signals. Once failures become “normal noise,” the real risk is that the important warning gets ignored too.",
+            "linkedinUrl": "https://il.linkedin.com/in/li-user-59"
+          }
+        ],
+        "likeCount": 9,
+        "commentCount": 7
+      },
+      {
+        "url": "https://www.linkedin.com/posts/li-user-60_cicd-devops-testautomation-activity-7500697795272577024-lYid",
+        "datePublished": "2026-09-01T23:35:10.600Z",
+        "description": "There's a pattern that shows up once a test suite gets big enough. Every test wired straight to a live dependency. The real API, the shared staging box, the third-party sandbox. It feels honest. You're testing the real thing, right?\n\nThen the provider has a rough morning and 200 tests go red. Not one of them caught a bug. They caught latency.\n\nThe fix we keep relearning is a seam. One layer you control, sitting between your tests and the outside world. A fake, an adapter, a contract test that pins down the provider's shape. Your tests talk to the seam. The seam talks to reality, on your terms.\n\nIt happens because direct wiring is the fastest thing to write. Realism now, flakiness later. And flaky tests cost more than time. They train people to ignore red, and that's the one thing a suite can't afford.\n\nYou still need real integration checks. Just not scattered across every unit test, one per provider.\n\nWhere's the line for you between a test that's realistic and one that's just coupled to someone else's uptime?\n\n#CICD #DevOps #TestAutomation #FlakyTests",
+        "media": "https://media.licdn.com/dms/image/v2/D5610AQF0kp7xjcEN5A/image-shrink_1280/B56aBfU5SDH0Ac-/0/1788305708560?e=2147483647&v=beta&t=ZpsUGPs4BnCX2jfNeUWyzxoIEWxXNVz2aOsMVeiO1aA",
+        "images": [
+          "https://media.licdn.com/dms/image/v2/D5610AQF0kp7xjcEN5A/image-shrink_1280/B56aBfU5SDH0Ac-/0/1788305708560?e=2147483647&v=beta&t=ZpsUGPs4BnCX2jfNeUWyzxoIEWxXNVz2aOsMVeiO1aA"
+        ],
+        "image": "https://media.licdn.com/dms/image/v2/D5610AQF0kp7xjcEN5A/image-shrink_1280/B56aBfU5SDH0Ac-/0/1788305708560?e=2147483647&v=beta&t=ZpsUGPs4BnCX2jfNeUWyzxoIEWxXNVz2aOsMVeiO1aA",
+        "author": {
+          "name": "li-user-61",
+          "url": "https://www.linkedin.com/in/li-user-60",
+          "image": "https://scrubbed.invalid/li-user-62",
+          "followers": 724
+        },
+        "comments": [
+          {
+            "author": "li-user-61",
+            "text": "Contract tests are the underrated middle ground here. They pin the provider's shape so you catch breaking changes without needing the provider live or inheriting its downtime. How do you keep those contracts from quietly going stale?\n\nMore on this here: https://dev.to/james_lin/tried-corsairdevcorsair-today-a-practical-gateway-test-drive-bd0",
+            "linkedinUrl": "https://www.linkedin.com/in/li-user-60"
+          },
+          {
+            "author": "li-user-63",
+            "text": "This is the exact failure mode CI/CD suites hit once they scale — one flaky third-party dependency and dozens of tests go red for reasons that have nothing to do with the code under test. Contract tests are underrated for this in API-heavy stacks (RestAssured is where they earn their keep most) since they pin the provider's shape without needing it live. The staleness question is the real open problem though — most teams only notice a contract drifted when the mock and the real integration test disagree.",
+            "linkedinUrl": "https://in.linkedin.com/in/li-user-64"
+          }
+        ],
+        "likeCount": 1,
+        "commentCount": 2
+      },
+      {
+        "url": "https://www.linkedin.com/posts/li-user-65_i-spent-part-of-this-week-testing-out-shiplight-activity-7501338251878813696-cQgy",
+        "datePublished": "2026-09-03T18:00:07.306Z",
+        "description": "I spent part of this week testing out Shiplight AI. It's a different take on AI test automation, and worth a look.\n\nI used Claude + the Shiplight skill to create a few tests. What Shiplight gives you is a simple YAML test definition that captures the intent of the test, then transpiles that into Playwright underneath.\n\nThe interesting part is what happens when the app changes.\n\nInstead of constantly fixing selectors and maintaining generated test code, Shiplight can re-resolve the right elements, regenerate the Playwright, and auto-fix a lot of the breakage, and the run keeps going, with nothing to commit.\n\nSo the tradeoff starts to change: more coverage doesn't have to mean more maintenance.\n\nThe YAML is also much easier to understand and review than the generated code, and you don't really have to write it by hand - your AI coding tool does that through the Shiplight skill.\n\nIt ships with a reporter too, so you can see failures, flaky tests, and why things broke.\n\nReadable intent on top, Playwright underneath, with a lot less maintenance in between.\n\nCool product, do check it out!\n\nYou can try it for free today: https://lnkd.in/gyJarj37",
+        "media": "https://media.licdn.com/dms/image/v2/D5622AQFG7Suo2XshrA/feedshare-shrink_800/B56aBle_OjIAAc-/0/1788409017571?e=2147483647&v=beta&t=glf6Ddnr8d7dBZmgwQwfX6ZdQCLEpKQVZeoMO_DL1U4",
+        "images": [
+          "https://media.licdn.com/dms/image/v2/D5622AQFG7Suo2XshrA/feedshare-shrink_800/B56aBle_OjIAAc-/0/1788409017571?e=2147483647&v=beta&t=glf6Ddnr8d7dBZmgwQwfX6ZdQCLEpKQVZeoMO_DL1U4"
+        ],
+        "image": "https://media.licdn.com/dms/image/v2/D5622AQFG7Suo2XshrA/feedshare-shrink_800/B56aBle_OjIAAc-/0/1788409017571?e=2147483647&v=beta&t=glf6Ddnr8d7dBZmgwQwfX6ZdQCLEpKQVZeoMO_DL1U4",
+        "author": {
+          "name": "li-user-66",
+          "url": "https://www.linkedin.com/in/li-user-65",
+          "image": "https://scrubbed.invalid/li-user-67",
+          "followers": 11839
+        },
+        "comments": [
+          {
+            "author": "li-user-68",
+            "text": "How would it know if the app changes or developer left a bug? Does it have the understanding of code/ requirements  without tester giving the intent manually?",
+            "linkedinUrl": "https://www.linkedin.com/in/li-user-69"
+          },
+          {
+            "author": "li-user-20",
+            "text": "YAML you can read and review is the piece that stands out. I check the intent before the code in my own agent runs. Curious how the auto-fix tells a stale locator from a real app change.",
+            "linkedinUrl": "https://www.linkedin.com/in/li-user-21"
+          }
+        ],
+        "likeCount": 11,
+        "commentCount": 4
+      }
+    ],
+    "cursor": "2"
+  }
+}

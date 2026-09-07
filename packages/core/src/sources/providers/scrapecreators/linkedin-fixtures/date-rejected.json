@@ -1,0 +1,11 @@
+{
+  "httpStatus": 400,
+  "body": {
+    "success": false,
+    "credits_remaining": 2023,
+    "credits_charged": 0,
+    "error": "bad_request",
+    "errorStatus": 400,
+    "message": "date_posted must be one of the following: last-hour, last-day, last-week, last-month, last-year"
+  }
+}

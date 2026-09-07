@@ -1,0 +1,11 @@
+{
+  "httpStatus": 404,
+  "body": {
+    "success": false,
+    "credits_remaining": 2020,
+    "credits_charged": 0,
+    "error": "not_found",
+    "errorStatus": 404,
+    "message": "No posts found"
+  }
+}

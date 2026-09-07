@@ -1,0 +1,232 @@
+{
+  "note": "US-054. The four numbers that decide whether LinkedIn is worth offering through this provider, computed from the answers in this folder.",
+  "capturedAt": "2026-09-07T05:04:37.056Z",
+  "calls": [
+    {
+      "call": "credentials-rejected",
+      "httpStatus": 401,
+      "elapsedMs": 875,
+      "creditsCharged": null,
+      "topLevelKeys": [
+        "success",
+        "message"
+      ],
+      "itemsKey": null,
+      "itemCount": 0,
+      "itemKeys": [],
+      "dateField": null,
+      "newest": null,
+      "oldest": null,
+      "orderedNewestFirst": false,
+      "ids": []
+    },
+    {
+      "call": "credentials-accepted",
+      "httpStatus": 400,
+      "elapsedMs": 731,
+      "creditsCharged": 0,
+      "topLevelKeys": [
+        "success",
+        "credits_remaining",
+        "credits_charged",
+        "error",
+        "errorStatus",
+        "message"
+      ],
+      "itemsKey": null,
+      "itemCount": 0,
+      "itemKeys": [],
+      "dateField": null,
+      "newest": null,
+      "oldest": null,
+      "orderedNewestFirst": false,
+      "ids": []
+    },
+    {
+      "call": "date-rejected",
+      "httpStatus": 400,
+      "elapsedMs": 391,
+      "creditsCharged": 0,
+      "topLevelKeys": [
+        "success",
+        "credits_remaining",
+        "credits_charged",
+        "error",
+        "errorStatus",
+        "message"
+      ],
+      "itemsKey": null,
+      "itemCount": 0,
+      "itemKeys": [],
+      "dateField": null,
+      "newest": null,
+      "oldest": null,
+      "orderedNewestFirst": false,
+      "ids": []
+    },
+    {
+      "call": "search-posts",
+      "httpStatus": 200,
+      "elapsedMs": 9828,
+      "creditsCharged": 1,
+      "topLevelKeys": [
+        "success",
+        "credits_remaining",
+        "credits_charged",
+        "query",
+        "posts",
+        "cursor"
+      ],
+      "itemsKey": "posts",
+      "itemCount": 10,
+      "itemKeys": [
+        "url",
+        "datePublished",
+        "description",
+        "media",
+        "images",
+        "image",
+        "author",
+        "comments",
+        "likeCount",
+        "commentCount"
+      ],
+      "dateField": "datePublished",
+      "newest": "2026-09-04T13:00:00.031Z",
+      "oldest": "2025-04-14T13:10:50.119Z",
+      "orderedNewestFirst": false,
+      "ids": [
+        "https://www.linkedin.com/posts/virtuoso-qa_flaky-tests-causes-detection-and-how-to-activity-7500106623722475520-u_64",
+        "https://www.linkedin.com/posts/moritzplassnig_flaky-tests-were-always-an-annoying-problem-activity-7496559082884018177-y1fs",
+        "https://www.linkedin.com/posts/stefan-judis_fighting-flaky-tests-in-playwright-end-to-end-activity-7317534802570596352-w6zq",
+        "https://www.linkedin.com/posts/sidhunavjott_flaky-tests-causes-examples-and-how-to-activity-7498569521595760640-88k5",
+        "https://www.linkedin.com/posts/testyr-ai_qa-outsourcing-test-automation-testyrai-activity-7497007067895955456-ObwI",
+        "https://www.linkedin.com/posts/nikolayadvolodkin_playwright-debugging-confession-your-tests-activity-7333829746725699586-VwD6",
+        "https://www.linkedin.com/posts/autify_what-are-flaky-tests-how-to-identify-prevent-activity-7369370254663266305-N0BA",
+        "https://www.linkedin.com/posts/rockywarren_one-flaky-test-got-fixed-twelve-times-activity-7493351780211220480-Vthh",
+        "https://www.linkedin.com/posts/leapwork_a-flaky-test-is-frustrating-a-test-suite-activity-7501625111817654272-Dvgl",
+        "https://www.linkedin.com/posts/giridharan-raja-071a42245_selenium-java-testng-activity-7348689500572708864-LqPa"
+      ]
+    },
+    {
+      "call": "search-page-2",
+      "httpStatus": 200,
+      "elapsedMs": 9228,
+      "creditsCharged": 1,
+      "topLevelKeys": [
+        "success",
+        "credits_remaining",
+        "credits_charged",
+        "query",
+        "posts",
+        "cursor"
+      ],
+      "itemsKey": "posts",
+      "itemCount": 10,
+      "itemKeys": [
+        "url",
+        "datePublished",
+        "description",
+        "media",
+        "images",
+        "image",
+        "author",
+        "comments",
+        "likeCount",
+        "commentCount"
+      ],
+      "dateField": "datePublished",
+      "newest": "2026-08-27T13:43:04.018Z",
+      "oldest": "2023-05-04T16:28:01.917Z",
+      "orderedNewestFirst": false,
+      "ids": [
+        "https://www.linkedin.com/posts/rainforestqa_your-qa-environment-needs-cattle-not-activity-7396952288357031936-SyYd",
+        "https://www.linkedin.com/posts/umaabu_heres-how-functional-testing-keeps-your-activity-7369036485880180741-cIPh",
+        "https://www.linkedin.com/posts/shalini-s-3b310523a_playwright-qaengineer-testautomation-activity-7498069090503127041-Y9mM",
+        "https://www.linkedin.com/posts/tatiana-bystrova-7248041a2_qualityassurance-testautomation-softwaretesting-activity-7498650617754845187-XgFC",
+        "https://www.linkedin.com/posts/austin-chadwick-3a58151a4_dont-do-e2e-testing-activity-7328509413990858752-Zq6S",
+        "https://www.linkedin.com/posts/smartbear_how-to-overcome-flaky-ui-tests-activity-7059926656236314624-bG9F",
+        "https://www.linkedin.com/posts/prat3ik_is-a-random-flaky-test-blocking-your-pipeline-activity-7490759281693327360-vPTP",
+        "https://www.linkedin.com/posts/margrave_%F0%9D%97%A1%F0%9D%97%BC%F0%9D%98%81%F0%9D%97%B5%F0%9D%97%B6%F0%9D%97%BB%F0%9D%97%B4-%F0%9D%97%B1%F0%9D%97%B2%F0%9D%98%80%F0%9D%98%81%F0%9D%97%BF%F0%9D%97%BC%F0%9D%98%86%F0%9D%98%80-%F0%9D%97%B0%F0%9D%97%BC%F0%9D%97%BB%F0%9D%97%B3%F0%9D%97%B6%F0%9D%97%B1%F0%9D%97%B2%F0%9D%97%BB%F0%9D%97%B0%F0%9D%97%B2-activity-7498736846701551616-lCdY",
+        "https://www.linkedin.com/posts/albert-greenberg-376a39_flaky-tests-overhaul-at-uber-activity-7226279561313837059-ZpFI",
+        "https://www.linkedin.com/posts/y-combinator_mendral-yc-w26-keeps-your-ci-green-and-activity-7422292414415056896-Wl3U"
+      ]
+    },
+    {
+      "call": "search-last-week",
+      "httpStatus": 200,
+      "elapsedMs": 9408,
+      "creditsCharged": 1,
+      "topLevelKeys": [
+        "success",
+        "credits_remaining",
+        "credits_charged",
+        "query",
+        "posts",
+        "cursor"
+      ],
+      "itemsKey": "posts",
+      "itemCount": 10,
+      "itemKeys": [
+        "url",
+        "datePublished",
+        "description",
+        "media",
+        "images",
+        "image",
+        "author",
+        "comments",
+        "likeCount",
+        "commentCount"
+      ],
+      "dateField": "datePublished",
+      "newest": "2026-09-06T07:54:14.284Z",
+      "oldest": "2026-08-31T08:26:04.318Z",
+      "orderedNewestFirst": false,
+      "ids": [
+        "https://www.linkedin.com/posts/virtuoso-qa_flaky-tests-causes-detection-and-how-to-activity-7500106623722475520-u_64",
+        "https://www.linkedin.com/posts/leapwork_a-flaky-test-is-frustrating-a-test-suite-activity-7501625111817654272-Dvgl",
+        "https://www.linkedin.com/posts/muhammad-wasif001_softwaretesting-ci-devops-activity-7500416569940869120-OgdC",
+        "https://www.linkedin.com/posts/pvlsgnnks_i-dont-use-claude-anymore-in-my-test-automation-activity-7501150329913143297-jeho",
+        "https://www.linkedin.com/posts/himanshuai_ai-driven-test-automation-architecture-from-activity-7502162368026554368-pKBC",
+        "https://www.linkedin.com/posts/mabl_your-mabl-dashboard-just-got-a-refresh-activity-7500639646339584000-vEhP",
+        "https://www.linkedin.com/posts/bharti81_frugaltesting-qualityengineering-softwaretesting-activity-7500466731325386752-5zXO",
+        "https://www.linkedin.com/posts/vadim-lagun-813704144_devops-qa-playwright-activity-7502272939577368576-IPrI",
+        "https://www.linkedin.com/posts/jasonemerald_cicd-devops-testautomation-activity-7500697795272577024-lYid",
+        "https://www.linkedin.com/posts/butchmayhew_i-spent-part-of-this-week-testing-out-shiplight-activity-7501338251878813696-cQgy"
+      ]
+    },
+    {
+      "call": "search-no-results",
+      "httpStatus": 404,
+      "elapsedMs": 2047,
+      "creditsCharged": 0,
+      "topLevelKeys": [
+        "success",
+        "credits_remaining",
+        "credits_charged",
+        "error",
+        "errorStatus",
+        "message"
+      ],
+      "itemsKey": null,
+      "itemCount": 0,
+      "itemKeys": [],
+      "dateField": null,
+      "newest": null,
+      "oldest": null,
+      "orderedNewestFirst": false,
+      "ids": []
+    }
+  ],
+  "summary": {
+    "postsPerPage": 10,
+    "creditsPerCall": 1,
+    "orderedNewestFirst": false,
+    "newestPost": "2026-09-04T13:00:00.031Z",
+    "oldestPost": "2025-04-14T13:10:50.119Z",
+    "secondPageRepeats": 0,
+    "microDollarsPerPost": 188,
+    "dollarsPerFiftyPosts": 0.0094
+  }
+}

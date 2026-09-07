@@ -1,0 +1,77 @@
+{
+  "note": "Which request produced each file. Captured from the live API; see docs/testing.md on why these are captured and never written.",
+  "provider": "scrapecreators",
+  "platform": "linkedin",
+  "endpoint": "https://api.scrapecreators.com/v1/linkedin/search/posts",
+  "files": [
+    {
+      "file": "credentials-rejected.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v1/linkedin/search/posts?query=flaky+tests",
+        "note": "sent with a deliberately invalid key"
+      },
+      "capturedAt": "2026-09-07T05:04:05.421Z",
+      "identitiesReplaced": 0
+    },
+    {
+      "file": "credentials-accepted.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v1/linkedin/search/posts?",
+        "note": "a working key with no query: refused on the input, not on the key"
+      },
+      "capturedAt": "2026-09-07T05:04:06.153Z",
+      "identitiesReplaced": 0
+    },
+    {
+      "file": "date-rejected.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v1/linkedin/search/posts?query=flaky+tests&date_posted=yesterday-ish",
+        "note": "an invalid date_posted, to make the provider name the valid ones"
+      },
+      "capturedAt": "2026-09-07T05:04:06.544Z",
+      "identitiesReplaced": 0
+    },
+    {
+      "file": "search-posts.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v1/linkedin/search/posts?query=flaky+tests"
+      },
+      "capturedAt": "2026-09-07T05:04:16.373Z",
+      "identitiesReplaced": 71
+    },
+    {
+      "file": "search-page-2.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v1/linkedin/search/posts?query=flaky+tests&cursor=2",
+        "note": "the second page"
+      },
+      "capturedAt": "2026-09-07T05:04:25.601Z",
+      "identitiesReplaced": 76
+    },
+    {
+      "file": "search-last-week.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v1/linkedin/search/posts?query=flaky+tests&date_posted=last-week",
+        "note": "date_posted=last-week, named by the refusal"
+      },
+      "capturedAt": "2026-09-07T05:04:35.009Z",
+      "identitiesReplaced": 69
+    },
+    {
+      "file": "search-no-results.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v1/linkedin/search/posts?query=kumquat+velocipede+telemetry+brunch",
+        "note": "a phrase that cannot occur"
+      },
+      "capturedAt": "2026-09-07T05:04:37.056Z",
+      "identitiesReplaced": 0
+    }
+  ]
+}

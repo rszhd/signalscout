@@ -1,0 +1,7 @@
+{
+  "httpStatus": 200,
+  "body": {
+    "tweets": [],
+    "next_cursor": null
+  }
+}

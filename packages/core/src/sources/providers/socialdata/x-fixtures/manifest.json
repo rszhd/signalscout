@@ -1,0 +1,57 @@
+{
+  "note": "Which request produced each file. Captured from the live API; see docs/testing.md on why these are captured and never written.",
+  "provider": "socialdata",
+  "platform": "x",
+  "api": "https://api.socialdata.tools",
+  "files": [
+    {
+      "file": "credentials-rejected.json",
+      "request": {
+        "method": "GET",
+        "note": "invalid key"
+      },
+      "capturedAt": "2026-09-07T08:57:06.852Z",
+      "identitiesReplaced": 0
+    },
+    {
+      "file": "search-latest.json",
+      "request": {
+        "method": "GET",
+        "path": "/twitter/search?query=flaky%20tests&type=Latest",
+        "note": "type=Latest, no window"
+      },
+      "capturedAt": "2026-09-07T08:57:09.062Z",
+      "identitiesReplaced": 145
+    },
+    {
+      "file": "search-since.json",
+      "request": {
+        "method": "GET",
+        "path": "/twitter/search?query=flaky%20tests%20since_time%3A1788685029&type=Latest",
+        "note": "since_time:1788685029, which is 24h back"
+      },
+      "capturedAt": "2026-09-07T08:57:10.519Z",
+      "identitiesReplaced": 42
+    },
+    {
+      "file": "search-page-2.json",
+      "request": {
+        "method": "GET",
+        "path": "/twitter/search?query=flaky%20tests&type=Latest&cursor=DAADDAABCgABHRmTBtwW8A0KAAIdFk7B1dYgHwAIAAIAAAACCAADAAAAAAgABAAAAAAKAAUdGaI44QAnEAoABh0Zojjg_9jwCwAHAAAA8EVtUEM2d0FBQWZRL2dHSk4wdkdwL0FBQUFCUWRGNGY0Qk5ZQitSMFlOMDYyMTJFSkhSWllBRmlYY0trZEZ4aStxOXFnQmgwWk9vWkIyZ0FySFJrYTlhaVc0TlVkRjM3YWlSYnhheDBYVzYzMEZzSHJIUlpPd2RYV0lCOGRGbWRlL1JzQXBCMFhWcDZBVzBGWkhSZkg4Sy9hOGFrZEdEOXRSOWJBaXgwWWx6SDZsOUIwSFJaMzh0aFhBUmdkR1JyeWZaYlI0QjBXaElEYlY3RDFIUmN3dHJhWFFHY2RGMXF6cmxaQVh4MFprd2JjRnZBTgAA",
+        "note": "the cursor from search-latest"
+      },
+      "capturedAt": "2026-09-07T08:57:13.230Z",
+      "identitiesReplaced": 146
+    },
+    {
+      "file": "search-no-results.json",
+      "request": {
+        "method": "GET",
+        "path": "/twitter/search?query=kumquat%20velocipede%20telemetry%20brunch&type=Latest",
+        "note": "a phrase that cannot occur"
+      },
+      "capturedAt": "2026-09-07T08:57:14.730Z",
+      "identitiesReplaced": 0
+    }
+  ]
+}

@@ -1,0 +1,482 @@
+{
+  "httpStatus": 200,
+  "body": {
+    "tweets": [
+      {
+        "tweet_created_at": "2026-09-07T07:50:44.000000Z",
+        "id": 2096868759189254100,
+        "id_str": "2096868759189254157",
+        "type": "reply",
+        "conversation_id_str": "2096660284005847047",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "@x-user-1 Targeting the user boundary keeps tests fast. How do you handle flaky async calls in those small tests?",
+        "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+        "truncated": false,
+        "in_reply_to_status_id": 2096844342203675100,
+        "in_reply_to_status_id_str": "2096844342203675054",
+        "in_reply_to_user_id": "x-user-2",
+        "in_reply_to_user_id_str": "x-user-3",
+        "in_reply_to_screen_name": "x-user-1",
+        "user": {
+          "id": "x-user-4",
+          "id_str": "x-user-5",
+          "name": "x-user-6",
+          "screen_name": "x-user-7",
+          "location": null,
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 747,
+          "friends_count": 477,
+          "listed_count": 0,
+          "favourites_count": 2865,
+          "statuses_count": 1904,
+          "created_at": "2020-10-29T08:20:50.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-8",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-9",
+          "can_dm": false,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 0,
+        "retweet_count": 0,
+        "favorite_count": 0,
+        "views_count": 13,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "x-user-3",
+              "indices": [
+                0,
+                13
+              ],
+              "name": "x-user-10",
+              "screen_name": "x-user-1"
+            }
+          ],
+          "display_text_range": [
+            14,
+            117
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-09-07T01:24:04.000000Z",
+        "id": 2096771449822511000,
+        "id_str": "2096771449822511147",
+        "type": "reply",
+        "conversation_id_str": "2096600341420614051",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "@x-user-11 benchmarks are cute until the agent hits a messy repo, stale docs, flaky tests, and one cursed bash script from 2018. price per token is trivia. cost per correct shipped task is the scoreboard.",
+        "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+        "truncated": false,
+        "in_reply_to_status_id": 2096600341420614100,
+        "in_reply_to_status_id_str": "2096600341420614051",
+        "in_reply_to_user_id": "x-user-12",
+        "in_reply_to_user_id_str": "x-user-13",
+        "in_reply_to_screen_name": "x-user-11",
+        "user": {
+          "id": "x-user-14",
+          "id_str": "x-user-15",
+          "name": "x-user-16",
+          "screen_name": "x-user-17",
+          "location": null,
+          "url": "",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 92,
+          "friends_count": 58,
+          "listed_count": 3,
+          "favourites_count": 1166,
+          "statuses_count": 1945,
+          "created_at": "2026-02-13T21:41:32.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-18",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-19",
+          "can_dm": false,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 0,
+        "retweet_count": 0,
+        "favorite_count": 0,
+        "views_count": 5,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "x-user-13",
+              "indices": [
+                0,
+                11
+              ],
+              "name": "x-user-20",
+              "screen_name": "x-user-11"
+            }
+          ],
+          "display_text_range": [
+            12,
+            205
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-09-06T23:06:09.000000Z",
+        "id": 2096736743915446500,
+        "id_str": "2096736743915446485",
+        "type": "reply",
+        "conversation_id_str": "2096736725921898691",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "If your deploy time drops but your flaky rate spikes, you didn't optimize, you reorganized the chaos. Real speed is boring: isolated tests, deterministic setup, and no ghost in the machine.",
+        "source": "<a href=\"https://github.com/InnocentEdem\" rel=\"nofollow\">Quessy-x-manager</a>",
+        "truncated": false,
+        "in_reply_to_status_id": 2096736741746983400,
+        "in_reply_to_status_id_str": "2096736741746983339",
+        "in_reply_to_user_id": "x-user-21",
+        "in_reply_to_user_id_str": "x-user-21",
+        "in_reply_to_screen_name": "x-user-22",
+        "user": {
+          "id": "x-user-21",
+          "id_str": "x-user-21",
+          "name": "x-user-23",
+          "screen_name": "x-user-22",
+          "location": null,
+          "url": "",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": false,
+          "followers_count": 123,
+          "friends_count": 506,
+          "listed_count": 4,
+          "favourites_count": 123,
+          "statuses_count": 97,
+          "created_at": "2013-10-22T13:10:27.000000Z",
+          "profile_banner_url": "",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-24",
+          "can_dm": false,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 0,
+        "retweet_count": 0,
+        "favorite_count": 0,
+        "views_count": 5,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "display_text_range": [
+            0,
+            189
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-09-06T23:06:06.000000Z",
+        "id": 2096736730309120500,
+        "id_str": "2096736730309120480",
+        "type": "reply",
+        "conversation_id_str": "2096736725921898691",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "The three tests that shared state weren't slow or flaky on their own. They were only slow because they waited on each other's leftovers. Once we gave each shard its own process and database, the six minutes felt almost accidental.",
+        "source": "<a href=\"https://github.com/InnocentEdem\" rel=\"nofollow\">Quessy-x-manager</a>",
+        "truncated": false,
+        "in_reply_to_status_id": 2096736728123847000,
+        "in_reply_to_status_id_str": "2096736728123846947",
+        "in_reply_to_user_id": "x-user-21",
+        "in_reply_to_user_id_str": "x-user-21",
+        "in_reply_to_screen_name": "x-user-22",
+        "user": {
+          "id": "x-user-21",
+          "id_str": "x-user-21",
+          "name": "x-user-23",
+          "screen_name": "x-user-22",
+          "location": null,
+          "url": "",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": false,
+          "followers_count": 123,
+          "friends_count": 506,
+          "listed_count": 4,
+          "favourites_count": 123,
+          "statuses_count": 97,
+          "created_at": "2013-10-22T13:10:27.000000Z",
+          "profile_banner_url": "",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-24",
+          "can_dm": false,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 1,
+        "retweet_count": 0,
+        "favorite_count": 0,
+        "views_count": 2,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "display_text_range": [
+            0,
+            230
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-09-06T19:14:11.000000Z",
+        "id": 2096678365478461400,
+        "id_str": "2096678365478461476",
+        "type": "tweet",
+        "conversation_id_str": "2096678365478461476",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "https://t.co/mg6k9xGNk0",
+        "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+        "truncated": false,
+        "in_reply_to_status_id": null,
+        "in_reply_to_status_id_str": null,
+        "in_reply_to_user_id": null,
+        "in_reply_to_user_id_str": null,
+        "in_reply_to_screen_name": null,
+        "user": {
+          "id": "x-user-25",
+          "id_str": "x-user-26",
+          "name": "x-user-27",
+          "screen_name": "x-user-28",
+          "location": null,
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 113,
+          "friends_count": 100,
+          "listed_count": 1,
+          "favourites_count": 118,
+          "statuses_count": 625,
+          "created_at": "2023-12-14T15:48:55.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-29",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-30",
+          "can_dm": false,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 0,
+        "retweet_count": 0,
+        "favorite_count": 0,
+        "views_count": 100,
+        "bookmark_count": 0,
+        "lang": "zxx",
+        "entities": {
+          "urls": [
+            {
+              "display_url": "x.com/i/article/2096…",
+              "expanded_url": "https://x.com/i/article/2096675037101039620",
+              "indices": [
+                0,
+                23
+              ],
+              "url": "https://t.co/mg6k9xGNk0"
+            }
+          ],
+          "display_text_range": [
+            0,
+            23
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-09-06T17:24:13.000000Z",
+        "id": 2096650691771281700,
+        "id_str": "2096650691771281775",
+        "type": "reply",
+        "conversation_id_str": "2096650685005914275",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "English Test Tasks - Rough Notes\n\nFix the login bug. Sometimes users get redirected back to login even after successful authentication. Find out why and fix it.\n\nAdd dark mode. Keep the current design mostly the same, just make sure everything looks good in dark mode too.\n\nCheck the API for unnecessary calls. It feels like we're calling the backend too many times on some pages. Reduce them if possible.\n\nMake the dashboard load faster. Don't break existing behavior.\n\nAdd a search box to the users page. Search should work by name and email. Partial matches are fine.\n\nRefactor the payment code. It's getting messy. Keep behavior exactly the same and add tests around anything risky.\n\nThere's some weird mobile layout issue around 375px width. Find it and fix it without changing desktop layout.\n\nAdd pagination to the activity log. Maybe 50 items per page. Existing filters should still work.\n\nLook through the repo and find dead code / unused dependencies. Remove only things you're confident aren't used.\n\nImprove error handling for external API failures. Users shouldn't just see a blank screen when the API is down.\n\nAdd rate limiting to the public API endpoints. Pick reasonable defaults and document what you changed.\n\nWe need CSV export for the reports page. Export should respect the currently selected filters.\n\nCheck if there are any obvious security problems in the auth flow. Fix safe/obvious ones and report anything that needs a larger design change.\n\nAdd basic caching to the expensive stats endpoint. Don't return stale data for too long.\n\nThe test suite is flaky somewhere. Run it multiple times, identify the flaky tests, and fix the root cause instead of just adding retries.\n\nAdd a health check endpoint for deployment monitoring. Keep it lightweight and don't expose sensitive information.\n\nImprove the README setup instructions. Assume a new developer has cloned the repo and knows nothing about this project.\n\nCheck accessibility on the main user flows. Fix obvious keyboard navigation, labels, contrast, and focus issues.\n\nThere's duplicated validation logic between frontend and backend. Clean it up where practical, but don't turn this into a huge rewrite.\n\nDo a general production-readiness review. Look for things that could cause failures, data loss, security issues, bad performance, or painful debugging. Fix low-risk issues directly and make a short report for anything that shouldn't be changed without approval.\n👇️",
+        "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+        "truncated": false,
+        "in_reply_to_status_id": 2096650688386531300,
+        "in_reply_to_status_id_str": "2096650688386531385",
+        "in_reply_to_user_id": "x-user-31",
+        "in_reply_to_user_id_str": "x-user-32",
+        "in_reply_to_screen_name": "x-user-33",
+        "user": {
+          "id": "x-user-31",
+          "id_str": "x-user-32",
+          "name": "x-user-34",
+          "screen_name": "x-user-33",
+          "location": null,
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 209,
+          "friends_count": 243,
+          "listed_count": 3,
+          "favourites_count": 2197,
+          "statuses_count": 1887,
+          "created_at": "2026-03-05T12:39:56.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-35",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-36",
+          "can_dm": false,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 1,
+        "retweet_count": 0,
+        "favorite_count": 0,
+        "views_count": 22,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "hashtags": [],
+          "smarttags": [],
+          "symbols": [],
+          "urls": [],
+          "user_mentions": [],
+          "display_text_range": [
+            0,
+            279
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-09-06T13:30:28.000000Z",
+        "id": 2096591867454410800,
+        "id_str": "2096591867454410868",
+        "type": "tweet",
+        "conversation_id_str": "2096591867454410868",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "Developer productivity isn't about typing faster.\n\nIt’s about:\n• Automating repetitive CI/CD chores\n• Scripting routine database seeds\n• Killing flaky tests immediately\n\nProtect your focus time like your runway depends on it. It does.\n\n#developer #devtools #productivity #saas",
+        "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+        "truncated": false,
+        "in_reply_to_status_id": null,
+        "in_reply_to_status_id_str": null,
+        "in_reply_to_user_id": null,
+        "in_reply_to_user_id_str": null,
+        "in_reply_to_screen_name": null,
+        "user": {
+          "id": "x-user-37",
+          "id_str": "x-user-38",
+          "name": "x-user-39",
+          "screen_name": "x-user-40",
+          "location": null,
+          "url": "",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 342,
+          "friends_count": 152,
+          "listed_count": 1,
+          "favourites_count": 1093,
+          "statuses_count": 924,
+          "created_at": "2023-12-21T04:55:33.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-41",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-42",
+          "can_dm": true,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 0,
+        "retweet_count": 0,
+        "favorite_count": 0,
+        "views_count": 34,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "hashtags": [
+            {
+              "indices": [
+                236,
+                246
+              ],
+              "text": "developer"
+            },
+            {
+              "indices": [
+                247,
+                256
+              ],
+              "text": "devtools"
+            },
+            {
+              "indices": [
+                257,
+                270
+              ],
+              "text": "productivity"
+            },
+            {
+              "indices": [
+                271,
+                276
+              ],
+              "text": "saas"
+            }
+          ],
+          "display_text_range": [
+            0,
+            276
+          ]
+        },
+        "is_pinned": false
+      }
+    ],
+    "next_cursor": "DAADDAABCgABHRmTBtwW8A0KAAIdGJcx-pfQdAAIAAIAAAACCAADAAAAAAgABAAAAAAKAAUdGaI6mQAnEAoABh0ZojqY_9jwCwAHAAAAaEVtUEM2d0FBQWZRL2dHSk4wdkdwL0FBQUFBY2RHT1hkWHBjZ0pCMFpPb1pCMmdBckhSa2E5YWlXNE5VZEdNeXlGUnF4YngwWWx6SDZsOUIwSFJrYThuMlcwZUFkR1pNRzNCYndEUT09AAA"
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "note": "What each call did to the account balance. This provider reports no per-call charge, so its own balance either side of a call is the only honest instrument.",
+  "balanceBefore": 0.0812,
+  "balanceAfter": 0.0718,
+  "calls": [
+    {
+      "call": "credentials-rejected",
+      "httpStatus": 401,
+      "spentUsd": 0,
+      "note": "sent with a deliberately invalid key; the balance is another account's"
+    },
+    {
+      "call": "search-latest",
+      "path": "/twitter/search?query=flaky%20tests&type=Latest",
+      "httpStatus": 200,
+      "elapsedMs": 1667,
+      "balanceBefore": 0.0812,
+      "balanceAfter": 0.07719999999999999,
+      "spentUsd": 0.004,
+      "note": "type=Latest, no window"
+    },
+    {
+      "call": "search-since",
+      "path": "/twitter/search?query=flaky%20tests%20since_time%3A1788685029&type=Latest",
+      "httpStatus": 200,
+      "elapsedMs": 1024,
+      "balanceBefore": 0.07719999999999999,
+      "balanceAfter": 0.0758,
+      "spentUsd": 0.0014,
+      "note": "since_time:1788685029, which is 24h back"
+    },
+    {
+      "call": "search-page-2",
+      "path": "/twitter/search?query=flaky%20tests&type=Latest&cursor=DAADDAABCgABHRmTBtwW8A0KAAIdFk7B1dYgHwAIAAIAAAACCAADAAAAAAgABAAAAAAKAAUdGaI44QAnEAoABh0Zojjg_9jwCwAHAAAA8EVtUEM2d0FBQWZRL2dHSk4wdkdwL0FBQUFCUWRGNGY0Qk5ZQitSMFlOMDYyMTJFSkhSWllBRmlYY0trZEZ4aStxOXFnQmgwWk9vWkIyZ0FySFJrYTlhaVc0TlVkRjM3YWlSYnhheDBYVzYzMEZzSHJIUlpPd2RYV0lCOGRGbWRlL1JzQXBCMFhWcDZBVzBGWkhSZkg4Sy9hOGFrZEdEOXRSOWJBaXgwWWx6SDZsOUIwSFJaMzh0aFhBUmdkR1JyeWZaYlI0QjBXaElEYlY3RDFIUmN3dHJhWFFHY2RGMXF6cmxaQVh4MFprd2JjRnZBTgAA",
+      "httpStatus": 200,
+      "elapsedMs": 2153,
+      "balanceBefore": 0.0758,
+      "balanceAfter": 0.0718,
+      "spentUsd": 0.004,
+      "note": "the cursor from search-latest"
+    },
+    {
+      "call": "search-no-results",
+      "path": "/twitter/search?query=kumquat%20velocipede%20telemetry%20brunch&type=Latest",
+      "httpStatus": 200,
+      "elapsedMs": 844,
+      "balanceBefore": 0.0718,
+      "balanceAfter": 0.0718,
+      "spentUsd": 0,
+      "note": "a phrase that cannot occur"
+    }
+  ]
+}

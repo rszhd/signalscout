@@ -1,0 +1,1812 @@
+{
+  "httpStatus": 200,
+  "body": {
+    "tweets": [
+      {
+        "tweet_created_at": "2026-09-04T14:16:23.000000Z",
+        "id": 2095878645105807600,
+        "id_str": "2095878645105807627",
+        "type": "reply",
+        "conversation_id_str": "2095594035033563178",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "@x-user-1 Show horse vs workhorse is the right split. Demo latency and tasteful diffs win the timeline. Day to day product work wants a model that survives half-written specs, flaky tests, and the third retry without turning theatrical. Fun is not the same as shippable.",
+        "source": "",
+        "truncated": false,
+        "in_reply_to_status_id": 2095594035033563100,
+        "in_reply_to_status_id_str": "2095594035033563178",
+        "in_reply_to_user_id": "x-user-2",
+        "in_reply_to_user_id_str": "x-user-2",
+        "in_reply_to_screen_name": "x-user-1",
+        "user": {
+          "id": "x-user-3",
+          "id_str": "x-user-3",
+          "name": "x-user-4",
+          "screen_name": "x-user-5",
+          "location": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 126,
+          "friends_count": 422,
+          "listed_count": 0,
+          "favourites_count": 116,
+          "statuses_count": 1398,
+          "created_at": "2009-08-23T18:52:23.000000Z",
+          "profile_banner_url": "",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-6",
+          "can_dm": false,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 0,
+        "retweet_count": 0,
+        "favorite_count": 0,
+        "views_count": 40,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "x-user-2",
+              "indices": [
+                0,
+                15
+              ],
+              "name": "x-user-7",
+              "screen_name": "x-user-1"
+            }
+          ],
+          "display_text_range": [
+            16,
+            276
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-09-04T13:57:00.000000Z",
+        "id": 2095873769306784000,
+        "id_str": "2095873769306784051",
+        "type": "tweet",
+        "conversation_id_str": "2095873769306784051",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "Flaky tests are worse than no tests. Once a suite cries wolf enough times, nobody reads the red anymore.\n\n#BuildInPublic #SoftwareTesting #QA",
+        "source": "",
+        "truncated": false,
+        "in_reply_to_status_id": null,
+        "in_reply_to_status_id_str": null,
+        "in_reply_to_user_id": null,
+        "in_reply_to_user_id_str": null,
+        "in_reply_to_screen_name": null,
+        "user": {
+          "id": "x-user-8",
+          "id_str": "x-user-9",
+          "name": "x-user-10",
+          "screen_name": "x-user-11",
+          "location": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": false,
+          "followers_count": 0,
+          "friends_count": 14,
+          "listed_count": 0,
+          "favourites_count": 2,
+          "statuses_count": 64,
+          "created_at": "2019-05-28T21:06:30.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-12",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-13",
+          "can_dm": false,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 0,
+        "retweet_count": 0,
+        "favorite_count": 0,
+        "views_count": 9,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "hashtags": [
+            {
+              "indices": [
+                106,
+                120
+              ],
+              "text": "BuildInPublic"
+            },
+            {
+              "indices": [
+                121,
+                137
+              ],
+              "text": "SoftwareTesting"
+            },
+            {
+              "indices": [
+                138,
+                141
+              ],
+              "text": "QA"
+            }
+          ],
+          "display_text_range": [
+            0,
+            141
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-09-04T12:54:25.000000Z",
+        "id": 2095858020018237700,
+        "id_str": "2095858020018237795",
+        "type": "quote",
+        "conversation_id_str": "2095858020018237795",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "300 SUB-AGENTS. ZERO AUTO-MERGES.\n\nThat is how you build a serious 24/7 repo operations desk.\n\nKimi K3 can coordinate the parallel swarm and hold up to one million tokens of context.\n\nGrok Build can inspect code, run tests, edit files, and operate inside CI.\n\nSplit the system into six roles:\n\nTRIAGE sorts every issue.\nFIX touches only bounded failures.\nTEST hunts flaky suites.\nDEPENDENCY watches CVEs.\nRELEASE prepares changelogs.\nALERT wakes the human when the blast radius is real.\n\nLint, formatting, and known flaky tests can become draft PRs.\n\nApplication logic, critical security changes, and every production merge remain behind a human gate.\n\nThe goal is not replacing the engineer.\n\nIt is replacing the engineer who checks CI at 2AM because nobody else is watching.\n\nWatch everything.\nFix only what is bounded.\nEscalate everything dangerous.",
+        "source": "",
+        "truncated": false,
+        "in_reply_to_status_id": null,
+        "in_reply_to_status_id_str": null,
+        "in_reply_to_user_id": null,
+        "in_reply_to_user_id_str": null,
+        "in_reply_to_screen_name": null,
+        "user": {
+          "id": "x-user-14",
+          "id_str": "x-user-14",
+          "name": "x-user-15",
+          "screen_name": "x-user-16",
+          "location": "",
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 4302,
+          "friends_count": 2628,
+          "listed_count": 0,
+          "favourites_count": 58527,
+          "statuses_count": 33608,
+          "created_at": "2010-09-13T08:05:45.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-17",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-18",
+          "can_dm": true,
+          "affiliation_label": null
+        },
+        "quoted_status_id": 2095088203690570200,
+        "quoted_status_id_str": "2095088203690570191",
+        "is_quote_status": true,
+        "quoted_status": {
+          "tweet_created_at": "2026-09-02T09:55:27.000000Z",
+          "id": 2095088203690570200,
+          "id_str": "2095088203690570191",
+          "type": "tweet",
+          "conversation_id_str": "2095088203690570191",
+          "community_id_str": null,
+          "community_name": null,
+          "text": null,
+          "full_text": "https://t.co/q4aU28lxwq",
+          "source": "",
+          "truncated": false,
+          "in_reply_to_status_id": null,
+          "in_reply_to_status_id_str": null,
+          "in_reply_to_user_id": null,
+          "in_reply_to_user_id_str": null,
+          "in_reply_to_screen_name": null,
+          "user": {
+            "id": "x-user-19",
+            "id_str": "x-user-20",
+            "name": "x-user-21",
+            "screen_name": "x-user-22",
+            "location": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "protected": false,
+            "verified": true,
+            "followers_count": 10333,
+            "friends_count": 471,
+            "listed_count": 0,
+            "favourites_count": 69257,
+            "statuses_count": 22307,
+            "created_at": "2025-05-02T16:48:51.000000Z",
+            "profile_banner_url": "https://scrubbed.invalid/x-user-23",
+            "profile_image_url_https": "https://scrubbed.invalid/x-user-24",
+            "can_dm": true,
+            "affiliation_label": null
+          },
+          "quoted_status_id": null,
+          "quoted_status_id_str": null,
+          "is_quote_status": false,
+          "quoted_status": null,
+          "retweeted_status": null,
+          "quote_count": 20,
+          "reply_count": 28,
+          "retweet_count": 6,
+          "favorite_count": 114,
+          "views_count": 122794,
+          "bookmark_count": 177,
+          "lang": "zxx",
+          "entities": {
+            "urls": [
+              {
+                "display_url": "x.com/i/article/2094…",
+                "expanded_url": "https://x.com/i/article/2094515962989125632",
+                "indices": [
+                  0,
+                  23
+                ],
+                "url": "https://t.co/q4aU28lxwq"
+              }
+            ],
+            "display_text_range": [
+              0,
+              23
+            ]
+          },
+          "is_pinned": false
+        },
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 0,
+        "retweet_count": 0,
+        "favorite_count": 15,
+        "views_count": 767,
+        "bookmark_count": 2,
+        "lang": "en",
+        "entities": {
+          "hashtags": [],
+          "symbols": [],
+          "timestamps": [],
+          "urls": [],
+          "user_mentions": [],
+          "media": [
+            {
+              "additional_media_info": {
+                "monetizable": false
+              },
+              "allow_download_status": {
+                "allow_download": true
+              },
+              "display_url": "pic.x.com/StogUKyrRa",
+              "expanded_url": "https://x.com/x-user-16/status/2095858020018237795/video/1",
+              "ext_master_playlist_only": [],
+              "ext_media_availability": {
+                "status": "Available"
+              },
+              "ext_playlists": [],
+              "id_str": "2095857900669276162",
+              "indices": [
+                277,
+                300
+              ],
+              "media_key": "13_2095857900669276162",
+              "media_url_https": "https://pbs.twimg.com/amplify_video_thumb/2095857900669276162/img/xanamFUSJPtnk4aV.jpg",
+              "original_info": {
+                "focus_rects": [],
+                "height": 500,
+                "width": 1500
+              },
+              "sizes": {
+                "large": {
+                  "h": 500,
+                  "w": 1500
+                }
+              },
+              "type": "video",
+              "url": "https://t.co/StogUKyrRa",
+              "video_info": {
+                "aspect_ratio": [
+                  3,
+                  1
+                ],
+                "duration_millis": 16000,
+                "variants": [
+                  {
+                    "content_type": "application/x-mpegURL",
+                    "url": "https://video.twimg.com/amplify_video/2095857900669276162/pl/SPHtxXZDIXw6xxiY.m3u8"
+                  },
+                  {
+                    "bitrate": 256000,
+                    "content_type": "video/mp4",
+                    "url": "https://video.twimg.com/amplify_video/2095857900669276162/vid/avc1/810x270/EEDqNdaI1jSW4GdB.mp4"
+                  },
+                  {
+                    "bitrate": 832000,
+                    "content_type": "video/mp4",
+                    "url": "https://video.twimg.com/amplify_video/2095857900669276162/vid/avc1/1080x360/4_-N9fHgdxBCltjI.mp4"
+                  },
+                  {
+                    "bitrate": 2176000,
+                    "content_type": "video/mp4",
+                    "url": "https://video.twimg.com/amplify_video/2095857900669276162/vid/avc1/1500x500/opd7dt6HhrnnOa7k.mp4"
+                  }
+                ]
+              }
+            }
+          ],
+          "display_text_range": [
+            0,
+            276
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-09-04T07:46:23.000000Z",
+        "id": 2095780499813810400,
+        "id_str": "2095780499813810539",
+        "type": "reply",
+        "conversation_id_str": "2093014447833116908",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "@x-user-25 does the reset still hold after codex touches a legacy repo with flaky tests",
+        "source": "",
+        "truncated": false,
+        "in_reply_to_status_id": 2093014447833117000,
+        "in_reply_to_status_id_str": "2093014447833116908",
+        "in_reply_to_user_id": "x-user-26",
+        "in_reply_to_user_id_str": "x-user-27",
+        "in_reply_to_screen_name": "x-user-25",
+        "user": {
+          "id": "x-user-28",
+          "id_str": "x-user-29",
+          "name": "x-user-30",
+          "screen_name": "x-user-31",
+          "location": "",
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 6998,
+          "friends_count": 1825,
+          "listed_count": 0,
+          "favourites_count": 94596,
+          "statuses_count": 49447,
+          "created_at": "2024-06-19T18:26:54.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-32",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-33",
+          "can_dm": false,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 0,
+        "retweet_count": 0,
+        "favorite_count": 0,
+        "views_count": 51,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "x-user-27",
+              "indices": [
+                0,
+                11
+              ],
+              "name": "x-user-34",
+              "screen_name": "x-user-25"
+            }
+          ],
+          "display_text_range": [
+            12,
+            88
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-09-04T06:43:01.000000Z",
+        "id": 2095764551425778000,
+        "id_str": "2095764551425777872",
+        "type": "reply",
+        "conversation_id_str": "2095754984877178938",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "@x-user-35 @x-user-36 Hit this with a per-seat reviewer last month. Cheap model started rubber-stamping flaky tests. Switched to BYOK + one SOTA call on the dirty files only.",
+        "source": "",
+        "truncated": false,
+        "in_reply_to_status_id": 2095754984877179000,
+        "in_reply_to_status_id_str": "2095754984877178938",
+        "in_reply_to_user_id": "x-user-37",
+        "in_reply_to_user_id_str": "x-user-37",
+        "in_reply_to_screen_name": "x-user-35",
+        "user": {
+          "id": "x-user-38",
+          "id_str": "x-user-39",
+          "name": "x-user-40",
+          "screen_name": "x-user-41",
+          "location": "",
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 157,
+          "friends_count": 46,
+          "listed_count": 0,
+          "favourites_count": 79,
+          "statuses_count": 2728,
+          "created_at": "2025-02-09T05:02:10.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-42",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-43",
+          "can_dm": false,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 0,
+        "retweet_count": 0,
+        "favorite_count": 1,
+        "views_count": 266,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "x-user-37",
+              "indices": [
+                0,
+                11
+              ],
+              "name": "x-user-35",
+              "screen_name": "x-user-35"
+            },
+            {
+              "id_str": "x-user-44",
+              "indices": [
+                12,
+                23
+              ],
+              "name": "x-user-45",
+              "screen_name": "x-user-36"
+            }
+          ],
+          "display_text_range": [
+            24,
+            176
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-09-04T06:02:45.000000Z",
+        "id": 2095754420084732000,
+        "id_str": "2095754420084731974",
+        "type": "reply",
+        "conversation_id_str": "2095753222753333430",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "@x-user-46 Deterministic tests for agent tool usage is a great idea. LLM based evals are so flaky run to run, having a non LLM harness for the tool call logic itself makes debugging way faster.",
+        "source": "",
+        "truncated": false,
+        "in_reply_to_status_id": 2095753222753333500,
+        "in_reply_to_status_id_str": "2095753222753333430",
+        "in_reply_to_user_id": "x-user-47",
+        "in_reply_to_user_id_str": "x-user-48",
+        "in_reply_to_screen_name": "x-user-46",
+        "user": {
+          "id": "x-user-49",
+          "id_str": "x-user-49",
+          "name": "x-user-50",
+          "screen_name": "x-user-51",
+          "location": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "url": "",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 109,
+          "friends_count": 193,
+          "listed_count": 0,
+          "favourites_count": 1884,
+          "statuses_count": 591,
+          "created_at": "2013-04-08T09:37:22.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-52",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-53",
+          "can_dm": false,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 1,
+        "retweet_count": 0,
+        "favorite_count": 0,
+        "views_count": 58,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "x-user-48",
+              "indices": [
+                0,
+                12
+              ],
+              "name": "x-user-54",
+              "screen_name": "x-user-46"
+            }
+          ],
+          "display_text_range": [
+            13,
+            195
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-09-03T22:48:43.000000Z",
+        "id": 2095645191982256400,
+        "id_str": "2095645191982256331",
+        "type": "quote",
+        "conversation_id_str": "2095645191982256331",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "XAI ENGINEERS JUST SHOWED WHAT A 24/7 REPO OPS DESK COULD LOOK LIKE WITH GROK BOT\n\ngrok bot can watch ci, tests, dependencies and security signals continuously instead of waiting for someone to notice a broken repo hours later\n\n6 bots → 300 repo monitors → 60-second checks → triage → safe patch → draft pr → human review\n\nflaky tests, lint and deterministic failures stay inside the safe lane. regressions, cves and anything touching real logic get routed straight back to a person\n\nthe system can wait for 3 clean runs, track a 95% test threshold and prepare the fix with context, but it never merges code on its own\n\nthis is the shift from manually checking repos all day to letting grok bot run the night shift while humans keep the final decision",
+        "source": "",
+        "truncated": false,
+        "in_reply_to_status_id": null,
+        "in_reply_to_status_id_str": null,
+        "in_reply_to_user_id": null,
+        "in_reply_to_user_id_str": null,
+        "in_reply_to_screen_name": null,
+        "user": {
+          "id": "x-user-55",
+          "id_str": "x-user-56",
+          "name": "x-user-57",
+          "screen_name": "x-user-58",
+          "location": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 4598,
+          "friends_count": 1598,
+          "listed_count": 0,
+          "favourites_count": 84036,
+          "statuses_count": 60489,
+          "created_at": "2022-11-13T09:45:06.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-59",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-60",
+          "can_dm": true,
+          "affiliation_label": null
+        },
+        "quoted_status_id": 2094288068110893300,
+        "quoted_status_id_str": "2094288068110893390",
+        "is_quote_status": true,
+        "quoted_status": {
+          "tweet_created_at": "2026-08-31T04:56:00.000000Z",
+          "id": 2094288068110893300,
+          "id_str": "2094288068110893390",
+          "type": "tweet",
+          "conversation_id_str": "2094288068110893390",
+          "community_id_str": null,
+          "community_name": null,
+          "text": null,
+          "full_text": "https://t.co/VwUCjYyTXU",
+          "source": "",
+          "truncated": false,
+          "in_reply_to_status_id": null,
+          "in_reply_to_status_id_str": null,
+          "in_reply_to_user_id": null,
+          "in_reply_to_user_id_str": null,
+          "in_reply_to_screen_name": null,
+          "user": {
+            "id": "x-user-61",
+            "id_str": "x-user-62",
+            "name": "x-user-63",
+            "screen_name": "x-user-64",
+            "location": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "protected": false,
+            "verified": true,
+            "followers_count": 5157,
+            "friends_count": 1644,
+            "listed_count": 0,
+            "favourites_count": 32081,
+            "statuses_count": 21954,
+            "created_at": "2024-12-20T20:55:53.000000Z",
+            "profile_banner_url": "https://scrubbed.invalid/x-user-65",
+            "profile_image_url_https": "https://scrubbed.invalid/x-user-66",
+            "can_dm": true,
+            "affiliation_label": null
+          },
+          "quoted_status_id": null,
+          "quoted_status_id_str": null,
+          "is_quote_status": false,
+          "quoted_status": null,
+          "retweeted_status": null,
+          "quote_count": 7,
+          "reply_count": 50,
+          "retweet_count": 26,
+          "favorite_count": 149,
+          "views_count": 188312,
+          "bookmark_count": 139,
+          "lang": "zxx",
+          "entities": {
+            "urls": [
+              {
+                "display_url": "x.com/i/article/2094…",
+                "expanded_url": "https://x.com/i/article/2094223961257394176",
+                "indices": [
+                  0,
+                  23
+                ],
+                "url": "https://t.co/VwUCjYyTXU"
+              }
+            ],
+            "display_text_range": [
+              0,
+              23
+            ]
+          },
+          "is_pinned": false
+        },
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 3,
+        "retweet_count": 6,
+        "favorite_count": 19,
+        "views_count": 673,
+        "bookmark_count": 4,
+        "lang": "en",
+        "entities": {
+          "hashtags": [],
+          "symbols": [],
+          "timestamps": [],
+          "urls": [],
+          "user_mentions": [],
+          "media": [
+            {
+              "allow_download_status": {
+                "allow_download": true
+              },
+              "display_url": "pic.x.com/RHBzoKBvQE",
+              "expanded_url": "https://x.com/x-user-58/status/2095645191982256331/photo/1",
+              "ext_master_playlist_only": [],
+              "ext_media_availability": {
+                "status": "Available"
+              },
+              "ext_playlists": [],
+              "features": {
+                "large": {
+                  "faces": []
+                }
+              },
+              "id_str": "2095645178270781444",
+              "indices": [
+                276,
+                299
+              ],
+              "media_key": "3_2095645178270781444",
+              "media_url_https": "https://pbs.twimg.com/media/HRU6L7oXEAQfk3T.jpg",
+              "original_info": {
+                "focus_rects": [
+                  {
+                    "h": 420,
+                    "w": 750,
+                    "x": 0,
+                    "y": 0
+                  },
+                  {
+                    "h": 750,
+                    "w": 750,
+                    "x": 0,
+                    "y": 0
+                  },
+                  {
+                    "h": 855,
+                    "w": 750,
+                    "x": 0,
+                    "y": 0
+                  },
+                  {
+                    "h": 926,
+                    "w": 463,
+                    "x": 0,
+                    "y": 0
+                  },
+                  {
+                    "h": 926,
+                    "w": 750,
+                    "x": 0,
+                    "y": 0
+                  }
+                ],
+                "height": 926,
+                "width": 750
+              },
+              "sizes": {
+                "large": {
+                  "h": 926,
+                  "w": 750
+                }
+              },
+              "type": "photo",
+              "url": "https://t.co/RHBzoKBvQE"
+            }
+          ],
+          "display_text_range": [
+            0,
+            275
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-09-03T21:30:57.000000Z",
+        "id": 2095625620042768400,
+        "id_str": "2095625620042768432",
+        "type": "tweet",
+        "conversation_id_str": "2095625620042768432",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "doctor: do you have any allergies?\n\nme: penicillin and flaky tests",
+        "source": "",
+        "truncated": false,
+        "in_reply_to_status_id": null,
+        "in_reply_to_status_id_str": null,
+        "in_reply_to_user_id": null,
+        "in_reply_to_user_id_str": null,
+        "in_reply_to_screen_name": null,
+        "user": {
+          "id": "x-user-67",
+          "id_str": "x-user-67",
+          "name": "x-user-68",
+          "screen_name": "x-user-69",
+          "location": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 656,
+          "friends_count": 310,
+          "listed_count": 0,
+          "favourites_count": 2742,
+          "statuses_count": 1344,
+          "created_at": "2008-09-16T17:41:18.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-70",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-71",
+          "can_dm": true,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 0,
+        "retweet_count": 0,
+        "favorite_count": 2,
+        "views_count": 64,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "display_text_range": [
+            0,
+            66
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-09-03T21:05:00.000000Z",
+        "id": 2095619089519489000,
+        "id_str": "2095619089519489111",
+        "type": "quote",
+        "conversation_id_str": "2049570435096858699",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "@x-user-72 Flaky tests are reliability incidents, not background noise. Track flake rate, quarantine expiry and root-cause SLA like production defects—or real regressions will be mentally discounted. Related QA view: https://t.co/ONeJYmErS7",
+        "source": "",
+        "truncated": false,
+        "in_reply_to_status_id": 2049570435096858600,
+        "in_reply_to_status_id_str": "2049570435096858699",
+        "in_reply_to_user_id": "x-user-73",
+        "in_reply_to_user_id_str": "x-user-73",
+        "in_reply_to_screen_name": "x-user-72",
+        "user": {
+          "id": "x-user-74",
+          "id_str": "x-user-74",
+          "name": "x-user-75",
+          "screen_name": "x-user-76",
+          "location": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 73,
+          "friends_count": 108,
+          "listed_count": 0,
+          "favourites_count": 500,
+          "statuses_count": 2892,
+          "created_at": "2013-04-16T14:59:00.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-77",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-78",
+          "can_dm": false,
+          "affiliation_label": null
+        },
+        "quoted_status_id": 2095607112676061400,
+        "quoted_status_id_str": "2095607112676061319",
+        "is_quote_status": true,
+        "quoted_status": {
+          "tweet_created_at": "2026-09-03T20:17:24.000000Z",
+          "id": 2095607112676061400,
+          "id_str": "2095607112676061319",
+          "type": "tweet",
+          "conversation_id_str": "2095607112676061319",
+          "community_id_str": null,
+          "community_name": null,
+          "text": null,
+          "full_text": "AI can generate a Playwright test in seconds.\n\nBut it cannot fix a shared account corrupted by 20 parallel runs.\n\nTest generation is cheap. Trustworthy data is the new QA bottleneck.\n\nIsolate workers. Seed via APIs. Clean up deterministically.\n\nWhat causes your false failures?",
+          "source": "",
+          "truncated": false,
+          "in_reply_to_status_id": null,
+          "in_reply_to_status_id_str": null,
+          "in_reply_to_user_id": null,
+          "in_reply_to_user_id_str": null,
+          "in_reply_to_screen_name": null,
+          "user": {
+            "id": "x-user-74",
+            "id_str": "x-user-74",
+            "name": "x-user-75",
+            "screen_name": "x-user-76",
+            "location": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "protected": false,
+            "verified": true,
+            "followers_count": 73,
+            "friends_count": 108,
+            "listed_count": 0,
+            "favourites_count": 500,
+            "statuses_count": 2892,
+            "created_at": "2013-04-16T14:59:00.000000Z",
+            "profile_banner_url": "https://scrubbed.invalid/x-user-77",
+            "profile_image_url_https": "https://scrubbed.invalid/x-user-78",
+            "can_dm": false,
+            "affiliation_label": null
+          },
+          "quoted_status_id": null,
+          "quoted_status_id_str": null,
+          "is_quote_status": false,
+          "quoted_status": null,
+          "retweeted_status": null,
+          "quote_count": 1,
+          "reply_count": 1,
+          "retweet_count": 0,
+          "favorite_count": 2,
+          "views_count": 271,
+          "bookmark_count": 0,
+          "lang": "en",
+          "entities": {
+            "display_text_range": [
+              0,
+              277
+            ]
+          },
+          "is_pinned": false
+        },
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 0,
+        "retweet_count": 0,
+        "favorite_count": 0,
+        "views_count": 7,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "urls": [
+            {
+              "display_url": "x.com/AgomaMitchell/…",
+              "expanded_url": "https://x.com/x-user-76/status/2095607112676061319",
+              "indices": [
+                221,
+                244
+              ],
+              "url": "https://t.co/ONeJYmErS7"
+            }
+          ],
+          "user_mentions": [
+            {
+              "id_str": "x-user-73",
+              "indices": [
+                0,
+                14
+              ],
+              "name": "x-user-79",
+              "screen_name": "x-user-72"
+            }
+          ],
+          "display_text_range": [
+            15,
+            244
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-09-03T19:38:08.000000Z",
+        "id": 2095597227515236400,
+        "id_str": "2095597227515236437",
+        "type": "reply",
+        "conversation_id_str": "2095596020638036311",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "Astra looking strong on the parts that actually matter: long-horizon SWE and computer use. 75.2% DeepSWE and 72.6% OSWorld Offline is a real jump if it survives messy repos, flaky tests, and UIs that don’t match the sketch.The “AGI Era” line is marketing. The useful test is whether it can take a bug report, reproduce it, patch it, and pass CI without a human cleaning up the last 20%.Rolling out to a few orgs today and “everyone else very soon” is the same cadence as every prior drop. Ship it to Plus/API and let’s see if the demos hold",
+        "source": "",
+        "truncated": false,
+        "in_reply_to_status_id": 2095596020638036200,
+        "in_reply_to_status_id_str": "2095596020638036311",
+        "in_reply_to_user_id": "x-user-80",
+        "in_reply_to_user_id_str": "x-user-81",
+        "in_reply_to_screen_name": "x-user-82",
+        "user": {
+          "id": "x-user-83",
+          "id_str": "x-user-84",
+          "name": "x-user-85",
+          "screen_name": "x-user-86",
+          "location": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 5822,
+          "friends_count": 7499,
+          "listed_count": 0,
+          "favourites_count": 11502,
+          "statuses_count": 4844,
+          "created_at": "2026-03-19T01:27:14.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-87",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-88",
+          "can_dm": true,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 0,
+        "retweet_count": 1,
+        "favorite_count": 1,
+        "views_count": 832,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "x-user-81",
+              "indices": [
+                0,
+                11
+              ],
+              "name": "x-user-89",
+              "screen_name": "x-user-82"
+            }
+          ],
+          "hashtags": [],
+          "symbols": [],
+          "urls": [],
+          "display_text_range": [
+            12,
+            286
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-09-03T13:27:12.000000Z",
+        "id": 2095503881539076400,
+        "id_str": "2095503881539076322",
+        "type": "reply",
+        "conversation_id_str": "2095503879471268018",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "Without your team you'll at best (probably) turn into a PR factory. SOC2 theater, pr reviews, bob that keeps writing flaky tests, product managers. all things that will fuck up your production line. But dragging your teammates with you makes a lot of these easier and way more fun.",
+        "source": "",
+        "truncated": false,
+        "in_reply_to_status_id": 2095503879471268000,
+        "in_reply_to_status_id_str": "2095503879471268018",
+        "in_reply_to_user_id": "x-user-90",
+        "in_reply_to_user_id_str": "x-user-90",
+        "in_reply_to_screen_name": "x-user-91",
+        "user": {
+          "id": "x-user-90",
+          "id_str": "x-user-90",
+          "name": "x-user-92",
+          "screen_name": "x-user-91",
+          "location": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 653,
+          "friends_count": 444,
+          "listed_count": 0,
+          "favourites_count": 935,
+          "statuses_count": 5096,
+          "created_at": "2008-05-01T06:51:37.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-93",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-94",
+          "can_dm": true,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 0,
+        "retweet_count": 0,
+        "favorite_count": 0,
+        "views_count": 13,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "hashtags": [],
+          "symbols": [],
+          "urls": [],
+          "user_mentions": [],
+          "display_text_range": [
+            0,
+            276
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-09-03T09:04:47.000000Z",
+        "id": 2095437843468304600,
+        "id_str": "2095437843468304600",
+        "type": "tweet",
+        "conversation_id_str": "2095437843468304600",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "🧱 Open source is infrastructure. Treat it that way.\n\nNew Signals: Sebastian Bergmann joins Michael Dowden:\n🧪 PHPUnit 13.3 &amp; flaky tests\n🔐 dependency hygiene\n🤖 AI security reports\n💸 OSS funding\n\n🎥 https://t.co/kp0jroEWyY\n\n#IntPHPcon #PHP #OpenSource https://t.co/u1N2T0jLFt",
+        "source": "",
+        "truncated": false,
+        "in_reply_to_status_id": null,
+        "in_reply_to_status_id_str": null,
+        "in_reply_to_user_id": null,
+        "in_reply_to_user_id_str": null,
+        "in_reply_to_screen_name": null,
+        "user": {
+          "id": "x-user-95",
+          "id_str": "x-user-95",
+          "name": "x-user-96",
+          "screen_name": "x-user-97",
+          "location": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": false,
+          "followers_count": 4021,
+          "friends_count": 2297,
+          "listed_count": 0,
+          "favourites_count": 839,
+          "statuses_count": 11982,
+          "created_at": "2008-06-03T13:55:03.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-98",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-99",
+          "can_dm": false,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 0,
+        "retweet_count": 0,
+        "favorite_count": 0,
+        "views_count": 126,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "hashtags": [
+            {
+              "indices": [
+                225,
+                235
+              ],
+              "text": "IntPHPcon"
+            },
+            {
+              "indices": [
+                236,
+                240
+              ],
+              "text": "PHP"
+            },
+            {
+              "indices": [
+                241,
+                252
+              ],
+              "text": "OpenSource"
+            }
+          ],
+          "urls": [
+            {
+              "display_url": "youtube.com/watch?v=plAdMk…",
+              "expanded_url": "https://www.youtube.com/watch?v=plAdMkGzOaM&utm_source=twitter&utm_medium=social&utm_campaign=content",
+              "indices": [
+                200,
+                223
+              ],
+              "url": "https://t.co/kp0jroEWyY"
+            }
+          ],
+          "media": [
+            {
+              "display_url": "pic.x.com/u1N2T0jLFt",
+              "expanded_url": "https://x.com/x-user-97/status/2095437843468304600/photo/1",
+              "ext_master_playlist_only": [],
+              "ext_media_availability": {
+                "status": "Available"
+              },
+              "ext_playlists": [],
+              "features": {
+                "large": {
+                  "faces": [
+                    {
+                      "h": 429,
+                      "w": 429,
+                      "x": 746,
+                      "y": 724
+                    },
+                    {
+                      "h": 422,
+                      "w": 422,
+                      "x": 169,
+                      "y": 501
+                    }
+                  ]
+                }
+              },
+              "id_str": "2095437707329589253",
+              "indices": [
+                253,
+                276
+              ],
+              "media_key": "3_2095437707329589253",
+              "media_url_https": "https://pbs.twimg.com/media/HRR9fiJW0AUKPHF.jpg",
+              "original_info": {
+                "focus_rects": [
+                  {
+                    "h": 784,
+                    "w": 1400,
+                    "x": 0,
+                    "y": 0
+                  },
+                  {
+                    "h": 1400,
+                    "w": 1400,
+                    "x": 0,
+                    "y": 0
+                  },
+                  {
+                    "h": 1400,
+                    "w": 1228,
+                    "x": 0,
+                    "y": 0
+                  },
+                  {
+                    "h": 1400,
+                    "w": 700,
+                    "x": 0,
+                    "y": 0
+                  },
+                  {
+                    "h": 1400,
+                    "w": 1400,
+                    "x": 0,
+                    "y": 0
+                  }
+                ],
+                "height": 1400,
+                "width": 1400
+              },
+              "sizes": {
+                "large": {
+                  "h": 1400,
+                  "w": 1400
+                }
+              },
+              "type": "photo",
+              "url": "https://t.co/u1N2T0jLFt"
+            }
+          ],
+          "display_text_range": [
+            0,
+            252
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-09-03T07:38:42.000000Z",
+        "id": 2095416178764120300,
+        "id_str": "2095416178764120231",
+        "type": "reply",
+        "conversation_id_str": "2095172426925801608",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "@x-user-100 watched long running coding agents optimize around flaky tests, so more loops made failures harder to detect",
+        "source": "",
+        "truncated": false,
+        "in_reply_to_status_id": 2095172426925801700,
+        "in_reply_to_status_id_str": "2095172426925801608",
+        "in_reply_to_user_id": "x-user-101",
+        "in_reply_to_user_id_str": "x-user-102",
+        "in_reply_to_screen_name": "x-user-100",
+        "user": {
+          "id": "x-user-28",
+          "id_str": "x-user-29",
+          "name": "x-user-30",
+          "screen_name": "x-user-31",
+          "location": "",
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 6998,
+          "friends_count": 1825,
+          "listed_count": 0,
+          "favourites_count": 94596,
+          "statuses_count": 49447,
+          "created_at": "2024-06-19T18:26:54.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-32",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-33",
+          "can_dm": false,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 0,
+        "retweet_count": 0,
+        "favorite_count": 0,
+        "views_count": 32,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "x-user-102",
+              "indices": [
+                0,
+                8
+              ],
+              "name": "x-user-103",
+              "screen_name": "x-user-100"
+            }
+          ],
+          "display_text_range": [
+            9,
+            117
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-09-03T05:39:17.000000Z",
+        "id": 2095386126160974000,
+        "id_str": "2095386126160974101",
+        "type": "reply",
+        "conversation_id_str": "2095332368022384872",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "@x-user-104 the winning loop probably looks like repro, failing test, patch PR, rollback plan. trusted auto-merge has to survive monorepos, flaky tests, owners files, and rollback hooks.",
+        "source": "",
+        "truncated": false,
+        "in_reply_to_status_id": 2095332368022385000,
+        "in_reply_to_status_id_str": "2095332368022384872",
+        "in_reply_to_user_id": "x-user-105",
+        "in_reply_to_user_id_str": "x-user-105",
+        "in_reply_to_screen_name": "x-user-104",
+        "user": {
+          "id": "x-user-106",
+          "id_str": "x-user-107",
+          "name": "x-user-108",
+          "screen_name": "x-user-109",
+          "location": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "url": "",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 8972,
+          "friends_count": 696,
+          "listed_count": 0,
+          "favourites_count": 71481,
+          "statuses_count": 40854,
+          "created_at": "2023-07-03T14:33:51.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-110",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-111",
+          "can_dm": true,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 0,
+        "retweet_count": 0,
+        "favorite_count": 1,
+        "views_count": 26,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "x-user-105",
+              "indices": [
+                0,
+                13
+              ],
+              "name": "x-user-112",
+              "screen_name": "x-user-104"
+            }
+          ],
+          "display_text_range": [
+            14,
+            188
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-09-03T01:04:08.000000Z",
+        "id": 2095316882261750300,
+        "id_str": "2095316882261750253",
+        "type": "reply",
+        "conversation_id_str": "2095290392799502538",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "@x-user-113 @x-user-114 82.6% with four genuine failures is a useful signal, but what were the failures—wrong implementation, flaky tests, or getting stuck inside Claude Code?",
+        "source": "",
+        "truncated": false,
+        "in_reply_to_status_id": 2095290392799502600,
+        "in_reply_to_status_id_str": "2095290392799502538",
+        "in_reply_to_user_id": "x-user-115",
+        "in_reply_to_user_id_str": "x-user-115",
+        "in_reply_to_screen_name": "x-user-113",
+        "user": {
+          "id": "x-user-116",
+          "id_str": "x-user-117",
+          "name": "x-user-118",
+          "screen_name": "x-user-119",
+          "location": "",
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 1599,
+          "friends_count": 355,
+          "listed_count": 0,
+          "favourites_count": 8470,
+          "statuses_count": 10394,
+          "created_at": "2021-09-19T14:15:11.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-120",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-121",
+          "can_dm": true,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 1,
+        "retweet_count": 0,
+        "favorite_count": 1,
+        "views_count": 43,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "x-user-115",
+              "indices": [
+                0,
+                13
+              ],
+              "name": "x-user-122",
+              "screen_name": "x-user-113"
+            },
+            {
+              "id_str": "x-user-123",
+              "indices": [
+                14,
+                26
+              ],
+              "name": "x-user-114",
+              "screen_name": "x-user-114"
+            }
+          ],
+          "display_text_range": [
+            27,
+            178
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-09-03T00:32:04.000000Z",
+        "id": 2095308810571125200,
+        "id_str": "2095308810571125229",
+        "type": "reply",
+        "conversation_id_str": "2095256578559807810",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "@x-user-124 Rings true. Our invisible support was quarantining flaky tests and rewriting a runbook nobody asked for. Two boring weeks. Then a quarter where deploys stopped waking anyone up, and nobody connected the two. The guy who shipped the flashy feature got the applause.",
+        "source": "",
+        "truncated": false,
+        "in_reply_to_status_id": 2095256578559807700,
+        "in_reply_to_status_id_str": "2095256578559807810",
+        "in_reply_to_user_id": "x-user-125",
+        "in_reply_to_user_id_str": "x-user-125",
+        "in_reply_to_screen_name": "x-user-124",
+        "user": {
+          "id": "x-user-126",
+          "id_str": "x-user-126",
+          "name": "x-user-127",
+          "screen_name": "x-user-128",
+          "location": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 23,
+          "friends_count": 108,
+          "listed_count": 0,
+          "favourites_count": 69,
+          "statuses_count": 128,
+          "created_at": "2026-05-02T11:23:46.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-129",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-130",
+          "can_dm": false,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 0,
+        "retweet_count": 0,
+        "favorite_count": 1,
+        "views_count": 581,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "x-user-125",
+              "indices": [
+                0,
+                10
+              ],
+              "name": "x-user-131",
+              "screen_name": "x-user-124"
+            }
+          ],
+          "display_text_range": [
+            11,
+            275
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-09-02T17:22:35.000000Z",
+        "id": 2095200728247624000,
+        "id_str": "2095200728247623975",
+        "type": "reply",
+        "conversation_id_str": "2094854599840559528",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "@x-user-132 spent 8 months at an old job just deleting dead code and fixing flaky tests. nobody clapped, but deploys went from weekly and terrifying to ten a day.",
+        "source": "",
+        "truncated": false,
+        "in_reply_to_status_id": 2094854599840559600,
+        "in_reply_to_status_id_str": "2094854599840559528",
+        "in_reply_to_user_id": "x-user-133",
+        "in_reply_to_user_id_str": "x-user-133",
+        "in_reply_to_screen_name": "x-user-132",
+        "user": {
+          "id": "x-user-134",
+          "id_str": "x-user-135",
+          "name": "x-user-136",
+          "screen_name": "x-user-137",
+          "location": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 60,
+          "friends_count": 6,
+          "listed_count": 0,
+          "favourites_count": 1309,
+          "statuses_count": 800,
+          "created_at": "2026-08-17T08:23:33.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-138",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-139",
+          "can_dm": false,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 0,
+        "retweet_count": 0,
+        "favorite_count": 0,
+        "views_count": 2,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "x-user-133",
+              "indices": [
+                0,
+                14
+              ],
+              "name": "x-user-140",
+              "screen_name": "x-user-132"
+            }
+          ],
+          "display_text_range": [
+            15,
+            165
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-09-02T16:58:56.000000Z",
+        "id": 2095194777210020400,
+        "id_str": "2095194777210020274",
+        "type": "tweet",
+        "conversation_id_str": "2095194777210020274",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "Everyone talks about the test pyramid, but few follow it.\n\nHere's what actually happens:\n\n❌ 70% UI tests (slow, flaky)\n❌ 20% integration tests\n❌ 10% unit tests\n\nFlip it:\n✅ 70% unit tests (fast, reliable)\n✅ 20% integration tests\n✅ 10% UI tests (critical paths only)\n\nSpeed beats coverage if coverage slows you down.",
+        "source": "",
+        "truncated": false,
+        "in_reply_to_status_id": null,
+        "in_reply_to_status_id_str": null,
+        "in_reply_to_user_id": null,
+        "in_reply_to_user_id_str": null,
+        "in_reply_to_screen_name": null,
+        "user": {
+          "id": "x-user-141",
+          "id_str": "x-user-142",
+          "name": "x-user-143",
+          "screen_name": "x-user-144",
+          "location": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "url": "",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 233,
+          "friends_count": 132,
+          "listed_count": 0,
+          "favourites_count": 1554,
+          "statuses_count": 2178,
+          "created_at": "2017-12-19T10:07:59.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-145",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-146",
+          "can_dm": true,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 0,
+        "retweet_count": 0,
+        "favorite_count": 0,
+        "views_count": 7,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "hashtags": [],
+          "symbols": [],
+          "urls": [],
+          "user_mentions": [],
+          "display_text_range": [
+            0,
+            271
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-09-02T16:58:48.000000Z",
+        "id": 2095194746193101000,
+        "id_str": "2095194746193100975",
+        "type": "tweet",
+        "conversation_id_str": "2095194746193100975",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "Everyone talks about the test pyramid, but few follow it.\n\nHere's what actually happens:\n\n❌ 70% UI tests (slow, flaky)\n❌ 20% integration tests\n❌ 10% unit tests\n\nFlip it:\n✅ 70% unit tests (fast, reliable)\n✅ 20% integration tests\n✅ 10% UI tests (critical paths only)\n\nSpeed beats coverage if coverage slows you down.",
+        "source": "",
+        "truncated": false,
+        "in_reply_to_status_id": null,
+        "in_reply_to_status_id_str": null,
+        "in_reply_to_user_id": null,
+        "in_reply_to_user_id_str": null,
+        "in_reply_to_screen_name": null,
+        "user": {
+          "id": "x-user-141",
+          "id_str": "x-user-142",
+          "name": "x-user-143",
+          "screen_name": "x-user-144",
+          "location": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "url": "",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 233,
+          "friends_count": 132,
+          "listed_count": 0,
+          "favourites_count": 1554,
+          "statuses_count": 2178,
+          "created_at": "2017-12-19T10:07:59.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-145",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-146",
+          "can_dm": true,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 0,
+        "retweet_count": 0,
+        "favorite_count": 0,
+        "views_count": 9,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "hashtags": [],
+          "symbols": [],
+          "urls": [],
+          "user_mentions": [],
+          "display_text_range": [
+            0,
+            271
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-09-02T16:58:40.000000Z",
+        "id": 2095194709903937800,
+        "id_str": "2095194709903937818",
+        "type": "tweet",
+        "conversation_id_str": "2095194709903937818",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "Everyone talks about the test pyramid, but few follow it.\n\nHere's what actually happens:\n\n❌ 70% UI tests (slow, flaky)\n❌ 20% integration tests\n❌ 10% unit tests\n\nFlip it:\n✅ 70% unit tests (fast, reliable)\n✅ 20% integration tests\n✅ 10% UI tests (critical paths only)\n\nSpeed beats coverage if coverage slows you down.",
+        "source": "",
+        "truncated": false,
+        "in_reply_to_status_id": null,
+        "in_reply_to_status_id_str": null,
+        "in_reply_to_user_id": null,
+        "in_reply_to_user_id_str": null,
+        "in_reply_to_screen_name": null,
+        "user": {
+          "id": "x-user-141",
+          "id_str": "x-user-142",
+          "name": "x-user-143",
+          "screen_name": "x-user-144",
+          "location": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "url": "",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 233,
+          "friends_count": 132,
+          "listed_count": 0,
+          "favourites_count": 1554,
+          "statuses_count": 2178,
+          "created_at": "2017-12-19T10:07:59.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-145",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-146",
+          "can_dm": true,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 0,
+        "retweet_count": 0,
+        "favorite_count": 0,
+        "views_count": 11,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "hashtags": [],
+          "symbols": [],
+          "urls": [],
+          "user_mentions": [],
+          "display_text_range": [
+            0,
+            271
+          ]
+        },
+        "is_pinned": false
+      }
+    ],
+    "next_cursor": "DAADDAABCgABHRmTBtwW8A0KAAIdE6B84xoRGgAIAAIAAAACCAADAAAAAAgABAAAAAEKAAUdGaI44QAnEAoABh0Zojjg_7HgCwAHAAAByEVtUEM2d0FBQWZRL2dHSk4wdkdwL0FBQUFDZ2RGMXF6cmxaQVh4MFlOMDYyMTJFSkhSWUtGcm1YQVRNZEU2Q0ZWaHJBcngwVG9JeU8yMkd5SFJVNk11dGJrTXNkRnhpK3E5cWdCaDBXV0FCWWwzQ3BIUldtd1hTVzROQWRHVHFHUWRvQUt4MFZLR1g0MjJBd0hSUnA2Wi9YZ0tjZEYxdXQ5QmJCNngwVG9IempHaEVhSFJXZGlwR2E4RVlkRmJWQ3VwZkJheDBVRDVwYkZ6SHRIUlpuWHYwYkFLUWRGOGZ3cjlyeHFSMFlQMjFIMXNDTEhSUUlRd1RXa2UwZEdScnlmWmJSNEIwVXVhMkVsc0RpSFJhRWdOdFhzUFVkRnpDMnRwZEFaeDBaa3diY0Z2QU5IUmVIK0FUV0Fma2RGbmZ5MkZjQkdCMFZJblYzVmpCWEhSWU9oZlhiMFFzZEZIMmQxTmJBMkIwWkd2V29sdURWSFJkKzJva1c4V3NkRkU2VWRSdFJGUjBUcGZZa1Z1RW5IUlpPd2RYV0lCOGRGMWFlZ0Z0QldSMFYrOFBPMXpGakhSaVhNZnFYMEhRZEZRNlRVbGJRVlE9PQAA"
+  }
+}

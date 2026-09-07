@@ -163,9 +163,46 @@ describe("the draft itself", () => {
 
     expect(text()).toContain("an unknown amount");
   });
+
+  it("counts edits and confirms that the final text was copied", async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(globalThis.navigator, "clipboard", {
+      configurable: true,
+      value: { writeText },
+    });
+    server({});
+    screen = await mount(<ReplyDraft matchId={matchId} />);
+
+    await press("Draft reply");
+
+    const area = field("Draft reply");
+    setValue(area, "A shorter reply.");
+    await settle();
+    expect(text()).toContain("16 characters");
+
+    await press("Copy draft");
+
+    expect(writeText).toHaveBeenCalledWith("A shorter reply.");
+    expect(text()).toContain("Copied");
+  });
 });
 
 describe("the saved prompts", () => {
+  it("edits prompts in a dialog and returns focus when it closes", async () => {
+    server({ prompts: { prompts: [] } });
+    screen = await mount(<ReplyDraft matchId={matchId} />);
+
+    await press("Edit prompts");
+
+    const dialog = screen.container.querySelector('[role="dialog"]');
+    expect(dialog?.getAttribute("aria-modal")).toBe("true");
+
+    await press("Cancel");
+
+    expect(screen.container.querySelector('[role="dialog"]')).toBeNull();
+    expect(document.activeElement).toBe(button("Edit prompts"));
+  });
+
   it("offers the ones the account has, and none by default", async () => {
     server({ prompts: { prompts: [prompt()] } });
     screen = await mount(<ReplyDraft matchId={matchId} />);

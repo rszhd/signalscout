@@ -1,109 +1,544 @@
-/*
- * The draft panel in the inbox. US-040.
- *
- * It sits between what the model saw and the verdict buttons, which is the
- * order a person works in: read why this matched, write a reply, say whether
- * it was a good lead. docs/design.md — every colour and radius here is a token.
- */
+/* The reply composer in the inbox. Prompt editing opens in its own dialog. */
 
 .reply-draft {
-  margin-top: var(--space-6, 1rem);
-  padding-top: var(--space-6, 1rem);
-  border-top: 1px solid var(--line);
+  margin-top: var(--space-8);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  box-shadow: 0 1px 2px rgb(20 24 21 / 3%);
+}
+
+.reply-draft-heading {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: var(--space-3);
+  align-items: center;
+  padding: 18px var(--space-5);
+  border-bottom: 1px solid var(--line);
+  background: linear-gradient(135deg, var(--surface) 35%, var(--accent-soft));
+}
+
+.reply-draft-mark {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #dbe4f2;
+  border-radius: 10px;
+  color: var(--accent-text);
+  background: var(--surface);
+  box-shadow: 0 1px 2px rgb(38 67 111 / 8%);
+  font-size: 1.25rem;
+}
+
+.reply-draft-heading h3 {
+  margin: 0;
+  font-size: var(--text-label);
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+.reply-draft-heading p {
+  margin: 3px 0 0;
+  color: var(--muted);
+  font-size: var(--text-xs);
+  line-height: 1.45;
+}
+
+.reply-draft-safety {
+  min-height: 28px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 9px;
+  border: 1px solid #d9e1d6;
+  border-radius: 999px;
+  color: #52634e;
+  background: rgb(255 255 255 / 72%);
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.reply-draft-safety-icon,
+.reply-draft-button-icon {
+  display: grid;
+  place-items: center;
+  line-height: 1;
+}
+
+.reply-draft-safety-icon {
+  width: 14px;
+  height: 14px;
+  font-size: 0.6875rem;
+  font-weight: 700;
 }
 
 .reply-draft-controls {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
+  display: grid;
+  grid-template-columns: minmax(150px, 1fr) auto auto;
+  gap: var(--space-2);
+  align-items: end;
+  padding: var(--space-4) var(--space-5);
 }
 
-.reply-draft-controls .filter {
-  flex: 1 1 10rem;
+.reply-voice-field {
   min-width: 0;
+  display: grid;
+  gap: 5px;
 }
 
-.reply-draft-prompts,
-.reply-draft-result {
-  margin-top: 0.75rem;
+.reply-voice-field > span,
+.reply-dialog-select > span {
+  color: var(--muted-strong);
+  font-size: 0.75rem;
+  font-weight: 600;
 }
 
-.reply-draft-prompts textarea,
-.reply-draft-result textarea {
+.reply-voice-field select,
+.reply-dialog-select select {
   width: 100%;
-  padding: 0.5rem 0.625rem;
+  min-height: var(--control-height-compact);
+  padding: 0 31px 0 10px;
+  overflow: hidden;
+  border: 1px solid var(--line-dark);
+  border-radius: var(--radius-sm);
+  outline: none;
+  color: var(--ink);
+  background: var(--surface);
+  font-size: var(--text-sm);
+  text-overflow: ellipsis;
+}
+
+.reply-voice-field select:focus,
+.reply-dialog-select select:focus,
+.reply-draft-dialog :where(input, textarea):focus {
+  border-color: #848d85;
+  box-shadow: 0 0 0 3px rgb(25 28 26 / 6%);
+}
+
+.reply-draft-manage {
+  min-height: var(--control-height-compact);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 11px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  color: var(--muted-strong);
+  background: transparent;
+  font-size: var(--text-sm);
+  font-weight: 500;
+}
+
+.reply-draft-manage:hover,
+.reply-draft-manage[aria-expanded="true"] {
+  border-color: var(--line);
+  color: var(--ink);
+  background: var(--surface-soft);
+}
+
+.reply-draft-button-icon {
+  width: 17px;
+  height: 17px;
+  font-size: 1rem;
+}
+
+.reply-draft-generate {
+  min-height: var(--control-height-compact);
+  gap: 7px;
+  font-size: var(--text-sm);
+  white-space: nowrap;
+}
+
+.reply-draft-spinner {
+  width: 15px;
+  height: 15px;
+  border: 2px solid rgb(255 255 255 / 35%);
+  border-top-color: currentcolor;
+  border-radius: 50%;
+  animation: reply-draft-spin 650ms linear infinite;
+}
+
+@keyframes reply-draft-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.reply-draft > .form-error {
+  margin: 0 var(--space-5) var(--space-4);
+}
+
+.reply-draft-result {
+  padding: var(--space-4) var(--space-5) var(--space-5);
+  border-top: 1px solid var(--line);
+}
+
+.reply-draft-editor-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: 7px;
+}
+
+.reply-draft-editor-heading label {
+  color: var(--ink);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.reply-draft-editor-status {
+  padding: 3px 7px;
+  border-radius: 999px;
+  color: var(--accent-text);
+  background: var(--accent-soft);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.reply-draft-editor {
+  overflow: hidden;
   border: 1px solid var(--line-dark);
   border-radius: var(--radius-sm);
   background: var(--surface);
-  color: var(--ink);
-  font: inherit;
-  font-size: var(--text-xs);
-  line-height: 1.5;
+  transition:
+    border-color 140ms ease,
+    box-shadow 140ms ease;
+}
+
+.reply-draft-editor:focus-within {
+  border-color: #848d85;
+  box-shadow: 0 0 0 3px rgb(25 28 26 / 6%);
+}
+
+.reply-draft-editor textarea {
+  width: 100%;
+  min-height: 185px;
+  display: block;
+  padding: 14px 15px 10px;
+  border: 0;
+  outline: none;
+  color: var(--text-reading-color);
+  background: transparent;
+  font-size: var(--text-body);
+  line-height: 1.65;
   resize: vertical;
 }
 
-.reply-draft-prompts .field span,
-.reply-draft-result .field span {
-  display: block;
-  margin-bottom: 0.375rem;
-  font-size: 0.8125rem;
-  color: var(--muted);
-}
-
-.reply-draft-prompt-actions {
+.reply-draft-editor-meta {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
-}
-
-.reply-draft-prompt-actions input {
-  flex: 1 1 8rem;
-  min-width: 0;
-  padding: 0.375rem 0.5rem;
-  border: 1px solid var(--line-dark);
-  border-radius: var(--radius-sm);
-  background: var(--surface);
-  color: var(--ink);
-  font: inherit;
-  font-size: var(--text-xs);
-}
-
-/*
- * What the model was unsure of, under the draft rather than beside it.
- *
- * The same doubts are written into the draft itself as `[check: …]`, because
- * that is where somebody editing is looking. This list is for the ones who
- * scan, and it is why the duplication is deliberate.
- */
-.reply-draft-checks {
-  margin-top: 0.75rem;
-  padding: 0.625rem 0.75rem;
-  border-radius: var(--radius-sm);
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: 8px 12px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
   background: var(--surface-soft);
-  border: 1px solid var(--line);
+  font-size: 0.75rem;
+  line-height: 1.35;
+}
+
+.reply-draft-editor-meta span:first-child {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.reply-draft-checks {
+  margin-top: var(--space-3);
+  padding: 12px 14px;
+  border: 1px solid #ead8b7;
+  border-radius: var(--radius-sm);
+  color: #77542f;
+  background: #fff8e9;
+}
+
+.reply-draft-checks-heading {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+}
+
+.reply-draft-warning-icon {
+  width: 17px;
+  height: 17px;
+  display: grid;
+  place-items: center;
+  border: 1.5px solid currentcolor;
+  border-radius: 50%;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.reply-draft-checks-heading strong {
+  font-size: var(--text-sm);
+  font-weight: 600;
 }
 
 .reply-draft-checks ul {
-  margin: 0.375rem 0 0;
+  display: grid;
+  gap: 4px;
+  margin: 7px 0 0 24px;
   padding: 0;
-  list-style: none;
-  font-size: 0.8125rem;
-  color: var(--muted-strong);
-}
-
-.reply-draft-checks li {
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 0.25rem;
+  font-size: var(--text-xs);
+  line-height: 1.45;
 }
 
 .reply-draft-actions {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.625rem;
-  margin-top: 0.625rem;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.reply-draft-copy {
+  min-width: 120px;
+  gap: 7px;
+}
+
+.reply-draft-copy.copied {
+  background: #52634e;
+}
+
+.reply-draft-cost {
+  order: -1;
+  margin-right: auto;
+  color: var(--muted);
+  font-size: 0.75rem;
+  line-height: 1.45;
+}
+
+/* Prompt management leaves the composer and gets one focused workspace. */
+.reply-draft-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: var(--space-5);
+  background: rgb(21 26 34 / 42%);
+  backdrop-filter: blur(2px);
+}
+
+.reply-draft-dialog {
+  width: min(100%, 560px);
+  max-height: calc(100dvh - 40px);
+  display: flex;
+  overflow: hidden;
+  flex-direction: column;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.reply-draft-dialog-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  border-bottom: 1px solid var(--line);
+}
+
+.reply-draft-dialog-heading h3 {
+  margin: 0;
+  font-size: var(--text-md);
+  line-height: 1.3;
+  letter-spacing: -0.015em;
+}
+
+.reply-draft-dialog-heading p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+
+.reply-draft-dialog-heading button {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  color: var(--muted);
+  background: transparent;
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.reply-draft-dialog-heading button:hover {
+  color: var(--ink);
+  background: var(--surface-soft);
+}
+
+.reply-draft-dialog-body {
+  display: grid;
+  gap: var(--space-5);
+  overflow-y: auto;
+  padding: var(--space-5);
+}
+
+.reply-dialog-select {
+  display: grid;
+  gap: 6px;
+}
+
+.reply-draft-dialog .field > span {
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.reply-draft-dialog .field > small {
+  margin: 3px 0 8px;
+  font-size: var(--text-xs);
+}
+
+.reply-draft-dialog :where(input, textarea) {
+  width: 100%;
+  border: 1px solid var(--line-dark);
+  border-radius: var(--radius-sm);
+  outline: none;
+  color: var(--ink);
+  background: var(--surface);
+  font-size: var(--text-sm);
+}
+
+.reply-draft-dialog textarea {
+  min-height: 132px;
+  padding: 11px 12px;
+  line-height: 1.55;
+  resize: vertical;
+}
+
+.reply-draft-dialog input {
+  min-height: var(--control-height-compact);
+  padding: 0 11px;
+}
+
+.reply-prompt-name {
+  display: block;
+}
+
+.reply-draft-dialog-body .form-error {
+  margin: 0;
+}
+
+.reply-draft-dialog-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: 14px var(--space-5);
+  border-top: 1px solid var(--line);
+  background: var(--surface-soft);
+}
+
+.reply-draft-dialog-actions > div {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.reply-draft-dialog-actions :where(.primary-button, .secondary-button) {
+  min-height: var(--control-height-compact);
+  font-size: var(--text-sm);
+}
+
+.reply-draft-delete {
+  min-height: var(--control-height-compact);
+  padding: 0 4px;
+  border: 0;
+  color: #8f3f39;
+  background: transparent;
+  font-size: var(--text-sm);
+  font-weight: 500;
+}
+
+.reply-draft-delete:hover {
+  color: #6f2f2a;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (max-width: 600px) {
+  .reply-draft-heading {
+    grid-template-columns: auto minmax(0, 1fr);
+    padding-inline: var(--space-4);
+  }
+
+  .reply-draft-safety {
+    grid-column: 2;
+    justify-self: start;
+  }
+
+  .reply-draft-controls {
+    grid-template-columns: minmax(0, 1fr) auto;
+    padding-inline: var(--space-4);
+  }
+
+  .reply-draft-generate {
+    grid-column: 1 / -1;
+  }
+
+  .reply-draft-result {
+    padding-right: var(--space-4);
+    padding-left: var(--space-4);
+  }
+
+  .reply-draft > .form-error {
+    margin-right: var(--space-4);
+    margin-left: var(--space-4);
+  }
+
+  .reply-draft-dialog-backdrop {
+    place-items: end center;
+    padding: 0;
+  }
+
+  .reply-draft-dialog {
+    width: 100%;
+    max-height: 92dvh;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  }
+}
+
+@media (max-width: 420px) {
+  .reply-draft-mark {
+    width: 34px;
+    height: 34px;
+  }
+
+  .reply-draft-heading p {
+    display: none;
+  }
+
+  .reply-draft-editor-meta {
+    align-items: flex-end;
+    flex-direction: column;
+  }
+
+  .reply-draft-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .reply-draft-cost {
+    order: 0;
+    margin: 0;
+    text-align: center;
+  }
+
+  .reply-draft-dialog-heading,
+  .reply-draft-dialog-body,
+  .reply-draft-dialog-actions {
+    padding-right: var(--space-4);
+    padding-left: var(--space-4);
+  }
 }

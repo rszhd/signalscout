@@ -283,7 +283,7 @@ export function ReplyDraft({ matchId }: { matchId: string }) {
                 <textarea
                   ref={customInstructionField}
                   aria-label="Instruction for this draft"
-                  rows={5}
+                  rows={9}
                   value={dialogInstruction}
                   placeholder="Answer the pricing question first, and keep it to three sentences."
                   onChange={(event) => setDialogInstruction(event.target.value)}

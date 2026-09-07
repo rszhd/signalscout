@@ -326,7 +326,12 @@
 }
 
 .reply-draft-dialog {
-  width: min(100%, 560px);
+  /*
+   * Wider than the 560px it started at, because the thing being read here is
+   * a paragraph of instructions rather than a form field. At 560 a saved
+   * voice wrapped every eight or nine words and was hard to scan.
+   */
+  width: min(100%, 720px);
   max-height: calc(100dvh - 40px);
   display: flex;
   overflow: hidden;
@@ -397,8 +402,9 @@
 }
 
 .reply-draft-dialog .field > small {
-  margin: 3px 0 8px;
+  margin: 3px 0 10px;
   font-size: var(--text-xs);
+  line-height: 1.5;
 }
 
 .reply-draft-dialog :where(input, textarea) {
@@ -411,10 +417,19 @@
   font-size: var(--text-sm);
 }
 
+/*
+ * The instruction box, sized for reading rather than for filling in.
+ *
+ * A voice is several sentences and a person edits it in place, so this is the
+ * one control on the screen where height and line length matter more than
+ * compactness. Still resizable, because somebody pasting a long instruction
+ * will want more.
+ */
 .reply-draft-dialog textarea {
-  min-height: 132px;
-  padding: 11px 12px;
-  line-height: 1.55;
+  min-height: 240px;
+  padding: 13px 14px;
+  font-size: var(--text-label);
+  line-height: 1.65;
   resize: vertical;
 }
 

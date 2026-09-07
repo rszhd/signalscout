@@ -834,6 +834,28 @@ hand, because Reddit answers 403 to an unauthenticated request, and
 it. What the plan is not proven to be is *useful* — a name that exists can
 still be the wrong place to look.
 
+**The inbox leaves as a spreadsheet.** US-064 closed on 2026-09-07. A link
+beside the match count downloads the list *currently on screen* as CSV — every
+filter honoured, every page walked, because a screen paginates and a file
+should not.
+
+**Two things about CSV here are correctness rather than formatting.** A cell
+starting `=`, `+`, `-`, `@`, a tab or a carriage return is a formula in Excel
+and Sheets, and this file is built from strangers' words: every cell is
+prefixed so it can only be text. Proven against the database rather than only
+in a test — a post title set to `=cmd|' /C calc'!A0` came back defused, words
+intact. And the file carries a UTF-8 byte order mark, because Excel otherwise
+reads it as the local code page and the Spanish, Hebrew and emoji in this
+database open as mojibake.
+
+**Measured on the running instance**: 171 lines, 20 matches, 12 columns, and
+ten of the twenty holding a newline inside a cell — all surviving a round trip
+through a real reader.
+
+`.xlsx` was refused. Excel opens CSV, Sheets opens CSV, every CRM imports CSV,
+and an `.xlsx` writer is a library and a binary format bought for nothing.
+The label says CSV so nobody hunts for a second button.
+
 **A reply can be drafted, and this product still never posts.** US-040 closed
 on 2026-09-07. A match has a Draft reply button; pressing it asks the model
 once, and the draft arrives in a textarea with a copy action and a line saying

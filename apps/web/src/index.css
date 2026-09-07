@@ -2223,6 +2223,22 @@ a {
 .list-heading span:last-child {
   text-align: right;
 }
+/*
+ * The export link, beside the count it exports. US-064.
+ *
+ * `margin-left: auto` rather than a third flex column, so the two spans keep
+ * the spacing they had and the link sits at the end whatever they say.
+ */
+.inbox-export {
+  margin-left: auto;
+  color: var(--accent-text);
+  font-size: var(--text-xs);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.inbox-export:hover {
+  text-decoration: underline;
+}
 .match-list-column .inbox-scroll-region {
   min-height: 0;
   flex: 1;

@@ -247,6 +247,8 @@ export {
 } from "./filter/keywords.js";
 export { createLogger, type Logger, type LoggerOptions, redactedFields } from "./logger.js";
 export {
+  csvCell,
+  csvFilename,
   cursorFor,
   cursorPattern,
   defaultPageSize,
@@ -254,10 +256,12 @@ export {
   type ListMatchesOptions,
   listMatches,
   type MatchPage,
+  matchesToCsv,
   maximumPageSize,
   rankDecayPointsPerDay,
   setMatchSaved,
   UnusableCursorError,
+  utf8ByteOrderMark,
 } from "./matches/index.js";
 export {
   allMonitorQueries,

@@ -327,4 +327,66 @@ describe("the inbox route", () => {
       expect(response.json<{ verdicts: unknown[] }>().verdicts).toEqual([]);
     });
   });
+
+  /**
+   * The inbox as a spreadsheet. US-064.
+   *
+   * The escaping is asserted in `packages/core/src/matches/csv.test.ts`. What
+   * belongs here is the route's promise: the file is the list on screen, and
+   * it is not one page of it.
+   */
+  describe("the inbox export", () => {
+    it("is a CSV download named after the day", async () => {
+      await seed({ monitorId, score: 91, minutesOld: 12 });
+
+      const response = await get("/api/matches/export");
+
+      expect(response.statusCode).toBe(200);
+      expect(response.headers["content-type"]).toContain("text/csv");
+      expect(response.headers["content-disposition"]).toMatch(
+        /attachment; filename="intentwatch-inbox-\d{4}-\d{2}-\d{2}\.csv"/,
+      );
+    });
+
+    it("honours the filters the screen applied", async () => {
+      // A button that quietly exported everything would be worse than no
+      // button, because the person would not check.
+      await seed({ monitorId, score: 91, minutesOld: 12 });
+      await seed({ monitorId: otherMonitorId, score: 88, minutesOld: 20 });
+
+      const everything = await get("/api/matches/export");
+      const oneMonitor = await get(`/api/matches/export?monitorId=${monitorId}`);
+
+      expect(everything.body.trim().split("\r\n")).toHaveLength(3);
+      expect(oneMonitor.body.trim().split("\r\n")).toHaveLength(2);
+    });
+
+    it("drops what a minimum score drops", async () => {
+      await seed({ monitorId, score: 91, minutesOld: 12 });
+      await seed({ monitorId, score: 55, minutesOld: 12 });
+
+      const response = await get("/api/matches/export?minScore=70");
+
+      expect(response.body.trim().split("\r\n")).toHaveLength(2);
+    });
+
+    it("exports past the first page, because a file has no pages", async () => {
+      // The screen paginates because a screen should. Twelve rows with a
+      // ten-row page proves the walk continues.
+      for (let i = 0; i < 12; i += 1) {
+        await seed({ monitorId, score: 90 - i, minutesOld: 10 + i });
+      }
+
+      const response = await get("/api/matches/export");
+
+      expect(response.body.trim().split("\r\n")).toHaveLength(13);
+    });
+
+    it("is a header and nothing else when nothing matches", async () => {
+      const response = await get("/api/matches/export?minScore=100");
+
+      expect(response.statusCode).toBe(200);
+      expect(response.body.trim().split("\r\n")).toHaveLength(1);
+    });
+  });
 });

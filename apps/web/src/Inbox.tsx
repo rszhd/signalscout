@@ -319,16 +319,30 @@ export function Inbox() {
     };
   }, [projectId]);
 
-  const loadFirstPage = useCallback(async (): Promise<void> => {
-    setState("loading");
-    setError(null);
-
+  /**
+   * The filters, as the server takes them.
+   *
+   * One function rather than a query built where it is needed, because US-064
+   * added a second caller: the export must ask for the list on screen, and a
+   * button that quietly exported everything would be worse than no button —
+   * the person would not check. Two copies of this would drift the first time
+   * a filter is added.
+   */
+  const filterQuery = useCallback((): URLSearchParams => {
     const query = new URLSearchParams();
     if (projectId) query.set("projectId", projectId);
     if (monitorId) query.set("monitorId", monitorId);
     if (minScore > 0) query.set("minScore", String(minScore));
     if (showDismissed) query.set("includeNotRelevant", "true");
     if (showSaved) query.set("saved", "true");
+    return query;
+  }, [projectId, monitorId, minScore, showDismissed, showSaved]);
+
+  const loadFirstPage = useCallback(async (): Promise<void> => {
+    setState("loading");
+    setError(null);
+
+    const query = filterQuery();
 
     try {
       const answer = await requestJson<MatchPage>(`/api/matches?${query}`);
@@ -342,7 +356,7 @@ export function Inbox() {
       setError(messageFor(cause, "The inbox could not be loaded."));
       setState("error");
     }
-  }, [projectId, monitorId, minScore, showDismissed, showSaved]);
+  }, [filterQuery]);
 
   useEffect(() => {
     void loadFirstPage();
@@ -638,6 +652,16 @@ export function Inbox() {
                 {page?.nextCursor ? "+" : ""} conversations
               </span>
               <span>{showSaved ? "Recently saved" : "Ranked by score & age"}</span>
+              {/*
+                Beside the count, because the count is what it exports. US-064.
+                A plain link rather than a fetch: the browser downloads it, so
+                nothing here has to hold a file in memory or invent a filename
+                — the server sets both. "CSV" is on the label because somebody
+                asking for Excel will otherwise go looking for a second button.
+              */}
+              <a className="inbox-export" href={`/api/matches/export?${filterQuery()}`} download>
+                Export CSV
+              </a>
             </div>
             <div className="inbox-scroll-region">
               <ol className="match-list" aria-label="Matches">

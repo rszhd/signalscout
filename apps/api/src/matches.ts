@@ -17,11 +17,14 @@
  * connection must not read as a change of mind.
  */
 import {
+  csvFilename,
   cursorPattern,
   type Database,
   defaultPageSize,
   exportFeedback,
+  type InboxMatch,
   listMatches,
+  matchesToCsv,
   maximumPageSize,
   recordVerdict,
   setMatchSaved,
@@ -102,6 +105,14 @@ const query = z.object({
    */
   includeNotRelevant: z.stringbool().default(false),
 });
+
+/**
+ * How many matches one page of the walk asks for.
+ *
+ * Larger than the screen's page because nobody is reading these one at a time,
+ * and small enough that a single query stays quick.
+ */
+const exportPageSize = 200;
 
 export interface MatchRoutesOptions {
   readonly db: Database;
@@ -236,6 +247,79 @@ export async function registerMatchRoutes(
         createdAt: recorded.createdAt.toISOString(),
         changed: recorded.changed,
       };
+    },
+  });
+
+  /**
+   * The inbox a person is looking at, as a spreadsheet. US-064.
+   *
+   * **The same filters as the screen**, so the file is the list they were
+   * reading rather than a different one. A button that quietly exported
+   * everything would be worse than no button: the person would not check.
+   *
+   * **Every page, not the first.** The screen paginates because a screen
+   * should; a file should not. It walks the cursor until the list runs out,
+   * bounded so a runaway query cannot build an unbounded string in memory.
+   *
+   * `Content-Disposition` is what makes a browser keep it, the same way
+   * `/api/feedback/export` does for verdicts.
+   */
+  app.route({
+    method: "GET",
+    url: "/api/matches/export",
+    schema: {
+      // The same querystring the list takes, minus the paging: a file has no
+      // pages. Sharing the schema is what stops the two drifting apart.
+      querystring: query.omit({ cursor: true, limit: true }),
+      response: { 200: z.string() },
+    },
+    handler: async (request, reply) => {
+      const { monitorId, projectId, minScore, asOf, includeNotRelevant, saved } = request.query;
+
+      const collected: InboxMatch[] = [];
+      let cursor: string | null = null;
+      let clock = asOf ? new Date(asOf) : undefined;
+
+      /**
+       * A ceiling on the walk, not on the export.
+       *
+       * Twenty pages of the maximum page size is more matches than any inbox
+       * this product has produced, and it is here so a cursor that stopped
+       * advancing could not spin for ever. If somebody ever hits it, the file
+       * is short and the log line below says why.
+       */
+      for (let page = 0; page < 20; page += 1) {
+        const answer = await listMatches(db, {
+          monitorId,
+          projectId,
+          minScore,
+          includeNotRelevant,
+          savedOnly: saved,
+          limit: exportPageSize,
+          cursor,
+          asOf: clock,
+        });
+
+        collected.push(...answer.matches);
+        clock = answer.asOf;
+        cursor = answer.nextCursor;
+
+        if (!cursor) break;
+      }
+
+      if (cursor) {
+        request.log.warn(
+          { exported: collected.length },
+          "the inbox export stopped at its page ceiling; the file is incomplete",
+        );
+      }
+
+      const now = new Date();
+
+      reply.header("content-type", "text/csv; charset=utf-8");
+      reply.header("content-disposition", `attachment; filename="${csvFilename(now)}"`);
+
+      return matchesToCsv(collected);
     },
   });
 

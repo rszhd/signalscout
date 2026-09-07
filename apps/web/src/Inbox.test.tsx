@@ -772,6 +772,37 @@ describe("the intent inbox", () => {
     expect(container.querySelector("canvas")).toBeNull();
     expect(container.querySelector("svg")).toBeNull();
   });
+
+  describe("taking the inbox away as a spreadsheet", () => {
+    /**
+     * US-064. The link is asserted rather than the file: the CSV itself is
+     * covered in `packages/core/src/matches/csv.test.ts`, and what the screen
+     * owes is that the download asks for the list a person is looking at.
+     */
+    it("offers an export beside the count it exports", async () => {
+      await show();
+
+      const link = document.querySelector<HTMLAnchorElement>("a.inbox-export");
+
+      expect(link?.textContent).toContain("CSV");
+      expect(link?.hasAttribute("download")).toBe(true);
+      expect(link?.getAttribute("href")).toContain("/api/matches/export");
+    });
+
+    it("carries the filters the screen has applied", async () => {
+      // A button that quietly exported everything would be worse than no
+      // button, because the person would not check.
+      await show();
+
+      await act(async () => button("Filters").click());
+      await act(async () => setValue(select("Minimum score"), "70"));
+      await settle();
+
+      const href = document.querySelector("a.inbox-export")?.getAttribute("href") ?? "";
+
+      expect(href).toContain("minScore=70");
+    });
+  });
 });
 
 describe("the age on a card", () => {

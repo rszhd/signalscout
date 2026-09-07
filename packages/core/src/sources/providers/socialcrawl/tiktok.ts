@@ -70,6 +70,8 @@ export const socialCrawlTikTok: ConnectorDefinition = {
   billableUnit: "request",
   /** The same credit as X, LinkedIn, YouTube and Reddit: one provider, one pack. */
   pricePerUnitMicros: 8118,
+  /** A search page is 30 videos for one credit. Measured in US-044. */
+  postsPerUnit: 30,
   maxUnitsPerQueryPoll: maxPagesPerInput,
   canFetchReplies: true,
   /** A comment page is one credit, the same as a search. Measured. */

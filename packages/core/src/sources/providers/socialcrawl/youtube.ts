@@ -91,6 +91,11 @@ export const socialCrawlYouTube: ConnectorDefinition = {
    * and a comment page is cheaper still at one credit for 51.
    */
   pricePerUnitMicros: 8118,
+  /**
+   * Forty-five results for one credit, measured — about 180 micro-dollars a
+   * video, the cheapest item this product fetches.
+   */
+  postsPerUnit: 45,
   maxUnitsPerQueryPoll: maxPagesPerInput,
   canFetchReplies: true,
   /** A comment page is one credit, the same as a search. Measured, not assumed. */

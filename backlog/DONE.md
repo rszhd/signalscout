@@ -2,7 +2,7 @@
 
 # Done
 
-44 finished.
+45 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
@@ -13,6 +13,7 @@
 | BUG-003 | [A post below the threshold is classified again on every poll](done/2026-09/BUG-003-a-post-below-the-threshold-is-classified-again-on-every-poll.md) | bug | fixed | 2026-09 |
 | BUG-002 | [A seven-day window is bought as a month](done/2026-09/BUG-002-a-seven-day-window-is-bought-as-a-month.md) | bug | fixed | 2026-09 |
 | BUG-001 | [A pending Reddit collection is not resumed](done/2026-09/BUG-001-a-pending-reddit-collection-is-not-resumed.md) | bug | shipped | 2026-09 |
+| US-058 | [One page compares what every provider charges](done/2026-09/US-058-one-page-compares-what-every-provider-charges.md) | feature | shipped | 2026-09 |
 | US-057 | [LinkedIn is fetched through Apify](done/2026-09/US-057-linkedin-is-fetched-through-apify.md) | feature | shipped | 2026-09 |
 | US-056 | [LinkedIn is measured at Apify](done/2026-09/US-056-linkedin-is-measured-at-apify.md) | spike | shipped | 2026-09 |
 | US-055 | [LinkedIn is fetched through ScrapeCreators](done/2026-09/US-055-linkedin-is-fetched-through-scrapecreators.md) | feature | dropped | 2026-09 |

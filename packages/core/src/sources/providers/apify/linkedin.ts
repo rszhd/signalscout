@@ -109,6 +109,12 @@ export const apifyLinkedIn: ConnectorDefinition = {
    * `unitsOf` rather than being lost.
    */
   pricePerUnitMicros: 2000,
+  /**
+   * One. The unit *is* the post: this actor charges for every post it returns,
+   * so the price is already per post. Bright Data is the only other connector
+   * here where that is true.
+   */
+  postsPerUnit: 1,
   /** `postsPerRun`: what one query costs in one poll. */
   maxUnitsPerQueryPoll: postsPerRun,
   /**

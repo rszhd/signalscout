@@ -167,7 +167,10 @@ describe("the four screens", () => {
       link.getAttribute("href"),
     );
 
-    expect(links).toEqual(["#/projects", "#/connections"]);
+    // Pricing joins Connections here, and for the same reason: both are
+    // machine-level screens — one set of keys, one set of prices, every
+    // project — so neither carries one. US-058.
+    expect(links).toEqual(["#/projects", "#/connections", "#/pricing"]);
   });
 
   /**
@@ -189,7 +192,7 @@ describe("the four screens", () => {
     // A monitor is made inside a project and prefills its four answers from
     // one, so offering the form here would make an unfiled monitor — the state
     // migration 0038 emptied out.
-    expect(links).toEqual(["#/projects", "#/connections"]);
+    expect(links).toEqual(["#/projects", "#/connections", "#/pricing"]);
   });
 
   it("carries the project through every link once one is chosen", async () => {
@@ -255,6 +258,7 @@ describe("the four screens", () => {
       "#/?project=p1",
       "#/monitors?project=p1",
       "#/connections",
+      "#/pricing",
       "#/monitors/new?project=p1",
     ]);
     expect(screen.container.textContent).not.toContain("Settings");

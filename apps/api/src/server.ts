@@ -32,6 +32,7 @@ import { registerEstimateRoutes } from "./estimates.js";
 import { registerMatchRoutes } from "./matches.js";
 import { registerMonitorRoutes } from "./monitors.js";
 import { registerNotificationRoutes } from "./notifications.js";
+import { registerPricingRoutes } from "./pricing.js";
 import { registerProjectRoutes } from "./projects.js";
 
 /**
@@ -186,6 +187,7 @@ export async function buildServer({
   await registerNotificationRoutes(app, { db, env });
 
   await registerConnectionRoutes(app, { db, sources, environment, encryption, logger });
+  await registerPricingRoutes(app, { db, sources, environment });
 
   await registerMonitorRoutes(app, {
     db,

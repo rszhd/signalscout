@@ -80,6 +80,12 @@ export const socialCrawlX: ConnectorDefinition = {
    * more reason it is.
    */
   pricePerUnitMicros: 8118,
+  /**
+   * Twenty. A request carried 20 posts in US-006's capture, which makes an X
+   * post about 406 micro-dollars — the cheapest item this product fetches
+   * after a YouTube video.
+   */
+  postsPerUnit: 20,
   /** `maxPagesPerInput`: what one query or handle costs in one poll. */
   maxUnitsPerQueryPoll: maxPagesPerInput,
   canFetchReplies: true,

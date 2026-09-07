@@ -64,6 +64,8 @@ export const socialCrawlReddit: ConnectorDefinition = {
   billableUnit: "request",
   /** The same credit as X, LinkedIn and YouTube: one provider, one pack. */
   pricePerUnitMicros: 8118,
+  /** About 25 posts a request, the page size measured for this endpoint. */
+  postsPerUnit: 25,
   maxUnitsPerQueryPoll: maxPagesPerInput,
   /**
    * False, and measured rather than unimplemented. Its comment endpoint works

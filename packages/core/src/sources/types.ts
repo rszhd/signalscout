@@ -420,6 +420,31 @@ export interface ConnectorDescriptor {
    */
   readonly pricePerUnitMicros: number;
   /**
+   * How many posts one billable unit brought back, when somebody measured it.
+   *
+   * The price alone cannot be compared across providers, because the units are
+   * different things: one SocialCrawl credit buys 45 YouTube results and 2
+   * LinkedIn posts, so the same credit price is a twentyfold difference in what
+   * a post costs. This is the number that makes `pricePerUnitMicros` mean
+   * something on a screen where two providers sit side by side.
+   *
+   * **It is measured, never estimated.** It belongs to a capture run, like the
+   * price does, and the comment beside each one says which. A connector whose
+   * yield nobody has measured leaves it out, and the pricing page says so
+   * rather than inventing a number.
+   *
+   * Where a connector has two discovery modes with different yields — a
+   * ScrapeCreators Reddit keyword request bought 7 posts and a subreddit
+   * request 23 — the **smaller** is declared. Over-reporting a bill is the
+   * direction this repository rounds: a person told they will spend more than
+   * they do stops early, and a person told the reverse spends past their cap.
+   *
+   * Never used to bill anything. `unitsConsumed` is what a provider reported
+   * and is the only number the budget guard may count; this is for a person
+   * comparing two providers before they choose one.
+   */
+  readonly postsPerUnit?: number;
+  /**
    * The most billable units one query can consume in one poll, when the caller
    * asks for no limit of its own.
    *

@@ -297,6 +297,20 @@ export function createSourceRegistry({
       );
     }
 
+    if (
+      definition.postsPerUnit !== undefined &&
+      (!Number.isFinite(definition.postsPerUnit) || definition.postsPerUnit <= 0)
+    ) {
+      // A zero or negative yield makes the comparison on the pricing page
+      // divide by it, and a person choosing a provider on an infinite cost per
+      // post would choose the wrong one. Absent is a fine answer; nonsense is
+      // not.
+      throw new Error(
+        `Source "${key.platformId}" says one ${definition.billableUnit} brings back ` +
+          `${definition.postsPerUnit} posts, which is not a count of them.`,
+      );
+    }
+
     if (!Number.isInteger(definition.maxUnitsPerQueryPoll) || definition.maxUnitsPerQueryPoll < 1) {
       // US-014 multiplies this by the polls in a month. A zero here would
       // report every plan on this source as costing nothing, which is the one

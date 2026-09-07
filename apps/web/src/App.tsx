@@ -4,6 +4,7 @@ import { Inbox } from "./Inbox.js";
 import { MonitorForm } from "./MonitorForm.js";
 import { Monitors } from "./Monitors.js";
 import { Notifications } from "./Notifications.js";
+import { Pricing } from "./Pricing.js";
 import { Projects } from "./Projects.js";
 import { routeParam, routePath } from "./route.js";
 
@@ -34,6 +35,7 @@ const newMonitorRoute = "#/monitors/new";
 const monitorsRoute = "#/monitors";
 const connectionsRoute = "#/connections";
 const projectsRoute = "#/projects";
+const pricingRoute = "#/pricing";
 
 function currentRoute(): string {
   return globalThis.location?.hash ?? "";
@@ -57,6 +59,7 @@ export function App() {
   const listing = !creating && path.startsWith(monitorsRoute);
   const connecting = path.startsWith(connectionsRoute);
   const projecting = path.startsWith(projectsRoute);
+  const pricing = path.startsWith(pricingRoute);
 
   /**
    * The project everything else is about, carried in the route. US-045.
@@ -83,7 +86,10 @@ export function App() {
    * sent to choose one, and the address is corrected to match what they are
    * looking at rather than left saying something untrue.
    */
-  const needsProject = !projecting && !connecting && !notificationId;
+  // Pricing joins Connections as a machine-level screen: one set of keys, one
+  // set of prices, every project. Asking it to pick a project first would ask a
+  // question it has no use for.
+  const needsProject = !projecting && !connecting && !pricing && !notificationId;
   const withoutProject = needsProject && projectId === null;
 
   useEffect(() => {
@@ -146,6 +152,12 @@ export function App() {
             </span>
             <span>Connections</span>
           </a>
+          <a className={pricing ? "nav-item current" : "nav-item"} href={pricingRoute}>
+            <span className="nav-icon" aria-hidden="true">
+              ⌗
+            </span>
+            <span>Pricing</span>
+          </a>
           {/*
             Also only with a project: a monitor is made in one, and the form
             prefills its four answers from it. Offered without one it would
@@ -180,6 +192,8 @@ export function App() {
           <Projects />
         ) : connecting ? (
           <Connections />
+        ) : pricing ? (
+          <Pricing />
         ) : listing ? (
           <Monitors />
         ) : (

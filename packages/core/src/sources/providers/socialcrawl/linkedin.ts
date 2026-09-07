@@ -89,6 +89,14 @@ export const socialCrawlLinkedIn: ConnectorDefinition = {
    * docs/costs.md is where it is said.
    */
   pricePerUnitMicros: 8118,
+  /**
+   * Two posts a credit: a call is five credits and returns ten posts.
+   *
+   * This is the number that makes the credit price mean something. The same
+   * 8,118 micro-dollars buys 45 YouTube results and 2 posts here, which is why
+   * a screen comparing providers cannot show a credit price alone.
+   */
+  postsPerUnit: 2,
   /** Two pages, five credits each. */
   maxUnitsPerQueryPoll: maxPagesPerQuery * creditsPerCall,
   create: (runtime) => new SocialCrawlLinkedInSource(runtime),

@@ -74,6 +74,16 @@ export const scrapeCreatorsReddit: ConnectorDefinition = {
    * person told the reverse spends past their cap.
    */
   pricePerUnitMicros: 1880,
+  /**
+   * Seven, the keyword figure, not the subreddit's twenty-three.
+   *
+   * One credit bought 7 posts on a keyword search and 23 on a subreddit in the
+   * same capture run on 2026-09-05. Declaring the smaller means a person
+   * comparing providers is told this one costs more per post than it may, which
+   * is the safe direction — and the two modes really are that far apart, which
+   * is worth knowing before choosing a discovery mode.
+   */
+  postsPerUnit: 7,
   /** `maxPagesPerInput`: what one keyword or subreddit costs in one poll. */
   maxUnitsPerQueryPoll: maxPagesPerInput,
   canFetchReplies: true,

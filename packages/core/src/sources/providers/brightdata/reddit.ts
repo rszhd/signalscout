@@ -52,6 +52,12 @@ export const brightDataReddit: ConnectorDefinition = {
   billableUnit: "record",
   /** $1.50 per 1,000 records. STACK.md, *Source economics*. */
   pricePerUnitMicros: 1500,
+  /**
+   * One. The unit *is* the post: this provider bills every record it collects,
+   * so a record and a post are the same thing and the price is already per
+   * post. It is the only connector here where that is true.
+   */
+  postsPerUnit: 1,
   /** `defaultRecordsPerInput`: what one keyword collects when nobody says otherwise. */
   maxUnitsPerQueryPoll: defaultRecordsPerInput,
   create: (runtime) => new RedditSource(runtime),

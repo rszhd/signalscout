@@ -79,6 +79,15 @@ export const socialCrawlInstagram: ConnectorDefinition = {
   provider: socialCrawlProvider,
   billableUnit: "credit",
   pricePerUnitMicros: creditMicros,
+  /**
+   * Thirty reels for one credit — the cheapest search this product makes.
+   *
+   * It describes the search half only, and on this platform that is the cheap
+   * half: a comment page is five credits for fifteen comments, and the lead is
+   * in the comments. A person reading this row should read
+   * `replyPricePerUnitMicros` beside it.
+   */
+  postsPerUnit: 30,
   maxUnitsPerQueryPoll: maxPagesPerInput,
   canFetchReplies: true,
   /**

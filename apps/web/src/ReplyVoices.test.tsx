@@ -154,7 +154,7 @@ describe("starting from a voice somebody already wrote", () => {
     ];
   });
 
-  it("offers them on the empty state, each with the reason it exists", async () => {
+  it("offers them beside the saved list, each with the reason it exists", async () => {
     // A preset somebody does not understand is one they cannot edit sensibly.
     server();
     screen = await mount(<ReplyVoices />);
@@ -164,20 +164,28 @@ describe("starting from a voice somebody already wrote", () => {
     expect(text).toContain("treat a reply that opens with a product");
   });
 
-  it("fills the form and saves nothing until a person does", async () => {
+  it("adds one in a single press, because that is what the button says", async () => {
+    // The first version only filled the form, which turned "add a few more
+    // voices" into a form to complete five times.
     const calls = server();
     screen = await mount(<ReplyVoices />);
 
-    // Queried rather than found by label: the button holds a name and a
-    // reason, so its text is both of them.
+    // Queried rather than found by label: the button holds a name, a reason
+    // and the word Add, so its text is all three.
     const preset = screen.container.querySelector<HTMLButtonElement>(".reply-voice-presets button");
     preset?.click();
     await settle();
 
+    const created = calls.find(
+      (call) => call.method === "POST" && call.url.endsWith("/api/reply-prompts"),
+    );
+
+    expect(created?.body).toEqual({
+      name: "Reddit regular",
+      instruction: "Write the way a regular in this subreddit writes.",
+    });
+    // And it opens for editing, because a preset is a starting point.
     expect(field("Voice name").value).toBe("Reddit regular");
-    expect(field("Voice instructions").value).toContain("regular in this subreddit");
-    // Choosing one is not saving one: the row exists when the person says so.
-    expect(calls.some((call) => call.method === "POST")).toBe(false);
   });
 
   it("keeps the blank form working when the presets cannot be read", async () => {
@@ -207,18 +215,18 @@ describe("reaching the presets with voices already saved", () => {
     ];
   });
 
-  it("offers them on the new-voice form, not only on an empty page", async () => {
+  it("shows them on arrival, with voices already saved", async () => {
+    // The failure this replaced: buried behind New voice, the page said
+    // "Saved voices 1" and the five may as well not have shipped.
     server([voice()]);
     screen = await mount(<ReplyVoices />);
-
-    await press("New voice");
 
     expect(screen.container.querySelector(".reply-voice-presets")).not.toBeNull();
   });
 
-  it("hides them while editing a saved voice, so nothing is overwritten", async () => {
-    // On a saved voice the button would quietly replace words somebody wrote.
-    server([voice()]);
+  it("stops offering one that is already saved", async () => {
+    // Offering it again would only produce the duplicate-name refusal.
+    server([voice({ name: "Reddit regular" })]);
     screen = await mount(<ReplyVoices />);
 
     expect(screen.container.querySelector(".reply-voice-presets")).toBeNull();

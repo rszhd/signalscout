@@ -59,33 +59,44 @@ interface VoicePreset {
  */
 function VoicePresets({
   presets,
-  onChoose,
+  saved,
+  busy,
+  onAdd,
 }: {
   presets: VoicePreset[];
-  onChoose: (preset: VoicePreset) => void;
+  /** Names already saved, so a preset somebody has is not offered again. */
+  saved: string[];
+  busy: boolean;
+  onAdd: (preset: VoicePreset) => void;
 }) {
-  if (presets.length === 0) return null;
+  const taken = new Set(saved.map((name) => name.trim().toLowerCase()));
+  const offered = presets.filter((preset) => !taken.has(preset.name.trim().toLowerCase()));
+
+  if (offered.length === 0) return null;
 
   return (
     <div className="reply-voice-presets">
-      <p className="section-label">Or start from one of these</p>
+      <header>
+        <h2>Add a voice</h2>
+        <span>{offered.length}</span>
+      </header>
       <ul>
-        {presets.map((preset) => (
+        {offered.map((preset) => (
           <li key={preset.id}>
-            <button type="button" onClick={() => onChoose(preset)}>
+            <button disabled={busy} type="button" onClick={() => onAdd(preset)}>
               <span className="reply-voice-preset-name">{preset.name}</span>
               {/*
                 Each says why it exists. A preset somebody does not understand
                 is one they cannot edit sensibly.
               */}
               <span className="reply-voice-preset-why">{preset.why}</span>
+              <span className="reply-voice-preset-add" aria-hidden="true">
+                Add
+              </span>
             </button>
           </li>
         ))}
       </ul>
-      <p className="reply-voice-preset-note">
-        Each one lands in the form as a new voice. Edit it before you save it.
-      </p>
     </div>
   );
 }
@@ -150,21 +161,38 @@ export function ReplyVoices() {
   }
 
   /**
-   * Fill the form from a preset, and save nothing.
+   * Add a preset as a saved voice, in one press.
    *
-   * A preset is a starting point: it lands in the fields as an unsaved new
-   * voice, so a person edits it before it exists rather than after. The name
-   * is copied too, and a name that collides is refused on save with the
-   * server's own sentence — which is the honest moment to find out.
+   * It saves rather than filling the form, and the button says "Add" so that
+   * is what a person expects. The first version only filled the fields, which
+   * made "add a few more voices" into a form to complete five times — and the
+   * presets were invisible until somebody pressed New voice, so nobody would
+   * have found them at all.
+   *
+   * The new voice is then opened for editing, because a preset is a starting
+   * point and the edit is the point.
    */
-  function startFromPreset(preset: VoicePreset): void {
-    setSelectedId(null);
-    setName(preset.name);
-    setInstruction(preset.instruction);
-    setEditing(true);
-    setConfirmingDelete(false);
+  async function addPreset(preset: VoicePreset): Promise<void> {
+    setBusy(true);
     setError(null);
     setNotice(null);
+
+    try {
+      const created = await requestJson<ReplyVoice>("/api/reply-prompts", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ name: preset.name, instruction: preset.instruction }),
+      });
+
+      const { prompts } = await requestJson<{ prompts: ReplyVoice[] }>("/api/reply-prompts");
+      setVoices(prompts);
+      choose(created);
+      setNotice(`Added “${created.name}”. Edit it to make it yours.`);
+    } catch (cause) {
+      setError(messageFor(cause, "That voice could not be added."));
+    } finally {
+      setBusy(false);
+    }
   }
 
   function cancel(): void {
@@ -303,6 +331,19 @@ export function ReplyVoices() {
               <p>No saved voices yet.</p>
             </div>
           )}
+
+          {/*
+            Under the saved list, because that is where somebody counting their
+            voices is looking. Buried behind New voice they were invisible: the
+            page said "Saved voices 1" and the five may as well not have
+            shipped.
+          */}
+          <VoicePresets
+            presets={presets}
+            saved={voices.map((voice) => voice.name)}
+            busy={busy}
+            onAdd={(preset) => void addPreset(preset)}
+          />
         </aside>
 
         <section className="reply-voice-workspace" aria-label="Reply voice editor">
@@ -362,12 +403,6 @@ export function ReplyVoices() {
                   A voice can guide style, but it cannot make a draft open with your product or
                   invent facts about it.
                 </p>
-
-                {/*
-                  Only while making a new one. On a saved voice this button
-                  would quietly overwrite words somebody already wrote.
-                */}
-                {!selected && <VoicePresets presets={presets} onChoose={startFromPreset} />}
 
                 {error && (
                   <p className="form-error" role="alert">
@@ -448,7 +483,6 @@ export function ReplyVoices() {
                 because a preset somebody does not understand is one they cannot
                 edit sensibly.
               */}
-              <VoicePresets presets={presets} onChoose={startFromPreset} />
             </div>
           )}
         </section>

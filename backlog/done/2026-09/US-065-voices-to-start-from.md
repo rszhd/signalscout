@@ -38,11 +38,10 @@ behaves as it did.
 
 - [x] A set of reply voices ships with the product, each with the reason it
       exists shown beside it
-- [x] Choosing one fills the form and saves nothing until a person says so
-- [x] They are offered wherever a *new* voice is made, not only on an empty
-      page
-- [x] They are never offered while editing a saved voice, so nothing somebody
-      wrote is overwritten
+- [x] One press adds a preset as a saved voice and opens it for editing
+- [x] They are visible on the page as it opens, beside the saved voices, with
+      voices already saved
+- [x] One press adds one, and a preset already saved is not offered again
 - [x] A page whose presets cannot be read still creates voices normally
 - [x] `pnpm test`, `pnpm lint` and `pnpm typecheck` pass
 
@@ -77,3 +76,27 @@ behaves as it did.
   route without checking the shape, so a route answering something unexpected
   threw inside a render. Presets are a way to start, not a way to work — the
   blank form has to survive losing them.
+
+- 2026-09-07T23:52+08:00 — **Corrected, because the owner could not find them.**
+  They reported seeing one voice on the page, and they were right: the presets
+  were behind the New voice button, so the page said "Saved voices 1" and the
+  five may as well not have shipped.
+
+  Two mistakes in one design, and the second was worse. **They were invisible**
+  — the page opens in edit mode whenever a voice exists, so the empty state
+  that carried them never rendered. And **choosing one only filled the form**,
+  which turned "add a few more voices" into a form to complete five times.
+
+  They now sit under the saved list, where somebody counting their voices is
+  looking, and one press adds one. The button says "Add" so a saved row is not
+  a surprise, the new voice opens for editing because a preset is a starting
+  point, and a preset already saved is not offered again — offering it would
+  only produce the duplicate-name refusal.
+
+  Verified in the browser: one press took the count from 1 to 2, left four
+  presets, opened "Reddit regular" for editing and wrote the row. The test row
+  was removed afterwards, so the five are the owner's to add.
+
+  The lesson is not about presets. **A feature nobody can find did not ship**,
+  and the way to know is to open the page in the state the person is actually
+  in — one saved voice, not zero.

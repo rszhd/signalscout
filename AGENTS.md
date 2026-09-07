@@ -495,10 +495,24 @@ than to replace a key that is fine.
 line makes a shell run the second half as a command and load an empty key,
 which looks exactly like a missing one. `.env` must quote it.
 
-Still unproven: this connector has never polled live. A real rate limit, a real
-402, and a second poll proving deduplication on X are all untested, and
-`canFetchReplies` is false because nobody has measured the provider's comment
-endpoint or whether its links open.
+**One live poll has run, and the window is proven in production.** On
+2026-09-07 a monitor with a 24-hour `since` collected **7 posts in 2 pages for
+$0.0014**. Two pages without a window would be forty tweets and $0.0080, so the
+window **cut the bill by 82%**. The seven posts run from 19.8 hours old to 87
+minutes; SocialCrawl's forty, collected without a window, reach back 4.8 days.
+
+**Its recorded cost matched the provider's own balance to the micro-dollar** —
+`api_usage` holds 1,400 and the account moved $0.0014. That is the second time
+a figure in that table has been checked against a provider's own number and the
+first time it matched exactly; Bright Data's day was 3.2% high.
+
+The poll found zero matches. Six posts mentioning flaky tests in one day on X
+is a thin sample of a narrow query, and it says nothing about the connector,
+which returned what it was asked for.
+
+Still unproven: a real rate limit, a real 402, and a second poll proving
+deduplication on X. `canFetchReplies` is false because nobody has measured the
+provider's comment endpoint or whether its links open.
 
 **X had one provider, and the reason was that only one of three could search
 it.** US-006 added SocialCrawl on 2026-09-05. Bright Data's X posts dataset
@@ -1097,6 +1111,7 @@ pnpm --filter @intentwatch/core capture:comment-filter # spends money; see below
 pnpm --filter @intentwatch/core capture:triage        # spends money; see below
 pnpm --filter @intentwatch/core live:provider-switch # spends ~$0.08; see below
 pnpm --filter @intentwatch/core live:linkedin-poll   # spends ~$0.08 + model; see below
+pnpm --filter @intentwatch/core live:x-poll          # spends ~$0.002 + model; see below
 pnpm --filter @intentwatch/core live:apify-linkedin-poll # spends ~$0.05 + model; see below
 pnpm --filter @intentwatch/core live:tiktok-poll     # spends ~$0.20 + model; see below
 pnpm --filter @intentwatch/core live:tiktok-comments # spends model only; see below
@@ -1164,7 +1179,10 @@ and it writes `ledger.json` beside the fixtures recording what each one cost.
 Run it when the LinkedIn parser changes. Read the fixtures it writes before you
 commit them — its first run leaked real names past a scrubber that looked right.
 
-`live:linkedin-poll` is US-028's equivalent, and it is a whole pipeline rather
+`live:linkedin-poll` is US-028's equivalent. The script behind it is
+`live-poll.ts`, and it takes `--platform=` — naming it is required, because a
+live poll spends money and a default would let a mistyped flag bill the wrong
+account. It, and it is a whole pipeline rather
 than one connector: it creates a paused monitor with one LinkedIn query and a
 $0.20 cap, then drives collect, pre-filter and classify with a queue that runs
 the next step instead of enqueuing it. The steps are the real ones in the real
@@ -1173,6 +1191,12 @@ that survives the filter, and it leaves a paused monitor, its posts, one
 `api_usage` row and its matches. Run it when the LinkedIn connector changes, or
 to prove deduplication — a second run inside the same window should store no new
 post and should bill again, because the provider charges for the search.
+
+`live:x-poll` is the same script with `--platform=x --provider=socialdata`. It
+is the cheapest live poll here — a 24-hour window bought 7 tweets for $0.0014 —
+and it is the one that exercises a provider-side window. `--since-hours=`
+controls it and defaults to 24; a monitor this script creates has never polled,
+so without a `since` the window is never sent and the run proves nothing.
 
 `live:apify-linkedin-poll` is the same script with `--provider=apify`, and it
 is the one that exercises a waiting collection: the Apify connector starts an

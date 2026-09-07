@@ -43,7 +43,7 @@ import {
 import { createEmbedder } from "../ai/embed.js";
 import { loadAiEnv } from "../config/env.js";
 import { createDatabase } from "../db/client.js";
-import type { Provider } from "../db/schema.js";
+import type { Provider, Source } from "../db/schema.js";
 import { apiUsage, budgets, matches, monitors, posts } from "../db/schema.js";
 import { createLogger } from "../logger.js";
 import { singleUserId } from "../monitors/monitors.js";
@@ -55,7 +55,7 @@ import { classifyQueue, filterQueue, notifyQueue, pollQueue } from "../worker/qu
 import type { StepContext } from "../worker/steps.js";
 import { setProviderChoice } from "./choices.js";
 import { builtInSources } from "./index.js";
-import { linkedInPlatformId } from "./platforms.js";
+import { platforms } from "./platforms.js";
 import { createSourceRegistry } from "./registry.js";
 import { createSourceRuntime } from "./runtime.js";
 
@@ -93,6 +93,51 @@ const capMicros = 200_000;
  * Naming one is therefore part of the measurement, not a detail. Without the
  * flag the first registered wins, which is what this script always did.
  */
+/**
+ * Which platform this run polls.
+ *
+ * The script was LinkedIn's until US-061 needed the same thing for X, and
+ * everything in it except the platform id was already general. Naming the
+ * platform is required rather than defaulted: a live poll spends money, and a
+ * default would let a mistyped flag quietly bill the wrong account.
+ */
+const wantedPlatform = process.argv
+  .filter((argument) => argument.startsWith("--platform="))
+  .map((argument) => argument.slice("--platform=".length))[0];
+
+if (!wantedPlatform) {
+  console.error(`Name the platform: --platform=${platforms.map((one) => one.id).join(" | ")}`);
+  process.exit(1);
+}
+
+const found = platforms.find((one) => one.id === wantedPlatform);
+
+if (!found) {
+  console.error(
+    `No platform "${wantedPlatform}". Known: ${platforms.map((one) => one.id).join(", ")}.`,
+  );
+  process.exit(1);
+}
+
+// `process.exit` above narrows nothing for the compiler, and every use below
+// is after it.
+const platform = found;
+
+/**
+ * How far back to tell the monitor it last looked.
+ *
+ * A monitor created by this script has never polled, so `since` would be
+ * undefined and a connector's window would never be exercised. US-061's whole
+ * case is that SocialData pushes `since_time:` to the provider and stops
+ * paying for older posts, and a run that never sets a `since` could not show
+ * it. Pass `--since-hours=0` to poll with no window at all.
+ */
+const sinceHours = Number(
+  process.argv
+    .filter((argument) => argument.startsWith("--since-hours="))
+    .map((argument) => argument.slice("--since-hours=".length))[0] ?? "24",
+);
+
 const wantedProvider = process.argv
   .filter((argument) => argument.startsWith("--provider="))
   .map((argument) => argument.slice("--provider=".length))[0];
@@ -109,7 +154,7 @@ const maxResumes = 10;
 
 let resumes = 0;
 
-const logger = createLogger({ level: "info", name: "live-linkedin" });
+const logger = createLogger({ level: "info", name: `live-${platform.id}` });
 const { db, close } = createDatabase(databaseUrl);
 
 const registry = createSourceRegistry({
@@ -239,7 +284,7 @@ async function storedPosts(): Promise<number> {
   const rows = await db
     .select({ id: posts.id })
     .from(posts)
-    .where(eq(posts.source, linkedInPlatformId));
+    .where(eq(posts.source, platform.id as never));
 
   return rows.length;
 }
@@ -263,19 +308,29 @@ async function main(): Promise<void> {
     .insert(monitors)
     .values({
       userId: singleUserId,
-      name: "US-028 live LinkedIn poll",
+      name: `live ${platform.displayName} poll`,
       product: "A test runner that records browser flows instead of coding them",
       idealCustomer: "Small SaaS teams with no dedicated QA engineer",
       problem: "End-to-end tests break whenever the UI changes",
       signals: ["recommendation_request", "problem"],
-      sources: [linkedInPlatformId],
-      generatedQueries: { [linkedInPlatformId]: [query] },
+      sources: [platform.id as never],
+      generatedQueries: { [platform.id]: [query] },
       generatedSubreddits: [],
       // US-022 measured this: inside a topical result set every post is
       // somewhat relevant and the scores compress upward, so 30 lets noise
       // through. 50 is the number that left nine real matches there.
       minScore: 50,
       pausedAt: new Date(),
+      /**
+       * Where the monitor last looked, so the poll has a `since` to send.
+       *
+       * A monitor that has never polled has none, and a connector's window
+       * would never be exercised — which on SocialData is the whole point:
+       * `since_time:` is what stops it paying for posts older than this.
+       */
+      ...(sinceHours > 0
+        ? { lastPolledAt: new Date(Date.now() - sinceHours * 60 * 60 * 1000) }
+        : {}),
     })
     .returning();
 
@@ -291,7 +346,7 @@ async function main(): Promise<void> {
 
   // Before anything is spent. A key missing here would otherwise be found
   // after the provider had already been paid for a page.
-  const registered = registry.forPlatform(linkedInPlatformId);
+  const registered = registry.forPlatform(platform.id);
   const connector = wantedProvider
     ? registered.find((candidate) => candidate.provider.id === wantedProvider)
     : registered[0];
@@ -317,13 +372,18 @@ async function main(): Promise<void> {
   // The id came from the connector the registry built, so it is a real
   // provider by construction; the cast is only telling the compiler what the
   // registry already guarantees.
-  await setProviderChoice(db, linkedInPlatformId, connector.provider.id as Provider);
+  await setProviderChoice(db, platform.id as Source, connector.provider.id as Provider);
 
   const before = await storedPosts();
 
   say(`monitor ${monitorId}`);
   say(`query "${query}", cap $${(capMicros / 1_000_000).toFixed(2)}`);
-  say(`${before} LinkedIn posts already stored`);
+  say(
+    sinceHours > 0
+      ? `since: ${sinceHours}h back, so the connector's window is exercised`
+      : "since: none, so the poll asks for everything the provider has",
+  );
+  say(`${before} ${platform.displayName} posts already stored`);
   say(
     `connector: ${connector.platform.id} through ${connector.provider.id}, ` +
       `${connector.pricePerUnitMicros} micro-dollars per ${connector.billableUnit}`,

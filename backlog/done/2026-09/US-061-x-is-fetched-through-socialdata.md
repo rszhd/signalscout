@@ -140,3 +140,38 @@ enum: 1,228 tests passed and it could not have stored a single row.
   the window, the early stop and the refusals are all driven from captured
   payloads. A real poll, a real rate limit, a real 402 and a second poll
   proving deduplication are all unproven.
+
+- 2026-09-07T17:58+08:00 — **One live poll has run, and it proved the thing
+  this connector exists for.**
+
+  A monitor with the query `flaky tests` and a 24-hour `since` collected **7
+  posts in 2 pages for 7 units, $0.0014**. Two pages without a window would be
+  forty tweets and $0.0080, so **the window cut the bill by 82%** — measured
+  through the worker rather than in a capture script.
+
+  It held on the way in too. The seven posts run from 19.8 hours old to 87
+  minutes; SocialCrawl's forty, collected earlier without a window, run to 4.8
+  days. Nothing outside the window arrived and nothing outside it was paid for.
+
+  **The recorded cost equals the provider's own balance movement, exactly.**
+  `api_usage` holds 1,400 micro-dollars and the account went $0.0718 to
+  $0.0704, which is $0.0014. That is the second time a figure in this table has
+  been checked against a provider's own number, and the first time it matched
+  to the micro-dollar — Bright Data's day was 3.2% high.
+
+  **Zero matches, and that is an honest outcome rather than a fault.** The
+  pre-filter dropped one of seven on keywords and the classifier read six for
+  $0.0217, finding nothing at or above 50. Six posts mentioning flaky tests in
+  one day on X is a thin sample of a narrow query; it says nothing about the
+  connector, which returned exactly what was asked for.
+
+  `live:x-poll` is the script. `live-linkedin-poll.ts` became `live-poll.ts`
+  and takes `--platform=`, because everything in it except the platform id was
+  already general. The platform must be named — a live poll spends money, and a
+  default would let a mistyped flag bill the wrong account. `--since-hours=`
+  defaults to 24 so a connector's window is exercised; a monitor created fresh
+  has never polled, so without it `since` is undefined and the window is never
+  sent.
+
+  Still unproven: a real rate limit, a real 402, and a second poll proving
+  deduplication on X.

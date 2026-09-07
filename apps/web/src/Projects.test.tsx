@@ -105,7 +105,15 @@ describe("the projects screen", () => {
     expect(button("Create project").disabled).toBe(false);
   });
 
-  it("posts the four answers and the signals that were ticked", async () => {
+  /**
+   * The four answers, and no signals.
+   *
+   * The form stopped asking for signals: they say what one search looks for,
+   * so the monitor form asks instead. What is asserted here is the body, not
+   * the absent control — a screen that still sent an empty list would look the
+   * same and would erase an edited project's own signals on `PATCH`.
+   */
+  it("posts the four answers and asks for no signals", async () => {
     await show([]);
     await act(async () => button("New project").click());
 
@@ -115,12 +123,7 @@ describe("the projects screen", () => {
     setValue(field("What problem does it solve?"), "Tests break on every UI change");
     await settle();
 
-    await act(async () => {
-      container.querySelector<HTMLElement>(".project-signals summary")?.click();
-    });
-    const tick = container.querySelector<HTMLInputElement>('.signal-card input[type="checkbox"]');
-    await act(async () => tick?.click());
-    await settle();
+    expect(container.querySelector(".project-signals")).toBeNull();
 
     await act(async () => button("Create project").click());
     await settle();
@@ -137,7 +140,6 @@ describe("the projects screen", () => {
       product: "A test runner",
       idealCustomer: "Small SaaS teams",
       problem: "Tests break on every UI change",
-      signals: ["problem"],
     });
   });
 

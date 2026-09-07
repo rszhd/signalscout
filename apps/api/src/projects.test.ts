@@ -120,6 +120,25 @@ describe("the project routes", () => {
     });
   });
 
+  /**
+   * The project form stopped asking for signals, so the body arrives without.
+   *
+   * A required field would answer 400 to every project the screen now makes.
+   * The column stays for the projects that already hold one, and absent means
+   * none rather than a refusal.
+   */
+  it("creates a project that names no signals", async () => {
+    const response = await post("/api/projects", {
+      name: "Gamma",
+      product: answers.product,
+      idealCustomer: answers.idealCustomer,
+      problem: answers.problem,
+    });
+
+    expect(response.statusCode).toBe(201);
+    expect(response.json().signals).toEqual([]);
+  });
+
   it("refuses a project with no product", async () => {
     const response = await post("/api/projects", { ...answers, product: "" });
 

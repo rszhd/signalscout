@@ -105,6 +105,7 @@ describe("the monitor form", () => {
 
   afterEach(async () => {
     await screen.unmount();
+    globalThis.location.hash = "";
     vi.unstubAllGlobals();
   });
 
@@ -124,6 +125,78 @@ describe("the monitor form", () => {
     expect(checkboxes).toHaveLength(7);
     expect(container.textContent).toContain("Asking for recommendations");
     expect(container.textContent).toContain("Looking to hire someone");
+  });
+
+  /**
+   * A project no longer carries signals, so the form must still start broad.
+   *
+   * The project screen stopped asking for them, so every project made after
+   * that answers with an empty list. Nothing here may read that as "the person
+   * narrowed it to nothing": a stage that opens with no box ticked refuses to
+   * continue, and the person is left correcting a choice they never made.
+   */
+  it("ticks every signal when the project has none", async () => {
+    await screen.unmount();
+    globalThis.location.hash = "#/monitors/new?project=11111111-1111-1111-1111-111111111111";
+    fetchMock.mockImplementation(async (request: string | URL | Request) => {
+      const url = String(request);
+      if (url === "/api/monitor-options") return json(options);
+      if (url.startsWith("/api/projects/")) {
+        return json({
+          name: "Acme QA",
+          product: "A browser test runner",
+          idealCustomer: "Small SaaS teams",
+          problem: "Tests break after UI changes",
+          signals: [],
+        });
+      }
+      throw new Error(`Unexpected request: ${url}`);
+    });
+
+    screen = await mount(<MonitorForm />);
+    container = screen.container;
+
+    await act(async () => {
+      setValue(input("Monitor name"), "Journeys");
+      button("Continue").click();
+    });
+
+    const checkboxes = [...document.querySelectorAll<HTMLInputElement>('input[name="signals"]')];
+    expect(checkboxes).toHaveLength(7);
+    expect(checkboxes.every((box) => box.checked)).toBe(true);
+  });
+
+  /** A project that does carry signals still narrows them, and wins the race. */
+  it("keeps the project's own signals when it has some", async () => {
+    await screen.unmount();
+    globalThis.location.hash = "#/monitors/new?project=11111111-1111-1111-1111-111111111111";
+    fetchMock.mockImplementation(async (request: string | URL | Request) => {
+      const url = String(request);
+      if (url === "/api/monitor-options") return json(options);
+      if (url.startsWith("/api/projects/")) {
+        return json({
+          name: "Acme QA",
+          product: "A browser test runner",
+          idealCustomer: "Small SaaS teams",
+          problem: "Tests break after UI changes",
+          signals: ["problem"],
+        });
+      }
+      throw new Error(`Unexpected request: ${url}`);
+    });
+
+    screen = await mount(<MonitorForm />);
+    container = screen.container;
+
+    await act(async () => {
+      setValue(input("Monitor name"), "Journeys");
+      button("Continue").click();
+    });
+
+    const ticked = [...document.querySelectorAll<HTMLInputElement>('input[name="signals"]')]
+      .filter((box) => box.checked)
+      .map((box) => box.value);
+    expect(ticked).toEqual(["problem"]);
   });
 
   it("preserves edited queries when going back without paying to generate again", async () => {

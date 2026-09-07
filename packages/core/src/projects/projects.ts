@@ -38,7 +38,16 @@ export interface Project extends ProjectAnswers {
   readonly monitorCount: number;
 }
 
-export type CreateProjectInput = ProjectAnswers;
+/**
+ * The signals are optional, and absent means none.
+ *
+ * The project form no longer asks for them: a signal says what one search
+ * looks for, so it is chosen per monitor. Older projects keep theirs and the
+ * monitor form still starts from them, so the column stays.
+ */
+export type CreateProjectInput = Omit<ProjectAnswers, "signals"> & {
+  readonly signals?: readonly Signal[];
+};
 
 /**
  * Every field optional, and absent means "leave it".
@@ -74,7 +83,7 @@ export async function createProject(
       product: trimmed(input.product, "product"),
       idealCustomer: trimmed(input.idealCustomer, "ideal customer"),
       problem: trimmed(input.problem, "problem"),
-      signals: [...input.signals],
+      signals: [...(input.signals ?? [])],
     })
     .returning();
 

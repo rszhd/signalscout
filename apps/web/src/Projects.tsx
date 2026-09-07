@@ -8,6 +8,14 @@ import { messageFor, requestJson } from "./api.js";
  * repetition is the point of the screen — a person with three monitors was
  * typing them three times and typing them slightly differently each time.
  *
+ * **The signals are not asked here.** They were, and they are asked again on
+ * the monitor form two screens later — where they decide what one search
+ * looks for rather than what a business is. A project is the description a
+ * person types once; which kinds of conversation to chase is a choice per
+ * monitor, and asking it twice made the second answer look like a repeat.
+ * Projects made before this still hold theirs, and the monitor form still
+ * starts from them.
+ *
  * **A monitor takes a copy.** Editing a project changes what the next monitor
  * starts from and nothing that already exists, which is stated on the screen
  * rather than left to be discovered. The reason is `monitors.version`: a
@@ -15,19 +23,12 @@ import { messageFor, requestJson } from "./api.js";
  * reached existing monitors would quietly discard every verdict already given.
  */
 
-interface SignalOption {
-  id: string;
-  label: string;
-  hint: string;
-}
-
 interface Project {
   id: string;
   name: string;
   product: string;
   idealCustomer: string;
   problem: string;
-  signals: string[];
   monitorCount: number;
 }
 
@@ -36,10 +37,9 @@ interface Draft {
   product: string;
   idealCustomer: string;
   problem: string;
-  signals: string[];
 }
 
-const empty: Draft = { name: "", product: "", idealCustomer: "", problem: "", signals: [] };
+const empty: Draft = { name: "", product: "", idealCustomer: "", problem: "" };
 
 interface DraftedProject extends Draft {
   missing: string[];
@@ -163,7 +163,6 @@ export function Projects() {
   const newButton = useRef<HTMLButtonElement>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [projects, setProjects] = useState<Project[]>([]);
-  const [signals, setSignals] = useState<SignalOption[]>([]);
   const [draft, setDraft] = useState<Draft>(empty);
   /** The project being edited, or null while the form is making a new one. */
   const [editing, setEditing] = useState<string | null>(null);
@@ -188,9 +187,6 @@ export function Projects() {
 
   useEffect(() => {
     void load();
-    requestJson<{ signals: SignalOption[] }>("/api/monitor-options")
-      .then((options) => setSignals(options.signals))
-      .catch(() => setSignals([]));
   }, [load]);
 
   useEffect(() => {
@@ -208,14 +204,6 @@ export function Projects() {
 
   const change = (field: keyof Draft) => (value: string) =>
     setDraft((current) => ({ ...current, [field]: value }));
-
-  const toggleSignal = (id: string) =>
-    setDraft((current) => ({
-      ...current,
-      signals: current.signals.includes(id)
-        ? current.signals.filter((signal) => signal !== id)
-        : [...current.signals, id],
-    }));
 
   const complete =
     draft.name.trim() !== "" &&
@@ -256,7 +244,6 @@ export function Projects() {
       product: project.product,
       idealCustomer: project.idealCustomer,
       problem: project.problem,
-      signals: [...project.signals],
     });
   }
 
@@ -355,7 +342,6 @@ export function Projects() {
                         product: drafted.product,
                         idealCustomer: drafted.idealCustomer,
                         problem: drafted.problem,
-                        signals: drafted.signals,
                       });
                       setMissing(drafted.missing);
                     }}
@@ -422,37 +408,6 @@ export function Projects() {
                       onChange={(event) => change("problem")(event.target.value)}
                     />
                   </label>
-
-                  {signals.length > 0 && (
-                    <details className="disclosure project-signals">
-                      <summary>
-                        Conversation signals{" "}
-                        <span>
-                          {draft.signals.length ? `${draft.signals.length} selected` : "Optional"}
-                        </span>
-                      </summary>
-                      <fieldset className="choice-section">
-                        <legend>Which signals matter?</legend>
-                        <p>Select the ways a promising conversation might begin.</p>
-                        <div className="signal-grid">
-                          {signals.map((signal) => (
-                            <label className="signal-card" key={signal.id}>
-                              <input
-                                type="checkbox"
-                                checked={draft.signals.includes(signal.id)}
-                                onChange={() => toggleSignal(signal.id)}
-                              />
-                              <span className="checkmark" aria-hidden="true" />
-                              <span>
-                                <strong>{signal.label}</strong>
-                                <small>{signal.hint}</small>
-                              </span>
-                            </label>
-                          ))}
-                        </div>
-                      </fieldset>
-                    </details>
-                  )}
                 </fieldset>
                 <p className="project-copy-note">
                   Each new monitor takes a copy of these answers. Editing this project leaves the

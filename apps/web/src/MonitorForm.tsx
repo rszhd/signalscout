@@ -261,9 +261,14 @@ export function MonitorForm() {
      * The project's answers, which prefill the four fields.
      *
      * A copy, not a link: a monitor made here keeps whatever is on the screen
-     * when it is saved, and later edits to the project never reach it. The
-     * signals come from the project too, so a person who narrowed them once
-     * does not narrow them again.
+     * when it is saved, and later edits to the project never reach it.
+     *
+     * The signals come from the project when it has any, so a person who
+     * narrowed them once does not narrow them again. The project form stopped
+     * asking for them, so most projects have none — those fall through to the
+     * every-signal default below, which is what a monitor with no project
+     * gets. The two fetches race, so neither may overwrite a choice the other
+     * made: this one only writes when the project has something to say.
      */
     if (projectId) {
       requestJson<{
@@ -298,8 +303,12 @@ export function MonitorForm() {
         if (cancelled) return;
         setOptionsState({ state: "ready", options });
         // PLAN.md shows every signal checked. It is the broad, explicit first
-        // run; a person can narrow it before generation.
-        if (!projectId) setSelectedSignals(options.signals.map((signal) => signal.id));
+        // run; a person can narrow it before generation. Functional, because
+        // the project fetch above may have answered first and its narrower
+        // choice wins.
+        setSelectedSignals((current) =>
+          current.length > 0 ? current : options.signals.map((signal) => signal.id),
+        );
         setSelectedSources(options.sources.map((source) => source.id));
       })
       .catch((cause: unknown) => {

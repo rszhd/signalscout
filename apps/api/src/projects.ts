@@ -64,7 +64,13 @@ const answers = {
   product: z.string().min(1).max(2000),
   idealCustomer: z.string().min(1).max(2000),
   problem: z.string().min(1).max(2000),
-  signals: z.array(signal),
+  /**
+   * Optional, because the project form stopped asking. A project made there
+   * carries none and the monitor form asks instead; a project made before,
+   * or by another caller, keeps what it sent. Absent is not the same as
+   * empty on `PATCH`, which is what `updateBody` below is careful about.
+   */
+  signals: z.array(signal).optional(),
 };
 
 const createBody = z.object(answers);

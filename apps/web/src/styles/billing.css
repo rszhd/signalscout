@@ -1,0 +1,109 @@
+/*
+ * Billing. One page, mostly words: what this account is, and the one button
+ * that changes it. The heavy lifting is Stripe's own hosted pages, so there is
+ * no card form here and no table of invoices.
+ */
+.billing-page {
+  min-width: 0;
+  min-height: 100%;
+  background: var(--surface-soft);
+}
+
+.billing-page .topbar {
+  align-items: flex-start;
+}
+
+.billing-plan {
+  width: min(var(--reading-width), 100%);
+  margin: var(--space-8) var(--page-gutter) var(--space-12);
+  padding: var(--space-8);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+
+.billing-plan h2 {
+  margin: 0;
+  font-size: var(--text-md);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+.billing-price {
+  margin: var(--space-3) 0 var(--space-6);
+  color: var(--ink);
+}
+
+.billing-price strong {
+  font-size: 2rem;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+
+.billing-price span {
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+
+.billing-includes {
+  margin: 0 0 var(--space-6);
+  padding-left: var(--space-5);
+  color: var(--text-reading-color);
+  font-size: var(--text-body);
+  line-height: 1.6;
+}
+
+.billing-includes li + li {
+  margin-top: var(--space-2);
+}
+
+.billing-note {
+  margin: 0 var(--page-gutter) var(--space-6);
+  max-width: var(--reading-width);
+  color: var(--muted);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+}
+
+.billing-plan .billing-note {
+  margin: 0;
+}
+
+.billing-error {
+  margin: 0 var(--page-gutter) var(--space-4);
+  color: var(--warning);
+  font-size: var(--text-sm);
+}
+
+/*
+ * The banner every other screen carries.
+ *
+ * Two states and not one: a trial with days left is information, and an account
+ * the server is already refusing is the reason the last button did nothing.
+ * They are told apart by weight rather than by color alone.
+ */
+.trial-banner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: baseline;
+  justify-content: space-between;
+  margin: 0;
+  padding: var(--space-3) var(--page-gutter);
+  border-bottom: 1px solid var(--line);
+  background: var(--accent-soft);
+  color: var(--muted-strong);
+  font-size: var(--text-sm);
+}
+
+.trial-banner.ended {
+  background: var(--quiet-accent-soft);
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.trial-banner a {
+  color: var(--accent-text);
+  font-weight: 500;
+  white-space: nowrap;
+}

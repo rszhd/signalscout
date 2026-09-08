@@ -2,6 +2,7 @@ import type { Env, JobSender, Logger, WorkerHandle } from "@signalscout/core";
 import {
   allStoredCredentialNames,
   assertStoredCredentialsAreReadable,
+  billingSettingsFrom,
   builtInSources,
   configureNetworking,
   createDatabase,
@@ -67,13 +68,28 @@ export async function startApi({
     );
   }
 
+  /**
+   * An instance that charges must be able to charge. US-072.
+   *
+   * Here, before the worker and before the first connection, because the state
+   * this refuses is the quiet one: `BILLING_MODE=stripe` with a missing price
+   * or webhook secret runs the whole product, every screen works, every trial
+   * runs out, and nobody is ever asked for money. Nothing about that looks
+   * broken from the outside.
+   *
+   * `buildServer` reads the same function, so this is not the only place it is
+   * checked. It is the place where the message arrives before anything else
+   * has started.
+   */
+  billingSettingsFrom(env);
+
   // Before any provider is called. BUG-011: Node gives an address 250ms to
   // connect, and several providers take longer than that, so half their
   // requests failed with what looked like an outage.
   configureNetworking();
 
   const worker = env.WORKER_IN_PROCESS
-    ? await startWorker({ databaseUrl: env.DATABASE_URL, logger })
+    ? await startWorker({ databaseUrl: env.DATABASE_URL, logger, billing: env.BILLING_MODE })
     : null;
 
   if (!worker) {

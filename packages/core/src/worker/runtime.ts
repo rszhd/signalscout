@@ -24,6 +24,7 @@ import {
 import { createEmbedder, type Embedder } from "../ai/embed.js";
 import { readAiEnvironment as readAiSettingsEnvironment } from "../ai/settings.js";
 import { createTriager, type Triager } from "../ai/triage.js";
+import type { BillingMode } from "../billing/index.js";
 import { loadAiEnv, loadNotificationEnv } from "../config/env.js";
 import { createDatabase, type Database, poolOptions } from "../db/client.js";
 import type { Logger } from "../logger.js";
@@ -134,6 +135,14 @@ export interface StartWorkerOptions {
    */
   pollingIntervalSeconds?: number;
   notificationTransport?: NotificationTransport;
+  /**
+   * Whether this deployment charges. `off` unless it says otherwise. US-072.
+   *
+   * The scheduler is the only thing here that reads it, and it is the half of
+   * the billing gate that costs money: an account whose trial ran out keeps
+   * polling until this is on.
+   */
+  billing?: BillingMode;
 }
 
 /**
@@ -317,6 +326,7 @@ export async function startWorker({
   scheduleTicks = true,
   pollingIntervalSeconds,
   notificationTransport,
+  billing = "off",
 }: StartWorkerOptions): Promise<WorkerHandle> {
   // Before any provider is called. See `net.ts`: Node's 250ms per-address
   // connect budget is shorter than several providers take to answer.
@@ -518,7 +528,7 @@ export async function startWorker({
   });
 
   await boss.work(scheduleTickQueue, workerOptions, async () => {
-    await enqueueDuePolls(db, boss, logger);
+    await enqueueDuePolls(db, boss, logger, billing);
     await enqueueNotifications(db, boss);
     await boss.send(reconcileQueue, {}, { singletonKey: "all" });
   });

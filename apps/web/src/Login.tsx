@@ -24,6 +24,8 @@ export interface AuthStatus {
   readonly signedIn: boolean;
   /** Who is asking, or null when nobody is signed in. US-069. */
   readonly account: { readonly name: string; readonly email: string } | null;
+  /** Whether this instance charges for itself. US-072. */
+  readonly billingMode: "off" | "stripe";
 }
 
 /**

@@ -1055,6 +1055,67 @@ driven through jsdom and the server half through `curl` against the built app.
 Read docs/accounts.md before changing the gate: it holds the proxy header a TLS
 terminator must send, and the SQL for getting back in.
 
+**The hosted version charges, and the self-hosted one never meets any of it.**
+US-072 closed on 2026-09-08. `BILLING_MODE` is `off` by default, which is
+`AUTH_SIGNUP`'s rule and reason: every instance running today is self-hosted,
+and a version bump that quietly began refusing writes on somebody's own machine
+is the upgrade nobody would forgive.
+
+**The trial is a clock we own, and it makes no network call.** Seven days, no
+card, one row written by the same sign-up hook that already claims the first
+account's rows — and the two must not be confused, because claiming is for the
+first account and a trial is for every account. A Stripe customer exists only
+once somebody opens Checkout, so a person who registers and never returns leaves
+no object in Stripe at all. The alternative — a Stripe subscription at sign-up
+with `trial_period_days` — was refused because it makes registration depend on a
+payment provider being reachable.
+
+**One rule decides entitlement, and it is written twice in one file.**
+`entitlementFor` answers about a row already read; `entitledCondition` answers
+inside the scheduler's query, where a row per monitor cannot be read into
+TypeScript first. `entitlement.test.ts` drives both over the same cases and
+compares the two lists, because the only thing worth asserting is that they
+agree.
+
+**Reads stay and writes stop, and the rule is the method rather than a list of
+paths.** Every route that changes something is a POST, PUT, PATCH or DELETE, so
+the rule covers the route nobody remembers to add to a list — and
+`billing.test.ts` walks every route the build registers, the way `auth.test.ts`
+walks them for the session gate. A refusal is **402** with `x-billing-reason`:
+not 403, because "you may not" and "you have not paid" send a person to two
+different places, and in a header because a route's own error schema strips a
+body key it does not name.
+
+**The half that costs money is the scheduler.** A route that refuses is what a
+person sees; `findDueMonitors` not returning an unentitled owner's monitors is
+what stops our hosting being spent on an account that cancelled — and that one
+is invisible from every screen.
+
+**Two rows of the entitlement table are decisions.** No row at all means
+entitled, because self-hosted nothing writes there and hosted there are accounts
+older than the table, the owner's own among them. And `past_due` means entitled,
+because a card that failed this morning is somebody Stripe is still retrying,
+and stopping their monitors throws away collection they paid for. `canceled` is
+where Stripe gave up, and that is the line.
+
+**Stripe's webhook is the fourth open path, and the first one added since the
+login shipped.** `auth.ts` says a fourth should be hard. It is justified because
+Stripe has no cookie and never will, and the signature over the body is a
+stronger check than a session rather than a weaker one. An event we do not act
+on is answered 200, because a non-2xx makes Stripe retry it for days.
+
+Two facts about the API version are worth keeping. `current_period_end` has
+moved off the subscription and onto the subscription **item**, so reading the
+old place returns undefined rather than an error — a null renewal date and
+nothing to tell you why. The version is therefore pinned in `stripe.ts` rather
+than left to whatever the account's dashboard says.
+
+**Nothing about this has met a live payment.** The product and the $15 monthly
+price exist in the test account, the local webhook secret comes from
+`stripe listen`, and no Checkout Session has been completed, no webhook has been
+delivered by Stripe, and no card — real or test — has been entered. Read
+docs/billing.md before changing any of it.
+
 **A provider slower than a quarter of a second read as an outage, for as long
 as this product has had connectors.** BUG-011, found on 2026-09-08 when a
 ScrapeCreators key test failed from the screen. Node gives each address a
@@ -1344,6 +1405,9 @@ screen's "about two minutes" is the fastest case and not the normal one.
 6. Read [`docs/secrets.md`](docs/secrets.md) if the task touches a credential.
    It holds where a key lives, what the encryption guarantees, why a key is
    tested before it is stored, and the rotation steps.
+7. Read [`docs/billing.md`](docs/billing.md) if the task touches the paywall,
+   the trial or Stripe. It holds who is entitled, what a refused write answers,
+   and why the scheduler is the half that matters.
 
 The ticket's **Acceptance** list is the definition of done. Every box is true
 or false. Do not mark one done that you have not verified.
@@ -1428,6 +1492,7 @@ naming its failure shape.
 - **Classification schema** — an invalid score stored as if it were a verdict
 - **Deletion reconciliation** — removed content still being shown
 - **Session gate** — a route answering a stranger, and looking normal doing it
+- **Entitlement** — an account that stopped paying still polling, on our bill
 
 A rule is only as tested as its least-tested caller. After asserting the rule,
 count the call sites and give each its own case.

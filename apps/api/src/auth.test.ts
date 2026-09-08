@@ -124,8 +124,14 @@ describe("the session gate", () => {
     }
   });
 
-  it("keeps the login and the health check open, and nothing else", async () => {
-    expect(openApiPaths).toEqual(["/api/health", "/api/auth-status"]);
+  it("keeps the login, the health check and Stripe's webhook open, and nothing else", async () => {
+    /**
+     * The list, spelled out, so a fourth entry cannot be added without changing
+     * this line and saying why. US-072 added the webhook: Stripe has no cookie
+     * and never will, and the signature over the body is the gate there — a
+     * stronger check than a session rather than a weaker one.
+     */
+    expect(openApiPaths).toEqual(["/api/health", "/api/auth-status", "/api/billing/webhook"]);
     expect(isOpenPath(`${authBasePath}/sign-in/email`)).toBe(true);
     expect(isOpenPath("/api/monitors")).toBe(false);
     // The UI has to load before anybody can sign in through it.
@@ -143,6 +149,8 @@ describe("the session gate", () => {
         signUpOpen: true,
         signedIn: false,
         account: null,
+        // US-072: this build charges nobody, which is the self-hosted default.
+        billingMode: "off",
       });
 
       const first = await signUp(app);
@@ -163,6 +171,7 @@ describe("the session gate", () => {
         signUpOpen: false,
         signedIn: false,
         account: null,
+        billingMode: "off",
       });
     } finally {
       await app.close();
@@ -233,6 +242,7 @@ describe("the session gate", () => {
           signUpOpen: true,
           signedIn: false,
           account: null,
+          billingMode: "off",
         });
 
         await signUp(open);
@@ -244,6 +254,7 @@ describe("the session gate", () => {
           signUpOpen: true,
           signedIn: false,
           account: null,
+          billingMode: "off",
         });
       } finally {
         await open.close();
@@ -375,6 +386,7 @@ describe("the session gate", () => {
         // US-069: the sidebar shows this, and only to a request carrying the
         // account's own cookie.
         account: { name: "The owner", email: "owner@example.com" },
+        billingMode: "off",
       });
     } finally {
       await app.close();

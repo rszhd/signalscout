@@ -17,7 +17,11 @@ if (env.WORKER_IN_PROCESS) {
 }
 
 const logger = createLogger({ level: env.LOG_LEVEL, name: "worker" });
-const handle = await startWorker({ databaseUrl: env.DATABASE_URL, logger });
+const handle = await startWorker({
+  databaseUrl: env.DATABASE_URL,
+  logger,
+  billing: env.BILLING_MODE,
+});
 
 for (const signal of ["SIGINT", "SIGTERM"] as const) {
   process.once(signal, () => {

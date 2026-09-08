@@ -4,6 +4,7 @@ import { App } from "./App.js";
 import "./index.css";
 import "./styles/theme.css";
 import "./styles/login.css";
+import "./styles/billing.css";
 import "./styles/models.css";
 import "./styles/monitor-setup.css";
 import "./styles/connections.css";

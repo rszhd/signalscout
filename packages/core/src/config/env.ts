@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { aiProviders, embeddingProviders } from "../ai/config.js";
 import { signupModes } from "../auth/user.js";
+import { billingModes } from "../billing/entitlement.js";
 import { encryptionKeyIsWellFormed } from "../secrets/cipher.js";
 
 /**
@@ -233,6 +234,37 @@ export const envSchema = z.object({
    * it when the browser's address and the one Fastify sees are different.
    */
   AUTH_URL: blankIsUnset(z.string().min(1).optional()),
+
+  /**
+   * Whether this deployment charges for itself. US-072.
+   *
+   * `off` is the default and it is the self-hosted shape: no trial, no gate,
+   * no payment provider, and every screen behaves exactly as it did before
+   * billing existed. `stripe` is the hosted shape.
+   *
+   * Off rather than on, for `AUTH_SIGNUP`'s reason. Every instance running
+   * today is self-hosted, and a version bump that quietly began refusing
+   * writes on somebody's own machine would arrive as a release note nobody
+   * read.
+   *
+   * Setting it to `stripe` makes the four variables below required, and the
+   * process refuses to boot without them. The failure that check exists for is
+   * the quiet one: an instance that charges nobody, where every screen works.
+   */
+  BILLING_MODE: blankIsUnset(z.enum(billingModes).default("off")),
+
+  /** The Stripe key, price and webhook secret. Required when BILLING_MODE is stripe. */
+  STRIPE_SECRET_KEY: blankIsUnset(z.string().min(1).optional()),
+  STRIPE_PRICE_ID: blankIsUnset(z.string().min(1).optional()),
+  STRIPE_WEBHOOK_SECRET: blankIsUnset(z.string().min(1).optional()),
+
+  /**
+   * Where this instance answers, for the addresses Stripe sends a person back
+   * to. Required when BILLING_MODE is stripe, and not derived from a request
+   * header: a return address built from something the caller controls is a
+   * return address the caller chooses.
+   */
+  APP_URL: blankIsUnset(z.string().min(1).optional()),
 
   HOST: z.string().min(1).default("0.0.0.0"),
   PORT: z.coerce.number().int().min(1).max(65535).default(3000),

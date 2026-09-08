@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { requestJson } from "./api.js";
+import { Billing, type BillingState, subscriptionSentence } from "./Billing.js";
 import { Connections } from "./Connections.js";
 import { Inbox } from "./Inbox.js";
 import { type AuthStatus, Login } from "./Login.js";
@@ -42,6 +43,7 @@ const projectsRoute = "#/projects";
 const providersRoute = "#/providers";
 const replyVoicesRoute = "#/reply-voices";
 const modelsRoute = "#/models";
+const billingRoute = "#/billing";
 
 function currentRoute(): string {
   return globalThis.location?.hash ?? "";
@@ -69,7 +71,13 @@ function useAuthStatus(): AuthStatus | null {
         // safe reading is signed out, and closed: an offer to register that we
         // could not confirm is an offer that will refuse.
         if (current) {
-          setStatus({ firstRun: false, signUpOpen: false, signedIn: false, account: null });
+          setStatus({
+            firstRun: false,
+            signUpOpen: false,
+            signedIn: false,
+            account: null,
+            billingMode: "off",
+          });
         }
       });
 
@@ -103,6 +111,7 @@ export function App() {
   const comparing = path.startsWith(providersRoute);
   const voicing = path.startsWith(replyVoicesRoute);
   const modelling = path.startsWith(modelsRoute);
+  const billing = path.startsWith(billingRoute);
 
   /**
    * The project everything else is about, carried in the route. US-045.
@@ -134,7 +143,13 @@ export function App() {
   // set of prices, every project. Asking it to pick a project first would ask a
   // question it has no use for.
   const needsProject =
-    !projecting && !connecting && !comparing && !voicing && !modelling && !notificationId;
+    !projecting &&
+    !connecting &&
+    !comparing &&
+    !voicing &&
+    !modelling &&
+    !billing &&
+    !notificationId;
   const withoutProject = needsProject && projectId === null;
 
   useEffect(() => {
@@ -226,6 +241,19 @@ export function App() {
             <span>Models</span>
           </a>
           {/*
+            Only where this instance charges. US-072. A self-hosted instance has
+            no subscription, so a Billing link there would open a page that can
+            only say so — and the route it reads is not even registered.
+          */}
+          {status?.billingMode === "stripe" && (
+            <a className={billing ? "nav-item current" : "nav-item"} href={billingRoute}>
+              <span className="nav-icon" aria-hidden="true">
+                ⬡
+              </span>
+              <span>Billing</span>
+            </a>
+          )}
+          {/*
             Also only with a project: a monitor is made in one, and the form
             prefills its four answers from it. Offered without one it would
             make an unfiled monitor, the state migration 0038 emptied out.
@@ -261,6 +289,15 @@ export function App() {
       </aside>
 
       <main className="app-main">
+        {/*
+          Why a write was refused, said wherever a person is. US-072.
+
+          The paywall answers 402 on every route that changes something, and a
+          person meeting that on the monitor form would read it as the form
+          being broken. The banner is the one place that says it is the
+          subscription, and it carries the way out.
+        */}
+        {status.billingMode === "stripe" && !billing && <TrialBanner />}
         {withoutProject ? (
           <Projects />
         ) : notificationId ? (
@@ -277,6 +314,8 @@ export function App() {
           <ReplyVoices />
         ) : modelling ? (
           <Models />
+        ) : billing ? (
+          <Billing />
         ) : listing ? (
           <Monitors />
         ) : (
@@ -314,5 +353,48 @@ function SignOut() {
     <button className="sign-out" disabled={busy} type="button" onClick={signOut}>
       Sign out
     </button>
+  );
+}
+
+/**
+ * The trial, on every screen but the billing one.
+ *
+ * Shown only while there is something to say: the last two days of a trial, or
+ * an account the server is already refusing. A banner that is always there is a
+ * banner nobody reads, and this one has to be read on the day it matters.
+ *
+ * It reads the same route the billing page does, so the sentence here and the
+ * sentence there cannot disagree.
+ */
+function TrialBanner() {
+  const [state, setState] = useState<BillingState | null>(null);
+
+  useEffect(() => {
+    let current = true;
+
+    requestJson<BillingState>("/api/billing")
+      .then((answer) => {
+        if (current) setState(answer);
+      })
+      .catch(() => {
+        // An instance that cannot answer this says nothing rather than
+        // guessing. A wrong "your trial ended" is worse than no banner.
+      });
+
+    return () => {
+      current = false;
+    };
+  }, []);
+
+  if (!state) return null;
+
+  const ending = state.reason === "trialing" && (state.trialDaysLeft ?? 99) <= 2;
+  if (!ending && state.entitled) return null;
+
+  return (
+    <p className={state.entitled ? "trial-banner" : "trial-banner ended"} role="status">
+      <span>{subscriptionSentence(state)}</span>
+      <a href="#/billing">Subscribe</a>
+    </p>
   );
 }

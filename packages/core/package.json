@@ -52,6 +52,7 @@
     "pg": "8.23.0",
     "pg-boss": "12.30.0",
     "pino": "10.1.0",
+    "stripe": "22.4.0",
     "zod": "4.5.4"
   },
   "devDependencies": {

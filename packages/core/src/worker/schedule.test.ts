@@ -1,7 +1,7 @@
 import { eq, sql } from "drizzle-orm";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { createDatabase, type Database } from "../db/client.js";
-import { defaultPollIntervalSeconds, monitors } from "../db/schema.js";
+import { defaultPollIntervalSeconds, monitors, subscriptions, users } from "../db/schema.js";
 import { createTestDatabase, type TestDatabase } from "../testing/database.js";
 import { startWorker, type WorkerHandle } from "./runtime.js";
 import { enqueueDuePolls, findDueMonitors } from "./schedule.js";
@@ -326,4 +326,92 @@ describe("two workers ticking at once", () => {
       polled.length >= before + 2 ? true : undefined,
     );
   }, 30_000);
+});
+
+/**
+ * Who has paid, and whose monitors therefore run. US-072.
+ *
+ * This is the half of the billing gate that costs money. A route that refuses
+ * to write is what a person sees; an account that keeps polling after its trial
+ * ran out is invisible from every screen and shows up on an invoice.
+ */
+describe("whether the owner has paid", () => {
+  let database: TestDatabase;
+  let db: Database;
+  let close: () => Promise<void>;
+
+  beforeAll(async () => {
+    database = await createTestDatabase("worker_due_billing");
+    ({ db, close } = createDatabase(database.url));
+  }, 60_000);
+
+  afterAll(async () => {
+    await close?.();
+    await database?.drop();
+  });
+
+  afterEach(async () => {
+    await db.delete(monitors);
+    await db.delete(subscriptions);
+    await db.delete(users);
+  });
+
+  async function ownerWith(status: string, trialEndsAt: Date | null): Promise<string> {
+    const id = `owner-${status}-${trialEndsAt ? trialEndsAt.getTime() : "none"}`;
+    await db.insert(users).values({ id, name: id, email: `${id}@example.test` });
+    await db.insert(subscriptions).values({ userId: id, status, trialEndsAt });
+    return id;
+  }
+
+  it("polls an expired account's monitors when this deployment does not charge", async () => {
+    const owner = await ownerWith("trialing", new Date(Date.now() - 60_000));
+    const id = await insertMonitor(database, { userId: owner });
+
+    /**
+     * The self-hosted default, and the assertion is that nothing changed. A
+     * `subscriptions` row on an instance that charges nobody must not be able
+     * to stop a poll.
+     */
+    expect((await findDueMonitors(db, "off")).map((monitor) => monitor.id)).toEqual([id]);
+  });
+
+  it("does not poll a monitor whose owner's trial has run out", async () => {
+    const expired = await ownerWith("trialing", new Date(Date.now() - 60_000));
+    const running = await ownerWith("trialing", new Date(Date.now() + 60 * 60 * 1000));
+
+    const stopped = await insertMonitor(database, { userId: expired });
+    const polling = await insertMonitor(database, { userId: running });
+
+    const ids = (await findDueMonitors(db, "stripe")).map((monitor) => monitor.id);
+
+    expect(ids).toEqual([polling]);
+    expect(ids).not.toContain(stopped);
+  });
+
+  it("keeps polling for a past-due card and stops for a cancelled one", async () => {
+    // The one judgement in the rule: a card that failed this morning is a
+    // person Stripe is still retrying, and stopping their monitors throws away
+    // collection they paid for. `canceled` is where Stripe gave up.
+    const retrying = await ownerWith("past_due", null);
+    const gone = await ownerWith("canceled", null);
+
+    const polling = await insertMonitor(database, { userId: retrying });
+    const stopped = await insertMonitor(database, { userId: gone });
+
+    const ids = (await findDueMonitors(db, "stripe")).map((monitor) => monitor.id);
+
+    expect(ids).toEqual([polling]);
+    expect(ids).not.toContain(stopped);
+  });
+
+  it("polls for an account that has no subscription row at all", async () => {
+    /**
+     * No row is the normal state for an account older than the table — the
+     * owner's own among them. A migration that silently stopped the instance
+     * that runs the product is not a state anybody should be able to reach.
+     */
+    const id = await insertMonitor(database, { userId: "older-than-billing" });
+
+    expect((await findDueMonitors(db, "stripe")).map((monitor) => monitor.id)).toEqual([id]);
+  });
 });

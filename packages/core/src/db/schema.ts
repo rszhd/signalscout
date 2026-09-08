@@ -1776,3 +1776,106 @@ export const verifications = pgTable("verifications", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
+
+/**
+ * What a subscription can be. US-072.
+ *
+ * Five values and no more, because every one of them has to answer one
+ * question: may this account write and may its monitors poll? Stripe's own
+ * status set is larger — `incomplete_expired`, `unpaid`, `paused` — and each
+ * of those maps onto one of these rather than being carried through. A status
+ * this application does not understand must not reach a table that decides
+ * whether somebody is entitled.
+ *
+ * `trialing` is ours before it is Stripe's. It is written at sign-up with no
+ * card and no Stripe object, so for most of its life the row here is the only
+ * record of it. See `billing/entitlement.ts`.
+ *
+ * `past_due` is entitled and `canceled` is not, and that is the one judgement
+ * in the list: a card that failed on Tuesday is a person Stripe is still
+ * retrying, and turning their monitors off before the retries finish loses
+ * data they paid for.
+ *
+ * There is no `trial_expired`, deliberately. An expired trial is `trialing`
+ * with a deadline in the past, which is a fact the clock already holds — a
+ * status meaning the same thing would need a job to write it, and until that
+ * job ran the row and the clock would disagree about whether somebody may
+ * poll.
+ */
+export const subscriptionStatuses = [
+  "trialing",
+  "active",
+  "past_due",
+  "canceled",
+  "incomplete",
+] as const;
+export type SubscriptionStatus = (typeof subscriptionStatuses)[number];
+
+/**
+ * One row per account, in a deployment that charges. US-072.
+ *
+ * No row is a normal state and it means two different things depending on the
+ * deployment. Self-hosted, it means billing is off and nobody ever writes
+ * here. Hosted, it means an account that predates this table — the owner's own
+ * — and `entitlementFor` reads that as entitled rather than as expired,
+ * because refusing the first account on the instance that runs the product is
+ * not a state anybody should be able to reach through a migration.
+ *
+ * The Stripe columns are null until somebody opens Checkout. A trial costs
+ * nothing, asks for no card, and creates no customer: there is nothing for a
+ * payment provider to hold. `stripe_customer_id` is unique so two accounts can
+ * never point at one customer, which is how a refund or a cancellation would
+ * silently move between people.
+ *
+ * `current_period_end` is Stripe's number, copied here, and it is not what
+ * decides entitlement — `status` is. It exists so a screen can say when the
+ * next charge falls without a round trip to Stripe on every page load.
+ */
+export const subscriptions = pgTable(
+  "subscriptions",
+  {
+    /** The account. One row each, so the account id is the key. */
+    userId: text("user_id")
+      .primaryKey()
+      .references((): AnyPgColumn => users.id, { onDelete: "cascade" }),
+    status: text("status").notNull(),
+    /**
+     * When the seven days run out.
+     *
+     * Written once, at sign-up, and never moved. A trial that is extended by
+     * anything other than a person deliberately extending it is a trial that
+     * does not end.
+     */
+    trialEndsAt: timestamp("trial_ends_at", { withTimezone: true }),
+    stripeCustomerId: text("stripe_customer_id").unique(),
+    stripeSubscriptionId: text("stripe_subscription_id").unique(),
+    /** Stripe's copy of when this period ends. Shown, never used to decide. */
+    currentPeriodEnd: timestamp("current_period_end", { withTimezone: true }),
+    /** Set when somebody cancels and the period has not run out yet. */
+    cancelAtPeriodEnd: boolean("cancel_at_period_end").notNull().default(false),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    /**
+     * The status is checked in the database and not only in TypeScript.
+     *
+     * This repository has shipped the other way twice — `apify` in US-057 and
+     * `draft_reply` in US-040 — and both times a full suite passed and a live
+     * run found it after the money was spent. A value added to the array above
+     * is not a value the database accepts.
+     */
+    check(
+      "subscriptions_status_known",
+      sql`${table.status} in ('trialing', 'active', 'past_due', 'canceled', 'incomplete')`,
+    ),
+    /**
+     * A trial with no deadline is not a trial. Every other status may have
+     * none, because a paid subscription's clock is Stripe's.
+     */
+    check(
+      "subscriptions_trial_has_an_end",
+      sql`${table.status} <> 'trialing' or ${table.trialEndsAt} is not null`,
+    ),
+  ],
+);

@@ -337,6 +337,13 @@
       "when": 1788707618120,
       "tag": "0047_a_reply_is_drafted_by_its_own_model",
       "breakpoints": true
+    },
+    {
+      "idx": 48,
+      "version": "7",
+      "when": 1788707618121,
+      "tag": "0048_a_cloud_account_has_a_subscription",
+      "breakpoints": true
     }
   ]
 }

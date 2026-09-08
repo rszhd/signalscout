@@ -11,10 +11,11 @@
  * monitor id turns the second send into `null`. That is the guarantee the
  * ticket asks for — a queue policy, not a lock this file writes.
  */
-import { and, isNull, or, sql } from "drizzle-orm";
+import { and, eq, isNull, or, sql } from "drizzle-orm";
 import type { PgBoss } from "pg-boss";
+import { type BillingMode, entitledCondition } from "../billing/index.js";
 import type { Database } from "../db/client.js";
-import { monitors } from "../db/schema.js";
+import { monitors, subscriptions } from "../db/schema.js";
 import type { Logger } from "../logger.js";
 import { pollQueue } from "./queues.js";
 
@@ -43,30 +44,59 @@ export interface DueMonitor {
  * in the UI would keep collecting and keep billing, which is the opposite of
  * what a person means when they press it. US-010.
  */
-export async function findDueMonitors(db: Database): Promise<DueMonitor[]> {
-  return db
-    .select({ id: monitors.id, pollIntervalSeconds: monitors.pollIntervalSeconds })
-    .from(monitors)
-    .where(
-      and(
-        // A monitor that names no source has nothing to poll.
-        sql`cardinality(${monitors.sources}) > 0`,
-        // A paused monitor keeps its history and collects nothing.
-        isNull(monitors.pausedAt),
-        /**
-         * Today, where the monitor lives. US-041.
-         *
-         * `AT TIME ZONE` reads the monitor's own zone, because a person who
-         * chose weekdays meant their weekdays — in UTC a Monday in Kuala Lumpur
-         * starts at 8am on Sunday.
-         */
-        sql`extract(dow from (now() AT TIME ZONE ${monitors.pollTimezone})) = ANY(${monitors.pollDays})`,
-        or(
-          isNull(monitors.lastPolledAt),
-          sql`${monitors.lastPolledAt} + make_interval(secs => ${monitors.pollIntervalSeconds}) <= now()`,
+export async function findDueMonitors(
+  db: Database,
+  /**
+   * Whether this deployment charges. US-072.
+   *
+   * `off` is the default and it is the whole self-hosted behaviour: the join
+   * below is still made and the condition is still true for every row, so the
+   * query a self-hoster runs returns exactly what it returned before billing
+   * existed.
+   *
+   * This is the half of the gate that matters. A route that refuses to write is
+   * what a person sees; this is what stops our hosting, our database and our
+   * compute being spent on an account that stopped paying — and an account
+   * still polling after it cancelled is invisible from every screen.
+   */
+  billing: BillingMode = "off",
+): Promise<DueMonitor[]> {
+  return (
+    db
+      .select({ id: monitors.id, pollIntervalSeconds: monitors.pollIntervalSeconds })
+      .from(monitors)
+      /**
+       * The owner's subscription, or no row.
+       *
+       * A left join and not an inner one, because no row is the normal state:
+       * self-hosted nothing ever writes here, and a hosted instance has accounts
+       * older than the table. `entitledCondition` reads both as entitled.
+       */
+      .leftJoin(subscriptions, eq(subscriptions.userId, monitors.userId))
+      .where(
+        and(
+          billing === "off"
+            ? sql`true`
+            : entitledCondition(sql`${subscriptions.status}`, sql`${subscriptions.trialEndsAt}`),
+          // A monitor that names no source has nothing to poll.
+          sql`cardinality(${monitors.sources}) > 0`,
+          // A paused monitor keeps its history and collects nothing.
+          isNull(monitors.pausedAt),
+          /**
+           * Today, where the monitor lives. US-041.
+           *
+           * `AT TIME ZONE` reads the monitor's own zone, because a person who
+           * chose weekdays meant their weekdays — in UTC a Monday in Kuala Lumpur
+           * starts at 8am on Sunday.
+           */
+          sql`extract(dow from (now() AT TIME ZONE ${monitors.pollTimezone})) = ANY(${monitors.pollDays})`,
+          or(
+            isNull(monitors.lastPolledAt),
+            sql`${monitors.lastPolledAt} + make_interval(secs => ${monitors.pollIntervalSeconds}) <= now()`,
+          ),
         ),
-      ),
-    );
+      )
+  );
 }
 
 export interface TickResult {
@@ -80,8 +110,9 @@ export async function enqueueDuePolls(
   db: Database,
   boss: PgBoss,
   logger: Logger,
+  billing: BillingMode = "off",
 ): Promise<TickResult> {
-  const due = await findDueMonitors(db);
+  const due = await findDueMonitors(db, billing);
   let alreadyQueued = 0;
 
   for (const monitor of due) {

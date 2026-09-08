@@ -3,6 +3,8 @@ import "@fontsource/figtree/400.css";
 import "@fontsource/figtree/500.css";
 import "@fontsource/figtree/600.css";
 import "@fontsource/figtree/700.css";
+import "@fontsource/figtree/800.css";
+import "@fontsource/figtree/900.css";
 import "../styles/tokens.css";
 import "../styles/landing.css";
 import Icon from "../components/Icon.astro";
@@ -86,7 +88,7 @@ const faqs = [
   ],
   [
     "What does the Cloud plan include?",
-    "Yes. SignalScout Cloud is $15 USD per month. We run the application, scheduler and database for you, including automatic updates and backups. Bring your own social data and AI keys; provider usage is billed separately.",
+    "SignalScout Cloud is $15 USD per month. We run the application, scheduler and database for you, including automatic updates and backups. Bring your own social data and AI keys; provider usage is billed separately.",
   ],
 ];
 ---
@@ -96,7 +98,7 @@ const faqs = [
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#48679f" />
+    <meta name="theme-color" content="#f4f2eb" />
     <title>SignalScout — Find conversations that need your product</title>
     <meta
       name="description"
@@ -135,29 +137,20 @@ const faqs = [
       <section class="hero container">
         <div class="hero-copy">
           <a class="eyebrow hero-badge" href="#open-source"
-            ><span class="status-dot"></span> Open source. Intent first. <span
+            ><span class="status-dot"></span> FOR PEOPLE BUILDING SOMETHING USEFUL <span
               aria-hidden="true">↗</span
             ></a
           >
-          <h1>
-            Your next customer<br />is already <span class="accent-word"
-              >asking.<svg
-                viewBox="0 0 290 16"
-                preserveAspectRatio="none"
-                aria-hidden="true"
-                ><path d="M3 10Q145-4 287 8M30 15Q175 4 268 13"></path></svg
-              ></span
-            >
-          </h1>
+          <h1>Your next customer<br />is already <span class="accent-word">asking.</span></h1>
           <p class="hero-description">
-            Find people talking about the problem your product solves. Turn
-            social conversations into an inbox of opportunities worth your time.
+            Somewhere, someone is asking for exactly what you’re building.
+            SignalScout finds the conversation. You bring the help.
           </p>
           <div class="hero-actions">
             <a class="button button-primary" href="#pricing"
-              >Start finding signals <Icon /></a
+              >Find your people <Icon /></a
             ><a class="text-link" href="#demo"
-              ><Icon name="play" size={18} /> See it in action</a
+              ><Icon name="inbox" size={18} /> Explore the inbox</a
             >
           </div>
           <p class="hero-note">
@@ -167,7 +160,7 @@ const faqs = [
         </div>
         <div class="hero-visual">
           <div class="visual-label">
-            <span class="status-dot"></span> LESS SEARCHING. MORE SIGNAL.
+            <span class="status-dot"></span> 001 / A SIGNAL, NOT JUST A MENTION
           </div>
           <div class="conversation-card">
             <div class="conversation-meta">
@@ -191,13 +184,13 @@ const faqs = [
             </div>
           </div>
           <div class="connection-line" aria-hidden="true">
-            <span>✦</span> Reading between the keywords
+            <span>✦</span> Problem → intent → match
           </div>
           <div class="insight-card">
             <div class="insight-heading">
               <div>
-                <span class="eyebrow">A CONVERSATION WORTH OPENING</span><h3>
-                  They have the problem you solve.
+                <span class="eyebrow">THIS IS YOUR PERSON</span><h3>
+                  A real problem. A reason to reply.
                 </h3>
               </div><div class="score">94<span>intent score</span></div>
             </div>
@@ -216,8 +209,8 @@ const faqs = [
         aria-label="Supported platforms"
       >
         <p>
-          Good conversations happen everywhere.<br /><strong
-            >Find yours where your customers are.</strong
+          SIX PLATFORMS. ONE INBOX.<br /><strong
+            >Go where the questions are.</strong
           >
         </p><div class="platforms">
           {
@@ -232,9 +225,9 @@ const faqs = [
       </section>
       <section class="section container workflow" id="how-it-works">
         <div class="section-intro">
-          <span class="eyebrow">FROM THE CONVERSATION TO THE OPPORTUNITY</span
+          <span class="eyebrow">01 / THE IDEA IS SIMPLE</span
           ><h2>
-            A little context from you.<br />A lot less noise in your day.
+            You build the product.<br />We’ll find the conversations.
           </h2><p>
             Tell SignalScout who you help. It finds the conversations that make
             it worth showing up.
@@ -254,7 +247,7 @@ const faqs = [
           <article>
             <span class="step-number">02 /</span><div class="step-icon">
               <Icon name="signal" size={26} />
-            </div><h3>Let the context do the filtering</h3><p>
+            </div><h3>Find the actual intent</h3><p>
               SignalScout collects conversations and uses AI to evaluate the
               problem, the person and their intent.
             </p><span class="step-foot">Every match comes with a reason.</span>
@@ -262,7 +255,7 @@ const faqs = [
           <article>
             <span class="step-number">03 /</span><div class="step-icon">
               <Icon name="inbox" size={26} />
-            </div><h3>Find your way into the conversation</h3><p>
+            </div><h3>Show up with something useful</h3><p>
               Review your best matches, open the original post and decide how
               you can help. Give feedback as you go.
             </p><span class="step-foot">You choose when to reach out.</span>
@@ -273,7 +266,7 @@ const faqs = [
         <div class="container">
           <div class="demo-heading">
             <div>
-              <span class="eyebrow">MEET YOUR INTENT INBOX</span><h2>
+              <span class="eyebrow">02 / YOUR NEXT GOOD CONVERSATION</span><h2>
                 Less scrolling.<br />More “this is our person.”
               </h2>
             </div><p>
@@ -401,7 +394,7 @@ const faqs = [
       </section>
       <section class="section container features" id="features">
         <div class="section-intro">
-          <span class="eyebrow">BUILT TO STAY USEFUL</span><h2>
+          <span class="eyebrow">03 / SMALL TOOL. STRONG CONVICTIONS.</span><h2>
             The right signal.<br />On your terms.
           </h2>
         </div><div class="feature-grid">
@@ -433,8 +426,8 @@ const faqs = [
       </section>
       <section class="container ownership" id="open-source">
         <div class="ownership-copy">
-          <span class="eyebrow">OPEN SOURCE, ALL THE WAY DOWN</span><h2>
-            Your opportunities.<br />Your infrastructure.
+          <span class="eyebrow">YOURS TO RUN. YOURS TO CHANGE.</span><h2>
+            Built in the open.<br />Owned by you.
           </h2><p>
             Run the full application on your own server. Keep control of your
             data, your accounts and the way you find your next customer.
@@ -485,9 +478,9 @@ const faqs = [
         aria-labelledby="pricing-title"
       >
         <div class="section-intro">
-          <span class="eyebrow">ONE PRODUCT. TWO WAYS TO RUN IT.</span>
+          <span class="eyebrow">04 / FAIR, SIMPLE PRICING</span>
           <h2 id="pricing-title">
-            Host it yourself.<br />Or leave the hosting to us.
+            A small price.<br />For your next big thing.
           </h2>
           <p>
             The full application either way. Choose who takes care of the
@@ -592,11 +585,11 @@ const faqs = [
       </section>
       <section class="final-cta container">
         <span class="eyebrow"
-          ><span class="status-dot"></span> THE NEXT CONVERSATION IS OUT THERE</span
-        ><h2>Find someone you can help.</h2><p>
+          ><span class="status-dot"></span> LESS SCROLLING. MORE BUILDING.</span
+        ><h2>Go find your people.</h2><p>
           Start with your product. Let the conversations come to you.
         </p><a class="button button-primary" href="#pricing"
-          >Get started with SignalScout <Icon /></a
+          >Let’s get started <Icon /></a
         >
       </section>
     </main>

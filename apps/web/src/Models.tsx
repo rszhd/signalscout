@@ -4,7 +4,7 @@ import { messageFor, requestJson } from "./api.js";
 /**
  * Which model does which job, and whose key pays for it. US-068.
  *
- * Four cards, because this product asks a model four different things and the
+ * Four jobs, because this product asks a model four different things and the
  * right answer is different for each. That is not a preference: US-030 measured
  * that triage only saves money when its model is cheaper than the scorer's,
  * Anthropic — the default provider — publishes no embedding endpoint at all so
@@ -43,12 +43,31 @@ interface ModelsView {
   tasks: TaskView[];
 }
 
-/** What one card's form holds while somebody edits it. */
+/** What one job editor holds while somebody changes it. */
 interface Draft {
   provider: string;
   model: string;
   baseUrl: string;
   apiKey: string;
+}
+
+const taskIcons: Record<TaskView["task"], string> = {
+  classify: "◎",
+  triage: "⌁",
+  embed: "◇",
+  draft: "✎",
+};
+
+const providerNames: Record<string, string> = {
+  anthropic: "Anthropic",
+  google: "Google",
+  ollama: "Ollama",
+  openai: "OpenAI",
+  openrouter: "OpenRouter",
+};
+
+function providerName(provider: string): string {
+  return providerNames[provider] ?? provider;
 }
 
 function draftOf(task: TaskView): Draft {
@@ -63,30 +82,39 @@ function draftOf(task: TaskView): Draft {
 function TaskCard({
   task,
   canStore,
-  pricedModels,
+  position,
   onSaved,
 }: {
   task: TaskView;
   canStore: boolean;
-  pricedModels: string[];
+  position: number;
   onSaved: (view: ModelsView) => void;
 }) {
+  const usingInstance = !task.provider && !task.model && !task.keyHint && !task.baseUrl;
   const [draft, setDraft] = useState<Draft>(() => draftOf(task));
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [saved, setSaved] = useState(false);
+  const [notice, setNotice] = useState<string | null>(null);
+  const [open, setOpen] = useState(task.task === "classify");
 
-  // The server's answer replaces what is on screen after every write, so a
-  // card cannot drift from the row behind it.
+  // The server's answer replaces what is on screen after every write, so an
+  // editor cannot drift from the row behind it.
   useEffect(() => setDraft(draftOf(task)), [task]);
 
-  const usingInstance = !task.provider && !task.model && !task.keyHint && !task.baseUrl;
+  const effectiveProvider = task.provider ?? task.instance.provider;
+  const effectiveModel = task.model ?? task.instance.model;
+
+  function change(field: keyof Draft, value: string): void {
+    setDraft((current) => ({ ...current, [field]: value }));
+    setError(null);
+    setNotice(null);
+  }
 
   async function submit(event: FormEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault();
     setBusy(true);
     setError(null);
-    setSaved(false);
+    setNotice(null);
 
     try {
       const view = await requestJson<ModelsView>(`/api/models/${task.task}`, {
@@ -103,7 +131,7 @@ function TaskCard({
       });
 
       onSaved(view);
-      setSaved(true);
+      setNotice("Changes saved");
     } catch (cause) {
       setError(messageFor(cause, "That could not be saved."));
     } finally {
@@ -114,9 +142,11 @@ function TaskCard({
   async function useInstance(): Promise<void> {
     setBusy(true);
     setError(null);
+    setNotice(null);
 
     try {
       onSaved(await requestJson<ModelsView>(`/api/models/${task.task}`, { method: "DELETE" }));
+      setNotice("Using instance defaults");
     } catch (cause) {
       setError(messageFor(cause, "That could not be removed."));
     } finally {
@@ -125,106 +155,175 @@ function TaskCard({
   }
 
   return (
-    <li className="model-card">
-      <div className="model-card-heading">
-        <h2>{task.title}</h2>
-        <p>{task.what}</p>
-        <p className="model-card-note">{task.note}</p>
-      </div>
+    <li className="model-task">
+      <details
+        className="model-task-disclosure"
+        open={open}
+        onToggle={(event) => setOpen(event.currentTarget.open)}
+      >
+        <summary className="model-task-summary">
+          <span className="model-task-icon" aria-hidden="true">
+            {taskIcons[task.task]}
+          </span>
+          <span className="model-task-copy">
+            <span className="model-task-kicker">Job {String(position).padStart(2, "0")}</span>
+            <strong>{task.title}</strong>
+            <span>{task.what}</span>
+          </span>
+          <span className="model-task-current">
+            <span>{usingInstance ? "Instance default" : "Custom setup"}</span>
+            <strong>
+              {providerName(effectiveProvider)}
+              <i className="model-current-separator" aria-hidden="true">
+                /
+              </i>
+              {effectiveModel ?? "Not configured"}
+            </strong>
+            <small>{task.keyHint ? `Stored key ${task.keyHint}` : "Uses the instance key"}</small>
+          </span>
+          <span className="model-task-manage">
+            <span>Manage</span>
+            <i className="model-task-chevron" aria-hidden="true">
+              ⌄
+            </i>
+          </span>
+        </summary>
 
-      <form className="field-stack" onSubmit={submit}>
-        <label className="field">
-          <span>Provider</span>
-          <select
-            aria-label={`${task.title} provider`}
-            value={draft.provider}
-            onChange={(event) => setDraft({ ...draft, provider: event.target.value })}
-          >
-            <option value="">This instance's ({task.instance.provider})</option>
-            {task.providers.map((provider) => (
-              <option key={provider} value={provider}>
-                {provider}
-              </option>
-            ))}
-          </select>
-        </label>
+        <form className="model-editor" onSubmit={submit}>
+          <div className="model-editor-main">
+            <header className="model-editor-heading">
+              <h3>Configuration</h3>
+              <p>Leave a field empty to inherit the instance setting shown beside it.</p>
+            </header>
 
-        <label className="field">
-          <span>Model</span>
-          <input
-            aria-label={`${task.title} model`}
-            list="priced-models"
-            placeholder={task.instance.model ?? "none — this task is off"}
-            value={draft.model}
-            onChange={(event) => setDraft({ ...draft, model: event.target.value })}
-          />
-          <small>
-            Empty uses this instance's. A model nothing here carries a price for still runs; its
-            calls are recorded with no cost rather than a guessed one.
-          </small>
-        </label>
+            <div className="model-field-grid">
+              <label className="field">
+                <span>Provider</span>
+                <select
+                  aria-label={`${task.title} provider`}
+                  value={draft.provider}
+                  onChange={(event) => change("provider", event.target.value)}
+                >
+                  <option value="">
+                    Instance default · {providerName(task.instance.provider)}
+                  </option>
+                  {task.providers.map((provider) => (
+                    <option key={provider} value={provider}>
+                      {providerName(provider)}
+                    </option>
+                  ))}
+                </select>
+                <small>Who runs this job.</small>
+              </label>
 
-        <label className="field">
-          <span>API key</span>
-          <input
-            aria-label={`${task.title} API key`}
-            autoComplete="off"
-            disabled={!canStore}
-            placeholder={task.keyHint ?? "This instance's key"}
-            type="password"
-            value={draft.apiKey}
-            onChange={(event) => setDraft({ ...draft, apiKey: event.target.value })}
-          />
-          <small>
-            {task.keyHint
-              ? `Stored: ${task.keyHint}. Leave this empty to keep it.`
-              : "Empty uses the key this instance is configured with."}
-          </small>
-        </label>
+              <label className="field">
+                <span>Model</span>
+                <input
+                  aria-label={`${task.title} model`}
+                  list="priced-models"
+                  placeholder={task.instance.model ?? "None — this job is off"}
+                  spellCheck={false}
+                  value={draft.model}
+                  onChange={(event) => change("model", event.target.value)}
+                />
+                <small>
+                  Instance default · {task.instance.model ?? "not configured"}. Unlisted models
+                  still run, but their cost is not estimated.
+                </small>
+              </label>
+            </div>
 
-        <details className="model-advanced">
-          <summary>Advanced</summary>
-          <label className="field">
-            <span>Base URL</span>
-            <input
-              aria-label={`${task.title} base URL`}
-              placeholder="The provider's own endpoint"
-              value={draft.baseUrl}
-              onChange={(event) => setDraft({ ...draft, baseUrl: event.target.value })}
-            />
-            <small>For a self-hosted gateway, or a local runtime such as Ollama.</small>
-          </label>
-        </details>
+            <label className="field model-key-field">
+              <span>API key</span>
+              <input
+                aria-label={`${task.title} API key`}
+                autoComplete="off"
+                disabled={!canStore}
+                placeholder={task.keyHint ?? "This instance's key"}
+                spellCheck={false}
+                type="password"
+                value={draft.apiKey}
+                onChange={(event) => change("apiKey", event.target.value)}
+              />
+              <small>
+                {task.keyHint
+                  ? `Stored: ${task.keyHint}. Leave this empty to keep it.`
+                  : "Leave empty to use the key configured for this instance."}
+              </small>
+            </label>
 
-        {error && (
-          <p className="form-error" role="alert">
-            {error}
-          </p>
-        )}
+            <details className="model-advanced">
+              <summary>
+                <span>Advanced settings</span>
+                <small className="model-advanced-hint">Custom endpoint</small>
+              </summary>
+              <label className="field">
+                <span>Base URL</span>
+                <input
+                  aria-label={`${task.title} base URL`}
+                  placeholder="The provider's own endpoint"
+                  spellCheck={false}
+                  value={draft.baseUrl}
+                  onChange={(event) => change("baseUrl", event.target.value)}
+                />
+                <small>For a self-hosted gateway or a local runtime such as Ollama.</small>
+              </label>
+            </details>
+          </div>
 
-        <div className="model-actions">
-          <button className="primary-button" disabled={busy} type="submit">
-            {busy ? "Saving…" : "Save"}
-          </button>
-          {!usingInstance && (
-            <button className="text-button" disabled={busy} type="button" onClick={useInstance}>
-              Use this instance's
+          <aside className="model-guidance" aria-label={`Guidance for ${task.title}`}>
+            <p className="model-guidance-label">Why it matters</p>
+            <p>{task.note}</p>
+            <dl>
+              <div>
+                <dt>Effective provider</dt>
+                <dd>{providerName(effectiveProvider)}</dd>
+              </div>
+              <div>
+                <dt>Effective model</dt>
+                <dd>{effectiveModel ?? "Off"}</dd>
+              </div>
+            </dl>
+          </aside>
+
+          {(error || notice) && (
+            <p
+              className={error ? "form-error model-answer" : "model-answer model-answer-good"}
+              role={error ? "alert" : "status"}
+            >
+              {!error && (
+                <span className="model-answer-icon" aria-hidden="true">
+                  ✓
+                </span>
+              )}
+              {error ?? notice}
+            </p>
+          )}
+
+          <div className="model-actions">
+            <button className="primary-button" disabled={busy} type="submit">
+              {busy ? "Saving…" : "Save changes"}
             </button>
-          )}
-          {saved && (
-            <span className="model-saved" role="status">
-              Saved
-            </span>
-          )}
-        </div>
-      </form>
-
-      <datalist id="priced-models">
-        {pricedModels.map((model) => (
-          <option key={model} value={model} />
-        ))}
-      </datalist>
+            {!usingInstance && (
+              <button className="text-button" disabled={busy} type="button" onClick={useInstance}>
+                Use instance defaults
+              </button>
+            )}
+          </div>
+        </form>
+      </details>
     </li>
+  );
+}
+
+function ModelsHeader() {
+  return (
+    <header className="topbar">
+      <div>
+        <h1>Models</h1>
+        <p className="page-subtitle">Choose the right model for each job in your workflow.</p>
+      </div>
+    </header>
   );
 }
 
@@ -248,36 +347,92 @@ export function Models() {
     };
   }, []);
 
-  return (
-    <div className="models-page">
-      <header className="topbar">
-        <div>
-          <h1>Models</h1>
-          <p className="page-subtitle">Which model does which job, and whose key pays for it.</p>
+  if (error) {
+    return (
+      <div className="product-page models-page">
+        <ModelsHeader />
+        <div className="center-state page-state" role="alert">
+          <span className="state-icon" aria-hidden="true">
+            !
+          </span>
+          <h2>Models could not be loaded</h2>
+          <p>{error}</p>
         </div>
-      </header>
+      </div>
+    );
+  }
 
-      {error && (
-        <p className="form-error" role="alert">
-          {error}
-        </p>
-      )}
+  if (!view) {
+    return (
+      <div className="product-page models-page">
+        <ModelsHeader />
+        <div className="center-state page-state" role="status">
+          <div className="spinner" aria-hidden="true" />
+          <p>Reading your model settings.</p>
+        </div>
+      </div>
+    );
+  }
 
-      {view?.storeBlocker && <p className="model-blocker">{view.storeBlocker}</p>}
+  const customTasks = view.tasks.filter(
+    (task) => task.provider || task.model || task.keyHint || task.baseUrl,
+  ).length;
 
-      {view && (
-        <ul className="model-cards">
-          {view.tasks.map((task) => (
-            <TaskCard
-              canStore={view.canStore}
-              key={task.task}
-              onSaved={setView}
-              pricedModels={view.pricedModels}
-              task={task}
-            />
+  return (
+    <div className="product-page models-page">
+      <ModelsHeader />
+
+      <main className="models-content">
+        <section className="models-overview" aria-labelledby="models-overview-title">
+          <div>
+            <p className="eyebrow">Account model setup</p>
+            <h2 id="models-overview-title">Configure only what needs to differ</h2>
+            <p>
+              Every job starts with this instance&apos;s provider, model, and key. Override a job
+              here only when you need a different model or want calls billed to your own account.
+            </p>
+          </div>
+          <div className="models-overview-status">
+            <strong>{customTasks}</strong>
+            <span>of {view.tasks.length} jobs customized</span>
+          </div>
+        </section>
+
+        {view.storeBlocker && (
+          <p className="model-blocker">
+            <span aria-hidden="true">!</span>
+            <span>{view.storeBlocker}</span>
+          </p>
+        )}
+
+        <section className="models-jobs" aria-labelledby="models-jobs-title">
+          <header className="models-section-heading">
+            <div>
+              <h2 id="models-jobs-title">Model jobs</h2>
+              <p>Open a job to review or change its configuration.</p>
+            </div>
+            <span>{view.tasks.length} jobs</span>
+          </header>
+
+          <ul className="model-task-list">
+            {view.tasks.map((task, index) => (
+              <TaskCard
+                canStore={view.canStore}
+                key={task.task}
+                onSaved={setView}
+                position={index + 1}
+                task={task}
+              />
+            ))}
+          </ul>
+        </section>
+
+        <datalist id="priced-models">
+          {view.pricedModels.map((model) => (
+            <option key={model} value={model} />
           ))}
-        </ul>
-      )}
+        </datalist>
+      </main>
     </div>
   );
 }

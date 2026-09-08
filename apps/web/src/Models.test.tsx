@@ -56,7 +56,7 @@ describe("the models screen", () => {
     screen = await mount(<Models />);
 
     expect(select("Scoring posts provider").value).toBe("");
-    expect(screen.container.textContent).toContain("This instance's (anthropic)");
+    expect(screen.container.textContent).toContain("Instance default · Anthropic");
     expect(field("Scoring posts model").placeholder).toBe("claude-haiku-4-5");
     expect(field("Scoring posts API key").placeholder).toBe("This instance's key");
   });
@@ -88,7 +88,7 @@ describe("the models screen", () => {
     screen = await mount(<Models />);
 
     setValue(field("Scoring posts model"), "gpt-5.6-luna");
-    await act(async () => button("Save").click());
+    await act(async () => button("Save changes").click());
     await settle();
 
     const [url, init] = fetched.mock.calls[1] as [string, RequestInit];
@@ -102,7 +102,7 @@ describe("the models screen", () => {
     screen = await mount(<Models />);
 
     setValue(field("Scoring posts API key"), "sk-mine");
-    await act(async () => button("Save").click());
+    await act(async () => button("Save changes").click());
     await settle();
 
     const [, init] = fetched.mock.calls[1] as [string, RequestInit];
@@ -111,13 +111,13 @@ describe("the models screen", () => {
 
   it("offers the way back to the instance's settings only when there is one", async () => {
     screen = await mount(<Models />);
-    expect(() => button("Use this instance's")).toThrow();
+    expect(() => button("Use instance defaults")).toThrow();
 
     await screen.unmount();
     fetched.mockResolvedValue(json(view({ provider: "openai" })));
     screen = await mount(<Models />);
 
-    await act(async () => button("Use this instance's").click());
+    await act(async () => button("Use instance defaults").click());
     await settle();
 
     // The last call, because the remount above made a second GET first.

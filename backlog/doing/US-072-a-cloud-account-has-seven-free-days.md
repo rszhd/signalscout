@@ -144,3 +144,18 @@ thing that makes somebody come back.
   signing secret from `stripe listen`. A hosted instance needs its own webhook
   endpoint at `<APP_URL>/api/billing/webhook`, and that address does not exist
   yet — US-071 recorded the same gap for `PUBLIC_APP_URL`.
+- 2026-09-08T18:58+08:00 — Stripe delivered a webhook for the first time, to
+  the staging instance. A test-mode endpoint was created against the SignalScout
+  Cloud account for `https://app.signalscout-dev.space/api/billing/webhook`,
+  subscribed to the five events `billing.ts` acts on. `stripe trigger
+  invoice.paid` produced a 200 and no signature failure, and an unsigned POST to
+  the same route is refused with 400.
+
+  Two things came with it. `BILLING_MODE=stripe` could not reach a container at
+  all until US-074, so this could not have been tested from the shipped
+  deployment before today. And the `stripe` CLI on the development machine is
+  signed in to a different account, which holds no products — every command
+  about this product needs `--api-key`, and `stripe listen` without one listens
+  to the wrong account and looks fine doing it.
+
+  Still unproven: a Checkout Session, and any card.

@@ -1111,10 +1111,24 @@ nothing to tell you why. The version is therefore pinned in `stripe.ts` rather
 than left to whatever the account's dashboard says.
 
 **Nothing about this has met a live payment.** The product and the $15 monthly
-price exist in the test account, the local webhook secret comes from
-`stripe listen`, and no Checkout Session has been completed, no webhook has been
-delivered by Stripe, and no card — real or test — has been entered. Read
-docs/billing.md before changing any of it.
+price exist in the test account, and no Checkout Session has been completed and
+no card — real or test — has been entered. Read docs/billing.md before changing
+any of it.
+
+**Stripe has now delivered a webhook, to staging, and the signature verified.**
+On 2026-09-08 a test-mode endpoint was created against the SignalScout Cloud
+account for `https://app.signalscout-dev.space/api/billing/webhook`, subscribed
+to the five events `billing.ts` acts on and no others. `stripe trigger
+invoice.paid` fired a real event: the app answered 200 and logged no signature
+failure. So the signature check, the raw-body handling and the open route are
+proven on a hosted endpoint rather than on `stripe listen`.
+
+**Two Stripe accounts exist and the CLI defaults to the wrong one.** The
+`stripe` CLI on the development machine is signed in to an account that holds no
+products at all; the key in `.env` belongs to the account holding "SignalScout
+Cloud". Every CLI command about this product therefore needs `--api-key`, and a
+`stripe listen` run without one listens to somebody else's account and reports
+nothing wrong.
 
 **A provider slower than a quarter of a second read as an outage, for as long
 as this product has had connectors.** BUG-011, found on 2026-09-08 when a

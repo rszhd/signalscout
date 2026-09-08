@@ -90,8 +90,9 @@ A static Vite bundle plus Fastify holds around 70-120 MB and spends no CPU on
 rendering. We give up server rendering. We do not need it, because the whole
 application sits behind a login.
 
-The marketing site is a separate static site on a CDN. It does not live in this
-repository.
+The marketing site is a separate Astro static site in `landing/`, deployed
+independently on Vercel. It has its own dependencies and build. It is not part
+of the application workspace or Docker image. See `landing/README.md`.
 
 ## Not Redis
 

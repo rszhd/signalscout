@@ -1,0 +1,631 @@
+---
+import "@fontsource/figtree/400.css";
+import "@fontsource/figtree/500.css";
+import "@fontsource/figtree/600.css";
+import "@fontsource/figtree/700.css";
+import "../styles/tokens.css";
+import "../styles/landing.css";
+import Icon from "../components/Icon.astro";
+const repository = "https://github.com/rszhd/signalscout";
+const setup = `${repository}#running-it`;
+const cloudUrl = import.meta.env.PUBLIC_APP_URL || "#pricing";
+const platforms = [
+  ["Reddit", "reddit.png"],
+  ["X / Twitter", "x.png"],
+  ["LinkedIn", "linkedin.ico"],
+  ["YouTube", "youtube.png"],
+  ["TikTok", "tiktok.png"],
+  ["Instagram", "instagram.png"],
+];
+const examples = [
+  {
+    platform: "Reddit",
+    icon: "reddit.png",
+    channel: "r/SaaS",
+    time: "12 min ago",
+    score: 94,
+    title: "How are small teams handling regression testing?",
+    body: "We’re only three developers and still manually test signup and checkout before every release. It takes half a day. What are other small teams using?",
+    signal: "Asking for recommendations",
+    reason:
+      "A small SaaS team describes a recurring manual QA problem and explicitly asks for a solution.",
+    fit: [98, 91, 94],
+  },
+  {
+    platform: "X",
+    icon: "x.png",
+    channel: "@example_founder",
+    time: "28 min ago",
+    score: 87,
+    title: "Our tests need more attention than our product.",
+    body: "Another release, another afternoon fixing broken selectors. Anyone moved away from brittle end-to-end tests to something easier to maintain?",
+    signal: "Looking for alternatives",
+    reason:
+      "The author describes ongoing maintenance pain and is actively looking for a different testing approach.",
+    fit: [95, 80, 87],
+  },
+  {
+    platform: "Reddit",
+    icon: "reddit.png",
+    channel: "r/startups",
+    time: "46 min ago",
+    score: 82,
+    title: "We keep finding bugs after our customers do.",
+    body: "We’re a four-person team shipping every week. Nobody owns QA and things keep slipping through. How do you build a testing process without hiring a full team?",
+    signal: "Describing a problem",
+    reason:
+      "A small team has a current quality problem and needs a testing process that fits limited resources.",
+    fit: [93, 96, 82],
+  },
+];
+const faqs = [
+  [
+    "What does SignalScout actually look for?",
+    "You describe your product, ideal customer and the problems you solve. SignalScout searches for conversations, then uses AI to evaluate problem fit, customer fit and intent. You get scored matches with an explanation you can review.",
+  ],
+  [
+    "Which platforms can I monitor?",
+    "Reddit, X, LinkedIn, YouTube, TikTok and Instagram. Access comes through connected data providers, and capabilities vary by provider. Posts and comments can carry very different signals, so choose the places where your customers describe their problems.",
+  ],
+  [
+    "Is it free to use?",
+    "The self-hosted application is free and open source under Apache 2.0. You pay for your own hosting, social data providers and AI usage. There is no SignalScout subscription required to self-host.",
+  ],
+  [
+    "Are social data and AI costs included?",
+    "Both plans use your own provider accounts. The Cloud subscription covers hosting and maintenance. Social data and AI usage are billed directly by your providers, and depend on your sources, model and polling schedule.",
+  ],
+  [
+    "Can I choose my own AI model?",
+    "Yes. Bring credentials for a supported AI provider or use a compatible local model. Your instance makes the calls using your configuration.",
+  ],
+  [
+    "Does it automatically contact people?",
+    "No. You review each conversation and decide whether to respond. SignalScout can help draft a reply, but you edit it and post it yourself.",
+  ],
+  [
+    "What does the Cloud plan include?",
+    "Yes. SignalScout Cloud is $15 USD per month. We run the application, scheduler and database for you, including automatic updates and backups. Bring your own social data and AI keys; provider usage is billed separately.",
+  ],
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#48679f" />
+    <title>SignalScout — Find conversations that need your product</title>
+    <meta
+      name="description"
+      content="Find people talking about the problem your product solves. SignalScout is an open-source AI intent inbox for Reddit, X and more. Self-host it with your own keys."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Your next customer is already asking." />
+    <meta
+      property="og:description"
+      content="Find conversations that need your product with SignalScout. Open source. Self-hosted. Your keys."
+    />
+    <meta name="twitter:card" content="summary" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <div class="container nav-row">
+        <a class="brand" href="/" aria-label="SignalScout home"
+          ><span class="brand-mark"><Icon name="signal" size={23} /></span
+          >SignalScout<span class="brand-period">.</span></a
+        >
+        <nav aria-label="Main navigation">
+          <a href="#how-it-works">How it works</a><a href="#features"
+            >Features</a
+          ><a href="#pricing">Pricing</a><a href="#open-source">Open source</a>
+        </nav>
+        <a class="button button-small nav-cta" href={repository}
+          ><Icon name="github" size={18} /> GitHub <span aria-hidden="true"
+            >↗</span
+          ></a
+        >
+      </div>
+    </header>
+    <main id="main">
+      <section class="hero container">
+        <div class="hero-copy">
+          <a class="eyebrow hero-badge" href="#open-source"
+            ><span class="status-dot"></span> Open source. Intent first. <span
+              aria-hidden="true">↗</span
+            ></a
+          >
+          <h1>
+            Your next customer<br />is already <span class="accent-word"
+              >asking.<svg
+                viewBox="0 0 290 16"
+                preserveAspectRatio="none"
+                aria-hidden="true"
+                ><path d="M3 10Q145-4 287 8M30 15Q175 4 268 13"></path></svg
+              ></span
+            >
+          </h1>
+          <p class="hero-description">
+            Find people talking about the problem your product solves. Turn
+            social conversations into an inbox of opportunities worth your time.
+          </p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#pricing"
+              >Start finding signals <Icon /></a
+            ><a class="text-link" href="#demo"
+              ><Icon name="play" size={18} /> See it in action</a
+            >
+          </div>
+          <p class="hero-note">
+            <Icon name="check" size={16} /> Free to self-host <span>·</span> Cloud
+            for $15/month
+          </p>
+        </div>
+        <div class="hero-visual">
+          <div class="visual-label">
+            <span class="status-dot"></span> LESS SEARCHING. MORE SIGNAL.
+          </div>
+          <div class="conversation-card">
+            <div class="conversation-meta">
+              <img
+                src="/brands/reddit.png"
+                alt=""
+                width="25"
+                height="25"
+              /><strong>r/SaaS</strong><span>12 minutes ago</span><span
+                class="more"
+                aria-hidden="true">···</span
+              >
+            </div>
+            <h2>
+              “We’re only three developers and still manually test before every
+              release. What are other small teams using?”
+            </h2>
+            <div class="conversation-bottom">
+              <span>↑ 24 <span class="comment-count">◯ 12 comments</span></span
+              ><span class="signal-label">Recommendation request</span>
+            </div>
+          </div>
+          <div class="connection-line" aria-hidden="true">
+            <span>✦</span> Reading between the keywords
+          </div>
+          <div class="insight-card">
+            <div class="insight-heading">
+              <div>
+                <span class="eyebrow">A CONVERSATION WORTH OPENING</span><h3>
+                  They have the problem you solve.
+                </h3>
+              </div><div class="score">94<span>intent score</span></div>
+            </div>
+            <p>
+              <Icon name="check" size={16} /> Small team with a recurring QA problem
+            </p><p>
+              <Icon name="check" size={16} /> Actively asking for a better solution
+            </p>
+            <a href="#demo">Explore the intent inbox <Icon size={17} /></a>
+          </div>
+          <p class="example-caption">Illustrative conversation and scores</p>
+        </div>
+      </section>
+      <section
+        class="platform-strip container"
+        aria-label="Supported platforms"
+      >
+        <p>
+          Good conversations happen everywhere.<br /><strong
+            >Find yours where your customers are.</strong
+          >
+        </p><div class="platforms">
+          {
+            platforms.map(([name, icon]) => (
+              <span>
+                <img src={`/brands/${icon}`} alt="" width="22" height="22" />
+                {name}
+              </span>
+            ))
+          }
+        </div>
+      </section>
+      <section class="section container workflow" id="how-it-works">
+        <div class="section-intro">
+          <span class="eyebrow">FROM THE CONVERSATION TO THE OPPORTUNITY</span
+          ><h2>
+            A little context from you.<br />A lot less noise in your day.
+          </h2><p>
+            Tell SignalScout who you help. It finds the conversations that make
+            it worth showing up.
+          </p>
+        </div>
+        <div class="steps">
+          <article>
+            <span class="step-number">01 /</span><div class="step-icon">
+              <Icon name="sliders" size={26} />
+            </div><h3>Describe what you solve</h3><p>
+              Add your product, ideal customer and the problems you fix. Choose
+              the signals and platforms you care about.
+            </p><span class="step-foot"
+              >Your product is the starting point.</span
+            >
+          </article>
+          <article>
+            <span class="step-number">02 /</span><div class="step-icon">
+              <Icon name="signal" size={26} />
+            </div><h3>Let the context do the filtering</h3><p>
+              SignalScout collects conversations and uses AI to evaluate the
+              problem, the person and their intent.
+            </p><span class="step-foot">Every match comes with a reason.</span>
+          </article>
+          <article>
+            <span class="step-number">03 /</span><div class="step-icon">
+              <Icon name="inbox" size={26} />
+            </div><h3>Find your way into the conversation</h3><p>
+              Review your best matches, open the original post and decide how
+              you can help. Give feedback as you go.
+            </p><span class="step-foot">You choose when to reach out.</span>
+          </article>
+        </div>
+      </section>
+      <section class="demo-section" id="demo">
+        <div class="container">
+          <div class="demo-heading">
+            <div>
+              <span class="eyebrow">MEET YOUR INTENT INBOX</span><h2>
+                Less scrolling.<br />More “this is our person.”
+              </h2>
+            </div><p>
+              A score to help you prioritize.<br />The context to make your own
+              call.
+            </p>
+          </div>
+          <div class="inbox-demo">
+            <aside class="demo-sidebar">
+              <span class="mini-brand"
+                ><span class="brand-mark"><Icon name="signal" size={19} /></span
+                > SignalScout</span
+              ><span class="workspace-label">YOUR WORKSPACE</span><span
+                class="sidebar-current"
+                ><Icon name="inbox" size={18} /> Intent inbox <b>3</b></span
+              ><span><Icon name="signal" size={18} /> Monitors</span><span
+                ><Icon name="key" size={18} /> Connections</span
+              ><div class="demo-project">
+                <span class="project-avatar">Q</span><div>
+                  QA for small teams<small>Example project</small>
+                </div>
+              </div>
+            </aside>
+            <div class="inbox-content">
+              <div class="inbox-title">
+                <h3>Intent inbox <span>3 matches</span></h3><span
+                  class="sample-badge">Interactive example</span
+                >
+              </div><div class="inbox-columns">
+                <div
+                  class="match-list"
+                  role="group"
+                  aria-label="Select an example conversation"
+                >
+                  {
+                    examples.map((item, index) => (
+                      <button
+                        class:list={["match-row", { selected: index === 0 }]}
+                        data-match={index}
+                        aria-pressed={index === 0}
+                      >
+                        <>
+                          <span class="match-top">
+                            <>
+                              <span>
+                                <img
+                                  src={`/brands/${item.icon}`}
+                                  alt=""
+                                  width="16"
+                                  height="16"
+                                />
+                                {item.channel}
+                              </span>
+                              <b>{item.score}</b>
+                            </>
+                          </span>
+                          <strong>{item.title}</strong>
+                          <span class="match-time">
+                            {item.time} <span>↗</span>
+                          </span>
+                        </>
+                      </button>
+                    ))
+                  }
+                </div><div class="match-detail">
+                  {
+                    examples.map((item, index) => (
+                      <article data-detail={index} hidden={index !== 0}>
+                        <>
+                          <div class="detail-meta">
+                            <>
+                              <span>
+                                <img
+                                  src={`/brands/${item.icon}`}
+                                  alt=""
+                                  width="18"
+                                  height="18"
+                                />
+                                {item.platform} · {item.channel}
+                              </span>
+                              <span class="high-intent">
+                                {item.score} / 100
+                              </span>
+                            </>
+                          </div>
+                          <h4>{item.title}</h4>
+                          <p class="post-body">{item.body}</p>
+                          <span class="signal-label">{item.signal}</span>
+                          <div class="reason">
+                            <>
+                              <span>
+                                <Icon name="signal" size={16} /> WHAT THE MODEL
+                                SAW
+                              </span>
+                              <p>{item.reason}</p>
+                            </>
+                          </div>
+                          <div class="fit-scores">
+                            {["Problem fit", "Customer fit", "Intent"].map(
+                              (label, i) => (
+                                <div>
+                                  <span>
+                                    {label}
+                                    <b>{item.fit[i]}</b>
+                                  </span>
+                                  <div class="meter">
+                                    <i style={`width:${item.fit[i]}%`} />
+                                  </div>
+                                </div>
+                              ),
+                            )}
+                          </div>
+                        </>
+                      </article>
+                    ))
+                  }
+                </div>
+              </div>
+            </div>
+          </div><p class="demo-note">
+            Try selecting a conversation. All posts and scores in this preview
+            are illustrative.
+          </p>
+        </div>
+      </section>
+      <section class="section container features" id="features">
+        <div class="section-intro">
+          <span class="eyebrow">BUILT TO STAY USEFUL</span><h2>
+            The right signal.<br />On your terms.
+          </h2>
+        </div><div class="feature-grid">
+          <article>
+            <Icon name="signal" size={28} /><h3>Intent beyond keywords</h3><p>
+              A complaint, a comparison, a request for help. Find the context
+              that makes a conversation relevant to your product.
+            </p>
+          </article>
+          <article>
+            <Icon name="sliders" size={28} /><h3>A schedule you control</h3><p>
+              Choose when monitors run, which platforms they search and how much
+              you plan to spend.
+            </p>
+          </article>
+          <article>
+            <Icon name="bell" size={28} /><h3>Keep useful matches close</h3><p>
+              Read your inbox, receive email digests or connect your own
+              workflow with signed webhooks.
+            </p>
+          </article>
+          <article>
+            <Icon name="key" size={28} /><h3>Your providers. Your keys.</h3><p>
+              Connect your own social data and AI accounts. Choose your model
+              and pay your providers directly.
+            </p>
+          </article>
+        </div>
+      </section>
+      <section class="container ownership" id="open-source">
+        <div class="ownership-copy">
+          <span class="eyebrow">OPEN SOURCE, ALL THE WAY DOWN</span><h2>
+            Your opportunities.<br />Your infrastructure.
+          </h2><p>
+            Run the full application on your own server. Keep control of your
+            data, your accounts and the way you find your next customer.
+          </p><a class="button button-primary" href={repository}
+            ><Icon name="github" /> Explore the source <Icon
+              name="external"
+              size={17}
+            /></a
+          ><span class="license-note"
+            >Apache 2.0 · Free to self-host · Provider usage billed separately</span
+          >
+        </div><div class="ownership-list">
+          {
+            [
+              [
+                "The full application",
+                "The inbox, monitors, scheduler, email and webhooks.",
+              ],
+              [
+                "Bring your own keys",
+                "Your social data accounts and your choice of AI provider.",
+              ],
+              [
+                "Made to run on your server",
+                "A Docker Compose setup you can inspect and control.",
+              ],
+            ].map(([title, body]) => (
+              <div>
+                <>
+                  <span class="ownership-check">
+                    <Icon name="check" size={18} />
+                  </span>
+                  <div>
+                    <>
+                      <h3>{title}</h3>
+                      <p>{body}</p>
+                    </>
+                  </div>
+                </>
+              </div>
+            ))
+          }
+        </div>
+      </section>
+      <section
+        class="section container pricing"
+        id="pricing"
+        aria-labelledby="pricing-title"
+      >
+        <div class="section-intro">
+          <span class="eyebrow">ONE PRODUCT. TWO WAYS TO RUN IT.</span>
+          <h2 id="pricing-title">
+            Host it yourself.<br />Or leave the hosting to us.
+          </h2>
+          <p>
+            The full application either way. Choose who takes care of the
+            infrastructure.
+          </p>
+        </div>
+        <div class="pricing-grid">
+          <article class="price-card" aria-labelledby="self-hosted-title">
+            <span class="eyebrow">YOUR INFRASTRUCTURE</span>
+            <h3 id="self-hosted-title">Self-hosted</h3>
+            <p class="plan-description">
+              For people who want to run their own instance.
+            </p>
+            <p class="plan-price">
+              <strong>$0</strong><span>free forever</span>
+            </p>
+            <p class="plan-cost-note">You cover hosting and provider usage.</p>
+            <a class="button" href={setup}
+              >Start self-hosting <Icon name="github" size={18} /></a
+            >
+            <ul class="plan-features">
+              {
+                [
+                  "Full application, open source",
+                  "Intent inbox and AI scoring",
+                  "Monitors and scheduler",
+                  "Email alerts and webhooks",
+                  "Bring your own social data and AI keys",
+                  "Docker Compose setup",
+                ].map((feature) => (
+                  <li>
+                    <Icon name="check" size={17} />
+                    {feature}
+                  </li>
+                ))
+              }
+            </ul>
+          </article>
+          <article class="price-card cloud-card" aria-labelledby="cloud-title">
+            <span class="eyebrow">WE TAKE CARE OF THE HOSTING</span>
+            <h3 id="cloud-title">SignalScout Cloud</h3>
+            <p class="plan-description">
+              For people who want one less server to maintain.
+            </p>
+            <p class="plan-price">
+              <strong>$15</strong><span>USD / month</span>
+            </p>
+            <p class="plan-cost-note">
+              Billed monthly. Provider usage is separate.
+            </p>
+            <a class="button button-primary" href={cloudUrl}
+              >Get started with Cloud <Icon size={18} /></a
+            >
+            <ul class="plan-features">
+              {
+                [
+                  "Everything in Self-hosted",
+                  "No server setup",
+                  "Managed application and scheduler",
+                  "Hosted database",
+                  "Automatic updates and backups",
+                  "Bring your own social data and AI keys",
+                ].map((feature) => (
+                  <li>
+                    <Icon name="check" size={17} />
+                    {feature}
+                  </li>
+                ))
+              }
+            </ul>
+          </article>
+        </div>
+        <p class="pricing-note">
+          <Icon name="key" size={17} /> Your accounts. Your keys. Social data and
+          AI usage are paid directly to your providers on both plans.
+        </p>
+      </section>
+      <section class="section container faq" id="faq">
+        <div>
+          <span class="eyebrow">A FEW MORE DETAILS</span><h2>
+            Good questions.
+          </h2><p>
+            Something else on your mind?<br /><a href={`${repository}/issues`}
+              >Ask us on GitHub <span aria-hidden="true">↗</span></a
+            >
+          </p>
+        </div><div class="faq-list">
+          {
+            faqs.map(([question, answer]) => (
+              <details>
+                <>
+                  <summary>
+                    {question}
+                    <span aria-hidden="true">+</span>
+                  </summary>
+                  <p>{answer}</p>
+                </>
+              </details>
+            ))
+          }
+        </div>
+      </section>
+      <section class="final-cta container">
+        <span class="eyebrow"
+          ><span class="status-dot"></span> THE NEXT CONVERSATION IS OUT THERE</span
+        ><h2>Find someone you can help.</h2><p>
+          Start with your product. Let the conversations come to you.
+        </p><a class="button button-primary" href="#pricing"
+          >Get started with SignalScout <Icon /></a
+        >
+      </section>
+    </main>
+    <footer class="container footer">
+      <a class="brand" href="/"
+        ><span class="brand-mark"><Icon name="signal" size={20} /></span
+        >SignalScout<span class="brand-period">.</span></a
+      ><p>Find the conversation. Be useful.</p><nav
+        aria-label="Footer navigation"
+      >
+        <a href={repository}>GitHub ↗</a><a href={`${repository}#readme`}
+          >Documentation ↗</a
+        ><a href={`${repository}/blob/main/LICENSE`}>License ↗</a>
+      </nav>
+    </footer>
+    <script>
+      const buttons =
+        document.querySelectorAll<HTMLButtonElement>("[data-match]");
+      const details = document.querySelectorAll<HTMLElement>("[data-detail]");
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          for (const candidate of buttons) {
+            const selected = candidate === button;
+            candidate.classList.toggle("selected", selected);
+            candidate.setAttribute("aria-pressed", String(selected));
+          }
+          for (const detail of details)
+            detail.hidden = detail.dataset.detail !== button.dataset.match;
+        });
+      }
+    </script>
+  </body>
+</html>

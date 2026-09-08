@@ -2,7 +2,7 @@
 
 # Done
 
-59 finished.
+60 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
@@ -15,6 +15,7 @@
 | BUG-003 | [A post below the threshold is classified again on every poll](done/2026-09/BUG-003-a-post-below-the-threshold-is-classified-again-on-every-poll.md) | bug | fixed | 2026-09 |
 | BUG-002 | [A seven-day window is bought as a month](done/2026-09/BUG-002-a-seven-day-window-is-bought-as-a-month.md) | bug | fixed | 2026-09 |
 | BUG-001 | [A pending Reddit collection is not resumed](done/2026-09/BUG-001-a-pending-reddit-collection-is-not-resumed.md) | bug | shipped | 2026-09 |
+| US-071 | [A standalone landing page introduces the product](done/2026-09/US-071-a-standalone-landing-page-introduces-the-product.md) | feature | shipped | 2026-09 |
 | US-070 | [A reply is drafted by a model of its own](done/2026-09/US-070-a-reply-is-drafted-by-a-model-of-its-own.md) | feature | done | 2026-09 |
 | US-069 | [The sidebar says who is signed in](done/2026-09/US-069-the-sidebar-says-who-is-signed-in.md) | feature | done | 2026-09 |
 | US-068 | [A model key belongs to an account](done/2026-09/US-068-a-model-key-belongs-to-an-account.md) | feature | done | 2026-09 |

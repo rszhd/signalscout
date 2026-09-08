@@ -1,52 +1,54 @@
 /**
- * Reading a value out of the hash route. US-045, US-050.
+ * Every address in this application, in one table. US-076.
  *
- * The router lives in the hash, so a route can carry a query of its own:
- * `#/?project=<id>` is the inbox scoped to one project, and
- * `#/monitors?project=<id>` is its monitors. Three screens read the same
- * parameter, which is why this is one function rather than a third copy.
+ * The route used to live in the hash, and a Stripe return then read
+ * `/billing?checkout=done#/billing` — one address saying the same thing twice,
+ * because the path was the server's answer and the hash was the app's. There
+ * is one now. Fastify already hands `index.html` to any path that is not an
+ * API route or a file, and Vite does the same in development, so a path route
+ * is a real address: it can be bookmarked, linked to, and returned to by a
+ * payment provider.
  *
- * `globalThis.location` is read on every call rather than captured, because a
- * hash change does not remount anything: a screen that captured it once would
- * keep showing the project a person had navigated away from.
+ * The project is a path segment rather than a query parameter. An inbox is a
+ * question about one business, so the business is what the address is *of* —
+ * `/projects/<id>` — and not a filter laid over a page that means something
+ * without it.
+ *
+ * These are builders rather than strings, so the shape of an address is
+ * written once. `routes` beside them is the same table as the router matches
+ * it, and `App.tsx` is the only file that needs those.
  */
 
-/** The query part of the current hash route, or an empty one. */
-export function routeQuery(hash = globalThis.location?.hash ?? ""): URLSearchParams {
-  return new URLSearchParams(hash.split("?")[1] ?? "");
-}
+/** The patterns the router matches. Only `App.tsx` uses these. */
+export const routes = {
+  projects: "/projects",
+  inbox: "/projects/:projectId",
+  monitors: "/projects/:projectId/monitors",
+  newMonitor: "/projects/:projectId/monitors/new",
+  notifications: "/projects/:projectId/monitors/:monitorId/notifications",
+  connections: "/connections",
+  providers: "/providers",
+  replyVoices: "/reply-voices",
+  models: "/models",
+  billing: "/billing",
+} as const;
 
 /**
- * One parameter, or null.
+ * The address of each screen.
  *
- * Null rather than an empty string, so a caller can spread it into a request
- * and have absence mean absence — `project=` would filter on a project whose
- * id is the empty string, which is a query that matches nothing and looks like
- * an empty inbox.
+ * Every id is encoded, because a path segment carrying a slash would silently
+ * become a different route.
  */
-export function routeParam(name: string, hash?: string): string | null {
-  const found = routeQuery(hash).get(name);
-  return found === null || found.trim() === "" ? null : found;
-}
-
-/** The path part, without its query: `#/monitors?x=1` is `#/monitors`. */
-export function routePath(hash = globalThis.location?.hash ?? ""): string {
-  return hash.split("?")[0] ?? "";
-}
-
-/**
- * The current project as a query suffix, or an empty string.
- *
- * `#/monitors${projectSuffix()}` keeps a link inside the project a person is
- * looking at. Read live rather than passed down: a link is rendered wherever
- * it is rendered, and threading the project through every component that draws
- * one is how a single missed prop becomes a link that silently leaves the
- * project.
- *
- * `App.tsx` refuses the unscoped routes outright, so this is what stops that
- * refusal being reached rather than what enforces it.
- */
-export function projectSuffix(hash?: string): string {
-  const project = routeParam("project", hash);
-  return project === null ? "" : `?project=${project}`;
-}
+export const paths = {
+  projects: routes.projects,
+  inbox: (projectId: string): string => `/projects/${encodeURIComponent(projectId)}`,
+  monitors: (projectId: string): string => `${paths.inbox(projectId)}/monitors`,
+  newMonitor: (projectId: string): string => `${paths.monitors(projectId)}/new`,
+  notifications: (projectId: string, monitorId: string): string =>
+    `${paths.monitors(projectId)}/${encodeURIComponent(monitorId)}/notifications`,
+  connections: routes.connections,
+  providers: routes.providers,
+  replyVoices: routes.replyVoices,
+  models: routes.models,
+  billing: routes.billing,
+} as const;

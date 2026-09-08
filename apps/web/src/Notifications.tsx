@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router";
 import { messageFor, requestJson } from "./api.js";
-import { projectSuffix } from "./route.js";
+import { paths } from "./route.js";
 
 interface Settings {
   emailEnabled: boolean;
@@ -21,7 +22,13 @@ interface Response {
   nextDigestAt: string | null;
 }
 
-export function Notifications({ monitorId }: { monitorId: string }) {
+export function Notifications({
+  monitorId,
+  projectId,
+}: {
+  readonly monitorId: string;
+  readonly projectId: string;
+}) {
   const [data, setData] = useState<Response | null>(null);
   const [settings, setSettings] = useState<Settings | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -74,9 +81,9 @@ export function Notifications({ monitorId }: { monitorId: string }) {
           <p className="eyebrow">Monitor settings</p>
           <h1>Notifications</h1>
         </div>
-        <a className="text-link" href={`#/monitors${projectSuffix()}`}>
+        <Link className="text-link" to={paths.monitors(projectId)}>
           Back to monitors
-        </a>
+        </Link>
       </header>
       <div className="notification-panel">
         {error && <p role="alert">{error}</p>}

@@ -242,8 +242,8 @@ describe("the projects screen", () => {
 
     const links = [...container.querySelectorAll("a")].map((link) => link.getAttribute("href"));
 
-    expect(links).toContain("#/?project=11111111-1111-4111-8111-111111111111");
-    expect(links).toContain("#/monitors/new?project=11111111-1111-4111-8111-111111111111");
+    expect(links).toContain("/projects/11111111-1111-4111-8111-111111111111");
+    expect(links).toContain("/projects/11111111-1111-4111-8111-111111111111/monitors/new");
   });
 
   it("keeps the list separate from editing and clears a cancelled draft", async () => {

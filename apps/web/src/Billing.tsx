@@ -10,7 +10,9 @@
  * it. The same read decides the sentence at the top and which button is offered.
  */
 import { useCallback, useEffect, useState } from "react";
+import { Link, useSearchParams } from "react-router";
 import { messageFor, requestJson } from "./api.js";
+import { paths } from "./route.js";
 
 export interface BillingState {
   mode: "off" | "stripe";
@@ -68,6 +70,26 @@ export function subscriptionSentence(state: BillingState): string {
 }
 
 export function Billing() {
+  /**
+   * Where Stripe sends a person back to. US-076.
+   *
+   * Checkout returns to `/billing?checkout=done`, which is a real address now
+   * rather than a path and a hash saying the same thing twice. The parameter
+   * is read once and then removed, because it describes one arrival: a reload
+   * or a bookmark of the same address would otherwise announce a payment that
+   * happened last week.
+   */
+  const [search, setSearch] = useSearchParams();
+  const [arrival] = useState(() => search.get("checkout"));
+
+  useEffect(() => {
+    if (search.has("checkout")) {
+      const rest = new URLSearchParams(search);
+      rest.delete("checkout");
+      setSearch(rest, { replace: true });
+    }
+  }, [search, setSearch]);
+
   const [state, setState] = useState<BillingState | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -150,6 +172,21 @@ export function Billing() {
       </header>
 
       <div className="billing-content">
+        {/*
+          Stripe's own answer is the webhook, not this parameter, so the
+          sentence says what happened rather than what the account now is —
+          the subscription below is read from our own database either way.
+        */}
+        {arrival === "done" && (
+          <p className="billing-arrival" role="status">
+            Thank you. Stripe has taken your payment. Your subscription is shown below.
+          </p>
+        )}
+        {arrival === "cancelled" && (
+          <p className="billing-arrival" role="status">
+            You left Stripe without paying. Nothing was charged.
+          </p>
+        )}
         {state === null ? (
           <section className="billing-loading" aria-live="polite">
             {error ? (
@@ -279,9 +316,9 @@ export function Billing() {
                   Social data and AI providers bill your accounts directly. Their usage is separate
                   from your SignalScout subscription.
                 </p>
-                <a className="secondary-button" href="#/connections">
+                <Link className="secondary-button" to={paths.connections}>
                   Manage connections <span aria-hidden="true">↗</span>
-                </a>
+                </Link>
               </div>
               <dl>
                 <div>

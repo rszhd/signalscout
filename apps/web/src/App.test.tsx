@@ -2,12 +2,12 @@
 /**
  * Which screen the shell shows.
  *
- * These claims are about what a person lands on. The inbox is the
- * product, so an empty hash is the inbox and not the setup form. The monitor
- * form has to be reachable from the header, because the inbox's own empty
- * state sends people to it. The monitor list must not answer to the form's
- * route, because "#/monitors" is a prefix of "#/monitors/new" and the shorter
- * test would take both. And the nav offers only screens that are built.
+ * These claims are about what a person lands on. Every address here is a real
+ * path — US-076 moved the router out of the hash — so what a case asserts is
+ * the pair: the sidebar carries the link, and the router puts that screen on
+ * the page. The inbox, the monitor list and the form all live inside a
+ * project, and an address naming none is sent to choose one. The nav offers
+ * only screens that are built.
  */
 import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -22,21 +22,16 @@ const options = {
 };
 
 /**
- * Change the route the way the browser does after a click.
+ * Where a project's screens live. US-076.
  *
- * The click itself is not driven here. jsdom does not follow a fragment link
- * reliably — it leaves the location untouched and fires nothing — so a test
- * built on it would prove the browser rather than the app. What each case
- * asserts instead is the pair: the header carries the link, and the shell
- * follows the hash. The gap left is whether a real browser turns that link
- * into that hash, which no jsdom test can say.
+ * The project is a path segment rather than a query parameter, because an
+ * inbox is a question about one business — the address is *of* that business
+ * and not a filter over a page that means something without it.
  */
-async function go(hash: string): Promise<void> {
-  await act(async () => {
-    globalThis.location.hash = hash;
-  });
-  await settle();
-}
+const project = "p1";
+const inbox = `/projects/${project}`;
+const monitors = `${inbox}/monitors`;
+const newMonitor = `${monitors}/new`;
 
 describe("the application screens", () => {
   let screen: Screen;
@@ -44,7 +39,6 @@ describe("the application screens", () => {
   let billingState: BillingState;
 
   beforeEach(() => {
-    globalThis.location.hash = "";
     billingMode = "off";
     billingState = {
       mode: "stripe",
@@ -91,7 +85,6 @@ describe("the application screens", () => {
   afterEach(async () => {
     await screen?.unmount();
     vi.unstubAllGlobals();
-    globalThis.location.hash = "";
   });
 
   /**
@@ -144,21 +137,17 @@ describe("the application screens", () => {
   });
 
   it("opens on the inbox once a project is named", async () => {
-    globalThis.location.hash = "#/?project=p1";
-    screen = await mount(<App />);
+    screen = await mount(<App />, inbox);
 
     expect(screen.container.textContent).toContain("Intent inbox");
   });
 
   it("reaches the monitor form from the header", async () => {
-    globalThis.location.hash = "#/?project=p1";
-    screen = await mount(<App />);
+    screen = await mount(<App />, inbox);
 
-    expect(
-      screen.container.querySelector('nav a[href="#/monitors/new?project=p1"]'),
-    ).not.toBeNull();
+    expect(screen.container.querySelector(`nav a[href="${newMonitor}"]`)).not.toBeNull();
 
-    await go("#/monitors/new?project=p1");
+    await screen.go(newMonitor);
 
     expect(screen.container.textContent).toContain("What should this monitor find?");
     expect(screen.container.querySelector('[role="dialog"]')).toBeNull();
@@ -167,51 +156,48 @@ describe("the application screens", () => {
   });
 
   it("reaches the monitor list from the header, and not the form's route", async () => {
-    globalThis.location.hash = "#/?project=p1";
-    screen = await mount(<App />);
+    screen = await mount(<App />, inbox);
 
-    expect(screen.container.querySelector('nav a[href="#/monitors?project=p1"]')).not.toBeNull();
+    expect(screen.container.querySelector(`nav a[href="${monitors}"]`)).not.toBeNull();
 
-    await go("#/monitors?project=p1");
+    await screen.go(monitors);
     expect(screen.container.textContent).toContain("No monitors yet");
 
     expect(screen.container.querySelector('[role="dialog"]')).toBeNull();
 
     // Setup owns the whole page; the monitor list is not mounted underneath.
-    await go("#/monitors/new?project=p1");
+    await screen.go(newMonitor);
     expect(screen.container.textContent).toContain("What should this monitor find?");
     expect(screen.container.querySelector(".setup-page")).not.toBeNull();
   });
 
   it("comes back to the inbox from the header", async () => {
-    globalThis.location.hash = "#/monitors/new?project=p1";
-    screen = await mount(<App />);
+    screen = await mount(<App />, newMonitor);
     expect(screen.container.textContent).toContain("What should this monitor find?");
 
-    expect(screen.container.querySelector('nav a[href="#/?project=p1"]')).not.toBeNull();
+    expect(screen.container.querySelector(`nav a[href="${inbox}"]`)).not.toBeNull();
 
-    await go("#/?project=p1");
+    await screen.go(inbox);
 
     expect(screen.container.textContent).toContain("Intent inbox");
   });
 
   it("keeps page setup open on Escape", async () => {
-    globalThis.location.hash = "#/monitors/new?project=p1";
-    screen = await mount(<App />);
+    screen = await mount(<App />, newMonitor);
 
     await act(async () => {
       globalThis.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
     });
     await settle();
 
-    expect(globalThis.location.hash).toBe("#/monitors/new?project=p1");
+    expect(screen.path()).toBe(newMonitor);
     expect(screen.container.querySelector('[role="dialog"]')).toBeNull();
   });
 
   it("shows the connections screen on its own route", async () => {
     screen = await mount(<App />);
 
-    await go("#/connections");
+    await screen.go("/connections");
 
     expect(screen.container.textContent).toContain("Connections");
   });
@@ -226,7 +212,7 @@ describe("the application screens", () => {
   it("hides the project-scoped links on connections", async () => {
     screen = await mount(<App />);
 
-    await go("#/connections");
+    await screen.go("/connections");
 
     const links = [...screen.container.querySelectorAll("nav a")].map((link) =>
       link.getAttribute("href"),
@@ -235,13 +221,7 @@ describe("the application screens", () => {
     // Pricing joins Connections here, and for the same reason: both are
     // machine-level screens — one set of keys, one set of prices, every
     // project — so neither carries one. US-058.
-    expect(links).toEqual([
-      "#/projects",
-      "#/connections",
-      "#/providers",
-      "#/reply-voices",
-      "#/models",
-    ]);
+    expect(links).toEqual(["/projects", "/connections", "/providers", "/reply-voices", "/models"]);
   });
 
   /**
@@ -254,7 +234,7 @@ describe("the application screens", () => {
   it("hides the inbox, the monitors and new-monitor while no project is chosen", async () => {
     screen = await mount(<App />);
 
-    await go("#/projects");
+    await screen.go("/projects");
 
     const links = [...screen.container.querySelectorAll("nav a")].map((link) =>
       link.getAttribute("href"),
@@ -263,19 +243,13 @@ describe("the application screens", () => {
     // A monitor is made inside a project and prefills its four answers from
     // one, so offering the form here would make an unfiled monitor — the state
     // migration 0038 emptied out.
-    expect(links).toEqual([
-      "#/projects",
-      "#/connections",
-      "#/providers",
-      "#/reply-voices",
-      "#/models",
-    ]);
+    expect(links).toEqual(["/projects", "/connections", "/providers", "/reply-voices", "/models"]);
   });
 
   it("carries the project through every link once one is chosen", async () => {
     screen = await mount(<App />);
 
-    await go("#/?project=p1");
+    await screen.go(inbox);
 
     const links = [...screen.container.querySelectorAll("nav a")].map((link) =>
       link.getAttribute("href"),
@@ -283,9 +257,9 @@ describe("the application screens", () => {
 
     // The inbox, the monitors and the new-monitor form all stay inside the
     // project a person is looking at.
-    expect(links).toContain("#/?project=p1");
-    expect(links).toContain("#/monitors?project=p1");
-    expect(links).toContain("#/monitors/new?project=p1");
+    expect(links).toContain(inbox);
+    expect(links).toContain(monitors);
+    expect(links).toContain(newMonitor);
   });
 
   /**
@@ -296,9 +270,8 @@ describe("the application screens", () => {
    * the requirement lives in the router: no project, no inbox and no monitors.
    */
   it("sends a person to choose a project rather than answering for all of them", async () => {
-    for (const hash of ["#/", "#/monitors", "#/monitors/new"]) {
-      globalThis.location.hash = hash;
-      screen = await mount(<App />);
+    for (const address of ["/", "/monitors", "/monitors/new", "/projects//monitors"]) {
+      screen = await mount(<App />, address);
 
       expect(screen.container.textContent).toContain("Projects");
       // Not the inbox, and not the form: neither means anything yet.
@@ -306,23 +279,21 @@ describe("the application screens", () => {
       expect(screen.container.textContent).not.toContain("What should this monitor find?");
 
       // And the address is corrected, so it stops saying something untrue.
-      expect(globalThis.location.hash).toBe("#/projects");
+      expect(screen.path()).toBe("/projects");
 
       await screen.unmount();
     }
   });
 
   it("shows the inbox once a project is chosen", async () => {
-    globalThis.location.hash = "#/?project=p1";
-    screen = await mount(<App />);
+    screen = await mount(<App />, inbox);
 
     expect(screen.container.textContent).toContain("Intent inbox");
-    expect(globalThis.location.hash).toBe("#/?project=p1");
+    expect(screen.path()).toBe(inbox);
   });
 
   it("does not expose mockup routes whose behaviour is not built", async () => {
-    globalThis.location.hash = "#/?project=p1";
-    screen = await mount(<App />);
+    screen = await mount(<App />, inbox);
 
     const links = [...screen.container.querySelectorAll("nav a")].map((link) =>
       link.getAttribute("href"),
@@ -331,24 +302,55 @@ describe("the application screens", () => {
     // the screen behind it was built. Settings is still a mockup route and must
     // stay off the nav: a link that leads nowhere is worse than no link.
     expect(links).toEqual([
-      "#/projects",
-      "#/?project=p1",
-      "#/monitors?project=p1",
-      "#/connections",
-      "#/providers",
-      "#/reply-voices",
-      "#/models",
-      "#/monitors/new?project=p1",
+      "/projects",
+      inbox,
+      monitors,
+      "/connections",
+      "/providers",
+      "/reply-voices",
+      "/models",
+      newMonitor,
     ]);
     expect(screen.container.textContent).not.toContain("Settings");
+  });
+
+  /**
+   * The address is one address. US-076.
+   *
+   * The router lived in the hash until then, so Stripe's return read
+   * `/billing?checkout=done#/billing` — the path was the server's answer and
+   * the hash was the app's, and the two said the same thing twice.
+   */
+  it("puts the whole route in the path, with no hash", async () => {
+    billingMode = "stripe";
+    screen = await mount(<App />, "/billing?checkout=done");
+
+    expect(screen.container.textContent).toContain("Billing");
+    expect(screen.path()).toBe("/billing");
+
+    const links = [...screen.container.querySelectorAll("a")].map((link) =>
+      link.getAttribute("href"),
+    );
+    for (const link of links) expect(link).not.toContain("#");
+  });
+
+  /**
+   * A self-hosted instance has no subscription, so the route is not
+   * registered — and an address naming it lands on the projects list rather
+   * than on a page that can only say the instance does not charge. US-072.
+   */
+  it("does not answer the billing address where the instance does not charge", async () => {
+    screen = await mount(<App />, "/billing");
+
+    expect(screen.path()).toBe("/projects");
   });
 
   it("opens account-level reply voices without asking for a project", async () => {
     screen = await mount(<App />);
 
-    await go("#/reply-voices");
+    await screen.go("/reply-voices");
 
-    expect(globalThis.location.hash).toBe("#/reply-voices");
+    expect(screen.path()).toBe("/reply-voices");
     expect(screen.container.textContent).toContain("Reusable writing guidance for every project.");
     expect(screen.container.textContent).toContain("Create your first reply voice");
   });

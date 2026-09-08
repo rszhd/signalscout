@@ -275,3 +275,21 @@
   font-weight: 500;
   white-space: nowrap;
 }
+
+/**
+ * What Stripe sent a person back with. US-076.
+ *
+ * Above the subscription rather than inside it, because it describes the trip
+ * they have just made and the panel below describes the account. The two can
+ * briefly disagree: the payment is confirmed by Stripe's webhook, which may
+ * arrive a moment after the person does.
+ */
+.billing-arrival {
+  margin: 0 0 var(--space-6);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--accent-soft);
+  color: var(--muted-strong);
+  font-size: var(--text-sm);
+}

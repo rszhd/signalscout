@@ -1,5 +1,6 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import { BrowserRouter } from "react-router";
 import { App } from "./App.js";
 import "./index.css";
 import "./styles/theme.css";
@@ -22,6 +23,15 @@ if (!container) {
 
 createRoot(container).render(
   <StrictMode>
-    <App />
+    {/*
+      A real path router. US-076.
+
+      Fastify hands `index.html` to any path that is not an API route or a
+      file, and Vite does the same in development, so every address the app
+      writes is one the server will serve on a refresh.
+    */}
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
   </StrictMode>,
 );

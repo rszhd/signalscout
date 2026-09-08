@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
+import { Link } from "react-router";
 import { messageFor, requestJson } from "./api.js";
 import { BrandIcon } from "./BrandIcon.js";
 import { ageLabel } from "./labels.js";
 import { ReplyDraft } from "./ReplyDraft.js";
-import { projectSuffix, routeParam } from "./route.js";
+import { paths } from "./route.js";
 
 /**
  * The intent inbox.
@@ -248,23 +249,17 @@ function whereItCameFrom(match: Match): string {
   return channel ? `${platform.name} · ${channel}` : platform.name;
 }
 
-export function Inbox() {
+/**
+ * The inbox of one project. US-045, US-076.
+ *
+ * The project comes from the address — `/projects/<id>` — and reaches this
+ * screen as a prop, because the router already read it. Every effect below
+ * lists it as a dependency: moving between projects matches the same route and
+ * remounts nothing, so a screen that read it once would keep showing the
+ * project a person had navigated away from.
+ */
+export function Inbox({ projectId }: { readonly projectId: string }) {
   const [monitors, setMonitors] = useState<MonitorSummary[]>([]);
-  /**
-   * The project this inbox is scoped to, from `#/?project=<id>`. US-045.
-   *
-   * Held in state and refreshed on `hashchange`, because moving between
-   * projects does not remount this screen — a value read once would keep
-   * showing the project a person had navigated away from.
-   */
-  const [projectId, setProjectId] = useState(() => routeParam("project"));
-
-  useEffect(() => {
-    const onChange = () => setProjectId(routeParam("project"));
-    globalThis.addEventListener("hashchange", onChange);
-    return () => globalThis.removeEventListener("hashchange", onChange);
-  }, []);
-
   const [monitorId, setMonitorId] = useState("");
   const [minScore, setMinScore] = useState(0);
   const [matches, setMatches] = useState<Match[]>([]);
@@ -301,7 +296,7 @@ export function Inbox() {
       .then((rows) => {
         if (cancelled) return;
 
-        const mine = projectId === null ? rows : rows.filter((row) => row.projectId === projectId);
+        const mine = rows.filter((row) => row.projectId === projectId);
 
         setMonitors(mine.map(({ id, name }) => ({ id, name })));
 
@@ -330,7 +325,7 @@ export function Inbox() {
    */
   const filterQuery = useCallback((): URLSearchParams => {
     const query = new URLSearchParams();
-    if (projectId) query.set("projectId", projectId);
+    query.set("projectId", projectId);
     if (monitorId) query.set("monitorId", monitorId);
     if (minScore > 0) query.set("minScore", String(minScore));
     if (showDismissed) query.set("includeNotRelevant", "true");
@@ -368,7 +363,7 @@ export function Inbox() {
     setError(null);
 
     const query = new URLSearchParams({ cursor: page.nextCursor, asOf: page.asOf });
-    if (projectId) query.set("projectId", projectId);
+    query.set("projectId", projectId);
     if (monitorId) query.set("monitorId", monitorId);
     if (minScore > 0) query.set("minScore", String(minScore));
     if (showDismissed) query.set("includeNotRelevant", "true");
@@ -483,9 +478,9 @@ export function Inbox() {
           <p className="page-subtitle">Find your next conversation.</p>
         </div>
         {(matches.length > 0 || monitors.length === 0) && (
-          <a className="top-secondary-link" href={`#/monitors/new${projectSuffix()}`}>
+          <Link className="top-secondary-link" to={paths.newMonitor(projectId)}>
             <span aria-hidden="true">+ </span>New monitor
-          </a>
+          </Link>
         )}
       </header>
 
@@ -595,9 +590,9 @@ export function Inbox() {
               </span>
               <h2>No monitors yet</h2>
               <p>Create a monitor and SignalScout will start collecting conversations.</p>
-              <a className="primary-button" href={`#/monitors/new${projectSuffix()}`}>
+              <Link className="primary-button" to={paths.newMonitor(projectId)}>
                 Create a monitor
-              </a>
+              </Link>
             </>
           ) : filtered ? (
             <>

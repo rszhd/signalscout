@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { Link } from "react-router";
 import { messageFor, requestJson } from "./api.js";
+import { paths } from "./route.js";
 
 /**
  * Projects: the answers that describe a business, typed once. US-045.
@@ -475,7 +477,7 @@ export function Projects() {
                         </span>
                         <div className="project-identity">
                           <h2 className="project-name">
-                            <a href={`#/?project=${project.id}`}>{project.name}</a>
+                            <Link to={paths.inbox(project.id)}>{project.name}</Link>
                           </h2>
 
                           <small className="project-count">
@@ -498,15 +500,12 @@ export function Projects() {
                         <p>{project.idealCustomer}</p>
                       </div>
                       <div className="project-actions">
-                        <a className="project-inbox-link" href={`#/?project=${project.id}`}>
+                        <Link className="project-inbox-link" to={paths.inbox(project.id)}>
                           Open inbox →
-                        </a>
-                        <a
-                          className="secondary-button"
-                          href={`#/monitors/new?project=${project.id}`}
-                        >
+                        </Link>
+                        <Link className="secondary-button" to={paths.newMonitor(project.id)}>
                           New monitor
-                        </a>
+                        </Link>
                       </div>
                     </li>
                   ))}

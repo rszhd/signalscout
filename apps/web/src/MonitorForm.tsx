@@ -1,9 +1,10 @@
 import { type FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Link } from "react-router";
 import { messageFor, requestJson } from "./api.js";
 import { BrandIcon } from "./BrandIcon.js";
 import { CostTest, type EstimateReport, exceedsCap } from "./CostTest.js";
 import { formatMicros, toMicros } from "./Monitors.js";
-import { projectSuffix } from "./route.js";
+import { paths } from "./route.js";
 import { ScheduleField } from "./ScheduleField.js";
 import { browserTimezone, defaultRate, everyDay, timezoneOptions } from "./schedule.js";
 
@@ -189,7 +190,7 @@ function cleanList(values: readonly string[] | undefined): string[] {
  * owns the sequence, and keeps the generated plan editable before anything
  * starts. Each step owns one decision; App routes here as a dedicated page.
  */
-export function MonitorForm() {
+export function MonitorForm({ projectId }: { readonly projectId: string }) {
   const [optionsState, setOptionsState] = useState<OptionsState>({ state: "loading" });
   const [answers, setAnswers] = useState<Answers>(emptyAnswers);
   const [selectedSignals, setSelectedSignals] = useState<string[]>([]);
@@ -242,18 +243,6 @@ export function MonitorForm() {
   /** The plan the estimate measured. An edited plan makes the answer stale. */
   const [testedPlan, setTestedPlan] = useState<string | null>(null);
 
-  /**
-   * The project this monitor is being made in, from `#/monitors/new?project=`.
-   *
-   * US-045. Read once from the hash rather than held in state: the form is
-   * mounted fresh at that route, and a project chosen after typing has begun
-   * would have to decide whether to overwrite what was typed. Arriving with
-   * one is the only case worth serving.
-   */
-  const projectId = new URLSearchParams((globalThis.location?.hash ?? "").split("?")[1] ?? "").get(
-    "project",
-  );
-
   useEffect(() => {
     let cancelled = false;
 
@@ -266,37 +255,35 @@ export function MonitorForm() {
      * The signals come from the project when it has any, so a person who
      * narrowed them once does not narrow them again. The project form stopped
      * asking for them, so most projects have none — those fall through to the
-     * every-signal default below, which is what a monitor with no project
-     * gets. The two fetches race, so neither may overwrite a choice the other
-     * made: this one only writes when the project has something to say.
+     * every-signal default below. The two fetches race, so neither may
+     * overwrite a choice the other made: this one only writes when the project
+     * has something to say.
      */
-    if (projectId) {
-      requestJson<{
-        name: string;
-        product: string;
-        idealCustomer: string;
-        problem: string;
-        signals: string[];
-      }>(`/api/projects/${projectId}`)
-        .then((project) => {
-          if (cancelled) return;
-          setAnswers((current) => ({
-            // The monitor's own name is left alone: a project is a business
-            // and a monitor is one search inside it, so they are not the same
-            // name and prefilling one with the other invites a list of
-            // identical rows.
-            name: current.name,
-            product: project.product,
-            idealCustomer: project.idealCustomer,
-            problem: project.problem,
-          }));
-          if (project.signals.length > 0) setSelectedSignals(project.signals);
-        })
-        .catch(() => {
-          // A project that has gone leaves an ordinary empty form, which is
-          // what a person can act on. Nothing here is worth an error banner.
-        });
-    }
+    requestJson<{
+      name: string;
+      product: string;
+      idealCustomer: string;
+      problem: string;
+      signals: string[];
+    }>(`/api/projects/${projectId}`)
+      .then((project) => {
+        if (cancelled) return;
+        setAnswers((current) => ({
+          // The monitor's own name is left alone: a project is a business
+          // and a monitor is one search inside it, so they are not the same
+          // name and prefilling one with the other invites a list of
+          // identical rows.
+          name: current.name,
+          product: project.product,
+          idealCustomer: project.idealCustomer,
+          problem: project.problem,
+        }));
+        if (project.signals.length > 0) setSelectedSignals(project.signals);
+      })
+      .catch(() => {
+        // A project that has gone leaves an ordinary empty form, which is
+        // what a person can act on. Nothing here is worth an error banner.
+      });
 
     requestJson<MonitorOptions>("/api/monitor-options")
       .then((options) => {
@@ -503,7 +490,7 @@ export function MonitorForm() {
           ...answers,
           // Where the answers came from, for grouping. The answers themselves
           // are already copied into the body above.
-          ...(projectId ? { projectId } : {}),
+          projectId,
           signals: selectedSignals,
           queries,
           subreddits,
@@ -551,9 +538,9 @@ export function MonitorForm() {
           <h1>New monitor</h1>
           <p className="page-subtitle">A focused search for people you can help.</p>
         </div>
-        <a className="top-secondary-link" href={`#/monitors${projectSuffix()}`}>
+        <Link className="top-secondary-link" to={paths.monitors(projectId)}>
           Exit setup
-        </a>
+        </Link>
       </header>
       <div className="setup-layout">
         <aside className="setup-progress" aria-label="Setup progress">
@@ -673,9 +660,9 @@ export function MonitorForm() {
               </div>
 
               <div className="setup-actions">
-                <a className="secondary-button" href={`#/monitors${projectSuffix()}`}>
+                <Link className="secondary-button" to={paths.monitors(projectId)}>
                   Cancel
-                </a>
+                </Link>
                 <button className="primary-button" type="submit" disabled={working !== null}>
                   Continue
                 </button>
@@ -1191,9 +1178,9 @@ export function MonitorForm() {
                     : "Your plan is saved without collecting. Adjust the budget or search plan before starting it from Monitors."
                   : "SignalScout will collect the first conversations on the monitor schedule."}
               </p>
-              <a className="primary-button" href={`#/monitors${projectSuffix()}`}>
+              <Link className="primary-button" to={paths.monitors(projectId)}>
                 View monitors
-              </a>
+              </Link>
               <button className="text-button" type="button" onClick={reset}>
                 Create another monitor
               </button>

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link, Navigate, Outlet, Route, Routes, useMatch, useParams } from "react-router";
 import { requestJson } from "./api.js";
 import { Billing, type BillingState, subscriptionSentence } from "./Billing.js";
 import { BrandLogo } from "./BrandLogo.js";
@@ -12,15 +13,19 @@ import { Notifications } from "./Notifications.js";
 import { Projects } from "./Projects.js";
 import { Providers } from "./Providers.js";
 import { ReplyVoices } from "./ReplyVoices.js";
-import { routeParam, routePath } from "./route.js";
+import { paths, routes } from "./route.js";
 
 /**
  * The shell: the header, and which of the four screens is on it.
  *
- * The route lives in the hash rather than the path. Fastify already serves
- * `index.html` for any path that is not an API route or a file, so a path
- * router would work — but it would also need history handling this app has no
- * use for yet, and a hash is one listener.
+ * The route lives in the path, through React Router. US-076 moved it out of
+ * the hash: Fastify already serves `index.html` for any path that is not an
+ * API route or a file, so a path is a real address — and while the route lived
+ * in the hash, a Stripe return read `/billing?checkout=done#/billing`, which is
+ * one address saying the same thing twice.
+ *
+ * The project is a path segment now, not a query parameter. `route.ts` holds
+ * the whole table and explains why.
  *
  * **The inbox was the default until US-045, and now the projects list is.**
  * That reverses a decision this comment used to state, so it is written down
@@ -36,19 +41,6 @@ import { routeParam, routePath } from "./route.js";
  * its inbox rather than on the setup form is still right, and a project with
  * no monitors is told so and offered the form.
  */
-
-const newMonitorRoute = "#/monitors/new";
-const monitorsRoute = "#/monitors";
-const connectionsRoute = "#/connections";
-const projectsRoute = "#/projects";
-const providersRoute = "#/providers";
-const replyVoicesRoute = "#/reply-voices";
-const modelsRoute = "#/models";
-const billingRoute = "#/billing";
-
-function currentRoute(): string {
-  return globalThis.location?.hash ?? "";
-}
 
 /**
  * Who is looking, asked once on load. US-017.
@@ -123,73 +115,9 @@ function useBillingState(enabled: boolean): BillingState | null {
 
 export function App() {
   const status = useAuthStatus();
-  const [route, setRoute] = useState(currentRoute);
   const billingState = useBillingState(
     status?.signedIn === true && status.billingMode === "stripe",
   );
-
-  useEffect(() => {
-    const onChange = () => setRoute(currentRoute());
-    globalThis.addEventListener("hashchange", onChange);
-    return () => globalThis.removeEventListener("hashchange", onChange);
-  }, []);
-
-  // The longer route is tested first: "#/monitors" is a prefix of
-  // "#/monitors/new", and testing the shorter one first would put the list on
-  // the screen for both.
-  const path = routePath(route);
-  const notificationId = /^#\/monitors\/([0-9a-f-]+)\/notifications$/.exec(path)?.[1];
-  const creating = path.startsWith(newMonitorRoute);
-  const listing = !creating && path.startsWith(monitorsRoute);
-  const connecting = path.startsWith(connectionsRoute);
-  const projecting = path.startsWith(projectsRoute);
-  const comparing = path.startsWith(providersRoute);
-  const voicing = path.startsWith(replyVoicesRoute);
-  const modelling = path.startsWith(modelsRoute);
-  const billing = path.startsWith(billingRoute);
-
-  /**
-   * The project everything else is about, carried in the route. US-045.
-   *
-   * An inbox and a list of monitors are questions about *a business*, so they
-   * mean nothing until one is chosen. On the projects page there is no project
-   * yet, and the two links are hidden rather than shown pointing at everything
-   * — a link that silently means "all businesses at once" is the thing this
-   * grouping exists to remove.
-   */
-  const signedIn = status?.signedIn === true;
-  const projectId = routeParam("project", route);
-  const scoped = projectId === null ? "" : `?project=${projectId}`;
-
-  /**
-   * The screens that mean nothing without a project, and the guard for them.
-   *
-   * The inbox, the monitor list and the monitor form are all questions about
-   * one business. Reached without a project they would answer for every
-   * business at once, which is what grouping exists to remove — and it is not
-   * enough to scope the links, because a bookmark, a typed address or a link
-   * somebody forgot to update all arrive here too.
-   *
-   * So the requirement lives in the router: no project, no inbox. A person is
-   * sent to choose one, and the address is corrected to match what they are
-   * looking at rather than left saying something untrue.
-   */
-  // Pricing joins Connections as a machine-level screen: one set of keys, one
-  // set of prices, every project. Asking it to pick a project first would ask a
-  // question it has no use for.
-  const needsProject =
-    !projecting &&
-    !connecting &&
-    !comparing &&
-    !voicing &&
-    !modelling &&
-    !billing &&
-    !notificationId;
-  const withoutProject = needsProject && projectId === null;
-
-  useEffect(() => {
-    if (signedIn && withoutProject) globalThis.location.hash = projectsRoute;
-  }, [signedIn, withoutProject]);
 
   // Nothing at all until the answer is back. See `useAuthStatus`.
   if (status === null) return null;
@@ -197,26 +125,131 @@ export function App() {
     return <Login firstRun={status.firstRun} signUpOpen={status.signUpOpen} />;
   }
 
+  /**
+   * The whole table, and the guard that does not depend on any link. US-045.
+   *
+   * The inbox, the monitor list and the monitor form are questions about one
+   * business, so all three live *inside* a project rather than beside a
+   * `?project=` a screen could be reached without. An address that names no
+   * project therefore matches no such route, and the last line sends it to
+   * choose one — which covers the bookmark, the typed address and the link
+   * somebody forgot to update, none of which any href can reach.
+   *
+   * Connections, Providers, Reply voices, Models and Billing sit outside a
+   * project on purpose: one set of keys, one set of prices, one subscription,
+   * every project.
+   */
+  return (
+    <Routes>
+      <Route element={<Shell status={status} billingState={billingState} />}>
+        <Route path={routes.projects} element={<Projects />} />
+        <Route path={routes.inbox} element={<InboxRoute />} />
+        <Route path={routes.monitors} element={<MonitorsRoute />} />
+        <Route path={routes.newMonitor} element={<MonitorFormRoute />} />
+        <Route path={routes.notifications} element={<NotificationsRoute />} />
+        <Route path={routes.connections} element={<Connections />} />
+        <Route path={routes.providers} element={<Providers />} />
+        <Route path={routes.replyVoices} element={<ReplyVoices />} />
+        <Route path={routes.models} element={<Models />} />
+        {/*
+          Only where this instance charges. US-072. A self-hosted instance has
+          no subscription, so the route is not registered at all and the
+          address falls through to the projects list.
+        */}
+        {status.billingMode === "stripe" && <Route path={routes.billing} element={<Billing />} />}
+        <Route path="*" element={<Navigate replace to={paths.projects} />} />
+      </Route>
+    </Routes>
+  );
+}
+
+/** The project in the address, on any route inside one. */
+function useProjectId(): string | null {
+  const inside = useMatch(`${routes.inbox}/*`);
+  const exact = useMatch(routes.inbox);
+  return inside?.params.projectId ?? exact?.params.projectId ?? null;
+}
+
+/**
+ * A screen that needs a project reads it from the address, not from a prop.
+ *
+ * The route pattern guarantees the segment is there, and TypeScript cannot
+ * know that, so the impossible case is written out rather than asserted away.
+ */
+function InboxRoute() {
+  const { projectId } = useParams();
+  return projectId ? <Inbox projectId={projectId} /> : <Navigate replace to={paths.projects} />;
+}
+
+function MonitorsRoute() {
+  const { projectId } = useParams();
+  return projectId ? <Monitors projectId={projectId} /> : <Navigate replace to={paths.projects} />;
+}
+
+function MonitorFormRoute() {
+  const { projectId } = useParams();
+  return projectId ? (
+    <MonitorForm projectId={projectId} />
+  ) : (
+    <Navigate replace to={paths.projects} />
+  );
+}
+
+/**
+ * The `key` remounts the screen when the monitor changes.
+ *
+ * Moving between two monitors' notification settings matches the same route,
+ * so React would keep the mounted component and its loaded settings — the
+ * other monitor's — on the screen.
+ */
+function NotificationsRoute() {
+  const { projectId, monitorId } = useParams();
+  return projectId && monitorId ? (
+    <Notifications key={monitorId} monitorId={monitorId} projectId={projectId} />
+  ) : (
+    <Navigate replace to={paths.projects} />
+  );
+}
+
+/** The sidebar, the banner, and whichever screen the address named. */
+function Shell({
+  status,
+  billingState,
+}: {
+  readonly status: AuthStatus;
+  readonly billingState: BillingState | null;
+}) {
+  const projectId = useProjectId();
+  const listing = useMatch(routes.monitors) !== null;
+  const creating = useMatch(routes.newMonitor) !== null;
+  const reading = useMatch(routes.inbox) !== null;
+  const projecting = useMatch(routes.projects) !== null;
+  const connecting = useMatch(routes.connections) !== null;
+  const comparing = useMatch(routes.providers) !== null;
+  const voicing = useMatch(routes.replyVoices) !== null;
+  const modelling = useMatch(routes.models) !== null;
+  const billing = useMatch(routes.billing) !== null;
+
   return (
     <div className="app-shell">
       <aside className="sidebar">
-        <a className="brand" href={projectsRoute} aria-label="SignalScout home">
+        <Link className="brand" to={paths.projects} aria-label="SignalScout home">
           <BrandLogo />
           <span>SignalScout</span>
           {billingState?.reason === "trialing" && <span className="trial-badge">Trial</span>}
-        </a>
+        </Link>
 
         <nav className="site-nav" aria-label="Screens">
-          <a className={projecting ? "nav-item current" : "nav-item"} href={projectsRoute}>
+          <Link className={projecting ? "nav-item current" : "nav-item"} to={paths.projects}>
             <span className="nav-icon" aria-hidden="true">
               ▦
             </span>
             <span>Projects</span>
-          </a>
+          </Link>
 
           {/*
-            Only when a project is in the route.
-            
+            Only when a project is in the address.
+
             Not "everywhere except the projects page": Connections is a
             machine-level screen — one key, every project — so it carries no
             project either, and offering an inbox link there would offer one
@@ -224,66 +257,66 @@ export function App() {
           */}
           {projectId !== null && (
             <>
-              <a
-                className={creating || listing || connecting ? "nav-item" : "nav-item current"}
-                href={`#/${scoped}`}
+              <Link
+                className={reading ? "nav-item current" : "nav-item"}
+                to={paths.inbox(projectId)}
               >
                 <span className="nav-icon" aria-hidden="true">
                   ▤
                 </span>
                 <span>Intent inbox</span>
-              </a>
-              <a
+              </Link>
+              <Link
                 className={listing ? "nav-item current" : "nav-item"}
-                href={`${monitorsRoute}${scoped}`}
+                to={paths.monitors(projectId)}
               >
                 <span className="nav-icon" aria-hidden="true">
                   ◎
                 </span>
                 <span>Monitors</span>
-              </a>
+              </Link>
             </>
           )}
-          <a className={connecting ? "nav-item current" : "nav-item"} href={connectionsRoute}>
+          <Link className={connecting ? "nav-item current" : "nav-item"} to={paths.connections}>
             <span className="nav-icon" aria-hidden="true">
               ⚿
             </span>
             <span>Connections</span>
-          </a>
-          <a className={comparing ? "nav-item current" : "nav-item"} href={providersRoute}>
+          </Link>
+          <Link className={comparing ? "nav-item current" : "nav-item"} to={paths.providers}>
             <span className="nav-icon" aria-hidden="true">
               ⌗
             </span>
             <span>Providers</span>
-          </a>
-          <a className={voicing ? "nav-item current" : "nav-item"} href={replyVoicesRoute}>
+          </Link>
+          <Link className={voicing ? "nav-item current" : "nav-item"} to={paths.replyVoices}>
             <span className="nav-icon" aria-hidden="true">
               ✎
             </span>
             <span>Reply voices</span>
-          </a>
+          </Link>
           {/*
             Beside Connections and Providers rather than inside a project: a
             model key is one account's, for every project it runs. US-068.
           */}
-          <a className={modelling ? "nav-item current" : "nav-item"} href={modelsRoute}>
+          <Link className={modelling ? "nav-item current" : "nav-item"} to={paths.models}>
             <span className="nav-icon" aria-hidden="true">
               ◈
             </span>
             <span>Models</span>
-          </a>
+          </Link>
           {/*
             Only where this instance charges. US-072. A self-hosted instance has
             no subscription, so a Billing link there would open a page that can
             only say so — and the route it reads is not even registered.
           */}
-          {status?.billingMode === "stripe" && (
-            <a className={billing ? "nav-item current" : "nav-item"} href={billingRoute}>
+          {status.billingMode === "stripe" && (
+            <Link className={billing ? "nav-item current" : "nav-item"} to={paths.billing}>
               <span className="nav-icon" aria-hidden="true">
                 ⬡
               </span>
               <span>Billing</span>
-            </a>
+            </Link>
           )}
           {/*
             Also only with a project: a monitor is made in one, and the form
@@ -291,15 +324,15 @@ export function App() {
             make an unfiled monitor, the state migration 0038 emptied out.
           */}
           {projectId !== null && (
-            <a
+            <Link
               className={creating ? "nav-item new-monitor-nav current" : "nav-item new-monitor-nav"}
-              href={`${newMonitorRoute}${scoped}`}
+              to={paths.newMonitor(projectId)}
             >
               <span className="nav-icon" aria-hidden="true">
                 +
               </span>
               <span>New monitor</span>
-            </a>
+            </Link>
           )}
         </nav>
 
@@ -330,29 +363,7 @@ export function App() {
           subscription, and it carries the way out.
         */}
         {status.billingMode === "stripe" && !billing && <TrialBanner state={billingState} />}
-        {withoutProject ? (
-          <Projects />
-        ) : notificationId ? (
-          <Notifications key={notificationId} monitorId={notificationId} />
-        ) : creating ? (
-          <MonitorForm />
-        ) : projecting ? (
-          <Projects />
-        ) : connecting ? (
-          <Connections />
-        ) : comparing ? (
-          <Providers />
-        ) : voicing ? (
-          <ReplyVoices />
-        ) : modelling ? (
-          <Models />
-        ) : billing ? (
-          <Billing />
-        ) : listing ? (
-          <Monitors />
-        ) : (
-          <Inbox />
-        )}
+        <Outlet />
       </main>
     </div>
   );
@@ -407,7 +418,7 @@ function TrialBanner({ state }: { readonly state: BillingState | null }) {
   return (
     <p className={state.entitled ? "trial-banner" : "trial-banner ended"} role="status">
       <span>{subscriptionSentence(state)}</span>
-      <a href="#/billing">Subscribe</a>
+      <Link to={paths.billing}>Subscribe</Link>
     </p>
   );
 }

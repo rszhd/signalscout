@@ -21,6 +21,9 @@ import {
   setValue,
 } from "./testing.js";
 
+/** The project this monitor is being made in. The route always names one. */
+const projectId = "11111111-1111-1111-1111-111111111111";
+
 const options = {
   signals: [
     {
@@ -84,6 +87,17 @@ describe("the monitor form", () => {
   let container: HTMLDivElement;
   let fetchMock: ReturnType<typeof vi.fn>;
 
+  /**
+   * The form always lives inside a project. US-076.
+   *
+   * The route is `/projects/<id>/monitors/new`, so there is no version of this
+   * screen without one — a monitor is made in a business and prefills its
+   * answers from it.
+   */
+  async function mountForm(): Promise<Screen> {
+    return mount(<MonitorForm projectId={projectId} />, `/projects/${projectId}/monitors/new`);
+  }
+
   async function toSources() {
     if (!container.querySelector('[aria-label="Monitor name"]')) return;
     await act(async () => {
@@ -109,13 +123,12 @@ describe("the monitor form", () => {
     });
     vi.stubGlobal("fetch", fetchMock);
 
-    screen = await mount(<MonitorForm />);
+    screen = await mountForm();
     container = screen.container;
   });
 
   afterEach(async () => {
     await screen.unmount();
-    globalThis.location.hash = "";
     vi.unstubAllGlobals();
   });
 
@@ -147,7 +160,6 @@ describe("the monitor form", () => {
    */
   it("ticks every signal when the project has none", async () => {
     await screen.unmount();
-    globalThis.location.hash = "#/monitors/new?project=11111111-1111-1111-1111-111111111111";
     fetchMock.mockImplementation(async (request: string | URL | Request) => {
       const url = String(request);
       if (url === "/api/monitor-options") return json(options);
@@ -163,7 +175,7 @@ describe("the monitor form", () => {
       throw new Error(`Unexpected request: ${url}`);
     });
 
-    screen = await mount(<MonitorForm />);
+    screen = await mountForm();
     container = screen.container;
 
     await act(async () => {
@@ -179,7 +191,6 @@ describe("the monitor form", () => {
   /** A project that does carry signals still narrows them, and wins the race. */
   it("keeps the project's own signals when it has some", async () => {
     await screen.unmount();
-    globalThis.location.hash = "#/monitors/new?project=11111111-1111-1111-1111-111111111111";
     fetchMock.mockImplementation(async (request: string | URL | Request) => {
       const url = String(request);
       if (url === "/api/monitor-options") return json(options);
@@ -195,7 +206,7 @@ describe("the monitor form", () => {
       throw new Error(`Unexpected request: ${url}`);
     });
 
-    screen = await mount(<MonitorForm />);
+    screen = await mountForm();
     container = screen.container;
 
     await act(async () => {
@@ -264,7 +275,7 @@ describe("the monitor form", () => {
   it("allows a manual plan when query generation is unavailable", async () => {
     await screen.unmount();
     fetchMock.mockImplementation(async () => json({ ...options, canGenerateQueries: false }));
-    screen = await mount(<MonitorForm />);
+    screen = await mountForm();
     container = screen.container;
     await toSources();
     await act(async () => button("Review search plan").click());
@@ -461,7 +472,7 @@ describe("the monitor form", () => {
         throw new Error(`Unexpected request: ${url}`);
       });
 
-      screen = await mount(<MonitorForm />);
+      screen = await mountForm();
       container = screen.container;
       await toSources();
 

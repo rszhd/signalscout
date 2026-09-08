@@ -195,6 +195,15 @@ export async function registerBillingRoutes(
         email: request.sessionUser?.email ?? "",
         customerId: subscription?.stripeCustomerId ?? null,
         trialEndsAt: subscription?.trialEndsAt ?? null,
+        /**
+         * Where Stripe sends the person back to.
+         *
+         * These are the web app's own addresses. US-076 moved its router out
+         * of the hash, so `/billing` is a route the app matches and Fastify's
+         * not-found handler serves `index.html` for — until then the same
+         * return read `/billing?checkout=done#/billing`, one address saying
+         * the same thing twice, and the app landed on whichever half it read.
+         */
         successUrl: `${settings.appUrl}/billing?checkout=done`,
         cancelUrl: `${settings.appUrl}/billing?checkout=cancelled`,
       });

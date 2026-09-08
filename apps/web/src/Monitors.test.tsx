@@ -15,10 +15,13 @@ import { everyDay, summarise, weekdays } from "./schedule.js";
 import { button, field, json, mount, type Screen, select, settle, setValue } from "./testing.js";
 
 const monitorId = "11111111-1111-4111-8111-111111111111";
+/** The project every case is inside. A monitor list is a question about one. */
+const projectId = "p1";
 
 function monitor(overrides: Record<string, unknown> = {}) {
   return {
     id: monitorId,
+    projectId,
     name: "Teams replacing manual QA",
     sources: ["reddit"],
     paused: false,
@@ -56,7 +59,7 @@ describe("the monitor list", () => {
   let container: HTMLDivElement;
   let fetchMock: ReturnType<typeof vi.fn>;
 
-  async function show(rows: unknown[]) {
+  async function show(rows: unknown[], project = projectId) {
     fetchMock.mockImplementation(async (request: string | URL | Request) => {
       const url = typeof request === "string" ? request : request.toString();
       if (url === "/api/monitors") return json(rows);
@@ -64,7 +67,7 @@ describe("the monitor list", () => {
       throw new Error(`Unexpected request: ${url}`);
     });
 
-    screen = await mount(<Monitors />);
+    screen = await mount(<Monitors projectId={project} />, `/projects/${project}/monitors`);
     container = screen.container;
   }
 
@@ -101,25 +104,30 @@ describe("the monitor list", () => {
     expect(container.querySelector(".monitor-card")?.textContent).toContain("Customer questions");
   });
 
-  it("scopes the overview to the project and explains a project with no monitors", async () => {
-    const original = location.hash;
-    try {
-      location.hash = "#/monitors?project=one";
-      await show([
+  it("scopes the overview to the project in the address", async () => {
+    await show(
+      [
         monitor({ projectId: "one", projectName: "First project" }),
         monitor({ id: "other", paused: true, projectId: "two", projectName: "Second project" }),
-      ]);
-      expect(container.textContent).toContain("1 of 1 active");
-      expect(container.querySelectorAll(".monitor-card")).toHaveLength(1);
-      await act(async () => {
-        location.hash = "#/monitors?project=empty";
-        globalThis.dispatchEvent(new HashChangeEvent("hashchange"));
-      });
-      expect(container.textContent).toContain("No monitors in this project yet");
-      expect(container.querySelector('a[href="#/monitors/new?project=empty"]')).not.toBeNull();
-    } finally {
-      location.hash = original;
-    }
+      ],
+      "one",
+    );
+
+    expect(container.textContent).toContain("1 of 1 active");
+    expect(container.querySelectorAll(".monitor-card")).toHaveLength(1);
+  });
+
+  it("explains a project with no monitors, and offers the form inside it", async () => {
+    await show(
+      [
+        monitor({ projectId: "one", projectName: "First project" }),
+        monitor({ id: "other", paused: true, projectId: "two", projectName: "Second project" }),
+      ],
+      "empty",
+    );
+
+    expect(container.textContent).toContain("No monitors in this project yet");
+    expect(container.querySelector('a[href="/projects/empty/monitors/new"]')).not.toBeNull();
   });
 
   it("shows a disabled webhook and links to its settings", async () => {
@@ -129,7 +137,7 @@ describe("the monitor list", () => {
     expect(container.querySelector('[role="alert"]')?.textContent).toContain("Webhook disabled");
     expect(
       container.querySelector(
-        'a[href="#/monitors/11111111-1111-4111-8111-111111111111/notifications"]',
+        `a[href="/projects/${projectId}/monitors/${monitorId}/notifications"]`,
       ),
     ).not.toBeNull();
   });

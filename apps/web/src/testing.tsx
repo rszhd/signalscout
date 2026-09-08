@@ -10,6 +10,7 @@
 import type { ReactElement } from "react";
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
+import { MemoryRouter, useLocation, useNavigate } from "react-router";
 
 interface ActEnvironment {
   IS_REACT_ACT_ENVIRONMENT?: boolean;
@@ -18,21 +19,60 @@ interface ActEnvironment {
 export interface Screen {
   readonly container: HTMLDivElement;
   readonly unmount: () => Promise<void>;
+  /** The route the app is on now: the path and its query. */
+  readonly path: () => string;
+  /** Go somewhere, the way a click on a link does. */
+  readonly go: (to: string) => Promise<void>;
+}
+
+/**
+ * The router every mounted screen sits in. US-076.
+ *
+ * A `MemoryRouter` rather than the browser one: a test asserts where the app
+ * went, and a memory history says so without a `window.history` every test
+ * file would then have to reset. `Probe` is how a test reads that history and
+ * moves it — `useNavigate` is the call a `Link` makes, so `go()` goes exactly
+ * where a click would.
+ */
+interface Handle {
+  path: string;
+  navigate: (to: string) => void;
+}
+
+function Probe({ handle }: { readonly handle: Handle }) {
+  const location = useLocation();
+  const navigate = useNavigate();
+  handle.path = `${location.pathname}${location.search}`;
+  handle.navigate = (to) => navigate(to);
+  return null;
 }
 
 /** Mount a component into a real document and wait for its first effects. */
-export async function mount(element: ReactElement): Promise<Screen> {
+export async function mount(element: ReactElement, at = "/"): Promise<Screen> {
   (globalThis as typeof globalThis & ActEnvironment).IS_REACT_ACT_ENVIRONMENT = true;
 
   const container = document.createElement("div");
   document.body.append(container);
   const root: Root = createRoot(container);
+  const handle: Handle = { path: at, navigate: () => {} };
 
-  await act(async () => root.render(element));
+  await act(async () =>
+    root.render(
+      <MemoryRouter initialEntries={[at]}>
+        <Probe handle={handle} />
+        {element}
+      </MemoryRouter>,
+    ),
+  );
   await settle();
 
   return {
     container,
+    path: () => handle.path,
+    go: async (to: string) => {
+      await act(async () => handle.navigate(to));
+      await settle();
+    },
     unmount: async () => {
       await act(async () => root.unmount());
       container.remove();

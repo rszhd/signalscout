@@ -14,10 +14,17 @@ import { Inbox } from "./Inbox.js";
 import { ageLabel } from "./labels.js";
 import { button, json, mount, type Screen, select, settle, setValue } from "./testing.js";
 
-const qaMonitor = { id: "11111111-1111-4111-8111-111111111111", name: "Teams replacing manual QA" };
+/** The project every case is inside. The inbox is a question about one. */
+const projectId = "p1";
+const qaMonitor = {
+  id: "11111111-1111-4111-8111-111111111111",
+  name: "Teams replacing manual QA",
+  projectId,
+};
 const hiringMonitor = {
   id: "22222222-2222-4222-8222-222222222222",
   name: "Agencies hiring for QA",
+  projectId,
 };
 /** Typed, so a case can add the project a monitor belongs to. US-045. */
 const monitors: { id: string; name: string; projectId?: string | null }[] = [
@@ -92,7 +99,7 @@ describe("the intent inbox", () => {
 
   async function show(pages: Record<string, unknown> = {}, monitorRows = monitors) {
     answerWith(pages, monitorRows);
-    screen = await mount(<Inbox />);
+    screen = await mount(<Inbox projectId={projectId} />, `/projects/${projectId}`);
     container = screen.container;
   }
 
@@ -417,8 +424,6 @@ describe("the intent inbox", () => {
    * the inbox and names no reason for it.
    */
   it("offers only the monitors of the project being looked at", async () => {
-    globalThis.location.hash = "#/?project=p1";
-
     await show({}, [
       { id: "m1", name: "Reddit weekly", projectId: "p1" },
       { id: "m2", name: "Somebody else's", projectId: "p2" },
@@ -430,20 +435,23 @@ describe("the intent inbox", () => {
     expect(options).toContain("Reddit weekly");
     expect(options).not.toContain("Somebody else's");
     expect(options).not.toContain("Unfiled");
-
-    globalThis.location.hash = "";
   });
 
-  it("offers every monitor when no project is chosen", async () => {
-    await show({}, [
-      { id: "m1", name: "Reddit weekly", projectId: "p1" },
-      { id: "m2", name: "Another", projectId: "p2" },
-    ]);
+  /**
+   * The project is in the address, so it reaches the request too. US-076.
+   *
+   * There is no inbox without one now: the route carries `/projects/<id>`, so
+   * a screen that forgot to send it would answer for every business at once.
+   */
+  it("asks the server for this project's matches", async () => {
+    await show();
 
-    const options = [...container.querySelectorAll("option")].map((option) => option.textContent);
+    const asked = fetchMock.mock.calls
+      .map(([url]) => String(url))
+      .filter((url) => url.startsWith("/api/matches"));
 
-    expect(options).toContain("Reddit weekly");
-    expect(options).toContain("Another");
+    expect(asked.length).toBeGreaterThan(0);
+    for (const url of asked) expect(url).toContain(`projectId=${projectId}`);
   });
 
   it("does not claim a negative observation is a reason it matched", async () => {
@@ -706,7 +714,7 @@ describe("the intent inbox", () => {
     await show({ "/api/matches?": { matches: [], nextCursor: null, asOf: "x" } }, []);
 
     expect(container.textContent).toContain("No monitors yet");
-    expect(container.querySelector('a[href="#/monitors/new"]')).not.toBeNull();
+    expect(container.querySelector(`a[href="/projects/${projectId}/monitors/new"]`)).not.toBeNull();
   });
 
   it("offers to ask again when the monitors have simply not matched yet", async () => {
@@ -716,7 +724,7 @@ describe("the intent inbox", () => {
     await show({ "/api/matches?": { matches: [], nextCursor: null, asOf: "x" } });
 
     expect(container.textContent).toContain("Nothing has matched yet");
-    expect(container.querySelector('a[href="#/monitors/new"]')).toBeNull();
+    expect(container.querySelector(`a[href="/projects/${projectId}/monitors/new"]`)).toBeNull();
 
     const before = fetchMock.mock.calls.filter(([url]) =>
       String(url).startsWith("/api/matches"),
@@ -754,7 +762,7 @@ describe("the intent inbox", () => {
       if (url === "/api/monitors") return json(monitors);
       return json({ message: "The database is not reachable." }, 500);
     });
-    screen = await mount(<Inbox />);
+    screen = await mount(<Inbox projectId={projectId} />, `/projects/${projectId}`);
 
     expect(screen.container.textContent).toContain("The database is not reachable.");
   });

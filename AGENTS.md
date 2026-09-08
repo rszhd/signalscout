@@ -1430,6 +1430,21 @@ or false. Do not mark one done that you have not verified.
 
 ## Rules that are easy to break
 
+**Every address is a path, and `route.ts` holds them all.** US-076 moved the
+router out of the hash on 2026-09-08, after Stripe returned a person to
+`/billing?checkout=done#/billing` — one address saying the same thing twice,
+because the path was the server's answer and the hash was the application's.
+`apps/web/src/route.ts` is the whole table: `routes` are the patterns
+`App.tsx` matches, `paths` are the builders every screen links with. Never
+write an address as a string beside a link.
+
+**A project is a path segment, not a query parameter.** `/projects/<id>`,
+`/projects/<id>/monitors`, `/projects/<id>/monitors/new`. An inbox is a
+question about one business, so the address is *of* that business. US-045's
+rule — no project, no inbox — is the route table itself now rather than an
+effect that corrects the address after rendering: an address naming no project
+matches no project-scoped route and the catch-all sends it to choose one.
+
 **The UI shares one theme.** Read [docs/design.md](docs/design.md) before changing a screen. Colors and sizing live in `apps/web/src/styles/tokens.css`; shared controls live in `styles/theme.css`. Keep page layout separate, and migrate the remaining screens one at a time.
 
 **`packages/core` imports neither Fastify nor React.** The API and the worker

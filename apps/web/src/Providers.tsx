@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router";
 import { messageFor, requestJson } from "./api.js";
 import { BrandIcon } from "./BrandIcon.js";
+import { paths } from "./route.js";
 
 /**
  * The provider comparison keeps three different kinds of money visibly apart:
@@ -103,9 +105,9 @@ function ProvidersHeader() {
           Compare cost, coverage, and the results each provider has delivered here.
         </p>
       </div>
-      <a className="top-secondary-link" href="#/connections">
+      <Link className="top-secondary-link" to={paths.connections}>
         Manage connections
-      </a>
+      </Link>
     </header>
   );
 }

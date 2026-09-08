@@ -46,7 +46,10 @@ it("saves a digest and immediate threshold through the controls", async () => {
     }
     return json(response());
   });
-  screen = await mount(<Notifications monitorId="monitor-1" />);
+  screen = await mount(
+    <Notifications monitorId="monitor-1" projectId="p1" />,
+    "/projects/p1/monitors/monitor-1/notifications",
+  );
   await act(async () => {
     input("Email digest").click();
     setValue(input("Recipient email"), "owner@example.com");
@@ -76,7 +79,10 @@ it("shows missing configuration and disabled webhook failures", async () => {
       }),
     ),
   );
-  screen = await mount(<Notifications monitorId="monitor-1" />);
+  screen = await mount(
+    <Notifications monitorId="monitor-1" projectId="p1" />,
+    "/projects/p1/monitors/monitor-1/notifications",
+  );
   expect(input("Email digest").disabled).toBe(true);
   expect(input("Enable webhook").disabled).toBe(true);
   expect(screen.container.textContent).toContain("SMTP_HOST, SMTP_FROM");
@@ -86,7 +92,10 @@ it("keeps the form and reports a failed save", async () => {
   vi.stubGlobal("fetch", async (_url: string, init?: RequestInit) =>
     init?.method === "PUT" ? json({ message: "Settings were not saved." }, 500) : json(response()),
   );
-  screen = await mount(<Notifications monitorId="monitor-1" />);
+  screen = await mount(
+    <Notifications monitorId="monitor-1" projectId="p1" />,
+    "/projects/p1/monitors/monitor-1/notifications",
+  );
   await act(async () => {
     button("Save notifications").click();
   });

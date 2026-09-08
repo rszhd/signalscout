@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
+import { Link } from "react-router";
 import { messageFor, requestJson } from "./api.js";
 import { BrandIcon } from "./BrandIcon.js";
 import { ageLabel, platformName, providerName } from "./labels.js";
-import { projectSuffix, routeParam } from "./route.js";
+import { paths } from "./route.js";
 import { ScheduleField } from "./ScheduleField.js";
 import { describeSchedule } from "./schedule.js";
 
@@ -165,16 +166,16 @@ function status(monitor: Monitor): { label: string; tone: string } {
   return { label: "Running", tone: "running" };
 }
 
-function MonitorsHeader() {
+function MonitorsHeader({ projectId }: { readonly projectId: string }) {
   return (
     <header className="topbar">
       <div>
         <h1>Monitors</h1>
         <p className="page-subtitle">Keep an eye on the conversations that matter.</p>
       </div>
-      <a className="top-primary-button" href={`#/monitors/new${projectSuffix()}`}>
+      <Link className="top-primary-button" to={paths.newMonitor(projectId)}>
         <span aria-hidden="true">+</span> New monitor
-      </a>
+      </Link>
     </header>
   );
 }
@@ -459,28 +460,21 @@ function PreFilterForm({ monitor, onSaved }: { monitor: Monitor; onSaved: () => 
   );
 }
 
-export function Monitors() {
+/**
+ * The monitors of one project. US-045, US-076.
+ *
+ * The project comes from the address and reaches this screen as a prop. The
+ * list is filtered here rather than on the server: it is small, the response
+ * already carries the project on every row, and a query parameter would be a
+ * second place for the same rule to live.
+ */
+export function Monitors({ projectId }: { readonly projectId: string }) {
   const [monitors, setMonitors] = useState<Monitor[]>([]);
   const [search, setSearch] = useState("");
   const [view, setView] = useState("all");
   const [pending, setPending] = useState<string[]>([]);
   const [state, setState] = useState<LoadState>("loading");
   const [error, setError] = useState<string | null>(null);
-
-  /**
-   * The project this list is scoped to, from `#/monitors?project=<id>`.
-   *
-   * Filtered here rather than on the server: the list is small, the response
-   * already carries the project on every row, and a query parameter would be a
-   * second place for the same rule to live.
-   */
-  const [projectId, setProjectId] = useState(() => routeParam("project"));
-
-  useEffect(() => {
-    const onChange = () => setProjectId(routeParam("project"));
-    globalThis.addEventListener("hashchange", onChange);
-    return () => globalThis.removeEventListener("hashchange", onChange);
-  }, []);
 
   const load = useCallback(async (): Promise<void> => {
     try {
@@ -517,7 +511,7 @@ export function Monitors() {
   if (state === "loading") {
     return (
       <div className="product-page monitors-page">
-        <MonitorsHeader />
+        <MonitorsHeader projectId={projectId} />
         <div className="center-state page-state">
           <div className="spinner" aria-hidden="true" />
           <p>Reading your monitors.</p>
@@ -529,7 +523,7 @@ export function Monitors() {
   if (state === "error") {
     return (
       <div className="product-page monitors-page">
-        <MonitorsHeader />
+        <MonitorsHeader projectId={projectId} />
         <div className="center-state page-state">
           <h2>The monitors could not be loaded</h2>
           <p>{error}</p>
@@ -544,23 +538,22 @@ export function Monitors() {
   if (monitors.length === 0) {
     return (
       <div className="product-page monitors-page">
-        <MonitorsHeader />
+        <MonitorsHeader projectId={projectId} />
         <div className="center-state page-state">
           <span className="empty-mark" aria-hidden="true">
             ◎
           </span>
           <h2>No monitors yet</h2>
           <p>Create a monitor and SignalScout will start collecting conversations.</p>
-          <a className="primary-button" href={`#/monitors/new${projectSuffix()}`}>
+          <Link className="primary-button" to={paths.newMonitor(projectId)}>
             Create a monitor
-          </a>
+          </Link>
         </div>
       </div>
     );
   }
 
-  const scoped =
-    projectId === null ? monitors : monitors.filter((monitor) => monitor.projectId === projectId);
+  const scoped = monitors.filter((monitor) => monitor.projectId === projectId);
   const needsAttention = (monitor: Monitor) =>
     status(monitor).tone === "stopped" || !!monitor.notificationIssues?.length;
   const counts = {
@@ -581,7 +574,7 @@ export function Monitors() {
 
   return (
     <div className="product-page monitors-page">
-      <MonitorsHeader />
+      <MonitorsHeader projectId={projectId} />
       <div className="monitors-content">
         <div className="monitors-overview">
           <div>
@@ -628,7 +621,7 @@ export function Monitors() {
           </p>
         )}
         <p className="monitors-result-count" role="status">
-          Showing {visible.length} of {scoped.length} monitors{projectId ? " in this project" : ""}
+          Showing {visible.length} of {scoped.length} monitors in this project
         </p>
         {visible.length === 0 && (
           <div className="monitor-empty-results">
@@ -643,9 +636,9 @@ export function Monitors() {
                 : "Try another name, project or platform, or clear your filters."}
             </p>
             {scoped.length === 0 ? (
-              <a className="primary-button" href={`#/monitors/new${projectSuffix()}`}>
+              <Link className="primary-button" to={paths.newMonitor(projectId)}>
                 Create a monitor
-              </a>
+              </Link>
             ) : (
               <button
                 className="secondary-button"
@@ -675,6 +668,7 @@ export function Monitors() {
               load={load}
               setPaused={setPaused}
               pending={pending}
+              projectId={projectId}
             />
           </section>
         ))}
@@ -742,9 +736,11 @@ function MonitorCards({
   load,
   setPaused,
   pending,
+  projectId,
 }: {
   monitors: Monitor[];
   pending: string[];
+  projectId: string;
   load: () => Promise<void>;
   setPaused: (monitor: Monitor, paused: boolean) => Promise<void>;
 }) {
@@ -792,7 +788,7 @@ function MonitorCards({
                 {monitor.missingCredentials
                   .map((credential) => credential.environmentVariable)
                   .join(", ")}
-                . <a href="#/connections">Open connections</a>
+                . <Link to={paths.connections}>Open connections</Link>
               </p>
             )}
             <p className="monitor-schedule-summary">
@@ -825,7 +821,10 @@ function MonitorCards({
 
             {monitor.notificationIssues?.map((issue) => (
               <p key={issue} className="monitor-stopped" role="alert">
-                {issue} <a href={`#/monitors/${monitor.id}/notifications`}>Notification settings</a>
+                {issue}{" "}
+                <Link to={paths.notifications(monitor.projectId ?? projectId, monitor.id)}>
+                  Notification settings
+                </Link>
               </p>
             ))}
 
@@ -884,15 +883,15 @@ function MonitorCards({
             </details>
             <div>
               <div className="monitor-card-actions">
-                <a className="text-link" href={`#/monitors/${monitor.id}/notifications`}>
-                  Notifications
-                </a>
-                <a
+                <Link
                   className="text-link"
-                  href={`#/${monitor.projectId ? `?project=${encodeURIComponent(monitor.projectId)}` : ""}`}
+                  to={paths.notifications(monitor.projectId ?? projectId, monitor.id)}
                 >
+                  Notifications
+                </Link>
+                <Link className="text-link" to={paths.inbox(monitor.projectId ?? projectId)}>
                   View inbox
-                </a>
+                </Link>
                 <button
                   type="button"
                   className="secondary-button"

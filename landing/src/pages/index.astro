@@ -6,22 +6,23 @@ import '@fontsource/figtree/700.css';
 import '../styles/tokens.css';
 import '../styles/landing.css';
 import '../styles/story.css';
+import '../styles/features.css';
 import Icon from '../components/Icon.astro';
 const repository = 'https://github.com/rszhd/signalscout';
 const appUrl = import.meta.env.PUBLIC_APP_URL;
 const platforms = [['Reddit','reddit.png'],['X / Twitter','x.png'],['LinkedIn','linkedin.ico'],['YouTube','youtube.png'],['TikTok','tiktok.png'],['Instagram','instagram.png']];
 const heroPosts = [
-  { platform: 'Reddit', icon: 'reddit.png', source: 'r/SaaS', score: 94, text: 'We’re still testing everything manually before each release.', signal: 'What are other small teams using?' },
-  { platform: 'X', icon: 'x.png', source: 'X · Founder', score: 89, text: 'Another morning fixing broken tests after a tiny UI change.', signal: 'Has anyone found an easier way?' },
-  { platform: 'LinkedIn', icon: 'linkedin.ico', source: 'LinkedIn · SaaS team', score: 87, text: 'Our developers spend every Friday on regression testing.', signal: 'How do small teams automate this?' },
-  { platform: 'YouTube', icon: 'youtube.png', source: 'YouTube · Comment', score: 91, text: 'This works for one test, but we have fifty flows to check.', signal: 'Is there a tool that handles this?' },
-  { platform: 'TikTok', icon: 'tiktok.png', source: 'TikTok · Comment', score: 86, text: 'Every moisturiser I try makes my sensitive skin break out.', signal: 'What should I try instead?' },
-  { platform: 'Instagram', icon: 'instagram.png', source: 'Instagram · Comment', score: 90, text: 'Retinol left my skin irritated, but I still have acne scars.', signal: 'How can I treat them gently?' },
+  { platform: 'Reddit', icon: 'reddit.png', source: 'r/freelance', score: 94, text: 'I’m spending every Friday chasing unpaid invoices.', signal: 'What do other freelancers use?' },
+  { platform: 'X', icon: 'x.png', source: 'X · Freelancer', score: 89, text: 'My invoicing app costs more than I need to spend.', signal: 'Any simpler alternatives?' },
+  { platform: 'LinkedIn', icon: 'linkedin.ico', source: 'LinkedIn · Designer', score: 87, text: 'I started freelancing and track every payment in a spreadsheet.', signal: 'Is there an easier way?' },
+  { platform: 'YouTube', icon: 'youtube.png', source: 'YouTube · Comment', score: 91, text: 'Making each invoice by hand takes me forever.', signal: 'Can a tool do this for me?' },
+  { platform: 'TikTok', icon: 'tiktok.png', source: 'TikTok · Comment', score: 86, text: 'I love freelancing but hate reminding clients to pay.', signal: 'Can I automate the reminders?' },
+  { platform: 'Instagram', icon: 'instagram.png', source: 'Instagram · Comment', score: 90, text: 'I keep losing track of which clients have paid me.', signal: 'What app would you recommend?' },
 ];
 const examples = [
-{label:'Asking for a recommendation',source:'Reddit · r/SaaS',score:94,title:'There has to be a better way to test this.',quote:'We’re a team of three and still manually test signup and checkout before every release. What are other small teams using?',reason:'A small SaaS team describes a recurring testing problem and explicitly asks for a solution.',tags:['Small SaaS team','Manual testing pain','Looking for a tool']},
-{label:'Looking for an alternative',source:'X / Twitter',score:89,title:'Our tests need more work than our product.',quote:'Another morning fixing broken E2E tests after a tiny UI change. Has anyone switched to something easier to maintain?',reason:'The author is frustrated with their current workflow and actively exploring an alternative.',tags:['Maintenance pain','Current frustration','Ready to switch']},
-{label:'Just mentioning a keyword',source:'Reddit · r/webdev',score:18,title:'A few things I learned about testing.',quote:'Put together a guide to writing your first browser tests. Here are five tips that helped me get started.',reason:'The topic is relevant, but the author is sharing advice. They are not describing a need or asking for help.',tags:['Related topic','Sharing expertise','No request for help']}
+  { label: 'Asking for a recommendation', source: 'Reddit · r/freelance', score: 94, title: 'I want my Fridays back.', quote: 'I’m a freelance designer and spend every Friday chasing unpaid invoices. Is there a simple app that sends reminders for me?', reason: 'A freelancer describes time lost chasing payments and explicitly asks for an app with automatic reminders.', tags: ['Freelancer', 'Chasing late payments', 'Looking for an app'] },
+  { label: 'Looking for an alternative', source: 'X / Twitter', score: 89, title: 'I just need to send invoices and get paid.', quote: 'My accounting software is expensive and has a hundred features I never use. Any simpler invoicing apps for a solo freelancer?', reason: 'The author finds their current software too expensive and complex, and is actively asking for a simpler alternative.', tags: ['Too expensive', 'Wants something simpler', 'Ready to switch'] },
+  { label: 'Just mentioning a keyword', source: 'Reddit · r/freelance', score: 18, title: 'My tips for getting invoices paid on time.', quote: 'I wrote a guide to setting clear payment terms and following up with clients. Here are five tips that work for me.', reason: 'The topic is relevant, but the author is sharing advice. They are not describing a need or asking for help.', tags: ['Related topic', 'Sharing expertise', 'No request for help'] },
 ];
 ---
 <!doctype html>
@@ -47,6 +48,7 @@ const examples = [
 </a>
 <nav aria-label="Main navigation">
 <a href="#how-it-works">How it works</a>
+<a href="#features">Features</a>
 <a href="#pricing">Pricing</a>
 <a class="github-link" href={repository}>
 <Icon name="github" size={18}/>GitHub</a>
@@ -108,7 +110,7 @@ const examples = [
 </div>
 <div class="found-label">
 <Icon name="check" size={15}/>Less searching. A relevant conversation.</div>
-<span class="illustration-label">ILLUSTRATIVE MATCHES · DIFFERENT PRODUCTS</span>
+<span class="illustration-label">Example matches for a freelancer invoicing app</span>
 </div>
 </section>
 <section class="platform-strip wrap" aria-label="Supported platforms">
@@ -134,8 +136,8 @@ const examples = [
 <h3>Tell us what you build</h3>
 <p>Describe your product, your ideal customer, and the problems you solve. Choose the signals that matter to you.</p>
 <div class="step-visual brief-visual" aria-label="Example product brief">
-  <span class="visual-caption">YOUR PRODUCT, IN PLAIN WORDS</span>
-  <div class="brief-sheet"><span class="brief-label">I’m building</span><strong>A simpler way to test websites<span class="illustrative-caret" aria-hidden="true"></span></strong><span class="brief-label">For people who</span><span>Spend too much time testing manually</span></div>
+  <span class="visual-caption">Your product, in plain words</span>
+  <div class="brief-sheet"><span class="brief-label">I’m building</span><strong>A simple invoicing app<span class="illustrative-caret" aria-hidden="true"></span></strong><span class="brief-label">For people who</span><span>Spend too much time chasing payments</span></div>
   <span class="brief-sticker"><Icon name="check" size={14}/> That’s a starting point.</span>
 </div>
 </article>
@@ -147,10 +149,10 @@ const examples = [
 <h3>Listen for a real need</h3>
 <p>SignalScout searches your chosen platforms and uses AI to assess the context behind each conversation.</p>
 <div class="step-visual filter-visual" aria-label="Illustrative scores distinguish a need from a mention">
-  <span class="visual-caption">SAME TOPIC. DIFFERENT INTENT.</span>
-  <div class="filter-row quiet-row"><span>“Here’s my testing tutorial.”</span><span class="mini-score">18</span></div>
-  <div class="filter-row"><span>“Our tests keep breaking.”</span><span class="mini-score">62</span></div>
-  <div class="filter-row strong-row"><span>“What should we use instead?”</span><span class="mini-score">94 <span aria-hidden="true">✦</span></span></div>
+  <span class="visual-caption">Same topic. Different intent.</span>
+  <div class="filter-row quiet-row"><span>“Here are my invoicing tips.”</span><span class="mini-score">18</span></div>
+  <div class="filter-row"><span>“Chasing payments takes hours.”</span><span class="mini-score">62</span></div>
+  <div class="filter-row strong-row"><span>“Which invoicing app should I use?”</span><span class="mini-score">94 <span aria-hidden="true">✦</span></span></div>
 </div>
 </article>
 <article>
@@ -161,14 +163,14 @@ const examples = [
 <h3>Show up with something useful</h3>
 <p>Review scored matches, understand what the model saw, and open the conversation when you can help.</p>
 <div class="step-visual reply-visual" aria-label="Illustrative conversation and a reply you could write">
-  <span class="visual-caption">A HUMAN CONVERSATION STARTS HERE</span>
-  <div class="mini-message"><span class="message-avatar">?</span><span>“What are other small teams using?”</span></div>
-  <div class="mini-message your-message"><span>“We built something for exactly this…”</span><span class="message-avatar"><Icon name="signal" size={16}/></span></div>
+  <span class="visual-caption">A conversation starts here</span>
+  <div class="mini-message"><span class="message-avatar">?</span><span>“Can an app remind clients to pay?”</span></div>
+  <div class="mini-message your-message"><span>“We built an app that sends reminders…”</span><span class="message-avatar"><Icon name="signal" size={16}/></span></div>
   <span class="reply-footnote">You choose when to join in.</span>
 </div>
 </article>
 </div>
-<p class="walkthrough-caption">An illustrative journey for a browser-testing product.</p>
+<p class="walkthrough-caption">An illustrative journey for a freelancer invoicing app.</p>
 </section>
 <section id="inbox" class="demo-section section-space">
 <div class="wrap">
@@ -181,11 +183,11 @@ const examples = [
 <div class="demo-bar">
 <span>
 <Icon name="inbox" size={18}/>Your intent inbox</span>
-<span class="sample-label">Interactive example · AI browser testing product</span>
+<span class="sample-label">Interactive example · Freelancer invoicing app</span>
 </div>
 <div class="demo-content">
 <div class="example-list">
-<p class="eyebrow">EXPLORE A CONVERSATION</p>{examples.map((example,index)=>
+<p class="eyebrow">Explore a conversation</p>{examples.map((example,index)=>
 <button class:list={['example-button',{selected:index===0}]} data-example={index} aria-pressed={index===0} aria-controls="example-detail">
 <span class="example-number">0{index+1}</span>
 <span>{example.label}<small>{example.source}</small>
@@ -196,15 +198,18 @@ const examples = [
 <div id="example-detail" class="example-detail" aria-live="polite" aria-atomic="true">
 <div class="detail-meta">
 <span id="example-source">{examples[0].source}</span>
+<div class="score-summary">
+<span id="example-status" class="score-pill" data-score-tone={examples[0].score >= 80 ? "high" : examples[0].score >= 55 ? "medium" : "low"}>{examples[0].score >= 80 ? "High intent" : examples[0].score >= 55 ? "Worth reading" : "Low intent"}</span>
 <span class="detail-score">
-<strong id="example-score">94</strong> / 100 <span>match score</span>
+<strong id="example-score" data-score-tone={examples[0].score >= 80 ? "high" : examples[0].score >= 55 ? "medium" : "low"}>{examples[0].score}</strong> / 100 <span>match score</span>
 </span>
+</div>
 </div>
 <h3 id="example-title">{examples[0].title}</h3>
 <blockquote id="example-quote">“{examples[0].quote}”</blockquote>
 <div class="model-reason">
 <span class="eyebrow">
-<span class="sparkle">✦</span>WHAT THE MODEL SAW</span>
+<span class="sparkle">✦</span>What the model saw</span>
 <p id="example-reason">{examples[0].reason}</p>
 </div>
 <div class="tags" id="example-tags">{examples[0].tags.map(tag=>
@@ -214,54 +219,62 @@ const examples = [
 </div>
 </div>
 </section>
-<section class="ownership wrap section-space">
-<div>
-<span class="eyebrow">BUILT TO BE YOURS</span>
-<h2>A little less noise.<br/>A lot more control.</h2>
-<p class="ownership-intro">Start with the conversations that matter. Keep control of how you find them.</p>
-<a class="text-link" href={repository}>Explore the source code <Icon name="external" size={17}/>
-</a>
-<div class="delivery-preview">
-  <div class="delivery-header"><span class="delivery-icon"><Icon name="bell" size={18}/></span><span>SignalScout digest<small>Illustrative email preview</small></span><span class="delivery-stamp">FOR YOU</span></div>
-  <strong>A conversation worth a closer look.</strong>
-  <p>Someone is asking how to replace their manual testing routine.</p>
-  <div class="delivery-bottom"><span><img src="/brands/reddit.png" width="16" height="16" alt=""/>Reddit · r/SaaS</span><span>94 / 100 match</span></div>
-</div>
-</div>
-<div class="ownership-list">
-<article>
-<Icon name="key" size={23}/>
-<div>
-<h3>Your accounts, your choice</h3>
-<p>Connect your own data providers and AI models. Your usage is billed directly by your providers.</p>
-</div>
-</article>
-<article>
-<Icon name="sliders" size={23}/>
-<div>
-<h3>A schedule and budget that fit</h3>
-<p>Choose how often to search, estimate collection costs, and set a monthly budget for each monitor.</p>
-</div>
-</article>
-<article>
-<Icon name="bell" size={23}/>
-<div>
-<h3>Good matches, delivered</h3>
-<p>Review your inbox, receive email digests, or send matches to your workflow with webhooks.</p>
-</div>
-</article>
-</div>
+<section id="features" class="features wrap section-space" aria-labelledby="features-title">
+  <div class="section-heading">
+    <div><span class="eyebrow">FEATURES THAT KEEP YOU FOCUSED</span><h2 id="features-title">Find the need.<br/>Know your next move.</h2></div>
+    <p>From the first signal to a thoughtful reply,<br/>with control over every step.</p>
+  </div>
+  <div class="feature-grid">
+    <article class="feature-card feature-inbox">
+      <span class="feature-icon"><Icon name="inbox" size={24}/></span>
+      <h3>One inbox. Conversations that matter.</h3>
+      <p>Monitor your chosen platforms and see conversations scored against your product and ideal customer. Read what the model saw before deciding which matches deserve your time.</p>
+      <div class="feature-platforms" aria-label="Supported platforms">{platforms.map(([name, file]) => <span><img src={`/brands/${file}`} alt="" width="20" height="20"/>{name}</span>)}</div>
+      <div class="feature-signal"><span class="score-pill" data-score-tone="high">High intent</span><span>“Is there a simple app that sends reminders for me?”</span><strong>94<span> / 100</span></strong></div>
+      <span class="feature-note">Illustrative match for a freelancer invoicing app</span>
+      <a class="text-link" href="#inbox">Explore the example <Icon size={17}/></a>
+    </article>
+    <article class="feature-card feature-alerts">
+      <span class="feature-icon"><Icon name="bell" size={24}/></span>
+      <h3>Good matches, delivered.</h3>
+      <p>Get email digests, enable immediate alerts, or send matches to your workflow with webhooks.</p>
+      <div class="feature-digest">
+        <div><Icon name="bell" size={17}/><strong>SignalScout digest</strong></div>
+        <p>A freelance designer is looking for a simpler way to chase payments.</p>
+        <span>Reddit · r/freelance</span>
+        <small>Illustrative email preview</small>
+      </div>
+    </article>
+    <article class="feature-card">
+      <span class="feature-icon"><Icon name="reply" size={24}/></span>
+      <h3>A useful first draft.</h3>
+      <p>Draft a reply with the conversation in context. Choose a reply voice, edit the words, and decide what to post.</p>
+      <span class="feature-footnote">You review. You hit send.</span>
+    </article>
+    <article class="feature-card">
+      <span class="feature-icon"><Icon name="sliders" size={24}/></span>
+      <h3>Your pace. Your budget.</h3>
+      <p>Choose when each monitor runs, estimate collection costs, and set a monthly budget. See usage as it comes in.</p>
+      <span class="feature-footnote">Make the schedule fit your business.</span>
+    </article>
+    <article class="feature-card">
+      <span class="feature-icon"><Icon name="key" size={24}/></span>
+      <h3>Your accounts. Your choice.</h3>
+      <p>Connect your own data providers and AI models. Run the open-source application yourself or choose Cloud hosting.</p>
+      <a class="text-link" href={repository}>Explore the source code <Icon name="external" size={17}/></a>
+    </article>
+  </div>
 </section>
 <section id="pricing" class="pricing-section wrap section-space">
 <div class="center-heading">
 <span class="eyebrow">YOUR SETUP. YOUR CHOICE.</span>
 <h2>Host it yourself. Or let us.</h2>
-<p>The same idea, with a different amount of server admin.</p>
+<p>Choose your setup. Keep control of your accounts and data.</p>
 </div>
 <div class="plans">
 <article class="plan">
 <span class="eyebrow">SELF-HOSTED</span>
-<h3>For the hands-on builder.</h3>
+<h3>Your server. Your setup.</h3>
 <p class="price">$0<span> / forever</span>
 </p>
 <p>Run SignalScout on your own infrastructure.</p>
@@ -278,7 +291,7 @@ const examples = [
 </article>
 <article class="plan cloud-plan">
 <span class="eyebrow">SIGNALSCOUT CLOUD</span>
-<h3>For the one with enough to build.</h3>
+<h3>More time for what you build.</h3>
 <p class="price">$15<span> USD / month</span>
 </p>
 <p>Let us run SignalScout for you.</p>
@@ -345,8 +358,31 @@ const examples = [
 import '../scripts/hero-rotation';
 </script>
 <script is:inline>
-const examples = JSON.parse(document.querySelector("[data-examples]").dataset.examples);
-document.querySelectorAll('[data-example]').forEach(button=>{button.addEventListener('click',()=>{const example=examples[Number(button.dataset.example)];document.querySelectorAll('[data-example]').forEach(item=>{item.setAttribute('aria-pressed',String(item===button));item.classList.toggle('selected',item===button);});for(const key of ['source','score','title','reason'])document.getElementById(`example-${key}`).textContent=String(example[key]);document.getElementById('example-quote').textContent=`“${example.quote}”`;document.getElementById('example-tags').replaceChildren(...example.tags.map(tag=>{const span=document.createElement('span');span.textContent=tag;return span;}));});});
+const demo = document.querySelector('[data-examples]');
+const examples = JSON.parse(demo.dataset.examples);
+document.querySelectorAll('[data-example]').forEach(button => {
+  button.addEventListener('click', () => {
+    const example = examples[Number(button.dataset.example)];
+    const tone = example.score >= 80 ? "high" : example.score >= 55 ? "medium" : "low";
+    document.getElementById("example-score").dataset.scoreTone = tone;
+    const status = document.getElementById("example-status");
+    status.dataset.scoreTone = tone;
+    status.textContent = tone === "high" ? "High intent" : tone === "medium" ? "Worth reading" : "Low intent";
+    document.querySelectorAll('[data-example]').forEach(item => {
+      item.setAttribute('aria-pressed', String(item === button));
+      item.classList.toggle('selected', item === button);
+    });
+    for (const key of ['source', 'score', 'title', 'reason']) {
+      document.getElementById(`example-${key}`).textContent = String(example[key]);
+    }
+    document.getElementById('example-quote').textContent = `“${example.quote}”`;
+    document.getElementById('example-tags').replaceChildren(...example.tags.map(tag => {
+      const span = document.createElement('span');
+      span.textContent = tag;
+      return span;
+    }));
+  });
+});
 </script>
 </body>
 </html>

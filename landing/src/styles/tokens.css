@@ -12,8 +12,8 @@
   --lavender-line: #d4c9e9;
   --sunshine-soft: #fbf2d8;
   --ink: #151a22;
-  --muted: #626b78;
-  --muted-strong: #414b59;
+  --muted: #4f5967;
+  --muted-strong: #35404e;
   --background: #f7f8fa;
   --surface: #fff;
   --surface-soft: #f5f7fa;
@@ -63,6 +63,7 @@
   background: var(--background);
   font-family:
     Figtree, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.5;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
 }

@@ -20,7 +20,7 @@ if (scene && controls && toggle && next && position && cards.length > 1) {
     timer = setTimeout(() => {
       advance();
       schedule();
-    }, 4500);
+    }, 3500);
   }
 
   function advance() {

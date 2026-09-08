@@ -59,15 +59,22 @@ Set it to the real signup or checkout destination before publishing.
 `src/styles/tokens.css` is a snapshot of the application palette and sizing
 tokens, copied so the site builds alone, plus a small marketing accent palette
 (coral, mint, lavender and pale yellow). Review it when the application theme
-changes. `src/styles/landing.css` owns the marketing layout. Figtree is bundled
+changes. `src/styles/landing.css` owns the marketing layout. `features.css` styles the
+feature overview, and `story.css` styles the illustrated examples. Figtree is bundled
 locally through `@fontsource/figtree`. Platform icon provenance is recorded in
 `public/brands/README.md`; only the six platform icons are copied here.
 
-The inbox runs on illustrative posts and scores. Selecting a conversation
+The examples follow a simple invoicing app for freelancers, from chasing
+late payments to looking for a cheaper alternative. The inbox runs on
+illustrative posts and scores. Selecting a conversation
 updates the preview locally. FAQ disclosures use native HTML. The page makes
 no provider requests and collects no visitor data.
 
-The hero rotates through six illustrative platform posts every 4.5 seconds.
+The hero rotates through six illustrative platform posts every 3.5 seconds.
 Pause and Next controls are available. Rotation pauses on hover, keyboard focus,
 when off-screen, and in hidden tabs. Reduced-motion preference starts it paused
 and removes card transitions. With JavaScript disabled, the first card remains visible.
+
+Supporting text uses a 14px minimum at the default browser size. Body copy is
+16–18px. These sizes use rem-based tokens so browser text-size preferences
+apply. Cards and captions wrap rather than shrinking their type on phones.

@@ -96,7 +96,7 @@ const faqs = [
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#48679f" />
+    <meta name="theme-color" content="#f9f6ef" />
     <title>SignalScout — Find conversations that need your product</title>
     <meta
       name="description"
@@ -140,14 +140,7 @@ const faqs = [
             ></a
           >
           <h1>
-            Your next customer<br />is already <span class="accent-word"
-              >asking.<svg
-                viewBox="0 0 290 16"
-                preserveAspectRatio="none"
-                aria-hidden="true"
-                ><path d="M3 10Q145-4 287 8M30 15Q175 4 268 13"></path></svg
-              ></span
-            >
+            Your next<br />customer is<br />already <span class="accent-word">asking.</span>
           </h1>
           <p class="hero-description">
             Find people talking about the problem your product solves. Turn
@@ -191,7 +184,7 @@ const faqs = [
             </div>
           </div>
           <div class="connection-line" aria-hidden="true">
-            <span>✦</span> Reading between the keywords
+            <Icon size={24} />
           </div>
           <div class="insight-card">
             <div class="insight-heading">
@@ -199,7 +192,7 @@ const faqs = [
                 <span class="eyebrow">A CONVERSATION WORTH OPENING</span><h3>
                   They have the problem you solve.
                 </h3>
-              </div><div class="score">94<span>intent score</span></div>
+              </div><div class="score">94<span>intent</span></div>
             </div>
             <p>
               <Icon name="check" size={16} /> Small team with a recurring QA problem
@@ -216,7 +209,7 @@ const faqs = [
         aria-label="Supported platforms"
       >
         <p>
-          Good conversations happen everywhere.<br /><strong
+          Good conversations happen everywhere. <strong
             >Find yours where your customers are.</strong
           >
         </p><div class="platforms">
@@ -230,6 +223,11 @@ const faqs = [
           }
         </div>
       </section>
+      <div class="signal-ribbon" aria-label="Signals to look for">
+        <span class="ribbon-phrase"><b aria-hidden="true">✳</b> “Any recommendations?”</span>
+        <span class="ribbon-phrase"><b aria-hidden="true">✳</b> “There has to be a better way.”</span>
+        <span class="ribbon-phrase"><b aria-hidden="true">✳</b> “What are you using?”</span>
+      </div>
       <section class="section container workflow" id="how-it-works">
         <div class="section-intro">
           <span class="eyebrow">FROM THE CONVERSATION TO THE OPPORTUNITY</span

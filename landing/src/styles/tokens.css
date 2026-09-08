@@ -1,19 +1,19 @@
-/* The site palette and sizing contract. See docs/design.md. */
+/* Marketing palette. Typography and sizing follow docs/design.md. */
 :root {
-  --ink: #151a22;
-  --muted: #626b78;
-  --muted-strong: #414b59;
-  --background: #f7f8fa;
+  --ink: #26251f;
+  --muted: #706b60;
+  --muted-strong: #504b42;
+  --background: #f9f6ef;
   --surface: #fff;
-  --surface-soft: #f5f7fa;
-  --line: #e5e8ed;
-  --line-dark: #ccd2da;
-  --accent: #48679f;
-  --accent-hover: #38578f;
-  --accent-soft: #edf2fa;
+  --surface-soft: #f4f0e6;
+  --line: #e6dfd2;
+  --line-dark: #cfc5b5;
+  --accent: #ff653e;
+  --accent-hover: #f2512a;
+  --accent-soft: #fff0e6;
   --quiet-accent: #424a44;
   --quiet-accent-soft: #efeee9;
-  --accent-text: #36578f;
+  --accent-text: #aa3519;
   --warning: #8f4c26;
   --shadow-soft: 0 1px 2px rgb(20 24 21 / 3%), 0 12px 32px rgb(20 24 21 / 5%);
   --shadow: 0 24px 70px rgb(20 24 21 / 14%);
@@ -27,11 +27,15 @@
   --text-body: 1rem;
   --text-md: 1.125rem;
   --text-reading: 1.0625rem;
-  --surface-list: #fbfcfd;
-  --surface-hover: #f2f5fa;
-  --surface-brand: #dae5f5;
-  --text-on-accent: #fff;
-  --text-reading-color: #333b46;
+  --surface-list: #fffdf8;
+  --surface-hover: #fff2e9;
+  --surface-brand: #ffd6bf;
+  --text-on-accent: #26251f;
+  --lavender: #e7dff8;
+  --lime: #e7f1aa;
+  --hero-line: #b9a6d3;
+  --inverse: #fffdf8;
+  --text-reading-color: #474237;
   --border: var(--line);
   --space-1: 4px;
   --space-2: 8px;

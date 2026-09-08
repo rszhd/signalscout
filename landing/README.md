@@ -56,9 +56,9 @@ the `repository` constant if that location changes. The Cloud action reads
 `PUBLIC_APP_URL`. Until that URL is supplied, it stays on the pricing section.
 Set it to the real signup or checkout destination before publishing.
 
-`src/styles/tokens.css` is a snapshot of the application palette and sizing
-tokens, copied so the site builds alone. Review it when the application theme
-changes. `src/styles/landing.css` owns the marketing layout. Figtree is bundled
+`src/styles/tokens.css` owns the marketing palette: warm cream, orange,
+lavender and lime. Typography and sizing follow the application theme, while
+the landing page has its own visual identity and builds independently. `src/styles/landing.css` owns the marketing layout. Figtree is bundled
 locally through `@fontsource/figtree`. Platform icon provenance is recorded in
 `public/brands/README.md`; only the six platform icons are copied here.
 

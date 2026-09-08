@@ -51,13 +51,6 @@ interface Draft {
   apiKey: string;
 }
 
-const taskIcons: Record<TaskView["task"], string> = {
-  classify: "◎",
-  triage: "⌁",
-  embed: "◇",
-  draft: "✎",
-};
-
 const providerNames: Record<string, string> = {
   anthropic: "Anthropic",
   google: "Google",
@@ -82,12 +75,10 @@ function draftOf(task: TaskView): Draft {
 function TaskCard({
   task,
   canStore,
-  position,
   onSaved,
 }: {
   task: TaskView;
   canStore: boolean;
-  position: number;
   onSaved: (view: ModelsView) => void;
 }) {
   const usingInstance = !task.provider && !task.model && !task.keyHint && !task.baseUrl;
@@ -95,7 +86,7 @@ function TaskCard({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
-  const [open, setOpen] = useState(task.task === "classify");
+  const [open, setOpen] = useState(false);
 
   // The server's answer replaces what is on screen after every write, so an
   // editor cannot drift from the row behind it.
@@ -162,27 +153,16 @@ function TaskCard({
         onToggle={(event) => setOpen(event.currentTarget.open)}
       >
         <summary className="model-task-summary">
-          <span className="model-task-icon" aria-hidden="true">
-            {taskIcons[task.task]}
-          </span>
           <span className="model-task-copy">
-            <span className="model-task-kicker">Job {String(position).padStart(2, "0")}</span>
             <strong>{task.title}</strong>
-            <span>{task.what}</span>
+            <span className="model-task-model">{effectiveModel ?? "Not configured"}</span>
           </span>
           <span className="model-task-current">
-            <span>{usingInstance ? "Instance default" : "Custom setup"}</span>
-            <strong>
-              {providerName(effectiveProvider)}
-              <i className="model-current-separator" aria-hidden="true">
-                /
-              </i>
-              {effectiveModel ?? "Not configured"}
-            </strong>
-            <small>{task.keyHint ? `Stored key ${task.keyHint}` : "Uses the instance key"}</small>
+            <span>{providerName(effectiveProvider)}</span>
+            <small>{usingInstance ? "Instance default" : "Custom setup"}</small>
           </span>
           <span className="model-task-manage">
-            <span>Manage</span>
+            <span>{open ? "Close" : "Edit"}</span>
             <i className="model-task-chevron" aria-hidden="true">
               ⌄
             </i>
@@ -192,8 +172,8 @@ function TaskCard({
         <form className="model-editor" onSubmit={submit}>
           <div className="model-editor-main">
             <header className="model-editor-heading">
-              <h3>Configuration</h3>
-              <p>Leave a field empty to inherit the instance setting shown beside it.</p>
+              <p>{task.what}</p>
+              <p>Empty fields keep the instance defaults.</p>
             </header>
 
             <div className="model-field-grid">
@@ -213,7 +193,6 @@ function TaskCard({
                     </option>
                   ))}
                 </select>
-                <small>Who runs this job.</small>
               </label>
 
               <label className="field">
@@ -226,10 +205,7 @@ function TaskCard({
                   value={draft.model}
                   onChange={(event) => change("model", event.target.value)}
                 />
-                <small>
-                  Instance default · {task.instance.model ?? "not configured"}. Unlisted models
-                  still run, but their cost is not estimated.
-                </small>
+                <small>Unlisted models still run, but their cost is not estimated.</small>
               </label>
             </div>
 
@@ -252,6 +228,11 @@ function TaskCard({
               </small>
             </label>
 
+            <details className="model-guidance">
+              <summary>Choosing a model for this job</summary>
+              <p>{task.note}</p>
+            </details>
+
             <details className="model-advanced">
               <summary>
                 <span>Advanced settings</span>
@@ -270,21 +251,6 @@ function TaskCard({
               </label>
             </details>
           </div>
-
-          <aside className="model-guidance" aria-label={`Guidance for ${task.title}`}>
-            <p className="model-guidance-label">Why it matters</p>
-            <p>{task.note}</p>
-            <dl>
-              <div>
-                <dt>Effective provider</dt>
-                <dd>{providerName(effectiveProvider)}</dd>
-              </div>
-              <div>
-                <dt>Effective model</dt>
-                <dd>{effectiveModel ?? "Off"}</dd>
-              </div>
-            </dl>
-          </aside>
 
           {(error || notice) && (
             <p
@@ -321,7 +287,7 @@ function ModelsHeader() {
     <header className="topbar">
       <div>
         <h1>Models</h1>
-        <p className="page-subtitle">Choose the right model for each job in your workflow.</p>
+        <p className="page-subtitle">Review your models. Change only what you need.</p>
       </div>
     </header>
   );
@@ -374,29 +340,14 @@ export function Models() {
     );
   }
 
-  const customTasks = view.tasks.filter(
-    (task) => task.provider || task.model || task.keyHint || task.baseUrl,
-  ).length;
-
   return (
     <div className="product-page models-page">
       <ModelsHeader />
 
       <main className="models-content">
-        <section className="models-overview" aria-labelledby="models-overview-title">
-          <div>
-            <p className="eyebrow">Account model setup</p>
-            <h2 id="models-overview-title">Configure only what needs to differ</h2>
-            <p>
-              Every job starts with this instance&apos;s provider, model, and key. Override a job
-              here only when you need a different model or want calls billed to your own account.
-            </p>
-          </div>
-          <div className="models-overview-status">
-            <strong>{customTasks}</strong>
-            <span>of {view.tasks.length} jobs customized</span>
-          </div>
-        </section>
+        <p className="models-intro">
+          Jobs use this instance&apos;s settings unless you customize them.
+        </p>
 
         {view.storeBlocker && (
           <p className="model-blocker">
@@ -406,23 +357,13 @@ export function Models() {
         )}
 
         <section className="models-jobs" aria-labelledby="models-jobs-title">
-          <header className="models-section-heading">
-            <div>
-              <h2 id="models-jobs-title">Model jobs</h2>
-              <p>Open a job to review or change its configuration.</p>
-            </div>
-            <span>{view.tasks.length} jobs</span>
-          </header>
+          <h2 id="models-jobs-title" className="models-list-heading">
+            Models by job
+          </h2>
 
           <ul className="model-task-list">
-            {view.tasks.map((task, index) => (
-              <TaskCard
-                canStore={view.canStore}
-                key={task.task}
-                onSaved={setView}
-                position={index + 1}
-                task={task}
-              />
+            {view.tasks.map((task) => (
+              <TaskCard canStore={view.canStore} key={task.task} onSaved={setView} task={task} />
             ))}
           </ul>
         </section>

@@ -145,3 +145,12 @@ and Stripe action. Trial days have a labelled progress bar. Provider costs sit
 below with a link to connections. The panels stack on narrow screens; loading
 failures offer a retry. `styles/billing.css` owns the layout and uses the shared
 theme. Self-hosted instances show no payment action.
+
+## Models
+
+Models opens as a compact list of jobs, their current models and providers,
+and whether they use instance defaults. Every editor starts closed. Opening
+a job reveals its provider, model and key fields; model guidance and custom
+endpoints have their own disclosures. Keep empty-field inheritance, masked
+keys, save feedback and reset actions intact. `styles/models.css` owns the
+layout, which stacks on phones and uses the shared theme.

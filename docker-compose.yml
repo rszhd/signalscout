@@ -39,6 +39,59 @@ x-app-environment: &app-environment
   SMTP_FROM: ${SMTP_FROM:-}
   WEBHOOK_SIGNING_SECRET: ${WEBHOOK_SIGNING_SECRET:-}
 
+  # What the hosted version charges with. `off` on every self-hosted instance,
+  # which is why it is the default here and in the schema. US-072.
+  #
+  # A missing line in this block is not a missing setting — it is a setting
+  # that CANNOT be made. Compose reads `.env` to interpolate values into the
+  # lines below, so a variable named nowhere here never reaches the container,
+  # whatever anybody writes. That is how BILLING_MODE=stripe came to be
+  # readable by nothing: the instance booted in `off` mode, every screen
+  # worked, and the boot check that exists for exactly this could not fire.
+  # `compose-environment.test.ts` is what keeps this list level with the schema.
+  BILLING_MODE: ${BILLING_MODE:-off}
+  STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+  STRIPE_PRICE_ID: ${STRIPE_PRICE_ID:-}
+  STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
+  # Where Checkout sends a person back to. Required with BILLING_MODE=stripe.
+  APP_URL: ${APP_URL:-}
+
+  # The model settings. An account can store its own on the settings screen
+  # since US-068, and these are what an instance falls back to.
+  AI_PROVIDER: ${AI_PROVIDER:-}
+  AI_MODEL: ${AI_MODEL:-}
+  AI_API_KEY: ${AI_API_KEY:-}
+  AI_BASE_URL: ${AI_BASE_URL:-}
+  AI_TIMEOUT_MS: ${AI_TIMEOUT_MS:-}
+  AI_INPUT_PRICE_MICROS: ${AI_INPUT_PRICE_MICROS:-}
+  AI_OUTPUT_PRICE_MICROS: ${AI_OUTPUT_PRICE_MICROS:-}
+  AI_EMBEDDING_PROVIDER: ${AI_EMBEDDING_PROVIDER:-}
+  AI_EMBEDDING_MODEL: ${AI_EMBEDDING_MODEL:-}
+  AI_EMBEDDING_API_KEY: ${AI_EMBEDDING_API_KEY:-}
+  AI_EMBEDDING_BASE_URL: ${AI_EMBEDDING_BASE_URL:-}
+  AI_EMBEDDING_PRICE_MICROS: ${AI_EMBEDDING_PRICE_MICROS:-}
+  AI_TRIAGE_PROVIDER: ${AI_TRIAGE_PROVIDER:-}
+  AI_TRIAGE_MODEL: ${AI_TRIAGE_MODEL:-}
+  AI_TRIAGE_API_KEY: ${AI_TRIAGE_API_KEY:-}
+  AI_TRIAGE_BASE_URL: ${AI_TRIAGE_BASE_URL:-}
+  AI_TRIAGE_INPUT_PRICE_MICROS: ${AI_TRIAGE_INPUT_PRICE_MICROS:-}
+  AI_TRIAGE_OUTPUT_PRICE_MICROS: ${AI_TRIAGE_OUTPUT_PRICE_MICROS:-}
+  AI_DRAFT_PROVIDER: ${AI_DRAFT_PROVIDER:-}
+  AI_DRAFT_MODEL: ${AI_DRAFT_MODEL:-}
+  AI_DRAFT_API_KEY: ${AI_DRAFT_API_KEY:-}
+  AI_DRAFT_BASE_URL: ${AI_DRAFT_BASE_URL:-}
+  AI_DRAFT_INPUT_PRICE_MICROS: ${AI_DRAFT_INPUT_PRICE_MICROS:-}
+  AI_DRAFT_OUTPUT_PRICE_MICROS: ${AI_DRAFT_OUTPUT_PRICE_MICROS:-}
+
+  # One per provider in the registry, named by `environmentVariableFor`. A key
+  # stored on the connections screen is read first; this is the machine's copy
+  # and the only one a fresh instance has. docs/secrets.md.
+  BRIGHTDATA_API_KEY: ${BRIGHTDATA_API_KEY:-}
+  SCRAPECREATORS_API_KEY: ${SCRAPECREATORS_API_KEY:-}
+  SOCIALCRAWL_API_KEY: ${SOCIALCRAWL_API_KEY:-}
+  SOCIALDATA_API_KEY: ${SOCIALDATA_API_KEY:-}
+  APIFY_API_TOKEN: ${APIFY_API_TOKEN:-}
+
 services:
   postgres:
     image: pgvector/pgvector:pg17

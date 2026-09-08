@@ -80,3 +80,49 @@ describe("the compose file", () => {
     expect([...notCarried.keys()].filter((name) => !declared.has(name))).toEqual([]);
   });
 });
+
+/**
+ * The compose file names a default image, and CI decides which tags exist. The
+ * two were written a month apart and disagreed: the default asked for
+ * `:latest`, and the rule that publishes it was conditional on a repository
+ * setting that had since changed, so nothing had ever built it. `docker compose
+ * up` — the first command in README.md — failed on a tag that did not exist.
+ *
+ * Neither file can be checked alone, which is why this reads both.
+ */
+describe("the default image", () => {
+  function workflow(): string {
+    return readFileSync(new URL("../../../../.github/workflows/ci.yml", import.meta.url), "utf8");
+  }
+
+  /** The tag `docker compose up` pulls when nothing sets SIGNALSCOUT_IMAGE. */
+  function defaultImageTag(): string | undefined {
+    const match = /\$\{SIGNALSCOUT_IMAGE:-([^}]+)\}/.exec(composeFile());
+    return match?.[1]?.split(":").pop();
+  }
+
+  /** Every tag CI publishes under a fixed name. */
+  function publishedTags(): Set<string> {
+    return new Set(
+      [...workflow().matchAll(/type=raw,value=([A-Za-z0-9._-]+)/g)].map((match) => match[1] ?? ""),
+    );
+  }
+
+  it("carries a tag that CI publishes", () => {
+    const tag = defaultImageTag();
+
+    // Guards the guard: a regex that stopped matching would pass silently.
+    expect(tag).toBeTruthy();
+    expect(publishedTags().size).toBeGreaterThan(0);
+
+    expect([...publishedTags()]).toContain(tag);
+  });
+
+  it("is published from a named branch rather than from a repository setting", () => {
+    // The macro reads a value nobody here controls, and this repository's
+    // default branch is not the branch that releases. Matched where it would
+    // be USED rather than anywhere in the file, so the comment explaining why
+    // it is not used does not trip its own rule.
+    expect(workflow()).not.toMatch(/enable=\{\{\s*is_default_branch\s*\}\}/);
+  });
+});

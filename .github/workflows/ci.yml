@@ -99,7 +99,13 @@ jobs:
         with:
           images: ghcr.io/${{ github.repository }}
           tags: |
-            type=raw,value=latest,enable={{is_default_branch}}
+            # `main` by name, not `is_default_branch`. That macro reads a
+            # setting in a web interface: this repository's default is `dev`,
+            # which CI never runs on, so the condition was false on every run
+            # that could publish and `:latest` was never made — while
+            # docker-compose.yml asked for it by default and README.md told
+            # people to run it.
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
             type=raw,value=staging,enable=${{ github.ref == 'refs/heads/staging' }}
             type=sha,format=long
 

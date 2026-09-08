@@ -54,12 +54,12 @@ export const sessionRefreshAfterSeconds = 60 * 60 * 24;
 /**
  * The password rule, stated once.
  *
- * Twelve rather than eight, and no character classes. Length is what a
- * password costs an attacker; a class rule mostly costs the person a
- * substitution they will make the same way everybody else does. There is one
- * account on this instance, and it opens an inbox and a set of provider keys.
+ * Eight, and no character classes. A class rule mostly costs the person a
+ * substitution they will make the same way everybody else does, and it buys
+ * an attacker almost nothing. Eight rather than twelve is the owner's call:
+ * this is a floor, not the advice, and the screen still says what it is.
  */
-export const minimumPasswordLength = 12;
+export const minimumPasswordLength = 8;
 
 export interface CreateAuthOptions {
   readonly db: Database;

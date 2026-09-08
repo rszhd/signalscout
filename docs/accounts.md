@@ -103,7 +103,7 @@ network and nothing else.
 ## The first run makes the account
 
 Start the instance and open it. It has no account, so it asks you to make one:
-a name, an email address and a password of at least twelve characters.
+a name, an email address and a password of at least eight characters.
 
 **By default, signup closes the moment that account exists.** A second attempt
 is refused by the server, not hidden by the screen. There is no default account

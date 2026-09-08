@@ -162,3 +162,12 @@ instance, and signup closes after it.
   reasoning, the `X-Forwarded-Proto` header a proxy must send, and the SQL for
   getting back in — there is no password reset, because nothing here sends
   mail and a reset link that never arrives is worse than no button.
+- 2026-09-09T00:34+08:00 — **The password minimum is eight, not twelve.** The
+  owner's decision, and it reverses a number this ticket chose without
+  measuring anything. What is unchanged is the rest of the rule: no character
+  classes, because a class rule buys an attacker almost nothing and costs the
+  person a substitution everybody makes the same way. Eight is a floor, not
+  advice. `minimumPasswordLength` in `auth/auth.ts` is the original and
+  `Login.tsx` holds the copy the bundle needs, so the number is stated twice
+  and the server is still the one that refuses. The two form assertions moved
+  because the behaviour was meant to move. `docs/accounts.md` says eight.

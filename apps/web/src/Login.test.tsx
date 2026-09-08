@@ -40,7 +40,7 @@ describe("the login screen", () => {
     expect(screen.container.textContent).toContain("Set up this instance");
     expect(screen.container.textContent).toContain("signup closes behind it");
     expect(field("Your name")).toBeTruthy();
-    expect(field("Password").minLength).toBe(12);
+    expect(field("Password").minLength).toBe(8);
   });
 
   it("offers no way to make a second account when signup is closed", async () => {
@@ -72,7 +72,7 @@ describe("the login screen", () => {
 
     expect(screen.container.textContent).toContain("Create an account");
     expect(field("Your name")).toBeTruthy();
-    expect(field("Password").minLength).toBe(12);
+    expect(field("Password").minLength).toBe(8);
     // And it does not claim to be the first run, because it is not.
     expect(screen.container.textContent).not.toContain("Set up this instance");
   });

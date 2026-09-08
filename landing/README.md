@@ -53,7 +53,7 @@ on the owner's instruction. Billing itself is outside this site.
 
 The self-hosted action links to the repository's running instructions. Update
 the `repository` constant if that location changes. The Cloud action reads
-`PUBLIC_APP_URL`. Until that URL is supplied, it stays on the pricing section.
+`PUBLIC_APP_URL`. Until that URL is supplied, the page shows “Cloud signup coming soon” instead of a signup link.
 Set it to the real signup or checkout destination before publishing.
 
 `src/styles/tokens.css` is a snapshot of the application palette and sizing

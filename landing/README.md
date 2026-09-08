@@ -56,11 +56,17 @@ the `repository` constant if that location changes. The Cloud action reads
 `PUBLIC_APP_URL`. Until that URL is supplied, it stays on the pricing section.
 Set it to the real signup or checkout destination before publishing.
 
-`src/styles/tokens.css` is a snapshot of the application palette and sizing
-tokens, copied so the site builds alone. Review it when the application theme
-changes. `src/styles/landing.css` owns the marketing layout. Figtree is bundled
+`src/styles/tokens.css` gives the app’s blue theme a marketing variation:
+richer blue actions, pale blue highlights, cool neutral surfaces and deep navy
+sections. The site builds independently and the application theme stays unchanged.
+`src/styles/landing.css` owns the marketing layout, including the oversized
+headline, example conversation and contrasting inbox section. Figtree is bundled
 locally through `@fontsource/figtree`. Platform icon provenance is recorded in
 `public/brands/README.md`; only the six platform icons are copied here.
+
+The page uses staggered platform logos, illustrative feature previews and a
+self-hosting setup preview. Navigation stays available while scrolling; on
+phones, a native disclosure menu closes on selection, Escape or an outside click.
 
 The inbox runs on illustrative posts and scores. Selecting a conversation
 updates the preview locally. FAQ disclosures use native HTML. The page makes

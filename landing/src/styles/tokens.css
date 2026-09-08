@@ -1,25 +1,26 @@
-/* The site palette and sizing contract. See docs/design.md. */
+/* Marketing variation of the app’s blue theme. Builds independently. */
 :root {
-  --ink: #151a22;
-  --muted: #626b78;
-  --muted-strong: #414b59;
-  --background: #f7f8fa;
-  --surface: #fff;
-  --surface-soft: #f5f7fa;
-  --line: #e5e8ed;
-  --line-dark: #ccd2da;
-  --accent: #48679f;
-  --accent-hover: #38578f;
-  --accent-soft: #edf2fa;
+  --ink: #19253b;
+  --muted: #647087;
+  --muted-strong: #43516a;
+  --background: #f4f7fc;
+  --surface: #fcfdff;
+  --surface-soft: #f3f6fc;
+  --line: #e0e6f0;
+  --line-dark: #c5cfdf;
+  --accent: #4168b8;
+  --accent-hover: #34569c;
+  --accent-soft: #edf3ff;
   --quiet-accent: #424a44;
   --quiet-accent-soft: #efeee9;
-  --accent-text: #36578f;
+  --accent-text: #355ba5;
   --warning: #8f4c26;
-  --shadow-soft: 0 1px 2px rgb(20 24 21 / 3%), 0 12px 32px rgb(20 24 21 / 5%);
-  --shadow: 0 24px 70px rgb(20 24 21 / 14%);
+  --shadow-soft: 0 1px 2px rgb(23 43 77 / 3%), 0 12px 32px rgb(23 43 77 / 5%);
+  --shadow: 0 24px 70px rgb(23 43 77 / 14%);
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 18px;
+  --radius-xl: 24px;
   /* Keep supporting text readable without enlarging the page headings. */
   --text-xs: 0.875rem;
   --text-sm: 0.9375rem;
@@ -28,10 +29,17 @@
   --text-md: 1.125rem;
   --text-reading: 1.0625rem;
   --surface-list: #fbfcfd;
-  --surface-hover: #f2f5fa;
-  --surface-brand: #dae5f5;
+  --surface-hover: #eef3fc;
+  --surface-brand: #d8e5fc;
   --text-on-accent: #fff;
-  --text-reading-color: #333b46;
+  /* Brighter highlights and deep navy give the landing page its own contrast. */
+  --highlight: #cbdfff;
+  --night: #172b4d;
+  --night-raised: #274573;
+  --night-line: #354968;
+  --night-muted: #b9c9e2;
+  --paper: #fff;
+  --text-reading-color: #34435b;
   --border: var(--line);
   --space-1: 4px;
   --space-2: 8px;

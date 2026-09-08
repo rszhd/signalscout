@@ -86,7 +86,7 @@ const faqs = [
   ],
   [
     "What does the Cloud plan include?",
-    "Yes. SignalScout Cloud is $15 USD per month. We run the application, scheduler and database for you, including automatic updates and backups. Bring your own social data and AI keys; provider usage is billed separately.",
+    "SignalScout Cloud is $15 USD per month. We run the application, scheduler and database for you, including automatic updates and backups. Bring your own social data and AI keys; provider usage is billed separately.",
   ],
 ];
 ---
@@ -96,7 +96,7 @@ const faqs = [
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#48679f" />
+    <meta name="theme-color" content="#4168b8" />
     <title>SignalScout — Find conversations that need your product</title>
     <meta
       name="description"
@@ -124,50 +124,58 @@ const faqs = [
             >Features</a
           ><a href="#pricing">Pricing</a><a href="#open-source">Open source</a>
         </nav>
-        <a class="button button-small nav-cta" href={repository}
-          ><Icon name="github" size={18} /> GitHub <span aria-hidden="true"
+        <a class="button button-small nav-cta" href={repository} aria-label="View SignalScout on GitHub"
+          ><Icon name="github" size={18} /> <span class="nav-cta-label">GitHub</span> <span aria-hidden="true"
             >↗</span
           ></a
         >
+        <details class="mobile-menu">
+          <summary aria-label="Toggle navigation"><span></span><span></span></summary>
+          <nav aria-label="Mobile navigation">
+            <a href="#how-it-works">How it works <span aria-hidden="true">↗</span></a>
+            <a href="#features">Features <span aria-hidden="true">↗</span></a>
+            <a href="#pricing">Pricing <span aria-hidden="true">↗</span></a>
+            <a href="#open-source">Open source <span aria-hidden="true">↗</span></a>
+          </nav>
+        </details>
       </div>
     </header>
     <main id="main">
       <section class="hero container">
         <div class="hero-copy">
           <a class="eyebrow hero-badge" href="#open-source"
-            ><span class="status-dot"></span> Open source. Intent first. <span
+            ><span class="status-dot"></span> FIND PEOPLE ALREADY LOOKING <span
               aria-hidden="true">↗</span
             ></a
           >
           <h1>
-            Your next customer<br />is already <span class="accent-word"
-              >asking.<svg
-                viewBox="0 0 290 16"
-                preserveAspectRatio="none"
-                aria-hidden="true"
-                ><path d="M3 10Q145-4 287 8M30 15Q175 4 268 13"></path></svg
-              ></span
-            >
+            Your next<br />customer is<br /><span class="accent-word">asking.</span>
           </h1>
           <p class="hero-description">
-            Find people talking about the problem your product solves. Turn
-            social conversations into an inbox of opportunities worth your time.
+            People are asking for recommendations, comparing alternatives,
+            and describing problems you solve. Find the conversations where
+            you can help.
           </p>
           <div class="hero-actions">
             <a class="button button-primary" href="#pricing"
-              >Start finding signals <Icon /></a
+              >Find my next customer <Icon /></a
             ><a class="text-link" href="#demo"
               ><Icon name="play" size={18} /> See it in action</a
             >
           </div>
-          <p class="hero-note">
-            <Icon name="check" size={16} /> Free to self-host <span>·</span> Cloud
-            for $15/month
-          </p>
+          <div class="hero-note">
+            <span class="hero-note-item"><Icon name="check" size={16} /> Free to self-host</span>
+            <span class="hero-note-divider" aria-hidden="true">·</span>
+            <span class="hero-note-item">Cloud for $15/month</span>
+          </div>
         </div>
         <div class="hero-visual">
           <div class="visual-label">
-            <span class="status-dot"></span> LESS SEARCHING. MORE SIGNAL.
+            <span class="status-dot"></span> THE SIGNAL IN THE SCROLL <span class="visual-index">EXAMPLE</span>
+          </div>
+          <div class="noise-posts" aria-hidden="true">
+            <span>My 10 tips for growing a SaaS… <span>↓ skip</span></span>
+            <span>Excited to announce our latest… <span>↓ skip</span></span>
           </div>
           <div class="conversation-card">
             <div class="conversation-meta">
@@ -183,7 +191,7 @@ const faqs = [
             </div>
             <h2>
               “We’re only three developers and still manually test before every
-              release. What are other small teams using?”
+              release. <mark>What are other small teams using?</mark>”
             </h2>
             <div class="conversation-bottom">
               <span>↑ 24 <span class="comment-count">◯ 12 comments</span></span
@@ -191,13 +199,13 @@ const faqs = [
             </div>
           </div>
           <div class="connection-line" aria-hidden="true">
-            <span>✦</span> Reading between the keywords
+            <span>↓</span> A real problem. A reason to reach out.
           </div>
           <div class="insight-card">
             <div class="insight-heading">
               <div>
-                <span class="eyebrow">A CONVERSATION WORTH OPENING</span><h3>
-                  They have the problem you solve.
+                <span class="eyebrow">THERE’S YOUR OPENING</span><h3>
+                  You build exactly what they need.
                 </h3>
               </div><div class="score">94<span>intent score</span></div>
             </div>
@@ -211,30 +219,35 @@ const faqs = [
           <p class="example-caption">Illustrative conversation and scores</p>
         </div>
       </section>
-      <section
-        class="platform-strip container"
-        aria-label="Supported platforms"
-      >
-        <p>
-          Good conversations happen everywhere.<br /><strong
-            >Find yours where your customers are.</strong
-          >
-        </p><div class="platforms">
+      <div class="signal-ticker" aria-label="Types of buying signals">
+        <div class="container">
+          <span>Small words. <strong>Big buying signals.</strong></span>
+          <span>“Any recommendations?” <b aria-hidden="true">↗</b></span>
+          <span>“Looking for an alternative” <b aria-hidden="true">↗</b></span>
+          <span>“How do you solve this?” <b aria-hidden="true">↗</b></span>
+        </div>
+      </div>
+      <section class="platform-strip container" aria-labelledby="platforms-title">
+        <div class="platform-copy">
+          <span class="eyebrow">WHERE YOUR CUSTOMERS TALK</span>
+          <h2 id="platforms-title">Six feeds. <span>One inbox.</span></h2>
+        </div>
+        <ul class="platforms" aria-label="Supported platforms">
           {
             platforms.map(([name, icon]) => (
-              <span>
-                <img src={`/brands/${icon}`} alt="" width="22" height="22" />
-                {name}
-              </span>
+              <li class="platform-logo">
+                <img src={`/brands/${icon}`} alt="" width="48" height="48" />
+                <span>{name}</span>
+              </li>
             ))
           }
-        </div>
+        </ul>
       </section>
       <section class="section container workflow" id="how-it-works">
         <div class="section-intro">
           <span class="eyebrow">FROM THE CONVERSATION TO THE OPPORTUNITY</span
           ><h2>
-            A little context from you.<br />A lot less noise in your day.
+            You build the solution.<br /><span class="heading-secondary">We’ll find the conversation.</span>
           </h2><p>
             Tell SignalScout who you help. It finds the conversations that make
             it worth showing up.
@@ -242,7 +255,7 @@ const faqs = [
         </div>
         <div class="steps">
           <article>
-            <span class="step-number">01 /</span><div class="step-icon">
+            <span class="step-number">01</span><div class="step-icon">
               <Icon name="sliders" size={26} />
             </div><h3>Describe what you solve</h3><p>
               Add your product, ideal customer and the problems you fix. Choose
@@ -252,7 +265,7 @@ const faqs = [
             >
           </article>
           <article>
-            <span class="step-number">02 /</span><div class="step-icon">
+            <span class="step-number">02</span><div class="step-icon">
               <Icon name="signal" size={26} />
             </div><h3>Let the context do the filtering</h3><p>
               SignalScout collects conversations and uses AI to evaluate the
@@ -260,7 +273,7 @@ const faqs = [
             </p><span class="step-foot">Every match comes with a reason.</span>
           </article>
           <article>
-            <span class="step-number">03 /</span><div class="step-icon">
+            <span class="step-number">03</span><div class="step-icon">
               <Icon name="inbox" size={26} />
             </div><h3>Find your way into the conversation</h3><p>
               Review your best matches, open the original post and decide how
@@ -300,7 +313,7 @@ const faqs = [
             <div class="inbox-content">
               <div class="inbox-title">
                 <h3>Intent inbox <span>3 matches</span></h3><span
-                  class="sample-badge">Interactive example</span
+                class="sample-badge"><span class="status-dot"></span> Interactive example</span
                 >
               </div><div class="inbox-columns">
                 <div
@@ -338,7 +351,7 @@ const faqs = [
                       </button>
                     ))
                   }
-                </div><div class="match-detail">
+                </div><div class="match-detail" aria-live="polite" aria-atomic="true">
                   {
                     examples.map((item, index) => (
                       <article data-detail={index} hidden={index !== 0}>
@@ -402,29 +415,55 @@ const faqs = [
       <section class="section container features" id="features">
         <div class="section-intro">
           <span class="eyebrow">BUILT TO STAY USEFUL</span><h2>
-            The right signal.<br />On your terms.
+            The right signal.<br /><span class="heading-secondary">On your terms.</span>
           </h2>
+          <p>Decide where to listen, what matters, and how the next opportunity reaches you.</p>
         </div><div class="feature-grid">
-          <article>
-            <Icon name="signal" size={28} /><h3>Intent beyond keywords</h3><p>
+          <article class="feature-intent">
+            <div class="feature-preview intent-preview" aria-label="Example of a buying signal">
+              <span class="preview-label">READ BETWEEN THE KEYWORDS</span>
+              <p class="signal-quote">“There has to be<br /><mark>a better way.</mark>”</p>
+              <span class="preview-tag"><Icon name="signal" size={16} /> Looking for an alternative</span>
+            </div>
+            <h3>Intent beyond keywords</h3><p>
               A complaint, a comparison, a request for help. Find the context
               that makes a conversation relevant to your product.
             </p>
           </article>
-          <article>
-            <Icon name="sliders" size={28} /><h3>A schedule you control</h3><p>
+          <article class="feature-schedule">
+            <div class="feature-preview schedule-preview" aria-label="Example schedule: a collection every six hours">
+              <span class="preview-label">YOUR PACE. YOUR BUDGET.</span>
+              <div class="schedule-timeline" aria-hidden="true">
+                <div class="schedule-bars">
+                  {Array.from({ length: 25 }, (_, hour) => <i class:list={{ "scheduled-poll": hour % 6 === 0 }}></i>)}
+                </div>
+                <div class="schedule-axis"><span>00:00</span><span>12:00</span><span>24:00</span></div>
+              </div>
+              <span class="schedule-caption"><Icon name="sliders" size={16} /> Every 6 hours <span class="schedule-example">Example schedule</span></span>
+            </div>
+            <h3>A schedule you control</h3><p>
               Choose when monitors run, which platforms they search and how much
               you plan to spend.
             </p>
           </article>
-          <article>
-            <Icon name="bell" size={28} /><h3>Keep useful matches close</h3><p>
+          <article class="feature-delivery">
+            <div class="feature-preview delivery-preview">
+              <span class="preview-label">A GOOD REASON TO CHECK YOUR INBOX</span>
+              <div class="delivery-message"><span class="delivery-icon"><Icon name="bell" size={23} /></span><div><strong>A conversation worth opening.</strong><span>Someone has the problem you solve.</span></div></div>
+              <div class="delivery-channels"><span>Inbox</span><span>Email</span><span>Webhook</span></div>
+            </div>
+            <h3>Keep useful matches close</h3><p>
               Read your inbox, receive email digests or connect your own
               workflow with signed webhooks.
             </p>
           </article>
-          <article>
-            <Icon name="key" size={28} /><h3>Your providers. Your keys.</h3><p>
+          <article class="feature-keys">
+            <div class="feature-preview keys-preview">
+              <span class="preview-label">BUILT AROUND YOUR CHOICES</span>
+              <div class="key-composition" aria-hidden="true"><span>YOUR DATA</span><span class="key-symbol"><Icon name="key" size={36} /></span><span>YOUR AI</span></div>
+              <span class="keys-caption">Connected by you. Controlled by you.</span>
+            </div>
+            <h3>Your providers. Your keys.</h3><p>
               Connect your own social data and AI accounts. Choose your model
               and pay your providers directly.
             </p>
@@ -446,7 +485,12 @@ const faqs = [
           ><span class="license-note"
             >Apache 2.0 · Free to self-host · Provider usage billed separately</span
           >
-        </div><div class="ownership-list">
+        </div><div class="ownership-system">
+          <div class="source-terminal">
+            <div class="terminal-heading"><Icon name="github" size={18} /><span>signalscout / your-server</span><span class="terminal-license">Apache 2.0</span></div>
+            <div class="terminal-body"><span class="preview-label">AFTER CONFIGURATION</span><code><span aria-hidden="true">$ </span>docker compose up -d</code><p>The full product.<br /><strong>On a machine you control.</strong></p><a href={setup}>Read the setup guide <Icon size={17} /></a></div>
+          </div>
+          <div class="ownership-list">
           {
             [
               [
@@ -477,6 +521,7 @@ const faqs = [
               </div>
             ))
           }
+          </div>
         </div>
       </section>
       <section
@@ -487,7 +532,7 @@ const faqs = [
         <div class="section-intro">
           <span class="eyebrow">ONE PRODUCT. TWO WAYS TO RUN IT.</span>
           <h2 id="pricing-title">
-            Host it yourself.<br />Or leave the hosting to us.
+            Host it yourself.<br /><span class="heading-secondary">Or leave the hosting to us.</span>
           </h2>
           <p>
             The full application either way. Choose who takes care of the
@@ -593,8 +638,8 @@ const faqs = [
       <section class="final-cta container">
         <span class="eyebrow"
           ><span class="status-dot"></span> THE NEXT CONVERSATION IS OUT THERE</span
-        ><h2>Find someone you can help.</h2><p>
-          Start with your product. Let the conversations come to you.
+        ><h2>Be the answer<br /><span class="heading-highlight">they’re looking for.</span></h2><p>
+          Your next customer might be one conversation away.
         </p><a class="button button-primary" href="#pricing"
           >Get started with SignalScout <Icon /></a
         >
@@ -613,6 +658,21 @@ const faqs = [
       </nav>
     </footer>
     <script>
+      const mobileMenu = document.querySelector<HTMLDetailsElement>(".mobile-menu");
+      mobileMenu?.addEventListener("click", (event) => {
+        if (event.target instanceof Element && event.target.closest("a")) mobileMenu.open = false;
+      });
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && mobileMenu?.open) {
+          mobileMenu.open = false;
+          mobileMenu.querySelector("summary")?.focus();
+        }
+      });
+      document.addEventListener("click", (event) => {
+        if (mobileMenu?.open && event.target instanceof Node && !mobileMenu.contains(event.target)) {
+          mobileMenu.open = false;
+        }
+      });
       const buttons =
         document.querySelectorAll<HTMLButtonElement>("[data-match]");
       const details = document.querySelectorAll<HTMLElement>("[data-detail]");

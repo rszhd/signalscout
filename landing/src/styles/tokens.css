@@ -1,5 +1,16 @@
 /* The site palette and sizing contract. See docs/design.md. */
 :root {
+  /* Marketing accents: warm emphasis, positive signals, and section surfaces. */
+  --coral: #ac4936;
+  --coral-soft: #fbe9e2;
+  --coral-line: #edc1b4;
+  --mint: #286451;
+  --mint-soft: #e5f2eb;
+  --mint-line: #b7d7c6;
+  --lavender: #69549b;
+  --lavender-soft: #f0edf8;
+  --lavender-line: #d4c9e9;
+  --sunshine-soft: #fbf2d8;
   --ink: #151a22;
   --muted: #626b78;
   --muted-strong: #414b59;

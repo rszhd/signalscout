@@ -9,6 +9,14 @@ import Icon from '../components/Icon.astro';
 const repository = 'https://github.com/rszhd/signalscout';
 const appUrl = import.meta.env.PUBLIC_APP_URL;
 const platforms = [['Reddit','reddit.png'],['X / Twitter','x.png'],['LinkedIn','linkedin.ico'],['YouTube','youtube.png'],['TikTok','tiktok.png'],['Instagram','instagram.png']];
+const heroPosts = [
+  { platform: 'Reddit', icon: 'reddit.png', source: 'r/SaaS', score: 94, text: 'We’re still testing everything manually before each release.', signal: 'What are other small teams using?' },
+  { platform: 'X', icon: 'x.png', source: 'X · Founder', score: 89, text: 'Another morning fixing broken tests after a tiny UI change.', signal: 'Has anyone found an easier way?' },
+  { platform: 'LinkedIn', icon: 'linkedin.ico', source: 'LinkedIn · SaaS team', score: 87, text: 'Our developers spend every Friday on regression testing.', signal: 'How do small teams automate this?' },
+  { platform: 'YouTube', icon: 'youtube.png', source: 'YouTube · Comment', score: 91, text: 'This works for one test, but we have fifty flows to check.', signal: 'Is there a tool that handles this?' },
+  { platform: 'TikTok', icon: 'tiktok.png', source: 'TikTok · Comment', score: 86, text: 'Every moisturiser I try makes my sensitive skin break out.', signal: 'What should I try instead?' },
+  { platform: 'Instagram', icon: 'instagram.png', source: 'Instagram · Comment', score: 90, text: 'Retinol left my skin irritated, but I still have acne scars.', signal: 'How can I treat them gently?' },
+];
 const examples = [
 {label:'Asking for a recommendation',source:'Reddit · r/SaaS',score:94,title:'There has to be a better way to test this.',quote:'We’re a team of three and still manually test signup and checkout before every release. What are other small teams using?',reason:'A small SaaS team describes a recurring testing problem and explicitly asks for a solution.',tags:['Small SaaS team','Manual testing pain','Looking for a tool']},
 {label:'Looking for an alternative',source:'X / Twitter',score:89,title:'Our tests need more work than our product.',quote:'Another morning fixing broken E2E tests after a tiny UI change. Has anyone switched to something easier to maintain?',reason:'The author is frustrated with their current workflow and actively exploring an alternative.',tags:['Maintenance pain','Current frustration','Ready to switch']},
@@ -77,24 +85,29 @@ const examples = [
 </div>
 <div class="floating-note note-two">
 <img src="/brands/reddit.png" alt="Reddit" width="20" height="20"/>“Anyone know a better way to…?”</div>
-<div class="signal-card">
-<div class="signal-card-top">
-<span class="platform-meta">
-<img src="/brands/reddit.png" alt="" width="21" height="21"/>r/SaaS <span>· 12m ago</span>
-</span>
-<span class="match-badge">↗ High intent</span>
+<div class="hero-deck" id="hero-deck" aria-live="off">
+{heroPosts.map((post, index) => (
+  <article class="signal-card" data-platform={post.platform.toLowerCase()} data-hero-card aria-hidden={index !== 0}>
+    <div class="signal-card-top">
+      <span class="platform-meta"><img src={`/brands/${post.icon}`} alt="" width="21" height="21"/>{post.source}</span>
+      <span class="match-badge">↗ High intent</span>
+    </div>
+    <p>“{post.text} <mark>{post.signal}</mark>”</p>
+    <div class="card-bottom">
+      <span><span class="sparkle">✦</span>A problem your product solves</span>
+      <span class="score">{post.score}<span>/100</span></span>
+    </div>
+  </article>
+))}
 </div>
-<p>“We’re still testing everything manually before each release. <mark>What are other small teams using?</mark>”</p>
-<div class="card-bottom">
-<span>
-<span class="sparkle">✦</span>A problem your product solves</span>
-<span class="score">94<span>/100</span>
-</span>
-</div>
+<div class="hero-rotation-controls" hidden>
+  <button type="button" data-hero-toggle aria-controls="hero-deck" aria-label="Pause post rotation">Pause</button>
+  <span data-hero-position>1 / {heroPosts.length}</span>
+  <button type="button" data-hero-next aria-controls="hero-deck" aria-label="Show next example post">Next <Icon size={13}/></button>
 </div>
 <div class="found-label">
 <Icon name="check" size={15}/>Less searching. A relevant conversation.</div>
-<span class="illustration-label">ILLUSTRATIVE MATCH</span>
+<span class="illustration-label">ILLUSTRATIVE MATCHES · DIFFERENT PRODUCTS</span>
 </div>
 </section>
 <section class="platform-strip wrap" aria-label="Supported platforms">
@@ -298,6 +311,9 @@ const examples = [
 <a href={repository}>Open source on GitHub <Icon name="external" size={15}/>
 </a>
 </footer>
+<script>
+import '../scripts/hero-rotation';
+</script>
 <script is:inline>
 const examples = JSON.parse(document.querySelector("[data-examples]").dataset.examples);
 document.querySelectorAll('[data-example]').forEach(button=>{button.addEventListener('click',()=>{const example=examples[Number(button.dataset.example)];document.querySelectorAll('[data-example]').forEach(item=>{item.setAttribute('aria-pressed',String(item===button));item.classList.toggle('selected',item===button);});for(const key of ['source','score','title','reason'])document.getElementById(`example-${key}`).textContent=String(example[key]);document.getElementById('example-quote').textContent=`“${example.quote}”`;document.getElementById('example-tags').replaceChildren(...example.tags.map(tag=>{const span=document.createElement('span');span.textContent=tag;return span;}));});});

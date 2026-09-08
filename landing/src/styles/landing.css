@@ -166,7 +166,7 @@ h1 {
 }
 .headline-accent {
   position: relative;
-  color: var(--accent);
+  color: var(--coral);
   white-space: nowrap;
 }
 .headline-accent::after {
@@ -176,7 +176,7 @@ h1 {
   right: -3px;
   bottom: -7px;
   height: 8px;
-  border-top: 2px solid var(--accent);
+  border-top: 2px solid var(--coral);
   border-radius: 50%;
   transform: rotate(-3deg);
 }
@@ -216,15 +216,30 @@ h1 {
 .orbit-one {
   width: 390px;
   height: 390px;
+  border-color: var(--coral-line);
+  background: radial-gradient(circle at 30% 25%, var(--sunshine-soft), transparent 65%);
+}
+.orbit-one::after {
+  content: "";
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  top: 55px;
+  right: 42px;
+  border-radius: 50%;
+  background: var(--coral-line);
 }
 .orbit-two {
   width: 290px;
   height: 290px;
+  border-color: var(--mint-line);
+  background: var(--mint-soft);
 }
 .orbit-three {
   width: 180px;
   height: 180px;
-  background: var(--accent-soft);
+  background: var(--lavender-soft);
+  border-color: var(--lavender-line);
 }
 .scene-label {
   position: absolute;
@@ -264,6 +279,9 @@ h1 {
   transform: rotate(5deg);
 }
 .signal-card {
+  --post-accent: var(--accent-text);
+  --post-soft: var(--accent-soft);
+  --post-line: var(--surface-brand);
   position: relative;
   width: 430px;
   margin-top: 70px;
@@ -294,9 +312,9 @@ h1 {
 }
 .match-badge {
   font-size: 11px;
-  color: var(--accent-text);
+  color: var(--mint);
   padding: 5px 8px;
-  background: var(--accent-soft);
+  background: var(--mint-soft);
   border-radius: 5px;
 }
 .signal-card p {
@@ -328,13 +346,76 @@ mark {
 .score {
   font-size: 27px;
   font-weight: 600;
-  color: var(--accent-text);
+  color: var(--mint);
 }
 .score span {
   color: var(--muted);
   font-size: 11px;
   font-weight: 400;
   margin-left: 3px;
+}
+.hero-deck {
+  display: grid;
+  width: 430px;
+  max-width: 100%;
+  margin-top: 70px;
+  perspective: 1000px;
+}
+.hero-deck .signal-card {
+  border-top: 3px solid var(--post-line);
+  grid-area: 1 / 1;
+  width: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  animation: none;
+  transition:
+    opacity 450ms ease,
+    transform 600ms cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 600ms;
+}
+.hero-deck .signal-card[aria-hidden="true"] {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translate(10px, 15px) rotate(4deg) rotateY(-8deg) scale(0.96);
+}
+.hero-deck .signal-card[aria-hidden="false"] {
+  opacity: 1;
+  visibility: visible;
+  transform: rotate(-3deg);
+  z-index: 1;
+}
+.hero-deck .card-bottom {
+  margin-top: auto;
+}
+.hero-rotation-controls {
+  position: absolute;
+  bottom: -55px;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.hero-rotation-controls[hidden] {
+  display: none;
+}
+.hero-rotation-controls button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-height: 36px;
+  min-width: 48px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--accent-text);
+  cursor: pointer;
+}
+.hero-rotation-controls button:hover {
+  background: var(--accent-soft);
 }
 .found-label {
   position: absolute;
@@ -344,9 +425,9 @@ mark {
   align-items: center;
   gap: 7px;
   padding: 10px 13px;
-  background: var(--accent-soft);
-  color: var(--accent-text);
-  border: 1px solid var(--surface-brand);
+  background: var(--mint-soft);
+  color: var(--mint);
+  border: 1px solid var(--mint-line);
   font-size: 11px;
   border-radius: 6px;
   transform: rotate(3deg);
@@ -415,6 +496,11 @@ h2 {
   border-bottom: 1px solid var(--line-dark);
   color: var(--accent);
 }
+.step-top > svg {
+  box-sizing: content-box;
+  padding: 10px;
+  border-radius: var(--radius-md);
+}
 .step-top span {
   font-size: 13px;
   letter-spacing: 1px;
@@ -431,7 +517,7 @@ h3 {
   margin-bottom: 0;
 }
 .demo-section {
-  background: var(--accent-soft);
+  background: var(--lavender-soft);
   border-block: 1px solid var(--line);
 }
 .center-heading {
@@ -676,8 +762,8 @@ blockquote {
   background: var(--surface-hover);
 }
 .cloud-plan {
-  background: var(--accent-soft);
-  border-color: var(--surface-brand);
+  background: var(--mint-soft);
+  border-color: var(--mint-line);
 }
 .cloud-status {
   display: flex;
@@ -735,8 +821,8 @@ details[open] summary::after {
   text-align: center;
   position: relative;
   overflow: hidden;
-  background: var(--surface-brand);
-  border: 1px solid var(--line-dark);
+  background: linear-gradient(115deg, var(--coral-soft), var(--sunshine-soft));
+  border: 1px solid var(--coral-line);
   border-radius: var(--radius-lg);
   padding: 62px 24px;
   isolation: isolate;
@@ -780,6 +866,57 @@ footer > a:last-child {
   align-items: center;
   gap: 8px;
   font-size: 12px;
+}
+.signal-card[data-platform="reddit"],
+.signal-card[data-platform="youtube"] {
+  --post-accent: var(--coral);
+  --post-soft: var(--coral-soft);
+  --post-line: var(--coral-line);
+}
+.signal-card[data-platform="tiktok"] {
+  --post-accent: var(--mint);
+  --post-soft: var(--mint-soft);
+  --post-line: var(--mint-line);
+}
+.signal-card[data-platform="instagram"] {
+  --post-accent: var(--lavender);
+  --post-soft: var(--lavender-soft);
+  --post-line: var(--lavender-line);
+}
+.signal-card mark {
+  color: var(--post-accent);
+  background: var(--post-soft);
+}
+.steps article:nth-child(1) .step-top {
+  color: var(--coral);
+  border-color: var(--coral-line);
+}
+.steps article:nth-child(2) .step-top {
+  color: var(--lavender);
+  border-color: var(--lavender-line);
+}
+.steps article:nth-child(3) .step-top {
+  color: var(--mint);
+  border-color: var(--mint-line);
+}
+
+.steps article:nth-child(1) .step-top > svg {
+  background: var(--coral-soft);
+}
+.steps article:nth-child(2) .step-top > svg {
+  background: var(--lavender-soft);
+}
+.steps article:nth-child(3) .step-top > svg {
+  background: var(--mint-soft);
+}
+.demo-section :where(.center-heading) .eyebrow {
+  color: var(--lavender);
+}
+.cloud-plan > .eyebrow {
+  color: var(--mint);
+}
+.closing > .eyebrow {
+  color: var(--coral);
 }
 @keyframes arrive {
   from {
@@ -1122,13 +1259,27 @@ footer > a:last-child {
     padding-block: 30px;
   }
 }
+@media (max-width: 540px) {
+  .hero-deck {
+    width: calc(100% - 12px);
+    margin-top: 55px;
+  }
+  .hero {
+    padding-bottom: 85px;
+  }
+  .illustration-label {
+    letter-spacing: 1px;
+  }
+}
 @media (prefers-reduced-motion: reduce) {
+  .hero-deck .signal-card {
+    transition: none;
+  }
+
   html {
     scroll-behavior: auto;
   }
-  .signal-card {
-    animation: none;
-  }
+
   .button {
     transition: none;
   }

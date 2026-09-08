@@ -57,7 +57,8 @@ the `repository` constant if that location changes. The Cloud action reads
 Set it to the real signup or checkout destination before publishing.
 
 `src/styles/tokens.css` is a snapshot of the application palette and sizing
-tokens, copied so the site builds alone. Review it when the application theme
+tokens, copied so the site builds alone, plus a small marketing accent palette
+(coral, mint, lavender and pale yellow). Review it when the application theme
 changes. `src/styles/landing.css` owns the marketing layout. Figtree is bundled
 locally through `@fontsource/figtree`. Platform icon provenance is recorded in
 `public/brands/README.md`; only the six platform icons are copied here.
@@ -65,3 +66,8 @@ locally through `@fontsource/figtree`. Platform icon provenance is recorded in
 The inbox runs on illustrative posts and scores. Selecting a conversation
 updates the preview locally. FAQ disclosures use native HTML. The page makes
 no provider requests and collects no visitor data.
+
+The hero rotates through six illustrative platform posts every 4.5 seconds.
+Pause and Next controls are available. Rotation pauses on hover, keyboard focus,
+when off-screen, and in hidden tabs. Reduced-motion preference starts it paused
+and removes card transitions. With JavaScript disabled, the first card remains visible.

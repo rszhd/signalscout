@@ -378,7 +378,16 @@ function PlatformRow({
 
   return (
     <li className="connection-row">
-      <details className="platform-connection" open={platform.needsChoice || !!platform.blocker}>
+      {/*
+        Closed, whatever the platform's state.
+
+        This section used to open a row that needed a choice, on the argument
+        that a question should be visible. The summary already asks it — the
+        status reads "Choose one" — and a list where some rows are open and
+        others are not is harder to read than a list of shut rows. So the
+        question is in the summary and the answer is one press away.
+      */}
+      <details className="platform-connection">
         <summary className="connection-summary">
           <span className="connection-avatar" aria-hidden="true">
             <BrandIcon brand={platform.id} size={24} />

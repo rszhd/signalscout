@@ -375,7 +375,9 @@ describe("the connections screen", () => {
       expect(container.textContent).toContain("Which provider fetches what");
       expect(container.textContent).toContain("ScrapeCreators");
       expect(container.textContent).toContain("Choose one");
-      expect(container.querySelector<HTMLDetailsElement>(".platform-connection")?.open).toBe(true);
+      // Closed, even here. The summary carries the question; opening the row
+      // is what a person does to answer it.
+      expect(container.querySelector<HTMLDetailsElement>(".platform-connection")?.open).toBe(false);
     });
 
     it("sends the choice, and shows what the server sent back", async () => {

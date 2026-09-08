@@ -3,7 +3,7 @@
  *
  * These routes hold no rules. The ordering, the hidden filter, the page
  * boundary and what a verdict does to the list all live in
- * `@intentwatch/core`, for the reason `monitors.ts` gives: the worker and the
+ * `@signalscout/core`, for the reason `monitors.ts` gives: the worker and the
  * deletion job read the same rows, and a rule written in a handler is a rule
  * one caller obeys.
  *
@@ -30,7 +30,7 @@ import {
   recordVerdict,
   setMatchSaved,
   verdicts,
-} from "@intentwatch/core";
+} from "@signalscout/core";
 import { z } from "zod";
 import { sessionUserId } from "./auth.js";
 import type { ApiServer } from "./server.js";
@@ -384,7 +384,7 @@ export async function registerMatchRoutes(
     handler: async (request, reply) => {
       const rows = await exportFeedback(db, sessionUserId(request));
 
-      reply.header("content-disposition", 'attachment; filename="intentwatch-feedback.json"');
+      reply.header("content-disposition", 'attachment; filename="signalscout-feedback.json"');
 
       return {
         exportedAt: new Date().toISOString(),

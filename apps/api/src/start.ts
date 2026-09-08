@@ -1,4 +1,4 @@
-import type { Env, JobSender, Logger, WorkerHandle } from "@intentwatch/core";
+import type { Env, JobSender, Logger, WorkerHandle } from "@signalscout/core";
 import {
   allStoredCredentialNames,
   assertStoredCredentialsAreReadable,
@@ -10,7 +10,7 @@ import {
   startJobSender as startJobSenderDefault,
   startWorker as startWorkerDefault,
   storedCredentialNames,
-} from "@intentwatch/core";
+} from "@signalscout/core";
 import { type ApiServer, buildServer as buildServerDefault } from "./server.js";
 
 export interface StartApiOptions {

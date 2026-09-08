@@ -118,7 +118,7 @@ export function matchesToCsv(matches: readonly InboxMatch[]): string {
   return `${utf8ByteOrderMark}${lines.join("\r\n")}\r\n`;
 }
 
-/** `intentwatch-inbox-2026-09-07.csv`: what it is, and when it was taken. */
+/** `signalscout-inbox-2026-09-07.csv`: what it is, and when it was taken. */
 export function csvFilename(now: Date): string {
-  return `intentwatch-inbox-${now.toISOString().slice(0, 10)}.csv`;
+  return `signalscout-inbox-${now.toISOString().slice(0, 10)}.csv`;
 }

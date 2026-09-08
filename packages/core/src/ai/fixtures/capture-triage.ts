@@ -32,8 +32,8 @@
  * It spends money: fifty short calls. The answer is one word, so the output is
  * about six tokens each.
  *
- *     pnpm --filter @intentwatch/core capture:triage
- *     AI_TRIAGE_MODEL=gpt-5.6-luna pnpm --filter @intentwatch/core capture:triage
+ *     pnpm --filter @signalscout/core capture:triage
+ *     AI_TRIAGE_MODEL=gpt-5.6-luna pnpm --filter @signalscout/core capture:triage
  *
  * Put the results, the model and the date in the ticket that changed the
  * prompt. A number from a run nobody recorded is a comment, and a comment

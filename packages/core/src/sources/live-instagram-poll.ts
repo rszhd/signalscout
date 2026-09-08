@@ -7,7 +7,7 @@
  * comments, triage them, classify them with the reel above as context, and bill
  * what the connector says it billed.
  *
- *     pnpm --filter @intentwatch/core live:instagram-poll
+ *     pnpm --filter @signalscout/core live:instagram-poll
  *
  * **Read the cost before running it. This is the dearest comment platform we
  * have.** A search page is 1 credit. **A comment page is 5**, where TikTok's and

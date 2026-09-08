@@ -13,7 +13,7 @@
  * instead, and `vitest.config.ts` blanks `AI_API_KEY` so a machine with a key
  * exported cannot spend one by accident.
  */
-import type { Database } from "@intentwatch/core";
+import type { Database } from "@signalscout/core";
 import {
   createDatabase,
   createLogger,
@@ -22,8 +22,8 @@ import {
   loadEnv,
   replyPrompts,
   unclaimedUserId,
-} from "@intentwatch/core";
-import { createTestDatabase, type TestDatabase } from "@intentwatch/core/testing";
+} from "@signalscout/core";
+import { createTestDatabase, type TestDatabase } from "@signalscout/core/testing";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { buildServer } from "./server.js";
 import { asOwner } from "./testing.js";

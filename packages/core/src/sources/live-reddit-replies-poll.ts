@@ -9,7 +9,7 @@
  * classifies it with the thread as context, and bills what the connector says
  * it billed. The only way to ask that is to ask it.
  *
- *     pnpm --filter @intentwatch/core live:reddit-replies
+ *     pnpm --filter @signalscout/core live:reddit-replies
  *
  * **It spends money and it writes rows.** One credit for the subreddit page,
  * then one per thread opened — at most `maxThreadsPerJob` — so about $0.03 of

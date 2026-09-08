@@ -95,7 +95,7 @@ it("delivers an email through Nodemailer over a real TLS SMTP connection", async
     );
     expect(message).toContain("To: owner@example.com");
     expect(message).toContain("Subject: A useful match");
-    expect(message).toContain("Message-ID: <smtp-integration@intentwatch.local>");
+    expect(message).toContain("Message-ID: <smtp-integration@signalscout.local>");
     expect(message).toContain("Score: 90");
   } finally {
     for (const socket of sockets) socket.destroy();

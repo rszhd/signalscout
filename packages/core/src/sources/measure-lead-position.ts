@@ -1,7 +1,7 @@
 /**
  * Does this product's lead rate depend on where the platform ranked a comment?
  *
- *     pnpm --filter @intentwatch/core measure:lead-position <post url>
+ *     pnpm --filter @signalscout/core measure:lead-position <post url>
  *
  * US-048's first acceptance box, and the question the whole ticket rests on.
  *

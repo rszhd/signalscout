@@ -1,13 +1,13 @@
-# What IntentWatch says a monitor cost
+# What SignalScout says a monitor cost
 
-IntentWatch runs on your API keys. So it has to be able to answer two
+SignalScout runs on your API keys. So it has to be able to answer two
 questions: what has this monitor spent, and how do I stop it spending more.
 This page says how it answers them, and — more important — what its answer is
 not.
 
 ---
 
-## Every figure IntentWatch shows is an estimate
+## Every figure SignalScout shows is an estimate
 
 **The provider's invoice is authoritative. Ours is not.**
 
@@ -39,7 +39,7 @@ that quietly finds nothing — it is a query that pays full price for noise, and
 then pays the classifier to read it.
 
 **The free allowance is not modelled.** Bright Data's first 5,000 records each
-month cost nothing. IntentWatch prices every record at the paid rate, so a
+month cost nothing. SignalScout prices every record at the paid rate, so a
 monitor inside the free tier reads as more expensive than it was.
 
 **A failed call may still be billed.** A call that never came back reported no

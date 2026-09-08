@@ -37,7 +37,7 @@ connections and settings stay out until their own behaviour exists.
 - [x] A post body longer than 80 words is collapsed behind a working read-more
       control
 - [x] An inbox pane without overflow does not reserve or show a scrollbar
-- [x] The IntentWatch wordmark uses the mockup's lime three-dot logo
+- [x] The SignalScout wordmark uses the mockup's lime three-dot logo
 - [x] New monitor opens in the mockup's dialog layout over the monitor list
       and can be dismissed without losing the application shell
 - [x] The application uses Figtree for its interface typography
@@ -57,7 +57,7 @@ connections and settings stay out until their own behaviour exists.
 - Visual source: `mockup/index.html` and `mockup/styles.css`.
 - Behaviour source: the existing components and their jsdom tests in
   `apps/web/src/`.
-- Keep the IntentWatch name. `mockup/README.md` says Signalbox is provisional.
+- Keep the SignalScout name. `mockup/README.md` says Signalbox is provisional.
 
 ## Log
 
@@ -83,7 +83,7 @@ connections and settings stay out until their own behaviour exists.
   pane keeps automatic overflow, so its scrollbar appears only when its own
   content is taller than the pane.
 - 2026-09-05T11:26+08:00 — Replaced the approximate orange bars with the
-  mockup's lime speech-bubble mark and three offset dots. Kept the IntentWatch
+  mockup's lime speech-bubble mark and three offset dots. Kept the SignalScout
   name. Verified the combined mark and wordmark in the browser.
 - 2026-09-05T11:35+08:00 — Moved the two-stage monitor workflow into the
   mockup's modal layout over the monitor list. Added the close link, Escape

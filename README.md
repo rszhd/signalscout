@@ -1,15 +1,15 @@
-# IntentWatch
+# SignalScout
 
 **Open-source AI intent monitoring.** Find the people publicly talking about the
 problem your product solves.
 
-Traditional social listening answers *who mentioned my brand*. IntentWatch
+Traditional social listening answers *who mentioned my brand*. SignalScout
 answers a different question:
 
 > Who is publicly describing a problem my product can solve?
 
 You describe what you sell, who buys it, and what problems you solve.
-IntentWatch searches Reddit, X and LinkedIn, and uses a model to read each conversation
+SignalScout searches Reddit, X and LinkedIn, and uses a model to read each conversation
 and score it — relevance, problem fit, ICP fit, buyer intent, urgency. What you
 get is not a dashboard. It is an inbox of people who might need what you build.
 
@@ -55,7 +55,7 @@ before anything reaches a model, so you are not billed for reading noise.
 
 ## Your accounts, your keys, your data
 
-IntentWatch ships the integrations. You own the accounts.
+SignalScout ships the integrations. You own the accounts.
 
 ```env
 BRIGHTDATA_API_KEY=      # Bright Data, which serves Reddit
@@ -69,7 +69,7 @@ AI_MODEL=claude-haiku-4-5
 AI_API_KEY=              # not needed for ollama
 ```
 
-Nothing is proxied through us. There is no IntentWatch account to create, no
+Nothing is proxied through us. There is no SignalScout account to create, no
 data leaves your instance, and the AI provider is yours to choose — including
 Ollama, if you want no external provider at all. Changing provider is those
 three lines; there is no code path per provider and no picker in the UI.
@@ -95,7 +95,7 @@ bills a record, starting with 5,000 free each month. ScrapeCreators bills a
 request, and a request brought back 7 to 23 posts when we measured it, which
 makes it much cheaper per post; a new account gets 100 credits with no card.
 
-With one key, IntentWatch uses it and asks nothing. With both, the connections
+With one key, SignalScout uses it and asks nothing. With both, the connections
 screen shows a row for Reddit and you pick which provider fetches it; the
 choice is stored, applies to every monitor, and takes effect on the next
 collection. Until you pick, a poll refuses to start rather than choose for you
@@ -135,7 +135,7 @@ now means a manual approval request under their Responsible Builder Policy, and
 developers report rejections for small projects. We are not willing to ship a
 product that only works for the users who win an approval.
 
-So IntentWatch reads Reddit through **Bright Data**, a third-party data
+So SignalScout reads Reddit through **Bright Data**, a third-party data
 provider, and you bring a Bright Data key. Their free tier covers 5,000 posts a
 month and needs no card.
 
@@ -176,7 +176,7 @@ that is not X, under an agreement that puts the compliance burden on you.
    named after Bright Data because the key is Bright Data's: the same key
    serves every platform we fetch through them.
 
-That is all. You do not choose a dataset, a scraper or a plan; IntentWatch asks
+That is all. You do not choose a dataset, a scraper or a plan; SignalScout asks
 for the Reddit ones by name.
 
 A **record** is one post. The free tier is 5,000 records a month, and a monitor
@@ -189,8 +189,8 @@ Data to collect an empty list, which authenticates without collecting anything.
 ## Running it
 
 ```bash
-git clone https://github.com/<user>/intentwatch
-cd intentwatch
+git clone https://github.com/<user>/signalscout
+cd signalscout
 cp .env.example .env      # add your keys
 docker compose up
 ```

@@ -2,7 +2,7 @@
  * The HTTP side of a project. US-045.
  *
  * A route is a shape check and a status code. Every rule lives in
- * `@intentwatch/core`, for the reason `monitors.ts` gives: the worker reads the
+ * `@signalscout/core`, for the reason `monitors.ts` gives: the worker reads the
  * same rows, so a rule written here would be one caller's rule.
  *
  * One decision shows through in the shapes below. A `PATCH` body has no
@@ -24,7 +24,7 @@ import {
   recordModelCall,
   signals as signalIds,
   updateProject,
-} from "@intentwatch/core";
+} from "@signalscout/core";
 import { z } from "zod";
 import { sessionUserId } from "./auth.js";
 import type { ApiServer } from "./server.js";

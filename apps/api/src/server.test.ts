@@ -1,7 +1,7 @@
 import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { createDatabase, createLogger, loadEnv } from "@intentwatch/core";
+import { createDatabase, createLogger, loadEnv } from "@signalscout/core";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { buildServer } from "./server.js";
 import { asOwner } from "./testing.js";
@@ -22,8 +22,8 @@ describe("the API and the UI on one port", () => {
   const database = createDatabase("postgres://user:pw@localhost:5432/unused");
 
   beforeAll(() => {
-    webDist = mkdtempSync(join(tmpdir(), "intentwatch-web-"));
-    writeFileSync(join(webDist, "index.html"), "<!doctype html><title>IntentWatch</title>");
+    webDist = mkdtempSync(join(tmpdir(), "signalscout-web-"));
+    writeFileSync(join(webDist, "index.html"), "<!doctype html><title>SignalScout</title>");
     writeFileSync(join(webDist, "asset.js"), "export const built = true;\n");
   });
 
@@ -62,7 +62,7 @@ describe("the API and the UI on one port", () => {
       const response = await app.inject({ method: "GET", url: "/" });
 
       expect(response.statusCode).toBe(200);
-      expect(response.body).toContain("IntentWatch");
+      expect(response.body).toContain("SignalScout");
     } finally {
       await app.close();
     }
@@ -88,7 +88,7 @@ describe("the API and the UI on one port", () => {
       const response = await app.inject({ method: "GET", url: "/monitors/42" });
 
       expect(response.statusCode).toBe(200);
-      expect(response.body).toContain("IntentWatch");
+      expect(response.body).toContain("SignalScout");
     } finally {
       await app.close();
     }
@@ -101,7 +101,7 @@ describe("the API and the UI on one port", () => {
       const response = await app.inject({ method: "GET", url: "/api/nope" });
 
       expect(response.statusCode).toBe(404);
-      expect(response.body).not.toContain("IntentWatch");
+      expect(response.body).not.toContain("SignalScout");
     } finally {
       await app.close();
     }

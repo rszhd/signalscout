@@ -1,8 +1,8 @@
 /**
  * US-044's last question, asked on comments that are already bought.
  *
- *     pnpm --filter @intentwatch/core live:tiktok-comments [sample]
- *     pnpm --filter @intentwatch/core live:instagram-comments [sample]
+ *     pnpm --filter @signalscout/core live:tiktok-comments [sample]
+ *     pnpm --filter @signalscout/core live:instagram-comments [sample]
  *
  * **US-049 made it take a platform.** The question it asks is not TikTok's — it
  * is "can a comment on this platform read as a lead", and Instagram raised it

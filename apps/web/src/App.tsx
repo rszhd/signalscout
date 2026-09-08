@@ -150,13 +150,13 @@ export function App() {
   return (
     <div className="app-shell">
       <aside className="sidebar">
-        <a className="brand" href={projectsRoute} aria-label="IntentWatch home">
+        <a className="brand" href={projectsRoute} aria-label="SignalScout home">
           <span className="brand-mark" aria-hidden="true">
             <i />
             <i />
             <i />
           </span>
-          <span>intentwatch</span>
+          <span>signalscout</span>
         </a>
 
         <nav className="site-nav" aria-label="Screens">

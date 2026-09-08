@@ -90,7 +90,7 @@ export function Login({ firstRun, signUpOpen }: { firstRun: boolean; signUpOpen:
             <i />
             <i />
           </span>
-          <span>intentwatch</span>
+          <span>signalscout</span>
         </div>
 
         <h1>{firstRun ? "Set up this instance" : signingUp ? "Create an account" : "Sign in"}</h1>

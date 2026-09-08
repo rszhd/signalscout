@@ -15,8 +15,8 @@ import {
   matches,
   monitors,
   posts,
-} from "@intentwatch/core";
-import { createTestDatabase, type TestDatabase } from "@intentwatch/core/testing";
+} from "@signalscout/core";
+import { createTestDatabase, type TestDatabase } from "@signalscout/core/testing";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { buildServer } from "./server.js";
 import { asOwner } from "./testing.js";
@@ -315,7 +315,7 @@ describe("the inbox route", () => {
       }>();
 
       expect(response.statusCode).toBe(200);
-      expect(response.headers["content-disposition"]).toContain("intentwatch-feedback.json");
+      expect(response.headers["content-disposition"]).toContain("signalscout-feedback.json");
       expect(body.verdicts).toHaveLength(2);
       expect(body.verdicts.filter((row) => row.supersededAt === null)).toHaveLength(1);
       expect(body.verdicts.every((row) => row.externalId.startsWith("t3_"))).toBe(true);
@@ -345,7 +345,7 @@ describe("the inbox route", () => {
       expect(response.statusCode).toBe(200);
       expect(response.headers["content-type"]).toContain("text/csv");
       expect(response.headers["content-disposition"]).toMatch(
-        /attachment; filename="intentwatch-inbox-\d{4}-\d{2}-\d{2}\.csv"/,
+        /attachment; filename="signalscout-inbox-\d{4}-\d{2}-\d{2}\.csv"/,
       );
     });
 

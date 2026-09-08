@@ -1,7 +1,7 @@
 /**
  * One deep thread, read by the real loop until the rules stop it. US-048.
  *
- *     pnpm --filter @intentwatch/core live:thread-loop <post url> [cap dollars]
+ *     pnpm --filter @signalscout/core live:thread-loop <post url> [cap dollars]
  *
  * **Every other test of this loop turns it by hand.** The suite sends one
  * `replies` job, asserts what one batch did, and sends another. That proves the

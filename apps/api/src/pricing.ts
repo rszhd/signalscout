@@ -28,7 +28,7 @@ import type {
   Database,
   PlatformDescriptor,
   ProviderId,
-} from "@intentwatch/core";
+} from "@signalscout/core";
 import {
   decideProvider,
   environmentVariableFor,
@@ -38,7 +38,7 @@ import {
   readProviderChoices,
   spendByPair,
   verdictCount,
-} from "@intentwatch/core";
+} from "@signalscout/core";
 import { z } from "zod";
 import { sessionUserId } from "./auth.js";
 import type { ApiServer } from "./server.js";

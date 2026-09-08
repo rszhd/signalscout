@@ -706,7 +706,7 @@ if (wanted("generated")) {
   } else {
     failures.push(
       "generated: ai/fixtures/query-plan.json holds no X query. Run " +
-        "`pnpm --filter @intentwatch/core capture:queries` first.",
+        "`pnpm --filter @signalscout/core capture:queries` first.",
     );
   }
 }

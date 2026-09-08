@@ -25,8 +25,8 @@ import {
   replyPrompts,
   unclaimedUserId,
   users,
-} from "@intentwatch/core";
-import { createTestDatabase, type TestDatabase } from "@intentwatch/core/testing";
+} from "@signalscout/core";
+import { createTestDatabase, type TestDatabase } from "@signalscout/core/testing";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { authBasePath, isOpenPath, openApiPaths, signedOutMessage } from "./auth.js";
 import { type ApiServer, buildServer, trustedOrigins, viteDevOrigins } from "./server.js";

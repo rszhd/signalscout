@@ -1189,7 +1189,7 @@ export function MonitorForm() {
                   ? created.missingCredentials.length > 0
                     ? `It will stay paused until you connect ${describeMissing(created.missingCredentials)}.`
                     : "Your plan is saved without collecting. Adjust the budget or search plan before starting it from Monitors."
-                  : "IntentWatch will collect the first conversations on the monitor schedule."}
+                  : "SignalScout will collect the first conversations on the monitor schedule."}
               </p>
               <a className="primary-button" href={`#/monitors${projectSuffix()}`}>
                 View monitors

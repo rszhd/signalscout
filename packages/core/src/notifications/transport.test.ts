@@ -28,9 +28,9 @@ it("sends signed JSON with a timestamp and stable delivery id and refuses redire
   expect(options.redirect).toBe("error");
   expect(options.body).toBe('{"version":1}');
   const headers = options.headers as Record<string, string>;
-  expect(headers["x-intentwatch-id"]).toBe("delivery-1");
-  expect(headers["x-intentwatch-timestamp"]).toBe("1788566400");
-  expect(headers["x-intentwatch-signature"]).toBe(
+  expect(headers["x-signalscout-id"]).toBe("delivery-1");
+  expect(headers["x-signalscout-timestamp"]).toBe("1788566400");
+  expect(headers["x-signalscout-signature"]).toBe(
     `v1=${createHmac("sha256", key).update('1788566400.{"version":1}').digest("hex")}`,
   );
   fetcher.mockImplementation(async () => new Response("private receiver details", { status: 500 }));
@@ -68,7 +68,7 @@ it("configures implicit TLS for Resend and sends a stable message id", async () 
   expect(sendMail.mock.calls[0]?.[0]).toMatchObject({
     from: "alerts@example.com",
     to: "owner@example.com",
-    messageId: "<delivery-1@intentwatch.local>",
+    messageId: "<delivery-1@signalscout.local>",
     text: "Message body",
   });
 });

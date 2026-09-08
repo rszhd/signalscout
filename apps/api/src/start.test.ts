@@ -5,8 +5,8 @@ import type {
   JobSender,
   Logger,
   WorkerHandle,
-} from "@intentwatch/core";
-import { createLogger, loadEnv } from "@intentwatch/core";
+} from "@signalscout/core";
+import { createLogger, loadEnv } from "@signalscout/core";
 import { describe, expect, it, vi } from "vitest";
 import type { ApiServer } from "./server.js";
 import { startApi } from "./start.js";

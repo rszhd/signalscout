@@ -218,7 +218,7 @@ the ticket that changed the prompt.
 
 Both halves are one command:
 
-    pnpm --filter @intentwatch/core capture:classifier
+    pnpm --filter @signalscout/core capture:classifier
 
 It scores the four examples against a live model, records the answers as the
 fixtures `ai/examples.test.ts` replays, and prints the scores. The bands that

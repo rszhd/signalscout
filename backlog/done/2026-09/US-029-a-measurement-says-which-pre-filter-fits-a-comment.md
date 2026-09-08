@@ -71,7 +71,7 @@ up as one.
 - Depends on nothing. It reads a committed fixture.
 - Blocks the stage-order decision in [US-020](../../todo/US-020-a-monitor-can-include-comments-and-replies.md)
   and [US-030](../../todo/US-030-a-cheap-model-decides-which-comments-the-good-model-reads.md).
-- The instrument precedent is `pnpm --filter @intentwatch/core capture:embeddings`
+- The instrument precedent is `pnpm --filter @signalscout/core capture:embeddings`
   and `ai/similarity.test.ts`, which replays its numbers and goes red if the
   default threshold leaves the measured gap.
 - About 1,300 tokens of embedding, well under a tenth of a cent. It is an
@@ -100,7 +100,7 @@ up as one.
   nobody in the thread is the person we want. It is one thread and it cannot
   carry a rate, but it is the shape US-030 was written against.
 
-- 2026-09-06T09:24+08:00 — Measured. `pnpm --filter @intentwatch/core
+- 2026-09-06T09:24+08:00 — Measured. `pnpm --filter @signalscout/core
   capture:comment-filter`, two calls, 3,009 tokens in 3.5 seconds against
   `openai/text-embedding-3-small`. `estimatedCostMicros` is null, because no
   embedding price is configured and this repository does not fill that table

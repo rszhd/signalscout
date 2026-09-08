@@ -594,7 +594,7 @@ export function Inbox() {
                 ✦
               </span>
               <h2>No monitors yet</h2>
-              <p>Create a monitor and IntentWatch will start collecting conversations.</p>
+              <p>Create a monitor and SignalScout will start collecting conversations.</p>
               <a className="primary-button" href={`#/monitors/new${projectSuffix()}`}>
                 Create a monitor
               </a>

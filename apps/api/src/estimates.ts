@@ -30,7 +30,7 @@ import {
   startEstimate,
   sources as storableSources,
   subredditSchema,
-} from "@intentwatch/core";
+} from "@signalscout/core";
 import { z } from "zod";
 import { ownedMonitor, sessionUserId } from "./auth.js";
 import type { ApiServer } from "./server.js";

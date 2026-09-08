@@ -8,7 +8,7 @@
  * classify them with the video above as context, and bill what the connector
  * says it billed.
  *
- *     pnpm --filter @intentwatch/core live:tiktok-poll
+ *     pnpm --filter @signalscout/core live:tiktok-poll
  *
  * **It spends money and it writes rows.** One credit for the search page, then
  * one per thread opened, at most `maxThreadsPerJob` — so under $0.20 of

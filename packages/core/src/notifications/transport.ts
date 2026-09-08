@@ -54,7 +54,7 @@ export function createNotificationTransport(
               to,
               subject,
               text,
-              messageId: `<${id}@intentwatch.local>`,
+              messageId: `<${id}@signalscout.local>`,
             });
             if (!result.accepted?.length || result.rejected?.length)
               throw new Error("Recipient rejected");
@@ -80,9 +80,9 @@ export function createNotificationTransport(
               signal: AbortSignal.timeout(15_000),
               headers: {
                 "content-type": "application/json",
-                "x-intentwatch-id": id,
-                "x-intentwatch-timestamp": timestamp,
-                "x-intentwatch-signature": `v1=${signature}`,
+                "x-signalscout-id": id,
+                "x-signalscout-timestamp": timestamp,
+                "x-signalscout-signature": `v1=${signature}`,
               },
             });
             await response.body?.cancel();

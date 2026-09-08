@@ -68,7 +68,7 @@ const env = {
   // In development the worker is always its own process, so a restart of the
   // API does not restart the queue. `pnpm dev` starts three processes.
   WORKER_IN_PROCESS: "false",
-  // Resolve @intentwatch/core to its source through the "development" export
+  // Resolve @signalscout/core to its source through the "development" export
   // condition. Nothing has to be built first, and a change inside core
   // restarts the API and the worker with it.
   NODE_OPTIONS: `${process.env.NODE_OPTIONS ?? ""} --conditions=development`.trim(),
@@ -78,7 +78,7 @@ console.log("Starting Postgres…");
 await run("docker", ["compose", "up", "-d", "--wait", "postgres"]);
 
 console.log("Applying migrations…");
-await run("pnpm", ["--filter", "@intentwatch/core", "migrate"], { env });
+await run("pnpm", ["--filter", "@signalscout/core", "migrate"], { env });
 
 await run(
   "pnpm",
@@ -90,9 +90,9 @@ await run(
     "--prefix-colors",
     "blue,magenta,green",
     "--kill-others",
-    "pnpm --filter @intentwatch/api dev",
-    "pnpm --filter @intentwatch/web dev",
-    "pnpm --filter @intentwatch/worker dev",
+    "pnpm --filter @signalscout/api dev",
+    "pnpm --filter @signalscout/web dev",
+    "pnpm --filter @signalscout/worker dev",
   ],
   { env },
 );

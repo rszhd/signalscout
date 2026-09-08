@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { generateEncryptionKey } from "../secrets/cipher.js";
 import { loadEnv } from "./env.js";
 
-const minimal = { DATABASE_URL: "postgres://user:pw@localhost:5432/intentwatch" };
+const minimal = { DATABASE_URL: "postgres://user:pw@localhost:5432/signalscout" };
 
 describe("loadEnv", () => {
   it("refuses to start without a database URL", () => {

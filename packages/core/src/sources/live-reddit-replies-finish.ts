@@ -12,7 +12,7 @@
  * where a reply meets triage and nothing else, and the classifier, which reads
  * it with its parent post as context.
  *
- *     pnpm --filter @intentwatch/core live:reddit-replies-finish
+ *     pnpm --filter @signalscout/core live:reddit-replies-finish
  *
  * **It spends model calls only.** One triage call per reply, then one
  * classification per reply triage keeps. No provider is asked for anything, so

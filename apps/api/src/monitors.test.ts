@@ -31,8 +31,8 @@ import {
   recordSourceUsage,
   recordVerdict,
   setProviderChoice,
-} from "@intentwatch/core";
-import { createTestDatabase, type TestDatabase } from "@intentwatch/core/testing";
+} from "@signalscout/core";
+import { createTestDatabase, type TestDatabase } from "@signalscout/core/testing";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { buildServer } from "./server.js";
 import { asOwner, testOwner as owner } from "./testing.js";

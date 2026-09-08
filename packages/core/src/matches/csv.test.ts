@@ -221,7 +221,7 @@ describe("the file a person opens", () => {
 
   it("names the file after the day it was taken", () => {
     expect(csvFilename(new Date("2026-09-07T22:53:00.000Z"))).toBe(
-      "intentwatch-inbox-2026-09-07.csv",
+      "signalscout-inbox-2026-09-07.csv",
     );
   });
 });

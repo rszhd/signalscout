@@ -1,4 +1,4 @@
-import { createLogger, loadEnv } from "@intentwatch/core";
+import { createLogger, loadEnv } from "@signalscout/core";
 import { startApi } from "./start.js";
 
 const env = loadEnv();

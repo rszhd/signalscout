@@ -448,7 +448,7 @@ export class SocialCrawlXSource implements SocialSource {
     const term = this.listFor(query, at.phase)[at.index];
     if (term === undefined) return undefined;
 
-    // A person may type either "@intentwatch" or "intentwatch"; the operator
+    // A person may type either "@signalscout" or "signalscout"; the operator
     // takes neither an at-sign nor a URL.
     const words =
       at.phase === "keyword" ? term : `from:${term.replace(/^@/, "").replace(/^.*x\.com\//, "")}`;

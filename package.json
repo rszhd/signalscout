@@ -1,5 +1,5 @@
 {
-  "name": "intentwatch",
+  "name": "signalscout",
   "version": "0.0.0",
   "private": true,
   "license": "Apache-2.0",
@@ -10,17 +10,17 @@
   },
   "scripts": {
     "dev": "node scripts/dev.mjs",
-    "build": "tsc --build && pnpm --filter @intentwatch/web build",
-    "typecheck": "tsc --build && pnpm --filter @intentwatch/web typecheck",
+    "build": "tsc --build && pnpm --filter @signalscout/web build",
+    "typecheck": "tsc --build && pnpm --filter @signalscout/web typecheck",
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "biome check .",
     "check:licenses": "node scripts/check-licenses.mjs",
     "format": "biome check --write .",
     "db:up": "docker compose up -d postgres",
-    "db:migrate": "pnpm --filter @intentwatch/core migrate",
-    "db:generate": "pnpm --filter @intentwatch/core generate",
-    "db:rotate-key": "pnpm --filter @intentwatch/core rotate-key",
+    "db:migrate": "pnpm --filter @signalscout/core migrate",
+    "db:generate": "pnpm --filter @signalscout/core generate",
+    "db:rotate-key": "pnpm --filter @signalscout/core rotate-key",
     "capture:deletions": "node --env-file=.env packages/core/src/sources/deletion-fixtures/capture.mjs"
   },
   "devDependencies": {

@@ -17,7 +17,7 @@
  *
  * It spends money: one short call.
  *
- *     pnpm --filter @intentwatch/core capture:queries
+ *     pnpm --filter @signalscout/core capture:queries
  *
  * Read the output before trusting it. Two failures are invisible to the
  * schema: a subreddit that does not exist, and eight queries that are one

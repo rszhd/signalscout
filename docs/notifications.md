@@ -18,7 +18,7 @@ up eligible matches that have not been assigned a delivery.
 
 ## SMTP and Resend
 
-IntentWatch uses Nodemailer, a Node.js library, to send through your SMTP
+SignalScout uses Nodemailer, a Node.js library, to send through your SMTP
 provider. There is no separate Nodemailer account or service.
 
 For Resend, put these settings in `.env`:
@@ -100,9 +100,9 @@ compatible with this contract.
 Headers:
 
 - `Content-Type: application/json`
-- `X-IntentWatch-Id`: the delivery UUID, stable across retries
-- `X-IntentWatch-Timestamp`: the attempt time, in Unix seconds
-- `X-IntentWatch-Signature`: `v1=` followed by a hexadecimal HMAC-SHA256
+- `X-SignalScout-Id`: the delivery UUID, stable across retries
+- `X-SignalScout-Timestamp`: the attempt time, in Unix seconds
+- `X-SignalScout-Signature`: `v1=` followed by a hexadecimal HMAC-SHA256
 
 Verify the HMAC over `timestamp + "." + rawBody`, using the signing secret.
 Read the original request bytes before parsing JSON. Compare signatures in

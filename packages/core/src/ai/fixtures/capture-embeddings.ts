@@ -23,7 +23,7 @@
  *
  * It spends money: two short calls, well under a hundredth of a cent.
  *
- *     pnpm --filter @intentwatch/core capture:embeddings
+ *     pnpm --filter @signalscout/core capture:embeddings
  *
  * Read the output before trusting it. The number to look at is the gap between
  * the lowest on-topic post and the off-topic one. A threshold has to sit

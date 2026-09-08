@@ -28,7 +28,7 @@
  *
  * It spends money: two short calls, well under a hundredth of a cent.
  *
- *     pnpm --filter @intentwatch/core capture:comment-filter
+ *     pnpm --filter @signalscout/core capture:comment-filter
  *
  * What it records is the similarities and not the vectors, for the reason
  * `capture-embeddings.ts` gives: the similarity is the number the threshold is

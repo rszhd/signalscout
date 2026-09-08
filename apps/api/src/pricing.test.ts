@@ -6,7 +6,7 @@
  * number stay apart — a declared price, our estimate over it, and money the
  * deployment has already spent.
  */
-import type { ConnectorDefinition, Database } from "@intentwatch/core";
+import type { ConnectorDefinition, Database } from "@signalscout/core";
 import {
   apiUsage,
   createDatabase,
@@ -18,8 +18,8 @@ import {
   monitors,
   posts,
   sourceProviders,
-} from "@intentwatch/core";
-import { createTestDatabase, type TestDatabase } from "@intentwatch/core/testing";
+} from "@signalscout/core";
+import { createTestDatabase, type TestDatabase } from "@signalscout/core/testing";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { comparedPosts, formatMicros } from "./pricing.js";
 import { buildServer } from "./server.js";

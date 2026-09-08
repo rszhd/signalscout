@@ -6,7 +6,7 @@
  * posts, stores them, bills what the connector says it billed, and produces
  * matches a person can read. The only way to ask that is to ask it.
  *
- *     pnpm --filter @intentwatch/core live:linkedin-poll
+ *     pnpm --filter @signalscout/core live:linkedin-poll
  *
  * **It spends money and it writes rows.** Ten SocialCrawl credits at most —
  * two pages of one query, five credits each, about $0.081 — plus one model

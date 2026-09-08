@@ -3,7 +3,7 @@
 This file is the single source. `CLAUDE.md` imports it, so Claude Code and
 Codex read the same rules.
 
-IntentWatch finds public conversations from people describing a problem your
+SignalScout finds public conversations from people describing a problem your
 product solves. Read [PLAN.md](PLAN.md) for the product and
 [STACK.md](STACK.md) for the stack before proposing anything structural.
 
@@ -1453,21 +1453,21 @@ pnpm db:rotate-key            # re-encrypt stored credentials under a new key
 backlog/index.sh              # rebuild OPEN.md and DONE.md — run after any ticket change
 backlog/index.sh --check      # exit 1 if either list is stale
 
-pnpm --filter @intentwatch/core capture:classifier   # spends money; see below
-pnpm --filter @intentwatch/core capture:queries      # spends money; see below
-pnpm --filter @intentwatch/core capture:embeddings   # spends money; see below
-pnpm --filter @intentwatch/core capture:comment-filter # spends money; see below
-pnpm --filter @intentwatch/core capture:triage        # spends money; see below
-pnpm --filter @intentwatch/core live:provider-switch # spends ~$0.08; see below
-pnpm --filter @intentwatch/core live:linkedin-poll   # spends ~$0.08 + model; see below
-pnpm --filter @intentwatch/core live:x-poll          # spends ~$0.002 + model; see below
-pnpm --filter @intentwatch/core live:apify-linkedin-poll # spends ~$0.05 + model; see below
-pnpm --filter @intentwatch/core live:tiktok-poll     # spends ~$0.20 + model; see below
-pnpm --filter @intentwatch/core live:tiktok-comments # spends model only; see below
-pnpm --filter @intentwatch/core live:instagram-poll   # spends ~$1.65 + model; see below
-pnpm --filter @intentwatch/core live:instagram-comments # spends model only; see below
-pnpm --filter @intentwatch/core live:thread-loop      # spends up to a cap you pass; see below
-pnpm --filter @intentwatch/core measure:lead-position # spends ~$0.40; see below
+pnpm --filter @signalscout/core capture:classifier   # spends money; see below
+pnpm --filter @signalscout/core capture:queries      # spends money; see below
+pnpm --filter @signalscout/core capture:embeddings   # spends money; see below
+pnpm --filter @signalscout/core capture:comment-filter # spends money; see below
+pnpm --filter @signalscout/core capture:triage        # spends money; see below
+pnpm --filter @signalscout/core live:provider-switch # spends ~$0.08; see below
+pnpm --filter @signalscout/core live:linkedin-poll   # spends ~$0.08 + model; see below
+pnpm --filter @signalscout/core live:x-poll          # spends ~$0.002 + model; see below
+pnpm --filter @signalscout/core live:apify-linkedin-poll # spends ~$0.05 + model; see below
+pnpm --filter @signalscout/core live:tiktok-poll     # spends ~$0.20 + model; see below
+pnpm --filter @signalscout/core live:tiktok-comments # spends model only; see below
+pnpm --filter @signalscout/core live:instagram-poll   # spends ~$1.65 + model; see below
+pnpm --filter @signalscout/core live:instagram-comments # spends model only; see below
+pnpm --filter @signalscout/core live:thread-loop      # spends up to a cap you pass; see below
+pnpm --filter @signalscout/core measure:lead-position # spends ~$0.40; see below
 pnpm capture:deletions                            # spends ~$0.02; see below
 
 node packages/core/src/sources/providers/socialcrawl/linkedin-fixtures/capture.mjs   # ~30 credits

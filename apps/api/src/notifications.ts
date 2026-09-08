@@ -6,7 +6,7 @@ import {
   notificationReadiness,
   readNotificationSettings,
   saveNotificationSettings,
-} from "@intentwatch/core";
+} from "@signalscout/core";
 import { z } from "zod";
 import { ownedMonitor } from "./auth.js";
 import type { ApiServer } from "./server.js";

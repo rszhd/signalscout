@@ -14,8 +14,8 @@ import {
   loadEnv,
   modelCalls,
   type ProjectDescriber,
-} from "@intentwatch/core";
-import { createTestDatabase, type TestDatabase } from "@intentwatch/core/testing";
+} from "@signalscout/core";
+import { createTestDatabase, type TestDatabase } from "@signalscout/core/testing";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { buildServer } from "./server.js";
 import { asOwner } from "./testing.js";

@@ -20,7 +20,7 @@ import {
   type QueryGenerator,
   readAiEnvironment,
   storedCredentialNames,
-} from "@intentwatch/core";
+} from "@signalscout/core";
 import Fastify, {
   type FastifyInstance,
   type RawReplyDefaultExpression,

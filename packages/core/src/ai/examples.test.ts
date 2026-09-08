@@ -40,7 +40,7 @@ function recorded(slug: string): CapturedClassification {
     ) as CapturedClassification;
   } catch {
     throw new Error(
-      `No recorded answer for "${slug}". Run \`pnpm --filter @intentwatch/core capture:classifier\` ` +
+      `No recorded answer for "${slug}". Run \`pnpm --filter @signalscout/core capture:classifier\` ` +
         "with a model key. A model fixture is recorded, never written.",
     );
   }

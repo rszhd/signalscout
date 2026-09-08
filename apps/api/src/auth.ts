@@ -26,7 +26,7 @@ import {
   type Logger,
   type Monitor,
   type SignupMode,
-} from "@intentwatch/core";
+} from "@signalscout/core";
 import type { FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
 import type { ApiServer } from "./server.js";
@@ -93,7 +93,7 @@ export const openApiPaths: readonly string[] = [
 export const authBasePath = "/api/auth";
 
 /** The message a signed-out request gets. One sentence, and no detail. */
-export const signedOutMessage = "Sign in to use IntentWatch.";
+export const signedOutMessage = "Sign in to use SignalScout.";
 
 export interface AuthRoutesOptions {
   readonly db: Database;

@@ -56,7 +56,7 @@ passing run on `main`.
 - Skip Turborepo. pnpm workspaces are enough until builds get slow.
 
 **The image name is a placeholder.** `.env.example` and `docker-compose.yml`
-default to `ghcr.io/intentwatch/intentwatch:latest`, and CI pushes to
+default to `ghcr.io/signalscout/signalscout:latest`, and CI pushes to
 `ghcr.io/${{ github.repository }}`. These agree only by luck. Set the real one
 when the GitHub repository exists.
 

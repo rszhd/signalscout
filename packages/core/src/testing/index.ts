@@ -1,5 +1,5 @@
 /**
- * Test helpers, reachable as `@intentwatch/core/testing`.
+ * Test helpers, reachable as `@signalscout/core/testing`.
  *
  * A separate entry point rather than more names on the package's main export.
  * `createTestDatabase` creates and drops databases, and a helper that does

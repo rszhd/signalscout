@@ -6,6 +6,10 @@
 #
 #   docker compose -f docker-compose.yml -f docker-compose.build.yml up --build
 
+# The product was renamed to SignalScout, and this line was deliberately not
+# renamed with it. Compose prefixes its volumes with this name, so changing it
+# points `postgres-data` at a new empty volume and an existing instance comes up
+# with no data. The same reason keeps the Postgres role and database below.
 name: intentwatch
 
 x-app-environment: &app-environment
@@ -58,7 +62,7 @@ services:
   # Runs to completion before anything connects. Two processes applying the
   # same migrations at boot is a race nobody needs.
   migrate:
-    image: ${INTENTWATCH_IMAGE:-ghcr.io/intentwatch/intentwatch:latest}
+    image: ${SIGNALSCOUT_IMAGE:-ghcr.io/signalscout/signalscout:latest}
     command: ["node", "packages/core/dist/db/migrate-cli.js"]
     environment: *app-environment
     depends_on:
@@ -67,7 +71,7 @@ services:
     restart: "no"
 
   app:
-    image: ${INTENTWATCH_IMAGE:-ghcr.io/intentwatch/intentwatch:latest}
+    image: ${SIGNALSCOUT_IMAGE:-ghcr.io/signalscout/signalscout:latest}
     environment:
       <<: *app-environment
       WORKER_IN_PROCESS: ${WORKER_IN_PROCESS:-true}
@@ -85,7 +89,7 @@ services:
   # or with two.
   worker:
     profiles: ["worker"]
-    image: ${INTENTWATCH_IMAGE:-ghcr.io/intentwatch/intentwatch:latest}
+    image: ${SIGNALSCOUT_IMAGE:-ghcr.io/signalscout/signalscout:latest}
     command: ["node", "apps/worker/dist/index.js"]
     environment:
       <<: *app-environment

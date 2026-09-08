@@ -66,8 +66,8 @@ breaks.
   not block a run from the command line.
 - The commands, in order:
 
-      pnpm --filter @intentwatch/core capture:queries
-      pnpm --filter @intentwatch/core capture:classifier
+      pnpm --filter @signalscout/core capture:queries
+      pnpm --filter @signalscout/core capture:classifier
 
   Then `pnpm dev`, the monitor form, and the inbox.
 - What the run costs. Bright Data bills one record at $0.0015, so a fifty-record

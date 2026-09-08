@@ -18,8 +18,8 @@
  *
  * It spends money — four short calls, well under a cent on a cheap model.
  *
- *     pnpm --filter @intentwatch/core capture:classifier
- *     AI_MODEL=gpt-5-mini AI_PROVIDER=openai pnpm --filter @intentwatch/core capture:classifier
+ *     pnpm --filter @signalscout/core capture:classifier
+ *     AI_MODEL=gpt-5-mini AI_PROVIDER=openai pnpm --filter @signalscout/core capture:classifier
  *
  * Put the results, the model and the date in the ticket that changed the
  * prompt. A number from a run nobody recorded is a comment, and a comment

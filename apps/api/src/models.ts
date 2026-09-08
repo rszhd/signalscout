@@ -30,7 +30,7 @@ import {
   optionalEncryptionKey,
   readAiSettings,
   saveAiTaskSettings,
-} from "@intentwatch/core";
+} from "@signalscout/core";
 import { z } from "zod";
 import { sessionUserId } from "./auth.js";
 import type { ApiServer } from "./server.js";

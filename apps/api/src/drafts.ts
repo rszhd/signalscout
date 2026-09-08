@@ -12,7 +12,7 @@
  * social publishing on the "what we are NOT building" list, and this feature
  * ends at the clipboard.
  */
-import type { AiConfig, Database } from "@intentwatch/core";
+import type { AiConfig, Database } from "@signalscout/core";
 import {
   budgetStates,
   createDrafter,
@@ -24,7 +24,7 @@ import {
   recordModelCall,
   replyVoicePresets,
   updateReplyPrompt,
-} from "@intentwatch/core";
+} from "@signalscout/core";
 import { z } from "zod";
 import { sessionUserId } from "./auth.js";
 import type { ApiServer } from "./server.js";

@@ -1,6 +1,6 @@
 # Accounts, and the port they listen on
 
-IntentWatch has one account by default, and a setting that opens registration
+SignalScout has one account by default, and a setting that opens registration
 for a deployment that wants many. This document says how the first one is made,
 what the login does and does not protect, and the one thing you must do before
 the instance has a public address.

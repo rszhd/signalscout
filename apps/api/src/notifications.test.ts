@@ -6,8 +6,8 @@ import {
   loadEnv,
   notificationDefaults,
   readNotificationSettings,
-} from "@intentwatch/core";
-import { createTestDatabase, type TestDatabase } from "@intentwatch/core/testing";
+} from "@signalscout/core";
+import { createTestDatabase, type TestDatabase } from "@signalscout/core/testing";
 import { afterAll, beforeAll, expect, it } from "vitest";
 import { insertMonitor } from "../../../packages/core/src/worker/testing.js";
 import { buildServer } from "./server.js";

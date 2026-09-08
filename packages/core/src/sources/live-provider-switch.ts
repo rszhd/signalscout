@@ -6,7 +6,7 @@
  * only way to ask them is to ask them. Run it when `collect.ts` changes how a
  * provider is chosen or resumed, and put the numbers in the ticket.
  *
- *     pnpm --filter @intentwatch/core live:provider-switch
+ *     pnpm --filter @signalscout/core live:provider-switch
  *
  * **It spends money and it writes rows.** About $0.08 — one Bright Data
  * subreddit page at $0.075, one ScrapeCreators search at $0.00376 — and it

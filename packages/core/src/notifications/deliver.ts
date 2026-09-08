@@ -192,7 +192,7 @@ export async function processNotifications(
         monitor: { id: monitorId, name: monitor.name },
         matches: selected,
       };
-      const subject = `IntentWatch: ${selected.length} ${selected.length === 1 ? "match" : "matches"} for ${monitor.name}`;
+      const subject = `SignalScout: ${selected.length} ${selected.length === 1 ? "match" : "matches"} for ${monitor.name}`;
       const text = `${subject}\n\n${selected.map((row) => `Score: ${row.score}\n${row.excerpt}\n${row.reasons.join("\n")}\n${row.url}`).join("\n\n")}\n`;
       const attempts = delivery.attempts + 1;
       try {

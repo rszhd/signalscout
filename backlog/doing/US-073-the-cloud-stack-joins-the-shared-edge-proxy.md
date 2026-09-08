@@ -112,3 +112,26 @@ proxy. `!override []` is what actually drops it.
   over a real hostname and seen a `Secure` cookie. A compose file that parses is
   evidence about YAML and none about a certificate. `pnpm lint` fails on
   `reply-voices.css`, which is older than this ticket and untouched by it.
+- 2026-09-08T18:25+08:00 — Deployed to staging at app.signalscout-dev.space, on
+  the box that already runs Traefik. The stack starts no proxy: EDGE_NETWORK is
+  qassist-edge and the router labels are the whole of the integration.
+
+  Measured from outside: HTTP answers 301 to HTTPS, the certificate is Let's
+  Encrypt for the hostname, /api/health answers 200 over HTTP/2, /api/monitors
+  answers 401 with no cookie, and every response carries `X-Robots-Tag:
+  noindex, nofollow`. A real browser rendered the first-run form over TLS,
+  which is also the screen US-017 has never seen in one.
+
+  Three things had to be fixed before any of it could run, and none was the
+  proxy: the compose default named an org that does not exist, CI published on
+  main alone, and the lint failed on the landing page so no image could be
+  built at all. A fourth was found by CI itself and is its own commit.
+
+  The last box stays open. The account is the owner's to create, and signup
+  closes behind the first one, so the Secure cookie is unproven until they make
+  it.
+
+  Within a minute of the hostname resolving, a scanner was asking for
+  /actuator/env, /trace.axd and /@vite/env. They answer 200 because the SPA
+  serves index.html for any unknown path, which is worth knowing before somebody
+  reads that as a leak.

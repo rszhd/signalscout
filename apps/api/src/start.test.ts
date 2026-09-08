@@ -21,6 +21,8 @@ const logger = createLogger({ level: "silent", name: "test" });
 function envWith(workerInProcess: boolean): Env {
   return loadEnv({
     DATABASE_URL: "postgres://user:pw@localhost:5432/unused",
+    // US-017 refuses to boot without one, before anything here runs.
+    AUTH_SECRET: "a-test-secret-that-is-long-enough-to-pass",
     WORKER_IN_PROCESS: String(workerInProcess),
   });
 }

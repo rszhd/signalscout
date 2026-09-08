@@ -195,7 +195,14 @@ cp .env.example .env      # add your keys
 docker compose up
 ```
 
-The app is then on <http://localhost:3000>.
+The app is then on <http://localhost:3000>. It asks you to make the one account
+it has, and closes signup behind it.
+
+**Put it behind TLS before you give it a public address.** It holds provider
+keys that spend money and an inbox of your own research, and on plain HTTP the
+session cookie is readable by anything between you and the server.
+[docs/accounts.md](docs/accounts.md) has the proxy header you need and the way
+back in if you are locked out.
 
 One Postgres and one Node process. It is designed to run on a 1 GB VPS, and the
 image is built in CI, so your server pulls it and never compiles anything.
@@ -277,6 +284,7 @@ The scope is one sentence: **find conversations with intent.**
 |---|---|
 | [PLAN.md](PLAN.md) | What we are building, and why |
 | [STACK.md](STACK.md) | What we are building it with, and why not the alternatives |
+| [docs/accounts.md](docs/accounts.md) | The one account, TLS, and getting back in |
 | [docs/testing.md](docs/testing.md) | How the tests are written, and what a green suite cannot say |
 | [backlog/](backlog/README.md) | One ticket per file; the folder is the status |
 | [AGENTS.md](AGENTS.md) | Instructions for AI coding agents working in this repo |

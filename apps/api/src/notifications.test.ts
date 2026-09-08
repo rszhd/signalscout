@@ -11,6 +11,7 @@ import { createTestDatabase, type TestDatabase } from "@intentwatch/core/testing
 import { afterAll, beforeAll, expect, it } from "vitest";
 import { insertMonitor } from "../../../packages/core/src/worker/testing.js";
 import { buildServer } from "./server.js";
+import { asUser } from "./testing.js";
 
 let database: TestDatabase;
 let db: Database;
@@ -26,6 +27,8 @@ afterAll(async () => {
 });
 async function server(configured = true) {
   return buildServer({
+    // The shared helper writes its monitors under this id.
+    session: asUser("user-1"),
     db,
     env: loadEnv({
       DATABASE_URL: database.url,

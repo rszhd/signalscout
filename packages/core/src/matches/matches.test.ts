@@ -39,6 +39,9 @@ function at(page: MatchPage, index: number): InboxMatch {
   return match;
 }
 
+/** The one account this instance has. Every row below belongs to it. */
+const owner = "self-hosted";
+
 const now = new Date("2026-09-05T12:00:00.000Z");
 
 function minutesAgo(minutes: number): Date {
@@ -72,7 +75,7 @@ describe("the inbox list", () => {
       await db
         .insert(monitors)
         .values({
-          userId: "self-hosted",
+          userId: owner,
           name,
           product: "A test runner that records browser flows instead of coding them",
           idealCustomer: "Small SaaS teams with no dedicated QA engineer",
@@ -149,7 +152,7 @@ describe("the inbox list", () => {
       const stale = await seed({ monitorId, score: 96, postedAt: daysAgo(3) });
       const fresh = await seed({ monitorId, score: 88, postedAt: minutesAgo(10) });
 
-      const page = await listMatches(db, { asOf: now });
+      const page = await listMatches(db, { userId: owner, asOf: now });
 
       expect(page.matches.map((match) => match.id)).toEqual([fresh, stale]);
     });
@@ -159,7 +162,7 @@ describe("the inbox list", () => {
       await seed({ monitorId, score: 90, postedAt: daysAgo(1) });
       await seed({ monitorId, score: 90, postedAt: daysAgo(3) });
 
-      const page = await listMatches(db, { asOf: now });
+      const page = await listMatches(db, { userId: owner, asOf: now });
 
       // Written as numbers and not as `90 - rankDecayPointsPerDay`. An
       // expectation computed from the constant passes whatever the constant
@@ -176,7 +179,7 @@ describe("the inbox list", () => {
       await seed({ monitorId, score: 40, postedAt: new Date(now.getTime() + 86_400_000) });
       await seed({ monitorId, score: 50, postedAt: now });
 
-      const page = await listMatches(db, { asOf: now });
+      const page = await listMatches(db, { userId: owner, asOf: now });
 
       expect(page.matches.map((match) => match.score)).toEqual([50, 40]);
       expect(at(page, 1).rank).toBe(40);
@@ -186,8 +189,9 @@ describe("the inbox list", () => {
       await seed({ monitorId, score: 90, postedAt: daysAgo(1) });
       await seed({ monitorId, score: 80, postedAt: daysAgo(2) });
 
-      const first = await listMatches(db, { asOf: now, limit: 1 });
+      const first = await listMatches(db, { userId: owner, asOf: now, limit: 1 });
       const second = await listMatches(db, {
+        userId: owner,
         asOf: first.asOf,
         limit: 1,
         cursor: first.nextCursor,
@@ -206,7 +210,7 @@ describe("the inbox list", () => {
       const visible = await seed({ monitorId, score: 50, postedAt: minutesAgo(5) });
       await seed({ monitorId, score: 99, postedAt: minutesAgo(1), hidden: true });
 
-      const page = await listMatches(db, { asOf: now });
+      const page = await listMatches(db, { userId: owner, asOf: now });
 
       expect(page.matches.map((match) => match.id)).toEqual([visible]);
     });
@@ -215,7 +219,7 @@ describe("the inbox list", () => {
       await seed({ monitorId, score: 50, postedAt: minutesAgo(5) });
       await seed({ monitorId, score: 99, postedAt: minutesAgo(1), hidden: true });
 
-      const page = await listMatches(db, { asOf: now, limit: 1 });
+      const page = await listMatches(db, { userId: owner, asOf: now, limit: 1 });
 
       expect(page.nextCursor).toBeNull();
     });
@@ -226,9 +230,9 @@ describe("the inbox list", () => {
       const kept = await seed({ monitorId, score: 50, postedAt: minutesAgo(5) });
       const dismissed = await seed({ monitorId, score: 99, postedAt: minutesAgo(1) });
 
-      await recordVerdict(db, { matchId: dismissed, verdict: "not_relevant" });
+      await recordVerdict(db, { matchId: dismissed, userId: owner, verdict: "not_relevant" });
 
-      const page = await listMatches(db, { asOf: now });
+      const page = await listMatches(db, { userId: owner, asOf: now });
 
       expect(page.matches.map((match) => match.id)).toEqual([kept]);
     });
@@ -236,11 +240,11 @@ describe("the inbox list", () => {
     it("is still there, and comes back when asked for", async () => {
       const dismissed = await seed({ monitorId, score: 99, postedAt: minutesAgo(1) });
 
-      await recordVerdict(db, { matchId: dismissed, verdict: "not_relevant" });
+      await recordVerdict(db, { matchId: dismissed, userId: owner, verdict: "not_relevant" });
 
       // US-012 is firm that it is not deleted. This is the assertion: the row
       // a person dismissed is the row the feedback loop was collected for.
-      const page = await listMatches(db, { asOf: now, includeNotRelevant: true });
+      const page = await listMatches(db, { userId: owner, asOf: now, includeNotRelevant: true });
 
       expect(page.matches.map((match) => match.id)).toEqual([dismissed]);
       expect(at(page, 0).verdict).toBe("not_relevant");
@@ -249,10 +253,10 @@ describe("the inbox list", () => {
     it("comes back when the person changes their mind", async () => {
       const matchId = await seed({ monitorId, score: 99, postedAt: minutesAgo(1) });
 
-      await recordVerdict(db, { matchId, verdict: "not_relevant" });
-      await recordVerdict(db, { matchId, verdict: "good" });
+      await recordVerdict(db, { matchId, userId: owner, verdict: "not_relevant" });
+      await recordVerdict(db, { matchId, userId: owner, verdict: "good" });
 
-      const page = await listMatches(db, { asOf: now });
+      const page = await listMatches(db, { userId: owner, asOf: now });
 
       expect(page.matches.map((match) => match.id)).toEqual([matchId]);
       expect(at(page, 0).verdict).toBe("good");
@@ -263,7 +267,7 @@ describe("the inbox list", () => {
 
       await recordVerdict(db, { matchId, userId: "someone-else", verdict: "not_relevant" });
 
-      const page = await listMatches(db, { asOf: now });
+      const page = await listMatches(db, { userId: owner, asOf: now });
 
       expect(page.matches.map((match) => match.id)).toEqual([matchId]);
       expect(at(page, 0).verdict).toBeNull();
@@ -274,7 +278,7 @@ describe("the inbox list", () => {
 
       // The one that would break first: an unjudged match has no feedback row,
       // so a comparison that is not null-safe drops the whole inbox.
-      const page = await listMatches(db, { asOf: now });
+      const page = await listMatches(db, { userId: owner, asOf: now });
 
       expect(page.matches).toHaveLength(1);
       expect(at(page, 0).verdict).toBeNull();
@@ -284,9 +288,9 @@ describe("the inbox list", () => {
       await seed({ monitorId, score: 50, postedAt: minutesAgo(5) });
       const dismissed = await seed({ monitorId, score: 99, postedAt: minutesAgo(1) });
 
-      await recordVerdict(db, { matchId: dismissed, verdict: "not_relevant" });
+      await recordVerdict(db, { matchId: dismissed, userId: owner, verdict: "not_relevant" });
 
-      const page = await listMatches(db, { asOf: now, limit: 1 });
+      const page = await listMatches(db, { userId: owner, asOf: now, limit: 1 });
 
       expect(page.nextCursor).toBeNull();
     });
@@ -304,21 +308,21 @@ describe("the inbox list", () => {
       const kept = await seed({ monitorId, score: 70, postedAt: minutesAgo(5) });
       await seed({ monitorId, score: 90, postedAt: minutesAgo(1) });
 
-      await setMatchSaved(db, kept, true);
+      await setMatchSaved(db, owner, kept, true);
 
-      const saved = await listMatches(db, { savedOnly: true });
+      const saved = await listMatches(db, { userId: owner, savedOnly: true });
 
       expect(saved.matches.map((match) => match.id)).toEqual([kept]);
       // And the inbox is unchanged: keeping something does not remove it.
-      expect((await listMatches(db, {})).matches).toHaveLength(2);
+      expect((await listMatches(db, { userId: owner })).matches).toHaveLength(2);
     });
 
     it("says so on the card, so a screen can show the button pressed", async () => {
       const kept = await seed({ monitorId, score: 70, postedAt: minutesAgo(5) });
 
-      await setMatchSaved(db, kept, true);
+      await setMatchSaved(db, owner, kept, true);
 
-      const [match] = (await listMatches(db, {})).matches;
+      const [match] = (await listMatches(db, { userId: owner })).matches;
 
       expect(match?.saved).toBe(true);
     });
@@ -326,10 +330,10 @@ describe("the inbox list", () => {
     it("can be let go again", async () => {
       const kept = await seed({ monitorId, score: 70, postedAt: minutesAgo(5) });
 
-      await setMatchSaved(db, kept, true);
-      await setMatchSaved(db, kept, false);
+      await setMatchSaved(db, owner, kept, true);
+      await setMatchSaved(db, owner, kept, false);
 
-      expect((await listMatches(db, { savedOnly: true })).matches).toEqual([]);
+      expect((await listMatches(db, { userId: owner, savedOnly: true })).matches).toEqual([]);
     });
 
     /**
@@ -341,10 +345,10 @@ describe("the inbox list", () => {
       const weak = await seed({ monitorId, score: 40, postedAt: minutesAgo(5) });
       const strong = await seed({ monitorId, score: 95, postedAt: minutesAgo(1) });
 
-      await setMatchSaved(db, weak, true, new Date("2026-09-01T00:00:00.000Z"));
-      await setMatchSaved(db, strong, true, new Date("2026-08-01T00:00:00.000Z"));
+      await setMatchSaved(db, owner, weak, true, new Date("2026-09-01T00:00:00.000Z"));
+      await setMatchSaved(db, owner, strong, true, new Date("2026-08-01T00:00:00.000Z"));
 
-      const saved = await listMatches(db, { savedOnly: true });
+      const saved = await listMatches(db, { userId: owner, savedOnly: true });
 
       // The weak one was kept later, so it is first — the inbox would put the
       // 95 above the 40 every time.
@@ -355,12 +359,12 @@ describe("the inbox list", () => {
       const first = await seed({ monitorId, score: 70, postedAt: minutesAgo(5) });
       const second = await seed({ monitorId, score: 70, postedAt: minutesAgo(5) });
 
-      await setMatchSaved(db, first, true, new Date("2026-09-01T00:00:00.000Z"));
-      await setMatchSaved(db, second, true, new Date("2026-09-02T00:00:00.000Z"));
+      await setMatchSaved(db, owner, first, true, new Date("2026-09-01T00:00:00.000Z"));
+      await setMatchSaved(db, owner, second, true, new Date("2026-09-02T00:00:00.000Z"));
       // Pressing a button somebody already pressed. A slow connection does this.
-      await setMatchSaved(db, first, true, new Date("2026-09-03T00:00:00.000Z"));
+      await setMatchSaved(db, owner, first, true, new Date("2026-09-03T00:00:00.000Z"));
 
-      const saved = await listMatches(db, { savedOnly: true });
+      const saved = await listMatches(db, { userId: owner, savedOnly: true });
 
       expect(saved.matches.map((match) => match.id)).toEqual([second, first]);
     });
@@ -373,25 +377,29 @@ describe("the inbox list", () => {
     it("stays on the list after being marked not relevant", async () => {
       const kept = await seed({ monitorId, score: 70, postedAt: minutesAgo(5) });
 
-      await setMatchSaved(db, kept, true);
-      await recordVerdict(db, { matchId: kept, verdict: "not_relevant" });
+      await setMatchSaved(db, owner, kept, true);
+      await recordVerdict(db, { matchId: kept, userId: owner, verdict: "not_relevant" });
 
-      expect((await listMatches(db, {})).matches).toEqual([]);
-      expect((await listMatches(db, { savedOnly: true })).matches.map((m) => m.id)).toEqual([kept]);
+      expect((await listMatches(db, { userId: owner })).matches).toEqual([]);
+      expect(
+        (await listMatches(db, { userId: owner, savedOnly: true })).matches.map((m) => m.id),
+      ).toEqual([kept]);
     });
 
     it("is not a verdict, and leaves the feedback sample alone", async () => {
       const kept = await seed({ monitorId, score: 70, postedAt: minutesAgo(5) });
 
-      await setMatchSaved(db, kept, true);
+      await setMatchSaved(db, owner, kept, true);
 
-      const [match] = (await listMatches(db, {})).matches;
+      const [match] = (await listMatches(db, { userId: owner })).matches;
 
       expect(match?.verdict).toBeNull();
     });
 
     it("answers nothing for a match that does not exist", async () => {
-      expect(await setMatchSaved(db, "00000000-0000-0000-0000-000000000000", true)).toBeUndefined();
+      expect(
+        await setMatchSaved(db, owner, "00000000-0000-0000-0000-000000000000", true),
+      ).toBeUndefined();
     });
   });
 
@@ -400,7 +408,7 @@ describe("the inbox list", () => {
       const mine = await seed({ monitorId, score: 60, postedAt: minutesAgo(5) });
       await seed({ monitorId: otherMonitorId, score: 95, postedAt: minutesAgo(5) });
 
-      const page = await listMatches(db, { asOf: now, monitorId });
+      const page = await listMatches(db, { userId: owner, asOf: now, monitorId });
 
       expect(page.matches.map((match) => match.id)).toEqual([mine]);
     });
@@ -409,7 +417,7 @@ describe("the inbox list", () => {
       await seed({ monitorId, score: 60, postedAt: minutesAgo(5) });
       await seed({ monitorId: otherMonitorId, score: 95, postedAt: minutesAgo(5) });
 
-      const page = await listMatches(db, { asOf: now });
+      const page = await listMatches(db, { userId: owner, asOf: now });
 
       expect(page.matches.map((match) => match.monitorName)).toEqual([
         "Something else entirely",
@@ -421,7 +429,7 @@ describe("the inbox list", () => {
       await seed({ monitorId, score: 40, postedAt: minutesAgo(5) });
       const kept = await seed({ monitorId, score: 70, postedAt: minutesAgo(5) });
 
-      const page = await listMatches(db, { asOf: now, minScore: 70 });
+      const page = await listMatches(db, { userId: owner, asOf: now, minScore: 70 });
 
       expect(page.matches.map((match) => match.id)).toEqual([kept]);
     });
@@ -431,7 +439,7 @@ describe("the inbox list", () => {
       // is two days old, and nobody could tell the filter from the decay.
       await seed({ monitorId, score: 96, postedAt: daysAgo(2) });
 
-      const page = await listMatches(db, { asOf: now, minScore: 90 });
+      const page = await listMatches(db, { userId: owner, asOf: now, minScore: 90 });
 
       expect(page.matches).toHaveLength(1);
       expect(at(page, 0).rank).toBe(72);
@@ -450,7 +458,7 @@ describe("the inbox list", () => {
       let pages = 0;
 
       do {
-        const page = await listMatches(db, { asOf: now, limit: 7, cursor });
+        const page = await listMatches(db, { userId: owner, asOf: now, limit: 7, cursor });
         seen.push(...page.matches);
         cursor = page.nextCursor;
         pages += 1;
@@ -471,8 +479,9 @@ describe("the inbox list", () => {
         await seed({ monitorId, score: 80, postedAt: posted }),
       ];
 
-      const first = await listMatches(db, { asOf: now, limit: 2 });
+      const first = await listMatches(db, { userId: owner, asOf: now, limit: 2 });
       const second = await listMatches(db, {
+        userId: owner,
         asOf: now,
         limit: 2,
         cursor: first.nextCursor,
@@ -486,25 +495,25 @@ describe("the inbox list", () => {
     it("stops with no cursor on the last page", async () => {
       await seed({ monitorId, score: 60, postedAt: minutesAgo(5) });
 
-      const page = await listMatches(db, { asOf: now, limit: 1 });
+      const page = await listMatches(db, { userId: owner, asOf: now, limit: 1 });
 
       expect(page.nextCursor).toBeNull();
     });
 
     it("refuses a cursor it did not issue", async () => {
-      await expect(listMatches(db, { asOf: now, cursor: "nonsense" })).rejects.toBeInstanceOf(
-        UnusableCursorError,
-      );
+      await expect(
+        listMatches(db, { userId: owner, asOf: now, cursor: "nonsense" }),
+      ).rejects.toBeInstanceOf(UnusableCursorError);
     });
 
     it("issues a cursor that survives being written down and read back", async () => {
       await seed({ monitorId, score: 73, postedAt: minutesAgo(97) });
       await seed({ monitorId, score: 71, postedAt: minutesAgo(13) });
 
-      const first = await listMatches(db, { asOf: now, limit: 1 });
+      const first = await listMatches(db, { userId: owner, asOf: now, limit: 1 });
       const rebuilt = cursorFor(at(first, 0));
 
-      const second = await listMatches(db, { asOf: now, limit: 1, cursor: rebuilt });
+      const second = await listMatches(db, { userId: owner, asOf: now, limit: 1, cursor: rebuilt });
 
       expect(second.matches).toHaveLength(1);
       expect(at(second, 0).id).not.toBe(at(first, 0).id);
@@ -520,7 +529,7 @@ describe("the inbox list", () => {
         reasons: ["Small SaaS team", "Explicit manual-testing pain", "Asking for solutions"],
       });
 
-      const match = at(await listMatches(db, { asOf: now }), 0);
+      const match = at(await listMatches(db, { userId: owner, asOf: now }), 0);
 
       expect(match.reasons).toEqual([
         "Small SaaS team",
@@ -542,7 +551,7 @@ describe("the inbox list", () => {
         intentType: "alternative_search",
       });
 
-      const match = at(await listMatches(db, { asOf: now }), 0);
+      const match = at(await listMatches(db, { userId: owner, asOf: now }), 0);
 
       expect(match.intentLabel).toBe("Looking for alternatives");
     });
@@ -550,7 +559,7 @@ describe("the inbox list", () => {
     it("says so plainly when the classifier found no intent", async () => {
       await seed({ monitorId, score: 30, postedAt: minutesAgo(1), intentType: "none" });
 
-      const match = at(await listMatches(db, { asOf: now }), 0);
+      const match = at(await listMatches(db, { userId: owner, asOf: now }), 0);
 
       expect(match.intentLabel).toBe("No clear intent");
     });

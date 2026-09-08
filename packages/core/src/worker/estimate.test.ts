@@ -17,6 +17,9 @@ import { estimateQueue } from "./queues.js";
 import type { StepContext } from "./steps.js";
 import { fakeRegistry, insertMonitor, silentLogger } from "./testing.js";
 
+/** The one account these cases run as. US-067. */
+const owner = "self-hosted";
+
 /**
  * The cost test, driven without a queue.
  *
@@ -125,6 +128,7 @@ describe("the cost test", () => {
     options: { monitorId?: string; capMicros?: number; pollIntervalSeconds?: number } = {},
   ): Promise<string> {
     return startEstimate(db, {
+      userId: owner,
       monitorId: options.monitorId ?? null,
       pollDays: [0, 1, 2, 3, 4, 5, 6],
       pollIntervalSeconds: options.pollIntervalSeconds ?? 3600,
@@ -527,6 +531,7 @@ describe("the cost test", () => {
     const monitorId = await insertMonitor(database);
     await setBudget(db, monitorId, { monthlyCapMicros: 10_000, onExhausted: "notify" });
     await recordSourceUsage(db, {
+      userId: owner,
       monitorId,
       source: "reddit",
       provider: "brightdata",

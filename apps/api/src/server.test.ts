@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { createDatabase, createLogger, loadEnv } from "@intentwatch/core";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { buildServer } from "./server.js";
+import { asOwner } from "./testing.js";
 
 const logger = createLogger({ level: "silent", name: "test" });
 
@@ -38,7 +39,7 @@ describe("the API and the UI on one port", () => {
       ...overrides,
     });
 
-    return buildServer({ env, logger, db: database.db, queryGenerator: null });
+    return buildServer({ session: asOwner, env, logger, db: database.db, queryGenerator: null });
   }
 
   it("answers /api/health with the worker mode it is running in", async () => {

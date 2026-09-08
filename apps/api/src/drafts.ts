@@ -23,16 +23,24 @@ import {
   listReplyPrompts,
   recordModelCall,
   replyVoicePresets,
-  singleUserId,
   updateReplyPrompt,
 } from "@intentwatch/core";
 import { z } from "zod";
+import { sessionUserId } from "./auth.js";
 import type { ApiServer } from "./server.js";
 
 export interface DraftRoutesOptions {
   readonly db: Database;
   /** Null when no model is configured, which the route reports rather than hides. */
-  readonly ai: AiConfig | null;
+  readonly ai?: AiConfig | null;
+  /**
+   * The per-account fallback. US-068.
+   *
+   * The option above stays an override — a test passes one, and `null` still
+   * means "this deployment has none". This is what is used when it is absent,
+   * and it is a function of the person asking because they pay for the call.
+   */
+  readonly aiFor?: (userId: string) => Promise<AiConfig | null>;
 }
 
 /**
@@ -47,7 +55,7 @@ const excerptLength = 2000;
 
 export async function registerDraftRoutes(
   app: ApiServer,
-  { db, ai }: DraftRoutesOptions,
+  { db, ai, aiFor }: DraftRoutesOptions,
 ): Promise<void> {
   app.route({
     method: "POST",
@@ -82,7 +90,11 @@ export async function registerDraftRoutes(
       },
     },
     handler: async (request, reply) => {
-      if (!ai) {
+      // The person pressing the button pays for the call, so the settings are
+      // theirs. US-068.
+      const config = ai === undefined ? ((await aiFor?.(sessionUserId(request))) ?? null) : ai;
+
+      if (!config) {
         return reply.code(503).send({
           message:
             "No model is configured, so a reply cannot be drafted. Set AI_API_KEY, " +
@@ -115,7 +127,7 @@ export async function registerDraftRoutes(
 
       const instruction = (request.body?.instruction ?? "").trim();
 
-      const drafter = createDrafter({ config: ai });
+      const drafter = createDrafter({ config });
 
       const outcome = await drafter.draft({
         monitor: {
@@ -244,8 +256,8 @@ export async function registerReplyPromptRoutes(
     method: "GET",
     url: "/api/reply-prompts",
     schema: { response: { 200: z.object({ prompts: z.array(promptSchema) }) } },
-    handler: async () => ({
-      prompts: (await listReplyPrompts(db, singleUserId)).map(serialise),
+    handler: async (request) => ({
+      prompts: (await listReplyPrompts(db, sessionUserId(request))).map(serialise),
     }),
   });
 
@@ -261,7 +273,7 @@ export async function registerReplyPromptRoutes(
     },
     handler: async (request, reply) => {
       try {
-        const created = await createReplyPrompt(db, singleUserId, request.body);
+        const created = await createReplyPrompt(db, sessionUserId(request), request.body);
         return reply.code(201).send(serialise(created));
       } catch (error) {
         // Two prompts with one name are a person choosing blind, so the name
@@ -290,7 +302,12 @@ export async function registerReplyPromptRoutes(
     },
     handler: async (request, reply) => {
       try {
-        const updated = await updateReplyPrompt(db, singleUserId, request.params.id, request.body);
+        const updated = await updateReplyPrompt(
+          db,
+          sessionUserId(request),
+          request.params.id,
+          request.body,
+        );
 
         if (!updated) return reply.code(404).send({ message: "No saved prompt has that id." });
 
@@ -312,7 +329,7 @@ export async function registerReplyPromptRoutes(
       response: { 204: z.null(), 404: z.object({ message: z.string() }) },
     },
     handler: async (request, reply) => {
-      const gone = await deleteReplyPrompt(db, singleUserId, request.params.id);
+      const gone = await deleteReplyPrompt(db, sessionUserId(request), request.params.id);
 
       if (!gone) return reply.code(404).send({ message: "No saved prompt has that id." });
 

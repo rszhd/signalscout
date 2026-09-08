@@ -74,8 +74,8 @@ const triager = createTriager({ config: triageConfig });
  * run is the live check of that: 328 replies should reach the classifier with
  * no embedding bought.
  */
-const filter = createFilterStep({ triager });
-const classify = createClassifyStep({ classifier });
+const filter = createFilterStep({ triagerFor: async () => triager });
+const classify = createClassifyStep({ classifierFor: async () => classifier });
 
 let unscored: string | undefined;
 

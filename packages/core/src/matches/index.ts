@@ -7,6 +7,7 @@ export {
   type ListMatchesOptions,
   listMatches,
   type MatchPage,
+  matchOwner,
   maximumPageSize,
   rankDecayPointsPerDay,
   setMatchSaved,

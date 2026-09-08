@@ -24,14 +24,18 @@ import { type MissingCredential, missingCredentials } from "../worker/credential
 export type Monitor = typeof monitors.$inferSelect;
 
 /**
- * Who owns a monitor until Better Auth creates the user table in US-017.
+ * A monitor row, scoped to the person who owns it.
  *
- * A constant rather than a nullable column: the column is `NOT NULL` because
- * an unowned monitor is not a thing the product has, and a self-hosted
- * instance has exactly one account. US-017 replaces this with the session's
- * user and adds the foreign key; nothing else about these rows changes.
+ * US-017 replaced the `singleUserId` constant that used to sit here. The
+ * column was always `NOT NULL`, so this is the same shape carrying a real id:
+ * what changed is who fills it and who is allowed to read it back.
+ *
+ * There is deliberately no foreign key to `users`. A monitor may be older than
+ * the first account — every instance that upgraded into US-017 has some — and
+ * a constraint would refuse to apply the migration on exactly the instances
+ * that have data worth keeping. `claimUnownedRows` is what closes the gap, at
+ * the moment the account exists.
  */
-export const singleUserId = "self-hosted";
 
 /** What the person typed. PLAN.md, *Monitor creation*. */
 export interface MonitorAnswers {
@@ -63,6 +67,14 @@ export interface MonitorFilterSettings {
 }
 
 export interface CreateMonitorInput extends MonitorAnswers, MonitorPlan, MonitorFilterSettings {
+  /**
+   * Who this monitor belongs to. US-017.
+   *
+   * Required, with no default. A default here would be one word in one file
+   * deciding that every monitor an instance ever makes belongs to the same
+   * person, which is precisely the state this ticket left behind.
+   */
+  readonly userId: string;
   /**
    * `Source`, not a free connector id. `posts.source` can only hold a source
    * the schema names, so a monitor that named any other id would collect posts
@@ -334,11 +346,12 @@ export interface MonitorWithProject extends Monitor {
   readonly projectName: string | null;
 }
 
-export async function listMonitors(db: Database): Promise<MonitorWithProject[]> {
+export async function listMonitors(db: Database, userId: string): Promise<MonitorWithProject[]> {
   const rows = await db
     .select({ monitor: monitors, projectName: projects.name })
     .from(monitors)
     .leftJoin(projects, eq(projects.id, monitors.projectId))
+    .where(eq(monitors.userId, userId))
     .orderBy(desc(monitors.createdAt));
 
   return rows.map((row) => ({ ...row.monitor, projectName: row.projectName }));
@@ -359,7 +372,7 @@ export async function createMonitor(
   const [monitor] = await db
     .insert(monitors)
     .values({
-      userId: singleUserId,
+      userId: input.userId,
       name: input.name,
       product: input.product,
       idealCustomer: input.idealCustomer,

@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
+import { requestJson } from "./api.js";
 import { Connections } from "./Connections.js";
 import { Inbox } from "./Inbox.js";
+import { type AuthStatus, Login } from "./Login.js";
+import { Models } from "./Models.js";
 import { MonitorForm } from "./MonitorForm.js";
 import { Monitors } from "./Monitors.js";
 import { Notifications } from "./Notifications.js";
@@ -38,12 +41,48 @@ const connectionsRoute = "#/connections";
 const projectsRoute = "#/projects";
 const providersRoute = "#/providers";
 const replyVoicesRoute = "#/reply-voices";
+const modelsRoute = "#/models";
 
 function currentRoute(): string {
   return globalThis.location?.hash ?? "";
 }
 
+/**
+ * Who is looking, asked once on load. US-017.
+ *
+ * `null` while the question is out, and that state renders nothing rather than
+ * a login form. A form shown for the moment before the answer arrives would
+ * flash at the person who is already signed in, every single load.
+ */
+function useAuthStatus(): AuthStatus | null {
+  const [status, setStatus] = useState<AuthStatus | null>(null);
+
+  useEffect(() => {
+    let current = true;
+
+    requestJson<AuthStatus>("/api/auth-status")
+      .then((answer) => {
+        if (current) setStatus(answer);
+      })
+      .catch(() => {
+        // An instance that cannot answer this cannot be signed in to, so the
+        // safe reading is signed out, and closed: an offer to register that we
+        // could not confirm is an offer that will refuse.
+        if (current) {
+          setStatus({ firstRun: false, signUpOpen: false, signedIn: false, account: null });
+        }
+      });
+
+    return () => {
+      current = false;
+    };
+  }, []);
+
+  return status;
+}
+
 export function App() {
+  const status = useAuthStatus();
   const [route, setRoute] = useState(currentRoute);
 
   useEffect(() => {
@@ -63,6 +102,7 @@ export function App() {
   const projecting = path.startsWith(projectsRoute);
   const comparing = path.startsWith(providersRoute);
   const voicing = path.startsWith(replyVoicesRoute);
+  const modelling = path.startsWith(modelsRoute);
 
   /**
    * The project everything else is about, carried in the route. US-045.
@@ -73,6 +113,7 @@ export function App() {
    * — a link that silently means "all businesses at once" is the thing this
    * grouping exists to remove.
    */
+  const signedIn = status?.signedIn === true;
   const projectId = routeParam("project", route);
   const scoped = projectId === null ? "" : `?project=${projectId}`;
 
@@ -92,12 +133,19 @@ export function App() {
   // Pricing joins Connections as a machine-level screen: one set of keys, one
   // set of prices, every project. Asking it to pick a project first would ask a
   // question it has no use for.
-  const needsProject = !projecting && !connecting && !comparing && !voicing && !notificationId;
+  const needsProject =
+    !projecting && !connecting && !comparing && !voicing && !modelling && !notificationId;
   const withoutProject = needsProject && projectId === null;
 
   useEffect(() => {
-    if (withoutProject) globalThis.location.hash = projectsRoute;
-  }, [withoutProject]);
+    if (signedIn && withoutProject) globalThis.location.hash = projectsRoute;
+  }, [signedIn, withoutProject]);
+
+  // Nothing at all until the answer is back. See `useAuthStatus`.
+  if (status === null) return null;
+  if (!status.signedIn) {
+    return <Login firstRun={status.firstRun} signUpOpen={status.signUpOpen} />;
+  }
 
   return (
     <div className="app-shell">
@@ -168,6 +216,16 @@ export function App() {
             <span>Reply voices</span>
           </a>
           {/*
+            Beside Connections and Providers rather than inside a project: a
+            model key is one account's, for every project it runs. US-068.
+          */}
+          <a className={modelling ? "nav-item current" : "nav-item"} href={modelsRoute}>
+            <span className="nav-icon" aria-hidden="true">
+              ◈
+            </span>
+            <span>Models</span>
+          </a>
+          {/*
             Also only with a project: a monitor is made in one, and the form
             prefills its four answers from it. Offered without one it would
             make an unfiled monitor, the state migration 0038 emptied out.
@@ -185,8 +243,20 @@ export function App() {
           )}
         </nav>
 
+        {/*
+          Who is signed in, where a hardcoded "Self-hosted" pill used to be.
+          US-069. That label was written before there were accounts and was true
+          then; it is false on an instance taking registrations, and it occupied
+          the one place a person looks to find out which account they are using.
+        */}
         <div className="sidebar-bottom">
-          <span className="local-pill">Self-hosted</span>
+          {status.account && (
+            <div className="signed-in-as">
+              <strong>{status.account.name}</strong>
+              <span>{status.account.email}</span>
+            </div>
+          )}
+          <SignOut />
         </div>
       </aside>
 
@@ -205,6 +275,8 @@ export function App() {
           <Providers />
         ) : voicing ? (
           <ReplyVoices />
+        ) : modelling ? (
+          <Models />
         ) : listing ? (
           <Monitors />
         ) : (
@@ -212,5 +284,35 @@ export function App() {
         )}
       </main>
     </div>
+  );
+}
+
+/**
+ * Signing out.
+ *
+ * A `POST`, because it changes something on the server: the row in `sessions`
+ * is deleted, so the cookie the browser keeps stops meaning anything even if
+ * somebody copied it. A link that only cleared the cookie would leave a
+ * working session behind on a machine somebody has walked away from.
+ */
+function SignOut() {
+  const [busy, setBusy] = useState(false);
+
+  async function signOut(): Promise<void> {
+    setBusy(true);
+
+    try {
+      await requestJson("/api/auth/sign-out", { method: "POST" });
+    } finally {
+      // Reload either way. A sign-out the server refused still has to put the
+      // person somewhere honest, and the reload asks it who they are again.
+      globalThis.location.reload();
+    }
+  }
+
+  return (
+    <button className="sign-out" disabled={busy} type="button" onClick={signOut}>
+      Sign out
+    </button>
   );
 }

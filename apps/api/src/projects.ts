@@ -23,10 +23,10 @@ import {
   readUploadedDocument,
   recordModelCall,
   signals as signalIds,
-  singleUserId,
   updateProject,
 } from "@intentwatch/core";
 import { z } from "zod";
+import { sessionUserId } from "./auth.js";
 import type { ApiServer } from "./server.js";
 
 export interface ProjectRoutesOptions {
@@ -39,6 +39,14 @@ export interface ProjectRoutesOptions {
    * button is absent rather than broken.
    */
   readonly describer?: ProjectDescriber | null;
+  /**
+   * The per-account fallback. US-068.
+   *
+   * The option above stays an override — a test passes one, and `null` still
+   * means "this deployment has none". This is what is used when it is absent,
+   * and it is a function of the person asking because they pay for the call.
+   */
+  readonly describerFor?: (userId: string) => Promise<ProjectDescriber | null>;
 }
 
 const signal = z.enum(signalIds);
@@ -126,7 +134,7 @@ const draftSchema = z.object({
 
 export async function registerProjectRoutes(
   app: ApiServer,
-  { db, describer = null }: ProjectRoutesOptions,
+  { db, describer, describerFor }: ProjectRoutesOptions,
 ): Promise<void> {
   /**
    * Draft the four answers from a URL or an uploaded document.
@@ -152,7 +160,12 @@ export async function registerProjectRoutes(
       },
     },
     handler: async (request, reply) => {
-      if (!describer) {
+      const model =
+        describer === undefined
+          ? ((await describerFor?.(sessionUserId(request))) ?? null)
+          : describer;
+
+      if (!model) {
         return reply
           .code(503)
           .send({ message: "This instance has no model key, so it cannot read a document." });
@@ -184,7 +197,7 @@ export async function registerProjectRoutes(
           .send({ message: "That document has no text in it, so there was nothing to read." });
       }
 
-      const result = await describer.describe(document.text, url ?? filename);
+      const result = await model.describe(document.text, url ?? filename);
 
       if (result.status === "empty") {
         return reply
@@ -222,8 +235,8 @@ export async function registerProjectRoutes(
     method: "GET",
     url: "/api/projects",
     schema: { response: { 200: z.object({ projects: z.array(projectSchema) }) } },
-    handler: async () => {
-      const found = await listProjects(db, singleUserId);
+    handler: async (request) => {
+      const found = await listProjects(db, sessionUserId(request));
       return { projects: found.map(serialise) };
     },
   });
@@ -233,7 +246,7 @@ export async function registerProjectRoutes(
     url: "/api/projects",
     schema: { body: createBody, response: { 201: projectSchema } },
     handler: async (request, reply) => {
-      const project = await createProject(db, singleUserId, request.body);
+      const project = await createProject(db, sessionUserId(request), request.body);
       reply.code(201);
       return serialise(project);
     },
@@ -247,7 +260,7 @@ export async function registerProjectRoutes(
       response: { 200: projectSchema, 404: problemSchema },
     },
     handler: async (request, reply) => {
-      const project = await getProject(db, singleUserId, request.params.id);
+      const project = await getProject(db, sessionUserId(request), request.params.id);
 
       if (!project) return reply.code(404).send({ message: "No such project." });
 
@@ -264,7 +277,12 @@ export async function registerProjectRoutes(
       response: { 200: projectSchema, 404: problemSchema },
     },
     handler: async (request, reply) => {
-      const project = await updateProject(db, singleUserId, request.params.id, request.body);
+      const project = await updateProject(
+        db,
+        sessionUserId(request),
+        request.params.id,
+        request.body,
+      );
 
       if (!project) return reply.code(404).send({ message: "No such project." });
 
@@ -280,7 +298,7 @@ export async function registerProjectRoutes(
       response: { 204: z.null(), 404: problemSchema },
     },
     handler: async (request, reply) => {
-      const gone = await deleteProject(db, singleUserId, request.params.id);
+      const gone = await deleteProject(db, sessionUserId(request), request.params.id);
 
       if (!gone) return reply.code(404).send({ message: "No such project." });
 

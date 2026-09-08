@@ -30,10 +30,10 @@
  *   5. `api_usage` holds two rows, each priced by the connector that ran.
  */
 import { desc, eq } from "drizzle-orm";
+import { ownerUserId } from "../auth/user.js";
 import { createDatabase } from "../db/client.js";
 import { apiUsage, monitors, posts, sourceContinuations, sourceProviders } from "../db/schema.js";
 import { createLogger } from "../logger.js";
-import { singleUserId } from "../monitors/monitors.js";
 import { createCollectStep } from "../worker/collect.js";
 import { credentialsFromStore } from "../worker/credentials.js";
 import type { StepContext } from "../worker/steps.js";
@@ -57,6 +57,8 @@ const registry = createSourceRegistry({
   runtime: createSourceRuntime({ logger }),
 });
 
+/** The one account this instance has, or the pre-account id. US-067. */
+const owner = await ownerUserId(db);
 const credentialsFor = credentialsFromStore(db, undefined, process.env, logger);
 
 /** A queue that swallows everything. Nothing here is meant to be classified. */
@@ -111,7 +113,7 @@ async function main(): Promise<void> {
   const [monitor] = await db
     .insert(monitors)
     .values({
-      userId: singleUserId,
+      userId: owner,
       name: "US-026 live provider switch",
       product: "A test runner that records browser flows instead of coding them",
       idealCustomer: "Small SaaS teams with no dedicated QA engineer",
@@ -130,7 +132,7 @@ async function main(): Promise<void> {
   // Before anything is spent. A key missing here would otherwise be found
   // after Bright Data had already been paid for a snapshot.
   for (const connector of registry.forPlatform("reddit")) {
-    if (!(await credentialsFor(connector))) {
+    if (!(await credentialsFor(connector, owner))) {
       throw new Error(`No credentials for ${connector.provider.id}. Both keys are needed here.`);
     }
   }

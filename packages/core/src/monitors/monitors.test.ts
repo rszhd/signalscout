@@ -41,9 +41,13 @@ const answers = {
   signals: ["recommendation_request", "problem"],
 } as const;
 
+/** The one account this instance has. Every monitor below belongs to it. */
+const owner = "self-hosted";
+
 function input(overrides: Partial<CreateMonitorInput> = {}): CreateMonitorInput {
   return {
     ...answers,
+    userId: owner,
     queries: { reddit: ["flaky end to end tests", "manual qa before every release"] },
     subreddits: ["SaaS", "webdev"],
     sources: ["reddit"],

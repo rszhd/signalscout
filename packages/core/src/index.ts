@@ -29,6 +29,7 @@ export {
   aiProviders,
   canEmbed,
   defaultEmbeddingModels,
+  draftConfigFromEnvironment,
   type EmbeddingConfig,
   type EmbeddingProvider,
   embeddingConfigFromEnvironment,
@@ -108,6 +109,32 @@ export {
 } from "./ai/reply-prompts.js";
 export { type ReplyVoicePreset, replyVoicePresets } from "./ai/reply-voices.js";
 export {
+  type AiTaskSettings,
+  aiRecordName,
+  clearAiTaskSettings,
+  readAiEnvironment,
+  readAiSettings,
+  type SaveAiTaskInput,
+  saveAiTaskSettings,
+} from "./ai/settings.js";
+export {
+  type Auth,
+  accountExists,
+  type CreateAuthOptions,
+  claimUnownedRows,
+  createAuth,
+  isOnlyAccount,
+  minimumPasswordLength,
+  sessionMaxAgeSeconds,
+  sessionRefreshAfterSeconds,
+} from "./auth/auth.js";
+export {
+  ownerUserId,
+  type SignupMode,
+  signupModes,
+  unclaimedUserId,
+} from "./auth/user.js";
+export {
   type BudgetState,
   budgetState,
   budgetStates,
@@ -123,10 +150,12 @@ export {
   type MonitorSpend,
   monitorSpend,
   monthStart,
+  type PairSpend,
   type RecordSourceUsageInput,
   recordSourceUsage,
   setBudget,
   spendByMonitor,
+  spendByPair,
 } from "./budget/index.js";
 export {
   aiEnvSchema,
@@ -140,6 +169,10 @@ export {
 export { createDatabase, type Database } from "./db/client.js";
 export { migrationsFolder, runMigrations } from "./db/migrate.js";
 export {
+  type AiTask,
+  accounts,
+  aiSettings,
+  aiTasks,
   apiUsage,
   budgets,
   defaultMinimumScore,
@@ -169,19 +202,23 @@ export {
   monitors,
   type Provider,
   posts,
+  projects,
   providers,
   queryEstimateProbes,
   queryEstimates,
   replyPrompts,
   type Signal,
   type Source,
+  sessions,
   signals,
   sourceContinuations,
   sourceCredentials,
   sourceProviders,
   sources,
+  users,
   type Verdict,
   verdicts,
+  verifications,
 } from "./db/schema.js";
 export {
   daysPerMonth,
@@ -258,6 +295,7 @@ export {
   listMatches,
   type MatchPage,
   matchesToCsv,
+  matchOwner,
   maximumPageSize,
   rankDecayPointsPerDay,
   setMatchSaved,
@@ -290,11 +328,11 @@ export {
   type SignalDescription,
   signalDescriptions,
   signalList,
-  singleUserId,
   startBlockers,
   type UpdateMonitorInput,
   updateMonitor,
 } from "./monitors/index.js";
+export { configureNetworking, connectAttemptTimeoutMs } from "./net.js";
 export { type NotificationTransport, processNotifications } from "./notifications/deliver.js";
 export {
   type NotificationInput,
@@ -341,9 +379,11 @@ export {
   UndecryptableSecretError,
 } from "./secrets/cipher.js";
 export {
+  allStoredCredentialNames,
   assertStoredCredentialsAreReadable,
   type CredentialHint,
   credentialRecordName,
+  credentialSlotName,
   deleteSourceCredential,
   listCredentialHints,
   putSourceCredential,
@@ -472,10 +512,9 @@ export {
   findDueMonitors,
   type TickResult,
 } from "./worker/schedule.js";
-export {
-  type PipelineSteps,
-  type Step,
-  type StepContext,
-  unconfiguredClassify,
-  type WorkerSteps,
+export type {
+  PipelineSteps,
+  Step,
+  StepContext,
+  WorkerSteps,
 } from "./worker/steps.js";

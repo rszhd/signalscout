@@ -299,7 +299,7 @@ export function createCollectStep({ registry, credentialsFor }: CollectOptions):
       const keyed = new Map<string, SourceCredentials>();
 
       for (const candidate of registry.forPlatform(sourceId)) {
-        const found = await credentialsFor(candidate);
+        const found = await credentialsFor(candidate, monitor.userId);
         if (found) keyed.set(candidate.provider.id, found);
       }
 
@@ -417,6 +417,7 @@ export function createCollectStep({ registry, credentialsFor }: CollectOptions):
         continuation?.cursor,
         (units) =>
           recordSourceUsage(db, {
+            userId: monitor.userId,
             monitorId,
             // The registry's id space is wider than the schema's, and this
             // narrowing is safe for the same reason `toRow`'s is: a monitor

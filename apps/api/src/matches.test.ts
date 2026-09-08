@@ -19,6 +19,7 @@ import {
 import { createTestDatabase, type TestDatabase } from "@intentwatch/core/testing";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { buildServer } from "./server.js";
+import { asOwner } from "./testing.js";
 
 const logger = createLogger({ level: "silent", name: "test" });
 
@@ -126,7 +127,7 @@ describe("the inbox route", () => {
 
   async function server() {
     const env = loadEnv({ DATABASE_URL: database.url });
-    return buildServer({ env, logger, db, queryGenerator: null });
+    return buildServer({ session: asOwner, env, logger, db, queryGenerator: null });
   }
 
   /** The scores on a page, which is what most of these cases compare. */

@@ -49,7 +49,7 @@
  * a rank that moves with the clock skips rows, and the failure looks like a
  * match that was never delivered.
  */
-import { and, desc, eq, gte, isNotNull, isNull, or, type SQL, sql } from "drizzle-orm";
+import { and, desc, eq, gte, inArray, isNotNull, isNull, or, type SQL, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import type { Database } from "../db/client.js";
 import {
@@ -61,7 +61,6 @@ import {
   type Source,
   type Verdict,
 } from "../db/schema.js";
-import { singleUserId } from "../monitors/monitors.js";
 
 /**
  * `posts` a second time, as the thread above a reply.
@@ -177,10 +176,13 @@ export interface ListMatchesOptions {
   /** `nextCursor` from the page before, or null for the first page. */
   readonly cursor?: string | null;
   /**
-   * Whose verdicts to read, and whose not-relevant matches to hide. The single
-   * self-hosted account until US-017 brings real sessions.
+   * Whose inbox this is, and whose verdicts to read. US-017.
+   *
+   * Required, and it used to default to the one self-hosted id. A default is
+   * what an unscoped caller gets when it forgets, and here that means one
+   * person's inbox answering somebody else's request.
    */
-  readonly userId?: string;
+  readonly userId: string;
   /** Show the matches this user marked not relevant. Default false. */
   readonly includeNotRelevant?: boolean;
   /**
@@ -251,16 +253,21 @@ export function cursorFor(match: InboxMatch): string {
  * removed the post, and Reddit's terms are not satisfied by a screen that
  * merely stops linking to it.
  */
-export async function listMatches(
-  db: Database,
-  options: ListMatchesOptions = {},
-): Promise<MatchPage> {
+export async function listMatches(db: Database, options: ListMatchesOptions): Promise<MatchPage> {
   const asOf = options.asOf ?? new Date();
   const limit = Math.min(Math.max(options.limit ?? defaultPageSize, 1), maximumPageSize);
-  const userId = options.userId ?? singleUserId;
+  const userId = options.userId;
   const rank = rankExpression(asOf);
 
-  const conditions: SQL[] = [eq(matches.hidden, false)];
+  /**
+   * The inbox belongs to one person. US-017.
+   *
+   * On the monitor rather than on the match, because that is where ownership
+   * is recorded: a match is a post scored against somebody's monitor, and it
+   * belongs to whoever the monitor does. The join is already here for the
+   * monitor's name, so this costs nothing.
+   */
+  const conditions: SQL[] = [eq(matches.hidden, false), eq(monitors.userId, userId)];
 
   // At most one verdict is in force per match per user — the partial unique
   // index on `feedback` is what guarantees it — so this join cannot turn one
@@ -402,8 +409,33 @@ export async function listMatches(
  * Returns undefined when no match has that id, so a caller can answer 404
  * rather than reporting a write that did not happen.
  */
+/**
+ * Who owns the monitor this match was scored against. US-017.
+ *
+ * `undefined` for a match that does not exist, so one query answers both
+ * questions a route addressed by a match id has to ask.
+ *
+ * Deliberately *not* folded into `recordVerdict`. `feedback` is one row per
+ * match per person on purpose — the schema keeps that so teams are a data
+ * change later — and refusing a verdict from anybody but the monitor's owner
+ * would take that capability away inside a ticket that defers the screens for
+ * it. So the rule lives at the route, where US-017's scoping lives, and the
+ * mechanism underneath is unchanged.
+ */
+export async function matchOwner(db: Database, matchId: string): Promise<string | undefined> {
+  const [row] = await db
+    .select({ userId: monitors.userId })
+    .from(matches)
+    .innerJoin(monitors, eq(matches.monitorId, monitors.id))
+    .where(eq(matches.id, matchId))
+    .limit(1);
+
+  return row?.userId;
+}
+
 export async function setMatchSaved(
   db: Database,
+  userId: string,
   matchId: string,
   saved: boolean,
   now: Date = new Date(),
@@ -414,7 +446,19 @@ export async function setMatchSaved(
     // would otherwise reshuffle under somebody's cursor when they pressed a
     // button they had already pressed.
     .set({ savedAt: saved ? sql`coalesce(${matches.savedAt}, ${now})` : null })
-    .where(eq(matches.id, matchId))
+    // Scoped in the same statement as the write, not checked before it. US-017.
+    // A read and then a write is two questions with a gap between them; one
+    // `WHERE` cannot be raced, and a match on somebody else's monitor simply
+    // updates no row and comes back as the 404 an unknown id already gets.
+    .where(
+      and(
+        eq(matches.id, matchId),
+        inArray(
+          matches.monitorId,
+          db.select({ id: monitors.id }).from(monitors).where(eq(monitors.userId, userId)),
+        ),
+      ),
+    )
     .returning({ id: matches.id, savedAt: matches.savedAt });
 
   return row ? { matchId: row.id, savedAt: row.savedAt } : undefined;

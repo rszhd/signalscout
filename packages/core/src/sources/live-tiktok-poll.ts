@@ -46,11 +46,11 @@ import {
 } from "../ai/config.js";
 import { createEmbedder } from "../ai/embed.js";
 import { createTriager } from "../ai/triage.js";
+import { ownerUserId } from "../auth/user.js";
 import { loadAiEnv } from "../config/env.js";
 import { createDatabase } from "../db/client.js";
 import { apiUsage, budgets, matches, monitors, posts } from "../db/schema.js";
 import { createLogger } from "../logger.js";
-import { singleUserId } from "../monitors/monitors.js";
 import { createClassifyStep } from "../worker/classify.js";
 import { createCollectStep } from "../worker/collect.js";
 import { credentialsFromStore } from "../worker/credentials.js";
@@ -107,6 +107,8 @@ const registry = createSourceRegistry({
   runtime: createSourceRuntime({ logger }),
 });
 
+/** The one account this instance has, or the pre-account id. US-067. */
+const owner = await ownerUserId(db);
 const credentialsFor = credentialsFromStore(db, undefined, process.env, logger);
 
 const started = Date.now();
@@ -135,9 +137,12 @@ const embedder =
     : undefined;
 
 const collect = createCollectStep({ registry, credentialsFor });
-const filter = createFilterStep({ ...(embedder ? { embedder } : {}), triager });
+const filter = createFilterStep({
+  embedderFor: async () => embedder,
+  triagerFor: async () => triager,
+});
 const replies = createRepliesStep({ registry, credentialsFor });
-const classify = createClassifyStep({ classifier });
+const classify = createClassifyStep({ classifierFor: async () => classifier });
 
 let unscored: string | undefined;
 
@@ -210,7 +215,7 @@ async function main(): Promise<void> {
   const [monitor] = await db
     .insert(monitors)
     .values({
-      userId: singleUserId,
+      userId: owner,
       name: "US-044 live TikTok poll",
       /**
        * A consumer product, because TikTok is a consumer platform.
@@ -243,7 +248,7 @@ async function main(): Promise<void> {
   const [connector] = registry.forPlatform(tikTokPlatformId);
 
   if (!connector) throw new Error("No YouTube connector is registered.");
-  if (!(await credentialsFor(connector))) {
+  if (!(await credentialsFor(connector, owner))) {
     throw new Error(
       `No credentials for ${connector.provider.id}. Set SOCIALCRAWL_API_KEY, or store one on the connections screen.`,
     );

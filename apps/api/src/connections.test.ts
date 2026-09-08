@@ -25,6 +25,7 @@ import {
   monitors,
   putSourceCredential,
   readEncryptionKey,
+  readSourceCredential,
   type SocialSource,
   sourceCredentials,
   sourceProviders,
@@ -32,6 +33,7 @@ import {
 import { createTestDatabase, type TestDatabase } from "@intentwatch/core/testing";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { buildServer } from "./server.js";
+import { asOwner, asUser, testOwner as owner } from "./testing.js";
 
 const logger = createLogger({ level: "silent", name: "test" });
 
@@ -102,6 +104,7 @@ describe("connecting a provider", () => {
     encryption?: Record<string, string | undefined>;
   }) {
     return buildServer({
+      session: asOwner,
       env: loadEnv({ DATABASE_URL: database.url }),
       logger,
       db,
@@ -113,7 +116,21 @@ describe("connecting a provider", () => {
   }
 
   async function stored() {
-    return listCredentialHints(db);
+    return listCredentialHints(db, owner);
+  }
+
+  /** The same build, signed in as somebody else. US-067. */
+  async function serverAs(userId: string) {
+    return buildServer({
+      session: asUser(userId),
+      env: loadEnv({ DATABASE_URL: database.url }),
+      logger,
+      db,
+      sources: [acceptsOnly(goodKey)],
+      environment: {},
+      encryption: { ENCRYPTION_KEY: encryptionKey },
+      queryGenerator: null,
+    });
   }
 
   /** Reddit through both of its providers, which is what a choice looks like. */
@@ -173,6 +190,7 @@ describe("connecting a provider", () => {
 
     it("shows a stored key as a mask, and says it is stored", async () => {
       await putSourceCredential(db, key, {
+        userId: owner,
         provider: "brightdata",
         field: "apiKey",
         value: goodKey,
@@ -381,6 +399,7 @@ describe("connecting a provider", () => {
     it("replaces a stored key with a new one", async () => {
       const second = "brd_0000111122223333";
       await putSourceCredential(db, key, {
+        userId: owner,
         provider: "brightdata",
         field: "apiKey",
         value: goodKey,
@@ -404,6 +423,7 @@ describe("connecting a provider", () => {
 
     it("deletes a stored key", async () => {
       await putSourceCredential(db, key, {
+        userId: owner,
         provider: "brightdata",
         field: "apiKey",
         value: goodKey,
@@ -576,6 +596,7 @@ describe("connecting a provider", () => {
 
     it("reports a key deleted in this process without a restart", async () => {
       await putSourceCredential(db, key, {
+        userId: owner,
         provider: "brightdata",
         field: "apiKey",
         value: goodKey,
@@ -806,6 +827,109 @@ describe("connecting a provider", () => {
 
         expect(answer.statusCode).toBe(404);
         expect(answer.json().message).toContain("reddit");
+      } finally {
+        await app.close();
+      }
+    });
+  });
+
+  /**
+   * What one account can do to another's keys, through the screen. US-067.
+   *
+   * `secrets/store.test.ts` asserts the same rule against the table. This is
+   * the other half, and it is the half a person can actually reach: until
+   * US-067 every signed-in account shared one row per provider, so the second
+   * person to paste a key silently replaced the first, and anybody could
+   * delete one and stop every monitor on the instance.
+   */
+  describe("one account's keys and another's", () => {
+    const other = "account-2";
+
+    async function storeFor(userId: string, value: string) {
+      await putSourceCredential(db, key, {
+        userId,
+        provider: "brightdata",
+        field: "apiKey",
+        value,
+      });
+    }
+
+    it("shows an account only its own keys", async () => {
+      await storeFor(owner, goodKey);
+      const app = await serverAs(other);
+
+      try {
+        const view = (await app.inject({ method: "GET", url: "/api/connections" })).json();
+        const provider = view.providers.find((one: { id: string }) => one.id === "brightdata");
+
+        expect(provider.ready).toBe(false);
+        expect(provider.credentials[0].stored).toBeFalsy();
+        // The mask is a fact about somebody else's key and must not be here.
+        expect(JSON.stringify(view)).not.toContain("••••");
+      } finally {
+        await app.close();
+      }
+    });
+
+    it("stores a second account's key beside the first, not over it", async () => {
+      await storeFor(owner, goodKey);
+      const app = await serverAs(other);
+
+      try {
+        const saved = await app.inject({
+          method: "PUT",
+          url: "/api/connections/brightdata",
+          payload: { credentials: { apiKey: goodKey } },
+        });
+
+        expect(saved.statusCode).toBe(200);
+
+        // Two rows. One overwritten is the fault this ticket exists for.
+        expect(await db.select().from(sourceCredentials)).toHaveLength(2);
+        expect(await readSourceCredential(db, key, owner, "brightdata", "apiKey")).toBe(goodKey);
+        expect(await readSourceCredential(db, key, other, "brightdata", "apiKey")).toBe(goodKey);
+      } finally {
+        await app.close();
+      }
+    });
+
+    it("refuses to delete a key it does not own, and deletes nothing", async () => {
+      await storeFor(owner, goodKey);
+      const app = await serverAs(other);
+
+      try {
+        const removed = await app.inject({
+          method: "DELETE",
+          url: "/api/connections/brightdata/apiKey",
+        });
+
+        // The same 404 an unstored field gets: from `other`'s side there is
+        // genuinely nothing stored, and saying otherwise would confirm that
+        // somebody else has connected this provider.
+        expect(removed.statusCode).toBe(404);
+        expect(await readSourceCredential(db, key, owner, "brightdata", "apiKey")).toBe(goodKey);
+      } finally {
+        await app.close();
+      }
+    });
+
+    /**
+     * The consequence a person meets, rather than a row in a table.
+     *
+     * An account with no key of its own, on an instance with no environment
+     * key, cannot start a monitor — and is told which key to paste rather than
+     * being left with a monitor that never polls.
+     */
+    it("tells an account with no key of its own what is missing", async () => {
+      await storeFor(owner, goodKey);
+      const app = await serverAs(other);
+
+      try {
+        const options = (await app.inject({ method: "GET", url: "/api/monitor-options" })).json();
+        const reddit = options.sources.find((one: { id: string }) => one.id === "reddit");
+
+        expect(reddit.ready).toBe(false);
+        expect(reddit.missingCredentials[0].environmentVariable).toBe("BRIGHTDATA_API_KEY");
       } finally {
         await app.close();
       }

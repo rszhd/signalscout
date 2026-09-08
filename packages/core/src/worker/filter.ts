@@ -64,7 +64,7 @@ export interface FilterOptions {
    * case on our default provider: Anthropic does not embed. The keyword stage
    * still runs and everything it keeps reaches the classifier.
    */
-  readonly embedder?: Embedder;
+  readonly embedderFor?: (userId: string) => Promise<Embedder | undefined>;
   /**
    * Absent only in a test that is not about triage.
    *
@@ -74,7 +74,7 @@ export interface FilterOptions {
    * stage that is off drops nothing, which is safe, but it also saves nothing,
    * and on a comment this is the only paid stage in front of the classifier.
    */
-  readonly triager?: Triager;
+  readonly triagerFor?: (userId: string) => Promise<Triager | undefined>;
 }
 
 /** A post as both stages read it, which is a row minus what neither needs. */
@@ -104,7 +104,10 @@ function vectorLiteral(embedding: readonly number[]): string {
   return `[${embedding.join(",")}]`;
 }
 
-export function createFilterStep({ embedder, triager }: FilterOptions = {}): Step<FilterPayload> {
+export function createFilterStep({
+  embedderFor,
+  triagerFor,
+}: FilterOptions = {}): Step<FilterPayload> {
   return async function filter(
     { monitorId, postIds },
     { db, boss, logger }: StepContext,
@@ -124,6 +127,18 @@ export function createFilterStep({ embedder, triager }: FilterOptions = {}): Ste
       logger.warn({ monitorId }, "pre-filter skipped: the monitor is gone");
       return;
     }
+
+    /**
+     * The two paid stages, on this monitor owner's key. US-068.
+     *
+     * Both may be undefined, and both already have a fail-open path for that:
+     * no embedder means nothing is dropped on similarity, no triager means
+     * nothing is dropped on triage. An account with no model settings
+     * therefore filters on keywords alone, which is the same thing an instance
+     * with no key has always done.
+     */
+    const embedder = await embedderFor?.(monitor.userId);
+    const triager = await triagerFor?.(monitor.userId);
 
     /** Everything that is still going to the model, and why the rest is not. */
     const deliver = async (survivors: readonly Candidate[], drops: readonly FilterDrop[]) => {

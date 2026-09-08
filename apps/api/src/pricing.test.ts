@@ -12,13 +12,18 @@ import {
   createDatabase,
   createLogger,
   fakeSourceDefinition,
+  feedback,
   loadEnv,
+  matches,
+  monitors,
+  posts,
   sourceProviders,
 } from "@intentwatch/core";
 import { createTestDatabase, type TestDatabase } from "@intentwatch/core/testing";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { comparedPosts, formatMicros } from "./pricing.js";
 import { buildServer } from "./server.js";
+import { asOwner, asUser, testOwner as pageOwner } from "./testing.js";
 
 /**
  * Two providers for one platform, priced in different units.
@@ -128,6 +133,7 @@ describe("the pricing route", () => {
     environment: Record<string, string | undefined> = {},
   ): Promise<PricingBody> {
     const app = await buildServer({
+      session: asOwner,
       env: loadEnv({ DATABASE_URL: database.url }),
       logger,
       db,
@@ -244,6 +250,7 @@ describe("what the deployment has really spent", () => {
     // switched away from last month must not show as free.
     await db.insert(apiUsage).values([
       {
+        userId: pageOwner,
         source: "linkedin",
         provider: "apify",
         day: "2026-09-06",
@@ -251,6 +258,7 @@ describe("what the deployment has really spent", () => {
         estimatedCostMicros: 20_000,
       },
       {
+        userId: pageOwner,
         source: "linkedin",
         provider: "apify",
         day: "2026-09-07",
@@ -258,6 +266,7 @@ describe("what the deployment has really spent", () => {
         estimatedCostMicros: 52_000,
       },
       {
+        userId: pageOwner,
         source: "linkedin",
         provider: "socialcrawl",
         day: "2026-09-05",
@@ -267,6 +276,7 @@ describe("what the deployment has really spent", () => {
     ]);
 
     const app = await buildServer({
+      session: asOwner,
       env: loadEnv({ DATABASE_URL: database.url }),
       logger,
       db,
@@ -290,6 +300,7 @@ describe("what the deployment has really spent", () => {
 
   it("reports nothing spent as zero rather than leaving it out", async () => {
     const app = await buildServer({
+      session: asOwner,
       env: loadEnv({ DATABASE_URL: database.url }),
       logger,
       db,
@@ -330,6 +341,7 @@ describe("what each pair returned", () => {
     // 0 of 0 is not zero per cent. A rate here would read as a measurement of
     // a provider nobody has used.
     const app = await buildServer({
+      session: asOwner,
       env: loadEnv({ DATABASE_URL: database.url }),
       logger,
       db,
@@ -357,6 +369,7 @@ describe("what each pair returned", () => {
 
   it("reports what a connector can find, from its own declaration", async () => {
     const app = await buildServer({
+      session: asOwner,
       env: loadEnv({ DATABASE_URL: database.url }),
       logger,
       db,
@@ -383,6 +396,7 @@ describe("what each pair returned", () => {
 
   it("counts the verdicts, so the page can say how far to trust a match", async () => {
     const app = await buildServer({
+      session: asOwner,
       env: loadEnv({ DATABASE_URL: database.url }),
       logger,
       db,
@@ -399,5 +413,137 @@ describe("what each pair returned", () => {
     } finally {
       await app.close();
     }
+  });
+});
+
+/**
+ * What a brand-new account sees on this page. BUG-009.
+ *
+ * Reported from a running instance: a person who had just registered and
+ * created nothing was shown match and spend figures. They were somebody else's.
+ *
+ * US-067 scoped the *keys* on this route and left three reads unscoped beside
+ * them — the spend, the posts-and-matches, and the verdict count. That is the
+ * shape of this whole class of bug: the route was edited, the obvious half was
+ * fixed, and the numbers underneath kept answering for the instance.
+ */
+describe("what one account sees of another's numbers", () => {
+  let database: TestDatabase;
+  let db: Database;
+  let close: () => Promise<void>;
+
+  const owner = "account-1";
+  const newcomer = "account-2";
+
+  beforeAll(async () => {
+    database = await createTestDatabase("pricing_scope");
+    ({ db, close } = createDatabase(database.url));
+  }, 60_000);
+
+  afterAll(async () => {
+    await close?.();
+    await database?.drop();
+  });
+
+  /** One monitor, one post it matched, one verdict on it, and the bill. */
+  async function seedFor(userId: string) {
+    const [monitor] = await db
+      .insert(monitors)
+      .values({
+        userId,
+        name: `${userId}'s monitor`,
+        product: "A test runner",
+        idealCustomer: "QA leads",
+        problem: "Flaky tests",
+        sources: ["linkedin"],
+      })
+      .returning({ id: monitors.id });
+
+    const [post] = await db
+      .insert(posts)
+      .values({
+        source: "linkedin",
+        provider: "socialcrawl",
+        externalId: `urn:${userId}`,
+        url: `https://linkedin.com/feed/update/${userId}`,
+        excerpt: "Our end-to-end suite fails at random.",
+        postedAt: new Date(),
+      })
+      .returning({ id: posts.id });
+
+    const [match] = await db
+      .insert(matches)
+      .values({
+        monitorId: monitor?.id ?? "",
+        postId: post?.id ?? "",
+        score: 71,
+        relevance: 90,
+        problemFit: 98,
+        icpFit: 91,
+        intent: 94,
+        urgency: 70,
+        intentType: "problem",
+        reasons: ["A QA lead with no automation"],
+      })
+      .returning({ id: matches.id });
+
+    await db.insert(feedback).values({
+      matchId: match?.id ?? "",
+      monitorId: monitor?.id ?? "",
+      monitorVersion: 1,
+      userId,
+      verdict: "good",
+    });
+
+    await db.insert(apiUsage).values({
+      userId,
+      monitorId: monitor?.id ?? "",
+      source: "linkedin",
+      provider: "socialcrawl",
+      day: "2026-09-08",
+      units: 10,
+      estimatedCostMicros: 81_180,
+    });
+  }
+
+  async function pricingAs(userId: string) {
+    const app = await buildServer({
+      session: asUser(userId),
+      env: loadEnv({ DATABASE_URL: database.url }),
+      logger,
+      db,
+      sources: [socialCrawlLinkedIn()],
+      environment: {},
+      queryGenerator: null,
+    });
+
+    try {
+      return (await app.inject({ method: "GET", url: "/api/pricing" })).json();
+    } finally {
+      await app.close();
+    }
+  }
+
+  it("shows an account that has created nothing that it has nothing", async () => {
+    await seedFor(owner);
+
+    const mine = await pricingAs(owner);
+    const theirs = await pricingAs(newcomer);
+
+    const minePair = mine.platforms[0].connectors[0];
+    const theirsPair = theirs.platforms[0].connectors[0];
+
+    // The owner sees their own run.
+    expect(minePair.returned.posts).toBe(1);
+    expect(minePair.returned.matches).toBe(1);
+    expect(minePair.spent.units).toBe(10);
+    expect(mine.verdicts).toBe(1);
+
+    // The newcomer sees none of it. Every one of these was the owner's number
+    // before BUG-009 was fixed.
+    expect(theirsPair.returned.posts).toBe(0);
+    expect(theirsPair.returned.matches).toBe(0);
+    expect(theirsPair.spent.units).toBe(0);
+    expect(theirs.verdicts).toBe(0);
   });
 });

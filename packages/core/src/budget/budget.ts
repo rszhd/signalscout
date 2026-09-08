@@ -125,6 +125,14 @@ function toMicros(value: unknown): number {
 
 export interface RecordSourceUsageInput {
   /**
+   * Which account the money is spent by. BUG-009.
+   *
+   * Required, and separate from `monitorId` below, which is null for a cost
+   * test — money bought before a monitor exists. Without this, that spend
+   * belongs to nobody and shows on everybody's page.
+   */
+  readonly userId: string;
+  /**
    * Null for a call made before any monitor existed — US-014's cost test.
    * The row is on the bill and on no monitor's cap, which is what the column
    * says and what docs/costs.md tells the user.
@@ -162,6 +170,7 @@ export interface RecordSourceUsageInput {
 export async function recordSourceUsage(
   db: Pick<Database, "insert">,
   {
+    userId,
     monitorId,
     source,
     provider,
@@ -174,9 +183,15 @@ export async function recordSourceUsage(
 
   await db
     .insert(apiUsage)
-    .values({ monitorId, source, provider, day: dayOf(now), units, estimatedCostMicros })
+    .values({ userId, monitorId, source, provider, day: dayOf(now), units, estimatedCostMicros })
     .onConflictDoUpdate({
-      target: [apiUsage.monitorId, apiUsage.source, apiUsage.provider, apiUsage.day],
+      target: [
+        apiUsage.userId,
+        apiUsage.monitorId,
+        apiUsage.source,
+        apiUsage.provider,
+        apiUsage.day,
+      ],
       set: {
         units: sql`${apiUsage.units} + ${units}`,
         estimatedCostMicros: sql`${apiUsage.estimatedCostMicros} + ${estimatedCostMicros}`,
@@ -302,6 +317,46 @@ export async function spendByMonitor(
   }
 
   return spend;
+}
+
+/** What one account has spent through one platform-and-provider pair. */
+export interface PairSpend {
+  readonly source: Source;
+  readonly provider: Provider;
+  readonly units: number;
+  readonly micros: number;
+}
+
+/**
+ * One account's whole spend, per pair, over all time.
+ *
+ * All time rather than this month, and the pricing page is why: a cap is
+ * monthly and that page is not a cap. Somebody comparing two providers wants
+ * everything they have ever paid each one, and a provider switched away from
+ * last month would otherwise show as free.
+ *
+ * Scoped to the account by BUG-009, which is also why it lives here rather
+ * than in the route: `apps/api` imports no `drizzle-orm`, so a query written
+ * there is a query written twice.
+ */
+export async function spendByPair(db: Database, userId: string): Promise<PairSpend[]> {
+  const rows = await db
+    .select({
+      source: apiUsage.source,
+      provider: apiUsage.provider,
+      units: sql<number>`sum(${apiUsage.units})::bigint`,
+      micros: sql<number>`sum(${apiUsage.estimatedCostMicros})::bigint`,
+    })
+    .from(apiUsage)
+    .where(eq(apiUsage.userId, userId))
+    .groupBy(apiUsage.source, apiUsage.provider);
+
+  return rows.map((row) => ({
+    source: row.source,
+    provider: row.provider,
+    units: Number(row.units ?? 0),
+    micros: Number(row.micros ?? 0),
+  }));
 }
 
 /** Which provider last collected one platform for one monitor, and when. */

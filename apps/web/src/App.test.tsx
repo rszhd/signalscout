@@ -46,6 +46,16 @@ describe("the application screens", () => {
       "fetch",
       vi.fn(async (request: string | URL | Request) => {
         const url = typeof request === "string" ? request : request.toString();
+        // US-017 put every screen behind a session. These cases are about
+        // which screen the shell shows, so the person asking is signed in.
+        if (url === "/api/auth-status") {
+          return json({
+            firstRun: false,
+            signUpOpen: false,
+            signedIn: true,
+            account: { name: "The owner", email: "owner@example.com" },
+          });
+        }
         if (url === "/api/monitor-options") return json(options);
         if (url === "/api/monitors") return json([]);
         if (url.startsWith("/api/matches")) {
@@ -64,6 +74,21 @@ describe("the application screens", () => {
     await screen?.unmount();
     vi.unstubAllGlobals();
     globalThis.location.hash = "";
+  });
+
+  /**
+   * The sidebar says which account is in use. US-069.
+   *
+   * It carried a hardcoded `Self-hosted` pill before, which was written when
+   * there were no accounts and is false on an instance taking registrations —
+   * and it sat in the one place a person looks to tell two accounts apart.
+   */
+  it("shows the signed-in account where the self-hosted label used to be", async () => {
+    screen = await mount(<App />);
+
+    expect(screen.container.textContent).toContain("The owner");
+    expect(screen.container.textContent).toContain("owner@example.com");
+    expect(screen.container.textContent).not.toContain("Self-hosted");
   });
 
   /**
@@ -171,7 +196,13 @@ describe("the application screens", () => {
     // Pricing joins Connections here, and for the same reason: both are
     // machine-level screens — one set of keys, one set of prices, every
     // project — so neither carries one. US-058.
-    expect(links).toEqual(["#/projects", "#/connections", "#/providers", "#/reply-voices"]);
+    expect(links).toEqual([
+      "#/projects",
+      "#/connections",
+      "#/providers",
+      "#/reply-voices",
+      "#/models",
+    ]);
   });
 
   /**
@@ -193,7 +224,13 @@ describe("the application screens", () => {
     // A monitor is made inside a project and prefills its four answers from
     // one, so offering the form here would make an unfiled monitor — the state
     // migration 0038 emptied out.
-    expect(links).toEqual(["#/projects", "#/connections", "#/providers", "#/reply-voices"]);
+    expect(links).toEqual([
+      "#/projects",
+      "#/connections",
+      "#/providers",
+      "#/reply-voices",
+      "#/models",
+    ]);
   });
 
   it("carries the project through every link once one is chosen", async () => {
@@ -261,6 +298,7 @@ describe("the application screens", () => {
       "#/connections",
       "#/providers",
       "#/reply-voices",
+      "#/models",
       "#/monitors/new?project=p1",
     ]);
     expect(screen.container.textContent).not.toContain("Settings");

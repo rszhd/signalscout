@@ -71,7 +71,7 @@ interface MatchPage {
 interface MonitorSummary {
   id: string;
   name: string;
-  /** Optional, for BUG-008's reason: an older API does not send it. US-045. */
+  /** Optional, for BUG-009's reason: an older API does not send it. US-045. */
   projectId?: string | null;
 }
 

@@ -1,0 +1,115 @@
+/* The signed-out screen. One card, centred, and nothing else on the page. */
+.login-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: var(--space-6);
+  background: var(--background);
+}
+
+.login-card {
+  width: min(420px, 100%);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+  padding: var(--space-8);
+}
+
+.login-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: var(--space-6);
+}
+
+.login-card h1 {
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-md);
+}
+
+.login-card .page-subtitle {
+  margin: 0 0 var(--space-6);
+}
+
+.login-card form {
+  gap: var(--space-4);
+}
+
+.login-card .primary-button {
+  width: 100%;
+  justify-content: center;
+  margin-top: var(--space-2);
+}
+
+/* The way between the two forms. A sentence, not a second button competing
+   with the one that submits. */
+.login-switch {
+  margin: var(--space-5) 0 0;
+  color: var(--muted);
+  font-size: var(--text-xs);
+  text-align: center;
+}
+
+.login-switch button {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--accent-text);
+  font-size: inherit;
+  cursor: pointer;
+}
+
+.login-switch button:hover {
+  text-decoration: underline;
+}
+
+.login-note {
+  margin: var(--space-6) 0 0;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: var(--text-xs);
+}
+
+/* In the sidebar, beside the self-hosted pill. Quiet: it is rarely the thing
+   somebody came to press, and it ends the session when it is. */
+.sign-out {
+  background: none;
+  border: 0;
+  padding: var(--space-2) 0 0;
+  color: var(--muted);
+  font-size: var(--text-xs);
+  text-align: left;
+  cursor: pointer;
+}
+
+.sign-out:hover {
+  color: var(--ink);
+  text-decoration: underline;
+}
+
+/* Who is signed in, at the foot of the sidebar. The email is the part that
+   tells two accounts apart, so it is shown in full and allowed to wrap rather
+   than being cut with an ellipsis. */
+.signed-in-as {
+  display: grid;
+  gap: 2px;
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--line);
+  line-height: 1.35;
+}
+
+.signed-in-as strong {
+  color: var(--ink);
+  font-size: var(--text-xs);
+  font-weight: 600;
+}
+
+.signed-in-as span {
+  color: var(--muted);
+  font-size: var(--text-xs);
+  overflow-wrap: anywhere;
+}

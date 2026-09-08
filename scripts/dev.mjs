@@ -7,7 +7,8 @@
  * is a step that belongs in the script.
  */
 import { spawn } from "node:child_process";
-import { copyFileSync, existsSync, readFileSync } from "node:fs";
+import { randomBytes } from "node:crypto";
+import { appendFileSync, copyFileSync, existsSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
@@ -43,6 +44,22 @@ const envPath = `${root}.env`;
 if (!existsSync(envPath)) {
   copyFileSync(`${root}.env.example`, envPath);
   console.log("Created .env from .env.example.");
+}
+
+/**
+ * A session secret for this checkout, generated once.
+ *
+ * `.env.example` is committed, so it cannot carry one: a secret in git is a
+ * secret every reader of this repository holds. Generated here instead, and
+ * appended rather than replacing anything, so a value somebody already set
+ * survives.
+ *
+ * The application refuses to start without it. Making a developer read that
+ * error on their first `pnpm dev` teaches nothing they need on day one.
+ */
+if (!readEnvFile(envPath).AUTH_SECRET) {
+  appendFileSync(envPath, `\nAUTH_SECRET=${randomBytes(32).toString("base64")}\n`);
+  console.log("Generated AUTH_SECRET in .env.");
 }
 
 const env = {

@@ -67,7 +67,15 @@ import type { Step, StepContext } from "./steps.js";
 export const maxClassificationAttempts = 3;
 
 export interface ClassifyOptions {
-  readonly classifier: Classifier;
+  /**
+   * The classifier for one account, or undefined when that account has no
+   * usable model settings. US-068.
+   *
+   * A function of the owner and not a single client, because one worker
+   * process serves every account on the instance and each may pay with its own
+   * key. `runtime.ts` caches per owner; this step only asks.
+   */
+  readonly classifierFor: (userId: string) => Promise<Classifier | undefined>;
 }
 
 function profileOf(monitor: typeof monitors.$inferSelect): MonitorProfile {
@@ -79,7 +87,7 @@ function profileOf(monitor: typeof monitors.$inferSelect): MonitorProfile {
   };
 }
 
-export function createClassifyStep({ classifier }: ClassifyOptions): Step<ClassifyPayload> {
+export function createClassifyStep({ classifierFor }: ClassifyOptions): Step<ClassifyPayload> {
   return async function classify(
     { monitorId, postIds },
     { db, boss, logger }: StepContext,
@@ -94,6 +102,36 @@ export function createClassifyStep({ classifier }: ClassifyOptions): Step<Classi
     if (!monitor) {
       // Deleted between the poll and this job. Retrying would never find it.
       logger.warn({ monitorId }, "classification skipped: the monitor is gone");
+      return;
+    }
+
+    /**
+     * The model this monitor's owner pays for. US-068.
+     *
+     * Read after the monitor, because the owner is on it, and refused here
+     * rather than at the first call: a monitor whose owner has no usable model
+     * settings must not consume its posts and write nothing. The posts keep
+     * their place and the next poll asks again, which is what happens today
+     * when the instance itself has no key.
+     */
+    const classifier = await classifierFor(monitor.userId);
+
+    if (!classifier) {
+      /**
+       * It logs an error and completes rather than throwing. A missing key is
+       * not transient: retrying four times and dead-lettering the job buries
+       * the one sentence the user has to read. `worker/collect.ts` treats a
+       * missing source key the same way, for the same reason.
+       *
+       * The sentence names both places a key can come from, because either
+       * fixes it and only one of them is on a screen.
+       */
+      logger.error(
+        { monitorId, posts: postIds.length },
+        "classification skipped: no model is configured. Set one on the Models screen, " +
+          "or set AI_API_KEY, or AI_PROVIDER=ollama.",
+      );
+      await boss.send(notifyQueue, { monitorId, matchIds: [] });
       return;
     }
 

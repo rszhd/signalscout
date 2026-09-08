@@ -78,7 +78,7 @@ interface Monitor {
   /**
    * The project this monitor came out of. US-045.
    *
-   * Optional as well as nullable, for the reason BUG-008 taught: a browser
+   * Optional as well as nullable, for the reason BUG-009 taught: a browser
    * holds a build for as long as its tab is open and talks to whatever API is
    * deployed, so a field this screen did not show yesterday can simply be
    * absent.

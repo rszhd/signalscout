@@ -22,10 +22,12 @@ import {
   triageConfigFromEnvironment,
 } from "../ai/config.js";
 import { createEmbedder, type Embedder } from "../ai/embed.js";
+import { readAiEnvironment as readAiSettingsEnvironment } from "../ai/settings.js";
 import { createTriager, type Triager } from "../ai/triage.js";
 import { loadAiEnv, loadNotificationEnv } from "../config/env.js";
 import { createDatabase, type Database, poolOptions } from "../db/client.js";
 import type { Logger } from "../logger.js";
+import { configureNetworking } from "../net.js";
 import type { NotificationTransport } from "../notifications/deliver.js";
 import { createNotificationTransport } from "../notifications/transport.js";
 import { assertStoredCredentialsAreReadable } from "../secrets/store.js";
@@ -63,7 +65,7 @@ import {
 import { createReconcileStep } from "./reconcile.js";
 import { createRepliesStep } from "./replies.js";
 import { enqueueDuePolls } from "./schedule.js";
-import { type Step, type StepContext, unconfiguredClassify, type WorkerSteps } from "./steps.js";
+import type { Step, StepContext, WorkerSteps } from "./steps.js";
 
 export type HeartbeatPayload = Record<string, never>;
 
@@ -316,6 +318,10 @@ export async function startWorker({
   pollingIntervalSeconds,
   notificationTransport,
 }: StartWorkerOptions): Promise<WorkerHandle> {
+  // Before any provider is called. See `net.ts`: Node's 250ms per-address
+  // connect budget is shorter than several providers take to answer.
+  configureNetworking();
+
   const { db, close } = createDatabase(databaseUrl);
 
   // Before anything is queued. A stored credential this process cannot read
@@ -366,6 +372,72 @@ export async function startWorker({
     return aiEnvironment;
   };
 
+  /**
+   * The three model clients an account uses. US-068.
+   *
+   * One worker process serves every account, and each may pay with its own key,
+   * so these are built per owner rather than once at boot. What is *not* per
+   * owner is any of the fallback logic: `readAiSettings` lays an account's rows
+   * over the instance's environment and hands an ordinary `AiEnvironment` to
+   * the same three functions that have always read it.
+   *
+   * **Cached, and the cache is what makes this affordable.** Building a client
+   * decrypts a key and constructs an SDK object; a poll of fifty posts would
+   * otherwise do that fifty times. The cache is per process and lives as long
+   * as the worker, which means **a key changed on the screen reaches the worker
+   * on its next restart and not before**. That is the one real cost of this
+   * design and it is written into docs/secrets.md rather than left to be
+   * discovered.
+   *
+   * An injected client wins over all of it. Every test passes one, and so does
+   * every live script, so neither pays for a database read per job.
+   */
+  const modelCache = new Map<
+    string,
+    {
+      classifier: Classifier | undefined;
+      embedder: Embedder | undefined;
+      triager: Triager | undefined;
+    }
+  >();
+
+  async function modelsFor(userId: string) {
+    const cached = modelCache.get(userId);
+    if (cached) return cached;
+
+    const instance = readAiEnvironment();
+    // An account with no rows gets the instance's environment back, so the
+    // common install pays one small query per owner per process and nothing
+    // else changes about it.
+    const mine = await readAiSettingsEnvironment(db, userId, instance);
+
+    const own = {
+      classifier:
+        classifier ?? classifierFromEnvironment(aiConfig ?? aiConfigFromEnvironment(mine), logger),
+      embedder:
+        embedder ??
+        embedderFromEnvironment(embeddingConfig ?? embeddingConfigFromEnvironment(mine), logger),
+      triager: undefined as Triager | undefined,
+    };
+
+    own.triager =
+      triager ??
+      triagerFromEnvironment(
+        triageConfig ?? triageConfigFromEnvironment(mine),
+        own.classifier?.model,
+        logger,
+      );
+
+    modelCache.set(userId, own);
+    return own;
+  }
+
+  /**
+   * The instance's own clients, for the boot line below and for nothing else.
+   *
+   * Built from the environment alone, so the log says what this deployment is
+   * configured with rather than what one account happens to have chosen.
+   */
   const model =
     classifier ??
     classifierFromEnvironment(aiConfig ?? aiConfigFromEnvironment(readAiEnvironment()), logger);
@@ -390,10 +462,16 @@ export async function startWorker({
       steps.reconcile ?? createReconcileStep({ registry: sources, credentialsFor: lookup }),
     poll: steps.poll ?? createCollectStep({ registry: sources, credentialsFor: lookup }),
     estimate: steps.estimate ?? createEstimateStep({ registry: sources, credentialsFor: lookup }),
-    filter: steps.filter ?? createFilterStep({ embedder: embedding, triager: triage }),
+    filter:
+      steps.filter ??
+      createFilterStep({
+        embedderFor: async (userId) => (await modelsFor(userId)).embedder,
+        triagerFor: async (userId) => (await modelsFor(userId)).triager,
+      }),
     replies: steps.replies ?? createRepliesStep({ registry: sources, credentialsFor: lookup }),
     classify:
-      steps.classify ?? (model ? createClassifyStep({ classifier: model }) : unconfiguredClassify),
+      steps.classify ??
+      createClassifyStep({ classifierFor: async (userId) => (await modelsFor(userId)).classifier }),
     notify:
       steps.notify ??
       createNotifyStep(notificationTransport ?? createNotificationTransport(loadNotificationEnv())),

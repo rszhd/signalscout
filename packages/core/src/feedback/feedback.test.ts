@@ -12,9 +12,10 @@
  * the story in each case, not computed from the code under test.
  */
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
+import { unclaimedUserId } from "../auth/user.js";
 import { createDatabase, type Database } from "../db/client.js";
 import { feedback, matches, monitors, posts } from "../db/schema.js";
-import { singleUserId, updateMonitor } from "../monitors/monitors.js";
+import { updateMonitor } from "../monitors/monitors.js";
 import { createTestDatabase, type TestDatabase } from "../testing/database.js";
 import { currentVerdicts, exportFeedback, recordVerdict, verdictCounts } from "./feedback.js";
 
@@ -38,7 +39,7 @@ describe("verdicts on a match", () => {
       await db
         .insert(monitors)
         .values({
-          userId: singleUserId,
+          userId: unclaimedUserId,
           name,
           product: "A test runner that records browser flows instead of coding them",
           idealCustomer: "Small SaaS teams with no dedicated QA engineer",
@@ -113,11 +114,11 @@ describe("verdicts on a match", () => {
   it("stores the user, the match, the monitor and a timestamp", async () => {
     const matchId = await seedMatch(monitorId);
 
-    const recorded = await recordVerdict(db, { matchId, verdict: "good" });
+    const recorded = await recordVerdict(db, { matchId, userId: unclaimedUserId, verdict: "good" });
 
     expect(recorded?.verdict).toBe("good");
     expect(recorded?.monitorId).toBe(monitorId);
-    expect(recorded?.userId).toBe(singleUserId);
+    expect(recorded?.userId).toBe(unclaimedUserId);
     expect(recorded?.createdAt).toBeInstanceOf(Date);
     expect(recorded?.changed).toBe(false);
   });
@@ -125,6 +126,7 @@ describe("verdicts on a match", () => {
   it("answers with nothing when no match has that id", async () => {
     const recorded = await recordVerdict(db, {
       matchId: "00000000-0000-4000-8000-000000000000",
+      userId: unclaimedUserId,
       verdict: "good",
     });
 
@@ -134,8 +136,12 @@ describe("verdicts on a match", () => {
   it("records a change of mind instead of overwriting the first answer", async () => {
     const matchId = await seedMatch(monitorId);
 
-    await recordVerdict(db, { matchId, verdict: "good" });
-    const second = await recordVerdict(db, { matchId, verdict: "not_relevant" });
+    await recordVerdict(db, { matchId, userId: unclaimedUserId, verdict: "good" });
+    const second = await recordVerdict(db, {
+      matchId,
+      userId: unclaimedUserId,
+      verdict: "not_relevant",
+    });
 
     const rows = await db.select().from(feedback);
 
@@ -150,8 +156,8 @@ describe("verdicts on a match", () => {
   it("writes nothing when the same verdict is given twice", async () => {
     const matchId = await seedMatch(monitorId);
 
-    const first = await recordVerdict(db, { matchId, verdict: "good" });
-    const again = await recordVerdict(db, { matchId, verdict: "good" });
+    const first = await recordVerdict(db, { matchId, userId: unclaimedUserId, verdict: "good" });
+    const again = await recordVerdict(db, { matchId, userId: unclaimedUserId, verdict: "good" });
 
     // A second press of the same button is not a change of mind, and a history
     // that recorded it as one would report a double click as one.
@@ -163,10 +169,12 @@ describe("verdicts on a match", () => {
   it("keeps one verdict in force per person, whoever else has judged", async () => {
     const matchId = await seedMatch(monitorId);
 
-    await recordVerdict(db, { matchId, verdict: "good" });
+    await recordVerdict(db, { matchId, userId: unclaimedUserId, verdict: "good" });
     await recordVerdict(db, { matchId, userId: "someone-else", verdict: "not_relevant" });
 
-    expect(await currentVerdicts(db, [matchId])).toEqual(new Map([[matchId, "good"]]));
+    expect(await currentVerdicts(db, [matchId], unclaimedUserId)).toEqual(
+      new Map([[matchId, "good"]]),
+    );
     expect(await currentVerdicts(db, [matchId], "someone-else")).toEqual(
       new Map([[matchId, "not_relevant"]]),
     );
@@ -176,9 +184,9 @@ describe("verdicts on a match", () => {
     const judged = await seedMatch(monitorId);
     const unjudged = await seedMatch(monitorId);
 
-    await recordVerdict(db, { matchId: judged, verdict: "good" });
+    await recordVerdict(db, { matchId: judged, userId: unclaimedUserId, verdict: "good" });
 
-    const verdicts = await currentVerdicts(db, [judged, unjudged]);
+    const verdicts = await currentVerdicts(db, [judged, unjudged], unclaimedUserId);
 
     expect(verdicts.get(unjudged)).toBeUndefined();
     expect(verdicts.size).toBe(1);
@@ -188,13 +196,17 @@ describe("verdicts on a match", () => {
     it("carries the monitor's version at the time", async () => {
       const first = await seedMatch(monitorId);
 
-      await recordVerdict(db, { matchId: first, verdict: "good" });
+      await recordVerdict(db, { matchId: first, userId: unclaimedUserId, verdict: "good" });
 
       await updateMonitor(db, monitorId, {
         problem: "Nobody can tell which release broke the checkout flow",
       });
       const second = await seedMatch(monitorId);
-      const later = await recordVerdict(db, { matchId: second, verdict: "good" });
+      const later = await recordVerdict(db, {
+        matchId: second,
+        userId: unclaimedUserId,
+        verdict: "good",
+      });
 
       const rows = await db.select().from(feedback);
 
@@ -205,7 +217,7 @@ describe("verdicts on a match", () => {
     it("leaves the first verdict's version alone when the monitor is edited", async () => {
       const matchId = await seedMatch(monitorId);
 
-      await recordVerdict(db, { matchId, verdict: "good" });
+      await recordVerdict(db, { matchId, userId: unclaimedUserId, verdict: "good" });
       await updateMonitor(db, monitorId, { product: "Something completely different" });
 
       const [row] = await db.select().from(feedback);
@@ -223,10 +235,14 @@ describe("verdicts on a match", () => {
       const bad = await seedMatch(monitorId);
       const elsewhere = await seedMatch(otherMonitorId);
 
-      await recordVerdict(db, { matchId: good, verdict: "good" });
-      await recordVerdict(db, { matchId: alsoGood, verdict: "good" });
-      await recordVerdict(db, { matchId: bad, verdict: "not_relevant" });
-      await recordVerdict(db, { matchId: elsewhere, verdict: "not_relevant" });
+      await recordVerdict(db, { matchId: good, userId: unclaimedUserId, verdict: "good" });
+      await recordVerdict(db, { matchId: alsoGood, userId: unclaimedUserId, verdict: "good" });
+      await recordVerdict(db, { matchId: bad, userId: unclaimedUserId, verdict: "not_relevant" });
+      await recordVerdict(db, {
+        matchId: elsewhere,
+        userId: unclaimedUserId,
+        verdict: "not_relevant",
+      });
 
       const counts = await verdictCounts(db);
 
@@ -237,8 +253,8 @@ describe("verdicts on a match", () => {
     it("does not count a verdict that was changed", async () => {
       const matchId = await seedMatch(monitorId);
 
-      await recordVerdict(db, { matchId, verdict: "good" });
-      await recordVerdict(db, { matchId, verdict: "not_relevant" });
+      await recordVerdict(db, { matchId, userId: unclaimedUserId, verdict: "good" });
+      await recordVerdict(db, { matchId, userId: unclaimedUserId, verdict: "not_relevant" });
 
       // One person, one match, one opinion. A count over the history would
       // report this as one good lead and one bad one.
@@ -259,10 +275,10 @@ describe("verdicts on a match", () => {
     it("carries the history and the post's own identity", async () => {
       const matchId = await seedMatch(monitorId, 91);
 
-      await recordVerdict(db, { matchId, verdict: "good" });
-      await recordVerdict(db, { matchId, verdict: "not_relevant" });
+      await recordVerdict(db, { matchId, userId: unclaimedUserId, verdict: "good" });
+      await recordVerdict(db, { matchId, userId: unclaimedUserId, verdict: "not_relevant" });
 
-      const exported = await exportFeedback(db);
+      const exported = await exportFeedback(db, unclaimedUserId);
 
       expect(exported).toHaveLength(2);
 
@@ -283,10 +299,10 @@ describe("verdicts on a match", () => {
     it("exports one person's verdicts and not another's", async () => {
       const matchId = await seedMatch(monitorId);
 
-      await recordVerdict(db, { matchId, verdict: "good" });
+      await recordVerdict(db, { matchId, userId: unclaimedUserId, verdict: "good" });
       await recordVerdict(db, { matchId, userId: "someone-else", verdict: "not_relevant" });
 
-      expect(await exportFeedback(db)).toHaveLength(1);
+      expect(await exportFeedback(db, unclaimedUserId)).toHaveLength(1);
       expect(await exportFeedback(db, "someone-else")).toHaveLength(1);
     });
   });

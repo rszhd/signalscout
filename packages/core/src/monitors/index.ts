@@ -19,7 +19,6 @@ export {
   type ResumeResult,
   redefinesTheMonitor,
   resumeMonitor,
-  singleUserId,
   startBlockers,
   type UpdateMonitorInput,
   updateMonitor,

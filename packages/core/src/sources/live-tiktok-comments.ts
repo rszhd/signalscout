@@ -126,8 +126,11 @@ const embedder =
     ? createEmbedder({ config: embeddingConfig })
     : undefined;
 
-const filter = createFilterStep({ ...(embedder ? { embedder } : {}), triager });
-const classify = createClassifyStep({ classifier });
+const filter = createFilterStep({
+  embedderFor: async () => embedder,
+  triagerFor: async () => triager,
+});
+const classify = createClassifyStep({ classifierFor: async () => classifier });
 
 let unscored: string | undefined;
 

@@ -48,6 +48,7 @@ import {
 } from "../ai/config.js";
 import { createEmbedder } from "../ai/embed.js";
 import { createTriager } from "../ai/triage.js";
+import { ownerUserId } from "../auth/user.js";
 import { recordSourceUsage } from "../budget/budget.js";
 import { loadAiEnv } from "../config/env.js";
 import { createDatabase } from "../db/client.js";
@@ -129,6 +130,8 @@ const registry = createSourceRegistry({
   definitions: builtInSources,
   runtime: createSourceRuntime({ logger }),
 });
+/** The one account this instance has, or the pre-account id. US-067. */
+const owner = await ownerUserId(db);
 const credentialsFor = credentialsFromStore(db, undefined, process.env, logger);
 
 const classifier = createClassifier({ config: aiConfig });
@@ -141,8 +144,11 @@ const embedder =
     ? createEmbedder({ config: embeddingConfig })
     : undefined;
 
-const filter = createFilterStep({ ...(embedder ? { embedder } : {}), triager });
-const classify = createClassifyStep({ classifier });
+const filter = createFilterStep({
+  embedderFor: async () => embedder,
+  triagerFor: async () => triager,
+});
+const classify = createClassifyStep({ classifierFor: async () => classifier });
 
 /** A queue that runs the next step instead of enqueuing it. */
 function inlineQueue(context: () => StepContext) {
@@ -212,7 +218,7 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
-  const credentials = await credentialsFor(connector);
+  const credentials = await credentialsFor(connector, owner);
 
   if (!credentials) {
     console.error(`No credentials for ${connector.provider.id}.`);
@@ -251,6 +257,7 @@ async function main(): Promise<void> {
     positionOffset += result.itemsReturned;
 
     await recordSourceUsage(db, {
+      userId: owner,
       monitorId: monitor.id,
       source: post.source as Source,
       provider: connector.provider.id as Provider,

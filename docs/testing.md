@@ -141,10 +141,20 @@ against it, so it cannot be retrofitted:
 | Credential encryption | A key reaches a log line or an API response |
 | Classification schema | An invalid score is stored as if it were a verdict |
 | Deletion reconciliation | Content the author removed keeps being shown |
+| Session gate | A route answers a stranger, and looks completely normal doing it |
 
 Each of these files carries a `Correctness-critical` header comment naming the
 failure and the tests that pin it. The list is
 `grep -rl 'Correctness-critical' packages apps`.
+
+The session gate is the one on that list whose test cannot be a sample.
+Every other surface has a rule you can state and then check at each call site;
+this one is a claim about *all* the routes, and the route added next month is
+exactly the one that will not be checked. So `apps/api/src/auth.ts` records
+what it registered, and `auth.test.ts` walks that list and asserts each entry
+answers 401 without a session, against a written list of three open paths. A
+test that named five routes would pass for ever and say nothing about the
+sixth.
 
 **5. The house rule: a red test is fixed in the code, not in the assertion.**
 

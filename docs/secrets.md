@@ -8,6 +8,61 @@ first key has to move out of a file.
 
 ---
 
+
+## Whose key is it
+
+**A key stored in the database belongs to an account. A key in `.env` belongs to
+the machine.** US-067.
+
+That is the whole rule, and the two halves are for two deployments.
+
+A self-hoster puts `BRIGHTDATA_API_KEY` and its siblings in `.env`, never opens
+the connections screen, and every monitor on the instance polls on those keys.
+Nothing changed for them.
+
+An instance taking registrations (`AUTH_SIGNUP=open`, see
+[docs/accounts.md](accounts.md)) leaves the environment empty. Each person then
+pastes their own key on the connections screen, and a poll uses the key
+belonging to **the owner of the monitor being polled**. An account with no key
+of its own cannot start a monitor, and the form names the key it wants.
+
+The environment is still the fallback for everybody, and that is worth being
+deliberate about: an instance with both a `.env` key and open signup lets a
+stranger poll on the machine's key. Empty the environment before you open
+signup, or accept the bill.
+
+**A model key follows the same rule, with one difference.** US-068. The Models
+screen stores a per-account key for each of the three jobs — scoring, triage and
+similarity — encrypted the same way, in `ai_settings`. The difference is that
+every field there is an *override*: a person who pastes only a key keeps the
+instance's provider and model and simply pays for their own calls, and an
+account with no row behaves exactly as it did before the screen existed.
+
+**The worker caches a model client per account, and that cache lives as long as
+the process.** So a model key changed on the screen reaches the API immediately
+and the worker on its next restart. Provider keys have no such cache and take
+effect on the next poll. If you change a model key and the next poll still uses
+the old one, restart the worker.
+
+Three things follow that are easy to get wrong later.
+
+- **The record is not the slot.** `credentialRecordName` — what the ciphertext
+  is authenticated with — is `user:provider:field`. `credentialSlotName` — how a
+  key is spoken about in a "this is missing" message — is `provider:field`. The
+  owner is in the first because a row moved between two accounts' slots by
+  somebody with `psql` must not decrypt; it is out of the second because that
+  set is already one person's, and an account id in the message would name
+  somebody nobody asked about.
+- **The boot check and the rotation are instance-wide, on purpose.** A key that
+  opens one account's rows and not another's must stop the process, and a
+  rotation covering one account would leave the rest sealed under a key nobody
+  has.
+- **An old row keeps its own record and still decrypts.** `record` is stored per
+  row, so changing the naming rule re-encrypts nothing. A row normalises the
+  first time it is rewritten or rotated. US-024 proved that path; US-067 used it
+  again.
+
+---
 ## Where a credential lives
 
 Two places, and the store wins.

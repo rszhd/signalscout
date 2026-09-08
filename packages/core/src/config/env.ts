@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { aiProviders, embeddingProviders } from "../ai/config.js";
+import { signupModes } from "../auth/user.js";
 import { encryptionKeyIsWellFormed } from "../secrets/cipher.js";
 
 /**
@@ -92,6 +93,26 @@ const aiFields = {
    * only while no triage model is named. A cheaper model priced at the
    * classifier's rate would report a saving that did not happen.
    */
+  /**
+   * The model that writes a reply draft. US-070.
+   *
+   * Unset means the classifier's, the way triage's does. It is its own setting
+   * because the two jobs are not the same: scoring reads carefully and answers
+   * in numbers, and a draft carries somebody's name into another person's
+   * conversation. On some providers those are different models.
+   *
+   * The prices are separate from `AI_INPUT_PRICE_MICROS` and fall back to it
+   * only while no draft model is named. A draft billed at the classifier's rate
+   * would misreport what it cost, and that figure is shown to the person who
+   * pressed the button.
+   */
+  AI_DRAFT_PROVIDER: blankIsUnset(z.enum(aiProviders).optional()),
+  AI_DRAFT_MODEL: blankIsUnset(z.string().min(1).optional()),
+  AI_DRAFT_API_KEY: blankIsUnset(z.string().min(1).optional()),
+  AI_DRAFT_BASE_URL: blankIsUnset(z.string().min(1).optional()),
+  AI_DRAFT_INPUT_PRICE_MICROS: blankIsUnset(z.coerce.number().int().min(0).optional()),
+  AI_DRAFT_OUTPUT_PRICE_MICROS: blankIsUnset(z.coerce.number().int().min(0).optional()),
+
   AI_TRIAGE_PROVIDER: blankIsUnset(z.enum(aiProviders).optional()),
   AI_TRIAGE_MODEL: blankIsUnset(z.string().min(1).optional()),
   AI_TRIAGE_API_KEY: blankIsUnset(z.string().min(1).optional()),
@@ -151,6 +172,67 @@ export const envSchema = z.object({
       })
       .optional(),
   ),
+
+  /**
+   * What signs a session cookie. US-017.
+   *
+   * Optional here and refused at boot, which is `ENCRYPTION_KEY`'s shape and
+   * for the same reason: `.env.example` is committed with blank values and
+   * `pnpm dev` copies it, so a required field would make a clean checkout fail
+   * to parse its own example file.
+   *
+   * There is no default and there will not be one. A default signing secret is
+   * a default password wearing another name — anybody holding this source could
+   * mint a session for any instance running it. `startApi` says how to make one
+   * and stops.
+   *
+   * Thirty-two characters, because the check that catches a real mistake is a
+   * short paste rather than a weak one.
+   */
+  AUTH_SECRET: blankIsUnset(
+    z
+      .string()
+      .min(32, {
+        message: "must be at least 32 characters. Generate one with `openssl rand -base64 32`.",
+      })
+      .optional(),
+  ),
+
+  /**
+   * Whether a stranger may create an account. US-066.
+   *
+   * `closed` is the default: the first run makes one account and the server
+   * refuses every attempt after it. `open` is the cloud shape, where anybody
+   * who reaches the login screen may register.
+   *
+   * The default is closed and not open, because every instance running today is
+   * self-hosted. A version bump that silently began accepting registrations
+   * would hand somebody's instance — their inbox, and provider keys that spend
+   * their money — to whoever found the address first.
+   */
+  AUTH_SIGNUP: blankIsUnset(z.enum(signupModes).default("closed")),
+
+  /**
+   * Origins allowed to sign in, besides this instance's own address.
+   *
+   * Comma separated. Leave it empty for the normal install, where one process
+   * serves the UI and the API on one origin. Set it when the UI is served from
+   * somewhere else — a separate static host, or a proxy that rewrites the host
+   * without rewriting the browser's `Origin`.
+   *
+   * `pnpm dev` is exactly that shape, and it needs no entry here: the API adds
+   * the Vite dev server itself when NODE_ENV is development.
+   */
+  AUTH_TRUSTED_ORIGINS: blankIsUnset(z.string().min(1).optional()),
+
+  /**
+   * Where this instance answers, when a proxy rewrites the host.
+   *
+   * Unset means "read it from the request", which is right whenever one
+   * Fastify serves the UI and the API on one origin — the common install. Set
+   * it when the browser's address and the one Fastify sees are different.
+   */
+  AUTH_URL: blankIsUnset(z.string().min(1).optional()),
 
   HOST: z.string().min(1).default("0.0.0.0"),
   PORT: z.coerce.number().int().min(1).max(65535).default(3000),

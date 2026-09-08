@@ -22,6 +22,7 @@ import {
 import { createTestDatabase, type TestDatabase } from "@intentwatch/core/testing";
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { buildServer } from "./server.js";
+import { asOwner } from "./testing.js";
 
 const logger = createLogger({ level: "silent", name: "test" });
 
@@ -62,6 +63,7 @@ describe("the cost test routes", () => {
     body: (app: Awaited<ReturnType<typeof buildServer>>) => Promise<T>,
   ): Promise<T> {
     const app = await buildServer({
+      session: asOwner,
       env: loadEnv({ DATABASE_URL: database.url }),
       logger,
       db,

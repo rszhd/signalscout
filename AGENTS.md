@@ -834,6 +834,252 @@ hand, because Reddit answers 403 to an unauthenticated request, and
 it. What the plan is not proven to be is *useful* — a name that exists can
 still be the wrong place to look.
 
+**This instance has a login, and one account.** US-017 shipped on 2026-09-08
+and is held in `doing/` with one acceptance box open — the credentials one,
+deferred for the reason four paragraphs down. Better Auth, email and password, sessions in the same Postgres as
+the monitors they open — no external identity provider, because a self-hosted
+tool that needs a hosted one is not self-hosted.
+
+**The first run makes the account, and `AUTH_SIGNUP` decides whether anybody
+else may register.** US-066 reversed US-017's single-account rule on the owner's
+decision — there is a cloud version, and a cloud version needs registration.
+`closed | open`, and **the default is `closed`**, which is the one place the
+implementation went against the literal request: every instance running today is
+self-hosted, and a version bump that silently began accepting registrations is
+the failure US-017 exists to prevent, arriving through a release note nobody
+read. Both halves live in the `user.create.before` hook, which every path that
+creates a user passes through, so the refusal cannot be routed around. There is
+no default account and no default password.
+
+**`claimUnownedRows` needed a guard the moment that setting existed.** It ran
+for every created user, which was correct only because no second user could
+exist. `isOnlyAccount` is the guard now. A stranger who registers on an open
+instance and inherits the owner's monitors is the worst bug a shared instance
+could have, and until US-066 nothing stopped it except the impossibility of a
+second account.
+
+**A provider key stored in the database belongs to an account; one in `.env`
+belongs to the machine.** US-067 closed on 2026-09-08, reversing the deferral
+US-017 recorded — US-066 made a second account possible, and until this ticket
+every signed-in person shared one row per provider. Three faults at once: they
+polled on one key and one bill, the second person to paste silently overwrote
+the first, and anybody could delete a key and stop every monitor on the
+instance.
+
+A poll now uses the key of **the monitor's owner** and falls back to the
+environment. `CredentialLookup` takes the owner as an argument rather than being
+built per account, because one worker process serves every account — a lookup
+per account would be a cache keyed by something, and the something is the owner.
+`query_estimates` gained its own `user_id`, because the cost test usually has no
+monitor to read one from and a sample is real money at a real provider.
+
+**The environment half ignores the owner, and that is the self-hosted path.** It
+also means an instance with **both** a `.env` key and `AUTH_SIGNUP=open` lets a
+stranger poll on the machine's key. Empty the environment before opening signup;
+`.env.example` and docs/accounts.md say so.
+
+**Two naming functions, and mixing them up is the mistake to avoid.**
+`credentialRecordName` is `user:provider:field` — what the ciphertext is
+authenticated with, so a row moved between two accounts' slots by anybody with
+`psql` fails to decrypt; the primary key alone does not stop that.
+`credentialSlotName` is `provider:field` — how a key is spoken about in a "this
+is missing" message, with no owner, because that set is already one person's.
+Read docs/secrets.md, *Whose key is it*.
+
+**Proven live with two accounts on 2026-09-08.** Two rows for the same
+provider, A's screen showing `••••AAAA` and B's `••••BBBB`; B deleted its own
+key and **A's survived**; B's monitor form then named `BRIGHTDATA_API_KEY` as
+missing while A's said ready. What is unproven is a live *poll* on a
+per-account key — a real provider probe needs a real key, so the connectors
+were never called.
+
+**The providers page answered for the instance, and a new account saw somebody
+else's numbers.** BUG-009, reported from a running instance on 2026-09-08 and
+fixed the same day. US-067 scoped the *keys* on that route and left three reads
+beside them untouched — the spend, the posts-and-matches, and the verdict count.
+Nothing went red, because nothing on that page was scoped by a test.
+
+**The lesson is countable: scoping a route means scoping every read in it.**
+That one had four and three were missed. Migration 0045 added
+`api_usage.user_id`, and it had to go into the unique key as well — the key is
+`nullsNotDistinct`, so without the owner two accounts running a cost test on the
+same pair on the same day would add their money into one row. `posts` is the one
+table that cannot carry an owner, because a post is deduplicated across every
+monitor on the instance; the page now counts the posts an account's monitors
+matched or recorded a drop for, which is the same number on a single-account
+instance.
+
+**The provider *choice* is the same bug and is not fixed.**
+`source_providers` is keyed by platform alone, so on an instance taking
+registrations one account's choice changes what every other account polls
+through — and by US-026's own rule a choice that cannot run is refused rather
+than replaced, so it can stop another account's monitors dead.
+[BUG-010](backlog/todo/BUG-010-a-provider-choice-is-shared-between-accounts.md)
+is that ticket. The self-hosted instance is unaffected.
+
+**A model key belongs to an account too, and a person picks a model per job.**
+US-068 closed on 2026-09-08 with three cards and US-070 added the fourth the
+same day. Scoring, triage, similarity, drafting a reply — four, because this
+product asks a model four different things and the right answer differs: US-030
+measured that triage only saves money when its model is cheaper than the
+scorer's, Anthropic publishes no embedding endpoint at all, and a draft is the
+one model output that carries somebody's name into another person's
+conversation.
+
+**Query generation and project describing stay on the classifier's settings**,
+and that is a decision rather than an omission: both produce input a person
+edits before anything is spent on it, and neither has anybody's name on it.
+
+**US-070's migration exists only to widen a check constraint, and that is the
+point of it.** `aiTasks` gaining a value is not the database gaining one. This
+repository has shipped that exact mistake twice — `apify` in US-057 and
+`draft_reply` in US-040 — and both times a full suite passed and a live run
+found it after the money was spent.
+
+**The whole design is one idea: a stored row is an override of the
+environment.** `readAiEnvironment` lays an account's rows over the instance's
+`AiEnvironment` and hands the result to the same three functions in
+`ai/config.ts` that have always read it. Not one of their fallback rules is
+reimplemented — triage falls back to the classifier's settings but not its
+price, a key is reused only within one provider, an embedding model is never
+guessed. Each took a measurement to get right, and a second copy is how one ends
+up wrong. Two consequences fall out for free: a person who pastes only a key
+keeps the deployment's measured choices, and an account with no rows behaves
+exactly as before the screen existed.
+
+**The worker caches a model client per owner for the life of the process**, so a
+model key changed on the screen reaches the API at once and the worker on its
+next restart. That is the one real cost of the design and docs/secrets.md says
+so. Provider keys have no such cache.
+
+**Every test passed before any of this was covered.** Every existing test
+injects a client into `startWorker`, and injection still wins over the
+resolver — so the entire new path was invisible to a green suite.
+`ai/settings.test.ts` and `worker/classify-owner.test.ts` are what exercise it.
+**A green suite after a refactor of a seam everything injects past is evidence
+about the injection, not about the seam.**
+
+Two things are not built. **A model key is not tested with the provider before
+it is stored**, unlike a provider key: no model provider has a free probe, so
+validating one spends the person's money on a call they did not ask for, and
+that is its own decision. And **no live model call has been made on a
+per-account key.**
+
+**No route asks for a session, so none can forget.** One `onRequest` hook on
+the root instance covers every API route, and what is *not* behind it is a
+written list of three: `/api/auth/*` because it is the login, `/api/health`
+because a container probe has no cookie and the answer holds no data, and
+`/api/auth-status` because the login screen has to know whether to show a
+sign-up form. The built UI is open too — it is the page the login form is on.
+
+**The sidebar says which account is in use.** US-069 replaced a hardcoded
+`Self-hosted` pill with the signed-in account's name and email. That label was
+written before there were accounts, is false on an instance taking
+registrations, and sat in the one place a person looks to tell two accounts
+apart — the owner found it by spending a round trip working out which of two
+accounts owned a stored provider key. `/api/auth-status` carries it, because
+the shell already calls that route once on load. The route is open by
+necessity, so it answers with an account only to a request carrying that
+account's own cookie: a stranger who finds the port learns whether the instance
+is set up and nothing about who set it up.
+
+**The login screen has two forms and shows one.** `firstRun` decides between
+"set this up" and "sign in"; `signUpOpen` decides whether a new account is
+offered at all. They were one boolean until US-066 and are two now, because an
+open instance that already has an owner is `firstRun: false, signUpOpen: true`.
+Where signup is closed the switch between the forms is **absent rather than
+disabled** — an offer that refuses is worse than no offer, because somebody
+fills the form in before they meet the refusal.
+
+**The test enumerates rather than samples, and that is the point.** Every other
+correctness-critical surface has a rule you check at each call site; this one is
+a claim about *all* the routes, and the route added next month is the one
+nobody checks. So `apps/api/src/auth.ts` records what it registered and
+`auth.test.ts` walks that list. Fifty-three method-and-path pairs today, and
+every one of them answers 401 without a cookie.
+
+**The cross-site check is on because we said so, not because of `NODE_ENV`.**
+Better Auth's default turns it off when `NODE_ENV` is `test`, which had two
+consequences: no test in this suite could reach the branch, and a deployment
+whose `NODE_ENV` was not what its owner thought would lose the protection in
+silence, with the login still working. `advanced.disableOriginCheck: false` in
+`auth/auth.ts` states it once for every environment, and `auth.test.ts` now
+proves it — sign-out with a valid cookie and no `Origin` is **403
+`MISSING_OR_NULL_ORIGIN`**, the wrong origin is 403, the session survives both,
+and only the right origin ends it.
+
+**That check broke `pnpm dev`, and the shape is worth remembering.** Vite serves
+the UI on 5173 and proxies `/api` to 3000 with `changeOrigin`, so Fastify sees
+the host rewritten to 3000 beside the browser's untouched `Origin:
+http://localhost:5173`. Better Auth compares them and answers **403
+`INVALID_ORIGIN`** — every sign-in refused on a developer's machine, while
+production, where one process serves both, works perfectly. `trustedOrigins` in
+`server.ts` adds the dev server while `NODE_ENV` is development and never in
+production, and `AUTH_TRUSTED_ORIGINS` carries any other split-origin
+deployment. **A login that works in production and fails in development is not
+a development-only problem** — it was the same check both times, and only the
+origins differed.
+
+**The first account adopts what came before it.** Every row written earlier
+carries `user_id = 'self-hosted'`, and the sign-up hook re-points monitors,
+projects, reply voices and verdicts to the new id in one transaction. Without
+it, upgrading an instance that already polls shows empty screens over intact
+data, which reads as data loss. Proven live: a scratch database seeded the old
+way, one sign-up through the built app, and both rows came back under the new
+id. `monitors.user_id` still carries **no foreign key**, and that is deliberate
+— a monitor may be older than the first account, so the constraint would refuse
+to apply on exactly the instances with data worth keeping.
+
+**Provider keys stay on the machine, and that is a decision rather than an
+oversight.** `source_credentials` is keyed by provider alone. The same lookup
+falls back to the process environment — `BRIGHTDATA_API_KEY` and its siblings —
+and an environment variable cannot belong to a person, so scoping only the
+database half would make the two halves of one lookup disagree. The owner's
+plan is per-account keys in a cloud tier; adding `user_id` there later is a
+migration and a threaded owner, **not** a re-encryption, because `record` is
+stored per row and an old row decrypts under its own stored name. US-017's
+acceptance box for credentials is therefore recorded as deferred, with this
+reason, rather than ticked.
+
+**`AUTH_SECRET` is required and the process refuses to boot without it.** The
+one boot check here that is about somebody else reaching the process rather
+than about the process working — an instance that starts without it serves an
+inbox and a set of money-spending keys to whoever finds the port, and every
+screen works, which is why nobody would notice. `pnpm dev` writes one into a
+fresh `.env`; `.env.example` cannot carry one, because a secret in git is a
+secret every reader of this repository holds.
+
+**One thing is still unproven: no real browser has rendered the login.** The
+Chrome extension was not connected on the day it shipped, so the screen is
+driven through jsdom and the server half through `curl` against the built app.
+Read docs/accounts.md before changing the gate: it holds the proxy header a TLS
+terminator must send, and the SQL for getting back in.
+
+**A provider slower than a quarter of a second read as an outage, for as long
+as this product has had connectors.** BUG-011, found on 2026-09-08 when a
+ScrapeCreators key test failed from the screen. Node gives each address a
+hostname resolves to **250 milliseconds** to connect and then fails with
+`ETIMEDOUT`; `api.scrapecreators.com` takes **850 to 1,200 milliseconds**. So
+about half of all calls to it failed, and the message a person read blamed the
+two innocent things — their key, and the provider.
+
+`net.ts` sets the budget to five seconds at the start of the API and the
+worker, and carries the measurement. Raising it costs nothing on a healthy
+call: the budget is only spent failing over between addresses, and a refused
+connection still fails at once because that is a packet coming back rather than
+a timeout.
+
+**Three wrong theories came first and each looked right** — the provider's WAF
+blocking undici's user agent, a dead A record, my own sandbox. What settled it
+was the *shape* of the number: every failure was ~580ms and every success
+780–1,280ms. A failure that consistent is a stopwatch, not a network.
+
+**No test in this suite calls a provider, so no test could see it.** That is the
+lasting lesson rather than the setting: a whole class of connection fault is
+invisible to a green run, and the thing that found this one was running `curl`
+against the same host from the same machine and watching one client wait where
+the other would not.
+
 **The inbox leaves as a spreadsheet.** US-064 closed on 2026-09-07. A link
 beside the match count downloads the list *currently on screen* as CSV — every
 filter honoured, every page walked, because a screen paginates and a file
@@ -917,7 +1163,12 @@ Its fixtures are not captured from a real model:
 [US-062](backlog/todo/US-062-a-real-model-s-drafts-are-replayed.md) is that
 gap, and `ai/reply.test.ts` asserts the prompt's words meanwhile.
 
-Two tickets are in `doing/`.
+Three tickets are in `doing/`.
+[US-017](backlog/doing/US-017-a-self-hosted-instance-has-one-account.md) is the
+login, described above: everything works, and the credentials box is the
+owner's call rather than an unfinished piece of work. It is also the ticket that
+now blocks a real cloud deployment, because opening signup without per-account
+keys shares the owner's bill.
 [US-015](backlog/doing/US-015-a-deleted-post-stops-being-shown.md) has the
 scheduled deletion job, budget guard, durable provider continuations and post
 tombstones. Bright Data returned explicit deletion evidence in live captures.
@@ -1176,6 +1427,7 @@ naming its failure shape.
 - **Credential encryption** — a key reaching a log line or an API response
 - **Classification schema** — an invalid score stored as if it were a verdict
 - **Deletion reconciliation** — removed content still being shown
+- **Session gate** — a route answering a stranger, and looking normal doing it
 
 A rule is only as tested as its least-tested caller. After asserting the rule,
 count the call sites and give each its own case.

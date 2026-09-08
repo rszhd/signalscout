@@ -292,7 +292,7 @@ export function createRepliesStep({
 
       const keyed = new Map<string, SourceCredentials>();
       for (const candidate of registry.forPlatform(source)) {
-        const found = await credentialsFor(candidate);
+        const found = await credentialsFor(candidate, monitor.userId);
         if (found) keyed.set(candidate.provider.id, found);
       }
 
@@ -474,7 +474,7 @@ export function createRepliesStep({
         continue;
       }
 
-      const credentials = await credentialsFor(connector);
+      const credentials = await credentialsFor(connector, monitor.userId);
       if (!credentials) {
         skipped += 1;
         continue;
@@ -593,6 +593,7 @@ export function createRepliesStep({
         readThisBatch += result.itemsReturned;
 
         await recordSourceUsage(db, {
+          userId: monitor.userId,
           monitorId,
           source: post.source as Source,
           provider: connector.provider.id as Provider,

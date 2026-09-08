@@ -25,6 +25,9 @@ import {
 import { startWorker, type WorkerHandle } from "./runtime.js";
 import { fakeRegistry, fastRetries, insertMonitor, until } from "./testing.js";
 
+/** The account these cases spend on. BUG-009 put the owner on every usage row. */
+const owner = "user-1";
+
 const postedAt = new Date("2026-09-05T09:00:00.000Z");
 
 /**
@@ -1051,6 +1054,7 @@ describe("reading a thread in batches", () => {
         .values({ monitorId, monthlyCapMicros: 1_000, onExhausted: "pause" });
 
       await harness.db.insert(apiUsage).values({
+        userId: owner,
         monitorId,
         source: "reddit",
         provider: "scrapecreators",

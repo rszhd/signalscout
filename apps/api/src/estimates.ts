@@ -17,7 +17,6 @@ import {
   estimateProbeKinds,
   estimateStatuses,
   getBudget,
-  getMonitor,
   type JobSender,
   maximumQueries,
   maximumSubreddits,
@@ -33,6 +32,7 @@ import {
   subredditSchema,
 } from "@intentwatch/core";
 import { z } from "zod";
+import { ownedMonitor, sessionUserId } from "./auth.js";
 import type { ApiServer } from "./server.js";
 
 const sampleSchema = z.object({
@@ -203,7 +203,7 @@ export async function registerEstimateRoutes(
       let monthlyCapMicros = request.body.monthlyCapMicros;
 
       if (monitorId) {
-        const monitor = await getMonitor(db, monitorId);
+        const monitor = await ownedMonitor(db, request, monitorId);
         if (!monitor) return reply.code(404).send({ message: "No monitor has that id." });
 
         pollIntervalSeconds = monitor.pollIntervalSeconds;
@@ -215,6 +215,7 @@ export async function registerEstimateRoutes(
       }
 
       const estimateId = await startEstimate(db, {
+        userId: sessionUserId(request),
         monitorId: monitorId ?? null,
         pollIntervalSeconds,
         pollDays,

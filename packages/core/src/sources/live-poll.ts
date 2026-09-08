@@ -41,12 +41,12 @@ import {
   needsApiKey,
 } from "../ai/config.js";
 import { createEmbedder } from "../ai/embed.js";
+import { ownerUserId } from "../auth/user.js";
 import { loadAiEnv } from "../config/env.js";
 import { createDatabase } from "../db/client.js";
 import type { Provider, Source } from "../db/schema.js";
 import { apiUsage, budgets, matches, monitors, posts } from "../db/schema.js";
 import { createLogger } from "../logger.js";
-import { singleUserId } from "../monitors/monitors.js";
 import { createClassifyStep } from "../worker/classify.js";
 import { createCollectStep } from "../worker/collect.js";
 import { credentialsFromStore } from "../worker/credentials.js";
@@ -162,6 +162,8 @@ const registry = createSourceRegistry({
   runtime: createSourceRuntime({ logger }),
 });
 
+/** The one account this instance has, or the pre-account id. US-067. */
+const owner = await ownerUserId(db);
 const credentialsFor = credentialsFromStore(db, undefined, process.env, logger);
 
 const started = Date.now();
@@ -196,8 +198,8 @@ const embedder =
     : undefined;
 
 const collect = createCollectStep({ registry, credentialsFor });
-const filter = createFilterStep(embedder ? { embedder } : {});
-const classify = createClassifyStep({ classifier });
+const filter = createFilterStep({ embedderFor: async () => embedder });
+const classify = createClassifyStep({ classifierFor: async () => classifier });
 
 /** What the classify step complained about, if it could not finish. */
 let unscored: string | undefined;
@@ -307,7 +309,7 @@ async function main(): Promise<void> {
   const [monitor] = await db
     .insert(monitors)
     .values({
-      userId: singleUserId,
+      userId: owner,
       name: `live ${platform.displayName} poll`,
       product: "A test runner that records browser flows instead of coding them",
       idealCustomer: "Small SaaS teams with no dedicated QA engineer",
@@ -360,7 +362,7 @@ async function main(): Promise<void> {
     );
   }
 
-  if (!(await credentialsFor(connector))) {
+  if (!(await credentialsFor(connector, owner))) {
     throw new Error(
       `No credentials for ${connector.provider.id}. Set its key in .env, or store one on the connections screen.`,
     );

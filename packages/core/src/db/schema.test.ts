@@ -121,6 +121,8 @@ async function insertMatch(overrides: Record<string, unknown> = {}): Promise<str
 /** One day's usage at one source. Returns its id. */
 async function insertUsage(overrides: Record<string, unknown> = {}): Promise<string> {
   const values = {
+    // BUG-009 put the owner on every usage row, and in the unique key with it.
+    user_id: "user-1",
     monitor_id: overrides.monitor_id ?? (await insertMonitor()),
     source: "reddit",
     provider: "brightdata",

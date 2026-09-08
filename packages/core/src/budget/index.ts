@@ -14,8 +14,10 @@ export {
   type MonitorSpend,
   monitorSpend,
   monthStart,
+  type PairSpend,
   type RecordSourceUsageInput,
   recordSourceUsage,
   setBudget,
   spendByMonitor,
+  spendByPair,
 } from "./budget.js";

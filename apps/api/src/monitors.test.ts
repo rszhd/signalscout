@@ -35,6 +35,7 @@ import {
 import { createTestDatabase, type TestDatabase } from "@intentwatch/core/testing";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { buildServer } from "./server.js";
+import { asOwner, testOwner as owner } from "./testing.js";
 
 const logger = createLogger({ level: "silent", name: "test" });
 
@@ -139,6 +140,7 @@ describe("the monitor routes", () => {
     const env = loadEnv({ DATABASE_URL: database.url });
 
     return buildServer({
+      session: asOwner,
       env,
       logger,
       db,
@@ -360,6 +362,7 @@ describe("the monitor routes", () => {
       // No generator passed at all, so the server builds its own from an
       // environment the suite keeps keyless.
       const app = await buildServer({
+        session: asOwner,
         env: loadEnv({ DATABASE_URL: database.url }),
         logger,
         db,
@@ -934,9 +937,14 @@ describe("the monitor routes", () => {
       await withServer({}, async (app) => {
         const id = await create(app);
 
-        await recordVerdict(db, { matchId: await seedMatch(id, "judged-1"), verdict: "good" });
+        await recordVerdict(db, {
+          matchId: await seedMatch(id, "judged-1"),
+          userId: owner,
+          verdict: "good",
+        });
         await recordVerdict(db, {
           matchId: await seedMatch(id, "judged-2"),
+          userId: owner,
           verdict: "not_relevant",
         });
 
@@ -999,6 +1007,7 @@ describe("the monitor routes", () => {
           payload: { monthlyCapMicros: 1_000_000, onExhausted: "pause" },
         });
         await recordSourceUsage(db, {
+          userId: owner,
           monitorId: id,
           source: "reddit",
           provider: "brightdata",
@@ -1025,6 +1034,7 @@ describe("the monitor routes", () => {
           payload: { monthlyCapMicros: 200_000, onExhausted: "pause" },
         });
         await recordSourceUsage(db, {
+          userId: owner,
           monitorId: id,
           source: "reddit",
           provider: "brightdata",
@@ -1048,6 +1058,7 @@ describe("the monitor routes", () => {
         const id = await create(app);
 
         await recordSourceUsage(db, {
+          userId: owner,
           monitorId: id,
           source: "reddit",
           provider: "brightdata",
@@ -1071,6 +1082,7 @@ describe("the monitor routes", () => {
           payload: { monthlyCapMicros: 1_000, onExhausted: "pause" },
         });
         await recordSourceUsage(db, {
+          userId: owner,
           monitorId: id,
           source: "reddit",
           provider: "brightdata",

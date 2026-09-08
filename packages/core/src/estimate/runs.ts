@@ -59,6 +59,14 @@ export interface EstimateProbe {
 
 export interface EstimateRun {
   readonly id: string;
+  /**
+   * Whose key pays for the samples. US-067.
+   *
+   * Not read through `monitorId`, which is null for the common case: the cost
+   * test runs on a plan, before there is a monitor. A sample is money spent at
+   * a real provider, so the run has to say whose account it is spent on.
+   */
+  readonly userId: string;
   /** Null for a plan that is still a plan. That is the common case. */
   readonly monitorId: string | null;
   readonly status: EstimateStatus;
@@ -76,6 +84,8 @@ export interface EstimateRun {
 }
 
 export interface StartEstimateInput {
+  /** Whose key pays for the samples. Required: money is spent on somebody's account. */
+  readonly userId: string;
   readonly monitorId?: string | null;
   readonly pollIntervalSeconds: number;
   /** The days it would poll on. US-041. */
@@ -99,6 +109,7 @@ function readSamples(value: unknown): EstimateSample[] {
 export async function startEstimate(
   db: Database,
   {
+    userId,
     monitorId = null,
     pollIntervalSeconds,
     pollDays,
@@ -112,7 +123,7 @@ export async function startEstimate(
 
   const [run] = await db
     .insert(queryEstimates)
-    .values({ monitorId, pollIntervalSeconds, pollDays: [...pollDays], monthlyCapMicros })
+    .values({ userId, monitorId, pollIntervalSeconds, pollDays: [...pollDays], monthlyCapMicros })
     .returning({ id: queryEstimates.id });
 
   if (!run) throw new Error("The cost test was not inserted.");
@@ -138,6 +149,7 @@ export async function readEstimate(db: Database, id: string): Promise<EstimateRu
 
   return {
     id: row.id,
+    userId: row.userId,
     monitorId: row.monitorId,
     status: row.status,
     pollIntervalSeconds: row.pollIntervalSeconds,

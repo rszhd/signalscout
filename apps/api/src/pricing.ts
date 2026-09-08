@@ -30,16 +30,17 @@ import type {
   ProviderId,
 } from "@intentwatch/core";
 import {
-  apiUsage,
   decideProvider,
   environmentVariableFor,
   groupByPlatform,
   listCredentialHints,
   providerReturns,
   readProviderChoices,
+  spendByPair,
   verdictCount,
 } from "@intentwatch/core";
 import { z } from "zod";
+import { sessionUserId } from "./auth.js";
 import type { ApiServer } from "./server.js";
 
 /**
@@ -194,8 +195,8 @@ export async function registerPricingRoutes(
         }),
       },
     },
-    handler: async () => {
-      const hints = await listCredentialHints(db);
+    handler: async (request) => {
+      const hints = await listCredentialHints(db, sessionUserId(request));
       const stored = new Set(hints.map((hint) => `${hint.provider}:${hint.field}`));
       const choices = await readProviderChoices(db);
 
@@ -207,29 +208,21 @@ export async function registerPricingRoutes(
        * ever paid each one, and a provider switched away from last month would
        * otherwise show as free.
        */
-      const spending = await db
-        .select({
-          source: apiUsage.source,
-          provider: apiUsage.provider,
-          units: apiUsage.units,
-          micros: apiUsage.estimatedCostMicros,
-        })
-        .from(apiUsage);
+      /**
+       * All time rather than this month. A cap is monthly and this page is not
+       * a cap: somebody comparing two providers wants everything they have
+       * ever paid each one, and a provider switched away from last month would
+       * otherwise show as free.
+       *
+       * Scoped to the person asking. BUG-009: it was the instance's spend, so
+       * an account that had just registered was shown somebody else's.
+       */
+      const spending = await spendByPair(db, sessionUserId(request));
 
-      // Summed here rather than in SQL. The table holds a row per monitor, per
-      // pair, per day, so a deployment's whole history is small — and adding it
-      // up in one place keeps the two figures, units and money, from drifting
-      // apart in two different aggregates.
       const spentBy = new Map<string, { units: number; micros: number }>();
 
       for (const row of spending) {
-        const key = `${row.source}:${row.provider}`;
-        const running = spentBy.get(key) ?? { units: 0, micros: 0 };
-
-        spentBy.set(key, {
-          units: running.units + Number(row.units ?? 0),
-          micros: running.micros + Number(row.micros ?? 0),
-        });
+        spentBy.set(`${row.source}:${row.provider}`, { units: row.units, micros: row.micros });
       }
 
       /**
@@ -244,10 +237,10 @@ export async function registerPricingRoutes(
        * belong to no pair and are excluded rather than being attributed to
        * whichever provider happens to be listed first.
        */
-      const returns = await providerReturns(db);
+      const returns = await providerReturns(db, sessionUserId(request));
       const returnedBy = new Map(returns.map((row) => [`${row.source}:${row.provider}`, row]));
 
-      const verdicts = await verdictCount(db);
+      const verdicts = await verdictCount(db, sessionUserId(request));
 
       /** Which credential fields this deployment is missing for one provider. */
       function missingFor(connector: ConnectorDescriptor): string[] {

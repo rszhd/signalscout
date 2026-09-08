@@ -7,6 +7,15 @@ import {
   environmentVariableFor,
 } from "./credentials.js";
 
+/**
+ * The account these cases ask on behalf of. US-067.
+ *
+ * The environment lookup ignores it, and that is the point of every case in
+ * this file: `.env` belongs to the machine, so the same variable answers for
+ * whoever asks. The store's own scoping is asserted in `secrets/store.test.ts`.
+ */
+const owner = "account-1";
+
 function connectorWith(platformId: string, providerId: string, fields: string[]): SocialSource {
   return {
     platform: { id: platformId, displayName: platformId },
@@ -45,7 +54,7 @@ describe("reading credentials from the environment", () => {
       BRIGHTDATA_API_SECRET: "secret",
     });
 
-    expect(lookup(connectorWith("x", "brightdata", ["apiKey", "apiSecret"]))).toEqual({
+    expect(lookup(connectorWith("x", "brightdata", ["apiKey", "apiSecret"]), owner)).toEqual({
       apiKey: "key",
       apiSecret: "secret",
     });
@@ -57,13 +66,15 @@ describe("reading credentials from the environment", () => {
     // be answered here for nothing.
     const lookup = credentialsFromEnvironment({ BRIGHTDATA_API_KEY: "key" });
 
-    expect(lookup(connectorWith("x", "brightdata", ["apiKey", "apiSecret"]))).toBeUndefined();
+    expect(
+      lookup(connectorWith("x", "brightdata", ["apiKey", "apiSecret"]), owner),
+    ).toBeUndefined();
   });
 
   it("treats an empty variable as unset", () => {
     const lookup = credentialsFromEnvironment({ BRIGHTDATA_API_KEY: "" });
 
-    expect(lookup(connectorWith("reddit", "brightdata", ["apiKey"]))).toBeUndefined();
+    expect(lookup(connectorWith("reddit", "brightdata", ["apiKey"]), owner)).toBeUndefined();
   });
 
   it("falls back to the platform's old name, so an instance that upgraded keeps polling", () => {
@@ -72,7 +83,7 @@ describe("reading credentials from the environment", () => {
     // learn from an empty inbox.
     const lookup = credentialsFromEnvironment({ REDDIT_API_KEY: "old-key" });
 
-    expect(lookup(connectorWith("reddit", "brightdata", ["apiKey"]))).toEqual({
+    expect(lookup(connectorWith("reddit", "brightdata", ["apiKey"]), owner)).toEqual({
       apiKey: "old-key",
     });
   });
@@ -83,7 +94,7 @@ describe("reading credentials from the environment", () => {
       BRIGHTDATA_API_KEY: "new-key",
     });
 
-    expect(lookup(connectorWith("reddit", "brightdata", ["apiKey"]))).toEqual({
+    expect(lookup(connectorWith("reddit", "brightdata", ["apiKey"]), owner)).toEqual({
       apiKey: "new-key",
     });
   });
@@ -99,7 +110,7 @@ describe("reading credentials from the environment", () => {
     // A fresh variable name, because the warning is given once per process and
     // another case in this file may already have spent it.
     const lookup = credentialsFromEnvironment({ BLUESKY_API_KEY: "old-key" }, logger);
-    lookup(connectorWith("bluesky", "someprovider", ["apiKey"]));
+    lookup(connectorWith("bluesky", "someprovider", ["apiKey"]), owner);
 
     expect(lines.join("\n")).toContain("BLUESKY_API_KEY");
     expect(lines.join("\n")).toContain("SOMEPROVIDER_API_KEY");

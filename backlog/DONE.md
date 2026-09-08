@@ -2,10 +2,12 @@
 
 # Done
 
-52 finished.
+59 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
+| BUG-011 | [A slow provider reads as an outage](done/2026-09/BUG-011-a-slow-provider-reads-as-an-outage.md) | bug | fixed | 2026-09 |
+| BUG-009 | [The providers page answers for the instance, not the account](done/2026-09/BUG-009-the-providers-page-answers-for-the-instance.md) | bug | fixed | 2026-09 |
 | BUG-008 | [The inbox crashes on a comment match](done/2026-09/BUG-008-the-inbox-crashes-on-a-comment-match.md) | bug | shipped | 2026-09 |
 | BUG-007 | [A comment is stored under a post it is not under](done/2026-09/BUG-007-a-comment-is-stored-under-a-post-it-is-not-under.md) | bug | shipped | 2026-09 |
 | BUG-006 | [The first poll of a monitor stores no replies](done/2026-09/BUG-006-the-first-poll-of-a-monitor-stores-no-replies.md) | bug | shipped | 2026-09 |
@@ -13,6 +15,11 @@
 | BUG-003 | [A post below the threshold is classified again on every poll](done/2026-09/BUG-003-a-post-below-the-threshold-is-classified-again-on-every-poll.md) | bug | fixed | 2026-09 |
 | BUG-002 | [A seven-day window is bought as a month](done/2026-09/BUG-002-a-seven-day-window-is-bought-as-a-month.md) | bug | fixed | 2026-09 |
 | BUG-001 | [A pending Reddit collection is not resumed](done/2026-09/BUG-001-a-pending-reddit-collection-is-not-resumed.md) | bug | shipped | 2026-09 |
+| US-070 | [A reply is drafted by a model of its own](done/2026-09/US-070-a-reply-is-drafted-by-a-model-of-its-own.md) | feature | done | 2026-09 |
+| US-069 | [The sidebar says who is signed in](done/2026-09/US-069-the-sidebar-says-who-is-signed-in.md) | feature | done | 2026-09 |
+| US-068 | [A model key belongs to an account](done/2026-09/US-068-a-model-key-belongs-to-an-account.md) | feature | done | 2026-09 |
+| US-067 | [A provider key belongs to an account](done/2026-09/US-067-a-provider-key-belongs-to-an-account.md) | feature | done | 2026-09 |
+| US-066 | [Signup is open or closed by a setting](done/2026-09/US-066-signup-is-open-or-closed-by-a-setting.md) | feature | done | 2026-09 |
 | US-065 | [Voices to start from](done/2026-09/US-065-voices-to-start-from.md) | feature | shipped | 2026-09 |
 | US-064 | [The inbox leaves as a spreadsheet](done/2026-09/US-064-the-inbox-leaves-as-a-spreadsheet.md) | feature | shipped | 2026-09 |
 | US-063 | [An instruction for this post only](done/2026-09/US-063-an-instruction-for-this-post-only.md) | feature | shipped | 2026-09 |

@@ -32,7 +32,7 @@ import {
   type ConnectorDefinition,
   clearProviderChoice,
   createSourceRuntime,
-  credentialRecordName,
+  credentialSlotName,
   type Database,
   decideProvider,
   deleteSourceCredential,
@@ -52,6 +52,7 @@ import {
   setProviderChoice,
 } from "@intentwatch/core";
 import { z } from "zod";
+import { sessionUserId } from "./auth.js";
 import type { ApiServer } from "./server.js";
 
 export interface ConnectionRoutesOptions {
@@ -206,17 +207,17 @@ export async function registerConnectionRoutes(
     return providers.find((provider) => provider.descriptor.id === id);
   }
 
-  /** The store's answer, as a map from field name to its mask. */
-  async function hintsFor(providerId: string): Promise<Map<string, string>> {
-    const hints = await listCredentialHints(db);
+  /** The store's answer for one person, as a map from field name to its mask. */
+  async function hintsFor(userId: string, providerId: string): Promise<Map<string, string>> {
+    const hints = await listCredentialHints(db, userId);
     return new Map(
       hints.filter((hint) => hint.provider === providerId).map((hint) => [hint.field, hint.hint]),
     );
   }
 
-  async function view(provider: ProviderEntry) {
+  async function view(userId: string, provider: ProviderEntry) {
     const { descriptor } = provider;
-    const hints = await hintsFor(descriptor.id);
+    const hints = await hintsFor(userId, descriptor.id);
 
     const credentials: FieldView[] = descriptor.credentialFields.map((field) => {
       const storedHint = hints.get(field.name) ?? null;
@@ -248,8 +249,8 @@ export async function registerConnectionRoutes(
    * One read of the hints for every provider, rather than one per card. The
    * hints never decrypt, so this costs no encryption key.
    */
-  async function connectedProviders(): Promise<Set<string>> {
-    const hints = await listCredentialHints(db);
+  async function connectedProviders(userId: string): Promise<Set<string>> {
+    const hints = await listCredentialHints(db, userId);
     const stored = new Set(hints.map((hint) => `${hint.provider}:${hint.field}`));
     const connected = new Set<string>();
 
@@ -310,20 +311,23 @@ export async function registerConnectionRoutes(
   }
 
   /** The whole screen: the provider cards, and the platform rows under them. */
-  async function connectionsView() {
+  async function connectionsView(userId: string) {
     const canStore = Boolean(optionalEncryptionKey(encryption));
 
     return {
       canStore,
       storeBlocker: canStore ? null : noEncryptionKey,
-      providers: await Promise.all(providers.map(view)),
-      platforms: await platformViews(),
+      providers: await Promise.all(providers.map((provider) => view(userId, provider))),
+      platforms: await platformViews(userId),
     };
   }
 
   /** Every platform, with the choices and the keys read once for all of them. */
-  async function platformViews() {
-    const [choices, connected] = await Promise.all([readProviderChoices(db), connectedProviders()]);
+  async function platformViews(userId: string) {
+    const [choices, connected] = await Promise.all([
+      readProviderChoices(db),
+      connectedProviders(userId),
+    ]);
 
     return platformEntries.map((platform) => platformView(platform, choices, connected));
   }
@@ -338,6 +342,7 @@ export async function registerConnectionRoutes(
    * without anybody retyping it.
    */
   async function credentialsToTest(
+    userId: string,
     { descriptor }: ProviderEntry,
     typed: Record<string, string>,
   ): Promise<{ credentials: SourceCredentials } | { missing: string }> {
@@ -346,7 +351,7 @@ export async function registerConnectionRoutes(
 
     for (const field of descriptor.credentialFields) {
       const stored = key
-        ? await readSourceCredential(db, key, descriptor.id as Provider, field.name)
+        ? await readSourceCredential(db, key, userId, descriptor.id as Provider, field.name)
         : undefined;
       const value =
         typed[field.name]?.trim() ||
@@ -408,7 +413,7 @@ export async function registerConnectionRoutes(
     schema: {
       response: { 200: connectionsSchema },
     },
-    handler: connectionsView,
+    handler: async (request) => connectionsView(sessionUserId(request)),
   });
 
   /**
@@ -467,7 +472,7 @@ export async function registerConnectionRoutes(
         "recorded which provider fetches a platform",
       );
 
-      return connectionsView();
+      return connectionsView(sessionUserId(request));
     },
   });
 
@@ -500,7 +505,7 @@ export async function registerConnectionRoutes(
 
       await clearProviderChoice(db, platform.platform.id as Source);
 
-      return connectionsView();
+      return connectionsView(sessionUserId(request));
     },
   });
 
@@ -532,7 +537,11 @@ export async function registerConnectionRoutes(
         return reply.code(400).send({ message: unknownFieldMessage(provider, unknown) });
       }
 
-      const candidate = await credentialsToTest(provider, request.body.credentials);
+      const candidate = await credentialsToTest(
+        sessionUserId(request),
+        provider,
+        request.body.credentials,
+      );
       if ("missing" in candidate) {
         return reply
           .code(400)
@@ -588,7 +597,7 @@ export async function registerConnectionRoutes(
         return reply.code(400).send({ message: "Paste a key before saving." });
       }
 
-      const candidate = await credentialsToTest(provider, typed);
+      const candidate = await credentialsToTest(sessionUserId(request), provider, typed);
       if ("missing" in candidate) {
         return reply.code(400).send({
           message: `${provider.descriptor.displayName} also needs a ${candidate.missing}.`,
@@ -607,6 +616,7 @@ export async function registerConnectionRoutes(
 
       for (const [field, value] of written) {
         await putSourceCredential(db, key, {
+          userId: sessionUserId(request),
           provider: provider.descriptor.id as Provider,
           field,
           value: value.trim(),
@@ -618,12 +628,12 @@ export async function registerConnectionRoutes(
         // that a credential logged by mistake is redacted; this line has none
         // to redact.
         {
-          records: written.map(([field]) => credentialRecordName(provider.descriptor.id, field)),
+          records: written.map(([field]) => credentialSlotName(provider.descriptor.id, field)),
         },
         "stored a provider credential",
       );
 
-      return view(provider);
+      return view(sessionUserId(request), provider);
     },
   });
 
@@ -642,18 +652,23 @@ export async function registerConnectionRoutes(
           .send({ message: unknownProvider(request.params.provider, providers) });
       }
 
-      const hints = await hintsFor(provider.descriptor.id);
+      const hints = await hintsFor(sessionUserId(request), provider.descriptor.id);
       if (!hints.has(request.params.field)) {
         return reply.code(404).send({
           message:
-            `Nothing is stored for ${credentialRecordName(provider.descriptor.id, request.params.field)}. ` +
+            `Nothing is stored for ${credentialSlotName(provider.descriptor.id, request.params.field)}. ` +
             "A key that came from the environment is removed by editing it there.",
         });
       }
 
-      await deleteSourceCredential(db, provider.descriptor.id as Provider, request.params.field);
+      await deleteSourceCredential(
+        db,
+        sessionUserId(request),
+        provider.descriptor.id as Provider,
+        request.params.field,
+      );
 
-      return view(provider);
+      return view(sessionUserId(request), provider);
     },
   });
 }

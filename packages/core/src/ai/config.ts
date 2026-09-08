@@ -41,6 +41,12 @@ export interface AiEnvironment {
   readonly AI_TRIAGE_BASE_URL?: string;
   readonly AI_TRIAGE_INPUT_PRICE_MICROS?: number;
   readonly AI_TRIAGE_OUTPUT_PRICE_MICROS?: number;
+  readonly AI_DRAFT_MODEL?: string;
+  readonly AI_DRAFT_PROVIDER?: AiProvider;
+  readonly AI_DRAFT_API_KEY?: string;
+  readonly AI_DRAFT_BASE_URL?: string;
+  readonly AI_DRAFT_INPUT_PRICE_MICROS?: number;
+  readonly AI_DRAFT_OUTPUT_PRICE_MICROS?: number;
   readonly AI_PROVIDER: AiProvider;
   readonly AI_MODEL: string;
   readonly AI_API_KEY?: string;
@@ -206,5 +212,43 @@ export function triageConfigFromEnvironment(env: AiEnvironment): AiConfig {
     outputPriceMicros: env.AI_TRIAGE_MODEL
       ? env.AI_TRIAGE_OUTPUT_PRICE_MICROS
       : (env.AI_TRIAGE_OUTPUT_PRICE_MICROS ?? env.AI_OUTPUT_PRICE_MICROS),
+  };
+}
+
+/**
+ * The model that writes a reply draft. US-070.
+ *
+ * Triage's shape, and deliberately so: every setting falls back to the
+ * classifier's, so a deployment that names nothing here drafts on the model it
+ * already has, and a person who sets only a key on the Models screen keeps the
+ * rest.
+ *
+ * It exists as its own setting because the two jobs are not the same job.
+ * Scoring reads carefully and answers in numbers; drafting writes something
+ * that will carry somebody's name into another person's conversation, and
+ * `ai/reply.ts` is strict about what that may say. On some providers those are
+ * different models.
+ *
+ * The key is reused only when the provider is the same, and the price falls
+ * back only with the model — both for the reasons the triage block gives. A
+ * draft billed at the classifier's rate would misreport what it cost, and that
+ * figure is shown to the person who pressed the button.
+ */
+export function draftConfigFromEnvironment(env: AiEnvironment): AiConfig {
+  const provider = env.AI_DRAFT_PROVIDER ?? env.AI_PROVIDER;
+  const sameProvider = provider === env.AI_PROVIDER;
+
+  return {
+    provider,
+    model: env.AI_DRAFT_MODEL ?? env.AI_MODEL,
+    apiKey: env.AI_DRAFT_API_KEY ?? (sameProvider ? env.AI_API_KEY : undefined),
+    baseUrl: env.AI_DRAFT_BASE_URL ?? (sameProvider ? env.AI_BASE_URL : undefined),
+    timeoutMs: env.AI_TIMEOUT_MS,
+    inputPriceMicros: env.AI_DRAFT_MODEL
+      ? env.AI_DRAFT_INPUT_PRICE_MICROS
+      : (env.AI_DRAFT_INPUT_PRICE_MICROS ?? env.AI_INPUT_PRICE_MICROS),
+    outputPriceMicros: env.AI_DRAFT_MODEL
+      ? env.AI_DRAFT_OUTPUT_PRICE_MICROS
+      : (env.AI_DRAFT_OUTPUT_PRICE_MICROS ?? env.AI_OUTPUT_PRICE_MICROS),
   };
 }

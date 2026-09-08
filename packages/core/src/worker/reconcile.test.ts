@@ -30,6 +30,9 @@ import {
   until,
 } from "./testing.js";
 
+/** The account these cases spend on. BUG-009 put the owner on every usage row. */
+const owner = "user-1";
+
 const now = new Date("2026-09-05T12:00:00Z");
 const ago = (hours: number) => new Date(now.getTime() - hours * 3600000);
 let database: TestDatabase;
@@ -130,8 +133,12 @@ it("hides every match for a deleted post and preserves verdicts and scores", asy
   expect(rows.map((row) => row.score)).toEqual([80, 80]);
   expect(rows[0]?.reasons).toEqual(["A buyer asks for help"]);
   expect(await db.select().from(feedback)).toHaveLength(1);
-  expect(await exportFeedback(db)).toMatchObject([{ score: 80, verdict: "good", title: null }]);
-  expect((await listMatches(db, { includeNotRelevant: true })).matches).toEqual([]);
+  expect(await exportFeedback(db, "self-hosted")).toMatchObject([
+    { score: 80, verdict: "good", title: null },
+  ]);
+  expect(
+    (await listMatches(db, { userId: "self-hosted", includeNotRelevant: true })).matches,
+  ).toEqual([]);
   expect((await db.select().from(posts))[0]?.deletedAt).toEqual(now);
 });
 it("checks oldest verification first and advances a successful check", async () => {
@@ -180,6 +187,7 @@ it("refuses a metered re-check at the cap before reaching the provider", async (
   await seed();
   await setBudget(db, monitorId, { monthlyCapMicros: 1500, onExhausted: "notify" });
   await recordSourceUsage(db, {
+    userId: owner,
     monitorId,
     source: "reddit",
     provider: "brightdata",

@@ -25,12 +25,14 @@ import {
   type InboxMatch,
   listMatches,
   matchesToCsv,
+  matchOwner,
   maximumPageSize,
   recordVerdict,
   setMatchSaved,
   verdicts,
 } from "@intentwatch/core";
 import { z } from "zod";
+import { sessionUserId } from "./auth.js";
 import type { ApiServer } from "./server.js";
 
 const matchSchema = z.object({
@@ -140,6 +142,7 @@ export async function registerMatchRoutes(
         request.query;
 
       const page = await listMatches(db, {
+        userId: sessionUserId(request),
         monitorId,
         projectId,
         minScore,
@@ -192,7 +195,12 @@ export async function registerMatchRoutes(
       },
     },
     handler: async (request, reply) => {
-      const result = await setMatchSaved(db, request.params.id, request.body.saved);
+      const result = await setMatchSaved(
+        db,
+        sessionUserId(request),
+        request.params.id,
+        request.body.saved,
+      );
 
       if (!result) return reply.code(404).send({ message: "No match has that id." });
 
@@ -232,7 +240,21 @@ export async function registerMatchRoutes(
       },
     },
     handler: async (request, reply) => {
+      /**
+       * The match has to be in this person's inbox. US-017.
+       *
+       * Checked here rather than inside `recordVerdict`, because `feedback` is
+       * one row per match per person by design and core keeps that. What this
+       * route decides is narrower: you may judge what you can read. A match on
+       * somebody else's monitor gets the same 404 an unknown id gets, because
+       * telling the two apart would confirm the id.
+       */
+      if ((await matchOwner(db, request.params.id)) !== sessionUserId(request)) {
+        return reply.code(404).send({ message: "No match has that id." });
+      }
+
       const recorded = await recordVerdict(db, {
+        userId: sessionUserId(request),
         matchId: request.params.id,
         verdict: request.body.verdict,
       });
@@ -290,6 +312,7 @@ export async function registerMatchRoutes(
        */
       for (let page = 0; page < 20; page += 1) {
         const answer = await listMatches(db, {
+          userId: sessionUserId(request),
           monitorId,
           projectId,
           minScore,
@@ -358,8 +381,8 @@ export async function registerMatchRoutes(
         }),
       },
     },
-    handler: async (_request, reply) => {
-      const rows = await exportFeedback(db);
+    handler: async (request, reply) => {
+      const rows = await exportFeedback(db, sessionUserId(request));
 
       reply.header("content-disposition", 'attachment; filename="intentwatch-feedback.json"');
 

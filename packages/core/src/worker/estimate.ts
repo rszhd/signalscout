@@ -256,7 +256,7 @@ export function createEstimateStep({
       const keyed = new Map<string, SourceCredentials>();
 
       for (const candidate of registry.forPlatform(probe.source)) {
-        const found = await credentialsFor(candidate);
+        const found = await credentialsFor(candidate, run.userId);
         if (found) keyed.set(candidate.provider.id, found);
       }
 
@@ -302,6 +302,7 @@ export function createEstimateStep({
       try {
         const sample = await takeSample(source, probe, credentials, since, (units) =>
           recordSourceUsage(db, {
+            userId: run.userId,
             monitorId: run.monitorId,
             source: probe.source,
             provider: source.provider.id as Provider,

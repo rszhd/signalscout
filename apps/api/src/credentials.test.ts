@@ -25,6 +25,14 @@ import { createTestDatabase, type TestDatabase } from "@intentwatch/core/testing
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { buildServer } from "./server.js";
 import { startApi } from "./start.js";
+import { asOwner, testOwner as owner } from "./testing.js";
+
+/**
+ * US-017 refuses to boot without a session secret, before the credential
+ * check below is reached. These cases are about that check, so every instance
+ * they describe has one.
+ */
+const bootSecret = "a-test-secret-that-is-long-enough-to-pass";
 
 const logger = createLogger({ level: "silent", name: "test" });
 
@@ -54,7 +62,9 @@ describe("a stored credential and the API", () => {
   });
 
   async function storedSet() {
-    return new Set((await listCredentialHints(db)).map((hint) => `${hint.provider}:${hint.field}`));
+    return new Set(
+      (await listCredentialHints(db, owner)).map((hint) => `${hint.provider}:${hint.field}`),
+    );
   }
 
   async function server(options: {
@@ -62,7 +72,8 @@ describe("a stored credential and the API", () => {
     storedCredentials?: () => Promise<ReadonlySet<string>>;
   }) {
     return buildServer({
-      env: loadEnv({ DATABASE_URL: database.url }),
+      session: asOwner,
+      env: loadEnv({ DATABASE_URL: database.url, AUTH_SECRET: bootSecret }),
       logger,
       db,
       sources: builtInSources,
@@ -93,6 +104,7 @@ describe("a stored credential and the API", () => {
 
     it("never carries a key that came from the database", async () => {
       await putSourceCredential(db, key, {
+        userId: owner,
         provider: "brightdata",
         field: "apiKey",
         value: secret,
@@ -131,6 +143,7 @@ describe("a stored credential and the API", () => {
       // Otherwise a person who moved a key into the database is told their
       // source is not set up, while the worker polls it happily.
       await putSourceCredential(db, key, {
+        userId: owner,
         provider: "brightdata",
         field: "apiKey",
         value: secret,
@@ -170,6 +183,7 @@ describe("a stored credential and the API", () => {
       // Structural, not a sample: every route this build registers, by method
       // and path. A route added later that serves a key has to pass this.
       await putSourceCredential(db, key, {
+        userId: owner,
         provider: "brightdata",
         field: "apiKey",
         value: secret,
@@ -195,6 +209,7 @@ describe("a stored credential and the API", () => {
   describe("the boot check", () => {
     it("refuses to start when a stored credential cannot be decrypted", async () => {
       await putSourceCredential(db, key, {
+        userId: owner,
         provider: "brightdata",
         field: "apiKey",
         value: secret,
@@ -204,6 +219,7 @@ describe("a stored credential and the API", () => {
         startApi({
           env: loadEnv({
             DATABASE_URL: database.url,
+            AUTH_SECRET: bootSecret,
             WORKER_IN_PROCESS: "false",
             ENCRYPTION_KEY: otherKey,
           }),
@@ -217,6 +233,7 @@ describe("a stored credential and the API", () => {
 
     it("refuses to start when a credential is stored and no key is set", async () => {
       await putSourceCredential(db, key, {
+        userId: owner,
         provider: "brightdata",
         field: "apiKey",
         value: secret,
@@ -224,7 +241,11 @@ describe("a stored credential and the API", () => {
 
       await expect(
         startApi({
-          env: loadEnv({ DATABASE_URL: database.url, WORKER_IN_PROCESS: "false" }),
+          env: loadEnv({
+            DATABASE_URL: database.url,
+            WORKER_IN_PROCESS: "false",
+            AUTH_SECRET: bootSecret,
+          }),
           logger,
           createDatabase: () => ({ db, pool: {}, close: async () => undefined }) as never,
           startJobSender: vi.fn(async () => ({ send: vi.fn(), stop: vi.fn() })) as never,
@@ -235,6 +256,7 @@ describe("a stored credential and the API", () => {
 
     it("never puts the value in the message it refuses with", async () => {
       await putSourceCredential(db, key, {
+        userId: owner,
         provider: "brightdata",
         field: "apiKey",
         value: secret,
@@ -244,6 +266,7 @@ describe("a stored credential and the API", () => {
         await startApi({
           env: loadEnv({
             DATABASE_URL: database.url,
+            AUTH_SECRET: bootSecret,
             WORKER_IN_PROCESS: "false",
             ENCRYPTION_KEY: otherKey,
           }),

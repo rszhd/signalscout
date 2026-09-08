@@ -208,19 +208,6 @@ a {
   border-top: 1px solid var(--line);
 }
 
-.local-pill {
-  display: inline-flex;
-  padding: 5px 8px;
-  border: 1px solid var(--line-dark);
-  border-radius: 999px;
-  color: var(--muted-strong);
-  background: var(--surface);
-  font-size: var(--text-xs);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-}
-
 .sidebar-bottom p {
   margin: 9px 0 0;
   color: var(--muted);

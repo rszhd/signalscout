@@ -53,11 +53,29 @@ import {
  * in its own `record` column, and this function names only what is written
  * from now on. A rewrite normalises the row.
  */
-export function credentialRecordName(provider: string, field: string): string {
+export function credentialRecordName(userId: string, provider: string, field: string): string {
+  return `${userId}:${provider}:${field}`;
+}
+
+/**
+ * How a credential is *spoken about*: "brightdata:apiKey is set".
+ *
+ * Deliberately not the record above, and US-067 split them. The record is what
+ * the ciphertext is authenticated with, so it carries the owner — without it, a
+ * row moved between two accounts' slots by anybody with `psql` would decrypt
+ * happily, and the primary key alone does not stop that.
+ *
+ * A slot must *not* carry the owner. It keys the readiness set, and that set is
+ * already one person's, so putting the id in would make every "this key is
+ * missing" sentence name an account nobody asked about.
+ */
+export function credentialSlotName(provider: string, field: string): string {
   return `${provider}:${field}`;
 }
 
 export interface StoredCredential {
+  /** Which account on this instance. Never the provider's own account. */
+  readonly userId: string;
   readonly provider: Provider;
   readonly field: string;
   readonly value: string;
@@ -71,20 +89,21 @@ export interface CredentialHint {
   readonly hint: string;
 }
 
-/** Write one credential, replacing whatever was there. */
+/** Write one credential, replacing whatever this account had there. */
 export async function putSourceCredential(
   db: Database,
   key: EncryptionKey,
-  { provider, field, value }: StoredCredential,
+  { userId, provider, field, value }: StoredCredential,
 ): Promise<void> {
   if (!value.trim()) {
     throw new Error(
-      `Refusing to store a blank credential for ${credentialRecordName(provider, field)}.`,
+      `Refusing to store a blank credential for ${credentialSlotName(provider, field)}.`,
     );
   }
 
-  const record = credentialRecordName(provider, field);
+  const record = credentialRecordName(userId, provider, field);
   const row = {
+    userId,
     provider,
     field,
     record,
@@ -97,7 +116,9 @@ export async function putSourceCredential(
     .insert(sourceCredentials)
     .values(row)
     .onConflictDoUpdate({
-      target: [sourceCredentials.provider, sourceCredentials.field],
+      // The owner is in the target, so one account writing its own key can no
+      // longer replace another's. Until US-067 it could, silently.
+      target: [sourceCredentials.userId, sourceCredentials.provider, sourceCredentials.field],
       // The old ciphertext is overwritten, never kept beside the new one. A
       // second row would keep the replaced key working. `record` moves with
       // it, so a row written under an older name stops carrying one.
@@ -119,26 +140,41 @@ export async function putSourceCredential(
 export async function readSourceCredential(
   db: Database,
   key: EncryptionKey,
+  userId: string,
   provider: Provider,
   field: string,
 ): Promise<string | undefined> {
   const [row] = await db
     .select({ ciphertext: sourceCredentials.ciphertext, record: sourceCredentials.record })
     .from(sourceCredentials)
-    .where(and(eq(sourceCredentials.provider, provider), eq(sourceCredentials.field, field)));
+    .where(
+      and(
+        eq(sourceCredentials.userId, userId),
+        eq(sourceCredentials.provider, provider),
+        eq(sourceCredentials.field, field),
+      ),
+    );
 
   // The row's own record name, not one derived here. US-024 renamed what this
   // is keyed by, and a derived name would refuse to open a key that works.
   return row ? decryptSecret(key, row.ciphertext, row.record) : undefined;
 }
 
-/** Every credential this instance holds, encrypted, in one read. */
+/**
+ * Every credential this instance holds, whoever owns it, in one read.
+ *
+ * Instance-wide on purpose, and the two callers are why: the boot check has to
+ * refuse a key it cannot open *whoever* it belongs to, and a rotation that
+ * covered one account would leave the rest sealed under a key nobody has.
+ * Nothing that answers a request calls this.
+ */
 export async function readAllSourceCredentials(
   db: Database,
   key: EncryptionKey,
 ): Promise<StoredCredential[]> {
   const rows = await db
     .select({
+      userId: sourceCredentials.userId,
       provider: sourceCredentials.provider,
       field: sourceCredentials.field,
       ciphertext: sourceCredentials.ciphertext,
@@ -147,21 +183,23 @@ export async function readAllSourceCredentials(
     .from(sourceCredentials);
 
   return rows.map((row) => ({
+    userId: row.userId,
     provider: row.provider,
     field: row.field,
     value: decryptSecret(key, row.ciphertext, row.record),
   }));
 }
 
-/** Which credentials are set, in the only form that may leave this process. */
-export async function listCredentialHints(db: Database): Promise<CredentialHint[]> {
+/** Which of this account's credentials are set, in the only form that may leave this process. */
+export async function listCredentialHints(db: Database, userId: string): Promise<CredentialHint[]> {
   return db
     .select({
       provider: sourceCredentials.provider,
       field: sourceCredentials.field,
       hint: sourceCredentials.hint,
     })
-    .from(sourceCredentials);
+    .from(sourceCredentials)
+    .where(eq(sourceCredentials.userId, userId));
 }
 
 /**
@@ -172,19 +210,48 @@ export async function listCredentialHints(db: Database): Promise<CredentialHint[
  * copies of one join is how a set ends up holding names the store does not
  * use, so the join lives here.
  */
-export async function storedCredentialNames(db: Database): Promise<ReadonlySet<string>> {
-  const hints = await listCredentialHints(db);
-  return new Set(hints.map((hint) => credentialRecordName(hint.provider, hint.field)));
+export async function storedCredentialNames(
+  db: Database,
+  userId: string,
+): Promise<ReadonlySet<string>> {
+  const hints = await listCredentialHints(db, userId);
+  return new Set(hints.map((hint) => credentialSlotName(hint.provider, hint.field)));
+}
+
+/**
+ * The same set, for every account at once.
+ *
+ * One caller: the line `startApi` logs at boot about sources nothing can poll.
+ * That is a sentence in a log and not a decision about a request, so it is
+ * allowed to be instance-wide — and a per-account version of it would need a
+ * session, which boot does not have.
+ *
+ * A separate function rather than an optional argument, because an optional
+ * owner is how a route ends up reading everybody's keys by forgetting one.
+ */
+export async function allStoredCredentialNames(db: Database): Promise<ReadonlySet<string>> {
+  const rows = await db
+    .select({ provider: sourceCredentials.provider, field: sourceCredentials.field })
+    .from(sourceCredentials);
+
+  return new Set(rows.map((row) => credentialSlotName(row.provider, row.field)));
 }
 
 export async function deleteSourceCredential(
   db: Database,
+  userId: string,
   provider: Provider,
   field: string,
 ): Promise<void> {
   await db
     .delete(sourceCredentials)
-    .where(and(eq(sourceCredentials.provider, provider), eq(sourceCredentials.field, field)));
+    .where(
+      and(
+        eq(sourceCredentials.userId, userId),
+        eq(sourceCredentials.provider, provider),
+        eq(sourceCredentials.field, field),
+      ),
+    );
 }
 
 /**
@@ -225,6 +292,7 @@ export async function rotateEncryptionKey(
   return db.transaction(async (tx) => {
     const rows = await tx
       .select({
+        userId: sourceCredentials.userId,
         provider: sourceCredentials.provider,
         field: sourceCredentials.field,
         ciphertext: sourceCredentials.ciphertext,
@@ -238,7 +306,7 @@ export async function rotateEncryptionKey(
       const value = decryptSecret(from, row.ciphertext, row.record);
       // Sealed again under the current name. A rotation is the other moment a
       // row written before US-024 stops carrying its old one.
-      const record = credentialRecordName(row.provider, row.field);
+      const record = credentialRecordName(row.userId, row.provider, row.field);
 
       await tx
         .update(sourceCredentials)
@@ -248,7 +316,11 @@ export async function rotateEncryptionKey(
           updatedAt: new Date(),
         })
         .where(
-          and(eq(sourceCredentials.provider, row.provider), eq(sourceCredentials.field, row.field)),
+          and(
+            eq(sourceCredentials.userId, row.userId),
+            eq(sourceCredentials.provider, row.provider),
+            eq(sourceCredentials.field, row.field),
+          ),
         );
     }
 

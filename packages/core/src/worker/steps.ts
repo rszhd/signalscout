@@ -11,14 +11,13 @@
 import type { PgBoss } from "pg-boss";
 import type { Database } from "../db/client.js";
 import type { Logger } from "../logger.js";
-import {
-  type ClassifyPayload,
-  type EstimatePayload,
-  type FilterPayload,
-  type NotifyPayload,
-  notifyQueue,
-  type PollPayload,
-  type RepliesPayload,
+import type {
+  ClassifyPayload,
+  EstimatePayload,
+  FilterPayload,
+  NotifyPayload,
+  PollPayload,
+  RepliesPayload,
 } from "./queues.js";
 
 export interface StepContext {
@@ -49,27 +48,3 @@ export interface WorkerSteps extends PipelineSteps {
   readonly estimate: Step<EstimatePayload>;
   readonly reconcile: Step<Record<string, never>>;
 }
-
-/**
- * What runs in place of the classifier when no model is configured.
- *
- * US-009 built the classify step; this is the branch where the deployment has
- * not been given a key to run it with. It writes no match, because an unscored
- * post is not a match and inventing one would put a number in front of a
- * person that no model produced.
- *
- * It logs an error and completes rather than throwing. A missing key is not
- * transient: retrying it four times and dead-lettering the job buries the one
- * sentence the user has to read. `worker/collect.ts` treats a missing source
- * key the same way, for the same reason.
- */
-export const unconfiguredClassify: Step<ClassifyPayload> = async (
-  { monitorId, postIds },
-  { boss, logger },
-) => {
-  logger.error(
-    { monitorId, posts: postIds.length },
-    "classification skipped: no model is configured. Set AI_API_KEY, or AI_PROVIDER=ollama.",
-  );
-  await boss.send(notifyQueue, { monitorId, matchIds: [] });
-};

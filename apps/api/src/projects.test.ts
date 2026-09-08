@@ -18,6 +18,7 @@ import {
 import { createTestDatabase, type TestDatabase } from "@intentwatch/core/testing";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { buildServer } from "./server.js";
+import { asOwner } from "./testing.js";
 
 const logger = createLogger({ level: "silent", name: "test" });
 
@@ -75,7 +76,7 @@ describe("the project routes", () => {
 
   async function server(describer: ProjectDescriber | null = describerAnswering(draft)) {
     const env = loadEnv({ DATABASE_URL: database.url });
-    return buildServer({ env, logger, db, queryGenerator: null, describer });
+    return buildServer({ session: asOwner, env, logger, db, queryGenerator: null, describer });
   }
 
   async function post(url: string, body: Record<string, unknown>) {
@@ -270,6 +271,7 @@ describe("drafting a project from a document", () => {
   async function describing(result: DescribeResult | null, body: Record<string, unknown>) {
     const env = loadEnv({ DATABASE_URL: database.url });
     const app = await buildServer({
+      session: asOwner,
       env,
       logger,
       db,

@@ -1,7 +1,9 @@
 import type { Env, JobSender, Logger, WorkerHandle } from "@intentwatch/core";
 import {
+  allStoredCredentialNames,
   assertStoredCredentialsAreReadable,
   builtInSources,
+  configureNetworking,
   createDatabase,
   jobSenderFor,
   startBlockers,
@@ -44,6 +46,32 @@ export async function startApi({
   startJobSender = startJobSenderDefault,
   createDatabase: openDatabase = createDatabase,
 }: StartApiOptions): Promise<ApiHandle> {
+  /**
+   * No login, no instance. US-017.
+   *
+   * Refused here rather than warned about, and this is the one boot check in
+   * the product that is about somebody else reaching the process rather than
+   * about the process working. An instance that starts without a session
+   * secret serves an inbox of commercial research and a set of keys that spend
+   * money to whoever finds the port, and it does it silently — every screen
+   * works, which is exactly why nobody notices.
+   *
+   * `buildServer` still tolerates a build with no auth, because a test may
+   * describe one. A process may not.
+   */
+  if (!env.AUTH_SECRET) {
+    throw new Error(
+      "AUTH_SECRET is not set, so this instance would have no login.\n" +
+        "Generate one and put it in .env:\n\n" +
+        "    openssl rand -base64 32\n",
+    );
+  }
+
+  // Before any provider is called. BUG-011: Node gives an address 250ms to
+  // connect, and several providers take longer than that, so half their
+  // requests failed with what looked like an outage.
+  configureNetworking();
+
   const worker = env.WORKER_IN_PROCESS
     ? await startWorker({ databaseUrl: env.DATABASE_URL, logger })
     : null;
@@ -91,7 +119,7 @@ export async function startApi({
    * Boot is where the database is already known to be reachable, because the
    * check above just read every row of it.
    */
-  const configured = await storedCredentialNames(db);
+  const configured = await allStoredCredentialNames(db);
   const unconfigured = builtInSources.filter(
     (source) =>
       startBlockers([source.platform.id], {
@@ -125,7 +153,7 @@ export async function startApi({
     logger,
     db,
     jobs,
-    storedCredentials: () => storedCredentialNames(db),
+    storedCredentials: (userId: string) => storedCredentialNames(db, userId),
   });
   await app.listen({ host: env.HOST, port: env.PORT });
 

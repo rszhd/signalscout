@@ -34,7 +34,7 @@ import type { Database } from "../db/client.js";
 import type { Provider } from "../db/schema.js";
 import type { Logger } from "../logger.js";
 import { type EncryptionKey, optionalEncryptionKey } from "../secrets/cipher.js";
-import { credentialRecordName, readSourceCredential } from "../secrets/store.js";
+import { credentialSlotName, readSourceCredential } from "../secrets/store.js";
 import type { ConnectorDescriptor, SourceCredentials } from "../sources/types.js";
 
 /**
@@ -46,6 +46,18 @@ import type { ConnectorDescriptor, SourceCredentials } from "../sources/types.js
  */
 export type CredentialLookup = (
   connector: ConnectorDescriptor,
+  /**
+   * Whose key to use: the owner of the monitor this work belongs to. US-067.
+   *
+   * A parameter and not a closure, because one worker process serves every
+   * account on the instance. A lookup built per account would be a cache
+   * keyed by something, and the something is this.
+   *
+   * The environment half below ignores it, and that is the self-hosted path:
+   * `BRIGHTDATA_API_KEY` in `.env` belongs to the machine, so every monitor
+   * on an instance configured that way polls on it, exactly as before.
+   */
+  userId: string,
 ) => Promise<SourceCredentials | undefined> | SourceCredentials | undefined;
 
 /** `apiKey` -> `API_KEY`, `apiSecret` -> `API_SECRET`. */
@@ -105,6 +117,8 @@ export function credentialsFromEnvironment(
   environment: Record<string, string | undefined> = process.env,
   logger?: Logger,
 ): CredentialLookup {
+  // The owner is ignored here on purpose: an environment variable belongs to
+  // the machine, and that is what makes `.env` the self-hosted path.
   return (connector) => {
     const credentials: Record<string, string> = {};
 
@@ -183,7 +197,7 @@ export function missingCredentials(
   return connector.provider.credentialFields
     .filter(
       (field) =>
-        !stored.has(credentialRecordName(connector.provider.id, field.name)) &&
+        !stored.has(credentialSlotName(connector.provider.id, field.name)) &&
         !environmentValue(connector, field.name, environment),
     )
     .map((field) => ({
@@ -217,7 +231,7 @@ export function credentialsFromStore(
 
   if (!key) return fromEnvironment;
 
-  return async (connector) => {
+  return async (connector, userId) => {
     const credentials: Record<string, string> = {};
 
     for (const field of connector.provider.credentialFields) {
@@ -230,6 +244,7 @@ export function credentialsFromStore(
       const stored = await readSourceCredential(
         db,
         key,
+        userId,
         connector.provider.id as Provider,
         field.name,
       );

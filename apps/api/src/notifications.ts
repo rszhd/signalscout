@@ -1,6 +1,5 @@
 import {
   type Database,
-  getMonitor,
   type NotificationEnv,
   notificationDefaults,
   notificationInputSchema,
@@ -9,6 +8,7 @@ import {
   saveNotificationSettings,
 } from "@intentwatch/core";
 import { z } from "zod";
+import { ownedMonitor } from "./auth.js";
 import type { ApiServer } from "./server.js";
 
 export async function registerNotificationRoutes(
@@ -40,7 +40,7 @@ export async function registerNotificationRoutes(
     url: "/api/monitors/:id/notifications",
     schema: { params, response: { 200: response, 404: problem } },
     handler: async (request, reply) => {
-      if (!(await getMonitor(db, request.params.id)))
+      if (!(await ownedMonitor(db, request, request.params.id)))
         return reply.code(404).send({ message: "No monitor has that id." });
       return read(request.params.id);
     },
@@ -54,7 +54,7 @@ export async function registerNotificationRoutes(
       response: { 200: response, 404: problem, 409: problem },
     },
     handler: async (request, reply) => {
-      if (!(await getMonitor(db, request.params.id)))
+      if (!(await ownedMonitor(db, request, request.params.id)))
         return reply.code(404).send({ message: "No monitor has that id." });
       const ready = notificationReadiness(env);
       const missing = [

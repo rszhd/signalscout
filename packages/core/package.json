@@ -46,6 +46,7 @@
     "@ai-sdk/openai": "4.0.58",
     "@ai-sdk/openai-compatible": "3.0.43",
     "ai": "7.0.92",
+    "better-auth": "1.7.3",
     "drizzle-orm": "0.45.2",
     "nodemailer": "^10.0.0",
     "pg": "8.23.0",

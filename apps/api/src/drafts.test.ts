@@ -21,11 +21,12 @@ import {
   listReplyPrompts,
   loadEnv,
   replyPrompts,
-  singleUserId,
+  unclaimedUserId,
 } from "@intentwatch/core";
 import { createTestDatabase, type TestDatabase } from "@intentwatch/core/testing";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { buildServer } from "./server.js";
+import { asOwner } from "./testing.js";
 
 const logger = createLogger({ level: "silent", name: "test" });
 
@@ -50,6 +51,7 @@ describe("the saved reply prompts", () => {
 
   async function server() {
     return await buildServer({
+      session: asOwner,
       env: loadEnv({ DATABASE_URL: database.url }),
       logger,
       db,
@@ -132,7 +134,7 @@ describe("the saved reply prompts", () => {
     // US-022 fixed exactly this on monitors: a PATCH carrying one field must
     // not erase the rest.
     const app = await server();
-    const saved = await createReplyPrompt(db, singleUserId, {
+    const saved = await createReplyPrompt(db, unclaimedUserId, {
       name: "Plain",
       instruction: "No exclamation marks.",
     });
@@ -146,7 +148,7 @@ describe("the saved reply prompts", () => {
 
       expect(answer.statusCode).toBe(200);
 
-      const [after] = await listReplyPrompts(db, singleUserId);
+      const [after] = await listReplyPrompts(db, unclaimedUserId);
       expect(after?.name).toBe("Plain");
       expect(after?.instruction).toBe("No exclamation marks, and ask one question back.");
     } finally {
@@ -156,7 +158,7 @@ describe("the saved reply prompts", () => {
 
   it("deletes one, and says so when there is nothing to delete", async () => {
     const app = await server();
-    const saved = await createReplyPrompt(db, singleUserId, {
+    const saved = await createReplyPrompt(db, unclaimedUserId, {
       name: "Plain",
       instruction: "One.",
     });
@@ -166,7 +168,7 @@ describe("the saved reply prompts", () => {
         (await app.inject({ method: "DELETE", url: `/api/reply-prompts/${saved.id}` })).statusCode,
       ).toBe(204);
 
-      expect(await listReplyPrompts(db, singleUserId)).toHaveLength(0);
+      expect(await listReplyPrompts(db, unclaimedUserId)).toHaveLength(0);
 
       expect(
         (await app.inject({ method: "DELETE", url: `/api/reply-prompts/${saved.id}` })).statusCode,
@@ -215,6 +217,7 @@ describe("drafting without a model", () => {
     // state every test machine is in — and the state a self-hoster who has not
     // set a key is in.
     const app = await buildServer({
+      session: asOwner,
       env: loadEnv({ DATABASE_URL: database.url }),
       logger,
       db,

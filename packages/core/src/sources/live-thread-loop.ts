@@ -34,11 +34,11 @@ import {
 } from "../ai/config.js";
 import { createEmbedder } from "../ai/embed.js";
 import { createTriager } from "../ai/triage.js";
+import { ownerUserId } from "../auth/user.js";
 import { loadAiEnv } from "../config/env.js";
 import { createDatabase } from "../db/client.js";
 import { apiUsage, budgets, matches, modelCalls, monitors, posts } from "../db/schema.js";
 import { createLogger } from "../logger.js";
-import { singleUserId } from "../monitors/monitors.js";
 import { createClassifyStep } from "../worker/classify.js";
 import { credentialsFromStore } from "../worker/credentials.js";
 import { createFilterStep } from "../worker/filter.js";
@@ -96,8 +96,11 @@ const embedder =
     ? createEmbedder({ config: embeddingConfig })
     : undefined;
 
-const filter = createFilterStep({ ...(embedder ? { embedder } : {}), triager });
-const classify = createClassifyStep({ classifier });
+const filter = createFilterStep({
+  embedderFor: async () => embedder,
+  triagerFor: async () => triager,
+});
+const classify = createClassifyStep({ classifierFor: async () => classifier });
 const replies = createRepliesStep({ registry, credentialsFor });
 
 /**
@@ -207,7 +210,7 @@ async function main(): Promise<void> {
   const [monitor] = await db
     .insert(monitors)
     .values({
-      userId: singleUserId,
+      userId: await ownerUserId(db),
       name: `US-048 live thread loop ${new Date().toISOString().slice(0, 16)}`,
       product: template.product,
       idealCustomer: template.idealCustomer,

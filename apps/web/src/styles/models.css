@@ -1,0 +1,74 @@
+/* The Models screen. Three cards, one per job this product asks a model to do. */
+.models-page {
+  display: grid;
+  gap: var(--space-6);
+}
+
+.model-cards {
+  display: grid;
+  gap: var(--space-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.model-card {
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-6);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+}
+
+.model-card-heading h2 {
+  margin: 0 0 var(--space-1);
+  font-size: var(--text-md);
+}
+
+.model-card-heading > p {
+  margin: 0;
+  color: var(--muted-strong);
+  font-size: var(--text-sm);
+}
+
+/* The measurement behind the choice, which is the part that stops somebody
+   picking an expensive triage model and paying more than they save. Its own
+   selector rather than `!important` over the rule above: the two say different
+   things and one of them should not have to shout. */
+.model-card-heading .model-card-note {
+  margin-top: var(--space-2);
+  color: var(--muted);
+  font-size: var(--text-xs);
+}
+
+.model-advanced summary {
+  color: var(--muted-strong);
+  font-size: var(--text-xs);
+  cursor: pointer;
+}
+
+.model-advanced .field {
+  margin-top: var(--space-3);
+}
+
+.model-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.model-saved {
+  color: var(--muted);
+  font-size: var(--text-xs);
+}
+
+.model-blocker {
+  margin: 0;
+  padding: var(--space-4);
+  background: var(--accent-soft);
+  border-radius: var(--radius-md);
+  color: var(--muted-strong);
+  font-size: var(--text-sm);
+}

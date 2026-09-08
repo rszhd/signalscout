@@ -29,7 +29,6 @@ import {
   exhaustedBehaviours,
   type FilterDropCounts,
   filterDropCounts,
-  getMonitor,
   groupByPlatform,
   type LastCollection,
   lastCollections,
@@ -62,6 +61,7 @@ import {
   verdictCounts,
 } from "@intentwatch/core";
 import { z } from "zod";
+import { ownedMonitor, sessionUserId } from "./auth.js";
 import type { ApiServer } from "./server.js";
 
 /**
@@ -390,9 +390,19 @@ export interface MonitorRoutesOptions {
    * reads `source_credentials`; a test that describes a deployment passes one
    * that answers from memory. US-004, US-023.
    */
-  readonly storedCredentials?: () => Promise<ReadonlySet<string>> | ReadonlySet<string>;
+  readonly storedCredentials?: (
+    userId: string,
+  ) => Promise<ReadonlySet<string>> | ReadonlySet<string>;
   /** Null when this deployment has no model key. The form says so. */
-  readonly queryGenerator: QueryGenerator | null;
+  readonly queryGenerator?: QueryGenerator | null;
+  /**
+   * The per-account fallback. US-068.
+   *
+   * The option above stays an override — a test passes one, and `null` still
+   * means "this deployment has none". This is what is used when it is absent,
+   * and it is a function of the person asking because they pay for the call.
+   */
+  readonly queryGeneratorFor?: (userId: string) => Promise<QueryGenerator | null>;
 }
 
 function monitorEnvironment(
@@ -517,7 +527,19 @@ export async function registerMonitorRoutes(
   app: ApiServer,
   options: MonitorRoutesOptions,
 ): Promise<void> {
-  const { db, sources, queryGenerator } = options;
+  const { db, sources, queryGenerator, queryGeneratorFor } = options;
+
+  /**
+   * The model that writes this person's queries. US-068.
+   *
+   * They pay for the call, so the settings are theirs. The option stays an
+   * override for tests, including `null` for a deployment that has none.
+   */
+  async function generatorFor(userId: string): Promise<QueryGenerator | null> {
+    return queryGenerator === undefined
+      ? ((await queryGeneratorFor?.(userId)) ?? null)
+      : queryGenerator;
+  }
 
   /**
    * Which credentials exist, read when a request asks rather than at boot.
@@ -529,13 +551,21 @@ export async function registerMonitorRoutes(
    */
   const stored = options.storedCredentials ?? (() => new Set<string>());
 
-  async function currentEnvironment(): Promise<MonitorEnvironment> {
+  /**
+   * What this *person* can poll with. US-067.
+   *
+   * A key is an account's since US-067, so "is Reddit ready?" is a question
+   * about whoever is asking. It used to be a question about the instance, and
+   * on an instance taking registrations that answer would tell one person a
+   * platform is connected because somebody else pasted a key for it.
+   */
+  async function currentEnvironment(userId: string): Promise<MonitorEnvironment> {
     // Both halves per request, and for the same reason: the connections screen
     // writes a key and a provider choice into this running process, and a
     // value captured at registration would keep answering with the old one
     // until a restart.
     const [storedCredentials, providerChoices] = await Promise.all([
-      stored(),
+      stored(userId),
       readProviderChoices(db),
     ]);
 
@@ -585,8 +615,8 @@ export async function registerMonitorRoutes(
         }),
       },
     },
-    handler: async () => {
-      const runtime = await currentEnvironment();
+    handler: async (request) => {
+      const runtime = await currentEnvironment(sessionUserId(request));
 
       return {
         signals: signalList.map(({ id, label, hint }) => ({ id, label, hint })),
@@ -624,7 +654,7 @@ export async function registerMonitorRoutes(
             canFetchReplies: replies[platform.id] === true,
           };
         }),
-        canGenerateQueries: queryGenerator !== null,
+        canGenerateQueries: (await generatorFor(sessionUserId(request))) !== null,
       };
     },
   });
@@ -655,7 +685,9 @@ export async function registerMonitorRoutes(
       },
     },
     handler: async (request, reply) => {
-      if (!queryGenerator) {
+      const generator = await generatorFor(sessionUserId(request));
+
+      if (!generator) {
         return reply.code(503).send({
           message:
             "No model is configured, so queries cannot be written. Set AI_API_KEY, " +
@@ -679,7 +711,7 @@ export async function registerMonitorRoutes(
           ? platforms
           : platforms.filter((platform) => wanted.some((id) => id === platform.id));
 
-      const outcome = await queryGenerator.generate(request.body, wantedPlatforms);
+      const outcome = await generator.generate(request.body, wantedPlatforms);
 
       await recordModelCall(db, {
         purpose: "query_generation",
@@ -692,7 +724,7 @@ export async function registerMonitorRoutes(
         request.log.warn({ err: outcome.error }, "the model wrote an unusable set of queries");
         return reply.code(422).send({
           message:
-            `${queryGenerator.model} did not write a usable set of queries. ` +
+            `${generator.model} did not write a usable set of queries. ` +
             "Try again, or make the answers more specific. You can also type the queries yourself.",
         });
       }
@@ -700,7 +732,7 @@ export async function registerMonitorRoutes(
       if (outcome.status === "failed") {
         request.log.error({ err: outcome.error }, "the model could not be reached");
         return reply.code(502).send({
-          message: `${queryGenerator.model} could not be reached: ${outcome.error}`,
+          message: `${generator.model} could not be reached: ${outcome.error}`,
         });
       }
 
@@ -711,7 +743,7 @@ export async function registerMonitorRoutes(
           Object.entries(outcome.plan.queries).map(([platform, list]) => [platform, [...list]]),
         ),
         subreddits: [...outcome.plan.subreddits],
-        model: queryGenerator.model,
+        model: generator.model,
         estimatedCostMicros: outcome.call.estimatedCostMicros ?? null,
       };
     },
@@ -721,13 +753,13 @@ export async function registerMonitorRoutes(
     method: "GET",
     url: "/api/monitors",
     schema: { response: { 200: z.array(monitorSchema) } },
-    handler: async () => {
-      const runtime = await currentEnvironment();
+    handler: async (request) => {
+      const runtime = await currentEnvironment(sessionUserId(request));
 
       // One read for every monitor's spend, rather than one per row. The
       // screen that shows this is a list, and a per-row query here would be
       // the list's cost growing with the number of monitors.
-      const rows = await listMonitors(db);
+      const rows = await listMonitors(db, sessionUserId(request));
       const [states, drops, read, verdicts, collected, notifications] = await Promise.all([
         budgetStates(db),
         filterDropCounts(db),
@@ -767,11 +799,16 @@ export async function registerMonitorRoutes(
       response: { 201: monitorSchema },
     },
     handler: async (request, reply) => {
-      const runtime = await currentEnvironment();
+      const runtime = await currentEnvironment(sessionUserId(request));
 
       const { monitor, missing } = await createMonitor(
         db,
-        { ...request.body, ...filterSettings(request.body), ...replySettings(request.body) },
+        {
+          ...request.body,
+          ...filterSettings(request.body),
+          ...replySettings(request.body),
+          userId: sessionUserId(request),
+        },
         runtime,
       );
 
@@ -799,10 +836,10 @@ export async function registerMonitorRoutes(
       response: { 200: monitorSchema, 404: problemSchema },
     },
     handler: async (request, reply) => {
-      const monitor = await getMonitor(db, request.params.id);
+      const monitor = await ownedMonitor(db, request, request.params.id);
       if (!monitor) return reply.code(404).send({ message: "No monitor has that id." });
 
-      return readResponse(db, monitor, await currentEnvironment());
+      return readResponse(db, monitor, await currentEnvironment(sessionUserId(request)));
     },
   });
 
@@ -815,6 +852,10 @@ export async function registerMonitorRoutes(
       response: { 200: monitorSchema, 404: problemSchema },
     },
     handler: async (request, reply) => {
+      if (!(await ownedMonitor(db, request, request.params.id))) {
+        return reply.code(404).send({ message: "No monitor has that id." });
+      }
+
       const monitor = await updateMonitor(db, request.params.id, {
         ...request.body,
         ...filterSettings(request.body),
@@ -822,7 +863,7 @@ export async function registerMonitorRoutes(
       });
       if (!monitor) return reply.code(404).send({ message: "No monitor has that id." });
 
-      return readResponse(db, monitor, await currentEnvironment());
+      return readResponse(db, monitor, await currentEnvironment(sessionUserId(request)));
     },
   });
 
@@ -834,10 +875,14 @@ export async function registerMonitorRoutes(
       response: { 200: monitorSchema, 404: problemSchema },
     },
     handler: async (request, reply) => {
+      if (!(await ownedMonitor(db, request, request.params.id))) {
+        return reply.code(404).send({ message: "No monitor has that id." });
+      }
+
       const monitor = await pauseMonitor(db, request.params.id);
       if (!monitor) return reply.code(404).send({ message: "No monitor has that id." });
 
-      return readResponse(db, monitor, await currentEnvironment());
+      return readResponse(db, monitor, await currentEnvironment(sessionUserId(request)));
     },
   });
 
@@ -851,7 +896,11 @@ export async function registerMonitorRoutes(
     handler: async (request, reply) => {
       // Read now, not at boot. A key stored on the connections screen a moment
       // ago is what makes this resume the one that succeeds.
-      const runtime = await currentEnvironment();
+      const runtime = await currentEnvironment(sessionUserId(request));
+
+      if (!(await ownedMonitor(db, request, request.params.id))) {
+        return reply.code(404).send({ message: "No monitor has that id." });
+      }
 
       const result = await resumeMonitor(db, request.params.id, runtime);
       if (!result) return reply.code(404).send({ message: "No monitor has that id." });
@@ -897,12 +946,12 @@ export async function registerMonitorRoutes(
       response: { 200: monitorSchema, 404: problemSchema },
     },
     handler: async (request, reply) => {
-      const monitor = await getMonitor(db, request.params.id);
+      const monitor = await ownedMonitor(db, request, request.params.id);
       if (!monitor) return reply.code(404).send({ message: "No monitor has that id." });
 
       await setBudget(db, monitor.id, request.body);
 
-      return readResponse(db, monitor, await currentEnvironment());
+      return readResponse(db, monitor, await currentEnvironment(sessionUserId(request)));
     },
   });
 
@@ -925,12 +974,12 @@ export async function registerMonitorRoutes(
       response: { 200: monitorSchema, 404: problemSchema },
     },
     handler: async (request, reply) => {
-      const monitor = await getMonitor(db, request.params.id);
+      const monitor = await ownedMonitor(db, request, request.params.id);
       if (!monitor) return reply.code(404).send({ message: "No monitor has that id." });
 
       await clearBudget(db, monitor.id);
 
-      return readResponse(db, monitor, await currentEnvironment());
+      return readResponse(db, monitor, await currentEnvironment(sessionUserId(request)));
     },
   });
 
@@ -942,6 +991,10 @@ export async function registerMonitorRoutes(
       response: { 204: z.null(), 404: problemSchema },
     },
     handler: async (request, reply) => {
+      if (!(await ownedMonitor(db, request, request.params.id))) {
+        return reply.code(404).send({ message: "No monitor has that id." });
+      }
+
       const deleted = await deleteMonitor(db, request.params.id);
       if (!deleted) return reply.code(404).send({ message: "No monitor has that id." });
 

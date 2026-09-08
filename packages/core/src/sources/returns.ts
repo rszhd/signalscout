@@ -12,9 +12,9 @@
  * API imports no `drizzle-orm`, and `packages/core` is where the database is
  * reached. The route reads this and shapes it for a screen.
  */
-import { eq, isNotNull, sql } from "drizzle-orm";
+import { and, eq, isNotNull, sql } from "drizzle-orm";
 import type { Database } from "../db/client.js";
-import { feedback, matches, posts } from "../db/schema.js";
+import { feedback, filterDrops, matches, monitors, posts } from "../db/schema.js";
 
 /** One platform-and-provider pair, and what it returned. */
 export interface ProviderReturn {
@@ -47,7 +47,33 @@ export interface ProviderReturn {
  * attributing them to whichever provider is listed first would credit one
  * provider with another's work.
  */
-export async function providerReturns(db: Database): Promise<ProviderReturn[]> {
+export async function providerReturns(db: Database, userId: string): Promise<ProviderReturn[]> {
+  /**
+   * The posts this account's pipeline handled. BUG-009.
+   *
+   * `posts` has no owner and cannot have one: a post is deduplicated across
+   * every monitor on the instance, so the same Reddit thread is one row however
+   * many accounts collected it. What *is* per account is what each account's
+   * monitors did with it — a match, or a recorded drop — and that is the set
+   * counted here.
+   *
+   * On a single-account instance this is the same number as before, because
+   * every collected post is either matched or dropped by the monitor that
+   * collected it. On a shared one it stops a brand-new account being shown
+   * somebody else's collection, which is the bug this replaced.
+   */
+  const mine = sql`
+    SELECT ${matches.postId} AS post_id
+      FROM ${matches}
+      JOIN ${monitors} ON ${monitors.id} = ${matches.monitorId}
+     WHERE ${monitors.userId} = ${userId}
+     UNION
+    SELECT ${filterDrops.postId} AS post_id
+      FROM ${filterDrops}
+      JOIN ${monitors} ON ${monitors.id} = ${filterDrops.monitorId}
+     WHERE ${monitors.userId} = ${userId}
+  `;
+
   const rows = await db
     .select({
       source: posts.source,
@@ -59,8 +85,19 @@ export async function providerReturns(db: Database): Promise<ProviderReturn[]> {
       >`extract(epoch from percentile_cont(0.5) within group (order by now() - ${posts.postedAt})) / 3600.0`,
     })
     .from(posts)
-    .leftJoin(matches, eq(matches.postId, posts.id))
-    .where(isNotNull(posts.provider))
+    // The join is scoped too, not only the post set. A post this account
+    // dropped may have been matched by somebody else's monitor, and counting
+    // that match here would report a yield nobody on this account saw.
+    .leftJoin(
+      matches,
+      and(
+        eq(matches.postId, posts.id),
+        sql`${matches.monitorId} IN (SELECT ${monitors.id} FROM ${monitors} WHERE ${monitors.userId} = ${userId})`,
+      ),
+    )
+    .where(
+      and(isNotNull(posts.provider), sql`${posts.id} IN (SELECT post_id FROM (${mine}) AS mine)`),
+    )
     .groupBy(posts.source, posts.provider);
 
   return rows.map((row) => ({
@@ -76,14 +113,18 @@ export async function providerReturns(db: Database): Promise<ProviderReturn[]> {
 }
 
 /**
- * How many verdicts this instance holds.
+ * How many verdicts this account has given.
  *
  * The number that says how far to trust every other number here. A match is
  * the classifier's guess and a verdict is a person's judgement, so "cost per
  * good lead" needs verdicts and not matches — and with five of them on one
  * monitor it is not a figure anybody may compute yet. US-033.
  */
-export async function verdictCount(db: Database): Promise<number> {
-  const [row] = await db.select({ count: sql<number>`count(*)::int` }).from(feedback);
+export async function verdictCount(db: Database, userId: string): Promise<number> {
+  const [row] = await db
+    .select({ count: sql<number>`count(*)::int` })
+    .from(feedback)
+    .where(eq(feedback.userId, userId));
+
   return Number(row?.count ?? 0);
 }

@@ -34,14 +34,13 @@
 import { and, count, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 import type { Database } from "../db/client.js";
 import { feedback, matches, monitors, posts, type Verdict } from "../db/schema.js";
-import { singleUserId } from "../monitors/monitors.js";
 
 /** A verdict as the caller gives it. */
 export interface RecordVerdictInput {
   readonly matchId: string;
   readonly verdict: Verdict;
-  /** The single self-hosted account until US-017 brings real sessions. */
-  readonly userId?: string;
+  /** Who gave the verdict. Required since US-017; there is no default owner. */
+  readonly userId: string;
 }
 
 /** The verdict now in force, after the write. */
@@ -77,7 +76,7 @@ export async function recordVerdict(
   db: Database,
   input: RecordVerdictInput,
 ): Promise<RecordedVerdict | undefined> {
-  const userId = input.userId ?? singleUserId;
+  const userId = input.userId;
 
   return db.transaction(async (tx) => {
     const [match] = await tx
@@ -160,7 +159,7 @@ export async function recordVerdict(
 export async function currentVerdicts(
   db: Database,
   matchIds: readonly string[],
-  userId: string = singleUserId,
+  userId: string,
 ): Promise<Map<string, Verdict>> {
   if (matchIds.length === 0) return new Map();
 
@@ -260,10 +259,7 @@ export interface ExportedVerdict {
  * answers would lose the part that took time to collect — that somebody
  * changed their mind, and when.
  */
-export async function exportFeedback(
-  db: Database,
-  userId: string = singleUserId,
-): Promise<ExportedVerdict[]> {
+export async function exportFeedback(db: Database, userId: string): Promise<ExportedVerdict[]> {
   return db
     .select({
       matchId: feedback.matchId,

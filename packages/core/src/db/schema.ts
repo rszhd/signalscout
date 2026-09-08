@@ -1126,6 +1126,18 @@ export const apiUsage = pgTable(
      * and is shown the price. docs/costs.md says so to the user.
      */
     monitorId: uuid("monitor_id").references(() => monitors.id, { onDelete: "cascade" }),
+    /**
+     * Which account on this instance the money is spent by. BUG-009.
+     *
+     * Its own column rather than a read through `monitor_id`, for the reason
+     * the comment above gives: that one is null for a cost test, which is real
+     * money bought before a monitor exists. Without this, a cost test's spend
+     * belongs to nobody and appears on everybody's page.
+     *
+     * It is functionally determined by `monitor_id` when there is one, so
+     * adding it to the unique key below changes no grouping.
+     */
+    userId: text("user_id").notNull(),
     source: text("source").$type<Source>().notNull(),
     /** Whose bill this lands on, and whose price computed the cost beside it. */
     provider: text("provider").$type<Provider>().notNull(),
@@ -1146,8 +1158,12 @@ export const apiUsage = pgTable(
     // Postgres treats two nulls as different by default, so the unattributed
     // cost tests of one day would insert a row each instead of adding to one,
     // and the table would grow with every press of a button.
+    // The owner is in the key, and BUG-009 put it there. `nullsNotDistinct`
+    // above makes the rows with no monitor — the cost tests — dedupe on the
+    // rest of the key, so without the owner two accounts testing the same pair
+    // on the same day would add their money into one row.
     unique("api_usage_monitor_source_day_unique")
-      .on(table.monitorId, table.source, table.provider, table.day)
+      .on(table.userId, table.monitorId, table.source, table.provider, table.day)
       .nullsNotDistinct(),
     index("api_usage_monitor_day_idx").on(table.monitorId, table.day),
     check("api_usage_source_known", oneOf("source", sources)),
@@ -1223,6 +1239,15 @@ export const queryEstimates = pgTable(
   "query_estimates",
   {
     id: uuid("id").primaryKey().defaultRandom(),
+    /**
+     * Whose key pays for this test. US-067.
+     *
+     * Its own column rather than a read through `monitor_id`, because that one
+     * is null for the common case: the cost test runs on a plan, before a
+     * monitor exists. A sample is real money spent at a real provider, so the
+     * row has to say whose account it was spent on.
+     */
+    userId: text("user_id").notNull(),
     /** Null while the plan is still a plan. Set when an existing monitor is retested. */
     monitorId: uuid("monitor_id").references(() => monitors.id, { onDelete: "cascade" }),
     status: text("status").$type<EstimateStatus>().notNull().default("collecting"),
@@ -1409,6 +1434,23 @@ export const queryEstimateProbes = pgTable(
 export const sourceCredentials = pgTable(
   "source_credentials",
   {
+    /**
+     * Which account on *this instance* the key belongs to. US-067.
+     *
+     * Not to be confused with `provider` below, which is whose account at the
+     * data company it is. One person's Bright Data key; another person's is a
+     * different row.
+     *
+     * It was absent until US-066 made a second account possible, and the three
+     * faults it removes are worth naming: everybody polled on one key and one
+     * bill, the second person to paste a key silently overwrote the first, and
+     * anybody signed in could delete a key and stop every monitor on the
+     * instance.
+     *
+     * Text and no foreign key, for `monitors.user_id`'s reason: a row may be
+     * older than the first account.
+     */
+    userId: text("user_id").notNull(),
     /** Whose account the key is on. Never the platform it is used to fetch. */
     provider: text("provider").$type<Provider>().notNull(),
     /** The provider's own field name: `apiKey`, `apiSecret`. */
@@ -1422,7 +1464,7 @@ export const sourceCredentials = pgTable(
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [
-    primaryKey({ columns: [table.provider, table.field] }),
+    primaryKey({ columns: [table.userId, table.provider, table.field] }),
     check("source_credentials_provider_known", oneOf("provider", providers)),
     // A value that is not in the cipher's format was never encrypted by us.
     // The database refuses it rather than handing it to a connector as a key.
@@ -1463,6 +1505,94 @@ export const sourceProviders = pgTable(
   () => [
     check("source_providers_source_known", oneOf("source", sources)),
     check("source_providers_provider_known", oneOf("provider", providers)),
+  ],
+);
+
+/**
+ * The three jobs this product asks a model to do, as a person picks them.
+ *
+ * The same three the environment already names — `AI_*`, `AI_TRIAGE_*` and
+ * `AI_EMBEDDING_*` — because the whole design of US-068 is that a stored row
+ * is an *override of the environment*, layered over it and then read by the
+ * same three functions in `ai/config.ts`. Those functions carry rules that took
+ * measurements to get right (triage falls back to the classifier's settings but
+ * not to its price; a key is reused only within one provider), and none of them
+ * is rewritten here.
+ *
+ * `draft` is the fourth and US-070 added it. Scoring wants a model that reads
+ * carefully and answers in numbers; drafting wants one that writes like a
+ * person, and on some providers those are different models. It is also the only
+ * model output that carries somebody's name into another person's conversation,
+ * which is why it is the one of the API's three calls worth choosing.
+ *
+ * Query generation and project describing stay on the classifier's settings.
+ * Both produce input for a person to edit before anything is spent on it, and
+ * neither has anybody's name on it.
+ */
+export const aiTasks = ["classify", "triage", "embed", "draft"] as const;
+export type AiTask = (typeof aiTasks)[number];
+
+/**
+ * One account's model settings for one task. US-068.
+ *
+ * A row is an override and every column in it is optional except the key: a
+ * person who pastes only an API key keeps the instance's provider and model and
+ * simply pays for their own calls, which is the common cloud case.
+ *
+ * The key is encrypted with the same cipher and the same rules as
+ * `source_credentials` — `record` stored per row, `hint` for showing, and never
+ * a column anything can read the plaintext from. It is a separate table because
+ * that one is keyed by `Provider`, the data-company enum, and a model provider
+ * is a different list entirely.
+ */
+export const aiSettings = pgTable(
+  "ai_settings",
+  {
+    /** Which account. Text and no foreign key, for `monitors.user_id`'s reason. */
+    userId: text("user_id").notNull(),
+    task: text("task").$type<AiTask>().notNull(),
+    /** Null keeps the instance's provider for this task. */
+    provider: text("provider"),
+    /** Null keeps the instance's model. */
+    model: text("model"),
+    /** For a self-hosted gateway or a local runtime. */
+    baseUrl: text("base_url"),
+    /**
+     * Micro-dollars per million tokens, for a model we carry no price for.
+     *
+     * Null means "we cannot say", which is what an unpriced call already
+     * records. A guessed price would read as a measurement. `embed` uses the
+     * input column alone, because an embedding has no output tokens.
+     */
+    inputPriceMicros: integer("input_price_micros"),
+    outputPriceMicros: integer("output_price_micros"),
+    /** Null when this account uses the instance's key for this task. */
+    ciphertext: text("ciphertext"),
+    /** What the cipher authenticated. Stored, never derived. */
+    record: text("record"),
+    /** `••••1234`, so showing which key is set decrypts nothing. */
+    hint: text("hint"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.userId, table.task] }),
+    check("ai_settings_task_known", oneOf("task", aiTasks)),
+    // A value that is not in the cipher's format was never encrypted by us.
+    check(
+      "ai_settings_ciphertext_format",
+      sql.raw(`ciphertext IS NULL OR ciphertext LIKE 'v1.%.%.%'`),
+    ),
+    check(
+      "ai_settings_hint_masked",
+      sql.raw(`hint IS NULL OR (hint LIKE '••••%' AND length(hint) <= 8)`),
+    ),
+    // A ciphertext with no record cannot be opened, and a record with no
+    // ciphertext is a row describing nothing. Both halves or neither.
+    check(
+      "ai_settings_key_complete",
+      sql.raw(`(ciphertext IS NULL) = (record IS NULL) AND (ciphertext IS NULL) = (hint IS NULL)`),
+    ),
   ],
 );
 
@@ -1554,3 +1684,95 @@ export const postVerifications = pgTable(
   },
   () => [check("post_verifications_provider_known", oneOf("provider", providers))],
 );
+
+/**
+ * The four tables Better Auth owns. US-017.
+ *
+ * Better Auth addresses a Drizzle schema by the key a table is exported under
+ * and each column by its **property name**, so every property here is the
+ * camel-case field name the library asks for. The SQL column beside it is
+ * snake case, which is this schema's own convention, and the two are free to
+ * differ. Change a property name and the library stops finding the column,
+ * with no type error to say so.
+ *
+ * They are declared here rather than generated by Better Auth's CLI, because
+ * this repository has one migration path and `drizzle-kit` reads one schema
+ * file. A second tool writing tables into the same database would take the
+ * "one migration number, one file" rule away.
+ *
+ * Nothing outside `auth/` reads these. The rest of the application knows a
+ * user as a text id and no more, which is what makes `singleUserId` a value
+ * this replaces rather than a shape it changes.
+ */
+export const users = pgTable("users", {
+  /** Better Auth generates it, so text and not `uuid`. */
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  email: text("email").notNull().unique(),
+  emailVerified: boolean("email_verified").notNull().default(false),
+  image: text("image"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+/**
+ * One row per signed-in browser.
+ *
+ * `expiresAt` is the server's copy of the deadline and it is the one that
+ * counts. A cookie carries its own expiry, and a cookie is a thing the browser
+ * holds — the row here is what makes signing out and expiry real rather than
+ * advisory. US-017's acceptance asks for exactly that.
+ *
+ * `on delete cascade`: deleting a person deletes their sessions in the same
+ * statement, so no session can outlive the account it belongs to.
+ */
+export const sessions = pgTable("sessions", {
+  id: text("id").primaryKey(),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  token: text("token").notNull().unique(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+  userId: text("user_id")
+    .notNull()
+    .references((): AnyPgColumn => users.id, { onDelete: "cascade" }),
+});
+
+/**
+ * How a person proves who they are. One row per method.
+ *
+ * Email and password is the only method US-017 ships, and for it `password`
+ * holds Better Auth's hash — never a password, and never anything this
+ * application writes or reads. The OAuth columns are unused and are here
+ * because the library writes them the day somebody enables a social provider,
+ * and a missing column is a runtime failure rather than a type error.
+ */
+export const accounts = pgTable("accounts", {
+  id: text("id").primaryKey(),
+  accountId: text("account_id").notNull(),
+  providerId: text("provider_id").notNull(),
+  userId: text("user_id")
+    .notNull()
+    .references((): AnyPgColumn => users.id, { onDelete: "cascade" }),
+  accessToken: text("access_token"),
+  refreshToken: text("refresh_token"),
+  idToken: text("id_token"),
+  accessTokenExpiresAt: timestamp("access_token_expires_at", { withTimezone: true }),
+  refreshTokenExpiresAt: timestamp("refresh_token_expires_at", { withTimezone: true }),
+  scope: text("scope"),
+  /** Better Auth's hash of the password. Nothing here ever reads it. */
+  password: text("password"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+/** Short-lived tokens Better Auth issues, such as a password reset. */
+export const verifications = pgTable("verifications", {
+  id: text("id").primaryKey(),
+  identifier: text("identifier").notNull(),
+  value: text("value").notNull(),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});

@@ -65,7 +65,7 @@ export function createReconcileStep({
       if (!monitor) continue;
       const keyed = new Map<string, SourceCredentials>();
       for (const candidate of registry.forPlatform(post.source)) {
-        const credentials = await credentialsFor(candidate);
+        const credentials = await credentialsFor(candidate, monitor.userId);
         if (credentials) keyed.set(candidate.provider.id, credentials);
       }
       let source: SocialSource;
@@ -143,6 +143,7 @@ export function createReconcileStep({
       }
       await db.transaction(async (tx) => {
         await recordSourceUsage(tx, {
+          userId: monitor.userId,
           monitorId,
           source: post.source,
           provider: source.provider.id as Provider,

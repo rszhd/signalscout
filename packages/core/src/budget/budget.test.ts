@@ -18,6 +18,9 @@ import {
   spendByMonitor,
 } from "./budget.js";
 
+/** The account these cases spend on. BUG-009 put the owner on every usage row. */
+const owner = "user-1";
+
 /**
  * The budget guard, written before the guard.
  *
@@ -64,6 +67,7 @@ describe("the budget guard", () => {
       const monitorId = await insertMonitor(database);
 
       await recordSourceUsage(db, {
+        userId: owner,
         monitorId,
         source: "reddit",
         provider: "brightdata",
@@ -91,8 +95,8 @@ describe("the budget guard", () => {
         now: march,
       };
 
-      await recordSourceUsage(db, { ...page, units: 10 });
-      await recordSourceUsage(db, { ...page, units: 4 });
+      await recordSourceUsage(db, { userId: owner, ...page, units: 10 });
+      await recordSourceUsage(db, { userId: owner, ...page, units: 4 });
 
       const rows = await db.select().from(apiUsage);
 
@@ -108,6 +112,7 @@ describe("the budget guard", () => {
       const monitorId = await insertMonitor(database);
 
       await recordSourceUsage(db, {
+        userId: owner,
         monitorId: null,
         source: "reddit",
         provider: "brightdata",
@@ -116,6 +121,7 @@ describe("the budget guard", () => {
         now: march,
       });
       await recordSourceUsage(db, {
+        userId: owner,
         monitorId: null,
         source: "reddit",
         provider: "brightdata",
@@ -143,6 +149,7 @@ describe("the budget guard", () => {
       const common = { pricePerUnitMicros: redditPricePerRecord, units: 1 };
 
       await recordSourceUsage(db, {
+        userId: owner,
         ...common,
         monitorId: first,
         source: "reddit",
@@ -150,6 +157,7 @@ describe("the budget guard", () => {
         now: march,
       });
       await recordSourceUsage(db, {
+        userId: owner,
         ...common,
         monitorId: first,
         source: "x",
@@ -157,6 +165,7 @@ describe("the budget guard", () => {
         now: march,
       });
       await recordSourceUsage(db, {
+        userId: owner,
         ...common,
         monitorId: first,
         source: "reddit",
@@ -164,6 +173,7 @@ describe("the budget guard", () => {
         now: new Date("2026-03-15T09:00:00.000Z"),
       });
       await recordSourceUsage(db, {
+        userId: owner,
         ...common,
         monitorId: second,
         source: "reddit",
@@ -181,6 +191,7 @@ describe("the budget guard", () => {
       const monitorId = await insertMonitor(database);
 
       await recordSourceUsage(db, {
+        userId: owner,
         monitorId,
         source: "reddit",
         provider: "brightdata",
@@ -201,6 +212,7 @@ describe("the budget guard", () => {
       const monitorId = await insertMonitor(database);
 
       await recordSourceUsage(db, {
+        userId: owner,
         monitorId,
         source: "reddit",
         provider: "brightdata",
@@ -233,6 +245,7 @@ describe("the budget guard", () => {
       const february = new Date("2026-02-27T09:00:00.000Z");
 
       await recordSourceUsage(db, {
+        userId: owner,
         monitorId,
         source: "reddit",
         provider: "brightdata",
@@ -265,6 +278,7 @@ describe("the budget guard", () => {
       const theirs = await insertMonitor(database);
 
       await recordSourceUsage(db, {
+        userId: owner,
         monitorId: theirs,
         source: "reddit",
         provider: "brightdata",
@@ -306,6 +320,7 @@ describe("the budget guard", () => {
       // A dollar cap, and a thousand records at $1.50 per thousand on top of it.
       await setBudget(db, capped, { monthlyCapMicros: 1_000_000, onExhausted: "notify" });
       await recordSourceUsage(db, {
+        userId: owner,
         monitorId: capped,
         source: "reddit",
         provider: "brightdata",
@@ -327,6 +342,7 @@ describe("the budget guard", () => {
       const second = await insertMonitor(database);
 
       await recordSourceUsage(db, {
+        userId: owner,
         monitorId: first,
         source: "reddit",
         provider: "brightdata",
@@ -426,6 +442,7 @@ describe("the budget guard", () => {
       // Six hundred records at $1.50 per thousand is ninety cents.
       await setBudget(db, monitorId, { monthlyCapMicros: 900_000, onExhausted: "pause" });
       await recordSourceUsage(db, {
+        userId: owner,
         monitorId,
         source: "reddit",
         provider: "brightdata",
@@ -484,6 +501,7 @@ describe("the budget guard", () => {
       await setBudget(db, monitorId, { monthlyCapMicros: 1_000_000, onExhausted: "pause" });
       await clearBudget(db, monitorId);
       await recordSourceUsage(db, {
+        userId: owner,
         monitorId,
         source: "reddit",
         provider: "brightdata",

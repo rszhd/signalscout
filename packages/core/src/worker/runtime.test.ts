@@ -228,9 +228,17 @@ describe("a stored credential the worker cannot read", () => {
     await close();
   });
 
+  /** The account whose key this instance stores. US-067. */
+  const owner = "self-hosted";
+
   async function store(value: string, key: EncryptionKey): Promise<void> {
     const { db, close } = createDatabase(database.url);
-    await putSourceCredential(db, key, { provider: "brightdata", field: "apiKey", value });
+    await putSourceCredential(db, key, {
+      userId: owner,
+      provider: "brightdata",
+      field: "apiKey",
+      value,
+    });
     await close();
   }
 

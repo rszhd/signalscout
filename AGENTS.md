@@ -873,10 +873,17 @@ per account would be a cache keyed by something, and the something is the owner.
 `query_estimates` gained its own `user_id`, because the cost test usually has no
 monitor to read one from and a sample is real money at a real provider.
 
-**The environment half ignores the owner, and that is the self-hosted path.** It
-also means an instance with **both** a `.env` key and `AUTH_SIGNUP=open` lets a
-stranger poll on the machine's key. Empty the environment before opening signup;
-`.env.example` and docs/accounts.md say so.
+**The environment half ignores the owner, and that is the self-hosted path.**
+US-081 made that safe rather than documented: **where signup is open, the keys
+in `.env` are not an account's to spend**, provider keys and model keys alike.
+`config/machine-keys.ts` is the whole rule, asked once per composition root —
+the API in `server.ts`, the worker in `runtime.ts` — and every layer below is
+handed an environment with the keys already gone, so nothing downstream needs a
+branch. Only the keys go: the provider, the model, the endpoint and the prices
+are what a deployment was configured and measured for. With signup closed
+nothing changes, which is the point of tying the rule to signup rather than
+applying it everywhere. **No instance has yet run open with a `.env` key to
+watch a poll refuse.**
 
 **Two naming functions, and mixing them up is the mistake to avoid.**
 `credentialRecordName` is `user:provider:field` — what the ciphertext is
@@ -959,11 +966,47 @@ resolver — so the entire new path was invisible to a green suite.
 **A green suite after a refactor of a seam everything injects past is evidence
 about the injection, not about the seam.**
 
-Two things are not built. **A model key is not tested with the provider before
-it is stored**, unlike a provider key: no model provider has a free probe, so
-validating one spends the person's money on a call they did not ask for, and
-that is its own decision. And **no live model call has been made on a
-per-account key.**
+**A model key is added once and a job points at it.** US-079 closed on
+2026-09-09. `ai_keys` holds the account's keys — a name, a provider label and
+the ciphertext — and `ai_settings.key_id` says which one pays for a job. Several
+jobs may name one key, and a job that names none runs on the instance's.
+
+That reversed US-078, written the same day and never shipped. US-068 kept a key
+on each job's row, so a person with one key pasted it more than once; US-078
+answered with a rule — a job borrows the key of any job on the same provider —
+and the owner read the rule and called it confusing. It was: answering *whose
+key pays for this job?* took two ideas at once. **A list a person picks from
+beats a rule they have to hold**, and two jobs sharing a key is now a fact on
+the screen.
+
+Three things travel with it. **Migration 0050 is a move, not a
+re-encryption** — `record` has been stored per row since US-024, so a
+ciphertext changes tables and nobody retypes a key; it ran on the development
+database and the moved keys decrypted. **A key's provider decides the job's**, when the
+key states one — the card shows it rather than asking, because one question
+with two fields is how an OpenAI key ends up on an Anthropic job, failing every
+call and reading as a bad key. Where the card does ask, it offers **providers
+and not settings**: no "instance default" entry, and the value is the provider
+the job will run on. The model list follows it — `modelPrices` records which
+provider sells each model, so a card offers three names rather than six. And **`pnpm db:rotate-key` had never touched model keys**, which US-068
+introduced and nothing noticed — a rotation that reports success and then fails
+every model call the moment the old key is thrown away. It walks both tables
+now.
+
+Two things are not built. **A model key is not tested when it is stored, and is
+tested when somebody presses Test.** US-080. Validating on save spends money on
+a call nobody asked for; a button is the person asking. The probe makes one
+small structured call with the provider, model and key **on the screen** — test
+first, then keep, because asking somebody to save first is asking them to commit
+to what they pressed the button to doubt, and it answers
+three states rather than two — the middle one is the provider accepting the key
+and billing for it while the model returns the wrong shape, which sends a person
+somewhere different from a refusal. It is recorded as `key_test`, and
+**migration 0051 is what makes the database accept that purpose**: the same
+mistake as `apify` in US-057 and `draft_reply` in US-040, caught this time
+before it shipped. The probe is injected, so no test in this suite reaches a
+provider. **Nothing has pressed the button against a real provider**, and **no
+live model call has been made on a per-account key.**
 
 **No route asks for a session, so none can forget.** One `onRequest` hook on
 the root instance covers every API route, and what is *not* behind it is a

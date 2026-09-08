@@ -7,10 +7,12 @@
  */
 import { sql } from "drizzle-orm";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
+import { createAiKey } from "../ai/keys.js";
 import { createDatabase, type Database } from "../db/client.js";
-import { sourceCredentials } from "../db/schema.js";
+import { aiKeys, sourceCredentials } from "../db/schema.js";
 import { createTestDatabase, type TestDatabase } from "../testing/database.js";
 import {
+  decryptSecret,
   generateEncryptionKey,
   MissingEncryptionKeyError,
   readEncryptionKey,
@@ -56,6 +58,7 @@ describe("the credential store", () => {
 
   afterEach(async () => {
     await db.delete(sourceCredentials);
+    await db.delete(aiKeys);
   });
 
   describe("writing and reading", () => {
@@ -326,6 +329,24 @@ describe("the credential store", () => {
       expect(await readSourceCredential(db, replacementKey, owner, "brightdata", "apiSecret")).toBe(
         "the-secret",
       );
+    });
+
+    /**
+     * The one that reports success and breaks everything. US-079.
+     *
+     * A rotation that skips model keys leaves them readable only by a key the
+     * procedure tells you to throw away — and nothing says so until the next
+     * poll, when every model call fails at once.
+     */
+    it("rotates model keys too, and counts them", async () => {
+      await createAiKey(db, key, owner, { name: "My OpenAI key", apiKey: "sk-model" });
+
+      expect(await rotateEncryptionKey(db, key, replacementKey)).toBe(1);
+
+      const [row] = await db.select().from(aiKeys);
+      if (!row) throw new Error("The key was not stored.");
+
+      expect(decryptSecret(replacementKey, row.ciphertext, row.record)).toBe("sk-model");
     });
 
     it("leaves nothing readable by the old key", async () => {

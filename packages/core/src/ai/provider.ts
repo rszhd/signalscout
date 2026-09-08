@@ -74,14 +74,30 @@ export function createModel(config: AiConfig): LanguageModel {
  * deployment triages with decides whether the cascade saves a little or a lot,
  * and the ticket's arithmetic is only true for the pair it names.
  */
-export const modelPrices: Readonly<Record<string, { input: number; output: number }>> = {
-  "claude-haiku-4-5": { input: 1_000_000, output: 5_000_000 },
-  "claude-sonnet-5": { input: 2_000_000, output: 10_000_000 },
-  "claude-opus-5": { input: 5_000_000, output: 25_000_000 },
-  "gpt-5.6-luna": { input: 200_000, output: 1_200_000 },
-  "gpt-5.6-terra": { input: 2_000_000, output: 12_000_000 },
-  "gpt-5.6-sol": { input: 4_000_000, output: 20_000_000 },
+export const modelPrices: Readonly<
+  Record<string, { input: number; output: number; provider: AiProvider }>
+> = {
+  "claude-haiku-4-5": { input: 1_000_000, output: 5_000_000, provider: "anthropic" },
+  "claude-sonnet-5": { input: 2_000_000, output: 10_000_000, provider: "anthropic" },
+  "claude-opus-5": { input: 5_000_000, output: 25_000_000, provider: "anthropic" },
+  "gpt-5.6-luna": { input: 200_000, output: 1_200_000, provider: "openai" },
+  "gpt-5.6-terra": { input: 2_000_000, output: 12_000_000, provider: "openai" },
+  "gpt-5.6-sol": { input: 4_000_000, output: 20_000_000, provider: "openai" },
 };
+
+/**
+ * The priced models one provider sells.
+ *
+ * A person choosing a model for a job on Anthropic has no use for OpenAI's
+ * names, and a list holding both invites the pairing that fails every call.
+ * A provider with none here — Ollama, whose models are whatever somebody has
+ * pulled — answers with an empty list, and the field still takes any name.
+ */
+export function pricedModelsFor(provider: string): string[] {
+  return Object.entries(modelPrices)
+    .filter(([, price]) => price.provider === provider)
+    .map(([model]) => model);
+}
 
 export interface TokenUsage {
   readonly inputTokens?: number;

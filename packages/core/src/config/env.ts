@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { aiProviders, embeddingProviders } from "../ai/config.js";
-import { signupModes } from "../auth/user.js";
+import { type SignupMode, signupModes } from "../auth/user.js";
 import { billingModes } from "../billing/entitlement.js";
 import { encryptionKeyIsWellFormed } from "../secrets/cipher.js";
 
@@ -140,6 +140,24 @@ export function loadNotificationEnv(
   source: Record<string, string | undefined> = process.env,
 ): NotificationEnv {
   return notificationEnvSchema.parse(source);
+}
+
+/**
+ * Signup alone, for a process that needs the rule and not the rest.
+ *
+ * The worker asks whether this deployment takes registrations, because that
+ * decides whether the keys in `.env` are an account's to spend — US-081 — and
+ * it must not have to parse a whole `DATABASE_URL` to find out. Same field,
+ * same default, one definition.
+ */
+export const signupEnvSchema = z.object({
+  AUTH_SIGNUP: blankIsUnset(z.enum(signupModes).default("closed")),
+});
+
+export function loadSignupEnv(
+  source: Record<string, string | undefined> = process.env,
+): SignupMode {
+  return signupEnvSchema.parse(source).AUTH_SIGNUP;
 }
 
 export const envSchema = z.object({

@@ -1,158 +1,75 @@
-/* A quiet overview; configuration is revealed only when a job is opened. */
+/*
+  The Models screen. US-081 rebuilt it.
+
+  Two sections down one column: the account's keys, then the four jobs that
+  choose one. Whitespace and dividers rather than a card around everything, per
+  docs/design.md, and every job open — four is few, comparing them is the normal
+  reason to be here, and a disclosure per job hid exactly that.
+*/
+
 .models-page {
-  min-width: 0;
-  min-height: 100%;
-  background: var(--surface-soft);
+  min-height: 100vh;
+  background: var(--background);
 }
 
 .models-content {
-  width: min(960px, 100%);
+  max-width: var(--reading-width);
   margin: 0 auto;
   padding: var(--space-8) var(--page-gutter) var(--space-12);
+  display: grid;
+  gap: var(--space-12);
 }
 
-.models-intro {
-  margin: 0 0 var(--space-8);
-  color: var(--muted);
-  font-size: var(--text-sm);
-  line-height: 1.6;
-}
-
-.models-list-heading {
-  margin: 0 0 var(--space-4);
-  font-size: var(--text-body);
-  font-weight: 500;
-}
-
-.model-task-list {
+.models-blocker {
+  display: flex;
+  gap: var(--space-3);
   margin: 0;
-  padding: 0;
-  border: 1px solid var(--line);
+  padding: var(--space-4);
+  border: 1px solid var(--line-dark);
   border-radius: var(--radius-md);
   background: var(--surface);
-  list-style: none;
-}
-
-.model-task + .model-task {
-  border-top: 1px solid var(--line);
-}
-
-.model-task-summary {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(120px, 0.45fr) auto;
-  gap: var(--space-6);
-  align-items: center;
-  padding: var(--space-6) var(--space-8);
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  list-style: none;
-}
-
-.model-task-summary::-webkit-details-marker {
-  display: none;
-}
-
-.model-task-summary:hover {
-  background: var(--surface-hover);
-}
-
-.model-task-copy,
-.model-task-current {
-  min-width: 0;
-  display: grid;
-  gap: var(--space-1);
-  overflow-wrap: anywhere;
-}
-
-.model-task-copy strong {
-  font-size: var(--text-body);
-  font-weight: 600;
-}
-
-.model-task-model,
-.model-task-current small {
-  color: var(--muted);
-  font-size: var(--text-xs);
-  line-height: 1.5;
-}
-
-.model-task-current > span {
-  color: var(--muted-strong);
+  color: var(--warning);
   font-size: var(--text-sm);
 }
 
-.model-task-manage {
-  display: flex;
-  align-items: center;
-  justify-content: end;
-  gap: var(--space-2);
-  min-width: 64px;
-  color: var(--accent-text);
-  font-size: var(--text-sm);
-}
-
-.model-task-chevron {
-  font-style: normal;
-}
-
-.model-task-disclosure[open] .model-task-chevron {
-  transform: rotate(180deg);
-}
-
-.model-editor {
-  padding: 0 var(--space-8) var(--space-8);
-}
-
-.model-editor-main {
+.models-section {
   display: grid;
   gap: var(--space-6);
-  min-width: 0;
-  padding-top: var(--space-6);
-  border-top: 1px solid var(--line);
 }
 
-.model-guidance p {
-  margin: var(--space-3) 0 0;
-  color: var(--muted);
-  font-size: var(--text-sm);
-  line-height: 1.6;
+.models-section-heading h2 {
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-md);
 }
 
-.model-editor-heading p {
+.models-section-heading p {
+  max-width: 60ch;
   margin: 0;
-  color: var(--muted-strong);
-  font-size: var(--text-sm);
-  line-height: 1.6;
-}
-
-.model-editor-heading p + p {
-  margin-top: var(--space-1);
   color: var(--muted);
-  font-size: var(--text-xs);
-}
-
-.model-field-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-6);
-}
-
-.model-editor .field > span {
-  margin-bottom: var(--space-2);
-  color: var(--ink);
   font-size: var(--text-sm);
+}
+
+/* One field: a label, a control, and a line saying what it falls back to. */
+.models-content .field {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+  margin: 0;
+}
+
+.models-content .field > span {
+  color: var(--ink);
+  font-size: var(--text-label);
   font-weight: 500;
 }
 
-.model-editor .field > small {
-  display: block;
-  margin-top: var(--space-2);
+.models-content .field > small {
   color: var(--muted);
   font-size: var(--text-xs);
   line-height: 1.5;
 }
 
-.model-editor :where(input, select) {
+.models-content :where(.field input, .field select) {
   width: 100%;
   min-height: var(--control-height);
   padding: 0 var(--space-3);
@@ -164,110 +81,167 @@
   font-size: var(--text-sm);
 }
 
-.model-key-field {
-  display: block;
-}
-
-.model-guidance > summary,
-.model-advanced > summary {
-  color: var(--muted-strong);
+/* A provider the chosen key already decided: shown, not asked. */
+.field-fixed > strong {
+  display: flex;
+  align-items: center;
+  min-height: var(--control-height);
+  padding: 0 var(--space-3);
+  border: 1px dashed var(--line-dark);
+  border-radius: var(--radius-sm);
   font-size: var(--text-sm);
-  cursor: pointer;
+  font-weight: 500;
 }
 
-.model-advanced-hint {
-  margin-left: var(--space-2);
+/* The account's keys. */
+.key-list {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.key-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+}
+
+.key-identity {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.models-content .key-identity > span {
   color: var(--muted);
   font-size: var(--text-xs);
 }
 
-.model-advanced .field {
-  margin-top: var(--space-4);
+.key-form {
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-6);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
 }
 
-.model-answer {
-  margin: var(--space-6) 0 0;
+.key-form-fields {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: 1fr 1fr;
+}
+
+.key-form-fields .field:last-child {
+  grid-column: 1 / -1;
+}
+
+.key-form-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--text-xs);
+}
+
+.key-form .primary-button {
+  justify-self: start;
+}
+
+/* The jobs. A divider between them rather than a box around each. */
+.job-list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.job {
+  display: grid;
+  gap: var(--space-5);
+  padding: var(--space-8) 0;
+}
+
+.job + .job {
+  border-top: 1px solid var(--line);
+}
+
+.job-heading h3 {
+  margin: 0 0 var(--space-1);
+  font-size: var(--text-body);
+}
+
+.job-heading p {
+  max-width: 62ch;
+  margin: 0;
+  color: var(--muted);
   font-size: var(--text-sm);
 }
 
-.model-answer-good {
+.job-form {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.job-fields {
+  display: grid;
+  gap: var(--space-5);
+  grid-template-columns: 1fr 1fr;
+}
+
+/* The key spans the row: its name and mask are the longest thing here. */
+.job-fields > .field:first-child {
+  grid-column: 1 / -1;
+}
+
+/* One sentence saying what this job would do, in the words of the answers. */
+.job-summary {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-sm);
+  background: var(--surface-soft);
+  color: var(--muted-strong);
+  font-size: var(--text-sm);
+}
+
+.job-advanced .job-note {
+  max-width: 62ch;
+  margin: var(--space-3) 0 var(--space-4);
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+
+.job-answer {
+  margin: 0;
   color: var(--accent-text);
+  font-size: var(--text-sm);
 }
 
-.model-answer-icon {
-  margin-right: var(--space-2);
-}
-
-.model-actions {
+.job-actions {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-4);
-  margin-top: var(--space-6);
-}
-
-.model-actions .text-button {
-  min-height: var(--control-height);
-  padding: 0;
-  color: var(--muted);
-  background: transparent;
-  font: inherit;
-  font-size: var(--text-sm);
-}
-
-.model-actions .text-button:hover {
-  color: var(--ink);
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-
-.model-blocker {
-  display: flex;
   gap: var(--space-3);
-  margin: 0 0 var(--space-6);
-  padding: var(--space-4);
-  border: 1px solid var(--line-dark);
-  border-radius: var(--radius-sm);
-  color: var(--muted-strong);
-  background: var(--accent-soft);
-  font-size: var(--text-sm);
-  line-height: 1.6;
-  overflow-wrap: anywhere;
 }
 
-@media (max-width: 600px) {
-  .models-content {
-    padding-top: var(--space-6);
-  }
+.models-content .form-error {
+  margin: 0;
+  font-size: var(--text-sm);
+}
 
-  .model-task-summary {
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: var(--space-3);
-    padding: var(--space-5);
-  }
-
-  .model-task-current {
-    grid-column: 1;
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-2);
-    align-items: baseline;
-  }
-
-  .model-task-manage {
-    grid-column: 2;
-    grid-row: 1;
-  }
-
-  .model-editor {
-    padding: 0 var(--space-5) var(--space-5);
-  }
-
-  .model-field-grid {
+@media (width <= 720px) {
+  .key-form-fields,
+  .job-fields {
     grid-template-columns: 1fr;
   }
 
-  .model-advanced-hint {
-    display: none;
+  .key-row {
+    align-items: flex-start;
   }
 }

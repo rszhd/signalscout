@@ -29,7 +29,7 @@
  */
 import { and, eq, sql } from "drizzle-orm";
 import type { Database } from "../db/client.js";
-import { type Provider, sourceCredentials } from "../db/schema.js";
+import { aiKeys, type Provider, sourceCredentials } from "../db/schema.js";
 import {
   decryptSecret,
   type EncryptionKey,
@@ -283,6 +283,13 @@ export async function assertStoredCredentialsAreReadable(
  * One transaction, because half a rotation is worse than none: some rows on
  * each key and no single key that opens them all. docs/secrets.md, *Rotating
  * the key*, is the procedure this function is the middle of.
+ *
+ * **Both tables, since US-079.** Model keys were left behind when US-068 added
+ * them, and the shape of that fault is the worst one available here: the
+ * rotation reports success, the provider keys open, and every model call fails
+ * the moment the old key is thrown away. A model key keeps its own record name
+ * — it is the row's id and nothing about it moves — so it is resealed under
+ * the name it already has.
  */
 export async function rotateEncryptionKey(
   db: Database,
@@ -324,6 +331,19 @@ export async function rotateEncryptionKey(
         );
     }
 
-    return rows.length;
+    const keys = await tx
+      .select({ id: aiKeys.id, ciphertext: aiKeys.ciphertext, record: aiKeys.record })
+      .from(aiKeys);
+
+    for (const row of keys) {
+      const value = decryptSecret(from, row.ciphertext, row.record);
+
+      await tx
+        .update(aiKeys)
+        .set({ ciphertext: encryptSecret(to, value, row.record), updatedAt: new Date() })
+        .where(eq(aiKeys.id, row.id));
+    }
+
+    return rows.length + keys.length;
   });
 }

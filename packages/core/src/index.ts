@@ -36,6 +36,7 @@ export {
   embeddingNeedsApiKey,
   embeddingProviders,
   needsApiKey,
+  triageConfigFromEnvironment,
 } from "./ai/config.js";
 export {
   createProjectDescriber,
@@ -57,6 +58,23 @@ export {
   MissingEmbeddingKeyError,
 } from "./ai/embed.js";
 export {
+  type AiKey,
+  aiKeyRecordName,
+  type CreateAiKeyInput,
+  createAiKey,
+  DuplicateAiKeyName,
+  deleteAiKey,
+  listAiKeys,
+  readAiKey,
+  readAiKeySecret,
+} from "./ai/keys.js";
+export {
+  type ModelProbe,
+  type ModelProbeStatus,
+  probeChatModel,
+  probeEmbeddingModel,
+} from "./ai/probe.js";
+export {
   buildSystemPrompt,
   buildUserPrompt,
   type MonitorProfile,
@@ -67,6 +85,7 @@ export {
   estimateCostMicros,
   MissingAiKeyError,
   modelPrices,
+  pricedModelsFor,
 } from "./ai/provider.js";
 export {
   buildQuerySystemPrompt,
@@ -110,9 +129,10 @@ export {
 } from "./ai/reply-prompts.js";
 export { type ReplyVoicePreset, replyVoicePresets } from "./ai/reply-voices.js";
 export {
+  type AiTaskDraft,
   type AiTaskSettings,
-  aiRecordName,
   clearAiTaskSettings,
+  previewAiEnvironment,
   readAiEnvironment,
   readAiSettings,
   type SaveAiTaskInput,
@@ -197,13 +217,20 @@ export {
   loadAiEnv,
   loadEnv,
   loadNotificationEnv,
+  loadSignupEnv,
   type NotificationEnv,
 } from "./config/env.js";
+export {
+  machineKeysUsable,
+  providerKeyEnvironment,
+  withoutMachineModelKeys,
+} from "./config/machine-keys.js";
 export { createDatabase, type Database } from "./db/client.js";
 export { migrationsFolder, runMigrations } from "./db/migrate.js";
 export {
   type AiTask,
   accounts,
+  aiKeys,
   aiSettings,
   aiTasks,
   apiUsage,

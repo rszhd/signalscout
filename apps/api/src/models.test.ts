@@ -8,11 +8,13 @@
  * back to.
  */
 import {
+  aiKeys,
   aiSettings,
   createDatabase,
   createLogger,
   type Database,
   loadEnv,
+  modelCalls,
   readAiEnvironment,
 } from "@signalscout/core";
 import { createTestDatabase, type TestDatabase } from "@signalscout/core/testing";
@@ -43,8 +45,34 @@ describe("the models routes", () => {
   });
 
   afterEach(async () => {
+    await db.delete(modelCalls);
     await db.delete(aiSettings);
+    await db.delete(aiKeys);
+    probed = { status: "ok" };
   });
+
+  /** Add a key the way the screen does, and hand back its id. */
+  async function addKey(
+    app: Awaited<ReturnType<typeof server>>,
+    name: string,
+    apiKey: string,
+    provider?: string,
+  ): Promise<string> {
+    const added = await app.inject({
+      method: "POST",
+      url: "/api/models/keys",
+      payload: { name, apiKey, ...(provider ? { provider } : {}) },
+    });
+
+    expect(added.statusCode).toBe(200);
+    expect(added.body).not.toContain(apiKey);
+
+    const stored = added.json().keys.find((one: { name: string }) => one.name === name);
+    return stored.id;
+  }
+
+  /** What a probe would have answered, without a provider or a bill. */
+  let probed: { status: "ok" | "answered" | "failed"; error?: string } = { status: "ok" };
 
   async function server(userId: string, store = true) {
     return buildServer({
@@ -58,6 +86,18 @@ describe("the models routes", () => {
       db,
       encryption: store ? encryption : {},
       queryGenerator: null,
+      modelProbe: async (config) => ({
+        status: probed.status,
+        ...(probed.error ? { error: probed.error } : {}),
+        call: {
+          provider: config.provider,
+          model: config.model,
+          inputTokens: 12,
+          outputTokens: 3,
+          latencyMs: 640,
+          estimatedCostMicros: 41,
+        },
+      }),
     });
   }
 
@@ -85,9 +125,15 @@ describe("the models routes", () => {
         "embed",
         "draft",
       ]);
-      expect(classify.instance).toEqual({ provider: "anthropic", model: "claude-haiku-4-5" });
+      // `hasKey` false: this instance names a provider and stores no key, so
+      // "the instance's key" would be no key at all.
+      expect(classify.instance).toEqual({
+        provider: "anthropic",
+        model: "claude-haiku-4-5",
+        hasKey: false,
+      });
       expect(classify.provider).toBeNull();
-      expect(classify.keyHint).toBeNull();
+      expect(classify.keyId).toBeNull();
     });
   });
 
@@ -105,19 +151,25 @@ describe("the models routes", () => {
 
   it("stores a key as a mask and never returns it", async () => {
     await withServer(owner, async (app) => {
+      const keyId = await addKey(app, "My OpenAI key", "sk-1234567890abcd", "openai");
+
       const saved = await app.inject({
         method: "PUT",
         url: "/api/models/classify",
-        payload: { provider: "openai", model: "gpt-5.6-terra", apiKey: "sk-1234567890abcd" },
+        payload: { provider: "openai", model: "gpt-5.6-terra", keyId },
       });
 
       expect(saved.statusCode).toBe(200);
       expect(saved.body).not.toContain("sk-1234567890abcd");
 
+      const [stored] = saved.json().keys;
+      expect(stored.hint).toBe("••••abcd");
+      expect(stored.provider).toBe("openai");
+
       const classify = saved
         .json()
         .tasks.find((task: { task: string }) => task.task === "classify");
-      expect(classify.keyHint).toBe("••••abcd");
+      expect(classify.keyId).toBe(keyId);
       expect(classify.model).toBe("gpt-5.6-terra");
     });
 
@@ -132,17 +184,354 @@ describe("the models routes", () => {
   });
 
   /**
+   * US-079: one key, added once, chosen by as many jobs as a person likes.
+   */
+  it("lets two jobs point at one key", async () => {
+    await withServer(owner, async (app) => {
+      const keyId = await addKey(app, "My OpenAI key", "sk-1234567890abcd", "openai");
+
+      await app.inject({
+        method: "PUT",
+        url: "/api/models/draft",
+        payload: { provider: "openai", model: "gpt-5.6-terra", keyId },
+      });
+
+      const view = await app.inject({
+        method: "PUT",
+        url: "/api/models/triage",
+        payload: { provider: "openai", model: "gpt-5.6-luna", keyId },
+      });
+
+      const tasks = view.json().tasks as { task: string; keyId: string | null }[];
+
+      expect(tasks.find((task) => task.task === "triage")?.keyId).toBe(keyId);
+      expect(tasks.find((task) => task.task === "draft")?.keyId).toBe(keyId);
+      // Scoring was never pointed at it, so it stays on the instance's key.
+      expect(tasks.find((task) => task.task === "classify")?.keyId).toBeNull();
+      // One key on the account, whatever the number of jobs using it.
+      expect(view.json().keys).toHaveLength(1);
+    });
+  });
+
+  /**
+   * The owner's question: why ask which provider, when the key said so?
+   *
+   * It does not any more. The key's own provider is written to the job, so
+   * the screen, the worker and `config.ts` read one answer rather than two
+   * that can disagree.
+   */
+  /**
+   * Whether the machine could run a job at all.
+   *
+   * A hosted account's instance holds no model key, so offering "this
+   * instance's key" there offers a job that cannot run — and the way that
+   * shows up is a poll that scores nothing.
+   */
+  it("says whether the instance holds a key for each job", async () => {
+    const app = await buildServer({
+      session: asUser(owner),
+      env: loadEnv({
+        DATABASE_URL: database.url,
+        AI_PROVIDER: "anthropic",
+        AI_MODEL: "claude-haiku-4-5",
+        AI_API_KEY: "the-machine-key",
+      }),
+      logger,
+      db,
+      encryption,
+      queryGenerator: null,
+    });
+
+    try {
+      const view = (await app.inject({ method: "GET", url: "/api/models" })).json();
+      const of = (task: string) =>
+        view.tasks.find((one: { task: string }) => one.task === task).instance;
+
+      expect(of("classify").hasKey).toBe(true);
+      // Triage falls back to the classifier's key, so it has one too.
+      expect(of("triage").hasKey).toBe(true);
+      // Similarity does not: Anthropic publishes no embedding endpoint, so
+      // there is no embedding configuration to hold a key.
+      expect(of("embed").hasKey).toBe(false);
+    } finally {
+      await app.close();
+    }
+  });
+
+  /**
+   * The machine's key is the machine's, on an instance taking registrations.
+   * US-081. A stranger who registers must not classify on the owner's key, and
+   * the screen must not offer them one.
+   */
+  it("offers no instance key when this deployment takes registrations", async () => {
+    const app = await buildServer({
+      session: asUser(owner),
+      env: loadEnv({
+        DATABASE_URL: database.url,
+        AI_PROVIDER: "anthropic",
+        AI_MODEL: "claude-haiku-4-5",
+        AI_API_KEY: "the-machine-key",
+        AUTH_SIGNUP: "open",
+      }),
+      logger,
+      db,
+      encryption,
+      queryGenerator: null,
+    });
+
+    try {
+      const view = (await app.inject({ method: "GET", url: "/api/models" })).json();
+      const classify = view.tasks.find((task: { task: string }) => task.task === "classify");
+
+      // The provider and the model are still the deployment's. Only the key is
+      // somebody's money, and it does not travel.
+      expect(classify.instance.provider).toBe("anthropic");
+      expect(classify.instance.model).toBe("claude-haiku-4-5");
+      expect(classify.instance.hasKey).toBe(false);
+    } finally {
+      await app.close();
+    }
+  });
+
+  it("sends the priced models of each provider, and not one list", async () => {
+    await withServer(owner, async (app) => {
+      const view = (await app.inject({ method: "GET", url: "/api/models" })).json();
+
+      expect(view.pricedModels.anthropic).toContain("claude-haiku-4-5");
+      expect(view.pricedModels.anthropic).not.toContain("gpt-5.6-luna");
+      expect(view.pricedModels.openai).toContain("gpt-5.6-luna");
+      // Ollama runs whatever somebody pulled, so this build prices none of it.
+      expect(view.pricedModels.ollama).toEqual([]);
+    });
+  });
+
+  it("takes the provider from the chosen key", async () => {
+    await withServer(owner, async (app) => {
+      const keyId = await addKey(app, "My OpenAI key", "sk-1234567890abcd", "openai");
+
+      // The body says nothing about a provider, and the job ends up on one.
+      const saved = await app.inject({
+        method: "PUT",
+        url: "/api/models/classify",
+        payload: { model: "gpt-5.6-terra", keyId },
+      });
+
+      const classify = saved
+        .json()
+        .tasks.find((task: { task: string }) => task.task === "classify");
+
+      expect(classify.provider).toBe("openai");
+    });
+  });
+
+  it("refuses a job on another provider with no model of its own", async () => {
+    await withServer(owner, async (app) => {
+      const keyId = await addKey(app, "My OpenAI key", "sk-1234567890abcd", "openai");
+
+      const refused = await app.inject({
+        method: "PUT",
+        url: "/api/models/classify",
+        payload: { keyId },
+      });
+
+      expect(refused.statusCode).toBe(400);
+      // `claude-haiku-4-5` is not a name OpenAI answers to, so saving this
+      // would store a setting that fails every call at whatever hour the
+      // schedule picked.
+      expect(refused.json().message).toContain("needs a model of its own");
+      expect(await db.select().from(aiSettings)).toEqual([]);
+
+      // With one named, it saves.
+      const saved = await app.inject({
+        method: "PUT",
+        url: "/api/models/classify",
+        payload: { keyId, model: "gpt-5.6-terra" },
+      });
+
+      expect(saved.statusCode).toBe(200);
+    });
+  });
+
+  it("refuses a key whose provider this build cannot use for that job", async () => {
+    await withServer(owner, async (app) => {
+      // Anthropic publishes no embedding endpoint, so this pairing can only
+      // fail — and it fails here rather than at 02:00 on the next poll.
+      const keyId = await addKey(app, "My Anthropic key", "sk-1234567890abcd", "anthropic");
+
+      const refused = await app.inject({
+        method: "PUT",
+        url: "/api/models/embed",
+        payload: { keyId },
+      });
+
+      expect(refused.statusCode).toBe(400);
+      // Named, because "anthropic is not a provider" would be a puzzle to
+      // somebody who chose a key rather than a provider.
+      expect(refused.json().message).toContain("My Anthropic key");
+      expect(await db.select().from(aiSettings)).toEqual([]);
+    });
+  });
+
+  /**
+   * Testing a key. US-080.
+   *
+   * The route is the one place in this product that spends money because
+   * somebody pressed a button, so what it owns is refusing before it spends
+   * and writing down what it spent.
+   */
+  describe("testing a job's key", () => {
+    it("refuses before it spends when the key is not this account's", async () => {
+      let theirs = "";
+
+      await withServer(other, async (app) => {
+        theirs = await addKey(app, "Their key", "sk-theirs-000000abcd", "openai");
+      });
+
+      await withServer(owner, async (app) => {
+        const refused = await app.inject({
+          method: "POST",
+          url: "/api/models/classify/test",
+          payload: { keyId: theirs, model: "gpt-5.6-terra" },
+        });
+
+        expect(refused.statusCode).toBe(400);
+        expect(refused.json().message).toContain("not on this account");
+        expect(await db.select().from(modelCalls)).toEqual([]);
+      });
+    });
+
+    /**
+     * Test first, then keep. The route reads the body rather than the row, so
+     * nothing has to be saved before it can be doubted.
+     */
+    it("tests what is on the screen, and saves nothing", async () => {
+      await withServer(owner, async (app) => {
+        const keyId = await addKey(app, "My OpenAI key", "sk-1234567890abcd", "openai");
+
+        const tested = await app.inject({
+          method: "POST",
+          url: "/api/models/classify/test",
+          payload: { keyId, model: "gpt-5.6-terra" },
+        });
+
+        expect(tested.statusCode).toBe(200);
+        expect(tested.json()).toMatchObject({
+          status: "ok",
+          provider: "openai",
+          model: "gpt-5.6-terra",
+          costMicros: 41,
+        });
+        // Never the key, in the answer or anywhere near it.
+        expect(tested.body).not.toContain("sk-1234567890abcd");
+
+        // A billed call is a recorded call, and it is its own purpose so that
+        // a test is never counted as work a monitor did.
+        const [recorded] = await db.select().from(modelCalls);
+        expect(recorded?.purpose).toBe("key_test");
+        expect(recorded?.outcome).toBe("scored");
+        expect(recorded?.monitorId).toBeNull();
+        expect(recorded?.estimatedCostMicros).toBe(41);
+
+        // A test is a call and not a save. The job is untouched.
+        expect(await db.select().from(aiSettings)).toEqual([]);
+      });
+    });
+
+    it("carries the provider's own sentence back when the call fails", async () => {
+      probed = { status: "failed", error: "401 Incorrect API key provided." };
+
+      await withServer(owner, async (app) => {
+        const keyId = await addKey(app, "A wrong key", "sk-wrong-000000abcd", "openai");
+
+        const tested = await app.inject({
+          method: "POST",
+          url: "/api/models/classify/test",
+          payload: { keyId, model: "gpt-5.6-terra" },
+        });
+
+        expect(tested.json()).toMatchObject({
+          status: "failed",
+          error: "401 Incorrect API key provided.",
+        });
+
+        // A refused call is billed by some providers and is a fact either way.
+        const [recorded] = await db.select().from(modelCalls);
+        expect(recorded?.outcome).toBe("failed");
+        expect(recorded?.error).toContain("401");
+      });
+    });
+  });
+
+  it("refuses a key that belongs to another account", async () => {
+    let theirs = "";
+
+    await withServer(other, async (app) => {
+      theirs = await addKey(app, "Their key", "sk-theirs-000000abcd");
+    });
+
+    await withServer(owner, async (app) => {
+      const refused = await app.inject({
+        method: "PUT",
+        url: "/api/models/classify",
+        payload: { keyId: theirs },
+      });
+
+      expect(refused.statusCode).toBe(400);
+      expect(await db.select().from(aiSettings)).toEqual([]);
+    });
+  });
+
+  /**
+   * Deleting a key is not deleting a job. Every job pointing at it goes back
+   * to the instance's key, which the column's own `set null` does — a job left
+   * pointing at nothing would fail every call with nothing able to say why.
+   */
+  it("puts a job back on the instance's key when the key is deleted", async () => {
+    await withServer(owner, async (app) => {
+      const keyId = await addKey(app, "Going away", "sk-1234567890abcd");
+
+      await app.inject({
+        method: "PUT",
+        url: "/api/models/classify",
+        payload: { model: "gpt-5.6-terra", keyId },
+      });
+
+      const after = await app.inject({ method: "DELETE", url: `/api/models/keys/${keyId}` });
+      const classify = after
+        .json()
+        .tasks.find((task: { task: string }) => task.task === "classify");
+
+      expect(after.json().keys).toEqual([]);
+      expect(classify.keyId).toBeNull();
+      // The rest of the job's settings survive it.
+      expect(classify.model).toBe("gpt-5.6-terra");
+    });
+  });
+
+  it("refuses a second key with the same name", async () => {
+    await withServer(owner, async (app) => {
+      await addKey(app, "My key", "sk-1234567890abcd");
+
+      const again = await app.inject({
+        method: "POST",
+        url: "/api/models/keys",
+        payload: { name: "my key", apiKey: "sk-something-else-1234" },
+      });
+
+      expect(again.statusCode).toBe(409);
+    });
+  });
+
+  /**
    * The silent one. The form posts every field on every save, so a blank key
    * box has to mean "unchanged" — erasing it would look like a poll that
    * scored nothing, days later.
    */
-  it("leaves a stored key alone when a save carries no key", async () => {
+  it("leaves the chosen key alone when a save carries no choice", async () => {
     await withServer(owner, async (app) => {
-      await app.inject({
-        method: "PUT",
-        url: "/api/models/classify",
-        payload: { apiKey: "sk-1234567890abcd" },
-      });
+      const keyId = await addKey(app, "My key", "sk-1234567890abcd");
+
+      await app.inject({ method: "PUT", url: "/api/models/classify", payload: { keyId } });
 
       const again = await app.inject({
         method: "PUT",
@@ -154,7 +543,7 @@ describe("the models routes", () => {
         .json()
         .tasks.find((task: { task: string }) => task.task === "classify");
 
-      expect(classify.keyHint).toBe("••••abcd");
+      expect(classify.keyId).toBe(keyId);
       expect(classify.model).toBe("gpt-5.6-luna");
     });
   });
@@ -175,10 +564,12 @@ describe("the models routes", () => {
 
   it("puts a task back on the instance's settings when it is cleared", async () => {
     await withServer(owner, async (app) => {
+      const keyId = await addKey(app, "My key", "sk-1234567890abcd");
+
       await app.inject({
         method: "PUT",
         url: "/api/models/classify",
-        payload: { provider: "openai", apiKey: "sk-1234567890abcd" },
+        payload: { provider: "openai", keyId },
       });
 
       const cleared = await app.inject({ method: "DELETE", url: "/api/models/classify" });
@@ -187,17 +578,21 @@ describe("the models routes", () => {
         .tasks.find((task: { task: string }) => task.task === "classify");
 
       expect(classify.provider).toBeNull();
-      expect(classify.keyHint).toBeNull();
+      expect(classify.keyId).toBeNull();
       expect(await db.select().from(aiSettings)).toEqual([]);
+      // Clearing a job is not deleting a key. It is still on the account.
+      expect(cleared.json().keys).toHaveLength(1);
     });
   });
 
   it("keeps one account's model settings out of another's", async () => {
     await withServer(owner, async (app) => {
+      const keyId = await addKey(app, "My key", "sk-1234567890abcd");
+
       await app.inject({
         method: "PUT",
         url: "/api/models/classify",
-        payload: { provider: "openai", apiKey: "sk-1234567890abcd" },
+        payload: { provider: "openai", keyId },
       });
     });
 
@@ -206,8 +601,10 @@ describe("the models routes", () => {
       const classify = view.tasks.find((task: { task: string }) => task.task === "classify");
 
       expect(classify.provider).toBeNull();
-      expect(classify.keyHint).toBeNull();
-      expect(view.tasks.some((task: { keyHint: string | null }) => task.keyHint)).toBe(false);
+      expect(classify.keyId).toBeNull();
+      // Not one key, and not one job pointed anywhere.
+      expect(view.keys).toEqual([]);
+      expect(view.tasks.some((task: { keyId: string | null }) => task.keyId)).toBe(false);
     });
   });
 
@@ -220,9 +617,9 @@ describe("the models routes", () => {
       expect(view.storeBlocker).toContain("ENCRYPTION_KEY");
 
       const refused = await app.inject({
-        method: "PUT",
-        url: "/api/models/classify",
-        payload: { apiKey: "sk-1234567890abcd" },
+        method: "POST",
+        url: "/api/models/keys",
+        payload: { name: "Nowhere to put it", apiKey: "sk-1234567890abcd" },
       });
 
       expect(refused.statusCode).toBe(400);

@@ -102,10 +102,14 @@ describe("connecting a provider", () => {
     sources?: readonly ConnectorDefinition[];
     environment?: Record<string, string | undefined>;
     encryption?: Record<string, string | undefined>;
+    signup?: "open" | "closed";
   }) {
     return buildServer({
       session: asOwner,
-      env: loadEnv({ DATABASE_URL: database.url }),
+      env: loadEnv({
+        DATABASE_URL: database.url,
+        ...(options.signup ? { AUTH_SIGNUP: options.signup } : {}),
+      }),
       logger,
       db,
       sources: options.sources ?? [acceptsOnly(goodKey)],
@@ -223,6 +227,29 @@ describe("connecting a provider", () => {
         expect(field.fromEnvironment).toBe(true);
         expect(field.storedHint).toBe(null);
         expect(field.configured).toBe(true);
+      } finally {
+        await app.close();
+      }
+    });
+    /**
+     * The machine's provider keys are the machine's, on an instance taking
+     * registrations. US-081.
+     *
+     * Without this a stranger who signs up polls Bright Data on the owner's
+     * account, and the first anybody knows of it is the invoice.
+     */
+    it("does not offer a key from the environment when signup is open", async () => {
+      const app = await server({
+        environment: { BRIGHTDATA_API_KEY: goodKey },
+        signup: "open",
+      });
+
+      try {
+        const field = (await app.inject({ method: "GET", url: "/api/connections" })).json()
+          .providers[0].credentials[0];
+
+        expect(field.fromEnvironment).toBe(false);
+        expect(field.configured).toBe(false);
       } finally {
         await app.close();
       }

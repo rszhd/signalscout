@@ -24,8 +24,14 @@ import {
 import { createEmbedder, type Embedder } from "../ai/embed.js";
 import { readAiEnvironment as readAiSettingsEnvironment } from "../ai/settings.js";
 import { createTriager, type Triager } from "../ai/triage.js";
+import type { SignupMode } from "../auth/user.js";
 import type { BillingMode } from "../billing/index.js";
-import { loadAiEnv, loadNotificationEnv } from "../config/env.js";
+import { loadAiEnv, loadNotificationEnv, loadSignupEnv } from "../config/env.js";
+import {
+  machineKeysUsable,
+  providerKeyEnvironment,
+  withoutMachineModelKeys,
+} from "../config/machine-keys.js";
 import { createDatabase, type Database, poolOptions } from "../db/client.js";
 import type { Logger } from "../logger.js";
 import { configureNetworking } from "../net.js";
@@ -79,6 +85,15 @@ export interface WorkerHandle {
 export interface StartWorkerOptions {
   databaseUrl: string;
   logger: Logger;
+  /**
+   * Whether this deployment takes registrations. US-081.
+   *
+   * It decides one thing here and it is the expensive one: on an instance
+   * taking registrations the keys in `.env` are the machine's and not an
+   * account's, so a poll and a classification run on the owner's own stored
+   * keys or they do not run. Defaults to the environment, which is `closed`.
+   */
+  signup?: SignupMode;
   /** The connectors to poll with. Defaults to the built-in ones over the real network. */
   registry?: SourceRegistry;
   /** Where source keys come from. US-004 replaces the environment with the database. */
@@ -327,6 +342,7 @@ export async function startWorker({
   pollingIntervalSeconds,
   notificationTransport,
   billing = "off",
+  signup = loadSignupEnv(),
 }: StartWorkerOptions): Promise<WorkerHandle> {
   // Before any provider is called. See `net.ts`: Node's 250ms per-address
   // connect budget is shorter than several providers take to answer.
@@ -351,7 +367,11 @@ export async function startWorker({
   }
 
   // The logger, so a key still read from its deprecated variable says so once.
-  const lookup = credentialsFor ?? credentialsFromStore(db, undefined, process.env, logger);
+  // The environment half is empty where signup is open: a stranger's monitor
+  // must not poll on the machine's provider keys. US-081.
+  const lookup =
+    credentialsFor ??
+    credentialsFromStore(db, undefined, providerKeyEnvironment(signup, process.env), logger);
 
   const sources =
     registry ??
@@ -383,6 +403,15 @@ export async function startWorker({
     aiEnvironment ??= loadAiEnv();
     return aiEnvironment;
   };
+
+  /**
+   * The same, with the machine's model keys taken out where they are nobody's
+   * to spend. US-081. It is what an account's own settings are laid over, so a
+   * job with no key of its own does not run rather than running on the
+   * owner's.
+   */
+  const readAccountBaseEnvironment = () =>
+    machineKeysUsable(signup) ? readAiEnvironment() : withoutMachineModelKeys(readAiEnvironment());
 
   /**
    * The three model clients an account uses. US-068.
@@ -417,7 +446,7 @@ export async function startWorker({
     const cached = modelCache.get(userId);
     if (cached) return cached;
 
-    const instance = readAiEnvironment();
+    const instance = readAccountBaseEnvironment();
     // An account with no rows gets the instance's environment back, so the
     // common install pays one small query per owner per process and nothing
     // else changes about it.

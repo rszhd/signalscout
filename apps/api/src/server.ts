@@ -18,11 +18,14 @@ import {
   type Env,
   type JobSender,
   type Logger,
+  machineKeysUsable,
   needsApiKey,
   type ProjectDescriber,
+  providerKeyEnvironment,
   type QueryGenerator,
   readAiEnvironment,
   storedCredentialNames,
+  withoutMachineModelKeys,
 } from "@signalscout/core";
 import Fastify, {
   type FastifyInstance,
@@ -42,7 +45,7 @@ import { registerConnectionRoutes } from "./connections.js";
 import { registerDraftRoutes, registerReplyPromptRoutes } from "./drafts.js";
 import { registerEstimateRoutes } from "./estimates.js";
 import { registerMatchRoutes } from "./matches.js";
-import { registerModelRoutes } from "./models.js";
+import { type ModelRoutesOptions, registerModelRoutes } from "./models.js";
 import { registerMonitorRoutes } from "./monitors.js";
 import { registerNotificationRoutes } from "./notifications.js";
 import { registerPricingRoutes } from "./pricing.js";
@@ -86,6 +89,14 @@ export interface BuildServerOptions {
    * above so a test can describe an instance that cannot store one.
    */
   encryption?: Record<string, string | undefined>;
+  /**
+   * How the Models screen's Test button reaches a provider.
+   *
+   * Injected so the suite can answer without one: AGENTS.md's rule is that no
+   * test here spends money, and this is the one route whose purpose is a
+   * billed call.
+   */
+  modelProbe?: ModelRoutesOptions["probe"];
   /**
    * Which credentials the database holds, as `source:field` names.
    *
@@ -271,7 +282,12 @@ export function aiEnvironmentFor(
   db: Database,
   env: Env,
 ): (userId: string) => Promise<AiEnvironment> {
-  return (userId) => readAiEnvironment(db, userId, env);
+  // On an instance taking registrations the machine's model keys are nobody's
+  // to spend, so the account's own settings are laid over an environment that
+  // has none. US-081, and `config/machine-keys.ts` holds the reasoning.
+  const instance = machineKeysUsable(env.AUTH_SIGNUP) ? env : withoutMachineModelKeys(env);
+
+  return (userId) => readAiEnvironment(db, userId, instance);
 }
 
 export function queryGeneratorForEnvironment(
@@ -300,6 +316,7 @@ export async function buildServer({
   sources = builtInSources,
   environment,
   encryption,
+  modelProbe,
   storedCredentials,
   queryGenerator,
   describer,
@@ -387,9 +404,27 @@ export async function buildServer({
   });
   await registerNotificationRoutes(app, { db, env });
 
-  await registerConnectionRoutes(app, { db, sources, environment, encryption, logger });
-  await registerPricingRoutes(app, { db, sources, environment });
-  await registerModelRoutes(app, { db, env, encryption });
+  // The provider keys an account may spend. Empty where signup is open, which
+  // every reader of it then answers correctly with no branch of its own.
+  const providerKeys = providerKeyEnvironment(env.AUTH_SIGNUP, environment);
+
+  await registerConnectionRoutes(app, {
+    db,
+    sources,
+    environment: providerKeys,
+    encryption,
+    logger,
+  });
+  await registerPricingRoutes(app, { db, sources, environment: providerKeys });
+  await registerModelRoutes(app, {
+    db,
+    // The same environment with the machine's model keys taken out where they
+    // are nobody's to spend, so the screen's "this instance's key" is offered
+    // only where there is one to offer. US-081.
+    env: machineKeysUsable(env.AUTH_SIGNUP) ? env : { ...env, ...withoutMachineModelKeys(env) },
+    encryption,
+    ...(modelProbe ? { probe: modelProbe } : {}),
+  });
   await registerDraftRoutes(app, {
     db,
     aiFor: async (userId) => draftConfigForEnvironment(await aiFor(userId), logger),

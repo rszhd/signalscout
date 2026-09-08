@@ -12,7 +12,7 @@
  */
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { createDatabase, type Database } from "../db/client.js";
-import { aiSettings } from "../db/schema.js";
+import { aiKeys, aiSettings } from "../db/schema.js";
 import {
   generateEncryptionKey,
   readEncryptionKey,
@@ -26,6 +26,7 @@ import {
   embeddingConfigFromEnvironment,
   triageConfigFromEnvironment,
 } from "./config.js";
+import { createAiKey, DuplicateAiKeyName, deleteAiKey, listAiKeys } from "./keys.js";
 import {
   clearAiTaskSettings,
   readAiEnvironment,
@@ -65,7 +66,33 @@ describe("one account's model settings", () => {
 
   afterEach(async () => {
     await db.delete(aiSettings);
+    await db.delete(aiKeys);
+    stored.clear();
   });
+
+  /**
+   * A key the account holds, by its value.
+   *
+   * US-079 separated the two acts: a key is stored once and a job then names
+   * it. These cases care about the second, so this does the first and hands
+   * back the id — and it stores each distinct value once, because two rows
+   * holding the same key would be a person's mistake and not a fixture's.
+   */
+  const stored = new Map<string, string>();
+
+  async function keyFor(value: string, provider: string | null = null): Promise<string> {
+    const already = stored.get(value);
+    if (already) return already;
+
+    const made = await createAiKey(db, key, owner, {
+      name: `Key ${stored.size + 1}`,
+      provider,
+      apiKey: value,
+    });
+
+    stored.set(value, made.id);
+    return made.id;
+  }
 
   it("gives an account with no settings the instance's own environment", async () => {
     expect(await readAiEnvironment(db, owner, instance, encryption)).toEqual(instance);
@@ -74,12 +101,12 @@ describe("one account's model settings", () => {
   /**
    * The common cloud case, and the one that must not need any other field.
    *
-   * A person pastes a key and nothing else. They keep the deployment's provider
-   * and model — which is what the deployment has measured and priced — and pay
-   * for their own calls.
+   * A person adds a key and points one job at it. They keep the deployment's
+   * provider and model — which is what the deployment has measured and priced
+   * — and pay for their own calls.
    */
-  it("takes only the key when only the key is given", async () => {
-    await saveAiTaskSettings(db, key, owner, "classify", { apiKey: "sk-mine" });
+  it("takes only the key when only the key is chosen", async () => {
+    await saveAiTaskSettings(db, owner, "classify", { keyId: await keyFor("sk-mine") });
 
     const config = aiConfigFromEnvironment(
       await readAiEnvironment(db, owner, instance, encryption),
@@ -93,10 +120,10 @@ describe("one account's model settings", () => {
   });
 
   it("takes the provider and model when those are given too", async () => {
-    await saveAiTaskSettings(db, key, owner, "classify", {
+    await saveAiTaskSettings(db, owner, "classify", {
       provider: "openai",
       model: "gpt-5.6-terra",
-      apiKey: "sk-mine",
+      keyId: await keyFor("sk-mine"),
     });
 
     expect(
@@ -113,10 +140,10 @@ describe("one account's model settings", () => {
    * priced at the classifier's rate would report a saving that did not happen.
    */
   it("keeps the triage fallbacks that were measured, not reimplemented", async () => {
-    await saveAiTaskSettings(db, key, owner, "classify", {
+    await saveAiTaskSettings(db, owner, "classify", {
       provider: "openai",
       model: "gpt-5.6-terra",
-      apiKey: "sk-mine",
+      keyId: await keyFor("sk-mine"),
       inputPriceMicros: 2_000_000,
     });
 
@@ -130,7 +157,7 @@ describe("one account's model settings", () => {
       inputPriceMicros: 2_000_000,
     });
 
-    await saveAiTaskSettings(db, key, owner, "triage", { model: "gpt-5.6-luna" });
+    await saveAiTaskSettings(db, owner, "triage", { model: "gpt-5.6-luna" });
     const withTriage = await readAiEnvironment(db, owner, instance, encryption);
 
     expect(triageConfigFromEnvironment(withTriage)).toMatchObject({
@@ -149,8 +176,8 @@ describe("one account's model settings", () => {
    * name another one, and their Anthropic key must not travel to it.
    */
   it("does not send the classifier's key to a different embedding provider", async () => {
-    await saveAiTaskSettings(db, key, owner, "classify", { apiKey: "sk-anthropic" });
-    await saveAiTaskSettings(db, key, owner, "embed", {
+    await saveAiTaskSettings(db, owner, "classify", { keyId: await keyFor("sk-anthropic") });
+    await saveAiTaskSettings(db, owner, "embed", {
       provider: "openai",
       model: "text-embedding-3-small",
     });
@@ -174,10 +201,10 @@ describe("one account's model settings", () => {
    */
   describe("the model that writes a reply", () => {
     it("is the classifier's when nothing is set for it", async () => {
-      await saveAiTaskSettings(db, key, owner, "classify", {
+      await saveAiTaskSettings(db, owner, "classify", {
         provider: "openai",
         model: "gpt-5.6-terra",
-        apiKey: "sk-mine",
+        keyId: await keyFor("sk-mine"),
         inputPriceMicros: 2_000_000,
       });
 
@@ -192,13 +219,13 @@ describe("one account's model settings", () => {
     });
 
     it("keeps the classifier's key when it stays on the same provider", async () => {
-      await saveAiTaskSettings(db, key, owner, "classify", {
+      await saveAiTaskSettings(db, owner, "classify", {
         provider: "openai",
         model: "gpt-5.6-terra",
-        apiKey: "sk-mine",
+        keyId: await keyFor("sk-mine"),
         inputPriceMicros: 2_000_000,
       });
-      await saveAiTaskSettings(db, key, owner, "draft", { model: "gpt-5.6-sol" });
+      await saveAiTaskSettings(db, owner, "draft", { model: "gpt-5.6-sol" });
 
       const config = draftConfigFromEnvironment(
         await readAiEnvironment(db, owner, instance, encryption),
@@ -214,11 +241,11 @@ describe("one account's model settings", () => {
     });
 
     it("does not send the classifier's key to a different drafting provider", async () => {
-      await saveAiTaskSettings(db, key, owner, "classify", {
+      await saveAiTaskSettings(db, owner, "classify", {
         provider: "openai",
-        apiKey: "sk-openai",
+        keyId: await keyFor("sk-openai"),
       });
-      await saveAiTaskSettings(db, key, owner, "draft", {
+      await saveAiTaskSettings(db, owner, "draft", {
         provider: "anthropic",
         model: "claude-sonnet-5",
       });
@@ -232,10 +259,10 @@ describe("one account's model settings", () => {
     });
 
     it("takes a key of its own", async () => {
-      await saveAiTaskSettings(db, key, owner, "draft", {
+      await saveAiTaskSettings(db, owner, "draft", {
         provider: "anthropic",
         model: "claude-sonnet-5",
-        apiKey: "sk-anthropic",
+        keyId: await keyFor("sk-anthropic"),
       });
 
       expect(
@@ -248,11 +275,125 @@ describe("one account's model settings", () => {
     });
   });
 
+  /**
+   * One key, several jobs. US-079.
+   *
+   * The thing the owner asked for: paste once, then choose. Two jobs on
+   * different providers pointing at one key is a person's own choice, so
+   * nothing here refuses it — a wrong key fails at the provider, which is the
+   * only place that can tell.
+   */
+  describe("one key across several jobs", () => {
+    it("gives two jobs the same key when both are pointed at it", async () => {
+      const mineOnly = await keyFor("sk-openai", "openai");
+
+      await saveAiTaskSettings(db, owner, "draft", {
+        provider: "openai",
+        model: "gpt-5.6-terra",
+        keyId: mineOnly,
+      });
+      await saveAiTaskSettings(db, owner, "triage", {
+        provider: "openai",
+        model: "gpt-5.6-luna",
+        keyId: mineOnly,
+      });
+
+      const mine = await readAiEnvironment(db, owner, instance, encryption);
+
+      expect(triageConfigFromEnvironment(mine).apiKey).toBe("sk-openai");
+      expect(draftConfigFromEnvironment(mine).apiKey).toBe("sk-openai");
+      // And scoring, pointed at nothing, is still the instance's.
+      expect(aiConfigFromEnvironment(mine).apiKey).toBe("the-instance-key");
+    });
+
+    it("lends nothing on its own: a job with no key uses the instance's", async () => {
+      await saveAiTaskSettings(db, owner, "draft", {
+        provider: "openai",
+        keyId: await keyFor("sk-openai", "openai"),
+      });
+      await saveAiTaskSettings(db, owner, "triage", {
+        provider: "openai",
+        model: "gpt-5.6-luna",
+      });
+
+      // Triage picked no key. It does not quietly take drafting's, which is
+      // the rule US-078 added and this ticket replaced with a choice.
+      expect(
+        triageConfigFromEnvironment(await readAiEnvironment(db, owner, instance, encryption))
+          .apiKey,
+      ).toBeUndefined();
+    });
+
+    it("puts every job back on the instance's key when the key is deleted", async () => {
+      const doomed = await keyFor("sk-openai", "openai");
+
+      await saveAiTaskSettings(db, owner, "classify", { keyId: doomed });
+      await deleteAiKey(db, owner, doomed);
+
+      expect(
+        aiConfigFromEnvironment(await readAiEnvironment(db, owner, instance, encryption)).apiKey,
+      ).toBe("the-instance-key");
+      expect((await readAiSettings(db, owner))[0]?.keyId).toBeNull();
+    });
+  });
+
+  /**
+   * The hole US-068 left, found while auditing US-080.
+   *
+   * An account can move a job onto another provider without storing a key. The
+   * instance's key stays in the environment underneath, and sending it to the
+   * provider that did not issue it fails every call — while the sentence a
+   * person reads blames a key they never chose.
+   */
+  describe("moving a job to another provider without a key", () => {
+    it("does not send the instance's key to the provider it did not come from", async () => {
+      await saveAiTaskSettings(db, owner, "classify", {
+        provider: "openai",
+        model: "gpt-5.6-terra",
+      });
+
+      const config = aiConfigFromEnvironment(
+        await readAiEnvironment(db, owner, instance, encryption),
+      );
+
+      expect(config.provider).toBe("openai");
+      expect(config.apiKey).toBeUndefined();
+    });
+
+    it("keeps the instance's key when the provider is the instance's own", async () => {
+      await saveAiTaskSettings(db, owner, "classify", { model: "claude-sonnet-5" });
+
+      expect(
+        aiConfigFromEnvironment(await readAiEnvironment(db, owner, instance, encryption)).apiKey,
+      ).toBe("the-instance-key");
+    });
+
+    it("does the same for a job with a key of its own in the environment", async () => {
+      const withTriageKey: AiEnvironment = {
+        ...instance,
+        AI_TRIAGE_PROVIDER: "anthropic",
+        AI_TRIAGE_API_KEY: "the-instance-triage-key",
+      };
+
+      await saveAiTaskSettings(db, owner, "triage", {
+        provider: "openai",
+        model: "gpt-5.6-luna",
+      });
+
+      const config = triageConfigFromEnvironment(
+        await readAiEnvironment(db, owner, withTriageKey, encryption),
+      );
+
+      expect(config.provider).toBe("openai");
+      expect(config.apiKey).toBeUndefined();
+    });
+  });
+
   it("keeps one account's settings out of another's", async () => {
-    await saveAiTaskSettings(db, key, owner, "classify", {
+    await saveAiTaskSettings(db, owner, "classify", {
       provider: "openai",
       model: "gpt-5.6-terra",
-      apiKey: "sk-mine",
+      keyId: await keyFor("sk-mine"),
     });
 
     const theirs = await readAiEnvironment(db, other, instance, encryption);
@@ -262,26 +403,26 @@ describe("one account's model settings", () => {
   });
 
   it("never reads a key back out, only its mask", async () => {
-    await saveAiTaskSettings(db, key, owner, "classify", { apiKey: "sk-1234567890abcd" });
+    await saveAiTaskSettings(db, owner, "classify", { keyId: await keyFor("sk-1234567890abcd") });
 
-    const [row] = await readAiSettings(db, owner);
+    const [listed] = await listAiKeys(db, owner);
 
-    expect(row?.hint).toBe("••••abcd");
-    expect(JSON.stringify(row)).not.toContain("sk-1234567890abcd");
+    expect(listed?.hint).toBe("••••abcd");
+    expect(JSON.stringify(listed)).not.toContain("sk-1234567890abcd");
 
-    // And nothing in the row itself is the plaintext.
-    const [stored] = await db.select().from(aiSettings);
-    expect(JSON.stringify(stored)).not.toContain("sk-1234567890abcd");
+    // And nothing in either row is the plaintext.
+    expect(JSON.stringify(await db.select().from(aiSettings))).not.toContain("sk-1234567890abcd");
+    expect(JSON.stringify(await db.select().from(aiKeys))).not.toContain("sk-1234567890abcd");
   });
 
   /**
    * A form posts every field on every save. US-022 found that shape erasing
-   * settings a person had not touched, and a key is the worst thing to erase:
-   * silent, and only noticed when the next poll scores nothing.
+   * settings a person had not touched, and the key is the worst choice to
+   * erase: silent, and only noticed when the next poll scores nothing.
    */
-  it("leaves the stored key alone when a save does not carry one", async () => {
-    await saveAiTaskSettings(db, key, owner, "classify", { apiKey: "sk-mine" });
-    await saveAiTaskSettings(db, key, owner, "classify", { model: "gpt-5.6-terra" });
+  it("leaves the chosen key alone when a save does not carry one", async () => {
+    await saveAiTaskSettings(db, owner, "classify", { keyId: await keyFor("sk-mine") });
+    await saveAiTaskSettings(db, owner, "classify", { model: "gpt-5.6-terra" });
 
     const config = aiConfigFromEnvironment(
       await readAiEnvironment(db, owner, instance, encryption),
@@ -291,22 +432,24 @@ describe("one account's model settings", () => {
     expect(config.model).toBe("gpt-5.6-terra");
   });
 
-  it("removes the stored key when a save says so, and falls back to the instance's", async () => {
-    await saveAiTaskSettings(db, key, owner, "classify", { apiKey: "sk-mine" });
-    await saveAiTaskSettings(db, key, owner, "classify", { apiKey: null });
+  it("goes back to the instance's key when a save says null", async () => {
+    await saveAiTaskSettings(db, owner, "classify", { keyId: await keyFor("sk-mine") });
+    await saveAiTaskSettings(db, owner, "classify", { keyId: null });
 
     const config = aiConfigFromEnvironment(
       await readAiEnvironment(db, owner, instance, encryption),
     );
 
     expect(config.apiKey).toBe("the-instance-key");
-    expect((await readAiSettings(db, owner))[0]?.hint).toBeNull();
+    expect((await readAiSettings(db, owner))[0]?.keyId).toBeNull();
+    // The key itself is still on the account. Pointing away is not deleting.
+    expect(await listAiKeys(db, owner)).toHaveLength(1);
   });
 
   it("forgets a task entirely when it is cleared", async () => {
-    await saveAiTaskSettings(db, key, owner, "classify", {
+    await saveAiTaskSettings(db, owner, "classify", {
       provider: "openai",
-      apiKey: "sk-mine",
+      keyId: await keyFor("sk-mine"),
     });
     await clearAiTaskSettings(db, owner, "classify");
 
@@ -320,7 +463,7 @@ describe("one account's model settings", () => {
    * classifying on somebody else's key is how a rotation looks like it worked.
    */
   it("throws rather than classifying on the instance's key when it cannot open a stored one", async () => {
-    await saveAiTaskSettings(db, key, owner, "classify", { apiKey: "sk-mine" });
+    await saveAiTaskSettings(db, owner, "classify", { keyId: await keyFor("sk-mine") });
 
     await expect(
       readAiEnvironment(db, owner, instance, { ENCRYPTION_KEY: generateEncryptionKey() }),
@@ -329,7 +472,15 @@ describe("one account's model settings", () => {
 
   it("refuses to store a key on an instance that has no encryption key", async () => {
     await expect(
-      saveAiTaskSettings(db, undefined, owner, "classify", { apiKey: "sk-mine" }),
+      createAiKey(db, undefined, owner, { name: "Nowhere to put it", apiKey: "sk-mine" }),
     ).rejects.toThrow(/ENCRYPTION_KEY/);
+  });
+
+  it("refuses a second key with the same name", async () => {
+    await createAiKey(db, key, owner, { name: "My key", apiKey: "sk-one" });
+
+    await expect(createAiKey(db, key, owner, { name: "my key", apiKey: "sk-two" })).rejects.toThrow(
+      DuplicateAiKeyName,
+    );
   });
 });

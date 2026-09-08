@@ -31,12 +31,32 @@ deliberate about: an instance with both a `.env` key and open signup lets a
 stranger poll on the machine's key. Empty the environment before you open
 signup, or accept the bill.
 
-**A model key follows the same rule, with one difference.** US-068. The Models
-screen stores a per-account key for each of the three jobs — scoring, triage and
-similarity — encrypted the same way, in `ai_settings`. The difference is that
-every field there is an *override*: a person who pastes only a key keeps the
-instance's provider and model and simply pays for their own calls, and an
-account with no row behaves exactly as it did before the screen existed.
+**A model key follows the same rule, with two differences.** US-068 and
+US-079. The Models screen stores keys on the account, in `ai_keys`, encrypted
+the same way. Each of the four jobs — scoring, triage, similarity, drafting —
+then names one, or names none and runs on the instance's key.
+
+The first difference is that every field on a job is an *override*: a person
+who picks only a key keeps the instance's provider and model and simply pays
+for their own calls, and an account with no row behaves exactly as it did
+before the screen existed.
+
+A key that states its provider decides the job's, and the card shows it rather
+than asking — one question with two fields is how an OpenAI key ends up on an
+Anthropic job.
+
+The second is that **a key belongs to nobody's job**. It is added once and
+several jobs may name it, which is a fact on the screen rather than a rule to
+learn. US-068 kept a key on each job's row and US-078 wrote a rule for lending
+one job's key to another; the owner read that rule and called it confusing, and
+US-079 replaced it with a list a person picks from. Deleting a key puts every
+job that named it back on the instance's key rather than stopping it dead.
+
+**A model key is not tested when it is stored, and is tested when somebody
+presses Test.** US-080. Validating on save would spend the person's money on a
+call they did not ask for; a button is the person asking. The button appears on
+a job that holds both halves it would test — a key and a model — and the call is
+billed, so it is recorded in the ledger as `key_test`.
 
 **The worker caches a model client per account, and that cache lives as long as
 the process.** So a model key changed on the screen reaches the API immediately
@@ -245,9 +265,11 @@ Set the credentials again from the provider's dashboard, or move them back to
 
 ## What this does not cover
 
-- **The model keys.** `AI_API_KEY` and `AI_EMBEDDING_API_KEY` stay in the
-  environment. They are per-instance, not per-user, and they never reach the
-  database.
+- **The instance's own model keys.** `AI_API_KEY` and `AI_EMBEDDING_API_KEY`
+  stay in the environment. They are the machine's, they are what a job with no
+  chosen key runs on, and they never reach the database. An account's own keys
+  are in `ai_keys` and are covered — including by `pnpm db:rotate-key`, which
+  re-encrypts both tables since US-079.
 - **Postgres itself.** Encryption at rest for the volume, TLS for the
   connection, and who can read a backup are deployment questions. This file is
   about what the application writes, not about where it writes it.

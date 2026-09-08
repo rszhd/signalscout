@@ -128,18 +128,23 @@ The default is `closed` and not `open`, because an instance that upgraded into
 this version without anyone reading the notes must not start accepting
 registrations.
 
-**Read this before you open it.** A provider key stored in the database belongs
-to an account, so each person who registers pastes their own on the connections
-screen and polls on it. But a key in `.env` belongs to the *machine* and is the
-fallback for everybody — so an instance with both a `.env` key and open signup
-lets a stranger poll on your key and against your bill. **Empty the provider
-keys out of `.env` before you open signup.** [docs/secrets.md](secrets.md),
-*Whose key is it*.
+**Opening it changes whose keys pay.** US-081: where signup is open, the keys
+in `.env` are the machine's and not an account's, so nothing falls back to
+them — not a provider key on a poll, and not a model key on a classification.
+Each person who registers pastes their own on the connections and Models
+screens, and a job with no key of its own does not run. That is a refusal you
+can see: the connections screen shows the key as missing and the monitor form
+says the monitor cannot start.
 
-The model key is the same shape since US-068: the Models screen stores one per
-account for each of the three jobs, and `AI_API_KEY` in the environment is the
-fallback for everybody. Empty that too before you open signup, or a stranger's
-classifications land on your model bill.
+Until US-081 this was advice — *empty the keys out of `.env` before you open
+signup* — and advice is a thing somebody skips. It is now the behaviour. You may
+still leave the keys in `.env`: with signup open they are simply not offered to
+anybody, and switching back to `closed` makes them the fallback again.
+
+What does **not** stop travelling is everything else in `.env`: the provider,
+the model, the endpoint and the prices. Those are what this deployment was
+configured and measured for, and an account that sets nothing keeps them.
+[docs/secrets.md](secrets.md), *Whose key is it*.
 
 **The first account keeps what came before it, and only the first.** See
 *Upgrading* below. A second person registering inherits nothing.

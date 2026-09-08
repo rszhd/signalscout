@@ -264,6 +264,15 @@ export const modelCallPurposes = [
    * chose to make, where a classification is one the poll made for them.
    */
   "draft_reply",
+  /**
+   * One call somebody made by pressing Test on the Models screen. US-080.
+   *
+   * Its own purpose for `draft_reply`'s reason and one more: a person reading
+   * "what did my key pay for" must be able to tell a test they ran from work
+   * the product did, and a budget page that counted tests as classifications
+   * would report a monitor reading posts it never read.
+   */
+  "key_test",
 ] as const;
 export type ModelCallPurpose = (typeof modelCallPurposes)[number];
 
@@ -1533,17 +1542,66 @@ export const aiTasks = ["classify", "triage", "embed", "draft"] as const;
 export type AiTask = (typeof aiTasks)[number];
 
 /**
+ * One account's model API keys. US-079.
+ *
+ * **A key belongs to the account and to no job.** US-068 stored one on each
+ * job's row, and US-078 then wrote a rule for lending one job's key to
+ * another. The owner read that rule and called it confusing, which it was: a
+ * person who has one key had to know where it was kept and which jobs would
+ * quietly reach for it. A key is a thing you own, so it is a row of its own,
+ * and a job points at one.
+ *
+ * The cipher and its rules are `source_credentials`': `record` stored per row,
+ * `hint` for showing, and no column anything can read a plaintext from. It is
+ * a separate table from that one because that is keyed by `Provider`, the
+ * data-company enum, and a model provider is a different list.
+ *
+ * `provider` is a label rather than a rule. It is what the picker shows beside
+ * the mask, and what lets a screen say "this is an Anthropic key on an OpenAI
+ * job". It is nullable because a key migrated off a job that named no provider
+ * has no stated one, and inventing one would be a guess written as a fact.
+ */
+export const aiKeys = pgTable(
+  "ai_keys",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    /** Which account. Text and no foreign key, for `monitors.user_id`'s reason. */
+    userId: text("user_id").notNull(),
+    /** What the person calls it, so a list of several is choosable. */
+    name: text("name").notNull(),
+    /** Which provider it is for, as a label. Null means nobody said. */
+    provider: text("provider"),
+    ciphertext: text("ciphertext").notNull(),
+    /** What the cipher authenticated. Stored, never derived. */
+    record: text("record").notNull(),
+    /** `••••1234`, so showing which key is set decrypts nothing. */
+    hint: text("hint").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    check("ai_keys_name_not_blank", sql`length(btrim(${table.name})) > 0`),
+    // A value that is not in the cipher's format was never encrypted by us.
+    check("ai_keys_ciphertext_format", sql.raw(`ciphertext LIKE 'v1.%.%.%'`)),
+    check("ai_keys_hint_masked", sql.raw(`hint LIKE '••••%' AND length(hint) <= 8`)),
+    // Two keys called the same thing are a person choosing blind, which is the
+    // rule `reply_prompts` already follows and for the same reason.
+    uniqueIndex("ai_keys_user_name_unique").on(table.userId, sql`lower(${table.name})`),
+  ],
+);
+
+/**
  * One account's model settings for one task. US-068.
  *
- * A row is an override and every column in it is optional except the key: a
- * person who pastes only an API key keeps the instance's provider and model and
- * simply pays for their own calls, which is the common cloud case.
+ * A row is an override and every column in it is optional: a person who picks
+ * only a key keeps the instance's provider and model and simply pays for their
+ * own calls, which is the common cloud case.
  *
- * The key is encrypted with the same cipher and the same rules as
- * `source_credentials` — `record` stored per row, `hint` for showing, and never
- * a column anything can read the plaintext from. It is a separate table because
- * that one is keyed by `Provider`, the data-company enum, and a model provider
- * is a different list entirely.
+ * **The key is a reference and not a secret.** US-079 moved the ciphertext to
+ * `ai_keys`, so this row says which key pays for this job and holds none of
+ * it. Deleting a key sets this back to null, which is the job going back to
+ * the instance's own key — a deletion that stopped a job dead with no way to
+ * see why would be worse.
  */
 export const aiSettings = pgTable(
   "ai_settings",
@@ -1566,33 +1624,14 @@ export const aiSettings = pgTable(
      */
     inputPriceMicros: integer("input_price_micros"),
     outputPriceMicros: integer("output_price_micros"),
-    /** Null when this account uses the instance's key for this task. */
-    ciphertext: text("ciphertext"),
-    /** What the cipher authenticated. Stored, never derived. */
-    record: text("record"),
-    /** `••••1234`, so showing which key is set decrypts nothing. */
-    hint: text("hint"),
+    /** Which stored key pays for this job. Null uses the instance's. */
+    keyId: uuid("key_id").references(() => aiKeys.id, { onDelete: "set null" }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [
     primaryKey({ columns: [table.userId, table.task] }),
     check("ai_settings_task_known", oneOf("task", aiTasks)),
-    // A value that is not in the cipher's format was never encrypted by us.
-    check(
-      "ai_settings_ciphertext_format",
-      sql.raw(`ciphertext IS NULL OR ciphertext LIKE 'v1.%.%.%'`),
-    ),
-    check(
-      "ai_settings_hint_masked",
-      sql.raw(`hint IS NULL OR (hint LIKE '••••%' AND length(hint) <= 8)`),
-    ),
-    // A ciphertext with no record cannot be opened, and a record with no
-    // ciphertext is a row describing nothing. Both halves or neither.
-    check(
-      "ai_settings_key_complete",
-      sql.raw(`(ciphertext IS NULL) = (record IS NULL) AND (ciphertext IS NULL) = (hint IS NULL)`),
-    ),
   ],
 );
 

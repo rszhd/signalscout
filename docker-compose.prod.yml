@@ -1,0 +1,75 @@
+# Production overlay (US-073). Layered on the base file, never instead of it:
+#
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+#
+# What it changes: the app stops publishing a port on the host, joins the shared
+# edge network, and carries the router labels that make Traefik serve it on a
+# hostname with a certificate.
+#
+# It does not change the database. This product keeps its own Postgres, its own
+# volume and its own backup, however many other stacks run on the box — one
+# database per product. Only the edge network is shared.
+#
+# The proxy is a separate compose project. Start docker-compose.proxy.yml first,
+# or point EDGE_NETWORK at the network a proxy you already run is on. Full
+# instructions: docs/accounts.md.
+
+services:
+  app:
+    # US-073's "the port is not published": the base file's host mapping is
+    # removed rather than firewalled. Compose merges list fields by appending,
+    # so omitting `ports` here would keep it and the app would stay reachable on
+    # the host address beside the proxy. !override is what actually drops it.
+    ports: !override []
+    networks:
+      # Naming any network opts out of the implicit one, so `default` is listed
+      # explicitly. It is what carries the app to Postgres and the migrations.
+      - default
+      - edge
+    # Makes "is this stack healthy?" a `docker compose ps` question, and it is
+    # the same answer Traefik's own check reads. The image has neither curl nor
+    # a shell HTTP client worth trusting, so it asks Node, which is certainly
+    # there.
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:' + (process.env.PORT || 3000) + '/api/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    # List form, not the `key: value` map form: Compose interpolates label
+    # values but NOT label keys, so ${TRAEFIK_NAME} inside a map key comes out
+    # literal and every stack on the box collides on one router name. Written as
+    # `key=value` strings it interpolates.
+    labels:
+      - traefik.enable=true
+      # The app sits on two networks. This says which one Traefik dials.
+      - traefik.docker.network=${EDGE_NETWORK:-signalscout-edge}
+      - traefik.http.routers.${TRAEFIK_NAME:-signalscout}.rule=Host(`${APP_HOST:?set APP_HOST}`)
+      - traefik.http.routers.${TRAEFIK_NAME:-signalscout}.entrypoints=websecure
+      - traefik.http.routers.${TRAEFIK_NAME:-signalscout}.tls.certresolver=le
+      - traefik.http.services.${TRAEFIK_NAME:-signalscout}.loadbalancer.server.port=${PORT:-3000}
+
+  # The migrations run against the same database and never face the proxy. They
+  # get no labels and no edge network on purpose.
+  migrate:
+    labels:
+      - traefik.enable=false
+
+  worker:
+    labels:
+      - traefik.enable=false
+
+  postgres:
+    # The base file publishes 5432 on loopback so `pnpm dev` and `pnpm test` can
+    # reach it. In production nothing off the compose network may, and two
+    # stacks on one box would collide on that port anyway.
+    ports: !override []
+
+networks:
+  edge:
+    external: true
+    name: ${EDGE_NETWORK:-signalscout-edge}

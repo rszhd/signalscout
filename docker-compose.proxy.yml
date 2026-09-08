@@ -1,0 +1,64 @@
+# The edge proxy: TLS termination and hostname routing (US-073).
+#
+# It is optional. If a proxy already fronts this box — Caddy, nginx, or a
+# Traefik another stack runs — do not start this file. Set EDGE_NETWORK to the
+# network that proxy is on and use docker-compose.prod.yml alone.
+#
+# It is its own compose project, not a service in docker-compose.prod.yml, so
+# its lifecycle is independent of the app's: `down` on the app must not take the
+# certificates with it. Traefik discovers backends through the Docker socket, so
+# a second stack needs no change here — it joins the edge network and carries
+# router labels.
+#
+#   docker network create signalscout-edge                              # once
+#   docker compose -p signalscout-proxy -f docker-compose.proxy.yml up -d
+#
+# Reads ACME_EMAIL and EDGE_NETWORK from .env in this directory. Let's Encrypt
+# rate-limits issuance, so read docs/accounts.md before deleting the volume.
+
+name: signalscout-proxy
+
+services:
+  traefik:
+    # Not below v3.7: Traefik's Docker client pinned API version 1.24 until
+    # then, and Docker Engine 29 refuses anything under 1.40. On an older proxy
+    # the provider never initialises — no routers, no ACME, and every hostname
+    # served the Traefik default certificate while the entrypoint redirect still
+    # works. That failure reads as a DNS or ACME problem and is neither.
+    image: traefik:v3.7
+    command:
+      - --providers.docker=true
+      # Nothing is routable until it says so itself: a container without
+      # traefik.enable=true is invisible, so an unrelated stack on this box
+      # cannot acquire a public hostname by accident.
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.web.address=:80
+      - --entrypoints.web.http.redirections.entrypoint.to=websecure
+      - --entrypoints.web.http.redirections.entrypoint.scheme=https
+      - --entrypoints.websecure.address=:443
+      - --certificatesresolvers.le.acme.email=${ACME_EMAIL:?set ACME_EMAIL in .env}
+      - --certificatesresolvers.le.acme.storage=/acme/acme.json
+      # TLS-ALPN over 443, so issuing a certificate needs no open port beyond
+      # the one already redirecting to HTTPS.
+      - --certificatesresolvers.le.acme.tlschallenge=true
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      # Read-only: Traefik reads container labels, it never drives Docker.
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      # One certificate store for every hostname on the box. Losing it means
+      # re-issuing into a rate limit, so it is a named volume and never a
+      # container layer.
+      - acme:/acme
+    networks:
+      - edge
+    restart: unless-stopped
+
+volumes:
+  acme:
+
+networks:
+  edge:
+    external: true
+    name: ${EDGE_NETWORK:-signalscout-edge}

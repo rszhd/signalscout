@@ -20,9 +20,11 @@ an `https` origin, which tells the browser never to send it over plain HTTP. On
 an `http` origin that mark cannot be set, so the cookie travels wherever the
 page does.
 
-So: run a TLS terminator in front of it. Caddy, nginx or Traefik all do this in
-a few lines, and Caddy will get a certificate on its own. Point it at the app's
-port and let nothing else reach that port.
+So: run a TLS terminator in front of it. This repository ships one, and it is
+optional — read *The proxy this repository ships* below. Caddy and nginx do the
+same job in a few lines if you would rather run your own, and Caddy will get a
+certificate on its own. Point it at the app's port and let nothing else reach
+that port.
 
 If your proxy terminates TLS and talks to the app over HTTP — which is the
 normal arrangement — it must send `X-Forwarded-Proto: https`. The app reads that
@@ -51,6 +53,50 @@ the browser's own origin intact. The API trusts the dev server on its own while
 `NODE_ENV` is `development`, and never in production.
 
 **On localhost, none of this applies.** Nothing leaves the machine.
+
+---
+
+## The proxy this repository ships
+
+`docker-compose.proxy.yml` runs Traefik: it answers on 80 and 443, redirects
+plain HTTP to HTTPS, and gets a certificate from Let's Encrypt on its own.
+`docker-compose.prod.yml` is the other half — it stops the app publishing a port
+on the host, so the proxy becomes the only way in.
+
+**Both are optional.** An instance already behind Caddy or nginx should keep it.
+The overlay exists so that the hosted deployment and the documented self-hosted
+one are the same mechanism, not because Traefik is simpler for one hostname —
+for one hostname it is not.
+
+Set four values in `.env`: `APP_HOST` is the hostname the browser uses,
+`ACME_EMAIL` is where Let's Encrypt sends expiry warnings, `EDGE_NETWORK` names
+the Docker network the proxy and the app meet on, and `TRAEFIK_NAME` names this
+stack's router. Point the hostname's DNS at the box first: the certificate is
+issued over that name, so it cannot be issued before the name resolves.
+
+```bash
+docker network create signalscout-edge
+docker compose -p signalscout-proxy -f docker-compose.proxy.yml up -d
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+```
+
+The proxy is its own compose project, so `down` on the app leaves it and its
+certificates running. That is the point of the separation: Let's Encrypt
+rate-limits issuance, and the `acme` volume is the only copy.
+
+### If a proxy already runs on this box
+
+Do not start `docker-compose.proxy.yml`. Set `EDGE_NETWORK` to the network that
+proxy is on and start the app overlay alone. The app carries its own router
+labels, so a Traefik with `exposedbydefault=false` picks it up with no change to
+the proxy's own configuration.
+
+Give this stack a `TRAEFIK_NAME` no other stack uses. Two stacks with one name
+share a router, and the second one to start takes the hostname.
+
+**The database is not shared, whatever else on the box is.** This product keeps
+its own Postgres, its own volume and its own backup. The overlay shares one
+network and nothing else.
 
 ---
 

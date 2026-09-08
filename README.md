@@ -201,8 +201,23 @@ it has, and closes signup behind it.
 **Put it behind TLS before you give it a public address.** It holds provider
 keys that spend money and an inbox of your own research, and on plain HTTP the
 session cookie is readable by anything between you and the server.
-[docs/accounts.md](docs/accounts.md) has the proxy header you need and the way
-back in if you are locked out.
+
+Two more compose files do that, and both are optional:
+
+```bash
+docker network create signalscout-edge
+docker compose -p signalscout-proxy -f docker-compose.proxy.yml up -d
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+```
+
+The first runs Traefik, which gets a certificate on its own. The second stops
+the app publishing a port on the host, so the proxy is the only way in. Set
+`APP_HOST` and `ACME_EMAIL` in `.env` first, and point the hostname at the box.
+
+If Caddy, nginx or another Traefik already fronts this machine, keep it: set
+`EDGE_NETWORK` to the network it is on and run the second command alone.
+[docs/accounts.md](docs/accounts.md) has both paths, the proxy header you need,
+and the way back in if you are locked out.
 
 One Postgres and one Node process. It is designed to run on a 1 GB VPS, and the
 image is built in CI, so your server pulls it and never compiles anything.

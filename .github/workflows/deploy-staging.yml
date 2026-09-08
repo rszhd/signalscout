@@ -1,0 +1,70 @@
+# A push to `staging` puts that commit on app.signalscout-dev.space (US-075).
+#
+# This file is thin on purpose. It knows which branch feeds which stack and
+# where that stack lives on the box, and nothing else. If it ever needs to know
+# which environment it is serving, the file is wrong — `main` will get its own
+# copy of this shape when there is a production stack.
+#
+# Before this existed, CI published an image and nobody took it: `:staging` is a
+# mutable tag, so the box kept serving the digest it had pulled until somebody
+# typed `pull` and `up -d`. On 2026-09-08 that gap ran twenty minutes with
+# nothing reporting a difference.
+
+name: Deploy staging
+
+on:
+  push:
+    branches: [staging]
+  # Dispatch this workflow on an older commit to roll back. GitHub's own ref
+  # picker is the input: it accepts a branch, a tag or a sha, and the run then
+  # builds and deploys that commit.
+  workflow_dispatch:
+
+# NOT cancel-in-progress. Two builds racing to move one mutable tag can leave it
+# behind the newer commit, and a deploy killed between `up -d` and its digest
+# assertion leaves a stack nobody has checked. Queue them.
+concurrency:
+  group: deploy-staging
+  cancel-in-progress: false
+
+# A called workflow's jobs may not ask for more than the caller grants, so the
+# ceiling is set here as well: the image job pushes to ghcr, which
+# `contents: read` alone would refuse.
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  # Reused rather than copied. That is what makes "a commit whose checks never
+  # ran cannot reach the box" a property of the job graph instead of a rule
+  # somebody remembers.
+  ci:
+    uses: ./.github/workflows/ci.yml
+
+  deploy:
+    name: Deploy to the box
+    needs: ci
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Load the deploy key
+        run: |
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          # Pinned, not accepted on sight. Without this every run trusts
+          # whatever answers on that address, which is the whole of the
+          # protection SSH offers here.
+          printf '%s\n' "${{ secrets.DEPLOY_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+
+      - name: Deploy
+        env:
+          HOST: ${{ secrets.DEPLOY_HOST }}
+          # A digest reference, not a tag. The box is told exactly which build
+          # to run, so a rollback is this same workflow dispatched on an older
+          # commit and nothing on the box has to be edited.
+          IMAGE: ghcr.io/${{ github.repository }}@${{ needs.ci.outputs.digest }}
+        run: ./scripts/deploy-remote.sh "$HOST" /root/signalscout-staging signalscout-staging "$IMAGE"

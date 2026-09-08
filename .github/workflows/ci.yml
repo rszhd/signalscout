@@ -2,8 +2,18 @@ name: CI
 
 on:
   push:
-    branches: [main, staging]
+    branches: [main]
   pull_request:
+  # Called by deploy-staging.yml, so a commit whose checks never ran cannot
+  # reach a box. That is a property of the job graph rather than a convention
+  # somebody keeps. `staging` is deliberately absent from the push list above:
+  # it would run this file twice for one commit, and the second run would
+  # publish the same tag from the same source for nobody.
+  workflow_call:
+    outputs:
+      digest:
+        description: The digest of the image this run published
+        value: ${{ jobs.image.outputs.digest }}
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -61,6 +71,12 @@ jobs:
       contents: read
       packages: write
 
+    outputs:
+      # What a deployment must end up running. A tag is a mutable pointer and a
+      # digest is not, so this is the only value that lets a deploy prove it
+      # took the build rather than whatever the box had already pulled.
+      digest: ${{ steps.build.outputs.digest }}
+
     steps:
       - uses: actions/checkout@v5
 
@@ -87,7 +103,8 @@ jobs:
             type=raw,value=staging,enable=${{ github.ref == 'refs/heads/staging' }}
             type=sha,format=long
 
-      - uses: docker/build-push-action@v6
+      - id: build
+        uses: docker/build-push-action@v6
         with:
           context: .
           push: ${{ github.event_name == 'push' }}

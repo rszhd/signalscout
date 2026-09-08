@@ -73,6 +73,7 @@ export function Billing() {
   const [busy, setBusy] = useState(false);
 
   const load = useCallback(async () => {
+    setError(null);
     try {
       setState(await requestJson<BillingState>("/api/billing"));
     } catch (cause) {
@@ -106,81 +107,179 @@ export function Billing() {
     }
   }
 
-  if (state === null) {
-    return (
-      <div className="billing-page">
-        <header className="topbar">
-          <div>
-            <h1>Billing</h1>
-            <p className="page-subtitle">{error ?? "Reading your subscription…"}</p>
-          </div>
-        </header>
-      </div>
-    );
-  }
+  const statusLabel =
+    state?.mode === "off"
+      ? "Self-hosted"
+      : ({
+          trialing: "Free trial",
+          trial_expired: "Trial ended",
+          subscribed: state?.cancelAtPeriodEnd ? "Cancels at period end" : "Active subscription",
+          past_due: "Payment needs attention",
+          canceled: "Subscription ended",
+          incomplete: "Payment incomplete",
+        }[state?.reason ?? ""] ?? "Subscription");
 
   return (
     <div className="billing-page">
       <header className="topbar">
         <div>
           <h1>Billing</h1>
-          <p className="page-subtitle">{subscriptionSentence(state)}</p>
+          <p className="page-subtitle">Your plan, subscription and what's included.</p>
         </div>
-        {state.hasBillingAccount ? (
-          <button
-            className="primary-button"
-            type="button"
-            disabled={busy}
-            onClick={() => void open("portal")}
-          >
-            Manage billing
-          </button>
-        ) : (
-          <button
-            className="primary-button"
-            type="button"
-            disabled={busy}
-            onClick={() => void open("checkout")}
-          >
-            Subscribe
-          </button>
-        )}
       </header>
 
-      {error && (
-        <p className="billing-error" role="alert">
-          {error}
-        </p>
-      )}
+      <div className="billing-content">
+        {state === null ? (
+          <section className="billing-loading" aria-live="polite">
+            {error ? (
+              <>
+                <h2>Billing details are unavailable</h2>
+                <p role="alert">{error}</p>
+                <button className="secondary-button" type="button" onClick={() => void load()}>
+                  Try again
+                </button>
+              </>
+            ) : (
+              <p role="status">Reading your subscription…</p>
+            )}
+          </section>
+        ) : (
+          <>
+            <div className="billing-overview">
+              <section className="billing-plan" aria-labelledby="billing-plan-title">
+                <p className="billing-eyebrow">
+                  {state.mode === "off" ? "Your deployment" : "Your cloud plan"}
+                </p>
+                <h2 id="billing-plan-title">
+                  SignalScout {state.mode === "off" ? "Self-hosted" : "Cloud"}
+                </h2>
+                <p className="billing-plan-intro">
+                  {state.mode === "off"
+                    ? "Your infrastructure. Your keys. Your data."
+                    : "You find the conversations. We keep it running."}
+                </p>
+                <p className="billing-price">
+                  <strong>{state.mode === "off" ? "$0" : "$15"}</strong>
+                  <span>USD / month</span>
+                </p>
+                <p className="billing-price-note">
+                  {state.mode === "off"
+                    ? "No application subscription."
+                    : "Hosting included. Provider usage billed separately."}
+                </p>
+                <div className="billing-features">
+                  <h3>
+                    {state.mode === "off"
+                      ? "Included in the application"
+                      : "We take care of the hosting"}
+                  </h3>
+                  <ul className="billing-includes">
+                    {(state.mode === "off"
+                      ? [
+                          "The full SignalScout application",
+                          "Scheduled monitoring and your intent inbox",
+                          "Your own social data and AI connections",
+                        ]
+                      : [
+                          "Hosted application and database",
+                          "Managed scheduler for your monitors",
+                          "Automatic updates and backups",
+                        ]
+                    ).map((feature) => (
+                      <li key={feature}>
+                        <span aria-hidden="true">✓</span>
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </section>
 
-      <section className="billing-plan">
-        <h2>SignalScout Cloud</h2>
-        <p className="billing-price">
-          <strong>$15</strong> <span>USD / month</span>
-        </p>
-        <ul className="billing-includes">
-          <li>We run the application, the scheduler and the database.</li>
-          <li>Automatic updates and backups.</li>
-          <li>Your own social data and AI keys. Provider usage is billed by them, not by us.</li>
-        </ul>
-        {/*
-          Said here rather than only on the landing page. Somebody reading this
-          screen is deciding whether $15 is the whole cost, and it is not: the
-          providers bill separately, and docs/costs.md is firm that our own
-          figure for that is an estimate.
-        */}
-        <p className="billing-note">
-          The subscription covers the hosting. What your monitors spend at the social data and model
-          providers is billed by those providers, on your own keys.
-        </p>
-      </section>
+              <section className="billing-account" aria-labelledby="billing-account-title">
+                <h2 id="billing-account-title">Subscription</h2>
+                <span
+                  className={`billing-status${!state.entitled || state.reason === "past_due" ? " billing-status-warning" : ""}`}
+                >
+                  {statusLabel}
+                </span>
+                <p className="billing-account-description">{subscriptionSentence(state)}</p>
+                {state.reason === "trialing" && state.trialDays > 0 && (
+                  <div className="billing-trial">
+                    <div>
+                      <span>Free trial</span>
+                      <strong>
+                        {state.trialDaysLeft ?? 0} of {state.trialDays} days left
+                      </strong>
+                    </div>
+                    <progress
+                      aria-label="Free trial days remaining"
+                      max={state.trialDays}
+                      value={Math.max(0, Math.min(state.trialDays, state.trialDaysLeft ?? 0))}
+                    />
+                  </div>
+                )}
+                {state.mode === "stripe" && (
+                  <div className="billing-action">
+                    {error && (
+                      <p className="billing-error" role="alert">
+                        {error}
+                      </p>
+                    )}
+                    <button
+                      className="primary-button"
+                      type="button"
+                      disabled={busy}
+                      onClick={() => void open(state.hasBillingAccount ? "portal" : "checkout")}
+                    >
+                      {busy
+                        ? "Opening Stripe…"
+                        : state.hasBillingAccount
+                          ? "Manage billing"
+                          : "Subscribe"}
+                    </button>
+                    <p>
+                      {state.hasBillingAccount
+                        ? "Manage your payment method, view invoices or cancel your subscription in Stripe."
+                        : "Continue to Stripe to set up your subscription."}
+                    </p>
+                    <span className="billing-secure">Payments handled securely by Stripe</span>
+                  </div>
+                )}
+              </section>
+            </div>
 
-      {state.hasBillingAccount && (
-        <p className="billing-note">
-          Cards, invoices and cancelling are on Stripe's own page. Nothing about a card is stored
-          here.
-        </p>
-      )}
+            <section className="billing-usage" aria-labelledby="billing-usage-title">
+              <div>
+                <p className="billing-eyebrow">Bring your own keys</p>
+                <h2 id="billing-usage-title">Your provider usage is separate</h2>
+                <p>
+                  Social data and AI providers bill your accounts directly. Their usage is separate
+                  from your SignalScout subscription.
+                </p>
+                <a className="secondary-button" href="#/connections">
+                  Manage connections <span aria-hidden="true">↗</span>
+                </a>
+              </div>
+              <dl>
+                <div>
+                  <dt>Social data</dt>
+                  <dd>Searches and conversations collected through your connected providers.</dd>
+                </div>
+                <div>
+                  <dt>AI models</dt>
+                  <dd>
+                    Classification, embeddings and reply drafts using your model provider keys.
+                  </dd>
+                </div>
+                <div>
+                  <dt>You control the budget</dt>
+                  <dd>Set a monthly spending cap for each monitor in its settings.</dd>
+                </div>
+              </dl>
+            </section>
+          </>
+        )}
+      </div>
     </div>
   );
 }

@@ -105,6 +105,31 @@ describe("the billing screen", () => {
     expect(button("Manage billing")).toBeTruthy();
   });
 
+  it("retries a failed subscription read", async () => {
+    fetched.mockResolvedValueOnce(json({ message: "Billing is unavailable." }, 502));
+    screen = await mount(<Billing />);
+    await settle();
+    expect(document.querySelector('[role="alert"]')?.textContent).toContain(
+      "Billing is unavailable.",
+    );
+
+    await act(async () => button("Try again").click());
+    await settle();
+
+    expect(button("Subscribe")).toBeTruthy();
+    expect(document.querySelector('[role="alert"]')).toBeNull();
+  });
+
+  it("does not offer a payment action when billing is off", async () => {
+    fetched.mockResolvedValue(json(state({ mode: "off", reason: "billing_off" })));
+    screen = await mount(<Billing />);
+    await settle();
+
+    expect(document.body.textContent).toContain("Self-hosted");
+    expect(document.body.textContent).not.toContain("$15");
+    expect(document.querySelector("button")).toBeNull();
+  });
+
   it("sends a person to Stripe when they press Subscribe", async () => {
     const assign = vi.fn();
     vi.stubGlobal("location", { assign, hash: "" });

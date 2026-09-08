@@ -137,3 +137,11 @@ project. Status, estimated spending, remaining budget and feedback stay visible;
 schedule, budget, pre-filter controls and collection history sit behind a native
 disclosure. Budget, credential and notification issues remain outside it.
 `styles/monitors.css` owns the responsive layout and uses the shared theme.
+
+## Billing
+
+Billing puts the plan and hosting price beside the account's subscription state
+and Stripe action. Trial days have a labelled progress bar. Provider costs sit
+below with a link to connections. The panels stack on narrow screens; loading
+failures offer a retry. `styles/billing.css` owns the layout and uses the shared
+theme. Self-hosted instances show no payment action.

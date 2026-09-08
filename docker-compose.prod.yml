@@ -51,7 +51,13 @@ services:
       - traefik.http.routers.${TRAEFIK_NAME:-signalscout}.rule=Host(`${APP_HOST:?set APP_HOST}`)
       - traefik.http.routers.${TRAEFIK_NAME:-signalscout}.entrypoints=websecure
       - traefik.http.routers.${TRAEFIK_NAME:-signalscout}.tls.certresolver=le
+      - traefik.http.routers.${TRAEFIK_NAME:-signalscout}.middlewares=${TRAEFIK_NAME:-signalscout}-robots@docker
       - traefik.http.services.${TRAEFIK_NAME:-signalscout}.loadbalancer.server.port=${PORT:-3000}
+      # Indexability is a value rather than a branch, so a staging stack is the
+      # same file with a different ROBOTS_TAG. A staging instance that Google
+      # indexes competes with the real one and shows strangers a half-built
+      # product, and the login screen does not stop a crawler reading the URL.
+      - traefik.http.middlewares.${TRAEFIK_NAME:-signalscout}-robots.headers.customresponseheaders.X-Robots-Tag=${ROBOTS_TAG:-all}
 
   # The migrations run against the same database and never face the proxy. They
   # get no labels and no edge network on purpose.

@@ -62,7 +62,7 @@ services:
   # Runs to completion before anything connects. Two processes applying the
   # same migrations at boot is a race nobody needs.
   migrate:
-    image: ${SIGNALSCOUT_IMAGE:-ghcr.io/signalscout/signalscout:latest}
+    image: ${SIGNALSCOUT_IMAGE:-ghcr.io/rszhd/signalscout:latest}
     command: ["node", "packages/core/dist/db/migrate-cli.js"]
     environment: *app-environment
     depends_on:
@@ -71,7 +71,7 @@ services:
     restart: "no"
 
   app:
-    image: ${SIGNALSCOUT_IMAGE:-ghcr.io/signalscout/signalscout:latest}
+    image: ${SIGNALSCOUT_IMAGE:-ghcr.io/rszhd/signalscout:latest}
     environment:
       <<: *app-environment
       WORKER_IN_PROCESS: ${WORKER_IN_PROCESS:-true}
@@ -89,7 +89,7 @@ services:
   # or with two.
   worker:
     profiles: ["worker"]
-    image: ${SIGNALSCOUT_IMAGE:-ghcr.io/signalscout/signalscout:latest}
+    image: ${SIGNALSCOUT_IMAGE:-ghcr.io/rszhd/signalscout:latest}
     command: ["node", "apps/worker/dist/index.js"]
     environment:
       <<: *app-environment

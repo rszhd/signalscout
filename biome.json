@@ -10,7 +10,8 @@
       "!pnpm-lock.yaml",
       "!packages/core/src/sources/**/*fixtures/*.json",
       "!packages/core/src/ai/fixtures/*.json",
-      "!packages/core/src/sources/deletion-fixtures/*.json"
+      "!packages/core/src/sources/deletion-fixtures/*.json",
+      "!landing/public"
     ]
   },
   "formatter": {
@@ -27,6 +28,17 @@
     "rules": { "preset": "recommended" }
   },
   "overrides": [
+    {
+      "includes": ["**/*.astro"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noUnusedVariables": "off",
+            "noUnusedImports": "off"
+          }
+        }
+      }
+    },
     {
       "includes": ["packages/core/**"],
       "linter": {

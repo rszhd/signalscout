@@ -2,19 +2,7 @@ import { type FormEvent, useState } from "react";
 import { messageFor, requestJson } from "./api.js";
 import { BrandLogo } from "./BrandLogo.js";
 
-/**
- * The one screen a signed-out person can reach. US-017.
- *
- * It is two forms, and which one it shows is not a choice a person makes: an
- * instance with no account yet asks for one, and an instance that has one asks
- * to be let in. Offering both would put an open signup form on a public
- * address, which is the way these tools are usually given away.
- *
- * There is no "forgot password" and no "create another account". Nothing here
- * sends mail, so a reset link would be a button that does nothing; the recovery
- * path for a self-hoster is the database they already own, and
- * docs/self-hosting.md says which command.
- */
+/** Email authentication, with registration offered only when the instance allows it. */
 
 /** What `/api/auth-status` answers. */
 export interface AuthStatus {
@@ -86,104 +74,151 @@ export function Login({ firstRun, signUpOpen }: { firstRun: boolean; signUpOpen:
 
   return (
     <main className="login-page">
-      <section className="login-card">
+      <header className="login-header">
         <div className="login-brand">
           <BrandLogo />
           <span>SignalScout</span>
         </div>
+        <span className="login-header-note">Conversations worth finding.</span>
+      </header>
 
-        <h1>{firstRun ? "Set up this instance" : signingUp ? "Create an account" : "Sign in"}</h1>
-        <p className="page-subtitle">
-          {firstRun
-            ? "This instance has no account yet. The first one is yours, and signup closes behind it."
-            : signingUp
-              ? "Your monitors, matches and saved replies are your own."
-              : "Sign in to read your inbox."}
-        </p>
+      <div className="login-layout">
+        <aside className="login-story" aria-labelledby="login-story-title">
+          <p className="login-eyebrow">A little less searching. A lot more signal.</p>
+          <h2 id="login-story-title">
+            Your next customer
+            <br />
+            is already talking.
+          </h2>
+          <p className="login-story-copy">
+            Find people describing the problem your product solves, and join the conversation when
+            it matters.
+          </p>
+          <figure className="login-preview">
+            <figcaption>Example conversation</figcaption>
+            <div className="login-preview-heading">
+              <span className="login-preview-source">Reddit · r/SaaS</span>
+              <span className="login-signal">Asking for recommendations</span>
+            </div>
+            <blockquote>
+              “We’re only three developers and manually test signup and checkout before every
+              release. What are other small teams using?”
+            </blockquote>
+            <div className="login-preview-reason">
+              <span className="login-preview-mark" aria-hidden="true">
+                ↗
+              </span>
+              <p>
+                <strong>A problem your product could solve.</strong>
+                <span>A small team. A recurring pain. An active search for a solution.</span>
+              </p>
+            </div>
+          </figure>
+          <p className="login-story-footer">Your accounts. Your API keys. Your data.</p>
+        </aside>
 
-        <form className="field-stack" onSubmit={submit}>
-          {signingUp && (
+        <section className="login-card" aria-labelledby="login-title">
+          <p className="login-eyebrow">{signingUp ? "Get started" : "Welcome back"}</p>
+          <h1 id="login-title">
+            {firstRun ? "Set up this instance" : signingUp ? "Create an account" : "Sign in"}
+          </h1>
+          <p className="page-subtitle">
+            {firstRun
+              ? "This instance has no account yet. The first one is yours, and signup closes behind it."
+              : signingUp
+                ? "Your monitors, matches and saved replies are your own."
+                : "Sign in to read your inbox."}
+          </p>
+
+          <form className="field-stack" onSubmit={submit} aria-busy={busy}>
+            {signingUp && (
+              <label className="field">
+                <span>Your name</span>
+                <input
+                  aria-label="Your name"
+                  autoComplete="name"
+                  placeholder="Alex Morgan"
+                  required
+                  value={name}
+                  onChange={(event) => setName(event.target.value)}
+                />
+              </label>
+            )}
+
             <label className="field">
-              <span>Your name</span>
+              <span>Email</span>
               <input
-                aria-label="Your name"
-                autoComplete="name"
+                aria-label="Email"
+                autoComplete="username"
+                placeholder="you@company.com"
                 required
-                value={name}
-                onChange={(event) => setName(event.target.value)}
+                type="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
               />
             </label>
-          )}
 
-          <label className="field">
-            <span>Email</span>
-            <input
-              aria-label="Email"
-              autoComplete="username"
-              required
-              type="email"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-            />
-          </label>
+            <label className="field">
+              <span>Password</span>
+              <input
+                aria-label="Password"
+                autoComplete={signingUp ? "new-password" : "current-password"}
+                placeholder={signingUp ? "Create a password" : "Enter your password"}
+                aria-describedby={signingUp ? "login-password-help" : undefined}
+                minLength={signingUp ? minimumPasswordLength : undefined}
+                required
+                type="password"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+              />
+              {signingUp && (
+                <small id="login-password-help">
+                  Use at least {minimumPasswordLength} characters.
+                </small>
+              )}
+            </label>
 
-          <label className="field">
-            <span>Password</span>
-            <input
-              aria-label="Password"
-              autoComplete={signingUp ? "new-password" : "current-password"}
-              minLength={signingUp ? minimumPasswordLength : undefined}
-              required
-              type="password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-            />
-            {signingUp && (
-              <small>
-                At least {minimumPasswordLength} characters. Length is what a password costs
-                somebody guessing it.
-              </small>
+            {error && (
+              <p className="form-error" role="alert">
+                {error}
+              </p>
             )}
-          </label>
 
-          {error && (
-            <p className="form-error" role="alert">
-              {error}
-            </p>
-          )}
+            <button className="primary-button" disabled={busy} type="submit">
+              {busy ? "Working…" : signingUp ? "Create the account" : "Sign in"}
+            </button>
+          </form>
 
-          <button className="primary-button" disabled={busy} type="submit">
-            {busy ? "Working…" : signingUp ? "Create the account" : "Sign in"}
-          </button>
-        </form>
-
-        {/*
+          {/*
           Only where a second account is actually possible. On a closed instance
           this is absent rather than disabled: an offer that refuses is worse
           than no offer, because somebody will fill the form in first.
         */}
-        {!firstRun && signUpOpen && (
-          <p className="login-switch">
-            {registering ? "Already have an account? " : "New here? "}
-            <button
-              type="button"
-              onClick={() => {
-                setRegistering(!registering);
-                setError(null);
-              }}
-            >
-              {registering ? "Sign in" : "Create an account"}
-            </button>
-          </p>
-        )}
+          {!firstRun && signUpOpen && (
+            <p className="login-switch">
+              {registering ? "Already have an account? " : "New here? "}
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() => {
+                  setRegistering(!registering);
+                  setError(null);
+                }}
+              >
+                {registering ? "Sign in" : "Create an account"}
+              </button>
+            </p>
+          )}
 
-        {firstRun && (
-          <p className="login-note">
-            Put this instance behind TLS before you open it to the internet. It holds provider keys
-            that spend money.
-          </p>
-        )}
-      </section>
+          {firstRun && (
+            <p className="login-note">
+              Put this instance behind TLS before you open it to the internet. It holds provider
+              keys that spend money.
+            </p>
+          )}
+        </section>
+      </div>
+      <footer className="login-footer">Open-source AI intent monitoring.</footer>
     </main>
   );
 }

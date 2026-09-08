@@ -100,7 +100,9 @@ export async function startApi({
   // shapes of load — short reads against long jobs — and one pool shared
   // between them would let a slow poll hold connections a request is waiting
   // for. Nothing connects until the first query.
-  const { db, close } = openDatabase(env.DATABASE_URL);
+  const { db, close } = openDatabase(env.DATABASE_URL, {
+    onError: (error) => logger.error({ err: error }, "an idle database connection failed"),
+  });
 
   /**
    * The credential store, checked before the first request.

@@ -332,7 +332,9 @@ export async function startWorker({
   // connect budget is shorter than several providers take to answer.
   configureNetworking();
 
-  const { db, close } = createDatabase(databaseUrl);
+  const { db, close } = createDatabase(databaseUrl, {
+    onError: (error) => logger.error({ err: error }, "an idle database connection failed"),
+  });
 
   // Before anything is queued. A stored credential this process cannot read
   // is a poll that would fail at 02:00 with a message about a provider, so it
@@ -552,9 +554,22 @@ export async function startWorker({
     boss,
     db,
     stop: async () => {
-      // Graceful: a job that is running gets to finish. pg-boss stops fetching
-      // first, so nothing new is claimed while the last ones drain.
+      /**
+       * `stop()` asks pg-boss to shut down and resolves before it has. Its own
+       * pool is still open at that point, so a caller that closes the database
+       * next — or drops it, which is what a test does — pulls the connections
+       * out from under a library that is still using them. The `stopped` event
+       * is the end of the shutdown, and this waits for it.
+       *
+       * Graceful: a job that is running gets to finish. pg-boss stops fetching
+       * first, so nothing new is claimed while the last ones drain.
+       */
+      const stopped = new Promise<void>((resolve) => {
+        boss.once("stopped", () => resolve());
+      });
+
       await boss.stop({ graceful: true });
+      await stopped;
       await close();
     },
   };

@@ -44,14 +44,38 @@ export function poolOptions(): { max?: number } {
   return Number.isInteger(configured) && configured > 0 ? { max: configured } : {};
 }
 
+export interface DatabaseOptions {
+  /**
+   * Told when a connection this pool is not using fails. Optional, because a
+   * one-off script has nowhere useful to say it; the listener is attached
+   * either way, and that is the part that matters.
+   */
+  onError?: (error: Error) => void;
+}
+
 /**
  * Open a connection pool and the Drizzle handle over it.
  *
  * The caller owns the pool and must `close()` it. Nothing here opens a
  * connection on import, so a test file can hold several databases at once.
  */
-export function createDatabase(databaseUrl: string) {
+export function createDatabase(databaseUrl: string, { onError }: DatabaseOptions = {}) {
   const pool = new Pool({ connectionString: databaseUrl, ...poolOptions() });
+
+  /**
+   * `pg` emits this on an IDLE client, so no query is waiting to receive it.
+   * With no listener here Node treats it as an unhandled error and ends the
+   * process — the API and the worker both die, having served every request
+   * correctly up to that moment.
+   *
+   * It arrives whenever Postgres closes a connection we are not using: a
+   * restart, a failover, an administrator running `pg_terminate_backend`, a
+   * connection pooler timing an idle session out. None of those is a reason
+   * for this process to stop. The pool opens a replacement on its own, so
+   * there is nothing to repair here — only something to catch.
+   */
+  pool.on("error", (error) => onError?.(error));
+
   const db = drizzle(pool, { schema });
 
   return {

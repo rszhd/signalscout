@@ -100,3 +100,35 @@ behaves as it did.
   The lesson is not about presets. **A feature nobody can find did not ship**,
   and the way to know is to open the page in the state the person is actually
   in — one saved voice, not zero.
+- 2026-09-09T00:46+08:00 — **Reversed, on the owner's decision: an account now
+  starts with all five saved.** This ticket's Context says they are starting
+  points and not settings, and that is what changed. The reason it was worth
+  changing is the same one the ticket opened with — a person who has never
+  written an instruction cannot judge five names on a page, and reading a real
+  draft in a voice is what tells them which one they want. A press is one more
+  decision asked before the moment that would inform it.
+
+  `seedPresetReplyVoices` in `ai/reply-prompts.ts` is the whole rule, and it is
+  called from `user.create.after` for every account. There, and not in the
+  sign-up route, for that hook's own reason: it is what every path that creates
+  a user goes through. It runs **after** `claimUnownedRows`, and that ordering
+  is what makes a conflict harmless — an instance older than the login may
+  already hold a voice called "Short comment", and those are somebody's words.
+  Conflicts do nothing, so the function is safe to run twice and never
+  overwrites.
+
+  Migration 0049 is the same five rows for accounts that already existed. It
+  carries the preset text as a SQL snapshot, generated from the module rather
+  than retyped, and it will drift on purpose: rewriting old rows to follow the
+  module later would overwrite whatever a person has since edited.
+
+  **Proven on the development database**, which is the half a test could not
+  reach. Three accounts, and the one that had written its own "Short and plain"
+  came out with six voices while the other two have five. No row was
+  overwritten.
+
+  The screen needed no change, and that is `VoicePresets` returning null when
+  every preset is saved: the picker is simply absent on a fresh account and
+  comes back the moment somebody deletes a voice. The box the ticket ticked —
+  *a preset already saved is not offered again* — is what makes the new default
+  read correctly.

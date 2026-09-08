@@ -1204,16 +1204,26 @@ question first, this one time" and press the button — measured live, an
 instruction of "exactly two sentences, do not ask anything back" produced
 exactly that.
 
-**Five voices ship with the product, as starting points.** US-065. The voices
-page opened on a blank box, which is the hardest screen here to answer: a
-person who has never written an instruction does not know what a good one looks
-like, and the ones they guess at ask for what the prompt refuses. Each preset
-carries the measurement it came from — `Reddit regular` because a subreddit
-treats a promotional reply as an advertisement, `Technical detail` because
-LinkedIn's noise is expertise-signalling, `Short comment` because a TikTok
-comment runs a median of 54 characters and an Instagram one 26. Choosing one
-fills the form and saves nothing; they are offered wherever a *new* voice is
-made and never while editing a saved one.
+**Five voices ship with the product, and an account starts with all five
+saved.** US-065 wrote them and offered them; on 2026-09-09 the owner decided
+they should simply be there. The voices page opened on a blank box, which is
+the hardest screen here to answer: a person who has never written an
+instruction does not know what a good one looks like, and the ones they guess
+at ask for what the prompt refuses. Each preset carries the measurement it came
+from — `Reddit regular` because a subreddit treats a promotional reply as an
+advertisement, `Technical detail` because LinkedIn's noise is
+expertise-signalling, `Short comment` because a TikTok comment runs a median of
+54 characters and an Instagram one 26.
+
+`seedPresetReplyVoices` writes them in `user.create.after`, after claiming and
+for every account, and migration 0049 does the same once for accounts that
+already existed. **A name already taken is left alone**, which is why the order
+matters: an instance upgrading from before the login may already hold a voice
+called `Short comment`, and those are somebody's own words. Nothing is
+overwritten and nothing is rewritten later — the migration is a snapshot of the
+module and says so, because following the module would edit rows a person has
+since changed. Presets are still offered, and the picker hides itself when
+every one is saved, so it reappears exactly when somebody deletes one.
 
 **A person saves reply instructions on their account, several of them, and
 picks one when drafting.** Not per project: a voice is how one person writes,

@@ -23,6 +23,7 @@ import {
   posts,
   projects,
   replyPrompts,
+  replyVoicePresets,
   unclaimedUserId,
   users,
 } from "@signalscout/core";
@@ -585,7 +586,10 @@ describe("the session gate", () => {
         .select({ name: replyPrompts.name, userId: replyPrompts.userId })
         .from(replyPrompts);
 
-      expect(voices).toEqual([{ name: "Older voice", userId: owner?.id }]);
+      // The claimed voice, and the shipped ones beside it. Every row belongs
+      // to the new account, and the person's own words are still there.
+      expect(voices).toContainEqual({ name: "Older voice", userId: owner?.id });
+      expect(voices).toHaveLength(1 + replyVoicePresets.length);
 
       // And the screens show them, which is the thing a person would notice.
       const cookie = jarOf(created.headers["set-cookie"]);
@@ -597,6 +601,44 @@ describe("the session gate", () => {
 
       expect(listed.statusCode).toBe(200);
       expect(listed.json().projects).toHaveLength(1);
+    } finally {
+      await app.close();
+    }
+  });
+
+  /**
+   * The library starts full. US-065's presets, saved rather than offered.
+   *
+   * Asserted here rather than on the screen, because the hook is what every
+   * path that creates a user passes through — and a preset a person never
+   * receives is a blank box, which is the screen this was written to answer.
+   */
+  it("gives a new account the shipped reply voices", async () => {
+    await clear();
+    const app = await server();
+
+    try {
+      expect((await signUp(app)).statusCode).toBe(200);
+
+      const [owner] = await db.select({ id: users.id }).from(users);
+      const rows = await db
+        .select({
+          userId: replyPrompts.userId,
+          name: replyPrompts.name,
+          instruction: replyPrompts.instruction,
+        })
+        .from(replyPrompts);
+      const voices = rows
+        .filter((row) => row.userId === owner?.id)
+        .map(({ name, instruction }) => ({ name, instruction }));
+
+      expect(voices.map((voice) => voice.name).sort()).toEqual(
+        replyVoicePresets.map((preset) => preset.name).sort(),
+      );
+      // The words are the module's own, not a paraphrase of them.
+      for (const preset of replyVoicePresets) {
+        expect(voices).toContainEqual({ name: preset.name, instruction: preset.instruction });
+      }
     } finally {
       await app.close();
     }

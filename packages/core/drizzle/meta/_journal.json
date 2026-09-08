@@ -344,6 +344,13 @@
       "when": 1788707618121,
       "tag": "0048_a_cloud_account_has_a_subscription",
       "breakpoints": true
+    },
+    {
+      "idx": 49,
+      "version": "7",
+      "when": 1788707618122,
+      "tag": "0049_the_shipped_reply_voices_are_saved",
+      "breakpoints": true
     }
   ]
 }

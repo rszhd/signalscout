@@ -13,6 +13,7 @@
 import { and, asc, eq, sql } from "drizzle-orm";
 import type { Database } from "../db/client.js";
 import { replyPrompts } from "../db/schema.js";
+import { replyVoicePresets } from "./reply-voices.js";
 
 export interface ReplyPrompt {
   readonly id: string;
@@ -164,4 +165,38 @@ export async function deleteReplyPrompt(
     .returning({ id: replyPrompts.id });
 
   return rows.length > 0;
+}
+
+/**
+ * Give an account the shipped voices. US-065's presets, saved rather than
+ * offered.
+ *
+ * They were starting points: an empty library, and a picker that filled the
+ * form. That asked a person to choose before they had ever drafted a reply,
+ * which is the wrong moment — the choice is worth making beside a real post,
+ * and it can only be made by somebody who has seen what the five sound like.
+ * So the library starts full and a voice is deleted like any other.
+ *
+ * **A name already taken is left alone.** Conflicts do nothing, so this is
+ * safe to run twice, and it never overwrites words a person wrote — including
+ * the ones the first account claimed from before the login existed.
+ *
+ * It returns how many rows it wrote, because "five" and "none" are the two
+ * things a caller might want to log and they are not distinguishable from a
+ * success.
+ */
+export async function seedPresetReplyVoices(db: Database, userId: string): Promise<number> {
+  const rows = await db
+    .insert(replyPrompts)
+    .values(
+      replyVoicePresets.map((preset) => ({
+        userId,
+        name: preset.name,
+        instruction: preset.instruction,
+      })),
+    )
+    .onConflictDoNothing()
+    .returning({ id: replyPrompts.id });
+
+  return rows.length;
 }

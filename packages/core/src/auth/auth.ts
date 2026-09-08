@@ -22,6 +22,7 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { APIError } from "better-auth/api";
 import { eq, sql } from "drizzle-orm";
+import { seedPresetReplyVoices } from "../ai/reply-prompts.js";
 import { type BillingMode, startTrial } from "../billing/index.js";
 import type { Database } from "../db/client.js";
 import {
@@ -293,6 +294,21 @@ export function createAuth({
              * two would give the second person to register no trial at all.
              */
             if (billing !== "off") await startTrial(db, user.id);
+
+            /**
+             * The shipped reply voices, saved rather than offered. US-065.
+             *
+             * For every account, like the trial and unlike claiming: the
+             * presets are the product's own answer to a blank box, and the
+             * second person to register meets the same blank box as the
+             * first.
+             *
+             * It runs *after* claiming, and that order is the whole reason a
+             * conflict does nothing. An instance upgrading from before the
+             * login already holds voices, one of them may be called "Short
+             * comment", and the person who wrote it must keep their words.
+             */
+            await seedPresetReplyVoices(db, user.id);
           },
         },
       },

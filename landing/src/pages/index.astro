@@ -5,6 +5,7 @@ import '@fontsource/figtree/600.css';
 import '@fontsource/figtree/700.css';
 import '../styles/tokens.css';
 import '../styles/landing.css';
+import '../styles/story.css';
 import Icon from '../components/Icon.astro';
 const repository = 'https://github.com/rszhd/signalscout';
 const appUrl = import.meta.env.PUBLIC_APP_URL;
@@ -132,6 +133,11 @@ const examples = [
 </div>
 <h3>Tell us what you build</h3>
 <p>Describe your product, your ideal customer, and the problems you solve. Choose the signals that matter to you.</p>
+<div class="step-visual brief-visual" aria-label="Example product brief">
+  <span class="visual-caption">YOUR PRODUCT, IN PLAIN WORDS</span>
+  <div class="brief-sheet"><span class="brief-label">I’m building</span><strong>A simpler way to test websites<span class="illustrative-caret" aria-hidden="true"></span></strong><span class="brief-label">For people who</span><span>Spend too much time testing manually</span></div>
+  <span class="brief-sticker"><Icon name="check" size={14}/> That’s a starting point.</span>
+</div>
 </article>
 <article>
 <div class="step-top">
@@ -140,6 +146,12 @@ const examples = [
 </div>
 <h3>Listen for a real need</h3>
 <p>SignalScout searches your chosen platforms and uses AI to assess the context behind each conversation.</p>
+<div class="step-visual filter-visual" aria-label="Illustrative scores distinguish a need from a mention">
+  <span class="visual-caption">SAME TOPIC. DIFFERENT INTENT.</span>
+  <div class="filter-row quiet-row"><span>“Here’s my testing tutorial.”</span><span class="mini-score">18</span></div>
+  <div class="filter-row"><span>“Our tests keep breaking.”</span><span class="mini-score">62</span></div>
+  <div class="filter-row strong-row"><span>“What should we use instead?”</span><span class="mini-score">94 <span aria-hidden="true">✦</span></span></div>
+</div>
 </article>
 <article>
 <div class="step-top">
@@ -148,8 +160,15 @@ const examples = [
 </div>
 <h3>Show up with something useful</h3>
 <p>Review scored matches, understand what the model saw, and open the conversation when you can help.</p>
+<div class="step-visual reply-visual" aria-label="Illustrative conversation and a reply you could write">
+  <span class="visual-caption">A HUMAN CONVERSATION STARTS HERE</span>
+  <div class="mini-message"><span class="message-avatar">?</span><span>“What are other small teams using?”</span></div>
+  <div class="mini-message your-message"><span>“We built something for exactly this…”</span><span class="message-avatar"><Icon name="signal" size={16}/></span></div>
+  <span class="reply-footnote">You choose when to join in.</span>
+</div>
 </article>
 </div>
+<p class="walkthrough-caption">An illustrative journey for a browser-testing product.</p>
 </section>
 <section id="inbox" class="demo-section section-space">
 <div class="wrap">
@@ -202,6 +221,12 @@ const examples = [
 <p class="ownership-intro">Start with the conversations that matter. Keep control of how you find them.</p>
 <a class="text-link" href={repository}>Explore the source code <Icon name="external" size={17}/>
 </a>
+<div class="delivery-preview">
+  <div class="delivery-header"><span class="delivery-icon"><Icon name="bell" size={18}/></span><span>SignalScout digest<small>Illustrative email preview</small></span><span class="delivery-stamp">FOR YOU</span></div>
+  <strong>A conversation worth a closer look.</strong>
+  <p>Someone is asking how to replace their manual testing routine.</p>
+  <div class="delivery-bottom"><span><img src="/brands/reddit.png" width="16" height="16" alt=""/>Reddit · r/SaaS</span><span>94 / 100 match</span></div>
+</div>
 </div>
 <div class="ownership-list">
 <article>
@@ -294,6 +319,11 @@ const examples = [
 </div>
 </section>
 <section class="closing wrap">
+<div class="closing-conversations" aria-label="Examples of intent signals">
+  <span class="closing-question"><img src="/brands/reddit.png" alt="Reddit" width="20" height="20"/>“Any recommendations?”</span>
+  <span class="closing-question"><img src="/brands/x.png" alt="X" width="18" height="18"/>“There has to be a better way.”</span>
+  <span class="closing-question"><img src="/brands/youtube.png" alt="YouTube" width="21" height="21"/>“What would you use instead?”</span>
+</div>
 <span class="eyebrow">SOMEONE IS ASKING THE RIGHT QUESTION.</span>
 <h2>Be there when you can help.</h2>
 <a class="button" href="#pricing">Find your first signal <Icon size={18}/>

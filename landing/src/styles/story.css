@@ -1,0 +1,294 @@
+/* Small product stories keep the lower page concrete and visually varied. */
+.step-visual {
+  position: relative;
+  min-height: 234px;
+  margin-top: 28px;
+  padding: 22px 18px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+.visual-caption {
+  display: block;
+  margin-bottom: 20px;
+  font-size: 9px;
+  letter-spacing: 1.3px;
+  font-weight: 600;
+}
+.brief-visual {
+  background: var(--coral-soft);
+  color: var(--coral);
+}
+.brief-sheet {
+  display: grid;
+  gap: 8px;
+  padding: 17px;
+  background: var(--surface);
+  color: var(--muted-strong);
+  border: 1px solid var(--coral-line);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  transform: rotate(-2deg);
+  box-shadow: var(--shadow-soft);
+}
+.brief-label {
+  font-size: 10px;
+  color: var(--muted);
+}
+.brief-sheet strong {
+  font-weight: 500;
+  color: var(--ink);
+}
+.illustrative-caret {
+  display: inline-block;
+  width: 1px;
+  height: 12px;
+  margin-left: 3px;
+  background: var(--coral);
+  vertical-align: middle;
+}
+.brief-sticker {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  justify-content: flex-end;
+  margin-top: 12px;
+  font-size: 11px;
+}
+.filter-visual {
+  background: var(--lavender-soft);
+  color: var(--lavender);
+}
+.filter-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--lavender-line);
+  border-radius: 6px;
+  padding: 12px 10px;
+  margin-bottom: 8px;
+  background: var(--surface);
+  color: var(--muted-strong);
+  font-size: 11px;
+}
+.mini-score {
+  flex-shrink: 0;
+  font-weight: 600;
+}
+.quiet-row {
+  background: transparent;
+  border-color: var(--line-dark);
+}
+.strong-row {
+  color: var(--mint);
+  border-color: var(--mint-line);
+  box-shadow: var(--shadow-soft);
+  transform: rotate(-2deg);
+}
+.strong-row .mini-score {
+  background: var(--mint-soft);
+  padding: 3px 6px;
+  border-radius: 4px;
+}
+.reply-visual {
+  background: var(--mint-soft);
+  color: var(--mint);
+}
+.mini-message {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.message-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 25px;
+  height: 25px;
+  flex-shrink: 0;
+  border: 1px solid var(--mint-line);
+  border-radius: 50%;
+  background: var(--surface);
+}
+.mini-message > span:not(.message-avatar) {
+  background: var(--surface);
+  border: 1px solid var(--mint-line);
+  border-radius: 0 10px 10px;
+  padding: 11px;
+  color: var(--muted-strong);
+}
+.your-message {
+  margin-top: 14px;
+  padding-left: 20px;
+}
+.your-message > span:not(.message-avatar) {
+  border-radius: 10px 0 10px 10px;
+  background: var(--mint);
+  color: var(--surface);
+  border-color: var(--mint);
+}
+.reply-footnote {
+  display: block;
+  font-size: 10px;
+  margin-top: 14px;
+  text-align: right;
+}
+.walkthrough-caption {
+  font-size: 12px;
+  text-align: center;
+  margin: 25px 0 0;
+}
+.delivery-preview {
+  position: relative;
+  max-width: 385px;
+  margin-top: 35px;
+  padding: 23px;
+  background: var(--surface);
+  border: 1px solid var(--line-dark);
+  border-radius: var(--radius-md);
+  box-shadow:
+    5px 6px 0 var(--sunshine-soft),
+    var(--shadow-soft);
+  transform: rotate(-2deg);
+}
+.delivery-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 22px;
+}
+.delivery-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 35px;
+  height: 35px;
+  border-radius: 10px;
+  background: var(--sunshine-soft);
+  color: var(--coral);
+}
+.delivery-header small {
+  display: block;
+  margin-top: 3px;
+  font-size: 10px;
+  color: var(--muted);
+  font-weight: 400;
+}
+.delivery-stamp {
+  margin-left: auto;
+  font-size: 8px;
+  letter-spacing: 1.2px;
+  border: 1px dashed var(--coral-line);
+  padding: 7px;
+  color: var(--coral);
+  transform: rotate(7deg);
+}
+.delivery-preview > strong {
+  font-size: 15px;
+  font-weight: 600;
+}
+.delivery-preview > p {
+  font-size: 13px;
+  margin: 10px 0 20px;
+}
+.delivery-bottom {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 10px;
+  border-top: 1px solid var(--line);
+  padding-top: 13px;
+  font-size: 11px;
+  color: var(--mint);
+}
+.delivery-bottom > span:first-child {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--muted);
+}
+.closing-conversations {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin: 0 0 45px;
+}
+.closing-question {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 18px;
+  background: var(--surface);
+  border: 1px solid var(--coral-line);
+  border-radius: 12px 12px 12px 0;
+  color: var(--muted-strong);
+  font-size: 13px;
+  box-shadow: var(--shadow-soft);
+  transform: rotate(-5deg);
+}
+.closing-question:nth-child(2) {
+  transform: translateY(-10px) rotate(3deg);
+  border-color: var(--lavender-line);
+}
+.closing-question:nth-child(3) {
+  transform: rotate(-2deg);
+  border-color: var(--mint-line);
+}
+@media (min-width: 801px) {
+  .steps article {
+    display: flex;
+    flex-direction: column;
+  }
+  .steps article > p {
+    min-height: 100px;
+  }
+  .step-visual {
+    flex: 1;
+  }
+}
+@media (min-width: 541px) and (max-width: 800px) {
+  .steps {
+    grid-template-columns: 1fr;
+  }
+  .steps article {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 28px;
+  }
+  .step-top,
+  .steps h3,
+  .steps article > p {
+    grid-column: 1;
+  }
+  .step-visual {
+    grid-column: 2;
+    grid-row: 1 / 4;
+    margin: 0;
+  }
+}
+@media (max-width: 540px) {
+  .step-visual {
+    min-height: 220px;
+  }
+  .delivery-preview {
+    margin-inline: 5px;
+  }
+  .closing-conversations {
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 35px;
+  }
+  .closing-question {
+    padding: 12px;
+    font-size: 11px;
+  }
+  .closing-question:nth-child(2) {
+    transform: rotate(3deg);
+  }
+}

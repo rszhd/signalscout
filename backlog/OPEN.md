@@ -2,7 +2,7 @@
 
 # Open tickets
 
-26 open — 12 doing, 13 todo, 1 parked (8 p1, 16 p2, 2 p3).
+24 open — 10 doing, 13 todo, 1 parked (7 p1, 15 p2, 2 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -10,7 +10,6 @@
 | p1 | US-041 | [A person chooses when a monitor runs](doing/US-041-a-person-chooses-when-a-monitor-runs.md) | feature | doing | 2026-09-06T12:31+08:00 |
 | p1 | US-072 | [A cloud account has seven free days, then a subscription](doing/US-072-a-cloud-account-has-seven-free-days.md) | feature | doing | 2026-09-08T14:05+08:00 |
 | p1 | US-073 | [The cloud stack joins the shared edge proxy](doing/US-073-the-cloud-stack-joins-the-shared-edge-proxy.md) | feature | doing | 2026-09-08T17:03+08:00 |
-| p1 | US-075 | [A push to staging deploys itself](doing/US-075-a-push-to-staging-deploys-itself.md) | feature | doing | 2026-09-08T19:57+08:00 |
 | p1 | BUG-004 | [The model half of a poll is not capped](doing/BUG-004-the-model-half-of-a-poll-is-not-capped.md) | bug | doing | 2026-09-06T04:42+08:00 |
 | p1 | US-033 | [Thirty verdicts say whether the score is right](todo/US-033-thirty-verdicts-say-whether-the-score-is-right.md) | chore | todo | 2026-09-06T03:02+08:00 |
 | p1 | BUG-010 | [A provider choice is shared between accounts](todo/BUG-010-a-provider-choice-is-shared-between-accounts.md) | bug | todo | 2026-09-08T11:25+08:00 |
@@ -19,7 +18,6 @@
 | p2 | US-020 | [A monitor can include comments and replies](doing/US-020-a-monitor-can-include-comments-and-replies.md) | feature | doing | 2026-09-05T01:18+08:00 |
 | p2 | US-043 | [A match is kept for something to be done about it](doing/US-043-a-match-is-kept-for-something-to-be-done-about-it.md) | feature | doing | 2026-09-06T12:36+08:00 |
 | p2 | US-049 | [Instagram is the sixth platform](doing/US-049-instagram-is-the-sixth-platform.md) | feature | doing | 2026-09-06T17:05+08:00 |
-| p2 | US-076 | [The address bar says one thing](doing/US-076-the-address-bar-says-one-thing.md) | feature | doing | 2026-09-08T20:10+08:00 |
 | p2 | US-035 | [A monitor is told where people are talking](todo/US-035-a-monitor-is-told-where-people-are-talking.md) | spike | todo | 2026-09-06T11:40+08:00 |
 | p2 | US-036 | [A provider is rated per platform, from measurements](todo/US-036-a-provider-is-rated-per-platform-from-measurements.md) | spike | todo | 2026-09-06T11:48+08:00 |
 | p2 | US-037 | [One subscription is enough](todo/US-037-one-subscription-is-enough.md) | feature | todo | 2026-09-06T11:48+08:00 |

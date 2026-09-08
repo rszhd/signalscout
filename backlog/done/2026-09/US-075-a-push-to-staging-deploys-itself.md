@@ -6,7 +6,7 @@ priority: p1
 created: 2026-09-08T19:57+08:00
 parent: US-073
 area: deployment
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -37,8 +37,8 @@ commit as the pin, and the push as the approval.
 
 ## Acceptance
 
-- [ ] A push to `staging` builds, publishes, and deploys, with no command typed
-- [ ] The deploy runs only after the checks pass, so a commit whose tests never
+- [x] A push to `staging` builds, publishes, and deploys, with no command typed
+- [x] The deploy runs only after the checks pass, so a commit whose tests never
       ran cannot reach the box — a property of the job graph, not a convention
 - [x] The compose files on the box come from the same commit as the image
 - [x] The workflow asserts the box is serving the new digest afterwards, and
@@ -82,3 +82,12 @@ commit as the pin, and the push as the approval.
   Two boxes stay open until the secrets exist, because both are claims about a
   workflow run rather than about a script: the automatic trigger, and the
   ordering that stops an unchecked commit reaching the box.
+- 2026-09-08T20:15+08:00 — The first automatic deploy ran. Push to serving took
+  **2 minutes 49 seconds**: checks 1m46, image 40s, box 23s. The run asserted
+  `sha256:b32cdd48…` and the box reported the same id, so the last two boxes are
+  ticked against a workflow run rather than against the script.
+
+  Three secrets were installed by the owner, because installing an authorized
+  key and storing a private one are not things this session may do. The key and
+  the pinned host key were both exercised before GitHub used them, which is why
+  the first run had nothing to debug.

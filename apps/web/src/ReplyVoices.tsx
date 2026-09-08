@@ -77,9 +77,10 @@ function VoicePresets({
   return (
     <div className="reply-voice-presets">
       <header>
-        <h2>Add a voice</h2>
+        <h2>Start with a preset</h2>
         <span>{offered.length}</span>
       </header>
+      <p className="reply-voice-presets-intro">Add one to your library, then make it yours.</p>
       <ul>
         {offered.map((preset) => (
           <li key={preset.id}>
@@ -299,38 +300,46 @@ export function ReplyVoices() {
 
   return (
     <div className="product-page reply-voices-page">
-      <ReplyVoicesHeader onNew={startNew} />
+      <ReplyVoicesHeader disabled={busy} onNew={startNew} />
 
       <div className="reply-voices-content">
-        <aside className="reply-voices-library" aria-label="Saved reply voices">
-          <header>
-            <h2>Saved voices</h2>
-            <span>{voices.length}</span>
-          </header>
+        <aside className="reply-voices-sidebar" aria-label="Reply voice library">
+          <section className="reply-voices-library" aria-label="Saved reply voices">
+            <header>
+              <h2>Saved voices</h2>
+              <span>{voices.length}</span>
+            </header>
 
-          {voices.length > 0 ? (
-            <ul>
-              {voices.map((voice) => (
-                <li key={voice.id}>
-                  <button
-                    aria-current={selectedId === voice.id ? "true" : undefined}
-                    type="button"
-                    onClick={() => choose(voice)}
-                  >
-                    <strong>{voice.name}</strong>
-                    <span>{voice.instruction}</span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <div className="reply-voices-empty-list">
-              <span className="reply-voices-empty-icon" aria-hidden="true">
-                ✦
-              </span>
-              <p>No saved voices yet.</p>
-            </div>
-          )}
+            {voices.length > 0 ? (
+              <ul>
+                {voices.map((voice) => (
+                  <li key={voice.id}>
+                    <button
+                      disabled={busy}
+                      aria-current={selectedId === voice.id ? "true" : undefined}
+                      type="button"
+                      onClick={() => choose(voice)}
+                    >
+                      <strong>{voice.name}</strong>
+                      {selectedId === voice.id && (
+                        <span className="reply-voice-selected" aria-hidden="true">
+                          ✓
+                        </span>
+                      )}
+                      <span>{voice.instruction}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div className="reply-voices-empty-list">
+                <span className="reply-voices-empty-icon" aria-hidden="true">
+                  ✦
+                </span>
+                <p>No saved voices yet.</p>
+              </div>
+            )}
+          </section>
 
           {/*
             Under the saved list, because that is where somebody counting their
@@ -357,7 +366,7 @@ export function ReplyVoices() {
               <header className="reply-voice-editor-heading">
                 <div>
                   <p className="eyebrow">{selected ? "Saved voice" : "New voice"}</p>
-                  <h2>{selected ? `Edit ${selected.name}` : "Create a reply voice"}</h2>
+                  <h2>{selected ? selected.name : "Create a reply voice"}</h2>
                   <p>
                     Voices are available when drafting a reply in any project. One-off changes stay
                     with that draft.
@@ -397,7 +406,22 @@ export function ReplyVoices() {
                       setNotice(null);
                     }}
                   />
+                  <span className="reply-voice-character-count">
+                    {instruction.length.toLocaleString()} / 4,000 characters
+                  </span>
                 </label>
+
+                <details className="reply-voice-guidance">
+                  <summary>What makes a useful voice?</summary>
+                  <p>
+                    Describe how you write: your tone, how long a reply should be, and words to use
+                    or avoid.
+                  </p>
+                  <blockquote>
+                    “Lead with a practical answer. Use short paragraphs and everyday language. Skip
+                    exclamation marks and sales jargon.”
+                  </blockquote>
+                </details>
 
                 <p className="reply-voice-boundary">
                   A voice can guide style, but it cannot make a draft open with your product or
@@ -470,19 +494,19 @@ export function ReplyVoices() {
                 ✦
               </span>
               <h2>Create your first reply voice</h2>
-              <p>Save the writing guidance you want available across every project.</p>
+              <p>
+                Choose a preset from the library or write your own. Your voices will be available
+                across every project.
+              </p>
               <button className="primary-button" type="button" onClick={startNew}>
                 Create a voice
               </button>
 
-              {/*
-                Presets, on the empty state where they are needed most. US-065.
-                A person who has never written an instruction does not know what
-                a good one looks like, and the ones they guess at tend to ask
-                for the thing the prompt refuses. Each says why it exists,
-                because a preset somebody does not understand is one they cannot
-                edit sensibly.
-              */}
+              {error && (
+                <p className="form-error" role="alert">
+                  {error}
+                </p>
+              )}
             </div>
           )}
         </section>

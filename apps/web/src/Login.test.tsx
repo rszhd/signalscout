@@ -34,6 +34,9 @@ describe("the login screen", () => {
   it("asks for the first account when the instance has none", async () => {
     screen = await mount(<Login firstRun={true} signUpOpen={true} />);
 
+    expect(
+      screen.container.querySelector<HTMLImageElement>('.brand-logo[src="/logo.png"]'),
+    ).not.toBeNull();
     expect(screen.container.textContent).toContain("Set up this instance");
     expect(screen.container.textContent).toContain("signup closes behind it");
     expect(field("Your name")).toBeTruthy();

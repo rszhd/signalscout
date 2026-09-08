@@ -105,6 +105,55 @@ describe("the billing screen", () => {
     expect(button("Manage billing")).toBeTruthy();
   });
 
+  it("returns an incomplete purchase to Checkout instead of the billing portal", async () => {
+    const assign = vi.fn();
+    vi.stubGlobal("location", { assign, hash: "" });
+    fetched.mockImplementation(async (_url: string, init?: RequestInit) => {
+      if (init?.method === "POST") return json({ url: "https://checkout.stripe.test/retry" });
+      return json(
+        state({
+          entitled: false,
+          reason: "incomplete",
+          status: "incomplete",
+          hasBillingAccount: true,
+        }),
+      );
+    });
+
+    screen = await mount(<Billing />);
+    await settle();
+
+    expect(button("Complete purchase")).toBeTruthy();
+    expect(document.body.textContent).toContain("Return to Stripe");
+
+    await act(async () => button("Complete purchase").click());
+    await settle();
+
+    expect(fetched).toHaveBeenCalledWith("/api/billing/checkout", {
+      method: "POST",
+    });
+    expect(assign).toHaveBeenCalledWith("https://checkout.stripe.test/retry");
+  });
+
+  it("offers a new subscription after a previous subscription ended", async () => {
+    fetched.mockResolvedValue(
+      json(
+        state({
+          entitled: false,
+          reason: "canceled",
+          status: "canceled",
+          hasBillingAccount: true,
+        }),
+      ),
+    );
+
+    screen = await mount(<Billing />);
+    await settle();
+
+    expect(button("Subscribe again")).toBeTruthy();
+    expect(() => button("Manage billing")).toThrow();
+  });
+
   it("retries a failed subscription read", async () => {
     fetched.mockResolvedValueOnce(json({ message: "Billing is unavailable." }, 502));
     screen = await mount(<Billing />);

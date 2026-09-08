@@ -62,7 +62,7 @@ a {
 .brand {
   display: inline-flex;
   align-items: center;
-  gap: 11px;
+  gap: 9px;
   padding: 0 8px;
   color: var(--ink);
   font-size: 1.05rem;
@@ -71,35 +71,25 @@ a {
   text-decoration: none;
 }
 
-.brand-mark {
-  position: relative;
+.brand-logo {
   width: 27px;
   height: 27px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 8px 8px 8px 2px;
-  background: #c3dc64;
+  flex: 0 0 auto;
+  border-radius: 8px;
 }
 
-.brand-mark i {
-  position: absolute;
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: var(--ink);
-}
-
-.brand-mark i:nth-child(1) {
-  transform: translate(-6px, -2px);
-}
-
-.brand-mark i:nth-child(2) {
-  transform: translate(0, 3px);
-}
-
-.brand-mark i:nth-child(3) {
-  transform: translate(6px, -5px);
+.trial-badge {
+  margin-left: 2px;
+  padding: 2px 7px;
+  border: 1px solid var(--line-dark);
+  border-radius: 999px;
+  color: var(--accent-text);
+  background: var(--accent-soft);
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.5;
+  text-transform: uppercase;
 }
 
 .product-note {
@@ -2152,9 +2142,6 @@ a {
 }
 .app-main {
   margin-left: var(--sidebar-width);
-}
-.brand-mark {
-  background: var(--surface-brand);
 }
 .site-nav {
   margin-top: 42px;

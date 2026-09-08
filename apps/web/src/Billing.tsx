@@ -119,6 +119,27 @@ export function Billing() {
           incomplete: "Payment incomplete",
         }[state?.reason ?? ""] ?? "Subscription");
 
+  /**
+   * A Stripe customer is not the same thing as a working subscription.
+   *
+   * The customer is stored before Checkout opens, so an abandoned or failed
+   * first purchase already has `hasBillingAccount: true`. The portal can
+   * manage a subscription that exists; it cannot replace the missing purchase
+   * flow for an incomplete one. Stripe recommends a new Checkout Session for
+   * each payment attempt, so every state that still needs a subscription goes
+   * back through Checkout.
+   */
+  const canManageSubscription =
+    state?.hasBillingAccount === true &&
+    (state.reason === "subscribed" || state.reason === "past_due");
+  const actionPath = canManageSubscription ? "portal" : "checkout";
+  const actionLabel =
+    state?.reason === "incomplete"
+      ? "Complete purchase"
+      : state?.reason === "canceled"
+        ? "Subscribe again"
+        : "Subscribe";
+
   return (
     <div className="billing-page">
       <header className="topbar">
@@ -229,18 +250,20 @@ export function Billing() {
                       className="primary-button"
                       type="button"
                       disabled={busy}
-                      onClick={() => void open(state.hasBillingAccount ? "portal" : "checkout")}
+                      onClick={() => void open(actionPath)}
                     >
                       {busy
                         ? "Opening Stripe…"
-                        : state.hasBillingAccount
+                        : canManageSubscription
                           ? "Manage billing"
-                          : "Subscribe"}
+                          : actionLabel}
                     </button>
                     <p>
-                      {state.hasBillingAccount
+                      {canManageSubscription
                         ? "Manage your payment method, view invoices or cancel your subscription in Stripe."
-                        : "Continue to Stripe to set up your subscription."}
+                        : state.reason === "incomplete"
+                          ? "Return to Stripe to complete your subscription."
+                          : "Continue to Stripe to set up your subscription."}
                     </p>
                     <span className="billing-secure">Payments handled securely by Stripe</span>
                   </div>

@@ -1,5 +1,6 @@
 import { type FormEvent, useState } from "react";
 import { messageFor, requestJson } from "./api.js";
+import { BrandLogo } from "./BrandLogo.js";
 
 /**
  * The one screen a signed-out person can reach. US-017.
@@ -87,12 +88,8 @@ export function Login({ firstRun, signUpOpen }: { firstRun: boolean; signUpOpen:
     <main className="login-page">
       <section className="login-card">
         <div className="login-brand">
-          <span className="brand-mark" aria-hidden="true">
-            <i />
-            <i />
-            <i />
-          </span>
-          <span>signalscout</span>
+          <BrandLogo />
+          <span>SignalScout</span>
         </div>
 
         <h1>{firstRun ? "Set up this instance" : signingUp ? "Create an account" : "Sign in"}</h1>

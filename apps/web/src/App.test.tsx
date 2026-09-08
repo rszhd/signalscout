@@ -12,6 +12,7 @@
 import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { App } from "./App.js";
+import type { BillingState } from "./Billing.js";
 import { json, mount, type Screen, settle } from "./testing.js";
 
 const options = {
@@ -39,9 +40,24 @@ async function go(hash: string): Promise<void> {
 
 describe("the application screens", () => {
   let screen: Screen;
+  let billingMode: "off" | "stripe";
+  let billingState: BillingState;
 
   beforeEach(() => {
     globalThis.location.hash = "";
+    billingMode = "off";
+    billingState = {
+      mode: "stripe",
+      entitled: true,
+      reason: "trialing",
+      status: "trialing",
+      trialDaysLeft: 7,
+      trialEndsAt: "2026-09-15T00:00:00.000Z",
+      currentPeriodEnd: null,
+      cancelAtPeriodEnd: false,
+      hasBillingAccount: false,
+      trialDays: 7,
+    };
     vi.stubGlobal(
       "fetch",
       vi.fn(async (request: string | URL | Request) => {
@@ -54,8 +70,10 @@ describe("the application screens", () => {
             signUpOpen: false,
             signedIn: true,
             account: { name: "The owner", email: "owner@example.com" },
+            billingMode,
           });
         }
+        if (url === "/api/billing") return json(billingState);
         if (url === "/api/monitor-options") return json(options);
         if (url === "/api/monitors") return json([]);
         if (url.startsWith("/api/matches")) {
@@ -86,9 +104,30 @@ describe("the application screens", () => {
   it("shows the signed-in account where the self-hosted label used to be", async () => {
     screen = await mount(<App />);
 
+    expect(
+      screen.container.querySelector<HTMLImageElement>('.brand-logo[src="/logo.png"]'),
+    ).not.toBeNull();
     expect(screen.container.textContent).toContain("The owner");
     expect(screen.container.textContent).toContain("owner@example.com");
     expect(screen.container.textContent).not.toContain("Self-hosted");
+  });
+
+  it("labels a trial account, and no other account, beside the product name", async () => {
+    billingMode = "stripe";
+    screen = await mount(<App />);
+
+    expect(screen.container.querySelector(".trial-badge")?.textContent).toBe("Trial");
+
+    await screen.unmount();
+    billingState = {
+      ...billingState,
+      reason: "subscribed",
+      status: "active",
+      currentPeriodEnd: "2026-10-15T00:00:00.000Z",
+    };
+    screen = await mount(<App />);
+
+    expect(screen.container.querySelector(".trial-badge")).toBeNull();
   });
 
   /**

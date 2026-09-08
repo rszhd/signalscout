@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { requestJson } from "./api.js";
 import { Billing, type BillingState, subscriptionSentence } from "./Billing.js";
+import { BrandLogo } from "./BrandLogo.js";
 import { Connections } from "./Connections.js";
 import { Inbox } from "./Inbox.js";
 import { type AuthStatus, Login } from "./Login.js";
@@ -89,9 +90,43 @@ function useAuthStatus(): AuthStatus | null {
   return status;
 }
 
+/** The account's billing state, when this deployment has accounts to bill. */
+function useBillingState(enabled: boolean): BillingState | null {
+  const [state, setState] = useState<BillingState | null>(null);
+
+  useEffect(() => {
+    let current = true;
+
+    if (!enabled) {
+      setState(null);
+      return () => {
+        current = false;
+      };
+    }
+
+    requestJson<BillingState>("/api/billing")
+      .then((answer) => {
+        if (current) setState(answer);
+      })
+      .catch(() => {
+        // A failed read says nothing. Guessing here could label a paid account
+        // as a trial, or tell somebody their trial ended when it did not.
+      });
+
+    return () => {
+      current = false;
+    };
+  }, [enabled]);
+
+  return state;
+}
+
 export function App() {
   const status = useAuthStatus();
   const [route, setRoute] = useState(currentRoute);
+  const billingState = useBillingState(
+    status?.signedIn === true && status.billingMode === "stripe",
+  );
 
   useEffect(() => {
     const onChange = () => setRoute(currentRoute());
@@ -166,12 +201,9 @@ export function App() {
     <div className="app-shell">
       <aside className="sidebar">
         <a className="brand" href={projectsRoute} aria-label="SignalScout home">
-          <span className="brand-mark" aria-hidden="true">
-            <i />
-            <i />
-            <i />
-          </span>
-          <span>signalscout</span>
+          <BrandLogo />
+          <span>SignalScout</span>
+          {billingState?.reason === "trialing" && <span className="trial-badge">Trial</span>}
         </a>
 
         <nav className="site-nav" aria-label="Screens">
@@ -297,7 +329,7 @@ export function App() {
           being broken. The banner is the one place that says it is the
           subscription, and it carries the way out.
         */}
-        {status.billingMode === "stripe" && !billing && <TrialBanner />}
+        {status.billingMode === "stripe" && !billing && <TrialBanner state={billingState} />}
         {withoutProject ? (
           <Projects />
         ) : notificationId ? (
@@ -366,26 +398,7 @@ function SignOut() {
  * It reads the same route the billing page does, so the sentence here and the
  * sentence there cannot disagree.
  */
-function TrialBanner() {
-  const [state, setState] = useState<BillingState | null>(null);
-
-  useEffect(() => {
-    let current = true;
-
-    requestJson<BillingState>("/api/billing")
-      .then((answer) => {
-        if (current) setState(answer);
-      })
-      .catch(() => {
-        // An instance that cannot answer this says nothing rather than
-        // guessing. A wrong "your trial ended" is worse than no banner.
-      });
-
-    return () => {
-      current = false;
-    };
-  }, []);
-
+function TrialBanner({ state }: { readonly state: BillingState | null }) {
   if (!state) return null;
 
   const ending = state.reason === "trialing" && (state.trialDaysLeft ?? 99) <= 2;

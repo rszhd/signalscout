@@ -312,8 +312,20 @@ a {
 
 /* Inbox */
 
-.inbox-page {
+.app-main:has(> .inbox-page) {
+  display: flex;
+  flex-direction: column;
   height: 100dvh;
+  min-height: 0;
+}
+
+.app-main:has(> .inbox-page) > .trial-banner {
+  flex-shrink: 0;
+}
+
+.inbox-page {
+  flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -1724,7 +1736,7 @@ a {
     margin: 0 0 var(--bottom-nav-height);
   }
 
-  .inbox-page {
+  .app-main:has(> .inbox-page) {
     height: calc(100dvh - var(--bottom-nav-height));
   }
 

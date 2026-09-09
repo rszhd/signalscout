@@ -47,7 +47,12 @@ Astro documents static deployment at
 
 `src/pages/index.astro` owns the copy, repository links and illustrative inbox.
 The main action opens pricing: Self-hosted is free, and SignalScout Cloud is
-$15 USD per month. Both plans bill social data and AI usage separately through
+$15 USD per month after a seven-day trial. The trial figure is US-072's, held
+in `trialDays` in `packages/core/src/billing/entitlement.ts`; change the page
+only when that constant changes. The page claims no card is asked for, which
+is true because sign-up writes the trial row itself and creates nothing in
+Stripe until somebody opens Checkout. The FAQ says what running out does:
+monitors stop and writes are refused, while reading and exporting stay open. Both plans bill social data and AI usage separately through
 the customer's provider accounts. Cloud is presented as available at launch,
 on the owner's instruction. Billing itself is outside this site.
 

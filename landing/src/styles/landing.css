@@ -727,8 +727,31 @@ blockquote {
   letter-spacing: 0;
   color: var(--muted);
 }
+.plan-badge {
+  padding: 6px 12px;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--mint);
+  background: var(--mint-soft);
+  border: 1px solid var(--mint-line);
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.plan-badge.quiet {
+  color: var(--muted-strong);
+  background: var(--surface-soft);
+  border-color: var(--line-dark);
+}
+.plan-trial {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 0;
+  font-size: var(--text-sm);
+  color: var(--muted-strong);
+}
 .plan .button {
-  margin-top: 12px;
+  margin-top: 24px;
 }
 .cloud-plan {
   background: var(--accent-soft);
@@ -738,7 +761,7 @@ blockquote {
   display: inline-flex;
   align-items: center;
   min-height: 49px;
-  margin-top: 12px;
+  margin-top: 24px;
   font-size: var(--text-body);
   color: var(--muted-strong);
 }

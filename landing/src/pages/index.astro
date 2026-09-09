@@ -253,8 +253,8 @@ const examples = [
 <div class="wrap">
   <div class="section-heading"><span class="eyebrow">04 / MAKE IT YOURS</span><h2>Your server.<br/><span>Or ours.</span></h2><p>The full app, either way.<br/>Bring your own data and AI provider keys.</p></div>
   <div class="plans">
-    <article class="plan"><div class="plan-top"><h3>Self-hosted</h3><Icon name="github" size={26}/></div><p class="price">$0<span> / software</span></p><p>Full source. Docker Compose. Your infrastructure.</p><a class="button secondary" href={`${repository}#running-it`}>Get the code <Icon size={18}/></a></article>
-    <article class="plan cloud-plan"><div class="plan-top"><h3>SignalScout Cloud</h3><Icon name="signal" size={26}/></div><p class="price">$15<span> USD / month</span></p><p>We run the app and scheduler. You keep building.</p>{appUrl ? <a class="button" href={appUrl}>Start on Cloud <Icon size={18}/></a> : <span class="cloud-status">Cloud signup coming soon</span>}</article>
+    <article class="plan"><div class="plan-top"><h3>Self-hosted</h3><span class="plan-badge quiet">Always free</span></div><p class="price">$0<span> / software, forever</span></p><p>Full source. Docker Compose. Your infrastructure.</p><p class="plan-trial"><Icon name="github" size={17}/>Nothing expires. Nothing to cancel.</p><a class="button secondary" href={`${repository}#running-it`}>Get the code <Icon size={18}/></a></article>
+    <article class="plan cloud-plan"><div class="plan-top"><h3>SignalScout Cloud</h3><span class="plan-badge">7 days free</span></div><p class="price">$15<span> USD / month, after that</span></p><p>We run the app and scheduler. You keep building.</p><p class="plan-trial"><Icon name="signal" size={17}/>The full product. No card asked for.</p>{appUrl ? <a class="button" href={appUrl}>Start the 7-day trial <Icon size={18}/></a> : <span class="cloud-status">Cloud signup coming soon</span>}</article>
   </div>
   <p class="pricing-note">Social data and AI usage cost extra on both plans, billed by your providers.</p>
 </div>
@@ -265,6 +265,7 @@ const examples = [
     <details><summary>How is this different from keyword alerts?</summary><p>Keywords find the topic. AI checks whether the person needs what you sell, then explains its score.</p></details>
     <details><summary>Which keys do I need?</summary><p>A supported social-data provider account, plus an AI provider or supported local model. No direct social-platform API key needed.</p></details>
     <details><summary>Will it post for me?</summary><p>No. SignalScout can draft a reply. You review it and post it yourself.</p></details>
+    <details><summary>What happens when the trial ends?</summary><p>Your monitors stop polling and you cannot create new ones. You can still sign in, read every match you collected, export it, and subscribe whenever you want.</p></details>
     <details><summary>Can I run the whole app myself?</summary><p>Yes. The full application is open source and runs with Docker Compose. You pay for your infrastructure and provider usage.</p></details>
   </div>
 </section>

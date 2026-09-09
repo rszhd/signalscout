@@ -225,6 +225,8 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
   const [stage, setStage] = useState<SetupStage>("answers");
   const [created, setCreated] = useState<CreatedMonitor | null>(null);
   const [working, setWorking] = useState<"generating" | "creating" | null>(null);
+  /** True while the platform list is being read again. US-085. */
+  const [checking, setChecking] = useState(false);
   const [error, setError] = useState<string | null>(null);
   /**
    * Dollars, as typed. Empty is refused on submit since US-084: the guard
@@ -310,7 +312,10 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
         setSelectedSignals((current) =>
           current.length > 0 ? current : options.signals.map((signal) => signal.id),
         );
-        setSelectedSources(options.sources.map((source) => source.id));
+        // Only the platforms this account can actually poll. US-085 disables
+        // the others, and a disabled box that arrived ticked is a selection
+        // nobody can remove.
+        setSelectedSources(options.sources.filter((source) => source.ready).map((s) => s.id));
       })
       .catch((cause: unknown) => {
         if (!cancelled) {
@@ -399,6 +404,41 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
 
   function toggle(list: readonly string[], value: string): string[] {
     return list.includes(value) ? list.filter((item) => item !== value) : [...list, value];
+  }
+
+  /**
+   * Read the platform list again, for somebody who has just pasted a key.
+   *
+   * US-085. The options are read once when the form opens, so a platform
+   * connected in another tab stays disabled until something asks again — and
+   * the alternative to asking is reloading the page, which throws away four
+   * typed answers and a generated plan.
+   *
+   * Only the options are replaced. What has been ticked is left alone: a
+   * platform that lost its key while it was selected stays selected and
+   * enabled, so it can be unticked, and the notice below says what will
+   * happen if it is not.
+   */
+  async function recheckSources(): Promise<void> {
+    if (checking) return;
+    setChecking(true);
+    try {
+      const fresh = await requestJson<MonitorOptions>("/api/monitor-options");
+
+      setOptionsState({ state: "ready", options: fresh });
+      // A platform connected since the form opened is ticked, the way it would
+      // have been had the key been there all along.
+      setSelectedSources((current) => [
+        ...current,
+        ...fresh.sources
+          .filter((source) => source.ready && !current.includes(source.id))
+          .map((source) => source.id),
+      ]);
+    } catch (cause) {
+      setError(messageFor(cause, "The platform list could not be read again."));
+    } finally {
+      setChecking(false);
+    }
   }
 
   async function generatePlan(event: FormEvent<HTMLFormElement>): Promise<void> {
@@ -535,7 +575,7 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
   function reset(): void {
     setAnswers(emptyAnswers);
     setSelectedSignals(options?.signals.map((signal) => signal.id) ?? []);
-    setSelectedSources(options?.sources.map((source) => source.id) ?? []);
+    setSelectedSources(options?.sources.filter((source) => source.ready).map((s) => s.id) ?? []);
     setPlan(emptyPlan);
     setCreated(null);
     setError(null);
@@ -746,27 +786,72 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
             <form onSubmit={generatePlan}>
               <fieldset className="choice-section source-section">
                 <legend>Where should it look?</legend>
-                <p>Pick at least one platform. You can save now and connect an account later.</p>
+                <p>
+                  Pick at least one platform. A platform needs a connected account to be picked.
+                </p>
                 <div className="source-list">
-                  {options.sources.map((source) => (
-                    <label className="source-card" key={source.id}>
-                      <input
-                        checked={selectedSources.includes(source.id)}
-                        type="checkbox"
-                        onChange={() => setSelectedSources(toggle(selectedSources, source.id))}
-                      />
-                      <span className="source-symbol" aria-hidden="true">
-                        <BrandIcon brand={source.id} size={22} />
-                      </span>
-                      <span>
-                        <strong>{source.displayName}</strong>
-                      </span>
-                      <span className={`status-dot ${source.ready ? "ready" : "missing"}`}>
-                        {source.ready ? "Ready" : "Not connected"}
-                      </span>
-                    </label>
-                  ))}
+                  {options.sources.map((source) => {
+                    const picked = selectedSources.includes(source.id);
+                    // US-085. Unpickable, not merely marked: a monitor that
+                    // cannot poll is not worth the model call that writes its
+                    // queries. A platform already ticked stays enabled, so a
+                    // key deleted elsewhere leaves a box that can be unticked
+                    // rather than one that is stuck.
+                    const blocked = !source.ready && !picked;
+
+                    return (
+                      <label
+                        className={`source-card${blocked ? " unavailable" : ""}`}
+                        key={source.id}
+                      >
+                        <input
+                          checked={picked}
+                          disabled={blocked}
+                          type="checkbox"
+                          onChange={() => setSelectedSources(toggle(selectedSources, source.id))}
+                        />
+                        <span className="source-symbol" aria-hidden="true">
+                          <BrandIcon brand={source.id} size={22} />
+                        </span>
+                        <span>
+                          <strong>{source.displayName}</strong>
+                          {!source.ready && (
+                            <small>Connect {describeMissing(source.missingCredentials)}.</small>
+                          )}
+                        </span>
+                        <span className={`status-dot ${source.ready ? "ready" : "missing"}`}>
+                          {source.ready ? "Ready" : "Not connected"}
+                        </span>
+                      </label>
+                    );
+                  })}
                 </div>
+                {options.sources.some((source) => !source.ready) && (
+                  <div className="notice" role="status">
+                    <strong>
+                      {options.sources.every((source) => !source.ready)
+                        ? "No platform is connected yet."
+                        : "Some platforms are waiting for an account."}
+                    </strong>
+                    <span>
+                      A platform needs a provider key before it can be watched. Connect one, then
+                      check again — the answers already typed are kept.
+                    </span>
+                    <span className="source-recheck">
+                      <Link className="secondary-button" to={paths.connections}>
+                        Connect an account
+                      </Link>
+                      <button
+                        className="secondary-button"
+                        type="button"
+                        disabled={checking}
+                        onClick={() => void recheckSources()}
+                      >
+                        {checking ? "Checking…" : "Check again"}
+                      </button>
+                    </span>
+                  </div>
+                )}
               </fieldset>
 
               <fieldset className="choice-section">

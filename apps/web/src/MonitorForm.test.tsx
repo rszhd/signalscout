@@ -489,6 +489,123 @@ describe("the monitor form", () => {
     });
   });
 
+  /**
+   * US-085. A platform this account holds no key for cannot be watched, so it
+   * cannot be ticked either — the alternative is paying a model to write
+   * queries for a monitor that will never poll.
+   */
+  describe("a platform with no provider key", () => {
+    const x = {
+      id: "x",
+      displayName: "X",
+      search: { maxQueryWords: 4, note: "Four words on X." },
+      missingCredentials: [
+        {
+          providerId: "socialcrawl",
+          providerName: "SocialCrawl",
+          field: "apiKey",
+          environmentVariable: "SOCIALCRAWL_API_KEY",
+        },
+      ],
+      ready: false,
+      canFetchReplies: true,
+    };
+
+    function sourceBox(name: string): HTMLInputElement {
+      const label = [...container.querySelectorAll("label.source-card")].find((element) =>
+        element.querySelector("strong")?.textContent?.includes(name),
+      );
+
+      return label?.querySelector("input") as HTMLInputElement;
+    }
+
+    async function mountWith(sources: unknown[], onRecheck?: unknown[]) {
+      await screen.unmount();
+      let reads = 0;
+      fetchMock.mockImplementation(async (request: string | URL | Request) => {
+        const url = typeof request === "string" ? request : request.toString();
+        if (url === "/api/monitor-options") {
+          reads += 1;
+          const list = reads === 1 || !onRecheck ? sources : onRecheck;
+          return json({ ...options, sources: list });
+        }
+        if (url === "/api/monitors/queries") return json(generated);
+        throw new Error(`Unexpected request: ${url}`);
+      });
+
+      screen = await mountForm();
+      container = screen.container;
+      await toSources();
+    }
+
+    it("cannot be ticked, and does not arrive ticked", async () => {
+      await mountWith([options.sources[0], x]);
+
+      expect(sourceBox("Reddit").disabled).toBe(false);
+      expect(sourceBox("Reddit").checked).toBe(true);
+      expect(sourceBox("X").disabled).toBe(true);
+      expect(sourceBox("X").checked).toBe(false);
+      // The key it is waiting for, named on the card rather than in a banner
+      // the person has to connect to the row themselves.
+      expect(container.textContent).toContain("SocialCrawl (SOCIALCRAWL_API_KEY)");
+    });
+
+    it("says so plainly when nothing at all is connected", async () => {
+      await mountWith([
+        { ...options.sources[0], ready: false, missingCredentials: x.missingCredentials },
+        x,
+      ]);
+
+      expect(container.textContent).toContain("No platform is connected yet");
+      expect(sourceBox("Reddit").disabled).toBe(true);
+      expect(sourceBox("X").disabled).toBe(true);
+    });
+
+    it("is picked up by Check again, without losing the typed answers", async () => {
+      // The form reads the options once. Somebody who leaves to paste a key
+      // must be able to come back to the answers they already wrote.
+      await mountWith(
+        [options.sources[0], x],
+        [options.sources[0], { ...x, ready: true, missingCredentials: [] }],
+      );
+
+      expect(sourceBox("X").disabled).toBe(true);
+
+      await act(async () => button("Check again").click());
+      await settle();
+
+      expect(sourceBox("X").disabled).toBe(false);
+      expect(sourceBox("X").checked).toBe(true);
+      expect(container.textContent).not.toContain("waiting for an account");
+
+      // Back to the first step, where the four answers were typed.
+      await act(async () => button("Back").click());
+      await act(async () => button("Back").click());
+      expect(input("What do you sell?").value).toBe("A browser test runner");
+    });
+
+    it("leaves a ticked platform tickable when its key goes away", async () => {
+      // Disabling it here would leave a selection nobody can remove, and the
+      // monitor would be created against a platform that cannot poll.
+      // X is unready throughout, which is what keeps "Check again" on screen.
+      await mountWith(
+        [options.sources[0], x],
+        [{ ...options.sources[0], ready: false, missingCredentials: x.missingCredentials }, x],
+      );
+
+      await act(async () => button("Check again").click());
+      await settle();
+
+      expect(sourceBox("Reddit").checked).toBe(true);
+      expect(sourceBox("Reddit").disabled).toBe(false);
+      expect(container.textContent).toContain("This monitor will be saved paused");
+
+      await act(async () => sourceBox("Reddit").click());
+      expect(sourceBox("Reddit").checked).toBe(false);
+      expect(sourceBox("Reddit").disabled).toBe(true);
+    });
+  });
+
   it("keeps a plan the cost test says would break the budget, without starting it", async () => {
     // US-014. The money is spent at fetch time, so the only place to stop a
     // plan that is too broad is before it starts.

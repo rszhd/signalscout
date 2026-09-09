@@ -303,3 +303,19 @@
 .setup-content .source-section .source-card {
   min-height: 64px;
 }
+/* US-085. A platform this account holds no key for cannot be ticked. The card
+   is dimmed and the cursor refuses before the click does, so the reason is
+   read rather than discovered. */
+.setup-content .source-card.unavailable {
+  opacity: 0.55;
+}
+.setup-content .source-card.unavailable,
+.setup-content .source-card.unavailable input {
+  cursor: not-allowed;
+}
+.source-recheck {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+}

@@ -6,7 +6,6 @@
       "**",
       "!**/dist",
       "!**/drizzle",
-      "!mockup",
       "!pnpm-lock.yaml",
       "!packages/core/src/sources/**/*fixtures/*.json",
       "!packages/core/src/ai/fixtures/*.json",

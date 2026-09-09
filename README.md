@@ -303,7 +303,6 @@ The scope is one sentence: **find conversations with intent.**
 | [docs/testing.md](docs/testing.md) | How the tests are written, and what a green suite cannot say |
 | [backlog/](backlog/README.md) | One ticket per file; the folder is the status |
 | [AGENTS.md](AGENTS.md) | Instructions for AI coding agents working in this repo |
-| [mockup/](mockup/README.md) | A dependency-free interactive mockup of the UI |
 
 ---
 

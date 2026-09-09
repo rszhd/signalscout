@@ -2,10 +2,11 @@
 
 # Done
 
-67 finished.
+68 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
+| BUG-012 | [db:generate has not worked since 0038](done/2026-09/BUG-012-db-generate-has-not-worked-since-0038.md) | bug | fixed | 2026-09 |
 | BUG-011 | [A slow provider reads as an outage](done/2026-09/BUG-011-a-slow-provider-reads-as-an-outage.md) | bug | fixed | 2026-09 |
 | BUG-009 | [The providers page answers for the instance, not the account](done/2026-09/BUG-009-the-providers-page-answers-for-the-instance.md) | bug | fixed | 2026-09 |
 | BUG-008 | [The inbox crashes on a comment match](done/2026-09/BUG-008-the-inbox-crashes-on-a-comment-match.md) | bug | shipped | 2026-09 |

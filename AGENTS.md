@@ -1524,6 +1524,13 @@ our schema and none about the model.
 **One migration number, one file.** Two branches that each take the next number
 merge cleanly and break at boot.
 
+**A migration file is not a migration until `meta/_journal.json` names it.** The
+migrator walks the journal and never the directory, and so does the test
+harness — so a file with no entry is applied nowhere, and the whole suite passes
+against a database missing the column. `pnpm db:generate` writes both halves;
+BUG-012 restored it after fourteen migrations were written by hand without it.
+`db/migrations.test.ts` is what fails now, by name, when the two disagree.
+
 **The folder is the ticket's status.** Moving a ticket is `git mv`, in the same
 commit as the code that caused it, followed by `backlog/index.sh`. There is no
 `status:` field. Never add one.

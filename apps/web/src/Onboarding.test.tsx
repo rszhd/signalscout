@@ -140,6 +140,25 @@ describe("the setup gate", () => {
     expect(field("Model API key")).toBeTruthy();
   });
 
+  it("preselects SocialCrawl when this build registers it", async () => {
+    // One SocialCrawl key unlocks every platform fetched through it, so a new
+    // account is pointed at it first. Registration order is the fallback, not
+    // the rule — the fallback is asserted above, where no SocialCrawl exists.
+    await mount(
+      connectionsView({
+        providers: [
+          provider("brightdata", "Bright Data", false),
+          provider("socialcrawl", "SocialCrawl", false),
+          provider("apify", "Apify", false),
+        ],
+      }),
+      modelsView(false),
+    );
+
+    expect(select("Data provider").value).toBe("socialcrawl");
+    expect(field("API key for SocialCrawl")).toBeTruthy();
+  });
+
   it("saves a provider key through the connections route", async () => {
     // The route answers with the whole connections screen since US-090, so the
     // gate takes the whole view back rather than one refreshed provider.

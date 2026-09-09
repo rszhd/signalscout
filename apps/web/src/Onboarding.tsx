@@ -126,9 +126,20 @@ function ProviderStep({
   providers: ProviderView[];
   onSaved: (view: ConnectionsView) => void;
 }) {
-  // Registration order, which US-055 recorded is the order every screen shows
-  // providers in. The first one is the one most deployments connect.
-  const [chosen, setChosen] = useState(providers[0]?.id ?? "");
+  /**
+   * SocialCrawl by default when this build registers it, and the first
+   * provider otherwise.
+   *
+   * A select needs a value, and the value is a guess about who the person has.
+   * SocialCrawl is the one key that unlocks every platform this product fetches
+   * through it — X, LinkedIn, YouTube, TikTok, Instagram and Reddit — so a new
+   * account that pastes one key gets the whole product. Registration order is
+   * the fallback, not the rule: the first registered provider is an artefact
+   * of how the connectors were added, not a recommendation.
+   */
+  const defaultProviderId =
+    providers.find((one) => one.id === "socialcrawl")?.id ?? providers[0]?.id ?? "";
+  const [chosen, setChosen] = useState(defaultProviderId);
   const [typed, setTyped] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);

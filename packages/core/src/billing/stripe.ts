@@ -78,7 +78,29 @@ export type BillingEvent =
     }
   | { readonly kind: "ignored"; readonly type: string };
 
+/**
+ * What a card will be charged, as the provider states it.
+ *
+ * `amount` is in the currency's **minor unit**, which is what Stripe returns
+ * and what `Intl.NumberFormat` wants. Do not divide it by a hundred on the way
+ * out: JPY and KRW have no minor unit at all, and the formatter knows which
+ * currencies those are while a division does not.
+ */
+export interface PlanPrice {
+  readonly amount: number;
+  /** ISO 4217, lower case from Stripe. */
+  readonly currency: string;
+  /** `month` or `year`. Absent on a price that does not recur. */
+  readonly interval: string | null;
+}
+
 export interface BillingProvider {
+  /**
+   * What this deployment charges, read from the provider rather than stated
+   * here. BUG-014: the screen carried the figure as a literal, and a literal
+   * about money is right until somebody changes the price somewhere else.
+   */
+  readPrice(): Promise<PlanPrice>;
   /** Opens Stripe's hosted Checkout, creating the customer if there is none. */
   createCheckout(request: CheckoutRequest): Promise<CheckoutResult>;
   /** Opens Stripe's billing portal: change a card, cancel, read an invoice. */
@@ -177,6 +199,20 @@ export const handledEventTypes = [
   "invoice.payment_failed",
 ] as const;
 
+/**
+ * A price with no flat amount cannot be put on a screen.
+ *
+ * Tiered and usage-based prices answer `unit_amount: null`. Rendering zero
+ * would tell somebody this product is free, so the read fails instead and the
+ * caller shows no figure at all — Checkout still states the real terms.
+ */
+function raiseUnstatablePrice(priceId: string): never {
+  throw new Error(
+    `Stripe price ${priceId} has no flat unit_amount, so this screen cannot state it. ` +
+      "A tiered or usage-based price needs a different screen, not a number.",
+  );
+}
+
 export interface StripeBillingOptions {
   readonly apiKey: string;
   readonly priceId: string;
@@ -202,6 +238,20 @@ export function createStripeBilling({
   const stripe = client ?? new Stripe(apiKey, { apiVersion: stripeApiVersion });
 
   return {
+    async readPrice() {
+      const price = await stripe.prices.retrieve(priceId);
+
+      return {
+        // Stripe returns null on a price whose amount varies by tier. This
+        // product uses one flat monthly price, so a null here is a price
+        // somebody changed in the dashboard into a shape the screen cannot
+        // state — zero is wrong, so it throws and the caller shows no figure.
+        amount: price.unit_amount ?? raiseUnstatablePrice(priceId),
+        currency: price.currency,
+        interval: price.recurring?.interval ?? null,
+      };
+    },
+
     async createCheckout(request) {
       const customerId =
         request.customerId ??

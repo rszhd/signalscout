@@ -9,7 +9,7 @@
  */
 import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { Billing, type BillingState, subscriptionSentence } from "./Billing.js";
+import { Billing, type BillingState, priceLabel, subscriptionSentence } from "./Billing.js";
 import { button, json, mount, type Screen, settle } from "./testing.js";
 
 function state(overrides: Partial<BillingState> = {}): BillingState {
@@ -24,9 +24,89 @@ function state(overrides: Partial<BillingState> = {}): BillingState {
     cancelAtPeriodEnd: false,
     hasBillingAccount: false,
     trialDays: 7,
+    price: { amount: 2000, currency: "usd", interval: "month" },
     ...overrides,
   };
 }
+
+/**
+ * BUG-014. This screen said `$15` as a literal while Stripe charged $20, so a
+ * person read one figure and Checkout asked for another.
+ */
+describe("the price on the screen", () => {
+  it("formats what the provider states, and never a figure of its own", () => {
+    expect(priceLabel({ amount: 2000, currency: "usd", interval: "month" })).toBe("$20");
+    expect(priceLabel({ amount: 1500, currency: "usd", interval: "month" })).toBe("$15");
+  });
+
+  it("keeps the cents on a price that has them", () => {
+    expect(priceLabel({ amount: 1999, currency: "usd", interval: "month" })).toBe("$19.99");
+  });
+
+  it("does not divide a currency that has no minor unit", () => {
+    // 2000 JPY is ¥2,000, not ¥20. Dividing by a hundred everywhere would
+    // under-quote this plan by two orders of magnitude.
+    const yen = priceLabel({ amount: 2000, currency: "jpy", interval: "month" });
+
+    expect(yen).toContain("2,000");
+    expect(yen).not.toContain("20.00");
+  });
+
+  it("shows nothing when the provider could not be read", () => {
+    expect(priceLabel(null)).toBe(null);
+  });
+
+  describe("on the screen itself", () => {
+    let screen: Screen;
+    let fetched: ReturnType<typeof vi.fn>;
+
+    beforeEach(() => {
+      fetched = vi.fn(async () => json(state()));
+      vi.stubGlobal("fetch", fetched);
+    });
+
+    afterEach(async () => {
+      await screen?.unmount();
+      vi.unstubAllGlobals();
+    });
+
+    it("puts the provider's amount on the screen and no literal", async () => {
+      fetched.mockImplementation(async () =>
+        json(state({ price: { amount: 4200, currency: "usd", interval: "month" } })),
+      );
+
+      screen = await mount(<Billing />);
+      await settle();
+
+      // 4200 rather than any number written in this repository. A literal
+      // returning to the screen fails here whatever it says.
+      expect(document.body.textContent).toContain("$42");
+      expect(document.body.textContent).not.toContain("$15");
+      expect(document.body.textContent).not.toContain("$20");
+    });
+
+    it("says pricing is shown at checkout when the price could not be read", async () => {
+      fetched.mockImplementation(async () => json(state({ price: null })));
+
+      screen = await mount(<Billing />);
+      await settle();
+
+      expect(document.body.textContent).toContain("Pricing is shown at checkout");
+      // And the way out is still offered: an unreadable price is not a paywall.
+      expect(button("Subscribe")).toBeTruthy();
+    });
+
+    it("shows a self-hosted instance zero and asks no provider", async () => {
+      fetched.mockImplementation(async () => json(state({ mode: "off", price: null })));
+
+      screen = await mount(<Billing />);
+      await settle();
+
+      expect(document.body.textContent).toContain("$0");
+      expect(document.body.textContent).not.toContain("Pricing is shown at checkout");
+    });
+  });
+});
 
 describe("the sentence this account gets", () => {
   it("counts a trial in days, and says one day rather than 1 days", () => {

@@ -190,6 +190,7 @@ export {
   type HostedPage,
   handledEventTypes,
   linkStripeCustomer,
+  type PlanPrice,
   type PortalRequest,
   readEntitlement,
   readSubscription,

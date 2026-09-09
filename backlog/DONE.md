@@ -2,10 +2,11 @@
 
 # Done
 
-84 finished.
+85 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
+| BUG-014 | [The billing screen names a price nobody charges](done/2026-09/BUG-014-the-billing-screen-names-a-price-nobody-charges.md) | bug | fixed | 2026-09 |
 | BUG-012 | [db:generate has not worked since 0038](done/2026-09/BUG-012-db-generate-has-not-worked-since-0038.md) | bug | fixed | 2026-09 |
 | BUG-011 | [A slow provider reads as an outage](done/2026-09/BUG-011-a-slow-provider-reads-as-an-outage.md) | bug | fixed | 2026-09 |
 | BUG-010 | [A provider choice is shared between accounts](done/2026-09/BUG-010-a-provider-choice-is-shared-between-accounts.md) | bug | fixed | 2026-09 |

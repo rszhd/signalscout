@@ -59,6 +59,7 @@ describe("the application screens", () => {
       cancelAtPeriodEnd: false,
       hasBillingAccount: false,
       trialDays: 7,
+      price: { amount: 2000, currency: "usd", interval: "month" },
     };
     fetchImpl = async (request: string | URL | Request) => {
       const url = typeof request === "string" ? request : request.toString();

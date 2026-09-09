@@ -35,6 +35,7 @@ export {
   type HostedPage,
   handledEventTypes,
   integrationIdentifier,
+  type PlanPrice,
   type PortalRequest,
   periodEndOf,
   type StripeBillingOptions,

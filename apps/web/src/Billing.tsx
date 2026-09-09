@@ -25,6 +25,64 @@ export interface BillingState {
   cancelAtPeriodEnd: boolean;
   hasBillingAccount: boolean;
   trialDays: number;
+  /** What Stripe charges, or null when it could not be read. BUG-014. */
+  price: { amount: number; currency: string; interval: string | null } | null;
+}
+
+/**
+ * The price, as the provider states it.
+ *
+ * `amount` is the currency's minor unit and is handed to the formatter rather
+ * than divided by a hundred here: JPY and KRW have no minor unit, and
+ * `Intl.NumberFormat` knows which currencies those are.
+ *
+ * This screen said `$15` as a literal until BUG-014. The literal was right the
+ * day it was written and became wrong when the cloud price was set to $20,
+ * with nothing anywhere to notice — so the figure comes from Stripe now, and
+ * when Stripe cannot be reached the screen shows no figure rather than one
+ * this product guessed.
+ */
+export function priceLabel(price: BillingState["price"]): string | null {
+  if (!price) return null;
+
+  return new Intl.NumberFormat(undefined, {
+    style: "currency",
+    currency: price.currency.toUpperCase(),
+    // A whole-dollar plan reads as "$20", not "$20.00"; a price with cents in
+    // it keeps them.
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  }).format(price.amount / 10 ** currencyExponent(price.currency));
+}
+
+/**
+ * How many minor units make one unit of this currency.
+ *
+ * Stripe's zero-decimal list is what this encodes. It is a list rather than a
+ * lookup because there is no such thing in the browser: `Intl` will format a
+ * number correctly once it is scaled, but it cannot tell us the scale.
+ */
+function currencyExponent(currency: string): number {
+  const zeroDecimal = new Set([
+    "bif",
+    "clp",
+    "djf",
+    "gnf",
+    "jpy",
+    "kmf",
+    "krw",
+    "mga",
+    "pyg",
+    "rwf",
+    "ugx",
+    "vnd",
+    "vuv",
+    "xaf",
+    "xof",
+    "xpf",
+  ]);
+
+  return zeroDecimal.has(currency.toLowerCase()) ? 0 : 2;
 }
 
 /** A date a person reads, or an empty string. */
@@ -217,8 +275,25 @@ export function Billing() {
                     : "You find the conversations. We keep it running."}
                 </p>
                 <p className="billing-price">
-                  <strong>{state.mode === "off" ? "$0" : "$15"}</strong>
-                  <span>USD / month</span>
+                  {state.mode === "off" ? (
+                    <>
+                      <strong>$0</strong>
+                      <span>USD / month</span>
+                    </>
+                  ) : priceLabel(state.price) ? (
+                    <>
+                      <strong>{priceLabel(state.price)}</strong>
+                      <span>
+                        {state.price?.currency.toUpperCase()}
+                        {state.price?.interval ? ` / ${state.price.interval}` : ""}
+                      </span>
+                    </>
+                  ) : (
+                    // Stripe could not be reached. Checkout states the real
+                    // terms on the next page, so the button still works and
+                    // this product invents no figure.
+                    <span>Pricing is shown at checkout.</span>
+                  )}
                 </p>
                 <p className="billing-price-note">
                   {state.mode === "off"

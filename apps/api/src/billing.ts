@@ -32,6 +32,7 @@ import {
   type Entitlement,
   type Logger,
   linkStripeCustomer,
+  type PlanPrice,
   readEntitlement,
   readSubscription,
   trialDays,
@@ -134,6 +135,25 @@ const billingStateSchema = z.object({
   /** Whether this account has ever been to Checkout, which is what the portal needs. */
   hasBillingAccount: z.boolean(),
   trialDays: z.number().int(),
+  /**
+   * What a card will be charged, from Stripe. BUG-014.
+   *
+   * Null when the provider could not be reached, and the screen then shows no
+   * figure rather than one this product guessed. A wrong number about money is
+   * worse than a missing one, and Checkout states the real terms on the next
+   * page either way.
+   *
+   * `amount` is the currency's minor unit, as Stripe gives it. It is not
+   * divided here: JPY has no minor unit and `Intl.NumberFormat` knows that
+   * while a division by a hundred does not.
+   */
+  price: z
+    .object({
+      amount: z.number().int(),
+      currency: z.string(),
+      interval: z.string().nullable(),
+    })
+    .nullable(),
 });
 
 export interface BillingRoutesOptions {
@@ -158,6 +178,29 @@ export async function registerBillingRoutes(
   const provider = billing ?? createStripeBilling(settings);
   const iso = (value: Date | null) => value?.toISOString() ?? null;
 
+  /**
+   * The price, read once and then held for the life of the process.
+   *
+   * A screen load is not a Stripe call: this figure changes when somebody
+   * edits it in a dashboard, which is rarer than people opening the billing
+   * page, and a restart is what picks that change up. Only a *successful* read
+   * is cached — a failed one is retried on the next request rather than
+   * pinning "no price" until the process is restarted.
+   */
+  let cachedPrice: PlanPrice | null = null;
+
+  async function planPrice(): Promise<PlanPrice | null> {
+    if (cachedPrice) return cachedPrice;
+
+    try {
+      cachedPrice = await provider.readPrice();
+      return cachedPrice;
+    } catch (cause) {
+      logger.error({ err: cause }, "the plan price could not be read: the screen will show none");
+      return null;
+    }
+  }
+
   app.route({
     method: "GET",
     url: billingBasePath,
@@ -178,6 +221,7 @@ export async function registerBillingRoutes(
         cancelAtPeriodEnd: subscription?.cancelAtPeriodEnd ?? false,
         hasBillingAccount: Boolean(subscription?.stripeCustomerId),
         trialDays,
+        price: await planPrice(),
       };
     },
   });

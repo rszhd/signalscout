@@ -55,10 +55,19 @@ interface Recorded {
   portal: unknown[];
   /** What `readEvent` will answer next, or a thrown signature failure. */
   next: BillingEvent | Error;
+  /** How many times the screen asked Stripe what the price is. BUG-014. */
+  priceReads?: number;
+  /** Set to make the price unreadable, which is Stripe being unreachable. */
+  priceFails?: boolean;
 }
 
 function fakeBilling(recorded: Recorded): BillingProvider {
   return {
+    async readPrice() {
+      recorded.priceReads = (recorded.priceReads ?? 0) + 1;
+      if (recorded.priceFails) throw new Error("Stripe is unreachable");
+      return { amount: 2000, currency: "usd", interval: "month" };
+    },
     async createCheckout(request) {
       recorded.checkout.push(request);
       return {
@@ -307,6 +316,90 @@ describe("the billing routes", () => {
         status: "trialing",
         trialDaysLeft: 7,
         hasBillingAccount: false,
+      });
+    } finally {
+      await app.close();
+    }
+  });
+
+  /**
+   * BUG-014. The screen carried `$15` as a literal and the live price is $20,
+   * so it quoted a figure Stripe does not charge and Checkout corrected it on
+   * the next page.
+   */
+  it("states the price the provider holds rather than one of its own", async () => {
+    const id = await account(`price-${randomUUID()}`);
+    await startTrial(db, id);
+
+    const app = await server(id);
+
+    try {
+      const body = (await app.inject({ method: "GET", url: billingBasePath })).json();
+
+      // The minor unit, undivided. Dividing here would be wrong for a currency
+      // that has no minor unit, and the screen is where the scaling belongs.
+      expect(body.price).toEqual({ amount: 2000, currency: "usd", interval: "month" });
+    } finally {
+      await app.close();
+    }
+  });
+
+  it("reads the price once and holds it, so a screen load is not a Stripe call", async () => {
+    const id = await account(`price-cache-${randomUUID()}`);
+    await startTrial(db, id);
+
+    const app = await server(id);
+
+    try {
+      await app.inject({ method: "GET", url: billingBasePath });
+      await app.inject({ method: "GET", url: billingBasePath });
+      await app.inject({ method: "GET", url: billingBasePath });
+
+      expect(recorded.priceReads).toBe(1);
+    } finally {
+      await app.close();
+    }
+  });
+
+  it("shows no price when the provider cannot be reached, and invents none", async () => {
+    // A wrong number about money is worse than a missing one. Checkout states
+    // the real terms on the next page, so nothing is lost by saying nothing.
+    const id = await account(`price-down-${randomUUID()}`);
+    await startTrial(db, id);
+
+    const app = await server(id);
+    recorded.priceFails = true;
+
+    try {
+      const body = (await app.inject({ method: "GET", url: billingBasePath })).json();
+
+      expect(body.price).toBe(null);
+      // Still entitled, and Checkout is still reachable: an unreadable price
+      // must not become a paywall.
+      expect(body.entitled).toBe(true);
+    } finally {
+      await app.close();
+    }
+  });
+
+  it("retries a failed price read rather than pinning the failure", async () => {
+    // Only a successful read is cached. Caching the failure would leave the
+    // screen priceless until somebody restarted the process.
+    const id = await account(`price-retry-${randomUUID()}`);
+    await startTrial(db, id);
+
+    const app = await server(id);
+    recorded.priceFails = true;
+
+    try {
+      expect((await app.inject({ method: "GET", url: billingBasePath })).json().price).toBe(null);
+
+      recorded.priceFails = false;
+
+      expect((await app.inject({ method: "GET", url: billingBasePath })).json().price).toEqual({
+        amount: 2000,
+        currency: "usd",
+        interval: "month",
       });
     } finally {
       await app.close();

@@ -846,6 +846,11 @@ footer {
   border-top: 1px solid var(--line-dark);
   padding-block: 30px;
 }
+.footer-links {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
 main:has(.closing) + footer {
   border-top: none;
 }

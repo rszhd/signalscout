@@ -99,6 +99,17 @@ The secret stays in the environment. It is never returned by the API or stored
 in a notification row. All monitors on an instance use this signing key.
 Rotate it by updating the receiver and both application processes together.
 
+**One signing key for the whole instance is why webhooks are not offered on the
+hosted version yet.** Every account would hold the value every other account's
+deliveries are signed with, so any of them could sign a payload another's
+receiver accepts as genuine.
+[US-096](../backlog/todo/US-096-a-webhook-secret-belongs-to-an-account.md) makes
+the secret an account's own.
+[US-097](../backlog/todo/US-097-a-webhook-cannot-be-aimed-at-our-own-network.md)
+is the other half: a hosted worker must not be pointed at an address inside our
+own network. Neither affects a self-hosted instance, where the machine and the
+network are already the owner's.
+
 The URL must use HTTPS, with no username, password or fragment. Redirects are
 refused. Choose **Digest** or **Each match above the minimum score**. A request
 is a JSON `POST`. Its body has this versioned shape:

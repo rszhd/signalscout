@@ -22,6 +22,8 @@
 /** The patterns the router matches. Only `App.tsx` uses these. */
 export const routes = {
   projects: "/projects",
+  newProject: "/projects/new",
+  editProject: "/projects/:projectId/edit",
   inbox: "/projects/:projectId",
   monitors: "/projects/:projectId/monitors",
   newMonitor: "/projects/:projectId/monitors/new",
@@ -41,6 +43,8 @@ export const routes = {
  */
 export const paths = {
   projects: routes.projects,
+  newProject: routes.newProject,
+  editProject: (projectId: string): string => `/projects/${encodeURIComponent(projectId)}/edit`,
   inbox: (projectId: string): string => `/projects/${encodeURIComponent(projectId)}`,
   monitors: (projectId: string): string => `${paths.inbox(projectId)}/monitors`,
   newMonitor: (projectId: string): string => `${paths.monitors(projectId)}/new`,

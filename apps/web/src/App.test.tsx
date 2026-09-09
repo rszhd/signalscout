@@ -13,7 +13,7 @@ import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { App } from "./App.js";
 import type { BillingState } from "./Billing.js";
-import { json, mount, type Screen, settle } from "./testing.js";
+import { button, field, json, mount, type Screen, settle, setValue } from "./testing.js";
 
 const options = {
   signals: [{ id: "problem", label: "Describing the problem", hint: "Clear pain" }],
@@ -41,6 +41,8 @@ describe("the application screens", () => {
   /** Whether the two setup reads answer at all. */
   let setupReadable: boolean;
   let billingState: BillingState;
+  /** The base fetch each case can wrap rather than rewrite. */
+  let fetchImpl: (request: string | URL | Request) => Promise<Response>;
 
   beforeEach(() => {
     billingMode = "off";
@@ -58,98 +60,97 @@ describe("the application screens", () => {
       hasBillingAccount: false,
       trialDays: 7,
     };
-    vi.stubGlobal(
-      "fetch",
-      vi.fn(async (request: string | URL | Request) => {
-        const url = typeof request === "string" ? request : request.toString();
-        // US-017 put every screen behind a session. These cases are about
-        // which screen the shell shows, so the person asking is signed in.
-        if (url === "/api/auth-status") {
-          return json({
-            firstRun: false,
-            signUpOpen: false,
-            signedIn: true,
-            account: { name: "The owner", email: "owner@example.com" },
-            billingMode,
-          });
-        }
-        if (url === "/api/billing") return json(billingState);
-        if (url === "/api/monitor-options") return json(options);
-        if (url === "/api/monitors") return json([]);
-        if (url.startsWith("/api/matches")) {
-          return json({ matches: [], nextCursor: null, asOf: "2026-09-05T12:00:00.000Z" });
-        }
-        /*
-          Set up, unless a case says otherwise. US-088.
+    fetchImpl = async (request: string | URL | Request) => {
+      const url = typeof request === "string" ? request : request.toString();
+      // US-017 put every screen behind a session. These cases are about
+      // which screen the shell shows, so the person asking is signed in.
+      if (url === "/api/auth-status") {
+        return json({
+          firstRun: false,
+          signUpOpen: false,
+          signedIn: true,
+          account: { name: "The owner", email: "owner@example.com" },
+          billingMode,
+        });
+      }
+      if (url === "/api/billing") return json(billingState);
+      if (url === "/api/monitor-options") return json(options);
+      if (url === "/api/monitors") return json([]);
+      if (url === "/api/projects") return json({ projects: [] });
+      if (url.startsWith("/api/matches")) {
+        return json({ matches: [], nextCursor: null, asOf: "2026-09-05T12:00:00.000Z" });
+      }
+      /*
+        Set up, unless a case says otherwise. US-088.
 
-          The catch-all goes through the setup screen now, and that screen asks
-          these two routes whether the account holds a provider key and a model
-          key. An account holding neither is offered setup instead of the
-          projects list, so every case about where an address lands has to say
-          which kind of account is asking.
-        */
-        if (!setupReadable && (url === "/api/connections" || url === "/api/models")) {
-          return json({ message: "no" }, 500);
-        }
-        if (url === "/api/connections") {
-          return json({
-            canStore: true,
-            storeBlocker: null,
-            providers: [
-              {
-                id: "brightdata",
-                displayName: "Bright Data",
-                platforms: ["Reddit"],
-                ready: setUp,
-                credentials: [
-                  {
-                    name: "apiKey",
-                    label: "API key",
-                    environmentVariable: "BRIGHTDATA_API_KEY",
-                    storedHint: setUp ? "••••b3e7" : null,
-                    fromEnvironment: false,
-                    configured: setUp,
-                  },
-                ],
-              },
-            ],
-            platforms: [],
-          });
-        }
-        if (url === "/api/models") {
-          return json({
-            canStore: true,
-            storeBlocker: null,
-            pricedModels: {},
-            embeddingModels: {},
-            testModels: { anthropic: "claude-sonnet-5" },
-            keys: [],
-            tasks: [
-              {
-                task: "classify",
-                title: "Scoring posts",
-                providers: ["anthropic"],
-                instance: { provider: "anthropic", model: "claude-haiku-4-5", hasKey: setUp },
-                fallback: {
-                  source: "instance",
-                  provider: "anthropic",
-                  model: "claude-haiku-4-5",
-                  hasKey: setUp,
-                  keyName: null,
-                  keyId: null,
+        The catch-all goes through the setup screen now, and that screen asks
+        these two routes whether the account holds a provider key and a model
+        key. An account holding neither is offered setup instead of the
+        projects list, so every case about where an address lands has to say
+        which kind of account is asking.
+      */
+      if (!setupReadable && (url === "/api/connections" || url === "/api/models")) {
+        return json({ message: "no" }, 500);
+      }
+      if (url === "/api/connections") {
+        return json({
+          canStore: true,
+          storeBlocker: null,
+          providers: [
+            {
+              id: "brightdata",
+              displayName: "Bright Data",
+              platforms: ["Reddit"],
+              ready: setUp,
+              credentials: [
+                {
+                  name: "apiKey",
+                  label: "API key",
+                  environmentVariable: "BRIGHTDATA_API_KEY",
+                  storedHint: setUp ? "••••b3e7" : null,
+                  fromEnvironment: false,
+                  configured: setUp,
                 },
-                provider: null,
-                model: null,
-                baseUrl: null,
+              ],
+            },
+          ],
+          platforms: [],
+        });
+      }
+      if (url === "/api/models") {
+        return json({
+          canStore: true,
+          storeBlocker: null,
+          pricedModels: {},
+          embeddingModels: {},
+          testModels: { anthropic: "claude-sonnet-5" },
+          keys: [],
+          tasks: [
+            {
+              task: "classify",
+              title: "Scoring posts",
+              providers: ["anthropic"],
+              instance: { provider: "anthropic", model: "claude-haiku-4-5", hasKey: setUp },
+              fallback: {
+                source: "instance",
+                provider: "anthropic",
+                model: "claude-haiku-4-5",
+                hasKey: setUp,
+                keyName: null,
                 keyId: null,
               },
-            ],
-          });
-        }
-        if (url === "/api/reply-prompts") return json({ prompts: [] });
-        throw new Error(`Unexpected request: ${url}`);
-      }),
-    );
+              provider: null,
+              model: null,
+              baseUrl: null,
+              keyId: null,
+            },
+          ],
+        });
+      }
+      if (url === "/api/reply-prompts") return json({ prompts: [] });
+      throw new Error(`Unexpected request: ${url}`);
+    };
+    vi.stubGlobal("fetch", vi.fn(fetchImpl));
   });
 
   afterEach(async () => {
@@ -465,5 +466,213 @@ describe("the application screens", () => {
     expect(screen.path()).toBe("/reply-voices");
     expect(screen.container.textContent).toContain("Reusable writing guidance for every project.");
     expect(screen.container.textContent).toContain("Create your first reply voice");
+  });
+
+  /** The connections view the gate reads once a provider key is stored. */
+  function readyConnections() {
+    return {
+      canStore: true,
+      storeBlocker: null,
+      providers: [
+        {
+          id: "brightdata",
+          displayName: "Bright Data",
+          platforms: ["Reddit"],
+          ready: true,
+          credentials: [
+            {
+              name: "apiKey",
+              label: "API key",
+              environmentVariable: "BRIGHTDATA_API_KEY",
+              storedHint: "••••b3e7",
+              fromEnvironment: false,
+              configured: true,
+            },
+          ],
+        },
+      ],
+      platforms: [],
+    };
+  }
+
+  /** The models view the gate reads once a model key is stored. */
+  function readyModels() {
+    return {
+      canStore: true,
+      storeBlocker: null,
+      pricedModels: {},
+      embeddingModels: {},
+      testModels: { anthropic: "claude-sonnet-5" },
+      keys: [
+        {
+          id: "k1",
+          name: "Anthropic key",
+          provider: "anthropic",
+          hint: "••••abcd",
+          isDefault: true,
+        },
+      ],
+      tasks: [
+        {
+          task: "classify",
+          title: "Scoring posts",
+          providers: ["anthropic"],
+          instance: { provider: "anthropic", model: "claude-haiku-4-5", hasKey: true },
+          fallback: {
+            source: "instance",
+            provider: "anthropic",
+            model: "claude-haiku-4-5",
+            hasKey: true,
+            keyName: "Anthropic key",
+            keyId: "k1",
+          },
+          provider: null,
+          model: null,
+          baseUrl: null,
+          keyId: null,
+        },
+      ],
+    };
+  }
+
+  function singleProject() {
+    return {
+      id: "p1",
+      name: "Acme QA",
+      product: "A test runner for small teams",
+      idealCustomer: "Small SaaS teams",
+      problem: "Their end to end tests break on every UI change",
+      signals: ["problem"],
+      monitorCount: 0,
+      createdAt: "2026-09-05T00:00:00.000Z",
+      updatedAt: "2026-09-05T00:00:00.000Z",
+    };
+  }
+
+  /**
+   * Put the two keys in from the gate, the way a person would.
+   *
+   * Both forms sit on one page, so a key is saved for each. The wrapper above
+   * answers the two saves with the ready views, which is what closes the gate.
+   */
+  async function finishSetup() {
+    setValue(field("API key for Bright Data"), "bd_key");
+    await act(async () => button("Save the provider key").click());
+    await settle();
+
+    setValue(field("Model API key"), "sk-ant-test");
+    await act(async () => button("Save the model key").click());
+    await settle();
+    await settle();
+  }
+
+  /**
+   * The gate's exit. US-088 closed when the last key was saved, and a new
+   * account holding no project has exactly one honest next step: describing
+   * a business. The finish button on the setup page is never reachable — the
+   * gate leaves the moment both keys are on the views — so the redirect is
+   * driven by the gate closing, and only when the account has no project.
+   */
+  it("sends an account that finishes setup with no project to make one", async () => {
+    setUp = false;
+    const fetchMock = vi.mocked(globalThis.fetch);
+    fetchMock.mockImplementation(async (request, init) => {
+      const url = typeof request === "string" ? request : request.toString();
+      const method = init?.method ?? "GET";
+      if (method === "PUT" && url === "/api/connections/brightdata")
+        return json(readyConnections());
+      if (method === "POST" && url === "/api/models/keys") return json(readyModels());
+      if (url === "/api/projects") return json({ projects: [] });
+      return fetchImpl(request);
+    });
+
+    screen = await mount(<App />, "/");
+
+    expect(screen.container.textContent).toContain("Set up SignalScout");
+
+    await finishSetup();
+
+    expect(screen.path()).toBe("/projects/new");
+    expect(screen.container.textContent).toContain("New project");
+  });
+
+  it("leaves an account that already has a project on the projects list", async () => {
+    setUp = false;
+    const fetchMock = vi.mocked(globalThis.fetch);
+    fetchMock.mockImplementation(async (request, init) => {
+      const url = typeof request === "string" ? request : request.toString();
+      const method = init?.method ?? "GET";
+      if (method === "PUT" && url === "/api/connections/brightdata")
+        return json(readyConnections());
+      if (method === "POST" && url === "/api/models/keys") return json(readyModels());
+      if (url === "/api/projects") return json({ projects: [singleProject()] });
+      return fetchImpl(request);
+    });
+
+    screen = await mount(<App />, "/");
+
+    await finishSetup();
+
+    expect(screen.path()).toBe("/projects");
+    expect(screen.container.textContent).toContain("Acme QA");
+    expect(screen.container.textContent).not.toContain("Set up SignalScout");
+  });
+
+  it("does not herd an account back to the create form on a later load", async () => {
+    const fetchMock = vi.mocked(globalThis.fetch);
+    fetchMock.mockImplementation(async (request) => {
+      const url = typeof request === "string" ? request : request.toString();
+      if (url === "/api/projects") return json({ projects: [] });
+      return fetchImpl(request);
+    });
+
+    // Keys are in and no project exists, but the gate never opened this load,
+    // so there is no "finish" to redirect from.
+    screen = await mount(<App />, "/projects");
+
+    expect(screen.path()).toBe("/projects");
+    expect(screen.container.querySelector("h1")?.textContent).toBe("Projects");
+    expect(screen.container.textContent).toContain("No projects yet");
+    expect(screen.container.querySelector('input[aria-label="Name"]')).toBeNull();
+  });
+
+  it("opens the project editor on its own address, with no project scoped", async () => {
+    screen = await mount(<App />, "/projects/new");
+
+    expect(screen.path()).toBe("/projects/new");
+    expect(screen.container.textContent).toContain("A little context.");
+
+    // The create form is not inside a project, so the project-scoped links
+    // are hidden the way they are on the list — and Projects is current.
+    const links = [...screen.container.querySelectorAll(".site-nav a")].map((link) =>
+      link.getAttribute("href"),
+    );
+    expect(links).toEqual(["/projects"]);
+    expect(screen.container.querySelector('.site-nav a[href="/projects"]')?.className).toContain(
+      "current",
+    );
+  });
+
+  it("opens the edit form for the project the address names", async () => {
+    const fetchMock = vi.mocked(globalThis.fetch);
+    fetchMock.mockImplementation(async (request) => {
+      const url = typeof request === "string" ? request : request.toString();
+      if (url === "/api/projects/p1") return json(singleProject());
+      return fetchImpl(request);
+    });
+
+    screen = await mount(<App />, "/projects/p1/edit");
+    await settle();
+
+    expect(screen.path()).toBe("/projects/p1/edit");
+    expect(screen.container.textContent).toContain("Edit project");
+    expect(field("Name").value).toBe("Acme QA");
+
+    // Editing belongs to a real project, so its inbox and monitors are offered.
+    const links = [...screen.container.querySelectorAll(".site-nav a")].map((link) =>
+      link.getAttribute("href"),
+    );
+    expect(links).toContain("/projects/p1");
+    expect(links).toContain("/projects/p1/monitors");
   });
 });

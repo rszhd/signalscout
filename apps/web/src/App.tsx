@@ -1,5 +1,14 @@
-import { useEffect, useState } from "react";
-import { Link, Navigate, Outlet, Route, Routes, useMatch, useParams } from "react-router";
+import { useEffect, useRef, useState } from "react";
+import {
+  Link,
+  Navigate,
+  Outlet,
+  Route,
+  Routes,
+  useMatch,
+  useNavigate,
+  useParams,
+} from "react-router";
 import { requestJson } from "./api.js";
 import { Billing, type BillingState, subscriptionSentence } from "./Billing.js";
 import { BrandLogo } from "./BrandLogo.js";
@@ -17,7 +26,7 @@ import {
   type ModelsView,
   Onboarding,
 } from "./Onboarding.js";
-import { Projects } from "./Projects.js";
+import { ProjectForm, Projects } from "./Projects.js";
 import { Providers } from "./Providers.js";
 import { ReplyVoices } from "./ReplyVoices.js";
 import { paths, routes } from "./route.js";
@@ -188,11 +197,59 @@ function useSetup(enabled: boolean): {
 }
 
 export function App() {
+  const navigate = useNavigate();
   const status = useAuthStatus();
   const billingState = useBillingState(
     status?.signedIn === true && status.billingMode === "stripe",
   );
   const setup = useSetup(status?.signedIn === true);
+
+  /**
+   * The setup gate sends a new account to make its first project.
+   *
+   * The gate is not a route and has no address, so it cannot navigate. This
+   * effect watches for it *closing*: an account with no project that has just
+   * put its two keys in is a brand-new account, and the next honest step is
+   * describing a business — not landing on an empty list. An account that
+   * already has projects is left where the gate let it through.
+   *
+   * `wasGated` is what tells the two apart. The effect sets it while the gate
+   * is on screen, so the read fires only on the moment the gate ends and never
+   * again on later loads — an account that refreshes after setup must not be
+   * herded back to the create form.
+   */
+  const wasGated = useRef(false);
+
+  useEffect(() => {
+    if (!setup.answered || setup.views === null) return;
+
+    const missingKeys = !(
+      hasProviderKey(setup.views.connections) && hasModelKey(setup.views.models)
+    );
+
+    if (missingKeys) {
+      wasGated.current = true;
+      return;
+    }
+    if (!wasGated.current) return;
+    wasGated.current = false;
+
+    let current = true;
+    requestJson<{ projects: unknown[] }>("/api/projects")
+      .then((answer) => {
+        if (current && answer.projects.length === 0) {
+          navigate(paths.newProject, { replace: true });
+        }
+      })
+      .catch(() => {
+        // A read that failed says nothing. The projects list is the honest
+        // landing, and it will say so itself.
+      });
+
+    return () => {
+      current = false;
+    };
+  }, [setup.answered, setup.views, navigate]);
 
   // Nothing at all until the answer is back. See `useAuthStatus`.
   if (status === null) return null;
@@ -246,6 +303,14 @@ export function App() {
     <Routes>
       <Route element={<Shell status={status} billingState={billingState} />}>
         <Route path={routes.projects} element={<Projects />} />
+        {/*
+          The project editor's own address. US-045's editor used to be a state
+          of the list; it is a page now, so the setup gate can send a new
+          account to it. `new` is a static segment, which outranks the `:id`
+          of the inbox route below it.
+        */}
+        <Route path={routes.newProject} element={<NewProjectRoute />} />
+        <Route path={routes.editProject} element={<EditProjectRoute />} />
         <Route path={routes.inbox} element={<InboxRoute />} />
         <Route path={routes.monitors} element={<MonitorsRoute />} />
         <Route path={routes.newMonitor} element={<MonitorFormRoute />} />
@@ -268,9 +333,25 @@ export function App() {
 
 /** The project in the address, on any route inside one. */
 function useProjectId(): string | null {
+  const creating = useMatch(routes.newProject) !== null;
   const inside = useMatch(`${routes.inbox}/*`);
   const exact = useMatch(routes.inbox);
+  // `/projects/new` is the create form, not a project whose id is "new".
+  if (creating) return null;
   return inside?.params.projectId ?? exact?.params.projectId ?? null;
+}
+
+function NewProjectRoute() {
+  return <ProjectForm projectId={null} />;
+}
+
+function EditProjectRoute() {
+  const { projectId } = useParams();
+  return projectId ? (
+    <ProjectForm key={projectId} projectId={projectId} />
+  ) : (
+    <Navigate replace to={paths.projects} />
+  );
 }
 
 /**
@@ -326,7 +407,12 @@ function Shell({
   const listing = useMatch(routes.monitors) !== null;
   const creating = useMatch(routes.newMonitor) !== null;
   const reading = useMatch(routes.inbox) !== null;
-  const projecting = useMatch(routes.projects) !== null;
+  // The project editor is a page of its own, and the Projects item stays
+  // current while a project is being made or edited.
+  const listingProjects = useMatch(routes.projects) !== null;
+  const addingProject = useMatch(routes.newProject) !== null;
+  const editingProject = useMatch(routes.editProject) !== null;
+  const projecting = listingProjects || addingProject || editingProject;
   const comparing = useMatch(routes.providers) !== null;
   const voicing = useMatch(routes.replyVoices) !== null;
   const modelling = useMatch(routes.models) !== null;
@@ -413,7 +499,7 @@ function Shell({
               <span className="nav-icon" aria-hidden="true">
                 ✎
               </span>
-              <span>Reply voices</span>
+              <span>Voices</span>
             </Link>
             {/*
               Beside Providers rather than inside a project: a model key is one

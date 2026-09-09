@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { messageFor, requestJson } from "./api.js";
 import { paths } from "./route.js";
 
@@ -23,6 +23,11 @@ import { paths } from "./route.js";
  * rather than left to be discovered. The reason is `monitors.version`: a
  * verdict is recorded against the version that earned it, so an edit that
  * reached existing monitors would quietly discard every verdict already given.
+ *
+ * **The editor is a page, not a state of this one.** New project and edit
+ * project each have an address, so the list can link to them and a person can
+ * be sent to them — which is what happens when the setup gate finishes with no
+ * project in the account.
  */
 
 interface Project {
@@ -158,21 +163,18 @@ function DraftFromDocument({
   );
 }
 
+/**
+ * The list of projects, and the way into the two editor pages.
+ *
+ * There is no editor state on this screen any more. A project is made and
+ * edited on its own address (`/projects/new`, `/projects/<id>/edit`), and this
+ * page links to both — which is what lets the setup gate send a new account
+ * straight to making its first one.
+ */
 export function Projects() {
-  const [editorOpen, setEditorOpen] = useState(false);
-  const [reading, setReading] = useState(false);
-  const nameInput = useRef<HTMLInputElement>(null);
-  const newButton = useRef<HTMLButtonElement>(null);
-  const [notice, setNotice] = useState<string | null>(null);
   const [projects, setProjects] = useState<Project[]>([]);
-  const [draft, setDraft] = useState<Draft>(empty);
-  /** The project being edited, or null while the form is making a new one. */
-  const [editing, setEditing] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  /** What the model said it could not find. Shown, not swallowed. US-050. */
-  const [missing, setMissing] = useState<string[]>([]);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -191,18 +193,163 @@ export function Projects() {
     void load();
   }, [load]);
 
-  useEffect(() => {
-    if (editorOpen) nameInput.current?.focus();
-  }, [editorOpen]);
+  return (
+    <>
+      <header className="topbar projects-topbar">
+        <div>
+          <h1>Projects</h1>
+          <p className="page-subtitle">
+            Your businesses and the conversations that matter to each.
+          </p>
+        </div>
+        <Link className="primary-button" to={paths.newProject}>
+          New project
+        </Link>
+      </header>
 
-  function closeEditor() {
-    setEditorOpen(false);
-    setEditing(null);
-    setDraft(empty);
-    setMissing([]);
-    setError(null);
-    requestAnimationFrame(() => newButton.current?.focus());
-  }
+      <div className="projects-content">
+        {error && (
+          <div className="form-error" role="alert">
+            {error}
+            <button className="secondary-button" type="button" onClick={() => void load()}>
+              Try again
+            </button>
+          </div>
+        )}
+        <section aria-label="Your projects">
+          {loading ? (
+            <p className="project-state" role="status">
+              Loading projects…
+            </p>
+          ) : error ? null : projects.length === 0 ? (
+            <div className="project-empty">
+              <span className="project-empty-mark" aria-hidden="true">
+                ＋
+              </span>
+              <h2>A home for your business</h2>
+              <p>
+                No projects yet. Add your product, audience and the problem you solve. Your next
+                monitor starts with its answers filled in.
+              </p>
+              <Link className="primary-button" to={paths.newProject}>
+                Create your first project
+              </Link>
+            </div>
+          ) : (
+            <>
+              <div className="project-list-heading">
+                <h2>
+                  Your projects <span>{projects.length}</span>
+                </h2>
+                <p>Choose a project to explore its conversations.</p>
+              </div>
+              <ul className="project-list">
+                {projects.map((project) => (
+                  <li className="project-row" key={project.id}>
+                    <div className="project-card-heading">
+                      <span className="project-avatar" aria-hidden="true">
+                        {project.name.slice(0, 1).toUpperCase()}
+                      </span>
+                      <div className="project-identity">
+                        <h2 className="project-name">
+                          <Link to={paths.inbox(project.id)}>{project.name}</Link>
+                        </h2>
+
+                        <small className="project-count">
+                          {project.monitorCount === 0
+                            ? "No monitors yet"
+                            : `${project.monitorCount} monitor${project.monitorCount === 1 ? "" : "s"}`}
+                        </small>
+                      </div>
+                      <Link className="project-edit-button" to={paths.editProject(project.id)}>
+                        Edit
+                      </Link>
+                    </div>
+                    <p className="project-product">{project.product}</p>
+                    <div className="project-audience">
+                      <span>FOR</span>
+                      <p>{project.idealCustomer}</p>
+                    </div>
+                    <div className="project-actions">
+                      <Link className="project-inbox-link" to={paths.inbox(project.id)}>
+                        Open inbox →
+                      </Link>
+                      <Link className="secondary-button" to={paths.newMonitor(project.id)}>
+                        New monitor
+                      </Link>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+        </section>
+      </div>
+    </>
+  );
+}
+
+/**
+ * The editor, on its own address. US-045.
+ *
+ * `projectId` is null on `/projects/new` and an id on
+ * `/projects/<id>/edit`, so this is one form with two modes rather than two
+ * screens that would drift apart. A created project goes to its own inbox —
+ * the address *of* the business just described — and an edited one goes back
+ * to the list it came from.
+ */
+export function ProjectForm({ projectId }: { readonly projectId: string | null }) {
+  const editing = projectId !== null;
+  const navigate = useNavigate();
+  const [draft, setDraft] = useState<Draft>(empty);
+  /** Whether the answers are on screen yet. Editing loads them first. */
+  const [loading, setLoading] = useState(editing);
+  /** A project that will not load is not offered for saving. */
+  const [unavailable, setUnavailable] = useState(false);
+  const [missing, setMissing] = useState<string[]>([]);
+  const nameInput = useRef<HTMLInputElement>(null);
+  const [busy, setBusy] = useState(false);
+  const [reading, setReading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!editing) return;
+
+    let current = true;
+    setLoading(true);
+
+    requestJson<Project>(`/api/projects/${projectId}`)
+      .then((project) => {
+        if (current) {
+          setDraft({
+            name: project.name,
+            product: project.product,
+            idealCustomer: project.idealCustomer,
+            problem: project.problem,
+          });
+        }
+      })
+      .catch((cause) => {
+        // A screen editing a project that cannot be read must not offer a
+        // blank form: saving it would make a second project rather than edit
+        // the first.
+        if (current) {
+          setUnavailable(true);
+          setError(messageFor(cause, "The project could not be loaded."));
+        }
+      })
+      .finally(() => {
+        if (current) setLoading(false);
+      });
+
+    return () => {
+      current = false;
+    };
+  }, [projectId, editing]);
+
+  useEffect(() => {
+    if (!loading && !unavailable) nameInput.current?.focus();
+  }, [loading, unavailable]);
 
   const change = (field: keyof Draft) => (value: string) =>
     setDraft((current) => ({ ...current, [field]: value }));
@@ -218,16 +365,18 @@ export function Projects() {
     setError(null);
 
     try {
-      await requestJson<Project>(editing ? `/api/projects/${editing}` : "/api/projects", {
-        method: editing ? "PATCH" : "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify(draft),
-      });
+      const saved = await requestJson<Project>(
+        editing ? `/api/projects/${projectId}` : "/api/projects",
+        {
+          method: editing ? "PATCH" : "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify(draft),
+        },
+      );
 
-      const savedName = draft.name;
-      closeEditor();
-      setNotice(`${savedName} ${editing ? "updated" : "created"}. Ready for your next monitor.`);
-      await load();
+      // A new business is sent to its own inbox, which offers the first
+      // monitor; an edited one goes back to the list.
+      navigate(editing ? paths.projects : paths.inbox(saved.id));
     } catch (cause) {
       setError(messageFor(cause, "The project could not be saved."));
     } finally {
@@ -235,76 +384,41 @@ export function Projects() {
     }
   }
 
-  function edit(project: Project) {
-    setMissing([]);
-    setError(null);
-    setNotice(null);
-    setEditorOpen(true);
-    setEditing(project.id);
-    setDraft({
-      name: project.name,
-      product: project.product,
-      idealCustomer: project.idealCustomer,
-      problem: project.problem,
-    });
-  }
-
   return (
     <>
       <header className="topbar projects-topbar">
         <div>
-          <h1>{editorOpen ? (editing ? "Edit project" : "New project") : "Projects"}</h1>
+          <h1>{editing ? "Edit project" : "New project"}</h1>
           <p className="page-subtitle">
-            {editorOpen
-              ? "Describe your business once. Give every new monitor a head start."
-              : "Your businesses and the conversations that matter to each."}
+            Describe your business once. Give every new monitor a head start.
           </p>
         </div>
-        {!editorOpen && (
-          <button
-            ref={newButton}
-            className="primary-button"
-            type="button"
-            disabled={loading || !!error}
-            onClick={() => {
-              setDraft(empty);
-              setMissing([]);
-              setEditing(null);
-              setNotice(null);
-              setEditorOpen(true);
-            }}
-          >
-            New project
-          </button>
-        )}
       </header>
 
       <div className="projects-content">
-        {notice && (
-          <p className="project-notice" role="status">
-            {notice}
+        {loading ? (
+          <p className="project-state" role="status">
+            Loading project…
           </p>
-        )}
-        {error && (
+        ) : unavailable ? (
           <div className="form-error" role="alert">
             {error}
-            {!editorOpen && (
-              <button className="secondary-button" type="button" onClick={() => void load()}>
-                Try again
-              </button>
-            )}
+            <Link className="secondary-button" to={paths.projects}>
+              All projects
+            </Link>
           </div>
-        )}
-        {editorOpen ? (
+        ) : (
           <section className="project-editor" aria-label="Project details">
-            <button
-              className="project-text-button"
-              type="button"
-              disabled={busy || reading}
-              onClick={closeEditor}
-            >
+            <Link className="project-text-button" to={paths.projects}>
               ← All projects
-            </button>
+            </Link>
+
+            {error && (
+              <div className="form-error" role="alert">
+                {error}
+              </div>
+            )}
+
             <div className="project-editor-layout">
               <aside className="project-editor-guide">
                 <span className="project-guide-label">PROJECT PROFILE</span>
@@ -424,94 +538,12 @@ export function Projects() {
                   >
                     {busy ? "Saving…" : editing ? "Save changes" : "Create project"}
                   </button>
-                  <button
-                    className="secondary-button"
-                    type="button"
-                    disabled={busy || reading}
-                    onClick={closeEditor}
-                  >
+                  <Link className="secondary-button" to={paths.projects}>
                     Cancel
-                  </button>
+                  </Link>
                 </div>
               </form>
             </div>
-          </section>
-        ) : (
-          <section aria-label="Your projects">
-            {loading ? (
-              <p className="project-state" role="status">
-                Loading projects…
-              </p>
-            ) : error ? null : projects.length === 0 ? (
-              <div className="project-empty">
-                <span className="project-empty-mark" aria-hidden="true">
-                  ＋
-                </span>
-                <h2>A home for your business</h2>
-                <p>
-                  No projects yet. Add your product, audience and the problem you solve. Your next
-                  monitor starts with its answers filled in.
-                </p>
-                <button
-                  className="primary-button"
-                  type="button"
-                  onClick={() => setEditorOpen(true)}
-                >
-                  Create your first project
-                </button>
-              </div>
-            ) : (
-              <>
-                <div className="project-list-heading">
-                  <h2>
-                    Your projects <span>{projects.length}</span>
-                  </h2>
-                  <p>Choose a project to explore its conversations.</p>
-                </div>
-                <ul className="project-list">
-                  {projects.map((project) => (
-                    <li className="project-row" key={project.id}>
-                      <div className="project-card-heading">
-                        <span className="project-avatar" aria-hidden="true">
-                          {project.name.slice(0, 1).toUpperCase()}
-                        </span>
-                        <div className="project-identity">
-                          <h2 className="project-name">
-                            <Link to={paths.inbox(project.id)}>{project.name}</Link>
-                          </h2>
-
-                          <small className="project-count">
-                            {project.monitorCount === 0
-                              ? "No monitors yet"
-                              : `${project.monitorCount} monitor${project.monitorCount === 1 ? "" : "s"}`}
-                          </small>
-                        </div>
-                        <button
-                          className="project-edit-button"
-                          type="button"
-                          onClick={() => edit(project)}
-                        >
-                          Edit
-                        </button>
-                      </div>
-                      <p className="project-product">{project.product}</p>
-                      <div className="project-audience">
-                        <span>FOR</span>
-                        <p>{project.idealCustomer}</p>
-                      </div>
-                      <div className="project-actions">
-                        <Link className="project-inbox-link" to={paths.inbox(project.id)}>
-                          Open inbox →
-                        </Link>
-                        <Link className="secondary-button" to={paths.newMonitor(project.id)}>
-                          New monitor
-                        </Link>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              </>
-            )}
           </section>
         )}
       </div>

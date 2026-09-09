@@ -791,6 +791,23 @@ function JobCard({
         </header>
         <p className="job-description">{task.what}</p>
 
+        {/*
+          The measurement that decides which model to pick, where the choice is
+          made.
+
+          It sat inside Advanced, behind a summary that reads as base URLs and
+          prices, so the one sentence a person needs before answering "which
+          model?" was a click nobody made. Each of these notes is a measurement
+          rather than advice: US-030 measured that triage costs 48% *more* on
+          the scorer's own model, and Anthropic publishes no embedding endpoint
+          at all. Somebody who does not read them picks the expensive wrong
+          answer, so it is stated above the fields rather than under them.
+        */}
+        <p className="job-tip">
+          <span className="job-tip-label">Choosing a model</span>
+          {task.note}
+        </p>
+
         <form className="job-form" onSubmit={submit}>
           <div className="job-fields">
             <label className="field">
@@ -889,7 +906,6 @@ function JobCard({
 
           <details className="disclosure job-advanced">
             <summary>Advanced</summary>
-            <p className="job-note">{task.note}</p>
             <label className="field">
               <span>Base URL</span>
               <input

@@ -172,6 +172,20 @@ describe("the models screen", () => {
     expect(screen.container.textContent).toContain("The most expensive call this product makes.");
   });
 
+  /**
+   * It was inside Advanced, behind a summary that reads as base URLs and
+   * prices — so the sentence that decides the answer was a click nobody made.
+   */
+  it("puts that reason above the fields, not inside Advanced", async () => {
+    screen = await mount(<Models />);
+
+    const tip = document.querySelector(".job-tip") as HTMLElement;
+    const advanced = document.querySelector(".job-advanced") as HTMLElement;
+
+    expect(tip.textContent).toContain("The most expensive call this product makes.");
+    expect(advanced.textContent).not.toContain("The most expensive call this product makes.");
+  });
+
   const storedKey = {
     id: "11111111-1111-4111-8111-111111111111",
     name: "My OpenAI key",

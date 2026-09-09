@@ -213,11 +213,28 @@
   font-size: var(--text-sm);
 }
 
-.job-advanced .job-note {
+/*
+  The measurement a person needs before they choose a model.
+
+  Given the accent rather than the muted grey the rest of the supporting copy
+  uses: it is the one sentence on the card that changes the answer, and it was
+  missed entirely while it was inside Advanced.
+*/
+.job-tip {
   max-width: 62ch;
-  margin: var(--space-3) 0 var(--space-4);
-  color: var(--muted);
+  margin: 0 var(--space-6) var(--space-5);
+  padding: var(--space-3) var(--space-4);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius-sm);
+  background: var(--accent-soft);
+  color: var(--accent-text);
   font-size: var(--text-sm);
+}
+
+.job-tip-label {
+  display: block;
+  margin-bottom: var(--space-1);
+  font-weight: 600;
 }
 
 .job-answer {

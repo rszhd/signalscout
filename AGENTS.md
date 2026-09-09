@@ -1023,6 +1023,47 @@ The probe is injected, so no test in this suite reaches a provider. **Nothing
 has pressed the button against a real provider**, and **no live model call has
 been made on a per-account key.**
 
+**A new account is asked for two keys before it is given the product.** US-088
+closed on 2026-09-09. A provider key buys the conversations and a model key
+reads them, so an account holding neither can do nothing at all — and until
+this screen existed a new one landed on an empty projects list, with the first
+sentence about a missing key arriving on step 3 of the monitor form as US-085's
+refusal.
+
+**It is a gate, not a route, and the first version was a route.** `App.tsx`
+renders it in place of the whole application while either key is missing, which
+is what it already does with the login ten lines above. The first attempt
+redirected the catch-all to `/welcome` and put a "Skip for now" link on the
+page; the owner registered, stepped around it in one click, and reported it.
+**A redirect that can be skipped is not onboarding** — the missing key arrives
+later anyway, as a refusal on a form, which is the thing this exists to
+prevent. There is no address that reaches past it now, and no route to
+navigate to.
+
+**Two ways out, and both are deliberate.** Signing out is on the page, because
+every other screen is behind the gate and so is the sidebar that holds the
+sign-out button — without it somebody signed in to the wrong account on a
+shared machine is stuck. And **a failed read opens the gate**: when
+`/api/connections` or `/api/models` does not answer, the application is shown
+as normal. Locking somebody out of their own inbox over one failed request is
+worse than letting an unconfigured account through, and the monitor form and
+every poll already refuse that account with a reason.
+
+**It stores nothing of its own and adds no route to the server.** Both saves
+are the routes Connections and Models already own, so a key is tested with the
+provider before it is stored and a refusal is the provider's own sentence, here
+as there. The first model key becomes the account's default through
+`adoptDefault`, so pointing a job at it is not part of setup.
+
+**Whether setup is finished is derived, not recorded.** There is no flag and no
+migration: `App.tsx` reads the same two views the other screens read and asks
+whether any provider is ready and whether the scoring job's fallback can run. A
+stored flag would be a second copy of the truth that goes wrong in the
+direction that hurts — an account that deleted its keys let in, and then
+refused by every poll. One consequence falls out and is wanted: an instance
+whose keys are in `.env` is already finished, so nobody there ever sees the
+screen.
+
 **No route asks for a session, so none can forget.** One `onRequest` hook on
 the root instance covers every API route, and what is *not* behind it is a
 written list of three: `/api/auth/*` because it is the login, `/api/health`

@@ -10,6 +10,13 @@ import { Models } from "./Models.js";
 import { MonitorForm } from "./MonitorForm.js";
 import { Monitors } from "./Monitors.js";
 import { Notifications } from "./Notifications.js";
+import {
+  type ConnectionsView,
+  hasModelKey,
+  hasProviderKey,
+  type ModelsView,
+  Onboarding,
+} from "./Onboarding.js";
 import { Projects } from "./Projects.js";
 import { Providers } from "./Providers.js";
 import { ReplyVoices } from "./ReplyVoices.js";
@@ -113,16 +120,112 @@ function useBillingState(enabled: boolean): BillingState | null {
   return state;
 }
 
+/**
+ * The two keys this account needs before the product does anything. US-088.
+ *
+ * Read here rather than inside the setup screen, because the answer decides
+ * whether that screen is shown at all — and a second read inside it could
+ * disagree with this one about what is missing.
+ *
+ * **A failed read opens the gate.** `null` means the question was not
+ * answered, and locking somebody out of their own inbox because one request
+ * failed is worse than letting an unconfigured account through: the monitor
+ * form refuses a platform with no key anyway, and every poll is refused with a
+ * reason. The gate is for the common path, not a security boundary.
+ */
+interface SetupViews {
+  readonly connections: ConnectionsView;
+  readonly models: ModelsView;
+}
+
+function useSetup(enabled: boolean): {
+  views: SetupViews | null;
+  answered: boolean;
+  replace: (views: { connections?: ConnectionsView; models?: ModelsView }) => void;
+  dismiss: () => void;
+} {
+  const [views, setViews] = useState<SetupViews | null>(null);
+  const [answered, setAnswered] = useState(false);
+
+  useEffect(() => {
+    let current = true;
+
+    if (!enabled) {
+      setAnswered(true);
+      return () => {
+        current = false;
+      };
+    }
+
+    Promise.all([
+      requestJson<ConnectionsView>("/api/connections"),
+      requestJson<ModelsView>("/api/models"),
+    ])
+      .then(([connections, models]) => {
+        if (current) setViews({ connections, models });
+      })
+      .catch(() => {
+        // See above: an unanswered question opens the gate rather than closing
+        // it. `views` stays null, which reads as "nothing to ask for".
+      })
+      .finally(() => {
+        if (current) setAnswered(true);
+      });
+
+    return () => {
+      current = false;
+    };
+  }, [enabled]);
+
+  return {
+    views,
+    answered,
+    replace: (updated) => setViews((current) => (current ? { ...current, ...updated } : current)),
+    // Pressing the last button on the setup screen. The keys are in, so there
+    // is nothing left to gate on.
+    dismiss: () => setViews(null),
+  };
+}
+
 export function App() {
   const status = useAuthStatus();
   const billingState = useBillingState(
     status?.signedIn === true && status.billingMode === "stripe",
   );
+  const setup = useSetup(status?.signedIn === true);
 
   // Nothing at all until the answer is back. See `useAuthStatus`.
   if (status === null) return null;
   if (!status.signedIn) {
     return <Login firstRun={status.firstRun} signUpOpen={status.signUpOpen} />;
+  }
+
+  // Nothing until the setup question is answered either, for the same reason:
+  // the application flashing on screen before the gate replaces it is worse
+  // than a moment of nothing.
+  if (!setup.answered) return null;
+
+  /**
+   * The two keys, before the product. US-088.
+   *
+   * In place of the whole application rather than as a route inside it, which
+   * is how the login above works and for the same reason: a route can be
+   * navigated away from, and the first version of this was — a new account
+   * stepped around setup in one click and met the missing key later, on the
+   * monitor form, as a refusal it could not act on.
+   */
+  if (
+    setup.views &&
+    !(hasProviderKey(setup.views.connections) && hasModelKey(setup.views.models))
+  ) {
+    return (
+      <Onboarding
+        connections={setup.views.connections}
+        models={setup.views.models}
+        onSaved={setup.replace}
+        onFinished={setup.dismiss}
+      />
+    );
   }
 
   /**

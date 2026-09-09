@@ -8,6 +8,7 @@ import "./styles/login.css";
 import "./styles/billing.css";
 import "./styles/models.css";
 import "./styles/monitor-setup.css";
+import "./styles/onboarding.css";
 import "./styles/connections.css";
 import "./styles/projects.css";
 import "./styles/monitors.css";

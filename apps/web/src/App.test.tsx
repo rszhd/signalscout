@@ -36,10 +36,16 @@ const newMonitor = `${monitors}/new`;
 describe("the application screens", () => {
   let screen: Screen;
   let billingMode: "off" | "stripe";
+  /** Whether this account holds the two keys the setup gate asks for. */
+  let setUp: boolean;
+  /** Whether the two setup reads answer at all. */
+  let setupReadable: boolean;
   let billingState: BillingState;
 
   beforeEach(() => {
     billingMode = "off";
+    setUp = true;
+    setupReadable = true;
     billingState = {
       mode: "stripe",
       entitled: true,
@@ -73,8 +79,72 @@ describe("the application screens", () => {
         if (url.startsWith("/api/matches")) {
           return json({ matches: [], nextCursor: null, asOf: "2026-09-05T12:00:00.000Z" });
         }
+        /*
+          Set up, unless a case says otherwise. US-088.
+
+          The catch-all goes through the setup screen now, and that screen asks
+          these two routes whether the account holds a provider key and a model
+          key. An account holding neither is offered setup instead of the
+          projects list, so every case about where an address lands has to say
+          which kind of account is asking.
+        */
+        if (!setupReadable && (url === "/api/connections" || url === "/api/models")) {
+          return json({ message: "no" }, 500);
+        }
         if (url === "/api/connections") {
-          return json({ canStore: true, storeBlocker: null, providers: [], platforms: [] });
+          return json({
+            canStore: true,
+            storeBlocker: null,
+            providers: [
+              {
+                id: "brightdata",
+                displayName: "Bright Data",
+                platforms: ["Reddit"],
+                ready: setUp,
+                credentials: [
+                  {
+                    name: "apiKey",
+                    label: "API key",
+                    environmentVariable: "BRIGHTDATA_API_KEY",
+                    storedHint: setUp ? "••••b3e7" : null,
+                    fromEnvironment: false,
+                    configured: setUp,
+                  },
+                ],
+              },
+            ],
+            platforms: [],
+          });
+        }
+        if (url === "/api/models") {
+          return json({
+            canStore: true,
+            storeBlocker: null,
+            pricedModels: {},
+            embeddingModels: {},
+            testModels: { anthropic: "claude-sonnet-5" },
+            keys: [],
+            tasks: [
+              {
+                task: "classify",
+                title: "Scoring posts",
+                providers: ["anthropic"],
+                instance: { provider: "anthropic", model: "claude-haiku-4-5", hasKey: setUp },
+                fallback: {
+                  source: "instance",
+                  provider: "anthropic",
+                  model: "claude-haiku-4-5",
+                  hasKey: setUp,
+                  keyName: null,
+                  keyId: null,
+                },
+                provider: null,
+                model: null,
+                baseUrl: null,
+                keyId: null,
+              },
+            ],
+          });
         }
         if (url === "/api/reply-prompts") return json({ prompts: [] });
         throw new Error(`Unexpected request: ${url}`);
@@ -283,6 +353,46 @@ describe("the application screens", () => {
 
       await screen.unmount();
     }
+  });
+
+  /**
+   * The gate, in place of the whole application. US-088.
+   *
+   * Not a route: a route can be navigated away from, and the first version of
+   * this was one — a new account stepped around setup in a click and met the
+   * missing key later, on the monitor form, as a refusal. So the setup screen
+   * replaces the application the way the login does, and no address reaches
+   * past it.
+   */
+  it("replaces the whole application until both keys are there", async () => {
+    setUp = false;
+
+    for (const address of ["/", "/projects", inbox, "/models", "/connections"]) {
+      screen = await mount(<App />, address);
+
+      expect(screen.container.textContent).toContain("Set up SignalScout");
+      expect(screen.container.textContent).toContain("Connect a data provider");
+      // No sidebar, so there is no link out of it either.
+      expect(screen.container.querySelectorAll("nav a").length).toBe(0);
+
+      await screen.unmount();
+    }
+  });
+
+  /**
+   * A failed read opens the gate rather than closing it. US-088.
+   *
+   * Locking somebody out of their own inbox because one request failed is
+   * worse than letting an unconfigured account through: the monitor form
+   * refuses a platform with no key anyway, and every poll is refused with a
+   * reason.
+   */
+  it("does not gate an account whose setup could not be read", async () => {
+    setupReadable = false;
+    screen = await mount(<App />, "/projects");
+
+    expect(screen.container.textContent).toContain("Projects");
+    expect(screen.container.textContent).not.toContain("Set up SignalScout");
   });
 
   it("shows the inbox once a project is chosen", async () => {

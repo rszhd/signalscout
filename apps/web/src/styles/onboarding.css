@@ -1,0 +1,72 @@
+/*
+  The setup gate. US-088.
+
+  It borrows the monitor setup page's two-column layout — a progress list
+  beside the work — because it is the same shape of task and a second layout
+  would be a second thing to keep in step. What is here is only what that page
+  has no equivalent for: the page fills the window rather than sitting inside
+  the shell, since it replaces the application rather than being a screen in
+  it, and a finished step is a row rather than a form.
+*/
+.onboarding-page {
+  min-height: 100vh;
+  background: var(--surface);
+}
+.onboarding-brand {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+.onboarding-brand svg {
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+.onboarding-step {
+  padding: var(--space-8) 0;
+  border-bottom: 1px solid var(--line);
+}
+.onboarding-step:last-of-type {
+  border-bottom: none;
+}
+.onboarding-step .setup-heading h2 {
+  font-size: var(--text-md);
+}
+
+/* An answered step: what it is, and what it was answered with. */
+.onboarding-done {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface-soft);
+}
+.onboarding-done > span:first-child {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  color: var(--text-on-accent);
+  background: var(--accent);
+  font-size: var(--text-xs);
+}
+.onboarding-done > span:last-child {
+  display: grid;
+  gap: 2px;
+}
+.onboarding-done small {
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+.onboarding-finish {
+  padding-top: var(--space-6);
+}
+
+@media (max-width: 760px) {
+  .onboarding-brand {
+    gap: var(--space-3);
+  }
+}

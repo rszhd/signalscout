@@ -173,3 +173,19 @@
   gap: 5px;
   vertical-align: middle;
 }
+
+/* Opt-in single-line controls share sizing across inputs and native selects. */
+.field .form-control {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  height: var(--control-height);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--line-dark);
+  border-radius: var(--radius-sm);
+  color: var(--ink);
+  background: var(--surface);
+  font: inherit;
+  font-size: var(--text-body);
+  line-height: 1.5;
+}

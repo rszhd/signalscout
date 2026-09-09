@@ -1,5 +1,6 @@
-import { type FormEvent, useEffect, useState } from "react";
+import { type FormEvent, useEffect, useRef, useState } from "react";
 import { messageFor, requestJson } from "./api.js";
+import { BrandIcon } from "./BrandIcon.js";
 
 /**
  * Which model does which job, and whose key pays for it. US-068 to US-081.
@@ -10,7 +11,7 @@ import { messageFor, requestJson } from "./api.js";
  * derived from those two answers, and the rebuild is what made that visible:
  * the earlier version asked for a provider beside a key that already named
  * one, offered the instance's model on a provider that had never heard of it,
- * and hid every job behind a disclosure so no two could be compared.
+ * and made the model and provider difficult to compare.
  *
  * Four jobs, because this product asks a model four different things and the
  * right answer differs: US-030 measured that triage only saves money when its
@@ -139,6 +140,7 @@ function KeyLibrary({
   providers: string[];
   onChanged: (view: ModelsView) => void;
 }) {
+  const dialog = useRef<HTMLDialogElement>(null);
   const [name, setName] = useState("");
   const [provider, setProvider] = useState("");
   const [apiKey, setApiKey] = useState("");
@@ -187,24 +189,30 @@ function KeyLibrary({
   return (
     <section className="models-section" aria-labelledby="models-keys-title">
       <div className="models-section-heading">
-        <h2 id="models-keys-title">API keys</h2>
-        <p>
-          Add a key once and name it. Each job below chooses one, and a key can pay for as many jobs
-          as you like.
-        </p>
+        <div className="models-section-title">
+          <h2 id="models-keys-title">API keys</h2>
+          <span className="models-count">{keys.length} saved</span>
+        </div>
+        <p>Save a key once and reuse it across jobs.</p>
       </div>
 
+      {keys.length === 0 && (
+        <p className="models-empty">No saved keys yet. Add your provider’s key to get started.</p>
+      )}
       {keys.length > 0 && (
         <ul className="key-list">
           {keys.map((stored) => (
             <li className="key-row" key={stored.id}>
-              <span className="key-identity">
-                <strong>{stored.name}</strong>
-                <span>
-                  {stored.provider ? providerName(stored.provider) : "No provider set"} ·{" "}
-                  {stored.hint}
+              <div className="key-account">
+                <BrandIcon brand={stored.provider ?? "key"} size={26} />
+                <span className="key-identity">
+                  <strong>{stored.name}</strong>
+                  <span>
+                    {stored.provider ? providerName(stored.provider) : "No provider set"} ·{" "}
+                    {stored.hint}
+                  </span>
                 </span>
-              </span>
+              </div>
               {/*
                 No confirmation. Nothing is lost that cannot be pasted again,
                 every job pointing at it goes back to the instance's key where
@@ -224,77 +232,164 @@ function KeyLibrary({
         </ul>
       )}
 
-      <form className="key-form" onSubmit={add}>
-        <div className="key-form-fields">
-          <label className="field">
-            <span>Name</span>
-            <input
-              aria-label="Key name"
-              placeholder="My OpenAI key"
-              value={name}
-              onChange={(event) => setName(event.target.value)}
-            />
-          </label>
+      <button
+        className="secondary-button key-add"
+        type="button"
+        onClick={() => dialog.current?.showModal()}
+      >
+        Add an API key
+      </button>
+      <dialog className="models-dialog" ref={dialog} aria-labelledby="add-model-key-title">
+        <header className="models-dialog-heading">
+          <h2 id="add-model-key-title">Add an API key</h2>
+          <button
+            className="secondary-button"
+            type="button"
+            aria-label="Close API key dialog"
+            onClick={() => dialog.current?.close()}
+          >
+            Close
+          </button>
+        </header>
+        <form className="key-form" onSubmit={add}>
+          <div className="key-form-fields">
+            <label className="field">
+              <span>Name</span>
+              <input
+                className="form-control"
+                aria-label="Key name"
+                placeholder="My OpenAI key"
+                value={name}
+                onChange={(event) => setName(event.target.value)}
+              />
+            </label>
 
-          <label className="field">
-            <span>Provider</span>
-            <select
-              aria-label="Key provider"
-              value={provider}
-              onChange={(event) => setProvider(event.target.value)}
-            >
-              <option value="">Not stated</option>
-              {providers.map((one) => (
-                <option key={one} value={one}>
-                  {providerName(one)}
-                </option>
-              ))}
-            </select>
-          </label>
+            <label className="field">
+              <span>Provider</span>
+              <select
+                className="form-control"
+                aria-label="Key provider"
+                value={provider}
+                onChange={(event) => setProvider(event.target.value)}
+              >
+                <option value="">Not stated</option>
+                {providers.map((one) => (
+                  <option key={one} value={one}>
+                    {providerName(one)}
+                  </option>
+                ))}
+              </select>
+            </label>
 
-          <label className="field">
-            <span>Key</span>
-            <input
-              aria-label="New API key"
-              autoComplete="off"
-              disabled={!canStore}
-              placeholder="Pasted once, stored encrypted"
-              spellCheck={false}
-              type="password"
-              value={apiKey}
-              onChange={(event) => setApiKey(event.target.value)}
-            />
-          </label>
-        </div>
+            <label className="field">
+              <span>Key</span>
+              <input
+                className="form-control"
+                aria-label="New API key"
+                autoComplete="off"
+                disabled={!canStore}
+                placeholder="Pasted once, stored encrypted"
+                spellCheck={false}
+                type="password"
+                value={apiKey}
+                onChange={(event) => setApiKey(event.target.value)}
+              />
+            </label>
+          </div>
 
-        <p className="key-form-note">
-          A key that names a provider sets the provider of every job that uses it.
-        </p>
-
-        {error && (
-          <p className="form-error" role="alert">
-            {error}
+          <p className="key-form-note">
+            A key that names a provider sets the provider of every job that uses it.
           </p>
-        )}
 
-        <button
-          className="primary-button"
-          disabled={busy || !canStore || !name.trim() || !apiKey.trim()}
-          type="submit"
-        >
-          {busy ? "Saving…" : "Add key"}
-        </button>
-      </form>
+          {error && (
+            <p className="form-error" role="alert">
+              {error}
+            </p>
+          )}
+
+          <button
+            className="primary-button"
+            disabled={busy || !canStore || !name.trim() || !apiKey.trim()}
+            type="submit"
+          >
+            {busy ? "Saving…" : "Add key"}
+          </button>
+        </form>
+      </dialog>
     </section>
+  );
+}
+
+/** Use the same native picker as Provider, with explicit custom-name entry. */
+function ModelField({
+  title,
+  task,
+  value,
+  fallback,
+  suggestions,
+  onChange,
+}: {
+  title: string;
+  task: string;
+  value: string;
+  fallback: string | null;
+  suggestions: string[];
+  onChange: (value: string) => void;
+}) {
+  const [custom, setCustom] = useState(false);
+  const isCustom = custom || Boolean(value && !suggestions.includes(value));
+
+  return (
+    <div className="field">
+      <label htmlFor={`model-${task}`}>Model</label>
+      <select
+        id={`model-${task}`}
+        className="form-control"
+        aria-label={`${title} model`}
+        value={isCustom ? "__custom__" : value}
+        onChange={(event) => {
+          const next = event.target.value;
+          setCustom(next === "__custom__");
+          onChange(next === "__custom__" ? "" : next);
+        }}
+      >
+        <option value="">{fallback ? `Instance default · ${fallback}` : "Choose a model"}</option>
+        <optgroup id={`models-${task}`} label="Models">
+          {suggestions.map((name) => (
+            <option key={name} value={name}>
+              {name}
+            </option>
+          ))}
+        </optgroup>
+        <option value="__custom__">Custom model…</option>
+      </select>
+      {isCustom && (
+        <label className="field">
+          <span>Custom model name</span>
+          <input
+            className="form-control"
+            aria-label={`${title} custom model`}
+            placeholder="Enter the provider’s model ID"
+            spellCheck={false}
+            value={value}
+            onChange={(event) => onChange(event.target.value)}
+          />
+          <small>Unlisted models still run, but their cost is not estimated.</small>
+        </label>
+      )}
+      {!fallback && !value && (
+        <small>
+          This instance's model is on another provider, so this job needs one of its own.
+        </small>
+      )}
+    </div>
   );
 }
 
 /**
  * One job.
  *
- * Open on the page rather than behind a disclosure: there are four, a person
- * comparing them is the normal case, and the settings that matter are two
- * fields. The rest is behind *Advanced*.
+ * The saved model and provider stay visible. Open a job’s modal to change its settings.
  */
 function JobCard({
   task,
@@ -309,6 +404,7 @@ function JobCard({
   embeddingModels: Record<string, string>;
   onSaved: (view: ModelsView) => void;
 }) {
+  const dialog = useRef<HTMLDialogElement>(null);
   const [draft, setDraft] = useState<Draft>(() => draftOf(task));
   const [busy, setBusy] = useState(false);
   const [testing, setTesting] = useState(false);
@@ -489,186 +585,204 @@ function JobCard({
 
   return (
     <li className="job">
-      <div className="job-heading">
-        <h3>{task.title}</h3>
-        <p>{task.what}</p>
-      </div>
+      <button
+        className="job-heading"
+        type="button"
+        aria-label={`Edit ${task.title}`}
+        aria-haspopup="dialog"
+        onClick={() => dialog.current?.showModal()}
+      >
+        <span className="job-identity">
+          <strong>{task.title}</strong>
+          <span>
+            {task.model ||
+              (task.provider && task.provider !== task.instance.provider
+                ? "Choose a model"
+                : task.instance.model) ||
+              "Not configured"}
+          </span>
+        </span>
+        <span className="job-provider">
+          <BrandIcon brand={task.provider ?? task.instance.provider} size={20} />
+          {providerName(task.provider ?? task.instance.provider)}
+        </span>
+        <span className="job-edit-label">Edit</span>
+      </button>
+      <dialog className="models-dialog" ref={dialog} aria-labelledby={`job-title-${task.task}`}>
+        <header className="models-dialog-heading">
+          <h2 id={`job-title-${task.task}`}>{task.title}</h2>
+          <button
+            className="secondary-button"
+            type="button"
+            aria-label={`Close ${task.title}`}
+            onClick={() => dialog.current?.close()}
+          >
+            Close
+          </button>
+        </header>
+        <p className="job-description">{task.what}</p>
 
-      <form className="job-form" onSubmit={submit}>
-        <div className="job-fields">
-          <label className="field">
-            <span>Key</span>
-            <select
-              aria-label={`${task.title} key`}
-              value={draft.keyId}
-              onChange={(event) => change("keyId", event.target.value)}
-            >
-              {/*
+        <form className="job-form" onSubmit={submit}>
+          <div className="job-fields">
+            <label className="field">
+              <span>Key</span>
+              <select
+                className="form-control"
+                aria-label={`${task.title} key`}
+                value={draft.keyId}
+                onChange={(event) => change("keyId", event.target.value)}
+              >
+                {/*
                 The truth about the machine, not a hopeful label. Where signup
                 is open the instance's keys are nobody's to spend, and offering
                 one would offer a job that cannot run.
               */}
-              <option value="">
-                {task.instance.hasKey ? "This instance's key" : "No key — this job cannot run"}
-              </option>
-              {usable.map((one) => (
-                <option key={one.id} value={one.id}>
-                  {one.name} · {one.provider ? providerName(one.provider) : "no provider"} ·{" "}
-                  {one.hint}
+                <option value="">
+                  {task.instance.hasKey ? "This instance's key" : "No key — this job cannot run"}
                 </option>
-              ))}
-            </select>
-            <small>
-              {!task.instance.hasKey && !draft.keyId
-                ? `This instance has no ${providerName(provider)} key, so this job will not run until you choose one.`
-                : usable.length === 0
-                  ? "Add a key above to pay for this job from your own account."
-                  : "Any key above can pay for this job."}
-            </small>
-          </label>
-
-          {fromKey ? (
-            <p className="field field-fixed">
-              <span>Provider</span>
-              <strong>{providerName(fromKey)}</strong>
-              <small>From the key you chose.</small>
-            </p>
-          ) : (
-            <label className="field">
-              <span>Provider</span>
-              {/*
-                Providers, and no "instance default" among them. A first entry
-                naming a setting asks a person to hold what the instance is set
-                to in order to read their own job.
-              */}
-              <select
-                aria-label={`${task.title} provider`}
-                value={draft.provider}
-                onChange={(event) => change("provider", event.target.value)}
-              >
-                {task.providers.map((one) => (
-                  <option key={one} value={one}>
-                    {providerName(one)}
+                {usable.map((one) => (
+                  <option key={one.id} value={one.id}>
+                    {one.name} · {one.provider ? providerName(one.provider) : "no provider"} ·{" "}
+                    {one.hint}
                   </option>
                 ))}
               </select>
               <small>
-                {task.provider
-                  ? "Your own choice for this job."
-                  : `This instance runs on ${providerName(task.instance.provider)}.`}
+                {!task.instance.hasKey && !draft.keyId
+                  ? `This instance has no ${providerName(provider)} key, so this job will not run until you choose one.`
+                  : usable.length === 0
+                    ? "Add a key in API keys to pay from your own account."
+                    : "Choose a saved key for this job."}
               </small>
             </label>
-          )}
 
-          <label className="field">
-            <span>Model</span>
-            <input
-              aria-label={`${task.title} model`}
-              list={`models-${task.task}`}
-              placeholder={
-                onInstanceProvider
-                  ? (task.instance.model ?? "None — this job is off")
-                  : `Name a ${providerName(provider)} model`
-              }
-              spellCheck={false}
+            {fromKey ? (
+              <p className="field field-fixed">
+                <span>Provider</span>
+                <strong className="form-control">{providerName(fromKey)}</strong>
+                <small>From the key you chose.</small>
+              </p>
+            ) : (
+              <label className="field">
+                <span>Provider</span>
+                {/*
+                Providers, and no "instance default" among them. A first entry
+                naming a setting asks a person to hold what the instance is set
+                to in order to read their own job.
+              */}
+                <select
+                  className="form-control"
+                  aria-label={`${task.title} provider`}
+                  value={draft.provider}
+                  onChange={(event) => change("provider", event.target.value)}
+                >
+                  {task.providers.map((one) => (
+                    <option key={one} value={one}>
+                      {providerName(one)}
+                    </option>
+                  ))}
+                </select>
+                <small>
+                  {task.provider
+                    ? "Your own choice for this job."
+                    : `This instance runs on ${providerName(task.instance.provider)}.`}
+                </small>
+              </label>
+            )}
+
+            <ModelField
+              key={`${provider}:${task.model ?? ""}`}
+              title={task.title}
+              task={task.task}
               value={draft.model}
-              onChange={(event) => change("model", event.target.value)}
+              fallback={onInstanceProvider ? task.instance.model : null}
+              suggestions={suggestions}
+              onChange={(value) => change("model", value)}
             />
-            {/* This job's provider and no other: a name from another one
-                fails every call. */}
-            <datalist id={`models-${task.task}`}>
-              {suggestions.map((one) => (
-                <option key={one} value={one} />
-              ))}
-            </datalist>
-            <small>
-              {model
-                ? "Unlisted models still run, but their cost is not estimated."
-                : `This instance's model is a ${providerName(task.instance.provider)} name, so this job needs one of its own.`}
-            </small>
-          </label>
-        </div>
+          </div>
 
-        <p className="job-summary">
-          {model ? (
-            <>
-              Runs <strong>{model}</strong> on {providerName(provider)}
-              {paying ? (
-                <>
-                  , paid by <strong>{paying}</strong>.
-                </>
-              ) : (
-                <>, and has no key to pay for it.</>
-              )}
-            </>
-          ) : (
-            <>Not configured: name a model above.</>
-          )}
-        </p>
-
-        <details className="disclosure job-advanced">
-          <summary>Advanced</summary>
-          <p className="job-note">{task.note}</p>
-          <label className="field">
-            <span>Base URL</span>
-            <input
-              aria-label={`${task.title} base URL`}
-              placeholder="The provider's own endpoint"
-              spellCheck={false}
-              value={draft.baseUrl}
-              onChange={(event) => change("baseUrl", event.target.value)}
-            />
-            <small>For a self-hosted gateway or a local runtime such as Ollama.</small>
-          </label>
-        </details>
-
-        {(error || notice) && (
-          <p className={error ? "form-error" : "job-answer"} role={error ? "alert" : "status"}>
-            {error ?? notice}
+          <p className="job-summary">
+            {model ? (
+              <>
+                Runs <strong>{model}</strong> on {providerName(provider)}
+                {paying ? (
+                  <>
+                    , paid by <strong>{paying}</strong>.
+                  </>
+                ) : (
+                  <>, and has no key to pay for it.</>
+                )}
+              </>
+            ) : (
+              <>Not configured: name a model above.</>
+            )}
           </p>
-        )}
 
-        <div className="job-actions">
-          {/*
+          <details className="disclosure job-advanced">
+            <summary>Advanced</summary>
+            <p className="job-note">{task.note}</p>
+            <label className="field">
+              <span>Base URL</span>
+              <input
+                className="form-control"
+                aria-label={`${task.title} base URL`}
+                placeholder="The provider's own endpoint"
+                spellCheck={false}
+                value={draft.baseUrl}
+                onChange={(event) => change("baseUrl", event.target.value)}
+              />
+              <small>For a self-hosted gateway or a local runtime such as Ollama.</small>
+            </label>
+          </details>
+
+          {(error || notice) && (
+            <p className={error ? "form-error" : "job-answer"} role={error ? "alert" : "status"}>
+              {error ?? notice}
+            </p>
+          )}
+
+          <div className="job-actions">
+            {/*
             A job on another provider with no model would save a setting that
             cannot run. Refused here and on the server, which is the one that
             has to be right.
           */}
-          <button className="primary-button" disabled={busy || testing || !model} type="submit">
-            {busy ? "Saving…" : "Save changes"}
-          </button>
-
-          {/* Both halves, as they stand on screen — a test with no key would
-              test the instance's, which is not what the button says. */}
-          {draft.keyId && model && (
-            <button
-              className="secondary-button"
-              disabled={busy || testing}
-              type="button"
-              onClick={() => void test()}
-            >
-              {testing ? "Testing…" : "Test key"}
+            <button className="primary-button" disabled={busy || testing || !model} type="submit">
+              {busy ? "Saving…" : "Save changes"}
             </button>
-          )}
 
-          {/*
+            {/* Both halves, as they stand on screen — a test with no key would
+              test the instance's, which is not what the button says. */}
+            {draft.keyId && model && (
+              <button
+                className="secondary-button"
+                disabled={busy || testing}
+                type="button"
+                onClick={() => void test()}
+              >
+                {testing ? "Testing…" : "Test key"}
+              </button>
+            )}
+
+            {/*
             Only where the instance has a key for this job. Clearing a job
             hands it back to the deployment's provider, model and key — and
             where signup is open there is no key to hand it back to, so the
             button would offer a job that cannot run and call it a default.
           */}
-          {customised && task.instance.hasKey && (
-            <button
-              className="text-button"
-              disabled={busy || testing}
-              type="button"
-              onClick={() => void resetToInstance()}
-            >
-              Use instance defaults
-            </button>
-          )}
-        </div>
-      </form>
+            {customised && task.instance.hasKey && (
+              <button
+                className="text-button"
+                disabled={busy || testing}
+                type="button"
+                onClick={() => void resetToInstance()}
+              >
+                Use instance defaults
+              </button>
+            )}
+          </div>
+        </form>
+      </dialog>
     </li>
   );
 }
@@ -752,7 +866,10 @@ export function Models() {
 
         <section className="models-section" aria-labelledby="models-jobs-title">
           <div className="models-section-heading">
-            <h2 id="models-jobs-title">Jobs</h2>
+            <div className="models-section-title">
+              <h2 id="models-jobs-title">Models by job</h2>
+              <span className="models-count">{view.tasks.length} jobs</span>
+            </div>
             {/*
               Two sentences, because the answer differs. Where the machine
               holds keys, a job left alone runs on them; where it does not —

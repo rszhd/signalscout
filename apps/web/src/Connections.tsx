@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { messageFor, requestJson } from "./api.js";
 import { BrandIcon } from "./BrandIcon.js";
 
@@ -120,6 +120,7 @@ function ProviderCard({
   canStore: boolean;
   onChanged: (provider: ProviderView) => void;
 }) {
+  const dialog = useRef<HTMLDialogElement>(null);
   const [typed, setTyped] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
   const [answer, setAnswer] = useState<Answer | null>(null);
@@ -203,8 +204,8 @@ function ProviderCard({
 
   return (
     <li className="connection-row">
-      <details className="connection-account">
-        <summary className="connection-summary">
+      <div className="connection-account">
+        <div className="connection-summary">
           <span className="connection-avatar" aria-hidden="true">
             <BrandIcon brand={provider.id} size={26} />
           </span>
@@ -240,11 +241,39 @@ function ProviderCard({
           <span className={`connection-status ${provider.ready ? "connected" : "missing"}`}>
             {provider.ready ? "Connected" : "Not connected"}
           </span>
-          <span className="connection-expand">
+          <button
+            type="button"
+            className="secondary-button connection-manage"
+            aria-haspopup="dialog"
+            aria-label={`${provider.ready ? "Manage" : "Connect"} ${provider.displayName}`}
+            onClick={() => dialog.current?.showModal()}
+          >
             {provider.ready ? "Manage" : "Connect"}
-            <span aria-hidden="true">⌄</span>
+          </button>
+        </div>
+      </div>
+      <dialog
+        className="connection-dialog"
+        ref={dialog}
+        aria-labelledby={`account-title-${provider.id}`}
+      >
+        <header className="connection-dialog-heading">
+          <span className="connection-avatar" aria-hidden="true">
+            <BrandIcon brand={provider.id} size={26} />
           </span>
-        </summary>
+          <div className="connection-dialog-title">
+            <h2 id={`account-title-${provider.id}`}>{provider.displayName}</h2>
+            <p>{provider.ready ? "Manage your connection" : "Connect your account"}</p>
+          </div>
+          <button
+            type="button"
+            className="secondary-button"
+            aria-label={`Close ${provider.displayName} dialog`}
+            onClick={() => dialog.current?.close()}
+          >
+            Close
+          </button>
+        </header>
         <div className="connection-editor">
           <p className="connection-editor-note">
             {provider.ready
@@ -294,37 +323,36 @@ function ProviderCard({
             </div>
           ))}
 
-          <div className="connection-actions">
+          {answer && (
+            <p
+              className={answer.tone === "good" ? "connection-answer good" : "budget-error"}
+              role={answer.tone === "good" ? "status" : "alert"}
+            >
+              {answer.text}
+            </p>
+          )}
+        </div>
+        <footer className="connection-actions">
+          <button
+            type="button"
+            className="secondary-button"
+            disabled={busy}
+            onClick={() => void test()}
+          >
+            Test connection
+          </button>
+          {canStore && (
             <button
               type="button"
-              className="secondary-button"
+              className="primary-button"
               disabled={busy}
-              onClick={() => void test()}
+              onClick={() => void save()}
             >
-              Test connection
+              Save key
             </button>
-            {canStore && (
-              <button
-                type="button"
-                className="primary-button"
-                disabled={busy}
-                onClick={() => void save()}
-              >
-                Save key
-              </button>
-            )}
-          </div>
-        </div>
-      </details>
-
-      {answer && (
-        <p
-          className={answer.tone === "good" ? "connection-answer good" : "budget-error"}
-          role={answer.tone === "good" ? "status" : "alert"}
-        >
-          {answer.text}
-        </p>
-      )}
+          )}
+        </footer>
+      </dialog>
     </li>
   );
 }
@@ -348,6 +376,7 @@ function PlatformRow({
   platform: PlatformView;
   onChanged: (view: ConnectionsView) => void;
 }) {
+  const dialog = useRef<HTMLDialogElement>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -378,17 +407,8 @@ function PlatformRow({
 
   return (
     <li className="connection-row">
-      {/*
-        Closed, whatever the platform's state.
-
-        This section used to open a row that needed a choice, on the argument
-        that a question should be visible. The summary already asks it — the
-        status reads "Choose one" — and a list where some rows are open and
-        others are not is harder to read than a list of shut rows. So the
-        question is in the summary and the answer is one press away.
-      */}
-      <details className="platform-connection">
-        <summary className="connection-summary">
+      <div className="platform-connection">
+        <div className="connection-summary">
           <span className="connection-avatar" aria-hidden="true">
             <BrandIcon brand={platform.id} size={24} />
           </span>
@@ -401,10 +421,39 @@ function PlatformRow({
           <span className={`connection-status ${effective ? "connected" : "missing"}`}>
             {effective ? "Ready" : platform.needsChoice ? "Choose one" : "Unavailable"}
           </span>
-          <span className="connection-expand">
-            Change<span aria-hidden="true">⌄</span>
+          <button
+            type="button"
+            className="secondary-button connection-manage"
+            aria-haspopup="dialog"
+            aria-label={`Change provider for ${platform.displayName}`}
+            onClick={() => dialog.current?.showModal()}
+          >
+            Change
+          </button>
+        </div>
+      </div>
+      <dialog
+        className="connection-dialog"
+        ref={dialog}
+        aria-labelledby={`platform-title-${platform.id}`}
+      >
+        <header className="connection-dialog-heading">
+          <span className="connection-avatar" aria-hidden="true">
+            <BrandIcon brand={platform.id} size={26} />
           </span>
-        </summary>
+          <div className="connection-dialog-title">
+            <h2 id={`platform-title-${platform.id}`}>Provider for {platform.displayName}</h2>
+            <p>Choose which account fetches conversations.</p>
+          </div>
+          <button
+            type="button"
+            className="secondary-button"
+            aria-label={`Close ${platform.displayName} dialog`}
+            onClick={() => dialog.current?.close()}
+          >
+            Close
+          </button>
+        </header>
         <div className="connection-editor">
           <fieldset className="provider-choice">
             <legend className="visually-hidden">Provider for {platform.displayName}</legend>
@@ -414,13 +463,13 @@ function PlatformRow({
                 key={provider.id}
               >
                 <input
-                  className="visually-hidden"
                   checked={platform.chosen === provider.id}
                   disabled={busy || !provider.connected}
                   name={`provider-for-${platform.id}`}
                   type="radio"
                   onChange={() => void choose(provider.id)}
                 />
+                <BrandIcon brand={provider.id} size={24} />
                 <span>
                   <strong>{provider.displayName}</strong>
                   <small>{provider.connected ? "Connected" : "No key here"}</small>
@@ -454,7 +503,7 @@ function PlatformRow({
             </p>
           )}
         </div>
-      </details>
+      </dialog>
     </li>
   );
 }

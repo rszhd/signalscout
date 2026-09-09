@@ -97,15 +97,16 @@ plan is marked stale. Creation is always an explicit final action.
 
 ## Connections
 
-Connections lists provider accounts as compact native disclosures. The closed
-row names the platforms, configuration status and masked key origin. Testing,
-pasting, replacing and removing keys stay inside the account being managed.
-Opening a row makes no API call. Responses remain visible beneath the account
-if its controls are collapsed, and editing a key clears the previous test result.
+Connections lists provider accounts as compact rows. Each row names the
+platforms, configuration status and masked key origin. Connect or Manage opens
+a native dialog for testing, pasting, replacing and removing keys. Opening a
+dialog makes no API call. Responses appear inside the dialog, and editing a key
+clears the previous test result. Close and Escape dismiss the dialog and return
+focus to its trigger.
 
-Platform choices are separate from accounts. Rows with a blocker or an unresolved
-choice start expanded; healthy rows start compact. Keep the server’s provider
-selection rules, environment-key fallback and test-before-save behavior intact.
+Platform choices are separate from accounts. Change opens a dialog with the
+available providers and any blocker. Keep the server’s provider selection rules,
+environment-key fallback and test-before-save behavior intact.
 `styles/connections.css` owns this page layout and uses the shared theme.
 
 ## Provider and platform icons
@@ -148,9 +149,11 @@ theme. Self-hosted instances show no payment action.
 
 ## Models
 
-Models opens as a compact list of jobs, their current models and providers,
-and whether they use instance defaults. Every editor starts closed. Opening
-a job reveals its provider, model and key fields; model guidance and custom
-endpoints have their own disclosures. Keep empty-field inheritance, masked
-keys, save feedback and reset actions intact. `styles/models.css` owns the
-layout, which stacks on phones and uses the shared theme.
+Models shows saved keys and a compact list of jobs with their current model
+and provider. Each job opens a modal to edit its settings, with native focus containment,
+Escape to close and a visible Close button. Model and provider use native
+selects with shared control styling; “Custom model…” reveals a model-name input. Adding a key
+opens its own modal. Advanced settings stay
+inside the job editor. Preserve inheritance, provider compatibility, paid tests,
+save feedback and reset actions. `styles/models.css` owns the responsive layout
+and uses the shared theme.

@@ -1,11 +1,4 @@
-/*
-  The Models screen. US-081 rebuilt it.
-
-  Two sections down one column: the account's keys, then the four jobs that
-  choose one. Whitespace and dividers rather than a card around everything, per
-  docs/design.md, and every job open — four is few, comparing them is the normal
-  reason to be here, and a disclosure per job hid exactly that.
-*/
+/* Models: a shared key library above comparable job editors. */
 
 .models-page {
   min-height: 100vh;
@@ -17,7 +10,7 @@
   margin: 0 auto;
   padding: var(--space-8) var(--page-gutter) var(--space-12);
   display: grid;
-  gap: var(--space-12);
+  gap: var(--space-8);
 }
 
 .models-blocker {
@@ -38,7 +31,7 @@
 }
 
 .models-section-heading h2 {
-  margin: 0 0 var(--space-2);
+  margin: 0;
   font-size: var(--text-md);
 }
 
@@ -52,6 +45,7 @@
 /* One field: a label, a control, and a line saying what it falls back to. */
 .models-content .field {
   display: grid;
+  align-content: start;
   gap: var(--space-2);
   min-width: 0;
   margin: 0;
@@ -64,39 +58,24 @@
 }
 
 .models-content .field > small {
+  margin: 0;
   color: var(--muted);
   font-size: var(--text-xs);
   line-height: 1.5;
 }
 
-.models-content :where(.field input, .field select) {
-  width: 100%;
-  min-height: var(--control-height);
-  padding: 0 var(--space-3);
-  border: 1px solid var(--line-dark);
-  border-radius: var(--radius-sm);
-  color: var(--ink);
-  background: var(--surface);
-  font: inherit;
-  font-size: var(--text-sm);
-}
-
-/* A provider the chosen key already decided: shown, not asked. */
+/* A provider determined by the key shares the standard control dimensions. */
 .field-fixed > strong {
   display: flex;
   align-items: center;
-  min-height: var(--control-height);
-  padding: 0 var(--space-3);
-  border: 1px dashed var(--line-dark);
-  border-radius: var(--radius-sm);
-  font-size: var(--text-sm);
-  font-weight: 500;
+  font-weight: 400;
 }
 
 /* The account's keys. */
 .key-list {
   display: grid;
-  gap: var(--space-2);
+  gap: var(--space-3);
+  grid-template-columns: 1fr;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -137,11 +116,7 @@
 .key-form-fields {
   display: grid;
   gap: var(--space-4);
-  grid-template-columns: 1fr 1fr;
-}
-
-.key-form-fields .field:last-child {
-  grid-column: 1 / -1;
+  grid-template-columns: 1fr 1fr 1.5fr;
 }
 
 .key-form-note {
@@ -154,26 +129,29 @@
   justify-self: start;
 }
 
-/* The jobs. A divider between them rather than a box around each. */
+/* Saved models stay visible; editors open independently. */
 .job-list {
   display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
   margin: 0;
   padding: 0;
   list-style: none;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  overflow: hidden;
 }
 
 .job {
   display: grid;
   gap: var(--space-5);
-  padding: var(--space-8) 0;
-}
-
-.job + .job {
-  border-top: 1px solid var(--line);
+  padding: 0;
+  min-width: 0;
 }
 
 .job-heading h3 {
-  margin: 0 0 var(--space-1);
+  margin: 0;
   font-size: var(--text-body);
 }
 
@@ -192,7 +170,7 @@
 .job-fields {
   display: grid;
   gap: var(--space-5);
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 /* The key spans the row: its name and mask are the longest thing here. */
@@ -235,7 +213,14 @@
   font-size: var(--text-sm);
 }
 
+@media (width <= 1100px) {
+  .job-list {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (width <= 720px) {
+  .key-list,
   .key-form-fields,
   .job-fields {
     grid-template-columns: 1fr;
@@ -243,5 +228,203 @@
 
   .key-row {
     align-items: flex-start;
+  }
+}
+
+.models-section-title,
+.job-title-row,
+.key-account,
+.job-provider {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.models-section-title,
+.job-title-row {
+  flex-wrap: wrap;
+  margin-bottom: var(--space-3);
+}
+
+.job-title-row {
+  justify-content: space-between;
+}
+
+.models-count,
+.job-provider {
+  font-size: var(--text-xs);
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.models-count {
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  background: var(--surface-soft);
+  border: 1px solid var(--line);
+}
+
+.key-form h3 {
+  margin: 0;
+  font-size: var(--text-body);
+}
+
+.models-empty {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--text-sm);
+  border-left: 2px solid var(--line-dark);
+  padding-left: var(--space-4);
+}
+
+.key-identity,
+.job-summary,
+.job-answer,
+.models-content .form-error {
+  overflow-wrap: anywhere;
+}
+
+@media (width <= 720px) {
+  .job,
+  .key-form {
+    padding: var(--space-5);
+  }
+
+  .job-actions > button {
+    flex-grow: 1;
+  }
+}
+
+.job + .job {
+  border-top: 1px solid var(--line);
+}
+
+.job-heading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-5) var(--space-6);
+  cursor: pointer;
+  list-style: none;
+}
+
+.job-heading:hover {
+  background: var(--surface-hover);
+}
+
+.job-identity {
+  display: grid;
+  gap: var(--space-1);
+  flex: 1;
+  min-width: 0;
+}
+
+.models-content .job-identity > span {
+  font-size: var(--text-sm);
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
+.job-description {
+  margin: 0;
+  padding: 0 var(--space-6) var(--space-5);
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+
+.job-form {
+  padding: 0 var(--space-6) var(--space-6);
+}
+
+.key-add {
+  justify-self: start;
+}
+
+@media (width <= 720px) {
+  .job {
+    padding: 0;
+  }
+
+  .job-heading {
+    flex-wrap: wrap;
+    padding: var(--space-4);
+  }
+
+  .job-identity {
+    flex-basis: 65%;
+  }
+
+  .job-form {
+    padding: 0 var(--space-4) var(--space-4);
+  }
+}
+
+.job-heading {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+}
+
+.job-edit-label {
+  color: var(--accent-text);
+  font-size: var(--text-sm);
+}
+
+.models-dialog {
+  width: min(680px, calc(100% - var(--space-8)));
+  max-height: calc(100dvh - var(--space-8));
+  margin: auto;
+  padding: 0;
+  overflow-y: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--shadow);
+}
+
+.models-dialog::backdrop {
+  background: var(--ink);
+  opacity: 0.4;
+}
+
+.models-dialog-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-6);
+}
+
+.models-dialog-heading h2 {
+  margin: 0;
+  font-size: var(--text-md);
+}
+
+.models-dialog .key-form {
+  padding-top: 0;
+  border: 0;
+}
+
+.models-dialog .key-form-fields {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.models-dialog .key-form-fields > .field:last-child {
+  grid-column: 1 / -1;
+}
+
+@media (width <= 720px) {
+  .models-dialog-heading,
+  .models-dialog .key-form {
+    padding: var(--space-4);
+  }
+
+  .models-dialog .key-form-fields {
+    grid-template-columns: 1fr;
   }
 }

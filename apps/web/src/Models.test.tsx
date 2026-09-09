@@ -9,10 +9,25 @@
  * account's keys, that a save carries the choice, and that adding a key posts
  * to the key route and nowhere else.
  */
-import { act } from "react";
+import { act, type ReactElement } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Models } from "./Models.js";
-import { button, field, json, mount, type Screen, select, settle, setValue } from "./testing.js";
+import {
+  button,
+  field,
+  json,
+  mount as mountScreen,
+  type Screen,
+  select,
+  settle,
+  setValue,
+} from "./testing.js";
+
+async function mount(element: ReactElement) {
+  const screen = await mountScreen(element);
+  await act(async () => button("Edit Scoring posts").click());
+  return screen;
+}
 
 function view(overrides: Record<string, unknown> = {}, keys: unknown[] = []) {
   return {
@@ -49,6 +64,19 @@ describe("the models screen", () => {
   let fetched: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
+    // jsdom has no dialog top layer; browser checks cover native focus and Escape.
+    Object.defineProperty(HTMLDialogElement.prototype, "showModal", {
+      configurable: true,
+      value: function (this: HTMLDialogElement) {
+        this.open = true;
+      },
+    });
+    Object.defineProperty(HTMLDialogElement.prototype, "close", {
+      configurable: true,
+      value: function (this: HTMLDialogElement) {
+        this.open = false;
+      },
+    });
     fetched = vi.fn(async () => json(view()));
     vi.stubGlobal("fetch", fetched);
   });
@@ -56,6 +84,36 @@ describe("the models screen", () => {
   afterEach(async () => {
     await screen?.unmount();
     vi.unstubAllGlobals();
+    Reflect.deleteProperty(HTMLDialogElement.prototype, "showModal");
+    Reflect.deleteProperty(HTMLDialogElement.prototype, "close");
+  });
+
+  it("opens job settings in a modal and closes without saving", async () => {
+    screen = await mountScreen(<Models />);
+    const dialog = document.querySelector(
+      'dialog[aria-labelledby="job-title-classify"]',
+    ) as HTMLDialogElement;
+    expect(dialog.open).toBe(false);
+    await act(async () => button("Edit Scoring posts").click());
+    expect(dialog.open).toBe(true);
+    setValue(select("Scoring posts model"), "claude-sonnet-5");
+    await act(async () => button("Close Scoring posts").click());
+    expect(dialog.open).toBe(false);
+    expect(fetched).toHaveBeenCalledTimes(1);
+    await act(async () => button("Edit Scoring posts").click());
+    expect(select("Scoring posts model").value).toBe("claude-sonnet-5");
+  });
+
+  it("opens the add-key form in its own modal", async () => {
+    screen = await mountScreen(<Models />);
+    const dialog = document.querySelector(
+      'dialog[aria-labelledby="add-model-key-title"]',
+    ) as HTMLDialogElement;
+    expect(dialog.open).toBe(false);
+    await act(async () => button("Add an API key").click());
+    expect(dialog.open).toBe(true);
+    await act(async () => button("Close API key dialog").click());
+    expect(dialog.open).toBe(false);
   });
 
   it("says what an empty field falls back to", async () => {
@@ -65,7 +123,9 @@ describe("the models screen", () => {
     // job will run on rather than a blank standing for it.
     expect(select("Scoring posts provider").value).toBe("anthropic");
     expect(screen.container.textContent).toContain("This instance runs on Anthropic.");
-    expect(field("Scoring posts model").placeholder).toBe("claude-haiku-4-5");
+    expect(select("Scoring posts model").selectedOptions[0]?.textContent).toBe(
+      "Instance default · claude-haiku-4-5",
+    );
     // And the key it would use, which on an account with none is the machine's.
     expect(select("Scoring posts key").value).toBe("");
     expect(screen.container.textContent).toContain("This instance's key");
@@ -103,7 +163,7 @@ describe("the models screen", () => {
 
     setValue(select("Scoring posts key"), storedKey.id);
     // The key moves the job to OpenAI, so it needs an OpenAI model name.
-    setValue(field("Scoring posts model"), "gpt-5.6-terra");
+    setValue(select("Scoring posts model"), "gpt-5.6-terra");
     await act(async () => button("Save changes").click());
     await settle();
 
@@ -228,7 +288,7 @@ describe("the models screen", () => {
     screen = await mount(<Models />);
 
     setValue(select("Scoring posts key"), storedKey.id);
-    setValue(field("Scoring posts model"), "gpt-5.6-terra");
+    setValue(select("Scoring posts model"), "gpt-5.6-terra");
     await settle();
 
     expect(screen.container.textContent).toContain("From the key you chose");
@@ -239,7 +299,7 @@ describe("the models screen", () => {
     await settle();
 
     expect(select("Scoring posts provider").value).toBe("anthropic");
-    expect(field("Scoring posts model").value).toBe("");
+    expect(select("Scoring posts model").value).toBe("");
   });
 
   /**
@@ -258,7 +318,7 @@ describe("the models screen", () => {
     expect(() => button("Test key")).toThrow();
     expect(screen.container.textContent).toContain("so this job needs one of its own");
 
-    setValue(field("Scoring posts model"), "gpt-5.6-terra");
+    setValue(select("Scoring posts model"), "gpt-5.6-terra");
     await settle();
 
     expect(button("Save changes").disabled).toBe(false);
@@ -280,7 +340,7 @@ describe("the models screen", () => {
 
     // Picked on screen, saved nowhere. With a model, the button is there.
     setValue(select("Scoring posts key"), storedKey.id);
-    setValue(field("Scoring posts model"), "gpt-5.6-terra");
+    setValue(select("Scoring posts model"), "gpt-5.6-terra");
     await settle();
 
     expect(button("Test key")).toBeTruthy();
@@ -292,7 +352,7 @@ describe("the models screen", () => {
 
     // Both halves typed and picked, and neither saved.
     setValue(select("Scoring posts key"), storedKey.id);
-    setValue(field("Scoring posts model"), "gpt-5.6-terra");
+    setValue(select("Scoring posts model"), "gpt-5.6-terra");
     await settle();
 
     fetched.mockResolvedValue(
@@ -345,9 +405,33 @@ describe("the models screen", () => {
     expect(screen.container.textContent).toContain("401 Incorrect API key provided.");
   });
 
+  it("saves a custom model entered through the explicit custom option", async () => {
+    screen = await mount(<Models />);
+    setValue(select("Scoring posts model"), "__custom__");
+    await settle();
+    setValue(field("Scoring posts custom model"), "my-private-model");
+    await act(async () => button("Save changes").click());
+    const [, init] = fetched.mock.calls.at(-1) as [string, RequestInit];
+    expect(JSON.parse(String(init.body)).model).toBe("my-private-model");
+  });
+
+  it("keeps a saved unlisted model editable and returns to listed models", async () => {
+    fetched.mockResolvedValue(json(view({ model: "my-private-model" })));
+    screen = await mount(<Models />);
+    expect(field("Scoring posts custom model").value).toBe("my-private-model");
+    setValue(select("Scoring posts model"), "claude-sonnet-5");
+    await settle();
+    expect(() => field("Scoring posts custom model")).toThrow();
+    await act(async () => button("Save changes").click());
+    const [, init] = fetched.mock.calls.at(-1) as [string, RequestInit];
+    expect(JSON.parse(String(init.body)).model).toBe("claude-sonnet-5");
+  });
+
   it("adds a key to the account rather than to a job", async () => {
     screen = await mount(<Models />);
 
+    await act(async () => button("Close Scoring posts").click());
+    await act(async () => button("Add an API key").click());
     setValue(field("Key name"), "My OpenAI key");
     setValue(field("New API key"), "sk-mine");
     await act(async () => button("Add key").click());

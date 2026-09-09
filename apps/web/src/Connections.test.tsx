@@ -91,11 +91,25 @@ describe("the connections screen", () => {
   }
 
   async function openAccount() {
-    const account = container.querySelector<HTMLDetailsElement>(".connection-account");
-    if (!account?.open) await act(async () => account?.querySelector("summary")?.click());
+    const account = container.querySelector<HTMLDialogElement>(
+      'dialog[aria-labelledby="account-title-brightdata"]',
+    );
+    if (!account?.open) {
+      const trigger = container.querySelector<HTMLButtonElement>(".connection-account button");
+      await act(async () => trigger?.click());
+    }
   }
 
   beforeEach(() => {
+    // jsdom does not implement the native dialog top layer.
+    for (const method of ["showModal", "close"] as const) {
+      Object.defineProperty(HTMLDialogElement.prototype, method, {
+        configurable: true,
+        value: function (this: HTMLDialogElement) {
+          this.open = method === "showModal";
+        },
+      });
+    }
     calls = [];
     fetchMock = vi.fn();
     vi.stubGlobal("fetch", fetchMock);
@@ -104,16 +118,22 @@ describe("the connections screen", () => {
   afterEach(async () => {
     await screen?.unmount();
     vi.unstubAllGlobals();
+    Reflect.deleteProperty(HTMLDialogElement.prototype, "showModal");
+    Reflect.deleteProperty(HTMLDialogElement.prototype, "close");
   });
 
   it("opens one account's controls without testing or saving a key", async () => {
     await show(connections());
-    const account = container.querySelector<HTMLDetailsElement>(".connection-account");
+    const account = container.querySelector<HTMLDialogElement>(
+      'dialog[aria-labelledby="account-title-brightdata"]',
+    );
     expect(account).not.toBeNull();
     expect(account?.open).toBe(false);
-    await act(async () => account?.querySelector("summary")?.click());
+    await act(async () => button("Connect Bright Data").click());
     expect(account?.open).toBe(true);
     expect(field("Bright Data API key for Bright Data").type).toBe("password");
+    await act(async () => button("Close Bright Data dialog").click());
+    expect(account?.open).toBe(false);
     expect(calls.map((call) => call.method)).toEqual(["GET"]);
   });
 
@@ -375,9 +395,15 @@ describe("the connections screen", () => {
       expect(container.textContent).toContain("Which provider fetches what");
       expect(container.textContent).toContain("ScrapeCreators");
       expect(container.textContent).toContain("Choose one");
-      // Closed, even here. The summary carries the question; opening the row
-      // is what a person does to answer it.
-      expect(container.querySelector<HTMLDetailsElement>(".platform-connection")?.open).toBe(false);
+      const dialog = container.querySelector<HTMLDialogElement>(
+        'dialog[aria-labelledby="platform-title-reddit"]',
+      );
+      expect(dialog?.open).toBe(false);
+      await act(async () => button("Change provider for Reddit").click());
+      expect(dialog?.open).toBe(true);
+      await act(async () => button("Close Reddit dialog").click());
+      expect(dialog?.open).toBe(false);
+      expect(calls.map((call) => call.method)).toEqual(["GET"]);
     });
 
     it("sends the choice, and shows what the server sent back", async () => {

@@ -96,6 +96,23 @@ footer > p {
 .wordmark-dot {
   color: var(--coral);
 }
+/*
+ * The header stays a three-part `space-between` — wordmark, nav, actions — so
+ * the sign-in link and the button travel together as one child. A fourth child
+ * would be spaced out across the bar instead of sitting beside the button.
+ */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.sign-in-link {
+  font-size: var(--text-sm);
+  white-space: nowrap;
+}
+.sign-in-link:hover {
+  color: var(--accent);
+}
 nav,
 .github-link,
 .text-link {
@@ -976,6 +993,9 @@ main:has(.closing) + footer {
   .site-header .button {
     padding-inline: 12px;
     gap: 8px;
+  }
+  .header-actions {
+    gap: 12px;
   }
   .logo-mark {
     width: 24px;

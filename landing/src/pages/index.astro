@@ -126,7 +126,7 @@ const examples = [
 <header class="site-header wrap">
   <a href="#" class="wordmark" aria-label="SignalScout home"><span class="logo-mark"><Icon name="signal" size={23}/></span>SignalScout<span class="wordmark-dot">.</span></a>
   <nav aria-label="Main navigation"><a href="#how-it-works">How it works</a><a href="#features">Features</a><a href="#pricing">Pricing</a><a class="github-link" href={repository}><Icon name="github" size={18}/>GitHub</a></nav>
-  <a class="button small" href="#pricing">Get started <Icon size={16}/></a>
+  <div class="header-actions">{appUrl && <a class="sign-in-link" href={appUrl}>Sign in</a>}<a class="button small" href={appUrl ?? "#pricing"}>Get started <Icon size={16}/></a></div>
 </header>
 <main id="main">
 <section class="hero wrap">

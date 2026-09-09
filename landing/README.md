@@ -34,8 +34,15 @@ disabled. `vercel.json` supplies:
 - Build command: `npm run build`
 - Output directory: `dist`
 
-Set `PUBLIC_APP_URL` to the hosted signup or checkout URL before launch.
-Astro reads this public value at build time; redeploy after changing it.
+Set `PUBLIC_APP_URL` to the hosted application. It is
+`https://app.signalscout.run` on this project, set on 2026-09-10 when the cloud
+version went live.
+
+**Astro reads it at build time, so changing it needs a redeploy** — a value
+edited in the Vercel dashboard reaches nobody until the next build. Until it is
+set the page says cloud signup is coming soon and links nowhere, which is the
+right answer for a deployment that has no hosted application rather than a
+broken link to one.
 No server adapter or API deployment is needed for the landing page.
 Attach the marketing domain in the Vercel project settings when ready.
 The folder is the deployment root; the page is served at `/`, not `/landing`.

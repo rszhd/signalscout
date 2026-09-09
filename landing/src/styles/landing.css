@@ -8,6 +8,12 @@ html {
 body {
   margin: 0;
   overflow-wrap: anywhere;
+  background-color: var(--background);
+  background-repeat: no-repeat;
+  background-image:
+    radial-gradient(760px 520px at 84% -80px, rgb(172 73 54 / 11%), rgb(172 73 54 / 0%) 70%),
+    radial-gradient(620px 460px at 4% 170px, rgb(72 103 159 / 9%), rgb(72 103 159 / 0%) 72%),
+    linear-gradient(180deg, #fff, rgb(255 255 255 / 0%) 720px);
 }
 a {
   color: inherit;
@@ -146,29 +152,74 @@ nav a:hover,
   letter-spacing: 0.08em;
   color: var(--muted-strong);
 }
+.hero-copy .eyebrow {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 15px 8px 13px;
+  background: var(--surface);
+  border: 1px solid var(--line-dark);
+  border-radius: 999px;
+  box-shadow: var(--shadow-soft);
+}
 .status-dot {
   display: inline-block;
+  position: relative;
   width: 7px;
   height: 7px;
   border-radius: 50%;
   background: var(--mint);
-  margin-right: 8px;
+  margin-right: 9px;
+}
+.hero-copy .status-dot::after {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border: 1px solid var(--mint);
+  border-radius: 50%;
+  animation: pulse-ring 2.4s ease-out infinite;
+}
+@keyframes pulse-ring {
+  0% {
+    opacity: 0.7;
+    transform: scale(0.6);
+  }
+  70%,
+  100% {
+    opacity: 0;
+    transform: scale(1.8);
+  }
 }
 .hero {
   display: grid;
   grid-template-columns: 1.15fr 1fr;
   align-items: center;
   gap: 40px;
-  padding-block: 80px 70px;
+  padding-block: 88px 76px;
 }
 h1 {
-  font-size: clamp(3rem, 5.5vw, 5.2rem);
+  font-size: clamp(3rem, 5.9vw, 5.7rem);
   line-height: 1.02;
   letter-spacing: -0.06em;
-  margin: 28px 0;
+  margin: 26px 0;
+}
+.hero h1 {
+  font-weight: 700;
 }
 .headline-accent {
+  position: relative;
   color: var(--coral);
+  white-space: nowrap;
+}
+.headline-accent::after {
+  content: "";
+  position: absolute;
+  left: -0.015em;
+  right: 0.06em;
+  bottom: -0.09em;
+  height: 0.07em;
+  background: var(--coral-line);
+  border-radius: 999px;
+  transform: rotate(-0.7deg);
 }
 .hero-description {
   font-size: var(--text-md);
@@ -178,8 +229,22 @@ h1 {
 .hero-actions {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 26px;
   flex-wrap: wrap;
+}
+.hero-actions .button {
+  min-height: 58px;
+  padding: 16px 28px;
+  font-size: var(--text-md);
+  box-shadow: 5px 5px 0 var(--ink);
+  transition:
+    background 0.2s,
+    transform 0.15s,
+    box-shadow 0.15s;
+}
+.hero-actions .button:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 3px 3px 0 var(--ink);
 }
 .hero-note {
   font-size: var(--text-xs);
@@ -230,9 +295,20 @@ h1 {
   text-decoration: line-through;
 }
 .hero-deck {
+  position: relative;
   display: grid;
   width: 100%;
   margin-top: -4px;
+}
+.hero-deck::after {
+  content: "";
+  position: absolute;
+  inset: 14px -6px -10px 10px;
+  z-index: -1;
+  background: var(--surface);
+  border: 1px solid var(--line-dark);
+  border-radius: 2px;
+  transform: rotate(3.5deg);
 }
 .signal-card {
   grid-area: 1 / 1;
@@ -245,7 +321,8 @@ h1 {
   border-radius: 2px;
   box-shadow:
     7px 7px 0 var(--sunshine-soft),
-    8px 8px 0 var(--line-dark);
+    8px 8px 0 var(--line-dark),
+    26px 30px 54px rgb(20 24 21 / 13%);
   transition:
     opacity 450ms,
     transform 450ms,
@@ -278,8 +355,13 @@ h1 {
   font-size: var(--text-xs);
 }
 .match-badge {
+  padding: 5px 11px;
   font-size: var(--text-xs);
+  font-weight: 600;
   color: var(--mint);
+  background: var(--mint-soft);
+  border: 1px solid var(--mint-line);
+  border-radius: 999px;
 }
 .signal-card p {
   font-size: clamp(1.3rem, 2vw, 1.75rem);
@@ -303,7 +385,7 @@ mark {
 }
 .score {
   color: var(--mint);
-  font-size: 2.1rem;
+  font-size: 2.4rem;
   font-weight: 600;
 }
 .score span {
@@ -867,8 +949,14 @@ main:has(.closing) + footer {
     width: 24px;
     margin-right: 5px;
   }
+  h1 {
+    font-size: clamp(2.4rem, 10.5vw, 3rem);
+  }
   .hero-actions {
     gap: 18px;
+  }
+  .hero-actions .button {
+    padding-inline: 22px;
   }
   .signal-scene {
     padding-inline: 8px;
@@ -911,8 +999,12 @@ main:has(.closing) + footer {
     scroll-behavior: auto;
   }
   .signal-card,
-  .button {
+  .button,
+  .hero-actions .button {
     transition: none;
+  }
+  .hero-copy .status-dot::after {
+    animation: none;
   }
 }
 

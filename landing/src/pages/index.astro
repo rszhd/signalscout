@@ -68,6 +68,13 @@ const heroPosts = [
     signal: "What app would you recommend?",
   },
 ];
+const overheard = [
+  "can someone recommend…",
+  "there has to be a better way to…",
+  "what do you all use for…",
+  "is there anything simpler than…",
+  "does anyone know a tool that…",
+];
 const examples = [
   {
     label: "Needs an app",
@@ -208,7 +215,6 @@ const examples = [
   <div class="section-heading"><span class="eyebrow">03 / KEEP THE GOOD ONES</span><h2 id="features-title">A question found.<br/><span>A conversation started.</span></h2><p>Read it. Save it. Reply when you can help.</p></div>
   <div class="feature-grid">
     <article class="feature-card feature-inbox">
-      <span class="feature-icon"><Icon name="inbox" size={24}/></span>
       <h3>Six platforms. One place to look.</h3>
       <p>Posts and comments, scored against your product. The reason for every match is right beside it.</p>
       <div class="feature-platforms" aria-label="Supported platforms">{platforms.map(([name, file]) => <span><img src={`/brands/${file}`} alt="" width="20" height="20"/>{name}</span>)}</div>
@@ -217,7 +223,6 @@ const examples = [
       <a class="text-link" href="#inbox">Explore the example <Icon size={17}/></a>
     </article>
     <article class="feature-card feature-alerts">
-      <span class="feature-icon"><Icon name="bell" size={24}/></span>
       <h3>Let the good ones come to you.</h3>
       <p>Daily digests, immediate email alerts, or webhooks. Pick your delivery.</p>
       <div class="feature-digest">
@@ -228,19 +233,16 @@ const examples = [
       </div>
     </article>
     <article class="feature-card">
-      <span class="feature-icon"><Icon name="reply" size={24}/></span>
       <h3>Skip the blank reply box.</h3>
       <p>Draft with context and your chosen voice. Edit it, then post it yourself.</p>
       <span class="feature-footnote">You review. You hit send.</span>
     </article>
     <article class="feature-card">
-      <span class="feature-icon"><Icon name="sliders" size={24}/></span>
       <h3>Put a number on it.</h3>
       <p>Estimate costs. Set a schedule and monthly cap. Track what each monitor spends.</p>
       <span class="feature-footnote">Your schedule. Your spending limit.</span>
     </article>
     <article class="feature-card">
-      <span class="feature-icon"><Icon name="key" size={24}/></span>
       <h3>Bring your keys. Keep control.</h3>
       <p>Choose your data providers and AI models. Run it yourself or let us host it.</p>
       <a class="text-link" href={repository}>Read the source <Icon name="external" size={17}/></a>
@@ -266,7 +268,14 @@ const examples = [
     <details><summary>Can I run the whole app myself?</summary><p>Yes. The full application is open source and runs with Docker Compose. You pay for your infrastructure and provider usage.</p></details>
   </div>
 </section>
-<section class="closing wrap"><span class="eyebrow">“DOES ANYONE KNOW A TOOL THAT…?”</span><h2>Maybe they mean yours.</h2><a class="button" href="#pricing">Start listening <Icon size={18}/></a></section>
+<section class="closing">
+  <div class="wrap">
+    <div class="overheard" aria-hidden="true">{overheard.map((line, index) => <span style={`--step:${index}`}>“{line}”</span>)}</div>
+    <h2>Maybe they <span>mean yours.</span></h2>
+    <p class="closing-line">Six platforms. Somebody is halfway through the question.</p>
+    <a class="button" href="#pricing">Start listening <Icon size={20}/></a>
+  </div>
+</section>
 </main>
 <footer class="wrap"><a href="#" class="wordmark">SignalScout.</a><p>Built for the conversation worth joining.</p><a class="text-link" href={repository}>Open source on GitHub <Icon name="external" size={15}/></a></footer>
 <script>

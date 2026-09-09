@@ -14,17 +14,6 @@
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
 }
-.feature-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  margin-bottom: 24px;
-  border-radius: var(--radius-sm);
-  color: var(--accent-text);
-  background: var(--accent-soft);
-}
 .feature-card h3 {
   margin-bottom: 12px;
   line-height: 1.35;
@@ -97,10 +86,6 @@
   color: var(--muted-strong);
   margin-top: auto;
   padding-top: 8px;
-}
-.feature-alerts .feature-icon {
-  color: var(--coral);
-  background: var(--coral-soft);
 }
 .feature-digest {
   width: 100%;

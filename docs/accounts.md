@@ -149,10 +149,72 @@ configured and measured for, and an account that sets nothing keeps them.
 **The first account keeps what came before it, and only the first.** See
 *Upgrading* below. A second person registering inherits nothing.
 
-The email address is an identifier, not a mailbox. Nothing sends mail to it, so
-it does not have to be one you can read. The mail this product *does* send —
-digests and alerts — is configured separately, inside, and
+By default the email address is an identifier, not a mailbox. Nothing sends
+mail to it, so it does not have to be one you can read. The mail this product
+*does* send — digests and alerts — is configured separately, inside, and
 [docs/notifications.md](notifications.md) covers it.
+
+### Proving the address
+
+`AUTH_EMAIL_VERIFICATION` decides it, and it takes two values.
+
+| | |
+|---|---|
+| `off` | The default. The address is taken as given, and a session starts the moment the account exists. |
+| `required` | A link is sent to the address, and nobody is signed in until they open it. |
+
+**Set it to `required` wherever `AUTH_SIGNUP` is `open`.** Without it anybody
+can register with an address they do not own. Three things follow, and they get
+worse in that order: they hold that address for ever, because the column is
+unique; they take a fresh seven-day trial from an address nobody has to reach,
+as often as they like; and the digests meant for the real owner arrive in
+their inbox on the first match.
+
+**A key is not a sending domain.** `SMTP_FROM` on a provider's shared testing
+domain sends to one address — the mail account owner's — and answers every
+other recipient with a 550. The instance still registers those people, still
+answers 200, and still tells them to check an inbox the provider refused. Use
+an address on a domain you have verified with your provider, and send one probe
+to somebody else's address before you trust it.
+
+`required` needs `SMTP_HOST` and `SMTP_FROM`, and **the process refuses to
+start without them**. That is the point of the check rather than an
+inconvenience: with no mail server the link is never sent, so the instance
+would refuse every account it has — yours included — with a message about an
+email nobody posted, and no screen would say the mail server was the cause.
+[docs/notifications.md](notifications.md) has the SMTP settings; the same ones
+carry the digests.
+
+What a person sees:
+
+- Registering says *check your email* and creates no session. It says the same
+  thing for an address that is **already registered**, on purpose — an answer
+  that said "that address is taken" would tell a stranger which addresses exist
+  here, which is one of the three things above. No link is sent in that case,
+  so somebody who forgot they had an account waits for mail that is not coming.
+  The screen names the possibility and points them at signing in; there is
+  nothing better available without giving the enumeration away.
+- Signing in before the link is opened is refused, **and sends a new link**.
+  That is the whole way back for somebody whose link expired or never arrived;
+  there is no resend button and no reset. A wrong password is refused before
+  the message goes out, so this cannot be used to mail somebody whose password
+  you do not know.
+- Opening the link confirms the address and signs the person in.
+- A link that expired or was tampered with returns to the login screen with a
+  sentence saying so. Links work for 24 hours.
+
+**Turning it on does not lock out the accounts you already have.** Migration
+0053 marks every account that existed before this version as verified. They
+registered before the rule and cannot be asked retroactively.
+
+**If mail breaks and somebody is stuck**, verify them by hand:
+
+```sql
+UPDATE users SET email_verified = true WHERE email = 'them@example.com';
+```
+
+That is the whole recovery, and it is why the setting is worth having only on
+an instance where somebody watches the mail server.
 
 `AUTH_SECRET` is what signs the session cookie. The app refuses to start without
 it. Generate one with `openssl rand -base64 32`. Changing it later signs
@@ -169,6 +231,10 @@ Everything under `/api/` needs a session, with three exceptions:
 | `/api/auth/*` | It is the login. |
 | `/api/health` | A container health check has no cookie, and the answer holds no data. |
 | `/api/auth-status` | The login screen asks it whether the instance needs its first account, and whether registration is open. |
+
+`/api/auth/verify-email` is under `/api/auth/*`, so a confirmation link opens
+without a session. It has to: the person clicking it does not have one yet, and
+the signed token in the address is the check.
 
 The built UI is also served without a session. It has to be: it is the page the
 login form is on. It carries no monitor, no match and no key — everything it
@@ -202,9 +268,11 @@ and inheriting the owner's monitors is the last thing they should do.
 
 ## Locked out
 
-There is no password reset, because nothing here sends mail and a reset link
-that never arrives is worse than no button at all. The recovery path is the
-database, which you own.
+There is no password reset, because a reset link that never arrives is worse
+than no button at all and the common install has no mail server. The recovery
+path is the database, which you own. (`AUTH_EMAIL_VERIFICATION` uses mail when
+it is configured, but it confirms an address rather than replacing a password —
+it is no help to somebody who has forgotten one.)
 
 With `AUTH_SIGNUP=open` you can simply register again, and then move the rows as
 below. With it closed, delete the account first.

@@ -372,6 +372,13 @@
       "when": 1788707618125,
       "tag": "0052_one_key_is_the_default",
       "breakpoints": true
+    },
+    {
+      "idx": 53,
+      "version": "7",
+      "when": 1788707618126,
+      "tag": "0053_an_address_is_verified_before_an_account_is_used",
+      "breakpoints": true
     }
   ]
 }

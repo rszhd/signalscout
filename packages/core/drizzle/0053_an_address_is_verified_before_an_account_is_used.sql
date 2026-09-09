@@ -1,0 +1,13 @@
+--> US-092. Every account that exists today registered before there was
+--> anything to verify, and `email_verified` has been false on every row since
+--> the column was written, because nothing has ever set it.
+-->
+--> Turning `AUTH_EMAIL_VERIFICATION` on without this line refuses every one of
+--> them on the first restart after the upgrade — the owner of the instance
+--> included, on a machine they run for themselves. They cannot be asked
+--> retroactively: the link goes to the address, and they are locked out of the
+--> screen that would send it.
+-->
+--> On a fresh database `users` is empty and this touches nothing, which is why
+--> it is safe to run everywhere and needs no condition.
+UPDATE "users" SET "email_verified" = true WHERE "email_verified" = false;

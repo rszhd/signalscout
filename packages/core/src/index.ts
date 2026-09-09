@@ -163,6 +163,14 @@ export {
   unclaimedUserId,
 } from "./auth/user.js";
 export {
+  type EmailVerificationEnvironment,
+  type EmailVerificationMode,
+  emailVerificationModes,
+  emailVerificationRequired,
+  requiredVerificationVariables,
+} from "./auth/verification.js";
+export { type SendEmail, verificationMessage } from "./auth/verification-email.js";
+export {
   applyStripeSubscription,
   type BillingEnvironment,
   type BillingEvent,

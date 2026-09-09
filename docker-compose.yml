@@ -25,6 +25,10 @@ x-app-environment: &app-environment
   # closed | open. Closed is the self-hosted default: one account, and the
   # server refuses every attempt after it. See .env.example.
   AUTH_SIGNUP: ${AUTH_SIGNUP:-closed}
+  # off | required. Required sends a confirmation link and signs nobody in
+  # until they open it. It needs SMTP_HOST and SMTP_FROM below, and the app
+  # refuses to start without them. See .env.example.
+  AUTH_EMAIL_VERIFICATION: ${AUTH_EMAIL_VERIFICATION:-off}
   # Set it when a proxy rewrites the host. Empty means "read it per request".
   AUTH_URL: ${AUTH_URL:-}
   # Origins allowed to sign in, besides this instance's own. Comma separated.

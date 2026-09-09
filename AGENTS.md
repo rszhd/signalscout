@@ -851,6 +851,100 @@ read. Both halves live in the `user.create.before` hook, which every path that
 creates a user passes through, so the refusal cannot be routed around. There is
 no default account and no default password.
 
+**An address can be proven before an account is used, and the default is not
+to.** US-092 closed on 2026-09-09. `AUTH_EMAIL_VERIFICATION` is `off |
+required`, and `off` is `AUTH_SIGNUP`'s rule and reason again — every instance
+running today is self-hosted and most have no SMTP at all, so a version bump
+that began requiring a link would arrive as a login refusing the owner of a
+machine they run for themselves.
+
+**The requirement and the transport are one field.** `CreateAuthOptions` takes
+`sendEmail` and nothing else, and `requireEmailVerification` is
+`sendEmail !== undefined`, so the state this must never be in — verification
+required, no way to send — cannot be described. `emailVerificationRequired` is
+where the deployment's setting becomes that field, and it throws when the mode
+asks for what the SMTP settings cannot deliver: `start.ts` calls it before the
+worker starts, for `BILLING_MODE=stripe`'s reason and against a worse failure.
+A login that refuses every account it has, with a message about mail nobody
+posted, and no screen saying the mail server is the cause.
+
+**Two of the library's behaviours were found by running it.** `sendOnSignIn`
+defaults to false, so the first version refused an unverified sign-in and sent
+nothing — and that refusal is the *only* way back, because there is no resend
+route and no reset. And a sign-up for an address that already exists answers a
+**generic success** under this setting rather than "that is taken", which is
+right: telling a stranger which addresses are registered is one of the three
+things the setting exists to stop. The screen shows one sentence for both, and
+no second link goes to the real owner.
+
+**Migration 0053 is why turning it on locks nobody out.** Every account written
+before this carries `email_verified = false`, because nothing has ever set it,
+so the setting without the migration refuses everybody on the first restart
+after an upgrade. It ran against the development database: three accounts, all
+verified, and on a fresh database it touches nothing.
+
+**`compose-environment.test.ts` caught the setting before it shipped.** It was
+absent from `docker-compose.yml`, and a variable named nowhere in that file
+never reaches the container — so `AUTH_EMAIL_VERIFICATION=required` in a `.env`
+would have been read by nothing, which is `BILLING_MODE`'s own silent shape.
+
+**The whole path ran live on 2026-09-09, and a person opened the link.** A real
+`POST /api/auth/sign-up/email` answered **200 with `token: null`**, set no
+cookie and wrote `email_verified = false`. A link was then sent, received in a
+real inbox, and opened in a real browser: `email_verified` moved to true and a
+**session was written expiring seven days later**, which is
+`sessionMaxAgeSeconds`. So `autoSignInAfterVerification` holds — the link
+confirms the address and signs the person in, with no second password prompt.
+
+**One 200 was misread first, and the lesson is general.**
+`POST /api/auth/send-verification-email` answers `{"status":true}` for an
+address already verified *and* for one that does not exist, having sent
+nothing: it signs a throwaway token and sleeps to a 500 ms floor so response
+times cannot enumerate addresses. That branch sits above
+`sendVerificationEmailFn`, so reading the sender and not its caller made a skip
+look like a send. **A route that awaits the sender is not a route that called
+it**, and the timing is what tells them apart — **3.67 s** for a real send
+against **0.51 s** for a skipped one.
+
+**A key is not a sending domain, and the shared one delivers to one address.**
+`SMTP_FROM=onboarding@resend.dev` answers every recipient but the account
+owner's with *550 You can only send testing emails to your own email address*.
+So a registration anywhere else is written, answered 200, and told to check an
+inbox the provider refused — five such accounts reached that state before the
+domain was fixed. **A deployment that verifies addresses needs a verified
+sending domain**, and `AUTH_EMAIL_VERIFICATION=required` on a shared one is a
+one-recipient instance.
+
+`signalscout.run` was then verified at Resend, and the same probes answered
+**250** — to the account owner and to an unrelated address alike. A
+registration at `harith@journeys-inbox.space` took 3.53 s, the link arrived,
+and opening it verified the account and wrote a seven-day session. **That is
+the first registration this product has completed at an address that is not the
+mail account owner's**, which is what the cloud shape needs.
+
+**Registering an address that already exists is indistinguishable from
+success, and the owner read it as a broken product.** Better Auth fabricates a
+200 with `token: null` and an invented user id — **0.073 s, no SMTP call, no
+row written** — so that nobody can enumerate the accounts on an instance. That
+is right and it stays. What was wrong was the screen: it said "check your
+email" and left a person waiting for mail that was never coming, with nothing
+to try. The panel now says an address that already has an account is sent no
+link, and to sign in instead — a possibility rather than a statement, so it
+confirms nothing about any particular address.
+
+**That refusal found the fault worth keeping.** The sign-up answered 200
+anyway. Better Auth awaits the send, catches what it throws, and logs `Failed
+to run background task` — naming neither mail nor the account. **A broken mail
+server and a working one produce the same response**, so the person is told to
+check an inbox nothing reached and the operator's only signal is unactionable.
+The 200 stays, because the account is written before the send and refusing
+would report a failure that did not happen. The repair is the log line: the
+sender wrapper names the address and says the account cannot sign in until the
+mail leaves, and `auth.test.ts` fails if it is lowered to `debug`.
+
+Read docs/accounts.md, *Proving the address*, which holds the SQL for verifying
+somebody by hand when the mail server is the thing that broke.
+
 **`claimUnownedRows` needed a guard the moment that setting existed.** It ran
 for every created user, which was correct only because no second user could
 exist. `isOnlyAccount` is the guard now. A stranger who registers on an open

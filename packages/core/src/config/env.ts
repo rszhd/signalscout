@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { aiProviders, embeddingProviders } from "../ai/config.js";
 import { type SignupMode, signupModes } from "../auth/user.js";
+import { emailVerificationModes } from "../auth/verification.js";
 import { billingModes } from "../billing/entitlement.js";
 import { encryptionKeyIsWellFormed } from "../secrets/cipher.js";
 
@@ -230,6 +231,25 @@ export const envSchema = z.object({
    * their money — to whoever found the address first.
    */
   AUTH_SIGNUP: blankIsUnset(z.enum(signupModes).default("closed")),
+
+  /**
+   * Whether an address is proven before an account is used. US-092.
+   *
+   * `off` is the default: the address is taken as given, and a session starts
+   * the moment the account exists. `required` sends a link and signs nobody in
+   * until it is opened.
+   *
+   * Off rather than required, for `AUTH_SIGNUP`'s reason and one of its own.
+   * Every instance running today is self-hosted, and most of them have no SMTP
+   * at all — so a version bump that quietly began requiring a link would arrive
+   * as a login that refuses the owner of a machine they run for themselves.
+   *
+   * Setting it to `required` makes the SMTP variables required, and the process
+   * refuses to boot without them. `emailVerificationRequired` is that check,
+   * and it exists because the half-configured state is the silent one: a login
+   * that answers every account with a message about mail nobody sent.
+   */
+  AUTH_EMAIL_VERIFICATION: blankIsUnset(z.enum(emailVerificationModes).default("off")),
 
   /**
    * Origins allowed to sign in, besides this instance's own address.

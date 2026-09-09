@@ -18,12 +18,13 @@ import { startApi } from "./start.js";
  */
 const logger = createLogger({ level: "silent", name: "test" });
 
-function envWith(workerInProcess: boolean): Env {
+function envWith(workerInProcess: boolean, extra: Record<string, string> = {}): Env {
   return loadEnv({
     DATABASE_URL: "postgres://user:pw@localhost:5432/unused",
     // US-017 refuses to boot without one, before anything here runs.
     AUTH_SECRET: "a-test-secret-that-is-long-enough-to-pass",
     WORKER_IN_PROCESS: String(workerInProcess),
+    ...extra,
   });
 }
 
@@ -145,5 +146,60 @@ describe("startApi", () => {
     // A pool the shutdown forgets keeps the process alive after it is asked
     // to exit.
     expect(database.close).toHaveBeenCalledTimes(1);
+  });
+});
+
+/**
+ * A deployment that verifies addresses and cannot send. US-092.
+ *
+ * `verification.test.ts` proves the rule; this proves `startApi` reaches it,
+ * which is the part a unit test on a pure function cannot say. The assertion
+ * that nothing started is half the case: a process that refuses *after* the
+ * worker is up leaves a queue polling a database with no API in front of it.
+ */
+describe("an instance that asks for a verified address", () => {
+  it("refuses to start when it could never send the link", async () => {
+    const server = fakeServer();
+    const worker = fakeWorker();
+    const database = fakeDatabase();
+    const jobs = fakeJobSender();
+
+    await expect(
+      startApi({
+        env: envWith(true, { AUTH_EMAIL_VERIFICATION: "required" }),
+        logger,
+        buildServer: server.buildServer,
+        startWorker: worker.startWorker,
+        startJobSender: jobs.startJobSender,
+        createDatabase: database.createDatabase,
+      }),
+    ).rejects.toThrow(/SMTP_HOST, SMTP_FROM/);
+
+    expect(worker.startWorker).not.toHaveBeenCalled();
+    expect(database.createDatabase).not.toHaveBeenCalled();
+    expect(server.buildServer).not.toHaveBeenCalled();
+  });
+
+  it("starts when the mail server that carries the link is configured", async () => {
+    const server = fakeServer();
+    const worker = fakeWorker();
+    const database = fakeDatabase();
+    const jobs = fakeJobSender();
+
+    const handle = await startApi({
+      env: envWith(true, {
+        AUTH_EMAIL_VERIFICATION: "required",
+        SMTP_HOST: "smtp.example.test",
+        SMTP_FROM: "signalscout@example.test",
+      }),
+      logger,
+      buildServer: server.buildServer,
+      startWorker: worker.startWorker,
+      startJobSender: jobs.startJobSender,
+      createDatabase: database.createDatabase,
+    });
+
+    expect(server.buildServer).toHaveBeenCalledTimes(1);
+    await handle.stop();
   });
 });

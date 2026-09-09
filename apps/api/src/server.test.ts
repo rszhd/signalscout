@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createDatabase, createLogger, loadEnv } from "@signalscout/core";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { buildServer } from "./server.js";
+import { buildServer, verificationSenderFor } from "./server.js";
 import { asOwner } from "./testing.js";
 
 const logger = createLogger({ level: "silent", name: "test" });
@@ -105,5 +105,51 @@ describe("the API and the UI on one port", () => {
     } finally {
       await app.close();
     }
+  });
+});
+
+/**
+ * How a verification link leaves this instance. US-092.
+ *
+ * The point of these three cases is the seam between two files that both
+ * decide what a working mailer is: `emailVerificationRequired` refuses to boot
+ * without one, and `notificationReadiness` decides whether US-016 builds one.
+ * If they ever disagree, `authFor` would hand `createAuth` an undefined sender
+ * and the requirement would quietly vanish.
+ *
+ * Nothing here connects to anything. Nodemailer opens no socket until a
+ * message is sent, and no message is sent.
+ */
+describe("the sender a verification link leaves through", () => {
+  const base = { DATABASE_URL: "postgres://unused/unused", AUTH_SECRET: "x".repeat(32) };
+
+  it("is absent on a deployment that does not verify", () => {
+    expect(verificationSenderFor(loadEnv(base))).toBeUndefined();
+    // Even with SMTP configured, because US-016's digests are a different
+    // question from whether a login requires a link.
+    expect(
+      verificationSenderFor(
+        loadEnv({ ...base, SMTP_HOST: "smtp.example.test", SMTP_FROM: "a@example.test" }),
+      ),
+    ).toBeUndefined();
+  });
+
+  it("is present where the deployment verifies and can send", () => {
+    const send = verificationSenderFor(
+      loadEnv({
+        ...base,
+        AUTH_EMAIL_VERIFICATION: "required",
+        SMTP_HOST: "smtp.example.test",
+        SMTP_FROM: "a@example.test",
+      }),
+    );
+
+    expect(typeof send).toBe("function");
+  });
+
+  it("refuses a deployment that verifies and cannot send", () => {
+    expect(() =>
+      verificationSenderFor(loadEnv({ ...base, AUTH_EMAIL_VERIFICATION: "required" })),
+    ).toThrow(/SMTP_HOST/);
   });
 });

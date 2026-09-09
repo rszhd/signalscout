@@ -11,11 +11,13 @@ import {
   builtInSources,
   type ConnectorDefinition,
   createAuth,
+  createNotificationTransport,
   createProjectDescriber,
   createQueryGenerator,
   type Database,
   draftConfigFromEnvironment,
   type Env,
+  emailVerificationRequired,
   type JobSender,
   type Logger,
   machineKeysUsable,
@@ -24,6 +26,7 @@ import {
   providerKeyEnvironment,
   type QueryGenerator,
   readAiEnvironment,
+  type SendEmail,
   storedCredentialNames,
   withoutMachineModelKeys,
 } from "@signalscout/core";
@@ -231,7 +234,40 @@ export function authFor(env: Env, db: Database, logger: Logger): Auth | null {
     trustedOrigins: trustedOrigins(env),
     signup: env.AUTH_SIGNUP,
     billing: env.BILLING_MODE,
+    sendEmail: verificationSenderFor(env),
   });
+}
+
+/**
+ * How a verification link leaves this instance, or undefined. US-092.
+ *
+ * US-016's transport, and not a second one. There is one mail server in a
+ * deployment, configured once, and a mailer of this file's own would be a
+ * second set of SMTP settings that can disagree with the first about the port,
+ * the TLS mode or the from address.
+ *
+ * `emailVerificationRequired` throws when the mode asks for verification that
+ * cannot be sent, so `undefined` here always means "this deployment does not
+ * verify" and never "it wanted to and could not". `startApi` asks the same
+ * question before anything starts, so the message arrives at boot rather than
+ * at the first registration.
+ */
+export function verificationSenderFor(env: Env): SendEmail | undefined {
+  if (!emailVerificationRequired(env)) return undefined;
+
+  const send = createNotificationTransport(env).email;
+
+  // Unreachable while the check above and `notificationReadiness` agree about
+  // what a working mailer needs. Written out rather than asserted away,
+  // because the two lists live in different files and the failure this would
+  // hide is the one the ticket exists to prevent.
+  if (!send) {
+    throw new Error(
+      'AUTH_EMAIL_VERIFICATION is "required" but the SMTP settings do not build a mailer.',
+    );
+  }
+
+  return send;
 }
 
 /**

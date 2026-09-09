@@ -13,6 +13,7 @@
 import { randomUUID } from "node:crypto";
 import {
   accountExists,
+  createAuth,
   createDatabase,
   createLogger,
   type Database,
@@ -316,6 +317,278 @@ describe("the session gate", () => {
    * request carries that account's own cookie — a stranger who finds the port
    * learns whether the instance is set up, and nothing about who set it up.
    */
+  /**
+   * An address is proven before an account is used. US-092.
+   *
+   * Against real Postgres and the real auth library, because everything worth
+   * asserting here is the library's own behaviour under our settings: whether a
+   * session is created, whether a link is sent, and what the second attempt
+   * does. A stub in front of it would assert our stub.
+   *
+   * Nothing sends mail. `sendEmail` is captured, which is also how the test
+   * gets the link — a person opening it is the only way through this path.
+   */
+  describe("when an address has to be verified", () => {
+    /** Every link this instance sent, newest last. */
+    let sent: { to: string; subject: string; text: string; url: string }[];
+
+    async function verifyingServer(): Promise<ApiServer> {
+      sent = [];
+      const env = loadEnv({
+        DATABASE_URL: database.url,
+        AUTH_SECRET: secret,
+        AUTH_SIGNUP: "open",
+      });
+
+      return buildServer({
+        env,
+        logger,
+        db,
+        queryGenerator: null,
+        auth: createAuth({
+          db,
+          secret,
+          signup: "open",
+          sendEmail: async (to, subject, text) => {
+            // The link, as a person would copy it out of the message.
+            const url = text.split("\n").find((line) => line.startsWith("http")) ?? "";
+            sent.push({ to, subject, text, url });
+          },
+        }),
+      });
+    }
+
+    /** The cookie header a browser would send back, from a reply. */
+    function cookiesOf(reply: { headers: Record<string, unknown> }): string {
+      return jarOf(reply.headers["set-cookie"] as string | string[] | undefined);
+    }
+
+    it("creates the account, sends a link, and signs nobody in", async () => {
+      await clear();
+      const app = await verifyingServer();
+
+      try {
+        const reply = await signUp(app);
+
+        expect(reply.statusCode).toBe(200);
+        expect(reply.json().token).toBeNull();
+        expect(cookiesOf(reply)).toBe("");
+
+        // The row exists. The account is real; it just cannot be used yet.
+        const [account] = await db.select().from(users);
+        expect(account?.email).toBe("owner@example.com");
+        expect(account?.emailVerified).toBe(false);
+
+        expect(sent).toHaveLength(1);
+        expect(sent[0]?.to).toBe("owner@example.com");
+        expect(sent[0]?.url).toContain("/api/auth/verify-email?token=");
+      } finally {
+        await app.close();
+      }
+    });
+
+    it("refuses a sign-in until the link is opened, and sends a fresh one", async () => {
+      await clear();
+      const app = await verifyingServer();
+
+      try {
+        await signUp(app);
+        sent = [];
+
+        const reply = await app.inject({
+          method: "POST",
+          url: `${authBasePath}/sign-in/email`,
+          payload: { email: "owner@example.com", password },
+        });
+
+        expect(reply.statusCode).toBe(403);
+        // The code and not the sentence: the login screen reads this to tell
+        // an unverified account from a wrong password, and the wording is the
+        // library's to change.
+        expect(reply.json().code).toBe("EMAIL_NOT_VERIFIED");
+        expect(cookiesOf(reply)).toBe("");
+
+        // The refusal is where a replacement link comes from. Without this
+        // there is no way back for somebody whose first link expired.
+        expect(sent).toHaveLength(1);
+        expect(sent[0]?.to).toBe("owner@example.com");
+      } finally {
+        await app.close();
+      }
+    });
+
+    it("verifies the address and signs the person in when the link is opened", async () => {
+      await clear();
+      const app = await verifyingServer();
+
+      try {
+        await signUp(app);
+        const link = new URL(sent[0]?.url ?? "");
+
+        const reply = await app.inject({
+          method: "GET",
+          url: `${link.pathname}${link.search}`,
+        });
+
+        // A redirect back to the application, carrying the session.
+        expect(reply.statusCode).toBe(302);
+        expect(cookiesOf(reply)).not.toBe("");
+
+        const [account] = await db.select().from(users);
+        expect(account?.emailVerified).toBe(true);
+
+        // And the session it set is a session the gate accepts.
+        const inbox = await app.inject({
+          method: "GET",
+          url: "/api/projects",
+          headers: { cookie: cookiesOf(reply) },
+        });
+        expect(inbox.statusCode).toBe(200);
+      } finally {
+        await app.close();
+      }
+    });
+
+    it("refuses a tampered link, and sends the person back with a reason", async () => {
+      await clear();
+      const app = await verifyingServer();
+
+      try {
+        await signUp(app);
+        const link = new URL(sent[0]?.url ?? "");
+        link.searchParams.set("token", `${link.searchParams.get("token")}x`);
+
+        const reply = await app.inject({
+          method: "GET",
+          url: `${link.pathname}${link.search}`,
+        });
+
+        // Back to the login screen with a code it can turn into a sentence,
+        // rather than a bare 401 page with nothing to do next.
+        expect(reply.statusCode).toBe(302);
+        expect(reply.headers.location).toContain("error=INVALID_TOKEN");
+
+        const [account] = await db.select().from(users);
+        expect(account?.emailVerified).toBe(false);
+      } finally {
+        await app.close();
+      }
+    });
+
+    /**
+     * An address already registered answers as though it were new.
+     *
+     * Deliberate, and it is the library's behaviour under this setting: an
+     * answer that said "that address is taken" would tell a stranger which
+     * addresses exist here, which is one of the three things the setting is for.
+     * The screen shows one sentence for both, and it is true of both.
+     */
+    it("says nothing about whether an address is already registered", async () => {
+      await clear();
+      const app = await verifyingServer();
+
+      try {
+        await signUp(app);
+        sent = [];
+
+        const again = await signUp(app);
+
+        expect(again.statusCode).toBe(200);
+        expect(again.json().token).toBeNull();
+        expect(await db.select().from(users)).toHaveLength(1);
+        // And no second link, so the address's real owner is not mailed by
+        // whoever guessed it.
+        expect(sent).toHaveLength(0);
+      } finally {
+        await app.close();
+      }
+    });
+
+    /**
+     * A mail server that refuses. Measured live on 2026-09-09.
+     *
+     * The library awaits the send, swallows the error and logs "Failed to run
+     * background task", which names neither mail nor the account. So the
+     * person is told to check an inbox nothing reached, and the one signal an
+     * operator gets says nothing they can act on.
+     *
+     * The request still answers 200, and that is deliberate: the account is
+     * written before the send, so a refusal would report a failure that did
+     * not happen and a second attempt meets the generic duplicate answer. The
+     * log line is the whole repair, which is why it is asserted here.
+     */
+    it("says in the log when the link could not be sent", async () => {
+      await clear();
+      const lines: { message: string; email?: string }[] = [];
+      const recording = {
+        ...logger,
+        error: (details: unknown, message?: string) => {
+          lines.push({
+            message: typeof details === "string" ? details : (message ?? ""),
+            email: (details as { email?: string })?.email,
+          });
+        },
+      } as unknown as typeof logger;
+
+      const env = loadEnv({ DATABASE_URL: database.url, AUTH_SECRET: secret, AUTH_SIGNUP: "open" });
+      const app = await buildServer({
+        env,
+        logger,
+        db,
+        queryGenerator: null,
+        auth: createAuth({
+          db,
+          secret,
+          signup: "open",
+          logger: recording,
+          sendEmail: async () => {
+            throw new Error("SMTP delivery failed");
+          },
+        }),
+      });
+
+      try {
+        const reply = await signUp(app);
+
+        // The account exists and the caller is told to check their email, both
+        // of which are true of a working instance too. Nothing here tells them
+        // apart, which is the reason the log line has to.
+        expect(reply.statusCode).toBe(200);
+        expect(await db.select().from(users)).toHaveLength(1);
+
+        const said = lines.find((line) => line.message.includes("verification email was not sent"));
+        expect(said).toBeDefined();
+        expect(said?.email).toBe("owner@example.com");
+        // And it says what it costs, so nobody reads it as a retryable notice.
+        expect(said?.message).toContain("cannot sign in");
+      } finally {
+        await app.close();
+      }
+    });
+
+    /**
+     * The default, stated as a test rather than as a comment.
+     *
+     * The self-hosted instance has no SMTP, and a version bump that began
+     * requiring a link would refuse the owner of a machine they run for
+     * themselves.
+     */
+    it("is off unless the deployment asks for it", async () => {
+      await clear();
+      const app = await server();
+
+      try {
+        const reply = await signUp(app);
+
+        expect(reply.statusCode).toBe(200);
+        expect(reply.json().token).not.toBeNull();
+        expect(jarOf(reply.headers["set-cookie"])).not.toBe("");
+      } finally {
+        await app.close();
+      }
+    });
+  });
+
   it("names the account only to a request carrying its session", async () => {
     await clear();
     const app = await server();

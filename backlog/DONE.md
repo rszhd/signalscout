@@ -2,7 +2,7 @@
 
 # Done
 
-76 finished.
+77 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
@@ -16,6 +16,7 @@
 | BUG-003 | [A post below the threshold is classified again on every poll](done/2026-09/BUG-003-a-post-below-the-threshold-is-classified-again-on-every-poll.md) | bug | fixed | 2026-09 |
 | BUG-002 | [A seven-day window is bought as a month](done/2026-09/BUG-002-a-seven-day-window-is-bought-as-a-month.md) | bug | fixed | 2026-09 |
 | BUG-001 | [A pending Reddit collection is not resumed](done/2026-09/BUG-001-a-pending-reddit-collection-is-not-resumed.md) | bug | shipped | 2026-09 |
+| US-092 | [An address is verified before an account is used](done/2026-09/US-092-an-address-is-verified-before-an-account-is-used.md) | feature | shipped | 2026-09 |
 | US-091 | [A finished setup sends a new account to create its first project](done/2026-09/US-091-a-finished-setup-sends-a-new-account-to-create-its-first-project.md) | feature | shipped | 2026-09 |
 | US-090 | [A stored provider key becomes the fetcher where none was chosen](done/2026-09/US-090-a-stored-provider-key-becomes-the-fetcher-where-none-was-chosen.md) | feature | shipped | 2026-09 |
 | US-089 | [The setup forms use familiar sample copy](done/2026-09/US-089-the-setup-forms-use-familiar-sample-copy.md) | chore | shipped | 2026-09 |

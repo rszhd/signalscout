@@ -128,6 +128,125 @@ describe("the login screen", () => {
     expect(screen.container.textContent).toContain("Invalid email or password.");
   });
 
+  /**
+   * An address that has to be proven. US-092.
+   *
+   * Three states the screen never had before, and each one is a person left
+   * with nothing to do if it is missing: a sign-up that made no session, a
+   * sign-in the server refused because the link is unopened, and a link that
+   * had expired by the time it was clicked.
+   */
+  describe("when the instance verifies an address", () => {
+    it("says to check the email when a sign-up made no session", async () => {
+      fetched.mockResolvedValue(json({ token: null, user: { email: "new@example.com" } }));
+      screen = await mount(<Login firstRun={false} signUpOpen={true} />);
+
+      await act(async () => button("Create an account").click());
+      await settle();
+      setValue(field("Your name"), "Someone New");
+      setValue(field("Email"), "new@example.com");
+      setValue(field("Password"), "a-long-enough-password");
+      await act(async () => button("Create the account").click());
+      await settle();
+
+      expect(screen.container.textContent).toContain("Check your email");
+      expect(screen.container.textContent).toContain("new@example.com");
+      // The form is gone, not merely covered: a second submit would post the
+      // same registration again and send a second link.
+      expect(() => field("Password")).toThrow();
+      expect(globalThis.location.reload).not.toHaveBeenCalled();
+    });
+
+    /**
+     * The loop a person actually got stuck in, on 2026-09-09.
+     *
+     * They registered an address they had registered earlier, met "check your
+     * email", and no mail came — because the server answers an existing
+     * address with a fabricated success so that nobody can enumerate accounts.
+     * Nothing on the screen said the way out was to sign in, so the product
+     * read as broken.
+     */
+    it("names the reason no link may come, without saying which address it is", async () => {
+      fetched.mockResolvedValue(json({ token: null, user: { email: "taken@example.com" } }));
+      screen = await mount(<Login firstRun={false} signUpOpen={true} />);
+
+      await act(async () => button("Create an account").click());
+      await settle();
+      setValue(field("Your name"), "Someone");
+      setValue(field("Email"), "taken@example.com");
+      setValue(field("Password"), "a-long-enough-password");
+      await act(async () => button("Create the account").click());
+      await settle();
+
+      expect(screen.container.textContent).toContain("already have an account");
+      expect(screen.container.textContent).toContain("sign in instead");
+      // And it stays a possibility rather than a statement. Confirming that
+      // this address is taken is the enumeration the server refuses to do.
+      expect(screen.container.textContent).not.toContain("is already registered");
+    });
+
+    it("says the same thing when a refused sign-in means the link is unopened", async () => {
+      fetched.mockResolvedValue(
+        json({ message: "Email not verified", code: "EMAIL_NOT_VERIFIED" }, 403),
+      );
+      screen = await mount(<Login firstRun={false} signUpOpen={false} />);
+
+      setValue(field("Email"), "owner@example.com");
+      setValue(field("Password"), "a-long-enough-password");
+      await act(async () => button("Sign in").click());
+      await settle();
+
+      expect(screen.container.textContent).toContain("Check your email");
+      expect(screen.container.textContent).toContain("owner@example.com");
+      // And not the library's own words, which name a state rather than an
+      // action and read as a failure the person caused.
+      expect(screen.container.textContent).not.toContain("Email not verified");
+    });
+
+    /**
+     * The code and not the sentence.
+     *
+     * A refusal that is *not* about verification has to go back to the form
+     * with the server's own words, and matching on wording would send a wrong
+     * password to the wrong screen the day the library rephrases something.
+     */
+    it("still shows a wrong password as a wrong password", async () => {
+      fetched.mockResolvedValue(
+        json({ message: "Invalid email or password.", code: "INVALID_EMAIL_OR_PASSWORD" }, 401),
+      );
+      screen = await mount(<Login firstRun={false} signUpOpen={false} />);
+
+      setValue(field("Email"), "owner@example.com");
+      setValue(field("Password"), "the-wrong-password");
+      await act(async () => button("Sign in").click());
+      await settle();
+
+      expect(screen.container.textContent).toContain("Invalid email or password.");
+      expect(screen.container.textContent).not.toContain("Check your email");
+    });
+
+    it("explains a link that had already expired, rather than showing a bare form", async () => {
+      vi.stubGlobal("location", {
+        ...globalThis.location,
+        reload: vi.fn(),
+        search: "?error=TOKEN_EXPIRED",
+      });
+
+      screen = await mount(<Login firstRun={false} signUpOpen={false} />);
+
+      expect(screen.container.textContent).toContain("expired");
+      // And it says what to do next, which is the one action that works.
+      expect(screen.container.textContent).toContain("send a new one");
+      expect(button("Sign in")).toBeTruthy();
+    });
+
+    it("says nothing about a link when the address carries no error", async () => {
+      screen = await mount(<Login firstRun={false} signUpOpen={false} />);
+
+      expect(screen.container.textContent).not.toContain("confirmation link");
+    });
+  });
+
   it("is what the shell shows instead of the inbox when nobody is signed in", async () => {
     fetched.mockImplementation(async (request: string) => {
       if (request === "/api/auth-status") {

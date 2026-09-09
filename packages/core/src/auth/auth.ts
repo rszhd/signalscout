@@ -37,6 +37,7 @@ import {
 } from "../db/schema.js";
 import type { Logger } from "../logger.js";
 import { type SignupMode, unclaimedUserId } from "./user.js";
+import { type SendEmail, verificationMessage } from "./verification-email.js";
 
 /** The instance `apps/api` mounts. Named so no signature carries the inferred type. */
 export type Auth = ReturnType<typeof createAuth>;
@@ -114,6 +115,18 @@ export interface CreateAuthOptions {
    * must not accumulate subscription rows for a gate that will never run.
    */
   readonly billing?: BillingMode;
+  /**
+   * How a verification link is sent, or undefined for a deployment that does
+   * not verify. US-092.
+   *
+   * One field rather than a mode beside a transport, and that is the point of
+   * it: the state this product must never be in is "verification required, no
+   * way to send a link", which is a login that refuses everybody with a message
+   * about mail nobody posted. Here that state cannot be described.
+   * `emailVerificationRequired` is what turns the deployment's setting into
+   * this, and it is where the refusal to boot lives.
+   */
+  readonly sendEmail?: SendEmail;
 }
 
 /**
@@ -174,6 +187,7 @@ export function createAuth({
   trustedOrigins = [],
   signup = "closed",
   billing = "off",
+  sendEmail,
 }: CreateAuthOptions) {
   return betterAuth({
     secret,
@@ -205,14 +219,99 @@ export function createAuth({
       enabled: true,
       minPasswordLength: minimumPasswordLength,
       /**
-       * Nothing sends mail here, so nothing may depend on mail arriving. A
-       * verification requirement with no transport is an instance nobody can
-       * sign in to, and US-016's SMTP settings are the *product's* mail, which
-       * a person configures after they are already inside.
+       * A link, only where one can be posted. US-092.
+       *
+       * This used to be `false` unconditionally, with the note that nothing
+       * here sends mail so nothing may depend on mail arriving. That reasoning
+       * is unchanged and is now enforced by the shape above: `sendEmail` is
+       * present exactly when the deployment both asked for verification and can
+       * send it, so a requirement with no transport — a login that refuses
+       * everybody, the owner included — cannot be configured.
+       *
+       * The common install still lands on `false`. It has no SMTP, one account,
+       * and a person who typed their own address sitting at the machine.
        */
-      requireEmailVerification: false,
+      requireEmailVerification: sendEmail !== undefined,
       autoSignIn: true,
     },
+
+    ...(sendEmail
+      ? {
+          emailVerification: {
+            /**
+             * Twenty-four hours rather than the library's one.
+             *
+             * A link that dies while somebody is at lunch is a support request,
+             * and the window buys little: the token is single use, it is
+             * useless without the address it names, and signing in again sends
+             * a fresh one anyway.
+             */
+            expiresIn: 60 * 60 * 24,
+            /**
+             * Opening the link signs them in.
+             *
+             * Without this a person confirms their address and is then shown a
+             * login form, which reads as the confirmation having failed. They
+             * proved they hold the address and they typed the password minutes
+             * ago; asking again buys nothing.
+             */
+            autoSignInAfterVerification: true,
+            /**
+             * On sign-up, because that is what the setting means.
+             *
+             * The library would infer it from `requireEmailVerification`, and
+             * this block only exists when that is true — so it is stated rather
+             * than inherited, because the inference is a default somebody
+             * else's version bump may change.
+             */
+            sendOnSignUp: true,
+            /**
+             * On a refused sign-in, because that is the only way back.
+             *
+             * A person whose link expired, or who never received it, has one
+             * action available: sign in again. Without this they get a refusal
+             * with nothing behind it, and no screen in the product can help
+             * them. There is no resend route, and this is why there needs to be
+             * none.
+             *
+             * It is not a way to mail somebody who did not ask. The wrong
+             * password is refused before this line, so a message goes out only
+             * to an address whose password the sender already knows.
+             */
+            sendOnSignIn: true,
+            /**
+             * A failure here is silent to everybody who needs to know.
+             *
+             * The library awaits this, catches whatever it throws and logs
+             * "Failed to run background task" — so the person is told to check
+             * an inbox nothing was sent to, and the one line that says why
+             * names neither mail nor this account. That was measured on
+             * 2026-09-09: a wrong SMTP password answered the sign-up 200 with
+             * `token: null`, exactly as a working one does.
+             *
+             * Failing the request instead would be worse. The account is
+             * already written by this point, so a refusal would report a
+             * failure that did not happen, and registering again meets the
+             * generic duplicate answer. The repair is the log line: it names
+             * the address and says a person is now waiting for mail that did
+             * not leave, which is what an operator needs to act.
+             */
+            sendVerificationEmail: async ({ user, url, token }) => {
+              const { subject, text } = verificationMessage(user.name, url);
+
+              try {
+                await sendEmail(user.email, subject, text, token);
+              } catch (error) {
+                logger?.error(
+                  { err: error, email: user.email },
+                  "the verification email was not sent: this account cannot sign in until it is",
+                );
+                throw error;
+              }
+            },
+          },
+        }
+      : {}),
 
     session: {
       expiresIn: sessionMaxAgeSeconds,

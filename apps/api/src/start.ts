@@ -6,6 +6,7 @@ import {
   builtInSources,
   configureNetworking,
   createDatabase,
+  emailVerificationRequired,
   jobSenderFor,
   startBlockers,
   startJobSender as startJobSenderDefault,
@@ -82,6 +83,21 @@ export async function startApi({
    * has started.
    */
   billingSettingsFrom(env);
+
+  /**
+   * An instance that asks for a verified address must be able to ask. US-092.
+   *
+   * Here for `billingSettingsFrom`'s reason and against a worse failure. A
+   * deployment with `AUTH_EMAIL_VERIFICATION=required` and no mail server does
+   * not half work: it refuses every account it has, the owner's included, with
+   * a message about a link that was never posted. Nothing on the screen says
+   * the mail server is the problem.
+   *
+   * `authFor` reads the same function, so this is not the only place it is
+   * checked. It is the place where the message arrives before the port is
+   * bound.
+   */
+  emailVerificationRequired(env);
 
   // Before any provider is called. BUG-011: Node gives an address 250ms to
   // connect, and several providers take longer than that, so half their

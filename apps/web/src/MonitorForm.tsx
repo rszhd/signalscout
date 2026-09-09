@@ -679,7 +679,7 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
                     aria-label="What do you sell?"
                     maxLength={2000}
                     minLength={10}
-                    placeholder="A test runner that records browser flows instead of coding them"
+                    placeholder="A project management app for small teams"
                     required
                     rows={2}
                     value={answers.product}
@@ -694,7 +694,7 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
                     aria-label="Who is most likely to buy it?"
                     maxLength={2000}
                     minLength={10}
-                    placeholder="Small SaaS teams without a dedicated QA engineer"
+                    placeholder="Team leads at small companies"
                     required
                     rows={2}
                     value={answers.idealCustomer}
@@ -709,7 +709,7 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
                     aria-label="What problem does it solve?"
                     maxLength={2000}
                     minLength={10}
-                    placeholder="End-to-end tests break whenever the UI changes"
+                    placeholder="Work gets lost across chat, email, and spreadsheets"
                     required
                     rows={2}
                     value={answers.problem}

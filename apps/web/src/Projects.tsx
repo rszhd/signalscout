@@ -370,7 +370,7 @@ export function Projects() {
                       required
                       aria-label="Name"
                       value={draft.name}
-                      placeholder="Acme QA"
+                      placeholder="Northwind"
                       onChange={(event) => change("name")(event.target.value)}
                     />
                   </label>
@@ -382,7 +382,7 @@ export function Projects() {
                       aria-label="What is the product?"
                       rows={2}
                       value={draft.product}
-                      placeholder="A test runner for small teams"
+                      placeholder="A task tracker for small teams"
                       onChange={(event) => change("product")(event.target.value)}
                     />
                   </label>
@@ -394,7 +394,7 @@ export function Projects() {
                       aria-label="Who is it for?"
                       rows={2}
                       value={draft.idealCustomer}
-                      placeholder="Small SaaS teams with no dedicated QA"
+                      placeholder="Team leads at growing companies"
                       onChange={(event) => change("idealCustomer")(event.target.value)}
                     />
                   </label>
@@ -406,7 +406,7 @@ export function Projects() {
                       aria-label="What problem does it solve?"
                       rows={2}
                       value={draft.problem}
-                      placeholder="Their end to end tests break on every UI change"
+                      placeholder="Tasks get lost across chat, email, and spreadsheets"
                       onChange={(event) => change("problem")(event.target.value)}
                     />
                   </label>

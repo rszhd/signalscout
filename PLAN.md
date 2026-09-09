@@ -114,13 +114,15 @@ The user controls the account, API access, usage, and associated API costs.
 
 ---
 
-# Initial MVP
+# Sources
 
-Keep the first version extremely small.
+Six platforms are monitored, through ten connectors: Reddit, X, LinkedIn,
+YouTube, TikTok and Instagram. Reddit and X came first, and the signals they
+carry are written out here. STACK.md holds what each platform and provider
+costs and returns, and AGENTS.md records what each one has been measured
+doing.
 
-## Sources
-
-### Reddit
+## Reddit
 
 Monitor relevant posts and comments.
 
@@ -134,7 +136,7 @@ Useful signals include:
 * Asking how other companies solve something
 * Looking to hire someone to solve the problem
 
-### X / Twitter
+## X / Twitter
 
 Monitor real-time conversations around similar signals.
 
@@ -589,7 +591,7 @@ The first meaningful question is:
 
 Early milestones:
 
-1. Get the MVP working for ourselves.
+1. Get the product working for ourselves.
 2. Get 10–20 people self-hosting it.
 3. See whether they continue running monitors.
 4. Measure whether matches are genuinely useful.

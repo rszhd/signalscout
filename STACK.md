@@ -153,7 +153,7 @@ design more than any framework choice.
 
 **The money is spent before our code ever sees the text.** That holds for every
 row above, and it is what the budget guard is built on. Reddit through Bright
-Data starts free, so Reddit still carries the MVP.
+Data starts free, so Reddit is still the cheapest platform to try first.
 
 **X is now the cheapest row per post, and that is a surprise worth stating.** A
 SocialCrawl request costs about eight tenths of a cent and returned twenty

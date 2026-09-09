@@ -17,8 +17,8 @@ that a decision is found here rather than an oversight.
 
 **PLAN.md's own milestones put them last, and in plain words.** The list at
 *Success criteria* ends: *"8. Only then expand integrations and features."*
-Milestone 1 is "get the MVP working for ourselves", and that is roughly where
-this product is. Two networks were added ahead of that list already — LinkedIn
+Milestone 1 is "get the product working for ourselves", and that is roughly
+where this product is. Two networks were added ahead of that list already — LinkedIn
 in US-028 and YouTube in US-034, both crossings of PLAN.md's *Important rule*,
 both recorded as decisions. A third, fourth and fifth would stop being
 exceptions and start being the plan.
@@ -76,6 +76,7 @@ not mean a shared contract.
 ## Log
 
 - 2026-09-06T11:56+08:00 — Parked at the owner's decision, in the same sentence
-  they named the three platforms: finish the MVP first. Recorded rather than
-  left in a conversation, because two networks have already been added ahead of
-  the plan and a third would need a reason rather than a habit.
+  they named the three platforms: finish the core product first. Recorded
+  rather than left in a conversation, because two networks have been added
+  ahead of
+  the plan already, and a third would need a reason rather than a habit.

@@ -11,8 +11,8 @@ resolution: shipped
 
 ## Context
 
-Reddit is the first source. It carries the MVP because it is the cheaper of the
-two and it starts free.
+Reddit is the first source. It came first because it is the cheaper of the two
+and it starts free.
 
 **It is no longer reached through Reddit's own API.** Reddit's Responsible
 Builder Policy, from November 2025, replaced self-serve app registration with a

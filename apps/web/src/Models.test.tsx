@@ -484,6 +484,93 @@ describe("the models screen", () => {
     });
   });
 
+  /**
+   * US-086. Pressing Save is a person saying they are finished with the
+   * dialog, and the row underneath is the confirmation.
+   */
+  describe("a dialog that was saved", () => {
+    function jobDialog(): HTMLDialogElement {
+      return document.querySelector(
+        'dialog[aria-labelledby="job-title-classify"]',
+      ) as HTMLDialogElement;
+    }
+
+    it("closes when the job is saved", async () => {
+      // A fresh response per call: a `Response` body can be read once, and the
+      // save reads a second one.
+      fetched.mockImplementation(async () => json(view({}, [storedKey])));
+      screen = await mount(<Models />);
+
+      expect(jobDialog().open).toBe(true);
+      setValue(select("Scoring posts key"), storedKey.id);
+      setValue(select("Scoring posts model"), "gpt-5.6-terra");
+      await act(async () => button("Save changes").click());
+      await settle();
+
+      expect(jobDialog().open).toBe(false);
+    });
+
+    it("closes when a key is added", async () => {
+      screen = await mount(<Models />);
+      const dialog = document.querySelector(
+        'dialog[aria-labelledby="add-model-key-title"]',
+      ) as HTMLDialogElement;
+
+      await act(async () => button("Close Scoring posts").click());
+      await act(async () => button("Add an API key").click());
+      setValue(field("Key name"), "My OpenAI key");
+      setValue(field("New API key"), "sk-mine");
+      await act(async () => button("Add key").click());
+      await settle();
+
+      expect(dialog.open).toBe(false);
+    });
+
+    /**
+     * The one case where the person is not finished, and what they typed is
+     * the only copy of it.
+     */
+    it("stays open when the server refuses, with the values that caused it", async () => {
+      fetched.mockImplementation(async (_url: string, init?: RequestInit) => {
+        if (init?.method === "PUT") {
+          return new Response(JSON.stringify({ message: "That model is retired." }), {
+            status: 400,
+            headers: { "content-type": "application/json" },
+          });
+        }
+        return json(view({}, [storedKey]));
+      });
+      screen = await mount(<Models />);
+
+      setValue(select("Scoring posts key"), storedKey.id);
+      setValue(select("Scoring posts model"), "gpt-5.6-terra");
+      await act(async () => button("Save changes").click());
+      await settle();
+
+      expect(jobDialog().open).toBe(true);
+      expect(jobDialog().textContent).toContain("That model is retired.");
+      expect(select("Scoring posts model").value).toBe("gpt-5.6-terra");
+    });
+
+    it("carries no message over from the last time it was open", async () => {
+      fetched.mockImplementation(async (url: string, init?: RequestInit) => {
+        if (init?.method === "DELETE" && String(url).endsWith("/classify")) {
+          return json(view({}, [storedKey]));
+        }
+        return json(view({ keyId: storedKey.id, model: "gpt-5.6-terra" }, [storedKey]));
+      });
+      screen = await mount(<Models />);
+
+      await act(async () => button("Use instance defaults").click());
+      await settle();
+      expect(jobDialog().textContent).toContain("Using instance defaults");
+
+      await act(async () => button("Close Scoring posts").click());
+      await act(async () => button("Edit Scoring posts").click());
+      expect(jobDialog().textContent).not.toContain("Using instance defaults");
+    });
+  });
+
   it("removes a key on its own row", async () => {
     fetched.mockResolvedValue(json(view({}, [storedKey])));
     screen = await mount(<Models />);

@@ -203,6 +203,10 @@ function KeyLibrary({
       setName("");
       setProvider("");
       setApiKey("");
+      // US-086. Pressing Save is a person saying they are finished here, and
+      // the key now in the list behind is the confirmation. A refusal below
+      // leaves the dialog open, because the typed key is the only copy.
+      dialog.current?.close();
     } catch (cause) {
       setError(messageFor(cause, "That key could not be stored."));
     } finally {
@@ -318,7 +322,10 @@ function KeyLibrary({
       <button
         className="secondary-button key-add"
         type="button"
-        onClick={() => dialog.current?.showModal()}
+        onClick={() => {
+          setError(null);
+          dialog.current?.showModal();
+        }}
       >
         Add an API key
       </button>
@@ -596,7 +603,9 @@ function JobCard({
         }),
       );
 
-      setNotice("Saved.");
+      // US-086. The card underneath now says what the job runs, which is a
+      // better answer than "Saved." above a form nobody is reading any more.
+      dialog.current?.close();
     } catch (cause) {
       setError(messageFor(cause, "That could not be saved."));
     } finally {
@@ -678,7 +687,13 @@ function JobCard({
         type="button"
         aria-label={`Edit ${task.title}`}
         aria-haspopup="dialog"
-        onClick={() => dialog.current?.showModal()}
+        onClick={() => {
+          // A message from the last time this was open answers a question
+          // nobody has asked yet. US-086.
+          setError(null);
+          setNotice(null);
+          dialog.current?.showModal();
+        }}
       >
         <span className="job-identity">
           <strong>{task.title}</strong>

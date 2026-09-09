@@ -2,7 +2,7 @@
 
 # Open tickets
 
-27 open — 13 doing, 13 todo, 1 parked (9 p1, 16 p2, 2 p3).
+28 open — 13 doing, 14 todo, 1 parked (9 p1, 16 p2, 3 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -32,6 +32,7 @@
 | p2 | US-053 | [A connector ships without being offered](todo/US-053-a-connector-ships-without-being-offered.md) | feature | todo | 2026-09-07T12:55+08:00 |
 | p2 | US-062 | [A real model's drafts are replayed](todo/US-062-a-real-model-s-drafts-are-replayed.md) | chore | todo | 2026-09-07T20:30+08:00 |
 | p3 | US-018 | [A mutation sweep proves the suite is sensitive](todo/US-018-a-mutation-sweep-proves-the-suite-is-sensitive.md) | chore | todo | 2026-09-04T22:54+08:00 |
+| p3 | BUG-013 | [A key row's error is printed inside a closed dialog](todo/BUG-013-a-key-row-s-error-is-printed-inside-a-closed-dialog.md) | bug | todo | 2026-09-09T11:58+08:00 |
 | p3 | US-038 | [Instagram, TikTok and Threads](parked/US-038-instagram-tiktok-and-threads.md) | feature | parked | 2026-09-06T11:56+08:00 |
 
 Finished work is in [DONE.md](DONE.md). The rules and the ticket

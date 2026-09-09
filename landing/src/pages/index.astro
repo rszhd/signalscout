@@ -20,52 +20,52 @@ const platforms = [
 ];
 const heroPosts = [
   {
-    platform: "Reddit",
     icon: "reddit.png",
-    source: "r/freelance",
+    source: "Reddit · r/smallbusiness",
+    product: "a booking app",
     score: 94,
-    text: "I’m spending every Friday chasing unpaid invoices.",
-    signal: "What do other freelancers use?",
+    text: "My clients keep booking the same slot twice.",
+    signal: "Is there a scheduling tool that stops this?",
   },
   {
-    platform: "X",
     icon: "x.png",
-    source: "X · Freelancer",
-    score: 89,
-    text: "My invoicing app costs more than I need to spend.",
-    signal: "Any simpler alternatives?",
+    source: "X · Backend developer",
+    product: "an error monitor",
+    score: 88,
+    text: "Our alerts are buried under a hundred other emails.",
+    signal: "What do you all use to catch them?",
   },
   {
-    platform: "LinkedIn",
     icon: "linkedin.ico",
-    source: "LinkedIn · Designer",
+    source: "LinkedIn · Operations lead",
+    product: "a hiring tracker",
     score: 87,
-    text: "I started freelancing and track every payment in a spreadsheet.",
-    signal: "Is there an easier way?",
+    text: "We are hiring out of a spreadsheet of forty candidates.",
+    signal: "Is there anything simpler than a full ATS?",
   },
   {
-    platform: "YouTube",
     icon: "youtube.png",
     source: "YouTube · Comment",
+    product: "a subtitle editor",
     score: 91,
-    text: "Making each invoice by hand takes me forever.",
+    text: "Fixing the subtitles takes me longer than filming did.",
     signal: "Can a tool do this for me?",
   },
   {
-    platform: "TikTok",
     icon: "tiktok.png",
     source: "TikTok · Comment",
+    product: "a skincare line",
     score: 86,
-    text: "I love freelancing but hate reminding clients to pay.",
-    signal: "Can I automate the reminders?",
+    text: "This moisturiser broke me out within a week.",
+    signal: "What should I be using instead?",
   },
   {
-    platform: "Instagram",
     icon: "instagram.png",
     source: "Instagram · Comment",
+    product: "a meal planner",
     score: 90,
-    text: "I keep losing track of which clients have paid me.",
-    signal: "What app would you recommend?",
+    text: "I throw out half my groceries every single week.",
+    signal: "Does anyone have a planner they like?",
   },
 ];
 const overheard = [
@@ -137,22 +137,22 @@ const examples = [
     <div class="hero-actions"><a class="button" href="#inbox">Find the question <Icon size={18}/></a><a class="text-link" href={repository}>Self-host it <Icon name="github" size={18}/></a></div>
     <p class="hero-note">Open source. Your keys. Your data.</p>
   </div>
-  <div class="signal-scene" aria-label="Illustrative matches for a freelancer invoicing app">
+  <div class="signal-scene" aria-label="Illustrative matches for six different products">
     <span class="scene-label">SOMEWHERE IN THE COMMENTS</span>
     <div class="question-mark" aria-hidden="true">?</div>
-    <div class="floating-note note-one"><img src="/brands/x.png" alt="X" width="18" height="18"/>“Here are my invoicing tips.”<span>Skip</span></div>
+    <div class="floating-note note-one"><img src="/brands/x.png" alt="X" width="18" height="18"/>“Ten tips I learned the hard way.”<span>Skip</span></div>
     <div class="hero-deck" id="hero-deck" aria-live="off">
     {heroPosts.map((post, index) => (
       <article class="signal-card" data-hero-card aria-hidden={index !== 0}>
         <div class="signal-card-top"><span class="platform-meta"><img src={`/brands/${post.icon}`} alt="" width="21" height="21"/>{post.source}</span><span class="match-badge">Worth a look ↗</span></div>
         <p>“{post.text} <mark>{post.signal}</mark>”</p>
-        <div class="card-bottom"><span>Asking for a solution</span><span class="score">{post.score}<span>/100</span></span></div>
+        <div class="card-bottom"><span>You build <strong>{post.product}</strong></span><span class="score">{post.score}<span>/100</span></span></div>
       </article>
     ))}
     </div>
     <span class="found-label"><Icon name="signal" size={18}/> That’s your cue.</span>
     <div class="hero-rotation-controls" hidden><button type="button" data-hero-toggle aria-controls="hero-deck" aria-label="Pause post rotation">Pause</button><span data-hero-position>1 / {heroPosts.length}</span><button type="button" data-hero-next aria-controls="hero-deck" aria-label="Show next example post">Next <Icon size={13}/></button></div>
-    <span class="illustration-label">Example: you’re building an invoicing app.</span>
+    <span class="illustration-label">Six platforms. Six different things somebody built.</span>
   </div>
 </section>
 <section class="platform-strip wrap" aria-label="Supported platforms">

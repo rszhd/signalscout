@@ -383,6 +383,10 @@ mark {
   font-size: var(--text-xs);
   color: var(--muted);
 }
+.card-bottom strong {
+  color: var(--ink);
+  font-weight: 600;
+}
 .score {
   color: var(--mint);
   font-size: 2.4rem;

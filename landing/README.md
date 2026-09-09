@@ -66,13 +66,19 @@ Copy stays short within each section. Figtree is bundled
 locally through `@fontsource/figtree`. Platform icon provenance is recorded in
 `public/brands/README.md`; only the six platform icons are copied here.
 
-The examples follow a simple invoicing app for freelancers, from chasing
-late payments to looking for a cheaper alternative. The inbox runs on
-illustrative posts and scores. Selecting a conversation
+The hero deck and the inbox demo answer two different questions, so they use
+different content. The hero carries one post per platform and a different
+product behind each one — a booking app, an error monitor, a hiring tracker, a
+subtitle editor, a skincare line, a meal planner — because the headline claims
+that somebody is asking for whatever the reader built. Each card names its
+product, so the post reads without outside context. The inbox demo below is one
+monitor, so it stays on a single product: a simple invoicing app for
+freelancers, from chasing late payments to looking for a cheaper alternative.
+Every post and score on the page is illustrative. Selecting a conversation
 updates the preview locally. FAQ disclosures use native HTML. The page makes
 no provider requests and collects no visitor data.
 
-The hero rotates through six illustrative platform posts every 3.5 seconds.
+The hero rotates through those six illustrative posts every 3.5 seconds.
 Pause and Next controls are available. Rotation pauses on hover, keyboard focus,
 when off-screen, and in hidden tabs. Reduced-motion preference starts it paused
 and removes card transitions. With JavaScript disabled, the first card remains visible.

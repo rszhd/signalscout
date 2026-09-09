@@ -1,0 +1,7 @@
+# The marketing site is meant to be found. The application is not: it is behind
+# a login, its SPA answers index.html for any unknown path, and a crawler
+# indexing it would list a sign-in page under a hundred addresses.
+User-agent: *
+Allow: /
+
+Sitemap: https://www.signalscout.run/sitemap.xml

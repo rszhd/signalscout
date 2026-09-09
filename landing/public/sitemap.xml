@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  One page, written by hand rather than generated.
+
+  `@astrojs/sitemap` exists and is not worth a dependency for a single URL. The
+  day this site has a second page, take the integration and delete this file —
+  a hand-written list is right for one entry and wrong for twenty.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://www.signalscout.run/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>

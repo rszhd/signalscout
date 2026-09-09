@@ -98,3 +98,33 @@ and removes card transitions. With JavaScript disabled, the first card remains v
 Supporting text uses a 14px minimum at the default browser size. Body copy is
 16–18px. These sizes use rem-based tokens so browser text-size preferences
 apply. Cards and captions wrap rather than shrinking their type on phones.
+
+## The social card
+
+`public/og.png` is what a link to this site unfurls into on X, LinkedIn, Slack
+and every other preview. **1200×630**, PNG — X and LinkedIn both refuse SVG, and
+a card at another ratio is cropped by each platform in its own way.
+
+Replace the file and redeploy. Nothing in the page needs editing: the `<head>`
+builds the absolute URL from the site's own origin, and the dimensions are
+declared so a preview reserves the right space before the file downloads.
+
+Two things to know when it changes. The **alt text** in `index.astro` describes
+the current image, so a new card needs a new sentence. And every platform
+**caches** what it scraped: X's Card Validator and LinkedIn's Post Inspector
+both force a re-fetch, and without one an old card can persist for days.
+
+## Metadata
+
+The title, the description and the card all live in the `<head>` of
+`src/pages/index.astro`, and the description is written once and reused by
+search results, Open Graph and X.
+
+`site` is the canonical origin and names the **`www`** host on purpose: the
+apex answers 308 to it, so pointing the canonical at the apex would aim every
+link and every crawler at a redirect.
+
+The JSON-LD block carries both plans, which is the one place the cloud price is
+repeated outside the pricing card. The application reads its price from Stripe
+rather than stating it; a static build cannot, so changing the price means
+changing both.

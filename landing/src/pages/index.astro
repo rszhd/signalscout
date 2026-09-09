@@ -10,6 +10,22 @@ import Icon from "../components/Icon.astro";
 
 const repository = "https://github.com/rszhd/signalscout";
 const appUrl = import.meta.env.PUBLIC_APP_URL;
+
+/**
+ * This page's own address, and the `www` host is deliberate: the apex answers
+ * 308 to it, so naming the apex here would make every canonical and every
+ * social card point at a redirect.
+ *
+ * A crawler and a link preview both need absolute URLs, so this is the one
+ * place the origin is written and everything absolute is built from it.
+ */
+const site = "https://www.signalscout.run";
+const socialCard = `${site}/og.png`;
+
+/** One sentence, used by search results and by every link preview. */
+const description =
+  "SignalScout finds public posts and comments from people describing a problem your product solves. " +
+  "Six platforms, scored by AI, in one inbox. Open source and self-hostable.";
 const platforms = [
   ["Reddit", "reddit.png"],
   ["X / Twitter", "x.png"],
@@ -113,13 +129,93 @@ const examples = [
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<meta name="description" content="Someone is asking for what you built. SignalScout finds public posts and comments from people describing a problem your product solves. Open source. Self-hostable."/>
+<title>SignalScout — Find the people already asking for what you built</title>
+<meta name="description" content={description}/>
+<link rel="canonical" href={`${site}/`}/>
 <meta name="theme-color" content="#f7f8fa"/>
-<meta property="og:title" content="SignalScout — Someone is asking for what you built."/>
-<meta property="og:description" content="Find the question your product answers. Open-source AI intent monitoring across six platforms."/>
+
+<!--
+  The link preview. `og:image` is an absolute URL because a scraper has no page
+  to resolve a relative one against, and it is a PNG because X and LinkedIn
+  both refuse SVG. The dimensions are stated so a preview reserves the right
+  space before the file has finished downloading.
+-->
+<meta property="og:site_name" content="SignalScout"/>
 <meta property="og:type" content="website"/>
+<meta property="og:url" content={`${site}/`}/>
+<meta property="og:title" content="SignalScout — Find the people already asking for what you built"/>
+<meta property="og:description" content={description}/>
+<meta property="og:locale" content="en_US"/>
+<meta property="og:image" content={socialCard}/>
+<meta property="og:image:secure_url" content={socialCard}/>
+<meta property="og:image:type" content="image/png"/>
+<meta property="og:image:width" content="1200"/>
+<meta property="og:image:height" content="630"/>
+<meta property="og:image:alt" content="A SignalScout match: a LinkedIn comment asking for something simpler than a full ATS, scored 87 out of 100 for someone building a hiring tracker."/>
+
+<!--
+  X reads its own names and falls back to the Open Graph ones for anything it
+  does not find. They are written out rather than left to that fallback because
+  the card type has no `og:` equivalent at all, and without it a link unfurls
+  as a thumbnail beside the text instead of a full-width image.
+-->
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:site" content="@signalscoutrun"/>
+<meta name="twitter:creator" content="@signalscoutrun"/>
+<meta name="twitter:title" content="SignalScout — Find the people already asking for what you built"/>
+<meta name="twitter:description" content={description}/>
+<meta name="twitter:image" content={socialCard}/>
+<meta name="twitter:image:alt" content="A SignalScout match: a LinkedIn comment asking for something simpler than a full ATS, scored 87 out of 100 for someone building a hiring tracker."/>
+
+<meta name="robots" content="index, follow, max-image-preview:large"/>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml"/>
-<title>SignalScout — Someone is asking for what you built</title>
+<link rel="apple-touch-icon" href="/logo.png"/>
+<link rel="sitemap" href="/sitemap.xml"/>
+
+<!--
+  Structured data, so a search result can carry the price and the free tier
+  rather than a bare blue link. Both plans are listed because both are real:
+  the software is free to self-host and the hosted version is a subscription,
+  and naming only one of them describes a product this is not.
+
+  The price is written here as well as on the pricing card above, which is a
+  second copy and a risk. The application itself reads its price from Stripe
+  for exactly that reason (BUG-014); this page cannot, because it is a static
+  build with no server and no key. Change one and change the other.
+-->
+<script
+  is:inline
+  type="application/ld+json"
+  set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: "SignalScout",
+    applicationCategory: "BusinessApplication",
+    operatingSystem: "Web",
+    url: `${site}/`,
+    description,
+    image: socialCard,
+    license: repository,
+    sameAs: [repository, "https://x.com/signalscoutrun", "https://www.linkedin.com/company/signalscoutrun"],
+    offers: [
+      {
+        "@type": "Offer",
+        name: "Self-hosted",
+        price: "0",
+        priceCurrency: "USD",
+        description: "The full source, run on your own infrastructure with your own keys.",
+      },
+      {
+        "@type": "Offer",
+        name: "SignalScout Cloud",
+        price: "20",
+        priceCurrency: "USD",
+        description: "Hosted, with a seven-day free trial and no card asked for.",
+        ...(appUrl ? { url: appUrl } : {}),
+      },
+    ],
+  })}
+/>
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>

@@ -74,11 +74,27 @@ place, because a promoted key would move every following job onto a provider
 nobody chose. No default is a state the screen shows and a person fixes in one
 press.
 
-**A model key is not tested when it is stored, and is tested when somebody
-presses Test.** US-080. Validating on save would spend the person's money on a
-call they did not ask for; a button is the person asking. The button appears on
-a job that holds both halves it would test — a key and a model — and the call is
-billed, so it is recorded in the ledger as `key_test`.
+**A model key is tested before it is stored, like a provider key.** US-087. A
+key the provider refuses is never written, and the sentence the person reads is
+the provider's own. US-068 and US-080 decided the other way twice, because a
+model call costs money where `validateCredentials` is free on Reddit — so the
+cost is now stated on the screen rather than avoided: one small structured
+call, recorded in the ledger as `key_test`.
+
+The dialog asks which model to test with, prefilled from this build's scoring
+recommendation for the chosen provider. It is not stored. Without it a key for
+OpenRouter or Ollama could not be tested at all, because this build recommends
+no model for either.
+
+Two refusals come before the probe — no `ENCRYPTION_KEY`, and a name already
+taken — because either one would throw away a call somebody paid for. And a
+`answered` result stores the key: the provider accepted it and billed for it,
+which is the whole question, and the doubtful half is a test model that is not
+kept.
+
+**A job's own Test button is still there.** US-080 put it on each card, where it
+tests the job's key against the job's model, which is a different question from
+whether the key works at all.
 
 **The worker caches a model client per account, and that cache lives as long as
 the process.** So a model key changed on the screen reaches the API immediately
@@ -164,6 +180,12 @@ answering at all** lead to different actions, so the routes keep them apart: a
 refusal is a 200 carrying `valid: false` and the provider's own sentence, and
 an unreachable provider is a 502. A key that could not be tested is not stored
 either — the environment variable is the way through a provider outage.
+
+**A model key is tested the same way and cannot make that distinction.**
+`generateStructured` answers one `failed` for a refused key and for a provider
+that never answered, so the Models screen shows the provider's sentence and
+stores nothing either way. A person whose provider is down retries. Separating
+the two is a change to `ai/call.ts`.
 
 ---
 

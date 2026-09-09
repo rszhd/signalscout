@@ -64,7 +64,7 @@ because `recommendedModelFor` answers null for both by design.
 
 ## Log
 
-- 2026-09-09T14:05+08:00 — Built. Nine new cases — seven on the route, four on
+- 2026-09-09T14:05+08:00 — Built. Twelve new cases — eight on the route, four on
   the screen — and 1,609 tests pass, lint and typecheck clean. Two mutations
   were confirmed to turn the suite red: dropping the probe from the add route
   fails four cases, and storing a refused key fails one.

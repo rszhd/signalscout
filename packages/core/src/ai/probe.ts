@@ -1,15 +1,20 @@
 /**
- * One small call, made because a person pressed a button. US-080.
+ * One small call, to find out whether a key and a model work. US-080, US-087.
  *
  * A provider key is tested before it is stored — `SocialSource.validateCredentials`,
- * and docs/secrets.md says why. A model key never was, and the reason is in
+ * and docs/secrets.md says why. A model key was not, and the reason is in
  * US-068's log: no model provider here publishes a free probe, so validating
- * one on save would spend somebody's money on a call they did not ask for.
+ * one on save spends somebody's money on a call they did not ask for.
  *
- * **A button is the person asking.** That is the whole difference, and it is
- * why this is a route and not a step in saving. The call is as small as the
- * two shapes allow — one sentence in, one boolean or one short vector back —
- * and it is billed, so it is recorded in the ledger like every other call.
+ * It is called from two places now, for two different questions. US-080's
+ * button on a job card asks whether *this job's* key and model work. US-087
+ * asks, as a key is added, whether the provider accepts it at all — the same
+ * rule as a provider key, on the owner's decision, with the cost said out loud
+ * on the dialog rather than avoided.
+ *
+ * The call is as small as the two shapes allow — one sentence in, one boolean
+ * or one short vector back — and it is billed, so it is recorded in the ledger
+ * like every other call.
  *
  * It answers three states rather than two, because they send a person to
  * different places:

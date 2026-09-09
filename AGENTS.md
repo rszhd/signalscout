@@ -993,20 +993,35 @@ introduced and nothing noticed — a rotation that reports success and then fail
 every model call the moment the old key is thrown away. It walks both tables
 now.
 
-Two things are not built. **A model key is not tested when it is stored, and is
-tested when somebody presses Test.** US-080. Validating on save spends money on
-a call nobody asked for; a button is the person asking. The probe makes one
-small structured call with the provider, model and key **on the screen** — test
-first, then keep, because asking somebody to save first is asking them to commit
-to what they pressed the button to doubt, and it answers
-three states rather than two — the middle one is the provider accepting the key
-and billing for it while the model returns the wrong shape, which sends a person
-somewhere different from a refusal. It is recorded as `key_test`, and
-**migration 0051 is what makes the database accept that purpose**: the same
-mistake as `apify` in US-057 and `draft_reply` in US-040, caught this time
-before it shipped. The probe is injected, so no test in this suite reaches a
-provider. **Nothing has pressed the button against a real provider**, and **no
-live model call has been made on a per-account key.**
+**A model key is tested on the screen, and now before it is stored.** US-080
+put a Test button on each job card: the probe makes one small structured call
+with the provider, model and key **on the screen** — test first, then keep,
+because asking somebody to save first is asking them to commit to what they
+pressed the button to doubt — and it answers three states rather than two. The
+middle one is the provider accepting the key and billing for it while the model
+returns the wrong shape, which sends a person somewhere different from a
+refusal. It is recorded as `key_test`, and **migration 0051 is what makes the
+database accept that purpose**: the same mistake as `apify` in US-057 and
+`draft_reply` in US-040, caught this time before it shipped.
+
+**US-087 then made the test unavoidable**, on the owner's decision, reversing
+US-068 and US-080 in the same direction as the provider keys: a key added on
+the Models screen is probed before the row is written, and a key the provider
+refuses is never stored. The reason for the two earlier refusals was money, so
+the cost is stated on the dialog rather than avoided. Three consequences are
+worth holding. The dialog asks for a **model to test with** — prefilled from
+the scoring recommendation, not stored — because this build can name no model
+for OpenRouter or Ollama, and a key for either would otherwise be untestable.
+The two free refusals, no `ENCRYPTION_KEY` and a name already taken, come
+**before** the probe, because either would throw away a paid call. And
+`answered` stores the key: the provider accepted it, which is the whole
+question. **The probe cannot tell a refused key from an unreachable provider** —
+`generateStructured` answers one `failed` for both, where `connections.ts`
+separates them into 400 and 502 — so an outage blocks a good key.
+
+The probe is injected, so no test in this suite reaches a provider. **Nothing
+has pressed the button against a real provider**, and **no live model call has
+been made on a per-account key.**
 
 **No route asks for a session, so none can forget.** One `onRequest` hook on
 the root instance covers every API route, and what is *not* behind it is a

@@ -72,6 +72,8 @@ interface ModelsView {
   pricedModels: Record<string, string[]>;
   /** The embedding model each provider defaults to, which has no price here. */
   embeddingModels: Record<string, string>;
+  /** The model a new key on each provider is tested with. US-087. */
+  testModels: Record<string, string>;
   keys: KeyView[];
   tasks: TaskView[];
 }
@@ -172,19 +174,37 @@ function KeyLibrary({
   keys,
   canStore,
   providers,
+  testModels,
+  instanceModel,
   onChanged,
 }: {
   keys: KeyView[];
   canStore: boolean;
   providers: string[];
+  /** The model a key on each provider is tested with. US-087. */
+  testModels: Record<string, string>;
+  /** What a key naming no provider is tested with: the deployment's own model. */
+  instanceModel: string;
   onChanged: (view: ModelsView) => void;
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const [name, setName] = useState("");
   const [provider, setProvider] = useState("");
   const [apiKey, setApiKey] = useState("");
+  const [model, setModel] = useState(instanceModel);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  /**
+   * The model a key on this provider is tested with, before anything is typed.
+   *
+   * Empty for OpenRouter and Ollama, which is not an omission: this build
+   * recommends no model for either — OpenRouter resells four hundred and
+   * Ollama runs whatever the machine has pulled — so the person names one.
+   */
+  function suggestedModel(one: string): string {
+    return one ? (testModels[one] ?? "") : instanceModel;
+  }
 
   async function add(event: FormEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault();
@@ -196,18 +216,21 @@ function KeyLibrary({
         await requestJson<ModelsView>("/api/models/keys", {
           method: "POST",
           headers: { "content-type": "application/json" },
-          body: JSON.stringify({ name, provider, apiKey }),
+          body: JSON.stringify({ name, provider, apiKey, model }),
         }),
       );
 
       setName("");
       setProvider("");
       setApiKey("");
+      setModel(instanceModel);
       // US-086. Pressing Save is a person saying they are finished here, and
       // the key now in the list behind is the confirmation. A refusal below
       // leaves the dialog open, because the typed key is the only copy.
       dialog.current?.close();
     } catch (cause) {
+      // The provider's own refusal, when there is one. US-087 tests the key
+      // before it is stored, so this is where a wrong key is read about.
       setError(messageFor(cause, "That key could not be stored."));
     } finally {
       setBusy(false);
@@ -360,7 +383,13 @@ function KeyLibrary({
                 className="form-control"
                 aria-label="Key provider"
                 value={provider}
-                onChange={(event) => setProvider(event.target.value)}
+                onChange={(event) => {
+                  // The test model follows the provider, because it belongs to
+                  // it. A name typed for OpenAI is not a name Anthropic
+                  // answers to, and leaving it would test the wrong pairing.
+                  setProvider(event.target.value);
+                  setModel(suggestedModel(event.target.value));
+                }}
               >
                 <option value="">Not stated</option>
                 {providers.map((one) => (
@@ -385,10 +414,27 @@ function KeyLibrary({
                 onChange={(event) => setApiKey(event.target.value)}
               />
             </label>
+
+            <label className="field">
+              <span>Model to test with</span>
+              <input
+                className="form-control"
+                aria-label="Model to test the key with"
+                placeholder="A model this key can call"
+                spellCheck={false}
+                value={model}
+                onChange={(event) => setModel(event.target.value)}
+              />
+            </label>
           </div>
 
           <p className="key-form-note">
             A key that names a provider sets the provider of every job that uses it.
+          </p>
+
+          <p className="key-form-note">
+            The key is tested before it is stored, so one small call is made to the provider and
+            billed to it. The model above is only used for that test and is not saved.
           </p>
 
           {error && (
@@ -399,10 +445,10 @@ function KeyLibrary({
 
           <button
             className="primary-button"
-            disabled={busy || !canStore || !name.trim() || !apiKey.trim()}
+            disabled={busy || !canStore || !name.trim() || !apiKey.trim() || !model.trim()}
             type="submit"
           >
-            {busy ? "Saving…" : "Add key"}
+            {busy ? "Testing…" : "Test and add key"}
           </button>
         </form>
       </dialog>
@@ -985,9 +1031,11 @@ export function Models() {
 
         <KeyLibrary
           canStore={view.canStore}
+          instanceModel={view.tasks.find((task) => task.task === "classify")?.instance.model ?? ""}
           keys={view.keys}
           onChanged={setView}
           providers={[...new Set(view.tasks.flatMap((task) => task.providers))]}
+          testModels={view.testModels}
         />
 
         <section className="models-section" aria-labelledby="models-jobs-title">

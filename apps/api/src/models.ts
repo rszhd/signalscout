@@ -20,6 +20,7 @@
  */
 import {
   type AiConfig,
+  type AiProvider,
   type AiTask,
   aiConfigFromEnvironment,
   aiProviders,
@@ -189,6 +190,8 @@ const modelsSchema = z.object({
   pricedModels: z.record(z.string(), z.array(z.string())),
   /** The embedding model each provider defaults to. See the view for why. */
   embeddingModels: z.record(z.string(), z.string()),
+  /** The model a new key on each provider is tested with. US-087. */
+  testModels: z.record(z.string(), z.string()),
   /** Every key on the account. One list, and every job picks from it. */
   keys: z.array(keySchema),
   tasks: z.array(taskSchema),
@@ -250,6 +253,16 @@ const keyBody = z.object({
   /** A label, so the list reads. Null is "not stated" and runs the same. */
   provider: optionalText.nullable().optional(),
   apiKey: z.string().trim().min(1).max(400),
+  /**
+   * The model the key is tested with, before it is stored. US-087.
+   *
+   * It is not kept. A key row names a provider and holds a ciphertext, and the
+   * model it was proved against belongs to the test rather than to the key.
+   * The screen asks for it because a probe has to call something, and this
+   * build can name no model for OpenRouter or Ollama — so a key for either
+   * could not be tested at all if the model were only ever inferred.
+   */
+  model: optionalText.nullable().optional(),
 });
 
 export async function registerModelRoutes(
@@ -360,6 +373,81 @@ export async function registerModelRoutes(
     };
   }
 
+  /** The deployment's own model, but only for the provider it names. */
+  function instanceModelFor(provider: string): string | null {
+    return provider === env.AI_PROVIDER ? env.AI_MODEL : null;
+  }
+
+  /**
+   * Ask the provider whether a pasted key works, before it is stored. US-087.
+   *
+   * Answers the sentence to refuse with, or null to store. The provider's own
+   * words are carried out whole: ours would be a guess about somebody else's
+   * refusal, and `connections.ts` learned that on the provider keys.
+   *
+   * **`answered` stores the key.** The provider accepted it and billed for it,
+   * which is the only question being asked here — a model returning the wrong
+   * shape is a doubt about the test model, and no model is kept on a key row.
+   *
+   * The call is billed, so it is recorded whatever it answers. A refused key
+   * still costs something at most providers, and a ledger that showed only the
+   * successful tests would understate the month.
+   */
+  async function testBeforeStoring(
+    provider: string | null,
+    apiKey: string,
+    model: string | null,
+  ): Promise<string | null> {
+    if (provider && !(aiProviders as readonly string[]).includes(provider)) {
+      return `${provider} is not a provider this build can use. Choose one of: ${aiProviders.join(", ")}.`;
+    }
+
+    // A key that names no provider pays for the deployment's own choices and
+    // changes nothing else, so the deployment's own provider and model are
+    // what it is proved against — the same rule `fallbackFor` follows.
+    const chosen = (provider ?? env.AI_PROVIDER) as AiProvider;
+    const named = provider
+      ? (model ?? recommendedModelFor(chosen, "classify") ?? instanceModelFor(chosen))
+      : (model ?? env.AI_MODEL);
+
+    if (!named) {
+      return `Name a model to test this key with. This build has no default model for ${chosen}.`;
+    }
+
+    const answer = await probe({
+      provider: chosen,
+      model: named,
+      apiKey,
+      // Only when the key is for the provider this deployment was configured
+      // for. Another provider's endpoint is not this one's, and sending it
+      // would test a gateway nobody asked about.
+      baseUrl: chosen === env.AI_PROVIDER ? env.AI_BASE_URL : undefined,
+      timeoutMs: env.AI_TIMEOUT_MS,
+    });
+
+    await recordModelCall(db, {
+      purpose: "key_test",
+      // `answered` is the model failing the shape rather than the call
+      // failing, which is exactly what `rejected` means in this ledger.
+      outcome:
+        answer.status === "ok" ? "scored" : answer.status === "answered" ? "rejected" : "failed",
+      call: answer.call,
+      error: answer.error ?? null,
+    });
+
+    app.log.info(
+      // The outcome and the model. Never the key.
+      { status: answer.status, provider: chosen, model: named },
+      "tested a model key before storing it",
+    );
+
+    if (answer.status === "failed") {
+      return answer.error ?? `${chosen} did not accept that key, so it was not saved.`;
+    }
+
+    return null;
+  }
+
   async function view(userId: string) {
     const settings = await readAiSettings(db, userId);
     const stored = new Map(settings.map((row) => [row.task, row]));
@@ -385,6 +473,22 @@ export async function registerModelRoutes(
        * empty list on a job that needs a name to run at all.
        */
       embeddingModels: defaultEmbeddingModels,
+      /**
+       * What a new key on each provider is tested against. US-087.
+       *
+       * The scoring recommendation, because that is the model the key runs the
+       * moment somebody makes it the account default — so the test proves the
+       * pairing that will actually be used rather than one chosen for being
+       * cheap. A provider missing here has no name this build can offer, which
+       * is OpenRouter and Ollama, and the screen asks for one.
+       */
+      testModels: Object.fromEntries(
+        aiProviders.flatMap((provider) => {
+          const model = recommendedModelFor(provider, "classify");
+
+          return model ? [[provider, model] as const] : [];
+        }),
+      ),
       keys,
       tasks: aiTasks.map((task) => {
         const mine = stored.get(task);
@@ -612,14 +716,24 @@ export async function registerModelRoutes(
   });
 
   /**
-   * Add a key to the account. US-079.
+   * Add a key to the account, and test it first. US-079, US-087.
    *
    * It belongs to nobody's job until somebody picks it, which is the whole
    * point: a person pastes a key once and then says, on each card, which key
-   * pays. Nothing is tested against the provider first — no model provider
-   * here publishes a free probe, so validating one would spend the person's
-   * money on a call they did not ask for. `docs/secrets.md` says so beside the
-   * provider keys, which *are* tested.
+   * pays.
+   *
+   * **The provider is asked before the row is written**, which is the rule
+   * `connections.ts` has always followed for a provider key: a key the
+   * provider refuses is never stored, and the sentence a person reads is the
+   * provider's own. US-068 and US-080 decided the other way twice, because a
+   * model call costs money where `validateCredentials` is free on Reddit. The
+   * owner reversed it in US-087, so the cost is stated on the screen instead
+   * of avoided: one small structured call, recorded in the ledger like any
+   * other.
+   *
+   * **The two free refusals come first.** No `ENCRYPTION_KEY` and a name
+   * already taken are both answered before the probe, because either one
+   * throws away a call somebody paid for.
    */
   app.route({
     method: "POST",
@@ -634,9 +748,25 @@ export async function registerModelRoutes(
       if (!key) return reply.code(400).send({ message: noEncryptionKey });
 
       const userId = sessionUserId(request);
+      const { name, provider, apiKey, model } = request.body;
+
+      // Read rather than left to the unique index, so a clash costs nothing.
+      // `createAiKey` still throws below: two adds at once is a race the
+      // database settles, and this read only saves the common case a call.
+      const taken = (await listAiKeys(db, userId)).some(
+        (one) => one.name.toLowerCase() === name.toLowerCase(),
+      );
+
+      if (taken) {
+        return reply.code(409).send({ message: new DuplicateAiKeyName(name).message });
+      }
+
+      const refusal = await testBeforeStoring(provider ?? null, apiKey, model ?? null);
+
+      if (refusal) return reply.code(400).send({ message: refusal });
 
       try {
-        const stored = await createAiKey(db, key, userId, request.body);
+        const stored = await createAiKey(db, key, userId, { name, provider, apiKey });
 
         request.log.info(
           // The name and the mask. Never the key, and never the ciphertext.

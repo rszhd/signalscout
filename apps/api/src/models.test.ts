@@ -51,17 +51,24 @@ describe("the models routes", () => {
     probed = { status: "ok" };
   });
 
-  /** Add a key the way the screen does, and hand back its id. */
+  /**
+   * Add a key the way the screen does, and hand back its id.
+   *
+   * Adding one now makes a probe and records a `key_test` row — US-087 tests a
+   * key before it is stored — so a test counting the ledger has to say which
+   * calls it means.
+   */
   async function addKey(
     app: Awaited<ReturnType<typeof server>>,
     name: string,
     apiKey: string,
     provider?: string,
+    model?: string,
   ): Promise<string> {
     const added = await app.inject({
       method: "POST",
       url: "/api/models/keys",
-      payload: { name, apiKey, ...(provider ? { provider } : {}) },
+      payload: { name, apiKey, ...(provider ? { provider } : {}), ...(model ? { model } : {}) },
     });
 
     expect(added.statusCode).toBe(200);
@@ -387,6 +394,9 @@ describe("the models routes", () => {
         theirs = await addKey(app, "Their key", "sk-theirs-000000abcd", "openai");
       });
 
+      // The probe that stored their key is not the one under test here.
+      await db.delete(modelCalls);
+
       await withServer(owner, async (app) => {
         const refused = await app.inject({
           method: "POST",
@@ -438,10 +448,12 @@ describe("the models routes", () => {
     });
 
     it("carries the provider's own sentence back when the call fails", async () => {
-      probed = { status: "failed", error: "401 Incorrect API key provided." };
-
       await withServer(owner, async (app) => {
+        // Stored while the provider was answering, so that the failure below
+        // is this route's and not the one that added it.
         const keyId = await addKey(app, "A wrong key", "sk-wrong-000000abcd", "openai");
+        await db.delete(modelCalls);
+        probed = { status: "failed", error: "401 Incorrect API key provided." };
 
         const tested = await app.inject({
           method: "POST",
@@ -505,6 +517,143 @@ describe("the models routes", () => {
       expect(classify.keyId).toBeNull();
       // The rest of the job's settings survive it.
       expect(classify.model).toBe("gpt-5.6-terra");
+    });
+  });
+
+  /**
+   * US-087. A provider key has been tested before it was stored since US-023,
+   * and a model key was not: US-068 and US-080 both refused, because a model
+   * call costs money where `validateCredentials` is free. The owner reversed
+   * it, so these are the cases that hold the reversal.
+   */
+  describe("testing a key before it is stored", () => {
+    it("does not store a key the provider refuses, and says what it said", async () => {
+      probed = { status: "failed", error: "401 Incorrect API key provided." };
+
+      await withServer(owner, async (app) => {
+        const refused = await app.inject({
+          method: "POST",
+          url: "/api/models/keys",
+          payload: { name: "A wrong key", apiKey: "sk-wrong-000000abcd", provider: "openai" },
+        });
+
+        expect(refused.statusCode).toBe(400);
+        expect(refused.json().message).toBe("401 Incorrect API key provided.");
+
+        const after = await app.inject({ method: "GET", url: "/api/models" });
+        expect(after.json().keys).toEqual([]);
+
+        // Billed by some providers whatever it answered, so it is recorded.
+        const [recorded] = await db.select().from(modelCalls);
+        expect(recorded?.purpose).toBe("key_test");
+        expect(recorded?.outcome).toBe("failed");
+      });
+    });
+
+    it("tests the pairing the key will run, and records the call", async () => {
+      await withServer(owner, async (app) => {
+        await addKey(app, "My OpenAI key", "sk-1234567890abcd", "openai");
+
+        const [recorded] = await db.select().from(modelCalls);
+
+        expect(recorded?.purpose).toBe("key_test");
+        expect(recorded?.provider).toBe("openai");
+        // This build's scoring recommendation for that provider, which is what
+        // the key runs the moment it becomes the account's default.
+        expect(recorded?.model).toBe("gpt-5.6-terra");
+      });
+    });
+
+    /**
+     * A key naming no provider moves the bill and nothing else, so the
+     * deployment's own provider and model are what it is proved against.
+     */
+    it("tests an unlabelled key against the instance's own model", async () => {
+      await withServer(owner, async (app) => {
+        await addKey(app, "Just a key", "sk-1234567890abcd");
+
+        const [recorded] = await db.select().from(modelCalls);
+
+        expect(recorded?.provider).toBe("anthropic");
+        expect(recorded?.model).toBe("claude-haiku-4-5");
+      });
+    });
+
+    it("stores a key the provider accepted but the model answered badly", async () => {
+      probed = { status: "answered", error: "The model returned prose." };
+
+      await withServer(owner, async (app) => {
+        const added = await app.inject({
+          method: "POST",
+          url: "/api/models/keys",
+          payload: { name: "My key", apiKey: "sk-1234567890abcd", provider: "openai" },
+        });
+
+        // The provider accepted the key and billed for it, which is the whole
+        // question here. No model is kept on a key row.
+        expect(added.statusCode).toBe(200);
+        expect(added.json().keys).toHaveLength(1);
+      });
+    });
+
+    it("asks for a model when this build can name none for the provider", async () => {
+      await withServer(owner, async (app) => {
+        const refused = await app.inject({
+          method: "POST",
+          url: "/api/models/keys",
+          payload: { name: "Gateway", apiKey: "sk-router", provider: "openrouter" },
+        });
+
+        expect(refused.statusCode).toBe(400);
+        expect(refused.json().message).toContain("Name a model");
+        expect(await db.select().from(modelCalls)).toEqual([]);
+      });
+    });
+
+    /** Both free refusals come first, so neither throws a paid call away. */
+    it("refuses a name already taken before it spends", async () => {
+      await withServer(owner, async (app) => {
+        await addKey(app, "My key", "sk-1234567890abcd");
+        await db.delete(modelCalls);
+
+        const again = await app.inject({
+          method: "POST",
+          url: "/api/models/keys",
+          payload: { name: "my key", apiKey: "sk-something-else-1234" },
+        });
+
+        expect(again.statusCode).toBe(409);
+        expect(await db.select().from(modelCalls)).toEqual([]);
+      });
+    });
+
+    it("spends nothing on an instance that cannot store a key", async () => {
+      const app = await server(owner, false);
+
+      try {
+        const refused = await app.inject({
+          method: "POST",
+          url: "/api/models/keys",
+          payload: { name: "My key", apiKey: "sk-1234567890abcd" },
+        });
+
+        expect(refused.statusCode).toBe(400);
+        expect(await db.select().from(modelCalls)).toEqual([]);
+      } finally {
+        await app.close();
+      }
+    });
+
+    it("tells the screen which model each provider's key is tested with", async () => {
+      await withServer(owner, async (app) => {
+        const view = (await app.inject({ method: "GET", url: "/api/models" })).json();
+
+        expect(view.testModels).toMatchObject({ openai: "gpt-5.6-terra" });
+        // Named for neither: OpenRouter resells four hundred models and Ollama
+        // runs whatever the machine pulled, so the screen asks.
+        expect(view.testModels.openrouter).toBeUndefined();
+        expect(view.testModels.ollama).toBeUndefined();
+      });
     });
   });
 
@@ -690,7 +839,8 @@ describe("the models routes", () => {
 
     it("says the machine answers for a provider it can name no model on", async () => {
       await withServer(owner, async (app) => {
-        await addKey(app, "Gateway", "sk-router", "openrouter");
+        // OpenRouter has no recommended model, so a test model is named.
+        await addKey(app, "Gateway", "sk-router", "openrouter", "some/model");
         const view = (await app.inject({ method: "GET", url: "/api/models" })).json();
 
         expect(

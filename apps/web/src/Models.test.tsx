@@ -69,6 +69,7 @@ function view(overrides: Record<string, unknown> = {}, keys: unknown[] = []) {
       openai: ["gpt-5.6-luna", "gpt-5.6-terra"],
     },
     embeddingModels: { openai: "text-embedding-3-small" },
+    testModels: { openai: "gpt-5.6-terra", anthropic: "claude-sonnet-5" },
     keys,
     tasks: [
       {
@@ -472,7 +473,7 @@ describe("the models screen", () => {
     await act(async () => button("Add an API key").click());
     setValue(field("Key name"), "My OpenAI key");
     setValue(field("New API key"), "sk-mine");
-    await act(async () => button("Add key").click());
+    await act(async () => button("Test and add key").click());
     await settle();
 
     const [url, init] = fetched.mock.calls.at(-1) as [string, RequestInit];
@@ -481,6 +482,91 @@ describe("the models screen", () => {
     expect(JSON.parse(String(init.body))).toMatchObject({
       name: "My OpenAI key",
       apiKey: "sk-mine",
+      // The key is tested before it is stored, and a test has to call
+      // something. US-087.
+      model: "claude-haiku-4-5",
+    });
+  });
+
+  /**
+   * US-087. A provider key has been tested before it was stored since US-023,
+   * and a model key was not. These are the cases that hold the reversal on the
+   * screen: the person sees what will be called, and reads the refusal.
+   */
+  describe("adding a key tests it first", () => {
+    async function openTheKeyDialog() {
+      screen = await mount(<Models />);
+      await act(async () => button("Close Scoring posts").click());
+      await act(async () => button("Add an API key").click());
+    }
+
+    it("fills the test model in from the provider, and sends it", async () => {
+      await openTheKeyDialog();
+
+      setValue(field("Key name"), "My OpenAI key");
+      setValue(select("Key provider"), "openai");
+      setValue(field("New API key"), "sk-mine");
+
+      expect(field("Model to test the key with").value).toBe("gpt-5.6-terra");
+
+      await act(async () => button("Test and add key").click());
+      await settle();
+
+      const [, init] = fetched.mock.calls.at(-1) as [string, RequestInit];
+      expect(JSON.parse(String(init.body))).toMatchObject({
+        provider: "openai",
+        model: "gpt-5.6-terra",
+      });
+    });
+
+    it("leaves the model empty for a provider this build cannot name one for", async () => {
+      // Ollama runs whatever the machine has pulled, so there is no name to
+      // offer and the person types one.
+      fetched.mockResolvedValue(json(view({ providers: ["openai", "ollama"] })));
+      await openTheKeyDialog();
+
+      setValue(select("Key provider"), "openai");
+      setValue(select("Key provider"), "ollama");
+
+      expect(field("Model to test the key with").value).toBe("");
+    });
+
+    it("keeps the dialog open on a refusal, with the provider's own sentence", async () => {
+      fetched.mockImplementation(async (url: string, init?: RequestInit) => {
+        if (init?.method === "POST" && String(url) === "/api/models/keys") {
+          return new Response(JSON.stringify({ message: "401 Incorrect API key provided." }), {
+            status: 400,
+            headers: { "content-type": "application/json" },
+          });
+        }
+        return json(view());
+      });
+      await openTheKeyDialog();
+
+      const dialog = document.querySelector(
+        'dialog[aria-labelledby="add-model-key-title"]',
+      ) as HTMLDialogElement;
+
+      setValue(field("Key name"), "A wrong key");
+      setValue(field("New API key"), "sk-wrong");
+      await act(async () => button("Test and add key").click());
+      await settle();
+
+      expect(dialog.open).toBe(true);
+      expect(dialog.textContent).toContain("401 Incorrect API key provided.");
+      // The typed key is the only copy of it.
+      expect(field("New API key").value).toBe("sk-wrong");
+    });
+
+    it("says the test costs money, because it does", async () => {
+      await openTheKeyDialog();
+
+      const dialog = document.querySelector(
+        'dialog[aria-labelledby="add-model-key-title"]',
+      ) as HTMLDialogElement;
+
+      expect(dialog.textContent).toContain("tested before it is stored");
+      expect(dialog.textContent).toContain("billed");
     });
   });
 
@@ -520,7 +606,7 @@ describe("the models screen", () => {
       await act(async () => button("Add an API key").click());
       setValue(field("Key name"), "My OpenAI key");
       setValue(field("New API key"), "sk-mine");
-      await act(async () => button("Add key").click());
+      await act(async () => button("Test and add key").click());
       await settle();
 
       expect(dialog.open).toBe(false);

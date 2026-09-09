@@ -162,8 +162,8 @@ export interface AuthRoutesOptions {
  * path the gate does not cover fails loudly here instead of writing a row
  * owned by `undefined`.
  */
-export function sessionUserId(request: FastifyRequest): string {
-  const found = request.sessionUser?.id;
+export function sessionUser(request: FastifyRequest): SessionUser {
+  const found = request.sessionUser;
 
   if (!found) {
     throw new Error(
@@ -173,6 +173,10 @@ export function sessionUserId(request: FastifyRequest): string {
   }
 
   return found;
+}
+
+export function sessionUserId(request: FastifyRequest): string {
+  return sessionUser(request).id;
 }
 
 /** Is this path answered without a session? */

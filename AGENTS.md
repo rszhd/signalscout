@@ -1405,6 +1405,47 @@ invisible to a green run, and the thing that found this one was running `curl`
 against the same host from the same machine and watching one client wait where
 the other would not.
 
+**A match now reaches a person without being asked to.** US-093 closed on
+2026-09-10, on the owner's decision. US-016 built digests, immediate alerts and
+signed webhooks in September and **nothing was ever delivered**: the running
+instance held zero rows in `notification_settings` and zero in
+`notification_deliveries`, against 174 posts and 20 matches. There was no row
+until somebody opened a screen and saved, so the common outcome was a monitor
+that collected, classified and told nobody.
+
+`createMonitor` writes the row now. A new monitor gets a **24-hour digest at
+50+ and an immediate email above 70**, addressed to the account of whoever
+created it. 70 rather than the shipped 90 because the best scores measured are
+71 on Reddit, 66 on X, 69 on LinkedIn, 82 on TikTok and 90 on Instagram — at 90
+an immediate email would have fired twice in this product's history.
+
+**Email is on only where the deployment can send, and that is one rule rather
+than a new variable.** `defaultNotificationSettings` reads
+`notificationReadiness`, the same list the save route and the screen read. This
+is `AUTH_EMAIL_VERIFICATION`'s shape: the setting and the transport are one
+thing, so "notifications on, no way to send" cannot be described. A self-hosted
+instance with no SMTP gets a row with email off and a screen naming
+`SMTP_HOST` and `SMTP_FROM`; the cloud, which has Resend on a verified domain,
+gets email. **The webhook stays off**, because it needs a URL only the person
+has.
+
+**It has delivered, live.** On 2026-09-10 `live:notification` read 40 stored
+r/softwaretesting posts, called no provider, produced six matches — 90, 75, 63,
+62, 52, 51 — and sent **three deliveries, every one `sent` on the first attempt
+with no error**: an immediate email for the 90, one for the 75, and a digest
+carrying all six. $0.166 of model and $0.00 of provider. The 90 was due the
+moment it was written and needed no clock.
+
+Two things it found. The first two samples — 20 newest Reddit posts, then 20
+newest from the subreddit — scored **zero matches at 50**, where the oldest
+forty produced six: a sample aimed at nothing measures nothing. And one of 26
+answers came back as malformed JSON with Malayalam and Chinese characters
+spliced into a reason, recorded as `rejected` with the post keeping its place —
+the **third** live sighting of US-006's failure path.
+
+Existing monitors were deliberately not migrated, so one stays silent until
+somebody opens its notification screen and saves. Read docs/notifications.md.
+
 **The inbox leaves as a spreadsheet.** US-064 closed on 2026-09-07. A link
 beside the match count downloads the list *currently on screen* as CSV — every
 filter honoured, every page walked, because a screen paginates and a file
@@ -1828,6 +1869,7 @@ pnpm --filter @signalscout/core live:tiktok-comments # spends model only; see be
 pnpm --filter @signalscout/core live:instagram-poll   # spends ~$1.65 + model; see below
 pnpm --filter @signalscout/core live:instagram-comments # spends model only; see below
 pnpm --filter @signalscout/core live:thread-loop      # spends up to a cap you pass; see below
+pnpm --filter @signalscout/core live:notification      # spends model only; see below
 pnpm --filter @signalscout/core measure:lead-position # spends ~$0.40; see below
 pnpm capture:deletions                            # spends ~$0.02; see below
 
@@ -1954,6 +1996,15 @@ Pass the cap in dollars — the budget is what ends it on a thread that keeps
 producing leads, and that is itself a stop reason worth seeing. It leaves a
 paused monitor of its own, so it never skips comments an older monitor has
 already classified.
+
+`live:notification` answers whether a match ever reaches a person. It calls no
+provider: it creates a monitor through `createMonitor`, reads posts **already
+stored**, filters and classifies them in the real order, and hands the result to
+the real SMTP transport. `--channel=` aims the sample and `--oldest` flips its
+order, and both matter — twenty newest posts scored nothing at 50 where the
+oldest forty produced six matches. Run it when the notification defaults or the
+delivery rules change. It leaves a paused monitor, its settings row, its matches
+and its delivery rows.
 
 `measure:lead-position` answers whether this product's leads sit where the
 platform ranks highest. It pages a thread cheaply and classifies only the

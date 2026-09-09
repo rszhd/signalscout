@@ -22,6 +22,7 @@ import {
   type Logger,
   machineKeysUsable,
   needsApiKey,
+  notificationReadiness,
   type ProjectDescriber,
   providerKeyEnvironment,
   type QueryGenerator,
@@ -100,6 +101,15 @@ export interface BuildServerOptions {
    * billed call.
    */
   modelProbe?: ModelRoutesOptions["probe"];
+  /**
+   * Whether this deployment has a working mailer, for a new monitor's
+   * notification defaults. US-093.
+   *
+   * Derived from `env` unless a test says otherwise, so a deployment never has
+   * to state it twice and a test can describe an instance with a mail server
+   * without describing the mail server.
+   */
+  canSendEmail?: boolean;
   /**
    * Which credentials the database holds, as `source:field` names.
    *
@@ -361,6 +371,7 @@ export async function buildServer({
   jobs = null,
   billingSettings,
   billing,
+  canSendEmail,
 }: BuildServerOptions): Promise<ApiServer> {
   const app = Fastify({ loggerInstance: logger }).withTypeProvider<ZodTypeProvider>();
 
@@ -472,6 +483,10 @@ export async function buildServer({
     db,
     sources,
     environment,
+    // US-093: whether a new monitor's email notifications can be switched on.
+    // The same list the notification screen and its save route read, asked
+    // once here so the monitor routes never see the SMTP settings.
+    canSendEmail: canSendEmail ?? notificationReadiness(env).smtpMissing.length === 0,
     storedCredentials: storedCredentials ?? ((userId: string) => storedCredentialNames(db, userId)),
     queryGenerator,
     queryGeneratorFor: async (userId) => queryGeneratorForEnvironment(await aiFor(userId), logger),

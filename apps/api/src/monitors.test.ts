@@ -28,6 +28,7 @@ import {
   posts,
   type QueryGenerator,
   type QueryPlanOutcome,
+  readNotificationSettings,
   recordFilterDrops,
   recordModelCall,
   recordSourceUsage,
@@ -138,12 +139,15 @@ describe("the monitor routes", () => {
     queryGenerator?: QueryGenerator | null;
     /** US-053: what this build offers, for a case about a connector that is off. */
     sources?: readonly ConnectorDefinition[];
+    /** US-093: whether this deployment has a mailer to switch email on with. */
+    canSendEmail?: boolean;
   }
 
   async function server({
     environment = configured,
     queryGenerator = null,
     sources = builtInSources,
+    canSendEmail = false,
   }: ServerOptions = {}) {
     const env = loadEnv({ DATABASE_URL: database.url });
 
@@ -155,6 +159,7 @@ describe("the monitor routes", () => {
       sources,
       environment,
       queryGenerator,
+      canSendEmail,
     });
   }
 
@@ -1256,6 +1261,84 @@ describe("the monitor routes", () => {
           "tiktok",
           "instagram",
         ]);
+      });
+    });
+  });
+  describe("a new monitor is told how to reach its owner", () => {
+    /**
+     * US-093. Before this there was no `notification_settings` row until
+     * somebody opened a screen and saved, so the running instance held zero
+     * rows and zero deliveries against 174 posts and 20 matches: a monitor that
+     * collected, classified and told nobody.
+     */
+    const settingsFor = (id: string) => readNotificationSettings(db, id);
+
+    it("writes the settings, addressed to the signed-in account", async () => {
+      await withServer({ canSendEmail: true }, async (app) => {
+        const created = await app.inject({
+          method: "POST",
+          url: "/api/monitors",
+          payload: newMonitor,
+        });
+
+        const row = await settingsFor(created.json().id);
+
+        expect(row?.emailEnabled).toBe(true);
+        expect(row?.emailTo).toBe("owner@example.test");
+        expect(row?.immediateScore).toBe(70);
+        expect(row?.minScore).toBe(50);
+        expect(row?.digestHours).toBe(24);
+      });
+    });
+
+    it("invents no webhook", async () => {
+      // A webhook needs a URL only the person has.
+      await withServer({ canSendEmail: true }, async (app) => {
+        const created = await app.inject({
+          method: "POST",
+          url: "/api/monitors",
+          payload: newMonitor,
+        });
+
+        const row = await settingsFor(created.json().id);
+
+        expect(row?.webhookEnabled).toBe(false);
+        expect(row?.webhookUrl).toBe("");
+      });
+    });
+
+    it("sends no backlog: only matches found after the row is written count", async () => {
+      // What makes defaulting this on safe. `enabled_since` is the moment the
+      // monitor was created, so an inbox filled later is not posted at once.
+      const before = new Date();
+
+      await withServer({ canSendEmail: true }, async (app) => {
+        const created = await app.inject({
+          method: "POST",
+          url: "/api/monitors",
+          payload: newMonitor,
+        });
+
+        const row = await settingsFor(created.json().id);
+
+        expect(row?.enabledSince.getTime()).toBeGreaterThanOrEqual(before.getTime());
+      });
+    });
+
+    it("leaves email off on a deployment with no mailer", async () => {
+      // Most self-hosted instances. The row exists and says off, so nothing is
+      // queued and the notification screen names what is missing.
+      await withServer({}, async (app) => {
+        const created = await app.inject({
+          method: "POST",
+          url: "/api/monitors",
+          payload: newMonitor,
+        });
+
+        const row = await settingsFor(created.json().id);
+
+        expect(row?.emailEnabled).toBe(false);
+        expect(row?.emailTo).toBe("owner@example.test");
       });
     });
   });

@@ -1,10 +1,23 @@
 # Notifications
 
 Open **Monitors → Notifications** for the monitor you want to configure.
-Email and webhooks start disabled. Enabling email uses a daily digest with a
-minimum score of 50. The interval and score floor are editable. Quiet periods
-send nothing. An optional immediate email threshold starts at 90.
-Immediate alerts also appear in the next digest.
+
+**A new monitor emails its owner already.** US-093. It is created with a daily
+digest of matches scoring 50 or more, and an immediate email for anything above
+70, sent to the account address of whoever created it. The interval, the score
+floor and the immediate threshold are all editable, and email can be switched
+off. Quiet periods send nothing. Immediate alerts also appear in the next
+digest.
+
+Email is on only where the deployment can send it. An instance with no
+`SMTP_HOST` or `SMTP_FROM` creates the monitor with email off, and this screen
+names what is missing. So nothing is queued that cannot be delivered.
+
+**Webhooks start disabled**, and stay that way until you give a URL. There is
+nothing to guess.
+
+Only matches found after a monitor is created are eligible. Nothing already in
+an inbox is posted as a backlog.
 
 Saving settings starts a new period. Only matches created after that save are
 eligible. Pending deliveries under the previous settings are cancelled, so a

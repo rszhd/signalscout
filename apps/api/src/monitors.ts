@@ -62,7 +62,7 @@ import {
   verdictCounts,
 } from "@signalscout/core";
 import { z } from "zod";
-import { ownedMonitor, sessionUserId } from "./auth.js";
+import { ownedMonitor, sessionUser, sessionUserId } from "./auth.js";
 import type { ApiServer } from "./server.js";
 
 /**
@@ -383,6 +383,16 @@ export interface MonitorRoutesOptions {
   readonly sources: readonly ConnectorDescriptor[];
   /** The environment half of where a source key lives. */
   readonly environment?: Record<string, string | undefined>;
+  /**
+   * Whether this deployment has a working mailer. US-093.
+   *
+   * A boolean rather than the SMTP settings, because these routes have no
+   * other business with them: `notificationReadiness` is asked once at the
+   * composition root, where the notification routes already ask it. False by
+   * default, so a caller that says nothing creates monitors that notify
+   * nobody — which is how every monitor behaved before US-093.
+   */
+  readonly canSendEmail?: boolean;
   /**
    * The stored half: which credentials `source_credentials` holds, as
    * `source:field` names.
@@ -833,7 +843,8 @@ export async function registerMonitorRoutes(
       const off = switchedOffSources(options.sources, request.body.sources);
       if (off) return reply.code(422).send({ message: off });
 
-      const runtime = await currentEnvironment(sessionUserId(request));
+      const person = sessionUser(request);
+      const runtime = await currentEnvironment(person.id);
 
       const { monitor, missing } = await createMonitor(
         db,
@@ -841,9 +852,19 @@ export async function registerMonitorRoutes(
           ...request.body,
           ...filterSettings(request.body),
           ...replySettings(request.body),
-          userId: sessionUserId(request),
+          userId: person.id,
         },
-        runtime,
+        {
+          ...runtime,
+          // US-093. A monitor is told how to reach its owner as it is created,
+          // rather than staying silent until somebody visits a screen they
+          // have no reason to visit. The rule is in core; these are its two
+          // inputs.
+          notificationDefaults: {
+            canSendEmail: options.canSendEmail === true,
+            emailTo: person.email,
+          },
+        },
       );
 
       if (request.body.budget) await setBudget(db, monitor.id, request.body.budget);

@@ -413,6 +413,7 @@ export {
 export { configureNetworking, connectAttemptTimeoutMs } from "./net.js";
 export { type NotificationTransport, processNotifications } from "./notifications/deliver.js";
 export {
+  defaultNotificationSettings,
   type NotificationInput,
   notificationDefaults,
   notificationInputSchema,

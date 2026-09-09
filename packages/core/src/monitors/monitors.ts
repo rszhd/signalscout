@@ -17,6 +17,10 @@
 import { desc, eq, sql } from "drizzle-orm";
 import type { Database } from "../db/client.js";
 import { monitors, projects, type Signal, type Source } from "../db/schema.js";
+import {
+  defaultNotificationSettings,
+  saveNotificationSettings,
+} from "../notifications/settings.js";
 import { offeredConnectors } from "../sources/offering.js";
 import type { ConnectorDescriptor, ProviderChoices } from "../sources/types.js";
 import { type MissingCredential, missingCredentials } from "../worker/credentials.js";
@@ -135,6 +139,22 @@ export interface MonitorEnvironment {
    * prevent, one axis further along.
    */
   readonly providerChoices?: ProviderChoices;
+  /**
+   * What a new monitor is set to notify with. US-093.
+   *
+   * The two facts belong to the composition root and not to this file: whether
+   * the deployment has a working mailer, and what the owner's address is. The
+   * *rule* they feed is `defaultNotificationSettings`, which is in
+   * `packages/core` like every other rule a route enforces.
+   *
+   * Absent writes no settings row, which is how every monitor behaved before
+   * US-093 and is what the worker's own tests describe. A caller that has no
+   * person asking — a live script, a fixture — is not asked for one.
+   */
+  readonly notificationDefaults?: {
+    readonly canSendEmail: boolean;
+    readonly emailTo: string | null;
+  };
 }
 
 export interface CreatedMonitor {
@@ -407,6 +427,23 @@ export async function createMonitor(
     .returning();
 
   if (!monitor) throw new Error("The monitor was not inserted.");
+
+  /**
+   * The monitor is told how to reach its owner, at the moment it is created.
+   *
+   * US-093. Before this there was no row until somebody opened the
+   * notification screen, so the common outcome was a monitor that collected,
+   * classified and told nobody. `enabledSince` is set to now by
+   * `saveNotificationSettings`, so only matches found after this are eligible
+   * and nothing already in the inbox is posted as a backlog.
+   */
+  if (runtime.notificationDefaults) {
+    await saveNotificationSettings(
+      db,
+      monitor.id,
+      defaultNotificationSettings(runtime.notificationDefaults),
+    );
+  }
 
   return { monitor, missing };
 }

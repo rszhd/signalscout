@@ -347,7 +347,7 @@ async function main(): Promise<void> {
 
   say(`delivering as at ${at.toISOString()} — the moment the digest falls due`);
 
-  await processNotifications(db, monitorId, transport, at, process.env.APP_URL);
+  await processNotifications(db, monitorId, transport, at, { appUrl: process.env.APP_URL });
 
   const deliveries = await db
     .select({

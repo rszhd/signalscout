@@ -13,6 +13,16 @@ interface Settings {
   webhookUrl: string;
   webhookMode: "match" | "digest";
 }
+/** The account's signing secret, as the screen may see it. US-096. */
+interface SigningSecret {
+  /** `••••1234`, or null when this account has none of its own. */
+  hint: string | null;
+  usingInstanceSecret: boolean;
+  canStore: boolean;
+  storeBlocker: string | null;
+  updatedAt: string | null;
+}
+
 interface Response {
   settings: Settings;
   smtpMissing: string[];
@@ -20,6 +30,7 @@ interface Response {
   emailError: string | null;
   webhookError: string | null;
   nextDigestAt: string | null;
+  signingSecret: SigningSecret;
 }
 
 export function Notifications({
@@ -34,6 +45,14 @@ export function Notifications({
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [saved, setSaved] = useState(false);
+  /**
+   * The secret, held only while this page is open. US-096.
+   *
+   * It is never read back from the server: the generate route is the one
+   * response that carries the value, and a page that could re-display it is a
+   * page that leaks it with a screenshot.
+   */
+  const [freshSecret, setFreshSecret] = useState<string | null>(null);
   useEffect(() => {
     let active = true;
     requestJson<Response>(`/api/monitors/${monitorId}/notifications`)
@@ -54,6 +73,39 @@ export function Notifications({
     setSettings((current) => current && { ...current, ...patch });
     setSaved(false);
   }
+  /**
+   * Ask for a secret and show it, once. US-096.
+   *
+   * The response is the only one that ever carries the value, so it is held in
+   * state and never fetched again. Nothing is saved by this: the readiness the
+   * server returns is folded back in, which is what lets the webhook switch
+   * become usable without a reload.
+   */
+  async function generateSecret() {
+    setBusy(true);
+    setError(null);
+    try {
+      const value = await requestJson<{ secret: string; signingSecret: SigningSecret }>(
+        "/api/notifications/signing-secret",
+        { method: "POST" },
+      );
+      setFreshSecret(value.secret);
+      setData(
+        (current) =>
+          current && {
+            ...current,
+            signingSecret: value.signingSecret,
+            // The account can sign now, so the switch stops being refused.
+            webhookMissing: [],
+          },
+      );
+    } catch (cause) {
+      setError(messageFor(cause, "A signing secret could not be generated."));
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function save(event: React.FormEvent) {
     event.preventDefault();
     setBusy(true);
@@ -175,9 +227,50 @@ export function Notifications({
               {data.webhookMissing.length > 0 && (
                 <p role="status">
                   Set {data.webhookMissing.join(", ")} and restart the API and worker to enable
-                  signed webhooks.
+                  signed webhooks, or make a signing secret for this account below.
                 </p>
               )}
+              <div className="notification-secret">
+                <p>
+                  Every delivery is signed with a secret, and your receiver verifies the
+                  <code> X-SignalScout-Signature</code> header with the same value. It belongs to
+                  your account and every monitor you own uses it.
+                </p>
+                {freshSecret ? (
+                  <p role="status">
+                    <strong>Copy this now. It is not shown again.</strong>
+                    <output>{freshSecret}</output>
+                  </p>
+                ) : data.signingSecret.hint ? (
+                  <p>
+                    A secret is set for this account, ending <code>{data.signingSecret.hint}</code>.
+                  </p>
+                ) : data.signingSecret.usingInstanceSecret ? (
+                  <p>
+                    Signing with this instance&rsquo;s own <code>WEBHOOK_SIGNING_SECRET</code>. Make
+                    one for your account to sign with a value nobody else here holds.
+                  </p>
+                ) : (
+                  <p>No secret yet, so nothing can be delivered.</p>
+                )}
+                {data.signingSecret.storeBlocker && (
+                  <p role="status">{data.signingSecret.storeBlocker}</p>
+                )}
+                <button
+                  type="button"
+                  className="secondary-button"
+                  disabled={!data.signingSecret.canStore || busy}
+                  onClick={generateSecret}
+                >
+                  {data.signingSecret.hint ? "Generate a new secret" : "Generate a secret"}
+                </button>
+                {data.signingSecret.hint && (
+                  <p>
+                    Generating a new one stops every receiver configured with the old value from
+                    verifying, until you give them the new one.
+                  </p>
+                )}
+              </div>
               <label className="notification-check">
                 <input
                   type="checkbox"

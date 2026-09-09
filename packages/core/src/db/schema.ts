@@ -1933,3 +1933,42 @@ export const subscriptions = pgTable(
     ),
   ],
 );
+
+/**
+ * The secret an account's webhook deliveries are signed with. US-096.
+ *
+ * **One row per account, and that is the whole point of the table.**
+ * `WEBHOOK_SIGNING_SECRET` was one value for the instance, which is right for
+ * one person on one machine and wrong the moment a second account exists: the
+ * contract hands the secret to the customer to verify with, so every customer
+ * would hold the value every other customer's deliveries are signed with, and
+ * any of them could sign a payload another's receiver accepts as genuine. It is
+ * BUG-010's shape on a different column.
+ *
+ * **We generate it, so nothing here is pasted and nothing is probed.** That is
+ * the difference from `ai_keys` and `source_credentials`, which hold what
+ * somebody typed. It is still encrypted, because a database that leaks would
+ * otherwise let anybody forge a delivery to a customer's receiver.
+ *
+ * An account with no row falls back to the environment, which is what keeps
+ * every self-hosted instance working unchanged.
+ */
+export const webhookSecrets = pgTable(
+  "webhook_secrets",
+  {
+    /** One per account, so the account is the key. No foreign key, for `monitors.user_id`'s reason. */
+    userId: text("user_id").primaryKey(),
+    ciphertext: text("ciphertext").notNull(),
+    /** What the cipher authenticated. Stored, never derived. */
+    record: text("record").notNull(),
+    /** `••••1234`, so a screen can say a secret exists without decrypting one. */
+    hint: text("hint").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  () => [
+    // A value that is not in the cipher's format was never encrypted by us.
+    check("webhook_secrets_ciphertext_format", sql.raw(`ciphertext LIKE 'v1.%.%.%'`)),
+    check("webhook_secrets_hint_masked", sql.raw(`hint LIKE '••••%' AND length(hint) <= 8`)),
+  ],
+);

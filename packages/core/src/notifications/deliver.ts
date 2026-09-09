@@ -29,7 +29,16 @@ export interface NotificationTransport {
         html?: string,
       ) => Promise<void>)
     | null;
-  webhook: ((url: string, body: string, id: string) => Promise<void>) | null;
+  /**
+   * Post one delivery, signed with the secret the caller resolved. US-096.
+   *
+   * The secret is an argument rather than something the transport captured at
+   * startup, because it belongs to the **account** now: one may hold its own on
+   * an instance whose environment has none, and every account on a hosted
+   * instance must not sign with the same value. Null or undefined means nothing
+   * can sign this one, and the transport refuses rather than sending unsigned.
+   */
+  webhook: (url: string, body: string, id: string, signingSecret: string | null) => Promise<void>;
 }
 
 export async function processNotifications(
@@ -37,15 +46,30 @@ export async function processNotifications(
   monitorId: string,
   transport: NotificationTransport,
   now = new Date(),
-  /**
-   * Where this instance answers, for the "open the inbox" button. US-094.
-   *
-   * Optional, and the template renders without it. `APP_URL` is required only
-   * for Stripe, so a self-hosted deployment may not have set one — and a button
-   * pointing nowhere is worse than no button. A match still links to its own
-   * post, which needs nothing configured.
-   */
-  appUrl?: string,
+  {
+    appUrl,
+    signingSecretFor,
+  }: {
+    /**
+     * Where this instance answers, for the "open the inbox" button. US-094.
+     *
+     * Optional, and the template renders without it. `APP_URL` is required only
+     * for Stripe, so a self-hosted deployment may not have set one — and a
+     * button pointing nowhere is worse than no button. A match still links to
+     * its own post, which needs nothing configured.
+     */
+    readonly appUrl?: string | undefined;
+    /**
+     * The secret this account's webhook deliveries are signed with. US-096.
+     *
+     * Injected rather than read here, because resolving it needs the encryption
+     * key and the process environment, and neither belongs in a file that
+     * writes delivery rows. Absent means no webhook can be signed, which is the
+     * state every caller before US-096 was in when the environment had no
+     * secret.
+     */
+    readonly signingSecretFor?: ((userId: string) => Promise<string | null>) | undefined;
+  } = {},
 ) {
   // Commit the outbox before calling a remote service. A crash during delivery
   // leaves the original delivery id available to the next attempt.
@@ -170,7 +194,9 @@ export async function processNotifications(
         return true;
       }
       const [monitor] = await tx
-        .select({ name: monitors.name })
+        // The owner comes back too, because a webhook is signed with *their*
+        // secret now and not the instance's. US-096.
+        .select({ name: monitors.name, userId: monitors.userId })
         .from(monitors)
         .where(eq(monitors.id, monitorId));
       if (!monitor) return false;
@@ -227,8 +253,11 @@ export async function processNotifications(
           if (!transport.email) throw new Error("SMTP is unavailable");
           await transport.email(config.emailTo, subject, text, delivery.id, html);
         } else {
-          if (!transport.webhook) throw new Error("Webhook signing is unavailable");
-          await transport.webhook(config.webhookUrl, JSON.stringify(payload), delivery.id);
+          // Resolved per delivery, so a secret regenerated on the screen
+          // signs the next attempt. The transport refuses a null rather than
+          // sending something no receiver can verify.
+          const secret = signingSecretFor ? await signingSecretFor(monitor.userId) : null;
+          await transport.webhook(config.webhookUrl, JSON.stringify(payload), delivery.id, secret);
         }
       } catch {
         // Do not retain provider text or errors: these can echo passwords,

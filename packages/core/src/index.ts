@@ -238,6 +238,7 @@ export {
 export {
   machineKeysUsable,
   providerKeyEnvironment,
+  webhookSecretEnvironment,
   withoutMachineModelKeys,
 } from "./config/machine-keys.js";
 export { createDatabase, type Database } from "./db/client.js";
@@ -412,6 +413,15 @@ export {
 } from "./monitors/index.js";
 export { configureNetworking, connectAttemptTimeoutMs } from "./net.js";
 export { type NotificationTransport, processNotifications } from "./notifications/deliver.js";
+export {
+  deleteAccountWebhookSecret,
+  generateAccountWebhookSecret,
+  generateWebhookSecret,
+  readWebhookSecretHint,
+  type WebhookSecretHint,
+  webhookSecretFor,
+  webhookSecretRecordName,
+} from "./notifications/secret.js";
 export {
   defaultNotificationSettings,
   type NotificationInput,

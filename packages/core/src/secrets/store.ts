@@ -29,7 +29,8 @@
  */
 import { and, eq, sql } from "drizzle-orm";
 import type { Database } from "../db/client.js";
-import { aiKeys, type Provider, sourceCredentials } from "../db/schema.js";
+import { aiKeys, type Provider, sourceCredentials, webhookSecrets } from "../db/schema.js";
+import { webhookSecretRecordName } from "../notifications/secret.js";
 import {
   decryptSecret,
   type EncryptionKey,
@@ -344,6 +345,34 @@ export async function rotateEncryptionKey(
         .where(eq(aiKeys.id, row.id));
     }
 
-    return rows.length + keys.length;
+    /**
+     * The webhook signing secrets. US-096, and the third table to join this
+     * walk.
+     *
+     * US-079 recorded why this matters: `db:rotate-key` had never touched
+     * `ai_keys`, so a rotation reported success and then failed every model
+     * call the moment the old key was thrown away. A secret missed here is
+     * quieter and worse — every webhook delivery for that account would fail to
+     * decrypt, and the person would read it as their receiver being down.
+     */
+    const secrets = await tx
+      .select({ userId: webhookSecrets.userId, ciphertext: webhookSecrets.ciphertext })
+      .from(webhookSecrets);
+
+    for (const row of secrets) {
+      // Derived from the owner rather than read from the row, which is what
+      // `webhookSecretFor` does and for the same reason: a row moved between
+      // accounts brings its `record` column with it, so trusting that column
+      // would re-seal somebody else's secret under this account's name.
+      const record = webhookSecretRecordName(row.userId);
+      const value = decryptSecret(from, row.ciphertext, record);
+
+      await tx
+        .update(webhookSecrets)
+        .set({ ciphertext: encryptSecret(to, value, record), updatedAt: new Date() })
+        .where(eq(webhookSecrets.userId, row.userId));
+    }
+
+    return rows.length + keys.length + secrets.length;
   });
 }

@@ -30,13 +30,16 @@ import { loadAiEnv, loadNotificationEnv, loadSignupEnv } from "../config/env.js"
 import {
   machineKeysUsable,
   providerKeyEnvironment,
+  webhookSecretEnvironment,
   withoutMachineModelKeys,
 } from "../config/machine-keys.js";
 import { createDatabase, type Database, poolOptions } from "../db/client.js";
 import type { Logger } from "../logger.js";
 import { configureNetworking } from "../net.js";
 import type { NotificationTransport } from "../notifications/deliver.js";
+import { webhookSecretFor } from "../notifications/secret.js";
 import { createNotificationTransport } from "../notifications/transport.js";
+import { optionalEncryptionKey } from "../secrets/cipher.js";
 import { assertStoredCredentialsAreReadable } from "../secrets/store.js";
 import { builtInSources } from "../sources/index.js";
 import { createSourceRegistry, type SourceRegistry } from "../sources/registry.js";
@@ -517,10 +520,24 @@ export async function startWorker({
       steps.notify ??
       createNotifyStep(
         notificationTransport ?? createNotificationTransport(loadNotificationEnv()),
-        // US-094. Optional everywhere: `APP_URL` is required only for Stripe,
-        // so the button is offered where a deployment has said where it
-        // answers and left out where it has not.
-        process.env.APP_URL,
+        {
+          // US-094. Optional everywhere: `APP_URL` is required only for Stripe,
+          // so the button is offered where a deployment has said where it
+          // answers and left out where it has not.
+          appUrl: process.env.APP_URL,
+          // US-096. The account's own secret, falling back to the instance's.
+          // Read per delivery: one worker serves every account, and a secret
+          // regenerated on the screen must sign the next attempt.
+          signingSecretFor: (userId) =>
+            webhookSecretFor(
+              db,
+              userId,
+              optionalEncryptionKey(),
+              // Undefined where signup is open, so an account there signs with
+              // its own secret or with nothing at all.
+              webhookSecretEnvironment(signup),
+            ),
+        },
       ),
   };
 

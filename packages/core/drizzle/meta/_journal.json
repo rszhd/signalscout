@@ -379,6 +379,13 @@
       "when": 1788707618126,
       "tag": "0053_an_address_is_verified_before_an_account_is_used",
       "breakpoints": true
+    },
+    {
+      "idx": 54,
+      "version": "7",
+      "when": 1788972718207,
+      "tag": "0054_a_webhook_secret_belongs_to_an_account",
+      "breakpoints": true
     }
   ]
 }

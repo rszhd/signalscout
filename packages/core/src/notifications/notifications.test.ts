@@ -21,6 +21,7 @@ let close: () => Promise<void>;
 let monitorId: string;
 let now: Date;
 let sent: { channel: string; body: string }[];
+let signed: string[];
 let transport: NotificationTransport;
 beforeAll(async () => {
   database = await createTestDatabase("notifications");
@@ -35,12 +36,16 @@ beforeEach(async () => {
   monitorId = await insertMonitor(database);
   now = new Date("2026-09-05T00:00:00Z");
   sent = [];
+  signed = [];
   transport = {
     email: async (_to, _subject, body) => {
       sent.push({ channel: "email", body });
     },
-    webhook: async (_url, body) => {
+    // The secret is recorded, because US-096's whole claim is about *which*
+    // one signed each delivery.
+    webhook: async (_url, body, _id, secret) => {
       sent.push({ channel: "webhook", body });
+      if (secret) signed.push(secret);
     },
   };
 });
@@ -57,7 +62,7 @@ async function configure(extra = {}) {
     now,
   );
 }
-async function match(score: number, hidden = false) {
+async function match(score: number, hidden = false, forMonitor = monitorId) {
   const [post] = await db
     .insert(posts)
     .values({
@@ -74,7 +79,7 @@ async function match(score: number, hidden = false) {
   const [row] = await db
     .insert(matches)
     .values({
-      monitorId,
+      monitorId: forMonitor,
       postId: post.id,
       score,
       relevance: score,
@@ -274,4 +279,43 @@ it("an unavailable SMTP transport does not speed up or block webhook digests", a
   await processNotifications(db, monitorId, transport, now);
   expect(sent.map((row) => row.channel)).toEqual(["webhook", "email"]);
   expect(sent[1]?.body).not.toContain("90");
+});
+
+it("signs a delivery with the monitor owner's secret, not with anybody else's", async () => {
+  /**
+   * US-096, and the case a mutation found missing. Signing every delivery with
+   * one value was the state before this ticket, and it is exactly what lets one
+   * customer forge a payload another's receiver accepts — so it is not enough
+   * that *a* secret reaches the transport. It has to be the secret of the
+   * account that owns this monitor.
+   */
+  const owner = `owner-${randomUUID()}`;
+  const mine = await insertMonitor(database, { userId: owner });
+  const asked: string[] = [];
+
+  await saveNotificationSettings(
+    db,
+    mine,
+    {
+      ...notificationDefaults,
+      emailEnabled: false,
+      webhookEnabled: true,
+      webhookUrl: "https://receiver.example/hook",
+      webhookMode: "match",
+      immediateScore: 70,
+    },
+    now,
+  );
+
+  await match(90, false, mine);
+
+  await processNotifications(db, mine, transport, new Date(now.getTime() + 60_000), {
+    signingSecretFor: async (userId) => {
+      asked.push(userId);
+      return `secret-for-${userId}`;
+    },
+  });
+
+  expect(asked).toEqual([owner]);
+  expect(signed).toEqual([`secret-for-${owner}`]);
 });

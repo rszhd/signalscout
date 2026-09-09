@@ -11,6 +11,7 @@ import type { AiEnvironment } from "../ai/config.js";
 import {
   machineKeysUsable,
   providerKeyEnvironment,
+  webhookSecretEnvironment,
   withoutMachineModelKeys,
 } from "./machine-keys.js";
 
@@ -71,5 +72,32 @@ describe("whether the machine's keys are an account's to spend", () => {
 
     expect(providerKeyEnvironment("closed", environment)).toEqual(environment);
     expect(providerKeyEnvironment("open", environment)).toEqual({});
+  });
+});
+
+describe("the webhook signing secret", () => {
+  const environment = { WEBHOOK_SIGNING_SECRET: "the-instance-secret-32-characters-long" };
+
+  it("is an account's to sign with where signup is closed", () => {
+    // One person, one machine, one `.env`. Every receiver they configured
+    // against it keeps verifying.
+    expect(webhookSecretEnvironment("closed", environment)).toBe(
+      environment.WEBHOOK_SIGNING_SECRET,
+    );
+  });
+
+  it("is nobody's to sign with where signup is open", () => {
+    /**
+     * US-096's whole reason. The contract hands this value to the customer to
+     * verify with, so an account falling back to it on a shared instance would
+     * sign with a secret every other account also holds — and any of them could
+     * forge a delivery another's receiver accepts as genuine.
+     */
+    expect(webhookSecretEnvironment("open", environment)).toBeUndefined();
+  });
+
+  it("answers undefined where the instance set none, either way", () => {
+    expect(webhookSecretEnvironment("closed", {})).toBeUndefined();
+    expect(webhookSecretEnvironment("open", {})).toBeUndefined();
   });
 });

@@ -4,7 +4,16 @@ import type SMTPTransport from "nodemailer/lib/smtp-transport/index.js";
 import type { NotificationEnv } from "../config/env.js";
 import type { NotificationTransport } from "./deliver.js";
 
-export function notificationReadiness(env: NotificationEnv) {
+/**
+ * What this deployment cannot do yet, as the list of variables to set.
+ *
+ * `hasAccountSecret` is US-096: an account with a signing secret of its own can
+ * enable a webhook on an instance whose environment has none, so the answer is
+ * per account and not per instance. Absent means "ask about the instance
+ * alone", which is what a caller describing the build rather than a person
+ * wants.
+ */
+export function notificationReadiness(env: NotificationEnv, hasAccountSecret = false) {
   const smtpMissing: string[] = [];
   if (!env.SMTP_HOST) smtpMissing.push("SMTP_HOST");
   if (!env.SMTP_FROM) smtpMissing.push("SMTP_FROM");
@@ -12,7 +21,8 @@ export function notificationReadiness(env: NotificationEnv) {
   if (env.SMTP_PASSWORD && !env.SMTP_USER) smtpMissing.push("SMTP_USER");
   return {
     smtpMissing,
-    webhookMissing: env.WEBHOOK_SIGNING_SECRET ? [] : ["WEBHOOK_SIGNING_SECRET"],
+    webhookMissing:
+      hasAccountSecret || env.WEBHOOK_SIGNING_SECRET ? [] : ["WEBHOOK_SIGNING_SECRET"],
   };
 }
 
@@ -28,7 +38,6 @@ export function createNotificationTransport(
   env: NotificationEnv,
   options: TransportOptions = {},
 ): NotificationTransport {
-  const signingSecret = env.WEBHOOK_SIGNING_SECRET;
   const readiness = notificationReadiness(env);
   const mailer = readiness.smtpMissing.length
     ? null
@@ -68,34 +77,43 @@ export function createNotificationTransport(
           }
         }
       : null,
-    webhook: signingSecret
-      ? async (url, body, id) => {
-          const timestamp = String(Math.floor((options.now?.() ?? new Date()).getTime() / 1000));
-          const signature = createHmac("sha256", signingSecret)
-            .update(`${timestamp}.${body}`)
-            .digest("hex");
-          try {
-            const parsed = new URL(url);
-            if (parsed.protocol !== "https:" || parsed.username || parsed.password)
-              throw new Error("Invalid URL");
-            const response = await fetcher(url, {
-              method: "POST",
-              body,
-              redirect: "error",
-              signal: AbortSignal.timeout(15_000),
-              headers: {
-                "content-type": "application/json",
-                "x-signalscout-id": id,
-                "x-signalscout-timestamp": timestamp,
-                "x-signalscout-signature": `v1=${signature}`,
-              },
-            });
-            await response.body?.cancel();
-            if (!response.ok) throw new Error("Receiver rejected the delivery");
-          } catch {
-            throw new Error("Webhook delivery failed");
-          }
-        }
-      : null,
+    /**
+     * Always present, and the secret arrives with the delivery. US-096.
+     *
+     * It used to be captured once at worker start, which made "can this
+     * instance sign?" a property of the process. It is a property of the
+     * **account** now — one may hold its own secret on an instance whose
+     * environment has none — so the caller resolves it per delivery and this
+     * function refuses when there is nothing to sign with.
+     */
+    webhook: async (url, body, id, signingSecret) => {
+      if (!signingSecret) throw new Error("Webhook signing is unavailable");
+
+      const timestamp = String(Math.floor((options.now?.() ?? new Date()).getTime() / 1000));
+      const signature = createHmac("sha256", signingSecret)
+        .update(`${timestamp}.${body}`)
+        .digest("hex");
+      try {
+        const parsed = new URL(url);
+        if (parsed.protocol !== "https:" || parsed.username || parsed.password)
+          throw new Error("Invalid URL");
+        const response = await fetcher(url, {
+          method: "POST",
+          body,
+          redirect: "error",
+          signal: AbortSignal.timeout(15_000),
+          headers: {
+            "content-type": "application/json",
+            "x-signalscout-id": id,
+            "x-signalscout-timestamp": timestamp,
+            "x-signalscout-signature": `v1=${signature}`,
+          },
+        });
+        await response.body?.cancel();
+        if (!response.ok) throw new Error("Receiver rejected the delivery");
+      } catch {
+        throw new Error("Webhook delivery failed");
+      }
+    },
   };
 }

@@ -19,6 +19,15 @@ const settings = {
   webhookUrl: "",
   webhookMode: "digest",
 };
+/** US-096. An account with no secret of its own, on an instance that has one. */
+const instanceSecret = {
+  hint: null,
+  usingInstanceSecret: true,
+  canStore: true,
+  storeBlocker: null,
+  updatedAt: null,
+};
+
 function response(extra = {}) {
   return {
     settings,
@@ -27,6 +36,7 @@ function response(extra = {}) {
     emailError: null,
     webhookError: null,
     nextDigestAt: null,
+    signingSecret: instanceSecret,
     ...extra,
   };
 }
@@ -104,4 +114,91 @@ it("keeps the form and reports a failed save", async () => {
     "Settings were not saved.",
   );
   expect(button("Save notifications").disabled).toBe(false);
+});
+
+it("shows a generated signing secret once, and never asks for it again", async () => {
+  /**
+   * US-096. The generate route is the only response that carries the value, so
+   * the page holds it in state — a screen that could re-fetch it is a screen
+   * that leaks it with a screenshot.
+   */
+  const calls: string[] = [];
+  vi.stubGlobal("fetch", async (url: string, init?: RequestInit) => {
+    calls.push(`${init?.method ?? "GET"} ${url}`);
+
+    if (init?.method === "POST") {
+      return json({
+        secret: "a".repeat(64),
+        signingSecret: { ...instanceSecret, hint: "••••aaaa", usingInstanceSecret: false },
+      });
+    }
+
+    return json(response({ webhookMissing: ["WEBHOOK_SIGNING_SECRET"] }));
+  });
+
+  screen = await mount(
+    <Notifications monitorId="monitor-1" projectId="p1" />,
+    "/projects/p1/monitors/monitor-1/notifications",
+  );
+
+  // Refused before there is anything to sign with.
+  expect(input("Enable webhook").disabled).toBe(true);
+
+  await act(async () => {
+    button("Generate a secret").click();
+  });
+  await settle();
+
+  expect(screen.container.textContent).toContain("a".repeat(64));
+  expect(screen.container.textContent).toContain("Copy this now. It is not shown again.");
+  // The switch is usable now, with no reload.
+  expect(input("Enable webhook").disabled).toBe(false);
+  // One POST, and nothing fetched the value back.
+  expect(calls.filter((call) => call.includes("signing-secret"))).toEqual([
+    "POST /api/notifications/signing-secret",
+  ]);
+});
+
+it("warns that regenerating stops existing receivers verifying", async () => {
+  vi.stubGlobal("fetch", async () =>
+    json(
+      response({
+        signingSecret: { ...instanceSecret, hint: "••••beef", usingInstanceSecret: false },
+      }),
+    ),
+  );
+
+  screen = await mount(
+    <Notifications monitorId="monitor-1" projectId="p1" />,
+    "/projects/p1/monitors/monitor-1/notifications",
+  );
+
+  expect(screen.container.textContent).toContain("••••beef");
+  expect(screen.container.textContent).toContain("Generate a new secret");
+  expect(screen.container.textContent).toContain("stops every receiver configured with the old");
+});
+
+it("says why a secret cannot be stored on an instance with no encryption key", async () => {
+  const blocker = "This instance has no ENCRYPTION_KEY, so a signing secret cannot be stored.";
+  vi.stubGlobal("fetch", async () =>
+    json(
+      response({
+        webhookMissing: ["WEBHOOK_SIGNING_SECRET"],
+        signingSecret: {
+          ...instanceSecret,
+          usingInstanceSecret: false,
+          canStore: false,
+          storeBlocker: blocker,
+        },
+      }),
+    ),
+  );
+
+  screen = await mount(
+    <Notifications monitorId="monitor-1" projectId="p1" />,
+    "/projects/p1/monitors/monitor-1/notifications",
+  );
+
+  expect(screen.container.textContent).toContain(blocker);
+  expect(button("Generate a secret").disabled).toBe(true);
 });

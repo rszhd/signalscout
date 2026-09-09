@@ -42,6 +42,31 @@ export function withoutMachineModelKeys(env: AiEnvironment): AiEnvironment {
 }
 
 /**
+ * The instance's webhook signing secret, where an account may use it. US-096.
+ *
+ * **Undefined where signup is open, and that is the whole point.** The contract
+ * hands this value to the customer to verify with, so an account falling back
+ * to it on a shared instance would sign with a secret every other account also
+ * holds — and any of them could then forge a delivery that another's receiver
+ * accepts as genuine. Stripping it means an account there has to make its own,
+ * which the notification screen offers in one button.
+ *
+ * This is US-081's rule applied to something that is not money. The reasoning
+ * transfers because the shape is identical: a value that belongs to the machine
+ * is not a value a stranger's account may act with. The harm differs — this one
+ * is forgeable signatures rather than somebody else's bill — and it is worse.
+ *
+ * With signup closed nothing changes: one person, one machine, one `.env`, and
+ * every receiver they configured keeps verifying.
+ */
+export function webhookSecretEnvironment(
+  signup: SignupMode,
+  environment: Record<string, string | undefined> = process.env,
+): string | undefined {
+  return machineKeysUsable(signup) ? environment.WEBHOOK_SIGNING_SECRET : undefined;
+}
+
+/**
  * The environment a provider-key lookup should read.
  *
  * Empty when the machine's keys are not an account's to spend — which every

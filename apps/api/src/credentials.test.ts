@@ -199,7 +199,21 @@ describe("a stored credential and the API", () => {
 
         // The tree really was read. An empty list would pass the next line.
         expect(routes.length).toBeGreaterThan(5);
-        expect(routes.join("\n")).not.toMatch(/credential|secret|apikey/i);
+
+        /**
+         * The one exception, named rather than allowed by loosening the rule.
+         * US-096's `POST /api/notifications/signing-secret` answers with a
+         * secret **it has just generated**, which is the only moment that value
+         * is ever readable — nothing stores it in a form a later request can
+         * fetch, and `notifications.test.ts` asserts the settings route does
+         * not carry it. Every other route on this list must still fail the
+         * match below.
+         */
+        const generatesOne = "/api/notifications/signing-secret";
+        const rest = routes.filter((line) => !line.includes("/signing-secret"));
+
+        expect(routes.join("\n")).toContain(generatesOne);
+        expect(rest.join("\n")).not.toMatch(/credential|secret|apikey/i);
       } finally {
         await app.close();
       }

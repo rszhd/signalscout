@@ -96,19 +96,40 @@ openssl rand -hex 32
 ```
 
 The secret stays in the environment. It is never returned by the API or stored
-in a notification row. All monitors on an instance use this signing key.
-Rotate it by updating the receiver and both application processes together.
+in a notification row. Rotate it by updating the receiver and both application
+processes together.
 
-**One signing key for the whole instance is why webhooks are not offered on the
-hosted version yet.** Every account would hold the value every other account's
-deliveries are signed with, so any of them could sign a payload another's
-receiver accepts as genuine.
-[US-096](../backlog/todo/US-096-a-webhook-secret-belongs-to-an-account.md) makes
-the secret an account's own.
-[US-097](../backlog/todo/US-097-a-webhook-cannot-be-aimed-at-our-own-network.md)
-is the other half: a hosted worker must not be pointed at an address inside our
-own network. Neither affects a self-hosted instance, where the machine and the
-network are already the owner's.
+### An account can have its own
+
+US-096. **Monitors → Notifications** has a *Generate a secret* button. It makes
+one for your account, shows it once, and never shows it again — copy it into
+your receiver before you leave the page. Every monitor you own signs with it.
+
+An account's own secret wins over `WEBHOOK_SIGNING_SECRET`. An account without
+one falls back to the environment, which is why a self-hosted instance that
+already has a receiver configured keeps working unchanged after an upgrade.
+
+Generating a new secret stops every receiver holding the old value from
+verifying, immediately and including deliveries already queued — a pending
+delivery is signed at each attempt, not once. That is the repair for a leaked
+secret and there is no other. Deleting the account's secret goes back to the
+instance's.
+
+An instance with no `ENCRYPTION_KEY` cannot store one, and the screen says so.
+
+**Where `AUTH_SIGNUP=open`, the instance's own secret is not used at all.** It
+would be one value shared by every account, and each of them is told to verify
+with it — so any of them could sign a payload another's receiver accepts as
+genuine. On such an instance an account must generate its own, and until it
+does, its webhooks report `WEBHOOK_SIGNING_SECRET` as missing. This is
+`machine-keys.ts`'s rule, the same one that stops a stranger spending the
+owner's provider keys.
+
+**One thing is still open before the hosted version offers webhooks.**
+[US-097](../backlog/todo/US-097-a-webhook-cannot-be-aimed-at-our-own-network.md):
+a hosted worker must not be pointed at an address inside our own network. It
+does not affect a self-hosted instance, where the network is already the
+owner's.
 
 The URL must use HTTPS, with no username, password or fragment. Redirects are
 refused. Choose **Digest** or **Each match above the minimum score**. A request

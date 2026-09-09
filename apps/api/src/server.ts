@@ -449,7 +449,7 @@ export async function buildServer({
     describer,
     describerFor: async (userId) => describerForEnvironment(await aiFor(userId), logger),
   });
-  await registerNotificationRoutes(app, { db, env });
+  await registerNotificationRoutes(app, { db, env, encryption, signup: env.AUTH_SIGNUP });
 
   // The provider keys an account may spend. Empty where signup is open, which
   // every reader of it then answers correctly with no branch of its own.

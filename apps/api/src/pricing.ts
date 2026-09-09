@@ -197,9 +197,10 @@ export async function registerPricingRoutes(
       },
     },
     handler: async (request) => {
-      const hints = await listCredentialHints(db, sessionUserId(request));
+      const userId = sessionUserId(request);
+      const hints = await listCredentialHints(db, userId);
       const stored = new Set(hints.map((hint) => `${hint.provider}:${hint.field}`));
-      const choices = await readProviderChoices(db);
+      const choices = await readProviderChoices(db, userId);
 
       /**
        * One query for every pair's spend, rather than one per row.

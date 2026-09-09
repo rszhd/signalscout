@@ -251,7 +251,7 @@ async function main(): Promise<void> {
   // without it would make a two-provider deployment ambiguous here and not in
   // the worker, which is the wrong place to differ.
   const connector = registry.only(redditPlatformId, {
-    choices: await readProviderChoices(db),
+    choices: await readProviderChoices(db, owner),
     among: (
       await Promise.all(
         registry

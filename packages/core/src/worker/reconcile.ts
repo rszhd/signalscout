@@ -15,7 +15,12 @@ import {
   sourceContinuations,
 } from "../db/schema.js";
 import { readProviderChoices } from "../sources/choices.js";
-import type { SocialSource, SourceCredentials, VerificationResult } from "../sources/types.js";
+import type {
+  ProviderChoices,
+  SocialSource,
+  SourceCredentials,
+  VerificationResult,
+} from "../sources/types.js";
 import type { CollectOptions } from "./collect.js";
 import { pollQueue } from "./queues.js";
 import type { Step } from "./steps.js";
@@ -52,7 +57,26 @@ export function createReconcileStep({
         ),
       )
       .orderBy(asc(matches.lastVerifiedAt), asc(matches.id));
-    const choices = await readProviderChoices(db);
+    /**
+     * Whose choice decides each check, cached for the length of this job.
+     *
+     * This is the one reader of the table that walks rows belonging to several
+     * accounts, so unlike the poll it cannot read once above the loop: BUG-010
+     * is precisely one account's choice deciding another's provider, and a
+     * single read here would reintroduce it inside the job that was supposed to
+     * be fixed. The cache is bounded by `maxChecksPerJob`, so it holds twenty
+     * entries at worst and usually one.
+     */
+    const choicesByOwner = new Map<string, ProviderChoices>();
+    const choicesFor = async (userId: string): Promise<ProviderChoices> => {
+      const held = choicesByOwner.get(userId);
+      if (held) return held;
+
+      const read = await readProviderChoices(db, userId);
+      choicesByOwner.set(userId, read);
+      return read;
+    };
+
     const seen = new Set<string>();
     let checked = 0;
     for (const { match, post, pending } of candidates) {
@@ -63,6 +87,7 @@ export function createReconcileStep({
       if (!monitorId) continue;
       const [monitor] = await db.select().from(monitors).where(eq(monitors.id, monitorId));
       if (!monitor) continue;
+      const choices = await choicesFor(monitor.userId);
       const keyed = new Map<string, SourceCredentials>();
       for (const candidate of registry.forPlatform(post.source)) {
         const credentials = await credentialsFor(candidate, monitor.userId);

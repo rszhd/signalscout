@@ -284,7 +284,7 @@ export function createRepliesStep({
      */
     const floor = new Date(Date.now() - defaultReplyWindowDays * 86_400_000);
 
-    const choices = await readProviderChoices(db);
+    const choices = await readProviderChoices(db, monitor.userId);
     const sources = new Map<string, SocialSource | undefined>();
 
     const connectorFor = async (source: string): Promise<SocialSource | undefined> => {

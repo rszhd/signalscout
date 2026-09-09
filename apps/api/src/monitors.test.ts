@@ -692,7 +692,7 @@ describe("the monitor routes", () => {
        * nobody picked. The two have to agree, or a monitor starts and then
        * refuses every poll for ever.
        */
-      await setProviderChoice(db, "reddit", "scrapecreators");
+      await setProviderChoice(db, owner, "reddit", "scrapecreators");
 
       try {
         await withServer({ environment: configured }, async (app) => {
@@ -705,7 +705,7 @@ describe("the monitor routes", () => {
           expect(response.json().message).not.toContain("BRIGHTDATA_API_KEY");
         });
       } finally {
-        await clearProviderChoice(db, "reddit");
+        await clearProviderChoice(db, owner, "reddit");
       }
     });
 

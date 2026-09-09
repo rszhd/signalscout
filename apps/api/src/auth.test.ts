@@ -23,8 +23,10 @@ import {
   monitors,
   posts,
   projects,
+  readProviderChoices,
   replyPrompts,
   replyVoicePresets,
+  sourceProviders,
   unclaimedUserId,
   users,
 } from "@signalscout/core";
@@ -844,6 +846,14 @@ describe("the session gate", () => {
       instruction: "Answer briefly.",
     });
 
+    // A provider chosen before the login existed. BUG-010's migration leaves it
+    // under `self-hosted`, and unlike the rows above nobody would see it go
+    // missing: the poll reads the owner's choice, so an unclaimed row is an
+    // instance holding two Reddit keys that refuses every Reddit collection.
+    await db
+      .insert(sourceProviders)
+      .values({ userId: unclaimedUserId, source: "reddit", provider: "scrapecreators" });
+
     const app = await server();
 
     try {
@@ -874,7 +884,12 @@ describe("the session gate", () => {
 
       expect(listed.statusCode).toBe(200);
       expect(listed.json().projects).toHaveLength(1);
+
+      expect(await readProviderChoices(db, owner?.id ?? "")).toEqual({
+        reddit: "scrapecreators",
+      });
     } finally {
+      await db.delete(sourceProviders);
       await app.close();
     }
   });

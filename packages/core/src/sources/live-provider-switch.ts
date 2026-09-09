@@ -145,7 +145,7 @@ async function main(): Promise<void> {
   const context: StepContext = { db, boss, logger };
 
   // 1. Bright Data starts the collection.
-  await setProviderChoice(db, "reddit", "brightdata");
+  await setProviderChoice(db, owner, "reddit", "brightdata");
   say("choice: brightdata");
 
   await collect({ monitorId }, context);
@@ -160,7 +160,7 @@ async function main(): Promise<void> {
   say(`spent so far: ${JSON.stringify(await usage(monitorId))}`);
 
   // 2. The switch, while the snapshot is still collecting.
-  await setProviderChoice(db, "reddit", "scrapecreators");
+  await setProviderChoice(db, owner, "reddit", "scrapecreators");
   say("choice: scrapecreators — changed while the Bright Data snapshot is open");
 
   // 3. Resume until the snapshot is read, or until it is clearly stuck.

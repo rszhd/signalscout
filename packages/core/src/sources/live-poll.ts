@@ -374,7 +374,7 @@ async function main(): Promise<void> {
   // The id came from the connector the registry built, so it is a real
   // provider by construction; the cast is only telling the compiler what the
   // registry already guarantees.
-  await setProviderChoice(db, platform.id as Source, connector.provider.id as Provider);
+  await setProviderChoice(db, owner, platform.id as Source, connector.provider.id as Provider);
 
   const before = await storedPosts();
 

@@ -461,7 +461,6 @@ export async function buildServer({
     environment: providerKeys,
     encryption,
     logger,
-    signup: env.AUTH_SIGNUP,
   });
   await registerPricingRoutes(app, { db, sources, environment: providerKeys });
   await registerModelRoutes(app, {

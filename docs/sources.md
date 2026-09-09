@@ -185,8 +185,18 @@ caller that has a platform and no provider.
 `decideProvider` is the rule, and it is written once. Four branches, in order:
 
 1. **A recorded choice that can run wins.** `source_providers` holds one row
-   per platform, the connections screen writes it, and `readProviderChoices`
-   reads it. A choice is a decision and not a guess.
+   per platform per account, the connections screen writes it, and
+   `readProviderChoices` reads it. A choice is a decision and not a guess.
+
+   **Whose choice, is the question every reader must answer.** BUG-010: the
+   table was keyed by the platform alone until 2026-09-10, so on an instance
+   taking registrations one account's choice decided what every other account
+   polled through — and by rule 2 below a choice that cannot run is refused
+   rather than replaced, so a stranger could stop somebody's monitors dead. A
+   poll therefore reads the choice of the **monitor's owner**, never of whoever
+   is signed in, the same way `worker/credentials.ts` reads their key. The
+   function takes the owner as an argument, so there is no way to read the
+   table without answering the question.
 2. **A recorded choice that cannot run is refused**, never replaced. A person
    who chose ScrapeCreators and lost its key would otherwise have every poll
    billed to Bright Data, which charges twenty times as much for the same

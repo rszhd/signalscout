@@ -386,6 +386,13 @@
       "when": 1788972718207,
       "tag": "0054_a_webhook_secret_belongs_to_an_account",
       "breakpoints": true
+    },
+    {
+      "idx": 55,
+      "version": "7",
+      "when": 1788978753269,
+      "tag": "0055_a_provider_choice_belongs_to_an_account",
+      "breakpoints": true
     }
   ]
 }

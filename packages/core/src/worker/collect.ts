@@ -274,8 +274,14 @@ export function createCollectStep({ registry, credentialsFor }: CollectOptions):
      * Per poll, so a choice made on the connections screen takes effect on the
      * next collection and needs no restart. It is one small select, and this
      * job is about to make network calls that cost money.
+     *
+     * The monitor's owner, not whoever is signed in — this job has no signed-in
+     * person. BUG-010: reading the whole table would let one account's choice
+     * decide what another account's monitors poll through, and by US-026's rule
+     * a choice that cannot run is refused rather than replaced, so it would
+     * stop them rather than merely redirect them.
      */
-    const choices = await readProviderChoices(db);
+    const choices = await readProviderChoices(db, monitor.userId);
 
     const now = new Date();
     const outcomes: SourceOutcome[] = [];

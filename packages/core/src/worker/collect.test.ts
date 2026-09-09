@@ -800,10 +800,20 @@ describe("the poll step", () => {
    * collection that is already paid for and running.
    */
   describe("which provider fetches a platform", () => {
+    /** The owner `insertMonitor` writes, and somebody else on the same box. */
+    const monitorOwner = "user-1";
+    const neighbour = "user-2";
+
     /** A key for these providers and no others. */
     function keysFor(...providerIds: string[]): CredentialLookup {
       return (connector) =>
         providerIds.includes(connector.provider.id) ? { token: "test-token" } : undefined;
+    }
+
+    /** Which providers each account holds a key for. BUG-010's tests need two. */
+    function keysPerOwner(byOwner: Record<string, string[]>): CredentialLookup {
+      return (connector, userId) =>
+        byOwner[userId]?.includes(connector.provider.id) ? { token: "test-token" } : undefined;
     }
 
     const brightDataPosts: CandidatePost[] = [
@@ -889,7 +899,7 @@ describe("the poll step", () => {
       const monitorId = await insertMonitor(database);
       const registry = bothProviders();
 
-      await setProviderChoice(db, "reddit", "scrapecreators");
+      await setProviderChoice(db, monitorOwner, "reddit", "scrapecreators");
       await poll(registry, keysFor("brightdata", "scrapecreators"), monitorId);
 
       expect((await db.select().from(posts)).map((post) => post.externalId)).toEqual([
@@ -908,7 +918,7 @@ describe("the poll step", () => {
       const registry = bothProviders();
       const keys = keysFor("brightdata", "scrapecreators");
 
-      await setProviderChoice(db, "reddit", "brightdata");
+      await setProviderChoice(db, monitorOwner, "reddit", "brightdata");
       await poll(registry, keys, monitorId);
 
       // The poll mark, back where it was. The window is not what this test is
@@ -916,7 +926,7 @@ describe("the poll step", () => {
       // newer than the first poll — which is every fixture filtered away.
       await db.update(monitors).set({ lastPolledAt: null }).where(eq(monitors.id, monitorId));
 
-      await setProviderChoice(db, "reddit", "scrapecreators");
+      await setProviderChoice(db, monitorOwner, "reddit", "scrapecreators");
       await poll(registry, keys, monitorId);
 
       expect(callsFor(registry, "brightdata")).toHaveLength(1);
@@ -938,10 +948,10 @@ describe("the poll step", () => {
       });
       const keys = keysFor("brightdata", "scrapecreators");
 
-      await setProviderChoice(db, "reddit", "brightdata");
+      await setProviderChoice(db, monitorOwner, "reddit", "brightdata");
       await poll(registry, keys, monitorId);
 
-      await setProviderChoice(db, "reddit", "scrapecreators");
+      await setProviderChoice(db, monitorOwner, "reddit", "scrapecreators");
       await poll(registry, keys, monitorId);
 
       const usage = await db.select().from(apiUsage).orderBy(apiUsage.provider);
@@ -970,7 +980,7 @@ describe("the poll step", () => {
         brightdata: { pageSize: 1, callsBeforeRateLimit: 1, posts: [...fakePosts] },
       });
 
-      await setProviderChoice(db, "reddit", "brightdata");
+      await setProviderChoice(db, monitorOwner, "reddit", "brightdata");
       await poll(registry, keys, monitorId);
 
       const [started] = await db
@@ -982,7 +992,7 @@ describe("the poll step", () => {
       expect(started?.cursor).toBe("1");
 
       // The person changes their mind while the snapshot is still collecting.
-      await setProviderChoice(db, "reddit", "scrapecreators");
+      await setProviderChoice(db, monitorOwner, "reddit", "scrapecreators");
       await db
         .update(sourceContinuations)
         .set({ resumeAfter: new Date(Date.now() - 1000) })
@@ -1007,11 +1017,60 @@ describe("the poll step", () => {
       const monitorId = await insertMonitor(database);
       const registry = bothProviders();
 
-      await setProviderChoice(db, "reddit", "scrapecreators");
+      await setProviderChoice(db, monitorOwner, "reddit", "scrapecreators");
       await poll(registry, keysFor("brightdata"), monitorId);
 
       expect(await db.select().from(posts)).toHaveLength(0);
       expect(callsFor(registry, "brightdata")).toHaveLength(0);
+    });
+
+    describe("with two accounts on the instance", () => {
+      it("polls each monitor through its own owner's choice", async () => {
+        // BUG-010. One process, one registry, two monitors: the only thing
+        // that differs between the two polls is whose row was read.
+        const annas = await insertMonitor(database, { userId: monitorOwner });
+        const bens = await insertMonitor(database, { userId: neighbour });
+        const registry = bothProviders();
+        const keys = keysFor("brightdata", "scrapecreators");
+
+        await setProviderChoice(db, monitorOwner, "reddit", "brightdata");
+        await setProviderChoice(db, neighbour, "reddit", "scrapecreators");
+
+        await poll(registry, keys, annas);
+        await poll(registry, keys, bens);
+
+        expect(callsFor(registry, "brightdata")).toHaveLength(1);
+        expect(callsFor(registry, "scrapecreators")).toHaveLength(1);
+      });
+
+      it("does not let a neighbour's choice stop a monitor that can run", async () => {
+        /**
+         * The whole of BUG-010, as the person on the receiving end meets it.
+         *
+         * Anna holds the Bright Data key alone, so her Reddit poll has one
+         * connector that can run and needs no choice. Ben records
+         * ScrapeCreators for himself. Read from a table keyed by the platform
+         * alone, Anna's poll finds a recorded choice she has no key for — and
+         * by US-026's rule a choice that cannot run is refused rather than
+         * replaced, so her monitor stops. She was never asked, never told, and
+         * nothing on her screens changed.
+         */
+        const annas = await insertMonitor(database, { userId: monitorOwner });
+        const registry = bothProviders();
+
+        await setProviderChoice(db, neighbour, "reddit", "scrapecreators");
+
+        await poll(
+          registry,
+          keysPerOwner({ [monitorOwner]: ["brightdata"], [neighbour]: ["scrapecreators"] }),
+          annas,
+        );
+
+        expect((await db.select().from(posts)).map((post) => post.externalId)).toEqual([
+          "t3_from_brightdata",
+        ]);
+        expect(callsFor(registry, "scrapecreators")).toHaveLength(0);
+      });
     });
   });
 

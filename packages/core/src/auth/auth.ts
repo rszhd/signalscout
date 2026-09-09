@@ -32,6 +32,7 @@ import {
   projects,
   replyPrompts,
   sessions,
+  sourceProviders,
   users,
   verifications,
 } from "../db/schema.js";
@@ -160,6 +161,13 @@ export async function isOnlyAccount(db: Database, userId: string): Promise<boole
  * rows are still there and the screens are empty, which reads as data loss and
  * is the worst way to meet a new login screen.
  *
+ * The provider choice is here for a sharper version of the same reason. It is
+ * not a screen going empty: BUG-010's migration leaves a pre-login choice under
+ * `self-hosted`, and a poll reads the choice of the monitor's owner — so
+ * without this the first account polls as though it had chosen nothing, and a
+ * box holding two Reddit keys refuses every Reddit collection rather than
+ * showing a blank.
+ *
  * Only the first account claims them. A second user is a person joining an
  * instance that already has an owner, and handing them the owner's inbox is
  * the opposite of what scoping is for.
@@ -170,6 +178,10 @@ export async function claimUnownedRows(db: Database, userId: string): Promise<vo
     await tx.update(monitors).set({ userId }).where(eq(monitors.userId, unclaimedUserId));
     await tx.update(replyPrompts).set({ userId }).where(eq(replyPrompts.userId, unclaimedUserId));
     await tx.update(feedback).set({ userId }).where(eq(feedback.userId, unclaimedUserId));
+    await tx
+      .update(sourceProviders)
+      .set({ userId })
+      .where(eq(sourceProviders.userId, unclaimedUserId));
   });
 }
 

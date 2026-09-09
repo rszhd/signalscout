@@ -242,6 +242,46 @@ it("a late classification cannot resurrect a deleted post in another monitor", a
   expect((await db.select().from(matches).where(eq(matches.id, late.id)))[0]?.hidden).toBe(true);
 });
 
+/**
+ * BUG-010, at the reader that walks several accounts' rows in one job.
+ *
+ * The other four readers hold one monitor and so one owner; this one holds a
+ * page of matches and each may belong to a different person. A single read
+ * above the loop would be the bug arriving inside the job meant to be fixed —
+ * and it would be invisible, because a re-check is a background job nobody
+ * watches and its refusal only shows up as content that stops disappearing.
+ */
+it("verifies through the monitor owner's provider, not a neighbour's", async () => {
+  await seed();
+
+  // The owner picks Bright Data. Somebody else on the same box picks the
+  // other one, for a platform they both watch.
+  await db.insert(sourceProviders).values([
+    { userId: owner, source: "reddit", provider: "brightdata" },
+    { userId: "somebody-else", source: "reddit", provider: "scrapecreators" },
+  ]);
+
+  const registry = twoProviderRegistry();
+  const theirs = vi.fn();
+  registry.get("reddit", "brightdata").verify = verify;
+  registry.get("reddit", "scrapecreators").verify = theirs;
+  verify.mockResolvedValue({ status: "available", unitsConsumed: 1 });
+
+  await createReconcileStep({
+    registry,
+    credentialsFor: async () => ({ token: "test" }),
+    now: () => now,
+  })({}, context);
+
+  expect(verify).toHaveBeenCalledTimes(1);
+  expect(theirs).not.toHaveBeenCalled();
+  expect((await db.select().from(apiUsage)).every((row) => row.provider === "brightdata")).toBe(
+    true,
+  );
+
+  await db.delete(sourceProviders);
+});
+
 it("a restart and provider switch preserve the provider that started a check", async () => {
   await seed();
   verify.mockResolvedValue({
@@ -252,10 +292,16 @@ it("a restart and provider switch preserve the provider that started a check", a
   });
   await run({}, context);
   await db.update(postVerifications).set({ nextAttemptAt: ago(1) });
+  // The monitor's owner, since BUG-010: a row under anybody else is a row this
+  // check never reads, so the switch would not be a switch and the test would
+  // pass for the wrong reason.
   await db
     .insert(sourceProviders)
-    .values({ source: "reddit", provider: "scrapecreators" })
-    .onConflictDoUpdate({ target: sourceProviders.source, set: { provider: "scrapecreators" } });
+    .values({ userId: owner, source: "reddit", provider: "scrapecreators" })
+    .onConflictDoUpdate({
+      target: [sourceProviders.userId, sourceProviders.source],
+      set: { provider: "scrapecreators" },
+    });
   const registry = twoProviderRegistry();
   const other = vi.fn();
   registry.get("reddit", "brightdata").verify = verify;

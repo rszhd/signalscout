@@ -210,8 +210,10 @@ export function createEstimateStep({
     }
 
     // Read per run, like the poll reads it, so a choice made on the connections
-    // screen applies to the next sample rather than waiting for a restart.
-    const choices = await readProviderChoices(db);
+    // screen applies to the next sample rather than waiting for a restart. The
+    // run's own owner, for BUG-010's reason: a sample is real money at a real
+    // provider, and the account paying decides which one it goes to.
+    const choices = await readProviderChoices(db, run.userId);
 
     const now = new Date();
     const since = new Date(now.getTime() - sampleWindowDays * 24 * 60 * 60 * 1000);

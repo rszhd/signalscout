@@ -1486,15 +1486,15 @@ export const sourceCredentials = pgTable(
 /**
  * Which provider fetches a platform, when more than one can.
  *
- * One row per platform, and a platform with nothing recorded has no row. That
- * is the common deployment: it holds one provider's key, so there is one
- * connector that can run and no question to ask. US-026 built this table for
- * the deployment that holds both, where answering from registration order
- * would spend money at a provider nobody picked.
+ * One row per platform per account, and a platform with nothing recorded has
+ * no row. That is the common deployment: it holds one provider's key, so there
+ * is one connector that can run and no question to ask. US-026 built this
+ * table for the deployment that holds both, where answering from registration
+ * order would spend money at a provider nobody picked.
  *
- * The choice is global, not per monitor. A person who wants Reddit through
- * Bright Data wants it for every monitor. A per-monitor override is one column
- * on `monitors` the day somebody asks for it.
+ * The choice is global across an account's monitors, not per monitor. A person
+ * who wants Reddit through Bright Data wants it for every monitor of theirs. A
+ * per-monitor override is one column on `monitors` the day somebody asks.
  *
  * Nothing in flight reads this. A collection belongs to the provider that
  * started it, and `source_continuations` carries that provider, so changing a
@@ -1504,14 +1504,30 @@ export const sourceCredentials = pgTable(
 export const sourceProviders = pgTable(
   "source_providers",
   {
-    /** The platform. One row per platform, so this is the whole key. */
-    source: text("source").$type<Source>().primaryKey(),
+    /**
+     * Whose choice it is. BUG-010.
+     *
+     * The table was keyed by the platform alone until US-066 made a second
+     * account possible, and the fault that removes is worse than a shared
+     * preference. US-026's rule is that a recorded choice which cannot run is
+     * *refused* rather than replaced — so one account picking the provider it
+     * holds a key for would stop every other account's monitors dead, because
+     * their key is for the other provider and their polls are refused rather
+     * than falling back.
+     *
+     * Text and no foreign key, for `monitors.user_id`'s reason: a row may be
+     * older than the first account.
+     */
+    userId: text("user_id").notNull(),
+    /** The platform. One row per platform per account. */
+    source: text("source").$type<Source>().notNull(),
     /** Who fetches it. */
     provider: text("provider").$type<Provider>().notNull(),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
-  () => [
+  (table) => [
+    primaryKey({ columns: [table.userId, table.source] }),
     check("source_providers_source_known", oneOf("source", sources)),
     check("source_providers_provider_known", oneOf("provider", providers)),
   ],

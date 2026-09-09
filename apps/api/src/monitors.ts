@@ -601,7 +601,7 @@ export async function registerMonitorRoutes(
     // until a restart.
     const [storedCredentials, providerChoices] = await Promise.all([
       stored(userId),
-      readProviderChoices(db),
+      readProviderChoices(db, userId),
     ]);
 
     return monitorEnvironment(options, storedCredentials, providerChoices);

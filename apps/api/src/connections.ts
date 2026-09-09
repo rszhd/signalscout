@@ -71,17 +71,6 @@ export interface ConnectionRoutesOptions {
    */
   readonly encryption?: Record<string, string | undefined>;
   readonly logger: Logger;
-  /**
-   * Whether a stranger may register, for the one rule that is about who owns
-   * the key being pasted.
-   *
-   * US-090: where signup is open, a stored key belongs to one account while
-   * `source_providers` is shared by every account (BUG-010), so a key must not
-   * auto-record a shared choice. Where it is closed there is one account, the
-   * common deployment, and the rule runs. Defaults to `closed`, which is the
-   * same default `AUTH_SIGNUP` has.
-   */
-  readonly signup?: "open" | "closed";
 }
 
 /** The sentence an instance with no key is shown, in both places it is shown. */
@@ -219,7 +208,6 @@ export async function registerConnectionRoutes(
   const { db, sources, logger } = options;
   const environment = options.environment ?? process.env;
   const encryption = options.encryption ?? process.env;
-  const signup = options.signup ?? "closed";
   const providers = providersOf(sources);
   const platformEntries = groupByPlatform(sources);
 
@@ -304,11 +292,11 @@ export async function registerConnectionRoutes(
    * override. So the rule is narrow: record the saved provider only where it is
    * now the platform's sole connected provider.
    *
-   * The table is shared by every account (BUG-010). Where signup is open a
-   * stored key belongs to one account, so a shared row written from it would
-   * decide for tenants that never saw it — US-081's rule applied to the choice
-   * instead of the key. The rule runs only where signup is closed, the
-   * single-account instance.
+   * It runs on every instance since BUG-010. Until then the choice was a row
+   * per platform for the whole box, so writing one from one account's key
+   * decided for tenants that never saw it, and the rule was switched off
+   * wherever signup was open. The row is that account's own now, so the reason
+   * to switch it off is gone with it.
    *
    * Returns the platforms recorded, for the log line.
    */
@@ -316,10 +304,8 @@ export async function registerConnectionRoutes(
     userId: string,
     savedProvider: Provider,
   ): Promise<string[]> {
-    if (signup === "open") return [];
-
     const [choices, connected] = await Promise.all([
-      readProviderChoices(db),
+      readProviderChoices(db, userId),
       connectedProviders(userId),
     ]);
 
@@ -331,7 +317,7 @@ export async function registerConnectionRoutes(
 
       const usable = fetchers.filter((provider) => connected.has(provider.id));
       if (usable.length === 1 && usable[0]?.id === savedProvider) {
-        await setProviderChoice(db, platform.id as Source, savedProvider);
+        await setProviderChoice(db, userId, platform.id as Source, savedProvider);
         recorded.push(platform.id);
       }
     }
@@ -410,7 +396,7 @@ export async function registerConnectionRoutes(
   /** Every platform, with the choices and the keys read once for all of them. */
   async function platformViews(userId: string) {
     const [choices, connected] = await Promise.all([
-      readProviderChoices(db),
+      readProviderChoices(db, userId),
       connectedProviders(userId),
     ]);
 
@@ -546,8 +532,11 @@ export async function registerConnectionRoutes(
         });
       }
 
+      const userId = sessionUserId(request);
+
       await setProviderChoice(
         db,
+        userId,
         platform.platform.id as Source,
         request.body.provider as Provider,
       );
@@ -557,7 +546,7 @@ export async function registerConnectionRoutes(
         "recorded which provider fetches a platform",
       );
 
-      return connectionsView(sessionUserId(request));
+      return connectionsView(userId);
     },
   });
 
@@ -588,9 +577,11 @@ export async function registerConnectionRoutes(
         });
       }
 
-      await clearProviderChoice(db, platform.platform.id as Source);
+      const userId = sessionUserId(request);
 
-      return connectionsView(sessionUserId(request));
+      await clearProviderChoice(db, userId, platform.platform.id as Source);
+
+      return connectionsView(userId);
     },
   });
 

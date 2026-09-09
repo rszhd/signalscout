@@ -27,6 +27,7 @@ import {
   monitors,
   putSourceCredential,
   readEncryptionKey,
+  readProviderChoices,
   readSourceCredential,
   type SocialSource,
   setProviderChoice,
@@ -127,13 +128,16 @@ describe("connecting a provider", () => {
   }
 
   /** The same build, signed in as somebody else. US-067. */
-  async function serverAs(userId: string) {
+  async function serverAs(
+    userId: string,
+    sources: readonly ConnectorDefinition[] = [acceptsOnly(goodKey)],
+  ) {
     return buildServer({
       session: asUser(userId),
       env: loadEnv({ DATABASE_URL: database.url }),
       logger,
       db,
-      sources: [acceptsOnly(goodKey)],
+      sources,
       environment: {},
       encryption: { ENCRYPTION_KEY: encryptionKey },
       queryGenerator: null,
@@ -603,11 +607,18 @@ describe("connecting a provider", () => {
       }
     });
 
-    it("records nothing from an account's key where signup is open", async () => {
-      // US-081's rule applied to the choice table: a stored key belongs to one
-      // account there, while `source_providers` is shared by every account
-      // (BUG-010), so an account's key must not decide for the tenants that
-      // never saw it.
+    it("records the saver's own choice where signup is open", async () => {
+      /**
+       * This asserted the opposite until BUG-010, and the reversal is the
+       * point. The rule was switched off on an open instance because
+       * `source_providers` was keyed by the platform alone: a row written from
+       * one account's key decided for every tenant that never saw it, which is
+       * US-081's rule arriving at a table instead of a bill.
+       *
+       * The row is that account's own now, so the reason is gone and a person
+       * on the cloud gets the same screen a self-hoster gets — a key pasted,
+       * and the platform under it answered.
+       */
       const app = await server({
         sources: bothRedditProviders(),
         environment: { BRIGHTDATA_API_KEY: goodKey },
@@ -622,8 +633,14 @@ describe("connecting a provider", () => {
         });
 
         expect(saved.statusCode).toBe(200);
-        expect(await db.select().from(sourceProviders)).toHaveLength(0);
+        expect(platformIn(saved.json()).chosen).toBe("brightdata");
+
+        const rows = await db.select().from(sourceProviders);
+        expect(rows.map((row) => [row.userId, row.source, row.provider])).toEqual([
+          [owner, "reddit", "brightdata"],
+        ]);
       } finally {
+        await db.delete(sourceProviders);
         await app.close();
       }
     });
@@ -1069,7 +1086,7 @@ describe("connecting a provider", () => {
       });
 
       try {
-        await setProviderChoice(db, "reddit", "scrapecreators");
+        await setProviderChoice(db, owner, "reddit", "scrapecreators");
 
         const reddit = platformIn(
           (await app.inject({ method: "GET", url: "/api/connections" })).json(),
@@ -1081,7 +1098,7 @@ describe("connecting a provider", () => {
         expect(reddit.blocker).toContain(reason);
         expect(reddit.blocker).toContain("Choose Bright Data instead.");
       } finally {
-        await clearProviderChoice(db, "reddit");
+        await clearProviderChoice(db, owner, "reddit");
         await app.close();
       }
     });
@@ -1201,6 +1218,75 @@ describe("connecting a provider", () => {
         expect(reddit.ready).toBe(false);
         expect(reddit.missingCredentials[0].environmentVariable).toBe("BRIGHTDATA_API_KEY");
       } finally {
+        await app.close();
+      }
+    });
+
+    /**
+     * The provider choice, scoped the way the keys above are. BUG-010.
+     *
+     * These are the screen's half of it. The poll's half — that a monitor
+     * reads its own owner's row — is in `worker/collect.test.ts`, because a
+     * route test cannot see a poll refuse at two in the morning.
+     */
+    it("writes a choice under the account that asked, not over another's", async () => {
+      await setProviderChoice(db, owner, "reddit", "brightdata");
+      const app = await serverAs(other, bothRedditProviders());
+
+      try {
+        const saved = await app.inject({
+          method: "PUT",
+          url: "/api/platforms/reddit/provider",
+          payload: { provider: "scrapecreators" },
+        });
+
+        expect(saved.statusCode).toBe(200);
+
+        const rows = await db.select().from(sourceProviders).orderBy(sourceProviders.userId);
+        expect(rows.map((row) => [row.userId, row.provider])).toEqual([
+          [other, "scrapecreators"],
+          [owner, "brightdata"],
+        ]);
+      } finally {
+        await db.delete(sourceProviders);
+        await app.close();
+      }
+    });
+
+    it("shows an account its own choice and never a neighbour's", async () => {
+      await setProviderChoice(db, owner, "reddit", "scrapecreators");
+      const app = await serverAs(other, bothRedditProviders());
+
+      try {
+        const reddit = platformIn(
+          (await app.inject({ method: "GET", url: "/api/connections" })).json(),
+        );
+
+        // Null rather than "scrapecreators". A screen that showed a neighbour's
+        // row would tell this person their monitors poll somewhere they do not.
+        expect(reddit.chosen).toBe(null);
+      } finally {
+        await db.delete(sourceProviders);
+        await app.close();
+      }
+    });
+
+    it("refuses to clear a choice it does not own, and clears nothing", async () => {
+      await setProviderChoice(db, owner, "reddit", "brightdata");
+      const app = await serverAs(other, bothRedditProviders());
+
+      try {
+        const cleared = await app.inject({
+          method: "DELETE",
+          url: "/api/platforms/reddit/provider",
+        });
+
+        // 200, because from `other`'s side there was nothing to clear and the
+        // route is idempotent. What matters is the row still standing.
+        expect(cleared.statusCode).toBe(200);
+        expect(await readProviderChoices(db, owner)).toEqual({ reddit: "brightdata" });
+      } finally {
+        await db.delete(sourceProviders);
         await app.close();
       }
     });

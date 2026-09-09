@@ -1047,13 +1047,37 @@ monitor on the instance; the page now counts the posts an account's monitors
 matched or recorded a drop for, which is the same number on a single-account
 instance.
 
-**The provider *choice* is the same bug and is not fixed.**
-`source_providers` is keyed by platform alone, so on an instance taking
-registrations one account's choice changes what every other account polls
-through — and by US-026's own rule a choice that cannot run is refused rather
-than replaced, so it can stop another account's monitors dead.
-[BUG-010](backlog/todo/BUG-010-a-provider-choice-is-shared-between-accounts.md)
-is that ticket. The self-hosted instance is unaffected.
+**The provider *choice* was the same bug, and it is fixed.** BUG-010 closed on
+2026-09-10, before the production instance takes a second registration.
+`source_providers` was keyed by the platform alone, so one account's choice
+changed what every other account polled through — and by US-026's own rule a
+choice that cannot run is refused rather than replaced, so a stranger could
+stop somebody's monitors dead. It is keyed by `(user_id, source)` now, and a
+poll reads the choice of the **monitor's owner** rather than of whoever is
+signed in.
+
+**The signature is what covers the readers no test reaches.** All three
+functions in `choices.ts` take the owner, so the table cannot be read without
+answering whose choice it is, and the compiler enumerated all eight call sites
+rather than a grep doing it.
+
+**`reconcile` is the reader that could not simply be threaded.** The other four
+hold one monitor and so one owner; that job walks a page of matches which may
+belong to different people, so a single read above its loop would have been the
+same bug living inside the fix. It reads per owner, cached for the length of
+the job — and that is the one place a deliberate mutation *passed* on the first
+attempt, because the existing test asserts the continuation wins, which it does
+whoever the choices belong to.
+
+`claimUnownedRows` gained the table for a sharper reason than the four rows
+already there. Those are screens going empty, which reads as data loss; this
+one is silent — a pre-login choice left under `self-hosted` means the first
+account polls as though it chose nothing, and a box holding two Reddit keys
+refuses every Reddit collection with nothing on any screen saying why.
+
+**Nothing about it has run live.** No instance has yet taken a second
+registration with two Reddit keys on it, so neither the fault nor its absence
+has been observed in production.
 
 **A stored key is a choice where the platform had none.** US-090 closed on
 2026-09-09. The connections screen used to save a key and leave every platform
@@ -1064,9 +1088,11 @@ platform it can fetch that has no recorded choice and no other connected
 provider — the narrow rule, because the other two cases are decisions. A
 platform another provider already fetches is left alone (taking it over would
 spend money at an account the person did not pick), and a recorded choice is
-never overridden. Where signup is open the rule does not run at all: a stored
-key belongs to one account there while `source_providers` is shared by every
-account, and BUG-010 says the self-hosted instance is the unaffected one.
+never overridden. It did not run at all where signup was open, because a stored
+key belonged to one account while `source_providers` was shared by every
+account — **BUG-010 removed that reason on 2026-09-10 and the rule now runs
+everywhere**, so a person on the cloud gets the same screen a self-hoster gets.
+Its test asserts the opposite of what it asserted the day before.
 
 Two consequences follow. **The store and the delete routes answer with the
 whole screen now**, not the one provider, for the reason the platform choice

@@ -119,6 +119,16 @@ type SetupStage = (typeof steps)[number]["id"] | "created";
 const emptyAnswers: Answers = { name: "", product: "", idealCustomer: "", problem: "" };
 
 /**
+ * Where the monthly cap starts, in dollars as the field carries them. US-084.
+ *
+ * Above one live poll on the dearest platform and above a month of one keyword
+ * at the default rate, below what an hourly keyword costs. A plan that would
+ * spend more than this meets the "Save without starting" path rather than the
+ * bill.
+ */
+const defaultCap = "5";
+
+/**
  * The missing keys as one phrase, grouped by the account they belong to.
  *
  * Fields of one provider are joined with "and", because that account needs
@@ -216,8 +226,12 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
   const [created, setCreated] = useState<CreatedMonitor | null>(null);
   const [working, setWorking] = useState<"generating" | "creating" | null>(null);
   const [error, setError] = useState<string | null>(null);
-  /** Dollars, as typed. Empty means no cap, which is a decision and not an oversight. */
-  const [cap, setCap] = useState("");
+  /**
+   * Dollars, as typed. Empty is refused on submit since US-084: the guard
+   * cannot refuse what has no cap, and this form is where somebody is thinking
+   * about the money. A monitor that already exists may still have no cap.
+   */
+  const [cap, setCap] = useState(defaultCap);
   const [onExhausted, setOnExhausted] = useState("pause");
   const [estimate, setEstimate] = useState<EstimateReport | null>(null);
 
@@ -476,7 +490,12 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
       return;
     }
 
-    if (cap.trim() !== "" && capMicros === null) {
+    if (cap.trim() === "") {
+      setError("Set a monthly budget. A monitor with no cap can spend without limit.");
+      return;
+    }
+
+    if (capMicros === null) {
       setError("A monthly budget is an amount in dollars, such as 10.");
       return;
     }
@@ -520,7 +539,7 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
     setPlan(emptyPlan);
     setCreated(null);
     setError(null);
-    setCap("");
+    setCap(defaultCap);
     setOnExhausted("pause");
     takeReport(null);
     setIncludeReplies(false);
@@ -1082,8 +1101,8 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
               <fieldset className="choice-section budget-section">
                 <legend>How much may it spend a month?</legend>
                 <p>
-                  Leave it empty for no cap. The final call can overshoot the cap; its price is
-                  known only afterwards. Spending is recorded either way.
+                  A budget is required. The final call can overshoot the cap; its price is known
+                  only afterwards. Spending is recorded either way.
                 </p>
                 <div className="budget-row">
                   <label className="field">
@@ -1093,7 +1112,8 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
                       <input
                         aria-label="Monthly budget"
                         inputMode="decimal"
-                        placeholder="10.00"
+                        placeholder="5.00"
+                        required
                         value={cap}
                         onChange={(event) => setCap(event.target.value)}
                       />

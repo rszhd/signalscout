@@ -496,7 +496,9 @@ describe("the monitor form", () => {
       id: "estimate-1",
       monitorId: null,
       status: "ready",
-      pollIntervalSeconds: 3600,
+      // The rate the form starts at, so the answer is not stale the moment it
+      // arrives. US-084 moved that default to six hours.
+      pollIntervalSeconds: 21_600,
       // BUG-005. The response carries the days it priced, so the sentence under
       // the table can say what was assumed rather than implying every day.
       pollDays: [0, 1, 2, 3, 4, 5, 6],
@@ -602,7 +604,7 @@ describe("the monitor form", () => {
     await act(async () => setValue(ratePicker, "86400"));
     expect(container.textContent).toContain("The plan or schedule has changed since this test.");
     expect(button("Start monitor")).toBeDefined();
-    await act(async () => setValue(ratePicker, "3600"));
+    await act(async () => setValue(ratePicker, "21600"));
 
     await act(async () => button("Save without starting").click());
     await settle();
@@ -649,7 +651,55 @@ describe("the monitor form", () => {
     const payload = JSON.parse(createCall?.[1]?.body as string);
 
     expect(payload.startPaused).toBeUndefined();
-    expect(payload.budget).toBeUndefined();
+    // US-084. A cap nobody typed is still a cap: the field starts at $5, and a
+    // monitor created without touching step 5 is capped rather than open-ended.
+    expect(payload.budget).toEqual({ monthlyCapMicros: 5_000_000, onExhausted: "pause" });
+    expect(payload.pollIntervalSeconds).toBe(21_600);
+    expect(payload.pollDays).toEqual([0, 1, 2, 3, 4, 5, 6]);
     expect(fetchMock.mock.calls.some(([url]) => url === "/api/monitors/estimates")).toBe(false);
+
+    // "Create another monitor" is the path a second monitor is made on, and it
+    // is the one most likely to be made without reading step 5 again. US-084.
+    await act(async () => button("Create another monitor").click());
+    await toSources();
+    await act(async () => button("Generate search plan").click());
+    await settle();
+    await act(async () => button("Continue to schedule").click());
+
+    expect(input("Monthly budget").value).toBe("5");
+    const rate = container.querySelector('[aria-label="How often"]') as HTMLSelectElement;
+    expect(rate.value).toBe("21600");
+    expect(container.textContent).toContain("122");
+  });
+
+  it("refuses to create a monitor whose budget was cleared", async () => {
+    // The budget guard cannot refuse what has no cap, so the form is where a
+    // missing one is caught. US-084.
+    fetchMock.mockImplementation(async (request: string | URL | Request) => {
+      const url = typeof request === "string" ? request : request.toString();
+      if (url === "/api/monitor-options") return json(options);
+      if (url === "/api/monitors/queries") return json(generated);
+      throw new Error(`Unexpected request: ${url}`);
+    });
+
+    await act(async () => {
+      setValue(input("Monitor name"), "Journeys");
+      setValue(input("What do you sell?"), "A test runner that records browser flows");
+      setValue(input("Who is most likely to buy it?"), "Small SaaS teams without a QA engineer");
+      setValue(input("What problem does it solve?"), "Their tests break after UI changes");
+    });
+
+    await toSources();
+    await act(async () => button("Generate search plan").click());
+    await settle();
+    await act(async () => button("Continue to schedule").click());
+
+    // Whitespace, which the browser's own check reads as filled in.
+    await act(async () => setValue(input("Monthly budget"), "  "));
+    await act(async () => button("Start monitor").click());
+    await settle();
+
+    expect(container.textContent).toContain("Set a monthly budget");
+    expect(fetchMock.mock.calls.some(([url]) => url === "/api/monitors")).toBe(false);
   });
 });

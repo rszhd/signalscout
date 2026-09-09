@@ -62,14 +62,19 @@ export interface PollRate {
 }
 
 /**
- * Where a new monitor starts: hourly, every day.
+ * Where a new monitor starts: every six hours, every day. US-084.
  *
- * The most expensive answer, deliberately. A monitor that finds nothing on its
- * first day looks broken, and a person who wants it cheaper is shown the count
- * under the control the moment they touch it — where the old list buried the
- * same number inside an option label.
+ * It was hourly until then, on the argument that a monitor finding nothing on
+ * its first day looks broken. The owner decided the other way, and the cost
+ * decided it: the same query is $10.80 a month polled hourly and $1.80 polled
+ * at this rate, and US-007 measured an over-eager monitor billing 9 to 11
+ * records a poll for no posts at all, because everything it found was older
+ * than the last poll.
+ *
+ * A person who wants it faster is shown the count under the control the moment
+ * they touch it.
  */
-export const defaultRate = hour;
+export const defaultRate = 6 * hour;
 
 export const pollRates: readonly PollRate[] = [
   { seconds: hour, label: "Every hour" },

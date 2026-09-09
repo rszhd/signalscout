@@ -2,7 +2,7 @@
 
 # Done
 
-68 finished.
+69 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
@@ -16,6 +16,7 @@
 | BUG-003 | [A post below the threshold is classified again on every poll](done/2026-09/BUG-003-a-post-below-the-threshold-is-classified-again-on-every-poll.md) | bug | fixed | 2026-09 |
 | BUG-002 | [A seven-day window is bought as a month](done/2026-09/BUG-002-a-seven-day-window-is-bought-as-a-month.md) | bug | fixed | 2026-09 |
 | BUG-001 | [A pending Reddit collection is not resumed](done/2026-09/BUG-001-a-pending-reddit-collection-is-not-resumed.md) | bug | shipped | 2026-09 |
+| US-084 | [A new monitor starts with a cap and a slower clock](done/2026-09/US-084-a-new-monitor-starts-with-a-cap-and-a-slower-clock.md) | feature | done | 2026-09 |
 | US-082 | [What the Models screen cost to get right](done/2026-09/US-082-what-the-models-screen-cost-to-get-right.md) | chore | done | 2026-09 |
 | US-081 | [An open instance does not share the machine's keys](done/2026-09/US-081-an-open-instance-does-not-share-the-machines-keys.md) | feature | done | 2026-09 |
 | US-080 | [A model key is tested on the screen](done/2026-09/US-080-a-model-key-is-tested-on-the-screen.md) | feature | done | 2026-09 |

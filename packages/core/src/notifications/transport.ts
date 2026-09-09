@@ -47,13 +47,18 @@ export function createNotificationTransport(
   const fetcher = options.fetch ?? globalThis.fetch;
   return {
     email: mailer
-      ? async (to, subject, text, id) => {
+      ? async (to, subject, text, id, html) => {
           try {
             const result = await mailer.sendMail({
               from: env.SMTP_FROM,
               to,
               subject,
+              // Both parts, never one. US-094: the text is the message and the
+              // HTML is a presentation of it, so a text-only client and a
+              // screen reader lose nothing, and a multipart message scores
+              // better with a spam filter than an HTML-only one.
               text,
+              ...(html === undefined ? {} : { html }),
               messageId: `<${id}@signalscout.local>`,
             });
             if (!result.accepted?.length || result.rejected?.length)

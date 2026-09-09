@@ -16,9 +16,19 @@ import {
   posts,
   notificationSettings as settings,
 } from "../db/schema.js";
+import { matchEmail } from "./match-email.js";
 
 export interface NotificationTransport {
-  email: ((to: string, subject: string, text: string, id: string) => Promise<void>) | null;
+  email:
+    | ((
+        to: string,
+        subject: string,
+        text: string,
+        id: string,
+        /** The dressed version. US-094. Absent means send the text alone. */
+        html?: string,
+      ) => Promise<void>)
+    | null;
   webhook: ((url: string, body: string, id: string) => Promise<void>) | null;
 }
 
@@ -27,6 +37,15 @@ export async function processNotifications(
   monitorId: string,
   transport: NotificationTransport,
   now = new Date(),
+  /**
+   * Where this instance answers, for the "open the inbox" button. US-094.
+   *
+   * Optional, and the template renders without it. `APP_URL` is required only
+   * for Stripe, so a self-hosted deployment may not have set one — and a button
+   * pointing nowhere is worse than no button. A match still links to its own
+   * post, which needs nothing configured.
+   */
+  appUrl?: string,
 ) {
   // Commit the outbox before calling a remote service. A crash during delivery
   // leaves the original delivery id available to the next attempt.
@@ -192,13 +211,21 @@ export async function processNotifications(
         monitor: { id: monitorId, name: monitor.name },
         matches: selected,
       };
-      const subject = `SignalScout: ${selected.length} ${selected.length === 1 ? "match" : "matches"} for ${monitor.name}`;
-      const text = `${subject}\n\n${selected.map((row) => `Score: ${row.score}\n${row.excerpt}\n${row.reasons.join("\n")}\n${row.url}`).join("\n\n")}\n`;
+      // US-094. The subject and the plain text are what they always were —
+      // somebody's mail filter is written against that subject — and the HTML
+      // is built beside them.
+      const { subject, text, html } = matchEmail({
+        monitorName: monitor.name,
+        matches: selected,
+        kind: delivery.kind === "digest" ? "digest" : "match",
+        appUrl,
+        now,
+      });
       const attempts = delivery.attempts + 1;
       try {
         if (delivery.channel === "email") {
           if (!transport.email) throw new Error("SMTP is unavailable");
-          await transport.email(config.emailTo, subject, text, delivery.id);
+          await transport.email(config.emailTo, subject, text, delivery.id, html);
         } else {
           if (!transport.webhook) throw new Error("Webhook signing is unavailable");
           await transport.webhook(config.webhookUrl, JSON.stringify(payload), delivery.id);

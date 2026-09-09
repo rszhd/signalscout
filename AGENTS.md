@@ -1405,6 +1405,41 @@ invisible to a green run, and the thing that found this one was running `curl`
 against the same host from the same machine and watching one client wait where
 the other would not.
 
+**An email looks like the product it came from, and the palette is copied on
+purpose.** US-094 closed on 2026-09-10. Every message this product sent was
+plain text — a join of scores, excerpts and URLs — so US-093's first digests
+arrived looking like a log file.
+
+**Email cannot read `tokens.css`**, and that is the whole difficulty: no
+external stylesheet, no CSS variable in Outlook's Word renderer, no flexbox and
+no grid. So the palette is copied into `notifications/email-theme.ts`, **once**,
+with each value named for the token it came from. A palette copied into each
+template drifts in three places until two emails disagree about the blue.
+Changing a colour in `tokens.css` means changing it there too, and that cost is
+why the file is six colours and one shell rather than a second design system.
+
+**HTML is added beside the text and never instead of it.** `sendMail` takes
+both, so a text-only client, a screen reader and a spam filter all keep what
+they had. The subject and the plain text are byte-for-byte what they were,
+because somebody's mail filter is written against that subject.
+
+**Escaping here is correctness-critical, and it is US-064's lesson again.** A
+digest is built entirely from strangers' words — a title, an excerpt, an author,
+a model's reasons, a URL a provider returned. Unescaped, a title carrying
+`<img onerror=…>` is markup in somebody's mail client. `safeUrl` also refuses
+anything but `http` and `https` an `href`, and renders it as text instead.
+
+**The first render had a fault and reading the output is what found it.** The
+font stack in `tokens.css` contains `"Segoe UI"` in double quotes, and every
+style here is written into a double-quoted HTML attribute — so the attribute
+ended at `Segoe` and the rest became stray attributes on the tag. Apostrophes
+are valid CSS in the same place. The test walks every `style="…"` and fails on a
+double quote inside one.
+
+Live: two dressed emails sent and accepted, from seven real matches. Still
+unproven: nobody has opened one in Outlook, and the verification email has not
+been re-sent since it was dressed.
+
 **A match now reaches a person without being asked to.** US-093 closed on
 2026-09-10, on the owner's decision. US-016 built digests, immediate alerts and
 signed webhooks in September and **nothing was ever delivered**: the running

@@ -515,7 +515,13 @@ export async function startWorker({
       createClassifyStep({ classifierFor: async (userId) => (await modelsFor(userId)).classifier }),
     notify:
       steps.notify ??
-      createNotifyStep(notificationTransport ?? createNotificationTransport(loadNotificationEnv())),
+      createNotifyStep(
+        notificationTransport ?? createNotificationTransport(loadNotificationEnv()),
+        // US-094. Optional everywhere: `APP_URL` is required only for Stripe,
+        // so the button is offered where a deployment has said where it
+        // answers and left out where it has not.
+        process.env.APP_URL,
+      ),
   };
 
   /**

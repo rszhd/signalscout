@@ -29,6 +29,28 @@ several deliveries. A paused monitor can still deliver matches already found.
 The worker checks for due notifications once a minute. After downtime it picks
 up eligible matches that have not been assigned a delivery.
 
+## What an email looks like
+
+US-094. Every message carries a plain-text part and an HTML part. The text is
+the message and the HTML is a presentation of it, so a client that shows only
+text loses the styling and nothing else.
+
+The palette is copied from `apps/web/src/styles/tokens.css` into
+`packages/core/src/notifications/email-theme.ts`, because a mail client has no
+external stylesheet and no CSS variables. **Change a colour in one and change
+it in the other.** The copy is deliberate and it is made once: that file holds
+the palette and the shared shell, and the two templates beside it render
+through it.
+
+The templates lay out with tables and inline styles, load no image and no web
+font, and declare a light scheme with their own background so a dark-mode
+client does not invert them. A match links to the post it came from. The
+"open the inbox" button appears only where `APP_URL` is set.
+
+Everything interpolated is escaped, and only `http` and `https` URLs reach an
+`href`. A digest is built from strangers' words, so this is correctness and not
+tidiness.
+
 ## SMTP and Resend
 
 SignalScout uses Nodemailer, a Node.js library, to send through your SMTP

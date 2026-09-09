@@ -39,6 +39,21 @@ semantics a screen must not get wrong:
 theme class not served by a component (e.g. a page's own `text-button`) stays a
 plain class until a component earns it. Components never import `packages/core`.
 
+## Spacing
+
+Spacing follows the scale in `tokens.css`: `--space-1` to `--space-12`
+(4, 8, 12, 16, 20, 24, 32, 48). Read `docs/spacing.md` before adding a value.
+
+The rule: a `padding`, `margin` or `gap` is a `var(--space-*)` token or `0`.
+Hairline values (1–2px, for a border width) and non-spacing values (border
+radius, a width, a height) stay as they are. A value between two steps snaps
+to the nearest one; a value exactly between is decided by what it measures —
+a tight gap is the smaller step, a control or section inset the larger.
+
+`index.css` still holds legacy page styles and is grandfathered until each page
+migrates. A new rule in a migrated file that uses a raw px spacing value is a
+lint error (see `docs/spacing.md`, *Enforced*).
+
 ## Shared patterns
 
 | Pattern | Use |

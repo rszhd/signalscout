@@ -14,7 +14,7 @@
   grid-template-columns: auto minmax(0, 1fr) auto;
   gap: var(--space-3);
   align-items: center;
-  padding: 18px var(--space-5);
+  padding: var(--space-5);
   border-bottom: 1px solid var(--line);
   background: linear-gradient(135deg, var(--surface) 35%, var(--accent-soft));
 }
@@ -40,7 +40,7 @@
 }
 
 .reply-draft-heading p {
-  margin: 3px 0 0;
+  margin: var(--space-1) 0 0;
   color: var(--muted);
   font-size: var(--text-xs);
   line-height: 1.45;
@@ -50,8 +50,8 @@
   min-height: 28px;
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 0 9px;
+  gap: var(--space-1);
+  padding: 0 var(--space-2);
   border: 1px solid #d9e1d6;
   border-radius: 999px;
   color: #52634e;
@@ -86,7 +86,7 @@
 .reply-voice-field {
   min-width: 0;
   display: grid;
-  gap: 5px;
+  gap: var(--space-1);
 }
 
 .reply-voice-field > span,
@@ -100,7 +100,7 @@
 .reply-dialog-select select {
   width: 100%;
   min-height: var(--control-height-compact);
-  padding: 0 31px 0 10px;
+  padding: 0 var(--space-8) 0 var(--space-3);
   overflow: hidden;
   border: 1px solid var(--line-dark);
   border-radius: var(--radius-sm);
@@ -122,8 +122,8 @@
   min-height: var(--control-height-compact);
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 0 11px;
+  gap: var(--space-1);
+  padding: 0 var(--space-3);
   border: 1px solid transparent;
   border-radius: var(--radius-sm);
   color: var(--muted-strong);
@@ -147,7 +147,7 @@
 
 .reply-draft-generate {
   min-height: var(--control-height-compact);
-  gap: 7px;
+  gap: var(--space-2);
   font-size: var(--text-sm);
   white-space: nowrap;
 }
@@ -181,7 +181,7 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-3);
-  margin-bottom: 7px;
+  margin-bottom: var(--space-2);
 }
 
 .reply-draft-editor-heading label {
@@ -191,7 +191,7 @@
 }
 
 .reply-draft-editor-status {
-  padding: 3px 7px;
+  padding: var(--space-1) var(--space-2);
   border-radius: 999px;
   color: var(--accent-text);
   background: var(--accent-soft);
@@ -220,7 +220,7 @@
   width: 100%;
   min-height: 185px;
   display: block;
-  padding: 14px 15px 10px;
+  padding: var(--space-4) var(--space-4) var(--space-2);
   border: 0;
   outline: none;
   color: var(--text-reading-color);
@@ -234,7 +234,7 @@
   display: flex;
   justify-content: space-between;
   gap: var(--space-3);
-  padding: 8px 12px;
+  padding: var(--space-2) var(--space-3);
   border-top: 1px solid var(--line);
   color: var(--muted);
   background: var(--surface-soft);
@@ -249,7 +249,7 @@
 
 .reply-draft-checks {
   margin-top: var(--space-3);
-  padding: 12px 14px;
+  padding: var(--space-3) var(--space-4);
   border: 1px solid #ead8b7;
   border-radius: var(--radius-sm);
   color: #77542f;
@@ -258,7 +258,7 @@
 
 .reply-draft-checks-heading {
   display: flex;
-  gap: 7px;
+  gap: var(--space-2);
   align-items: center;
 }
 
@@ -281,8 +281,8 @@
 
 .reply-draft-checks ul {
   display: grid;
-  gap: 4px;
-  margin: 7px 0 0 24px;
+  gap: var(--space-1);
+  margin: var(--space-2) 0 0 var(--space-6);
   padding: 0;
   font-size: var(--text-xs);
   line-height: 1.45;
@@ -298,7 +298,7 @@
 
 .reply-draft-copy {
   min-width: 120px;
-  gap: 7px;
+  gap: var(--space-2);
 }
 
 .reply-draft-copy.copied {
@@ -359,7 +359,7 @@
 }
 
 .reply-draft-dialog-heading p {
-  margin: 4px 0 0;
+  margin: var(--space-1) 0 0;
   color: var(--muted);
   font-size: var(--text-sm);
 }
@@ -393,7 +393,7 @@
 
 .reply-dialog-select {
   display: grid;
-  gap: 6px;
+  gap: var(--space-1);
 }
 
 .reply-draft-dialog .field > span {
@@ -402,7 +402,7 @@
 }
 
 .reply-draft-dialog .field > small {
-  margin: 3px 0 10px;
+  margin: var(--space-1) 0 var(--space-3);
   font-size: var(--text-xs);
   line-height: 1.5;
 }
@@ -427,7 +427,7 @@
  */
 .reply-draft-dialog textarea {
   min-height: 240px;
-  padding: 13px 14px;
+  padding: var(--space-3) var(--space-4);
   font-size: var(--text-label);
   line-height: 1.65;
   resize: vertical;
@@ -435,7 +435,7 @@
 
 .reply-draft-dialog input {
   min-height: var(--control-height-compact);
-  padding: 0 11px;
+  padding: 0 var(--space-3);
 }
 
 .reply-draft-dialog-body .form-error {
@@ -443,7 +443,7 @@
 }
 
 .reply-draft-dialog-note {
-  margin: -8px 0 0;
+  margin: calc(-1 * var(--space-2)) 0 0;
   padding-top: var(--space-3);
   border-top: 1px solid var(--line);
   color: var(--muted);
@@ -456,7 +456,7 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-3);
-  padding: 14px var(--space-5);
+  padding: var(--space-4) var(--space-5);
   border-top: 1px solid var(--line);
   background: var(--surface-soft);
 }

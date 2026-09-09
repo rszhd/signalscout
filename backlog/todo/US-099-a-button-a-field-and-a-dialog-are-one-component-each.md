@@ -66,7 +66,10 @@ per commit.
       assertions
 - [ ] `docs/design.md` names the rule: a screen uses a component before writing
       a raw theme class, and the components are the only path to a dialog
-- [ ] `pnpm lint`, `pnpm typecheck` and the web tests all pass
+- [ ] Spacing: `theme.css` and `reply-draft.css` use the `--space-*` scale; a
+      `padding`, `margin` or `gap` is `0`, `auto`, a token or a `calc()` of
+      tokens. `docs/spacing.md` names the rule and the snapshot decision
+- [ ] `pnpm lint`, `pnpm lint:css`, `pnpm typecheck` and the web tests all pass
 - [ ] `backlog/index.sh` regenerates the lists
 
 ## Notes
@@ -78,11 +81,21 @@ per commit.
 - The dialog tests stub `HTMLDialogElement.prototype.showModal` and `close`
   and read `.open`. The component must keep the native dialog, the ref and the
   `aria-labelledby`, or those tests break.
-- Do not change the theme or page CSS. The components reuse the existing class
-  names; the only new file is the component module.
+- The renamed `title` prop on `Dialog` is `titleId` — it is an id for
+  `aria-labelledby`, not visible text.
+- Spacing: `index.css` and the un-migrated page stylesheets are grandfathered,
+  so `pnpm lint:css` names the two migrated files explicitly. Each migrated
+  page is added to the command and to `docs/design.md`'s migration list.
+  Biome has no CSS spacing rule; the check is stylelint.
 
 ## Log
 
 - 2026-09-10T01:20+08:00 — Written. Three dialog implementations and a 34-fold
   repeated button class are what this addresses. `packages/core` is out of
   scope; the design doc rule is the deliverable with the two migrated screens.
+- 2026-09-10T01:38+08:00 — Spacing sweep added, on the owner's request for
+  across-the-site consistency. The off-scale values were concentrated in
+  `theme.css` and `reply-draft.css`; both are now on the scale, and
+  `docs/spacing.md` names the rule. `pnpm lint:css` is the enforcement, since
+  Biome ships no CSS rule for it. Values were snapped to the nearest step;
+  `index.css` (160 off-scale rules) is left for its per-page migration.

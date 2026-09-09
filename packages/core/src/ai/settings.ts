@@ -21,10 +21,11 @@
  */
 import { and, eq } from "drizzle-orm";
 import type { Database } from "../db/client.js";
-import { type AiTask, aiKeys, aiSettings } from "../db/schema.js";
+import { type AiTask, aiKeys, aiSettings, aiTasks } from "../db/schema.js";
 import { decryptSecret, type EncryptionKey, optionalEncryptionKey } from "../secrets/cipher.js";
 import type { AiEnvironment, AiProvider, EmbeddingProvider } from "./config.js";
 import { readAiKeySecret } from "./keys.js";
+import { followsDefault, recommendedModelFor } from "./recommended.js";
 
 /** One task's settings, as a person edits them. The key is never read back. */
 export interface AiTaskSettings {
@@ -176,6 +177,93 @@ async function resolve(
 }
 
 /**
+ * The account's default key, opened. US-083.
+ *
+ * Null is the ordinary answer on a self-hosted instance, and it means every
+ * job with no row of its own falls back to the environment, exactly as it did
+ * before this existed.
+ */
+async function readDefault(
+  db: Database,
+  key: EncryptionKey | undefined,
+  userId: string,
+): Promise<{ provider: string | null; apiKey: string | undefined } | null> {
+  const [row] = await db
+    .select({
+      provider: aiKeys.provider,
+      ciphertext: aiKeys.ciphertext,
+      record: aiKeys.record,
+    })
+    .from(aiKeys)
+    .where(and(eq(aiKeys.userId, userId), eq(aiKeys.isDefault, true)));
+
+  if (!row) return null;
+
+  // A stored key this process cannot open throws, for `resolve`'s reason: a
+  // rotation that half worked must not read as a key nobody stored.
+  return {
+    provider: row.provider,
+    apiKey: key ? decryptSecret(key, row.ciphertext, row.record) : undefined,
+  };
+}
+
+/**
+ * Every job that said nothing runs on the default key. US-083.
+ *
+ * **Following the default is the absent row**, which is the same idea this
+ * whole file is built on. A person who edits a job has a row, and the row is
+ * what "I chose this myself" means — so the default fills the jobs nobody has
+ * touched and never overwrites the ones somebody has. Nothing is written when
+ * the default changes, so there is nothing to go stale and no restart.
+ *
+ * The model comes from `recommended.ts` rather than from the instance:
+ * `AI_MODEL` is one name on one provider, and a job moved to the default key's
+ * provider would otherwise carry a name that provider has never heard of. A
+ * provider we recommend nothing for leaves the model unset, which is a job the
+ * screen can report as needing one rather than a call that fails at 02:00.
+ */
+function fill(
+  mine: Map<AiTask, ResolvedTask>,
+  fallback: { provider: string | null; apiKey: string | undefined },
+): void {
+  const blank = {
+    baseUrl: null,
+    inputPriceMicros: null,
+    outputPriceMicros: null,
+    apiKey: fallback.apiKey,
+  };
+
+  for (const task of aiTasks) {
+    if (mine.has(task)) continue;
+
+    /**
+     * **A job this build cannot complete is left alone entirely.**
+     *
+     * Moving a job's provider without its model is the one combination that
+     * must never be written: `AI_MODEL` is a name the instance's provider
+     * answers to, so the pair would fail every call at whatever hour the
+     * schedule picked. The save route refuses a person who asks for it, and
+     * this is the same refusal where nobody asked. The job stays on the
+     * instance, and the screen says it needs a model.
+     *
+     * `followsDefault` is that question, and the Models screen asks the same
+     * function. A screen answering it separately would promise a call this
+     * never makes.
+     */
+    if (!followsDefault(fallback.provider, task)) continue;
+
+    // A key that names no provider moves the bill and nothing else, keeping
+    // the deployment's own provider and model — US-068's original case, and
+    // the only honest reading of a key whose owner did not say where it goes.
+    mine.set(task, {
+      provider: fallback.provider,
+      model: fallback.provider ? recommendedModelFor(fallback.provider, task) : null,
+      ...blank,
+    });
+  }
+}
+
+/**
  * One account's rows over the instance's, before any key is shared.
  *
  * The result is an ordinary `AiEnvironment`, so every caller downstream is the
@@ -288,6 +376,9 @@ export async function readAiEnvironment(
 ): Promise<AiEnvironment> {
   const key = optionalEncryptionKey(encryption);
   const mine = await resolve(db, key, userId);
+  const fallback = await readDefault(db, key, userId);
+
+  if (fallback) fill(mine, fallback);
 
   if (mine.size === 0) return instance;
 
@@ -325,6 +416,11 @@ export async function previewAiEnvironment(
   const key = optionalEncryptionKey(encryption);
   const mine = await resolve(db, key, userId);
   const saved = mine.get(task);
+
+  // The other three jobs are filled the way a run would fill them, so a test
+  // of one job is read against the environment the worker would build.
+  const fallback = await readDefault(db, key, userId);
+  if (fallback) fill(mine, fallback);
 
   mine.set(task, {
     // Absent means "as saved", the same three states a write has.

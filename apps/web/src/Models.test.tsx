@@ -29,6 +29,37 @@ async function mount(element: ReactElement) {
   return screen;
 }
 
+/**
+ * The default key's answer for a job, as the server computes it. US-083.
+ *
+ * A view built by hand would otherwise carry a fallback that disagrees with
+ * the key list beside it, and the screen would be asserted against a state the
+ * server cannot produce.
+ */
+function fallbackFor(keys: { provider?: string | null; name: string; id: string }[]) {
+  const chosen = keys.find((one) => (one as { isDefault?: boolean }).isDefault);
+
+  if (!chosen) {
+    return {
+      source: "instance" as const,
+      provider: "anthropic",
+      model: "claude-haiku-4-5",
+      hasKey: true,
+      keyName: null,
+      keyId: null,
+    };
+  }
+
+  return {
+    source: "key" as const,
+    provider: chosen.provider ?? "anthropic",
+    model: chosen.provider === "openai" ? "gpt-5.6-terra" : "claude-sonnet-5",
+    hasKey: true,
+    keyName: chosen.name,
+    keyId: chosen.id,
+  };
+}
+
 function view(overrides: Record<string, unknown> = {}, keys: unknown[] = []) {
   return {
     canStore: true,
@@ -47,6 +78,7 @@ function view(overrides: Record<string, unknown> = {}, keys: unknown[] = []) {
         note: "The most expensive call this product makes.",
         providers: ["openai", "anthropic"],
         instance: { provider: "anthropic", model: "claude-haiku-4-5", hasKey: true },
+        fallback: fallbackFor(keys as { provider?: string | null; name: string; id: string }[]),
         provider: null,
         model: null,
         baseUrl: null,
@@ -144,7 +176,11 @@ describe("the models screen", () => {
     name: "My OpenAI key",
     provider: "openai",
     hint: "••••abcd",
+    isDefault: false,
   };
+
+  /** The same key, marked as the one every untouched job follows. US-083. */
+  const defaultKey = { ...storedKey, isDefault: true };
 
   it("lists the account's keys and never a value", async () => {
     fetched.mockResolvedValue(json(view({}, [storedKey])));
@@ -258,12 +294,14 @@ describe("the models screen", () => {
             name: "A Google key",
             provider: "google",
             hint: "••••ghij",
+            isDefault: false,
           },
           {
             id: "33333333-3333-4333-8333-333333333333",
             name: "Unlabelled",
             provider: null,
             hint: "••••klmn",
+            isDefault: false,
           },
         ]),
       ),
@@ -456,6 +494,117 @@ describe("the models screen", () => {
     const [url, init] = fetched.mock.calls.at(-1) as [string, RequestInit];
     expect(url).toBe(`/api/models/keys/${storedKey.id}`);
     expect(init.method).toBe("DELETE");
+  });
+
+  /**
+   * One pasted key, and the four jobs run. US-083.
+   *
+   * Through the DOM because the claim is what a person sees: a job nobody has
+   * touched has to *say* it is working and on what, or the page reads as
+   * unfinished on the account where everything is already right.
+   */
+  describe("the default key", () => {
+    it("marks the default in the list and offers to move it to another", async () => {
+      fetched.mockResolvedValue(
+        json(
+          view({}, [
+            defaultKey,
+            {
+              id: "22222222-2222-4222-8222-222222222222",
+              name: "Second",
+              provider: "anthropic",
+              hint: "••••ghij",
+              isDefault: false,
+            },
+          ]),
+        ),
+      );
+      screen = await mount(<Models />);
+
+      expect(screen.container.textContent).toContain("Default");
+
+      // One button, on the key that is not the default. A key offered the
+      // chance to become what it already is reads as a setting that did not take.
+      expect(
+        [...screen.container.querySelectorAll("button")].filter(
+          (one) => one.textContent === "Make default",
+        ),
+      ).toHaveLength(1);
+
+      await act(async () => button("Make default").click());
+      await settle();
+
+      const [url, init] = fetched.mock.calls.at(-1) as [string, RequestInit];
+      expect(url).toBe("/api/models/keys/22222222-2222-4222-8222-222222222222/default");
+      expect(init.method).toBe("PUT");
+    });
+
+    it("says a job with no settings runs on the default key and its model", async () => {
+      fetched.mockResolvedValue(json(view({}, [defaultKey])));
+      screen = await mount(<Models />);
+
+      // The row a person reads before opening anything.
+      expect(screen.container.textContent).toContain("gpt-5.6-terra");
+      expect(screen.container.textContent).toContain("default key: My OpenAI key");
+      expect(screen.container.textContent).toContain("runs on your default key");
+    });
+
+    /**
+     * Opening a working job and saving it must not change what it does.
+     *
+     * The fields start on what the job is running rather than on blanks
+     * standing for it — the failure otherwise is silent and expensive: a
+     * person opens a card to read it, presses Save, and the job moves back to
+     * a deployment key that a hosted account does not have.
+     */
+    it("opens a following job on what it is already running", async () => {
+      fetched.mockResolvedValue(json(view({}, [defaultKey])));
+      screen = await mount(<Models />);
+
+      expect(select("Scoring posts key").value).toBe(defaultKey.id);
+      expect(select("Scoring posts model").value).toBe("gpt-5.6-terra");
+    });
+
+    /**
+     * A key on a provider this build can name no model for changes nothing,
+     * and the card must not pretend otherwise. On a hosted account there is no
+     * machine key underneath, so the honest answer is that the job needs one.
+     */
+    it("says a following job needs a key when nothing underneath it has one", async () => {
+      fetched.mockResolvedValue(
+        json(
+          view({
+            instance: { provider: "anthropic", model: "claude-haiku-4-5", hasKey: false },
+            fallback: {
+              source: "instance",
+              provider: "anthropic",
+              model: "claude-haiku-4-5",
+              hasKey: false,
+              keyName: null,
+              keyId: null,
+            },
+          }),
+        ),
+      );
+      screen = await mount(<Models />);
+
+      expect(screen.container.textContent).toContain("Needs a key");
+      expect(screen.container.textContent).not.toContain("claude-haiku-4-5 · this instance");
+    });
+
+    it("names the default on the button that hands a job back to it", async () => {
+      fetched.mockResolvedValue(
+        json(view({ provider: "openai", model: "gpt-5.6-luna" }, [defaultKey])),
+      );
+      screen = await mount(<Models />);
+
+      await act(async () => button("Follow the default key (My OpenAI key)").click());
+      await settle();
+
+      const [url, init] = fetched.mock.calls.at(-1) as [string, RequestInit];
+      expect(url).toBe("/api/models/classify");
+      expect(init.method).toBe("DELETE");
+    });
   });
 
   it("offers the way back to the instance's settings only when there is one", async () => {

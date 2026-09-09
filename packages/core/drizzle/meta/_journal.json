@@ -365,6 +365,13 @@
       "when": 1788707618124,
       "tag": "0051_a_model_key_can_be_tested",
       "breakpoints": true
+    },
+    {
+      "idx": 52,
+      "version": "7",
+      "when": 1788707618125,
+      "tag": "0052_one_key_is_the_default",
+      "breakpoints": true
     }
   ]
 }

@@ -67,6 +67,7 @@ export {
   listAiKeys,
   readAiKey,
   readAiKeySecret,
+  setDefaultAiKey,
 } from "./ai/keys.js";
 export {
   type ModelProbe,
@@ -104,6 +105,12 @@ export {
   searchQuerySchemaFor,
   subredditSchema,
 } from "./ai/queries.js";
+export {
+  followsDefault,
+  recommendationsFor,
+  recommendedModelFor,
+  recommendedProviders,
+} from "./ai/recommended.js";
 export {
   classifiedPostCounts,
   type RecordModelCallInput,

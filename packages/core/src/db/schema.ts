@@ -1576,6 +1576,16 @@ export const aiKeys = pgTable(
     record: text("record").notNull(),
     /** `••••1234`, so showing which key is set decrypts nothing. */
     hint: text("hint").notNull(),
+    /**
+     * The key every job runs on until a job says otherwise. US-083.
+     *
+     * A boolean rather than a `default_key_id` on some settings row, because
+     * the question is about this key — "is this the one?" — and the screen
+     * answers it in the list where the keys are. It is also what makes the
+     * partial unique index below possible, and that index is the whole
+     * guarantee: two defaults is not a state this table can hold.
+     */
+    isDefault: boolean("is_default").notNull().default(false),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
@@ -1587,6 +1597,11 @@ export const aiKeys = pgTable(
     // Two keys called the same thing are a person choosing blind, which is the
     // rule `reply_prompts` already follows and for the same reason.
     uniqueIndex("ai_keys_user_name_unique").on(table.userId, sql`lower(${table.name})`),
+    // One default per account, enforced by the database rather than by every
+    // writer remembering to clear the old one. Two rows claiming it is a
+    // question with two answers, and the screen would show whichever the
+    // ordering happened to return.
+    uniqueIndex("ai_keys_user_default_unique").on(table.userId).where(sql`${table.isDefault}`),
   ],
 );
 

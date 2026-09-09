@@ -10,6 +10,7 @@
  * object — an override that produced the right `AiEnvironment` and the wrong
  * classifier would pass the second kind of test and fail a person.
  */
+import { eq } from "drizzle-orm";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { createDatabase, type Database } from "../db/client.js";
 import { aiKeys, aiSettings } from "../db/schema.js";
@@ -26,7 +27,13 @@ import {
   embeddingConfigFromEnvironment,
   triageConfigFromEnvironment,
 } from "./config.js";
-import { createAiKey, DuplicateAiKeyName, deleteAiKey, listAiKeys } from "./keys.js";
+import {
+  createAiKey,
+  DuplicateAiKeyName,
+  deleteAiKey,
+  listAiKeys,
+  setDefaultAiKey,
+} from "./keys.js";
 import {
   clearAiTaskSettings,
   readAiEnvironment,
@@ -92,6 +99,20 @@ describe("one account's model settings", () => {
 
     stored.set(value, made.id);
     return made.id;
+  }
+
+  /**
+   * Put this account back in the world before US-083.
+   *
+   * The first key an account stores becomes its default, and a default fills
+   * every job nobody has touched. Several cases below are about what happens
+   * when a job is pointed at nothing *and nothing else is either* — the rule
+   * that still governs an account whose keys were all added before this
+   * existed, and an account whose default was deleted. They say so here rather
+   * than reading as passing by accident.
+   */
+  async function clearDefault(): Promise<void> {
+    await db.update(aiKeys).set({ isDefault: false }).where(eq(aiKeys.userId, owner));
   }
 
   it("gives an account with no settings the instance's own environment", async () => {
@@ -286,6 +307,7 @@ describe("one account's model settings", () => {
   describe("one key across several jobs", () => {
     it("gives two jobs the same key when both are pointed at it", async () => {
       const mineOnly = await keyFor("sk-openai", "openai");
+      await clearDefault();
 
       await saveAiTaskSettings(db, owner, "draft", {
         provider: "openai",
@@ -311,6 +333,7 @@ describe("one account's model settings", () => {
         provider: "openai",
         keyId: await keyFor("sk-openai", "openai"),
       });
+      await clearDefault();
       await saveAiTaskSettings(db, owner, "triage", {
         provider: "openai",
         model: "gpt-5.6-luna",
@@ -389,6 +412,250 @@ describe("one account's model settings", () => {
     });
   });
 
+  /**
+   * The default key, and what a job that said nothing runs on. US-083.
+   *
+   * These are the cases that decide whether one pasted key is enough. The
+   * failure they exist to catch is silent in both directions: a default that
+   * does not reach a job leaves it dead on a hosted account, and a default that
+   * reaches a job somebody configured overwrites a choice with a suggestion.
+   */
+  describe("the default key", () => {
+    it("makes the first key stored the default, and leaves the second alone", async () => {
+      const first = await createAiKey(db, key, owner, {
+        name: "First",
+        provider: "openai",
+        apiKey: "sk-first",
+      });
+      const second = await createAiKey(db, key, owner, {
+        name: "Second",
+        provider: "anthropic",
+        apiKey: "sk-second",
+      });
+
+      expect(first.isDefault).toBe(true);
+      expect(second.isDefault).toBe(false);
+
+      const listed = await listAiKeys(db, owner);
+      expect(listed.filter((one) => one.isDefault).map((one) => one.name)).toEqual(["First"]);
+    });
+
+    /**
+     * The whole point of the ticket, in one case.
+     *
+     * One key, nothing else touched, and all four jobs run — on that key, on
+     * its provider, on the model this build recommends for each. Before this
+     * the same account had four jobs pointing at an instance key that a hosted
+     * deployment does not have.
+     */
+    it("runs every untouched job on the default key and its recommended models", async () => {
+      await createAiKey(db, key, owner, {
+        name: "Mine",
+        provider: "openai",
+        apiKey: "sk-openai",
+      });
+
+      const mine = await readAiEnvironment(db, owner, instance, encryption);
+
+      expect(aiConfigFromEnvironment(mine)).toMatchObject({
+        provider: "openai",
+        model: "gpt-5.6-terra",
+        apiKey: "sk-openai",
+      });
+      expect(triageConfigFromEnvironment(mine)).toMatchObject({
+        provider: "openai",
+        model: "gpt-5.6-luna",
+        apiKey: "sk-openai",
+      });
+      expect(draftConfigFromEnvironment(mine)).toMatchObject({
+        provider: "openai",
+        model: "gpt-6-astra",
+        apiKey: "sk-openai",
+      });
+      expect(embeddingConfigFromEnvironment(mine)).toMatchObject({
+        provider: "openai",
+        model: "text-embedding-3-small",
+        apiKey: "sk-openai",
+      });
+    });
+
+    it("moves every following job when the default moves, with nothing rewritten", async () => {
+      await createAiKey(db, key, owner, {
+        name: "OpenAI",
+        provider: "openai",
+        apiKey: "sk-openai",
+      });
+      const anthropic = await createAiKey(db, key, owner, {
+        name: "Anthropic",
+        provider: "anthropic",
+        apiKey: "sk-anthropic",
+      });
+
+      expect(await setDefaultAiKey(db, owner, anthropic.id)).toBe(true);
+
+      const mine = await readAiEnvironment(db, owner, instance, encryption);
+
+      expect(aiConfigFromEnvironment(mine)).toMatchObject({
+        provider: "anthropic",
+        model: "claude-sonnet-5",
+        apiKey: "sk-anthropic",
+      });
+      // Nothing was written to say so. A job follows the default by having no
+      // row of its own, which is why a change needs no migration and no restart.
+      expect(await readAiSettings(db, owner)).toEqual([]);
+    });
+
+    /**
+     * A suggestion never overwrites a choice.
+     *
+     * This is the case that would be worst to get wrong: somebody sets triage
+     * to a cheap model on purpose, changes their default key months later, and
+     * the deliberate setting is replaced by ours without a word.
+     */
+    it("leaves a job somebody saved exactly as they saved it", async () => {
+      const openai = await createAiKey(db, key, owner, {
+        name: "OpenAI",
+        provider: "openai",
+        apiKey: "sk-openai",
+      });
+      await saveAiTaskSettings(db, owner, "triage", {
+        provider: "openai",
+        model: "gpt-5.6-sol",
+        keyId: openai.id,
+      });
+
+      const anthropic = await createAiKey(db, key, owner, {
+        name: "Anthropic",
+        provider: "anthropic",
+        apiKey: "sk-anthropic",
+      });
+      await setDefaultAiKey(db, owner, anthropic.id);
+
+      const mine = await readAiEnvironment(db, owner, instance, encryption);
+
+      expect(triageConfigFromEnvironment(mine)).toMatchObject({
+        provider: "openai",
+        model: "gpt-5.6-sol",
+        apiKey: "sk-openai",
+      });
+      // And the job beside it, which nobody touched, did move.
+      expect(aiConfigFromEnvironment(mine).provider).toBe("anthropic");
+    });
+
+    it("gives a cleared job back to the default rather than to the instance", async () => {
+      const openai = await createAiKey(db, key, owner, {
+        name: "OpenAI",
+        provider: "openai",
+        apiKey: "sk-openai",
+      });
+      await saveAiTaskSettings(db, owner, "classify", {
+        provider: "openai",
+        model: "gpt-5.6-sol",
+        keyId: openai.id,
+      });
+      await clearAiTaskSettings(db, owner, "classify");
+
+      expect(
+        aiConfigFromEnvironment(await readAiEnvironment(db, owner, instance, encryption)),
+      ).toMatchObject({ provider: "openai", model: "gpt-5.6-terra", apiKey: "sk-openai" });
+    });
+
+    /**
+     * Deleting the default promotes nothing.
+     *
+     * A promoted key would move every following job onto a provider nobody
+     * chose, at whatever hour the schedule picked. No default is a state a
+     * screen can show; the wrong default is a state that looks finished.
+     */
+    it("leaves no default when the default key is deleted", async () => {
+      const only = await createAiKey(db, key, owner, {
+        name: "Only",
+        provider: "openai",
+        apiKey: "sk-openai",
+      });
+      const second = await createAiKey(db, key, owner, {
+        name: "Second",
+        provider: "openai",
+        apiKey: "sk-second",
+      });
+
+      await deleteAiKey(db, owner, only.id);
+
+      expect((await listAiKeys(db, owner)).map((one) => one.isDefault)).toEqual([false]);
+      expect(await readAiEnvironment(db, owner, instance, encryption)).toEqual(instance);
+      expect(second.isDefault).toBe(false);
+    });
+
+    /**
+     * A key that names no provider moves the bill and nothing else.
+     *
+     * Nobody said where it belongs, so guessing would be how an OpenAI key
+     * reaches Anthropic. The instance's measured provider and model stay, and
+     * the account pays for its own calls — US-068's original case.
+     */
+    it("keeps the instance's provider and model when the key names no provider", async () => {
+      await createAiKey(db, key, owner, { name: "Unlabelled", apiKey: "sk-mine" });
+
+      expect(
+        aiConfigFromEnvironment(await readAiEnvironment(db, owner, instance, encryption)),
+      ).toMatchObject({
+        provider: "anthropic",
+        model: "claude-haiku-4-5",
+        apiKey: "sk-mine",
+      });
+    });
+
+    /**
+     * A provider we recommend no model for is left alone entirely.
+     *
+     * Moving the provider without the model is the one pairing that must never
+     * be written: `AI_MODEL` is a name the instance's provider answers to, so
+     * the job would fail every call. The screen asks for a model instead.
+     */
+    it("does not move a job to a provider it has no model to name", async () => {
+      await createAiKey(db, key, owner, {
+        name: "Gateway",
+        provider: "openrouter",
+        apiKey: "sk-router",
+      });
+
+      expect(
+        aiConfigFromEnvironment(await readAiEnvironment(db, owner, instance, encryption)),
+      ).toMatchObject({ provider: "anthropic", model: "claude-haiku-4-5" });
+    });
+
+    /**
+     * Anthropic has no embedding endpoint, so a default Anthropic key gives
+     * the account three jobs and not four. Similarity stays off, which costs
+     * nothing and drops nothing — the direction US-008 says to fail in.
+     */
+    it("gives no embedder to a default key on a provider that cannot embed", async () => {
+      await createAiKey(db, key, owner, {
+        name: "Anthropic",
+        provider: "anthropic",
+        apiKey: "sk-anthropic",
+      });
+
+      const mine = await readAiEnvironment(db, owner, instance, encryption);
+
+      expect(aiConfigFromEnvironment(mine).model).toBe("claude-sonnet-5");
+      expect(embeddingConfigFromEnvironment(mine)).toBeUndefined();
+    });
+
+    it("keeps one account's default out of another's", async () => {
+      await createAiKey(db, key, owner, {
+        name: "Mine",
+        provider: "openai",
+        apiKey: "sk-openai",
+      });
+
+      expect(await readAiEnvironment(db, other, instance, encryption)).toEqual(instance);
+      expect(await setDefaultAiKey(db, other, (await listAiKeys(db, owner))[0]?.id as string)).toBe(
+        false,
+      );
+    });
+  });
+
   it("keeps one account's settings out of another's", async () => {
     await saveAiTaskSettings(db, owner, "classify", {
       provider: "openai",
@@ -452,6 +719,7 @@ describe("one account's model settings", () => {
       keyId: await keyFor("sk-mine"),
     });
     await clearAiTaskSettings(db, owner, "classify");
+    await clearDefault();
 
     expect(await readAiSettings(db, owner)).toEqual([]);
     expect(await readAiEnvironment(db, owner, instance, encryption)).toEqual(instance);

@@ -608,6 +608,138 @@ describe("the models routes", () => {
     });
   });
 
+  /**
+   * One pasted key, and the four jobs run. US-083.
+   *
+   * The route half of it: the list says which key is the default, the view
+   * says what each job will therefore run, and a job somebody configured says
+   * its own answer instead.
+   */
+  describe("the default key", () => {
+    it("makes the first key the default and says so in the list", async () => {
+      await withServer(owner, async (app) => {
+        await addKey(app, "First", "sk-first", "openai");
+        await addKey(app, "Second", "sk-second", "anthropic");
+
+        const view = (await app.inject({ method: "GET", url: "/api/models" })).json();
+
+        // Listed by name, so the assertion is about the flag and not the order.
+        expect(view.keys).toMatchObject([
+          { name: "First", isDefault: true },
+          { name: "Second", isDefault: false },
+        ]);
+      });
+    });
+
+    it("tells the screen every job now runs on that key's recommended model", async () => {
+      await withServer(owner, async (app) => {
+        await addKey(app, "Mine", "sk-openai", "openai");
+        const view = (await app.inject({ method: "GET", url: "/api/models" })).json();
+        const by = (task: string) =>
+          view.tasks.find((one: { task: string }) => one.task === task).fallback;
+
+        expect(by("classify")).toEqual({
+          source: "key",
+          provider: "openai",
+          model: "gpt-5.6-terra",
+          hasKey: true,
+          keyName: "Mine",
+          keyId: view.keys[0].id,
+        });
+        expect(by("triage").model).toBe("gpt-5.6-luna");
+        expect(by("draft").model).toBe("gpt-6-astra");
+        expect(by("embed").model).toBe("text-embedding-3-small");
+
+        // And the machine's own answer is still reported beside it, unchanged.
+        expect(
+          view.tasks.find((one: { task: string }) => one.task === "classify").instance,
+        ).toEqual({ provider: "anthropic", model: "claude-haiku-4-5", hasKey: false });
+      });
+    });
+
+    it("moves every following job when the default moves", async () => {
+      await withServer(owner, async (app) => {
+        await addKey(app, "OpenAI", "sk-openai", "openai");
+        const anthropic = await addKey(app, "Anthropic", "sk-anthropic", "anthropic");
+
+        const moved = await app.inject({
+          method: "PUT",
+          url: `/api/models/keys/${anthropic}/default`,
+        });
+
+        expect(moved.statusCode).toBe(200);
+        expect(moved.body).not.toContain("sk-anthropic");
+
+        const classify = moved
+          .json()
+          .tasks.find((one: { task: string }) => one.task === "classify");
+
+        expect(classify.fallback).toMatchObject({
+          source: "key",
+          provider: "anthropic",
+          model: "claude-sonnet-5",
+          keyName: "Anthropic",
+        });
+        // Anthropic publishes no embedding endpoint, so similarity goes back
+        // to the machine rather than onto a key that cannot do the job.
+        expect(
+          moved.json().tasks.find((one: { task: string }) => one.task === "embed").fallback.source,
+        ).toBe("instance");
+      });
+    });
+
+    it("says the machine answers for a provider it can name no model on", async () => {
+      await withServer(owner, async (app) => {
+        await addKey(app, "Gateway", "sk-router", "openrouter");
+        const view = (await app.inject({ method: "GET", url: "/api/models" })).json();
+
+        expect(
+          view.tasks.find((one: { task: string }) => one.task === "classify").fallback,
+        ).toEqual({
+          source: "instance",
+          provider: "anthropic",
+          model: "claude-haiku-4-5",
+          hasKey: false,
+          keyName: null,
+          keyId: null,
+        });
+      });
+    });
+
+    it("leaves no default when the default key is removed", async () => {
+      await withServer(owner, async (app) => {
+        const first = await addKey(app, "First", "sk-first", "openai");
+        await addKey(app, "Second", "sk-second", "openai");
+
+        const after = await app.inject({ method: "DELETE", url: `/api/models/keys/${first}` });
+
+        expect(after.json().keys).toMatchObject([{ name: "Second", isDefault: false }]);
+        expect(
+          after.json().tasks.find((one: { task: string }) => one.task === "classify").fallback
+            .source,
+        ).toBe("instance");
+      });
+    });
+
+    it("refuses to make another account's key the default", async () => {
+      const theirs = await withServer(other, async (app) =>
+        addKey(app, "Theirs", "sk-theirs", "openai"),
+      );
+
+      await withServer(owner, async (app) => {
+        const refused = await app.inject({
+          method: "PUT",
+          url: `/api/models/keys/${theirs}/default`,
+        });
+
+        expect(refused.statusCode).toBe(404);
+        expect(
+          (await app.inject({ method: "GET", url: "/api/models" })).json().tasks[0].fallback.source,
+        ).toBe("instance");
+      });
+    });
+  });
+
   it("says why, rather than failing, on an instance that cannot store a key", async () => {
     const app = await server(owner, false);
 

@@ -32,6 +32,8 @@ export interface AiKey {
   readonly provider: string | null;
   /** `••••1234`. */
   readonly hint: string;
+  /** Whether every job with no settings of its own runs on this key. US-083. */
+  readonly isDefault: boolean;
   readonly createdAt: Date;
 }
 
@@ -66,6 +68,7 @@ export async function listAiKeys(db: Database, userId: string): Promise<AiKey[]>
       name: aiKeys.name,
       provider: aiKeys.provider,
       hint: aiKeys.hint,
+      isDefault: aiKeys.isDefault,
       createdAt: aiKeys.createdAt,
     })
     .from(aiKeys)
@@ -121,15 +124,89 @@ export async function createAiKey(
         name: aiKeys.name,
         provider: aiKeys.provider,
         hint: aiKeys.hint,
+        isDefault: aiKeys.isDefault,
         createdAt: aiKeys.createdAt,
       });
 
     if (!row) throw new Error("The key was not stored.");
-    return row;
+
+    return { ...row, isDefault: await adoptDefault(db, userId, row.id) };
   } catch (error) {
     if (isUniqueViolation(error)) throw new DuplicateAiKeyName(name);
     throw error;
   }
+}
+
+/**
+ * The first key an account stores becomes its default. US-083.
+ *
+ * A person who has pasted one key has answered the question, and asking them
+ * to press a second button to say so is asking them to confirm the only
+ * possible answer. Every later key is added without disturbing anything.
+ *
+ * **One statement, so two keys added at once cannot both win.** The condition
+ * is inside the `UPDATE` rather than read first and acted on after. Should two
+ * requests still cross — both find no default, both try to take it — the
+ * partial unique index refuses the loser, and that refusal is swallowed here:
+ * the account has a default, which is all this function was for. It is not a
+ * duplicate *name*, so it must not surface as one.
+ */
+async function adoptDefault(db: Database, userId: string, id: string): Promise<boolean> {
+  try {
+    const rows = await db
+      .update(aiKeys)
+      .set({ isDefault: true })
+      .where(
+        and(
+          eq(aiKeys.id, id),
+          eq(aiKeys.userId, userId),
+          sql`NOT EXISTS (
+            SELECT 1 FROM ${aiKeys} AS existing
+            WHERE existing.user_id = ${userId} AND existing.is_default
+          )`,
+        ),
+      )
+      .returning({ id: aiKeys.id });
+
+    return rows.length > 0;
+  } catch (error) {
+    if (isUniqueViolation(error)) return false;
+    throw error;
+  }
+}
+
+/**
+ * Make one key the account's default, and unmake whichever was.
+ *
+ * Both halves in one transaction, because the moment between them is a moment
+ * with no default: a poll landing there would run every following job on the
+ * instance's key, or on none. It is a narrow window and it is a real one — the
+ * scheduler is another process.
+ *
+ * False when the key is not this account's, which is `readAiKey`'s answer to
+ * the same question and for the same reason: saying which of the two is true
+ * tells a stranger that an id exists.
+ */
+export async function setDefaultAiKey(db: Database, userId: string, id: string): Promise<boolean> {
+  return await db.transaction(async (tx) => {
+    const [mine] = await tx
+      .select({ id: aiKeys.id })
+      .from(aiKeys)
+      .where(and(eq(aiKeys.id, id), eq(aiKeys.userId, userId)));
+
+    if (!mine) return false;
+
+    // Cleared first. The index allows one default per account, so setting the
+    // new one before clearing the old would be refused by the database.
+    await tx
+      .update(aiKeys)
+      .set({ isDefault: false })
+      .where(and(eq(aiKeys.userId, userId), eq(aiKeys.isDefault, true)));
+
+    await tx.update(aiKeys).set({ isDefault: true }).where(eq(aiKeys.id, id));
+
+    return true;
+  });
 }
 
 /**
@@ -175,6 +252,12 @@ export async function readAiKeySecret(
  * Every job pointing at it goes back to the instance's key, by the foreign
  * key's `set null`. That is a decision: a job left pointing at nothing would
  * fail every call with no screen able to say why.
+ *
+ * **Deleting the default leaves the account with no default**, and no other
+ * key is promoted. Promotion would move every following job onto a key nobody
+ * chose, on a provider nobody chose, at whatever hour the schedule picked. No
+ * default is a state the screen can show and a person can fix in one press;
+ * the wrong default is a state that looks finished.
  */
 export async function deleteAiKey(db: Database, userId: string, id: string): Promise<boolean> {
   const rows = await db
@@ -199,6 +282,7 @@ export async function readAiKey(db: Database, userId: string, id: string): Promi
       name: aiKeys.name,
       provider: aiKeys.provider,
       hint: aiKeys.hint,
+      isDefault: aiKeys.isDefault,
       createdAt: aiKeys.createdAt,
     })
     .from(aiKeys)

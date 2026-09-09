@@ -95,6 +95,15 @@ export function canEmbed(provider: AiProvider): provider is EmbeddingProvider {
  * `db/schema.ts` fixed the column at, and it is the cheapest of OpenAI's
  * three. Every other provider has to be told its model, because a wrong guess
  * here is a call that is billed and then thrown away for its width.
+ *
+ * **Google is absent for a narrower reason than "we do not know its name",
+ * measured 2026-09-09.** `gemini-embedding-2` and `gemini-embedding-001` both
+ * reach 1536, but only when the request carries `output_dimensionality`, and
+ * `embed.ts` sends no such parameter. So a Gemini embedding comes back wider
+ * than the column, is refused by the width check, and is billed anyway.
+ * Naming one here would turn that into a cost per poll on a deployment that
+ * chose nothing. Sending the parameter is the change that would let Google in,
+ * and it needs a real call to prove the width — which no test here may make.
  */
 export const defaultEmbeddingModels: Partial<Record<EmbeddingProvider, string>> = {
   openai: "text-embedding-3-small",

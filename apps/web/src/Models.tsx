@@ -32,6 +32,21 @@ interface TaskView {
   providers: string[];
   /** What this deployment is set to, and whether it holds a key for it. */
   instance: { provider: string; model: string | null; hasKey: boolean };
+  /**
+   * What this job runs when its own settings say nothing. US-083.
+   *
+   * The account's default key when there is one this build can name a model
+   * for, and the machine otherwise. The server decides which, because the rule
+   * for whether a job may follow a key is the worker's own.
+   */
+  fallback: {
+    source: "key" | "instance";
+    provider: string;
+    model: string | null;
+    hasKey: boolean;
+    keyName: string | null;
+    keyId: string | null;
+  };
   provider: string | null;
   model: string | null;
   baseUrl: string | null;
@@ -46,6 +61,8 @@ interface KeyView {
   name: string;
   provider: string | null;
   hint: string;
+  /** Whether every job with no settings of its own runs on this key. */
+  isDefault: boolean;
 }
 
 interface ModelsView {
@@ -112,13 +129,35 @@ interface Draft {
   keyId: string;
 }
 
+/** Whether a person has ever saved this job, which is what stops it following. */
+function isOwnChoice(task: TaskView): boolean {
+  return Boolean(task.provider || task.model || task.keyId || task.baseUrl);
+}
+
+/**
+ * What the editor opens on.
+ *
+ * A job nobody has touched opens on what it is *actually running* — the
+ * default key, its provider, its recommended model — rather than on blanks
+ * standing for them. Opening a working job and pressing Save must not change
+ * what it does, and it would if the fields started empty.
+ */
 function draftOf(task: TaskView): Draft {
+  if (isOwnChoice(task)) {
+    return {
+      // A concrete provider, never a blank standing for the instance's.
+      provider: task.provider ?? task.instance.provider,
+      model: task.model ?? "",
+      baseUrl: task.baseUrl ?? "",
+      keyId: task.keyId ?? "",
+    };
+  }
+
   return {
-    // A concrete provider, never a blank standing for the instance's.
-    provider: task.provider ?? task.instance.provider,
-    model: task.model ?? "",
-    baseUrl: task.baseUrl ?? "",
-    keyId: task.keyId ?? "",
+    provider: task.fallback.provider,
+    model: task.fallback.source === "key" ? (task.fallback.model ?? "") : "",
+    baseUrl: "",
+    keyId: task.fallback.keyId ?? "",
   };
 }
 
@@ -171,6 +210,28 @@ function KeyLibrary({
     }
   }
 
+  /**
+   * Move the default. US-083.
+   *
+   * Every job nobody has configured moves with it, on the next call. That is
+   * why the sentence under the list says so: a person pressing this is
+   * changing what four jobs run, and the button is one word.
+   */
+  async function makeDefault(stored: KeyView): Promise<void> {
+    setBusy(true);
+    setError(null);
+
+    try {
+      onChanged(
+        await requestJson<ModelsView>(`/api/models/keys/${stored.id}/default`, { method: "PUT" }),
+      );
+    } catch (cause) {
+      setError(messageFor(cause, "That key could not be made the default."));
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function remove(stored: KeyView): Promise<void> {
     setBusy(true);
     setError(null);
@@ -193,7 +254,10 @@ function KeyLibrary({
           <h2 id="models-keys-title">API keys</h2>
           <span className="models-count">{keys.length} saved</span>
         </div>
-        <p>Save a key once and reuse it across jobs.</p>
+        <p>
+          Save a key once and reuse it across jobs. Every job you have not set yourself runs on the
+          default key.
+        </p>
       </div>
 
       {keys.length === 0 && (
@@ -206,7 +270,10 @@ function KeyLibrary({
               <div className="key-account">
                 <BrandIcon brand={stored.provider ?? "key"} size={26} />
                 <span className="key-identity">
-                  <strong>{stored.name}</strong>
+                  <strong>
+                    {stored.name}
+                    {stored.isDefault && <span className="key-default-badge">Default</span>}
+                  </strong>
                   <span>
                     {stored.provider ? providerName(stored.provider) : "No provider set"} ·{" "}
                     {stored.hint}
@@ -215,18 +282,34 @@ function KeyLibrary({
               </div>
               {/*
                 No confirmation. Nothing is lost that cannot be pasted again,
-                every job pointing at it goes back to the instance's key where
-                there is one, and to none where there is not — which the job
-                then says of itself.
+                and every job pointing at it goes back to the instance's key
+                where there is one and to none where there is not — which the
+                job then says of itself.
+
+                Removing the default promotes nothing. No other key takes its
+                place, because a promoted key would move every following job
+                onto a provider nobody chose.
               */}
-              <button
-                className="secondary-button"
-                disabled={busy}
-                type="button"
-                onClick={() => void remove(stored)}
-              >
-                Remove
-              </button>
+              <span className="key-row-actions">
+                {!stored.isDefault && (
+                  <button
+                    className="text-button"
+                    disabled={busy}
+                    type="button"
+                    onClick={() => void makeDefault(stored)}
+                  >
+                    Make default
+                  </button>
+                )}
+                <button
+                  className="secondary-button"
+                  disabled={busy}
+                  type="button"
+                  onClick={() => void remove(stored)}
+                >
+                  Remove
+                </button>
+              </span>
             </li>
           ))}
         </ul>
@@ -435,6 +518,7 @@ function JobCard({
   const fromKey = chosen?.provider ?? null;
   const provider = fromKey ?? draft.provider;
   const onInstanceProvider = provider === task.instance.provider;
+  const following = !isOwnChoice(task);
 
   /**
    * What this job would run, as the card stands — typed and unsaved included,
@@ -453,7 +537,7 @@ function JobCard({
       ? "This instance's key"
       : null;
 
-  const customised = Boolean(task.provider || task.model || task.keyId || task.baseUrl);
+  const customised = isOwnChoice(task);
   const suggestions =
     task.task === "embed"
       ? [embeddingModels[provider]].filter((one): one is string => Boolean(one))
@@ -575,7 +659,11 @@ function JobCard({
 
     try {
       onSaved(await requestJson<ModelsView>(`/api/models/${task.task}`, { method: "DELETE" }));
-      setNotice("Using instance defaults.");
+      setNotice(
+        task.fallback.source === "key"
+          ? `Following the default key: ${task.fallback.keyName}.`
+          : "Using instance defaults.",
+      );
     } catch (cause) {
       setError(messageFor(cause, "That could not be removed."));
     } finally {
@@ -594,17 +682,37 @@ function JobCard({
       >
         <span className="job-identity">
           <strong>{task.title}</strong>
+          {/*
+            What it will run, and where that came from. A job following the
+            default has no settings of its own to show, and showing blanks
+            there is how a working job reads as an unfinished one.
+          */}
           <span>
-            {task.model ||
-              (task.provider && task.provider !== task.instance.provider
-                ? "Choose a model"
-                : task.instance.model) ||
-              "Not configured"}
+            {following
+              ? !task.fallback.hasKey
+                ? "Needs a key"
+                : task.fallback.model
+                  ? `${task.fallback.model} · ${
+                      task.fallback.source === "key"
+                        ? `default key: ${task.fallback.keyName}`
+                        : "this instance"
+                    }`
+                  : "Needs a model"
+              : task.model ||
+                (task.provider && task.provider !== task.instance.provider
+                  ? "Choose a model"
+                  : task.instance.model) ||
+                "Not configured"}
           </span>
         </span>
         <span className="job-provider">
-          <BrandIcon brand={task.provider ?? task.instance.provider} size={20} />
-          {providerName(task.provider ?? task.instance.provider)}
+          <BrandIcon
+            brand={following ? task.fallback.provider : (task.provider ?? task.instance.provider)}
+            size={20}
+          />
+          {providerName(
+            following ? task.fallback.provider : (task.provider ?? task.instance.provider),
+          )}
         </span>
         <span className="job-edit-label">Edit</span>
       </button>
@@ -765,19 +873,22 @@ function JobCard({
             )}
 
             {/*
-            Only where the instance has a key for this job. Clearing a job
-            hands it back to the deployment's provider, model and key — and
-            where signup is open there is no key to hand it back to, so the
-            button would offer a job that cannot run and call it a default.
+            Clearing a job's settings is how it goes back to following, so the
+            button says which thing it will follow. Offered only where there
+            is something to follow: with no default key and no key on the
+            machine it would hand the job back to nothing and call it a
+            default.
           */}
-            {customised && task.instance.hasKey && (
+            {customised && (task.fallback.source === "key" || task.instance.hasKey) && (
               <button
                 className="text-button"
                 disabled={busy || testing}
                 type="button"
                 onClick={() => void resetToInstance()}
               >
-                Use instance defaults
+                {task.fallback.source === "key"
+                  ? `Follow the default key (${task.fallback.keyName})`
+                  : "Use instance defaults"}
               </button>
             )}
           </div>
@@ -877,10 +988,18 @@ export function Models() {
               run at all, and saying otherwise sends somebody away from this
               page thinking they are finished.
             */}
+            {/*
+              Three sentences, because the answer differs and a person reading
+              the wrong one leaves this page thinking they are finished. A
+              default key answers for every job nobody has touched; failing
+              that the machine does; failing that, nothing does.
+            */}
             <p>
-              {view.tasks.some((task) => task.instance.hasKey)
-                ? "Each job chooses a key and a model. Leave one alone and it runs on this instance's settings."
-                : "Each job chooses a key and a model. This instance holds no keys of its own, so a job with none chosen does not run."}
+              {view.tasks.some((task) => task.fallback.source === "key")
+                ? "Each job chooses a key and a model. Leave one alone and it runs on your default key."
+                : view.tasks.some((task) => task.instance.hasKey)
+                  ? "Each job chooses a key and a model. Leave one alone and it runs on this instance's settings."
+                  : "Each job chooses a key and a model. This instance holds no keys of its own, so a job with none chosen does not run."}
             </p>
           </div>
 

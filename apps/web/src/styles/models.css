@@ -99,6 +99,31 @@
   min-width: 0;
 }
 
+.key-identity > strong {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+/* The one key every untouched job runs on. US-083. */
+.key-default-badge {
+  flex: none;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  background: var(--surface-soft);
+  border: 1px solid var(--line);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.key-row-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
 .models-content .key-identity > span {
   color: var(--muted);
   font-size: var(--text-xs);

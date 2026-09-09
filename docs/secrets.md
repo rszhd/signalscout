@@ -52,6 +52,28 @@ one job's key to another; the owner read that rule and called it confusing, and
 US-079 replaced it with a list a person picks from. Deleting a key puts every
 job that named it back on the instance's key rather than stopping it dead.
 
+**One key is the default, and every job that says nothing runs on it.** US-083.
+The first key an account stores becomes its default without anybody asking, and
+a person can move the mark to another key at any time. A job with no settings
+row of its own then runs on that key, on that key's provider, on the model this
+build recommends for the pair — `gpt-5.6-terra` for scoring on OpenAI,
+`gpt-5.6-luna` for triage, and so on down `ai/recommended.ts`.
+
+**Following the default is the absence of a row.** That is why changing the
+default takes effect on the next call with nothing rewritten and no migration,
+and why a job somebody has saved is never touched: a row is what "I chose this
+myself" means. Clearing a job's settings is how it goes back to following, and
+the button on the card says which key it will follow.
+
+Two rules sit under that and both exist to stop a call that fails at 02:00. A
+job is left on the instance rather than moved when this build can name no model
+for the pair — OpenRouter and Ollama, and similarity on anything but OpenAI —
+because moving a provider without its model is the pairing that fails every
+call. And **deleting the default promotes nothing**: no other key takes its
+place, because a promoted key would move every following job onto a provider
+nobody chose. No default is a state the screen shows and a person fixes in one
+press.
+
 **A model key is not tested when it is stored, and is tested when somebody
 presses Test.** US-080. Validating on save would spend the person's money on a
 call they did not ask for; a button is the person asking. The button appears on

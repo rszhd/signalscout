@@ -65,14 +65,29 @@ export function createModel(config: AiConfig): LanguageModel {
  * records no cost and says so, which a self-hoster can act on. A guessed price
  * would look exactly like a real one on the bill page US-014 builds.
  *
- * Anthropic list prices, read 2026-09-05, and OpenAI's, read 2026-09-06 off
- * developers.openai.com/api/docs/pricing. One US dollar is 1,000,000 micros,
- * so $1.00 per million tokens is 1_000_000 here.
+ * Anthropic list prices, read 2026-09-05 and again 2026-09-09 off
+ * platform.claude.com/docs/en/about-claude/pricing; OpenAI's, read 2026-09-06
+ * and again 2026-09-09 off developers.openai.com/api/docs/pricing; Google's,
+ * read 2026-09-09 off ai.google.dev/gemini-api/docs/pricing. One US dollar is
+ * 1,000,000 micros, so $1.00 per million tokens is 1_000_000 here.
  *
  * The OpenAI family matters to US-030 beyond its own bill. Luna is a tenth of
  * Terra on both halves, where Haiku is half of Sonnet — so the model a
  * deployment triages with decides whether the cascade saves a little or a lot,
  * and the ticket's arithmetic is only true for the pair it names.
+ *
+ * **Two prices this table deliberately does not hold.** Google's
+ * `gemini-3.8-flash` is $0.75 and $3.75 only until 2026-12-31 and then $1.50
+ * and $7.50, and a price that expires becomes wrong in silence on a date
+ * nobody is watching for. Google's Pro models are quoted in two bands, one
+ * above 200k input tokens and one below; the figures here are the lower band,
+ * which is every call this product makes — a post and a monitor description
+ * are thousands of tokens, not hundreds of thousands.
+ *
+ * There is no OpenRouter row and there never should be a guessed one. It
+ * resells four hundred models at the upstream provider's price, so a snapshot
+ * taken here would be a guess sitting in a table whose whole rule is that it
+ * holds only what somebody read off a page.
  */
 export const modelPrices: Readonly<
   Record<string, { input: number; output: number; provider: AiProvider }>
@@ -80,9 +95,14 @@ export const modelPrices: Readonly<
   "claude-haiku-4-5": { input: 1_000_000, output: 5_000_000, provider: "anthropic" },
   "claude-sonnet-5": { input: 2_000_000, output: 10_000_000, provider: "anthropic" },
   "claude-opus-5": { input: 5_000_000, output: 25_000_000, provider: "anthropic" },
+  "claude-fable-5-1": { input: 10_000_000, output: 50_000_000, provider: "anthropic" },
   "gpt-5.6-luna": { input: 200_000, output: 1_200_000, provider: "openai" },
   "gpt-5.6-terra": { input: 2_000_000, output: 12_000_000, provider: "openai" },
   "gpt-5.6-sol": { input: 4_000_000, output: 20_000_000, provider: "openai" },
+  "gpt-6-astra": { input: 10_000_000, output: 50_000_000, provider: "openai" },
+  "gemini-3.5-flash-lite": { input: 300_000, output: 2_500_000, provider: "google" },
+  "gemini-3.5-flash": { input: 1_500_000, output: 9_000_000, provider: "google" },
+  "gemini-3.1-pro-preview": { input: 2_000_000, output: 12_000_000, provider: "google" },
 };
 
 /**

@@ -36,6 +36,7 @@ import {
   embeddingConfigFromEnvironment,
   embeddingNeedsApiKey,
   embeddingProviders,
+  followsDefault,
   listAiKeys,
   type ModelProbe,
   needsApiKey,
@@ -46,8 +47,10 @@ import {
   probeEmbeddingModel,
   readAiKey,
   readAiSettings,
+  recommendedModelFor,
   recordModelCall,
   saveAiTaskSettings,
+  setDefaultAiKey,
   triageConfigFromEnvironment,
 } from "@signalscout/core";
 import { z } from "zod";
@@ -134,6 +137,25 @@ const taskSchema = z.object({
     model: z.string().nullable(),
     hasKey: z.boolean(),
   }),
+  /**
+   * What this job runs when its own settings say nothing. US-083.
+   *
+   * Two answers and the screen says which: the account's default key, or the
+   * machine. It is not derived on the screen, because `followsDefault` decides
+   * whether a job may follow a key at all — a provider this build can name no
+   * model for is left on the instance — and a second copy of that rule on the
+   * screen would promise a call the worker never makes.
+   */
+  fallback: z.object({
+    source: z.enum(["key", "instance"]),
+    provider: z.string(),
+    model: z.string().nullable(),
+    hasKey: z.boolean(),
+    /** The default key's name, for a card that has to say whose key pays. */
+    keyName: z.string().nullable(),
+    /** And its id, so a card opened for editing starts on what it already runs. */
+    keyId: z.string().nullable(),
+  }),
   provider: z.string().nullable(),
   model: z.string().nullable(),
   baseUrl: z.string().nullable(),
@@ -149,6 +171,8 @@ const keySchema = z.object({
   name: z.string(),
   provider: z.string().nullable(),
   hint: z.string(),
+  /** Whether every job with no settings of its own runs on this key. US-083. */
+  isDefault: z.boolean(),
 });
 
 const modelsSchema = z.object({
@@ -299,10 +323,49 @@ export async function registerModelRoutes(
     return { provider: env.AI_PROVIDER, model: env.AI_MODEL, hasKey };
   }
 
+  /**
+   * What a job with no settings of its own runs on. US-083.
+   *
+   * The default key answers it when there is one and when this build can name
+   * a model for the pair. Otherwise the machine does, which is every
+   * self-hosted instance and every account that has marked no default.
+   */
+  function fallbackFor(
+    task: AiTask,
+    fallbackKey: { id: string; name: string; provider: string | null } | undefined,
+  ): {
+    source: "key" | "instance";
+    provider: string;
+    model: string | null;
+    hasKey: boolean;
+    keyName: string | null;
+    keyId: string | null;
+  } {
+    const machine = instanceFor(task);
+
+    if (!fallbackKey || !followsDefault(fallbackKey.provider, task)) {
+      return { source: "instance", ...machine, keyName: null, keyId: null };
+    }
+
+    // A key that names no provider pays for the deployment's own choices.
+    const provider = fallbackKey.provider ?? machine.provider;
+
+    return {
+      source: "key",
+      provider,
+      model: fallbackKey.provider ? recommendedModelFor(provider, task) : machine.model,
+      hasKey: true,
+      keyName: fallbackKey.name,
+      keyId: fallbackKey.id,
+    };
+  }
+
   async function view(userId: string) {
     const settings = await readAiSettings(db, userId);
     const stored = new Map(settings.map((row) => [row.task, row]));
     const key = optionalEncryptionKey(encryption);
+    const keys = await listAiKeys(db, userId);
+    const fallbackKey = keys.find((one) => one.isDefault);
 
     return {
       canStore: key !== undefined,
@@ -322,7 +385,7 @@ export async function registerModelRoutes(
        * empty list on a job that needs a name to run at all.
        */
       embeddingModels: defaultEmbeddingModels,
-      keys: await listAiKeys(db, userId),
+      keys,
       tasks: aiTasks.map((task) => {
         const mine = stored.get(task);
 
@@ -331,6 +394,7 @@ export async function registerModelRoutes(
           ...taskViews[task],
           providers: [...(task === "embed" ? embeddingProviders : aiProviders)],
           instance: instanceFor(task),
+          fallback: fallbackFor(task, fallbackKey),
           provider: mine?.provider ?? null,
           model: mine?.model ?? null,
           baseUrl: mine?.baseUrl ?? null,
@@ -592,11 +656,53 @@ export async function registerModelRoutes(
   });
 
   /**
+   * Make one key the account's default. US-083.
+   *
+   * Every job that has no settings of its own then runs on it, on its
+   * provider, on this build's recommended model for the pair — and moves again
+   * the next time this is called, because following the default is the absence
+   * of a row rather than a copy of one. Nothing is rewritten and no worker is
+   * restarted.
+   *
+   * A job somebody saved is untouched. That is not enforced here: it falls out
+   * of `readAiEnvironment` filling only the tasks with no row, which is the
+   * whole reason the design is that shape.
+   */
+  app.route({
+    method: "PUT",
+    url: "/api/models/keys/:id/default",
+    schema: {
+      params: z.object({ id: z.string().uuid() }),
+      response: { 200: modelsSchema, 404: problemSchema },
+    },
+    handler: async (request, reply) => {
+      const userId = sessionUserId(request);
+
+      if (!(await setDefaultAiKey(db, userId, request.params.id))) {
+        return reply.code(404).send({ message: "That key is not on this account." });
+      }
+
+      request.log.info(
+        // Which key, never a key.
+        { keyId: request.params.id },
+        "moved the default model key",
+      );
+
+      return view(userId);
+    },
+  });
+
+  /**
    * Remove one.
    *
    * Every job pointing at it goes back to the instance's key rather than to
    * nothing, by the column's own `set null`. A job left pointing at a deleted
    * row would fail every call with no screen able to say why.
+   *
+   * **Deleting the default promotes nothing.** No other key takes its place,
+   * so every following job goes back to the machine — which on a hosted
+   * account is no key at all, and the card says so. A promoted key would move
+   * those jobs onto a provider nobody chose.
    */
   app.route({
     method: "DELETE",

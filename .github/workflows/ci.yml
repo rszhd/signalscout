@@ -1,14 +1,17 @@
 name: CI
 
 on:
-  push:
-    branches: [main]
   pull_request:
-  # Called by deploy-staging.yml, so a commit whose checks never ran cannot
-  # reach a box. That is a property of the job graph rather than a convention
-  # somebody keeps. `staging` is deliberately absent from the push list above:
-  # it would run this file twice for one commit, and the second run would
-  # publish the same tag from the same source for nobody.
+  # Called by the two deploy workflows, so a commit whose checks never ran
+  # cannot reach a box. That is a property of the job graph rather than a
+  # convention somebody keeps.
+  #
+  # There is no `push` list above, and that is the point rather than an
+  # omission. `staging` was never in it — a push there would run this file
+  # twice for one commit, and the second run would publish the same tag from
+  # the same source for nobody. `main` left it when production got a stack
+  # (US-100), for exactly that reason: the deploy workflow calls this one, so
+  # a push list would double every release.
   workflow_call:
     outputs:
       digest:

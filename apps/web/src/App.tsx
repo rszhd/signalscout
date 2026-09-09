@@ -327,7 +327,6 @@ function Shell({
   const creating = useMatch(routes.newMonitor) !== null;
   const reading = useMatch(routes.inbox) !== null;
   const projecting = useMatch(routes.projects) !== null;
-  const connecting = useMatch(routes.connections) !== null;
   const comparing = useMatch(routes.providers) !== null;
   const voicing = useMatch(routes.replyVoices) !== null;
   const modelling = useMatch(routes.models) !== null;
@@ -353,10 +352,8 @@ function Shell({
           {/*
             Only when a project is in the address.
 
-            Not "everywhere except the projects page": Connections is a
-            machine-level screen — one key, every project — so it carries no
-            project either, and offering an inbox link there would offer one
-            that answers for all of them.
+            The project screens all need it. The page without one should not
+            offer an inbox that answers for every business.
           */}
           {projectId !== null && (
             <>
@@ -380,47 +377,6 @@ function Shell({
               </Link>
             </>
           )}
-          <Link className={connecting ? "nav-item current" : "nav-item"} to={paths.connections}>
-            <span className="nav-icon" aria-hidden="true">
-              ⚿
-            </span>
-            <span>Connections</span>
-          </Link>
-          <Link className={comparing ? "nav-item current" : "nav-item"} to={paths.providers}>
-            <span className="nav-icon" aria-hidden="true">
-              ⌗
-            </span>
-            <span>Providers</span>
-          </Link>
-          <Link className={voicing ? "nav-item current" : "nav-item"} to={paths.replyVoices}>
-            <span className="nav-icon" aria-hidden="true">
-              ✎
-            </span>
-            <span>Reply voices</span>
-          </Link>
-          {/*
-            Beside Connections and Providers rather than inside a project: a
-            model key is one account's, for every project it runs. US-068.
-          */}
-          <Link className={modelling ? "nav-item current" : "nav-item"} to={paths.models}>
-            <span className="nav-icon" aria-hidden="true">
-              ◈
-            </span>
-            <span>Models</span>
-          </Link>
-          {/*
-            Only where this instance charges. US-072. A self-hosted instance has
-            no subscription, so a Billing link there would open a page that can
-            only say so — and the route it reads is not even registered.
-          */}
-          {status.billingMode === "stripe" && (
-            <Link className={billing ? "nav-item current" : "nav-item"} to={paths.billing}>
-              <span className="nav-icon" aria-hidden="true">
-                ⬡
-              </span>
-              <span>Billing</span>
-            </Link>
-          )}
           {/*
             Also only with a project: a monitor is made in one, and the form
             prefills its four answers from it. Offered without one it would
@@ -439,13 +395,59 @@ function Shell({
           )}
         </nav>
 
-        {/*
-          Who is signed in, where a hardcoded "Self-hosted" pill used to be.
-          US-069. That label was written before there were accounts and was true
-          then; it is false on an instance taking registrations, and it occupied
-          the one place a person looks to find out which account they are using.
-        */}
         <div className="sidebar-bottom">
+          {/*
+            Account-level navigation now sits beside the account, not beside
+            the project flow. US-021 kept the project screens here; these four
+            belong with the signed-in person instead.
+          */}
+          <nav className="account-nav" aria-label="Account">
+            <p className="sidebar-section-label">Account</p>
+            <Link className={comparing ? "nav-item current" : "nav-item"} to={paths.providers}>
+              <span className="nav-icon" aria-hidden="true">
+                ⌗
+              </span>
+              <span>Providers</span>
+            </Link>
+            <Link className={voicing ? "nav-item current" : "nav-item"} to={paths.replyVoices}>
+              <span className="nav-icon" aria-hidden="true">
+                ✎
+              </span>
+              <span>Reply voices</span>
+            </Link>
+            {/*
+              Beside Providers rather than inside a project: a model key is one
+              account's, for every project it runs. US-068.
+            */}
+            <Link className={modelling ? "nav-item current" : "nav-item"} to={paths.models}>
+              <span className="nav-icon" aria-hidden="true">
+                ◈
+              </span>
+              <span>Models</span>
+            </Link>
+            {/*
+              Only where this instance charges. US-072. A self-hosted instance
+              has no subscription, so a Billing link there would open a page
+              that can only say so — and the route it reads is not even
+              registered.
+            */}
+            {status.billingMode === "stripe" && (
+              <Link className={billing ? "nav-item current" : "nav-item"} to={paths.billing}>
+                <span className="nav-icon" aria-hidden="true">
+                  ⬡
+                </span>
+                <span>Billing</span>
+              </Link>
+            )}
+          </nav>
+
+          {/*
+            Who is signed in, where a hardcoded "Self-hosted" pill used to be.
+            US-069. That label was written before there were accounts and was
+            true then; it is false on an instance taking registrations, and it
+            occupied the one place a person looks to find out which account
+            they are using.
+          */}
           {status.account && (
             <div className="signed-in-as">
               <strong>{status.account.name}</strong>

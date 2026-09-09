@@ -180,6 +180,7 @@ describe("the application screens", () => {
     screen = await mount(<App />);
 
     expect(screen.container.querySelector(".trial-badge")?.textContent).toBe("Trial");
+    expect(screen.container.querySelector('.account-nav a[href="/billing"]')).not.toBeNull();
 
     await screen.unmount();
     billingState = {
@@ -270,6 +271,8 @@ describe("the application screens", () => {
     await screen.go("/connections");
 
     expect(screen.container.textContent).toContain("Connections");
+    expect(screen.container.querySelector('.site-nav a[href="/connections"]')).toBeNull();
+    expect(screen.container.querySelector('.account-nav a[href="/connections"]')).toBeNull();
   });
 
   /**
@@ -284,14 +287,18 @@ describe("the application screens", () => {
 
     await screen.go("/connections");
 
-    const links = [...screen.container.querySelectorAll("nav a")].map((link) =>
+    const projectLinks = [...screen.container.querySelectorAll(".site-nav a")].map((link) =>
+      link.getAttribute("href"),
+    );
+    const accountLinks = [...screen.container.querySelectorAll(".account-nav a")].map((link) =>
       link.getAttribute("href"),
     );
 
-    // Pricing joins Connections here, and for the same reason: both are
-    // machine-level screens — one set of keys, one set of prices, every
+    // Pricing joins the account section here, and for the same reason: both
+    // are machine-level screens — one set of keys, one set of prices, every
     // project — so neither carries one. US-058.
-    expect(links).toEqual(["/projects", "/connections", "/providers", "/reply-voices", "/models"]);
+    expect(projectLinks).toEqual(["/projects"]);
+    expect(accountLinks).toEqual(["/providers", "/reply-voices", "/models"]);
   });
 
   /**
@@ -306,14 +313,14 @@ describe("the application screens", () => {
 
     await screen.go("/projects");
 
-    const links = [...screen.container.querySelectorAll("nav a")].map((link) =>
+    const links = [...screen.container.querySelectorAll(".site-nav a")].map((link) =>
       link.getAttribute("href"),
     );
 
     // A monitor is made inside a project and prefills its four answers from
     // one, so offering the form here would make an unfiled monitor — the state
     // migration 0038 emptied out.
-    expect(links).toEqual(["/projects", "/connections", "/providers", "/reply-voices", "/models"]);
+    expect(links).toEqual(["/projects"]);
   });
 
   it("carries the project through every link once one is chosen", async () => {
@@ -321,7 +328,7 @@ describe("the application screens", () => {
 
     await screen.go(inbox);
 
-    const links = [...screen.container.querySelectorAll("nav a")].map((link) =>
+    const links = [...screen.container.querySelectorAll(".site-nav a")].map((link) =>
       link.getAttribute("href"),
     );
 
@@ -405,22 +412,22 @@ describe("the application screens", () => {
   it("does not expose mockup routes whose behaviour is not built", async () => {
     screen = await mount(<App />, inbox);
 
-    const links = [...screen.container.querySelectorAll("nav a")].map((link) =>
+    const projectLinks = [...screen.container.querySelectorAll(".site-nav a")].map((link) =>
       link.getAttribute("href"),
     );
-    // Connections joined this list in US-023 and Projects in US-045, each when
-    // the screen behind it was built. Settings is still a mockup route and must
-    // stay off the nav: a link that leads nowhere is worse than no link.
-    expect(links).toEqual([
+    const accountLinks = [...screen.container.querySelectorAll(".account-nav a")].map((link) =>
+      link.getAttribute("href"),
+    );
+    // Connections is gone from the menu and the account screens sit together.
+    // Settings is still a mockup route and must stay off the nav: a link that
+    // leads nowhere is worse than no link.
+    expect(projectLinks).toEqual([
       "/projects",
       inbox,
       monitors,
-      "/connections",
-      "/providers",
-      "/reply-voices",
-      "/models",
       newMonitor,
     ]);
+    expect(accountLinks).toEqual(["/providers", "/reply-voices", "/models"]);
     expect(screen.container.textContent).not.toContain("Settings");
   });
 

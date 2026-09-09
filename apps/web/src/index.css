@@ -136,6 +136,22 @@ a {
   margin-top: 26px;
 }
 
+.account-nav {
+  display: grid;
+  gap: 5px;
+  margin-bottom: 16px;
+}
+
+.sidebar-bottom .sidebar-section-label {
+  margin: 0 0 3px;
+  padding: 0 11px;
+  color: var(--muted);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 .nav-item {
   min-height: 48px;
   display: grid;

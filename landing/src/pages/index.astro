@@ -1,28 +1,104 @@
 ---
-import '@fontsource/figtree/400.css';
-import '@fontsource/figtree/500.css';
-import '@fontsource/figtree/600.css';
-import '@fontsource/figtree/700.css';
-import '../styles/tokens.css';
-import '../styles/landing.css';
-import '../styles/story.css';
-import '../styles/features.css';
-import Icon from '../components/Icon.astro';
-const repository = 'https://github.com/rszhd/signalscout';
+import "@fontsource/figtree/400.css";
+import "@fontsource/figtree/500.css";
+import "@fontsource/figtree/600.css";
+import "@fontsource/figtree/700.css";
+import "../styles/tokens.css";
+import "../styles/landing.css";
+import "../styles/features.css";
+import Icon from "../components/Icon.astro";
+
+const repository = "https://github.com/rszhd/signalscout";
 const appUrl = import.meta.env.PUBLIC_APP_URL;
-const platforms = [['Reddit','reddit.png'],['X / Twitter','x.png'],['LinkedIn','linkedin.ico'],['YouTube','youtube.png'],['TikTok','tiktok.png'],['Instagram','instagram.png']];
+const platforms = [
+  ["Reddit", "reddit.png"],
+  ["X / Twitter", "x.png"],
+  ["LinkedIn", "linkedin.ico"],
+  ["YouTube", "youtube.png"],
+  ["TikTok", "tiktok.png"],
+  ["Instagram", "instagram.png"],
+];
 const heroPosts = [
-  { platform: 'Reddit', icon: 'reddit.png', source: 'r/freelance', score: 94, text: 'I’m spending every Friday chasing unpaid invoices.', signal: 'What do other freelancers use?' },
-  { platform: 'X', icon: 'x.png', source: 'X · Freelancer', score: 89, text: 'My invoicing app costs more than I need to spend.', signal: 'Any simpler alternatives?' },
-  { platform: 'LinkedIn', icon: 'linkedin.ico', source: 'LinkedIn · Designer', score: 87, text: 'I started freelancing and track every payment in a spreadsheet.', signal: 'Is there an easier way?' },
-  { platform: 'YouTube', icon: 'youtube.png', source: 'YouTube · Comment', score: 91, text: 'Making each invoice by hand takes me forever.', signal: 'Can a tool do this for me?' },
-  { platform: 'TikTok', icon: 'tiktok.png', source: 'TikTok · Comment', score: 86, text: 'I love freelancing but hate reminding clients to pay.', signal: 'Can I automate the reminders?' },
-  { platform: 'Instagram', icon: 'instagram.png', source: 'Instagram · Comment', score: 90, text: 'I keep losing track of which clients have paid me.', signal: 'What app would you recommend?' },
+  {
+    platform: "Reddit",
+    icon: "reddit.png",
+    source: "r/freelance",
+    score: 94,
+    text: "I’m spending every Friday chasing unpaid invoices.",
+    signal: "What do other freelancers use?",
+  },
+  {
+    platform: "X",
+    icon: "x.png",
+    source: "X · Freelancer",
+    score: 89,
+    text: "My invoicing app costs more than I need to spend.",
+    signal: "Any simpler alternatives?",
+  },
+  {
+    platform: "LinkedIn",
+    icon: "linkedin.ico",
+    source: "LinkedIn · Designer",
+    score: 87,
+    text: "I started freelancing and track every payment in a spreadsheet.",
+    signal: "Is there an easier way?",
+  },
+  {
+    platform: "YouTube",
+    icon: "youtube.png",
+    source: "YouTube · Comment",
+    score: 91,
+    text: "Making each invoice by hand takes me forever.",
+    signal: "Can a tool do this for me?",
+  },
+  {
+    platform: "TikTok",
+    icon: "tiktok.png",
+    source: "TikTok · Comment",
+    score: 86,
+    text: "I love freelancing but hate reminding clients to pay.",
+    signal: "Can I automate the reminders?",
+  },
+  {
+    platform: "Instagram",
+    icon: "instagram.png",
+    source: "Instagram · Comment",
+    score: 90,
+    text: "I keep losing track of which clients have paid me.",
+    signal: "What app would you recommend?",
+  },
 ];
 const examples = [
-  { label: 'Asking for a recommendation', source: 'Reddit · r/freelance', score: 94, title: 'I want my Fridays back.', quote: 'I’m a freelance designer and spend every Friday chasing unpaid invoices. Is there a simple app that sends reminders for me?', reason: 'A freelancer describes time lost chasing payments and explicitly asks for an app with automatic reminders.', tags: ['Freelancer', 'Chasing late payments', 'Looking for an app'] },
-  { label: 'Looking for an alternative', source: 'X / Twitter', score: 89, title: 'I just need to send invoices and get paid.', quote: 'My accounting software is expensive and has a hundred features I never use. Any simpler invoicing apps for a solo freelancer?', reason: 'The author finds their current software too expensive and complex, and is actively asking for a simpler alternative.', tags: ['Too expensive', 'Wants something simpler', 'Ready to switch'] },
-  { label: 'Just mentioning a keyword', source: 'Reddit · r/freelance', score: 18, title: 'My tips for getting invoices paid on time.', quote: 'I wrote a guide to setting clear payment terms and following up with clients. Here are five tips that work for me.', reason: 'The topic is relevant, but the author is sharing advice. They are not describing a need or asking for help.', tags: ['Related topic', 'Sharing expertise', 'No request for help'] },
+  {
+    label: "Needs an app",
+    source: "Reddit · r/freelance",
+    score: 94,
+    title: "I want my Fridays back.",
+    quote:
+      "I’m a freelance designer and spend every Friday chasing unpaid invoices. Is there a simple app that sends reminders for me?",
+    reason: "Chasing payments costs them time. They’re asking for an app to do it.",
+    tags: ["Freelancer", "Chasing late payments", "Looking for an app"],
+  },
+  {
+    label: "Ready to switch",
+    source: "X / Twitter",
+    score: 89,
+    title: "I just need to send invoices and get paid.",
+    quote:
+      "My accounting software is expensive and has a hundred features I never use. Any simpler invoicing apps for a solo freelancer?",
+    reason: "Their current tool costs too much. They want a simpler replacement.",
+    tags: ["Too expensive", "Wants something simpler", "Ready to switch"],
+  },
+  {
+    label: "Sharing advice",
+    source: "Reddit · r/freelance",
+    score: 18,
+    title: "My tips for getting invoices paid on time.",
+    quote:
+      "I wrote a guide to setting clear payment terms and following up with clients. Here are five tips that work for me.",
+    reason: "Sharing advice. No problem to solve, no request for help.",
+    tags: ["Related topic", "Sharing expertise", "No request for help"],
+  },
 ];
 ---
 <!doctype html>
@@ -30,170 +106,70 @@ const examples = [
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<meta name="description" content="Find people talking about the problem your product solves. SignalScout turns public conversations into an AI-scored intent inbox. Open source and self-hostable."/>
+<meta name="description" content="Someone is asking for what you built. SignalScout finds public posts and comments from people describing a problem your product solves. Open source. Self-hostable."/>
 <meta name="theme-color" content="#f7f8fa"/>
-<meta property="og:title" content="SignalScout — Your next customer is already asking."/>
-<meta property="og:description" content="Find public conversations from people who may need what you build. Open-source AI intent monitoring."/>
+<meta property="og:title" content="SignalScout — Someone is asking for what you built."/>
+<meta property="og:description" content="Find the question your product answers. Open-source AI intent monitoring across six platforms."/>
 <meta property="og:type" content="website"/>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml"/>
-<title>SignalScout — Your next customer is already asking</title>
+<title>SignalScout — Someone is asking for what you built</title>
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
 <header class="site-header wrap">
-<a href="#" class="wordmark" aria-label="SignalScout home">
-<span class="logo-mark">
-<Icon name="signal" size={23}/>
-</span>SignalScout<span class="wordmark-dot">.</span>
-</a>
-<nav aria-label="Main navigation">
-<a href="#how-it-works">How it works</a>
-<a href="#features">Features</a>
-<a href="#pricing">Pricing</a>
-<a class="github-link" href={repository}>
-<Icon name="github" size={18}/>GitHub</a>
-</nav>
-<a class="button small" href="#pricing">Get started <Icon size={16}/>
-</a>
+  <a href="#" class="wordmark" aria-label="SignalScout home"><span class="logo-mark"><Icon name="signal" size={23}/></span>SignalScout<span class="wordmark-dot">.</span></a>
+  <nav aria-label="Main navigation"><a href="#how-it-works">How it works</a><a href="#features">Features</a><a href="#pricing">Pricing</a><a class="github-link" href={repository}><Icon name="github" size={18}/>GitHub</a></nav>
+  <a class="button small" href="#pricing">Get started <Icon size={16}/></a>
 </header>
 <main id="main">
 <section class="hero wrap">
-<div class="hero-copy">
-<div class="eyebrow">
-<span class="status-dot">
-</span>OPEN-SOURCE INTENT MONITORING</div>
-<h1>Your next customer<br/>is already <span class="headline-accent">asking.</span>
-</h1>
-<p class="hero-description">Find people talking about the problem your product solves. SignalScout brings the right conversations to you, with the context to join in.</p>
-<div class="hero-actions">
-<a class="button" href="#pricing">Find your first signal <Icon size={18}/>
-</a>
-<a class="text-link" href="#inbox">
-<Icon name="play" size={17}/>See it in action</a>
-</div>
-<p class="hero-note">Your API keys. Your data. Your next conversation.</p>
-</div>
-<div class="signal-scene" aria-label="Illustration: public conversations become a relevant match">
-<div class="orbit orbit-one">
-</div>
-<div class="orbit orbit-two">
-</div>
-<div class="orbit orbit-three">
-</div>
-<div class="scene-label">
-<span class="status-dot">
-</span>LISTENING FOR THE RIGHT MOMENT</div>
-<div class="floating-note note-one">
-<img src="/brands/x.png" alt="X" width="18" height="18"/>“Just shipped something new!”<span>···</span>
-</div>
-<div class="floating-note note-two">
-<img src="/brands/reddit.png" alt="Reddit" width="20" height="20"/>“Anyone know a better way to…?”</div>
-<div class="hero-deck" id="hero-deck" aria-live="off">
-{heroPosts.map((post, index) => (
-  <article class="signal-card" data-platform={post.platform.toLowerCase()} data-hero-card aria-hidden={index !== 0}>
-    <div class="signal-card-top">
-      <span class="platform-meta"><img src={`/brands/${post.icon}`} alt="" width="21" height="21"/>{post.source}</span>
-      <span class="match-badge">↗ High intent</span>
+  <div class="hero-copy">
+    <span class="eyebrow"><span class="status-dot"></span> FOR THE THINGS YOU BUILD</span>
+    <h1>Someone is<br/>asking for<br/><span class="headline-accent">what you built.</span></h1>
+    <p class="hero-description">SignalScout finds posts and comments from people with a problem your product solves.</p>
+    <div class="hero-actions"><a class="button" href="#inbox">Find the question <Icon size={18}/></a><a class="text-link" href={repository}>Self-host it <Icon name="github" size={18}/></a></div>
+    <p class="hero-note">Open source. Your keys. Your data.</p>
+  </div>
+  <div class="signal-scene" aria-label="Illustrative matches for a freelancer invoicing app">
+    <span class="scene-label">SOMEWHERE IN THE COMMENTS</span>
+    <div class="question-mark" aria-hidden="true">?</div>
+    <div class="floating-note note-one"><img src="/brands/x.png" alt="X" width="18" height="18"/>“Here are my invoicing tips.”<span>Skip</span></div>
+    <div class="hero-deck" id="hero-deck" aria-live="off">
+    {heroPosts.map((post, index) => (
+      <article class="signal-card" data-hero-card aria-hidden={index !== 0}>
+        <div class="signal-card-top"><span class="platform-meta"><img src={`/brands/${post.icon}`} alt="" width="21" height="21"/>{post.source}</span><span class="match-badge">Worth a look ↗</span></div>
+        <p>“{post.text} <mark>{post.signal}</mark>”</p>
+        <div class="card-bottom"><span>Asking for a solution</span><span class="score">{post.score}<span>/100</span></span></div>
+      </article>
+    ))}
     </div>
-    <p>“{post.text} <mark>{post.signal}</mark>”</p>
-    <div class="card-bottom">
-      <span><span class="sparkle">✦</span>A problem your product solves</span>
-      <span class="score">{post.score}<span>/100</span></span>
-    </div>
-  </article>
-))}
-</div>
-<div class="hero-rotation-controls" hidden>
-  <button type="button" data-hero-toggle aria-controls="hero-deck" aria-label="Pause post rotation">Pause</button>
-  <span data-hero-position>1 / {heroPosts.length}</span>
-  <button type="button" data-hero-next aria-controls="hero-deck" aria-label="Show next example post">Next <Icon size={13}/></button>
-</div>
-<div class="found-label">
-<Icon name="check" size={15}/>Less searching. A relevant conversation.</div>
-<span class="illustration-label">Example matches for a freelancer invoicing app</span>
-</div>
+    <span class="found-label"><Icon name="signal" size={18}/> That’s your cue.</span>
+    <div class="hero-rotation-controls" hidden><button type="button" data-hero-toggle aria-controls="hero-deck" aria-label="Pause post rotation">Pause</button><span data-hero-position>1 / {heroPosts.length}</span><button type="button" data-hero-next aria-controls="hero-deck" aria-label="Show next example post">Next <Icon size={13}/></button></div>
+    <span class="illustration-label">Example: you’re building an invoicing app.</span>
+  </div>
 </section>
 <section class="platform-strip wrap" aria-label="Supported platforms">
-<p>Good conversations happen everywhere.</p>
-<div class="platform-list">{platforms.map(([name,file])=>
-<span>
-<img src={`/brands/${file}`} width="23" height="23" alt=""/>{name}</span>)}</div>
-</section>
-<section id="how-it-works" class="wrap section-space">
-<div class="section-heading">
-<div>
-<span class="eyebrow">LESS SCROLLING. MORE CONNECTING.</span>
-<h2>From “who needs this?”<br/>to “I can help with that.”</h2>
-</div>
-<p>You know the problem you solve.<br/>We help you find the people who have it.</p>
-</div>
-<div class="steps">
-<article>
-<div class="step-top">
-<span>01</span>
-<Icon name="sliders" size={25}/>
-</div>
-<h3>Tell us what you build</h3>
-<p>Describe your product, your ideal customer, and the problems you solve. Choose the signals that matter to you.</p>
-<div class="step-visual brief-visual" aria-label="Example product brief">
-  <span class="visual-caption">Your product, in plain words</span>
-  <div class="brief-sheet"><span class="brief-label">I’m building</span><strong>A simple invoicing app<span class="illustrative-caret" aria-hidden="true"></span></strong><span class="brief-label">For people who</span><span>Spend too much time chasing payments</span></div>
-  <span class="brief-sticker"><Icon name="check" size={14}/> That’s a starting point.</span>
-</div>
-</article>
-<article>
-<div class="step-top">
-<span>02</span>
-<Icon name="signal" size={25}/>
-</div>
-<h3>Listen for a real need</h3>
-<p>SignalScout searches your chosen platforms and uses AI to assess the context behind each conversation.</p>
-<div class="step-visual filter-visual" aria-label="Illustrative scores distinguish a need from a mention">
-  <span class="visual-caption">Same topic. Different intent.</span>
-  <div class="filter-row quiet-row"><span>“Here are my invoicing tips.”</span><span class="mini-score">18</span></div>
-  <div class="filter-row"><span>“Chasing payments takes hours.”</span><span class="mini-score">62</span></div>
-  <div class="filter-row strong-row"><span>“Which invoicing app should I use?”</span><span class="mini-score">94 <span aria-hidden="true">✦</span></span></div>
-</div>
-</article>
-<article>
-<div class="step-top">
-<span>03</span>
-<Icon name="inbox" size={25}/>
-</div>
-<h3>Show up with something useful</h3>
-<p>Review scored matches, understand what the model saw, and open the conversation when you can help.</p>
-<div class="step-visual reply-visual" aria-label="Illustrative conversation and a reply you could write">
-  <span class="visual-caption">A conversation starts here</span>
-  <div class="mini-message"><span class="message-avatar">?</span><span>“Can an app remind clients to pay?”</span></div>
-  <div class="mini-message your-message"><span>“We built an app that sends reminders…”</span><span class="message-avatar"><Icon name="signal" size={16}/></span></div>
-  <span class="reply-footnote">You choose when to join in.</span>
-</div>
-</article>
-</div>
-<p class="walkthrough-caption">An illustrative journey for a freelancer invoicing app.</p>
+  <span class="eyebrow">SIX PLACES TO LISTEN</span>
+  <div class="platform-list">{platforms.map(([name,file]) => <span><img src={`/brands/${file}`} width="21" height="21" alt=""/>{name}</span>)}</div>
 </section>
 <section id="inbox" class="demo-section section-space">
 <div class="wrap">
-<div class="center-heading">
-<span class="eyebrow">CONTEXT MAKES THE DIFFERENCE</span>
-<h2>A keyword is a start.<br/>A real need is a signal.</h2>
-<p>See how the same topic can mean very different things.</p>
-</div>
+  <div class="section-heading"><span class="eyebrow">01 / SPOT THE DIFFERENCE</span><h2>Same keyword.<br/><span>Different story.</span></h2><p>AI reads for need, fit, and intent.<br/>You get a score and the reason behind it.</p></div>
 <div class="demo-shell" data-examples={JSON.stringify(examples)}>
 <div class="demo-bar">
 <span>
 <Icon name="inbox" size={18}/>Your intent inbox</span>
-<span class="sample-label">Interactive example · Freelancer invoicing app</span>
+<span class="sample-label">Example monitor: freelancer invoicing app</span>
 </div>
 <div class="demo-content">
 <div class="example-list">
-<p class="eyebrow">Explore a conversation</p>{examples.map((example,index)=>
+<p class="eyebrow">THREE POSTS. ONE TOPIC.</p>{examples.map((example,index)=>
 <button class:list={['example-button',{selected:index===0}]} data-example={index} aria-pressed={index===0} aria-controls="example-detail">
 <span class="example-number">0{index+1}</span>
 <span>{example.label}<small>{example.source}</small>
 </span>
 <Icon size={17}/>
-</button>)}<p class="sample-note">Sample conversations and scores.<br/>Actual matches depend on your monitor.</p>
+</button>)}<p class="sample-note">Illustrative posts and scores.</p>
 </div>
 <div id="example-detail" class="example-detail" aria-live="polite" aria-atomic="true">
 <div class="detail-meta">
@@ -217,18 +193,24 @@ const examples = [
 </div>
 </div>
 </div>
+
 </div>
 </section>
-<section id="features" class="features wrap section-space" aria-labelledby="features-title">
-  <div class="section-heading">
-    <div><span class="eyebrow">FEATURES THAT KEEP YOU FOCUSED</span><h2 id="features-title">Find the need.<br/>Know your next move.</h2></div>
-    <p>From the first signal to a thoughtful reply,<br/>with control over every step.</p>
+<section id="how-it-works" class="workflow wrap section-space">
+  <div class="section-heading"><span class="eyebrow">02 / YOUR PART IS SIMPLE</span><h2>Describe it.<br/><span>Then go build it.</span></h2></div>
+  <div class="steps">
+    <article><span class="step-number">01</span><h3>Tell us who you help.</h3><p>Your product, their problem, the platforms to watch.</p></article>
+    <article><span class="step-number">02</span><h3>Let the monitor run.</h3><p>Set a schedule and budget. Get matches by inbox, email, or webhook.</p></article>
+    <article><span class="step-number">03</span><h3>Join when you can help.</h3><p>Read the post. Draft a reply. You edit and post it yourself.</p></article>
   </div>
+</section>
+<section id="features" class="features wrap section-space" aria-labelledby="features-title">
+  <div class="section-heading"><span class="eyebrow">03 / KEEP THE GOOD ONES</span><h2 id="features-title">A question found.<br/><span>A conversation started.</span></h2><p>Read it. Save it. Reply when you can help.</p></div>
   <div class="feature-grid">
     <article class="feature-card feature-inbox">
       <span class="feature-icon"><Icon name="inbox" size={24}/></span>
-      <h3>One inbox. Conversations that matter.</h3>
-      <p>Monitor your chosen platforms and see conversations scored against your product and ideal customer. Read what the model saw before deciding which matches deserve your time.</p>
+      <h3>Six platforms. One place to look.</h3>
+      <p>Posts and comments, scored against your product. The reason for every match is right beside it.</p>
       <div class="feature-platforms" aria-label="Supported platforms">{platforms.map(([name, file]) => <span><img src={`/brands/${file}`} alt="" width="20" height="20"/>{name}</span>)}</div>
       <div class="feature-signal"><span class="score-pill" data-score-tone="high">High intent</span><span>“Is there a simple app that sends reminders for me?”</span><strong>94<span> / 100</span></strong></div>
       <span class="feature-note">Illustrative match for a freelancer invoicing app</span>
@@ -236,124 +218,57 @@ const examples = [
     </article>
     <article class="feature-card feature-alerts">
       <span class="feature-icon"><Icon name="bell" size={24}/></span>
-      <h3>Good matches, delivered.</h3>
-      <p>Get email digests, enable immediate alerts, or send matches to your workflow with webhooks.</p>
+      <h3>Let the good ones come to you.</h3>
+      <p>Daily digests, immediate email alerts, or webhooks. Pick your delivery.</p>
       <div class="feature-digest">
         <div><Icon name="bell" size={17}/><strong>SignalScout digest</strong></div>
-        <p>A freelance designer is looking for a simpler way to chase payments.</p>
+        <p>A designer wants an app to chase late payments.</p>
         <span>Reddit · r/freelance</span>
         <small>Illustrative email preview</small>
       </div>
     </article>
     <article class="feature-card">
       <span class="feature-icon"><Icon name="reply" size={24}/></span>
-      <h3>A useful first draft.</h3>
-      <p>Draft a reply with the conversation in context. Choose a reply voice, edit the words, and decide what to post.</p>
+      <h3>Skip the blank reply box.</h3>
+      <p>Draft with context and your chosen voice. Edit it, then post it yourself.</p>
       <span class="feature-footnote">You review. You hit send.</span>
     </article>
     <article class="feature-card">
       <span class="feature-icon"><Icon name="sliders" size={24}/></span>
-      <h3>Your pace. Your budget.</h3>
-      <p>Choose when each monitor runs, estimate collection costs, and set a monthly budget. See usage as it comes in.</p>
-      <span class="feature-footnote">Make the schedule fit your business.</span>
+      <h3>Put a number on it.</h3>
+      <p>Estimate costs. Set a schedule and monthly cap. Track what each monitor spends.</p>
+      <span class="feature-footnote">Your schedule. Your spending limit.</span>
     </article>
     <article class="feature-card">
       <span class="feature-icon"><Icon name="key" size={24}/></span>
-      <h3>Your accounts. Your choice.</h3>
-      <p>Connect your own data providers and AI models. Run the open-source application yourself or choose Cloud hosting.</p>
-      <a class="text-link" href={repository}>Explore the source code <Icon name="external" size={17}/></a>
+      <h3>Bring your keys. Keep control.</h3>
+      <p>Choose your data providers and AI models. Run it yourself or let us host it.</p>
+      <a class="text-link" href={repository}>Read the source <Icon name="external" size={17}/></a>
     </article>
   </div>
 </section>
-<section id="pricing" class="pricing-section wrap section-space">
-<div class="center-heading">
-<span class="eyebrow">YOUR SETUP. YOUR CHOICE.</span>
-<h2>Host it yourself. Or let us.</h2>
-<p>Choose your setup. Keep control of your accounts and data.</p>
-</div>
-<div class="plans">
-<article class="plan">
-<span class="eyebrow">SELF-HOSTED</span>
-<h3>Your server. Your setup.</h3>
-<p class="price">$0<span> / forever</span>
-</p>
-<p>Run SignalScout on your own infrastructure.</p>
-<ul>
-<li>
-<Icon name="check" size={17}/>Full open-source application</li>
-<li>
-<Icon name="check" size={17}/>Your server and your data</li>
-<li>
-<Icon name="check" size={17}/>Bring your own provider keys</li>
-</ul>
-<a class="button secondary" href={`${repository}#running-it`}>Start self-hosting <Icon name="github" size={18}/>
-</a>
-</article>
-<article class="plan cloud-plan">
-<span class="eyebrow">SIGNALSCOUT CLOUD</span>
-<h3>More time for what you build.</h3>
-<p class="price">$15<span> USD / month</span>
-</p>
-<p>Let us run SignalScout for you.</p>
-<ul>
-<li>
-<Icon name="check" size={17}/>No server setup</li>
-<li>
-<Icon name="check" size={17}/>Hosted application and scheduler</li>
-<li>
-<Icon name="check" size={17}/>Bring your own provider keys</li>
-</ul>{appUrl ? <a class="button" href={appUrl}>Get started with Cloud <Icon size={18}/>
-</a> : <span class="cloud-status">Cloud signup coming soon</span>}</article>
-</div>
-<p class="pricing-note">Social data and AI usage are billed separately by your providers on both plans.</p>
-</section>
-<section class="faq wrap section-space">
-<div>
-<span class="eyebrow">A FEW GOOD QUESTIONS</span>
-<h2>Before you tune in.</h2>
-</div>
-<div class="faq-list">
-<details>
-<summary>How is this different from keyword alerts?</summary>
-<p>Keywords help discover conversations. SignalScout then assesses each post against your product, audience, and chosen intent signals, and explains its score so you can judge the match.</p>
-</details>
-<details>
-<summary>Which API keys do I need?</summary>
-<p>You need an account with a supported social-data provider for the platforms you choose, plus an AI provider or supported local model. You connect provider accounts in SignalScout; a direct social platform API key is not required.</p>
-</details>
-<details>
-<summary>Does SignalScout reply for me?</summary>
-<p>You decide which conversations to join. SignalScout can help draft a reply, but you review it and post it yourself.</p>
-</details>
-<details>
-<summary>Can I run the whole application myself?</summary>
-<p>Yes. SignalScout is open source and self-hostable with Docker Compose. The repository includes setup instructions. You pay your own infrastructure and provider costs.</p>
-</details>
+<section id="pricing" class="pricing-section section-space">
+<div class="wrap">
+  <div class="section-heading"><span class="eyebrow">04 / MAKE IT YOURS</span><h2>Your server.<br/><span>Or ours.</span></h2><p>The full app, either way.<br/>Bring your own data and AI provider keys.</p></div>
+  <div class="plans">
+    <article class="plan"><div class="plan-top"><h3>Self-hosted</h3><Icon name="github" size={26}/></div><p class="price">$0<span> / software</span></p><p>Full source. Docker Compose. Your infrastructure.</p><a class="button secondary" href={`${repository}#running-it`}>Get the code <Icon size={18}/></a></article>
+    <article class="plan cloud-plan"><div class="plan-top"><h3>SignalScout Cloud</h3><Icon name="signal" size={26}/></div><p class="price">$15<span> USD / month</span></p><p>We run the app and scheduler. You keep building.</p>{appUrl ? <a class="button" href={appUrl}>Start on Cloud <Icon size={18}/></a> : <span class="cloud-status">Cloud signup coming soon</span>}</article>
+  </div>
+  <p class="pricing-note">Social data and AI usage cost extra on both plans, billed by your providers.</p>
 </div>
 </section>
-<section class="closing wrap">
-<div class="closing-conversations" aria-label="Examples of intent signals">
-  <span class="closing-question"><img src="/brands/reddit.png" alt="Reddit" width="20" height="20"/>“Any recommendations?”</span>
-  <span class="closing-question"><img src="/brands/x.png" alt="X" width="18" height="18"/>“There has to be a better way.”</span>
-  <span class="closing-question"><img src="/brands/youtube.png" alt="YouTube" width="21" height="21"/>“What would you use instead?”</span>
-</div>
-<span class="eyebrow">SOMEONE IS ASKING THE RIGHT QUESTION.</span>
-<h2>Be there when you can help.</h2>
-<a class="button" href="#pricing">Find your first signal <Icon size={18}/>
-</a>
-<div class="closing-rings" aria-hidden="true">
-</div>
+<section id="faq" class="faq wrap section-space">
+  <div class="section-heading"><span class="eyebrow">05 / BEFORE YOU START</span><h2>A few things<br/><span>worth asking.</span></h2></div>
+  <div class="faq-list">
+    <details><summary>How is this different from keyword alerts?</summary><p>Keywords find the topic. AI checks whether the person needs what you sell, then explains its score.</p></details>
+    <details><summary>Which keys do I need?</summary><p>A supported social-data provider account, plus an AI provider or supported local model. No direct social-platform API key needed.</p></details>
+    <details><summary>Will it post for me?</summary><p>No. SignalScout can draft a reply. You review it and post it yourself.</p></details>
+    <details><summary>Can I run the whole app myself?</summary><p>Yes. The full application is open source and runs with Docker Compose. You pay for your infrastructure and provider usage.</p></details>
+  </div>
 </section>
+<section class="closing wrap"><span class="eyebrow">“DOES ANYONE KNOW A TOOL THAT…?”</span><h2>Maybe they mean yours.</h2><a class="button" href="#pricing">Start listening <Icon size={18}/></a></section>
 </main>
-<footer class="wrap">
-<a href="#" class="wordmark">
-<span class="logo-mark">
-<Icon name="signal" size={19}/>
-</span>SignalScout.</a>
-<p class="footer-note">Find the conversation worth joining.</p>
-<a href={repository}>Open source on GitHub <Icon name="external" size={15}/>
-</a>
-</footer>
+<footer class="wrap"><a href="#" class="wordmark">SignalScout.</a><p>Built for the conversation worth joining.</p><a class="text-link" href={repository}>Open source on GitHub <Icon name="external" size={15}/></a></footer>
 <script>
 import '../scripts/hero-rotation';
 </script>

@@ -59,8 +59,10 @@ Set it to the real signup or checkout destination before publishing.
 `src/styles/tokens.css` is a snapshot of the application palette and sizing
 tokens, copied so the site builds alone, plus a small marketing accent palette
 (coral, mint, lavender and pale yellow). Review it when the application theme
-changes. `src/styles/landing.css` owns the marketing layout. `features.css` styles the
-feature overview, and `story.css` styles the illustrated examples. Figtree is bundled
+changes. `src/styles/landing.css` owns the landing layout and interactive example styles;
+`features.css` styles the feature overview. Large headlines and stacked conversation
+cards lead into the inbox demo, three-step workflow, features, pricing, and FAQ.
+Copy stays short within each section. Figtree is bundled
 locally through `@fontsource/figtree`. Platform icon provenance is recorded in
 `public/brands/README.md`; only the six platform icons are copied here.
 

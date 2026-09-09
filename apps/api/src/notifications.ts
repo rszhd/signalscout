@@ -1,7 +1,10 @@
+import { isIP } from "node:net";
 import {
   type Database,
   deleteAccountWebhookSecret,
   generateAccountWebhookSecret,
+  isPublicAddress,
+  machineKeysUsable,
   type NotificationEnv,
   notificationDefaults,
   notificationInputSchema,
@@ -16,6 +19,34 @@ import {
 import { z } from "zod";
 import { ownedMonitor, sessionUserId } from "./auth.js";
 import type { ApiServer } from "./server.js";
+
+/**
+ * Why this URL cannot be a receiver, when its host says so on its own.
+ *
+ * Only a literal address or a name that is obviously this machine. Anything
+ * needing DNS is the transport's question, asked when the delivery is sent.
+ */
+function literalPrivateHost(url: string): string | null {
+  let hostname: string;
+
+  try {
+    hostname = new URL(url).hostname;
+  } catch {
+    return null;
+  }
+
+  const bare = hostname.replace(/^\[|\]$/g, "");
+  const isLocalName = bare === "localhost" || bare.endsWith(".localhost");
+
+  if (isLocalName || (isIP(bare) !== 0 && !isPublicAddress(bare))) {
+    return (
+      `A webhook here cannot be sent to "${hostname}", which is not on the public internet. ` +
+      "Use an address your receiver answers on from outside this machine."
+    );
+  }
+
+  return null;
+}
 
 /** What a person is told when this instance cannot encrypt anything. US-004. */
 const noEncryptionKey =
@@ -152,6 +183,24 @@ export async function registerNotificationRoutes(
         return reply.code(409).send({
           message: `Set ${missing.join(", ")} and restart the API and worker before enabling notifications.`,
         });
+
+      /**
+       * A courtesy, and not the guard. US-097.
+       *
+       * The guard is in the transport, because the address that matters is the
+       * one resolved when the delivery is sent — a name can answer publicly now
+       * and privately later. This catches the obvious case here so somebody who
+       * typed `localhost` is told at once, rather than after five failed
+       * attempts have disabled their webhook.
+       *
+       * It runs only where signup is open, exactly as the transport's guard
+       * does. On a self-hosted instance a receiver on the owner's own network
+       * is the normal case.
+       */
+      if (request.body.webhookEnabled && !machineKeysUsable(signup)) {
+        const refusal = literalPrivateHost(request.body.webhookUrl);
+        if (refusal) return reply.code(409).send({ message: refusal });
+      }
       await saveNotificationSettings(db, request.params.id, request.body);
       return read(request.params.id, userId);
     },

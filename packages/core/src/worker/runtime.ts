@@ -519,7 +519,14 @@ export async function startWorker({
     notify:
       steps.notify ??
       createNotifyStep(
-        notificationTransport ?? createNotificationTransport(loadNotificationEnv()),
+        notificationTransport ??
+          createNotificationTransport(loadNotificationEnv(), {
+            // US-097. Where a stranger may register, a webhook URL is a
+            // stranger's string and this worker makes the request — so it may
+            // not be aimed at an address inside our own network. Self-hosted
+            // the network is already the owner's and nothing changes.
+            guardAddresses: !machineKeysUsable(signup),
+          }),
         {
           // US-094. Optional everywhere: `APP_URL` is required only for Stripe,
           // so the button is offered where a deployment has said where it

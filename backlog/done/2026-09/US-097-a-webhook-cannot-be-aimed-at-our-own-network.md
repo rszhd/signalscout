@@ -6,7 +6,7 @@ priority: p1
 created: 2026-09-10T00:52+08:00
 parent:
 area:
-resolution:
+resolution: done
 ---
 
 ## Context
@@ -53,20 +53,21 @@ everywhere.
 
 ## Acceptance
 
-- [ ] Where signup is open, a delivery refuses an address that resolves to a
+- [x] Where signup is open, a delivery refuses an address that resolves to a
       private, loopback, link-local, unique-local or otherwise non-public
       address
-- [ ] The check is made against the address the request will actually use, not
-      only against the string that was saved
-- [ ] Where signup is closed nothing changes: a self-hoster may still post to
+- [x] The check is made against the address the request will actually use, not
+      only against the string that was saved — resolved at **send** time rather
+      than at save time. It does not close DNS rebinding: see the Log
+- [x] Where signup is closed nothing changes: a self-hoster may still post to
       their own network, and no existing webhook stops working on upgrade
-- [ ] The refusal is recorded as a webhook failure with a reason a person can
+- [x] The refusal is recorded as a webhook failure with a reason a person can
       act on, and it does not read as the receiver being down
-- [ ] The form refuses the obvious cases as a courtesy, and the ticket records
+- [x] The form refuses the obvious cases as a courtesy, and the ticket records
       that this is not the guard
-- [ ] A test drives each family of address, and one drives a name that resolves
+- [x] A test drives each family of address, and one drives a name that resolves
       to a private address while looking public
-- [ ] The existing three defences are asserted rather than assumed: HTTPS only,
+- [x] The existing three defences are asserted rather than assumed: HTTPS only,
       no credentials in the URL, and a redirect refused
 
 ## Notes
@@ -88,3 +89,25 @@ everywhere.
 
 - 2026-09-10T00:52+08:00 — Written beside US-096 when the owner asked whether
   webhooks work on the cloud version and said they must be enabled there.
+- 2026-09-10T02:05+08:00 — Built. `address-guard.ts` is the rule and the
+  transport asks it before the request rather than after, because a guard that
+  refuses after the POST guards nothing. The refusal keeps its own sentence
+  instead of becoming "Webhook delivery failed": a private address and a
+  receiver that went down send a person to different places, which is why
+  `connections.ts` separates a 400 from a 502.
+- 2026-09-10T02:05+08:00 — **DNS rebinding is not closed, and that is written
+  down rather than hidden.** The name is resolved to check it and resolved
+  again by the client, so an authoritative server the attacker controls can
+  answer publicly and then privately. Closing it needs the connection to use
+  the address that was checked, which means a custom `lookup` —
+  `node:https` offers one and `fetch` does not, and `undici` is not a
+  dependency here. What the window offers is a blind `POST` and a reachability
+  signal, because the response body is discarded. Worth a ticket if this
+  product ever posts something a receiver acts on without verifying.
+- 2026-09-10T02:05+08:00 — Two mutations turn the suite red: dropping the
+  IPv4-mapped unwrap, and removing the call from the transport. The mapped case
+  is the one a check written against IPv4 strings gets wrong —
+  `::ffff:169.254.169.254` is the metadata endpoint wearing a different hat.
+- 2026-09-10T02:05+08:00 — Unproven, and it is the same gap US-096 has: nothing
+  has posted to a real receiver. The guard has never refused a real address and
+  no delivery has ever been verified by anybody.

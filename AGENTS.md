@@ -1405,6 +1405,55 @@ invisible to a green run, and the thing that found this one was running `curl`
 against the same host from the same machine and watching one client wait where
 the other would not.
 
+**A webhook secret belongs to an account, and a webhook cannot be aimed at our
+own network.** US-096 and US-097 closed on 2026-09-10, on the owner's decision
+to offer webhooks on the hosted version. Both are cloud-only faults and neither
+changes a self-hosted instance.
+
+**One signing key for the whole instance was the first.**
+`WEBHOOK_SIGNING_SECRET` is handed to the customer to verify with, so on a
+shared instance every account would hold the value every other account's
+deliveries are signed with — and any of them could sign a payload another's
+receiver accepts as genuine. It is BUG-010's shape on a different column.
+`webhook_secrets` is the table, migration 0054, one row per account. We
+generate the value rather than taking a pasted one, so there is nothing to
+probe; it is shown in full **once** and nothing reads it back.
+
+**The record is derived on read, not taken from the row**, and that is where
+this departs from `readSourceCredential`. That function trusts its stored
+column because US-024 renamed what its table is keyed by, so a derived name
+would refuse a working key. This table has no such history, and deriving is
+what makes the defence real: a row copied into another account's slot with
+`psql` brings its `record` along.
+
+**Where signup is open the instance's own secret is stripped**, so an account
+there signs with its own or with nothing. That is US-081's rule applied to
+something that is not money, and the harm is worse than a bill.
+`webhookSecretEnvironment` is the one function.
+
+**The second fault is where a webhook may point.** A URL is a stranger's string
+and the worker makes the request, so on an open instance a receiver must be on
+the public internet. `localhost` and a literal private address are refused as
+you save — a courtesy, not the guard — and a name that resolves privately is
+refused when the delivery is sent, keeping its own sentence rather than reading
+as a receiver that went down. The **IPv4-mapped** case is the one to get right:
+`::ffff:169.254.169.254` is the metadata endpoint wearing a different hat, and a
+check written against IPv4 strings waves it through.
+
+**DNS rebinding is not closed and it is written down.** The name is resolved to
+check it and resolved again by the client, so an attacker's own DNS can answer
+publicly and then privately. Closing it needs the connection to use the address
+that was checked — a custom `lookup`, which `node:https` offers and `fetch` does
+not. The response body is discarded, so the window offers a blind `POST` and a
+reachability signal.
+
+**Five mutations turn the suite red across the two, and one passed and had to be
+covered**: signing with a fixed account rather than the monitor's owner, which
+is US-096's own claim and nothing was checking it. Still unproven for both:
+**no webhook has ever been delivered to a real receiver**, so the guard has
+never refused a real address and no signature has ever been verified by
+anybody. Read docs/notifications.md.
+
 **An email looks like the product it came from, and the palette is copied on
 purpose.** US-094 closed on 2026-09-10. Every message this product sent was
 plain text — a join of scores, excerpts and URLs — so US-093's first digests

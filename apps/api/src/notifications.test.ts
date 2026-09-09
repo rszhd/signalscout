@@ -318,3 +318,76 @@ it("does not let an open instance sign with the machine's own secret", async () 
     await app.close();
   }
 });
+
+it("refuses an obviously local receiver at once where signup is open", async () => {
+  /**
+   * US-097's courtesy check. The guard is in the transport, because the address
+   * that matters is the one resolved when the delivery is sent — but somebody
+   * who typed `localhost` deserves an answer now rather than after five failed
+   * attempts have disabled their webhook.
+   */
+  const owner = "open-instance-url-account";
+  const app = await buildServer({
+    session: asUser(owner),
+    db,
+    encryption: { ENCRYPTION_KEY: encryptionKey },
+    env: loadEnv({
+      DATABASE_URL: database.url,
+      AUTH_SIGNUP: "open",
+      SMTP_HOST: "smtp.resend.com",
+      SMTP_FROM: "alerts@example.com",
+    }),
+    logger: createLogger({ level: "silent", name: "test" }),
+    queryGenerator: null,
+  });
+
+  try {
+    const id = await insertMonitor(database, { userId: owner });
+    await app.inject({ method: "POST", url: "/api/notifications/signing-secret" });
+
+    const enable = (webhookUrl: string) =>
+      app.inject({
+        method: "PUT",
+        url: `/api/monitors/${id}/notifications`,
+        payload: { ...notificationDefaults, webhookEnabled: true, webhookUrl },
+      });
+
+    for (const url of [
+      "https://localhost/hook",
+      "https://127.0.0.1/hook",
+      "https://169.254.169.254/latest/meta-data",
+      "https://10.1.2.3/hook",
+      "https://[::1]/hook",
+    ]) {
+      const refused = await enable(url);
+      expect(refused.statusCode, url).toBe(409);
+      expect(refused.json().message).toContain("not on the public internet");
+    }
+
+    // A public receiver is accepted, so the rule's pass and fail differ.
+    expect((await enable("https://receiver.example/hook")).statusCode).toBe(200);
+  } finally {
+    await app.close();
+  }
+});
+
+it("lets a self-hosted instance point a webhook at its own network", async () => {
+  // The homelab case. Refusing it would break a working deployment on upgrade.
+  const app = await server();
+  try {
+    const id = await insertMonitor(database);
+    const saved = await app.inject({
+      method: "PUT",
+      url: `/api/monitors/${id}/notifications`,
+      payload: {
+        ...notificationDefaults,
+        webhookEnabled: true,
+        webhookUrl: "https://192.168.1.50/hook",
+      },
+    });
+
+    expect(saved.statusCode).toBe(200);
+  } finally {
+    await app.close();
+  }
+});

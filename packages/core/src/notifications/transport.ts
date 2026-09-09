@@ -2,6 +2,7 @@ import { createHmac } from "node:crypto";
 import nodemailer from "nodemailer";
 import type SMTPTransport from "nodemailer/lib/smtp-transport/index.js";
 import type { NotificationEnv } from "../config/env.js";
+import { assertPublicHost, type ResolveHost, resolveHost } from "./address-guard.js";
 import type { NotificationTransport } from "./deliver.js";
 
 /**
@@ -28,6 +29,18 @@ export function notificationReadiness(env: NotificationEnv, hasAccountSecret = f
 
 interface TransportOptions {
   fetch?: typeof fetch;
+  /**
+   * Whether a webhook may reach an address inside this machine's network.
+   * US-097.
+   *
+   * False on a self-hosted instance, where the network is the owner's own and a
+   * receiver on it is the normal case — refusing it would break a working
+   * deployment on upgrade. True where signup is open: a tenant choosing an
+   * internal address there has a trusted process fetch it for them.
+   */
+  guardAddresses?: boolean;
+  /** How a hostname becomes addresses. Injected so a test needs no DNS. */
+  resolveHost?: ResolveHost;
   now?: () => Date;
   mailer?: (
     options: SMTPTransport.Options,
@@ -54,6 +67,7 @@ export function createNotificationTransport(
         disableUrlAccess: true,
       });
   const fetcher = options.fetch ?? globalThis.fetch;
+  const resolve = options.resolveHost ?? resolveHost;
   return {
     email: mailer
       ? async (to, subject, text, id, html) => {
@@ -93,10 +107,27 @@ export function createNotificationTransport(
       const signature = createHmac("sha256", signingSecret)
         .update(`${timestamp}.${body}`)
         .digest("hex");
+      let parsed: URL;
+
       try {
-        const parsed = new URL(url);
+        parsed = new URL(url);
         if (parsed.protocol !== "https:" || parsed.username || parsed.password)
           throw new Error("Invalid URL");
+      } catch {
+        throw new Error("Webhook delivery failed");
+      }
+
+      /**
+       * Refused before the request, and outside the catch below. US-097.
+       *
+       * A private address is a decision about the URL and not a receiver that
+       * went down, and the two send a person to different places — so this
+       * error keeps its own words rather than becoming the generic "Webhook
+       * delivery failed".
+       */
+      if (options.guardAddresses) await assertPublicHost(parsed.hostname, resolve);
+
+      try {
         const response = await fetcher(url, {
           method: "POST",
           body,

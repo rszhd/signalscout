@@ -2,7 +2,7 @@
 
 # Open tickets
 
-31 open — 14 doing, 16 todo, 1 parked (11 p1, 16 p2, 4 p3).
+30 open — 14 doing, 15 todo, 1 parked (10 p1, 16 p2, 4 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -15,7 +15,6 @@
 | p1 | US-096 | [A webhook secret belongs to an account](doing/US-096-a-webhook-secret-belongs-to-an-account.md) | feature | doing | 2026-09-10T00:52+08:00 |
 | p1 | BUG-004 | [The model half of a poll is not capped](doing/BUG-004-the-model-half-of-a-poll-is-not-capped.md) | bug | doing | 2026-09-06T04:42+08:00 |
 | p1 | US-033 | [Thirty verdicts say whether the score is right](todo/US-033-thirty-verdicts-say-whether-the-score-is-right.md) | chore | todo | 2026-09-06T03:02+08:00 |
-| p1 | US-097 | [A webhook cannot be aimed at our own network](todo/US-097-a-webhook-cannot-be-aimed-at-our-own-network.md) | feature | todo | 2026-09-10T00:52+08:00 |
 | p1 | BUG-010 | [A provider choice is shared between accounts](todo/BUG-010-a-provider-choice-is-shared-between-accounts.md) | bug | todo | 2026-09-08T11:25+08:00 |
 | p2 | US-015 | [A deleted post stops being shown](doing/US-015-a-deleted-post-stops-being-shown.md) | feature | doing | 2026-09-04T22:49+08:00 |
 | p2 | US-017 | [A self-hosted instance has one account](doing/US-017-a-self-hosted-instance-has-one-account.md) | feature | doing | 2026-09-04T22:49+08:00 |

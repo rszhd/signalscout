@@ -130,3 +130,65 @@ it("configures implicit TLS for Resend and sends a stable message id", async () 
     text: "Message body",
   });
 });
+
+it("refuses a receiver that resolves inside our own network, before the request", async () => {
+  /**
+   * US-097. On a hosted instance a webhook URL is a tenant's string and this
+   * process makes the request. The URL passes every check made when it was
+   * saved — HTTPS, no credentials, a public-looking name — and points at an
+   * internal address when the delivery is sent.
+   */
+  const fetcher = vi.fn(
+    async (_url: string | URL | Request, _options?: RequestInit) =>
+      new Response(null, { status: 204 }),
+  );
+  const transport = createNotificationTransport(loadNotificationEnv({}), {
+    fetch: fetcher,
+    guardAddresses: true,
+    resolveHost: async () => ["169.254.169.254"],
+  });
+
+  await expect(
+    transport.webhook("https://receiver.example/hook", "{}", "delivery-1", "a-secret"),
+  ).rejects.toThrow("not a public address");
+
+  // Nothing was sent. A guard that refuses after the POST guards nothing.
+  expect(fetcher).not.toHaveBeenCalled();
+});
+
+it("lets a self-hosted instance post to its own network", async () => {
+  // The homelab case: another container on the same host is the normal
+  // receiver there, and refusing it would break a working deployment on
+  // upgrade. The guard is off unless signup is open.
+  const fetcher = vi.fn(
+    async (_url: string | URL | Request, _options?: RequestInit) =>
+      new Response(null, { status: 204 }),
+  );
+  const transport = createNotificationTransport(loadNotificationEnv({}), {
+    fetch: fetcher,
+    resolveHost: async () => ["192.168.1.50"],
+  });
+
+  await expect(
+    transport.webhook("https://receiver.local/hook", "{}", "delivery-1", "a-secret"),
+  ).resolves.toBeUndefined();
+  expect(fetcher).toHaveBeenCalledTimes(1);
+});
+
+it("keeps a refused address distinct from a receiver that went down", async () => {
+  // They send a person to different places, which is why `connections.ts`
+  // separates a 400 from a 502 and why this one does not become the generic
+  // "Webhook delivery failed".
+  const transport = createNotificationTransport(loadNotificationEnv({}), {
+    fetch: async () => new Response(null, { status: 500 }),
+    guardAddresses: true,
+    resolveHost: async () => ["10.0.0.5"],
+  });
+
+  await expect(
+    transport.webhook("https://receiver.example/hook", "{}", "delivery-1", "a-secret"),
+  ).rejects.toThrow(/not a public address/);
+  await expect(
+    transport.webhook("https://receiver.example/hook", "{}", "delivery-1", "a-secret"),
+  ).rejects.not.toThrow(/Webhook delivery failed/);
+});

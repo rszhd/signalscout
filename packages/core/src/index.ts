@@ -412,6 +412,12 @@ export {
   updateMonitor,
 } from "./monitors/index.js";
 export { configureNetworking, connectAttemptTimeoutMs } from "./net.js";
+export {
+  assertPublicHost,
+  isPublicAddress,
+  PrivateAddressError,
+  type ResolveHost,
+} from "./notifications/address-guard.js";
 export { type NotificationTransport, processNotifications } from "./notifications/deliver.js";
 export {
   deleteAccountWebhookSecret,

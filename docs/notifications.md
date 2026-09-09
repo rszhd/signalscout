@@ -125,11 +125,30 @@ does, its webhooks report `WEBHOOK_SIGNING_SECRET` as missing. This is
 `machine-keys.ts`'s rule, the same one that stops a stranger spending the
 owner's provider keys.
 
-**One thing is still open before the hosted version offers webhooks.**
-[US-097](../backlog/todo/US-097-a-webhook-cannot-be-aimed-at-our-own-network.md):
-a hosted worker must not be pointed at an address inside our own network. It
-does not affect a self-hosted instance, where the network is already the
-owner's.
+### Where a webhook may point
+
+US-097, and it applies **only where `AUTH_SIGNUP=open`**. There a webhook URL is
+a stranger's string and our worker makes the request, so a receiver must be on
+the public internet: a private, loopback, link-local, carrier-grade-NAT or
+unique-local address is refused. `localhost` and a literal private address are
+refused as you save, and a name that resolves privately is refused when the
+delivery is sent, with the reason on the monitor's notification screen rather
+than a generic failure.
+
+On a self-hosted instance nothing is refused. The network is already the
+owner's, and a receiver in another container on the same host is the normal
+case there.
+
+Three older defences still stand on every instance: the URL must be HTTPS, it
+may carry no username or password, and a redirect is refused rather than
+followed.
+
+**One gap is left open on purpose: DNS rebinding.** The name is resolved to
+check it and resolved again by the HTTP client, so a server the attacker
+controls can answer publicly the first time and privately the second. Closing it
+needs the connection to use the address that was checked, which `fetch` does not
+allow. What the window offers is a blind `POST` and a reachability signal — the
+response body is discarded and never reaches the product.
 
 The URL must use HTTPS, with no username, password or fragment. Redirects are
 refused. Choose **Digest** or **Each match above the minimum score**. A request

@@ -16,6 +16,7 @@ import {
   posts,
   notificationSettings as settings,
 } from "../db/schema.js";
+import { PrivateAddressError } from "./address-guard.js";
 import { matchEmail } from "./match-email.js";
 
 export interface NotificationTransport {
@@ -259,7 +260,18 @@ export async function processNotifications(
           const secret = signingSecretFor ? await signingSecretFor(monitor.userId) : null;
           await transport.webhook(config.webhookUrl, JSON.stringify(payload), delivery.id, secret);
         }
-      } catch {
+      } catch (error) {
+        /**
+         * One error is kept in full, and every other one is not. US-097.
+         *
+         * A refused address is **our** sentence about the URL somebody typed,
+         * so it carries no provider text and a person can act on it: the
+         * receiver is not down, the address is not allowed. Anything else is
+         * discarded, because a provider's own words can echo passwords, signed
+         * URLs, message content or an SMTP authentication response.
+         */
+        const refusedAddress = error instanceof PrivateAddressError ? error.message : null;
+
         // Do not retain provider text or errors: these can echo passwords,
         // signed URLs, message content, or SMTP authentication responses.
         await tx
@@ -278,9 +290,11 @@ export async function processNotifications(
             .set({
               webhookFailures: failures,
               webhookEnabled: !disabled,
-              webhookError: disabled
-                ? "Webhook disabled after repeated delivery failures. Check the receiver, then save settings to enable it again."
-                : "Webhook delivery failed. A retry is scheduled.",
+              webhookError:
+                refusedAddress ??
+                (disabled
+                  ? "Webhook disabled after repeated delivery failures. Check the receiver, then save settings to enable it again."
+                  : "Webhook delivery failed. A retry is scheduled."),
             })
             .where(eq(settings.monitorId, monitorId));
         } else {

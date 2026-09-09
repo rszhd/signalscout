@@ -924,6 +924,26 @@ than replaced, so it can stop another account's monitors dead.
 [BUG-010](backlog/todo/BUG-010-a-provider-choice-is-shared-between-accounts.md)
 is that ticket. The self-hosted instance is unaffected.
 
+**A stored key is a choice where the platform had none.** US-090 closed on
+2026-09-09. The connections screen used to save a key and leave every platform
+that key unlocks untouched: a platform with no key still said nothing can
+collect it, and the person had to answer the row under it for the account they
+had just pasted. The save route now records the saved provider for every
+platform it can fetch that has no recorded choice and no other connected
+provider — the narrow rule, because the other two cases are decisions. A
+platform another provider already fetches is left alone (taking it over would
+spend money at an account the person did not pick), and a recorded choice is
+never overridden. Where signup is open the rule does not run at all: a stored
+key belongs to one account there while `source_providers` is shared by every
+account, and BUG-010 says the self-hosted instance is the unaffected one.
+
+Two consequences follow. **The store and the delete routes answer with the
+whole screen now**, not the one provider, for the reason the platform choice
+route already had: a stored key changes what the platforms below the cards are
+allowed to do, and a reply carrying one refreshed provider beside stale rows
+would show the old answer. **The onboarding gate takes the same whole screen
+back**, which is what re-decides whether the account still needs a key.
+
 **A model key belongs to an account too, and a person picks a model per job.**
 US-068 closed on 2026-09-08 with three cards and US-070 added the fourth the
 same day. Scoring, triage, similarity, drafting a reply — four, because this

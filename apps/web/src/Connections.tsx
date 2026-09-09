@@ -118,7 +118,7 @@ function ProviderCard({
 }: {
   provider: ProviderView;
   canStore: boolean;
-  onChanged: (provider: ProviderView) => void;
+  onChanged: (view: ConnectionsView) => void;
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const [typed, setTyped] = useState<Record<string, string>>({});
@@ -166,7 +166,10 @@ function ProviderCard({
     setAnswer(null);
 
     try {
-      const updated = await requestJson<ProviderView>(`/api/connections/${provider.id}`, {
+      // The route answers with the whole screen (US-090), because a stored key
+      // can also record the fetcher for a platform that had none. The card and
+      // the platform rows under it come back together.
+      const updated = await requestJson<ConnectionsView>(`/api/connections/${provider.id}`, {
         method: "PUT",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ credentials: filled() }),
@@ -190,8 +193,10 @@ function ProviderCard({
     setAnswer(null);
 
     try {
+      // The whole screen, for the same reason the save above takes it: removing
+      // a key can leave a platform unserved, and the rows must say so.
       onChanged(
-        await requestJson<ProviderView>(`/api/connections/${provider.id}/${field.name}`, {
+        await requestJson<ConnectionsView>(`/api/connections/${provider.id}/${field.name}`, {
           method: "DELETE",
         }),
       );
@@ -527,25 +532,6 @@ export function Connections() {
     void load();
   }, [load]);
 
-  /**
-   * Replace one provider with what the write returned, rather than reloading.
-   *
-   * The routes answer with the provider's own refreshed view, so a reload
-   * would be a second round trip for an answer already in hand.
-   */
-  function replace(updated: ProviderView): void {
-    setView((current) =>
-      current
-        ? {
-            ...current,
-            providers: current.providers.map((provider) =>
-              provider.id === updated.id ? updated : provider,
-            ),
-          }
-        : current,
-    );
-  }
-
   if (state === "loading") {
     return (
       <div className="product-page connections-page">
@@ -608,7 +594,10 @@ export function Connections() {
                 key={provider.id}
                 provider={provider}
                 canStore={view.canStore}
-                onChanged={replace}
+                // The store and remove routes answer with the whole screen, so
+                // the rows under the cards and the card itself come back in one
+                // reply — the same contract the platform rows already used.
+                onChanged={setView}
               />
             ))}
           </ul>

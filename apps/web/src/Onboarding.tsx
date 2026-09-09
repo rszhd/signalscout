@@ -124,7 +124,7 @@ function ProviderStep({
   onSaved,
 }: {
   providers: ProviderView[];
-  onSaved: (provider: ProviderView) => void;
+  onSaved: (view: ConnectionsView) => void;
 }) {
   // Registration order, which US-055 recorded is the order every screen shows
   // providers in. The first one is the one most deployments connect.
@@ -143,8 +143,12 @@ function ProviderStep({
     setError(null);
 
     try {
+      // The route answers with the whole screen since US-090 — a stored key can
+      // record the fetcher for platforms that had none — so the gate takes the
+      // whole view back and re-decides from it, the way it re-decides after the
+      // model half.
       onSaved(
-        await requestJson<ProviderView>(`/api/connections/${provider.id}`, {
+        await requestJson<ConnectionsView>(`/api/connections/${provider.id}`, {
           method: "PUT",
           headers: { "content-type": "application/json" },
           // The key travels in the body. A query string would put it in the
@@ -535,16 +539,7 @@ export function Onboarding({
               canStore && (
                 <ProviderStep
                   providers={connections.providers}
-                  onSaved={(saved) =>
-                    onSaved({
-                      connections: {
-                        ...connections,
-                        providers: connections.providers.map((one) =>
-                          one.id === saved.id ? saved : one,
-                        ),
-                      },
-                    })
-                  }
+                  onSaved={(saved) => onSaved({ connections: saved })}
                 />
               )
             )}

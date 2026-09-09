@@ -69,6 +69,17 @@ export interface ConnectionRoutesOptions {
    */
   readonly encryption?: Record<string, string | undefined>;
   readonly logger: Logger;
+  /**
+   * Whether a stranger may register, for the one rule that is about who owns
+   * the key being pasted.
+   *
+   * US-090: where signup is open, a stored key belongs to one account while
+   * `source_providers` is shared by every account (BUG-010), so a key must not
+   * auto-record a shared choice. Where it is closed there is one account, the
+   * common deployment, and the rule runs. Defaults to `closed`, which is the
+   * same default `AUTH_SIGNUP` has.
+   */
+  readonly signup?: "open" | "closed";
 }
 
 /** The sentence an instance with no key is shown, in both places it is shown. */
@@ -200,6 +211,7 @@ export async function registerConnectionRoutes(
   const { db, sources, logger } = options;
   const environment = options.environment ?? process.env;
   const encryption = options.encryption ?? process.env;
+  const signup = options.signup ?? "closed";
   const providers = providersOf(sources);
   const platformEntries = groupByPlatform(sources);
 
@@ -265,6 +277,57 @@ export async function registerConnectionRoutes(
     }
 
     return connected;
+  }
+
+  /**
+   * Record the stored provider for every platform that has none.
+   *
+   * US-090. A key is pasted on this screen, and a platform with no recorded
+   * choice and no other connected provider was waiting for exactly that key.
+   * Recording it here is what makes the platform collectable without a second
+   * trip to the row under it.
+   *
+   * Two limits keep a stored key from deciding who pays, and both are
+   * `decideProvider`'s own rules. A platform another provider already fetches
+   * is left alone — its provider may be running monitors, and taking it over
+   * would spend money at an account the person did not pick. And a platform
+   * with a recorded choice is somebody's decision, which a new key must not
+   * override. So the rule is narrow: record the saved provider only where it is
+   * now the platform's sole connected provider.
+   *
+   * The table is shared by every account (BUG-010). Where signup is open a
+   * stored key belongs to one account, so a shared row written from it would
+   * decide for tenants that never saw it — US-081's rule applied to the choice
+   * instead of the key. The rule runs only where signup is closed, the
+   * single-account instance.
+   *
+   * Returns the platforms recorded, for the log line.
+   */
+  async function recordChoiceForUnassigned(
+    userId: string,
+    savedProvider: Provider,
+  ): Promise<string[]> {
+    if (signup === "open") return [];
+
+    const [choices, connected] = await Promise.all([
+      readProviderChoices(db),
+      connectedProviders(userId),
+    ]);
+
+    const recorded: string[] = [];
+
+    for (const { platform, providers: fetchers } of platformEntries) {
+      if (choices[platform.id] !== undefined) continue;
+      if (!fetchers.some((provider) => provider.id === savedProvider)) continue;
+
+      const usable = fetchers.filter((provider) => connected.has(provider.id));
+      if (usable.length === 1 && usable[0]?.id === savedProvider) {
+        await setProviderChoice(db, platform.id as Source, savedProvider);
+        recorded.push(platform.id);
+      }
+    }
+
+    return recorded;
   }
 
   /**
@@ -562,7 +625,11 @@ export async function registerConnectionRoutes(
       params: z.object({ provider: z.string() }),
       body: credentialsBody,
       response: {
-        200: providerSchema,
+        // The whole screen, not the one provider: a stored key can record the
+        // choice for a platform that had none (US-090), and a reply carrying
+        // one refreshed provider beside stale rows would show the old answer.
+        // The platform choice route answers the same way for the same reason.
+        200: connectionsSchema,
         400: problemSchema,
         404: problemSchema,
         // No `ENCRYPTION_KEY`: nothing is wrong with the key, and nothing can
@@ -597,7 +664,9 @@ export async function registerConnectionRoutes(
         return reply.code(400).send({ message: "Paste a key before saving." });
       }
 
-      const candidate = await credentialsToTest(sessionUserId(request), provider, typed);
+      const userId = sessionUserId(request);
+
+      const candidate = await credentialsToTest(userId, provider, typed);
       if ("missing" in candidate) {
         return reply.code(400).send({
           message: `${provider.descriptor.displayName} also needs a ${candidate.missing}.`,
@@ -616,7 +685,7 @@ export async function registerConnectionRoutes(
 
       for (const [field, value] of written) {
         await putSourceCredential(db, key, {
-          userId: sessionUserId(request),
+          userId,
           provider: provider.descriptor.id as Provider,
           field,
           value: value.trim(),
@@ -633,7 +702,18 @@ export async function registerConnectionRoutes(
         "stored a provider credential",
       );
 
-      return view(sessionUserId(request), provider);
+      // A key pasted here is a choice where the platform had none. Recording it
+      // happens only for a platform this provider alone can now fetch, and only
+      // on the single-account instance — the two limits above the helper.
+      const recorded = await recordChoiceForUnassigned(userId, provider.descriptor.id as Provider);
+      if (recorded.length > 0) {
+        logger.info(
+          { provider: provider.descriptor.id, platforms: recorded },
+          "recorded the fetcher for platforms that had none chosen",
+        );
+      }
+
+      return connectionsView(userId);
     },
   });
 
@@ -642,7 +722,9 @@ export async function registerConnectionRoutes(
     url: "/api/connections/:provider/:field",
     schema: {
       params: z.object({ provider: z.string(), field: z.string() }),
-      response: { 200: providerSchema, 404: problemSchema },
+      // The whole screen, like the store route above: a removed key can leave a
+      // platform unserved, and the rows under the cards must say so.
+      response: { 200: connectionsSchema, 404: problemSchema },
     },
     handler: async (request, reply) => {
       const provider = find(request.params.provider);
@@ -668,7 +750,7 @@ export async function registerConnectionRoutes(
         request.params.field,
       );
 
-      return view(sessionUserId(request), provider);
+      return connectionsView(sessionUserId(request));
     },
   });
 }

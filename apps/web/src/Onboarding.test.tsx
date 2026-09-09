@@ -141,7 +141,18 @@ describe("the setup gate", () => {
   });
 
   it("saves a provider key through the connections route", async () => {
-    answers.set("PUT /api/connections/apify", () => json(provider("apify", "Apify", true)));
+    // The route answers with the whole connections screen since US-090, so the
+    // gate takes the whole view back rather than one refreshed provider.
+    answers.set("PUT /api/connections/apify", () =>
+      json(
+        connectionsView({
+          providers: [
+            provider("brightdata", "Bright Data", false),
+            provider("apify", "Apify", true),
+          ],
+        }),
+      ),
+    );
 
     await mount(connectionsView(), modelsView(false));
 

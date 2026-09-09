@@ -2,7 +2,7 @@
 
 # Done
 
-74 finished.
+75 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
@@ -16,6 +16,7 @@
 | BUG-003 | [A post below the threshold is classified again on every poll](done/2026-09/BUG-003-a-post-below-the-threshold-is-classified-again-on-every-poll.md) | bug | fixed | 2026-09 |
 | BUG-002 | [A seven-day window is bought as a month](done/2026-09/BUG-002-a-seven-day-window-is-bought-as-a-month.md) | bug | fixed | 2026-09 |
 | BUG-001 | [A pending Reddit collection is not resumed](done/2026-09/BUG-001-a-pending-reddit-collection-is-not-resumed.md) | bug | shipped | 2026-09 |
+| US-090 | [A stored provider key becomes the fetcher where none was chosen](done/2026-09/US-090-a-stored-provider-key-becomes-the-fetcher-where-none-was-chosen.md) | feature | shipped | 2026-09 |
 | US-089 | [The setup forms use familiar sample copy](done/2026-09/US-089-the-setup-forms-use-familiar-sample-copy.md) | chore | shipped | 2026-09 |
 | US-088 | [A new account is asked for two keys](done/2026-09/US-088-a-new-account-is-asked-for-two-keys.md) | feature | done | 2026-09 |
 | US-087 | [A model key is tested before it is stored](done/2026-09/US-087-a-model-key-is-tested-before-it-is-stored.md) | feature | done | 2026-09 |

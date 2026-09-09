@@ -32,6 +32,27 @@ function brightData(overrides: Record<string, unknown> = {}) {
   };
 }
 
+/** A second Reddit provider, for a test about a choice. */
+function scrapeCreators(overrides: Record<string, unknown> = {}) {
+  return {
+    id: "scrapecreators",
+    displayName: "ScrapeCreators",
+    platforms: ["Reddit"],
+    ready: false,
+    credentials: [
+      {
+        name: "apiKey",
+        label: "ScrapeCreators API key",
+        environmentVariable: "SCRAPECREATORS_API_KEY",
+        storedHint: null,
+        fromEnvironment: false,
+        configured: false,
+      },
+    ],
+    ...overrides,
+  };
+}
+
 /**
  * One platform row, as the server sends it.
  *
@@ -259,17 +280,21 @@ describe("the connections screen", () => {
     await show(connections(), {
       "PUT /api/connections/brightdata": () =>
         json(
-          brightData({
-            ready: true,
-            credentials: [
-              {
-                name: "apiKey",
-                label: "Bright Data API key",
-                environmentVariable: "BRIGHTDATA_API_KEY",
-                storedHint: "••••2d65",
-                fromEnvironment: false,
-                configured: true,
-              },
+          connections({
+            providers: [
+              brightData({
+                ready: true,
+                credentials: [
+                  {
+                    name: "apiKey",
+                    label: "Bright Data API key",
+                    environmentVariable: "BRIGHTDATA_API_KEY",
+                    storedHint: "••••2d65",
+                    fromEnvironment: false,
+                    configured: true,
+                  },
+                ],
+              }),
             ],
           }),
         ),
@@ -289,6 +314,95 @@ describe("the connections screen", () => {
     // second save of a value the person can no longer read back.
     expect(field("Bright Data API key for Bright Data").value).toBe("");
     expect(container.textContent).toContain("••••2d65");
+  });
+
+  it("shows the platform a saved key unlocked, from the save's own reply", async () => {
+    // US-090. The store route answers with the whole screen, because a stored
+    // key can record the fetcher for a platform that had none. If the screen
+    // only refreshed the one card, the row under it would go on saying "Fetched
+    // by Bright Data" while the server had already moved the choice.
+    const storedBrightData = brightData({
+      ready: true,
+      credentials: [
+        {
+          name: "apiKey",
+          label: "Bright Data API key",
+          environmentVariable: "BRIGHTDATA_API_KEY",
+          storedHint: "••••2d65",
+          fromEnvironment: false,
+          configured: true,
+        },
+      ],
+    });
+    const savedScrapeCreators = scrapeCreators({
+      ready: true,
+      credentials: [
+        {
+          name: "apiKey",
+          label: "ScrapeCreators API key",
+          environmentVariable: "SCRAPECREATORS_API_KEY",
+          storedHint: "••••3333",
+          fromEnvironment: false,
+          configured: true,
+        },
+      ],
+    });
+
+    const before = connections({
+      providers: [storedBrightData, scrapeCreators()],
+      platforms: [
+        reddit({
+          providers: [
+            { id: "brightdata", displayName: "Bright Data", connected: true },
+            { id: "scrapecreators", displayName: "ScrapeCreators", connected: false },
+          ],
+          chosen: null,
+          effective: "brightdata",
+          needsChoice: false,
+          blocker: null,
+        }),
+      ],
+    });
+    const after = connections({
+      providers: [storedBrightData, savedScrapeCreators],
+      platforms: [
+        reddit({
+          providers: [
+            { id: "brightdata", displayName: "Bright Data", connected: true },
+            { id: "scrapecreators", displayName: "ScrapeCreators", connected: true },
+          ],
+          chosen: "scrapecreators",
+          effective: "scrapecreators",
+          needsChoice: false,
+          blocker: null,
+        }),
+      ],
+    });
+
+    await show(before, {
+      "PUT /api/connections/scrapecreators": () => json(after),
+    });
+
+    expect(container.textContent).toContain("Fetched by Bright Data");
+
+    const trigger = container.querySelector<HTMLButtonElement>(
+      'button[aria-label="Connect ScrapeCreators"]',
+    );
+    await act(async () => trigger?.click());
+
+    const dialog = container.querySelector<HTMLDialogElement>(
+      'dialog[aria-labelledby="account-title-scrapecreators"]',
+    );
+    const save = [...(dialog?.querySelectorAll("button") ?? [])].find(
+      (candidate) => candidate.textContent?.trim() === "Save key",
+    );
+
+    setValue(field("ScrapeCreators API key for ScrapeCreators"), "key");
+    await act(async () => save?.click());
+    await settle();
+
+    expect(container.textContent).toContain("Fetched by ScrapeCreators");
+    expect(container.textContent).toContain("ScrapeCreators is connected.");
   });
 
   it("keeps the typed key on the screen when the save was refused", async () => {
@@ -325,7 +439,10 @@ describe("the connections screen", () => {
           }),
         ],
       }),
-      { "DELETE /api/connections/brightdata/apiKey": () => json(brightData()) },
+      {
+        "DELETE /api/connections/brightdata/apiKey": () =>
+          json(connections({ providers: [brightData()] })),
+      },
     );
 
     await openAccount();

@@ -376,7 +376,11 @@ describe("connecting a provider", () => {
         });
 
         expect(response.statusCode).toBe(200);
-        expect(response.json().credentials[0].storedHint).toBe("••••2d65");
+        // The store route answers with the whole screen now (US-090): a saved
+        // key can record the fetcher for a platform that had none, so a reply
+        // with one refreshed provider beside stale rows would show the old
+        // answer.
+        expect(response.json().providers[0].credentials[0].storedHint).toBe("••••2d65");
         expect(response.body).not.toContain(goodKey);
 
         const [row] = await db.select().from(sourceCredentials);
@@ -465,7 +469,7 @@ describe("connecting a provider", () => {
         });
 
         expect(response.statusCode).toBe(200);
-        expect(response.json().credentials[0].configured).toBe(false);
+        expect(response.json().providers[0].credentials[0].configured).toBe(false);
         expect(await stored()).toEqual([]);
       } finally {
         await app.close();
@@ -485,6 +489,125 @@ describe("connecting a provider", () => {
         expect(response.statusCode).toBe(400);
         expect(response.json().message).toContain("apiSecret");
         expect(await stored()).toEqual([]);
+      } finally {
+        await app.close();
+      }
+    });
+  });
+
+  /**
+   * A key stored on this screen is a choice where the platform had none.
+   * US-090.
+   *
+   * What these cases own is when the store records a fetcher and when it must
+   * not: a new key never takes a platform from a provider already fetching it,
+   * and never overrides a choice somebody made. Both limits are the rules the
+   * platform rows already read, applied at the moment the key arrives.
+   */
+  describe("a stored key becomes the fetcher where none was chosen", () => {
+    it("records the saved provider for a platform nothing could fetch before", async () => {
+      const app = await server({ sources: bothRedditProviders(), environment: {} });
+
+      try {
+        const saved = await app.inject({
+          method: "PUT",
+          url: "/api/connections/scrapecreators",
+          payload: { credentials: { apiKey: goodKey } },
+        });
+
+        expect(saved.statusCode).toBe(200);
+        // The save's own reply already shows the recorded choice. No reload.
+        const reddit = platformIn(saved.json());
+        expect(reddit.chosen).toBe("scrapecreators");
+        expect(reddit.effective).toBe("scrapecreators");
+        expect(reddit.needsChoice).toBe(false);
+        expect(reddit.blocker).toBe(null);
+
+        expect(await db.select().from(sourceProviders)).toEqual([
+          expect.objectContaining({ source: "reddit", provider: "scrapecreators" }),
+        ]);
+      } finally {
+        await app.close();
+      }
+    });
+
+    it("does not take a platform from a provider already fetching it", async () => {
+      // Bright Data holds a key (the common single-key deployment), so Reddit
+      // is running and has never needed a recorded choice. Storing a second
+      // key must not move Reddit to it; the platform now asks, as it did before
+      // this route knew how to record.
+      const app = await server({
+        sources: bothRedditProviders(),
+        environment: { BRIGHTDATA_API_KEY: goodKey },
+      });
+
+      try {
+        const saved = await app.inject({
+          method: "PUT",
+          url: "/api/connections/scrapecreators",
+          payload: { credentials: { apiKey: goodKey } },
+        });
+
+        expect(saved.statusCode).toBe(200);
+        const reddit = platformIn(saved.json());
+        expect(reddit.chosen).toBe(null);
+        expect(reddit.needsChoice).toBe(true);
+        expect(reddit.effective).toBe(null);
+
+        expect(await db.select().from(sourceProviders)).toHaveLength(0);
+      } finally {
+        await app.close();
+      }
+    });
+
+    it("never overrides a choice somebody already made", async () => {
+      const app = await server({ sources: bothRedditProviders(), environment: {} });
+
+      try {
+        // The first key is the only provider that can run, so the save records
+        // it. The second key arrives afterwards and must not move the choice.
+        await app.inject({
+          method: "PUT",
+          url: "/api/connections/scrapecreators",
+          payload: { credentials: { apiKey: goodKey } },
+        });
+
+        const saved = await app.inject({
+          method: "PUT",
+          url: "/api/connections/brightdata",
+          payload: { credentials: { apiKey: goodKey } },
+        });
+
+        expect(saved.statusCode).toBe(200);
+        const reddit = platformIn(saved.json());
+        expect(reddit.chosen).toBe("scrapecreators");
+        expect(reddit.effective).toBe("scrapecreators");
+        expect(reddit.needsChoice).toBe(false);
+      } finally {
+        await app.close();
+      }
+    });
+
+    it("records nothing from an account's key where signup is open", async () => {
+      // US-081's rule applied to the choice table: a stored key belongs to one
+      // account there, while `source_providers` is shared by every account
+      // (BUG-010), so an account's key must not decide for the tenants that
+      // never saw it.
+      const app = await server({
+        sources: bothRedditProviders(),
+        environment: { BRIGHTDATA_API_KEY: goodKey },
+        signup: "open",
+      });
+
+      try {
+        const saved = await app.inject({
+          method: "PUT",
+          url: "/api/connections/brightdata",
+          payload: { credentials: { apiKey: goodKey } },
+        });
+
+        expect(saved.statusCode).toBe(200);
+        expect(await db.select().from(sourceProviders)).toHaveLength(0);
       } finally {
         await app.close();
       }

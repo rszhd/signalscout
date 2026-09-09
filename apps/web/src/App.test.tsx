@@ -421,12 +421,7 @@ describe("the application screens", () => {
     // Connections is gone from the menu and the account screens sit together.
     // Settings is still a mockup route and must stay off the nav: a link that
     // leads nowhere is worse than no link.
-    expect(projectLinks).toEqual([
-      "/projects",
-      inbox,
-      monitors,
-      newMonitor,
-    ]);
+    expect(projectLinks).toEqual(["/projects", inbox, monitors, newMonitor]);
     expect(accountLinks).toEqual(["/providers", "/reply-voices", "/models"]);
     expect(screen.container.textContent).not.toContain("Settings");
   });

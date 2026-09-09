@@ -125,6 +125,22 @@ does, its webhooks report `WEBHOOK_SIGNING_SECRET` as missing. This is
 `machine-keys.ts`'s rule, the same one that stops a stranger spending the
 owner's provider keys.
 
+### Proving a receiver
+
+`pnpm --filter @signalscout/core live:webhook` starts an HTTPS receiver on this
+machine and delivers to it. It spends nothing — no provider and no model — and
+it is the way to check that a change to the signing or the address rules has not
+broken the contract this document describes. It answers three things: a delivery
+signed with the account's own secret verifies, the same receiver holding a
+different secret rejects one, and with the hosted guard on the same URL is
+refused before the request.
+
+Its receiver is written from this document alone. If you are implementing one,
+it is the shortest correct example: read the raw bytes before parsing, recompute
+the HMAC over `timestamp + "." + rawBody`, compare in constant time, refuse a
+timestamp more than five minutes from your clock, and deduplicate the delivery
+id.
+
 ### Where a webhook may point
 
 US-097, and it applies **only where `AUTH_SIGNUP=open`**. There a webhook URL is

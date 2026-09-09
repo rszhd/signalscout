@@ -35,6 +35,7 @@
     "live:youtube-poll": "tsx --env-file-if-exists=../../.env src/sources/live-youtube-poll.ts",
     "live:tiktok-poll": "tsx --env-file-if-exists=../../.env src/sources/live-tiktok-poll.ts",
     "live:instagram-poll": "tsx --env-file-if-exists=../../.env src/sources/live-instagram-poll.ts",
+    "live:webhook": "tsx --env-file-if-exists=../../.env src/notifications/live-webhook.ts",
     "live:notification": "tsx --env-file-if-exists=../../.env src/notifications/live-notification.ts",
     "live:tiktok-comments": "tsx --env-file-if-exists=../../.env src/sources/live-tiktok-comments.ts",
     "live:instagram-comments": "tsx --env-file-if-exists=../../.env src/sources/live-tiktok-comments.ts --platform=instagram",

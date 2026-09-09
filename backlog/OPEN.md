@@ -2,7 +2,7 @@
 
 # Open tickets
 
-30 open — 14 doing, 15 todo, 1 parked (10 p1, 16 p2, 4 p3).
+29 open — 13 doing, 15 todo, 1 parked (9 p1, 16 p2, 4 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -12,7 +12,6 @@
 | p1 | US-073 | [The cloud stack joins the shared edge proxy](doing/US-073-the-cloud-stack-joins-the-shared-edge-proxy.md) | feature | doing | 2026-09-08T17:03+08:00 |
 | p1 | US-077 | [The published image has the tag the compose file asks for](doing/US-077-the-published-image-has-the-tag-the-compose-file-asks-for.md) | bug | doing | 2026-09-08T20:15+08:00 |
 | p1 | US-083 | [One default key sets every job](doing/US-083-one-default-key-sets-every-job.md) | feature | doing | 2026-09-09T11:13+08:00 |
-| p1 | US-096 | [A webhook secret belongs to an account](doing/US-096-a-webhook-secret-belongs-to-an-account.md) | feature | doing | 2026-09-10T00:52+08:00 |
 | p1 | BUG-004 | [The model half of a poll is not capped](doing/BUG-004-the-model-half-of-a-poll-is-not-capped.md) | bug | doing | 2026-09-06T04:42+08:00 |
 | p1 | US-033 | [Thirty verdicts say whether the score is right](todo/US-033-thirty-verdicts-say-whether-the-score-is-right.md) | chore | todo | 2026-09-06T03:02+08:00 |
 | p1 | BUG-010 | [A provider choice is shared between accounts](todo/BUG-010-a-provider-choice-is-shared-between-accounts.md) | bug | todo | 2026-09-08T11:25+08:00 |

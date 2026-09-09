@@ -1449,10 +1449,27 @@ reachability signal.
 
 **Five mutations turn the suite red across the two, and one passed and had to be
 covered**: signing with a fixed account rather than the monitor's owner, which
-is US-096's own claim and nothing was checking it. Still unproven for both:
-**no webhook has ever been delivered to a real receiver**, so the guard has
-never refused a real address and no signature has ever been verified by
-anybody. Read docs/notifications.md.
+is US-096's own claim and nothing was checking it.
+
+**A webhook has now been delivered and verified, live.** `live:webhook` starts
+an HTTPS receiver on this machine — a throw-away CA it makes and deletes — hands
+it the account's secret, and posts a digest of **7 real matches**: signature
+matches, 204, one row `sent`. It spends nothing, because the matches were
+already collected and classified. The receiver is written from
+docs/notifications.md and nothing else, so what passed is the contract that
+document describes: raw bytes before parsing, the HMAC over
+`timestamp + "." + rawBody`, a constant-time compare, a five-minute skew window,
+a seen-id set.
+
+**The negative case is what makes it mean anything.** The same receiver holding
+a *different* secret rejected the next delivery. And on the same run the hosted
+guard refused the same URL **before the request** — the receiver was asked zero
+times — recording our own sentence rather than a delivery failure:
+`"localhost" resolves to 127.0.0.1, which is not a public address.`
+
+Still unproven: nothing has reached a receiver on **another machine**, so a real
+TLS chain, a real DNS answer and a real network have not been part of it. Read
+docs/notifications.md.
 
 **An email looks like the product it came from, and the palette is copied on
 purpose.** US-094 closed on 2026-09-10. Every message this product sent was
@@ -1954,6 +1971,7 @@ pnpm --filter @signalscout/core live:instagram-poll   # spends ~$1.65 + model; s
 pnpm --filter @signalscout/core live:instagram-comments # spends model only; see below
 pnpm --filter @signalscout/core live:thread-loop      # spends up to a cap you pass; see below
 pnpm --filter @signalscout/core live:notification      # spends model only; see below
+pnpm --filter @signalscout/core live:webhook           # spends nothing; see below
 pnpm --filter @signalscout/core measure:lead-position # spends ~$0.40; see below
 pnpm capture:deletions                            # spends ~$0.02; see below
 
@@ -2080,6 +2098,15 @@ Pass the cap in dollars — the budget is what ends it on a thread that keeps
 producing leads, and that is itself a stop reason worth seeing. It leaves a
 paused monitor of its own, so it never skips comments an older monitor has
 already classified.
+
+`live:webhook` answers whether a signed webhook arrives and verifies. It starts
+an HTTPS receiver on this machine, makes the account a signing secret, and
+delivers matches this instance already holds — no provider and no model, so it
+spends nothing. It answers three things: a delivery signed with the account's
+own secret verifies; the same receiver holding a different secret rejects one;
+and with the hosted guard on the same URL is refused before the request. It
+resets the delivery rows between the three, which is the one thing here a real
+deployment never does. Run it when the signing or the address guard changes.
 
 `live:notification` answers whether a match ever reaches a person. It calls no
 provider: it creates a monitor through `createMonitor`, reads posts **already

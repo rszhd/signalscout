@@ -2,7 +2,7 @@
 
 # Done
 
-82 finished.
+83 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
@@ -18,6 +18,7 @@
 | BUG-001 | [A pending Reddit collection is not resumed](done/2026-09/BUG-001-a-pending-reddit-collection-is-not-resumed.md) | bug | shipped | 2026-09 |
 | US-098 | [A provider card links to its website](done/2026-09/US-098-a-provider-card-links-to-its-website.md) | feature | shipped | 2026-09 |
 | US-097 | [A webhook cannot be aimed at our own network](done/2026-09/US-097-a-webhook-cannot-be-aimed-at-our-own-network.md) | feature | done | 2026-09 |
+| US-096 | [A webhook secret belongs to an account](done/2026-09/US-096-a-webhook-secret-belongs-to-an-account.md) | feature | done | 2026-09 |
 | US-094 | [An email looks like the product it came from](done/2026-09/US-094-an-email-looks-like-the-product-it-came-from.md) | feature | done | 2026-09 |
 | US-093 | [A match reaches a person without being asked to](done/2026-09/US-093-a-match-reaches-a-person-without-being-asked-to.md) | feature | done | 2026-09 |
 | US-092 | [An address is verified before an account is used](done/2026-09/US-092-an-address-is-verified-before-an-account-is-used.md) | feature | shipped | 2026-09 |

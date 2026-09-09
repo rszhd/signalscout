@@ -72,9 +72,8 @@ value and the screen says so, rather than offering a button that fails.
 - [x] `machine-keys.ts` is revisited in the same change: the environment secret
       **is** stripped where signup is open, so an account there signs with its
       own or with nothing
-- [ ] A live send: a real receiver verifies a real delivery signed with an
-      account's own secret — **open.** Nothing has posted to a receiver yet,
-      here or anywhere, and US-097 has to land before a hosted worker should
+- [x] A live send: a real receiver verifies a real delivery signed with an
+      account's own secret
 
 ## Notes
 
@@ -126,3 +125,25 @@ value and the screen says so, rather than offering a button that fails.
   the product's history, and it is named in that test rather than the rule being
   loosened: it answers with a value it has just generated, and nothing reads one
   back.
+- 2026-09-10T02:10+08:00 — Delivered live, to a real receiver, and it verified.
+  `live:webhook` starts an HTTPS server on this machine, hands it the account's
+  secret, and posts a digest of **7 real matches** to it: signature matches,
+  204, one delivery row `sent`. The receiver is written from
+  docs/notifications.md and from nothing else — raw bytes before parsing, the
+  HMAC over `timestamp + "." + rawBody`, a constant-time compare, a five-minute
+  skew window and a seen-id set — so what passed is the contract the document
+  describes rather than our own two copies of one string.
+  It spends nothing: no provider and no model, only matches already collected.
+- 2026-09-10T02:10+08:00 — **The negative case is what makes the first one mean
+  anything.** The same receiver, holding a different secret, rejected the next
+  delivery: `signature does not match`. Without it the run proves only that two
+  copies of a string are equal.
+- 2026-09-10T02:10+08:00 — US-097 answered on the same run. With the hosted
+  guard on, the same URL was refused **before the request** — the receiver was
+  asked zero times — and `notification_settings.webhook_error` holds our own
+  sentence: `"localhost" resolves to 127.0.0.1, which is not a public address.`
+  Not a receiver that went down, which is the distinction the ticket asked for.
+- 2026-09-10T02:10+08:00 — What is still unproven: nothing has delivered to a
+  receiver on another machine, so a real TLS chain, a real DNS answer and a
+  real network have not been part of it. The certificate here is a throw-away
+  CA this script makes and deletes.

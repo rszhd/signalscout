@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { messageFor, requestJson } from "./api.js";
 import { BrandIcon } from "./BrandIcon.js";
+import { Button } from "./components/Button.js";
+import { Dialog } from "./components/Dialog.js";
 
 /**
  * Where a provider key is pasted, tested and stored.
@@ -251,28 +253,24 @@ function ProviderCard({
           </button>
         </div>
       </div>
-      <dialog
+      <Dialog
         className="connection-dialog"
-        ref={dialog}
-        aria-labelledby={`account-title-${provider.id}`}
+        headingClass="connection-dialog-heading"
+        titleId={`account-title-${provider.id}`}
+        closeLabel={`Close ${provider.displayName} dialog`}
+        dialogRef={dialog}
+        heading={
+          <>
+            <span className="connection-avatar" aria-hidden="true">
+              <BrandIcon brand={provider.id} size={26} />
+            </span>
+            <div className="connection-dialog-title">
+              <h2 id={`account-title-${provider.id}`}>{provider.displayName}</h2>
+              <p>{provider.ready ? "Manage your connection" : "Connect your account"}</p>
+            </div>
+          </>
+        }
       >
-        <header className="connection-dialog-heading">
-          <span className="connection-avatar" aria-hidden="true">
-            <BrandIcon brand={provider.id} size={26} />
-          </span>
-          <div className="connection-dialog-title">
-            <h2 id={`account-title-${provider.id}`}>{provider.displayName}</h2>
-            <p>{provider.ready ? "Manage your connection" : "Connect your account"}</p>
-          </div>
-          <button
-            type="button"
-            className="secondary-button"
-            aria-label={`Close ${provider.displayName} dialog`}
-            onClick={() => dialog.current?.close()}
-          >
-            Close
-          </button>
-        </header>
         <div className="connection-editor">
           <p className="connection-editor-note">
             {provider.ready
@@ -332,26 +330,16 @@ function ProviderCard({
           )}
         </div>
         <footer className="connection-actions">
-          <button
-            type="button"
-            className="secondary-button"
-            disabled={busy}
-            onClick={() => void test()}
-          >
+          <Button disabled={busy} onClick={() => void test()}>
             Test connection
-          </button>
+          </Button>
           {canStore && (
-            <button
-              type="button"
-              className="primary-button"
-              disabled={busy}
-              onClick={() => void save()}
-            >
+            <Button variant="primary" disabled={busy} onClick={() => void save()}>
               Save key
-            </button>
+            </Button>
           )}
         </footer>
-      </dialog>
+      </Dialog>
     </li>
   );
 }
@@ -431,28 +419,24 @@ function PlatformRow({
           </button>
         </div>
       </div>
-      <dialog
+      <Dialog
         className="connection-dialog"
-        ref={dialog}
-        aria-labelledby={`platform-title-${platform.id}`}
+        headingClass="connection-dialog-heading"
+        titleId={`platform-title-${platform.id}`}
+        closeLabel={`Close ${platform.displayName} dialog`}
+        dialogRef={dialog}
+        heading={
+          <>
+            <span className="connection-avatar" aria-hidden="true">
+              <BrandIcon brand={platform.id} size={26} />
+            </span>
+            <div className="connection-dialog-title">
+              <h2 id={`platform-title-${platform.id}`}>Provider for {platform.displayName}</h2>
+              <p>Choose which account fetches conversations.</p>
+            </div>
+          </>
+        }
       >
-        <header className="connection-dialog-heading">
-          <span className="connection-avatar" aria-hidden="true">
-            <BrandIcon brand={platform.id} size={26} />
-          </span>
-          <div className="connection-dialog-title">
-            <h2 id={`platform-title-${platform.id}`}>Provider for {platform.displayName}</h2>
-            <p>Choose which account fetches conversations.</p>
-          </div>
-          <button
-            type="button"
-            className="secondary-button"
-            aria-label={`Close ${platform.displayName} dialog`}
-            onClick={() => dialog.current?.close()}
-          >
-            Close
-          </button>
-        </header>
         <div className="connection-editor">
           <fieldset className="provider-choice">
             <legend className="visually-hidden">Provider for {platform.displayName}</legend>
@@ -502,7 +486,7 @@ function PlatformRow({
             </p>
           )}
         </div>
-      </dialog>
+      </Dialog>
     </li>
   );
 }

@@ -19,6 +19,26 @@ Use tokens rather than introducing another gray, blue, radius or shadow in a
 page. Platform brand colors and semantic warning/success colors may differ
 from the site accent. The theme is currently light only.
 
+## Components
+
+A screen uses a shared component before it writes a theme class by hand. The
+components live in `apps/web/src/components/` and own the class names and the
+semantics a screen must not get wrong:
+
+- `Button` — the three control intents (`primary`, `secondary`, `compact`). A
+  page names the intent and never the class. `type` defaults to `button`, so a
+  form's submit button says `type="submit"` explicitly.
+- `Dialog` — the only path to a modal. It owns the native `<dialog>`, the
+  heading row, the Close button and `aria-labelledby`. A screen passes the
+  heading content, the body and a ref it opens with `showModal`. A new dialog
+  is never `role="dialog"` on a div with its own Escape listener.
+- `Field` — the label-plus-control shape. The label is a `<span>`, an optional
+  `<small>` carries supporting text, and the control is children.
+
+`docs/design.md` is the rule; the migration happens one screen at a time. A
+theme class not served by a component (e.g. a page's own `text-button`) stays a
+plain class until a component earns it. Components never import `packages/core`.
+
 ## Shared patterns
 
 | Pattern | Use |

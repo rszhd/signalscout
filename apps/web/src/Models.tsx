@@ -1,6 +1,8 @@
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { messageFor, requestJson } from "./api.js";
 import { BrandIcon } from "./BrandIcon.js";
+import { Button } from "./components/Button.js";
+import { Dialog } from "./components/Dialog.js";
 
 /**
  * Which model does which job, and whose key pays for it. US-068 to US-081.
@@ -328,42 +330,32 @@ function KeyLibrary({
                     Make default
                   </button>
                 )}
-                <button
-                  className="secondary-button"
-                  disabled={busy}
-                  type="button"
-                  onClick={() => void remove(stored)}
-                >
+                <Button disabled={busy} onClick={() => void remove(stored)}>
                   Remove
-                </button>
+                </Button>
               </span>
             </li>
           ))}
         </ul>
       )}
 
-      <button
-        className="secondary-button key-add"
-        type="button"
+      <Button
+        className="key-add"
         onClick={() => {
           setError(null);
           dialog.current?.showModal();
         }}
       >
         Add an API key
-      </button>
-      <dialog className="models-dialog" ref={dialog} aria-labelledby="add-model-key-title">
-        <header className="models-dialog-heading">
-          <h2 id="add-model-key-title">Add an API key</h2>
-          <button
-            className="secondary-button"
-            type="button"
-            aria-label="Close API key dialog"
-            onClick={() => dialog.current?.close()}
-          >
-            Close
-          </button>
-        </header>
+      </Button>
+      <Dialog
+        className="models-dialog"
+        headingClass="models-dialog-heading"
+        titleId="add-model-key-title"
+        closeLabel="Close API key dialog"
+        dialogRef={dialog}
+        heading={<h2 id="add-model-key-title">Add an API key</h2>}
+      >
         <form className="key-form" onSubmit={add}>
           <div className="key-form-fields">
             <label className="field">
@@ -443,15 +435,15 @@ function KeyLibrary({
             </p>
           )}
 
-          <button
-            className="primary-button"
+          <Button
+            variant="primary"
             disabled={busy || !canStore || !name.trim() || !apiKey.trim() || !model.trim()}
             type="submit"
           >
             {busy ? "Testing…" : "Test and add key"}
-          </button>
+          </Button>
         </form>
-      </dialog>
+      </Dialog>
     </section>
   );
 }
@@ -777,18 +769,14 @@ function JobCard({
         </span>
         <span className="job-edit-label">Edit</span>
       </button>
-      <dialog className="models-dialog" ref={dialog} aria-labelledby={`job-title-${task.task}`}>
-        <header className="models-dialog-heading">
-          <h2 id={`job-title-${task.task}`}>{task.title}</h2>
-          <button
-            className="secondary-button"
-            type="button"
-            aria-label={`Close ${task.title}`}
-            onClick={() => dialog.current?.close()}
-          >
-            Close
-          </button>
-        </header>
+      <Dialog
+        className="models-dialog"
+        headingClass="models-dialog-heading"
+        titleId={`job-title-${task.task}`}
+        closeLabel={`Close ${task.title}`}
+        dialogRef={dialog}
+        heading={<h2 id={`job-title-${task.task}`}>{task.title}</h2>}
+      >
         <p className="job-description">{task.what}</p>
 
         {/*
@@ -932,21 +920,16 @@ function JobCard({
             cannot run. Refused here and on the server, which is the one that
             has to be right.
           */}
-            <button className="primary-button" disabled={busy || testing || !model} type="submit">
+            <Button variant="primary" disabled={busy || testing || !model} type="submit">
               {busy ? "Saving…" : "Save changes"}
-            </button>
+            </Button>
 
             {/* Both halves, as they stand on screen — a test with no key would
               test the instance's, which is not what the button says. */}
             {draft.keyId && model && (
-              <button
-                className="secondary-button"
-                disabled={busy || testing}
-                type="button"
-                onClick={() => void test()}
-              >
+              <Button disabled={busy || testing} type="button" onClick={() => void test()}>
                 {testing ? "Testing…" : "Test key"}
-              </button>
+              </Button>
             )}
 
             {/*
@@ -970,7 +953,7 @@ function JobCard({
             )}
           </div>
         </form>
-      </dialog>
+      </Dialog>
     </li>
   );
 }

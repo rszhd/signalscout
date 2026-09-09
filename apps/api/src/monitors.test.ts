@@ -12,10 +12,12 @@
  */
 import {
   builtInSources,
+  type ConnectorDefinition,
   clearProviderChoice,
   createDatabase,
   createLogger,
   type Database,
+  fakeSourceDefinition,
   filterDrops,
   getMonitor,
   loadEnv,
@@ -134,9 +136,15 @@ describe("the monitor routes", () => {
   interface ServerOptions {
     environment?: Record<string, string | undefined>;
     queryGenerator?: QueryGenerator | null;
+    /** US-053: what this build offers, for a case about a connector that is off. */
+    sources?: readonly ConnectorDefinition[];
   }
 
-  async function server({ environment = configured, queryGenerator = null }: ServerOptions = {}) {
+  async function server({
+    environment = configured,
+    queryGenerator = null,
+    sources = builtInSources,
+  }: ServerOptions = {}) {
     const env = loadEnv({ DATABASE_URL: database.url });
 
     return buildServer({
@@ -144,7 +152,7 @@ describe("the monitor routes", () => {
       env,
       logger,
       db,
-      sources: builtInSources,
+      sources,
       environment,
       queryGenerator,
     });
@@ -1135,6 +1143,119 @@ describe("the monitor routes", () => {
           (await app.inject({ method: "DELETE", url: `/api/monitors/${missing}/budget` }))
             .statusCode,
         ).toBe(404);
+      });
+    });
+  });
+  describe("a platform this build does not offer", () => {
+    /**
+     * US-053. A connector can be switched off with one field, and the platform
+     * has to leave every screen and every write path together — or a person
+     * ticks it, is told nothing, and the poll collects nothing at 02:00.
+     *
+     * Fakes, not LinkedIn: the mechanism is the subject, and a test naming the
+     * connector that happens to be off today would go red the day it comes
+     * back.
+     */
+    const reason = "Bluesky is switched off: nothing has measured what it returns.";
+
+    const offBuild: ConnectorDefinition[] = [
+      fakeSourceDefinition({ id: "reddit", displayName: "Reddit", providerId: "brightdata" }),
+      fakeSourceDefinition({
+        id: "linkedin",
+        displayName: "LinkedIn",
+        providerId: "socialcrawl",
+        notOffered: reason,
+      }),
+    ];
+
+    it("is not on the monitor form", async () => {
+      await withServer({ sources: offBuild }, async (app) => {
+        const body = (await app.inject({ method: "GET", url: "/api/monitor-options" })).json();
+
+        expect(body.sources.map((source: { id: string }) => source.id)).toEqual(["reddit"]);
+      });
+    });
+
+    it("refuses a monitor that names it, and says why", async () => {
+      await withServer({ sources: offBuild }, async (app) => {
+        const response = await app.inject({
+          method: "POST",
+          url: "/api/monitors",
+          payload: { ...newMonitor, sources: ["reddit", "linkedin"] },
+        });
+
+        expect(response.statusCode).toBe(422);
+        expect(response.json().message).toBe(reason);
+        expect(await db.select().from(monitors)).toEqual([]);
+      });
+    });
+
+    it("refuses an edit that adds it", async () => {
+      await withServer({ sources: offBuild }, async (app) => {
+        const created = await app.inject({
+          method: "POST",
+          url: "/api/monitors",
+          payload: newMonitor,
+        });
+        const id = created.json().id;
+
+        const response = await app.inject({
+          method: "PATCH",
+          url: `/api/monitors/${id}`,
+          payload: { sources: ["linkedin"] },
+        });
+
+        expect(response.statusCode).toBe(422);
+        expect(response.json().message).toBe(reason);
+        expect((await getMonitor(db, id))?.sources).toEqual(["reddit"]);
+      });
+    });
+
+    it("lets an edit that does not touch the sources through", async () => {
+      // An edit carrying one setting must not fail over a platform the monitor
+      // already names. Absent is absent.
+      await withServer({ sources: offBuild }, async (app) => {
+        const created = await app.inject({
+          method: "POST",
+          url: "/api/monitors",
+          payload: newMonitor,
+        });
+
+        const response = await app.inject({
+          method: "PATCH",
+          url: `/api/monitors/${created.json().id}`,
+          payload: { minScore: 55 },
+        });
+
+        expect(response.statusCode).toBe(200);
+      });
+    });
+
+    it("has no queries written for it, even when the body asks for every platform", async () => {
+      // Model tokens spent on a list nobody can use. The other five are the
+      // schema's own platform list, unchanged: this route writes for what the
+      // build offers and never for what it has a connector for.
+      let asked: readonly { id: string }[] = [];
+
+      const generator: QueryGenerator = {
+        provider: "anthropic",
+        model: "claude-haiku-4-5",
+        generate: async (_answers, wanted) => {
+          asked = wanted;
+          return { status: "generated", plan, call };
+        },
+      };
+
+      await withServer({ sources: offBuild, queryGenerator: generator }, async (app) => {
+        await app.inject({ method: "POST", url: "/api/monitors/queries", payload: answers });
+
+        expect(asked.map((platform) => platform.id)).toEqual([
+          "reddit",
+          "x",
+          "youtube",
+          "tiktok",
+          "instagram",
+        ]);
       });
     });
   });

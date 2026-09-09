@@ -107,7 +107,10 @@ no provider is a platform nothing can fetch.
 
 SocialCrawl fetches X and LinkedIn since US-028, Reddit since US-031, YouTube
 since US-034, TikTok since US-044 and Instagram since US-049, and that is the
-case `ProviderDescriptor` was split out for. The credential fields are written once
+case `ProviderDescriptor` was split out for. Its LinkedIn connector has been
+switched off since US-053 on 2026-09-09 — Apify fetches that platform now — so
+five of its six are offered. Everything this section says still holds: the key,
+the card and the rotation are one for all six. The credential fields are written once
 and the connections screen shows one card, so a person pastes that key once and
 rotates it once however many platforms sit behind it.
 
@@ -229,7 +232,7 @@ for the split:
 
 | | Bright Data | ScrapeCreators | SocialCrawl |
 |---|---|---|---|
-| Fetches | Reddit | Reddit | X, LinkedIn, Reddit, YouTube, TikTok and Instagram |
+| Fetches | Reddit | Reddit | X, Reddit, YouTube, TikTok and Instagram — and LinkedIn, switched off since US-053 |
 | Billable unit | a record | a request | a request on X, a credit on LinkedIn and Instagram |
 | Price | $1.50 / 1,000 records | $1.88 / 1,000 requests | $8.12 / 1,000 credits |
 | One unit buys | one post | 7 to 23 posts, measured | X: 20 posts. LinkedIn: 2 posts, and a call spends 5 credits. Instagram: 30 reels for 1 credit, and a comment page of 15 for 5 |
@@ -253,6 +256,74 @@ estimate; this is one more reason it is.
 A connector reports `unitsConsumed` in its own unit and the budget guard prices
 it from the connector's own `pricePerUnitMicros`. Nothing downstream reads the
 table above.
+
+---
+
+## Switching a connector off
+
+A connector can ship and not be offered. `ConnectorDescriptor.notOffered` is
+the whole switch: one sentence saying why, on one connector definition, and
+nothing else changes. US-053 built it and LinkedIn through SocialCrawl was its
+first caller, on 2026-09-09.
+
+**Write the sentence for the person who meets it.** It reaches three places: a
+`422` refusing a monitor that names the platform, a `400` refusing a cost test,
+and the log line where a poll skips it. So say what is wrong and what fetches
+the platform instead. A boolean would say "off", which is a bug report.
+
+**Deleting the line from `builtInSources` is not the same thing, and it is
+worse.** It hides the platform from the monitor form and leaves three doors
+open. The API takes its platform list from the `posts.source` enum, not from
+the registry, so a `POST /api/monitors` naming the platform is still written.
+`startBlockers` reports nothing for a platform with no connector, so that
+monitor reads as startable. Then the poll throws `UnknownSourceError` at 02:00,
+and nobody sees a refusal — they see a monitor that collects nothing.
+
+### What happens to what already exists
+
+* **A monitor that names the platform still runs.** The poll skips that
+  platform with the reason in the log and collects every other one. A decision
+  somebody made about a connector is not an error in a job.
+* **A collection already bought is still read.** `source_continuations` names
+  the provider that started it, and `registry.get` still answers for a
+  switched-off pair. Refusing there would throw away money already spent. The
+  same holds for a cost test's sample and for deletion verification.
+* **The rows stay.** Posts, matches, verdicts and `api_usage` are untouched,
+  and the platform stays in `sources/platforms.ts` and in the `posts.source`
+  enum. Nothing is deleted, so nothing has to be migrated.
+* **A recorded choice naming it is refused, never replaced.** This is the money
+  case. `decideProvider` treats a switched-off provider as one that cannot run,
+  which is branch 2 above: falling back to whoever is left would bill an
+  account the person never chose. The connections screen says so, and names the
+  provider to choose instead.
+
+### What disappears
+
+`groupByPlatform` leaves a switched-off connector out, so the monitor form and
+the connections rows both lose it with no branch of their own. A platform whose
+**every** connector is switched off disappears from both screens, from the
+pricing comparison, and from the platforms a query is generated for.
+
+A provider whose every connector is off loses its card on the connections
+screen too. That is right: there would be nothing to spend the key on.
+
+### The way back
+
+Delete the field. Nothing else was changed, so nothing else has to be undone —
+the file, the parser, the fixtures, the capture script and the connector's own
+tests all stayed. Write into the sentence what would have to be measured for it
+to come back, because that is the note the next person needs.
+
+**A live poll script that drives the real pipeline will refuse a switched-off
+connector**, because it goes through `registry.only` like everything else.
+Switch the connector back on to re-measure it.
+
+There is no per-deployment override, deliberately. This switch is the build's
+decision, made once for everybody, and an environment variable reversing it
+would be a second answer to the same question — the shape US-026 removed when
+it deleted `REDDIT_PROVIDER`. If a self-hoster ever needs a connector this
+build does not offer, `source_providers` is the precedent: a row, chosen on a
+screen. Nobody has asked yet.
 
 ---
 

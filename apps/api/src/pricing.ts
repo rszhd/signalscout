@@ -34,6 +34,7 @@ import {
   environmentVariableFor,
   groupByPlatform,
   listCredentialHints,
+  offeredConnectors,
   providerReturns,
   readProviderChoices,
   spendByPair,
@@ -253,7 +254,13 @@ export async function registerPricingRoutes(
       }
 
       function viewOf(platform: PlatformDescriptor) {
-        const connectors = sources.filter((source) => source.platform.id === platform.id);
+        // A switched-off connector is not on the comparison, because the page
+        // is what a person may choose between. US-053: the platform itself
+        // stays while another provider still fetches it, and `groupByPlatform`
+        // has already dropped it when none does.
+        const connectors = offeredConnectors(sources).filter(
+          (source) => source.platform.id === platform.id,
+        );
         const usable = connectors.filter((connector) => missingFor(connector).length === 0);
 
         /**

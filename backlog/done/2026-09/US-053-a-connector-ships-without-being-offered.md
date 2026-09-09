@@ -6,7 +6,7 @@ priority: p2
 created: 2026-09-07T12:55+08:00
 parent:
 area:
-resolution:
+resolution: done
 ---
 
 ## Context
@@ -56,27 +56,33 @@ the job. A disabled connector is a decision, and a decision is not an error.
 
 ## Acceptance
 
-- [ ] Any connector definition can carry the reason it is not offered, in one
+- [x] Any connector definition can carry the reason it is not offered, in one
       sentence. Nothing about the mechanism names LinkedIn
-- [ ] Switching off a connector is that one field and nothing else: no list to
+- [x] Switching off a connector is that one field and nothing else: no list to
       edit, no screen to change, no test outside its own to update
-- [ ] `socialCrawlLinkedIn` carries the reason, and is still exported, still
+- [x] `socialCrawlLinkedIn` carries the reason, and is still exported, still
       built by its own tests, and still run by `live:linkedin-poll`
-- [ ] A test switches off **one of the three Reddit connectors** and asserts
+      — **not the last part.** The script drives the real pipeline through
+      `registry.only`, so it refuses a switched-off connector. That is the
+      mechanism working rather than a fault, and AGENTS.md says how to
+      re-measure: `--provider=apify`, or delete the field
+- [x] A test switches off **one of the three Reddit connectors** and asserts
       Reddit is still offered, still polls through another provider, and that a
       recorded choice naming the disabled one is refused rather than replaced
-- [ ] A test switches off every connector for a platform and asserts the
+- [x] A test switches off every connector for a platform and asserts the
       platform disappears from the form and from the connections screen
-- [ ] `POST /api/monitors` and `PATCH` refuse a monitor whose sources name a
+- [x] `POST /api/monitors` and `PATCH` refuse a monitor whose sources name a
       platform with no offered connector, and the message says why it is off
-- [ ] The cost test refuses the same platform the same way, because
+- [x] The cost test refuses the same platform the same way, because
       `estimates.ts` reads the database enum too
-- [ ] A poll of a monitor that already names LinkedIn collects its other
+- [x] A poll of a monitor that already names LinkedIn collects its other
       platforms and skips LinkedIn, recording the reason; the job succeeds
-- [ ] `docs/sources.md` gains the procedure beside its two existing lists:
+- [x] `docs/sources.md` gains the procedure beside its two existing lists:
       how to switch a connector off, and what happens to monitors naming it
-- [ ] No behaviour changes for any connector that is still offered, and the
-      only expected values that move are LinkedIn's
+- [x] No behaviour changes for any connector that is still offered, and the
+      only expected values that move are LinkedIn's — no expected value moved
+      at all: 1,660 tests passed before the switch and 1,687 after, the 27 new
+      ones being this ticket's
 
 ## Notes
 
@@ -107,3 +113,23 @@ the job. A disabled connector is a decision, and a decision is not an error.
   LinkedIn alone. Rewritten so the mechanism is the ticket: the Reddit case
   proves a platform survives losing one of its providers, which LinkedIn
   cannot test with one.
+- 2026-09-09T23:52+08:00 — Built and closed. `notOffered` is the field,
+  `sources/offering.ts` is the only place it is read, and `groupByPlatform`,
+  `decideProvider`, `startBlockers` and `registry.only` are where the reading
+  happens — so no screen has a branch of its own. The reason it is a sentence
+  and not a boolean: it reaches a 422, a 400 and a log line, and "off" is a bug
+  report.
+- 2026-09-09T23:52+08:00 — The premise moved between writing and building. The
+  ticket was written on 2026-09-07 because LinkedIn was too dear; US-057 added
+  Apify the same day, so the argument is now freshness rather than price —
+  every Apify post was under ninety minutes old against SocialCrawl's 543
+  hours — and the platform survives the switch instead of leaving with it. That
+  is the case the ticket said LinkedIn could not test, and it now tests itself.
+- 2026-09-09T23:52+08:00 — Three deliberate mutations were confirmed to turn
+  the suite red: not filtering `usable` in `decideProvider`, not filtering
+  inside `groupByPlatform`, and dropping the create route's refusal. The money
+  case has its own test — a recorded choice naming a switched-off provider is
+  refused, never moved to whoever is left.
+- 2026-09-09T23:52+08:00 — Unproven: nothing has run live. No poll has skipped
+  a platform on a real machine and no person has met the 422. The suite covers
+  our half only.

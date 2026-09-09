@@ -314,10 +314,47 @@ and the hashtag search was never called — the capture ran lean at 13 credits a
 left that question open. `--lean` is the flag; running it without one answers
 both remaining questions.
 
+**A connector can ship and not be offered, and LinkedIn through SocialCrawl is
+the first one switched off.** US-053 closed on 2026-09-09, on the owner's
+decision. `ConnectorDescriptor.notOffered` is the whole switch: one sentence on
+one definition, and no list to edit and no screen to change. Read
+docs/sources.md, *Switching a connector off*.
+
+The switch is on the **pair**, which is what US-024 separated the axes for.
+LinkedIn stays and Apify fetches it. The connector is switched off rather than
+deleted — its file, parser, fixtures, capture script and tests are all
+untouched — so the way back is deleting one field.
+
+**Nothing was deleted, so four things keep working.** A monitor that already
+names the platform still polls, skipping it with the reason logged rather than
+failing the job. A collection already bought is still resumed and read, because
+`registry.get` still answers for a switched-off pair and refusing there would
+throw away money already spent. Every post, match and `api_usage` row stays.
+And a recorded choice naming the switched-off provider is **refused rather than
+replaced**, which is the money case: falling back to whoever is left would bill
+an account the person never chose.
+
+What disappears is what a person can pick. `groupByPlatform` leaves the
+connector out, so the monitor form, the connections rows and the pricing
+comparison lose it with no branch of their own; a platform whose every
+connector is off disappears from all three. A `POST` or `PATCH` naming such a
+platform answers **422** with the sentence, and a cost test answers 400 — the
+body's enum is the `posts.source` column, which says what can be *stored* and
+not what will be collected.
+
+Three consequences are worth holding. **A live poll script refuses a
+switched-off connector**, because it drives the real pipeline through
+`registry.only` — so `live:linkedin-poll` on SocialCrawl no longer runs, and
+re-measuring means switching the connector back on. **The whole suite passed
+before and after the switch**, 1,660 tests, which is the claim that switching
+one off changes nothing for the others — and three deliberate mutations were
+confirmed to turn it red. And **nothing about this has run live**: no poll has
+skipped a platform on a real machine, and no person has met the 422.
+
 **LinkedIn has two providers, and the second one was chosen for freshness
 rather than price.** US-057 added HarvestAPI's actor on Apify on 2026-09-07,
 after US-056 measured three providers for one platform and US-055 built and
-dropped one of them.
+dropped one of them. Since US-053 it is the only one offered.
 
 **Every post the measurement returned was under ninety minutes old** — ten
 posts across a 71-minute page. ScrapeCreators' newest was three days old and
@@ -1852,7 +1889,11 @@ and it writes `ledger.json` beside the fixtures recording what each one cost.
 Run it when the LinkedIn parser changes. Read the fixtures it writes before you
 commit them — its first run leaked real names past a scrubber that looked right.
 
-`live:linkedin-poll` is US-028's equivalent. The script behind it is
+`live:linkedin-poll` is US-028's equivalent, **and it no longer runs on
+SocialCrawl**: US-053 switched that connector off, so the poll it drives is
+refused like any other. Pass `--provider=apify`, or delete `notOffered` from
+`socialcrawl/linkedin.ts` to re-measure the connector this paragraph describes.
+The script behind it is
 `live-poll.ts`, and it takes `--platform=` — naming it is required, because a
 live poll spends money and a default would let a mistyped flag bill the wrong
 account. It, and it is a whole pipeline rather

@@ -1,3 +1,4 @@
+import { notOfferedReason, reasonsByProvider } from "./offering.js";
 import type {
   ConnectorDefinition,
   PlatformId,
@@ -127,6 +128,26 @@ export class NoUsableProviderError extends Error {
 }
 
 /**
+ * Thrown when this build ships a connector for the platform and offers none of
+ * them.
+ *
+ * Its own error rather than `UnknownSourceError`, because the two send a reader
+ * to opposite places. "Unknown" means the id is wrong or a connector is
+ * missing, and somebody goes looking for the code. This means the code is
+ * there, working and deliberately switched off, and the message carries the
+ * sentence that says why. US-053.
+ */
+export class ConnectorNotOfferedError extends Error {
+  constructor(
+    readonly platformId: PlatformId,
+    readonly reason: string,
+  ) {
+    super(`"${platformId}" is not offered by this build. ${reason}`);
+    this.name = "ConnectorNotOfferedError";
+  }
+}
+
+/**
  * What the rules below decided about one platform.
  *
  * A value rather than a thrown error, because two callers need the same
@@ -139,30 +160,64 @@ export type ProviderDecision =
   | { readonly status: "chosen"; readonly providerId: ProviderId; readonly recorded: boolean }
   /** Two or more could, and nobody has said which. */
   | { readonly status: "undecided"; readonly providers: readonly ProviderId[] }
-  /** None can. `chosen` names the recorded provider when that is the reason. */
+  /**
+   * This build offers no connector for the platform. US-053.
+   *
+   * Its own status and not an `unavailable` with an empty list, because the
+   * repair is different in kind: nothing a person connects or chooses will
+   * change it, and `reason` is the sentence that says so.
+   */
+  | { readonly status: "off"; readonly reason: string }
+  /**
+   * None can. `chosen` names the recorded provider when that is the reason,
+   * and `reason` says the choice is switched off rather than unconnected.
+   */
   | {
       readonly status: "unavailable";
       readonly chosen: ProviderId | null;
       readonly available: readonly ProviderId[];
+      /** Why the chosen provider cannot run, when it is switched off. */
+      readonly reason?: string;
     };
 
 /**
  * Which provider fetches a platform, from what is registered, what can run,
- * and what somebody chose.
+ * what this build offers, and what somebody chose.
  *
  * The one place the rule is written. `usable` is what this deployment holds a
  * key for; passing `registered` as `usable` asks the question about the build
  * rather than about the deployment.
+ *
+ * `notOffered` is the fourth input, and it is a build fact where the other
+ * three are a deployment's. Pass every registered provider in `registered`,
+ * switched-off ones included: this function takes them out itself, so no caller
+ * can forget and none has to filter first. Passing only the offered ones would
+ * turn a recorded choice naming a switched-off provider into a stale row, and
+ * the poll would then quietly bill the other provider — which is the whole
+ * failure US-026 refuses.
  */
 export function decideProvider(
   platformId: PlatformId,
   registered: readonly ProviderId[],
   usable: readonly ProviderId[],
   choices: ProviderChoices = {},
+  notOffered: Readonly<Partial<Record<ProviderId, string>>> = {},
 ): ProviderDecision {
   const chosen = choices[platformId];
+  const offered = (id: ProviderId) => notOffered[id] === undefined;
 
-  if (chosen && usable.includes(chosen)) {
+  // The whole platform is switched off, so no key and no choice can change the
+  // answer. Read before the choice, because a recorded choice here is a row
+  // from before the switch and not a repair anybody can make.
+  const reasons = [...new Set(registered.filter((id) => !offered(id)).map((id) => notOffered[id]))];
+  if (registered.length > 0 && reasons.length === registered.length) {
+    return { status: "off", reason: reasons.join(" ") };
+  }
+
+  const offeredUsable = usable.filter(offered);
+  const offeredRegistered = registered.filter(offered);
+
+  if (chosen && offeredUsable.includes(chosen)) {
     return { status: "chosen", providerId: chosen, recorded: true };
   }
 
@@ -171,8 +226,18 @@ export function decideProvider(
   // account the person did not pick, at a price they never saw — a lost
   // ScrapeCreators key would move every poll to Bright Data, which charges
   // twenty times as much for the same subreddit page.
+  //
+  // A switched-off provider is one that cannot run, so a choice naming it is
+  // refused the same way. The reason travels, because "connect it" is not the
+  // repair here — choosing another provider is.
   if (chosen && registered.includes(chosen)) {
-    return { status: "unavailable", chosen, available: usable };
+    const reason = notOffered[chosen];
+    return {
+      status: "unavailable",
+      chosen,
+      available: offeredUsable,
+      ...(reason === undefined ? {} : { reason }),
+    };
   }
 
   // A choice naming a provider that does not fetch this platform at all is a
@@ -182,12 +247,19 @@ export function decideProvider(
 
   // One provider that can run is its own answer, and that is the deployment
   // holding a single key: no question is asked.
-  const only = usable[0];
-  if (usable.length === 1 && only) return { status: "chosen", providerId: only, recorded: false };
+  const only = offeredUsable[0];
+  if (offeredUsable.length === 1 && only) {
+    return { status: "chosen", providerId: only, recorded: false };
+  }
 
-  if (usable.length === 0) return { status: "unavailable", chosen: null, available: registered };
+  // `available` lists what is left to connect, so a switched-off provider is
+  // not in it: telling somebody to connect a connector this build will not run
+  // is an instruction that cannot work.
+  if (offeredUsable.length === 0) {
+    return { status: "unavailable", chosen: null, available: offeredRegistered };
+  }
 
-  return { status: "undecided", providers: usable };
+  return { status: "undecided", providers: offeredUsable };
 }
 
 export interface SourceRegistry {
@@ -203,11 +275,21 @@ export interface SourceRegistry {
    *
    * It throws rather than returning undefined, and each throw is a different
    * repair. `UnknownSourceError`: nothing fetches this platform, so the build
-   * has no connector for it. `AmbiguousConnectorError`: two providers can run
-   * it and nobody has chosen. `NoUsableProviderError`: nothing can run it
-   * here, or the recorded choice names a provider that cannot.
+   * has no connector for it. `ConnectorNotOfferedError`: it has one and offers
+   * none of them. `AmbiguousConnectorError`: two providers can run it and
+   * nobody has chosen. `NoUsableProviderError`: nothing can run it here, or the
+   * recorded choice names a provider that cannot — which includes a choice
+   * naming a switched-off provider.
    */
   only(platformId: PlatformId, options?: ChoiceOptions): SocialSource;
+  /**
+   * Why this build offers no connector for a platform, or null when it offers
+   * one. US-053.
+   *
+   * Null also answers for a platform nothing here fetches: that is
+   * `UnknownSourceError`'s question and not this one's.
+   */
+  notOffered(platformId: PlatformId): string | null;
   /** Every connector for a platform, in the order the definitions were given. */
   forPlatform(platformId: PlatformId): readonly SocialSource[];
   /** Every registered platform, in the order the definitions were given. */
@@ -356,7 +438,12 @@ export function createSourceRegistry({
         registered.map((candidate) => candidate.provider.id),
         usable.map((candidate) => candidate.provider.id),
         choices,
+        reasonsByProvider(registered, platformId),
       );
+
+      if (decision.status === "off") {
+        throw new ConnectorNotOfferedError(platformId, decision.reason);
+      }
 
       if (decision.status === "unavailable") {
         throw new NoUsableProviderError(platformId, decision.chosen, decision.available);
@@ -372,6 +459,9 @@ export function createSourceRegistry({
       ) as SocialSource;
     },
     forPlatform,
+    // The same rule the screens and the write paths read, asked of what is
+    // registered here rather than of a list somebody assembled.
+    notOffered: (platformId) => notOfferedReason(forPlatform(platformId), platformId),
     platforms: () => platformIds,
     keys: () => keys,
     list: () => keys.map((key) => connectors.get(keyOf(key)) as SocialSource),

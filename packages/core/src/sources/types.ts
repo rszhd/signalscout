@@ -474,6 +474,35 @@ export interface ConnectorDescriptor {
    */
   readonly linksToComments?: boolean;
   /**
+   * Why this connector is not offered, in one sentence, when it is not.
+   *
+   * Absent means offered, which is every connector by default. A sentence here
+   * takes the pair out of the monitor form, out of the connections screen, out
+   * of every write path and out of `only`, and it is the *only* thing a person
+   * switching a connector off has to write. US-053.
+   *
+   * A sentence rather than a boolean, because the reason reaches a person: a
+   * monitor that names the platform is refused with it, and a poll that skips
+   * the platform records it. "Off" with no reason is a bug report.
+   *
+   * The connector is switched off, not deleted. Its file, its parser, its
+   * fixtures and its tests stay, and the way back is deleting this one field —
+   * which is why the sentence says what would have to change for it to come
+   * back rather than only what is wrong today.
+   *
+   * It is on the *pair* and never on the platform. LinkedIn through SocialCrawl
+   * is dear; LinkedIn through Apify is not, and the platform stays. A platform
+   * whose every connector is switched off disappears from the screens, and a
+   * poll of a monitor already naming it skips it with this sentence rather than
+   * failing the job.
+   *
+   * Two things it does not stop, both deliberate. A collection already bought
+   * is still resumed and read, through `get` and the continuation's own
+   * provider — refusing there would throw away money already spent. And the
+   * connector is still built, still exported and still tested.
+   */
+  readonly notOffered?: string;
+  /**
    * The most billable units one query can consume in one poll, when the caller
    * asks for no limit of its own.
    *

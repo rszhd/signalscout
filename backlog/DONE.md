@@ -2,7 +2,7 @@
 
 # Done
 
-77 finished.
+78 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
@@ -49,6 +49,7 @@
 | US-056 | [LinkedIn is measured at Apify](done/2026-09/US-056-linkedin-is-measured-at-apify.md) | spike | shipped | 2026-09 |
 | US-055 | [LinkedIn is fetched through ScrapeCreators](done/2026-09/US-055-linkedin-is-fetched-through-scrapecreators.md) | feature | dropped | 2026-09 |
 | US-054 | [LinkedIn is measured at the other provider](done/2026-09/US-054-linkedin-is-measured-at-the-other-provider.md) | spike | shipped | 2026-09 |
+| US-053 | [A connector ships without being offered](done/2026-09/US-053-a-connector-ships-without-being-offered.md) | feature | done | 2026-09 |
 | US-051 | [A schedule asks two questions, not one](done/2026-09/US-051-a-schedule-asks-two-questions.md) | feature | shipped | 2026-09 |
 | US-048 | [A deep thread is read in batches and stopped early](done/2026-09/US-048-a-deep-thread-is-read-in-batches-and-stopped-early.md) | feature | shipped | 2026-09 |
 | US-047 | [Every comment link is opened once](done/2026-09/US-047-every-comment-link-is-opened-once.md) | chore | shipped | 2026-09 |

@@ -10,6 +10,7 @@
  * Adding a platform is this file, a migration for `posts.source`, and at least
  * one connector. docs/sources.md holds the list.
  */
+import { isOffered } from "./offering.js";
 import type { ConnectorDescriptor, PlatformDescriptor, ProviderDescriptor } from "./types.js";
 
 export const redditPlatformId = "reddit";
@@ -220,6 +221,7 @@ export const platforms: readonly PlatformDescriptor[] = [
 /** One platform, with every provider a build has for it. */
 export interface PlatformConnectors {
   readonly platform: PlatformDescriptor;
+  /** The providers a person may use. A switched-off one is not among them. */
   readonly providers: readonly ProviderDescriptor[];
 }
 
@@ -231,6 +233,12 @@ export interface PlatformConnectors {
  * connections rows — has to collapse it the same way, or Reddit appears twice
  * on one screen and once on the other. Registration order is kept, so the two
  * screens list platforms and providers in the same order.
+ *
+ * A connector that is not offered is left out here, which is what makes
+ * switching one off cost no screen a branch. US-053. A platform keeps its row
+ * while one of its providers is still offered — LinkedIn survives losing
+ * SocialCrawl because Apify fetches it — and disappears from every screen at
+ * once when the last one goes.
  */
 export function groupByPlatform(connectors: readonly ConnectorDescriptor[]): PlatformConnectors[] {
   const grouped = new Map<
@@ -238,7 +246,7 @@ export function groupByPlatform(connectors: readonly ConnectorDescriptor[]): Pla
     { platform: PlatformDescriptor; providers: ProviderDescriptor[] }
   >();
 
-  for (const connector of connectors) {
+  for (const connector of connectors.filter(isOffered)) {
     const found = grouped.get(connector.platform.id);
 
     if (!found) {

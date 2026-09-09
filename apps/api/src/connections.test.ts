@@ -15,6 +15,7 @@
  */
 import {
   type ConnectorDefinition,
+  clearProviderChoice,
   createDatabase,
   createLogger,
   type Database,
@@ -27,6 +28,7 @@ import {
   readEncryptionKey,
   readSourceCredential,
   type SocialSource,
+  setProviderChoice,
   sourceCredentials,
   sourceProviders,
 } from "@signalscout/core";
@@ -992,6 +994,111 @@ describe("connecting a provider", () => {
    * person to paste a key silently replaced the first, and anybody could
    * delete one and stop every monitor on the instance.
    */
+  describe("a connector this build does not offer", () => {
+    /**
+     * US-053. Switching a connector off is one field, and the connections
+     * screen has to answer for it in two different ways: a platform that lost
+     * one of its providers keeps its row, and a platform that lost all of them
+     * has no row at all.
+     */
+    const reason = "Reddit through ScrapeCreators is switched off: it costs too much here.";
+
+    function redditWithOneOff(): ConnectorDefinition[] {
+      const [brightData] = bothRedditProviders();
+
+      return [
+        brightData as ConnectorDefinition,
+        fakeSourceDefinition({
+          id: "reddit",
+          displayName: "Reddit",
+          providerId: "scrapecreators",
+          providerName: "ScrapeCreators",
+          credentialFields: [{ name: "apiKey", label: "ScrapeCreators API key", secret: true }],
+          notOffered: reason,
+        }),
+      ];
+    }
+
+    it("is not offered as a fetcher, and its platform keeps polling", async () => {
+      const app = await server({
+        sources: redditWithOneOff(),
+        environment: { BRIGHTDATA_API_KEY: goodKey, SCRAPECREATORS_API_KEY: goodKey },
+      });
+
+      try {
+        const body = (await app.inject({ method: "GET", url: "/api/connections" })).json();
+        const reddit = platformIn(body);
+
+        // Two keys held and no question asked: one of the two is switched off,
+        // so there is one answer and asking would be a question with one.
+        expect((reddit.providers as { id: string }[]).map((provider) => provider.id)).toEqual([
+          "brightdata",
+        ]);
+        expect(reddit.needsChoice).toBe(false);
+        expect(reddit.effective).toBe("brightdata");
+        expect(reddit.blocker).toBe(null);
+
+        // And the card is gone with it: a key with nothing to spend it on.
+        expect(body.providers.map((provider: { id: string }) => provider.id)).toEqual([
+          "brightdata",
+        ]);
+      } finally {
+        await app.close();
+      }
+    });
+
+    it("refuses a recorded choice naming it rather than moving the money", async () => {
+      // The row was written before the switch. Falling back to Bright Data
+      // would collect at a price nobody chose, which is US-026's rule.
+      const app = await server({
+        sources: redditWithOneOff(),
+        environment: { BRIGHTDATA_API_KEY: goodKey, SCRAPECREATORS_API_KEY: goodKey },
+      });
+
+      try {
+        await setProviderChoice(db, "reddit", "scrapecreators");
+
+        const reddit = platformIn(
+          (await app.inject({ method: "GET", url: "/api/connections" })).json(),
+        );
+
+        expect(reddit.effective).toBe(null);
+        expect(reddit.chosen).toBe("scrapecreators");
+        expect(reddit.blocker).toContain("no longer offers");
+        expect(reddit.blocker).toContain(reason);
+        expect(reddit.blocker).toContain("Choose Bright Data instead.");
+      } finally {
+        await clearProviderChoice(db, "reddit");
+        await app.close();
+      }
+    });
+
+    it("takes the platform off the screen when every connector for it is off", async () => {
+      const app = await server({
+        sources: [
+          fakeSourceDefinition({
+            id: "reddit",
+            displayName: "Reddit",
+            providerId: "brightdata",
+            providerName: "Bright Data",
+            credentialFields: [{ name: "apiKey", label: "Bright Data API key", secret: true }],
+            notOffered: reason,
+          }),
+        ],
+        environment: { BRIGHTDATA_API_KEY: goodKey },
+      });
+
+      try {
+        const body = (await app.inject({ method: "GET", url: "/api/connections" })).json();
+
+        expect(body.platforms).toEqual([]);
+        expect(body.providers).toEqual([]);
+      } finally {
+        await app.close();
+      }
+    });
+  });
+
   describe("one account's keys and another's", () => {
     const other = "account-2";
 

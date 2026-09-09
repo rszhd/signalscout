@@ -76,6 +76,8 @@ export interface FakeSourceOptions {
   readonly discovery?: readonly ("keyword" | "channel")[];
   /** Whether a comment it returns can be linked to. US-059. */
   readonly linksToComments?: boolean;
+  /** Why this connector is not offered. US-053: the whole switch, in one field. */
+  readonly notOffered?: string;
   readonly credentialFields?: readonly CredentialField[];
   /** Exact credentials that pass. Any non-empty value passes when this is unset. */
   readonly validCredentials?: SourceCredentials;
@@ -151,6 +153,7 @@ export function fakeSourceDefinition(options: FakeSourceOptions = {}): Connector
     ...(options.postsPerUnit === undefined ? {} : { postsPerUnit: options.postsPerUnit }),
     ...(options.discovery === undefined ? {} : { discovery: options.discovery }),
     ...(options.linksToComments === undefined ? {} : { linksToComments: options.linksToComments }),
+    ...(options.notOffered === undefined ? {} : { notOffered: options.notOffered }),
     canFetchReplies: options.replies !== undefined,
     create: (runtime) => createFakeSource(runtime, options),
   };

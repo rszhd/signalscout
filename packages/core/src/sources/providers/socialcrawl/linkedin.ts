@@ -106,6 +106,26 @@ export const socialCrawlLinkedIn: ConnectorDefinition = {
   discovery: ["keyword"],
   /** Two pages, five credits each. */
   maxUnitsPerQueryPoll: maxPagesPerQuery * creditsPerCall,
+  /**
+   * Switched off on 2026-09-09, on the owner's decision. US-053.
+   *
+   * Fifty posts cost $0.2030 here, against $0.10 through Apify and $0.0094
+   * through ScrapeCreators — and US-057 measured the thing that settles it,
+   * which is not the price. Every post Apify returned was under ninety minutes
+   * old; this connector orders by relevance across weeks, and its twenty posts
+   * in `posts` reach back 543 hours. Dearest and stalest is not a trade
+   * anybody makes.
+   *
+   * The decision is about the pair and not about LinkedIn: the platform stays,
+   * fetched by Apify, and every row this connector collected stays readable.
+   * Deleting this field is the way back, and the reason to delete it would be
+   * this provider gaining a date window — that is the one measurement that
+   * would change the answer.
+   */
+  notOffered:
+    "LinkedIn through SocialCrawl is switched off: it is the dearest of the " +
+    "three providers measured and its search is ordered by relevance rather " +
+    "than by date, so it returns posts weeks old. Apify fetches LinkedIn here.",
   create: (runtime) => new SocialCrawlLinkedInSource(runtime),
 };
 

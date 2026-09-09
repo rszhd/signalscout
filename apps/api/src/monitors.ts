@@ -41,6 +41,7 @@ import {
   monitorQueryPlan,
   noFilterDrops,
   notificationIssues,
+  notOfferedReason,
   noVerdicts,
   type ProviderChoices,
   pauseMonitor,
@@ -405,6 +406,30 @@ export interface MonitorRoutesOptions {
   readonly queryGeneratorFor?: (userId: string) => Promise<QueryGenerator | null>;
 }
 
+/**
+ * Why the platforms a body names cannot be watched, or null when they can.
+ *
+ * US-053. The body schema checks the `posts.source` enum, which says what the
+ * database can store and not what this build will collect — so a monitor
+ * naming a switched-off platform passes every shape check, reads as startable,
+ * and then collects nothing at 02:00 with nobody told why. This is the sentence
+ * that refuses it instead.
+ *
+ * Absent `sources` means the body is not changing them, so there is nothing to
+ * refuse: an edit that only moves a threshold must not fail over a platform the
+ * monitor already names.
+ */
+function switchedOffSources(
+  sources: readonly ConnectorDescriptor[],
+  named: readonly string[] | undefined,
+): string | null {
+  const reasons = (named ?? [])
+    .map((id) => notOfferedReason(sources, id))
+    .filter((reason): reason is string => reason !== null);
+
+  return reasons.length === 0 ? null : [...new Set(reasons)].join(" ");
+}
+
 function monitorEnvironment(
   options: MonitorRoutesOptions,
   storedCredentials: ReadonlySet<string>,
@@ -706,10 +731,16 @@ export async function registerMonitorRoutes(
        * the old behaviour, and it is what an older client still gets.
        */
       const wanted = request.body.sources;
+      // A switched-off platform is never written for, whether it was asked for
+      // or the body asked for all of them. Queries for a platform this build
+      // will not poll are model tokens spent on a list nobody can use. US-053.
+      const offered = platforms.filter(
+        (platform) => notOfferedReason(options.sources, platform.id) === null,
+      );
       const wantedPlatforms =
         wanted.length === 0
-          ? platforms
-          : platforms.filter((platform) => wanted.some((id) => id === platform.id));
+          ? offered
+          : offered.filter((platform) => wanted.some((id) => id === platform.id));
 
       const outcome = await generator.generate(request.body, wantedPlatforms);
 
@@ -796,9 +827,12 @@ export async function registerMonitorRoutes(
     url: "/api/monitors",
     schema: {
       body: createBody,
-      response: { 201: monitorSchema },
+      response: { 201: monitorSchema, 422: problemSchema },
     },
     handler: async (request, reply) => {
+      const off = switchedOffSources(options.sources, request.body.sources);
+      if (off) return reply.code(422).send({ message: off });
+
       const runtime = await currentEnvironment(sessionUserId(request));
 
       const { monitor, missing } = await createMonitor(
@@ -849,12 +883,15 @@ export async function registerMonitorRoutes(
     schema: {
       params: z.object({ id: z.uuid() }),
       body: updateBody,
-      response: { 200: monitorSchema, 404: problemSchema },
+      response: { 200: monitorSchema, 404: problemSchema, 422: problemSchema },
     },
     handler: async (request, reply) => {
       if (!(await ownedMonitor(db, request, request.params.id))) {
         return reply.code(404).send({ message: "No monitor has that id." });
       }
+
+      const off = switchedOffSources(options.sources, request.body.sources);
+      if (off) return reply.code(422).send({ message: off });
 
       const monitor = await updateMonitor(db, request.params.id, {
         ...request.body,

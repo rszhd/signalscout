@@ -140,7 +140,7 @@ design more than any framework choice.
 | Reddit read, Bright Data pay-as-you-go | $0.0015 ($1.50 per 1,000 records) |
 | Reddit read, ScrapeCreators | ~$0.00008 to $0.00027, measured |
 | X read, SocialCrawl | $0.008118 per request, and a request brought 20 posts |
-| LinkedIn read, SocialCrawl | $0.04059 per request — five credits — and a request brought 10 posts |
+| LinkedIn read, SocialCrawl | $0.04059 per request — five credits — and a request brought 10 posts. Switched off since US-053; Apify fetches LinkedIn |
 | YouTube read, SocialCrawl | $0.008118 per request, and a request brought 45 videos |
 | YouTube comments, SocialCrawl | $0.008118 per request, and a request brought 51 comments |
 | Reddit read, SocialCrawl | $0.008118 per request, and a request brought 25 posts |
@@ -438,11 +438,30 @@ was needed.
 
 ## LinkedIn
 
-**LinkedIn is reached through SocialCrawl, on the same key as X.** US-028 added
-it on 2026-09-05. There is no elimination story here and none should be
+**LinkedIn is fetched through Apify, and the SocialCrawl connector is switched
+off.** US-057 added the Apify actor on 2026-09-07 and US-053 switched
+SocialCrawl's LinkedIn connector off on 2026-09-09, on the owner's decision.
+Fifty posts cost $0.2030 through SocialCrawl against $0.10 through Apify — and
+the price is not what settled it. Every post Apify returned was under ninety
+minutes old, where SocialCrawl orders by relevance across weeks and its twenty
+stored posts reach back 543 hours. Dearest and stalest is not a trade anybody
+makes.
+
+The decision is about the **pair** and not about the platform. LinkedIn stays,
+the connector is switched off rather than deleted, and its file, parser,
+fixtures and tests are untouched: `ConnectorDescriptor.notOffered` carries one
+sentence and nothing else changed. docs/sources.md, *Switching a connector off*,
+holds the procedure and what happens to what already exists. The way back is
+deleting that field, and the measurement that would justify it is this provider
+gaining a date window.
+
+Everything below describes that connector as it was measured, and it is still
+true of the code. It is history now rather than the shipping path.
+
+**LinkedIn was reached through SocialCrawl, on the same key as X.** US-028
+added it on 2026-09-05. There is no elimination story here and none should be
 claimed: the provider documents `/v1/linkedin/search/posts`, we used it, and
 Bright Data and ScrapeCreators were never asked what they can do with LinkedIn.
-A second provider for this platform is an open question, not a closed one.
 
 **PLAN.md says not to add a third network yet, and this one was added anyway.**
 The rule is that detection quality outranks a new source, and it is not met:

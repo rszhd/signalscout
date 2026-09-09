@@ -161,6 +161,61 @@ describe("the poll step", () => {
     expect(asked("x")[0]?.query.queries).not.toContain("manual qa before every release");
   });
 
+  it("skips a platform this build does not offer, and collects the rest", async () => {
+    /**
+     * US-053. A monitor written before a connector was switched off still names
+     * its platform. The job is not failed over it: a decision somebody made
+     * about a connector is not an error, and failing here would retry four
+     * times and then bury a monitor's other platforms in a dead letter queue.
+     *
+     * The connector is still registered and still built. What it is not is
+     * offered, so nothing new is bought through it.
+     */
+    const registry = createSourceRegistry({
+      definitions: [
+        fakeSourceDefinition({
+          id: "reddit",
+          displayName: "Reddit",
+          providerId: "brightdata",
+          providerName: "Bright Data",
+        }),
+        fakeSourceDefinition({
+          id: "x",
+          displayName: "X",
+          providerId: "socialcrawl",
+          providerName: "SocialCrawl",
+          notOffered: "X through SocialCrawl is switched off: nothing has measured it.",
+        }),
+      ],
+      runtime: createSourceRuntime({ fetch: unreachableFetch, logger: silentLogger }),
+    });
+
+    const monitorId = await insertMonitor(database, {
+      sources: ["reddit", "x"],
+      generatedQueries: { reddit: ["manual qa before every release"], x: ["flaky tests"] },
+      generatedSubreddits: [],
+    });
+
+    await expect(
+      createCollectStep({ registry, credentialsFor: credentials })(
+        { monitorId },
+        contextFor(db, stubBoss()),
+      ),
+    ).resolves.toBeUndefined();
+
+    const switchedOff = registry.get("x", "socialcrawl") as SocialSource & {
+      calls: readonly SearchRequest[];
+    };
+
+    expect(switchedOff.calls).toHaveLength(0);
+    expect((await db.select().from(apiUsage)).map((row) => row.source)).toEqual(["reddit"]);
+
+    // The other platform is collected exactly as before.
+    const stored = await db.select().from(posts);
+    expect(stored).toHaveLength(fakePosts.length);
+    expect(stored.every((post) => post.source === "reddit")).toBe(true);
+  });
+
   it("gives a monitor written before the split the same queries it had", async () => {
     // Migration 0021 keys each row by the platforms its monitor watches, and a
     // monitor naming none keeps its array. Such a row still polls, with

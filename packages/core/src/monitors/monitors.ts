@@ -17,6 +17,7 @@
 import { desc, eq, sql } from "drizzle-orm";
 import type { Database } from "../db/client.js";
 import { monitors, projects, type Signal, type Source } from "../db/schema.js";
+import { offeredConnectors } from "../sources/offering.js";
 import type { ConnectorDescriptor, ProviderChoices } from "../sources/types.js";
 import { type MissingCredential, missingCredentials } from "../worker/credentials.js";
 
@@ -245,7 +246,12 @@ export function startBlockers(
   }: MonitorEnvironment,
 ): MissingCredential[] {
   return sourceIds.flatMap((id) => {
-    const all = descriptors.filter((candidate) => candidate.platform.id === id);
+    // Switched-off connectors are not asked for a key. A platform this build
+    // no longer offers needs nothing connected, and naming its variable here
+    // would send a person to buy an account that cannot be used. US-053: the
+    // refusal for such a monitor comes from `notOfferedReason` at the write
+    // path, which is a different sentence and a different repair.
+    const all = offeredConnectors(descriptors).filter((candidate) => candidate.platform.id === id);
 
     // A recorded choice narrows the question to one provider. Reading the
     // other one's key as an answer here would report a monitor as startable
@@ -297,7 +303,7 @@ export function canFetchRepliesFor(
   const out: Record<string, boolean> = {};
 
   for (const id of sourceIds) {
-    const all = descriptors.filter((candidate) => candidate.platform.id === id);
+    const all = offeredConnectors(descriptors).filter((candidate) => candidate.platform.id === id);
     const chosen = providerChoices[id];
     const connectors = chosen ? all.filter((candidate) => candidate.provider.id === chosen) : all;
     const considered = connectors.length > 0 ? connectors : all;

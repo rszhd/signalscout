@@ -13,6 +13,12 @@ export {
   fakeSourceId,
 } from "./fake/index.js";
 export {
+  isOffered,
+  notOfferedReason,
+  offeredConnectors,
+  reasonsByProvider,
+} from "./offering.js";
+export {
   groupByPlatform,
   instagramPlatform,
   instagramPlatformId,
@@ -69,6 +75,7 @@ export {
   AmbiguousConnectorError,
   type ChoiceOptions,
   type ConnectorKey,
+  ConnectorNotOfferedError,
   type CreateSourceRegistryOptions,
   createSourceRegistry,
   decideProvider,

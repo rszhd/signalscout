@@ -288,6 +288,24 @@ export function createCollectStep({ registry, credentialsFor }: CollectOptions):
 
     for (const sourceId of monitor.sources) {
       /**
+       * A platform this build no longer offers is skipped, not failed.
+       *
+       * US-053. A monitor written before the switch still names it, and the
+       * rest of its platforms are collected exactly as before: a decision
+       * somebody made about a connector is not an error in this job. The reason
+       * is logged because a short poll otherwise reads as a quiet platform.
+       */
+      const notOffered = registry.notOffered(sourceId);
+
+      if (notOffered) {
+        logger.info(
+          { monitorId, sourceId, reason: notOffered },
+          "poll skipped for this source: this build does not offer a connector for it",
+        );
+        continue;
+      }
+
+      /**
        * Which of this platform's providers could run, and with what key.
        *
        * A monitor names a platform and its row records no provider, so the

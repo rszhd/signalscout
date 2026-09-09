@@ -9,9 +9,11 @@
  */
 import {
   builtInSources,
+  type ConnectorDefinition,
   createDatabase,
   createLogger,
   type Database,
+  fakeSourceDefinition,
   type JobSender,
   loadEnv,
   monitors,
@@ -61,13 +63,14 @@ describe("the cost test routes", () => {
   async function withServer<T>(
     jobs: JobSender | null,
     body: (app: Awaited<ReturnType<typeof buildServer>>) => Promise<T>,
+    sources: readonly ConnectorDefinition[] = builtInSources,
   ): Promise<T> {
     const app = await buildServer({
       session: asOwner,
       env: loadEnv({ DATABASE_URL: database.url }),
       logger,
       db,
-      sources: builtInSources,
+      sources,
       environment: { REDDIT_API_KEY: "bd-test-key" },
       queryGenerator: null,
       jobs,
@@ -147,6 +150,41 @@ describe("the cost test routes", () => {
       expect(body.pollIntervalSeconds).toBe(7200);
       expect(body.totals.capMicros).toBe(5_000_000);
     });
+  });
+
+  it("refuses to sample a platform this build does not offer", async () => {
+    /**
+     * US-053. The body's enum is the `posts.source` column, which says what can
+     * be stored and not what will be collected — so without this the cost test
+     * would spend real money at a real provider for a platform no monitor may
+     * name.
+     */
+    const reason = "Reddit through this provider is switched off: it costs too much here.";
+    const { jobs, sendEstimate } = stubJobs();
+
+    await withServer(
+      jobs,
+      async (app) => {
+        const response = await app.inject({
+          method: "POST",
+          url: "/api/monitors/estimates",
+          payload: { ...plan, sources: ["reddit"] },
+        });
+
+        expect(response.statusCode).toBe(400);
+        expect(response.json().message).toBe(reason);
+        expect(sendEstimate).not.toHaveBeenCalled();
+        expect(await db.select().from(queryEstimates)).toEqual([]);
+      },
+      [
+        fakeSourceDefinition({
+          id: "reddit",
+          displayName: "Reddit",
+          providerId: "brightdata",
+          notOffered: reason,
+        }),
+      ],
+    );
   });
 
   it("refuses a plan with nothing in it, before anything is queued", async () => {

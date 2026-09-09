@@ -21,6 +21,7 @@ import {
   maximumQueries,
   maximumSubreddits,
   minimumPollIntervalSeconds,
+  notOfferedReason,
   platforms,
   probesFor,
   readEstimate,
@@ -177,6 +178,18 @@ export async function registerEstimateRoutes(
     },
     handler: async (request, reply) => {
       const { monitorId, queries, subreddits, sources: sourceIds } = request.body;
+
+      // The body's enum is the `posts.source` column, which says what can be
+      // stored and not what this build will collect. A sample of a switched-off
+      // platform is real money at a real provider for a platform no monitor may
+      // name. US-053.
+      const off = sourceIds
+        .map((id) => notOfferedReason(sources, id))
+        .filter((reason): reason is string => reason !== null);
+
+      if (off.length > 0) {
+        return reply.code(400).send({ message: [...new Set(off)].join(" ") });
+      }
 
       const probes = probesFor(sourceIds, queries, subreddits);
 

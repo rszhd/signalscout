@@ -40,6 +40,7 @@ import {
   groupByPlatform,
   type Logger,
   listCredentialHints,
+  offeredConnectors,
   optionalEncryptionKey,
   type PlatformConnectors,
   type Provider,
@@ -47,6 +48,7 @@ import {
   putSourceCredential,
   readProviderChoices,
   readSourceCredential,
+  reasonsByProvider,
   type Source,
   type SourceCredentials,
   setProviderChoice,
@@ -183,10 +185,15 @@ interface ProviderEntry {
   readonly probeWith: ConnectorDefinition;
 }
 
+/**
+ * A switched-off connector is left out, so a card never names a platform its
+ * key cannot be used for. US-053. A provider whose every connector is off
+ * loses its card, which is right: there would be nothing to spend the key on.
+ */
 function providersOf(sources: readonly ConnectorDefinition[]): ProviderEntry[] {
   const entries = new Map<string, { entry: ProviderEntry; platforms: string[] }>();
 
-  for (const source of sources) {
+  for (const source of offeredConnectors(sources)) {
     const found = entries.get(source.provider.id);
 
     if (found) {
@@ -342,10 +349,15 @@ export async function registerConnectionRoutes(
     choices: ProviderChoices,
     connected: ReadonlySet<string>,
   ) {
-    const registered = fetchers.map((provider) => provider.id);
+    // Switched-off providers are registered and not offered, and both facts go
+    // to `decideProvider`: a recorded choice naming one is refused there rather
+    // than replaced by whoever is left. US-053.
+    const notOffered = reasonsByProvider(sources, platform.id);
+    const registered = [...fetchers.map((provider) => provider.id), ...Object.keys(notOffered)];
     const usable = registered.filter((id) => connected.has(id));
-    const decision = decideProvider(platform.id, registered, usable, choices);
-    const name = (id: string) => fetchers.find((provider) => provider.id === id)?.displayName ?? id;
+    const decision = decideProvider(platform.id, registered, usable, choices, notOffered);
+    const name = (id: string) =>
+      sources.find((source) => source.provider.id === id)?.provider.displayName ?? id;
 
     return {
       id: platform.id,
@@ -365,11 +377,19 @@ export async function registerConnectionRoutes(
             ? `${decision.providers.map(name).join(" and ")} can both fetch ` +
               `${platform.displayName}. Choose one: a poll will not pick for you, ` +
               "because picking would spend money at a provider you did not choose."
-            : decision.chosen
-              ? `${platform.displayName} is set to fetch through ${name(decision.chosen)}, ` +
-                "which has no key here. Connect it, or choose another provider."
-              : `No provider is connected for ${platform.displayName}, ` +
-                `so nothing can collect it. Connect ${registered.map(name).join(" or ")}.`,
+            : // A platform with no offered connector never reaches this screen:
+              // `groupByPlatform` leaves it out, so there is no row to put a
+              // sentence on. US-053.
+              decision.status === "off"
+              ? decision.reason
+              : decision.chosen
+                ? `${platform.displayName} is set to fetch through ${name(decision.chosen)}, ` +
+                  (decision.reason
+                    ? `which this build no longer offers. ${decision.reason} ` +
+                      `Choose ${fetchers.map((provider) => provider.displayName).join(" or ")} instead.`
+                    : "which has no key here. Connect it, or choose another provider.")
+                : `No provider is connected for ${platform.displayName}, ` +
+                  `so nothing can collect it. Connect ${decision.available.map(name).join(" or ")}.`,
     };
   }
 

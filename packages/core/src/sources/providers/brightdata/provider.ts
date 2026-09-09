@@ -27,5 +27,6 @@ const credentialFields: readonly CredentialField[] = [
 export const brightDataProvider: ProviderDescriptor = {
   id: brightDataProviderId,
   displayName: "Bright Data",
+  websiteUrl: "https://brightdata.com/",
   credentialFields,
 };

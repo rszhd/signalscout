@@ -55,6 +55,7 @@ export interface CredentialView {
 export interface ProviderView {
   id: string;
   displayName: string;
+  websiteUrl?: string;
   platforms: string[];
   ready: boolean;
   credentials: CredentialView[];
@@ -205,6 +206,19 @@ function ProviderStep({
             ))}
           </select>
         </label>
+
+        {provider?.websiteUrl && (
+          <a
+            className="onboarding-provider-website"
+            href={provider.websiteUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`${provider.displayName} website (opens in a new tab)`}
+          >
+            Visit {provider.displayName} website
+            <span aria-hidden="true">↗</span>
+          </a>
+        )}
 
         {/* What this one key unlocks, in the same words the connections screen uses. */}
         {provider && provider.platforms.length > 0 && (

@@ -32,6 +32,22 @@
   font-size: var(--text-md);
 }
 
+.onboarding-provider-website {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: var(--space-2);
+  text-decoration: none;
+  color: var(--accent-text);
+  font-size: var(--text-sm);
+  font-weight: 500;
+}
+
+.onboarding-provider-website:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 /* An answered step: what it is, and what it was answered with. */
 .onboarding-done {
   display: flex;

@@ -384,6 +384,8 @@ export interface ProviderDescriptor {
   readonly id: ProviderId;
   /** Shown to a person. "Bright Data", not "brightdata". */
   readonly displayName: string;
+  /** The provider's own website, where a person can sign up or buy more. */
+  readonly websiteUrl?: string;
   readonly credentialFields: readonly CredentialField[];
 }
 

@@ -29,5 +29,6 @@ const credentialFields: readonly CredentialField[] = [
 export const socialCrawlProvider: ProviderDescriptor = {
   id: socialCrawlProviderId,
   displayName: "SocialCrawl",
+  websiteUrl: "https://www.socialcrawl.dev/",
   credentialFields,
 };

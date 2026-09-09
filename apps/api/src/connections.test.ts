@@ -19,6 +19,7 @@ import {
   createDatabase,
   createLogger,
   type Database,
+  brightDataReddit,
   fakeSourceDefinition,
   generateEncryptionKey,
   listCredentialHints,
@@ -189,6 +190,18 @@ describe("connecting a provider", () => {
             ],
           },
         ]);
+      } finally {
+        await app.close();
+      }
+    });
+
+    it("carries the provider website from shared provider data", async () => {
+      const app = await server({ sources: [brightDataReddit], environment: {} });
+
+      try {
+        const body = (await app.inject({ method: "GET", url: "/api/connections" })).json();
+
+        expect(body.providers[0]?.websiteUrl).toBe("https://brightdata.com/");
       } finally {
         await app.close();
       }

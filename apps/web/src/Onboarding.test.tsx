@@ -33,9 +33,17 @@ import {
 
 /** One provider, ready or not, as `/api/connections` answers for it. */
 function provider(id: string, displayName: string, ready: boolean) {
+  const websites: Record<string, string> = {
+    brightdata: "https://brightdata.com/",
+    scrapecreators: "https://scrapecreators.com/",
+    socialcrawl: "https://www.socialcrawl.dev/",
+    apify: "https://apify.com/",
+  };
+
   return {
     id,
     displayName,
+    websiteUrl: websites[id],
     platforms: ["Reddit"],
     ready,
     credentials: [
@@ -157,6 +165,36 @@ describe("the setup gate", () => {
 
     expect(select("Data provider").value).toBe("socialcrawl");
     expect(field("API key for SocialCrawl")).toBeTruthy();
+  });
+
+  it("links the selected provider to its website", async () => {
+    await mount(
+      connectionsView({
+        providers: [
+          provider("brightdata", "Bright Data", false),
+          provider("socialcrawl", "SocialCrawl", false),
+          provider("apify", "Apify", false),
+        ],
+      }),
+      modelsView(false),
+    );
+
+    const link = screen.container.querySelector<HTMLAnchorElement>(
+      '[aria-label="SocialCrawl website (opens in a new tab)"]',
+    );
+
+    expect(link?.getAttribute("href")).toBe("https://www.socialcrawl.dev/");
+    expect(link?.target).toBe("_blank");
+    expect(link?.rel).toContain("noopener");
+
+    setValue(select("Data provider"), "apify");
+    await settle();
+
+    const updated = screen.container.querySelector<HTMLAnchorElement>(
+      '[aria-label="Apify website (opens in a new tab)"]',
+    );
+
+    expect(updated?.getAttribute("href")).toBe("https://apify.com/");
   });
 
   it("saves a provider key through the connections route", async () => {

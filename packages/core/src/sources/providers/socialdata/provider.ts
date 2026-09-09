@@ -36,5 +36,6 @@ const credentialFields: readonly CredentialField[] = [
 export const socialDataProvider: ProviderDescriptor = {
   id: socialDataProviderId,
   displayName: "SocialData",
+  websiteUrl: "https://socialdata.tools/",
   credentialFields,
 };

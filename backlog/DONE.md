@@ -2,7 +2,7 @@
 
 # Done
 
-80 finished.
+81 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
@@ -16,6 +16,7 @@
 | BUG-003 | [A post below the threshold is classified again on every poll](done/2026-09/BUG-003-a-post-below-the-threshold-is-classified-again-on-every-poll.md) | bug | fixed | 2026-09 |
 | BUG-002 | [A seven-day window is bought as a month](done/2026-09/BUG-002-a-seven-day-window-is-bought-as-a-month.md) | bug | fixed | 2026-09 |
 | BUG-001 | [A pending Reddit collection is not resumed](done/2026-09/BUG-001-a-pending-reddit-collection-is-not-resumed.md) | bug | shipped | 2026-09 |
+| US-098 | [A provider card links to its website](done/2026-09/US-098-a-provider-card-links-to-its-website.md) | feature | shipped | 2026-09 |
 | US-094 | [An email looks like the product it came from](done/2026-09/US-094-an-email-looks-like-the-product-it-came-from.md) | feature | done | 2026-09 |
 | US-093 | [A match reaches a person without being asked to](done/2026-09/US-093-a-match-reaches-a-person-without-being-asked-to.md) | feature | done | 2026-09 |
 | US-092 | [An address is verified before an account is used](done/2026-09/US-092-an-address-is-verified-before-an-account-is-used.md) | feature | shipped | 2026-09 |

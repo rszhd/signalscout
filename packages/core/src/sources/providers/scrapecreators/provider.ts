@@ -27,5 +27,6 @@ const credentialFields: readonly CredentialField[] = [
 export const scrapeCreatorsProvider: ProviderDescriptor = {
   id: scrapeCreatorsProviderId,
   displayName: "ScrapeCreators",
+  websiteUrl: "https://scrapecreators.com/",
   credentialFields,
 };

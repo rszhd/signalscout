@@ -112,6 +112,7 @@ const fieldSchema = z.object({
 const providerSchema = z.object({
   id: z.string(),
   displayName: z.string(),
+  websiteUrl: z.string().url().optional(),
   /** The platforms this one key unlocks. "Reddit", not "reddit". */
   platforms: z.array(z.string()),
   ready: z.boolean(),
@@ -256,6 +257,7 @@ export async function registerConnectionRoutes(
     return {
       id: descriptor.id,
       displayName: descriptor.displayName,
+      ...(descriptor.websiteUrl ? { websiteUrl: descriptor.websiteUrl } : {}),
       platforms: [...provider.platformNames],
       ready: credentials.every((field) => field.configured),
       credentials,

@@ -47,6 +47,7 @@ interface CredentialView {
 interface ProviderView {
   id: string;
   displayName: string;
+  websiteUrl?: string;
   /** The platforms this one key unlocks: "Reddit". */
   platforms: string[];
   ready: boolean;
@@ -82,13 +83,6 @@ interface Answer {
   tone: "good" | "bad";
   text: string;
 }
-
-// Official account websites. Unknown providers remain plain text.
-const providerWebsites: Record<string, string> = {
-  brightdata: "https://brightdata.com/",
-  scrapecreators: "https://scrapecreators.com/",
-  socialcrawl: "https://www.socialcrawl.dev/",
-};
 
 function ConnectionsHeader() {
   return (
@@ -216,10 +210,10 @@ function ProviderCard({
           </span>
           <span className="connection-identity">
             <strong>
-              {providerWebsites[provider.id] ? (
+              {provider.websiteUrl ? (
                 <a
                   className="connection-website"
-                  href={providerWebsites[provider.id]}
+                  href={provider.websiteUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={`${provider.displayName} website (opens in a new tab)`}

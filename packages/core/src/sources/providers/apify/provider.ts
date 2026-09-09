@@ -35,5 +35,6 @@ const credentialFields: readonly CredentialField[] = [
 export const apifyProvider: ProviderDescriptor = {
   id: apifyProviderId,
   displayName: "Apify",
+  websiteUrl: "https://apify.com/",
   credentialFields,
 };

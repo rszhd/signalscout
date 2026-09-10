@@ -5,8 +5,12 @@
 paywall, no payment provider, and every screen behaves exactly as it did before
 this existed.
 
-The hosted version is $15 USD per month, after seven free days that ask for no
-card. This document says how that works, what it refuses, and what to set up.
+The hosted version is $20 USD per month, after seven free days that ask for no
+card. **Stripe holds that number, not this repository.** The price object
+`STRIPE_PRICE_ID` names is what a card is charged, the billing screen reads it
+per BUG-014, and a figure written here or on the landing page is a copy that
+goes stale in silence. This document says how that works, what it refuses, and
+what to set up.
 
 ---
 

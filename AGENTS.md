@@ -1386,10 +1386,12 @@ old place returns undefined rather than an error — a null renewal date and
 nothing to tell you why. The version is therefore pinned in `stripe.ts` rather
 than left to whatever the account's dashboard says.
 
-**Nothing about this has met a live payment.** The product and the $15 monthly
+**Nothing about this has met a live payment.** The product and its monthly
 price exist in the test account, and no Checkout Session has been completed and
-no card — real or test — has been entered. Read docs/billing.md before changing
-any of it.
+no card — real or test — has been entered. **The price is $20 and it lives in
+Stripe**, not here: this paragraph said $15 until 2026-09-10, which is the day
+the live price was created and BUG-014 found the billing screen quoting the old
+figure. Read docs/billing.md before changing any of it.
 
 **Stripe has now delivered a webhook, to staging, and the signature verified.**
 On 2026-09-08 a test-mode endpoint was created against the SignalScout Cloud

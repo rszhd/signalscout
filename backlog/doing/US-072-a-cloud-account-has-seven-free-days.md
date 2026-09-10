@@ -12,7 +12,9 @@ resolution:
 ## Context
 
 **There is a cloud version, and nothing charges for it.** US-071's landing
-page sells SignalScout Cloud at $15 USD per month. US-066 opened registration.
+page sells SignalScout Cloud at $15 USD per month — the figure this ticket was
+written against. The live price created on 2026-09-10 is **$20**, and BUG-014
+is where the screen stopped stating either one and read Stripe instead. US-066 opened registration.
 US-067 gave each account its own provider keys. So a stranger can register on
 the hosted instance today, and the product runs their monitors on our hosting
 for ever, free.

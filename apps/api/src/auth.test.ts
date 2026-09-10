@@ -153,6 +153,7 @@ describe("the session gate", () => {
         signUpOpen: true,
         signedIn: false,
         account: null,
+        onboarded: false,
         // US-072: this build charges nobody, which is the self-hosted default.
         billingMode: "off",
       });
@@ -175,6 +176,7 @@ describe("the session gate", () => {
         signUpOpen: false,
         signedIn: false,
         account: null,
+        onboarded: false,
         billingMode: "off",
       });
     } finally {
@@ -246,6 +248,7 @@ describe("the session gate", () => {
           signUpOpen: true,
           signedIn: false,
           account: null,
+          onboarded: false,
           billingMode: "off",
         });
 
@@ -258,6 +261,7 @@ describe("the session gate", () => {
           signUpOpen: true,
           signedIn: false,
           account: null,
+          onboarded: false,
           billingMode: "off",
         });
       } finally {
@@ -662,6 +666,8 @@ describe("the session gate", () => {
         // US-069: the sidebar shows this, and only to a request carrying the
         // account's own cookie.
         account: { name: "The owner", email: "owner@example.com" },
+        // US-105: a freshly created account has not set up yet.
+        onboarded: false,
         billingMode: "off",
       });
     } finally {

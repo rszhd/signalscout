@@ -157,6 +157,10 @@ export {
   sessionRefreshAfterSeconds,
 } from "./auth/auth.js";
 export {
+  hasCompletedOnboarding,
+  markOnboardingComplete,
+} from "./auth/onboarding.js";
+export {
   ownerUserId,
   type SignupMode,
   signupModes,

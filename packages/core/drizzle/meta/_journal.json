@@ -400,6 +400,13 @@
       "when": 1789005769545,
       "tag": "0056_a_poll_says_what_it_did",
       "breakpoints": true
+    },
+    {
+      "idx": 57,
+      "version": "7",
+      "when": 1789011569407,
+      "tag": "0057_onboarding_is_recorded_once",
+      "breakpoints": true
     }
   ]
 }

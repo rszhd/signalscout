@@ -24,6 +24,7 @@ import {
   type BillingMode,
   type Database,
   getMonitor,
+  hasCompletedOnboarding,
   type Logger,
   type Monitor,
   type SignupMode,
@@ -314,6 +315,15 @@ export async function registerAuthRoutes(
            * visitor learns nothing about who else uses this instance.
            */
           account: z.object({ name: z.string(), email: z.email() }).nullable(),
+          /**
+           * Whether this account has finished setting up. US-105.
+           *
+           * The setup gate reads it with the key state to decide whether to
+           * show onboarding. An account that completed setup once is never
+           * sent back, however many keys it removes later. False when nobody
+           * is signed in, because there is no account to ask about.
+           */
+          onboarded: z.boolean(),
           /** Whether this instance charges. US-072. */
           billingMode: z.enum(["off", "stripe"]),
         }),
@@ -328,6 +338,7 @@ export async function registerAuthRoutes(
         signUpOpen: firstRun || signup === "open",
         signedIn: user !== null,
         account: user ? { name: user.name, email: user.email } : null,
+        onboarded: user ? await hasCompletedOnboarding(db, user.id) : false,
         billingMode: billing,
       };
     },

@@ -38,6 +38,8 @@ describe("the application screens", () => {
   let billingMode: "off" | "stripe";
   /** Whether this account holds the two keys the setup gate asks for. */
   let setUp: boolean;
+  /** Whether this account has already finished setup. US-105. */
+  let onboarded: boolean;
   /** Whether the two setup reads answer at all. */
   let setupReadable: boolean;
   let billingState: BillingState;
@@ -47,6 +49,7 @@ describe("the application screens", () => {
   beforeEach(() => {
     billingMode = "off";
     setUp = true;
+    onboarded = false;
     setupReadable = true;
     billingState = {
       mode: "stripe",
@@ -71,10 +74,12 @@ describe("the application screens", () => {
           signUpOpen: false,
           signedIn: true,
           account: { name: "The owner", email: "owner@example.com" },
+          onboarded,
           billingMode,
         });
       }
       if (url === "/api/billing") return json(billingState);
+      if (url === "/api/onboarding") return json({ onboarded: true });
       if (url === "/api/monitor-options") return json(options);
       if (url === "/api/monitors") return json([]);
       if (url === "/api/projects") return json({ projects: [] });
@@ -386,6 +391,54 @@ describe("the application screens", () => {
 
       await screen.unmount();
     }
+  });
+
+  /**
+   * Onboarding is for a new account, and only a new one. US-105.
+   *
+   * Removing every key must not send an existing account back here. The keys
+   * are gone and the gate would once have shown; the account is onboarded, so
+   * it is let in, and the forms behind it refuse the missing key with a
+   * reason.
+   */
+  it("does not gate an account that already finished setup, even with no keys", async () => {
+    setUp = false;
+    onboarded = true;
+
+    screen = await mount(<App />, "/projects");
+
+    expect(screen.container.textContent).toContain("Projects");
+    expect(screen.container.textContent).not.toContain("Set up SignalScout");
+  });
+
+  /**
+   * The completion is recorded once both keys are present. US-105.
+   *
+   * The gate's own condition is what decides it, so an account that holds both
+   * keys is marked as set up. The write is what makes the gate stay away after
+   * the keys are removed later.
+   */
+  it("records that setup is finished once both keys are present", async () => {
+    const fetchMock = vi.mocked(globalThis.fetch);
+    screen = await mount(<App />, "/projects");
+    await settle();
+
+    expect(
+      fetchMock.mock.calls.some(
+        ([request, init]) => String(request) === "/api/onboarding" && init?.method === "PUT",
+      ),
+    ).toBe(true);
+  });
+
+  it("does not record setup for an account that already finished it", async () => {
+    onboarded = true;
+    const fetchMock = vi.mocked(globalThis.fetch);
+    screen = await mount(<App />, "/projects");
+    await settle();
+
+    expect(fetchMock.mock.calls.some(([request]) => String(request) === "/api/onboarding")).toBe(
+      false,
+    );
   });
 
   /**

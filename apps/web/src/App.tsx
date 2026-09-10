@@ -85,6 +85,7 @@ function useAuthStatus(): AuthStatus | null {
             signUpOpen: false,
             signedIn: false,
             account: null,
+            onboarded: false,
             billingMode: "off",
           });
         }
@@ -227,7 +228,9 @@ export function App() {
       hasProviderKey(setup.views.connections) && hasModelKey(setup.views.models)
     );
 
-    if (missingKeys) {
+    // An account that already set up is never gated, so it is never "closing"
+    // a gate either. US-105.
+    if (!status?.onboarded && missingKeys) {
       wasGated.current = true;
       return;
     }
@@ -249,7 +252,33 @@ export function App() {
     return () => {
       current = false;
     };
-  }, [setup.answered, setup.views, navigate]);
+  }, [setup.answered, setup.views, status?.onboarded, navigate]);
+
+  /**
+   * Record that setup is finished, once the account holds both keys. US-105.
+   *
+   * The gate's own condition decides this, so there is no second copy of the
+   * rule: whenever both keys are present — stored on the account or in the
+   * instance's environment — the account has set up, and it must not be sent
+   * back here after it removes them.
+   *
+   * The insert is idempotent, so the ref only avoids a request per render. A
+   * failed call is retried on the next load, where `/api/auth-status` still
+   * answers that the account is not onboarded.
+   */
+  const recordedSetup = useRef(false);
+
+  useEffect(() => {
+    if (recordedSetup.current || status?.onboarded) return;
+    if (!setup.views) return;
+    if (!(hasProviderKey(setup.views.connections) && hasModelKey(setup.views.models))) return;
+
+    recordedSetup.current = true;
+    requestJson("/api/onboarding", { method: "PUT" }).catch(() => {
+      // Nothing to say here. The gate is not a boundary, and the next load
+      // asks again.
+    });
+  }, [setup.views, status?.onboarded]);
 
   // Nothing at all until the answer is back. See `useAuthStatus`.
   if (status === null) return null;
@@ -263,16 +292,23 @@ export function App() {
   if (!setup.answered) return null;
 
   /**
-   * The two keys, before the product. US-088.
+   * The two keys, before the product — for an account that has not set up
+   * before. US-088, narrowed by US-105.
    *
    * In place of the whole application rather than as a route inside it, which
    * is how the login above works and for the same reason: a route can be
    * navigated away from, and the first version of this was — a new account
    * stepped around setup in one click and met the missing key later, on the
    * monitor form, as a refusal it could not act on.
+   *
+   * **Only a new account.** An account that completed setup once is let in
+   * even with no key at all, because it is not new and the forms behind this
+   * point already refuse it with a reason. `onboarded` is the record of that;
+   * `App.test.tsx` holds the case.
    */
   if (
     setup.views &&
+    !status.onboarded &&
     !(hasProviderKey(setup.views.connections) && hasModelKey(setup.views.models))
   ) {
     return (

@@ -13,6 +13,13 @@ export interface AuthStatus {
   readonly signedIn: boolean;
   /** Who is asking, or null when nobody is signed in. US-069. */
   readonly account: { readonly name: string; readonly email: string } | null;
+  /**
+   * Whether this account has finished setting up. US-105.
+   *
+   * An account that completed setup once is never sent back to the setup
+   * screen, however many keys it removes later.
+   */
+  readonly onboarded: boolean;
   /** Whether this instance charges for itself. US-072. */
   readonly billingMode: "off" | "stripe";
 }

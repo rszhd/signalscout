@@ -52,6 +52,7 @@ import { registerMatchRoutes } from "./matches.js";
 import { type ModelRoutesOptions, registerModelRoutes } from "./models.js";
 import { registerMonitorRoutes } from "./monitors.js";
 import { registerNotificationRoutes } from "./notifications.js";
+import { registerOnboardingRoutes } from "./onboarding.js";
 import { registerPricingRoutes } from "./pricing.js";
 import { registerProjectRoutes } from "./projects.js";
 
@@ -432,6 +433,10 @@ export async function buildServer({
   });
 
   await registerBillingRoutes(app, { db, logger, settings, billing });
+
+  // The account's setup marker. US-105. Registered here rather than with the
+  // connections screen because it is about the account, not a key.
+  await registerOnboardingRoutes(app, { db });
 
   await registerMatchRoutes(app, { db });
   /**

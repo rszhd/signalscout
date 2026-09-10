@@ -2159,3 +2159,29 @@ export const webhookSecrets = pgTable(
     check("webhook_secrets_hint_masked", sql.raw(`hint LIKE '••••%' AND length(hint) <= 8`)),
   ],
 );
+
+/**
+ * One account has finished setting up. US-105.
+ *
+ * **A row is the fact, and its absence is the only new account there is.** The
+ * setup gate in `App.tsx` shows itself only when this row is missing *and* a
+ * key is missing, so an account that removes its last key is let in rather
+ * than asked to set up again. US-088 derived setup from the keys alone and
+ * rejected a flag; this is that decision reversed, on the owner's request. The
+ * reasoning is in the ticket.
+ *
+ * **Written once and never deleted.** Deleting a key must not delete the row,
+ * or the gate returns — which is the bug this table exists to fix. The write
+ * is `markOnboardingComplete`, an idempotent insert, and the read is
+ * `hasCompletedOnboarding`.
+ *
+ * A text id and no foreign key, for `monitors.user_id`'s reason: a test and a
+ * pre-login instance both name an owner the `users` table has never held, and
+ * the marker is written by that owner's own setup. Deleting an account leaves
+ * the row, which is harmless — the id is never reused.
+ */
+export const userOnboarding = pgTable("user_onboarding", {
+  /** One per account, so the account is the key. */
+  userId: text("user_id").primaryKey(),
+  completedAt: timestamp("completed_at", { withTimezone: true }).notNull().defaultNow(),
+});

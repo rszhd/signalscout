@@ -2,10 +2,11 @@
 
 # Done
 
-93 finished.
+94 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
+| BUG-017 | [A poll pays for pages its own window then discards](done/2026-09/BUG-017-a-poll-pays-for-pages-its-own-window-then-discards.md) | bug | fixed | 2026-09 |
 | BUG-015 | [One post found twice in a poll throws away the whole collection](done/2026-09/BUG-015-one-post-found-twice-in-a-poll-throws-away-the-whole-collection.md) | bug | fixed | 2026-09 |
 | BUG-014 | [The billing screen names a price nobody charges](done/2026-09/BUG-014-the-billing-screen-names-a-price-nobody-charges.md) | bug | fixed | 2026-09 |
 | BUG-012 | [db:generate has not worked since 0038](done/2026-09/BUG-012-db-generate-has-not-worked-since-0038.md) | bug | fixed | 2026-09 |

@@ -1573,6 +1573,37 @@ the **third** live sighting of US-006's failure path.
 Existing monitors were deliberately not migrated, so one stays silent until
 somebody opens its notification screen and saves. Read docs/notifications.md.
 
+**The fixed poll collects, measured live.** On 2026-09-10 the production
+monitor's own plan — five Reddit queries across eight subreddits — was polled
+three times against SocialCrawl: **125 posts returned and 104 stored new**, then
+100 and 95, then 125 and 109. **308 new posts for 14 credits, $0.1137**, where
+the same plan had stored nothing at all. The build is on staging and on
+production, and migration 0058 applied to the production database with a
+collection in flight.
+
+**The walk boundary is proven in both directions.** All three polls carried one
+`walk_id` and wrote **no coverage row**, because the walk was still paging. A
+second probe on a single (query, subreddit) pair finished inside one poll, wrote
+its mark, and the next poll opened a new walk. What the live run cannot
+discriminate is the mark's *value*: those two walks were two seconds apart, so
+the previous walk's start and the last poll's time are the same number there.
+That claim rests on the unit test.
+
+**An empty scoped Reddit search is refunded.** `Brand24 too expensive` inside
+r/SaaS returned nothing and cost **0 credits**, twice. This file already
+recorded that refund for SocialCrawl's *X search* and said the property does not
+travel; on `/v1/reddit/subreddit/search` it does. A page that matches nothing on
+this endpoint is free, and a page that matches is one credit — so the money in
+BUG-017 was paid for pages that *did* match and were then dropped by our own
+window, not for empty answers.
+
+**One thing paused itself and nothing recorded why.** The production monitor was
+found paused with **$1.06 spent of a $5.00 cap**, so the budget guard is not the
+cause, and no poll ran at the minute `paused_at` names. A paused monitor is
+skipped by the scheduler, so it had stopped collecting with nothing on any
+screen saying by whose hand. `poll_runs` would not have caught this either: a
+pause is not a poll.
+
 **Three faults sat between a paid page and a stored post, and all three are
 fixed.** BUG-015, BUG-016 and BUG-017 were found on 2026-09-10 by asking why
 the first monitor on the production instance collected nothing. Each ends the

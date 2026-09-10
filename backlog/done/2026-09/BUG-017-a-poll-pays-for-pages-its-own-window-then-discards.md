@@ -6,7 +6,7 @@ priority: p1
 created: 2026-09-10T10:44+08:00
 parent:
 area: worker
-resolution:
+resolution: fixed
 ---
 
 ## Context
@@ -86,9 +86,9 @@ a wrong guess there drops posts silently where the current code merely pays.
       makes the first one true
 - [x] The window a walk is pinned to survives a worker restart, because it
       lives in `source_continuations` and not in the job
-- [ ] `poll_runs` shows the difference: a walk that used to return zero posts
+- [x] `poll_runs` shows the difference: a walk that used to return zero posts
       for five credits a poll returns posts for the same credits
-- [ ] Measured, not argued: one live run of the production monitor's own plan,
+- [x] Measured, not argued: one live run of the production monitor's own plan,
       with the pages bought and the posts stored both recorded
 
 ## Notes
@@ -156,3 +156,21 @@ a wrong guess there drops posts silently where the current code merely pays.
   **Two boxes stay open and both need a live run.** Nothing has polled a real
   provider through this, so the row that would show the difference is
   unmeasured. The production monitor is the case to run it on.
+- 2026-09-10T14:35+08:00 — Measured live against SocialCrawl, on the
+  production monitor's own plan. Three polls of one walk: **125 posts returned
+  and 104 stored new**, then 100 and 95, then 125 and 109 — **308 new posts for
+  14 credits, $0.1137**. Where the same plan stored nothing.
+
+  The walk boundary is proven both ways. All three polls carried one `walk_id`
+  and wrote **no coverage row**, because the walk was still paging — which is
+  the half that makes the other half true. A second probe on one (query,
+  subreddit) pair finished its walk inside one poll, wrote its coverage mark,
+  and the next poll opened a **new walk id**.
+
+  What the live run does *not* discriminate is the mark's value: the probe's two
+  walks were two seconds apart, so the previous walk's start and the last poll's
+  time are the same number there. That claim rests on the unit test.
+
+  Migration 0058 applied to the production database with a collection in flight
+  and seeded both platforms from `last_polled_at`, so the box about surviving an
+  upgrade is closed by a real upgrade rather than by a test.

@@ -133,3 +133,13 @@ configured` at `error` and nothing sees it. Those reasons belong on the row.
   The last box is open and it is the one that matters: nothing has run live. No
   poll on a real machine has written a row, and the production monitor this
   ticket was written from is still the only evidence that any of it was needed.
+- 2026-09-10T14:35+08:00 — Deployed to staging and then to production, which
+  both run this build with `poll_runs` and `source_coverage` present. Rows have
+  been written by a real poll against a real provider: `collected` with 125
+  returned and 104 new at $0.0406, `page_cap` as the stop reason, and one
+  `walk_id` across three polls of the same collection. So the table answers the
+  question it was written for.
+
+  The last box stays open on one word. Nobody has opened the monitor list on
+  the production instance, so "legible on the screen" is still read from a
+  database rather than from a screen.

@@ -2,7 +2,7 @@
 
 # Open tickets
 
-32 open — 17 doing, 14 todo, 1 parked (12 p1, 16 p2, 4 p3).
+32 open — 17 doing, 14 todo, 1 parked (11 p1, 17 p2, 4 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -16,7 +16,6 @@
 | p1 | US-104 | [A monitor says what its last poll did](doing/US-104-a-monitor-says-what-its-last-poll-did.md) | feature | doing | 2026-09-10T09:51+08:00 |
 | p1 | BUG-004 | [The model half of a poll is not capped](doing/BUG-004-the-model-half-of-a-poll-is-not-capped.md) | bug | doing | 2026-09-06T04:42+08:00 |
 | p1 | BUG-016 | [One platform's outage throws away another platform's collection](doing/BUG-016-one-platforms-outage-throws-away-another-platforms-collection.md) | bug | doing | 2026-09-10T10:44+08:00 |
-| p1 | BUG-017 | [A poll pays for pages its own window then discards](doing/BUG-017-a-poll-pays-for-pages-its-own-window-then-discards.md) | bug | doing | 2026-09-10T10:44+08:00 |
 | p1 | US-033 | [Thirty verdicts say whether the score is right](todo/US-033-thirty-verdicts-say-whether-the-score-is-right.md) | chore | todo | 2026-09-06T03:02+08:00 |
 | p2 | US-015 | [A deleted post stops being shown](doing/US-015-a-deleted-post-stops-being-shown.md) | feature | doing | 2026-09-04T22:49+08:00 |
 | p2 | US-017 | [A self-hosted instance has one account](doing/US-017-a-self-hosted-instance-has-one-account.md) | feature | doing | 2026-09-04T22:49+08:00 |
@@ -24,6 +23,7 @@
 | p2 | US-043 | [A match is kept for something to be done about it](doing/US-043-a-match-is-kept-for-something-to-be-done-about-it.md) | feature | doing | 2026-09-06T12:36+08:00 |
 | p2 | US-049 | [Instagram is the sixth platform](doing/US-049-instagram-is-the-sixth-platform.md) | feature | doing | 2026-09-06T17:05+08:00 |
 | p2 | US-076 | [The address bar says one thing](doing/US-076-the-address-bar-says-one-thing.md) | feature | doing | 2026-09-08T20:10+08:00 |
+| p2 | US-109 | [The monitor list is a table, and a monitor has a page](doing/US-109-the-monitor-list-is-a-table.md) | feature | doing | 2026-09-10T14:12+08:00 |
 | p2 | US-035 | [A monitor is told where people are talking](todo/US-035-a-monitor-is-told-where-people-are-talking.md) | spike | todo | 2026-09-06T11:40+08:00 |
 | p2 | US-036 | [A provider is rated per platform, from measurements](todo/US-036-a-provider-is-rated-per-platform-from-measurements.md) | spike | todo | 2026-09-06T11:48+08:00 |
 | p2 | US-037 | [One subscription is enough](todo/US-037-one-subscription-is-enough.md) | feature | todo | 2026-09-06T11:48+08:00 |

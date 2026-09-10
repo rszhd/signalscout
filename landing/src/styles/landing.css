@@ -936,6 +936,13 @@ footer {
   align-items: center;
   gap: 22px;
 }
+/*
+ * The brand mark is the phone's version of these links. A desktop has room for
+ * the words, so it shows them and never this.
+ */
+.footer-mark {
+  display: none;
+}
 main:has(.closing) + footer {
   border-top: none;
 }
@@ -1051,6 +1058,106 @@ main:has(.closing) + footer {
     margin: 28px 0 16px;
   }
 }
+/*
+ * The phone layout removes what the page says twice, never the only copy of
+ * something. The nav repeats the section order that scrolling already gives;
+ * the label under the hero deck names the six platforms the strip below it
+ * lists; the note and the question mark carry no words at all. So a phone
+ * loses no sentence, and neither does a mobile crawler.
+ */
+@media (max-width: 700px) {
+  .site-header {
+    min-height: 72px;
+  }
+  .site-header nav {
+    display: none;
+  }
+  .question-mark,
+  .floating-note,
+  .illustration-label {
+    display: none;
+  }
+  .signal-scene {
+    padding-top: 16px;
+  }
+  .hero-deck {
+    margin-top: 0;
+  }
+  .found-label {
+    margin-top: 18px;
+  }
+  /* Five faint lines are decoration. Three of them are decoration too. */
+  .overheard span:nth-child(-n + 2) {
+    display: none;
+  }
+  /*
+   * A finger is not a cursor. These links sit at the height of their own text
+   * on a desktop, which is 23px, and a phone needs a target it can hit.
+   */
+  .text-link,
+  .wordmark,
+  a.provider-name {
+    min-height: 44px;
+  }
+  /*
+   * A provider row is a name and the platforms it fetches, held apart by
+   * `space-between`. On a phone the right-hand side is one chip, so the gap
+   * between the two is wide and a different width on every row — and
+   * SocialCrawl, which has five, wraps under its own name and left-aligns
+   * while the rows above it sit hard right. So the platforms take a line of
+   * their own on every row and all five read the same way.
+   *
+   * The AI list keeps its two columns. Its right-hand side is a sentence, not
+   * a chip, so the rows are already even.
+   */
+  .provider-list > li {
+    padding-block: 6px;
+    row-gap: 2px;
+  }
+  .provider-platforms {
+    flex-basis: 100%;
+    gap: 8px 14px;
+  }
+  /*
+   * The footer is a wordmark and three marks. Three *labels* do not fit one
+   * phone row: flex shrank them instead of wrapping them, and `body`'s
+   * `overflow-wrap: anywhere` — right for a URL, wrong for a name — then broke
+   * them inside their own words. Stacking them fixed that and cost 264px of
+   * height. A mark says the same thing in 44px.
+   *
+   * The label stays in the DOM and is only hidden from sight, so each link
+   * keeps its own accessible name and no `aria-label` has to repeat it.
+   */
+  footer {
+    padding-block: 16px;
+  }
+  .footer-links {
+    gap: 4px;
+  }
+  .footer-links .text-link {
+    min-width: 44px;
+    justify-content: center;
+  }
+  .footer-mark {
+    display: inline-flex;
+    align-items: center;
+  }
+  .footer-links .text-link > span:not(.footer-mark),
+  .footer-links .text-link > svg {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+  /* A name must not break mid-word, whatever `overflow-wrap` says. */
+  .wordmark {
+    white-space: nowrap;
+  }
+  .section-space {
+    padding-block: 52px;
+  }
+}
 @media (max-width: 440px) {
   .wrap {
     width: calc(100% - 32px);
@@ -1112,9 +1219,6 @@ main:has(.closing) + footer {
   }
   .plan {
     padding: 24px;
-  }
-  footer {
-    flex-direction: column;
   }
 }
 @media (prefers-reduced-motion: reduce) {

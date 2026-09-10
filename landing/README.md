@@ -54,9 +54,12 @@ Astro documents static deployment at
 
 `src/pages/index.astro` owns the copy, repository links and illustrative inbox.
 The main action opens pricing: Self-hosted is free, and SignalScout Cloud is
-$15 USD per month after a seven-day trial. The trial figure is US-072's, held
-in `trialDays` in `packages/core/src/billing/entitlement.ts`; change the page
-only when that constant changes. The page claims no card is asked for, which
+$20 USD per month after a seven-day trial. **The price is Stripe's**, held in
+the object `STRIPE_PRICE_ID` names, and this page states it because a static
+build cannot read it — so the figure here is a copy, and BUG-014 is what
+happens when a copy is left behind. The trial figure is US-072's, held in
+`trialDays` in `packages/core/src/billing/entitlement.ts`; change the page only
+when that constant changes. The page claims no card is asked for, which
 is true because sign-up writes the trial row itself and creates nothing in
 Stripe until somebody opens Checkout. The FAQ says what running out does:
 monitors stop and writes are refused, while reading and exporting stay open. Both plans bill social data and AI usage separately through
@@ -102,6 +105,15 @@ freelancers, from chasing late payments to looking for a cheaper alternative.
 Every post and score on the page is illustrative. Selecting a conversation
 updates the preview locally. FAQ disclosures use native HTML. The page makes
 no provider requests and collects no visitor data.
+
+The hero's eyebrow reads **RIGHT NOW, IN PUBLIC**, and the pill it sits in
+carries a pulsing green dot. The two are one sentence: the dot means live, so
+the words have to earn it. It said FOR THE THINGS YOU BUILD until 2026-09-10,
+which repeated the headline directly below it and left the dot decorating
+nothing. Keep any replacement **under 24 characters** — past that the pill
+wraps to two lines at 320px — and keep it clear of the two phrases beside it,
+"SOMEWHERE IN THE COMMENTS" on the hero card and "SIX PLACES TO LISTEN" on the
+strip under it.
 
 The hero rotates through those six illustrative posts every 3.5 seconds.
 Pause and Next controls are available. Rotation pauses on hover, keyboard focus,

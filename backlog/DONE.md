@@ -2,7 +2,7 @@
 
 # Done
 
-96 finished.
+97 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
@@ -20,6 +20,7 @@
 | BUG-003 | [A post below the threshold is classified again on every poll](done/2026-09/BUG-003-a-post-below-the-threshold-is-classified-again-on-every-poll.md) | bug | fixed | 2026-09 |
 | BUG-002 | [A seven-day window is bought as a month](done/2026-09/BUG-002-a-seven-day-window-is-bought-as-a-month.md) | bug | fixed | 2026-09 |
 | BUG-001 | [A pending Reddit collection is not resumed](done/2026-09/BUG-001-a-pending-reddit-collection-is-not-resumed.md) | bug | shipped | 2026-09 |
+| US-112 | [The landing page fits a phone](done/2026-09/US-112-the-landing-page-fits-a-phone.md) | feature | shipped | 2026-09 |
 | US-110 | [Constrained pages share one content width](done/2026-09/US-110-constrained-pages-share-one-content-width.md) | chore | shipped | 2026-09 |
 | US-109 | [The monitor list is a table, and a monitor has a page](done/2026-09/US-109-the-monitor-list-is-a-table.md) | feature | shipped | 2026-09 |
 | US-108 | [Setup asks one step at a time](done/2026-09/US-108-setup-asks-one-step-at-a-time.md) | feature | shipped | 2026-09 |

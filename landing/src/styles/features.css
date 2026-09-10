@@ -147,4 +147,20 @@
     flex-basis: 100%;
     min-width: 0;
   }
+  /*
+   * The inbox card is a second reading of the two sections above it: the same
+   * six platforms as the strip under the hero, and the same illustrative match
+   * as the demo. Stacked on a phone they are read one after the other, so the
+   * card keeps its heading and its sentence and drops the repeats. The link it
+   * loses points back up at the demo the reader has just scrolled past.
+   */
+  .feature-inbox .feature-platforms,
+  .feature-inbox .feature-signal,
+  .feature-inbox .feature-note,
+  .feature-inbox > .text-link {
+    display: none;
+  }
+  .feature-inbox > p {
+    margin-bottom: 0;
+  }
 }

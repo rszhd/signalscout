@@ -53,6 +53,7 @@ a {
   width: var(--sidebar-width);
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
   overflow-y: auto;
   padding: var(--space-6) var(--space-4) var(--space-5);
   border-right: 1px solid var(--line);
@@ -61,9 +62,11 @@ a {
 }
 
 .brand {
-  display: inline-flex;
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-3);
+  gap: var(--space-2) var(--space-3);
+  width: 100%;
   padding: 0 var(--space-3);
   color: var(--ink);
   font-size: 1.125rem;
@@ -84,6 +87,7 @@ a {
 }
 
 .trial-badge {
+  flex: 0 0 auto;
   margin-left: auto;
   padding: var(--space-1) var(--space-2);
   border: 1px solid var(--surface-brand);

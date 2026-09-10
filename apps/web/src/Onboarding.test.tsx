@@ -2,10 +2,10 @@
 /**
  * The setup gate, through the DOM. US-088.
  *
- * What this file owns is the page: it asks for both keys, it shows a step that
- * is already answered as answered rather than asking again, and it saves
- * through the two routes Connections and Models already own — so a key the
- * provider refuses is never stored and the sentence a person reads is the
+ * What this file owns is the page: it asks for the two keys one step at a
+ * time, it moves on when a step is answered rather than asking again, and it
+ * saves through the two routes Connections and Models already own — so a key
+ * the provider refuses is never stored and the sentence a person reads is the
  * provider's own.
  *
  * Whether the gate is shown at all is `App.tsx`'s decision and `App.test.tsx`
@@ -25,11 +25,17 @@ import {
   field,
   json,
   mount as mountScreen,
+  radio,
   type Screen,
-  select,
   settle,
   setValue,
 } from "./testing.js";
+
+/** Pick a provider the way a person does: press its row. */
+async function choose(name: string): Promise<void> {
+  await act(async () => radio(`Choose ${name}`).click());
+  await settle();
+}
 
 /** One provider, ready or not, as `/api/connections` answers for it. */
 function provider(id: string, displayName: string, ready: boolean) {
@@ -137,21 +143,74 @@ describe("the setup gate", () => {
     return screen;
   }
 
-  it("asks for both keys on one page", async () => {
+  /**
+   * US-108 reversed US-088 here.
+   *
+   * The two questions are unrelated — one key buys the conversations and the
+   * other reads them, at different companies — so both on one page is one long
+   * form whose second half is noise while the first is being answered.
+   */
+  it("asks the first step and not the second", async () => {
     await mount(connectionsView(), modelsView(false));
 
     expect(screen.container.textContent).toContain("1. Connect a data provider");
+    expect(screen.container.textContent).toContain("Which provider do you have an account with?");
+    expect(screen.container.textContent).toContain("Step 1 of 2");
+
+    expect(screen.container.textContent).not.toContain("2. Add a model key");
+    expect(() => radio("Choose Anthropic")).toThrow();
+  });
+
+  /** The step is the first unanswered one, so a stored key moves the page. */
+  it("moves to the model step when the provider key is saved", async () => {
+    answers.set("PUT /api/connections/apify", () =>
+      json(
+        connectionsView({
+          providers: [
+            provider("brightdata", "Bright Data", false),
+            provider("apify", "Apify", true),
+          ],
+        }),
+      ),
+    );
+
+    const models = modelsView(false);
+    await mount(connectionsView(), models);
+
+    await choose("Apify");
+    setValue(field("API key for Apify"), "apify_key");
+    await act(async () => button("Save the provider key").click());
+
+    // The gate is handed the new view back, the way `App.tsx` hands it back.
+    await screen.unmount();
+    await mount(saved[0]?.connections as ConnectionsView, models);
+
     expect(screen.container.textContent).toContain("2. Add a model key");
-    expect(screen.container.textContent).toContain("0 of 2 done");
-    // Both forms, not one after the other.
-    expect(field("API key for Bright Data")).toBeTruthy();
-    expect(field("Model API key")).toBeTruthy();
+    expect(screen.container.textContent).toContain("Step 2 of 2");
+    expect(() => radio("Choose Apify")).toThrow();
   });
 
-  it("preselects SocialCrawl when this build registers it", async () => {
-    // One SocialCrawl key unlocks every platform fetched through it, so a new
-    // account is pointed at it first. Registration order is the fallback, not
-    // the rule — the fallback is asserted above, where no SocialCrawl exists.
+  /** An account that arrives half done starts where it left off. */
+  it("starts on the model step when a provider key is already there", async () => {
+    await mount(
+      connectionsView({ providers: [provider("brightdata", "Bright Data", true)] }),
+      modelsView(false),
+    );
+
+    expect(screen.container.textContent).toContain("2. Add a model key");
+    expect(screen.container.textContent).not.toContain("1. Connect a data provider");
+  });
+
+  /**
+   * US-107 reversed US-088 here.
+   *
+   * A select must carry a value, so the value it started on was a guess about
+   * which account the person holds — and a guess that looks like an answer is
+   * how a Bright Data key is pasted into a field labelled for SocialCrawl. The
+   * provider then refuses it as a wrong key, which says nothing about the real
+   * mistake.
+   */
+  it("preselects no data provider, and asks for no key until one is picked", async () => {
     await mount(
       connectionsView({
         providers: [
@@ -163,11 +222,68 @@ describe("the setup gate", () => {
       modelsView(false),
     );
 
-    expect(select("Data provider").value).toBe("socialcrawl");
+    for (const name of ["Bright Data", "SocialCrawl", "Apify"]) {
+      expect(radio(`Choose ${name}`).checked).toBe(false);
+    }
+    expect(() => field("API key for SocialCrawl")).toThrow();
+    expect(button("Save the provider key").disabled).toBe(true);
+
+    await choose("SocialCrawl");
+
     expect(field("API key for SocialCrawl")).toBeTruthy();
+    expect(button("Save the provider key").disabled).toBe(false);
   });
 
-  it("links the selected provider to its website", async () => {
+  it("preselects no model provider, and asks for no key until one is picked", async () => {
+    await mount(
+      connectionsView({ providers: [provider("brightdata", "Bright Data", true)] }),
+      modelsView(false),
+    );
+
+    expect(radio("Choose Anthropic").checked).toBe(false);
+    expect(radio("Choose OpenAI").checked).toBe(false);
+    expect(() => field("Model API key")).toThrow();
+    expect(button("Save the model key").disabled).toBe(true);
+
+    await choose("Anthropic");
+
+    expect(field("Model API key")).toBeTruthy();
+    expect(field("Key name").value).toBe("Anthropic key");
+    expect(field("Model to test with").value).toBe("claude-sonnet-5");
+  });
+
+  /**
+   * What was typed belonged to the provider before it, and a key sent to the
+   * wrong provider is refused as a wrong key.
+   */
+  it("clears what was typed when the choice changes", async () => {
+    await mount(connectionsView(), modelsView(false));
+
+    await choose("Bright Data");
+    setValue(field("API key for Bright Data"), "brightdata_key");
+    await choose("Apify");
+
+    expect(field("API key for Apify").value).toBe("");
+  });
+
+  /** The platforms one key unlocks, before the key is pasted. */
+  it("says what a provider fetches on its own row", async () => {
+    await mount(
+      connectionsView({
+        providers: [
+          { ...provider("socialcrawl", "SocialCrawl", false), platforms: ["Reddit", "X"] },
+        ],
+      }),
+      modelsView(false),
+    );
+
+    const row = radio("Choose SocialCrawl").closest("label");
+
+    expect(row?.textContent).toContain("Reddit");
+    expect(row?.textContent).toContain("X");
+  });
+
+  it("links the chosen provider to its website", async () => {
     await mount(
       connectionsView({
         providers: [
@@ -178,6 +294,8 @@ describe("the setup gate", () => {
       }),
       modelsView(false),
     );
+
+    await choose("SocialCrawl");
 
     const link = screen.container.querySelector<HTMLAnchorElement>(
       '[aria-label="SocialCrawl website (opens in a new tab)"]',
@@ -187,8 +305,7 @@ describe("the setup gate", () => {
     expect(link?.target).toBe("_blank");
     expect(link?.rel).toContain("noopener");
 
-    setValue(select("Data provider"), "apify");
-    await settle();
+    await choose("Apify");
 
     const updated = screen.container.querySelector<HTMLAnchorElement>(
       '[aria-label="Apify website (opens in a new tab)"]',
@@ -213,8 +330,7 @@ describe("the setup gate", () => {
 
     await mount(connectionsView(), modelsView(false));
 
-    setValue(select("Data provider"), "apify");
-    await settle();
+    await choose("Apify");
     setValue(field("API key for Apify"), "apify_key");
     await act(async () => button("Save the provider key").click());
 
@@ -234,6 +350,7 @@ describe("the setup gate", () => {
 
     await mount(connectionsView(), modelsView(false));
 
+    await choose("Bright Data");
     setValue(field("API key for Bright Data"), "wrong");
     await act(async () => button("Save the provider key").click());
 
@@ -253,10 +370,12 @@ describe("the setup gate", () => {
       ),
     );
 
-    await mount(connectionsView(), modelsView(false));
+    await mount(
+      connectionsView({ providers: [provider("brightdata", "Bright Data", true)] }),
+      modelsView(false),
+    );
 
-    setValue(select("Model provider"), "openai");
-    await settle();
+    await choose("OpenAI");
     setValue(field("Model API key"), "sk-test");
     await act(async () => button("Save the model key").click());
 
@@ -268,17 +387,21 @@ describe("the setup gate", () => {
     expect(hasModelKey(saved[0]?.models as ModelsView)).toBe(true);
   });
 
-  it("shows an answered step as answered rather than asking again", async () => {
+  /** The last screen is a confirmation: both answers, and the way in. */
+  it("shows both answers once both keys are in", async () => {
     await mount(
       connectionsView({ providers: [provider("brightdata", "Bright Data", true)] }),
-      modelsView(false),
+      modelsView(true, {
+        keys: [
+          { id: "k1", name: "OpenAI key", provider: "openai", hint: "••••2410", isDefault: true },
+        ],
+      }),
     );
 
     expect(screen.container.textContent).toContain("Bright Data is connected");
-    expect(screen.container.textContent).toContain("1 of 2 done");
-    expect(() => field("API key for Bright Data")).toThrow();
-    // The step that is still missing is still asked for.
-    expect(field("Model API key")).toBeTruthy();
+    expect(screen.container.textContent).toContain("OpenAI key is ready");
+    expect(screen.container.textContent).toContain("Setup complete");
+    expect(button("Start using SignalScout")).toBeTruthy();
   });
 
   it("asks for neither key where nothing can be stored", async () => {
@@ -291,8 +414,7 @@ describe("the setup gate", () => {
     );
 
     expect(screen.container.textContent).toContain("Set ENCRYPTION_KEY");
-    expect(() => field("API key for Bright Data")).toThrow();
-    expect(() => field("Model API key")).toThrow();
+    expect(() => radio("Choose Bright Data")).toThrow();
   });
 
   it("offers the way in only once both keys are there", async () => {

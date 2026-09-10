@@ -36,7 +36,6 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  margin-top: var(--space-2);
   text-decoration: none;
   color: var(--accent-text);
   font-size: var(--text-sm);
@@ -46,6 +45,12 @@
 .onboarding-provider-website:hover {
   text-decoration: underline;
   text-underline-offset: 3px;
+}
+
+/* Both answers on the last screen, which is a confirmation and not a step. */
+.onboarding-answers {
+  display: grid;
+  gap: var(--space-3);
 }
 
 /* An answered step: what it is, and what it was answered with. */
@@ -81,8 +86,124 @@
   padding-top: var(--space-6);
 }
 
+/*
+  Choosing a provider. US-107.
+
+  Nothing is preselected, so the list has to be the question rather than a
+  control that already carries an answer. The rows are the shape the
+  connections screen picks a provider with, and they carry the brand mark and
+  the platforms one key unlocks — which is what a person needs in order to
+  choose at all.
+*/
+.onboarding-choice {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.onboarding-choice legend {
+  padding: 0;
+  margin-bottom: var(--space-4);
+  font-size: var(--text-label);
+  font-weight: 500;
+}
+.onboarding-page .provider-option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  cursor: pointer;
+}
+.onboarding-page .provider-option:hover {
+  border-color: var(--line-dark);
+  background: var(--surface-hover);
+}
+.onboarding-page .provider-option:has(input:focus-visible) {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+.onboarding-page .provider-option:has(input:checked) {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.onboarding-page .provider-option input {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  accent-color: var(--accent);
+}
+.onboarding-page .provider-option .brand-icon {
+  flex-shrink: 0;
+}
+.onboarding-page .provider-option > span {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+}
+.onboarding-page .provider-option strong {
+  font-weight: 500;
+}
+.onboarding-page .provider-option small,
+.onboarding-page .provider-option .connection-platforms {
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+.onboarding-choice[disabled] .provider-option {
+  cursor: default;
+  opacity: 0.6;
+}
+
+/* The chosen provider's own fields, in a panel that says whose they are. */
+.onboarding-key {
+  margin-top: var(--space-6);
+  padding: var(--space-5);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface-soft);
+}
+.onboarding-key-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+.onboarding-key .field-stack {
+  gap: var(--space-5);
+}
+.onboarding-page .setup-actions {
+  align-items: center;
+  justify-content: flex-start;
+}
+.onboarding-waiting {
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+
+/*
+  The shared rail turns horizontal below 1100px and lays out the monitor
+  form's five steps. This page has two.
+*/
+@media (max-width: 1100px) {
+  .onboarding-page .setup-progress ol {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 760px) {
   .onboarding-brand {
     gap: var(--space-3);
+  }
+  .onboarding-page .provider-option {
+    align-items: flex-start;
+    padding: var(--space-4);
+  }
+  .onboarding-key {
+    padding: var(--space-4);
   }
 }

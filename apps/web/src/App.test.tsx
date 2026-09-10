@@ -13,7 +13,7 @@ import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { App } from "./App.js";
 import type { BillingState } from "./Billing.js";
-import { button, field, json, mount, type Screen, settle, setValue } from "./testing.js";
+import { button, field, json, mount, radio, type Screen, settle, setValue } from "./testing.js";
 
 const options = {
   signals: [{ id: "problem", label: "Describing the problem", hint: "Clear pain" }],
@@ -610,10 +610,15 @@ describe("the application screens", () => {
    * answers the two saves with the ready views, which is what closes the gate.
    */
   async function finishSetup() {
+    // Neither step preselects a provider since US-107, so each is picked first.
+    await act(async () => radio("Choose Bright Data").click());
+    await settle();
     setValue(field("API key for Bright Data"), "bd_key");
     await act(async () => button("Save the provider key").click());
     await settle();
 
+    await act(async () => radio("Choose Anthropic").click());
+    await settle();
     setValue(field("Model API key"), "sk-ant-test");
     await act(async () => button("Save the model key").click());
     await settle();

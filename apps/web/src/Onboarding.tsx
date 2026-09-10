@@ -26,6 +26,12 @@ import { BrandLogo } from "./BrandLogo.js";
  * screen that owns it, and those screens are in the sidebar on the other side
  * of this one.
  *
+ * **It asks one at a time.** US-108 reversed US-088's decision to put both
+ * forms on one page. The two questions are unrelated — one key buys the
+ * conversations and the other reads them, at different companies with
+ * different websites — so read together they are one long form whose second
+ * half is noise while the first is being answered.
+ *
  * **It stores nothing of its own.** The two saves are the routes Connections
  * and Models already use, so a key is tested with the provider before it is
  * stored and a refusal is the provider's own sentence, here as there. The
@@ -119,6 +125,80 @@ export function hasModelKey(view: ModelsView): boolean {
   return view.tasks.find((task) => task.task === "classify")?.fallback.hasKey === true;
 }
 
+/**
+ * One provider, picked rather than defaulted. US-107.
+ *
+ * A `<select>` must carry a value, so every value it could start on is a guess
+ * about which account the person holds — and the first field of the first
+ * screen reading as decided is how a Bright Data key gets pasted into a field
+ * labelled for SocialCrawl. The refusal that follows is the provider's own
+ * sentence about a wrong key, which says nothing about the real mistake.
+ *
+ * So this is a radio list, and it starts on nothing. It is the shape the
+ * connections screen already picks a provider with, and it carries what a
+ * select cannot: the brand mark, and the platforms one key unlocks. That last
+ * line is the grounds for the decision, so it belongs beside the name rather
+ * than under the control.
+ */
+interface ChoiceOption {
+  id: string;
+  name: string;
+  /** The platforms this one key unlocks, where the choice is a data provider. */
+  platforms?: string[];
+  /** One line under the name, where there are no platforms to show. */
+  detail?: string;
+}
+
+function ProviderChoice({
+  chosen,
+  disabled,
+  group,
+  legend,
+  options,
+  onChoose,
+}: {
+  chosen: string;
+  disabled: boolean;
+  /** The radio group's name. Two choices on one page must not share one. */
+  group: string;
+  legend: string;
+  options: ChoiceOption[];
+  onChoose: (id: string) => void;
+}) {
+  return (
+    <fieldset className="onboarding-choice" disabled={disabled}>
+      <legend>{legend}</legend>
+      {options.map((option) => (
+        <label className="provider-option" key={option.id}>
+          <input
+            aria-label={`Choose ${option.name}`}
+            checked={chosen === option.id}
+            name={group}
+            type="radio"
+            onChange={() => onChoose(option.id)}
+          />
+          <BrandIcon brand={option.id} size={26} />
+          <span>
+            <strong>{option.name}</strong>
+            {option.platforms && option.platforms.length > 0 ? (
+              <span className="connection-platforms">
+                {option.platforms.map((platform) => (
+                  <span className="brand-label" key={platform}>
+                    <BrandIcon brand={platform} size={16} />
+                    {platform}
+                  </span>
+                ))}
+              </span>
+            ) : (
+              option.detail && <small>{option.detail}</small>
+            )}
+          </span>
+        </label>
+      ))}
+    </fieldset>
+  );
+}
+
 /** Paste one provider key. The connections route tests it before storing it. */
 function ProviderStep({
   providers,
@@ -128,19 +208,13 @@ function ProviderStep({
   onSaved: (view: ConnectionsView) => void;
 }) {
   /**
-   * SocialCrawl by default when this build registers it, and the first
-   * provider otherwise.
+   * Nothing is chosen until a person chooses. US-107 reversed US-088 here.
    *
-   * A select needs a value, and the value is a guess about who the person has.
-   * SocialCrawl is the one key that unlocks every platform this product fetches
-   * through it — X, LinkedIn, YouTube, TikTok, Instagram and Reddit — so a new
-   * account that pastes one key gets the whole product. Registration order is
-   * the fallback, not the rule: the first registered provider is an artefact
-   * of how the connectors were added, not a recommendation.
+   * SocialCrawl unlocking every platform this product fetches through it is
+   * still true, and it is now said on that provider's own card instead of
+   * being decided on the person's behalf.
    */
-  const defaultProviderId =
-    providers.find((one) => one.id === "socialcrawl")?.id ?? providers[0]?.id ?? "";
-  const [chosen, setChosen] = useState(defaultProviderId);
+  const [chosen, setChosen] = useState("");
   const [typed, setTyped] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -184,80 +258,73 @@ function ProviderStep({
 
   return (
     <form onSubmit={save} aria-busy={busy}>
-      <div className="field-stack">
-        <label className="field">
-          <span>Provider</span>
-          <small>One account can fetch several platforms. Connect the one you have.</small>
-          <select
-            aria-label="Data provider"
-            className="form-control"
-            disabled={busy}
-            value={chosen}
-            onChange={(event) => {
-              setChosen(event.target.value);
-              setTyped({});
-              setError(null);
-            }}
-          >
-            {providers.map((one) => (
-              <option key={one.id} value={one.id}>
-                {one.displayName}
-              </option>
+      <ProviderChoice
+        chosen={chosen}
+        disabled={busy}
+        group="onboarding-data-provider"
+        legend="Which provider do you have an account with?"
+        options={providers.map((one) => ({
+          id: one.id,
+          name: one.displayName,
+          platforms: one.platforms,
+        }))}
+        onChoose={(id) => {
+          setChosen(id);
+          // What was typed belonged to the provider before it, and a key sent
+          // to the wrong provider is refused as a wrong key.
+          setTyped({});
+          setError(null);
+        }}
+      />
+
+      {provider && (
+        <div className="onboarding-key">
+          <div className="onboarding-key-head">
+            <strong>{provider.displayName}</strong>
+            {provider.websiteUrl && (
+              <a
+                className="onboarding-provider-website"
+                href={provider.websiteUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`${provider.displayName} website (opens in a new tab)`}
+              >
+                Get a key from {provider.displayName}
+                <span aria-hidden="true">↗</span>
+              </a>
+            )}
+          </div>
+
+          <div className="field-stack">
+            {provider.credentials.map((credential) => (
+              <label className="field" key={credential.name}>
+                <span>{credential.label}</span>
+                <small>
+                  Or set <code>{credential.environmentVariable}</code> in this instance's
+                  environment and restart.
+                </small>
+                <input
+                  aria-label={`${credential.label} for ${provider.displayName}`}
+                  autoComplete="off"
+                  disabled={busy}
+                  placeholder="Paste the key"
+                  required
+                  spellCheck={false}
+                  // The browser must not offer this back on another screen, and
+                  // a key on a shared screen must not be readable over a
+                  // shoulder.
+                  type="password"
+                  value={typed[credential.name] ?? ""}
+                  onChange={(event) => {
+                    setError(null);
+                    setTyped((current) => ({ ...current, [credential.name]: event.target.value }));
+                  }}
+                />
+              </label>
             ))}
-          </select>
-        </label>
-
-        {provider?.websiteUrl && (
-          <a
-            className="onboarding-provider-website"
-            href={provider.websiteUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={`${provider.displayName} website (opens in a new tab)`}
-          >
-            Visit {provider.displayName} website
-            <span aria-hidden="true">↗</span>
-          </a>
-        )}
-
-        {/* What this one key unlocks, in the same words the connections screen uses. */}
-        {provider && provider.platforms.length > 0 && (
-          <p className="connection-platforms">
-            {provider.platforms.map((platform) => (
-              <span className="brand-label" key={platform}>
-                <BrandIcon brand={platform} size={16} />
-                {platform}
-              </span>
-            ))}
-          </p>
-        )}
-
-        {provider?.credentials.map((credential) => (
-          <label className="field" key={credential.name}>
-            <span>{credential.label}</span>
-            <small>
-              Or set <code>{credential.environmentVariable}</code> in this instance's environment
-              and restart.
-            </small>
-            <input
-              aria-label={`${credential.label} for ${provider.displayName}`}
-              autoComplete="off"
-              disabled={busy}
-              placeholder="Paste the key"
-              required
-              spellCheck={false}
-              // The browser must not offer this back on another screen, and a
-              // key on a shared screen must not be readable over a shoulder.
-              type="password"
-              value={typed[credential.name] ?? ""}
-              onChange={(event) => {
-                setError(null);
-                setTyped((current) => ({ ...current, [credential.name]: event.target.value }));
-              }}
-            />
-          </label>
-        ))}
-      </div>
+          </div>
+        </div>
+      )}
 
       {error && (
         <p className="form-error" role="alert">
@@ -269,6 +336,9 @@ function ProviderStep({
         <button className="primary-button" disabled={busy || !provider} type="submit">
           {busy ? "Testing the key…" : "Save the provider key"}
         </button>
+        {!provider && (
+          <small className="onboarding-waiting">Choose a provider to paste a key.</small>
+        )}
       </div>
     </form>
   );
@@ -288,8 +358,6 @@ function ModelStep({
   instance: { provider: string; model: string | null };
   onSaved: (view: ModelsView) => void;
 }) {
-  const first = providers.includes(instance.provider) ? instance.provider : (providers[0] ?? "");
-
   /**
    * What a key on this provider is tested against.
    *
@@ -303,15 +371,18 @@ function ModelStep({
     [testModels, instance],
   );
 
-  const [provider, setProvider] = useState(first);
-  const [name, setName] = useState(`${providerName(first)} key`);
+  /** Nothing is chosen until a person chooses. US-107, as on the step above. */
+  const [provider, setProvider] = useState("");
+  const [name, setName] = useState("");
   const [apiKey, setApiKey] = useState("");
-  const [model, setModel] = useState(suggestedModel(first));
+  const [model, setModel] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function save(event: FormEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault();
+    if (!provider) return;
+
     setBusy(true);
     setError(null);
 
@@ -332,84 +403,89 @@ function ModelStep({
 
   return (
     <form onSubmit={save} aria-busy={busy}>
-      <div className="field-stack">
-        <label className="field">
-          <span>Provider</span>
-          <select
-            aria-label="Model provider"
-            className="form-control"
-            disabled={busy}
-            value={provider}
-            onChange={(event) => {
-              const one = event.target.value;
+      <ProviderChoice
+        chosen={provider}
+        disabled={busy}
+        group="onboarding-model-provider"
+        legend="Which model provider do you have a key for?"
+        options={providers.map((one) => ({
+          id: one,
+          name: providerName(one),
+          detail: suggestedModel(one)
+            ? `Tested with ${suggestedModel(one)}.`
+            : "You name the model to test with.",
+        }))}
+        onChoose={(one) => {
+          // The name, the key and the test model all belong to the provider. A
+          // model named for OpenAI is not a name Anthropic answers to, and
+          // leaving either would test the wrong pairing.
+          setProvider(one);
+          setName(`${providerName(one)} key`);
+          setApiKey("");
+          setModel(suggestedModel(one));
+          setError(null);
+        }}
+      />
 
-              // The name and the test model both belong to the provider. A
-              // model named for OpenAI is not a name Anthropic answers to, and
-              // leaving it would test the wrong pairing.
-              setProvider(one);
-              setName(`${providerName(one)} key`);
-              setModel(suggestedModel(one));
-              setError(null);
-            }}
-          >
-            {providers.map((one) => (
-              <option key={one} value={one}>
-                {providerName(one)}
-              </option>
-            ))}
-          </select>
-        </label>
+      {provider && (
+        <div className="onboarding-key">
+          <div className="onboarding-key-head">
+            <strong>{providerName(provider)}</strong>
+          </div>
 
-        <label className="field">
-          <span>Name</span>
-          <small>What this key is called in your account. You can add more later.</small>
-          <input
-            aria-label="Key name"
-            className="form-control"
-            disabled={busy}
-            required
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-          />
-        </label>
+          <div className="field-stack">
+            <label className="field">
+              <span>Name</span>
+              <small>What this key is called in your account. You can add more later.</small>
+              <input
+                aria-label="Key name"
+                className="form-control"
+                disabled={busy}
+                required
+                value={name}
+                onChange={(event) => setName(event.target.value)}
+              />
+            </label>
 
-        <label className="field">
-          <span>Key</span>
-          <input
-            aria-label="Model API key"
-            autoComplete="off"
-            className="form-control"
-            disabled={busy}
-            placeholder="Pasted once, stored encrypted"
-            required
-            spellCheck={false}
-            type="password"
-            value={apiKey}
-            onChange={(event) => {
-              setError(null);
-              setApiKey(event.target.value);
-            }}
-          />
-        </label>
+            <label className="field">
+              <span>Key</span>
+              <input
+                aria-label="Model API key"
+                autoComplete="off"
+                className="form-control"
+                disabled={busy}
+                placeholder="Pasted once, stored encrypted"
+                required
+                spellCheck={false}
+                type="password"
+                value={apiKey}
+                onChange={(event) => {
+                  setError(null);
+                  setApiKey(event.target.value);
+                }}
+              />
+            </label>
 
-        <label className="field">
-          <span>Model to test with</span>
-          <small>
-            One short call proves the key before it is stored. The model is not kept — each job
-            picks its own.
-          </small>
-          <input
-            aria-label="Model to test with"
-            className="form-control"
-            disabled={busy}
-            placeholder="Name a model this provider serves"
-            required
-            spellCheck={false}
-            value={model}
-            onChange={(event) => setModel(event.target.value)}
-          />
-        </label>
-      </div>
+            <label className="field">
+              <span>Model to test with</span>
+              <small>
+                One short call proves the key before it is stored. The model is not kept — each job
+                picks its own.
+              </small>
+              <input
+                aria-label="Model to test with"
+                className="form-control"
+                disabled={busy}
+                placeholder="Name a model this provider serves"
+                required
+                spellCheck={false}
+                value={model}
+                onChange={(event) => setModel(event.target.value)}
+              />
+            </label>
+          </div>
+        </div>
+      )}
 
       {error && (
         <p className="form-error" role="alert">
@@ -421,6 +497,9 @@ function ModelStep({
         <button className="primary-button" disabled={busy || !provider} type="submit">
           {busy ? "Testing the key…" : "Save the model key"}
         </button>
+        {!provider && (
+          <small className="onboarding-waiting">Choose a provider to paste a key.</small>
+        )}
       </div>
     </form>
   );
@@ -472,6 +551,21 @@ export function Onboarding({
   ];
 
   /**
+   * Which step the page is on. US-108.
+   *
+   * The first unanswered one, derived from the same two answers the gate
+   * itself is derived from. There is no stored step and no cursor to move:
+   * a step is answered by a key the provider accepted and this instance
+   * stored, so nothing can put the page and the keys out of step.
+   *
+   * There is no way back for the same reason. Changing a stored key means
+   * changing or removing it, which is the connections screen's work and not
+   * this page's.
+   */
+  const step = !providerDone ? "provider" : !modelDone ? "model" : "ready";
+  const stepNumber = steps.findIndex((one) => one.id === step) + 1;
+
+  /**
    * Signing out is the only way off this page, and it has to be here.
    *
    * Without it somebody signed in to the wrong account on a shared machine is
@@ -507,19 +601,17 @@ export function Onboarding({
       <div className="setup-layout">
         <aside className="setup-progress" aria-label="Setup progress">
           <p className="setup-progress-label">
-            {providerDone && modelDone
-              ? "Setup complete"
-              : `${steps.filter((step) => step.done).length} of ${steps.length} done`}
+            {step === "ready" ? "Setup complete" : `Step ${stepNumber} of ${steps.length}`}
           </p>
           <ol>
-            {steps.map((step, index) => (
+            {steps.map((one, index) => (
               <li
-                aria-current={!step.done ? "step" : undefined}
-                className={step.done ? "complete" : ""}
-                key={step.id}
+                aria-current={one.id === step ? "step" : undefined}
+                className={one.done ? "complete" : ""}
+                key={one.id}
               >
-                <span aria-hidden="true">{step.done ? "✓" : index + 1}</span>
-                <span>{step.label}</span>
+                <span aria-hidden="true">{one.done ? "✓" : index + 1}</span>
+                <span>{one.label}</span>
               </li>
             ))}
           </ol>
@@ -537,59 +629,45 @@ export function Onboarding({
             </div>
           )}
 
-          <div className="onboarding-step">
-            <div className="setup-heading">
-              <h2>1. Connect a data provider</h2>
-              <p>
-                A provider fetches the public conversations. One key is enough to start, and the
-                rest can be connected later.
-              </p>
-            </div>
-
-            {providerDone ? (
-              <DoneRow
-                title={`${connected?.displayName ?? "A provider"} is connected`}
-                detail={
-                  connected?.platforms.length
-                    ? `Fetches ${connected.platforms.join(", ")}.`
-                    : "This key is stored in your account."
-                }
-              />
-            ) : connections.providers.length === 0 ? (
-              <div className="notice warning" role="status">
-                <strong>No provider is available</strong>
-                <span>This build registers no data provider, so there is nothing to connect.</span>
+          {step === "provider" && (
+            <div className="onboarding-step">
+              <div className="setup-heading">
+                <h2>1. Connect a data provider</h2>
+                <p>
+                  A provider fetches the public conversations. One key is enough to start, and the
+                  rest can be connected later.
+                </p>
               </div>
-            ) : (
-              canStore && (
-                <ProviderStep
-                  providers={connections.providers}
-                  onSaved={(saved) => onSaved({ connections: saved })}
-                />
-              )
-            )}
-          </div>
 
-          <div className="onboarding-step">
-            <div className="setup-heading">
-              <h2>2. Add a model key</h2>
-              <p>
-                A model reads each post and scores it against your monitor. This key pays for every
-                job until you give one a key of its own.
-              </p>
+              {connections.providers.length === 0 ? (
+                <div className="notice warning" role="status">
+                  <strong>No provider is available</strong>
+                  <span>
+                    This build registers no data provider, so there is nothing to connect.
+                  </span>
+                </div>
+              ) : (
+                canStore && (
+                  <ProviderStep
+                    providers={connections.providers}
+                    onSaved={(saved) => onSaved({ connections: saved })}
+                  />
+                )
+              )}
             </div>
+          )}
 
-            {modelDone ? (
-              <DoneRow
-                title={defaultKey ? `${defaultKey.name} is ready` : "This instance has a model key"}
-                detail={
-                  defaultKey
-                    ? `${defaultKey.provider ? providerName(defaultKey.provider) : "No provider set"} · ${defaultKey.hint}`
-                    : "Set in this instance's environment."
-                }
-              />
-            ) : (
-              canStore && (
+          {step === "model" && (
+            <div className="onboarding-step">
+              <div className="setup-heading">
+                <h2>2. Add a model key</h2>
+                <p>
+                  A model reads each post and scores it against your monitor. This key pays for
+                  every job until you give one a key of its own.
+                </p>
+              </div>
+
+              {canStore && (
                 <ModelStep
                   providers={classify?.providers ?? []}
                   testModels={models.testModels}
@@ -601,15 +679,50 @@ export function Onboarding({
                   }
                   onSaved={(saved) => onSaved({ models: saved })}
                 />
-              )
-            )}
-          </div>
+              )}
+            </div>
+          )}
 
-          {providerDone && modelDone && (
-            <div className="setup-actions onboarding-finish">
-              <button className="primary-button" type="button" onClick={onFinished}>
-                Start using SignalScout
-              </button>
+          {/*
+            The end of the path rather than a third step: both answers, and the
+            way in. It is not counted on the rail, because the rail counts keys.
+          */}
+          {step === "ready" && (
+            <div className="onboarding-step">
+              <div className="setup-heading">
+                <h2>You are ready</h2>
+                <p>
+                  Both keys are stored in this instance and tested with their providers. Describe
+                  the business you are watching for, and the first monitor follows from it.
+                </p>
+              </div>
+
+              <div className="onboarding-answers">
+                <DoneRow
+                  title={`${connected?.displayName ?? "A provider"} is connected`}
+                  detail={
+                    connected?.platforms.length
+                      ? `Fetches ${connected.platforms.join(", ")}.`
+                      : "This key is stored in your account."
+                  }
+                />
+                <DoneRow
+                  title={
+                    defaultKey ? `${defaultKey.name} is ready` : "This instance has a model key"
+                  }
+                  detail={
+                    defaultKey
+                      ? `${defaultKey.provider ? providerName(defaultKey.provider) : "No provider set"} · ${defaultKey.hint}`
+                      : "Set in this instance's environment."
+                  }
+                />
+              </div>
+
+              <div className="setup-actions onboarding-finish">
+                <button className="primary-button" type="button" onClick={onFinished}>
+                  Start using SignalScout
+                </button>
+              </div>
             </div>
           )}
         </section>

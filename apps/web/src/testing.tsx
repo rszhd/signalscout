@@ -104,6 +104,15 @@ export function field(label: string): HTMLInputElement | HTMLTextAreaElement {
   return element;
 }
 
+/** A radio or a checkbox, found by its label the way a person finds its row. */
+export function radio(label: string): HTMLInputElement {
+  const element = document.querySelector(`[aria-label="${label}"]`);
+  if (!(element instanceof HTMLInputElement)) {
+    throw new Error(`No input has the label "${label}".`);
+  }
+  return element;
+}
+
 export function select(label: string): HTMLSelectElement {
   const element = document.querySelector(`[aria-label="${label}"]`);
   if (!(element instanceof HTMLSelectElement)) {

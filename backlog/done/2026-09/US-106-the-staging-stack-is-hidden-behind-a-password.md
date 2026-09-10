@@ -53,9 +53,9 @@ never enters the repository, which is where it must never be.
       committed to the repository
 - [x] `deploy-staging.yml` and `scripts/deploy-remote.sh` layer the overlay on
       staging only, and `deploy-production.yml` does not
-- [ ] `https://app.signalscout-dev.space` answers `401` without credentials and
+- [x] `https://app.signalscout-dev.space` answers `401` without credentials and
       serves the app after them — **live, in a browser**
-- [ ] The app's own login and session still work behind the prompt. The
+- [x] The app's own login and session still work behind the prompt. The
       session is a cookie and no route here reads `Authorization`, so it does
       not matter whether Traefik forwards the header
 - [x] The container healthcheck and the deploy digest assertion are unaffected,
@@ -141,3 +141,36 @@ never enters the repository, which is where it must never be.
   as well as a missing one — measured, `docker compose config` stops with the
   overlay's own sentence — so an empty value stops the deploy rather than
   unlocking the site.
+- 2026-09-10T13:45+08:00 — Deployed and proven live. The first deploy after the
+  merge **failed**, with the overlay's own sentence: `required variable
+  TRAEFIK_BASIC_AUTH_USERS is missing a value`. That is the acceptance the
+  ticket asked for, met by accident — a stack that cannot start without its
+  lock. The value was then written to the staging box's `.env` and the job was
+  re-run, and it passed.
+
+  Measured from outside: `/` answers **401** with no credentials, **401** with
+  a wrong password, and **200** with the right ones. `/api/health` and
+  `/api/auth-status` both answer 401 unauthenticated and answer normally behind
+  the prompt. The owner then met the prompt in a browser, the site served,
+  and **signing in behind it worked** — so Traefik forwarding the
+  `Authorization` header costs the app's own session nothing, which is the
+  claim the note about `removeHeader` rests on.
+
+  **The container healthcheck was unaffected**, which the deploy itself proves:
+  `deploy-remote.sh` waits on `docker inspect` and the wait passed. But
+  `/api/health` now answers 401 from outside, so any external uptime monitor
+  watching that URL will read staging as down.
+
+  **The ticket's premise is wrong about the box, and the lock is still right.**
+  `auth-status` answers `signUpOpen: false`, so staging runs
+  `AUTH_SIGNUP=closed` rather than `open`. The harm this ticket describes —
+  strangers registering on a half-built product — was already closed by a
+  setting. What the edge lock adds is that staging can go back to open
+  registration, which is what it exists to rehearse, without facing the
+  internet.
+
+  **The value's shape is the thing to get right.** The first value written was
+  the password itself. The variable takes `username:hash`, so a value with no
+  colon authenticates nobody. It is `staging:` plus a bcrypt hash from
+  `htpasswd -nbB`, made on this machine with `docker run --rm httpd:2.4-alpine`
+  because the box has no `htpasswd`.

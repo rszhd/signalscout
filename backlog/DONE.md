@@ -2,7 +2,7 @@
 
 # Done
 
-89 finished.
+90 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
@@ -18,6 +18,7 @@
 | BUG-003 | [A post below the threshold is classified again on every poll](done/2026-09/BUG-003-a-post-below-the-threshold-is-classified-again-on-every-poll.md) | bug | fixed | 2026-09 |
 | BUG-002 | [A seven-day window is bought as a month](done/2026-09/BUG-002-a-seven-day-window-is-bought-as-a-month.md) | bug | fixed | 2026-09 |
 | BUG-001 | [A pending Reddit collection is not resumed](done/2026-09/BUG-001-a-pending-reddit-collection-is-not-resumed.md) | bug | shipped | 2026-09 |
+| US-106 | [The staging stack is hidden behind a password](done/2026-09/US-106-the-staging-stack-is-hidden-behind-a-password.md) | feature | — | 2026-09 |
 | US-105 | [Onboarding is for new accounts only](done/2026-09/US-105-onboarding-is-for-new-accounts-only.md) | feature | — | 2026-09 |
 | US-103 | [The README is an overview](done/2026-09/US-103-the-readme-is-an-overview.md) | chore | shipped | 2026-09 |
 | US-102 | [A self-hosted install starts from the commands we print](done/2026-09/US-102-a-self-hosted-install-starts-from-the-commands-we-print.md) | bug | shipped | 2026-09 |

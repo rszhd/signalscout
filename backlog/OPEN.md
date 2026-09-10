@@ -2,7 +2,7 @@
 
 # Open tickets
 
-34 open — 16 doing, 17 todo, 1 parked (14 p1, 16 p2, 4 p3).
+33 open — 15 doing, 17 todo, 1 parked (13 p1, 16 p2, 4 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -14,7 +14,6 @@
 | p1 | US-083 | [One default key sets every job](doing/US-083-one-default-key-sets-every-job.md) | feature | doing | 2026-09-09T11:13+08:00 |
 | p1 | US-100 | [The cloud version runs at app.signalscout.run](doing/US-100-the-cloud-version-runs-at-app-signalscout-run.md) | feature | doing | 2026-09-10T03:05+08:00 |
 | p1 | US-104 | [A monitor says what its last poll did](doing/US-104-a-monitor-says-what-its-last-poll-did.md) | feature | doing | 2026-09-10T09:51+08:00 |
-| p1 | US-106 | [The staging stack is hidden behind a password](doing/US-106-the-staging-stack-is-hidden-behind-a-password.md) | feature | doing | 2026-09-10T11:58+08:00 |
 | p1 | BUG-004 | [The model half of a poll is not capped](doing/BUG-004-the-model-half-of-a-poll-is-not-capped.md) | bug | doing | 2026-09-06T04:42+08:00 |
 | p1 | US-033 | [Thirty verdicts say whether the score is right](todo/US-033-thirty-verdicts-say-whether-the-score-is-right.md) | chore | todo | 2026-09-06T03:02+08:00 |
 | p1 | BUG-015 | [One post found twice in a poll throws away the whole collection](todo/BUG-015-one-post-found-twice-in-a-poll-throws-away-the-whole-collection.md) | bug | todo | 2026-09-10T10:31+08:00 |

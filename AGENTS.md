@@ -1597,12 +1597,13 @@ this endpoint is free, and a page that matches is one credit — so the money in
 BUG-017 was paid for pages that *did* match and were then dropped by our own
 window, not for empty answers.
 
-**One thing paused itself and nothing recorded why.** The production monitor was
-found paused with **$1.06 spent of a $5.00 cap**, so the budget guard is not the
-cause, and no poll ran at the minute `paused_at` names. A paused monitor is
-skipped by the scheduler, so it had stopped collecting with nothing on any
-screen saying by whose hand. `poll_runs` would not have caught this either: a
-pause is not a poll.
+**The production monitor is paused, and the owner paused it.** It was found
+that way with **$1.06 spent of a $5.00 cap**, so the budget guard is not the
+cause — and the owner confirmed pressing Pause while the monitor was spending
+money and collecting nothing. There is no fault here: the screen says `Paused`,
+which is the truth. It is recorded because the next reader will find a live
+instance whose only monitor does not poll, and that is a decision rather than a
+bug.
 
 **Three faults sat between a paid page and a stored post, and all three are
 fixed.** BUG-015, BUG-016 and BUG-017 were found on 2026-09-10 by asking why

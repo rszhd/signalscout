@@ -92,3 +92,20 @@ a connection a visitor pays for, and it reports nothing in exchange.
   it runs, and it sends. **That a real property receives it is unproven until
   the variable is set in Vercel and the page is redeployed** — GA's realtime
   report is what closes it.
+- 2026-09-10T22:45+08:00 — **Live.** `PUBLIC_GA_MEASUREMENT_ID` was set on the
+  `signalscout-landing` Vercel project, **Production only**, and the folder was
+  deployed with `vercel --prod`. A preview deployment and a local run still
+  report nothing, which is the point of scoping it to one environment.
+
+  `https://www.signalscout.run/` serves the loader carrying the real property
+  id, and so does the apex through its redirect. Headless Chrome against the
+  live site: **15 requests**, the loader and a `google-analytics.com/g/collect`
+  hit carrying the same `tid`, `window.gtag` a function, `dataLayer` with 4
+  entries.
+
+  **The project is not connected to git**, so a push to `dev` deploys nothing
+  here. `vercel --prod` from `landing/` is the only path, and the same is true
+  of any later change to this page.
+
+  What is left open is the property's own side: GA's Realtime report is what
+  says the hit was accepted and attributed, and nobody has read it.

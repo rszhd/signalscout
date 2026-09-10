@@ -13,6 +13,11 @@ const icons: Record<string, string> = {
   youtube: "youtube.png",
   tiktok: "tiktok.png",
   instagram: "instagram.png",
+  anthropic: "anthropic.ico",
+  openai: "openai.png",
+  google: "google.ico",
+  openrouter: "openrouter.ico",
+  ollama: "ollama.png",
 };
 
 /** Decorative: callers keep the provider/platform name alongside the icon. */

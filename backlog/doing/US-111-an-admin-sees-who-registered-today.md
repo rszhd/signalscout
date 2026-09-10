@@ -45,3 +45,12 @@ account whose email is not listed.
 - 2026-09-10T18:10+08:00 — Started. Owner chose `ADMIN_EMAILS`, a separate `admin/` app, and all matches for the inbox count.
 - 2026-09-10T18:16+08:00 — Backend done: `ADMIN_EMAILS` in the schema, `.env.example` and the compose file; `registrationsOn` in `packages/core/src/admin/overview.ts`; `GET /api/admin/registrations` in `apps/api/src/admin.ts`. 13 new tests, the full suite (1,890) green, typecheck and build pass. The `admin/` frontend is next.
 - 2026-09-10T19:59+08:00 — Frontend done. A Vite + React + Tailwind + shadcn app in `admin/`, a workspace package, built under `/admin/` and served by the API at `/admin` (`/admin` redirects to `/admin/`). It reads the one endpoint same-origin, so it uses the existing session cookie. `pnpm build` and `pnpm typecheck` include it; the Dockerfile copies `admin/dist`. Verified live against the built API: `/admin/` 200, `/admin` 302, assets 200. The whole suite (1,890) still green.
+- 2026-09-10T22:02+08:00 — The image did not build. `pnpm-workspace.yaml` gained
+  `admin`, but the Dockerfile's dependency stage copies each manifest by name
+  and `admin/package.json` was not among them, so `pnpm install` made no
+  `admin/node_modules` and `pnpm build` stopped at `sh: vite: not found`. No
+  local build can show this: a developer's install has already made that
+  directory. CI could not show it either — the image job needs the check job,
+  and the check job was red on an unrelated test. Fixed by copying the manifest,
+  and proven by building the whole image and running it: `/admin` 302,
+  `/admin/` 200, `/api/admin/registrations` 401 without a cookie.

@@ -29,6 +29,17 @@ function read(name: string): string {
   return readFileSync(new URL(name, rootUrl), "utf8");
 }
 
+/**
+ * How long one `docker compose config` may take.
+ *
+ * These two tests are the only ones in this suite that start another program,
+ * so the five-second default is the wrong measure for them. On a warm machine
+ * the whole file runs in about a fifth of a second; on a cold CI runner the
+ * first call took 7.9 seconds and the file went red on the clock rather than
+ * on an assertion. Raising it costs nothing when Docker answers quickly.
+ */
+const rendering = { timeout: 60_000 };
+
 function render(files: string[], env: Record<string, string>): string {
   return execFileSync(
     "docker",
@@ -61,7 +72,7 @@ function productionConfig(): string {
 }
 
 describe("the staging password", () => {
-  it("puts a basic-auth prompt on the staging router", () => {
+  it("puts a basic-auth prompt on the staging router", rendering, () => {
     const config = stagingConfig();
 
     expect(config).toContain("basicauth.users");
@@ -70,7 +81,7 @@ describe("the staging password", () => {
     );
   });
 
-  it("leaves the production router without one", () => {
+  it("leaves the production router without one", rendering, () => {
     const config = productionConfig();
 
     expect(config).not.toContain("basicauth");

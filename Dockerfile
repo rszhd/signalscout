@@ -15,6 +15,10 @@ COPY packages/core/package.json packages/core/
 COPY apps/api/package.json apps/api/
 COPY apps/web/package.json apps/web/
 COPY apps/worker/package.json apps/worker/
+# The admin panel. A workspace project whose manifest is missing here installs
+# nothing, and `pnpm build` then fails at `vite: not found` — which no local
+# build can show, because a developer's install already made its node_modules.
+COPY admin/package.json admin/
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 
 # --- build ------------------------------------------------------------------

@@ -22,6 +22,9 @@
   "javascript": {
     "formatter": { "quoteStyle": "double" }
   },
+  "css": {
+    "parser": { "tailwindDirectives": true }
+  },
   "linter": {
     "enabled": true,
     "rules": { "preset": "recommended" }

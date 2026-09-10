@@ -38,6 +38,7 @@ COPY --from=build /app/packages/core/drizzle packages/core/drizzle
 COPY --from=build /app/apps/api/dist apps/api/dist
 COPY --from=build /app/apps/worker/dist apps/worker/dist
 COPY --from=build /app/apps/web/dist apps/web/dist
+COPY --from=build /app/admin/dist admin/dist
 
 # The test files are compiled with everything else. They import vitest, which
 # is not installed here, so remove them rather than ship a broken import.

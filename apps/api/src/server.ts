@@ -43,6 +43,7 @@ import {
   type ZodTypeProvider,
 } from "fastify-type-provider-zod";
 import { z } from "zod";
+import { registerAdminRoutes } from "./admin.js";
 import { registerAuthRoutes, type SessionResolver } from "./auth.js";
 import { registerBillingGate, registerBillingRoutes } from "./billing.js";
 import { registerConnectionRoutes } from "./connections.js";
@@ -62,6 +63,16 @@ import { registerProjectRoutes } from "./projects.js";
  */
 export function resolveWebDist(env: Env): string {
   return env.WEB_DIST_PATH ?? new URL("../../web/dist", import.meta.url).pathname;
+}
+
+/**
+ * The built admin panel, served at `/admin`. US-111.
+ *
+ * A path inside the image like the UI's, so a deployment does not move it and
+ * the compose file does not carry a variable for it.
+ */
+export function resolveAdminDist(): string {
+  return new URL("../../../admin/dist", import.meta.url).pathname;
 }
 
 /**
@@ -497,6 +508,32 @@ export async function buildServer({
   });
 
   await registerEstimateRoutes(app, { db, sources, jobs });
+
+  // The operator's view of who is signing up. US-111. Behind the session gate
+  // like every other API route, and then refused unless the address is listed.
+  await registerAdminRoutes(app, { db, adminEmails: env.ADMIN_EMAILS });
+
+  /**
+   * The admin panel, at `/admin`. US-111. A second static root with its own
+   * prefix; `decorateReply: false` because the UI's registration below already
+   * added `reply.sendFile`, and a second one throws.
+   */
+  const adminDist = resolveAdminDist();
+
+  if (existsSync(adminDist)) {
+    await app.register(fastifyStatic, {
+      root: adminDist,
+      prefix: "/admin/",
+      decorateReply: false,
+    });
+
+    // `/admin` with no slash is the address a person types. The static plugin
+    // serves the directory under `/admin/`, so send the bare path there rather
+    // than let it fall through to the UI's catch-all.
+    app.get("/admin", async (_request, reply) => reply.redirect("/admin/"));
+  } else {
+    logger.warn({ adminDist }, "no built admin panel found; /admin is not served");
+  }
 
   const webDist = resolveWebDist(env);
 

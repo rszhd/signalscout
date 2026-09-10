@@ -274,6 +274,16 @@ export const envSchema = z.object({
   AUTH_URL: blankIsUnset(z.string().min(1).optional()),
 
   /**
+   * The addresses allowed to read the admin view. US-111.
+   *
+   * Comma separated. Empty means nobody is an admin, which is the safe answer
+   * for a self-hosted instance where the question never comes up. The admin
+   * endpoint returns every account's data, so this list is the security
+   * boundary and not a convenience.
+   */
+  ADMIN_EMAILS: blankIsUnset(z.string().min(1).optional()),
+
+  /**
    * Whether this deployment charges for itself. US-072.
    *
    * `off` is the default and it is the self-hosted shape: no trial, no gate,

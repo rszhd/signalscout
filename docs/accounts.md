@@ -98,6 +98,49 @@ share a router, and the second one to start takes the hostname.
 its own Postgres, its own volume and its own backup. The overlay shares one
 network and nothing else.
 
+### Putting a password in front of one stack
+
+A staging stack takes registrations (`AUTH_SIGNUP=open`), so anybody who can
+reach it may make an account. `docker-compose.staging.yml` puts a password in
+front of the whole site, at the proxy, so no request reaches the app without
+it. It is a second lock: the app's own login stays behind it.
+
+It is a separate file because `docker-compose.prod.yml` serves every stack. A
+middleware added there would prompt on production too. Only the staging deploy
+layers this file; production does not.
+
+Make the value on the box and put it in `.env`. `htpasswd` comes from the
+`apache2-utils` package on Debian and Ubuntu.
+
+```bash
+htpasswd -nbB staging 'the-password'   # prints staging:$2y$05$…
+```
+
+```dotenv
+TRAEFIK_BASIC_AUTH_USERS=staging:$2y$05$…
+```
+
+More users are comma-separated on the one line. **A bcrypt hash starts with
+`$2y$`, and the hash goes in `.env` and never in a compose file**: Compose reads
+`$` in a compose file as a variable, so a hash written there needs every `$`
+doubled. A value from `.env` is inserted as it is.
+
+Start it, or let the next deploy do it:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.prod.yml \
+  -f docker-compose.staging.yml up -d
+```
+
+To rotate the password, change the value in `.env` and run the same command.
+Nothing in the database changes. To remove the lock, drop the third file from
+the command; the next deploy restores it, because the staging workflow passes
+it.
+
+`TRAEFIK_BASIC_AUTH_USERS` has no default on purpose. When it is missing the
+overlay refuses to render and the stack does not start, rather than starting
+without the lock it was asked for.
+
 ---
 
 ## The first run makes the account

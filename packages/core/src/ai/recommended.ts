@@ -49,7 +49,7 @@ const chatRecommendations: Readonly<Record<string, Readonly<Partial<Record<AiTas
   openai: {
     classify: "gpt-5.6-terra",
     triage: "gpt-5.6-luna",
-    draft: "gpt-6-astra",
+    draft: "gpt-5.6-sol",
   },
   anthropic: {
     classify: "claude-sonnet-5",

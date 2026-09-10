@@ -47,7 +47,7 @@ read from the providers' own pricing pages, like `modelPrices` beside it. Read
 | Scoring | `gpt-5.6-terra` | `claude-sonnet-5` | `gemini-3.5-flash` |
 | Triage | `gpt-5.6-luna` | `claude-haiku-4-5` | `gemini-3.5-flash-lite` |
 | Similarity | `text-embedding-3-small` | none | none |
-| Drafting | `gpt-6-astra` | `claude-fable-5-1` | `gemini-3.1-pro-preview` |
+| Drafting | `gpt-5.6-sol` | `claude-fable-5-1` | `gemini-3.1-pro-preview` |
 
 Every triage model is cheaper than the scoring model beside it, which is the
 whole of US-030's finding: with no price gap the stage costs more than it
@@ -147,3 +147,8 @@ runs whatever somebody pulled, and costs nothing either way.
 
   Unproven: no real browser has rendered any of it. The screen is driven
   through jsdom, and nothing has moved a default in Chrome.
+- 2026-09-10T13:45+08:00 — The owner changed the OpenAI drafting
+  recommendation from `gpt-6-astra` to `gpt-5.6-sol`. Both names are priced in
+  `provider.ts`; sol is $4.00/$20.00 against astra's $10.00/$50.00, so the
+  recommendation table, the Models screen view and the three tests that assert
+  it move together. A job somebody already saved keeps the model they chose.

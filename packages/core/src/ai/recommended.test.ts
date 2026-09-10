@@ -71,7 +71,7 @@ describe("recommended models", () => {
     expect(recommendationsFor("openai")).toEqual({
       classify: "gpt-5.6-terra",
       triage: "gpt-5.6-luna",
-      draft: "gpt-6-astra",
+      draft: "gpt-5.6-sol",
       embed: "text-embedding-3-small",
     });
 

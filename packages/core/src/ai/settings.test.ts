@@ -469,7 +469,7 @@ describe("one account's model settings", () => {
       });
       expect(draftConfigFromEnvironment(mine)).toMatchObject({
         provider: "openai",
-        model: "gpt-6-astra",
+        model: "gpt-5.6-sol",
         apiKey: "sk-openai",
       });
       expect(embeddingConfigFromEnvironment(mine)).toMatchObject({

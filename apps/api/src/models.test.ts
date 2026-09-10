@@ -796,7 +796,7 @@ describe("the models routes", () => {
           keyId: view.keys[0].id,
         });
         expect(by("triage").model).toBe("gpt-5.6-luna");
-        expect(by("draft").model).toBe("gpt-6-astra");
+        expect(by("draft").model).toBe("gpt-5.6-sol");
         expect(by("embed").model).toBe("text-embedding-3-small");
 
         // And the machine's own answer is still reported beside it, unchanged.

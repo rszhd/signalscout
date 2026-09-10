@@ -13,7 +13,7 @@
 }
 
 .providers-content {
-  max-width: 1320px;
+  max-width: var(--page-content-width);
   min-width: 0;
   margin: 0 auto;
   padding: var(--space-8) var(--page-gutter) var(--space-12);

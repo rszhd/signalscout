@@ -10,26 +10,23 @@
 */
 .onboarding-page {
   min-height: 100vh;
-  background: var(--surface);
+  background: var(--background);
 }
 .onboarding-brand {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: var(--space-4);
 }
-.onboarding-brand svg {
+.onboarding-brand .brand-logo {
+  width: 40px;
+  height: 40px;
   flex-shrink: 0;
-  margin-top: 4px;
 }
 .onboarding-step {
-  padding: var(--space-8) 0;
-  border-bottom: 1px solid var(--line);
+  padding: 0;
 }
 .onboarding-step:last-of-type {
   border-bottom: none;
-}
-.onboarding-step .setup-heading h2 {
-  font-size: var(--text-md);
 }
 
 .onboarding-provider-website {
@@ -58,16 +55,16 @@
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  padding: var(--space-4) var(--space-5);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
-  background: var(--surface-soft);
+  padding: var(--space-5);
+  border: 1px solid var(--surface-brand);
+  border-radius: var(--radius-md);
+  background: var(--accent-soft);
 }
 .onboarding-done > span:first-child {
   display: grid;
   place-items: center;
-  width: 22px;
-  height: 22px;
+  width: 28px;
+  height: 28px;
   flex-shrink: 0;
   border-radius: 50%;
   color: var(--text-on-accent);
@@ -76,7 +73,10 @@
 }
 .onboarding-done > span:last-child {
   display: grid;
-  gap: 2px;
+  gap: var(--space-1);
+}
+.onboarding-done strong {
+  font-weight: 600;
 }
 .onboarding-done small {
   color: var(--muted);
@@ -84,6 +84,9 @@
 }
 .onboarding-finish {
   padding-top: var(--space-6);
+}
+.onboarding-finish .primary-button {
+  min-width: 220px;
 }
 
 /*
@@ -105,18 +108,22 @@
 .onboarding-choice legend {
   padding: 0;
   margin-bottom: var(--space-4);
-  font-size: var(--text-label);
-  font-weight: 500;
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 .onboarding-page .provider-option {
   display: flex;
   align-items: center;
   gap: var(--space-4);
-  padding: var(--space-4) var(--space-5);
+  padding: var(--space-5);
   border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   background: var(--surface);
   cursor: pointer;
+  transition:
+    border-color 140ms ease,
+    background 140ms ease;
 }
 .onboarding-page .provider-option:hover {
   border-color: var(--line-dark);
@@ -129,10 +136,11 @@
 .onboarding-page .provider-option:has(input:checked) {
   border-color: var(--accent);
   background: var(--accent-soft);
+  box-shadow: inset 3px 0 0 var(--accent);
 }
 .onboarding-page .provider-option input {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   flex-shrink: 0;
   accent-color: var(--accent);
 }
@@ -145,7 +153,7 @@
   min-width: 0;
 }
 .onboarding-page .provider-option strong {
-  font-weight: 500;
+  font-weight: 600;
 }
 .onboarding-page .provider-option small,
 .onboarding-page .provider-option .connection-platforms {
@@ -160,10 +168,10 @@
 /* The chosen provider's own fields, in a panel that says whose they are. */
 .onboarding-key {
   margin-top: var(--space-6);
-  padding: var(--space-5);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
-  background: var(--surface-soft);
+  padding: var(--space-6);
+  border: 1px solid var(--surface-brand);
+  border-radius: var(--radius-md);
+  background: var(--accent-soft);
 }
 .onboarding-key-head {
   display: flex;
@@ -172,6 +180,10 @@
   justify-content: space-between;
   gap: var(--space-3);
   margin-bottom: var(--space-4);
+}
+.onboarding-page .onboarding-key-head > strong {
+  font-size: var(--text-md);
+  font-weight: 600;
 }
 .onboarding-key .field-stack {
   gap: var(--space-5);
@@ -189,7 +201,7 @@
   The shared rail turns horizontal below 1100px and lays out the monitor
   form's five steps. This page has two.
 */
-@media (max-width: 1100px) {
+@media (max-width: 820px) {
   .onboarding-page .setup-progress ol {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }

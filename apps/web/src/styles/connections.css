@@ -3,7 +3,7 @@
   background: var(--surface);
 }
 .connections-content {
-  max-width: 1040px;
+  max-width: var(--page-content-width);
   margin: 0 auto;
   padding: var(--space-8) var(--page-gutter) var(--space-12);
 }

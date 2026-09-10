@@ -187,42 +187,49 @@ export function Monitors({ projectId }: { readonly projectId: string }) {
                 : "Manage your schedules, spending and search quality in one place."}
             </p>
           </div>
-          <a className="text-link" href="/api/feedback/export">
+          <a className="secondary-button" href="/api/feedback/export">
             Export feedback as JSON
           </a>
         </div>
-        <div className="monitors-toolbar">
-          <fieldset className="view-switch" aria-label="Filter monitors by status">
-            {(
-              [
-                ["all", "All"],
-                ["running", "Running"],
-                ["paused", "Paused"],
-                ["attention", "Needs attention"],
-              ] as const
-            ).map(([id, label]) => (
-              <button type="button" key={id} aria-pressed={view === id} onClick={() => setView(id)}>
-                {label} <span>{counts[id]}</span>
-              </button>
-            ))}
-          </fieldset>
-          <input
-            className="monitor-search"
-            type="search"
-            aria-label="Search monitors"
-            placeholder="Search monitors…"
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-          />
+        <div className="monitors-filter-panel">
+          <div className="monitors-toolbar">
+            <fieldset className="view-switch" aria-label="Filter monitors by status">
+              {(
+                [
+                  ["all", "All"],
+                  ["running", "Running"],
+                  ["paused", "Paused"],
+                  ["attention", "Needs attention"],
+                ] as const
+              ).map(([id, label]) => (
+                <button
+                  type="button"
+                  key={id}
+                  aria-pressed={view === id}
+                  onClick={() => setView(id)}
+                >
+                  {label} <span>{counts[id]}</span>
+                </button>
+              ))}
+            </fieldset>
+            <input
+              className="monitor-search"
+              type="search"
+              aria-label="Search monitors"
+              placeholder="Search monitors…"
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+            />
+          </div>
+          <p className="monitors-result-count" role="status">
+            Showing {visible.length} of {scoped.length} monitors in this project
+          </p>
         </div>
         {error && (
           <p className="budget-error" role="alert">
             {error}
           </p>
         )}
-        <p className="monitors-result-count" role="status">
-          Showing {visible.length} of {scoped.length} monitors in this project
-        </p>
         {visible.length === 0 && (
           <div className="monitor-empty-results">
             <h2>
@@ -419,7 +426,7 @@ function MonitorTable({
                 <td className="monitor-table-actions">
                   <button
                     type="button"
-                    className="secondary-button"
+                    className="compact-button"
                     disabled={pending.includes(monitor.id)}
                     onClick={() => void setPaused(monitor, !monitor.paused)}
                   >

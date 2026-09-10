@@ -267,11 +267,11 @@ export function Projects() {
                     </div>
                     <p className="project-product">{project.product}</p>
                     <div className="project-audience">
-                      <span>FOR</span>
+                      <span>Ideal customer</span>
                       <p>{project.idealCustomer}</p>
                     </div>
                     <div className="project-actions">
-                      <Link className="project-inbox-link" to={paths.inbox(project.id)}>
+                      <Link className="primary-button" to={paths.inbox(project.id)}>
                         Open inbox →
                       </Link>
                       <Link className="secondary-button" to={paths.newMonitor(project.id)}>
@@ -395,7 +395,7 @@ export function ProjectForm({ projectId }: { readonly projectId: string | null }
         </div>
       </header>
 
-      <div className="projects-content">
+      <div className="projects-content project-form-content">
         {loading ? (
           <p className="project-state" role="status">
             Loading project…

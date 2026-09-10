@@ -45,6 +45,7 @@
   --control-height-compact: 40px;
   --text-title: 1.6rem;
   --page-gutter: var(--space-8);
+  --page-content-width: 1240px;
   --sidebar-width: 224px;
   --bottom-nav-height: 80px;
   --reading-width: 820px;

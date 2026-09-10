@@ -1,20 +1,28 @@
 /* Shared UI primitives. Page styles own layout, never a second theme. */
 .topbar {
-  min-height: 108px;
+  --topbar-gutter: max(
+    var(--page-gutter),
+    calc((100% - var(--page-content-width)) / 2 + var(--page-gutter))
+  );
+
+  min-height: 128px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-6);
-  padding: var(--space-6) var(--page-gutter);
+  padding-block: var(--space-8);
+  padding-inline: var(--topbar-gutter);
   border: 0;
+  border-bottom: 1px solid var(--line);
   background: var(--surface);
 }
 
 .topbar h1 {
   margin: 0;
-  font-size: var(--text-title);
-  line-height: 1.1;
-  letter-spacing: -0.04em;
+  font-size: 1.875rem;
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.035em;
 }
 
 .primary-button,
@@ -68,9 +76,11 @@
 }
 
 .page-subtitle {
-  margin: var(--space-2) 0 0;
+  max-width: 60ch;
+  margin: var(--space-3) 0 0;
   color: var(--muted);
-  font-size: var(--text-label);
+  font-size: var(--text-sm);
+  line-height: 1.5;
 }
 
 .view-switch {
@@ -108,8 +118,12 @@
 }
 @media (max-width: 820px) {
   .topbar {
-    min-height: 95px;
-    padding: var(--space-5) var(--page-gutter);
+    min-height: 108px;
+    padding-block: var(--space-6);
+  }
+
+  .topbar h1 {
+    font-size: 1.625rem;
   }
 }
 @media (max-width: 600px) {

@@ -329,12 +329,14 @@ export function Billing() {
               </section>
 
               <section className="billing-account" aria-labelledby="billing-account-title">
-                <h2 id="billing-account-title">Subscription</h2>
-                <span
-                  className={`billing-status${!state.entitled || state.reason === "past_due" ? " billing-status-warning" : ""}`}
-                >
-                  {statusLabel}
-                </span>
+                <div className="billing-account-heading">
+                  <h2 id="billing-account-title">Subscription</h2>
+                  <span
+                    className={`billing-status${!state.entitled || state.reason === "past_due" ? " billing-status-warning" : ""}`}
+                  >
+                    {statusLabel}
+                  </span>
+                </div>
                 <p className="billing-account-description">{subscriptionSentence(state)}</p>
                 {state.reason === "trialing" && state.trialDays > 0 && (
                   <div className="billing-trial">

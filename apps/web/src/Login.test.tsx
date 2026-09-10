@@ -39,6 +39,7 @@ describe("the login screen", () => {
     ).not.toBeNull();
     expect(screen.container.textContent).toContain("Set up this instance");
     expect(screen.container.textContent).toContain("signup closes behind it");
+    expect(screen.container.textContent).not.toContain("Example conversation");
     expect(field("Your name")).toBeTruthy();
     expect(field("Password").minLength).toBe(8);
   });

@@ -277,7 +277,7 @@ function KeyLibrary({
   }
 
   return (
-    <section className="models-section" aria-labelledby="models-keys-title">
+    <section className="models-section models-keys" aria-labelledby="models-keys-title">
       <div className="models-section-heading">
         <div className="models-section-title">
           <h2 id="models-keys-title">API keys</h2>
@@ -341,6 +341,7 @@ function KeyLibrary({
 
       <Button
         className="key-add"
+        variant="primary"
         onClick={() => {
           setError(null);
           dialog.current?.showModal();
@@ -1037,7 +1038,7 @@ export function Models() {
           testModels={view.testModels}
         />
 
-        <section className="models-section" aria-labelledby="models-jobs-title">
+        <section className="models-section models-jobs" aria-labelledby="models-jobs-title">
           <div className="models-section-heading">
             <div className="models-section-title">
               <h2 id="models-jobs-title">Models by job</h2>

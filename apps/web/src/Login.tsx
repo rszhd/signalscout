@@ -180,26 +180,29 @@ export function Login({ firstRun, signUpOpen }: { firstRun: boolean; signUpOpen:
             Find people describing the problem your product solves, and join the conversation when
             it matters.
           </p>
-          <figure className="login-preview">
-            <figcaption>Example conversation</figcaption>
-            <div className="login-preview-heading">
-              <span className="login-preview-source">Reddit · r/SaaS</span>
-              <span className="login-signal">Asking for recommendations</span>
-            </div>
-            <blockquote>
-              “We’re only three developers and manually test signup and checkout before every
-              release. What are other small teams using?”
-            </blockquote>
-            <div className="login-preview-reason">
-              <span className="login-preview-mark" aria-hidden="true">
-                ↗
-              </span>
+          <ul className="login-story-points">
+            <li>
+              <span aria-hidden="true">01</span>
               <p>
-                <strong>A problem your product could solve.</strong>
-                <span>A small team. A recurring pain. An active search for a solution.</span>
+                <strong>Find real demand</strong>
+                <span>Watch public conversations where customers already ask for help.</span>
               </p>
-            </div>
-          </figure>
+            </li>
+            <li>
+              <span aria-hidden="true">02</span>
+              <p>
+                <strong>Read for intent</strong>
+                <span>Bring the conversations most relevant to your product into one inbox.</span>
+              </p>
+            </li>
+            <li>
+              <span aria-hidden="true">03</span>
+              <p>
+                <strong>Stay in control</strong>
+                <span>You choose when to reply. SignalScout never posts for you.</span>
+              </p>
+            </li>
+          </ul>
           <p className="login-story-footer">Your accounts. Your API keys. Your data.</p>
         </aside>
 

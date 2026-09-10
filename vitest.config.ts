@@ -14,7 +14,15 @@ export default defineConfig({
     },
   },
   test: {
-    include: ["{apps,packages}/*/src/**/*.test.{ts,tsx}"],
+    /**
+     * The workspace, plus `scripts/`.
+     *
+     * `scripts/` is here for one file: `init-env.mjs` writes the session
+     * secret and the encryption key, and a secret written wrongly is an
+     * instance with no login or credentials nobody can decrypt again. A script
+     * outside the include pattern is a script the suite cannot see.
+     */
+    include: ["{apps,packages}/*/src/**/*.test.{ts,tsx}", "scripts/**/*.test.mjs"],
     environment: "node",
     /**
      * Four, and the number is bounded by contention rather than by cores.

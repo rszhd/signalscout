@@ -7,9 +7,8 @@
  * is a step that belongs in the script.
  */
 import { spawn } from "node:child_process";
-import { randomBytes } from "node:crypto";
-import { appendFileSync, copyFileSync, existsSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
+import { ensureEnvFile, readEnvFile } from "./init-env.mjs";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 
@@ -23,44 +22,17 @@ function run(command, args, options = {}) {
   });
 }
 
-/** Read .env without a dependency. Only `KEY=value` lines, no expansion. */
-function readEnvFile(path) {
-  if (!existsSync(path)) return {};
-
-  return Object.fromEntries(
-    readFileSync(path, "utf8")
-      .split("\n")
-      .map((line) => line.trim())
-      .filter((line) => line && !line.startsWith("#") && line.includes("="))
-      .map((line) => {
-        const index = line.indexOf("=");
-        return [line.slice(0, index), line.slice(index + 1).replace(/^["']|["']$/g, "")];
-      }),
-  );
-}
-
 const envPath = `${root}.env`;
 
-if (!existsSync(envPath)) {
-  copyFileSync(`${root}.env.example`, envPath);
-  console.log("Created .env from .env.example.");
-}
-
 /**
- * A session secret for this checkout, generated once.
+ * The same bootstrap `pnpm setup` runs, so the two install paths cannot drift.
  *
- * `.env.example` is committed, so it cannot carry one: a secret in git is a
- * secret every reader of this repository holds. Generated here instead, and
- * appended rather than replacing anything, so a value somebody already set
- * survives.
- *
- * The application refuses to start without it. Making a developer read that
- * error on their first `pnpm dev` teaches nothing they need on day one.
+ * A README step that everyone forgets is a step that belongs in the script,
+ * and a step in one script and not the other is a difference nobody chose:
+ * `AUTH_SECRET` was generated here and not for the Docker path, which is the
+ * path a self-hoster takes.
  */
-if (!readEnvFile(envPath).AUTH_SECRET) {
-  appendFileSync(envPath, `\nAUTH_SECRET=${randomBytes(32).toString("base64")}\n`);
-  console.log("Generated AUTH_SECRET in .env.");
-}
+for (const note of ensureEnvFile(root)) console.log(note);
 
 const env = {
   ...process.env,

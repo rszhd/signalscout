@@ -9,6 +9,7 @@
     "node": ">=24"
   },
   "scripts": {
+    "setup": "node scripts/init-env.mjs",
     "dev": "node scripts/dev.mjs",
     "build": "tsc --build && pnpm --filter @signalscout/web build",
     "typecheck": "tsc --build && pnpm --filter @signalscout/web typecheck",

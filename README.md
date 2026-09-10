@@ -266,9 +266,27 @@ row was written for any of the five probes.
 ```bash
 git clone https://github.com/rszhd/signalscout
 cd signalscout
-cp .env.example .env      # add your keys
+pnpm setup                # writes .env, and the two secrets it cannot ship
 docker compose -f docker-compose.yml -f docker-compose.build.yml up --build
 ```
+
+`pnpm setup` generates `AUTH_SECRET` and `ENCRYPTION_KEY`. Neither can live in
+a committed file — a secret in git is a secret every reader of this repository
+holds — and the app refuses to boot without the first and refuses to store a
+provider key without the second. It never overwrites a value you have already
+set, so it is safe to re-run. Then open `.env` and add your keys.
+
+**On a server with no Node**, which is the point of the Docker path, do the
+same thing with `openssl`:
+
+```bash
+cp .env.example .env
+echo "AUTH_SECRET=$(openssl rand -base64 32)" >> .env
+echo "ENCRYPTION_KEY=$(openssl rand -base64 32)" >> .env
+```
+
+Change `POSTGRES_PASSWORD` and `DATABASE_URL` too, before this answers on a
+public address.
 
 The app is then on <http://localhost:3000>. It asks you to make the first
 account, and refuses every registration after it.

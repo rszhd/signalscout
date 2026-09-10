@@ -575,6 +575,76 @@ describe("the intent inbox", () => {
     expect(asked.some((url) => url.includes("minScore"))).toBe(false);
   });
 
+  describe("the order the list is read in", () => {
+    it("asks the server for the date order and says so above the list", async () => {
+      await show();
+
+      await act(async () => setValue(select("Order"), "newest"));
+      await settle();
+
+      const asked = fetchMock.mock.calls.map(([url]) => String(url));
+
+      expect(asked.some((url) => url.includes("order=newest"))).toBe(true);
+      expect(container.querySelector(".list-heading")?.textContent).toContain("Newest first");
+    });
+
+    it("asks the server for the score order and says so above the list", async () => {
+      await show();
+
+      await act(async () => setValue(select("Order"), "score"));
+      await settle();
+
+      const asked = fetchMock.mock.calls.map(([url]) => String(url));
+
+      expect(asked.some((url) => url.includes("order=score"))).toBe(true);
+      expect(container.querySelector(".list-heading")?.textContent).toContain("Highest score");
+    });
+
+    it("sends no order on the default, which is the rank", async () => {
+      await show();
+
+      const asked = fetchMock.mock.calls.map(([url]) => String(url));
+
+      expect(asked.some((url) => url.includes("order="))).toBe(false);
+      expect(container.querySelector(".list-heading")?.textContent).toContain("score & age");
+    });
+
+    it("does not count as a filter", async () => {
+      // The Filters button carries a count of what is hiding rows. An order
+      // hides nothing, so a person who changed it must not be told something
+      // is filtered — that is what sends them to press Clear filters.
+      await show();
+
+      await act(async () => setValue(select("Order"), "newest"));
+      await settle();
+
+      expect(button("Filters").textContent).toBe("Filters");
+    });
+
+    it("carries the order into the exported file", async () => {
+      await show();
+
+      await act(async () => setValue(select("Order"), "newest"));
+      await settle();
+
+      const link = container.querySelector(".inbox-export");
+
+      expect(link?.getAttribute("href")).toContain("order=newest");
+    });
+
+    it("does not offer an order on the saved list, which has its own", async () => {
+      await show();
+
+      const picker = container.querySelector(".inbox-views button:last-child") as HTMLButtonElement;
+
+      await act(async () => picker.click());
+      await settle();
+
+      expect(container.querySelector('select[aria-label="Order"]')).toBeNull();
+      expect(container.querySelector(".list-heading")?.textContent).toContain("Recently saved");
+    });
+  });
+
   it("asks for the next page against the clock the first page used", async () => {
     // Without the clock the second page is ranked against a later `now`, every
     // rank has moved down, and a match on the boundary is skipped. Nobody can

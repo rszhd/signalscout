@@ -25,6 +25,7 @@ import {
   type InboxMatch,
   listMatches,
   matchesToCsv,
+  matchOrders,
   matchOwner,
   maximumPageSize,
   recordVerdict,
@@ -97,6 +98,17 @@ const query = z.object({
    * somebody who judged a match weak and kept it anyway meant both.
    */
   saved: z.stringbool().default(false),
+  /**
+   * What to order the page by. US-114.
+   *
+   * An enum rather than a free string: it names a column and an expression, so
+   * an unknown value must be a 400 and never a silent fall back to the
+   * default. A person paging with `order=newest` spelled wrong would otherwise
+   * walk a rank-ordered list with a date cursor.
+   *
+   * The saved list ignores it, because that list's order is what it is.
+   */
+  order: z.enum(matchOrders).default("rank"),
   cursor: z.string().regex(cursorPattern).optional(),
   /** The clock the first page was ranked against. Omitted on the first page. */
   asOf: z.iso.datetime().optional(),
@@ -138,8 +150,17 @@ export async function registerMatchRoutes(
       },
     },
     handler: async (request) => {
-      const { monitorId, projectId, minScore, limit, cursor, asOf, includeNotRelevant, saved } =
-        request.query;
+      const {
+        monitorId,
+        projectId,
+        minScore,
+        limit,
+        cursor,
+        asOf,
+        includeNotRelevant,
+        saved,
+        order,
+      } = request.query;
 
       const page = await listMatches(db, {
         userId: sessionUserId(request),
@@ -150,6 +171,7 @@ export async function registerMatchRoutes(
         cursor,
         includeNotRelevant,
         savedOnly: saved,
+        order,
         asOf: asOf ? new Date(asOf) : undefined,
       });
 
@@ -296,7 +318,8 @@ export async function registerMatchRoutes(
       response: { 200: z.string() },
     },
     handler: async (request, reply) => {
-      const { monitorId, projectId, minScore, asOf, includeNotRelevant, saved } = request.query;
+      const { monitorId, projectId, minScore, asOf, includeNotRelevant, saved, order } =
+        request.query;
 
       const collected: InboxMatch[] = [];
       let cursor: string | null = null;
@@ -318,6 +341,7 @@ export async function registerMatchRoutes(
           minScore,
           includeNotRelevant,
           savedOnly: saved,
+          order,
           limit: exportPageSize,
           cursor,
           asOf: clock,

@@ -28,6 +28,24 @@
  * Age is clamped at zero. A post dated in the future is a clock difference at
  * the source, and it must not rank above its own score.
  *
+ * ## The other orders
+ *
+ * The rank is the default and not the only one. US-114 added the two halves it
+ * is made of: the score alone, and the date alone. The rank mixes them at
+ * twelve points a day, which answers "what should I read next" and answers the
+ * other two questions badly — "what are the best leads this monitor has ever
+ * found" and "what arrived since I last looked". Under the rank a fresh low
+ * score and an old high one land on the same rung, so both answers are
+ * scattered through one list. The saved list of US-043 has a fourth order, by
+ * when a thing was kept.
+ *
+ * All three go through `orderValue`, which is the one place a page's ordering
+ * is decided. The sort and the keyset cursor read the same expression, so they
+ * cannot disagree — and they did disagree before US-114: the saved list sorted
+ * by `saved_at` and paged on the rank, which dropped rows from page two.
+ * Each row carries the cursor that resumes after it, in its own ordering,
+ * because a cursor built anywhere else is a second way to build one.
+ *
  * ## What a verdict does to the list
  *
  * A match the user marked not relevant leaves the default view and stays in
@@ -50,7 +68,7 @@
  * match that was never delivered.
  */
 import { and, desc, eq, gte, inArray, isNotNull, isNull, or, type SQL, sql } from "drizzle-orm";
-import { alias } from "drizzle-orm/pg-core";
+import { type AnyPgColumn, alias } from "drizzle-orm/pg-core";
 import type { Database } from "../db/client.js";
 import {
   feedback,
@@ -93,8 +111,33 @@ export const defaultPageSize = 50;
  */
 export const maximumPageSize = 200;
 
-/** The shape the cursor takes: a rank and the id it belongs to. */
+/** The shape the cursor takes: an ordering value and the id it belongs to. */
 export const cursorPattern = /^-?\d+(?:\.\d+)?(?:e[+-]?\d+)?:[0-9a-fA-F-]{36}$/;
+
+/**
+ * What a page of the inbox is ordered by. US-114.
+ *
+ * `rank` is US-011's score minus twelve points a day, and it is the default.
+ * The other two are its halves, because the rank mixes them and a person
+ * sometimes wants one on its own:
+ *
+ * - `score` is what the classifier said, with no decay. The best leads this
+ *   monitor has ever found, whenever they were written.
+ * - `newest` is the post's own date, with no score. What arrived since I last
+ *   looked. It is the same date the rank decays against and the same one the
+ *   card shows — never `matches.created_at`, which records when a poll got
+ *   round to scoring the post and so describes our schedule rather than the
+ *   lead.
+ *
+ * The saved list has an order of its own and it is not offered here: it is not
+ * a choice, it is what that list is.
+ */
+export const matchOrders = ["rank", "score", "newest"] as const;
+
+export type MatchOrder = (typeof matchOrders)[number];
+
+/** The saved list's own order, beside the two a caller may ask for. */
+type PageOrder = MatchOrder | "saved";
 
 /** One match, with the post it is about and the monitor that found it. */
 export interface InboxMatch {
@@ -103,7 +146,12 @@ export interface InboxMatch {
   readonly monitorName: string;
   /** The lead score, 0 to 100, exactly as the classifier wrote it. */
   readonly score: number;
-  /** The score after the age decay above. What the list is ordered by. */
+  /**
+   * The score after the age decay above.
+   *
+   * What the default order sorts by, and reported on every page whatever the
+   * order — it is a fact about the match rather than about the list.
+   */
   readonly rank: number;
   readonly relevance: number;
   readonly problemFit: number;
@@ -150,6 +198,16 @@ export interface InboxMatch {
   /** The original conversation. The inbox opens it in a new tab. */
   readonly url: string;
   readonly postedAt: Date;
+  /**
+   * The cursor that resumes the list after this row. US-114.
+   *
+   * On the row rather than from a function, because its value depends on the
+   * order the page was read in: the rank orders by one number and the newest
+   * order by another. A cursor built anywhere but here would be a second
+   * answer to that question, free to disagree with the `ORDER BY` — which is
+   * exactly how the saved list came to page on a rank it did not sort by.
+   */
+  readonly cursor: string;
 }
 
 export interface ListMatchesOptions {
@@ -191,9 +249,18 @@ export interface ListMatchesOptions {
    * A different list rather than a filter on the same one, and the ordering
    * says why: the inbox ranks by score and age together, subtracting twelve
    * points a day, and something kept on purpose does not get less kept
-   * overnight. When this is set the page is ordered by when it was saved.
+   * overnight. When this is set the page is ordered by when it was saved, and
+   * `order` is ignored.
    */
   readonly savedOnly?: boolean;
+  /**
+   * What to order the page by. Defaults to the rank. US-114.
+   *
+   * Ignored on the saved list, which has an order of its own: something kept
+   * on purpose does not get less kept overnight, and neither is it kept by the
+   * date it was written.
+   */
+  readonly order?: MatchOrder;
 }
 
 export interface MatchPage {
@@ -213,7 +280,8 @@ export class UnusableCursorError extends Error {
 }
 
 interface Cursor {
-  readonly rank: number;
+  /** Whatever this page was ordered by. `orderValue` decides which number. */
+  readonly value: number;
   readonly id: string;
 }
 
@@ -221,11 +289,11 @@ function parseCursor(cursor: string): Cursor {
   if (!cursorPattern.test(cursor)) throw new UnusableCursorError(cursor);
 
   const separator = cursor.lastIndexOf(":");
-  const rank = Number(cursor.slice(0, separator));
+  const value = Number(cursor.slice(0, separator));
 
-  if (!Number.isFinite(rank)) throw new UnusableCursorError(cursor);
+  if (!Number.isFinite(value)) throw new UnusableCursorError(cursor);
 
-  return { rank, id: cursor.slice(separator + 1) };
+  return { value, id: cursor.slice(separator + 1) };
 }
 
 /**
@@ -241,9 +309,32 @@ function rankExpression(asOf: Date): SQL<number> {
     * GREATEST(0, EXTRACT(EPOCH FROM (${asOf}::timestamptz - ${posts.postedAt})) / 86400.0))`;
 }
 
-/** The cursor for a row, so the next page starts after it. */
-export function cursorFor(match: InboxMatch): string {
-  return `${match.rank}:${match.id}`;
+/**
+ * A timestamp as a number the cursor can carry.
+ *
+ * `double precision` for `rankExpression`'s reason, and it is enough here: a
+ * double holds a second-of-the-epoch to well under a microsecond, and Postgres
+ * stores a `timestamptz` to the microsecond. So the boundary row found by a
+ * cursor is the row the cursor was built from, and not the one beside it.
+ */
+function epochOf(column: SQL | AnyPgColumn): SQL<number> {
+  return sql<number>`EXTRACT(EPOCH FROM ${column})::double precision`;
+}
+
+/**
+ * The one number a page is sorted and paged by.
+ *
+ * Both the `ORDER BY` and the keyset boundary read this, so an order cannot be
+ * added to one and forgotten in the other.
+ */
+function orderValue(order: PageOrder, asOf: Date): SQL<number> {
+  if (order === "rank") return rankExpression(asOf);
+  if (order === "newest") return epochOf(posts.postedAt);
+  // `double precision` like the rest, so one cursor shape carries all four
+  // orders and `parseCursor` has one number to read.
+  if (order === "score") return sql<number>`${matches.score}::double precision`;
+
+  return epochOf(matches.savedAt);
 }
 
 /**
@@ -258,6 +349,10 @@ export async function listMatches(db: Database, options: ListMatchesOptions): Pr
   const limit = Math.min(Math.max(options.limit ?? defaultPageSize, 1), maximumPageSize);
   const userId = options.userId;
   const rank = rankExpression(asOf);
+  // The saved list wins over the caller's order rather than arguing with it.
+  // Its order is what that list is, so there is nothing here to choose.
+  const order: PageOrder = options.savedOnly ? "saved" : (options.order ?? "rank");
+  const sortBy = orderValue(order, asOf);
 
   /**
    * The inbox belongs to one person. US-017.
@@ -306,8 +401,11 @@ export async function listMatches(db: Database, options: ListMatchesOptions): Pr
     // alias from `WHERE`, and repeating it is cheaper than the subquery that
     // would let us name it once.
     const boundary = or(
-      sql`${rank} < ${after.rank}::double precision`,
-      and(sql`${rank} = ${after.rank}::double precision`, sql`${matches.id} < ${after.id}::uuid`),
+      sql`${sortBy} < ${after.value}::double precision`,
+      and(
+        sql`${sortBy} = ${after.value}::double precision`,
+        sql`${matches.id} < ${after.id}::uuid`,
+      ),
     );
 
     if (boundary) conditions.push(boundary);
@@ -322,6 +420,7 @@ export async function listMatches(db: Database, options: ListMatchesOptions): Pr
       monitorName: monitors.name,
       score: matches.score,
       rank,
+      sortBy,
       relevance: matches.relevance,
       problemFit: matches.problemFit,
       icpFit: matches.icpFit,
@@ -364,29 +463,28 @@ export async function listMatches(db: Database, options: ListMatchesOptions): Pr
     .leftJoin(feedback, currentVerdict)
     .where(and(...conditions))
     /**
-     * Newest first on the saved list, and by rank everywhere else.
+     * Whatever this page is ordered by, then the id.
      *
-     * US-011's rank subtracts twelve points a day, which is right for an inbox
-     * — an old lead is a colder one — and wrong for a list somebody built on
-     * purpose. Something kept does not get less kept overnight.
+     * The id is not decoration: two matches share a rank whenever two posts of
+     * the same score land in the same instant, and on the newest order two
+     * posts from one page of a provider often carry the same timestamp. A
+     * keyset cursor over a value that repeats needs a tie-break it can compare,
+     * or the second row of the pair is skipped.
      */
-    .orderBy(
-      ...(options.savedOnly
-        ? [desc(matches.savedAt), desc(matches.id)]
-        : [desc(rank), desc(matches.id)]),
-    )
+    .orderBy(desc(sortBy), desc(matches.id))
     .limit(limit + 1);
 
-  const page = rows.slice(0, limit).map((row) => ({
+  const page = rows.slice(0, limit).map(({ sortBy: value, ...row }) => ({
     ...row,
     rank: Number(row.rank),
     intentLabel: intentTypeLabel(row.intentType),
+    cursor: `${Number(value)}:${row.id}`,
   }));
   const last = page.at(-1);
 
   return {
     matches: page,
-    nextCursor: rows.length > limit && last ? cursorFor(last) : null,
+    nextCursor: rows.length > limit && last ? last.cursor : null,
     asOf,
   };
 }

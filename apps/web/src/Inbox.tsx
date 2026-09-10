@@ -90,6 +90,24 @@ const dismissedFilters = [
   { value: "show", label: "Shown" },
 ];
 
+/**
+ * The orders the list offers, and what the heading calls each one. US-114.
+ *
+ * An order is not a filter, so it sits beside the monitor picker rather than
+ * inside the Filters panel and never adds to that panel's count. A filter says
+ * what is on the list; this says where to start reading.
+ */
+const orders = [
+  // "Best" on the control and the rule in the heading below it. The picker has
+  // room for one word and the heading has room for the sentence that says what
+  // the word means, so neither has to do the other's job.
+  { value: "rank", label: "Best", heading: "Ranked by score & age" },
+  { value: "score", label: "Score", heading: "Highest score first" },
+  { value: "newest", label: "Newest", heading: "Newest first" },
+] as const;
+
+type Order = (typeof orders)[number]["value"];
+
 const postPreviewWordLimit = 80;
 
 function limitWords(body: string): { text: string; truncated: boolean } {
@@ -269,6 +287,7 @@ export function Inbox({ projectId }: { readonly projectId: string }) {
   const [selectedMatchId, setSelectedMatchId] = useState<string | null>(null);
   const [mobileDetailOpen, setMobileDetailOpen] = useState(false);
   const [expandedMatchId, setExpandedMatchId] = useState<string | null>(null);
+  const [order, setOrder] = useState<Order>("rank");
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [showDismissed, setShowDismissed] = useState(false);
   /**
@@ -330,8 +349,11 @@ export function Inbox({ projectId }: { readonly projectId: string }) {
     if (minScore > 0) query.set("minScore", String(minScore));
     if (showDismissed) query.set("includeNotRelevant", "true");
     if (showSaved) query.set("saved", "true");
+    // Not on the saved list, which has an order of its own. Sending it would
+    // ask the server for something it is right to ignore. US-114.
+    if (!showSaved && order !== "rank") query.set("order", order);
     return query;
-  }, [projectId, monitorId, minScore, showDismissed, showSaved]);
+  }, [projectId, monitorId, minScore, showDismissed, showSaved, order]);
 
   const loadFirstPage = useCallback(async (): Promise<void> => {
     setState("loading");
@@ -362,12 +384,13 @@ export function Inbox({ projectId }: { readonly projectId: string }) {
     setState("more");
     setError(null);
 
-    const query = new URLSearchParams({ cursor: page.nextCursor, asOf: page.asOf });
-    query.set("projectId", projectId);
-    if (monitorId) query.set("monitorId", monitorId);
-    if (minScore > 0) query.set("minScore", String(minScore));
-    if (showDismissed) query.set("includeNotRelevant", "true");
-    if (showSaved) query.set("saved", "true");
+    // The same filters as the first page, plus the paging. Built from the one
+    // function rather than copied: a cursor is issued in one order and must be
+    // spent in the same one, so a second copy that forgot the order would page
+    // a ranked list with a date cursor and drop rows nobody sees go missing.
+    const query = filterQuery();
+    query.set("cursor", page.nextCursor);
+    query.set("asOf", page.asOf);
 
     try {
       const answer = await requestJson<MatchPage>(`/api/matches?${query}`);
@@ -453,6 +476,8 @@ export function Inbox({ projectId }: { readonly projectId: string }) {
   }
 
   const filtered = monitorId !== "" || minScore > 0 || showDismissed;
+  const orderHeading =
+    orders.find((option) => option.value === order)?.heading ?? orders[0].heading;
   const selectedMatch = matches.find((match) => match.id === selectedMatchId) ?? matches[0] ?? null;
   const scoreRows: Array<[string, number]> = selectedMatch
     ? [
@@ -509,6 +534,23 @@ export function Inbox({ projectId }: { readonly projectId: string }) {
               ))}
             </select>
           </label>
+
+          {!showSaved && (
+            <label className="filter">
+              <span>Order</span>
+              <select
+                aria-label="Order"
+                value={order}
+                onChange={(event) => setOrder(event.target.value as Order)}
+              >
+                {orders.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
 
           <button
             className={`compact-button filter-toggle ${filtered ? "active" : ""}`}
@@ -646,7 +688,7 @@ export function Inbox({ projectId }: { readonly projectId: string }) {
                 {matches.length}
                 {page?.nextCursor ? "+" : ""} conversations
               </span>
-              <span>{showSaved ? "Recently saved" : "Ranked by score & age"}</span>
+              <span>{showSaved ? "Recently saved" : orderHeading}</span>
               {/*
                 Beside the count, because the count is what it exports. US-064.
                 A plain link rather than a fetch: the browser downloads it, so

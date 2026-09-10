@@ -16,7 +16,6 @@ import { type IntentType, matches, monitors, posts } from "../db/schema.js";
 import { recordVerdict } from "../feedback/feedback.js";
 import { createTestDatabase, type TestDatabase } from "../testing/database.js";
 import {
-  cursorFor,
   type InboxMatch,
   listMatches,
   type MatchPage,
@@ -358,6 +357,55 @@ describe("the inbox list", () => {
       expect(saved.matches.map((match) => match.id)).toEqual([weak, strong]);
     });
 
+    /**
+     * The bug US-114 found beside its own work. The saved list sorted by
+     * `saved_at` and paged on the rank, so page two kept only the rows whose
+     * rank happened to be below the last row's — silently, and only once
+     * somebody had saved more than one page. The scores here descend while the
+     * save times ascend, so every row on page two is above the boundary the
+     * old cursor tested.
+     */
+    it("pages without losing a match", async () => {
+      const kept: string[] = [];
+
+      for (let index = 0; index < 6; index += 1) {
+        const id = await seed({ monitorId, score: 90 - index * 10, postedAt: minutesAgo(5) });
+        await setMatchSaved(db, owner, id, true, new Date(now.getTime() + index * 60_000));
+        kept.push(id);
+      }
+
+      const walked: string[] = [];
+      let cursor: string | null = null;
+
+      do {
+        const page: MatchPage = await listMatches(db, {
+          userId: owner,
+          savedOnly: true,
+          limit: 2,
+          cursor,
+        });
+
+        walked.push(...page.matches.map((match) => match.id));
+        cursor = page.nextCursor;
+      } while (cursor);
+
+      // Newest save first, so the walk is the order things were kept, reversed.
+      expect(walked).toEqual([...kept].reverse());
+    });
+
+    it("keeps its own order when an order is asked for", async () => {
+      const older = await seed({ monitorId, score: 40, postedAt: daysAgo(4) });
+      const newer = await seed({ monitorId, score: 40, postedAt: minutesAgo(1) });
+
+      await setMatchSaved(db, owner, newer, true, new Date("2026-09-01T00:00:00.000Z"));
+      await setMatchSaved(db, owner, older, true, new Date("2026-09-02T00:00:00.000Z"));
+
+      const saved = await listMatches(db, { userId: owner, savedOnly: true, order: "newest" });
+
+      // The date order would put `newer` first. The saved list is not a choice.
+      expect(saved.matches.map((match) => match.id)).toEqual([older, newer]);
+    });
+
     it("does not move when it is kept twice", async () => {
       const first = await seed({ monitorId, score: 70, postedAt: minutesAgo(5) });
       const second = await seed({ monitorId, score: 70, postedAt: minutesAgo(5) });
@@ -514,12 +562,192 @@ describe("the inbox list", () => {
       await seed({ monitorId, score: 71, postedAt: minutesAgo(13) });
 
       const first = await listMatches(db, { userId: owner, asOf: now, limit: 1 });
-      const rebuilt = cursorFor(at(first, 0));
+      // The row's own cursor, not the page's. They are the same string here,
+      // and a screen that pages from a row it chose depends on that.
+      const rebuilt = at(first, 0).cursor;
+
+      expect(rebuilt).toBe(first.nextCursor);
 
       const second = await listMatches(db, { userId: owner, asOf: now, limit: 1, cursor: rebuilt });
 
       expect(second.matches).toHaveLength(1);
       expect(at(second, 0).id).not.toBe(at(first, 0).id);
+    });
+  });
+
+  /**
+   * The score on its own. US-114.
+   *
+   * The rank's other half. Every case seeds an old high score against a fresh
+   * low one, because that is the only arrangement where the three orders
+   * disagree.
+   */
+  describe("ordered by score", () => {
+    it("puts the highest score first, however old it is", async () => {
+      const old = await seed({ monitorId, score: 95, postedAt: daysAgo(30) });
+      const fresh = await seed({ monitorId, score: 60, postedAt: minutesAgo(2) });
+
+      const page = await listMatches(db, { userId: owner, asOf: now, order: "score" });
+
+      expect(page.matches.map((match) => match.id)).toEqual([old, fresh]);
+      // The rank puts the fresh one first: 95 - 360 against 60.
+      const ranked = await listMatches(db, { userId: owner, asOf: now });
+      expect(at(ranked, 0).id).toBe(fresh);
+    });
+
+    it("pages without repeating or losing a match", async () => {
+      const seeded: string[] = [];
+
+      // Descending in score and ascending in date, so a boundary read against
+      // either of the other two orders lands somewhere else.
+      for (let index = 0; index < 6; index += 1) {
+        seeded.push(
+          await seed({ monitorId, score: 90 - index, postedAt: minutesAgo(60 - index * 10) }),
+        );
+      }
+
+      const walked: string[] = [];
+      let cursor: string | null = null;
+
+      do {
+        const page: MatchPage = await listMatches(db, {
+          userId: owner,
+          asOf: now,
+          order: "score",
+          limit: 2,
+          cursor,
+        });
+
+        walked.push(...page.matches.map((match) => match.id));
+        cursor = page.nextCursor;
+      } while (cursor);
+
+      expect(walked).toEqual(seeded);
+    });
+
+    it("does not lose a match that shares a score with another", async () => {
+      // Scores are whole numbers between 0 and 100, so ties are the normal
+      // case here rather than the rare one the other orders see.
+      const first = await seed({ monitorId, score: 70, postedAt: minutesAgo(5) });
+      const second = await seed({ monitorId, score: 70, postedAt: minutesAgo(9) });
+
+      const page = await listMatches(db, { userId: owner, asOf: now, order: "score", limit: 1 });
+      const next = await listMatches(db, {
+        userId: owner,
+        asOf: now,
+        order: "score",
+        limit: 1,
+        cursor: page.nextCursor,
+      });
+
+      expect([at(page, 0).id, at(next, 0).id].sort()).toEqual([first, second].sort());
+    });
+  });
+
+  /**
+   * The date on its own. US-114.
+   *
+   * The cases that matter are the ones where the two orders disagree, because
+   * an order that agrees with the rank is untestable: every assertion here
+   * seeds a low score that is new and a high score that is old.
+   */
+  describe("ordered by date", () => {
+    it("puts the newest post first, whatever it scored", async () => {
+      // Ranks: 95 - 36 = 59, 70 - 0.75 = 69.25, 31. So the rank puts the
+      // freshest match last and the date order puts it first.
+      const old = await seed({ monitorId, score: 95, postedAt: daysAgo(3) });
+      const fresh = await seed({ monitorId, score: 31, postedAt: minutesAgo(2) });
+      const between = await seed({ monitorId, score: 70, postedAt: minutesAgo(90) });
+
+      const page = await listMatches(db, { userId: owner, asOf: now, order: "newest" });
+
+      expect(page.matches.map((match) => match.id)).toEqual([fresh, between, old]);
+
+      const ranked = await listMatches(db, { userId: owner, asOf: now, order: "rank" });
+
+      expect(ranked.matches.map((match) => match.id)).toEqual([between, old, fresh]);
+    });
+
+    it("still reports the rank of every match it returns", async () => {
+      await seed({ monitorId, score: 90, postedAt: daysAgo(1) });
+
+      const page = await listMatches(db, { userId: owner, asOf: now, order: "newest" });
+
+      // The rank is a fact about the match, not about the list it is in.
+      expect(at(page, 0).rank).toBe(78);
+    });
+
+    it("is the rank when nobody asks for an order", async () => {
+      const old = await seed({ monitorId, score: 95, postedAt: daysAgo(3) });
+      const fresh = await seed({ monitorId, score: 31, postedAt: minutesAgo(2) });
+
+      const page = await listMatches(db, { userId: owner, asOf: now });
+
+      // 59 against 31: the rank, which is the order this list has always had.
+      expect(page.matches.map((match) => match.id)).toEqual([old, fresh]);
+    });
+
+    it("pages without repeating or losing a match", async () => {
+      const seeded: string[] = [];
+      // Descending in date and ascending in score, so a page boundary read
+      // against the rank would land in a different place than this order.
+      for (let index = 0; index < 6; index += 1) {
+        seeded.push(
+          await seed({ monitorId, score: 40 + index * 5, postedAt: minutesAgo(60 - index * 10) }),
+        );
+      }
+
+      const walked: string[] = [];
+      let cursor: string | null = null;
+
+      do {
+        const page: MatchPage = await listMatches(db, {
+          userId: owner,
+          asOf: now,
+          order: "newest",
+          limit: 2,
+          cursor,
+        });
+
+        walked.push(...page.matches.map((match) => match.id));
+        cursor = page.nextCursor;
+      } while (cursor);
+
+      expect(walked).toEqual([...seeded].reverse());
+      expect(new Set(walked).size).toBe(6);
+    });
+
+    it("does not lose a match that shares a date with another", async () => {
+      // Two posts collected from one page of a provider often carry the same
+      // timestamp. Without the id as a tie-break the second one is skipped.
+      const sameMoment = minutesAgo(30);
+      const first = await seed({ monitorId, score: 60, postedAt: sameMoment });
+      const second = await seed({ monitorId, score: 61, postedAt: sameMoment });
+
+      const page = await listMatches(db, { userId: owner, asOf: now, order: "newest", limit: 1 });
+      const next = await listMatches(db, {
+        userId: owner,
+        asOf: now,
+        order: "newest",
+        limit: 1,
+        cursor: page.nextCursor,
+      });
+
+      expect([at(page, 0).id, at(next, 0).id].sort()).toEqual([first, second].sort());
+    });
+
+    it("honours the filters it is given", async () => {
+      await seed({ monitorId, score: 20, postedAt: minutesAgo(1) });
+      const strong = await seed({ monitorId, score: 80, postedAt: daysAgo(2) });
+
+      const page = await listMatches(db, {
+        userId: owner,
+        asOf: now,
+        order: "newest",
+        minScore: 50,
+      });
+
+      expect(page.matches.map((match) => match.id)).toEqual([strong]);
     });
   });
 

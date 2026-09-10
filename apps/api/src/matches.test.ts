@@ -243,6 +243,50 @@ describe("the inbox route", () => {
     expect(response.statusCode).toBe(400);
   });
 
+  describe("the order the query string asks for", () => {
+    it("puts the newest post first when it asks for the date", async () => {
+      // 95 three days old ranks 59 and 31 two minutes old ranks 31, so the
+      // default puts them the other way round.
+      await seed({ monitorId, score: 95, minutesOld: 3 * 24 * 60 });
+      await seed({ monitorId, score: 31, minutesOld: 2 });
+
+      expect(scores((await get("/api/matches?order=newest")).json() as Page)).toEqual([31, 95]);
+      expect(scores((await get("/api/matches")).json() as Page)).toEqual([95, 31]);
+    });
+
+    it("carries the order across a page boundary", async () => {
+      await seed({ monitorId, score: 95, minutesOld: 3 * 24 * 60 });
+      await seed({ monitorId, score: 31, minutesOld: 2 });
+
+      const first = (await get("/api/matches?order=newest&limit=1")).json() as Page;
+      const second = (
+        await get(
+          `/api/matches?order=newest&limit=1&cursor=${encodeURIComponent(first.nextCursor ?? "")}&asOf=${encodeURIComponent(first.asOf)}`,
+        )
+      ).json() as Page;
+
+      expect(scores(first)).toEqual([31]);
+      expect(scores(second)).toEqual([95]);
+    });
+
+    it("puts the highest score first when it asks for the score", async () => {
+      // 95 thirty days old ranks below zero, so the rank puts it last and the
+      // score puts it first. The third order, the date, agrees with the rank
+      // here and is not what this asserts.
+      await seed({ monitorId, score: 95, minutesOld: 30 * 24 * 60 });
+      await seed({ monitorId, score: 60, minutesOld: 2 });
+
+      expect(scores((await get("/api/matches?order=score")).json() as Page)).toEqual([95, 60]);
+      expect(scores((await get("/api/matches")).json() as Page)).toEqual([60, 95]);
+    });
+
+    it("refuses an order it does not have", async () => {
+      // Not a silent fall back to the default: a cursor issued in one order
+      // and spent in another walks past rows nobody sees go missing.
+      expect((await get("/api/matches?order=relevance")).statusCode).toBe(400);
+    });
+  });
+
   describe("the two buttons on a match", () => {
     it("stores a verdict and puts it on the card", async () => {
       const matchId = await seed({ monitorId, score: 94, minutesOld: 12 });
@@ -381,6 +425,26 @@ describe("the inbox route", () => {
       const response = await get("/api/matches/export");
 
       expect(response.body.trim().split("\r\n")).toHaveLength(13);
+    });
+
+    it("is written in the order the screen was in", async () => {
+      await seed({ monitorId, score: 95, minutesOld: 3 * 24 * 60 });
+      await seed({ monitorId, score: 31, minutesOld: 2 });
+
+      const ranked = await get("/api/matches/export");
+      const dated = await get("/api/matches/export?order=newest");
+
+      // The score is the first column. A file in a different order from the
+      // screen it was exported from is a file somebody has to re-sort.
+      const column = (body: string): string[] =>
+        body
+          .trim()
+          .split("\r\n")
+          .slice(1)
+          .map((line) => line.split(",")[0]?.replace(/^\uFEFF/, "") ?? "");
+
+      expect(column(ranked.body)).toEqual(["95", "31"]);
+      expect(column(dated.body)).toEqual(["31", "95"]);
     });
 
     it("is a header and nothing else when nothing matches", async () => {

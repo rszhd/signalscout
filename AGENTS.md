@@ -1719,6 +1719,35 @@ production monitor this ticket came from is still the only evidence any of it
 was needed, and why *that* monitor collected nothing is a separate question this
 ticket does not answer.
 
+**The inbox has three orders, and adding them found a cursor that was already
+wrong.** US-114 closed on 2026-09-11. US-011's rank subtracts twelve points a
+day, so it is two facts mixed — and a person who wants one of them unmixed had
+no way to ask. The other two orders are its halves: the score alone, which is
+the best leads a monitor has ever found, and the post's date alone, which is
+what arrived since somebody last looked. Under the rank both answers are
+scattered through one list, because a fresh low score and an old high one land
+on the same rung.
+
+The rank stays the default and the control calls it **Best**, with the rule —
+"Ranked by score & age" — in the heading under it.
+
+**One ordering value per page, chosen once, read by the sort and by the
+cursor.** `orderValue` is that place. Pagination here is keyset, so an order
+the `ORDER BY` knows about and the boundary does not is a list that silently
+drops rows — and the saved list of US-043 was exactly that: it sorted by
+`saved_at` and paged on the rank, so page two kept only the rows whose rank
+happened to sit below the last row's. It needs more than fifty saved matches to
+show, which is why nobody had seen it.
+
+`cursorFor` is gone and each row carries its own cursor. **A cursor is a
+property of a row in the ordering that produced it**, so a function that builds
+one from the row alone has to guess the order, and a guess is what disagreed.
+
+The order is a control beside the monitor filter and not inside the Filters
+panel, and it never adds to that panel's count: a filter says what is on the
+list, an order says where to start reading. The saved list is not offered the
+control, because its order is what that list is.
+
 **The inbox leaves as a spreadsheet.** US-064 closed on 2026-09-07. A link
 beside the match count downloads the list *currently on screen* as CSV — every
 filter honoured, every page walked, because a screen paginates and a file

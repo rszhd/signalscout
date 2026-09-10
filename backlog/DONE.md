@@ -2,7 +2,7 @@
 
 # Done
 
-85 finished.
+86 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
@@ -18,6 +18,7 @@
 | BUG-003 | [A post below the threshold is classified again on every poll](done/2026-09/BUG-003-a-post-below-the-threshold-is-classified-again-on-every-poll.md) | bug | fixed | 2026-09 |
 | BUG-002 | [A seven-day window is bought as a month](done/2026-09/BUG-002-a-seven-day-window-is-bought-as-a-month.md) | bug | fixed | 2026-09 |
 | BUG-001 | [A pending Reddit collection is not resumed](done/2026-09/BUG-001-a-pending-reddit-collection-is-not-resumed.md) | bug | shipped | 2026-09 |
+| US-101 | [The README says what the product does now](done/2026-09/US-101-the-readme-says-what-the-product-does-now.md) | chore | shipped | 2026-09 |
 | US-098 | [A provider card links to its website](done/2026-09/US-098-a-provider-card-links-to-its-website.md) | feature | shipped | 2026-09 |
 | US-097 | [A webhook cannot be aimed at our own network](done/2026-09/US-097-a-webhook-cannot-be-aimed-at-our-own-network.md) | feature | done | 2026-09 |
 | US-096 | [A webhook secret belongs to an account](done/2026-09/US-096-a-webhook-secret-belongs-to-an-account.md) | feature | done | 2026-09 |

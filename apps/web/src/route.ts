@@ -27,6 +27,7 @@ export const routes = {
   inbox: "/projects/:projectId",
   monitors: "/projects/:projectId/monitors",
   newMonitor: "/projects/:projectId/monitors/new",
+  monitor: "/projects/:projectId/monitors/:monitorId",
   notifications: "/projects/:projectId/monitors/:monitorId/notifications",
   connections: "/connections",
   providers: "/providers",
@@ -48,6 +49,8 @@ export const paths = {
   inbox: (projectId: string): string => `/projects/${encodeURIComponent(projectId)}`,
   monitors: (projectId: string): string => `${paths.inbox(projectId)}/monitors`,
   newMonitor: (projectId: string): string => `${paths.monitors(projectId)}/new`,
+  monitor: (projectId: string, monitorId: string): string =>
+    `${paths.monitors(projectId)}/${encodeURIComponent(monitorId)}`,
   notifications: (projectId: string, monitorId: string): string =>
     `${paths.monitors(projectId)}/${encodeURIComponent(monitorId)}/notifications`,
   connections: routes.connections,

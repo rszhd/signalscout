@@ -1,379 +1,51 @@
+/**
+ * The monitor list: one row per monitor, and five columns. US-109.
+ *
+ * A list answers *which one*, and a page answers *what about it*. This was
+ * both until US-109, so it was a bad list and a cramped page: a card carried
+ * four settings forms, four spend figures and three actions, took about forty
+ * lines of vertical space, and three monitors did not fit on one screen. The
+ * question the list is opened with — which of these needs me? — was answered
+ * by scrolling past everything that does not.
+ *
+ * Five facts decide that, and they are the five columns. The name says which
+ * monitor. The status says whether a person or a cap stopped it. The next run
+ * says whether waiting is the right thing to do. The last poll says what the
+ * last collection did, which is US-104's whole point. And the matches found
+ * say whether any of it produced anything — the one measure of the outcome,
+ * beside four measures of the work.
+ *
+ * Everything else lives on `MonitorDetail`, one click away. Pause and resume
+ * stay here: it is the action a person takes *from* the list, prompted by the
+ * status column beside it, and a page in between is the detour this screen was
+ * rewritten to remove.
+ */
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router";
 import { messageFor, requestJson } from "./api.js";
 import { BrandIcon } from "./BrandIcon.js";
-import { ageLabel, platformName, providerName } from "./labels.js";
+import { platformName } from "./labels.js";
+import { type Monitor, needsAttention, nextPollLabel, pollSummary, status } from "./monitor.js";
 import { paths } from "./route.js";
-import { ScheduleField } from "./ScheduleField.js";
-import { describeSchedule } from "./schedule.js";
-
-/**
- * The monitor list: what each monitor is doing, what it has spent, and what it
- * may still spend.
- *
- * US-013 asks for two things this screen exists to carry. A refused poll must
- * be visible with its reason, because a monitor that quietly stopped
- * collecting looks exactly like a quiet week — and an empty inbox is the one
- * place a person must never learn that from. And the spend must sit next to
- * the monitor it belongs to, because "what is this costing me" is a question
- * about one monitor, not about the deployment.
- *
- * Every figure here says "estimated" beside it. That is not hedging: we
- * multiply the units a connector reported by the price it declares, and the
- * provider's invoice is the authority. docs/costs.md says why in full, and the
- * screen links to it rather than repeating it.
- */
-
-interface Budget {
-  monthlyCapMicros: number;
-  onExhausted: "pause" | "notify";
-}
-
-interface Spend {
-  sourceMicros: number;
-  modelMicros: number;
-  totalMicros: number;
-  remainingMicros: number | null;
-  exhausted: boolean;
-  reason: string | null;
-  since: string;
-}
-
-interface MissingCredential {
-  environmentVariable: string;
-}
-
-interface PreFilter {
-  enabled: boolean;
-  /**
-   * Sent by the API and no longer edited here. It is a research dial: the
-   * default of 0.15 came from one monitor and five posts, a value set too high
-   * drops leads with no row and no bill to notice, and on every platform
-   * measured so far the stage has dropped almost nothing — 0 of 40 posts on X,
-   * 0 of 20 on LinkedIn, 1 of 50 in a subreddit. `PATCH /api/monitors/:id`
-   * still carries it for whoever is tuning one.
-   */
-  similarityThreshold: number;
-  dropped: { keyword: number; embedding: number; triage: number };
-  /** Posts the classifier has read. With the drops it makes the total. */
-  read: number;
-}
-
-/** The verdicts in force on this monitor's matches. US-012. */
-interface Feedback {
-  good: number;
-  notRelevant: number;
-}
-
-/** Which provider last collected one platform for this monitor, and when. */
-interface LastCollection {
-  source: string;
-  provider: string;
-  at: string;
-}
-
-/** One platform's line inside a poll. US-104. */
-interface PollRunSource {
-  source: string;
-  provider: string | null;
-  pages: number;
-  postsReturned: number;
-  postsNew: number;
-  units: number;
-  estimatedCostMicros: number;
-  reason: string | null;
-}
-
-/**
- * What one poll did. US-104.
- *
- * The three counts stay apart here as they do on the row: returned against
- * units says whether the searches found anything at all, and returned against
- * new says whether it was anything this instance had not already seen.
- */
-interface PollRun {
-  id: string;
-  walkId: string;
-  startedAt: string;
-  finishedAt: string;
-  outcome: string;
-  postsReturned: number;
-  postsNew: number;
-  units: number;
-  estimatedCostMicros: number;
-  stopReason: string | null;
-  sources: PollRunSource[];
-}
-
-interface Monitor {
-  notificationIssues?: string[];
-  id: string;
-  name: string;
-  /**
-   * The project this monitor came out of. US-045.
-   *
-   * Optional as well as nullable, for the reason BUG-009 taught: a browser
-   * holds a build for as long as its tab is open and talks to whatever API is
-   * deployed, so a field this screen did not show yesterday can simply be
-   * absent.
-   */
-  projectId?: string | null;
-  projectName?: string | null;
-  sources: string[];
-  paused: boolean;
-  lastPolledAt: string | null;
-  /** When it runs. US-041. */
-  pollIntervalSeconds: number;
-  pollDays: number[];
-  pollTimezone: string;
-  lastCollected: LastCollection[];
-  /**
-   * The last poll, or null where none has run. US-104.
-   *
-   * Optional as well as nullable for `projectId`'s reason: a tab open since
-   * before this shipped talks to the API that has it, and a tab open now may
-   * talk to one that does not.
-   */
-  lastPoll?: PollRun | null;
-  missingCredentials: MissingCredential[];
-  budget: Budget | null;
-  spend: Spend;
-  preFilter: PreFilter;
-  feedback: Feedback;
-}
 
 type LoadState = "loading" | "ready" | "error";
 
 /**
- * A micro-dollar amount as a person reads it.
+ * What a row says under "Next run".
  *
- * Up to four decimal places, and the server formats the same way for the
- * sentence it sends. Ten Reddit records cost $0.015, and a page that rounded
- * that to two cents could not be reconciled against an invoice.
+ * Three answers rather than a blank: a paused monitor is not late, a monitor
+ * that has never polled is not overdue, and an empty cell reads as neither.
  */
-export function formatMicros(micros: number): string {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 4,
-  }).format(micros / 1_000_000);
+function nextRunLabel(monitor: Monitor): string {
+  if (monitor.paused) return "Paused";
+  if (!monitor.lastPolledAt) return "Waiting for the first poll";
+
+  return nextPollLabel(monitor) ?? "—";
 }
 
-/** What a person typed in dollars, as the micro-dollars the API takes. */
-export function toMicros(dollars: string): number | null {
-  const amount = Number(dollars);
-  if (!Number.isFinite(amount) || amount < 0) return null;
-
-  return Math.round(amount * 1_000_000);
-}
-
-/** The month the figures cover, for the line above them. */
-function monthLabel(since: string): string {
-  return new Date(since).toLocaleDateString("en-US", {
-    month: "long",
-    year: "numeric",
-    timeZone: "UTC",
-  });
-}
-
-/**
- * What the person thought of this monitor's matches, in one sentence.
- *
- * PLAN.md sets the ratio as the real measure of success, so the sentence says
- * the ratio and not only the counts. A monitor nobody has judged says so
- * rather than showing two zeros, because "0 good" reads as a verdict about the
- * monitor and it is a verdict about nothing.
- */
-function feedbackLabel({ good, notRelevant }: Feedback): string {
-  const judged = good + notRelevant;
-  if (judged === 0) return "No matches judged yet";
-
-  return `${good} good, ${notRelevant} not relevant of ${judged} judged`;
-}
-
-/**
- * What this monitor is doing, in two words.
- *
- * The budget comes before the pause, because a monitor the cap paused is
- * paused *for a reason a person needs*, and "Paused" alone would send them
- * looking for a button somebody pressed.
- */
-function status(monitor: Monitor): { label: string; tone: string; attention?: boolean } {
-  if (monitor.spend.exhausted) return { label: "Budget spent", tone: "stopped" };
-  if (monitor.missingCredentials.length > 0) return { label: "Needs a key", tone: "stopped" };
-  if (monitor.paused) return { label: "Paused", tone: "paused" };
-
-  /**
-   * A monitor that is polling and finding nothing. US-104.
-   *
-   * The tone stays `running`, because it is: the filter above counts it among
-   * the active monitors and it would be a lie to take it out of them. What
-   * changes is the word and the badge, because on 2026-09-09 a monitor that
-   * had spent $0.666 and collected nothing said `Running`, and the two
-   * readings that leaves a person — nobody is talking, or this is broken — are
-   * both wrong.
-   */
-  if (monitor.lastPoll?.outcome === "empty") {
-    return { label: "Found nothing", tone: "running", attention: true };
-  }
-
-  if (monitor.lastPoll?.outcome === "failed") {
-    return { label: "Poll failed", tone: "stopped" };
-  }
-
-  return { label: "Running", tone: "running" };
-}
-
-/**
- * Why a poll, or one platform inside it, stopped.
- *
- * The server sends the closed set from `schema.ts` and this is where each one
- * becomes a sentence. A screen that printed the value itself would show
- * somebody `no_provider_choice`.
- */
-const stopReasonLabels: Record<string, string> = {
-  budget_exhausted: "the monthly budget was spent",
-  no_credentials: "no provider has a key",
-  no_provider_choice: "no provider is chosen",
-  not_offered: "this build no longer collects it",
-  resume_key_missing: "the key that started the collection is gone",
-  collection_abandoned: "the collection was never ready to read",
-  provider_wait: "the provider asked us to come back",
-  page_cap: "the page limit for one poll was reached",
-  still_collecting: "a collection is still running",
-  error: "the poll failed",
-};
-
-function stopReasonLabel(reason: string | null): string | null {
-  if (!reason) return null;
-
-  return stopReasonLabels[reason] ?? reason;
-}
-
-/**
- * What the last poll did, in one line, without opening anything.
- *
- * The spend is on it whenever there was any, and that is the point rather than
- * a detail: a poll that found nothing and cost nothing is a quiet platform,
- * and a poll that found nothing and cost money is not. Only the two numbers
- * together say which.
- */
-function pollSummary(run: PollRun): string {
-  const spent = run.units > 0 ? ` · ${formatMicros(run.estimatedCostMicros)} (estimated)` : "";
-  const reason = stopReasonLabel(run.stopReason);
-
-  if (run.outcome === "refused") {
-    return `Last poll collected nothing: ${reason ?? "it was refused"}`;
-  }
-
-  if (run.outcome === "failed") {
-    return `The last poll failed${spent}`;
-  }
-
-  if (run.outcome === "waiting") {
-    return `Collecting: ${run.postsReturned} posts so far, ${run.postsNew} new${spent}`;
-  }
-
-  if (run.outcome === "empty") {
-    const because = reason ? `, and ${reason}` : "";
-    return `Last poll found no posts${because}${spent}`;
-  }
-
-  /**
-   * A poll that collected *and* lost a platform. BUG-016.
-   *
-   * The outcome reads `collected` because it did collect, and making it say
-   * otherwise would be the row lying about the posts it stored. So the failure
-   * arrives here instead: without this clause a poll that lost X to a 503 and
-   * kept Reddit reads as an ordinary success, which is the reading that let a
-   * paid outage go unnoticed for a day.
-   */
-  const lost = run.sources.filter((entry) => entry.reason === "error");
-
-  if (lost.length > 0) {
-    const names = lost.map((entry) => platformName(entry.source)).join(", ");
-    return `Last poll: ${run.postsReturned} posts, ${run.postsNew} new${spent} · ${names} failed`;
-  }
-
-  return `Last poll: ${run.postsReturned} posts, ${run.postsNew} new${spent}`;
-}
-
-/** When this monitor is due to try again, or null when nothing is scheduled. */
-function nextPollLabel(monitor: Monitor): string | null {
-  if (monitor.paused || !monitor.lastPolledAt) return null;
-
-  const due = new Date(monitor.lastPolledAt).getTime() + monitor.pollIntervalSeconds * 1000;
-
-  return due <= Date.now() ? "due now" : `next ${new Date(due).toLocaleString()}`;
-}
-
-/**
- * This monitor's recent polls, fetched when somebody opens the section.
- *
- * On demand rather than with the list, because the list already carries one
- * poll per monitor and this is fifty of one. Loading them for every card would
- * make opening the page cost fifty times what the question is worth.
- */
-function PollHistory({ monitorId }: { readonly monitorId: string }) {
-  const [runs, setRuns] = useState<PollRun[] | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let live = true;
-
-    requestJson<PollRun[]>(`/api/monitors/${monitorId}/polls?limit=20`)
-      .then((answer) => {
-        if (live) setRuns(answer);
-      })
-      .catch((cause: unknown) => {
-        if (live) setError(messageFor(cause, "The polls could not be loaded."));
-      });
-
-    return () => {
-      live = false;
-    };
-  }, [monitorId]);
-
-  if (error) {
-    return (
-      <p className="budget-error" role="alert">
-        {error}
-      </p>
-    );
-  }
-
-  if (!runs) return <p className="monitor-origin">Loading…</p>;
-
-  if (runs.length === 0) return <p className="monitor-origin">No polls recorded yet.</p>;
-
-  return (
-    <ul className="poll-history">
-      {runs.map((run) => (
-        <li key={run.id}>
-          <time
-            dateTime={run.startedAt}
-            title={new Date(run.startedAt).toLocaleString()}
-            className="poll-history-when"
-          >
-            {ageLabel(run.startedAt)}
-          </time>
-          <span className="poll-history-what">{pollSummary(run)}</span>
-          {/* Which platform did what, because a poll that skipped Reddit and
-              collected X is one row and two different answers. */}
-          <span className="poll-history-sources">
-            {run.sources.map((entry) => (
-              <span key={`${entry.source}-${entry.provider ?? "none"}`} className="brand-label">
-                <BrandIcon brand={entry.source} size={14} />
-                {platformName(entry.source)}: {entry.postsReturned} posts, {entry.postsNew} new
-                {entry.reason ? ` — ${stopReasonLabel(entry.reason)}` : ""}
-              </span>
-            ))}
-          </span>
-        </li>
-      ))}
-    </ul>
-  );
+/** What a row says under "Last poll", without opening anything. */
+function lastPollLabel(monitor: Monitor): string {
+  return monitor.lastPoll ? pollSummary(monitor.lastPoll) : "No poll recorded yet";
 }
 
 function MonitorsHeader({ projectId }: { readonly projectId: string }) {
@@ -387,286 +59,6 @@ function MonitorsHeader({ projectId }: { readonly projectId: string }) {
         <span aria-hidden="true">+</span> New monitor
       </Link>
     </header>
-  );
-}
-
-function BudgetForm({ monitor, onSaved }: { monitor: Monitor; onSaved: () => Promise<void> }) {
-  const [cap, setCap] = useState(
-    monitor.budget ? String(monitor.budget.monthlyCapMicros / 1_000_000) : "",
-  );
-  const [onExhausted, setOnExhausted] = useState<Budget["onExhausted"]>(
-    monitor.budget?.onExhausted ?? "pause",
-  );
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  async function save(): Promise<void> {
-    const monthlyCapMicros = toMicros(cap);
-
-    if (monthlyCapMicros === null) {
-      setError("Type the cap as an amount in dollars, such as 5 or 2.50.");
-      return;
-    }
-
-    setBusy(true);
-    setError(null);
-
-    try {
-      await requestJson(`/api/monitors/${monitor.id}/budget`, {
-        method: "PUT",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ monthlyCapMicros, onExhausted }),
-      });
-      await onSaved();
-    } catch (cause) {
-      setError(messageFor(cause, "The budget could not be saved."));
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function remove(): Promise<void> {
-    setBusy(true);
-    setError(null);
-
-    try {
-      await requestJson(`/api/monitors/${monitor.id}/budget`, { method: "DELETE" });
-      setCap("");
-      await onSaved();
-    } catch (cause) {
-      setError(messageFor(cause, "The budget could not be removed."));
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  return (
-    <div className="budget-form budget-settings-form">
-      <label className="budget-field">
-        <span className="budget-label">Monthly cap</span>
-        <input
-          aria-label={`Monthly cap for ${monitor.name}`}
-          inputMode="decimal"
-          placeholder="No cap"
-          value={cap}
-          onChange={(event) => setCap(event.target.value)}
-        />
-      </label>
-
-      <label className="budget-field">
-        <span className="budget-label">When it is spent</span>
-        <select
-          aria-label={`When the budget for ${monitor.name} is spent`}
-          value={onExhausted}
-          onChange={(event) => setOnExhausted(event.target.value as Budget["onExhausted"])}
-        >
-          {/* Two behaviours, and the difference is what happens next month.
-              A paused monitor waits for a person; a notified one starts
-              collecting again by itself when the spend resets. */}
-          <option value="pause">Pause the monitor</option>
-          <option value="notify">Tell me, and stop polling until next month</option>
-        </select>
-      </label>
-
-      <div className="budget-actions">
-        <button
-          type="button"
-          className="secondary-button"
-          disabled={busy}
-          onClick={() => void save()}
-        >
-          Save cap
-        </button>
-        {monitor.budget && (
-          <button
-            type="button"
-            className="text-button"
-            disabled={busy}
-            onClick={() => void remove()}
-          >
-            Remove cap
-          </button>
-        )}
-      </div>
-
-      {error && (
-        <p className="budget-error" role="alert">
-          {error}
-        </p>
-      )}
-    </div>
-  );
-}
-
-/**
- * The pre-filter's two settings, and what it has dropped.
- *
- * The counts sit next to the controls on purpose. A threshold nobody can see
- * the effect of is a number somebody guessed, and this is the only screen that
- * can say "it dropped 340 posts" beside the box that decides it. The similarity
- * is shown as the cosine value the database stores, not as a percentage,
- * because that is what a person comparing it against a recorded drop reads.
- */
-/**
- * When a monitor runs, and a way to change it. US-041.
- *
- * This was unreachable until now: `poll_interval_seconds` has existed since
- * US-007 and no screen ever wrote to it, so every monitor anybody made polled
- * hourly for ever. It is the largest cost dial in the product — the same query
- * costs $10.80 a month polled hourly and $648 polled every minute — so the
- * hints say what each choice costs in polls rather than leaving a person to
- * work it out.
- */
-function ScheduleForm({ monitor, onSaved }: { monitor: Monitor; onSaved: () => Promise<void> }) {
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  async function save(next: { pollIntervalSeconds: number; pollDays: number[] }): Promise<void> {
-    setBusy(true);
-    setError(null);
-
-    try {
-      await requestJson(`/api/monitors/${monitor.id}`, {
-        method: "PATCH",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify(next),
-      });
-      await onSaved();
-    } catch (cause) {
-      setError(messageFor(cause, "The schedule could not be changed."));
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  return (
-    <div className="monitor-schedule">
-      <ScheduleField
-        pollIntervalSeconds={monitor.pollIntervalSeconds}
-        pollDays={monitor.pollDays}
-        timezone={monitor.pollTimezone}
-        disabled={busy}
-        onChange={(next) => void save(next)}
-      />
-
-      {error && (
-        <p className="notice warning" role="status">
-          {error}
-        </p>
-      )}
-    </div>
-  );
-}
-
-/**
- * What this monitor has read and what it skipped, in one sentence.
- *
- * Read plus skipped is not a count of anything: `posts` has no monitor column,
- * because one row serves every monitor that found it and the same conversation
- * must not be classified and billed twice. The total is therefore the two
- * numbers the monitor does own, added together — every post it has decided
- * about. A stage that dropped nothing is left out rather than reported as
- * zero, which would invite a question about a stage that did nothing.
- */
-function countsSentence(preFilter: PreFilter): string {
-  const { keyword, embedding, triage } = preFilter.dropped;
-  const skipped = keyword + embedding + triage;
-  const decided = preFilter.read + skipped;
-
-  if (!preFilter.enabled) {
-    return "Every post this monitor collects is read by the AI, and every one is billed.";
-  }
-
-  if (decided === 0) return "This monitor has not found any posts yet.";
-  if (skipped === 0) return `The AI read all ${decided} posts found. Nothing was skipped.`;
-
-  const reasons = [
-    keyword > 0 ? `${keyword} did not use your words` : undefined,
-    embedding > 0 ? `${embedding} were not about your subject` : undefined,
-    triage > 0 ? `${triage} read as someone answering rather than asking` : undefined,
-  ].filter((reason) => reason !== undefined);
-
-  return (
-    `The AI read ${preFilter.read} of ${decided} posts found. ` +
-    `The other ${skipped} were skipped: ${reasons.join(", ")}.`
-  );
-}
-
-/**
- * Which posts the AI reads: one choice, in the words the person pays in.
- *
- * This asked for a similarity threshold as a decimal, and a person who does
- * not know what cosine similarity is could not answer it — nor could they see
- * what a wrong answer did, because a threshold set too high deletes leads
- * before anything records them. What is left is the half that is a real
- * decision: money against missed leads.
- *
- * The counts stay, and they are the instrument. A filter dropping most of what
- * it sees is either saving a lot of money or emptying the inbox, and only the
- * number says which question to ask.
- */
-function PreFilterForm({ monitor, onSaved }: { monitor: Monitor; onSaved: () => Promise<void> }) {
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  async function save(enabled: boolean): Promise<void> {
-    if (enabled === monitor.preFilter.enabled) return;
-
-    setBusy(true);
-    setError(null);
-
-    try {
-      await requestJson(`/api/monitors/${monitor.id}`, {
-        method: "PATCH",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ preFilter: { enabled } }),
-      });
-      await onSaved();
-    } catch (cause) {
-      setError(messageFor(cause, "That could not be changed."));
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  return (
-    <div className="reading-choice">
-      <fieldset className="reading-options" disabled={busy}>
-        <legend className="visually-hidden">Which posts the AI reads</legend>
-
-        <label className="reading-option">
-          <input
-            className="visually-hidden"
-            type="radio"
-            name={`reading-${monitor.id}`}
-            checked={monitor.preFilter.enabled}
-            onChange={() => void save(true)}
-          />
-          <strong>Only the promising ones</strong>
-          <small>Cheaper. A few real leads may be missed.</small>
-        </label>
-
-        <label className="reading-option">
-          <input
-            className="visually-hidden"
-            type="radio"
-            name={`reading-${monitor.id}`}
-            checked={!monitor.preFilter.enabled}
-            onChange={() => void save(false)}
-          />
-          <strong>Every post found</strong>
-          <small>Costs more. Misses nothing.</small>
-        </label>
-      </fieldset>
-
-      <p className="monitor-filter-counts">{countsSentence(monitor.preFilter)}</p>
-
-      {error && (
-        <p className="budget-error" role="alert">
-          {error}
-        </p>
-      )}
-    </div>
   );
 }
 
@@ -764,12 +156,6 @@ export function Monitors({ projectId }: { readonly projectId: string }) {
   }
 
   const scoped = monitors.filter((monitor) => monitor.projectId === projectId);
-  const needsAttention = (monitor: Monitor) =>
-    status(monitor).tone === "stopped" ||
-    // A poll that runs and finds nothing is the case US-104 exists for: it is
-    // active, it may be spending, and nothing is arriving.
-    !!status(monitor).attention ||
-    !!monitor.notificationIssues?.length;
   const counts = {
     all: scoped.length,
     running: scoped.filter((monitor) => status(monitor).tone === "running").length,
@@ -877,9 +263,8 @@ export function Monitors({ projectId }: { readonly projectId: string }) {
                 </span>
               </h2>
             )}
-            <MonitorCards
+            <MonitorTable
               monitors={group.monitors}
-              load={load}
               setPaused={setPaused}
               pending={pending}
               projectId={projectId}
@@ -887,8 +272,8 @@ export function Monitors({ projectId }: { readonly projectId: string }) {
           </section>
         ))}
         <p className="monitors-cost-note">
-          Spend is estimated; your provider’s invoice is the authority. Amounts include source and
-          model calls.
+          Spend is estimated; your provider’s invoice is the authority. Open a monitor for what it
+          has spent and what it may still spend.
         </p>
       </div>
     </div>
@@ -939,15 +324,14 @@ export function groupsOf(monitors: Monitor[]): MonitorGroup[] {
 }
 
 /**
- * The cards for one group.
+ * One group's rows.
  *
- * `load` and `setPaused` belong to the page, so they are passed in rather than
- * reached for: this is one list among several on the screen, and a component
- * that closed over the page's state could only ever render one of them.
+ * `setPaused` belongs to the page, so it is passed in rather than reached for:
+ * this is one table among several on the screen, and a component that closed
+ * over the page's state could only ever render one of them.
  */
-function MonitorCards({
+function MonitorTable({
   monitors,
-  load,
   setPaused,
   pending,
   projectId,
@@ -955,209 +339,102 @@ function MonitorCards({
   monitors: Monitor[];
   pending: string[];
   projectId: string;
-  load: () => Promise<void>;
   setPaused: (monitor: Monitor, paused: boolean) => Promise<void>;
 }) {
-  /**
-   * Which cards have their settings section open.
-   *
-   * `<details>` renders its children whether it is open or not, so a component
-   * that fetches on mount fetches once per monitor the moment the page loads —
-   * which is thirty requests for a question nobody asked. The set is what makes
-   * "on demand" true rather than intended.
-   */
-  const [opened, setOpened] = useState<readonly string[]>([]);
-
   return (
-    <ul className="monitor-list">
-      {monitors.map((monitor) => {
-        const running = status(monitor);
+    <div className="monitor-table-scroll">
+      <table className="monitor-table">
+        <thead>
+          <tr>
+            <th scope="col">Monitor</th>
+            <th scope="col">Status</th>
+            <th scope="col">Next run</th>
+            <th scope="col">Last poll</th>
+            <th scope="col">Found</th>
+            {/* No heading: the cell holds one action, and "Actions" is a word
+                that describes the column rather than naming anything in it. */}
+            <th scope="col">
+              <span className="visually-hidden">Actions</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {monitors.map((monitor) => {
+            const running = status(monitor);
 
-        return (
-          <li key={monitor.id} className="monitor-card">
-            <div className="monitor-top">
-              <div className="monitor-identity">
-                <h2>{monitor.name}</h2>
-                <p className="monitor-origin">
-                  {monitor.sources.length > 0
-                    ? monitor.sources.map((source, index) => (
-                        <span key={source}>
-                          {index > 0 ? " · " : ""}
-                          <span className="brand-label">
-                            <BrandIcon brand={source} size={16} />
-                            {source}
+            return (
+              <tr key={monitor.id}>
+                <th scope="row">
+                  <Link
+                    className="monitor-table-name"
+                    to={paths.monitor(monitor.projectId ?? projectId, monitor.id)}
+                  >
+                    {monitor.name}
+                  </Link>
+                  <span className="monitor-table-sources">
+                    {monitor.sources.length > 0
+                      ? monitor.sources.map((source) => (
+                          <span key={source} className="brand-label">
+                            <BrandIcon brand={source} size={14} />
+                            {platformName(source)}
                           </span>
-                        </span>
-                      ))
-                    : "No source"}
-                  {monitor.lastPolledAt
-                    ? ` · last polled ${new Date(monitor.lastPolledAt).toLocaleString()}`
-                    : " · never polled"}
-                </p>
-              </div>
-              <span
-                className={`monitor-status ${running.tone}${running.attention ? " quiet" : ""}`}
-              >
-                {running.label}
-              </span>
-            </div>
-
-            {/* The sentence that refused the poll, sent whole by the server,
-                  so the screen and the worker's log say the same thing. */}
-            {monitor.spend.reason && (
-              <p className="monitor-stopped" role="status">
-                {monitor.spend.reason}
-              </p>
-            )}
-
-            {monitor.missingCredentials.length > 0 && (
-              <p className="monitor-stopped">
-                Connect a provider to resume collecting. Missing:{" "}
-                {monitor.missingCredentials
-                  .map((credential) => credential.environmentVariable)
-                  .join(", ")}
-                . <Link to={paths.connections}>Open connections</Link>
-              </p>
-            )}
-            <p className="monitor-schedule-summary">
-              {describeSchedule(monitor.pollIntervalSeconds, monitor.pollDays)}{" "}
-              <span>· {monitor.pollTimezone}</span>
-            </p>
-
-            {/* What the last poll did, without opening anything. US-104. The
-                monitor list is opened to ask "is this working?", and until
-                this line existed the answer was the word `Running`. */}
-            {monitor.lastPoll && (
-              <p className="monitor-poll-summary" role="status">
-                {pollSummary(monitor.lastPoll)}
-                {nextPollLabel(monitor) ? ` · ${nextPollLabel(monitor)}` : ""}
-              </p>
-            )}
-
-            <dl className="monitor-spend">
-              <div>
-                <dt>Spent in {monthLabel(monitor.spend.since)} (estimated)</dt>
-                <dd>{formatMicros(monitor.spend.totalMicros)}</dd>
-              </div>
-              <div>
-                <dt>Sources</dt>
-                <dd>{formatMicros(monitor.spend.sourceMicros)}</dd>
-              </div>
-              <div>
-                <dt>Model</dt>
-                <dd>{formatMicros(monitor.spend.modelMicros)}</dd>
-              </div>
-              <div>
-                <dt>Left this month</dt>
-                <dd>
-                  {monitor.spend.remainingMicros === null
-                    ? "No cap set"
-                    : formatMicros(monitor.spend.remainingMicros)}
-                </dd>
-              </div>
-            </dl>
-
-            {monitor.notificationIssues?.map((issue) => (
-              <p key={issue} className="monitor-stopped" role="alert">
-                {issue}{" "}
-                <Link to={paths.notifications(monitor.projectId ?? projectId, monitor.id)}>
-                  Notification settings
-                </Link>
-              </p>
-            ))}
-
-            <p className="monitor-feedback">{feedbackLabel(monitor.feedback)}</p>
-
-            <details
-              className="disclosure monitor-settings"
-              onToggle={(event) => {
-                if (event.currentTarget.open && !opened.includes(monitor.id)) {
-                  setOpened((ids) => [...ids, monitor.id]);
-                }
-              }}
-            >
-              <summary>
-                Schedule & settings <span>Budget · filtering · activity</span>
-              </summary>
-              <div className="monitor-controls">
-                <section className="monitor-settings-section">
-                  <h3>Schedule</h3>
-                  <ScheduleForm monitor={monitor} onSaved={load} />
-                </section>
-                <section className="monitor-settings-section">
-                  <h3>Monthly budget (USD)</h3>
-                  <BudgetForm monitor={monitor} onSaved={load} />
-                </section>
-                <section className="monitor-settings-section">
-                  <h3>Which posts the AI reads</h3>
-                  <PreFilterForm monitor={monitor} onSaved={load} />
-                </section>
-                <section className="monitor-settings-section collection-settings-section">
-                  <h3>Last collection</h3>
-                  {/* Who actually collected, which is not always who would collect
-                  now: the choice can be changed and this is the record of what
-                  ran. Read from the ledger, so the moment is when money was
-                  last spent on that pair. US-026. */}
-                  {monitor.lastCollected.length === 0 ? (
-                    <p className="monitor-origin">No collections recorded yet.</p>
+                        ))
+                      : "No source"}
+                  </span>
+                </th>
+                <td>
+                  <span
+                    className={`monitor-status ${running.tone}${running.attention ? " quiet" : ""}`}
+                  >
+                    {running.label}
+                  </span>
+                  {/* A broken webhook does not change what the monitor is
+                      doing, so it is not the status word — but it is why this
+                      row is counted under "Needs attention", and a count a
+                      person cannot act on from the list sends them hunting
+                      through every monitor. */}
+                  {monitor.notificationIssues?.map((issue) => (
+                    <small key={issue} className="monitor-table-note">
+                      {issue}
+                    </small>
+                  ))}
+                </td>
+                <td>{nextRunLabel(monitor)}</td>
+                <td className="monitor-table-poll">{lastPollLabel(monitor)}</td>
+                <td className="monitor-table-found">
+                  {/* Two numbers rather than one. "Sixty found, none read" and
+                      "sixty found, all read" send a person to two different
+                      places, and one total says neither. A build whose API
+                      does not carry the count says so rather than showing a
+                      zero nothing measured. */}
+                  {monitor.matches ? (
+                    <>
+                      <strong>{monitor.matches.total}</strong>
+                      <small>{monitor.matches.unread} unread</small>
+                    </>
                   ) : (
-                    <ul className="collection-list">
-                      {monitor.lastCollected.map((one) => (
-                        <li key={`${one.source}-${one.provider}`}>
-                          <span className="brand-label">
-                            <BrandIcon brand={one.source} size={16} />
-                            {platformName(one.source)}
-                          </span>
-                          <span className="collection-provider">
-                            <BrandIcon brand={one.provider} size={14} />
-                            {providerName(one.provider)}
-                          </span>
-                          {/* The exact moment stays in the tooltip. "2 hours
-                              ago" answers "did it run this morning?", and the
-                              timestamp answers "which row on the invoice?" —
-                              two questions, and only the first is asked here. */}
-                          <time dateTime={one.at} title={new Date(one.at).toLocaleString()}>
-                            {ageLabel(one.at)}
-                          </time>
-                        </li>
-                      ))}
-                    </ul>
+                    <small>—</small>
                   )}
-                </section>
-                <section className="monitor-settings-section collection-settings-section">
-                  <h3>Recent polls</h3>
-                  {opened.includes(monitor.id) ? (
-                    <PollHistory monitorId={monitor.id} />
-                  ) : (
-                    <p className="monitor-origin">Open this section to load them.</p>
-                  )}
-                </section>
-              </div>
-            </details>
-            <div>
-              <div className="monitor-card-actions">
-                <Link
-                  className="text-link"
-                  to={paths.notifications(monitor.projectId ?? projectId, monitor.id)}
-                >
-                  Notifications
-                </Link>
-                <Link className="text-link" to={paths.inbox(monitor.projectId ?? projectId)}>
-                  View inbox
-                </Link>
-                <button
-                  type="button"
-                  className="secondary-button"
-                  disabled={pending.includes(monitor.id)}
-                  onClick={() => void setPaused(monitor, !monitor.paused)}
-                >
-                  {pending.includes(monitor.id) ? "Updating…" : monitor.paused ? "Resume" : "Pause"}
-                </button>
-              </div>
-            </div>
-          </li>
-        );
-      })}
-    </ul>
+                </td>
+                <td className="monitor-table-actions">
+                  <button
+                    type="button"
+                    className="secondary-button"
+                    disabled={pending.includes(monitor.id)}
+                    onClick={() => void setPaused(monitor, !monitor.paused)}
+                  >
+                    {pending.includes(monitor.id)
+                      ? "Updating…"
+                      : monitor.paused
+                        ? "Resume"
+                        : "Pause"}
+                  </button>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
   );
 }

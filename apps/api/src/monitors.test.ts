@@ -907,7 +907,11 @@ describe("the monitor routes", () => {
 
   describe("the feedback counts", () => {
     /** One match on this monitor, so there is something to judge. */
-    async function seedMatch(monitorId: string, externalId: string): Promise<string> {
+    async function seedMatch(
+      monitorId: string,
+      externalId: string,
+      state: { readAt?: Date; hidden?: boolean } = {},
+    ): Promise<string> {
       const [post] = await db
         .insert(posts)
         .values({
@@ -932,6 +936,8 @@ describe("the monitor routes", () => {
           urgency: 70,
           intentType: "problem",
           reasons: ["Small SaaS team"],
+          readAt: state.readAt ?? null,
+          hidden: state.hidden ?? false,
         })
         .returning({ id: matches.id });
 
@@ -970,6 +976,34 @@ describe("the monitor routes", () => {
         // sites and only one of them counts in bulk.
         expect(list.json()[0].feedback).toEqual({ good: 1, notRelevant: 1 });
         expect(one.json().feedback).toEqual({ good: 1, notRelevant: 1 });
+      });
+    });
+
+    it("counts this monitor's matches, and the ones nobody has opened. US-109", async () => {
+      await withServer({}, async (app) => {
+        const id = await create(app);
+
+        await seedMatch(id, "found-1");
+        await seedMatch(id, "found-2", { readAt: new Date() });
+        await seedMatch(id, "found-3", { hidden: true });
+
+        const list = await app.inject({ method: "GET", url: "/api/monitors" });
+        const one = await app.inject({ method: "GET", url: `/api/monitors/${id}` });
+
+        // Both reads, because the list counts in bulk and the single monitor
+        // does not — and the hidden one is in neither.
+        expect(list.json()[0].matches).toEqual({ total: 2, unread: 1 });
+        expect(one.json().matches).toEqual({ total: 2, unread: 1 });
+      });
+    });
+
+    it("reports no matches on a monitor that has found none", async () => {
+      await withServer({}, async (app) => {
+        const id = await create(app);
+
+        const response = await app.inject({ method: "GET", url: `/api/monitors/${id}` });
+
+        expect(response.json().matches).toEqual({ total: 0, unread: 0 });
       });
     });
   });
@@ -1374,6 +1408,31 @@ describe("the monitor routes", () => {
         });
 
         expect(response.statusCode).toBe(404);
+      });
+    });
+
+    it("answers 404 for the monitor page of a monitor that is not this account's", async () => {
+      // US-109 gave a monitor an address of its own, so an id typed into it is
+      // a way to ask about a stranger's monitor. The same read answers.
+      const [row] = await db
+        .insert(monitors)
+        .values({
+          userId: "somebody-else",
+          name: "Not yours",
+          product: "A test runner",
+          idealCustomer: "Small SaaS teams",
+          problem: "Flaky end-to-end tests",
+          sources: ["reddit"],
+        })
+        .returning({ id: monitors.id });
+
+      await withServer({}, async (app) => {
+        const response = await app.inject({ method: "GET", url: `/api/monitors/${row?.id}` });
+
+        expect(response.statusCode).toBe(404);
+        // And it is not in the list either, so its count is in nobody's row.
+        const list = await app.inject({ method: "GET", url: "/api/monitors" });
+        expect(list.json().some((one: { id: string }) => one.id === row?.id)).toBe(false);
       });
     });
   });

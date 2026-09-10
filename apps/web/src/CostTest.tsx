@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { messageFor, requestJson } from "./api.js";
-import { formatMicros } from "./Monitors.js";
+import { formatMicros } from "./monitor.js";
 
 /**
  * What a search plan would collect, and what it would cost, before it runs.

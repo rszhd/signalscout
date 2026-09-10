@@ -34,14 +34,17 @@ import {
   lastCollections,
   latestPollRuns,
   listMonitors,
+  type MatchCounts,
   type Monitor,
   type MonitorEnvironment,
+  matchCounts,
   maximumQueries,
   maximumSubreddits,
   maxPollRunsRead,
   minimumPollIntervalSeconds,
   monitorQueryPlan,
   noFilterDrops,
+  noMatchCounts,
   notificationIssues,
   notOfferedReason,
   noVerdicts,
@@ -425,6 +428,18 @@ const monitorSchema = z.object({
   /** US-020. Whether this monitor reads the replies under the posts it finds. */
   includeReplies: z.boolean(),
   /**
+   * How many matches this monitor holds, and how many nobody has opened.
+   * US-109.
+   *
+   * The list's one measure of whether any of the spending produced anything.
+   * Every other figure on the row is about the work — posts returned, posts
+   * skipped, money spent — and none of them says whether a lead came out.
+   *
+   * A hidden match is not counted: US-015 hides one whose post has been
+   * deleted, and a number counting those promises leads that open on nothing.
+   */
+  matches: z.object({ total: z.number(), unread: z.number() }),
+  /**
    * What the person thought of this monitor's matches, counting only the
    * verdicts in force.
    *
@@ -531,17 +546,33 @@ function filterSettings(body: { preFilter?: { enabled?: boolean; similarityThres
   };
 }
 
+/**
+ * Everything read *about* a monitor rather than off its row.
+ *
+ * One object rather than nine positional arguments. Both paths below fill it,
+ * and each field is named where it is passed — which matters here because
+ * several of them are counts, and a pair swapped by hand would type-check and
+ * report the filter's drops as the classifier's reads.
+ */
+interface MonitorReadings {
+  readonly state: BudgetState;
+  readonly dropped: FilterDropCounts;
+  readonly read: number;
+  readonly verdicts: VerdictCounts;
+  /** How many matches this monitor holds, and how many are unread. US-109. */
+  readonly matches: MatchCounts;
+  readonly collected: readonly LastCollection[];
+  readonly notificationProblems: readonly string[];
+  readonly lastPoll: PollRun | null;
+}
+
 function toResponse(
   monitor: Monitor & { projectName?: string | null },
   runtime: MonitorEnvironment,
-  state: BudgetState,
-  dropped: FilterDropCounts,
-  read: number,
-  verdicts: VerdictCounts,
-  collected: readonly LastCollection[],
-  notificationProblems: readonly string[],
-  lastPoll: PollRun | null,
+  readings: MonitorReadings,
 ) {
+  const { state, dropped, read, verdicts, collected, notificationProblems, lastPoll } = readings;
+
   return {
     id: monitor.id,
     name: monitor.name,
@@ -591,6 +622,8 @@ function toResponse(
       read,
     },
     includeReplies: monitor.includeReplies,
+    /** US-109. The list's one measure of whether any of this produced anything. */
+    matches: readings.matches,
     feedback: verdicts,
     notificationIssues: [...notificationProblems],
   };
@@ -603,27 +636,27 @@ function toResponse(
  * paths end in `toResponse`, so neither can grow a field the other lacks.
  */
 async function readResponse(db: Database, monitor: Monitor, runtime: MonitorEnvironment) {
-  const [state, drops, read, verdicts, collected, notifications, polls] = await Promise.all([
+  const [state, drops, read, verdicts, found, collected, notifications, polls] = await Promise.all([
     checkBudget(db, monitor.id),
     filterDropCounts(db, [monitor.id]),
     classifiedPostCounts(db, [monitor.id]),
     verdictCounts(db, [monitor.id]),
+    matchCounts(db, [monitor.id]),
     lastCollections(db),
     notificationIssues(db),
     latestPollRuns(db, monitor.userId, [monitor.id]),
   ]);
 
-  return toResponse(
-    monitor,
-    runtime,
+  return toResponse(monitor, runtime, {
     state,
-    drops.get(monitor.id) ?? noFilterDrops,
-    read.get(monitor.id) ?? 0,
-    verdicts.get(monitor.id) ?? noVerdicts,
-    collected.get(monitor.id) ?? [],
-    notifications.get(monitor.id) ?? [],
-    polls.get(monitor.id) ?? null,
-  );
+    dropped: drops.get(monitor.id) ?? noFilterDrops,
+    read: read.get(monitor.id) ?? 0,
+    verdicts: verdicts.get(monitor.id) ?? noVerdicts,
+    matches: found.get(monitor.id) ?? noMatchCounts,
+    collected: collected.get(monitor.id) ?? [],
+    notificationProblems: notifications.get(monitor.id) ?? [],
+    lastPoll: polls.get(monitor.id) ?? null,
+  });
 }
 
 export async function registerMonitorRoutes(
@@ -869,22 +902,26 @@ export async function registerMonitorRoutes(
       // screen that shows this is a list, and a per-row query here would be
       // the list's cost growing with the number of monitors.
       const rows = await listMonitors(db, sessionUserId(request));
-      const [states, drops, read, verdicts, collected, notifications, polls] = await Promise.all([
-        budgetStates(db),
-        filterDropCounts(db),
-        classifiedPostCounts(db),
-        verdictCounts(db),
-        lastCollections(db),
-        notificationIssues(db),
-        // One statement for the whole list, for the reason the spend above is
-        // one: a query per card is the shape that reads fine with three
-        // monitors and stops the page with thirty.
-        latestPollRuns(
-          db,
-          sessionUserId(request),
-          rows.map((monitor) => monitor.id),
-        ),
-      ]);
+      const [states, drops, read, verdicts, found, collected, notifications, polls] =
+        await Promise.all([
+          budgetStates(db),
+          filterDropCounts(db),
+          classifiedPostCounts(db),
+          verdictCounts(db),
+          // One statement for every row's match count, for the reason the
+          // spend above is one. US-109.
+          matchCounts(db),
+          lastCollections(db),
+          notificationIssues(db),
+          // One statement for the whole list, for the reason the spend above is
+          // one: a query per card is the shape that reads fine with three
+          // monitors and stops the page with thirty.
+          latestPollRuns(
+            db,
+            sessionUserId(request),
+            rows.map((monitor) => monitor.id),
+          ),
+        ]);
 
       return Promise.all(
         rows.map(async (monitor) =>
@@ -893,17 +930,16 @@ export async function registerMonitorRoutes(
           // bill page, and a zero nothing measured is the failure US-013 is
           // about. A missing drop count is different — it means this monitor
           // has dropped nothing, which is what zero says.
-          toResponse(
-            monitor,
-            runtime,
-            states.get(monitor.id) ?? (await checkBudget(db, monitor.id)),
-            drops.get(monitor.id) ?? noFilterDrops,
-            read.get(monitor.id) ?? 0,
-            verdicts.get(monitor.id) ?? noVerdicts,
-            collected.get(monitor.id) ?? [],
-            notifications.get(monitor.id) ?? [],
-            polls.get(monitor.id) ?? null,
-          ),
+          toResponse(monitor, runtime, {
+            state: states.get(monitor.id) ?? (await checkBudget(db, monitor.id)),
+            dropped: drops.get(monitor.id) ?? noFilterDrops,
+            read: read.get(monitor.id) ?? 0,
+            verdicts: verdicts.get(monitor.id) ?? noVerdicts,
+            matches: found.get(monitor.id) ?? noMatchCounts,
+            collected: collected.get(monitor.id) ?? [],
+            notificationProblems: notifications.get(monitor.id) ?? [],
+            lastPoll: polls.get(monitor.id) ?? null,
+          }),
         ),
       );
     },

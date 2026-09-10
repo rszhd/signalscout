@@ -34,6 +34,7 @@
 .monitors-toolbar {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   gap: var(--space-5);
   border-bottom: 1px solid var(--line);
   padding-bottom: var(--space-3);
@@ -81,37 +82,6 @@
   font-size: var(--text-xs);
   font-weight: 400;
 }
-.monitors-content .monitor-list {
-  width: 100%;
-  margin: 0 0 var(--space-8);
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-6);
-  align-items: start;
-}
-.monitors-content .monitor-card {
-  padding: var(--space-8);
-  gap: var(--space-6);
-  box-shadow: none;
-  transition: none;
-}
-.monitors-content .monitor-card:hover {
-  transform: none;
-  box-shadow: none;
-  border-color: var(--line-dark);
-}
-/* One column: the monitor's name over what it watches. The letter tile that
-   stood beside them was decoration — the name is already the identity. */
-.monitors-content .monitor-identity {
-  grid-template-columns: minmax(0, 1fr);
-}
-.monitors-content .monitor-top h2 {
-  font-size: var(--text-md);
-  font-weight: 500;
-  line-height: 1.5;
-  overflow-wrap: anywhere;
-}
 .monitors-content .monitor-origin {
   font-size: var(--text-xs);
   line-height: 1.8;
@@ -132,31 +102,24 @@
   color: var(--muted-strong);
   background: var(--surface-soft);
 }
-.monitor-schedule-summary {
-  margin: 0;
-  font-size: var(--text-sm);
-  color: var(--muted-strong);
-}
-.monitors-content .monitor-schedule-summary span {
-  color: var(--muted);
-}
 .monitors-content .monitor-spend {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-6);
-  padding: var(--space-2) 0;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+  padding: var(--space-4) 0;
   background: transparent;
-  border: 0;
-  border-radius: var(--radius-md);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
 }
 .monitors-content .monitor-spend > div {
-  padding: 0;
-  border: 0;
+  padding: 0 var(--space-4);
+  border-right: 1px solid var(--line);
 }
 .monitors-content .monitor-spend > div:first-child {
-  order: -2;
+  padding-left: 0;
 }
 .monitors-content .monitor-spend > div:last-child {
-  order: -1;
+  padding-right: 0;
+  border-right: 0;
 }
 .monitors-content .monitor-spend dt {
   min-height: 0;
@@ -166,27 +129,9 @@
   font-variant-numeric: tabular-nums;
   font-size: var(--text-label);
 }
-.monitors-content .monitor-spend > div:first-child dd,
-.monitors-content .monitor-spend > div:last-child dd {
-  font-size: 1.15rem;
-}
-.monitor-settings {
-  border-top: 1px solid var(--line);
-  padding-top: var(--space-4);
-}
-.monitor-settings summary {
-  line-height: 1.6;
-}
-.monitors-content .monitor-settings summary > span {
-  font-size: var(--text-xs);
-}
-.monitor-settings .monitor-controls {
-  margin-top: var(--space-5);
-  gap: 0;
-}
 .monitor-settings-section {
   min-width: 0;
-  padding: var(--space-5) 0;
+  padding: var(--space-6) 0;
   border-bottom: 1px solid var(--line);
 }
 .monitor-settings-section:first-child {
@@ -198,7 +143,7 @@
 }
 .monitor-controls h3 {
   margin: 0 0 var(--space-3);
-  font-size: var(--text-sm);
+  font-size: var(--text-label);
 }
 .monitor-controls .field {
   min-width: 0;
@@ -232,7 +177,7 @@
   align-items: end;
 }
 .monitor-controls .budget-settings-form {
-  grid-template-columns: minmax(104px, 0.7fr) minmax(190px, 2fr);
+  grid-template-columns: 1fr;
 }
 .budget-settings-form .budget-actions {
   grid-column: 1 / -1;
@@ -242,7 +187,7 @@
 }
 .reading-options {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: 1fr;
   gap: var(--space-3);
   margin: 0;
   padding: 0;
@@ -282,9 +227,6 @@
 .reading-choice .monitor-filter-counts {
   margin-top: var(--space-3);
 }
-.monitor-settings .schedule-controls {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
 .collection-settings-section .monitor-origin {
   overflow-wrap: anywhere;
 }
@@ -312,7 +254,7 @@
 .collection-provider {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: var(--space-1);
   min-width: 0;
   color: var(--muted);
   overflow-wrap: anywhere;
@@ -321,15 +263,6 @@
   color: var(--muted);
   font-size: var(--text-xs);
   white-space: nowrap;
-}
-.monitors-content .monitor-card-actions {
-  border: 0;
-  padding: 0;
-  gap: var(--space-3);
-  flex-wrap: wrap;
-}
-.monitors-content .monitor-card-actions a {
-  font-weight: 500;
 }
 .monitors-content :is(input, select):focus-visible {
   outline: 2px solid var(--accent);
@@ -343,7 +276,7 @@
   margin-top: var(--space-4);
 }
 .monitor-empty-results {
-  padding: var(--space-12) var(--space-5);
+  padding: var(--space-12) var(--space-6);
   text-align: center;
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
@@ -351,18 +284,16 @@
   margin-bottom: var(--space-6);
 }
 .monitors-content .monitor-empty-results h2 {
+  margin: 0 0 var(--space-3);
   font-size: 1.1rem;
 }
 .monitor-empty-results p {
+  margin: 0 0 var(--space-5);
   color: var(--muted);
   font-size: var(--text-label);
   line-height: 1.7;
-  margin-bottom: var(--space-5);
 }
 @media (max-width: 1100px) {
-  .monitors-content .monitor-list {
-    grid-template-columns: 1fr;
-  }
   .monitors-toolbar {
     flex-wrap: wrap;
   }
@@ -390,20 +321,6 @@
   .monitors-toolbar .view-switch button {
     font-size: var(--text-sm);
   }
-  .monitors-content .monitor-card {
-    padding: var(--space-5);
-  }
-  .monitors-content .monitor-top {
-    flex-wrap: wrap;
-  }
-  .monitors-content .monitor-settings summary > span {
-    display: none;
-  }
-  .monitor-settings .schedule-controls,
-  .monitor-controls .budget-settings-form,
-  .reading-options {
-    grid-template-columns: 1fr;
-  }
   .collection-list li {
     grid-template-columns: minmax(0, 1fr) auto;
   }
@@ -414,12 +331,6 @@
 }
 
 /* What the last poll did, under the schedule line. US-104. */
-.monitors-content .monitor-poll-summary {
-  margin: 0;
-  font-size: var(--text-sm);
-  color: var(--muted-strong);
-}
-
 /*
  * A monitor that is polling and finding nothing.
  *
@@ -456,4 +367,449 @@
   gap: var(--space-2);
   color: var(--muted-strong);
   font-size: var(--text-xs);
+}
+
+/*
+ * The monitor table. US-109.
+ *
+ * Five columns and one action, sharing the shape `providers.css` already uses
+ * for a table: a scroll container that owns the border, a header row on the
+ * soft surface, and a hairline between rows rather than a card each.
+ *
+ * `table-layout: fixed` with a `min-width`, so the last-poll sentence — the
+ * only cell whose length is a stranger's — wraps inside its column rather than
+ * pushing the other four off the screen. Below the minimum the container
+ * scrolls, which is the one thing on this page allowed to.
+ */
+.monitor-table-scroll {
+  min-width: 0;
+  margin-bottom: var(--space-8);
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  overscroll-behavior-inline: contain;
+}
+.monitor-table {
+  width: 100%;
+  min-width: 860px;
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+  background: var(--surface);
+  font-size: var(--text-sm);
+}
+.monitor-table th,
+.monitor-table td {
+  padding: var(--space-4);
+  text-align: left;
+  vertical-align: top;
+}
+.monitor-table thead th {
+  height: 44px;
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+  background: var(--surface-soft);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  white-space: nowrap;
+}
+.monitor-table thead th:nth-child(1) {
+  width: 230px;
+}
+.monitor-table thead th:nth-child(2) {
+  width: 150px;
+}
+.monitor-table thead th:nth-child(3) {
+  width: 165px;
+}
+.monitor-table thead th:nth-child(5) {
+  width: 90px;
+}
+.monitor-table thead th:nth-child(6) {
+  width: 110px;
+}
+.monitor-table tbody tr + tr > * {
+  border-top: 1px solid var(--line);
+}
+.monitor-table tbody th {
+  font-weight: 400;
+}
+.monitor-table tbody td {
+  color: var(--muted-strong);
+}
+.monitor-table-name {
+  display: block;
+  color: var(--ink);
+  font-size: var(--text-label);
+  font-weight: 500;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.monitor-table-sources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-1);
+  color: var(--muted);
+  font-size: var(--text-xs);
+}
+/* The one cell built from what a poll did, so it is the one that runs long. */
+.monitor-table-poll {
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+.monitor-table-note {
+  display: block;
+  margin-top: var(--space-2);
+  color: var(--muted);
+  font-size: var(--text-xs);
+  line-height: 1.5;
+}
+.monitor-table-found > strong {
+  display: block;
+  color: var(--ink);
+  font-size: var(--text-md);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.monitor-table-found > small {
+  color: var(--muted);
+  font-size: var(--text-xs);
+}
+.monitor-table td.monitor-table-actions {
+  text-align: right;
+}
+.monitor-table-actions .secondary-button {
+  transform: translateX(calc(-1 * var(--space-2)));
+  white-space: nowrap;
+}
+
+/*
+ * One monitor's page. US-109.
+ *
+ * The summary answers what is happening now. The wide column holds results and
+ * history. The narrow column holds every control, so reading and changing do
+ * not compete for the same vertical line.
+ */
+.monitor-breadcrumb {
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-xs);
+}
+.monitor-breadcrumb a {
+  color: var(--muted);
+  text-decoration: none;
+}
+.monitor-breadcrumb a:hover {
+  color: var(--accent-text);
+}
+.monitor-page-actions {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: var(--space-3);
+}
+.monitor-page-content {
+  display: block;
+}
+.monitor-alerts {
+  display: grid;
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
+}
+.monitor-alerts:empty {
+  display: none;
+}
+.monitor-page-content .monitor-stopped {
+  padding: var(--space-4);
+  border-left-color: var(--warning);
+  border-radius: var(--radius-sm);
+}
+.monitor-activity {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(440px, 1fr);
+  align-items: stretch;
+  margin-bottom: var(--space-6);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-soft);
+}
+.monitor-activity-copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  padding: var(--space-8);
+}
+.monitor-section-label {
+  margin: 0 0 var(--space-2);
+  color: var(--accent-text);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.monitor-activity-title {
+  max-width: 650px;
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: -0.02em;
+}
+.monitor-schedule-summary {
+  margin: var(--space-3) 0 0;
+  color: var(--muted-strong);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+}
+.monitor-schedule-zone {
+  color: var(--muted);
+}
+.monitor-key-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+  background: var(--surface-soft);
+}
+.monitor-key-metric {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  padding: var(--space-6) var(--space-5);
+  border-left: 1px solid var(--line);
+}
+.monitor-key-label {
+  color: var(--muted);
+  font-size: var(--text-xs);
+  line-height: 1.4;
+}
+.monitor-key-value {
+  margin: var(--space-2) 0 var(--space-1);
+  color: var(--ink);
+  font-size: 1.4rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+.monitor-key-note {
+  color: var(--muted);
+  font-size: var(--text-xs);
+}
+.monitor-detail-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(320px, 0.8fr);
+  align-items: start;
+  gap: var(--space-6);
+}
+.monitor-detail-main,
+.monitor-settings-panel {
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+}
+.monitor-detail-section {
+  min-width: 0;
+  padding: var(--space-8);
+  border-bottom: 1px solid var(--line);
+}
+.monitor-detail-section:last-child {
+  border-bottom: 0;
+}
+.monitor-section-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+}
+.monitor-detail-title {
+  margin: 0;
+  font-size: var(--text-md);
+  line-height: 1.35;
+}
+.monitor-section-heading .monitor-section-label {
+  margin-bottom: var(--space-1);
+}
+.monitor-section-note {
+  flex-shrink: 0;
+  color: var(--muted);
+  font-size: var(--text-xs);
+}
+.monitor-results-section .monitor-found {
+  margin: 0;
+  color: var(--ink);
+  font-size: var(--text-md);
+  font-weight: 500;
+}
+.monitor-results-section .monitor-feedback {
+  margin-top: var(--space-2);
+}
+.monitor-settings-panel {
+  position: sticky;
+  top: var(--space-6);
+  padding: 0 var(--space-6);
+}
+.monitor-settings-heading {
+  padding: var(--space-6) 0;
+  border-bottom: 1px solid var(--line);
+}
+.monitor-settings-heading .monitor-section-label {
+  margin-bottom: var(--space-1);
+}
+.monitor-settings-heading > p:last-child {
+  margin: var(--space-2) 0 0;
+  color: var(--muted);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+.monitor-settings-panel .monitor-settings-section > h3 {
+  margin: 0 0 var(--space-4);
+}
+.monitor-settings-panel .schedule-controls {
+  grid-template-columns: 1fr;
+}
+.monitor-settings-panel .day-chips {
+  gap: var(--space-1);
+}
+.monitor-settings-panel .day-chip {
+  flex: 1 1 34px;
+  max-width: 40px;
+}
+.monitor-settings-panel .monitor-card-actions {
+  justify-content: flex-start;
+  gap: var(--space-5);
+  padding: var(--space-5) 0;
+  border-top: 0;
+  flex-wrap: wrap;
+}
+.monitor-settings-panel .monitor-card-actions a {
+  font-weight: 500;
+}
+.monitor-page-content .monitor-found {
+  font-size: var(--text-sm);
+  color: var(--muted-strong);
+}
+.monitor-page-content .collection-list li {
+  padding: var(--space-3) 0;
+}
+.monitor-page-content .poll-history {
+  gap: 0;
+}
+.monitor-page-content .poll-history li {
+  position: relative;
+  grid-template-columns: 104px minmax(0, 1fr);
+  column-gap: var(--space-5);
+  padding: 0 0 var(--space-6) var(--space-5);
+  border-left: 1px solid var(--line-dark);
+}
+.monitor-page-content .poll-history li:last-child {
+  padding-bottom: 0;
+}
+.monitor-page-content .poll-history li::before {
+  position: absolute;
+  top: 5px;
+  left: -5px;
+  width: 9px;
+  height: 9px;
+  border: 2px solid var(--surface);
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+  content: "";
+}
+.monitor-page-content .poll-history-when {
+  grid-row: 1 / span 2;
+}
+.monitor-page-content .poll-history-what {
+  color: var(--ink);
+  line-height: 1.5;
+}
+.monitor-page-content .poll-history-sources {
+  grid-column: 2;
+  margin-top: var(--space-1);
+}
+
+@media (max-width: 1080px) {
+  .monitor-activity {
+    grid-template-columns: 1fr;
+  }
+  .monitor-key-metric:first-child {
+    border-left: 0;
+  }
+  .monitor-detail-layout {
+    grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.8fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .monitor-detail-layout {
+    grid-template-columns: 1fr;
+  }
+  .monitor-settings-panel {
+    position: static;
+  }
+  .monitor-settings-panel .schedule-controls,
+  .monitor-controls .budget-settings-form,
+  .monitor-settings-panel .reading-options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .monitor-page-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .monitor-activity-copy,
+  .monitor-detail-section {
+    padding: var(--space-5);
+  }
+  .monitor-key-metrics {
+    grid-template-columns: 1fr;
+  }
+  .monitor-key-metric {
+    padding: var(--space-4) var(--space-5);
+    border-top: 1px solid var(--line);
+    border-left: 0;
+  }
+  .monitor-settings-panel {
+    padding: 0 var(--space-5);
+  }
+  .monitor-settings-panel .schedule-controls,
+  .monitor-controls .budget-settings-form,
+  .monitor-settings-panel .reading-options {
+    grid-template-columns: 1fr;
+  }
+  .monitor-page-content .monitor-spend {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .monitor-page-content .monitor-spend > div {
+    padding: var(--space-3);
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .monitor-page-content .monitor-spend > div:nth-child(odd) {
+    padding-left: 0;
+    border-right: 1px solid var(--line);
+  }
+  .monitor-page-content .monitor-spend > div:nth-child(even) {
+    padding-right: 0;
+  }
+  .monitor-page-content .monitor-spend > div:nth-last-child(-n + 2) {
+    border-bottom: 0;
+  }
+  .monitor-page-content .poll-history li {
+    grid-template-columns: 1fr;
+    row-gap: var(--space-1);
+  }
+  .monitor-page-content .poll-history-when,
+  .monitor-page-content .poll-history-sources {
+    grid-column: 1;
+    grid-row: auto;
+  }
 }

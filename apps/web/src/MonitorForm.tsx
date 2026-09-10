@@ -3,7 +3,7 @@ import { Link } from "react-router";
 import { messageFor, requestJson } from "./api.js";
 import { BrandIcon } from "./BrandIcon.js";
 import { CostTest, type EstimateReport, exceedsCap } from "./CostTest.js";
-import { formatMicros, toMicros } from "./Monitors.js";
+import { formatMicros, toMicros } from "./monitor.js";
 import { paths } from "./route.js";
 import { ScheduleField } from "./ScheduleField.js";
 import { browserTimezone, defaultRate, everyDay, timezoneOptions } from "./schedule.js";

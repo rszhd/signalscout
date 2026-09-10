@@ -463,3 +463,57 @@ export async function setMatchSaved(
 
   return row ? { matchId: row.id, savedAt: row.savedAt } : undefined;
 }
+
+/** How many matches one monitor holds, and how many nobody has opened. US-109. */
+export interface MatchCounts {
+  readonly total: number;
+  readonly unread: number;
+}
+
+export const noMatchCounts: MatchCounts = { total: 0, unread: 0 };
+
+/**
+ * Every named monitor's match counts, in one read. US-109.
+ *
+ * The monitor list is what asks. It shows one number per row, so a count per
+ * row would be a query per row — the shape that reads fine with three monitors
+ * and stops the page with thirty. `verdictCounts` and `filterDropCounts` are
+ * the same statement for the same reason.
+ *
+ * A hidden match is not counted. US-015 hides a match whose post has been
+ * deleted, and a number that counted those would promise a person leads that
+ * open on nothing.
+ *
+ * Unread counts the rows with no `read_at`, whatever their verdict. "Sixty
+ * found, none read" and "sixty found, all read" send a person to two different
+ * places, and one total says neither.
+ *
+ * A monitor with no matches is absent rather than present with zeros, and a
+ * caller may default to `noMatchCounts` without hiding anything: zero here
+ * means this monitor has found nothing, which is what zero says.
+ */
+export async function matchCounts(
+  db: Database,
+  monitorIds?: readonly string[],
+): Promise<Map<string, MatchCounts>> {
+  const rows = await db
+    .select({
+      monitorId: matches.monitorId,
+      total: sql<number>`count(*)::int`,
+      unread: sql<number>`count(*) filter (where ${matches.readAt} is null)::int`,
+    })
+    .from(matches)
+    .where(
+      and(
+        eq(matches.hidden, false),
+        monitorIds && monitorIds.length > 0
+          ? inArray(matches.monitorId, [...monitorIds])
+          : undefined,
+      ),
+    )
+    .groupBy(matches.monitorId);
+
+  return new Map(
+    rows.map((row) => [row.monitorId, { total: Number(row.total), unread: Number(row.unread) }]),
+  );
+}

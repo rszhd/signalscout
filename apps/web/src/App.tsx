@@ -16,6 +16,7 @@ import { Connections } from "./Connections.js";
 import { Inbox } from "./Inbox.js";
 import { type AuthStatus, Login } from "./Login.js";
 import { Models } from "./Models.js";
+import { MonitorDetail } from "./MonitorDetail.js";
 import { MonitorForm } from "./MonitorForm.js";
 import { Monitors } from "./Monitors.js";
 import { Notifications } from "./Notifications.js";
@@ -350,6 +351,7 @@ export function App() {
         <Route path={routes.inbox} element={<InboxRoute />} />
         <Route path={routes.monitors} element={<MonitorsRoute />} />
         <Route path={routes.newMonitor} element={<MonitorFormRoute />} />
+        <Route path={routes.monitor} element={<MonitorRoute />} />
         <Route path={routes.notifications} element={<NotificationsRoute />} />
         <Route path={routes.connections} element={<Connections />} />
         <Route path={routes.providers} element={<Providers />} />
@@ -410,6 +412,22 @@ function MonitorFormRoute() {
   const { projectId } = useParams();
   return projectId ? (
     <MonitorForm projectId={projectId} />
+  ) : (
+    <Navigate replace to={paths.projects} />
+  );
+}
+
+/**
+ * One monitor's page. US-109.
+ *
+ * The `key` remounts it for `NotificationsRoute`'s reason: two monitors match
+ * the same route, so React would otherwise keep the other one's loaded state
+ * on the screen.
+ */
+function MonitorRoute() {
+  const { projectId, monitorId } = useParams();
+  return projectId && monitorId ? (
+    <MonitorDetail key={monitorId} monitorId={monitorId} projectId={projectId} />
   ) : (
     <Navigate replace to={paths.projects} />
   );

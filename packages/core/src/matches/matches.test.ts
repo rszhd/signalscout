@@ -20,6 +20,7 @@ import {
   type InboxMatch,
   listMatches,
   type MatchPage,
+  matchCounts,
   rankDecayPointsPerDay,
   setMatchSaved,
   UnusableCursorError,
@@ -57,6 +58,7 @@ interface Seed {
   readonly score: number;
   readonly postedAt: Date;
   readonly hidden?: boolean;
+  readonly readAt?: Date;
   readonly reasons?: readonly string[];
   readonly channel?: string;
   readonly intentType?: IntentType;
@@ -123,6 +125,7 @@ describe("the inbox list", () => {
           intentType: match.intentType ?? "problem",
           reasons: [...(match.reasons ?? ["Small SaaS team", "Explicit manual-testing pain"])],
           hidden: match.hidden ?? false,
+          readAt: match.readAt ?? null,
         })
         .returning({ id: matches.id }),
     );
@@ -562,6 +565,51 @@ describe("the inbox list", () => {
       const match = at(await listMatches(db, { userId: owner, asOf: now }), 0);
 
       expect(match.intentLabel).toBe("No clear intent");
+    });
+  });
+  describe("counting one monitor's matches", () => {
+    it("counts each monitor's own matches and leaves the others out", async () => {
+      await seed({ monitorId, score: 80, postedAt: minutesAgo(10) });
+      await seed({ monitorId, score: 60, postedAt: minutesAgo(20) });
+      await seed({ monitorId: otherMonitorId, score: 70, postedAt: minutesAgo(30) });
+
+      const counts = await matchCounts(db);
+
+      expect(counts.get(monitorId)?.total).toBe(2);
+      expect(counts.get(otherMonitorId)?.total).toBe(1);
+    });
+
+    it("does not count a match whose post is gone", async () => {
+      await seed({ monitorId, score: 80, postedAt: minutesAgo(10) });
+      await seed({ monitorId, score: 60, postedAt: minutesAgo(20), hidden: true });
+
+      // US-015 hides the match rather than deleting it, so the row is still
+      // there. A count that included it would promise a lead that opens on
+      // nothing.
+      expect((await matchCounts(db)).get(monitorId)).toEqual({ total: 1, unread: 1 });
+    });
+
+    it("counts the ones nobody has opened apart from the total", async () => {
+      await seed({ monitorId, score: 80, postedAt: minutesAgo(10) });
+      await seed({ monitorId, score: 60, postedAt: minutesAgo(20), readAt: minutesAgo(5) });
+
+      expect((await matchCounts(db)).get(monitorId)).toEqual({ total: 2, unread: 1 });
+    });
+
+    it("leaves a monitor that found nothing out, rather than reporting zeros", async () => {
+      await seed({ monitorId, score: 80, postedAt: minutesAgo(10) });
+
+      expect((await matchCounts(db)).has(otherMonitorId)).toBe(false);
+    });
+
+    it("answers about only the monitors it was asked about", async () => {
+      await seed({ monitorId, score: 80, postedAt: minutesAgo(10) });
+      await seed({ monitorId: otherMonitorId, score: 70, postedAt: minutesAgo(30) });
+
+      const counts = await matchCounts(db, [monitorId]);
+
+      expect(counts.get(monitorId)?.total).toBe(1);
+      expect(counts.has(otherMonitorId)).toBe(false);
     });
   });
 });

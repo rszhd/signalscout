@@ -2,7 +2,7 @@
 
 # Done
 
-87 finished.
+88 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
@@ -18,6 +18,7 @@
 | BUG-003 | [A post below the threshold is classified again on every poll](done/2026-09/BUG-003-a-post-below-the-threshold-is-classified-again-on-every-poll.md) | bug | fixed | 2026-09 |
 | BUG-002 | [A seven-day window is bought as a month](done/2026-09/BUG-002-a-seven-day-window-is-bought-as-a-month.md) | bug | fixed | 2026-09 |
 | BUG-001 | [A pending Reddit collection is not resumed](done/2026-09/BUG-001-a-pending-reddit-collection-is-not-resumed.md) | bug | shipped | 2026-09 |
+| US-103 | [The README is an overview](done/2026-09/US-103-the-readme-is-an-overview.md) | chore | shipped | 2026-09 |
 | US-102 | [A self-hosted install starts from the commands we print](done/2026-09/US-102-a-self-hosted-install-starts-from-the-commands-we-print.md) | bug | shipped | 2026-09 |
 | US-101 | [The README says what the product does now](done/2026-09/US-101-the-readme-says-what-the-product-does-now.md) | chore | shipped | 2026-09 |
 | US-098 | [A provider card links to its website](done/2026-09/US-098-a-provider-card-links-to-its-website.md) | feature | shipped | 2026-09 |

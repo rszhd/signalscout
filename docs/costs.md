@@ -14,29 +14,47 @@ not.
 We do not read your bill. We count what each call reported and multiply it by
 the price the connector declares:
 
-| | Billable unit | Price per unit |
-|---|---|---|
-| Reddit, through Bright Data | one record | $0.0015 |
-| Reddit, through ScrapeCreators | one request | $0.00188 |
-| X, through SocialCrawl | one request | $0.008118 |
-| LinkedIn, through SocialCrawl | one credit, and a call costs five | $0.008118 |
-| A model call | one call | the provider's own token price |
+| Platform | Provider | Billable unit | Price per unit | Per post |
+|---|---|---|---|---|
+| Reddit | Bright Data | a record | $0.0015 | $0.0015 |
+| Reddit | ScrapeCreators | a request | $0.00188 | ~$0.00027 (7–23 posts a request) |
+| Reddit | SocialCrawl | a credit | $0.008118 | ~$0.00032 (25 posts) |
+| X | SocialData | a tweet | $0.0002 | $0.0002 |
+| X | SocialCrawl | a request | $0.008118 | ~$0.0004 (20 posts) |
+| LinkedIn | Apify | a post | $0.002 | $0.002 |
+| YouTube | SocialCrawl | a credit | $0.008118 | ~$0.00018 (45 videos) |
+| TikTok | SocialCrawl | a credit | $0.008118 | ~$0.00027 (30 videos) |
+| Instagram | SocialCrawl | a credit | $0.008118 | ~$0.00027 (30 reels) |
+| Instagram comments | SocialCrawl | 5 credits a page | $0.0406 | ~$0.0027 (15 comments) |
+| A model call | your provider | one call | the provider's own token price | |
+
+Each price is the one its connector declares, and each per-post figure is that
+price divided by the `postsPerUnit` the connector measured. LinkedIn through
+SocialCrawl is not here because US-053 switched that pair off; Apify fetches
+LinkedIn now.
 
 That arithmetic is wrong in at least five ways we already know about, and
 probably in a sixth we do not:
 
-**LinkedIn is the dearest platform here, by a wide margin.** One call costs
-five credits and returns ten posts, so a LinkedIn post costs about $0.0041 —
-ten times an X post and twenty-seven times a Bright Data Reddit record. One
-query polled hourly, at the two pages a poll allows, is about $58 a month
-before a single model call. Set a cap before you start one.
+**An Instagram comment is the dearest item this product fetches.** A comment
+page is five credits for fifteen comments, which is about $0.0027 each —
+fifteen times a YouTube video, thirteen times a tweet through SocialData, and
+about a third dearer than a LinkedIn post through Apify. Set a cap before you
+tick that box.
 
-**A LinkedIn search that matches nothing still costs the full five credits.**
-X refunds a search that finds no posts. LinkedIn does not, and worse, it does
-not come back empty: a phrase that cannot occur anywhere returned ten
-unrelated posts and billed in full. So a vague LinkedIn query is not a query
-that quietly finds nothing — it is a query that pays full price for noise, and
-then pays the classifier to read it.
+**A comment is not priced like a post, and a guard fed the wrong one lets a
+monitor spend five times its cap.** That is why a connector declares
+`replyPricePerUnitMicros` separately. US-028 found it on LinkedIn, where a call
+was five credits and a credit was not a request.
+
+**Instagram is the one platform where the provider costs more than the model.**
+A search page is one credit and a comment page is five, and the leads there are
+in the comments. One live poll spent $1.6317 with SocialCrawl against $0.3336
+with the model, which is the reverse of every other platform.
+
+**A vague query is not free silence.** X refunds a search that matches nothing.
+LinkedIn, YouTube and Instagram do not — they return unrelated results at full
+price, and then the model is paid to read them.
 
 **The free allowance is not modelled.** Bright Data's first 5,000 records each
 month cost nothing. SignalScout prices every record at the paid rate, so a

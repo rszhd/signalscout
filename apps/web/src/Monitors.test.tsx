@@ -159,6 +159,34 @@ describe("the monitor list", () => {
       expect(container.textContent).not.toContain("Found nothing");
     });
 
+    it("says which platform failed when the poll collected anyway", async () => {
+      /**
+       * BUG-016. A 503 on X used to discard Reddit's collection outright; now
+       * Reddit's posts are kept, and this line is what stops the poll reading
+       * as an ordinary success. The outcome is `collected` and stays that way
+       * — it did collect — so the failure has to arrive in the sentence.
+       */
+      await show([
+        monitor({
+          lastPoll: poll({
+            outcome: "collected",
+            postsReturned: 5,
+            postsNew: 5,
+            stopReason: "error",
+            sources: [
+              { ...poll().sources[0], source: "reddit", reason: null },
+              { ...poll().sources[0], source: "x", provider: "socialcrawl", reason: "error" },
+            ],
+          }),
+        }),
+      ]);
+
+      const text = container.textContent ?? "";
+
+      expect(text).toContain("5 posts, 5 new");
+      expect(text).toContain("X failed");
+    });
+
     it("turns a stop reason into a sentence rather than printing it", async () => {
       await show([
         monitor({ lastPoll: poll({ outcome: "refused", stopReason: "no_provider_choice" }) }),

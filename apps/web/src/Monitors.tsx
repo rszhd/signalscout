@@ -280,6 +280,22 @@ function pollSummary(run: PollRun): string {
     return `Last poll found no posts${because}${spent}`;
   }
 
+  /**
+   * A poll that collected *and* lost a platform. BUG-016.
+   *
+   * The outcome reads `collected` because it did collect, and making it say
+   * otherwise would be the row lying about the posts it stored. So the failure
+   * arrives here instead: without this clause a poll that lost X to a 503 and
+   * kept Reddit reads as an ordinary success, which is the reading that let a
+   * paid outage go unnoticed for a day.
+   */
+  const lost = run.sources.filter((entry) => entry.reason === "error");
+
+  if (lost.length > 0) {
+    const names = lost.map((entry) => platformName(entry.source)).join(", ");
+    return `Last poll: ${run.postsReturned} posts, ${run.postsNew} new${spent} · ${names} failed`;
+  }
+
   return `Last poll: ${run.postsReturned} posts, ${run.postsNew} new${spent}`;
 }
 

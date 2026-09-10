@@ -60,8 +60,9 @@ does, the poll's own row has to say which platform failed and why —
       every other platform's posts are stored and the filter job is sent
 - [x] The failing platform keeps its continuation, so the pages it had already
       bought are read on the next poll rather than bought again
-- [ ] The poll's row names the failing platform and its reason, and the poll's
-      own outcome says something failed
+- [x] The poll's row names the failing platform and its reason, and the
+      monitor card says which platform failed — see the Log for why the
+      outcome itself stays `collected`
 - [x] A platform that fails on every source is still a failed job, so a
       provider outage that stops everything still reaches the dead letter queue
 - [x] A test drives two platforms where the second throws, and asserts the
@@ -111,3 +112,11 @@ does, the poll's own row has to say which platform failed and why —
   The 503 was reproduced with a plain `Error` rather than a `SocialCrawlError`.
   The boundary does not read the error's type, so the branch is the same one —
   but the box stays open because the ticket asked for that class specifically.
+- 2026-09-10T14:12+08:00 — Screen line added. `pollSummary` now ends a
+  collected poll with "X failed" when any platform's line carries `error`, so a
+  poll that lost one platform to an outage cannot read as an ordinary success.
+  The acceptance box asked for the *outcome* to say something failed and that
+  is the one thing not done: `collected` is true, and changing it would be the
+  row lying about the posts it stored. The failure belongs beside the counts,
+  not instead of them. One mutation — never naming the lost platform — turns
+  the screen suite red.

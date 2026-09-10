@@ -16,41 +16,6 @@ get is not a dashboard. It is an inbox of people who might need what you build.
 
 ---
 
-## Status: it runs, and it has found real people
-
-The pipeline works end to end, on real providers and a real model. A monitor is
-created on a form, polled on its own schedule, filtered, scored, and the
-matches arrive in an inbox and in your email.
-
-What has happened on live data, not in a test:
-
-- Six platforms have been polled with real keys. Reddit, X, LinkedIn, YouTube,
-  TikTok and Instagram all have at least one measured collection behind them.
-- The best matches are real. A QA lead with no test automation asking what to
-  automate first (71 on Reddit). A person whose skin barrier retinol destroyed
-  asking how to treat the scars (90 on Instagram).
-- A budget cap has refused a poll that would have spent past it, and the same
-  poll's model half stopped mid-batch.
-- A digest and an immediate alert have been delivered by email, and a signed
-  webhook has been received and verified.
-
-What is not proven, and is written down rather than implied:
-
-- **The scores have five verdicts behind them.** Five matches on one monitor
-  were judged by a person, and every kept post scored above every refused one —
-  but by six points, and five verdicts is not a distribution.
-- **A rate limit has never happened.** Every connector's 429 branch is our half
-  of a contract no provider has shown us yet.
-- **The hosted version is not up.** There is a staging stack and a Stripe
-  product, and no container image on the registry yet. Build it yourself for
-  now — see *Running it*.
-
-[PLAN.md](PLAN.md) is the product argument and [STACK.md](STACK.md) is the
-engineering one. [`backlog/OPEN.md`](backlog/OPEN.md) is what is being built
-and in what order.
-
----
-
 ## How it works
 
 ```

@@ -309,10 +309,13 @@ export function createAuth({
              * not leave, which is what an operator needs to act.
              */
             sendVerificationEmail: async ({ user, url, token }) => {
-              const { subject, text } = verificationMessage(user.name, url);
+              // The dressed half travels too. US-094: the text is the message
+              // and the HTML presents it, so a client that renders markup gets
+              // the product's own look and a text-only one loses nothing.
+              const { subject, text, html } = verificationMessage(user.name, url);
 
               try {
-                await sendEmail(user.email, subject, text, token);
+                await sendEmail(user.email, subject, text, token, html);
               } catch (error) {
                 logger?.error(
                   { err: error, email: user.email },

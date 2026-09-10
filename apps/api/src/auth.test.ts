@@ -336,7 +336,7 @@ describe("the session gate", () => {
    */
   describe("when an address has to be verified", () => {
     /** Every link this instance sent, newest last. */
-    let sent: { to: string; subject: string; text: string; url: string }[];
+    let sent: { to: string; subject: string; text: string; url: string; html?: string }[];
 
     async function verifyingServer(): Promise<ApiServer> {
       sent = [];
@@ -355,10 +355,10 @@ describe("the session gate", () => {
           db,
           secret,
           signup: "open",
-          sendEmail: async (to, subject, text) => {
+          sendEmail: async (to, subject, text, _id, html) => {
             // The link, as a person would copy it out of the message.
             const url = text.split("\n").find((line) => line.startsWith("http")) ?? "";
-            sent.push({ to, subject, text, url });
+            sent.push({ to, subject, text, url, html });
           },
         }),
       });
@@ -388,6 +388,14 @@ describe("the session gate", () => {
         expect(sent).toHaveLength(1);
         expect(sent[0]?.to).toBe("owner@example.com");
         expect(sent[0]?.url).toContain("/api/auth/verify-email?token=");
+
+        // US-094. The dressed half travels with the text. The hook dropped it
+        // until this assertion existed, so a verification mail went out as
+        // plain text while the digest mail was dressed.
+        expect(sent[0]?.html).toContain("Confirm this address");
+        // The path up to the token, which HTML leaves unescaped. The full URL
+        // carries an `&` that the HTML writes as `&amp;`.
+        expect(sent[0]?.html).toContain("/api/auth/verify-email?token=");
       } finally {
         await app.close();
       }

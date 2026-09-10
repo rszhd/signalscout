@@ -230,7 +230,7 @@ const examples = [
     <span class="eyebrow"><span class="status-dot"></span> FOR THE THINGS YOU BUILD</span>
     <h1>Someone is<br/>asking for<br/><span class="headline-accent">what you built.</span></h1>
     <p class="hero-description">SignalScout finds posts and comments from people with a problem your product solves.</p>
-    <div class="hero-actions"><a class="button" href="#inbox">Find the question <Icon size={18}/></a><a class="text-link" href={repository}>Self-host it <Icon name="github" size={18}/></a></div>
+    <div class="hero-actions"><a class="button" href={appUrl ?? "https://app.signalscout.run"}>Find the question <Icon size={18}/></a><a class="text-link" href={repository}>Self-host it <Icon name="github" size={18}/></a></div>
     <p class="hero-note">Open source. Your keys. Your data.</p>
   </div>
   <div class="signal-scene" aria-label="Illustrative matches for six different products">
@@ -370,7 +370,7 @@ const examples = [
     <div class="overheard" aria-hidden="true">{overheard.map((line, index) => <span style={`--step:${index}`}>“{line}”</span>)}</div>
     <h2>Maybe they <span>mean yours.</span></h2>
     <p class="closing-line">Six platforms. Somebody is halfway through the question.</p>
-    <a class="button" href="#pricing">Start listening <Icon size={20}/></a>
+    <a class="button" href={appUrl ?? "https://app.signalscout.run"}>Start listening <Icon size={20}/></a>
   </div>
 </section>
 </main>

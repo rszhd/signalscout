@@ -104,7 +104,8 @@ monitor, so it stays on a single product: a simple invoicing app for
 freelancers, from chasing late payments to looking for a cheaper alternative.
 Every post and score on the page is illustrative. Selecting a conversation
 updates the preview locally. FAQ disclosures use native HTML. The page makes
-no provider requests and collects no visitor data.
+no provider requests. It measures its visitors where a measurement id is set —
+see *Analytics* below.
 
 The hero's eyebrow reads **RIGHT NOW, IN PUBLIC**, and the pill it sits in
 carries a pulsing green dot. The two are one sentence: the dot means live, so
@@ -123,6 +124,29 @@ and removes card transitions. With JavaScript disabled, the first card remains v
 Supporting text uses a 14px minimum at the default browser size. Body copy is
 16–18px. These sizes use rem-based tokens so browser text-size preferences
 apply. Cards and captions wrap rather than shrinking their type on phones.
+
+## Analytics
+
+`PUBLIC_GA_MEASUREMENT_ID` is the Google Analytics 4 property this page reports
+to. Set it in the Vercel project, beside `PUBLIC_APP_URL`.
+
+**Astro reads it at build time, so changing it needs a redeploy**, the same way
+`PUBLIC_APP_URL` does. Where it is unset the page carries no tag at all — not an
+empty one — so a fork, a `npm run dev` and a preview deployment report nothing
+and cost a visitor no connection to another origin. The id is not written into
+the repository for that reason: a fork that inherited it would send its visitors
+into this property.
+
+The tag is the snippet Google publishes, with one change. Astro's `define:vars`
+wraps an inline script in a function, so `gtag` is assigned to `window` by hand.
+Without that the pageview still arrives — the library reads `dataLayer`, not the
+function — and `gtag("event", ...)` written later finds nothing.
+
+**Two things this does not do.** There is no consent banner, so an audience in
+the EU or the UK is measured without being asked; that is a decision to make
+before this site is advertised there, not a setting. And no event is sent beyond
+the pageview, so the page tells you who arrived and nothing about what they
+pressed.
 
 ## The social card
 

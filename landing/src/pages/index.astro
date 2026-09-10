@@ -12,6 +12,17 @@ const repository = "https://github.com/rszhd/signalscout";
 const appUrl = import.meta.env.PUBLIC_APP_URL;
 
 /**
+ * The Google Analytics property this page reports to, `G-` and ten characters.
+ *
+ * It is read at build time like `PUBLIC_APP_URL` beside it, so changing it in
+ * the Vercel dashboard reaches nobody until the next build. It is deliberately
+ * not written into this file: a fork, a local `npm run dev` and a preview
+ * deployment then report nothing, rather than sending somebody else's visitors
+ * into this property. No variable means no tag at all — not an empty one.
+ */
+const analyticsId = import.meta.env.PUBLIC_GA_MEASUREMENT_ID;
+
+/**
  * This page's own address, and the `www` host is deliberate: the apex answers
  * 308 to it, so naming the apex here would make every canonical and every
  * social card point at a redirect.
@@ -173,6 +184,38 @@ const examples = [
 <meta name="description" content={description}/>
 <link rel="canonical" href={`${site}/`}/>
 <meta name="theme-color" content="#f7f8fa"/>
+
+{/*
+  Google Analytics. Both halves are `is:inline` so Astro leaves them where they
+  are: the loader has to keep its `async` attribute and its own origin, and the
+  snippet below has to run before the loader arrives, because `gtag` queues its
+  calls into `dataLayer` and the library reads the queue when it loads.
+
+  `gtag` is put on `window` by hand. Astro's `define:vars` wraps the script in a
+  function, so the plain declaration Google publishes would be local to that
+  wrapper — the pageview would still be sent, because the library reads
+  `dataLayer` and not the function, and the next person to write
+  `gtag("event", ...)` would find nothing there.
+
+  The whole block is absent when no measurement id is set, which is every
+  environment except this production build. An empty `id=` is a request that
+  reports nothing and still costs a visitor a connection to another origin.
+
+  This comment is a template comment rather than an HTML one, so it is stripped
+  from the output. An HTML comment ships, and a page that carries no tag should
+  not carry the name of one either.
+*/}
+{analyticsId && (
+  <Fragment>
+    <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${analyticsId}`}></script>
+    <script is:inline define:vars={{ analyticsId }}>
+      window.dataLayer = window.dataLayer || [];
+      window.gtag = function gtag() { window.dataLayer.push(arguments); };
+      window.gtag("js", new Date());
+      window.gtag("config", analyticsId);
+    </script>
+  </Fragment>
+)}
 
 <!--
   The link preview. `og:image` is an absolute URL because a scraper has no page

@@ -68,12 +68,25 @@ the `repository` constant if that location changes. The Cloud action reads
 `PUBLIC_APP_URL`. Until that URL is supplied, the page shows “Cloud signup coming soon” instead of a signup link.
 Set it to the real signup or checkout destination before publishing.
 
+The providers section names who fetches the posts and who reads them. The data
+providers and the platforms beside each are the connectors the application
+ships — `builtInSources` in `packages/core/src/sources/index.ts` — and only the
+pairs that are offered: SocialCrawl also has a LinkedIn connector, switched off
+by US-053, so LinkedIn names Apify alone. The model providers are
+`aiProviders` in `packages/core/src/ai/config.ts`. Update this section when a
+connector is added or switched off. **The heading counts nothing on purpose** —
+"five who fetch" was true on the day it was written and stops being true the
+next time a provider is added, and a headline is the last place anybody looks
+for the thing that went stale. The section eyebrows are numbered in order,
+so inserting a section renumbers the ones below it.
+
 `src/styles/tokens.css` is a snapshot of the application palette and sizing
 tokens, copied so the site builds alone, plus a small marketing accent palette
 (coral, mint, lavender and pale yellow). Review it when the application theme
 changes. `src/styles/landing.css` owns the landing layout and interactive example styles;
 `features.css` styles the feature overview. Large headlines and stacked conversation
-cards lead into the inbox demo, three-step workflow, features, pricing, and FAQ.
+cards lead into the inbox demo, three-step workflow, features, providers,
+pricing, and FAQ.
 Copy stays short within each section. Figtree is bundled
 locally through `@fontsource/figtree`. Platform icon provenance is recorded in
 `public/brands/README.md`; only the six platform icons are copied here.

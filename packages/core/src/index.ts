@@ -299,6 +299,7 @@ export {
   sessions,
   signals,
   sourceContinuations,
+  sourceCoverage,
   sourceCredentials,
   sourceProviders,
   sources,

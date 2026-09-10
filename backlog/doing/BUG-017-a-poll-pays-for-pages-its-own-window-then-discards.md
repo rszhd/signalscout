@@ -11,65 +11,80 @@ resolution:
 
 ## Context
 
-**A long walk narrows its own window on every step, so the pages it buys near
-the end are almost always empty.** `collect.ts` moves `monitors.last_polled_at`
-to now at the start of every poll, and a source that is *not* resuming a
-collection is read with `since = last_polled_at` — the previous poll's time. A
-walk that takes many polls therefore asks its later inputs for posts newer than
-a few minutes ago, and a keyword search sorted by `new` has nothing that
-recent. The page is fetched, billed, and then dropped by the connector's own
-`since` filter.
+**`monitors.last_polled_at` answers two questions and only one of them is
+about a window.** The poll interval needs "when did a job last run". The search
+window needs "how far forward does our collection already reach". One column
+holds both, and it moves at the *start of every poll* — including the resumes
+of a collection that is still being walked. So by the time one walk ends, that
+mark is minutes fresh while the walk's own coverage ended long before, and the
+**next** walk is started with a window as narrow as the gap between two polls.
 
-**Measured live on the production instance, 2026-09-10.** The monitor's Reddit
-plan is five queries across eight subreddits, which the SocialCrawl connector
-walks as **forty (query, subreddit) pairs** at `maxPagesPerPoll = 5` a poll — so
-the walk needs many polls to finish. Two consecutive polls logged:
+**A walk is long and a poll is short, which is what makes the gap bite.** The
+SocialCrawl Reddit connector turns five queries across eight subreddits into
+**forty (query, subreddit) pairs**, and `maxPagesPerPoll = 5` means one poll
+buys five pages. A walk therefore takes eight or more polls, and it re-books
+itself immediately — `resumeAfter: now` when the page cap stops it. A monitor
+in that state polls in a tight loop, and each new walk inherits a window a
+minute wide, then spends eight polls buying forty inputs against it. Every page
+is fetched, billed, and dropped by the connector's own `since` filter.
+
+**What is already right, and is worth not breaking.** `rememberContinuation`
+writes `since` **once and never updates it**, and its comment says why: the
+window belongs to the poll that triggered the collection, and a resume that
+moved it would read a snapshot with a question it was not collected for. So one
+walk keeps one window. The fault is not inside a walk. It is at the seam
+between two.
+
+**Measured live on the production instance, 2026-09-10.** Two consecutive polls
+logged:
 
 ```
 sourceId=reddit  resumed=true  pages=5  posts=0  unitsConsumed=5
 ```
 
-Five pages, five credits, **zero posts**, twice. The continuation sat at
-`scoped|22|0` with `since = 2026-09-09 19:48:45`.
+Five pages, five credits, **zero posts**, twice. `source_continuations` held
+one row: cursor `scoped|22|0` — input 22 of the 40 — with
+`since = 2026-09-09 19:48:45`, which is the moment the *previous* poll of the
+original run started. That is the inherited window, still filtering pages
+bought seven hours later.
 
-**The searches are not the problem, and that is measured too.** The same forty
-pairs run against the same endpoint with **no window** returned **125 posts in
-5 pages for 5 credits**. The pages are full. The window is what empties them.
+**The searches themselves are full.** The same forty pairs run against the same
+endpoint with **no window** returned **125 posts in 5 pages for 5 credits**. So
+the pages are not empty; the window empties them.
 
-**The first run cost $0.666 and stored nothing.** On 2026-09-09 the same
-monitor polled fifteen times, one minute apart, billing 67 Reddit credits and
-15 X credits. Every poll after the first read its new inputs against a `since`
-about sixty seconds old.
+**The first run cost $0.666 and stored nothing.** On 2026-09-09 the monitor
+polled fifteen times inside ten minutes, billing 67 Reddit credits and 15 X
+credits. Fifteen polls one minute apart is the tight loop this describes.
 
-**A resumed input is already right, and that is the shape of the fix.**
-`rememberContinuation` stores the window the collection started with, and
-`const window = continuation ? continuation.since : since` reads it back — the
-comment above it says exactly why: *reading `last_polled_at` here would ask for
-posts newer than the trigger, and every record the collection was paid for
-would be filtered away as old.* That reasoning is correct and it stops one
-input short. The **walk** has the same property as one input: it is one
-question, asked over several polls, and the moment it started is the moment its
-window should be pinned to.
+**One thing is not explained and must not be claimed.** The *first* poll of
+that run had no window at all — `createMonitor` never writes `last_polled_at`
+— so it should have collected. It stored nothing, and this ticket does not say
+why. BUG-016 is one candidate and the account is another. Fixing this ticket
+will not on its own prove the production monitor collects.
 
-**There is a second, cheaper half.** Even with the window pinned, this connector
-fetches a page and discards it locally. `since` is applied by us on Reddit
-because the provider refuses a `timeframe` beside `sort=new` (US-025 measured
-that for ScrapeCreators). Where a page comes back sorted newest-first and its
-**whole** page is older than the window, the walk can stop that input instead of
-buying its second page — the early-stop rule US-061 uses on SocialData and
-US-028 deliberately omits on LinkedIn, where the order is relevance. Whether
-this endpoint's `sort=new` really orders the whole page has to be measured
-before anything relies on it.
+**There is a second, cheaper half, and it is parked.** Even with the window
+right, this connector fetches a page and then discards it locally, because the
+provider refuses a `timeframe` beside `sort=new`. Where a page comes back
+newest-first and its *whole* page is older than the window, the walk could stop
+that input rather than buy its second page — the early-stop rule US-061 uses on
+SocialData and US-028 deliberately omits on LinkedIn, where the order is
+relevance. That needs a capture proving this endpoint orders a whole page, and
+a wrong guess there drops posts silently where the current code merely pays.
 
 ## Acceptance
 
-- [ ] A walk that spans several polls asks every one of its inputs against the
-      window the walk started with, not the previous poll's time
-- [ ] A monitor that has never polled still collects with no window at all, and
-      the first poll of a later walk uses the mark the previous walk finished at
-- [ ] A test drives a multi-poll walk over several inputs and asserts the later
-      inputs receive the first poll's window — it fails on the current code
-- [ ] The window a walk is pinned to survives a worker restart, because it
+- [x] A new walk is started with the window the previous walk *finished* at,
+      not with the time of the last poll job
+- [x] The mark a window is taken from advances only when a walk completes, so a
+      poll that resumes one does not move it
+- [x] `monitors.last_polled_at` keeps meaning "when a job last ran", so the
+      interval and `findDueMonitors` are untouched
+- [x] A monitor that has never polled still collects with no window at all
+- [x] A test drives two walks over several polls and asserts the second walk's
+      window is where the first one finished — it fails on the current code
+- [x] A test asserts a resume does not move that mark, which is the half that
+      makes the first one true
+- [x] The window a walk is pinned to survives a worker restart, because it
       lives in `source_continuations` and not in the job
 - [ ] `poll_runs` shows the difference: a walk that used to return zero posts
       for five credits a poll returns posts for the same credits
@@ -80,7 +95,10 @@ before anything relies on it.
 
 - Do not fix this by not advancing `last_polled_at`. The interval is measured
   from poll starts, and a monitor that stopped moving that mark would be polled
-  again immediately and forever.
+  again immediately and forever. The repair is a **second** mark for coverage,
+  not a change to what this one means.
+- Do not touch `rememberContinuation`'s write-once `since`. That is the rule
+  that keeps one walk on one question, and it is already correct.
 - The early-stop half belongs in its own ticket if it is taken: it needs a
   capture proving `sort=new` orders a whole page on
   `/v1/reddit/subreddit/search`, and a wrong guess there silently drops posts
@@ -101,3 +119,40 @@ before anything relies on it.
   instance and watching the log, then reading `source_continuations`. Two polls
   bought five pages each and stored nothing; the same forty pairs with no
   window returned 125 posts in five pages.
+- 2026-09-10T10:52+08:00 — Context rewritten. The first version said a walk
+  narrows its own window on every step. That is wrong: `rememberContinuation`
+  writes `since` once and never updates it, so a walk keeps its window. The
+  fault is at the seam between two walks, where the new one inherits a window
+  one poll-interval wide. The symptom, the money and the measurements are
+  unchanged; the mechanism is not.
+- 2026-09-10T13:55+08:00 — Fixed. `source_coverage` is the second mark, one
+  row per (monitor, platform), migration 0058. A row is written when a **walk**
+  finishes and it holds the moment that walk *started*, never the moment it
+  ended: a walk collects up to its own beginning, and anything written while it
+  paged may have been missed. Erring early is the safe direction, because
+  `posts` deduplicates — a window that is too wide costs a page and a window
+  that is too narrow loses posts with no trace. `greatest()` in the upsert
+  stops the mark ever moving backwards.
+
+  `monitors.last_polled_at` is untouched and still means "when a job last ran",
+  so the interval and `findDueMonitors` are exactly as they were.
+
+  The migration seeds every monitor that has already polled, from
+  `last_polled_at` — which is what the window used to be — so the first poll
+  after the upgrade behaves like the last one before it. Without that seed,
+  every monitor would open one unwindowed walk per platform at a provider that
+  bills the page.
+
+  Three mutations turn the suite red: reading the poll mark as a window again,
+  recording nothing when a walk finishes, and marking the walk's end rather
+  than its start.
+
+  **Three existing tests changed, and none of them by weakening an
+  assertion.** Each one set up or reset the window through `last_polled_at`,
+  which is no longer where a window comes from; the claims they protect — a
+  resume asks its trigger's window, a provider switch takes effect on the next
+  collection, a repeated page buys no model call — are asserted unchanged.
+
+  **Two boxes stay open and both need a live run.** Nothing has polled a real
+  provider through this, so the row that would show the difference is
+  unmeasured. The production monitor is the case to run it on.

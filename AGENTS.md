@@ -1573,6 +1573,71 @@ the **third** live sighting of US-006's failure path.
 Existing monitors were deliberately not migrated, so one stays silent until
 somebody opens its notification screen and saves. Read docs/notifications.md.
 
+**Three faults sat between a paid page and a stored post, and all three are
+fixed.** BUG-015, BUG-016 and BUG-017 were found on 2026-09-10 by asking why
+the first monitor on the production instance collected nothing. Each ends the
+same way — a poll that spent money and stored no row — and each survives the
+other two being fixed.
+
+**A post found twice in one poll used to lose the whole collection.** BUG-015.
+`collect.ts` built one `INSERT` from every post every source returned, and
+Postgres refuses a statement whose own rows collide: *ON CONFLICT DO UPDATE
+command cannot affect row a second time*. It refuses the whole statement, so a
+poll that collected 125 posts stored none of them. The scoped Reddit search
+makes it ordinary rather than rare — five queries across eight subreddits is
+forty searches, and a post matching two of them arrives twice in one batch.
+**`on conflict` is not the guard people assume**: it resolves a collision with
+a row already in the table and says nothing about two rows arriving together.
+The batch is deduplicated on `(source, external_id)` before the statement is
+built, and `poll_runs.posts_returned` still counts what the connectors handed
+back, so a poll that found one post through three searches still says it paid
+for three.
+
+**One platform's outage used to throw away another platform's collection.**
+BUG-016, watched live. SocialCrawl answered 503 for X — *twitter is temporarily
+unavailable, your credits have been refunded* — the connector threw, and
+`collect` never reached its insert. Reddit's pages had been fetched, parsed and
+paid for, and they went with it; SocialCrawl refunded X's credits and nobody
+refunded Reddit's. **Retrying made it worse**, because the retry resumed the
+Reddit walk, bought more pages and threw again. A platform's failure is now
+kept to that platform, its continuation is left alone, and a poll where *every*
+platform asked has failed still throws so the outage reaches the dead letter
+queue. What is not done is the screen: a partial failure carries `error` as its
+stop reason while the outcome reads `collected`, and `pollSummary` shows a
+reason only for a refused, empty or failed poll.
+
+**A walk used to narrow its own window at the seam and pay for pages it then
+discarded.** BUG-017, and it is the one that cost $0.666.
+`monitors.last_polled_at` answered two questions — when a job last ran, which
+the interval needs, and how far the collection reaches, which the window needs
+— and it moves at the start of **every** poll, including the resumes of a walk
+still paging. So when one walk ended and the next began, the new one was handed
+a window as narrow as the gap between two polls: one minute, forty searches
+wide, every page bought and dropped by our own `since` filter. The production
+continuation was found at `scoped|22|0` carrying a seven-hour-old window, and
+two consecutive polls each read 5 pages for 5 credits and returned **zero
+posts**. The same forty pairs with **no** window returned **125 posts in 5
+pages for 5 credits**, so the pages are full and the window emptied them.
+
+`source_coverage` is the second mark, migration 0058, one row per (monitor,
+platform). It is written when a **walk** finishes and holds the moment that walk
+*started* — never its end, because a walk collects up to its own beginning and
+anything written while it paged may have been missed. **Erring early is the safe
+direction**: `posts` deduplicates, so a window that is too wide costs a page,
+and one that is too narrow loses posts with no trace. `greatest()` stops the
+mark moving backwards, and the migration seeds every monitor that has already
+polled from `last_polled_at` — what the window used to be — so the first poll
+after the upgrade behaves like the last one before it.
+
+**Three existing tests changed and none by weakening an assertion.** Each set
+up or reset the window through `last_polled_at`, which is no longer where a
+window comes from. The claims they protect are asserted unchanged.
+
+**Nothing about any of the three has run live.** The measurements above come
+from one probe against a real provider on a development machine and one
+triggered poll on the production box, both read from logs and rows rather than
+from a screen.
+
 **A poll now says what it did, and until it did a monitor that spent $0.666
 and collected nothing read `Running`.** US-104 closed on 2026-09-10, from a
 fault on the production instance. On 2026-09-09 the first monitor on

@@ -51,6 +51,7 @@ import {
   forgetContinuation,
   rememberContinuation,
 } from "./continuations.js";
+import { coverageFor, recordCoverage } from "./coverage.js";
 import type { CredentialLookup } from "./credentials.js";
 import { filterQueue, type PollPayload, pollQueue } from "./queues.js";
 import type { Step, StepContext } from "./steps.js";
@@ -176,6 +177,18 @@ async function readSource(
   };
 }
 
+/**
+ * A post's identity, as the unique index sees it.
+ *
+ * `JSON.stringify` rather than joining with a separator, because an id is a
+ * provider's string and no character can be assumed absent from it. The pair is
+ * `(source, external_id)` and nothing else: `provider` sits outside the index
+ * on purpose, so the same post through two providers is one post. US-024.
+ */
+function keyOf(row: { source: Source; externalId: string }): string {
+  return JSON.stringify([row.source, row.externalId]);
+}
+
 function toRow(sourceId: Source, providerId: Provider, post: CandidatePost) {
   return {
     source: sourceId,
@@ -198,6 +211,28 @@ function toRow(sourceId: Source, providerId: Provider, post: CandidatePost) {
      */
     replyCount: post.replyCount ?? null,
   };
+}
+
+/**
+ * `readSource`, with one platform's failure kept to that platform. BUG-016.
+ *
+ * Undefined means this source threw and was recorded. Every caller has to look
+ * at the answer to know, which is the point: a wrapper that returned an empty
+ * outcome instead would let a failed platform read as a quiet one, and that is
+ * the difference the ticket exists for.
+ */
+async function readSourceOrFail(
+  ...args: [...Parameters<typeof readSource>, (error: unknown) => void]
+): Promise<SourceOutcome | undefined> {
+  const onFailure = args[args.length - 1] as (error: unknown) => void;
+  const rest = args.slice(0, -1) as Parameters<typeof readSource>;
+
+  try {
+    return await readSource(...rest);
+  } catch (error) {
+    onFailure(error);
+    return undefined;
+  }
 }
 
 /** A `PollRunSource` while it is still being filled in. */
@@ -237,6 +272,18 @@ export function createCollectStep({ registry, credentialsFor }: CollectOptions):
     let stopReason: PollStopReason | null = null;
     /** Set once the collections in flight have been read. See `walkFor`. */
     let resuming = false;
+
+    /**
+     * Platforms that were actually asked, and the ones whose provider threw.
+     * BUG-016.
+     *
+     * Counted rather than flagged, because the two numbers together decide
+     * whether this job failed: some platforms failing is a short poll, and
+     * every platform failing is an outage that must reach the dead letter
+     * queue rather than look like a quiet night.
+     */
+    let asked = 0;
+    const failures: unknown[] = [];
 
     /**
      * One platform's line on the row.
@@ -336,9 +383,22 @@ export function createCollectStep({ registry, credentialsFor }: CollectOptions):
         return;
       }
 
-      // Read before writing. `since` is where the last poll got to, and the next
-      // statement is what moves that mark forward.
-      const since = monitor.lastPolledAt ?? undefined;
+      /**
+       * How far each platform's collection already reaches. BUG-017.
+       *
+       * Not `monitors.last_polled_at`, which is the next statement and answers
+       * a different question. That mark moves on every poll, including the
+       * resumes of a walk still paging, so reading it as a window gave each new
+       * walk a gap-between-polls of history — and on the production instance
+       * that was one minute, forty searches wide, every page bought and
+       * dropped.
+       *
+       * Absent means no walk has ever finished for that platform, and a monitor
+       * with no window collects whatever its queries return. Wide is the safe
+       * direction: `posts` deduplicates, so it costs a page rather than losing
+       * one.
+       */
+      const covered = await coverageFor(db, monitorId);
 
       // Marked at the start, not at the end: the interval measures poll starts,
       // so a poll that runs long does not stretch the interval it was given.
@@ -531,7 +591,17 @@ export function createCollectStep({ registry, credentialsFor }: CollectOptions):
          * reading it here would ask for posts newer than the trigger, and every
          * record the collection was paid for would be filtered away as old.
          */
-        const window = continuation ? continuation.since : since;
+        const window = continuation ? continuation.since : covered.get(sourceId);
+
+        /**
+         * When this walk began, which is what a finished one marks. BUG-017.
+         *
+         * A resumed walk began when its continuation was written; a fresh one
+         * begins now. The start rather than the end, because a walk collects up
+         * to its own beginning and anything written while it paged may have
+         * been missed.
+         */
+        const walkStartedAt = continuation?.startedAt ?? now;
 
         /**
          * This platform's own queries, and never another platform's.
@@ -554,7 +624,9 @@ export function createCollectStep({ registry, credentialsFor }: CollectOptions):
         let sourceUnits = 0;
         let sourceCostMicros = 0;
 
-        const outcome = await readSource(
+        asked += 1;
+
+        const outcome = await readSourceOrFail(
           source,
           { queries, channels, ...(window ? { since: window } : {}) },
           credentials,
@@ -579,7 +651,36 @@ export function createCollectStep({ registry, credentialsFor }: CollectOptions):
               pricePerUnitMicros: source.pricePerUnitMicros,
             });
           },
+          /**
+           * One platform's failure, kept to itself. BUG-016.
+           *
+           * The pages this source was billed for before it threw are on the
+           * row, because `sourceUnits` is added up in the callback above
+           * rather than read from an outcome that no longer exists.
+           *
+           * The continuation is deliberately left alone. It names pages that
+           * are collected and paid for, and forgetting it here would make the
+           * next poll buy the whole query again — BUG-001's lesson, reached
+           * through a different door.
+           */
+          (error) => {
+            logger.error(
+              { monitorId, sourceId, providerId, err: error },
+              "source failed: the poll continues without it",
+            );
+            failures.push(error);
+            noteSource(sourceId, providerId, "error", {
+              pages: 0,
+              postsReturned: 0,
+              units: sourceUnits,
+              estimatedCostMicros: sourceCostMicros,
+            });
+          },
         );
+
+        // The platform failed. Everything below is about what it returned.
+        if (!outcome) continue;
+
         outcomes.push(outcome);
 
         noteSource(
@@ -651,11 +752,31 @@ export function createCollectStep({ registry, credentialsFor }: CollectOptions):
             progressed,
           });
           wakeNoLaterThan(now);
-        } else if (continuation) {
-          // Read to the end. Nothing left to come back for.
-          await forgetContinuation(db, monitorId, continuation.source, continuation.provider);
+        } else {
+          /**
+           * Read to the end. The walk is over, so its platform is covered.
+           *
+           * Both halves matter and BUG-017 is the second one. Forgetting the
+           * continuation is what lets the next poll start a new walk; recording
+           * the coverage is what gives that walk a window worth having.
+           */
+          if (continuation) {
+            await forgetContinuation(db, monitorId, continuation.source, continuation.provider);
+          }
+
+          await recordCoverage(db, monitorId, source.platform.id as Source, walkStartedAt);
         }
       }
+
+      /**
+       * Every platform that was asked failed, so this job failed. BUG-016.
+       *
+       * Thrown rather than recorded quietly, because pg-boss's retry and its
+       * dead letter queue are the only things that will notice a provider
+       * outage. A poll that swallowed this would report a quiet night to a
+       * screen and to nobody else. The outer catch writes the row first.
+       */
+      if (asked > 0 && failures.length === asked) throw failures[0];
 
       /**
        * One alarm clock for the monitor, set to the earliest thing it is waiting
@@ -681,11 +802,37 @@ export function createCollectStep({ registry, credentialsFor }: CollectOptions):
         }
       }
 
-      const rows = outcomes.flatMap((outcome) =>
+      const collected = outcomes.flatMap((outcome) =>
         outcome.posts.map((post) =>
           toRow(outcome.sourceId as Source, outcome.providerId as Provider, post),
         ),
       );
+
+      /**
+       * One row per post, before the statement is built. BUG-015.
+       *
+       * Correctness-critical: cursor and deduplication. Postgres refuses a
+       * statement whose own rows collide — `ON CONFLICT DO UPDATE command
+       * cannot affect row a second time` — and it refuses the whole statement,
+       * so a poll that collected a hundred posts stores none of them and has
+       * already paid for every page. `on conflict` resolves a collision with a
+       * row already in the table; it says nothing about two rows arriving
+       * together, and no `do update` variant does.
+       *
+       * The scoped Reddit search makes this ordinary. Five queries across eight
+       * subreddits is forty searches, and a post matching two of those queries
+       * comes back twice into one batch.
+       *
+       * Keyed by `(source, external_id)` and nothing else, because that pair is
+       * the unique index: the same post through two providers is one post,
+       * which is US-024's rule. Last one wins, which is what `do update`
+       * already means for a post the table holds.
+       *
+       * `poll_runs.posts_returned` is counted before this and stays that way. A
+       * poll that found one post through three queries found one post and paid
+       * for three searches, and both halves of that are worth reading.
+       */
+      const rows = [...new Map(collected.map((row) => [keyOf(row), row])).values()];
 
       if (rows.length === 0) {
         /**

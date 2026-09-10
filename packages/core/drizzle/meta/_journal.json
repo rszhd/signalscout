@@ -407,6 +407,13 @@
       "when": 1789011569407,
       "tag": "0057_onboarding_is_recorded_once",
       "breakpoints": true
+    },
+    {
+      "idx": 58,
+      "version": "7",
+      "when": 1789018586490,
+      "tag": "0058_a_walk_says_how_far_it_reached",
+      "breakpoints": true
     }
   ]
 }

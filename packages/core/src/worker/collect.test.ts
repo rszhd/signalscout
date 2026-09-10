@@ -8,6 +8,7 @@ import {
   monitors,
   posts,
   sourceContinuations,
+  sourceCoverage,
   sourceProviders,
 } from "../db/schema.js";
 import { setProviderChoice } from "../sources/choices.js";
@@ -107,6 +108,239 @@ describe("the poll step", () => {
 
     expect(boss.send).toHaveBeenCalledTimes(1);
     expect(sentTo(boss, filterQueue).postIds).toHaveLength(fakePosts.length);
+  });
+
+  it("stores one row when a poll finds the same post twice", async () => {
+    /**
+     * Correctness-critical: cursor and deduplication. BUG-015.
+     *
+     * A poll builds one `INSERT` from every post every source returned, and
+     * Postgres rejects a statement whose own rows collide:
+     *
+     *     ON CONFLICT DO UPDATE command cannot affect row a second time
+     *
+     * It is not a partial failure. The whole statement is refused, so a poll
+     * that collected a hundred posts stores none of them and has already paid
+     * the provider for every page.
+     *
+     * The scoped Reddit search makes this ordinary rather than rare: five
+     * queries across eight subreddits is forty searches, and a post matching
+     * two of those queries comes back twice into one batch.
+     */
+    const monitorId = await insertMonitor(database);
+    const boss = stubBoss();
+    const first = fakePosts[0] as CandidatePost;
+    const registry = fakeRegistry({ posts: [first, first, fakePosts[1] as CandidatePost] });
+
+    await createCollectStep({ registry, credentialsFor: credentials })(
+      { monitorId },
+      contextFor(db, boss),
+    );
+
+    const stored = await db.select().from(posts);
+
+    // Two posts, not three and not none.
+    expect(stored.map((post) => post.externalId).sort()).toEqual(
+      [first.externalId, fakePosts[1]?.externalId].sort(),
+    );
+
+    // And the post that arrived twice is handed on once, not twice: the
+    // filter step pays a model for every id it is given.
+    const handed = sentTo(boss, filterQueue).postIds;
+    expect(handed).toHaveLength(2);
+    expect(new Set(handed).size).toBe(2);
+  });
+
+  it("keeps two platforms' posts that happen to share an id", async () => {
+    /**
+     * The other half of BUG-015's key. `(source, external_id)` is the unique
+     * index, so deduplicating on the id alone would silently drop one
+     * platform's post because another platform numbers a post the same way.
+     * Reddit's ids are `t3_…` and X's are bare numbers today, and nothing in
+     * the schema promises they stay apart.
+     */
+    const registry = createSourceRegistry({
+      definitions: [
+        fakeSourceDefinition({
+          id: "reddit",
+          displayName: "Reddit",
+          providerId: "brightdata",
+          providerName: "Bright Data",
+          posts: [fakePosts[0] as CandidatePost],
+        }),
+        fakeSourceDefinition({
+          id: "x",
+          displayName: "X",
+          providerId: "socialcrawl",
+          providerName: "SocialCrawl",
+          posts: [fakePosts[0] as CandidatePost],
+        }),
+      ],
+      runtime: createSourceRuntime({ fetch: unreachableFetch, logger: silentLogger }),
+    });
+
+    const monitorId = await insertMonitor(database, {
+      sources: ["reddit", "x"],
+      generatedQueries: { reddit: ["flaky tests"], x: ["flaky tests"] },
+    });
+
+    await createCollectStep({ registry, credentialsFor: credentials })(
+      { monitorId },
+      contextFor(db, stubBoss()),
+    );
+
+    const stored = await db.select().from(posts);
+
+    expect(stored.map((post) => post.source).sort()).toEqual(["reddit", "x"]);
+  });
+
+  it("stores what one platform collected when another platform's provider fails", async () => {
+    /**
+     * BUG-016, found live. SocialCrawl answered 503 for X — "twitter is
+     * temporarily unavailable, your credits have been refunded" — the
+     * connector threw, and `collect` never reached its insert. Reddit's pages
+     * had already been fetched, parsed and paid for, and they went with it.
+     * SocialCrawl refunded X's credits; nobody refunded Reddit's.
+     *
+     * Retrying makes it worse rather than better: the retry resumes the Reddit
+     * walk, buys more pages, and throws again while the outage lasts.
+     */
+    const registry = createSourceRegistry({
+      definitions: [
+        fakeSourceDefinition({
+          id: "reddit",
+          displayName: "Reddit",
+          providerId: "brightdata",
+          providerName: "Bright Data",
+        }),
+        fakeSourceDefinition({
+          id: "x",
+          displayName: "X",
+          providerId: "socialcrawl",
+          providerName: "SocialCrawl",
+        }),
+      ],
+      runtime: createSourceRuntime({ fetch: unreachableFetch, logger: silentLogger }),
+    });
+
+    const down = registry.only("x") as unknown as { search: () => Promise<never> };
+    down.search = async () => {
+      throw new Error("SocialCrawl answered 503: twitter is temporarily unavailable.");
+    };
+
+    const monitorId = await insertMonitor(database, {
+      sources: ["reddit", "x"],
+      generatedQueries: { reddit: ["flaky tests"], x: ["flaky tests"] },
+    });
+    const boss = stubBoss();
+
+    // The poll finishes. One platform being down is not the monitor's failure.
+    await createCollectStep({ registry, credentialsFor: credentials })(
+      { monitorId },
+      contextFor(db, boss),
+    );
+
+    const stored = await db.select().from(posts);
+
+    expect(stored).toHaveLength(fakePosts.length);
+    expect(stored.every((post) => post.source === "reddit")).toBe(true);
+    expect(sentTo(boss, filterQueue).postIds).toHaveLength(fakePosts.length);
+  });
+
+  it("starts a new walk where the last one finished, not where the last poll ran", async () => {
+    /**
+     * BUG-017, and it cost $0.666 on the production instance.
+     *
+     * `monitors.last_polled_at` answers two questions: when a job last ran,
+     * which the interval needs, and how far our collection already reaches,
+     * which the window needs. It moves at the start of **every** poll,
+     * including the resumes of a walk still being paged. So when one walk ends
+     * and the next begins, that mark is minutes fresh while the walk's own
+     * coverage ended long before — and the new walk is given a window as
+     * narrow as the gap between two polls.
+     *
+     * On Reddit a walk is forty (query, subreddit) pairs at five pages a poll,
+     * so it takes eight polls and re-books itself immediately. Every page of
+     * the next walk is then bought and dropped by our own `since` filter.
+     */
+    const many = Array.from({ length: 7 }, (_, index) => ({
+      ...(fakePosts[0] as CandidatePost),
+      externalId: `walk-${index}`,
+      url: `https://example.test/walk/${index}`,
+    }));
+
+    // One post a page, so seven posts is more than `maxPagesPerPoll` and the
+    // walk has to span two polls.
+    const registry = fakeRegistry({ posts: many, pageSize: 1 });
+    const monitorId = await insertMonitor(database);
+
+    const step = createCollectStep({ registry, credentialsFor: credentials });
+
+    const firstWalkStarted = new Date();
+    await step({ monitorId }, contextFor(db, stubBoss()));
+
+    // The walk is not finished: the page cap stopped it with a cursor.
+    expect(
+      await db
+        .select()
+        .from(sourceContinuations)
+        .where(eq(sourceContinuations.monitorId, monitorId)),
+    ).toHaveLength(1);
+
+    const secondPollStarted = new Date();
+    await step({ monitorId }, contextFor(db, stubBoss()));
+
+    // Read to the end, so the walk is over and its coverage is what counts.
+    expect(
+      await db
+        .select()
+        .from(sourceContinuations)
+        .where(eq(sourceContinuations.monitorId, monitorId)),
+    ).toHaveLength(0);
+
+    await step({ monitorId }, contextFor(db, stubBoss()));
+
+    const asked = callsOf(registry);
+    const newWalk = asked[asked.length - 1]?.query.since;
+
+    // The third poll opens a new walk. Its window is where the finished walk
+    // began — not the second poll, which was that same walk still paging.
+    expect(newWalk).toBeDefined();
+    expect(newWalk?.getTime()).toBeLessThan(secondPollStarted.getTime());
+    expect(newWalk?.getTime()).toBeGreaterThanOrEqual(firstWalkStarted.getTime() - 1000);
+  });
+
+  it("does not move the coverage mark while a walk is still paging", async () => {
+    /**
+     * BUG-017's other half, and the one that makes the first half true. If a
+     * resume advanced the mark, the walk would be marking itself covered as it
+     * went — which is the same fault as reading `last_polled_at`, wearing a
+     * new column.
+     */
+    const many = Array.from({ length: 7 }, (_, index) => ({
+      ...(fakePosts[0] as CandidatePost),
+      externalId: `paging-${index}`,
+      url: `https://example.test/paging/${index}`,
+    }));
+
+    const registry = fakeRegistry({ posts: many, pageSize: 1 });
+    const monitorId = await insertMonitor(database);
+    const step = createCollectStep({ registry, credentialsFor: credentials });
+
+    await step({ monitorId }, contextFor(db, stubBoss()));
+
+    // The page cap stopped it, so the walk is not finished and nothing is
+    // covered yet — not even the pages it did read.
+    expect(
+      await db.select().from(sourceCoverage).where(eq(sourceCoverage.monitorId, monitorId)),
+    ).toHaveLength(0);
+
+    await step({ monitorId }, contextFor(db, stubBoss()));
+
+    // Now it is finished, and one row appears.
+    expect(
+      await db.select().from(sourceCoverage).where(eq(sourceCoverage.monitorId, monitorId)),
+    ).toHaveLength(1);
   });
 
   it("asks each platform with the queries written for it", async () => {
@@ -365,15 +599,22 @@ describe("the poll step", () => {
     await collect({ monitorId }, contextFor(db, stubBoss()));
 
     const [afterFirst] = await db.select().from(monitors).where(eq(monitors.id, monitorId));
+    const [covered] = await db
+      .select()
+      .from(sourceCoverage)
+      .where(eq(sourceCoverage.monitorId, monitorId));
 
     expect(source.calls[0]?.query.since).toBeUndefined();
+    // The interval's mark still moves, and it is not the window. BUG-017.
     expect(afterFirst?.lastPolledAt).not.toBeNull();
+    // The first walk finished, so its platform is covered to where it began.
+    expect(covered?.coveredThrough).toBeDefined();
 
     await collect({ monitorId }, contextFor(db, stubBoss()));
 
-    // The second poll asks from where the first one got to. Without this every
+    // The second poll asks from where the first walk got to. Without this every
     // poll re-reads the whole window, and on X every re-read is billed.
-    expect(source.calls[1]?.query.since?.getTime()).toBe(afterFirst?.lastPolledAt?.getTime());
+    expect(source.calls[1]?.query.since?.getTime()).toBe(covered?.coveredThrough?.getTime());
   });
 
   it("stores a post once, and still gives its id to a second monitor", async () => {
@@ -623,6 +864,13 @@ describe("the poll step", () => {
     it("asks the resumed collection for the window the trigger asked for", async () => {
       const lastPolledAt = new Date("2026-07-01T00:00:00.000Z");
       const monitorId = await insertMonitor(database, { lastPolledAt });
+
+      // Where this platform's collection already reaches, which is what a
+      // fresh walk is opened with since BUG-017. The poll mark beside it is
+      // the interval's and no longer the window's.
+      await db
+        .insert(sourceCoverage)
+        .values({ monitorId, source: "reddit", coveredThrough: lastPolledAt });
 
       await poll(waitingRegistry(), monitorId);
 
@@ -921,10 +1169,14 @@ describe("the poll step", () => {
       await setProviderChoice(db, monitorOwner, "reddit", "brightdata");
       await poll(registry, keys, monitorId);
 
-      // The poll mark, back where it was. The window is not what this test is
-      // about, and leaving it would make the second poll ask only for posts
-      // newer than the first poll — which is every fixture filtered away.
+      // The window, back where it was. This test is not about the window, and
+      // leaving it would make the second poll ask only for posts newer than
+      // the first walk — which is every fixture filtered away.
+      //
+      // Both marks, because BUG-017 separated them: `last_polled_at` is the
+      // interval's and `source_coverage` is the window's.
       await db.update(monitors).set({ lastPolledAt: null }).where(eq(monitors.id, monitorId));
+      await db.delete(sourceCoverage).where(eq(sourceCoverage.monitorId, monitorId));
 
       await setProviderChoice(db, monitorOwner, "reddit", "scrapecreators");
       await poll(registry, keys, monitorId);

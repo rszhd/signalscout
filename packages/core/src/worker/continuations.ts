@@ -34,6 +34,15 @@ export interface Continuation {
   readonly resumeAfter: Date;
   /** Resumes in a row that brought back nothing. Progress resets it. */
   readonly attempts: number;
+  /**
+   * When this walk began. BUG-017.
+   *
+   * The row is written once and updated in place as the walk pages, so its
+   * `created_at` is the moment the collection was triggered. That is what a
+   * finished walk marks its platform covered to — not the poll that happened
+   * to read its last page.
+   */
+  readonly startedAt: Date;
 }
 
 export async function continuationsFor(
@@ -52,6 +61,7 @@ export async function continuationsFor(
     ...(row.since ? { since: row.since } : {}),
     resumeAfter: row.resumeAfter,
     attempts: row.attempts,
+    startedAt: row.createdAt,
   }));
 }
 

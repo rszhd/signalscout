@@ -56,15 +56,15 @@ does, the poll's own row has to say which platform failed and why —
 
 ## Acceptance
 
-- [ ] A connector that throws stops that platform and does not stop the poll:
+- [x] A connector that throws stops that platform and does not stop the poll:
       every other platform's posts are stored and the filter job is sent
-- [ ] The failing platform keeps its continuation, so the pages it had already
+- [x] The failing platform keeps its continuation, so the pages it had already
       bought are read on the next poll rather than bought again
 - [ ] The poll's row names the failing platform and its reason, and the poll's
       own outcome says something failed
-- [ ] A platform that fails on every source is still a failed job, so a
+- [x] A platform that fails on every source is still a failed job, so a
       provider outage that stops everything still reaches the dead letter queue
-- [ ] A test drives two platforms where the second throws, and asserts the
+- [x] A test drives two platforms where the second throws, and asserts the
       first one's posts are stored — it fails on the current code
 - [ ] The 503 case specifically: a `SocialCrawlError` of kind `provider` is
       covered, because that is the one this was found by
@@ -88,3 +88,26 @@ does, the poll's own row has to say which platform failed and why —
   instance and watching the log. Two consecutive polls read Reddit for 5 pages
   and 5 credits each, then failed on X's 503. `posts` stayed at zero and
   `api_usage` grew by 38 Reddit credits, $0.308.
+- 2026-09-10T13:55+08:00 — Fixed in the worker. `readSourceOrFail` wraps one
+  platform's read and answers `undefined` when it threw, so the loop records
+  the failure and moves on. The pages that platform was billed for before it
+  threw are on the row, because the units are added up in the billing callback
+  rather than read from an outcome that no longer exists. Its continuation is
+  left alone, which is what stops the next poll buying the query again.
+
+  A poll where **every** platform asked has failed still throws, so a provider
+  outage reaches the retry and the dead letter queue rather than reading as a
+  quiet night. Three mutations turn the suite red: not recording the failure,
+  not failing a total outage, and removing the boundary altogether.
+
+  **Two boxes are left open on purpose.** The row names the failing platform
+  and carries `error` as the poll's stop reason, but the poll's `outcome` still
+  reads `collected` — which is true, because it did collect. Making it say
+  `failed` would be the row lying about the posts it stored. What is missing is
+  the *screen*: `pollSummary` mentions a reason only for a refused, empty or
+  failed poll, so a partial failure is invisible on the monitor card. That is
+  one line of frontend and it is not written yet.
+
+  The 503 was reproduced with a plain `Error` rather than a `SocialCrawlError`.
+  The boundary does not read the error's type, so the branch is the same one —
+  but the box stays open because the ticket asked for that class specifically.

@@ -1258,6 +1258,43 @@ export const apiUsage = pgTable(
 );
 
 /**
+ * How far forward this monitor's collection reaches, per platform. BUG-017.
+ *
+ * `monitors.last_polled_at` used to answer this as well as "when did a job
+ * last run", and the two are not the same question. That mark moves at the
+ * start of every poll, including the resumes of a walk that is still paging —
+ * so when one walk ended and the next began, the new one was handed a window
+ * as narrow as the gap between two polls, and then paid for forty searches
+ * that returned nothing.
+ *
+ * A row is written when a **walk** finishes, and it holds the moment that walk
+ * *started* rather than the moment it ended. A walk collects everything from
+ * its own window up to its start; posts written while it was paging may or may
+ * not have been caught, and the earlier mark is the one that cannot lose them.
+ * Being too wide costs money and loses nothing, because `posts` deduplicates.
+ * Being too narrow loses posts silently, which is the failure this replaces.
+ *
+ * Per platform, because platforms finish at different times: an X search is
+ * one page and a Reddit walk is forty inputs over eight polls.
+ */
+export const sourceCoverage = pgTable(
+  "source_coverage",
+  {
+    monitorId: uuid("monitor_id")
+      .notNull()
+      .references(() => monitors.id, { onDelete: "cascade" }),
+    source: text("source").$type<Source>().notNull(),
+    /** The start of the last walk that finished. Never the end of one. */
+    coveredThrough: timestamp("covered_through", { withTimezone: true }).notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.monitorId, table.source] }),
+    check("source_coverage_source_known", oneOf("source", sources)),
+  ],
+);
+
+/**
  * What one poll did, so a person can read it without a database. US-104.
  *
  * On 2026-09-09 a monitor on the production instance polled fifteen times,

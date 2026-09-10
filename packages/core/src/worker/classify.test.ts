@@ -20,7 +20,15 @@ import { createClassifier } from "../ai/classify.js";
 import type { AiConfig } from "../ai/config.js";
 import { classifiedPostCounts } from "../ai/record.js";
 import { createDatabase, type Database } from "../db/client.js";
-import { apiUsage, budgets, matches, modelCalls, monitors, posts } from "../db/schema.js";
+import {
+  apiUsage,
+  budgets,
+  matches,
+  modelCalls,
+  monitors,
+  posts,
+  sourceCoverage,
+} from "../db/schema.js";
 import { createLogger } from "../logger.js";
 import { updateMonitor } from "../monitors/monitors.js";
 import { fakePosts } from "../sources/fake/fixtures.js";
@@ -657,7 +665,11 @@ it("makes no classification call when a poll returns a page it has already seen"
   // The second poll asks for the same window as the first, so the connector
   // hands back the page it handed back last time. That is not a contrivance:
   // US-026's live ScrapeCreators run collected 47 posts and stored none.
+  //
+  // Both marks, because BUG-017 separated them: `last_polled_at` is what the
+  // interval measures and `source_coverage` is what the window reads.
   await db.update(monitors).set({ lastPolledAt: null }).where(eq(monitors.id, monitorId));
+  await db.delete(sourceCoverage).where(eq(sourceCoverage.monitorId, monitorId));
 
   calls.length = 0;
   notified.length = 0;

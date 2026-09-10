@@ -6,7 +6,7 @@ priority: p1
 created: 2026-09-10T10:31+08:00
 parent:
 area: worker
-resolution:
+resolution: fixed
 ---
 
 ## Context
@@ -51,14 +51,14 @@ halves of that sentence are worth reading.
 
 ## Acceptance
 
-- [ ] A poll whose sources return the same post more than once stores it once
+- [x] A poll whose sources return the same post more than once stores it once
       and stores every other post beside it
-- [ ] The `filter` job carries that post's id once
-- [ ] `poll_runs.posts_returned` still counts what the connectors handed back,
+- [x] The `filter` job carries that post's id once
+- [x] `poll_runs.posts_returned` still counts what the connectors handed back,
       so the duplication is visible rather than hidden by the fix
-- [ ] A test drives the poll step with a connector that returns one post twice
+- [x] A test drives the poll step with a connector that returns one post twice
       in one poll, and fails on the current code
-- [ ] The same test covers two sources returning one post, which is the
+- [x] The same test covers two sources returning one post, which is the
       cross-platform shape of it
 
 ## Notes
@@ -80,3 +80,17 @@ halves of that sentence are worth reading.
 - 2026-09-10T10:31+08:00 — Written from a live probe against SocialCrawl:
   125 posts collected, 5 credits spent, nothing stored, and the reduced case
   reproduces the error with two rows and no network.
+- 2026-09-10T13:55+08:00 — Fixed. The batch is deduplicated on
+  `(source, external_id)` before the statement is built, last one winning,
+  which is what `on conflict do update` already means for a post the table
+  holds. The key is `JSON.stringify([source, externalId])` rather than a joined
+  string, because an id is a provider's own text and no separator can be
+  assumed absent from it.
+
+  Two tests, and both were watched failing first: one post arriving twice is
+  stored once and handed on once, and two platforms that happen to number a
+  post the same way both keep theirs. Two mutations — no deduplication, and
+  deduplication on the id alone — each turn the suite red.
+
+  `posts_returned` counts before the deduplication and has its own case, so a
+  poll that found one post through three searches still says it paid for three.

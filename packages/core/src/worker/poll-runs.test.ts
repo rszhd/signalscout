@@ -26,6 +26,7 @@ import { fakePosts } from "../sources/fake/fixtures.js";
 import { fakeSourceDefinition } from "../sources/fake/index.js";
 import { createSourceRegistry } from "../sources/registry.js";
 import { createSourceRuntime } from "../sources/runtime.js";
+import type { CandidatePost } from "../sources/types.js";
 import { createTestDatabase, type TestDatabase } from "../testing/database.js";
 import { unreachableFetch } from "../testing/network.js";
 import { createCollectStep } from "./collect.js";
@@ -216,6 +217,109 @@ describe("what a poll records about itself", () => {
     ]);
     // The first reason, and it is on the row even though the poll collected.
     expect(run?.stopReason).toBe("no_credentials");
+  });
+
+  it("names the platform that failed while the poll keeps what it collected", async () => {
+    /**
+     * BUG-016. The failure has to be on the row, or a poll that lost one
+     * platform to an outage reads as a poll that found the platform quiet —
+     * and a quiet platform costs nothing, where this one has been billed.
+     */
+    const registry = createSourceRegistry({
+      definitions: [
+        fakeSourceDefinition({
+          id: "reddit",
+          displayName: "Reddit",
+          providerId: "brightdata",
+          providerName: "Bright Data",
+        }),
+        fakeSourceDefinition({
+          id: "x",
+          displayName: "X",
+          providerId: "socialcrawl",
+          providerName: "SocialCrawl",
+        }),
+      ],
+      runtime: createSourceRuntime({ fetch: unreachableFetch, logger: silentLogger }),
+    });
+
+    const down = registry.only("x") as unknown as { search: () => Promise<never> };
+    down.search = async () => {
+      throw new Error("SocialCrawl answered 503: twitter is temporarily unavailable.");
+    };
+
+    const monitorId = await insertMonitor(database, {
+      sources: ["reddit", "x"],
+      generatedQueries: { reddit: ["flaky tests"], x: ["flaky tests"] },
+    });
+
+    await createCollectStep({ registry, credentialsFor: credentials })(
+      { monitorId },
+      contextFor(db, stubBoss()),
+    );
+
+    const [run] = await runsOf(monitorId);
+
+    expect(run?.outcome).toBe("collected");
+    expect(run?.stopReason).toBe("error");
+    expect(run?.sources).toEqual([
+      expect.objectContaining({ source: "reddit", reason: null }),
+      expect.objectContaining({ source: "x", provider: "socialcrawl", reason: "error" }),
+    ]);
+  });
+
+  it("counts what the connectors returned, not what survived deduplication", async () => {
+    /**
+     * BUG-015 removed the duplicate before the insert, and this is the number
+     * that must not follow it down. A poll that found one post through three
+     * queries found one post and paid for three searches, and a row that
+     * counted the survivors would hide the half worth acting on.
+     */
+    const monitorId = await insertMonitor(database);
+    const first = fakePosts[0] as CandidatePost;
+
+    await poll(monitorId, fakeRegistry({ posts: [first, first] }));
+
+    const [run] = await runsOf(monitorId);
+
+    expect(run?.postsReturned).toBe(2);
+    expect(run?.postsNew).toBe(1);
+  });
+
+  it("keeps the continuation of a platform whose provider failed", async () => {
+    /**
+     * BUG-016. The cursor names pages that are collected and paid for, so
+     * forgetting it here would make the next poll buy the whole query again —
+     * BUG-001's lesson reached through a different door.
+     */
+    const monitorId = await insertMonitor(database);
+    const registry = fakeRegistry();
+    const down = registry.only("reddit") as unknown as { search: () => Promise<never> };
+    down.search = async () => {
+      throw new Error("SocialCrawl answered 503: reddit is temporarily unavailable.");
+    };
+
+    await db.insert(sourceContinuations).values({
+      monitorId,
+      source: "reddit",
+      provider: "brightdata",
+      cursor: "scoped|22|0|",
+      resumeAfter: new Date(Date.now() - 1000),
+    });
+
+    await expect(
+      createCollectStep({ registry, credentialsFor: credentials })(
+        { monitorId },
+        contextFor(db, stubBoss()),
+      ),
+    ).rejects.toThrow("temporarily unavailable");
+
+    const [kept] = await db
+      .select()
+      .from(sourceContinuations)
+      .where(eq(sourceContinuations.monitorId, monitorId));
+
+    expect(kept?.cursor).toBe("scoped|22|0|");
   });
 
   it("records a poll that threw, and still lets the job fail", async () => {

@@ -54,6 +54,40 @@ function monitor(overrides: Record<string, unknown> = {}) {
   };
 }
 
+/**
+ * What a poll did. US-104.
+ *
+ * The defaults are the production run of 2026-09-09, scaled to one platform: a
+ * poll that asked, was billed, and returned nothing.
+ */
+function poll(overrides: Record<string, unknown> = {}) {
+  return {
+    id: "poll-1",
+    walkId: "walk-1",
+    startedAt: "2026-03-14T08:00:00.000Z",
+    finishedAt: "2026-03-14T08:01:00.000Z",
+    outcome: "empty",
+    postsReturned: 0,
+    postsNew: 0,
+    units: 67,
+    estimatedCostMicros: 543_906,
+    stopReason: null,
+    sources: [
+      {
+        source: "reddit",
+        provider: "socialcrawl",
+        pages: 5,
+        postsReturned: 0,
+        postsNew: 0,
+        units: 67,
+        estimatedCostMicros: 543_906,
+        reason: null,
+      },
+    ],
+    ...overrides,
+  };
+}
+
 describe("the monitor list", () => {
   let screen: Screen;
   let container: HTMLDivElement;
@@ -79,6 +113,94 @@ describe("the monitor list", () => {
   afterEach(async () => {
     await screen?.unmount();
     vi.unstubAllGlobals();
+  });
+
+  describe("what the last poll did", () => {
+    /**
+     * US-104. On 2026-09-09 a monitor on the production instance had polled
+     * fifteen times, spent $0.666 and stored no post, and this screen said
+     * `Running`. The two readings that leaves a person — nobody is talking, or
+     * this product does not work — are both wrong.
+     */
+    it("says a poll found nothing, and what it cost", async () => {
+      await show([monitor({ lastPoll: poll() })]);
+
+      const text = container.textContent ?? "";
+
+      expect(text).toContain("Last poll found no posts");
+      // The spend is the half that rules out a quiet platform. A quiet
+      // platform costs nothing.
+      expect(text).toContain("$0.5439");
+    });
+
+    it("does not let a monitor that found nothing read as Running alone", async () => {
+      await show([monitor({ lastPoll: poll() })]);
+
+      expect(container.textContent).toContain("Found nothing");
+      // The label carries its own count, so the whole string is the assertion.
+      expect(button("Needs attention 1")).toBeTruthy();
+      // It is still active, and that count must not say otherwise.
+      expect(button("Running 1")).toBeTruthy();
+    });
+
+    it("counts posts returned apart from posts new", async () => {
+      /**
+       * Five returned and none new is deduplication working, and it is a
+       * different sentence from five returned and five new. One "posts found"
+       * number is what this screen had, and it says neither.
+       */
+      await show([
+        monitor({
+          lastPoll: poll({ outcome: "collected", postsReturned: 5, postsNew: 0, units: 1 }),
+        }),
+      ]);
+
+      expect(container.textContent).toContain("Last poll: 5 posts, 0 new");
+      expect(container.textContent).not.toContain("Found nothing");
+    });
+
+    it("turns a stop reason into a sentence rather than printing it", async () => {
+      await show([
+        monitor({ lastPoll: poll({ outcome: "refused", stopReason: "no_provider_choice" }) }),
+      ]);
+
+      expect(container.textContent).toContain("no provider is chosen");
+      expect(container.textContent).not.toContain("no_provider_choice");
+    });
+
+    it("asks for the polls only when the section is opened", async () => {
+      /**
+       * `<details>` renders its children whether it is open or not, so a
+       * component that fetched on mount would fetch once per monitor the
+       * moment the page loaded.
+       */
+      fetchMock.mockImplementation(async (request: string | URL | Request) => {
+        const url = typeof request === "string" ? request : request.toString();
+        if (url === "/api/monitors") return json([monitor({ lastPoll: poll() })]);
+        if (url.includes("/polls")) return json([poll({ id: "older" })]);
+        if (url.startsWith("/api/monitors/")) return json(monitor());
+        throw new Error(`Unexpected request: ${url}`);
+      });
+
+      screen = await mount(<Monitors projectId={projectId} />, `/projects/${projectId}/monitors`);
+      container = screen.container;
+
+      const asked = () => fetchMock.mock.calls.filter(([url]) => String(url).includes("/polls"));
+
+      expect(asked()).toHaveLength(0);
+
+      const details = container.querySelector("details.monitor-settings");
+      if (!(details instanceof HTMLDetailsElement)) throw new Error("No settings section.");
+
+      await act(async () => {
+        details.open = true;
+        details.dispatchEvent(new Event("toggle"));
+      });
+      await settle();
+
+      expect(asked()).toHaveLength(1);
+      expect(String(asked()[0]?.[0])).toContain(`/api/monitors/${monitorId}/polls`);
+    });
   });
 
   it("combines status and search filters and lets a person clear an empty result", async () => {

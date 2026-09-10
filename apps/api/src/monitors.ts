@@ -32,21 +32,25 @@ import {
   groupByPlatform,
   type LastCollection,
   lastCollections,
+  latestPollRuns,
   listMonitors,
   type Monitor,
   type MonitorEnvironment,
   maximumQueries,
   maximumSubreddits,
+  maxPollRunsRead,
   minimumPollIntervalSeconds,
   monitorQueryPlan,
   noFilterDrops,
   notificationIssues,
   notOfferedReason,
   noVerdicts,
+  type PollRun,
   type ProviderChoices,
   pauseMonitor,
   platforms,
   type QueryGenerator,
+  readPollRuns,
   readProviderChoices,
   recordModelCall,
   resumeMonitor,
@@ -297,6 +301,58 @@ const spendSchema = z.object({
   since: z.string(),
 });
 
+/**
+ * What one poll did. US-104.
+ *
+ * The three counts are separate on purpose and a screen must keep them
+ * separate: none returned with units above zero says the queries or the parser
+ * are at fault, many returned and none new says deduplication is working, and
+ * many new with no match says the threshold is wrong. One "posts found" number
+ * collapses all three, which is what the monitor list had.
+ */
+const pollRunSchema = z.object({
+  id: z.string(),
+  /** The collection this poll belongs to. Several polls share one. */
+  walkId: z.string(),
+  startedAt: z.string(),
+  finishedAt: z.string(),
+  outcome: z.string(),
+  postsReturned: z.number(),
+  postsNew: z.number(),
+  units: z.number(),
+  /** Estimated, in the sense docs/costs.md means. Never rounded to cents. */
+  estimatedCostMicros: z.number(),
+  stopReason: z.string().nullable(),
+  sources: z.array(
+    z.object({
+      source: z.string(),
+      provider: z.string().nullable(),
+      pages: z.number(),
+      postsReturned: z.number(),
+      postsNew: z.number(),
+      units: z.number(),
+      estimatedCostMicros: z.number(),
+      reason: z.string().nullable(),
+    }),
+  ),
+});
+
+function toPollRunResponse(run: PollRun) {
+  return {
+    id: run.id,
+    walkId: run.walkId,
+    startedAt: run.startedAt.toISOString(),
+    finishedAt: run.finishedAt.toISOString(),
+    outcome: run.outcome,
+    postsReturned: run.postsReturned,
+    postsNew: run.postsNew,
+    units: run.units,
+    estimatedCostMicros: run.estimatedCostMicros,
+    stopReason: run.stopReason,
+    sources: run.sources.map((entry) => ({ ...entry })),
+  };
+}
+
 const monitorSchema = z.object({
   notificationIssues: z.array(z.string()),
   id: z.string(),
@@ -335,6 +391,14 @@ const monitorSchema = z.object({
    * here, which is the honest answer.
    */
   lastCollected: z.array(z.object({ source: z.string(), provider: z.string(), at: z.string() })),
+  /**
+   * The last poll, or null where none has run yet. US-104.
+   *
+   * On the monitor itself rather than behind a second request, because the
+   * question it answers — "is this working?" — is the one the list is opened
+   * to ask. `lastPolledAt` above says a poll happened; this says what it did.
+   */
+  lastPoll: pollRunSchema.nullable(),
   /** Null when no cap is set. A monitor with no cap still records what it spends. */
   budget: budgetSchema.nullable(),
   spend: spendSchema,
@@ -476,6 +540,7 @@ function toResponse(
   verdicts: VerdictCounts,
   collected: readonly LastCollection[],
   notificationProblems: readonly string[],
+  lastPoll: PollRun | null,
 ) {
   return {
     id: monitor.id,
@@ -498,6 +563,7 @@ function toResponse(
     paused: monitor.pausedAt !== null,
     pausedAt: monitor.pausedAt?.toISOString() ?? null,
     lastPolledAt: monitor.lastPolledAt?.toISOString() ?? null,
+    lastPoll: lastPoll ? toPollRunResponse(lastPoll) : null,
     createdAt: monitor.createdAt.toISOString(),
     missingCredentials: startBlockers(monitor.sources, runtime),
     lastCollected: collected.map((one) => ({
@@ -537,13 +603,14 @@ function toResponse(
  * paths end in `toResponse`, so neither can grow a field the other lacks.
  */
 async function readResponse(db: Database, monitor: Monitor, runtime: MonitorEnvironment) {
-  const [state, drops, read, verdicts, collected, notifications] = await Promise.all([
+  const [state, drops, read, verdicts, collected, notifications, polls] = await Promise.all([
     checkBudget(db, monitor.id),
     filterDropCounts(db, [monitor.id]),
     classifiedPostCounts(db, [monitor.id]),
     verdictCounts(db, [monitor.id]),
     lastCollections(db),
     notificationIssues(db),
+    latestPollRuns(db, monitor.userId, [monitor.id]),
   ]);
 
   return toResponse(
@@ -555,6 +622,7 @@ async function readResponse(db: Database, monitor: Monitor, runtime: MonitorEnvi
     verdicts.get(monitor.id) ?? noVerdicts,
     collected.get(monitor.id) ?? [],
     notifications.get(monitor.id) ?? [],
+    polls.get(monitor.id) ?? null,
   );
 }
 
@@ -801,13 +869,21 @@ export async function registerMonitorRoutes(
       // screen that shows this is a list, and a per-row query here would be
       // the list's cost growing with the number of monitors.
       const rows = await listMonitors(db, sessionUserId(request));
-      const [states, drops, read, verdicts, collected, notifications] = await Promise.all([
+      const [states, drops, read, verdicts, collected, notifications, polls] = await Promise.all([
         budgetStates(db),
         filterDropCounts(db),
         classifiedPostCounts(db),
         verdictCounts(db),
         lastCollections(db),
         notificationIssues(db),
+        // One statement for the whole list, for the reason the spend above is
+        // one: a query per card is the shape that reads fine with three
+        // monitors and stops the page with thirty.
+        latestPollRuns(
+          db,
+          sessionUserId(request),
+          rows.map((monitor) => monitor.id),
+        ),
       ]);
 
       return Promise.all(
@@ -826,6 +902,7 @@ export async function registerMonitorRoutes(
             verdicts.get(monitor.id) ?? noVerdicts,
             collected.get(monitor.id) ?? [],
             notifications.get(monitor.id) ?? [],
+            polls.get(monitor.id) ?? null,
           ),
         ),
       );
@@ -895,6 +972,45 @@ export async function registerMonitorRoutes(
       if (!monitor) return reply.code(404).send({ message: "No monitor has that id." });
 
       return readResponse(db, monitor, await currentEnvironment(sessionUserId(request)));
+    },
+  });
+
+  /**
+   * What this monitor's recent polls did. US-104.
+   *
+   * Its own route rather than more fields on the monitor, because the list
+   * screen wants one poll per monitor and this screen wants many polls of one
+   * monitor. `lastPoll` on the monitor answers the first; this answers the
+   * second, and only when somebody asks.
+   *
+   * A monitor that is not this account's answers 404 and not an empty list.
+   * The two are different sentences, and `readPollRuns` cannot tell them apart
+   * on purpose — it answers with nothing either way — so the check is here,
+   * where the reply is chosen.
+   */
+  app.route({
+    method: "GET",
+    url: "/api/monitors/:id/polls",
+    schema: {
+      params: z.object({ id: z.uuid() }),
+      querystring: z.object({
+        limit: z.coerce.number().int().min(1).max(maxPollRunsRead).optional(),
+      }),
+      response: { 200: z.array(pollRunSchema), 404: problemSchema },
+    },
+    handler: async (request, reply) => {
+      if (!(await ownedMonitor(db, request, request.params.id))) {
+        return reply.code(404).send({ message: "No monitor has that id." });
+      }
+
+      const runs = await readPollRuns(
+        db,
+        sessionUserId(request),
+        request.params.id,
+        request.query.limit ?? maxPollRunsRead,
+      );
+
+      return runs.map(toPollRunResponse);
     },
   });
 

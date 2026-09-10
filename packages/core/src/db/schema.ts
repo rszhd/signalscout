@@ -276,6 +276,81 @@ export const modelCallPurposes = [
 ] as const;
 export type ModelCallPurpose = (typeof modelCallPurposes)[number];
 
+/**
+ * What a poll did, in one word. US-104.
+ *
+ * Read as a person reads it: `collected` is the only one that put something in
+ * front of them. `empty` is the answer the production run needed and did not
+ * have — the poll ran, it may have spent money, and it holds nothing. It is
+ * separate from `refused`, where nothing was asked of any provider at all,
+ * because the two send a person to different places: `empty` asks about the
+ * queries, `refused` about a key, a cap or a choice.
+ */
+export const pollOutcomes = [
+  /** At least one post came back. Whether any of it was new is `posts_new`. */
+  "collected",
+  /** Every source was asked and none returned a post. */
+  "empty",
+  /** Nothing was asked. A cap, a missing key or an unmade choice stopped it first. */
+  "refused",
+  /** A collection is still running at the provider. This poll is one step of a walk. */
+  "waiting",
+  /** The step threw. The job will be retried; this row is what the retry cannot say. */
+  "failed",
+] as const;
+export type PollOutcome = (typeof pollOutcomes)[number];
+
+/**
+ * Why a poll, or one of its sources, stopped. A closed set on purpose.
+ *
+ * This is the field a person reads first when an inbox is empty, so it must be
+ * countable, translatable and assertable. A sentence written at the call site
+ * is none of those, and it is also where a provider's own error text — which
+ * `logger.ts` redacts and a screen does not — would reach a page.
+ */
+export const pollStopReasons = [
+  /** US-013's cap refused the poll before any provider was asked. */
+  "budget_exhausted",
+  /** No provider of this platform has a key on this account or in the environment. */
+  "no_credentials",
+  /** Two providers could run and no choice is recorded, or the choice cannot run. */
+  "no_provider_choice",
+  /** US-053: this build does not offer a connector for the platform any more. */
+  "not_offered",
+  /** A collection is in flight and the key that started it is gone. */
+  "resume_key_missing",
+  /** A collection was never ready to read, and `maxResumeAttempts` gave up on it. */
+  "collection_abandoned",
+  /** The provider asked us to come back later. Usually a rate limit. */
+  "provider_wait",
+  /** `maxPagesPerPoll` stopped a source that had another page ready now. */
+  "page_cap",
+  /** A collection at the provider is not ready, and it is not yet time to look. */
+  "still_collecting",
+  /** The step threw. */
+  "error",
+] as const;
+export type PollStopReason = (typeof pollStopReasons)[number];
+
+/**
+ * What one platform did inside one poll.
+ *
+ * Its own reason, because a poll may skip Reddit for want of a key and collect
+ * X in the same run. A poll-level reason alone would report the whole poll as
+ * refused, which is the kind of half-truth this table exists to stop.
+ */
+export interface PollRunSource {
+  readonly source: Source;
+  /** Null where the poll never got as far as choosing one. */
+  readonly provider: Provider | null;
+  readonly pages: number;
+  readonly postsReturned: number;
+  readonly postsNew: number;
+  readonly units: number;
+  readonly estimatedCostMicros: number;
+  readonly reason: PollStopReason | null;
+}
+
 /** SQL fragment for a score column that must read 0 to 100. */
 function scoreRange(column: string) {
   return sql.raw(`${column} BETWEEN 0 AND 100`);
@@ -1179,6 +1254,102 @@ export const apiUsage = pgTable(
     check("api_usage_provider_known", oneOf("provider", providers)),
     check("api_usage_units_non_negative", sql.raw(`units >= 0`)),
     check("api_usage_cost_non_negative", sql.raw(`estimated_cost_micros >= 0`)),
+  ],
+);
+
+/**
+ * What one poll did, so a person can read it without a database. US-104.
+ *
+ * On 2026-09-09 a monitor on the production instance polled fifteen times,
+ * billed $0.666, stored no post, and the screen said `Running`. Every number
+ * needed to explain that was already recorded — `api_usage` had the spend,
+ * `posts` had what came back, `pgboss.job` had the timings — and none of them
+ * says what a *poll* did. That cannot be reconstructed afterwards: a poll that
+ * collected fifty posts another monitor already held and a poll that collected
+ * nothing leave the same absence of rows.
+ *
+ * A row is written on every exit from the poll step, including the exits that
+ * do nothing. A poll that records nothing when it does nothing is the fault
+ * this table exists to remove, one layer down.
+ */
+export const pollRuns = pgTable(
+  "poll_runs",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    monitorId: uuid("monitor_id")
+      .notNull()
+      .references(() => monitors.id, { onDelete: "cascade" }),
+    /**
+     * The owner, copied rather than joined. BUG-009's lesson: scoping a route
+     * means scoping every read in it, and a read that has to join to find out
+     * whose row this is has one more place to forget.
+     */
+    userId: text("user_id").notNull(),
+    /**
+     * The collection this poll belongs to, which is not this job.
+     *
+     * Fifteen poll jobs ran for one collection in the production run, because
+     * a paging walk resumes itself through the queue. Grouped by the job, one
+     * collection reads as fifteen failures. A poll that finds no continuation
+     * mints a new id; a poll that resumes one inherits the id of the monitor's
+     * previous run.
+     */
+    walkId: uuid("walk_id").notNull(),
+    startedAt: timestamp("started_at", { withTimezone: true }).notNull().defaultNow(),
+    finishedAt: timestamp("finished_at", { withTimezone: true }),
+    /** What the poll did, as one word a screen can group on. */
+    outcome: text("outcome").$type<PollOutcome>().notNull(),
+    /**
+     * Posts the connectors handed back, after their own parsing and their own
+     * `since` cut.
+     *
+     * Not the records the provider returned, which no connector reports — read
+     * it beside `units`. Zero here with units above zero is the shape the
+     * production run had, and it says the fault is in the query or the parser
+     * rather than in the platform being quiet.
+     */
+    postsReturned: integer("posts_returned").notNull().default(0),
+    /**
+     * Of those, the ones this instance had never stored.
+     *
+     * Its own number because the difference is a diagnosis. Many returned and
+     * none new is deduplication working and a monitor asking an old question;
+     * none returned at all is something else entirely.
+     */
+    postsNew: integer("posts_new").notNull().default(0),
+    /** Billable units, summed across every connector this poll asked. */
+    units: bigint("units", { mode: "number" }).notNull().default(0),
+    /** Estimated, in the sense docs/costs.md means. The connector's price times its units. */
+    estimatedCostMicros: bigint("estimated_cost_micros", { mode: "number" }).notNull().default(0),
+    /**
+     * One entry per platform the poll considered, whether or not it collected.
+     *
+     * JSONB rather than a child table because it is written once, read whole,
+     * and never queried across rows. Every entry carries its own reason, since
+     * a poll may skip one platform and collect another — the reason is a
+     * property of the source and not of the poll.
+     */
+    sources: jsonb("sources").$type<PollRunSource[]>().notNull().default([]),
+    /**
+     * Why the whole poll stopped, where something stopped it, from a closed
+     * set.
+     *
+     * Closed rather than free text because this is the field a person reads
+     * first, and a sentence written at the call site cannot be counted,
+     * translated or asserted. Null is the ordinary answer: nothing stopped it.
+     */
+    stopReason: text("stop_reason").$type<PollStopReason>(),
+  },
+  (table) => [
+    // The screen's own query: this monitor's polls, newest first.
+    index("poll_runs_monitor_started_idx").on(table.monitorId, table.startedAt),
+    index("poll_runs_walk_idx").on(table.walkId),
+    check("poll_runs_outcome_known", oneOf("outcome", pollOutcomes)),
+    check("poll_runs_stop_reason_known", optionallyOneOf("stop_reason", pollStopReasons)),
+    check("poll_runs_counts_non_negative", sql.raw(`posts_returned >= 0 AND posts_new >= 0`)),
+    // A poll cannot store more than it was handed.
+    check("poll_runs_new_within_returned", sql.raw(`posts_new <= posts_returned`)),
+    check("poll_runs_spend_non_negative", sql.raw(`units >= 0 AND estimated_cost_micros >= 0`)),
   ],
 );
 

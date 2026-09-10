@@ -412,3 +412,48 @@
     grid-row: 2;
   }
 }
+
+/* What the last poll did, under the schedule line. US-104. */
+.monitors-content .monitor-poll-summary {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--muted-strong);
+}
+
+/*
+ * A monitor that is polling and finding nothing.
+ *
+ * The amber of `paused` rather than the red of `stopped`: nothing is broken
+ * and nothing has been refused. It is running, and it is not producing.
+ */
+.monitors-content .monitor-status.running.quiet {
+  color: var(--muted-strong);
+  background: var(--surface-soft);
+}
+
+.poll-history {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: var(--space-3);
+}
+
+.poll-history li {
+  display: grid;
+  gap: var(--space-1);
+  font-size: var(--text-sm);
+}
+
+.poll-history-when {
+  color: var(--muted);
+  font-size: var(--text-xs);
+}
+
+.poll-history-sources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  color: var(--muted-strong);
+  font-size: var(--text-xs);
+}

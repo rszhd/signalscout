@@ -1011,6 +1011,12 @@ a {
   background: #f9e8e2;
 }
 
+/* Running, and finding nothing. US-104. */
+.monitor-status.running.quiet {
+  color: #786324;
+  background: #f8f1d9;
+}
+
 .monitor-stopped {
   margin: 0;
   padding: 10px 12px;

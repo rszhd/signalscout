@@ -1573,6 +1573,53 @@ the **third** live sighting of US-006's failure path.
 Existing monitors were deliberately not migrated, so one stays silent until
 somebody opens its notification screen and saves. Read docs/notifications.md.
 
+**A poll now says what it did, and until it did a monitor that spent $0.666
+and collected nothing read `Running`.** US-104 closed on 2026-09-10, from a
+fault on the production instance. On 2026-09-09 the first monitor on
+app.signalscout.run polled fifteen times, billed SocialCrawl 67 Reddit credits
+and 15 X credits, stored **zero posts**, and stopped at `collect.ts`'s early
+return with no `filter` job ever sent. Every number needed to explain that was
+already in the database — `api_usage` had the spend, `posts` had nothing,
+`pgboss.job` had the timings — and none of them says what a *poll* did.
+
+**That cannot be reconstructed afterwards.** A poll that collected fifty posts
+this instance already held and a poll that collected nothing leave the same
+absence of rows. `poll_runs` is the record, migration 0056, and it is written on
+**seven of `collect.ts`'s eight exits** — the eighth is a deleted monitor, which
+has nothing to attach a row to. The six exits that ask no provider anything are
+the reason: those are the polls a person cannot otherwise explain.
+
+**Three counts, kept apart, because each pair answers a different question.**
+Returned against units says whether the searches found anything at all;
+returned against new says whether it was anything this instance had not seen.
+`posts_new` comes from `xmax = 0` on the returning clause, which is the only way
+to tell an inserted row from a found one when `on conflict do update` returns
+both. One "posts found" number collapses all three, and that is what the monitor
+list had.
+
+**A walk is not a job.** Fifteen poll jobs ran for one collection, because a
+paging walk resumes itself through the queue. `walk_id` groups them — a poll
+that finds no continuation mints one, a poll that resumes inherits the previous
+row's — so one collection reads as one collection rather than fifteen failures.
+
+**The stop reason is a closed set and a screen turns it into a sentence.** It is
+the field a person reads first, so it must be countable and assertable, and it
+is also where a provider's own error text would otherwise reach a page that has
+no redaction rule. Each reason sits on the **platform** rather than the poll: a
+poll may skip Reddit for want of a key and collect X in the same run.
+
+**One mutation passed, and it is the finding worth keeping.** `readPollRuns` has
+two locks — the monitor's owner and the owner on the row — and the scoping test
+could kill neither, because a poll writes both from the same person. Two rows a
+poll cannot produce were written by hand, each leaving one lock holding. **A
+guard nothing can reach is a guard nothing tests.** Twelve of thirteen mutations
+were caught the first time; 1,820 tests pass.
+
+**Nothing has run live.** No poll on a real machine has written a row. The
+production monitor this ticket came from is still the only evidence any of it
+was needed, and why *that* monitor collected nothing is a separate question this
+ticket does not answer.
+
 **The inbox leaves as a spreadsheet.** US-064 closed on 2026-09-07. A link
 beside the match count downloads the list *currently on screen* as CSV — every
 filter honoured, every page walked, because a screen paginates and a file

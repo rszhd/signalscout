@@ -2,7 +2,7 @@
 
 # Open tickets
 
-29 open — 14 doing, 14 todo, 1 parked (9 p1, 16 p2, 4 p3).
+33 open — 15 doing, 17 todo, 1 parked (13 p1, 16 p2, 4 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -13,8 +13,12 @@
 | p1 | US-077 | [The published image has the tag the compose file asks for](doing/US-077-the-published-image-has-the-tag-the-compose-file-asks-for.md) | bug | doing | 2026-09-08T20:15+08:00 |
 | p1 | US-083 | [One default key sets every job](doing/US-083-one-default-key-sets-every-job.md) | feature | doing | 2026-09-09T11:13+08:00 |
 | p1 | US-100 | [The cloud version runs at app.signalscout.run](doing/US-100-the-cloud-version-runs-at-app-signalscout-run.md) | feature | doing | 2026-09-10T03:05+08:00 |
+| p1 | US-104 | [A monitor says what its last poll did](doing/US-104-a-monitor-says-what-its-last-poll-did.md) | feature | doing | 2026-09-10T09:51+08:00 |
 | p1 | BUG-004 | [The model half of a poll is not capped](doing/BUG-004-the-model-half-of-a-poll-is-not-capped.md) | bug | doing | 2026-09-06T04:42+08:00 |
 | p1 | US-033 | [Thirty verdicts say whether the score is right](todo/US-033-thirty-verdicts-say-whether-the-score-is-right.md) | chore | todo | 2026-09-06T03:02+08:00 |
+| p1 | BUG-015 | [One post found twice in a poll throws away the whole collection](todo/BUG-015-one-post-found-twice-in-a-poll-throws-away-the-whole-collection.md) | bug | todo | 2026-09-10T10:31+08:00 |
+| p1 | BUG-016 | [One platform's outage throws away another platform's collection](todo/BUG-016-one-platforms-outage-throws-away-another-platforms-collection.md) | bug | todo | 2026-09-10T10:44+08:00 |
+| p1 | BUG-017 | [A poll pays for pages its own window then discards](todo/BUG-017-a-poll-pays-for-pages-its-own-window-then-discards.md) | bug | todo | 2026-09-10T10:44+08:00 |
 | p2 | US-015 | [A deleted post stops being shown](doing/US-015-a-deleted-post-stops-being-shown.md) | feature | doing | 2026-09-04T22:49+08:00 |
 | p2 | US-017 | [A self-hosted instance has one account](doing/US-017-a-self-hosted-instance-has-one-account.md) | feature | doing | 2026-09-04T22:49+08:00 |
 | p2 | US-020 | [A monitor can include comments and replies](doing/US-020-a-monitor-can-include-comments-and-replies.md) | feature | doing | 2026-09-05T01:18+08:00 |

@@ -24,6 +24,16 @@ export {
   updateMonitor,
 } from "./monitors.js";
 export {
+  latestPollRuns,
+  maxPollRunsRead,
+  type PollRun,
+  type PollRunRecord,
+  pollRunsKeptPerMonitor,
+  readPollRuns,
+  recordPollRun,
+  walkFor,
+} from "./poll-runs.js";
+export {
   describeSignals,
   intentTypeLabel,
   type SignalDescription,

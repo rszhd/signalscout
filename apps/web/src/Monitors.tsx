@@ -72,6 +72,39 @@ interface LastCollection {
   at: string;
 }
 
+/** One platform's line inside a poll. US-104. */
+interface PollRunSource {
+  source: string;
+  provider: string | null;
+  pages: number;
+  postsReturned: number;
+  postsNew: number;
+  units: number;
+  estimatedCostMicros: number;
+  reason: string | null;
+}
+
+/**
+ * What one poll did. US-104.
+ *
+ * The three counts stay apart here as they do on the row: returned against
+ * units says whether the searches found anything at all, and returned against
+ * new says whether it was anything this instance had not already seen.
+ */
+interface PollRun {
+  id: string;
+  walkId: string;
+  startedAt: string;
+  finishedAt: string;
+  outcome: string;
+  postsReturned: number;
+  postsNew: number;
+  units: number;
+  estimatedCostMicros: number;
+  stopReason: string | null;
+  sources: PollRunSource[];
+}
+
 interface Monitor {
   notificationIssues?: string[];
   id: string;
@@ -94,6 +127,14 @@ interface Monitor {
   pollDays: number[];
   pollTimezone: string;
   lastCollected: LastCollection[];
+  /**
+   * The last poll, or null where none has run. US-104.
+   *
+   * Optional as well as nullable for `projectId`'s reason: a tab open since
+   * before this shipped talks to the API that has it, and a tab open now may
+   * talk to one that does not.
+   */
+  lastPoll?: PollRun | null;
   missingCredentials: MissingCredential[];
   budget: Budget | null;
   spend: Spend;
@@ -158,12 +199,165 @@ function feedbackLabel({ good, notRelevant }: Feedback): string {
  * paused *for a reason a person needs*, and "Paused" alone would send them
  * looking for a button somebody pressed.
  */
-function status(monitor: Monitor): { label: string; tone: string } {
+function status(monitor: Monitor): { label: string; tone: string; attention?: boolean } {
   if (monitor.spend.exhausted) return { label: "Budget spent", tone: "stopped" };
   if (monitor.missingCredentials.length > 0) return { label: "Needs a key", tone: "stopped" };
   if (monitor.paused) return { label: "Paused", tone: "paused" };
 
+  /**
+   * A monitor that is polling and finding nothing. US-104.
+   *
+   * The tone stays `running`, because it is: the filter above counts it among
+   * the active monitors and it would be a lie to take it out of them. What
+   * changes is the word and the badge, because on 2026-09-09 a monitor that
+   * had spent $0.666 and collected nothing said `Running`, and the two
+   * readings that leaves a person — nobody is talking, or this is broken — are
+   * both wrong.
+   */
+  if (monitor.lastPoll?.outcome === "empty") {
+    return { label: "Found nothing", tone: "running", attention: true };
+  }
+
+  if (monitor.lastPoll?.outcome === "failed") {
+    return { label: "Poll failed", tone: "stopped" };
+  }
+
   return { label: "Running", tone: "running" };
+}
+
+/**
+ * Why a poll, or one platform inside it, stopped.
+ *
+ * The server sends the closed set from `schema.ts` and this is where each one
+ * becomes a sentence. A screen that printed the value itself would show
+ * somebody `no_provider_choice`.
+ */
+const stopReasonLabels: Record<string, string> = {
+  budget_exhausted: "the monthly budget was spent",
+  no_credentials: "no provider has a key",
+  no_provider_choice: "no provider is chosen",
+  not_offered: "this build no longer collects it",
+  resume_key_missing: "the key that started the collection is gone",
+  collection_abandoned: "the collection was never ready to read",
+  provider_wait: "the provider asked us to come back",
+  page_cap: "the page limit for one poll was reached",
+  still_collecting: "a collection is still running",
+  error: "the poll failed",
+};
+
+function stopReasonLabel(reason: string | null): string | null {
+  if (!reason) return null;
+
+  return stopReasonLabels[reason] ?? reason;
+}
+
+/**
+ * What the last poll did, in one line, without opening anything.
+ *
+ * The spend is on it whenever there was any, and that is the point rather than
+ * a detail: a poll that found nothing and cost nothing is a quiet platform,
+ * and a poll that found nothing and cost money is not. Only the two numbers
+ * together say which.
+ */
+function pollSummary(run: PollRun): string {
+  const spent = run.units > 0 ? ` · ${formatMicros(run.estimatedCostMicros)} (estimated)` : "";
+  const reason = stopReasonLabel(run.stopReason);
+
+  if (run.outcome === "refused") {
+    return `Last poll collected nothing: ${reason ?? "it was refused"}`;
+  }
+
+  if (run.outcome === "failed") {
+    return `The last poll failed${spent}`;
+  }
+
+  if (run.outcome === "waiting") {
+    return `Collecting: ${run.postsReturned} posts so far, ${run.postsNew} new${spent}`;
+  }
+
+  if (run.outcome === "empty") {
+    const because = reason ? `, and ${reason}` : "";
+    return `Last poll found no posts${because}${spent}`;
+  }
+
+  return `Last poll: ${run.postsReturned} posts, ${run.postsNew} new${spent}`;
+}
+
+/** When this monitor is due to try again, or null when nothing is scheduled. */
+function nextPollLabel(monitor: Monitor): string | null {
+  if (monitor.paused || !monitor.lastPolledAt) return null;
+
+  const due = new Date(monitor.lastPolledAt).getTime() + monitor.pollIntervalSeconds * 1000;
+
+  return due <= Date.now() ? "due now" : `next ${new Date(due).toLocaleString()}`;
+}
+
+/**
+ * This monitor's recent polls, fetched when somebody opens the section.
+ *
+ * On demand rather than with the list, because the list already carries one
+ * poll per monitor and this is fifty of one. Loading them for every card would
+ * make opening the page cost fifty times what the question is worth.
+ */
+function PollHistory({ monitorId }: { readonly monitorId: string }) {
+  const [runs, setRuns] = useState<PollRun[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let live = true;
+
+    requestJson<PollRun[]>(`/api/monitors/${monitorId}/polls?limit=20`)
+      .then((answer) => {
+        if (live) setRuns(answer);
+      })
+      .catch((cause: unknown) => {
+        if (live) setError(messageFor(cause, "The polls could not be loaded."));
+      });
+
+    return () => {
+      live = false;
+    };
+  }, [monitorId]);
+
+  if (error) {
+    return (
+      <p className="budget-error" role="alert">
+        {error}
+      </p>
+    );
+  }
+
+  if (!runs) return <p className="monitor-origin">Loading…</p>;
+
+  if (runs.length === 0) return <p className="monitor-origin">No polls recorded yet.</p>;
+
+  return (
+    <ul className="poll-history">
+      {runs.map((run) => (
+        <li key={run.id}>
+          <time
+            dateTime={run.startedAt}
+            title={new Date(run.startedAt).toLocaleString()}
+            className="poll-history-when"
+          >
+            {ageLabel(run.startedAt)}
+          </time>
+          <span className="poll-history-what">{pollSummary(run)}</span>
+          {/* Which platform did what, because a poll that skipped Reddit and
+              collected X is one row and two different answers. */}
+          <span className="poll-history-sources">
+            {run.sources.map((entry) => (
+              <span key={`${entry.source}-${entry.provider ?? "none"}`} className="brand-label">
+                <BrandIcon brand={entry.source} size={14} />
+                {platformName(entry.source)}: {entry.postsReturned} posts, {entry.postsNew} new
+                {entry.reason ? ` — ${stopReasonLabel(entry.reason)}` : ""}
+              </span>
+            ))}
+          </span>
+        </li>
+      ))}
+    </ul>
+  );
 }
 
 function MonitorsHeader({ projectId }: { readonly projectId: string }) {
@@ -555,7 +749,11 @@ export function Monitors({ projectId }: { readonly projectId: string }) {
 
   const scoped = monitors.filter((monitor) => monitor.projectId === projectId);
   const needsAttention = (monitor: Monitor) =>
-    status(monitor).tone === "stopped" || !!monitor.notificationIssues?.length;
+    status(monitor).tone === "stopped" ||
+    // A poll that runs and finds nothing is the case US-104 exists for: it is
+    // active, it may be spending, and nothing is arriving.
+    !!status(monitor).attention ||
+    !!monitor.notificationIssues?.length;
   const counts = {
     all: scoped.length,
     running: scoped.filter((monitor) => status(monitor).tone === "running").length,
@@ -744,6 +942,16 @@ function MonitorCards({
   load: () => Promise<void>;
   setPaused: (monitor: Monitor, paused: boolean) => Promise<void>;
 }) {
+  /**
+   * Which cards have their settings section open.
+   *
+   * `<details>` renders its children whether it is open or not, so a component
+   * that fetches on mount fetches once per monitor the moment the page loads —
+   * which is thirty requests for a question nobody asked. The set is what makes
+   * "on demand" true rather than intended.
+   */
+  const [opened, setOpened] = useState<readonly string[]>([]);
+
   return (
     <ul className="monitor-list">
       {monitors.map((monitor) => {
@@ -771,7 +979,11 @@ function MonitorCards({
                     : " · never polled"}
                 </p>
               </div>
-              <span className={`monitor-status ${running.tone}`}>{running.label}</span>
+              <span
+                className={`monitor-status ${running.tone}${running.attention ? " quiet" : ""}`}
+              >
+                {running.label}
+              </span>
             </div>
 
             {/* The sentence that refused the poll, sent whole by the server,
@@ -795,6 +1007,16 @@ function MonitorCards({
               {describeSchedule(monitor.pollIntervalSeconds, monitor.pollDays)}{" "}
               <span>· {monitor.pollTimezone}</span>
             </p>
+
+            {/* What the last poll did, without opening anything. US-104. The
+                monitor list is opened to ask "is this working?", and until
+                this line existed the answer was the word `Running`. */}
+            {monitor.lastPoll && (
+              <p className="monitor-poll-summary" role="status">
+                {pollSummary(monitor.lastPoll)}
+                {nextPollLabel(monitor) ? ` · ${nextPollLabel(monitor)}` : ""}
+              </p>
+            )}
 
             <dl className="monitor-spend">
               <div>
@@ -830,7 +1052,14 @@ function MonitorCards({
 
             <p className="monitor-feedback">{feedbackLabel(monitor.feedback)}</p>
 
-            <details className="disclosure monitor-settings">
+            <details
+              className="disclosure monitor-settings"
+              onToggle={(event) => {
+                if (event.currentTarget.open && !opened.includes(monitor.id)) {
+                  setOpened((ids) => [...ids, monitor.id]);
+                }
+              }}
+            >
               <summary>
                 Schedule & settings <span>Budget · filtering · activity</span>
               </summary>
@@ -877,6 +1106,14 @@ function MonitorCards({
                         </li>
                       ))}
                     </ul>
+                  )}
+                </section>
+                <section className="monitor-settings-section collection-settings-section">
+                  <h3>Recent polls</h3>
+                  {opened.includes(monitor.id) ? (
+                    <PollHistory monitorId={monitor.id} />
+                  ) : (
+                    <p className="monitor-origin">Open this section to load them.</p>
                   )}
                 </section>
               </div>

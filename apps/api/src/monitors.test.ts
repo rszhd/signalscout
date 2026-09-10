@@ -25,12 +25,14 @@ import {
   matches,
   modelCalls,
   monitors,
+  type PollRunRecord,
   posts,
   type QueryGenerator,
   type QueryPlanOutcome,
   readNotificationSettings,
   recordFilterDrops,
   recordModelCall,
+  recordPollRun,
   recordSourceUsage,
   recordVerdict,
   setProviderChoice,
@@ -1264,6 +1266,118 @@ describe("the monitor routes", () => {
       });
     });
   });
+  describe("what the last poll did", () => {
+    /**
+     * US-104. The screen's question is "is this working?", and until this
+     * existed the answer was `Running` for a monitor that had spent $0.666 and
+     * collected nothing.
+     */
+    async function writePoll(monitorId: string, overrides: Partial<PollRunRecord> = {}) {
+      const at = new Date();
+
+      return await recordPollRun(db, {
+        monitorId,
+        userId: owner,
+        walkId: crypto.randomUUID(),
+        startedAt: at,
+        finishedAt: at,
+        outcome: "empty",
+        postsReturned: 0,
+        postsNew: 0,
+        units: 67,
+        estimatedCostMicros: 543_906,
+        sources: [
+          {
+            source: "reddit",
+            provider: "socialcrawl",
+            pages: 5,
+            postsReturned: 0,
+            postsNew: 0,
+            units: 67,
+            estimatedCostMicros: 543_906,
+            reason: null,
+          },
+        ],
+        stopReason: null,
+        ...overrides,
+      });
+    }
+
+    it("puts the last poll on the monitor, spend and all", async () => {
+      await withServer({}, async (app) => {
+        const id = await create(app);
+        await writePoll(id);
+
+        const response = await app.inject({ method: "GET", url: `/api/monitors/${id}` });
+
+        expect(response.statusCode).toBe(200);
+        expect(response.json().lastPoll).toMatchObject({
+          outcome: "empty",
+          postsReturned: 0,
+          postsNew: 0,
+          units: 67,
+          estimatedCostMicros: 543_906,
+        });
+      });
+    });
+
+    it("says null where no poll has run", async () => {
+      await withServer({}, async (app) => {
+        const id = await create(app);
+
+        const response = await app.inject({ method: "GET", url: `/api/monitors/${id}` });
+
+        expect(response.json().lastPoll).toBeNull();
+      });
+    });
+
+    it("lists the recent polls, newest first", async () => {
+      await withServer({}, async (app) => {
+        const id = await create(app);
+        await writePoll(id, { startedAt: new Date(Date.now() - 60_000) });
+        const newest = await writePoll(id, { outcome: "collected", postsReturned: 5, postsNew: 5 });
+
+        const response = await app.inject({ method: "GET", url: `/api/monitors/${id}/polls` });
+
+        expect(response.statusCode).toBe(200);
+        expect(response.json()).toHaveLength(2);
+        expect(response.json()[0].id).toBe(newest.id);
+        expect(response.json()[0].sources[0]).toMatchObject({
+          source: "reddit",
+          provider: "socialcrawl",
+        });
+      });
+    });
+
+    it("answers 404 for a monitor that is not this account's", async () => {
+      /**
+       * 404 and not an empty list. "You have no polls" and "that is not your
+       * monitor" are different sentences, and answering the first for the
+       * second is how a stranger learns an id exists.
+       */
+      const [row] = await db
+        .insert(monitors)
+        .values({
+          userId: "somebody-else",
+          name: "Not yours",
+          product: "A test runner",
+          idealCustomer: "Small SaaS teams",
+          problem: "Flaky end-to-end tests",
+          sources: ["reddit"],
+        })
+        .returning({ id: monitors.id });
+
+      await withServer({}, async (app) => {
+        const response = await app.inject({
+          method: "GET",
+          url: `/api/monitors/${row?.id}/polls`,
+        });
+
+        expect(response.statusCode).toBe(404);
+      });
+    });
+  });
+
   describe("a new monitor is told how to reach its owner", () => {
     /**
      * US-093. Before this there was no `notification_settings` row until

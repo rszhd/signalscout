@@ -1,0 +1,167 @@
+/* biome-ignore-all lint/style/noDescendingSpecificity: the status and alert notices are styled once, then given a full-width grid span. */
+/* The monitor notification settings page. Shared colors and controls come from the theme. */
+.notifications-page {
+  background: var(--background);
+}
+
+.notifications-content {
+  max-width: var(--page-content-width);
+  margin: 0 auto;
+  padding: var(--space-8) var(--page-gutter) var(--space-12);
+}
+
+/* One card per section, so the page uses its width like the other screens. */
+.notification-panel form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: var(--space-6);
+  align-items: start;
+}
+
+.notification-panel form > p,
+.notification-panel form > button,
+.notification-panel form > [role="alert"],
+.notification-panel form > [role="status"] {
+  grid-column: 1 / -1;
+}
+
+.notification-panel form > p {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+
+.notification-panel fieldset {
+  display: grid;
+  gap: var(--space-6);
+  min-width: 0;
+  margin: 0;
+  padding: var(--space-6);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-soft);
+}
+
+.notification-panel legend {
+  display: block;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.notification-panel label {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  color: var(--muted-strong);
+  font-size: var(--text-sm);
+}
+
+.notification-panel input:not([type="checkbox"]),
+.notification-panel select {
+  width: 100%;
+  min-height: var(--control-height);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--line-dark);
+  border-radius: var(--radius-sm);
+  color: var(--ink);
+  background: var(--surface);
+  font: inherit;
+}
+
+.notification-panel input:not([type="checkbox"]):focus,
+.notification-panel select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+  outline: 0;
+}
+
+.notification-panel .notification-check {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--ink);
+}
+
+.notification-panel .notification-check input {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  accent-color: var(--accent);
+}
+
+.notification-panel .notification-secret {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface-soft);
+}
+
+.notification-panel .notification-secret p {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+}
+
+.notification-panel .notification-secret .secondary-button {
+  justify-self: start;
+}
+
+.notification-panel .notification-secret output {
+  display: block;
+  margin-top: var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid var(--line-dark);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+  font-size: var(--text-sm);
+  overflow-wrap: anywhere;
+}
+
+.notification-panel code {
+  padding: 1px var(--space-1);
+  border-radius: var(--radius-sm);
+  background: var(--surface-soft);
+  font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+  font-size: 0.9em;
+}
+
+.notification-panel [role="status"],
+.notification-panel [role="alert"] {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-sm);
+  background: var(--surface-soft);
+  font-size: var(--text-sm);
+}
+
+.notification-panel [role="status"] {
+  color: var(--muted-strong);
+}
+
+.notification-panel [role="alert"] {
+  color: var(--warning);
+  background: var(--quiet-accent-soft);
+}
+
+.notification-panel .primary-button {
+  justify-self: start;
+}
+
+@media (max-width: 600px) {
+  .notifications-content {
+    padding-top: var(--space-6);
+  }
+
+  .notification-panel fieldset {
+    padding: var(--space-5);
+  }
+}

@@ -2155,52 +2155,6 @@ a {
   }
 }
 
-.notification-panel {
-  max-width: 720px;
-  line-height: 1.6;
-  margin: 32px auto;
-  padding: 24px;
-  background: var(--surface, var(--surface));
-  border: 1px solid var(--border, #e6e8eb);
-  border-radius: 16px;
-}
-.notification-panel fieldset {
-  margin: 24px 0;
-  padding: 20px;
-  border: 1px solid var(--border, #e6e8eb);
-  border-radius: 10px;
-}
-.notification-panel legend {
-  font-weight: 600;
-  padding: 0 8px;
-}
-.notification-panel label {
-  display: grid;
-  gap: 8px;
-  margin: 16px 0;
-}
-.notification-panel input:not([type="checkbox"]),
-.notification-panel select {
-  width: 100%;
-  padding: 10px 12px;
-  border: 1px solid var(--border, #e6e8eb);
-  border-radius: 6px;
-  font: inherit;
-}
-.notification-panel .notification-check {
-  display: flex;
-  align-items: center;
-}
-.notification-panel [role="alert"] {
-  color: #a12e2e;
-}
-@media (max-width: 640px) {
-  .notification-panel {
-    margin: 16px;
-    padding: 16px;
-  }
-}
-
 /* A quiet inbox: scan the list, read one conversation, reveal detail on demand. */
 .sidebar {
   width: var(--sidebar-width);

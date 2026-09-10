@@ -12,6 +12,7 @@ import "./styles/onboarding.css";
 import "./styles/connections.css";
 import "./styles/projects.css";
 import "./styles/monitors.css";
+import "./styles/notifications.css";
 import "./styles/providers.css";
 import "./styles/reply-draft.css";
 import "./styles/reply-voices.css";

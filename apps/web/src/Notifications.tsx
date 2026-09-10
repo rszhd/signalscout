@@ -127,196 +127,201 @@ export function Notifications({
     }
   }
   return (
-    <>
+    <div className="product-page notifications-page">
       <header className="topbar">
         <div>
           <p className="eyebrow">Monitor settings</p>
           <h1>Notifications</h1>
         </div>
-        <Link className="text-link" to={paths.monitors(projectId)}>
+        <Link className="top-secondary-link" to={paths.monitors(projectId)}>
           Back to monitors
         </Link>
       </header>
-      <div className="notification-panel">
-        {error && <p role="alert">{error}</p>}
-        {!settings && !error && <p role="status">Loading notifications…</p>}
-        {settings && data && (
-          <form onSubmit={(event) => void save(event)}>
-            <p>
-              Receive a digest of new matches. Add immediate email alerts for the scores you want to
-              see sooner.
-            </p>
-            {data.emailError && <p role="alert">{data.emailError}</p>}
-            {data.webhookError && <p role="alert">{data.webhookError}</p>}
-            <fieldset disabled={busy}>
-              <legend>Digest</legend>
-              <label>
-                Digest interval (hours)
-                <input
-                  type="number"
-                  min="1"
-                  max="168"
-                  required
-                  value={settings.digestHours}
-                  onChange={(event) => update({ digestHours: Number(event.target.value) })}
-                />
-              </label>
-              <label>
-                Minimum score
-                <input
-                  type="number"
-                  min="0"
-                  max="100"
-                  required
-                  value={settings.minScore}
-                  onChange={(event) => update({ minScore: Number(event.target.value) })}
-                />
-              </label>
-              <p>Quiet periods send nothing. Immediate alerts also appear in the next digest.</p>
-            </fieldset>
-            <fieldset disabled={busy}>
-              <legend>Email</legend>
-              {data.smtpMissing.length > 0 && (
-                <p role="status">
-                  Email is unavailable. Set {data.smtpMissing.join(", ")} and restart the API and
-                  worker. The inbox still works.
-                </p>
-              )}
-              <label className="notification-check">
-                <input
-                  type="checkbox"
-                  checked={settings.emailEnabled}
-                  disabled={data.smtpMissing.length > 0 && !settings.emailEnabled}
-                  onChange={(event) => update({ emailEnabled: event.target.checked })}
-                />
-                Email digest
-              </label>
-              <label>
-                Recipient email
-                <input
-                  type="email"
-                  required={settings.emailEnabled}
-                  value={settings.emailTo}
-                  onChange={(event) => update({ emailTo: event.target.value })}
-                />
-              </label>
-              <label className="notification-check">
-                <input
-                  type="checkbox"
-                  checked={settings.immediateScore !== null}
-                  onChange={(event) => update({ immediateScore: event.target.checked ? 90 : null })}
-                />
-                Immediate email alerts
-              </label>
-              {settings.immediateScore !== null && (
+      <div className="notifications-content">
+        <div className="notification-panel">
+          {error && <p role="alert">{error}</p>}
+          {!settings && !error && <p role="status">Loading notifications…</p>}
+          {settings && data && (
+            <form onSubmit={(event) => void save(event)}>
+              <p>
+                Receive a digest of new matches. Add immediate email alerts for the scores you want
+                to see sooner.
+              </p>
+              {data.emailError && <p role="alert">{data.emailError}</p>}
+              {data.webhookError && <p role="alert">{data.webhookError}</p>}
+              <fieldset disabled={busy}>
+                <legend>Digest</legend>
                 <label>
-                  Immediate alert score
+                  Digest interval (hours)
+                  <input
+                    type="number"
+                    min="1"
+                    max="168"
+                    required
+                    value={settings.digestHours}
+                    onChange={(event) => update({ digestHours: Number(event.target.value) })}
+                  />
+                </label>
+                <label>
+                  Minimum score
                   <input
                     type="number"
                     min="0"
                     max="100"
                     required
-                    value={settings.immediateScore}
-                    onChange={(event) => update({ immediateScore: Number(event.target.value) })}
+                    value={settings.minScore}
+                    onChange={(event) => update({ minScore: Number(event.target.value) })}
                   />
                 </label>
-              )}
-            </fieldset>
-            <fieldset disabled={busy}>
-              <legend>Webhook</legend>
-              {data.webhookMissing.length > 0 && (
-                <p role="status">
-                  Set {data.webhookMissing.join(", ")} and restart the API and worker to enable
-                  signed webhooks, or make a signing secret for this account below.
-                </p>
-              )}
-              <div className="notification-secret">
-                <p>
-                  Every delivery is signed with a secret, and your receiver verifies the
-                  <code> X-SignalScout-Signature</code> header with the same value. It belongs to
-                  your account and every monitor you own uses it.
-                </p>
-                {freshSecret ? (
+                <p>Quiet periods send nothing. Immediate alerts also appear in the next digest.</p>
+              </fieldset>
+              <fieldset disabled={busy}>
+                <legend>Email</legend>
+                {data.smtpMissing.length > 0 && (
                   <p role="status">
-                    <strong>Copy this now. It is not shown again.</strong>
-                    <output>{freshSecret}</output>
-                  </p>
-                ) : data.signingSecret.hint ? (
-                  <p>
-                    A secret is set for this account, ending <code>{data.signingSecret.hint}</code>.
-                  </p>
-                ) : data.signingSecret.usingInstanceSecret ? (
-                  <p>
-                    Signing with this instance&rsquo;s own <code>WEBHOOK_SIGNING_SECRET</code>. Make
-                    one for your account to sign with a value nobody else here holds.
-                  </p>
-                ) : (
-                  <p>No secret yet, so nothing can be delivered.</p>
-                )}
-                {data.signingSecret.storeBlocker && (
-                  <p role="status">{data.signingSecret.storeBlocker}</p>
-                )}
-                <button
-                  type="button"
-                  className="secondary-button"
-                  disabled={!data.signingSecret.canStore || busy}
-                  onClick={generateSecret}
-                >
-                  {data.signingSecret.hint ? "Generate a new secret" : "Generate a secret"}
-                </button>
-                {data.signingSecret.hint && (
-                  <p>
-                    Generating a new one stops every receiver configured with the old value from
-                    verifying, until you give them the new one.
+                    Email is unavailable. Set {data.smtpMissing.join(", ")} and restart the API and
+                    worker. The inbox still works.
                   </p>
                 )}
-              </div>
-              <label className="notification-check">
-                <input
-                  type="checkbox"
-                  checked={settings.webhookEnabled}
-                  disabled={data.webhookMissing.length > 0 && !settings.webhookEnabled}
-                  onChange={(event) => update({ webhookEnabled: event.target.checked })}
-                />
-                Enable webhook
-              </label>
-              <label>
-                Webhook URL
-                <input
-                  type="url"
-                  placeholder="https://example.com/webhook"
-                  required={settings.webhookEnabled}
-                  value={settings.webhookUrl}
-                  onChange={(event) => update({ webhookUrl: event.target.value })}
-                />
-              </label>
-              <label>
-                Webhook delivery
-                <select
-                  value={settings.webhookMode}
-                  onChange={(event) =>
-                    update({ webhookMode: event.target.value as Settings["webhookMode"] })
-                  }
-                >
-                  <option value="digest">Digest</option>
-                  <option value="match">Each match above the minimum score</option>
-                </select>
-              </label>
-            </fieldset>
-            <p>
-              Saving starts a new period with future matches and cancels pending deliveries from the
-              previous settings.
-            </p>
-            {data.nextDigestAt && (
-              <p>Next digest: {new Date(data.nextDigestAt).toLocaleString()}</p>
-            )}
-            <button className="primary-button" disabled={busy} type="submit">
-              {busy ? "Saving…" : "Save notifications"}
-            </button>
-            {saved && <p role="status">Notification settings saved.</p>}
-          </form>
-        )}
+                <label className="notification-check">
+                  <input
+                    type="checkbox"
+                    checked={settings.emailEnabled}
+                    disabled={data.smtpMissing.length > 0 && !settings.emailEnabled}
+                    onChange={(event) => update({ emailEnabled: event.target.checked })}
+                  />
+                  Email digest
+                </label>
+                <label>
+                  Recipient email
+                  <input
+                    type="email"
+                    required={settings.emailEnabled}
+                    value={settings.emailTo}
+                    onChange={(event) => update({ emailTo: event.target.value })}
+                  />
+                </label>
+                <label className="notification-check">
+                  <input
+                    type="checkbox"
+                    checked={settings.immediateScore !== null}
+                    onChange={(event) =>
+                      update({ immediateScore: event.target.checked ? 90 : null })
+                    }
+                  />
+                  Immediate email alerts
+                </label>
+                {settings.immediateScore !== null && (
+                  <label>
+                    Immediate alert score
+                    <input
+                      type="number"
+                      min="0"
+                      max="100"
+                      required
+                      value={settings.immediateScore}
+                      onChange={(event) => update({ immediateScore: Number(event.target.value) })}
+                    />
+                  </label>
+                )}
+              </fieldset>
+              <fieldset disabled={busy}>
+                <legend>Webhook</legend>
+                {data.webhookMissing.length > 0 && (
+                  <p role="status">
+                    Set {data.webhookMissing.join(", ")} and restart the API and worker to enable
+                    signed webhooks, or make a signing secret for this account below.
+                  </p>
+                )}
+                <div className="notification-secret">
+                  <p>
+                    Every delivery is signed with a secret, and your receiver verifies the
+                    <code> X-SignalScout-Signature</code> header with the same value. It belongs to
+                    your account and every monitor you own uses it.
+                  </p>
+                  {freshSecret ? (
+                    <p role="status">
+                      <strong>Copy this now. It is not shown again.</strong>
+                      <output>{freshSecret}</output>
+                    </p>
+                  ) : data.signingSecret.hint ? (
+                    <p>
+                      A secret is set for this account, ending{" "}
+                      <code>{data.signingSecret.hint}</code>.
+                    </p>
+                  ) : data.signingSecret.usingInstanceSecret ? (
+                    <p>
+                      Signing with this instance&rsquo;s own <code>WEBHOOK_SIGNING_SECRET</code>.
+                      Make one for your account to sign with a value nobody else here holds.
+                    </p>
+                  ) : (
+                    <p>No secret yet, so nothing can be delivered.</p>
+                  )}
+                  {data.signingSecret.storeBlocker && (
+                    <p role="status">{data.signingSecret.storeBlocker}</p>
+                  )}
+                  <button
+                    type="button"
+                    className="secondary-button"
+                    disabled={!data.signingSecret.canStore || busy}
+                    onClick={generateSecret}
+                  >
+                    {data.signingSecret.hint ? "Generate a new secret" : "Generate a secret"}
+                  </button>
+                  {data.signingSecret.hint && (
+                    <p>
+                      Generating a new one stops every receiver configured with the old value from
+                      verifying, until you give them the new one.
+                    </p>
+                  )}
+                </div>
+                <label className="notification-check">
+                  <input
+                    type="checkbox"
+                    checked={settings.webhookEnabled}
+                    disabled={data.webhookMissing.length > 0 && !settings.webhookEnabled}
+                    onChange={(event) => update({ webhookEnabled: event.target.checked })}
+                  />
+                  Enable webhook
+                </label>
+                <label>
+                  Webhook URL
+                  <input
+                    type="url"
+                    placeholder="https://example.com/webhook"
+                    required={settings.webhookEnabled}
+                    value={settings.webhookUrl}
+                    onChange={(event) => update({ webhookUrl: event.target.value })}
+                  />
+                </label>
+                <label>
+                  Webhook delivery
+                  <select
+                    value={settings.webhookMode}
+                    onChange={(event) =>
+                      update({ webhookMode: event.target.value as Settings["webhookMode"] })
+                    }
+                  >
+                    <option value="digest">Digest</option>
+                    <option value="match">Each match above the minimum score</option>
+                  </select>
+                </label>
+              </fieldset>
+              <p>
+                Saving starts a new period with future matches and cancels pending deliveries from
+                the previous settings.
+              </p>
+              {data.nextDigestAt && (
+                <p>Next digest: {new Date(data.nextDigestAt).toLocaleString()}</p>
+              )}
+              <button className="primary-button" disabled={busy} type="submit">
+                {busy ? "Saving…" : "Save notifications"}
+              </button>
+              {saved && <p role="status">Notification settings saved.</p>}
+            </form>
+          )}
+        </div>
       </div>
-    </>
+    </div>
   );
 }

@@ -48,11 +48,17 @@ export function Dialog({
   readonly dialogRef: { current: HTMLDialogElement | null };
 }) {
   return (
-    <dialog className={className} ref={dialogRef} aria-labelledby={titleId}>
-      <header className={headingClass}>
+    <dialog
+      className={className ? `app-dialog ${className}` : "app-dialog"}
+      ref={dialogRef}
+      aria-labelledby={titleId}
+    >
+      <header
+        className={headingClass ? `app-dialog-heading ${headingClass}` : "app-dialog-heading"}
+      >
         {heading}
         <Button
-          variant="secondary"
+          variant="compact"
           aria-label={closeLabel}
           onClick={() => {
             dialogRef.current?.close();

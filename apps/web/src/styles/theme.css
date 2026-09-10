@@ -188,6 +188,55 @@
   vertical-align: middle;
 }
 
+/* Native modal shell. Screens own dialog content, not a second frame. */
+.app-dialog {
+  width: min(680px, calc(100% - var(--space-8)));
+  max-width: none;
+  max-height: calc(100dvh - var(--space-8));
+  margin: auto;
+  padding: 0;
+  overflow-y: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  color: var(--ink);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  scrollbar-gutter: stable;
+}
+
+.app-dialog::backdrop {
+  background: rgb(21 26 34 / 48%);
+  backdrop-filter: blur(2px);
+}
+
+.app-dialog-heading {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-6);
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.app-dialog-heading > button {
+  flex-shrink: 0;
+}
+
+@media (max-width: 600px) {
+  .app-dialog {
+    width: calc(100% - var(--space-4));
+    max-height: calc(100dvh - var(--space-4));
+  }
+
+  .app-dialog-heading {
+    padding: var(--space-4);
+  }
+}
+
 /* Opt-in single-line controls share sizing across inputs and native selects. */
 .field .form-control {
   box-sizing: border-box;

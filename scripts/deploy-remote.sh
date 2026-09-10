@@ -2,7 +2,7 @@
 #
 # Put a published image on the box and prove it took (US-075).
 #
-#   scripts/deploy-remote.sh <host> <directory> <project> [image]
+#   scripts/deploy-remote.sh <host> <directory> <project> [image] [overlay]
 #
 # `image` is a digest reference — repository@sha256:… — and giving one is what
 # separates a deploy from a hope. A tag is a mutable pointer: `pull` can be a
@@ -24,6 +24,12 @@
 # `.env` is NOT copied. It holds the box's own secrets, it is not in this
 # repository, and a deploy that overwrote it would replace a generated
 # Postgres password with whatever a developer had locally.
+#
+# `overlay` is an extra compose file for one stack alone (US-105). Staging
+# passes `docker-compose.staging.yml`, which puts a password in front of the
+# site; production passes none, so it never receives the prompt. The caller
+# names the file rather than the script guessing it, because the two workflows
+# are twins that each know one answer.
 
 set -euo pipefail
 
@@ -31,11 +37,17 @@ host=${1:?the box to deploy to}
 directory=${2:?the directory for this stack on the box}
 project=${3:?the compose project name}
 image=${4:-}
+overlay=${5:-}
 
 ssh_options=(-o BatchMode=yes -o ConnectTimeout=15)
 remote="root@${host}"
 
+files=(docker-compose.yml docker-compose.prod.yml docker-compose.proxy.yml)
 compose=(docker compose -p "$project" -f docker-compose.yml -f docker-compose.prod.yml)
+if [ -n "$overlay" ]; then
+  files+=("$overlay")
+  compose+=(-f "$overlay")
+fi
 
 # Passed through the ssh command line rather than written into the box's `.env`,
 # because the two answer different questions: `.env` says which stream this box
@@ -50,7 +62,7 @@ fi
 echo "==> Sending the compose files from this commit"
 ssh "${ssh_options[@]}" "$remote" "mkdir -p '$directory'"
 scp "${ssh_options[@]}" -q \
-  docker-compose.yml docker-compose.prod.yml docker-compose.proxy.yml \
+  "${files[@]}" \
   "${remote}:${directory}/"
 
 echo "==> Pulling and starting"

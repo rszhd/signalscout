@@ -1,0 +1,30 @@
+# Staging overlay (US-105). Layered on the production overlay, and only on
+# staging:
+#
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml \
+#     -f docker-compose.staging.yml up -d
+#
+# Staging takes registrations (`AUTH_SIGNUP=open`), so anybody who can read mail
+# may make an account on a half-built product. This puts a password in front of
+# the whole site, at the proxy, so no request reaches the app without it.
+#
+# It is a separate file rather than a line in docker-compose.prod.yml because
+# that file serves both stacks. A middleware attached there would prompt on
+# production too, and with no users configured it would refuse every request
+# there. The two deploy workflows each know one answer, and this is staging's.
+#
+# The value comes from the box's `.env`. A bcrypt hash starts with `$2y$`, and
+# Compose reads `$` as a variable, so the hash is never written here: it is
+# interpolated from TRAEFIK_BASIC_AUTH_USERS, where a `$` is literal. Make it
+# with `htpasswd -nbB staging 'the-password'`; more users are comma-separated.
+#
+# This is a second lock, not a replacement. The app's own login stays.
+
+services:
+  app:
+    labels:
+      - traefik.http.middlewares.${TRAEFIK_NAME:-signalscout}-basic.basicauth.users=${TRAEFIK_BASIC_AUTH_USERS:?set TRAEFIK_BASIC_AUTH_USERS in .env}
+      # The list replaces the one in docker-compose.prod.yml, so the robots
+      # middleware is named again here. Compose merges labels by key, and this
+      # key is the one being overridden.
+      - traefik.http.routers.${TRAEFIK_NAME:-signalscout}.middlewares=${TRAEFIK_NAME:-signalscout}-robots@docker,${TRAEFIK_NAME:-signalscout}-basic@docker

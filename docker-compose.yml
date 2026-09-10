@@ -33,6 +33,9 @@ x-app-environment: &app-environment
   AUTH_URL: ${AUTH_URL:-}
   # Origins allowed to sign in, besides this instance's own. Comma separated.
   AUTH_TRUSTED_ORIGINS: ${AUTH_TRUSTED_ORIGINS:-}
+  # Addresses allowed to read the admin view, comma separated. Empty means
+  # nobody is an admin. US-111.
+  ADMIN_EMAILS: ${ADMIN_EMAILS:-}
   # Empty until a credential is stored in the database. docs/secrets.md.
   ENCRYPTION_KEY: ${ENCRYPTION_KEY:-}
   SMTP_HOST: ${SMTP_HOST:-}

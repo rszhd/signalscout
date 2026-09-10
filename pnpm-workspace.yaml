@@ -1,6 +1,7 @@
 packages:
   - apps/*
   - packages/*
+  - admin
 
 onlyBuiltDependencies:
   - esbuild

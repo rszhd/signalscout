@@ -11,6 +11,7 @@
   "scripts": {
     "setup": "node scripts/init-env.mjs",
     "dev": "node scripts/dev.mjs",
+    "preview": "node scripts/preview.mjs",
     "build": "tsc --build && pnpm --filter @signalscout/web build && pnpm --filter @signalscout/admin build",
     "typecheck": "tsc --build && pnpm --filter @signalscout/web typecheck && pnpm --filter @signalscout/admin typecheck",
     "test": "vitest run",

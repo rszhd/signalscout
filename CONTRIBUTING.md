@@ -61,10 +61,31 @@ Four of them matter more than the rest:
 pnpm install
 pnpm db:up        # Postgres, which the tests need
 pnpm dev          # Postgres, migrations, API, web and worker
+pnpm preview      # the same app on a public link, for review from a phone
 pnpm test         # needs the Postgres that db:up starts
 pnpm lint         # Biome: formatting and lint rules together
 pnpm typecheck
 ```
+
+`pnpm preview` opens a Cloudflare tunnel to a second API and a second Vite, so
+it runs beside `pnpm dev` rather than instead of it. It prints one link and a
+password, hot reload included. It needs `cloudflared`, which it tells you how
+to install; it downloads nothing itself.
+
+The address is new every run — a stable one needs the domain on Cloudflare DNS.
+The password does not have to be: set `PREVIEW_PASS` in `.env` and every run
+uses it, so the phone that saved it does not ask again. `PREVIEW_USER`,
+`PREVIEW_PROXY_PORT`, `PREVIEW_API_PORT` and `PREVIEW_VITE_PORT` work the same
+way. A value typed in front of the command wins over the file.
+
+Only Vite reloads. The API is started without its watcher, so a change under
+`apps/api` or `packages/core` needs the command restarted.
+
+Use it to look at screens, not for anything real. Cloudflare terminates TLS at
+its edge, so it can read the traffic there, and a quick tunnel's address is
+public to anyone who finds it — which is why a password sits in front and
+registration is closed whatever `.env` says. Staging is the deployment whose
+certificate nobody outside this project terminates.
 
 `pnpm test` uses a real Postgres and creates a database per test file. If it
 cannot reach one it says so; it does not fall back to a fake. It can go red

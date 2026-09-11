@@ -2,7 +2,7 @@
 
 # Done
 
-105 finished.
+106 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
@@ -20,6 +20,7 @@
 | BUG-003 | [A post below the threshold is classified again on every poll](done/2026-09/BUG-003-a-post-below-the-threshold-is-classified-again-on-every-poll.md) | bug | fixed | 2026-09 |
 | BUG-002 | [A seven-day window is bought as a month](done/2026-09/BUG-002-a-seven-day-window-is-bought-as-a-month.md) | bug | fixed | 2026-09 |
 | BUG-001 | [A pending Reddit collection is not resumed](done/2026-09/BUG-001-a-pending-reddit-collection-is-not-resumed.md) | bug | shipped | 2026-09 |
+| US-118 | [One command puts the dev app on a link I can open anywhere](done/2026-09/US-118-one-command-puts-the-dev-app-on-a-link-i-can-open-anywhere.md) | feature | shipped | 2026-09 |
 | US-117 | [The documents agree with the code](done/2026-09/US-117-the-documents-agree-with-the-code.md) | chore | shipped | 2026-09 |
 | US-116 | [AGENTS.md holds rules, not history](done/2026-09/US-116-agents-md-holds-rules-not-history.md) | chore | shipped | 2026-09 |
 | US-115 | [A self-hoster copies a short env file](done/2026-09/US-115-a-self-hoster-copies-a-short-env-file.md) | chore | shipped | 2026-09 |

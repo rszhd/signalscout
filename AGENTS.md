@@ -213,6 +213,7 @@ count the call sites and give each its own case.
 
 ```bash
 pnpm dev                      # Postgres, migrations, API (3000), Vite (5173), worker
+pnpm preview                  # the same app on a public link, for review from a phone
 pnpm test                     # Vitest; needs the Postgres that `pnpm db:up` starts
 pnpm lint                     # Biome: formatting and lint rules together
 pnpm typecheck                # tsc --build across the workspace, plus the web app

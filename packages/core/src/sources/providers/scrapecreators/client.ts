@@ -2,7 +2,13 @@
  * Correctness-critical: an unavailable URL is not proof of deletion.
  * deletion-fixtures/verify.test.ts replays the captured counterexample.
  *
- * The ScrapeCreators half of the Reddit connector.
+ * The ScrapeCreators transport, for every platform behind that one key.
+ *
+ * It was the Reddit half of one connector until US-126, when TikTok arrived and
+ * the base URL moved up a path segment. One transport, and a `PageShape` per
+ * endpoint for the one thing that differs: where the records and the cursor
+ * are. That is `socialcrawl/client.ts`'s shape, arriving here for the same
+ * reason — sharing a key is not sharing a contract.
  *
  * This file, its siblings and the fixtures beside them are the only places in
  * the repository that name ScrapeCreators. STACK.md, *A source is not a
@@ -30,16 +36,31 @@
 import type { Logger } from "../../../logger.js";
 import type { SourceRuntime, VerificationRequest, VerificationResult } from "../../types.js";
 
-const apiBase = "https://api.scrapecreators.com/v1/reddit";
+/**
+ * The host, not a platform.
+ *
+ * This was `…/v1/reddit` until US-126, because Reddit was the only platform
+ * this provider fetched and the file was the Reddit half of one connector. One
+ * key serves every platform behind a provider, so the client is the provider's
+ * and the platform is a path segment on the endpoint beside it.
+ */
+const apiBase = "https://api.scrapecreators.com";
+
+const redditBase = `${apiBase}/v1/reddit`;
+const tikTokBase = `${apiBase}/v1/tiktok`;
+const youTubeBase = `${apiBase}/v1/youtube`;
 
 /**
- * The two endpoints a monitor needs, and the two discovery modes the Bright
- * Data connector already has: a keyword search across Reddit, and the recent
- * posts of one subreddit.
+ * Every endpoint a monitor needs from this provider, grouped by platform.
+ *
+ * Reddit has two discovery modes, the same two the Bright Data connector has:
+ * a keyword search, and the recent posts of one subreddit. TikTok and YouTube
+ * have one each, because a monitor exists to find a stranger describing a
+ * problem and a named account is not one.
  */
 export const endpoints = {
-  search: `${apiBase}/search`,
-  subreddit: `${apiBase}/subreddit`,
+  search: `${redditBase}/search`,
+  subreddit: `${redditBase}/subreddit`,
   /**
    * The replies under one post, by URL. US-020.
    *
@@ -48,8 +69,85 @@ export const endpoints = {
    * returned exactly 25. So a credit buys a page and not a thread, and the
    * connector reads one page and stops.
    */
-  postComments: `${apiBase}/post/comments`,
+  postComments: `${redditBase}/post/comments`,
+  redditPost: `${redditBase}/post`,
+  tikTokSearch: `${tikTokBase}/search/keyword`,
+  tikTokComments: `${tikTokBase}/video/comments`,
+  youTubeSearch: `${youTubeBase}/search`,
 } as const;
+
+/**
+ * Where one endpoint keeps its records and its cursor.
+ *
+ * Three platforms, three answers, and none of them guessable from another:
+ * Reddit returns `posts` with an `after`, TikTok returns `search_item_list`
+ * with a numeric `cursor` beside a numeric `has_more`, and YouTube returns
+ * `videos` with an opaque `continuationToken`. US-119 and US-121 measured all
+ * three.
+ *
+ * This exists so that `fetchPage` never assumes one platform's shape. Sharing a
+ * key is not sharing a contract — the same lesson `socialcrawl/client.ts`
+ * carries as `EndpointProfile`.
+ */
+export interface PageShape {
+  readonly recordsOf: (body: Record<string, unknown>) => readonly unknown[];
+  readonly cursorOf: (body: Record<string, unknown>) => string | undefined;
+}
+
+function arrayAt(body: Record<string, unknown>, key: string): readonly unknown[] {
+  const value = body[key];
+  return Array.isArray(value) ? value : [];
+}
+
+function textAt(body: Record<string, unknown>, key: string): string | undefined {
+  const value = body[key];
+  return typeof value === "string" && value !== "" ? value : undefined;
+}
+
+export const redditPageShape: PageShape = {
+  recordsOf: (body) => arrayAt(body, "posts"),
+  cursorOf: (body) => textAt(body, "after"),
+};
+
+/**
+ * TikTok: `search_item_list`, and a cursor that is a count.
+ *
+ * `cursor` is the number of videos returned so far and `has_more` is `1` or
+ * `0` — a number where every other provider here sends a boolean. The cursor is
+ * only offered when `has_more` says there is more, because a cursor followed
+ * past the end buys an empty page and is billed for it.
+ */
+export const tikTokSearchShape: PageShape = {
+  recordsOf: (body) => arrayAt(body, "search_item_list"),
+  cursorOf: (body) => {
+    const more = body.has_more;
+    const hasMore = more === true || more === 1;
+    const cursor = body.cursor;
+
+    if (!hasMore) return undefined;
+    if (typeof cursor === "number" && Number.isFinite(cursor)) return String(cursor);
+
+    return textAt(body, "cursor");
+  },
+};
+
+/** TikTok comments: the same numeric cursor, under `comments`. */
+export const tikTokCommentsShape: PageShape = {
+  recordsOf: (body) => arrayAt(body, "comments"),
+  cursorOf: tikTokSearchShape.cursorOf,
+};
+
+/**
+ * YouTube: `videos`, and an opaque `continuationToken`.
+ *
+ * The answer also carries `channels`, `playlists`, `shorts`, `shelves` and
+ * `lives`, each in its own array. Reading only `videos` is what stops a channel
+ * being stored as a post, and it needs no filtering to do it.
+ */
+export const youTubeSearchShape: PageShape = {
+  recordsOf: (body) => arrayAt(body, "videos"),
+  cursorOf: (body) => textAt(body, "continuationToken"),
+};
 
 /**
  * Newest first, on both endpoints.
@@ -232,7 +330,7 @@ export class ScrapeCreatorsClient {
    * Only explicit content markers mean deletion. Captures are in deletion-fixtures.
    */
   async verify(request: VerificationRequest): Promise<VerificationResult> {
-    const answer = await this.call(`${apiBase}/post`, { url: request.url }, request.signal);
+    const answer = await this.call(endpoints.redditPost, { url: request.url }, request.signal);
     const body =
       typeof answer.body === "object" && answer.body !== null
         ? (answer.body as Record<string, unknown>)
@@ -261,9 +359,19 @@ export class ScrapeCreatorsClient {
     return { status: deleted ? "deleted" : "available", unitsConsumed };
   }
 
+  /**
+   * Fetch one page, reading it through the shape its endpoint was measured to
+   * have.
+   *
+   * The shape is an argument and not a default, so a new platform cannot
+   * quietly inherit Reddit's answer format. US-119 found `search_item_list`
+   * where this method used to look for `posts`, which would have parsed as an
+   * empty page: no error, no posts, one credit.
+   */
   async fetchPage(
     endpoint: string,
     params: Record<string, string>,
+    shape: PageShape,
     signal?: AbortSignal,
   ): Promise<Page> {
     const answer = await this.call(endpoint, params, signal);
@@ -275,11 +383,10 @@ export class ScrapeCreatorsClient {
         ? (answer.body as Record<string, unknown>)
         : {};
 
-    const records = Array.isArray(body.posts) ? body.posts : [];
-    const after = typeof body.after === "string" && body.after !== "" ? body.after : undefined;
+    const after = shape.cursorOf(body);
 
     return {
-      records,
+      records: shape.recordsOf(body),
       ...(after ? { after } : {}),
       creditsCharged: this.chargeOf(body),
     };

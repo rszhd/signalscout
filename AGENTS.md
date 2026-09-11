@@ -22,7 +22,8 @@ webhook.
 
 **Six platforms are fetched, through five providers, and a connector is the
 pair.** Reddit, X, LinkedIn, YouTube, TikTok and Instagram; Bright Data,
-ScrapeCreators, SocialCrawl, SocialData and Apify. A platform is what a person
+ScrapeCreators, SocialCrawl, SocialData and Apify. Reddit has three providers,
+and X, TikTok and YouTube have two each. A platform is what a person
 ticks and it keys `posts.source` and deduplication. A provider fetches, owns
 the key and sends the bill. The table of who fetches what, at what price and
 with what quirks, is in [docs/sources.md](docs/sources.md) — read it before

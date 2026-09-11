@@ -88,6 +88,14 @@
       "creditsCharged": 1,
       "creditsRemaining": 1776,
       "note": "existing captions only; use_ai_as_fallback is not sent"
+    },
+    {
+      "call": "search-page-whole",
+      "httpStatus": 200,
+      "elapsedMs": 4206,
+      "creditsCharged": 1,
+      "creditsRemaining": 1738,
+      "note": "a whole wire page, kept whole; the narrowest window keeps it small"
     }
   ]
 }

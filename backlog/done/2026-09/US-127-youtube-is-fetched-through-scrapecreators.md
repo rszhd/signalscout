@@ -6,7 +6,7 @@ priority: p2
 created: 2026-09-11T23:30+08:00
 parent:
 area:
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -66,30 +66,30 @@ spends its cap on nothing.
 
 ## Acceptance
 
-- [ ] A `youtube` connector on the `scrapecreators` provider is registered, and
+- [x] A `youtube` connector on the `scrapecreators` provider is registered, and
       the registry, the monitor form and the connections screen show YouTube as
       fetched by either provider
-- [ ] Every search sends `includeExtras=true` and `type=videos`, and a test
+- [x] Every search sends `includeExtras=true` and `type=videos`, and a test
       pins both. A test asserts that the stored timestamp comes from
       `publishDate` and never from `publishedTime`
-- [ ] The exact `since` cut is made on our side, against `publishDate`, and
+- [x] The exact `since` cut is made on our side, against `publishDate`, and
       paging never stops early because a page looks old. A test pins that the
       rule is absent
-- [ ] `uploadDate` is sent as the narrowest value covering `since`, and a test
+- [x] `uploadDate` is sent as the narrowest value covering `since`, and a test
       covers a video outside the window arriving inside the answer
-- [ ] The external id is the eleven-character video id, so a video collected
+- [x] The external id is the eleven-character video id, so a video collected
       through one provider is not stored again through the other. A test
       asserts it with both providers' fixtures
-- [ ] The classified text is the title and the description together, and a test
+- [x] The classified text is the title and the description together, and a test
       covers a video whose description is empty
-- [ ] `unitsConsumed` is the provider's own `credits_charged`, never a video
+- [x] `unitsConsumed` is the provider's own `credits_charged`, never a video
       count
-- [ ] `canFetchReplies` is false, with the reason written on the connector, or
+- [x] `canFetchReplies` is false, with the reason written on the connector, or
       a measurement in this ticket's Log says why it should be true
-- [ ] No transcript is fetched by the connector. If this ticket decides it
+- [x] No transcript is fetched by the connector. If this ticket decides it
       should be, the price is declared separately, the way
       `replyPricePerUnitMicros` already is
-- [ ] `pnpm test`, `pnpm lint` and `pnpm typecheck` pass, and no existing
+- [x] `pnpm test`, `pnpm lint` and `pnpm typecheck` pass, and no existing
       expected value moves
 
 ## Notes
@@ -105,3 +105,40 @@ spends its cap on nothing.
 ## Log
 
 - 2026-09-11T23:30+08:00 — Written on US-121's recommendation.
+
+- 2026-09-12T00:05+08:00 — **Built. YouTube has two providers.** 28 tests, and
+  the whole suite is 2,053 passing across 117 files.
+
+  The client work is US-126's and landed with it.
+
+  **`includeExtras=true` and `type=videos` are sent on every search**, and a
+  test pins both. The extras are what make this connector worth having: the
+  stored text is the title and the description together, and the test asserts
+  the median stored text is over 500 characters where the median title is under
+  200.
+
+  **The date test is the one to keep.** It reads the fixture rather than the
+  code: twenty videos carry one or two distinct times of day in `publishedTime`
+  and many more in `publishDate`, which is the evidence that the first is
+  arithmetic on "3 weeks ago" and the second is real. If that ever stops being
+  true, the reason for the extras has changed and this test says so.
+
+  **An approximate date survives the `since` cut.** When `publishDate` is
+  missing — which means the extras did not reach the call —
+  `postedAtIsApproximate` is set and the post is kept. US-034 settled the
+  direction: dropping a video because the provider was vague loses a lead
+  nobody can tell was lost, and keeping it costs one model call.
+
+  **`canFetchReplies` is false, and the reason is written on the connector.**
+  US-121 measured one comment across twenty videos and it was "nice video sir";
+  a comment here also has no permalink, no parent id, and a date derived from
+  relative text that no parameter corrects.
+  `socialcrawl/youtube.ts` fetches comments and stays the choice for a monitor
+  that wants them.
+
+  **No transcript is fetched**, though the endpoint works and is the largest
+  body of text this product could reach — 31,971 characters on one video. It
+  doubles the price of a collected post, and whether it makes a better match is
+  unmeasured. That is a ticket, not a default.
+
+  **What is not proven.** No poll has run through this connector.

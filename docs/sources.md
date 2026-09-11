@@ -175,12 +175,22 @@ question, not the count: before adding a provider for a platform, ask whether
 it can discover a stranger, and not only whether it can fetch a URL.
 
 **Three platforms were measured at a second provider on 2026-09-11**, after
-the owner asked for two everywhere: TikTok and YouTube are worth building at
-ScrapeCreators and have tickets, and Instagram is worth building there only if
-a Google-indexed index is acceptable as the *second* provider — the question
-US-055 answered no to when it was the *only* one. The evidence is in US-119,
-US-120 and US-121, and the capture scripts beside their fixtures re-ask
-everything.
+the owner asked for two everywhere. **TikTok and YouTube now have two
+providers** — US-119 and US-121 measured them, US-126 and US-127 built them.
+Instagram is worth building there only if a Google-indexed search is acceptable
+as the *second* provider, which is the question US-055 answered no to when it
+was the *only* one; the owner has not decided, so it still has one. The
+evidence is in US-119, US-120 and US-121, and the capture scripts beside their
+fixtures re-ask everything.
+
+**Two things the ScrapeCreators build settled that are worth reading before the
+next connector there.** A search on that provider does not answer "nothing" the
+same way twice: TikTok returns thirty unrelated videos and bills, YouTube
+returns an honest empty page and bills, and the Instagram reels search answers
+404 and charges nothing. And an invalid parameter *value* is ignored and billed
+rather than refused, so the technique below — let the provider name its own
+vocabulary for free — works on its Reddit endpoint and nowhere else on it. Its
+OpenAPI document is the free substitute.
 
 **LinkedIn is the opposite case, and the two must not be written down the same
 way.** US-028 used SocialCrawl because it already had the key and the provider
@@ -259,7 +269,7 @@ for the split:
 
 | | Bright Data | ScrapeCreators | SocialCrawl | SocialData | Apify |
 |---|---|---|---|---|---|
-| Fetches | Reddit | Reddit | Reddit, X, YouTube, TikTok, Instagram — and LinkedIn, switched off since US-053 | X | LinkedIn |
+| Fetches | Reddit | Reddit, TikTok, YouTube | Reddit, X, YouTube, TikTok, Instagram — and LinkedIn, switched off since US-053 | X | LinkedIn |
 | Billable unit | a record | a request | a credit: 1 on X, Reddit, YouTube and TikTok, 5 on LinkedIn and an Instagram comment page | a tweet | a post, settled from the run's own total |
 | Price | $1.50 / 1,000 records | $1.88 / 1,000 requests | $8.12 / 1,000 credits | $0.20 / 1,000 tweets | $2.00 / 1,000 posts |
 | One unit buys | one post | 7 to 23 posts, measured | 20 X posts, 25 Reddit posts, 45 YouTube videos, 30 reels — or 15 Instagram comments for five credits | one tweet | one post |

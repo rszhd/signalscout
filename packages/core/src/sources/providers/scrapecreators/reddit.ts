@@ -35,7 +35,13 @@ import type {
   VerificationResult,
 } from "../../types.js";
 import type { Page } from "./client.js";
-import { endpoints, ScrapeCreatorsClient, ScrapeCreatorsError, sortNewest } from "./client.js";
+import {
+  endpoints,
+  redditPageShape,
+  ScrapeCreatorsClient,
+  ScrapeCreatorsError,
+  sortNewest,
+} from "./client.js";
 import { scrapeCreatorsProvider } from "./provider.js";
 
 /**
@@ -311,6 +317,7 @@ export class ScrapeCreatorsRedditSource implements SocialSource {
       page = await client.fetchPage(
         input.endpoint,
         { ...input.params, ...(start.after ? { after: start.after } : {}) },
+        redditPageShape,
         request.signal,
       );
     } catch (error) {

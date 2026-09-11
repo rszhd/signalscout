@@ -673,6 +673,30 @@ if (wanted("relevant-window")) {
   if (wordiest) transcriptTargetUrl = String(wordiest.share_url).split("?")[0];
 }
 
+/**
+ * One whole page, kept whole, for the parser to be tested against.
+ *
+ * US-119 committed digests because a page of thirty raw TikTok videos is
+ * 1.8 MB. US-126 needs a real wire page: a parser tested against a digest is a
+ * parser tested against our own summary. The narrowest window is used, so the
+ * page is complete and small — a few videos rather than thirty. It is the same
+ * endpoint, the same parameters a connector sends, and nothing is removed
+ * except the signed media URLs every fixture here loses.
+ */
+if (wanted("whole-page")) {
+  const whole = await capture(
+    "search-page-whole",
+    endpoints.search,
+    { query: keyword, sort_by: "relevance", date_posted: "yesterday" },
+    {
+      note: "a whole wire page, kept whole; the narrowest window keeps it small",
+    },
+  );
+
+  describeOrder("search-page-whole", whole.body);
+  console.log(`  cursor ${JSON.stringify(whole.body?.cursor)}, has_more ${whole.body?.has_more}`);
+}
+
 /** A window narrower than the one above. Question 5. */
 if (wanted("window")) {
   const yesterday = await capture(

@@ -6,7 +6,7 @@ priority: p2
 created: 2026-09-11T22:40+08:00
 parent:
 area:
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -72,28 +72,28 @@ credit and returned null on all three videos asked. Do not fetch one per post.
 
 ## Acceptance
 
-- [ ] A `tiktok` connector on the `scrapecreators` provider is registered, and
+- [x] A `tiktok` connector on the `scrapecreators` provider is registered, and
       the registry, the monitor form and the connections screen show TikTok as
       fetched by either provider
-- [ ] The search sends `sort_by=relevance` and the narrowest `date_posted`
+- [x] The search sends `sort_by=relevance` and the narrowest `date_posted`
       window that covers `since`. A test covers each window boundary, and a
       test pins that `date-posted` ordering is never requested
-- [ ] The exact `since` cut is made on our side, and paging never stops early
+- [x] The exact `since` cut is made on our side, and paging never stops early
       because a page looks old. A test pins that the rule is absent
-- [ ] The external id is the numeric video id, so a video collected through one
+- [x] The external id is the numeric video id, so a video collected through one
       provider is not stored again through the other. A test asserts it with
       both providers' fixtures
-- [ ] A stored post URL has no query string, and a test covers a `share_url`
+- [x] A stored post URL has no query string, and a test covers a `share_url`
       that arrives with tracking on it
-- [ ] A page that repeats videos already collected is not an error, and the
+- [x] A page that repeats videos already collected is not an error, and the
       repeated videos are not stored twice
-- [ ] `unitsConsumed` is the provider's own `credits_charged`, never a video
+- [x] `unitsConsumed` is the provider's own `credits_charged`, never a video
       count
-- [ ] A comment's link is built by the shared `commentLink()`, and a
+- [x] A comment's link is built by the shared `commentLink()`, and a
       `share_info.url` that is present is not preferred over it without a
       measurement saying it should be
-- [ ] No transcript is fetched
-- [ ] `pnpm test`, `pnpm lint` and `pnpm typecheck` pass, and no existing
+- [x] No transcript is fetched
+- [x] `pnpm test`, `pnpm lint` and `pnpm typecheck` pass, and no existing
       expected value moves
 
 ## Notes
@@ -113,3 +113,56 @@ credit and returned null on all three videos asked. Do not fetch one per post.
 ## Log
 
 - 2026-09-11T22:40+08:00 — Written on US-119's recommendation.
+
+- 2026-09-12T00:05+08:00 — **Built. TikTok has two providers.** 34 tests, and
+  the whole suite is 2,053 passing across 117 files.
+
+  **The client became the provider's.** `apiBase` was
+  `https://api.scrapecreators.com/v1/reddit`; it is the host now, with the
+  platform a segment on each endpoint beside it. `fetchPage` no longer assumes
+  Reddit's answer: it takes a `PageShape` saying where the records and the
+  cursor are, and the shape is an argument rather than a default so a third
+  platform cannot inherit the wrong one by silence. Reddit returns `posts` with
+  an `after`, TikTok returns `search_item_list` with a numeric `cursor` beside a
+  numeric `has_more`, and YouTube returns `videos` with a `continuationToken`.
+  Had `fetchPage` kept its default, TikTok would have parsed as an empty page:
+  no error, no posts, one credit.
+
+  **The tests that matter are the ones that pin a measurement**, because every
+  one of them is a fact that cost money to learn and would cost money to
+  relearn:
+
+  * the search asks for `sort_by=relevance` and never for `date-posted`;
+  * the window is the narrowest that covers `since`, at every boundary;
+  * the early-stop rule is *absent*, asserted by a page entirely older than
+    `since` still handing back a cursor;
+  * a stored URL has no query string, and a `share_url` that arrives with
+    tracking is cleaned;
+  * a page repeating an earlier one is ordinary, not an error;
+  * a comment naming another post is dropped, which is BUG-007's rule and is
+    live here where it is inert on Instagram;
+  * a thread is `partial` whenever a comment claims replies we did not read —
+    the captured page's eleven comments claimed 4, 49, 22, 47, 10, 4, 12 and 1
+    between them.
+
+  **One captured page was added, for one credit.** The fixtures US-119 left were
+  digests plus one whole video, and a parser tested against a digest is a parser
+  tested against our own summary. `search-page-whole.json` is a real wire page,
+  taken with the narrowest window so that it is complete and 934 KB rather than
+  1.8 MB.
+
+  **One test failed and the input was wrong, not the code.** A record stripped
+  of `share_url` still parsed, because the parser falls back to
+  `share_info.share_url` — which the capture found beside it. The test now
+  removes both, and a second test pins the fallback, so the behaviour is
+  described rather than discovered again.
+
+  **`commentLink` is imported from the SocialCrawl connector rather than
+  copied.** The format belongs to TikTok: US-047 read it off a notification and
+  then opened one. Two providers building the same link two ways is how one of
+  them gets fixed and the other does not.
+
+  **What is not proven.** No poll has run through this connector. The suite
+  covers our half only, and there is no `live:` script for it yet — the rate
+  limit, a real provider outage, and what a full poll costs on a real monitor
+  are all open.

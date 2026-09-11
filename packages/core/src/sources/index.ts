@@ -56,6 +56,19 @@ export {
   toCandidatePost as toScrapeCreatorsCandidatePost,
 } from "./providers/scrapecreators/reddit.js";
 export {
+  cleanPostUrl as cleanTikTokPostUrl,
+  ScrapeCreatorsTikTokSource,
+  scrapeCreatorsTikTok,
+  toCandidatePost as toScrapeCreatorsTikTokCandidatePost,
+  windowFor as scrapeCreatorsTikTokWindowFor,
+} from "./providers/scrapecreators/tiktok.js";
+export {
+  ScrapeCreatorsYouTubeSource,
+  scrapeCreatorsYouTube,
+  toCandidatePost as toScrapeCreatorsYouTubeCandidatePost,
+  windowFor as scrapeCreatorsYouTubeWindowFor,
+} from "./providers/scrapecreators/youtube.js";
+export {
   SocialCrawlInstagramSource,
   socialCrawlInstagram,
   toCandidatePost as toSocialCrawlInstagramCandidatePost,
@@ -112,6 +125,8 @@ export { connectorIdPattern } from "./types.js";
 import { apifyLinkedIn } from "./providers/apify/linkedin.js";
 import { brightDataReddit } from "./providers/brightdata/reddit.js";
 import { scrapeCreatorsReddit } from "./providers/scrapecreators/reddit.js";
+import { scrapeCreatorsTikTok } from "./providers/scrapecreators/tiktok.js";
+import { scrapeCreatorsYouTube } from "./providers/scrapecreators/youtube.js";
 import { socialCrawlInstagram } from "./providers/socialcrawl/instagram.js";
 import { socialCrawlLinkedIn } from "./providers/socialcrawl/linkedin.js";
 import { socialCrawlReddit } from "./providers/socialcrawl/reddit.js";
@@ -156,6 +171,8 @@ export const builtInSources: readonly ConnectorDefinition[] = [
   socialCrawlLinkedIn,
   apifyLinkedIn,
   socialCrawlYouTube,
+  scrapeCreatorsYouTube,
   socialCrawlTikTok,
+  scrapeCreatorsTikTok,
   socialCrawlInstagram,
 ];

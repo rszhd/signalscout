@@ -2,7 +2,7 @@
 
 # Open tickets
 
-32 open — 14 doing, 17 todo, 1 parked (10 p1, 18 p2, 4 p3).
+30 open — 14 doing, 15 todo, 1 parked (10 p1, 16 p2, 4 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -32,8 +32,6 @@
 | p2 | US-062 | [A real model's drafts are replayed](todo/US-062-a-real-model-s-drafts-are-replayed.md) | chore | todo | 2026-09-07T20:30+08:00 |
 | p2 | US-099 | [A button, a field and a dialog are one component each](todo/US-099-a-button-a-field-and-a-dialog-are-one-component-each.md) | chore | todo | 2026-09-10T01:20+08:00 |
 | p2 | US-122 | [LinkedIn gets a second provider](todo/US-122-linkedin-gets-a-second-provider.md) | spike | todo | 2026-09-11T18:44+08:00 |
-| p2 | US-126 | [TikTok is fetched through ScrapeCreators](todo/US-126-tiktok-is-fetched-through-scrapecreators.md) | feature | todo | 2026-09-11T22:40+08:00 |
-| p2 | US-127 | [YouTube is fetched through ScrapeCreators](todo/US-127-youtube-is-fetched-through-scrapecreators.md) | feature | todo | 2026-09-11T23:30+08:00 |
 | p3 | US-018 | [A mutation sweep proves the suite is sensitive](todo/US-018-a-mutation-sweep-proves-the-suite-is-sensitive.md) | chore | todo | 2026-09-04T22:54+08:00 |
 | p3 | US-095 | [The logo travels with the email](todo/US-095-the-logo-travels-with-the-email.md) | feature | todo | 2026-09-10T00:36+08:00 |
 | p3 | BUG-013 | [A key row's error is printed inside a closed dialog](todo/BUG-013-a-key-row-s-error-is-printed-inside-a-closed-dialog.md) | bug | todo | 2026-09-09T11:58+08:00 |

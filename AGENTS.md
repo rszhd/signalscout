@@ -22,7 +22,8 @@ webhook.
 
 **Six platforms are fetched, through five providers, and a connector is the
 pair.** Reddit, X, LinkedIn, YouTube, TikTok and Instagram; Bright Data,
-ScrapeCreators, SocialCrawl, SocialData and Apify. A platform is what a person
+ScrapeCreators, SocialCrawl, SocialData and Apify. Reddit has three providers,
+and X, TikTok and YouTube have two each. A platform is what a person
 ticks and it keys `posts.source` and deduplication. A provider fetches, owns
 the key and sends the bill. The table of who fetches what, at what price and
 with what quirks, is in [docs/sources.md](docs/sources.md) — read it before
@@ -238,6 +239,8 @@ pnpm --filter @signalscout/core live:model-probe      # one call, a fraction of 
 pnpm --filter @signalscout/core live:provider-switch # spends ~$0.08
 pnpm --filter @signalscout/core live:linkedin-poll   # spends ~$0.08 + model
 pnpm --filter @signalscout/core live:x-poll          # spends ~$0.002 + model
+pnpm --filter @signalscout/core live:sc-tiktok-poll   # spends ~$0.004 + model
+pnpm --filter @signalscout/core live:sc-youtube-poll  # spends ~$0.004 + model
 pnpm --filter @signalscout/core live:apify-linkedin-poll # spends ~$0.05 + model
 pnpm --filter @signalscout/core live:tiktok-poll     # spends ~$0.20 + model
 pnpm --filter @signalscout/core live:tiktok-comments # spends model only
@@ -251,6 +254,9 @@ pnpm capture:deletions                            # spends ~$0.02
 
 node packages/core/src/sources/providers/socialcrawl/linkedin-fixtures/capture.mjs   # ~30 credits
 node packages/core/src/sources/providers/socialcrawl/instagram-fixtures/capture.mjs  # 24 credits, or 14 with --lean
+node packages/core/src/sources/providers/scrapecreators/tiktok-fixtures/capture.mjs   # 9 credits
+node packages/core/src/sources/providers/scrapecreators/youtube-fixtures/capture.mjs  # 8 credits
+node packages/core/src/sources/providers/scrapecreators/instagram-fixtures/capture.mjs # 6 credits
 ```
 
 Everything from `capture:` down spends real money, and every one of them is an

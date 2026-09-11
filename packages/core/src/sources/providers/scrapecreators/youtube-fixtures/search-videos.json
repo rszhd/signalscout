@@ -1,0 +1,433 @@
+{
+  "httpStatus": 200,
+  "body": {
+    "success": true,
+    "credits_remaining": 1760,
+    "credits_charged": 1,
+    "videos": [
+      {
+        "type": "video",
+        "id": "NA813hJOLXg",
+        "url": "https://www.youtube.com/watch?v=NA813hJOLXg",
+        "title": "Flaky Tests: How to Tell a Real Bug From a Guess (With AI)06 lesson flaky test autopsy WEB",
+        "thumbnail": "https://scrubbed.invalid/thumbnail.jpg",
+        "channel": {
+          "id": "yt-channel-1",
+          "title": "yt-channel-2",
+          "handle": "yt-channel-3",
+          "thumbnail": "https://scrubbed.invalid/thumbnail.jpg"
+        },
+        "viewCountText": "12 views",
+        "viewCountInt": 12,
+        "publishedTimeText": "2 weeks ago",
+        "publishedTime": "2026-08-28T14:53:04.097Z",
+        "lengthText": "10:15",
+        "lengthSeconds": 615,
+        "badges": []
+      },
+      {
+        "type": "video",
+        "id": "uaTZxO7LEUQ",
+        "url": "https://www.youtube.com/watch?v=uaTZxO7LEUQ",
+        "title": "Flaky Tests — Diagnose the Cause Before Adding Retries",
+        "thumbnail": "https://scrubbed.invalid/thumbnail.jpg",
+        "channel": {
+          "id": "yt-channel-4",
+          "title": "yt-channel-5",
+          "handle": "yt-channel-6",
+          "thumbnail": "https://scrubbed.invalid/thumbnail.jpg"
+        },
+        "viewCountText": "5 views",
+        "viewCountInt": 5,
+        "publishedTimeText": "7 days ago",
+        "publishedTime": "2026-09-04T14:53:04.097Z",
+        "lengthText": "3:56",
+        "lengthSeconds": 236,
+        "badges": []
+      },
+      {
+        "type": "video",
+        "id": "9YYsyUaVyTg",
+        "url": "https://www.youtube.com/watch?v=9YYsyUaVyTg",
+        "title": "How to decide between retrying, quarantining, and fixing a flaky test",
+        "thumbnail": "https://scrubbed.invalid/thumbnail.jpg",
+        "channel": {
+          "id": "yt-channel-7",
+          "title": "yt-channel-8",
+          "handle": "yt-channel-8",
+          "thumbnail": "https://scrubbed.invalid/thumbnail.jpg"
+        },
+        "viewCountText": "16 views",
+        "viewCountInt": 16,
+        "publishedTimeText": "2 days ago",
+        "publishedTime": "2026-09-09T14:53:04.097Z",
+        "lengthText": "5:11",
+        "lengthSeconds": 311,
+        "badges": [
+          "New"
+        ]
+      },
+      {
+        "type": "video",
+        "id": "rfalV3mP7R0",
+        "url": "https://www.youtube.com/watch?v=rfalV3mP7R0",
+        "title": "FlakeSync: Automatically RepairingAsync Flaky Tests | Research Paper Deconstructed",
+        "thumbnail": "https://scrubbed.invalid/thumbnail.jpg",
+        "channel": {
+          "id": "yt-channel-9",
+          "title": "yt-channel-10",
+          "handle": "yt-channel-11",
+          "thumbnail": "https://scrubbed.invalid/thumbnail.jpg"
+        },
+        "viewCountText": "481 views",
+        "viewCountInt": 481,
+        "publishedTimeText": "3 weeks ago",
+        "publishedTime": "2026-08-21T14:53:04.097Z",
+        "lengthText": "27:09",
+        "lengthSeconds": 1629,
+        "badges": [
+          "4K"
+        ]
+      },
+      {
+        "type": "video",
+        "id": "cha91snibHk",
+        "url": "https://www.youtube.com/watch?v=cha91snibHk",
+        "title": "Flaky, Fragile, and Forgotten: The Fall of a Test Automation Project",
+        "thumbnail": "https://scrubbed.invalid/thumbnail.jpg",
+        "channel": {
+          "id": "yt-channel-12",
+          "title": "yt-channel-13",
+          "handle": "yt-channel-14",
+          "thumbnail": "https://scrubbed.invalid/thumbnail.jpg"
+        },
+        "viewCountText": "64 views",
+        "viewCountInt": 64,
+        "publishedTimeText": "9 days ago",
+        "publishedTime": "2026-09-02T14:53:04.097Z",
+        "lengthText": "46:18",
+        "lengthSeconds": 2778,
+        "badges": []
+      },
+      {
+        "type": "video",
+        "id": "fSr0QCEB8uE",
+        "url": "https://www.youtube.com/watch?v=fSr0QCEB8uE",
+        "title": "Playwright Retries and Repeat Tests Tutorial | Handle Flaky Tests Easily",
+        "thumbnail": "https://scrubbed.invalid/thumbnail.jpg",
+        "channel": {
+          "id": "yt-channel-15",
+          "title": "yt-channel-16",
+          "handle": "yt-channel-17",
+          "thumbnail": "https://scrubbed.invalid/thumbnail.jpg"
+        },
+        "viewCountText": "94 views",
+        "viewCountInt": 94,
+        "publishedTimeText": "3 weeks ago",
+        "publishedTime": "2026-08-21T14:53:04.097Z",
+        "lengthText": "11:24",
+        "lengthSeconds": 684,
+        "badges": []
+      },
+      {
+        "type": "video",
+        "id": "BkgP73weju8",
+        "url": "https://www.youtube.com/watch?v=BkgP73weju8",
+        "title": "How to run Playwright tests in parallel without increasing flakiness",
+        "thumbnail": "https://scrubbed.invalid/thumbnail.jpg",
+        "channel": {
+          "id": "yt-channel-7",
+          "title": "yt-channel-8",
+          "handle": "yt-channel-8",
+          "thumbnail": "https://scrubbed.invalid/thumbnail.jpg"
+        },
+        "viewCountText": "20 views",
+        "viewCountInt": 20,
+        "publishedTimeText": "2 days ago",
+        "publishedTime": "2026-09-09T14:53:04.097Z",
+        "lengthText": "2:03",
+        "lengthSeconds": 123,
+        "badges": [
+          "New"
+        ]
+      },
+      {
+        "type": "video",
+        "id": "D8G_Wb0dVPU",
+        "url": "https://www.youtube.com/watch?v=D8G_Wb0dVPU",
+        "title": "Cursor Cloud Agents: Fix Flaky Tests in 10 Minutes",
+        "thumbnail": "https://scrubbed.invalid/thumbnail.jpg",
+        "channel": {
+          "id": "yt-channel-18",
+          "title": "yt-channel-19",
+          "handle": "yt-channel-20",
+          "thumbnail": "https://scrubbed.invalid/thumbnail.jpg"
+        },
+        "viewCountText": "7 views",
+        "viewCountInt": 7,
+        "publishedTimeText": "4 days ago",
+        "publishedTime": "2026-09-07T14:53:04.097Z",
+        "lengthText": "5:57",
+        "lengthSeconds": 357,
+        "badges": [
+          "New"
+        ]
+      },
+      {
+        "type": "video",
+        "id": "zdf8US9rey8",
+        "url": "https://www.youtube.com/watch?v=zdf8US9rey8",
+        "title": "Flaky Test Detective — Evidence-Driven CI Reliability | Ready, Spec, Ship Hackathon",
+        "thumbnail": "https://scrubbed.invalid/thumbnail.jpg",
+        "channel": {
+          "id": "yt-channel-21",
+          "title": "yt-channel-22",
+          "handle": "yt-channel-23",
+          "thumbnail": "https://scrubbed.invalid/thumbnail.jpg"
+        },
+        "viewCountText": "9 views",
+        "viewCountInt": 9,
+        "publishedTimeText": "2 weeks ago",
+        "publishedTime": "2026-08-28T14:53:04.097Z",
+        "lengthText": "3:59",
+        "lengthSeconds": 239,
+        "badges": []
+      },
+      {
+        "type": "video",
+        "id": "-PgAjzQWXEI",
+        "url": "https://www.youtube.com/watch?v=-PgAjzQWXEI",
+        "title": "FlakeWarden: Agentic Flaky-Test Triage on UiPath Test Cloud (AgentHack 2026 Winner)",
+        "thumbnail": "https://scrubbed.invalid/thumbnail.jpg",
+        "channel": {
+          "id": "yt-channel-24",
+          "title": "yt-channel-25",
+          "handle": "yt-channel-26",
+          "thumbnail": "https://scrubbed.invalid/thumbnail.jpg"
+        },
+        "viewCountText": "32 views",
+        "viewCountInt": 32,
+        "publishedTimeText": "9 days ago",
+        "publishedTime": "2026-09-02T14:53:04.097Z",
+        "lengthText": "1:46",
+        "lengthSeconds": 106,
+        "badges": []
+      },
+      {
+        "type": "video",
+        "id": "rkoeqMt3cDk",
+        "url": "https://www.youtube.com/watch?v=rkoeqMt3cDk",
+        "title": "ChronoTrace — an AI agent that isn't allowed to cheat at fixing flaky tests",
+        "thumbnail": "https://scrubbed.invalid/thumbnail.jpg",
+        "channel": {
+          "id": "yt-channel-27",
+          "title": "yt-channel-28",
+          "handle": "yt-channel-29",
+          "thumbnail": "https://scrubbed.invalid/thumbnail.jpg"
+        },
+        "viewCountText": "3 views",
+        "viewCountInt": 3,
+        "publishedTimeText": "1 day ago",
+        "publishedTime": "2026-09-10T14:53:04.097Z",
+        "lengthText": "4:48",
+        "lengthSeconds": 288,
+        "badges": [
+          "New"
+        ]
+      },
+      {
+        "type": "video",
+        "id": "UIzNk5-F9HY",
+        "url": "https://www.youtube.com/watch?v=UIzNk5-F9HY",
+        "title": "Debug Flaky Hardware Tests Without Hiding Real Bugs",
+        "thumbnail": "https://scrubbed.invalid/thumbnail.jpg",
+        "channel": {
+          "id": "yt-channel-4",
+          "title": "yt-channel-5",
+          "handle": "yt-channel-6",
+          "thumbnail": "https://scrubbed.invalid/thumbnail.jpg"
+        },
+        "viewCountText": "5 views",
+        "viewCountInt": 5,
+        "publishedTimeText": "7 days ago",
+        "publishedTime": "2026-09-04T14:53:04.097Z",
+        "lengthText": "3:49",
+        "lengthSeconds": 229,
+        "badges": [
+          "CC"
+        ]
+      },
+      {
+        "type": "video",
+        "id": "miOobGEf79w",
+        "url": "https://www.youtube.com/watch?v=miOobGEf79w",
+        "title": "What Is Playwright? It is the ULTIMATE Software Test Automation Tool",
+        "thumbnail": "https://scrubbed.invalid/thumbnail.jpg",
+        "channel": {
+          "id": "yt-channel-30",
+          "title": "yt-channel-31",
+          "handle": "yt-channel-32",
+          "thumbnail": "https://scrubbed.invalid/thumbnail.jpg"
+        },
+        "viewCountText": "92 views",
+        "viewCountInt": 92,
+        "publishedTimeText": "2 days ago",
+        "publishedTime": "2026-09-09T14:53:04.097Z",
+        "lengthText": "9:23",
+        "lengthSeconds": 563,
+        "badges": [
+          "New"
+        ]
+      },
+      {
+        "type": "video",
+        "id": "4waRBxVlEgs",
+        "url": "https://www.youtube.com/watch?v=4waRBxVlEgs",
+        "title": "Flaky Tests",
+        "thumbnail": "https://scrubbed.invalid/thumbnail.jpg",
+        "channel": {
+          "id": "yt-channel-33",
+          "title": "yt-channel-34",
+          "handle": "yt-channel-35",
+          "thumbnail": "https://scrubbed.invalid/thumbnail.jpg"
+        },
+        "viewCountText": "11 views",
+        "viewCountInt": 11,
+        "publishedTimeText": "3 weeks ago",
+        "publishedTime": "2026-08-21T14:53:04.097Z",
+        "lengthText": "7:42",
+        "lengthSeconds": 462,
+        "badges": []
+      },
+      {
+        "type": "video",
+        "id": "F_FlvEgiLp0",
+        "url": "https://www.youtube.com/watch?v=F_FlvEgiLp0",
+        "title": "Stop Flaky Tests! How to Handle Dynamic Locators in Playwright",
+        "thumbnail": "https://scrubbed.invalid/thumbnail.jpg",
+        "channel": {
+          "id": "yt-channel-36",
+          "title": "yt-channel-37",
+          "handle": "yt-channel-38",
+          "thumbnail": "https://scrubbed.invalid/thumbnail.jpg"
+        },
+        "viewCountText": "7 views",
+        "viewCountInt": 7,
+        "publishedTimeText": "3 weeks ago",
+        "publishedTime": "2026-08-21T14:53:04.097Z",
+        "lengthText": "4:25",
+        "lengthSeconds": 265,
+        "badges": []
+      },
+      {
+        "type": "video",
+        "id": "ioP4UM7oLKI",
+        "url": "https://www.youtube.com/watch?v=ioP4UM7oLKI",
+        "title": "Module 18: Testing - Confidence, Not Coverage",
+        "thumbnail": "https://scrubbed.invalid/thumbnail.jpg",
+        "channel": {
+          "id": "yt-channel-39",
+          "title": "yt-channel-40",
+          "handle": "yt-channel-41",
+          "thumbnail": "https://scrubbed.invalid/thumbnail.jpg"
+        },
+        "viewCountText": "3 views",
+        "viewCountInt": 3,
+        "publishedTimeText": "2 weeks ago",
+        "publishedTime": "2026-08-28T14:53:04.097Z",
+        "lengthText": "1:09",
+        "lengthSeconds": 69,
+        "badges": []
+      },
+      {
+        "type": "video",
+        "id": "8ARQn0QKezk",
+        "url": "https://www.youtube.com/watch?v=8ARQn0QKezk",
+        "title": "Stop Delegating QA to AI: Train Agents to Run Real Exploratory Tests",
+        "thumbnail": "https://scrubbed.invalid/thumbnail.jpg",
+        "channel": {
+          "id": "yt-channel-42",
+          "title": "yt-channel-43",
+          "handle": "yt-channel-44",
+          "thumbnail": "https://scrubbed.invalid/thumbnail.jpg"
+        },
+        "viewCountText": "1,722 views",
+        "viewCountInt": 1722,
+        "publishedTimeText": "4 days ago",
+        "publishedTime": "2026-09-07T14:53:04.097Z",
+        "lengthText": "11:55",
+        "lengthSeconds": 715,
+        "badges": [
+          "New",
+          "CC"
+        ]
+      },
+      {
+        "type": "video",
+        "id": "deYsbWAvEp4",
+        "url": "https://www.youtube.com/watch?v=deYsbWAvEp4",
+        "title": "A Test Automation Dashboard That Tells You What to Fix",
+        "thumbnail": "https://scrubbed.invalid/thumbnail.jpg",
+        "channel": {
+          "id": "yt-channel-45",
+          "title": "yt-channel-46",
+          "handle": "yt-channel-46",
+          "thumbnail": "https://scrubbed.invalid/thumbnail.jpg"
+        },
+        "viewCountText": "8 views",
+        "viewCountInt": 8,
+        "publishedTimeText": "3 weeks ago",
+        "publishedTime": "2026-08-21T14:53:04.097Z",
+        "lengthText": "0:21",
+        "lengthSeconds": 21,
+        "badges": []
+      },
+      {
+        "type": "video",
+        "id": "MWFoBvQC5Xo",
+        "url": "https://www.youtube.com/watch?v=MWFoBvQC5Xo",
+        "title": "Red Test Suite to Green: Flaky Ordering, Datetime Bugs, 96s Runtime (Pluely, Codestral 2508)",
+        "thumbnail": "https://scrubbed.invalid/thumbnail.jpg",
+        "channel": {
+          "id": "yt-channel-47",
+          "title": "yt-channel-48",
+          "handle": "yt-channel-48",
+          "thumbnail": "https://scrubbed.invalid/thumbnail.jpg"
+        },
+        "viewCountText": "99 views",
+        "viewCountInt": 99,
+        "publishedTimeText": "9 days ago",
+        "publishedTime": "2026-09-02T14:53:04.097Z",
+        "lengthText": "1:18",
+        "lengthSeconds": 78,
+        "badges": []
+      },
+      {
+        "type": "video",
+        "id": "45XQ4-phdCE",
+        "url": "https://www.youtube.com/watch?v=45XQ4-phdCE",
+        "title": "How I Built a Zero-Hallucination AI Agent for Flaky CI Tests | FlakyGuard Demo",
+        "thumbnail": "https://scrubbed.invalid/thumbnail.jpg",
+        "channel": {
+          "id": "yt-channel-49",
+          "title": "yt-channel-50",
+          "handle": "yt-channel-51",
+          "thumbnail": "https://scrubbed.invalid/thumbnail.jpg"
+        },
+        "viewCountText": "23 views",
+        "viewCountInt": 23,
+        "publishedTimeText": "11 days ago",
+        "publishedTime": "2026-08-31T14:53:04.097Z",
+        "lengthText": "2:32",
+        "lengthSeconds": 152,
+        "badges": []
+      }
+    ],
+    "channels": [],
+    "playlists": [],
+    "shorts": [],
+    "shelves": [],
+    "lives": [],
+    "continuationToken": "Ep8DEgtmbGFreSB0ZXN0cxqMA0VnUUlCQkFCU0JTQ0FRdE9RVGd4TTJoS1QweFlaNElCQzNWaFZGcDRUemRNUlZWUmdnRUxPVmxaYzNsVllWWjVWR2VDQVF0eVptRnNWak50VURkU01JSUJDMk5vWVRreGMyNXBZa2hyZ2dFTFpsTnlNRkZEUlVJNGRVV0NBUXRDYTJkUU56TjNaV3AxT0lJQkMwUTRSMTlYWWpCa1ZsQlZnZ0VMZW1SbU9GVlRPWEpsZVRpQ0FRc3RVR2RCYW5wUlYxaEZTWUlCQzNKcmIyVnhUWFF6WTBScmdnRUxWVWw2VG1zMUxVWTVTRm1DQVF0dGFVOXZZa2RGWmpjNWQ0SUJDelIzWVZKQ2VGWnNSV2R6Z2dFTFJsOUdiSFpGWjJsTWNEQ0NBUXRwYjFBMFZVMDNiMHhMU1lJQkN6aEJVbEZ1TUZGTFpYcHJnZ0VMWkdWWmMySlhRWFpGY0RTQ0FRdE5WMFp2UW5aUlF6VlliNElCQ3pRMVdGRTBMWEJvWkVORnNnRUdDZ1FJRkJBQ6ACBBiB4OgYIgtzZWFyY2gtZmVlZA%3D%3D"
+  }
+}

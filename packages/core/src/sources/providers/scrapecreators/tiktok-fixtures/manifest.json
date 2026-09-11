@@ -1,0 +1,150 @@
+{
+  "capturedBy": "packages/core/src/sources/providers/scrapecreators/tiktok-fixtures/capture.mjs",
+  "provider": "ScrapeCreators, TikTok API v1",
+  "note": "Author identity is replaced with stable pseudonyms, and the handle inside a post URL is replaced with the same one. Everything else is whole.",
+  "fixtures": [
+    {
+      "file": "comments-page-1.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v1/tiktok/video/comments?url=https%3A%2F%2Fwww.tiktok.com%2F%40tiktoker-13%2Fvideo%2F7682751263435525398%3F_r%3D1%26u_code%3Df011h343e23g2m%26preview_pb%3D0%26sharer_language%3Den%26_d%3Df15732jmf1454g%26share_item_id%3D7682751263435525398%26source%3Dh5_m",
+        "note": "the first page of comments on the newest video the search returned"
+      },
+      "capturedAt": "2026-09-11T14:37:39.608Z",
+      "identitiesReplaced": 47,
+      "bytes": 38531
+    },
+    {
+      "file": "credentials-accepted.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v1/tiktok/search/keyword?",
+        "note": "a working key with no query: refused on the input, not on the key"
+      },
+      "capturedAt": "2026-09-11T14:36:40.677Z",
+      "identitiesReplaced": 0,
+      "bytes": 220
+    },
+    {
+      "file": "credentials-rejected.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v1/tiktok/search/keyword?query=flaky+tests",
+        "note": "sent with a deliberately invalid key"
+      },
+      "capturedAt": "2026-09-11T14:36:39.901Z",
+      "identitiesReplaced": 0,
+      "bytes": 96
+    },
+    {
+      "file": "search-newest-digest.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v1/tiktok/search/keyword?query=flaky+tests&sort_by=date-posted&date_posted=this-month",
+        "note": "sorted by date, this month: the shape a monitor needs"
+      },
+      "capturedAt": "2026-09-11T14:36:50.084Z",
+      "identitiesReplaced": 28,
+      "bytes": 19459
+    },
+    {
+      "file": "search-newest-page-2-digest.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v1/tiktok/search/keyword?query=flaky+tests&sort_by=date-posted&date_posted=this-month&cursor=30",
+        "note": "followed the cursor 30 from search-newest-digest.json"
+      },
+      "capturedAt": "2026-09-11T14:36:56.915Z",
+      "identitiesReplaced": 26,
+      "bytes": 19864
+    },
+    {
+      "file": "search-no-results-digest.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v1/tiktok/search/keyword?query=zqxjkv+wobblefish+intentwatch+nonexistent+phrase&sort_by=date-posted",
+        "note": "a phrase that cannot occur; the ledger says what it cost"
+      },
+      "capturedAt": "2026-09-11T14:37:27.875Z",
+      "identitiesReplaced": 31,
+      "bytes": 20496
+    },
+    {
+      "file": "search-page-whole.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v1/tiktok/search/keyword?query=flaky+tests&sort_by=relevance&date_posted=yesterday",
+        "note": "a whole wire page, kept whole; the narrowest window keeps it small"
+      },
+      "capturedAt": "2026-09-11T15:35:40.046Z",
+      "identitiesReplaced": 71,
+      "bytes": 956136
+    },
+    {
+      "file": "search-relevance-digest.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v1/tiktok/search/keyword?query=flaky+tests&sort_by=relevance",
+        "note": "the default sort, for comparison with the dated one"
+      },
+      "capturedAt": "2026-09-11T14:37:06.789Z",
+      "identitiesReplaced": 36,
+      "bytes": 20373
+    },
+    {
+      "file": "search-relevance-this-month-digest.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v1/tiktok/search/keyword?query=flaky+tests&sort_by=relevance&date_posted=this-month",
+        "note": "relevance ranking inside the window a monitor would ask for"
+      },
+      "capturedAt": "2026-09-11T14:37:15.378Z",
+      "identitiesReplaced": 34,
+      "bytes": 25028
+    },
+    {
+      "file": "search-unknown-parameter-digest.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v1/tiktok/search/keyword?query=flaky+tests&sort=banana",
+        "note": "an invented parameter: ignored, answered normally, and billed"
+      },
+      "capturedAt": "2026-09-11T14:37:38.603Z",
+      "identitiesReplaced": 29,
+      "bytes": 19266
+    },
+    {
+      "file": "search-window-yesterday-digest.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v1/tiktok/search/keyword?query=flaky+tests&sort_by=date-posted&date_posted=yesterday",
+        "note": "the narrowest window the provider documents"
+      },
+      "capturedAt": "2026-09-11T14:37:19.664Z",
+      "identitiesReplaced": 7,
+      "bytes": 4896
+    },
+    {
+      "file": "transcript.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v1/tiktok/video/transcript?url=https%3A%2F%2Fwww.tiktok.com%2F%40tiktoker-1%2Fvideo%2F7683587543270427912",
+        "note": "existing captions only; use_ai_as_fallback is not sent"
+      },
+      "capturedAt": "2026-09-11T14:37:40.732Z",
+      "identitiesReplaced": 1,
+      "bytes": 250
+    },
+    {
+      "file": "video-whole.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v1/tiktok/search/keyword?query=flaky+tests&sort_by=date-posted&date_posted=this-month",
+        "note": "the first video of search-newest, kept whole because a page of thirty is 1.8 MB"
+      },
+      "capturedAt": "2026-09-11T14:36:50.086Z",
+      "identitiesReplaced": 5,
+      "bytes": 47359
+    }
+  ]
+}

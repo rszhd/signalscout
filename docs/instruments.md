@@ -184,3 +184,50 @@ It retains whole provider responses with author identity scrubbed. The default
 run asks both providers; `--comments` probes ScrapeCreators' alternate endpoint.
 It writes fixture files and a request manifest, never application rows. Read
 docs/deletions.md for what each provider has and has not proved.
+
+The ScrapeCreators TikTok capture is run by hand with a key, like the Instagram
+and LinkedIn ones. It answers the ten questions US-119 asks and spends 9
+credits, about $0.017. Two of its calls are free and are worth knowing about
+before you spend anything here: a key with no query answers 400 and charges
+nothing, and a malformed video URL is refused the same way. What is **not**
+free on this provider is an invalid parameter value — `?sort=banana` is ignored
+and the page is billed in full, so the technique that makes its Reddit endpoint
+list its own vocabulary does not work here. Read
+`https://docs.scrapecreators.com/openapi.json` instead, at no cost.
+
+It writes one whole video and a digest per search page rather than whole pages,
+because this provider returns raw TikTok and a page of thirty is 1.8 MB. The
+script says why, beside `digestOf`.
+
+The ScrapeCreators YouTube capture is the same shape and spends 8 credits. Its
+fixtures are stored whole, unlike the TikTok ones, because this endpoint
+answers in a shape the provider designed and a page of twenty videos is 15 KB.
+Two of its calls answer questions that cost money to get wrong: `includeExtras`
+is what turns a 68-character title into a 1,400-character description **and**
+what replaces a computed `publishedTime` with the real `publishDate`, and the
+transcript endpoint charges a credit a video and returns thousands of
+characters where TikTok's returns null. Run it when a YouTube connector is
+written, and read `docs/sources.md` before trusting `uploadDate` — it narrows
+and it leaks.
+
+The ScrapeCreators Instagram capture asks two endpoints rather than one,
+because this platform's two candidates fail in opposite directions: Instagram's
+own topic page returns no date on any post, and the reels search returns
+everything a monitor needs through Google's index. It spends 6 credits. Three
+of its calls are free — a search matching nothing answers 404 and charges 0, a
+page past the documented last one answers 400 and charges 0, and so does a key
+with no query — so on this platform a bad query costs nothing.
+
+One lesson from the YouTube and Instagram captures together, because each paid
+to learn it: **read `comment_count` before asking for comments.** Both scripts
+first asked the first result in the page, got an empty comment page, billed for
+it, and in YouTube's case spent three more credits suspecting a parameter that
+was innocent. The count is in the search answer.
+
+`live:sc-tiktok-poll` and `live:sc-youtube-poll` are `live-poll.ts` aimed at the
+second provider for each of those platforms, the way `live:apify-linkedin-poll`
+already is. Each spends 2 ScrapeCreators credits — about $0.004, the cheapest
+live poll in this list — plus one model call per post that survives the
+pre-filter, which is the part that costs. Run one after changing either
+connector, and read `api_usage` afterwards: the run is only evidence if the row
+it wrote is priced by the connector rather than by an assumption.

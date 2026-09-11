@@ -30,6 +30,8 @@
     "live:linkedin-poll": "tsx --env-file-if-exists=../../.env src/sources/live-poll.ts --platform=linkedin",
     "live:apify-linkedin-poll": "tsx --env-file-if-exists=../../.env src/sources/live-poll.ts --platform=linkedin --provider=apify",
     "live:x-poll": "tsx --env-file-if-exists=../../.env src/sources/live-poll.ts --platform=x --provider=socialdata",
+    "live:sc-tiktok-poll": "tsx --env-file-if-exists=../../.env src/sources/live-poll.ts --platform=tiktok --provider=scrapecreators",
+    "live:sc-youtube-poll": "tsx --env-file-if-exists=../../.env src/sources/live-poll.ts --platform=youtube --provider=scrapecreators",
     "live:reddit-replies": "tsx --env-file-if-exists=../../.env src/sources/live-reddit-replies-poll.ts",
     "live:reddit-replies-finish": "tsx --env-file-if-exists=../../.env src/sources/live-reddit-replies-finish.ts",
     "live:youtube-poll": "tsx --env-file-if-exists=../../.env src/sources/live-youtube-poll.ts",

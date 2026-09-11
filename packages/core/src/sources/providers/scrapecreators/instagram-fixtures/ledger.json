@@ -1,0 +1,85 @@
+{
+  "note": "What each captured call cost, in the provider's own numbers.",
+  "calls": [
+    {
+      "call": "credentials-rejected",
+      "httpStatus": 401,
+      "elapsedMs": 1275,
+      "creditsCharged": null,
+      "creditsRemaining": null,
+      "note": "sent with a deliberately invalid key"
+    },
+    {
+      "call": "credentials-accepted",
+      "httpStatus": 400,
+      "elapsedMs": 656,
+      "creditsCharged": 0,
+      "creditsRemaining": 1751,
+      "note": "a working key with no query: refused on the input, not on the key"
+    },
+    {
+      "call": "popular-page-1",
+      "httpStatus": 200,
+      "elapsedMs": 2634,
+      "creditsCharged": 1,
+      "creditsRemaining": 1750,
+      "note": "Instagram's own topic page: no Google in the path"
+    },
+    {
+      "call": "popular-page-2",
+      "httpStatus": 200,
+      "elapsedMs": 1559,
+      "creditsCharged": 1,
+      "creditsRemaining": 1749,
+      "note": "followed the cursor from popular-page-1.json"
+    },
+    {
+      "call": "reels-no-window",
+      "httpStatus": 200,
+      "elapsedMs": 4813,
+      "creditsCharged": 1,
+      "creditsRemaining": 1746,
+      "note": "no date window: US-049 found five years of posts on the other provider"
+    },
+    {
+      "call": "reels-no-results",
+      "httpStatus": 404,
+      "elapsedMs": 2463,
+      "creditsCharged": 0,
+      "creditsRemaining": 1746,
+      "note": "a phrase that cannot occur; the ledger says what it cost"
+    },
+    {
+      "call": "reels-page-12",
+      "httpStatus": 400,
+      "elapsedMs": 709,
+      "creditsCharged": 0,
+      "creditsRemaining": 1746,
+      "note": "one page past the documented last one"
+    },
+    {
+      "call": "reels-window",
+      "httpStatus": 200,
+      "elapsedMs": 7218,
+      "creditsCharged": 1,
+      "creditsRemaining": 1741,
+      "note": "Google-indexed, inside a month"
+    },
+    {
+      "call": "reels-page-2",
+      "httpStatus": 200,
+      "elapsedMs": 4504,
+      "creditsCharged": 1,
+      "creditsRemaining": 1740,
+      "note": "followed next_page 2 from reels-window.json"
+    },
+    {
+      "call": "comments-page-1",
+      "httpStatus": 200,
+      "elapsedMs": 3295,
+      "creditsCharged": 1,
+      "creditsRemaining": 1739,
+      "note": "the paid comment endpoint, without include_replies"
+    }
+  ]
+}

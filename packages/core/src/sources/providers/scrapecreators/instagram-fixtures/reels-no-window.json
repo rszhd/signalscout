@@ -1,0 +1,1052 @@
+{
+  "httpStatus": 200,
+  "body": {
+    "success": true,
+    "credits_remaining": 1746,
+    "credits_charged": 1,
+    "reels": [
+      {
+        "id": "3917602056923715956",
+        "__typename": "XDTGraphVideo",
+        "shortcode": "DZeHlB-Rxl0",
+        "url": "https://www.instagram.com/reel/DZeHlB-Rxl0/",
+        "caption": "How to handle flaky tests? ✍️",
+        "thumbnail_src": "https://scrubbed.invalid/media-url-expired.bin",
+        "display_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "video_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "has_audio": true,
+        "product_type": "clips",
+        "video_duration": null,
+        "clips_music_attribution_info": null,
+        "is_video": true,
+        "owner": {
+          "id": "instagrammer-1",
+          "username": "instagrammer-2",
+          "is_verified": true,
+          "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+          "full_name": "instagrammer-3"
+        },
+        "taken_at": "2026-06-12T03:27:08.000Z",
+        "is_ad": false,
+        "like_count": 440,
+        "is_paid_partnership": false,
+        "location": {
+          "__typename": "XDTLocationDict",
+          "pk": 292718897556089,
+          "lat": 12.9713525,
+          "lng": 80.151595,
+          "name": "Chennai,Tamilnadu",
+          "profile_pic_url": null
+        },
+        "comment_count": 30,
+        "comments": [
+          {
+            "id": "18181416034395858",
+            "text": "🙌",
+            "owner": {
+              "id": "instagrammer-4",
+              "username": "instagrammer-5",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-06-16T03:26:16.000Z"
+          },
+          {
+            "id": "18095884931217023",
+            "text": "Yes",
+            "owner": {
+              "id": "instagrammer-6",
+              "username": "instagrammer-7",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-06-14T09:39:03.000Z"
+          },
+          {
+            "id": "18125088055571977",
+            "text": "Yes",
+            "owner": {
+              "id": "instagrammer-8",
+              "username": "instagrammer-9",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-06-14T04:05:02.000Z"
+          },
+          {
+            "id": "17892236880537408",
+            "text": "What is flaky test",
+            "owner": {
+              "id": "instagrammer-10",
+              "username": "instagrammer-11",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-06-13T11:58:51.000Z"
+          },
+          {
+            "id": "18418811965182886",
+            "text": "Link in Bio 📌",
+            "owner": {
+              "id": "instagrammer-1",
+              "username": "instagrammer-2",
+              "is_verified": true,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-06-13T05:38:46.000Z"
+          },
+          {
+            "id": "17934919911272563",
+            "text": "Java",
+            "owner": {
+              "id": "instagrammer-12",
+              "username": "instagrammer-13",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-06-13T01:26:22.000Z"
+          },
+          {
+            "id": "18128491261548087",
+            "text": "Java",
+            "owner": {
+              "id": "instagrammer-14",
+              "username": "instagrammer-15",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-06-12T17:58:48.000Z"
+          },
+          {
+            "id": "18101842490026469",
+            "text": "Java",
+            "owner": {
+              "id": "instagrammer-16",
+              "username": "instagrammer-17",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-06-12T17:52:01.000Z"
+          },
+          {
+            "id": "18068294897694581",
+            "text": "Java",
+            "owner": {
+              "id": "instagrammer-18",
+              "username": "instagrammer-19",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-06-12T17:07:55.000Z"
+          },
+          {
+            "id": "17892499449485023",
+            "text": "Yes",
+            "owner": {
+              "id": "instagrammer-20",
+              "username": "instagrammer-21",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-06-12T16:45:48.000Z"
+          },
+          {
+            "id": "17872674933522658",
+            "text": "Yes",
+            "owner": {
+              "id": "instagrammer-22",
+              "username": "instagrammer-23",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-06-12T13:20:27.000Z"
+          },
+          {
+            "id": "18257402413305866",
+            "text": "Yes",
+            "owner": {
+              "id": "instagrammer-24",
+              "username": "instagrammer-25",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-06-12T05:26:35.000Z"
+          },
+          {
+            "id": "18107862733948185",
+            "text": "java",
+            "owner": {
+              "id": "instagrammer-26",
+              "username": "instagrammer-27",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-06-12T04:33:03.000Z"
+          },
+          {
+            "id": "17989706742003792",
+            "text": "Java",
+            "owner": {
+              "id": "instagrammer-28",
+              "username": "instagrammer-29",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-06-12T04:05:34.000Z"
+          },
+          {
+            "id": "18015572018703113",
+            "text": "👏",
+            "owner": {
+              "id": "instagrammer-30",
+              "username": "instagrammer-31",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-06-12T03:55:22.000Z"
+          }
+        ]
+      },
+      {
+        "id": "3864836943138356426",
+        "__typename": "XDTGraphVideo",
+        "shortcode": "DWiqLkWkXzK",
+        "url": "https://www.instagram.com/reel/DWiqLkWkXzK/",
+        "caption": "How do you handle flaky tests?\n\nIf your answer is “we just rerun them” — save this right now 📌\n\nThat answer will cost you the offer.\n\nThis question is a trap. Here is what interviewers actually want to hear 👇\n\nThe quarantine process at the end is what shows real maturity.\n\n#FlakyTests #AutomationTesting #SDETinterview #SeleniumJava #QAEngineer InterviewTips TestAutomation CareerGrowth",
+        "thumbnail_src": "https://scrubbed.invalid/media-url-expired.bin",
+        "display_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "video_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "has_audio": true,
+        "product_type": "clips",
+        "video_duration": null,
+        "clips_music_attribution_info": null,
+        "is_video": true,
+        "owner": {
+          "id": "instagrammer-1",
+          "username": "instagrammer-2",
+          "is_verified": true,
+          "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+          "full_name": "instagrammer-3"
+        },
+        "taken_at": "2026-03-31T08:09:45.000Z",
+        "is_ad": false,
+        "like_count": 770,
+        "is_paid_partnership": false,
+        "location": {
+          "__typename": "XDTLocationDict",
+          "pk": 292718897556089,
+          "lat": 12.9713525,
+          "lng": 80.151595,
+          "name": "Chennai,Tamilnadu",
+          "profile_pic_url": null
+        },
+        "comment_count": 228,
+        "comments": [
+          {
+            "id": "18123276499694784",
+            "text": "🙌",
+            "owner": {
+              "id": "instagrammer-32",
+              "username": "instagrammer-33",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-08-07T06:07:47.000Z"
+          },
+          {
+            "id": "18094806827579533",
+            "text": "Yes",
+            "owner": {
+              "id": "instagrammer-34",
+              "username": "instagrammer-35",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-08-03T16:48:33.000Z"
+          },
+          {
+            "id": "18540086083075979",
+            "text": "Yes",
+            "owner": {
+              "id": "instagrammer-36",
+              "username": "instagrammer-37",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-06-17T08:43:19.000Z"
+          },
+          {
+            "id": "17914874586184880",
+            "text": "🙌",
+            "owner": {
+              "id": "instagrammer-38",
+              "username": "instagrammer-39",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-05-20T12:18:18.000Z"
+          },
+          {
+            "id": "17922969357319093",
+            "text": "Yes",
+            "owner": {
+              "id": "instagrammer-40",
+              "username": "instagrammer-41",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-04-28T03:31:13.000Z"
+          },
+          {
+            "id": "18099117766974103",
+            "text": "Kindly make it for Playwright with TS as well.",
+            "owner": {
+              "id": "instagrammer-42",
+              "username": "instagrammer-43",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-04-14T18:01:13.000Z"
+          },
+          {
+            "id": "18122079016548070",
+            "text": "I tried this myself — AI vs manual test case writing.\n\nHuge difference.\n\nWatch here: https://youtu.be/uNf3YTxO0w8",
+            "owner": {
+              "id": "instagrammer-44",
+              "username": "instagrammer-45",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-04-13T17:01:01.000Z"
+          },
+          {
+            "id": "18196525645359299",
+            "text": "Yes",
+            "owner": {
+              "id": "instagrammer-46",
+              "username": "instagrammer-47",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-04-13T16:41:46.000Z"
+          },
+          {
+            "id": "18113247580683197",
+            "text": "Yes",
+            "owner": {
+              "id": "instagrammer-48",
+              "username": "instagrammer-49",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-04-12T08:11:13.000Z"
+          },
+          {
+            "id": "18043875065759915",
+            "text": "Yes",
+            "owner": {
+              "id": "instagrammer-50",
+              "username": "instagrammer-51",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-04-12T05:24:59.000Z"
+          },
+          {
+            "id": "17987932787793229",
+            "text": "Yes",
+            "owner": {
+              "id": "instagrammer-52",
+              "username": "instagrammer-53",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-04-11T17:01:10.000Z"
+          },
+          {
+            "id": "18115657426672723",
+            "text": "Yes",
+            "owner": {
+              "id": "instagrammer-54",
+              "username": "instagrammer-55",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-04-10T08:51:44.000Z"
+          },
+          {
+            "id": "17953452336104849",
+            "text": "yes",
+            "owner": {
+              "id": "instagrammer-56",
+              "username": "instagrammer-57",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-04-08T17:24:26.000Z"
+          },
+          {
+            "id": "18102899374737181",
+            "text": "yes",
+            "owner": {
+              "id": "instagrammer-58",
+              "username": "instagrammer-59",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-04-07T18:52:38.000Z"
+          },
+          {
+            "id": "18455186221106845",
+            "text": "Yess",
+            "owner": {
+              "id": "instagrammer-60",
+              "username": "instagrammer-61",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-04-07T13:02:37.000Z"
+          }
+        ]
+      },
+      {
+        "id": "3845808006286494769",
+        "__typename": "XDTGraphVideo",
+        "shortcode": "DVfDgF5D0wx",
+        "url": "https://www.instagram.com/reel/DVfDgF5D0wx/",
+        "caption": "Interesting fact:\n\nTest flakiness — where tests randomly pass or fail without any code changes — is one of the most quietly expensive problems in software engineering, with Google reporting that 1 in 7 tests in their codebase exhibited flakiness at some point. A single flaky test can erode team trust so thoroughly that engineers begin routinely hitting \"re-run\" instead of investigating failures, effectively turning their CI/CD pipeline from a safety net into a formality. Microsoft research found that flaky tests waste an estimated developer hours in the thousands annually per large engineering org, as teams struggle to distinguish real bugs from phantom failures. The root causes are surprisingly mundane — race conditions, hardcoded timeouts, and test order dependencies account for the majority of flakiness, meaning most of the problem is solvable, yet it persists because fixing flaky tests rarely feels as urgent as shipping the next feature.",
+        "thumbnail_src": "https://scrubbed.invalid/media-url-expired.bin",
+        "display_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "video_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "has_audio": true,
+        "product_type": "clips",
+        "video_duration": null,
+        "clips_music_attribution_info": null,
+        "is_video": true,
+        "owner": {
+          "id": "instagrammer-62",
+          "username": "instagrammer-63",
+          "is_verified": true,
+          "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+          "full_name": "instagrammer-64"
+        },
+        "taken_at": "2026-03-05T02:01:20.000Z",
+        "is_ad": false,
+        "like_count": 1105,
+        "is_paid_partnership": false,
+        "location": null,
+        "comment_count": 4,
+        "comments": [
+          {
+            "id": "18316547782271333",
+            "text": "😂",
+            "owner": {
+              "id": "instagrammer-65",
+              "username": "instagrammer-66",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-03-09T04:47:52.000Z"
+          },
+          {
+            "id": "18043762115724934",
+            "text": "Unreliable test -) flaky tests",
+            "owner": {
+              "id": "instagrammer-67",
+              "username": "instagrammer-68",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-03-07T05:41:48.000Z"
+          },
+          {
+            "id": "18072709334566484",
+            "text": "So true",
+            "owner": {
+              "id": "instagrammer-69",
+              "username": "instagrammer-70",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-03-05T03:07:28.000Z"
+          }
+        ]
+      },
+      {
+        "id": "3920874336216438060",
+        "__typename": "XDTGraphVideo",
+        "shortcode": "DZpvm9jIFUs",
+        "url": "https://www.instagram.com/reel/DZpvm9jIFUs/",
+        "caption": "i had my patience tested. the results came back negative.",
+        "thumbnail_src": "https://scrubbed.invalid/media-url-expired.bin",
+        "display_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "video_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "has_audio": true,
+        "product_type": "clips",
+        "video_duration": null,
+        "clips_music_attribution_info": null,
+        "is_video": true,
+        "owner": {
+          "id": "instagrammer-71",
+          "username": "instagrammer-72",
+          "is_verified": true,
+          "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+          "full_name": "instagrammer-73"
+        },
+        "taken_at": "2026-06-16T15:45:12.000Z",
+        "is_ad": false,
+        "like_count": 87,
+        "is_paid_partnership": false,
+        "location": null,
+        "comment_count": 2,
+        "comments": [
+          {
+            "id": "18106402627793202",
+            "text": "I love the taste of palm oil 😍😍😍",
+            "owner": {
+              "id": "instagrammer-74",
+              "username": "instagrammer-75",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-06-17T07:20:40.000Z"
+          },
+          {
+            "id": "18159150613462086",
+            "text": "is twirl the solution to all life problems? i think it just might be…",
+            "owner": {
+              "id": "instagrammer-76",
+              "username": "instagrammer-77",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-06-16T15:52:14.000Z"
+          }
+        ]
+      },
+      {
+        "id": "3968413286202337145",
+        "__typename": "XDTGraphVideo",
+        "shortcode": "DcSotu2B-d5",
+        "url": "https://www.instagram.com/reel/DcSotu2B-d5/",
+        "caption": "Boris Cherny built Claude Code, then turned it on himself.\n\nUsing a feature he calls loops, cron-scheduled Claude sessions now run around the clock, five to ten parallel sessions with hundreds of agents during the day, thousands overnight, all managed mostly from his phone.\n\nSome loops auto-fix Cl issues and rebase pull requests. Others catch flaky tests or scan Twitter, GitHub, Discord, and support channels every 30 minutes to surface patterns in feedback.\n\nThe result: 20 to 30 pull requests shipped daily, and every one of his last 150 PRs was written entirely by Claude. His latest addition, Routines, moves the same system server-side so it keeps working even after he closes his laptop.\n\nThe guy who built Claude Code basically built himself an engineering team that never sleeps.\n\nMedia: Alex Kantrowitz/YT\n\n#claudecode\n\n#anthropic\n\n#aiagents",
+        "thumbnail_src": "https://scrubbed.invalid/media-url-expired.bin",
+        "display_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "video_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "has_audio": true,
+        "product_type": "clips",
+        "video_duration": null,
+        "clips_music_attribution_info": null,
+        "is_video": true,
+        "owner": {
+          "id": "instagrammer-78",
+          "username": "instagrammer-79",
+          "is_verified": false,
+          "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+          "full_name": "instagrammer-80"
+        },
+        "taken_at": "2026-08-21T05:55:17.000Z",
+        "is_ad": false,
+        "like_count": 3,
+        "is_paid_partnership": false,
+        "location": null,
+        "comment_count": 0,
+        "comments": []
+      },
+      {
+        "id": "3976336226277387110",
+        "__typename": "XDTGraphVideo",
+        "shortcode": "DcuyLryx-tm",
+        "url": "https://www.instagram.com/reel/DcuyLryx-tm/",
+        "caption": "📌 SAVE THIS — How to Retry a Failed Test (Playwright)\n\n⚠️ Freeze on this and the interviewer knows you’ve never dealt with a flaky suite 👇\n\n✅ THE MECHANISM:\n✅ No custom analyzer to write — Playwright has retries built in.\n✅ One line in the config: retries: 2. Or on the command line: —retries=2. Any failing test auto re-runs up to that count.\n\n✅ THE SMART PART (free with Playwright):\n✅ Gate retries to CI only, not locally — locally you WANT a failure to fail so you catch it; on CI a genuine blip shouldn’t break the pipeline.\n✅ Playwright captures a trace on the first retry — a full replay of exactly what went wrong.\n✅ So you get the retry AND the evidence to fix the flakiness, instead of hiding it.\n\nThe rule:\nPlaywright retries are built in → set retries in the config → gate them to CI only → use the trace on retry to actually fix the flaky test.\n\n💬 If this helped, grab my Ultimate Interview Success Kit for SDETs — 14 files in one:\n✅ 300+ Interview Q&A with answer strategy\n✅ 100+ Coding Questions — code block, explanation, complexity, DSA & design patterns\n✅ 3 sets of 100% ATS-optimised resumes\n✅ 45-day learning calendar & roadmap\n✅ LinkedIn profile optimisation so you start getting interview calls\n✅ A fully functional explain-your-framework with end-to-end, real-time scenarios\n\nLike, follow, and comment anything and I’ll send you the link — at a flash-sale rate right now.\n▶️ Watching on YouTube? It’s in the pinned comment.\n\n— Sreenidhi Rajakrishnan | SDET Interview Prep\n\n#playwright #playwrightautomation #typescript #automationtesting #testautomation sdet qaengineer interviewprep softwaretesting flakytests qajobs endtoendtesting",
+        "thumbnail_src": "https://scrubbed.invalid/media-url-expired.bin",
+        "display_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "video_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "has_audio": true,
+        "product_type": "clips",
+        "video_duration": null,
+        "clips_music_attribution_info": null,
+        "is_video": true,
+        "owner": {
+          "id": "instagrammer-1",
+          "username": "instagrammer-2",
+          "is_verified": true,
+          "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+          "full_name": "instagrammer-3"
+        },
+        "taken_at": "2026-09-01T04:18:50.000Z",
+        "is_ad": false,
+        "like_count": 316,
+        "is_paid_partnership": false,
+        "location": {
+          "__typename": "XDTLocationDict",
+          "pk": 103322428112763,
+          "lat": 10.7814,
+          "lng": 76.6526,
+          "name": "Palakkad",
+          "profile_pic_url": null
+        },
+        "comment_count": 18,
+        "comments": [
+          {
+            "id": "18168942895459898",
+            "text": "Link please 🖇️🥺",
+            "owner": {
+              "id": "instagrammer-81",
+              "username": "instagrammer-82",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-09-07T17:14:45.000Z"
+          },
+          {
+            "id": "18474418318113435",
+            "text": "🙌",
+            "owner": {
+              "id": "instagrammer-81",
+              "username": "instagrammer-82",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-09-07T17:14:31.000Z"
+          },
+          {
+            "id": "18112134289817959",
+            "text": "🙌",
+            "owner": {
+              "id": "instagrammer-83",
+              "username": "instagrammer-84",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-09-02T18:15:18.000Z"
+          },
+          {
+            "id": "18125450224746942",
+            "text": "--last-failed is much more usefull which onlg exexute failed test.. If we used retries or retry it will reExecuted passed and failed test also..",
+            "owner": {
+              "id": "instagrammer-85",
+              "username": "instagrammer-86",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-09-01T18:50:20.000Z"
+          },
+          {
+            "id": "18619747810007944",
+            "text": "Explain worker in playwright?. How it's working, why we need a worker since we explicitly configure the parallel execution in config.ts file?.",
+            "owner": {
+              "id": "instagrammer-87",
+              "username": "instagrammer-88",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-09-01T04:59:36.000Z"
+          },
+          {
+            "id": "18132992149653394",
+            "text": "🙌",
+            "owner": {
+              "id": "instagrammer-89",
+              "username": "instagrammer-90",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-09-01T04:33:04.000Z"
+          }
+        ]
+      },
+      {
+        "id": "3979362014461606675",
+        "__typename": "XDTGraphVideo",
+        "shortcode": "Dc5iKsoqrsT",
+        "url": "https://www.instagram.com/reel/Dc5iKsoqrsT/",
+        "caption": "Boris Cherny, creator of Claude Code, and Ramp engineers are showing what AI-assisted coding can look like when agents become part of the daily workflow.\n\nInstead of using AI only to write code, they use agents to gather information, run reviews, debug problems, and work across different tasks at the same time.\n\nCredits: Claude",
+        "thumbnail_src": "https://scrubbed.invalid/media-url-expired.bin",
+        "display_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "video_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "has_audio": true,
+        "product_type": "clips",
+        "video_duration": null,
+        "clips_music_attribution_info": null,
+        "is_video": true,
+        "owner": {
+          "id": "instagrammer-91",
+          "username": "instagrammer-92",
+          "is_verified": false,
+          "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+          "full_name": "instagrammer-93"
+        },
+        "taken_at": "2026-09-05T08:29:44.000Z",
+        "is_ad": false,
+        "like_count": 704,
+        "is_paid_partnership": false,
+        "location": null,
+        "comment_count": 5,
+        "comments": [
+          {
+            "id": "18333985594287157",
+            "text": "The orchestration layer is quietly becoming as important as the model.",
+            "owner": {
+              "id": "instagrammer-94",
+              "username": "instagrammer-95",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-09-08T12:50:30.000Z"
+          },
+          {
+            "id": "17978133081085831",
+            "text": "The great equalizer",
+            "owner": {
+              "id": "instagrammer-96",
+              "username": "instagrammer-97",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-09-05T19:15:51.000Z"
+          },
+          {
+            "id": "18153357226522490",
+            "text": "Great way to use up all the tokens",
+            "owner": {
+              "id": "instagrammer-98",
+              "username": "instagrammer-99",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-09-05T11:55:40.000Z"
+          },
+          {
+            "id": "18094733351554914",
+            "text": "One tactic I've been using: speech-to-text brain dumps with the agent. I just talk it out, literally stream of consciousness, then ask it to distill and summarize that into something coherent I can review. From there, we discuss it together and refine it. whether it's a feature, greenfield, brownfield, a bug, a POC, or an MVP, that's always the starting point. I keep using that same brain dump → distill → summarize loop as the work continues.\n\nNo fancy skills involved. Just two documents: a handoff doc and a session doc. The session doc captures what we did in that chat; the handoff doc carries forward anything specific Claude needs to know going into a new session , nothing else. That's enough to pick up in a fresh chat with no lost context, and it saves a lot of token burn since I'm not re-passing skills, MCP servers, or extra info I don't need.\n\nThe reasoning: your brain doesn't work by holding everything in context. It pattern-matches on the task at hand and pulls only what's relevant from long-term memory. This setup mirrors that.",
+            "owner": {
+              "id": "instagrammer-100",
+              "username": "instagrammer-101",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-09-05T09:54:31.000Z"
+          },
+          {
+            "id": "18075866579444328",
+            "text": "lol",
+            "owner": {
+              "id": "instagrammer-102",
+              "username": "instagrammer-103",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-09-05T08:54:54.000Z"
+          }
+        ]
+      },
+      {
+        "id": "3975916536895957434",
+        "__typename": "XDTGraphVideo",
+        "shortcode": "DctSwZmSOm6",
+        "url": "https://www.instagram.com/reel/DctSwZmSOm6/",
+        "caption": "📌 SAVE THIS — How to Retry a Failed Test (TestNG)\n\n⚠️ Freeze on this and the interviewer knows you’ve never dealt with a flaky suite 👇\n\n✅ THE MECHANISM:\n✅ In TestNG you don’t wrap tests in loops — you use a built-in hook, IRetryAnalyzer.\n✅ Implement its retry() method, set a max retry count, and it tells TestNG to re-run the failed test up to N times before marking it truly failed.\n\n⚠️ THE SENIOR LINE (this is what separates you):\n✅ Retries are a crutch, not a cure. Blindly retrying HIDES flakiness — a test that only passes on the third attempt is still broken; you’re masking a real timing or sync bug.\n✅ Retry to survive a genuine network blip, but TRACK every retry and fix the root cause. A retry that silently turns red into green is how a broken suite looks healthy.\n\nThe rule:\nTestNG uses IRetryAnalyzer with a max count → but track your retries and fix the flakiness, don’t let retries hide it.\n\n💬 If this helped, grab my Ultimate Interview Success Kit for SDETs — 14 files in one:\n✅ 300+ Interview Q&A with answer strategy\n✅ 100+ Coding Questions — code block, explanation, complexity, DSA & design patterns\n✅ 3 sets of 100% ATS-optimised resumes\n✅ 45-day learning calendar & roadmap\n✅ LinkedIn profile optimisation so you start getting interview calls\n✅ A fully functional explain-your-framework with end-to-end, real-time scenarios\n\nLike, follow, and comment anything and I’ll send you the link — at a flash-sale rate right now.\n▶️ Watching on YouTube? It’s in the pinned comment.\n\n— Sreenidhi Rajakrishnan | SDET Interview Prep\n\n#selenium #seleniumjava #testng #automationtesting #testautomation sdet qaengineer interviewprep softwaretesting flakytests qajobs testingtips",
+        "thumbnail_src": "https://scrubbed.invalid/media-url-expired.bin",
+        "display_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "video_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "has_audio": true,
+        "product_type": "clips",
+        "video_duration": null,
+        "clips_music_attribution_info": null,
+        "is_video": true,
+        "owner": {
+          "id": "instagrammer-1",
+          "username": "instagrammer-2",
+          "is_verified": true,
+          "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+          "full_name": "instagrammer-3"
+        },
+        "taken_at": "2026-08-31T14:27:09.000Z",
+        "is_ad": false,
+        "like_count": 265,
+        "is_paid_partnership": false,
+        "location": {
+          "__typename": "XDTLocationDict",
+          "pk": 103322428112763,
+          "lat": 10.7814,
+          "lng": 76.6526,
+          "name": "Palakkad",
+          "profile_pic_url": null
+        },
+        "comment_count": 16,
+        "comments": [
+          {
+            "id": "18484358800109771",
+            "text": "Please start mentioning reel topic on cover photo so we can search easily which topic we are looking for",
+            "owner": {
+              "id": "instagrammer-104",
+              "username": "instagrammer-105",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-09-09T10:10:20.000Z"
+          },
+          {
+            "id": "18140234362606874",
+            "text": "❤️",
+            "owner": {
+              "id": "instagrammer-106",
+              "username": "instagrammer-107",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-09-03T12:02:12.000Z"
+          },
+          {
+            "id": "18104964889918259",
+            "text": "Link",
+            "owner": {
+              "id": "instagrammer-108",
+              "username": "instagrammer-109",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-09-01T16:37:12.000Z"
+          },
+          {
+            "id": "18375502441230606",
+            "text": "🙌",
+            "owner": {
+              "id": "instagrammer-110",
+              "username": "instagrammer-111",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-08-31T20:16:45.000Z"
+          },
+          {
+            "id": "18013967384943075",
+            "text": "🙌",
+            "owner": {
+              "id": "instagrammer-112",
+              "username": "instagrammer-113",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-08-31T15:55:06.000Z"
+          },
+          {
+            "id": "17977078952912316",
+            "text": "🙌",
+            "owner": {
+              "id": "instagrammer-114",
+              "username": "instagrammer-115",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-08-31T15:43:12.000Z"
+          },
+          {
+            "id": "18226370929332532",
+            "text": "Very informative. Thanks ❤️",
+            "owner": {
+              "id": "instagrammer-116",
+              "username": "instagrammer-117",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-08-31T14:39:20.000Z"
+          }
+        ]
+      },
+      {
+        "id": "3870793786355375762",
+        "__typename": "XDTGraphVideo",
+        "shortcode": "DW30nC6gF6S",
+        "url": "https://www.instagram.com/reel/DW30nC6gF6S/",
+        "caption": "For the AZ-400 exam, the most effective way to ensure a consistent state for integration testing against a SQL Server database is to automate a database restore from a backup before each test run. While manual resets are error-prone and skipping resets leads to 'flaky' tests or false positives, using a dedicated pipeline task, such as Azure CLI, PowerShell, or the SQL Azure Database Deployment task, guarantees that every test begins with a known, clean dataset.  This pattern enforces reliability and repeatability, ensuring that test failures are due to code issues rather than leftover data from previous runs.\n\n#AZ400 #AzureDevOps #IntegrationTesting #SQLServer #DatabaseDevOps #CICD #Automation #TechTips #KodeKloud",
+        "thumbnail_src": "https://scrubbed.invalid/media-url-expired.bin",
+        "display_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "video_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "has_audio": true,
+        "product_type": "clips",
+        "video_duration": null,
+        "clips_music_attribution_info": null,
+        "is_video": true,
+        "owner": {
+          "id": "instagrammer-118",
+          "username": "instagrammer-119",
+          "is_verified": true,
+          "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+          "full_name": "instagrammer-120"
+        },
+        "taken_at": "2026-04-08T13:24:18.000Z",
+        "is_ad": false,
+        "like_count": 20,
+        "is_paid_partnership": false,
+        "location": null,
+        "comment_count": 2,
+        "comments": [
+          {
+            "id": "18177959152390211",
+            "text": "Shouldn't we just mock it?",
+            "owner": {
+              "id": "instagrammer-121",
+              "username": "instagrammer-122",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-04-08T14:04:13.000Z"
+          },
+          {
+            "id": "17943931155153337",
+            "text": "This is easy. I wanna get back in",
+            "owner": {
+              "id": "instagrammer-123",
+              "username": "instagrammer-124",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-04-08T13:53:24.000Z"
+          }
+        ]
+      },
+      {
+        "id": "3961397864709588974",
+        "__typename": "XDTGraphVideo",
+        "shortcode": "Db5tl6cAYfu",
+        "url": "https://www.instagram.com/reel/Db5tl6cAYfu/",
+        "caption": "Playwright doesn’t wait for your test to start before doing the smart work. With Browser Contexts, every test gets a clean, isolated environment—making automation more reliable, consistent, and CI/CD friendly. Learn why test isolation is one of Playwright’s biggest advantages.\n\nFollow the link for more detail - https://amolujagare.com/playwright/\n\n#Playwright, #PlaywrightTesting, #PlaywrightAutomation, #AutomationTesting, #TestAutomation, #SoftwareTesting, #BrowserContext, #TestIsolation, #EndToEndTesting, #CICD, #SDET, #QAEngineer, #AutomationEngineer, #webautomation",
+        "thumbnail_src": "https://scrubbed.invalid/media-url-expired.bin",
+        "display_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "video_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "has_audio": true,
+        "product_type": "clips",
+        "video_duration": null,
+        "clips_music_attribution_info": null,
+        "is_video": true,
+        "owner": {
+          "id": "instagrammer-125",
+          "username": "instagrammer-126",
+          "is_verified": false,
+          "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+          "full_name": "instagrammer-127"
+        },
+        "taken_at": "2026-08-11T13:38:09.000Z",
+        "is_ad": false,
+        "like_count": 1,
+        "is_paid_partnership": false,
+        "location": null,
+        "comment_count": 0,
+        "comments": []
+      }
+    ],
+    "next_page": 2
+  }
+}

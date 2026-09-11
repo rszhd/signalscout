@@ -1,0 +1,282 @@
+{
+  "httpStatus": 200,
+  "body": {
+    "success": true,
+    "credits_remaining": 1756,
+    "credits_charged": 1,
+    "videos": [
+      {
+        "type": "video",
+        "id": "J3gGCTLstx4",
+        "url": "https://www.youtube.com/watch?v=J3gGCTLstx4",
+        "title": "E2E Testing AI Agent – Cursor & Playwright MCP vs Momentic",
+        "thumbnail": "https://scrubbed.invalid/thumbnail.jpg",
+        "channel": {
+          "id": "yt-channel-1",
+          "title": "yt-channel-2",
+          "handle": "yt-channel-3",
+          "thumbnail": "https://scrubbed.invalid/thumbnail.jpg"
+        },
+        "viewCountText": "5,363 views",
+        "viewCountInt": 5363,
+        "publishedTimeText": "18 hours ago",
+        "publishedTime": "2026-09-10T20:53:14.933Z",
+        "lengthText": "8:11",
+        "lengthSeconds": 491,
+        "badges": [
+          "New",
+          "4K"
+        ]
+      },
+      {
+        "type": "video",
+        "id": "1QsUSnSQsno",
+        "url": "https://www.youtube.com/watch?v=1QsUSnSQsno",
+        "title": "Concentrix Automation Engineer Interview Questions & Answers",
+        "thumbnail": "https://scrubbed.invalid/thumbnail.jpg",
+        "channel": {
+          "id": "yt-channel-4",
+          "title": "yt-channel-5",
+          "handle": "yt-channel-6",
+          "thumbnail": "https://scrubbed.invalid/thumbnail.jpg"
+        },
+        "viewCountText": "4 views",
+        "viewCountInt": 4,
+        "publishedTimeText": "23 hours ago",
+        "publishedTime": "2026-09-10T15:53:14.933Z",
+        "lengthText": "14:44",
+        "lengthSeconds": 884,
+        "badges": [
+          "New"
+        ]
+      },
+      {
+        "type": "video",
+        "id": "rfalV3mP7R0",
+        "url": "https://www.youtube.com/watch?v=rfalV3mP7R0",
+        "title": "FlakeSync: Automatically RepairingAsync Flaky Tests | Research Paper Deconstructed",
+        "thumbnail": "https://scrubbed.invalid/thumbnail.jpg",
+        "channel": {
+          "id": "yt-channel-7",
+          "title": "yt-channel-8",
+          "handle": "yt-channel-9",
+          "thumbnail": "https://scrubbed.invalid/thumbnail.jpg"
+        },
+        "viewCountText": "481 views",
+        "viewCountInt": 481,
+        "publishedTimeText": "3 weeks ago",
+        "publishedTime": "2026-08-21T14:53:14.933Z",
+        "lengthText": "27:09",
+        "lengthSeconds": 1629,
+        "badges": [
+          "4K"
+        ]
+      },
+      {
+        "type": "video",
+        "id": "NA813hJOLXg",
+        "url": "https://www.youtube.com/watch?v=NA813hJOLXg",
+        "title": "Flaky Tests: How to Tell a Real Bug From a Guess (With AI)06 lesson flaky test autopsy WEB",
+        "thumbnail": "https://scrubbed.invalid/thumbnail.jpg",
+        "channel": {
+          "id": "yt-channel-10",
+          "title": "yt-channel-11",
+          "handle": "yt-channel-12",
+          "thumbnail": "https://scrubbed.invalid/thumbnail.jpg"
+        },
+        "viewCountText": "12 views",
+        "viewCountInt": 12,
+        "publishedTimeText": "2 weeks ago",
+        "publishedTime": "2026-08-28T14:53:14.933Z",
+        "lengthText": "10:15",
+        "lengthSeconds": 615,
+        "badges": []
+      },
+      {
+        "type": "video",
+        "id": "9YYsyUaVyTg",
+        "url": "https://www.youtube.com/watch?v=9YYsyUaVyTg",
+        "title": "How to decide between retrying, quarantining, and fixing a flaky test",
+        "thumbnail": "https://scrubbed.invalid/thumbnail.jpg",
+        "channel": {
+          "id": "yt-channel-13",
+          "title": "yt-channel-14",
+          "handle": "yt-channel-14",
+          "thumbnail": "https://scrubbed.invalid/thumbnail.jpg"
+        },
+        "viewCountText": "16 views",
+        "viewCountInt": 16,
+        "publishedTimeText": "2 days ago",
+        "publishedTime": "2026-09-09T14:53:14.933Z",
+        "lengthText": "5:11",
+        "lengthSeconds": 311,
+        "badges": [
+          "New"
+        ]
+      },
+      {
+        "type": "video",
+        "id": "F6SvBMkdikg",
+        "url": "https://www.youtube.com/watch?v=F6SvBMkdikg",
+        "title": "New Model Dropped? 4 Ways to De-slop Your Project",
+        "thumbnail": "https://scrubbed.invalid/thumbnail.jpg",
+        "channel": {
+          "id": "yt-channel-15",
+          "title": "yt-channel-16",
+          "handle": "yt-channel-17",
+          "thumbnail": "https://scrubbed.invalid/thumbnail.jpg"
+        },
+        "viewCountText": "6 views",
+        "viewCountInt": 6,
+        "publishedTimeText": "2 hours ago",
+        "publishedTime": "2026-09-11T12:53:14.933Z",
+        "lengthText": "46:53",
+        "lengthSeconds": 2813,
+        "badges": [
+          "New",
+          "CC"
+        ]
+      },
+      {
+        "type": "video",
+        "id": "Bn-lRiF4ZHY",
+        "url": "https://www.youtube.com/watch?v=Bn-lRiF4ZHY",
+        "title": "Firstsource QA Engineer Interview Questions & Answers",
+        "thumbnail": "https://scrubbed.invalid/thumbnail.jpg",
+        "channel": {
+          "id": "yt-channel-4",
+          "title": "yt-channel-5",
+          "handle": "yt-channel-6",
+          "thumbnail": "https://scrubbed.invalid/thumbnail.jpg"
+        },
+        "viewCountText": "7 views",
+        "viewCountInt": 7,
+        "publishedTimeText": "23 hours ago",
+        "publishedTime": "2026-09-10T15:53:14.933Z",
+        "lengthText": "14:25",
+        "lengthSeconds": 865,
+        "badges": [
+          "New"
+        ]
+      },
+      {
+        "type": "video",
+        "id": "ZAAr5dfJ8hs",
+        "url": "https://www.youtube.com/watch?v=ZAAr5dfJ8hs",
+        "title": "WNS Automation Engineer Interview Questions & Answers",
+        "thumbnail": "https://scrubbed.invalid/thumbnail.jpg",
+        "channel": {
+          "id": "yt-channel-4",
+          "title": "yt-channel-5",
+          "handle": "yt-channel-6",
+          "thumbnail": "https://scrubbed.invalid/thumbnail.jpg"
+        },
+        "viewCountText": "3 views",
+        "viewCountInt": 3,
+        "publishedTimeText": "23 hours ago",
+        "publishedTime": "2026-09-10T15:53:14.933Z",
+        "lengthText": "13:43",
+        "lengthSeconds": 823,
+        "badges": [
+          "New"
+        ]
+      },
+      {
+        "type": "video",
+        "id": "G8J0HKcvoCU",
+        "url": "https://www.youtube.com/watch?v=G8J0HKcvoCU",
+        "title": "Workday QA Automation Engineer Interview Questions & Answers",
+        "thumbnail": "https://scrubbed.invalid/thumbnail.jpg",
+        "channel": {
+          "id": "yt-channel-4",
+          "title": "yt-channel-5",
+          "handle": "yt-channel-6",
+          "thumbnail": "https://scrubbed.invalid/thumbnail.jpg"
+        },
+        "viewCountText": "6 views",
+        "viewCountInt": 6,
+        "publishedTimeText": "23 hours ago",
+        "publishedTime": "2026-09-10T15:53:14.933Z",
+        "lengthText": "14:22",
+        "lengthSeconds": 862,
+        "badges": [
+          "New"
+        ]
+      },
+      {
+        "type": "video",
+        "id": "DfgINZm8nn4",
+        "url": "https://www.youtube.com/watch?v=DfgINZm8nn4",
+        "title": "From Real Traffic to Reliable Integration Tests with AI | apidays India 2026",
+        "thumbnail": "https://scrubbed.invalid/thumbnail.jpg",
+        "channel": {
+          "id": "yt-channel-18",
+          "title": "yt-channel-19",
+          "handle": "yt-channel-19",
+          "thumbnail": "https://scrubbed.invalid/thumbnail.jpg"
+        },
+        "viewCountText": "32 views",
+        "viewCountInt": 32,
+        "publishedTimeText": "1 day ago",
+        "publishedTime": "2026-09-10T14:53:14.933Z",
+        "lengthText": "28:42",
+        "lengthSeconds": 1722,
+        "badges": [
+          "New"
+        ]
+      },
+      {
+        "type": "video",
+        "id": "4jsKjVkGcjs",
+        "url": "https://www.youtube.com/watch?v=4jsKjVkGcjs",
+        "title": "Can These Experts Tell a $3 Tin of Tuna From a $18 One? | Wirecutter | Taste Test",
+        "thumbnail": "https://scrubbed.invalid/thumbnail.jpg",
+        "channel": {
+          "id": "yt-channel-20",
+          "title": "yt-channel-21",
+          "handle": "yt-channel-22",
+          "thumbnail": "https://scrubbed.invalid/thumbnail.jpg"
+        },
+        "viewCountText": "12,082 views",
+        "viewCountInt": 12082,
+        "publishedTimeText": "20 hours ago",
+        "publishedTime": "2026-09-10T18:53:14.933Z",
+        "lengthText": "14:26",
+        "lengthSeconds": 866,
+        "badges": [
+          "New",
+          "CC"
+        ]
+      },
+      {
+        "type": "video",
+        "id": "e2IO6XXULWA",
+        "url": "https://www.youtube.com/watch?v=e2IO6XXULWA",
+        "title": "Stainless Won the Catalog — So Why Did Carbon Steel Stay in Deer Camps?",
+        "thumbnail": "https://scrubbed.invalid/thumbnail.jpg",
+        "channel": {
+          "id": "yt-channel-23",
+          "title": "yt-channel-24",
+          "handle": "yt-channel-25",
+          "thumbnail": "https://scrubbed.invalid/thumbnail.jpg"
+        },
+        "viewCountText": "63 views",
+        "viewCountInt": 63,
+        "publishedTimeText": "3 hours ago",
+        "publishedTime": "2026-09-11T11:53:14.933Z",
+        "lengthText": "17:14",
+        "lengthSeconds": 1034,
+        "badges": [
+          "New",
+          "CC"
+        ]
+      }
+    ],
+    "channels": [],
+    "playlists": [],
+    "shorts": [],
+    "shelves": [],
+    "lives": [],
+    "continuationToken": "Eo0CEgtmbGFreSB0ZXN0cxr6AUVnUUlBaEFCU0JTQ0FRdEtNMmRIUTFSTWMzUjROSUlCQ3pGUmMxVlRibE5SYzI1dmdnRUxjbVpoYkZZemJWQTNVakNDQVF0T1FUZ3hNMmhLVDB4WVo0SUJDemxaV1hONVZXRldlVlJuZ2dFTFJqWlRka0pOYTJScGEyZUNBUXRDYmkxc1VtbEdORnBJV1lJQkMxcEJRWEkxWkdaS09HaHpnZ0VMUnpoS01FaExZM1p2UTFXQ0FRdEVabWRKVGxwdE9HNXVOSUlCQ3pScWMwdHFWbXRIWTJwemdnRUxaVEpKVHpaWVdGVk1WMEd5QVFZS0JBZ01FQUklM0SgAgQYgeDoGCILc2VhcmNoLWZlZWQ%3D"
+  }
+}

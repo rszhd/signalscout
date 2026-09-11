@@ -1,0 +1,205 @@
+{
+  "httpStatus": 200,
+  "body": {
+    "success": true,
+    "credits_remaining": 1749,
+    "credits_charged": 1,
+    "query": "flaky tests",
+    "posts": [
+      {
+        "id": "POLARIS_3845957230369353443",
+        "shortcode": "DVflblpgq7j",
+        "url": "https://www.instagram.com/reel/DVflblpgq7j/",
+        "type": "reel",
+        "caption": "Handling waits using Selenium + C#.\n\nWelcome to Test Automation Studio – your go-to hub for learning tools like Selenium, Cypress, Playwright & more! From beginner basics to pro-level tricks, we’ve got you covered.\n\nVisit our website https://www.testautomationstudio.com\n\nFollow along, save this post, and drop your favorite automation tool in the comments! 👇\n\n#TestAutomationStudio #AutomationTesting #LearnAutomation #Selenium #Cypress #Playwright #TechSkills #CodingJourney #TestAutomation #AutomationForAll #Python #Java #csharp #javascript #testng #pytest #dotnet",
+        "display_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "video_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "play_count": 175,
+        "owner": {
+          "id": "instagrammer-1",
+          "username": "instagrammer-2",
+          "is_verified": false,
+          "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin"
+        }
+      },
+      {
+        "id": "POLARIS_3838154240565404197",
+        "shortcode": "DVD3PJGD2Il",
+        "url": "https://www.instagram.com/reel/DVD3PJGD2Il/",
+        "type": "reel",
+        "caption": "Follow us for daily software testing updates, career tips, and job opportunities in QA.\n\n#logicNextGen\n#SoftwareTestingLife\n#QATestingCommunity\n#LearnSoftwareTesting\n#TechCareersQA",
+        "display_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "video_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "play_count": 278,
+        "owner": {
+          "id": "instagrammer-3",
+          "username": "instagrammer-4",
+          "is_verified": false,
+          "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin"
+        }
+      },
+      {
+        "id": "POLARIS_3837529751112178220",
+        "shortcode": "DVBpPn-CNos",
+        "url": "https://www.instagram.com/reel/DVBpPn-CNos/",
+        "type": "reel",
+        "caption": "Most testers don’t struggle because they lack effort.\nThey struggle because nobody shows the complete roadmap of how testing actually grows in real projects.\n\nYou learn tools.\nYou learn theory.\nBut confidence never compounds.\n\nIf your testing career feels stuck, you’re probably missing the roadmap.\n\nFollow for real-world software testing clarity and senior QA thinking.\n\n#softwaretesting\n#qaengineer\n#softwaretester\n#testingcareer\n#manualtesting\n#istqb\n#qualityassurance\n#techcareergrowth\n#qatesting\n#softwaretestingmastery",
+        "display_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "video_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "play_count": 176,
+        "owner": {
+          "id": "instagrammer-5",
+          "username": "instagrammer-6",
+          "is_verified": false,
+          "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin"
+        }
+      },
+      {
+        "id": "POLARIS_3828701210350678555",
+        "shortcode": "DUiR3cqD3Ib",
+        "url": "https://www.instagram.com/reel/DUiR3cqD3Ib/",
+        "type": "reel",
+        "caption": "Selenium Day1 #automationtesting #learning #qa #softwareengineer #selenium",
+        "display_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "video_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "play_count": 190,
+        "owner": {
+          "id": "instagrammer-7",
+          "username": "instagrammer-8",
+          "is_verified": false,
+          "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin"
+        }
+      },
+      {
+        "id": "POLARIS_3840421956017489965",
+        "shortcode": "DVL62vsCIgt",
+        "url": "https://www.instagram.com/reel/DVL62vsCIgt/",
+        "type": "reel",
+        "caption": "Most teams don’t struggle because testers miss bugs.\n\nThey struggle because testing starts without real planning.\n\nTesting everything feels productive.\nBut senior testers don’t chase coverage — they chase risk.\n\nWhen planning is weak, testing becomes reaction.\nDeadlines feel chaotic.\nAnd bugs escape right before release.\n\nThis is where the difference between junior effort and senior thinking becomes visible.\n\nFollow if you want to understand how real project testing decisions are made.\n\n#softwaretesting\n#qaengineer\n#softwaretester\n#testingcareer\n#qatesting\n#manualtesting\n#softwarequality\n#careergrowth\n#softwaretestingcareer\n#testengineer",
+        "display_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "video_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "play_count": 126,
+        "owner": {
+          "id": "instagrammer-5",
+          "username": "instagrammer-6",
+          "is_verified": false,
+          "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin"
+        }
+      },
+      {
+        "id": "POLARIS_3838154674206137746",
+        "shortcode": "DVD3Vc9D92S",
+        "url": "https://www.instagram.com/reel/DVD3Vc9D92S/",
+        "type": "reel",
+        "caption": "Follow us for daily software testing updates, career tips, and job opportunities in QA.\n\n#logicNextGen\n#SoftwareTestingLife\n#QATestingCommunity\n#LearnSoftwareTesting\n#TechCareersQA",
+        "display_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "video_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "play_count": 317,
+        "owner": {
+          "id": "instagrammer-3",
+          "username": "instagrammer-4",
+          "is_verified": false,
+          "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin"
+        }
+      },
+      {
+        "id": "POLARIS_3824111350960383666",
+        "shortcode": "DUR-QM_iGay",
+        "url": "https://www.instagram.com/reel/DUR-QM_iGay/",
+        "type": "reel",
+        "caption": "Automation Testing Interview Questions Answers \n#softwaretesting #automationtesting #selenium #testautomation #java",
+        "display_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "video_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "play_count": 14063,
+        "owner": {
+          "id": "instagrammer-9",
+          "username": "instagrammer-10",
+          "is_verified": false,
+          "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin"
+        }
+      },
+      {
+        "id": "POLARIS_3832112727644508435",
+        "shortcode": "DUuZjjugRET",
+        "url": "https://www.instagram.com/reel/DUuZjjugRET/",
+        "type": "reel",
+        "caption": "Assertions = Validation\n.\n.\n.\n#assertion #automation #pytest #qajobs #seleniumtips",
+        "display_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "video_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "play_count": 501,
+        "owner": {
+          "id": "instagrammer-11",
+          "username": "instagrammer-12",
+          "is_verified": false,
+          "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin"
+        }
+      },
+      {
+        "id": "POLARIS_3843292141221112061",
+        "shortcode": "DVWHdb9iOj9",
+        "url": "https://www.instagram.com/reel/DVWHdb9iOj9/",
+        "type": "reel",
+        "caption": "Many testers believe good testing means executing more test cases.\n\nBut execution without strategy is just movement, not progress.\n\nWhen testing starts without clear priorities, teams become reactive.\nBugs escape.\nDeadlines feel chaotic.\nConfidence drops — even when effort is high.\n\nSenior testers don’t begin with execution.\nThey begin with thinking.\n\nThis is the shift that changes both interviews and real project impact.\n\nFollow if you want to understand how real testing decisions are made.\n\n#softwaretesting\n#qaengineer\n#softwaretester\n#testingcareer\n#qatesting\n#manualtesting\n#softwarequality\n#teststrategy\n#softwaretestingcareer\n#testengineer",
+        "display_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "video_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "play_count": 154,
+        "owner": {
+          "id": "instagrammer-5",
+          "username": "instagrammer-6",
+          "is_verified": false,
+          "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin"
+        }
+      },
+      {
+        "id": "POLARIS_3835791107255570996",
+        "shortcode": "DU7d7BskhI0",
+        "url": "https://www.instagram.com/reel/DU7d7BskhI0/",
+        "type": "reel",
+        "caption": "Day 4 🚀\n\nXPath is powerful.\nBut overusing complex XPath\ncan make tests unstable.\n\nTomorrow: Absolute vs Relative XPath 👀\n\n#Selenium #AutomationTesting #QAEngineer #LearnAutomation #TestingLife",
+        "display_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "video_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "play_count": 118,
+        "owner": {
+          "id": "instagrammer-13",
+          "username": "instagrammer-14",
+          "is_verified": false,
+          "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin"
+        }
+      },
+      {
+        "id": "POLARIS_3843777881293614421",
+        "shortcode": "DVX154qAm1V",
+        "url": "https://www.instagram.com/reel/DVX154qAm1V/",
+        "type": "reel",
+        "caption": "Interacting with elements inside iframe using Selenium + C#.\n\nWelcome to Test Automation Studio – your go-to hub for learning tools like Selenium, Cypress, Playwright & more! From beginner basics to pro-level tricks, we’ve got you covered.\n\nVisit our website https://www.testautomationstudio.com\n\nFollow along, save this post, and drop your favorite automation tool in the comments! 👇\n\n#TestAutomationStudio #AutomationTesting #LearnAutomation #Selenium #Cypress #Playwright #TechSkills #CodingJourney #TestAutomation #AutomationForAll #Python #Java #csharp #javascript #testng #pytest #dotnet",
+        "display_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "video_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "play_count": 364,
+        "owner": {
+          "id": "instagrammer-1",
+          "username": "instagrammer-2",
+          "is_verified": false,
+          "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin"
+        }
+      },
+      {
+        "id": "POLARIS_3824194484582312185",
+        "shortcode": "DUSRJ9NiWj5",
+        "url": "https://www.instagram.com/reel/DUSRJ9NiWj5/",
+        "type": "reel",
+        "caption": "Playwright Parallel Testing in 60 Seconds 🚀 | Sharding Explained\nDay 9 of my 10-Day Playwright TypeScript Shorts Series 🚀\n\nIn this video, you’ll learn:\n✔️ What parallel testing is\n✔️ How Playwright runs tests in parallel\n✔️ What sharding means in Playwright\n✔️ How to speed up your test execution\n\nPerfect for:\nAutomation Testers | SDETs | QA Engineers | Advanced Testers\n\n#Playwright\n#ParallelTesting\n#Sharding\n#AutomationTesting\n#TypeScript\n#QA\n#SDET\n#SoftwareTesting\n#TestAutomation\n#WebAutomation\n#CodingShorts\n#TestingShorts\n#TechShorts",
+        "display_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "video_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "play_count": 146,
+        "owner": {
+          "id": "instagrammer-15",
+          "username": "instagrammer-16",
+          "is_verified": false,
+          "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin"
+        }
+      }
+    ],
+    "cursor": "eyJ2ZXJzaW9uIjoxLCJxdWVyeSI6ImZsYWt5IHRlc3RzIiwiYWZ0ZXIiOiJBUUhUTm96Z3JucVNfenZ4ZG5VRUtvZ0h4SGpZSFEwRk1YbTFtRG5lMzdneVd6MGpBZTVxTERfZERYQ2hsdmhtdmpwTyIsImxzZCI6IkFkUmlPOXh6UWNqaGFWWnBFbVhUS0k0NjZrOCIsImNzcmZUb2tlbiI6Iks4VV9xTnl4YjZyakNBaldGaENEVlUifQ",
+    "has_more": true
+  }
+}

@@ -1,0 +1,117 @@
+{
+  "capturedBy": "packages/core/src/sources/providers/scrapecreators/youtube-fixtures/capture.mjs",
+  "provider": "ScrapeCreators, YouTube API v1",
+  "note": "Channel identity is replaced with stable pseudonyms. Everything else is whole.",
+  "fixtures": [
+    {
+      "file": "comments-newest.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v1/youtube/video/comments?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DfSr0QCEB8uE&order=newest",
+        "note": "newest first, on the first video the search returned"
+      },
+      "capturedAt": "2026-09-11T14:53:18.569Z",
+      "identitiesReplaced": 3,
+      "bytes": 762
+    },
+    {
+      "file": "credentials-accepted.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v1/youtube/search?",
+        "note": "a working key with no query: refused on the input, not on the key"
+      },
+      "capturedAt": "2026-09-11T14:53:02.925Z",
+      "identitiesReplaced": 0,
+      "bytes": 220
+    },
+    {
+      "file": "credentials-rejected.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v1/youtube/search?query=flaky+tests",
+        "note": "sent with a deliberately invalid key"
+      },
+      "capturedAt": "2026-09-11T14:53:02.218Z",
+      "identitiesReplaced": 0,
+      "bytes": 96
+    },
+    {
+      "file": "search-mixed.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v1/youtube/search?query=flaky+tests",
+        "note": "no type parameter: what the answer holds beside videos"
+      },
+      "capturedAt": "2026-09-11T14:53:10.170Z",
+      "identitiesReplaced": 52,
+      "bytes": 22138
+    },
+    {
+      "file": "search-no-results.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v1/youtube/search?query=zqxjkv+wobblefish+intentwatch+nonexistent+phrase&type=videos",
+        "note": "a phrase that cannot occur; the ledger says what it cost"
+      },
+      "capturedAt": "2026-09-11T14:53:16.195Z",
+      "identitiesReplaced": 0,
+      "bytes": 262
+    },
+    {
+      "file": "search-videos-page-2.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v1/youtube/search?query=flaky+tests&type=videos&uploadDate=this_month&continuationToken=Ep8DEgtmbGFreSB0ZXN0cxqMA0VnUUlCQkFCU0JTQ0FRdE9RVGd4TTJoS1QweFlaNElCQzNWaFZGcDRUemRNUlZWUmdnRUxPVmxaYzNsVllWWjVWR2VDQVF0eVptRnNWak50VURkU01JSUJDMk5vWVRreGMyNXBZa2hyZ2dFTFpsTnlNRkZEUlVJNGRVV0NBUXRDYTJkUU56TjNaV3AxT0lJQkMwUTRSMTlYWWpCa1ZsQlZnZ0VMZW1SbU9GVlRPWEpsZVRpQ0FRc3RVR2RCYW5wUlYxaEZTWUlCQzNKcmIyVnhUWFF6WTBScmdnRUxWVWw2VG1zMUxVWTVTRm1DQVF0dGFVOXZZa2RGWmpjNWQ0SUJDelIzWVZKQ2VGWnNSV2R6Z2dFTFJsOUdiSFpGWjJsTWNEQ0NBUXRwYjFBMFZVMDNiMHhMU1lJQkN6aEJVbEZ1TUZGTFpYcHJnZ0VMWkdWWmMySlhRWFpGY0RTQ0FRdE5WMFp2UW5aUlF6VlliNElCQ3pRMVdGRTBMWEJvWkVORnNnRUdDZ1FJRkJBQ6ACBBiB4OgYIgtzZWFyY2gtZmVlZA%253D%253D",
+        "note": "followed the continuationToken from search-videos.json"
+      },
+      "capturedAt": "2026-09-11T14:53:05.793Z",
+      "identitiesReplaced": 52,
+      "bytes": 15413
+    },
+    {
+      "file": "search-videos.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v1/youtube/search?query=flaky+tests&type=videos&uploadDate=this_month",
+        "note": "videos only, inside a month: the request a monitor would make"
+      },
+      "capturedAt": "2026-09-11T14:53:04.234Z",
+      "identitiesReplaced": 51,
+      "bytes": 15602
+    },
+    {
+      "file": "search-window-today.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v1/youtube/search?query=flaky+tests&type=videos&uploadDate=today",
+        "note": "the narrowest window the provider documents"
+      },
+      "capturedAt": "2026-09-11T14:53:15.112Z",
+      "identitiesReplaced": 25,
+      "bytes": 9745
+    },
+    {
+      "file": "search-with-extras.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v1/youtube/search?query=flaky+tests&type=videos&uploadDate=this_month&includeExtras=true",
+        "note": "includeExtras=true: does a description arrive, and how slow is it"
+      },
+      "capturedAt": "2026-09-11T14:53:13.833Z",
+      "identitiesReplaced": 53,
+      "bytes": 48664
+    },
+    {
+      "file": "transcript.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v1/youtube/video/transcript?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DNA813hJOLXg",
+        "note": "public captions only"
+      },
+      "capturedAt": "2026-09-11T14:53:25.525Z",
+      "identitiesReplaced": 0,
+      "bytes": 46129
+    }
+  ]
+}

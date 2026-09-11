@@ -1,0 +1,1444 @@
+{
+  "httpStatus": 200,
+  "body": {
+    "success": true,
+    "credits_remaining": 1753,
+    "credits_charged": 1,
+    "type": "video",
+    "url": "https://www.youtube.com/watch?v=NA813hJOLXg",
+    "transcript": [
+      {
+        "text": "The flaky test autopsy.",
+        "startMs": "840",
+        "endMs": "6520",
+        "startTimeText": "0:00"
+      },
+      {
+        "text": "40 red tests overnight, and by the end",
+        "startMs": "3520",
+        "endMs": "8560",
+        "startTimeText": "0:03"
+      },
+      {
+        "text": "of this, you'll know exactly what to do",
+        "startMs": "6520",
+        "endMs": "10880",
+        "startTimeText": "0:06"
+      },
+      {
+        "text": "with them. Not just how to make the red",
+        "startMs": "8560",
+        "endMs": "13560",
+        "startTimeText": "0:08"
+      },
+      {
+        "text": "go away.",
+        "startMs": "10880",
+        "endMs": "16440",
+        "startTimeText": "0:10"
+      },
+      {
+        "text": "40 tests failed last night.",
+        "startMs": "13560",
+        "endMs": "18840",
+        "startTimeText": "0:13"
+      },
+      {
+        "text": "Two are real bugs.",
+        "startMs": "16440",
+        "endMs": "21560",
+        "startTimeText": "0:16"
+      },
+      {
+        "text": "The other 38 are the actual subject of",
+        "startMs": "18840",
+        "endMs": "23400",
+        "startTimeText": "0:18"
+      },
+      {
+        "text": "this lesson.",
+        "startMs": "21560",
+        "endMs": "25960",
+        "startTimeText": "0:21"
+      },
+      {
+        "text": "Not how to fix a flaky test, how to even",
+        "startMs": "23400",
+        "endMs": "29760",
+        "startTimeText": "0:23"
+      },
+      {
+        "text": "tell which 40 you're looking at.",
+        "startMs": "25960",
+        "endMs": "31800",
+        "startTimeText": "0:25"
+      },
+      {
+        "text": "By the end of this, you will know how to",
+        "startMs": "29760",
+        "endMs": "34640",
+        "startTimeText": "0:29"
+      },
+      {
+        "text": "tell a real bug from a flaky one without",
+        "startMs": "31800",
+        "endMs": "36880",
+        "startTimeText": "0:31"
+      },
+      {
+        "text": "just re-running it.",
+        "startMs": "34640",
+        "endMs": "39600",
+        "startTimeText": "0:34"
+      },
+      {
+        "text": "The six most common causes of flakiness",
+        "startMs": "36880",
+        "endMs": "42120",
+        "startTimeText": "0:36"
+      },
+      {
+        "text": "and how to spot each one.",
+        "startMs": "39600",
+        "endMs": "44400",
+        "startTimeText": "0:39"
+      },
+      {
+        "text": "How to use AI to rank causes with",
+        "startMs": "42120",
+        "endMs": "47400",
+        "startTimeText": "0:42"
+      },
+      {
+        "text": "evidence instead of guessing.",
+        "startMs": "44400",
+        "endMs": "49760",
+        "startTimeText": "0:44"
+      },
+      {
+        "text": "And the guardrails that stop just add a",
+        "startMs": "47400",
+        "endMs": "54560",
+        "startTimeText": "0:47"
+      },
+      {
+        "text": "retry from quietly hiding a real bug.",
+        "startMs": "49760",
+        "endMs": "57800",
+        "startTimeText": "0:49"
+      },
+      {
+        "text": "First, what flaky actually means.",
+        "startMs": "54560",
+        "endMs": "60040",
+        "startTimeText": "0:54"
+      },
+      {
+        "text": "Get this definition wrong, and every",
+        "startMs": "57800",
+        "endMs": "63880",
+        "startTimeText": "0:57"
+      },
+      {
+        "text": "step after it goes wrong, too.",
+        "startMs": "60040",
+        "endMs": "66200",
+        "startTimeText": "1:00"
+      },
+      {
+        "text": "It passed on my machine, and it passed",
+        "startMs": "63880",
+        "endMs": "68080",
+        "startTimeText": "1:03"
+      },
+      {
+        "text": "on the rerun.",
+        "startMs": "66200",
+        "endMs": "70800",
+        "startTimeText": "1:06"
+      },
+      {
+        "text": "So, it's not a real bug.",
+        "startMs": "68080",
+        "endMs": "73000",
+        "startTimeText": "1:08"
+      },
+      {
+        "text": "That sentence is where good bugs go to",
+        "startMs": "70800",
+        "endMs": "74520",
+        "startTimeText": "1:10"
+      },
+      {
+        "text": "die.",
+        "startMs": "73000",
+        "endMs": "78280",
+        "startTimeText": "1:13"
+      },
+      {
+        "text": "Flaky doesn't mean not a bug.",
+        "startMs": "74520",
+        "endMs": "80680",
+        "startTimeText": "1:14"
+      },
+      {
+        "text": "Here's the same test run five times",
+        "startMs": "78280",
+        "endMs": "82600",
+        "startTimeText": "1:18"
+      },
+      {
+        "text": "back-to-back.",
+        "startMs": "80680",
+        "endMs": "85400",
+        "startTimeText": "1:20"
+      },
+      {
+        "text": "Identical code, identical input, and two",
+        "startMs": "82600",
+        "endMs": "87440",
+        "startTimeText": "1:22"
+      },
+      {
+        "text": "different verdicts.",
+        "startMs": "85400",
+        "endMs": "89880",
+        "startTimeText": "1:25"
+      },
+      {
+        "text": "That is the entire definition of flaky",
+        "startMs": "87440",
+        "endMs": "92920",
+        "startTimeText": "1:27"
+      },
+      {
+        "text": "in one table.",
+        "startMs": "89880",
+        "endMs": "94840",
+        "startTimeText": "1:29"
+      },
+      {
+        "text": "Three things to hold on to before you",
+        "startMs": "92920",
+        "endMs": "97320",
+        "startTimeText": "1:32"
+      },
+      {
+        "text": "diagnose anything.",
+        "startMs": "94840",
+        "endMs": "99920",
+        "startTimeText": "1:34"
+      },
+      {
+        "text": "Same code, same input, different result",
+        "startMs": "97320",
+        "endMs": "101960",
+        "startTimeText": "1:37"
+      },
+      {
+        "text": "across runs.",
+        "startMs": "99920",
+        "endMs": "104360",
+        "startTimeText": "1:39"
+      },
+      {
+        "text": "It is not proof the app is fine. It's",
+        "startMs": "101960",
+        "endMs": "107520",
+        "startTimeText": "1:41"
+      },
+      {
+        "text": "proof the signal is unreliable.",
+        "startMs": "104360",
+        "endMs": "110200",
+        "startTimeText": "1:44"
+      },
+      {
+        "text": "And a real bug can hide behind it. Just",
+        "startMs": "107520",
+        "endMs": "113680",
+        "startTimeText": "1:47"
+      },
+      {
+        "text": "needs a rerun for months.",
+        "startMs": "110200",
+        "endMs": "116120",
+        "startTimeText": "1:50"
+      },
+      {
+        "text": "Here are the six causes, roughly ranked",
+        "startMs": "113680",
+        "endMs": "119240",
+        "startTimeText": "1:53"
+      },
+      {
+        "text": "by how often actually show up.",
+        "startMs": "116120",
+        "endMs": "121680",
+        "startTimeText": "1:56"
+      },
+      {
+        "text": "Shared test state and leftover database",
+        "startMs": "119240",
+        "endMs": "124880",
+        "startTimeText": "1:59"
+      },
+      {
+        "text": "rows, the classic works alone, fails in",
+        "startMs": "121680",
+        "endMs": "128320",
+        "startTimeText": "2:01"
+      },
+      {
+        "text": "the suite, timing races and animations",
+        "startMs": "124880",
+        "endMs": "130560",
+        "startTimeText": "2:04"
+      },
+      {
+        "text": "where the test looked before the UI was",
+        "startMs": "128320",
+        "endMs": "132160",
+        "startTimeText": "2:08"
+      },
+      {
+        "text": "ready.",
+        "startMs": "130560",
+        "endMs": "134720",
+        "startTimeText": "2:10"
+      },
+      {
+        "text": "Third-party or network flake, not your",
+        "startMs": "132160",
+        "endMs": "137520",
+        "startTimeText": "2:12"
+      },
+      {
+        "text": "bug but still your failure.",
+        "startMs": "134720",
+        "endMs": "140480",
+        "startTimeText": "2:14"
+      },
+      {
+        "text": "Execution order dependency where test B",
+        "startMs": "137520",
+        "endMs": "142840",
+        "startTimeText": "2:17"
+      },
+      {
+        "text": "quietly needs something only test A",
+        "startMs": "140480",
+        "endMs": "145120",
+        "startTimeText": "2:20"
+      },
+      {
+        "text": "leaves behind.",
+        "startMs": "142840",
+        "endMs": "147480",
+        "startTimeText": "2:22"
+      },
+      {
+        "text": "Resource contention when tests run in",
+        "startMs": "145120",
+        "endMs": "149280",
+        "startTimeText": "2:25"
+      },
+      {
+        "text": "parallel.",
+        "startMs": "147480",
+        "endMs": "151240",
+        "startTimeText": "2:27"
+      },
+      {
+        "text": "And environment drift, a different",
+        "startMs": "149280",
+        "endMs": "154400",
+        "startTimeText": "2:29"
+      },
+      {
+        "text": "browser or version than CI.",
+        "startMs": "151240",
+        "endMs": "156800",
+        "startTimeText": "2:31"
+      },
+      {
+        "text": "Learn to recognize these six and most",
+        "startMs": "154400",
+        "endMs": "160920",
+        "startTimeText": "2:34"
+      },
+      {
+        "text": "triage stops being a guessing game.",
+        "startMs": "156800",
+        "endMs": "163240",
+        "startTimeText": "2:36"
+      },
+      {
+        "text": "40 red tests",
+        "startMs": "160920",
+        "endMs": "165959",
+        "startTimeText": "2:40"
+      },
+      {
+        "text": "20 minutes before stand-up",
+        "startMs": "163240",
+        "endMs": "168480",
+        "startTimeText": "2:43"
+      },
+      {
+        "text": "Where do I even start?",
+        "startMs": "165959",
+        "endMs": "170680",
+        "startTimeText": "2:45"
+      },
+      {
+        "text": "This is the exact moment most teams",
+        "startMs": "168480",
+        "endMs": "172600",
+        "startTimeText": "2:48"
+      },
+      {
+        "text": "reach for just rerun it. There's a",
+        "startMs": "170680",
+        "endMs": "175400",
+        "startTimeText": "2:50"
+      },
+      {
+        "text": "better start.",
+        "startMs": "172600",
+        "endMs": "177480",
+        "startTimeText": "2:52"
+      },
+      {
+        "text": "Meet the suite.",
+        "startMs": "175400",
+        "endMs": "180080",
+        "startTimeText": "2:55"
+      },
+      {
+        "text": "A real-looking regression suite so the",
+        "startMs": "177480",
+        "endMs": "181800",
+        "startTimeText": "2:57"
+      },
+      {
+        "text": "rest of this lesson has something to",
+        "startMs": "180080",
+        "endMs": "184400",
+        "startTimeText": "3:00"
+      },
+      {
+        "text": "point at.",
+        "startMs": "181800",
+        "endMs": "187120",
+        "startTimeText": "3:01"
+      },
+      {
+        "text": "About 2,000 tests",
+        "startMs": "184400",
+        "endMs": "190160",
+        "startTimeText": "3:04"
+      },
+      {
+        "text": "40 came back red this morning.",
+        "startMs": "187120",
+        "endMs": "192400",
+        "startTimeText": "3:07"
+      },
+      {
+        "text": "Two of those are new.",
+        "startMs": "190160",
+        "endMs": "195360",
+        "startTimeText": "3:10"
+      },
+      {
+        "text": "The other 38 aren't and right now nobody",
+        "startMs": "192400",
+        "endMs": "198920",
+        "startTimeText": "3:12"
+      },
+      {
+        "text": "on this team knows which two.",
+        "startMs": "195360",
+        "endMs": "198920",
+        "startTimeText": "3:15"
+      },
+      {
+        "text": "This is what most teams actually do at",
+        "startMs": "199000",
+        "endMs": "203200",
+        "startTimeText": "3:19"
+      },
+      {
+        "text": "9:00 a.m.",
+        "startMs": "200880",
+        "endMs": "205480",
+        "startTimeText": "3:20"
+      },
+      {
+        "text": "40 red tests",
+        "startMs": "203200",
+        "endMs": "207760",
+        "startTimeText": "3:23"
+      },
+      {
+        "text": "Skim each log.",
+        "startMs": "205480",
+        "endMs": "210720",
+        "startTimeText": "3:25"
+      },
+      {
+        "text": "Guess whether it's flaky or real.",
+        "startMs": "207760",
+        "endMs": "212959",
+        "startTimeText": "3:27"
+      },
+      {
+        "text": "Rerun three times.",
+        "startMs": "210720",
+        "endMs": "214880",
+        "startTimeText": "3:30"
+      },
+      {
+        "text": "Ship and hope.",
+        "startMs": "212959",
+        "endMs": "217120",
+        "startTimeText": "3:32"
+      },
+      {
+        "text": "Notice there is no evidence anywhere in",
+        "startMs": "214880",
+        "endMs": "220040",
+        "startTimeText": "3:34"
+      },
+      {
+        "text": "that process.",
+        "startMs": "217120",
+        "endMs": "222680",
+        "startTimeText": "3:37"
+      },
+      {
+        "text": "Diagnosing with evidence",
+        "startMs": "220040",
+        "endMs": "225400",
+        "startTimeText": "3:40"
+      },
+      {
+        "text": "Same 40 failures, a completely different",
+        "startMs": "222680",
+        "endMs": "227160",
+        "startTimeText": "3:42"
+      },
+      {
+        "text": "process.",
+        "startMs": "225400",
+        "endMs": "231320",
+        "startTimeText": "3:45"
+      },
+      {
+        "text": "This is the part that actually scales.",
+        "startMs": "227160",
+        "endMs": "234160",
+        "startTimeText": "3:47"
+      },
+      {
+        "text": "Three steps on repeat and every step",
+        "startMs": "231320",
+        "endMs": "235800",
+        "startTimeText": "3:51"
+      },
+      {
+        "text": "produces something you can point to",
+        "startMs": "234160",
+        "endMs": "237440",
+        "startTimeText": "3:54"
+      },
+      {
+        "text": "later.",
+        "startMs": "235800",
+        "endMs": "240080",
+        "startTimeText": "3:55"
+      },
+      {
+        "text": "Reproduce, run it five times and log",
+        "startMs": "237440",
+        "endMs": "242040",
+        "startTimeText": "3:57"
+      },
+      {
+        "text": "every result.",
+        "startMs": "240080",
+        "endMs": "244960",
+        "startTimeText": "4:00"
+      },
+      {
+        "text": "Isolate, pull the logs, the DOM state,",
+        "startMs": "242040",
+        "endMs": "248040",
+        "startTimeText": "4:02"
+      },
+      {
+        "text": "the timing, the database rows.",
+        "startMs": "244960",
+        "endMs": "250240",
+        "startTimeText": "4:04"
+      },
+      {
+        "text": "Rank the causes, each one with its",
+        "startMs": "248040",
+        "endMs": "252520",
+        "startTimeText": "4:08"
+      },
+      {
+        "text": "evidence attached.",
+        "startMs": "250240",
+        "endMs": "255040",
+        "startTimeText": "4:10"
+      },
+      {
+        "text": "This loop is the entire upgrade. It",
+        "startMs": "252520",
+        "endMs": "257600",
+        "startTimeText": "4:12"
+      },
+      {
+        "text": "doesn't need a bigger model.",
+        "startMs": "255040",
+        "endMs": "259600",
+        "startTimeText": "4:15"
+      },
+      {
+        "text": "It needs a time budget, same as any",
+        "startMs": "257600",
+        "endMs": "262280",
+        "startTimeText": "4:17"
+      },
+      {
+        "text": "agent loop and a hard stop. It ranks",
+        "startMs": "259600",
+        "endMs": "266800",
+        "startTimeText": "4:19"
+      },
+      {
+        "text": "causes, it does not decide the fix.",
+        "startMs": "262280",
+        "endMs": "268760",
+        "startTimeText": "4:22"
+      },
+      {
+        "text": "This is the prompt that replaces the",
+        "startMs": "266800",
+        "endMs": "270360",
+        "startTimeText": "4:26"
+      },
+      {
+        "text": "guess.",
+        "startMs": "268760",
+        "endMs": "272480",
+        "startTimeText": "4:28"
+      },
+      {
+        "text": "Here's the failing test, the DOM and the",
+        "startMs": "270360",
+        "endMs": "275200",
+        "startTimeText": "4:30"
+      },
+      {
+        "text": "last five run logs.",
+        "startMs": "272480",
+        "endMs": "277040",
+        "startTimeText": "4:32"
+      },
+      {
+        "text": "Rank the top three causes of",
+        "startMs": "275200",
+        "endMs": "279240",
+        "startTimeText": "4:35"
+      },
+      {
+        "text": "intermittent failure.",
+        "startMs": "277040",
+        "endMs": "281040",
+        "startTimeText": "4:37"
+      },
+      {
+        "text": "For each one, give the evidence you",
+        "startMs": "279240",
+        "endMs": "282760",
+        "startTimeText": "4:39"
+      },
+      {
+        "text": "used.",
+        "startMs": "281040",
+        "endMs": "285120",
+        "startTimeText": "4:41"
+      },
+      {
+        "text": "No evidence found.",
+        "startMs": "282760",
+        "endMs": "287400",
+        "startTimeText": "4:42"
+      },
+      {
+        "text": "Say so, don't guess.",
+        "startMs": "285120",
+        "endMs": "289800",
+        "startTimeText": "4:45"
+      },
+      {
+        "text": "That last line is what separates this",
+        "startMs": "287400",
+        "endMs": "294120",
+        "startTimeText": "4:47"
+      },
+      {
+        "text": "from a confident guess wearing a rank.",
+        "startMs": "289800",
+        "endMs": "297240",
+        "startTimeText": "4:49"
+      },
+      {
+        "text": "What good evidence actually looks like.",
+        "startMs": "294120",
+        "endMs": "299600",
+        "startTimeText": "4:54"
+      },
+      {
+        "text": "Time stamps showing the assertion ran",
+        "startMs": "297240",
+        "endMs": "302400",
+        "startTimeText": "4:57"
+      },
+      {
+        "text": "before the network call finished.",
+        "startMs": "299600",
+        "endMs": "304919",
+        "startTimeText": "4:59"
+      },
+      {
+        "text": "A row in the database left over from a",
+        "startMs": "302400",
+        "endMs": "308240",
+        "startTimeText": "5:02"
+      },
+      {
+        "text": "test that ran 20 minutes earlier.",
+        "startMs": "304919",
+        "endMs": "310320",
+        "startTimeText": "5:04"
+      },
+      {
+        "text": "The same element appearing twice in the",
+        "startMs": "308240",
+        "endMs": "313520",
+        "startTimeText": "5:08"
+      },
+      {
+        "text": "DOM after a re-render.",
+        "startMs": "310320",
+        "endMs": "315120",
+        "startTimeText": "5:10"
+      },
+      {
+        "text": "If the answer doesn't point at one of",
+        "startMs": "313520",
+        "endMs": "317919",
+        "startTimeText": "5:13"
+      },
+      {
+        "text": "these, it's a guess wearing a confidence",
+        "startMs": "315120",
+        "endMs": "320560",
+        "startTimeText": "5:15"
+      },
+      {
+        "text": "sentence.",
+        "startMs": "317919",
+        "endMs": "323400",
+        "startTimeText": "5:17"
+      },
+      {
+        "text": "Ranked one at a time, these look like 40",
+        "startMs": "320560",
+        "endMs": "325880",
+        "startTimeText": "5:20"
+      },
+      {
+        "text": "unrelated problems.",
+        "startMs": "323400",
+        "endMs": "327880",
+        "startTimeText": "5:23"
+      },
+      {
+        "text": "Grouped by root cause, they usually",
+        "startMs": "325880",
+        "endMs": "329480",
+        "startTimeText": "5:25"
+      },
+      {
+        "text": "aren't.",
+        "startMs": "327880",
+        "endMs": "332040",
+        "startTimeText": "5:27"
+      },
+      {
+        "text": "Each failure becomes a point, its logs,",
+        "startMs": "329480",
+        "endMs": "335200",
+        "startTimeText": "5:29"
+      },
+      {
+        "text": "its DOM state, its timing.",
+        "startMs": "332040",
+        "endMs": "337320",
+        "startTimeText": "5:32"
+      },
+      {
+        "text": "Failures with the same underlying cause",
+        "startMs": "335200",
+        "endMs": "339960",
+        "startTimeText": "5:35"
+      },
+      {
+        "text": "land in the same cluster.",
+        "startMs": "337320",
+        "endMs": "342640",
+        "startTimeText": "5:37"
+      },
+      {
+        "text": "A new failure arrives, gets placed in",
+        "startMs": "339960",
+        "endMs": "345320",
+        "startTimeText": "5:39"
+      },
+      {
+        "text": "that same space, and lands inside an",
+        "startMs": "342640",
+        "endMs": "347560",
+        "startTimeText": "5:42"
+      },
+      {
+        "text": "existing cluster instead of becoming a",
+        "startMs": "345320",
+        "endMs": "350880",
+        "startTimeText": "5:45"
+      },
+      {
+        "text": "new investigation.",
+        "startMs": "347560",
+        "endMs": "350880",
+        "startTimeText": "5:47"
+      },
+      {
+        "text": "It's not 38 flaky tests.",
+        "startMs": "350920",
+        "endMs": "356240",
+        "startTimeText": "5:50"
+      },
+      {
+        "text": "It's one shared login helper leaving a",
+        "startMs": "353960",
+        "endMs": "358480",
+        "startTimeText": "5:53"
+      },
+      {
+        "text": "session behind.",
+        "startMs": "356240",
+        "endMs": "360920",
+        "startTimeText": "5:56"
+      },
+      {
+        "text": "That's the payoff of clustering by cause",
+        "startMs": "358480",
+        "endMs": "365160",
+        "startTimeText": "5:58"
+      },
+      {
+        "text": "instead of triaging test by test.",
+        "startMs": "360920",
+        "endMs": "367960",
+        "startTimeText": "6:00"
+      },
+      {
+        "text": "Fixing it, not silencing it.",
+        "startMs": "365160",
+        "endMs": "370560",
+        "startTimeText": "6:05"
+      },
+      {
+        "text": "A ranked cause is only useful if what",
+        "startMs": "367960",
+        "endMs": "372960",
+        "startTimeText": "6:07"
+      },
+      {
+        "text": "happens next is an add a retry and move",
+        "startMs": "370560",
+        "endMs": "375360",
+        "startTimeText": "6:10"
+      },
+      {
+        "text": "on.",
+        "startMs": "372960",
+        "endMs": "375360",
+        "startTimeText": "6:12"
+      },
+      {
+        "text": "Band-Aid versus cure.",
+        "startMs": "375400",
+        "endMs": "381280",
+        "startTimeText": "6:15"
+      },
+      {
+        "text": "The left column makes the red go away.",
+        "startMs": "377960",
+        "endMs": "384360",
+        "startTimeText": "6:17"
+      },
+      {
+        "text": "The right column makes it stay away.",
+        "startMs": "381280",
+        "endMs": "387400",
+        "startTimeText": "6:21"
+      },
+      {
+        "text": "Retry until it's green versus wait for",
+        "startMs": "384360",
+        "endMs": "390840",
+        "startTimeText": "6:24"
+      },
+      {
+        "text": "the real condition instead of a timer.",
+        "startMs": "387400",
+        "endMs": "393640",
+        "startTimeText": "6:27"
+      },
+      {
+        "text": "A longer sleep and hope versus isolate",
+        "startMs": "390840",
+        "endMs": "395800",
+        "startTimeText": "6:30"
+      },
+      {
+        "text": "the test data so nothing leaks between",
+        "startMs": "393640",
+        "endMs": "397480",
+        "startTimeText": "6:33"
+      },
+      {
+        "text": "runs.",
+        "startMs": "395800",
+        "endMs": "399960",
+        "startTimeText": "6:35"
+      },
+      {
+        "text": "Skip it and forget it exists versus",
+        "startMs": "397480",
+        "endMs": "401840",
+        "startTimeText": "6:37"
+      },
+      {
+        "text": "quarantine it with an owner and an",
+        "startMs": "399960",
+        "endMs": "404080",
+        "startTimeText": "6:39"
+      },
+      {
+        "text": "expiry date.",
+        "startMs": "401840",
+        "endMs": "406880",
+        "startTimeText": "6:41"
+      },
+      {
+        "text": "Rerun the whole suite and move on versus",
+        "startMs": "404080",
+        "endMs": "409600",
+        "startTimeText": "6:44"
+      },
+      {
+        "text": "fix the shared root cause once for every",
+        "startMs": "406880",
+        "endMs": "412640",
+        "startTimeText": "6:46"
+      },
+      {
+        "text": "test it touches.",
+        "startMs": "409600",
+        "endMs": "415360",
+        "startTimeText": "6:49"
+      },
+      {
+        "text": "Five real fixes matched to the cause",
+        "startMs": "412640",
+        "endMs": "417919",
+        "startTimeText": "6:52"
+      },
+      {
+        "text": "that actually produced them.",
+        "startMs": "415360",
+        "endMs": "420280",
+        "startTimeText": "6:55"
+      },
+      {
+        "text": "Shared database state, a unique fixture",
+        "startMs": "417919",
+        "endMs": "423320",
+        "startTimeText": "6:57"
+      },
+      {
+        "text": "per test torn down after.",
+        "startMs": "420280",
+        "endMs": "425840",
+        "startTimeText": "7:00"
+      },
+      {
+        "text": "Timing race, wait for the real condition",
+        "startMs": "423320",
+        "endMs": "428240",
+        "startTimeText": "7:03"
+      },
+      {
+        "text": "not a fixed delay.",
+        "startMs": "425840",
+        "endMs": "430440",
+        "startTimeText": "7:05"
+      },
+      {
+        "text": "Third-party flake, mock the boundary in",
+        "startMs": "428240",
+        "endMs": "434400",
+        "startTimeText": "7:08"
+      },
+      {
+        "text": "CI, save the real call for staging.",
+        "startMs": "430440",
+        "endMs": "437120",
+        "startTimeText": "7:10"
+      },
+      {
+        "text": "Order dependency, randomize test order",
+        "startMs": "434400",
+        "endMs": "440520",
+        "startTimeText": "7:14"
+      },
+      {
+        "text": "in CI so it surfaces early.",
+        "startMs": "437120",
+        "endMs": "442560",
+        "startTimeText": "7:17"
+      },
+      {
+        "text": "Resource contention, one schema per",
+        "startMs": "440520",
+        "endMs": "446800",
+        "startTimeText": "7:20"
+      },
+      {
+        "text": "parallel worker not one shared database.",
+        "startMs": "442560",
+        "endMs": "449440",
+        "startTimeText": "7:22"
+      },
+      {
+        "text": "None of this is exotic.",
+        "startMs": "446800",
+        "endMs": "451919",
+        "startTimeText": "7:26"
+      },
+      {
+        "text": "It's ordinary engineering discipline",
+        "startMs": "449440",
+        "endMs": "456320",
+        "startTimeText": "7:29"
+      },
+      {
+        "text": "applied to the specific cause you found.",
+        "startMs": "451919",
+        "endMs": "458880",
+        "startTimeText": "7:31"
+      },
+      {
+        "text": "Quarantine with a leash.",
+        "startMs": "456320",
+        "endMs": "461160",
+        "startTimeText": "7:36"
+      },
+      {
+        "text": "Your whole regression suite and a small",
+        "startMs": "458880",
+        "endMs": "463760",
+        "startTimeText": "7:38"
+      },
+      {
+        "text": "number quarantined, each one with an",
+        "startMs": "461160",
+        "endMs": "465880",
+        "startTimeText": "7:41"
+      },
+      {
+        "text": "owner and a date.",
+        "startMs": "463760",
+        "endMs": "469040",
+        "startTimeText": "7:43"
+      },
+      {
+        "text": "Still counted as failing coverage.",
+        "startMs": "465880",
+        "endMs": "471640",
+        "startTimeText": "7:45"
+      },
+      {
+        "text": "Never silently deleted.",
+        "startMs": "469040",
+        "endMs": "473920",
+        "startTimeText": "7:49"
+      },
+      {
+        "text": "A quarantine list is a promise to come",
+        "startMs": "471640",
+        "endMs": "476120",
+        "startTimeText": "7:51"
+      },
+      {
+        "text": "back, not a place tests go to be",
+        "startMs": "473920",
+        "endMs": "478880",
+        "startTimeText": "7:53"
+      },
+      {
+        "text": "forgotten.",
+        "startMs": "476120",
+        "endMs": "480600",
+        "startTimeText": "7:56"
+      },
+      {
+        "text": "Zero",
+        "startMs": "478880",
+        "endMs": "482760",
+        "startTimeText": "7:58"
+      },
+      {
+        "text": "quarantine tests without an owner and a",
+        "startMs": "480600",
+        "endMs": "484360",
+        "startTimeText": "8:00"
+      },
+      {
+        "text": "date.",
+        "startMs": "482760",
+        "endMs": "487240",
+        "startTimeText": "8:02"
+      },
+      {
+        "text": "Same rule as self-healing locators.",
+        "startMs": "484360",
+        "endMs": "489520",
+        "startTimeText": "8:04"
+      },
+      {
+        "text": "Nothing silent, everything logged,",
+        "startMs": "487240",
+        "endMs": "492760",
+        "startTimeText": "8:07"
+      },
+      {
+        "text": "someone's name on it.",
+        "startMs": "489520",
+        "endMs": "494760",
+        "startTimeText": "8:09"
+      },
+      {
+        "text": "The guardrails.",
+        "startMs": "492760",
+        "endMs": "497480",
+        "startTimeText": "8:12"
+      },
+      {
+        "text": "Five rules. Put these in place before",
+        "startMs": "494760",
+        "endMs": "500000",
+        "startTimeText": "8:14"
+      },
+      {
+        "text": "AI-ranked triage becomes your default",
+        "startMs": "497480",
+        "endMs": "502680",
+        "startTimeText": "8:17"
+      },
+      {
+        "text": "process.",
+        "startMs": "500000",
+        "endMs": "505280",
+        "startTimeText": "8:20"
+      },
+      {
+        "text": "Before you trust an AI-ranked cause,",
+        "startMs": "502680",
+        "endMs": "507040",
+        "startTimeText": "8:22"
+      },
+      {
+        "text": "every ranked cause ships with its",
+        "startMs": "505280",
+        "endMs": "510680",
+        "startTimeText": "8:25"
+      },
+      {
+        "text": "evidence. No evidence, no rank.",
+        "startMs": "507040",
+        "endMs": "513599",
+        "startTimeText": "8:27"
+      },
+      {
+        "text": "AI never quarantines a test on its own.",
+        "startMs": "510680",
+        "endMs": "515919",
+        "startTimeText": "8:30"
+      },
+      {
+        "text": "A person approves it.",
+        "startMs": "513599",
+        "endMs": "518479",
+        "startTimeText": "8:33"
+      },
+      {
+        "text": "The quarantine list gets reviewed weekly",
+        "startMs": "515919",
+        "endMs": "521080",
+        "startTimeText": "8:35"
+      },
+      {
+        "text": "out loud in the stand-up.",
+        "startMs": "518479",
+        "endMs": "523240",
+        "startTimeText": "8:38"
+      },
+      {
+        "text": "A retry is a stopgap with an expiry",
+        "startMs": "521080",
+        "endMs": "525880",
+        "startTimeText": "8:41"
+      },
+      {
+        "text": "date, never a fix.",
+        "startMs": "523240",
+        "endMs": "528600",
+        "startTimeText": "8:43"
+      },
+      {
+        "text": "And track flake rate as one real number,",
+        "startMs": "525880",
+        "endMs": "532320",
+        "startTimeText": "8:45"
+      },
+      {
+        "text": "not a feeling about the pipeline.",
+        "startMs": "528600",
+        "endMs": "535600",
+        "startTimeText": "8:48"
+      },
+      {
+        "text": "A quarantine you can actually audit.",
+        "startMs": "532320",
+        "endMs": "538080",
+        "startTimeText": "8:52"
+      },
+      {
+        "text": "Test name, owner, the reason when it was",
+        "startMs": "535600",
+        "endMs": "540320",
+        "startTimeText": "8:55"
+      },
+      {
+        "text": "filed, when it expires, and how many",
+        "startMs": "538080",
+        "endMs": "542200",
+        "startTimeText": "8:58"
+      },
+      {
+        "text": "retries.",
+        "startMs": "540320",
+        "endMs": "544360",
+        "startTimeText": "9:00"
+      },
+      {
+        "text": "Retries are the stopgap here, not the",
+        "startMs": "542200",
+        "endMs": "545960",
+        "startTimeText": "9:02"
+      },
+      {
+        "text": "fix.",
+        "startMs": "544360",
+        "endMs": "548680",
+        "startTimeText": "9:04"
+      },
+      {
+        "text": "Eight lines, and the quarantine list is",
+        "startMs": "545960",
+        "endMs": "553160",
+        "startTimeText": "9:05"
+      },
+      {
+        "text": "now a document instead of a folk memory.",
+        "startMs": "548680",
+        "endMs": "555960",
+        "startTimeText": "9:08"
+      },
+      {
+        "text": "If you want to actually start, week one,",
+        "startMs": "553160",
+        "endMs": "558360",
+        "startTimeText": "9:13"
+      },
+      {
+        "text": "take your 10 flakiest tests and run each",
+        "startMs": "555960",
+        "endMs": "561080",
+        "startTimeText": "9:15"
+      },
+      {
+        "text": "five times back to back, logging every",
+        "startMs": "558360",
+        "endMs": "562839",
+        "startTimeText": "9:18"
+      },
+      {
+        "text": "result.",
+        "startMs": "561080",
+        "endMs": "565000",
+        "startTimeText": "9:21"
+      },
+      {
+        "text": "Week two, rank causes with the evidence",
+        "startMs": "562839",
+        "endMs": "568120",
+        "startTimeText": "9:22"
+      },
+      {
+        "text": "prompt. No guessing allowed.",
+        "startMs": "565000",
+        "endMs": "570160",
+        "startTimeText": "9:25"
+      },
+      {
+        "text": "Week three, fix the top three causes",
+        "startMs": "568120",
+        "endMs": "573560",
+        "startTimeText": "9:28"
+      },
+      {
+        "text": "properly, not with a longer sleep.",
+        "startMs": "570160",
+        "endMs": "575800",
+        "startTimeText": "9:30"
+      },
+      {
+        "text": "Week four, stand up a quarantine list",
+        "startMs": "573560",
+        "endMs": "578440",
+        "startTimeText": "9:33"
+      },
+      {
+        "text": "with an owner and an expiry date on",
+        "startMs": "575800",
+        "endMs": "581560",
+        "startTimeText": "9:35"
+      },
+      {
+        "text": "every single row.",
+        "startMs": "578440",
+        "endMs": "585120",
+        "startTimeText": "9:38"
+      },
+      {
+        "text": "Two are real bugs now with evidence.",
+        "startMs": "581560",
+        "endMs": "587440",
+        "startTimeText": "9:41"
+      },
+      {
+        "text": "The other 38 have names instead of a",
+        "startMs": "585120",
+        "endMs": "589120",
+        "startTimeText": "9:45"
+      },
+      {
+        "text": "shrug.",
+        "startMs": "587440",
+        "endMs": "590880",
+        "startTimeText": "9:47"
+      },
+      {
+        "text": "That's the whole shift from rerun and",
+        "startMs": "589120",
+        "endMs": "594280",
+        "startTimeText": "9:49"
+      },
+      {
+        "text": "hope to a named cause, a real fix, or at",
+        "startMs": "590880",
+        "endMs": "597480",
+        "startTimeText": "9:50"
+      },
+      {
+        "text": "least quarantine.",
+        "startMs": "594280",
+        "endMs": "601080",
+        "startTimeText": "9:54"
+      },
+      {
+        "text": "That's the flaky test autopsy, honestly.",
+        "startMs": "597480",
+        "endMs": "603240",
+        "startTimeText": "9:57"
+      },
+      {
+        "text": "If this helped, subscribe to Quick Tech",
+        "startMs": "601080",
+        "endMs": "606600",
+        "startTimeText": "10:01"
+      },
+      {
+        "text": "Update. Next lesson, an AI is writing",
+        "startMs": "603240",
+        "endMs": "609000",
+        "startTimeText": "10:03"
+      },
+      {
+        "text": "SQL straight at your database, and",
+        "startMs": "606600",
+        "endMs": "612520",
+        "startTimeText": "10:06"
+      },
+      {
+        "text": "here's the DBA's survival guide.",
+        "startMs": "609000",
+        "endMs": "615680",
+        "startTimeText": "10:09"
+      },
+      {
+        "text": "Thanks for watching.",
+        "startMs": "612520",
+        "endMs": "615680",
+        "startTimeText": "10:12"
+      }
+    ],
+    "transcript_only_text": " The  flaky  test  autopsy. \n 40  red  tests  overnight,  and  by  the  end \n of  this,  you'll  know  exactly  what  to  do \n with  them.  Not  just  how  to  make  the  red \n go  away. \n 40  tests  failed  last  night. \n Two  are  real  bugs. \n The  other  38  are  the  actual  subject  of \n this  lesson. \n Not  how  to  fix  a  flaky  test,  how  to  even \n tell  which  40  you're  looking  at. \n By  the  end  of  this,  you  will  know  how  to \n tell  a  real  bug  from  a  flaky  one  without \n just  re-running  it. \n The  six  most  common  causes  of  flakiness \n and  how  to  spot  each  one. \n How  to  use  AI  to  rank  causes  with \n evidence  instead  of  guessing. \n And  the  guardrails  that  stop  just  add  a \n retry  from  quietly  hiding  a  real  bug. \n First,  what  flaky  actually  means. \n Get  this  definition  wrong,  and  every \n step  after  it  goes  wrong,  too. \n It  passed  on  my  machine,  and  it  passed \n on  the  rerun. \n So,  it's  not  a  real  bug. \n That  sentence  is  where  good  bugs  go  to \n die. \n Flaky  doesn't  mean  not  a  bug. \n Here's  the  same  test  run  five  times \n back-to-back. \n Identical  code,  identical  input,  and  two \n different  verdicts. \n That  is  the  entire  definition  of  flaky \n in  one  table. \n Three  things  to  hold  on  to  before  you \n diagnose  anything. \n Same  code,  same  input,  different  result \n across  runs. \n It  is  not  proof  the  app  is  fine.  It's \n proof  the  signal  is  unreliable. \n And  a  real  bug  can  hide  behind  it.  Just \n needs  a  rerun  for  months. \n Here  are  the  six  causes,  roughly  ranked \n by  how  often  actually  show  up. \n Shared  test  state  and  leftover  database \n rows,  the  classic  works  alone,  fails  in \n the  suite,  timing  races  and  animations \n where  the  test  looked  before  the  UI  was \n ready. \n Third-party  or  network  flake,  not  your \n bug  but  still  your  failure. \n Execution  order  dependency  where  test  B \n quietly  needs  something  only  test  A \n leaves  behind. \n Resource  contention  when  tests  run  in \n parallel. \n And  environment  drift,  a  different \n browser  or  version  than  CI. \n Learn  to  recognize  these  six  and  most \n triage  stops  being  a  guessing  game. \n 40  red  tests \n 20  minutes  before  stand-up \n Where  do  I  even  start? \n This  is  the  exact  moment  most  teams \n reach  for  just  rerun  it.  There's  a \n better  start. \n Meet  the  suite. \n A  real-looking  regression  suite  so  the \n rest  of  this  lesson  has  something  to \n point  at. \n About  2,000  tests \n 40  came  back  red  this  morning. \n Two  of  those  are  new. \n The  other  38  aren't  and  right  now  nobody \n on  this  team  knows  which  two. \n This  is  what  most  teams  actually  do  at \n 9:00  a.m. \n 40  red  tests \n Skim  each  log. \n Guess  whether  it's  flaky  or  real. \n Rerun  three  times. \n Ship  and  hope. \n Notice  there  is  no  evidence  anywhere  in \n that  process. \n Diagnosing  with  evidence \n Same  40  failures,  a  completely  different \n process. \n This  is  the  part  that  actually  scales. \n Three  steps  on  repeat  and  every  step \n produces  something  you  can  point  to \n later. \n Reproduce,  run  it  five  times  and  log \n every  result. \n Isolate,  pull  the  logs,  the  DOM  state, \n the  timing,  the  database  rows. \n Rank  the  causes,  each  one  with  its \n evidence  attached. \n This  loop  is  the  entire  upgrade.  It \n doesn't  need  a  bigger  model. \n It  needs  a  time  budget,  same  as  any \n agent  loop  and  a  hard  stop.  It  ranks \n causes,  it  does  not  decide  the  fix. \n This  is  the  prompt  that  replaces  the \n guess. \n Here's  the  failing  test,  the  DOM  and  the \n last  five  run  logs. \n Rank  the  top  three  causes  of \n intermittent  failure. \n For  each  one,  give  the  evidence  you \n used. \n No  evidence  found. \n Say  so,  don't  guess. \n That  last  line  is  what  separates  this \n from  a  confident  guess  wearing  a  rank. \n What  good  evidence  actually  looks  like. \n Time  stamps  showing  the  assertion  ran \n before  the  network  call  finished. \n A  row  in  the  database  left  over  from  a \n test  that  ran  20  minutes  earlier. \n The  same  element  appearing  twice  in  the \n DOM  after  a  re-render. \n If  the  answer  doesn't  point  at  one  of \n these,  it's  a  guess  wearing  a  confidence \n sentence. \n Ranked  one  at  a  time,  these  look  like  40 \n unrelated  problems. \n Grouped  by  root  cause,  they  usually \n aren't. \n Each  failure  becomes  a  point,  its  logs, \n its  DOM  state,  its  timing. \n Failures  with  the  same  underlying  cause \n land  in  the  same  cluster. \n A  new  failure  arrives,  gets  placed  in \n that  same  space,  and  lands  inside  an \n existing  cluster  instead  of  becoming  a \n new  investigation. \n It's  not  38  flaky  tests. \n It's  one  shared  login  helper  leaving  a \n session  behind. \n That's  the  payoff  of  clustering  by  cause \n instead  of  triaging  test  by  test. \n Fixing  it,  not  silencing  it. \n A  ranked  cause  is  only  useful  if  what \n happens  next  is  an  add  a  retry  and  move \n on. \n Band-Aid  versus  cure. \n The  left  column  makes  the  red  go  away. \n The  right  column  makes  it  stay  away. \n Retry  until  it's  green  versus  wait  for \n the  real  condition  instead  of  a  timer. \n A  longer  sleep  and  hope  versus  isolate \n the  test  data  so  nothing  leaks  between \n runs. \n Skip  it  and  forget  it  exists  versus \n quarantine  it  with  an  owner  and  an \n expiry  date. \n Rerun  the  whole  suite  and  move  on  versus \n fix  the  shared  root  cause  once  for  every \n test  it  touches. \n Five  real  fixes  matched  to  the  cause \n that  actually  produced  them. \n Shared  database  state,  a  unique  fixture \n per  test  torn  down  after. \n Timing  race,  wait  for  the  real  condition \n not  a  fixed  delay. \n Third-party  flake,  mock  the  boundary  in \n CI,  save  the  real  call  for  staging. \n Order  dependency,  randomize  test  order \n in  CI  so  it  surfaces  early. \n Resource  contention,  one  schema  per \n parallel  worker  not  one  shared  database. \n None  of  this  is  exotic. \n It's  ordinary  engineering  discipline \n applied  to  the  specific  cause  you  found. \n Quarantine  with  a  leash. \n Your  whole  regression  suite  and  a  small \n number  quarantined,  each  one  with  an \n owner  and  a  date. \n Still  counted  as  failing  coverage. \n Never  silently  deleted. \n A  quarantine  list  is  a  promise  to  come \n back,  not  a  place  tests  go  to  be \n forgotten. \n Zero \n quarantine  tests  without  an  owner  and  a \n date. \n Same  rule  as  self-healing  locators. \n Nothing  silent,  everything  logged, \n someone's  name  on  it. \n The  guardrails. \n Five  rules.  Put  these  in  place  before \n AI-ranked  triage  becomes  your  default \n process. \n Before  you  trust  an  AI-ranked  cause, \n every  ranked  cause  ships  with  its \n evidence.  No  evidence,  no  rank. \n AI  never  quarantines  a  test  on  its  own. \n A  person  approves  it. \n The  quarantine  list  gets  reviewed  weekly \n out  loud  in  the  stand-up. \n A  retry  is  a  stopgap  with  an  expiry \n date,  never  a  fix. \n And  track  flake  rate  as  one  real  number, \n not  a  feeling  about  the  pipeline. \n A  quarantine  you  can  actually  audit. \n Test  name,  owner,  the  reason  when  it  was \n filed,  when  it  expires,  and  how  many \n retries. \n Retries  are  the  stopgap  here,  not  the \n fix. \n Eight  lines,  and  the  quarantine  list  is \n now  a  document  instead  of  a  folk  memory. \n If  you  want  to  actually  start,  week  one, \n take  your  10  flakiest  tests  and  run  each \n five  times  back  to  back,  logging  every \n result. \n Week  two,  rank  causes  with  the  evidence \n prompt.  No  guessing  allowed. \n Week  three,  fix  the  top  three  causes \n properly,  not  with  a  longer  sleep. \n Week  four,  stand  up  a  quarantine  list \n with  an  owner  and  an  expiry  date  on \n every  single  row. \n Two  are  real  bugs  now  with  evidence. \n The  other  38  have  names  instead  of  a \n shrug. \n That's  the  whole  shift  from  rerun  and \n hope  to  a  named  cause,  a  real  fix,  or  at \n least  quarantine. \n That's  the  flaky  test  autopsy,  honestly. \n If  this  helped,  subscribe  to  Quick  Tech \n Update.  Next  lesson,  an  AI  is  writing \n SQL  straight  at  your  database,  and \n here's  the  DBA's  survival  guide. \n Thanks  for  watching.",
+    "language": "English",
+    "videoId": "NA813hJOLXg",
+    "captionTracks": [
+      {
+        "baseUrl": "https://www.youtube.com/api/timedtext?v=NA813hJOLXg&ei=4xWkapWOHKfhkucPhPPHwAo&caps=asr&opi=112496729&exp=xpe&xoaf=5&xowf=1&xospf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1789163603&sparams=ip,ipbits,expire,v,ei,caps,opi,exp,xoaf&signature=0E3E3206C7B5DE88D148BBD1B9C769FF4747E069.DF4DC9A22E471807AA5B9680C1E6B965ECD26EA0&key=yt8&kind=asr&lang=en&variant=gemini",
+        "name": {
+          "simpleText": "English (auto-generated)"
+        },
+        "vssId": "a.en",
+        "languageCode": "en",
+        "kind": "asr",
+        "isTranslatable": true,
+        "trackName": ""
+      }
+    ]
+  }
+}

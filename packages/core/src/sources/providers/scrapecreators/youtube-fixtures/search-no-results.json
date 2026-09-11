@@ -1,0 +1,15 @@
+{
+  "httpStatus": 200,
+  "body": {
+    "success": true,
+    "credits_remaining": 1755,
+    "credits_charged": 1,
+    "videos": [],
+    "channels": [],
+    "playlists": [],
+    "shorts": [],
+    "shelves": [],
+    "lives": [],
+    "continuationToken": null
+  }
+}

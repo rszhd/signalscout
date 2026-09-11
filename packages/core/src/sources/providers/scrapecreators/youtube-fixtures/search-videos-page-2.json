@@ -1,0 +1,432 @@
+{
+  "httpStatus": 200,
+  "body": {
+    "success": true,
+    "credits_remaining": 1759,
+    "credits_charged": 1,
+    "videos": [
+      {
+        "type": "video",
+        "id": "qe2lWfE_Ong",
+        "url": "https://www.youtube.com/watch?v=qe2lWfE_Ong",
+        "title": "End-to-End Testing: How to Stop the Maintenance Trap",
+        "thumbnail": "https://scrubbed.invalid/thumbnail.jpg",
+        "channel": {
+          "id": "yt-channel-1",
+          "title": "yt-channel-2",
+          "handle": "yt-channel-3",
+          "thumbnail": "https://scrubbed.invalid/thumbnail.jpg"
+        },
+        "viewCountText": "58 views",
+        "viewCountInt": 58,
+        "publishedTimeText": "3 weeks ago",
+        "publishedTime": "2026-08-21T14:53:05.576Z",
+        "lengthText": "32:54",
+        "lengthSeconds": 1974,
+        "badges": [
+          "4K",
+          "CC"
+        ]
+      },
+      {
+        "type": "video",
+        "id": "UvmxqQRoGkE",
+        "url": "https://www.youtube.com/watch?v=UvmxqQRoGkE",
+        "title": "End-to-End Testing with Claude Code and Playwright",
+        "thumbnail": "https://scrubbed.invalid/thumbnail.jpg",
+        "channel": {
+          "id": "yt-channel-4",
+          "title": "yt-channel-5",
+          "handle": "yt-channel-6",
+          "thumbnail": "https://scrubbed.invalid/thumbnail.jpg"
+        },
+        "viewCountText": "13 views",
+        "viewCountInt": 13,
+        "publishedTimeText": "5 days ago",
+        "publishedTime": "2026-09-06T14:53:05.576Z",
+        "lengthText": "1:48",
+        "lengthSeconds": 108,
+        "badges": [
+          "New"
+        ]
+      },
+      {
+        "type": "video",
+        "id": "By-oEXkBaSM",
+        "url": "https://www.youtube.com/watch?v=By-oEXkBaSM",
+        "title": "Cypress Cloud CLI skill",
+        "thumbnail": "https://scrubbed.invalid/thumbnail.jpg",
+        "channel": {
+          "id": "yt-channel-7",
+          "title": "yt-channel-8",
+          "handle": "yt-channel-9",
+          "thumbnail": "https://scrubbed.invalid/thumbnail.jpg"
+        },
+        "viewCountText": "130 views",
+        "viewCountInt": 130,
+        "publishedTimeText": "1 day ago",
+        "publishedTime": "2026-09-10T14:53:05.576Z",
+        "lengthText": "2:25",
+        "lengthSeconds": 145,
+        "badges": [
+          "New"
+        ]
+      },
+      {
+        "type": "video",
+        "id": "rgtrIGBfaFA",
+        "url": "https://www.youtube.com/watch?v=rgtrIGBfaFA",
+        "title": "Run Playwright Tests with Harness AI Test Automation | CI/CD + AI Failure Analysis",
+        "thumbnail": "https://scrubbed.invalid/thumbnail.jpg",
+        "channel": {
+          "id": "yt-channel-10",
+          "title": "yt-channel-11",
+          "handle": "yt-channel-12",
+          "thumbnail": "https://scrubbed.invalid/thumbnail.jpg"
+        },
+        "viewCountText": "446 views",
+        "viewCountInt": 446,
+        "publishedTimeText": "3 weeks ago",
+        "publishedTime": "2026-08-21T14:53:05.576Z",
+        "lengthText": "6:58",
+        "lengthSeconds": 418,
+        "badges": []
+      },
+      {
+        "type": "video",
+        "id": "D3LNiaWdxw8",
+        "url": "https://www.youtube.com/watch?v=D3LNiaWdxw8",
+        "title": "Beyond the Green Checkmark: Clean Code, TDD, and AI Testing with TestingGil",
+        "thumbnail": "https://scrubbed.invalid/thumbnail.jpg",
+        "channel": {
+          "id": "yt-channel-13",
+          "title": "yt-channel-14",
+          "handle": "yt-channel-15",
+          "thumbnail": "https://scrubbed.invalid/thumbnail.jpg"
+        },
+        "viewCountText": "146 views",
+        "viewCountInt": 146,
+        "publishedTimeText": "3 weeks ago",
+        "publishedTime": "2026-08-21T14:53:05.576Z",
+        "lengthText": "52:08",
+        "lengthSeconds": 3128,
+        "badges": []
+      },
+      {
+        "type": "video",
+        "id": "fMeDe9-Vmcg",
+        "url": "https://www.youtube.com/watch?v=fMeDe9-Vmcg",
+        "title": "Tip 023 · Reset the Environment to a Known State Between Every Trial",
+        "thumbnail": "https://scrubbed.invalid/thumbnail.jpg",
+        "channel": {
+          "id": "yt-channel-16",
+          "title": "yt-channel-17",
+          "handle": "yt-channel-18",
+          "thumbnail": "https://scrubbed.invalid/thumbnail.jpg"
+        },
+        "viewCountText": "4 views",
+        "viewCountInt": 4,
+        "publishedTimeText": "11 days ago",
+        "publishedTime": "2026-08-31T14:53:05.576Z",
+        "lengthText": "3:56",
+        "lengthSeconds": 236,
+        "badges": []
+      },
+      {
+        "type": "video",
+        "id": "eJsseJ1fWGg",
+        "url": "https://www.youtube.com/watch?v=eJsseJ1fWGg",
+        "title": "05 - Playwright Scenario Based Interview Questions",
+        "thumbnail": "https://scrubbed.invalid/thumbnail.jpg",
+        "channel": {
+          "id": "yt-channel-19",
+          "title": "yt-channel-20",
+          "handle": "yt-channel-21",
+          "thumbnail": "https://scrubbed.invalid/thumbnail.jpg"
+        },
+        "viewCountText": "253 views",
+        "viewCountInt": 253,
+        "publishedTimeText": "4 days ago",
+        "publishedTime": "2026-09-07T14:53:05.576Z",
+        "lengthText": "11:14",
+        "lengthSeconds": 674,
+        "badges": [
+          "New"
+        ]
+      },
+      {
+        "type": "video",
+        "id": "K-7ZeQfkIc0",
+        "url": "https://www.youtube.com/watch?v=K-7ZeQfkIc0",
+        "title": "API-Assisted UI Automation: Faster Setup, Smaller UI Tests",
+        "thumbnail": "https://scrubbed.invalid/thumbnail.jpg",
+        "channel": {
+          "id": "yt-channel-22",
+          "title": "yt-channel-23",
+          "handle": "yt-channel-24",
+          "thumbnail": "https://scrubbed.invalid/thumbnail.jpg"
+        },
+        "viewCountText": "40 views",
+        "viewCountInt": 40,
+        "publishedTimeText": "3 weeks ago",
+        "publishedTime": "2026-08-21T14:53:05.576Z",
+        "lengthText": "8:10",
+        "lengthSeconds": 490,
+        "badges": [
+          "4K"
+        ]
+      },
+      {
+        "type": "video",
+        "id": "jPyYX2LhamA",
+        "url": "https://www.youtube.com/watch?v=jPyYX2LhamA",
+        "title": "10 ChatGPT & Claude Prompts That Will Level Up Your Playwright Testing",
+        "thumbnail": "https://scrubbed.invalid/thumbnail.jpg",
+        "channel": {
+          "id": "yt-channel-25",
+          "title": "yt-channel-26",
+          "handle": "yt-channel-27",
+          "thumbnail": "https://scrubbed.invalid/thumbnail.jpg"
+        },
+        "viewCountText": "70 views",
+        "viewCountInt": 70,
+        "publishedTimeText": "11 days ago",
+        "publishedTime": "2026-08-31T14:53:05.576Z",
+        "lengthText": "7:35",
+        "lengthSeconds": 455,
+        "badges": []
+      },
+      {
+        "type": "video",
+        "id": "WNsO2rkEU2o",
+        "url": "https://www.youtube.com/watch?v=WNsO2rkEU2o",
+        "title": "Why Playwright + LLMs Aren’t Foolproof for Locator Fixes",
+        "thumbnail": "https://scrubbed.invalid/thumbnail.jpg",
+        "channel": {
+          "id": "yt-channel-28",
+          "title": "yt-channel-29",
+          "handle": "yt-channel-30",
+          "thumbnail": "https://scrubbed.invalid/thumbnail.jpg"
+        },
+        "viewCountText": "3 views",
+        "viewCountInt": 3,
+        "publishedTimeText": "11 days ago",
+        "publishedTime": "2026-08-31T14:53:05.576Z",
+        "lengthText": "5:51",
+        "lengthSeconds": 351,
+        "badges": []
+      },
+      {
+        "type": "video",
+        "id": "yVEBbzc-lMs",
+        "url": "https://www.youtube.com/watch?v=yVEBbzc-lMs",
+        "title": "Stop Guessing A11y: Auto-Generate Playwright Tests from Your GraphQL Schema",
+        "thumbnail": "https://scrubbed.invalid/thumbnail.jpg",
+        "channel": {
+          "id": "yt-channel-31",
+          "title": "yt-channel-32",
+          "handle": "yt-channel-33",
+          "thumbnail": "https://scrubbed.invalid/thumbnail.jpg"
+        },
+        "viewCountText": "32 views",
+        "viewCountInt": 32,
+        "publishedTimeText": "9 days ago",
+        "publishedTime": "2026-09-02T14:53:05.576Z",
+        "lengthText": "30:38",
+        "lengthSeconds": 1838,
+        "badges": []
+      },
+      {
+        "type": "video",
+        "id": "ceC4MN_2iWQ",
+        "url": "https://www.youtube.com/watch?v=ceC4MN_2iWQ",
+        "title": "Testing AI When Every Answer Is Different",
+        "thumbnail": "https://scrubbed.invalid/thumbnail.jpg",
+        "channel": {
+          "id": "yt-channel-34",
+          "title": "yt-channel-35",
+          "handle": "yt-channel-35",
+          "thumbnail": "https://scrubbed.invalid/thumbnail.jpg"
+        },
+        "viewCountText": "117 views",
+        "viewCountInt": 117,
+        "publishedTimeText": "13 days ago",
+        "publishedTime": "2026-08-29T14:53:05.576Z",
+        "lengthText": "34:55",
+        "lengthSeconds": 2095,
+        "badges": [
+          "4K"
+        ]
+      },
+      {
+        "type": "video",
+        "id": "3FEWZO5mR6E",
+        "url": "https://www.youtube.com/watch?v=3FEWZO5mR6E",
+        "title": "Authentication and Session Reuse in UI Automation",
+        "thumbnail": "https://scrubbed.invalid/thumbnail.jpg",
+        "channel": {
+          "id": "yt-channel-22",
+          "title": "yt-channel-23",
+          "handle": "yt-channel-24",
+          "thumbnail": "https://scrubbed.invalid/thumbnail.jpg"
+        },
+        "viewCountText": "42 views",
+        "viewCountInt": 42,
+        "publishedTimeText": "3 weeks ago",
+        "publishedTime": "2026-08-21T14:53:05.576Z",
+        "lengthText": "13:26",
+        "lengthSeconds": 806,
+        "badges": [
+          "4K",
+          "CC"
+        ]
+      },
+      {
+        "type": "video",
+        "id": "mvxmLH5vcjw",
+        "url": "https://www.youtube.com/watch?v=mvxmLH5vcjw",
+        "title": "The Evolution of Software Testing: From Manual Testing to AI-Powered Automation",
+        "thumbnail": "https://scrubbed.invalid/thumbnail.jpg",
+        "channel": {
+          "id": "yt-channel-36",
+          "title": "yt-channel-37",
+          "handle": "yt-channel-38",
+          "thumbnail": "https://scrubbed.invalid/thumbnail.jpg"
+        },
+        "viewCountText": "10 views",
+        "viewCountInt": 10,
+        "publishedTimeText": "1 month ago",
+        "publishedTime": "2026-08-11T14:53:05.576Z",
+        "lengthText": "7:16",
+        "lengthSeconds": 436,
+        "badges": []
+      },
+      {
+        "type": "video",
+        "id": "jjLfTMkeu3E",
+        "url": "https://www.youtube.com/watch?v=jjLfTMkeu3E",
+        "title": "bisect-agent — finding a bug's commit when the test is flaky",
+        "thumbnail": "https://scrubbed.invalid/thumbnail.jpg",
+        "channel": {
+          "id": "yt-channel-39",
+          "title": "yt-channel-40",
+          "handle": "yt-channel-41",
+          "thumbnail": "https://scrubbed.invalid/thumbnail.jpg"
+        },
+        "viewCountText": "2 views",
+        "viewCountInt": 2,
+        "publishedTimeText": "12 days ago",
+        "publishedTime": "2026-08-30T14:53:05.576Z",
+        "lengthText": "2:49",
+        "lengthSeconds": 169,
+        "badges": []
+      },
+      {
+        "type": "video",
+        "id": "3wUYE5AalPc",
+        "url": "https://www.youtube.com/watch?v=3wUYE5AalPc",
+        "title": "Real World Lessons from Scaling Test Automation at Microsoft",
+        "thumbnail": "https://scrubbed.invalid/thumbnail.jpg",
+        "channel": {
+          "id": "yt-channel-31",
+          "title": "yt-channel-32",
+          "handle": "yt-channel-33",
+          "thumbnail": "https://scrubbed.invalid/thumbnail.jpg"
+        },
+        "viewCountText": "84 views",
+        "viewCountInt": 84,
+        "publishedTimeText": "9 days ago",
+        "publishedTime": "2026-09-02T14:53:05.576Z",
+        "lengthText": "49:20",
+        "lengthSeconds": 2960,
+        "badges": []
+      },
+      {
+        "type": "video",
+        "id": "OfD3rt6sMG4",
+        "url": "https://www.youtube.com/watch?v=OfD3rt6sMG4",
+        "title": "Playwright: The Testing Superpower You Need!",
+        "thumbnail": "https://scrubbed.invalid/thumbnail.jpg",
+        "channel": {
+          "id": "yt-channel-42",
+          "title": "yt-channel-43",
+          "handle": "yt-channel-43",
+          "thumbnail": "https://scrubbed.invalid/thumbnail.jpg"
+        },
+        "viewCountText": "6 views",
+        "viewCountInt": 6,
+        "publishedTimeText": "7 days ago",
+        "publishedTime": "2026-09-04T14:53:05.576Z",
+        "lengthText": "2:36",
+        "lengthSeconds": 156,
+        "badges": []
+      },
+      {
+        "type": "video",
+        "id": "KpkKTo9slMk",
+        "url": "https://www.youtube.com/watch?v=KpkKTo9slMk",
+        "title": "Selenium Waits Explained — Remove Flaky time.sleep Calls",
+        "thumbnail": "https://scrubbed.invalid/thumbnail.jpg",
+        "channel": {
+          "id": "yt-channel-44",
+          "title": "yt-channel-45",
+          "handle": "yt-channel-46",
+          "thumbnail": "https://scrubbed.invalid/thumbnail.jpg"
+        },
+        "viewCountText": "No views",
+        "viewCountInt": null,
+        "publishedTimeText": "7 days ago",
+        "publishedTime": "2026-09-04T14:53:05.576Z",
+        "lengthText": "3:55",
+        "lengthSeconds": 235,
+        "badges": []
+      },
+      {
+        "type": "video",
+        "id": "V3Cbp6-d9KY",
+        "url": "https://www.youtube.com/watch?v=V3Cbp6-d9KY",
+        "title": "Kiro Hackathon - flake-exorcist",
+        "thumbnail": "https://scrubbed.invalid/thumbnail.jpg",
+        "channel": {
+          "id": "yt-channel-47",
+          "title": "yt-channel-48",
+          "handle": "yt-channel-49",
+          "thumbnail": "https://scrubbed.invalid/thumbnail.jpg"
+        },
+        "viewCountText": "1 view",
+        "viewCountInt": 1,
+        "publishedTimeText": "2 weeks ago",
+        "publishedTime": "2026-08-28T14:53:05.576Z",
+        "lengthText": "6:22",
+        "lengthSeconds": 382,
+        "badges": []
+      },
+      {
+        "type": "video",
+        "id": "zh7QjNIv-Co",
+        "url": "https://www.youtube.com/watch?v=zh7QjNIv-Co",
+        "title": "You Don't Need a Staging Environment",
+        "thumbnail": "https://scrubbed.invalid/thumbnail.jpg",
+        "channel": {
+          "id": "yt-channel-50",
+          "title": "yt-channel-51",
+          "handle": "yt-channel-52",
+          "thumbnail": "https://scrubbed.invalid/thumbnail.jpg"
+        },
+        "viewCountText": "49 views",
+        "viewCountInt": 49,
+        "publishedTimeText": "2 weeks ago",
+        "publishedTime": "2026-08-28T14:53:05.576Z",
+        "lengthText": "9:50",
+        "lengthSeconds": 590,
+        "badges": []
+      }
+    ],
+    "channels": [],
+    "playlists": [],
+    "shorts": [],
+    "shelves": [],
+    "lives": [],
+    "continuationToken": "Ep8DEgtmbGFreSB0ZXN0cxqMA0VnUUlCQkFCU0NpQ0FRdHhaVEpzVjJaRlgwOXVaNElCQzFWMmJYaHhVVkp2UjJ0RmdnRUxRbmt0YjBWWWEwSmhVMDJDQVF0eVozUnlTVWRDWm1GR1FZSUJDMFF6VEU1cFlWZGtlSGM0Z2dFTFprMWxSR1U1TFZadFkyZUNBUXRsU25OelpVb3habGRIWjRJQkMwc3ROMXBsVVdaclNXTXdnZ0VMYWxCNVdWZ3lUR2hoYlVHQ0FRdFhUbk5QTW5KclJWVXliNElCQzNsV1JVSmllbU10YkUxemdnRUxZMlZETkUxT1h6SnBWMUdDQVFzelJrVlhXazgxYlZJMlJZSUJDMjEyZUcxTVNEVjJZMnAzZ2dFTGFtcE1abFJOYTJWMU0wV0NBUXN6ZDFWWlJUVkJZV3hRWTRJQkMwOW1SRE55ZERaelRVYzBnZ0VMUzNCclMxUnZPWE5zVFd1Q0FRdFdNME5pY0RZdFpEbExXWUlCQzNwb04xRnFUa2wyTFVOdnNnRUdDZ1FJS0JBRKACBBiB4OgYIgtzZWFyY2gtZmVlZA%3D%3D"
+  }
+}

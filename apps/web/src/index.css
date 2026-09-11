@@ -241,6 +241,47 @@ a {
   box-shadow: inset 0 0 0 1px var(--surface-brand);
 }
 
+/*
+  Two labels for one item, and one item for phones only. US-123.
+
+  The bottom bar has room for four items at 320px. "Intent inbox" does not fit
+  one of them, and the account screens need a fifth place, so the bar shows the
+  short label and an Account button while the sidebar shows neither.
+*/
+.nav-label-narrow,
+.account-sheet-button {
+  display: none;
+}
+
+.account-sheet-button {
+  width: 100%;
+  border: 0;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+/*
+  The account sheet. US-123.
+
+  A phone opens it from the bottom bar, so it rises from the bottom edge and
+  keeps the bar's width. A wide window never sees it; it stays a plain centred
+  dialog there so a narrow desktop window has no second layout to maintain.
+*/
+.app-dialog.account-sheet {
+  width: min(420px, calc(100% - var(--space-8)));
+}
+
+.account-sheet-body {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-4);
+}
+
+.account-sheet-body .account-nav {
+  margin-bottom: var(--space-2);
+}
+
 .sidebar-bottom {
   margin-top: auto;
   padding: var(--space-4) 0 0;
@@ -1595,8 +1636,11 @@ a {
 }
 
 .section-title-row > span {
+  /* "0 of 8" is a count, not a sentence: it broke after "of" on a phone. */
+  flex-shrink: 0;
   color: var(--muted);
   font-size: var(--text-xs);
+  white-space: nowrap;
 }
 
 .query-list {
@@ -1758,14 +1802,51 @@ a {
   .site-nav {
     width: 100%;
     height: 100%;
-    grid-template-columns: repeat(3, 1fr);
+
+    /*
+      Every item gets an equal share, whatever the count. A fixed three-column
+      bar dropped the fourth item onto a second row nobody could see.
+    */
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    grid-template-columns: none;
     gap: 3px;
     margin: 0;
+  }
+
+  .nav-label-wide {
+    display: none;
+  }
+
+  .nav-label-narrow,
+  .account-sheet-button {
+    display: flex;
+  }
+
+  .app-dialog.account-sheet {
+    width: 100%;
+    max-width: none;
+    max-height: calc(100dvh - var(--space-12));
+    margin: auto auto 0;
+    border-right: 0;
+    border-bottom: 0;
+    border-left: 0;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  }
+
+  .account-sheet .account-sheet-body {
+    padding-bottom: calc(var(--space-5) + env(safe-area-inset-bottom, 0px));
+  }
+
+  .account-sheet .sign-out {
+    min-height: 44px;
+    padding: var(--space-2) var(--space-3);
   }
 
   .nav-item,
   .new-monitor-nav {
     min-height: 52px;
+    min-width: 0;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -1775,6 +1856,16 @@ a {
     border: 0;
     text-align: center;
     font-size: var(--text-xs);
+  }
+
+  .account-sheet .nav-item {
+    min-height: 46px;
+    display: grid;
+    grid-template-columns: 30px 1fr;
+    gap: var(--space-2);
+    padding: 0 var(--space-3);
+    text-align: left;
+    font-size: var(--text-label);
   }
 
   .nav-icon {
@@ -2740,6 +2831,119 @@ a {
   }
   .filter-toggle {
     padding-inline: 9px;
+  }
+}
+
+/*
+  The inbox toolbar becomes two rows on a phone. US-123.
+
+  One row held the view switch and three controls beside it, so at 390px
+  "Saved" was cut to "S" and both selects showed no monitor name at all. The
+  switch keeps the first row and the filters take the second, each control
+  sharing the width.
+*/
+@media (max-width: 600px) {
+  .inbox-toolbar {
+    flex-wrap: wrap;
+    align-items: stretch;
+    padding-block: var(--space-3);
+    gap: var(--space-2);
+  }
+
+  .inbox-toolbar .inbox-views {
+    width: 100%;
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+  }
+
+  .inbox-toolbar .inbox-filters {
+    width: 100%;
+    min-width: 0;
+    gap: var(--space-2);
+  }
+
+  .inbox-toolbar .inbox-filters .filter {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  /* The monitor name is the longer of the two, so it gets the larger share. */
+  .inbox-toolbar .inbox-filters .filter:first-child {
+    flex: 2 1 0;
+  }
+
+  .inbox-toolbar .inbox-filters .filter select {
+    width: 100%;
+    max-width: none;
+  }
+
+  /*
+    A source card is three columns on a phone, not four. US-123.
+
+    The connection state sat in a fourth column that a narrow card cannot
+    give room to, and the tick floated in the middle of a three-line block.
+    The state moves under the platform name and the tick aligns with it.
+  */
+  .source-card {
+    grid-template-columns: auto 34px minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .source-card > .status-dot {
+    grid-column: 3;
+  }
+
+  .source-card > input[type="checkbox"] {
+    margin-top: var(--space-1);
+  }
+
+  /*
+    The inbox reads inside one screen height, so its header gives up the
+    supporting sentence rather than the list. The toolbar's own sentence is
+    already hidden here for the same reason.
+  */
+  .inbox-page .topbar .page-subtitle {
+    display: none;
+  }
+
+  /*
+    With the sentence gone the title and the action fit one row again, and the
+    inbox keeps that height for the list.
+  */
+  .inbox-page .topbar {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding-block: var(--space-4);
+  }
+
+  .inbox-page .topbar h1 {
+    font-size: 1.375rem;
+  }
+
+  .inbox-page .topbar > .top-secondary-link {
+    align-self: center;
+    min-height: var(--control-height-compact);
+    padding-inline: var(--space-3);
+    white-space: nowrap;
+  }
+
+  /* Count and export on one line, the ordering sentence under them. */
+  .list-heading {
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-3);
+  }
+
+  .list-heading > span:nth-child(2) {
+    order: 2;
+    flex-basis: 100%;
+    text-align: left;
+  }
+
+  .inbox-export {
+    order: 1;
   }
 }
 

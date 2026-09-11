@@ -464,3 +464,18 @@
     gap: var(--space-4);
   }
 }
+
+/*
+  A finger needs a bigger target than a cursor. US-123.
+
+  Edit was 39px tall on a phone. The recommended minimum is 44px, and the
+  extra height comes from padding so the card's layout does not move.
+*/
+@media (max-width: 600px) {
+  .project-edit-button {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    padding-inline: var(--space-3);
+  }
+}

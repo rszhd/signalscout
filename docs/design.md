@@ -98,6 +98,16 @@ preview truncation and mobile reading pane remain page-specific.
   Preserve native semantics and visible keyboard focus.
 - At 820px and below, navigation moves to the bottom. Layouts must work at
   320px without horizontal page scrolling. Respect reduced-motion preferences.
+- The bottom bar holds four items: Projects, Intent inbox, Monitors and
+  Account. New monitor is not one of them, because the inbox header, the
+  monitor list header and every project card already carry that action.
+  Account opens a sheet with Providers, Voices, Models, Billing and Sign out —
+  the sidebar's account section, which a phone does not show.
+- A table wider than the screen becomes one card per row below 600px. Each
+  cell carries its column name in `data-label` and the stylesheet prints it
+  with `::before`. Changing `display` on a table drops the table semantics, so
+  the table, its row groups, rows and cells name their roles explicitly.
+  Monitors and Providers are the two that do this.
 
 ## Migrating the remaining pages
 

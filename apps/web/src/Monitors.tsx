@@ -1,3 +1,4 @@
+// biome-ignore-all lint/a11y/noRedundantRoles: the roles are not redundant at phone width, where the stylesheet gives every table element `display: block` and the implicit table semantics go with it. US-123.
 /**
  * The monitor list: one row per monitor, and five columns. US-109.
  *
@@ -349,10 +350,19 @@ function MonitorTable({
   setPaused: (monitor: Monitor, paused: boolean) => Promise<void>;
 }) {
   return (
+    /*
+      The roles are written out because a phone stops this being a table. US-123.
+
+      Below 600px every cell becomes a block and each one carries its column
+      name, so a monitor reads as a card instead of a row somebody has to drag
+      sideways. Changing `display` on table elements takes the table semantics
+      with it in every browser, so each element names its own role and the
+      semantics survive the layout.
+    */
     <div className="monitor-table-scroll">
-      <table className="monitor-table">
-        <thead>
-          <tr>
+      <table className="monitor-table" role="table">
+        <thead role="rowgroup">
+          <tr role="row">
             <th scope="col">Monitor</th>
             <th scope="col">Status</th>
             <th scope="col">Next run</th>
@@ -365,13 +375,13 @@ function MonitorTable({
             </th>
           </tr>
         </thead>
-        <tbody>
+        <tbody role="rowgroup">
           {monitors.map((monitor) => {
             const running = status(monitor);
 
             return (
-              <tr key={monitor.id}>
-                <th scope="row">
+              <tr key={monitor.id} role="row">
+                <th scope="row" role="rowheader">
                   <Link
                     className="monitor-table-name"
                     to={paths.monitor(monitor.projectId ?? projectId, monitor.id)}
@@ -389,7 +399,7 @@ function MonitorTable({
                       : "No source"}
                   </span>
                 </th>
-                <td>
+                <td role="cell" data-label="Status">
                   <span
                     className={`monitor-status ${running.tone}${running.attention ? " quiet" : ""}`}
                   >
@@ -406,9 +416,13 @@ function MonitorTable({
                     </small>
                   ))}
                 </td>
-                <td>{nextRunLabel(monitor)}</td>
-                <td className="monitor-table-poll">{lastPollLabel(monitor)}</td>
-                <td className="monitor-table-found">
+                <td role="cell" data-label="Next run">
+                  {nextRunLabel(monitor)}
+                </td>
+                <td role="cell" data-label="Last poll" className="monitor-table-poll">
+                  {lastPollLabel(monitor)}
+                </td>
+                <td role="cell" data-label="Found" className="monitor-table-found">
                   {/* Two numbers rather than one. "Sixty found, none read" and
                       "sixty found, all read" send a person to two different
                       places, and one total says neither. A build whose API
@@ -423,7 +437,7 @@ function MonitorTable({
                     <small>—</small>
                   )}
                 </td>
-                <td className="monitor-table-actions">
+                <td role="cell" className="monitor-table-actions">
                   <button
                     type="button"
                     className="compact-button"

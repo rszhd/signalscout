@@ -423,6 +423,10 @@
  * scrolls, which is the one thing on this page allowed to.
  */
 .monitor-table-scroll {
+  /* Positioned so the header's visually-hidden "Actions" span is clipped
+     here. Absolute with no positioned ancestor, it landed 783px from the page
+     edge and the whole page scrolled sideways. US-123. */
+  position: relative;
   min-width: 0;
   margin-bottom: var(--space-8);
   overflow-x: auto;
@@ -871,5 +875,102 @@
   .monitor-page-content .poll-history-sources {
     grid-column: 1;
     grid-row: auto;
+  }
+}
+
+/*
+  One card per monitor on a phone. US-123.
+
+  The table is 860px wide by design: five facts about a monitor, side by side.
+  A phone cannot show that, and the sideways drag hid the two columns a person
+  opens this list for — the status and what the last poll did. Below 600px each
+  row becomes a block and every cell carries its column name.
+*/
+@media (max-width: 600px) {
+  .monitor-table-scroll {
+    overflow-x: visible;
+  }
+
+  .monitor-table {
+    min-width: 0;
+    display: block;
+    table-layout: auto;
+  }
+
+  .monitor-table thead {
+    display: none;
+  }
+
+  .monitor-table tbody,
+  .monitor-table tbody tr {
+    display: block;
+  }
+
+  .monitor-table tbody tr {
+    padding: var(--space-4) 0;
+  }
+
+  .monitor-table tbody tr + tr {
+    border-top: 1px solid var(--line);
+  }
+
+  .monitor-table tbody tr + tr > * {
+    border-top: 0;
+  }
+
+  .monitor-table th,
+  .monitor-table td {
+    display: block;
+    padding: var(--space-2) var(--space-4);
+  }
+
+  /* Label and value on one line: five stacked pairs make a card twice as
+     tall as the screen, and none of the values needs the full width. */
+  .monitor-table td[data-label] {
+    display: grid;
+    grid-template-columns: 88px minmax(0, 1fr);
+    gap: var(--space-3);
+    align-items: baseline;
+    padding-block: var(--space-1);
+  }
+
+  .monitor-table td[data-label]::before {
+    content: attr(data-label);
+    color: var(--muted);
+    font-size: var(--text-xs);
+    font-weight: 500;
+  }
+
+  .monitor-table td[data-label] > .monitor-table-note {
+    grid-column: 2;
+  }
+
+  /* The count and "n unread" read as one sentence, so this cell keeps its
+     label inline rather than becoming a grid of its own. */
+  .monitor-table td.monitor-table-found {
+    display: block;
+  }
+
+  .monitor-table td.monitor-table-found::before {
+    display: inline-block;
+    width: 88px;
+    margin-right: var(--space-3);
+  }
+
+  .monitor-table-found > strong {
+    display: inline;
+    font-size: var(--text-label);
+  }
+
+  .monitor-table-found > small {
+    margin-left: var(--space-2);
+  }
+
+  .monitor-table td.monitor-table-actions {
+    text-align: left;
+  }
+
+  .monitor-table td.monitor-table-actions .compact-button {
+    width: 100%;
   }
 }

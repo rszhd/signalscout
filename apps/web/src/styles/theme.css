@@ -126,11 +126,31 @@
     font-size: 1.625rem;
   }
 }
+/*
+  The page header stacks on a phone. US-123.
+
+  Title, supporting sentence and action shared one row, so the sentence was
+  squeezed into a three-line column beside a button whose own label then wrapped
+  as well. The action keeps its full size and moves under the title.
+*/
 @media (max-width: 600px) {
-  .top-primary-button,
-  .top-secondary-link {
-    min-height: var(--control-height-compact);
-    padding-inline: var(--space-2);
+  .topbar {
+    min-height: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-4);
+    padding-block: var(--space-5);
+  }
+
+  .topbar > * {
+    min-width: 0;
+  }
+
+  .topbar > .top-primary-button,
+  .topbar > .top-secondary-link,
+  .topbar > .primary-button,
+  .topbar > .secondary-button {
+    align-self: flex-start;
   }
 }
 

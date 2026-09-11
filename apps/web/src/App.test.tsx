@@ -297,9 +297,11 @@ describe("the application screens", () => {
     const projectLinks = [...screen.container.querySelectorAll(".site-nav a")].map((link) =>
       link.getAttribute("href"),
     );
-    const accountLinks = [...screen.container.querySelectorAll(".account-nav a")].map((link) =>
-      link.getAttribute("href"),
-    );
+    // The sidebar's copy. US-123 added a second one inside the account sheet,
+    // which is how a phone reaches these screens.
+    const accountLinks = [
+      ...screen.container.querySelectorAll(".sidebar-bottom .account-nav a"),
+    ].map((link) => link.getAttribute("href"));
 
     // Pricing joins the account section here, and for the same reason: both
     // are machine-level screens — one set of keys, one set of prices, every
@@ -470,15 +472,40 @@ describe("the application screens", () => {
     const projectLinks = [...screen.container.querySelectorAll(".site-nav a")].map((link) =>
       link.getAttribute("href"),
     );
-    const accountLinks = [...screen.container.querySelectorAll(".account-nav a")].map((link) =>
-      link.getAttribute("href"),
-    );
+    const accountLinks = [
+      ...screen.container.querySelectorAll(".sidebar-bottom .account-nav a"),
+    ].map((link) => link.getAttribute("href"));
     // Connections is gone from the menu and the account screens sit together.
     // Settings is still a mockup route and must stay off the nav: a link that
     // leads nowhere is worse than no link.
     expect(projectLinks).toEqual(["/projects", inbox, monitors, newMonitor]);
     expect(accountLinks).toEqual(["/providers", "/reply-voices", "/models"]);
     expect(screen.container.textContent).not.toContain("Settings");
+  });
+
+  /**
+   * The account screens have a second way in, for a phone. US-123.
+   *
+   * Below 820px the sidebar becomes a bottom bar and `.sidebar-bottom` is
+   * hidden, so Providers, Voices, Models, Billing and Sign out were reachable
+   * only by typing the address. The bottom bar's Account button opens a sheet
+   * holding the same links.
+   *
+   * The assertion is on the markup rather than on what is visible: jsdom
+   * applies no media query, so a test about the phone layout would be a test
+   * about nothing.
+   */
+  it("offers the account screens in a sheet the bottom bar can open", async () => {
+    screen = await mount(<App />, inbox);
+
+    expect(screen.container.querySelector(".site-nav .account-sheet-button")).not.toBeNull();
+
+    const sheetLinks = [...screen.container.querySelectorAll(".account-sheet a")].map((link) =>
+      link.getAttribute("href"),
+    );
+
+    expect(sheetLinks).toEqual(["/providers", "/reply-voices", "/models"]);
+    expect(screen.container.querySelector(".account-sheet .sign-out")).not.toBeNull();
   });
 
   /**

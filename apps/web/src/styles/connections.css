@@ -340,6 +340,11 @@
   }
   .connection-status {
     grid-column: 2;
+
+    /* A state chip is as wide as its words. Stretched to the grid track it
+       read as a banner across the card. US-123. */
+    justify-self: start;
+    align-self: center;
   }
   .connection-manage {
     min-width: 0;
@@ -356,5 +361,19 @@
   }
   .connection-dialog-heading > .connection-avatar {
     display: none;
+  }
+}
+
+/*
+  The narrowest phones put the action under the state. US-123.
+
+  At 320px the row is icon, state chip and Manage: the chip ran under the
+  button. Above 380px all three fit, so only the smallest screens stack.
+*/
+@media (max-width: 380px) {
+  .connection-status,
+  .connection-manage {
+    grid-column: 2 / -1;
+    justify-self: start;
   }
 }

@@ -1,3 +1,4 @@
+// biome-ignore-all lint/a11y/noRedundantRoles: the roles are not redundant at phone width, where the stylesheet gives every table element `display: block` and the implicit table semantics go with it. US-123.
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { messageFor, requestJson } from "./api.js";
@@ -115,15 +116,28 @@ function ProvidersHeader() {
 function ProviderRow({
   connector,
   cheapest,
+  comparedPosts,
 }: {
   connector: ConnectorView;
   cheapest: number | undefined;
+  comparedPosts: number;
 }) {
   const isCheapest = connector.estimatedPerComparedPosts?.micros === cheapest;
 
+  /*
+    Every cell names its column, and every element names its role. US-123.
+
+    Seven columns do not fit a phone, so below 600px each row becomes a card
+    and the `data-label` is what the column heading said. The roles are
+    written out because changing `display` on table elements takes the table
+    semantics with it.
+  */
   return (
-    <tr className={connector.inUse ? "provider-row provider-row-in-use" : "provider-row"}>
-      <th scope="row">
+    <tr
+      role="row"
+      className={connector.inUse ? "provider-row provider-row-in-use" : "provider-row"}
+    >
+      <th scope="row" role="rowheader">
         <div className="provider-name-cell">
           <span className="provider-logo" aria-hidden="true">
             <BrandIcon brand={connector.providerId} size={24} />
@@ -145,7 +159,7 @@ function ProviderRow({
           </div>
         </div>
       </th>
-      <td className="provider-estimate-cell">
+      <td role="cell" data-label={`Est. ${comparedPosts} posts`} className="provider-estimate-cell">
         {connector.estimatedPerComparedPosts === null ? (
           <>
             <span>Not measured</span>
@@ -158,7 +172,7 @@ function ProviderRow({
           </>
         )}
       </td>
-      <td>
+      <td role="cell" data-label="Rate & yield">
         <strong>{connector.pricePerUnit.display}</strong>
         <small>per {connector.billableUnit}</small>
         {connector.postsPerUnit === null ? (
@@ -174,11 +188,11 @@ function ProviderRow({
         )}
         <small>max {connector.ceilingPerQueryPoll.display} per query poll</small>
       </td>
-      <td>
+      <td role="cell" data-label="Coverage">
         <span className="provider-coverage">Finds by {findsWith(connector.can)}</span>
         <small>{commentCapability(connector.can)}</small>
       </td>
-      <td>
+      <td role="cell" data-label="Spent so far">
         {connector.spent.cost.micros === 0 ? (
           <span>nothing yet</span>
         ) : (
@@ -191,7 +205,7 @@ function ProviderRow({
           </>
         )}
       </td>
-      <td>
+      <td role="cell" data-label="Posts & freshness">
         {connector.returned.posts === 0 ? (
           <span>none collected</span>
         ) : (
@@ -201,7 +215,7 @@ function ProviderRow({
           </>
         )}
       </td>
-      <td>
+      <td role="cell" data-label="Matches">
         {connector.returned.matchRate === null ? (
           <span>nothing to judge yet</span>
         ) : (
@@ -324,9 +338,9 @@ export function Providers() {
                 </header>
 
                 <div className="providers-table-scroll">
-                  <table className="providers-table">
-                    <thead>
-                      <tr>
+                  <table className="providers-table" role="table">
+                    <thead role="rowgroup">
+                      <tr role="row">
                         <th scope="col">Provider</th>
                         <th scope="col">Est. {view.comparedPosts} posts</th>
                         <th scope="col">Rate &amp; yield</th>
@@ -336,12 +350,13 @@ export function Providers() {
                         <th scope="col">Matches</th>
                       </tr>
                     </thead>
-                    <tbody>
+                    <tbody role="rowgroup">
                       {platform.connectors.map((connector) => (
                         <ProviderRow
                           key={connector.providerId}
                           connector={connector}
                           cheapest={cheapest}
+                          comparedPosts={view.comparedPosts}
                         />
                       ))}
                     </tbody>

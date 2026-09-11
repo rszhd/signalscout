@@ -13,6 +13,7 @@ import { requestJson } from "./api.js";
 import { Billing, type BillingState, subscriptionSentence } from "./Billing.js";
 import { BrandLogo } from "./BrandLogo.js";
 import { Connections } from "./Connections.js";
+import { Dialog } from "./components/Dialog.js";
 import { Inbox } from "./Inbox.js";
 import { type AuthStatus, Login } from "./Login.js";
 import { Models } from "./Models.js";
@@ -457,7 +458,8 @@ type NavIconName =
   | "providers"
   | "voices"
   | "models"
-  | "billing";
+  | "billing"
+  | "account";
 
 const navIconPaths: Record<NavIconName, string> = {
   projects: "M4 6.5h6l2 2h8v10H4z",
@@ -468,6 +470,7 @@ const navIconPaths: Record<NavIconName, string> = {
   voices: "M5 19l4-.8L18 9.2a2.1 2.1 0 0 0-3-3L5.8 15z M13.8 7.4l2.8 2.8",
   models: "M12 3l1.4 4.6L18 9l-4.6 1.4L12 15l-1.4-4.6L6 9l4.6-1.4z M18.5 15v5 M16 17.5h5",
   billing: "M4 6h16v12H4z M4 10h16 M7 15h4",
+  account: "M12 11.2a3.4 3.4 0 1 0 0-6.8 3.4 3.4 0 0 0 0 6.8 M5.4 19.6a6.6 6.6 0 0 1 13.2 0",
 };
 
 function NavIcon({ name }: { readonly name: NavIconName }) {
@@ -508,6 +511,52 @@ function Shell({
   const voicing = useMatch(routes.replyVoices) !== null;
   const modelling = useMatch(routes.models) !== null;
   const billing = useMatch(routes.billing) !== null;
+  const accountSheet = useRef<HTMLDialogElement | null>(null);
+
+  const accountLinks = (
+    <>
+      <Link className={comparing ? "nav-item current" : "nav-item"} to={paths.providers}>
+        <NavIcon name="providers" />
+        <span>Providers</span>
+      </Link>
+      <Link className={voicing ? "nav-item current" : "nav-item"} to={paths.replyVoices}>
+        <NavIcon name="voices" />
+        <span>Voices</span>
+      </Link>
+      {/*
+        Beside Providers rather than inside a project: a model key is one
+        account's, for every project it runs. US-068.
+      */}
+      <Link className={modelling ? "nav-item current" : "nav-item"} to={paths.models}>
+        <NavIcon name="models" />
+        <span>Models</span>
+      </Link>
+      {/*
+        Only where this instance charges. US-072. A self-hosted instance
+        has no subscription, so a Billing link there would open a page
+        that can only say so — and the route it reads is not even
+        registered.
+      */}
+      {status.billingMode === "stripe" && (
+        <Link className={billing ? "nav-item current" : "nav-item"} to={paths.billing}>
+          <NavIcon name="billing" />
+          <span>Billing</span>
+        </Link>
+      )}
+    </>
+  );
+
+  const signedInAs = status.account && (
+    <div className="signed-in-as">
+      <span className="account-avatar" aria-hidden="true">
+        {status.account.name.slice(0, 1).toUpperCase()}
+      </span>
+      <span className="account-identity">
+        <strong>{status.account.name}</strong>
+        <span>{status.account.email}</span>
+      </span>
+    </div>
+  );
 
   return (
     <div className="app-shell">
@@ -537,7 +586,8 @@ function Shell({
                 to={paths.inbox(projectId)}
               >
                 <NavIcon name="inbox" />
-                <span>Intent inbox</span>
+                <span className="nav-label-wide">Intent inbox</span>
+                <span className="nav-label-narrow">Inbox</span>
               </Link>
               <Link
                 className={listing ? "nav-item current" : "nav-item"}
@@ -562,6 +612,15 @@ function Shell({
               <span>New monitor</span>
             </Link>
           )}
+
+          <button
+            className="nav-item account-sheet-button"
+            type="button"
+            onClick={() => accountSheet.current?.showModal()}
+          >
+            <NavIcon name="account" />
+            <span>Account</span>
+          </button>
         </nav>
 
         <div className="sidebar-bottom">
@@ -572,34 +631,7 @@ function Shell({
           */}
           <nav className="account-nav" aria-label="Account">
             <p className="sidebar-section-label">Account</p>
-            <Link className={comparing ? "nav-item current" : "nav-item"} to={paths.providers}>
-              <NavIcon name="providers" />
-              <span>Providers</span>
-            </Link>
-            <Link className={voicing ? "nav-item current" : "nav-item"} to={paths.replyVoices}>
-              <NavIcon name="voices" />
-              <span>Voices</span>
-            </Link>
-            {/*
-              Beside Providers rather than inside a project: a model key is one
-              account's, for every project it runs. US-068.
-            */}
-            <Link className={modelling ? "nav-item current" : "nav-item"} to={paths.models}>
-              <NavIcon name="models" />
-              <span>Models</span>
-            </Link>
-            {/*
-              Only where this instance charges. US-072. A self-hosted instance
-              has no subscription, so a Billing link there would open a page
-              that can only say so — and the route it reads is not even
-              registered.
-            */}
-            {status.billingMode === "stripe" && (
-              <Link className={billing ? "nav-item current" : "nav-item"} to={paths.billing}>
-                <NavIcon name="billing" />
-                <span>Billing</span>
-              </Link>
-            )}
+            {accountLinks}
           </nav>
 
           {/*
@@ -609,19 +641,34 @@ function Shell({
             occupied the one place a person looks to find out which account
             they are using.
           */}
-          {status.account && (
-            <div className="signed-in-as">
-              <span className="account-avatar" aria-hidden="true">
-                {status.account.name.slice(0, 1).toUpperCase()}
-              </span>
-              <span className="account-identity">
-                <strong>{status.account.name}</strong>
-                <span>{status.account.email}</span>
-              </span>
-            </div>
-          )}
+          {signedInAs}
           <SignOut />
         </div>
+
+        {/*
+          The same account screens, for a phone. US-123.
+
+          Below 820px the sidebar becomes a bottom bar and `.sidebar-bottom`
+          is hidden, which left Providers, Voices, Models, Billing and Sign
+          out reachable only by typing the address. The bar has room for four
+          items at 320px, so the fifth is this sheet and the links live in it.
+        */}
+        <Dialog
+          className="account-sheet"
+          headingClass="account-sheet-heading"
+          titleId="account-sheet-title"
+          closeLabel="Close the account menu"
+          heading={<h2 id="account-sheet-title">Account</h2>}
+          dialogRef={accountSheet}
+        >
+          <div className="account-sheet-body">
+            <nav className="account-nav" aria-label="Account screens">
+              {accountLinks}
+            </nav>
+            {signedInAs}
+            <SignOut />
+          </div>
+        </Dialog>
       </aside>
 
       <main className="app-main">

@@ -3,12 +3,13 @@
  *
  * The provider is configuration, never code. PLAN.md says users bring their
  * own AI key, and STACK.md chose the AI SDK exactly so that OpenAI, Anthropic,
- * Google, OpenRouter and a local Ollama are five values of one variable rather
- * than five code paths. Nothing outside this file names a provider.
+ * Google, DeepSeek, OpenRouter and a local Ollama are six values of one
+ * variable rather than six code paths. Nothing outside this file names a
+ * provider.
  *
- * OpenRouter and Ollama both speak the OpenAI wire format, so they arrive
- * through the same compatible provider with a different base URL. That is not
- * a shortcut: it is the reason a self-hoster can point `AI_BASE_URL` at
+ * DeepSeek, OpenRouter and Ollama all speak the OpenAI wire format, so they
+ * arrive through the same compatible provider with a different base URL. That
+ * is not a shortcut: it is the reason a self-hoster can point `AI_BASE_URL` at
  * anything that speaks it — vLLM, LM Studio, a gateway — without us shipping a
  * package for each.
  */
@@ -20,6 +21,9 @@ import type { LanguageModel } from "ai";
 import { type AiConfig, type AiProvider, needsApiKey } from "./config.js";
 
 const defaultBaseUrls: Partial<Record<AiProvider, string>> = {
+  // DeepSeek documents this host as an OpenAI drop-in. It answers `/v1` for
+  // the chat completions path, which is what the compatible client appends.
+  deepseek: "https://api.deepseek.com/v1",
   openrouter: "https://openrouter.ai/api/v1",
   // Ollama serves an OpenAI-compatible API on this path. A self-hoster who
   // runs it in another container overrides AI_BASE_URL.
@@ -88,6 +92,17 @@ export function createModel(config: AiConfig): LanguageModel {
  * resells four hundred models at the upstream provider's price, so a snapshot
  * taken here would be a guess sitting in a table whose whole rule is that it
  * holds only what somebody read off a page.
+ *
+ * **There is no DeepSeek row either, and US-124 read the page before deciding
+ * that.** DeepSeek prices each model in four bands: peak hours and off-peak
+ * hours, each split into cache hit and cache miss. One million input tokens on
+ * `deepseek-flash` is $0.003 in the cheapest band and $0.30 in the dearest, and
+ * the usage we are given does not say which tokens were cached. A single figure
+ * would be wrong by a factor of one hundred while looking exactly like the rows
+ * above it. The page also says `deepseek-v4-pro` is routed to Flash and billed
+ * at Flash's price from 2026-09-14, which is the `gemini-3.8-flash` problem as
+ * well. A DeepSeek deployment prices itself with `AI_INPUT_PRICE_MICROS` and
+ * `AI_OUTPUT_PRICE_MICROS`, or per job on the Models screen.
  */
 export const modelPrices: Readonly<
   Record<string, { input: number; output: number; provider: AiProvider }>
@@ -117,6 +132,34 @@ export function pricedModelsFor(provider: string): string[] {
   return Object.entries(modelPrices)
     .filter(([, price]) => price.provider === provider)
     .map(([model]) => model);
+}
+
+/**
+ * Model names we have read off a provider's own page and hold no price for.
+ * US-124.
+ *
+ * A screen needs a name to offer even where a price cannot be had, and the
+ * alternative is a person typing `deepseek-flash` from memory into a blank
+ * field. These are facts about somebody else's product like the prices above,
+ * read the same way, and kept apart from them for `embeddingModels`' reason:
+ * nothing here may be mistaken for a price we have.
+ *
+ * A job put on one of these records no cost until somebody sets a price. The
+ * screen says so beside the name, and `recommended.ts` will still not choose
+ * one by itself.
+ *
+ * DeepSeek's two, read 2026-09-11 off api-docs.deepseek.com. OpenRouter and
+ * Ollama have no entry and should not get one: one resells four hundred models
+ * and the other runs whatever a machine has pulled, so any list would be a
+ * fraction of the truth presented as the whole of it.
+ */
+export const unpricedModels: Readonly<Record<string, readonly string[]>> = {
+  deepseek: ["deepseek-flash", "deepseek-v4-pro"],
+};
+
+/** The names one provider sells that we can name but not cost. For a screen. */
+export function unpricedModelsFor(provider: string): string[] {
+  return [...(unpricedModels[provider] ?? [])];
 }
 
 export interface TokenUsage {

@@ -95,6 +95,7 @@ export {
   MissingAiKeyError,
   modelPrices,
   pricedModelsFor,
+  unpricedModelsFor,
 } from "./ai/provider.js";
 export {
   buildQuerySystemPrompt,

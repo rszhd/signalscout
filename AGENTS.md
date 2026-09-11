@@ -234,6 +234,7 @@ pnpm --filter @signalscout/core capture:queries      # spends money
 pnpm --filter @signalscout/core capture:embeddings   # spends money
 pnpm --filter @signalscout/core capture:comment-filter # spends money
 pnpm --filter @signalscout/core capture:triage        # spends money
+pnpm --filter @signalscout/core live:model-probe      # one call, a fraction of a cent
 pnpm --filter @signalscout/core live:provider-switch # spends ~$0.08
 pnpm --filter @signalscout/core live:linkedin-poll   # spends ~$0.08 + model
 pnpm --filter @signalscout/core live:x-poll          # spends ~$0.002 + model

@@ -6,11 +6,24 @@
  * process must not pull four provider packages into memory to do that.
  */
 
-export const aiProviders = ["openai", "anthropic", "google", "openrouter", "ollama"] as const;
+export const aiProviders = [
+  "openai",
+  "anthropic",
+  "google",
+  "deepseek",
+  "openrouter",
+  "ollama",
+] as const;
 export type AiProvider = (typeof aiProviders)[number];
 
 /** Providers that run on someone else's server, and so need a key. */
-const remoteProviders: readonly AiProvider[] = ["openai", "anthropic", "google", "openrouter"];
+const remoteProviders: readonly AiProvider[] = [
+  "openai",
+  "anthropic",
+  "google",
+  "deepseek",
+  "openrouter",
+];
 
 export function needsApiKey(provider: AiProvider): boolean {
   return remoteProviders.includes(provider);
@@ -76,9 +89,10 @@ export function aiConfigFromEnvironment(env: AiEnvironment): AiConfig {
 /**
  * The providers that can embed.
  *
- * A subset of `aiProviders`, and the missing one is the point: Anthropic
- * publishes no embedding API. A deployment that names it here would fail every
- * call at run time; naming the subset makes it a startup message instead.
+ * A subset of `aiProviders`, and the missing ones are the point: neither
+ * Anthropic nor DeepSeek publishes an embedding API. A deployment that names
+ * one here would fail every call at run time; naming the subset makes it a
+ * startup message instead.
  */
 export const embeddingProviders = ["openai", "google", "openrouter", "ollama"] as const;
 export type EmbeddingProvider = (typeof embeddingProviders)[number];

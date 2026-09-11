@@ -66,8 +66,8 @@ if (!config.apiKey && config.provider !== "ollama") {
     [
       "No model key. Set AI_API_KEY in .env, or in the environment.",
       "",
-      "AI_PROVIDER picks the client: openai, anthropic, google, openrouter or",
-      "ollama. AI_MODEL picks the model. A local Ollama needs no key.",
+      "AI_PROVIDER picks the client: openai, anthropic, google, deepseek,",
+      "openrouter or ollama. AI_MODEL picks the model. A local Ollama needs no key.",
       "",
       "This run makes four calls and costs well under a cent on a cheap model.",
     ].join("\n"),

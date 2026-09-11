@@ -128,6 +128,7 @@ describe("the application screens", () => {
           canStore: true,
           storeBlocker: null,
           pricedModels: {},
+          unpricedModels: {},
           embeddingModels: {},
           testModels: { anthropic: "claude-sonnet-5" },
           keys: [],
@@ -582,6 +583,7 @@ describe("the application screens", () => {
       canStore: true,
       storeBlocker: null,
       pricedModels: {},
+      unpricedModels: {},
       embeddingModels: {},
       testModels: { anthropic: "claude-sonnet-5" },
       keys: [

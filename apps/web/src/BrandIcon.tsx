@@ -14,6 +14,7 @@ const icons: Record<string, string> = {
   tiktok: "tiktok.png",
   instagram: "instagram.png",
   anthropic: "anthropic.ico",
+  deepseek: "deepseek.png",
   openai: "openai.png",
   google: "google.ico",
   openrouter: "openrouter.ico",

@@ -54,17 +54,25 @@ describe("recommended models", () => {
   });
 
   /**
-   * Null rather than a guess, in the three places we cannot answer.
+   * Null rather than a guess, in the four places we cannot answer.
    *
    * Anthropic publishes no embedding endpoint; Google's needs a parameter
-   * `embed.ts` does not send; Ollama's models are whatever somebody pulled.
-   * Each would be a billed call thrown away, or a call that never connects.
+   * `embed.ts` does not send; Ollama's models are whatever somebody pulled;
+   * DeepSeek's two models are unpriceable. Each would be a billed call thrown
+   * away, a call that never connects, or a cost we could not report.
    */
   it("says nothing where it has nothing to say", () => {
     expect(recommendedModelFor("anthropic", "embed")).toBeNull();
     expect(recommendedModelFor("google", "embed")).toBeNull();
     expect(recommendedModelFor("ollama", "classify")).toBeNull();
     expect(recommendedModelFor("openrouter", "classify")).toBeNull();
+
+    // DeepSeek publishes four price bands per model and tells us afterwards
+    // which one a call landed in — never. `provider.ts` holds no row for it,
+    // and a job filled in from a price we do not have is what this refuses.
+    for (const task of aiTasks) {
+      expect(recommendedModelFor("deepseek", task), task).toBeNull();
+    }
   });
 
   it("offers every job it can fill for one provider", () => {

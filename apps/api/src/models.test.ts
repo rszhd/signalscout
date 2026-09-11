@@ -610,6 +610,39 @@ describe("the models routes", () => {
       });
     });
 
+    /**
+     * US-124. DeepSeek is a provider this build offers and cannot price, so
+     * it takes a key on the same terms as a gateway: the provider is accepted
+     * and the model is asked for.
+     */
+    it("accepts a DeepSeek key once a model is named", async () => {
+      await withServer(owner, async (app) => {
+        const refused = await app.inject({
+          method: "POST",
+          url: "/api/models/keys",
+          payload: { name: "DeepSeek", apiKey: "sk-deepseek-1234", provider: "deepseek" },
+        });
+
+        expect(refused.statusCode).toBe(400);
+        expect(refused.json().message).toContain("Name a model");
+
+        const added = await app.inject({
+          method: "POST",
+          url: "/api/models/keys",
+          payload: {
+            name: "DeepSeek",
+            apiKey: "sk-deepseek-1234",
+            provider: "deepseek",
+            model: "deepseek-flash",
+          },
+        });
+
+        expect(added.statusCode).toBe(200);
+        expect(added.json().keys).toHaveLength(1);
+        expect(added.json().keys[0].provider).toBe("deepseek");
+      });
+    });
+
     /** Both free refusals come first, so neither throws a paid call away. */
     it("refuses a name already taken before it spends", async () => {
       await withServer(owner, async (app) => {
@@ -653,6 +686,13 @@ describe("the models routes", () => {
         // runs whatever the machine pulled, so the screen asks.
         expect(view.testModels.openrouter).toBeUndefined();
         expect(view.testModels.ollama).toBeUndefined();
+
+        // DeepSeek is the third case and it is not the same one. This build
+        // recommends no model for it, because it carries no price for one, and
+        // it can still name one to test a key with. US-124.
+        expect(view.testModels.deepseek).toBe("deepseek-flash");
+        expect(view.unpricedModels.deepseek).toEqual(["deepseek-flash", "deepseek-v4-pro"]);
+        expect(view.pricedModels.deepseek).toEqual([]);
       });
     });
   });

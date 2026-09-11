@@ -150,6 +150,16 @@ Null means *we cannot say*, and it is counted as nothing rather than guessed.
 A local model through Ollama is genuinely free; an unpriced hosted model is
 unknown; a number we invented would be indistinguishable from a measured one.
 
+**DeepSeek is unpriced on purpose, and it is the clearest case of that rule.**
+US-124 read the page: each model has four rates — peak hours and off-peak
+hours, each split into cache hit and cache miss — and one million input tokens
+on `deepseek-flash` costs $0.003 in one band and $0.30 in another. The usage
+the API returns does not say which band a call landed in. So DeepSeek has no
+row in `modelPrices`, and a deployment that wants a figure sets
+`AI_INPUT_PRICE_MICROS` and `AI_OUTPUT_PRICE_MICROS`, or the per-job price on
+the Models screen. Set the dearest band if you set anything: the cap is checked
+against the high end for the reason this page gives elsewhere.
+
 Everything is stored in **micro-dollars** — millionths of one US dollar, as
 integers. One classification costs about $0.001, which is a tenth of a cent, so
 a column in cents would record a month of classification as zero.

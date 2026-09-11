@@ -53,6 +53,7 @@ import {
   saveAiTaskSettings,
   setDefaultAiKey,
   triageConfigFromEnvironment,
+  unpricedModelsFor,
 } from "@signalscout/core";
 import { z } from "zod";
 import { sessionUserId } from "./auth.js";
@@ -112,8 +113,9 @@ const taskViews: Record<AiTask, { title: string; what: string; note: string }> =
     title: "Similarity",
     what: "Compares a post with your monitor before either model is paid to read it.",
     note:
-      "Optional. Anthropic publishes no embedding endpoint, so on Anthropic this needs a " +
-      "provider of its own or it stays off — which costs nothing and drops nothing.",
+      "Optional. Neither Anthropic nor DeepSeek publishes an embedding endpoint, so on " +
+      "either this needs a provider of its own or it stays off — which costs nothing and " +
+      "drops nothing.",
   },
 };
 
@@ -188,6 +190,8 @@ const modelsSchema = z.object({
    * provider a person is choosing rather than the one that is saved.
    */
   pricedModels: z.record(z.string(), z.array(z.string())),
+  /** Names we can offer but not cost, by provider. See the view for why. */
+  unpricedModels: z.record(z.string(), z.array(z.string())),
   /** The embedding model each provider defaults to. See the view for why. */
   embeddingModels: z.record(z.string(), z.string()),
   /** The model a new key on each provider is tested with. US-087. */
@@ -465,6 +469,17 @@ export async function registerModelRoutes(
         ]),
       ),
       /**
+       * Names we can offer but not cost. US-124.
+       *
+       * Separate from `pricedModels` for the reason the embedding list below
+       * is separate: a name here carries no price, the card says so beside it,
+       * and merging the two would make that invisible. DeepSeek is the only
+       * provider with any, and without them its cards offer nothing at all.
+       */
+      unpricedModels: Object.fromEntries(
+        aiProviders.map((provider) => [provider, unpricedModelsFor(provider)]),
+      ),
+      /**
        * The embedding model each provider is asked for when nobody names one.
        *
        * Separate from `pricedModels` because we have read no embedding price —
@@ -484,7 +499,11 @@ export async function registerModelRoutes(
        */
       testModels: Object.fromEntries(
         aiProviders.flatMap((provider) => {
-          const model = recommendedModelFor(provider, "classify");
+          // The recommendation first, because that is the model the key will
+          // actually run. Then a name we can offer but not cost, because a
+          // blank field on a provider whose models we can list is friction for
+          // nothing — this prefills one test call and sets no job. US-124.
+          const model = recommendedModelFor(provider, "classify") ?? unpricedModelsFor(provider)[0];
 
           return model ? [[provider, model] as const] : [];
         }),

@@ -62,7 +62,7 @@ a free tier that needs no card.
 A key lives in `.env`, where it belongs to the machine, or on a screen, where
 it is tested with the provider before it is stored and belongs to the account
 that pasted it. The model is yours to choose too — OpenAI, Anthropic, Google,
-OpenRouter or Ollama, in three lines and no code path per provider.
+DeepSeek, OpenRouter or Ollama, in three lines and no code path per provider.
 
 Read [docs/self-hosting.md](docs/self-hosting.md) for which variable is which,
 and [docs/secrets.md](docs/secrets.md) for what encryption promises.

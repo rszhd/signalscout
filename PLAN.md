@@ -102,11 +102,12 @@ The principle is unchanged: the user owns the account and pays for their own
 usage. STACK.md, *A source is not a provider*, holds the reasoning and the rule
 it produced, and docs/self-hosting.md lists every variable.
 
-Later we can support multiple AI providers:
+Several AI providers are supported:
 
 * OpenAI
 * Anthropic
 * Gemini
+* DeepSeek
 * OpenRouter
 * Ollama
 * OpenAI-compatible local models

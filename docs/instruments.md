@@ -20,6 +20,18 @@ numbers in the ticket.
 because an answer we wrote would be evidence about our own schema and none
 about the provider.
 
+`live:model-probe` asks one provider whether it answers the call this product
+actually makes. It is the cheapest instrument here — one sentence in, one
+boolean out, through `generateObject`, which is the Test button on the Models
+screen with no account behind it. Run it when a provider is added. A provider
+that speaks the OpenAI wire format is not by that fact a provider that speaks
+structured output: DeepSeek publishes `response_format: json_object` and no
+JSON schema, so the AI SDK puts the schema in the prompt instead, and only a
+real call says whether the answer comes back usable. It reads `AI_PROVIDER`,
+`AI_MODEL`, `AI_API_KEY` and `AI_BASE_URL`; `--provider=` and `--model=`
+override the first two, and the key must belong to the provider probed. It
+writes nothing, because there is no account here to bill.
+
 `capture:classifier` scores PLAN.md's four worked examples, records the answers
 as the fixtures `ai/examples.test.ts` replays, and prints the scores that
 justify the default `min_score`. Four short calls.

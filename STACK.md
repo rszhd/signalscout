@@ -38,7 +38,7 @@ Three rules follow from these:
 | Database | Postgres 17+ with `pgvector` | Rows, queue, and embeddings in one service. |
 | ORM | Drizzle | Migrations are plain SQL files. The generated query is readable. |
 | Queue + cron | `pg-boss` | Retries, scheduling, and dead letters inside Postgres. No Redis. |
-| AI calls | Vercel AI SDK | One API over OpenAI, Anthropic, Google, OpenRouter, and Ollama. |
+| AI calls | Vercel AI SDK | One API over OpenAI, Anthropic, Google, DeepSeek, OpenRouter, and Ollama. |
 | Schemas | Zod | AI structured output, API input, and env vars from one definition. |
 | Auth | Better Auth | Sessions in our own Postgres. No external service. |
 | Email | Nodemailer over SMTP | Self-hosters need SMTP. Hosted providers are just another SMTP target. |

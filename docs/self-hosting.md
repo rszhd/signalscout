@@ -103,7 +103,7 @@ SOCIALCRAWL_API_KEY=     # SocialCrawl — Reddit, X, YouTube, TikTok, Instagram
 SOCIALDATA_API_KEY=''    # SocialData — X. Quote it; the key can contain a pipe
 APIFY_API_TOKEN=         # Apify — LinkedIn
 
-AI_PROVIDER=anthropic    # openai | anthropic | google | openrouter | ollama
+AI_PROVIDER=anthropic    # openai | anthropic | google | deepseek | openrouter | ollama
 AI_MODEL=claude-haiku-4-5
 AI_API_KEY=              # not needed for ollama
 ```

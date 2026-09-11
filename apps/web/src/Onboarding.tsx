@@ -91,6 +91,7 @@ export interface ModelsView {
 
 const providerNames: Record<string, string> = {
   anthropic: "Anthropic",
+  deepseek: "DeepSeek",
   google: "Google",
   ollama: "Ollama",
   openai: "OpenAI",

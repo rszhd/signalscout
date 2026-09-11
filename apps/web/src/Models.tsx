@@ -72,6 +72,8 @@ interface ModelsView {
   storeBlocker: string | null;
   /** Models this build knows a price for, by provider. */
   pricedModels: Record<string, string[]>;
+  /** Models this build can name but not cost, by provider. US-124. */
+  unpricedModels: Record<string, string[]>;
   /** The embedding model each provider defaults to, which has no price here. */
   embeddingModels: Record<string, string>;
   /** The model a new key on each provider is tested with. US-087. */
@@ -91,6 +93,7 @@ interface Probe {
 
 const providerNames: Record<string, string> = {
   anthropic: "Anthropic",
+  deepseek: "DeepSeek",
   google: "Google",
   ollama: "Ollama",
   openai: "OpenAI",
@@ -456,6 +459,7 @@ function ModelField({
   value,
   fallback,
   suggestions,
+  unpriced,
   onChange,
 }: {
   title: string;
@@ -463,6 +467,8 @@ function ModelField({
   value: string;
   fallback: string | null;
   suggestions: string[];
+  /** Which of them this build carries no price for. They are offered, marked. */
+  unpriced: string[];
   onChange: (value: string) => void;
 }) {
   const [custom, setCustom] = useState(false);
@@ -486,7 +492,7 @@ function ModelField({
         <optgroup id={`models-${task}`} label="Models">
           {suggestions.map((name) => (
             <option key={name} value={name}>
-              {name}
+              {unpriced.includes(name) ? `${name} — no price carried` : name}
             </option>
           ))}
         </optgroup>
@@ -524,12 +530,14 @@ function JobCard({
   task,
   keys,
   pricedModels,
+  unpricedModels,
   embeddingModels,
   onSaved,
 }: {
   task: TaskView;
   keys: KeyView[];
   pricedModels: Record<string, string[]>;
+  unpricedModels: Record<string, string[]>;
   embeddingModels: Record<string, string>;
   onSaved: (view: ModelsView) => void;
 }) {
@@ -584,10 +592,11 @@ function JobCard({
       : null;
 
   const customised = isOwnChoice(task);
+  const unpriced = task.task === "embed" ? [] : (unpricedModels[provider] ?? []);
   const suggestions =
     task.task === "embed"
       ? [embeddingModels[provider]].filter((one): one is string => Boolean(one))
-      : (pricedModels[provider] ?? []);
+      : [...(pricedModels[provider] ?? []), ...unpriced];
 
   function change(field: keyof Draft, value: string): void {
     setDraft((current) => {
@@ -872,6 +881,7 @@ function JobCard({
               value={draft.model}
               fallback={onInstanceProvider ? task.instance.model : null}
               suggestions={suggestions}
+              unpriced={unpriced}
               onChange={(value) => change("model", value)}
             />
           </div>
@@ -1074,6 +1084,7 @@ export function Models() {
                 keys={view.keys}
                 onSaved={setView}
                 pricedModels={view.pricedModels}
+                unpricedModels={view.unpricedModels}
                 task={task}
               />
             ))}

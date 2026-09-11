@@ -22,12 +22,14 @@
  * screen. `recommended.test.ts` asserts the gap for every provider in the
  * table, so a future addition cannot quietly close it.
  *
- * **Three providers are absent, each for a reason somebody measured.**
+ * **Four providers are absent, each for a reason somebody measured.**
  * Anthropic has no embedding endpoint, which is why `embed` is asked of
  * `defaultEmbeddingModels` rather than answered here. OpenRouter resells four
  * hundred models at the upstream provider's prices, so we hold no price for
  * one and would be recommending a name we cannot cost. Ollama runs whatever
- * the machine has pulled, and there is no name to guess.
+ * the machine has pulled, and there is no name to guess. DeepSeek has two
+ * models and we can price neither: `provider.ts` says why, and a recommendation
+ * we cannot cost is the one thing this table refuses to make.
  */
 import type { AiTask } from "../db/schema.js";
 import {

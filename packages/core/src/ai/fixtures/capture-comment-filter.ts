@@ -78,9 +78,9 @@ if (!config || (!config.apiKey && config.provider !== "ollama")) {
     [
       "No embedding model. Set AI_EMBEDDING_PROVIDER and AI_EMBEDDING_MODEL in .env.",
       "",
-      "AI_EMBEDDING_PROVIDER is openai, google, openrouter or ollama. Anthropic",
-      "publishes no embedding endpoint, so a deployment on it has to name",
-      "another provider here. On openai the model defaults to",
+      "AI_EMBEDDING_PROVIDER is openai, google, openrouter or ollama. Neither",
+      "Anthropic nor DeepSeek publishes an embedding endpoint, so a deployment",
+      "on either has to name another provider here. On openai the model defaults to",
       "text-embedding-3-small and the key falls back to AI_API_KEY.",
       "",
       "This run makes two short calls and costs well under a hundredth of a cent.",

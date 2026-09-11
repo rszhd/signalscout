@@ -72,7 +72,8 @@ the button on the card says which key it will follow.
 
 Two rules sit under that and both exist to stop a call that fails at 02:00. A
 job is left on the instance rather than moved when this build can name no model
-for the pair — OpenRouter and Ollama, and similarity on anything but OpenAI —
+for the pair — DeepSeek, OpenRouter and Ollama, and similarity on anything but
+OpenAI —
 because moving a provider without its model is the pairing that fails every
 call. And **deleting the default promotes nothing**: no other key takes its
 place, because a promoted key would move every following job onto a provider
@@ -88,8 +89,8 @@ call, recorded in the ledger as `key_test`.
 
 The dialog asks which model to test with, prefilled from this build's scoring
 recommendation for the chosen provider. It is not stored. Without it a key for
-OpenRouter or Ollama could not be tested at all, because this build recommends
-no model for either.
+DeepSeek, OpenRouter or Ollama could not be tested at all, because this build
+recommends no model for any of them.
 
 Two refusals come before the probe — no `ENCRYPTION_KEY`, and a name already
 taken — because either one would throw away a call somebody paid for. And a

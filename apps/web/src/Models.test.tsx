@@ -68,8 +68,13 @@ function view(overrides: Record<string, unknown> = {}, keys: unknown[] = []) {
       anthropic: ["claude-haiku-4-5", "claude-sonnet-5"],
       openai: ["gpt-5.6-luna", "gpt-5.6-terra"],
     },
+    unpricedModels: { deepseek: ["deepseek-flash", "deepseek-v4-pro"] },
     embeddingModels: { openai: "text-embedding-3-small" },
-    testModels: { openai: "gpt-5.6-terra", anthropic: "claude-sonnet-5" },
+    testModels: {
+      openai: "gpt-5.6-terra",
+      anthropic: "claude-sonnet-5",
+      deepseek: "deepseek-flash",
+    },
     keys,
     tasks: [
       {
@@ -543,6 +548,27 @@ describe("the models screen", () => {
       setValue(select("Key provider"), "ollama");
 
       expect(field("Model to test the key with").value).toBe("");
+    });
+
+    /**
+     * US-124. The picker must say "DeepSeek" rather than the raw value, and
+     * the field must prefill — this build recommends no DeepSeek model,
+     * because it carries no price for one, but it can still name one. An empty
+     * field on a provider whose two models we have read off its own page is
+     * friction for nothing, and this prefill tests a key rather than setting a
+     * job.
+     */
+    it("names DeepSeek in the picker and fills in a model we can name", async () => {
+      fetched.mockResolvedValue(json(view({ providers: ["openai", "deepseek"] })));
+      await openTheKeyDialog();
+
+      const picker = select("Key provider");
+      expect([...picker.options].map((option) => option.textContent)).toContain("DeepSeek");
+
+      setValue(picker, "openai");
+      setValue(picker, "deepseek");
+
+      expect(field("Model to test the key with").value).toBe("deepseek-flash");
     });
 
     it("keeps the dialog open on a refusal, with the provider's own sentence", async () => {

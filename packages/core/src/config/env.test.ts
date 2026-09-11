@@ -56,6 +56,20 @@ describe("the AI provider", () => {
     expect(() => loadEnv({ ...minimal, AI_PROVIDER: "some-startup" })).toThrow(/AI_PROVIDER/);
   });
 
+  /**
+   * US-124. DeepSeek scores and drafts, and it publishes no embedding
+   * endpoint. Naming it as the embedder is a call that fails once per poll,
+   * so it is refused at startup instead.
+   */
+  it("takes DeepSeek for chat and refuses it for embedding", () => {
+    const env = loadEnv({ ...minimal, AI_PROVIDER: "deepseek", AI_MODEL: "deepseek-flash" });
+
+    expect(env.AI_PROVIDER).toBe("deepseek");
+    expect(() => loadEnv({ ...minimal, AI_EMBEDDING_PROVIDER: "deepseek" })).toThrow(
+      /AI_EMBEDDING_PROVIDER/,
+    );
+  });
+
   // `.env.example` ships blank values and `pnpm dev` copies it, so a present
   // but empty variable must read as absent rather than stop the process.
   it("reads a blank value as an unset one", () => {

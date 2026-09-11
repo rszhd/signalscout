@@ -2,7 +2,7 @@
 
 # Open tickets
 
-33 open — 14 doing, 18 todo, 1 parked (10 p1, 19 p2, 4 p3).
+34 open — 14 doing, 19 todo, 1 parked (10 p1, 20 p2, 4 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -35,6 +35,7 @@
 | p2 | US-120 | [Instagram is measured at ScrapeCreators](todo/US-120-instagram-is-measured-at-scrapecreators.md) | spike | todo | 2026-09-11T18:38+08:00 |
 | p2 | US-121 | [YouTube is measured at ScrapeCreators](todo/US-121-youtube-is-measured-at-scrapecreators.md) | spike | todo | 2026-09-11T18:40+08:00 |
 | p2 | US-122 | [LinkedIn gets a second provider](todo/US-122-linkedin-gets-a-second-provider.md) | spike | todo | 2026-09-11T18:44+08:00 |
+| p2 | US-125 | [The inbox says new matches arrived](todo/US-125-the-inbox-says-new-matches-arrived.md) | feature | todo | 2026-09-11T18:48+08:00 |
 | p3 | US-018 | [A mutation sweep proves the suite is sensitive](todo/US-018-a-mutation-sweep-proves-the-suite-is-sensitive.md) | chore | todo | 2026-09-04T22:54+08:00 |
 | p3 | US-095 | [The logo travels with the email](todo/US-095-the-logo-travels-with-the-email.md) | feature | todo | 2026-09-10T00:36+08:00 |
 | p3 | BUG-013 | [A key row's error is printed inside a closed dialog](todo/BUG-013-a-key-row-s-error-is-printed-inside-a-closed-dialog.md) | bug | todo | 2026-09-09T11:58+08:00 |

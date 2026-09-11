@@ -385,10 +385,13 @@ export {
 } from "./filter/keywords.js";
 export { createLogger, type Logger, type LoggerOptions, redactedFields } from "./logger.js";
 export {
+  type CountNewMatchesOptions,
+  countNewMatches,
   csvCell,
   csvFilename,
   cursorPattern,
   defaultPageSize,
+  type InboxFilters,
   type InboxMatch,
   type ListMatchesOptions,
   listMatches,

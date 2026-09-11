@@ -17,6 +17,7 @@
  * connection must not read as a change of mind.
  */
 import {
+  countNewMatches,
   csvFilename,
   cursorPattern,
   type Database,
@@ -121,6 +122,33 @@ const query = z.object({
 });
 
 /**
+ * What the count route accepts. US-125.
+ *
+ * Picked from `query` rather than written again, so the two reads cannot drift
+ * apart when the next filter is added. Paging and ordering are absent because
+ * a count has neither.
+ */
+const countQuery = query
+  .pick({
+    monitorId: true,
+    projectId: true,
+    minScore: true,
+    saved: true,
+    includeNotRelevant: true,
+  })
+  .extend({
+    /**
+     * Count what arrived after this instant. Required.
+     *
+     * The client sends back the `asOf` of the page it is showing, which is the
+     * moment that page was read. Required rather than defaulted: a missing
+     * `since` would quietly ask the most expensive question this route can
+     * answer, and the answer would be wrong on the screen as well.
+     */
+    since: z.iso.datetime(),
+  });
+
+/**
  * How many matches one page of the walk asks for.
  *
  * Larger than the screen's page because nobody is reading these one at a time,
@@ -185,6 +213,45 @@ export async function registerMatchRoutes(
         nextCursor: page.nextCursor,
         asOf: page.asOf.toISOString(),
       };
+    },
+  });
+
+  /**
+   * How many matches arrived since the screen last loaded. US-125.
+   *
+   * The inbox polls this on a timer and shows the answer as a banner. It
+   * returns a number and never rows, because the list must not move while
+   * somebody is reading it: the rank subtracts twelve points a day, so
+   * re-reading the page on a timer would reorder every row under the cursor.
+   * The person clicks the banner when they are ready, and that is the only
+   * thing that reloads the list.
+   *
+   * The filters are `query`'s own fields, picked rather than retyped. A count
+   * that did not narrow the way the list narrows would announce leads that are
+   * not there when the banner is clicked, and a wrong count looks exactly like
+   * a right one.
+   */
+  app.route({
+    method: "GET",
+    url: "/api/matches/count",
+    schema: {
+      querystring: countQuery,
+      response: { 200: z.object({ count: z.number() }) },
+    },
+    handler: async (request) => {
+      const { monitorId, projectId, minScore, includeNotRelevant, saved, since } = request.query;
+
+      const count = await countNewMatches(db, {
+        userId: sessionUserId(request),
+        monitorId,
+        projectId,
+        minScore,
+        includeNotRelevant,
+        savedOnly: saved,
+        since: new Date(since),
+      });
+
+      return { count };
     },
   });
 

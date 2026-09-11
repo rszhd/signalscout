@@ -78,11 +78,22 @@ describe("the intent inbox", () => {
   let screen: Screen;
   let container: HTMLDivElement;
   let fetchMock: ReturnType<typeof vi.fn>;
+  /** What `/api/matches/count` answers, and every URL it was asked. US-125. */
+  let arriving: number | "fails";
+  let countRequests: string[];
 
   function answerWith(pages: Record<string, unknown>, monitorRows = monitors) {
     fetchMock.mockImplementation(async (request: string | URL | Request) => {
       const url = typeof request === "string" ? request : request.toString();
       if (url === "/api/monitors") return json(monitorRows);
+      // US-125. Before the list, because the count's URL starts with the
+      // list's. A case that cares sets `arriving`; every other case leaves it
+      // at zero and never sees a banner.
+      if (url.startsWith("/api/matches/count")) {
+        countRequests.push(url);
+        if (arriving === "fails") return json({ error: "The count could not be read." }, 500);
+        return json({ count: arriving });
+      }
       // Checked before the list, because a verdict's URL starts with the
       // list's. The body is what the assertions below read.
       if (url.endsWith("/verdict")) return json({ verdict: "good", changed: false });
@@ -105,6 +116,8 @@ describe("the intent inbox", () => {
 
   beforeEach(() => {
     fetchMock = vi.fn();
+    arriving = 0;
+    countRequests = [];
     vi.stubGlobal("fetch", fetchMock);
   });
 
@@ -849,6 +862,186 @@ describe("the intent inbox", () => {
     }
     expect(container.querySelector("canvas")).toBeNull();
     expect(container.querySelector("svg")).toBeNull();
+  });
+
+  /**
+   * The banner that says matches arrived. US-125.
+   *
+   * The screen asks for a number on a timer and never for the list, so what
+   * these cases hold is that the list does not move on its own. A screen that
+   * reordered itself while somebody read a card would be the failure the whole
+   * ticket exists to prevent.
+   */
+  describe("matches that arrive while somebody is reading", () => {
+    /** Only the interval. `settle` runs on real timers and must keep working. */
+    beforeEach(() => {
+      vi.useFakeTimers({ toFake: ["setInterval", "clearInterval"] });
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    /** Let the timer fire, then let the request it made finish. */
+    async function waitAMinute(): Promise<void> {
+      await act(async () => {
+        vi.advanceTimersByTime(60_000);
+      });
+      await settle();
+    }
+
+    function seeIfVisible(state: "visible" | "hidden"): void {
+      Object.defineProperty(document, "visibilityState", {
+        configurable: true,
+        get: () => state,
+      });
+    }
+
+    afterEach(() => seeIfVisible("visible"));
+
+    function banner(): HTMLButtonElement | undefined {
+      return document.querySelector<HTMLButtonElement>("button.inbox-arrived") ?? undefined;
+    }
+
+    it("says nothing while nothing has arrived", async () => {
+      await show();
+      await waitAMinute();
+
+      expect(banner()).toBeUndefined();
+    });
+
+    it("offers to show the matches that arrived", async () => {
+      await show();
+      arriving = 3;
+      await waitAMinute();
+
+      expect(banner()?.textContent).toBe("Show 3 new matches");
+    });
+
+    it("counts one match in the singular", async () => {
+      await show();
+      arriving = 1;
+      await waitAMinute();
+
+      expect(banner()?.textContent).toBe("Show 1 new match");
+    });
+
+    it("leaves the list exactly as it was until the banner is clicked", async () => {
+      await show();
+      arriving = 4;
+      await waitAMinute();
+
+      // The whole point. The rank moves with the clock, so a list that
+      // refreshed itself would reorder under the cursor of whoever is
+      // reading a card.
+      expect(container.querySelectorAll(".match-card")).toHaveLength(1);
+      expect(
+        fetchMock.mock.calls.filter(([url]) => url === "/api/matches?projectId=p1"),
+      ).toHaveLength(1);
+    });
+
+    it("reads the list again, and clears itself, when it is clicked", async () => {
+      await show();
+      arriving = 2;
+      await waitAMinute();
+
+      const shown = banner();
+
+      expect(shown).toBeDefined();
+
+      arriving = 0;
+      await act(async () => shown?.click());
+      await settle();
+
+      expect(banner()).toBeUndefined();
+      expect(
+        fetchMock.mock.calls.filter(([url]) => url === "/api/matches?projectId=p1"),
+      ).toHaveLength(2);
+    });
+
+    it("asks against the clock the list was read at, with the screen's filters", async () => {
+      await show();
+
+      await act(async () => button("Filters").click());
+      await act(async () => setValue(select("Minimum score"), "70"));
+      await settle();
+
+      await waitAMinute();
+
+      const asked = countRequests.at(-1) ?? "";
+
+      expect(asked).toContain(`since=${encodeURIComponent(firstPage.asOf)}`);
+      expect(asked).toContain("minScore=70");
+      expect(asked).toContain("projectId=p1");
+    });
+
+    it("does not send the order, which a count has no use for", async () => {
+      await show();
+
+      await act(async () => setValue(select("Order"), "newest"));
+      await settle();
+      await waitAMinute();
+
+      expect(countRequests.at(-1)).not.toContain("order=");
+    });
+
+    it("asks for nothing while the tab is hidden", async () => {
+      await show();
+      seeIfVisible("hidden");
+
+      await waitAMinute();
+      await waitAMinute();
+
+      // A laptop left open for a week would otherwise send ten thousand
+      // requests about a screen nobody is looking at.
+      expect(countRequests).toEqual([]);
+    });
+
+    it("asks once more the moment the tab comes back", async () => {
+      await show();
+      seeIfVisible("hidden");
+      await waitAMinute();
+
+      expect(countRequests).toEqual([]);
+
+      arriving = 5;
+      seeIfVisible("visible");
+      await act(async () => {
+        document.dispatchEvent(new Event("visibilitychange"));
+      });
+      await settle();
+
+      expect(countRequests).toHaveLength(1);
+      expect(banner()?.textContent).toBe("Show 5 new matches");
+    });
+
+    it("says nothing, and reports no error, when the count cannot be read", async () => {
+      await show();
+      arriving = "fails";
+      await waitAMinute();
+
+      // This is a question the person did not ask. The list in front of them
+      // is still correct, so an error here would report a failure that costs
+      // them nothing.
+      expect(banner()).toBeUndefined();
+      expect(container.querySelector(".error-state")).toBeNull();
+      expect(container.querySelectorAll(".match-card")).toHaveLength(1);
+    });
+
+    it("does not turn the reader's own dismissal into something that arrived", async () => {
+      await show();
+
+      const dismiss = button("Not relevant");
+
+      await act(async () => dismiss.click());
+      await settle();
+      await waitAMinute();
+
+      // The count is the server's answer about rows recorded after the clock,
+      // so nothing this person does to the list can appear in it. The server
+      // half is asserted in `packages/core/src/matches/matches.test.ts`.
+      expect(banner()).toBeUndefined();
+    });
   });
 
   describe("taking the inbox away as a spreadsheet", () => {

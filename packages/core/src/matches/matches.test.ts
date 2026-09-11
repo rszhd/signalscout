@@ -16,6 +16,7 @@ import { type IntentType, matches, monitors, posts } from "../db/schema.js";
 import { recordVerdict } from "../feedback/feedback.js";
 import { createTestDatabase, type TestDatabase } from "../testing/database.js";
 import {
+  countNewMatches,
   type InboxMatch,
   listMatches,
   type MatchPage,
@@ -61,6 +62,8 @@ interface Seed {
   readonly reasons?: readonly string[];
   readonly channel?: string;
   readonly intentType?: IntentType;
+  /** When the row was recorded, which is not when the post was written. */
+  readonly createdAt?: Date;
 }
 
 describe("the inbox list", () => {
@@ -69,14 +72,15 @@ describe("the inbox list", () => {
   let close: () => Promise<void>;
   let monitorId: string;
   let otherMonitorId: string;
+  let strangerMonitorId: string;
   let postSequence = 0;
 
-  async function createMonitorRow(name: string): Promise<string> {
+  async function createMonitorRow(name: string, userId: string = owner): Promise<string> {
     const row = inserted(
       await db
         .insert(monitors)
         .values({
-          userId: owner,
+          userId,
           name,
           product: "A test runner that records browser flows instead of coding them",
           idealCustomer: "Small SaaS teams with no dedicated QA engineer",
@@ -125,6 +129,7 @@ describe("the inbox list", () => {
           reasons: [...(match.reasons ?? ["Small SaaS team", "Explicit manual-testing pain"])],
           hidden: match.hidden ?? false,
           readAt: match.readAt ?? null,
+          ...(match.createdAt ? { createdAt: match.createdAt } : {}),
         })
         .returning({ id: matches.id }),
     );
@@ -137,6 +142,7 @@ describe("the inbox list", () => {
     ({ db, close } = createDatabase(database.url));
     monitorId = await createMonitorRow("Teams replacing manual QA");
     otherMonitorId = await createMonitorRow("Something else entirely");
+    strangerMonitorId = await createMonitorRow("Somebody else's monitor", "stranger");
   }, 60_000);
 
   afterAll(async () => {
@@ -205,6 +211,18 @@ describe("the inbox list", () => {
   });
 
   describe("what it refuses to show", () => {
+    it("never returns another account's match", async () => {
+      // US-017 scopes the inbox on the monitor's owner. Nothing asserted it
+      // until US-125 added a second account to this file: removing the scope
+      // left every list test passing, which is the shape BUG-009 had.
+      const mine = await seed({ monitorId, score: 50, postedAt: minutesAgo(5) });
+      await seed({ monitorId: strangerMonitorId, score: 99, postedAt: minutesAgo(1) });
+
+      const page = await listMatches(db, { userId: owner, asOf: now });
+
+      expect(page.matches.map((match) => match.id)).toEqual([mine]);
+    });
+
     it("never returns a hidden match", async () => {
       // US-015 sets this column when the author removed the post. The inbox is
       // the caller that has to honour it; a screen that still shows the
@@ -838,6 +856,160 @@ describe("the inbox list", () => {
 
       expect(counts.get(monitorId)?.total).toBe(1);
       expect(counts.has(otherMonitorId)).toBe(false);
+    });
+  });
+
+  /**
+   * US-125. The banner on the inbox is a claim about the list below it, so
+   * every case here is either "the count moved when it should" or "the count
+   * and the list agree". A wrong count looks exactly like a right one.
+   */
+  describe("counting what arrived", () => {
+    const since = minutesAgo(30);
+
+    it("counts a match recorded after the instant and not one recorded before", async () => {
+      await seed({ monitorId, score: 80, postedAt: minutesAgo(90), createdAt: minutesAgo(60) });
+      await seed({ monitorId, score: 80, postedAt: minutesAgo(20), createdAt: minutesAgo(10) });
+
+      expect(await countNewMatches(db, { userId: owner, since })).toBe(1);
+    });
+
+    it("leaves out a match recorded at the instant itself", async () => {
+      await seed({ monitorId, score: 80, postedAt: minutesAgo(40), createdAt: since });
+
+      // `since` is when the screen last loaded, so a row written in that
+      // instant is a row the person has already been shown.
+      expect(await countNewMatches(db, { userId: owner, since })).toBe(0);
+    });
+
+    it("reads when the row was recorded, not when the post was written", async () => {
+      await seed({ monitorId, score: 80, postedAt: daysAgo(400), createdAt: minutesAgo(10) });
+
+      // A poll can classify a post written a year ago. It arrived in the
+      // inbox ten minutes ago, and that is what the person is being told.
+      expect(await countNewMatches(db, { userId: owner, since })).toBe(1);
+    });
+
+    it("does not count a match this person dismissed", async () => {
+      const matchId = await seed({
+        monitorId,
+        score: 80,
+        postedAt: minutesAgo(20),
+        createdAt: minutesAgo(10),
+      });
+
+      await recordVerdict(db, { matchId, userId: owner, verdict: "not_relevant" });
+
+      expect(await countNewMatches(db, { userId: owner, since })).toBe(0);
+    });
+
+    it("counts a dismissed match when the caller asks for them", async () => {
+      const matchId = await seed({
+        monitorId,
+        score: 80,
+        postedAt: minutesAgo(20),
+        createdAt: minutesAgo(10),
+      });
+
+      await recordVerdict(db, { matchId, userId: owner, verdict: "not_relevant" });
+
+      expect(await countNewMatches(db, { userId: owner, since, includeNotRelevant: true })).toBe(1);
+    });
+
+    it("does not count a match whose post is gone", async () => {
+      await seed({
+        monitorId,
+        score: 80,
+        postedAt: minutesAgo(20),
+        createdAt: minutesAgo(10),
+        hidden: true,
+      });
+
+      expect(await countNewMatches(db, { userId: owner, since })).toBe(0);
+    });
+
+    it("does not count a match below the score the screen is filtered to", async () => {
+      await seed({ monitorId, score: 60, postedAt: minutesAgo(20), createdAt: minutesAgo(10) });
+      await seed({ monitorId, score: 90, postedAt: minutesAgo(20), createdAt: minutesAgo(10) });
+
+      expect(await countNewMatches(db, { userId: owner, since, minScore: 70 })).toBe(1);
+    });
+
+    it("counts one monitor's matches when the screen is filtered to it", async () => {
+      await seed({ monitorId, score: 80, postedAt: minutesAgo(20), createdAt: minutesAgo(10) });
+      await seed({
+        monitorId: otherMonitorId,
+        score: 80,
+        postedAt: minutesAgo(20),
+        createdAt: minutesAgo(10),
+      });
+
+      expect(await countNewMatches(db, { userId: owner, since, monitorId })).toBe(1);
+    });
+
+    it("does not count another account's matches", async () => {
+      await seed({
+        monitorId: strangerMonitorId,
+        score: 99,
+        postedAt: minutesAgo(20),
+        createdAt: minutesAgo(10),
+      });
+
+      expect(await countNewMatches(db, { userId: owner, since })).toBe(0);
+    });
+
+    it("counts nothing when asked about another account's monitor", async () => {
+      await seed({
+        monitorId: strangerMonitorId,
+        score: 99,
+        postedAt: minutesAgo(20),
+        createdAt: minutesAgo(10),
+      });
+
+      expect(
+        await countNewMatches(db, { userId: owner, since, monitorId: strangerMonitorId }),
+      ).toBe(0);
+    });
+
+    it("agrees with the list it describes, over the same data and filters", async () => {
+      const dismissed = await seed({
+        monitorId,
+        score: 95,
+        postedAt: minutesAgo(20),
+        createdAt: minutesAgo(10),
+      });
+
+      await recordVerdict(db, { matchId: dismissed, userId: owner, verdict: "not_relevant" });
+      await seed({ monitorId, score: 90, postedAt: minutesAgo(20), createdAt: minutesAgo(10) });
+      await seed({ monitorId, score: 75, postedAt: minutesAgo(20), createdAt: minutesAgo(10) });
+      await seed({ monitorId, score: 60, postedAt: minutesAgo(20), createdAt: minutesAgo(10) });
+      await seed({
+        monitorId,
+        score: 99,
+        postedAt: minutesAgo(20),
+        createdAt: minutesAgo(10),
+        hidden: true,
+      });
+      await seed({
+        monitorId: otherMonitorId,
+        score: 99,
+        postedAt: minutesAgo(20),
+        createdAt: minutesAgo(10),
+      });
+      await seed({
+        monitorId: strangerMonitorId,
+        score: 99,
+        postedAt: minutesAgo(20),
+        createdAt: minutesAgo(10),
+      });
+
+      const filters = { userId: owner, monitorId, minScore: 70 };
+      const page = await listMatches(db, { ...filters, asOf: now, limit: 50 });
+
+      // Two of the seven survive both filters: the 90 and the 75. Every other
+      // row is dropped by a rule the count must apply as well.
+      expect(page.matches).toHaveLength(2);
+      expect(await countNewMatches(db, { ...filters, since })).toBe(page.matches.length);
     });
   });
 });

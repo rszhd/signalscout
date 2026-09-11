@@ -1,7 +1,10 @@
 export { csvCell, csvFilename, matchesToCsv, utf8ByteOrderMark } from "./csv.js";
 export {
+  type CountNewMatchesOptions,
+  countNewMatches,
   cursorPattern,
   defaultPageSize,
+  type InboxFilters,
   type InboxMatch,
   type ListMatchesOptions,
   listMatches,

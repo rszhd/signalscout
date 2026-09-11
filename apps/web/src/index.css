@@ -419,6 +419,36 @@ a {
   flex: 1;
 }
 
+/*
+  The banner that says matches arrived. US-125.
+
+  The slot is always in the document so the live region can announce into it,
+  and it takes no room until it holds something. A quiet accent bar rather
+  than a warning colour: nothing is wrong, there is simply more to read.
+*/
+.inbox-arrived-slot:empty {
+  display: none;
+}
+
+.inbox-arrived {
+  display: block;
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  background: var(--accent-soft);
+  color: var(--accent);
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+}
+
+.inbox-arrived:hover {
+  text-decoration: underline;
+}
+
 .inbox-toolbar {
   min-height: 70px;
   display: flex;

@@ -67,7 +67,7 @@
  * a rank that moves with the clock skips rows, and the failure looks like a
  * match that was never delivered.
  */
-import { and, desc, eq, gte, inArray, isNotNull, isNull, or, type SQL, sql } from "drizzle-orm";
+import { and, desc, eq, gt, gte, inArray, isNotNull, isNull, or, type SQL, sql } from "drizzle-orm";
 import { type AnyPgColumn, alias } from "drizzle-orm/pg-core";
 import type { Database } from "../db/client.js";
 import {
@@ -210,7 +210,27 @@ export interface InboxMatch {
   readonly cursor: string;
 }
 
-export interface ListMatchesOptions {
+/**
+ * What an inbox read is narrowed to, shared by the page and the count. US-125.
+ *
+ * One interface because there is one answer. The banner that says how many
+ * matches arrived is a claim about the list underneath it, so the two reads
+ * must be narrowed by the same fields and by the same SQL — a count that
+ * counted a monitor the list is filtered away from would announce leads that
+ * are not there when the person clicks.
+ *
+ * `inboxConditions` is the other half of that. This says what may be asked;
+ * that says what it means.
+ */
+export interface InboxFilters {
+  /**
+   * Whose inbox this is, and whose verdicts to read. US-017.
+   *
+   * Required, and it used to default to the one self-hosted id. A default is
+   * what an unscoped caller gets when it forgets, and here that means one
+   * person's inbox answering somebody else's request.
+   */
+  readonly userId: string;
   /** One monitor, or every monitor when undefined. */
   readonly monitorId?: string;
   /**
@@ -228,19 +248,6 @@ export interface ListMatchesOptions {
   readonly projectId?: string;
   /** The lowest score to show. The monitor's own `min_score` already applied. */
   readonly minScore?: number;
-  /** The clock every rank on this page is measured against. */
-  readonly asOf?: Date;
-  readonly limit?: number;
-  /** `nextCursor` from the page before, or null for the first page. */
-  readonly cursor?: string | null;
-  /**
-   * Whose inbox this is, and whose verdicts to read. US-017.
-   *
-   * Required, and it used to default to the one self-hosted id. A default is
-   * what an unscoped caller gets when it forgets, and here that means one
-   * person's inbox answering somebody else's request.
-   */
-  readonly userId: string;
   /** Show the matches this user marked not relevant. Default false. */
   readonly includeNotRelevant?: boolean;
   /**
@@ -253,6 +260,14 @@ export interface ListMatchesOptions {
    * `order` is ignored.
    */
   readonly savedOnly?: boolean;
+}
+
+export interface ListMatchesOptions extends InboxFilters {
+  /** The clock every rank on this page is measured against. */
+  readonly asOf?: Date;
+  readonly limit?: number;
+  /** `nextCursor` from the page before, or null for the first page. */
+  readonly cursor?: string | null;
   /**
    * What to order the page by. Defaults to the rank. US-114.
    *
@@ -261,6 +276,21 @@ export interface ListMatchesOptions {
    * date it was written.
    */
   readonly order?: MatchOrder;
+}
+
+export interface CountNewMatchesOptions extends InboxFilters {
+  /**
+   * Count only the matches recorded after this instant. Required. US-125.
+   *
+   * Required because the question is always "what arrived", never "how many
+   * are there". An optional `since` would make the expensive reading — every
+   * match this account has ever had — the one a caller gets by forgetting.
+   *
+   * It is compared against `matches.created_at` and never `posts.posted_at`.
+   * A poll can classify a post written last year, and the person watching the
+   * screen is told when the row appeared, not when somebody wrote it.
+   */
+  readonly since: Date;
 }
 
 export interface MatchPage {
@@ -338,40 +368,39 @@ function orderValue(order: PageOrder, asOf: Date): SQL<number> {
 }
 
 /**
- * One page of the inbox, highest rank first.
+ * The join that finds this person's verdict on a match, and only theirs.
  *
- * Hidden matches are never returned. US-015 sets that column when the author
- * removed the post, and Reddit's terms are not satisfied by a screen that
- * merely stops linking to it.
+ * At most one verdict is in force per match per user — the partial unique
+ * index on `feedback` is what guarantees it — so this join cannot turn one
+ * match into two rows of a page, or into two of a count.
  */
-export async function listMatches(db: Database, options: ListMatchesOptions): Promise<MatchPage> {
-  const asOf = options.asOf ?? new Date();
-  const limit = Math.min(Math.max(options.limit ?? defaultPageSize, 1), maximumPageSize);
-  const userId = options.userId;
-  const rank = rankExpression(asOf);
-  // The saved list wins over the caller's order rather than arguing with it.
-  // Its order is what that list is, so there is nothing here to choose.
-  const order: PageOrder = options.savedOnly ? "saved" : (options.order ?? "rank");
-  const sortBy = orderValue(order, asOf);
-
-  /**
-   * The inbox belongs to one person. US-017.
-   *
-   * On the monitor rather than on the match, because that is where ownership
-   * is recorded: a match is a post scored against somebody's monitor, and it
-   * belongs to whoever the monitor does. The join is already here for the
-   * monitor's name, so this costs nothing.
-   */
-  const conditions: SQL[] = [eq(matches.hidden, false), eq(monitors.userId, userId)];
-
-  // At most one verdict is in force per match per user — the partial unique
-  // index on `feedback` is what guarantees it — so this join cannot turn one
-  // match into two rows of a page.
-  const currentVerdict = and(
+function currentVerdictOf(userId: string): SQL | undefined {
+  return and(
     eq(feedback.matchId, matches.id),
     eq(feedback.userId, userId),
     isNull(feedback.supersededAt),
   );
+}
+
+/**
+ * Everything an inbox read is narrowed by, in one place. US-125.
+ *
+ * Extracted from `listMatches` when the count route was added, because the
+ * count is a claim about the list and a second copy of these lines is a second
+ * answer free to disagree with the first. The next filter added here reaches
+ * both reads, which is the point.
+ *
+ * Hidden matches are never returned. US-015 sets that column when the author
+ * removed the post, and Reddit's terms are not satisfied by a screen that
+ * merely stops linking to it.
+ *
+ * The account scope is on the monitor rather than on the match, because that
+ * is where ownership is recorded: a match is a post scored against somebody's
+ * monitor, and it belongs to whoever the monitor does. Every caller joins
+ * `monitors` already, so this costs nothing.
+ */
+function inboxConditions(options: InboxFilters): SQL[] {
+  const conditions: SQL[] = [eq(matches.hidden, false), eq(monitors.userId, options.userId)];
 
   if (!options.includeNotRelevant && !options.savedOnly) {
     // `IS DISTINCT FROM` and not `<>`: an unjudged match has no feedback row,
@@ -394,6 +423,28 @@ export async function listMatches(db: Database, options: ListMatchesOptions): Pr
    */
   if (options.savedOnly) conditions.push(isNotNull(matches.savedAt));
   if (options.minScore !== undefined) conditions.push(gte(matches.score, options.minScore));
+
+  return conditions;
+}
+
+/**
+ * One page of the inbox, highest rank first.
+ *
+ * Hidden matches are never returned. US-015 sets that column when the author
+ * removed the post, and Reddit's terms are not satisfied by a screen that
+ * merely stops linking to it.
+ */
+export async function listMatches(db: Database, options: ListMatchesOptions): Promise<MatchPage> {
+  const asOf = options.asOf ?? new Date();
+  const limit = Math.min(Math.max(options.limit ?? defaultPageSize, 1), maximumPageSize);
+  const userId = options.userId;
+  const rank = rankExpression(asOf);
+  // The saved list wins over the caller's order rather than arguing with it.
+  // Its order is what that list is, so there is nothing here to choose.
+  const order: PageOrder = options.savedOnly ? "saved" : (options.order ?? "rank");
+  const sortBy = orderValue(order, asOf);
+
+  const conditions = inboxConditions(options);
 
   if (options.cursor) {
     const after = parseCursor(options.cursor);
@@ -460,7 +511,7 @@ export async function listMatches(db: Database, options: ListMatchesOptions): Pr
     .innerJoin(posts, eq(matches.postId, posts.id))
     .leftJoin(parentPost, eq(posts.parentPostId, parentPost.id))
     .innerJoin(monitors, eq(matches.monitorId, monitors.id))
-    .leftJoin(feedback, currentVerdict)
+    .leftJoin(feedback, currentVerdictOf(userId))
     .where(and(...conditions))
     /**
      * Whatever this page is ordered by, then the id.
@@ -487,6 +538,46 @@ export async function listMatches(db: Database, options: ListMatchesOptions): Pr
     nextCursor: rows.length > limit && last ? last.cursor : null,
     asOf,
   };
+}
+
+/**
+ * How many matches arrived since an instant, under the same filters. US-125.
+ *
+ * The inbox loads once and then stands still, so the screen asks this on a
+ * timer and shows the answer as a banner. It deliberately returns a number and
+ * not rows: the rank subtracts twelve points a day, so re-reading the list on
+ * a timer would move every row under the cursor of whoever is reading one, and
+ * the banner exists so a person decides when that happens.
+ *
+ * **It counts what the list would show, or it is a lie.** The filters come
+ * from `inboxConditions`, the same call `listMatches` makes, so a match this
+ * account cannot see, one below the score filter, one belonging to another
+ * monitor, and one the person already dismissed are all uncounted. A wrong
+ * count is not visibly wrong — it looks exactly like a right one — which is
+ * why the agreement is asserted rather than argued.
+ *
+ * The joins are the page's joins for the same reason, `posts` included. It
+ * drops nothing today, because `matches.post_id` is `not null` and its post is
+ * deleted by cascade with the match. Keeping it means the count cannot begin
+ * to disagree with the page if either of those stops being true.
+ */
+export async function countNewMatches(
+  db: Database,
+  options: CountNewMatchesOptions,
+): Promise<number> {
+  const conditions = inboxConditions(options);
+
+  conditions.push(gt(matches.createdAt, options.since));
+
+  const [row] = await db
+    .select({ count: sql<number>`count(*)::int` })
+    .from(matches)
+    .innerJoin(posts, eq(matches.postId, posts.id))
+    .innerJoin(monitors, eq(matches.monitorId, monitors.id))
+    .leftJoin(feedback, currentVerdictOf(options.userId))
+    .where(and(...conditions));
+
+  return Number(row?.count ?? 0);
 }
 
 /**

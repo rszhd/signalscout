@@ -287,6 +287,79 @@ describe("the inbox route", () => {
     });
   });
 
+  /**
+   * US-125. The core owns what a count means; this is the other half — that
+   * the screen's filters survive the query string. A filter dropped here is a
+   * banner promising leads the list will not show when it is clicked.
+   */
+  describe("how many arrived", () => {
+    /** An instant before everything a case seeds, so it counts all of it. */
+    function aMinuteAgo(): string {
+      return new Date(Date.now() - 60_000).toISOString();
+    }
+
+    async function count(query: string): Promise<number> {
+      const response = await get(`/api/matches/count?${query}`);
+
+      expect(response.statusCode).toBe(200);
+
+      return (JSON.parse(response.body) as { count: number }).count;
+    }
+
+    it("answers with how many arrived after the instant", async () => {
+      await seed({ monitorId, score: 94, minutesOld: 12 });
+      await seed({ monitorId, score: 71, minutesOld: 30 });
+
+      expect(await count(`since=${encodeURIComponent(aMinuteAgo())}`)).toBe(2);
+    });
+
+    it("answers zero when nothing arrived after it", async () => {
+      await seed({ monitorId, score: 94, minutesOld: 12 });
+
+      const later = new Date(Date.now() + 60_000).toISOString();
+
+      expect(await count(`since=${encodeURIComponent(later)}`)).toBe(0);
+    });
+
+    it("carries the monitor filter from the query string", async () => {
+      await seed({ monitorId, score: 94, minutesOld: 12 });
+      await seed({ monitorId: otherMonitorId, score: 88, minutesOld: 12 });
+
+      expect(await count(`since=${encodeURIComponent(aMinuteAgo())}&monitorId=${monitorId}`)).toBe(
+        1,
+      );
+    });
+
+    it("carries the score filter from the query string", async () => {
+      await seed({ monitorId, score: 94, minutesOld: 12 });
+      await seed({ monitorId, score: 40, minutesOld: 12 });
+
+      expect(await count(`since=${encodeURIComponent(aMinuteAgo())}&minScore=70`)).toBe(1);
+    });
+
+    it("leaves out a match this person dismissed, and counts it when asked", async () => {
+      const matchId = await seed({ monitorId, score: 94, minutesOld: 12 });
+
+      expect((await judge(matchId, "not_relevant")).statusCode).toBe(200);
+
+      const since = encodeURIComponent(aMinuteAgo());
+
+      expect(await count(`since=${since}`)).toBe(0);
+      expect(await count(`since=${since}&includeNotRelevant=true`)).toBe(1);
+    });
+
+    it("refuses a request that names no instant", async () => {
+      // Without this the route would answer the most expensive question it
+      // can — every match this account has ever had — to a caller that forgot
+      // a parameter, and the number on the screen would be wrong as well.
+      expect((await get("/api/matches/count")).statusCode).toBe(400);
+    });
+
+    it("refuses an instant that is not a date", async () => {
+      expect((await get("/api/matches/count?since=yesterday")).statusCode).toBe(400);
+    });
+  });
+
   describe("the two buttons on a match", () => {
     it("stores a verdict and puts it on the card", async () => {
       const matchId = await seed({ monitorId, score: 94, minutesOld: 12 });

@@ -20,6 +20,16 @@ import { paths } from "./route.js";
  * dismissed is the only one that changed.
  */
 
+/**
+ * How often the screen asks whether anything arrived. US-125.
+ *
+ * Far below the fastest schedule a monitor can have, which is once an hour.
+ * That is deliberate and it is not a measurement: being early costs one
+ * counting query, and being late costs a person their attention on a screen
+ * that is quietly out of date.
+ */
+const arrivalCheckMs = 60_000;
+
 type Verdict = "good" | "not_relevant";
 
 interface Match {
@@ -298,6 +308,13 @@ export function Inbox({ projectId }: { readonly projectId: string }) {
    * are in the list and the order they come in. The server does both.
    */
   const [showSaved, setShowSaved] = useState(false);
+  /**
+   * How many matches arrived since this page was read. US-125.
+   *
+   * A number and not rows, because the list must not move while somebody is
+   * reading it. Zero means the banner is not shown.
+   */
+  const [arrived, setArrived] = useState(0);
   const [judging, setJudging] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -358,6 +375,9 @@ export function Inbox({ projectId }: { readonly projectId: string }) {
   const loadFirstPage = useCallback(async (): Promise<void> => {
     setState("loading");
     setError(null);
+    // Whatever had arrived is about to be on screen. This is also what clears
+    // the banner when it is clicked, and when a filter changes underneath it.
+    setArrived(0);
 
     const query = filterQuery();
 
@@ -378,6 +398,61 @@ export function Inbox({ projectId }: { readonly projectId: string }) {
   useEffect(() => {
     void loadFirstPage();
   }, [loadFirstPage]);
+
+  /**
+   * Ask how many matches arrived, on a timer. US-125.
+   *
+   * A number on a timer, and never the list on a timer. The rank depends on a
+   * clock, so re-reading the list here would move every row while somebody is
+   * reading one — the same reason a dismissed match is removed in the browser
+   * rather than by reloading. The banner lets the person say when.
+   *
+   * `page.asOf` is the instant the list on screen was read, which is exactly
+   * what "since" has to mean. Nothing is asked while the tab is hidden: a
+   * laptop left open for a week would otherwise send ten thousand requests
+   * about a screen nobody is looking at.
+   */
+  useEffect(() => {
+    const since = page?.asOf;
+
+    if (!since) return;
+
+    let cancelled = false;
+
+    const ask = async (): Promise<void> => {
+      if (document.visibilityState !== "visible") return;
+
+      // The list's own filters, minus the order, which a count has no use for.
+      // A banner counting matches the filters hide would promise leads that
+      // are not there when somebody clicks it.
+      const query = filterQuery();
+      query.delete("order");
+      query.set("since", since);
+
+      try {
+        const answer = await requestJson<{ count: number }>(`/api/matches/count?${query}`);
+
+        if (!cancelled) setArrived(answer.count);
+      } catch {
+        // Silent on purpose. The list on screen is still correct, and this is
+        // a question the person did not ask; an error here would report a
+        // failure that costs them nothing.
+      }
+    };
+
+    const timer = window.setInterval(() => void ask(), arrivalCheckMs);
+    const onVisibilityChange = (): void => {
+      if (document.visibilityState === "visible") void ask();
+    };
+
+    document.addEventListener("visibilitychange", onVisibilityChange);
+
+    return () => {
+      cancelled = true;
+      window.clearInterval(timer);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+    };
+  }, [page?.asOf, filterQuery]);
 
   async function loadMore(): Promise<void> {
     if (!page?.nextCursor) return;
@@ -600,6 +675,21 @@ export function Inbox({ projectId }: { readonly projectId: string }) {
         {filtered && (
           <button className="read-more-button" type="button" onClick={clearFilters}>
             Clear filters
+          </button>
+        )}
+      </div>
+
+      {/*
+        The banner, and the only thing that reloads the list. US-125.
+
+        A live region that is present and empty rather than one that appears
+        with its message: a region added to the document at the same moment as
+        its content is announced by nothing.
+      */}
+      <div className="inbox-arrived-slot" role="status" aria-live="polite">
+        {arrived > 0 && state !== "loading" && (
+          <button className="inbox-arrived" type="button" onClick={() => void loadFirstPage()}>
+            {arrived === 1 ? "Show 1 new match" : `Show ${arrived} new matches`}
           </button>
         )}
       </div>

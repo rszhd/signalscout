@@ -26,15 +26,28 @@ The app is then on <http://localhost:3000>.
 same thing with `openssl`:
 
 ```bash
-cp .env.example .env
+cp .env.example.self-hosted .env
 echo "AUTH_SECRET=$(openssl rand -base64 32)" >> .env
 echo "ENCRYPTION_KEY=$(openssl rand -base64 32)" >> .env
 ```
 
+### The two example files
+
+`.env.example.self-hosted` is the one you copy, and it is what `pnpm setup`
+copies too. It names thirty variables: the two secrets, the Postgres password,
+the provider keys, the model settings, SMTP and a few switches. Everything it
+leaves out has a default that is already the self-hosted answer, so what it
+produces boots.
+
+`.env.example` is the reference. It names every variable the application
+reads — sixty-six of them, including the Stripe settings, the proxy names and
+the model price overrides — with the reasoning beside each one. Read it when
+you want a dial the short file does not offer.
+
 ### The two secrets, and why they are not in the file you copied
 
-`.env.example` is committed, so it cannot carry either of them. A secret in git
-is a secret every reader of this repository holds.
+Both example files are committed, so neither can carry a secret. A secret in
+git is a secret every reader of this repository holds.
 
 `AUTH_SECRET` signs the session cookie. **The process refuses to start without
 it**, because an instance with no login serves an inbox of commercial research
@@ -52,7 +65,7 @@ already holds encrypted credentials is safe.
 
 ### Change the Postgres password
 
-`.env.example` ships `POSTGRES_PASSWORD=intentwatch`. Change it, and
+The example ships `POSTGRES_PASSWORD=intentwatch`. Change it, and
 `DATABASE_URL` with it, before this answers on a public address. `pnpm setup`
 tells you it is still the default rather than replacing it: changing it on an
 instance whose volume already exists locks the app out of its own database.
@@ -109,9 +122,9 @@ picking would spend money at a provider you did not.
 This product asks a model four different things — scoring, triage, similarity
 and drafting a reply — and each is configured on its own.
 [costs.md](costs.md) says why triage must be the cheaper model, and
-`.env.example` carries a working pair. Anthropic publishes no embedding
-endpoint, so the similarity stage needs another provider named or it does not
-run.
+`.env.example` carries a working pair with the prices it was measured at.
+Anthropic publishes no embedding endpoint, so the similarity stage needs
+another provider named or it does not run.
 
 Read [secrets.md](secrets.md) for what encryption promises, and
 [sources.md](sources.md) for what each connector fetches.

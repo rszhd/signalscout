@@ -2,7 +2,7 @@
 /**
  * Write a `.env` this instance can boot with.
  *
- * Two values in `.env.example` are empty and cannot be anything else: a secret
+ * Two values in the example are empty and cannot be anything else: a secret
  * committed to git is a secret every reader of this repository holds. Both are
  * generated here.
  *
@@ -58,8 +58,20 @@ const generated = [
   { name: "ENCRYPTION_KEY", describe: () => "encrypts credentials stored in the database" },
 ];
 
-/** The password `.env.example` ships. Real on nobody's server, and the default. */
+/** The password the example ships. Real on nobody's server, and the default. */
 const shippedPostgresPassword = "intentwatch";
+
+/**
+ * The example a new `.env` is made from.
+ *
+ * The short one, not `.env.example`. That file is the reference: it names every
+ * variable `config/env.ts` declares, so a setting cannot exist without being
+ * written down somewhere. This one names only what a self-hosted instance sets
+ * — about a dozen values against sixty-six — and it is what somebody reads on
+ * their first install. Every variable it leaves out has a default that is
+ * already the self-hosted answer, so what it produces boots.
+ */
+const exampleFile = ".env.example.self-hosted";
 
 /**
  * Make `.env` bootable, and report what changed.
@@ -72,8 +84,8 @@ export function ensureEnvFile(root) {
   const notes = [];
 
   if (!existsSync(envPath)) {
-    copyFileSync(`${root}.env.example`, envPath);
-    notes.push("Created .env from .env.example.");
+    copyFileSync(`${root}${exampleFile}`, envPath);
+    notes.push(`Created .env from ${exampleFile}.`);
   }
 
   for (const secret of generated) {

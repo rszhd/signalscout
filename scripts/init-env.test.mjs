@@ -22,8 +22,9 @@ function envPath() {
   return join(root, ".env");
 }
 
+// The short file `pnpm setup` copies, not the long reference beside it.
 function writeExample(contents) {
-  writeFileSync(join(root, ".env.example"), contents);
+  writeFileSync(join(root, ".env.example.self-hosted"), contents);
 }
 
 beforeEach(() => {
@@ -38,7 +39,7 @@ describe("ensureEnvFile", () => {
 
     expect(env.AUTH_SECRET).toBeTruthy();
     expect(env.ENCRYPTION_KEY).toBeTruthy();
-    expect(notes[0]).toContain("Created .env");
+    expect(notes[0]).toContain("Created .env from .env.example.self-hosted");
   });
 
   it("generates a key the application itself accepts", () => {

@@ -114,7 +114,8 @@ say it here than let you find it in an agreement you skimmed.
 ```bash
 git clone https://github.com/rszhd/signalscout
 cd signalscout
-pnpm setup                # writes .env, and the two secrets it cannot ship
+pnpm setup                # writes .env from .env.example.self-hosted,
+                          # and the two secrets it cannot ship
 docker compose -f docker-compose.yml -f docker-compose.build.yml up --build
 ```
 

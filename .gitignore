@@ -8,10 +8,14 @@ build/
 .turbo/
 *.tsbuildinfo
 
-# Environment and secrets
+# Environment and secrets. Both example files are committed and every other
+# `.env.` file is somebody's real values, so each exception is named rather
+# than globbed: `!.env.example*` would also un-ignore a `.env.example.local`
+# that a person made by copying one of them.
 .env
 .env.*
 !.env.example
+!.env.example.self-hosted
 
 # Logs and coverage
 *.log

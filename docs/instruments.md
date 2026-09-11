@@ -209,3 +209,17 @@ transcript endpoint charges a credit a video and returns thousands of
 characters where TikTok's returns null. Run it when a YouTube connector is
 written, and read `docs/sources.md` before trusting `uploadDate` — it narrows
 and it leaks.
+
+The ScrapeCreators Instagram capture asks two endpoints rather than one,
+because this platform's two candidates fail in opposite directions: Instagram's
+own topic page returns no date on any post, and the reels search returns
+everything a monitor needs through Google's index. It spends 6 credits. Three
+of its calls are free — a search matching nothing answers 404 and charges 0, a
+page past the documented last one answers 400 and charges 0, and so does a key
+with no query — so on this platform a bad query costs nothing.
+
+One lesson from the YouTube and Instagram captures together, because each paid
+to learn it: **read `comment_count` before asking for comments.** Both scripts
+first asked the first result in the page, got an empty comment page, billed for
+it, and in YouTube's case spent three more credits suspecting a parameter that
+was innocent. The count is in the search answer.

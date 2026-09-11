@@ -1,0 +1,511 @@
+{
+  "httpStatus": 200,
+  "body": {
+    "success": true,
+    "credits_remaining": 1740,
+    "credits_charged": 1,
+    "reels": [
+      {
+        "id": "3973405568074366692",
+        "__typename": "XDTGraphVideo",
+        "shortcode": "DckX0_pob7k",
+        "url": "https://www.instagram.com/reel/DckX0_pob7k/",
+        "caption": "1. If your only skill is manual testing, start considering test automation if for no reason learn it for when you’d need it cos you will\n\n2. Testing is not about finding bugs that’s just 10% of the job, improving processes and preventing bugs is 90%\n\n3. If developers discover more bugs than QA before release, it shows a huge product knowledge gap that needs to be tightened \nTesters who don’t understand the product will always be outperformed by those who do. It’s not always a skill issue\n\n4. I hope you understand shift-left testing: it’s simply “the earlier the better”.\n\n5. You don’t need to know every automation tool. You need to master one and understand testing deeply.\n\n6. Truly, AI can generate test cases in seconds. It still can’t replace critical thinking and domain knowledge.\n\n7. Don’t skip regressions test\n\n8. Quality is everyone’s responsibility. If QA is the only team thinking about quality, your engineering culture is unsustainable.\n\n9. The most influential testers aren’t the ones who click the fastest, they’re the ones who influence product decisions before a single line of code is written.\n\n10. Bug-free software doesn’t exist. Stop promising it. Same as 100% automation\n\n11. Understanding the business impact of a bug further deepens your knowledge of the product and helps you determine the bug severity \n\n12. Risk based testing over Quality/speed anytime\n\n13. I’m yet to find an accurate KPM for QAs tell me how you measure QAs KPIs\n\n#theqagirl #QA #facts #fyppppppppppppppppppppppp #tester \n\nSoftware testing, QA, facts, AI, Remote Work\n\nSave this for later",
+        "thumbnail_src": "https://scrubbed.invalid/media-url-expired.bin",
+        "display_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "video_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "has_audio": true,
+        "product_type": "clips",
+        "video_duration": null,
+        "clips_music_attribution_info": null,
+        "is_video": true,
+        "owner": {
+          "id": "instagrammer-1",
+          "username": "instagrammer-2",
+          "is_verified": false,
+          "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+          "full_name": "instagrammer-3"
+        },
+        "taken_at": "2026-08-28T03:21:21.000Z",
+        "is_ad": false,
+        "like_count": 1231,
+        "is_paid_partnership": false,
+        "location": null,
+        "comment_count": 26,
+        "comments": [
+          {
+            "id": "18186899482366631",
+            "text": "Is QA job are going to exhaust?",
+            "owner": {
+              "id": "instagrammer-4",
+              "username": "instagrammer-5",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-09-04T14:21:50.000Z"
+          },
+          {
+            "id": "17916823965433272",
+            "text": "Is a",
+            "owner": {
+              "id": "instagrammer-4",
+              "username": "instagrammer-5",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-09-04T14:21:23.000Z"
+          },
+          {
+            "id": "18111968489022202",
+            "text": "🙌",
+            "owner": {
+              "id": "instagrammer-6",
+              "username": "instagrammer-7",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-09-03T17:48:50.000Z"
+          },
+          {
+            "id": "17957789138999225",
+            "text": "How can QA influence the product before a line of code is written?",
+            "owner": {
+              "id": "instagrammer-8",
+              "username": "instagrammer-9",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-09-02T21:48:03.000Z"
+          },
+          {
+            "id": "18456199117191575",
+            "text": "The sooner businesses understand no10 the better.",
+            "owner": {
+              "id": "instagrammer-10",
+              "username": "instagrammer-11",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-09-01T17:03:15.000Z"
+          },
+          {
+            "id": "18132602572655765",
+            "text": "🙌",
+            "owner": {
+              "id": "instagrammer-12",
+              "username": "instagrammer-13",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-09-01T15:06:59.000Z"
+          },
+          {
+            "id": "17967501237160334",
+            "text": "Can u provide me the roadmap sis",
+            "owner": {
+              "id": "instagrammer-14",
+              "username": "instagrammer-15",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-08-31T04:10:44.000Z"
+          },
+          {
+            "id": "18130046662637444",
+            "text": "Regression Pass % Improvement and penalty for Release Bugs",
+            "owner": {
+              "id": "instagrammer-16",
+              "username": "instagrammer-17",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-08-29T19:22:28.000Z"
+          },
+          {
+            "id": "18097563902366810",
+            "text": "🙌",
+            "owner": {
+              "id": "instagrammer-18",
+              "username": "instagrammer-19",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-08-29T14:29:40.000Z"
+          },
+          {
+            "id": "18139536628587281",
+            "text": "Manual testing can never be replaced and automation can mot cover everything but yes manual jobs will be dropped by 50%",
+            "owner": {
+              "id": "instagrammer-20",
+              "username": "instagrammer-21",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-08-28T20:39:13.000Z"
+          },
+          {
+            "id": "18004621706780258",
+            "text": "COULD you please provide docs to optimize process?",
+            "owner": {
+              "id": "instagrammer-22",
+              "username": "instagrammer-23",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-08-28T18:40:45.000Z"
+          },
+          {
+            "id": "18105094949236665",
+            "text": "True so true",
+            "owner": {
+              "id": "instagrammer-24",
+              "username": "instagrammer-25",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-08-28T17:23:49.000Z"
+          },
+          {
+            "id": "18114627598953525",
+            "text": "🙌🙌",
+            "owner": {
+              "id": "instagrammer-26",
+              "username": "instagrammer-27",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-08-28T12:19:03.000Z"
+          },
+          {
+            "id": "17878468704686147",
+            "text": "💯",
+            "owner": {
+              "id": "instagrammer-28",
+              "username": "instagrammer-29",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-08-28T12:06:32.000Z"
+          },
+          {
+            "id": "18091829891552445",
+            "text": "Do u have a roadmap or something? @instagrammer-2",
+            "owner": {
+              "id": "instagrammer-30",
+              "username": "instagrammer-31",
+              "is_verified": false,
+              "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+              "full_name": ""
+            },
+            "like_count": 0,
+            "created_at": "2026-08-28T10:17:49.000Z"
+          }
+        ]
+      },
+      {
+        "id": "3976025570282843479",
+        "__typename": "XDTGraphVideo",
+        "shortcode": "DctrjC2lC1X",
+        "url": "https://www.instagram.com/reel/DctrjC2lC1X/",
+        "caption": "Software Testing Fundamentals - Episode 9: CI Testing\nCI turns testing into a habit.\n\n#SoftwareTesting #QA #TechEducation #DevTools #AFS",
+        "thumbnail_src": "https://scrubbed.invalid/media-url-expired.bin",
+        "display_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "video_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "has_audio": true,
+        "product_type": "clips",
+        "video_duration": null,
+        "clips_music_attribution_info": null,
+        "is_video": true,
+        "owner": {
+          "id": "instagrammer-32",
+          "username": "instagrammer-33",
+          "is_verified": false,
+          "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+          "full_name": "instagrammer-34"
+        },
+        "taken_at": "2026-08-31T18:01:34.000Z",
+        "is_ad": false,
+        "like_count": 0,
+        "is_paid_partnership": false,
+        "location": null,
+        "comment_count": 0,
+        "comments": []
+      },
+      {
+        "id": "3975987814936126797",
+        "__typename": "XDTGraphVideo",
+        "shortcode": "Dcti9ocjKVN",
+        "url": "https://www.instagram.com/reel/Dcti9ocjKVN/",
+        "caption": "Software Testing Fundamentals - Episode 4: Integration Tests\nBoundaries deserve real checks.\n\n#SoftwareTesting #QA #TechEducation #DevTools #AFS",
+        "thumbnail_src": "https://scrubbed.invalid/media-url-expired.bin",
+        "display_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "video_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "has_audio": true,
+        "product_type": "clips",
+        "video_duration": null,
+        "clips_music_attribution_info": null,
+        "is_video": true,
+        "owner": {
+          "id": "instagrammer-32",
+          "username": "instagrammer-33",
+          "is_verified": false,
+          "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+          "full_name": "instagrammer-34"
+        },
+        "taken_at": "2026-08-31T16:45:29.000Z",
+        "is_ad": false,
+        "like_count": 0,
+        "is_paid_partnership": false,
+        "location": null,
+        "comment_count": 0,
+        "comments": []
+      },
+      {
+        "id": "3976002916217838715",
+        "__typename": "XDTGraphVideo",
+        "shortcode": "DctmZYnFNx7",
+        "url": "https://www.instagram.com/reel/DctmZYnFNx7/",
+        "caption": "Software Testing Fundamentals - Episode 6: Test Data\nStable data creates stable tests.\n\n#SoftwareTesting #QA #TechEducation #DevTools #AFS",
+        "thumbnail_src": "https://scrubbed.invalid/media-url-expired.bin",
+        "display_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "video_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "has_audio": true,
+        "product_type": "clips",
+        "video_duration": null,
+        "clips_music_attribution_info": null,
+        "is_video": true,
+        "owner": {
+          "id": "instagrammer-32",
+          "username": "instagrammer-33",
+          "is_verified": false,
+          "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+          "full_name": "instagrammer-34"
+        },
+        "taken_at": "2026-08-31T17:15:29.000Z",
+        "is_ad": false,
+        "like_count": 0,
+        "is_paid_partnership": false,
+        "location": null,
+        "comment_count": 0,
+        "comments": []
+      },
+      {
+        "id": "3966446640913659082",
+        "__typename": "XDTGraphVideo",
+        "shortcode": "DcLpjRsMzTK",
+        "url": "https://www.instagram.com/reel/DcLpjRsMzTK/",
+        "caption": "🕵️‍♂️ Debug Playwright Tests Like You Have a Time Machine! ⏪🚀\n\nTest failed in CI and you have NO IDEA WHY? 😭\nThat’s exactly where Playwright Trace Viewer becomes your superpower.\n\nWith Trace Viewer, you can:\n\n🎯 Replay your test step-by-step\n🔍 Inspect DOM & locators at any moment\n🌐 Check network requests\n🖥️ Review screenshots and page state\n📝 Inspect console logs and actions\n🐛 Debug flaky & failed tests faster\n🤝 Share traces with your team\n\n⚡ The workflow is simple:\n\nRecord → Run → Open Trace → Investigate → Fix\n\n💡 Pro Tip: Enable tracing for failed tests in CI and attach the \"trace.zip\" artifact. Instead of guessing what happened, you can literally travel back through the test execution.\n\n📌 SAVE THIS POST — your future self debugging a 2 AM CI failure will thank you! 😂\n\n💬 Have you used Playwright Trace Viewer yet? YES / NOT YET?\n\nFollow @instagrammer-35 for practical Playwright, QA Automation & Software Testing content. 🚀\n\n#Playwright #PlaywrightTesting #PlaywrightAutomation #TraceViewer #TestAutomation AutomationTesting SoftwareTesting QAEngineer SDET QualityAssurance TestAutomationEngineer WebAutomation TypeScript JavaScript QATesting SoftwareTester QACommunity TestingTips E2ETesting DevTesting",
+        "thumbnail_src": "https://scrubbed.invalid/media-url-expired.bin",
+        "display_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "video_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "has_audio": true,
+        "product_type": "clips",
+        "video_duration": null,
+        "clips_music_attribution_info": null,
+        "is_video": true,
+        "owner": {
+          "id": "instagrammer-36",
+          "username": "instagrammer-37",
+          "is_verified": false,
+          "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+          "full_name": "instagrammer-38"
+        },
+        "taken_at": "2026-08-18T12:49:00.000Z",
+        "is_ad": false,
+        "like_count": 17,
+        "is_paid_partnership": false,
+        "location": {
+          "__typename": "XDTLocationDict",
+          "pk": 101465674741338,
+          "lat": 25.204921738873,
+          "lng": 55.270478725433,
+          "name": "Dubai, UAE - دبي ألاِمارات",
+          "profile_pic_url": null
+        },
+        "comment_count": 0,
+        "comments": []
+      },
+      {
+        "id": "3975972712203499626",
+        "__typename": "XDTGraphVideo",
+        "shortcode": "Dctfh27iThq",
+        "url": "https://www.instagram.com/reel/Dctfh27iThq/",
+        "caption": "Software Testing Fundamentals - Episode 2: Test Levels\nTest levels cover different risks.\n\n#SoftwareTesting #QA #TechEducation #DevTools #AFS",
+        "thumbnail_src": "https://scrubbed.invalid/media-url-expired.bin",
+        "display_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "video_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "has_audio": true,
+        "product_type": "clips",
+        "video_duration": null,
+        "clips_music_attribution_info": null,
+        "is_video": true,
+        "owner": {
+          "id": "instagrammer-32",
+          "username": "instagrammer-33",
+          "is_verified": false,
+          "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+          "full_name": "instagrammer-34"
+        },
+        "taken_at": "2026-08-31T16:15:28.000Z",
+        "is_ad": false,
+        "like_count": 0,
+        "is_paid_partnership": false,
+        "location": null,
+        "comment_count": 0,
+        "comments": []
+      },
+      {
+        "id": "3975980280346860028",
+        "__typename": "XDTGraphVideo",
+        "shortcode": "DcthP_UCFn8",
+        "url": "https://www.instagram.com/reel/DcthP_UCFn8/",
+        "caption": "Software Testing Fundamentals - Episode 3: Unit Tests\nSmall tests give fast feedback.\n\n#SoftwareTesting #QA #TechEducation #DevTools #AFS",
+        "thumbnail_src": "https://scrubbed.invalid/media-url-expired.bin",
+        "display_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "video_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "has_audio": true,
+        "product_type": "clips",
+        "video_duration": null,
+        "clips_music_attribution_info": null,
+        "is_video": true,
+        "owner": {
+          "id": "instagrammer-32",
+          "username": "instagrammer-33",
+          "is_verified": false,
+          "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+          "full_name": "instagrammer-34"
+        },
+        "taken_at": "2026-08-31T16:30:35.000Z",
+        "is_ad": false,
+        "like_count": 0,
+        "is_paid_partnership": false,
+        "location": null,
+        "comment_count": 0,
+        "comments": []
+      },
+      {
+        "id": "3975965429415733637",
+        "__typename": "XDTGraphVideo",
+        "shortcode": "Dctd34TjumF",
+        "url": "https://www.instagram.com/reel/Dctd34TjumF/",
+        "caption": "Software Testing Fundamentals - Episode 1: Testing Mindset\nGood tests make change less scary.\n\n#SoftwareTesting #QA #TechEducation #DevTools #AFS",
+        "thumbnail_src": "https://scrubbed.invalid/media-url-expired.bin",
+        "display_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "video_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "has_audio": true,
+        "product_type": "clips",
+        "video_duration": null,
+        "clips_music_attribution_info": null,
+        "is_video": true,
+        "owner": {
+          "id": "instagrammer-32",
+          "username": "instagrammer-33",
+          "is_verified": false,
+          "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+          "full_name": "instagrammer-34"
+        },
+        "taken_at": "2026-08-31T16:01:02.000Z",
+        "is_ad": false,
+        "like_count": 0,
+        "is_paid_partnership": false,
+        "location": null,
+        "comment_count": 0,
+        "comments": []
+      },
+      {
+        "id": "3972344515964556297",
+        "__typename": "XDTGraphVideo",
+        "shortcode": "Dcgmkp3idQJ",
+        "url": "https://www.instagram.com/reel/Dcgmkp3idQJ/",
+        "caption": "MongoDB Atlas Managed MCP Server is now available as a plugin on major AI marketplaces, including Claude and Claude Code, giving Claude direct, secure access to your MongoDB Atlas projects and clusters.\n\nTry it out and let us know what you think!",
+        "thumbnail_src": "https://scrubbed.invalid/media-url-expired.bin",
+        "display_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "video_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "has_audio": true,
+        "product_type": "clips",
+        "video_duration": null,
+        "clips_music_attribution_info": null,
+        "is_video": true,
+        "owner": {
+          "id": "instagrammer-39",
+          "username": "instagrammer-40",
+          "is_verified": true,
+          "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+          "full_name": "instagrammer-41"
+        },
+        "taken_at": "2026-08-27T07:00:03.000Z",
+        "is_ad": false,
+        "like_count": 42,
+        "is_paid_partnership": false,
+        "location": null,
+        "comment_count": 0,
+        "comments": []
+      },
+      {
+        "id": "3976299628944091807",
+        "__typename": "XDTGraphVideo",
+        "shortcode": "Dcup3H3uuqf",
+        "url": "https://www.instagram.com/reel/Dcup3H3uuqf/",
+        "caption": "1️⃣ Identify the Slow Query\nFirst, measure where the latency is coming from using Spring Boot Actuator, application logs, APM tools, or Hibernate SQL logs. Check API response time and database execution time separately to confirm that the database query is actually the bottleneck.\n\n2️⃣ Analyze the SQL Query\nOnce the query is identified, run it directly against the database and use EXPLAIN / EXPLAIN ANALYZE to understand the execution plan. Look for full table scans, inefficient joins, excessive rows scanned, or expensive sorting/grouping operations.\n\n3️⃣ Optimize Indexes\nCheck whether columns used in WHERE, JOIN, ORDER BY, and frequently used search conditions have appropriate indexes. Adding the right indexes can significantly reduce the number of rows the database needs to scan. However, avoid unnecessary indexes because they increase storage and write overhead.\n\n4️⃣ Optimize the JPA/Hibernate Query\nReview the repository method or JPQL query. Avoid fetching unnecessary columns or entities. Use DTO projections when only a few fields are required. Also check for the N+1 query problem and use appropriate JOIN FETCH, entity graphs, or batch fetching where necessary.\n\n5️⃣ Reduce the Amount of Data Retrieved\nDon't load thousands of records when the API needs only a small subset. Implement pagination, filtering, and limits using Spring Data's Pageable or database-level limits. This reduces database processing, memory consumption, and network overhead.\n\n6️⃣ Test, Monitor & Validate the Fix\nAfter optimization, compare the before-and-after query execution time and API response time under realistic load. Run load tests and monitor database CPU, connections, query latency, and application metrics. Finally, verify that the optimization improves performance without changing the API's functional behavior.\n\nDo Follow @instagrammer-42 for more tech Content.",
+        "thumbnail_src": "https://scrubbed.invalid/media-url-expired.bin",
+        "display_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "video_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "has_audio": true,
+        "product_type": "clips",
+        "video_duration": null,
+        "clips_music_attribution_info": null,
+        "is_video": true,
+        "owner": {
+          "id": "instagrammer-43",
+          "username": "instagrammer-42",
+          "is_verified": false,
+          "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin",
+          "full_name": "instagrammer-44"
+        },
+        "taken_at": "2026-09-01T03:06:10.000Z",
+        "is_ad": false,
+        "like_count": 43,
+        "is_paid_partnership": false,
+        "location": {
+          "__typename": "XDTLocationDict",
+          "pk": 100644411459349,
+          "lat": 18.520170282082,
+          "lng": 73.8553232922,
+          "name": "Pune, Maharashtra, India",
+          "profile_pic_url": null
+        },
+        "comment_count": 0,
+        "comments": []
+      }
+    ],
+    "next_page": 3
+  }
+}

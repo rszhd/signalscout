@@ -1,0 +1,224 @@
+{
+  "httpStatus": 200,
+  "body": {
+    "success": true,
+    "credits_remaining": 1750,
+    "credits_charged": 1,
+    "query": "flaky tests",
+    "title": "Flaky Tests",
+    "total_media_count": null,
+    "description": {
+      "plain_text": "Google defines a flaky test as an automated test that passes or fails inconsistently without code changes. The nondeterministic behavior erodes trust in continuous integration and slows CI/CD pipelines by causing false failures and wasted debugging time.\n\nCommon causes include concurrency issues, shared state between tests, unstable environments, and reliance on external systems like third-party APIs. Martin Fowler popularized the term, noting it undermines automation reliability.\n\nFixes focus on test isolation, mocking dependencies, and replacing fixed sleeps with dynamic waits. Google for Developers recommends unique test environments, while QA experts stress cleaning state between runs to reduce flakiness by up to 80% ¹ ² ³.",
+      "source_uris": [
+        "https://www.datadoghq.com/knowledge-center/flaky-tests/",
+        "https://en.wikipedia.org/wiki/Flaky_test",
+        "https://www.instagram.com/reel/DYQL6idEUxO/"
+      ],
+      "linked_terms": []
+    },
+    "suggested_terms": [
+      "flaky test meaning",
+      "what is a flaky test",
+      "flaky test cases",
+      "flaky test",
+      "aggregate flakiness test",
+      "what are flaky tests"
+    ],
+    "posts": [
+      {
+        "id": "POLARIS_3822902987405051490",
+        "shortcode": "DUNrgMvDsZi",
+        "url": "https://www.instagram.com/reel/DUNrgMvDsZi/",
+        "type": "reel",
+        "caption": "⚡ How Playwright Executes Tests Faster (Parallel Execution Explained) ⚡\n\nEver wondered how Playwright finishes\n10 test cases in the time of 1? 🤯\n\nThe secret is Workers 👇\n👉 1 Worker = 1 Browser\n👉 More Workers = Parallel Execution\n👉 Faster runs + CI/CD ready 🚀\n\nSimple story. Real project concept.\nIf you understand this, you already think like a senior automation tester 💪\n\n👇 Save this for interviews\n👇 Share with your QA friends\n\n#playwright #automationtesting #paralleltesting #testautomation #qaengineer #softwaretesting #seleniumvsplaywright #testingcommunity #automationengineer #itcareer #devops #cicd #learnautomation #interviewquestions",
+        "display_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "video_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "play_count": 354,
+        "owner": {
+          "id": "instagrammer-1",
+          "username": "instagrammer-2",
+          "is_verified": false,
+          "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin"
+        }
+      },
+      {
+        "id": "POLARIS_3821491866864637097",
+        "shortcode": "DUIqpsUgtSp",
+        "url": "https://www.instagram.com/reel/DUIqpsUgtSp/",
+        "type": "reel",
+        "caption": "Test failed, and you don’t know what went wrong? 📸\n\nSelenium Day 9\nLearn how to capture screenshots in Selenium for failures and debugging.\nA must-use technique in real projects and automation frameworks.\n\nFollow for daily Selenium concepts with practical examples. 👆\n\n[selenium tutorial] [capture screenshot selenium] [test failure debugging] [automation testing] [selenium basics] [testing tools]\n\n#selenium #automationtesting #softwaretesting #qatester #qaengineer #testinglife #learnselenium #testingcommunity #stadsolution",
+        "display_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "video_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "play_count": 701,
+        "owner": {
+          "id": "instagrammer-3",
+          "username": "instagrammer-4",
+          "is_verified": true,
+          "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin"
+        }
+      },
+      {
+        "id": "POLARIS_3824158531620765155",
+        "shortcode": "DUSI-xaCP3j",
+        "url": "https://www.instagram.com/reel/DUSI-xaCP3j/",
+        "type": "reel",
+        "caption": "Still using full XPath and your script breaks every time? 😬\n\nSelenium Day 10\n\nUnderstand the difference between Absolute XPath and Relative XPath with clear examples.\n\nLearn which one to use in real projects and why interviewers always ask this.\n\nFollow for daily Selenium learning with practical explanations. 👆\n\n[selenium tutorial] [relative vs absolute xpath] [xpath in selenium] [automation testing] [selenium basics] [locators in selenium]\n\n#selenium #automationtesting #softwaretesting #qatester #qaengineer testinglife learnselenium testingcommunity stadsolution",
+        "display_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "video_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "play_count": 922,
+        "owner": {
+          "id": "instagrammer-3",
+          "username": "instagrammer-4",
+          "is_verified": true,
+          "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin"
+        }
+      },
+      {
+        "id": "POLARIS_3833919296544521280",
+        "shortcode": "DU00UmIDTxA",
+        "url": "https://www.instagram.com/reel/DU00UmIDTxA/",
+        "type": "reel",
+        "caption": "Don’t learn Selenium in 2026” — That’s misleading.\nHere’s the reality 👇\n\n✔ Many companies are still hiring Selenium Automation Testers\n✔ Selenium has a strong ecosystem (Java, TestNG, Grid, Frameworks)\n✔ Large service-based companies still rely heavily on Selenium\n\nBut yes — depending on only one tool is risky.\n\nSmart strategy for 2026:\n👉 Learn Selenium for strong fundamentals\n👉 Learn Playwright because it’s trending and modern\n👉 Focus on automation concepts, not just tools\n\nPlaywright is growing fast.\n\nSelenium still has strong demand in real projects.\nBest move? Learn both. Stay ahead.\n\nIf you're a fresher or a manual tester planning to switch to automation, dual skill is the safest path in 2026.\n\n[ Selenium Automation Testing ]\n[ Selenium vs Playwright 2026 ]\n[ Automation Testing Career 2026 ]\n[ QA Automation Roadmap ]\n[ Software Testing Jobs India ]\n[ Playwright Automation Testing ]\n[ Automation Tester Skills 2026 ]\n[ Selenium Demand 2026 ]\n\n#Selenium #Playwright #AutomationTesting #SoftwareTesting #QAEngineer TestingCareer AutomationTester TechJobs QACareer",
+        "display_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "video_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "play_count": 6336,
+        "owner": {
+          "id": "instagrammer-3",
+          "username": "instagrammer-4",
+          "is_verified": true,
+          "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin"
+        }
+      },
+      {
+        "id": "POLARIS_3836521681989550640",
+        "shortcode": "DU-ECScEkIw",
+        "url": "https://www.instagram.com/reel/DU-ECScEkIw/",
+        "type": "reel",
+        "caption": "Automation fails → first reaction:\n“Worked yesterday.” \n\nThen comes the classic round:\nFramework issues? Developer changed without informing me?\nEnvironment issue? CI acting up?\n\nSometimes… it’s just the tooling showing its age.\n\nIf you are interested in less firefighting and more in actual testing, then you must meet AiScriptBuddy.\n\nhttps://tinyurl.com/rfsuawhj\n\n#AutomationTesting #TestAutomation \n #QA #Selenium #AiScriptBuddy",
+        "display_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "video_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "play_count": 199,
+        "owner": {
+          "id": "instagrammer-5",
+          "username": "instagrammer-6",
+          "is_verified": false,
+          "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin"
+        }
+      },
+      {
+        "id": "POLARIS_3828708527465142176",
+        "shortcode": "DUiTh7QEZeg",
+        "url": "https://www.instagram.com/reel/DUiTh7QEZeg/",
+        "type": "reel",
+        "caption": "What are the different types of Exceptions?",
+        "display_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "video_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "play_count": 27033,
+        "owner": {
+          "id": "instagrammer-7",
+          "username": "instagrammer-8",
+          "is_verified": true,
+          "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin"
+        }
+      },
+      {
+        "id": "POLARIS_3834567211680506039",
+        "shortcode": "DU3HpAHk6C3",
+        "url": "https://www.instagram.com/reel/DU3HpAHk6C3/",
+        "type": "reel",
+        "caption": "Technology has evolved for years. Hundreds of automation tools have come and gone.\n\nBut still… when it comes to Automation Testing, Selenium is everyone’s first choice. Why?\n\nBecause Selenium is not just a tool. It’s a complete automation ecosystem.\n\n✅ Open-source and free\n✅ Supports Java, Python, C#\n✅ Works across Windows, Linux & macOS\n✅ Proven for long-term career growth\n\nIn IT, tools change fast. But if you want to survive and grow in the Testing field, Selenium is a must-learn skill.\n\n(Selenium, AutomationTesting, SoftwareTesting, QATesting, SDET, QAEngineer, TestingTools, ITCareers, TechCareers, LearnAutomation)\n#automationtesting",
+        "display_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "video_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "play_count": 404,
+        "owner": {
+          "id": "instagrammer-9",
+          "username": "instagrammer-10",
+          "is_verified": false,
+          "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin"
+        }
+      },
+      {
+        "id": "POLARIS_3846930214090166194",
+        "shortcode": "DVjCqXWj8-y",
+        "url": "https://www.instagram.com/reel/DVjCqXWj8-y/",
+        "type": "reel",
+        "caption": "Manual testers asking how to move into automation.\n\nFollow this roadmap.\n\nComment “ROADMAP” and I’ll send the PDF.#qaengineer #ai #automationtesting #selenium #playwright",
+        "display_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "video_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "play_count": 72314,
+        "owner": {
+          "id": "instagrammer-11",
+          "username": "instagrammer-12",
+          "is_verified": true,
+          "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin"
+        }
+      },
+      {
+        "id": "POLARIS_3844492111244306844",
+        "shortcode": "DVaYTTIgimc",
+        "url": "https://www.instagram.com/reel/DVaYTTIgimc/",
+        "type": "reel",
+        "caption": "Handling alerts using Selenium + C#.\n\nWelcome to Test Automation Studio – your go-to hub for learning tools like Selenium, Cypress, Playwright & more! From beginner basics to pro-level tricks, we’ve got you covered.\n\nVisit our website https://www.testautomationstudio.com\n\nFollow along, save this post, and drop your favorite automation tool in the comments! 👇\n\n#TestAutomationStudio #AutomationTesting #LearnAutomation #Selenium #Cypress #Playwright #TechSkills #CodingJourney #TestAutomation #AutomationForAll #Python #Java #csharp #javascript #testng #pytest #dotnet",
+        "display_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "video_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "play_count": 350,
+        "owner": {
+          "id": "instagrammer-13",
+          "username": "instagrammer-14",
+          "is_verified": false,
+          "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin"
+        }
+      },
+      {
+        "id": "POLARIS_3844703006906684146",
+        "shortcode": "DVbIQPBjJLy",
+        "url": "https://www.instagram.com/reel/DVbIQPBjJLy/",
+        "type": "reel",
+        "caption": "Comment “Automation” 🤖 in the comments and I’ll personally send you the complete roadmap to learn Automation Testing in your DM 🚀\n\nMake sure you’re following me so you don’t miss the message 👀🔥\n\nLet’s start your automation journey today 💻✨\n\nSDLC, STLC, Requirement Analysis, Test Planning, Test Scenario, Test Case Design, Test Case Execution, Smoke Testing, Sanity Testing, Regression Testing, Functional Testing, Integration Testing, System Testing, UAT, Black Box Testing, White Box Testing, Exploratory Testing, Ad-hoc Testing, Defect Life Cycle, Bug Tracking, Severity vs Priority, RTM, Test Report, Test Metrics\n\nAutomation Testing#qaengineer #softwaretesting #testautomation \nAutomation Framework, Selenium WebDriver, TestNG, JUnit, Maven, Page Object Model (POM), Data Driven Framework, Hybrid Framework, Keyword Driven Framework, BDD, Cucumber, CI/CD Integration, Jenkins, Git, Cross Browser Testing, Headless Testing, Test Scripts, Parallel Execution, Assertions, Implicit Wait, Explicit Wait, Fluent Wait\n\nAPI Testing\nREST API, SOAP, HTTP Methods (GET, POST, PUT, DELETE), Status Codes, Request & Response Validation, JSON, XML, Authorization, Authentication, Postman, Swagger, API Automation, Schema Validation, API Chaining, Mock Server\n\nJava\nOOP Concepts, Encapsulation, Inheritance, Polymorphism, Abstraction, Class & Object, Constructor, Interface, Exception Handling, Collections Framework, List, Set, Map, String Handling, Loops, Conditional Statements, Multithreading, File Handling, JDBC, Java Streams, Lambda Expressions\n\nSelenium\nWebDriver, Locators (XPath, CSS Selector, ID, Name), WebElement, Actions Class, Select Class, JavaScript Executor, Alert Handling, Frame Handling, Window Handling, Waits, Screenshot Capture, Selenium Grid, DesiredCapabilities\n\nCorporate / SDLC / Software Industry\nAgile, Scrum, Sprint Planning, Daily Stand-up, Retrospective, Product Owner, Scrum Master, Stakeholder Communication, Release Cycle, Deployment, Production Support, Change Management, Risk Analysis, Client Demo, Sign-off, Documentation, Team Collaboration, IT Industry Standards",
+        "display_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "video_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "play_count": 298,
+        "owner": {
+          "id": "instagrammer-15",
+          "username": "instagrammer-16",
+          "is_verified": false,
+          "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin"
+        }
+      },
+      {
+        "id": "POLARIS_3843866374322165724",
+        "shortcode": "DVYKBoNipfc",
+        "url": "https://www.instagram.com/reel/DVYKBoNipfc/",
+        "type": "reel",
+        "caption": "Day 1: Assertions in Selenium - The Biggest Mistake Automation Testers Make ❌",
+        "display_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "video_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "play_count": 227,
+        "owner": {
+          "id": "instagrammer-17",
+          "username": "instagrammer-18",
+          "is_verified": false,
+          "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin"
+        }
+      },
+      {
+        "id": "POLARIS_3835240235270370973",
+        "shortcode": "DU5gqyLk3ad",
+        "url": "https://www.instagram.com/reel/DU5gqyLk3ad/",
+        "type": "reel",
+        "caption": "We rated popular Automation Testing tools 👇\n\nSelenium – 9/10\nPlaywright – 8/10\nAppium – 9/10\nCypress – 7/10\n\nEvery tool has its own strengths.\nThe real skill is knowing when and where to use each one.\n\nWhich tool are you currently using?\nComment below 👇\n\nFollow our page for more practical testing insights 🚀\n\n(AutomationTesting, SoftwareTesting, Selenium, Playwright, Appium, Cypress, QATesting, AutomationEngineer, ManualTesting, TestingCareers)",
+        "display_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "video_url": "https://scrubbed.invalid/media-url-expired.bin",
+        "play_count": 510,
+        "owner": {
+          "id": "instagrammer-9",
+          "username": "instagrammer-10",
+          "is_verified": false,
+          "profile_pic_url": "https://scrubbed.invalid/media-url-expired.bin"
+        }
+      }
+    ],
+    "cursor": "eyJ2ZXJzaW9uIjoxLCJxdWVyeSI6ImZsYWt5IHRlc3RzIiwiYWZ0ZXIiOiJBUUhUem14MGpDUFB5QmdoVi1qQmZlM0VuZ282dUZ4NGpTV21LbWdmOFN3bTJRTlVaaXJOREg1UC13alVJRXZLNnlYUSIsImxzZCI6IkFkUmlPOXh6UWNqaGFWWnBFbVhUS0k0NjZrOCIsImNzcmZUb2tlbiI6Iks4VV9xTnl4YjZyakNBaldGaENEVlUifQ",
+    "has_more": true
+  }
+}

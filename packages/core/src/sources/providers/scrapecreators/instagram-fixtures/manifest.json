@@ -1,0 +1,117 @@
+{
+  "capturedBy": "packages/core/src/sources/providers/scrapecreators/instagram-fixtures/capture.mjs",
+  "provider": "ScrapeCreators, Instagram: the native popular page and the Google-indexed reels search",
+  "note": "Identity is replaced with stable pseudonyms. Signed CDN addresses are replaced because they expire within hours. Everything else is whole.",
+  "fixtures": [
+    {
+      "file": "comments-page-1.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v2/instagram/post/comments?url=https%3A%2F%2Fwww.instagram.com%2Freel%2FDc_mJYKSnNJ%2F",
+        "note": "the paid comment endpoint, without include_replies"
+      },
+      "capturedAt": "2026-09-11T14:59:52.944Z",
+      "identitiesReplaced": 30,
+      "bytes": 7425
+    },
+    {
+      "file": "credentials-accepted.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v2/instagram/reels/search?",
+        "note": "a working key with no query: refused on the input, not on the key"
+      },
+      "capturedAt": "2026-09-11T14:57:55.605Z",
+      "identitiesReplaced": 0,
+      "bytes": 220
+    },
+    {
+      "file": "credentials-rejected.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v2/instagram/reels/search?query=flaky+tests",
+        "note": "sent with a deliberately invalid key"
+      },
+      "capturedAt": "2026-09-11T14:57:54.949Z",
+      "identitiesReplaced": 0,
+      "bytes": 96
+    },
+    {
+      "file": "popular-page-1.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v1/instagram/search/popular?query=flaky+tests",
+        "note": "Instagram's own topic page: no Google in the path"
+      },
+      "capturedAt": "2026-09-11T14:57:58.240Z",
+      "identitiesReplaced": 18,
+      "bytes": 16441
+    },
+    {
+      "file": "popular-page-2.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v1/instagram/search/popular?query=flaky+tests&cursor=eyJ2ZXJzaW9uIjoxLCJxdWVyeSI6ImZsYWt5IHRlc3RzIiwiYWZ0ZXIiOiJBUUhUem14MGpDUFB5QmdoVi1qQmZlM0VuZ282dUZ4NGpTV21LbWdmOFN3bTJRTlVaaXJOREg1UC13alVJRXZLNnlYUSIsImxzZCI6IkFkUmlPOXh6UWNqaGFWWnBFbVhUS0k0NjZrOCIsImNzcmZUb2tlbiI6Iks4VV9xTnl4YjZyakNBaldGaENEVlUifQ",
+        "note": "followed the cursor from popular-page-1.json"
+      },
+      "capturedAt": "2026-09-11T14:57:59.800Z",
+      "identitiesReplaced": 16,
+      "bytes": 12096
+    },
+    {
+      "file": "reels-no-results.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v2/instagram/reels/search?query=zqxjkv+wobblefish+intentwatch+nonexistent+phrase",
+        "note": "a phrase that cannot occur; the ledger says what it cost"
+      },
+      "capturedAt": "2026-09-11T14:58:15.450Z",
+      "identitiesReplaced": 0,
+      "bytes": 257
+    },
+    {
+      "file": "reels-no-window.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v2/instagram/reels/search?query=flaky+tests",
+        "note": "no date window: US-049 found five years of posts on the other provider"
+      },
+      "capturedAt": "2026-09-11T14:58:12.986Z",
+      "identitiesReplaced": 127,
+      "bytes": 45678
+    },
+    {
+      "file": "reels-page-12.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v2/instagram/reels/search?query=flaky+tests&page=12",
+        "note": "one page past the documented last one"
+      },
+      "capturedAt": "2026-09-11T14:58:16.159Z",
+      "identitiesReplaced": 0,
+      "bytes": 230
+    },
+    {
+      "file": "reels-page-2.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v2/instagram/reels/search?query=flaky+tests&date_posted=last-month&page=2",
+        "note": "followed next_page 2 from reels-window.json"
+      },
+      "capturedAt": "2026-09-11T14:59:49.648Z",
+      "identitiesReplaced": 44,
+      "bytes": 24405
+    },
+    {
+      "file": "reels-window.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v2/instagram/reels/search?query=flaky+tests&date_posted=last-month",
+        "note": "Google-indexed, inside a month"
+      },
+      "capturedAt": "2026-09-11T14:59:45.142Z",
+      "identitiesReplaced": 133,
+      "bytes": 46478
+    }
+  ]
+}

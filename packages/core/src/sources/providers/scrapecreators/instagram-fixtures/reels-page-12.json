@@ -1,0 +1,11 @@
+{
+  "httpStatus": 400,
+  "body": {
+    "success": false,
+    "credits_remaining": 1746,
+    "credits_charged": 0,
+    "error": "bad_request",
+    "errorStatus": 400,
+    "message": "page must be an integer between 1 and 11"
+  }
+}

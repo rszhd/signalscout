@@ -174,6 +174,14 @@ not weaken that rule — it searches. So the conclusion to carry forward is the
 question, not the count: before adding a provider for a platform, ask whether
 it can discover a stranger, and not only whether it can fetch a URL.
 
+**Three platforms were measured at a second provider on 2026-09-11**, after
+the owner asked for two everywhere: TikTok and YouTube are worth building at
+ScrapeCreators and have tickets, and Instagram is worth building there only if
+a Google-indexed index is acceptable as the *second* provider — the question
+US-055 answered no to when it was the *only* one. The evidence is in US-119,
+US-120 and US-121, and the capture scripts beside their fixtures re-ask
+everything.
+
 **LinkedIn is the opposite case, and the two must not be written down the same
 way.** US-028 used SocialCrawl because it already had the key and the provider
 documents `/v1/linkedin/search/posts`. Bright Data and ScrapeCreators were

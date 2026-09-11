@@ -2,7 +2,7 @@
 
 # Open tickets
 
-33 open — 14 doing, 18 todo, 1 parked (10 p1, 19 p2, 4 p3).
+32 open — 14 doing, 17 todo, 1 parked (10 p1, 18 p2, 4 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -31,7 +31,6 @@
 | p2 | US-052 | [A monitor does not poll overnight](todo/US-052-a-monitor-does-not-poll-overnight.md) | feature | todo | 2026-09-07T00:25+08:00 |
 | p2 | US-062 | [A real model's drafts are replayed](todo/US-062-a-real-model-s-drafts-are-replayed.md) | chore | todo | 2026-09-07T20:30+08:00 |
 | p2 | US-099 | [A button, a field and a dialog are one component each](todo/US-099-a-button-a-field-and-a-dialog-are-one-component-each.md) | chore | todo | 2026-09-10T01:20+08:00 |
-| p2 | US-120 | [Instagram is measured at ScrapeCreators](todo/US-120-instagram-is-measured-at-scrapecreators.md) | spike | todo | 2026-09-11T18:38+08:00 |
 | p2 | US-122 | [LinkedIn gets a second provider](todo/US-122-linkedin-gets-a-second-provider.md) | spike | todo | 2026-09-11T18:44+08:00 |
 | p2 | US-126 | [TikTok is fetched through ScrapeCreators](todo/US-126-tiktok-is-fetched-through-scrapecreators.md) | feature | todo | 2026-09-11T22:40+08:00 |
 | p2 | US-127 | [YouTube is fetched through ScrapeCreators](todo/US-127-youtube-is-fetched-through-scrapecreators.md) | feature | todo | 2026-09-11T23:30+08:00 |

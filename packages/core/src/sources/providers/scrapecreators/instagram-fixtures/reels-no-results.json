@@ -1,0 +1,11 @@
+{
+  "httpStatus": 404,
+  "body": {
+    "success": false,
+    "credits_remaining": 1746,
+    "credits_charged": 0,
+    "error": "not_found",
+    "errorStatus": 404,
+    "message": "No reels found for that query. You were not charged for this request."
+  }
+}

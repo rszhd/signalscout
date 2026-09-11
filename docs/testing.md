@@ -398,3 +398,40 @@ being worse tested.
 Whenever it happens: **before believing a sweep's number, break a line on
 purpose and confirm the sweep catches it.** A number from a harness nobody has
 watched fail is worth exactly as much as an assertion nobody has watched fail.
+
+## Running the suite
+
+`pnpm test` uses a real Postgres and creates a database per test file. If it
+cannot reach one it says so; it does not fall back to a fake.
+
+**It can go red without a broken test.** A database per file, run in parallel,
+can outrun Postgres `max_connections` of 100: a file fails with "sorry, too
+many clients already", sometimes surfacing as a 500 from a route whose insert
+could not get a connection. The failing file moves between runs and passes
+alone, so it reads as flakiness rather than as what it is. Check that before
+reading a red run as a regression.
+
+Two settings hold it off and both live in `vitest.config.ts`:
+`DATABASE_POOL_SIZE` caps each pool at three, and `maxWorkers` caps the run at
+four. **Pass `--maxWorkers` by hand only to go lower**; the advice to run at
+three is older than the pool cap and costs about ten seconds.
+
+**Six workers were tried and reverted, and the reason is worth keeping.**
+Measured when the suite was 615 tests, they peak at 57 connections of the
+hundred and finish in 39 seconds against four's 41 — but `classify.test.ts` then failed two runs in four, an `until()` wait
+exceeding its twenty seconds under load rather than a broken assertion. Two
+seconds is not worth a suite that cries wolf: a flaky run costs far more than
+it saves the moment somebody starts ignoring it.
+
+**One number used to dominate the wall clock, and removing it is why the suite
+absorbed a tripling of its test count.** It ran 170 seconds when almost all of
+that was one setting. Five pg-boss worker files were 397 of the 435 seconds of
+file time, every test costing four to six seconds to do milliseconds of work,
+because a pipeline test sends a job and then waits for a worker to poll for it.
+`WORKER_POLLING_INTERVAL_SECONDS` is set to pg-boss's floor of 0.5 for the
+suite alone, and nothing sets it in production — a poll that starts a second
+later is a poll that starts a second later, and a query per queue per second
+against a working database buys nothing.
+
+If a worker file starts costing seconds a test again, that is the number to
+look at first, and `--reporter=json` gives the per-file timings that show it.

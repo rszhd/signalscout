@@ -160,6 +160,8 @@ The scope is one sentence: **find conversations with intent.**
 | [docs/design.md](docs/design.md) | The shared theme, tokens and controls |
 | [docs/spacing.md](docs/spacing.md) | The spacing scale |
 | [docs/testing.md](docs/testing.md) | How the tests are written, and what a green suite cannot say |
+| [docs/instruments.md](docs/instruments.md) | Every command that spends money, what it asks and what it costs |
+| [docs/history.md](docs/history.md) | What each ticket measured, in the order it happened |
 | [backlog/](backlog/README.md) | One ticket per file; the folder is the status |
 | [AGENTS.md](AGENTS.md) | Instructions for AI coding agents working in this repo |
 

@@ -1,0 +1,313 @@
+{
+  "httpStatus": 200,
+  "digest": {
+    "success": true,
+    "credits_charged": 1,
+    "cursor": 30,
+    "has_more": 1,
+    "error": null,
+    "message": null,
+    "videos": [
+      {
+        "aweme_id": "7509258113170623774",
+        "create_time": 1748385415,
+        "created_iso": "2025-05-27T22:36:55.000Z",
+        "desc": "From rewriting commit history to avoiding flaky tests and safe migrations, these are real habits that save hours in production. Follow for more tips that make you a sharper dev. #tektok #coding #software #programming ",
+        "share_url": "https://www.tiktok.com/@tiktoker-1/video/7509258113170623774?_r=1&u_code=f0f9j2h35b9e7f&preview_pb=0&sharer_language=en&_d=f1i66kg8glj8e6&share_item_id=7509258113170623774&source=h5_m",
+        "author_unique_id": "stevencodes.swe",
+        "comment_count": 16,
+        "play_count": 16677
+      },
+      {
+        "aweme_id": "7667192779893673229",
+        "create_time": 1785157440,
+        "created_iso": "2026-07-27T13:04:00.000Z",
+        "desc": "POV: your team stopped trusting red builds — and honestly? they were right to 💀 One flaky test trains everyone to just hit re-run… until a real bug ships. BuildPulse catches flaky tests automatically and quarantines them, so red means broken again. Try BuildPulse free → https://buildpulse.io #DevTok #coding #CICD #flakytests #softwareengineering",
+        "share_url": "https://www.tiktok.com/@tiktoker-2/video/7667192779893673229?_r=1&u_code=f0f9j2h35b9e7f&preview_pb=0&sharer_language=en&_d=f1i66kg8glj8e6&share_item_id=7667192779893673229&source=h5_m",
+        "author_unique_id": "buildpulseio",
+        "comment_count": 0,
+        "play_count": 116
+      },
+      {
+        "aweme_id": "7653887475336744206",
+        "create_time": 1782059579,
+        "created_iso": "2026-06-21T16:32:59.000Z",
+        "desc": "The flaky test passed ten times in a row #techmemes #programming #devhumor #coding #devlife #softwaredev #techhumor #developer #rightclawai\"",
+        "share_url": "https://www.tiktok.com/@tiktoker-3/video/7653887475336744206?_r=1&u_code=f0f9j2h35b9e7f&preview_pb=0&sharer_language=en&_d=f1i66kg8glj8e6&share_item_id=7653887475336744206&source=h5_m",
+        "author_unique_id": "rightclawai",
+        "comment_count": 0,
+        "play_count": 115
+      },
+      {
+        "aweme_id": "7189651315167923499",
+        "create_time": 1673971174,
+        "created_iso": "2023-01-17T15:59:34.000Z",
+        "desc": "What causes flaky tests and how can we fix them? —— #softwareengineer #coding #programming #testing ",
+        "share_url": "https://www.tiktok.com/@tiktoker-4/video/7189651315167923499?_r=1&u_code=f0f9j2h35b9e7f&preview_pb=0&sharer_language=en&_d=f1i66kg8glj8e6&share_item_id=7189651315167923499&source=h5_m",
+        "author_unique_id": "kellysuttondotcom",
+        "comment_count": 3,
+        "play_count": 555
+      },
+      {
+        "aweme_id": "7145987779720121643",
+        "create_time": 1663804945,
+        "created_iso": "2022-09-22T00:02:25.000Z",
+        "desc": "Do you see this in your at home urine test? Get your kidneys filtering naturally! QuietQrew.com #kidneyfailure #kidneydisease #kidneywarrior #kidneystones #kidneyweakness #fyp #alkalinediet #loseweight #lymphaticsystem #cholesterol #alkalinelifestyle #lymphaticdrainage #lymphoma",
+        "share_url": "https://www.tiktok.com/@tiktoker-5/video/7145987779720121643?_r=1&u_code=f0f9j2h35b9e7f&preview_pb=0&sharer_language=en&_d=f1i66kg8glj8e6&share_item_id=7145987779720121643&source=h5_m",
+        "author_unique_id": "quietqrew",
+        "comment_count": 78,
+        "play_count": 187853
+      },
+      {
+        "aweme_id": "7575391601585966367",
+        "create_time": 1763783323,
+        "created_iso": "2025-11-22T03:48:43.000Z",
+        "desc": "Time sensitive conditions in flaky tests. (Flaky tests 4 of 5) #softwaretesting #engineering #softwareengineer ",
+        "share_url": "https://www.tiktok.com/@tiktoker-6/video/7575391601585966367?_r=1&u_code=f0f9j2h35b9e7f&preview_pb=0&sharer_language=en&_d=f1i66kg8glj8e6&share_item_id=7575391601585966367&source=h5_m",
+        "author_unique_id": "jfbcodes",
+        "comment_count": 0,
+        "play_count": 414
+      },
+      {
+        "aweme_id": "7679356117905902869",
+        "create_time": 1787989439,
+        "created_iso": "2026-08-29T07:43:59.000Z",
+        "desc": "Light test! || Ft. Flaky ||  #happytreefriends #htf #flakyhtf || ",
+        "share_url": "https://www.tiktok.com/@tiktoker-7/video/7679356117905902869?_r=1&u_code=f0f9j2h35b9e7f&preview_pb=0&sharer_language=en&_d=f1i66kg8glj8e6&share_item_id=7679356117905902869&source=h5_m",
+        "author_unique_id": "blaxx_htf",
+        "comment_count": 51,
+        "play_count": 5023
+      },
+      {
+        "aweme_id": "6905486261520305413",
+        "create_time": 1607808829,
+        "created_iso": "2020-12-12T21:33:49.000Z",
+        "desc": "#beautysupplymtl #blackownedbusiness #blackownedbusinessmtl #fyp #mtl #flaketest #beautysupply #smallbusinesscheck",
+        "share_url": "https://www.tiktok.com/@tiktoker-8/video/6905486261520305413?_r=1&u_code=f0f9j2h35b9e7f&preview_pb=0&sharer_language=en&_d=f1i66kg8glj8e6&share_item_id=6905486261520305413&source=h5_m",
+        "author_unique_id": "dialidaaxo",
+        "comment_count": 1,
+        "play_count": 3137
+      },
+      {
+        "aweme_id": "7666884656586837261",
+        "create_time": 1785085702,
+        "created_iso": "2026-07-26T17:08:22.000Z",
+        "desc": "How flaky tests quietly kill trust in your CI. [private test]",
+        "share_url": "https://www.tiktok.com/@tiktoker-2/video/7666884656586837261?_r=1&u_code=f0f9j2h35b9e7f&preview_pb=0&sharer_language=en&_d=f1i66kg8glj8e6&share_item_id=7666884656586837261&source=h5_m",
+        "author_unique_id": "buildpulseio",
+        "comment_count": 0,
+        "play_count": 86
+      },
+      {
+        "aweme_id": "7681154301695216927",
+        "create_time": 1788408124,
+        "created_iso": "2026-09-03T04:02:04.000Z",
+        "desc": "WTF!! Mind you, I did a flake test first day #curlyhair #naturalhair #type3hair #thedoux #curlyhairroutine ",
+        "share_url": "https://www.tiktok.com/@tiktoker-9/video/7681154301695216927?_r=1&u_code=f0f9j2h35b9e7f&preview_pb=0&sharer_language=en&_d=f1i66kg8glj8e6&share_item_id=7681154301695216927&source=h5_m",
+        "author_unique_id": "agirlcalledfrey",
+        "comment_count": 10,
+        "play_count": 2554
+      },
+      {
+        "aweme_id": "7575387065618124062",
+        "create_time": 1763782268,
+        "created_iso": "2025-11-22T03:31:08.000Z",
+        "desc": "Examining race conditions in system tests. (Flaky Tests 2 of 5)",
+        "share_url": "https://www.tiktok.com/@tiktoker-6/video/7575387065618124062?_r=1&u_code=f0f9j2h35b9e7f&preview_pb=0&sharer_language=en&_d=f1i66kg8glj8e6&share_item_id=7575387065618124062&source=h5_m",
+        "author_unique_id": "jfbcodes",
+        "comment_count": 0,
+        "play_count": 415
+      },
+      {
+        "aweme_id": "7624604258943487263",
+        "create_time": 1775241543,
+        "created_iso": "2026-04-03T18:39:03.000Z",
+        "desc": "Stop putting thick hair oils on your flaky scalp! 🛑🧴 If you have thick, yellowish, oily crusts on your scalp that itch intensely, it is NOT dry skin. It is Scalp Seborrheic Dermatitis—a reaction to an overgrowth of Malassezia yeast. This yeast feeds on oil! If you apply coconut, castor, or rosemary oil to fix the \"dryness,\" you are just feeding the yeast and making the crusts thicker! 🧬 Welcome to Day 1/30 of clearing every type of stubborn skin texture! Here is your foolproof, dermatologist-approved scalp rescue squad: 🧪 STEP 1 (The Neutralizer): Do NOT scratch the scales off—you will pull your hair out! Use a Salicylic Acid scalp serum to chemically unbind the dead skin from your follicles safely. 🧼 STEP 2 (The Halter): Wash your roots with a medicated shampoo containing Ketoconazole or Zinc Pyrithione. This starves the yeast and stops the overproduction of oily scales. 🌿 STEP 3 (The Soother): Seborrheic Dermatitis causes severe inflammation. Apply a lightweight, oil-free soothing serum like Centella or Aloe to instantly calm the red, angry skin barrier. 📌 SAVE this safe scalp rescue routine. What texture should we fix next? COMMENT your worst skin problem below, and FOLLOW @tiktoker-10 for Day 2! 🐼✨ #seborrheicdermatitis #dandruffsolution #scalpcare #flakyscalp #hairgrowthtips  ",
+        "share_url": "https://www.tiktok.com/@tiktoker-11/video/7624604258943487263?_r=1&u_code=f0f9j2h35b9e7f&preview_pb=0&sharer_language=en&_d=f1i66kg8glj8e6&share_item_id=7624604258943487263&source=h5_m",
+        "author_unique_id": "thesecondthoughtofficial",
+        "comment_count": 15,
+        "play_count": 301581
+      },
+      {
+        "aweme_id": "7303229296322071850",
+        "create_time": 1700415586,
+        "created_iso": "2023-11-19T17:39:46.000Z",
+        "desc": "Huge dandruff flakes part 1",
+        "share_url": "https://www.tiktok.com/@tiktoker-12/video/7303229296322071850?_r=1&u_code=f0f9j2h35b9e7f&preview_pb=0&sharer_language=en&_d=f1i66kg8glj8e6&share_item_id=7303229296322071850&source=h5_m",
+        "author_unique_id": "kyms.lyfe.scalp.c",
+        "comment_count": 0,
+        "play_count": 3986
+      },
+      {
+        "aweme_id": "7648387290422709535",
+        "create_time": 1780778957,
+        "created_iso": "2026-06-06T20:49:17.000Z",
+        "desc": "I did the skin test and honestly wasn’t expecting this… #drmelaxin #calciumbondingserum #antiagingserum #koreanskincare #tiktokshop ",
+        "share_url": "https://www.tiktok.com/@tiktoker-13/video/7648387290422709535?_r=1&u_code=f0f9j2h35b9e7f&preview_pb=0&sharer_language=en&_d=f1i66kg8glj8e6&ec_shared_reflux_dynamic_params=%7B%22device_id%22%3A%227599871617095026190%22%2C%22placeholder_material_id%22%3A%227648387290422709535%22%2C%22placeholder_origin_cover%22%3A%22https%253A%252F%252Fp16-common-sign.tiktokcdn-us.com%252Ftos-useast8-p-0068-tx2%252FokKJcWAJfAQAgaBWCDRqA6BuDEEVFEQSSIPQes~tplv-tiktok-shrink%253A640%253A640.webp%253Fdr%253D9632%2526refresh_token%253De76e79d0%2526x-expires%253D1820671200%2526x-signature%253DGlNSoD2Um73urr0AuLBrhx%25252Bhxz0%25253D%2526t%253D4d5b0474%2526ps%253D13740610%2526shp%253Dd05b14bd%2526shcp%253D34ff8df6%2526idc%253Duseast8%2526s%253DSEARCH%22%2C%22placeholder_product_id%22%3A%221732349581419647003%22%2C%22placeholder_video_id%22%3A%227648387290422709535%22%2C%22ttuid%22%3A%227575244850900698167%22%7D&ec_shared_reflux_scene=shop_tab_feed&share_item_id=7648387290422709535&source=h5_m",
+        "author_unique_id": "shop_dealz88",
+        "comment_count": 0,
+        "play_count": 467
+      },
+      {
+        "aweme_id": "7634580699646823693",
+        "create_time": 1777564375,
+        "created_iso": "2026-04-30T15:52:55.000Z",
+        "desc": "Who deals with sideburn flakes? #psoriasis #fyp #dandruffremovel #seborrheicdermatitis ",
+        "share_url": "https://www.tiktok.com/@tiktoker-14/video/7634580699646823693?_r=1&u_code=f0f9j2h35b9e7f&preview_pb=0&sharer_language=en&_d=f1i66kg8glj8e6&share_item_id=7634580699646823693&source=h5_m",
+        "author_unique_id": "flakyflake92",
+        "comment_count": 3,
+        "play_count": 67118
+      },
+      {
+        "aweme_id": "7680360642628308244",
+        "create_time": 1788223324,
+        "created_iso": "2026-09-01T00:42:04.000Z",
+        "desc": "test #aftereffects #htf #flaky #edit ",
+        "share_url": "https://www.tiktok.com/@tiktoker-15/video/7680360642628308244?_r=1&u_code=f0f9j2h35b9e7f&preview_pb=0&sharer_language=en&_d=f1i66kg8glj8e6&share_item_id=7680360642628308244&source=h5_m",
+        "author_unique_id": "falc0njunk",
+        "comment_count": 3,
+        "play_count": 819
+      },
+      {
+        "aweme_id": "7600438948522904850",
+        "create_time": 1769615098,
+        "created_iso": "2026-01-28T15:44:58.000Z",
+        "desc": "Are you into gel hairstyles but is worried about gel flakes in your hair?  I have tired kaima edge control or kaima hair wax, brooklyn hair gel, shine n jam, overa edge control. Watch this to know how to stop gel from flaking on hair. 💯   #edgecontrol #hairwax #hair #hairgel #4chair",
+        "share_url": "https://www.tiktok.com/@tiktoker-16/video/7600438948522904850?_r=1&u_code=f0f9j2h35b9e7f&preview_pb=0&sharer_language=en&_d=f1i66kg8glj8e6&share_item_id=7600438948522904850&source=h5_m",
+        "author_unique_id": "darajaz_hairmuse",
+        "comment_count": 14,
+        "play_count": 20551
+      },
+      {
+        "aweme_id": "7561887048206929166",
+        "create_time": 1760639042,
+        "created_iso": "2025-10-16T18:24:02.000Z",
+        "desc": "Testing 24 karat gold flakes #fyp #pawnshop @tiktoker-17 #gold ",
+        "share_url": "https://www.tiktok.com/@tiktoker-18/video/7561887048206929166?_r=1&u_code=f0f9j2h35b9e7f&preview_pb=0&sharer_language=en&_d=f1i66kg8glj8e6&share_item_id=7561887048206929166&source=h5_m",
+        "author_unique_id": "dylandoestiktok1",
+        "comment_count": 349,
+        "play_count": 8519017
+      },
+      {
+        "aweme_id": "7683673526993276190",
+        "create_time": 1788994671,
+        "created_iso": "2026-09-09T22:57:51.000Z",
+        "desc": "Our goal is to help create a clean, balanced and healthy scalp environment while identifying when something needs to be referred to a dermatologist. Healthy hair begins with a healthy scalp. 🤎 Bloom House by AOA Relaxation • Restoration • Maintenance @tiktoker-19 house by AOA ",
+        "share_url": "https://www.tiktok.com/@tiktoker-20/video/7683673526993276190?_r=1&u_code=f0f9j2h35b9e7f&preview_pb=0&sharer_language=en&_d=f1i66kg8glj8e6&share_item_id=7683673526993276190&source=h5_m",
+        "author_unique_id": "the_atlanta_aesthetician",
+        "comment_count": 1,
+        "play_count": 823
+      },
+      {
+        "aweme_id": "7553835630178946334",
+        "create_time": 1758764429,
+        "created_iso": "2025-09-25T01:40:29.000Z",
+        "desc": "Do we like these dander vids as much as I like them #dandruff #flakyscalp #flake ",
+        "share_url": "https://www.tiktok.com/@tiktoker-21/video/7553835630178946334?_r=1&u_code=f0f9j2h35b9e7f&preview_pb=0&sharer_language=en&_d=f1i66kg8glj8e6&share_item_id=7553835630178946334&source=h5_m",
+        "author_unique_id": "i.nose.u2",
+        "comment_count": 7,
+        "play_count": 55639
+      },
+      {
+        "aweme_id": "7382333119585799466",
+        "create_time": 1718833379,
+        "created_iso": "2024-06-19T21:42:59.000Z",
+        "desc": "Thank you for sending this!! @tiktoker-22  #fyp #gifted #flakes #flakesshampoo #shampooandconditioner #hairtok #latinainfluencer #test ",
+        "share_url": "https://www.tiktok.com/@tiktoker-23/video/7382333119585799466?_r=1&u_code=f0f9j2h35b9e7f&preview_pb=0&sharer_language=en&_d=f1i66kg8glj8e6&share_item_id=7382333119585799466&source=h5_m",
+        "author_unique_id": "giaaaliz",
+        "comment_count": 10,
+        "play_count": 13312
+      },
+      {
+        "aweme_id": "7586783615971888398",
+        "create_time": 1766435725,
+        "created_iso": "2025-12-22T20:35:25.000Z",
+        "desc": "If you know me please don’t judge. 😭😭 #seborrheicdermatitis #psoriasis #flakyscalp #scalppsoriasis #scratching ",
+        "share_url": "https://www.tiktok.com/@tiktoker-24/video/7586783615971888398?_r=1&u_code=f0f9j2h35b9e7f&preview_pb=0&sharer_language=en&_d=f1i66kg8glj8e6&share_item_id=7586783615971888398&source=h5_m",
+        "author_unique_id": "kween.lela",
+        "comment_count": 4403,
+        "play_count": 17993439
+      },
+      {
+        "aweme_id": "7638443704440671501",
+        "create_time": 1778463793,
+        "created_iso": "2026-05-11T01:43:13.000Z",
+        "desc": "Large flake removal #flakyscalp #dandruffremovel ",
+        "share_url": "https://www.tiktok.com/@tiktoker-25/video/7638443704440671501?_r=1&u_code=f0f9j2h35b9e7f&preview_pb=0&sharer_language=en&_d=f1i66kg8glj8e6&share_item_id=7638443704440671501&source=h5_m",
+        "author_unique_id": "kween_keems",
+        "comment_count": 11,
+        "play_count": 141251
+      },
+      {
+        "aweme_id": "6912977305002380550",
+        "create_time": 1609552972,
+        "created_iso": "2021-01-02T02:02:52.000Z",
+        "desc": "Natural Hair Product Flake Test #DecadesofHair #LearnOnTikTok #tiktokpartner #naturalhairproduct #naturalhairtutorials #Welcome2021",
+        "share_url": "https://www.tiktok.com/@tiktoker-26/video/6912977305002380550?_r=1&u_code=f0f9j2h35b9e7f&preview_pb=0&sharer_language=en&_d=f1i66kg8glj8e6&share_item_id=6912977305002380550&source=h5_m",
+        "author_unique_id": "curlycalynna",
+        "comment_count": 3,
+        "play_count": 8038
+      },
+      {
+        "aweme_id": "7276803207911755041",
+        "create_time": 1694262782,
+        "created_iso": "2023-09-09T12:33:02.000Z",
+        "desc": "Replying to @tiktoker-27 gluten test #gluten #scalp #scalppsoriasis #dandruff #flakyscalp #seborrheicdermatitis #glutenintolerance ",
+        "share_url": "https://www.tiktok.com/@tiktoker-28/video/7276803207911755041?_r=1&u_code=f0f9j2h35b9e7f&preview_pb=0&sharer_language=en&_d=f1i66kg8glj8e6&share_item_id=7276803207911755041&source=h5_m",
+        "author_unique_id": "scalpandthings",
+        "comment_count": 7,
+        "play_count": 16341
+      },
+      {
+        "aweme_id": "7601239008353668382",
+        "create_time": 1769801383,
+        "created_iso": "2026-01-30T19:29:43.000Z",
+        "desc": "I know it’s hard to tell in the hair stores but usually it’ll say “non flaking” or open it and touch it your self if it says “tester” #fyp #hairtok #trending #edgecontrol ",
+        "share_url": "https://www.tiktok.com/@tiktoker-29/video/7601239008353668382?_r=1&u_code=f0f9j2h35b9e7f&preview_pb=0&sharer_language=en&_d=f1i66kg8glj8e6&share_item_id=7601239008353668382&source=h5_m",
+        "author_unique_id": "a.s.i.aa001",
+        "comment_count": 83,
+        "play_count": 721714
+      },
+      {
+        "aweme_id": "7443496839774522666",
+        "create_time": 1733074166,
+        "created_iso": "2024-12-01T17:29:26.000Z",
+        "desc": "Knowing how to avoid flakey products BEFORE applying is a life saver😩❤️ #type4washday #naturalhairstyles #type4hairstyles #naturalhairproducts #lowporosityhair #4b4chair #type4hair @tiktoker-30 I Am @tiktoker-31’s Daughter @tiktoker-32 ",
+        "share_url": "https://www.tiktok.com/@tiktoker-33/video/7443496839774522666?_r=1&u_code=f0f9j2h35b9e7f&preview_pb=0&sharer_language=en&_d=f1i66kg8glj8e6&share_item_id=7443496839774522666&source=h5_m",
+        "author_unique_id": "myuhpapayaa",
+        "comment_count": 60,
+        "play_count": 90414
+      },
+      {
+        "aweme_id": "7652850295315254550",
+        "create_time": 1781818065,
+        "created_iso": "2026-06-18T21:27:45.000Z",
+        "desc": "",
+        "share_url": "https://www.tiktok.com/@tiktoker-34/video/7652850295315254550?_r=1&u_code=f0f9j2h35b9e7f&preview_pb=0&sharer_language=en&_d=f1i66kg8glj8e6&share_item_id=7652850295315254550&source=h5_m",
+        "author_unique_id": "slorseismissing",
+        "comment_count": 2,
+        "play_count": 1625
+      },
+      {
+        "aweme_id": "7486891793439575318",
+        "create_time": 1743177840,
+        "created_iso": "2025-03-28T16:04:00.000Z",
+        "desc": "Flake test 😍😍 Book your April appointment 💕💕",
+        "share_url": "https://www.tiktok.com/@tiktoker-35/video/7486891793439575318?_r=1&u_code=f0f9j2h35b9e7f&preview_pb=0&sharer_language=en&_d=f1i66kg8glj8e6&share_item_id=7486891793439575318&source=h5_m",
+        "author_unique_id": "shefleeksit",
+        "comment_count": 0,
+        "play_count": 637
+      },
+      {
+        "aweme_id": "7427171251203869998",
+        "create_time": 1729273068,
+        "created_iso": "2024-10-18T17:37:48.000Z",
+        "desc": "#naturalhair #4chair #blackgirlhair #hairgrowth #viral #hairconditioner #haircareroutine #haircareproducts #hairgrowthproducts ",
+        "share_url": "https://www.tiktok.com/@tiktoker-36/video/7427171251203869998?_r=1&u_code=f0f9j2h35b9e7f&preview_pb=0&sharer_language=en&_d=f1i66kg8glj8e6&share_item_id=7427171251203869998&source=h5_m",
+        "author_unique_id": "derlysnatureoil",
+        "comment_count": 8,
+        "play_count": 9697
+      }
+    ]
+  }
+}

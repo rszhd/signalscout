@@ -1,0 +1,11 @@
+{
+  "httpStatus": 200,
+  "body": {
+    "success": true,
+    "credits_remaining": 1776,
+    "credits_charged": 1,
+    "id": "7683587543270427912",
+    "url": "https://www.tiktok.com/@tiktoker-1/video/7683587543270427912",
+    "transcript": null
+  }
+}

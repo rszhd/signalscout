@@ -184,3 +184,17 @@ It retains whole provider responses with author identity scrubbed. The default
 run asks both providers; `--comments` probes ScrapeCreators' alternate endpoint.
 It writes fixture files and a request manifest, never application rows. Read
 docs/deletions.md for what each provider has and has not proved.
+
+The ScrapeCreators TikTok capture is run by hand with a key, like the Instagram
+and LinkedIn ones. It answers the ten questions US-119 asks and spends 9
+credits, about $0.017. Two of its calls are free and are worth knowing about
+before you spend anything here: a key with no query answers 400 and charges
+nothing, and a malformed video URL is refused the same way. What is **not**
+free on this provider is an invalid parameter value — `?sort=banana` is ignored
+and the page is billed in full, so the technique that makes its Reddit endpoint
+list its own vocabulary does not work here. Read
+`https://docs.scrapecreators.com/openapi.json` instead, at no cost.
+
+It writes one whole video and a digest per search page rather than whole pages,
+because this provider returns raw TikTok and a page of thirty is 1.8 MB. The
+script says why, beside `digestOf`.

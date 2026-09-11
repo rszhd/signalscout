@@ -56,9 +56,9 @@ the other. Two thin files each know one answer.
       rather than twice
 - [ ] The box holds a production `.env` with its own generated `AUTH_SECRET`,
       `ENCRYPTION_KEY` and Postgres password, and no provider or model key
-- [ ] A push to `main` publishes `:latest` and puts that digest on the box,
+- [x] A push to `main` publishes `:latest` and puts that digest on the box,
       asserted by the run rather than assumed — which closes US-077's last box
-- [ ] `https://app.signalscout.run` answers over TLS with a Let's Encrypt
+- [x] `https://app.signalscout.run` answers over TLS with a Let's Encrypt
       certificate for that hostname, and HTTP redirects to it
 - [ ] An account registers, receives the verification link, opens it, and lands
       on the onboarding gate — the first registration on the cloud version
@@ -86,3 +86,28 @@ the other. Two thin files each know one answer.
   the owner named. The live Stripe objects were created first, because the
   webhook secret is one of the values the box's `.env` needs and the endpoint
   cannot be made before the hostname it points at is decided.
+
+- 2026-09-11T13:12+08:00 — Two boxes closed by reading what has already run,
+  and one that cannot be closed from here.
+
+  The stack is up. `https://app.signalscout.run` answers 200 with a Let's
+  Encrypt certificate whose subject is that hostname, valid 2026-09-09 to
+  2026-12-08, and `http://` returns 301 to it. `x-robots-tag: all`, which is
+  the one crawler-visible difference from staging the Notes ask for.
+
+  The release path is proven end to end. The production deploy of
+  2026-09-10T17:34Z published `sha256:78b6fe5f48ed`, pulled that digest on the
+  box, and its own last step says `signalscout is serving the build this run
+  produced`. The same digest is what `ghcr.io/rszhd/signalscout:latest` now
+  answers with, so US-077's last box closed with it.
+
+  The `.env` box stays open. The app boots, so the file exists and holds
+  `AUTH_SECRET`; the other half of that box — that it carries no provider or
+  model key — is a statement about a file on the box, and reading it needs SSH,
+  which this session was refused. It is the owner's to confirm.
+
+  The last three boxes are unchanged and all need a person. Registering an
+  account is an account creation and a password entry, which this agent may not
+  do whoever asks; the browser extension is also not connected here, so the
+  `Secure` cookie cannot be read either. Both wait on the owner.
+

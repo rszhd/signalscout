@@ -2,7 +2,7 @@
 
 # Open tickets
 
-32 open — 17 doing, 14 todo, 1 parked (11 p1, 17 p2, 4 p3).
+29 open — 14 doing, 14 todo, 1 parked (10 p1, 15 p2, 4 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -10,7 +10,6 @@
 | p1 | US-041 | [A person chooses when a monitor runs](doing/US-041-a-person-chooses-when-a-monitor-runs.md) | feature | doing | 2026-09-06T12:31+08:00 |
 | p1 | US-072 | [A cloud account has seven free days, then a subscription](doing/US-072-a-cloud-account-has-seven-free-days.md) | feature | doing | 2026-09-08T14:05+08:00 |
 | p1 | US-073 | [The cloud stack joins the shared edge proxy](doing/US-073-the-cloud-stack-joins-the-shared-edge-proxy.md) | feature | doing | 2026-09-08T17:03+08:00 |
-| p1 | US-077 | [The published image has the tag the compose file asks for](doing/US-077-the-published-image-has-the-tag-the-compose-file-asks-for.md) | bug | doing | 2026-09-08T20:15+08:00 |
 | p1 | US-083 | [One default key sets every job](doing/US-083-one-default-key-sets-every-job.md) | feature | doing | 2026-09-09T11:13+08:00 |
 | p1 | US-100 | [The cloud version runs at app.signalscout.run](doing/US-100-the-cloud-version-runs-at-app-signalscout-run.md) | feature | doing | 2026-09-10T03:05+08:00 |
 | p1 | US-104 | [A monitor says what its last poll did](doing/US-104-a-monitor-says-what-its-last-poll-did.md) | feature | doing | 2026-09-10T09:51+08:00 |
@@ -22,8 +21,6 @@
 | p2 | US-020 | [A monitor can include comments and replies](doing/US-020-a-monitor-can-include-comments-and-replies.md) | feature | doing | 2026-09-05T01:18+08:00 |
 | p2 | US-043 | [A match is kept for something to be done about it](doing/US-043-a-match-is-kept-for-something-to-be-done-about-it.md) | feature | doing | 2026-09-06T12:36+08:00 |
 | p2 | US-049 | [Instagram is the sixth platform](doing/US-049-instagram-is-the-sixth-platform.md) | feature | doing | 2026-09-06T17:05+08:00 |
-| p2 | US-076 | [The address bar says one thing](doing/US-076-the-address-bar-says-one-thing.md) | feature | doing | 2026-09-08T20:10+08:00 |
-| p2 | US-111 | [An admin sees who registered today](doing/US-111-an-admin-sees-who-registered-today.md) | feature | doing | 2026-09-10T18:10+08:00 |
 | p2 | US-035 | [A monitor is told where people are talking](todo/US-035-a-monitor-is-told-where-people-are-talking.md) | spike | todo | 2026-09-06T11:40+08:00 |
 | p2 | US-036 | [A provider is rated per platform, from measurements](todo/US-036-a-provider-is-rated-per-platform-from-measurements.md) | spike | todo | 2026-09-06T11:48+08:00 |
 | p2 | US-037 | [One subscription is enough](todo/US-037-one-subscription-is-enough.md) | feature | todo | 2026-09-06T11:48+08:00 |

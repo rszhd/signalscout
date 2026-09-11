@@ -2,7 +2,7 @@
 
 # Done
 
-102 finished.
+105 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
@@ -26,6 +26,7 @@
 | US-114 | [The inbox can be ordered three ways](done/2026-09/US-114-the-inbox-can-be-ordered-three-ways.md) | feature | shipped | 2026-09 |
 | US-113 | [The landing page reports its visitors](done/2026-09/US-113-the-landing-page-reports-its-visitors.md) | feature | shipped | 2026-09 |
 | US-112 | [The landing page fits a phone](done/2026-09/US-112-the-landing-page-fits-a-phone.md) | feature | shipped | 2026-09 |
+| US-111 | [An admin sees who registered today](done/2026-09/US-111-an-admin-sees-who-registered-today.md) | feature | shipped | 2026-09 |
 | US-110 | [Constrained pages share one content width](done/2026-09/US-110-constrained-pages-share-one-content-width.md) | chore | shipped | 2026-09 |
 | US-109 | [The monitor list is a table, and a monitor has a page](done/2026-09/US-109-the-monitor-list-is-a-table.md) | feature | shipped | 2026-09 |
 | US-108 | [Setup asks one step at a time](done/2026-09/US-108-setup-asks-one-step-at-a-time.md) | feature | shipped | 2026-09 |
@@ -54,6 +55,8 @@
 | US-080 | [A model key is tested on the screen](done/2026-09/US-080-a-model-key-is-tested-on-the-screen.md) | feature | done | 2026-09 |
 | US-079 | [A model key is added once and chosen per job](done/2026-09/US-079-a-model-key-is-added-once-and-chosen-per-job.md) | feature | done | 2026-09 |
 | US-078 | [A model key is pasted once](done/2026-09/US-078-a-model-key-is-pasted-once.md) | feature | done | 2026-09 |
+| US-077 | [The published image has the tag the compose file asks for](done/2026-09/US-077-the-published-image-has-the-tag-the-compose-file-asks-for.md) | bug | shipped | 2026-09 |
+| US-076 | [The address bar says one thing](done/2026-09/US-076-the-address-bar-says-one-thing.md) | feature | shipped | 2026-09 |
 | US-075 | [A push to staging deploys itself](done/2026-09/US-075-a-push-to-staging-deploys-itself.md) | feature | shipped | 2026-09 |
 | US-074 | [The container carries every setting the app declares](done/2026-09/US-074-the-container-carries-every-setting-the-app-declares.md) | bug | shipped | 2026-09 |
 | US-071 | [A standalone landing page introduces the product](done/2026-09/US-071-a-standalone-landing-page-introduces-the-product.md) | feature | shipped | 2026-09 |

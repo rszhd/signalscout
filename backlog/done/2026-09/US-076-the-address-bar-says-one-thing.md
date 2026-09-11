@@ -6,7 +6,7 @@ priority: p2
 created: 2026-09-08T20:10+08:00
 parent:
 area: web
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -76,3 +76,16 @@ all arrive at the same place.
 
 - 2026-09-08T20:10+08:00 — Written after the owner read
   `/billing?checkout=done#/billing` and asked for the routing to be fixed.
+
+- 2026-09-08T20:11+08:00 — Shipped in `Move the router out of the hash and into
+  the path`. `react-router` on the path, `route.ts` holding the whole table,
+  the project a path segment passed to the inbox, the monitor list and the
+  monitor form as a prop, and the catch-all doing what an effect used to do.
+  Three `hashchange` listeners are gone with it.
+
+- 2026-09-11T13:12+08:00 — Closed. Every box was ticked when the work landed
+  and the ticket was left in `doing/`. The Notes' unproven line still stands:
+  no real browser has rendered a deep path, so Fastify's not-found handler
+  serving `index.html` on a refresh is asserted by no test and no run. US-100
+  carries that proof for the production stack.
+

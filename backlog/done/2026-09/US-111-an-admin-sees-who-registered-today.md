@@ -5,6 +5,7 @@ type: feature
 priority: p2
 created: 2026-09-10T18:10+08:00
 area: admin
+resolution: shipped
 ---
 
 ## Context
@@ -54,3 +55,11 @@ account whose email is not listed.
   and the check job was red on an unrelated test. Fixed by copying the manifest,
   and proven by building the whole image and running it: `/admin` 302,
   `/admin/` 200, `/api/admin/registrations` 401 without a cookie.
+
+- 2026-09-11T13:12+08:00 — Closed. Both halves shipped and the image builds
+  with them: `Add an admin panel at /admin` and `Install the admin panel's
+  dependencies in the image`, and the production deploys since have carried
+  them. What no run has shown is a person listed: the cloud instance has taken
+  no registration yet, so the day's list has only ever been read empty. The
+  first registration is US-100's.
+

@@ -6,7 +6,7 @@ priority: p1
 created: 2026-09-08T20:15+08:00
 parent: US-074
 area: deployment
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -35,7 +35,7 @@ The first person to follow README.md would have found it.
 
 - [x] A push to `main` publishes `:latest`, and the condition names the branch
       rather than reading a repository setting
-- [ ] `docker compose up` with no `SIGNALSCOUT_IMAGE` set pulls a real image
+- [x] `docker compose up` with no `SIGNALSCOUT_IMAGE` set pulls a real image
 - [x] The check is a test rather than a reading: something fails when the
       compose file's default tag is one CI does not publish
 
@@ -63,3 +63,16 @@ The first person to follow README.md would have found it.
   The middle box stays open. `main` is 170 commits behind `dev` and has never
   been released, so `:latest` will not exist until somebody pushes it — and
   that is a release decision rather than part of this fix.
+
+- 2026-09-11T13:12+08:00 — The middle box is closed. `main` has been released
+  since this was written: the production deploys of 2026-09-10 published
+  `:latest`, and the registry now answers for that tag with
+  `sha256:78b6fe5f48ed`. Proven by running the real compose file with no
+  `SIGNALSCOUT_IMAGE` set, on this machine, against an empty volume — compose
+  pulled `ghcr.io/rszhd/signalscout:latest`, the pulled image carried that same
+  digest, `migrate` exited 0, and the app answered `GET /` with 200 and
+  `/api/health` with `{"status":"ok","workerInProcess":true}`. The pull was
+  anonymous, so a self-hoster with no ghcr login gets the same result. The only
+  thing changed for the run was the Postgres host port, which this machine
+  already uses for the development database; the image lines were untouched.
+

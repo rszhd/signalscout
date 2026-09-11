@@ -2,7 +2,7 @@
 
 # Open tickets
 
-35 open — 15 doing, 19 todo, 1 parked (10 p1, 21 p2, 4 p3).
+33 open — 14 doing, 18 todo, 1 parked (10 p1, 19 p2, 4 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -21,7 +21,6 @@
 | p2 | US-020 | [A monitor can include comments and replies](doing/US-020-a-monitor-can-include-comments-and-replies.md) | feature | doing | 2026-09-05T01:18+08:00 |
 | p2 | US-043 | [A match is kept for something to be done about it](doing/US-043-a-match-is-kept-for-something-to-be-done-about-it.md) | feature | doing | 2026-09-06T12:36+08:00 |
 | p2 | US-049 | [Instagram is the sixth platform](doing/US-049-instagram-is-the-sixth-platform.md) | feature | doing | 2026-09-06T17:05+08:00 |
-| p2 | US-124 | [DeepSeek is a model provider](doing/US-124-deepseek-is-a-model-provider.md) | feature | doing | 2026-09-11T18:46+08:00 |
 | p2 | US-035 | [A monitor is told where people are talking](todo/US-035-a-monitor-is-told-where-people-are-talking.md) | spike | todo | 2026-09-06T11:40+08:00 |
 | p2 | US-036 | [A provider is rated per platform, from measurements](todo/US-036-a-provider-is-rated-per-platform-from-measurements.md) | spike | todo | 2026-09-06T11:48+08:00 |
 | p2 | US-037 | [One subscription is enough](todo/US-037-one-subscription-is-enough.md) | feature | todo | 2026-09-06T11:48+08:00 |
@@ -36,7 +35,6 @@
 | p2 | US-120 | [Instagram is measured at ScrapeCreators](todo/US-120-instagram-is-measured-at-scrapecreators.md) | spike | todo | 2026-09-11T18:38+08:00 |
 | p2 | US-121 | [YouTube is measured at ScrapeCreators](todo/US-121-youtube-is-measured-at-scrapecreators.md) | spike | todo | 2026-09-11T18:40+08:00 |
 | p2 | US-122 | [LinkedIn gets a second provider](todo/US-122-linkedin-gets-a-second-provider.md) | spike | todo | 2026-09-11T18:44+08:00 |
-| p2 | US-125 | [The inbox says new matches arrived](todo/US-125-the-inbox-says-new-matches-arrived.md) | feature | todo | 2026-09-11T18:48+08:00 |
 | p3 | US-018 | [A mutation sweep proves the suite is sensitive](todo/US-018-a-mutation-sweep-proves-the-suite-is-sensitive.md) | chore | todo | 2026-09-04T22:54+08:00 |
 | p3 | US-095 | [The logo travels with the email](todo/US-095-the-logo-travels-with-the-email.md) | feature | todo | 2026-09-10T00:36+08:00 |
 | p3 | BUG-013 | [A key row's error is printed inside a closed dialog](todo/BUG-013-a-key-row-s-error-is-printed-inside-a-closed-dialog.md) | bug | todo | 2026-09-09T11:58+08:00 |

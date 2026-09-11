@@ -1,0 +1,30 @@
+{
+  "httpStatus": 200,
+  "body": {
+    "success": true,
+    "credits_remaining": 1754,
+    "credits_charged": 1,
+    "comments": [
+      {
+        "id": "Ugz78g5XMndpUkM1SsV4AaABAg",
+        "content": "nice video sir",
+        "publishedTimeText": "3 weeks ago",
+        "publishedTime": "2026-08-21T14:53:18.444Z",
+        "replyLevel": 0,
+        "author": {
+          "name": "yt-channel-1",
+          "channelId": "yt-channel-2",
+          "isVerified": false,
+          "isCreator": false,
+          "avatarUrl": "https://scrubbed.invalid/thumbnail.jpg",
+          "channelUrl": "https://youtube.com/@yt-channel-3"
+        },
+        "engagement": {
+          "likes": 0,
+          "replies": 0
+        }
+      }
+    ],
+    "continuationToken": null
+  }
+}

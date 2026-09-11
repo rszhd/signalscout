@@ -2,7 +2,7 @@
 
 # Done
 
-111 finished.
+112 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
@@ -24,6 +24,7 @@
 | US-125 | [The inbox says new matches arrived](done/2026-09/US-125-the-inbox-says-new-matches-arrived.md) | feature | shipped | 2026-09 |
 | US-124 | [DeepSeek is a model provider](done/2026-09/US-124-deepseek-is-a-model-provider.md) | feature | — | 2026-09 |
 | US-123 | [Every screen works on a phone](done/2026-09/US-123-every-screen-works-on-a-phone.md) | chore | shipped | 2026-09 |
+| US-121 | [YouTube is measured at ScrapeCreators](done/2026-09/US-121-youtube-is-measured-at-scrapecreators.md) | spike | shipped | 2026-09 |
 | US-119 | [TikTok is measured at ScrapeCreators](done/2026-09/US-119-tiktok-is-measured-at-scrapecreators.md) | spike | shipped | 2026-09 |
 | US-118 | [One command puts the dev app on a link I can open anywhere](done/2026-09/US-118-one-command-puts-the-dev-app-on-a-link-i-can-open-anywhere.md) | feature | shipped | 2026-09 |
 | US-117 | [The documents agree with the code](done/2026-09/US-117-the-documents-agree-with-the-code.md) | chore | shipped | 2026-09 |

@@ -1,0 +1,85 @@
+{
+  "note": "What each captured call cost, in the provider's own numbers. This is the evidence for the billable unit and for whether a credential probe is free.",
+  "calls": [
+    {
+      "call": "credentials-rejected",
+      "httpStatus": 401,
+      "elapsedMs": 651,
+      "creditsCharged": null,
+      "creditsRemaining": null,
+      "note": "sent with a deliberately invalid key"
+    },
+    {
+      "call": "credentials-accepted",
+      "httpStatus": 400,
+      "elapsedMs": 707,
+      "creditsCharged": 0,
+      "creditsRemaining": 1761,
+      "note": "a working key with no query: refused on the input, not on the key"
+    },
+    {
+      "call": "search-videos",
+      "httpStatus": 200,
+      "elapsedMs": 1308,
+      "creditsCharged": 1,
+      "creditsRemaining": 1760,
+      "note": "videos only, inside a month: the request a monitor would make"
+    },
+    {
+      "call": "search-videos-page-2",
+      "httpStatus": 200,
+      "elapsedMs": 1559,
+      "creditsCharged": 1,
+      "creditsRemaining": 1759,
+      "note": "followed the continuationToken from search-videos.json"
+    },
+    {
+      "call": "search-mixed",
+      "httpStatus": 200,
+      "elapsedMs": 4376,
+      "creditsCharged": 1,
+      "creditsRemaining": 1758,
+      "note": "no type parameter: what the answer holds beside videos"
+    },
+    {
+      "call": "search-with-extras",
+      "httpStatus": 200,
+      "elapsedMs": 3662,
+      "creditsCharged": 1,
+      "creditsRemaining": 1757,
+      "note": "includeExtras=true: does a description arrive, and how slow is it"
+    },
+    {
+      "call": "search-window-today",
+      "httpStatus": 200,
+      "elapsedMs": 1278,
+      "creditsCharged": 1,
+      "creditsRemaining": 1756,
+      "note": "the narrowest window the provider documents"
+    },
+    {
+      "call": "search-no-results",
+      "httpStatus": 200,
+      "elapsedMs": 1083,
+      "creditsCharged": 1,
+      "creditsRemaining": 1755,
+      "note": "a phrase that cannot occur; the ledger says what it cost"
+    },
+    {
+      "call": "comments-newest",
+      "httpStatus": 200,
+      "elapsedMs": 2374,
+      "creditsCharged": 1,
+      "creditsRemaining": 1754,
+      "note": "newest first, on the first video the search returned"
+    },
+    {
+      "call": "transcript",
+      "httpStatus": 200,
+      "elapsedMs": 6955,
+      "creditsCharged": 1,
+      "creditsRemaining": 1753,
+      "note": "public captions only"
+    }
+  ]
+}

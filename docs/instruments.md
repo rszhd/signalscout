@@ -198,3 +198,14 @@ list its own vocabulary does not work here. Read
 It writes one whole video and a digest per search page rather than whole pages,
 because this provider returns raw TikTok and a page of thirty is 1.8 MB. The
 script says why, beside `digestOf`.
+
+The ScrapeCreators YouTube capture is the same shape and spends 8 credits. Its
+fixtures are stored whole, unlike the TikTok ones, because this endpoint
+answers in a shape the provider designed and a page of twenty videos is 15 KB.
+Two of its calls answer questions that cost money to get wrong: `includeExtras`
+is what turns a 68-character title into a 1,400-character description **and**
+what replaces a computed `publishedTime` with the real `publishDate`, and the
+transcript endpoint charges a credit a video and returns thousands of
+characters where TikTok's returns null. Run it when a YouTube connector is
+written, and read `docs/sources.md` before trusting `uploadDate` — it narrows
+and it leaks.

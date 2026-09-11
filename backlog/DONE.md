@@ -2,10 +2,11 @@
 
 # Done
 
-108 finished.
+109 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
+| BUG-018 | [An OpenAI-compatible provider is sent no schema](done/2026-09/BUG-018-a-compatible-provider-is-sent-no-schema.md) | bug | — | 2026-09 |
 | BUG-017 | [A poll pays for pages its own window then discards](done/2026-09/BUG-017-a-poll-pays-for-pages-its-own-window-then-discards.md) | bug | fixed | 2026-09 |
 | BUG-015 | [One post found twice in a poll throws away the whole collection](done/2026-09/BUG-015-one-post-found-twice-in-a-poll-throws-away-the-whole-collection.md) | bug | fixed | 2026-09 |
 | BUG-014 | [The billing screen names a price nobody charges](done/2026-09/BUG-014-the-billing-screen-names-a-price-nobody-charges.md) | bug | fixed | 2026-09 |

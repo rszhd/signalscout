@@ -95,6 +95,7 @@ export {
   MissingAiKeyError,
   modelPrices,
   pricedModelsFor,
+  schemaGoesInThePrompt,
   unpricedModelsFor,
 } from "./ai/provider.js";
 export {

@@ -23,9 +23,9 @@
 
 import type { LanguageModel } from "ai";
 import { APICallError, generateObject, NoObjectGeneratedError, RetryError } from "ai";
-import type { z } from "zod";
+import { z } from "zod";
 import type { AiConfig, AiProvider } from "./config.js";
-import { estimateCostMicros } from "./provider.js";
+import { estimateCostMicros, schemaGoesInThePrompt } from "./provider.js";
 
 /**
  * Why a schema refused an answer, short enough to log and to show.
@@ -90,6 +90,33 @@ function messageOf(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
 
+/**
+ * The system prompt, with the schema added when the client cannot send it.
+ *
+ * Two things are added and each one is load-bearing. The **schema** is what
+ * the compatible client drops, so without it the model is asked for JSON of no
+ * particular shape. The **word "json"** is what DeepSeek refuses the call for
+ * missing: `response_format: json_object` is rejected outright unless some
+ * message contains it, which is also OpenAI's rule for that mode.
+ *
+ * The answer is still validated against the Zod schema afterwards, exactly as
+ * it is for a provider that carries the schema natively. This makes the call
+ * possible; it does not make the model obedient.
+ */
+export function systemForSchema<Value>(
+  system: string,
+  schema: z.ZodType<Value>,
+  schemaDescription: string,
+): string {
+  return [
+    system,
+    "",
+    `Answer with one JSON object and nothing else: no prose, no code fence. ${schemaDescription}`,
+    "The object must be valid against this JSON schema:",
+    JSON.stringify(z.toJSONSchema(schema)),
+  ].join("\n");
+}
+
 export async function generateStructured<Value>({
   model,
   config,
@@ -117,7 +144,11 @@ export async function generateStructured<Value>({
       schema,
       schemaName,
       schemaDescription,
-      system,
+      // BUG-018. The compatible client sends `json_object` and drops the
+      // schema, so for those providers the schema goes in the prompt instead.
+      system: schemaGoesInThePrompt(config.provider)
+        ? systemForSchema(system, schema, schemaDescription)
+        : system,
       prompt,
       // The queue owns retries. The AI SDK retrying inside the step would
       // spend three times on one provider outage and report it as one call,

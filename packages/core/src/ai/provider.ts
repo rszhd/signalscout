@@ -30,6 +30,46 @@ const defaultBaseUrls: Partial<Record<AiProvider, string>> = {
   ollama: "http://localhost:11434/v1",
 };
 
+/**
+ * Which client each provider is built with. BUG-018.
+ *
+ * A table rather than the `switch` below alone, because two questions are
+ * asked of it and they must never disagree: which SDK package to build, and
+ * whether that package can carry a JSON schema to the provider. Adding a name
+ * to `aiProviders` and forgetting this is a compile error, which is the only
+ * kind of reminder that works.
+ */
+type ClientKind = "openai" | "anthropic" | "google" | "compatible";
+
+const clients: Readonly<Record<AiProvider, ClientKind>> = {
+  openai: "openai",
+  anthropic: "anthropic",
+  google: "google",
+  deepseek: "compatible",
+  openrouter: "compatible",
+  ollama: "compatible",
+};
+
+/**
+ * Whether this provider's client sends the schema, or the prompt must. BUG-018.
+ *
+ * `createOpenAICompatible` asks for `response_format: json_object` and drops
+ * the schema, with a warning nothing reads: *JSON response format schema is
+ * only supported with structuredOutputs*. So the model is told to answer JSON
+ * and never told which JSON. DeepSeek refuses the call outright — the word
+ * "json" is not in the prompt either — and a provider that does not refuse
+ * answers a shape our schema then rejects. Either way the call is billed and
+ * scores nothing.
+ *
+ * `call.ts` puts the schema in the system prompt for these three. That is what
+ * the AI SDK itself did before version 5 moved the decision into each
+ * provider, and it is the only thing that works for a provider whose JSON mode
+ * takes no schema.
+ */
+export function schemaGoesInThePrompt(provider: AiProvider): boolean {
+  return clients[provider] === "compatible";
+}
+
 export class MissingAiKeyError extends Error {
   constructor(provider: AiProvider) {
     super(
@@ -44,7 +84,7 @@ export function createModel(config: AiConfig): LanguageModel {
 
   if (needsApiKey(provider) && !apiKey) throw new MissingAiKeyError(provider);
 
-  switch (provider) {
+  switch (clients[provider]) {
     case "openai":
       return createOpenAI({ apiKey, baseURL: baseUrl })(model);
     case "anthropic":

@@ -52,7 +52,8 @@ Four of them matter more than the rest:
   key exported cannot spend one by accident.
 - **A fixture for somebody else's API is captured, never written.** A payload
   you wrote is evidence about our parser and none at all about the wire
-  format. This has caught four documented provider claims wrong in one month.
+  format. Instagram alone contradicted three of its provider's documented
+  claims, and each would have shipped as a silent fault.
 
 ## Running it
 
@@ -67,20 +68,20 @@ pnpm typecheck
 
 `pnpm test` uses a real Postgres and creates a database per test file. If it
 cannot reach one it says so; it does not fall back to a fake. It can go red
-without a broken test — a database per file outruns Postgres's default
-connection limit — so try `pnpm vitest run --maxWorkers=3` before reading a red
-run as a regression.
+without a broken test, and *Running the suite* in
+[docs/testing.md](docs/testing.md) says how to tell that apart from a
+regression before you go looking for one.
 
 ## Adding a connector
 
 [docs/sources.md](docs/sources.md) holds two lists: adding a *provider* and
-adding a *platform*. They are different jobs. Read the three things connectors
-get wrong before starting.
+adding a *platform*. They are different jobs. Read *What connectors get
+wrong* before starting.
 
 A new platform is also a product decision, not only a technical one. PLAN.md's
 *Important rule* says no further network is added until the existing ones
-reliably produce useful matches, and the two crossings of that rule so far are
-both recorded as deliberate decisions.
+reliably produce useful matches. It has been crossed four times, each on the
+owner's decision and each recorded in its own ticket. It is still the rule.
 
 ## Commit messages
 

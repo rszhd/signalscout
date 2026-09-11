@@ -26,10 +26,15 @@ pastes their own key on the connections screen, and a poll uses the key
 belonging to **the owner of the monitor being polled**. An account with no key
 of its own cannot start a monitor, and the form names the key it wants.
 
-The environment is still the fallback for everybody, and that is worth being
-deliberate about: an instance with both a `.env` key and open signup lets a
-stranger poll on the machine's key. Empty the environment before you open
-signup, or accept the bill.
+**Where signup is open, the keys in `.env` are not offered to anybody.**
+US-081. Until then this paragraph said *empty the environment before you open
+signup, or accept the bill* — and advice is a thing somebody skips, so it is
+the behaviour now. `config/machine-keys.ts` is the whole rule, asked once per
+composition root, and every layer below is handed an environment with the keys
+already gone. Only the keys go: the provider, the model, the endpoint and the
+prices are what the deployment was configured and measured for. With signup
+closed nothing changes, which is the point of tying the rule to signup rather
+than applying it everywhere.
 
 **A model key follows the same rule, with two differences.** US-068 and
 US-079. The Models screen stores keys on the account, in `ai_keys`, encrypted
@@ -132,8 +137,9 @@ process environment is not a thing a database backup carries.
 
 US-024 changed that name. It used to be `<SOURCE>_<FIELD>`, which was right
 while one provider served one platform and wrong the moment one key serves
-three: `REDDIT_API_KEY` and `X_API_KEY` would hold the same Bright Data value,
-and rotating it would give a person three chances to leave one behind. The old
+five: `REDDIT_API_KEY`, `X_API_KEY` and three more would all hold the same
+SocialCrawl value, and rotating it would give a person five chances to leave
+one behind. The old
 name is still read, so an instance that upgrades keeps polling, and reading it
 logs which line to change, once per process.
 
@@ -323,8 +329,27 @@ Set the credentials again from the provider's dashboard, or move them back to
 
 ## Notification credentials
 
-`SMTP_PASSWORD` and `WEBHOOK_SIGNING_SECRET` stay in the environment, like model
-keys. The API returns readiness and missing variable names, never their values.
-The logger redacts both names. Provider error bodies are not retained because
-they may echo authentication values or message content. See
-[notifications.md](notifications.md) for configuration and signing-key rotation.
+`SMTP_PASSWORD` stays in the environment. Mail is the machine's, not an
+account's: one instance sends through one server.
+
+**A webhook signing secret is an account's.** US-096. `webhook_secrets` holds
+one row per account, encrypted the same way, and an account's own secret wins
+over `WEBHOOK_SIGNING_SECRET`. One signing key for a whole instance is
+BUG-010's shape on a different column: every account would hold the value every
+other account's deliveries are signed with, and any of them could sign a
+payload another's receiver accepts as genuine. So where signup is open the
+instance's own secret is stripped, by the same rule that strips the provider
+keys.
+
+Two details differ from a provider key and both are deliberate. We generate the
+value rather than taking a pasted one, so there is nothing to probe and it is
+shown in full exactly once. And **the record is derived on read rather than
+taken from the row** — the opposite of `readSourceCredential`, which trusts its
+stored column because US-024 renamed what its table is keyed by. This table has
+no such history, and deriving is what makes the defence real: a row copied into
+another account's slot with `psql` brings its `record` along.
+
+The API returns readiness and missing variable names, never values. The logger
+redacts both names. Provider error bodies are not retained, because they may
+echo authentication values or message content. See
+[notifications.md](notifications.md) for the contract and for rotation.

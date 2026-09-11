@@ -72,11 +72,13 @@ lets an assistant run everything after every change and correct itself without
 a person in the loop. A slow or flaky suite breaks that loop: it gets skipped,
 or a green run gets trusted that should not be.
 
-Measured on 2026-09-05: 615 tests in 42 files, 78.3 seconds, against a Postgres
-that was already running. That is the number this claim rests on, so re-measure
-it rather than assuming it holds. This is a reason to keep the suite hermetic.
-It is not an instruction to run all of it after every keystroke: run the files
-you touched while you work, and the whole suite before you call the work done.
+Measured on 2026-09-11: **1,922 tests in 112 files, 74.6 seconds**, against a
+Postgres that was already running. Re-measure it rather than assuming it holds
+— the figure was 615 tests in 78.3 seconds on 2026-09-05, and the work between
+those two dates tripled the count while the wall clock barely moved. This is a
+reason to keep the suite hermetic. It is not an instruction to run all of it
+after every keystroke: run the files you touched while you work, and the whole
+suite before you call the work done.
 
 ---
 
@@ -142,10 +144,12 @@ against it, so it cannot be retrofitted:
 | Classification schema | An invalid score is stored as if it were a verdict |
 | Deletion reconciliation | Content the author removed keeps being shown |
 | Session gate | A route answers a stranger, and looks completely normal doing it |
+| Entitlement | An account that stopped paying keeps polling, on our bill |
 
 Each of these files carries a `Correctness-critical` header comment naming the
-failure and the tests that pin it. The list is
-`grep -rl 'Correctness-critical' packages apps`.
+failure and the tests that pin it:
+
+    grep -rl 'Correctness-critical' packages/*/src apps/*/src
 
 The session gate is the one on that list whose test cannot be a sample.
 Every other surface has a rule you can state and then check at each call site;
@@ -389,8 +393,9 @@ is precisely the AI-pair failure mode above. It does not prove the expected
 values are the ones we want; a test can kill every mutant and still pin a
 misread spec.
 
-It is deferred until the classifier and the budget guard exist, because a sweep
-needs a suite to sweep. See US-018. Two reading rules from the project that ran
+It was deferred until there was a suite worth sweeping. That condition is met —
+1,922 tests over every surface named above — so US-018 is now waiting on
+somebody rather than on the code. Two reading rules from the project that ran
 one, worth having in advance: a survivor list has a timestamp and can invent
 gaps that are already closed, and a file that logs heavily scores low without
 being worse tested.

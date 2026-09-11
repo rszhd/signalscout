@@ -70,9 +70,16 @@ be.
 `packages/core/src/sources/index.ts`, per connector.
 
 **5. Add the provider id to `providers`** in
-`packages/core/src/db/schema.ts` and run `pnpm db:generate`. Four columns carry
-it — `api_usage`, `source_continuations`, `source_credentials` and `posts` —
-and each has a check constraint. One migration number, one file.
+`packages/core/src/db/schema.ts` and run `pnpm db:generate`. Six columns carry
+it, each with its own check constraint: `api_usage`, `source_continuations`,
+`source_credentials`, `posts` (attribution only), `query_estimate_probes` and
+`source_providers`. One migration number, one file.
+
+**Do this, and do not assume a green suite noticed.** US-057 shipped the Apify
+connector without adding `apify` here: 1,228 tests passed, the connector
+collected 25 real posts, and every insert failed. `assertSourcesCanBeStored`
+checks platforms and nothing checks providers, so a connector can be
+registered, tested and unable to write a row.
 
 That is the whole change. Nothing that consumes a source needs a case for it:
 the collector pages it through `next`, the budget guard prices it from
@@ -103,7 +110,7 @@ no provider is a platform nothing can fetch.
 
 ---
 
-## One provider, five platforms
+## One provider, six platforms
 
 SocialCrawl fetches X and LinkedIn since US-028, Reddit since US-031, YouTube
 since US-034, TikTok since US-044 and Instagram since US-049, and that is the
@@ -149,29 +156,31 @@ The prices differ inside one platform too, which is new here. A reel search is
 that trap on LinkedIn: where a request and a credit are different numbers, a
 guard fed the wrong one lets a monitor spend five times its cap.
 
-## One platform, one provider — when only one can do the work
+## When only one provider can do the work
 
-X has one provider and it was chosen by elimination, which is worth writing
-down because the next person will assume it was preference.
+X is the case worth remembering, because it was one provider for a reason
+rather than by preference — and the reason has since half expired.
 
-US-006 asked all three. Bright Data's X posts dataset answers a discovery
-trigger with `Available types: profile_url, profiles_array`, so it can fetch
-the posts of accounts you name and cannot search. ScrapeCreators publishes six
-X endpoints and none of them is a search. SocialCrawl has
-`/v1/twitter/search/tweets`. A monitor exists to find a stranger describing a
-problem, so a provider that cannot search cannot serve X here, however good it
-is at Reddit.
+US-006 asked all three accounts we already held. Bright Data's X posts dataset
+answers a discovery trigger with `Available types: profile_url,
+profiles_array`, so it fetches the posts of accounts you name and cannot
+search. ScrapeCreators publishes six X endpoints and none of them is a search.
+SocialCrawl has `/v1/twitter/search/tweets`. A monitor exists to find a
+stranger describing a problem, so a provider that cannot search cannot serve X
+here, however good it is at Reddit.
 
-Two consequences. `registry.only("x")` never has to choose, so no deployment is
-asked a question about X. And a second X provider is not a small change: it
-would have to search, and today two of the three cannot.
+**X has two providers now.** US-061 added SocialData on 2026-09-07, and it did
+not weaken that rule — it searches. So the conclusion to carry forward is the
+question, not the count: before adding a provider for a platform, ask whether
+it can discover a stranger, and not only whether it can fetch a URL.
 
-**LinkedIn also has one provider, and for a different reason: nobody asked the
-others.** US-028 used SocialCrawl because it already had the key and documents
-`/v1/linkedin/search/posts`. Bright Data and ScrapeCreators were never asked
-what they can do with LinkedIn. So this is one provider by convenience, not by
-elimination, and the two must not be written down the same way — the X entry
-above is a closed question and this one is open.
+**LinkedIn is the opposite case, and the two must not be written down the same
+way.** US-028 used SocialCrawl because it already had the key and the provider
+documents `/v1/linkedin/search/posts`. Bright Data and ScrapeCreators were
+never asked what they can do with LinkedIn. That is one provider by
+convenience, not by elimination — an open question rather than a closed one —
+and US-056 later measured three providers for that platform and US-057 shipped
+a second.
 
 ## Two providers for one platform
 
@@ -240,16 +249,22 @@ subreddit Bright Data had already collected, and stored no new row.
 **The two providers agree about almost nothing else**, which is the argument
 for the split:
 
-| | Bright Data | ScrapeCreators | SocialCrawl |
-|---|---|---|---|
-| Fetches | Reddit | Reddit | X, Reddit, YouTube, TikTok and Instagram — and LinkedIn, switched off since US-053 |
-| Billable unit | a record | a request | a request on X, a credit on LinkedIn and Instagram |
-| Price | $1.50 / 1,000 records | $1.88 / 1,000 requests | $8.12 / 1,000 credits |
-| One unit buys | one post | 7 to 23 posts, measured | X: 20 posts. LinkedIn: 2 posts, and a call spends 5 credits. Instagram: 30 reels for 1 credit, and a comment page of 15 for 5 |
-| A call that finds nothing | billed | billed | X: refunded. LinkedIn: billed in full, and it returns unrelated posts rather than none. Instagram: an empty page is refunded, and it still claims `has_more` |
-| Shape | trigger, then poll a snapshot | the posts are in the answer | the posts are in the answer |
-| A collection took | 8 minutes 40 seconds, and 2 minutes 13 on another day | 1.8 to 4.9 seconds | 1.4 to 5.3 seconds |
-| A refused key says | `Invalid credentials`, as a bare string | `{"message":"Invalid API key"}` | `Invalid API key format. Keys start with 'sc_'.` |
+| | Bright Data | ScrapeCreators | SocialCrawl | SocialData | Apify |
+|---|---|---|---|---|---|
+| Fetches | Reddit | Reddit | Reddit, X, YouTube, TikTok, Instagram — and LinkedIn, switched off since US-053 | X | LinkedIn |
+| Billable unit | a record | a request | a credit: 1 on X, Reddit, YouTube and TikTok, 5 on LinkedIn and an Instagram comment page | a tweet | a post, settled from the run's own total |
+| Price | $1.50 / 1,000 records | $1.88 / 1,000 requests | $8.12 / 1,000 credits | $0.20 / 1,000 tweets | $2.00 / 1,000 posts |
+| One unit buys | one post | 7 to 23 posts, measured | 20 X posts, 25 Reddit posts, 45 YouTube videos, 30 reels — or 15 Instagram comments for five credits | one tweet | one post |
+| A call that finds nothing | billed | billed | refunded on X search and on a scoped Reddit search; billed in full on LinkedIn, which returns unrelated posts rather than none | billed, outside the free allowance | billed — a run that matches nothing still costs its start event |
+| Shape | trigger, then poll a snapshot | the posts are in the answer | the posts are in the answer | the posts are in the answer | start an actor run, then read it |
+| A collection took | 8 minutes 40 seconds, and 2 minutes 13 on another day | 1.8 to 4.9 seconds | 1.4 to 5.3 seconds | under 2 seconds | 3 to 11 seconds |
+| A refused key says | `Invalid credentials`, as a bare string | `{"message":"Invalid API key"}` | `Invalid API key format. Keys start with 'sc_'.` | 401, and an empty balance is **402** — a different repair | the actor refuses the run |
+
+**Two of them carry a trap the other three do not.** SocialData is prepaid, so
+an empty balance answers 402 — not a wrong key and not a rate limit, and
+retrying will not help. Apify settles the bill *after* the run ends, so a total
+read too early prices every poll at a fraction of a cent and refuses nothing,
+for ever.
 
 **One provider does not bill one way.** SocialCrawl is the row that proves the
 three money fields belong to the *pair* and never to the provider: the same key
@@ -365,7 +380,7 @@ X or a model provider. See [testing.md](testing.md).
 
 ---
 
-## The three things connectors get wrong
+## What connectors get wrong
 
 **Cost is not the post count.** One provider bills a call that returns up to
 100 posts; another bills every record; a third refunds the call that finds

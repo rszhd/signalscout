@@ -33,8 +33,8 @@ price divided by the `postsPerUnit` the connector measured. LinkedIn through
 SocialCrawl is not here because US-053 switched that pair off; Apify fetches
 LinkedIn now.
 
-That arithmetic is wrong in at least five ways we already know about, and
-probably in a sixth we do not:
+That arithmetic is wrong in every way listed below, and probably in one more we
+have not met yet:
 
 **An Instagram comment is the dearest item this product fetches.** A comment
 page is five credits for fifteen comments, which is about $0.0027 each —
@@ -354,7 +354,7 @@ which costs more and hides nothing.
   they belong to. A refused poll says why there, in the same sentence the
   worker logged.
 - The rule itself is `packages/core/src/budget/budget.ts`. It is one of the
-  five correctness-critical surfaces in [testing.md](testing.md), so its
+  correctness-critical surfaces named in [testing.md](testing.md), so its
   assertions were written before it was.
 - The pre-filter is `packages/core/src/worker/filter.ts`, its keyword rule is
   `packages/core/src/filter/keywords.ts`, and what it dropped is in

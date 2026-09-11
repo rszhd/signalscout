@@ -88,16 +88,18 @@ with your provider. SMTP charges are outside the monitor's source/model budget.
 
 ## Webhook contract
 
-Set `WEBHOOK_SIGNING_SECRET` to a random value of at least 32 characters, and
-configure the same value at your receiver. Generate one with:
+A delivery is signed, and the secret comes from one of two places: the
+account's own, or the instance's. Neither is ever returned by the API or stored
+in a notification row.
+
+For the instance's, set `WEBHOOK_SIGNING_SECRET` to a random value of at least
+32 characters and configure the same value at your receiver. Generate one with:
 
 ```bash
 openssl rand -hex 32
 ```
 
-The secret stays in the environment. It is never returned by the API or stored
-in a notification row. Rotate it by updating the receiver and both application
-processes together.
+Rotate it by updating the receiver and both application processes together.
 
 ### An account can have its own
 
@@ -166,9 +168,8 @@ needs the connection to use the address that was checked, which `fetch` does not
 allow. What the window offers is a blind `POST` and a reachability signal — the
 response body is discarded and never reaches the product.
 
-The URL must use HTTPS, with no username, password or fragment. Redirects are
-refused. Choose **Digest** or **Each match above the minimum score**. A request
-is a JSON `POST`. Its body has this versioned shape:
+Choose **Digest** or **Each match above the minimum score**. A request is a
+JSON `POST`. Its body has this versioned shape:
 
 ```json
 {
@@ -239,10 +240,24 @@ matches and excludes hidden ones. An empty delivery is skipped. A retry's body
 may therefore contain fewer matches than an earlier attempt; its signature is
 computed again over the current body.
 
-## Verification
+## What has actually been delivered
 
-The suite uses real Postgres, pg-boss and a local TLS SMTP receiver. It checks
-our Nodemailer integration without sending to an external account. Resend inbox
-delivery and a real third-party webhook receiver have not been exercised by
-US-016. Those remain unproven until a live send is explicitly requested and a
-recipient or receiver is supplied.
+The suite uses real Postgres, pg-boss and a local TLS SMTP receiver, so it
+checks our Nodemailer integration without sending to an external account. Three
+things have since run for real:
+
+* **Mail reaches an inbox.** US-092 registered an account at an address that is
+  not the mail account owner's, through Resend on a verified domain: the link
+  arrived in 3.53 seconds and opening it verified the account. US-094 then sent
+  two dressed digests from seven real matches.
+* **A monitor notified its owner without being asked.** US-093's live run
+  produced six matches from stored posts and sent three deliveries — two
+  immediate emails and a digest — every one `sent` on the first attempt.
+* **A signed webhook verified.** `live:webhook` delivers to an HTTPS receiver
+  written from this document and nothing else, and the negative case is what
+  makes it mean anything: the same receiver holding a different secret rejects
+  the next delivery.
+
+Still unproven: nobody has opened one of these emails in Outlook, and no
+webhook has reached a receiver on **another machine** — so a real TLS chain, a
+real DNS answer and a real network have not been part of it.

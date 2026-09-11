@@ -102,8 +102,11 @@ Each ticket's own file records why *it* moved. This section holds the
 principles, so the next ordering call is not argued from nothing.
 
 - **Detection quality outranks a new source.** PLAN.md sets this as a rule: no
-  third social network until Reddit and X reliably produce useful matches. A
-  ticket that adds a connector loses to a ticket that improves scoring.
+  further social network until the existing ones reliably produce useful
+  matches. A ticket that adds a connector loses to a ticket that improves
+  scoring. The rule has been crossed four times, each on the owner's decision
+  and each recorded in its own ticket — which is what an overruled rule looks
+  like when it is still a rule.
 - **A ticket that settles shared vocabulary goes first.** The classification
   schema and the `SocialSource` interface are both named in PLAN.md, and every
   later ticket either uses them or invents a rival.

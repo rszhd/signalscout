@@ -8,7 +8,9 @@ Instead of traditional social listening focused on brand mentions, sentiment, da
 
 > Who is publicly talking about a problem my product can solve?
 
-The first version will focus on **Reddit and X/Twitter**.
+The first version focused on **Reddit and X/Twitter**. Six platforms are
+monitored now — see *Sources* below, and *Important rule* for how that
+happened.
 
 ---
 
@@ -82,20 +84,23 @@ Users provide their own credentials for external services.
 For example:
 
 ```env
-REDDIT_API_KEY=
+BRIGHTDATA_API_KEY=      # Bright Data — Reddit
+SOCIALCRAWL_API_KEY=     # SocialCrawl — Reddit, X, YouTube, TikTok, Instagram
+APIFY_API_TOKEN=         # Apify — LinkedIn
 
-X_API_KEY=
-X_API_SECRET=
-
-OPENAI_API_KEY=
+AI_API_KEY=
 ```
 
-Reddit is the exception that proves the rule. Reddit closed self-serve API
-registration in November 2025, so a user cannot get their own Reddit key any
-more. Reddit therefore arrives through Bright Data, and the key the user brings
-is a Bright Data one. The principle is unchanged: the user owns the account and
-pays for their own usage. STACK.md, *A source is not a provider*, holds the
-reasoning and the rule it produced.
+**No platform is reached through its own API, and that is not what was
+planned.** Reddit closed self-serve registration in November 2025 and X sells
+pay-per-use with no free tier, so every platform arrives through a data
+provider and the key a person brings is that provider's. A variable is named
+after the provider rather than the platform, because one key can serve five of
+them.
+
+The principle is unchanged: the user owns the account and pays for their own
+usage. STACK.md, *A source is not a provider*, holds the reasoning and the rule
+it produced, and docs/self-hosting.md lists every variable.
 
 Later we can support multiple AI providers:
 
@@ -116,11 +121,12 @@ The user controls the account, API access, usage, and associated API costs.
 
 # Sources
 
-Six platforms are monitored, through ten connectors: Reddit, X, LinkedIn,
-YouTube, TikTok and Instagram. Reddit and X came first, and the signals they
-carry are written out here. STACK.md holds what each platform and provider
-costs and returns, and AGENTS.md records what each one has been measured
-doing.
+Six platforms are monitored, through ten connectors — of which nine are
+offered, because a connector can ship and not be offered. Reddit and X came
+first, and the signals they carry are written out below. STACK.md holds what
+the economics of a source do to the build, docs/sources.md holds what each
+connector can and cannot do, and docs/history.md records what each one has been
+measured doing.
 
 ## Reddit
 
@@ -373,37 +379,8 @@ The long-term goal is for the system to learn:
 
 # Architecture
 
-Keep integrations modular.
-
-```text
-src/
-  sources/
-    reddit/
-    twitter/
-
-  ai/
-    openai/
-    anthropic/
-    openrouter/
-    ollama/
-
-  services/
-    collector
-    classifier
-    scheduler
-    notifications
-
-  notifications/
-    email/
-    webhook/
-    slack/
-
-  db/
-    monitors
-    posts
-    matches
-    feedback
-```
+Keep integrations modular. The shape the repository actually took is in
+STACK.md, *Repository shape*; what matters here is the seam.
 
 Social networks should implement a common connector interface.
 
@@ -422,21 +399,21 @@ See [docs/sources.md](docs/sources.md) for the steps.
 
 # Future integrations
 
-Do not build these until Reddit + X are working well.
+Do not build these until the existing sources are working well. YouTube,
+TikTok and Instagram have since been built, each as a recorded decision — see
+*Important rule*.
 
 Potential sources:
 
 * Hacker News
 * Bluesky
 * Mastodon
-* YouTube
+* Threads — parked in US-038, and the only one of that ticket's three still parked
 * RSS
 * GitHub
 * Stack Overflow
 * Discourse
 * Facebook
-* Instagram
-* TikTok
 * Other forums and communities
 
 Community pull requests should be encouraged for new connectors.
@@ -447,7 +424,10 @@ Community pull requests should be encouraged for new connectors.
 
 The open-source project remains free and self-hostable.
 
-Later we introduce a very inexpensive hosted version.
+**It is live.** SignalScout Cloud has run at app.signalscout.run since
+2026-09-10, at **$20 USD a month after seven free days that ask for no card.**
+That figure lives in Stripe and not in this repository — docs/billing.md says
+why, and this paragraph is a copy that goes stale the day the price moves.
 
 The hosted product is not charging users for social data or AI usage.
 
@@ -470,7 +450,7 @@ We charge for convenience.
 
 ## Hosted
 
-Approximately **$5/month**
+**$20/month**, after seven free days
 
 * No server setup
 * Runs 24/7
@@ -491,7 +471,7 @@ Not:
 
 > Hosted version for people who don't know how to use servers.
 
-Developers may also happily pay $5 simply because they don't want another service to maintain.
+Developers may also happily pay simply because they do not want another service to maintain.
 
 ---
 
@@ -504,11 +484,13 @@ Open Source
 $0
 
 Hosted
-$5–9/month
-
-Pro
-$15–25/month
+$20/month          the tier that exists
 ```
+
+This section planned $5-9 for the hosted tier and a Pro tier above it. The
+hosted tier shipped at $20 and there is no Pro tier. The reason to keep the
+paragraph is the rule under it, which has not changed: keep the entry tier
+cheap, and do not design a second tier until people are using the first.
 
 Possible Pro features later:
 
@@ -606,12 +588,15 @@ Early milestones:
 
 **Do not add another social network until Reddit + X reliably produce useful matches.**
 
-**This rule was crossed once, deliberately.** On 2026-09-05 the owner asked for
-LinkedIn, and US-028 added it while the condition was still unmet: X had run one
-poll and collected five verdicts. The exception is recorded in the ticket and in
-STACK.md rather than being quietly absorbed here. The rule stands for the
-fourth network, and the argument below is unchanged by having been overruled
-once.
+**This rule has been crossed four times, each one deliberately and each one on
+the owner's decision.** LinkedIn in US-028, YouTube in US-034, TikTok in US-044
+and Instagram in US-049, all inside 2026-09-05 and 2026-09-06, while the
+condition was still unmet: X had run one poll and collected five verdicts. Each
+exception is recorded in its own ticket rather than being quietly absorbed here.
+The rule stands for the seventh network, and the argument below is unchanged by
+having been overruled four times — what those crossings measured is that a
+platform's value depends on the product being sold, which is a reason to be
+slower rather than faster.
 
 The quality of the intent detection is more important than the number of integrations.
 

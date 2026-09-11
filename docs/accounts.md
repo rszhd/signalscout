@@ -342,8 +342,28 @@ UPDATE projects           SET user_id = '<new>' WHERE user_id = '<old>';
 UPDATE reply_prompts      SET user_id = '<new>' WHERE user_id = '<old>';
 UPDATE feedback           SET user_id = '<new>' WHERE user_id = '<old>';
 UPDATE source_credentials SET user_id = '<new>' WHERE user_id = '<old>';
+UPDATE source_providers   SET user_id = '<new>' WHERE user_id = '<old>';
 UPDATE ai_settings        SET user_id = '<new>' WHERE user_id = '<old>';
+UPDATE ai_keys            SET user_id = '<new>' WHERE user_id = '<old>';
+UPDATE webhook_secrets    SET user_id = '<new>' WHERE user_id = '<old>';
+
+-- History, so the spend and poll screens keep answering:
+UPDATE api_usage          SET user_id = '<new>' WHERE user_id = '<old>';
+UPDATE poll_runs          SET user_id = '<new>' WHERE user_id = '<old>';
+UPDATE query_estimates    SET user_id = '<new>' WHERE user_id = '<old>';
 ```
+
+**Every table in that list is one somebody has to remember**, and the list has
+grown three times since it was written. `grep -n user_id
+packages/core/src/db/schema.ts` is how to check it is still complete before
+trusting it.
+
+Two of them are silent when they are missed. A `source_providers` row left
+behind means the new account polls as though it chose no provider, so a box
+holding two Reddit keys refuses every Reddit collection with nothing on any
+screen saying why. An `ai_keys` row left behind means every model call falls
+back to the instance's key, or fails, with the keys still listed on the old
+account nobody can sign in to.
 
 Deleting a user deletes its sessions with it, which is a cascade in the schema.
 It deletes nothing else — including its stored provider keys, which keep the old

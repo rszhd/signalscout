@@ -142,3 +142,29 @@ spends its cap on nothing.
   unmeasured. That is a ticket, not a default.
 
   **What is not proven.** No poll has run through this connector.
+
+- 2026-09-12T00:35+08:00 — **Polled live, and it proved the one claim the suite
+  could only assert by shape: the two providers deduplicate.**
+
+  `live:sc-youtube-poll`, two pages of `flaky tests` with a 24-hour `since`:
+  **39 videos collected, 2 credits, 3,760 micro-dollars** — and only **13 were
+  stored**. The other 26 were already in `posts`, collected earlier through
+  SocialCrawl, and `posts.provider` confirms it: 78 YouTube rows from SocialCrawl
+  before and after, 13 new from here.
+
+  That is the whole deduplication argument, measured rather than reasoned. Two
+  providers, one platform, two thirds of a page already held, no duplicate row
+  and no second bill for a post we already had. `youtube.test.ts` can only
+  assert that both write an eleven-character id and a `watch?v=` URL; this is
+  the thing itself.
+
+  The pre-filter kept all 39 — no keyword dropped one, which is worth noting
+  beside TikTok's 24 of 59, because the text here is a title plus a description
+  and there is simply more of it to match.
+
+  **The model then did nothing: the account has no credits left.** OpenAI
+  refused the embedding call and all 39 classifications, `spentMicros` was 0,
+  and the run reported `unclassified: 39`. So the description this connector
+  exists to fetch has been collected and stored, and has never been scored. Re-run
+  this when the model account has credit — that is the measurement that says
+  whether twenty times the text makes a better match.

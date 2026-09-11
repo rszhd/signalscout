@@ -223,3 +223,11 @@ to learn it: **read `comment_count` before asking for comments.** Both scripts
 first asked the first result in the page, got an empty comment page, billed for
 it, and in YouTube's case spent three more credits suspecting a parameter that
 was innocent. The count is in the search answer.
+
+`live:sc-tiktok-poll` and `live:sc-youtube-poll` are `live-poll.ts` aimed at the
+second provider for each of those platforms, the way `live:apify-linkedin-poll`
+already is. Each spends 2 ScrapeCreators credits — about $0.004, the cheapest
+live poll in this list — plus one model call per post that survives the
+pre-filter, which is the part that costs. Run one after changing either
+connector, and read `api_usage` afterwards: the run is only evidence if the row
+it wrote is priced by the connector rather than by an assumption.

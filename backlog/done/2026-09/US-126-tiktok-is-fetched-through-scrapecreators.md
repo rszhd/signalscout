@@ -166,3 +166,30 @@ credit and returned null on all three videos asked. Do not fetch one per post.
   covers our half only, and there is no `live:` script for it yet — the rate
   limit, a real provider outage, and what a full poll costs on a real monitor
   are all open.
+
+- 2026-09-12T00:35+08:00 — **Polled live. The collecting half is proven; the
+  scoring half is not, and the reason is not this connector.**
+
+  `live:sc-tiktok-poll`, two pages of `flaky tests` with a 24-hour `since`:
+  **59 posts collected, 2 credits, 3,760 micro-dollars**, and `api_usage` holds
+  one row for the pair priced from `pricePerUnitMicros` rather than from
+  anything's assumption. All 59 were new, so `posts` now holds 1,087 TikTok rows
+  from SocialCrawl and 59 from here. The connector took 9.1 seconds for both
+  pages.
+
+  The pre-filter kept 35 of 59 and dropped 24 on keywords.
+
+  **Then the model did nothing, because the account has no credits left**:
+  OpenAI answered "You have no credits remaining" to the embedding call and to
+  all 35 classifications. `spentMicros` was 0, so nothing was billed for it.
+  The run reported `unclassified: 35` and stopped, which is the right
+  behaviour and is the first time it has been seen against a real refusal.
+
+  So what is proven live: the search, the parse, the store, the deduplication
+  key, the billing row, and the poll's own accounting. What is still not: a
+  score, a match, and what a full poll costs when the model answers. Re-run
+  this when the model account has credit.
+
+  What the two figures now say about the two providers on this platform:
+  SocialCrawl's 1,087 rows cost about $0.29 at its own price, and these 59 cost
+  $0.0038.

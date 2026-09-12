@@ -362,9 +362,31 @@ export async function registerBillingRoutes(
           );
         } else {
           logger.info(
-            { type: event.type, userId: updated.userId, status: updated.status },
+            {
+              type: event.type,
+              userId: updated.userId,
+              status: updated.status,
+              plan: updated.plan,
+            },
             "a subscription changed",
           );
+
+          /**
+           * A price this deployment recognises neither of. US-128.
+           *
+           * It is read as the plan that spends the account's own money, which
+           * is the safe direction and a silent one: an operator who mistyped
+           * `STRIPE_PRICE_ID_KEYS_INCLUDED` would see paying accounts on the
+           * cheaper plan and no error anywhere. This is the error.
+           */
+          const known = [settings.priceId, settings.keysIncludedPriceId].filter(Boolean);
+
+          if (event.state.priceId && !known.includes(event.state.priceId)) {
+            logger.error(
+              { userId: updated.userId, price: event.state.priceId, plan: updated.plan },
+              "a subscription names a price this instance does not sell; read as own_keys",
+            );
+          }
         }
 
         return { received: true as const };

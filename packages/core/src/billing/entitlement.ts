@@ -26,7 +26,7 @@
  * behave differently from the way it behaved before this file existed.
  */
 import { type SQL, sql } from "drizzle-orm";
-import type { SubscriptionStatus } from "../db/schema.js";
+import type { SubscriptionPlan, SubscriptionStatus } from "../db/schema.js";
 
 /**
  * Whether this deployment charges for itself.
@@ -59,6 +59,14 @@ export const trialDays = 7;
 export interface SubscriptionRecord {
   readonly userId: string;
   readonly status: SubscriptionStatus;
+  /**
+   * Whose keys this account spends. US-128, and `billing/plan.ts` is the rule.
+   *
+   * It is not read here. Entitlement asks whether an account may poll at all,
+   * and the plan asks whose money the poll spends — two questions that fail in
+   * opposite directions, which is why neither file decides the other.
+   */
+  readonly plan: SubscriptionPlan;
   readonly trialEndsAt: Date | null;
   readonly stripeCustomerId: string | null;
   readonly stripeSubscriptionId: string | null;

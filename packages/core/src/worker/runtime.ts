@@ -25,15 +25,25 @@ import { createEmbedder, type Embedder } from "../ai/embed.js";
 import { readAiEnvironment as readAiSettingsEnvironment } from "../ai/settings.js";
 import { createTriager, type Triager } from "../ai/triage.js";
 import type { SignupMode } from "../auth/user.js";
-import type { BillingMode } from "../billing/index.js";
-import { loadAiEnv, loadNotificationEnv, loadSignupEnv } from "../config/env.js";
 import {
+  type AccountKeys,
+  accountKeys,
+  type BillingMode,
+  planKeyedCache,
+} from "../billing/index.js";
+import {
+  loadAiEnv,
+  loadBillingModeEnv,
+  loadNotificationEnv,
+  loadSignupEnv,
+} from "../config/env.js";
+import {
+  accountModelEnvironment,
   machineKeysUsable,
-  providerKeyEnvironment,
   webhookSecretEnvironment,
-  withoutMachineModelKeys,
 } from "../config/machine-keys.js";
 import { createDatabase, type Database, poolOptions } from "../db/client.js";
+import type { SubscriptionPlan } from "../db/schema.js";
 import type { Logger } from "../logger.js";
 import { configureNetworking } from "../net.js";
 import type { NotificationTransport } from "../notifications/deliver.js";
@@ -328,6 +338,24 @@ function triagerFromEnvironment(
   return createTriager({ config });
 }
 
+/**
+ * The lookup a poll is billed through: the account's stored keys, then the
+ * machine's where the account's plan includes them. US-004, US-067, US-128.
+ *
+ * Named and exported so the wiring has a case of its own. The rule and the
+ * lookup are each asserted elsewhere; what is asserted here is that this
+ * process hands the lookup a question about the account rather than a copy of
+ * its own environment. BUG-019 was exactly that mistake one layer up, and it
+ * passed a full suite.
+ */
+export function credentialsForAccounts(
+  db: Database,
+  keys: AccountKeys,
+  logger?: Logger,
+): CredentialLookup {
+  return credentialsFromStore(db, undefined, (userId) => keys.provider(userId), logger);
+}
+
 export async function startWorker({
   databaseUrl,
   logger,
@@ -344,7 +372,7 @@ export async function startWorker({
   scheduleTicks = true,
   pollingIntervalSeconds,
   notificationTransport,
-  billing = "off",
+  billing = loadBillingModeEnv(),
   signup = loadSignupEnv(),
 }: StartWorkerOptions): Promise<WorkerHandle> {
   // Before any provider is called. See `net.ts`: Node's 250ms per-address
@@ -369,12 +397,18 @@ export async function startWorker({
     throw error;
   }
 
+  /**
+   * Whose keys a job may spend. US-128.
+   *
+   * Asked per account rather than once here, which is the whole change from
+   * US-081: on this instance one account's plan includes the machine's keys and
+   * the next account's does not. The layers below still receive an environment
+   * that is simply right, and still learn nothing about why.
+   */
+  const keys = accountKeys(db, { signup, mode: billing });
+
   // The logger, so a key still read from its deprecated variable says so once.
-  // The environment half is empty where signup is open: a stranger's monitor
-  // must not poll on the machine's provider keys. US-081.
-  const lookup =
-    credentialsFor ??
-    credentialsFromStore(db, undefined, providerKeyEnvironment(signup, process.env), logger);
+  const lookup = credentialsFor ?? credentialsForAccounts(db, keys, logger);
 
   const sources =
     registry ??
@@ -408,13 +442,13 @@ export async function startWorker({
   };
 
   /**
-   * The same, with the machine's model keys taken out where they are nobody's
-   * to spend. US-081. It is what an account's own settings are laid over, so a
-   * job with no key of its own does not run rather than running on the
-   * owner's.
+   * The same, with the machine's model key taken out where it is not this
+   * account's to spend. US-081, per account since US-128. It is what an
+   * account's own settings are laid over, so a job with no key of its own does
+   * not run rather than running on somebody else's.
    */
-  const readAccountBaseEnvironment = () =>
-    machineKeysUsable(signup) ? readAiEnvironment() : withoutMachineModelKeys(readAiEnvironment());
+  const readAccountBaseEnvironment = (plan: SubscriptionPlan) =>
+    accountModelEnvironment(signup, plan, readAiEnvironment());
 
   /**
    * The three model clients an account uses. US-068.
@@ -433,23 +467,17 @@ export async function startWorker({
    * design and it is written into docs/secrets.md rather than left to be
    * discovered.
    *
+   * **The plan is part of the cache key, and it is read on every call.** US-128.
+   * A key is somebody paying for their own calls and waiting for a restart is
+   * only slow; a plan is us paying for theirs, and an account that left the plan
+   * must stop spending our key on the next job rather than at the next restart.
+   * One primary-key read per job buys that.
+   *
    * An injected client wins over all of it. Every test passes one, and so does
    * every live script, so neither pays for a database read per job.
    */
-  const modelCache = new Map<
-    string,
-    {
-      classifier: Classifier | undefined;
-      embedder: Embedder | undefined;
-      triager: Triager | undefined;
-    }
-  >();
-
-  async function modelsFor(userId: string) {
-    const cached = modelCache.get(userId);
-    if (cached) return cached;
-
-    const instance = readAccountBaseEnvironment();
+  const modelsFor = planKeyedCache(keys, async (userId, plan) => {
+    const instance = readAccountBaseEnvironment(plan);
     // An account with no rows gets the instance's environment back, so the
     // common install pays one small query per owner per process and nothing
     // else changes about it.
@@ -472,9 +500,8 @@ export async function startWorker({
         logger,
       );
 
-    modelCache.set(userId, own);
     return own;
-  }
+  });
 
   /**
    * The instance's own clients, for the boot line below and for nothing else.

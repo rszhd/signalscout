@@ -102,6 +102,15 @@ The principle is unchanged: the user owns the account and pays for their own
 usage. STACK.md, *A source is not a provider*, holds the reasoning and the rule
 it produced, and docs/self-hosting.md lists every variable.
 
+**The hosted version sells a second plan where it does not hold.** US-128. Six
+signups before one lead is what bringing your own keys costs a person who has
+none, so an account may instead subscribe to a price that includes the
+instance's keys: it polls and classifies on them and stores nothing. This is the
+line further down — *the cheap hosted version monetizes convenience* — one step
+on, and it changes nothing about the self-hosted build, where `.env` is how one
+person configures their own machine. docs/billing.md holds the plan and
+docs/secrets.md holds whose key is whose.
+
 Several AI providers are supported:
 
 * OpenAI
@@ -625,7 +634,8 @@ useful opportunities
 
 The open-source project creates distribution and trust.
 
-BYOK keeps costs and platform dependency low.
+BYOK keeps costs and platform dependency low, and the hosted version sells a
+plan that spares a person from it.
 
 The cheap hosted version monetizes convenience.
 

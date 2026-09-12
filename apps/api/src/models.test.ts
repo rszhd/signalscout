@@ -16,6 +16,8 @@ import {
   loadEnv,
   modelCalls,
   readAiEnvironment,
+  subscriptions,
+  users,
 } from "@signalscout/core";
 import { createTestDatabase, type TestDatabase } from "@signalscout/core/testing";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
@@ -48,6 +50,8 @@ describe("the models routes", () => {
     await db.delete(modelCalls);
     await db.delete(aiSettings);
     await db.delete(aiKeys);
+    await db.delete(subscriptions);
+    await db.delete(users);
     probed = { status: "ok" };
   });
 
@@ -260,6 +264,79 @@ describe("the models routes", () => {
       // Similarity does not: Anthropic publishes no embedding endpoint, so
       // there is no embedding configuration to hold a key.
       expect(of("embed").hasKey).toBe(false);
+    } finally {
+      await app.close();
+    }
+  });
+
+  /** Put one account on one plan, in a deployment that charges. US-128. */
+  async function onPlan(userId: string, plan: "own_keys" | "keys_included") {
+    await db
+      .insert(users)
+      .values({ id: userId, name: userId, email: `${userId}@example.test` })
+      .onConflictDoNothing();
+    await db
+      .insert(subscriptions)
+      .values({ userId, status: "active", plan })
+      .onConflictDoUpdate({ target: subscriptions.userId, set: { plan } });
+  }
+
+  /** An open instance that charges, with a model key of its own. US-128. */
+  async function openInstance(userId: string) {
+    return buildServer({
+      session: asUser(userId),
+      env: loadEnv({
+        DATABASE_URL: database.url,
+        AI_PROVIDER: "anthropic",
+        AI_MODEL: "claude-haiku-4-5",
+        AI_API_KEY: "the-machine-key",
+        AUTH_SIGNUP: "open",
+      }),
+      logger,
+      db,
+      encryption,
+      queryGenerator: null,
+      billingSettings: {
+        mode: "stripe" as const,
+        apiKey: "sk_test_not_a_real_key",
+        priceId: "price_own",
+        keysIncludedPriceId: "price_included",
+        webhookSecret: "whsec_test",
+        appUrl: "https://app.example.test",
+      },
+    });
+  }
+
+  /**
+   * US-128. One instance, one `AI_API_KEY`, two accounts. The screen asks the
+   * same question the worker asks, so what it offers is what a job would run
+   * on — US-081's own lesson, which is that a rule enforced in the routes is
+   * not a rule until every screen stops offering what it refuses.
+   */
+  it("offers the instance key to an account whose plan includes it", async () => {
+    await onPlan(owner, "keys_included");
+    const app = await openInstance(owner);
+
+    try {
+      const view = (await app.inject({ method: "GET", url: "/api/models" })).json();
+      const classify = view.tasks.find((task: { task: string }) => task.task === "classify");
+
+      expect(classify.instance.hasKey).toBe(true);
+      expect(classify.instance.provider).toBe("anthropic");
+    } finally {
+      await app.close();
+    }
+  });
+
+  it("offers it to nobody on the plan that brings its own key", async () => {
+    await onPlan(owner, "own_keys");
+    const app = await openInstance(owner);
+
+    try {
+      const view = (await app.inject({ method: "GET", url: "/api/models" })).json();
+      const classify = view.tasks.find((task: { task: string }) => task.task === "classify");
+
+      expect(classify.instance.hasKey).toBe(false);
     } finally {
       await app.close();
     }

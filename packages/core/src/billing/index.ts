@@ -17,6 +17,15 @@ export {
   trialDays,
 } from "./entitlement.js";
 export {
+  type AccountKeys,
+  type AccountKeysOptions,
+  accountKeys,
+  planForPrice,
+  planKeyedCache,
+  planOf,
+  readPlan,
+} from "./plan.js";
+export {
   applyStripeSubscription,
   linkStripeCustomer,
   readEntitlement,
@@ -38,6 +47,7 @@ export {
   type PlanPrice,
   type PortalRequest,
   periodEndOf,
+  priceIdOf,
   type StripeBillingOptions,
   stateFromSubscription,
   statusFromStripe,

@@ -1,0 +1,2 @@
+ALTER TABLE "subscriptions" ADD COLUMN "plan" text DEFAULT 'own_keys' NOT NULL;--> statement-breakpoint
+ALTER TABLE "subscriptions" ADD CONSTRAINT "subscriptions_plan_known" CHECK (plan IN ('own_keys', 'keys_included'));

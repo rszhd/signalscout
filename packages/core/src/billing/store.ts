@@ -7,7 +7,7 @@
  */
 import { eq } from "drizzle-orm";
 import type { Database } from "../db/client.js";
-import { type SubscriptionStatus, subscriptions } from "../db/schema.js";
+import { type SubscriptionPlan, type SubscriptionStatus, subscriptions } from "../db/schema.js";
 import {
   type BillingMode,
   type Entitlement,
@@ -20,6 +20,7 @@ function toRecord(row: typeof subscriptions.$inferSelect): SubscriptionRecord {
   return {
     userId: row.userId,
     status: row.status as SubscriptionStatus,
+    plan: row.plan as SubscriptionPlan,
     trialEndsAt: row.trialEndsAt,
     stripeCustomerId: row.stripeCustomerId,
     stripeSubscriptionId: row.stripeSubscriptionId,
@@ -112,6 +113,25 @@ export interface StripeSubscriptionState {
   readonly stripeCustomerId: string;
   readonly stripeSubscriptionId: string;
   readonly status: SubscriptionStatus;
+  /**
+   * Which plan the price says this is. US-128.
+   *
+   * Resolved in `stripe.ts` beside the status, because both are the same kind
+   * of thing: somebody else's vocabulary mapped onto ours before it reaches a
+   * column. A price this deployment does not recognise arrives here as
+   * `own_keys`, which is the direction that spends nobody else's money.
+   */
+  readonly plan: SubscriptionPlan;
+  /**
+   * The price the plan was read from, kept so the caller can say when it
+   * recognises none. US-128.
+   *
+   * An operator who mistyped `STRIPE_PRICE_ID_KEYS_INCLUDED` gets accounts
+   * quietly on the cheaper plan and no error anywhere, which is this
+   * repository's usual worst failure: everything works and one number is
+   * wrong. The webhook logs the price it did not know.
+   */
+  readonly priceId: string | null;
   readonly currentPeriodEnd: Date | null;
   readonly cancelAtPeriodEnd: boolean;
   /** Stripe's own trial deadline, when Stripe is running one. */
@@ -137,6 +157,7 @@ export async function applyStripeSubscription(
     .update(subscriptions)
     .set({
       status: state.status,
+      plan: state.plan,
       stripeSubscriptionId: state.stripeSubscriptionId,
       currentPeriodEnd: state.currentPeriodEnd,
       cancelAtPeriodEnd: state.cancelAtPeriodEnd,

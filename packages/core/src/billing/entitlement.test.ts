@@ -96,6 +96,10 @@ describe("the rule, without a database", () => {
 function record(overrides: { status: SubscriptionStatus; trialEndsAt?: Date | null }) {
   return {
     userId: "user-1",
+    // US-128's column. Entitlement does not read it: whether an account may
+    // poll and whose keys the poll spends are two questions, and the rules that
+    // answer them fail in opposite directions.
+    plan: "own_keys" as const,
     trialEndsAt: null,
     stripeCustomerId: null,
     stripeSubscriptionId: null,

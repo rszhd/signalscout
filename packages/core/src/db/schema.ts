@@ -2090,6 +2090,23 @@ export const subscriptionStatuses = [
 export type SubscriptionStatus = (typeof subscriptionStatuses)[number];
 
 /**
+ * Which plan an account is on, and it decides whose keys pay. US-128.
+ *
+ * `own_keys` is the product as it shipped: the account stores a provider key
+ * and a model key of its own, and spends them. `keys_included` is the second
+ * price — the account polls and classifies on the keys in this instance's
+ * `.env`, and stores none.
+ *
+ * **`own_keys` is the default, and it is the fail-safe direction.** A row
+ * written before this column existed, a Stripe price this deployment does not
+ * recognise, a webhook that has not arrived yet: every one of them lands here,
+ * and every one of them means the account spends its own money rather than
+ * ours. The only thing that opens the machine's keys is a row that says so.
+ */
+export const subscriptionPlans = ["own_keys", "keys_included"] as const;
+export type SubscriptionPlan = (typeof subscriptionPlans)[number];
+
+/**
  * One row per account, in a deployment that charges. US-072.
  *
  * No row is a normal state and it means two different things depending on the
@@ -2117,6 +2134,15 @@ export const subscriptions = pgTable(
       .primaryKey()
       .references((): AnyPgColumn => users.id, { onDelete: "cascade" }),
     status: text("status").notNull(),
+    /**
+     * Whose keys this account spends. US-128.
+     *
+     * Written by the webhook from the price the subscription names, and by
+     * nothing else: no screen offers it and no route sets it. Defaulted rather
+     * than nullable, so every row that predates the column reads as the plan
+     * that spends nobody else's money.
+     */
+    plan: text("plan").$type<SubscriptionPlan>().notNull().default("own_keys"),
     /**
      * When the seven days run out.
      *
@@ -2155,6 +2181,12 @@ export const subscriptions = pgTable(
       "subscriptions_trial_has_an_end",
       sql`${table.status} <> 'trialing' or ${table.trialEndsAt} is not null`,
     ),
+    /**
+     * The plan is checked in the database too, for the reason above it: an
+     * array in this file is not a set the column accepts, and this repository
+     * has shipped that mistake three times.
+     */
+    check("subscriptions_plan_known", oneOf("plan", subscriptionPlans)),
   ],
 );
 

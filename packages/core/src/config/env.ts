@@ -2,7 +2,7 @@ import { z } from "zod";
 import { aiProviders, embeddingProviders } from "../ai/config.js";
 import { type SignupMode, signupModes } from "../auth/user.js";
 import { emailVerificationModes } from "../auth/verification.js";
-import { billingModes } from "../billing/entitlement.js";
+import { type BillingMode, billingModes } from "../billing/entitlement.js";
 import { encryptionKeyIsWellFormed } from "../secrets/cipher.js";
 
 /**
@@ -161,6 +161,23 @@ export function loadSignupEnv(
   return signupEnvSchema.parse(source).AUTH_SIGNUP;
 }
 
+/**
+ * The billing mode alone, for the same reason and the same process. US-128.
+ *
+ * Signup says whether the machine's keys could ever belong to an account; the
+ * mode says whether a plan can. The worker needs both to answer "whose key does
+ * this poll spend", and neither question is worth a whole `Env` to it.
+ */
+export const billingModeEnvSchema = z.object({
+  BILLING_MODE: blankIsUnset(z.enum(billingModes).default("off")),
+});
+
+export function loadBillingModeEnv(
+  source: Record<string, string | undefined> = process.env,
+): BillingMode {
+  return billingModeEnvSchema.parse(source).BILLING_MODE;
+}
+
 export const envSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   LOG_LEVEL: z.enum(["fatal", "error", "warn", "info", "debug", "trace", "silent"]).default("info"),
@@ -304,6 +321,15 @@ export const envSchema = z.object({
   /** The Stripe key, price and webhook secret. Required when BILLING_MODE is stripe. */
   STRIPE_SECRET_KEY: blankIsUnset(z.string().min(1).optional()),
   STRIPE_PRICE_ID: blankIsUnset(z.string().min(1).optional()),
+  /**
+   * The price of the plan whose keys are included. US-128.
+   *
+   * Optional in `stripe` mode as well, and deliberately: a deployment that does
+   * not set it sells one plan, which is what every deployment running today
+   * does. Setting it is what makes the second plan exist at all, and the
+   * webhook reads an account's plan from the price a subscription names.
+   */
+  STRIPE_PRICE_ID_KEYS_INCLUDED: blankIsUnset(z.string().min(1).optional()),
   STRIPE_WEBHOOK_SECRET: blankIsUnset(z.string().min(1).optional()),
 
   /**

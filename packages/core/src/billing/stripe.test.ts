@@ -16,7 +16,9 @@
 import type Stripe from "stripe";
 import { describe, expect, it } from "vitest";
 import {
+  createStripeBilling,
   periodEndOf,
+  priceIdOf,
   stateFromSubscription,
   statusFromStripe,
   stripeApiVersion,
@@ -30,7 +32,7 @@ function subscription(overrides: Record<string, unknown> = {}): Stripe.Subscript
     status: "active",
     cancel_at_period_end: false,
     trial_end: null,
-    items: { data: [{ current_period_end: 1_791_000_000 }] },
+    items: { data: [{ current_period_end: 1_791_000_000, price: { id: "price_ordinary" } }] },
     ...overrides,
   } as unknown as Stripe.Subscription;
 }
@@ -80,6 +82,37 @@ describe("reading a subscription", () => {
   });
 });
 
+/**
+ * US-128. The plan is mapped here, beside the status, because both are the same
+ * kind of thing: somebody else's vocabulary turned into ours before it reaches a
+ * column that decides something. The status decides who may poll; the plan
+ * decides whose keys the poll spends.
+ */
+describe("the plan a subscription's price names", () => {
+  it("reads the price off the same item the period end is on", () => {
+    expect(priceIdOf(subscription())).toBe("price_ordinary");
+    expect(priceIdOf(subscription({ items: { data: [] } }))).toBeNull();
+  });
+
+  it("is keys-included only for the price this deployment sells it as", () => {
+    const included = subscription({
+      items: { data: [{ current_period_end: 1_791_000_000, price: { id: "price_included" } }] },
+    });
+
+    expect(stateFromSubscription(included, "price_included")?.plan).toBe("keys_included");
+    expect(stateFromSubscription(subscription(), "price_included")?.plan).toBe("own_keys");
+  });
+
+  /**
+   * A deployment that names no keys-included price sells one plan, and a price
+   * cannot put an account onto a plan this instance was never configured for.
+   * That is every deployment running today.
+   */
+  it("is own-keys where this deployment names no keys-included price", () => {
+    expect(stateFromSubscription(subscription())?.plan).toBe("own_keys");
+  });
+});
+
 describe("the subscription an invoice belongs to", () => {
   it("reads it off the invoice's parent", () => {
     const invoice = {
@@ -102,5 +135,55 @@ describe("the API version", () => {
      * would look like: a null renewal date and no error anywhere.
      */
     expect(stripeApiVersion).toBe("2026-07-29.dahlia");
+  });
+});
+
+/**
+ * Which price Checkout opens on. US-128.
+ *
+ * The keys-included price exists so the webhook can recognise it, and it is not
+ * a button yet: an account on that plan spends this instance's providers and
+ * model, and US-129 is the cap on how much. A line item is one word, so the
+ * decision needs a case rather than a comment — a button added later turns this
+ * red, which is the reminder.
+ *
+ * The Stripe client is injected and nothing here reaches the network.
+ */
+describe("the price Checkout opens on", () => {
+  it("is the ordinary one, and never the keys-included one", async () => {
+    const created: unknown[] = [];
+
+    const billing = createStripeBilling({
+      apiKey: "sk_test_not_a_real_key",
+      priceId: "price_own",
+      keysIncludedPriceId: "price_included",
+      webhookSecret: "whsec_test",
+      client: {
+        customers: { create: async () => ({ id: "cus_new" }) },
+        checkout: {
+          sessions: {
+            create: async (params: unknown) => {
+              created.push(params);
+              return { url: "https://checkout.stripe.test/session" };
+            },
+          },
+        },
+        // biome-ignore lint/suspicious/noExplicitAny: a hand-shaped double, not a Stripe client.
+      } as any,
+    });
+
+    const result = await billing.createCheckout({
+      userId: "account-1",
+      email: "one@example.test",
+      customerId: null,
+      trialEndsAt: null,
+      successUrl: "https://app.example.test/billing?checkout=done",
+      cancelUrl: "https://app.example.test/billing?checkout=cancelled",
+    });
+
+    expect(result.customerId).toBe("cus_new");
+    expect((created[0] as { line_items: { price: string }[] }).line_items).toEqual([
+      { price: "price_own", quantity: 1 },
+    ]);
   });
 });

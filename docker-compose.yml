@@ -59,6 +59,8 @@ x-app-environment: &app-environment
   BILLING_MODE: ${BILLING_MODE:-off}
   STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
   STRIPE_PRICE_ID: ${STRIPE_PRICE_ID:-}
+  # The second plan's price, whose keys are included. Empty sells one plan.
+  STRIPE_PRICE_ID_KEYS_INCLUDED: ${STRIPE_PRICE_ID_KEYS_INCLUDED:-}
   STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
   # Where Checkout sends a person back to. Required with BILLING_MODE=stripe.
   APP_URL: ${APP_URL:-}

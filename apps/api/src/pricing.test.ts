@@ -18,6 +18,8 @@ import {
   monitors,
   posts,
   sourceProviders,
+  subscriptions,
+  users,
 } from "@signalscout/core";
 import { createTestDatabase, type TestDatabase } from "@signalscout/core/testing";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
@@ -126,20 +128,51 @@ describe("the pricing route", () => {
   afterEach(async () => {
     await db.delete(apiUsage);
     await db.delete(sourceProviders);
+    await db.delete(subscriptions);
+    await db.delete(users);
   });
+
+  /** Put the signed-in account on one plan, in a deployment that charges. US-128. */
+  async function onPlan(plan: "own_keys" | "keys_included") {
+    await db
+      .insert(users)
+      .values({ id: pageOwner, name: pageOwner, email: `${pageOwner}@example.test` })
+      .onConflictDoNothing();
+    await db
+      .insert(subscriptions)
+      .values({ userId: pageOwner, status: "active", plan })
+      .onConflictDoUpdate({ target: subscriptions.userId, set: { plan } });
+  }
 
   async function read(
     sources: ConnectorDefinition[],
     environment: Record<string, string | undefined> = {},
+    signup?: "open" | "closed",
+    charging = false,
   ): Promise<PricingBody> {
     const app = await buildServer({
       session: asOwner,
-      env: loadEnv({ DATABASE_URL: database.url }),
+      env: loadEnv({
+        DATABASE_URL: database.url,
+        ...(signup ? { AUTH_SIGNUP: signup } : {}),
+      }),
       logger,
       db,
       sources,
       environment,
       queryGenerator: null,
+      ...(charging
+        ? {
+            billingSettings: {
+              mode: "stripe" as const,
+              apiKey: "sk_test_not_a_real_key",
+              priceId: "price_own",
+              keysIncludedPriceId: "price_included",
+              webhookSecret: "whsec_test",
+              appUrl: "https://app.example.test",
+            },
+          }
+        : {}),
     });
 
     try {
@@ -150,6 +183,39 @@ describe("the pricing route", () => {
       await app.close();
     }
   }
+
+  /**
+   * BUG-019 counted the readers of a provider key, and this is one of them.
+   *
+   * The page was already handed the stripped environment and no case said so,
+   * which is how the monitor routes lost the same rule without going red. One
+   * key, one deployment, two answers, decided by who may spend it.
+   */
+  it("does not call a provider connected on the machine's key where signup is open", async () => {
+    const key = { SOCIALCRAWL_API_KEY: "sc-test-key" };
+
+    const closed = await read([socialCrawlLinkedIn()], key, "closed");
+    expect(closed.platforms[0]?.connectors[0]?.connected).toBe(true);
+
+    const open = await read([socialCrawlLinkedIn()], key, "open");
+    expect(open.platforms[0]?.connectors[0]?.connected).toBe(false);
+  });
+
+  /**
+   * US-128. The page says which providers this account may use, and on a plan
+   * whose keys are included that is every provider the deployment configured.
+   */
+  it("calls a provider connected where the account's plan includes the key", async () => {
+    const key = { SOCIALCRAWL_API_KEY: "sc-test-key" };
+
+    await onPlan("keys_included");
+    const included = await read([socialCrawlLinkedIn()], key, "open", true);
+    expect(included.platforms[0]?.connectors[0]?.connected).toBe(true);
+
+    await onPlan("own_keys");
+    const own = await read([socialCrawlLinkedIn()], key, "open", true);
+    expect(own.platforms[0]?.connectors[0]?.connected).toBe(false);
+  });
 
   it("prices every connector for the same number of posts", async () => {
     // The whole feature. 50 posts at 2 per credit is 25 credits, which is

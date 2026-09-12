@@ -1,6 +1,7 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
+import { accountKeys } from "../billing/plan.js";
 import { createDatabase } from "../db/client.js";
-import { sourceCredentials } from "../db/schema.js";
+import { sourceCredentials, subscriptions, users } from "../db/schema.js";
 import type { Logger } from "../logger.js";
 import { type EncryptionKey, generateEncryptionKey, readEncryptionKey } from "../secrets/cipher.js";
 import { putSourceCredential } from "../secrets/store.js";
@@ -20,7 +21,7 @@ import {
   retryPolicy,
   scheduleTickQueue,
 } from "./queues.js";
-import { startWorker, type WorkerHandle } from "./runtime.js";
+import { credentialsForAccounts, startWorker, type WorkerHandle } from "./runtime.js";
 import type { PipelineSteps } from "./steps.js";
 import { fakeRegistry, fastRetries, insertMonitor, silentLogger, until } from "./testing.js";
 
@@ -265,5 +266,65 @@ describe("a stored credential the worker cannot read", () => {
     // The pass and the fail of the check must differ, or it guards nothing.
     const worker = await startTestWorker(database);
     await worker.stop();
+  });
+});
+
+/**
+ * The lookup this process polls with. US-128.
+ *
+ * The rule is asserted in `billing/plan.test.ts` and the lookup in
+ * `credentials.test.ts`. What is asserted here is the wiring between them: that
+ * a worker asks about the account rather than handing every poll a copy of its
+ * own environment. BUG-019 was that mistake in the API, it cost nothing because
+ * the worker was right, and it passed a full suite.
+ */
+describe("whose keys a worker polls with", () => {
+  let database: TestDatabase;
+
+  beforeAll(async () => {
+    database = await createTestDatabase("worker_account_keys");
+  }, 60_000);
+
+  afterAll(async () => {
+    await database?.drop();
+  });
+
+  const machine = { BRIGHTDATA_API_KEY: "the-machine-key" };
+  const connector = {
+    platform: { id: "reddit", displayName: "Reddit" },
+    provider: {
+      id: "brightdata",
+      displayName: "Bright Data",
+      credentialFields: [{ name: "apiKey", label: "Bright Data API key", secret: true }],
+    },
+  };
+
+  it("hands the machine's keys to the plan that includes them and to no other", async () => {
+    const { db, close } = createDatabase(database.url);
+
+    try {
+      for (const [id, plan] of [
+        ["included", "keys_included"],
+        ["own", "own_keys"],
+      ] as const) {
+        await db.insert(users).values({ id, name: id, email: `${id}@example.test` });
+        await db.insert(subscriptions).values({ userId: id, status: "active", plan });
+      }
+
+      const lookup = credentialsForAccounts(
+        db,
+        accountKeys(db, { signup: "open", mode: "stripe", environment: machine }),
+        silentLogger,
+      );
+
+      // biome-ignore lint/suspicious/noExplicitAny: the descriptor is shaped by hand here.
+      expect(await lookup(connector as any, "included")).toEqual({ apiKey: "the-machine-key" });
+      // biome-ignore lint/suspicious/noExplicitAny: the same.
+      expect(await lookup(connector as any, "own")).toBeUndefined();
+    } finally {
+      await db.delete(subscriptions);
+      await db.delete(users);
+      await close();
+    }
   });
 });

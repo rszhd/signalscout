@@ -60,6 +60,19 @@ export type CredentialLookup = (
   userId: string,
 ) => Promise<SourceCredentials | undefined> | SourceCredentials | undefined;
 
+/**
+ * Where the environment half of a lookup comes from.
+ *
+ * A plain record is the machine's own environment, which is every self-hosted
+ * instance and every live script. A function is asked per account, and US-128
+ * is why: on an instance taking registrations the keys in `.env` belong to the
+ * accounts whose plan includes them and to nobody else, so the answer cannot be
+ * decided once at boot.
+ */
+export type ProviderKeyEnvironment =
+  | Record<string, string | undefined>
+  | ((userId: string) => Promise<Record<string, string | undefined>>);
+
 /** `apiKey` -> `API_KEY`, `apiSecret` -> `API_SECRET`. */
 function screamingSnakeCase(value: string): string {
   return value
@@ -224,14 +237,18 @@ export function missingCredentials(
 export function credentialsFromStore(
   db: Database,
   key: EncryptionKey | undefined = optionalEncryptionKey(),
-  environment: Record<string, string | undefined> = process.env,
+  environment: ProviderKeyEnvironment = process.env,
   logger?: Logger,
 ): CredentialLookup {
-  const fromEnvironment = credentialsFromEnvironment(environment, logger);
+  const environmentFor = typeof environment === "function" ? environment : async () => environment;
 
-  if (!key) return fromEnvironment;
+  if (!key) {
+    return async (connector, userId) =>
+      credentialsFromEnvironment(await environmentFor(userId), logger)(connector, userId);
+  }
 
   return async (connector, userId) => {
+    const environment = await environmentFor(userId);
     const credentials: Record<string, string> = {};
 
     for (const field of connector.provider.credentialFields) {

@@ -36,6 +36,8 @@ import {
   recordSourceUsage,
   recordVerdict,
   setProviderChoice,
+  subscriptions,
+  users,
 } from "@signalscout/core";
 import { createTestDatabase, type TestDatabase } from "@signalscout/core/testing";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
@@ -134,6 +136,8 @@ describe("the monitor routes", () => {
     await db.delete(matches);
     await db.delete(monitors);
     await db.delete(posts);
+    await db.delete(subscriptions);
+    await db.delete(users);
   });
 
   interface ServerOptions {
@@ -143,6 +147,10 @@ describe("the monitor routes", () => {
     sources?: readonly ConnectorDefinition[];
     /** US-093: whether this deployment has a mailer to switch email on with. */
     canSendEmail?: boolean;
+    /** US-081: whether the keys in this machine's `.env` are anybody's to spend. */
+    signup?: "open" | "closed";
+    /** US-128: whether this deployment charges, so a plan can mean anything. */
+    charging?: boolean;
   }
 
   async function server({
@@ -150,8 +158,13 @@ describe("the monitor routes", () => {
     queryGenerator = null,
     sources = builtInSources,
     canSendEmail = false,
+    signup,
+    charging = false,
   }: ServerOptions = {}) {
-    const env = loadEnv({ DATABASE_URL: database.url });
+    const env = loadEnv({
+      DATABASE_URL: database.url,
+      ...(signup ? { AUTH_SIGNUP: signup } : {}),
+    });
 
     return buildServer({
       session: asOwner,
@@ -162,7 +175,31 @@ describe("the monitor routes", () => {
       environment,
       queryGenerator,
       canSendEmail,
+      ...(charging
+        ? {
+            billingSettings: {
+              mode: "stripe" as const,
+              apiKey: "sk_test_not_a_real_key",
+              priceId: "price_own",
+              keysIncludedPriceId: "price_included",
+              webhookSecret: "whsec_test",
+              appUrl: "https://app.example.test",
+            },
+          }
+        : {}),
     });
+  }
+
+  /** Put the signed-in account on one plan. US-128. */
+  async function onPlan(plan: "own_keys" | "keys_included") {
+    await db
+      .insert(users)
+      .values({ id: owner, name: owner, email: `${owner}@example.test` })
+      .onConflictDoNothing();
+    await db
+      .insert(subscriptions)
+      .values({ userId: owner, status: "active", plan })
+      .onConflictDoUpdate({ target: subscriptions.userId, set: { plan } });
   }
 
   async function withServer<T>(
@@ -230,6 +267,79 @@ describe("the monitor routes", () => {
           label: "Bright Data API key",
           environmentVariable: "BRIGHTDATA_API_KEY",
         });
+      });
+    });
+
+    /**
+     * BUG-019. US-081 stripped the machine's keys from the connections screen
+     * and left this page reading `process.env`, so an instance taking
+     * registrations reported a key as present that no poll would use: the form
+     * offered a monitor, the monitor started, and the poll found nothing.
+     *
+     * Nothing went red because no monitor-route test ran with signup open.
+     * These two are that case, and the pair is the point — the same deployment
+     * and the same key, answered differently by the one setting that decides
+     * whose money it is.
+     */
+    it("reports an environment key as missing where signup is open", async () => {
+      await withServer({ environment: configured, signup: "open" }, async (app) => {
+        const body = (await app.inject({ method: "GET", url: "/api/monitor-options" })).json();
+        const reddit = body.sources.find((source: { id: string }) => source.id === "reddit");
+
+        expect(reddit.ready).toBe(false);
+        expect(
+          reddit.missingCredentials.map(
+            (credential: { environmentVariable: string }) => credential.environmentVariable,
+          ),
+        ).toContain("BRIGHTDATA_API_KEY");
+      });
+    });
+
+    /**
+     * US-128. The form is where a person first meets the plan they bought: an
+     * account whose keys are included ticks Reddit and starts, with no key and
+     * no second account anywhere.
+     */
+    it("reports it as present to an account whose plan includes it", async () => {
+      await onPlan("keys_included");
+
+      await withServer({ environment: configured, signup: "open", charging: true }, async (app) => {
+        const body = (await app.inject({ method: "GET", url: "/api/monitor-options" })).json();
+        const reddit = body.sources.find((source: { id: string }) => source.id === "reddit");
+
+        expect(reddit.ready).toBe(true);
+        expect(reddit.missingCredentials).toEqual([]);
+      });
+    });
+
+    /**
+     * And the way back. An account that leaves the plan has monitors with no
+     * key behind them, and the honest answer is the sentence naming the key
+     * rather than a poll that fails at whatever hour the schedule picked.
+     */
+    it("reports it as missing again to an account on the plan that brings its own", async () => {
+      await onPlan("own_keys");
+
+      await withServer({ environment: configured, signup: "open", charging: true }, async (app) => {
+        const body = (await app.inject({ method: "GET", url: "/api/monitor-options" })).json();
+        const reddit = body.sources.find((source: { id: string }) => source.id === "reddit");
+
+        expect(reddit.ready).toBe(false);
+        expect(
+          reddit.missingCredentials.map(
+            (credential: { environmentVariable: string }) => credential.environmentVariable,
+          ),
+        ).toContain("BRIGHTDATA_API_KEY");
+      });
+    });
+
+    it("reports the same key as present where signup is closed", async () => {
+      await withServer({ environment: configured, signup: "closed" }, async (app) => {
+        const body = (await app.inject({ method: "GET", url: "/api/monitor-options" })).json();
+        const reddit = body.sources.find((source: { id: string }) => source.id === "reddit");
+
+        expect(reddit.ready).toBe(true);
+        expect(reddit.missingCredentials).toEqual([]);
       });
     });
 
@@ -573,6 +683,27 @@ describe("the monitor routes", () => {
         expect(body.paused).toBe(true);
         expect(body.missingCredentials[0].environmentVariable).toBe("BRIGHTDATA_API_KEY");
         expect(body.missingCredentials[0].label).toBe("Bright Data API key");
+      });
+    });
+
+    /**
+     * BUG-019, at the write path. The key is in this deployment's environment
+     * and signup is open, so it is not this account's to spend: the monitor is
+     * created paused, exactly as if the variable were unset.
+     */
+    it("creates it paused where the only key is the machine's and signup is open", async () => {
+      await withServer({ environment: configured, signup: "open" }, async (app) => {
+        const response = await app.inject({
+          method: "POST",
+          url: "/api/monitors",
+          payload: newMonitor,
+        });
+
+        expect(response.statusCode).toBe(201);
+        const body = response.json();
+
+        expect(body.paused).toBe(true);
+        expect(body.missingCredentials[0].environmentVariable).toBe("BRIGHTDATA_API_KEY");
       });
     });
   });

@@ -185,6 +185,9 @@ export {
 } from "./auth/verification.js";
 export { type SendEmail, verificationMessage } from "./auth/verification-email.js";
 export {
+  type AccountKeys,
+  type AccountKeysOptions,
+  accountKeys,
   applyStripeSubscription,
   type BillingEnvironment,
   type BillingEvent,
@@ -206,7 +209,11 @@ export {
   linkStripeCustomer,
   type PlanPrice,
   type PortalRequest,
+  planForPrice,
+  planKeyedCache,
+  planOf,
   readEntitlement,
+  readPlan,
   readSubscription,
   requiredBillingVariables,
   type StripeSubscriptionState,
@@ -245,14 +252,18 @@ export {
   type Env,
   envSchema,
   loadAiEnv,
+  loadBillingModeEnv,
   loadEnv,
   loadNotificationEnv,
   loadSignupEnv,
   type NotificationEnv,
 } from "./config/env.js";
 export {
+  accountModelEnvironment,
   machineKeysUsable,
+  machineKeysUsableFor,
   providerKeyEnvironment,
+  providerKeyEnvironmentFor,
   webhookSecretEnvironment,
   withoutMachineModelKeys,
 } from "./config/machine-keys.js";
@@ -305,6 +316,7 @@ export {
   replyPrompts,
   type Signal,
   type Source,
+  type SubscriptionPlan,
   type SubscriptionStatus,
   sessions,
   signals,
@@ -313,6 +325,7 @@ export {
   sourceCredentials,
   sourceProviders,
   sources,
+  subscriptionPlans,
   subscriptionStatuses,
   subscriptions,
   users,

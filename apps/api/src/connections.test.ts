@@ -33,6 +33,8 @@ import {
   setProviderChoice,
   sourceCredentials,
   sourceProviders,
+  subscriptions,
+  users,
 } from "@signalscout/core";
 import { createTestDatabase, type TestDatabase } from "@signalscout/core/testing";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
@@ -100,6 +102,8 @@ describe("connecting a provider", () => {
     await db.delete(sourceCredentials);
     await db.delete(sourceProviders);
     await db.delete(monitors);
+    await db.delete(subscriptions);
+    await db.delete(users);
   });
 
   async function server(options: {
@@ -107,6 +111,8 @@ describe("connecting a provider", () => {
     environment?: Record<string, string | undefined>;
     encryption?: Record<string, string | undefined>;
     signup?: "open" | "closed";
+    /** US-128: whether this deployment charges, so a plan can mean anything. */
+    charging?: boolean;
   }) {
     return buildServer({
       session: asOwner,
@@ -120,7 +126,31 @@ describe("connecting a provider", () => {
       environment: options.environment ?? {},
       encryption: options.encryption ?? { ENCRYPTION_KEY: encryptionKey },
       queryGenerator: null,
+      ...(options.charging
+        ? {
+            billingSettings: {
+              mode: "stripe" as const,
+              apiKey: "sk_test_not_a_real_key",
+              priceId: "price_own",
+              keysIncludedPriceId: "price_included",
+              webhookSecret: "whsec_test",
+              appUrl: "https://app.example.test",
+            },
+          }
+        : {}),
     });
+  }
+
+  /** Put the signed-in account on one plan. US-128. */
+  async function onPlan(plan: "own_keys" | "keys_included") {
+    await db
+      .insert(users)
+      .values({ id: owner, name: owner, email: `${owner}@example.test` })
+      .onConflictDoNothing();
+    await db
+      .insert(subscriptions)
+      .values({ userId: owner, status: "active", plan })
+      .onConflictDoUpdate({ target: subscriptions.userId, set: { plan } });
   }
 
   async function stored() {
@@ -261,6 +291,49 @@ describe("connecting a provider", () => {
       const app = await server({
         environment: { BRIGHTDATA_API_KEY: goodKey },
         signup: "open",
+      });
+
+      try {
+        const field = (await app.inject({ method: "GET", url: "/api/connections" })).json()
+          .providers[0].credentials[0];
+
+        expect(field.fromEnvironment).toBe(false);
+        expect(field.configured).toBe(false);
+      } finally {
+        await app.close();
+      }
+    });
+
+    /**
+     * US-128. The same instance, the same key, and the answer now depends on
+     * the account reading the page. This is the screen half of the plan: an
+     * account whose plan includes the keys is never asked for one.
+     */
+    it("offers the environment's key to an account whose plan includes it", async () => {
+      await onPlan("keys_included");
+      const app = await server({
+        environment: { BRIGHTDATA_API_KEY: goodKey },
+        signup: "open",
+        charging: true,
+      });
+
+      try {
+        const field = (await app.inject({ method: "GET", url: "/api/connections" })).json()
+          .providers[0].credentials[0];
+
+        expect(field.fromEnvironment).toBe(true);
+        expect(field.configured).toBe(true);
+      } finally {
+        await app.close();
+      }
+    });
+
+    it("withholds it from an account on the plan that brings its own", async () => {
+      await onPlan("own_keys");
+      const app = await server({
+        environment: { BRIGHTDATA_API_KEY: goodKey },
+        signup: "open",
+        charging: true,
       });
 
       try {

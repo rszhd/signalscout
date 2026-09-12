@@ -1,9 +1,11 @@
 import { existsSync } from "node:fs";
 import fastifyStatic from "@fastify/static";
 import {
+  type AccountKeys,
   type AiConfig,
   type AiEnvironment,
   type Auth,
+  accountKeys,
   aiConfigFromEnvironment,
   type BillingProvider,
   type BillingSettings,
@@ -20,16 +22,13 @@ import {
   emailVerificationRequired,
   type JobSender,
   type Logger,
-  machineKeysUsable,
   needsApiKey,
   notificationReadiness,
   type ProjectDescriber,
-  providerKeyEnvironment,
   type QueryGenerator,
   readAiEnvironment,
   type SendEmail,
   storedCredentialNames,
-  withoutMachineModelKeys,
 } from "@signalscout/core";
 import Fastify, {
   type FastifyInstance,
@@ -339,13 +338,13 @@ export function trustedOrigins(env: Env): string[] {
 export function aiEnvironmentFor(
   db: Database,
   env: Env,
+  keys: AccountKeys,
 ): (userId: string) => Promise<AiEnvironment> {
-  // On an instance taking registrations the machine's model keys are nobody's
-  // to spend, so the account's own settings are laid over an environment that
-  // has none. US-081, and `config/machine-keys.ts` holds the reasoning.
-  const instance = machineKeysUsable(env.AUTH_SIGNUP) ? env : withoutMachineModelKeys(env);
-
-  return (userId) => readAiEnvironment(db, userId, instance);
+  // The account's own settings are laid over an environment that holds the
+  // machine's model key only where this account may spend it. US-081 asked that
+  // once for the whole instance; US-128 asks it per person, because the plan
+  // whose keys are included is one account answering differently from the next.
+  return async (userId) => readAiEnvironment(db, userId, await keys.model(userId, env));
 }
 
 export function queryGeneratorForEnvironment(
@@ -401,6 +400,7 @@ export async function buildServer({
           BILLING_MODE: env.BILLING_MODE,
           STRIPE_SECRET_KEY: env.STRIPE_SECRET_KEY,
           STRIPE_PRICE_ID: env.STRIPE_PRICE_ID,
+          STRIPE_PRICE_ID_KEYS_INCLUDED: env.STRIPE_PRICE_ID_KEYS_INCLUDED,
           STRIPE_WEBHOOK_SECRET: env.STRIPE_WEBHOOK_SECRET,
           APP_URL: env.APP_URL,
         })
@@ -458,7 +458,21 @@ export async function buildServer({
    * deployment has none". Only the *fallback* changed: it used to read the
    * environment once and now reads the person's settings over it.
    */
-  const aiFor = aiEnvironmentFor(db, env);
+  /**
+   * Whose keys each account may spend. US-128.
+   *
+   * One object, built once, asked per request. The rule underneath is
+   * `config/machine-keys.ts` as it always was — what changed is that the answer
+   * is about the account rather than about the instance, so it has to be asked
+   * where the account is known instead of here.
+   */
+  const keys = accountKeys(db, {
+    signup: env.AUTH_SIGNUP,
+    mode: settings?.mode ?? "off",
+    ...(environment ? { environment } : {}),
+  });
+
+  const aiFor = aiEnvironmentFor(db, env, keys);
 
   await registerProjectRoutes(app, {
     db,
@@ -467,24 +481,34 @@ export async function buildServer({
   });
   await registerNotificationRoutes(app, { db, env, encryption, signup: env.AUTH_SIGNUP });
 
-  // The provider keys an account may spend. Empty where signup is open, which
-  // every reader of it then answers correctly with no branch of its own.
-  const providerKeys = providerKeyEnvironment(env.AUTH_SIGNUP, environment);
+  /**
+   * The provider keys one account may spend, asked per request. US-128.
+   *
+   * Empty for an account that brings its own, which every reader of it then
+   * answers correctly with no branch of its own: the connections screen says
+   * the key is missing, the pricing page says the provider is not connected,
+   * and the monitor form refuses to start a monitor the poll would refuse.
+   */
+  const providerKeysFor = (userId: string) => keys.provider(userId);
 
   await registerConnectionRoutes(app, {
     db,
     sources,
-    environment: providerKeys,
+    environmentFor: providerKeysFor,
     encryption,
     logger,
   });
-  await registerPricingRoutes(app, { db, sources, environment: providerKeys });
+  await registerPricingRoutes(app, { db, sources, environmentFor: providerKeysFor });
   await registerModelRoutes(app, {
     db,
-    // The same environment with the machine's model keys taken out where they
-    // are nobody's to spend, so the screen's "this instance's key" is offered
-    // only where there is one to offer. US-081.
-    env: machineKeysUsable(env.AUTH_SIGNUP) ? env : { ...env, ...withoutMachineModelKeys(env) },
+    // The deployment's own settings, for the provider, the model and the base
+    // URL this instance was configured with.
+    env,
+    // The same environment with the machine's model key taken out where it is
+    // not this account's to spend, so the screen's "this instance's key" is
+    // offered only where there is one to offer. US-081, per account since
+    // US-128.
+    envFor: (userId) => keys.model(userId, env),
     encryption,
     ...(modelProbe ? { probe: modelProbe } : {}),
   });
@@ -497,7 +521,13 @@ export async function buildServer({
   await registerMonitorRoutes(app, {
     db,
     sources,
-    environment,
+    // The same stripped environment the connections screen reads, and BUG-019
+    // is what happened while this said `environment` instead. The raw options
+    // object is undefined in production, so `startBlockers` fell back to
+    // `process.env` and reported the machine's key as present to an account
+    // that may not spend it: the form offered a monitor every poll refuses.
+    // Every reader of a provider key on this page reads one value.
+    environmentFor: providerKeysFor,
     // US-093: whether a new monitor's email notifications can be switched on.
     // The same list the notification screen and its save route read, asked
     // once here so the monitor routes never see the SMTP settings.

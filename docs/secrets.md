@@ -26,15 +26,29 @@ pastes their own key on the connections screen, and a poll uses the key
 belonging to **the owner of the monitor being polled**. An account with no key
 of its own cannot start a monitor, and the form names the key it wants.
 
-**Where signup is open, the keys in `.env` are not offered to anybody.**
-US-081. Until then this paragraph said *empty the environment before you open
-signup, or accept the bill* — and advice is a thing somebody skips, so it is
-the behaviour now. `config/machine-keys.ts` is the whole rule, asked once per
-composition root, and every layer below is handed an environment with the keys
-already gone. Only the keys go: the provider, the model, the endpoint and the
+**Where signup is open, the keys in `.env` are not offered to anybody — unless
+the account's plan includes them.** US-081, then US-128. Before US-081 this
+paragraph said *empty the environment before you open signup, or accept the
+bill*, and advice is a thing somebody skips, so it became behaviour.
+`config/machine-keys.ts` is still the whole rule. What changed in US-128 is who
+it is asked about: `machineKeysUsableFor(signup, plan)` answers per account, and
+a composition root builds one `accountKeys` object and asks it per request and
+per job. Every layer below is handed an environment with the keys already gone
+or already there, and none of them learns why.
+
+Only the keys move either way: the provider, the model, the endpoint and the
 prices are what the deployment was configured and measured for. With signup
 closed nothing changes, which is the point of tying the rule to signup rather
 than applying it everywhere.
+
+**The plan comes from Stripe and from nowhere else.** `subscriptions.plan` is
+written by the webhook, from the price the subscription names —
+`STRIPE_PRICE_ID_KEYS_INCLUDED` is what this deployment sells that plan as. No
+screen sets it. Every unknown reads as `own_keys`: no row, no column value, a
+price this instance was never told about, a webhook that has not arrived. The
+direction is the whole design, and it is the opposite of `entitlementFor`'s —
+being allowed to poll and being allowed to poll *on our keys* are different
+questions, and only one of them arrives as an invoice.
 
 **A model key follows the same rule, with two differences.** US-068 and
 US-079. The Models screen stores keys on the account, in `ai_keys`, encrypted

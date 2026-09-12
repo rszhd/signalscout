@@ -460,8 +460,14 @@ export interface MonitorRoutesOptions {
   readonly db: Database;
   /** The connectors this build ships, read for their credential fields. */
   readonly sources: readonly ConnectorDescriptor[];
-  /** The environment half of where a source key lives. */
-  readonly environment?: Record<string, string | undefined>;
+  /**
+   * The environment half of where a source key lives, for one account.
+   *
+   * A function of the owner since US-128. Before it, this was a record and the
+   * composition root handed over the wrong one — BUG-019, where the form read
+   * the machine's keys and offered a monitor that every poll then refused.
+   */
+  readonly environmentFor?: (userId: string) => Promise<Record<string, string | undefined>>;
   /**
    * Whether this deployment has a working mailer. US-093.
    *
@@ -521,12 +527,13 @@ function switchedOffSources(
 
 function monitorEnvironment(
   options: MonitorRoutesOptions,
+  environment: Record<string, string | undefined>,
   storedCredentials: ReadonlySet<string>,
   providerChoices: ProviderChoices,
 ): MonitorEnvironment {
   return {
     descriptors: options.sources,
-    environment: options.environment,
+    environment,
     storedCredentials,
     providerChoices,
   };
@@ -688,6 +695,16 @@ export async function registerMonitorRoutes(
   const stored = options.storedCredentials ?? (() => new Set<string>());
 
   /**
+   * Which of the machine's keys this account may spend. US-128.
+   *
+   * Read per request, beside the stored keys, for the same reason they are: the
+   * answer changes while this process runs. A plan bought this morning is a
+   * monitor that can start this afternoon, and a plan that lapsed is a monitor
+   * that reports its key as missing rather than failing at the next poll.
+   */
+  const environmentFor = options.environmentFor ?? (async () => process.env);
+
+  /**
    * What this *person* can poll with. US-067.
    *
    * A key is an account's since US-067, so "is Reddit ready?" is a question
@@ -700,12 +717,13 @@ export async function registerMonitorRoutes(
     // writes a key and a provider choice into this running process, and a
     // value captured at registration would keep answering with the old one
     // until a restart.
-    const [storedCredentials, providerChoices] = await Promise.all([
+    const [storedCredentials, providerChoices, environment] = await Promise.all([
       stored(userId),
       readProviderChoices(db, userId),
+      environmentFor(userId),
     ]);
 
-    return monitorEnvironment(options, storedCredentials, providerChoices);
+    return monitorEnvironment(options, environment, storedCredentials, providerChoices);
   }
 
   /**

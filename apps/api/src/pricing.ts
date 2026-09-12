@@ -69,7 +69,14 @@ export const comparedPosts = 50;
 export interface PricingRoutesOptions {
   readonly db: Database;
   readonly sources: readonly ConnectorDescriptor[];
-  readonly environment?: Record<string, string | undefined>;
+  /**
+   * The environment half of where a key lives, for one account. US-128.
+   *
+   * A function of the owner, like the connections screen's: this page says
+   * which providers are connected, and on an instance taking registrations that
+   * is an answer about the person reading it rather than about the machine.
+   */
+  readonly environmentFor?: (userId: string) => Promise<Record<string, string | undefined>>;
 }
 
 const money = z.object({
@@ -171,7 +178,7 @@ export async function registerPricingRoutes(
   options: PricingRoutesOptions,
 ): Promise<void> {
   const { db, sources } = options;
-  const environment = options.environment ?? process.env;
+  const environmentFor = options.environmentFor ?? (async () => process.env);
   const platforms = groupByPlatform(sources);
 
   app.route({
@@ -243,8 +250,9 @@ export async function registerPricingRoutes(
       const returnedBy = new Map(returns.map((row) => [`${row.source}:${row.provider}`, row]));
 
       const verdicts = await verdictCount(db, sessionUserId(request));
+      const environment = await environmentFor(sessionUserId(request));
 
-      /** Which credential fields this deployment is missing for one provider. */
+      /** Which credential fields this account is missing for one provider. */
       function missingFor(connector: ConnectorDescriptor): string[] {
         return connector.provider.credentialFields
           .filter((field) => {

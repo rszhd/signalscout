@@ -119,6 +119,15 @@ export interface MonitorEnvironment {
   /**
    * The environment half of where a key lives. `source_credentials` is the
    * other half, and `storedCredentials` below is what it holds.
+   *
+   * **A caller answering for one account passes
+   * `providerKeyEnvironment(signup)` and not its own `process.env`.** Omitting
+   * it falls back to the whole environment, which describes the machine rather
+   * than the account: where signup is open the machine's keys are nobody's to
+   * spend, so the fallback reports a key as present that no poll will use.
+   * BUG-019 was that, through an options object that carried `undefined`. The
+   * default stays for the boot line in `start.ts`, which asks about the
+   * deployment and not about anybody's account.
    */
   readonly environment?: Record<string, string | undefined>;
   /**

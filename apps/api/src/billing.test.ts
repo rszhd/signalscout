@@ -46,6 +46,9 @@ const settings: BillingSettings = {
   mode: "stripe",
   apiKey: "sk_test_not_a_real_key",
   priceId: "price_test",
+  // US-128. A deployment that sells the keys-included plan names its price
+  // here; these cases are about the gate and the webhook, so they sell one.
+  keysIncludedPriceId: undefined,
   webhookSecret: "whsec_test",
   appUrl: "https://app.example.test",
 };
@@ -278,13 +281,19 @@ describe("the billing routes", () => {
     await db.delete(users);
   });
 
-  async function server(userId: string): Promise<ApiServer> {
+  async function server(userId: string, lines?: string[]): Promise<ApiServer> {
     recorded = { checkout: [], portal: [], next: { kind: "ignored", type: "none" } };
     const env = loadEnv({ DATABASE_URL: database.url, AUTH_SECRET: "x".repeat(32) });
 
     return buildServer({
       env,
-      logger,
+      logger: lines
+        ? createLogger({
+            level: "error",
+            name: "billing-test",
+            destination: { write: (line: string) => lines.push(line) },
+          })
+        : logger,
       db,
       auth: null,
       session: asUser(userId),
@@ -523,6 +532,8 @@ describe("the billing routes", () => {
         stripeCustomerId: "cus_paid",
         stripeSubscriptionId: "sub_1",
         status: "active",
+        plan: "own_keys",
+        priceId: "price_own",
         currentPeriodEnd: periodEnd,
         cancelAtPeriodEnd: false,
         trialEndsAt: null,
@@ -545,6 +556,103 @@ describe("the billing routes", () => {
       expect(stored?.currentPeriodEnd?.toISOString()).toBe(periodEnd.toISOString());
       // The seven days are kept, so a screen can still say when they ended.
       expect(stored?.trialEndsAt).not.toBeNull();
+    } finally {
+      await app.close();
+    }
+  });
+
+  /**
+   * US-128. The plan reaches the column the only way it can: from the price
+   * Stripe names, through the webhook. No screen sets it and no route does,
+   * which is what stops a person choosing the expensive plan by choosing it.
+   */
+  it("writes the plan the price named, and moves it back when Stripe says so", async () => {
+    const id = await account(`plan-${randomUUID()}`);
+    await startTrial(db, id);
+    await db.update(subscriptions).set({ stripeCustomerId: "cus_plan" });
+
+    const app = await server(id);
+
+    const event = (plan: "own_keys" | "keys_included") => ({
+      kind: "subscription" as const,
+      type: "customer.subscription.updated",
+      state: {
+        stripeCustomerId: "cus_plan",
+        stripeSubscriptionId: "sub_plan",
+        status: "active" as const,
+        plan,
+        priceId: plan === "keys_included" ? "price_included" : "price_own",
+        currentPeriodEnd: new Date("2026-10-08T00:00:00Z"),
+        cancelAtPeriodEnd: false,
+        trialEndsAt: null,
+      },
+    });
+
+    const deliver = async () =>
+      app.inject({
+        method: "POST",
+        url: billingWebhookPath,
+        headers: { "stripe-signature": "t=1,v1=fine", "content-type": "application/json" },
+        payload: JSON.stringify({ type: "customer.subscription.updated" }),
+      });
+
+    try {
+      recorded.next = event("keys_included");
+      expect((await deliver()).statusCode).toBe(200);
+      expect((await readSubscription(db, id))?.plan).toBe("keys_included");
+
+      // And back. An account that moves off the plan stops spending our keys,
+      // and this is the write that says so.
+      recorded.next = event("own_keys");
+      expect((await deliver()).statusCode).toBe(200);
+      expect((await readSubscription(db, id))?.plan).toBe("own_keys");
+    } finally {
+      await app.close();
+    }
+  });
+
+  /**
+   * US-128. A price neither variable names is read as the plan that spends the
+   * account's own money, which is the safe direction and a silent one: an
+   * operator who mistyped `STRIPE_PRICE_ID_KEYS_INCLUDED` would see paying
+   * accounts on the cheaper plan and no error anywhere. So it is an error.
+   */
+  it("says so when a subscription names a price this instance does not sell", async () => {
+    const id = await account(`unknown-price-${randomUUID()}`);
+    await startTrial(db, id);
+    await db.update(subscriptions).set({ stripeCustomerId: "cus_unknown_price" });
+
+    const lines: string[] = [];
+    const app = await server(id, lines);
+
+    recorded.next = {
+      kind: "subscription",
+      type: "customer.subscription.updated",
+      state: {
+        stripeCustomerId: "cus_unknown_price",
+        stripeSubscriptionId: "sub_unknown",
+        status: "active",
+        plan: "own_keys",
+        priceId: "price_nobody_configured",
+        currentPeriodEnd: null,
+        cancelAtPeriodEnd: false,
+        trialEndsAt: null,
+      },
+    };
+
+    try {
+      const response = await app.inject({
+        method: "POST",
+        url: billingWebhookPath,
+        headers: { "stripe-signature": "t=1,v1=fine", "content-type": "application/json" },
+        payload: JSON.stringify({ type: "customer.subscription.updated" }),
+      });
+
+      // Answered, and stored, and complained about. The account keeps polling
+      // on its own keys, which is what the safe direction means.
+      expect(response.statusCode).toBe(200);
+      expect((await readSubscription(db, id))?.plan).toBe("own_keys");
+      expect(lines.join("\n")).toContain("price_nobody_configured");
     } finally {
       await app.close();
     }

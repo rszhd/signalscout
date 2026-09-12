@@ -60,12 +60,19 @@ import type { ApiServer } from "./server.js";
 export interface ConnectionRoutesOptions {
   readonly db: Database;
   readonly sources: readonly ConnectorDefinition[];
-  /** The environment half of where a key lives. Injected so a test has none. */
-  readonly environment?: Record<string, string | undefined>;
+  /**
+   * The environment half of where a key lives, for one account.
+   *
+   * A function of the owner since US-128, because the answer is no longer a
+   * property of the machine: on an instance taking registrations the keys in
+   * `.env` belong to the accounts whose plan includes them and to nobody else.
+   * Injected so a test has none.
+   */
+  readonly environmentFor?: (userId: string) => Promise<Record<string, string | undefined>>;
   /**
    * Where `ENCRYPTION_KEY` is read from.
    *
-   * Separate from `environment` above, which is the provider keys. A test
+   * Separate from `environmentFor` above, which is the provider keys. A test
    * describes an instance that can store and one that cannot without also
    * having to describe its Reddit key.
    */
@@ -206,7 +213,7 @@ export async function registerConnectionRoutes(
   options: ConnectionRoutesOptions,
 ): Promise<void> {
   const { db, sources, logger } = options;
-  const environment = options.environment ?? process.env;
+  const environmentFor = options.environmentFor ?? (async () => process.env);
   const encryption = options.encryption ?? process.env;
   const providers = providersOf(sources);
   const platformEntries = groupByPlatform(sources);
@@ -226,6 +233,7 @@ export async function registerConnectionRoutes(
   async function view(userId: string, provider: ProviderEntry) {
     const { descriptor } = provider;
     const hints = await hintsFor(userId, descriptor.id);
+    const environment = await environmentFor(userId);
 
     const credentials: FieldView[] = descriptor.credentialFields.map((field) => {
       const storedHint = hints.get(field.name) ?? null;
@@ -261,6 +269,7 @@ export async function registerConnectionRoutes(
   async function connectedProviders(userId: string): Promise<Set<string>> {
     const hints = await listCredentialHints(db, userId);
     const stored = new Set(hints.map((hint) => `${hint.provider}:${hint.field}`));
+    const environment = await environmentFor(userId);
     const connected = new Set<string>();
 
     for (const { descriptor } of providers) {
@@ -418,6 +427,7 @@ export async function registerConnectionRoutes(
     typed: Record<string, string>,
   ): Promise<{ credentials: SourceCredentials } | { missing: string }> {
     const key = optionalEncryptionKey(encryption);
+    const environment = await environmentFor(userId);
     const credentials: Record<string, string> = {};
 
     for (const field of descriptor.credentialFields) {

@@ -33,7 +33,10 @@ touching a connector.
 same Postgres, `AUTH_SIGNUP` deciding whether anybody else may register, and
 every provider key, model key and provider choice scoped to an account.
 `BILLING_MODE` is `off` by default, so a self-hosted instance meets none of
-Stripe. Read [docs/accounts.md](docs/accounts.md) and
+Stripe. **There are two plans**: bring your own keys, and a second one where the
+account spends the instance's — `subscriptions.plan`, written by the webhook
+from the price, and every unknown reads as the plan that spends its own money.
+Read [docs/accounts.md](docs/accounts.md) and
 [docs/billing.md](docs/billing.md).
 
 **Every default is the self-hosted answer.** `AUTH_SIGNUP=closed`,
@@ -133,8 +136,11 @@ migration in the same change.
 
 **Scoping a route means scoping every read in it.** BUG-009 scoped the keys on
 the providers page and left the spend, the counts and the verdicts answering
-for the whole instance, so a new account saw somebody else's numbers. Nothing
-went red, because nothing on that page was scoped by a test. Count the reads.
+for the whole instance, so a new account saw somebody else's numbers. BUG-019
+was the same shape a rule later: US-081 stripped the machine's keys from three
+readers and the monitor routes kept a fourth, which then offered a monitor every
+poll refuses. Both times nothing went red, because nothing on that page was
+scoped by a test. Count the reads, and give each one a case.
 
 **One migration number, one file.** Two branches that each take the next number
 merge cleanly and break at boot.
@@ -204,6 +210,8 @@ naming its failure shape.
 - **Deletion reconciliation** — removed content still being shown
 - **Session gate** — a route answering a stranger, and looking normal doing it
 - **Entitlement** — an account that stopped paying still polling, on our bill
+- **Plan** — an account polling and classifying on the instance's keys without
+  the plan that pays for them
 
 A rule is only as tested as its least-tested caller. After asserting the rule,
 count the call sites and give each its own case.

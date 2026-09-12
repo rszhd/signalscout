@@ -21,6 +21,7 @@
  */
 import Stripe from "stripe";
 import type { SubscriptionStatus } from "../db/schema.js";
+import { planForPrice } from "./plan.js";
 import type { StripeSubscriptionState } from "./store.js";
 
 /**
@@ -165,9 +166,29 @@ export function periodEndOf(subscription: Stripe.Subscription): Date | null {
   return fromUnixSeconds(item?.current_period_end);
 }
 
-/** The part of a Stripe subscription this database keeps. */
+/**
+ * Which price this subscription is on, from the same item the period end is on.
+ *
+ * One item, because this product sells one line. A subscription somebody built
+ * in the dashboard with two lines answers with the first, which is not a shape
+ * this integration creates and not one it pretends to understand.
+ */
+export function priceIdOf(subscription: Stripe.Subscription): string | null {
+  const [item] = subscription.items?.data ?? [];
+  return item?.price?.id ?? null;
+}
+
+/**
+ * The part of a Stripe subscription this database keeps.
+ *
+ * `keysIncludedPriceId` is what this deployment sells the keys-included plan
+ * as. Undefined means it sells no such plan, and then every subscription is on
+ * `own_keys` however its price is named — a price cannot put an account on a
+ * plan this instance was never configured for.
+ */
 export function stateFromSubscription(
   subscription: Stripe.Subscription,
+  keysIncludedPriceId?: string,
 ): StripeSubscriptionState | null {
   const stripeCustomerId = customerIdOf(subscription.customer);
   if (!stripeCustomerId) return null;
@@ -176,6 +197,8 @@ export function stateFromSubscription(
     stripeCustomerId,
     stripeSubscriptionId: subscription.id,
     status: statusFromStripe(subscription.status),
+    plan: planForPrice(priceIdOf(subscription), keysIncludedPriceId),
+    priceId: priceIdOf(subscription),
     currentPeriodEnd: periodEndOf(subscription),
     cancelAtPeriodEnd: subscription.cancel_at_period_end,
     trialEndsAt: fromUnixSeconds(subscription.trial_end),
@@ -216,6 +239,16 @@ function raiseUnstatablePrice(priceId: string): never {
 export interface StripeBillingOptions {
   readonly apiKey: string;
   readonly priceId: string;
+  /**
+   * The price of the plan whose keys are included, where this deployment sells
+   * one. US-128.
+   *
+   * Optional, unlike the four in `requiredBillingVariables`. A deployment that
+   * has not named it sells one plan, which is every deployment running today —
+   * and the failure of leaving it out is visible on the billing screen rather
+   * than quiet, so it does not belong on the list the boot check refuses over.
+   */
+  readonly keysIncludedPriceId?: string | undefined;
   readonly webhookSecret: string;
   /** Injected by the test that drives the mapping without a network. */
   readonly client?: Stripe;
@@ -232,6 +265,7 @@ export const integrationIdentifier = "signalscout_cloudsubs";
 export function createStripeBilling({
   apiKey,
   priceId,
+  keysIncludedPriceId,
   webhookSecret,
   client,
 }: StripeBillingOptions): BillingProvider {
@@ -276,6 +310,16 @@ export function createStripeBilling({
           ? Math.floor(request.trialEndsAt.getTime() / 1000)
           : undefined;
 
+      /**
+       * One line, and it is always `priceId`. US-128.
+       *
+       * `keysIncludedPriceId` is read by the webhook and not offered here,
+       * which is deliberate and temporary: an account on that plan spends this
+       * instance's providers and model, and nothing yet caps what one account
+       * may spend of them. US-129 is that cap. Until it closes, the plan can be
+       * put on an account from Stripe's own dashboard — where somebody is
+       * watching — and not bought from a button.
+       */
       const session = await stripe.checkout.sessions.create({
         mode: "subscription",
         customer: customerId,
@@ -315,7 +359,10 @@ export function createStripeBilling({
       const event = await stripe.webhooks.constructEventAsync(payload, signature, webhookSecret);
 
       if (event.type.startsWith("customer.subscription.")) {
-        const state = stateFromSubscription(event.data.object as Stripe.Subscription);
+        const state = stateFromSubscription(
+          event.data.object as Stripe.Subscription,
+          keysIncludedPriceId,
+        );
         return state
           ? { kind: "subscription", type: event.type, state }
           : { kind: "ignored", type: event.type };
@@ -334,7 +381,7 @@ export function createStripeBilling({
         if (!subscriptionId) return { kind: "ignored", type: event.type };
 
         const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-        const state = stateFromSubscription(subscription);
+        const state = stateFromSubscription(subscription, keysIncludedPriceId);
         return state
           ? { kind: "subscription", type: event.type, state }
           : { kind: "ignored", type: event.type };

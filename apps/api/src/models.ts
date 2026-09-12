@@ -62,6 +62,16 @@ import type { ApiServer } from "./server.js";
 export interface ModelRoutesOptions {
   readonly db: Database;
   readonly env: Env;
+  /**
+   * The same environment, as one account may spend it. US-128.
+   *
+   * Only one thing differs between the two: whether the machine's model key is
+   * in it. That decides whether this screen offers "this instance's key" at
+   * all, which US-081 made a property of the instance and US-128 makes a
+   * property of the plan. Everything else here — the provider, the model, the
+   * base URL, the timeout — is the deployment's and is read from `env` above.
+   */
+  readonly envFor?: (userId: string) => Promise<Env>;
   /** Where `ENCRYPTION_KEY` is read from. A test describes an instance without one. */
   readonly encryption?: Record<string, string | undefined>;
   /**
@@ -274,6 +284,7 @@ export async function registerModelRoutes(
   {
     db,
     env,
+    envFor = async () => env,
     encryption = process.env,
     probe = probeChatModel,
     probeEmbedding = probeEmbeddingModel,
@@ -287,7 +298,7 @@ export async function registerModelRoutes(
    * measured and a second copy of them here would answer a different question
    * from the one the worker answers.
    */
-  function instanceHasKey(task: AiTask): boolean {
+  function instanceHasKey(env: Env, task: AiTask): boolean {
     if (task === "embed") {
       const config = embeddingConfigFromEnvironment(env);
 
@@ -306,12 +317,15 @@ export async function registerModelRoutes(
     return !needsApiKey(config.provider) || Boolean(config.apiKey);
   }
 
-  function instanceFor(task: AiTask): {
+  function instanceFor(
+    env: Env,
+    task: AiTask,
+  ): {
     provider: string;
     model: string | null;
     hasKey: boolean;
   } {
-    const hasKey = instanceHasKey(task);
+    const hasKey = instanceHasKey(env, task);
 
     if (task === "triage") {
       return {
@@ -348,6 +362,7 @@ export async function registerModelRoutes(
    * self-hosted instance and every account that has marked no default.
    */
   function fallbackFor(
+    env: Env,
     task: AiTask,
     fallbackKey: { id: string; name: string; provider: string | null } | undefined,
   ): {
@@ -358,7 +373,7 @@ export async function registerModelRoutes(
     keyName: string | null;
     keyId: string | null;
   } {
-    const machine = instanceFor(task);
+    const machine = instanceFor(env, task);
 
     if (!fallbackKey || !followsDefault(fallbackKey.provider, task)) {
       return { source: "instance", ...machine, keyName: null, keyId: null };
@@ -453,6 +468,10 @@ export async function registerModelRoutes(
   }
 
   async function view(userId: string) {
+    // The instance's key is this account's only where the plan includes it.
+    // US-128, and it is the one thing on this screen that is not the
+    // deployment's own answer.
+    const mineEnv = await envFor(userId);
     const settings = await readAiSettings(db, userId);
     const stored = new Map(settings.map((row) => [row.task, row]));
     const key = optionalEncryptionKey(encryption);
@@ -516,8 +535,8 @@ export async function registerModelRoutes(
           task,
           ...taskViews[task],
           providers: [...(task === "embed" ? embeddingProviders : aiProviders)],
-          instance: instanceFor(task),
-          fallback: fallbackFor(task, fallbackKey),
+          instance: instanceFor(mineEnv, task),
+          fallback: fallbackFor(mineEnv, task, fallbackKey),
           provider: mine?.provider ?? null,
           model: mine?.model ?? null,
           baseUrl: mine?.baseUrl ?? null,
@@ -598,7 +617,7 @@ export async function registerModelRoutes(
        * setting that fails every call — and it would fail quietly, at whatever
        * hour the schedule picked, reading as a bad key.
        */
-      const instanceProvider = instanceFor(request.params.task).provider;
+      const instanceProvider = instanceFor(await envFor(userId), request.params.task).provider;
       const saved = (await readAiSettings(db, userId)).find(
         (row) => row.task === request.params.task,
       );

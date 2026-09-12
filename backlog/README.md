@@ -118,7 +118,10 @@ the short list, so a decision is not reopened by accident.
 
 - **Bring your own keys, for both AI and social APIs.** The user holds the
   account and pays the provider. This is not a fallback mode; it is the
-  product.
+  product — for the self-hosted build, which is the whole application and is
+  unchanged. US-128 added a second plan on the hosted one, where a subscription
+  includes the instance's keys and nobody pastes one. The owner asked for it,
+  on 2026-09-12. PLAN.md, *Bring Your Own Keys*, holds both halves.
 - **Self-hostable first.** The open-source build is the whole application.
   Nothing is removed to make the hosted version worth paying for.
 - **One language, one database, two processes.** TypeScript, Postgres, an API

@@ -414,6 +414,13 @@
       "when": 1789018586490,
       "tag": "0058_a_walk_says_how_far_it_reached",
       "breakpoints": true
+    },
+    {
+      "idx": 59,
+      "version": "7",
+      "when": 1789197658813,
+      "tag": "0059_a_plan_says_whose_keys_pay",
+      "breakpoints": true
     }
   ]
 }

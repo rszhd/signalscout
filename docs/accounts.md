@@ -184,6 +184,15 @@ signup* — and advice is a thing somebody skips. It is now the behaviour. You m
 still leave the keys in `.env`: with signup open they are simply not offered to
 anybody, and switching back to `closed` makes them the fallback again.
 
+**US-128 added one exception and it is a paid one.** A deployment that sets
+`STRIPE_PRICE_ID_KEYS_INCLUDED` sells a second plan, and an account subscribed
+to that price does poll and classify on the keys in `.env`. The question moved
+from the instance to the account: one account on an open instance may answer yes
+while the next answers no. Everything else here is unchanged, and everything
+unknown — no subscription row, a price this instance does not recognise — reads
+as the plan that spends the account's own money. [docs/billing.md](billing.md)
+holds the plan.
+
 What does **not** stop travelling is everything else in `.env`: the provider,
 the model, the endpoint and the prices. Those are what this deployment was
 configured and measured for, and an account that sets nothing keeps them.

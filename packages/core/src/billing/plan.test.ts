@@ -18,7 +18,14 @@ import { createDatabase, type Database } from "../db/client.js";
 import { subscriptions, users } from "../db/schema.js";
 import { createTestDatabase, type TestDatabase } from "../testing/database.js";
 import type { SubscriptionRecord } from "./entitlement.js";
-import { accountKeys, planForPrice, planKeyedCache, planOf, readPlan } from "./plan.js";
+import {
+  accountKeys,
+  keysIncludedAmong,
+  planForPrice,
+  planKeyedCache,
+  planOf,
+  readPlan,
+} from "./plan.js";
 
 function record(overrides: Partial<SubscriptionRecord>): SubscriptionRecord {
   return {
@@ -244,6 +251,58 @@ describe("the plan, and the keys, read from the database", () => {
     expect((await cached("one")).userId).toBe("one");
     expect((await cached("two")).userId).toBe("two");
     expect(built).toEqual(["one", "two"]);
+  });
+
+  /**
+   * US-129. The cap turns on the plan, and on nothing else the account can see.
+   *
+   * The self-hosted case is the one worth the assertion. `machineKeysUsableFor`
+   * says yes there, because `.env` is how one person configures their own
+   * machine — but the money is theirs, so a cap the deployment lends would be a
+   * limit nobody asked for. The two questions are close and they are not the
+   * same one.
+   */
+  it("lends a cap to the plan that spends our money, and to nobody else", async () => {
+    await account("included", "keys_included");
+    await account("own", "own_keys");
+
+    const open = accountKeys(db, {
+      signup: "open",
+      mode: "stripe",
+      environment: machine,
+      capMicros: 15_000_000,
+    });
+
+    expect(await open.cap("included")).toBe(15_000_000);
+    expect(await open.cap("own")).toBeNull();
+
+    const closed = accountKeys(db, {
+      signup: "closed",
+      mode: "stripe",
+      environment: machine,
+      capMicros: 15_000_000,
+    });
+
+    expect(await closed.cap("included")).toBeNull();
+  });
+
+  it("lends no cap where the deployment named none", async () => {
+    await account("included", "keys_included");
+    const keys = accountKeys(db, { signup: "open", mode: "stripe", environment: machine });
+
+    expect(await keys.cap("included")).toBeNull();
+  });
+
+  it("names the accounts on the plan, in one read, for the scheduler", async () => {
+    await account("included", "keys_included");
+    await account("own", "own_keys");
+    await account("no-row");
+
+    expect(await keysIncludedAmong(db, ["included", "own", "no-row"], "stripe")).toEqual([
+      "included",
+    ]);
+    // A deployment that does not charge has no plans to find.
+    expect(await keysIncludedAmong(db, ["included"], "off")).toEqual([]);
   });
 
   /**

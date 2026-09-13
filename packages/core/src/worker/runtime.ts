@@ -31,6 +31,7 @@ import {
   type BillingMode,
   planKeyedCache,
 } from "../billing/index.js";
+import { accountCapFrom } from "../budget/account.js";
 import {
   loadAiEnv,
   loadBillingModeEnv,
@@ -171,6 +172,16 @@ export interface StartWorkerOptions {
    * polling until this is on.
    */
   billing?: BillingMode;
+  /**
+   * What one account may spend of this instance's money in a month, where its
+   * plan includes the keys. US-129.
+   *
+   * Read from `ACCOUNT_MONTHLY_CAP_MICROS` unless a caller says otherwise. It
+   * reaches an account only through `accountKeys`, which answers null for every
+   * account spending its own money — so a self-hosted worker is unaffected by
+   * whatever this says.
+   */
+  accountCapMicros?: number;
 }
 
 /**
@@ -374,6 +385,7 @@ export async function startWorker({
   notificationTransport,
   billing = loadBillingModeEnv(),
   signup = loadSignupEnv(),
+  accountCapMicros = accountCapFrom(process.env),
 }: StartWorkerOptions): Promise<WorkerHandle> {
   // Before any provider is called. See `net.ts`: Node's 250ms per-address
   // connect budget is shorter than several providers take to answer.
@@ -405,7 +417,17 @@ export async function startWorker({
    * the next account's does not. The layers below still receive an environment
    * that is simply right, and still learn nothing about why.
    */
-  const keys = accountKeys(db, { signup, mode: billing });
+  const keys = accountKeys(db, {
+    signup,
+    mode: billing,
+    // US-129. What this deployment lends one account in a month, where its plan
+    // includes the keys. `accountKeys` answers null for everybody else, so a
+    // self-hosted worker asks the database nothing about caps.
+    ...(accountCapMicros === undefined ? {} : { capMicros: accountCapMicros }),
+  });
+
+  /** What one account may still spend of ours, for the three steps that spend. */
+  const accountCapFor = (userId: string) => keys.cap(userId);
 
   // The logger, so a key still read from its deprecated variable says so once.
   const lookup = credentialsFor ?? credentialsForAccounts(db, keys, logger);
@@ -531,18 +553,23 @@ export async function startWorker({
   const pipeline: WorkerSteps = {
     reconcile:
       steps.reconcile ?? createReconcileStep({ registry: sources, credentialsFor: lookup }),
-    poll: steps.poll ?? createCollectStep({ registry: sources, credentialsFor: lookup }),
+    poll:
+      steps.poll ?? createCollectStep({ registry: sources, credentialsFor: lookup, accountCapFor }),
     estimate: steps.estimate ?? createEstimateStep({ registry: sources, credentialsFor: lookup }),
     filter:
       steps.filter ??
       createFilterStep({
         embedderFor: async (userId) => (await modelsFor(userId)).embedder,
         triagerFor: async (userId) => (await modelsFor(userId)).triager,
+        accountCapFor,
       }),
     replies: steps.replies ?? createRepliesStep({ registry: sources, credentialsFor: lookup }),
     classify:
       steps.classify ??
-      createClassifyStep({ classifierFor: async (userId) => (await modelsFor(userId)).classifier }),
+      createClassifyStep({
+        classifierFor: async (userId) => (await modelsFor(userId)).classifier,
+        accountCapFor,
+      }),
     notify:
       steps.notify ??
       createNotifyStep(
@@ -616,7 +643,7 @@ export async function startWorker({
   });
 
   await boss.work(scheduleTickQueue, workerOptions, async () => {
-    await enqueueDuePolls(db, boss, logger, billing);
+    await enqueueDuePolls(db, boss, logger, billing, accountCapMicros ?? null);
     await enqueueNotifications(db, boss);
     await boss.send(reconcileQueue, {}, { singletonKey: "all" });
   });

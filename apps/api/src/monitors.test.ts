@@ -215,7 +215,10 @@ describe("the monitor routes", () => {
   }
 
   /** Create a monitor through the route, and hand back its id. */
-  async function create(app: Awaited<ReturnType<typeof server>>, payload = newMonitor) {
+  async function create(
+    app: Awaited<ReturnType<typeof server>>,
+    payload: Record<string, unknown> = newMonitor,
+  ) {
     const response = await app.inject({ method: "POST", url: "/api/monitors", payload });
     return response.json().id as string;
   }
@@ -687,6 +690,66 @@ describe("the monitor routes", () => {
     });
 
     /**
+     * US-129. Hourly is what every self-hosted instance has run since US-041
+     * and it stays the column's default. It is only when the instance is paying
+     * that the default is ours to choose, and hourly costs about four times
+     * what every four hours does.
+     *
+     * A default and not a limit: the next case is a person choosing hourly
+     * anyway, and getting it.
+     */
+    it("polls a lent-keys account's new monitor every four hours", async () => {
+      await onPlan("keys_included");
+
+      await withServer({ signup: "open", charging: true }, async (app) => {
+        const id = await create(app);
+        const monitor = await getMonitor(db, id);
+
+        expect(monitor?.pollIntervalSeconds).toBe(4 * 60 * 60);
+      });
+    });
+
+    it("still gives the hourly default to an account spending its own money", async () => {
+      await onPlan("own_keys");
+
+      await withServer({ signup: "open", charging: true }, async (app) => {
+        const id = await create(app);
+        const monitor = await getMonitor(db, id);
+
+        expect(monitor?.pollIntervalSeconds).toBe(60 * 60);
+      });
+    });
+
+    it("keeps an interval the person chose, on either plan", async () => {
+      await onPlan("keys_included");
+
+      await withServer({ signup: "open", charging: true }, async (app) => {
+        const id = await create(app, { ...newMonitor, pollIntervalSeconds: 900 });
+        const monitor = await getMonitor(db, id);
+
+        expect(monitor?.pollIntervalSeconds).toBe(900);
+      });
+    });
+
+    /**
+     * US-129, and the assertion is that no code was needed. `include_replies`
+     * has defaulted to false since US-020, so a new monitor on any plan starts
+     * without comments — and on Instagram a comment page is the dearest thing
+     * this product fetches. The case is here so that a change to that default
+     * has to argue with the plan's arithmetic.
+     */
+    it("starts every new monitor with comments off, whatever the plan", async () => {
+      await onPlan("keys_included");
+
+      await withServer({ signup: "open", charging: true }, async (app) => {
+        const id = await create(app);
+        const monitor = await getMonitor(db, id);
+
+        expect(monitor?.includeReplies).toBe(false);
+      });
+    });
+
+    /**
      * BUG-019, at the write path. The key is in this deployment's environment
      * and signup is open, so it is not this account's to spend: the monitor is
      * created paused, exactly as if the variable were unset.
@@ -1015,6 +1078,7 @@ describe("the monitor routes", () => {
           await recordModelCall(db, {
             purpose: "classification",
             outcome: "scored",
+            userId: owner,
             monitorId: id,
             monitorVersion,
             postId: post?.id as string,

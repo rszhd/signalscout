@@ -81,26 +81,28 @@ the first month of real accounts, not before.
 
 ## Acceptance
 
-- [ ] One figure in `.env` sets the monthly cap for a keys-included account, and
+- [x] One figure in `.env` sets the monthly cap for a keys-included account, and
       the deployment sets it. No screen and no route raises it. It defaults to
       $15, the figure the price was set from
-- [ ] The cap counts source spend and model spend together, per account, per
+- [x] The cap counts source spend and model spend together, per account, per
       calendar month, on the month `monthStart` already defines
-- [ ] A poll that would cross either the monitor's cap or the account's is
+- [x] A poll that would cross either the monitor's cap or the account's is
       refused, and the sentence says which one stopped it
-- [ ] The account's cap is not applied to a bring-your-own-keys account, nor
+- [x] The account's cap is not applied to a bring-your-own-keys account, nor
       anywhere signup is closed
-- [ ] The billing screen shows the account's cap and what is left of it
-- [ ] Reaching the cap does not lose collection already paid for, and does not
+- [ ] The billing screen shows the account's cap and what is left of it — the
+      route answers it; no browser has rendered it
+- [x] Reaching the cap does not lose collection already paid for, and does not
       delete anything. Reads stay, the way the paywall's do
-- [ ] Asserted against real Postgres, with the money already recorded, and the
+- [x] Asserted against real Postgres, with the money already recorded, and the
       scheduler half asserted separately from the route half
-- [ ] A monitor created by a keys-included account polls every four hours rather
+- [x] A monitor created by a keys-included account polls every four hours rather
       than hourly, and a person may still choose either
-- [ ] A keys-included account's new monitor starts with Instagram comments off
+- [x] A keys-included account's new monitor starts with Instagram comments off
 - [ ] The billing screen states the plan's price and its cap in one place, read
-      from Stripe and from the setting rather than written in the markup
-- [ ] No test spends money
+      from Stripe and from the setting rather than written in the markup — the
+      route does; the screen is the next session
+- [x] No test spends money
 
 ## Notes
 
@@ -133,3 +135,56 @@ the first month of real accounts, not before.
   reader can disagree with the arithmetic rather than with the conclusion. Two
   defaults joined the scope at the same time, because the price does not work
   without them.
+
+- 2026-09-13T09:10+08:00 — **The cap is built, and the screens are not.**
+  2,130 tests pass, lint and typecheck are clean.
+
+  **`model_calls` had no `user_id`, and the cap could not be correct without
+  one.** The table has only carried `monitor_id`, which was right while every
+  question asked of it was about a monitor. Three of the calls it records have
+  no monitor at all — writing a monitor's queries from the form, drafting a
+  project, drafting a reply — and each is repeatable from a screen. Summing
+  through `monitors` would have left exactly the repeatable ones uncounted,
+  which is the hole a customer could drive through. Migration 0060 adds the
+  column and backfills every row that has a monitor; the ones that never had one
+  stay null rather than being guessed at. `recordModelCall` requires it now, so
+  TypeScript named all eight call sites rather than leaving one to be found
+  later.
+
+  **Three places enforce it, and the third is the one that matters.** A poll is
+  refused in `collect.ts`, before any provider is asked. A batch of
+  classifications stops mid-way, through the spend meter BUG-004 built — that is
+  where an account's lent month actually goes, because a batch is many more
+  calls than a poll is pages. And `enqueueDuePolls` does not queue a poll for an
+  account that has spent its month, which is what stops the work being started
+  at all: a refusal in `collect.ts` has already been queued, claimed and
+  started, and forty of those an hour until the month turns over is not a cap.
+
+  **`account_budget_exhausted` is its own stop reason.** Migration 0061. Apart
+  from `budget_exhausted` because the repair differs and the person differs: a
+  monitor's budget is the customer's and they raise it, and this one resets with
+  the month and nobody raises it. A screen showing one sentence for both would
+  send somebody to a control that changes nothing.
+
+  **One acceptance box needed no code.** `include_replies` has defaulted to
+  false since US-020, so a new monitor already starts with comments off on every
+  plan. A case was added anyway, so that a change to that default has to argue
+  with this plan's arithmetic first.
+
+  **The tests were watched to fail, in three independent paths.** Making the cap
+  never apply turns seven red across four files. Emptying the scheduler's
+  over-cap set and making the meter ignore the account half turns four more red
+  across three. The paths are independent, which is why two mutations were
+  needed rather than one.
+
+  **Unproven, and it is the same gap US-128 left.** No account has polled a real
+  provider on this instance's keys and been stopped by this. Nothing has run with
+  `AUTH_SIGNUP=open`, `BILLING_MODE=stripe` and a real subscription. No browser
+  has rendered the billing screen, which is why its two boxes stay open — the
+  route answers the cap and what is left of it, and a screen reading that route
+  is the next session.
+
+  **docs/costs.md's price table was stale and is fixed** in the same pass:
+  ScrapeCreators fetches TikTok and YouTube since US-126 and US-127, and neither
+  pair was on it.
+

@@ -20,6 +20,7 @@ export {
   type AccountKeys,
   type AccountKeysOptions,
   accountKeys,
+  keysIncludedAmong,
   planForPrice,
   planKeyedCache,
   planOf,

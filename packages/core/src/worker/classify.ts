@@ -76,6 +76,15 @@ export interface ClassifyOptions {
    * key. `runtime.ts` caches per owner; this step only asks.
    */
   readonly classifierFor: (userId: string) => Promise<Classifier | undefined>;
+  /**
+   * What this monitor's owner may still spend of the instance's money, or null
+   * where the money is its own. US-129.
+   *
+   * The model half is where an account's month actually goes — a batch of 123
+   * classifications is many more calls than a poll is pages — so the meter
+   * stops on whichever cap runs out first.
+   */
+  readonly accountCapFor?: (userId: string) => Promise<number | null>;
 }
 
 function profileOf(monitor: typeof monitors.$inferSelect): MonitorProfile {
@@ -87,7 +96,10 @@ function profileOf(monitor: typeof monitors.$inferSelect): MonitorProfile {
   };
 }
 
-export function createClassifyStep({ classifierFor }: ClassifyOptions): Step<ClassifyPayload> {
+export function createClassifyStep({
+  classifierFor,
+  accountCapFor = async () => null,
+}: ClassifyOptions): Step<ClassifyPayload> {
   return async function classify(
     { monitorId, postIds },
     { db, boss, logger }: StepContext,
@@ -200,7 +212,10 @@ export function createClassifyStep({ classifierFor }: ClassifyOptions): Step<Cla
      * produced 328 replies and 123 classifications on 2026-09-06, and nothing
      * between them asked whether there was any money left.
      */
-    const meter = await createSpendMeter(db, monitorId);
+    const meter = await createSpendMeter(db, monitorId, new Date(), {
+      userId: monitor.userId,
+      accountCapMicros: await accountCapFor(monitor.userId),
+    });
     let unspentFor = 0;
 
     const record = async (
@@ -216,6 +231,7 @@ export function createClassifyStep({ classifierFor }: ClassifyOptions): Step<Cla
         purpose: "classification",
         outcome,
         call,
+        userId: monitor.userId,
         monitorId,
         monitorVersion: monitor.version,
         postId,

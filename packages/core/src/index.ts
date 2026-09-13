@@ -206,6 +206,7 @@ export {
   entitlementFor,
   type HostedPage,
   handledEventTypes,
+  keysIncludedAmong,
   linkStripeCustomer,
   type PlanPrice,
   type PortalRequest,
@@ -224,6 +225,17 @@ export {
   subscriptionByCustomer,
   trialDays,
 } from "./billing/index.js";
+export {
+  type AccountBudgetState,
+  type AccountCapEnvironment,
+  type AccountSpend,
+  accountBudgetState,
+  accountCapFrom,
+  accountSpend,
+  accountsOverCap,
+  checkAccountBudget,
+  defaultAccountCapMicros,
+} from "./budget/account.js";
 export {
   type BudgetState,
   budgetState,
@@ -264,6 +276,7 @@ export {
   machineKeysUsableFor,
   providerKeyEnvironment,
   providerKeyEnvironmentFor,
+  spendsInstanceMoney,
   webhookSecretEnvironment,
   withoutMachineModelKeys,
 } from "./config/machine-keys.js";
@@ -293,6 +306,7 @@ export {
   filterStages,
   type IntentType,
   intentTypes,
+  lentKeysPollIntervalSeconds,
   type ModelCallOutcome,
   type ModelCallPurpose,
   matches,

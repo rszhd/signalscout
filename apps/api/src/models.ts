@@ -413,6 +413,7 @@ export async function registerModelRoutes(
    * successful tests would understate the month.
    */
   async function testBeforeStoring(
+    userId: string,
     provider: string | null,
     apiKey: string,
     model: string | null,
@@ -446,6 +447,7 @@ export async function registerModelRoutes(
 
     await recordModelCall(db, {
       purpose: "key_test",
+      userId,
       // `answered` is the model failing the shape rather than the call
       // failing, which is exactly what `rejected` means in this ledger.
       outcome:
@@ -728,6 +730,7 @@ export async function registerModelRoutes(
 
       await recordModelCall(db, {
         purpose: "key_test",
+        userId,
         // `answered` is the model failing the shape rather than the call
         // failing, which is exactly what `rejected` means in this ledger.
         outcome:
@@ -799,7 +802,7 @@ export async function registerModelRoutes(
         return reply.code(409).send({ message: new DuplicateAiKeyName(name).message });
       }
 
-      const refusal = await testBeforeStoring(provider ?? null, apiKey, model ?? null);
+      const refusal = await testBeforeStoring(userId, provider ?? null, apiKey, model ?? null);
 
       if (refusal) return reply.code(400).send({ message: refusal });
 

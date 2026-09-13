@@ -23,7 +23,9 @@ the price the connector declares:
 | X | SocialCrawl | a request | $0.008118 | ~$0.0004 (20 posts) |
 | LinkedIn | Apify | a post | $0.002 | $0.002 |
 | YouTube | SocialCrawl | a credit | $0.008118 | ~$0.00018 (45 videos) |
+| YouTube | ScrapeCreators | a request | $0.00188 | ~$0.000094 (20 videos) |
 | TikTok | SocialCrawl | a credit | $0.008118 | ~$0.00027 (30 videos) |
+| TikTok | ScrapeCreators | a request | $0.00188 | ~$0.0000627 (30 videos) |
 | Instagram | SocialCrawl | a credit | $0.008118 | ~$0.00027 (30 reels) |
 | Instagram comments | SocialCrawl | 5 credits a page | $0.0406 | ~$0.0027 (15 comments) |
 | A model call | your provider | one call | the provider's own token price | |
@@ -180,6 +182,34 @@ with nobody pressing anything.
 
 A monitor with no cap still records everything it spends. A default cap would
 be this software deciding how much of your key it may use.
+
+### The second cap, and it is not the customer's
+
+US-129. An account whose plan includes this instance's keys meets a second cap,
+and the two are not alike:
+
+| | A monitor's cap | The account's month |
+|---|---|---|
+| Whose money | the customer's | the deployment's |
+| Who sets it | the customer, per monitor | `ACCOUNT_MONTHLY_CAP_MICROS`, once |
+| Who raises it | the customer | nobody. It resets with the month |
+| Who meets it | every monitor with a cap | an account whose plan lends the keys |
+
+The lower of the two stops the poll, and the sentence says which — "you have
+spent your budget" and "this plan's month is used up" send a person to two
+different places, and only one of them is a control they can reach. The poll run
+records them apart as well: `budget_exhausted` and `account_budget_exhausted`.
+
+**It counts what no monitor owns.** A monitor's cap counts what that monitor
+caused. The account's month counts everything on the bill, including the calls
+that belong to no monitor at all — writing a monitor's queries from the form,
+drafting a project from a document, drafting a reply. Each is repeatable from a
+screen, so leaving them out would leave the repeatable ones uncounted.
+`model_calls.user_id` is the column US-129 added for it.
+
+**Nothing about a self-hosted instance meets any of this.** The money there is
+the owner's own, and a cap the software lent them would be a limit nobody asked
+for.
 
 ### The cap can be overshot, by up to one poll
 

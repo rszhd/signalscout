@@ -172,6 +172,22 @@ export const defaultPollIntervalSeconds = 3600;
 export const minimumPollIntervalSeconds = 60;
 
 /**
+ * What a monitor polls at when the instance is paying for it. US-129.
+ *
+ * Four hours, against the hourly default above, and it is a default rather than
+ * a limit: the person may still choose hourly on the form. The column's own
+ * default does not move, because it is what every self-hosted instance has run
+ * since US-041 and that is somebody else's machine and somebody else's bill.
+ *
+ * The number comes from the arithmetic in US-129. One Reddit monitor polled
+ * hourly costs about $27 a month and the plan lends $15; polled every four
+ * hours it costs about $7, so three monitors fit. This product finds threads
+ * that are still worth replying to next month, so the slower default loses
+ * close to nothing.
+ */
+export const lentKeysPollIntervalSeconds = 4 * 60 * 60;
+
+/**
  * The lowest lead score that becomes a match, for a monitor that has not said
  * otherwise.
  *
@@ -311,6 +327,16 @@ export type PollOutcome = (typeof pollOutcomes)[number];
 export const pollStopReasons = [
   /** US-013's cap refused the poll before any provider was asked. */
   "budget_exhausted",
+  /**
+   * US-129's cap refused it: the account has spent the month its plan includes.
+   *
+   * Apart from `budget_exhausted` because the repair is different and the
+   * person is different. A monitor's budget is the customer's and they raise
+   * it; this one is the deployment's and nobody raises it — it resets with the
+   * month. A screen that showed one sentence for both would send somebody
+   * looking for a control that does not exist.
+   */
+  "account_budget_exhausted",
   /** No provider of this platform has a key on this account or in the environment. */
   "no_credentials",
   /** Two providers could run and no choice is recorded, or the choice cannot run. */
@@ -1011,6 +1037,23 @@ export const modelCalls = pgTable(
   "model_calls",
   {
     id: uuid("id").primaryKey().defaultRandom(),
+    /**
+     * Whose call this was. US-129.
+     *
+     * `api_usage` has carried the account since BUG-009 and this table did not,
+     * because until now every question asked of it was about a monitor. An
+     * account-wide cap is not: a monitor's owner is reachable through
+     * `monitor_id`, and three of the calls this table records have no monitor
+     * at all — writing a monitor's queries from the form, drafting a project
+     * from a document, drafting a reply. Each is repeatable from a screen, and
+     * on a plan whose keys are the instance's each is our money. Summing
+     * through `monitors` would leave exactly those uncounted.
+     *
+     * Nullable, and null means a row written before the column existed. The
+     * migration backfills every row that has a monitor; the ones that never had
+     * one cannot be attributed now and are not guessed at.
+     */
+    userId: text("user_id"),
     monitorId: uuid("monitor_id").references(() => monitors.id, { onDelete: "set null" }),
     postId: uuid("post_id").references(() => posts.id, { onDelete: "set null" }),
     /** Named, not chosen by the user: one provider per source, one per model. */
@@ -1054,6 +1097,9 @@ export const modelCalls = pgTable(
   (table) => [
     // The classifier counts a post's failures on this pair before every call.
     index("model_calls_monitor_post_idx").on(table.monitorId, table.postId),
+    // The account cap sums this month's calls for one account, before every
+    // poll and every twenty classifications. US-129.
+    index("model_calls_user_created_idx").on(table.userId, table.createdAt),
     check("model_calls_outcome_known", oneOf("outcome", modelCallOutcomes)),
     check("model_calls_purpose_known", oneOf("purpose", modelCallPurposes)),
     check(

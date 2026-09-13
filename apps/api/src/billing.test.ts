@@ -23,6 +23,7 @@ import {
   loadEnv,
   monitors,
   readSubscription,
+  recordSourceUsage,
   startTrial,
   subscriptions,
   users,
@@ -281,9 +282,28 @@ describe("the billing routes", () => {
     await db.delete(users);
   });
 
-  async function server(userId: string, lines?: string[]): Promise<ApiServer> {
+  async function server(
+    userId: string,
+    lines?: string[],
+    /**
+     * An instance that lends its keys: registrations open and a month to lend.
+     * US-129. Nothing is injected — the cap the route answers with is the one
+     * `buildServer` builds for the worker, which is the whole point of the two
+     * assertions below.
+     */
+    lending?: { capMicros: number },
+  ): Promise<ApiServer> {
     recorded = { checkout: [], portal: [], next: { kind: "ignored", type: "none" } };
-    const env = loadEnv({ DATABASE_URL: database.url, AUTH_SECRET: "x".repeat(32) });
+    const env = loadEnv({
+      DATABASE_URL: database.url,
+      AUTH_SECRET: "x".repeat(32),
+      ...(lending
+        ? {
+            AUTH_SIGNUP: "open",
+            ACCOUNT_MONTHLY_CAP_MICROS: String(lending.capMicros),
+          }
+        : {}),
+    });
 
     return buildServer({
       env,
@@ -307,6 +327,63 @@ describe("the billing routes", () => {
     await db.insert(users).values({ id, name: id, email: `${id}@example.test` });
     return id;
   }
+
+  /**
+   * US-129. The screen states the cap the worker enforces, from the same object
+   * — a second copy of the figure is how a page and a poll stop agreeing.
+   */
+  it("reports what the plan lends and what is left of it", async () => {
+    const id = await account(`lent-${randomUUID()}`);
+    await db.insert(subscriptions).values({ userId: id, status: "active", plan: "keys_included" });
+
+    await recordSourceUsage(db, {
+      userId: id,
+      monitorId: null,
+      source: "reddit",
+      provider: "socialcrawl",
+      units: 1,
+      pricePerUnitMicros: 4_000_000,
+    });
+
+    const app = await server(id, undefined, { capMicros: 15_000_000 });
+
+    try {
+      const body = (await app.inject({ method: "GET", url: billingBasePath })).json();
+
+      expect(body.plan).toBe("keys_included");
+      expect(body.included).toEqual({
+        capMicros: 15_000_000,
+        spentMicros: 4_000_000,
+        remainingMicros: 11_000_000,
+        exhausted: false,
+        since: new Date(
+          Date.UTC(new Date().getUTCFullYear(), new Date().getUTCMonth(), 1),
+        ).toISOString(),
+      });
+    } finally {
+      await app.close();
+    }
+  });
+
+  /**
+   * An account spending its own money meets no cap, so the screen shows none.
+   * A figure there would be a limit that does not apply, which is worse than
+   * no figure at all.
+   */
+  it("reports no lent month for an account spending its own money", async () => {
+    const id = await account(`own-${randomUUID()}`);
+    // The same lending instance, and an account on the other plan.
+    const app = await server(id, undefined, { capMicros: 15_000_000 });
+
+    try {
+      const body = (await app.inject({ method: "GET", url: billingBasePath })).json();
+
+      expect(body.plan).toBe("own_keys");
+      expect(body.included).toBeNull();
+    } finally {
+      await app.close();
+    }
+  });
 
   it("reports the trial a new account is on", async () => {
     const id = await account(`state-${randomUUID()}`);

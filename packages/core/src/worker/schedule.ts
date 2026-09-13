@@ -13,7 +13,8 @@
  */
 import { and, eq, isNull, or, sql } from "drizzle-orm";
 import type { PgBoss } from "pg-boss";
-import { type BillingMode, entitledCondition } from "../billing/index.js";
+import { type BillingMode, entitledCondition, keysIncludedAmong } from "../billing/index.js";
+import { accountsOverCap } from "../budget/account.js";
 import type { Database } from "../db/client.js";
 import { monitors, subscriptions } from "../db/schema.js";
 import type { Logger } from "../logger.js";
@@ -21,6 +22,8 @@ import { pollQueue } from "./queues.js";
 
 export interface DueMonitor {
   readonly id: string;
+  /** Whose monitor it is, so the tick can ask whose money the poll would spend. US-129. */
+  readonly userId: string;
   readonly pollIntervalSeconds: number;
 }
 
@@ -63,7 +66,11 @@ export async function findDueMonitors(
 ): Promise<DueMonitor[]> {
   return (
     db
-      .select({ id: monitors.id, pollIntervalSeconds: monitors.pollIntervalSeconds })
+      .select({
+        id: monitors.id,
+        userId: monitors.userId,
+        pollIntervalSeconds: monitors.pollIntervalSeconds,
+      })
       .from(monitors)
       /**
        * The owner's subscription, or no row.
@@ -103,6 +110,8 @@ export interface TickResult {
   readonly due: number;
   /** Sends that the queue policy turned away because a poll was already in flight. */
   readonly alreadyQueued: number;
+  /** Monitors not sent because their account has spent its month. US-129. */
+  readonly overCapSkipped: number;
 }
 
 /** Send a poll job for every due monitor. One tick of the scheduler. */
@@ -111,11 +120,52 @@ export async function enqueueDuePolls(
   boss: PgBoss,
   logger: Logger,
   billing: BillingMode = "off",
+  /**
+   * What one account may spend of the instance's money in a month, where its
+   * plan lends the keys. US-129. Null lends nothing and costs no query.
+   *
+   * This is the account cap's other half, and it is the half that matters for
+   * the same reason `entitledCondition` is: a poll refused in `collect.ts` has
+   * already been queued, claimed and started, and it is the scheduler not
+   * sending it that stops the work being done at all. An account over its cap
+   * whose monitors keep being queued would be forty refused jobs an hour, every
+   * hour, until the month turned over.
+   */
+  accountCapMicros: number | null = null,
 ): Promise<TickResult> {
   const due = await findDueMonitors(db, billing);
   let alreadyQueued = 0;
 
+  /**
+   * The accounts that have spent their month, in two reads for the whole tick.
+   *
+   * Only accounts on the plan have a cap, so the first read narrows the list
+   * and the second sums only what is left. A deployment that lends nothing does
+   * neither.
+   */
+  const overCap =
+    accountCapMicros === null
+      ? new Set<string>()
+      : new Set(
+          await accountsOverCap(
+            db,
+            await keysIncludedAmong(db, [...new Set(due.map((one) => one.userId))], billing),
+            accountCapMicros,
+          ),
+        );
+
+  let overCapSkipped = 0;
+
   for (const monitor of due) {
+    if (overCap.has(monitor.userId)) {
+      overCapSkipped += 1;
+      logger.warn(
+        { monitorId: monitor.id, userId: monitor.userId, capMicros: accountCapMicros },
+        "poll not sent: this account has spent the month its plan includes",
+      );
+      continue;
+    }
+
     // `send` answers null when the queue policy refuses the job. The monitor
     // id as the key is what makes "refuse" mean "this monitor is already
     // being polled".
@@ -131,7 +181,7 @@ export async function enqueueDuePolls(
     }
   }
 
-  const result = { due: due.length, alreadyQueued };
+  const result = { due: due.length, alreadyQueued, overCapSkipped };
 
   if (due.length > 0) logger.info(result, "scheduler tick");
 

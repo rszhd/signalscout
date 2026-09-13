@@ -154,6 +154,7 @@ export async function registerDraftRoutes(
         purpose: "draft_reply",
         outcome: outcome.status === "ok" ? "scored" : outcome.status,
         call: outcome.call,
+        userId: sessionUserId(request),
         monitorId: row.monitorId,
         postId: row.postId,
         error: outcome.status === "ok" ? null : outcome.error,

@@ -23,16 +23,19 @@
  * which sentence to show.
  */
 import {
+  type AccountKeys,
   applyStripeSubscription,
   type BillingMode,
   type BillingProvider,
   type BillingSettings,
+  checkAccountBudget,
   createStripeBilling,
   type Database,
   type Entitlement,
   type Logger,
   linkStripeCustomer,
   type PlanPrice,
+  planOf,
   readEntitlement,
   readSubscription,
   trialDays,
@@ -154,6 +157,28 @@ const billingStateSchema = z.object({
       interval: z.string().nullable(),
     })
     .nullable(),
+  /** Which plan this account is on: whose keys its monitors spend. US-128. */
+  plan: z.enum(["own_keys", "keys_included"]),
+  /**
+   * The month this plan lends, and what is left of it. US-129.
+   *
+   * Null on every account spending its own money, and the screen then shows
+   * nothing rather than a cap that does not apply. Micro-dollars, like every
+   * other money figure this API answers with.
+   *
+   * `spentMicros` is an estimate, like every figure in `budget/`. The
+   * provider's invoice is authoritative and this is not, which is why the
+   * screen says "estimated" beside it.
+   */
+  included: z
+    .object({
+      capMicros: z.number().int(),
+      spentMicros: z.number().int(),
+      remainingMicros: z.number().int(),
+      exhausted: z.boolean(),
+      since: z.string(),
+    })
+    .nullable(),
 });
 
 export interface BillingRoutesOptions {
@@ -166,12 +191,20 @@ export interface BillingRoutesOptions {
    * and no test needs the network. Undefined builds the real Stripe client.
    */
   readonly billing?: BillingProvider;
+  /**
+   * What one account may spend of the instance's money. US-129.
+   *
+   * The same object the rest of the composition root uses, so the screen states
+   * the cap the worker enforces rather than a second copy of it. Undefined in a
+   * test that is not about the cap, and the screen then shows none.
+   */
+  readonly keys?: Pick<AccountKeys, "cap">;
   readonly now?: () => Date;
 }
 
 export async function registerBillingRoutes(
   app: ApiServer,
-  { db, logger, settings, billing, now = () => new Date() }: BillingRoutesOptions,
+  { db, logger, settings, billing, keys, now = () => new Date() }: BillingRoutesOptions,
 ): Promise<void> {
   if (!settings) return;
 
@@ -210,8 +243,29 @@ export async function registerBillingRoutes(
       const subscription = await readSubscription(db, userId);
       const entitlement: Entitlement = await readEntitlement(db, userId, settings.mode, now());
 
+      /**
+       * What this account may still spend of ours, and what it has. US-129.
+       *
+       * `keys.cap` answers null for every account spending its own money, and
+       * `checkAccountBudget` then reads no ledger — so the common account pays
+       * one comparison for this and no query at all.
+       */
+      const capMicros = (await keys?.cap(userId)) ?? null;
+      const included = await checkAccountBudget(db, userId, capMicros, now());
+
       return {
         mode: settings.mode,
+        plan: planOf(settings.mode, subscription),
+        included:
+          included.capMicros === null
+            ? null
+            : {
+                capMicros: included.capMicros,
+                spentMicros: included.spend.totalMicros,
+                remainingMicros: included.remainingMicros ?? 0,
+                exhausted: included.exhausted,
+                since: included.spend.since.toISOString(),
+              },
         entitled: entitlement.entitled,
         reason: entitlement.reason,
         status: subscription?.status ?? null,

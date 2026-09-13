@@ -41,6 +41,7 @@ import {
   type Source,
 } from "../db/schema.js";
 import { pauseMonitor } from "../monitors/monitors.js";
+import { checkAccountBudget } from "./account.js";
 
 /** What one monitor spent since the start of the month, in micro-dollars. */
 export interface MonitorSpend {
@@ -602,18 +603,61 @@ export interface SpendMeter {
  * A monitor with no cap is never exhausted and never re-reads, so an uncapped
  * deployment pays one query for the whole batch.
  */
+export interface SpendMeterOptions {
+  /**
+   * The account this monitor belongs to, and what it may still spend of the
+   * instance's money. US-129.
+   *
+   * Both or neither. Without them the meter is exactly what BUG-004 built: one
+   * monitor, one cap, the customer's own money. With them it stops on whichever
+   * of the two runs out first, which is what makes the account cap cover the
+   * model half — a batch of 123 classifications is where an account's month
+   * actually goes.
+   */
+  readonly userId?: string;
+  readonly accountCapMicros?: number | null;
+}
+
 export async function createSpendMeter(
   db: Database,
   monitorId: string,
   now: Date = new Date(),
+  { userId, accountCapMicros = null }: SpendMeterOptions = {},
 ): Promise<SpendMeter> {
-  let state = await checkBudget(db, monitorId, now);
+  const accountCapped = userId !== undefined && accountCapMicros !== null;
+
+  const read = async (moment: Date) => {
+    const [monitor, account] = await Promise.all([
+      checkBudget(db, monitorId, moment),
+      accountCapped
+        ? checkAccountBudget(db, userId, accountCapMicros, moment)
+        : Promise.resolve(null),
+    ]);
+
+    return { monitor, account };
+  };
+
+  let state = await read(now);
   let sinceRead = 0;
   let spentSinceRead = 0;
 
+  /**
+   * What is left before either cap, whichever is nearer.
+   *
+   * Null only when neither applies, which is every deployment that sets no cap
+   * and lends nothing — and those must not pay a query per batch.
+   */
+  const remaining = (): number | null => {
+    const values = [state.monitor.remainingMicros, state.account?.remainingMicros ?? null].filter(
+      (value): value is number => value !== null,
+    );
+
+    return values.length === 0 ? null : Math.min(...values);
+  };
+
   return {
     get state() {
-      return state;
+      return state.monitor;
     },
 
     spent(micros) {
@@ -625,20 +669,20 @@ export async function createSpendMeter(
     },
 
     async exhausted() {
-      if (state.capMicros === null) return false;
+      if (remaining() === null) return false;
 
       if (sinceRead >= recheckEvery) {
-        state = await checkBudget(db, monitorId, new Date());
+        state = await read(new Date());
         sinceRead = 0;
         spentSinceRead = 0;
       }
 
-      if (state.exhausted) return true;
+      if (state.monitor.exhausted || state.account?.exhausted) return true;
 
       // Between readings, the estimate is what the ledger said plus what this
       // loop has spent since. Erring towards stopping early is the safe
       // direction: a person can see an unfinished batch and raise the cap.
-      return spentSinceRead >= (state.remainingMicros ?? 0);
+      return spentSinceRead >= (remaining() ?? 0);
     },
   };
 }

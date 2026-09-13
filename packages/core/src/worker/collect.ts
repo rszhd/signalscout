@@ -24,6 +24,7 @@
  * far past the cap one poll can carry a monitor.
  */
 import { eq, sql } from "drizzle-orm";
+import { checkAccountBudget } from "../budget/account.js";
 import { enforceBudget, recordSourceUsage } from "../budget/budget.js";
 import {
   maxResumeAttempts,
@@ -77,6 +78,15 @@ export const excerptLength = 2000;
 export interface CollectOptions {
   readonly registry: SourceRegistry;
   readonly credentialsFor: CredentialLookup;
+  /**
+   * What this monitor's owner may still spend of the instance's money, or null
+   * where the money is its own. US-129.
+   *
+   * Optional, and undefined answers null for every account: a self-hosted
+   * instance lends nothing, and neither does a deployment that sells no plan
+   * whose keys are included.
+   */
+  readonly accountCapFor?: (userId: string) => Promise<number | null>;
 }
 
 /** What one connector returned in one poll. US-013 records the units against a budget. */
@@ -242,7 +252,11 @@ function sum<T>(items: readonly T[], of: (item: T) => number): number {
   return items.reduce((total, item) => total + of(item), 0);
 }
 
-export function createCollectStep({ registry, credentialsFor }: CollectOptions): Step<PollPayload> {
+export function createCollectStep({
+  registry,
+  credentialsFor,
+  accountCapFor = async () => null,
+}: CollectOptions): Step<PollPayload> {
   return async function collect({ monitorId }, { db, boss, logger }: StepContext): Promise<void> {
     const [monitor] = await db.select().from(monitors).where(eq(monitors.id, monitorId)).limit(1);
 
@@ -363,6 +377,42 @@ export function createCollectStep({ registry, credentialsFor }: CollectOptions):
        * is the one thing about this product a person must not learn from an
        * empty inbox. It is also on the monitor list, from the same sentence.
        */
+      /**
+       * The account's month, before the monitor's own. US-129.
+       *
+       * First because it is the one the person cannot repair. A monitor's
+       * budget is theirs and the sentence invites them to raise it; this one is
+       * the deployment's and resets with the month, so telling somebody about
+       * their monitor's cap while the account's is what stopped them sends them
+       * to a control that changes nothing.
+       *
+       * It writes no `paused_at`. `onExhausted` is the monitor's setting about
+       * the monitor's cap, and pausing here would leave every monitor on the
+       * account switched off after the month turned over, waiting for somebody
+       * to notice and resume them one at a time.
+       */
+      const account = await checkAccountBudget(
+        db,
+        monitor.userId,
+        await accountCapFor(monitor.userId),
+      );
+
+      if (account.exhausted) {
+        logger.error(
+          {
+            monitorId,
+            userId: monitor.userId,
+            spentMicros: account.spend.totalMicros,
+            capMicros: account.capMicros,
+          },
+          account.reason ?? "poll refused: this account has spent the month its plan includes",
+        );
+
+        stopReason = "account_budget_exhausted";
+        await finish("refused");
+        return;
+      }
+
       const budget = await enforceBudget(db, monitorId);
 
       if (budget.exhausted) {

@@ -6,6 +6,7 @@ import {
   apiUsage,
   maxResumeAttempts,
   monitors,
+  pollRuns,
   posts,
   sourceContinuations,
   sourceCoverage,
@@ -1346,6 +1347,65 @@ describe("the poll step", () => {
       // Nothing reached the filter either. A refused poll that still sent an
       // empty batch onward would spend model money on the way.
       expect(boss.send).not.toHaveBeenCalled();
+    });
+
+    /**
+     * US-129. The account's cap, which is the deployment's rather than the
+     * customer's, and applies to an account spending the instance's money.
+     *
+     * It is checked before the monitor's own, because it is the one the person
+     * cannot repair: telling somebody about their monitor's budget while the
+     * account's month is what stopped them sends them to a control that changes
+     * nothing.
+     */
+    it("reaches no source once the account has spent the month its plan includes", async () => {
+      const monitorId = await insertMonitor(database);
+      const registry = fakeRegistry();
+      const boss = stubBoss();
+
+      await createCollectStep({
+        registry,
+        credentialsFor: credentials,
+        // A cap of nothing, for `setBudget`'s reason: it is the cheapest way to
+        // say "the month is spent" without spending it first.
+        accountCapFor: async () => 0,
+      })({ monitorId }, contextFor(db, boss));
+
+      expect(callsOf(registry)).toHaveLength(0);
+      expect(await db.select().from(posts)).toHaveLength(0);
+      expect(boss.send).not.toHaveBeenCalled();
+
+      // The stop reason is its own, and not the monitor budget's. A screen
+      // showing one sentence for both would offer the wrong repair.
+      const [run] = await db.select().from(pollRuns).where(eq(pollRuns.monitorId, monitorId));
+      expect(run?.stopReason).toBe("account_budget_exhausted");
+    });
+
+    it("polls where the account still has room, whatever the plan", async () => {
+      const monitorId = await insertMonitor(database);
+
+      await createCollectStep({
+        registry: fakeRegistry(),
+        credentialsFor: credentials,
+        accountCapFor: async () => 1_000_000,
+      })({ monitorId }, contextFor(db, stubBoss()));
+
+      expect(await db.select().from(posts)).toHaveLength(fakePosts.length);
+    });
+
+    /**
+     * Every deployment before US-129, and every self-hosted one after it. No
+     * cap is lent, so the account guard must cost nothing and refuse nothing.
+     */
+    it("polls when the deployment lends nothing", async () => {
+      const monitorId = await insertMonitor(database);
+
+      await createCollectStep({ registry: fakeRegistry(), credentialsFor: credentials })(
+        { monitorId },
+        contextFor(db, stubBoss()),
+      );
+
+      expect(await db.select().from(posts)).toHaveLength(fakePosts.length);
     });
 
     it("leaves the poll mark alone when it refuses, because nothing was polled", async () => {

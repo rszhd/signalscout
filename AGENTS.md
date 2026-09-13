@@ -203,7 +203,8 @@ These are written test-first: the assertion is written and reviewed before the
 implementation. Each file carries a `Correctness-critical` header comment
 naming its failure shape.
 
-- **Budget guard** — money spent past a cap, silently, at 02:00
+- **Budget guard** — money spent past a cap, silently, at 02:00. Two caps since
+  US-129: the customer's, per monitor, and the deployment's, per account
 - **Cursor and deduplication** — the same post fetched and billed twice
 - **Credential encryption** — a key reaching a log line or an API response
 - **Classification schema** — an invalid score stored as if it were a verdict
@@ -211,7 +212,7 @@ naming its failure shape.
 - **Session gate** — a route answering a stranger, and looking normal doing it
 - **Entitlement** — an account that stopped paying still polling, on our bill
 - **Plan** — an account polling and classifying on the instance's keys without
-  the plan that pays for them
+  the plan that pays for them, or past the month that plan lends
 
 A rule is only as tested as its least-tested caller. After asserting the rule,
 count the call sites and give each its own case.

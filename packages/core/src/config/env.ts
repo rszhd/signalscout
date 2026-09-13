@@ -333,6 +333,17 @@ export const envSchema = z.object({
   STRIPE_WEBHOOK_SECRET: blankIsUnset(z.string().min(1).optional()),
 
   /**
+   * What one account may spend of this instance's money in a month, in
+   * micro-dollars. US-129.
+   *
+   * It applies only to an account whose plan includes the keys — every other
+   * account, and every account on a self-hosted instance, is spending its own
+   * money and this is not a limit anybody asked for. `budget/account.ts` holds
+   * the default and the reasoning; 15000000 is $15.
+   */
+  ACCOUNT_MONTHLY_CAP_MICROS: blankIsUnset(z.string().min(1).optional()),
+
+  /**
    * Where this instance answers, for the addresses Stripe sends a person back
    * to. Required when BILLING_MODE is stripe, and not derived from a request
    * header: a return address built from something the caller controls is a

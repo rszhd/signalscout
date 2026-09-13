@@ -9,6 +9,7 @@ import {
   budgetStates,
   checkBudget,
   clearBudget,
+  createSpendMeter,
   enforceBudget,
   formatMicros,
   monitorSpend,
@@ -538,6 +539,88 @@ describe("the budget guard", () => {
       expect(formatMicros(15_000_000)).toBe("$15.00");
       expect(formatMicros(15_000)).toBe("$0.015");
       expect(formatMicros(0)).toBe("$0.00");
+    });
+  });
+  /**
+   * The meter a batch spends through, and the two caps it now honours. US-129.
+   *
+   * BUG-004 built it because `enforceBudget` answers "may this work start",
+   * which is the right question for a poll and the wrong one for 123
+   * classifications: the cap can be crossed between the first item and the
+   * last. The account cap arrives at the same place for the same reason, and it
+   * is the more important of the two here — the model half is where an
+   * account's lent month actually goes.
+   */
+  describe("metering a batch against both caps", () => {
+    it("stops on the account's cap while the monitor's has room left", async () => {
+      const monitorId = await insertMonitor(database, { userId: owner });
+      await setBudget(db, monitorId, { monthlyCapMicros: 90_000_000, onExhausted: "notify" });
+
+      // Spent against the account and against no monitor, which is the shape
+      // the monitor's own cap cannot see at all.
+      await recordSourceUsage(db, {
+        userId: owner,
+        monitorId: null,
+        source: "reddit",
+        provider: "brightdata",
+        units: 10_000,
+        pricePerUnitMicros: redditPricePerRecord,
+      });
+
+      const meter = await createSpendMeter(db, monitorId, new Date(), {
+        userId: owner,
+        accountCapMicros: 15_000_000,
+      });
+
+      expect(await meter.exhausted()).toBe(true);
+      // The monitor's own state still says there is room, which is the honest
+      // answer to a different question.
+      expect(meter.state.exhausted).toBe(false);
+    });
+
+    it("stops on the monitor's cap while the account has room left", async () => {
+      const monitorId = await insertMonitor(database, { userId: owner });
+      await setBudget(db, monitorId, { monthlyCapMicros: 0, onExhausted: "notify" });
+
+      const meter = await createSpendMeter(db, monitorId, new Date(), {
+        userId: owner,
+        accountCapMicros: 90_000_000,
+      });
+
+      expect(await meter.exhausted()).toBe(true);
+    });
+
+    /**
+     * Between readings the meter subtracts what the loop reports, so a batch
+     * that crosses the cap mid-way stops mid-way rather than at the next read.
+     * Erring towards stopping early is the safe direction.
+     */
+    it("stops mid-batch when what the loop spent crosses the account's cap", async () => {
+      const monitorId = await insertMonitor(database, { userId: owner });
+
+      const meter = await createSpendMeter(db, monitorId, new Date(), {
+        userId: owner,
+        accountCapMicros: 1_000_000,
+      });
+
+      expect(await meter.exhausted()).toBe(false);
+      meter.spent(999_999);
+      expect(await meter.exhausted()).toBe(false);
+      meter.spent(1);
+      expect(await meter.exhausted()).toBe(true);
+    });
+
+    /**
+     * Every deployment that lends nothing, which is every self-hosted one. No
+     * cap on either side means the meter never stops and never re-reads, so an
+     * uncapped batch pays one query for the whole of it.
+     */
+    it("never stops where neither cap applies", async () => {
+      const monitorId = await insertMonitor(database, { userId: owner });
+      const meter = await createSpendMeter(db, monitorId);
+
+      meter.spent(90_000_000);
+      expect(await meter.exhausted()).toBe(false);
     });
   });
 });

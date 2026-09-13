@@ -55,6 +55,22 @@ export function machineKeysUsableFor(signup: SignupMode, plan: SubscriptionPlan)
 }
 
 /**
+ * Whether this account is spending money that is not its own. US-129.
+ *
+ * Close to the question above and deliberately not the same one, because the
+ * self-hosted instance answers them differently. There, `.env` is how one
+ * person configures their own machine: the keys are usable and the money is
+ * theirs, so a cap the deployment lends would be a limit nobody asked for and a
+ * version bump that began refusing their polls. Here, only a plan on an
+ * instance taking registrations makes the spending ours.
+ *
+ * It is what decides whether the account cap applies at all.
+ */
+export function spendsInstanceMoney(signup: SignupMode, plan: SubscriptionPlan): boolean {
+  return signup === "open" && plan === "keys_included";
+}
+
+/**
  * The same environment with every model key removed.
  *
  * The provider, the model, the base URL and the prices stay: those describe

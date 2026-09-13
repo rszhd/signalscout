@@ -32,12 +32,24 @@ Every unknown reads as bring-your-own-keys: no row, no column value, a price
 this instance was never told about. `billing/plan.ts` holds that, and
 `config/machine-keys.ts` holds what it then means.
 
+**The plan lends a month, and `ACCOUNT_MONTHLY_CAP_MICROS` is how much.**
+US-129. $15 unless a deployment says otherwise, counted across every provider
+call and every model call the account caused, and reset by the calendar. No
+screen and no route raises it: a monitor's own budget is the customer's and they
+raise it, and this one is the deployment's. Both apply, and the lower stops the
+poll. docs/costs.md, *The second cap*, holds the table.
+
+It is enforced in three places, and the third is the one that matters. A poll is
+refused in `collect.ts`; a batch of classifications stops mid-way through the
+spend meter; and the scheduler does not queue a poll for an account that has
+spent its month — which is what stops the work being started at all, the same
+half of the gate `entitledCondition` is.
+
 **Checkout does not offer the keys-included price yet, and that is deliberate.**
-An account on it spends this instance's providers and model, and nothing caps
-what one account may spend of them — `budgets` is per monitor and set by the
-customer. US-129 is that cap. Until it closes, the plan can be put on an account
-from Stripe's own dashboard, where somebody is watching, and not bought from a
-button.
+The cap now exists, and what has not happened is a live run: no account has
+polled a real provider on this instance's keys and watched the cap stop it. The
+plan can be put on an account from Stripe's own dashboard, where somebody is
+watching, and not bought from a button.
 
 One consequence is worth stating rather than discovering. `past_due` is
 entitled, so a card that failed this morning keeps polling on our keys while
@@ -150,6 +162,7 @@ STRIPE_WEBHOOK_SECRET=whsec_…
 APP_URL=https://app.example.com
 
 STRIPE_PRICE_ID_KEYS_INCLUDED=price_…   # optional: the second plan's price
+ACCOUNT_MONTHLY_CAP_MICROS=15000000     # optional: what that plan lends, $15
 ```
 
 `APP_URL` is where Stripe returns a person to. It is not derived from a request

@@ -23,6 +23,15 @@ export interface RecordModelCallInput {
   readonly purpose: ModelCallPurpose;
   readonly outcome: ModelCallOutcome;
   readonly call: ModelCall;
+  /**
+   * Whose call it was. US-129. Required, so a new caller has to answer it.
+   *
+   * The account cap sums this column, and three of the calls recorded here have
+   * no monitor to reach an owner through — writing a monitor's queries, drafting
+   * a project, drafting a reply. Each is repeatable from a screen, and on a plan
+   * whose keys are the instance's each is our money.
+   */
+  readonly userId: string;
   /** Null before the monitor exists: the queries are written before it does. */
   readonly monitorId?: string | null;
   /**
@@ -43,6 +52,7 @@ export async function recordModelCall(
     purpose,
     outcome,
     call,
+    userId,
     monitorId = null,
     monitorVersion = null,
     postId = null,
@@ -50,6 +60,7 @@ export async function recordModelCall(
   }: RecordModelCallInput,
 ): Promise<void> {
   await db.insert(modelCalls).values({
+    userId,
     monitorId,
     monitorVersion,
     postId,

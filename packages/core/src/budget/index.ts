@@ -1,4 +1,15 @@
 export {
+  type AccountBudgetState,
+  type AccountCapEnvironment,
+  type AccountSpend,
+  accountBudgetState,
+  accountCapFrom,
+  accountSpend,
+  accountsOverCap,
+  checkAccountBudget,
+  defaultAccountCapMicros,
+} from "./account.js";
+export {
   type BudgetState,
   budgetState,
   budgetStates,
@@ -17,6 +28,7 @@ export {
   type PairSpend,
   type RecordSourceUsageInput,
   recordSourceUsage,
+  type SpendMeterOptions,
   setBudget,
   spendByMonitor,
   spendByPair,

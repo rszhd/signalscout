@@ -62,6 +62,10 @@ x-app-environment: &app-environment
   # The second plan's price, whose keys are included. Empty sells one plan.
   STRIPE_PRICE_ID_KEYS_INCLUDED: ${STRIPE_PRICE_ID_KEYS_INCLUDED:-}
   STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
+  # What one account may spend of this instance's money in a month, in
+  # micro-dollars. Empty is the default of $15. It applies only to an account
+  # whose plan includes the keys.
+  ACCOUNT_MONTHLY_CAP_MICROS: ${ACCOUNT_MONTHLY_CAP_MICROS:-}
   # Where Checkout sends a person back to. Required with BILLING_MODE=stripe.
   APP_URL: ${APP_URL:-}
 

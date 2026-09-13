@@ -75,6 +75,15 @@ export interface FilterOptions {
    * and on a comment this is the only paid stage in front of the classifier.
    */
   readonly triagerFor?: (userId: string) => Promise<Triager | undefined>;
+  /**
+   * What this monitor's owner may still spend of the instance's money, or null
+   * where the money is its own. US-129.
+   *
+   * The model half is where an account's month actually goes — a batch of 123
+   * classifications is many more calls than a poll is pages — so the meter
+   * stops on whichever cap runs out first.
+   */
+  readonly accountCapFor?: (userId: string) => Promise<number | null>;
 }
 
 /** A post as both stages read it, which is a row minus what neither needs. */
@@ -107,6 +116,7 @@ function vectorLiteral(embedding: readonly number[]): string {
 export function createFilterStep({
   embedderFor,
   triagerFor,
+  accountCapFor = async () => null,
 }: FilterOptions = {}): Step<FilterPayload> {
   return async function filter(
     { monitorId, postIds },
@@ -214,7 +224,10 @@ export function createFilterStep({
        * The classify step refuses the actual spend; letting these through
        * costs nothing here and loses nothing there.
        */
-      const meter = await createSpendMeter(db, monitorId);
+      const meter = await createSpendMeter(db, monitorId, new Date(), {
+        userId: monitor.userId,
+        accountCapMicros: await accountCapFor(monitor.userId),
+      });
 
       for (const candidate of survivors) {
         if (await meter.exhausted()) {
@@ -233,6 +246,7 @@ export function createFilterStep({
           purpose: "triage",
           outcome: outcome.status,
           call: outcome.call,
+          userId: monitor.userId,
           monitorId,
           postId: candidate.id,
           error: outcome.error ?? null,
@@ -371,6 +385,7 @@ export function createFilterStep({
         purpose: "embedding",
         outcome,
         call,
+        userId: monitor.userId,
         monitorId,
         // One call covers many posts, so it belongs to none of them. The row
         // is on the monitor's bill, which is where the cap reads it.

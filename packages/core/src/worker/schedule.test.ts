@@ -1,8 +1,18 @@
 import { eq, sql } from "drizzle-orm";
+import { PgBoss } from "pg-boss";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
+import { recordSourceUsage } from "../budget/budget.js";
 import { createDatabase, type Database } from "../db/client.js";
-import { defaultPollIntervalSeconds, monitors, subscriptions, users } from "../db/schema.js";
+import {
+  apiUsage,
+  defaultPollIntervalSeconds,
+  monitors,
+  subscriptions,
+  users,
+} from "../db/schema.js";
+import { createLogger } from "../logger.js";
 import { createTestDatabase, type TestDatabase } from "../testing/database.js";
+import { pollQueue } from "./queues.js";
 import { startWorker, type WorkerHandle } from "./runtime.js";
 import { enqueueDuePolls, findDueMonitors } from "./schedule.js";
 import { fakeRegistry, fastRetries, insertMonitor, silentLogger, until } from "./testing.js";
@@ -413,5 +423,115 @@ describe("whether the owner has paid", () => {
     const id = await insertMonitor(database, { userId: "older-than-billing" });
 
     expect((await findDueMonitors(db, "stripe")).map((monitor) => monitor.id)).toEqual([id]);
+  });
+});
+
+/**
+ * Whether the account has any of its lent month left. US-129.
+ *
+ * The other half of the cap, and the half that matters for `entitledCondition`'s
+ * reason: a poll refused in `collect.ts` has already been queued, claimed and
+ * started. An account over its cap whose monitors keep being queued is forty
+ * refused jobs an hour until the month turns over.
+ */
+describe("whether the account has spent its month", () => {
+  let database: TestDatabase;
+  let db: Database;
+  let close: () => Promise<void>;
+  let boss: PgBoss;
+
+  beforeAll(async () => {
+    database = await createTestDatabase("worker_due_cap");
+    ({ db, close } = createDatabase(database.url));
+    boss = new PgBoss({ connectionString: database.url });
+    await boss.start();
+    await boss.createQueue(pollQueue);
+  }, 60_000);
+
+  afterAll(async () => {
+    await boss?.stop();
+    await close?.();
+    await database?.drop();
+  });
+
+  afterEach(async () => {
+    await db.delete(apiUsage);
+    await db.delete(monitors);
+    await db.delete(subscriptions);
+    await db.delete(users);
+  });
+
+  async function ownerOn(id: string, plan: "own_keys" | "keys_included"): Promise<string> {
+    await db.insert(users).values({ id, name: id, email: `${id}@example.test` });
+    await db.insert(subscriptions).values({ userId: id, status: "active", plan });
+    return id;
+  }
+
+  async function spend(userId: string, micros: number): Promise<void> {
+    await recordSourceUsage(db, {
+      userId,
+      monitorId: null,
+      source: "reddit",
+      provider: "socialcrawl",
+      units: 1,
+      pricePerUnitMicros: micros,
+    });
+  }
+
+  it("does not send a poll for an account that has spent its month", async () => {
+    const over = await ownerOn("cap-over", "keys_included");
+    const under = await ownerOn("cap-under", "keys_included");
+
+    await spend(over, 15_000_000);
+    await spend(under, 1_000_000);
+
+    const stopped = await insertMonitor(database, { userId: over });
+    await insertMonitor(database, { userId: under });
+
+    const lines: string[] = [];
+    const logger = createLogger({
+      level: "warn",
+      name: "schedule-cap-test",
+      destination: { write: (line: string) => lines.push(line) },
+    });
+
+    const result = await enqueueDuePolls(db, boss, logger, "stripe", 15_000_000);
+
+    // Both were due. One was not sent, and the log says which and why.
+    expect(result.due).toBe(2);
+    expect(result.overCapSkipped).toBe(1);
+    expect(lines.join("\n")).toContain(stopped);
+    expect(lines.join("\n")).toContain("spent the month its plan includes");
+  });
+
+  /**
+   * The account is spending its own money, so the deployment's cap is not a
+   * limit it meets however much it has spent. This is the bring-your-own-keys
+   * account on the same instance as the one above.
+   */
+  it("sends a poll for an account spending its own money, however much it spent", async () => {
+    const own = await ownerOn("cap-own", "own_keys");
+    await spend(own, 90_000_000);
+    await insertMonitor(database, { userId: own });
+
+    const result = await enqueueDuePolls(db, boss, silentLogger, "stripe", 15_000_000);
+
+    expect(result.due).toBe(1);
+    expect(result.overCapSkipped).toBe(0);
+  });
+
+  /**
+   * The self-hosted instance, which lends nothing and must ask the database
+   * nothing about caps. Null is what every deployment before US-129 passes.
+   */
+  it("sends every due poll where the deployment lends nothing", async () => {
+    const over = await ownerOn("cap-nolend", "keys_included");
+    await spend(over, 90_000_000);
+    await insertMonitor(database, { userId: over });
+
+    const result = await enqueueDuePolls(db, boss, silentLogger, "stripe", null);
+
+    expect(result.due).toBe(1);
+    expect(result.overCapSkipped).toBe(0);
   });
 });

@@ -33,6 +33,7 @@ import {
   type LastCollection,
   lastCollections,
   latestPollRuns,
+  lentKeysPollIntervalSeconds,
   listMonitors,
   type MatchCounts,
   type Monitor,
@@ -469,6 +470,16 @@ export interface MonitorRoutesOptions {
    */
   readonly environmentFor?: (userId: string) => Promise<Record<string, string | undefined>>;
   /**
+   * What this account may still spend of the instance's money, or null where
+   * the money is its own. US-129.
+   *
+   * These routes read it for one thing only: a monitor created by an account
+   * spending our money polls every four hours rather than hourly unless the
+   * person says otherwise. The cap itself is enforced in the worker, where the
+   * money is spent.
+   */
+  readonly accountCapFor?: (userId: string) => Promise<number | null>;
+  /**
    * Whether this deployment has a working mailer. US-093.
    *
    * A boolean rather than the SMTP settings, because these routes have no
@@ -695,6 +706,27 @@ export async function registerMonitorRoutes(
   const stored = options.storedCredentials ?? (() => new Set<string>());
 
   /**
+   * What a new monitor polls at, before the person says otherwise. US-129.
+   *
+   * The column's default is hourly and stays hourly: it is what every
+   * self-hosted instance has run since US-041, and changing it there would
+   * change somebody else's machine and somebody else's bill.
+   *
+   * An account whose plan includes this instance's keys is the one case where
+   * the default is ours to pay for, and hourly is about four times what every
+   * four hours costs. This product finds threads that are still worth replying
+   * to next month, so the slower default loses close to nothing — and a person
+   * may still choose hourly on the form, which is why this is a default and not
+   * a limit.
+   *
+   * Spread *before* the body, so anything the person chose wins.
+   */
+  const pollDefaultsFor = async (userId: string): Promise<{ pollIntervalSeconds?: number }> =>
+    (await options.accountCapFor?.(userId)) === null || options.accountCapFor === undefined
+      ? {}
+      : { pollIntervalSeconds: lentKeysPollIntervalSeconds };
+
+  /**
    * Which of the machine's keys this account may spend. US-128.
    *
    * Read per request, beside the stored keys, for the same reason they are: the
@@ -877,6 +909,7 @@ export async function registerMonitorRoutes(
         purpose: "query_generation",
         outcome: outcome.status === "generated" ? "scored" : outcome.status,
         call: outcome.call,
+        userId: sessionUserId(request),
         error: outcome.status === "generated" ? null : outcome.error,
       });
 
@@ -980,6 +1013,7 @@ export async function registerMonitorRoutes(
       const { monitor, missing } = await createMonitor(
         db,
         {
+          ...(await pollDefaultsFor(person.id)),
           ...request.body,
           ...filterSettings(request.body),
           ...replySettings(request.body),

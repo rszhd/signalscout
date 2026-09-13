@@ -1,0 +1,2 @@
+ALTER TABLE "poll_runs" DROP CONSTRAINT "poll_runs_stop_reason_known";--> statement-breakpoint
+ALTER TABLE "poll_runs" ADD CONSTRAINT "poll_runs_stop_reason_known" CHECK (stop_reason IS NULL OR stop_reason IN ('budget_exhausted', 'account_budget_exhausted', 'no_credentials', 'no_provider_choice', 'not_offered', 'resume_key_missing', 'collection_abandoned', 'provider_wait', 'page_cap', 'still_collecting', 'error'));

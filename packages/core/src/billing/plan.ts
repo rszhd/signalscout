@@ -19,11 +19,17 @@
  * the price Stripe names. Nothing else writes it, so a person cannot choose the
  * expensive plan by choosing it.
  */
+
+import { and, eq, inArray } from "drizzle-orm";
 import type { AiEnvironment } from "../ai/config.js";
 import type { SignupMode } from "../auth/user.js";
-import { accountModelEnvironment, providerKeyEnvironmentFor } from "../config/machine-keys.js";
+import {
+  accountModelEnvironment,
+  providerKeyEnvironmentFor,
+  spendsInstanceMoney,
+} from "../config/machine-keys.js";
 import type { Database } from "../db/client.js";
-import type { SubscriptionPlan } from "../db/schema.js";
+import { type SubscriptionPlan, subscriptions } from "../db/schema.js";
 import type { BillingMode, SubscriptionRecord } from "./entitlement.js";
 import { readSubscription } from "./store.js";
 
@@ -82,6 +88,12 @@ export interface AccountKeysOptions {
   readonly mode: BillingMode;
   /** The machine's own environment. Handed out per account, or not at all. */
   readonly environment?: Record<string, string | undefined>;
+  /**
+   * What one account may spend of ours in a month, where its plan lends the
+   * keys. US-129. Undefined means this deployment lends nothing, which is every
+   * self-hosted instance.
+   */
+  readonly capMicros?: number;
 }
 
 /**
@@ -110,11 +122,20 @@ export interface AccountKeys {
    * has to be keyed by the plan the client was built under.
    */
   plan(userId: string): Promise<SubscriptionPlan>;
+  /**
+   * What this account may still spend of ours this month, or null where the
+   * money is its own. US-129.
+   *
+   * Here rather than in `budget/` because it is the same question this object
+   * already answers — what one account may spend — and because the cap turns on
+   * the plan, which nothing in `budget/` knows about.
+   */
+  cap(userId: string): Promise<number | null>;
 }
 
 export function accountKeys(
   db: Database,
-  { signup, mode, environment = process.env }: AccountKeysOptions,
+  { signup, mode, environment = process.env, capMicros }: AccountKeysOptions,
 ): AccountKeys {
   return {
     async provider(userId) {
@@ -126,7 +147,36 @@ export function accountKeys(
     async plan(userId) {
       return readPlan(db, userId, mode);
     },
+    async cap(userId) {
+      if (capMicros === undefined) return null;
+      return spendsInstanceMoney(signup, await readPlan(db, userId, mode)) ? capMicros : null;
+    },
   };
+}
+
+/**
+ * Which of these accounts are on the plan whose keys are the instance's. US-129.
+ *
+ * For the scheduler, which holds a list of owners and needs to know which of
+ * them have a cap at all. Asked of the database in one read rather than once
+ * per account: a tick that is about to queue forty polls must not make forty
+ * round trips to find out whose money it is about to spend.
+ */
+export async function keysIncludedAmong(
+  db: Database,
+  userIds: readonly string[],
+  mode: BillingMode,
+): Promise<string[]> {
+  if (mode === "off" || userIds.length === 0) return [];
+
+  const rows = await db
+    .select({ userId: subscriptions.userId })
+    .from(subscriptions)
+    .where(
+      and(inArray(subscriptions.userId, [...userIds]), eq(subscriptions.plan, "keys_included")),
+    );
+
+  return rows.map((row) => row.userId);
 }
 
 /**

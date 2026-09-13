@@ -5,6 +5,7 @@ import {
   type AiConfig,
   type AiEnvironment,
   type Auth,
+  accountCapFrom,
   accountKeys,
   aiConfigFromEnvironment,
   type BillingProvider,
@@ -443,7 +444,24 @@ export async function buildServer({
     handler: async () => ({ status: "ok" as const, workerInProcess: env.WORKER_IN_PROCESS }),
   });
 
-  await registerBillingRoutes(app, { db, logger, settings, billing });
+  /**
+   * Whose keys each account may spend. US-128.
+   *
+   * One object, built once, asked per request. The rule underneath is
+   * `config/machine-keys.ts` as it always was — what changed is that the answer
+   * is about the account rather than about the instance, so it has to be asked
+   * where the account is known instead of here.
+   */
+  const keys = accountKeys(db, {
+    signup: env.AUTH_SIGNUP,
+    mode: settings?.mode ?? "off",
+    ...(environment ? { environment } : {}),
+    // US-129. What this deployment lends one account in a month. It reaches an
+    // account only where its plan includes the keys.
+    capMicros: accountCapFrom(env),
+  });
+
+  await registerBillingRoutes(app, { db, logger, settings, billing, keys });
 
   // The account's setup marker. US-105. Registered here rather than with the
   // connections screen because it is about the account, not a key.
@@ -458,20 +476,6 @@ export async function buildServer({
    * deployment has none". Only the *fallback* changed: it used to read the
    * environment once and now reads the person's settings over it.
    */
-  /**
-   * Whose keys each account may spend. US-128.
-   *
-   * One object, built once, asked per request. The rule underneath is
-   * `config/machine-keys.ts` as it always was — what changed is that the answer
-   * is about the account rather than about the instance, so it has to be asked
-   * where the account is known instead of here.
-   */
-  const keys = accountKeys(db, {
-    signup: env.AUTH_SIGNUP,
-    mode: settings?.mode ?? "off",
-    ...(environment ? { environment } : {}),
-  });
-
   const aiFor = aiEnvironmentFor(db, env, keys);
 
   await registerProjectRoutes(app, {
@@ -528,6 +532,9 @@ export async function buildServer({
     // that may not spend it: the form offered a monitor every poll refuses.
     // Every reader of a provider key on this page reads one value.
     environmentFor: providerKeysFor,
+    // US-129. A monitor created by an account spending our money polls every
+    // four hours rather than hourly, unless the person chooses otherwise.
+    accountCapFor: (userId) => keys.cap(userId),
     // US-093: whether a new monitor's email notifications can be switched on.
     // The same list the notification screen and its save route read, asked
     // once here so the monitor routes never see the SMTP settings.

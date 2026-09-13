@@ -2,7 +2,7 @@
 
 # Open tickets
 
-32 open — 16 doing, 15 todo, 1 parked (12 p1, 16 p2, 4 p3).
+32 open — 14 doing, 17 todo, 1 parked (11 p1, 17 p2, 4 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -13,11 +13,10 @@
 | p1 | US-083 | [One default key sets every job](doing/US-083-one-default-key-sets-every-job.md) | feature | doing | 2026-09-09T11:13+08:00 |
 | p1 | US-100 | [The cloud version runs at app.signalscout.run](doing/US-100-the-cloud-version-runs-at-app-signalscout-run.md) | feature | doing | 2026-09-10T03:05+08:00 |
 | p1 | US-104 | [A monitor says what its last poll did](doing/US-104-a-monitor-says-what-its-last-poll-did.md) | feature | doing | 2026-09-10T09:51+08:00 |
-| p1 | US-128 | [A plan includes the keys, so nobody pastes one](doing/US-128-a-plan-includes-the-keys-so-nobody-pastes-one.md) | feature | doing | 2026-09-12T12:10+08:00 |
-| p1 | US-129 | [An account has a monthly cap on the instance's money](doing/US-129-an-account-has-a-monthly-cap-on-the-instances-money.md) | feature | doing | 2026-09-12T12:14+08:00 |
 | p1 | BUG-004 | [The model half of a poll is not capped](doing/BUG-004-the-model-half-of-a-poll-is-not-capped.md) | bug | doing | 2026-09-06T04:42+08:00 |
 | p1 | BUG-016 | [One platform's outage throws away another platform's collection](doing/BUG-016-one-platforms-outage-throws-away-another-platforms-collection.md) | bug | doing | 2026-09-10T10:44+08:00 |
 | p1 | US-033 | [Thirty verdicts say whether the score is right](todo/US-033-thirty-verdicts-say-whether-the-score-is-right.md) | chore | todo | 2026-09-06T03:02+08:00 |
+| p1 | US-131 | [Checkout offers the plan that includes the keys](todo/US-131-checkout-offers-the-plan-that-includes-the-keys.md) | feature | todo | 2026-09-13T13:05+08:00 |
 | p2 | US-015 | [A deleted post stops being shown](doing/US-015-a-deleted-post-stops-being-shown.md) | feature | doing | 2026-09-04T22:49+08:00 |
 | p2 | US-017 | [A self-hosted instance has one account](doing/US-017-a-self-hosted-instance-has-one-account.md) | feature | doing | 2026-09-04T22:49+08:00 |
 | p2 | US-020 | [A monitor can include comments and replies](doing/US-020-a-monitor-can-include-comments-and-replies.md) | feature | doing | 2026-09-05T01:18+08:00 |
@@ -34,6 +33,7 @@
 | p2 | US-062 | [A real model's drafts are replayed](todo/US-062-a-real-model-s-drafts-are-replayed.md) | chore | todo | 2026-09-07T20:30+08:00 |
 | p2 | US-099 | [A button, a field and a dialog are one component each](todo/US-099-a-button-a-field-and-a-dialog-are-one-component-each.md) | chore | todo | 2026-09-10T01:20+08:00 |
 | p2 | US-122 | [LinkedIn gets a second provider](todo/US-122-linkedin-gets-a-second-provider.md) | spike | todo | 2026-09-11T18:44+08:00 |
+| p2 | US-130 | [A lent-keys account is given a provider to poll through](todo/US-130-a-lent-keys-account-is-given-a-provider-to-poll-through.md) | feature | todo | 2026-09-13T12:24+08:00 |
 | p3 | US-018 | [A mutation sweep proves the suite is sensitive](todo/US-018-a-mutation-sweep-proves-the-suite-is-sensitive.md) | chore | todo | 2026-09-04T22:54+08:00 |
 | p3 | US-095 | [The logo travels with the email](todo/US-095-the-logo-travels-with-the-email.md) | feature | todo | 2026-09-10T00:36+08:00 |
 | p3 | BUG-013 | [A key row's error is printed inside a closed dialog](todo/BUG-013-a-key-row-s-error-is-printed-inside-a-closed-dialog.md) | bug | todo | 2026-09-09T11:58+08:00 |

@@ -6,7 +6,7 @@ priority: p1
 created: 2026-09-12T12:14+08:00
 parent: US-128
 area:
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -90,8 +90,7 @@ the first month of real accounts, not before.
       refused, and the sentence says which one stopped it
 - [x] The account's cap is not applied to a bring-your-own-keys account, nor
       anywhere signup is closed
-- [ ] The billing screen shows the account's cap and what is left of it — the
-      route answers it; no browser has rendered it
+- [x] The billing screen shows the account's cap and what is left of it
 - [x] Reaching the cap does not lose collection already paid for, and does not
       delete anything. Reads stay, the way the paywall's do
 - [x] Asserted against real Postgres, with the money already recorded, and the
@@ -99,9 +98,8 @@ the first month of real accounts, not before.
 - [x] A monitor created by a keys-included account polls every four hours rather
       than hourly, and a person may still choose either
 - [x] A keys-included account's new monitor starts with Instagram comments off
-- [ ] The billing screen states the plan's price and its cap in one place, read
-      from Stripe and from the setting rather than written in the markup — the
-      route does; the screen is the next session
+- [x] The billing screen states the plan's price and its cap in one place, read
+      from Stripe and from the setting rather than written in the markup
 - [x] No test spends money
 
 ## Notes
@@ -279,3 +277,36 @@ the first month of real accounts, not before.
   the mechanism: priced model calls accumulate into the account's month, and the
   meter stops the batch when it is gone. That claim does not depend on the price
   being right.
+
+- 2026-09-13T12:55+08:00 — **The screen is built, and the sentence it used to
+  say is the reason it needed to be.** The bottom of the billing page told every
+  account *your providers bill your accounts directly* — which is a page
+  describing somebody else's plan to an account that has no providers. It now
+  reads from `plan`, as do the plan card, its list of what is included and the
+  three definitions below it.
+
+  The allowance itself is shaped like the trial block beside it: a label, the
+  figure, a progress bar. Two things answer the same kind of question — how much
+  of something is left — and a second shape for that is a second thing to learn.
+
+  `usageLabel` keeps four decimal places for `budget/budget.ts`'s reason: ten
+  Reddit records cost $0.015, and a figure rounded to cents cannot be reconciled
+  against anything. It drops the zeros a whole figure does not need, so the cap
+  reads `$15` and a real spend reads `$0.0038`.
+
+  **The sentence at the cap never says "raise", and a test holds it there.**
+  Nobody raises this one. A monitor's own budget is the control a person has and
+  it is on the monitor; inviting somebody to raise this would send them looking
+  for something that does not exist.
+
+  Three screen cases, and all three were watched to fail: hiding the allowance
+  block and pinning the two plan sentences to their old wording turns two red.
+  2,134 tests pass, lint and typecheck clean.
+
+  **Still true: no real browser has rendered it.** These are jsdom tests, which
+  is how every screen in this repository is asserted, and it is the same gap
+  US-072 recorded for this page.
+
+  One thing found and left alone: `apps/web/src/index.css` fails stylelint on
+  `.product-note` — `margin-top: 29px`, against the spacing scale. It predates
+  this work and is nothing to do with billing.

@@ -45,11 +45,12 @@ spend meter; and the scheduler does not queue a poll for an account that has
 spent its month — which is what stops the work being started at all, the same
 half of the gate `entitledCondition` is.
 
-**Checkout does not offer the keys-included price yet, and that is deliberate.**
-The cap now exists, and what has not happened is a live run: no account has
-polled a real provider on this instance's keys and watched the cap stop it. The
-plan can be put on an account from Stripe's own dashboard, where somebody is
-watching, and not bought from a button.
+**Checkout does not offer the keys-included price yet, and US-131 is the ticket
+that changes it.** It was held back until there was a cap, and there is one now.
+Until that ticket closes the plan can be put on an account from Stripe's own
+dashboard and not bought from a button — the webhook reads whichever price the
+subscription names either way, which is how the live run put an account on each
+plan and back again.
 
 One consequence is worth stating rather than discovering. `past_due` is
 entitled, so a card that failed this morning keeps polling on our keys while

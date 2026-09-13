@@ -160,6 +160,16 @@
   color: var(--muted-strong);
   font-weight: 500;
 }
+/*
+  The sentence under the included-usage bar. US-129. Smaller than the figures
+  above it, because it is a qualification rather than a number: an estimate on
+  our side, and a month that resets by itself.
+*/
+.billing-included-note {
+  margin: var(--space-3) 0 0;
+  font-size: var(--text-xs);
+  color: var(--muted);
+}
 .billing-trial progress {
   display: block;
   width: 100%;

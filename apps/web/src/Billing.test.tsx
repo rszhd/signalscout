@@ -9,7 +9,13 @@
  */
 import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { Billing, type BillingState, priceLabel, subscriptionSentence } from "./Billing.js";
+import {
+  Billing,
+  type BillingState,
+  priceLabel,
+  subscriptionSentence,
+  usageLabel,
+} from "./Billing.js";
 import { button, json, mount, type Screen, settle } from "./testing.js";
 
 function state(overrides: Partial<BillingState> = {}): BillingState {
@@ -25,6 +31,10 @@ function state(overrides: Partial<BillingState> = {}): BillingState {
     hasBillingAccount: false,
     trialDays: 7,
     price: { amount: 2000, currency: "usd", interval: "month" },
+    // US-128's default, and it is the one every account had before the second
+    // plan existed: the person brings their own keys.
+    plan: "own_keys",
+    included: null,
     ...overrides,
   };
 }
@@ -147,6 +157,19 @@ describe("the sentence this account gets", () => {
   });
 });
 
+/**
+ * US-129. Four decimal places, for `budget/budget.ts`'s reason: ten Reddit
+ * records cost $0.015, and a page that rounded that to two cents could not be
+ * reconciled against anything.
+ */
+describe("the usage figure on the screen", () => {
+  it("keeps four decimal places, and drops the zeros a whole figure does not need", () => {
+    expect(usageLabel(15_000_000)).toBe("$15");
+    expect(usageLabel(3_800)).toBe("$0.0038");
+    expect(usageLabel(0)).toBe("$0");
+  });
+});
+
 describe("the billing screen", () => {
   let screen: Screen;
   let fetched: ReturnType<typeof vi.fn>;
@@ -167,6 +190,87 @@ describe("the billing screen", () => {
 
     expect(button("Subscribe")).toBeTruthy();
     expect(document.body.textContent).toContain("7 days left");
+  });
+
+  /**
+   * US-128 and US-129. The plan changes what the page claims, and the claim it
+   * used to make is the one that matters: a page telling an account with no
+   * providers that its providers bill it directly is a page describing somebody
+   * else's plan.
+   */
+  it("tells a lent-keys account its usage is included, and what is left of it", async () => {
+    fetched.mockImplementation(async () =>
+      json(
+        state({
+          reason: "subscribed",
+          status: "active",
+          hasBillingAccount: true,
+          plan: "keys_included",
+          included: {
+            capMicros: 15_000_000,
+            spentMicros: 4_000_000,
+            remainingMicros: 11_000_000,
+            exhausted: false,
+            since: "2026-09-01T00:00:00.000Z",
+          },
+        }),
+      ),
+    );
+
+    screen = await mount(<Billing />);
+    await settle();
+
+    const text = document.body.textContent ?? "";
+
+    expect(text).toContain("$4 of $15 used");
+    expect(text).toContain("Your provider usage is included");
+    expect(text).not.toContain("Your provider usage is separate");
+    expect(text).not.toContain("bill your accounts directly");
+  });
+
+  it("says the month resets when the allowance is spent, and never says raise", async () => {
+    fetched.mockImplementation(async () =>
+      json(
+        state({
+          reason: "subscribed",
+          status: "active",
+          hasBillingAccount: true,
+          plan: "keys_included",
+          included: {
+            capMicros: 15_000_000,
+            spentMicros: 15_000_000,
+            remainingMicros: 0,
+            exhausted: true,
+            since: "2026-09-01T00:00:00.000Z",
+          },
+        }),
+      ),
+    );
+
+    screen = await mount(<Billing />);
+    await settle();
+
+    const text = document.body.textContent ?? "";
+
+    // Nobody raises this cap. A sentence inviting somebody to would send them
+    // looking for a control that does not exist.
+    expect(text).toContain("start again when the month does");
+    expect(text.toLowerCase()).not.toContain("raise");
+  });
+
+  /**
+   * The account that was here before the second plan, and every self-hosted
+   * one. It meets no allowance, so the screen must show none: a figure there
+   * would be a limit that does not apply.
+   */
+  it("shows no allowance to an account spending its own money", async () => {
+    screen = await mount(<Billing />);
+    await settle();
+
+    const text = document.body.textContent ?? "";
+
+    expect(text).not.toContain("Included usage");
+    expect(text).toContain("Your provider usage is separate");
   });
 
   it("offers Stripe's own page once there is a customer", async () => {

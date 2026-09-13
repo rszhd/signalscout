@@ -59,6 +59,8 @@ describe("the application screens", () => {
       trialDaysLeft: 7,
       trialEndsAt: "2026-09-15T00:00:00.000Z",
       currentPeriodEnd: null,
+      plan: "own_keys",
+      included: null,
       cancelAtPeriodEnd: false,
       hasBillingAccount: false,
       trialDays: 7,

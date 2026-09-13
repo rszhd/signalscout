@@ -27,6 +27,40 @@ export interface BillingState {
   trialDays: number;
   /** What Stripe charges, or null when it could not be read. BUG-014. */
   price: { amount: number; currency: string; interval: string | null } | null;
+  /** Whose keys this account's monitors spend. US-128. */
+  plan: "own_keys" | "keys_included";
+  /**
+   * The month this plan lends and what is left of it. US-129.
+   *
+   * Null on every account spending its own money, and the screen then says
+   * nothing about it — a figure there would be a limit that does not apply.
+   */
+  included: {
+    capMicros: number;
+    spentMicros: number;
+    remainingMicros: number;
+    exhausted: boolean;
+    since: string;
+  } | null;
+}
+
+/**
+ * A micro-dollar amount as a person reads it. US-129.
+ *
+ * Four decimal places, because `budget/budget.ts` uses four for the same
+ * reason: ten Reddit records cost $0.015 and a page that rounded that to two
+ * cents could not be reconciled against anything. The trailing zeros are cut,
+ * so a whole month's cap reads as "$15" rather than "$15.0000".
+ */
+export function usageLabel(micros: number): string {
+  const exact = new Intl.NumberFormat(undefined, {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 4,
+  });
+
+  return exact.format(micros / 1_000_000);
 }
 
 /**
@@ -298,13 +332,17 @@ export function Billing() {
                 <p className="billing-price-note">
                   {state.mode === "off"
                     ? "No application subscription."
-                    : "Hosting included. Provider usage billed separately."}
+                    : state.plan === "keys_included"
+                      ? "Hosting and provider usage included, up to your monthly allowance."
+                      : "Hosting included. Provider usage billed separately."}
                 </p>
                 <div className="billing-features">
                   <h3>
                     {state.mode === "off"
                       ? "Included in the application"
-                      : "We take care of the hosting"}
+                      : state.plan === "keys_included"
+                        ? "We take care of the keys as well"
+                        : "We take care of the hosting"}
                   </h3>
                   <ul className="billing-includes">
                     {(state.mode === "off"
@@ -313,11 +351,17 @@ export function Billing() {
                           "Scheduled monitoring and your intent inbox",
                           "Your own social data and AI connections",
                         ]
-                      : [
-                          "Hosted application and database",
-                          "Managed scheduler for your monitors",
-                          "Automatic updates and backups",
-                        ]
+                      : state.plan === "keys_included"
+                        ? [
+                            "Hosted application and database",
+                            "Managed scheduler for your monitors",
+                            "Social data and AI keys included — nothing to set up",
+                          ]
+                        : [
+                            "Hosted application and database",
+                            "Managed scheduler for your monitors",
+                            "Automatic updates and backups",
+                          ]
                     ).map((feature) => (
                       <li key={feature}>
                         <span aria-hidden="true">✓</span>
@@ -353,6 +397,37 @@ export function Billing() {
                     />
                   </div>
                 )}
+                {/*
+                  What the plan lends this month, and what is left. US-129.
+                  Shaped like the trial block above it because it answers the
+                  same kind of question — how much of something is left — and a
+                  second shape for that would be a second thing to learn.
+
+                  The sentence says the month resets and never says "raise",
+                  because nobody can: the monitor's own budget is the control a
+                  person has, and it is on the monitor.
+                */}
+                {state.included && (
+                  <div className="billing-trial">
+                    <div>
+                      <span>Included usage</span>
+                      <strong>
+                        {usageLabel(state.included.spentMicros)} of{" "}
+                        {usageLabel(state.included.capMicros)} used
+                      </strong>
+                    </div>
+                    <progress
+                      aria-label="Included usage this month"
+                      max={state.included.capMicros}
+                      value={Math.min(state.included.capMicros, state.included.spentMicros)}
+                    />
+                    <p className="billing-included-note">
+                      {state.included.exhausted
+                        ? "This month's included usage is spent. Collecting and scoring start again when the month does."
+                        : "Estimated. Your providers' own invoices are what we are billed."}
+                    </p>
+                  </div>
+                )}
                 {state.mode === "stripe" && (
                   <div className="billing-action">
                     {error && (
@@ -385,32 +460,60 @@ export function Billing() {
               </section>
             </div>
 
+            {/*
+              The whole of this section was about somebody else's bill, and on
+              the plan that includes the keys there is no other bill. US-128:
+              the same page cannot say "your providers bill you directly" to an
+              account that has no providers.
+            */}
             <section className="billing-usage" aria-labelledby="billing-usage-title">
               <div>
-                <p className="billing-eyebrow">Bring your own keys</p>
-                <h2 id="billing-usage-title">Your provider usage is separate</h2>
+                <p className="billing-eyebrow">
+                  {state.plan === "keys_included" ? "Keys included" : "Bring your own keys"}
+                </p>
+                <h2 id="billing-usage-title">
+                  {state.plan === "keys_included"
+                    ? "Your provider usage is included"
+                    : "Your provider usage is separate"}
+                </h2>
                 <p>
-                  Social data and AI providers bill your accounts directly. Their usage is separate
-                  from your SignalScout subscription.
+                  {state.plan === "keys_included"
+                    ? "Social data and AI run on our keys, up to the monthly allowance in your plan. There is nothing to connect and no second invoice."
+                    : "Social data and AI providers bill your accounts directly. Their usage is separate from your SignalScout subscription."}
                 </p>
                 <Link className="secondary-button" to={paths.connections}>
-                  Manage connections <span aria-hidden="true">↗</span>
+                  {state.plan === "keys_included" ? "See connections" : "Manage connections"}{" "}
+                  <span aria-hidden="true">↗</span>
                 </Link>
               </div>
               <dl>
                 <div>
                   <dt>Social data</dt>
-                  <dd>Searches and conversations collected through your connected providers.</dd>
+                  <dd>
+                    {state.plan === "keys_included"
+                      ? "Searches and conversations collected through our providers."
+                      : "Searches and conversations collected through your connected providers."}
+                  </dd>
                 </div>
                 <div>
                   <dt>AI models</dt>
                   <dd>
-                    Classification, embeddings and reply drafts using your model provider keys.
+                    {state.plan === "keys_included"
+                      ? "Classification, embeddings and reply drafts on our model keys."
+                      : "Classification, embeddings and reply drafts using your model provider keys."}
                   </dd>
                 </div>
                 <div>
-                  <dt>You control the budget</dt>
-                  <dd>Set a monthly spending cap for each monitor in its settings.</dd>
+                  <dt>
+                    {state.plan === "keys_included"
+                      ? "Your monthly allowance"
+                      : "You control the budget"}
+                  </dt>
+                  <dd>
+                    {state.plan === "keys_included"
+                      ? "Included usage resets with the calendar month. A monitor can still have a cap of its own."
+                      : "Set a monthly spending cap for each monitor in its settings."}
+                  </dd>
                 </div>
               </dl>
             </section>

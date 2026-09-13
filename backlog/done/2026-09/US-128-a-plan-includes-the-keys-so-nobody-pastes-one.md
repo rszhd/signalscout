@@ -6,7 +6,7 @@ priority: p1
 created: 2026-09-12T12:10+08:00
 parent:
 area:
-resolution:
+resolution: shipped
 ---
 
 ## Context

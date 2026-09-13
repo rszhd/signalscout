@@ -2,7 +2,7 @@
 
 # Done
 
-116 finished.
+118 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
@@ -22,6 +22,8 @@
 | BUG-003 | [A post below the threshold is classified again on every poll](done/2026-09/BUG-003-a-post-below-the-threshold-is-classified-again-on-every-poll.md) | bug | fixed | 2026-09 |
 | BUG-002 | [A seven-day window is bought as a month](done/2026-09/BUG-002-a-seven-day-window-is-bought-as-a-month.md) | bug | fixed | 2026-09 |
 | BUG-001 | [A pending Reddit collection is not resumed](done/2026-09/BUG-001-a-pending-reddit-collection-is-not-resumed.md) | bug | shipped | 2026-09 |
+| US-129 | [An account has a monthly cap on the instance's money](done/2026-09/US-129-an-account-has-a-monthly-cap-on-the-instances-money.md) | feature | shipped | 2026-09 |
+| US-128 | [A plan includes the keys, so nobody pastes one](done/2026-09/US-128-a-plan-includes-the-keys-so-nobody-pastes-one.md) | feature | shipped | 2026-09 |
 | US-127 | [YouTube is fetched through ScrapeCreators](done/2026-09/US-127-youtube-is-fetched-through-scrapecreators.md) | feature | shipped | 2026-09 |
 | US-126 | [TikTok is fetched through ScrapeCreators](done/2026-09/US-126-tiktok-is-fetched-through-scrapecreators.md) | feature | shipped | 2026-09 |
 | US-125 | [The inbox says new matches arrived](done/2026-09/US-125-the-inbox-says-new-matches-arrived.md) | feature | shipped | 2026-09 |

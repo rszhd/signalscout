@@ -250,6 +250,8 @@ pnpm --filter @signalscout/core live:linkedin-poll   # spends ~$0.08 + model
 pnpm --filter @signalscout/core live:x-poll          # spends ~$0.002 + model
 pnpm --filter @signalscout/core live:sc-tiktok-poll   # spends ~$0.004 + model
 pnpm --filter @signalscout/core live:sc-youtube-poll  # spends ~$0.004 + model
+pnpm --filter @signalscout/core live:lent-keys        # spends ~$0.004 + model
+pnpm --filter @signalscout/api  live:stripe-plan     # spends nothing; Stripe test mode
 pnpm --filter @signalscout/core live:apify-linkedin-poll # spends ~$0.05 + model
 pnpm --filter @signalscout/core live:tiktok-poll     # spends ~$0.20 + model
 pnpm --filter @signalscout/core live:tiktok-comments # spends model only

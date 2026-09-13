@@ -224,6 +224,50 @@ first asked the first result in the page, got an empty comment page, billed for
 it, and in YouTube's case spent three more credits suspecting a parameter that
 was innocent. The count is in the search answer.
 
+`live:lent-keys` answers whether a plan that includes this instance's keys
+actually spends them, and whether the cap actually stops it. US-128 and US-129.
+It builds a scratch database, puts two accounts on the same open instance — one
+whose plan lends the keys and one spending its own — and drives the real
+`accountKeys`, the real credential lookup and the real collect step. One
+ScrapeCreators request is the only thing it pays for, about $0.004: the
+refusals cost nothing, which is why three of its four steps are free. It drops
+the scratch database on the way out, so it leaves nothing behind.
+
+Read the ledger lines at the end rather than the log: the run is only evidence
+if the `api_usage` row is against the account whose plan lends the keys and the
+other account has none. `--platform=` and `--query=` aim it; both default to the
+cheapest pair this repository has.
+
+**`--cap-micros=` is what makes the model half visible.** The cap a deployment
+lends is far more than one poll spends, so by default the run proves the guard
+by lending nothing rather than by reaching the limit. Set it a little above the
+provider's own spend and the classifier crosses it partway through the batch,
+which is the only way to watch the spend meter stop something: 38 posts, 5
+calls made, on 2026-09-13. The model must be priced or nothing accumulates —
+`AI_INPUT_PRICE_MICROS` and `AI_OUTPUT_PRICE_MICROS` for a model this
+repository holds no row for.
+
+`live:stripe-plan` answers whether a real Stripe subscription puts an account on
+the right plan. US-128. **It is the one instrument that does not live in
+`packages/core`** — it needs the Fastify server, so it is
+`pnpm --filter @signalscout/api live:stripe-plan`.
+
+It spends nothing: test mode, a test card token, and every customer it makes is
+deleted on the way out. What it costs instead is objects in somebody's Stripe
+account, so it refuses to run against a key that is not `sk_test_`.
+
+It reads this account's signing secret with `stripe listen --print-secret`,
+builds the API on a port of its own, puts `stripe listen` in front of it, and
+subscribes two customers — one to `STRIPE_PRICE_ID_KEYS_INCLUDED` and one to
+`STRIPE_PRICE_ID`. Then it reads the `subscriptions` rows out of a scratch
+database. The claim it exists for is somebody else's half: `priceIdOf` reads the
+price off the subscription *item*, the way `periodEndOf` reads the period end,
+and reading the wrong place answers undefined rather than an error — an account
+quietly on the cheaper plan with nothing anywhere saying so.
+
+`LIVE_STRIPE_PORT` moves it off 3999. It is deliberately not `PORT`, which names
+the development server's port and would be taken.
+
 `live:sc-tiktok-poll` and `live:sc-youtube-poll` are `live-poll.ts` aimed at the
 second provider for each of those platforms, the way `live:apify-linkedin-poll`
 already is. Each spends 2 ScrapeCreators credits — about $0.004, the cheapest

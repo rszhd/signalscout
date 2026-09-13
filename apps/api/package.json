@@ -8,6 +8,7 @@
     "build": "tsc --build",
     "typecheck": "tsc --build",
     "dev": "tsx watch src/index.ts",
+    "live:stripe-plan": "tsx --env-file-if-exists=../../.env src/live-stripe-plan.ts",
     "start": "node dist/index.js"
   },
   "dependencies": {

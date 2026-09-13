@@ -194,3 +194,135 @@ this, keep the price out of Checkout, close US-129, then sell it.
   for a keys-included account without a change — which is worth looking at in a
   browser before believing.
 
+- 2026-09-13T10:20+08:00 — **It has run live, on a real provider.**
+  `live:lent-keys` is the instrument, and it is new: nothing that existed could
+  ask this question, because every other live script builds its lookup from
+  `process.env` directly and so never meets the plan at all.
+
+  One scratch database, two accounts on the same open instance, and the real
+  `accountKeys`, the real `credentialsForAccounts` and the real collect step.
+  The whole run cost **$0.0038** — one ScrapeCreators YouTube request — because
+  the other three steps are refusals, and a refusal is free.
+
+  | | plan lends the keys | spends its own |
+  |---|---|---|
+  | `api_usage` rows | 1 | 0 |
+  | `model_calls` rows | 39 | 0 |
+  | spent | $0.0038 | $0.0000 |
+  | posts stored | 39 | — |
+
+  **The claim both tickets rested on is measured.** One instance, one
+  `SCRAPECREATORS_API_KEY`, two accounts, two answers: the plan account polled
+  YouTube and was billed 2 units against its own ledger rows, and the account
+  beside it reached no provider and spent nothing.
+
+  **The cap stopped a poll and the scheduler stopped a tick.** With nothing lent,
+  the same account's spend was $0.0038 before the poll and $0.0038 after it, so
+  no provider was reached. `enqueueDuePolls` then found 2 monitors due and sent
+  1: the plan account's was held back and the other account's was not.
+
+  **`model_calls.user_id` is written on real calls.** 39 rows against the plan
+  account and none against the other, which is migration 0060 working end to
+  end rather than in a fixture.
+
+  **The model half is still unmeasured, and the reason is not ours.** This
+  machine's `AI_API_KEY` is an OpenAI key with no credits: every one of the 39
+  classifications came back *You have no credits remaining*. So the spend meter
+  stopping a batch at the account cap has been asserted and not measured. It
+  needs a funded key and one more run of the same script, which would cost the
+  same $0.004 plus the classifications.
+
+  Two earlier runs of this script cost $0.0038 each and measured less: the first
+  died because the script did not catch the classify step's throw the way
+  `live-poll.ts` does, and the second reported `due: 0` because both monitors had
+  polled a moment before and their own interval, not the cap, was keeping them
+  out. Both are fixed in the script.
+
+- 2026-09-13T11:05+08:00 — **The model half is measured too, on DeepSeek.**
+  The earlier run could not reach it: this machine's OpenAI key has no credits.
+  DeepSeek's is in the machine environment rather than `.env`, which is why the
+  first attempt reported no key.
+
+  **`live:model-probe --provider=deepseek --model=deepseek-flash` first**, for a
+  fraction of a cent, because docs/instruments.md warns that a provider speaking
+  the OpenAI wire format is not by that fact one that speaks structured output.
+  It answers: `status: ok`, 149 in, 25 out, 0.9s. The AI SDK warns that
+  `responseFormat` is unsupported and puts the schema in the prompt instead —
+  and the answer still comes back usable. US-124 asked that question and this is
+  the answer for `deepseek-flash`.
+
+  **Then the run, with a cap set to $0.0060 — just above what the provider half
+  costs — so the classifier had to cross it.**
+
+  | | measured |
+  |---|---|
+  | posts collected and stored | 38 |
+  | posts sent to the classifier | 38 |
+  | **model calls actually made** | **5** |
+  | provider spend | $0.0038 |
+  | model spend | $0.0027 |
+  | total against the cap of $0.0060 | $0.0065 |
+
+  **The spend meter stopped a batch of 38 after 5 calls.** Uncapped, those 38
+  calls would have been about $0.0205. That is US-129's model half, which the
+  suite asserts and nothing had measured: a batch is where an account's lent
+  month actually goes, and the meter stops it partway rather than at the next
+  poll.
+
+  The $0.0005 overshoot past the cap is the documented one. The meter subtracts
+  what the loop reports between readings and stops when the next call would
+  cross, so the call that crosses is paid for — the same "up to one poll"
+  property docs/costs.md records for the monitor guard, one call at a time
+  instead.
+
+  **The price was stated, not read.** This repository holds no DeepSeek price
+  row on purpose: US-124 read the page and found four bands, $0.003 to $0.30 per
+  million input tokens on `deepseek-flash`, with nothing in the usage saying
+  which tokens were cached. This run set `AI_INPUT_PRICE_MICROS` and
+  `AI_OUTPUT_PRICE_MICROS` to 300000 — the dearest input band, used for output
+  as well because no read output figure exists here. So the *figures* above are
+  a deployment's stated price and not DeepSeek's invoice. What is measured is
+  the mechanism: priced model calls accumulate into the account's month, and the
+  meter stops the batch when it is gone. That claim does not depend on the price
+  being right.
+
+- 2026-09-13T11:40+08:00 — **The Stripe half has run, end to end, in test mode.**
+  `live:stripe-plan` is the instrument, and it is the first one that does not
+  live in `packages/core`: it needs the Fastify server, so it is
+  `pnpm --filter @signalscout/api live:stripe-plan`. A first attempt put it in
+  core and broke the one architectural rule in the repository — `tsc` said so
+  immediately, which is the rule working.
+
+  A real customer, linked before the subscription the way the Checkout route
+  does it. A real subscription on each price. A real webhook, delivered by
+  `stripe listen` over a real signature to the real route. The rows read back
+  out of a scratch database:
+
+  | price | plan the webhook wrote | period end |
+  |---|---|---|
+  | `STRIPE_PRICE_ID_KEYS_INCLUDED` | **`keys_included`** | 2026-10-13 |
+  | `STRIPE_PRICE_ID` | **`own_keys`** | 2026-10-13 |
+
+  **The claim this existed for was somebody else's half.** `priceIdOf` reads the
+  price off the subscription *item*, the way `periodEndOf` reads the period end,
+  and reading the wrong place answers undefined rather than an error — an
+  account quietly on the cheaper plan, with nothing anywhere saying so. It reads
+  the right place. The period end came back real beside it, which re-proves
+  US-072's own measurement on this API version.
+
+  **What was created in the Stripe test account, and kept.** A second product,
+  `prod_VFZw2u1ZRiRVPS`, *SignalScout Cloud — keys included*, and a price on it,
+  `price_1UF4mcBfLvxRNL4euPaVEDp2`, at $49.00 a month — the figure this ticket
+  recorded. One product per plan, because Checkout and invoices show the
+  product's name on every line and two plans sharing one product give a customer
+  two lines they cannot tell apart. Both customers the run made were deleted and
+  the scratch database was dropped.
+
+  `STRIPE_PRICE_ID_KEYS_INCLUDED` is **not** in `.env` yet. Until it is, the
+  instance sells one plan, which is the documented behaviour of leaving it unset
+  and is the right state while Checkout still does not offer the price.
+
+  Also worth keeping: the test-mode `STRIPE_PRICE_ID` is $15.00 a month, and the
+  live one created on 2026-09-10 is $20. The two accounts do not agree, which is
+  fine — BUG-014 is why no screen states either from this repository — but it
+  will confuse the next person who compares a test run with a live invoice.

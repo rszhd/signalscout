@@ -448,6 +448,14 @@ the same call without it returns the thread. An unrecognised value is ignored
 and behaves correctly, so the broken case is the one the provider knows. Test
 a parameter's effect on real output, not on the status code.
 
+The same provider's YouTube comments endpoint takes `order`, and `newest` is
+not date order: US-135 captured a 419-comment thread on 2026-09-15 and found a
+two-year-old comment on page two behind nineteen four-year-old ones, and
+`order=top` returned nineteen of the same twenty. A comment's `publishedTime`
+there is arithmetic on "4 years ago", with no `includeExtras` to correct it as
+there is for a video. The connector stores it marked approximate and cuts on
+`since` at the precision of the relative text, never at the second.
+
 **A thread's window is not the poll's window.** `ReplyRequest.since` is how far
 back this *thread* has been read, and it has nothing to do with when the
 monitor last searched. The two were the same value until BUG-006, and the

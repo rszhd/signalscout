@@ -12,7 +12,7 @@
  * platform in this product — and this endpoint returns the description beside
  * it, 1,413 to 1,620 characters at the median, for the same one credit.
  *
- * Four measured facts shape everything below.
+ * Five measured facts shape everything below.
  *
  * 1. **`includeExtras=true` is not optional, and the second reason is worse
  *    than the first.** It carries the description. It also carries
@@ -34,13 +34,24 @@
  *    `playlists`, `shorts`, `shelves` and `lives`, each in its own array, so
  *    reading `videos` cannot store a channel by accident. `type=videos` is
  *    still sent, because a short is not a conversation.
+ * 5. **A comment's date is arithmetic, and no parameter corrects it.** US-135
+ *    captured a 419-comment thread on 2026-09-15: every comment on a page
+ *    shares one time of day, `order=newest` put a two-year-old comment behind
+ *    nineteen four-year-old ones, and `order=top` returned nineteen of the
+ *    same twenty. So a reply here is kept with its date marked approximate,
+ *    and the `since` cut is made at the precision of the relative text — "4
+ *    years ago" is safely older than a thirty-day window and "3 weeks ago" is
+ *    not. See `fetchReplies`.
  */
 
 import { youTubePlatform } from "../../platforms.js";
 import type {
   CandidatePost,
+  CandidateReply,
   ConnectorDefinition,
   CredentialCheck,
+  ReplyRequest,
+  ReplyResult,
   SearchRequest,
   SearchResult,
   SocialSource,
@@ -53,6 +64,7 @@ import {
   endpoints,
   ScrapeCreatorsClient,
   ScrapeCreatorsError,
+  youTubeCommentsShape,
   youTubeSearchShape,
 } from "./client.js";
 import { scrapeCreatorsProvider } from "./provider.js";
@@ -71,20 +83,23 @@ export const scrapeCreatorsYouTube: ConnectorDefinition = {
   discovery: ["keyword"],
   maxUnitsPerQueryPoll: maxPagesPerInput,
   /**
-   * No comments, and the reason is a measurement rather than a missing
-   * endpoint.
+   * Comments, at the same credit a search costs, and with two limits the
+   * connector states rather than hides. US-135.
    *
-   * The endpoint exists and costs a credit. US-121 found **one comment across
-   * twenty videos** on this keyword, and it was "nice video sir". A comment
-   * also carries no permalink and no parent id, and its date is derived from
-   * relative text — "3 weeks ago" — with no `includeExtras` to correct it, so
-   * a stored reply would carry a timestamp this connector cannot stand behind.
+   * US-121 found one comment across twenty videos on its keyword and left this
+   * off; US-135 found 419 under one video on another and turned it on, because
+   * a monitor with a YouTube audience draws its questions from the thread and
+   * the lent-keys plan fetches YouTube through this connector alone.
    *
-   * The description and the transcript are the text worth paying for on this
-   * platform. `socialcrawl/youtube.ts` fetches comments and stays the choice
-   * for a monitor that wants them.
+   * The limits. A comment's date is computed from "4 years ago", so it is
+   * stored approximate and cut only at that precision. And the page is ranked
+   * rather than dated, so a thread re-opened because its count grew re-reads
+   * mostly the same twenty; a new comment in a busy thread is reached by
+   * paging, not by asking for it. `socialcrawl/youtube.ts` reads the same
+   * platform with a real date and a newest-first walk, for an account that
+   * holds that key.
    */
-  canFetchReplies: false,
+  canFetchReplies: true,
   create: (runtime) => new ScrapeCreatorsYouTubeSource(runtime),
 };
 
@@ -260,6 +275,56 @@ export class ScrapeCreatorsYouTubeSource implements SocialSource {
   }
 
   /**
+   * One page of the top-level comments under one video.
+   *
+   * The `since` cut is made here because the endpoint has no date parameter,
+   * and it is made at the precision of the provider's relative text rather
+   * than at the second, because the second is arithmetic. Every row is tested
+   * and the walk is never stopped early: measured, the page is not in date
+   * order, so an old comment says nothing about the next one.
+   *
+   * A comment's own replies are never bought. Each parent carries a
+   * `repliesContinuationToken` that costs a credit to follow, and a page is
+   * reported partial whenever any parent on it claims replies.
+   */
+  async fetchReplies(request: ReplyRequest): Promise<ReplyResult> {
+    const page = await this.client(request.credentials).fetchPage(
+      endpoints.youTubeComments,
+      {
+        url: request.postUrl,
+        /**
+         * Sent because it is what a monitor means, and not trusted: the
+         * captured `newest` page and the captured `top` page share nineteen
+         * of twenty ids, and neither is in date order.
+         */
+        order: "newest",
+        ...(request.cursor ? { continuationToken: request.cursor } : {}),
+      },
+      youTubeCommentsShape,
+      request.signal,
+    );
+
+    const replies = page.records
+      .map((record, index) =>
+        toCandidateReply(record, {
+          parentPostExternalId: request.postExternalId,
+          position: (request.positionOffset ?? 0) + index,
+          postUrl: request.postUrl,
+        }),
+      )
+      .filter((reply): reply is CandidateReply => reply !== undefined)
+      .filter((reply) => !request.since || couldBeAfter(reply, request.since));
+
+    return {
+      replies,
+      itemsReturned: page.records.length,
+      unitsConsumed: page.creditsCharged,
+      next: page.after ? { status: "ready", cursor: page.after } : { status: "done" },
+      partial: hasUnreadReplies(page.records) || page.after !== undefined,
+    };
+  }
+
+  /**
    * Where to go after this page.
    *
    * Two things end a query. The third that `reddit.ts` has cannot exist here:
@@ -353,4 +418,121 @@ export function toCandidatePost(record: unknown): CandidatePost | undefined {
     ...(exact ? {} : { postedAtIsApproximate: true }),
     ...(replyCount === undefined ? {} : { replyCount }),
   };
+}
+
+interface ReplyContext {
+  readonly parentPostExternalId: string;
+  readonly position: number;
+  readonly postUrl: string;
+}
+
+/**
+ * One record of `comments` to one `CandidateReply`.
+ *
+ * The payload names no parent post and no parent comment, so the parent is
+ * the video the caller asked about, and a reply under a reply — `replyLevel`
+ * above zero — is never on this page. BUG-007's check cannot be made here:
+ * nothing on a comment says which video it belongs to.
+ *
+ * The date is always marked approximate. `publishedTime` is computed from
+ * `publishedTimeText` at the moment of the call — every comment on a page
+ * carries the same time of day — and unlike a video there is no
+ * `includeExtras` to ask for the real one. The relative text is kept beside
+ * it, because it says how approximate: see `precisionOf`.
+ */
+export function toCandidateReply(
+  record: unknown,
+  context: ReplyContext,
+): (CandidateReply & { readonly postedAtPrecisionMs?: number }) | undefined {
+  const comment = objectOf(record);
+  if (!comment) return undefined;
+
+  const externalId = text(comment.id);
+  const body = text(comment.content);
+  const postedAt = dateOf(comment.publishedTime);
+
+  if (!externalId || !body || !postedAt) return undefined;
+
+  const author = text(objectOf(comment.author)?.name);
+  const replyCount = countOf(objectOf(comment.engagement)?.replies);
+  const precision = precisionOf(text(comment.publishedTimeText));
+
+  return {
+    externalId,
+    url: commentLink(context.postUrl, externalId),
+    ...(author ? { author } : {}),
+    text: body,
+    postedAt,
+    postedAtIsApproximate: true,
+    ...(precision === undefined ? {} : { postedAtPrecisionMs: precision }),
+    parentPostExternalId: context.parentPostExternalId,
+    threadPosition: context.position,
+    ...(replyCount === undefined ? {} : { replyCount }),
+  };
+}
+
+/**
+ * YouTube's own link to one comment: the video's URL with `lc=<comment id>`,
+ * which opens the video with that comment pinned above the thread. Opened in
+ * a browser on 2026-09-15, US-135 — AGENTS.md's rule that a URL we build is
+ * evidence about our own string building until somebody presses it.
+ */
+export function commentLink(postUrl: string, commentId: string): string {
+  const url = new URL(postUrl);
+  url.searchParams.set("lc", commentId);
+  return url.toString();
+}
+
+/**
+ * How far off a computed date can be, from the text it was computed from.
+ *
+ * "3 weeks ago" was written any time in the week before the provider's
+ * subtraction lands, and "4 years ago" any time in the year. Unreadable text
+ * answers nothing, and a caller keeps the comment rather than cut on a date
+ * with no known error.
+ */
+export function precisionOf(relative: string | undefined): number | undefined {
+  const match = relative?.match(
+    /^\s*(?:\d+|an?)\s+(second|minute|hour|day|week|month|year)s?\s+ago/,
+  );
+  if (!match) return undefined;
+
+  const unit = match[1] as "second" | "minute" | "hour" | "day" | "week" | "month" | "year";
+  return {
+    second: 1_000,
+    minute: 60_000,
+    hour: 3_600_000,
+    day: 86_400_000,
+    week: 7 * 86_400_000,
+    month: 31 * 86_400_000,
+    year: 366 * 86_400_000,
+  }[unit];
+}
+
+/**
+ * Whether a comment with an approximate date might have been written after
+ * `since`. A comment is dropped only when even the latest moment its text
+ * allows is not after the cut; a comment whose text could not be read is
+ * kept, by the rule on `postedAtIsApproximate`.
+ */
+function couldBeAfter(
+  reply: CandidateReply & { readonly postedAtPrecisionMs?: number },
+  since: Date,
+): boolean {
+  if (reply.postedAtPrecisionMs === undefined) return true;
+  return reply.postedAt.getTime() + reply.postedAtPrecisionMs > since.getTime();
+}
+
+/**
+ * Whether this page leaves replies behind it, under the comments it returned.
+ * A parent that claims replies, or carries a token to fetch them, has a
+ * subtree this connector did not buy.
+ */
+function hasUnreadReplies(records: readonly unknown[]): boolean {
+  return records.some((record) => {
+    const comment = objectOf(record);
+    if (!comment) return false;
+    if (text(comment.repliesContinuationToken)) return true;
+    return (countOf(objectOf(comment.engagement)?.replies) ?? 0) > 0;
+  });
 }

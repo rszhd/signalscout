@@ -28,6 +28,17 @@
  *  12. Is a transcript available, and at what price? This is the one platform
  *      here that publishes captions.
  *
+ * US-135 asks three more, about a thread that has one. `--only=comments-deep`
+ * answers them on a busier keyword, and it costs three credits:
+ *
+ *  13. What is the cursor on a comment page, and does page two repeat page one?
+ *  14. How does a nested reply arrive — inline under its parent, or flat with
+ *      `replyLevel` and a parent id?
+ *  15. Does a comment carry anything a permalink can be built from beyond its
+ *      id?
+ *  16. Does `order` change the page? `--only=comments-order`, one credit,
+ *      after the run above.
+ *
  * The TikTok capture beside this one found two traps that apply to the whole
  * provider. An unrecognised parameter is ignored and the call is billed in
  * full, so the trick that makes the Reddit endpoint list its own vocabulary
@@ -39,6 +50,7 @@
  *
  *     node packages/core/src/sources/providers/scrapecreators/youtube-fixtures/capture.mjs
  *     node .../capture.mjs --only=search
+ *     node .../capture.mjs --only=comments-deep     # three more credits, not in a full run
  *
  * What it writes, into this folder: one whole response body per call, with
  * channel identity scrubbed, plus manifest.json and ledger.json. Unlike the
@@ -68,6 +80,13 @@ const endpoints = {
 
 /** The keyword the SocialCrawl YouTube capture used, so one question is asked. */
 const keyword = "flaky tests";
+
+/**
+ * A keyword whose videos have comments. The first keyword found one comment in
+ * twenty videos, US-121, and a thread of one cannot show a cursor or a nested
+ * reply. This one is a comparison, and people argue under comparisons.
+ */
+const busyKeyword = "playwright vs cypress";
 
 /** A phrase that cannot occur. Question 6 is what this costs. */
 const impossibleKeyword = "zqxjkv wobblefish intentwatch nonexistent phrase";
@@ -383,7 +402,14 @@ const only = process.argv
   .filter((argument) => argument.startsWith("--only="))
   .map((argument) => argument.slice("--only=".length));
 
-const wanted = (name) => only.length === 0 || only.some((part) => name.includes(part));
+/**
+ * `comments-deep` is opt-in: it is not part of a full run, and `--only=comments`
+ * must not match it, so the match is exact for that one name.
+ */
+const wanted = (name) =>
+  name === "comments-deep" || name === "comments-order"
+    ? only.includes(name)
+    : only.length === 0 || only.some((part) => name.includes(part));
 
 console.log("Capturing ScrapeCreators YouTube payloads. This spends credits from your allowance.");
 
@@ -560,6 +586,112 @@ if (wanted("comments") && commentUrl) {
   }
 } else if (wanted("comments")) {
   failures.push("comments: the search returned no video URL to ask about.");
+}
+
+/**
+ * Two pages of a thread that has more than one, and a reply under a reply.
+ * Questions 13 to 15.
+ *
+ * One search with `includeExtras`, because only that call reports
+ * `commentCountInt`, then the busiest video's first two comment pages. Three
+ * credits. This is a separate mode rather than part of `comments` so that the
+ * cheap run stays cheap.
+ */
+if (wanted("comments-deep")) {
+  const busy = await capture(
+    "search-busy",
+    endpoints.search,
+    { query: busyKeyword, type: "videos", includeExtras: "true" },
+    { note: "a keyword whose videos have comments, so a thread can be paged" },
+  );
+
+  const target = videosOf(busy.body)
+    .filter((video) => (video?.commentCountInt ?? 0) > 20)
+    .sort((a, b) => (b.commentCountInt ?? 0) - (a.commentCountInt ?? 0))[0];
+
+  if (target?.url) {
+    console.log(`  busiest video has ${target.commentCountInt} comments`);
+
+    const first = await capture(
+      "comments-deep-page-1",
+      endpoints.comments,
+      { url: target.url, order: "newest" },
+      { note: "first page of a thread with more than twenty comments" },
+    );
+
+    const list = Array.isArray(first.body?.comments) ? first.body.comments : [];
+    const token = first.body?.continuationToken;
+    const nested = list.filter((comment) => (comment?.replyLevel ?? 0) > 0);
+    console.log(
+      `  ${list.length} comments, ${nested.length} nested, cursor ${token ? "present" : "absent"}`,
+    );
+    if (list.length > 0) console.log(`  a comment's keys: ${Object.keys(list[0]).join(", ")}`);
+    if (nested.length > 0)
+      console.log(`  a nested reply's keys: ${Object.keys(nested[0]).join(", ")}`);
+    const withChildren = list.find((comment) => Array.isArray(comment?.replies));
+    if (withChildren) console.log("  replies arrive INLINE under their parent, in `replies`");
+
+    if (typeof token === "string" && token !== "") {
+      const second = await capture(
+        "comments-deep-page-2",
+        endpoints.comments,
+        { url: target.url, order: "newest", continuationToken: token },
+        { note: "second page, by continuationToken" },
+      );
+
+      const ids = new Set(list.map((comment) => comment?.id));
+      const page2 = Array.isArray(second.body?.comments) ? second.body.comments : [];
+      const repeated = page2.filter((comment) => ids.has(comment?.id)).length;
+      console.log(`  page two: ${page2.length} comments, ${repeated} repeated from page one`);
+    } else {
+      failures.push(
+        "comments-deep: the first page carried no continuationToken, so paging is unproven.",
+      );
+    }
+  } else {
+    failures.push(`comments-deep: no video for "${busyKeyword}" has more than twenty comments.`);
+  }
+}
+
+/**
+ * Whether `order` does anything. Question 16, one credit.
+ *
+ * The `comments-deep` run asked for `newest` and got page one in like order
+ * with a two-year-old comment behind nineteen four-year-old ones on page two.
+ * So this asks the same video for `top` and counts the ids the two first
+ * pages share. It reads the video from `search-busy.json` on disk rather than
+ * searching again, and it needs `comments-deep-page-1.json` to compare with.
+ */
+if (wanted("comments-order")) {
+  let target;
+  let newestIds = new Set();
+  try {
+    const busy = JSON.parse(readFileSync(`${here}search-busy.json`, "utf8"));
+    target = videosOf(busy.body)
+      .filter((video) => (video?.commentCountInt ?? 0) > 20)
+      .sort((a, b) => (b.commentCountInt ?? 0) - (a.commentCountInt ?? 0))[0];
+    const newest = JSON.parse(readFileSync(`${here}comments-deep-page-1.json`, "utf8"));
+    newestIds = new Set((newest.body?.comments ?? []).map((comment) => comment?.id));
+  } catch {
+    failures.push(
+      "comments-order: run --only=comments-deep first; it writes the files this reads.",
+    );
+  }
+
+  if (target?.url && newestIds.size > 0) {
+    const top = await capture(
+      "comments-deep-top",
+      endpoints.comments,
+      { url: target.url, order: "top" },
+      { note: "the same video's first page with order=top, to compare with newest" },
+    );
+    const list = Array.isArray(top.body?.comments) ? top.body.comments : [];
+    const shared = list.filter((comment) => newestIds.has(comment?.id)).length;
+    console.log(
+      `  ${list.length} comments, ${shared} of them on the newest page too` +
+        (shared === list.length && list.length === newestIds.size ? " — order is IGNORED" : ""),
+    );
+  }
 }
 
 /**

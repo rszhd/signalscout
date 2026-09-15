@@ -4,6 +4,39 @@
   "note": "Channel identity is replaced with stable pseudonyms. Everything else is whole.",
   "fixtures": [
     {
+      "file": "comments-deep-page-1.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v1/youtube/video/comments?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DBQqzfHQkREo&order=newest",
+        "note": "first page of a thread with more than twenty comments"
+      },
+      "capturedAt": "2026-09-15T06:02:29.457Z",
+      "identitiesReplaced": 60,
+      "bytes": 17231
+    },
+    {
+      "file": "comments-deep-page-2.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v1/youtube/video/comments?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DBQqzfHQkREo&order=newest&continuationToken=Eg0SC0JRcXpmSFFrUkVvGAYy8gIKyAJnZXRfcmFua2VkX3N0cmVhbXMtLUNxWUJDSUFFRlJlMzBUZ2Ftd0VLbGdFSTJGOFFnQVFZQnlLTEFkdlBUY0w1Mlk1VGNXZDNxekNwc1hSYlF0VW8wemJ5M1lMTlpEbW00Q0VFY2lMTnh6SklZanQ2SU82SC1LTUNpbXFGYzJPMFBCQ0R3ZUh1UWhQMGIxQWFoX3dvN2dHVmtXUFVfLU4tZlU5aTIxN2dQUF9HNGxaY0hzeXBHN2JJRlhVdWlldDhRQUFoRENTbTJKM3FUR0pMWE1heDl4QW9QalNJVkxVX1VucElna3dyS0hhaU0tbEFTeE1RRkJJRkNMc2dHQUFTQndpRklCQVVHQUVTQlFpSElCZ0FFZ1VJaVNBWUFCSUZDSWdnR0FBU0JRakFJQmdBRWdVSWhpQVlBQklGQ0tnZ0dBQlFBRmdCIhEiC0JRcXpmSFFrUkVvMAB4ASgUQhBjb21tZW50cy1zZWN0aW9u",
+        "note": "second page, by continuationToken"
+      },
+      "capturedAt": "2026-09-15T06:02:30.725Z",
+      "identitiesReplaced": 60,
+      "bytes": 13845
+    },
+    {
+      "file": "comments-deep-top.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v1/youtube/video/comments?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DBQqzfHQkREo&order=top",
+        "note": "the same video's first page with order=top, to compare with newest"
+      },
+      "capturedAt": "2026-09-15T06:03:28.386Z",
+      "identitiesReplaced": 60,
+      "bytes": 17163
+    },
+    {
       "file": "comments-newest.json",
       "request": {
         "method": "GET",
@@ -35,6 +68,17 @@
       "capturedAt": "2026-09-11T14:53:02.218Z",
       "identitiesReplaced": 0,
       "bytes": 96
+    },
+    {
+      "file": "search-busy.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v1/youtube/search?query=playwright+vs+cypress&type=videos&includeExtras=true",
+        "note": "a keyword whose videos have comments, so a thread can be paged"
+      },
+      "capturedAt": "2026-09-15T06:02:27.158Z",
+      "identitiesReplaced": 56,
+      "bytes": 66406
     },
     {
       "file": "search-mixed.json",

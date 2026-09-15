@@ -208,7 +208,11 @@ what replaces a computed `publishedTime` with the real `publishDate`, and the
 transcript endpoint charges a credit a video and returns thousands of
 characters where TikTok's returns null. Run it when a YouTube connector is
 written, and read `docs/sources.md` before trusting `uploadDate` — it narrows
-and it leaks.
+and it leaks. Two modes are opt-in and not part of a full run: `--only=comments-deep`
+searches a busier keyword and reads two pages of the busiest thread, three
+credits, and `--only=comments-order` asks the same thread for `order=top` to
+compare, one credit. US-135 ran both once; re-run them if the comment endpoint's
+shape or ordering is in question.
 
 The ScrapeCreators Instagram capture asks two endpoints rather than one,
 because this platform's two candidates fail in opposite directions: Instagram's

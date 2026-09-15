@@ -2,7 +2,7 @@
 
 # Open tickets
 
-35 open — 14 doing, 20 todo, 1 parked (14 p1, 17 p2, 4 p3).
+40 open — 15 doing, 24 todo, 1 parked (17 p1, 18 p2, 5 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -13,6 +13,7 @@
 | p1 | US-083 | [One default key sets every job](doing/US-083-one-default-key-sets-every-job.md) | feature | doing | 2026-09-09T11:13+08:00 |
 | p1 | US-100 | [The cloud version runs at app.signalscout.run](doing/US-100-the-cloud-version-runs-at-app-signalscout-run.md) | feature | doing | 2026-09-10T03:05+08:00 |
 | p1 | US-104 | [A monitor says what its last poll did](doing/US-104-a-monitor-says-what-its-last-poll-did.md) | feature | doing | 2026-09-10T09:51+08:00 |
+| p1 | US-135 | [ScrapeCreators reads the comments under a YouTube video](doing/US-135-scrapecreators-reads-the-comments-under-a-youtube-video.md) | feature | doing | 2026-09-15T13:58+08:00 |
 | p1 | BUG-004 | [The model half of a poll is not capped](doing/BUG-004-the-model-half-of-a-poll-is-not-capped.md) | bug | doing | 2026-09-06T04:42+08:00 |
 | p1 | BUG-016 | [One platform's outage throws away another platform's collection](doing/BUG-016-one-platforms-outage-throws-away-another-platforms-collection.md) | bug | doing | 2026-09-10T10:44+08:00 |
 | p1 | US-033 | [Thirty verdicts say whether the score is right](todo/US-033-thirty-verdicts-say-whether-the-score-is-right.md) | chore | todo | 2026-09-06T03:02+08:00 |
@@ -20,6 +21,8 @@
 | p1 | US-132 | [The deployment chooses the model and the provider on the lent-keys plan](todo/US-132-the-deployment-chooses-the-model-and-the-provider-on-the-lent-keys-plan.md) | feature | todo | 2026-09-13T19:52+08:00 |
 | p1 | US-133 | [The lent-keys plan sells capacity, not an allowance](todo/US-133-the-lent-keys-plan-sells-capacity-not-an-allowance.md) | feature | todo | 2026-09-13T20:02+08:00 |
 | p1 | US-134 | [One plan at $35, with or without your own keys](todo/US-134-one-plan-at-35-dollars-with-or-without-your-own-keys.md) | feature | todo | 2026-09-13T20:38+08:00 |
+| p1 | US-136 | [SocialData reads the replies under a tweet](todo/US-136-socialdata-reads-the-replies-under-a-tweet.md) | feature | todo | 2026-09-15T13:59+08:00 |
+| p1 | US-137 | [Apify reads the comments under a LinkedIn post](todo/US-137-apify-reads-the-comments-under-a-linkedin-post.md) | feature | todo | 2026-09-15T14:00+08:00 |
 | p2 | US-015 | [A deleted post stops being shown](doing/US-015-a-deleted-post-stops-being-shown.md) | feature | doing | 2026-09-04T22:49+08:00 |
 | p2 | US-017 | [A self-hosted instance has one account](doing/US-017-a-self-hosted-instance-has-one-account.md) | feature | doing | 2026-09-04T22:49+08:00 |
 | p2 | US-020 | [A monitor can include comments and replies](doing/US-020-a-monitor-can-include-comments-and-replies.md) | feature | doing | 2026-09-05T01:18+08:00 |
@@ -37,8 +40,10 @@
 | p2 | US-099 | [A button, a field and a dialog are one component each](todo/US-099-a-button-a-field-and-a-dialog-are-one-component-each.md) | chore | todo | 2026-09-10T01:20+08:00 |
 | p2 | US-122 | [LinkedIn gets a second provider](todo/US-122-linkedin-gets-a-second-provider.md) | spike | todo | 2026-09-11T18:44+08:00 |
 | p2 | US-130 | [A lent-keys account is given a provider to poll through](todo/US-130-a-lent-keys-account-is-given-a-provider-to-poll-through.md) | feature | todo | 2026-09-13T12:24+08:00 |
+| p2 | US-138 | [SocialCrawl reads the comments under a Reddit post](todo/US-138-socialcrawl-reads-the-comments-under-a-reddit-post.md) | feature | todo | 2026-09-15T14:01+08:00 |
 | p3 | US-018 | [A mutation sweep proves the suite is sensitive](todo/US-018-a-mutation-sweep-proves-the-suite-is-sensitive.md) | chore | todo | 2026-09-04T22:54+08:00 |
 | p3 | US-095 | [The logo travels with the email](todo/US-095-the-logo-travels-with-the-email.md) | feature | todo | 2026-09-10T00:36+08:00 |
+| p3 | US-139 | [Bright Data reads the comments under a Reddit post](todo/US-139-bright-data-reads-the-comments-under-a-reddit-post.md) | feature | todo | 2026-09-15T14:02+08:00 |
 | p3 | BUG-013 | [A key row's error is printed inside a closed dialog](todo/BUG-013-a-key-row-s-error-is-printed-inside-a-closed-dialog.md) | bug | todo | 2026-09-09T11:58+08:00 |
 | p3 | US-038 | [Instagram, TikTok and Threads](parked/US-038-instagram-tiktok-and-threads.md) | feature | parked | 2026-09-06T11:56+08:00 |
 

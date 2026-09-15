@@ -80,6 +80,38 @@
       "creditsCharged": 1,
       "creditsRemaining": 1753,
       "note": "public captions only"
+    },
+    {
+      "call": "search-busy",
+      "httpStatus": 200,
+      "elapsedMs": 4403,
+      "creditsCharged": 1,
+      "creditsRemaining": 1637,
+      "note": "a keyword whose videos have comments, so a thread can be paged"
+    },
+    {
+      "call": "comments-deep-page-1",
+      "httpStatus": 200,
+      "elapsedMs": 2298,
+      "creditsCharged": 1,
+      "creditsRemaining": 1636,
+      "note": "first page of a thread with more than twenty comments"
+    },
+    {
+      "call": "comments-deep-page-2",
+      "httpStatus": 200,
+      "elapsedMs": 1266,
+      "creditsCharged": 1,
+      "creditsRemaining": 1635,
+      "note": "second page, by continuationToken"
+    },
+    {
+      "call": "comments-deep-top",
+      "httpStatus": 200,
+      "elapsedMs": 2929,
+      "creditsCharged": 1,
+      "creditsRemaining": 1634,
+      "note": "the same video's first page with order=top, to compare with newest"
     }
   ]
 }

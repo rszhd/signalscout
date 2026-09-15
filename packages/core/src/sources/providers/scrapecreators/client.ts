@@ -74,6 +74,15 @@ export const endpoints = {
   tikTokSearch: `${tikTokBase}/search/keyword`,
   tikTokComments: `${tikTokBase}/video/comments`,
   youTubeSearch: `${youTubeBase}/search`,
+  /**
+   * The comments under one video, by URL. US-135.
+   *
+   * One credit buys a page of twenty top-level comments and a
+   * `continuationToken` for the next twenty. A comment's own replies are not
+   * on the page: each parent carries a `repliesContinuationToken` instead, so
+   * a subtree is another credit, and this connector does not buy one.
+   */
+  youTubeComments: `${youTubeBase}/video/comments`,
 } as const;
 
 /**
@@ -147,6 +156,12 @@ export const tikTokCommentsShape: PageShape = {
 export const youTubeSearchShape: PageShape = {
   recordsOf: (body) => arrayAt(body, "videos"),
   cursorOf: (body) => textAt(body, "continuationToken"),
+};
+
+/** YouTube comments: `comments`, and the same opaque `continuationToken`. */
+export const youTubeCommentsShape: PageShape = {
+  recordsOf: (body) => arrayAt(body, "comments"),
+  cursorOf: youTubeSearchShape.cursorOf,
 };
 
 /**

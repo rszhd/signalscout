@@ -501,3 +501,19 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* US-132. On the plan that includes our keys a job is a statement, not a
+   control: the heading has the same shape and none of a button's affordances,
+   because there is nothing behind it to press towards. */
+.job-heading-static {
+  grid-template-columns: minmax(0, 1fr) auto;
+  cursor: default;
+}
+.job-heading-static:hover {
+  background: none;
+}
+.models-footnote {
+  margin: var(--space-4) 0 0;
+  color: var(--muted);
+  font-size: var(--text-xs);
+}

@@ -2,7 +2,7 @@
 
 # Open tickets
 
-35 open — 17 doing, 17 todo, 1 parked (14 p1, 16 p2, 5 p3).
+34 open — 16 doing, 17 todo, 1 parked (13 p1, 16 p2, 5 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -13,7 +13,6 @@
 | p1 | US-083 | [One default key sets every job](doing/US-083-one-default-key-sets-every-job.md) | feature | doing | 2026-09-09T11:13+08:00 |
 | p1 | US-100 | [The cloud version runs at app.signalscout.run](doing/US-100-the-cloud-version-runs-at-app-signalscout-run.md) | feature | doing | 2026-09-10T03:05+08:00 |
 | p1 | US-104 | [A monitor says what its last poll did](doing/US-104-a-monitor-says-what-its-last-poll-did.md) | feature | doing | 2026-09-10T09:51+08:00 |
-| p1 | US-132 | [The deployment chooses the model and the provider on the lent-keys plan](doing/US-132-the-deployment-chooses-the-model-and-the-provider-on-the-lent-keys-plan.md) | feature | doing | 2026-09-13T19:52+08:00 |
 | p1 | US-133 | [The lent-keys plan sells capacity, not an allowance](doing/US-133-the-lent-keys-plan-sells-capacity-not-an-allowance.md) | feature | doing | 2026-09-13T20:02+08:00 |
 | p1 | US-134 | [One plan at $35, with or without your own keys](doing/US-134-one-plan-at-35-dollars-with-or-without-your-own-keys.md) | feature | doing | 2026-09-13T20:38+08:00 |
 | p1 | BUG-004 | [The model half of a poll is not capped](doing/BUG-004-the-model-half-of-a-poll-is-not-capped.md) | bug | doing | 2026-09-06T04:42+08:00 |

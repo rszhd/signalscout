@@ -6,7 +6,7 @@ priority: p1
 created: 2026-09-13T19:52+08:00
 parent: US-128
 area:
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -81,11 +81,12 @@ US-130 was written to avoid: no choice, two providers, and a refused poll.
       `readAiEnvironmentFor`, and both composition roots call them
 - [x] Nothing stored is deleted. Tests move an account off the plan and read
       its key row and its model row again
-- [ ] The connections screen and the Models screen say what the deployment
-      uses. **The next session**, as the Notes say — the backend stops here.
-      Both GET routes answer 200 to an account on the plan today, and still
-      show its controls; the screens need a flag and a shape the screen
-      session decides
+- [x] The connections screen and the Models screen say what the deployment
+      uses: the provider per platform, the model per task, and that the plan
+      includes them. No key field, no test button, no provider control — and
+      the controls are absent rather than disabled, because a disabled button
+      is a thing a person tries anyway. Both views carry one `lentKeys` flag,
+      which is the same question the gate asks before refusing a write
 - [x] Both screens keep their addresses: no route was removed
 - [x] An account spending its own keys is unaffected: the walk asserts no 403
       for it, and its rows still win
@@ -149,3 +150,17 @@ US-130 was written to avoid: no choice, two providers, and a refused poll.
   the account's stored keys as connected for a lent-keys account, and
   `GET /api/models` still shows its rows. Neither is read by a poll now, so
   the screens are the only readers that lie.
+
+- 2026-09-15T22:30+08:00 — **Closed. Both screens are statements now.**
+  Connections lists every platform with what fetches it and no control at all;
+  Models lists the four jobs with what runs each and no control at all. Each
+  page keeps its address, so the billing page's one-word link still works.
+
+  The Models screen shows `task.instance` and not the account's own rows,
+  which is the visible half of the precedence flip: a row stored before the
+  plan is not read by the worker, so showing it here would show a setting
+  nothing obeys. A test pins that.
+
+  Neither page asks whether a control should be disabled: the gate refuses
+  every write behind them with 403, so the honest screen is one that offers
+  nothing.

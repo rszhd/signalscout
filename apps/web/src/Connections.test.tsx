@@ -76,6 +76,7 @@ function connections(overrides: Record<string, unknown> = {}) {
   return {
     canStore: true,
     storeBlocker: null,
+    lentKeys: false,
     providers: [brightData()],
     platforms: [reddit()],
     ...overrides,
@@ -573,6 +574,56 @@ describe("the connections screen", () => {
 
       expect(options.map((option) => option.disabled)).toEqual([false, true]);
       expect(container.textContent).toContain("No key here");
+    });
+  });
+
+  /**
+   * US-132. On the plan that includes our keys the account chooses nothing
+   * here, because every write behind these controls is refused with 403. The
+   * page keeps its address — the billing page links to it in one word — and
+   * states what fetches each platform instead.
+   */
+  describe("an account whose plan includes the keys", () => {
+    it("states what fetches each platform and offers no control at all", async () => {
+      await show(
+        connections({
+          lentKeys: true,
+          platforms: [
+            reddit({
+              providers: [
+                { id: "brightdata", displayName: "Bright Data", connected: true },
+                { id: "scrapecreators", displayName: "ScrapeCreators", connected: true },
+              ],
+              effective: "scrapecreators",
+              needsChoice: false,
+            }),
+          ],
+        }),
+      );
+
+      expect(container.textContent).toContain("Fetched by ScrapeCreators");
+      expect(container.textContent).toContain("Included");
+      expect(container.textContent).toContain("Your plan includes the provider accounts");
+
+      // No key field, no test button, no provider control: the three things
+      // the gate refuses.
+      expect(container.querySelector("input")).toBeNull();
+      expect(container.querySelector("button")).toBeNull();
+      expect(container.textContent).not.toContain("Provider accounts");
+      expect(container.textContent).not.toContain("How keys are stored");
+    });
+
+    it("says a platform outside the plan is unavailable rather than offering to connect it", async () => {
+      await show(
+        connections({
+          lentKeys: true,
+          platforms: [reddit({ effective: null, needsChoice: true })],
+        }),
+      );
+
+      expect(container.textContent).toContain("Not part of your plan");
+      expect(container.textContent).toContain("Unavailable");
+      expect(container.textContent).not.toContain("Choose one");
     });
   });
 });

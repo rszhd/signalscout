@@ -2,7 +2,7 @@
 
 # Done
 
-124 finished.
+125 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
@@ -27,6 +27,7 @@
 | US-137 | [Apify reads the comments under a LinkedIn post](done/2026-09/US-137-apify-reads-the-comments-under-a-linkedin-post.md) | feature | shipped | 2026-09 |
 | US-136 | [SocialData reads the replies under a tweet](done/2026-09/US-136-socialdata-reads-the-replies-under-a-tweet.md) | feature | shipped | 2026-09 |
 | US-135 | [ScrapeCreators reads the comments under a YouTube video](done/2026-09/US-135-scrapecreators-reads-the-comments-under-a-youtube-video.md) | feature | shipped | 2026-09 |
+| US-132 | [The deployment chooses the model and the provider on the lent-keys plan](done/2026-09/US-132-the-deployment-chooses-the-model-and-the-provider-on-the-lent-keys-plan.md) | feature | shipped | 2026-09 |
 | US-130 | [A lent-keys account is given a provider to poll through](done/2026-09/US-130-a-lent-keys-account-is-given-a-provider-to-poll-through.md) | feature | shipped | 2026-09 |
 | US-129 | [An account has a monthly cap on the instance's money](done/2026-09/US-129-an-account-has-a-monthly-cap-on-the-instances-money.md) | feature | shipped | 2026-09 |
 | US-128 | [A plan includes the keys, so nobody pastes one](done/2026-09/US-128-a-plan-includes-the-keys-so-nobody-pastes-one.md) | feature | shipped | 2026-09 |

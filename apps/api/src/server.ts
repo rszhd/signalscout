@@ -537,6 +537,9 @@ export async function buildServer({
     sources,
     environmentFor: providerKeysFor,
     choicesFor,
+    // US-132. The screen states what the deployment uses and offers nothing,
+    // because every write behind those controls is refused with 403.
+    lentKeysFor: (userId) => keys.spendsInstanceMoney(userId),
     encryption,
     logger,
   });
@@ -551,6 +554,9 @@ export async function buildServer({
     // offered only where there is one to offer. US-081, per account since
     // US-128.
     envFor: (userId) => keys.model(userId, env),
+    // US-132. The screen states what the deployment runs and offers nothing,
+    // because every write behind those controls is refused with 403.
+    lentKeysFor: (userId) => keys.spendsInstanceMoney(userId),
     encryption,
     ...(modelProbe ? { probe: modelProbe } : {}),
   });

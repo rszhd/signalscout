@@ -79,6 +79,14 @@ export interface ConnectionRoutesOptions {
    */
   readonly choicesFor?: (userId: string) => Promise<ProviderChoices>;
   /**
+   * Whether this account's plan includes the deployment's keys. US-132.
+   *
+   * The same question the gate asks before refusing a write, so the screen
+   * cannot offer a control the route would refuse. Undefined is false, which
+   * is every self-hosted instance.
+   */
+  readonly lentKeysFor?: (userId: string) => Promise<boolean>;
+  /**
    * Where `ENCRYPTION_KEY` is read from.
    *
    * Separate from `environmentFor` above, which is the provider keys. A test
@@ -156,6 +164,15 @@ const connectionsSchema = z.object({
   /** False when no `ENCRYPTION_KEY` is set. The screen offers no save. */
   canStore: z.boolean(),
   storeBlocker: z.string().nullable(),
+  /**
+   * True when this account's plan includes the deployment's keys. US-132.
+   *
+   * The screen then states what fetches each platform and offers nothing: no
+   * key field, no test button and no provider control, because every write
+   * behind them is refused with 403. The page keeps its address, because the
+   * billing page links to it in one word.
+   */
+  lentKeys: z.boolean(),
   providers: z.array(providerSchema),
   platforms: z.array(platformSchema),
 });
@@ -224,6 +241,8 @@ export async function registerConnectionRoutes(
   const { db, sources, logger } = options;
   const environmentFor = options.environmentFor ?? (async () => process.env);
   const choicesFor = options.choicesFor ?? ((userId: string) => readProviderChoices(db, userId));
+  /** Whether this account's plan includes the deployment's keys. US-132. */
+  const lentKeysFor = options.lentKeysFor ?? (async () => false);
   const encryption = options.encryption ?? process.env;
   const providers = providersOf(sources);
   const platformEntries = groupByPlatform(sources);
@@ -407,6 +426,7 @@ export async function registerConnectionRoutes(
     return {
       canStore,
       storeBlocker: canStore ? null : noEncryptionKey,
+      lentKeys: await lentKeysFor(userId),
       providers: await Promise.all(providers.map((provider) => view(userId, provider))),
       platforms: await platformViews(userId),
     };

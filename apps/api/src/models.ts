@@ -72,6 +72,14 @@ export interface ModelRoutesOptions {
    * base URL, the timeout — is the deployment's and is read from `env` above.
    */
   readonly envFor?: (userId: string) => Promise<Env>;
+  /**
+   * Whether this account's plan includes the deployment's keys. US-132.
+   *
+   * The same question the gate asks before refusing a write, so the screen
+   * cannot offer a control the route would refuse. Undefined is false, which
+   * is every self-hosted instance.
+   */
+  readonly lentKeysFor?: (userId: string) => Promise<boolean>;
   /** Where `ENCRYPTION_KEY` is read from. A test describes an instance without one. */
   readonly encryption?: Record<string, string | undefined>;
   /**
@@ -192,6 +200,15 @@ const modelsSchema = z.object({
   canStore: z.boolean(),
   storeBlocker: z.string().nullable(),
   /**
+   * True when this account's plan includes the deployment's keys. US-132.
+   *
+   * The screen then states which model reads each task and offers nothing: no
+   * key, no model and no test, because every write behind them is refused with
+   * 403. It keeps its address, and the tasks still carry what the deployment
+   * runs — which is what a person on that plan came here to read.
+   */
+  lentKeys: z.boolean(),
+  /**
    * Models this build knows a price for, by provider.
    *
    * By provider rather than one list, because a card offering OpenAI's names
@@ -285,6 +302,7 @@ export async function registerModelRoutes(
     db,
     env,
     envFor = async () => env,
+    lentKeysFor = async () => false,
     encryption = process.env,
     probe = probeChatModel,
     probeEmbedding = probeEmbeddingModel,
@@ -483,6 +501,7 @@ export async function registerModelRoutes(
     return {
       canStore: key !== undefined,
       storeBlocker: key === undefined ? noEncryptionKey : null,
+      lentKeys: await lentKeysFor(userId),
       pricedModels: Object.fromEntries(
         [...new Set([...aiProviders, ...embeddingProviders])].map((provider) => [
           provider,

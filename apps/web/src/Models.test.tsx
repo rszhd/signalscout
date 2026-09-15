@@ -64,6 +64,7 @@ function view(overrides: Record<string, unknown> = {}, keys: unknown[] = []) {
   return {
     canStore: true,
     storeBlocker: null,
+    lentKeys: false,
     pricedModels: {
       anthropic: ["claude-haiku-4-5", "claude-sonnet-5"],
       openai: ["gpt-5.6-luna", "gpt-5.6-terra"],
@@ -871,5 +872,59 @@ describe("the models screen", () => {
 
     expect(screen.container.textContent).toContain("Set ENCRYPTION_KEY and restart.");
     expect(field("New API key").disabled).toBe(true);
+  });
+
+  /**
+   * US-132. On the plan that includes our keys the account chooses nothing
+   * here, because every write behind these controls is refused with 403. The
+   * page keeps its address and states what the deployment runs — which is
+   * what a person on that plan came here to read.
+   */
+  describe("an account whose plan includes the keys", () => {
+    it("states the model each job runs on and offers no control at all", async () => {
+      fetched.mockResolvedValue(json({ ...view(), lentKeys: true }));
+      // `mount` opens the scoring dialog, and on this plan there is no dialog
+      // to open: the page is a statement.
+      screen = await mountScreen(<Models />);
+
+      const text = screen.container.textContent ?? "";
+
+      expect(text).toContain("Scoring posts");
+      expect(text).toContain("Your plan includes the model keys");
+      expect(text).toContain("no key of yours is used");
+
+      // No key field, no model field, no test: the three things the gate
+      // refuses, and the key library is not on the page at all.
+      expect(screen.container.querySelector("input")).toBeNull();
+      expect(screen.container.querySelector("button")).toBeNull();
+      expect(screen.container.querySelector("select")).toBeNull();
+      expect(text).not.toContain("New API key");
+    });
+
+    /**
+     * The account's own rows are not read while it is on the plan, so the
+     * screen shows the deployment's model rather than a setting nothing obeys.
+     */
+    it("shows the deployment's model, not a row the account stored before the plan", async () => {
+      // `view(overrides)` spreads into the first task, which is exactly what
+      // this needs: a row the account stored, and a different deployment model
+      // beside it.
+      fetched.mockResolvedValue(
+        json({
+          ...view({
+            model: "the-model-they-chose",
+            provider: "openai",
+            instance: { provider: "anthropic", model: "the-model-we-run", hasKey: true },
+          }),
+          lentKeys: true,
+        }),
+      );
+      screen = await mountScreen(<Models />);
+
+      const text = screen.container.textContent ?? "";
+
+      expect(text).toContain("the-model-we-run");
+      expect(text).not.toContain("the-model-they-chose");
+    });
   });
 });

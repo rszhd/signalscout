@@ -74,6 +74,15 @@ interface PlatformView {
 interface ConnectionsView {
   canStore: boolean;
   storeBlocker: string | null;
+  /**
+   * True when this account's plan includes the deployment's keys. US-132.
+   *
+   * The page then states what fetches each platform and offers nothing: the
+   * keys are not this account's to paste and the provider is not its to
+   * choose, and every write behind those controls is refused with 403. It
+   * keeps its address, because the billing page links to it in one word.
+   */
+  lentKeys: boolean;
   providers: ProviderView[];
   platforms: PlatformView[];
 }
@@ -86,16 +95,75 @@ interface Answer {
   text: string;
 }
 
-function ConnectionsHeader() {
+function ConnectionsHeader({ lentKeys = false }: { lentKeys?: boolean }) {
   return (
     <header className="topbar">
       <div>
         <h1>Connections</h1>
         <p className="page-subtitle">
-          Connect your accounts. Choose where conversations come from.
+          {lentKeys
+            ? "Where your conversations come from. Your plan includes these."
+            : "Connect your accounts. Choose where conversations come from."}
         </p>
       </div>
     </header>
+  );
+}
+
+/**
+ * What fetches each platform, when the account does not choose. US-132.
+ *
+ * The same rows the choosing screen shows, with the control taken out rather
+ * than disabled: a disabled button is a thing a person tries to press, and
+ * there is nothing behind this one to press towards. Every platform is listed,
+ * not only the ones two providers fetch, because the question here is not
+ * "which of these?" but "what is watching for me?".
+ */
+function LentKeysConnections({ platforms }: { platforms: PlatformView[] }) {
+  return (
+    <section className="connections-section" aria-labelledby="platforms-heading">
+      <div className="connections-section-heading">
+        <div>
+          <h2 id="platforms-heading">Where conversations come from</h2>
+          <p>
+            Your plan includes the provider accounts, so there is nothing to connect and nothing to
+            choose. These are the ones we fetch each platform through.
+          </p>
+        </div>
+      </div>
+
+      <ul className="connection-list">
+        {platforms.map((platform) => {
+          const effective = platform.providers.find(
+            (provider) => provider.id === platform.effective,
+          );
+
+          return (
+            <li className="connection-row" key={platform.id}>
+              <div className="platform-connection">
+                <div className="connection-summary">
+                  <span className="connection-avatar" aria-hidden="true">
+                    <BrandIcon brand={platform.id} size={24} />
+                  </span>
+                  <span className="connection-identity">
+                    <strong>{platform.displayName}</strong>
+                    <span>
+                      {effective ? `Fetched by ${effective.displayName}` : "Not part of your plan"}
+                    </span>
+                  </span>
+                  <span className={`connection-status ${effective ? "connected" : "missing"}`}>
+                    {effective ? "Included" : "Unavailable"}
+                  </span>
+                </div>
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+      <p className="connections-footnote">
+        We pay these providers. Nothing here is billed to you, and no key of yours is used.
+      </p>
+    </section>
   );
 }
 
@@ -541,9 +609,20 @@ export function Connections() {
   // one provider there is nothing to choose, and a row saying so is furniture.
   const choosable = view.platforms.filter((platform) => platform.providers.length > 1);
 
+  if (view.lentKeys) {
+    return (
+      <div className="product-page connections-page">
+        <ConnectionsHeader lentKeys />
+        <div className="connections-content">
+          <LentKeysConnections platforms={view.platforms} />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="product-page connections-page">
-      <ConnectionsHeader />
+      <ConnectionsHeader lentKeys={false} />
 
       <div className="connections-content">
         <section className="connections-section" aria-labelledby="accounts-heading">

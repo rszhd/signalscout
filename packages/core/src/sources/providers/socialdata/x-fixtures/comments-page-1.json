@@ -1,0 +1,912 @@
+{
+  "httpStatus": 200,
+  "body": {
+    "tweets": [
+      {
+        "tweet_created_at": "2026-08-04T15:57:44.000000Z",
+        "id": 2084670127786611200,
+        "id_str": "2084670127786611154",
+        "type": "reply",
+        "conversation_id_str": "2064374643729773029",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "@x-user-1 @x-user-2 @x-user-1 Salam, the unroll you asked for: https://t.co/g5YI9YFPps See you soon. 🤖",
+        "source": "<a href=\"https://threadreaderapp.com\" rel=\"nofollow\">ThreadReaderApp</a>",
+        "truncated": false,
+        "in_reply_to_status_id": 2084670039513235700,
+        "in_reply_to_status_id_str": "2084670039513235686",
+        "in_reply_to_user_id": "x-user-3",
+        "in_reply_to_user_id_str": "x-user-3",
+        "in_reply_to_screen_name": "x-user-1",
+        "user": {
+          "id": "x-user-4",
+          "id_str": "x-user-5",
+          "name": "x-user-6",
+          "screen_name": "x-user-7",
+          "location": null,
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 771835,
+          "friends_count": 4,
+          "listed_count": 3017,
+          "favourites_count": 2026,
+          "statuses_count": 5801968,
+          "created_at": "2017-08-11T01:11:39.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-8",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-9",
+          "can_dm": true,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 0,
+        "retweet_count": 0,
+        "favorite_count": 0,
+        "views_count": 35,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "urls": [
+            {
+              "display_url": "threadreaderapp.com/thread/2064374…",
+              "expanded_url": "https://threadreaderapp.com/thread/2064374643729773029.html",
+              "indices": [
+                60,
+                83
+              ],
+              "url": "https://t.co/g5YI9YFPps"
+            }
+          ],
+          "user_mentions": [
+            {
+              "id_str": "x-user-3",
+              "indices": [
+                0,
+                8
+              ],
+              "name": "x-user-10",
+              "screen_name": "x-user-1"
+            },
+            {
+              "id_str": "x-user-11",
+              "indices": [
+                9,
+                17
+              ],
+              "name": "x-user-12",
+              "screen_name": "x-user-2"
+            },
+            {
+              "id_str": "x-user-3",
+              "indices": [
+                18,
+                26
+              ],
+              "name": "x-user-10",
+              "screen_name": "x-user-1"
+            }
+          ],
+          "display_text_range": [
+            18,
+            99
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-07-01T17:07:25.000000Z",
+        "id": 2072366478662230300,
+        "id_str": "2072366478662230239",
+        "type": "reply",
+        "conversation_id_str": "2064374643729773029",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "@x-user-13 @x-user-2 @x-user-13 Saved!\n\nStats:\n• 22 saves of this tweet (ranked #1550)\n• 64 total saves of 0xCodez's tweets (ranked #5874)",
+        "source": "<a href=\"https://readwise.io/\" rel=\"nofollow\">Readwise Main</a>",
+        "truncated": false,
+        "in_reply_to_status_id": 2072366024083566600,
+        "in_reply_to_status_id_str": "2072366024083566652",
+        "in_reply_to_user_id": "x-user-14",
+        "in_reply_to_user_id_str": "x-user-14",
+        "in_reply_to_screen_name": "x-user-13",
+        "user": {
+          "id": "x-user-15",
+          "id_str": "x-user-16",
+          "name": "x-user-17",
+          "screen_name": "x-user-18",
+          "location": null,
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 212203,
+          "friends_count": 3203,
+          "listed_count": 1532,
+          "favourites_count": 3030,
+          "statuses_count": 591983,
+          "created_at": "2017-10-17T16:12:02.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-19",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-20",
+          "can_dm": true,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 0,
+        "retweet_count": 0,
+        "favorite_count": 0,
+        "views_count": 25,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "x-user-14",
+              "indices": [
+                0,
+                12
+              ],
+              "name": "x-user-21",
+              "screen_name": "x-user-13"
+            },
+            {
+              "id_str": "x-user-11",
+              "indices": [
+                13,
+                21
+              ],
+              "name": "x-user-12",
+              "screen_name": "x-user-2"
+            },
+            {
+              "id_str": "x-user-14",
+              "indices": [
+                22,
+                34
+              ],
+              "name": "x-user-21",
+              "screen_name": "x-user-13"
+            }
+          ],
+          "display_text_range": [
+            22,
+            141
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-06-24T16:56:35.000000Z",
+        "id": 2069827036726583300,
+        "id_str": "2069827036726583360",
+        "type": "reply",
+        "conversation_id_str": "2064374643729773029",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "@x-user-22 @x-user-2 @x-user-22 Halo! please find the unroll here: https://t.co/g5YI9YFPps Enjoy :) 🤖",
+        "source": "<a href=\"https://threadreaderapp.com\" rel=\"nofollow\">ThreadReaderApp</a>",
+        "truncated": false,
+        "in_reply_to_status_id": 2069826907185521000,
+        "in_reply_to_status_id_str": "2069826907185520895",
+        "in_reply_to_user_id": "x-user-23",
+        "in_reply_to_user_id_str": "x-user-23",
+        "in_reply_to_screen_name": "x-user-22",
+        "user": {
+          "id": "x-user-4",
+          "id_str": "x-user-5",
+          "name": "x-user-6",
+          "screen_name": "x-user-7",
+          "location": null,
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 771835,
+          "friends_count": 4,
+          "listed_count": 3017,
+          "favourites_count": 2026,
+          "statuses_count": 5801968,
+          "created_at": "2017-08-11T01:11:39.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-8",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-9",
+          "can_dm": true,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 0,
+        "retweet_count": 0,
+        "favorite_count": 0,
+        "views_count": 41,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "urls": [
+            {
+              "display_url": "threadreaderapp.com/thread/2064374…",
+              "expanded_url": "https://threadreaderapp.com/thread/2064374643729773029.html",
+              "indices": [
+                64,
+                87
+              ],
+              "url": "https://t.co/g5YI9YFPps"
+            }
+          ],
+          "user_mentions": [
+            {
+              "id_str": "x-user-23",
+              "indices": [
+                0,
+                9
+              ],
+              "name": "x-user-24",
+              "screen_name": "x-user-22"
+            },
+            {
+              "id_str": "x-user-11",
+              "indices": [
+                10,
+                18
+              ],
+              "name": "x-user-12",
+              "screen_name": "x-user-2"
+            },
+            {
+              "id_str": "x-user-23",
+              "indices": [
+                19,
+                28
+              ],
+              "name": "x-user-24",
+              "screen_name": "x-user-22"
+            }
+          ],
+          "display_text_range": [
+            19,
+            98
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-06-24T15:56:35.000000Z",
+        "id": 2069811936074617000,
+        "id_str": "2069811936074617174",
+        "type": "reply",
+        "conversation_id_str": "2064374643729773029",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "@x-user-25 @x-user-2 @x-user-25 Halo! here is your unroll: https://t.co/g5YI9YFPps See you soon. 🤖",
+        "source": "<a href=\"https://threadreaderapp.com\" rel=\"nofollow\">ThreadReaderApp</a>",
+        "truncated": false,
+        "in_reply_to_status_id": 2069811842805813800,
+        "in_reply_to_status_id_str": "2069811842805813637",
+        "in_reply_to_user_id": "x-user-26",
+        "in_reply_to_user_id_str": "x-user-27",
+        "in_reply_to_screen_name": "x-user-25",
+        "user": {
+          "id": "x-user-4",
+          "id_str": "x-user-5",
+          "name": "x-user-6",
+          "screen_name": "x-user-7",
+          "location": null,
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 771835,
+          "friends_count": 4,
+          "listed_count": 3017,
+          "favourites_count": 2026,
+          "statuses_count": 5801968,
+          "created_at": "2017-08-11T01:11:39.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-8",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-9",
+          "can_dm": true,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 0,
+        "retweet_count": 0,
+        "favorite_count": 0,
+        "views_count": 47,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "urls": [
+            {
+              "display_url": "threadreaderapp.com/thread/2064374…",
+              "expanded_url": "https://threadreaderapp.com/thread/2064374643729773029.html",
+              "indices": [
+                68,
+                91
+              ],
+              "url": "https://t.co/g5YI9YFPps"
+            }
+          ],
+          "user_mentions": [
+            {
+              "id_str": "x-user-27",
+              "indices": [
+                0,
+                15
+              ],
+              "name": "x-user-28",
+              "screen_name": "x-user-25"
+            },
+            {
+              "id_str": "x-user-11",
+              "indices": [
+                16,
+                24
+              ],
+              "name": "x-user-12",
+              "screen_name": "x-user-2"
+            },
+            {
+              "id_str": "x-user-27",
+              "indices": [
+                25,
+                40
+              ],
+              "name": "x-user-28",
+              "screen_name": "x-user-25"
+            }
+          ],
+          "display_text_range": [
+            25,
+            107
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-06-24T06:30:16.000000Z",
+        "id": 2069669416539988500,
+        "id_str": "2069669416539988374",
+        "type": "reply",
+        "conversation_id_str": "2064374643729773029",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "@x-user-2 is it just me or does none of my work involve repetitive tasks? I'm constantly building new things.",
+        "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+        "truncated": false,
+        "in_reply_to_status_id": 2064374643729773000,
+        "in_reply_to_status_id_str": "2064374643729773029",
+        "in_reply_to_user_id": "x-user-29",
+        "in_reply_to_user_id_str": "x-user-11",
+        "in_reply_to_screen_name": "x-user-2",
+        "user": {
+          "id": "x-user-30",
+          "id_str": "x-user-30",
+          "name": "x-user-31",
+          "screen_name": "x-user-32",
+          "location": null,
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 2094,
+          "friends_count": 1316,
+          "listed_count": 7,
+          "favourites_count": 4383,
+          "statuses_count": 4196,
+          "created_at": "2009-06-01T04:00:07.000000Z",
+          "profile_banner_url": "",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-33",
+          "can_dm": true,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 1,
+        "retweet_count": 0,
+        "favorite_count": 2,
+        "views_count": 1264,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "x-user-11",
+              "indices": [
+                0,
+                8
+              ],
+              "name": "x-user-12",
+              "screen_name": "x-user-2"
+            }
+          ],
+          "display_text_range": [
+            9,
+            108
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-06-17T21:41:17.000000Z",
+        "id": 2067361968499855600,
+        "id_str": "2067361968499855649",
+        "type": "reply",
+        "conversation_id_str": "2064374643729773029",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "\"The agent forgets, the file does not\" 🦭 step 10 is the spine of the whole thread.\n\nA STATE.md is perfect for one agent on one repo. The open problem is when several agents share state across sessions and orgs and have to trust what the others wrote. \n\nPortable, verifiable memory is exactly that gap, which is what we're building toward.",
+        "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+        "truncated": false,
+        "in_reply_to_status_id": 2064374643729773000,
+        "in_reply_to_status_id_str": "2064374643729773029",
+        "in_reply_to_user_id": "x-user-29",
+        "in_reply_to_user_id_str": "x-user-11",
+        "in_reply_to_screen_name": "x-user-2",
+        "user": {
+          "id": "x-user-34",
+          "id_str": "x-user-35",
+          "name": "x-user-36",
+          "screen_name": "x-user-37",
+          "location": null,
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": false,
+          "followers_count": 368243,
+          "friends_count": 250,
+          "listed_count": 532,
+          "favourites_count": 5251,
+          "statuses_count": 4944,
+          "created_at": "2024-06-20T15:45:37.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-38",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-39",
+          "can_dm": true,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 0,
+        "retweet_count": 0,
+        "favorite_count": 0,
+        "views_count": 3515,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "x-user-11",
+              "indices": [
+                0,
+                8
+              ],
+              "name": "x-user-12",
+              "screen_name": "x-user-2"
+            }
+          ],
+          "hashtags": [],
+          "smarttags": [],
+          "symbols": [],
+          "urls": [],
+          "display_text_range": [
+            9,
+            282
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-06-16T14:51:37.000000Z",
+        "id": 2066896483819856400,
+        "id_str": "2066896483819856361",
+        "type": "reply",
+        "conversation_id_str": "2064374643729773029",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "@x-user-40 @x-user-2 @x-user-40 Saved!\n\nStats:\n• 2 saves of this thread (ranked #111403)\n• 8 total saves of 0xCodez's threads (ranked #22476)",
+        "source": "<a href=\"https://readwise.io\" rel=\"nofollow\">Readwise DMs</a>",
+        "truncated": false,
+        "in_reply_to_status_id": 2066896202134671400,
+        "in_reply_to_status_id_str": "2066896202134671361",
+        "in_reply_to_user_id": "x-user-41",
+        "in_reply_to_user_id_str": "x-user-41",
+        "in_reply_to_screen_name": "x-user-40",
+        "user": {
+          "id": "x-user-15",
+          "id_str": "x-user-16",
+          "name": "x-user-17",
+          "screen_name": "x-user-18",
+          "location": null,
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 212203,
+          "friends_count": 3203,
+          "listed_count": 1532,
+          "favourites_count": 3030,
+          "statuses_count": 591983,
+          "created_at": "2017-10-17T16:12:02.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-19",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-20",
+          "can_dm": true,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 0,
+        "retweet_count": 0,
+        "favorite_count": 0,
+        "views_count": 17,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "x-user-41",
+              "indices": [
+                0,
+                13
+              ],
+              "name": "x-user-42",
+              "screen_name": "x-user-40"
+            },
+            {
+              "id_str": "x-user-11",
+              "indices": [
+                14,
+                22
+              ],
+              "name": "x-user-12",
+              "screen_name": "x-user-2"
+            },
+            {
+              "id_str": "x-user-41",
+              "indices": [
+                23,
+                36
+              ],
+              "name": "x-user-42",
+              "screen_name": "x-user-40"
+            }
+          ],
+          "display_text_range": [
+            23,
+            146
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-06-11T04:52:49.000000Z",
+        "id": 2064933852670251500,
+        "id_str": "2064933852670251519",
+        "type": "reply",
+        "conversation_id_str": "2064374643729773029",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "@x-user-43 @x-user-2 @x-user-43 First public save of this tweet! 🏆\n\nStats:\n• 25 total saves of 0xCodez's tweets (ranked #13179)",
+        "source": "<a href=\"https://readwise.io/\" rel=\"nofollow\">Readwise Main</a>",
+        "truncated": false,
+        "in_reply_to_status_id": 2064933382002262300,
+        "in_reply_to_status_id_str": "2064933382002262292",
+        "in_reply_to_user_id": "x-user-44",
+        "in_reply_to_user_id_str": "x-user-45",
+        "in_reply_to_screen_name": "x-user-43",
+        "user": {
+          "id": "x-user-15",
+          "id_str": "x-user-16",
+          "name": "x-user-17",
+          "screen_name": "x-user-18",
+          "location": null,
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 212203,
+          "friends_count": 3203,
+          "listed_count": 1532,
+          "favourites_count": 3030,
+          "statuses_count": 591983,
+          "created_at": "2017-10-17T16:12:02.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-19",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-20",
+          "can_dm": true,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 0,
+        "retweet_count": 0,
+        "favorite_count": 0,
+        "views_count": 4,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "x-user-45",
+              "indices": [
+                0,
+                10
+              ],
+              "name": "x-user-46",
+              "screen_name": "x-user-43"
+            },
+            {
+              "id_str": "x-user-11",
+              "indices": [
+                11,
+                19
+              ],
+              "name": "x-user-12",
+              "screen_name": "x-user-2"
+            },
+            {
+              "id_str": "x-user-45",
+              "indices": [
+                20,
+                30
+              ],
+              "name": "x-user-46",
+              "screen_name": "x-user-43"
+            }
+          ],
+          "display_text_range": [
+            20,
+            126
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-06-09T17:51:12.000000Z",
+        "id": 2064404961895563500,
+        "id_str": "2064404961895563619",
+        "type": "reply",
+        "conversation_id_str": "2064374643729773029",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "@x-user-2 nice job Codez!",
+        "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+        "truncated": false,
+        "in_reply_to_status_id": 2064374643729773000,
+        "in_reply_to_status_id_str": "2064374643729773029",
+        "in_reply_to_user_id": "x-user-29",
+        "in_reply_to_user_id_str": "x-user-11",
+        "in_reply_to_screen_name": "x-user-2",
+        "user": {
+          "id": "x-user-47",
+          "id_str": "x-user-48",
+          "name": "x-user-49",
+          "screen_name": "x-user-50",
+          "location": null,
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 2592,
+          "friends_count": 129,
+          "listed_count": 27,
+          "favourites_count": 5491,
+          "statuses_count": 1449,
+          "created_at": "2025-07-29T22:01:45.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-51",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-52",
+          "can_dm": true,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 0,
+        "retweet_count": 0,
+        "favorite_count": 3,
+        "views_count": 2270,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "x-user-11",
+              "indices": [
+                0,
+                8
+              ],
+              "name": "x-user-12",
+              "screen_name": "x-user-2"
+            }
+          ],
+          "display_text_range": [
+            9,
+            24
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-06-09T16:15:35.000000Z",
+        "id": 2064380899664278000,
+        "id_str": "2064380899664278001",
+        "type": "reply",
+        "conversation_id_str": "2064374643729773029",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "@x-user-2 you are sooo good!",
+        "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+        "truncated": false,
+        "in_reply_to_status_id": 2064374643729773000,
+        "in_reply_to_status_id_str": "2064374643729773029",
+        "in_reply_to_user_id": "x-user-29",
+        "in_reply_to_user_id_str": "x-user-11",
+        "in_reply_to_screen_name": "x-user-2",
+        "user": {
+          "id": "x-user-53",
+          "id_str": "x-user-54",
+          "name": "x-user-55",
+          "screen_name": "x-user-56",
+          "location": null,
+          "url": "",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 2825,
+          "friends_count": 120,
+          "listed_count": 37,
+          "favourites_count": 1533,
+          "statuses_count": 346,
+          "created_at": "2021-04-25T14:02:14.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-57",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-58",
+          "can_dm": true,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 1,
+        "retweet_count": 0,
+        "favorite_count": 3,
+        "views_count": 20066,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "x-user-11",
+              "indices": [
+                0,
+                8
+              ],
+              "name": "x-user-12",
+              "screen_name": "x-user-2"
+            }
+          ],
+          "display_text_range": [
+            9,
+            27
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-06-09T15:50:43.000000Z",
+        "id": 2064374643729773000,
+        "id_str": "2064374643729773029",
+        "type": "tweet",
+        "conversation_id_str": "2064374643729773029",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "https://t.co/eJB3TgyJwV",
+        "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+        "truncated": false,
+        "in_reply_to_status_id": null,
+        "in_reply_to_status_id_str": null,
+        "in_reply_to_user_id": null,
+        "in_reply_to_user_id_str": null,
+        "in_reply_to_screen_name": null,
+        "user": {
+          "id": "x-user-29",
+          "id_str": "x-user-11",
+          "name": "x-user-12",
+          "screen_name": "x-user-2",
+          "location": null,
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 46960,
+          "friends_count": 99,
+          "listed_count": 397,
+          "favourites_count": 2257,
+          "statuses_count": 1411,
+          "created_at": "2026-05-12T13:23:44.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-59",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-60",
+          "can_dm": true,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 206,
+        "reply_count": 150,
+        "retweet_count": 1232,
+        "favorite_count": 7581,
+        "views_count": 9820272,
+        "bookmark_count": 24161,
+        "lang": "zxx",
+        "entities": {
+          "urls": [
+            {
+              "display_url": "x.com/i/article/2064…",
+              "expanded_url": "http://x.com/i/article/2064357550225510400",
+              "indices": [
+                0,
+                23
+              ],
+              "url": "https://t.co/eJB3TgyJwV"
+            }
+          ],
+          "display_text_range": [
+            0,
+            23
+          ]
+        },
+        "is_pinned": false
+      }
+    ],
+    "next_cursor": "2064374643729773028"
+  }
+}

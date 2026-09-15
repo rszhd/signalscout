@@ -104,6 +104,13 @@ and it is the one that exercises a provider-side window. `--since-hours=`
 controls it and defaults to 24; a monitor this script creates has never polled,
 so without a `since` the window is never sent and the run proves nothing.
 
+The SocialData capture, `socialdata/x-fixtures/capture.mjs`, is the search
+run US-060 measured, and `--only=comments` is a mode of its own that leaves
+that run alone: one search with `min_replies:`, two pages of the busiest
+thread, and the replies under a tweet claiming none if the search found one.
+About $0.012, read from the balance either side of each call. US-136 ran it
+once on 2026-09-15.
+
 `live:apify-linkedin-poll` is the same script with `--provider=apify`, and it
 is the one that exercises a waiting collection: the Apify connector starts an
 actor run, hands the wait back, and is resumed to read it. One run is 25 posts

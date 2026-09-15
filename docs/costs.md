@@ -20,6 +20,7 @@ the price the connector declares:
 | Reddit | ScrapeCreators | a request | $0.00188 | ~$0.00027 (7–23 posts a request) |
 | Reddit | SocialCrawl | a credit | $0.008118 | ~$0.00032 (25 posts) |
 | X | SocialData | a tweet | $0.0002 | $0.0002 |
+| X replies | SocialData | a row of the reply page | $0.0002 | $0.0002, and the root tweet is one row on every page |
 | X | SocialCrawl | a request | $0.008118 | ~$0.0004 (20 posts) |
 | LinkedIn | Apify | a post | $0.002 | $0.002 |
 | YouTube | SocialCrawl | a credit | $0.008118 | ~$0.00018 (45 videos) |
@@ -47,7 +48,10 @@ tick that box.
 **A comment is not priced like a post, and a guard fed the wrong one lets a
 monitor spend five times its cap.** That is why a connector declares
 `replyPricePerUnitMicros` separately. US-028 found it on LinkedIn, where a call
-was five credits and a credit was not a request.
+was five credits and a credit was not a request. SocialData is the other
+shape, US-136: a reply page is billed per row at the tweet price, so the
+connector declares no reply price and reports the rows — and one row on every
+page is the root tweet, which it drops and still counts.
 
 **Instagram is the one platform where the provider costs more than the model.**
 A search page is one credit and a comment page is five, and the leads there are

@@ -425,6 +425,125 @@ save(
   },
 );
 
+// ------------------------------------------------------------ comments
+
+/**
+ * US-136. The replies under one tweet, in a mode of its own so the search
+ * run above stays what US-060 measured.
+ *
+ *     node .../capture.mjs --only=comments
+ *
+ * Four calls, about $0.012 at the published $0.0002 a comment:
+ *
+ *   a. a search for a tweet with replies — `min_replies:` is X's own operator
+ *      and this provider passes the query through;
+ *   b. the first page of that tweet's replies;
+ *   c. the second page, by `next_cursor`, to see whether it repeats the first;
+ *   d. the replies under a tweet with none, which is BUG-007's question: an
+ *      empty thread at SocialCrawl answers with one unrelated post.
+ *
+ * It merges into manifest.json and ledger.json rather than rewriting them,
+ * and it writes no findings.json: that file is the search run's.
+ */
+if (process.argv.includes("--only=comments")) {
+  const busy = await capture(
+    "search-with-replies",
+    `/twitter/search?query=${encodeURIComponent(`${keyword} min_replies:10`)}&type=Top`,
+    { note: "min_replies:10, type=Top — a tweet whose thread can be paged" },
+  );
+
+  const candidates = tweetsOf(busy).filter((tweet) => typeof tweet?.id_str === "string");
+  const target = [...candidates].sort((a, b) => (b.reply_count ?? 0) - (a.reply_count ?? 0))[0];
+  const quiet = candidates.find((tweet) => (tweet.reply_count ?? 0) === 0);
+
+  const commentsPath = (id, cursor) =>
+    `/twitter/tweets/${id}/comments${cursor ? `?cursor=${encodeURIComponent(cursor)}` : ""}`;
+
+  if (target) {
+    console.log(`  busiest tweet claims ${target.reply_count} replies`);
+
+    const first = await capture("comments-page-1", commentsPath(target.id_str), {
+      note: `first page of replies under a tweet claiming ${target.reply_count}`,
+    });
+    const replies = tweetsOf(first);
+    const parents = new Set(
+      replies.map((reply) =>
+        String(reply?.in_reply_to_status_id_str ?? reply?.in_reply_to_status_id ?? ""),
+      ),
+    );
+    console.log(
+      `  ${replies.length} replies, in_reply_to names: ${[...parents].join(", ") || "(nothing)"}`,
+    );
+    if (replies[0]) console.log(`  a reply's keys: ${Object.keys(replies[0]).join(", ")}`);
+    const dates = replies
+      .map((reply) => Date.parse(reply?.tweet_created_at ?? ""))
+      .filter(Number.isFinite);
+    const descending = dates.every((value, index) => index === 0 || dates[index - 1] >= value);
+    console.log(`  ${dates.length} dated, ${descending ? "newest first" : "NOT in date order"}`);
+
+    const cursor = first?.body?.next_cursor;
+    if (typeof cursor === "string" && cursor !== "") {
+      const second = await capture("comments-page-2", commentsPath(target.id_str, cursor), {
+        note: "second page, by next_cursor",
+      });
+      const seen = new Set(replies.map((reply) => reply?.id_str));
+      const repeated = tweetsOf(second).filter((reply) => seen.has(reply?.id_str)).length;
+      console.log(
+        `  page two: ${tweetsOf(second).length} replies, ${repeated} repeated from page one`,
+      );
+    } else {
+      console.log(
+        "  no next_cursor on page one: the whole thread fitted, or the provider stops here",
+      );
+    }
+
+    const sampleReply = replies[0];
+    if (sampleReply?.user?.screen_name && sampleReply?.id_str) {
+      console.log(
+        `
+Open this to answer the URL question — it is built, not returned:
+  https://x.com/${sampleReply.user.screen_name}/status/${sampleReply.id_str}`,
+      );
+    }
+  } else {
+    console.log("  no tweet with replies came back; nothing to page");
+  }
+
+  if (quiet) {
+    const none = await capture("comments-none", commentsPath(quiet.id_str), {
+      note: `the replies under a tweet claiming ${quiet.reply_count} — what an empty thread answers, and whether it is billed`,
+    });
+    console.log(`  ${tweetsOf(none).length} replies came back for a tweet claiming none`);
+  } else {
+    console.log("\ncomments-none\n  skipped: every tweet in the search had replies");
+  }
+
+  const closingBalance = await balance();
+  const merge = (file, key, mine, nameOf) => {
+    let previous = [];
+    try {
+      previous = JSON.parse(readFileSync(`${here}${file}`, "utf8"))[key] ?? [];
+    } catch {
+      // No previous file. A full run is the fix.
+    }
+    const rewritten = new Set(mine.map(nameOf));
+    return [...previous.filter((entry) => !rewritten.has(nameOf(entry))), ...mine];
+  };
+
+  const manifest = JSON.parse(readFileSync(`${here}manifest.json`, "utf8"));
+  manifest.files = merge("manifest.json", "files", written, (entry) => entry.file);
+  writeFileSync(`${here}manifest.json`, `${JSON.stringify(manifest, null, 2)}\n`);
+
+  const book = JSON.parse(readFileSync(`${here}ledger.json`, "utf8"));
+  book.calls = merge("ledger.json", "calls", ledger, (entry) => entry.call);
+  writeFileSync(`${here}ledger.json`, `${JSON.stringify(book, null, 2)}\n`);
+
+  console.log(`\n---\nwrote ${written.length} fixtures into manifest.json and ledger.json`);
+  console.log(`balance $${opening} to $${closingBalance}`);
+  console.log("\nRead the fixtures before committing them.");
+  process.exit(0);
+}
+
 /** Questions 1, 2, 3, 4 and 6. The call everything else is compared against. */
 const latest = await capture(
   "search-latest",

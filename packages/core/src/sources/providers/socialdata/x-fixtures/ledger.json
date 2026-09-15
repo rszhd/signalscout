@@ -4,12 +4,6 @@
   "balanceAfter": 0.0718,
   "calls": [
     {
-      "call": "credentials-rejected",
-      "httpStatus": 401,
-      "spentUsd": 0,
-      "note": "sent with a deliberately invalid key; the balance is another account's"
-    },
-    {
       "call": "search-latest",
       "path": "/twitter/search?query=flaky%20tests&type=Latest",
       "httpStatus": 200,
@@ -48,6 +42,42 @@
       "balanceAfter": 0.0718,
       "spentUsd": 0,
       "note": "a phrase that cannot occur"
+    },
+    {
+      "call": "credentials-rejected",
+      "httpStatus": 401,
+      "spentUsd": 0,
+      "note": "sent with a deliberately invalid key; the balance is another account's"
+    },
+    {
+      "call": "search-with-replies",
+      "path": "/twitter/search?query=flaky%20tests%20min_replies%3A10&type=Top",
+      "httpStatus": 200,
+      "elapsedMs": 2026,
+      "balanceBefore": 0.0644,
+      "balanceAfter": 0.0602,
+      "spentUsd": 0.0042,
+      "note": "min_replies:10, type=Top — a tweet whose thread can be paged"
+    },
+    {
+      "call": "comments-page-1",
+      "path": "/twitter/tweets/2064374643729773029/comments",
+      "httpStatus": 200,
+      "elapsedMs": 1783,
+      "balanceBefore": 0.0602,
+      "balanceAfter": 0.057999999999999996,
+      "spentUsd": 0.0022,
+      "note": "first page of replies under a tweet claiming 150"
+    },
+    {
+      "call": "comments-page-2",
+      "path": "/twitter/tweets/2064374643729773029/comments?cursor=2064374643729773028",
+      "httpStatus": 200,
+      "elapsedMs": 1660,
+      "balanceBefore": 0.057999999999999996,
+      "balanceAfter": 0.057800000000000004,
+      "spentUsd": 0.0002,
+      "note": "second page, by next_cursor"
     }
   ]
 }

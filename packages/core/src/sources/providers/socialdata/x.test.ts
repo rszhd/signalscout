@@ -17,10 +17,10 @@ import { createLogger } from "../../../logger.js";
 import { xPlatformId } from "../../platforms.js";
 import { createSourceRegistry } from "../../registry.js";
 import { assertSourcesCanBeStored } from "../../storage.js";
-import type { SearchRequest, SearchResult, SourceRuntime } from "../../types.js";
+import type { ReplyRequest, SearchRequest, SearchResult, SourceRuntime } from "../../types.js";
 import { toCandidatePost as toSocialCrawlPost } from "../socialcrawl/x.js";
 import { socialDataProviderId } from "./provider.js";
-import { SocialDataXSource, socialDataX, toCandidatePost } from "./x.js";
+import { SocialDataXSource, socialDataX, toCandidatePost, toCandidateReply } from "./x.js";
 
 interface Captured {
   readonly httpStatus: number;
@@ -38,6 +38,12 @@ const searchSince = fixture("search-since");
 const searchPage2 = fixture("search-page-2");
 const noResults = fixture("search-no-results");
 const credentialsRejected = fixture("credentials-rejected");
+/** US-136: the conversation under a tweet claiming 150 replies, two pages. */
+const repliesPage1 = fixture("comments-page-1");
+const repliesPage2 = fixture("comments-page-2");
+const ledger = JSON.parse(
+  readFileSync(new URL("./x-fixtures/ledger.json", import.meta.url), "utf8"),
+) as { calls: { call: string; spentUsd: number | null }[] };
 
 function bodyOf(captured: Captured): Record<string, unknown> {
   return captured.body as Record<string, unknown>;
@@ -408,6 +414,178 @@ describe("stopping early on a page that is entirely old", () => {
     const sorted = [...dates].sort().reverse();
 
     expect(dates).toEqual(sorted);
+  });
+});
+
+/** The tweet the reply capture asked about: the root row on its own page. */
+const threadId = "2064374643729773029";
+
+function replyRequest(overrides: Partial<ReplyRequest> = {}): ReplyRequest {
+  return {
+    postUrl: `https://x.com/x-user-2/status/${threadId}`,
+    postExternalId: threadId,
+    credentials,
+    ...overrides,
+  };
+}
+
+describe("replies", () => {
+  it("promises them, at the tweet price, and the ledger agrees", () => {
+    expect(socialDataX.canFetchReplies).toBe(true);
+    expect(socialDataX.replyPricePerUnitMicros).toBeUndefined();
+
+    // Eleven rows, $0.0022: 200 micro-dollars a row, the search price.
+    const first = ledger.calls.find((entry) => entry.call === "comments-page-1");
+    expect(first?.spentUsd).toBe(0.0022);
+    expect(tweetsOf(repliesPage1)).toHaveLength(11);
+  });
+
+  it("asks by tweet id, and by cursor on the next page", async () => {
+    const { source, provider } = sourceFor([repliesPage1, repliesPage2]);
+
+    const first = await source.fetchReplies(replyRequest());
+    const second = await source.fetchReplies(
+      replyRequest({ cursor: cursorOf(first.next), positionOffset: 11 }),
+    );
+
+    expect(new URL(provider.calls[0]?.url ?? "").pathname).toBe(
+      `/twitter/tweets/${threadId}/comments`,
+    );
+    expect(paramsOf(provider.calls[0]).get("cursor")).toBeNull();
+    expect(paramsOf(provider.calls[1]).get("cursor")).toBe(
+      (bodyOf(repliesPage1) as { next_cursor: string }).next_cursor,
+    );
+    expect(second.itemsReturned).toBe(1);
+  });
+
+  /**
+   * The provider puts the root tweet on the page as its last row and bills it
+   * with the rest. It is dropped and it is paid for, and both halves matter:
+   * storing it would make the post its own reply, and not counting it would
+   * under-report the bill by a row a page.
+   */
+  it("drops the root tweet from the page and still counts it in the bill", async () => {
+    const rows = tweetsOf(repliesPage1);
+    expect(rows.at(-1)?.id_str).toBe(threadId);
+
+    const { source } = sourceFor([repliesPage1]);
+    const result = await source.fetchReplies(replyRequest());
+
+    expect(result.itemsReturned).toBe(11);
+    expect(result.unitsConsumed).toBe(11);
+    expect(result.replies).toHaveLength(10);
+    expect(result.replies.some((reply) => reply.externalId === threadId)).toBe(false);
+  });
+
+  it("hangs a nested reply under its parent reply and a top-level one under the post", async () => {
+    const { source } = sourceFor([repliesPage1]);
+    const { replies } = await source.fetchReplies(replyRequest());
+
+    for (const reply of replies) expect(reply.parentPostExternalId).toBe(threadId);
+
+    const nested = replies.filter((reply) => reply.parentReplyExternalId !== undefined);
+    const topLevel = replies.filter((reply) => reply.parentReplyExternalId === undefined);
+    // Six of the ten hang under other replies, read off the fixture by eye.
+    expect(nested).toHaveLength(6);
+    expect(topLevel).toHaveLength(4);
+    for (const reply of nested) expect(reply.parentReplyExternalId).not.toBe(threadId);
+  });
+
+  it("builds the same URL shape a post gets, from the handle and the id", async () => {
+    const { source } = sourceFor([repliesPage1]);
+    const { replies } = await source.fetchReplies(replyRequest());
+
+    for (const reply of replies) {
+      expect(reply.url).toBe(`https://x.com/${reply.author}/status/${reply.externalId}`);
+    }
+  });
+
+  it("drops a row from another conversation", () => {
+    const row = tweetsOf(repliesPage1)[0] as Record<string, unknown>;
+
+    expect(
+      toCandidateReply(
+        { ...row, conversation_id_str: "1" },
+        { parentPostExternalId: threadId, position: 0 },
+      ),
+    ).toBeUndefined();
+  });
+
+  it("keeps the provider's own position, root row and all", async () => {
+    const { source } = sourceFor([repliesPage1]);
+    const { replies } = await source.fetchReplies(replyRequest({ positionOffset: 30 }));
+
+    expect(replies[0]?.threadPosition).toBe(30);
+  });
+
+  /**
+   * The page is newest first, measured across all eleven rows. So a page on
+   * which every reply is older than `since` ends the walk: the next one would
+   * be bought, at a row each, to be thrown away.
+   */
+  it("is newest first, and ends the walk when a page is entirely older than since", async () => {
+    const dates = tweetsOf(repliesPage1).map((row) => Date.parse(String(row.tweet_created_at)));
+    expect(dates.every((value, index) => index === 0 || (dates[index - 1] ?? 0) >= value)).toBe(
+      true,
+    );
+
+    const { source } = sourceFor([repliesPage1]);
+    const all = await source.fetchReplies(replyRequest());
+    const newest = all.replies.reduce((a, b) => (a.postedAt > b.postedAt ? a : b));
+
+    const later = await source.fetchReplies(replyRequest({ since: newest.postedAt }));
+
+    expect(later.replies).toHaveLength(0);
+    expect(later.itemsReturned).toBe(11);
+    expect(later.unitsConsumed).toBe(11);
+    expect(later.next.status).toBe("done");
+  });
+
+  /**
+   * Page two of the captured thread is the root tweet alone, billed, with a
+   * cursor still offered. Following it buys the same row again, so a page
+   * that yields nothing new is the end of the walk — and the thread stays
+   * partial, because the cursor is the only evidence of more there is.
+   */
+  it("ends the walk on a page that yields nothing new, and calls the thread partial", async () => {
+    expect(tweetsOf(repliesPage2)).toHaveLength(1);
+    expect((bodyOf(repliesPage2) as { next_cursor?: string }).next_cursor).toBeTruthy();
+
+    const { source } = sourceFor([repliesPage2]);
+    const result = await source.fetchReplies(replyRequest({ positionOffset: 11 }));
+
+    expect(result.replies).toHaveLength(0);
+    expect(result.unitsConsumed).toBe(1);
+    expect(result.next.status).toBe("done");
+    expect(result.partial).toBe(true);
+  });
+
+  it("calls a page with no cursor the end, and partial only while a cursor remains", async () => {
+    const { source } = sourceFor([
+      { httpStatus: 200, body: { tweets: tweetsOf(repliesPage1), next_cursor: null } },
+    ]);
+    const result = await source.fetchReplies(replyRequest());
+
+    expect(result.next.status).toBe("done");
+    expect(result.partial).toBe(false);
+  });
+
+  /**
+   * A 402 mid-thread is thrown, once, with the provider's repair in the
+   * message. It ends the replies step the way it ends a search, and the
+   * thread is re-opened next poll because its row was never marked.
+   */
+  it("throws on an empty balance rather than retrying or reading it as an empty page", async () => {
+    const { source, provider } = sourceFor([
+      { httpStatus: 402, body: { status: "error", message: "Insufficient balance" } },
+    ]);
+
+    await expect(source.fetchReplies(replyRequest())).rejects.toMatchObject({
+      name: "SocialDataError",
+      kind: "balance",
+      message: expect.stringContaining("Top up") as unknown as string,
+    });
+    expect(provider.calls).toHaveLength(1);
   });
 });
 

@@ -456,6 +456,14 @@ there is arithmetic on "4 years ago", with no `includeExtras` to correct it as
 there is for a video. The connector stores it marked approximate and cuts on
 `since` at the precision of the relative text, never at the second.
 
+**A reply page can contain the post it hangs under.** SocialData's comments
+endpoint answers with the whole conversation, root tweet included, as the last
+row of the page and billed like any other — US-136, 2026-09-15. Page two of
+the captured thread held only that root again and still offered a cursor, so
+following a cursor from a page that yielded nothing new buys the same row
+again. The connector drops the root by id, counts it in the bill, and ends the
+walk on a page with nothing new whatever the cursor says.
+
 **A thread's window is not the poll's window.** `ReplyRequest.since` is how far
 back this *thread* has been read, and it has nothing to do with when the
 monitor last searched. The two were the same value until BUG-006, and the

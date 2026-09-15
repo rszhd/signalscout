@@ -5,15 +5,6 @@
   "api": "https://api.socialdata.tools",
   "files": [
     {
-      "file": "credentials-rejected.json",
-      "request": {
-        "method": "GET",
-        "note": "invalid key"
-      },
-      "capturedAt": "2026-09-07T08:57:06.852Z",
-      "identitiesReplaced": 0
-    },
-    {
       "file": "search-latest.json",
       "request": {
         "method": "GET",
@@ -52,6 +43,45 @@
       },
       "capturedAt": "2026-09-07T08:57:14.730Z",
       "identitiesReplaced": 0
+    },
+    {
+      "file": "credentials-rejected.json",
+      "request": {
+        "method": "GET",
+        "note": "invalid key"
+      },
+      "capturedAt": "2026-09-15T06:14:17.416Z",
+      "identitiesReplaced": 0
+    },
+    {
+      "file": "search-with-replies.json",
+      "request": {
+        "method": "GET",
+        "path": "/twitter/search?query=flaky%20tests%20min_replies%3A10&type=Top",
+        "note": "min_replies:10, type=Top — a tweet whose thread can be paged"
+      },
+      "capturedAt": "2026-09-15T06:14:20.162Z",
+      "identitiesReplaced": 94
+    },
+    {
+      "file": "comments-page-1.json",
+      "request": {
+        "method": "GET",
+        "path": "/twitter/tweets/2064374643729773029/comments",
+        "note": "first page of replies under a tweet claiming 150"
+      },
+      "capturedAt": "2026-09-15T06:14:22.677Z",
+      "identitiesReplaced": 60
+    },
+    {
+      "file": "comments-page-2.json",
+      "request": {
+        "method": "GET",
+        "path": "/twitter/tweets/2064374643729773029/comments?cursor=2064374643729773028",
+        "note": "second page, by next_cursor"
+      },
+      "capturedAt": "2026-09-15T06:14:24.999Z",
+      "identitiesReplaced": 6
     }
   ]
 }

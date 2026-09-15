@@ -27,6 +27,18 @@ const apiBase = "https://api.socialdata.tools";
 export const endpoints = {
   search: `${apiBase}/twitter/search`,
   balance: `${apiBase}/user/balance`,
+  /**
+   * The replies under one tweet, by id. US-136.
+   *
+   * The answer is the same shape as a search — `tweets` and `next_cursor` —
+   * and the same price, $0.0002 a row, measured: eleven rows moved the
+   * balance $0.0022. Two things a search does not do, both captured on
+   * 2026-09-15: the root tweet itself is one of the rows, billed like the
+   * rest, and a second page can hold only that root again while still
+   * offering a cursor.
+   */
+  comments: (tweetId: string) =>
+    `${apiBase}/twitter/tweets/${encodeURIComponent(tweetId)}/comments`,
 } as const;
 
 /**
@@ -205,7 +217,23 @@ export class SocialDataClient {
    * this connector never returns a `wait` on a healthy call.
    */
   async fetchPage(params: Record<string, string>, signal?: AbortSignal): Promise<Page> {
-    const answer = await this.call(endpoints.search, params, signal);
+    return this.pageOf(endpoints.search, params, signal);
+  }
+
+  /**
+   * Fetch one page of the replies under a tweet. Same shape, same price, and
+   * the same absence of waiting as a search.
+   */
+  async fetchReplyPage(tweetId: string, cursor?: string, signal?: AbortSignal): Promise<Page> {
+    return this.pageOf(endpoints.comments(tweetId), cursor ? { cursor } : {}, signal);
+  }
+
+  private async pageOf(
+    endpoint: string,
+    params: Record<string, string>,
+    signal?: AbortSignal,
+  ): Promise<Page> {
+    const answer = await this.call(endpoint, params, signal);
 
     if (answer.httpStatus !== 200) throw this.fail(answer);
 

@@ -33,12 +33,21 @@
  *    US-047 says is the kind to re-check whenever this parser changes.
  * 4. **The id is the bare tweet id**, the same number `socialcrawl/x.ts` reads
  *    out of its own `id`, so the two providers deduplicate against each other.
+ * 5. **A reply page is the whole conversation, root included.** US-136
+ *    captured one on 2026-09-15: eleven rows for a tweet claiming 150, newest
+ *    first, nested — `in_reply_to_status_id_str` names a parent reply where
+ *    there is one — and the root tweet itself as the last row, billed like
+ *    the rest. Page two held only that root again, and still offered a
+ *    cursor. See `fetchReplies` for what each of those decides.
  */
 import { xPlatform } from "../../platforms.js";
 import type {
   CandidatePost,
+  CandidateReply,
   ConnectorDefinition,
   CredentialCheck,
+  ReplyRequest,
+  ReplyResult,
   SearchRequest,
   SearchResult,
   SocialSource,
@@ -95,14 +104,12 @@ export const socialDataX: ConnectorDefinition = {
   /** Keywords only. Nothing here searches inside a channel. */
   discovery: ["keyword"],
   /**
-   * The provider has a comments endpoint and this connector does not use it.
-   *
-   * Nobody has measured what it costs or whether the links it returns open the
-   * comment, and US-047's rule is that a match needs a URL that opens the
-   * thing it names. Turning on a per-item charge to find out is a ticket, not
-   * a default.
+   * Replies, at the tweet price: $0.0002 a row, the same unit and the same
+   * rate as a search, so no separate reply price is declared. Measured in
+   * US-136 — eleven rows moved the balance $0.0022 — and the published rate
+   * says the same. The row count is the bill, root tweet included.
    */
-  canFetchReplies: false,
+  canFetchReplies: true,
   create: (runtime) => new SocialDataXSource(runtime),
 };
 
@@ -341,6 +348,62 @@ export class SocialDataXSource implements SocialSource {
     return onward ? { status: "ready", cursor: encodeCursor(onward) } : { status: "done" };
   }
 
+  /**
+   * One page of the conversation under one tweet.
+   *
+   * Four things the capture decided:
+   *
+   * * The root tweet is one of the rows. It is dropped by id, and it is still
+   *   counted in `unitsConsumed` because the provider billed it.
+   * * A row from another conversation — `conversation_id_str` not the post we
+   *   asked about — is dropped. BUG-007's rule, with this provider's field.
+   * * The page is newest first, measured, so once every reply on it is older
+   *   than `since` the walk ends: the next page would be bought to be thrown
+   *   away, at $0.0002 a row.
+   * * A page that yields nothing new ends the walk whatever the cursor says.
+   *   Page two of the captured thread was the root alone, billed, with a
+   *   cursor still offered; following it buys the same row again.
+   *
+   * `partial` is whether a cursor remains. The provider gave eleven rows for a
+   * thread claiming 150 and no way to tell which claim is right, so a cursor
+   * is the only evidence of more that this connector has.
+   *
+   * A 402 is thrown, not caught. It ends the replies step the way it ends a
+   * search, in one log line, and the thread is re-opened on the next poll
+   * because its row was never marked. Catching it here would let the step go
+   * on to the next thread and meet the same answer, once per thread.
+   */
+  async fetchReplies(request: ReplyRequest): Promise<ReplyResult> {
+    const page = await this.client(request.credentials).fetchReplyPage(
+      request.postExternalId,
+      request.cursor,
+      request.signal,
+    );
+
+    const collected = page.records
+      .map((record, index) =>
+        toCandidateReply(record, {
+          parentPostExternalId: request.postExternalId,
+          position: (request.positionOffset ?? 0) + index,
+        }),
+      )
+      .filter((reply): reply is CandidateReply => reply !== undefined);
+
+    const replies = collected.filter((reply) => !request.since || reply.postedAt > request.since);
+
+    const reachedSince =
+      request.since !== undefined && collected.length > 0 && replies.length === 0;
+    const more = page.after !== undefined && replies.length > 0 && !reachedSince;
+
+    return {
+      replies,
+      itemsReturned: page.records.length,
+      unitsConsumed: page.tweetsReturned,
+      next: more && page.after ? { status: "ready", cursor: page.after } : { status: "done" },
+      partial: page.after !== undefined,
+    };
+  }
+
   /** The first query, or nothing if the monitor named none for this platform. */
   private first(query: SourceQuery): Cursor | undefined {
     return query.queries.length > 0 ? { index: 0, pages: 0 } : undefined;
@@ -412,6 +475,46 @@ export function toCandidatePost(record: unknown): CandidatePost | undefined {
     text: text(row.full_text) ?? text(row.text) ?? "",
     postedAt,
     author: handle,
+  };
+}
+
+interface ReplyContext {
+  readonly parentPostExternalId: string;
+  readonly position: number;
+}
+
+/**
+ * One row of a reply page to one `CandidateReply`, or nothing.
+ *
+ * Nothing for the root tweet, which the provider puts on the page; nothing
+ * for a row from another conversation; nothing for a row missing what a post
+ * needs. The parent reply is `in_reply_to_status_id_str` when it names
+ * something other than the post itself — the captured page had six of
+ * ten hanging under other replies.
+ */
+export function toCandidateReply(
+  record: unknown,
+  context: ReplyContext,
+): CandidateReply | undefined {
+  const post = toCandidatePost(record);
+  if (!post) return undefined;
+  if (post.externalId === context.parentPostExternalId) return undefined;
+
+  const row = record as Record<string, unknown>;
+  const conversation = text(row.conversation_id_str);
+  if (conversation && conversation !== context.parentPostExternalId) return undefined;
+
+  const replyTo = text(row.in_reply_to_status_id_str);
+  const replyCount = typeof row.reply_count === "number" ? row.reply_count : undefined;
+
+  return {
+    ...post,
+    parentPostExternalId: context.parentPostExternalId,
+    ...(replyTo && replyTo !== context.parentPostExternalId
+      ? { parentReplyExternalId: replyTo }
+      : {}),
+    threadPosition: context.position,
+    ...(replyCount === undefined ? {} : { replyCount }),
   };
 }
 

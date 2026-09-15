@@ -1,0 +1,77 @@
+{
+  "httpStatus": 200,
+  "body": {
+    "tweets": [
+      {
+        "tweet_created_at": "2026-06-09T15:50:43.000000Z",
+        "id": 2064374643729773000,
+        "id_str": "2064374643729773029",
+        "type": "tweet",
+        "conversation_id_str": "2064374643729773029",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "https://t.co/eJB3TgyJwV",
+        "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+        "truncated": false,
+        "in_reply_to_status_id": null,
+        "in_reply_to_status_id_str": null,
+        "in_reply_to_user_id": null,
+        "in_reply_to_user_id_str": null,
+        "in_reply_to_screen_name": null,
+        "user": {
+          "id": "x-user-1",
+          "id_str": "x-user-2",
+          "name": "x-user-3",
+          "screen_name": "x-user-4",
+          "location": null,
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 46959,
+          "friends_count": 99,
+          "listed_count": 397,
+          "favourites_count": 2257,
+          "statuses_count": 1411,
+          "created_at": "2026-05-12T13:23:44.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-5",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-6",
+          "can_dm": true,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 206,
+        "reply_count": 150,
+        "retweet_count": 1232,
+        "favorite_count": 7581,
+        "views_count": 9820272,
+        "bookmark_count": 24155,
+        "lang": "zxx",
+        "entities": {
+          "urls": [
+            {
+              "display_url": "x.com/i/article/2064…",
+              "expanded_url": "http://x.com/i/article/2064357550225510400",
+              "indices": [
+                0,
+                23
+              ],
+              "url": "https://t.co/eJB3TgyJwV"
+            }
+          ],
+          "display_text_range": [
+            0,
+            23
+          ]
+        },
+        "is_pinned": false
+      }
+    ],
+    "next_cursor": "2064374643729773028"
+  }
+}

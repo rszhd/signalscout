@@ -579,6 +579,8 @@ export {
   fakeSourceId,
   groupByPlatform,
   isOffered,
+  lentProvidersFrom,
+  lentProviderVariableName,
   type NextPage,
   NoUsableProviderError,
   notOfferedReason,

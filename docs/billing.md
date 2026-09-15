@@ -45,6 +45,18 @@ spend meter; and the scheduler does not queue a poll for an account that has
 spent its month — which is what stops the work being started at all, the same
 half of the gate `entitledCondition` is.
 
+**The plan's provider per platform is the deployment's, named in
+`KEYS_INCLUDED_PROVIDER_<PLATFORM>`.** US-130. An account on the plan never
+pastes a key, so nothing records it a choice, and with two keys on the
+instance for one platform the poll would refuse. So `accountKeys(...).choices`
+answers such an account with what the deployment named — and only that: a row
+the account recorded before the plan is left in place and not read, and
+reading it again is what leaving the plan does. An account spending its own
+keys reads its rows, US-026's refusal untouched. Every reader of a choice — the
+four worker steps, the connections screen, the pricing page and the monitor
+form — is handed that function by the composition root, so the form and the
+poll answer alike. A name this build cannot run stops both roots at boot.
+
 **Checkout does not offer the keys-included price yet, and US-131 is the ticket
 that changes it.** It was held back until there was a cap, and there is one now.
 Until that ticket closes the plan can be put on an account from Stripe's own
@@ -164,6 +176,7 @@ APP_URL=https://app.example.com
 
 STRIPE_PRICE_ID_KEYS_INCLUDED=price_…   # optional: the second plan's price
 ACCOUNT_MONTHLY_CAP_MICROS=15000000     # optional: what that plan lends, $15
+KEYS_INCLUDED_PROVIDER_REDDIT=scrapecreators   # one per platform: who fetches it on that plan
 ```
 
 `APP_URL` is where Stripe returns a person to. It is not derived from a request

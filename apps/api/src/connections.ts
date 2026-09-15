@@ -70,6 +70,15 @@ export interface ConnectionRoutesOptions {
    */
   readonly environmentFor?: (userId: string) => Promise<Record<string, string | undefined>>;
   /**
+   * Which provider fetches each platform for one account. US-130.
+   *
+   * Undefined reads the account's own recorded choices. A composition root on
+   * an instance whose plan lends the keys passes `accountKeys(...).choices`,
+   * which answers with the deployment's named provider for an account on that
+   * plan — so the screen, the form and the poll read one answer.
+   */
+  readonly choicesFor?: (userId: string) => Promise<ProviderChoices>;
+  /**
    * Where `ENCRYPTION_KEY` is read from.
    *
    * Separate from `environmentFor` above, which is the provider keys. A test
@@ -214,6 +223,7 @@ export async function registerConnectionRoutes(
 ): Promise<void> {
   const { db, sources, logger } = options;
   const environmentFor = options.environmentFor ?? (async () => process.env);
+  const choicesFor = options.choicesFor ?? ((userId: string) => readProviderChoices(db, userId));
   const encryption = options.encryption ?? process.env;
   const providers = providersOf(sources);
   const platformEntries = groupByPlatform(sources);
@@ -405,7 +415,7 @@ export async function registerConnectionRoutes(
   /** Every platform, with the choices and the keys read once for all of them. */
   async function platformViews(userId: string) {
     const [choices, connected] = await Promise.all([
-      readProviderChoices(db, userId),
+      choicesFor(userId),
       connectedProviders(userId),
     ]);
 

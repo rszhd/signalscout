@@ -336,6 +336,46 @@ describe("the monitor routes", () => {
       });
     });
 
+    /**
+     * US-130. An account on the plan never pastes a key, so nothing records
+     * it a choice, and with two Reddit keys in `.env` the poll would refuse.
+     * The deployment names the provider in the same environment, the form
+     * narrows to it exactly as it narrows to a recorded choice, and the poll
+     * reads the same answer through `accountKeys` — so the two agree.
+     */
+    it("reads a platform as ready for an account on the plan, through the provider the deployment named", async () => {
+      await onPlan("keys_included");
+      const twoKeys = {
+        ...configured,
+        SCRAPECREATORS_API_KEY: "sc-test-key",
+        KEYS_INCLUDED_PROVIDER_REDDIT: "scrapecreators",
+      };
+
+      await withServer({ environment: twoKeys, signup: "open", charging: true }, async (app) => {
+        const body = (await app.inject({ method: "GET", url: "/api/monitor-options" })).json();
+        const reddit = body.sources.find((source: { id: string }) => source.id === "reddit");
+
+        expect(reddit.ready).toBe(true);
+        expect(reddit.missingCredentials).toEqual([]);
+
+        // And the connections screen says the same provider is the one in use,
+        // with no choice asked of the person.
+        const connections = (await app.inject({ method: "GET", url: "/api/connections" })).json();
+        const row = connections.platforms.find((entry: { id: string }) => entry.id === "reddit");
+        expect(row.effective).toBe("scrapecreators");
+        expect(row.needsChoice).toBe(false);
+      });
+    });
+
+    it("refuses to start when the deployment names a provider this build cannot run", async () => {
+      await expect(
+        server({
+          environment: { ...configured, KEYS_INCLUDED_PROVIDER_REDDIT: "not-a-provider" },
+          signup: "open",
+        }),
+      ).rejects.toThrow(/KEYS_INCLUDED_PROVIDER_REDDIT=not-a-provider/);
+    });
+
     it("reports the same key as present where signup is closed", async () => {
       await withServer({ environment: configured, signup: "closed" }, async (app) => {
         const body = (await app.inject({ method: "GET", url: "/api/monitor-options" })).json();

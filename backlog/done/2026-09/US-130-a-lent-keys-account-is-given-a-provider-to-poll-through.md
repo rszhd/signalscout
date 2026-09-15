@@ -6,7 +6,7 @@ priority: p2
 created: 2026-09-13T12:24+08:00
 parent: US-128
 area:
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -44,22 +44,27 @@ question here is only what happens when nobody has.
 
 ## Acceptance
 
-- [ ] A deployment can name which provider fetches each platform for accounts
-      whose plan lends the keys
-- [ ] An account on that plan with no recorded choice polls through the named
+- [x] A deployment can name which provider fetches each platform for accounts
+      whose plan lends the keys: `KEYS_INCLUDED_PROVIDER_<PLATFORM>`, one per
+      platform, the name derived the way a credential's is
+- [x] An account on that plan with no recorded choice polls through the named
       provider, rather than being refused for having no choice
-- [ ] An account spending its own keys is unaffected: US-026's refusal stands,
-      because choosing for them spends their money at an account they did not
-      pick
-- [ ] A recorded choice still wins for an account spending its own keys. The
-      deployment's answer is a default there, not an override. On the plan that
-      lends the keys the deployment's answer is the only one — US-132
-- [ ] A named provider this build cannot run, or one that does not fetch the
-      platform, is refused at boot rather than at a poll
-- [ ] With signup closed nothing changes
-- [ ] The monitor form and the poll agree: a platform the deployment has named a
-      provider for reads as ready
-- [ ] No test spends money
+- [x] An account spending its own keys is unaffected: `accountKeys.choices`
+      reads its rows, and the steps read whatever they are handed
+- [x] A recorded choice still wins for an account spending its own keys. On
+      the plan that lends the keys the deployment's answer is the only one:
+      a row recorded before the plan is left in place and not read. That is
+      the choice half of US-132's precedence box, done here because
+      `choices()` decides it in one line; the key and model halves stay there
+- [x] A named provider this build cannot run, or one that does not fetch the
+      platform, or one it has switched off, is refused at boot — by the API
+      and by the worker, each tested
+- [x] With signup closed nothing changes: `spendsInstanceMoney` answers no
+- [x] The monitor form and the poll agree: both read `accountKeys.choices`,
+      and a test reads Reddit as ready with two keys on the instance and the
+      deployment naming one, with the connections screen showing it in use
+      and asking no choice
+- [x] No test spends money. 2,200 pass
 
 ## Notes
 
@@ -88,3 +93,25 @@ question here is only what happens when nobody has.
   ticket adds is the whole answer there rather than a value a person may
   replace. The refusal that makes it so is US-132's; what stays here is the
   deployment naming the provider, which that ticket needs.
+
+- 2026-09-15T18:05+08:00 — **Built.** The shape is the one the Notes hoped
+  for: no rows written. `accountKeys` — the per-account object US-128 built
+  for keys and US-129 for the cap — gained `choices(userId)`, and the seven
+  readers of a provider choice (collect, replies, reconcile, estimate;
+  connections, pricing, monitors) take a `choicesFor` function with the table
+  read as the default, so a self-hosted instance and every existing test
+  read exactly what they read before. The composition roots pass
+  `keys.choices` and call `lentProvidersFrom` at boot.
+
+  `recordChoiceForUnassigned` on the connections screen still reads the rows,
+  on purpose: it is about what is recorded, and US-132 refuses the key write
+  that triggers it for a lent-keys account anyway.
+
+  One gap seen and left: with two keys and no choice, `startBlockers` reads a
+  platform as ready — "one usable connector is enough" — while the poll
+  refuses it as undecided. That predates this ticket and is not the lent-keys
+  case; it is an own-keys account that pasted two keys and chose nothing.
+
+- 2026-09-15T18:15+08:00 — **Closed.** Every box is true. `live:lent-keys`
+  was not run: it needs two provider keys to show anything, and the model
+  account behind `AI_API_KEY` had no credit on the day.

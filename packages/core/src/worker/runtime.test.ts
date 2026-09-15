@@ -267,6 +267,32 @@ describe("a stored credential the worker cannot read", () => {
     const worker = await startTestWorker(database);
     await worker.stop();
   });
+
+  /**
+   * US-130. The deployment's named provider is read here, at boot, so a name
+   * this build cannot run stops the process rather than one poll at 02:00.
+   * The fake registry registers Reddit through Bright Data and nothing else.
+   */
+  it("refuses to start when the deployment names a provider it cannot run", async () => {
+    vi.stubEnv("KEYS_INCLUDED_PROVIDER_REDDIT", "scrapecreators");
+    try {
+      await expect(startTestWorker(database)).rejects.toThrow(
+        /KEYS_INCLUDED_PROVIDER_REDDIT=scrapecreators/,
+      );
+    } finally {
+      vi.unstubAllEnvs();
+    }
+  });
+
+  it("starts when the deployment names a provider it can run", async () => {
+    vi.stubEnv("KEYS_INCLUDED_PROVIDER_REDDIT", "brightdata");
+    try {
+      const worker = await startTestWorker(database);
+      await worker.stop();
+    } finally {
+      vi.unstubAllEnvs();
+    }
+  });
 });
 
 /**

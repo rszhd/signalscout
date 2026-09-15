@@ -23,9 +23,11 @@ import {
   emailVerificationRequired,
   type JobSender,
   type Logger,
+  lentProvidersFrom,
   needsApiKey,
   notificationReadiness,
   type ProjectDescriber,
+  type ProviderChoices,
   type QueryGenerator,
   readAiEnvironment,
   type SendEmail,
@@ -100,6 +102,13 @@ export interface BuildServerOptions {
   sources?: readonly ConnectorDefinition[];
   /** Where the source keys live when they are not in the database. */
   environment?: Record<string, string | undefined>;
+  /**
+   * Which provider fetches each platform for an account whose plan lends the
+   * keys. US-130. Undefined reads `KEYS_INCLUDED_PROVIDER_<PLATFORM>` from the
+   * same environment as the provider keys, and refuses a name this build
+   * cannot run before a route is registered.
+   */
+  lentProviders?: ProviderChoices;
   /**
    * Where `ENCRYPTION_KEY` is read from, kept apart from the provider keys
    * above so a test can describe an instance that cannot store one.
@@ -373,6 +382,7 @@ export async function buildServer({
   db,
   sources = builtInSources,
   environment,
+  lentProviders,
   encryption,
   modelProbe,
   storedCredentials,
@@ -459,6 +469,8 @@ export async function buildServer({
     // US-129. What this deployment lends one account in a month. It reaches an
     // account only where its plan includes the keys.
     capMicros: accountCapFrom(env),
+    // US-130. Which provider fetches each platform for an account on that plan.
+    lentProviders: lentProviders ?? lentProvidersFrom(environment ?? process.env, sources),
   });
 
   await registerBillingRoutes(app, { db, logger, settings, billing, keys });
@@ -494,15 +506,18 @@ export async function buildServer({
    * and the monitor form refuses to start a monitor the poll would refuse.
    */
   const providerKeysFor = (userId: string) => keys.provider(userId);
+  /** Which provider fetches each platform for one account. US-130. */
+  const choicesFor = (userId: string) => keys.choices(userId);
 
   await registerConnectionRoutes(app, {
     db,
     sources,
     environmentFor: providerKeysFor,
+    choicesFor,
     encryption,
     logger,
   });
-  await registerPricingRoutes(app, { db, sources, environmentFor: providerKeysFor });
+  await registerPricingRoutes(app, { db, sources, environmentFor: providerKeysFor, choicesFor });
   await registerModelRoutes(app, {
     db,
     // The deployment's own settings, for the provider, the model and the base
@@ -532,6 +547,7 @@ export async function buildServer({
     // that may not spend it: the form offered a monitor every poll refuses.
     // Every reader of a provider key on this page reads one value.
     environmentFor: providerKeysFor,
+    choicesFor,
     // US-129. A monitor created by an account spending our money polls every
     // four hours rather than hourly, unless the person chooses otherwise.
     accountCapFor: (userId) => keys.cap(userId),

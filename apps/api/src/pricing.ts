@@ -27,6 +27,7 @@ import type {
   ConnectorDescriptor,
   Database,
   PlatformDescriptor,
+  ProviderChoices,
   ProviderId,
 } from "@signalscout/core";
 import {
@@ -77,6 +78,15 @@ export interface PricingRoutesOptions {
    * is an answer about the person reading it rather than about the machine.
    */
   readonly environmentFor?: (userId: string) => Promise<Record<string, string | undefined>>;
+  /**
+   * Which provider fetches each platform for one account. US-130.
+   *
+   * Undefined reads the account's own recorded choices. A composition root on
+   * an instance whose plan lends the keys passes `accountKeys(...).choices`,
+   * which answers with the deployment's named provider for an account on that
+   * plan — so the screen, the form and the poll read one answer.
+   */
+  readonly choicesFor?: (userId: string) => Promise<ProviderChoices>;
 }
 
 const money = z.object({
@@ -179,6 +189,7 @@ export async function registerPricingRoutes(
 ): Promise<void> {
   const { db, sources } = options;
   const environmentFor = options.environmentFor ?? (async () => process.env);
+  const choicesFor = options.choicesFor ?? ((userId: string) => readProviderChoices(db, userId));
   const platforms = groupByPlatform(sources);
 
   app.route({
@@ -207,7 +218,7 @@ export async function registerPricingRoutes(
       const userId = sessionUserId(request);
       const hints = await listCredentialHints(db, userId);
       const stored = new Set(hints.map((hint) => `${hint.provider}:${hint.field}`));
-      const choices = await readProviderChoices(db, userId);
+      const choices = await choicesFor(userId);
 
       /**
        * One query for every pair's spend, rather than one per row.

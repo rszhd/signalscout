@@ -12,6 +12,7 @@ export {
   fakeSourceDefinition,
   fakeSourceId,
 } from "./fake/index.js";
+export { lentProvidersFrom, lentProviderVariableName } from "./lent-providers.js";
 export {
   isOffered,
   notOfferedReason,

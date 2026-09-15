@@ -179,6 +179,7 @@ interface Thread {
 export function createRepliesStep({
   registry,
   credentialsFor,
+  choicesFor,
 }: CollectOptions): Step<RepliesPayload> {
   return async function replies(
     { monitorId, postIds },
@@ -284,7 +285,9 @@ export function createRepliesStep({
      */
     const floor = new Date(Date.now() - defaultReplyWindowDays * 86_400_000);
 
-    const choices = await readProviderChoices(db, monitor.userId);
+    const choices = await (choicesFor ?? ((userId) => readProviderChoices(db, userId)))(
+      monitor.userId,
+    );
     const sources = new Map<string, SocialSource | undefined>();
 
     const connectorFor = async (source: string): Promise<SocialSource | undefined> => {

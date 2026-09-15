@@ -120,3 +120,9 @@ US-130 was written to avoid: no choice, two providers, and a refused poll.
   instance for the first time, saw the connections and Models screens still
   offering their controls to a lent-keys account, and asked for the deployment
   to hold both choices.
+
+- 2026-09-15T18:06+08:00 — US-130 did the provider-choice half of the
+  precedence box: `accountKeys.choices` answers a lent-keys account with the
+  deployment's named provider and reads none of its rows. What stays here is
+  the stored provider key, the stored model rows, the eight refused writes and
+  the two screens.

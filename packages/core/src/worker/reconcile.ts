@@ -29,6 +29,7 @@ export const maxChecksPerJob = 20;
 export function createReconcileStep({
   registry,
   credentialsFor,
+  choicesFor: accountChoices,
   now = () => new Date(),
 }: CollectOptions & { now?: () => Date }): Step<Record<string, never>> {
   return async (_, { db, boss, logger }) => {
@@ -72,7 +73,7 @@ export function createReconcileStep({
       const held = choicesByOwner.get(userId);
       if (held) return held;
 
-      const read = await readProviderChoices(db, userId);
+      const read = await (accountChoices ?? ((owner) => readProviderChoices(db, owner)))(userId);
       choicesByOwner.set(userId, read);
       return read;
     };

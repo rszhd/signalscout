@@ -18,7 +18,12 @@ import type { FakeSourceOptions } from "../sources/fake/index.js";
 import { fakeSourceDefinition } from "../sources/fake/index.js";
 import { createSourceRegistry } from "../sources/registry.js";
 import { createSourceRuntime } from "../sources/runtime.js";
-import type { CandidatePost, SearchRequest, SocialSource } from "../sources/types.js";
+import type {
+  CandidatePost,
+  ProviderChoices,
+  SearchRequest,
+  SocialSource,
+} from "../sources/types.js";
 import { createTestDatabase, type TestDatabase } from "../testing/database.js";
 import { unreachableFetch } from "../testing/network.js";
 import { createCollectStep, excerptLength, maxPagesPerPoll } from "./collect.js";
@@ -1104,8 +1109,12 @@ describe("the poll step", () => {
       credentialsFor: CredentialLookup,
       monitorId: string,
       boss = stubBoss(),
+      choicesFor?: (userId: string) => Promise<ProviderChoices>,
     ) {
-      await createCollectStep({ registry, credentialsFor })({ monitorId }, contextFor(db, boss));
+      await createCollectStep({ registry, credentialsFor, ...(choicesFor ? { choicesFor } : {}) })(
+        { monitorId },
+        contextFor(db, boss),
+      );
       return boss;
     }
 
@@ -1154,6 +1163,49 @@ describe("the poll step", () => {
       expect((await db.select().from(posts)).map((post) => post.externalId)).toEqual([
         "t3_from_scrapecreators",
       ]);
+      expect(callsFor(registry, "brightdata")).toHaveLength(0);
+    });
+
+    /**
+     * US-130. The account whose plan lends the keys never pastes one, so
+     * nothing records it a choice, and with two keys on the instance the
+     * refusal above is what it would meet. The composition root hands the
+     * step `accountKeys(...).choices`, which answers with the deployment's
+     * named provider for such an account; the step itself reads whatever it
+     * is handed and asks nothing about plans.
+     */
+    it("polls through the provider the deployment named, where the step is handed one", async () => {
+      const monitorId = await insertMonitor(database);
+      const registry = bothProviders();
+
+      await poll(
+        registry,
+        keysFor("brightdata", "scrapecreators"),
+        monitorId,
+        stubBoss(),
+        async () => ({ reddit: "scrapecreators" }),
+      );
+
+      expect((await db.select().from(posts)).map((post) => post.externalId)).toEqual([
+        "t3_from_scrapecreators",
+      ]);
+      expect(callsFor(registry, "brightdata")).toHaveLength(0);
+      // Nothing was written: the answer came from the deployment, not a row.
+      expect(await db.select().from(sourceProviders)).toHaveLength(0);
+    });
+
+    it("still refuses a recorded choice the deployment's answer overrode nothing about", async () => {
+      // The step obeys what it is handed. A recorded choice that names a
+      // provider with no key is refused whether it came from a row or a
+      // deployment — the rule underneath is US-026's and unchanged.
+      const monitorId = await insertMonitor(database);
+      const registry = bothProviders();
+
+      await poll(registry, keysFor("brightdata"), monitorId, stubBoss(), async () => ({
+        reddit: "scrapecreators",
+      }));
+
+      expect(await db.select().from(posts)).toHaveLength(0);
       expect(callsFor(registry, "brightdata")).toHaveLength(0);
     });
 

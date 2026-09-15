@@ -15,7 +15,8 @@
 import type { Pool } from "pg";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { createDatabase, type Database } from "../db/client.js";
-import { subscriptions, users } from "../db/schema.js";
+import { sourceProviders, subscriptions, users } from "../db/schema.js";
+import { readProviderChoices, setProviderChoice } from "../sources/choices.js";
 import { createTestDatabase, type TestDatabase } from "../testing/database.js";
 import type { SubscriptionRecord } from "./entitlement.js";
 import {
@@ -114,6 +115,7 @@ describe("the plan, and the keys, read from the database", () => {
   });
 
   afterEach(async () => {
+    await db.delete(sourceProviders);
     await db.delete(subscriptions);
     await db.delete(users);
   });
@@ -291,6 +293,54 @@ describe("the plan, and the keys, read from the database", () => {
     const keys = accountKeys(db, { signup: "open", mode: "stripe", environment: machine });
 
     expect(await keys.cap("included")).toBeNull();
+  });
+
+  /**
+   * US-130. The deployment names the provider for an account on the plan, and
+   * that answer is the whole answer there: a row the account recorded before
+   * moving onto the plan is left in place and not read. An account spending
+   * its own keys reads its rows, US-026's refusal untouched.
+   */
+  it("answers a lent-keys account with the deployment's provider, and nobody else", async () => {
+    await account("included", "keys_included");
+    await account("own", "own_keys");
+    await setProviderChoice(db, "included", "reddit", "brightdata");
+    await setProviderChoice(db, "own", "reddit", "brightdata");
+
+    const lent = { reddit: "scrapecreators" } as const;
+    const open = accountKeys(db, {
+      signup: "open",
+      mode: "stripe",
+      environment: machine,
+      lentProviders: lent,
+    });
+
+    expect(await open.choices("included")).toEqual(lent);
+    expect(await open.choices("own")).toEqual({ reddit: "brightdata" });
+    // Nothing was deleted: leaving the plan reads the row again.
+    expect(await readProviderChoices(db, "included")).toEqual({ reddit: "brightdata" });
+  });
+
+  it("reads every account's own rows where signup is closed, whatever the plan", async () => {
+    await account("included", "keys_included");
+    await setProviderChoice(db, "included", "reddit", "brightdata");
+
+    const closed = accountKeys(db, {
+      signup: "closed",
+      mode: "stripe",
+      environment: machine,
+      lentProviders: { reddit: "scrapecreators" },
+    });
+
+    expect(await closed.choices("included")).toEqual({ reddit: "brightdata" });
+  });
+
+  it("answers a lent-keys account with nothing where the deployment named nothing", async () => {
+    await account("included", "keys_included");
+    await setProviderChoice(db, "included", "reddit", "brightdata");
+    const keys = accountKeys(db, { signup: "open", mode: "stripe", environment: machine });
+
+    expect(await keys.choices("included")).toEqual({});
   });
 
   it("names the accounts on the plan, in one read, for the scheduler", async () => {

@@ -38,7 +38,12 @@ import {
 } from "../estimate/runs.js";
 import { readProviderChoices } from "../sources/choices.js";
 import type { SourceRegistry } from "../sources/registry.js";
-import type { CandidatePost, SocialSource, SourceCredentials } from "../sources/types.js";
+import type {
+  CandidatePost,
+  ProviderChoices,
+  SocialSource,
+  SourceCredentials,
+} from "../sources/types.js";
 import type { CredentialLookup } from "./credentials.js";
 import { type EstimatePayload, estimateQueue } from "./queues.js";
 import type { Step, StepContext } from "./steps.js";
@@ -55,6 +60,8 @@ export const maxSamplePagesPerProbe = 3;
 export interface EstimateOptions {
   readonly registry: SourceRegistry;
   readonly credentialsFor: CredentialLookup;
+  /** Which provider fetches each platform for the run's owner. US-130; see `CollectOptions`. */
+  readonly choicesFor?: (userId: string) => Promise<ProviderChoices>;
 }
 
 /** What one probe's sample measured, before any projection. */
@@ -169,6 +176,7 @@ function measurementOf(
 export function createEstimateStep({
   registry,
   credentialsFor,
+  choicesFor,
 }: EstimateOptions): Step<EstimatePayload> {
   return async function estimate({ estimateId }, { db, boss, logger }: StepContext): Promise<void> {
     const run = await readEstimate(db, estimateId);
@@ -213,7 +221,7 @@ export function createEstimateStep({
     // screen applies to the next sample rather than waiting for a restart. The
     // run's own owner, for BUG-010's reason: a sample is real money at a real
     // provider, and the account paying decides which one it goes to.
-    const choices = await readProviderChoices(db, run.userId);
+    const choices = await (choicesFor ?? ((userId) => readProviderChoices(db, userId)))(run.userId);
 
     const now = new Date();
     const since = new Date(now.getTime() - sampleWindowDays * 24 * 60 * 60 * 1000);

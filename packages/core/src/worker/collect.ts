@@ -42,6 +42,7 @@ import { readProviderChoices } from "../sources/choices.js";
 import type { SourceRegistry } from "../sources/registry.js";
 import type {
   CandidatePost,
+  ProviderChoices,
   SocialSource,
   SourceCredentials,
   SourceQuery,
@@ -87,6 +88,15 @@ export interface CollectOptions {
    * whose keys are included.
    */
   readonly accountCapFor?: (userId: string) => Promise<number | null>;
+  /**
+   * Which provider fetches each platform for this monitor's owner. US-130.
+   *
+   * Optional, and undefined reads the account's own recorded choices, which
+   * is every self-hosted instance. A composition root on an instance whose
+   * plan lends the keys passes `accountKeys(...).choices`, which answers with
+   * the deployment's named provider for an account on that plan.
+   */
+  readonly choicesFor?: (userId: string) => Promise<ProviderChoices>;
 }
 
 /** What one connector returned in one poll. US-013 records the units against a budget. */
@@ -256,6 +266,7 @@ export function createCollectStep({
   registry,
   credentialsFor,
   accountCapFor = async () => null,
+  choicesFor,
 }: CollectOptions): Step<PollPayload> {
   return async function collect({ monitorId }, { db, boss, logger }: StepContext): Promise<void> {
     const [monitor] = await db.select().from(monitors).where(eq(monitors.id, monitorId)).limit(1);
@@ -489,7 +500,9 @@ export function createCollectStep({
        * a choice that cannot run is refused rather than replaced, so it would
        * stop them rather than merely redirect them.
        */
-      const choices = await readProviderChoices(db, monitor.userId);
+      const choices = await (choicesFor ?? ((userId) => readProviderChoices(db, userId)))(
+        monitor.userId,
+      );
 
       // A poll that resumes something belongs to the collection it resumes.
       // Read here rather than at `finish`, because the map is emptied as the

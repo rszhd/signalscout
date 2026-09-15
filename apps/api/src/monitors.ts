@@ -470,6 +470,15 @@ export interface MonitorRoutesOptions {
    */
   readonly environmentFor?: (userId: string) => Promise<Record<string, string | undefined>>;
   /**
+   * Which provider fetches each platform for one account. US-130.
+   *
+   * Undefined reads the account's own recorded choices. A composition root on
+   * an instance whose plan lends the keys passes `accountKeys(...).choices`,
+   * which answers with the deployment's named provider for an account on that
+   * plan — so the screen, the form and the poll read one answer.
+   */
+  readonly choicesFor?: (userId: string) => Promise<ProviderChoices>;
+  /**
    * What this account may still spend of the instance's money, or null where
    * the money is its own. US-129.
    *
@@ -735,6 +744,7 @@ export async function registerMonitorRoutes(
    * that reports its key as missing rather than failing at the next poll.
    */
   const environmentFor = options.environmentFor ?? (async () => process.env);
+  const choicesFor = options.choicesFor ?? ((userId: string) => readProviderChoices(db, userId));
 
   /**
    * What this *person* can poll with. US-067.
@@ -751,7 +761,7 @@ export async function registerMonitorRoutes(
     // until a restart.
     const [storedCredentials, providerChoices, environment] = await Promise.all([
       stored(userId),
-      readProviderChoices(db, userId),
+      choicesFor(userId),
       environmentFor(userId),
     ]);
 

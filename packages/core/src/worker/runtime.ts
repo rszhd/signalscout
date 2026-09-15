@@ -53,9 +53,11 @@ import { createNotificationTransport } from "../notifications/transport.js";
 import { optionalEncryptionKey } from "../secrets/cipher.js";
 import { assertStoredCredentialsAreReadable } from "../secrets/store.js";
 import { builtInSources } from "../sources/index.js";
+import { lentProvidersFrom } from "../sources/lent-providers.js";
 import { createSourceRegistry, type SourceRegistry } from "../sources/registry.js";
 import { createSourceRuntime } from "../sources/runtime.js";
 import { assertSourcesCanBeStored } from "../sources/storage.js";
+import type { ProviderChoices } from "../sources/types.js";
 import { createClassifyStep } from "./classify.js";
 import { createCollectStep } from "./collect.js";
 import { type CredentialLookup, credentialsFromStore } from "./credentials.js";
@@ -182,6 +184,16 @@ export interface StartWorkerOptions {
    * whatever this says.
    */
   accountCapMicros?: number;
+  /**
+   * Which provider fetches each platform for an account whose plan lends the
+   * keys. US-130.
+   *
+   * Read from `KEYS_INCLUDED_PROVIDER_<PLATFORM>` unless a caller says
+   * otherwise, and refused at boot when a name cannot run here. It reaches an
+   * account only through `accountKeys`, which reads it for nobody spending
+   * their own money — so a self-hosted worker never sees it.
+   */
+  lentProviders?: ProviderChoices;
 }
 
 /**
@@ -386,6 +398,7 @@ export async function startWorker({
   billing = loadBillingModeEnv(),
   signup = loadSignupEnv(),
   accountCapMicros = accountCapFrom(process.env),
+  lentProviders,
 }: StartWorkerOptions): Promise<WorkerHandle> {
   // Before any provider is called. See `net.ts`: Node's 250ms per-address
   // connect budget is shorter than several providers take to answer.
@@ -417,6 +430,13 @@ export async function startWorker({
    * the next account's does not. The layers below still receive an environment
    * that is simply right, and still learn nothing about why.
    */
+  const sources =
+    registry ??
+    createSourceRegistry({
+      definitions: builtInSources,
+      runtime: createSourceRuntime({ logger }),
+    });
+
   const keys = accountKeys(db, {
     signup,
     mode: billing,
@@ -424,20 +444,19 @@ export async function startWorker({
     // includes the keys. `accountKeys` answers null for everybody else, so a
     // self-hosted worker asks the database nothing about caps.
     ...(accountCapMicros === undefined ? {} : { capMicros: accountCapMicros }),
+    // US-130. Which provider fetches each platform for an account on that
+    // plan. Read here, at boot, so a name this build cannot run stops the
+    // process rather than one poll at 02:00.
+    lentProviders: lentProviders ?? lentProvidersFrom(process.env, sources.list()),
   });
 
   /** What one account may still spend of ours, for the three steps that spend. */
   const accountCapFor = (userId: string) => keys.cap(userId);
+  /** Which provider fetches each platform for one account, for the four steps that choose. */
+  const choicesFor = (userId: string) => keys.choices(userId);
 
   // The logger, so a key still read from its deprecated variable says so once.
   const lookup = credentialsFor ?? credentialsForAccounts(db, keys, logger);
-
-  const sources =
-    registry ??
-    createSourceRegistry({
-      definitions: builtInSources,
-      runtime: createSourceRuntime({ logger }),
-    });
 
   // At boot, so a connector whose posts the schema cannot hold stops the
   // process instead of failing one poll, quietly, every hour.
@@ -552,10 +571,14 @@ export async function startWorker({
 
   const pipeline: WorkerSteps = {
     reconcile:
-      steps.reconcile ?? createReconcileStep({ registry: sources, credentialsFor: lookup }),
+      steps.reconcile ??
+      createReconcileStep({ registry: sources, credentialsFor: lookup, choicesFor }),
     poll:
-      steps.poll ?? createCollectStep({ registry: sources, credentialsFor: lookup, accountCapFor }),
-    estimate: steps.estimate ?? createEstimateStep({ registry: sources, credentialsFor: lookup }),
+      steps.poll ??
+      createCollectStep({ registry: sources, credentialsFor: lookup, accountCapFor, choicesFor }),
+    estimate:
+      steps.estimate ??
+      createEstimateStep({ registry: sources, credentialsFor: lookup, choicesFor }),
     filter:
       steps.filter ??
       createFilterStep({
@@ -563,7 +586,8 @@ export async function startWorker({
         triagerFor: async (userId) => (await modelsFor(userId)).triager,
         accountCapFor,
       }),
-    replies: steps.replies ?? createRepliesStep({ registry: sources, credentialsFor: lookup }),
+    replies:
+      steps.replies ?? createRepliesStep({ registry: sources, credentialsFor: lookup, choicesFor }),
     classify:
       steps.classify ??
       createClassifyStep({

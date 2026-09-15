@@ -30,6 +30,8 @@ import {
 } from "../config/machine-keys.js";
 import type { Database } from "../db/client.js";
 import { type SubscriptionPlan, subscriptions } from "../db/schema.js";
+import { readProviderChoices } from "../sources/choices.js";
+import type { ProviderChoices } from "../sources/types.js";
 import type { BillingMode, SubscriptionRecord } from "./entitlement.js";
 import { readSubscription } from "./store.js";
 
@@ -94,6 +96,13 @@ export interface AccountKeysOptions {
    * self-hosted instance.
    */
   readonly capMicros?: number;
+  /**
+   * Which provider fetches each platform for an account whose plan lends the
+   * keys. US-130. `lentProvidersFrom` reads it from the environment at boot.
+   * Undefined means the deployment named nothing, which is every self-hosted
+   * instance.
+   */
+  readonly lentProviders?: ProviderChoices;
 }
 
 /**
@@ -131,11 +140,23 @@ export interface AccountKeys {
    * the plan, which nothing in `budget/` knows about.
    */
   cap(userId: string): Promise<number | null>;
+  /**
+   * Which provider fetches each platform for this account. US-130.
+   *
+   * An account spending its own keys answers with what it recorded on the
+   * connections screen, exactly as `readProviderChoices` always has. An
+   * account whose plan lends the keys answers with what the deployment named,
+   * **and only that**: the owner decided in US-132 that such an account does
+   * not choose its provider at all, so a row it recorded before moving onto
+   * the plan is left in place and not read, and reading it again is what
+   * leaving the plan does. Nothing is deleted.
+   */
+  choices(userId: string): Promise<ProviderChoices>;
 }
 
 export function accountKeys(
   db: Database,
-  { signup, mode, environment = process.env, capMicros }: AccountKeysOptions,
+  { signup, mode, environment = process.env, capMicros, lentProviders = {} }: AccountKeysOptions,
 ): AccountKeys {
   return {
     async provider(userId) {
@@ -150,6 +171,10 @@ export function accountKeys(
     async cap(userId) {
       if (capMicros === undefined) return null;
       return spendsInstanceMoney(signup, await readPlan(db, userId, mode)) ? capMicros : null;
+    },
+    async choices(userId) {
+      if (spendsInstanceMoney(signup, await readPlan(db, userId, mode))) return lentProviders;
+      return readProviderChoices(db, userId);
     },
   };
 }

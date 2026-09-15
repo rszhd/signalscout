@@ -187,22 +187,6 @@
   align-items: center;
   gap: var(--space-1);
 }
-.project-delete-dialog {
-  width: min(460px, calc(100% - var(--space-8)));
-}
-.project-delete-body {
-  padding: var(--space-6);
-}
-.project-delete-body p {
-  margin: 0 0 var(--space-5);
-  color: var(--muted-strong);
-  line-height: 1.6;
-}
-.project-delete-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--space-3);
-}
 .project-edit-button {
   border: 0;
   padding: var(--space-2) 0;

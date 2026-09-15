@@ -45,11 +45,22 @@ describe("one monitor's page", () => {
   beforeEach(() => {
     fetchMock = vi.fn();
     vi.stubGlobal("fetch", fetchMock);
+    // jsdom does not implement the native dialog top layer.
+    for (const method of ["showModal", "close"] as const) {
+      Object.defineProperty(HTMLDialogElement.prototype, method, {
+        configurable: true,
+        value: function (this: HTMLDialogElement) {
+          this.open = method === "showModal";
+        },
+      });
+    }
   });
 
   afterEach(async () => {
     await screen?.unmount();
     vi.unstubAllGlobals();
+    Reflect.deleteProperty(HTMLDialogElement.prototype, "showModal");
+    Reflect.deleteProperty(HTMLDialogElement.prototype, "close");
   });
 
   it("names the monitor and links back to the list", async () => {
@@ -142,6 +153,52 @@ describe("one monitor's page", () => {
       await show(monitor({ paused: true }));
 
       expect(button("Resume")).toBeTruthy();
+    });
+
+    /**
+     * US-147. The route existed and no screen called it. The dialog says what
+     * goes — the matches and the verdicts — and the page leaves for the list.
+     */
+    it("deletes the monitor behind a dialog that says what goes, then leaves", async () => {
+      await show(monitor({ matches: { total: 12, unread: 3 } }));
+      fetchMock.mockImplementation(async (_request: unknown, init?: RequestInit) => {
+        if (init?.method === "DELETE") return new Response(null, { status: 204 });
+        return json([]);
+      });
+
+      await act(async () => button("Delete").click());
+      const dialog = container.querySelector<HTMLDialogElement>(".confirm-dialog");
+      expect(dialog?.open).toBe(true);
+      expect(dialog?.textContent).toContain("Delete Teams replacing manual QA?");
+      expect(dialog?.textContent).toContain(
+        "Its 12 matches and every verdict you gave go with it.",
+      );
+
+      await act(async () => button("Delete monitor").click());
+      await settle();
+
+      const [url] = fetchMock.mock.calls.find(
+        ([, options]) => (options as RequestInit | undefined)?.method === "DELETE",
+      ) as [string, RequestInit];
+      expect(url).toBe(`/api/monitors/${monitorId}`);
+      expect(screen.path()).toBe(`/projects/${projectId}/monitors`);
+    });
+
+    it("shows the server's sentence when a delete is refused, and stays", async () => {
+      await show(monitor());
+      fetchMock.mockImplementation(async (_request: unknown, init?: RequestInit) => {
+        if (init?.method === "DELETE") return json({ message: "No monitor has that id." }, 404);
+        return json([]);
+      });
+
+      await act(async () => button("Delete").click());
+      await act(async () => button("Delete monitor").click());
+      await settle();
+
+      expect(container.querySelector(".confirm-dialog [role='alert']")?.textContent).toContain(
+        "No monitor has that id.",
+      );
+      expect(screen.path()).toBe(`/projects/${projectId}/monitors/${monitorId}`);
     });
   });
 

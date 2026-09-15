@@ -153,7 +153,7 @@ describe("the projects screen", () => {
       button("Delete Acme QA").click();
     });
 
-    const dialog = container.querySelector<HTMLDialogElement>(".project-delete-dialog");
+    const dialog = container.querySelector<HTMLDialogElement>(".confirm-dialog");
     expect(dialog?.open).toBe(true);
     expect(dialog?.textContent).toContain("Delete Acme QA?");
     expect(dialog?.textContent).toContain("Its 2 monitors go with it");
@@ -192,7 +192,7 @@ describe("the projects screen", () => {
       button("Delete Acme QA").click();
     });
 
-    expect(container.querySelector(".project-delete-dialog")?.textContent).toContain(
+    expect(container.querySelector(".confirm-dialog")?.textContent).toContain(
       "This account has made 2, so 1 more can be made after this.",
     );
   });
@@ -218,7 +218,7 @@ describe("the projects screen", () => {
       button("Delete project").click();
     });
 
-    expect(container.querySelector(".project-delete-dialog [role='alert']")?.textContent).toContain(
+    expect(container.querySelector(".confirm-dialog [role='alert']")?.textContent).toContain(
       "No such project.",
     );
     expect(container.textContent).toContain("Acme QA");

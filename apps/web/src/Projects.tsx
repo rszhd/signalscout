@@ -256,14 +256,14 @@ function DeleteProject({
         Delete
       </button>
       <Dialog
-        className="project-delete-dialog"
+        className="confirm-dialog"
         titleId={`delete-title-${project.id}`}
         closeLabel="Close without deleting"
         dialogRef={dialog}
         onClose={() => setProblem(null)}
         heading={<h2 id={`delete-title-${project.id}`}>Delete {project.name}?</h2>}
       >
-        <div className="project-delete-body">
+        <div className="confirm-dialog-body">
           <p>{monitors} This cannot be undone.</p>
           {creations && (
             <p>
@@ -277,7 +277,7 @@ function DeleteProject({
               {problem}
             </p>
           )}
-          <footer className="project-delete-actions">
+          <footer className="confirm-dialog-actions">
             <Button disabled={busy} onClick={() => dialog.current?.close()}>
               Cancel
             </Button>

@@ -11,11 +11,12 @@
  * to another account — the same read the list is scoped by, so a person cannot
  * reach a stranger's monitor by typing its id into the address.
  */
-import { useCallback, useEffect, useState } from "react";
-import { Link } from "react-router";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router";
 import { messageFor, requestJson } from "./api.js";
 import { BrandIcon } from "./BrandIcon.js";
 import { Button } from "./components/Button.js";
+import { Dialog } from "./components/Dialog.js";
 import { ageLabel, platformName, providerName } from "./labels.js";
 import {
   type Budget,
@@ -302,6 +303,72 @@ function PreFilterForm({ monitor, onSaved }: { monitor: Monitor; onSaved: () => 
   );
 }
 
+/**
+ * Delete, behind a dialog that says what goes. US-147.
+ *
+ * The route existed since the first monitor and no screen called it. What
+ * goes with the monitor is everything it found: its posts, matches and
+ * verdicts cascade from it. What stays is what it spent, so the account's
+ * month reads the same after as before. A refusal is the server's sentence.
+ */
+function DeleteMonitor({ monitor, onDeleted }: { monitor: Monitor; onDeleted: () => void }) {
+  const dialog = useRef<HTMLDialogElement>(null);
+  const [busy, setBusy] = useState(false);
+  const [problem, setProblem] = useState<string | null>(null);
+  const found = monitor.matches?.total ?? 0;
+  const matches =
+    found === 0
+      ? "It has found no matches yet."
+      : `Its ${found} ${found === 1 ? "match" : "matches"} and every verdict you gave go with it.`;
+
+  async function remove() {
+    setBusy(true);
+    setProblem(null);
+    try {
+      await requestJson<null>(`/api/monitors/${monitor.id}`, { method: "DELETE" });
+      dialog.current?.close();
+      onDeleted();
+    } catch (cause) {
+      setProblem(messageFor(cause, "The monitor could not be deleted."));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <>
+      <Button aria-haspopup="dialog" onClick={() => dialog.current?.showModal()}>
+        Delete
+      </Button>
+      <Dialog
+        className="confirm-dialog"
+        titleId="delete-monitor-title"
+        closeLabel="Close without deleting"
+        dialogRef={dialog}
+        onClose={() => setProblem(null)}
+        heading={<h2 id="delete-monitor-title">Delete {monitor.name}?</h2>}
+      >
+        <div className="confirm-dialog-body">
+          <p>{matches} This cannot be undone.</p>
+          {problem && (
+            <p className="form-error" role="alert">
+              {problem}
+            </p>
+          )}
+          <footer className="confirm-dialog-actions">
+            <Button disabled={busy} onClick={() => dialog.current?.close()}>
+              Cancel
+            </Button>
+            <Button variant="primary" disabled={busy} onClick={() => void remove()}>
+              {busy ? "Deleting…" : "Delete monitor"}
+            </Button>
+          </footer>
+        </div>
+      </Dialog>
+    </>
+  );
+}
+
 export function MonitorDetail({
   monitorId,
   projectId,
@@ -309,6 +376,7 @@ export function MonitorDetail({
   readonly monitorId: string;
   readonly projectId: string;
 }) {
+  const navigate = useNavigate();
   const [monitor, setMonitor] = useState<Monitor | null>(null);
   const [state, setState] = useState<LoadState>("loading");
   const [error, setError] = useState<string | null>(null);
@@ -406,6 +474,7 @@ export function MonitorDetail({
           <Button disabled={busy} onClick={() => void setPaused(!monitor.paused)}>
             {busy ? "Updating…" : monitor.paused ? "Resume" : "Pause"}
           </Button>
+          <DeleteMonitor monitor={monitor} onDeleted={() => void navigate(paths.monitors(home))} />
         </div>
       </header>
 

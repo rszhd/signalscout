@@ -23,6 +23,7 @@ the price the connector declares:
 | X replies | SocialData | a row of the reply page | $0.0002 | $0.0002, and the root tweet is one row on every page |
 | X | SocialCrawl | a request | $0.008118 | ~$0.0004 (20 posts) |
 | LinkedIn | Apify | a post | $0.002 | $0.002 |
+| LinkedIn comments | Apify | a comment | $0.002 | $0.002, and no start event on the comments actor |
 | YouTube | SocialCrawl | a credit | $0.008118 | ~$0.00018 (45 videos) |
 | YouTube | ScrapeCreators | a request | $0.00188 | ~$0.000094 (20 videos) |
 | TikTok | SocialCrawl | a credit | $0.008118 | ~$0.00027 (30 videos) |

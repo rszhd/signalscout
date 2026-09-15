@@ -464,6 +464,15 @@ following a cursor from a page that yielded nothing new buys the same row
 again. The connector drops the root by id, counts it in the bill, and ends the
 walk on a page with nothing new whatever the cursor says.
 
+**Apify's comments actor has no cursor and no start event.** One run reads up
+to `maxItems` under one post URL and stops, at $0.002 a comment and nothing
+for the run — three comments cost $0.006 exactly, US-137, 2026-09-15 — where
+the search actor charges its start whatever it finds. The replies step cannot
+hand a wait back the way a poll can, so the connector waits inside the call,
+with a deadline, and a run that outlives it is abandoned to finish and bill on
+its own. `scrapeReplies: true` returned no nested reply for a comment claiming
+one, so what a nested reply looks like there is unproven.
+
 **A thread's window is not the poll's window.** `ReplyRequest.since` is how far
 back this *thread* has been read, and it has nothing to do with when the
 monitor last searched. The two were the same value until BUG-006, and the

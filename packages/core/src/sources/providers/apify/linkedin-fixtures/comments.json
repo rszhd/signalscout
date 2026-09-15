@@ -1,0 +1,171 @@
+[
+  {
+    "id": "7504273613332795392",
+    "linkedinUrl": "https://www.linkedin.com/feed/update/urn:li:activity:7504119126773362689?commentUrn=urn%3Ali%3Acomment%3A%28activity%3A7504119126773362689%2C7504273613332795392%29&dashCommentUrn=urn%3Ali%3Afsd_comment%3A%287504273613332795392%2Curn%3Ali%3Aactivity%3A7504119126773362689%29",
+    "commentary": "This is looking good! 👀 ",
+    "commentaryAttributes": [],
+    "createdAt": "2026-09-11T20:24:12.081Z",
+    "createdAtTimestamp": 1789158252081,
+    "engagement": {
+      "likes": 1,
+      "comments": 0,
+      "shares": 0,
+      "reactions": [
+        {
+          "type": "EMPATHY",
+          "count": 1
+        }
+      ]
+    },
+    "postId": "urn:li:activity:7504119126773362689",
+    "pinned": false,
+    "contributed": false,
+    "edited": false,
+    "actor": {
+      "id": "li-user-1",
+      "type": "profile",
+      "name": "li-user-2",
+      "linkedinUrl": "https://www.linkedin.com/in/li-user-3",
+      "position": "Scrubbed by capture.mjs. See docs/testing.md.",
+      "pictureUrl": "https://scrubbed.invalid/li-user-4",
+      "picture": {
+        "url": "https://scrubbed.invalid/li-user-4",
+        "width": 800,
+        "height": 800
+      },
+      "author": false
+    },
+    "query": {
+      "post": "https://www.linkedin.com/posts/li-user-5_here-we-launched-atlassians-bitbucket-tests-activity-7504119126773362689-_Y2d"
+    }
+  },
+  {
+    "id": "7504136796847509504",
+    "linkedinUrl": "https://www.linkedin.com/feed/update/urn:li:activity:7504119126773362689?commentUrn=urn%3Ali%3Acomment%3A%28activity%3A7504119126773362689%2C7504136796847509504%29&dashCommentUrn=urn%3Ali%3Afsd_comment%3A%287504136796847509504%2Curn%3Ali%3Aactivity%3A7504119126773362689%29",
+    "commentary": "Great 🎉",
+    "commentaryAttributes": [],
+    "createdAt": "2026-09-11T11:20:32.489Z",
+    "createdAtTimestamp": 1789125632489,
+    "engagement": {
+      "likes": 1,
+      "comments": 0,
+      "shares": 0,
+      "reactions": [
+        {
+          "type": "EMPATHY",
+          "count": 1
+        }
+      ]
+    },
+    "postId": "urn:li:activity:7504119126773362689",
+    "pinned": false,
+    "contributed": false,
+    "edited": false,
+    "actor": {
+      "id": "li-user-6",
+      "type": "profile",
+      "name": "li-user-7",
+      "linkedinUrl": "https://www.linkedin.com/in/li-user-8",
+      "position": "Scrubbed by capture.mjs. See docs/testing.md.",
+      "pictureUrl": "https://scrubbed.invalid/li-user-9",
+      "picture": {
+        "url": "https://scrubbed.invalid/li-user-9",
+        "width": 592,
+        "height": 592
+      },
+      "author": false
+    },
+    "query": {
+      "post": "https://www.linkedin.com/posts/li-user-5_here-we-launched-atlassians-bitbucket-tests-activity-7504119126773362689-_Y2d"
+    }
+  },
+  {
+    "id": "7504234612550819840",
+    "linkedinUrl": "https://www.linkedin.com/feed/update/urn:li:activity:7504119126773362689?commentUrn=urn%3Ali%3Acomment%3A%28activity%3A7504119126773362689%2C7504234612550819840%29&dashCommentUrn=urn%3Ali%3Afsd_comment%3A%287504234612550819840%2Curn%3Ali%3Aactivity%3A7504119126773362689%29",
+    "commentary": "Great! One-click drill-downs matter more than they sound because debugging flaky tests often means jumping across build logs, execution history, and test-level data. The interesting metric for me would be whether teams actually reduce mean time to resolution after having all three signals in the same workflow.",
+    "commentaryAttributes": [],
+    "createdAt": "2026-09-11T17:49:13.570Z",
+    "createdAtTimestamp": 1789148953570,
+    "engagement": {
+      "likes": 2,
+      "comments": 1,
+      "shares": 0,
+      "reactions": [
+        {
+          "type": "LIKE",
+          "count": 2
+        }
+      ]
+    },
+    "postId": "urn:li:activity:7504119126773362689",
+    "pinned": false,
+    "contributed": false,
+    "edited": false,
+    "actor": {
+      "id": "li-user-10",
+      "type": "profile",
+      "name": "li-user-11",
+      "linkedinUrl": "https://www.linkedin.com/in/li-user-12",
+      "position": "Scrubbed by capture.mjs. See docs/testing.md.",
+      "pictureUrl": "https://scrubbed.invalid/li-user-13",
+      "picture": {
+        "url": "https://scrubbed.invalid/li-user-13",
+        "width": 800,
+        "height": 800
+      },
+      "author": false
+    },
+    "replies": [
+      {
+        "id": "7504248768519684096",
+        "linkedinUrl": "https://www.linkedin.com/feed/update/urn:li:activity:7504119126773362689?commentUrn=urn%3Ali%3Acomment%3A%28activity%3A7504119126773362689%2C7504234612550819840%29&replyUrn=urn%3Ali%3Acomment%3A%28activity%3A7504119126773362689%2C7504248768519684096%29&dashCommentUrn=urn%3Ali%3Afsd_comment%3A%287504234612550819840%2Curn%3Ali%3Aactivity%3A7504119126773362689%29&dashReplyUrn=urn%3Ali%3Afsd_comment%3A%287504248768519684096%2Curn%3Ali%3Aactivity%3A7504119126773362689%29",
+        "commentary": "Subin S K agreed. The feature provides a flaky-test remediation agent that runs an agentic pipeline to identify and address the root cause of test flakiness.",
+        "commentaryAttributes": [
+          {
+            "start": 0,
+            "length": 9,
+            "type": "PROFILE_MENTION",
+            "hyperlink": "https://www.linkedin.com/in/li-user-14",
+            "textLink": null,
+            "profile": {
+              "id": "li-user-10",
+              "firstName": "li-user-15",
+              "lastName": "li-user-16",
+              "linkedinUrl": "https://www.linkedin.com/in/li-user-12",
+              "publicIdentifier": "li-user-12"
+            }
+          }
+        ],
+        "createdAt": "2026-09-11T18:45:28.616Z",
+        "createdAtTimestamp": 1789152328616,
+        "engagement": {
+          "likes": 0,
+          "comments": 0,
+          "shares": 0,
+          "reactions": []
+        },
+        "postId": "urn:li:activity:7504119126773362689",
+        "pinned": false,
+        "contributed": false,
+        "edited": false,
+        "actor": {
+          "id": "li-user-17",
+          "type": "profile",
+          "name": "li-user-18",
+          "linkedinUrl": "https://www.linkedin.com/in/li-user-5",
+          "position": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "pictureUrl": "https://scrubbed.invalid/li-user-19",
+          "picture": {
+            "url": "https://scrubbed.invalid/li-user-19",
+            "width": 800,
+            "height": 800
+          },
+          "author": true
+        }
+      }
+    ],
+    "query": {
+      "post": "https://www.linkedin.com/posts/li-user-5_here-we-launched-atlassians-bitbucket-tests-activity-7504119126773362689-_Y2d"
+    }
+  }
+]

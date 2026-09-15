@@ -49,6 +49,7 @@
  *
  *     node packages/core/src/sources/providers/apify/linkedin-fixtures/capture.mjs
  *     node .../capture.mjs --only=search
+ *     node .../capture.mjs --only=comments     # US-137, about $0.07, not in a full run
  *
  * **Prices are tiered by Apify plan, and this account is on FREE.** A post is
  * $0.002 there and $0.0015 on GOLD and above, which is why the actor's page
@@ -77,6 +78,15 @@ const root = fileURLToPath(new URL("../../../../../../../", import.meta.url));
 
 const api = "https://api.apify.com/v2";
 const actor = "harvestapi~linkedin-post-search";
+/**
+ * The same author's comments actor. US-137. Its input is `posts`, an array of
+ * post URLs, with `maxItems` per post and `scrapeReplies` for the replies
+ * under a comment — read from its input schema on 2026-09-15, not guessed
+ * from the search actor's. Published price $2 per thousand comments.
+ */
+const commentsActor = "harvestapi~linkedin-post-comments";
+/** Twenty-five comments is about $0.05, and enough to show a nested reply. */
+const maxComments = 25;
 
 /**
  * The query the two earlier captures used, so three providers are compared on
@@ -318,6 +328,18 @@ function createScrubber() {
       Object.entries(value).map(([key, child]) => {
         const childIsPerson = insidePerson || personContainers.has(key);
 
+        // A company author's `id`, `urn` and `companyId` are one bare number
+        // each — no `ACoAA` prefix for the member-id rule to catch. US-137's
+        // relevance page committed two before this branch existed.
+        if (
+          childIsPerson &&
+          (key === "id" || key === "urn" || key === "companyId") &&
+          typeof child === "string" &&
+          /^\d+$/.test(child)
+        ) {
+          return [key, pseudonym(child)];
+        }
+
         if (typeof child === "string" && child !== "") {
           if (identityFields.has(key) && (childIsPerson || key !== "name")) {
             return [key, pseudonym(child)];
@@ -419,11 +441,11 @@ const answers = new Map();
  * not the run, and the run is where `chargedEventCounts` lives. A capture that
  * could not say what it spent would fail its own ticket.
  */
-async function runActor(name, input) {
+async function runActor(name, input, which = actor) {
   console.log(`\n${name}`);
   console.log(`  input ${JSON.stringify(input)}`);
 
-  const started = await call(`/acts/${actor}/runs`, { method: "POST", body: input });
+  const started = await call(`/acts/${which}/runs`, { method: "POST", body: input });
 
   if (started.status >= 400) {
     console.log(`  ${started.status} starting the run`);
@@ -625,7 +647,10 @@ const only = process.argv
 const rescrub = process.argv.includes("--rescrub");
 
 const wanted = (name) =>
-  !rescrub && (only.length === 0 || only.some((part) => name.includes(part)));
+  !rescrub &&
+  (name === "comments"
+    ? only.includes(name)
+    : only.length === 0 || only.some((part) => name.includes(part)));
 
 if (rescrub) {
   console.log("Re-reading the datasets already captured. This buys nothing.\n");
@@ -730,6 +755,61 @@ if (wanted("empty")) {
   });
 }
 
+/**
+ * US-137: the comments under one post, through the comments actor.
+ *
+ *     node .../capture.mjs --only=comments
+ *
+ * Two runs, about $0.07. A relevance search first, because a relevance page
+ * carries engaged posts where a date page carries the newest ten with no
+ * comments at all — measured: the date page's busiest post claimed two. Then
+ * the busiest post's comments with replies on, so a nested reply's shape is
+ * captured along with a top-level one's.
+ */
+if (wanted("comments")) {
+  const found = await runActor("search-by-relevance", {
+    searchQueries: [keyword],
+    maxPosts,
+    sortBy: "relevance",
+  });
+
+  const posts = (found?.records ?? []).filter((item) => typeof item?.linkedinUrl === "string");
+  const busiest = [...posts].sort(
+    (a, b) => (b?.engagement?.comments ?? 0) - (a?.engagement?.comments ?? 0),
+  )[0];
+
+  if (busiest && (busiest.engagement?.comments ?? 0) > 0) {
+    console.log(`  busiest post claims ${busiest.engagement.comments} comments, id ${busiest.id}`);
+
+    const thread = await runActor(
+      "comments",
+      { posts: [busiest.linkedinUrl], maxItems: maxComments, scrapeReplies: true },
+      commentsActor,
+    );
+
+    const items = thread?.records ?? [];
+    if (items[0]) console.log(`  a comment's keys: ${Object.keys(items[0]).join(", ")}`);
+    const postIds = new Set(items.map((item) => String(item?.postId ?? "")));
+    console.log(
+      `  postId values: ${[...postIds].join(", ") || "(none)"}; asked about ${busiest.id}`,
+    );
+    const withReplies = items.filter((item) => (item?.numComments ?? 0) > 0).length;
+    console.log(`  ${items.length} items, ${withReplies} claim replies`);
+    const parentKeys = items.length
+      ? Object.keys(items[0]).filter((key) => /parent|reply|thread/i.test(key))
+      : [];
+    console.log(`  keys that could name a parent comment: ${parentKeys.join(", ") || "(none)"}`);
+    const sample = items.find((item) => typeof item?.linkedinUrl === "string");
+    if (sample) {
+      console.log(
+        `\nOpen this to answer the URL question — it is the provider's own:\n  ${sample.linkedinUrl}`,
+      );
+    }
+  } else {
+    console.log("  no post in the relevance page claims a comment; nothing to ask");
+  }
+}
+
 // ------------------------------------------------------------ the answers
 
 const findings = {
@@ -769,7 +849,11 @@ if (search) {
 
 const totalUsd = ledger.reduce((sum, entry) => sum + (entry.usageTotalUsd ?? 0), 0);
 
-writeFileSync(`${here}findings.json`, `${JSON.stringify(findings, null, 2)}\n`);
+// findings.json is the search run's record, US-056. The comments mode reads
+// nothing it describes and leaves it alone; its own evidence is the ledger.
+if (!wanted("comments")) {
+  writeFileSync(`${here}findings.json`, `${JSON.stringify(findings, null, 2)}\n`);
+}
 
 /**
  * Keep what an earlier pass recorded, and replace only what this one redid.

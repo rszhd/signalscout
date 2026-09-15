@@ -17,9 +17,14 @@ import { createLogger } from "../../../logger.js";
 import { linkedInPlatformId } from "../../platforms.js";
 import { createSourceRegistry } from "../../registry.js";
 import { assertSourcesCanBeStored } from "../../storage.js";
-import type { SearchRequest, SearchResult, SourceRuntime } from "../../types.js";
+import type { ReplyRequest, SearchRequest, SearchResult, SourceRuntime } from "../../types.js";
 import { toCandidatePost as toSocialCrawlPost } from "../socialcrawl/linkedin.js";
-import { ApifyLinkedInSource, apifyLinkedIn, toCandidatePost } from "./linkedin.js";
+import {
+  ApifyLinkedInSource,
+  apifyLinkedIn,
+  toCandidatePost,
+  toCandidateReply,
+} from "./linkedin.js";
 import { apifyProviderId } from "./provider.js";
 
 function fixture(name: string): unknown {
@@ -30,6 +35,11 @@ function fixture(name: string): unknown {
 
 const searchItems = fixture("search-by-date") as Record<string, unknown>[];
 const noResultItems = fixture("search-no-results") as Record<string, unknown>[];
+/** US-137: the comments actor's answer for a post claiming four, captured 2026-09-15. */
+const commentItems = fixture("comments") as Record<string, unknown>[];
+const ledger = fixture("ledger") as {
+  runs: { run: string; usageTotalUsd: number | null; chargedEventCounts: Record<string, number> }[];
+};
 const tokenRejected = fixture("credentials-rejected") as {
   httpStatus: number;
   body: unknown;
@@ -405,6 +415,232 @@ describe("finishing the run a cursor names", () => {
     await expect(source.search(request({ cursor: "not-a-cursor" }))).rejects.toThrow(
       /was not issued by this source/,
     );
+  });
+});
+
+/** The post the comments capture asked about, as the activity id. */
+const threadId = "7504119126773362689";
+
+function replyRequest(overrides: Partial<ReplyRequest> = {}): ReplyRequest {
+  return {
+    postUrl: `https://www.linkedin.com/posts/li-user-5_activity-${threadId}-_Y2d`,
+    postExternalId: threadId,
+    credentials,
+    ...overrides,
+  };
+}
+
+/** The comments run as the provider settled it: three comments, no start event. */
+const commentsRun = runObject({
+  usageTotalUsd: 0.006,
+  chargedEventCounts: { "post-comment": 3 },
+});
+
+describe("replies", () => {
+  it("promises them at the post price, and the ledger shows no start event", () => {
+    expect(apifyLinkedIn.canFetchReplies).toBe(true);
+    expect(apifyLinkedIn.replyPricePerUnitMicros).toBeUndefined();
+
+    const run = ledger.runs.find((entry) => entry.run === "comments");
+    expect(run?.usageTotalUsd).toBe(0.006);
+    expect(run?.chargedEventCounts["post-comment"]).toBe(3);
+    expect(run?.chargedEventCounts["apify-actor-start"]).toBeUndefined();
+  });
+
+  it("starts the comments actor with the post URL and a bound, and waits for it", async () => {
+    const { source, provider } = sourceFor({
+      start: startedRun,
+      run: [
+        { status: 200, body: runObject({ status: "RUNNING" }) },
+        { status: 200, body: commentsRun },
+        { status: 200, body: commentsRun },
+      ],
+      dataset: { status: 200, body: commentItems },
+    });
+
+    const result = await source.fetchReplies(replyRequest());
+
+    const start = provider.calls.find((call) => call.method === "POST");
+    expect(start?.url).toContain("/acts/harvestapi~linkedin-post-comments/runs");
+    expect(start?.body).toEqual({
+      posts: [replyRequest().postUrl],
+      maxItems: 50,
+      scrapeReplies: true,
+    });
+    expect(result.replies).toHaveLength(3);
+    expect(result.itemsReturned).toBe(3);
+    expect(result.next.status).toBe("done");
+  });
+
+  it("reads the bill once it has settled, in whole comments", async () => {
+    const { source } = sourceFor({
+      start: startedRun,
+      run: [
+        { status: 200, body: runObject({ usageTotalUsd: 0, chargedEventCounts: {} }) },
+        { status: 200, body: commentsRun },
+        { status: 200, body: commentsRun },
+      ],
+      dataset: { status: 200, body: commentItems },
+    });
+
+    const result = await source.fetchReplies(replyRequest());
+
+    // $0.006 is 6,000 micro-dollars: three comments at 2,000 each.
+    expect(result.unitsConsumed).toBe(3);
+  });
+
+  it("reads a comment's id, text, date, author slug and the provider's own link", () => {
+    const first = commentItems[0] as Record<string, unknown>;
+    const reply = toCandidateReply(first, { parentPostExternalId: threadId, position: 0 });
+
+    expect(reply?.externalId).toBe("7504273613332795392");
+    expect(reply?.text).toBe("This is looking good! 👀 ");
+    expect(reply?.postedAt).toEqual(new Date("2026-09-11T20:24:12.081Z"));
+    expect(reply?.author).toBe("li-user-3");
+    expect(reply?.url).toBe(first.linkedinUrl);
+    expect(reply?.parentPostExternalId).toBe(threadId);
+    expect(reply?.parentReplyExternalId).toBeUndefined();
+    expect(reply?.threadPosition).toBe(0);
+  });
+
+  it("drops a comment whose postId names another post", () => {
+    const first = commentItems[0] as Record<string, unknown>;
+
+    expect(
+      toCandidateReply(
+        { ...first, postId: "urn:li:activity:1" },
+        { parentPostExternalId: threadId, position: 0 },
+      ),
+    ).toBeUndefined();
+    expect(
+      toCandidateReply(first, { parentPostExternalId: "another-post", position: 0 }),
+    ).toBeUndefined();
+  });
+
+  it("drops a comment with no id, no link or no date rather than repairing it", () => {
+    const first = commentItems[0] as Record<string, unknown>;
+    const context = { parentPostExternalId: threadId, position: 0 };
+
+    expect(toCandidateReply({ ...first, id: "" }, context)).toBeUndefined();
+    expect(toCandidateReply({ ...first, linkedinUrl: "" }, context)).toBeUndefined();
+    expect(
+      toCandidateReply(
+        { ...first, createdAt: "not a date", createdAtTimestamp: undefined },
+        context,
+      ),
+    ).toBeUndefined();
+  });
+
+  it("falls back to the epoch timestamp when the ISO date is missing", () => {
+    const first = commentItems[0] as Record<string, unknown>;
+    const reply = toCandidateReply(
+      { ...first, createdAt: undefined },
+      { parentPostExternalId: threadId, position: 0 },
+    );
+
+    expect(reply?.postedAt).toEqual(new Date(1789158252081));
+  });
+
+  /**
+   * The page is not in date order — 20:24, 11:20, 17:49 on the captured one —
+   * so every row is tested against `since` and none ends the walk early.
+   */
+  it("cuts on the thread's own window, row by row", async () => {
+    const dates = commentItems.map((item) => Date.parse(String(item.createdAt)));
+    expect(dates.every((value, index) => index === 0 || (dates[index - 1] ?? 0) >= value)).toBe(
+      false,
+    );
+
+    const { source } = sourceFor({
+      start: startedRun,
+      run: { status: 200, body: commentsRun },
+      dataset: { status: 200, body: commentItems },
+    });
+
+    const middle = new Date("2026-09-11T17:49:13.570Z");
+    const result = await source.fetchReplies(replyRequest({ since: middle }));
+
+    expect(result.replies.map((reply) => reply.externalId)).toEqual(["7504273613332795392"]);
+    expect(result.itemsReturned).toBe(3);
+    expect(result.unitsConsumed).toBe(3);
+  });
+
+  /**
+   * One captured comment claims a reply underneath it and the run returned
+   * none, `scrapeReplies` on. What a nested reply looks like is unproven, so
+   * the thread is partial whenever one is claimed.
+   */
+  it("calls the thread partial when a comment claims replies that did not arrive", async () => {
+    const claimed = commentItems.filter(
+      (item) => ((item.engagement as { comments?: number }).comments ?? 0) > 0,
+    );
+    expect(claimed).toHaveLength(1);
+
+    const { source } = sourceFor({
+      start: startedRun,
+      run: { status: 200, body: commentsRun },
+      dataset: { status: 200, body: commentItems },
+    });
+
+    const result = await source.fetchReplies(replyRequest());
+
+    expect(result.partial).toBe(true);
+    expect(result.replies.find((reply) => reply.replyCount === 1)).toBeDefined();
+  });
+
+  it("calls a thread complete when nothing claims more and the page is not full", async () => {
+    const quiet = commentItems.map((item) => ({
+      ...item,
+      engagement: { ...(item.engagement as object), comments: 0 },
+    }));
+    const { source } = sourceFor({
+      start: startedRun,
+      run: { status: 200, body: commentsRun },
+      dataset: { status: 200, body: quiet },
+    });
+
+    const result = await source.fetchReplies(replyRequest());
+
+    expect(result.partial).toBe(false);
+    expect(result.next.status).toBe("done");
+  });
+
+  it("calls a full page partial, because the bound is ours", async () => {
+    const full = Array.from({ length: 50 }, (_, index) => ({
+      ...(commentItems[0] as Record<string, unknown>),
+      id: `comment-${index}`,
+      engagement: { comments: 0 },
+    }));
+    const { source } = sourceFor({
+      start: startedRun,
+      run: { status: 200, body: runObject({ usageTotalUsd: 0.1, chargedEventCounts: {} }) },
+      dataset: { status: 200, body: full },
+    });
+
+    const result = await source.fetchReplies(replyRequest());
+
+    expect(result.replies).toHaveLength(50);
+    expect(result.partial).toBe(true);
+    expect(result.unitsConsumed).toBe(50);
+  });
+
+  it("gives up on a run that never finishes, and says the run still bills", async () => {
+    let clock = now.getTime();
+    const provider = apify({
+      start: startedRun,
+      run: { status: 200, body: runObject({ status: "RUNNING" }) },
+    });
+    const source = new ApifyLinkedInSource({
+      ...runtimeWith(provider.fetch),
+      now: () => new Date(clock),
+      sleep: () => {
+        clock += 60_000;
+        return Promise.resolve();
+      },
+    });
+
+    await expect(source.fetchReplies(replyRequest())).rejects.toThrow(/still reading/);
+    expect(provider.calls.filter((call) => call.url.includes("/datasets/"))).toHaveLength(0);
   });
 });
 

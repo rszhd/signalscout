@@ -2,7 +2,7 @@
 
 # Open tickets
 
-38 open — 14 doing, 23 todo, 1 parked (15 p1, 18 p2, 5 p3).
+37 open — 14 doing, 22 todo, 1 parked (14 p1, 18 p2, 5 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -20,7 +20,6 @@
 | p1 | US-132 | [The deployment chooses the model and the provider on the lent-keys plan](todo/US-132-the-deployment-chooses-the-model-and-the-provider-on-the-lent-keys-plan.md) | feature | todo | 2026-09-13T19:52+08:00 |
 | p1 | US-133 | [The lent-keys plan sells capacity, not an allowance](todo/US-133-the-lent-keys-plan-sells-capacity-not-an-allowance.md) | feature | todo | 2026-09-13T20:02+08:00 |
 | p1 | US-134 | [One plan at $35, with or without your own keys](todo/US-134-one-plan-at-35-dollars-with-or-without-your-own-keys.md) | feature | todo | 2026-09-13T20:38+08:00 |
-| p1 | US-137 | [Apify reads the comments under a LinkedIn post](todo/US-137-apify-reads-the-comments-under-a-linkedin-post.md) | feature | todo | 2026-09-15T14:00+08:00 |
 | p2 | US-015 | [A deleted post stops being shown](doing/US-015-a-deleted-post-stops-being-shown.md) | feature | doing | 2026-09-04T22:49+08:00 |
 | p2 | US-017 | [A self-hosted instance has one account](doing/US-017-a-self-hosted-instance-has-one-account.md) | feature | doing | 2026-09-04T22:49+08:00 |
 | p2 | US-020 | [A monitor can include comments and replies](doing/US-020-a-monitor-can-include-comments-and-replies.md) | feature | doing | 2026-09-05T01:18+08:00 |

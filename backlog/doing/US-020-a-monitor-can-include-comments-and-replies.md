@@ -190,8 +190,9 @@ told that comments are unavailable, not quietly given none.
       opt-in is set, and never when it is not
 - [x] The SocialCrawl X connector fetches replies by post URL when the opt-in
       is set, and never when it is not
-- [ ] The SocialCrawl LinkedIn connector does the same, or the ticket records
-      why it was left out
+- [x] The SocialCrawl LinkedIn connector does the same, or the ticket records
+      why it was left out — it was switched off in US-053 before it read one,
+      and Apify's LinkedIn connector reads them since US-137
 - [x] A reply is stored as its own row, keyed by the id its platform gives it,
       with a link to its parent post and to its parent reply. Reddit's `t1_`
       fullname and an X reply id are the same kind of key, and
@@ -440,3 +441,9 @@ join both from our own rows.
   and the second is shaped from that X measurement rather than imagined. 1,010
   tests pass.
 
+- 2026-09-15T15:20+08:00 — The LinkedIn box is closed by US-137. The SocialCrawl
+  connector never read a comment: US-053 switched it off on 2026-09-09 and
+  Apify fetches the platform now. US-137 gave that connector `fetchReplies`
+  through the same author's comments actor, $0.002 a comment. Two of the five
+  connectors this ticket left without comments now read them, US-135 and
+  US-136 being the others; US-138 and US-139 are the last.

@@ -118,6 +118,13 @@ for about $0.052, plus a model call for each — the pre-filter drops none on th
 platform. It records the provider choice, so a build with two LinkedIn
 connectors does not refuse.
 
+The Apify capture, `apify/linkedin-fixtures/capture.mjs`, has a
+`--only=comments` mode that is not part of a full run: a relevance search,
+because the date page's busiest post claimed two comments, then the busiest
+post's comments through the comments actor with replies on. About $0.026 —
+$0.02 of it the search. It leaves `findings.json` alone, because that file is
+the search run's evidence. US-137 ran it once on 2026-09-15.
+
 `live:tiktok-poll` is the TikTok equivalent of `live:linkedin-poll`, and it
 turns replies on. Read its cost before running it: the search is 2 credits, but
 25 threads is 25 more, and 678 comments then buy a triage call each and a

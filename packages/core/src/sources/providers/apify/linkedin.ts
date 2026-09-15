@@ -42,8 +42,11 @@
 import { linkedInPlatform } from "../../platforms.js";
 import type {
   CandidatePost,
+  CandidateReply,
   ConnectorDefinition,
   CredentialCheck,
+  ReplyRequest,
+  ReplyResult,
   SearchRequest,
   SearchResult,
   SocialSource,
@@ -78,6 +81,26 @@ const postsPerRun = 25;
  * that is late costs the freshness this connector exists for.
  */
 const resumeAfterSeconds = 5;
+
+/**
+ * How many comments one thread may buy, in one run. US-137.
+ *
+ * The comments actor has no cursor: one run reads up to `maxItems` and stops,
+ * so this is both the page and the thread bound, at $0.002 a comment. Fifty
+ * is $0.10 for the busiest thread and one call for the median one — the
+ * captured post claimed four.
+ */
+const commentsPerRun = 50;
+
+/**
+ * How long a reply walk waits for the comments run before giving up.
+ *
+ * The replies step cannot hand a wait back the way a search can — it walks a
+ * thread in one job — so this connector waits inside the call. The captured
+ * run took 6.5 seconds. Past this the run is abandoned to finish on its own,
+ * still billed, and the thread is re-opened next poll; the log says so.
+ */
+const commentsRunDeadlineMs = 3 * 60 * 1000;
 
 export const apifyLinkedIn: ConnectorDefinition = {
   platform: linkedInPlatform,
@@ -124,15 +147,16 @@ export const apifyLinkedIn: ConnectorDefinition = {
   /** `postsPerRun`: what one query costs in one poll. */
   maxUnitsPerQueryPoll: postsPerRun,
   /**
-   * The actor can fetch comments, and this connector does not ask for them.
+   * Comments, through the same author's comments actor, at the post price:
+   * $0.002 a comment and no start event, so no separate reply price is
+   * declared. Measured in US-137 — three comments cost $0.006 exactly.
    *
-   * They are a separate charge at the same price as a post, and whether a
-   * LinkedIn comment carries a lead is a question nobody has measured — on
-   * Instagram and TikTok the comments hold everything and on Reddit they hold
-   * the experts. Turning on a per-item charge to find out is a ticket, not a
-   * default.
+   * Whether a LinkedIn comment carries a lead is still unmeasured. The
+   * captured three were "looking good" and its cousins, under a post claiming
+   * four. What is measured is what one costs, and the monitor form says so
+   * per platform.
    */
-  canFetchReplies: false,
+  canFetchReplies: true,
   create: (runtime) => new ApifyLinkedInSource(runtime),
 };
 
@@ -414,6 +438,83 @@ export class ApifyLinkedInSource implements SocialSource {
     return Math.ceil(run.costMicros / apifyLinkedIn.pricePerUnitMicros);
   }
 
+  /**
+   * The comments under one post, in one run.
+   *
+   * One run, waited for here, then read once its bill has settled — the same
+   * settling `search` does, for the same reason: the run object is not final
+   * at the moment its status changes, and a bill read early prices every
+   * thread at nothing.
+   *
+   * There is no cursor. The actor reads up to `maxItems` and stops, so `next`
+   * is always done, and `partial` is whether the thread could hold more than
+   * arrived: a full page, or a comment claiming replies underneath it. The
+   * captured run returned three for a post claiming four with `scrapeReplies`
+   * on, and the fourth — a reply under a comment — never came, so what a
+   * nested reply looks like here is unproven and every item is stored as a
+   * top-level reply.
+   */
+  async fetchReplies(request: ReplyRequest): Promise<ReplyResult> {
+    const client = this.client(request.credentials);
+
+    const started = await client.startRun(
+      actors.linkedInPostComments,
+      { posts: [request.postUrl], maxItems: commentsPerRun, scrapeReplies: true },
+      request.signal,
+    );
+
+    const deadline = this.runtime.now().getTime() + commentsRunDeadlineMs;
+    let status = started.status;
+
+    while (ApifyClient.isRunning(status)) {
+      if (this.runtime.now().getTime() >= deadline) {
+        throw new ApifyError(
+          "provider",
+          `Apify run ${started.runId} was still reading a LinkedIn thread after ` +
+            `${commentsRunDeadlineMs / 1000} seconds; it will finish and bill on its own, ` +
+            "and the thread is re-opened next poll.",
+          0,
+        );
+      }
+      await this.runtime.sleep(resumeAfterSeconds * 1000);
+      status = await client.runStatus(started.runId, request.signal);
+    }
+
+    const run = await client.readRun(started.runId, request.signal);
+
+    if (run.status !== "SUCCEEDED") {
+      this.runtime.logger.warn(
+        { platform: linkedInPlatform.id, runId: run.runId, status: run.status },
+        "an Apify comments run did not succeed; recording what it cost and moving on",
+      );
+    }
+
+    const collected = run.records
+      .map((record, index) =>
+        toCandidateReply(record, {
+          parentPostExternalId: request.postExternalId,
+          position: (request.positionOffset ?? 0) + index,
+        }),
+      )
+      .filter((reply): reply is CandidateReply => reply !== undefined);
+
+    // The cut is ours: the actor's `postedLimit` is a named range at best,
+    // and the page is not in date order, so every row is tested.
+    const replies = collected.filter((reply) => !request.since || reply.postedAt > request.since);
+
+    const claimsMore =
+      run.records.length >= commentsPerRun ||
+      collected.some((reply) => (reply.replyCount ?? 0) > 0);
+
+    return {
+      replies,
+      itemsReturned: run.records.length,
+      unitsConsumed: this.unitsOf(run),
+      next: { status: "done" },
+      partial: claimsMore,
+    };
+  }
+
   /** The first query, or nothing if the monitor named none for this platform. */
   private first(query: SourceQuery): Cursor | undefined {
     return query.queries.length > 0 ? { index: 0 } : undefined;
@@ -503,6 +604,84 @@ export function toCandidatePost(record: unknown): CandidatePost | undefined {
     postedAt,
     ...(handle ? { author: handle } : {}),
   };
+}
+
+interface ReplyContext {
+  readonly parentPostExternalId: string;
+  readonly position: number;
+}
+
+/**
+ * One item of the comments actor to one `CandidateReply`, or nothing.
+ *
+ * Field names come from `linkedin-fixtures/comments.json`. The id is the
+ * comment's own activity-style number, the URL is the provider's — a feed
+ * link carrying the comment URN, which the owner opened — and the parent
+ * post is read out of `postId`, `urn:li:activity:<id>`, and compared with the
+ * post asked about: BUG-007's rule, with this actor's field.
+ *
+ * No field names a parent comment, because no nested reply has been captured.
+ * Every item is stored directly under the post.
+ */
+export function toCandidateReply(
+  record: unknown,
+  context: ReplyContext,
+): CandidateReply | undefined {
+  if (typeof record !== "object" || record === null) return undefined;
+
+  const row = record as Record<string, unknown>;
+
+  const externalId = text(row.id);
+  const url = text(row.linkedinUrl);
+  const postedAt = commentTimestampOf(row);
+
+  if (!externalId || !url || !postedAt) return undefined;
+
+  const saysPost = text(row.postId)?.replace(/^urn:li:activity:/, "");
+  if (saysPost && saysPost !== context.parentPostExternalId) return undefined;
+
+  const actor =
+    typeof row.actor === "object" && row.actor !== null
+      ? (row.actor as Record<string, unknown>)
+      : undefined;
+  const handle = actor ? profileSlug(text(actor.linkedinUrl)) : undefined;
+
+  const engagement =
+    typeof row.engagement === "object" && row.engagement !== null
+      ? (row.engagement as Record<string, unknown>)
+      : undefined;
+  const replyCount =
+    typeof engagement?.comments === "number" && engagement.comments >= 0
+      ? engagement.comments
+      : undefined;
+
+  return {
+    externalId,
+    url,
+    text: text(row.commentary) ?? "",
+    postedAt,
+    ...(handle ? { author: handle } : {}),
+    parentPostExternalId: context.parentPostExternalId,
+    threadPosition: context.position,
+    ...(replyCount === undefined ? {} : { replyCount }),
+  };
+}
+
+/** A comment's instant: `createdAt` as ISO, else `createdAtTimestamp` in ms. */
+function commentTimestampOf(row: Record<string, unknown>): Date | undefined {
+  const iso = text(row.createdAt);
+  if (iso) {
+    const parsed = new Date(iso);
+    if (!Number.isNaN(parsed.getTime())) return parsed;
+  }
+
+  const epoch = row.createdAtTimestamp;
+  if (typeof epoch === "number" && Number.isFinite(epoch)) {
+    const parsed = new Date(epoch);
+    if (!Number.isNaN(parsed.getTime())) return parsed;
+  }
+
+  return undefined;
 }
 
 /**

@@ -1,0 +1,946 @@
+[
+  {
+    "type": "post",
+    "id": "7496559082884018177",
+    "linkedinUrl": "https://www.linkedin.com/posts/li-user-1_flaky-tests-were-always-an-annoying-problem-activity-7496559082884018177-y1fs",
+    "content": "Flaky tests were always an annoying problem. With agentic coding, it's 100x worse. You run many more builds and tests passing are the feedback loop your agent needs.\n\nWith CloudBees Smart Tests, we can identify your flaky tests and allow you to quarantine them so they stop breaking your builds. Once you isolated them, you can focus on fixing those tests and if we observe that they stopped being flaky, we will automatically include them in your builds again.\n\nRead Jake's blog post to learn more. Fantastic new feature Naoto Samyak Yoshiori  👏 \n\nhttps://lnkd.in/gzhdAyhQ",
+    "contentAttributes": [
+      {
+        "start": 468,
+        "length": 4,
+        "type": "PROFILE_MENTION",
+        "hyperlink": "https://www.linkedin.com/in/li-user-3",
+        "textLink": null,
+        "profile": {
+          "id": "li-user-2",
+          "firstName": "li-user-4",
+          "lastName": "li-user-5",
+          "linkedinUrl": "https://www.linkedin.com/in/li-user-6",
+          "publicIdentifier": "li-user-6"
+        }
+      },
+      {
+        "start": 522,
+        "length": 5,
+        "type": "PROFILE_MENTION",
+        "hyperlink": "https://www.linkedin.com/in/li-user-8",
+        "textLink": null,
+        "profile": {
+          "id": "li-user-7",
+          "firstName": "li-user-9",
+          "lastName": "li-user-10",
+          "linkedinUrl": "https://www.linkedin.com/in/li-user-11",
+          "publicIdentifier": "li-user-11"
+        }
+      },
+      {
+        "start": 528,
+        "length": 6,
+        "type": "PROFILE_MENTION",
+        "hyperlink": "https://www.linkedin.com/in/li-user-13",
+        "textLink": null,
+        "profile": {
+          "id": "li-user-12",
+          "firstName": "li-user-14",
+          "lastName": "li-user-15",
+          "linkedinUrl": "https://www.linkedin.com/in/li-user-16",
+          "publicIdentifier": "li-user-16"
+        }
+      },
+      {
+        "start": 535,
+        "length": 8,
+        "type": "PROFILE_MENTION",
+        "hyperlink": "https://www.linkedin.com/in/li-user-18",
+        "textLink": null,
+        "profile": {
+          "id": "li-user-17",
+          "firstName": "li-user-19",
+          "lastName": "li-user-20",
+          "linkedinUrl": "https://www.linkedin.com/in/li-user-21",
+          "publicIdentifier": "li-user-21"
+        }
+      }
+    ],
+    "author": {
+      "id": "li-user-22",
+      "universalName": null,
+      "publicIdentifier": "li-user-1",
+      "type": "profile",
+      "name": "li-user-23",
+      "linkedinUrl": "https://www.linkedin.com/in/li-user-1?miniProfileUrn=urn%3Ali%3Afsd_profile%3Ali-user-22",
+      "info": "Scrubbed by capture.mjs. See docs/testing.md.",
+      "website": "https://moritzplassnig.com",
+      "websiteLabel": "View my blog",
+      "avatar": {
+        "url": "https://scrubbed.invalid/li-user-24",
+        "width": 800,
+        "height": 800
+      },
+      "urn": "li-user-67",
+      "profileId": "li-user-22"
+    },
+    "postedAt": {
+      "timestamp": 1787318964692,
+      "date": "2026-08-21T13:29:24.692Z",
+      "postedAgoShort": "3w",
+      "postedAgoText": "3 weeks ago • Visible to anyone on or off LinkedIn"
+    },
+    "postImages": [],
+    "postVideo": {
+      "thumbnailUrl": "https://dms.licdn.com/playlist/vid/v2/D5605AQG8ZsTVtkrolg/thumbnail-shrink_720_1280/B56aAkguBNHAAk-/0/1787318953413?e=1790060400&v=beta&t=0txbkm9R6LlG8qbEpt0-_su8x7DUmL6ELe7jgfoFA4Y",
+      "videoUrl": "https://dms.licdn.com/playlist/vid/v2/D5605AQG8ZsTVtkrolg/mp4-720p-30fp-crf28/B56aAkguBNHAB8-/0/1787318958571?e=1790060400&v=beta&t=WppcS5ABY_Bv-csYcbux-WYm7z27SRlRf-YjaRvGzq0"
+    },
+    "socialContent": {
+      "hideCommentsCount": false,
+      "hideReactionsCount": false,
+      "hideSocialActivityCounts": false,
+      "hideShareAction": true,
+      "hideSendAction": true,
+      "hideRepostsCount": false,
+      "hideViewsCount": false,
+      "trustInterventionBanner": null,
+      "hideReactAction": false,
+      "hideCommentAction": false,
+      "shareUrl": "https://www.linkedin.com/posts/li-user-1_flaky-tests-were-always-an-annoying-problem-activity-7496559082884018177-y1fs?",
+      "showContributionExperience": false,
+      "showSocialDetail": true
+    },
+    "comments": [],
+    "header": {
+      "text": null
+    },
+    "entityId": "7496559082884018177",
+    "shareUrn": "urn:li:ugcPost:7496559029842919426",
+    "shareLinkedinUrl": "https://www.linkedin.com/feed/update/urn:li:ugcPost:7496559029842919426",
+    "engagement": {
+      "id": "7496559029842919426",
+      "likes": 119,
+      "comments": 3,
+      "shares": 18,
+      "reactions": [
+        {
+          "type": "LIKE",
+          "count": 96
+        },
+        {
+          "type": "PRAISE",
+          "count": 12
+        },
+        {
+          "type": "EMPATHY",
+          "count": 7
+        },
+        {
+          "type": "APPRECIATION",
+          "count": 2
+        },
+        {
+          "type": "INTEREST",
+          "count": 2
+        }
+      ]
+    },
+    "reactions": [],
+    "reactionIds": [],
+    "commentIds": [],
+    "query": {
+      "sortBy": "relevance",
+      "page": 1,
+      "search": "flaky tests"
+    }
+  },
+  {
+    "type": "post",
+    "id": "7505235033486467072",
+    "linkedinUrl": "https://www.linkedin.com/posts/li-user-25_a-test-fails-in-the-pipeline-before-anyone-activity-7505235033486467072-MY1L",
+    "content": "A test fails in the pipeline. Before anyone touches the product code, one question needs an answer first: is this a real bug, or an unstable test?\n\nSkipping that question is expensive either way. Treat a flaky test like a bug, and you waste time chasing something that isn't there. Treat a real bug like flakiness, and you ship a broken feature.\n\nThe habit that helps most is collecting evidence before assigning blame: rerun the test in isolation, check if it fails consistently or only under load, compare logs across runs, and look at whether the failure correlates with a specific environment or dataset.\n\nThe classification isn't guesswork. It's a checklist: reproducibility, isolation, environment correlation, and timing.\n\nSkip this step and pipelines get noisier over time, and some real defects slip through with them.",
+    "contentAttributes": [],
+    "author": {
+      "id": "li-user-26",
+      "universalName": null,
+      "publicIdentifier": "li-user-25",
+      "type": "profile",
+      "name": "li-user-27",
+      "linkedinUrl": "https://www.linkedin.com/in/li-user-25?miniProfileUrn=urn%3Ali%3Afsd_profile%3Ali-user-26",
+      "info": "Scrubbed by capture.mjs. See docs/testing.md.",
+      "website": null,
+      "websiteLabel": null,
+      "avatar": {
+        "url": "https://scrubbed.invalid/li-user-28",
+        "width": 800,
+        "height": 800
+      },
+      "urn": "li-user-68",
+      "profileId": "li-user-26"
+    },
+    "postedAt": {
+      "timestamp": 1789387472507,
+      "date": "2026-09-14T12:04:32.507Z",
+      "postedAgoShort": "18h",
+      "postedAgoText": "18 hours ago • Visible to anyone on or off LinkedIn"
+    },
+    "postImages": [
+      {
+        "url": "https://media.licdn.com/dms/image/v2/D5622AQH-kF-fwFJ-qA/feedshare-shrink_1280/B56aAnWeVDIAAM-/0/1787366598204?e=1790812800&v=beta&t=3eTGCWAfzRdQ2Xra5cI8d8bUzmojCMedDBNxrQyqEvA",
+        "width": 1024,
+        "height": 1536
+      }
+    ],
+    "socialContent": {
+      "hideCommentsCount": false,
+      "hideReactionsCount": false,
+      "hideSocialActivityCounts": false,
+      "hideShareAction": true,
+      "hideSendAction": true,
+      "hideRepostsCount": false,
+      "hideViewsCount": false,
+      "trustInterventionBanner": null,
+      "hideReactAction": false,
+      "hideCommentAction": false,
+      "shareUrl": "https://www.linkedin.com/posts/li-user-25_a-test-fails-in-the-pipeline-before-anyone-activity-7505235033486467072-MY1L?",
+      "showContributionExperience": false,
+      "showSocialDetail": true
+    },
+    "comments": [],
+    "header": {
+      "text": null
+    },
+    "entityId": "7505235033486467072",
+    "shareUrn": "urn:li:share:7496758876663345152",
+    "shareLinkedinUrl": "https://www.linkedin.com/feed/update/urn:li:share:7496758876663345152",
+    "engagement": {
+      "id": "7505235033486467072",
+      "likes": 1,
+      "comments": 0,
+      "shares": 0,
+      "reactions": [
+        {
+          "type": "INTEREST",
+          "count": 1
+        }
+      ]
+    },
+    "reactions": [],
+    "reactionIds": [],
+    "commentIds": [],
+    "query": {
+      "sortBy": "relevance",
+      "page": 1,
+      "search": "flaky tests"
+    }
+  },
+  {
+    "type": "post",
+    "id": "7495482722384064512",
+    "linkedinUrl": "https://www.linkedin.com/posts/li-user-29_testing-api-apitesting-activity-7495482722384064512-wmEs",
+    "content": "We spent six months calling flaky tests \"just noise\" until one meeting changed how we treated every CI failure.\nHere's what we learned about finding the real cause and building a test suite people can actually trust.\n\n#testing #api #apitesting #ai #automation\nTotal Shift Left",
+    "contentAttributes": [
+      {
+        "start": 260,
+        "length": 16,
+        "type": "COMPANY_NAME",
+        "hyperlink": "https://www.linkedin.com/company/li-user-30/",
+        "textLink": null,
+        "company": {
+          "id": "li-user-69",
+          "name": "li-user-31",
+          "linkedinUrl": "https://www.linkedin.com/company/li-user-30/"
+        }
+      }
+    ],
+    "author": {
+      "id": "li-user-32",
+      "universalName": null,
+      "publicIdentifier": "li-user-29",
+      "type": "profile",
+      "name": "li-user-33",
+      "linkedinUrl": "https://www.linkedin.com/in/li-user-29?miniProfileUrn=urn%3Ali%3Afsd_profile%3Ali-user-32",
+      "info": "Scrubbed by capture.mjs. See docs/testing.md.",
+      "website": null,
+      "websiteLabel": null,
+      "avatar": {
+        "url": "https://scrubbed.invalid/li-user-34",
+        "width": 800,
+        "height": 800
+      },
+      "urn": "li-user-70",
+      "profileId": "li-user-32"
+    },
+    "postedAt": {
+      "timestamp": 1787062340351,
+      "date": "2026-08-18T14:12:20.351Z",
+      "postedAgoShort": "3w",
+      "postedAgoText": "3 weeks ago • Visible to anyone on or off LinkedIn"
+    },
+    "postImages": [],
+    "article": {
+      "title": "The Meeting That Killed Six Months of Flaky Tests",
+      "subtitle": "Smeet Gohel",
+      "link": "https://www.linkedin.com/pulse/li-user-35?trackingId=xF4Y9gptTPSMOFBRLuwljg%3D%3D",
+      "linkLabel": "Open article: The Meeting That Killed Six Months of Flaky Tests by Smeet Gohel • 5 min read",
+      "description": "For six months, our test suite had a problem nobody could quite fix.Tests failed randomly.A test would pass locally, fail in CI, pass on the next retr",
+      "image": {
+        "url": "https://media.licdn.com/dms/image/v2/D5612AQG0xxDxBWvQHA/article-cover_image-shrink_720_1280/B56aAVNUyGIcAg-/0/1787062212640?e=1790812800&v=beta&t=n5QzLSy73WrBLUNY1KYiCOwlIk_vEtgLFHQ8rR_D9e8",
+        "width": 1280,
+        "height": 719
+      }
+    },
+    "socialContent": {
+      "hideCommentsCount": false,
+      "hideReactionsCount": false,
+      "hideSocialActivityCounts": false,
+      "hideShareAction": true,
+      "hideSendAction": true,
+      "hideRepostsCount": false,
+      "hideViewsCount": false,
+      "trustInterventionBanner": null,
+      "hideReactAction": false,
+      "hideCommentAction": false,
+      "shareUrl": "https://www.linkedin.com/posts/li-user-29_testing-api-apitesting-activity-7495482722384064512-wmEs?",
+      "showContributionExperience": false,
+      "showSocialDetail": true
+    },
+    "comments": [],
+    "header": {
+      "text": null
+    },
+    "entityId": "7495482722384064512",
+    "shareUrn": "urn:li:ugcPost:7495482721780080640",
+    "shareLinkedinUrl": "https://www.linkedin.com/feed/update/urn:li:ugcPost:7495482721780080640",
+    "engagement": {
+      "id": "7495482721780080640",
+      "likes": 6,
+      "comments": 1,
+      "shares": 0,
+      "reactions": [
+        {
+          "type": "LIKE",
+          "count": 6
+        }
+      ]
+    },
+    "reactions": [],
+    "reactionIds": [],
+    "commentIds": [],
+    "query": {
+      "sortBy": "relevance",
+      "page": 1,
+      "search": "flaky tests"
+    }
+  },
+  {
+    "type": "post",
+    "id": "7497429115973611521",
+    "linkedinUrl": "https://www.linkedin.com/posts/li-user-36_downloads-for-the-cypress-flaky-test-audit-activity-7497429115973611521-gVtT",
+    "content": "Downloads for the CYPRESS-FLAKY-TEST-AUDIT plugin for Cypress.io keep climbing (just a few downloads short of 6K a week)! \n\nAlso, the plugin has now been updated for the new environment and exposed variables, making it ready for Cypress v16.",
+    "contentAttributes": [],
+    "author": {
+      "id": "li-user-37",
+      "universalName": null,
+      "publicIdentifier": "li-user-36",
+      "type": "profile",
+      "name": "li-user-38",
+      "linkedinUrl": "https://www.linkedin.com/in/li-user-36?miniProfileUrn=urn%3Ali%3Afsd_profile%3Ali-user-37",
+      "info": "Scrubbed by capture.mjs. See docs/testing.md.",
+      "website": null,
+      "websiteLabel": null,
+      "avatar": {
+        "url": "https://scrubbed.invalid/li-user-39",
+        "width": 800,
+        "height": 800
+      },
+      "urn": "li-user-71",
+      "profileId": "li-user-37"
+    },
+    "postedAt": {
+      "timestamp": 1787526396745,
+      "date": "2026-08-23T23:06:36.745Z",
+      "postedAgoShort": "3w",
+      "postedAgoText": "3 weeks ago • Visible to anyone on or off LinkedIn"
+    },
+    "postImages": [
+      {
+        "url": "https://media.licdn.com/dms/image/v2/D5622AQFguvJmg9OG8g/feedshare-shrink_1280/B56aAw4DeQHAAM-/0/1787526396038?e=1790812800&v=beta&t=8n3lagw8sFyOmAeiOxWC4GpCJETZp5wGp3EupEAmqps",
+        "width": 1177,
+        "height": 753
+      }
+    ],
+    "socialContent": {
+      "hideCommentsCount": false,
+      "hideReactionsCount": false,
+      "hideSocialActivityCounts": false,
+      "hideShareAction": true,
+      "hideSendAction": true,
+      "hideRepostsCount": false,
+      "hideViewsCount": false,
+      "trustInterventionBanner": null,
+      "hideReactAction": false,
+      "hideCommentAction": false,
+      "shareUrl": "https://www.linkedin.com/posts/li-user-36_downloads-for-the-cypress-flaky-test-audit-activity-7497429115973611521-gVtT?",
+      "showContributionExperience": false,
+      "showSocialDetail": true
+    },
+    "comments": [],
+    "header": {
+      "text": null
+    },
+    "entityId": "7497429115973611521",
+    "shareUrn": "urn:li:share:7497429114933522432",
+    "shareLinkedinUrl": "https://www.linkedin.com/feed/update/urn:li:share:7497429114933522432",
+    "engagement": {
+      "id": "7497429115973611521",
+      "likes": 17,
+      "comments": 1,
+      "shares": 1,
+      "reactions": [
+        {
+          "type": "LIKE",
+          "count": 14
+        },
+        {
+          "type": "PRAISE",
+          "count": 2
+        },
+        {
+          "type": "INTEREST",
+          "count": 1
+        }
+      ]
+    },
+    "reactions": [],
+    "reactionIds": [],
+    "commentIds": [],
+    "query": {
+      "sortBy": "relevance",
+      "page": 1,
+      "search": "flaky tests"
+    }
+  },
+  {
+    "type": "post",
+    "id": "7495779447724457984",
+    "linkedinUrl": "https://www.linkedin.com/posts/li-user-40_how-do-you-handle-flaky-ai-generated-tests-activity-7495779447724457984-BpHk",
+    "content": "How Do You Handle Flaky AI-Generated Tests in CI/CD Pipelines?",
+    "contentAttributes": [],
+    "author": {
+      "id": "li-user-72",
+      "universalName": "li-user-40",
+      "publicIdentifier": null,
+      "type": "company",
+      "name": "li-user-41",
+      "linkedinUrl": "https://www.linkedin.com/company/li-user-40/posts",
+      "info": "Scrubbed by capture.mjs. See docs/testing.md.",
+      "website": null,
+      "websiteLabel": null,
+      "avatar": {
+        "url": "https://scrubbed.invalid/li-user-42",
+        "width": 400,
+        "height": 400
+      },
+      "urn": "li-user-72",
+      "companyId": "li-user-72"
+    },
+    "postedAt": {
+      "timestamp": 1787133085185,
+      "date": "2026-08-19T09:51:25.185Z",
+      "postedAgoShort": "3w",
+      "postedAgoText": "3 weeks ago • Visible to anyone on or off LinkedIn"
+    },
+    "postImages": [],
+    "article": {
+      "title": "How Do You Handle Flaky AI-Generated Tests in CI/CD Pipelines?",
+      "subtitle": "TM SQUARE",
+      "link": "https://www.linkedin.com/pulse/li-user-43?trackingId=L7HiRwYLTBaH1J0uovUmyg%3D%3D",
+      "linkLabel": "Open article: How Do You Handle Flaky AI-Generated Tests in CI/CD Pipelines?  by TM SQUARE • 6 min read",
+      "description": "What Is AI Testing and Flaky AI-Generated Tests? AI testing involves testing AI-powered applications while also using AI tools to support activities s",
+      "image": {
+        "url": "https://media.licdn.com/dms/image/v2/D4D12AQEpqryqb6Nlng/article-cover_image-shrink_720_1280/B4DaAZbSFIJcAQ-/0/1787132977709?e=1790812800&v=beta&t=MT3SDAQ_Wmw7cgT0MIYH55UwvYezUd8Of3-p4WpqHao",
+        "width": 1000,
+        "height": 562
+      }
+    },
+    "socialContent": {
+      "hideCommentsCount": false,
+      "hideReactionsCount": false,
+      "hideSocialActivityCounts": false,
+      "hideShareAction": true,
+      "hideSendAction": true,
+      "hideRepostsCount": false,
+      "hideViewsCount": false,
+      "trustInterventionBanner": null,
+      "hideReactAction": false,
+      "hideCommentAction": false,
+      "shareUrl": "https://www.linkedin.com/posts/li-user-40_how-do-you-handle-flaky-ai-generated-tests-activity-7495779447724457984-BpHk?",
+      "showContributionExperience": false,
+      "showSocialDetail": true
+    },
+    "comments": [],
+    "header": {
+      "text": null
+    },
+    "entityId": "7495779447724457984",
+    "shareUrn": "urn:li:ugcPost:7495779447154036736",
+    "shareLinkedinUrl": "https://www.linkedin.com/feed/update/urn:li:ugcPost:7495779447154036736",
+    "engagement": {
+      "id": "7495779447154036736",
+      "likes": 5,
+      "comments": 0,
+      "shares": 0,
+      "reactions": [
+        {
+          "type": "LIKE",
+          "count": 5
+        }
+      ]
+    },
+    "reactions": [],
+    "reactionIds": [],
+    "commentIds": [],
+    "query": {
+      "sortBy": "relevance",
+      "page": 1,
+      "search": "flaky tests"
+    }
+  },
+  {
+    "type": "post",
+    "id": "7505291706129494016",
+    "linkedinUrl": "https://www.linkedin.com/posts/li-user-44_what-is-your-teams-actual-tolerance-for-activity-7505291706129494016-gtkB",
+    "content": "What is your team’s actual tolerance for flaky automated tests in the CI/CD pipeline?",
+    "contentAttributes": [],
+    "author": {
+      "id": "li-user-45",
+      "universalName": null,
+      "publicIdentifier": "li-user-44",
+      "type": "profile",
+      "name": "li-user-46",
+      "linkedinUrl": "https://www.linkedin.com/in/li-user-44?miniProfileUrn=urn%3Ali%3Afsd_profile%3Ali-user-45",
+      "info": "Scrubbed by capture.mjs. See docs/testing.md.",
+      "website": null,
+      "websiteLabel": null,
+      "avatar": {
+        "url": "https://scrubbed.invalid/li-user-47",
+        "width": 800,
+        "height": 800
+      },
+      "urn": "li-user-73",
+      "profileId": "li-user-45"
+    },
+    "postedAt": {
+      "timestamp": 1789400984318,
+      "date": "2026-09-14T15:49:44.318Z",
+      "postedAgoShort": "14h",
+      "postedAgoText": "14 hours ago • Visible to anyone on or off LinkedIn"
+    },
+    "postImages": [],
+    "socialContent": {
+      "hideCommentsCount": false,
+      "hideReactionsCount": false,
+      "hideSocialActivityCounts": false,
+      "hideShareAction": true,
+      "hideSendAction": true,
+      "hideRepostsCount": false,
+      "hideViewsCount": false,
+      "trustInterventionBanner": null,
+      "hideReactAction": false,
+      "hideCommentAction": false,
+      "shareUrl": "https://www.linkedin.com/posts/li-user-44_what-is-your-teams-actual-tolerance-for-activity-7505291706129494016-gtkB?",
+      "showContributionExperience": false,
+      "showSocialDetail": true
+    },
+    "comments": [],
+    "header": {
+      "text": null
+    },
+    "entityId": "7505291706129494016",
+    "shareUrn": "urn:li:share:7505291705500225536",
+    "shareLinkedinUrl": "https://www.linkedin.com/feed/update/urn:li:share:7505291705500225536",
+    "engagement": {
+      "id": "7505291706129494016",
+      "likes": 0,
+      "comments": 0,
+      "shares": 0,
+      "reactions": []
+    },
+    "reactions": [],
+    "reactionIds": [],
+    "commentIds": [],
+    "query": {
+      "sortBy": "relevance",
+      "page": 1,
+      "search": "flaky tests"
+    }
+  },
+  {
+    "type": "post",
+    "id": "7504119126773362689",
+    "linkedinUrl": "https://www.linkedin.com/posts/li-user-48_here-we-launched-atlassians-bitbucket-tests-activity-7504119126773362689-_Y2d",
+    "content": "Here we launched Atlassian's Bitbucket-Tests (BBTS) New UI in Open Beta.  🚀 \nNow, Stop wasting hours chasing ghost failures from flaky tests that pass on retry.\nBitbucket Standard and Premium now feature native Bitbucket Tests dashboards, giving you deep visibility into test reliability right where your code lives:\n📊 Instant Health Breakdown: Track total, healthy, flaky, and quarantined tests at a glance. 🎯 \"Needs Attention\" Card: Pinpoint the exact tests dragging down your suite. \n🔍 One-Click CI/CD Drill-Downs: Jump straight from a build result to deep execution history using \"View in Tests.\" \n📈 Historical Trends: Spot systemic patterns before they hit production, and fix Flaky tests using our 𝐟𝐢𝐱 𝐟𝐥𝐚𝐤𝐲 𝐚𝐠𝐞𝐧𝐭.\nNo more guessing if a test failure is real noise or a false positive. Just cleaner pipelines and faster deployments.\nHow does your team currently handle flaky tests? Let’s talk in the comments! 👇\nBlog - https://lnkd.in/e72kcYBb\nCommunity post - https://lnkd.in/eHmxN99X",
+    "contentAttributes": [
+      {
+        "start": 17,
+        "length": 9,
+        "type": "COMPANY_NAME",
+        "hyperlink": "https://www.linkedin.com/company/li-user-49/",
+        "textLink": null,
+        "company": {
+          "id": "li-user-74",
+          "name": "li-user-50",
+          "linkedinUrl": "https://www.linkedin.com/company/li-user-49/"
+        }
+      }
+    ],
+    "author": {
+      "id": "li-user-51",
+      "universalName": null,
+      "publicIdentifier": "li-user-48",
+      "type": "profile",
+      "name": "li-user-52",
+      "linkedinUrl": "https://www.linkedin.com/in/li-user-48?miniProfileUrn=urn%3Ali%3Afsd_profile%3Ali-user-51",
+      "info": "Scrubbed by capture.mjs. See docs/testing.md.",
+      "website": null,
+      "websiteLabel": null,
+      "avatar": {
+        "url": "https://scrubbed.invalid/li-user-53",
+        "width": 800,
+        "height": 800
+      },
+      "urn": "li-user-75",
+      "profileId": "li-user-51"
+    },
+    "postedAt": {
+      "timestamp": 1789121419614,
+      "date": "2026-09-11T10:10:19.614Z",
+      "postedAgoShort": "3d",
+      "postedAgoText": "3 days ago • Visible to anyone on or off LinkedIn"
+    },
+    "postImages": [
+      {
+        "url": "https://media.licdn.com/dms/image/v2/D4E22AQHOLv13RtfgQA/feedshare-image-high-res/B4EaCMdIG9H4AU-/0/1789062841132?e=1790812800&v=beta&t=DMgb-GMDsfpeNViWfyYAEgdvhW74e0eCv8WlCC36JGE",
+        "width": 2048,
+        "height": 1151
+      }
+    ],
+    "socialContent": {
+      "hideCommentsCount": false,
+      "hideReactionsCount": false,
+      "hideSocialActivityCounts": false,
+      "hideShareAction": true,
+      "hideSendAction": true,
+      "hideRepostsCount": false,
+      "hideViewsCount": false,
+      "trustInterventionBanner": null,
+      "hideReactAction": false,
+      "hideCommentAction": false,
+      "shareUrl": "https://www.linkedin.com/posts/li-user-48_here-we-launched-atlassians-bitbucket-tests-activity-7504119126773362689-_Y2d?",
+      "showContributionExperience": false,
+      "showSocialDetail": true
+    },
+    "comments": [],
+    "header": {
+      "text": null
+    },
+    "entityId": "7504119126773362689",
+    "shareUrn": "urn:li:share:7503873437787058177",
+    "shareLinkedinUrl": "https://www.linkedin.com/feed/update/urn:li:share:7503873437787058177",
+    "engagement": {
+      "id": "7504119126773362689",
+      "likes": 89,
+      "comments": 4,
+      "shares": 3,
+      "reactions": [
+        {
+          "type": "LIKE",
+          "count": 79
+        },
+        {
+          "type": "EMPATHY",
+          "count": 7
+        },
+        {
+          "type": "PRAISE",
+          "count": 2
+        },
+        {
+          "type": "INTEREST",
+          "count": 1
+        }
+      ]
+    },
+    "reactions": [],
+    "reactionIds": [],
+    "commentIds": [],
+    "query": {
+      "sortBy": "relevance",
+      "page": 1,
+      "search": "flaky tests"
+    }
+  },
+  {
+    "type": "post",
+    "id": "7503544541476462592",
+    "linkedinUrl": "https://www.linkedin.com/posts/li-user-54_the-gitlab-o11y-mcp-server-is-live-agents-activity-7503544541476462592-k_fp",
+    "content": "The GitLab O11y MCP server is live.\nAgents can now handle operational work that never gets prioritized:\ndashboards nobody owns, flaky tests nobody has time to chase,\ngraphs that are empty for reasons no one remembers.\nThis clip shows an agent connecting to the server and fixing a\nflaky-test dashboard autonomously. Link to docs in comments.",
+    "contentAttributes": [],
+    "author": {
+      "id": "li-user-55",
+      "universalName": null,
+      "publicIdentifier": "li-user-54",
+      "type": "profile",
+      "name": "li-user-56",
+      "linkedinUrl": "https://www.linkedin.com/in/li-user-54?miniProfileUrn=urn%3Ali%3Afsd_profile%3Ali-user-55",
+      "info": "Scrubbed by capture.mjs. See docs/testing.md.",
+      "website": null,
+      "websiteLabel": null,
+      "avatar": {
+        "url": "https://scrubbed.invalid/li-user-57",
+        "width": 398,
+        "height": 398
+      },
+      "urn": "li-user-76",
+      "profileId": "li-user-55"
+    },
+    "postedAt": {
+      "timestamp": 1788984427804,
+      "date": "2026-09-09T20:07:07.804Z",
+      "postedAgoShort": "5d",
+      "postedAgoText": "5 days ago • Visible to anyone on or off LinkedIn"
+    },
+    "postImages": [],
+    "postVideo": {
+      "thumbnailUrl": "https://media.licdn.com/dms/image/v2/D4E05AQHlf9JvdUpY5A/videocover-low/B4EaCHx8QRGoBI-/0/1788984413408?e=1790060400&v=beta&t=WE027SX0Im3vACMCnqWWaaWHr1Wsv-leITFOic1SXlA",
+      "videoUrl": "https://dms.licdn.com/playlist/vid/v2/D4E05AQHlf9JvdUpY5A/mp4-720p-30fp-crf28/B4EaCHx8QRGoB8-/0/1788984419191?e=1790060400&v=beta&t=p1E4RPDIu37UTjub85NnWaSSQ3uzaS7S-XJXg26aEGg"
+    },
+    "socialContent": {
+      "hideCommentsCount": false,
+      "hideReactionsCount": false,
+      "hideSocialActivityCounts": false,
+      "hideShareAction": true,
+      "hideSendAction": true,
+      "hideRepostsCount": false,
+      "hideViewsCount": false,
+      "trustInterventionBanner": null,
+      "hideReactAction": false,
+      "hideCommentAction": false,
+      "shareUrl": "https://www.linkedin.com/posts/li-user-54_the-gitlab-o11y-mcp-server-is-live-agents-activity-7503544541476462592-k_fp?",
+      "showContributionExperience": false,
+      "showSocialDetail": true
+    },
+    "comments": [],
+    "header": {
+      "text": null
+    },
+    "entityId": "7503544541476462592",
+    "shareUrn": "urn:li:ugcPost:7503544420718280704",
+    "shareLinkedinUrl": "https://www.linkedin.com/feed/update/urn:li:ugcPost:7503544420718280704",
+    "engagement": {
+      "id": "7503544420718280704",
+      "likes": 71,
+      "comments": 2,
+      "shares": 8,
+      "reactions": [
+        {
+          "type": "LIKE",
+          "count": 64
+        },
+        {
+          "type": "PRAISE",
+          "count": 4
+        },
+        {
+          "type": "EMPATHY",
+          "count": 2
+        },
+        {
+          "type": "INTEREST",
+          "count": 1
+        }
+      ]
+    },
+    "reactions": [],
+    "reactionIds": [],
+    "commentIds": [],
+    "query": {
+      "sortBy": "relevance",
+      "page": 1,
+      "search": "flaky tests"
+    }
+  },
+  {
+    "type": "post",
+    "id": "7488483374173569024",
+    "linkedinUrl": "https://www.linkedin.com/posts/li-user-58_flakytests-testautomation-softwaretesting-activity-7488483374173569024-WTye",
+    "content": "One flaky test fails. You rerun it. It passes. Problem solved? Probably not. 🎭\n\nFlaky tests are often treated as isolated scripts with isolated defects. In practice, several tests may be reacting to the same unstable environment, shared dependency, timing issue, test data problem, or setup process.\n\nFixing them one by one can hide the real pattern.\n\nInstead of looking only at the latest failed test, examine which tests fail together, when the failures started, and what resources they share. Test run history can reveal a cluster that is almost invisible when every failure is investigated separately.\n\nRetries may unblock the pipeline, but they do not restore trust in the test suite. The real improvement comes from finding the shared cause behind the noise.\n\nHow does your team handle flaky tests: rerun, quarantine, or investigate immediately? 👇\n\n#FlakyTests #TestAutomation #SoftwareTesting #QualityEngineering #ContinuousIntegration",
+    "contentAttributes": [],
+    "author": {
+      "id": "li-user-77",
+      "universalName": "li-user-58",
+      "publicIdentifier": null,
+      "type": "company",
+      "name": "li-user-59",
+      "linkedinUrl": "https://www.linkedin.com/company/li-user-58/posts",
+      "info": "Scrubbed by capture.mjs. See docs/testing.md.",
+      "website": null,
+      "websiteLabel": null,
+      "avatar": {
+        "url": "https://scrubbed.invalid/li-user-60",
+        "width": 400,
+        "height": 400
+      },
+      "urn": "li-user-77",
+      "companyId": "li-user-77"
+    },
+    "postedAt": {
+      "timestamp": 1785393565696,
+      "date": "2026-07-30T06:39:25.696Z",
+      "postedAgoShort": "1mo",
+      "postedAgoText": "1 month ago • Visible to anyone on or off LinkedIn"
+    },
+    "postImages": [],
+    "article": {
+      "title": "Stop Treating Flaky Tests as Isolated Failures",
+      "subtitle": "TestCaseLab",
+      "link": "https://www.linkedin.com/pulse/li-user-61?trackingId=ZwzNEJ2RSLuyS55h9dso9g%3D%3D",
+      "linkLabel": "Open article: Stop Treating Flaky Tests as Isolated Failures by TestCaseLab • 9 min read",
+      "description": "Why rerunning one failed test may hide a much larger reliability problemOne automated test fails.The team reruns it. It passes.The pipeline turns gree",
+      "image": {
+        "url": "https://media.licdn.com/dms/image/v2/D4D12AQErU2-zieM_JA/article-cover_image-shrink_720_1280/B4DZ.xug.pIsAQ-/0/1785393189108?e=1790812800&v=beta&t=h0Rdzmneuvr9B7XaYrpPAq6FC3m6Eql3rG5Q1_p26B0",
+        "width": 1280,
+        "height": 720
+      }
+    },
+    "newsletterUrl": "https://www.linkedin.com/newsletters/weekly-software-testing-tips-7089906769765773313",
+    "newsletterTitle": "Weekly Software Testing Tips",
+    "socialContent": {
+      "hideCommentsCount": false,
+      "hideReactionsCount": false,
+      "hideSocialActivityCounts": false,
+      "hideShareAction": true,
+      "hideSendAction": true,
+      "hideRepostsCount": false,
+      "hideViewsCount": false,
+      "trustInterventionBanner": null,
+      "hideReactAction": false,
+      "hideCommentAction": false,
+      "shareUrl": "https://www.linkedin.com/posts/li-user-58_flakytests-testautomation-softwaretesting-activity-7488483374173569024-WTye?",
+      "showContributionExperience": false,
+      "showSocialDetail": true
+    },
+    "comments": [],
+    "header": {
+      "text": null
+    },
+    "entityId": "7488483374173569024",
+    "shareUrn": "urn:li:ugcPost:7488483373687037953",
+    "shareLinkedinUrl": "https://www.linkedin.com/feed/update/urn:li:ugcPost:7488483373687037953",
+    "engagement": {
+      "id": "7488483373687037953",
+      "likes": 10,
+      "comments": 0,
+      "shares": 0,
+      "reactions": [
+        {
+          "type": "LIKE",
+          "count": 10
+        }
+      ]
+    },
+    "reactions": [],
+    "reactionIds": [],
+    "commentIds": [],
+    "query": {
+      "sortBy": "relevance",
+      "page": 1,
+      "search": "flaky tests"
+    }
+  },
+  {
+    "type": "post",
+    "id": "7495827503773564928",
+    "linkedinUrl": "https://www.linkedin.com/posts/li-user-62_most-teams-migrate-to-playwright-to-escape-activity-7495827503773564928-GTSq",
+    "content": "Most teams migrate to Playwright to escape flaky tests.\nThen the flakiness follows them home.\nAnd they blame the tool. 👇\n—\nHere's what I watched happen on one team:\nThey moved thousands of tests off a legacy framework.\nNew syntax. Same 3 a.m. failures. Re-run until green. And slowly… everyone stopped trusting the suite.\nThe tool was never the problem.\nThey'd carried the old habits into a brand-new house:\n→ hard-coded sleeps as \"flakiness insurance\" \n→ selectors glued to the DOM structure \n→ an inverted pyramid — hundreds of slow UI tests checking logic a unit test could've caught in milliseconds \n→ CI runners so starved for memory the browsers were thrashing (which everyone confidently diagnosed as \"Playwright just being flaky\")\nPlaywright didn't fail them.\nTheir engineering discipline did.\n—\nSo I wrote the deep field guide I wish that team had.\nNot a getting-started tutorial — the architectural reasoning for engineers with 5–15 years in the trenches:\n• Why lazy Locators killed the stale-element era (and how ElementHandles still quietly bite) \n• Actionability checks + web-first assertions — the real fix for sleeps \n• Fixtures as dependency injection: worker vs test scope, and why it changes everything \n• The hybrid pattern → arrange state via API, assert via UI \n• Trace Viewer as your 3 a.m. time machine \n• Flakiness as a trust problem — and the metrics that prove it to leadership\n—\nThe uncomfortable truth:\nA technically perfect suite that the org has learned to ignore is worthless.\nThe tool is the easy half.\nThe discipline around it is the actual job.\n—\nFull guide linked below. 👇\nWhat's the #1 flakiness anti-pattern you see most often?\nI'll start: hard-coded sleeps that make suites slow AND flaky at the same time.\n♻️ Repost if your team is fighting a flaky suite right now.",
+    "contentAttributes": [],
+    "author": {
+      "id": "li-user-63",
+      "universalName": null,
+      "publicIdentifier": "li-user-62",
+      "type": "profile",
+      "name": "li-user-64",
+      "linkedinUrl": "https://www.linkedin.com/in/li-user-62?miniProfileUrn=urn%3Ali%3Afsd_profile%3Ali-user-63",
+      "info": "Scrubbed by capture.mjs. See docs/testing.md.",
+      "website": null,
+      "websiteLabel": null,
+      "avatar": {
+        "url": "https://scrubbed.invalid/li-user-65",
+        "width": 800,
+        "height": 800
+      },
+      "urn": "li-user-78",
+      "profileId": "li-user-63"
+    },
+    "postedAt": {
+      "timestamp": 1787144542640,
+      "date": "2026-08-19T13:02:22.640Z",
+      "postedAgoShort": "3w",
+      "postedAgoText": "3 weeks ago • Visible to anyone on or off LinkedIn"
+    },
+    "postImages": [],
+    "article": {
+      "title": "Playwright Test Automation Strategy: How Senior Engineers Turn Flaky Test Suites Into a Competitive Advantage",
+      "subtitle": "Himanshu Agarwal",
+      "link": "https://www.linkedin.com/pulse/li-user-66?trackingId=nBuFWCM7T5uAstrnzLyUQQ%3D%3D",
+      "linkLabel": "Open article: Playwright Test Automation Strategy: How Senior Engineers Turn Flaky Test Suites Into a Competitive Advantage by Himanshu Agarwal • 22 min read",
+      "description": "🔥 PLAYWRIGHT LOVERS — 95% OFF FOR ONE DAY! 🔥 If you're learning Playwright + TypeScript / Python / AI, grab these bundles before ONEDAY95 expires. ?",
+      "image": {
+        "url": "https://media.licdn.com/dms/image/v2/D4D12AQFv6JN2BZNwIg/article-cover_image-shrink_720_1280/B4DaAaGGkAKQAQ-/0/1787144204612?e=1790812800&v=beta&t=THaEjny8sehQgXMdr9XkKsnEnUK4ifib9vgOIRs5aM8",
+        "width": 1280,
+        "height": 719
+      }
+    },
+    "newsletterUrl": "https://www.linkedin.com/newsletters/the-ai-testing-heist-7458204728758259713",
+    "newsletterTitle": "THE AI TESTING HEIST",
+    "socialContent": {
+      "hideCommentsCount": false,
+      "hideReactionsCount": false,
+      "hideSocialActivityCounts": false,
+      "hideShareAction": true,
+      "hideSendAction": true,
+      "hideRepostsCount": false,
+      "hideViewsCount": false,
+      "trustInterventionBanner": null,
+      "hideReactAction": false,
+      "hideCommentAction": false,
+      "shareUrl": "https://www.linkedin.com/posts/li-user-62_most-teams-migrate-to-playwright-to-escape-activity-7495827503773564928-GTSq?",
+      "showContributionExperience": false,
+      "showSocialDetail": true
+    },
+    "comments": [],
+    "header": {
+      "text": null
+    },
+    "entityId": "7495827503773564928",
+    "shareUrn": "urn:li:ugcPost:7495827503111032832",
+    "shareLinkedinUrl": "https://www.linkedin.com/feed/update/urn:li:ugcPost:7495827503111032832",
+    "engagement": {
+      "id": "7495827503111032832",
+      "likes": 13,
+      "comments": 4,
+      "shares": 0,
+      "reactions": [
+        {
+          "type": "LIKE",
+          "count": 13
+        }
+      ]
+    },
+    "reactions": [],
+    "reactionIds": [],
+    "commentIds": [],
+    "query": {
+      "sortBy": "relevance",
+      "page": 1,
+      "search": "flaky tests"
+    }
+  }
+]

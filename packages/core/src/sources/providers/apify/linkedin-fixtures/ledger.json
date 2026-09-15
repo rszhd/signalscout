@@ -1,6 +1,6 @@
 {
   "note": "What each run was charged, in the provider's own numbers. Prices are tiered by Apify plan; this account is on FREE, where a post is $0.002 and a zero-result query is $0.001.",
-  "totalUsd": 0.04115,
+  "totalUsd": 0.02605,
   "runs": [
     {
       "run": "credentials-rejected",
@@ -82,6 +82,53 @@
       },
       "chargedTotalUsd": null,
       "usageTotalUsd": 0.00105
+    },
+    {
+      "run": "search-by-relevance",
+      "input": {
+        "searchQueries": [
+          "flaky tests"
+        ],
+        "maxPosts": 10,
+        "sortBy": "relevance"
+      },
+      "runId": "qSI01BiwXQt5eUqUG",
+      "status": "SUCCEEDED",
+      "elapsedMs": 6556,
+      "itemsReturned": 10,
+      "chargedEventCounts": {
+        "apify-actor-start": 1,
+        "post": 10,
+        "main-profile": 0,
+        "full-profile": 0,
+        "reaction": 0,
+        "comment": 0,
+        "no-result": 0
+      },
+      "chargedTotalUsd": null,
+      "usageTotalUsd": 0.020050000000000002
+    },
+    {
+      "run": "comments",
+      "input": {
+        "posts": [
+          "https://www.linkedin.com/posts/sachin-pokhriyal-54ab041a9_here-we-launched-atlassians-bitbucket-tests-activity-7504119126773362689-_Y2d"
+        ],
+        "maxItems": 25,
+        "scrapeReplies": true
+      },
+      "runId": "eVIkVCWXxbiXCi12f",
+      "status": "SUCCEEDED",
+      "elapsedMs": 6527,
+      "itemsReturned": 3,
+      "chargedEventCounts": {
+        "post-comment": 3,
+        "main-profile": 0,
+        "full-profile": 0,
+        "full-profile-with-email": 0
+      },
+      "chargedTotalUsd": null,
+      "usageTotalUsd": 0.006
     }
   ]
 }

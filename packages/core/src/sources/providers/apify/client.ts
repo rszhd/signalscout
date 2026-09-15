@@ -40,6 +40,14 @@ export const actors = {
    * was chosen over a provider that reaches LinkedIn through Google's index.
    */
   linkedInPostSearch: "harvestapi~linkedin-post-search",
+  /**
+   * The same author's comments actor. US-137.
+   *
+   * Input is `posts`, an array of post URLs, with `maxItems` per post. It
+   * bills `post-comment` at $0.002 each and, unlike the search actor, no
+   * start event: three comments cost $0.006 exactly, captured 2026-09-15.
+   */
+  linkedInPostComments: "harvestapi~linkedin-post-comments",
 } as const;
 
 /**

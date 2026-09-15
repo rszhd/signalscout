@@ -61,6 +61,41 @@
       },
       "capturedAt": "2026-09-07T05:44:43.191Z",
       "identitiesReplaced": 0
+    },
+    {
+      "file": "search-by-relevance.json",
+      "request": {
+        "input": {
+          "searchQueries": [
+            "flaky tests"
+          ],
+          "maxPosts": 10,
+          "sortBy": "relevance"
+        },
+        "runId": "qSI01BiwXQt5eUqUG",
+        "elapsedMs": 6556,
+        "phase": "dataset"
+      },
+      "capturedAt": "2026-09-15T06:36:23.482Z",
+      "identitiesReplaced": 78,
+      "note": " Twelve company ids scrubbed by hand after the run; the scrubber now does it."
+    },
+    {
+      "file": "comments.json",
+      "request": {
+        "input": {
+          "posts": [
+            "https://www.linkedin.com/posts/sachin-pokhriyal-54ab041a9_here-we-launched-atlassians-bitbucket-tests-activity-7504119126773362689-_Y2d"
+          ],
+          "maxItems": 25,
+          "scrapeReplies": true
+        },
+        "runId": "eVIkVCWXxbiXCi12f",
+        "elapsedMs": 6527,
+        "phase": "dataset"
+      },
+      "capturedAt": "2026-09-15T06:36:37.490Z",
+      "identitiesReplaced": 19
     }
   ]
 }

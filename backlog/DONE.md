@@ -2,7 +2,7 @@
 
 # Done
 
-120 finished.
+121 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
@@ -22,6 +22,7 @@
 | BUG-003 | [A post below the threshold is classified again on every poll](done/2026-09/BUG-003-a-post-below-the-threshold-is-classified-again-on-every-poll.md) | bug | fixed | 2026-09 |
 | BUG-002 | [A seven-day window is bought as a month](done/2026-09/BUG-002-a-seven-day-window-is-bought-as-a-month.md) | bug | fixed | 2026-09 |
 | BUG-001 | [A pending Reddit collection is not resumed](done/2026-09/BUG-001-a-pending-reddit-collection-is-not-resumed.md) | bug | shipped | 2026-09 |
+| US-137 | [Apify reads the comments under a LinkedIn post](done/2026-09/US-137-apify-reads-the-comments-under-a-linkedin-post.md) | feature | shipped | 2026-09 |
 | US-136 | [SocialData reads the replies under a tweet](done/2026-09/US-136-socialdata-reads-the-replies-under-a-tweet.md) | feature | shipped | 2026-09 |
 | US-135 | [ScrapeCreators reads the comments under a YouTube video](done/2026-09/US-135-scrapecreators-reads-the-comments-under-a-youtube-video.md) | feature | shipped | 2026-09 |
 | US-129 | [An account has a monthly cap on the instance's money](done/2026-09/US-129-an-account-has-a-monthly-cap-on-the-instances-money.md) | feature | shipped | 2026-09 |

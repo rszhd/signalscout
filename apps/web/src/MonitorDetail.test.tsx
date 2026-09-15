@@ -171,6 +171,40 @@ describe("one monitor's page", () => {
       expect(container.textContent).toContain("Running");
     });
 
+    /**
+     * US-133. On the plan that lends the keys the money is not this account's
+     * and the dials are the deployment's, so the page shows none of them: no
+     * cost, no schedule, no budget, no reading dial, and no time zone on a
+     * schedule nobody chose.
+     */
+    it("shows no cost and no dials on the plan that lends the keys", async () => {
+      await show(
+        monitor({
+          capacity: { trial: true },
+          spend: {
+            sourceMicros: 300_000,
+            modelMicros: 40_000,
+            totalMicros: 340_000,
+            remainingMicros: null,
+            exhausted: false,
+            reason: null,
+            since: "2026-03-01T00:00:00.000Z",
+          },
+        }),
+      );
+
+      const text = container.textContent ?? "";
+      expect(text).not.toContain("Spent in");
+      expect(text).not.toContain("$0.34");
+      expect(text).not.toContain("Monthly budget");
+      expect(text).not.toContain("Which posts the AI reads");
+      expect(container.querySelector(".monitor-schedule-zone")).toBeNull();
+      expect(container.querySelector('[aria-label="Poll interval"]')).toBeNull();
+      expect(text).toContain("Your trial sets the schedule, and the reading is included.");
+      // What stays: the links out of the page.
+      expect(text).toContain("Notification settings");
+    });
+
     it("says a poll was refused, in the server's own sentence", async () => {
       // The failure US-013 exists to prevent is a monitor that quietly stops
       // collecting. A person must be able to read why, and never have to work

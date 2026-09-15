@@ -135,6 +135,12 @@ export interface Monitor {
   budget: Budget | null;
   spend: Spend;
   preFilter: PreFilter;
+  /**
+   * Non-null on the plan that lends the keys. US-133. The money is not the
+   * account's and the dials are the deployment's, so the page shows no cost,
+   * no schedule, no budget and no reading dial. Optional, for an older server.
+   */
+  capacity?: { trial: boolean } | null;
   feedback: Feedback;
   /**
    * How many matches came out. US-109.

@@ -363,6 +363,39 @@ function toPollRunResponse(run: PollRun) {
   };
 }
 
+/**
+ * What the plan sells, as a screen reads it. US-133. The same numbers the
+ * write path holds a monitor to, so a screen and a refusal cannot disagree.
+ * Null is every self-hosted instance and every account on its own keys.
+ */
+const capacitySchema = z
+  .object({
+    monitors: z.number().int(),
+    queries: z.number().int(),
+    queriesPerPlatform: z.record(z.string(), z.number().int()),
+    platforms: z.array(z.string()),
+    pollIntervalSeconds: z.record(z.string(), z.number().int()),
+    replies: z.boolean(),
+    /** Whether these are the trial's numbers rather than the plan's. */
+    trial: z.boolean(),
+  })
+  .nullable();
+
+function capacityResponse(capacity: PlanCapacity | null): z.infer<typeof capacitySchema> {
+  if (!capacity) return null;
+  return {
+    monitors: capacity.monitors,
+    queries: capacity.queries,
+    queriesPerPlatform: Object.fromEntries(
+      Object.entries(capacity.queriesPerPlatform).filter(([, limit]) => limit !== undefined),
+    ) as Record<string, number>,
+    platforms: [...capacity.platforms],
+    pollIntervalSeconds: { ...capacity.pollIntervalSeconds },
+    replies: capacity.replies,
+    trial: capacity.trial,
+  };
+}
+
 const monitorSchema = z.object({
   notificationIssues: z.array(z.string()),
   id: z.string(),
@@ -412,6 +445,13 @@ const monitorSchema = z.object({
   /** Null when no cap is set. A monitor with no cap still records what it spends. */
   budget: budgetSchema.nullable(),
   spend: spendSchema,
+  /**
+   * What the plan sells, or null. US-133. The monitor page reads it to show
+   * no cost, no schedule, no budget and no reading dial on the plan that
+   * lends the keys: the money is not the account's and the dials are the
+   * deployment's.
+   */
+  capacity: capacitySchema,
   /**
    * The pre-filter's settings and what it has dropped, all time.
    *
@@ -594,6 +634,7 @@ function filterSettings(body: { preFilter?: { enabled?: boolean; similarityThres
  * report the filter's drops as the classifier's reads.
  */
 interface MonitorReadings {
+  readonly capacity: PlanCapacity | null;
   readonly state: BudgetState;
   readonly dropped: FilterDropCounts;
   readonly read: number;
@@ -610,7 +651,8 @@ function toResponse(
   runtime: MonitorEnvironment,
   readings: MonitorReadings,
 ) {
-  const { state, dropped, read, verdicts, collected, notificationProblems, lastPoll } = readings;
+  const { capacity, state, dropped, read, verdicts, collected, notificationProblems, lastPoll } =
+    readings;
 
   return {
     id: monitor.id,
@@ -645,6 +687,7 @@ function toResponse(
       state.capMicros === null || state.onExhausted === null
         ? null
         : { monthlyCapMicros: state.capMicros, onExhausted: state.onExhausted },
+    capacity: capacityResponse(capacity),
     spend: {
       sourceMicros: state.spend.sourceMicros,
       modelMicros: state.spend.modelMicros,
@@ -674,7 +717,12 @@ function toResponse(
  * The list route reads its spend and its drop counts in bulk instead. Both
  * paths end in `toResponse`, so neither can grow a field the other lacks.
  */
-async function readResponse(db: Database, monitor: Monitor, runtime: MonitorEnvironment) {
+async function readResponse(
+  db: Database,
+  monitor: Monitor,
+  runtime: MonitorEnvironment,
+  capacity: PlanCapacity | null,
+) {
   const [state, drops, read, verdicts, found, collected, notifications, polls] = await Promise.all([
     checkBudget(db, monitor.id),
     filterDropCounts(db, [monitor.id]),
@@ -687,6 +735,7 @@ async function readResponse(db: Database, monitor: Monitor, runtime: MonitorEnvi
   ]);
 
   return toResponse(monitor, runtime, {
+    capacity,
     state,
     dropped: drops.get(monitor.id) ?? noFilterDrops,
     read: read.get(monitor.id) ?? 0,
@@ -885,18 +934,7 @@ export async function registerMonitorRoutes(
            * then refusing them. The same numbers the write path holds them to,
            * so the form and the refusal cannot disagree.
            */
-          capacity: z
-            .object({
-              monitors: z.number().int(),
-              queries: z.number().int(),
-              queriesPerPlatform: z.record(z.string(), z.number().int()),
-              platforms: z.array(z.string()),
-              pollIntervalSeconds: z.record(z.string(), z.number().int()),
-              replies: z.boolean(),
-              /** Whether these are the trial's numbers rather than the plan's. */
-              trial: z.boolean(),
-            })
-            .nullable(),
+          capacity: capacitySchema,
         }),
       },
     },
@@ -907,21 +945,7 @@ export async function registerMonitorRoutes(
 
       return {
         signals: signalList.map(({ id, label, hint }) => ({ id, label, hint })),
-        capacity: capacity
-          ? {
-              monitors: capacity.monitors,
-              queries: capacity.queries,
-              queriesPerPlatform: Object.fromEntries(
-                Object.entries(capacity.queriesPerPlatform).filter(
-                  ([, limit]) => limit !== undefined,
-                ),
-              ) as Record<string, number>,
-              platforms: [...capacity.platforms],
-              pollIntervalSeconds: { ...capacity.pollIntervalSeconds },
-              replies: capacity.replies,
-              trial: capacity.trial,
-            }
-          : null,
+        capacity: capacityResponse(capacity),
         /**
          * One row per platform, not per connector.
          *
@@ -1065,6 +1089,7 @@ export async function registerMonitorRoutes(
     schema: { response: { 200: z.array(monitorSchema) } },
     handler: async (request) => {
       const runtime = await currentEnvironment(sessionUserId(request));
+      const capacity = await capacityFor(sessionUserId(request));
 
       // One read for every monitor's spend, rather than one per row. The
       // screen that shows this is a list, and a per-row query here would be
@@ -1099,6 +1124,7 @@ export async function registerMonitorRoutes(
           // about. A missing drop count is different — it means this monitor
           // has dropped nothing, which is what zero says.
           toResponse(monitor, runtime, {
+            capacity,
             state: states.get(monitor.id) ?? (await checkBudget(db, monitor.id)),
             dropped: drops.get(monitor.id) ?? noFilterDrops,
             read: read.get(monitor.id) ?? 0,
@@ -1173,7 +1199,9 @@ export async function registerMonitorRoutes(
         );
       }
 
-      return reply.code(201).send(await readResponse(db, monitor, runtime));
+      return reply
+        .code(201)
+        .send(await readResponse(db, monitor, runtime, await capacityFor(monitor.userId)));
     },
   });
 
@@ -1188,7 +1216,12 @@ export async function registerMonitorRoutes(
       const monitor = await ownedMonitor(db, request, request.params.id);
       if (!monitor) return reply.code(404).send({ message: "No monitor has that id." });
 
-      return readResponse(db, monitor, await currentEnvironment(sessionUserId(request)));
+      return readResponse(
+        db,
+        monitor,
+        await currentEnvironment(sessionUserId(request)),
+        await capacityFor(monitor.userId),
+      );
     },
   });
 
@@ -1269,7 +1302,12 @@ export async function registerMonitorRoutes(
       });
       if (!monitor) return reply.code(404).send({ message: "No monitor has that id." });
 
-      return readResponse(db, monitor, await currentEnvironment(sessionUserId(request)));
+      return readResponse(
+        db,
+        monitor,
+        await currentEnvironment(sessionUserId(request)),
+        await capacityFor(monitor.userId),
+      );
     },
   });
 
@@ -1288,7 +1326,12 @@ export async function registerMonitorRoutes(
       const monitor = await pauseMonitor(db, request.params.id);
       if (!monitor) return reply.code(404).send({ message: "No monitor has that id." });
 
-      return readResponse(db, monitor, await currentEnvironment(sessionUserId(request)));
+      return readResponse(
+        db,
+        monitor,
+        await currentEnvironment(sessionUserId(request)),
+        await capacityFor(monitor.userId),
+      );
     },
   });
 
@@ -1325,7 +1368,7 @@ export async function registerMonitorRoutes(
         });
       }
 
-      return readResponse(db, result.monitor, runtime);
+      return readResponse(db, result.monitor, runtime, await capacityFor(result.monitor.userId));
     },
   });
 
@@ -1357,7 +1400,12 @@ export async function registerMonitorRoutes(
 
       await setBudget(db, monitor.id, request.body);
 
-      return readResponse(db, monitor, await currentEnvironment(sessionUserId(request)));
+      return readResponse(
+        db,
+        monitor,
+        await currentEnvironment(sessionUserId(request)),
+        await capacityFor(monitor.userId),
+      );
     },
   });
 
@@ -1385,7 +1433,12 @@ export async function registerMonitorRoutes(
 
       await clearBudget(db, monitor.id);
 
-      return readResponse(db, monitor, await currentEnvironment(sessionUserId(request)));
+      return readResponse(
+        db,
+        monitor,
+        await currentEnvironment(sessionUserId(request)),
+        await capacityFor(monitor.userId),
+      );
     },
   });
 

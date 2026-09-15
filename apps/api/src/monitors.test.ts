@@ -858,6 +858,14 @@ describe("the monitor routes", () => {
 
         expect(response.statusCode).toBe(422);
         expect(response.json().message).toMatch(/^Your trial does not include LinkedIn/);
+
+        // A monitor read carries the same capacity, so its page can show no
+        // cost and no dials on the plan that lends the keys.
+        const id = await create(app, { ...newMonitor, pollIntervalSeconds: 24 * 60 * 60 });
+        const read = (await app.inject({ method: "GET", url: `/api/monitors/${id}` })).json();
+        expect(read.capacity.trial).toBe(true);
+        const listed = (await app.inject({ method: "GET", url: "/api/monitors" })).json();
+        expect(listed[0].capacity.trial).toBe(true);
       });
     });
 

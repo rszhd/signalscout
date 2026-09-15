@@ -374,6 +374,8 @@ export function MonitorDetail({
 
   const running = status(monitor);
   const home = monitor.projectId ?? projectId;
+  /** The plan that lends the keys: no money of theirs on this page, no dials of theirs either. */
+  const onCapacity = Boolean(monitor.capacity);
 
   return (
     <div className="product-page monitors-page monitor-page">
@@ -457,7 +459,9 @@ export function MonitorDetail({
             )}
             <p className="monitor-schedule-summary">
               {describeSchedule(monitor.pollIntervalSeconds, monitor.pollDays)}{" "}
-              <span className="monitor-schedule-zone">· {monitor.pollTimezone}</span>
+              {!onCapacity && (
+                <span className="monitor-schedule-zone">· {monitor.pollTimezone}</span>
+              )}
               {nextPollLabel(monitor) ? ` · ${nextPollLabel(monitor)}` : ""}
             </p>
           </div>
@@ -470,20 +474,24 @@ export function MonitorDetail({
                 {monitor.matches ? `${monitor.matches.unread} unread` : "Count unavailable"}
               </small>
             </div>
-            <div className="monitor-key-metric">
-              <dt className="monitor-key-label">Spent this month</dt>
-              <dd className="monitor-key-value">{formatMicros(monitor.spend.totalMicros)}</dd>
-              <small className="monitor-key-note">Estimated</small>
-            </div>
-            <div className="monitor-key-metric">
-              <dt className="monitor-key-label">Budget left</dt>
-              <dd className="monitor-key-value">
-                {monitor.spend.remainingMicros === null
-                  ? "No cap"
-                  : formatMicros(monitor.spend.remainingMicros)}
-              </dd>
-              <small className="monitor-key-note">{monthLabel(monitor.spend.since)}</small>
-            </div>
+            {!onCapacity && (
+              <>
+                <div className="monitor-key-metric">
+                  <dt className="monitor-key-label">Spent this month</dt>
+                  <dd className="monitor-key-value">{formatMicros(monitor.spend.totalMicros)}</dd>
+                  <small className="monitor-key-note">Estimated</small>
+                </div>
+                <div className="monitor-key-metric">
+                  <dt className="monitor-key-label">Budget left</dt>
+                  <dd className="monitor-key-value">
+                    {monitor.spend.remainingMicros === null
+                      ? "No cap"
+                      : formatMicros(monitor.spend.remainingMicros)}
+                  </dd>
+                  <small className="monitor-key-note">{monthLabel(monitor.spend.since)}</small>
+                </div>
+              </>
+            )}
           </dl>
         </section>
 
@@ -507,42 +515,49 @@ export function MonitorDetail({
               <p className="monitor-feedback">{feedbackLabel(monitor.feedback)}</p>
             </section>
 
-            <section className="monitor-detail-section">
-              <div className="monitor-section-heading">
-                <div>
-                  <p className="monitor-section-label">Cost</p>
-                  <h2 className="monitor-detail-title">
-                    Spent in {monthLabel(monitor.spend.since)} (estimated)
-                  </h2>
+            {/*
+              On the plan that lends the keys the money is not this account's,
+              so no figure in dollars reaches the page — the same rule the
+              billing page and the form follow. US-133.
+            */}
+            {!onCapacity && (
+              <section className="monitor-detail-section">
+                <div className="monitor-section-heading">
+                  <div>
+                    <p className="monitor-section-label">Cost</p>
+                    <h2 className="monitor-detail-title">
+                      Spent in {monthLabel(monitor.spend.since)} (estimated)
+                    </h2>
+                  </div>
                 </div>
-              </div>
-              <dl className="monitor-spend">
-                <div>
-                  <dt>Total</dt>
-                  <dd>{formatMicros(monitor.spend.totalMicros)}</dd>
-                </div>
-                <div>
-                  <dt>Sources</dt>
-                  <dd>{formatMicros(monitor.spend.sourceMicros)}</dd>
-                </div>
-                <div>
-                  <dt>Model</dt>
-                  <dd>{formatMicros(monitor.spend.modelMicros)}</dd>
-                </div>
-                <div>
-                  <dt>Left this month</dt>
-                  <dd>
-                    {monitor.spend.remainingMicros === null
-                      ? "No cap set"
-                      : formatMicros(monitor.spend.remainingMicros)}
-                  </dd>
-                </div>
-              </dl>
-              <p className="monitors-cost-note">
-                Spend is estimated; your provider’s invoice is the authority. Amounts include source
-                and model calls.
-              </p>
-            </section>
+                <dl className="monitor-spend">
+                  <div>
+                    <dt>Total</dt>
+                    <dd>{formatMicros(monitor.spend.totalMicros)}</dd>
+                  </div>
+                  <div>
+                    <dt>Sources</dt>
+                    <dd>{formatMicros(monitor.spend.sourceMicros)}</dd>
+                  </div>
+                  <div>
+                    <dt>Model</dt>
+                    <dd>{formatMicros(monitor.spend.modelMicros)}</dd>
+                  </div>
+                  <div>
+                    <dt>Left this month</dt>
+                    <dd>
+                      {monitor.spend.remainingMicros === null
+                        ? "No cap set"
+                        : formatMicros(monitor.spend.remainingMicros)}
+                    </dd>
+                  </div>
+                </dl>
+                <p className="monitors-cost-note">
+                  Spend is estimated; your provider’s invoice is the authority. Amounts include
+                  source and model calls.
+                </p>
+              </section>
+            )}
 
             <section className="monitor-detail-section collection-settings-section">
               <div className="monitor-section-heading">
@@ -600,23 +615,41 @@ export function MonitorDetail({
               <h2 id="monitor-settings-title" className="monitor-detail-title">
                 Monitor settings
               </h2>
-              <p>Schedule and reading changes save when you select them.</p>
+              {onCapacity ? (
+                <p>
+                  {monitor.capacity?.trial ? "Your trial" : "Your plan"} sets the schedule, and the
+                  reading is included.
+                </p>
+              ) : (
+                <p>Schedule and reading changes save when you select them.</p>
+              )}
             </div>
 
-            <section className="monitor-settings-section">
-              <h3>Schedule</h3>
-              <ScheduleForm monitor={monitor} onSaved={load} />
-            </section>
+            {/*
+              The three dials are the deployment's on the plan that lends the
+              keys: the schedule is the plan's floor per platform, the budget
+              caps money that is not theirs, and the reading dial trades their
+              money for recall. None is offered rather than offered and
+              refused. US-133.
+            */}
+            {!onCapacity && (
+              <>
+                <section className="monitor-settings-section">
+                  <h3>Schedule</h3>
+                  <ScheduleForm monitor={monitor} onSaved={load} />
+                </section>
 
-            <section className="monitor-settings-section">
-              <h3>Monthly budget (USD)</h3>
-              <BudgetForm monitor={monitor} onSaved={load} />
-            </section>
+                <section className="monitor-settings-section">
+                  <h3>Monthly budget (USD)</h3>
+                  <BudgetForm monitor={monitor} onSaved={load} />
+                </section>
 
-            <section className="monitor-settings-section">
-              <h3>Which posts the AI reads</h3>
-              <PreFilterForm monitor={monitor} onSaved={load} />
-            </section>
+                <section className="monitor-settings-section">
+                  <h3>Which posts the AI reads</h3>
+                  <PreFilterForm monitor={monitor} onSaved={load} />
+                </section>
+              </>
+            )}
 
             <nav className="monitor-card-actions" aria-label="Monitor links">
               <Link className="text-link" to={paths.notifications(home, monitor.id)}>

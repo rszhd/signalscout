@@ -6,7 +6,7 @@ priority: p1
 created: 2026-09-15T13:58+08:00
 parent: US-020
 area:
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -51,10 +51,9 @@ day and never at the second.
       the video the caller asked about. A nested reply is never on the page:
       each parent carries a `repliesContinuationToken`, a credit per subtree,
       and the connector buys none and reports the page partial instead
-- [ ] The permalink is `watch?v=<video>&lc=<comment id>`, built by the
-      connector. **Not yet pressed** — the browser extension was not connected
-      on 2026-09-15. Open one:
-      https://www.youtube.com/watch?v=BQqzfHQkREo&lc=UgxjcgU2He7VnTdNHV14AaABAg
+- [x] The permalink is `watch?v=<video>&lc=<comment id>`, built by the
+      connector. The owner opened one on 2026-09-15 and the comment was
+      highlighted under the video
 - [x] The comment's date is stored marked approximate, and the `since` cut is
       made at the precision of the relative text: "4 years ago" is dropped
       against a thirty-day window, "3 weeks ago" is kept six days past its
@@ -111,3 +110,6 @@ day and never at the second.
   Open: the permalink. `&lc=` is YouTube's own highlighted-comment parameter
   and the connector builds it, which by AGENTS.md's rule is evidence about our
   string building and none about YouTube until somebody opens one.
+
+- 2026-09-15T14:20+08:00 — **Closed.** The owner opened the built permalink and
+  the comment was highlighted under the video. Every box is true.

@@ -7,12 +7,15 @@
  * steps: which numbers a worktree receives, and what its `.env` says. A wrong
  * number here is silent until two agents are already running.
  */
+import { createServer } from "node:net";
 import { describe, expect, it } from "vitest";
 import {
   buildEnvFile,
   composeProjectName,
   MAIN_SLOT,
   pickSlot,
+  portsForSlots,
+  probeBusyPorts,
   slotPorts,
   usedSlotsFrom,
 } from "./new-worktree.mjs";
@@ -54,6 +57,48 @@ describe("pickSlot", () => {
   it("refuses rather than wrapping round onto a used slot", () => {
     const everySlot = Array.from({ length: 999 }, (_, index) => index + 1);
     expect(() => pickSlot(everySlot)).toThrow(/no free worktree slot/);
+  });
+
+  /**
+   * This machine ran two unrelated projects on 5433 and 5434. Docker refuses to
+   * publish a port it cannot have, and it refuses after the folder and the
+   * branch have been made — so the question has to be asked before the slot is
+   * handed out, not by the daemon afterwards.
+   */
+  it("skips a slot whose Postgres port something else already holds", () => {
+    expect(pickSlot([], new Set([5433]))).toBe(2);
+  });
+
+  it("skips a slot for a busy API port just as readily as a busy database port", () => {
+    expect(pickSlot([], new Set([3001]))).toBe(2);
+    expect(pickSlot([], new Set([5174]))).toBe(2);
+  });
+
+  it("skips every slot that is either held or busy, and takes the first that is neither", () => {
+    expect(pickSlot([1, 2], new Set([5435]))).toBe(4);
+  });
+});
+
+describe("portsForSlots", () => {
+  it("asks about all three ports of every slot, so one busy port is enough", () => {
+    expect(portsForSlots([1, 2])).toEqual([3001, 5174, 5433, 3002, 5175, 5434]);
+  });
+});
+
+describe("probeBusyPorts", () => {
+  it("reports a port something is listening on, and not one that is free", async () => {
+    const server = createServer();
+    await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
+    const held = server.address().port;
+
+    try {
+      const busy = await probeBusyPorts([held]);
+      expect(busy.has(held)).toBe(true);
+    } finally {
+      await new Promise((resolve) => server.close(resolve));
+    }
+
+    expect((await probeBusyPorts([held])).has(held)).toBe(false);
   });
 });
 

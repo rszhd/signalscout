@@ -79,11 +79,14 @@ safe, so the pause is not optional.
       unset variable binds 5432 and every instance running today is unchanged
 - [x] `apps/web/vite.config.ts` reads its own port and its proxy target from the
       environment, defaulting to 5173 and 3000
-- [ ] The Vite proxy targets the API port of its own worktree. A request to the
+- [x] The Vite proxy targets the API port of its own worktree. A request to the
       second UI never reaches the first API
-- [ ] `scripts/new-worktree.mjs <name>` adds the worktree, picks a port slot no
+- [x] `scripts/new-worktree.mjs <name>` adds the worktree, picks a port slot no
       running worktree holds, writes `.env`, starts Postgres, copies the main
       database and pauses every monitor in the copy
+- [x] A slot whose ports something else on the machine already holds is skipped.
+      The question is asked by binding, before the folder is made, rather than
+      by the Docker daemon after it
 - [x] The worktree is created at `worktrees/<name>` inside the main checkout,
       whichever folder the script is run from
 - [x] `.gitignore` and `.dockerignore` both exclude `worktrees/`, so the folder
@@ -99,7 +102,7 @@ safe, so the pause is not optional.
       slot, and a slot released by a removed worktree is offered again
 - [x] `pnpm dev` in the main checkout still needs no new variable. Every default
       is what it is today
-- [ ] The suite passes in two worktrees at the same time, each against its own
+- [x] The suite passes in two worktrees at the same time, each against its own
       Postgres. Say whether this was run or reasoned
 - [x] No test starts a container, reaches a provider or calls a model
 
@@ -122,6 +125,27 @@ safe, so the pause is not optional.
 
 ## Log
 
+- 2026-09-15T16:04+08:00 — Both claims that needed two running stacks are now
+  run rather than reasoned. Two suites at once, one against Postgres 5432 and
+  one against 5435: 119 files each, 2075 and 2070 tests, 56 seconds each, and no
+  "too many clients". Then `pnpm dev` in the probe worktree, with nothing on
+  3000: `/api/health` answered on 3003 directly and through the UI on 5176, so
+  the proxy reached its own worktree's API and could not have reached another's.
+  One box stays open — whether an editor lists the worktrees — because only the
+  owner can see it.
+- 2026-09-15T15:41+08:00 — Ran end to end, and the first run found the gap the
+  acceptance had left open. The allocator asked which slots this repository's
+  worktrees held and never whether the ports were free, so it chose slot 1 on a
+  machine where two unrelated projects hold 5433 and 5434. Docker refused the
+  port after the folder and the branch had been made. `pickSlot` now takes the
+  busy ports as well, found by binding each candidate. The second run took slot
+  3 and copied the database exactly: 30 tables, 31 monitors and 3140 posts on
+  both sides, under the same encryption key.
+- 2026-09-15T15:38+08:00 — The pause step ran against the copy and reported
+  `UPDATE 0`, because every monitor in the main database was already paused. The
+  run therefore proves the step executes and not what it does. What it does is
+  proved by `worker/copied-database.test.ts`, which creates two running monitors
+  and asserts `findDueMonitors` returns none afterwards.
 - 2026-09-15T15:10+08:00 — The owner asked for the worktrees to sit inside the
   main checkout rather than beside it, so that one editor window shows every
   agent's changes in one source-control view. The location changed, and with it

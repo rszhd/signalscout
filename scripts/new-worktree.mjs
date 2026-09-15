@@ -23,6 +23,7 @@
  */
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { createServer } from "node:net";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { readEnvFile } from "./init-env.mjs";
@@ -55,18 +56,59 @@ export function slotPorts(slot) {
 }
 
 /**
- * The lowest slot nobody holds, and never the main checkout's.
+ * The lowest slot nobody holds and nothing else on the machine is listening on.
+ *
+ * Two questions, not one. A slot another worktree wrote in its `.env` is taken
+ * even if its container is stopped, because starting that worktree must not
+ * collide. And a slot whose ports are held by something outside this repository
+ * is equally unusable — this machine already ran two unrelated projects on 5433
+ * and 5434, and the worktree only found out when Docker refused to publish the
+ * port, after the folder and its branch had been made.
  *
  * A removed worktree releases its number and the next call offers it again.
  * That is wanted — worktrees come and go all day — and it is why the container
  * and the volume must be removed with the worktree rather than left behind.
  */
-export function pickSlot(usedSlots) {
+export function pickSlot(usedSlots, busyPorts = new Set()) {
   const taken = new Set(usedSlots);
   for (let slot = MAIN_SLOT + 1; slot < 1000; slot += 1) {
-    if (!taken.has(slot)) return slot;
+    if (taken.has(slot)) continue;
+    if (Object.values(slotPorts(slot)).some((port) => busyPorts.has(port))) continue;
+    return slot;
   }
   throw new Error("no free worktree slot below 1000");
+}
+
+/** Every port a slot in `slots` would publish, for asking what is already busy. */
+export function portsForSlots(slots) {
+  return slots.flatMap((slot) => Object.values(slotPorts(slot)));
+}
+
+/**
+ * Which of these ports something is already listening on.
+ *
+ * Asked by binding rather than by reading a tool's output, because the thing in
+ * the way is usually Docker publishing a port for another project, and a bind
+ * is the same question the Docker daemon is about to ask.
+ */
+export async function probeBusyPorts(ports) {
+  const busy = new Set();
+
+  await Promise.all(
+    ports.map(
+      (port) =>
+        new Promise((resolve) => {
+          const server = createServer();
+          server.once("error", () => {
+            busy.add(port);
+            resolve();
+          });
+          server.listen(port, "127.0.0.1", () => server.close(() => resolve()));
+        }),
+    ),
+  );
+
+  return busy;
 }
 
 /** Read the slot each worktree wrote into its own `.env`. */
@@ -245,7 +287,9 @@ async function main() {
   }
 
   const target = resolve(main, WORKTREE_DIR, name);
-  const slot = pickSlot(usedSlotsFrom(worktreePaths().map((path) => readEnvFile(`${path}/.env`))));
+  const used = usedSlotsFrom(worktreePaths().map((path) => readEnvFile(`${path}/.env`)));
+  const candidates = Array.from({ length: 64 }, (_, index) => MAIN_SLOT + 1 + index);
+  const slot = pickSlot(used, await probeBusyPorts(portsForSlots(candidates)));
   const ports = slotPorts(slot);
   const project = composeProjectName(name);
   const mainEnv = readEnvFile(mainEnvPath);

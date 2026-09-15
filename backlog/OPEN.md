@@ -2,7 +2,7 @@
 
 # Open tickets
 
-32 open — 14 doing, 17 todo, 1 parked (11 p1, 17 p2, 4 p3).
+35 open — 14 doing, 20 todo, 1 parked (14 p1, 17 p2, 4 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -17,6 +17,9 @@
 | p1 | BUG-016 | [One platform's outage throws away another platform's collection](doing/BUG-016-one-platforms-outage-throws-away-another-platforms-collection.md) | bug | doing | 2026-09-10T10:44+08:00 |
 | p1 | US-033 | [Thirty verdicts say whether the score is right](todo/US-033-thirty-verdicts-say-whether-the-score-is-right.md) | chore | todo | 2026-09-06T03:02+08:00 |
 | p1 | US-131 | [Checkout offers the plan that includes the keys](todo/US-131-checkout-offers-the-plan-that-includes-the-keys.md) | feature | todo | 2026-09-13T13:05+08:00 |
+| p1 | US-132 | [The deployment chooses the model and the provider on the lent-keys plan](todo/US-132-the-deployment-chooses-the-model-and-the-provider-on-the-lent-keys-plan.md) | feature | todo | 2026-09-13T19:52+08:00 |
+| p1 | US-133 | [The lent-keys plan sells capacity, not an allowance](todo/US-133-the-lent-keys-plan-sells-capacity-not-an-allowance.md) | feature | todo | 2026-09-13T20:02+08:00 |
+| p1 | US-134 | [One plan at $35, with or without your own keys](todo/US-134-one-plan-at-35-dollars-with-or-without-your-own-keys.md) | feature | todo | 2026-09-13T20:38+08:00 |
 | p2 | US-015 | [A deleted post stops being shown](doing/US-015-a-deleted-post-stops-being-shown.md) | feature | doing | 2026-09-04T22:49+08:00 |
 | p2 | US-017 | [A self-hosted instance has one account](doing/US-017-a-self-hosted-instance-has-one-account.md) | feature | doing | 2026-09-04T22:49+08:00 |
 | p2 | US-020 | [A monitor can include comments and replies](doing/US-020-a-monitor-can-include-comments-and-replies.md) | feature | doing | 2026-09-05T01:18+08:00 |

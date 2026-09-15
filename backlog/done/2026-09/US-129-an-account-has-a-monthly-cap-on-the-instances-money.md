@@ -310,3 +310,11 @@ the first month of real accounts, not before.
   One thing found and left alone: `apps/web/src/index.css` fails stylelint on
   `.product-note` — `margin-top: 29px`, against the spacing scale. It predates
   this work and is nothing to do with billing.
+
+- 2026-09-13T20:04+08:00 — **Amended by US-133, and the cap itself stands.** The
+  first person to read the billing page saw a $49 plan telling them their
+  included usage is $15, which is this cap — a fuse for the deployment — printed
+  as a customer allowance. What that ticket changes is who the number is for: it
+  stops appearing on any screen, it rises above the capacity the plan sells, and
+  the plan is limited by monitors, queries and a schedule floor instead. Nothing
+  here was wrong for its own purpose. It was shown to the wrong person.

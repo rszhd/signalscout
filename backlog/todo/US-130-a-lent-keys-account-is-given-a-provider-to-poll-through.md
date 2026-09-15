@@ -51,8 +51,9 @@ question here is only what happens when nobody has.
 - [ ] An account spending its own keys is unaffected: US-026's refusal stands,
       because choosing for them spends their money at an account they did not
       pick
-- [ ] A recorded choice still wins. The deployment's answer is a default, not an
-      override
+- [ ] A recorded choice still wins for an account spending its own keys. The
+      deployment's answer is a default there, not an override. On the plan that
+      lends the keys the deployment's answer is the only one — US-132
 - [ ] A named provider this build cannot run, or one that does not fetch the
       platform, is refused at boot rather than at a poll
 - [ ] With signup closed nothing changes
@@ -81,3 +82,9 @@ question here is only what happens when nobody has.
 - 2026-09-13T12:24+08:00 — Written. Found while recommending which providers a
   lent-keys instance should hold: the cheapest set is four keys, and four keys
   make four platforms ambiguous for every account on the plan.
+
+- 2026-09-13T19:56+08:00 — Amended by US-132. The owner decided that an account
+  on the lent-keys plan does not choose its provider at all, so the default this
+  ticket adds is the whole answer there rather than a value a person may
+  replace. The refusal that makes it so is US-132's; what stays here is the
+  deployment naming the provider, which that ticket needs.

@@ -69,11 +69,23 @@ configured to offer the swap is a Stripe dashboard setting, not code.
   obvious next step for it, and US-072 recorded why nobody has: paying through
   Checkout means typing a card into a hosted form.
 - The price ids used for the live run are in US-128's Log. The test-mode
-  keys-included price is $49.00 a month.
+  keys-included price is $49.00 a month, and US-134 replaces it with a new price
+  object at $35.00. A Stripe price cannot be edited.
 - `STRIPE_PRICE_ID_KEYS_INCLUDED` is not in any `.env` yet. Nothing is for sale
   until it is, whatever this ticket builds.
+- There is one lent-keys plan — US-134. So this deployment names two prices, and
+  Checkout takes which of them is being bought rather than defaulting. A price it
+  was never told about is refused.
+- What the button says the plan is comes from US-133: monitors, queries, a
+  schedule and a platform list, never a figure in dollars of included usage. Do
+  not write that copy twice — Checkout, the billing page and Stripe's own
+  product description all state the same capacity.
 
 ## Log
 
 - 2026-09-13T13:05+08:00 — Written as US-128 and US-129 closed. Selling the plan
   was deliberately held back until the cap existed; it exists.
+
+- 2026-09-15T13:43+08:00 — Corrected a note that said US-134 carries three
+  plans. It carried three for 26 minutes on 2026-09-13 and has carried one
+  since.

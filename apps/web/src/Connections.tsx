@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { Link } from "react-router";
 import { messageFor, requestJson } from "./api.js";
 import { BrandIcon } from "./BrandIcon.js";
 import { Button } from "./components/Button.js";
 import { Dialog } from "./components/Dialog.js";
+import { paths } from "./route.js";
 
 /**
  * Where a provider key is pasted, tested and stored.
@@ -95,16 +97,12 @@ interface Answer {
   text: string;
 }
 
-function ConnectionsHeader({ lentKeys = false }: { lentKeys?: boolean }) {
+function ConnectionsHeader() {
   return (
     <header className="topbar">
       <div>
-        <h1>Connections</h1>
-        <p className="page-subtitle">
-          {lentKeys
-            ? "Where your conversations come from. Your plan includes these."
-            : "Connect your accounts. Choose where conversations come from."}
-        </p>
+        <h1>Data &amp; AI setup</h1>
+        <p className="page-subtitle">Manage how SignalScout accesses social data and AI.</p>
       </div>
     </header>
   );
@@ -134,15 +132,35 @@ function origin(credential: CredentialView): string {
  */
 function KeySourceChoice({
   source,
+  connectedProviders,
+  providerCount,
   onChanged,
 }: {
   source: "instance" | "own";
+  connectedProviders: number;
+  providerCount: number;
   onChanged: (view: ConnectionsView) => void;
 }) {
+  const dialog = useRef<HTMLDialogElement>(null);
+  const [pending, setPending] = useState<"instance" | "own" | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function choose(next: "instance" | "own"): Promise<void> {
+  function ask(next: "instance" | "own"): void {
+    setPending(next);
+    setError(null);
+    dialog.current?.showModal();
+  }
+
+  function cancel(): void {
+    dialog.current?.close();
+    setError(null);
+    setPending(null);
+  }
+
+  async function choose(): Promise<void> {
+    const next = pending;
+    if (!next) return;
     if (next === source || busy) return;
 
     setBusy(true);
@@ -156,6 +174,8 @@ function KeySourceChoice({
           body: JSON.stringify({ source: next }),
         }),
       );
+      dialog.current?.close();
+      setPending(null);
     } catch (cause) {
       setError(messageFor(cause, "That could not be changed."));
     } finally {
@@ -163,55 +183,133 @@ function KeySourceChoice({
     }
   }
 
+  const current =
+    source === "instance"
+      ? {
+          title: "Managed by SignalScout",
+          description: "Included in your plan: data access and AI. You are ready to run.",
+          benefits: ["Data access included", "AI included in your plan", "No additional setup"],
+        }
+      : {
+          title: "Your own keys",
+          description: "Your connected services pay for data and AI usage directly.",
+          benefits: [
+            `${connectedProviders} of ${providerCount} provider accounts connected`,
+            "Your model keys stay in your account",
+            "No SignalScout capacity limit",
+          ],
+        };
+
+  const alternate =
+    source === "instance"
+      ? {
+          title: "Prefer your own service accounts?",
+          description: "Connect provider and model keys, then pay those services directly.",
+          action: "Set up my own keys",
+          source: "own" as const,
+        }
+      : {
+          title: "Want SignalScout to handle access?",
+          description: "Use the data and AI access included with your plan instead.",
+          action: "Use managed access",
+          source: "instance" as const,
+        };
+
   return (
-    <section className="connections-section" aria-labelledby="key-source-heading">
+    <section className="connections-section connections-mode" aria-labelledby="key-source-heading">
       <div className="connections-section-heading">
         <div>
-          <h2 id="key-source-heading">Whose keys this account runs on</h2>
-          <p>One or the other, never both. It takes effect on the next collection.</p>
+          <h2 id="key-source-heading">How SignalScout runs</h2>
+          <p>One setup applies to the whole account.</p>
         </div>
       </div>
 
-      <ul className="key-source-list">
-        {[
-          {
-            id: "instance" as const,
-            title: "SignalScout's keys",
-            what: "Included in your plan. Nothing to connect, and no second invoice.",
-            limit:
-              "Your plan sets how many searches you run and how often each platform is checked.",
-          },
-          {
-            id: "own" as const,
-            title: "Your own keys",
-            what: "Your provider and model accounts bill you directly.",
-            limit: "No limit from us. Every platform you watch needs a key of yours.",
-          },
-        ].map((choice) => (
-          <li key={choice.id}>
-            <label className="key-source-choice">
-              <input
-                type="radio"
-                name="key-source"
-                value={choice.id}
-                checked={source === choice.id}
-                disabled={busy}
-                onChange={() => void choose(choice.id)}
-              />
-              <span>
-                <strong>{choice.title}</strong>
-                <span>{choice.what}</span>
-                <span>{choice.limit}</span>
-              </span>
-            </label>
-          </li>
-        ))}
-      </ul>
-      {error && (
-        <p className="connections-error" role="alert">
-          {error}
-        </p>
-      )}
+      <div className="key-source-current-card">
+        <span className="key-source-icon" aria-hidden="true">
+          {source === "instance" ? (
+            <svg viewBox="0 0 24 24" fill="none">
+              <title>Managed access</title>
+              <path d="M7 10.5V8a5 5 0 0 1 10 0v2.5M6 10.5h12v9H6z" />
+              <path d="m9.5 15 1.5 1.5 3.5-3.5" />
+            </svg>
+          ) : (
+            <svg viewBox="0 0 24 24" fill="none">
+              <title>Own keys</title>
+              <path d="M14.5 5.5a4 4 0 1 1-5.66 5.66L4 16v4h4v-2h2v-2h2l.84-.84a4 4 0 0 1 1.66-9.66Z" />
+              <path d="M16.5 7.5h.01" />
+            </svg>
+          )}
+        </span>
+        <div className="key-source-current-copy">
+          <div className="key-source-current-heading">
+            <span className="key-source-eyebrow">Current setup</span>
+            <span className="key-source-active">Active</span>
+          </div>
+          <h3>{current.title}</h3>
+          <p>{current.description}</p>
+        </div>
+        <ul className="key-source-benefits">
+          {current.benefits.map((benefit) => (
+            <li key={benefit}>{benefit}</li>
+          ))}
+        </ul>
+      </div>
+
+      <div className="key-source-alternate">
+        <div>
+          <strong>{alternate.title}</strong>
+          <p>{alternate.description}</p>
+        </div>
+        <Button disabled={busy} onClick={() => ask(alternate.source)}>
+          {alternate.action}
+        </Button>
+      </div>
+      <Dialog
+        className="connection-dialog key-source-dialog"
+        titleId="key-source-dialog-title"
+        closeLabel="Close key source confirmation"
+        dialogRef={dialog}
+        onClose={() => {
+          setError(null);
+          setPending(null);
+        }}
+        heading={
+          <h2 id="key-source-dialog-title">
+            {pending === "own" ? "Use your own keys?" : "Use managed access?"}
+          </h2>
+        }
+      >
+        <div className="connection-editor key-source-confirmation">
+          {pending === "own" ? (
+            <>
+              <p>Your own accounts will pay for data and AI usage.</p>
+              <p className="key-source-consequence">
+                Monitors without the keys they need will pause until you connect them.
+              </p>
+            </>
+          ) : (
+            <>
+              <p>SignalScout will supply data and AI access within your plan's capacity.</p>
+              <p className="key-source-consequence">
+                Your saved keys stay here, but they will not be used.
+              </p>
+            </>
+          )}
+          {error && (
+            <p className="budget-error" role="alert">
+              {error}
+            </p>
+          )}
+        </div>
+        <footer className="connection-actions">
+          <Button aria-label="Cancel mode change" disabled={busy} onClick={cancel}>
+            Cancel
+          </Button>
+          <Button variant="primary" disabled={busy} onClick={() => void choose()}>
+            {pending === "own" ? "Switch to my own keys" : "Switch to managed access"}
+          </Button>
+        </footer>
+      </Dialog>
     </section>
   );
 }
@@ -600,7 +698,16 @@ function PlatformRow({
   );
 }
 
-export function Connections() {
+export function Connections({
+  onKeySourceChanged,
+  managedKeys,
+  canChooseKeySource = true,
+}: {
+  readonly onKeySourceChanged?: (source: "instance" | "own") => void;
+  /** False for self-hosted, where `instance` means the owner's own `.env`. */
+  readonly managedKeys?: boolean;
+  readonly canChooseKeySource?: boolean;
+} = {}) {
   const [view, setView] = useState<ConnectionsView | null>(null);
   const [state, setState] = useState<LoadState>("loading");
   const [error, setError] = useState<string | null>(null);
@@ -649,87 +756,124 @@ export function Connections() {
   // Only a platform the build fetches two ways has a question to answer. With
   // one provider there is nothing to choose, and a row saying so is furniture.
   const choosable = view.platforms.filter((platform) => platform.providers.length > 1);
+  const hidesOwnKeySetup = managedKeys ?? view.keySource === "instance";
+  const connectedProviders = view.providers.filter((provider) => provider.ready).length;
 
   return (
     <div className="product-page connections-page">
-      <ConnectionsHeader lentKeys={view.keySource === "instance"} />
+      <ConnectionsHeader />
 
       <div className="connections-content">
-        <KeySourceChoice source={view.keySource} onChanged={setView} />
-        <section className="connections-section" aria-labelledby="accounts-heading">
-          <div className="connections-section-heading">
-            <div>
-              <h2 id="accounts-heading">Provider accounts</h2>
-              <p>
-                One provider account can connect several platforms. Connect only the ones you need.
-              </p>
-            </div>
-            <span>
-              {view.providers.filter((provider) => provider.ready).length} of{" "}
-              {view.providers.length} connected
-            </span>
-          </div>
-          {!view.canStore && (
-            <div className="notice warning" role="status">
-              <strong>Key storage needs setup</strong>
-              <span>{view.storeBlocker}</span>
-            </div>
-          )}
-
-          <ul className="connection-list">
-            {view.providers.map((provider) => (
-              <ProviderCard
-                key={provider.id}
-                provider={provider}
-                canStore={view.canStore}
-                // The store and remove routes answer with the whole screen, so
-                // the rows under the cards and the card itself come back in one
-                // reply — the same contract the platform rows already used.
-                onChanged={setView}
-              />
-            ))}
-          </ul>
-
-          {view.providers.length === 0 && (
-            <div className="connections-empty" role="status">
-              <h3>No providers available</h3>
-              <p>This deployment has no provider accounts to configure.</p>
-            </div>
-          )}
-        </section>
-        {choosable.length > 0 && (
-          <section className="connections-section" aria-labelledby="platforms-heading">
-            <div className="connections-section-heading">
-              <div>
-                <h2 id="platforms-heading">Which provider fetches what</h2>
-                <p>
-                  Choose the account each platform uses. Changes apply to every monitor on its next
-                  collection.
-                </p>
-              </div>
-            </div>
-
-            <ul className="connection-list">
-              {choosable.map((platform) => (
-                <PlatformRow key={platform.id} platform={platform} onChanged={setView} />
-              ))}
-            </ul>
-            <p className="connections-footnote">
-              Collections already running finish with the provider that started them.
-            </p>
-          </section>
+        {canChooseKeySource && (
+          <KeySourceChoice
+            source={view.keySource}
+            connectedProviders={connectedProviders}
+            providerCount={view.providers.length}
+            onChanged={(updated) => {
+              setView(updated);
+              onKeySourceChanged?.(updated.keySource);
+            }}
+          />
         )}
-        <details className="disclosure connections-help">
-          <summary>How keys are stored</summary>
-          <p>
-            Saved keys are encrypted in this instance’s database. Only a masked hint is shown after
-            saving. Environment variables remain supported; each account lists the variable to set.
-          </p>
-          <p>
-            Connecting an account does not start a monitor. Choose platforms and a schedule when you
-            create one.
-          </p>
-        </details>
+        {!hidesOwnKeySetup && (
+          <>
+            <nav className="connections-own-actions" aria-label="Own key settings">
+              <Link className="connections-own-link" to={paths.models}>
+                <span className="connections-own-link-label">AI setup</span>
+                <strong>Manage AI models</strong>
+                <span>
+                  Choose the keys and models used for scoring, triage, embeddings and drafts.
+                </span>
+                <span className="connections-own-link-arrow" aria-hidden="true">
+                  →
+                </span>
+              </Link>
+              <Link className="connections-own-link" to={paths.providers}>
+                <span className="connections-own-link-label">Data access</span>
+                <strong>Compare providers</strong>
+                <span>Review cost, coverage and measured results before choosing a provider.</span>
+                <span className="connections-own-link-arrow" aria-hidden="true">
+                  →
+                </span>
+              </Link>
+            </nav>
+            <section className="connections-section" aria-labelledby="accounts-heading">
+              <div className="connections-section-heading">
+                <div>
+                  <h2 id="accounts-heading">Provider accounts</h2>
+                  <p>
+                    One provider account can connect several platforms. Connect only the ones you
+                    need.
+                  </p>
+                </div>
+                <span>
+                  {connectedProviders} of {view.providers.length} connected
+                </span>
+              </div>
+              {!view.canStore && (
+                <div className="notice warning" role="status">
+                  <strong>Key storage needs setup</strong>
+                  <span>{view.storeBlocker}</span>
+                </div>
+              )}
+
+              <ul className="connection-list">
+                {view.providers.map((provider) => (
+                  <ProviderCard
+                    key={provider.id}
+                    provider={provider}
+                    canStore={view.canStore}
+                    // The store and remove routes answer with the whole screen, so
+                    // the rows under the cards and the card itself come back in one
+                    // reply — the same contract the platform rows already used.
+                    onChanged={setView}
+                  />
+                ))}
+              </ul>
+
+              {view.providers.length === 0 && (
+                <div className="connections-empty" role="status">
+                  <h3>No providers available</h3>
+                  <p>This deployment has no provider accounts to configure.</p>
+                </div>
+              )}
+            </section>
+            {choosable.length > 0 && (
+              <section className="connections-section" aria-labelledby="platforms-heading">
+                <div className="connections-section-heading">
+                  <div>
+                    <h2 id="platforms-heading">Which provider fetches what</h2>
+                    <p>
+                      Choose the account each platform uses. Changes apply to every monitor on its
+                      next collection.
+                    </p>
+                  </div>
+                </div>
+
+                <ul className="connection-list">
+                  {choosable.map((platform) => (
+                    <PlatformRow key={platform.id} platform={platform} onChanged={setView} />
+                  ))}
+                </ul>
+                <p className="connections-footnote">
+                  Collections already running finish with the provider that started them.
+                </p>
+              </section>
+            )}
+            <details className="disclosure connections-help">
+              <summary>How keys are stored</summary>
+              <p>
+                Saved keys are encrypted in this instance’s database. Only a masked hint is shown
+                after saving. Environment variables remain supported; each account lists the
+                variable to set.
+              </p>
+              <p>
+                Connecting an account does not start a monitor. Choose platforms and a schedule when
+                you create one.
+              </p>
+            </details>
+          </>
+        )}
       </div>
     </div>
   );

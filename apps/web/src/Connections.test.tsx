@@ -76,7 +76,9 @@ function connections(overrides: Record<string, unknown> = {}) {
   return {
     canStore: true,
     storeBlocker: null,
-    keySource: "instance",
+    // Most cases in this file exercise credential controls, which only belong
+    // to an account that has chosen to bring its own keys. US-143.
+    keySource: "own",
     providers: [brightData()],
     platforms: [reddit()],
     ...overrides,
@@ -587,28 +589,29 @@ describe("the connections screen", () => {
    * would mean pasting a Reddit key silently changed what happened to X.
    */
   describe("whose keys this account runs on", () => {
-    it("shows the state, and both halves of the trade", async () => {
+    it("shows the state and no implementation detail on managed keys", async () => {
       await show(connections({ keySource: "instance" }));
 
-      const chosen = [...container.querySelectorAll("input[name=key-source]")].filter(
-        (input) => (input as HTMLInputElement).checked,
-      );
-
-      expect((chosen[0] as HTMLInputElement).value).toBe("instance");
+      expect(container.textContent).toContain("Current setup");
+      expect(container.textContent).toContain("Managed by SignalScout");
       expect(container.textContent).toContain("Included in your plan");
-      expect(container.textContent).toContain("No limit from us");
+      expect(container.textContent).toContain("No additional setup");
+      expect(container.textContent).not.toContain("Bright Data");
+      expect(container.textContent).not.toContain("Provider accounts");
+      expect(container.querySelector("input[type=password], input[type=text]")).toBeNull();
     });
 
-    it("sends the choice and redraws from the reply", async () => {
+    it("confirms before it sends the choice, then redraws from the reply", async () => {
       await show(connections({ keySource: "instance" }), {
         "PUT /api/connections/key-source": () => json(connections({ keySource: "own" })),
       });
 
-      const own = [...container.querySelectorAll("input[name=key-source]")].find(
-        (input) => (input as HTMLInputElement).value === "own",
-      ) as HTMLInputElement;
+      await act(async () => button("Set up my own keys").click());
 
-      await act(async () => own.click());
+      expect(calls.filter((call) => call.method === "PUT")).toEqual([]);
+      expect(container.querySelector<HTMLDialogElement>("dialog")?.open).toBe(true);
+
+      await act(async () => button("Switch to my own keys").click());
 
       expect(calls).toContainEqual({
         url: "/api/connections/key-source",
@@ -616,23 +619,60 @@ describe("the connections screen", () => {
         body: JSON.stringify({ source: "own" }),
       });
 
-      const chosen = [...container.querySelectorAll("input[name=key-source]")].filter(
-        (input) => (input as HTMLInputElement).checked,
-      );
-      expect((chosen[0] as HTMLInputElement).value).toBe("own");
+      expect(container.textContent).toContain("Provider accounts");
+      expect(container.textContent).toContain("Bright Data");
     });
 
-    /**
-     * The controls stay, both ways. US-132 took them away from an account on
-     * our keys and US-141 gave them back: a key somebody pastes is theirs, and
-     * the switch is what decides whether it is the one that runs.
-     */
-    it("keeps every control whichever state the account is in", async () => {
-      for (const source of ["instance", "own"] as const) {
-        await show(connections({ keySource: source }));
-        expect(container.textContent).toContain("Provider accounts");
-        expect(container.querySelector("input[type=password], input[type=text]")).not.toBeNull();
-      }
+    it("puts provider and model detail behind the own-keys choice", async () => {
+      await show(
+        connections({
+          keySource: "own",
+          providers: [brightData({ ready: true }), scrapeCreators()],
+        }),
+      );
+
+      expect(container.textContent).toContain("1 of 2 provider accounts connected");
+      expect(container.textContent).toContain("Provider accounts");
+      expect(container.querySelector('a[href="/providers"]')?.textContent).toContain(
+        "Compare providers",
+      );
+      expect(container.querySelector('a[href="/providers"]')?.textContent).toContain(
+        "cost, coverage and measured results",
+      );
+      expect(container.querySelector('a[href="/models"]')?.textContent).toContain(
+        "Manage AI models",
+      );
+      expect(container.querySelector('a[href="/models"]')?.textContent).toContain(
+        "scoring, triage, embeddings and drafts",
+      );
+    });
+
+    it("closes the confirmation without changing anything", async () => {
+      await show(connections({ keySource: "instance" }));
+
+      await act(async () => button("Set up my own keys").click());
+      await act(async () => button("Cancel mode change").click());
+
+      expect(calls.filter((call) => call.method === "PUT")).toEqual([]);
+      expect(container.querySelector<HTMLDialogElement>("dialog")?.open).toBe(false);
+    });
+
+    it("confirms before returning to managed access", async () => {
+      await show(connections({ keySource: "own" }), {
+        "PUT /api/connections/key-source": () => json(connections({ keySource: "instance" })),
+      });
+
+      await act(async () => button("Use managed access").click());
+      expect(calls.filter((call) => call.method === "PUT")).toEqual([]);
+
+      await act(async () => button("Switch to managed access").click());
+
+      expect(calls).toContainEqual({
+        url: "/api/connections/key-source",
+        method: "PUT",
+        body: JSON.stringify({ source: "instance" }),
+      });
+      expect(container.textContent).not.toContain("Bright Data");
     });
   });
 });

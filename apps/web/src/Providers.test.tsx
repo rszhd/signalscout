@@ -106,6 +106,14 @@ async function show(body: unknown) {
 }
 
 describe("comparing two providers for one platform", () => {
+  it("returns to the setup screen in the words its navigation uses", async () => {
+    await show(view());
+
+    expect(screen.container.querySelector('a[href="/connections"]')?.textContent).toContain(
+      "Back to Data & AI setup",
+    );
+  });
+
   it("shows both, so the comparison is on one screen", async () => {
     await show(view());
 
@@ -317,7 +325,7 @@ describe("while it is loading", () => {
     vi.spyOn(globalThis, "fetch").mockReturnValue(new Promise(() => {}) as Promise<Response>);
     screen = await mount(<Providers />);
 
-    expect(text()).toContain("Providers");
+    expect(text()).toContain("Compare providers");
   });
 });
 

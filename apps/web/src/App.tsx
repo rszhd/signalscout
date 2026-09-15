@@ -334,6 +334,11 @@ export function App() {
     );
   }
 
+  // Null means the setup read failed. It is not evidence that the account is
+  // managed, so links and routes stay available in that case. US-143.
+  const keySource = setup.views?.connections.keySource ?? null;
+  const managedKeys = status.billingMode === "stripe" && keySource === "instance";
+
   /**
    * The whole table, and the guard that does not depend on any link. US-045.
    *
@@ -350,7 +355,9 @@ export function App() {
    */
   return (
     <Routes>
-      <Route element={<Shell status={status} billingState={billingState} />}>
+      <Route
+        element={<Shell status={status} billingState={billingState} managedKeys={managedKeys} />}
+      >
         <Route path={routes.projects} element={<Projects />} />
         {/*
           The project editor's own address. US-045's editor used to be a state
@@ -365,10 +372,30 @@ export function App() {
         <Route path={routes.newMonitor} element={<MonitorFormRoute />} />
         <Route path={routes.monitor} element={<MonitorRoute />} />
         <Route path={routes.notifications} element={<NotificationsRoute />} />
-        <Route path={routes.connections} element={<Connections />} />
-        <Route path={routes.providers} element={<Providers />} />
+        <Route
+          path={routes.connections}
+          element={
+            <Connections
+              managedKeys={managedKeys}
+              canChooseKeySource={status.billingMode === "stripe"}
+              onKeySourceChanged={(source) => {
+                if (!setup.views) return;
+                setup.replace({
+                  connections: { ...setup.views.connections, keySource: source },
+                });
+              }}
+            />
+          }
+        />
+        <Route
+          path={routes.providers}
+          element={managedKeys ? <Navigate replace to={paths.connections} /> : <Providers />}
+        />
         <Route path={routes.replyVoices} element={<ReplyVoices />} />
-        <Route path={routes.models} element={<Models />} />
+        <Route
+          path={routes.models}
+          element={managedKeys ? <Navigate replace to={paths.connections} /> : <Models />}
+        />
         {/*
           Only where this instance charges. US-072. A self-hosted instance has
           no subscription, so the route is not registered at all and the
@@ -504,9 +531,11 @@ function NavIcon({ name }: { readonly name: NavIconName }) {
 function Shell({
   status,
   billingState,
+  managedKeys,
 }: {
   readonly status: AuthStatus;
   readonly billingState: BillingState | null;
+  readonly managedKeys: boolean;
 }) {
   const projectId = useProjectId();
   const listing = useMatch(routes.monitors) !== null;
@@ -519,6 +548,7 @@ function Shell({
   const editingProject = useMatch(routes.editProject) !== null;
   const projecting = listingProjects || addingProject || editingProject;
   const comparing = useMatch(routes.providers) !== null;
+  const connecting = useMatch(routes.connections) !== null;
   const voicing = useMatch(routes.replyVoices) !== null;
   const modelling = useMatch(routes.models) !== null;
   const billing = useMatch(routes.billing) !== null;
@@ -526,10 +556,16 @@ function Shell({
 
   const accountLinks = (
     <>
-      <Link className={comparing ? "nav-item current" : "nav-item"} to={paths.providers}>
+      <Link className={connecting ? "nav-item current" : "nav-item"} to={paths.connections}>
         <NavIcon name="providers" />
-        <span>Providers</span>
+        <span>Data &amp; AI</span>
       </Link>
+      {!managedKeys && (
+        <Link className={comparing ? "nav-item current" : "nav-item"} to={paths.providers}>
+          <NavIcon name="providers" />
+          <span>Compare providers</span>
+        </Link>
+      )}
       <Link className={voicing ? "nav-item current" : "nav-item"} to={paths.replyVoices}>
         <NavIcon name="voices" />
         <span>Voices</span>
@@ -538,10 +574,12 @@ function Shell({
         Beside Providers rather than inside a project: a model key is one
         account's, for every project it runs. US-068.
       */}
-      <Link className={modelling ? "nav-item current" : "nav-item"} to={paths.models}>
-        <NavIcon name="models" />
-        <span>Models</span>
-      </Link>
+      {!managedKeys && (
+        <Link className={modelling ? "nav-item current" : "nav-item"} to={paths.models}>
+          <NavIcon name="models" />
+          <span>AI models</span>
+        </Link>
+      )}
       {/*
         Only where this instance charges. US-072. A self-hosted instance
         has no subscription, so a Billing link there would open a page

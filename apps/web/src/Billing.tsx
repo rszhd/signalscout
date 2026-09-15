@@ -28,8 +28,8 @@ export interface BillingState {
   trialDays: number;
   /** What Stripe charges, or null when it could not be read. BUG-014. */
   price: { amount: number; currency: string; interval: string | null } | null;
-  /** Whose keys this account's monitors spend. US-128. */
-  plan: "own_keys" | "keys_included";
+  /** Whose keys this account's monitors spend. US-141. */
+  keySource: "instance" | "own";
   /**
    * What this plan sells. US-133.
    *
@@ -399,7 +399,7 @@ export function Billing() {
                 <p className="billing-price-note">
                   {state.mode === "off"
                     ? "No application subscription."
-                    : state.plan === "keys_included"
+                    : state.keySource === "instance"
                       ? "Hosting, provider usage and the model, all included."
                       : "Hosting included. Provider usage billed separately."}
                 </p>
@@ -407,7 +407,7 @@ export function Billing() {
                   <h3>
                     {state.mode === "off"
                       ? "Included in the application"
-                      : state.plan === "keys_included"
+                      : state.keySource === "instance"
                         ? "We take care of the keys as well"
                         : "We take care of the hosting"}
                   </h3>
@@ -418,7 +418,7 @@ export function Billing() {
                           "Scheduled monitoring and your intent inbox",
                           "Your own social data and AI connections",
                         ]
-                      : state.plan === "keys_included"
+                      : state.keySource === "instance"
                         ? [
                             "Social data and AI keys included — nothing to set up",
                             // What the plan actually carries, from the same
@@ -528,28 +528,27 @@ export function Billing() {
             <section className="billing-usage" aria-labelledby="billing-usage-title">
               <div>
                 <p className="billing-eyebrow">
-                  {state.plan === "keys_included" ? "Keys included" : "Bring your own keys"}
+                  {state.keySource === "instance" ? "Managed access" : "Your own keys"}
                 </p>
                 <h2 id="billing-usage-title">
-                  {state.plan === "keys_included"
+                  {state.keySource === "instance"
                     ? "Your provider usage is included"
                     : "Your provider usage is separate"}
                 </h2>
                 <p>
-                  {state.plan === "keys_included"
+                  {state.keySource === "instance"
                     ? "Social data and AI run on our keys, within what your plan includes. There is nothing to connect, nothing to choose and no second invoice."
                     : "Social data and AI providers bill your accounts directly. Their usage is separate from your SignalScout subscription."}
                 </p>
                 <Link className="secondary-button" to={paths.connections}>
-                  {state.plan === "keys_included" ? "See connections" : "Manage connections"}{" "}
-                  <span aria-hidden="true">↗</span>
+                  Change how SignalScout runs <span aria-hidden="true">↗</span>
                 </Link>
               </div>
               <dl>
                 <div>
                   <dt>Social data</dt>
                   <dd>
-                    {state.plan === "keys_included"
+                    {state.keySource === "instance"
                       ? "Searches and conversations collected through our providers."
                       : "Searches and conversations collected through your connected providers."}
                   </dd>
@@ -557,14 +556,14 @@ export function Billing() {
                 <div>
                   <dt>AI models</dt>
                   <dd>
-                    {state.plan === "keys_included"
+                    {state.keySource === "instance"
                       ? "Classification, embeddings and reply drafts on our model keys."
                       : "Classification, embeddings and reply drafts using your model provider keys."}
                   </dd>
                 </div>
                 <div>
                   <dt>
-                    {state.plan === "keys_included"
+                    {state.keySource === "instance"
                       ? "What your plan watches"
                       : "You control the budget"}
                   </dt>
@@ -576,7 +575,7 @@ export function Billing() {
                       says what a person may still change, which is what they
                       are watching for and where.
                     */}
-                    {state.plan === "keys_included"
+                    {state.keySource === "instance"
                       ? "Your searches and platforms are yours to change. How often each platform is checked is part of the plan."
                       : "Set a monthly spending cap for each monitor in its settings."}
                   </dd>

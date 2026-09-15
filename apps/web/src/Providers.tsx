@@ -101,13 +101,13 @@ function ProvidersHeader() {
   return (
     <header className="topbar">
       <div>
-        <h1>Providers</h1>
+        <h1>Compare providers</h1>
         <p className="page-subtitle">
           Compare cost, coverage, and the results each provider has delivered here.
         </p>
       </div>
       <Link className="top-secondary-link" to={paths.connections}>
-        Manage connections
+        Back to Data &amp; AI setup
       </Link>
     </header>
   );

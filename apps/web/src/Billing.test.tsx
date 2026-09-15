@@ -31,9 +31,7 @@ function state(overrides: Partial<BillingState> = {}): BillingState {
     hasBillingAccount: false,
     trialDays: 7,
     price: { amount: 2000, currency: "usd", interval: "month" },
-    // US-128's default, and it is the one every account had before the second
-    // plan existed: the person brings their own keys.
-    plan: "own_keys",
+    keySource: "own",
     included: null,
     ...overrides,
   };
@@ -225,7 +223,7 @@ describe("the billing screen", () => {
           reason: "subscribed",
           status: "active",
           hasBillingAccount: true,
-          plan: "keys_included",
+          keySource: "instance",
           included: soldCapacity,
         }),
       ),
@@ -243,7 +241,9 @@ describe("the billing screen", () => {
     expect(text).toContain("Instagram checked twice a day");
     expect(text).toContain("Posts, not comment threads");
     expect(text).toContain("Your provider usage is included");
+    expect(text).toContain("Change how SignalScout runs");
     expect(text).not.toContain("Your provider usage is separate");
+    expect(text).not.toContain("See connections");
 
     // The fuse is the deployment's, and no figure from it reaches this page.
     expect(text).not.toContain("$15");
@@ -258,7 +258,7 @@ describe("the billing screen", () => {
           reason: "subscribed",
           status: "active",
           hasBillingAccount: true,
-          plan: "keys_included",
+          keySource: "instance",
           included: { ...soldCapacity, paused: true },
         }),
       ),
@@ -285,7 +285,7 @@ describe("the billing screen", () => {
           reason: "subscribed",
           status: "active",
           hasBillingAccount: true,
-          plan: "keys_included",
+          keySource: "instance",
           included: soldCapacity,
         }),
       ),

@@ -62,7 +62,7 @@ describe("the application screens", () => {
       trialDaysLeft: 7,
       trialEndsAt: "2026-09-15T00:00:00.000Z",
       currentPeriodEnd: null,
-      plan: "own_keys",
+      keySource: "own",
       included: null,
       cancelAtPeriodEnd: false,
       hasBillingAccount: false,
@@ -135,6 +135,7 @@ describe("the application screens", () => {
         return json({
           canStore: true,
           storeBlocker: null,
+          keySource: onOwnKeys ? "own" : "instance",
           pricedModels: {},
           unpricedModels: {},
           embeddingModels: {},
@@ -286,9 +287,9 @@ describe("the application screens", () => {
 
     await screen.go("/connections");
 
-    expect(screen.container.textContent).toContain("Connections");
+    expect(screen.container.textContent).toContain("Data & AI setup");
     expect(screen.container.querySelector('.site-nav a[href="/connections"]')).toBeNull();
-    expect(screen.container.querySelector('.account-nav a[href="/connections"]')).toBeNull();
+    expect(screen.container.querySelector('.account-nav a[href="/connections"]')).not.toBeNull();
   });
 
   /**
@@ -316,7 +317,7 @@ describe("the application screens", () => {
     // are machine-level screens — one set of keys, one set of prices, every
     // project — so neither carries one. US-058.
     expect(projectLinks).toEqual(["/projects"]);
-    expect(accountLinks).toEqual(["/providers", "/reply-voices", "/models"]);
+    expect(accountLinks).toEqual(["/connections", "/providers", "/reply-voices", "/models"]);
   });
 
   /**
@@ -484,11 +485,11 @@ describe("the application screens", () => {
     const accountLinks = [
       ...screen.container.querySelectorAll(".sidebar-bottom .account-nav a"),
     ].map((link) => link.getAttribute("href"));
-    // Connections is gone from the menu and the account screens sit together.
-    // Settings is still a mockup route and must stay off the nav: a link that
-    // leads nowhere is worse than no link.
+    // Data & AI setup now owns the key-source choice. Settings is still a
+    // mockup route and must stay off the nav: a link that leads nowhere is
+    // worse than no link.
     expect(projectLinks).toEqual(["/projects", inbox, monitors, newMonitor]);
-    expect(accountLinks).toEqual(["/providers", "/reply-voices", "/models"]);
+    expect(accountLinks).toEqual(["/connections", "/providers", "/reply-voices", "/models"]);
     expect(screen.container.textContent).not.toContain("Settings");
   });
 
@@ -513,7 +514,7 @@ describe("the application screens", () => {
       link.getAttribute("href"),
     );
 
-    expect(sheetLinks).toEqual(["/providers", "/reply-voices", "/models"]);
+    expect(sheetLinks).toEqual(["/connections", "/providers", "/reply-voices", "/models"]);
     expect(screen.container.querySelector(".account-sheet .sign-out")).not.toBeNull();
   });
 
@@ -546,6 +547,49 @@ describe("the application screens", () => {
     screen = await mount(<App />, "/billing");
 
     expect(screen.path()).toBe("/projects");
+  });
+
+  it("hides provider and model screens while this account uses managed keys", async () => {
+    onOwnKeys = false;
+    billingMode = "stripe";
+    billingState = { ...billingState, keySource: "instance" };
+    screen = await mount(<App />, "/projects");
+
+    const accountLinks = [
+      ...screen.container.querySelectorAll(".sidebar-bottom .account-nav a"),
+    ].map((link) => link.getAttribute("href"));
+    expect(accountLinks).toEqual(["/connections", "/reply-voices", "/billing"]);
+
+    await screen.go("/providers");
+    expect(screen.path()).toBe("/connections");
+    expect(screen.container.textContent).toContain("Managed by SignalScout");
+
+    await screen.go("/models");
+    expect(screen.path()).toBe("/connections");
+  });
+
+  it("keeps self-hosted key controls when its own environment is the instance", async () => {
+    onOwnKeys = false;
+    screen = await mount(<App />, "/projects");
+
+    const accountLinks = [
+      ...screen.container.querySelectorAll(".sidebar-bottom .account-nav a"),
+    ].map((link) => link.getAttribute("href"));
+    expect(accountLinks).toEqual(["/connections", "/providers", "/reply-voices", "/models"]);
+
+    await screen.go("/connections");
+    expect(screen.container.textContent).toContain("Provider accounts");
+    expect(screen.container.textContent).not.toContain("How SignalScout runs");
+  });
+
+  it("keeps provider and model screens available when key-source setup was unreadable", async () => {
+    setupReadable = false;
+    screen = await mount(<App />, "/projects");
+
+    const accountLinks = [
+      ...screen.container.querySelectorAll(".sidebar-bottom .account-nav a"),
+    ].map((link) => link.getAttribute("href"));
+    expect(accountLinks).toEqual(["/connections", "/providers", "/reply-voices", "/models"]);
   });
 
   it("opens account-level reply voices without asking for a project", async () => {
@@ -593,6 +637,7 @@ describe("the application screens", () => {
     return {
       canStore: true,
       storeBlocker: null,
+      keySource: "own",
       pricedModels: {},
       unpricedModels: {},
       embeddingModels: {},

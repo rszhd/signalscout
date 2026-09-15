@@ -139,17 +139,31 @@ plan is marked stale. Creation is always an explicit final action.
 
 ## Connections
 
-Connections lists provider accounts as compact rows. Each row names the
-platforms, configuration status and masked key origin. Connect or Manage opens
-a native dialog for testing, pasting, replacing and removing keys. Opening a
-dialog makes no API call. Responses appear inside the dialog, and editing a key
-clears the previous test result. Close and Escape dismiss the dialog and return
-focus to its trigger.
+Connections is headed **Data & AI setup**. On a hosted account it first asks
+who supplies that access. The current mode is one dominant status card. It
+summarizes readiness, while the other mode is a quieter action underneath it.
+Managed access names no providers, key fields or model settings. Moving modes
+requires a native confirmation dialog with Cancel beside the switch action;
+stored keys are not removed when managed access is chosen.
+
+An account using its own keys lists provider accounts as compact rows. Each row
+names the platforms, configuration status and masked key origin. Connect or
+Manage opens a native dialog for testing, pasting, replacing and removing keys.
+Opening a dialog makes no API call. Responses appear inside the dialog, and
+editing a key clears the previous test result. Close and Escape dismiss the
+dialog and return focus to its trigger. Models and the detailed provider
+comparison use separate explanatory cards beside this setup and are absent on
+managed access.
 
 Platform choices are separate from accounts. Change opens a dialog with the
 available providers and any blocker. Keep the server’s provider selection rules,
 environment-key fallback and test-before-save behavior intact.
 `styles/connections.css` owns this page layout and uses the shared theme.
+
+Providers and Models are absent from account navigation on managed access. A
+direct address for either returns to Data & AI setup. A failed key-source read
+hides nothing, and self-hosted instances keep both screens: their environment
+keys belong to the owner even though the stored source is named `instance`.
 
 ## Provider and platform icons
 
@@ -185,9 +199,11 @@ disclosure. Budget, credential and notification issues remain outside it.
 
 Billing puts the plan and hosting price beside the account's subscription state
 and Stripe action. Trial days have a labelled progress bar. Provider costs sit
-below with a link to connections. The panels stack on narrow screens; loading
-failures offer a retry. `styles/billing.css` owns the layout and uses the shared
-theme. Self-hosted instances show no payment action.
+below with a link to change how SignalScout runs. That section reads the
+account's current key source, not a Stripe plan: one price carries both modes.
+The panels stack on narrow screens; loading failures offer a retry.
+`styles/billing.css` owns the layout and uses the shared theme. Self-hosted
+instances show no payment action.
 
 ## Models
 

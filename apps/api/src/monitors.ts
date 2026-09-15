@@ -19,11 +19,13 @@ import {
   budgetStates,
   type ConnectorDescriptor,
   canFetchRepliesFor,
+  capacityRefusal,
   checkBudget,
   classifiedPostCounts,
   clearBudget,
   createMonitor,
   type Database,
+  defaultPollIntervalSeconds,
   deleteMonitor,
   describeMissingCredentials,
   exhaustedBehaviours,
@@ -35,9 +37,11 @@ import {
   latestPollRuns,
   lentKeysPollIntervalSeconds,
   listMonitors,
+  listProjects,
   type MatchCounts,
   type Monitor,
   type MonitorEnvironment,
+  type MonitorShape,
   matchCounts,
   maximumQueries,
   maximumSubreddits,
@@ -49,10 +53,12 @@ import {
   notificationIssues,
   notOfferedReason,
   noVerdicts,
+  type PlanCapacity,
   type PollRun,
   type ProviderChoices,
   pauseMonitor,
   platforms,
+  pollFloorFor,
   type QueryGenerator,
   readPollRuns,
   readProviderChoices,
@@ -489,6 +495,12 @@ export interface MonitorRoutesOptions {
    */
   readonly accountCapFor?: (userId: string) => Promise<number | null>;
   /**
+   * What this account's plan sells, or null where nothing bounds it but its
+   * own budget. US-133. A composition root passes `accountKeys(...).capacity`;
+   * undefined, which is every test that does not ask, bounds nobody.
+   */
+  readonly capacityFor?: (userId: string) => Promise<PlanCapacity | null>;
+  /**
    * Whether this deployment has a working mailer. US-093.
    *
    * A boolean rather than the SMTP settings, because these routes have no
@@ -730,10 +742,59 @@ export async function registerMonitorRoutes(
    *
    * Spread *before* the body, so anything the person chose wins.
    */
-  const pollDefaultsFor = async (userId: string): Promise<{ pollIntervalSeconds?: number }> =>
-    (await options.accountCapFor?.(userId)) === null || options.accountCapFor === undefined
+  const pollDefaultsFor = async (
+    userId: string,
+    sources: readonly string[],
+  ): Promise<{ pollIntervalSeconds?: number }> => {
+    // US-133: where the plan carries a floor per platform, the default is the
+    // floor of what the monitor names, so a LinkedIn-only monitor is offered
+    // daily rather than a four-hourly interval the write would then refuse.
+    const capacity = await capacityFor(userId);
+    if (capacity) {
+      const floor = pollFloorFor(capacity, sources);
+      return { pollIntervalSeconds: floor ?? lentKeysPollIntervalSeconds };
+    }
+    return (await options.accountCapFor?.(userId)) === null || options.accountCapFor === undefined
       ? {}
       : { pollIntervalSeconds: lentKeysPollIntervalSeconds };
+  };
+
+  const capacityFor = options.capacityFor ?? (async () => null);
+
+  /**
+   * Why a write would put this account past what its plan sells, or null.
+   * US-133. Counted across the account, with the monitor being written judged
+   * beside the others and never against itself.
+   */
+  async function capacityBlocker(
+    userId: string,
+    written: MonitorShape,
+    exceptMonitorId?: string,
+  ): Promise<string | null> {
+    const capacity = await capacityFor(userId);
+    if (!capacity) return null;
+
+    const [held, projects] = await Promise.all([
+      listMonitors(db, userId),
+      listProjects(db, userId),
+    ]);
+    const otherMonitors = held
+      .filter((row) => row.id !== exceptMonitorId)
+      .map((row) => ({
+        sources: row.sources,
+        queries: monitorQueryPlan(row.generatedQueries),
+        pollIntervalSeconds: row.pollIntervalSeconds,
+        includeReplies: row.includeReplies,
+      }));
+
+    return capacityRefusal(
+      capacity,
+      written,
+      { otherMonitors, otherProjects: projects.length },
+      (id) =>
+        options.sources.find((source) => source.platform.id === id)?.platform.displayName ?? id,
+    );
+  }
 
   /**
    * Which of the machine's keys this account may spend. US-128.
@@ -1019,11 +1080,23 @@ export async function registerMonitorRoutes(
 
       const person = sessionUser(request);
       const runtime = await currentEnvironment(person.id);
+      const defaults = await pollDefaultsFor(person.id, request.body.sources);
+
+      const past = await capacityBlocker(person.id, {
+        sources: request.body.sources,
+        queries: request.body.queries,
+        pollIntervalSeconds:
+          request.body.pollIntervalSeconds ??
+          defaults.pollIntervalSeconds ??
+          defaultPollIntervalSeconds,
+        includeReplies: request.body.includeReplies ?? false,
+      });
+      if (past) return reply.code(422).send({ message: past });
 
       const { monitor, missing } = await createMonitor(
         db,
         {
-          ...(await pollDefaultsFor(person.id)),
+          ...defaults,
           ...request.body,
           ...filterSettings(request.body),
           ...replySettings(request.body),
@@ -1121,12 +1194,27 @@ export async function registerMonitorRoutes(
       response: { 200: monitorSchema, 404: problemSchema, 422: problemSchema },
     },
     handler: async (request, reply) => {
-      if (!(await ownedMonitor(db, request, request.params.id))) {
+      const current = await ownedMonitor(db, request, request.params.id);
+      if (!current) {
         return reply.code(404).send({ message: "No monitor has that id." });
       }
 
       const off = switchedOffSources(options.sources, request.body.sources);
       if (off) return reply.code(422).send({ message: off });
+
+      // The row as it would be after this edit: what the body changes over
+      // what the row holds, judged against the account's other monitors.
+      const past = await capacityBlocker(
+        sessionUserId(request),
+        {
+          sources: request.body.sources ?? current.sources,
+          queries: request.body.queries ?? monitorQueryPlan(current.generatedQueries),
+          pollIntervalSeconds: request.body.pollIntervalSeconds ?? current.pollIntervalSeconds,
+          includeReplies: request.body.includeReplies ?? current.includeReplies,
+        },
+        current.id,
+      );
+      if (past) return reply.code(422).send({ message: past });
 
       const monitor = await updateMonitor(db, request.params.id, {
         ...request.body,

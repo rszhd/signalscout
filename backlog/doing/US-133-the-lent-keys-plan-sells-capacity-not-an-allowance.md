@@ -74,40 +74,41 @@ operator's own.
 
 ## Acceptance
 
-- [ ] The plan carries a capacity, and it is the deployment's configuration
-      rather than a constant: how many monitors, how many queries each, the
-      shortest poll interval, and which platforms are included
-- [ ] The capacity is the plan's, and its numbers are US-134's. What this ticket
-      owns is that a capacity exists, is configured, and is enforced
-- [ ] A query limit is counted per platform and not per monitor. Six queries
-      pointed at the dearest platform is the case that a per-monitor limit
-      misses, and it is four times the plan's fetch
-- [ ] A poll interval is per platform, not per monitor. The floor comes from the
-      plan, `source_coverage` says when each source was last covered, and a
-      source not yet due is skipped before anything is fetched
-- [ ] The cost estimate on the monitor form prices a monitor whose platforms run
-      at different rates. A quote that assumes one interval is wrong by the
-      ratio between them, which is six to one for LinkedIn
-- [ ] Creating a monitor past the count, with more queries than the plan
+- [x] The plan carries a capacity, and it is the deployment's configuration:
+      `billing/capacity.ts`, one variable per dial under `KEYS_INCLUDED_`,
+      with US-134's figures as the defaults and a second set for the trial
+- [x] The capacity is the plan's, and its numbers are US-134's
+- [x] A query limit is counted per platform, and across the account rather
+      than per monitor
+- [x] A poll interval is per platform. `source_coverage` says when each source
+      was last covered, and a source not yet due is skipped before anything is
+      fetched, recorded as `platform_not_due` with its own migration
+- [x] The cost estimate prices each platform at its own rate: the slower of
+      the monitor's interval and the plan's floor for that platform
+- [x] Creating a monitor past the count, with more queries than the plan
       carries, on a platform it excludes, or on a schedule tighter than its
-      floor is refused with a sentence naming the plan and the number
-- [ ] The refusal is checked where the monitor is written and again in the
-      scheduler, so a row that got past the form is not polled anyway
-- [ ] A monitor that already exists is never deleted or paused by this change.
-      An account that arrives over capacity keeps what it has and may not add
-- [ ] `ACCOUNT_MONTHLY_CAP_MICROS` is raised to sit above the sold capacity's
-      worst case, and the reasoning is in `docs/costs.md` rather than in a
-      commit message
-- [ ] No screen names the cap, the allowance or a figure in dollars for a
-      lent-keys account. The billing page states the capacity instead
-- [ ] If the fuse does blow, the sentence the person reads does not blame them,
-      and the operator gets a log line loud enough to act on
-- [ ] An account spending its own keys has no capacity limit, and every write it
-      makes today it makes after this
-- [ ] With signup closed nothing changes
-- [ ] Every rule that reads the database is asserted against real Postgres, and
-      the scheduler's half has its own cases in `worker/schedule.test.ts`
-- [ ] No test reaches a provider, Stripe or a model
+      floor is refused with a sentence naming the plan and the number. So is a
+      project past the count, and a monitor asking for comment threads
+- [x] The refusal is checked where the monitor is written — create **and**
+      update, which is the BUG-009 shape — and again in the scheduler
+- [x] A monitor that already exists is never deleted or paused by this change.
+      An account over capacity keeps what it has and may not add; a stored
+      query list longer than the plan carries is trimmed for the poll rather
+      than refused
+- [x] `ACCOUNT_MONTHLY_CAP_MICROS` is raised from $15 to $25, above US-134's
+      worst case of about $12, and the reasoning is in docs/costs.md
+- [x] No screen names the cap or a figure in dollars for a lent-keys account:
+      the billing route answers with the capacity instead, and a test asserts
+      the response carries no such key
+- [x] If the fuse blows the person reads a sentence naming no figure and
+      blaming nobody, and the operator gets a log line with the figures
+- [x] An account spending its own keys has no capacity limit, and every write
+      it makes today it makes after this
+- [x] With signup closed nothing changes: `spendsInstanceMoney` answers no, so
+      `accountKeys.capacity` answers null
+- [x] Every rule that reads the database is asserted against real Postgres,
+      and the scheduler's half has its own cases in `worker/schedule.test.ts`
+- [x] No test reaches a provider, Stripe or a model. 2,251 pass
 
 ## Notes
 
@@ -168,3 +169,22 @@ operator's own.
   platform, because LinkedIn at the four-hourly rate costs more than the plan
   earns, and the form's estimate has to price a monitor whose platforms do not
   all run at the same rate.
+
+- 2026-09-15T20:10+08:00 — **Built, with US-134, and the screens are next.**
+  The capacity is a value the deployment configures and `accountKeys.capacity`
+  hands out, so it reached the four readers the same way the cap and the
+  provider choice did.
+
+  Three expected values moved, each because the behaviour was meant to change,
+  and each says so beside itself: the fuse is $25 rather than $15; its
+  sentence names no figure; and the billing route answers with the capacity
+  where it answered with the cap and the spend.
+
+  Two decisions the ticket left open. **The plan reads no comment threads**: a
+  thread page is $0.04 on Instagram and up to $0.10 on LinkedIn, and
+  twenty-five threads a poll at those prices is the plan's month in a day. And
+  the query trim in the poll is a trim rather than a refusal, so a row that
+  predates the plan still polls, within what was priced.
+
+  Left for the screen session: the billing page and the monitor form render
+  the capacity. The route answers it; nothing draws it yet.

@@ -24,6 +24,7 @@
  * far past the cap one poll can carry a monitor.
  */
 import { eq, sql } from "drizzle-orm";
+import { type PlanCapacity, platformDue, queriesWithin } from "../billing/capacity.js";
 import { checkAccountBudget } from "../budget/account.js";
 import { enforceBudget, recordSourceUsage } from "../budget/budget.js";
 import {
@@ -97,6 +98,12 @@ export interface CollectOptions {
    * the deployment's named provider for an account on that plan.
    */
   readonly choicesFor?: (userId: string) => Promise<ProviderChoices>;
+  /**
+   * What this monitor's owner's plan sells, or null where nothing bounds it.
+   * US-133. The poll reads two things from it: which platforms are due on
+   * their own interval, and how many queries a platform may send.
+   */
+  readonly capacityFor?: (userId: string) => Promise<PlanCapacity | null>;
 }
 
 /** What one connector returned in one poll. US-013 records the units against a budget. */
@@ -267,6 +274,7 @@ export function createCollectStep({
   credentialsFor,
   accountCapFor = async () => null,
   choicesFor,
+  capacityFor = async () => null,
 }: CollectOptions): Step<PollPayload> {
   return async function collect({ monitorId }, { db, boss, logger }: StepContext): Promise<void> {
     const [monitor] = await db.select().from(monitors).where(eq(monitors.id, monitorId)).limit(1);
@@ -409,14 +417,25 @@ export function createCollectStep({
       );
 
       if (account.exhausted) {
+        /**
+         * The operator's line, not the customer's. US-133: the cap is the
+         * deployment's fuse and it sits above the capacity the plan sells, so
+         * an account reaching it is a bug, a provider quirk or a retry storm —
+         * something for whoever runs this instance to look at, with the
+         * figures a person would need to look. What the customer reads is
+         * `account.reason`, which names none of them.
+         */
         logger.error(
           {
             monitorId,
             userId: monitor.userId,
             spentMicros: account.spend.totalMicros,
             capMicros: account.capMicros,
+            sourceMicros: account.spend.sourceMicros,
+            modelMicros: account.spend.modelMicros,
           },
-          account.reason ?? "poll refused: this account has spent the month its plan includes",
+          "the deployment's monthly fuse blew for this account: it spent past the cap, " +
+            "which sits above what the plan sells, so something here needs looking at",
         );
 
         stopReason = "account_budget_exhausted";
@@ -512,6 +531,14 @@ export function createCollectStep({
       const now = new Date();
       const outcomes: SourceOutcome[] = [];
 
+      /**
+       * What this account's plan sells, read once for the poll. US-133.
+       *
+       * Null for every account spending its own money, which is every
+       * self-hosted instance, and then nothing below it changes.
+       */
+      const capacity = await capacityFor(monitor.userId);
+
       /** The earliest moment any source asked to be tried again. */
       let wakeAt: Date | undefined;
       const wakeNoLaterThan = (moment: Date) => {
@@ -527,6 +554,31 @@ export function createCollectStep({
          * somebody made about a connector is not an error in this job. The reason
          * is logged because a short poll otherwise reads as a quiet platform.
          */
+        /**
+         * A platform whose turn has not come round. US-133.
+         *
+         * The plan polls each platform at its own rate, because a LinkedIn
+         * query costs thirteen times a Reddit one and a B2B post that appeared
+         * on Monday is the same lead on Tuesday. Read before the connector and
+         * before the credentials, so a platform that is not due costs nothing
+         * at all — and a continuation is never skipped, because a collection in
+         * flight has already been paid for.
+         */
+        if (capacity && !pending.has(sourceId)) {
+          if (!platformDue(capacity, sourceId, covered.get(sourceId), now)) {
+            logger.debug(
+              {
+                monitorId,
+                sourceId,
+                everySeconds: capacity.pollIntervalSeconds[sourceId],
+              },
+              "poll skipped for this source: its turn under this plan has not come round",
+            );
+            noteSource(sourceId, null, "platform_not_due");
+            continue;
+          }
+        }
+
         const notOffered = registry.notOffered(sourceId);
 
         if (notOffered) {
@@ -674,7 +726,13 @@ export function createCollectStep({
          * Read inside the loop for that reason: one monitor holds a list per
          * platform, and the platform being polled decides which list it is.
          */
-        const queries = monitorQueries(monitor.generatedQueries, sourceId);
+        const queries = capacity
+          ? // US-133: a row that predates the plan, or a capacity the
+            // deployment lowered, can hold more queries than the plan carries.
+            // The write refuses more; this trims what is already stored, so
+            // the monitor still polls within what was priced.
+            queriesWithin(capacity, sourceId, monitorQueries(monitor.generatedQueries, sourceId))
+          : monitorQueries(monitor.generatedQueries, sourceId);
 
         /**
          * What this source cost, page by page.

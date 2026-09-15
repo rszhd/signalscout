@@ -172,11 +172,27 @@ const billingStateSchema = z.object({
    */
   included: z
     .object({
-      capMicros: z.number().int(),
-      spentMicros: z.number().int(),
-      remainingMicros: z.number().int(),
-      exhausted: z.boolean(),
-      since: z.string(),
+      /**
+       * What the plan sells, which is what a customer bought. US-133.
+       *
+       * No figure in dollars, and no cap: `ACCOUNT_MONTHLY_CAP_MICROS` is the
+       * deployment's fuse, it sits above this, and a screen that showed it
+       * would tell somebody paying $35 that their plan includes $25. The
+       * numbers here are the dials they already set on the monitor form.
+       */
+      monitors: z.number().int(),
+      projects: z.number().int(),
+      queries: z.number().int(),
+      queriesPerPlatform: z.record(z.string(), z.number().int()),
+      platforms: z.array(z.string()),
+      pollIntervalSeconds: z.record(z.string(), z.number().int()),
+      replies: z.boolean(),
+      /**
+       * True when the deployment's fuse has stopped this account for the
+       * month. No figures travel with it: what a person may read is in
+       * `accountBudgetState`'s sentence, which names none either.
+       */
+      paused: z.boolean(),
     })
     .nullable(),
 });
@@ -192,13 +208,14 @@ export interface BillingRoutesOptions {
    */
   readonly billing?: BillingProvider;
   /**
-   * What one account may spend of the instance's money. US-129.
+   * What one account may spend of the instance's money, and what its plan
+   * sells. US-129 and US-133.
    *
-   * The same object the rest of the composition root uses, so the screen states
-   * the cap the worker enforces rather than a second copy of it. Undefined in a
-   * test that is not about the cap, and the screen then shows none.
+   * The same object the rest of the composition root uses, so the screen
+   * states what the worker enforces rather than a second copy of it. Undefined
+   * in a test that is not about either, and the screen then shows none.
    */
-  readonly keys?: Pick<AccountKeys, "cap">;
+  readonly keys?: Pick<AccountKeys, "cap" | "capacity">;
   readonly now?: () => Date;
 }
 
@@ -252,19 +269,29 @@ export async function registerBillingRoutes(
        */
       const capMicros = (await keys?.cap(userId)) ?? null;
       const included = await checkAccountBudget(db, userId, capMicros, now());
+      // US-133. What the account was sold, rather than what the deployment
+      // will lend it. Null for everybody spending their own money.
+      const capacity = (await keys?.capacity(userId)) ?? null;
 
       return {
         mode: settings.mode,
         plan: planOf(settings.mode, subscription),
         included:
-          included.capMicros === null
+          capacity === null
             ? null
             : {
-                capMicros: included.capMicros,
-                spentMicros: included.spend.totalMicros,
-                remainingMicros: included.remainingMicros ?? 0,
-                exhausted: included.exhausted,
-                since: included.spend.since.toISOString(),
+                monitors: capacity.monitors,
+                projects: capacity.projects,
+                queries: capacity.queries,
+                queriesPerPlatform: Object.fromEntries(
+                  Object.entries(capacity.queriesPerPlatform).filter(
+                    ([, limit]) => limit !== undefined,
+                  ),
+                ) as Record<string, number>,
+                platforms: [...capacity.platforms],
+                pollIntervalSeconds: { ...capacity.pollIntervalSeconds },
+                replies: capacity.replies,
+                paused: included.exhausted,
               },
         entitled: entitlement.entitled,
         reason: entitlement.reason,

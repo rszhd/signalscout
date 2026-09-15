@@ -13,6 +13,7 @@
  */
 import { and, eq, isNull, or, sql } from "drizzle-orm";
 import type { PgBoss } from "pg-boss";
+import { type PlanCapacity, pollFloorFor } from "../billing/capacity.js";
 import { type BillingMode, entitledCondition, keysIncludedAmong } from "../billing/index.js";
 import { accountsOverCap } from "../budget/account.js";
 import type { Database } from "../db/client.js";
@@ -25,6 +26,10 @@ export interface DueMonitor {
   /** Whose monitor it is, so the tick can ask whose money the poll would spend. US-129. */
   readonly userId: string;
   readonly pollIntervalSeconds: number;
+  /** Which platforms it names, so the tick can read the plan's floor. US-133. */
+  readonly sources: readonly string[];
+  /** When it last started, for the same floor. Null means it never has. */
+  readonly lastPolledAt: Date | null;
 }
 
 /**
@@ -70,6 +75,10 @@ export async function findDueMonitors(
         id: monitors.id,
         userId: monitors.userId,
         pollIntervalSeconds: monitors.pollIntervalSeconds,
+        // US-133: the plan's floor is per platform, so the scheduler needs to
+        // know which ones a monitor names before it can hold it to one.
+        sources: monitors.sources,
+        lastPolledAt: monitors.lastPolledAt,
       })
       .from(monitors)
       /**
@@ -112,6 +121,8 @@ export interface TickResult {
   readonly alreadyQueued: number;
   /** Monitors not sent because their account has spent its month. US-129. */
   readonly overCapSkipped: number;
+  /** Monitors not sent because they poll faster than their plan sells. US-133. */
+  readonly tooSoonSkipped: number;
 }
 
 /** Send a poll job for every due monitor. One tick of the scheduler. */
@@ -132,6 +143,19 @@ export async function enqueueDuePolls(
    * hour, until the month turned over.
    */
   accountCapMicros: number | null = null,
+  /**
+   * What each account's plan sells, or null where nothing bounds it. US-133.
+   *
+   * The scheduler is the half that matters here for the same reason it is for
+   * entitlement and the cap: a form that refuses is what a person sees, and a
+   * monitor whose row got past the form — created before the plan, or a
+   * capacity the deployment lowered — is polled at its own rate until
+   * something here declines to send it. The refusal is the floor of the
+   * platforms it names; `collect.ts` then skips each platform that is not due
+   * on its own floor.
+   */
+  capacityFor: (userId: string) => Promise<PlanCapacity | null> = async () => null,
+  now: () => Date = () => new Date(),
 ): Promise<TickResult> {
   const due = await findDueMonitors(db, billing);
   let alreadyQueued = 0;
@@ -155,6 +179,14 @@ export async function enqueueDuePolls(
         );
 
   let overCapSkipped = 0;
+  let tooSoonSkipped = 0;
+
+  /** One read per account in the tick, not one per monitor. */
+  const capacities = new Map<string, PlanCapacity | null>();
+  const capacityOf = async (userId: string): Promise<PlanCapacity | null> => {
+    if (!capacities.has(userId)) capacities.set(userId, await capacityFor(userId));
+    return capacities.get(userId) ?? null;
+  };
 
   for (const monitor of due) {
     if (overCap.has(monitor.userId)) {
@@ -162,6 +194,29 @@ export async function enqueueDuePolls(
       logger.warn(
         { monitorId: monitor.id, userId: monitor.userId, capMicros: accountCapMicros },
         "poll not sent: this account has spent the month its plan includes",
+      );
+      continue;
+    }
+
+    /**
+     * The plan's floor, for a row that is polling faster than the plan sells.
+     *
+     * Measured from `last_polled_at` and not from the monitor's own interval:
+     * the query above already found it due by its own column, and this is the
+     * second opinion. A monitor that has never polled is sent.
+     */
+    const capacity = await capacityOf(monitor.userId);
+    const floor = capacity ? pollFloorFor(capacity, monitor.sources) : null;
+
+    if (
+      floor !== null &&
+      monitor.lastPolledAt &&
+      monitor.lastPolledAt.getTime() + floor * 1000 > now().getTime()
+    ) {
+      tooSoonSkipped += 1;
+      logger.debug(
+        { monitorId: monitor.id, userId: monitor.userId, floorSeconds: floor },
+        "poll not sent: this monitor polls faster than its plan includes",
       );
       continue;
     }
@@ -181,7 +236,7 @@ export async function enqueueDuePolls(
     }
   }
 
-  const result = { due: due.length, alreadyQueued, overCapSkipped };
+  const result = { due: due.length, alreadyQueued, overCapSkipped, tooSoonSkipped };
 
   if (due.length > 0) logger.info(result, "scheduler tick");
 

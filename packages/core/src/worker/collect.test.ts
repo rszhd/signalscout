@@ -1,5 +1,6 @@
 import { eq } from "drizzle-orm";
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
+import { defaultPlanCapacity } from "../billing/capacity.js";
 import { setBudget } from "../budget/budget.js";
 import { createDatabase, type Database } from "../db/client.js";
 import {
@@ -399,6 +400,123 @@ describe("the poll step", () => {
 
     // The point of the ticket, stated as the thing that must not happen.
     expect(asked("x")[0]?.query.queries).not.toContain("manual qa before every release");
+  });
+
+  /**
+   * US-133. The plan polls each platform at its own rate, because a LinkedIn
+   * query costs thirteen times a Reddit one and a B2B post that appeared on
+   * Monday is the same lead on Tuesday. The monitor's own interval is the
+   * cadence of the run; this is what decides whose turn it is inside one.
+   */
+  describe("a platform's own turn under the plan", () => {
+    function twoPlatforms() {
+      return createSourceRegistry({
+        definitions: [
+          fakeSourceDefinition({
+            id: "reddit",
+            displayName: "Reddit",
+            providerId: "brightdata",
+            providerName: "Bright Data",
+          }),
+          fakeSourceDefinition({
+            id: "linkedin",
+            displayName: "LinkedIn",
+            providerId: "apify",
+            providerName: "Apify",
+          }),
+        ],
+        runtime: createSourceRuntime({ fetch: unreachableFetch, logger: silentLogger }),
+      });
+    }
+
+    const askedOf = (registry: ReturnType<typeof twoPlatforms>, platform: string) =>
+      (registry.only(platform) as SocialSource & { calls: readonly SearchRequest[] }).calls;
+
+    async function monitorOnBoth(): Promise<string> {
+      return insertMonitor(database, {
+        sources: ["reddit", "linkedin"],
+        generatedQueries: { reddit: ["flaky tests"], linkedin: ["flaky tests"] },
+        generatedSubreddits: [],
+      });
+    }
+
+    it("collects a platform whose turn has come and skips one whose has not", async () => {
+      const registry = twoPlatforms();
+      const monitorId = await monitorOnBoth();
+      const fiveHoursAgo = new Date(Date.now() - 5 * 60 * 60 * 1000);
+
+      // Both were covered five hours ago: past Reddit's four-hour interval,
+      // inside LinkedIn's day.
+      for (const source of ["reddit", "linkedin"] as const) {
+        await db.insert(sourceCoverage).values({ monitorId, source, coveredThrough: fiveHoursAgo });
+      }
+
+      await createCollectStep({
+        registry,
+        credentialsFor: credentials,
+        capacityFor: async () => defaultPlanCapacity,
+      })({ monitorId }, contextFor(db, stubBoss()));
+
+      expect(askedOf(registry, "reddit")).toHaveLength(1);
+      expect(askedOf(registry, "linkedin")).toHaveLength(0);
+
+      const [run] = await db.select().from(pollRuns).where(eq(pollRuns.monitorId, monitorId));
+      const skipped = run?.sources.find((entry) => entry.source === "linkedin");
+      expect(skipped?.reason).toBe("platform_not_due");
+    });
+
+    it("collects a platform that has never been covered", async () => {
+      const registry = twoPlatforms();
+      const monitorId = await monitorOnBoth();
+
+      await createCollectStep({
+        registry,
+        credentialsFor: credentials,
+        capacityFor: async () => defaultPlanCapacity,
+      })({ monitorId }, contextFor(db, stubBoss()));
+
+      expect(askedOf(registry, "linkedin")).toHaveLength(1);
+    });
+
+    it("collects both where the account has no capacity", async () => {
+      const registry = twoPlatforms();
+      const monitorId = await monitorOnBoth();
+      const fiveHoursAgo = new Date(Date.now() - 5 * 60 * 60 * 1000);
+
+      for (const source of ["reddit", "linkedin"] as const) {
+        await db.insert(sourceCoverage).values({ monitorId, source, coveredThrough: fiveHoursAgo });
+      }
+
+      await createCollectStep({ registry, credentialsFor: credentials })(
+        { monitorId },
+        contextFor(db, stubBoss()),
+      );
+
+      expect(askedOf(registry, "reddit")).toHaveLength(1);
+      expect(askedOf(registry, "linkedin")).toHaveLength(1);
+    });
+
+    /**
+     * A stored list longer than the plan carries is trimmed rather than
+     * refused: the write refuses more, and a row that predates the plan or a
+     * capacity the deployment lowered still polls within what was priced.
+     */
+    it("sends only as many queries as the plan carries for that platform", async () => {
+      const registry = twoPlatforms();
+      const monitorId = await insertMonitor(database, {
+        sources: ["linkedin"],
+        generatedQueries: { linkedin: ["a", "b", "c", "d", "e"] },
+        generatedSubreddits: [],
+      });
+
+      await createCollectStep({
+        registry,
+        credentialsFor: credentials,
+        capacityFor: async () => defaultPlanCapacity,
+      })({ monitorId }, contextFor(db, stubBoss()));
+
+      expect(askedOf(registry, "linkedin")[0]?.query.queries).toEqual(["a", "b", "c"]);
+    });
   });
 
   it("skips a platform this build does not offer, and collects the rest", async () => {

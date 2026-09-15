@@ -13,6 +13,7 @@ import {
   billingSettingsFrom,
   builtInSources,
   type ConnectorDefinition,
+  capacitiesFrom,
   createAuth,
   createNotificationTransport,
   createProjectDescriber,
@@ -478,6 +479,9 @@ export async function buildServer({
     // US-129. What this deployment lends one account in a month. It reaches an
     // account only where its plan includes the keys.
     capMicros: accountCapFrom(env),
+    // US-133 and US-134. What the plan sells and what its trial does, read at
+    // boot so a value that is not a number stops the process.
+    capacities: capacitiesFrom(environment ?? process.env),
     // US-130. Which provider fetches each platform for an account on that plan.
     lentProviders: lentProviders ?? lentProvidersFrom(environment ?? process.env, sources),
   });
@@ -509,6 +513,8 @@ export async function buildServer({
 
   await registerProjectRoutes(app, {
     db,
+    // US-133. The plan carries a project count.
+    capacityFor: (userId) => keys.capacity(userId),
     describer,
     describerFor: async (userId) => describerForEnvironment(await aiFor(userId), logger),
   });
@@ -568,6 +574,9 @@ export async function buildServer({
     // US-129. A monitor created by an account spending our money polls every
     // four hours rather than hourly, unless the person chooses otherwise.
     accountCapFor: (userId) => keys.cap(userId),
+    // US-133. What the plan sells: monitors, queries per platform, a poll
+    // floor per platform and a platform list. Null for everybody else.
+    capacityFor: (userId) => keys.capacity(userId),
     // US-093: whether a new monitor's email notifications can be switched on.
     // The same list the notification screen and its save route read, asked
     // once here so the monitor routes never see the SMTP settings.
@@ -577,7 +586,14 @@ export async function buildServer({
     queryGeneratorFor: async (userId) => queryGeneratorForEnvironment(await aiFor(userId), logger),
   });
 
-  await registerEstimateRoutes(app, { db, sources, jobs });
+  await registerEstimateRoutes(app, {
+    db,
+    sources,
+    jobs,
+    // US-133. Each platform is quoted at the rate the plan polls it, which
+    // differs by six to one between LinkedIn and Reddit.
+    capacityFor: (userId) => keys.capacity(userId),
+  });
 
   // The operator's view of who is signing up. US-111. Behind the session gate
   // like every other API route, and then refused unless the address is listed.

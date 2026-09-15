@@ -19,6 +19,7 @@ import {
   getProject,
   listProjects,
   maximumDocumentCharacters,
+  type PlanCapacity,
   type ProjectDescriber,
   readUploadedDocument,
   recordModelCall,
@@ -31,6 +32,12 @@ import type { ApiServer } from "./server.js";
 
 export interface ProjectRoutesOptions {
   readonly db: Database;
+  /**
+   * What this account's plan sells, or null where nothing bounds it. US-133.
+   * The plan carries a project count; a composition root passes
+   * `accountKeys(...).capacity`.
+   */
+  readonly capacityFor?: (userId: string) => Promise<PlanCapacity | null>;
   /**
    * Null when this deployment has no model key. US-050.
    *
@@ -134,8 +141,9 @@ const draftSchema = z.object({
 
 export async function registerProjectRoutes(
   app: ApiServer,
-  { db, describer, describerFor }: ProjectRoutesOptions,
+  options: ProjectRoutesOptions,
 ): Promise<void> {
+  const { db, describer, describerFor } = options;
   /**
    * Draft the four answers from a URL or an uploaded document.
    *
@@ -245,9 +253,24 @@ export async function registerProjectRoutes(
   app.route({
     method: "POST",
     url: "/api/projects",
-    schema: { body: createBody, response: { 201: projectSchema } },
+    schema: { body: createBody, response: { 201: projectSchema, 422: problemSchema } },
     handler: async (request, reply) => {
-      const project = await createProject(db, sessionUserId(request), request.body);
+      const userId = sessionUserId(request);
+
+      // US-133. A project past the plan's count is refused with the number,
+      // before anything is written. An account that arrived over it keeps
+      // what it has.
+      const capacity = await (options.capacityFor ?? (async () => null))(userId);
+      if (capacity) {
+        const held = (await listProjects(db, userId)).length;
+        if (held >= capacity.projects) {
+          return reply.code(422).send({
+            message: `Your plan includes ${capacity.projects} ${capacity.projects === 1 ? "project" : "projects"}, and this account already has ${held}.`,
+          });
+        }
+      }
+
+      const project = await createProject(db, userId, request.body);
       reply.code(201);
       return serialise(project);
     },

@@ -186,6 +186,22 @@ export {
 } from "./auth/verification.js";
 export { type SendEmail, verificationMessage } from "./auth/verification-email.js";
 export {
+  type AccountHoldings,
+  type Capacities,
+  capacitiesFrom,
+  capacityRefusal,
+  countQueries,
+  defaultPlanCapacity,
+  defaultTrialCapacity,
+  describeInterval,
+  type MonitorShape,
+  type PlanCapacity,
+  planCapacityFrom,
+  platformDue,
+  pollFloorFor,
+  queriesWithin,
+} from "./billing/capacity.js";
+export {
   type AccountKeys,
   type AccountKeysOptions,
   accountKeys,

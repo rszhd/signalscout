@@ -760,14 +760,148 @@ describe("the monitor routes", () => {
       });
     });
 
-    it("keeps an interval the person chose, on either plan", async () => {
+    /**
+     * US-129 made the four-hourly interval a default a person could override.
+     * US-133 made the plan's floor a limit, so the two halves are separate
+     * now: an interval at or above the floor is the person's to choose, and
+     * one below it is refused with the number. The expected value moved
+     * because the behaviour was meant to.
+     */
+    it("keeps an interval at or above the plan's floor, and refuses one below", async () => {
       await onPlan("keys_included");
 
       await withServer({ signup: "open", charging: true }, async (app) => {
-        const id = await create(app, { ...newMonitor, pollIntervalSeconds: 900 });
-        const monitor = await getMonitor(db, id);
+        // Refused first, while the account holds nothing: the plan carries one
+        // monitor, so a second attempt afterwards would be refused for the
+        // count and prove nothing about the interval.
+        const refused = await app.inject({
+          method: "POST",
+          url: "/api/monitors",
+          payload: { ...newMonitor, name: "Too often", pollIntervalSeconds: 900 },
+        });
 
-        expect(monitor?.pollIntervalSeconds).toBe(900);
+        expect(refused.statusCode).toBe(422);
+        expect(refused.json().message).toMatch(/every 4 hours at most/);
+
+        // Reddit's floor on the plan is four hours; six is the person's choice.
+        const id = await create(app, { ...newMonitor, pollIntervalSeconds: 6 * 60 * 60 });
+        expect((await getMonitor(db, id))?.pollIntervalSeconds).toBe(6 * 60 * 60);
+      });
+    });
+
+    it("refuses a platform the plan does not include, and names the ones it does", async () => {
+      await onPlan("keys_included");
+      await withServer({ signup: "open", charging: true }, async (app) => {
+        const response = await app.inject({
+          method: "POST",
+          url: "/api/monitors",
+          payload: {
+            ...newMonitor,
+            sources: ["linkedin"],
+            queries: { ...newMonitor.queries, linkedin: ["hiring qa lead"] },
+            pollIntervalSeconds: 24 * 60 * 60,
+          },
+        });
+
+        // The trial capacity excludes LinkedIn; the plan's does not, so this
+        // account is on the plan and the refusal must not fire.
+        expect(response.statusCode).toBe(201);
+      });
+    });
+
+    it("refuses more queries on a platform than the plan carries", async () => {
+      await onPlan("keys_included");
+      await withServer({ signup: "open", charging: true }, async (app) => {
+        const response = await app.inject({
+          method: "POST",
+          url: "/api/monitors",
+          payload: {
+            ...newMonitor,
+            sources: ["linkedin"],
+            queries: {
+              ...newMonitor.queries,
+              linkedin: ["one two", "three four", "five six", "seven eight"],
+            },
+            pollIntervalSeconds: 24 * 60 * 60,
+          },
+        });
+
+        expect(response.statusCode).toBe(422);
+        expect(response.json().message).toMatch(/at most 3 queries on LinkedIn/);
+      });
+    });
+
+    it("refuses a second monitor, and a comment thread, on the plan", async () => {
+      await onPlan("keys_included");
+      await withServer({ signup: "open", charging: true }, async (app) => {
+        const replies = await app.inject({
+          method: "POST",
+          url: "/api/monitors",
+          payload: { ...newMonitor, includeReplies: true, pollIntervalSeconds: 4 * 60 * 60 },
+        });
+        expect(replies.statusCode).toBe(422);
+        expect(replies.json().message).toMatch(/does not read comment threads/);
+
+        await create(app, { ...newMonitor, pollIntervalSeconds: 4 * 60 * 60 });
+
+        const second = await app.inject({
+          method: "POST",
+          url: "/api/monitors",
+          payload: { ...newMonitor, name: "Second", pollIntervalSeconds: 4 * 60 * 60 },
+        });
+        expect(second.statusCode).toBe(422);
+        expect(second.json().message).toMatch(/includes 1 monitor/);
+      });
+    });
+
+    /**
+     * The edit path is the other writer, and a rule applied to one of two is
+     * BUG-009 again. The monitor being edited is judged beside the others and
+     * never against itself, so an edit that changes nothing is allowed.
+     */
+    it("refuses an edit that would put the account past the plan, and allows one that does not", async () => {
+      await onPlan("keys_included");
+      await withServer({ signup: "open", charging: true }, async (app) => {
+        const id = await create(app, { ...newMonitor, pollIntervalSeconds: 4 * 60 * 60 });
+
+        const allowed = await app.inject({
+          method: "PATCH",
+          url: `/api/monitors/${id}`,
+          payload: { name: "Renamed" },
+        });
+        expect(allowed.statusCode).toBe(200);
+
+        const refused = await app.inject({
+          method: "PATCH",
+          url: `/api/monitors/${id}`,
+          payload: { pollIntervalSeconds: 900 },
+        });
+        expect(refused.statusCode).toBe(422);
+        expect(refused.json().message).toMatch(/every 4 hours at most/);
+      });
+    });
+
+    it("bounds nothing for an account spending its own keys", async () => {
+      await onPlan("own_keys");
+      await withServer({ signup: "open", charging: true }, async (app) => {
+        await create(app, { ...newMonitor, name: "One", pollIntervalSeconds: 900 });
+        const second = await app.inject({
+          method: "POST",
+          url: "/api/monitors",
+          payload: { ...newMonitor, name: "Two", includeReplies: true, pollIntervalSeconds: 900 },
+        });
+
+        expect(second.statusCode).toBe(201);
+      });
+    });
+
+    it("keeps an interval the person chose for an account spending its own keys", async () => {
+      await onPlan("own_keys");
+
+      await withServer({ signup: "open", charging: true }, async (app) => {
+        const id = await create(app, { ...newMonitor, pollIntervalSeconds: 900 });
+
+        expect((await getMonitor(db, id))?.pollIntervalSeconds).toBe(900);
       });
     });
 

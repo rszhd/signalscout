@@ -353,6 +353,16 @@ export const pollStopReasons = [
   "page_cap",
   /** A collection at the provider is not ready, and it is not yet time to look. */
   "still_collecting",
+  /**
+   * US-133: this platform is polled less often than the monitor is, and its
+   * turn has not come round.
+   *
+   * The plan sets an interval per platform, because a query costs what its
+   * platform's provider charges and the spread is thirteen to one. A monitor
+   * polled every four hours still reads LinkedIn once a day, and the other
+   * platforms of the same run are collected as usual.
+   */
+  "platform_not_due",
   /** The step threw. */
   "error",
 ] as const;

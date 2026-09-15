@@ -75,35 +75,40 @@ exactly as US-128 decided.
 
 ## Acceptance
 
-- [ ] `subscriptions.plan` carries the lent-keys plan beside `own_keys`, with
-      the check constraint and the migration in this change, and
-      `meta/_journal.json` naming the file
-- [ ] The plan is one Stripe price on its own product, and the webhook writes
-      the plan from the price the subscription names. An unknown price still
-      reads as `own_keys` and still logs
-- [ ] An account on the plan may create one project and one monitor, with six
+- [x] `subscriptions.plan` carries the lent-keys plan beside `own_keys` —
+      US-128 did this; nothing here needed a second plan value
+- [x] The plan is one Stripe price on its own product, and the webhook writes
+      the plan from the price. An unknown price still reads as `own_keys`
+- [x] An account on the plan may create one project and one monitor, with six
       queries in total and at most three of them on LinkedIn
-- [ ] The limit is counted per platform, so six queries on LinkedIn is refused
+- [x] The limit is counted per platform, so six queries on LinkedIn is refused
       and the refusal says which platform and what the plan allows
-- [ ] Each platform carries its own poll interval, set by the plan: LinkedIn
+- [x] Each platform carries its own poll interval, set by the plan: LinkedIn
       daily, Instagram every 12 hours, the other four every 4 hours
-- [ ] A platform not yet due is skipped without spending, and the monitor's other
-      platforms poll on their own intervals in the same run
-- [ ] The trial capacity is four queries, polled once a day, on Reddit, X,
+- [x] A platform not yet due is skipped without spending, and the monitor's
+      other platforms poll on their own intervals in the same run
+- [x] The trial capacity is four queries, polled once a day, on Reddit, X,
       YouTube and TikTok only
-- [ ] An account bringing its own keys has no capacity limit at all, on any of
-      those dials
-- [ ] Every platform the lent side fetches has its provider named by the
-      deployment: ScrapeCreators for Reddit, YouTube and TikTok, SocialData for
-      X, SocialCrawl for Instagram, **Apify for LinkedIn**
-- [ ] Reddit through Bright Data and LinkedIn through SocialCrawl are not used
-      for a lent-keys account. Both are five times the price of the alternative
-- [ ] Whether the lent side reads comment threads is decided in this change, and
-      if it does, it carries its own limit
-- [ ] The fuse is raised to about twice the worst case and never appears on a
+- [x] An account bringing its own keys has no capacity limit at all
+- [x] Every platform the lent side fetches has its provider named by the
+      deployment — US-130 built it, and `.env.example` names US-134's set:
+      ScrapeCreators for Reddit, YouTube and TikTok, SocialData for X,
+      SocialCrawl for Instagram, Apify for LinkedIn
+- [x] Reddit through Bright Data and LinkedIn through SocialCrawl are not used
+      for a lent-keys account: neither is named, and a name this build cannot
+      run is refused at boot
+- [x] Whether the lent side reads comment threads is decided in this change:
+      **it does not.** A thread page is $0.04 on Instagram and up to $0.10 on
+      LinkedIn, so twenty-five threads a poll is the plan's month in a day. A
+      monitor asking for replies on the plan is refused at the write
+- [x] The fuse is raised to about twice the worst case and never appears on a
       screen. US-133 owns that rule
-- [ ] Every rule that reads the database is asserted against real Postgres
-- [ ] No test reaches Stripe, a provider or a model
+- [x] Every rule that reads the database is asserted against real Postgres
+- [x] No test reaches Stripe, a provider or a model
+- [ ] **The price itself is not set.** `STRIPE_PRICE_ID_KEYS_INCLUDED` still
+      names the $49 test-mode price. A Stripe price is immutable, so $35 needs
+      a new price object, and nothing here can make one. US-131 is where it is
+      sold
 
 ## Notes
 
@@ -147,3 +152,15 @@ exactly as US-128 decided.
 
 - 2026-09-14T09:22+08:00 — The trial polls daily on every platform it allows.
   Seven days then costs about $0.30 a head rather than $2.
+
+- 2026-09-15T20:12+08:00 — **The numbers are enforced; the price is not set.**
+  Every figure in this ticket is now a default in `billing/capacity.ts` and a
+  variable a deployment may change without a release. US-133 holds the
+  mechanism and the reasoning.
+
+  The comment-thread question is answered no, and the arithmetic is why: at
+  $0.04 an Instagram thread page the plan's month is one day's polling.
+
+  One box is open and it is not code. The test-mode price behind
+  `STRIPE_PRICE_ID_KEYS_INCLUDED` is still $49; $35 needs a new Stripe price
+  object, which the owner makes. US-131 sells it.

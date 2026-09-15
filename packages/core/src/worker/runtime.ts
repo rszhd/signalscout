@@ -25,6 +25,7 @@ import { createEmbedder, type Embedder } from "../ai/embed.js";
 import { readAiEnvironmentFor as readAiSettingsEnvironment } from "../ai/settings.js";
 import { createTriager, type Triager } from "../ai/triage.js";
 import type { SignupMode } from "../auth/user.js";
+import { type Capacities, capacitiesFrom } from "../billing/capacity.js";
 import {
   type AccountKeys,
   accountKeys,
@@ -199,6 +200,13 @@ export interface StartWorkerOptions {
    * their own money — so a self-hosted worker never sees it.
    */
   lentProviders?: ProviderChoices;
+  /**
+   * What the plan sells and what its trial does. US-133 and US-134. Read from
+   * the environment unless a caller says otherwise, and it reaches an account
+   * only through `accountKeys`, which answers null for everybody spending
+   * their own money.
+   */
+  capacities?: Capacities;
 }
 
 /**
@@ -423,6 +431,7 @@ export async function startWorker({
   signup = loadSignupEnv(),
   accountCapMicros = accountCapFrom(process.env),
   lentProviders,
+  capacities = capacitiesFrom(process.env),
 }: StartWorkerOptions): Promise<WorkerHandle> {
   // Before any provider is called. See `net.ts`: Node's 250ms per-address
   // connect budget is shorter than several providers take to answer.
@@ -472,12 +481,17 @@ export async function startWorker({
     // plan. Read here, at boot, so a name this build cannot run stops the
     // process rather than one poll at 02:00.
     lentProviders: lentProviders ?? lentProvidersFrom(process.env, sources.list()),
+    // US-133. What the plan sells: monitors, queries per platform, a poll
+    // floor per platform and a platform list.
+    capacities,
   });
 
   /** What one account may still spend of ours, for the three steps that spend. */
   const accountCapFor = (userId: string) => keys.cap(userId);
   /** Which provider fetches each platform for one account, for the four steps that choose. */
   const choicesFor = (userId: string) => keys.choices(userId);
+  /** What one account's plan sells, for the poll and for the scheduler. US-133. */
+  const capacityFor = (userId: string) => keys.capacity(userId);
 
   // The logger, so a key still read from its deprecated variable says so once.
   const lookup = credentialsFor ?? credentialsForAccounts(db, keys, logger);
@@ -606,7 +620,13 @@ export async function startWorker({
       createReconcileStep({ registry: sources, credentialsFor: lookup, choicesFor }),
     poll:
       steps.poll ??
-      createCollectStep({ registry: sources, credentialsFor: lookup, accountCapFor, choicesFor }),
+      createCollectStep({
+        registry: sources,
+        credentialsFor: lookup,
+        accountCapFor,
+        choicesFor,
+        capacityFor,
+      }),
     estimate:
       steps.estimate ??
       createEstimateStep({ registry: sources, credentialsFor: lookup, choicesFor }),
@@ -698,7 +718,7 @@ export async function startWorker({
   });
 
   await boss.work(scheduleTickQueue, workerOptions, async () => {
-    await enqueueDuePolls(db, boss, logger, billing, accountCapMicros ?? null);
+    await enqueueDuePolls(db, boss, logger, billing, accountCapMicros ?? null, capacityFor);
     await enqueueNotifications(db, boss);
     await boss.send(reconcileQueue, {}, { singletonKey: "all" });
   });

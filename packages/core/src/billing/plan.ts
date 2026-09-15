@@ -32,6 +32,7 @@ import type { Database } from "../db/client.js";
 import { type SubscriptionPlan, subscriptions } from "../db/schema.js";
 import { readProviderChoices } from "../sources/choices.js";
 import type { ProviderChoices } from "../sources/types.js";
+import type { Capacities, PlanCapacity } from "./capacity.js";
 import type { BillingMode, SubscriptionRecord } from "./entitlement.js";
 import { readSubscription } from "./store.js";
 
@@ -103,6 +104,13 @@ export interface AccountKeysOptions {
    * instance.
    */
   readonly lentProviders?: ProviderChoices;
+  /**
+   * What the plan sells, and what its trial does. US-133 and US-134.
+   * `capacitiesFrom` reads both from the environment at boot. Undefined means
+   * this deployment sells no capacity, which is every self-hosted instance —
+   * and then `capacity()` answers null for everybody.
+   */
+  readonly capacities?: Capacities;
 }
 
 /**
@@ -163,11 +171,27 @@ export interface AccountKeys {
    * name.
    */
   spendsInstanceMoney(userId: string): Promise<boolean>;
+  /**
+   * What this account may hold and how often it may poll, or null where the
+   * money is its own and nothing bounds it but its own budget. US-133.
+   *
+   * The trial's capacity while the subscription is trialing, the plan's
+   * after. Null for every account spending its own keys — US-013 owns their
+   * bound — and for every account on a self-hosted instance.
+   */
+  capacity(userId: string): Promise<PlanCapacity | null>;
 }
 
 export function accountKeys(
   db: Database,
-  { signup, mode, environment = process.env, capMicros, lentProviders = {} }: AccountKeysOptions,
+  {
+    signup,
+    mode,
+    environment = process.env,
+    capMicros,
+    lentProviders = {},
+    capacities,
+  }: AccountKeysOptions,
 ): AccountKeys {
   return {
     async provider(userId) {
@@ -189,6 +213,12 @@ export function accountKeys(
     },
     async spendsInstanceMoney(userId) {
       return spendsInstanceMoney(signup, await readPlan(db, userId, mode));
+    },
+    async capacity(userId) {
+      if (capacities === undefined || mode === "off") return null;
+      const subscription = await readSubscription(db, userId);
+      if (!spendsInstanceMoney(signup, planOf(mode, subscription))) return null;
+      return subscription?.status === "trialing" ? capacities.trial : capacities.plan;
     },
   };
 }

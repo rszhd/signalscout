@@ -332,7 +332,15 @@ describe("the billing routes", () => {
    * US-129. The screen states the cap the worker enforces, from the same object
    * — a second copy of the figure is how a page and a poll stop agreeing.
    */
-  it("reports what the plan lends and what is left of it", async () => {
+  /**
+   * US-133 replaced the allowance with the capacity, and the expected value
+   * moved because the behaviour was meant to. The route used to answer with
+   * `ACCOUNT_MONTHLY_CAP_MICROS` and the month's spend — the deployment's
+   * fuse, printed as though it were the customer's allowance, so a $49
+   * account was told its included usage was $15. What it answers with now is
+   * what the customer bought: monitors, queries, platforms and a schedule.
+   */
+  it("reports what the plan sells, and no figure in dollars", async () => {
     const id = await account(`lent-${randomUUID()}`);
     await db.insert(subscriptions).values({ userId: id, status: "active", plan: "keys_included" });
 
@@ -345,21 +353,32 @@ describe("the billing routes", () => {
       pricePerUnitMicros: 4_000_000,
     });
 
-    const app = await server(id, undefined, { capMicros: 15_000_000 });
+    const app = await server(id, undefined, { capMicros: 25_000_000 });
 
     try {
       const body = (await app.inject({ method: "GET", url: billingBasePath })).json();
 
       expect(body.plan).toBe("keys_included");
       expect(body.included).toEqual({
-        capMicros: 15_000_000,
-        spentMicros: 4_000_000,
-        remainingMicros: 11_000_000,
-        exhausted: false,
-        since: new Date(
-          Date.UTC(new Date().getUTCFullYear(), new Date().getUTCMonth(), 1),
-        ).toISOString(),
+        monitors: 1,
+        projects: 1,
+        queries: 6,
+        queriesPerPlatform: { linkedin: 3 },
+        platforms: ["reddit", "x", "linkedin", "youtube", "tiktok", "instagram"],
+        pollIntervalSeconds: {
+          reddit: 4 * 60 * 60,
+          x: 4 * 60 * 60,
+          youtube: 4 * 60 * 60,
+          tiktok: 4 * 60 * 60,
+          instagram: 12 * 60 * 60,
+          linkedin: 24 * 60 * 60,
+        },
+        replies: false,
+        paused: false,
       });
+
+      // The fuse is the deployment's and no key here names it.
+      expect(JSON.stringify(body.included)).not.toMatch(/Micros|spent|cap/i);
     } finally {
       await app.close();
     }
@@ -373,7 +392,7 @@ describe("the billing routes", () => {
   it("reports no lent month for an account spending its own money", async () => {
     const id = await account(`own-${randomUUID()}`);
     // The same lending instance, and an account on the other plan.
-    const app = await server(id, undefined, { capMicros: 15_000_000 });
+    const app = await server(id, undefined, { capMicros: 25_000_000 });
 
     try {
       const body = (await app.inject({ method: "GET", url: billingBasePath })).json();

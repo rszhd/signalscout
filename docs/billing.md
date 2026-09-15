@@ -32,6 +32,20 @@ Every unknown reads as bring-your-own-keys: no row, no column value, a price
 this instance was never told about. `billing/plan.ts` holds that, and
 `config/machine-keys.ts` holds what it then means.
 
+**The plan sells a capacity, not an allowance.** US-133 and US-134. One
+project, one monitor, six queries with at most three on LinkedIn, every
+platform, and an interval per platform: LinkedIn daily, Instagram every twelve
+hours, the other four every four hours. No comment threads. The trial is
+smaller — four queries, daily, and neither Instagram nor LinkedIn. Every
+number is a variable under `KEYS_INCLUDED_`, read at boot, with those figures
+as the defaults.
+
+It is enforced in three places and the third is the one that matters. A write
+past it is refused with the number — monitor create and update, and project
+create. The scheduler does not send a poll for a monitor polling faster than
+its plan sells. And the poll itself skips each platform whose turn has not
+come round, before anything is fetched, recording `platform_not_due`.
+
 **The plan lends a month, and `ACCOUNT_MONTHLY_CAP_MICROS` is how much.**
 US-129. $15 unless a deployment says otherwise, counted across every provider
 call and every model call the account caused, and reset by the calendar. No
@@ -175,7 +189,8 @@ STRIPE_WEBHOOK_SECRET=whsec_…
 APP_URL=https://app.example.com
 
 STRIPE_PRICE_ID_KEYS_INCLUDED=price_…   # optional: the second plan's price
-ACCOUNT_MONTHLY_CAP_MICROS=15000000     # optional: what that plan lends, $15
+ACCOUNT_MONTHLY_CAP_MICROS=25000000     # optional: the deployment's fuse, $25
+KEYS_INCLUDED_QUERIES=6                 # optional: what the plan sells, per dial
 KEYS_INCLUDED_PROVIDER_REDDIT=scrapecreators   # one per platform: who fetches it on that plan
 ```
 

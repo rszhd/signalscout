@@ -435,6 +435,13 @@
       "when": 1789254786889,
       "tag": "0061_a_poll_can_stop_at_the_accounts_cap",
       "breakpoints": true
+    },
+    {
+      "idx": 62,
+      "version": "7",
+      "when": 1789458337727,
+      "tag": "0062_a_platform_waits_its_turn",
+      "breakpoints": true
     }
   ]
 }

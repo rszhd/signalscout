@@ -68,6 +68,18 @@ and the provider's own ledger moved 1186 to 1094, the same 92. It went further
 than the first run because nothing refused it early. The model half of that
 repeat is unmeasured: the model account had no credit and every call failed.
 
+**The second cap is a fuse and it sits above what the plan sells.** US-129
+set `ACCOUNT_MONTHLY_CAP_MICROS` at $15 and the billing page showed it as the
+customer's monthly allowance — so a $49 account was told its plan included
+$15, and the fuse would have blown inside a month somebody paid for. US-133
+raised it to $25 and took it off every screen. The arithmetic: US-134's worst
+mix is about $9 of fetching a month and about $3 of model, so about $12, and
+twice that leaves room for the model half nobody has measured while still
+stopping a runaway. What the customer is sold instead is a capacity —
+monitors, queries per platform, a poll interval per platform and a platform
+list — which is `billing/capacity.ts`, and every figure in it came from the
+table above.
+
 **A vague query is not free silence.** X refunds a search that matches nothing.
 LinkedIn, YouTube and Instagram do not — they return unrelated results at full
 price, and then the model is paid to read them.

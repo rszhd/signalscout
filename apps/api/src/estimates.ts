@@ -22,6 +22,7 @@ import {
   maximumSubreddits,
   minimumPollIntervalSeconds,
   notOfferedReason,
+  type PlanCapacity,
   platforms,
   probesFor,
   readEstimate,
@@ -155,11 +156,17 @@ export interface EstimateRoutesOptions {
    * will ever pick up.
    */
   readonly jobs: JobSender | null;
+  /**
+   * What this account's plan sells, or null where nothing bounds it. US-133.
+   * The quote prices each platform at its own rate, and the plan's floor is
+   * where that rate comes from.
+   */
+  readonly capacityFor?: (userId: string) => Promise<PlanCapacity | null>;
 }
 
 export async function registerEstimateRoutes(
   app: ApiServer,
-  { db, sources, jobs }: EstimateRoutesOptions,
+  { db, sources, jobs, capacityFor = async () => null }: EstimateRoutesOptions,
 ): Promise<void> {
   /**
    * Start a cost test.
@@ -248,7 +255,9 @@ export async function registerEstimateRoutes(
       const run = await readEstimate(db, estimateId);
       if (!run) throw new Error("The cost test was not written.");
 
-      return reply.code(202).send(toResponse(run, sources));
+      return reply
+        .code(202)
+        .send(toResponse(run, sources, await capacityFor(sessionUserId(request))));
     },
   });
 
@@ -263,7 +272,7 @@ export async function registerEstimateRoutes(
       const run = await readEstimate(db, request.params.id);
       if (!run) return reply.code(404).send({ message: "No cost test has that id." });
 
-      return toResponse(run, sources);
+      return toResponse(run, sources, await capacityFor(sessionUserId(request)));
     },
   });
 }
@@ -271,8 +280,10 @@ export async function registerEstimateRoutes(
 function toResponse(
   run: Awaited<ReturnType<typeof readEstimate>> & object,
   sources: readonly ConnectorDescriptor[],
+  /** What the owner's plan sells, so each platform is quoted at its own rate. US-133. */
+  capacity: PlanCapacity | null = null,
 ) {
-  const report = reportFor(run, sources);
+  const report = reportFor(run, sources, capacity);
 
   return {
     ...report,

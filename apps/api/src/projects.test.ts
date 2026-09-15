@@ -14,11 +14,13 @@ import {
   loadEnv,
   modelCalls,
   type ProjectDescriber,
+  subscriptions,
+  users,
 } from "@signalscout/core";
 import { createTestDatabase, type TestDatabase } from "@signalscout/core/testing";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { buildServer } from "./server.js";
-import { asOwner } from "./testing.js";
+import { asOwner, testOwner } from "./testing.js";
 
 const logger = createLogger({ level: "silent", name: "test" });
 
@@ -108,6 +110,60 @@ describe("the project routes", () => {
   beforeEach(async () => {
     const response = await post("/api/projects", answers);
     created = response.json();
+  });
+
+  /**
+   * US-133. The plan carries a project count, and a second one is refused with
+   * the number rather than written. An account that arrived over the count
+   * keeps what it has; only the write is refused.
+   */
+  it("refuses a project past the count the plan includes", async () => {
+    const env = loadEnv({
+      DATABASE_URL: database.url,
+      AUTH_SECRET: "x".repeat(32),
+      AUTH_SIGNUP: "open",
+    });
+    await db
+      .insert(users)
+      .values({ id: testOwner, name: testOwner, email: `${testOwner}@example.test` })
+      .onConflictDoNothing();
+    await db.insert(subscriptions).values({
+      userId: testOwner,
+      status: "active",
+      plan: "keys_included",
+    });
+
+    const app = await buildServer({
+      session: asOwner,
+      env,
+      logger,
+      db,
+      queryGenerator: null,
+      describer: null,
+      billingSettings: {
+        mode: "stripe",
+        apiKey: "sk_test_not_a_real_key",
+        priceId: "price_own",
+        keysIncludedPriceId: "price_included",
+        webhookSecret: "whsec_test",
+        appUrl: "https://app.example.test",
+      },
+    });
+
+    try {
+      // `beforeEach` already created one, which is what the plan carries.
+      const response = await app.inject({
+        method: "POST",
+        url: "/api/projects",
+        payload: { ...answers, name: "Second" },
+      });
+
+      expect(response.statusCode).toBe(422);
+      expect(response.json().message).toMatch(/includes 1 project/);
+    } finally {
+      await app.close();
+      await db.delete(subscriptions);
+    }
   });
 
   it("creates a project and answers 201 with it", async () => {

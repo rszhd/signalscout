@@ -1,6 +1,7 @@
 import { eq, sql } from "drizzle-orm";
 import { PgBoss } from "pg-boss";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
+import { defaultPlanCapacity } from "../billing/capacity.js";
 import { recordSourceUsage } from "../budget/budget.js";
 import { createDatabase, type Database } from "../db/client.js";
 import {
@@ -530,8 +531,123 @@ describe("whether the account has spent its month", () => {
     await insertMonitor(database, { userId: over });
 
     const result = await enqueueDuePolls(db, boss, silentLogger, "stripe", null);
+    expect(result.tooSoonSkipped).toBe(0);
 
     expect(result.due).toBe(1);
     expect(result.overCapSkipped).toBe(0);
+  });
+
+  /**
+   * US-133. The scheduler is the half that matters here for the same reason
+   * it is for the cap: a form that refuses is what a person sees, and a row
+   * that got past the form — created before the plan, or a capacity the
+   * deployment lowered — is polled at its own rate until the tick declines to
+   * send it.
+   */
+  it("does not send a poll for a monitor polling faster than its plan sells", async () => {
+    const owner = await ownerOn("floor-included", "keys_included");
+    const id = await insertMonitor(database, { userId: owner, pollIntervalSeconds: 900 });
+
+    // Polled twenty minutes ago: due by its own column, not due under a plan
+    // that polls Reddit every four hours.
+    await db
+      .update(monitors)
+      .set({ lastPolledAt: minutes(20) })
+      .where(eq(monitors.id, id));
+
+    const result = await enqueueDuePolls(
+      db,
+      boss,
+      silentLogger,
+      "stripe",
+      null,
+      async () => defaultPlanCapacity,
+    );
+
+    expect(result.due).toBe(1);
+    expect(result.tooSoonSkipped).toBe(1);
+  });
+
+  it("sends it once the plan's floor has passed", async () => {
+    const owner = await ownerOn("floor-passed", "keys_included");
+    const id = await insertMonitor(database, { userId: owner, pollIntervalSeconds: 900 });
+
+    await db
+      .update(monitors)
+      .set({ lastPolledAt: minutes(5 * 60) })
+      .where(eq(monitors.id, id));
+
+    const result = await enqueueDuePolls(
+      db,
+      boss,
+      silentLogger,
+      "stripe",
+      null,
+      async () => defaultPlanCapacity,
+    );
+
+    expect(result.tooSoonSkipped).toBe(0);
+  });
+
+  it("sends a monitor that has never polled, whatever the plan's floor", async () => {
+    const owner = await ownerOn("floor-never", "keys_included");
+    await insertMonitor(database, { userId: owner, pollIntervalSeconds: 900 });
+
+    const result = await enqueueDuePolls(
+      db,
+      boss,
+      silentLogger,
+      "stripe",
+      null,
+      async () => defaultPlanCapacity,
+    );
+
+    expect(result.tooSoonSkipped).toBe(0);
+  });
+
+  /**
+   * The floor is the shortest of the platforms named, because the monitor's
+   * interval is the cadence of the whole poll — `collect.ts` then skips each
+   * platform that is not due on its own.
+   */
+  it("holds a monitor to the shortest floor of the platforms it names", async () => {
+    const owner = await ownerOn("floor-mixed", "keys_included");
+    const id = await insertMonitor(database, {
+      userId: owner,
+      pollIntervalSeconds: 900,
+      sources: ["reddit", "linkedin"],
+    });
+
+    await db
+      .update(monitors)
+      .set({ lastPolledAt: minutes(5 * 60) })
+      .where(eq(monitors.id, id));
+
+    // Five hours is past Reddit's four and inside LinkedIn's day, and the
+    // shorter one decides whether the poll is sent at all.
+    const result = await enqueueDuePolls(
+      db,
+      boss,
+      silentLogger,
+      "stripe",
+      null,
+      async () => defaultPlanCapacity,
+    );
+
+    expect(result.tooSoonSkipped).toBe(0);
+  });
+
+  it("holds nobody to a floor where the account has no capacity", async () => {
+    const owner = await ownerOn("floor-own", "own_keys");
+    const id = await insertMonitor(database, { userId: owner, pollIntervalSeconds: 900 });
+    await db
+      .update(monitors)
+      .set({ lastPolledAt: minutes(20) })
+      .where(eq(monitors.id, id));
+
+    const result = await enqueueDuePolls(db, boss, silentLogger, "stripe", null, async () => null);
+
+    expect(result.due).toBe(1);
+    expect(result.tooSoonSkipped).toBe(0);
   });
 });

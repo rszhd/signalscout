@@ -33,12 +33,19 @@ import { formatMicros, monthStart } from "./budget.js";
 /**
  * What one account may spend of ours in a month, when nothing says otherwise.
  *
- * $15, and US-129 holds the arithmetic behind it: one Reddit monitor polled
- * hourly costs about $27 a month, the same monitor polled every four hours
- * about $7, and the plan is sold at $49. The figure is one constant here so the
- * deployment, the screen and the documentation cannot hold three of them.
+ * **$25, and it is a fuse rather than an allowance.** US-129 set it at $15,
+ * which was below what the plan then sold — so it would have blown inside a
+ * month somebody paid for, and the person would have read a sentence blaming
+ * them for spending too much. US-133 moved it above the capacity: US-134's
+ * worst case is about $9 of fetching and $3 of model, and twice that leaves
+ * room for the model half nobody has measured while still stopping a runaway.
+ *
+ * It is the deployment's number and no screen shows it. What a customer is
+ * sold is `billing/capacity.ts` — monitors, queries, a schedule and a platform
+ * list — and if this ever blows it is a bug, a provider quirk or a retry
+ * storm, none of which are the customer's doing.
  */
-export const defaultAccountCapMicros = 15_000_000;
+export const defaultAccountCapMicros = 25_000_000;
 
 export interface AccountCapEnvironment {
   readonly ACCOUNT_MONTHLY_CAP_MICROS?: string | undefined;
@@ -162,12 +169,18 @@ export function accountBudgetState(
      * repair. A monitor's budget is raised by the person reading the message;
      * this one is not raised by anybody, so the sentence must not invite
      * somebody to go looking for a control that does not exist.
+     *
+     * **It names no figure, since US-133.** This cap is the deployment's fuse
+     * and it sits above the capacity the plan sells, so an account that
+     * reaches it did nothing wrong: what the customer bought is a number of
+     * monitors and queries, not a number of dollars, and printing our internal
+     * limit as though it were their allowance is the mistake US-133 was
+     * written to undo. The operator's own figures are in the log line at the
+     * refusal, which is where somebody can act on them.
      */
     reason: exhausted
-      ? `Stopped for this month: this account has spent an estimated ${formatMicros(
-          spend.totalMicros,
-        )} of the ${formatMicros(capMicros)} its plan includes. Collecting and scoring ` +
-        "start again when the month does."
+      ? "Paused for this month. Collecting and scoring start again when the month does, " +
+        "and nothing you set caused this — if it keeps happening, tell us."
       : null,
   };
 }

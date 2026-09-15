@@ -37,10 +37,16 @@ const spend = (sourceMicros: number, modelMicros: number) => ({
 });
 
 describe("what a deployment lends one account", () => {
-  it("is fifteen dollars when nothing says otherwise", () => {
+  /**
+   * US-133 raised it from $15 to $25, and the expected value moved because
+   * the behaviour was meant to. $15 sat *below* what the plan sells, so the
+   * fuse would have blown inside a month somebody paid for. It now sits above
+   * US-134's worst case of about $12.
+   */
+  it("is twenty-five dollars when nothing says otherwise, above what the plan sells", () => {
     expect(accountCapFrom({})).toBe(defaultAccountCapMicros);
     expect(accountCapFrom({ ACCOUNT_MONTHLY_CAP_MICROS: "" })).toBe(defaultAccountCapMicros);
-    expect(defaultAccountCapMicros).toBe(15_000_000);
+    expect(defaultAccountCapMicros).toBe(25_000_000);
   });
 
   it("is whatever the deployment set, including nothing at all", () => {
@@ -101,11 +107,19 @@ describe("the rule, over a reading already taken", () => {
    * Nobody raises this cap, so the message must not send somebody looking for a
    * control that does not exist.
    */
-  it("says the month resets rather than inviting somebody to raise the cap", () => {
-    const reason = accountBudgetState(spend(15_000_000, 0), 15_000_000).reason ?? "";
+  /**
+   * US-133. The sentence named the cap and the spend, which printed the
+   * deployment's fuse as though it were the customer's allowance — a $49
+   * account told its included usage was $15. It names no figure now: what the
+   * customer bought is monitors and queries, and the operator's numbers are
+   * in the log line at the refusal.
+   */
+  it("says the month resets, names no figure, and blames nobody", () => {
+    const reason = accountBudgetState(spend(25_000_000, 0), 25_000_000).reason ?? "";
 
-    expect(reason).toContain("$15.00");
     expect(reason).toContain("when the month does");
+    expect(reason).toMatch(/nothing you set caused this/);
+    expect(reason).not.toMatch(/\$\d/);
     expect(reason.toLowerCase()).not.toContain("raise");
   });
 });

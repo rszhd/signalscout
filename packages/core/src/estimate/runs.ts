@@ -12,6 +12,7 @@
  * back, and `estimate.ts` holds the arithmetic neither of them may repeat.
  */
 import { and, asc, eq, sql } from "drizzle-orm";
+import type { PlanCapacity } from "../billing/capacity.js";
 import type { Database } from "../db/client.js";
 import {
   type EstimateProbeKind,
@@ -354,6 +355,17 @@ export interface EstimateReport {
 export function reportFor(
   run: EstimateRun,
   descriptors: readonly ConnectorDescriptor[],
+  /**
+   * What the owner's plan sells, or null where nothing bounds it. US-133.
+   *
+   * A quote that assumed one interval for every platform was wrong by the
+   * ratio between them, which is six to one for LinkedIn: the plan polls it
+   * daily where it polls Reddit every four hours, so a monitor set to four
+   * hours would be quoted six LinkedIn polls a day it will never make. Each
+   * probe is projected at its own platform's rate instead — the slower of the
+   * monitor's interval and the plan's floor for that platform.
+   */
+  capacity: PlanCapacity | null = null,
 ): EstimateReport {
   const window = { windowDays: sampleWindowDays };
   const projections: Projection[] = [];
@@ -388,7 +400,10 @@ export function reportFor(
             newestPostAt: probe.newestPostAt,
           },
           {
-            pollIntervalSeconds: run.pollIntervalSeconds,
+            pollIntervalSeconds: Math.max(
+              run.pollIntervalSeconds,
+              capacity?.pollIntervalSeconds[probe.source] ?? 0,
+            ),
             pollDays: run.pollDays,
             maxUnitsPerQueryPoll: descriptor.maxUnitsPerQueryPoll,
             pricePerUnitMicros: descriptor.pricePerUnitMicros,

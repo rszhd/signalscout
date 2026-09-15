@@ -41,6 +41,20 @@ prices are what the deployment was configured and measured for. With signup
 closed nothing changes, which is the point of tying the rule to signup rather
 than applying it everywhere.
 
+**On the plan that lends the keys, the environment wins over every stored
+row, and the rows are not deleted.** US-132. Everywhere else the order is
+the table first, then the environment, and once a row exists it wins — that is
+what makes a stored key worth storing. It is right when the row is the
+person's own key. On this plan it is not: an account that pasted a key in
+March and moved onto the plan in April would keep polling on its own key while
+paying for one it does not use, and could point *our* model key at the dearest
+model the provider sells. So while `spendsInstanceMoney` answers yes for an
+account, `credentialsForAccounts` reads no stored key and
+`readAiEnvironmentFor` reads no model row, and the API refuses every write
+that would store one with **403** — not 402, because the account has paid and
+the repair is not on the billing page. The rows stay where they are, so an
+account that leaves the plan polls on its own again with no re-entry.
+
 **The plan comes from Stripe and from nowhere else.** `subscriptions.plan` is
 written by the webhook, from the price the subscription names —
 `STRIPE_PRICE_ID_KEYS_INCLUDED` is what this deployment sells that plan as. No

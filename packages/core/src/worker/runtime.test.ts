@@ -353,4 +353,55 @@ describe("whose keys a worker polls with", () => {
       await close();
     }
   });
+
+  /**
+   * US-132. `credentials.ts` says a stored row wins over the environment, and
+   * that is right when the row is the person's own key. On the plan that lends
+   * the keys the environment wins instead: an account that pasted a key in
+   * March and moved onto the plan in April must not keep polling on it. The
+   * row is left where it is, so leaving the plan reads it again.
+   */
+  it("reads the machine's key and not the stored row for an account on the plan", async () => {
+    const encryption = generateEncryptionKey();
+    vi.stubEnv("ENCRYPTION_KEY", encryption);
+    const key = readEncryptionKey(encryption);
+    const { db, close } = createDatabase(database.url);
+
+    try {
+      for (const [id, plan] of [
+        ["included", "keys_included"],
+        ["own", "own_keys"],
+      ] as const) {
+        await db.insert(users).values({ id, name: id, email: `${id}@example.test` });
+        await db.insert(subscriptions).values({ userId: id, status: "active", plan });
+        await putSourceCredential(db, key, {
+          userId: id,
+          provider: "brightdata",
+          field: "apiKey",
+          value: `${id}-stored-key`,
+        });
+      }
+
+      const keys = accountKeys(db, { signup: "open", mode: "stripe", environment: machine });
+      const lookup = credentialsForAccounts(db, keys, silentLogger);
+
+      // biome-ignore lint/suspicious/noExplicitAny: the descriptor is shaped by hand here.
+      expect(await lookup(connector as any, "included")).toEqual({ apiKey: "the-machine-key" });
+      // biome-ignore lint/suspicious/noExplicitAny: the same.
+      expect(await lookup(connector as any, "own")).toEqual({ apiKey: "own-stored-key" });
+
+      // Nothing deleted: off the plan, the row is read again.
+      await db.update(subscriptions).set({ plan: "own_keys" });
+      // biome-ignore lint/suspicious/noExplicitAny: the same.
+      expect(await lookup(connector as any, "included")).toEqual({
+        apiKey: "included-stored-key",
+      });
+    } finally {
+      vi.unstubAllEnvs();
+      await db.delete(sourceCredentials);
+      await db.delete(subscriptions);
+      await db.delete(users);
+      await close();
+    }
+  });
 });

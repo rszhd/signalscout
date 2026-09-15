@@ -152,6 +152,17 @@ export interface AccountKeys {
    * leaving the plan does. Nothing is deleted.
    */
   choices(userId: string): Promise<ProviderChoices>;
+  /**
+   * Whether this account is spending money that is not its own. US-132.
+   *
+   * `spendsInstanceMoney` asked about one account: open signup and the plan
+   * that lends the keys. It is what decides that a stored key, a stored
+   * provider choice and stored model rows are not read while the account is
+   * on the plan, and that the writes which would store them are refused. One
+   * rule, asked per account, and reused rather than copied under a second
+   * name.
+   */
+  spendsInstanceMoney(userId: string): Promise<boolean>;
 }
 
 export function accountKeys(
@@ -175,6 +186,9 @@ export function accountKeys(
     async choices(userId) {
       if (spendsInstanceMoney(signup, await readPlan(db, userId, mode))) return lentProviders;
       return readProviderChoices(db, userId);
+    },
+    async spendsInstanceMoney(userId) {
+      return spendsInstanceMoney(signup, await readPlan(db, userId, mode));
     },
   };
 }

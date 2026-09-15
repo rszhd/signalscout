@@ -335,6 +335,21 @@ describe("the plan, and the keys, read from the database", () => {
     expect(await closed.choices("included")).toEqual({ reddit: "brightdata" });
   });
 
+  it("says whose money an account spends, per account", async () => {
+    await account("included", "keys_included");
+    await account("own", "own_keys");
+
+    const open = accountKeys(db, { signup: "open", mode: "stripe", environment: machine });
+    expect(await open.spendsInstanceMoney("included")).toBe(true);
+    expect(await open.spendsInstanceMoney("own")).toBe(false);
+
+    const closed = accountKeys(db, { signup: "closed", mode: "stripe", environment: machine });
+    expect(await closed.spendsInstanceMoney("included")).toBe(false);
+
+    const off = accountKeys(db, { signup: "open", mode: "off", environment: machine });
+    expect(await off.spendsInstanceMoney("included")).toBe(false);
+  });
+
   it("answers a lent-keys account with nothing where the deployment named nothing", async () => {
     await account("included", "keys_included");
     await setProviderChoice(db, "included", "reddit", "brightdata");

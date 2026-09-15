@@ -65,33 +65,35 @@ US-130 was written to avoid: no choice, two providers, and a refused poll.
 
 ## Acceptance
 
-- [ ] One rule decides it, asked per account. `spendsInstanceMoney(signup,
-      plan)` already asks exactly this question — open signup and the plan that
-      lends the keys — and is reused rather than copied under a second name
-- [ ] Every write that chooses a provider, a model or a key is refused for an
-      account the deployment pays for: both connections writes, both platform
-      provider writes, both key tests, and every `/api/models` write
-- [ ] The refusal is **403** with a reason naming the plan. Not 402: the account
-      has paid, and "this is the deployment's choice" and "this account has not
-      paid" send a person to two different places
-- [ ] The refusal is proved by walking every route the build registers, the way
-      `billing.test.ts` walks them, so a route added later cannot escape it
-- [ ] A stored provider key, a stored provider choice and stored model rows are
-      ignored while the account is on the plan. The environment answers instead
-- [ ] Nothing stored is deleted. An account that leaves the plan polls on its own
-      rows again, with no re-entry
-- [ ] The connections screen and the Models screen say what the deployment uses:
-      the provider per platform, the model per task, and that the plan includes
-      them. No key field, no test button, no provider control
-- [ ] Both screens keep their addresses, and the billing page's link still works
-- [ ] An account spending its own keys is unaffected. Every write it makes today
-      it makes after this
-- [ ] With signup closed nothing changes. The self-hosted instance chooses
-      everything, because the money is the operator's own
-- [ ] US-130's acceptance is amended in this change: a recorded choice wins for
-      an account spending its own keys
-- [ ] Every rule that reads the database is asserted against real Postgres
-- [ ] No test reaches a provider, Stripe or a model
+- [x] One rule decides it, asked per account: `accountKeys.spendsInstanceMoney`
+      is `spendsInstanceMoney(signup, plan)` for one account, reused rather
+      than copied
+- [x] Every write that chooses a provider, a model or a key is refused for an
+      account the deployment pays for: eleven routes today under three
+      prefixes — `/api/connections`, `/api/platforms/`, `/api/models`
+- [x] The refusal is **403** with a sentence naming the plan and the repair
+- [x] The refusal is proved by walking every route the build registers, the
+      way `billing.test.ts` walks them; a route added under a prefix later is
+      refused without a test naming it
+- [x] A stored provider key, a stored provider choice and stored model rows
+      are ignored while the account is on the plan. The choice half was
+      US-130's; the key half is `credentialsForAccounts`, the model half is
+      `readAiEnvironmentFor`, and both composition roots call them
+- [x] Nothing stored is deleted. Tests move an account off the plan and read
+      its key row and its model row again
+- [ ] The connections screen and the Models screen say what the deployment
+      uses. **The next session**, as the Notes say — the backend stops here.
+      Both GET routes answer 200 to an account on the plan today, and still
+      show its controls; the screens need a flag and a shape the screen
+      session decides
+- [x] Both screens keep their addresses: no route was removed
+- [x] An account spending its own keys is unaffected: the walk asserts no 403
+      for it, and its rows still win
+- [x] With signup closed nothing changes: the gate is not registered, and
+      `spendsInstanceMoney` answers no
+- [x] US-130's acceptance was amended in that change
+- [x] Every rule that reads the database is asserted against real Postgres
+- [x] No test reaches a provider, Stripe or a model
 
 ## Notes
 
@@ -126,3 +128,24 @@ US-130 was written to avoid: no choice, two providers, and a refused poll.
   deployment's named provider and reads none of its rows. What stays here is
   the stored provider key, the stored model rows, the eight refused writes and
   the two screens.
+
+- 2026-09-15T18:50+08:00 — **Backend built; the screens wait.** The gate is
+  an `onRequest` hook registered after the paywall and only where signup is
+  open and billing is on, so a self-hosted instance pays no read for it. It
+  refuses by prefix rather than by list, for the reason the paywall walks
+  every route.
+
+  The two precedence flips live where each order was written: the key half
+  in `credentialsForAccounts`, which now hands a lent-keys account the
+  environment lookup and everybody else the store; the model half in a new
+  `readAiEnvironmentFor` in `ai/settings.ts`, which both roots call so the
+  worker and the API cannot disagree. The worker's `modelsFor` calls it with
+  `spendsInstanceMoney(signup, plan)` from the plan it already reads per job;
+  that call site is asserted only by reading, because an injected classifier
+  wins over the environment in every worker test. The API seam is asserted
+  with a stored row and a plan change.
+
+  Seen and left for the screen session: `GET /api/connections` still reports
+  the account's stored keys as connected for a lent-keys account, and
+  `GET /api/models` still shows its rows. Neither is read by a poll now, so
+  the screens are the only readers that lie.

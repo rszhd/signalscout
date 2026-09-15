@@ -2,7 +2,7 @@
 
 # Open tickets
 
-35 open — 14 doing, 20 todo, 1 parked (14 p1, 16 p2, 5 p3).
+35 open — 15 doing, 19 todo, 1 parked (14 p1, 16 p2, 5 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -13,11 +13,11 @@
 | p1 | US-083 | [One default key sets every job](doing/US-083-one-default-key-sets-every-job.md) | feature | doing | 2026-09-09T11:13+08:00 |
 | p1 | US-100 | [The cloud version runs at app.signalscout.run](doing/US-100-the-cloud-version-runs-at-app-signalscout-run.md) | feature | doing | 2026-09-10T03:05+08:00 |
 | p1 | US-104 | [A monitor says what its last poll did](doing/US-104-a-monitor-says-what-its-last-poll-did.md) | feature | doing | 2026-09-10T09:51+08:00 |
+| p1 | US-132 | [The deployment chooses the model and the provider on the lent-keys plan](doing/US-132-the-deployment-chooses-the-model-and-the-provider-on-the-lent-keys-plan.md) | feature | doing | 2026-09-13T19:52+08:00 |
 | p1 | BUG-004 | [The model half of a poll is not capped](doing/BUG-004-the-model-half-of-a-poll-is-not-capped.md) | bug | doing | 2026-09-06T04:42+08:00 |
 | p1 | BUG-016 | [One platform's outage throws away another platform's collection](doing/BUG-016-one-platforms-outage-throws-away-another-platforms-collection.md) | bug | doing | 2026-09-10T10:44+08:00 |
 | p1 | US-033 | [Thirty verdicts say whether the score is right](todo/US-033-thirty-verdicts-say-whether-the-score-is-right.md) | chore | todo | 2026-09-06T03:02+08:00 |
 | p1 | US-131 | [Checkout offers the plan that includes the keys](todo/US-131-checkout-offers-the-plan-that-includes-the-keys.md) | feature | todo | 2026-09-13T13:05+08:00 |
-| p1 | US-132 | [The deployment chooses the model and the provider on the lent-keys plan](todo/US-132-the-deployment-chooses-the-model-and-the-provider-on-the-lent-keys-plan.md) | feature | todo | 2026-09-13T19:52+08:00 |
 | p1 | US-133 | [The lent-keys plan sells capacity, not an allowance](todo/US-133-the-lent-keys-plan-sells-capacity-not-an-allowance.md) | feature | todo | 2026-09-13T20:02+08:00 |
 | p1 | US-134 | [One plan at $35, with or without your own keys](todo/US-134-one-plan-at-35-dollars-with-or-without-your-own-keys.md) | feature | todo | 2026-09-13T20:38+08:00 |
 | p2 | US-015 | [A deleted post stops being shown](doing/US-015-a-deleted-post-stops-being-shown.md) | feature | doing | 2026-09-04T22:49+08:00 |

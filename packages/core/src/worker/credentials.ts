@@ -10,6 +10,12 @@
  * exists, it wins, and the environment variable behind it becomes the value
  * nobody edits any more.
  *
+ * **Except on the plan that lends the keys.** US-132. There the row is not the
+ * person's own key and the environment is what they are paying for, so
+ * `runtime.ts`'s `credentialsForAccounts` reads the environment and never the
+ * store for such an account. This file does not know about plans; the caller
+ * that does hands it the right lookup.
+ *
  * This is the one place the application reads an environment variable that
  * `config/env.ts` does not declare, and the reason is that the set of
  * variables is not known until the registry is built: it is one per credential

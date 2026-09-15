@@ -22,7 +22,7 @@ import {
   triageConfigFromEnvironment,
 } from "../ai/config.js";
 import { createEmbedder, type Embedder } from "../ai/embed.js";
-import { readAiEnvironment as readAiSettingsEnvironment } from "../ai/settings.js";
+import { readAiEnvironmentFor as readAiSettingsEnvironment } from "../ai/settings.js";
 import { createTriager, type Triager } from "../ai/triage.js";
 import type { SignupMode } from "../auth/user.js";
 import {
@@ -41,6 +41,7 @@ import {
 import {
   accountModelEnvironment,
   machineKeysUsable,
+  spendsInstanceMoney,
   webhookSecretEnvironment,
 } from "../config/machine-keys.js";
 import { createDatabase, type Database, poolOptions } from "../db/client.js";
@@ -60,7 +61,11 @@ import { assertSourcesCanBeStored } from "../sources/storage.js";
 import type { ProviderChoices } from "../sources/types.js";
 import { createClassifyStep } from "./classify.js";
 import { createCollectStep } from "./collect.js";
-import { type CredentialLookup, credentialsFromStore } from "./credentials.js";
+import {
+  type CredentialLookup,
+  credentialsFromEnvironment,
+  credentialsFromStore,
+} from "./credentials.js";
 import { createEstimateStep } from "./estimate.js";
 import { createFilterStep } from "./filter.js";
 import { createNotifyStep, enqueueNotifications } from "./notify.js";
@@ -376,7 +381,26 @@ export function credentialsForAccounts(
   keys: AccountKeys,
   logger?: Logger,
 ): CredentialLookup {
-  return credentialsFromStore(db, undefined, (userId) => keys.provider(userId), logger);
+  const stored = credentialsFromStore(db, undefined, (userId) => keys.provider(userId), logger);
+
+  /**
+   * On the plan that lends the keys, the environment wins. US-132.
+   *
+   * `credentials.ts` documents the order everywhere else — the table first,
+   * and once a row exists it wins — and that order is right when the row is
+   * the person's own key. On this plan it is not: an account that pasted a
+   * key in March and moved onto the plan in April would keep polling on its
+   * own key while paying for one it does not use, and could point the poll at
+   * a provider the deployment did not choose. So the store is not read, and
+   * the rows are left where they are so that leaving the plan reads them
+   * again.
+   */
+  return async (connector, userId) => {
+    if (await keys.spendsInstanceMoney(userId)) {
+      return credentialsFromEnvironment(await keys.provider(userId), logger)(connector, userId);
+    }
+    return stored(connector, userId);
+  };
 }
 
 export async function startWorker({
@@ -521,8 +545,15 @@ export async function startWorker({
     const instance = readAccountBaseEnvironment(plan);
     // An account with no rows gets the instance's environment back, so the
     // common install pays one small query per owner per process and nothing
-    // else changes about it.
-    const mine = await readAiSettingsEnvironment(db, userId, instance);
+    // else changes about it. On the plan that lends the keys the rows are not
+    // read at all, US-132: the deployment chooses the model, and a row from
+    // before the plan must not point our key at a model nobody priced.
+    const mine = await readAiSettingsEnvironment(
+      db,
+      userId,
+      instance,
+      spendsInstanceMoney(signup, plan),
+    );
 
     const own = {
       classifier:

@@ -38,8 +38,15 @@ interface SourceOption {
   /** Empty when the platform can be collected. */
   missingCredentials: CredentialOption[];
   ready: boolean;
+  /** True when the plan, or the trial, leaves this platform out. US-134. */
+  excluded?: boolean;
   /** Whether the connector that would run here reads replies. US-020. */
   canFetchReplies: boolean;
+}
+
+/** Ticked by default and pickable: keyed, and inside the plan. */
+function pickable(source: SourceOption): boolean {
+  return source.ready && !source.excluded;
 }
 
 interface MonitorOptions {
@@ -63,6 +70,8 @@ interface PlanCapacity {
   platforms: string[];
   pollIntervalSeconds: Record<string, number>;
   replies: boolean;
+  /** Whether these are the trial's numbers rather than the plan's. */
+  trial?: boolean;
 }
 
 /** An interval as a person reads it. The same words the billing page uses. */
@@ -222,6 +231,54 @@ function planSignature(
   return JSON.stringify([byPlatform, cleanList(subreddits)]);
 }
 
+/** The most queries one platform's list may hold: the form's own eight, or fewer on a plan. */
+const longestList = 8;
+
+/**
+ * How many queries one platform may hold on this plan. US-134: the total is
+ * across the account, and one platform may carry a tighter limit of its own.
+ */
+export function listLimitFor(capacity: PlanCapacity | null, platform: string): number {
+  if (!capacity) return longestList;
+  return Math.min(longestList, capacity.queriesPerPlatform[platform] ?? capacity.queries);
+}
+
+/**
+ * Fit a generated plan to the plan's capacity, before a person reads it.
+ *
+ * The generator writes three to eight queries per platform, and a trial
+ * carries four in total. Taking the first of each platform's list in turn
+ * shares the total out evenly — four across four platforms is one each — and
+ * each platform's own limit is kept on the way. The model writes its list
+ * strongest first, so what is kept is the head of each.
+ */
+export function fitToCapacity(
+  capacity: PlanCapacity | null,
+  queries: Readonly<Record<string, readonly string[]>>,
+  platforms: readonly string[],
+): Record<string, string[]> {
+  const lists = Object.fromEntries(platforms.map((id) => [id, cleanList(queries[id] ?? [])]));
+  if (!capacity) return lists;
+
+  const kept: Record<string, string[]> = Object.fromEntries(platforms.map((id) => [id, []]));
+  let total = 0;
+  for (let index = 0; total < capacity.queries; index += 1) {
+    let took = false;
+    for (const id of platforms) {
+      const next = lists[id]?.[index];
+      const list = kept[id] ?? [];
+      if (next === undefined || list.length >= listLimitFor(capacity, id)) continue;
+      if (total >= capacity.queries) break;
+      list.push(next);
+      kept[id] = list;
+      total += 1;
+      took = true;
+    }
+    if (!took) break;
+  }
+  return kept;
+}
+
 /** Every query in the plan, for the "did you keep anything?" check. */
 function allQueries(queries: Readonly<Record<string, readonly string[]>>): string[] {
   return Object.values(queries).flatMap((list) => cleanList(list));
@@ -366,8 +423,8 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
         );
         // Only the platforms this account can actually poll. US-085 disables
         // the others, and a disabled box that arrived ticked is a selection
-        // nobody can remove.
-        setSelectedSources(options.sources.filter((source) => source.ready).map((s) => s.id));
+        // nobody can remove. A platform the plan leaves out is the same case.
+        setSelectedSources(options.sources.filter(pickable).map((s) => s.id));
       })
       .catch((cause: unknown) => {
         if (!cancelled) {
@@ -398,6 +455,8 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
    * acceptance names.
    */
   const repliesUnavailable = selectedSourceOptions.filter((source) => !source.canFetchReplies);
+  /** The plan does not read comment threads, so the box is shown disabled. US-134. */
+  const repliesExcluded = options?.capacity?.replies === false;
   const schedule = { pollIntervalSeconds, pollDays };
 
   const capMicros = cap.trim() === "" ? null : toMicros(cap);
@@ -533,7 +592,10 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
         }),
       });
       setGeneratedFor(generationSignature);
-      setPlan(generated);
+      setPlan({
+        ...generated,
+        queries: fitToCapacity(options.capacity, generated.queries, selectedSources),
+      });
       setStage("review");
     } catch (cause) {
       setError(messageFor(cause, "The search plan could not be generated."));
@@ -546,6 +608,13 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
     event.preventDefault();
     if (allQueries(queries).length === 0 && subreddits.length === 0) {
       setError("Keep at least one search query or subreddit.");
+      return;
+    }
+    // The same line the route holds the monitor to, said here first. US-134.
+    if (options?.capacity && allQueries(queries).length > options.capacity.queries) {
+      setError(
+        `${options.capacity.trial ? "Your trial" : "Your plan"} includes ${options.capacity.queries} queries in total, and this plan has ${allQueries(queries).length}. Remove some.`,
+      );
       return;
     }
     for (const source of selectedSourceOptions) {
@@ -615,7 +684,7 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
           queries,
           subreddits,
           sources: selectedSources,
-          includeReplies,
+          includeReplies: includeReplies && !repliesExcluded,
           /*
             The schedule, unless the plan sets it. US-133: on the plan that
             includes our keys the interval is the deployment's, so the form
@@ -650,7 +719,7 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
   function reset(): void {
     setAnswers(emptyAnswers);
     setSelectedSignals(options?.signals.map((signal) => signal.id) ?? []);
-    setSelectedSources(options?.sources.filter((source) => source.ready).map((s) => s.id) ?? []);
+    setSelectedSources(options?.sources.filter(pickable).map((s) => s.id) ?? []);
     setPlan(emptyPlan);
     setCreated(null);
     setError(null);
@@ -872,7 +941,7 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
                     // queries. A platform already ticked stays enabled, so a
                     // key deleted elsewhere leaves a box that can be unticked
                     // rather than one that is stuck.
-                    const blocked = !source.ready && !picked;
+                    const blocked = !pickable(source) && !picked;
 
                     return (
                       <label
@@ -890,21 +959,33 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
                         </span>
                         <span>
                           <strong>{source.displayName}</strong>
-                          {!source.ready && (
-                            <small>Connect {describeMissing(source.missingCredentials)}.</small>
+                          {source.excluded ? (
+                            <small>
+                              {options.capacity?.trial
+                                ? "Not included during the trial."
+                                : "Not included in your plan."}
+                            </small>
+                          ) : (
+                            !source.ready && (
+                              <small>Connect {describeMissing(source.missingCredentials)}.</small>
+                            )
                           )}
                         </span>
-                        <span className={`status-dot ${source.ready ? "ready" : "missing"}`}>
-                          {source.ready ? "Ready" : "Not connected"}
+                        <span className={`status-dot ${pickable(source) ? "ready" : "missing"}`}>
+                          {source.excluded
+                            ? "Not included"
+                            : source.ready
+                              ? "Ready"
+                              : "Not connected"}
                         </span>
                       </label>
                     );
                   })}
                 </div>
-                {options.sources.some((source) => !source.ready) && (
+                {options.sources.some((source) => !source.ready && !source.excluded) && (
                   <div className="notice" role="status">
                     <strong>
-                      {options.sources.every((source) => !source.ready)
+                      {options.sources.every((source) => !source.ready || source.excluded)
                         ? "No platform is connected yet."
                         : "Some platforms are waiting for an account."}
                     </strong>
@@ -935,9 +1016,16 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
                   A person describing their problem underneath somebody else's post is the same
                   lead. Fetching those replies is cheap; reading them is not.
                 </p>
-                <label className="source-card">
+                {/*
+                  A plan that does not read comment threads shows the box and
+                  disables it, the same way a platform it leaves out is shown:
+                  a thread page on Instagram is $0.04, and the route would
+                  refuse the tick. US-134.
+                */}
+                <label className={`source-card${repliesExcluded ? " unavailable" : ""}`}>
                   <input
-                    checked={includeReplies}
+                    checked={includeReplies && !repliesExcluded}
+                    disabled={repliesExcluded}
                     type="checkbox"
                     onChange={() => setIncludeReplies(!includeReplies)}
                   />
@@ -945,8 +1033,11 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
                   <span>
                     <strong>Include replies and comments</strong>
                     <small>
-                      Replies can reveal more people asking for help, but they multiply the model
-                      calls and collection costs.
+                      {repliesExcluded
+                        ? options.capacity?.trial
+                          ? "Not included during the trial."
+                          : "Not included in your plan."
+                        : "Replies can reveal more people asking for help, but they multiply the model calls and collection costs."}
                     </small>
                   </span>
                 </label>
@@ -1024,9 +1115,18 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
                 </div>
               )}
 
+              {options.capacity && (
+                <p className="plan-allowance" role="status">
+                  {options.capacity.trial ? "Your trial" : "Your plan"} includes{" "}
+                  {options.capacity.queries} queries in total across every platform. This plan uses{" "}
+                  {allQueries(queries).length}.
+                </p>
+              )}
+
               {selectedSourceOptions.map((source) => {
                 const list = plan.queries[source.id] ?? [];
                 const limit = source.search.maxQueryWords;
+                const most = listLimitFor(options.capacity, source.id);
 
                 return (
                   <details
@@ -1037,7 +1137,9 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
                   >
                     <summary>
                       <span>Search queries for {source.displayName}</span>
-                      <span>{cleanList(list).length} of 8</span>
+                      <span>
+                        {cleanList(list).length} of {most}
+                      </span>
                     </summary>
                     <p className="platform-plan-hint">
                       Plain phrases, without AND, OR or quote syntax. Use 2 to {limit} words each.
@@ -1102,7 +1204,7 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
                         phrase has to appear inside a post to match one, and it will not.
                       </p>
                     )}
-                    {list.length < 8 && (
+                    {list.length < most && (
                       <button
                         className="text-button"
                         type="button"
@@ -1325,21 +1427,31 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
                   </label>
                 </div>
               </fieldset>
-              <CostTest
-                monthlyCapMicros={capMicros}
-                pollDays={schedule.pollDays}
-                pollIntervalSeconds={schedule.pollIntervalSeconds}
-                queries={queries}
-                report={estimate}
-                sources={selectedSources}
-                subreddits={subreddits}
-                onReport={takeReport}
-              />
-              {stale && (
-                <div className="notice compact" role="status">
-                  <strong>The plan or schedule has changed since this test.</strong>
-                  <span>Test again to estimate the current plan and schedule.</span>
-                </div>
+              {/*
+                The cost test is a figure in dollars, and on the instance's
+                keys the money is not this account's: what bounds it is the
+                capacity above, already fitted. So the test is not offered,
+                the same way the budget is not. US-133.
+              */}
+              {!options.capacity && (
+                <>
+                  <CostTest
+                    monthlyCapMicros={capMicros}
+                    pollDays={schedule.pollDays}
+                    pollIntervalSeconds={schedule.pollIntervalSeconds}
+                    queries={queries}
+                    report={estimate}
+                    sources={selectedSources}
+                    subreddits={subreddits}
+                    onReport={takeReport}
+                  />
+                  {stale && (
+                    <div className="notice compact" role="status">
+                      <strong>The plan or schedule has changed since this test.</strong>
+                      <span>Test again to estimate the current plan and schedule.</span>
+                    </div>
+                  )}
+                </>
               )}
               {missingCredentials.length > 0 && (
                 <div className="notice warning" role="status">

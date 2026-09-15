@@ -164,6 +164,15 @@ describe("what a write past the capacity is refused with", () => {
 
     expect(refusal).toMatch(/does not include linkedin/);
     expect(refusal).toMatch(/reddit/);
+    // The trial's refusal says so, or a platform the trial leaves out reads
+    // as one the plan leaves out.
+    expect(refusal).toMatch(/^Your trial /);
+    expect(
+      capacityRefusal(defaultPlanCapacity, monitor(), {
+        otherMonitors: [monitor()],
+        otherProjects: 0,
+      }),
+    ).toMatch(/^Your plan /);
   });
 
   /**

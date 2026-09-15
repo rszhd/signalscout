@@ -197,14 +197,21 @@ describe("the monitor routes", () => {
    * A subscription row too, because the paywall reads one — but it carries no
    * plan any more: there is one price, and the state is the account's own.
    */
-  async function onPlan(source: "own" | "instance") {
+  async function onPlan(source: "own" | "instance", status: "active" | "trialing" = "active") {
     await db
       .insert(users)
       .values({ id: owner, name: owner, email: `${owner}@example.test` })
       .onConflictDoNothing();
     await db
       .insert(subscriptions)
-      .values({ userId: owner, status: "active" })
+      .values({
+        userId: owner,
+        status,
+        // A trial row must say when it ends; a week from now is one still running.
+        ...(status === "trialing"
+          ? { trialEndsAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) }
+          : {}),
+      })
       .onConflictDoNothing();
     await setKeySource(db, owner, source);
   }
@@ -813,6 +820,44 @@ describe("the monitor routes", () => {
         // The trial capacity excludes LinkedIn; the plan's does not, so this
         // account is on the plan and the refusal must not fire.
         expect(response.statusCode).toBe(201);
+      });
+    });
+
+    /**
+     * US-134. The deployment holds a LinkedIn key, so the platform is ready,
+     * and the trial leaves it out. The form is told both, so it does not tick
+     * the box and then meet the refusal — and the refusal says "trial", so a
+     * platform the trial leaves out is not read as one the plan leaves out.
+     */
+    it("marks a platform the trial leaves out, and refuses it as the trial's", async () => {
+      await onPlan("instance", "trialing");
+      await withServer({ signup: "open", charging: true }, async (app) => {
+        const body = (await app.inject({ method: "GET", url: "/api/monitor-options" })).json();
+        const byId = Object.fromEntries(
+          body.sources.map((source: { id: string; excluded: boolean }) => [
+            source.id,
+            source.excluded,
+          ]),
+        );
+
+        expect(body.capacity.trial).toBe(true);
+        expect(byId.reddit).toBe(false);
+        expect(byId.linkedin).toBe(true);
+        expect(byId.instagram).toBe(true);
+
+        const response = await app.inject({
+          method: "POST",
+          url: "/api/monitors",
+          payload: {
+            ...newMonitor,
+            sources: ["linkedin"],
+            queries: { ...newMonitor.queries, linkedin: ["hiring qa lead"] },
+            pollIntervalSeconds: 24 * 60 * 60,
+          },
+        });
+
+        expect(response.statusCode).toBe(422);
+        expect(response.json().message).toMatch(/^Your trial does not include LinkedIn/);
       });
     });
 

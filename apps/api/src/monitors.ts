@@ -857,6 +857,12 @@ export async function registerMonitorRoutes(
               missingCredentials: z.array(missingCredentialSchema),
               ready: z.boolean(),
               /**
+               * True when the plan, or the trial, leaves this platform out.
+               * US-134. The form shows it unpickable and says which of the
+               * two, rather than ticking it and being refused on save.
+               */
+              excluded: z.boolean(),
+              /**
                * Whether the connector that would run here reads replies.
                *
                * Per platform and per deployment, not per build. A build ships
@@ -887,6 +893,8 @@ export async function registerMonitorRoutes(
               platforms: z.array(z.string()),
               pollIntervalSeconds: z.record(z.string(), z.number().int()),
               replies: z.boolean(),
+              /** Whether these are the trial's numbers rather than the plan's. */
+              trial: z.boolean(),
             })
             .nullable(),
         }),
@@ -911,6 +919,7 @@ export async function registerMonitorRoutes(
               platforms: [...capacity.platforms],
               pollIntervalSeconds: { ...capacity.pollIntervalSeconds },
               replies: capacity.replies,
+              trial: capacity.trial,
             }
           : null,
         /**
@@ -944,6 +953,7 @@ export async function registerMonitorRoutes(
             // can be shown as needing one account or the other, never both.
             missingCredentials: missing,
             ready: missing.length === 0,
+            excluded: capacity !== null && !capacity.platforms.includes(platform.id),
             canFetchReplies: replies[platform.id] === true,
           };
         }),

@@ -55,6 +55,12 @@ export interface PlanCapacity {
    * on this plan is refused at the write, and the poll opens none.
    */
   readonly replies: boolean;
+  /**
+   * Whether this is the trial's capacity rather than the plan's. A refusal
+   * opens with "Your trial" then, so a platform the trial leaves out is not
+   * read as one the plan leaves out.
+   */
+  readonly trial: boolean;
 }
 
 const hour = 60 * 60;
@@ -80,6 +86,7 @@ export const defaultPlanCapacity: PlanCapacity = {
     linkedin: 24 * hour,
   },
   replies: false,
+  trial: false,
 };
 
 /**
@@ -103,6 +110,7 @@ export const defaultTrialCapacity: PlanCapacity = {
     linkedin: 24 * hour,
   },
   replies: false,
+  trial: true,
 };
 
 /**
@@ -151,6 +159,7 @@ export function planCapacityFrom(
       ]),
     ),
     replies: defaults.replies,
+    trial: defaults.trial,
   };
 }
 
@@ -234,7 +243,7 @@ export function capacityRefusal(
   holdings: AccountHoldings,
   platformName: (id: string) => string = (id) => id,
 ): string | null {
-  const plan = "Your plan";
+  const plan = capacity.trial ? "Your trial" : "Your plan";
 
   if (holdings.otherMonitors.length >= capacity.monitors) {
     return `${plan} includes ${plural(capacity.monitors, "monitor")}, and this account already has ${holdings.otherMonitors.length}.`;

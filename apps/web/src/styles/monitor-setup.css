@@ -342,6 +342,13 @@
   color: var(--muted);
   font-size: var(--text-xs);
 }
+/* What the plan carries, said above the lists it bounds. US-134. */
+.plan-allowance {
+  margin: 0 0 var(--space-4);
+  color: var(--muted-strong);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+}
 .platform-plan-hint {
   margin: var(--space-4) 0 var(--space-3);
   color: var(--muted);

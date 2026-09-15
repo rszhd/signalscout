@@ -8,7 +8,7 @@
  */
 import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { MonitorForm } from "./MonitorForm.js";
+import { fitToCapacity, listLimitFor, MonitorForm } from "./MonitorForm.js";
 import { browserTimezone } from "./schedule.js";
 import {
   button,
@@ -379,6 +379,13 @@ describe("the monitor form", () => {
     container = screen.container;
 
     await toSources();
+    // The replies box is shown and cannot be ticked: the plan does not read
+    // threads, and the route would refuse the tick.
+    const replies = [...container.querySelectorAll("label")].find((element) =>
+      element.textContent?.includes("Include replies and comments"),
+    );
+    expect(replies?.querySelector("input")?.disabled).toBe(true);
+    expect(replies?.textContent).toContain("Not included in your plan.");
     await act(async () => button("Generate search plan").click());
     await act(async () => button("Continue to schedule").click());
 
@@ -392,6 +399,8 @@ describe("the monitor form", () => {
     // And the budget is hidden: the money is not this account's, so there is
     // nothing of theirs to cap and no figure in dollars on the form. US-133.
     expect(input("Monthly budget").closest("fieldset")?.hidden).toBe(true);
+    // Nor a figure in dollars for a plan whose money is not this account's.
+    expect(container.textContent).not.toContain("What this plan would cost");
 
     await act(async () => button("Start monitor").click());
     await settle();
@@ -402,6 +411,85 @@ describe("the monitor form", () => {
     expect(body.pollDays).toBeUndefined();
     expect(body.pollTimezone).toBeUndefined();
     expect(body.budget).toBeUndefined();
+  });
+
+  /**
+   * US-134. The generator writes three to eight per platform and the trial
+   * carries four in total, so the plan is fitted before a person reads it:
+   * one each across four platforms, and the counters say what is left.
+   */
+  describe("fitting a generated plan to the capacity", () => {
+    const eight = ["a b", "c d", "e f", "g h", "i j", "k l", "m n", "o p"];
+    const trial = {
+      monitors: 1,
+      queries: 4,
+      queriesPerPlatform: {},
+      platforms: ["reddit", "x", "youtube", "tiktok"],
+      pollIntervalSeconds: {},
+      replies: false,
+      trial: true,
+    };
+    const plan = {
+      monitors: 1,
+      queries: 6,
+      queriesPerPlatform: { linkedin: 3 },
+      platforms: ["reddit", "linkedin"],
+      pollIntervalSeconds: {},
+      replies: false,
+      trial: false,
+    };
+
+    it("shares the total out evenly, keeping the head of each list", () => {
+      const fitted = fitToCapacity(
+        trial,
+        { reddit: eight, x: eight, youtube: eight, tiktok: eight },
+        ["reddit", "x", "youtube", "tiktok"],
+      );
+
+      expect(fitted).toEqual({ reddit: ["a b"], x: ["a b"], youtube: ["a b"], tiktok: ["a b"] });
+    });
+
+    it("keeps a platform's own limit, and gives the rest to the others", () => {
+      const fitted = fitToCapacity(plan, { reddit: eight, linkedin: eight }, [
+        "reddit",
+        "linkedin",
+      ]);
+
+      expect(fitted.linkedin).toHaveLength(3);
+      expect(fitted.reddit).toHaveLength(3);
+      expect(listLimitFor(plan, "linkedin")).toBe(3);
+      expect(listLimitFor(plan, "reddit")).toBe(6);
+    });
+
+    it("leaves a plan alone where nothing bounds it", () => {
+      expect(fitToCapacity(null, { reddit: eight }, ["reddit"]).reddit).toHaveLength(8);
+      expect(listLimitFor(null, "reddit")).toBe(8);
+    });
+
+    it("is applied to what the generator wrote, and said on the review step", async () => {
+      await screen.unmount();
+      fetchMock.mockImplementation(async (request: string | URL | Request) => {
+        const url = String(request);
+        if (url === "/api/monitor-options") {
+          return json({ ...options, capacity: { ...trial, queries: 2 } });
+        }
+        if (url === "/api/monitors/queries") return json(generated);
+        throw new Error(`Unexpected request: ${url}`);
+      });
+      screen = await mountForm();
+      container = screen.container;
+      await toSources();
+      await act(async () => button("Generate search plan").click());
+
+      expect(container.textContent).toContain("Your trial includes 2 queries in total");
+      expect(container.textContent).toContain("This plan uses 2");
+      expect(container.textContent).toContain("2 of 2");
+      // The third query the model wrote is gone, and nothing offers a fourth.
+      expect(container.textContent).not.toContain("flaky end to end tests");
+      expect(
+        [...container.querySelectorAll("button")].some((b) => b.textContent?.includes("Add query")),
+      ).toBe(false);
+    });
   });
 
   it("offers the schedule to an account spending its own keys", async () => {
@@ -623,6 +711,50 @@ describe("the monitor form", () => {
       // The key it is waiting for, named on the card rather than in a banner
       // the person has to connect to the row themselves.
       expect(container.textContent).toContain("SocialCrawl (SOCIALCRAWL_API_KEY)");
+    });
+
+    /**
+     * US-134. On the instance's keys the deployment holds a LinkedIn key, so
+     * the platform is ready — and the trial leaves it out. It must not arrive
+     * ticked, or the save is refused for a choice nobody made.
+     */
+    it("does not tick a platform the trial leaves out, and says which it is", async () => {
+      const linkedin = {
+        ...options.sources[0],
+        id: "linkedin",
+        displayName: "LinkedIn",
+        excluded: true,
+      };
+      await screen.unmount();
+      fetchMock.mockImplementation(async (request: string | URL | Request) => {
+        const url = String(request);
+        if (url === "/api/monitor-options") {
+          return json({
+            ...options,
+            sources: [options.sources[0], linkedin],
+            capacity: {
+              monitors: 1,
+              queries: 4,
+              queriesPerPlatform: {},
+              platforms: ["reddit"],
+              pollIntervalSeconds: { reddit: 86_400, linkedin: 86_400 },
+              replies: false,
+              trial: true,
+            },
+          });
+        }
+        throw new Error(`Unexpected request: ${url}`);
+      });
+      screen = await mountForm();
+      container = screen.container;
+      await toSources();
+
+      expect(sourceBox("Reddit").checked).toBe(true);
+      expect(sourceBox("LinkedIn").checked).toBe(false);
+      expect(sourceBox("LinkedIn").disabled).toBe(true);
+      expect(container.textContent).toContain("Not included during the trial.");
+      // It is not waiting for a key, so the banner about accounts stays away.
+      expect(container.textContent).not.toContain("waiting for an account");
     });
 
     it("says so plainly when nothing at all is connected", async () => {

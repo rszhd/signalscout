@@ -546,6 +546,13 @@ export interface ConnectorDescriptor {
    * once with LinkedIn credits and wrote down.
    *
    * Absent means the same price as a search.
+   *
+   * **The unit follows the price.** A connector that declares this reports
+   * `unitsConsumed` in calls, because this number is already the whole
+   * call's price; one that declares nothing reports its search unit. The
+   * usage row multiplies units by price, so a connector that declares five
+   * credits here and then reports five credits records twenty-five. BUG-020
+   * shipped exactly that on Instagram and stood for nine days.
    */
   readonly replyPricePerUnitMicros?: number;
 }

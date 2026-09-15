@@ -473,6 +473,12 @@ describe("replies", () => {
 
     expect(result.itemsReturned).toBe(11);
     expect(result.unitsConsumed).toBe(11);
+    // BUG-020: the usage row multiplies units by the reply price, so the
+    // product is what a page is recorded at, and it must be what it cost.
+    expect(
+      result.unitsConsumed *
+        (socialDataX.replyPricePerUnitMicros ?? socialDataX.pricePerUnitMicros),
+    ).toBe(11 * 200);
     expect(result.replies).toHaveLength(10);
     expect(result.replies.some((reply) => reply.externalId === threadId)).toBe(false);
   });

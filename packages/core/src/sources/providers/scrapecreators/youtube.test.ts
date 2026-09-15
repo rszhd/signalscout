@@ -455,6 +455,12 @@ describe("comments", () => {
     expect(result.itemsReturned).toBe(20);
     expect(result.replies).toHaveLength(20);
     expect(result.unitsConsumed).toBe(1);
+    // BUG-020: the usage row multiplies units by the reply price, so the
+    // product is what a page is recorded at, and it must be what it cost.
+    expect(
+      result.unitsConsumed *
+        (scrapeCreatorsYouTube.replyPricePerUnitMicros ?? scrapeCreatorsYouTube.pricePerUnitMicros),
+    ).toBe(1880);
   });
 
   it("asks by video URL, newest first, and follows continuationToken on the next page", async () => {

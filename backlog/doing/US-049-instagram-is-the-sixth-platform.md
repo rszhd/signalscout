@@ -262,3 +262,12 @@ polling at five credits a page.
 
   **Total spend for the whole ticket: about $2.08** — $0.106 capture, $1.6317
   provider, $0.3336 model, and $0.008 on the crashed run.
+
+- 2026-09-15T16:40+08:00 — **The live figures in this Log are five times too
+  high, BUG-020.** The connector reported `creditsUsed` (5) against a reply
+  price that was already five credits, and the usage row multiplies the two,
+  so each comment page was recorded at 25 credits. $1.6317 is 201 recorded
+  credits for a run that cost about 41 — about $0.33, level with the model's
+  $0.3336, and under the $1.00 cap. The guard's refusal was real and the 63%
+  overshoot was not. The sentence "the provider half is five times the model
+  half" does not hold; docs/costs.md carries the corrected reading.

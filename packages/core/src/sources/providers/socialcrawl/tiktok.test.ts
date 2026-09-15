@@ -232,6 +232,12 @@ describe("reading the comments under a video", () => {
     ).toBe(true);
     expect(result.replies.every((reply) => reply.text.length > 0)).toBe(true);
     expect(result.unitsConsumed).toBe(1);
+    // BUG-020: the usage row multiplies units by the reply price, so the
+    // product is what a page is recorded at, and it must be what it cost.
+    expect(
+      result.unitsConsumed *
+        (socialCrawlTikTok.replyPricePerUnitMicros ?? socialCrawlTikTok.pricePerUnitMicros),
+    ).toBe(8118);
   });
 
   /**

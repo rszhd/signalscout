@@ -608,6 +608,12 @@ describe("reading the replies under a post", () => {
     const result = await source.fetchReplies(replyRequest());
 
     expect(result.unitsConsumed).toBe(1);
+    // BUG-020: the usage row multiplies units by the reply price, so the
+    // product is what a page is recorded at, and it must be what it cost.
+    expect(
+      result.unitsConsumed *
+        (scrapeCreatorsReddit.replyPricePerUnitMicros ?? scrapeCreatorsReddit.pricePerUnitMicros),
+    ).toBe(1880);
   });
 });
 

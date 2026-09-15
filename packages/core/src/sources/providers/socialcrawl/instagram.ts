@@ -74,6 +74,9 @@ const maxPagesPerInput = 2;
 /** One SocialCrawl credit, in micro-dollars. The same pack as every platform. */
 const creditMicros = 8118;
 
+/** A comment page is five credits, per the provider's guide and its own `credits_used`. */
+const repliesCallCredits = 5;
+
 export const socialCrawlInstagram: ConnectorDefinition = {
   platform: instagramPlatform,
   provider: socialCrawlProvider,
@@ -104,7 +107,7 @@ export const socialCrawlInstagram: ConnectorDefinition = {
    * against the search's 1, so the two prices are declared separately and the
    * connector reports what the provider says it charged.
    */
-  replyPricePerUnitMicros: 5 * creditMicros,
+  replyPricePerUnitMicros: repliesCallCredits * creditMicros,
   create: (runtime) => new SocialCrawlInstagramSource(runtime),
 };
 
@@ -343,7 +346,14 @@ export class SocialCrawlInstagramSource implements SocialSource {
     return {
       replies,
       itemsReturned: page.records.length,
-      unitsConsumed: page.creditsUsed,
+      /**
+       * One unit per charged page, not the credit count. BUG-020: this
+       * reported `creditsUsed` — 5 — against a reply price that is already
+       * five credits, and the usage row multiplies the two, so every page
+       * was recorded at 25 credits. A page served from the provider's cache
+       * for `credits_used: 0` is reported as nothing, which is what it cost.
+       */
+      unitsConsumed: Math.ceil(page.creditsUsed / repliesCallCredits),
       next: page.cursor ? { status: "ready", cursor: page.cursor } : { status: "done" },
       /**
        * Partial while the provider offers another page, and it may over-report.

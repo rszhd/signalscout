@@ -155,6 +155,12 @@ describe("the thread under a post", () => {
     // words rather than storing silence. It is still counted, and paid for.
     expect(result.replies).toHaveLength(33);
     expect(result.unitsConsumed).toBe(1);
+    // BUG-020: the usage row multiplies units by the reply price, so the
+    // product is what a page is recorded at, and it must be what it cost.
+    expect(
+      result.unitsConsumed *
+        (socialCrawlReddit.replyPricePerUnitMicros ?? socialCrawlReddit.pricePerUnitMicros),
+    ).toBe(5 * 8118);
   });
 
   it("drops the removed comment the provider lists with no text, and counts it", () => {

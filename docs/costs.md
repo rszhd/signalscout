@@ -55,10 +55,18 @@ shape, US-136: a reply page is billed per row at the tweet price, so the
 connector declares no reply price and reports the rows — and one row on every
 page is the root tweet, which it drops and still counts.
 
-**Instagram is the one platform where the provider costs more than the model.**
-A search page is one credit and a comment page is five, and the leads there are
-in the comments. One live poll spent $1.6317 with SocialCrawl against $0.3336
-with the model, which is the reverse of every other platform.
+**Instagram is the platform where the provider costs about as much as the
+model, and it was recorded at five times that.** A search page is one credit
+and a comment page is five, and the leads there are in the comments. US-049's
+live poll recorded $1.6317 with SocialCrawl against $0.3336 with the model —
+but every comment page was written at 25 credits rather than 5, BUG-020, so
+the recorded figure is 201 credits for a run that cost about 41. At the real
+price the provider half was about $0.33, level with the model, not five times
+it. The run was repeated on 2026-09-15 with the fix in: `api_usage` recorded
+$0.7469, which is 92 credits — two search pages and eighteen comment pages —
+and the provider's own ledger moved 1186 to 1094, the same 92. It went further
+than the first run because nothing refused it early. The model half of that
+repeat is unmeasured: the model account had no credit and every call failed.
 
 **A vague query is not free silence.** X refunds a search that matches nothing.
 LinkedIn, YouTube and Instagram do not — they return unrelated results at full

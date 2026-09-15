@@ -1966,12 +1966,15 @@ discovery every collected post costs a model call, and that belongs in any
 arithmetic shown to a person.
 
 **The budget guard has now refused a real poll, and US-049 is when.** On
-2026-09-06 an Instagram poll under a $1.00 cap spent $1.6317 and both paid
+2026-09-06 an Instagram poll under a $1.00 cap recorded $1.6317 and both paid
 stages refused: `classify` stopped with 89 comments unread — BUG-004's
 mid-batch branch, reached live for the first time — and `replies` refused to
 open four more threads. **The overshoot was 63%**, larger than anything
 recorded before, because each overshoot step on that platform is a 5-credit
-comment page rather than a 1-credit one. Read the rest of this paragraph as the
+comment page rather than a 1-credit one. *Corrected 2026-09-15, BUG-020: the
+connector recorded each comment page at 25 credits, so the run cost about
+$0.33 and did not in fact pass the cap. The guard refused on a number five
+times too large. The refusal was real; the overshoot was not.* Read the rest of this paragraph as the
 history it now is. It has now allowed one
 and counted it: US-022's poll ran under a $0.20 cap and recorded $0.075 against
 it. Refusing is the half that no live run has reached. US-013's arithmetic, its

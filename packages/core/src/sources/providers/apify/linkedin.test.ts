@@ -487,6 +487,12 @@ describe("replies", () => {
 
     // $0.006 is 6,000 micro-dollars: three comments at 2,000 each.
     expect(result.unitsConsumed).toBe(3);
+    // BUG-020: the usage row multiplies units by the reply price, so the
+    // product is what a page is recorded at, and it must be what it cost.
+    expect(
+      result.unitsConsumed *
+        (apifyLinkedIn.replyPricePerUnitMicros ?? apifyLinkedIn.pricePerUnitMicros),
+    ).toBe(3 * 2000);
   });
 
   it("reads a comment's id, text, date, author slug and the provider's own link", () => {

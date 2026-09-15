@@ -308,7 +308,14 @@ describe("reading the comments under a video", () => {
     const { fetch: secondStub } = socialCrawl([{ status: 200, body: billed }]);
     const second = new SocialCrawlYouTubeSource(runtimeWith(secondStub));
 
-    expect((await second.fetchReplies(replyRequest)).unitsConsumed).toBe(1);
+    const paid = await second.fetchReplies(replyRequest);
+    expect(paid.unitsConsumed).toBe(1);
+    // BUG-020: the usage row multiplies units by the reply price, so the
+    // product is what a page is recorded at, and it must be what it cost.
+    expect(
+      paid.unitsConsumed *
+        (socialCrawlYouTube.replyPricePerUnitMicros ?? socialCrawlYouTube.pricePerUnitMicros),
+    ).toBe(8118);
   });
 
   it("links every comment to its video, and keeps an exact timestamp", async () => {

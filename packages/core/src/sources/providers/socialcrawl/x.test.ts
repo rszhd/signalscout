@@ -568,6 +568,12 @@ describe("reading the replies under a post", () => {
       result.replies.every((reply) => reply.parentPostExternalId === replyRequest.postExternalId),
     ).toBe(true);
     expect(result.unitsConsumed).toBe(1);
+    // BUG-020: the usage row multiplies units by the reply price, so the
+    // product is what a page is recorded at, and it must be what it cost.
+    expect(
+      result.unitsConsumed *
+        (socialCrawlX.replyPricePerUnitMicros ?? socialCrawlX.pricePerUnitMicros),
+    ).toBe(8118);
   });
 
   it("keeps the provider's own link, because X gives one", async () => {

@@ -369,7 +369,25 @@ describe("reading the comments under a reel", () => {
       result.replies.every((reply) => reply.parentPostExternalId === replyRequest.postExternalId),
     ).toBe(true);
     expect(result.replies.every((reply) => reply.text.length > 0)).toBe(true);
-    expect(result.unitsConsumed).toBe(5);
+    // One call, and the row that records it is five credits — the product
+    // of the two, which is what BUG-020 got wrong by asserting only this.
+    expect(result.unitsConsumed).toBe(1);
+    expect(
+      result.unitsConsumed *
+        (socialCrawlInstagram.replyPricePerUnitMicros ?? socialCrawlInstagram.pricePerUnitMicros),
+    ).toBe(5 * 8118);
+    expect((commentsRecent.body as { credits_used: number }).credits_used).toBe(5);
+  });
+
+  it("reports nothing for a page the provider served from cache for free", async () => {
+    const cached = {
+      httpStatus: 200,
+      body: { ...(commentsRecent.body as Record<string, unknown>), credits_used: 0, cached: true },
+    };
+    const { fetch: fetchStub } = socialCrawl([cached]);
+    const source = new SocialCrawlInstagramSource(runtimeWith(fetchStub));
+
+    expect((await source.fetchReplies(replyRequest)).unitsConsumed).toBe(0);
   });
 
   /**
@@ -454,7 +472,7 @@ describe("reading the comments under a reel", () => {
     expect(recent.replies.every((reply) => reply.postedAt > since)).toBe(true);
     // The page was bought whole, whatever survived the cut.
     expect(recent.itemsReturned).toBe(all.itemsReturned);
-    expect(recent.unitsConsumed).toBe(5);
+    expect(recent.unitsConsumed).toBe(1);
   });
 
   it("counts a thread position through the walk, not from each page", async () => {

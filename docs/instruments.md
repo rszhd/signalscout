@@ -147,10 +147,17 @@ than a second poll whenever the question is about the classifier and not about
 the connector.
 
 `live:instagram-poll` is the Instagram equivalent, and it is the **most
-expensive poll here**. A search page is 1 credit and a comment page is 5, so the
-provider half dominates: one run spent $1.6317 with SocialCrawl against $0.3336
-with the model, which is the reverse of every other platform. Pass it a cap you
-mean, and expect it to be exceeded — the first run overshot $1.00 by 63%.
+expensive poll here**. A search page is 1 credit and a comment page is 5. Its
+first run recorded $1.6317 with SocialCrawl against $0.3336 with the model,
+and that figure is five times too high: BUG-020 had the connector record
+every comment page at 25 credits, so the real provider half was about $0.33,
+level with the model. The 63% overshoot of a $1.00 cap that run reported was
+the same inflation; at the real price it stayed under the cap. Repeated on
+2026-09-15 with the fix in: $0.7469 recorded, 92 credits, and the provider's
+ledger agreed to the credit; it opened 22 threads under a $1.00 cap and was
+not refused. Pass it a cap you mean anyway — each overshoot step here is a
+five-credit page. It reuses a monitor it finds from an earlier run in the same
+database, so a repeat re-reads the threads that run left partial.
 
 `live:instagram-comments` is the cheap half of that question and it is the same
 script as `live:tiktok-comments`, which US-049 taught to take `--platform=`. It

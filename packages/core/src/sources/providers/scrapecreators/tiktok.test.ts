@@ -415,6 +415,12 @@ describe("comments", () => {
     expect(result.itemsReturned).toBe(commentsOf(comments).length);
     expect(result.replies.length).toBeGreaterThan(0);
     expect(result.unitsConsumed).toBe(1);
+    // BUG-020: the usage row multiplies units by the reply price, so the
+    // product is what a page is recorded at, and it must be what it cost.
+    expect(
+      result.unitsConsumed *
+        (scrapeCreatorsTikTok.replyPricePerUnitMicros ?? scrapeCreatorsTikTok.pricePerUnitMicros),
+    ).toBe(1880);
   });
 
   it("asks with the share tracking stripped off the video URL", async () => {

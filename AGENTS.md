@@ -153,6 +153,13 @@ started in a folder nobody is watching will poll and bill. Unpause one on
 purpose when you need a poll, and never seed a worktree by copying `.env` by
 hand: two folders on one port migrate one database.
 
+**Remove a worktree with `scripts/remove-worktree.mjs <name>`, not with `git
+worktree remove`.** Git deletes the folder and leaves the container, the network
+and the data volume, and it has no hook this could be attached to. The next
+`new-worktree.mjs` reports whatever was left behind, so forgetting is visible
+rather than silent. Neither command deletes a branch: a folder and a copied
+database can be made again, and commits cannot.
+
 **A migration file is not a migration until `meta/_journal.json` names it.** The
 migrator walks the journal and never the directory, and so does the test
 harness — so a file with no entry is applied nowhere, and the whole suite passes
@@ -241,7 +248,8 @@ docker compose up             # the published image: Postgres, migrations, the a
 
 pnpm db:rotate-key            # re-encrypt stored credentials under a new key
 
-node scripts/new-worktree.mjs <name>   # a worktree with its own ports and a copy of the database
+node scripts/new-worktree.mjs <name>    # a worktree with its own ports and a copy of the database
+node scripts/remove-worktree.mjs <name> # the folder, and the Postgres that came with it
 
 backlog/index.sh              # rebuild OPEN.md and DONE.md — run after any ticket change
 backlog/index.sh --check      # exit 1 if either list is stale

@@ -13,12 +13,13 @@ import {
   buildEnvFile,
   composeProjectName,
   MAIN_SLOT,
+  orphanProjects,
   pickSlot,
   portsForSlots,
   probeBusyPorts,
   slotPorts,
   usedSlotsFrom,
-} from "./new-worktree.mjs";
+} from "./worktrees.mjs";
 
 const mainEnv = [
   "PORT=3000",
@@ -82,6 +83,28 @@ describe("pickSlot", () => {
 describe("portsForSlots", () => {
   it("asks about all three ports of every slot, so one busy port is enough", () => {
     expect(portsForSlots([1, 2])).toEqual([3001, 5174, 5433, 3002, 5175, 5434]);
+  });
+});
+
+describe("orphanProjects", () => {
+  /**
+   * `git worktree remove` deletes the folder and leaves the container, the
+   * network and the data volume. Git has no hook for it, so the orphan is found
+   * afterwards by comparing what Docker holds against what a worktree still
+   * names.
+   */
+  it("finds a project this repository made whose worktree is gone", () => {
+    expect(orphanProjects(["signalscout_a", "signalscout_b"], ["signalscout_a"])).toEqual([
+      "signalscout_b",
+    ]);
+  });
+
+  it("never touches the main checkout or an unrelated project on the machine", () => {
+    expect(orphanProjects(["intentwatch", "patrol", "qassist", "smart"], [])).toEqual([]);
+  });
+
+  it("calls nothing an orphan while a worktree still names it", () => {
+    expect(orphanProjects(["signalscout_a"], ["signalscout_a"])).toEqual([]);
   });
 });
 

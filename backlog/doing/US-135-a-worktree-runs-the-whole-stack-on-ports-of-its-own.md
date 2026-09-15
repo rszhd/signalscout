@@ -89,6 +89,13 @@ safe, so the pause is not optional.
       by the Docker daemon after it
 - [x] The worktree is created at `worktrees/<name>` inside the main checkout,
       whichever folder the script is run from
+- [x] `scripts/remove-worktree.mjs <name>` removes the folder, the container,
+      the network and the data volume together
+- [x] Neither command deletes a branch. The removal names it and stops
+- [x] `new-worktree.mjs` reports a container left behind by a bare `git worktree
+      remove`, and never removes one itself
+- [x] The orphan rule cannot reach the main checkout or an unrelated project on
+      the machine, and is asserted against both
 - [x] `.gitignore` and `.dockerignore` both exclude `worktrees/`, so the folder
       is not untracked content of the repository it sits in and `pnpm lint` does
       not walk it
@@ -112,10 +119,11 @@ safe, so the pause is not optional.
   reads the folder's own `.env` for `COMPOSE_PROJECT_NAME` and for
   interpolation, so nothing there needs changing. Confirm it rather than assume
   it.
-- A worktree is removed with `git worktree remove`, which leaves the container
-  and the volume behind. The script needs a partner that removes both, or the
-  next agent inherits a stale database on that slot. Decide whether that is this
-  ticket or the next one.
+- The partner command is in this ticket rather than the next one. Git has no
+  hook for `worktree remove` and an alias cannot shadow a built-in subcommand,
+  so `remove-worktree.mjs` is a command to run in its place, and
+  `new-worktree.mjs` reports an orphan it finds rather than removing it — a
+  volume is deleted on purpose, never as a side effect of making something else.
 - The port table is three numbers from one slot index: `3000 + n`, `5173 + n`,
   `5432 + n`. Keep it that way — an agent reading 3002 should know without
   looking that it is slot 2.
@@ -125,6 +133,13 @@ safe, so the pause is not optional.
 
 ## Log
 
+- 2026-09-15T16:31+08:00 — Removal was pulled into this ticket at the owner's
+  request. Splitting the two commands exposed a cycle — each needed something
+  from the other — so the slot arithmetic, the `.env` builder and the orphan
+  rule moved into `scripts/worktrees.mjs` and both commands became thin. Run
+  against the probe worktree: the folder, the container, the network and the
+  volume all went, and `docker volume ls` afterwards holds only the main
+  checkout's.
 - 2026-09-15T16:04+08:00 — Both claims that needed two running stacks are now
   run rather than reasoned. Two suites at once, one against Postgres 5432 and
   one against 5435: 119 files each, 2075 and 2070 tests, 56 seconds each, and no

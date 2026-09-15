@@ -356,14 +356,20 @@ describe("whose keys a worker polls with", () => {
   });
 
   /**
-   * **A stored row wins, and US-141 restored that.** `credentials.ts` documents
-   * the order: the table first, the environment second. US-132 inverted it for
-   * the lent-keys plan, on the reasoning that the row was not the person's own
-   * key. An account chooses whose keys it runs on now, so a key it pasted is a
-   * choice it made — and a key stored and then ignored is what that file exists
-   * to prevent.
+   * **One source, and the account's state picks it.** US-142.
+   *
+   * US-141 reversed US-132 too far: it dropped the refusal to *use* a stored
+   * key along with the refusal to store one, so an account on this instance's
+   * keys polled Reddit on its own key and X on ours. That is the mix the
+   * owner ruled out, and the ledger then stamped the row `instance` and put
+   * the account's own spending under our fuse.
+   *
+   * A key it pasted is kept and unused. The account can see which state it is
+   * in and move in one press, so this is not the "stored and ignored" shape
+   * `credentials.ts` warns about — the key is ready, and the switch is what
+   * makes it run.
    */
-  it("reads the stored row and not the machine's key, whichever state the account is in", async () => {
+  it("reads one source, and the account's state picks which", async () => {
     const encryption = generateEncryptionKey();
     vi.stubEnv("ENCRYPTION_KEY", encryption);
     const key = readEncryptionKey(encryption);
@@ -387,19 +393,23 @@ describe("whose keys a worker polls with", () => {
       const keys = accountKeys(db, { signup: "open", mode: "stripe", environment: machine });
       const lookup = credentialsForAccounts(db, keys, silentLogger);
 
-      // Both read their own row, because a key somebody pasted is a choice
-      // they made whichever state the account is in.
+      // On ours: the machine's key, and the stored one is not read.
       // biome-ignore lint/suspicious/noExplicitAny: the descriptor is shaped by hand here.
-      expect(await lookup(connector as any, "ours")).toEqual({ apiKey: "ours-stored-key" });
+      expect(await lookup(connector as any, "ours")).toEqual({ apiKey: "the-machine-key" });
+      // On its own: its own row, and never the machine's.
       // biome-ignore lint/suspicious/noExplicitAny: the same.
       expect(await lookup(connector as any, "theirs")).toEqual({ apiKey: "theirs-stored-key" });
 
-      // The environment is the fallback, and only for an account on ours.
+      // The switch is what makes a kept key run, and it runs on the next call.
+      await setKeySource(db, "ours", "own");
+      // biome-ignore lint/suspicious/noExplicitAny: the same.
+      expect(await lookup(connector as any, "ours")).toEqual({ apiKey: "ours-stored-key" });
+
+      // And an account on its own keys with no row of its own polls nothing,
+      // rather than falling back to ours. That is what "no mix" means.
       await db.delete(sourceCredentials);
       // biome-ignore lint/suspicious/noExplicitAny: the same.
-      expect(await lookup(connector as any, "ours")).toEqual({ apiKey: "the-machine-key" });
-      // biome-ignore lint/suspicious/noExplicitAny: the same.
-      expect(await lookup(connector as any, "theirs")).toBeUndefined();
+      expect(await lookup(connector as any, "ours")).toBeUndefined();
     } finally {
       vi.unstubAllEnvs();
       await db.delete(sourceCredentials);

@@ -22,7 +22,7 @@ import {
   triageConfigFromEnvironment,
 } from "../ai/config.js";
 import { createEmbedder, type Embedder } from "../ai/embed.js";
-import { readAiEnvironment as readAiSettingsEnvironment } from "../ai/settings.js";
+import { readAiEnvironmentFor as readAiSettingsEnvironment } from "../ai/settings.js";
 import { createTriager, type Triager } from "../ai/triage.js";
 import type { SignupMode } from "../auth/user.js";
 import { type Capacities, capacitiesFrom } from "../billing/capacity.js";
@@ -42,6 +42,7 @@ import {
 import {
   accountModelEnvironment,
   machineKeysUsable,
+  spendsInstanceMoney,
   webhookSecretEnvironment,
 } from "../config/machine-keys.js";
 import { createDatabase, type Database, poolOptions } from "../db/client.js";
@@ -61,7 +62,11 @@ import { assertSourcesCanBeStored } from "../sources/storage.js";
 import type { ProviderChoices } from "../sources/types.js";
 import { createClassifyStep } from "./classify.js";
 import { createCollectStep } from "./collect.js";
-import { type CredentialLookup, credentialsFromStore } from "./credentials.js";
+import {
+  type CredentialLookup,
+  credentialsFromEnvironment,
+  credentialsFromStore,
+} from "./credentials.js";
 import { createEstimateStep } from "./estimate.js";
 import { createFilterStep } from "./filter.js";
 import { createNotifyStep, enqueueNotifications } from "./notify.js";
@@ -384,18 +389,33 @@ export function credentialsForAccounts(
   keys: AccountKeys,
   logger?: Logger,
 ): CredentialLookup {
+  const stored = credentialsFromStore(db, undefined, (userId) => keys.provider(userId), logger);
+
   /**
-   * The ordinary order, and US-141 restored it.
+   * One source, and which one is the account's own state. US-142.
    *
-   * `credentials.ts` documents it: the table first, the environment second,
-   * and once a row exists it wins. US-132 inverted that for the lent-keys
-   * plan, on the reasoning that the row was not the person's own key. An
-   * account chooses whose keys it runs on now, so a key it pasted is a choice
-   * it made — and a key stored and then ignored is the thing this file exists
-   * to prevent. `keys.provider` is what decides whether the environment half
-   * is this account's to read at all.
+   * `credentials.ts` documents the ordinary order — the table first, the
+   * environment second — and it is right for an account running on its own
+   * keys, which is what it was written for.
+   *
+   * **On this instance's keys the store is not read at all**, and that is what
+   * makes "one or the other, never both" true rather than merely said. US-141
+   * reversed US-132 too far: it dropped the refusal to *use* a stored key
+   * along with the refusal to store one, so an account on our keys polled
+   * Reddit on its own key and X on ours — a mix — and the ledger stamped the
+   * row `instance`, putting its spending under our fuse.
+   *
+   * A key it pasted is kept and unused. That is not the "stored and ignored"
+   * shape this file warns about, because the account can see which state it
+   * is in and move between them in one press: the key is ready, and the
+   * switch is what makes it run.
    */
-  return credentialsFromStore(db, undefined, (userId) => keys.provider(userId), logger);
+  return async (connector, userId) => {
+    if (await keys.spendsInstanceMoney(userId)) {
+      return credentialsFromEnvironment(await keys.provider(userId), logger)(connector, userId);
+    }
+    return stored(connector, userId);
+  };
 }
 
 export async function startWorker({
@@ -549,12 +569,15 @@ export async function startWorker({
     // common install pays one small query per owner per process and nothing
     // else changes about it.
     //
-    // **A stored row always wins**, which is `ai/settings.ts`'s own order.
-    // US-132 inverted it for the lent-keys plan and US-141 reversed that: an
-    // account chooses whose keys it runs on, so a model it names is a choice
-    // it made and not a stale row, and a setting stored and then ignored is
-    // what this product refuses to do.
-    const mine = await readAiSettingsEnvironment(db, userId, instance);
+    // **A stored row wins for an account on its own keys, and is not read for
+    // one on ours.** US-142: the key under those rows is the deployment's, and
+    // a model the account named would point it at something nobody priced.
+    const mine = await readAiSettingsEnvironment(
+      db,
+      userId,
+      instance,
+      spendsInstanceMoney(signup, source),
+    );
 
     const own = {
       classifier:

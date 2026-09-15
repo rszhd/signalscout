@@ -151,6 +151,7 @@ export {
   clearAiTaskSettings,
   previewAiEnvironment,
   readAiEnvironment,
+  readAiEnvironmentFor,
   readAiSettings,
   type SaveAiTaskInput,
   saveAiTaskSettings,

@@ -1054,8 +1054,9 @@ export function Models() {
           <p className="models-blocker" role="status">
             <span aria-hidden="true">i</span>
             <span>
-              Your plan includes these models. A key you add here runs your jobs only once you
-              switch this account to your own keys, on the connections screen.
+              Your plan includes these models, and your jobs run on them. A key you add here is kept
+              and not used until you switch this account to your own keys, on the connections
+              screen.
             </span>
           </p>
         )}

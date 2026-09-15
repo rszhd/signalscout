@@ -19,10 +19,13 @@
  * account that has stored nothing behaves exactly as it did before this
  * existed. Both are the common case, and neither needed a branch.
  *
- * **US-132 branched this and US-141 reversed the branch.** For a moment a
- * lent-keys account's rows were not read at all, because the key under them
- * was the deployment's. An account chooses whose keys it runs on now, so a
- * model it names is a choice it made, and the order above holds for everyone.
+ * **The order holds for an account running on its own keys, and not for one
+ * running on ours.** US-142: on this instance's keys the rows are not read at
+ * all, because the key under them is the deployment's and a model the account
+ * named would point our key at a model nobody priced. The rows are kept —
+ * the account moves between the two in one press, and they are what runs the
+ * moment it does. `readAiEnvironmentFor` is that branch, and both composition
+ * roots call it so the worker and the API cannot disagree.
  */
 import { and, eq } from "drizzle-orm";
 import type { Database } from "../db/client.js";
@@ -388,6 +391,28 @@ export async function readAiEnvironment(
   if (mine.size === 0) return instance;
 
   return overlay(mine, instance);
+}
+
+/**
+ * The same, for an account that may be running on this instance's keys.
+ * US-142.
+ *
+ * On ours the account's rows are not read: the key under them is the
+ * deployment's, and a model the account named would point it at something
+ * nobody priced. The rows stay, and moving the switch is what makes them run.
+ *
+ * Both composition roots call this rather than branching themselves, so the
+ * worker and the API cannot disagree about whose model an account runs on.
+ */
+export async function readAiEnvironmentFor(
+  db: Database,
+  userId: string,
+  instance: AiEnvironment,
+  onInstanceKeys: boolean,
+  encryption: Record<string, string | undefined> = process.env,
+): Promise<AiEnvironment> {
+  if (onInstanceKeys) return instance;
+  return readAiEnvironment(db, userId, instance, encryption);
 }
 
 /** What a person has on screen for one job, before they have saved it. */

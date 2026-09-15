@@ -13,8 +13,9 @@
  */
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { recordModelCall } from "../ai/record.js";
+import { setKeySource } from "../billing/key-source.js";
 import { createDatabase, type Database } from "../db/client.js";
-import { apiUsage, modelCalls, monitors, users } from "../db/schema.js";
+import { accountKeySource, apiUsage, modelCalls, monitors, users } from "../db/schema.js";
 import { createTestDatabase, type TestDatabase } from "../testing/database.js";
 import {
   accountBudgetState,
@@ -143,6 +144,7 @@ describe("the account's month, read from both ledgers", () => {
     await db.delete(modelCalls);
     await db.delete(apiUsage);
     await db.delete(monitors);
+    await db.delete(accountKeySource);
     await db.delete(users);
   });
 
@@ -193,6 +195,40 @@ describe("the account's month, read from both ledgers", () => {
         estimatedCostMicros: micros,
       },
     });
+
+  /**
+   * **The fuse counts what this instance lent, and nothing else.** US-141.
+   *
+   * Without this the cap would stop an account for the month over money we
+   * never spent — its own provider and model calls, counted against our
+   * ceiling. The row is stamped from the account's own state where it is
+   * written, so five callers of one ledger and eight of the other cannot
+   * each forget.
+   */
+  it("counts only the calls this instance's keys paid for", async () => {
+    const ours = await account("ours");
+    const theirs = await account("theirs");
+    await setKeySource(db, theirs, "own");
+
+    await source(ours, null, 4_000_000);
+    await model(ours, null, 1_000_000);
+    await source(theirs, null, 9_000_000);
+    await model(theirs, null, 9_000_000);
+
+    expect((await accountSpend(db, ours, now)).totalMicros).toBe(5_000_000);
+    // Their own spending is theirs. The fuse cannot see it.
+    expect((await accountSpend(db, theirs, now)).totalMicros).toBe(0);
+  });
+
+  it("stamps each row from the account's own state, without being told", async () => {
+    const theirs = await account("stamped");
+    await setKeySource(db, theirs, "own");
+
+    await source(theirs, null, 1_000_000);
+
+    const [row] = await db.select().from(apiUsage);
+    expect(row?.keySource).toBe("own");
+  });
 
   it("adds the provider half and the model half", async () => {
     const id = await account("one");

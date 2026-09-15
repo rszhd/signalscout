@@ -31,7 +31,7 @@ import {
   type ProjectDescriber,
   type ProviderChoices,
   type QueryGenerator,
-  readAiEnvironment,
+  readAiEnvironmentFor,
   type SendEmail,
   setKeySource,
   storedCredentialNames,
@@ -357,10 +357,15 @@ export function aiEnvironmentFor(
   // machine's model key only where this account may spend it. US-081 asked that
   // once for the whole instance; US-128 asks it per person, because the plan
   // whose keys are included is one account answering differently from the next.
-  // A stored row always wins, which is `ai/settings.ts`'s own order. US-132
-  // inverted it for the lent-keys plan; US-141 reversed that, because an
-  // account chooses whose keys it runs on and a model it names is its choice.
-  return async (userId) => readAiEnvironment(db, userId, await keys.model(userId, env));
+  // A stored row wins for an account on its own keys, and is not read for one
+  // on ours: the key under it is the deployment's. US-142.
+  return async (userId) =>
+    readAiEnvironmentFor(
+      db,
+      userId,
+      await keys.model(userId, env),
+      await keys.spendsInstanceMoney(userId),
+    );
 }
 
 export function queryGeneratorForEnvironment(

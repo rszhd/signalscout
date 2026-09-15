@@ -37,6 +37,7 @@ import {
 import {
   clearAiTaskSettings,
   readAiEnvironment,
+  readAiEnvironmentFor,
   readAiSettings,
   saveAiTaskSettings,
 } from "./settings.js";
@@ -117,6 +118,32 @@ describe("one account's model settings", () => {
 
   it("gives an account with no settings the instance's own environment", async () => {
     expect(await readAiEnvironment(db, owner, instance, encryption)).toEqual(instance);
+  });
+
+  /**
+   * **Whose keys the account runs on decides whether these rows are read at
+   * all.** US-142, and it is the model half of what `credentials.ts` does for
+   * providers.
+   *
+   * On this instance's keys the rows are not read: the key under them is the
+   * deployment's, and a model the account named would point it at something
+   * nobody priced. The rows are kept, and moving the switch is what makes them
+   * run — which is the difference between a setting kept ready and a setting
+   * stored and ignored.
+   */
+  it("reads the account's rows on its own keys, and none of them on ours", async () => {
+    await saveAiTaskSettings(db, owner, "classify", { model: "the-model-they-chose" });
+
+    const theirs = await readAiEnvironmentFor(db, owner, instance, false, encryption);
+    const ours = await readAiEnvironmentFor(db, owner, instance, true, encryption);
+
+    expect(aiConfigFromEnvironment(theirs).model).toBe("the-model-they-chose");
+    expect(aiConfigFromEnvironment(ours).model).toBe(instance.AI_MODEL);
+
+    // Kept, not deleted: the switch is what makes it run.
+    expect(
+      aiConfigFromEnvironment(await readAiEnvironmentFor(db, owner, instance, false)).model,
+    ).toBe("the-model-they-chose");
   });
 
   /**

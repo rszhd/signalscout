@@ -125,6 +125,13 @@ post's comments through the comments actor with replies on. About $0.026 —
 $0.02 of it the search. It leaves `findings.json` alone, because that file is
 the search run's evidence. US-137 ran it once on 2026-09-15.
 
+The SocialCrawl Reddit capture, `socialcrawl/reddit-fixtures/capture.mjs`,
+has a `--only=comments` mode: it reads the busiest post out of the
+`subreddit-search.json` already on disk and asks for its comments, following
+the cursor once if there is one. Five credits, ten with a cursor, or none
+inside the provider's five-minute cache. US-138 ran it once on 2026-09-15 and
+got the whole thread in one call.
+
 `live:tiktok-poll` is the TikTok equivalent of `live:linkedin-poll`, and it
 turns replies on. Read its cost before running it: the search is 2 credits, but
 25 threads is 25 more, and 678 comments then buy a triage call each and a

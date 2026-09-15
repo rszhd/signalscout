@@ -82,6 +82,8 @@ export const endpoints = {
   redditSubreddit: `${apiBase}/reddit/subreddit`,
   /** The one no other provider has: a keyword inside one subreddit. */
   redditSubredditSearch: `${apiBase}/reddit/subreddit/search`,
+  /** The whole tree under one post, five credits a call. US-138. */
+  redditComments: `${apiBase}/reddit/post/comments`,
   linkedInPosts: `${apiBase}/linkedin/search/posts`,
   /**
    * YouTube. US-034.
@@ -209,6 +211,29 @@ const redditProfile = (endpoint: string): EndpointProfile => ({
  */
 export const tikTokSearchProfile = redditProfile(endpoints.tikTokSearch);
 export const tikTokCommentsProfile = redditProfile(endpoints.tikTokComments);
+
+/**
+ * Reddit comments: **five credits**, and the tree arrives whole.
+ *
+ * One call returned every one of a thread's 34 comments, nested under each
+ * parent's `replies`, with `truncated: false`, `has_more: false` and no
+ * cursor — US-138, 2026-09-15. So the price is the trap here, not the paging:
+ * the same shape US-028 found on LinkedIn and US-049 on Instagram, where a
+ * request and a credit are different numbers.
+ *
+ * The cursor is still read, because the guide documents one for "more
+ * comments, or replies", and a thread bigger than one answer would be the
+ * case that shows it.
+ */
+export const redditCommentsProfile: EndpointProfile = {
+  endpoint: endpoints.redditComments,
+  standardCallCredits: 5,
+  cursorOf: (body) => {
+    const pagination = objectAt(body, "pagination");
+    if (pagination?.has_more === false) return undefined;
+    return text(pagination?.next_cursor);
+  },
+};
 
 export const redditSearchProfile = redditProfile(endpoints.redditSearch);
 export const redditSubredditProfile = redditProfile(endpoints.redditSubreddit);
@@ -374,6 +399,13 @@ export interface Page {
    * derived from either number would be wrong about the other.
    */
   readonly creditsUsed: number;
+  /**
+   * The provider's own word on whether the answer is whole, where it gives
+   * one. The Reddit comments envelope carries `data.truncated`; nothing else
+   * captured so far does. Absent means the provider did not say, which a
+   * caller treats as "not known to be whole".
+   */
+  readonly truncated?: boolean;
 }
 
 /** How long to wait when the provider rate-limits us and names no time. */
@@ -541,10 +573,13 @@ export class SocialCrawlClient {
     const records = Array.isArray(data.items) ? data.items : [];
     const cursor = this.profile.cursorOf(body);
 
+    const truncated = objectAt(body, "data")?.truncated;
+
     return {
       records,
       creditsUsed: creditsOf(body, this.profile.standardCallCredits),
       ...(cursor ? { cursor } : {}),
+      ...(typeof truncated === "boolean" ? { truncated } : {}),
     };
   }
 }

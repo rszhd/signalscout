@@ -32,12 +32,16 @@
  *      "a 10 to 12s median with a tail past 30s"? A connector's timeout is set
  *      from that number.
  *
- * The comment endpoint is deliberately **not** captured. US-020 measured it at
- * 5 credits against ScrapeCreators' 1 for the same thread, so the decision was
- * made against it; spending five more to photograph it would be paying to prove
- * a decision twice. Reddit replies stay with ScrapeCreators.
+ * The comment endpoint was deliberately not captured by US-031: US-020 had
+ * measured it at 5 credits against ScrapeCreators' 1 for the same thread, and
+ * the decision was made against it. US-138 reversed that for an account that
+ * holds this key and no other, and `--only=comments` is its mode: it reads the
+ * busiest post out of `subreddit-search.json` on disk, asks for its comments,
+ * and follows the cursor once if there is one. Five or ten credits, and it
+ * merges into manifest.json and ledger.json rather than rewriting them.
  *
  *     node packages/core/src/sources/providers/socialcrawl/reddit-fixtures/capture.mjs
+ *     node .../capture.mjs --only=comments
  *
  * Four billed calls at one credit each, about $0.032, plus one free refusal.
  */
@@ -52,6 +56,8 @@ const endpoints = {
   search: `${api}/search`,
   subreddit: `${api}/subreddit`,
   subredditSearch: `${api}/subreddit/search`,
+  /** 5 credits a page, per the provider's own guide, read 2026-09-15. */
+  comments: `${api}/post/comments`,
 };
 
 /** The keyword four other connectors have been polled with. */
@@ -175,6 +181,85 @@ async function capture(name, endpoint, params, { key = apiKey, note } = {}) {
 }
 
 console.log(`\nCapturing SocialCrawl Reddit payloads into ${here}\n`);
+
+if (process.argv.includes("--only=comments")) {
+  const searched = JSON.parse(readFileSync(`${here}subreddit-search.json`, "utf8"));
+  const posts = (searched?.body?.data?.items ?? []).map((item) => item?.post).filter(Boolean);
+  const busiest = [...posts].sort(
+    (a, b) => (b?.engagement?.comments ?? 0) - (a?.engagement?.comments ?? 0),
+  )[0];
+
+  if (!busiest?.url) {
+    console.error("subreddit-search.json holds no post to ask about. Run the full capture first.");
+    process.exit(1);
+  }
+
+  console.log(`  asking about ${busiest.url} (claims ${busiest.engagement?.comments} comments)\n`);
+
+  const page = await capture("comments", endpoints.comments, { url: busiest.url });
+  const items = page?.data?.items ?? [];
+  const comments = items.map((item) => item?.comment ?? item);
+  if (comments[0]) console.log(`  a comment's keys: ${Object.keys(comments[0]).join(", ")}`);
+  console.log(`  envelope keys: ${Object.keys(page?.data ?? {}).join(", ")}`);
+  console.log(`  pagination: ${JSON.stringify(page?.pagination ?? null)}`);
+  const authors = comments.filter(
+    (comment) => comment?.author?.username || comment?.author?.display_name,
+  ).length;
+  const nested = comments.filter(
+    (comment) => comment?.parent_id && !String(comment.parent_id).includes(busiest.id),
+  ).length;
+  console.log(
+    `  ${comments.length} comments, ${authors} with an author, ${nested} nested; ids look like ${comments[0]?.id}, parent_id like ${comments[0]?.parent_id}, post_id like ${comments[0]?.post_id}`,
+  );
+  const dates = comments
+    .map((comment) => Date.parse(comment?.published_at ?? ""))
+    .filter(Number.isFinite);
+  console.log(
+    `  ${dates.length} dated, ${dates.every((v, i) => i === 0 || dates[i - 1] >= v) ? "newest first" : "NOT in date order"}`,
+  );
+
+  const next = page?.pagination?.next_cursor;
+  if (page?.pagination?.has_more !== false && typeof next === "string" && next !== "") {
+    const second = await capture("comments-page-2", endpoints.comments, {
+      url: busiest.url,
+      cursor: next,
+    });
+    const seen = new Set(comments.map((comment) => comment?.id));
+    const more = (second?.data?.items ?? []).map((item) => item?.comment ?? item);
+    console.log(
+      `  page two: ${more.length} comments, ${more.filter((c) => seen.has(c?.id)).length} repeated from page one`,
+    );
+  } else {
+    console.log("  no cursor on page one, or has_more is false: nothing to page to");
+  }
+
+  const merge = (file, mine) => {
+    let previous = [];
+    try {
+      previous = JSON.parse(readFileSync(`${here}${file}`, "utf8"));
+    } catch {
+      // No previous record. A full run is the fix.
+    }
+    const names = new Set(mine.map((entry) => entry.name));
+    return [...previous.filter((entry) => !names.has(entry.name)), ...mine];
+  };
+  writeFileSync(
+    `${here}manifest.json`,
+    `${JSON.stringify(merge("manifest.json", manifest), null, 2)}\n`,
+  );
+  writeFileSync(`${here}ledger.json`, `${JSON.stringify(merge("ledger.json", ledger), null, 2)}\n`);
+
+  const sample = comments.find((comment) => comment?.url) ?? comments[0];
+  if (sample) {
+    console.log(
+      `\nOpen this to answer the URL question:\n  ${sample.url ?? `${busiest.url}${String(sample.id).replace(/^t1_/, "")}/  (built — the payload had no url)`}`,
+    );
+  }
+  console.log(
+    `\n${scrubber.replaced()} identities pseudonymised. Read the fixtures before you commit them.\n`,
+  );
+  process.exit(0);
+}
 
 const first = await capture("search-keyword", endpoints.search, { query: keyword, sort: "new" });
 

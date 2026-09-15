@@ -30,6 +30,7 @@ the price the connector declares:
 | TikTok | ScrapeCreators | a request | $0.00188 | ~$0.0000627 (30 videos) |
 | Instagram | SocialCrawl | a credit | $0.008118 | ~$0.00027 (30 reels) |
 | Instagram comments | SocialCrawl | 5 credits a page | $0.0406 | ~$0.0027 (15 comments) |
+| Reddit comments | SocialCrawl | 5 credits a call | $0.0406 | ~$0.0012 (34 comments, the whole tree in one call) |
 | A model call | your provider | one call | the provider's own token price | |
 
 Each price is the one its connector declares, and each per-post figure is that

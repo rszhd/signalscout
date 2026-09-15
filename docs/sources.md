@@ -473,6 +473,18 @@ with a deadline, and a run that outlives it is abandoned to finish and bill on
 its own. `scrapeReplies: true` returned no nested reply for a comment claiming
 one, so what a nested reply looks like there is unproven.
 
+**SocialCrawl's Reddit comments answer changed underneath US-020's notes.** On
+2026-09-06 the endpoint returned comments with a null author and an envelope
+saying `truncated`; on 2026-09-15, US-138, it returned every one of a thread's
+34 comments with an author, a permalink and its children nested under
+`replies`, `truncated: false`, `has_more: false` and no cursor — the guide
+names a different primary source now. So the connector flattens the tree,
+reads `truncated` as partial unless it says false, and still follows a cursor
+if one ever arrives. One row of the 34 was a removed comment with no text and
+no author, listed anyway; the shared parser drops it and the bill counts it.
+Every Reddit id there is bare, and the connector rebuilds `t1_` and `t3_` so a
+comment read here and through ScrapeCreators is one row.
+
 **A thread's window is not the poll's window.** `ReplyRequest.since` is how far
 back this *thread* has been read, and it has nothing to do with when the
 monitor last searched. The two were the same value until BUG-006, and the

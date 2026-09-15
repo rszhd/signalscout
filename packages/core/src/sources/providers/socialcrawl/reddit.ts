@@ -27,17 +27,22 @@
  * 4.3 times its equivalent. It buys precision, not volume: seven right posts
  * against twenty-five wrong ones.
  *
- * **It does not read replies, and that is deliberate.** SocialCrawl's Reddit
- * comment endpoint is 5 credits against ScrapeCreators' 1 for the same thread,
- * measured in US-020. A deployment that wants Reddit replies uses
- * ScrapeCreators, and the monitor form says so per platform rather than
- * leaving somebody to find out.
+ * **It reads replies since US-138, at five credits a thread.** US-020 measured
+ * the endpoint against ScrapeCreators' one-credit page and left it unbuilt;
+ * what changed is not the price but who holds the key. An account with this
+ * key and no ScrapeCreators one had Reddit posts and no Reddit threads. The
+ * form's cost sentence says what a thread costs here, and the whole tree
+ * arrives in one call — 34 comments for 34 claimed, captured 2026-09-15 —
+ * where ScrapeCreators returns a page of twenty-five and stops.
  */
 import { redditPlatform } from "../../platforms.js";
 import type {
   CandidatePost,
+  CandidateReply,
   ConnectorDefinition,
   CredentialCheck,
+  ReplyRequest,
+  ReplyResult,
   SearchRequest,
   SearchResult,
   SocialSource,
@@ -47,16 +52,24 @@ import type {
 } from "../../types.js";
 import type { Page } from "./client.js";
 import {
+  redditCommentsProfile,
   redditSearchProfile,
   redditSubredditProfile,
   redditSubredditSearchProfile,
   SocialCrawlClient,
   SocialCrawlError,
 } from "./client.js";
+import { toCandidateReply } from "./comments.js";
 import { socialCrawlProvider } from "./provider.js";
 
 /** The most pages one input may buy in one poll. A page is about 25 posts. */
 const maxPagesPerInput = 2;
+
+/** One credit, in micro-dollars: the price every SocialCrawl call is written against. */
+const creditMicros = 8118;
+
+/** A comment call is five credits, per the provider's guide and its own `credits_used`. */
+const repliesCallCredits = 5;
 
 export const socialCrawlReddit: ConnectorDefinition = {
   platform: redditPlatform,
@@ -73,12 +86,16 @@ export const socialCrawlReddit: ConnectorDefinition = {
    */
   discovery: ["keyword", "channel"],
   maxUnitsPerQueryPoll: maxPagesPerInput,
+  canFetchReplies: true,
   /**
-   * False, and measured rather than unimplemented. Its comment endpoint works
-   * and costs 5 credits where ScrapeCreators' costs 1 — US-020 compared them on
-   * one thread. Reddit replies belong to the cheaper provider.
+   * **Five credits a call, not one, and this is the field that stops a
+   * fivefold overspend.** A comment call here is five credits against the
+   * search's one — the same trap US-028 found on LinkedIn — so the two prices
+   * are declared separately, and `fetchReplies` reports one unit per charged
+   * call rather than the credit count, because this number is already the
+   * whole call's price.
    */
-  canFetchReplies: false,
+  replyPricePerUnitMicros: repliesCallCredits * creditMicros,
   create: (runtime) => new SocialCrawlRedditSource(runtime),
 };
 
@@ -144,6 +161,7 @@ export class SocialCrawlRedditSource implements SocialSource {
   readonly pricePerUnitMicros = socialCrawlReddit.pricePerUnitMicros;
   readonly maxUnitsPerQueryPoll = socialCrawlReddit.maxUnitsPerQueryPoll;
   readonly canFetchReplies = socialCrawlReddit.canFetchReplies;
+  readonly replyPricePerUnitMicros = socialCrawlReddit.replyPricePerUnitMicros;
 
   constructor(private readonly runtime: SourceRuntime) {}
 
@@ -281,6 +299,65 @@ export class SocialCrawlRedditSource implements SocialSource {
     return this.inputsFor(query, at.phase)[at.index];
   }
 
+  /**
+   * The whole thread under one post, in one call.
+   *
+   * The provider expands nested replies into the answer itself — each
+   * comment carries its children under `replies` — so the tree is flattened
+   * here, depth first in the provider's own order, and every comment reaches
+   * the shared parser as one row. What the parser needs and this platform
+   * says differently is normalised first: a bare id becomes Reddit's `t1_`
+   * fullname, the post's bare id its `t3_`, so a comment read here and the
+   * same comment read through ScrapeCreators are one row, and a `parent_id`
+   * naming the post reads as top-level rather than as a reply to a reply.
+   *
+   * The date cut is applied to every row: the captured tree was not in date
+   * order, and a nested reply is newer than its parent by construction.
+   *
+   * `partial` is the provider's own `truncated`, read as partial unless it
+   * says false — and a cursor, which the guide documents and the capture
+   * never saw. 34 comments arrived for a post claiming 34.
+   */
+  async fetchReplies(request: ReplyRequest): Promise<ReplyResult> {
+    const page = await this.client(request.credentials, redditCommentsProfile).fetchPage(
+      {
+        url: request.postUrl,
+        ...(request.cursor ? { cursor: request.cursor } : {}),
+      },
+      request.signal,
+    );
+
+    const rows = flattenThread(page.records);
+    const bareParent = request.postExternalId.replace(/^t3_/, "");
+
+    const parsed = rows
+      .map((row, index) =>
+        toCandidateReply(normaliseIds(row, bareParent), {
+          parentPostExternalId: request.postExternalId,
+          position: (request.positionOffset ?? 0) + index,
+        }),
+      )
+      .filter((reply): reply is CandidateReply => reply !== undefined);
+
+    const replies = request.since
+      ? parsed.filter((reply) => reply.postedAt > (request.since as Date))
+      : parsed;
+
+    return {
+      replies,
+      itemsReturned: rows.length,
+      /**
+       * One unit per charged call, because `replyPricePerUnitMicros` is
+       * already the whole call's price. A repeat inside the provider's
+       * five-minute cache answers with `credits_used: 0` and is reported as
+       * nothing, which is what it cost.
+       */
+      unitsConsumed: Math.ceil(page.creditsUsed / repliesCallCredits),
+      next: page.cursor ? { status: "ready", cursor: page.cursor } : { status: "done" },
+      partial: page.truncated !== false || page.cursor !== undefined,
+    };
+  }
+
   private first(query: SourceQuery): Cursor | undefined {
     for (const phase of phases) {
       if (this.inputsFor(query, phase).length > 0) return { phase, index: 0, pages: 0 };
@@ -360,6 +437,61 @@ export function toCandidatePost(record: unknown): CandidatePost | undefined {
     ...(typeof comments === "number" && Number.isFinite(comments) && comments >= 0
       ? { replyCount: comments }
       : {}),
+  };
+}
+
+/**
+ * The tree as one list, depth first, in the provider's order.
+ *
+ * A row arrives wrapped as `{ comment }` at the top level and bare inside
+ * `replies`; both shapes are read. A comment's `replies` are removed from
+ * the row it becomes, so nothing downstream stores a subtree twice.
+ */
+export function flattenThread(records: readonly unknown[]): Record<string, unknown>[] {
+  const out: Record<string, unknown>[] = [];
+
+  const visit = (record: unknown) => {
+    const item = objectOf(record);
+    const comment = objectOf(item?.comment) ?? item;
+    if (!comment) return;
+
+    const { replies, ...own } = comment;
+    out.push(own);
+    if (Array.isArray(replies)) for (const child of replies) visit(child);
+  };
+
+  for (const record of records) visit(record);
+  return out;
+}
+
+/**
+ * The ids as the shared parser and the other Reddit connectors expect them.
+ *
+ * SocialCrawl sends every Reddit id bare — `ov3sslq`, `1ulc2gz` — where
+ * ScrapeCreators sends the fullname and `socialcrawl/reddit.ts` rebuilds
+ * `t3_` for a post. A comment is keyed `t1_<id>` for the same reason: keyed
+ * by `(source, external_id)`, the same comment through two providers must be
+ * one row. `parent_id` is the post's bare id for a top-level comment and a
+ * comment's for a nested one, and the parser tells them apart only if the
+ * first equals the post's fullname.
+ */
+export function normaliseIds(
+  comment: Record<string, unknown>,
+  barePostId: string,
+): Record<string, unknown> {
+  const fullname = (value: unknown, prefix: "t1_" | "t3_"): unknown =>
+    typeof value === "string" && value !== "" && !/^t[13]_/.test(value)
+      ? `${prefix}${value}`
+      : value;
+
+  const parent = text(comment.parent_id);
+  const parentIsPost = parent === undefined || parent.replace(/^t3_/, "") === barePostId;
+
+  return {
+    ...comment,
+    id: fullname(comment.id, "t1_"),
+    post_id: fullname(comment.post_id, "t3_"),
+    parent_id: parentIsPost ? `t3_${barePostId}` : fullname(parent, "t1_"),
   };
 }
 

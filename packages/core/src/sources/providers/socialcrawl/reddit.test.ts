@@ -14,9 +14,15 @@ import { createLogger } from "../../../logger.js";
 import { unreachableFetch } from "../../../testing/network.js";
 import { redditPlatformId } from "../../platforms.js";
 import { assertSourcesCanBeStored } from "../../storage.js";
-import type { SearchRequest, SourceRuntime } from "../../types.js";
+import type { ReplyRequest, SearchRequest, SourceRuntime } from "../../types.js";
 import { socialCrawlProviderId } from "./provider.js";
-import { SocialCrawlRedditSource, socialCrawlReddit, toCandidatePost } from "./reddit.js";
+import {
+  flattenThread,
+  normaliseIds,
+  SocialCrawlRedditSource,
+  socialCrawlReddit,
+  toCandidatePost,
+} from "./reddit.js";
 
 interface Captured {
   readonly httpStatus: number;
@@ -34,6 +40,11 @@ const keywordPage2 = fixture("search-keyword-page-2");
 const subredditPosts = fixture("subreddit-posts");
 const scopedSearch = fixture("subreddit-search");
 const credentialsRejected = fixture("credentials-rejected");
+/** US-138: the whole tree under a post claiming 34 comments, captured 2026-09-15. */
+const thread = fixture("comments");
+const ledger = JSON.parse(
+  readFileSync(new URL("./reddit-fixtures/ledger.json", import.meta.url), "utf8"),
+) as { name: string; creditsUsed: number | null }[];
 
 function itemsOf(captured: Captured): readonly unknown[] {
   return (captured.body as { data?: { items?: readonly unknown[] } }).data?.items ?? [];
@@ -89,18 +100,230 @@ describe("the connector's declared economics", () => {
   });
 
   /**
-   * Not an omission. Its comment endpoint works and costs 5 credits where
-   * ScrapeCreators' costs 1 for the same thread, measured in US-020. A
-   * deployment that wants Reddit replies uses the cheaper provider, and the
-   * monitor form reads this declaration so a person is told rather than
-   * finding out.
+   * US-138. Five credits a call against the search's one, so the reply price
+   * is declared on its own — the field that stops a fivefold overspend — and
+   * the declaration reaches the built instance, which is what every screen
+   * reads.
    */
-  it("declares that it does not read replies, because the cheap provider does", () => {
+  it("declares replies at five credits a call, on the definition and the instance", () => {
     const built = new SocialCrawlRedditSource(runtimeWith(unreachableFetch));
 
-    expect(socialCrawlReddit.canFetchReplies).toBe(false);
-    expect(built.canFetchReplies).toBe(false);
-    expect((built as { fetchReplies?: unknown }).fetchReplies).toBeUndefined();
+    expect(socialCrawlReddit.canFetchReplies).toBe(true);
+    expect(socialCrawlReddit.replyPricePerUnitMicros).toBe(5 * 8118);
+    expect(built.canFetchReplies).toBe(true);
+    expect(built.replyPricePerUnitMicros).toBe(5 * 8118);
+
+    expect(ledger.find((entry) => entry.name === "comments")?.creditsUsed).toBe(5);
+  });
+});
+
+/** The post the comments capture asked about, as `socialcrawl/reddit.ts` keys it. */
+const threadPostId = "t3_1ulc2gz";
+const threadUrl =
+  "https://www.reddit.com/r/softwaretesting/comments/1ulc2gz/mobile_qa_engineers_how_long_would_this_test_take/";
+
+function replyRequest(overrides: Partial<ReplyRequest> = {}): ReplyRequest {
+  return { postUrl: threadUrl, postExternalId: threadPostId, credentials, ...overrides };
+}
+
+describe("the thread under a post", () => {
+  it("arrives whole in one call: 34 comments for 34 claimed, nested under replies", () => {
+    const rows = flattenThread(itemsOf(thread));
+
+    expect(itemsOf(thread)).toHaveLength(8);
+    expect(rows).toHaveLength(34);
+    // Flattened rows carry no subtree of their own, so nothing is stored twice.
+    expect(rows.every((row) => !("replies" in row))).toBe(true);
+    // Depth first, in the provider's order: the first top-level comment's
+    // child follows it directly.
+    expect(rows[0]?.id).toBe("ov3sslq");
+    expect(rows[1]?.parent_id).toBe("ov3sslq");
+  });
+
+  it("asks by post URL, five credits, and reports one unit for the call", async () => {
+    const { fetch: fetchStub, calls } = socialCrawl([thread]);
+    const source = new SocialCrawlRedditSource(runtimeWith(fetchStub));
+
+    const result = await source.fetchReplies(replyRequest());
+
+    const asked = new URL(calls[0]?.url ?? "");
+    expect(asked.pathname).toBe("/v1/reddit/post/comments");
+    expect(asked.searchParams.get("url")).toBe(threadUrl);
+    expect(result.itemsReturned).toBe(34);
+    // 33, not 34: one row is a removed comment the provider still lists, with
+    // no text and no author, and the shared parser drops a comment with no
+    // words rather than storing silence. It is still counted, and paid for.
+    expect(result.replies).toHaveLength(33);
+    expect(result.unitsConsumed).toBe(1);
+  });
+
+  it("drops the removed comment the provider lists with no text, and counts it", () => {
+    const removed = flattenThread(itemsOf(thread)).filter((row) => row.text === null);
+
+    expect(removed).toHaveLength(1);
+    expect(removed[0]?.id).toBe("ow825zg");
+  });
+
+  it("reports nothing for a call the provider served from cache for free", async () => {
+    const cached = {
+      httpStatus: 200,
+      body: { ...(thread.body as Record<string, unknown>), credits_used: 0, cached: true },
+    };
+    const { fetch: fetchStub } = socialCrawl([cached]);
+    const source = new SocialCrawlRedditSource(runtimeWith(fetchStub));
+
+    expect((await source.fetchReplies(replyRequest())).unitsConsumed).toBe(0);
+  });
+
+  /**
+   * The ids the other Reddit connectors already agree on. SocialCrawl sends
+   * them bare; ScrapeCreators sends Reddit's fullname. Keyed by
+   * `(source, external_id)`, the same comment through both must be one row.
+   */
+  it("keys a comment t1_ and its post t3_, so two providers store one row", async () => {
+    const { fetch: fetchStub } = socialCrawl([thread]);
+    const source = new SocialCrawlRedditSource(runtimeWith(fetchStub));
+
+    const { replies } = await source.fetchReplies(replyRequest());
+
+    expect(replies[0]?.externalId).toBe("t1_ov3sslq");
+    for (const reply of replies) {
+      expect(reply.externalId.startsWith("t1_")).toBe(true);
+      expect(reply.parentPostExternalId).toBe(threadPostId);
+    }
+  });
+
+  it("hangs a top-level comment under the post and a nested one under its parent", async () => {
+    const { fetch: fetchStub } = socialCrawl([thread]);
+    const source = new SocialCrawlRedditSource(runtimeWith(fetchStub));
+
+    const { replies } = await source.fetchReplies(replyRequest());
+
+    const topLevel = replies.filter((reply) => reply.parentReplyExternalId === undefined);
+    const nested = replies.filter((reply) => reply.parentReplyExternalId !== undefined);
+    expect(topLevel).toHaveLength(8);
+    // 25 of the 26 nested rows: the removed one above is nested.
+    expect(nested).toHaveLength(25);
+    expect(replies[1]?.parentReplyExternalId).toBe("t1_ov3sslq");
+  });
+
+  it("normalises a bare id, a bare post id and a parent naming the post", () => {
+    const top = normaliseIds({ id: "abc", post_id: "1ulc2gz", parent_id: "1ulc2gz" }, "1ulc2gz");
+    expect(top).toEqual({ id: "t1_abc", post_id: "t3_1ulc2gz", parent_id: "t3_1ulc2gz" });
+
+    const child = normaliseIds({ id: "def", post_id: "1ulc2gz", parent_id: "abc" }, "1ulc2gz");
+    expect(child.parent_id).toBe("t1_abc");
+
+    // Already a fullname: left alone rather than prefixed twice.
+    expect(normaliseIds({ id: "t1_abc", post_id: "t3_1ulc2gz" }, "1ulc2gz").id).toBe("t1_abc");
+  });
+
+  it("reads the author, the provider's own link and the reply count", async () => {
+    const { fetch: fetchStub } = socialCrawl([thread]);
+    const source = new SocialCrawlRedditSource(runtimeWith(fetchStub));
+
+    const { replies } = await source.fetchReplies(replyRequest());
+    const first = replies[0];
+
+    expect(first?.author).toBe("redditor-2");
+    expect(first?.url).toBe(
+      "https://www.reddit.com/r/softwaretesting/comments/1ulc2gz/comment/ov3sslq/",
+    );
+    expect(first?.replyCount).toBe(1);
+    expect(first?.threadPosition).toBe(0);
+    expect(first?.text).toBe("30min to write, another 30 to debug and optimize");
+  });
+
+  it("drops a comment that says it belongs to another post", async () => {
+    const body = thread.body as { data: { items: { comment: Record<string, unknown> }[] } };
+    const foreign = {
+      httpStatus: 200,
+      body: {
+        ...body,
+        data: {
+          ...body.data,
+          items: body.data.items.map((item) => ({
+            comment: { ...item.comment, post_id: "zzzzzzz", replies: [] },
+          })),
+        },
+      },
+    };
+    const { fetch: fetchStub } = socialCrawl([foreign]);
+    const source = new SocialCrawlRedditSource(runtimeWith(fetchStub));
+
+    const result = await source.fetchReplies(replyRequest());
+
+    expect(result.replies).toHaveLength(0);
+    expect(result.itemsReturned).toBe(8);
+  });
+
+  /**
+   * Not in date order — a nested reply is newer than its parent by
+   * construction and sits right after it — so every row is cut on its own.
+   */
+  it("cuts on the thread's window row by row, and never stops early", async () => {
+    const { fetch: fetchStub } = socialCrawl([thread]);
+    const source = new SocialCrawlRedditSource(runtimeWith(fetchStub));
+
+    const all = await source.fetchReplies(replyRequest());
+    const dates = all.replies.map((reply) => reply.postedAt.getTime());
+    expect(dates.every((value, index) => index === 0 || (dates[index - 1] ?? 0) >= value)).toBe(
+      false,
+    );
+
+    const sorted = [...dates].sort((a, b) => a - b);
+    const middle = new Date(sorted[17] as number);
+    const later = await source.fetchReplies(replyRequest({ since: middle }));
+
+    expect(later.replies.length).toBeGreaterThan(0);
+    expect(later.replies.length).toBeLessThan(33);
+    expect(later.replies.every((reply) => reply.postedAt > middle)).toBe(true);
+    expect(later.itemsReturned).toBe(34);
+  });
+
+  it("calls the thread complete when the provider says it is not truncated and offers no cursor", async () => {
+    const { fetch: fetchStub } = socialCrawl([thread]);
+    const source = new SocialCrawlRedditSource(runtimeWith(fetchStub));
+
+    const result = await source.fetchReplies(replyRequest());
+
+    expect(result.next.status).toBe("done");
+    expect(result.partial).toBe(false);
+  });
+
+  it("calls it partial when the provider says truncated, or says nothing", async () => {
+    const body = thread.body as { data: Record<string, unknown> };
+    const truncated = {
+      httpStatus: 200,
+      body: { ...body, data: { ...body.data, truncated: true } },
+    };
+    const silent = {
+      httpStatus: 200,
+      body: { ...body, data: { ...body.data, truncated: undefined } },
+    };
+
+    const first = new SocialCrawlRedditSource(runtimeWith(socialCrawl([truncated]).fetch));
+    const second = new SocialCrawlRedditSource(runtimeWith(socialCrawl([silent]).fetch));
+
+    expect((await first.fetchReplies(replyRequest())).partial).toBe(true);
+    expect((await second.fetchReplies(replyRequest())).partial).toBe(true);
+  });
+
+  it("follows a cursor when the provider offers one, and calls the thread partial", async () => {
+    const body = thread.body as Record<string, unknown>;
+    const paged = {
+      httpStatus: 200,
+      body: { ...body, pagination: { next_cursor: "more", has_more: true, page_size: 8 } },
+    };
+    const { fetch: fetchStub, calls } = socialCrawl([paged, thread]);
+    const source = new SocialCrawlRedditSource(runtimeWith(fetchStub));
+
+    const first = await source.fetchReplies(replyRequest());
+    expect(first.next).toEqual({ status: "ready", cursor: "more" });
+    expect(first.partial).toBe(true);
+
+    await source.fetchReplies(replyRequest({ cursor: "more", positionOffset: 34 }));
+    expect(new URL(calls[1]?.url ?? "").searchParams.get("cursor")).toBe("more");
   });
 });
 

@@ -108,8 +108,13 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-intentwatch}
     # Bound to loopback: the app reaches Postgres over the compose network, and
     # this port exists only so `pnpm dev` and `pnpm test` can reach it.
+    #
+    # The host port varies so that two git worktrees can each run their own
+    # Postgres. A worktree's `.env` sets POSTGRES_PORT together with
+    # COMPOSE_PROJECT_NAME, which gives it its own container, network and data
+    # volume. Unset is 5432, so an instance running today is unchanged.
     ports:
-      - "127.0.0.1:5432:5432"
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
     healthcheck:

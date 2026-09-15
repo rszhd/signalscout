@@ -409,6 +409,13 @@ watched fail is worth exactly as much as an assertion nobody has watched fail.
 `pnpm test` uses a real Postgres and creates a database per test file. If it
 cannot reach one it says so; it does not fall back to a fake.
 
+**Which Postgres is the folder's own.** The suite reads `DATABASE_URL` from the
+`.env` beside it. In the main checkout that is the container `pnpm db:up`
+starts, on 5432. In a worktree made by `scripts/new-worktree.mjs` it is that
+worktree's own container, on a port of its own, under its own
+`COMPOSE_PROJECT_NAME` — which is what lets two agents run the suite at the same
+time without crossing the `max_connections` ceiling described below. US-135.
+
 **It can go red without a broken test.** A database per file, run in parallel,
 can outrun Postgres `max_connections` of 100: a file fails with "sorry, too
 many clients already", sometimes surfacing as a 500 from a route whose insert

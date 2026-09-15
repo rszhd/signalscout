@@ -206,6 +206,12 @@ export class ScrapeCreatorsError extends Error {
     readonly httpStatus: number,
     /** Set only on `rateLimit`, and only when the provider named a time. */
     readonly retryAfter?: Date,
+    /**
+     * What the refused call was billed, when the answer said. Zero when it
+     * did not: a refusal the provider does not price is not one we guess at.
+     * A caller that skips the input rather than failing reports this.
+     */
+    readonly creditsCharged: number = 0,
   ) {
     super(message);
     this.name = "ScrapeCreatorsError";
@@ -328,10 +334,13 @@ export class ScrapeCreatorsClient {
       );
     }
 
+    const charged = record.credits_charged;
     return new ScrapeCreatorsError(
       "provider",
       `ScrapeCreators answered ${httpStatus}${text ? `: ${text.slice(0, 200)}` : ""}.`,
       httpStatus,
+      undefined,
+      typeof charged === "number" && Number.isFinite(charged) && charged >= 0 ? charged : 0,
     );
   }
 

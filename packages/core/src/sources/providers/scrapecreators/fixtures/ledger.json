@@ -52,9 +52,9 @@
     {
       "call": "unknown-subreddit",
       "httpStatus": 200,
-      "elapsedMs": 2216,
+      "elapsedMs": 1323,
       "creditsCharged": 1,
-      "creditsRemaining": 2091,
+      "creditsRemaining": 1580,
       "note": "a subreddit that does not exist; answers 200 with no posts, and bills for it"
     }
   ]

@@ -336,6 +336,38 @@ export class ScrapeCreatorsRedditSource implements SocialSource {
           },
         };
       }
+
+      /**
+       * A 404 is about this one input, and the rest of the list is readable.
+       *
+       * Seen live on 2026-09-15: `r/SideProject` answered "404: Subreddit not
+       * found :(" three times in three minutes and 200 with 24 posts an hour
+       * later, while a name that does not exist answered 200 and empty both
+       * times it was captured. So the answer is the provider's, not the
+       * name's — and throwing it failed the whole source, parked the walk on
+       * that input, and failed it again at every retry. The input is skipped,
+       * named in the log, and billed for what the answer said it cost.
+       */
+      if (error instanceof ScrapeCreatorsError && error.httpStatus === 404) {
+        this.runtime.logger.warn(
+          { phase: start.phase, input: this.listFor(request.query, start.phase)[start.index] },
+          `ScrapeCreators answered 404 for one input; the poll continues without it: ${error.message}`,
+        );
+        const onward = this.advance(request.query, start);
+        return {
+          posts: [],
+          unitsConsumed: error.creditsCharged,
+          next: onward ? { status: "ready", cursor: encodeCursor(onward) } : { status: "done" },
+        };
+      }
+
+      // Any other failure names the input, so the next one costs no credits
+      // to diagnose: this one took two.
+      if (error instanceof Error) {
+        const term = this.listFor(request.query, start.phase)[start.index] ?? "";
+        const input = start.phase === "keyword" ? `the query "${term}"` : `r/${term}`;
+        error.message = `${error.message} While reading ${input}.`;
+      }
       throw error;
     }
 

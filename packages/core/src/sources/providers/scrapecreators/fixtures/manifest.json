@@ -68,7 +68,7 @@
         "url": "https://api.scrapecreators.com/v1/reddit/subreddit?subreddit=this-subreddit-does-not-exist-intentwatch&sort=new",
         "note": "a subreddit that does not exist; answers 200 with no posts, and bills for it"
       },
-      "capturedAt": "2026-09-05T09:36:00.691Z",
+      "capturedAt": "2026-09-15T15:54:34.216Z",
       "identitiesReplaced": 0
     }
   ]

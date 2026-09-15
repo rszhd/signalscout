@@ -553,6 +553,15 @@ one. In particular, a ScrapeCreators 404 was captured for an available post
 with a shortened URL. See [deletions.md](deletions.md) and the committed
 `capture:deletions` instrument before changing a deletion rule.
 
+**A ScrapeCreators 404 on a subreddit is about the provider, not the name.**
+On 2026-09-15 `r/SideProject` answered "404: Subreddit not found :(" three
+times in three minutes and 200 with 24 posts an hour later, while a name that
+does not exist answers 200 and empty every time it has been captured. The
+Reddit connector skips the input, names it in the log, and reads the rest of
+the list; before that the whole source failed and the walk stayed parked on
+the input at every retry. Any other failure now names the input it was
+reading, because finding this one cost two credits.
+
 Verification currently uses the connector's existing billable unit and price.
 A provider whose verification endpoint bills differently must declare that
 price separately before it can be used; the worker must never guess one.

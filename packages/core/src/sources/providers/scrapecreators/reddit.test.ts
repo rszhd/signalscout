@@ -406,6 +406,45 @@ describe("searching", () => {
     expect(result.next).toEqual({ status: "done" });
   });
 
+  /**
+   * Not a capture. The status and the message are from the worker's log on
+   * 2026-09-15, when `r/SideProject` answered this three times in three
+   * minutes and 200 with posts an hour later; the JSON envelope around the
+   * message is assumed from how `fail` reads one. It is evidence about our
+   * handling of a 404 and none about the provider's shape for it — the name
+   * that does not exist still answers 200 and empty, above.
+   */
+  it("skips an input the provider answers 404 for, and reads the rest", async () => {
+    const notFound: Captured = {
+      httpStatus: 404,
+      body: { success: false, message: "Subreddit not found :(" },
+    };
+    const stub = scrapeCreators([notFound, subredditPage]);
+    const source = new ScrapeCreatorsRedditSource(runtimeWith(stub.fetch));
+    const query = { queries: [], channels: ["SideProject", "softwaretesting"] };
+
+    const skipped = await source.search(request({ query }));
+
+    expect(skipped.posts).toEqual([]);
+    // The answer priced nothing, so nothing is reported.
+    expect(skipped.unitsConsumed).toBe(0);
+    expect(skipped.next).toEqual({ status: "ready", cursor: cursorAt("subreddit", 1, 0) });
+
+    const rest = await source.search(
+      request({ query, cursor: (skipped.next as { cursor: string }).cursor }),
+    );
+    expect(rest.posts[0]?.externalId).toBe(firstSubredditPostId);
+  });
+
+  it("names the input in any other failure", async () => {
+    const broken: Captured = { httpStatus: 500, body: { message: "upstream" } };
+    const source = new ScrapeCreatorsRedditSource(runtimeWith(scrapeCreators([broken]).fetch));
+
+    await expect(
+      source.search(request({ query: { queries: [], channels: ["SideProject"] } })),
+    ).rejects.toThrow(/While reading r\/SideProject\./);
+  });
+
   it("refuses a cursor it did not issue", async () => {
     const source = new ScrapeCreatorsRedditSource(runtimeWith(unreachableFetch));
 

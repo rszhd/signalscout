@@ -21,7 +21,6 @@
  */
 import Stripe from "stripe";
 import type { SubscriptionStatus } from "../db/schema.js";
-import { planForPrice } from "./plan.js";
 import type { StripeSubscriptionState } from "./store.js";
 
 /**
@@ -181,14 +180,11 @@ export function priceIdOf(subscription: Stripe.Subscription): string | null {
 /**
  * The part of a Stripe subscription this database keeps.
  *
- * `keysIncludedPriceId` is what this deployment sells the keys-included plan
- * as. Undefined means it sells no such plan, and then every subscription is on
- * `own_keys` however its price is named — a price cannot put an account on a
- * plan this instance was never configured for.
+ * It no longer carries a plan. US-141: there is one price, and whose keys an
+ * account runs on is its own state rather than a property of what it bought.
  */
 export function stateFromSubscription(
   subscription: Stripe.Subscription,
-  keysIncludedPriceId?: string,
 ): StripeSubscriptionState | null {
   const stripeCustomerId = customerIdOf(subscription.customer);
   if (!stripeCustomerId) return null;
@@ -197,7 +193,6 @@ export function stateFromSubscription(
     stripeCustomerId,
     stripeSubscriptionId: subscription.id,
     status: statusFromStripe(subscription.status),
-    plan: planForPrice(priceIdOf(subscription), keysIncludedPriceId),
     priceId: priceIdOf(subscription),
     currentPeriodEnd: periodEndOf(subscription),
     cancelAtPeriodEnd: subscription.cancel_at_period_end,
@@ -248,7 +243,6 @@ export interface StripeBillingOptions {
    * and the failure of leaving it out is visible on the billing screen rather
    * than quiet, so it does not belong on the list the boot check refuses over.
    */
-  readonly keysIncludedPriceId?: string | undefined;
   readonly webhookSecret: string;
   /** Injected by the test that drives the mapping without a network. */
   readonly client?: Stripe;
@@ -265,7 +259,6 @@ export const integrationIdentifier = "signalscout_cloudsubs";
 export function createStripeBilling({
   apiKey,
   priceId,
-  keysIncludedPriceId,
   webhookSecret,
   client,
 }: StripeBillingOptions): BillingProvider {
@@ -311,14 +304,12 @@ export function createStripeBilling({
           : undefined;
 
       /**
-       * One line, and it is always `priceId`. US-128.
+       * One line, and there is only one price. US-141.
        *
-       * `keysIncludedPriceId` is read by the webhook and not offered here,
-       * which is deliberate and temporary: an account on that plan spends this
-       * instance's providers and model, and nothing yet caps what one account
-       * may spend of them. US-129 is that cap. Until it closes, the plan can be
-       * put on an account from Stripe's own dashboard — where somebody is
-       * watching — and not bought from a button.
+       * US-128 sold two and had the webhook read whose keys an account ran on
+       * off the price it named. There is one now, and that choice is the
+       * account's own — so Checkout has one thing to put on the session and
+       * nothing to decide.
        */
       const session = await stripe.checkout.sessions.create({
         mode: "subscription",
@@ -359,10 +350,7 @@ export function createStripeBilling({
       const event = await stripe.webhooks.constructEventAsync(payload, signature, webhookSecret);
 
       if (event.type.startsWith("customer.subscription.")) {
-        const state = stateFromSubscription(
-          event.data.object as Stripe.Subscription,
-          keysIncludedPriceId,
-        );
+        const state = stateFromSubscription(event.data.object as Stripe.Subscription);
         return state
           ? { kind: "subscription", type: event.type, state }
           : { kind: "ignored", type: event.type };
@@ -381,7 +369,7 @@ export function createStripeBilling({
         if (!subscriptionId) return { kind: "ignored", type: event.type };
 
         const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-        const state = stateFromSubscription(subscription, keysIncludedPriceId);
+        const state = stateFromSubscription(subscription);
         return state
           ? { kind: "subscription", type: event.type, state }
           : { kind: "ignored", type: event.type };

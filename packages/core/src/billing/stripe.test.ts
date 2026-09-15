@@ -83,33 +83,25 @@ describe("reading a subscription", () => {
 });
 
 /**
- * US-128. The plan is mapped here, beside the status, because both are the same
- * kind of thing: somebody else's vocabulary turned into ours before it reaches a
- * column that decides something. The status decides who may poll; the plan
- * decides whose keys the poll spends.
+ * US-128, narrowed by US-141. The status is somebody else's vocabulary turned
+ * into ours before it reaches a column that decides something.
+ *
+ * The plan was mapped here too, from the price — and is not any more. There is
+ * one price, and whose keys an account runs on is its own state rather than a
+ * property of what it bought. What survives is `priceIdOf`, because reading
+ * the price off the wrong place answers undefined rather than an error.
  */
-describe("the plan a subscription's price names", () => {
+describe("the price a subscription names", () => {
   it("reads the price off the same item the period end is on", () => {
     expect(priceIdOf(subscription())).toBe("price_ordinary");
     expect(priceIdOf(subscription({ items: { data: [] } }))).toBeNull();
   });
 
-  it("is keys-included only for the price this deployment sells it as", () => {
-    const included = subscription({
-      items: { data: [{ current_period_end: 1_791_000_000, price: { id: "price_included" } }] },
-    });
+  it("carries no plan, because one price decides nothing about keys", () => {
+    const state = stateFromSubscription(subscription());
 
-    expect(stateFromSubscription(included, "price_included")?.plan).toBe("keys_included");
-    expect(stateFromSubscription(subscription(), "price_included")?.plan).toBe("own_keys");
-  });
-
-  /**
-   * A deployment that names no keys-included price sells one plan, and a price
-   * cannot put an account onto a plan this instance was never configured for.
-   * That is every deployment running today.
-   */
-  it("is own-keys where this deployment names no keys-included price", () => {
-    expect(stateFromSubscription(subscription())?.plan).toBe("own_keys");
+    expect(state?.priceId).toBe("price_ordinary");
+    expect(state).not.toHaveProperty("plan");
   });
 });
 
@@ -139,24 +131,21 @@ describe("the API version", () => {
 });
 
 /**
- * Which price Checkout opens on. US-128.
+ * Which price Checkout opens on. US-128, settled by US-141.
  *
- * The keys-included price exists so the webhook can recognise it, and it is not
- * a button yet: an account on that plan spends this instance's providers and
- * model, and US-129 is the cap on how much. A line item is one word, so the
- * decision needs a case rather than a comment — a button added later turns this
- * red, which is the reminder.
+ * There is one, so there is nothing to choose and nothing to get wrong. The
+ * case stays because a second price added later turns it red, which is the
+ * reminder that whose keys an account runs on is not a thing to sell twice.
  *
  * The Stripe client is injected and nothing here reaches the network.
  */
 describe("the price Checkout opens on", () => {
-  it("is the ordinary one, and never the keys-included one", async () => {
+  it("is the one price this deployment sells", async () => {
     const created: unknown[] = [];
 
     const billing = createStripeBilling({
       apiKey: "sk_test_not_a_real_key",
       priceId: "price_own",
-      keysIncludedPriceId: "price_included",
       webhookSecret: "whsec_test",
       client: {
         customers: { create: async () => ({ id: "cus_new" }) },

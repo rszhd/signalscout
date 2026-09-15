@@ -407,6 +407,15 @@ export function createAuth({
              * first-account guard belongs to claiming rows, and confusing the
              * two would give the second person to register no trial at all.
              */
+            /**
+             * A new account starts on this instance's keys. US-140.
+             *
+             * Nothing is written for it: no row in `account_key_source` means
+             * this instance's keys, which is the default the whole product
+             * reads. So the trial is seven days of the plan's capacity with
+             * nothing to connect, and moving to their own keys is one switch
+             * on the connections screen whenever they want it.
+             */
             if (billing !== "off") await startTrial(db, user.id);
 
             /**

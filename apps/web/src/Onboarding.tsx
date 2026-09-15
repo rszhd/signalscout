@@ -71,6 +71,14 @@ export interface ConnectionsView {
   canStore: boolean;
   storeBlocker: string | null;
   providers: ProviderView[];
+  /**
+   * Whose keys this account runs on. US-141, read by the gate in `App.tsx`.
+   *
+   * An account on this instance's keys is not asked for any, because the plan
+   * includes them — US-140. Optional so an older reply, and every test that
+   * does not care, reads as this instance's.
+   */
+  keySource?: "instance" | "own";
 }
 
 /** The model half. Only the scoring job's fallback decides anything here. */

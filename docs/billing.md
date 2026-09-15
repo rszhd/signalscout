@@ -16,21 +16,37 @@ what to set up.
 
 ## Two plans, and the second one includes the keys
 
-US-128. **Bring your own keys** is the product as it shipped: the account stores
-a provider key and a model key and spends them. **Keys included** is the second
-price: the account polls and classifies on the keys in this instance's `.env`,
-and stores none.
+US-128, rekeyed by US-141. **One price, and two ways to run it.** Bring your
+own provider and model keys and there is no limit on what you build, because
+the money is yours. Run on this instance's keys and the plan carries a
+capacity, because the money is ours.
 
-The plan lives on `subscriptions.plan` and the webhook writes it, from the price
-the subscription names. `STRIPE_PRICE_ID_KEYS_INCLUDED` is what this deployment
-sells the second plan as, and leaving it unset sells one plan — which is what
-every deployment running today does. It is not on `requiredBillingVariables`
-for that reason: the list refuses to boot over the failure that looks fine, and
-selling one plan instead of two is stated plainly on the screen.
+**It is the account's own state, not a property of what it bought.** US-128
+made it a second Stripe price and had the webhook write `subscriptions.plan`;
+US-141 removed that column. A price cannot express a choice somebody changes at
+three o'clock, and a webhook is not how a key starts being used — so
+`account_key_source` holds one row per account, and the connections screen is
+where it is changed. It takes effect on the next poll, with no restart.
 
-Every unknown reads as bring-your-own-keys: no row, no column value, a price
-this instance was never told about. `billing/plan.ts` holds that, and
-`config/machine-keys.ts` holds what it then means.
+**One state, and never a mix.** An account runs on its own keys or on this
+instance's. A platform it holds no key for does not run rather than falling
+back to ours: `startBlockers` names the key on the monitor form, before
+anything starts. Inferring the state from which keys happen to exist was the
+alternative, and it fails twice over — pasting one Reddit key would silently
+change what happens to X, and a key stored and then ignored is what
+`credentials.ts` exists to prevent.
+
+No row means this instance's keys, which is what a new account is. Note the
+direction is the opposite of US-128's, and deliberately: there an unknown had
+to be *not ours* because the plan arrived from Stripe and a missing webhook
+must not hand out keys; here the state is the account's own, and the product's
+answer to somebody who has chosen nothing is that we run it. One thing the
+account cannot choose: an instance with signup open and `BILLING_MODE=off`
+lends nothing, so an account there is on its own keys whatever the row says.
+That is US-081's rule, and `accountKeys` is where it is composed.
+
+`billing/key-source.ts` holds the state and `config/machine-keys.ts` holds
+what it then means.
 
 **The plan sells a capacity, not an allowance.** US-133 and US-134. One
 project, one monitor, six queries with at most three on LinkedIn, every
@@ -60,7 +76,7 @@ spent its month — which is what stops the work being started at all, the same
 half of the gate `entitledCondition` is.
 
 **The plan's provider per platform is the deployment's, named in
-`KEYS_INCLUDED_PROVIDER_<PLATFORM>`.** US-130. An account on the plan never
+`KEYS_INCLUDED_PROVIDER_<PLATFORM>`.** US-130. An account on our keys never
 pastes a key, so nothing records it a choice, and with two keys on the
 instance for one platform the poll would refuse. So `accountKeys(...).choices`
 answers such an account with what the deployment named — and only that: a row
@@ -71,17 +87,15 @@ four worker steps, the connections screen, the pricing page and the monitor
 form — is handed that function by the composition root, so the form and the
 poll answer alike. A name this build cannot run stops both roots at boot.
 
-**Checkout does not offer the keys-included price yet, and US-131 is the ticket
-that changes it.** It was held back until there was a cap, and there is one now.
-Until that ticket closes the plan can be put on an account from Stripe's own
-dashboard and not bought from a button — the webhook reads whichever price the
-subscription names either way, which is how the live run put an account on each
-plan and back again.
+**Checkout opens on the one price this deployment sells, and US-131 is what
+puts a button in front of it.** There is nothing to choose there any more:
+whose keys an account runs on is a switch on the connections screen, not a
+line item.
 
 One consequence is worth stating rather than discovering. `past_due` is
 entitled, so a card that failed this morning keeps polling on our keys while
-Stripe retries. That is US-072's judgement about entitlement, applied to the
-plan rather than argued again.
+Stripe retries. That is US-072's judgement about entitlement, applied here
+rather than argued again.
 
 ---
 
@@ -188,7 +202,6 @@ STRIPE_PRICE_ID=price_…        # the price, not the product
 STRIPE_WEBHOOK_SECRET=whsec_…
 APP_URL=https://app.example.com
 
-STRIPE_PRICE_ID_KEYS_INCLUDED=price_…   # optional: the second plan's price
 ACCOUNT_MONTHLY_CAP_MICROS=25000000     # optional: the deployment's fuse, $25
 KEYS_INCLUDED_QUERIES=6                 # optional: what the plan sells, per dial
 KEYS_INCLUDED_PROVIDER_REDDIT=scrapecreators   # one per platform: who fetches it on that plan

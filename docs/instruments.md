@@ -279,26 +279,14 @@ calls made, on 2026-09-13. The model must be priced or nothing accumulates —
 `AI_INPUT_PRICE_MICROS` and `AI_OUTPUT_PRICE_MICROS` for a model this
 repository holds no row for.
 
-`live:stripe-plan` answers whether a real Stripe subscription puts an account on
-the right plan. US-128. **It is the one instrument that does not live in
-`packages/core`** — it needs the Fastify server, so it is
-`pnpm --filter @signalscout/api live:stripe-plan`.
-
-It spends nothing: test mode, a test card token, and every customer it makes is
-deleted on the way out. What it costs instead is objects in somebody's Stripe
-account, so it refuses to run against a key that is not `sk_test_`.
-
-It reads this account's signing secret with `stripe listen --print-secret`,
-builds the API on a port of its own, puts `stripe listen` in front of it, and
-subscribes two customers — one to `STRIPE_PRICE_ID_KEYS_INCLUDED` and one to
-`STRIPE_PRICE_ID`. Then it reads the `subscriptions` rows out of a scratch
-database. The claim it exists for is somebody else's half: `priceIdOf` reads the
-price off the subscription *item*, the way `periodEndOf` reads the period end,
-and reading the wrong place answers undefined rather than an error — an account
-quietly on the cheaper plan with nothing anywhere saying so.
-
-`LIVE_STRIPE_PORT` moves it off 3999. It is deliberately not `PORT`, which names
-the development server's port and would be taken.
+`live:stripe-plan` was deleted by US-141, and it is worth saying why rather
+than leaving a gap. It subscribed two customers to two prices and read back the
+plan the webhook wrote, which was US-128's claim. There is one price now, and
+whose keys an account runs on is its own state rather than a property of what
+it bought — so the instrument measured a thing that no longer exists. What it
+proved along the way survives in `priceIdOf`, which reads the price off the
+subscription *item*: the webhook still logs a price this deployment does not
+sell, which is the half that could go wrong silently.
 
 `live:sc-tiktok-poll` and `live:sc-youtube-poll` are `live-poll.ts` aimed at the
 second provider for each of those platforms, the way `live:apify-linkedin-poll`

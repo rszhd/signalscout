@@ -19,10 +19,10 @@
  * account that has stored nothing behaves exactly as it did before this
  * existed. Both are the common case, and neither needed a branch.
  *
- * **One branch since US-132, and it is `readAiEnvironmentFor`.** On the plan
- * that lends the keys the rows are not an override, because the key under
- * them is the deployment's: an account there runs on the instance's
- * environment and its rows are left unread until it leaves the plan.
+ * **US-132 branched this and US-141 reversed the branch.** For a moment a
+ * lent-keys account's rows were not read at all, because the key under them
+ * was the deployment's. An account chooses whose keys it runs on now, so a
+ * model it names is a choice it made, and the order above holds for everyone.
  */
 import { and, eq } from "drizzle-orm";
 import type { Database } from "../db/client.js";
@@ -388,28 +388,6 @@ export async function readAiEnvironment(
   if (mine.size === 0) return instance;
 
   return overlay(mine, instance);
-}
-
-/**
- * The same, for an account that may or may not be spending our money. US-132.
- *
- * On the plan that lends the keys the deployment chooses the model, so the
- * account's rows are not read: a row from before the plan would point our key
- * at a model nobody priced, and `readAiEnvironment`'s order — the rows over
- * the instance — is right only when the key under it is the person's own.
- * The rows stay, so leaving the plan reads them again. Both composition roots
- * call this rather than branching themselves, so the worker and the API
- * cannot disagree about whose model an account runs on.
- */
-export async function readAiEnvironmentFor(
-  db: Database,
-  userId: string,
-  instance: AiEnvironment,
-  spendsInstanceMoney: boolean,
-  encryption: Record<string, string | undefined> = process.env,
-): Promise<AiEnvironment> {
-  if (spendsInstanceMoney) return instance;
-  return readAiEnvironment(db, userId, instance, encryption);
 }
 
 /** What a person has on screen for one job, before they have saved it. */

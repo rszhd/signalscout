@@ -35,7 +35,6 @@ import {
   type Logger,
   linkStripeCustomer,
   type PlanPrice,
-  planOf,
   readEntitlement,
   readSubscription,
   trialDays,
@@ -157,8 +156,14 @@ const billingStateSchema = z.object({
       interval: z.string().nullable(),
     })
     .nullable(),
-  /** Which plan this account is on: whose keys its monitors spend. US-128. */
-  plan: z.enum(["own_keys", "keys_included"]),
+  /**
+   * Whose keys this account's monitors spend. US-128, rekeyed by US-141.
+   *
+   * It was the Stripe plan and it is the account's own state now: one price,
+   * and a choice a person changes on the connections screen rather than by
+   * moving between subscriptions.
+   */
+  keySource: z.enum(["instance", "own"]),
   /**
    * The month this plan lends, and what is left of it. US-129.
    *
@@ -215,7 +220,7 @@ export interface BillingRoutesOptions {
    * states what the worker enforces rather than a second copy of it. Undefined
    * in a test that is not about either, and the screen then shows none.
    */
-  readonly keys?: Pick<AccountKeys, "cap" | "capacity">;
+  readonly keys?: Pick<AccountKeys, "cap" | "capacity" | "source">;
   readonly now?: () => Date;
 }
 
@@ -275,7 +280,7 @@ export async function registerBillingRoutes(
 
       return {
         mode: settings.mode,
-        plan: planOf(settings.mode, subscription),
+        keySource: (await keys?.source(userId)) ?? "instance",
         included:
           capacity === null
             ? null
@@ -447,25 +452,23 @@ export async function registerBillingRoutes(
               type: event.type,
               userId: updated.userId,
               status: updated.status,
-              plan: updated.plan,
             },
             "a subscription changed",
           );
 
           /**
-           * A price this deployment recognises neither of. US-128.
+           * A price this deployment does not sell. US-128, kept by US-141.
            *
-           * It is read as the plan that spends the account's own money, which
-           * is the safe direction and a silent one: an operator who mistyped
-           * `STRIPE_PRICE_ID_KEYS_INCLUDED` would see paying accounts on the
-           * cheaper plan and no error anywhere. This is the error.
+           * It decides nothing now — whose keys an account runs on is the
+           * account's own state, not the price it pays. It is still worth a
+           * line: an operator who mistyped `STRIPE_PRICE_ID` would otherwise
+           * see subscriptions arriving against a price nothing here names,
+           * with no error anywhere.
            */
-          const known = [settings.priceId, settings.keysIncludedPriceId].filter(Boolean);
-
-          if (event.state.priceId && !known.includes(event.state.priceId)) {
+          if (event.state.priceId && event.state.priceId !== settings.priceId) {
             logger.error(
-              { userId: updated.userId, price: event.state.priceId, plan: updated.plan },
-              "a subscription names a price this instance does not sell; read as own_keys",
+              { userId: updated.userId, price: event.state.priceId },
+              "a subscription names a price this instance does not sell",
             );
           }
         }

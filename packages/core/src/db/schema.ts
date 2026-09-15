@@ -324,6 +324,17 @@ export type PollOutcome = (typeof pollOutcomes)[number];
  * is none of those, and it is also where a provider's own error text — which
  * `logger.ts` redacts and a screen does not — would reach a page.
  */
+/**
+ * Whose key paid for a call, and which keys one account runs on. US-141.
+ *
+ * Two values and never a mix, which the owner settled: an account runs on its
+ * own keys or on this instance's. `account_key_source` holds the account's
+ * state; `api_usage.key_source` and `model_calls.key_source` hold what each
+ * call actually spent, because the fuse must count only what we lent.
+ */
+export const keySources = ["instance", "own"] as const;
+export type KeySource = (typeof keySources)[number];
+
 export const pollStopReasons = [
   /** US-013's cap refused the poll before any provider was asked. */
   "budget_exhausted",
@@ -1100,6 +1111,20 @@ export const modelCalls = pgTable(
     latencyMs: integer("latency_ms").notNull(),
     /** Micro-dollars. Null when the price is unknown. */
     estimatedCostMicros: integer("estimated_cost_micros"),
+    /**
+     * Whose key paid for this. US-141.
+     *
+     * The fuse in `budget/account.ts` bounds what *this instance* lends one
+     * account, and without this column it would count an account's own
+     * spending too — stopping it for the month over money we never spent. So
+     * the sum that feeds the cap reads only the rows this says are ours.
+     *
+     * Defaulted to `instance`, and that is the honest reading of every row
+     * written before the column existed: the lent-keys plan is the only reason
+     * an account's own key was ever used at the same time as ours, and it
+     * shipped after these rows.
+     */
+    keySource: text("key_source").$type<KeySource>().notNull().default("instance"),
     /** The provider's message, for a call that did not produce a match. */
     error: text("error"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
@@ -1112,6 +1137,7 @@ export const modelCalls = pgTable(
     index("model_calls_user_created_idx").on(table.userId, table.createdAt),
     check("model_calls_outcome_known", oneOf("outcome", modelCallOutcomes)),
     check("model_calls_purpose_known", oneOf("purpose", modelCallPurposes)),
+    check("model_calls_key_source_known", oneOf("key_source", keySources)),
     check(
       "model_calls_classification_versioned",
       sql.raw("purpose <> 'classification' OR monitor_version IS NOT NULL"),
@@ -1286,6 +1312,20 @@ export const apiUsage = pgTable(
     /** Billable units the source reported. Never a post count: `SearchResult.unitsConsumed`. */
     units: bigint("units", { mode: "number" }).notNull().default(0),
     estimatedCostMicros: bigint("estimated_cost_micros", { mode: "number" }).notNull().default(0),
+    /**
+     * Whose key paid for this. US-141.
+     *
+     * The fuse in `budget/account.ts` bounds what *this instance* lends one
+     * account, and without this column it would count an account's own
+     * spending too — stopping it for the month over money we never spent. So
+     * the sum that feeds the cap reads only the rows this says are ours.
+     *
+     * Defaulted to `instance`, and that is the honest reading of every row
+     * written before the column existed: the lent-keys plan is the only reason
+     * an account's own key was ever used at the same time as ours, and it
+     * shipped after these rows.
+     */
+    keySource: text("key_source").$type<KeySource>().notNull().default("instance"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
@@ -1308,6 +1348,7 @@ export const apiUsage = pgTable(
     index("api_usage_monitor_day_idx").on(table.monitorId, table.day),
     check("api_usage_source_known", oneOf("source", sources)),
     check("api_usage_provider_known", oneOf("provider", providers)),
+    check("api_usage_key_source_known", oneOf("key_source", keySources)),
     check("api_usage_units_non_negative", sql.raw(`units >= 0`)),
     check("api_usage_cost_non_negative", sql.raw(`estimated_cost_micros >= 0`)),
   ],
@@ -2146,21 +2187,14 @@ export const subscriptionStatuses = [
 export type SubscriptionStatus = (typeof subscriptionStatuses)[number];
 
 /**
- * Which plan an account is on, and it decides whose keys pay. US-128.
+ * **There was a `subscriptions.plan`, and US-141 removed it.**
  *
- * `own_keys` is the product as it shipped: the account stores a provider key
- * and a model key of its own, and spends them. `keys_included` is the second
- * price — the account polls and classifies on the keys in this instance's
- * `.env`, and stores none.
- *
- * **`own_keys` is the default, and it is the fail-safe direction.** A row
- * written before this column existed, a Stripe price this deployment does not
- * recognise, a webhook that has not arrived yet: every one of them lands here,
- * and every one of them means the account spends its own money rather than
- * ours. The only thing that opens the machine's keys is a row that says so.
+ * US-128 gave it two values and had the Stripe webhook write it from the price
+ * a subscription named, so whose keys an account ran on was a property of what
+ * it had bought. There is one price now, and the choice is the account's to
+ * change at any moment — which a price cannot express and a webhook is too
+ * slow to carry. `account_key_source` holds it, and nothing reads a plan.
  */
-export const subscriptionPlans = ["own_keys", "keys_included"] as const;
-export type SubscriptionPlan = (typeof subscriptionPlans)[number];
 
 /**
  * One row per account, in a deployment that charges. US-072.
@@ -2190,15 +2224,6 @@ export const subscriptions = pgTable(
       .primaryKey()
       .references((): AnyPgColumn => users.id, { onDelete: "cascade" }),
     status: text("status").notNull(),
-    /**
-     * Whose keys this account spends. US-128.
-     *
-     * Written by the webhook from the price the subscription names, and by
-     * nothing else: no screen offers it and no route sets it. Defaulted rather
-     * than nullable, so every row that predates the column reads as the plan
-     * that spends nobody else's money.
-     */
-    plan: text("plan").$type<SubscriptionPlan>().notNull().default("own_keys"),
     /**
      * When the seven days run out.
      *
@@ -2242,7 +2267,6 @@ export const subscriptions = pgTable(
      * array in this file is not a set the column accepts, and this repository
      * has shipped that mistake three times.
      */
-    check("subscriptions_plan_known", oneOf("plan", subscriptionPlans)),
   ],
 );
 
@@ -2305,6 +2329,40 @@ export const webhookSecrets = pgTable(
  * the marker is written by that owner's own setup. Deleting an account leaves
  * the row, which is harmless — the id is never reused.
  */
+/**
+ * Whose keys one account runs on. US-141.
+ *
+ * Correctness-critical: plan. The failure shape is an account polling and
+ * classifying on this instance's keys when it was never meant to, or its own
+ * key being stored and then ignored.
+ *
+ * **It is one state and never a mix.** The owner settled that: an account runs
+ * on its own keys or on this instance's, and a platform it holds no key for
+ * does not run rather than falling back to ours. Inferring the state from
+ * which keys happen to exist was the alternative, and it fails the same way
+ * twice — pasting one Reddit key would silently change what happens to X, and
+ * a key stored and ignored is what `credentials.ts` exists to prevent.
+ *
+ * **A table of its own, and not a column on `subscriptions`.** US-128 keyed
+ * this to the Stripe price and US-141 is undoing that: a price cannot express
+ * a choice somebody changes at three o'clock, and a webhook is not how a key
+ * starts being used. It is not on `users` either, because Better Auth owns
+ * that table.
+ *
+ * No row means this instance's keys, which is what a new account gets and what
+ * every account had before this existed.
+ */
+export const accountKeySource = pgTable(
+  "account_key_source",
+  {
+    /** One per account, so the account is the key. */
+    userId: text("user_id").primaryKey(),
+    source: text("source").$type<KeySource>().notNull().default("instance"),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  () => [check("account_key_source_known", oneOf("source", keySources))],
+);
+
 export const userOnboarding = pgTable("user_onboarding", {
   /** One per account, so the account is the key. */
   userId: text("user_id").primaryKey(),

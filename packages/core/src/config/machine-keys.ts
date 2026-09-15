@@ -16,42 +16,48 @@
  * layers below an environment with the keys taken out, so nothing downstream
  * needs to know why they are missing.
  *
- * US-128 moved it from the instance to the account. The functions taking a
- * `plan` are the rule now; the ones taking only `signup` are what is left for
- * the questions that really are about the machine — the webhook signing secret,
- * and whether a stranger's URL may be requested from inside our network.
+ * US-128 moved it from the instance to the account, keyed to the Stripe price.
+ * **US-141 moved it again, off the price and onto a choice the account makes**:
+ * there is one price, and switching keys must take effect on the next poll
+ * rather than on the next webhook. The functions taking a `KeySource` are the
+ * rule now; the ones taking only `signup` are what is left for the questions
+ * that really are about the machine — the webhook signing secret, and whether
+ * a stranger's URL may be requested from inside our network.
  */
 import type { AiEnvironment } from "../ai/config.js";
 import type { SignupMode } from "../auth/user.js";
-import type { SubscriptionPlan } from "../db/schema.js";
+import type { KeySource } from "../db/schema.js";
 
 export function machineKeysUsable(signup: SignupMode): boolean {
   return signup === "closed";
 }
 
 /**
- * The same question, asked about one account. US-128.
+ * The same question, asked about one account. US-128, rekeyed by US-141.
  *
  * US-081's rule was a fact about the instance, because every account on an
- * open instance answered the same way. A plan whose keys are included is an
- * account that answers differently, so the question moved down: closed signup
- * is still yes for everybody, and on an open instance it is yes for the plan
- * that pays for it and no for every other.
+ * open instance answered the same way. An account that runs on this instance's
+ * keys answers differently from one that brought its own, so the question
+ * moved down: closed signup is still yes for everybody, and on an open
+ * instance it is yes for an account on ours and no for one on its own.
  *
- * **Every unknown is `own_keys` before it reaches here.** `billing/plan.ts`
- * holds that, and it is why this function needs no third answer: a missing row,
- * an unrecognised price and a webhook that has not arrived are all already the
- * plan that spends its own money.
+ * **Every unknown is `instance` before it reaches here.** `billing/key-source.ts`
+ * holds that: no row means this instance's keys, which is what a new account
+ * gets. Note the direction is the opposite of US-128's, and deliberately —
+ * there the unknown had to be *not ours* because the plan arrived from Stripe
+ * and a missing webhook must not hand out keys; here the state is the
+ * account's own and the product's answer to somebody who has chosen nothing is
+ * that we run it.
  *
  * This does not ask whether the account is entitled. `entitlementFor` owns
  * that, it is checked on every write and in the scheduler, and a second gate
  * here would be two rules answering one question — with the usual result that
  * they disagree. One consequence is worth stating: `past_due` is entitled, so a
  * card that failed this morning keeps polling on our keys while Stripe retries.
- * That is US-072's judgement, applied to the plan rather than re-argued.
+ * That is US-072's judgement, applied here rather than re-argued.
  */
-export function machineKeysUsableFor(signup: SignupMode, plan: SubscriptionPlan): boolean {
-  return machineKeysUsable(signup) || plan === "keys_included";
+export function machineKeysUsableFor(signup: SignupMode, source: KeySource): boolean {
+  return machineKeysUsable(signup) || source === "instance";
 }
 
 /**
@@ -66,8 +72,8 @@ export function machineKeysUsableFor(signup: SignupMode, plan: SubscriptionPlan)
  *
  * It is what decides whether the account cap applies at all.
  */
-export function spendsInstanceMoney(signup: SignupMode, plan: SubscriptionPlan): boolean {
-  return signup === "open" && plan === "keys_included";
+export function spendsInstanceMoney(signup: SignupMode, source: KeySource): boolean {
+  return signup === "open" && source === "instance";
 }
 
 /**
@@ -138,10 +144,10 @@ export function providerKeyEnvironment(
  */
 export function providerKeyEnvironmentFor(
   signup: SignupMode,
-  plan: SubscriptionPlan,
+  source: KeySource,
   environment: Record<string, string | undefined> = process.env,
 ): Record<string, string | undefined> {
-  return machineKeysUsableFor(signup, plan) ? environment : {};
+  return machineKeysUsableFor(signup, source) ? environment : {};
 }
 
 /**
@@ -153,8 +159,8 @@ export function providerKeyEnvironmentFor(
  */
 export function accountModelEnvironment<E extends AiEnvironment>(
   signup: SignupMode,
-  plan: SubscriptionPlan,
+  source: KeySource,
   environment: E,
 ): E {
-  return machineKeysUsableFor(signup, plan) ? environment : withoutMachineModelKeys(environment);
+  return machineKeysUsableFor(signup, source) ? environment : withoutMachineModelKeys(environment);
 }

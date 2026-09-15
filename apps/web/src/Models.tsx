@@ -71,14 +71,14 @@ interface ModelsView {
   canStore: boolean;
   storeBlocker: string | null;
   /**
-   * True when this account's plan includes the deployment's keys. US-132.
+   * Whose keys this account runs on. US-141.
    *
-   * The screen then states which model reads each task and offers nothing: no
-   * key, no model and no test, because every write behind them is refused
-   * with 403. It keeps its address, and each job still says what runs it —
-   * which is what a person on that plan came here to read.
+   * It is chosen on the connections screen, not here — one control for one
+   * choice — and this page reads it only to say which state it is in. Every
+   * control stays either way: an account on our keys may still store a model
+   * key, and the moment it does, moving the switch makes it the one that runs.
    */
-  lentKeys: boolean;
+  keySource: "instance" | "own";
   /** Models this build knows a price for, by provider. */
   pricedModels: Record<string, string[]>;
   /** Models this build can name but not cost, by provider. US-124. */
@@ -993,56 +993,6 @@ function ModelsHeader({ lentKeys = false }: { lentKeys?: boolean }) {
   );
 }
 
-/**
- * What runs each job, when the account does not choose. US-132.
- *
- * The same four jobs, with the card's controls taken out rather than
- * disabled. Each says what the deployment runs, which is `task.instance` —
- * the account's own rows are not read at all while it is on the plan, so
- * showing them here would show a setting nothing obeys.
- */
-function LentKeysJobs({ tasks }: { tasks: TaskView[] }) {
-  return (
-    <section className="models-section models-jobs" aria-labelledby="models-jobs-title">
-      <div className="models-section-heading">
-        <div className="models-section-title">
-          <h2 id="models-jobs-title">Models by job</h2>
-          <span className="models-count">{tasks.length} jobs</span>
-        </div>
-        <p>
-          Your plan includes the model keys, so there is nothing to connect and nothing to choose.
-          These are the models we run each job on.
-        </p>
-      </div>
-
-      <ul className="job-list">
-        {tasks.map((task) => (
-          <li className="job" key={task.task}>
-            {/*
-              The heading of a card that can be edited is a button. This one
-              is not: there is nothing behind it to press towards, and a
-              disabled button is a thing a person tries anyway.
-            */}
-            <div className="job-heading job-heading-static">
-              <span className="job-identity">
-                <strong>{task.title}</strong>
-                <span>{task.instance.model ?? "Set by this deployment"}</span>
-              </span>
-              <span className="job-provider">
-                <BrandIcon brand={task.instance.provider} size={20} />
-                {providerName(task.instance.provider)}
-              </span>
-            </div>
-          </li>
-        ))}
-      </ul>
-      <p className="models-footnote">
-        We pay for these calls. Nothing here is billed to you, and no key of yours is used.
-      </p>
-    </section>
-  );
-}
-
 export function Models() {
   const [view, setView] = useState<ModelsView | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -1090,22 +1040,25 @@ export function Models() {
     );
   }
 
-  if (view.lentKeys) {
-    return (
-      <div className="product-page models-page">
-        <ModelsHeader lentKeys />
-        <main className="models-content">
-          <LentKeysJobs tasks={view.tasks} />
-        </main>
-      </div>
-    );
-  }
-
   return (
     <div className="product-page models-page">
-      <ModelsHeader />
+      <ModelsHeader lentKeys={view.keySource === "instance"} />
 
       <main className="models-content">
+        {/*
+          Which state the account is in, said once and changed elsewhere.
+          US-141: the switch lives on the connections screen, because it is one
+          choice and two controls for it would be two things to disagree.
+        */}
+        {view.keySource === "instance" && (
+          <p className="models-blocker" role="status">
+            <span aria-hidden="true">i</span>
+            <span>
+              Your plan includes these models. A key you add here runs your jobs only once you
+              switch this account to your own keys, on the connections screen.
+            </span>
+          </p>
+        )}
         {view.storeBlocker && (
           <p className="models-blocker" role="status">
             <span aria-hidden="true">!</span>

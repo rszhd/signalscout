@@ -75,14 +75,14 @@ interface ConnectionsView {
   canStore: boolean;
   storeBlocker: string | null;
   /**
-   * True when this account's plan includes the deployment's keys. US-132.
+   * Whose keys this account runs on. US-141.
    *
-   * The page then states what fetches each platform and offers nothing: the
-   * keys are not this account's to paste and the provider is not its to
-   * choose, and every write behind those controls is refused with 403. It
-   * keeps its address, because the billing page links to it in one word.
+   * One state and never a mix: `instance` and this deployment's keys pay,
+   * within the capacity the plan carries; `own` and the account's own keys
+   * pay, with nothing bounding it. It is the account's to change here, and it
+   * takes effect on the next poll.
    */
-  lentKeys: boolean;
+  keySource: "instance" | "own";
   providers: ProviderView[];
   platforms: PlatformView[];
 }
@@ -110,69 +110,110 @@ function ConnectionsHeader({ lentKeys = false }: { lentKeys?: boolean }) {
   );
 }
 
-/**
- * What fetches each platform, when the account does not choose. US-132.
- *
- * The same rows the choosing screen shows, with the control taken out rather
- * than disabled: a disabled button is a thing a person tries to press, and
- * there is nothing behind this one to press towards. Every platform is listed,
- * not only the ones two providers fetch, because the question here is not
- * "which of these?" but "what is watching for me?".
- */
-function LentKeysConnections({ platforms }: { platforms: PlatformView[] }) {
-  return (
-    <section className="connections-section" aria-labelledby="platforms-heading">
-      <div className="connections-section-heading">
-        <div>
-          <h2 id="platforms-heading">Where conversations come from</h2>
-          <p>
-            Your plan includes the provider accounts, so there is nothing to connect and nothing to
-            choose. These are the ones we fetch each platform through.
-          </p>
-        </div>
-      </div>
-
-      <ul className="connection-list">
-        {platforms.map((platform) => {
-          const effective = platform.providers.find(
-            (provider) => provider.id === platform.effective,
-          );
-
-          return (
-            <li className="connection-row" key={platform.id}>
-              <div className="platform-connection">
-                <div className="connection-summary">
-                  <span className="connection-avatar" aria-hidden="true">
-                    <BrandIcon brand={platform.id} size={24} />
-                  </span>
-                  <span className="connection-identity">
-                    <strong>{platform.displayName}</strong>
-                    <span>
-                      {effective ? `Fetched by ${effective.displayName}` : "Not part of your plan"}
-                    </span>
-                  </span>
-                  <span className={`connection-status ${effective ? "connected" : "missing"}`}>
-                    {effective ? "Included" : "Unavailable"}
-                  </span>
-                </div>
-              </div>
-            </li>
-          );
-        })}
-      </ul>
-      <p className="connections-footnote">
-        We pay these providers. Nothing here is billed to you, and no key of yours is used.
-      </p>
-    </section>
-  );
-}
-
 /** Where this field's key comes from, in the words a person can act on. */
 function origin(credential: CredentialView): string {
   if (credential.storedHint) return `Stored in this instance · ${credential.storedHint}`;
   if (credential.fromEnvironment) return `Set in ${credential.environmentVariable}`;
 
   return "Not connected";
+}
+
+/**
+ * Whose keys this account runs on, and the one control that changes it.
+ * US-141.
+ *
+ * Two choices and never a mix: the owner settled that, and it is why this is
+ * a switch rather than something inferred from which keys happen to exist.
+ * Inferring it would mean pasting one Reddit key silently changed what
+ * happened to X, and a key stored and then ignored is what this product
+ * refuses to do everywhere else.
+ *
+ * Both halves of the sentence are here because the trade is the whole point:
+ * ours costs nothing and carries a limit, theirs has no limit and arrives on
+ * their own invoice.
+ */
+function KeySourceChoice({
+  source,
+  onChanged,
+}: {
+  source: "instance" | "own";
+  onChanged: (view: ConnectionsView) => void;
+}) {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function choose(next: "instance" | "own"): Promise<void> {
+    if (next === source || busy) return;
+
+    setBusy(true);
+    setError(null);
+
+    try {
+      onChanged(
+        await requestJson<ConnectionsView>("/api/connections/key-source", {
+          method: "PUT",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ source: next }),
+        }),
+      );
+    } catch (cause) {
+      setError(messageFor(cause, "That could not be changed."));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <section className="connections-section" aria-labelledby="key-source-heading">
+      <div className="connections-section-heading">
+        <div>
+          <h2 id="key-source-heading">Whose keys this account runs on</h2>
+          <p>One or the other, never both. It takes effect on the next collection.</p>
+        </div>
+      </div>
+
+      <ul className="key-source-list">
+        {[
+          {
+            id: "instance" as const,
+            title: "SignalScout's keys",
+            what: "Included in your plan. Nothing to connect, and no second invoice.",
+            limit:
+              "Your plan sets how many searches you run and how often each platform is checked.",
+          },
+          {
+            id: "own" as const,
+            title: "Your own keys",
+            what: "Your provider and model accounts bill you directly.",
+            limit: "No limit from us. Every platform you watch needs a key of yours.",
+          },
+        ].map((choice) => (
+          <li key={choice.id}>
+            <label className="key-source-choice">
+              <input
+                type="radio"
+                name="key-source"
+                value={choice.id}
+                checked={source === choice.id}
+                disabled={busy}
+                onChange={() => void choose(choice.id)}
+              />
+              <span>
+                <strong>{choice.title}</strong>
+                <span>{choice.what}</span>
+                <span>{choice.limit}</span>
+              </span>
+            </label>
+          </li>
+        ))}
+      </ul>
+      {error && (
+        <p className="connections-error" role="alert">
+          {error}
+        </p>
+      )}
+    </section>
+  );
 }
 
 function ProviderCard({
@@ -609,22 +650,12 @@ export function Connections() {
   // one provider there is nothing to choose, and a row saying so is furniture.
   const choosable = view.platforms.filter((platform) => platform.providers.length > 1);
 
-  if (view.lentKeys) {
-    return (
-      <div className="product-page connections-page">
-        <ConnectionsHeader lentKeys />
-        <div className="connections-content">
-          <LentKeysConnections platforms={view.platforms} />
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="product-page connections-page">
-      <ConnectionsHeader lentKeys={false} />
+      <ConnectionsHeader lentKeys={view.keySource === "instance"} />
 
       <div className="connections-content">
+        <KeySourceChoice source={view.keySource} onChanged={setView} />
         <section className="connections-section" aria-labelledby="accounts-heading">
           <div className="connections-section-heading">
             <div>

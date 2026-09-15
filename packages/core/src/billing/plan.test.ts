@@ -1,100 +1,27 @@
 /**
- * Which plan an account is on, and therefore whose keys it spends. US-128.
+ * What one account may spend, as the composition roots ask it. US-128,
+ * rekeyed by US-141.
  *
- * Correctness-critical, and the failure is an invoice. The rule fails towards
- * `own_keys` everywhere, so most of what is asserted here is that an unknown of
- * any kind — no row, no column value, a price nobody configured — reads as the
- * plan that spends the account's own money.
+ * Correctness-critical: plan, and the failure is an invoice. US-128 read the
+ * answer off `subscriptions.plan`, which the Stripe webhook wrote from the
+ * price. There is one price now and the answer is the account's own state, so
+ * what is asserted here is that every reader follows that state and follows it
+ * on the next call rather than the next restart.
  *
- * The two halves are apart on purpose. `planOf` and `planForPrice` are pure and
- * need no database. `readPlan` and `accountKeys` read one, and they read a real
- * Postgres because the column has a check constraint that TypeScript does not
- * know about.
+ * Against a real Postgres, because `account_key_source` carries a check
+ * constraint TypeScript does not know about.
  */
 
 import type { Pool } from "pg";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { createDatabase, type Database } from "../db/client.js";
-import { sourceProviders, subscriptions, users } from "../db/schema.js";
-import { readProviderChoices, setProviderChoice } from "../sources/choices.js";
+import { accountKeySource, sourceProviders, subscriptions, users } from "../db/schema.js";
+import { setProviderChoice } from "../sources/choices.js";
 import { createTestDatabase, type TestDatabase } from "../testing/database.js";
-import type { SubscriptionRecord } from "./entitlement.js";
-import {
-  accountKeys,
-  keysIncludedAmong,
-  planForPrice,
-  planKeyedCache,
-  planOf,
-  readPlan,
-} from "./plan.js";
+import { onInstanceKeysAmong, setKeySource } from "./key-source.js";
+import { accountKeys, planKeyedCache } from "./plan.js";
 
-function record(overrides: Partial<SubscriptionRecord>): SubscriptionRecord {
-  return {
-    userId: "user-1",
-    status: "active",
-    plan: "own_keys",
-    trialEndsAt: null,
-    stripeCustomerId: null,
-    stripeSubscriptionId: null,
-    currentPeriodEnd: null,
-    cancelAtPeriodEnd: false,
-    ...overrides,
-  };
-}
-
-describe("the plan a stored row is on", () => {
-  it("reads the column when this deployment charges", () => {
-    expect(planOf("stripe", record({ plan: "keys_included" }))).toBe("keys_included");
-    expect(planOf("stripe", record({ plan: "own_keys" }))).toBe("own_keys");
-  });
-
-  /**
-   * No row is entitled — `entitlementFor` says so, for the owner's own account
-   * and every self-hosted instance. It is not the plan, and the two rules
-   * failing in opposite directions is the whole design: being allowed to poll
-   * and being allowed to poll on our keys are different questions.
-   */
-  it("reads no row as the plan that spends nobody else's money", () => {
-    expect(planOf("stripe", null)).toBe("own_keys");
-  });
-
-  /**
-   * A deployment that does not charge is self-hosted, and `machineKeysUsable`
-   * has already said yes to every account on it. Answering here keeps a caller
-   * from having to know that.
-   */
-  it("answers own keys where this deployment does not charge", () => {
-    expect(planOf("off", record({ plan: "keys_included" }))).toBe("own_keys");
-  });
-});
-
-describe("the plan a Stripe price sells", () => {
-  it("names the keys-included plan only for the price configured for it", () => {
-    expect(planForPrice("price_included", "price_included")).toBe("keys_included");
-    expect(planForPrice("price_ordinary", "price_included")).toBe("own_keys");
-  });
-
-  /**
-   * A price created in the dashboard that nobody told this instance about must
-   * not be guessed into the plan that costs us money. Neither must a
-   * subscription carrying no price at all.
-   */
-  it("reads an unknown price and no price as own keys", () => {
-    expect(planForPrice("price_nobody_configured", "price_included")).toBe("own_keys");
-    expect(planForPrice(null, "price_included")).toBe("own_keys");
-  });
-
-  /**
-   * A deployment that sells one plan cannot be put onto the second by a price,
-   * however that price is named. This is the state every instance running today
-   * is in.
-   */
-  it("sells one plan where no keys-included price is configured", () => {
-    expect(planForPrice("price_anything", undefined)).toBe("own_keys");
-  });
-});
-
-describe("the plan, and the keys, read from the database", () => {
+describe("whose keys an account runs on, read from the database", () => {
   let database: TestDatabase;
   let db: Database;
   let close: () => Promise<void>;
@@ -115,18 +42,19 @@ describe("the plan, and the keys, read from the database", () => {
   });
 
   afterEach(async () => {
+    await db.delete(accountKeySource);
     await db.delete(sourceProviders);
     await db.delete(subscriptions);
     await db.delete(users);
   });
 
-  async function account(id: string, plan?: "own_keys" | "keys_included"): Promise<string> {
+  /**
+   * An account, and whose keys it runs on. No `source` writes no row, which is
+   * what a new account is: this instance's keys, chosen by nobody.
+   */
+  async function account(id: string, source?: "instance" | "own"): Promise<string> {
     await db.insert(users).values({ id, name: id, email: `${id}@example.test` });
-
-    if (plan) {
-      await db.insert(subscriptions).values({ userId: id, status: "active", plan });
-    }
-
+    if (source) await setKeySource(db, id, source);
     return id;
   }
 
@@ -138,25 +66,18 @@ describe("the plan, and the keys, read from the database", () => {
     AI_TIMEOUT_MS: 30_000,
   };
 
-  it("reads each account's own plan", async () => {
-    await account("included", "keys_included");
-    await account("own", "own_keys");
+  it("reads each account's own state, and no row as this instance's keys", async () => {
+    await account("ours", "instance");
+    await account("theirs", "own");
     await account("no-row");
 
-    expect(await readPlan(db, "included", "stripe")).toBe("keys_included");
-    expect(await readPlan(db, "own", "stripe")).toBe("own_keys");
-    expect(await readPlan(db, "no-row", "stripe")).toBe("own_keys");
-  });
+    const keys = accountKeys(db, { signup: "open", mode: "stripe", environment: machine });
 
-  /**
-   * A row written before the column existed. The default is what makes every
-   * account that predates this ticket spend its own money rather than ours.
-   */
-  it("defaults a row that names no plan to own keys", async () => {
-    await account("older");
-    await db.insert(subscriptions).values({ userId: "older", status: "active" });
-
-    expect(await readPlan(db, "older", "stripe")).toBe("own_keys");
+    expect(await keys.source("ours")).toBe("instance");
+    expect(await keys.source("theirs")).toBe("own");
+    // The default, and the direction US-141 chose deliberately: an account
+    // that has chosen nothing gets a working product on our keys.
+    expect(await keys.source("no-row")).toBe("instance");
   });
 
   /**
@@ -164,12 +85,28 @@ describe("the plan, and the keys, read from the database", () => {
    * has shipped the other way three times: a value TypeScript accepts, a full
    * suite passing, and the write failing after the money was spent.
    */
-  it("refuses a plan the application does not understand", async () => {
+  it("refuses a state the application does not understand", async () => {
     await account("odd");
 
+    // The raw pool, because Drizzle rewrites the message and the constraint's
+    // own name is the thing worth asserting.
     await expect(
-      query("insert into subscriptions (user_id, status, plan) values ('odd', 'active', 'free')"),
-    ).rejects.toThrow(/subscriptions_plan_known/);
+      query("insert into account_key_source (user_id, source) values ('odd', 'borrowed')"),
+    ).rejects.toThrow(/account_key_source_known/);
+  });
+
+  /** It is the account's to change, and the next read is the new answer. */
+  it("moves an account between the two, and keeps nothing else", async () => {
+    await account("mover", "instance");
+    const keys = accountKeys(db, { signup: "open", mode: "stripe", environment: machine });
+
+    expect(await keys.source("mover")).toBe("instance");
+
+    await setKeySource(db, "mover", "own");
+    expect(await keys.source("mover")).toBe("own");
+
+    await setKeySource(db, "mover", "instance");
+    expect(await keys.source("mover")).toBe("instance");
   });
 
   /**
@@ -178,23 +115,23 @@ describe("the plan, and the keys, read from the database", () => {
    * is already right, which is what has kept the rule in one file.
    */
   it("hands the machine's keys to one account on an open instance and not the next", async () => {
-    await account("included", "keys_included");
-    await account("own", "own_keys");
+    await account("ours", "instance");
+    await account("theirs", "own");
 
     const keys = accountKeys(db, { signup: "open", mode: "stripe", environment: machine });
 
-    expect(await keys.provider("included")).toEqual(machine);
-    expect(await keys.provider("own")).toEqual({});
+    expect(await keys.provider("ours")).toEqual(machine);
+    expect(await keys.provider("theirs")).toEqual({});
 
-    expect((await keys.model("included", model)).AI_API_KEY).toBe("the-machine-model-key");
-    expect((await keys.model("own", model)).AI_API_KEY).toBeUndefined();
+    expect((await keys.model("ours", model)).AI_API_KEY).toBe("the-machine-model-key");
+    expect((await keys.model("theirs", model)).AI_API_KEY).toBeUndefined();
   });
 
-  /** The model settings of the deployment survive on both plans. Only the key moves. */
+  /** The deployment's model settings survive in both states. Only the key moves. */
   it("keeps the deployment's provider and model for an account with neither", async () => {
-    await account("own", "own_keys");
+    await account("theirs", "own");
     const keys = accountKeys(db, { signup: "open", mode: "stripe", environment: machine });
-    const mine = await keys.model("own", model);
+    const mine = await keys.model("theirs", model);
 
     expect(mine.AI_PROVIDER).toBe("anthropic");
     expect(mine.AI_MODEL).toBe("claude-haiku-4-5");
@@ -206,42 +143,43 @@ describe("the plan, and the keys, read from the database", () => {
    * machine and that is what US-067 left the environment half for.
    */
   it("hands the machine's keys to every account where signup is closed", async () => {
-    await account("own", "own_keys");
+    await account("theirs", "own");
     const keys = accountKeys(db, { signup: "closed", mode: "stripe", environment: machine });
 
-    expect(await keys.provider("own")).toEqual(machine);
-    expect((await keys.model("own", model)).AI_API_KEY).toBe("the-machine-model-key");
+    expect(await keys.provider("theirs")).toEqual(machine);
+    expect((await keys.model("theirs", model)).AI_API_KEY).toBe("the-machine-model-key");
   });
 
   /**
    * The worker's model cache, and the claim is the money one: an account that
-   * leaves the plan stops spending our key on the next job rather than at the
-   * next restart. Everything else about that cache is unchanged — a *key*
-   * changed on the screen still reaches the worker on its next restart.
+   * moves onto its own keys stops spending our key on the next job rather
+   * than at the next restart. Everything else about that cache is unchanged —
+   * a *key* changed on the screen still reaches the worker on its next
+   * restart.
    */
-  it("builds once per account while the plan holds, and again when it changes", async () => {
-    await account("mover", "keys_included");
+  it("builds once per account while the state holds, and again when it changes", async () => {
+    await account("mover", "instance");
     const keys = accountKeys(db, { signup: "open", mode: "stripe", environment: machine });
 
     const built: string[] = [];
-    const cached = planKeyedCache(keys, async (userId, plan) => {
-      built.push(`${userId}:${plan}`);
-      return { plan };
+    const cached = planKeyedCache(keys, async (userId, source) => {
+      built.push(`${userId}:${source}`);
+      return { source };
     });
 
-    expect((await cached("mover")).plan).toBe("keys_included");
-    expect((await cached("mover")).plan).toBe("keys_included");
-    expect(built).toEqual(["mover:keys_included"]);
+    expect((await cached("mover")).source).toBe("instance");
+    expect((await cached("mover")).source).toBe("instance");
+    expect(built).toEqual(["mover:instance"]);
 
-    await db.update(subscriptions).set({ plan: "own_keys" });
+    await setKeySource(db, "mover", "own");
 
-    expect((await cached("mover")).plan).toBe("own_keys");
-    expect(built).toEqual(["mover:keys_included", "mover:own_keys"]);
+    expect((await cached("mover")).source).toBe("own");
+    expect(built).toEqual(["mover:instance", "mover:own"]);
   });
 
   it("keeps one account's clients out of another's", async () => {
-    await account("one", "keys_included");
-    await account("two", "keys_included");
+    await account("one", "instance");
+    await account("two", "instance");
     const keys = accountKeys(db, { signup: "open", mode: "stripe", environment: machine });
 
     const built: string[] = [];
@@ -265,8 +203,8 @@ describe("the plan, and the keys, read from the database", () => {
    * same one.
    */
   it("lends a cap to the plan that spends our money, and to nobody else", async () => {
-    await account("included", "keys_included");
-    await account("own", "own_keys");
+    await account("ours", "instance");
+    await account("theirs", "own");
 
     const open = accountKeys(db, {
       signup: "open",
@@ -275,8 +213,8 @@ describe("the plan, and the keys, read from the database", () => {
       capMicros: 15_000_000,
     });
 
-    expect(await open.cap("included")).toBe(15_000_000);
-    expect(await open.cap("own")).toBeNull();
+    expect(await open.cap("ours")).toBe(15_000_000);
+    expect(await open.cap("theirs")).toBeNull();
 
     const closed = accountKeys(db, {
       signup: "closed",
@@ -285,45 +223,45 @@ describe("the plan, and the keys, read from the database", () => {
       capMicros: 15_000_000,
     });
 
-    expect(await closed.cap("included")).toBeNull();
+    expect(await closed.cap("ours")).toBeNull();
   });
 
   it("lends no cap where the deployment named none", async () => {
-    await account("included", "keys_included");
+    await account("ours", "instance");
     const keys = accountKeys(db, { signup: "open", mode: "stripe", environment: machine });
 
-    expect(await keys.cap("included")).toBeNull();
+    expect(await keys.cap("ours")).toBeNull();
   });
 
   /**
-   * US-130. The deployment names the provider for an account on the plan, and
-   * that answer is the whole answer there: a row the account recorded before
-   * moving onto the plan is left in place and not read. An account spending
-   * its own keys reads its rows, US-026's refusal untouched.
+   * US-130's original wording, restored by US-141. A recorded choice wins and
+   * the deployment's answer is the default under it — US-132 made it an
+   * override for a moment, and the account chooses now, so a row it wrote is
+   * a decision it made.
    */
-  it("answers a lent-keys account with the deployment's provider, and nobody else", async () => {
-    await account("included", "keys_included");
-    await account("own", "own_keys");
-    await setProviderChoice(db, "included", "reddit", "brightdata");
-    await setProviderChoice(db, "own", "reddit", "brightdata");
+  it("lays the deployment's providers under the account's own choices", async () => {
+    await account("ours", "instance");
+    await account("theirs", "own");
+    await setProviderChoice(db, "ours", "reddit", "brightdata");
 
-    const lent = { reddit: "scrapecreators" } as const;
     const open = accountKeys(db, {
       signup: "open",
       mode: "stripe",
       environment: machine,
-      lentProviders: lent,
+      lentProviders: { reddit: "scrapecreators", x: "socialdata" },
     });
 
-    expect(await open.choices("included")).toEqual(lent);
-    expect(await open.choices("own")).toEqual({ reddit: "brightdata" });
-    // Nothing was deleted: leaving the plan reads the row again.
-    expect(await readProviderChoices(db, "included")).toEqual({ reddit: "brightdata" });
+    // Reddit is the account's own choice; X is the deployment's, because the
+    // account made none.
+    expect(await open.choices("ours")).toEqual({ reddit: "brightdata", x: "socialdata" });
+    // An account on its own keys reads only its rows: the deployment's answer
+    // names providers it holds no key for.
+    expect(await open.choices("theirs")).toEqual({});
   });
 
-  it("reads every account's own rows where signup is closed, whatever the plan", async () => {
-    await account("included", "keys_included");
-    await setProviderChoice(db, "included", "reddit", "brightdata");
+  it("reads every account's own rows where signup is closed", async () => {
+    await account("ours", "instance");
+    await setProviderChoice(db, "ours", "reddit", "brightdata");
 
     const closed = accountKeys(db, {
       signup: "closed",
@@ -332,53 +270,64 @@ describe("the plan, and the keys, read from the database", () => {
       lentProviders: { reddit: "scrapecreators" },
     });
 
-    expect(await closed.choices("included")).toEqual({ reddit: "brightdata" });
+    expect(await closed.choices("ours")).toEqual({ reddit: "brightdata" });
   });
 
   it("says whose money an account spends, per account", async () => {
-    await account("included", "keys_included");
-    await account("own", "own_keys");
+    await account("ours", "instance");
+    await account("theirs", "own");
 
     const open = accountKeys(db, { signup: "open", mode: "stripe", environment: machine });
-    expect(await open.spendsInstanceMoney("included")).toBe(true);
-    expect(await open.spendsInstanceMoney("own")).toBe(false);
+    expect(await open.spendsInstanceMoney("ours")).toBe(true);
+    expect(await open.spendsInstanceMoney("theirs")).toBe(false);
 
     const closed = accountKeys(db, { signup: "closed", mode: "stripe", environment: machine });
-    expect(await closed.spendsInstanceMoney("included")).toBe(false);
+    expect(await closed.spendsInstanceMoney("ours")).toBe(false);
 
+    /**
+     * US-081's rule, and it survives US-141. An open instance that does not
+     * charge has no plan, no trial and no invoice, so it lends nothing — and
+     * an account that has chosen nothing is on its own keys rather than on
+     * the owner's. The state defaults the other way, so this is the one thing
+     * the account cannot choose.
+     */
     const off = accountKeys(db, { signup: "open", mode: "off", environment: machine });
-    expect(await off.spendsInstanceMoney("included")).toBe(false);
+    expect(await off.spendsInstanceMoney("ours")).toBe(false);
+    expect(await off.source("ours")).toBe("own");
+    expect(await off.provider("ours")).toEqual({});
   });
 
-  it("answers a lent-keys account with nothing where the deployment named nothing", async () => {
-    await account("included", "keys_included");
-    await setProviderChoice(db, "included", "reddit", "brightdata");
+  it("answers with the account's own rows where the deployment named nothing", async () => {
+    await account("ours", "instance");
+    await setProviderChoice(db, "ours", "reddit", "brightdata");
     const keys = accountKeys(db, { signup: "open", mode: "stripe", environment: machine });
 
-    expect(await keys.choices("included")).toEqual({});
+    expect(await keys.choices("ours")).toEqual({ reddit: "brightdata" });
   });
 
-  it("names the accounts on the plan, in one read, for the scheduler", async () => {
-    await account("included", "keys_included");
-    await account("own", "own_keys");
+  /**
+   * The scheduler asks about every owner at once, so it must not read a row
+   * per monitor. No row means ours, so the answer is every id asked about
+   * minus the ones that said otherwise.
+   */
+  it("names the accounts on this instance's keys, in one read, for the scheduler", async () => {
+    await account("ours", "instance");
+    await account("theirs", "own");
     await account("no-row");
 
-    expect(await keysIncludedAmong(db, ["included", "own", "no-row"], "stripe")).toEqual([
-      "included",
-    ]);
-    // A deployment that does not charge has no plans to find.
-    expect(await keysIncludedAmong(db, ["included"], "off")).toEqual([]);
+    expect(await onInstanceKeysAmong(db, ["ours", "theirs", "no-row"])).toEqual(["ours", "no-row"]);
+    expect(await onInstanceKeysAmong(db, [])).toEqual([]);
   });
 
   /**
    * Billing off is the default deployment, and nothing here may make it behave
    * differently from the way it behaved before this file existed.
    */
-  it("ignores the column entirely where this deployment does not charge", async () => {
-    await account("included", "keys_included");
+  it("hands a self-hosted instance its own keys, whatever any row says", async () => {
+    await account("ours", "instance");
     const keys = accountKeys(db, { signup: "closed", mode: "off", environment: machine });
 
-    expect(await keys.plan("included")).toBe("own_keys");
-    expect(await keys.provider("included")).toEqual(machine);
+    expect(await keys.source("ours")).toBe("instance");
+    expect(await keys.provider("ours")).toEqual(machine);
   });
 });

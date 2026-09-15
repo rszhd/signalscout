@@ -2,7 +2,7 @@
 
 # Done
 
-125 finished.
+127 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
@@ -23,6 +23,8 @@
 | BUG-003 | [A post below the threshold is classified again on every poll](done/2026-09/BUG-003-a-post-below-the-threshold-is-classified-again-on-every-poll.md) | bug | fixed | 2026-09 |
 | BUG-002 | [A seven-day window is bought as a month](done/2026-09/BUG-002-a-seven-day-window-is-bought-as-a-month.md) | bug | fixed | 2026-09 |
 | BUG-001 | [A pending Reddit collection is not resumed](done/2026-09/BUG-001-a-pending-reddit-collection-is-not-resumed.md) | bug | shipped | 2026-09 |
+| US-141 | [One price, and an account chooses whose keys it runs on](done/2026-09/US-141-one-price-and-an-account-chooses-whose-keys-it-runs-on.md) | feature | shipped | 2026-09 |
+| US-140 | [A new account starts on the trial that includes the keys](done/2026-09/US-140-a-new-account-starts-on-the-trial-that-includes-the-keys.md) | feature | shipped | 2026-09 |
 | US-138 | [SocialCrawl reads the comments under a Reddit post](done/2026-09/US-138-socialcrawl-reads-the-comments-under-a-reddit-post.md) | feature | shipped | 2026-09 |
 | US-137 | [Apify reads the comments under a LinkedIn post](done/2026-09/US-137-apify-reads-the-comments-under-a-linkedin-post.md) | feature | shipped | 2026-09 |
 | US-136 | [SocialData reads the replies under a tweet](done/2026-09/US-136-socialdata-reads-the-replies-under-a-tweet.md) | feature | shipped | 2026-09 |

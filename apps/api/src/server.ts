@@ -23,6 +23,7 @@ import {
   type Env,
   emailVerificationRequired,
   type JobSender,
+  type KeySource,
   type Logger,
   lentProvidersFrom,
   needsApiKey,
@@ -30,8 +31,9 @@ import {
   type ProjectDescriber,
   type ProviderChoices,
   type QueryGenerator,
-  readAiEnvironmentFor,
+  readAiEnvironment,
   type SendEmail,
+  setKeySource,
   storedCredentialNames,
 } from "@signalscout/core";
 import Fastify, {
@@ -52,7 +54,6 @@ import { registerBillingGate, registerBillingRoutes } from "./billing.js";
 import { registerConnectionRoutes } from "./connections.js";
 import { registerDraftRoutes, registerReplyPromptRoutes } from "./drafts.js";
 import { registerEstimateRoutes } from "./estimates.js";
-import { registerLentKeysGate } from "./lent-keys.js";
 import { registerMatchRoutes } from "./matches.js";
 import { type ModelRoutesOptions, registerModelRoutes } from "./models.js";
 import { registerMonitorRoutes } from "./monitors.js";
@@ -356,15 +357,10 @@ export function aiEnvironmentFor(
   // machine's model key only where this account may spend it. US-081 asked that
   // once for the whole instance; US-128 asks it per person, because the plan
   // whose keys are included is one account answering differently from the next.
-  // US-132: on the plan that lends the keys the deployment chooses the model,
-  // so the account's rows are not read. `readAiEnvironmentFor` holds that.
-  return async (userId) =>
-    readAiEnvironmentFor(
-      db,
-      userId,
-      await keys.model(userId, env),
-      await keys.spendsInstanceMoney(userId),
-    );
+  // A stored row always wins, which is `ai/settings.ts`'s own order. US-132
+  // inverted it for the lent-keys plan; US-141 reversed that, because an
+  // account chooses whose keys it runs on and a model it names is its choice.
+  return async (userId) => readAiEnvironment(db, userId, await keys.model(userId, env));
 }
 
 export function queryGeneratorForEnvironment(
@@ -421,7 +417,6 @@ export async function buildServer({
           BILLING_MODE: env.BILLING_MODE,
           STRIPE_SECRET_KEY: env.STRIPE_SECRET_KEY,
           STRIPE_PRICE_ID: env.STRIPE_PRICE_ID,
-          STRIPE_PRICE_ID_KEYS_INCLUDED: env.STRIPE_PRICE_ID_KEYS_INCLUDED,
           STRIPE_WEBHOOK_SECRET: env.STRIPE_WEBHOOK_SECRET,
           APP_URL: env.APP_URL,
         })
@@ -486,14 +481,6 @@ export async function buildServer({
     lentProviders: lentProviders ?? lentProvidersFrom(environment ?? process.env, sources),
   });
 
-  /**
-   * The choices the lent-keys plan holds, refused before the routes that
-   * would make them. US-132. Here rather than beside the paywall because it
-   * needs `keys`, and an `onRequest` hook only sees routes registered after it
-   * — every route it covers is below.
-   */
-  registerLentKeysGate(app, { keys, signup: env.AUTH_SIGNUP, mode: settings?.mode ?? "off" });
-
   await registerBillingRoutes(app, { db, logger, settings, billing, keys });
 
   // The account's setup marker. US-105. Registered here rather than with the
@@ -537,9 +524,13 @@ export async function buildServer({
     sources,
     environmentFor: providerKeysFor,
     choicesFor,
-    // US-132. The screen states what the deployment uses and offers nothing,
-    // because every write behind those controls is refused with 403.
-    lentKeysFor: (userId) => keys.spendsInstanceMoney(userId),
+    // US-141. Whose keys this account runs on, and the one control that
+    // changes it. Only where this deployment has keys to lend: a self-hosted
+    // instance has one account and its keys are in `.env`.
+    keySourceFor: (userId) => keys.source(userId),
+    ...(env.AUTH_SIGNUP === "open"
+      ? { setKeySourceFor: (userId: string, source: KeySource) => setKeySource(db, userId, source) }
+      : {}),
     encryption,
     logger,
   });
@@ -554,9 +545,9 @@ export async function buildServer({
     // offered only where there is one to offer. US-081, per account since
     // US-128.
     envFor: (userId) => keys.model(userId, env),
-    // US-132. The screen states what the deployment runs and offers nothing,
-    // because every write behind those controls is refused with 403.
-    lentKeysFor: (userId) => keys.spendsInstanceMoney(userId),
+    // US-141. Which state the account is in. The switch itself is on the
+    // connections screen: one choice, one control.
+    keySourceFor: (userId) => keys.source(userId),
     encryption,
     ...(modelProbe ? { probe: modelProbe } : {}),
   });

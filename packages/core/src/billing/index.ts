@@ -17,14 +17,16 @@ export {
   trialDays,
 } from "./entitlement.js";
 export {
+  defaultKeySource,
+  onInstanceKeysAmong,
+  readKeySource,
+  setKeySource,
+} from "./key-source.js";
+export {
   type AccountKeys,
   type AccountKeysOptions,
   accountKeys,
-  keysIncludedAmong,
-  planForPrice,
   planKeyedCache,
-  planOf,
-  readPlan,
 } from "./plan.js";
 export {
   applyStripeSubscription,

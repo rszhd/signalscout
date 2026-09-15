@@ -22,7 +22,7 @@ import {
   triageConfigFromEnvironment,
 } from "../ai/config.js";
 import { createEmbedder, type Embedder } from "../ai/embed.js";
-import { readAiEnvironmentFor as readAiSettingsEnvironment } from "../ai/settings.js";
+import { readAiEnvironment as readAiSettingsEnvironment } from "../ai/settings.js";
 import { createTriager, type Triager } from "../ai/triage.js";
 import type { SignupMode } from "../auth/user.js";
 import { type Capacities, capacitiesFrom } from "../billing/capacity.js";
@@ -42,11 +42,10 @@ import {
 import {
   accountModelEnvironment,
   machineKeysUsable,
-  spendsInstanceMoney,
   webhookSecretEnvironment,
 } from "../config/machine-keys.js";
 import { createDatabase, type Database, poolOptions } from "../db/client.js";
-import type { SubscriptionPlan } from "../db/schema.js";
+import type { KeySource } from "../db/schema.js";
 import type { Logger } from "../logger.js";
 import { configureNetworking } from "../net.js";
 import type { NotificationTransport } from "../notifications/deliver.js";
@@ -62,11 +61,7 @@ import { assertSourcesCanBeStored } from "../sources/storage.js";
 import type { ProviderChoices } from "../sources/types.js";
 import { createClassifyStep } from "./classify.js";
 import { createCollectStep } from "./collect.js";
-import {
-  type CredentialLookup,
-  credentialsFromEnvironment,
-  credentialsFromStore,
-} from "./credentials.js";
+import { type CredentialLookup, credentialsFromStore } from "./credentials.js";
 import { createEstimateStep } from "./estimate.js";
 import { createFilterStep } from "./filter.js";
 import { createNotifyStep, enqueueNotifications } from "./notify.js";
@@ -389,26 +384,18 @@ export function credentialsForAccounts(
   keys: AccountKeys,
   logger?: Logger,
 ): CredentialLookup {
-  const stored = credentialsFromStore(db, undefined, (userId) => keys.provider(userId), logger);
-
   /**
-   * On the plan that lends the keys, the environment wins. US-132.
+   * The ordinary order, and US-141 restored it.
    *
-   * `credentials.ts` documents the order everywhere else — the table first,
-   * and once a row exists it wins — and that order is right when the row is
-   * the person's own key. On this plan it is not: an account that pasted a
-   * key in March and moved onto the plan in April would keep polling on its
-   * own key while paying for one it does not use, and could point the poll at
-   * a provider the deployment did not choose. So the store is not read, and
-   * the rows are left where they are so that leaving the plan reads them
-   * again.
+   * `credentials.ts` documents it: the table first, the environment second,
+   * and once a row exists it wins. US-132 inverted that for the lent-keys
+   * plan, on the reasoning that the row was not the person's own key. An
+   * account chooses whose keys it runs on now, so a key it pasted is a choice
+   * it made — and a key stored and then ignored is the thing this file exists
+   * to prevent. `keys.provider` is what decides whether the environment half
+   * is this account's to read at all.
    */
-  return async (connector, userId) => {
-    if (await keys.spendsInstanceMoney(userId)) {
-      return credentialsFromEnvironment(await keys.provider(userId), logger)(connector, userId);
-    }
-    return stored(connector, userId);
-  };
+  return credentialsFromStore(db, undefined, (userId) => keys.provider(userId), logger);
 }
 
 export async function startWorker({
@@ -526,8 +513,8 @@ export async function startWorker({
    * account's own settings are laid over, so a job with no key of its own does
    * not run rather than running on somebody else's.
    */
-  const readAccountBaseEnvironment = (plan: SubscriptionPlan) =>
-    accountModelEnvironment(signup, plan, readAiEnvironment());
+  const readAccountBaseEnvironment = (source: KeySource) =>
+    accountModelEnvironment(signup, source, readAiEnvironment());
 
   /**
    * The three model clients an account uses. US-068.
@@ -546,28 +533,28 @@ export async function startWorker({
    * design and it is written into docs/secrets.md rather than left to be
    * discovered.
    *
-   * **The plan is part of the cache key, and it is read on every call.** US-128.
-   * A key is somebody paying for their own calls and waiting for a restart is
-   * only slow; a plan is us paying for theirs, and an account that left the plan
-   * must stop spending our key on the next job rather than at the next restart.
-   * One primary-key read per job buys that.
+   * **Whose keys it runs on is part of the cache key, and it is read on every
+   * call.** US-128, rekeyed by US-141. A key is somebody paying for their own
+   * calls and waiting for a restart is only slow; running on ours is us paying
+   * for theirs, and an account that moves onto its own keys must stop spending
+   * our key on the next job rather than at the next restart. One primary-key
+   * read per job buys that.
    *
    * An injected client wins over all of it. Every test passes one, and so does
    * every live script, so neither pays for a database read per job.
    */
-  const modelsFor = planKeyedCache(keys, async (userId, plan) => {
-    const instance = readAccountBaseEnvironment(plan);
+  const modelsFor = planKeyedCache(keys, async (userId, source) => {
+    const instance = readAccountBaseEnvironment(source);
     // An account with no rows gets the instance's environment back, so the
     // common install pays one small query per owner per process and nothing
-    // else changes about it. On the plan that lends the keys the rows are not
-    // read at all, US-132: the deployment chooses the model, and a row from
-    // before the plan must not point our key at a model nobody priced.
-    const mine = await readAiSettingsEnvironment(
-      db,
-      userId,
-      instance,
-      spendsInstanceMoney(signup, plan),
-    );
+    // else changes about it.
+    //
+    // **A stored row always wins**, which is `ai/settings.ts`'s own order.
+    // US-132 inverted it for the lent-keys plan and US-141 reversed that: an
+    // account chooses whose keys it runs on, so a model it names is a choice
+    // it made and not a stale row, and a setting stored and then ignored is
+    // what this product refuses to do.
+    const mine = await readAiSettingsEnvironment(db, userId, instance);
 
     const own = {
       classifier:

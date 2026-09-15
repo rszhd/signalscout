@@ -35,6 +35,7 @@ import {
   recordPollRun,
   recordSourceUsage,
   recordVerdict,
+  setKeySource,
   setProviderChoice,
   subscriptions,
   users,
@@ -181,7 +182,6 @@ describe("the monitor routes", () => {
               mode: "stripe" as const,
               apiKey: "sk_test_not_a_real_key",
               priceId: "price_own",
-              keysIncludedPriceId: "price_included",
               webhookSecret: "whsec_test",
               appUrl: "https://app.example.test",
             },
@@ -191,15 +191,22 @@ describe("the monitor routes", () => {
   }
 
   /** Put the signed-in account on one plan. US-128. */
-  async function onPlan(plan: "own_keys" | "keys_included") {
+  /**
+   * Whose keys this account runs on. US-141, where a plan used to decide it.
+   *
+   * A subscription row too, because the paywall reads one — but it carries no
+   * plan any more: there is one price, and the state is the account's own.
+   */
+  async function onPlan(source: "own" | "instance") {
     await db
       .insert(users)
       .values({ id: owner, name: owner, email: `${owner}@example.test` })
       .onConflictDoNothing();
     await db
       .insert(subscriptions)
-      .values({ userId: owner, status: "active", plan })
-      .onConflictDoUpdate({ target: subscriptions.userId, set: { plan } });
+      .values({ userId: owner, status: "active" })
+      .onConflictDoNothing();
+    await setKeySource(db, owner, source);
   }
 
   async function withServer<T>(
@@ -304,7 +311,7 @@ describe("the monitor routes", () => {
      * no second account anywhere.
      */
     it("reports it as present to an account whose plan includes it", async () => {
-      await onPlan("keys_included");
+      await onPlan("instance");
 
       await withServer({ environment: configured, signup: "open", charging: true }, async (app) => {
         const body = (await app.inject({ method: "GET", url: "/api/monitor-options" })).json();
@@ -321,7 +328,7 @@ describe("the monitor routes", () => {
      * rather than a poll that fails at whatever hour the schedule picked.
      */
     it("reports it as missing again to an account on the plan that brings its own", async () => {
-      await onPlan("own_keys");
+      await onPlan("own");
 
       await withServer({ environment: configured, signup: "open", charging: true }, async (app) => {
         const body = (await app.inject({ method: "GET", url: "/api/monitor-options" })).json();
@@ -344,7 +351,7 @@ describe("the monitor routes", () => {
      * reads the same answer through `accountKeys` — so the two agree.
      */
     it("reads a platform as ready for an account on the plan, through the provider the deployment named", async () => {
-      await onPlan("keys_included");
+      await onPlan("instance");
       const twoKeys = {
         ...configured,
         SCRAPECREATORS_API_KEY: "sc-test-key",
@@ -739,7 +746,7 @@ describe("the monitor routes", () => {
      * anyway, and getting it.
      */
     it("polls a lent-keys account's new monitor every four hours", async () => {
-      await onPlan("keys_included");
+      await onPlan("instance");
 
       await withServer({ signup: "open", charging: true }, async (app) => {
         const id = await create(app);
@@ -750,7 +757,7 @@ describe("the monitor routes", () => {
     });
 
     it("still gives the hourly default to an account spending its own money", async () => {
-      await onPlan("own_keys");
+      await onPlan("own");
 
       await withServer({ signup: "open", charging: true }, async (app) => {
         const id = await create(app);
@@ -768,7 +775,7 @@ describe("the monitor routes", () => {
      * because the behaviour was meant to.
      */
     it("keeps an interval at or above the plan's floor, and refuses one below", async () => {
-      await onPlan("keys_included");
+      await onPlan("instance");
 
       await withServer({ signup: "open", charging: true }, async (app) => {
         // Refused first, while the account holds nothing: the plan carries one
@@ -790,7 +797,7 @@ describe("the monitor routes", () => {
     });
 
     it("refuses a platform the plan does not include, and names the ones it does", async () => {
-      await onPlan("keys_included");
+      await onPlan("instance");
       await withServer({ signup: "open", charging: true }, async (app) => {
         const response = await app.inject({
           method: "POST",
@@ -810,7 +817,7 @@ describe("the monitor routes", () => {
     });
 
     it("refuses more queries on a platform than the plan carries", async () => {
-      await onPlan("keys_included");
+      await onPlan("instance");
       await withServer({ signup: "open", charging: true }, async (app) => {
         const response = await app.inject({
           method: "POST",
@@ -832,7 +839,7 @@ describe("the monitor routes", () => {
     });
 
     it("refuses a second monitor, and a comment thread, on the plan", async () => {
-      await onPlan("keys_included");
+      await onPlan("instance");
       await withServer({ signup: "open", charging: true }, async (app) => {
         const replies = await app.inject({
           method: "POST",
@@ -860,7 +867,7 @@ describe("the monitor routes", () => {
      * never against itself, so an edit that changes nothing is allowed.
      */
     it("refuses an edit that would put the account past the plan, and allows one that does not", async () => {
-      await onPlan("keys_included");
+      await onPlan("instance");
       await withServer({ signup: "open", charging: true }, async (app) => {
         const id = await create(app, { ...newMonitor, pollIntervalSeconds: 4 * 60 * 60 });
 
@@ -882,7 +889,7 @@ describe("the monitor routes", () => {
     });
 
     it("bounds nothing for an account spending its own keys", async () => {
-      await onPlan("own_keys");
+      await onPlan("own");
       await withServer({ signup: "open", charging: true }, async (app) => {
         await create(app, { ...newMonitor, name: "One", pollIntervalSeconds: 900 });
         const second = await app.inject({
@@ -896,7 +903,7 @@ describe("the monitor routes", () => {
     });
 
     it("keeps an interval the person chose for an account spending its own keys", async () => {
-      await onPlan("own_keys");
+      await onPlan("own");
 
       await withServer({ signup: "open", charging: true }, async (app) => {
         const id = await create(app, { ...newMonitor, pollIntervalSeconds: 900 });
@@ -913,7 +920,7 @@ describe("the monitor routes", () => {
      * has to argue with the plan's arithmetic.
      */
     it("starts every new monitor with comments off, whatever the plan", async () => {
-      await onPlan("keys_included");
+      await onPlan("instance");
 
       await withServer({ signup: "open", charging: true }, async (app) => {
         const id = await create(app);

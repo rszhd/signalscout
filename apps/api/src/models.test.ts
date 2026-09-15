@@ -16,6 +16,7 @@ import {
   loadEnv,
   modelCalls,
   readAiEnvironment,
+  setKeySource,
   subscriptions,
   users,
 } from "@signalscout/core";
@@ -270,15 +271,14 @@ describe("the models routes", () => {
   });
 
   /** Put one account on one plan, in a deployment that charges. US-128. */
-  async function onPlan(userId: string, plan: "own_keys" | "keys_included") {
+  /** Whose keys this account runs on. US-141, where a plan used to decide it. */
+  async function onPlan(userId: string, source: "own" | "instance") {
     await db
       .insert(users)
       .values({ id: userId, name: userId, email: `${userId}@example.test` })
       .onConflictDoNothing();
-    await db
-      .insert(subscriptions)
-      .values({ userId, status: "active", plan })
-      .onConflictDoUpdate({ target: subscriptions.userId, set: { plan } });
+    await db.insert(subscriptions).values({ userId, status: "active" }).onConflictDoNothing();
+    await setKeySource(db, userId, source);
   }
 
   /** An open instance that charges, with a model key of its own. US-128. */
@@ -300,7 +300,6 @@ describe("the models routes", () => {
         mode: "stripe" as const,
         apiKey: "sk_test_not_a_real_key",
         priceId: "price_own",
-        keysIncludedPriceId: "price_included",
         webhookSecret: "whsec_test",
         appUrl: "https://app.example.test",
       },
@@ -314,7 +313,7 @@ describe("the models routes", () => {
    * not a rule until every screen stops offering what it refuses.
    */
   it("offers the instance key to an account whose plan includes it", async () => {
-    await onPlan(owner, "keys_included");
+    await onPlan(owner, "instance");
     const app = await openInstance(owner);
 
     try {
@@ -328,8 +327,8 @@ describe("the models routes", () => {
     }
   });
 
-  it("offers it to nobody on the plan that brings its own key", async () => {
-    await onPlan(owner, "own_keys");
+  it("offers it to nobody on an account running on its own keys", async () => {
+    await onPlan(owner, "own");
     const app = await openInstance(owner);
 
     try {

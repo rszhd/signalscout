@@ -24,6 +24,7 @@
 import { eq } from "drizzle-orm";
 import { createClassifier } from "../ai/classify.js";
 import { aiConfigFromEnvironment, needsApiKey } from "../ai/config.js";
+import { setKeySource } from "../billing/key-source.js";
 import { accountKeys } from "../billing/plan.js";
 import { accountCapFrom, accountSpend } from "../budget/account.js";
 import { loadAiEnv } from "../config/env.js";
@@ -118,9 +119,11 @@ const keys = accountKeys(db, {
 
 const credentialsFor = credentialsForAccounts(db, keys, logger);
 
-async function account(id: string, plan: "own_keys" | "keys_included"): Promise<string> {
+/** An account, and whose keys it runs on. US-141, where a plan used to decide it. */
+async function account(id: string, source: "own" | "instance"): Promise<string> {
   await db.insert(users).values({ id, name: id, email: `${id}@example.test` });
-  await db.insert(subscriptions).values({ userId: id, status: "active", plan });
+  await db.insert(subscriptions).values({ userId: id, status: "active" });
+  await setKeySource(db, id, source);
   return id;
 }
 
@@ -210,8 +213,8 @@ async function spentBy(userId: string): Promise<number> {
 }
 
 try {
-  const included = await account("lent-keys-account", "keys_included");
-  const own = await account("own-keys-account", "own_keys");
+  const included = await account("lent-keys-account", "instance");
+  const own = await account("own-keys-account", "own");
 
   say(
     `cap lent to a plan account: ${money(capMicros)} a month` +

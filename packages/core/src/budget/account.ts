@@ -123,11 +123,27 @@ export async function accountSpend(
 ): Promise<AccountSpend> {
   const since = monthStart(now);
 
+  /**
+   * Only what this instance's keys paid for. US-141.
+   *
+   * The cap is what the deployment lends, so an account's own spending is
+   * none of its business: counting it would stop somebody for the month over
+   * money we never spent, and an account on its own keys would meet a fuse it
+   * was never under. `key_source` is written at the call site that knows.
+   */
+  const ours = "instance" as const;
+
   const [sourceRows, modelRows] = await Promise.all([
     db
       .select({ micros: sql<string>`sum(${apiUsage.estimatedCostMicros})` })
       .from(apiUsage)
-      .where(and(eq(apiUsage.userId, userId), gte(apiUsage.day, dayOf(since)))),
+      .where(
+        and(
+          eq(apiUsage.userId, userId),
+          gte(apiUsage.day, dayOf(since)),
+          eq(apiUsage.keySource, ours),
+        ),
+      ),
     /**
      * A null `estimated_cost_micros` is a call whose price is not configured.
      * `sum` skips nulls, which is the answer we want: null means "we cannot
@@ -137,7 +153,13 @@ export async function accountSpend(
     db
       .select({ micros: sql<string>`sum(${modelCalls.estimatedCostMicros})` })
       .from(modelCalls)
-      .where(and(eq(modelCalls.userId, userId), gte(modelCalls.createdAt, since))),
+      .where(
+        and(
+          eq(modelCalls.userId, userId),
+          gte(modelCalls.createdAt, since),
+          eq(modelCalls.keySource, ours),
+        ),
+      ),
   ]);
 
   const sourceMicros = toMicros(sourceRows[0]?.micros);
@@ -230,7 +252,14 @@ export async function accountsOverCap(
         micros: sql<string>`sum(${apiUsage.estimatedCostMicros})`,
       })
       .from(apiUsage)
-      .where(and(inArray(apiUsage.userId, ids), gte(apiUsage.day, dayOf(since))))
+      // Only what this instance's keys paid for, as `accountSpend` reads it.
+      .where(
+        and(
+          inArray(apiUsage.userId, ids),
+          gte(apiUsage.day, dayOf(since)),
+          eq(apiUsage.keySource, "instance"),
+        ),
+      )
       .groupBy(apiUsage.userId),
     db
       .select({
@@ -238,7 +267,13 @@ export async function accountsOverCap(
         micros: sql<string>`sum(${modelCalls.estimatedCostMicros})`,
       })
       .from(modelCalls)
-      .where(and(inArray(modelCalls.userId, ids), gte(modelCalls.createdAt, since)))
+      .where(
+        and(
+          inArray(modelCalls.userId, ids),
+          gte(modelCalls.createdAt, since),
+          eq(modelCalls.keySource, "instance"),
+        ),
+      )
       .groupBy(modelCalls.userId),
   ]);
 

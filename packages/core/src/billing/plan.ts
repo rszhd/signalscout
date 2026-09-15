@@ -20,7 +20,6 @@
  * expensive plan by choosing it.
  */
 
-import { and, eq, inArray } from "drizzle-orm";
 import type { AiEnvironment } from "../ai/config.js";
 import type { SignupMode } from "../auth/user.js";
 import {
@@ -29,63 +28,25 @@ import {
   spendsInstanceMoney,
 } from "../config/machine-keys.js";
 import type { Database } from "../db/client.js";
-import { type SubscriptionPlan, subscriptions } from "../db/schema.js";
+import type { KeySource } from "../db/schema.js";
 import { readProviderChoices } from "../sources/choices.js";
 import type { ProviderChoices } from "../sources/types.js";
 import type { Capacities, PlanCapacity } from "./capacity.js";
-import type { BillingMode, SubscriptionRecord } from "./entitlement.js";
+import type { BillingMode } from "./entitlement.js";
+import { readKeySource } from "./key-source.js";
 import { readSubscription } from "./store.js";
 
 /**
- * The plan a stored row is on.
+ * **`subscriptions.plan` no longer decides anything, and US-141 is why.**
  *
- * `off` answers `own_keys` and the answer is never used: a deployment that does
- * not charge is self-hosted, and `machineKeysUsable` has already said yes to
- * every account on it because signup is closed. Answering here rather than
- * throwing keeps a caller from having to know that.
- */
-export function planOf(
-  mode: BillingMode,
-  subscription: SubscriptionRecord | null,
-): SubscriptionPlan {
-  if (mode === "off") return "own_keys";
-  return subscription?.plan ?? "own_keys";
-}
-
-/**
- * Which plan a Stripe price sells.
+ * US-128 gave the column two values and had the webhook write it from the
+ * price a subscription named, so whose keys an account ran on was a property
+ * of what it had bought. There is one price now, and the choice is the
+ * account's to change at any moment — which a price cannot express and a
+ * webhook is too slow to carry. `billing/key-source.ts` holds it instead.
  *
- * A deployment that has named no keys-included price sells no keys-included
- * plan, so every price answers `own_keys`. A price that is neither of the two
- * configured ones answers `own_keys` as well, and the caller logs it: a price
- * created in the dashboard that nobody told this instance about must not be
- * guessed into the expensive plan.
+ * What is left here is the per-account object the composition roots build.
  */
-export function planForPrice(
-  priceId: string | null,
-  keysIncludedPriceId: string | undefined,
-): SubscriptionPlan {
-  if (!priceId || !keysIncludedPriceId) return "own_keys";
-  return priceId === keysIncludedPriceId ? "keys_included" : "own_keys";
-}
-
-/**
- * One account's plan, read from the database.
- *
- * A primary-key lookup on one small table. It is asked per request in the API
- * and per job in the worker rather than cached at boot, and that is the point:
- * an account that stops paying for the plan stops spending our keys on the next
- * poll, not on the next restart.
- */
-export async function readPlan(
-  db: Database,
-  userId: string,
-  mode: BillingMode,
-): Promise<SubscriptionPlan> {
-  if (mode === "off") return "own_keys";
-  return planOf(mode, await readSubscription(db, userId));
-}
-
 export interface AccountKeysOptions {
   readonly signup: SignupMode;
   readonly mode: BillingMode;
@@ -134,11 +95,11 @@ export interface AccountKeys {
   /** The model environment this account's own settings are laid over. */
   model<E extends AiEnvironment>(userId: string, base: E): Promise<E>;
   /**
-   * The plan itself, for the one caller that needs the answer and not the
-   * environment: the worker caches a model client per account, and the cache
-   * has to be keyed by the plan the client was built under.
+   * Whose keys this account runs on, for the one caller that needs the answer
+   * and not the environment: the worker caches a model client per account, and
+   * the cache has to be keyed by the state the client was built under.
    */
-  plan(userId: string): Promise<SubscriptionPlan>;
+  source(userId: string): Promise<KeySource>;
   /**
    * What this account may still spend of ours this month, or null where the
    * money is its own. US-129.
@@ -193,63 +154,65 @@ export function accountKeys(
     capacities,
   }: AccountKeysOptions,
 ): AccountKeys {
+  /**
+   * Whose keys this account runs on, with the one thing the account cannot
+   * choose folded in. US-141, and it keeps US-081's rule alive.
+   *
+   * **An instance that does not charge has nothing to lend.** With signup open
+   * and `BILLING_MODE=off` there is no plan, no trial and no invoice — so an
+   * account that has chosen nothing must be on its own keys rather than on the
+   * owner's, which is the hole US-081 was written to close. Under US-128 the
+   * plan column carried that: `off` read as `own_keys`. The state defaults the
+   * other way, deliberately, so the composition is where it is said.
+   *
+   * A self-hosted instance is signup closed, and `machineKeysUsable` has
+   * already answered yes for it before any of this is asked.
+   */
+  const sourceFor = async (userId: string): Promise<KeySource> => {
+    if (signup === "open" && mode === "off") return "own";
+    return readKeySource(db, userId);
+  };
+
   return {
     async provider(userId) {
-      return providerKeyEnvironmentFor(signup, await readPlan(db, userId, mode), environment);
+      return providerKeyEnvironmentFor(signup, await sourceFor(userId), environment);
     },
     async model(userId, base) {
-      return accountModelEnvironment(signup, await readPlan(db, userId, mode), base);
+      return accountModelEnvironment(signup, await sourceFor(userId), base);
     },
-    async plan(userId) {
-      return readPlan(db, userId, mode);
+    async source(userId) {
+      return sourceFor(userId);
     },
     async cap(userId) {
       if (capMicros === undefined) return null;
-      return spendsInstanceMoney(signup, await readPlan(db, userId, mode)) ? capMicros : null;
+      return spendsInstanceMoney(signup, await sourceFor(userId)) ? capMicros : null;
     },
+    /**
+     * US-141: a recorded choice wins, and the deployment's is the default
+     * under it — US-130's original wording, restored. An account on its own
+     * keys reads only its own rows, because the deployment's answer names
+     * providers it holds no key for.
+     */
     async choices(userId) {
-      if (spendsInstanceMoney(signup, await readPlan(db, userId, mode))) return lentProviders;
-      return readProviderChoices(db, userId);
+      const recorded = await readProviderChoices(db, userId);
+      if (!spendsInstanceMoney(signup, await sourceFor(userId))) return recorded;
+      return { ...lentProviders, ...recorded };
     },
     async spendsInstanceMoney(userId) {
-      return spendsInstanceMoney(signup, await readPlan(db, userId, mode));
+      return spendsInstanceMoney(signup, await sourceFor(userId));
     },
     async capacity(userId) {
       if (capacities === undefined || mode === "off") return null;
+      if (!spendsInstanceMoney(signup, await sourceFor(userId))) return null;
       const subscription = await readSubscription(db, userId);
-      if (!spendsInstanceMoney(signup, planOf(mode, subscription))) return null;
       return subscription?.status === "trialing" ? capacities.trial : capacities.plan;
     },
   };
 }
 
 /**
- * Which of these accounts are on the plan whose keys are the instance's. US-129.
- *
- * For the scheduler, which holds a list of owners and needs to know which of
- * them have a cap at all. Asked of the database in one read rather than once
- * per account: a tick that is about to queue forty polls must not make forty
- * round trips to find out whose money it is about to spend.
- */
-export async function keysIncludedAmong(
-  db: Database,
-  userIds: readonly string[],
-  mode: BillingMode,
-): Promise<string[]> {
-  if (mode === "off" || userIds.length === 0) return [];
-
-  const rows = await db
-    .select({ userId: subscriptions.userId })
-    .from(subscriptions)
-    .where(
-      and(inArray(subscriptions.userId, [...userIds]), eq(subscriptions.plan, "keys_included")),
-    );
-
-  return rows.map((row) => row.userId);
-}
-
-/**
- * A per-account cache whose key carries the plan. US-128.
+ * A per-account cache whose key carries whose keys it runs on. US-128,
+ * rekeyed by US-141.
  *
  * The worker builds a model client per account and keeps it for the life of the
  * process, because building one decrypts a key and constructs an SDK object and
@@ -257,27 +220,28 @@ export async function keysIncludedAmong(
  * keyed by the account alone, which was right while the only thing it could be
  * wrong about was whose key somebody was paying with.
  *
- * The plan is not that. An account that leaves the plan must stop spending our
- * model key on the next job, not at the next restart — so the plan is read on
- * every call and it is part of the key. One primary-key read per job buys it.
+ * Whose keys it runs on is not that. An account that moves onto its own keys
+ * must stop spending our model key on the next job, not at the next restart —
+ * so the state is read on every call and it is part of the key. One
+ * primary-key read per job buys it.
  *
  * The old entry is left rather than evicted. It costs one object, and an
  * account that moves back finds its client already built.
  */
 export function planKeyedCache<T>(
   keys: AccountKeys,
-  build: (userId: string, plan: SubscriptionPlan) => Promise<T>,
+  build: (userId: string, source: KeySource) => Promise<T>,
 ): (userId: string) => Promise<T> {
   const cache = new Map<string, T>();
 
   return async (userId) => {
-    const plan = await keys.plan(userId);
-    const cacheKey = `${plan}:${userId}`;
+    const source = await keys.source(userId);
+    const cacheKey = `${source}:${userId}`;
 
     const cached = cache.get(cacheKey);
     if (cached) return cached;
 
-    const built = await build(userId, plan);
+    const built = await build(userId, source);
     cache.set(cacheKey, built);
     return built;
   };

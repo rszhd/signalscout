@@ -30,6 +30,7 @@ import {
   readProviderChoices,
   readSourceCredential,
   type SocialSource,
+  setKeySource,
   setProviderChoice,
   sourceCredentials,
   sourceProviders,
@@ -132,7 +133,6 @@ describe("connecting a provider", () => {
               mode: "stripe" as const,
               apiKey: "sk_test_not_a_real_key",
               priceId: "price_own",
-              keysIncludedPriceId: "price_included",
               webhookSecret: "whsec_test",
               appUrl: "https://app.example.test",
             },
@@ -142,15 +142,22 @@ describe("connecting a provider", () => {
   }
 
   /** Put the signed-in account on one plan. US-128. */
-  async function onPlan(plan: "own_keys" | "keys_included") {
+  /**
+   * Whose keys this account runs on. US-141, where a plan used to decide it.
+   *
+   * A subscription row too, because the paywall reads one — but it carries no
+   * plan any more: there is one price, and the state is the account's own.
+   */
+  async function onPlan(source: "own" | "instance") {
     await db
       .insert(users)
       .values({ id: owner, name: owner, email: `${owner}@example.test` })
       .onConflictDoNothing();
     await db
       .insert(subscriptions)
-      .values({ userId: owner, status: "active", plan })
-      .onConflictDoUpdate({ target: subscriptions.userId, set: { plan } });
+      .values({ userId: owner, status: "active" })
+      .onConflictDoNothing();
+    await setKeySource(db, owner, source);
   }
 
   async function stored() {
@@ -310,7 +317,7 @@ describe("connecting a provider", () => {
      * account whose plan includes the keys is never asked for one.
      */
     it("offers the environment's key to an account whose plan includes it", async () => {
-      await onPlan("keys_included");
+      await onPlan("instance");
       const app = await server({
         environment: { BRIGHTDATA_API_KEY: goodKey },
         signup: "open",
@@ -329,7 +336,7 @@ describe("connecting a provider", () => {
     });
 
     it("withholds it from an account on the plan that brings its own", async () => {
-      await onPlan("own_keys");
+      await onPlan("own");
       const app = await server({
         environment: { BRIGHTDATA_API_KEY: goodKey },
         signup: "open",

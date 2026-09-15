@@ -308,9 +308,20 @@ export function App() {
    * point already refuse it with a reason. `onboarded` is the record of that;
    * `App.test.tsx` holds the case.
    */
+  /**
+   * **An account on this instance's keys needs neither, so it is not asked.**
+   * US-140. The keys are the deployment's, the plan includes them, and a page
+   * asking a new subscriber to open two accounts before seeing anything is
+   * two accounts they were told they would not need.
+   *
+   * An account that moves onto its own keys and has none meets the forms
+   * behind this point, which refuse it with the key they want — the same
+   * sentence this page would have shown, at the moment it matters.
+   */
   if (
     setup.views &&
     !status.onboarded &&
+    setup.views.connections.keySource === "own" &&
     !(hasProviderKey(setup.views.connections) && hasModelKey(setup.views.models))
   ) {
     return (

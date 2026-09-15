@@ -15,8 +15,14 @@
  * actually read, which is the other half of the pre-filter's own sentence.
  */
 import { and, countDistinct, eq, inArray, isNotNull } from "drizzle-orm";
+import { readKeySource } from "../billing/key-source.js";
 import type { Database, Queryable } from "../db/client.js";
-import { type ModelCallOutcome, type ModelCallPurpose, modelCalls } from "../db/schema.js";
+import {
+  type KeySource,
+  type ModelCallOutcome,
+  type ModelCallPurpose,
+  modelCalls,
+} from "../db/schema.js";
 import type { ModelCall } from "./call.js";
 
 export interface RecordModelCallInput {
@@ -44,6 +50,19 @@ export interface RecordModelCallInput {
   readonly postId?: string | null;
   /** The provider's message, for a call that did not produce what was asked. */
   readonly error?: string | null;
+  /**
+   * Whose key paid for this call. US-141.
+   *
+   * The fuse in `budget/account.ts` counts only the rows this says are ours,
+   * so a caller that leaves it out puts somebody's own spending under our cap.
+   * **Absent means "read it", not "assume ours".** Thirteen callers write to
+   * these two ledgers and a rule applied to twelve of them is BUG-009 again,
+   * so the row is stamped here from the account's own state rather than by
+   * each caller remembering. One primary-key read per ledger write buys that.
+   * A caller that does know — a live script, a test — passes it and pays for
+   * no read.
+   */
+  readonly keySource?: KeySource;
 }
 
 export async function recordModelCall(
@@ -57,6 +76,7 @@ export async function recordModelCall(
     monitorVersion = null,
     postId = null,
     error = null,
+    keySource,
   }: RecordModelCallInput,
 ): Promise<void> {
   await db.insert(modelCalls).values({
@@ -73,6 +93,7 @@ export async function recordModelCall(
     latencyMs: call.latencyMs,
     estimatedCostMicros: call.estimatedCostMicros ?? null,
     error,
+    keySource: keySource ?? (userId ? await readKeySource(db, userId) : "instance"),
   });
 }
 

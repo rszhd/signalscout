@@ -79,13 +79,14 @@ export interface ConnectionRoutesOptions {
    */
   readonly choicesFor?: (userId: string) => Promise<ProviderChoices>;
   /**
-   * Whether this account's plan includes the deployment's keys. US-132.
+   * Whose keys this account runs on, and how it is changed. US-141.
    *
-   * The same question the gate asks before refusing a write, so the screen
-   * cannot offer a control the route would refuse. Undefined is false, which
-   * is every self-hosted instance.
+   * Injected so a test has neither. Undefined reads as this instance's keys,
+   * which is every self-hosted instance and every account that has chosen
+   * nothing.
    */
-  readonly lentKeysFor?: (userId: string) => Promise<boolean>;
+  readonly keySourceFor?: (userId: string) => Promise<"instance" | "own">;
+  readonly setKeySourceFor?: (userId: string, source: "instance" | "own") => Promise<void>;
   /**
    * Where `ENCRYPTION_KEY` is read from.
    *
@@ -165,14 +166,18 @@ const connectionsSchema = z.object({
   canStore: z.boolean(),
   storeBlocker: z.string().nullable(),
   /**
-   * True when this account's plan includes the deployment's keys. US-132.
+   * Whose keys this account runs on. US-141.
    *
-   * The screen then states what fetches each platform and offers nothing: no
-   * key field, no test button and no provider control, because every write
-   * behind them is refused with 403. The page keeps its address, because the
-   * billing page links to it in one word.
+   * One state and never a mix: `instance` means this deployment's keys pay
+   * and the plan's capacity applies, `own` means the account's own keys pay
+   * and nothing bounds it. It is the account's to change here, and it takes
+   * effect on the next poll.
+   *
+   * US-132 made this screen read-only for an account on our keys. US-141
+   * reversed that: the account chooses, so it keeps every control and a key
+   * it pastes is obeyed.
    */
-  lentKeys: z.boolean(),
+  keySource: z.enum(["instance", "own"]),
   providers: z.array(providerSchema),
   platforms: z.array(platformSchema),
 });
@@ -241,8 +246,9 @@ export async function registerConnectionRoutes(
   const { db, sources, logger } = options;
   const environmentFor = options.environmentFor ?? (async () => process.env);
   const choicesFor = options.choicesFor ?? ((userId: string) => readProviderChoices(db, userId));
-  /** Whether this account's plan includes the deployment's keys. US-132. */
-  const lentKeysFor = options.lentKeysFor ?? (async () => false);
+  /** Whose keys this account runs on. US-141. */
+  const keySourceFor = options.keySourceFor ?? (async () => "instance" as const);
+  const setKeySource = options.setKeySourceFor;
   const encryption = options.encryption ?? process.env;
   const providers = providersOf(sources);
   const platformEntries = groupByPlatform(sources);
@@ -426,7 +432,7 @@ export async function registerConnectionRoutes(
     return {
       canStore,
       storeBlocker: canStore ? null : noEncryptionKey,
-      lentKeys: await lentKeysFor(userId),
+      keySource: await keySourceFor(userId),
       providers: await Promise.all(providers.map((provider) => view(userId, provider))),
       platforms: await platformViews(userId),
     };
@@ -517,6 +523,38 @@ export async function registerConnectionRoutes(
       };
     }
   }
+
+  /**
+   * Move this account onto its own keys, or back onto this instance's. US-141.
+   *
+   * One state and never a mix, which is why it is a route and not an
+   * inference: choosing is a thing a person does, and a product that guessed
+   * from which keys happen to exist would change what X does when somebody
+   * pastes a Reddit key.
+   *
+   * It answers with the whole screen, the same contract every other write
+   * here uses, so the page redraws from one reply rather than two.
+   */
+  app.route({
+    method: "PUT",
+    url: "/api/connections/key-source",
+    schema: {
+      body: z.object({ source: z.enum(["instance", "own"]) }),
+      response: { 200: connectionsSchema, 422: problemSchema },
+    },
+    handler: async (request, reply) => {
+      const userId = sessionUserId(request);
+
+      if (!setKeySource) {
+        return reply.code(422).send({
+          message: "This deployment does not lend its keys, so there is nothing to choose.",
+        });
+      }
+
+      await setKeySource(userId, request.body.source);
+      return connectionsView(userId);
+    },
+  });
 
   app.route({
     method: "GET",

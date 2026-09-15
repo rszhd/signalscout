@@ -33,10 +33,11 @@ touching a connector.
 same Postgres, `AUTH_SIGNUP` deciding whether anybody else may register, and
 every provider key, model key and provider choice scoped to an account.
 `BILLING_MODE` is `off` by default, so a self-hosted instance meets none of
-Stripe. **There are two plans**: bring your own keys, and a second one where the
-account spends the instance's — `subscriptions.plan`, written by the webhook
-from the price, and every unknown reads as the plan that spends its own money.
-Read [docs/accounts.md](docs/accounts.md) and
+Stripe. **There is one price and two ways to run it**: bring your own keys and
+nothing bounds you, or run on the instance's and the plan carries a capacity.
+It is the account's own state in `account_key_source`, changed on the
+connections screen and never a mix — not a Stripe price, which US-141 removed
+along with `subscriptions.plan`. Read [docs/accounts.md](docs/accounts.md) and
 [docs/billing.md](docs/billing.md).
 
 **Every default is the self-hosted answer.** `AUTH_SIGNUP=closed`,
@@ -251,7 +252,6 @@ pnpm --filter @signalscout/core live:x-poll          # spends ~$0.002 + model
 pnpm --filter @signalscout/core live:sc-tiktok-poll   # spends ~$0.004 + model
 pnpm --filter @signalscout/core live:sc-youtube-poll  # spends ~$0.004 + model
 pnpm --filter @signalscout/core live:lent-keys        # spends ~$0.004 + model
-pnpm --filter @signalscout/api  live:stripe-plan     # spends nothing; Stripe test mode
 pnpm --filter @signalscout/core live:apify-linkedin-poll # spends ~$0.05 + model
 pnpm --filter @signalscout/core live:tiktok-poll     # spends ~$0.20 + model
 pnpm --filter @signalscout/core live:tiktok-comments # spends model only

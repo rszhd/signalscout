@@ -321,15 +321,6 @@ export const envSchema = z.object({
   /** The Stripe key, price and webhook secret. Required when BILLING_MODE is stripe. */
   STRIPE_SECRET_KEY: blankIsUnset(z.string().min(1).optional()),
   STRIPE_PRICE_ID: blankIsUnset(z.string().min(1).optional()),
-  /**
-   * The price of the plan whose keys are included. US-128.
-   *
-   * Optional in `stripe` mode as well, and deliberately: a deployment that does
-   * not set it sells one plan, which is what every deployment running today
-   * does. Setting it is what makes the second plan exist at all, and the
-   * webhook reads an account's plan from the price a subscription names.
-   */
-  STRIPE_PRICE_ID_KEYS_INCLUDED: blankIsUnset(z.string().min(1).optional()),
   STRIPE_WEBHOOK_SECRET: blankIsUnset(z.string().min(1).optional()),
 
   /**

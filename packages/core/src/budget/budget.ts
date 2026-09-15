@@ -30,11 +30,13 @@
  * says so to the user, and every screen carries the word "estimated".
  */
 import { and, eq, gte, inArray, sql } from "drizzle-orm";
+import { readKeySource } from "../billing/key-source.js";
 import type { Database } from "../db/client.js";
 import {
   apiUsage,
   budgets,
   type ExhaustedBehaviour,
+  type KeySource,
   modelCalls,
   monitors,
   type Provider,
@@ -154,6 +156,18 @@ export interface RecordSourceUsageInput {
    * provider's arithmetic on every provider's bill.
    */
   readonly pricePerUnitMicros: number;
+  /**
+   * Whose key paid for this call. US-141.
+   *
+   * The fuse in `budget/account.ts` counts only the rows this says are ours,
+   * so a caller that leaves it out puts somebody's own spending under our cap.
+   * **Absent means "read it", not "assume ours".** Five callers write to this
+   * ledger and a rule applied to four of them is BUG-009 again, so the row is
+   * stamped here from the account's own state rather than by each caller
+   * remembering. One primary-key read per ledger write buys that. A caller
+   * that does know — a live script, a test — passes it and pays for no read.
+   */
+  readonly keySource?: KeySource;
   readonly now?: Date;
 }
 
@@ -169,7 +183,7 @@ export interface RecordSourceUsageInput {
  * never polled", and Bright Data's trigger call is exactly that shape.
  */
 export async function recordSourceUsage(
-  db: Pick<Database, "insert">,
+  db: Pick<Database, "insert" | "select">,
   {
     userId,
     monitorId,
@@ -177,6 +191,7 @@ export async function recordSourceUsage(
     provider,
     units,
     pricePerUnitMicros,
+    keySource,
     now = new Date(),
   }: RecordSourceUsageInput,
 ): Promise<void> {
@@ -184,7 +199,16 @@ export async function recordSourceUsage(
 
   await db
     .insert(apiUsage)
-    .values({ userId, monitorId, source, provider, day: dayOf(now), units, estimatedCostMicros })
+    .values({
+      userId,
+      monitorId,
+      source,
+      provider,
+      day: dayOf(now),
+      units,
+      estimatedCostMicros,
+      keySource: keySource ?? (await readKeySource(db, userId)),
+    })
     .onConflictDoUpdate({
       target: [
         apiUsage.userId,

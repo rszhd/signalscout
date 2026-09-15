@@ -18,7 +18,6 @@ export interface BillingEnvironment {
   readonly BILLING_MODE?: BillingMode;
   readonly STRIPE_SECRET_KEY?: string | undefined;
   readonly STRIPE_PRICE_ID?: string | undefined;
-  readonly STRIPE_PRICE_ID_KEYS_INCLUDED?: string | undefined;
   readonly STRIPE_WEBHOOK_SECRET?: string | undefined;
   readonly APP_URL?: string | undefined;
 }
@@ -37,7 +36,6 @@ export interface BillingSettings {
    * one plan is sold instead of two, which is what every deployment running
    * today does and what the billing screen states plainly.
    */
-  readonly keysIncludedPriceId: string | undefined;
   readonly webhookSecret: string;
   /**
    * Where Stripe sends a person back to.
@@ -83,7 +81,6 @@ export function billingSettingsFrom(env: BillingEnvironment): BillingSettings | 
     mode,
     apiKey: env.STRIPE_SECRET_KEY as string,
     priceId: env.STRIPE_PRICE_ID as string,
-    keysIncludedPriceId: env.STRIPE_PRICE_ID_KEYS_INCLUDED,
     webhookSecret: env.STRIPE_WEBHOOK_SECRET as string,
     appUrl: (env.APP_URL as string).replace(/\/+$/, ""),
   };

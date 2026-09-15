@@ -1,7 +1,8 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
+import { setKeySource } from "../billing/key-source.js";
 import { accountKeys } from "../billing/plan.js";
 import { createDatabase } from "../db/client.js";
-import { sourceCredentials, subscriptions, users } from "../db/schema.js";
+import { accountKeySource, sourceCredentials, users } from "../db/schema.js";
 import type { Logger } from "../logger.js";
 import { type EncryptionKey, generateEncryptionKey, readEncryptionKey } from "../secrets/cipher.js";
 import { putSourceCredential } from "../secrets/store.js";
@@ -325,16 +326,16 @@ describe("whose keys a worker polls with", () => {
     },
   };
 
-  it("hands the machine's keys to the plan that includes them and to no other", async () => {
+  it("hands the machine's keys to an account on ours and to no other", async () => {
     const { db, close } = createDatabase(database.url);
 
     try {
-      for (const [id, plan] of [
-        ["included", "keys_included"],
-        ["own", "own_keys"],
+      for (const [id, source] of [
+        ["included", "instance"],
+        ["own", "own"],
       ] as const) {
         await db.insert(users).values({ id, name: id, email: `${id}@example.test` });
-        await db.insert(subscriptions).values({ userId: id, status: "active", plan });
+        await setKeySource(db, id, source);
       }
 
       const lookup = credentialsForAccounts(
@@ -348,32 +349,33 @@ describe("whose keys a worker polls with", () => {
       // biome-ignore lint/suspicious/noExplicitAny: the same.
       expect(await lookup(connector as any, "own")).toBeUndefined();
     } finally {
-      await db.delete(subscriptions);
+      await db.delete(accountKeySource);
       await db.delete(users);
       await close();
     }
   });
 
   /**
-   * US-132. `credentials.ts` says a stored row wins over the environment, and
-   * that is right when the row is the person's own key. On the plan that lends
-   * the keys the environment wins instead: an account that pasted a key in
-   * March and moved onto the plan in April must not keep polling on it. The
-   * row is left where it is, so leaving the plan reads it again.
+   * **A stored row wins, and US-141 restored that.** `credentials.ts` documents
+   * the order: the table first, the environment second. US-132 inverted it for
+   * the lent-keys plan, on the reasoning that the row was not the person's own
+   * key. An account chooses whose keys it runs on now, so a key it pasted is a
+   * choice it made — and a key stored and then ignored is what that file exists
+   * to prevent.
    */
-  it("reads the machine's key and not the stored row for an account on the plan", async () => {
+  it("reads the stored row and not the machine's key, whichever state the account is in", async () => {
     const encryption = generateEncryptionKey();
     vi.stubEnv("ENCRYPTION_KEY", encryption);
     const key = readEncryptionKey(encryption);
     const { db, close } = createDatabase(database.url);
 
     try {
-      for (const [id, plan] of [
-        ["included", "keys_included"],
-        ["own", "own_keys"],
+      for (const [id, source] of [
+        ["ours", "instance"],
+        ["theirs", "own"],
       ] as const) {
         await db.insert(users).values({ id, name: id, email: `${id}@example.test` });
-        await db.insert(subscriptions).values({ userId: id, status: "active", plan });
+        await setKeySource(db, id, source);
         await putSourceCredential(db, key, {
           userId: id,
           provider: "brightdata",
@@ -385,21 +387,23 @@ describe("whose keys a worker polls with", () => {
       const keys = accountKeys(db, { signup: "open", mode: "stripe", environment: machine });
       const lookup = credentialsForAccounts(db, keys, silentLogger);
 
+      // Both read their own row, because a key somebody pasted is a choice
+      // they made whichever state the account is in.
       // biome-ignore lint/suspicious/noExplicitAny: the descriptor is shaped by hand here.
-      expect(await lookup(connector as any, "included")).toEqual({ apiKey: "the-machine-key" });
+      expect(await lookup(connector as any, "ours")).toEqual({ apiKey: "ours-stored-key" });
       // biome-ignore lint/suspicious/noExplicitAny: the same.
-      expect(await lookup(connector as any, "own")).toEqual({ apiKey: "own-stored-key" });
+      expect(await lookup(connector as any, "theirs")).toEqual({ apiKey: "theirs-stored-key" });
 
-      // Nothing deleted: off the plan, the row is read again.
-      await db.update(subscriptions).set({ plan: "own_keys" });
+      // The environment is the fallback, and only for an account on ours.
+      await db.delete(sourceCredentials);
       // biome-ignore lint/suspicious/noExplicitAny: the same.
-      expect(await lookup(connector as any, "included")).toEqual({
-        apiKey: "included-stored-key",
-      });
+      expect(await lookup(connector as any, "ours")).toEqual({ apiKey: "the-machine-key" });
+      // biome-ignore lint/suspicious/noExplicitAny: the same.
+      expect(await lookup(connector as any, "theirs")).toBeUndefined();
     } finally {
       vi.unstubAllEnvs();
       await db.delete(sourceCredentials);
-      await db.delete(subscriptions);
+      await db.delete(accountKeySource);
       await db.delete(users);
       await close();
     }

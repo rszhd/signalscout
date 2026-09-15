@@ -38,6 +38,8 @@ describe("the application screens", () => {
   let billingMode: "off" | "stripe";
   /** Whether this account holds the two keys the setup gate asks for. */
   let setUp: boolean;
+  /** US-141: whether this account brings its own keys, which is what the gate is for. */
+  let onOwnKeys: boolean;
   /** Whether this account has already finished setup. US-105. */
   let onboarded: boolean;
   /** Whether the two setup reads answer at all. */
@@ -49,6 +51,7 @@ describe("the application screens", () => {
   beforeEach(() => {
     billingMode = "off";
     setUp = true;
+    onOwnKeys = true;
     onboarded = false;
     setupReadable = true;
     billingState = {
@@ -104,6 +107,9 @@ describe("the application screens", () => {
         return json({
           canStore: true,
           storeBlocker: null,
+          // US-140 and US-141: the gate is for an account running on its own
+          // keys. One on ours needs none, so it is never asked.
+          keySource: onOwnKeys ? "own" : "instance",
           providers: [
             {
               id: "brightdata",
@@ -557,6 +563,9 @@ describe("the application screens", () => {
     return {
       canStore: true,
       storeBlocker: null,
+      // The gate is for an account on its own keys, and this is the reply that
+      // closes it: both keys saved, still on its own keys. US-141.
+      keySource: "own",
       providers: [
         {
           id: "brightdata",

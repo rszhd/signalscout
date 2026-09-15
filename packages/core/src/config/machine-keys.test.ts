@@ -79,44 +79,44 @@ describe("whether the machine's keys are an account's to spend", () => {
 });
 
 /**
- * US-128. The same rule, asked about one account rather than about the
- * instance, which is the only thing that changed: a plan whose keys are
- * included is one account on an open instance answering yes while the next
- * answers no.
+ * US-128, rekeyed by US-141. The same rule, asked about one account rather
+ * than about the instance — and asked about a state the account chose rather
+ * than a plan it bought, because there is one price and the choice changes on
+ * the next poll rather than on the next webhook.
  */
-describe("whether one account's plan includes the machine's keys", () => {
-  it("says yes to the plan that pays for them and no to the other", () => {
-    expect(machineKeysUsableFor("open", "keys_included")).toBe(true);
-    expect(machineKeysUsableFor("open", "own_keys")).toBe(false);
+describe("whether one account runs on the machine's keys", () => {
+  it("says yes to an account on ours and no to one on its own", () => {
+    expect(machineKeysUsableFor("open", "instance")).toBe(true);
+    expect(machineKeysUsableFor("open", "own")).toBe(false);
   });
 
   /**
    * The self-hosted instance is one person and their own `.env`. It answered
    * yes before any of this existed and it has to go on answering yes whatever
-   * a `subscriptions` row somewhere says — a version bump that began refusing
-   * a self-hoster's own keys is the upgrade nobody would forgive.
+   * a row somewhere says — a version bump that began refusing a self-hoster's
+   * own keys is the upgrade nobody would forgive.
    */
-  it("says yes on a closed instance, on either plan", () => {
-    expect(machineKeysUsableFor("closed", "own_keys")).toBe(true);
-    expect(machineKeysUsableFor("closed", "keys_included")).toBe(true);
+  it("says yes on a closed instance, in either state", () => {
+    expect(machineKeysUsableFor("closed", "own")).toBe(true);
+    expect(machineKeysUsableFor("closed", "instance")).toBe(true);
   });
 
-  it("hands the provider keys to the plan that includes them, and nothing to the other", () => {
+  it("hands the provider keys to an account on ours, and nothing to one on its own", () => {
     const environment = { BRIGHTDATA_API_KEY: "the-machine-key" };
 
-    expect(providerKeyEnvironmentFor("open", "keys_included", environment)).toEqual(environment);
-    expect(providerKeyEnvironmentFor("open", "own_keys", environment)).toEqual({});
-    expect(providerKeyEnvironmentFor("closed", "own_keys", environment)).toEqual(environment);
+    expect(providerKeyEnvironmentFor("open", "instance", environment)).toEqual(environment);
+    expect(providerKeyEnvironmentFor("open", "own", environment)).toEqual({});
+    expect(providerKeyEnvironmentFor("closed", "own", environment)).toEqual(environment);
   });
 
   /**
-   * Only the key depends on the plan. The provider, the model, the endpoint and
-   * the prices are what the deployment was configured and measured for, and an
-   * account that brings its own key still runs on them.
+   * Only the key depends on the state. The provider, the model, the endpoint
+   * and the prices are what the deployment was configured and measured for,
+   * and an account that brings its own key still runs on them.
    */
-  it("keeps the deployment's model settings on both plans, and the key on one", () => {
-    const included = accountModelEnvironment("open", "keys_included", instance);
-    const own = accountModelEnvironment("open", "own_keys", instance);
+  it("keeps the deployment's model settings in both states, and the key in one", () => {
+    const included = accountModelEnvironment("open", "instance", instance);
+    const own = accountModelEnvironment("open", "own", instance);
 
     expect(included.AI_API_KEY).toBe("the-machine-key");
     expect(own.AI_API_KEY).toBeUndefined();

@@ -17,6 +17,7 @@ import {
   matches,
   monitors,
   posts,
+  setKeySource,
   sourceProviders,
   subscriptions,
   users,
@@ -132,16 +133,22 @@ describe("the pricing route", () => {
     await db.delete(users);
   });
 
-  /** Put the signed-in account on one plan, in a deployment that charges. US-128. */
-  async function onPlan(plan: "own_keys" | "keys_included") {
+  /**
+   * Whose keys this account runs on. US-141, where a plan used to decide it.
+   *
+   * A subscription row too, because the paywall reads one — but it carries no
+   * plan any more: there is one price, and the state is the account's own.
+   */
+  async function onPlan(source: "own" | "instance") {
     await db
       .insert(users)
       .values({ id: pageOwner, name: pageOwner, email: `${pageOwner}@example.test` })
       .onConflictDoNothing();
     await db
       .insert(subscriptions)
-      .values({ userId: pageOwner, status: "active", plan })
-      .onConflictDoUpdate({ target: subscriptions.userId, set: { plan } });
+      .values({ userId: pageOwner, status: "active" })
+      .onConflictDoNothing();
+    await setKeySource(db, pageOwner, source);
   }
 
   async function read(
@@ -167,7 +174,6 @@ describe("the pricing route", () => {
               mode: "stripe" as const,
               apiKey: "sk_test_not_a_real_key",
               priceId: "price_own",
-              keysIncludedPriceId: "price_included",
               webhookSecret: "whsec_test",
               appUrl: "https://app.example.test",
             },
@@ -208,11 +214,11 @@ describe("the pricing route", () => {
   it("calls a provider connected where the account's plan includes the key", async () => {
     const key = { SOCIALCRAWL_API_KEY: "sc-test-key" };
 
-    await onPlan("keys_included");
+    await onPlan("instance");
     const included = await read([socialCrawlLinkedIn()], key, "open", true);
     expect(included.platforms[0]?.connectors[0]?.connected).toBe(true);
 
-    await onPlan("own_keys");
+    await onPlan("own");
     const own = await read([socialCrawlLinkedIn()], key, "open", true);
     expect(own.platforms[0]?.connectors[0]?.connected).toBe(false);
   });

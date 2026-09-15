@@ -20,7 +20,7 @@
  * were $27 of a $35 plan, and the same three polled daily are $4.50.
  *
  * The numbers are a price decision and will change, so each is read from the
- * environment beside `STRIPE_PRICE_ID_KEYS_INCLUDED` with US-134's figure as
+ * environment beside `STRIPE_PRICE_ID` with US-134's figure as
  * the default. Nothing here knows what a plan is: `accountKeys.capacity`
  * decides whether an account has one at all, and which.
  */

@@ -41,28 +41,20 @@ prices are what the deployment was configured and measured for. With signup
 closed nothing changes, which is the point of tying the rule to signup rather
 than applying it everywhere.
 
-**On the plan that lends the keys, the environment wins over every stored
-row, and the rows are not deleted.** US-132. Everywhere else the order is
-the table first, then the environment, and once a row exists it wins — that is
-what makes a stored key worth storing. It is right when the row is the
-person's own key. On this plan it is not: an account that pasted a key in
-March and moved onto the plan in April would keep polling on its own key while
-paying for one it does not use, and could point *our* model key at the dearest
-model the provider sells. So while `spendsInstanceMoney` answers yes for an
-account, `credentialsForAccounts` reads no stored key and
-`readAiEnvironmentFor` reads no model row, and the API refuses every write
-that would store one with **403** — not 402, because the account has paid and
-the repair is not on the billing page. The rows stay where they are, so an
-account that leaves the plan polls on its own again with no re-entry.
+**A stored key always wins, and US-141 put that back.** `credentials.ts`
+documents the order: the table first, the environment second, and once a row
+exists it wins. US-132 inverted it for a moment, for a plan where the
+deployment held every choice — and the account holds the choice now, so a key
+it pasted is a decision it made. A key stored and then ignored is the thing
+this file exists to prevent.
 
-**The plan comes from Stripe and from nowhere else.** `subscriptions.plan` is
-written by the webhook, from the price the subscription names —
-`STRIPE_PRICE_ID_KEYS_INCLUDED` is what this deployment sells that plan as. No
-screen sets it. Every unknown reads as `own_keys`: no row, no column value, a
-price this instance was never told about, a webhook that has not arrived. The
-direction is the whole design, and it is the opposite of `entitlementFor`'s —
-being allowed to poll and being allowed to poll *on our keys* are different
-questions, and only one of them arrives as an invoice.
+**Whose keys an account runs on is its own state, and it changes it.** US-141.
+`account_key_source` holds one row per account: `instance` and this
+deployment's keys are the fallback under whatever the account stored, `own` and
+only its own rows answer. One state and never a mix — a platform it holds no
+key for does not run rather than falling back to ours. It was
+`subscriptions.plan` until US-141, written by the Stripe webhook from the
+price; one price cannot carry a choice somebody changes at three o'clock.
 
 **A model key follows the same rule, with two differences.** US-068 and
 US-079. The Models screen stores keys on the account, in `ai_keys`, encrypted

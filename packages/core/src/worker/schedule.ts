@@ -14,7 +14,8 @@
 import { and, eq, isNull, or, sql } from "drizzle-orm";
 import type { PgBoss } from "pg-boss";
 import { type PlanCapacity, pollFloorFor } from "../billing/capacity.js";
-import { type BillingMode, entitledCondition, keysIncludedAmong } from "../billing/index.js";
+import { type BillingMode, entitledCondition } from "../billing/index.js";
+import { onInstanceKeysAmong } from "../billing/key-source.js";
 import { accountsOverCap } from "../budget/account.js";
 import type { Database } from "../db/client.js";
 import { monitors, subscriptions } from "../db/schema.js";
@@ -163,9 +164,10 @@ export async function enqueueDuePolls(
   /**
    * The accounts that have spent their month, in two reads for the whole tick.
    *
-   * Only accounts on the plan have a cap, so the first read narrows the list
-   * and the second sums only what is left. A deployment that lends nothing does
-   * neither.
+   * Only accounts running on this instance's keys have a cap, so the first
+   * read narrows the list and the second sums only what is left — and it sums
+   * only the rows whose `key_source` says we paid. A deployment that lends
+   * nothing does neither.
    */
   const overCap =
     accountCapMicros === null
@@ -173,7 +175,10 @@ export async function enqueueDuePolls(
       : new Set(
           await accountsOverCap(
             db,
-            await keysIncludedAmong(db, [...new Set(due.map((one) => one.userId))], billing),
+            // Only the accounts running on this instance's keys have a cap at
+            // all. US-141 moved that question off the Stripe plan and onto the
+            // account's own state.
+            await onInstanceKeysAmong(db, [...new Set(due.map((one) => one.userId))]),
             accountCapMicros,
           ),
         );

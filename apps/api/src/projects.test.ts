@@ -14,6 +14,7 @@ import {
   loadEnv,
   modelCalls,
   type ProjectDescriber,
+  setKeySource,
   subscriptions,
   users,
 } from "@signalscout/core";
@@ -127,11 +128,10 @@ describe("the project routes", () => {
       .insert(users)
       .values({ id: testOwner, name: testOwner, email: `${testOwner}@example.test` })
       .onConflictDoNothing();
-    await db.insert(subscriptions).values({
-      userId: testOwner,
-      status: "active",
-      plan: "keys_included",
-    });
+    await db.insert(subscriptions).values({ userId: testOwner, status: "active" });
+    // US-141: whose keys the account runs on is its own state, and this
+    // account is on ours, which is what carries a capacity.
+    await setKeySource(db, testOwner, "instance");
 
     const app = await buildServer({
       session: asOwner,
@@ -144,7 +144,6 @@ describe("the project routes", () => {
         mode: "stripe",
         apiKey: "sk_test_not_a_real_key",
         priceId: "price_own",
-        keysIncludedPriceId: "price_included",
         webhookSecret: "whsec_test",
         appUrl: "https://app.example.test",
       },

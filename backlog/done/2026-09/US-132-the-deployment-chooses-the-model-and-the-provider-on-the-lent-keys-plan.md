@@ -164,3 +164,23 @@ US-130 was written to avoid: no choice, two providers, and a refused poll.
   Neither page asks whether a control should be disabled: the gate refuses
   every write behind them with 403, so the honest screen is one that offers
   nothing.
+
+- 2026-09-16T01:30+08:00 — **Reversed by US-141, on the owner's instruction,
+  the same day.** The 403 gate is deleted and both precedence flips are gone.
+
+  What changed underneath is the thing this ticket was built on: a lent-keys
+  account was one that had bought a particular Stripe price, and the
+  deployment held its choices because it had not asked for any. There is one
+  price now, and whose keys an account runs on is a switch it operates — so a
+  key it pastes is a decision it made, and refusing the write would refuse the
+  choice the switch exists to offer.
+
+  The hole this ticket closed is open again and worth naming: a subscriber can
+  point our model key at the dearest model a provider sells. US-129's $25 fuse
+  bounds that, and it did not exist when this was written. That is the whole
+  of the argument, and the owner heard it before choosing.
+
+  What survives: the screens still say which state an account is in, and the
+  Models screen still shows the deployment's model rather than a row nothing
+  obeys — because now the rows *are* obeyed, and the sentence points at the
+  switch instead.

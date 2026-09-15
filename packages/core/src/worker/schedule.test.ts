@@ -2,9 +2,11 @@ import { eq, sql } from "drizzle-orm";
 import { PgBoss } from "pg-boss";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { defaultPlanCapacity } from "../billing/capacity.js";
+import { setKeySource } from "../billing/key-source.js";
 import { recordSourceUsage } from "../budget/budget.js";
 import { createDatabase, type Database } from "../db/client.js";
 import {
+  accountKeySource,
   apiUsage,
   defaultPollIntervalSeconds,
   monitors,
@@ -458,13 +460,16 @@ describe("whether the account has spent its month", () => {
   afterEach(async () => {
     await db.delete(apiUsage);
     await db.delete(monitors);
+    await db.delete(accountKeySource);
     await db.delete(subscriptions);
     await db.delete(users);
   });
 
-  async function ownerOn(id: string, plan: "own_keys" | "keys_included"): Promise<string> {
+  /** An account, and whose keys it runs on. US-141. */
+  async function ownerOn(id: string, source: "instance" | "own"): Promise<string> {
     await db.insert(users).values({ id, name: id, email: `${id}@example.test` });
-    await db.insert(subscriptions).values({ userId: id, status: "active", plan });
+    await db.insert(subscriptions).values({ userId: id, status: "active" });
+    await setKeySource(db, id, source);
     return id;
   }
 
@@ -480,8 +485,8 @@ describe("whether the account has spent its month", () => {
   }
 
   it("does not send a poll for an account that has spent its month", async () => {
-    const over = await ownerOn("cap-over", "keys_included");
-    const under = await ownerOn("cap-under", "keys_included");
+    const over = await ownerOn("cap-over", "instance");
+    const under = await ownerOn("cap-under", "instance");
 
     await spend(over, 15_000_000);
     await spend(under, 1_000_000);
@@ -511,7 +516,7 @@ describe("whether the account has spent its month", () => {
    * account on the same instance as the one above.
    */
   it("sends a poll for an account spending its own money, however much it spent", async () => {
-    const own = await ownerOn("cap-own", "own_keys");
+    const own = await ownerOn("cap-own", "own");
     await spend(own, 90_000_000);
     await insertMonitor(database, { userId: own });
 
@@ -526,7 +531,7 @@ describe("whether the account has spent its month", () => {
    * nothing about caps. Null is what every deployment before US-129 passes.
    */
   it("sends every due poll where the deployment lends nothing", async () => {
-    const over = await ownerOn("cap-nolend", "keys_included");
+    const over = await ownerOn("cap-nolend", "instance");
     await spend(over, 90_000_000);
     await insertMonitor(database, { userId: over });
 
@@ -545,7 +550,7 @@ describe("whether the account has spent its month", () => {
    * send it.
    */
   it("does not send a poll for a monitor polling faster than its plan sells", async () => {
-    const owner = await ownerOn("floor-included", "keys_included");
+    const owner = await ownerOn("floor-included", "instance");
     const id = await insertMonitor(database, { userId: owner, pollIntervalSeconds: 900 });
 
     // Polled twenty minutes ago: due by its own column, not due under a plan
@@ -569,7 +574,7 @@ describe("whether the account has spent its month", () => {
   });
 
   it("sends it once the plan's floor has passed", async () => {
-    const owner = await ownerOn("floor-passed", "keys_included");
+    const owner = await ownerOn("floor-passed", "instance");
     const id = await insertMonitor(database, { userId: owner, pollIntervalSeconds: 900 });
 
     await db
@@ -590,7 +595,7 @@ describe("whether the account has spent its month", () => {
   });
 
   it("sends a monitor that has never polled, whatever the plan's floor", async () => {
-    const owner = await ownerOn("floor-never", "keys_included");
+    const owner = await ownerOn("floor-never", "instance");
     await insertMonitor(database, { userId: owner, pollIntervalSeconds: 900 });
 
     const result = await enqueueDuePolls(
@@ -611,7 +616,7 @@ describe("whether the account has spent its month", () => {
    * platform that is not due on its own.
    */
   it("holds a monitor to the shortest floor of the platforms it names", async () => {
-    const owner = await ownerOn("floor-mixed", "keys_included");
+    const owner = await ownerOn("floor-mixed", "instance");
     const id = await insertMonitor(database, {
       userId: owner,
       pollIntervalSeconds: 900,
@@ -638,7 +643,7 @@ describe("whether the account has spent its month", () => {
   });
 
   it("holds nobody to a floor where the account has no capacity", async () => {
-    const owner = await ownerOn("floor-own", "own_keys");
+    const owner = await ownerOn("floor-own", "own");
     const id = await insertMonitor(database, { userId: owner, pollIntervalSeconds: 900 });
     await db
       .update(monitors)

@@ -367,3 +367,15 @@
   gap: var(--space-3);
   margin-top: var(--space-3);
 }
+/* US-133. What the plan checks and how often, where the schedule control was.
+   A list rather than a paragraph, because a person reads it to find their own
+   platform in it; the marker is dropped because each line is a statement and
+   not a step. */
+.plan-schedule {
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  list-style: none;
+  color: var(--muted-strong);
+  font-size: var(--text-sm);
+  line-height: 1.7;
+}

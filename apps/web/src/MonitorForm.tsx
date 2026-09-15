@@ -3,6 +3,7 @@ import { Link } from "react-router";
 import { messageFor, requestJson } from "./api.js";
 import { BrandIcon } from "./BrandIcon.js";
 import { CostTest, type EstimateReport, exceedsCap } from "./CostTest.js";
+import { platformName } from "./labels.js";
 import { formatMicros, toMicros } from "./monitor.js";
 import { paths } from "./route.js";
 import { ScheduleField } from "./ScheduleField.js";
@@ -45,6 +46,57 @@ interface MonitorOptions {
   signals: SignalOption[];
   sources: SourceOption[];
   canGenerateQueries: boolean;
+  /**
+   * What this account's plan sells, or null where nothing bounds it. US-133.
+   *
+   * Null is every self-hosted instance and every account bringing its own
+   * keys, and the form then behaves exactly as it did before this existed.
+   */
+  capacity: PlanCapacity | null;
+}
+
+/** The dials the plan carries. The same numbers the write path holds a monitor to. */
+interface PlanCapacity {
+  monitors: number;
+  queries: number;
+  queriesPerPlatform: Record<string, number>;
+  platforms: string[];
+  pollIntervalSeconds: Record<string, number>;
+  replies: boolean;
+}
+
+/** An interval as a person reads it. The same words the billing page uses. */
+function intervalLabel(seconds: number): string {
+  if (seconds === 86_400) return "once a day";
+  if (seconds % 86_400 === 0) return `every ${seconds / 86_400} days`;
+  if (seconds === 43_200) return "twice a day";
+  if (seconds % 3_600 === 0) return `every ${seconds / 3_600} hours`;
+  return `every ${Math.round(seconds / 60)} minutes`;
+}
+
+/**
+ * How often the plan checks each platform this monitor watches. US-133.
+ *
+ * Only the platforms that were ticked, because the other four are not this
+ * monitor's business — and grouped by interval, so the daily one stands out
+ * rather than being the sixth line of a list.
+ */
+export function scheduleLines(capacity: PlanCapacity, selected: readonly string[]): string[] {
+  const byInterval = new Map<number, string[]>();
+
+  for (const platform of selected) {
+    const seconds = capacity.pollIntervalSeconds[platform];
+    if (seconds === undefined) continue;
+    byInterval.set(seconds, [...(byInterval.get(seconds) ?? []), platformName(platform)]);
+  }
+
+  return [...byInterval]
+    .sort((a, b) => a[0] - b[0])
+    .map(([seconds, names]) => {
+      const last = names[names.length - 1] ?? "";
+      const list = names.length <= 1 ? last : `${names.slice(0, -1).join(", ")} and ${last}`;
+      return `${list} ${intervalLabel(seconds)}`;
+    });
 }
 
 /**
@@ -530,12 +582,21 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
       return;
     }
 
-    if (cap.trim() === "") {
+    /*
+      A budget is the customer's own cap on their own spending, US-013. On the
+      plan that includes our keys the money is not theirs, so there is nothing
+      for them to cap: what bounds that account is the capacity it was sold and
+      the deployment's own fuse, neither of which is a figure on this form.
+      US-133.
+    */
+    const needsBudget = !options?.capacity;
+
+    if (needsBudget && cap.trim() === "") {
       setError("Set a monthly budget. A monitor with no cap can spend without limit.");
       return;
     }
 
-    if (capMicros === null) {
+    if (needsBudget && capMicros === null) {
       setError("A monthly budget is an amount in dollars, such as 10.");
       return;
     }
@@ -555,10 +616,24 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
           subreddits,
           sources: selectedSources,
           includeReplies,
-          pollIntervalSeconds: schedule.pollIntervalSeconds,
-          pollDays: [...schedule.pollDays],
-          pollTimezone: timezone,
-          ...(capMicros === null ? {} : { budget: { monthlyCapMicros: capMicros, onExhausted } }),
+          /*
+            The schedule, unless the plan sets it. US-133: on the plan that
+            includes our keys the interval is the deployment's, so the form
+            sends none and the route fills in the floor of the platforms this
+            monitor watches. Sending the form's own default would be a value
+            the person never chose, refused by the rule that made the field
+            disappear.
+          */
+          ...(options?.capacity
+            ? {}
+            : {
+                pollIntervalSeconds: schedule.pollIntervalSeconds,
+                pollDays: [...schedule.pollDays],
+                pollTimezone: timezone,
+              }),
+          ...(!needsBudget || capMicros === null
+            ? {}
+            : { budget: { monthlyCapMicros: capMicros, onExhausted } }),
           // Kept, not started. The person was shown what it would cost.
           ...(overCap ? { startPaused: true } : {}),
         }),
@@ -1151,39 +1226,72 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
               </div>
               <fieldset className="choice-section">
                 <legend>How often should it look?</legend>
-                <p>More frequent searches mean more provider calls.</p>
-                <ScheduleField
-                  pollIntervalSeconds={pollIntervalSeconds}
-                  pollDays={pollDays}
-                  onChange={(next) => {
-                    setPollIntervalSeconds(next.pollIntervalSeconds);
-                    setPollDays(next.pollDays);
-                  }}
-                />
-                <details className="disclosure timezone-setting">
-                  <summary>Time zone · {timezone}</summary>
-                  {/* A list rather than a text field. The scheduler reads an
+                {/*
+                  On the plan that includes our keys, the schedule is ours.
+                  US-132 and US-133: a query costs what its platform's provider
+                  charges, and the plan is priced on each platform being
+                  checked at its own rate — so this is not a control the
+                  person was sold, and offering it and then refusing the
+                  choice is worse than not offering it.
+                */}
+                {options.capacity ? (
+                  <>
+                    <p>Your plan sets how often each platform is checked.</p>
+                    <ul className="plan-schedule">
+                      {scheduleLines(options.capacity, selectedSources).map((line) => (
+                        <li key={line}>{line}</li>
+                      ))}
+                    </ul>
+                  </>
+                ) : (
+                  <>
+                    <p>More frequent searches mean more provider calls.</p>
+                    <ScheduleField
+                      pollIntervalSeconds={pollIntervalSeconds}
+                      pollDays={pollDays}
+                      onChange={(next) => {
+                        setPollIntervalSeconds(next.pollIntervalSeconds);
+                        setPollDays(next.pollDays);
+                      }}
+                    />
+                  </>
+                )}
+                {/* The zone is part of the schedule, so it goes with it. */}
+                {!options.capacity && (
+                  <details className="disclosure timezone-setting">
+                    <summary>Time zone · {timezone}</summary>
+                    {/* A list rather than a text field. The scheduler reads an
                       IANA name, and a typed one that is not a name is a monitor
                       whose days mean something else than the person meant. */}
-                  <label className="field">
-                    <span>Time zone</span>
-                    <select
-                      aria-label="Time zone"
-                      required
-                      value={timezone}
-                      onChange={(event) => setTimezone(event.target.value)}
-                    >
-                      {timezoneOptions(timezone).map((zone) => (
-                        <option key={zone} value={zone}>
-                          {zone}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                  <p>Days follow this time zone. We started with your browser’s setting.</p>
-                </details>
+                    <label className="field">
+                      <span>Time zone</span>
+                      <select
+                        aria-label="Time zone"
+                        required
+                        value={timezone}
+                        onChange={(event) => setTimezone(event.target.value)}
+                      >
+                        {timezoneOptions(timezone).map((zone) => (
+                          <option key={zone} value={zone}>
+                            {zone}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <p>Days follow this time zone. We started with your browser’s setting.</p>
+                  </details>
+                )}
               </fieldset>{" "}
-              <fieldset className="choice-section budget-section">
+              {/*
+                The budget is the customer's cap on their own spending. On the
+                plan that includes our keys there is nothing of theirs to cap,
+                and a figure in dollars there would be the mistake US-133 was
+                written to undo. What bounds the account is the capacity above.
+              */}
+              <fieldset
+                className="choice-section budget-section"
+                hidden={Boolean(options.capacity)}
+              >
                 <legend>How much may it spend a month?</legend>
                 <p>
                   A budget is required. The final call can overshoot the cap; its price is known

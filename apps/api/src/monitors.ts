@@ -869,14 +869,50 @@ export async function registerMonitorRoutes(
           ),
           /** False when no model key is set, so the form can say why. */
           canGenerateQueries: z.boolean(),
+          /**
+           * What this account's plan sells, or null where nothing bounds it.
+           * US-133.
+           *
+           * The form reads it to stop offering what the plan does not carry —
+           * a schedule the deployment sets, a platform it excludes, a comment
+           * thread it does not read — rather than letting somebody choose and
+           * then refusing them. The same numbers the write path holds them to,
+           * so the form and the refusal cannot disagree.
+           */
+          capacity: z
+            .object({
+              monitors: z.number().int(),
+              queries: z.number().int(),
+              queriesPerPlatform: z.record(z.string(), z.number().int()),
+              platforms: z.array(z.string()),
+              pollIntervalSeconds: z.record(z.string(), z.number().int()),
+              replies: z.boolean(),
+            })
+            .nullable(),
         }),
       },
     },
     handler: async (request) => {
-      const runtime = await currentEnvironment(sessionUserId(request));
+      const userId = sessionUserId(request);
+      const runtime = await currentEnvironment(userId);
+      const capacity = await capacityFor(userId);
 
       return {
         signals: signalList.map(({ id, label, hint }) => ({ id, label, hint })),
+        capacity: capacity
+          ? {
+              monitors: capacity.monitors,
+              queries: capacity.queries,
+              queriesPerPlatform: Object.fromEntries(
+                Object.entries(capacity.queriesPerPlatform).filter(
+                  ([, limit]) => limit !== undefined,
+                ),
+              ) as Record<string, number>,
+              platforms: [...capacity.platforms],
+              pollIntervalSeconds: { ...capacity.pollIntervalSeconds },
+              replies: capacity.replies,
+            }
+          : null,
         /**
          * One row per platform, not per connector.
          *

@@ -188,3 +188,26 @@ operator's own.
 
   Left for the screen session: the billing page and the monitor form render
   the capacity. The route answers it; nothing draws it yet.
+
+- 2026-09-15T21:40+08:00 — **Two of the screens are done, and the owner made a
+  decision while they were being built: on the plan, the schedule is not
+  offered at all.** It was going to be a control the person could set and the
+  write would then refuse, which is the worse half of both — so the monitor
+  form states what the plan checks and how often, for the platforms this
+  monitor watches, and sends no schedule. The route fills in the floor.
+
+  The budget field went the same way and for the same reason. A budget is the
+  customer's cap on their own spending, US-013; on this plan the money is not
+  theirs, so there is nothing of theirs to cap and a figure in dollars there
+  is exactly what this ticket exists to remove. What bounds the account is the
+  capacity, which is on the form above it.
+
+  The billing page states the capacity in dials — monitors, searches, a
+  platform list and one line per interval — and the progress bar of the month's
+  spend is gone. A paused notice appears only when the fuse has actually blown,
+  and it names no figure.
+
+  `/api/monitor-options` carries the capacity now, so the form holds a monitor
+  to the same numbers the write path does rather than a copy of them.
+
+  Left: the connections and Models screens, which are US-132's box.

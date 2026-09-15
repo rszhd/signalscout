@@ -349,6 +349,81 @@ describe("the monitor form", () => {
   });
 
   /**
+   * US-133, and the owner's decision. On the plan that includes our keys the
+   * schedule is the deployment's: a query costs what its platform's provider
+   * charges, and the plan is priced on each platform being checked at its own
+   * rate. So the control is not offered rather than offered and then refused,
+   * and the form sends no schedule at all — the route fills in the floor.
+   */
+  it("states the plan's schedule instead of offering one, and sends none", async () => {
+    const capacity = {
+      monitors: 1,
+      queries: 6,
+      queriesPerPlatform: { linkedin: 3 },
+      platforms: ["reddit", "linkedin"],
+      pollIntervalSeconds: { reddit: 4 * 60 * 60, linkedin: 24 * 60 * 60 },
+      replies: false,
+    };
+
+    await screen.unmount();
+    fetchMock.mockImplementation(async (request: string | URL | Request) => {
+      const url = String(request);
+      if (url === "/api/monitor-options") return json({ ...options, capacity });
+      if (url === "/api/monitors/queries") return json(generated);
+      if (url === "/api/monitors") {
+        return json({ id: "m", name: "Journeys", paused: false, missingCredentials: [] }, 201);
+      }
+      throw new Error(`Unexpected request: ${url}`);
+    });
+    screen = await mountForm();
+    container = screen.container;
+
+    await toSources();
+    await act(async () => button("Generate search plan").click());
+    await act(async () => button("Continue to schedule").click());
+
+    expect(container.textContent).toContain("Your plan sets how often each platform is checked");
+    expect(container.textContent).toContain("Reddit every 4 hours");
+    // Only the platforms this monitor watches: LinkedIn is in the plan and
+    // not on this monitor, so it is not this monitor's business.
+    expect(container.textContent).not.toContain("LinkedIn once a day");
+    // The control itself is gone, not disabled.
+    expect(document.querySelector('[aria-label="Time zone"]')).toBeNull();
+    // And the budget is hidden: the money is not this account's, so there is
+    // nothing of theirs to cap and no figure in dollars on the form. US-133.
+    expect(input("Monthly budget").closest("fieldset")?.hidden).toBe(true);
+
+    await act(async () => button("Start monitor").click());
+    await settle();
+
+    const createCall = fetchMock.mock.calls.find(([url]) => url === "/api/monitors");
+    const body = JSON.parse(createCall?.[1]?.body as string);
+    expect(body.pollIntervalSeconds).toBeUndefined();
+    expect(body.pollDays).toBeUndefined();
+    expect(body.pollTimezone).toBeUndefined();
+    expect(body.budget).toBeUndefined();
+  });
+
+  it("offers the schedule to an account spending its own keys", async () => {
+    await screen.unmount();
+    fetchMock.mockImplementation(async (request: string | URL | Request) => {
+      const url = String(request);
+      if (url === "/api/monitor-options") return json({ ...options, capacity: null });
+      if (url === "/api/monitors/queries") return json(generated);
+      throw new Error(`Unexpected request: ${url}`);
+    });
+    screen = await mountForm();
+    container = screen.container;
+
+    await toSources();
+    await act(async () => button("Generate search plan").click());
+    await act(async () => button("Continue to schedule").click());
+
+    expect(container.textContent).toContain("More frequent searches mean more provider calls");
+    expect(document.querySelector('[aria-label="Time zone"]')).not.toBeNull();
+  });
+
+  /**
    * The time zone is chosen from a list, not typed.
    *
    * The scheduler reads an IANA name. A typed one that is not a name is a

@@ -12,6 +12,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router";
 import { messageFor, requestJson } from "./api.js";
+import { platformName } from "./labels.js";
 import { paths } from "./route.js";
 
 export interface BillingState {
@@ -30,18 +31,84 @@ export interface BillingState {
   /** Whose keys this account's monitors spend. US-128. */
   plan: "own_keys" | "keys_included";
   /**
-   * The month this plan lends and what is left of it. US-129.
+   * What this plan sells. US-133.
    *
    * Null on every account spending its own money, and the screen then says
-   * nothing about it — a figure there would be a limit that does not apply.
+   * nothing about it — a limit there would be one that does not apply.
+   *
+   * It carried the month's cap and spend until US-133, which is how a $49
+   * account came to be told its plan included $15: that figure is the
+   * deployment's fuse, it sits above what the plan sells, and printing it
+   * here made an internal limit read as the customer's allowance. What a
+   * person bought is these dials, which are the ones on the monitor form.
    */
   included: {
-    capMicros: number;
-    spentMicros: number;
-    remainingMicros: number;
-    exhausted: boolean;
-    since: string;
+    monitors: number;
+    projects: number;
+    queries: number;
+    queriesPerPlatform: Record<string, number>;
+    platforms: string[];
+    pollIntervalSeconds: Record<string, number>;
+    replies: boolean;
+    /** True when the deployment's fuse has stopped this account for the month. */
+    paused: boolean;
   } | null;
+}
+
+/** An interval as a person reads it: "every 4 hours", "once a day". */
+export function intervalLabel(seconds: number): string {
+  if (seconds === 86_400) return "once a day";
+  if (seconds % 86_400 === 0) return `every ${seconds / 86_400} days`;
+  if (seconds === 43_200) return "twice a day";
+  if (seconds % 3_600 === 0) return `every ${seconds / 3_600} hours`;
+  return `every ${Math.round(seconds / 60)} minutes`;
+}
+
+/** "Reddit, X and YouTube", the way a sentence needs them. */
+function joinNames(names: readonly string[]): string {
+  if (names.length <= 1) return names[0] ?? "";
+  return `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}`;
+}
+
+/**
+ * What the plan includes, as the lines a person reads. US-133.
+ *
+ * Grouped by interval rather than listed per platform, because the plan's
+ * whole shape is that the dear platforms are polled less often: six lines
+ * saying "every 4 hours" would bury the one saying "once a day", which is the
+ * line that makes the price work.
+ */
+export function capacityLines(capacity: NonNullable<BillingState["included"]>): string[] {
+  const lines = [
+    `${countLabel(capacity.monitors, "monitor")} in ${countLabel(capacity.projects, "project")}`,
+    `${countLabel(capacity.queries, "search", "searches")} in total`,
+  ];
+
+  for (const [platform, limit] of Object.entries(capacity.queriesPerPlatform)) {
+    if (!capacity.platforms.includes(platform)) continue;
+    lines.push(`At most ${countLabel(limit, "search", "searches")} on ${platformName(platform)}`);
+  }
+
+  // One line per distinct interval, slowest first: the slow ones are the
+  // platforms whose price the plan is shaped around.
+  const byInterval = new Map<number, string[]>();
+  for (const platform of capacity.platforms) {
+    const seconds = capacity.pollIntervalSeconds[platform];
+    if (seconds === undefined) continue;
+    byInterval.set(seconds, [...(byInterval.get(seconds) ?? []), platformName(platform)]);
+  }
+
+  for (const [seconds, names] of [...byInterval].sort((a, b) => a[0] - b[0])) {
+    lines.push(`${joinNames(names)} checked ${intervalLabel(seconds)}`);
+  }
+
+  if (!capacity.replies) lines.push("Posts, not comment threads");
+
+  return lines;
+}
+
+function countLabel(count: number, one: string, many = `${one}s`): string {
+  return `${count} ${count === 1 ? one : many}`;
 }
 
 /**
@@ -333,7 +400,7 @@ export function Billing() {
                   {state.mode === "off"
                     ? "No application subscription."
                     : state.plan === "keys_included"
-                      ? "Hosting and provider usage included, up to your monthly allowance."
+                      ? "Hosting, provider usage and the model, all included."
                       : "Hosting included. Provider usage billed separately."}
                 </p>
                 <div className="billing-features">
@@ -353,9 +420,10 @@ export function Billing() {
                         ]
                       : state.plan === "keys_included"
                         ? [
-                            "Hosted application and database",
-                            "Managed scheduler for your monitors",
                             "Social data and AI keys included — nothing to set up",
+                            // What the plan actually carries, from the same
+                            // numbers the write path and the poll read. US-133.
+                            ...(state.included ? capacityLines(state.included) : []),
                           ]
                         : [
                             "Hosted application and database",
@@ -398,33 +466,24 @@ export function Billing() {
                   </div>
                 )}
                 {/*
-                  What the plan lends this month, and what is left. US-129.
-                  Shaped like the trial block above it because it answers the
-                  same kind of question — how much of something is left — and a
-                  second shape for that would be a second thing to learn.
+                  Only when something has actually stopped. US-133.
 
-                  The sentence says the month resets and never says "raise",
-                  because nobody can: the monitor's own budget is the control a
-                  person has, and it is on the monitor.
+                  This block used to show a progress bar of the month's spend
+                  against `ACCOUNT_MONTHLY_CAP_MICROS`, which is the
+                  deployment's fuse rather than anything the customer bought —
+                  so it told a paying account its plan included $15. The fuse
+                  sits above the capacity now and no figure travels with it:
+                  an account that reaches it did nothing wrong, and the
+                  sentence says so rather than pointing at a meter.
                 */}
-                {state.included && (
+                {state.included?.paused && (
                   <div className="billing-trial">
                     <div>
-                      <span>Included usage</span>
-                      <strong>
-                        {usageLabel(state.included.spentMicros)} of{" "}
-                        {usageLabel(state.included.capMicros)} used
-                      </strong>
+                      <span>Paused for this month</span>
                     </div>
-                    <progress
-                      aria-label="Included usage this month"
-                      max={state.included.capMicros}
-                      value={Math.min(state.included.capMicros, state.included.spentMicros)}
-                    />
                     <p className="billing-included-note">
-                      {state.included.exhausted
-                        ? "This month's included usage is spent. Collecting and scoring start again when the month does."
-                        : "Estimated. Your providers' own invoices are what we are billed."}
+                      Collecting and scoring start again when the month does, and nothing you set
+                      caused this. Tell us if it keeps happening.
                     </p>
                   </div>
                 )}
@@ -478,7 +537,7 @@ export function Billing() {
                 </h2>
                 <p>
                   {state.plan === "keys_included"
-                    ? "Social data and AI run on our keys, up to the monthly allowance in your plan. There is nothing to connect and no second invoice."
+                    ? "Social data and AI run on our keys, within what your plan includes. There is nothing to connect, nothing to choose and no second invoice."
                     : "Social data and AI providers bill your accounts directly. Their usage is separate from your SignalScout subscription."}
                 </p>
                 <Link className="secondary-button" to={paths.connections}>
@@ -506,12 +565,19 @@ export function Billing() {
                 <div>
                   <dt>
                     {state.plan === "keys_included"
-                      ? "Your monthly allowance"
+                      ? "What your plan watches"
                       : "You control the budget"}
                   </dt>
                   <dd>
+                    {/*
+                      US-133. This said "your monthly allowance" and described
+                      a figure in dollars. What the plan sells is the dials
+                      above, and the schedule is ours to set — so the sentence
+                      says what a person may still change, which is what they
+                      are watching for and where.
+                    */}
                     {state.plan === "keys_included"
-                      ? "Included usage resets with the calendar month. A monitor can still have a cap of its own."
+                      ? "Your searches and platforms are yours to change. How often each platform is checked is part of the plan."
                       : "Set a monthly spending cap for each monitor in its settings."}
                   </dd>
                 </div>

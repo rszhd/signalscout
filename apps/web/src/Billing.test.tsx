@@ -192,13 +192,33 @@ describe("the billing screen", () => {
     expect(document.body.textContent).toContain("7 days left");
   });
 
+  /** The capacity US-134 priced, as the route answers it. */
+  const soldCapacity = {
+    monitors: 1,
+    projects: 1,
+    queries: 6,
+    queriesPerPlatform: { linkedin: 3 },
+    platforms: ["reddit", "x", "linkedin", "youtube", "tiktok", "instagram"],
+    pollIntervalSeconds: {
+      reddit: 4 * 60 * 60,
+      x: 4 * 60 * 60,
+      youtube: 4 * 60 * 60,
+      tiktok: 4 * 60 * 60,
+      instagram: 12 * 60 * 60,
+      linkedin: 24 * 60 * 60,
+    },
+    replies: false,
+    paused: false,
+  };
+
   /**
-   * US-128 and US-129. The plan changes what the page claims, and the claim it
-   * used to make is the one that matters: a page telling an account with no
-   * providers that its providers bill it directly is a page describing somebody
-   * else's plan.
+   * US-128 and US-133. The plan changes what the page claims, and the claim it
+   * used to make is the one that matters twice over: a page telling an account
+   * with no providers that its providers bill it directly is describing
+   * somebody else's plan, and a page telling a paying account that its plan
+   * includes $15 is printing our own fuse as their allowance.
    */
-  it("tells a lent-keys account its usage is included, and what is left of it", async () => {
+  it("tells a lent-keys account what its plan includes, in dials and not in dollars", async () => {
     fetched.mockImplementation(async () =>
       json(
         state({
@@ -206,13 +226,7 @@ describe("the billing screen", () => {
           status: "active",
           hasBillingAccount: true,
           plan: "keys_included",
-          included: {
-            capMicros: 15_000_000,
-            spentMicros: 4_000_000,
-            remainingMicros: 11_000_000,
-            exhausted: false,
-            since: "2026-09-01T00:00:00.000Z",
-          },
+          included: soldCapacity,
         }),
       ),
     );
@@ -222,13 +236,22 @@ describe("the billing screen", () => {
 
     const text = document.body.textContent ?? "";
 
-    expect(text).toContain("$4 of $15 used");
+    expect(text).toContain("1 monitor in 1 project");
+    expect(text).toContain("6 searches in total");
+    expect(text).toContain("At most 3 searches on LinkedIn");
+    expect(text).toContain("LinkedIn checked once a day");
+    expect(text).toContain("Instagram checked twice a day");
+    expect(text).toContain("Posts, not comment threads");
     expect(text).toContain("Your provider usage is included");
     expect(text).not.toContain("Your provider usage is separate");
-    expect(text).not.toContain("bill your accounts directly");
+
+    // The fuse is the deployment's, and no figure from it reaches this page.
+    expect(text).not.toContain("$15");
+    expect(text).not.toContain("$25");
+    expect(text.toLowerCase()).not.toContain("allowance");
   });
 
-  it("says the month resets when the allowance is spent, and never says raise", async () => {
+  it("says the month resets when the fuse blows, blames nobody and names no figure", async () => {
     fetched.mockImplementation(async () =>
       json(
         state({
@@ -236,13 +259,7 @@ describe("the billing screen", () => {
           status: "active",
           hasBillingAccount: true,
           plan: "keys_included",
-          included: {
-            capMicros: 15_000_000,
-            spentMicros: 15_000_000,
-            remainingMicros: 0,
-            exhausted: true,
-            since: "2026-09-01T00:00:00.000Z",
-          },
+          included: { ...soldCapacity, paused: true },
         }),
       ),
     );
@@ -253,9 +270,31 @@ describe("the billing screen", () => {
     const text = document.body.textContent ?? "";
 
     // Nobody raises this cap. A sentence inviting somebody to would send them
-    // looking for a control that does not exist.
+    // looking for a control that does not exist — and an account that reaches
+    // it did nothing wrong, because it sits above what the plan sells.
+    expect(text).toContain("Paused for this month");
     expect(text).toContain("start again when the month does");
+    expect(text).toContain("nothing you set caused this");
     expect(text.toLowerCase()).not.toContain("raise");
+  });
+
+  it("shows no paused notice while the plan is running", async () => {
+    fetched.mockImplementation(async () =>
+      json(
+        state({
+          reason: "subscribed",
+          status: "active",
+          hasBillingAccount: true,
+          plan: "keys_included",
+          included: soldCapacity,
+        }),
+      ),
+    );
+
+    screen = await mount(<Billing />);
+    await settle();
+
+    expect(document.body.textContent ?? "").not.toContain("Paused for this month");
   });
 
   /**

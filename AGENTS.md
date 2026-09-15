@@ -137,7 +137,21 @@ for the whole instance, so a new account saw somebody else's numbers. Nothing
 went red, because nothing on that page was scoped by a test. Count the reads.
 
 **One migration number, one file.** Two branches that each take the next number
-merge cleanly and break at boot.
+merge cleanly and break at boot. Two agents in two worktrees make this likelier,
+not rarer, because neither one can see the other's file.
+
+**A worktree gets its ports and its data from the script, not by hand.**
+`node scripts/new-worktree.mjs <name>` gives the folder a slot — its own API
+port, Vite port and Postgres container — and seeds it with a copy of the main
+database so a screen has something on it. It is placed at `worktrees/<name>`
+*inside* the main checkout, so one editor window opened there lists every
+worktree's changes in one source-control view. `.gitignore` and `.dockerignore`
+both carry the folder; a worktree that is also untracked content of the
+repository it sits in shows up in `git status` and is walked by `pnpm lint`. **Every monitor in a copy is paused**,
+because a copy carries real schedules and real provider keys, and a worker
+started in a folder nobody is watching will poll and bill. Unpause one on
+purpose when you need a poll, and never seed a worktree by copying `.env` by
+hand: two folders on one port migrate one database.
 
 **A migration file is not a migration until `meta/_journal.json` names it.** The
 migrator walks the journal and never the directory, and so does the test
@@ -226,6 +240,8 @@ pnpm db:generate              # drizzle-kit generate, after a schema change
 docker compose up             # the published image: Postgres, migrations, the app
 
 pnpm db:rotate-key            # re-encrypt stored credentials under a new key
+
+node scripts/new-worktree.mjs <name>   # a worktree with its own ports and a copy of the database
 
 backlog/index.sh              # rebuild OPEN.md and DONE.md — run after any ticket change
 backlog/index.sh --check      # exit 1 if either list is stale

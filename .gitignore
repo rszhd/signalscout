@@ -28,6 +28,14 @@ coverage/
 .vscode/*
 !.vscode/extensions.json
 
+# Worktrees made by `scripts/new-worktree.mjs`. They live inside the checkout so
+# that opening the main folder in an editor shows every worktree's changes in
+# one source-control view. Each one is a working tree of this same repository,
+# so it must not also be untracked content *of* it: without this line
+# `git status` reports the folder, and Biome — which reads this file — walks
+# every worktree on every `pnpm lint`.
+worktrees/
+
 # Third-party agent skills. `skills-lock.json` is committed and the installed
 # files are not, the way a lockfile is committed and `node_modules` is not:
 # `npx skills add` restores them from the lock. `.claude/skills/` holds only

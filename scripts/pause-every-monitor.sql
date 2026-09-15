@@ -1,0 +1,17 @@
+-- Run against a database copied into a new git worktree, before anybody starts
+-- the worker.
+--
+-- A copy carries the real monitors, their schedules and the provider keys. Left
+-- running, `pnpm dev` starts the worker, the scheduler finds a monitor due, and
+-- a real provider and a real model are billed for a poll nobody asked for in a
+-- folder nobody is watching. The budget guard bounds that spend; it does not
+-- prevent it.
+--
+-- `paused_at` is null while a monitor runs, and `findDueMonitors` skips a
+-- paused row. The `where` clause is not a saving: the column is a timestamp so
+-- a screen can say "paused 3 days ago", and re-stamping it would make every
+-- copy look like a pause somebody had just made.
+--
+-- One file, read by `scripts/new-worktree.mjs` and by the test that proves what
+-- it does, so the statement cannot be written twice and drift. US-135.
+update monitors set paused_at = now() where paused_at is null;

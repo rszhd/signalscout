@@ -12,6 +12,7 @@
  * lets absence survive the wire.
  */
 import {
+  countProjectCreations,
   createProject,
   type Database,
   deleteProject,
@@ -57,6 +58,10 @@ export interface ProjectRoutesOptions {
 }
 
 const signal = z.enum(signalIds);
+
+function plural(count: number, noun: string): string {
+  return `${count} ${noun}${count === 1 ? "" : "s"}`;
+}
 
 /** The shape every refusal here takes. `monitors.ts` and `connections.ts` too. */
 const problemSchema = z.object({ message: z.string() });
@@ -240,13 +245,67 @@ export async function registerProjectRoutes(
     },
   });
 
+  /**
+   * What bounds the next project: the sentence it would be refused with, or
+   * null, and the total the account is held to where there is one. US-133,
+   * US-146.
+   *
+   * Read once here so the list can answer it beside the projects: the screen
+   * shows the refusal when the button is pressed, rather than after four
+   * fields have been typed and saved, and the delete dialog says how many
+   * more can be made.
+   */
+  async function projectBounds(
+    userId: string,
+    held: number,
+  ): Promise<{
+    nextBlocker: string | null;
+    creations: { made: number; allowed: number } | null;
+  }> {
+    const capacity = await (options.capacityFor ?? (async () => null))(userId);
+    if (!capacity) return { nextBlocker: null, creations: null };
+
+    const plan = capacity.trial ? "Your trial" : "Your plan";
+    const creations =
+      capacity.projectCreations === null
+        ? null
+        : { made: await countProjectCreations(db, userId), allowed: capacity.projectCreations };
+
+    // The total ever made is checked first: it is the one a delete cannot
+    // free, so it is the one to say when both are reached.
+    if (creations && creations.made >= creations.allowed) {
+      return {
+        nextBlocker: `${plan} includes ${plural(creations.allowed, "project")} in total, counting any you deleted, and this account has made ${creations.made}.`,
+        creations,
+      };
+    }
+    if (held >= capacity.projects) {
+      return {
+        nextBlocker: `${plan} includes ${plural(capacity.projects, "project")}, and this account already has ${held}.`,
+        creations,
+      };
+    }
+    return { nextBlocker: null, creations };
+  }
+
   app.route({
     method: "GET",
     url: "/api/projects",
-    schema: { response: { 200: z.object({ projects: z.array(projectSchema) }) } },
+    schema: {
+      response: {
+        200: z.object({
+          projects: z.array(projectSchema),
+          /** Why the next project would be refused, ahead of the form. */
+          nextBlocker: z.string().nullable(),
+          /** The total ever made and the total allowed, where the plan counts one. */
+          creations: z.object({ made: z.number().int(), allowed: z.number().int() }).nullable(),
+        }),
+      },
+    },
     handler: async (request) => {
-      const found = await listProjects(db, sessionUserId(request));
-      return { projects: found.map(serialise) };
+      const userId = sessionUserId(request);
+      const found = await listProjects(db, userId);
+      return { projects: found.map(serialise), ...(await projectBounds(userId, found.length)) };
     },
   });
 
@@ -260,15 +319,8 @@ export async function registerProjectRoutes(
       // US-133. A project past the plan's count is refused with the number,
       // before anything is written. An account that arrived over it keeps
       // what it has.
-      const capacity = await (options.capacityFor ?? (async () => null))(userId);
-      if (capacity) {
-        const held = (await listProjects(db, userId)).length;
-        if (held >= capacity.projects) {
-          return reply.code(422).send({
-            message: `Your plan includes ${capacity.projects} ${capacity.projects === 1 ? "project" : "projects"}, and this account already has ${held}.`,
-          });
-        }
-      }
+      const { nextBlocker } = await projectBounds(userId, (await listProjects(db, userId)).length);
+      if (nextBlocker) return reply.code(422).send({ message: nextBlocker });
 
       const project = await createProject(db, userId, request.body);
       reply.code(201);
@@ -326,7 +378,7 @@ export async function registerProjectRoutes(
 
       if (!gone) return reply.code(404).send({ message: "No such project." });
 
-      // The monitors made from it stay, unfiled. Their answers are their own.
+      // The monitors made from it went with it. US-145.
       return reply.code(204).send(null);
     },
   });

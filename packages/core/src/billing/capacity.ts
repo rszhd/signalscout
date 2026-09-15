@@ -31,6 +31,14 @@ export interface PlanCapacity {
   readonly monitors: number;
   /** How many projects the account may hold. */
   readonly projects: number;
+  /**
+   * How many projects the account may make in total, counting the ones it
+   * deleted, or null where only the count held bounds it. US-146: a delete
+   * frees the one monitor slot and a new monitor polls at once, so a trial
+   * that could create and delete without end could poll on the instance's
+   * keys as often as it liked. Three for the trial; the plan has the fuse.
+   */
+  readonly projectCreations: number | null;
   /** How many queries, in total across every platform of every monitor. */
   readonly queries: number;
   /**
@@ -74,6 +82,7 @@ const hour = 60 * 60;
 export const defaultPlanCapacity: PlanCapacity = {
   monitors: 1,
   projects: 1,
+  projectCreations: null,
   queries: 6,
   queriesPerPlatform: { linkedin: 3 },
   platforms: ["reddit", "x", "linkedin", "youtube", "tiktok", "instagram"],
@@ -98,6 +107,7 @@ export const defaultPlanCapacity: PlanCapacity = {
 export const defaultTrialCapacity: PlanCapacity = {
   monitors: 1,
   projects: 1,
+  projectCreations: 3,
   queries: 4,
   queriesPerPlatform: {},
   platforms: ["reddit", "x", "youtube", "tiktok"],
@@ -118,6 +128,7 @@ export const defaultTrialCapacity: PlanCapacity = {
  *
  *     KEYS_INCLUDED_MONITORS=1
  *     KEYS_INCLUDED_PROJECTS=1
+ *     KEYS_INCLUDED_PROJECT_CREATIONS=          in total, counting deleted; blank is no limit
  *     KEYS_INCLUDED_QUERIES=6
  *     KEYS_INCLUDED_QUERIES_LINKEDIN=3           one per platform, optional
  *     KEYS_INCLUDED_PLATFORMS=reddit,x,linkedin,youtube,tiktok,instagram
@@ -138,6 +149,8 @@ export function planCapacityFrom(
   return {
     monitors: countAt(environment, `${prefix}MONITORS`) ?? defaults.monitors,
     projects: countAt(environment, `${prefix}PROJECTS`) ?? defaults.projects,
+    projectCreations:
+      countAt(environment, `${prefix}PROJECT_CREATIONS`) ?? defaults.projectCreations,
     queries: countAt(environment, `${prefix}QUERIES`) ?? defaults.queries,
     queriesPerPlatform: Object.fromEntries(
       every

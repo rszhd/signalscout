@@ -14,6 +14,8 @@ import {
   loadEnv,
   modelCalls,
   type ProjectDescriber,
+  projectCreations,
+  projects,
   setKeySource,
   subscriptions,
   users,
@@ -159,6 +161,88 @@ describe("the project routes", () => {
 
       expect(response.statusCode).toBe(422);
       expect(response.json().message).toMatch(/includes 1 project/);
+
+      // The list says the same sentence ahead of time, so the screen can show
+      // it when the button is pressed rather than after the form is saved.
+      const list = await app.inject({ method: "GET", url: "/api/projects" });
+      expect(list.json().nextBlocker).toBe(response.json().message);
+      // The plan counts what is held and not what was ever made.
+      expect(list.json().creations).toBeNull();
+    } finally {
+      await app.close();
+      await db.delete(subscriptions);
+    }
+  });
+
+  /**
+   * US-146. A delete frees the trial's one slot and a new monitor polls at
+   * once, so a trial is held to three projects ever made, deleted or not.
+   */
+  it("refuses a trial its fourth project, however many it deleted", async () => {
+    const env = loadEnv({
+      DATABASE_URL: database.url,
+      AUTH_SECRET: "x".repeat(32),
+      AUTH_SIGNUP: "open",
+    });
+    await db
+      .insert(users)
+      .values({ id: testOwner, name: testOwner, email: `${testOwner}@example.test` })
+      .onConflictDoNothing();
+    await db.insert(subscriptions).values({
+      userId: testOwner,
+      status: "trialing",
+      trialEndsAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    });
+    await setKeySource(db, testOwner, "instance");
+    // Earlier cases leave their projects and their ledger rows behind; this
+    // case starts from the one `beforeEach` made.
+    await db.delete(projects);
+    await db.delete(projectCreations);
+    created = (await post("/api/projects", answers)).json();
+
+    const app = await buildServer({
+      session: asOwner,
+      env,
+      logger,
+      db,
+      queryGenerator: null,
+      describer: null,
+      billingSettings: {
+        mode: "stripe",
+        apiKey: "sk_test_not_a_real_key",
+        priceId: "price_own",
+        webhookSecret: "whsec_test",
+        appUrl: "https://app.example.test",
+      },
+    });
+
+    try {
+      const make = (name: string) =>
+        app.inject({ method: "POST", url: "/api/projects", payload: { ...answers, name } });
+      const drop = (id: string) => app.inject({ method: "DELETE", url: `/api/projects/${id}` });
+
+      // One held, one made. The list says two more can be made.
+      let list = (await app.inject({ method: "GET", url: "/api/projects" })).json();
+      expect(list.creations).toEqual({ made: 1, allowed: 3 });
+
+      await drop(created.id);
+      const second = await make("Second");
+      expect(second.statusCode).toBe(201);
+      await drop(second.json().id);
+      const third = await make("Third");
+      expect(third.statusCode).toBe(201);
+      await drop(third.json().id);
+
+      // Nothing held, and still refused: the count is of what was ever made.
+      const fourth = await make("Fourth");
+      expect(fourth.statusCode).toBe(422);
+      expect(fourth.json().message).toBe(
+        "Your trial includes 3 projects in total, counting any you deleted, and this account has made 3.",
+      );
+      list = (await app.inject({ method: "GET", url: "/api/projects" })).json();
+      expect(list.projects).toEqual([]);
+      expect(list.nextBlocker).toBe(fourth.json().message);
+      expect(list.creations).toEqual({ made: 3, allowed: 3 });
     } finally {
       await app.close();
       await db.delete(subscriptions);
@@ -270,6 +354,16 @@ describe("the project routes", () => {
       };
 
       expect(project.monitorCount).toBe(1);
+
+      // US-145. Deleting the project takes the monitor with it, so the slot
+      // it filled is free in the same request.
+      const monitorId = response.json().id as string;
+      expect(
+        (await app.inject({ method: "DELETE", url: `/api/projects/${created.id}` })).statusCode,
+      ).toBe(204);
+      expect(
+        (await app.inject({ method: "GET", url: `/api/monitors/${monitorId}` })).statusCode,
+      ).toBe(404);
     } finally {
       await app.close();
     }

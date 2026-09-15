@@ -2,6 +2,22 @@
   flex-shrink: 0;
   white-space: nowrap;
 }
+/* The button and, once pressed, the sentence that says why it opens nothing. */
+.new-project-blocked {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-3);
+  max-width: 28rem;
+}
+.new-project-blocked .form-error {
+  margin: 0;
+  text-align: left;
+}
+.project-empty .new-project-blocked {
+  align-items: center;
+  margin: 0 auto;
+}
 .projects-content {
   max-width: var(--page-content-width);
   margin: 0 auto;
@@ -166,6 +182,27 @@
   border-top: 1px solid var(--line);
 }
 .project-text-button,
+.project-row-tools {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+.project-delete-dialog {
+  width: min(460px, calc(100% - var(--space-8)));
+}
+.project-delete-body {
+  padding: var(--space-6);
+}
+.project-delete-body p {
+  margin: 0 0 var(--space-5);
+  color: var(--muted-strong);
+  line-height: 1.6;
+}
+.project-delete-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+}
 .project-edit-button {
   border: 0;
   padding: var(--space-2) 0;

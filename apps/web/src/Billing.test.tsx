@@ -249,6 +249,29 @@ describe("the billing screen", () => {
     expect(text).not.toContain("$15");
     expect(text).not.toContain("$25");
     expect(text.toLowerCase()).not.toContain("allowance");
+    // The plan has no total ever made; the trial below does.
+    expect(text).not.toContain("counting deleted ones");
+  });
+
+  /** US-146. A trial is held to three projects ever made, and the page says so. */
+  it("tells a trial how many projects it may make in total", async () => {
+    fetched.mockImplementation(async () =>
+      json(
+        state({
+          reason: "trialing",
+          status: "trialing",
+          trialDaysLeft: 5,
+          hasBillingAccount: false,
+          keySource: "instance",
+          included: { ...soldCapacity, projectCreations: 3, queries: 4 },
+        }),
+      ),
+    );
+
+    screen = await mount(<Billing />);
+    await settle();
+
+    expect(document.body.textContent).toContain("3 projects in total, counting deleted ones");
   });
 
   it("says the month resets when the fuse blows, blames nobody and names no figure", async () => {

@@ -18,7 +18,7 @@
  */
 import { and, desc, eq, sql } from "drizzle-orm";
 import type { Database } from "../db/client.js";
-import { monitors, projects, type Signal } from "../db/schema.js";
+import { monitors, projectCreations, projects, type Signal } from "../db/schema.js";
 
 /** The four the classifier reads, plus the name a person files them under. */
 export interface ProjectAnswers {
@@ -75,21 +75,44 @@ export async function createProject(
   userId: string,
   input: CreateProjectInput,
 ): Promise<Project> {
-  const [row] = await db
-    .insert(projects)
-    .values({
-      userId,
-      name: trimmed(input.name, "name"),
-      product: trimmed(input.product, "product"),
-      idealCustomer: trimmed(input.idealCustomer, "ideal customer"),
-      problem: trimmed(input.problem, "problem"),
-      signals: [...(input.signals ?? [])],
-    })
-    .returning();
+  const row = await db.transaction(async (tx) => {
+    const [created] = await tx
+      .insert(projects)
+      .values({
+        userId,
+        name: trimmed(input.name, "name"),
+        product: trimmed(input.product, "product"),
+        idealCustomer: trimmed(input.idealCustomer, "ideal customer"),
+        problem: trimmed(input.problem, "problem"),
+        signals: [...(input.signals ?? [])],
+      })
+      .returning();
 
-  if (!row) throw new Error("The project was not created.");
+    if (!created) throw new Error("The project was not created.");
+
+    // The ledger a trial's total is counted from. US-146. Written with the
+    // project so the two cannot disagree, and never deleted from.
+    await tx.insert(projectCreations).values({ userId, projectId: created.id });
+
+    return created;
+  });
 
   return { ...row, signals: row.signals as Signal[], monitorCount: 0 };
+}
+
+/**
+ * How many projects this account has ever made, deleted ones included. US-146.
+ *
+ * Read from the ledger and not from `projects`, which forgets a deleted one —
+ * and forgetting is what the trial's limit exists to prevent.
+ */
+export async function countProjectCreations(db: Database, userId: string): Promise<number> {
+  const [row] = await db
+    .select({ count: sql<number>`count(*)::int` })
+    .from(projectCreations)
+    .where(eq(projectCreations.userId, userId));
+
+  return row?.count ?? 0;
 }
 
 /**
@@ -168,16 +191,33 @@ export async function updateProject(
 }
 
 /**
- * Delete a project. The monitors made from it stay, with their own answers.
+ * Delete a project, and the monitors made from it. US-145.
  *
- * `on delete set null` does the work; this returns whether a row went, so a
- * route can answer 404 rather than pretending.
+ * US-045 left the monitors in place, unfiled, because their answers are their
+ * own. Two later rules turned that into a trap: every address names a project
+ * (US-076), so an unfiled monitor is reachable from no screen, and the plan
+ * counts monitors across the account (US-133), so it still polls, still
+ * spends, and still fills the slot. The monitors go first, in the same
+ * transaction, and what hangs off each one cascades from it. The `set null`
+ * on `monitors.project_id` stays for a monitor made with no project at all.
+ *
+ * Returns whether a project went, so a route can answer 404 rather than
+ * pretending.
  */
 export async function deleteProject(db: Database, userId: string, id: string): Promise<boolean> {
-  const gone = await db
-    .delete(projects)
-    .where(and(eq(projects.id, id), eq(projects.userId, userId)))
-    .returning({ id: projects.id });
+  return await db.transaction(async (tx) => {
+    // Ownership is checked before anything goes, and the monitors go before
+    // the project: the other order would `set null` them first and then find
+    // nothing to delete.
+    const [owned] = await tx
+      .select({ id: projects.id })
+      .from(projects)
+      .where(and(eq(projects.id, id), eq(projects.userId, userId)));
+    if (!owned) return false;
 
-  return gone.length > 0;
+    await tx.delete(monitors).where(eq(monitors.projectId, id));
+    await tx.delete(projects).where(eq(projects.id, id));
+
+    return true;
+  });
 }

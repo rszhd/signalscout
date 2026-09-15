@@ -78,6 +78,10 @@ describe("the numbers US-134 priced the plan on", () => {
    */
   it("gives the trial four queries, daily, on neither Instagram nor LinkedIn", () => {
     expect(defaultTrialCapacity.queries).toBe(4);
+    // US-146: three projects in total, counting deleted ones, so create-and-
+    // delete is not a way to poll without end. The plan has the fuse instead.
+    expect(defaultTrialCapacity.projectCreations).toBe(3);
+    expect(defaultPlanCapacity.projectCreations).toBeNull();
     expect([...defaultTrialCapacity.platforms].sort()).toEqual([
       "reddit",
       "tiktok",
@@ -125,6 +129,16 @@ describe("reading a capacity from the environment", () => {
 
     expect(plan.queries).toBe(9);
     expect(trial.queries).toBe(2);
+  });
+
+  it("reads a total of projects ever made, for either", () => {
+    const { plan, trial } = capacitiesFrom({
+      KEYS_INCLUDED_PROJECT_CREATIONS: "5",
+      KEYS_INCLUDED_TRIAL_PROJECT_CREATIONS: "2",
+    });
+
+    expect(plan.projectCreations).toBe(5);
+    expect(trial.projectCreations).toBe(2);
   });
 
   /**

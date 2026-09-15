@@ -56,6 +56,16 @@ smaller — four queries, daily, and neither Instagram nor LinkedIn. Every
 number is a variable under `KEYS_INCLUDED_`, read at boot, with those figures
 as the defaults.
 
+**A trial may make three projects in total, deleted ones counted.** US-146.
+Deleting a project takes its monitor, which frees the trial's one slot, and a
+new monitor polls at the next tick — so create-and-delete was a way to poll on
+the instance's keys as often as one liked. The count is read from
+`project_creations`, a ledger nothing deletes from, and the fourth is refused
+with the total. The plan has no such count: what bounds a paying account is
+the fuse, and since US-146 `api_usage.monitor_id` is not a foreign key, so a
+row outlives its monitor and deleting and re-creating does not reset what the
+fuse has counted.
+
 It is enforced in three places and the third is the one that matters. A write
 past it is refused with the number — monitor create and update, and project
 create. The scheduler does not send a poll for a monitor polling faster than

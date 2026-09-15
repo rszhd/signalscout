@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { messageFor, requestJson } from "./api.js";
+import { Button } from "./components/Button.js";
+import { Dialog } from "./components/Dialog.js";
 import { paths } from "./route.js";
 
 /**
@@ -164,6 +166,132 @@ function DraftFromDocument({
 }
 
 /**
+ * The way into the editor, or the sentence that says why there is none. US-133.
+ *
+ * On the instance's keys the plan carries a project count, and the list route
+ * answers the refusal beside the projects. Pressing the button then shows it
+ * here, rather than after four fields have been typed and saved.
+ */
+function NewProjectButton({ blocker, children }: { blocker: string | null; children: string }) {
+  const [shown, setShown] = useState(false);
+
+  if (!blocker) {
+    return (
+      <Link className="primary-button" to={paths.newProject}>
+        {children}
+      </Link>
+    );
+  }
+
+  return (
+    <div className="new-project-blocked">
+      <button className="primary-button" type="button" onClick={() => setShown(true)}>
+        {children}
+      </button>
+      {shown && (
+        <p className="form-error" role="alert">
+          {blocker}
+        </p>
+      )}
+    </div>
+  );
+}
+
+/**
+ * Delete, behind a dialog that says what goes. US-145.
+ *
+ * The monitors made from the project go with it, and the dialog names how
+ * many, because an unfiled monitor would be reachable from no screen and
+ * would keep polling. A refusal is the server's own sentence.
+ */
+/** The total a trial may ever make, counting deleted ones. US-146. */
+interface Creations {
+  made: number;
+  allowed: number;
+}
+
+function DeleteProject({
+  project,
+  creations,
+  onDeleted,
+}: {
+  project: Project;
+  creations: Creations | null;
+  onDeleted: () => void;
+}) {
+  const dialog = useRef<HTMLDialogElement>(null);
+  const [busy, setBusy] = useState(false);
+  const [problem, setProblem] = useState<string | null>(null);
+  const count = project.monitorCount;
+  const monitors =
+    count === 0
+      ? "It has no monitors."
+      : count === 1
+        ? "Its 1 monitor goes with it, with everything it found."
+        : `Its ${count} monitors go with it, with everything they found.`;
+
+  async function remove() {
+    setBusy(true);
+    setProblem(null);
+    try {
+      await requestJson<null>(`/api/projects/${project.id}`, { method: "DELETE" });
+      dialog.current?.close();
+      onDeleted();
+    } catch (cause) {
+      setProblem(messageFor(cause, "The project could not be deleted."));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <>
+      <button
+        className="project-edit-button"
+        type="button"
+        aria-haspopup="dialog"
+        aria-label={`Delete ${project.name}`}
+        onClick={() => dialog.current?.showModal()}
+      >
+        Delete
+      </button>
+      <Dialog
+        className="project-delete-dialog"
+        titleId={`delete-title-${project.id}`}
+        closeLabel="Close without deleting"
+        dialogRef={dialog}
+        onClose={() => setProblem(null)}
+        heading={<h2 id={`delete-title-${project.id}`}>Delete {project.name}?</h2>}
+      >
+        <div className="project-delete-body">
+          <p>{monitors} This cannot be undone.</p>
+          {creations && (
+            <p>
+              {creations.allowed - creations.made > 0
+                ? `Your trial includes ${creations.allowed} projects in total, counting deleted ones. This account has made ${creations.made}, so ${creations.allowed - creations.made} more can be made after this.`
+                : `Your trial includes ${creations.allowed} projects in total, counting deleted ones, and this account has made ${creations.made}. No more can be made after this.`}
+            </p>
+          )}
+          {problem && (
+            <p className="form-error" role="alert">
+              {problem}
+            </p>
+          )}
+          <footer className="project-delete-actions">
+            <Button disabled={busy} onClick={() => dialog.current?.close()}>
+              Cancel
+            </Button>
+            <Button variant="primary" disabled={busy} onClick={() => void remove()}>
+              {busy ? "Deleting…" : "Delete project"}
+            </Button>
+          </footer>
+        </div>
+      </Dialog>
+    </>
+  );
+}
+
+/**
  * The list of projects, and the way into the two editor pages.
  *
  * There is no editor state on this screen any more. A project is made and
@@ -173,6 +301,8 @@ function DraftFromDocument({
  */
 export function Projects() {
   const [projects, setProjects] = useState<Project[]>([]);
+  const [blocker, setBlocker] = useState<string | null>(null);
+  const [creations, setCreations] = useState<Creations | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -180,8 +310,14 @@ export function Projects() {
     setLoading(true);
     setError(null);
     try {
-      const answer = await requestJson<{ projects: Project[] }>("/api/projects");
+      const answer = await requestJson<{
+        projects: Project[];
+        nextBlocker?: string | null;
+        creations?: Creations | null;
+      }>("/api/projects");
       setProjects(answer.projects);
+      setBlocker(answer.nextBlocker ?? null);
+      setCreations(answer.creations ?? null);
     } catch (cause) {
       setError(messageFor(cause, "The projects could not be loaded."));
     } finally {
@@ -202,9 +338,7 @@ export function Projects() {
             Your businesses and the conversations that matter to each.
           </p>
         </div>
-        <Link className="primary-button" to={paths.newProject}>
-          New project
-        </Link>
+        <NewProjectButton blocker={blocker}>New project</NewProjectButton>
       </header>
 
       <div className="projects-content">
@@ -231,9 +365,7 @@ export function Projects() {
                 No projects yet. Add your product, audience and the problem you solve. Your next
                 monitor starts with its answers filled in.
               </p>
-              <Link className="primary-button" to={paths.newProject}>
-                Create your first project
-              </Link>
+              <NewProjectButton blocker={blocker}>Create your first project</NewProjectButton>
             </div>
           ) : (
             <>
@@ -261,9 +393,16 @@ export function Projects() {
                             : `${project.monitorCount} monitor${project.monitorCount === 1 ? "" : "s"}`}
                         </small>
                       </div>
-                      <Link className="project-edit-button" to={paths.editProject(project.id)}>
-                        Edit
-                      </Link>
+                      <div className="project-row-tools">
+                        <Link className="project-edit-button" to={paths.editProject(project.id)}>
+                          Edit
+                        </Link>
+                        <DeleteProject
+                          project={project}
+                          creations={creations}
+                          onDeleted={() => void load()}
+                        />
+                      </div>
                     </div>
                     <p className="project-product">{project.product}</p>
                     <div className="project-audience">

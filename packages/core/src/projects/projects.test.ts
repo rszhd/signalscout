@@ -11,9 +11,10 @@
 import { eq } from "drizzle-orm";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { createDatabase, type Database } from "../db/client.js";
-import { monitors, projects } from "../db/schema.js";
+import { monitors, projectCreations, projects } from "../db/schema.js";
 import { createTestDatabase, type TestDatabase } from "../testing/database.js";
 import {
+  countProjectCreations,
   createProject,
   deleteProject,
   getProject,
@@ -48,6 +49,7 @@ afterAll(async () => {
 beforeEach(async () => {
   await db.delete(monitors);
   await db.delete(projects);
+  await db.delete(projectCreations);
 });
 
 async function insertMonitorIn(projectId: string | null, name = "A monitor") {
@@ -165,18 +167,53 @@ describe("editing a project", () => {
 });
 
 describe("deleting a project", () => {
-  it("leaves the monitors made from it, with their answers", async () => {
+  /**
+   * US-145 reversed US-045 here. An unfiled monitor is reachable from no
+   * screen since every address names a project, and it keeps polling and
+   * filling the plan's one slot — so it goes with the project.
+   */
+  it("takes the monitors made from it, and leaves every other monitor alone", async () => {
     const project = await createProject(db, userId, answers);
-    const monitor = await insertMonitorIn(project.id);
+    const other = await createProject(db, userId, { ...answers, name: "Other" });
+    const inside = await insertMonitorIn(project.id);
+    const elsewhere = await insertMonitorIn(other.id, "Elsewhere");
+    const unfiled = await insertMonitorIn(null, "Unfiled");
 
     expect(await deleteProject(db, userId, project.id)).toBe(true);
 
-    const [after] = await db.select().from(monitors).where(eq(monitors.id, monitor.id));
+    const left = await db.select({ id: monitors.id }).from(monitors);
+    const ids = left.map((row) => row.id);
 
-    // The monitor survives, unfiled rather than deleted. Its answers are its
-    // own, so nothing it needs went with the project.
-    expect(after?.projectId).toBeNull();
-    expect(after?.product).toBe(answers.product);
+    expect(ids).not.toContain(inside.id);
+    expect(ids).toContain(elsewhere.id);
+    expect(ids).toContain(unfiled.id);
+  });
+
+  /**
+   * US-146. A delete frees the trial's one slot, so the count a trial is held
+   * to is of projects ever made, and a delete must not lower it.
+   */
+  it("does not lower the count of projects this account has made", async () => {
+    expect(await countProjectCreations(db, userId)).toBe(0);
+
+    const first = await createProject(db, userId, answers);
+    await createProject(db, userId, { ...answers, name: "Second" });
+    expect(await countProjectCreations(db, userId)).toBe(2);
+
+    await deleteProject(db, userId, first.id);
+    expect(await countProjectCreations(db, userId)).toBe(2);
+    // Another account's projects are not this account's count.
+    expect(await countProjectCreations(db, "someone-else")).toBe(0);
+  });
+
+  it("touches nothing when the project is not this person's", async () => {
+    const theirs = await createProject(db, "someone-else", answers);
+    const monitor = await insertMonitorIn(theirs.id);
+
+    expect(await deleteProject(db, userId, theirs.id)).toBe(false);
+
+    const [after] = await db.select().from(monitors).where(eq(monitors.id, monitor.id));
+    expect(after?.id).toBe(monitor.id);
   });
 
   it("says so when there was nothing to delete", async () => {

@@ -45,6 +45,8 @@ export interface BillingState {
   included: {
     monitors: number;
     projects: number;
+    /** How many may ever be made, deleted ones counted, or null. US-146. */
+    projectCreations?: number | null;
     queries: number;
     queriesPerPlatform: Record<string, number>;
     platforms: string[];
@@ -81,6 +83,9 @@ function joinNames(names: readonly string[]): string {
 export function capacityLines(capacity: NonNullable<BillingState["included"]>): string[] {
   const lines = [
     `${countLabel(capacity.monitors, "monitor")} in ${countLabel(capacity.projects, "project")}`,
+    ...(capacity.projectCreations == null
+      ? []
+      : [`${countLabel(capacity.projectCreations, "project")} in total, counting deleted ones`]),
     `${countLabel(capacity.queries, "search", "searches")} in total`,
   ];
 

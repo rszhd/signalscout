@@ -93,6 +93,9 @@ describe("the poll step", () => {
   afterEach(async () => {
     await db.delete(posts);
     await db.delete(monitors);
+    // US-146: a usage row outlives its monitor, so the fuse forgets nothing.
+    // The cases below count rows, so each starts from none.
+    await db.delete(apiUsage);
   });
 
   it("stores what the source returned and hands the ids to the filter step", async () => {

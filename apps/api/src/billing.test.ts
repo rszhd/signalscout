@@ -362,6 +362,8 @@ describe("the billing routes", () => {
       expect(body.included).toEqual({
         monitors: 1,
         projects: 1,
+        // The plan is bounded by the fuse, not by a total ever made. US-146.
+        projectCreations: null,
         queries: 6,
         queriesPerPlatform: { linkedin: 3 },
         platforms: ["reddit", "x", "linkedin", "youtube", "tiktok", "instagram"],

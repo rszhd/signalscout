@@ -16,6 +16,7 @@ import { recordModelCall } from "../ai/record.js";
 import { setKeySource } from "../billing/key-source.js";
 import { createDatabase, type Database } from "../db/client.js";
 import { accountKeySource, apiUsage, modelCalls, monitors, users } from "../db/schema.js";
+import { deleteMonitor } from "../monitors/monitors.js";
 import { createTestDatabase, type TestDatabase } from "../testing/database.js";
 import {
   accountBudgetState,
@@ -255,6 +256,25 @@ describe("the account's month, read from both ledgers", () => {
 
     await model(id, null, 4_000_000);
     await source(id, null, 1_000_000);
+
+    expect((await accountSpend(db, id, now)).totalMicros).toBe(5_000_000);
+  });
+
+  /**
+   * US-146. Both ledgers keep their rows when the monitor goes. Before this
+   * `api_usage` cascaded, so deleting and re-creating a monitor reset the
+   * provider half of the month — and on the plan that lends our keys, a delete
+   * is one button on the projects screen.
+   */
+  it("still counts what a deleted monitor spent", async () => {
+    const id = await account("deleter");
+    const monitorId = await monitorFor(id);
+
+    await source(id, monitorId, 3_000_000);
+    await model(id, monitorId, 2_000_000);
+    expect((await accountSpend(db, id, now)).totalMicros).toBe(5_000_000);
+
+    await deleteMonitor(db, monitorId);
 
     expect((await accountSpend(db, id, now)).totalMicros).toBe(5_000_000);
   });

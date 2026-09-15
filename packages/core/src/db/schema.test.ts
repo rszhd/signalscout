@@ -916,9 +916,11 @@ describe("usage and budgets", () => {
     );
   });
 
-  it("forgets the usage and the cap when the monitor is deleted", async () => {
-    // Unlike `model_calls`, which survives its post. A monitor that is gone
-    // has no bill page to read, and nothing else joins to these rows.
+  it("keeps the usage and forgets the cap when the monitor is deleted", async () => {
+    // The cap is the monitor's own and goes with it. The usage stays, with
+    // the gone monitor's id: US-146, because the account fuse sums this table
+    // by account for the month, and a row that cascaded away was money the
+    // fuse forgot — deleting and re-creating a monitor reset the count.
     const monitorId = await insertMonitor();
 
     await insertUsage({ monitor_id: monitorId });
@@ -927,7 +929,7 @@ describe("usage and budgets", () => {
 
     expect(
       (await sql.query("SELECT id FROM api_usage WHERE monitor_id = $1", [monitorId])).rows,
-    ).toHaveLength(0);
+    ).toHaveLength(1);
     expect(
       (await sql.query("SELECT monitor_id FROM budgets WHERE monitor_id = $1", [monitorId])).rows,
     ).toHaveLength(0);

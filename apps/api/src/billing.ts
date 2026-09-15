@@ -187,6 +187,8 @@ const billingStateSchema = z.object({
        */
       monitors: z.number().int(),
       projects: z.number().int(),
+      /** How many may ever be made, deleted ones counted, or null. US-146. */
+      projectCreations: z.number().int().nullable(),
       queries: z.number().int(),
       queriesPerPlatform: z.record(z.string(), z.number().int()),
       platforms: z.array(z.string()),
@@ -287,6 +289,7 @@ export async function registerBillingRoutes(
             : {
                 monitors: capacity.monitors,
                 projects: capacity.projects,
+                projectCreations: capacity.projectCreations,
                 queries: capacity.queries,
                 queriesPerPlatform: Object.fromEntries(
                   Object.entries(capacity.queriesPerPlatform).filter(

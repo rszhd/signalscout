@@ -456,6 +456,24 @@ export const projects = pgTable("projects", {
 });
 
 /**
+ * One row per project an account has ever made. US-146.
+ *
+ * A trial is allowed three projects in total, counting the ones it deleted,
+ * because a delete frees the trial's one monitor slot and a new monitor polls
+ * at once — so create-and-delete was a way to poll on the instance's keys as
+ * often as one liked. The rows on `projects` cannot say this: a deleted
+ * project is gone. This ledger is never deleted from, and `project_id` is kept
+ * only for reading; it is not a foreign key, so the project going does not
+ * take the row.
+ */
+export const projectCreations = pgTable("project_creations", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: text("user_id").notNull(),
+  projectId: uuid("project_id").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+/**
  * The reply instructions a person has saved. US-040.
  *
  * **Owned by the account, not by a project.** The owner asked for it that way
@@ -1286,12 +1304,20 @@ export const apiUsage = pgTable(
      * the same reason and says the same thing — the call is on the bill and on
      * no monitor's cap.
      *
+     * Since US-146 it is not a foreign key, so a row outlives its monitor and
+     * keeps that monitor's id. The account fuse (US-129) sums this table by
+     * account for the month, and a row that cascaded away with its monitor was
+     * money the fuse forgot — deleting and re-creating a monitor must not
+     * reset what an account has spent of the instance's. `set null` was the
+     * other way, and the unique key below has `nullsNotDistinct`, so two
+     * monitors deleted on one day would have collided in the cost-test row.
+     *
      * A null row is therefore money no cap can see. That is the honest reading
      * of it: a cap guards the worker, which spends at 02:00 with nobody
      * watching, and the cost test spends only when a person presses a button
      * and is shown the price. docs/costs.md says so to the user.
      */
-    monitorId: uuid("monitor_id").references(() => monitors.id, { onDelete: "cascade" }),
+    monitorId: uuid("monitor_id"),
     /**
      * Which account on this instance the money is spent by. BUG-009.
      *

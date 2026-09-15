@@ -342,6 +342,7 @@ export {
   pollOutcomes,
   pollStopReasons,
   posts,
+  projectCreations,
   projects,
   providers,
   queryEstimateProbes,
@@ -528,6 +529,7 @@ export {
 } from "./projects/document.js";
 export {
   type CreateProjectInput,
+  countProjectCreations,
   createProject,
   deleteProject,
   getProject,

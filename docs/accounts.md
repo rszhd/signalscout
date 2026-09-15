@@ -305,6 +305,13 @@ environment. Monitors, projects, matches, verdicts and reply voices are the
 account's as well. [docs/secrets.md](secrets.md), *Whose key is it*, covers the
 rule.
 
+**Deleting a project deletes the monitors made from it, and everything under
+them.** US-145. Every address names a project, so a monitor left without one
+would be reachable from no screen while it kept polling — and on the instance's
+keys it would keep filling the one slot the plan carries. The dialog names the
+count before anything goes. A monitor made with no project, from before
+projects existed, is not touched.
+
 ---
 
 ## Upgrading an instance that already has data

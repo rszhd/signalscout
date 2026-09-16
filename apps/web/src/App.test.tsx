@@ -317,7 +317,7 @@ describe("the application screens", () => {
     // are machine-level screens — one set of keys, one set of prices, every
     // project — so neither carries one. US-058.
     expect(projectLinks).toEqual(["/projects"]);
-    expect(accountLinks).toEqual(["/connections", "/reply-voices", "/models"]);
+    expect(accountLinks).toEqual(["/connections", "/reply-voices"]);
   });
 
   /**
@@ -489,7 +489,7 @@ describe("the application screens", () => {
     // mockup route and must stay off the nav: a link that leads nowhere is
     // worse than no link.
     expect(projectLinks).toEqual(["/projects", inbox, monitors, newMonitor]);
-    expect(accountLinks).toEqual(["/connections", "/reply-voices", "/models"]);
+    expect(accountLinks).toEqual(["/connections", "/reply-voices"]);
     expect(screen.container.textContent).not.toContain("Settings");
   });
 
@@ -514,7 +514,7 @@ describe("the application screens", () => {
       link.getAttribute("href"),
     );
 
-    expect(sheetLinks).toEqual(["/connections", "/reply-voices", "/models"]);
+    expect(sheetLinks).toEqual(["/connections", "/reply-voices"]);
     expect(screen.container.querySelector(".account-sheet .sign-out")).not.toBeNull();
   });
 
@@ -575,7 +575,7 @@ describe("the application screens", () => {
     const accountLinks = [
       ...screen.container.querySelectorAll(".sidebar-bottom .account-nav a"),
     ].map((link) => link.getAttribute("href"));
-    expect(accountLinks).toEqual(["/connections", "/reply-voices", "/models"]);
+    expect(accountLinks).toEqual(["/connections", "/reply-voices"]);
 
     await screen.go("/connections");
     expect(screen.container.textContent).toContain("Provider accounts");
@@ -589,7 +589,7 @@ describe("the application screens", () => {
     const accountLinks = [
       ...screen.container.querySelectorAll(".sidebar-bottom .account-nav a"),
     ].map((link) => link.getAttribute("href"));
-    expect(accountLinks).toEqual(["/connections", "/reply-voices", "/models"]);
+    expect(accountLinks).toEqual(["/connections", "/reply-voices"]);
   });
 
   it("opens account-level reply voices without asking for a project", async () => {

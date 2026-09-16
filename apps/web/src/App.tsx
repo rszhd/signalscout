@@ -355,9 +355,7 @@ export function App() {
    */
   return (
     <Routes>
-      <Route
-        element={<Shell status={status} billingState={billingState} managedKeys={managedKeys} />}
-      >
+      <Route element={<Shell status={status} billingState={billingState} />}>
         <Route path={routes.projects} element={<Projects />} />
         {/*
           The project editor's own address. US-045's editor used to be a state
@@ -531,11 +529,9 @@ function NavIcon({ name }: { readonly name: NavIconName }) {
 function Shell({
   status,
   billingState,
-  managedKeys,
 }: {
   readonly status: AuthStatus;
   readonly billingState: BillingState | null;
-  readonly managedKeys: boolean;
 }) {
   const projectId = useProjectId();
   const listing = useMatch(routes.monitors) !== null;
@@ -549,7 +545,6 @@ function Shell({
   const projecting = listingProjects || addingProject || editingProject;
   const connecting = useMatch(routes.connections) !== null;
   const voicing = useMatch(routes.replyVoices) !== null;
-  const modelling = useMatch(routes.models) !== null;
   const billing = useMatch(routes.billing) !== null;
   const accountSheet = useRef<HTMLDialogElement | null>(null);
 
@@ -563,16 +558,6 @@ function Shell({
         <NavIcon name="voices" />
         <span>Voices</span>
       </Link>
-      {/*
-        Beside Providers rather than inside a project: a model key is one
-        account's, for every project it runs. US-068.
-      */}
-      {!managedKeys && (
-        <Link className={modelling ? "nav-item current" : "nav-item"} to={paths.models}>
-          <NavIcon name="models" />
-          <span>AI models</span>
-        </Link>
-      )}
       {/*
         Only where this instance charges. US-072. A self-hosted instance
         has no subscription, so a Billing link there would open a page

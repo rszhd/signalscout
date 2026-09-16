@@ -280,6 +280,8 @@ describe("one monitor's page", () => {
       // Nor on the poll sentence.
       expect(text).toContain("Last poll: 5 posts, 2 new");
       expect(text).not.toContain("$0.0056");
+      // Nor the provider behind each platform, which is the deployment's.
+      expect(text).not.toContain("Last collection");
       expect(text).not.toContain("Monthly budget");
       expect(text).not.toContain("Which posts the AI reads");
       expect(container.querySelector(".monitor-schedule-zone")).toBeNull();

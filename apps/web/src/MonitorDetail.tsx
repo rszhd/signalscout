@@ -628,43 +628,50 @@ export function MonitorDetail({
               </section>
             )}
 
-            <section className="monitor-detail-section collection-settings-section">
-              <div className="monitor-section-heading">
-                <div>
-                  <p className="monitor-section-label">Sources</p>
-                  <h2 className="monitor-detail-title">Last collection</h2>
+            {/*
+              The provider behind each platform is plumbing the plan that lends
+              the keys hides everywhere else (US-143), so it is not shown here
+              either.
+            */}
+            {!onCapacity && (
+              <section className="monitor-detail-section collection-settings-section">
+                <div className="monitor-section-heading">
+                  <div>
+                    <p className="monitor-section-label">Sources</p>
+                    <h2 className="monitor-detail-title">Last collection</h2>
+                  </div>
                 </div>
-              </div>
-              {/* Who actually collected, which is not always who would collect
+                {/* Who actually collected, which is not always who would collect
                   now: the choice can be changed and this is the record of what
                   ran. Read from the ledger, so the moment is when money was last
                   spent on that pair. US-026. */}
-              {monitor.lastCollected.length === 0 ? (
-                <p className="monitor-origin">No collections recorded yet.</p>
-              ) : (
-                <ul className="collection-list">
-                  {monitor.lastCollected.map((one) => (
-                    <li key={`${one.source}-${one.provider}`}>
-                      <span className="brand-label">
-                        <BrandIcon brand={one.source} size={16} />
-                        {platformName(one.source)}
-                      </span>
-                      <span className="collection-provider">
-                        <BrandIcon brand={one.provider} size={14} />
-                        {providerName(one.provider)}
-                      </span>
-                      {/* The exact moment stays in the tooltip. "2 hours ago"
+                {monitor.lastCollected.length === 0 ? (
+                  <p className="monitor-origin">No collections recorded yet.</p>
+                ) : (
+                  <ul className="collection-list">
+                    {monitor.lastCollected.map((one) => (
+                      <li key={`${one.source}-${one.provider}`}>
+                        <span className="brand-label">
+                          <BrandIcon brand={one.source} size={16} />
+                          {platformName(one.source)}
+                        </span>
+                        <span className="collection-provider">
+                          <BrandIcon brand={one.provider} size={14} />
+                          {providerName(one.provider)}
+                        </span>
+                        {/* The exact moment stays in the tooltip. "2 hours ago"
                           answers "did it run this morning?", and the timestamp
                           answers "which row on the invoice?" — two questions, and
                           only the first is asked here. */}
-                      <time dateTime={one.at} title={new Date(one.at).toLocaleString()}>
-                        {ageLabel(one.at)}
-                      </time>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </section>
+                        <time dateTime={one.at} title={new Date(one.at).toLocaleString()}>
+                          {ageLabel(one.at)}
+                        </time>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </section>
+            )}
 
             <section className="monitor-detail-section collection-settings-section">
               <div className="monitor-section-heading">

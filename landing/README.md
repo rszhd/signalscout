@@ -58,7 +58,7 @@ $20 USD per month after a seven-day trial. **The price is Stripe's**, held in
 the object `STRIPE_PRICE_ID` names, and this page states it because a static
 build cannot read it — so the figure here is a copy, and BUG-014 is what
 happens when a copy is left behind. The trial figure is US-072's, held in
-`trialDays` in `packages/core/src/billing/entitlement.ts`; change the page only
+`trialDays` in `apps/api/src/billing/entitlement.ts`; change the page only
 when that constant changes. The page claims no card is asked for, which
 is true because sign-up writes the trial row itself and creates nothing in
 Stripe until somebody opens Checkout. The FAQ says what running out does:
@@ -73,10 +73,10 @@ Set it to the real signup or checkout destination before publishing.
 
 The providers section names who fetches the posts and who reads them. The data
 providers and the platforms beside each are the connectors the application
-ships — `builtInSources` in `packages/core/src/sources/index.ts` — and only the
+ships — `builtInSources` in `packages/engine/src/sources/index.ts` — and only the
 pairs that are offered: SocialCrawl also has a LinkedIn connector, switched off
 by US-053, so LinkedIn names Apify alone. The model providers are
-`aiProviders` in `packages/core/src/ai/config.ts`. Update this section when a
+`aiProviders` in `packages/engine/src/ai/config.ts`. Update this section when a
 connector is added or switched off. **The heading counts nothing on purpose** —
 "five who fetch" was true on the day it was written and stops being true the
 next time a provider is added, and a headline is the last place anybody looks

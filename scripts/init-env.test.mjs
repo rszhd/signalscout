@@ -11,7 +11,7 @@
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { encryptionKeyIsWellFormed } from "@signalscout/core";
+import { encryptionKeyIsWellFormed } from "@signalscout/pipeline";
 import { beforeEach, describe, expect, it } from "vitest";
 import { ensureEnvFile, readEnvFile } from "./init-env.mjs";
 

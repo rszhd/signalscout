@@ -390,7 +390,7 @@ The sketch this plan started from was three members: an id,
 wider, because three facts about billing and throttling were missing here and
 each one, left out, ends up copied into the worker: a page carries a cost as
 well as a cursor, back-off belongs to the connector, and a source declares its
-own price. `packages/core/src/sources/types.ts` is the interface, and its
+own price. `packages/engine/src/sources/types.ts` is the interface, and its
 comments say why each member exists.
 
 This makes additional integrations easy for both us and community contributors.

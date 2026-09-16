@@ -57,13 +57,17 @@ const platformIcons = Object.fromEntries(
  * Who fetches the posts, and which platforms each one covers.
  *
  * This mirrors the connectors the application ships — `builtInSources` in
- * `packages/core/src/sources/index.ts` — in the same order, and it lists only
+ * `packages/pipeline/src/sources/index.ts` — in the same order, and it lists only
  * the pairs that are offered. SocialCrawl also has a LinkedIn connector, and
  * it is switched off (US-053), so LinkedIn names Apify alone here.
  */
 const dataProviders = [
   { name: "Bright Data", url: "https://brightdata.com/", platforms: ["Reddit"] },
-  { name: "ScrapeCreators", url: "https://scrapecreators.com/", platforms: ["Reddit"] },
+  {
+    name: "ScrapeCreators",
+    url: "https://scrapecreators.com/",
+    platforms: ["Reddit", "YouTube", "TikTok"],
+  },
   {
     name: "SocialCrawl",
     url: "https://www.socialcrawl.dev/",
@@ -74,7 +78,7 @@ const dataProviders = [
 ];
 
 /**
- * Who reads the posts. `aiProviders` in `packages/core/src/ai/config.ts`, with
+ * Who reads the posts. `aiProviders` in `packages/pipeline/src/ai/config.ts`, with
  * the one difference worth stating on a marketing page: Anthropic publishes no
  * embedding endpoint, so it cannot serve the similarity job.
  */

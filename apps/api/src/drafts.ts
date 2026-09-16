@@ -12,7 +12,7 @@
  * social publishing on the "what we are NOT building" list, and this feature
  * ends at the clipboard.
  */
-import type { AiConfig, Database } from "@signalscout/core";
+import type { AiConfig, Database } from "@signalscout/pipeline";
 import {
   budgetStates,
   createDrafter,
@@ -24,7 +24,7 @@ import {
   recordModelCall,
   replyVoicePresets,
   updateReplyPrompt,
-} from "@signalscout/core";
+} from "@signalscout/pipeline";
 import { z } from "zod";
 import { sessionUserId } from "./auth.js";
 import type { ApiServer } from "./server.js";

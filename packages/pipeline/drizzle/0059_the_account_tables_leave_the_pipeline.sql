@@ -1,0 +1,11 @@
+-- US-153. The six account tables — users, sessions, accounts, verifications,
+-- subscriptions, user_onboarding — are the application's now, applied by its
+-- own migration stream (apps/api/drizzle) under its own migrations table.
+--
+-- drizzle-kit generated six DROP TABLE ... CASCADE statements here, because
+-- the tables left this schema. They are not run. The rows are every login
+-- and every subscription an instance has, and the application's first
+-- migration expects to find them present. This file exists so the snapshot
+-- beside it stops describing tables this stream no longer owns; it changes
+-- nothing in the database.
+SELECT 1;

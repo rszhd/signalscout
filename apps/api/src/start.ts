@@ -1,18 +1,19 @@
-import type { Env, JobSender, Logger, WorkerHandle } from "@signalscout/core";
+import type { JobSender, Logger, WorkerHandle } from "@signalscout/pipeline";
 import {
   allStoredCredentialNames,
   assertStoredCredentialsAreReadable,
-  billingSettingsFrom,
   builtInSources,
   configureNetworking,
   createDatabase,
-  emailVerificationRequired,
   jobSenderFor,
   startBlockers,
   startJobSender as startJobSenderDefault,
   startWorker as startWorkerDefault,
   storedCredentialNames,
-} from "@signalscout/core";
+} from "@signalscout/pipeline";
+import { emailVerificationRequired } from "./auth/verification.js";
+import { billingSettingsFrom, subscriptionGate } from "./billing/index.js";
+import type { Env } from "./config/env.js";
 import { type ApiServer, buildServer as buildServerDefault } from "./server.js";
 
 export interface StartApiOptions {
@@ -37,7 +38,7 @@ export interface ApiHandle {
  * Start the API, and the worker with it when WORKER_IN_PROCESS is true.
  *
  * The two modes share this one function. A separate worker container runs the
- * same `startWorker` from `apps/worker`, so "in process" and "own container"
+ * same `startWorker` that `worker.ts` runs alone, so "in process" and "own container"
  * differ in where the process boundary falls and in nothing else.
  */
 export async function startApi({
@@ -104,14 +105,6 @@ export async function startApi({
   // requests failed with what looked like an outage.
   configureNetworking();
 
-  const worker = env.WORKER_IN_PROCESS
-    ? await startWorker({ databaseUrl: env.DATABASE_URL, logger, billing: env.BILLING_MODE })
-    : null;
-
-  if (!worker) {
-    logger.info("WORKER_IN_PROCESS is false; expecting a separate worker container");
-  }
-
   // The API's own pool, separate from the worker's. They have different
   // shapes of load — short reads against long jobs — and one pool shared
   // between them would let a slow poll hold connections a request is waiting
@@ -119,6 +112,20 @@ export async function startApi({
   const { db, close } = openDatabase(env.DATABASE_URL, {
     onError: (error) => logger.error({ err: error }, "an idle database connection failed"),
   });
+
+  const worker = env.WORKER_IN_PROCESS
+    ? await startWorker({
+        databaseUrl: env.DATABASE_URL,
+        logger,
+        // The scheduler asks this once a tick, on the API's pool: one short
+        // read, which is the shape of load this pool is for.
+        entitled: subscriptionGate(db, env.BILLING_MODE),
+      })
+    : null;
+
+  if (!worker) {
+    logger.info("WORKER_IN_PROCESS is false; expecting a separate worker container");
+  }
 
   /**
    * The credential store, checked before the first request.

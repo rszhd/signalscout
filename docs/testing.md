@@ -19,7 +19,7 @@ its reasoning is written before the code. The test ships in the same commit as
 the feature it covers. Not test-first everywhere, and not test-later.
 
 **The fastest fake that still catches the bug you care about.** Most assertions
-belong in plain unit tests over `packages/core`, which needs no database, no
+belong in plain unit tests over `packages/engine`, which needs no database, no
 network and no clock. Reach for a heavier shape only when the lighter one
 cannot hold the claim up.
 
@@ -29,7 +29,7 @@ layer takes lies about the thing the other must verify.**
 Say the lie out loud before writing the second test: name the failure it
 catches that the first one cannot. For ordinary CRUD, one test from the route
 to the database covers the routing and the persistence together. A second test
-in `packages/core` earns its place when the rule has a caller the first test
+in `packages/pipeline` earns its place when the rule has a caller the first test
 never reaches — which is what US-012 found, with the monitor routes' counts
 asserted nowhere while the rule under them passed.
 
@@ -57,6 +57,14 @@ Two of our load-bearing pieces are exactly what such a fake gets wrong:
 `pgvector` distance, and `pg-boss` claiming a job. A uniquely named database per
 test file, migrations applied, dropped after, costs a few hundred milliseconds.
 Pay it.
+
+**Two migration streams, one database.** Since US-153 the pipeline's tables
+come from `packages/pipeline/drizzle` and the account tables from
+`apps/api/drizzle`, each under its own migrations table. A pipeline test gets
+the pipeline's stream; a test in `apps/api` uses that package's own
+`createTestDatabase`, which applies both. Each stream has a
+`migrations.test.ts` holding it to the same rules, and `pnpm db:generate` runs
+`drizzle-kit` for both.
 
 **No test spends money.** No test may reach the Reddit API, the X API, or a
 model provider.
@@ -222,7 +230,7 @@ the ticket that changed the prompt.
 
 Both halves are one command:
 
-    pnpm --filter @signalscout/core capture:classifier
+    pnpm --filter @signalscout/engine capture:classifier
 
 It scores the four examples against a live model, records the answers as the
 fixtures `ai/examples.test.ts` replays, and prints the scores. The bands that
@@ -322,13 +330,13 @@ number is right.
 Three of ours are exactly this shape:
 
 - the pre-filter similarity threshold (US-008) — the instrument is
-  `packages/core/src/ai/fixtures/capture-embeddings.ts`, and the numbers it
+  `packages/engine/src/ai/fixtures/capture-embeddings.ts`, and the numbers it
   produced on 2026-09-05 are in the ticket and replayed by
   `ai/similarity.test.ts`. Five posts is a gap, not a distribution, so the
   second instrument is the `filter_drops` table: it records the similarity of
   every post the threshold refused, which is what moves the number next
 - the minimum score that makes a match (US-009) — the instrument is
-  `packages/core/src/ai/fixtures/capture.ts`, and the numbers it produced are
+  `packages/engine/src/ai/fixtures/capture.ts`, and the numbers it produced are
   in the ticket
 - the weight of age against score in the inbox ordering (US-011)
 
@@ -408,6 +416,13 @@ watched fail is worth exactly as much as an assertion nobody has watched fail.
 
 `pnpm test` uses a real Postgres and creates a database per test file. If it
 cannot reach one it says so; it does not fall back to a fake.
+
+**Which Postgres is the folder's own.** The suite reads `DATABASE_URL` from the
+`.env` beside it. In the main checkout that is the container `pnpm db:up`
+starts, on 5432. In a worktree made by `scripts/new-worktree.mjs` it is that
+worktree's own container, on a port of its own, under its own
+`COMPOSE_PROJECT_NAME` — which is what lets two agents run the suite at the same
+time without crossing the `max_connections` ceiling described below. US-135.
 
 **It can go red without a broken test.** A database per file, run in parallel,
 can outrun Postgres `max_connections` of 100: a file fails with "sorry, too

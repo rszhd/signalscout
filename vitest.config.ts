@@ -4,13 +4,21 @@ import { defineConfig } from "vitest/config";
 export default defineConfig({
   resolve: {
     alias: {
-      // Tests run against core's source, so `pnpm test` needs no build first.
+      // Tests run against the packages' source, so `pnpm test` needs no build first.
       // The longer specifier is first: an alias is matched in order, and
-      // "@signalscout/core" is a prefix of "@signalscout/core/testing".
-      "@signalscout/core/testing": fileURLToPath(
-        new URL("./packages/core/src/testing/index.ts", import.meta.url),
+      // "@signalscout/pipeline" is a prefix of "@signalscout/pipeline/testing".
+      "@signalscout/pipeline/testing": fileURLToPath(
+        new URL("./packages/pipeline/src/testing/index.ts", import.meta.url),
       ),
-      "@signalscout/core": fileURLToPath(new URL("./packages/core/src/index.ts", import.meta.url)),
+      "@signalscout/pipeline": fileURLToPath(
+        new URL("./packages/pipeline/src/index.ts", import.meta.url),
+      ),
+      "@signalscout/engine/testing": fileURLToPath(
+        new URL("./packages/engine/src/testing/index.ts", import.meta.url),
+      ),
+      "@signalscout/engine": fileURLToPath(
+        new URL("./packages/engine/src/index.ts", import.meta.url),
+      ),
     },
   },
   test: {

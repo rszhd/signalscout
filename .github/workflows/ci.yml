@@ -65,6 +65,12 @@ jobs:
       - run: pnpm build
       - run: pnpm test
 
+      # What `pnpm publish` would ship, installed into an empty project and
+      # used from there. Nothing else in the suite imports the built packages,
+      # so this is the only check that the published shape works. US-154.
+      - name: The packed packages install and work outside the workspace
+        run: pnpm release:verify
+
   image:
     name: Build and publish the image
     runs-on: ubuntu-latest

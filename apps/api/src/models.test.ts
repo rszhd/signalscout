@@ -13,14 +13,13 @@ import {
   createDatabase,
   createLogger,
   type Database,
-  loadEnv,
   modelCalls,
   readAiEnvironment,
-} from "@signalscout/core";
-import { createTestDatabase, type TestDatabase } from "@signalscout/core/testing";
+} from "@signalscout/pipeline";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
+import { loadEnv } from "./config/env.js";
 import { buildServer } from "./server.js";
-import { asUser } from "./testing.js";
+import { asUser, createTestDatabase, type TestDatabase } from "./testing.js";
 
 const logger = createLogger({ level: "silent", name: "test" });
 const encryptionKey = "Zy8Qb3lVQe1wJc0nT7sD5aR2xK9mP4hG6uV0yB8eN1o=";

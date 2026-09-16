@@ -97,9 +97,19 @@ matches no project-scoped route and the catch-all sends it to choose one.
 
 **The UI shares one theme.** Read [docs/design.md](docs/design.md) before changing a screen. Colors and sizing live in `apps/web/src/styles/tokens.css`; shared controls live in `styles/theme.css`. Keep page layout separate, and migrate the remaining screens one at a time.
 
-**`packages/core` imports neither Fastify nor React.** The API and the worker
-both call into it. This is the one architectural rule in the repository. If a
-change seems to need it, the change is wrong.
+**`packages/engine` is stateless, `packages/pipeline` owns only its tables,
+and neither knows an account.** The engine holds connectors, model calls, the
+pre-filter, the estimate and the cipher: input in, result and cost out. It
+declares no `pg`, `drizzle-orm`, `pg-boss`, `better-auth` or `stripe`, imports
+nothing from another package, and reads no `process.env` — a key or a model
+name is an argument. The pipeline is the stateful half: monitors, posts,
+matches, cursors, the budget, the jobs. It imports the engine, never the
+reverse, and it imports neither Fastify, React, Better Auth nor Stripe. It
+knows an owner as `user_id text` and never joins a users table; who may log
+in, who has paid and who may poll are `apps/api`'s — auth, billing and the
+entitlement gate the scheduler is handed. `engine-boundary.test.ts` and
+`pipeline-boundary.test.ts` say all of this to CI. If a change seems to need
+one of them broken, the change is wrong. US-151 says where this is going.
 
 **A red test is fixed in the code, not in the assertion.** An expected value
 changes only when the behaviour was meant to change, and the commit says which
@@ -124,12 +134,15 @@ shipped as `?comment_id=`, which the connector invented; it survived a capture,
 two live polls and a code comment admitting it was a guess, because nobody
 pressed it. Open one.
 
-**A value added to an array in `schema.ts` is not a value the database
-accepts.** `modelCallPurposes`, the provider enum and their siblings are also
-check constraints, and TypeScript does not know that. This has shipped three
-times — `apify`, `draft_reply`, `key_test` — and each time a full suite passed,
-the call succeeded, the money was spent, and recording it failed. Write the
-migration in the same change.
+**A value added to an array in `schema.ts` or `vocabulary.ts` is not a value
+the database accepts.** `modelCallPurposes` in the schema, and `sources`,
+`providers`, `intentTypes` and their siblings in
+`packages/engine/src/vocabulary.ts`, are also check constraints, and
+TypeScript does not know that. This has shipped three times — `apify`,
+`draft_reply`, `key_test` — and each time a full suite passed, the call
+succeeded, the money was spent, and recording it failed. The array is now one
+package away from the migration, which makes forgetting easier, not harder.
+Write the migration in the same change.
 
 **Scoping a route means scoping every read in it.** BUG-009 scoped the keys on
 the providers page and left the spend, the counts and the verdicts answering
@@ -137,7 +150,28 @@ for the whole instance, so a new account saw somebody else's numbers. Nothing
 went red, because nothing on that page was scoped by a test. Count the reads.
 
 **One migration number, one file.** Two branches that each take the next number
-merge cleanly and break at boot.
+merge cleanly and break at boot. Two agents in two worktrees make this likelier,
+not rarer, because neither one can see the other's file.
+
+**A worktree gets its ports and its data from the script, not by hand.**
+`node scripts/new-worktree.mjs <name>` gives the folder a slot — its own API
+port, Vite port and Postgres container — and seeds it with a copy of the main
+database so a screen has something on it. It is placed at `worktrees/<name>`
+*inside* the main checkout, so one editor window opened there lists every
+worktree's changes in one source-control view. `.gitignore` and `.dockerignore`
+both carry the folder; a worktree that is also untracked content of the
+repository it sits in shows up in `git status` and is walked by `pnpm lint`. **Every monitor in a copy is paused**,
+because a copy carries real schedules and real provider keys, and a worker
+started in a folder nobody is watching will poll and bill. Unpause one on
+purpose when you need a poll, and never seed a worktree by copying `.env` by
+hand: two folders on one port migrate one database.
+
+**Remove a worktree with `scripts/remove-worktree.mjs <name>`, not with `git
+worktree remove`.** Git deletes the folder and leaves the container, the network
+and the data volume, and it has no hook this could be attached to. The next
+`new-worktree.mjs` reports whatever was left behind, so forgetting is visible
+rather than silent. Neither command deletes a branch: a folder and a copied
+database can be made again, and commits cannot.
 
 **A migration file is not a migration until `meta/_journal.json` names it.** The
 migrator walks the journal and never the directory, and so does the test
@@ -145,6 +179,11 @@ harness — so a file with no entry is applied nowhere, and the whole suite pass
 against a database missing the column. `pnpm db:generate` writes both halves;
 BUG-012 restored it after fourteen migrations were written by hand without it.
 `db/migrations.test.ts` is what fails now, by name, when the two disagree.
+There are two streams since US-153 — `packages/pipeline/drizzle` for the
+pipeline's tables and `apps/api/drizzle` for the account tables — each with
+its own journal and its own migrations table, and `pnpm db:generate` runs
+both. A table goes in the stream that owns it; the pipeline never joins an
+account table.
 
 **This file is not a changelog, and it grew to 25,000 words by being used as
 one.** A closed ticket's evidence belongs in its own **Log**, and the rule it
@@ -226,37 +265,41 @@ pnpm db:generate              # drizzle-kit generate, after a schema change
 docker compose up             # the published image: Postgres, migrations, the app
 
 pnpm db:rotate-key            # re-encrypt stored credentials under a new key
+pnpm release:verify           # pack both packages and use them from outside the workspace
+
+node scripts/new-worktree.mjs <name>    # a worktree with its own ports and a copy of the database
+node scripts/remove-worktree.mjs <name> # the folder, and the Postgres that came with it
 
 backlog/index.sh              # rebuild OPEN.md and DONE.md — run after any ticket change
 backlog/index.sh --check      # exit 1 if either list is stale
 
-pnpm --filter @signalscout/core capture:classifier   # spends money
-pnpm --filter @signalscout/core capture:queries      # spends money
-pnpm --filter @signalscout/core capture:embeddings   # spends money
-pnpm --filter @signalscout/core capture:comment-filter # spends money
-pnpm --filter @signalscout/core capture:triage        # spends money
-pnpm --filter @signalscout/core live:model-probe      # one call, a fraction of a cent
-pnpm --filter @signalscout/core live:provider-switch # spends ~$0.08
-pnpm --filter @signalscout/core live:linkedin-poll   # spends ~$0.08 + model
-pnpm --filter @signalscout/core live:x-poll          # spends ~$0.002 + model
-pnpm --filter @signalscout/core live:sc-tiktok-poll   # spends ~$0.004 + model
-pnpm --filter @signalscout/core live:sc-youtube-poll  # spends ~$0.004 + model
-pnpm --filter @signalscout/core live:apify-linkedin-poll # spends ~$0.05 + model
-pnpm --filter @signalscout/core live:tiktok-poll     # spends ~$0.20 + model
-pnpm --filter @signalscout/core live:tiktok-comments # spends model only
-pnpm --filter @signalscout/core live:instagram-poll   # spends ~$1.65 + model
-pnpm --filter @signalscout/core live:instagram-comments # spends model only
-pnpm --filter @signalscout/core live:thread-loop      # spends up to a cap you pass
-pnpm --filter @signalscout/core live:notification      # spends model only
-pnpm --filter @signalscout/core live:webhook           # spends nothing
-pnpm --filter @signalscout/core measure:lead-position # spends ~$0.40
+pnpm --filter @signalscout/engine capture:classifier   # spends money
+pnpm --filter @signalscout/engine capture:queries      # spends money
+pnpm --filter @signalscout/engine capture:embeddings   # spends money
+pnpm --filter @signalscout/engine capture:comment-filter # spends money
+pnpm --filter @signalscout/engine capture:triage        # spends money
+pnpm --filter @signalscout/pipeline live:model-probe      # one call, a fraction of a cent
+pnpm --filter @signalscout/pipeline live:provider-switch # spends ~$0.08
+pnpm --filter @signalscout/pipeline live:linkedin-poll   # spends ~$0.08 + model
+pnpm --filter @signalscout/pipeline live:x-poll          # spends ~$0.002 + model
+pnpm --filter @signalscout/pipeline live:sc-tiktok-poll   # spends ~$0.004 + model
+pnpm --filter @signalscout/pipeline live:sc-youtube-poll  # spends ~$0.004 + model
+pnpm --filter @signalscout/pipeline live:apify-linkedin-poll # spends ~$0.05 + model
+pnpm --filter @signalscout/pipeline live:tiktok-poll     # spends ~$0.20 + model
+pnpm --filter @signalscout/pipeline live:tiktok-comments # spends model only
+pnpm --filter @signalscout/pipeline live:instagram-poll   # spends ~$1.65 + model
+pnpm --filter @signalscout/pipeline live:instagram-comments # spends model only
+pnpm --filter @signalscout/pipeline live:thread-loop      # spends up to a cap you pass
+pnpm --filter @signalscout/pipeline live:notification      # spends model only
+pnpm --filter @signalscout/pipeline live:webhook           # spends nothing
+pnpm --filter @signalscout/pipeline measure:lead-position # spends ~$0.40
 pnpm capture:deletions                            # spends ~$0.02
 
-node packages/core/src/sources/providers/socialcrawl/linkedin-fixtures/capture.mjs   # ~30 credits
-node packages/core/src/sources/providers/socialcrawl/instagram-fixtures/capture.mjs  # 24 credits, or 14 with --lean
-node packages/core/src/sources/providers/scrapecreators/tiktok-fixtures/capture.mjs   # 9 credits
-node packages/core/src/sources/providers/scrapecreators/youtube-fixtures/capture.mjs  # 8 credits
-node packages/core/src/sources/providers/scrapecreators/instagram-fixtures/capture.mjs # 6 credits
+node packages/engine/src/sources/providers/socialcrawl/linkedin-fixtures/capture.mjs   # ~30 credits
+node packages/engine/src/sources/providers/socialcrawl/instagram-fixtures/capture.mjs  # 24 credits, or 14 with --lean
+node packages/engine/src/sources/providers/scrapecreators/tiktok-fixtures/capture.mjs   # 9 credits
+node packages/engine/src/sources/providers/scrapecreators/youtube-fixtures/capture.mjs  # 8 credits
+node packages/engine/src/sources/providers/scrapecreators/instagram-fixtures/capture.mjs # 6 credits
 ```
 
 Everything from `capture:` down spends real money, and every one of them is an

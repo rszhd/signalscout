@@ -1,0 +1,97 @@
+name: Release
+
+# A version is a tag. Pushing `v1.2.3` runs every check main runs, builds the
+# image, and then publishes @signalscout/engine and @signalscout/pipeline to
+# npm at 1.2.3 — both, at one version, because the pipeline depends on the
+# engine at that exact version and nothing has tested them mixed. A tag that
+# is not on main is refused: a release is a commit main has, or it is not a
+# release. docs/releasing.md says how to cut one. US-154.
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  on-main:
+    name: The tag points at a commit on main
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - run: |
+          git fetch origin main --depth=1000
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then
+            echo "::error::${GITHUB_REF_NAME} points at ${GITHUB_SHA}, which is not on main. Merge first, then tag."
+            exit 1
+          fi
+
+  ci:
+    needs: on-main
+    uses: ./.github/workflows/ci.yml
+    permissions:
+      contents: read
+      packages: write
+
+  publish:
+    name: Publish both packages to npm
+    needs: ci
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    # The same Postgres the check job has, because release:verify runs the
+    # pipeline's migrations from the packed tarball against a real database.
+    services:
+      postgres:
+        image: pgvector/pgvector:pg17
+        env:
+          POSTGRES_USER: intentwatch
+          POSTGRES_PASSWORD: intentwatch
+          POSTGRES_DB: intentwatch
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U intentwatch"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - run: corepack enable
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+
+      # The tag is the version. The manifests say 0.0.0 in git on purpose:
+      # a number in a file is a number somebody forgets to move, and two
+      # packages with two numbers would say they can be mixed.
+      - name: Set both versions from the tag
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          for package in engine pipeline; do
+            (cd "packages/$package" && pnpm version "$version" --no-git-tag-version)
+          done
+
+      - name: The packed packages install and work outside the workspace
+        run: pnpm release:verify
+        env:
+          DATABASE_URL: postgres://intentwatch:intentwatch@localhost:5432/intentwatch
+
+      - name: Publish
+        run: pnpm --filter "./packages/*" publish --access public --no-git-checks --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

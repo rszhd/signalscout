@@ -243,7 +243,7 @@ The mask is stored in its own column. Showing which key is set therefore
 decrypts nothing, and there is no route in the API that returns a stored
 credential. `apps/api/src/credentials.test.ts` asserts that against every route
 this build registers — the connections routes included — and
-`packages/core/src/secrets/leak.test.ts` asserts that a credential logged by
+`packages/pipeline/src/secrets/leak.test.ts` asserts that a credential logged by
 mistake is redacted by the logger before it is written.
 
 The screen sends a typed key in the request body, never in a URL. A key in a

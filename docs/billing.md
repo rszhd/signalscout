@@ -59,19 +59,23 @@ Two paths stay open to an unpaid account — opening Checkout and opening the
 portal. Without them the paywall could not be paid.
 
 **The half that costs money is the scheduler.** A route that refuses is what a
-person sees; `findDueMonitors` not returning an unentitled owner's monitors is
-what stops our hosting, our database and our compute being spent on an account
-that stopped paying. That one is invisible from every screen, which is why it
-has its own tests in `worker/schedule.test.ts`.
+person sees; the scheduler not polling an unentitled owner's monitors is what
+stops our hosting, our database and our compute being spent on an account
+that stopped paying. That one is invisible from every screen. Since US-153 the
+pipeline does not know who has paid: the scheduler is handed an entitlement
+gate — `worker/entitlement.ts` — and `schedule.test.ts` proves that an owner
+the gate refuses is never asked to poll and that a gate that throws enqueues
+nothing. `subscriptionGate` in `apps/api/src/billing/gate.ts` is the gate this
+application passes, and `entitlement.test.ts` drives it over the same cases.
 
 ---
 
 ## Who is entitled
 
-One rule, in `packages/core/src/billing/entitlement.ts`, written twice in the
-same file: once for a row already read, and once as SQL for the scheduler's
-query. `entitlement.test.ts` drives both over the same cases, because the only
-thing worth asserting is that they agree.
+One rule, in `apps/api/src/billing/entitlement.ts`, written twice in the
+same file: once for a row already read, and once as SQL for the gate's query.
+`entitlement.test.ts` drives both over the same cases, because the only thing
+worth asserting is that they agree.
 
 | Stored status | May write and poll? |
 |---|---|

@@ -3,21 +3,14 @@ import fastifyStatic from "@fastify/static";
 import {
   type AiConfig,
   type AiEnvironment,
-  type Auth,
   aiConfigFromEnvironment,
-  type BillingProvider,
-  type BillingSettings,
-  billingSettingsFrom,
   builtInSources,
   type ConnectorDefinition,
-  createAuth,
   createNotificationTransport,
   createProjectDescriber,
   createQueryGenerator,
   type Database,
   draftConfigFromEnvironment,
-  type Env,
-  emailVerificationRequired,
   type JobSender,
   type Logger,
   machineKeysUsable,
@@ -27,10 +20,9 @@ import {
   providerKeyEnvironment,
   type QueryGenerator,
   readAiEnvironment,
-  type SendEmail,
   storedCredentialNames,
   withoutMachineModelKeys,
-} from "@signalscout/core";
+} from "@signalscout/pipeline";
 import Fastify, {
   type FastifyInstance,
   type RawReplyDefaultExpression,
@@ -44,8 +36,17 @@ import {
 } from "fastify-type-provider-zod";
 import { z } from "zod";
 import { registerAdminRoutes } from "./admin.js";
+import { type Auth, createAuth } from "./auth/auth.js";
+import { emailVerificationRequired } from "./auth/verification.js";
+import type { SendEmail } from "./auth/verification-email.js";
 import { registerAuthRoutes, type SessionResolver } from "./auth.js";
+import {
+  type BillingProvider,
+  type BillingSettings,
+  billingSettingsFrom,
+} from "./billing/index.js";
 import { registerBillingGate, registerBillingRoutes } from "./billing.js";
+import type { Env } from "./config/env.js";
 import { registerConnectionRoutes } from "./connections.js";
 import { registerDraftRoutes, registerReplyPromptRoutes } from "./drafts.js";
 import { registerEstimateRoutes } from "./estimates.js";

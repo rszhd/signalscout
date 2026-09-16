@@ -27,7 +27,7 @@ export interface AuthStatus {
 /**
  * The rule the server enforces, said before somebody types seven characters.
  *
- * A copy, and `packages/core/src/auth/auth.ts` holds the original — the bundle
+ * A copy, and `packages/pipeline/src/auth/auth.ts` holds the original — the bundle
  * cannot import core. The server is the one that refuses, so this number being
  * wrong shows up as a form that submits and comes back with an error, not as a
  * password shorter than the rule.

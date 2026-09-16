@@ -6,24 +6,29 @@
  * number stay apart — a declared price, our estimate over it, and money the
  * deployment has already spent.
  */
-import type { ConnectorDefinition, Database } from "@signalscout/core";
+import type { ConnectorDefinition, Database } from "@signalscout/pipeline";
 import {
   apiUsage,
   createDatabase,
   createLogger,
   fakeSourceDefinition,
   feedback,
-  loadEnv,
   matches,
   monitors,
   posts,
   sourceProviders,
-} from "@signalscout/core";
-import { createTestDatabase, type TestDatabase } from "@signalscout/core/testing";
+} from "@signalscout/pipeline";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
+import { loadEnv } from "./config/env.js";
 import { comparedPosts, formatMicros } from "./pricing.js";
 import { buildServer } from "./server.js";
-import { asOwner, asUser, testOwner as pageOwner } from "./testing.js";
+import {
+  asOwner,
+  asUser,
+  createTestDatabase,
+  testOwner as pageOwner,
+  type TestDatabase,
+} from "./testing.js";
 
 /**
  * Two providers for one platform, priced in different units.

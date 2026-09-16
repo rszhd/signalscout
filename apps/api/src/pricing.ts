@@ -28,7 +28,7 @@ import type {
   Database,
   PlatformDescriptor,
   ProviderId,
-} from "@signalscout/core";
+} from "@signalscout/pipeline";
 import {
   decideProvider,
   environmentVariableFor,
@@ -39,7 +39,7 @@ import {
   readProviderChoices,
   spendByPair,
   verdictCount,
-} from "@signalscout/core";
+} from "@signalscout/pipeline";
 import { z } from "zod";
 import { sessionUserId } from "./auth.js";
 import type { ApiServer } from "./server.js";

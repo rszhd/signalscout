@@ -40,7 +40,7 @@ the verification time for every match of that post.
 `pnpm capture:deletions` records a small, bounded set of live provider responses.
 It reads keys from `.env`, costs about $0.02, and never runs in the test suite.
 The captured responses and request manifest live in
-`packages/core/src/sources/deletion-fixtures/`.
+`packages/engine/src/sources/deletion-fixtures/`.
 
 Bright Data returned a normal post, an explicitly deleted post, and a
 `dead_page` record saying that the post was absent from Reddit's JSON response.

@@ -1,10 +1,10 @@
 /**
- * The half of US-004 that `packages/core` cannot assert: what an HTTP response
+ * The half of US-004 that `packages/pipeline` cannot assert: what an HTTP response
  * carries, and what the process does at boot with a credential it cannot read.
  *
  * Correctness-critical: credential encryption. The failure shape from
  * docs/testing.md is "a key reaches a log line or an API response", and the
- * log line is pinned in `packages/core/src/secrets/leak.test.ts`. This file
+ * log line is pinned in `packages/pipeline/src/secrets/leak.test.ts`. This file
  * pins the response, against real Postgres and a real server.
  */
 import {
@@ -14,18 +14,17 @@ import {
   type Database,
   generateEncryptionKey,
   listCredentialHints,
-  loadEnv,
   monitors,
   putSourceCredential,
   readEncryptionKey,
   sourceCredentials,
   UndecryptableSecretError,
-} from "@signalscout/core";
-import { createTestDatabase, type TestDatabase } from "@signalscout/core/testing";
+} from "@signalscout/pipeline";
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
+import { loadEnv } from "./config/env.js";
 import { buildServer } from "./server.js";
 import { startApi } from "./start.js";
-import { asOwner, testOwner as owner } from "./testing.js";
+import { asOwner, createTestDatabase, testOwner as owner, type TestDatabase } from "./testing.js";
 
 /**
  * US-017 refuses to boot without a session secret, before the credential

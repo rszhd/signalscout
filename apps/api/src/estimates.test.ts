@@ -15,16 +15,15 @@ import {
   type Database,
   fakeSourceDefinition,
   type JobSender,
-  loadEnv,
   monitors,
   queryEstimates,
   readEstimate,
   setBudget,
-} from "@signalscout/core";
-import { createTestDatabase, type TestDatabase } from "@signalscout/core/testing";
+} from "@signalscout/pipeline";
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
+import { loadEnv } from "./config/env.js";
 import { buildServer } from "./server.js";
-import { asOwner } from "./testing.js";
+import { asOwner, createTestDatabase, type TestDatabase } from "./testing.js";
 
 const logger = createLogger({ level: "silent", name: "test" });
 

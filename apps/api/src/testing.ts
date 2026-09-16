@@ -11,7 +11,23 @@
  * becomes a person, which is the seam `buildServer` already opens for the
  * query generator and the describer.
  */
+import {
+  createTestDatabase as createPipelineTestDatabase,
+  type TestDatabase,
+} from "@signalscout/pipeline/testing";
 import type { SessionResolver, SessionUser } from "./auth.js";
+import { runAppMigrations } from "./db/migrate.js";
+
+export type { TestDatabase };
+
+/**
+ * A database per test file, with both migration streams applied — the
+ * pipeline's and then this application's — so a test here sees the account
+ * tables the pipeline's own harness does not know about. US-153.
+ */
+export function createTestDatabase(label: string): Promise<TestDatabase> {
+  return createPipelineTestDatabase(label, { migrate: runAppMigrations });
+}
 
 /**
  * The id these tests own their rows under.

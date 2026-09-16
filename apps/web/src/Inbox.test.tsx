@@ -1039,7 +1039,7 @@ describe("the intent inbox", () => {
 
       // The count is the server's answer about rows recorded after the clock,
       // so nothing this person does to the list can appear in it. The server
-      // half is asserted in `packages/core/src/matches/matches.test.ts`.
+      // half is asserted in `packages/pipeline/src/matches/matches.test.ts`.
       expect(banner()).toBeUndefined();
     });
   });
@@ -1047,7 +1047,7 @@ describe("the intent inbox", () => {
   describe("taking the inbox away as a spreadsheet", () => {
     /**
      * US-064. The link is asserted rather than the file: the CSV itself is
-     * covered in `packages/core/src/matches/csv.test.ts`, and what the screen
+     * covered in `packages/pipeline/src/matches/csv.test.ts`, and what the screen
      * owes is that the download asks for the list a person is looking at.
      */
     it("offers an export beside the count it exports", async () => {

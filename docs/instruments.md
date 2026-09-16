@@ -75,7 +75,7 @@ monitor and two `api_usage` rows, which are the evidence. Run it when
 
 The LinkedIn capture is the sixth, and it has no `package.json` script because
 it is run by hand with a key: `node
-packages/core/src/sources/providers/socialcrawl/linkedin-fixtures/capture.mjs`.
+packages/engine/src/sources/providers/socialcrawl/linkedin-fixtures/capture.mjs`.
 It makes five billed calls at five credits each, plus four probes that are free,
 and it writes `ledger.json` beside the fixtures recording what each one cost.
 Run it when the LinkedIn parser changes. Read the fixtures it writes before you

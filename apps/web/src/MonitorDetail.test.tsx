@@ -6,7 +6,7 @@
  * moved with it unchanged wherever the behaviour did not change. US-013 asks
  * for two of them: that a poll refused by the budget says so with its reason,
  * and that the spend and what is left of the cap sit next to the monitor they
- * belong to. The rule itself belongs to `packages/core`; what this owns is
+ * belong to. The rule itself belongs to `packages/pipeline`; what this owns is
  * whether a person can see it and act on it.
  */
 import { act } from "react";

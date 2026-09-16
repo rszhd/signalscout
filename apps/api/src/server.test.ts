@@ -1,8 +1,9 @@
 import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { createDatabase, createLogger, loadEnv } from "@signalscout/core";
+import { createDatabase, createLogger } from "@signalscout/pipeline";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { loadEnv } from "./config/env.js";
 import { buildServer, verificationSenderFor } from "./server.js";
 import { asOwner } from "./testing.js";
 

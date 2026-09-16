@@ -64,4 +64,5 @@ creates the package on first publish when the scope exists.
 
 | Version | Date | What a consumer must know |
 |---|---|---|
-| 0.1.0 | — | First publish. Engine and pipeline as US-152 and US-153 left them. |
+| 0.1.0 | 2026-09-16 | First publish. Engine and pipeline as US-152 and US-153 left them. |
+| 0.1.1 | 2026-09-16 | `@signalscout/pipeline/testing` exports `insertMonitor` and `fastRetries`. Nothing else changes. |

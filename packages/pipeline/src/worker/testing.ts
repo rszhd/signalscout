@@ -19,14 +19,9 @@ import {
   type SourceRegistry,
 } from "@signalscout/engine";
 import { silentLogger, unreachableFetch } from "@signalscout/engine/testing";
-import { createDatabase } from "../db/client.js";
-import { monitors } from "../db/schema.js";
-import type { TestDatabase } from "../testing/database.js";
 
+export { fastRetries, insertMonitor } from "../testing/monitors.js";
 export { silentLogger };
-
-/** Retries a test can wait out. Production's backoff spans about an hour. */
-export const fastRetries = { retryLimit: 2, retryDelay: 0, retryBackoff: false } as const;
 
 export function fakeRegistry(
   options: FakeSourceOptions = {},
@@ -72,35 +67,6 @@ export function twoProviderRegistry(
     ),
     runtime: createSourceRuntime({ fetch: unreachableFetch, logger }),
   });
-}
-
-export async function insertMonitor(
-  database: TestDatabase,
-  overrides: Record<string, unknown> = {},
-): Promise<string> {
-  const { db, close } = createDatabase(database.url);
-
-  try {
-    const [row] = await db
-      .insert(monitors)
-      .values({
-        userId: "user-1",
-        name: "Test monitor",
-        product: "A test runner",
-        idealCustomer: "Small SaaS teams",
-        problem: "Flaky end-to-end tests",
-        sources: ["reddit"],
-        generatedQueries: ["flaky tests"],
-        ...overrides,
-      })
-      .returning({ id: monitors.id });
-
-    if (!row) throw new Error("The monitor was not inserted.");
-
-    return row.id;
-  } finally {
-    await close();
-  }
 }
 
 /**

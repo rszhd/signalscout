@@ -54,7 +54,7 @@ Three rules follow from these:
 
 ```
 apps/
-  api/          Fastify: REST endpoints, serves the built UI and /admin
+  api/          Fastify: REST endpoints, serves the built UI
     auth/       Better Auth, and who owns a row
     db/         the account tables and their own migration stream
     worker.ts   the same worker as a process of its own
@@ -73,10 +73,7 @@ packages/
     worker/     the job steps the worker process registers, and the gate
     budget/     the cap, and what a poll is allowed to spend
 
-admin/          Vite + shadcn/ui: the operator panel, served at /admin
 ```
-
-`admin/` is outside the application workspace and has its own README.
 
 ## The one rule
 

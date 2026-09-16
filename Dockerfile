@@ -15,10 +15,6 @@ COPY packages/engine/package.json packages/engine/
 COPY packages/pipeline/package.json packages/pipeline/
 COPY apps/api/package.json apps/api/
 COPY apps/web/package.json apps/web/
-# The admin panel. A workspace project whose manifest is missing here installs
-# nothing, and `pnpm build` then fails at `vite: not found` — which no local
-# build can show, because a developer's install already made its node_modules.
-COPY admin/package.json admin/
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 
 # --- build ------------------------------------------------------------------
@@ -43,7 +39,6 @@ COPY --from=build /app/packages/pipeline/drizzle packages/pipeline/drizzle
 COPY --from=build /app/apps/api/drizzle apps/api/drizzle
 COPY --from=build /app/apps/api/dist apps/api/dist
 COPY --from=build /app/apps/web/dist apps/web/dist
-COPY --from=build /app/admin/dist admin/dist
 
 # The test files are compiled with everything else. They import vitest, which
 # is not installed here, so remove them rather than ship a broken import.

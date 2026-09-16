@@ -80,16 +80,6 @@ export const envSchema = z.object({
   AUTH_URL: blankIsUnset(z.string().min(1).optional()),
 
   /**
-   * The addresses allowed to read the admin view. US-111.
-   *
-   * Comma separated. Empty means nobody is an admin, which is the safe answer
-   * for a self-hosted instance where the question never comes up. The admin
-   * endpoint returns every account's data, so this list is the security
-   * boundary and not a convenience.
-   */
-  ADMIN_EMAILS: blankIsUnset(z.string().min(1).optional()),
-
-  /**
    * Where this instance answers, for the links a notification carries. Not
    * derived from a request header: an address built from something the
    * caller controls is an address the caller chooses.

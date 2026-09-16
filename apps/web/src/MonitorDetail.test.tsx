@@ -286,7 +286,8 @@ describe("one monitor's page", () => {
       expect(text).not.toContain("Which posts the AI reads");
       expect(container.querySelector(".monitor-schedule-zone")).toBeNull();
       expect(container.querySelector('[aria-label="Poll interval"]')).toBeNull();
-      expect(text).toContain("Your trial sets the schedule, and the reading is included.");
+      expect(text).not.toContain("Monitor settings");
+      expect(text).not.toContain("sets the schedule");
       // What stays: the links out of the page.
       expect(text).toContain("Notification settings");
     });

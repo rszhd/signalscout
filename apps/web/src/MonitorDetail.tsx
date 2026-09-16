@@ -686,19 +686,16 @@ export function MonitorDetail({
           </div>
 
           <aside className="monitor-settings-panel" aria-labelledby="monitor-settings-title">
+            {/*
+              On the plan that lends the keys there is nothing to set, so the
+              panel is its two links and no heading over them.
+            */}
             <div className="monitor-settings-heading">
-              <p className="monitor-section-label">Controls</p>
+              <p className="monitor-section-label">{onCapacity ? "Links" : "Controls"}</p>
               <h2 id="monitor-settings-title" className="monitor-detail-title">
-                Monitor settings
+                {onCapacity ? "Notifications and inbox" : "Monitor settings"}
               </h2>
-              {onCapacity ? (
-                <p>
-                  {monitor.capacity?.trial ? "Your trial" : "Your plan"} sets the schedule, and the
-                  reading is included.
-                </p>
-              ) : (
-                <p>Schedule and reading changes save when you select them.</p>
-              )}
+              {!onCapacity && <p>Schedule and reading changes save when you select them.</p>}
             </div>
 
             {/*

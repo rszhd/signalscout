@@ -324,6 +324,8 @@ const pollRunSchema = z.object({
   id: z.string(),
   /** The collection this poll belongs to. Several polls share one. */
   walkId: z.string(),
+  /** Whether this poll continued a walk an earlier poll started. US-148. */
+  continued: z.boolean(),
   startedAt: z.string(),
   finishedAt: z.string(),
   outcome: z.string(),
@@ -351,6 +353,7 @@ function toPollRunResponse(run: PollRun) {
   return {
     id: run.id,
     walkId: run.walkId,
+    continued: run.continued,
     startedAt: run.startedAt.toISOString(),
     finishedAt: run.finishedAt.toISOString(),
     outcome: run.outcome,

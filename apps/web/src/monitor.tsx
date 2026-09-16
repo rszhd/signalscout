@@ -90,6 +90,8 @@ export interface PollRunSource {
 export interface PollRun {
   id: string;
   walkId: string;
+  /** Whether this poll continued a walk an earlier poll started. US-148. */
+  continued?: boolean;
   startedAt: string;
   finishedAt: string;
   outcome: string;
@@ -287,13 +289,21 @@ export function stopReasonLabel(reason: string | null): string | null {
 export function pollSummary(run: PollRun): string {
   const spent = run.units > 0 ? ` · ${formatMicros(run.estimatedCostMicros)} (estimated)` : "";
   const reason = stopReasonLabel(run.stopReason);
+  /**
+   * One walk is several rows when a page limit splits it. US-148. A row that
+   * picked up where the last one stopped says so, or four rows a minute
+   * apart read as four polls.
+   */
+  const poll = run.continued ? "Continued from the last poll" : "Last poll";
 
   if (run.outcome === "refused") {
-    return `Last poll collected nothing: ${reason ?? "it was refused"}`;
+    return `${poll} collected nothing: ${reason ?? "it was refused"}`;
   }
 
   if (run.outcome === "failed") {
-    return `The last poll failed${spent}`;
+    return run.continued
+      ? `Continued from the last poll, and failed${spent}`
+      : `The last poll failed${spent}`;
   }
 
   if (run.outcome === "waiting") {
@@ -302,7 +312,7 @@ export function pollSummary(run: PollRun): string {
 
   if (run.outcome === "empty") {
     const because = reason ? `, and ${reason}` : "";
-    return `Last poll found no posts${because}${spent}`;
+    return `${poll} found no posts${because}${spent}`;
   }
 
   /**
@@ -318,10 +328,10 @@ export function pollSummary(run: PollRun): string {
 
   if (lost.length > 0) {
     const names = lost.map((entry) => platformName(entry.source)).join(", ");
-    return `Last poll: ${run.postsReturned} posts, ${run.postsNew} new${spent} · ${names} failed`;
+    return `${poll}: ${run.postsReturned} posts, ${run.postsNew} new${spent} · ${names} failed`;
   }
 
-  return `Last poll: ${run.postsReturned} posts, ${run.postsNew} new${spent}`;
+  return `${poll}: ${run.postsReturned} posts, ${run.postsNew} new${spent}`;
 }
 
 /** When this monitor is due to try again, or null when nothing is scheduled. */

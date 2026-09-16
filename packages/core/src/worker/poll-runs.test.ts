@@ -413,13 +413,18 @@ describe("reading a monitor's polls back", () => {
   });
 
   /** One row, written `secondsAgo` before now so the order is a fact and not a race. */
-  async function write(monitorId: string, userId: string, secondsAgo: number) {
+  async function write(
+    monitorId: string,
+    userId: string,
+    secondsAgo: number,
+    walkId = crypto.randomUUID(),
+  ) {
     const at = new Date(Date.now() - secondsAgo * 1000);
 
     return await recordPollRun(db, {
       monitorId,
       userId,
-      walkId: crypto.randomUUID(),
+      walkId,
       startedAt: at,
       finishedAt: at,
       outcome: "empty",
@@ -478,6 +483,31 @@ describe("reading a monitor's polls back", () => {
 
     // The monitor is theirs; the rows belong to somebody else.
     expect(await readPollRuns(db, "stranger", mine)).toEqual([]);
+  });
+
+  /**
+   * US-148. A walk split by the page limit is several rows, and the screen
+   * says which rows picked up an earlier one so four rows a minute apart do
+   * not read as four polls. Read from the walk id, so it is true for rows
+   * written before this existed.
+   */
+  it("says which polls continued a walk an earlier poll started", async () => {
+    const monitorId = await insertMonitor(database);
+    const walk = crypto.randomUUID();
+
+    const first = await write(monitorId, "user-1", 30, walk);
+    const second = await write(monitorId, "user-1", 20, walk);
+    const fresh = await write(monitorId, "user-1", 10);
+
+    expect(first.continued).toBe(false);
+    expect(second.continued).toBe(true);
+    expect(fresh.continued).toBe(false);
+
+    const read = await readPollRuns(db, "user-1", monitorId);
+    expect(read.map((run) => run.continued)).toEqual([false, true, false]);
+
+    const latest = await latestPollRuns(db, "user-1", [monitorId]);
+    expect(latest.get(monitorId)?.continued).toBe(false);
   });
 
   it("gives the list screen one row per monitor", async () => {

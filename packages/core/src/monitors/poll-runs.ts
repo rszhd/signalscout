@@ -20,7 +20,7 @@
  * production run. `walkFor` is what groups them, so a screen shows one
  * collection rather than fifteen failures.
  */
-import { and, desc, eq, inArray, sql } from "drizzle-orm";
+import { and, desc, eq, getTableColumns, inArray, lt, sql } from "drizzle-orm";
 import type { Database } from "../db/client.js";
 import {
   monitors,
@@ -60,7 +60,29 @@ export interface PollRunRecord {
 
 export interface PollRun extends PollRunRecord {
   readonly id: string;
+  /**
+   * Whether this poll picked up a walk an earlier poll started. US-148.
+   *
+   * A paging walk resumes itself through the queue, so one collection is
+   * several rows, and a row that reads "Last poll: 72 posts" three times over
+   * looks like three polls. Read from `walk_id`: an earlier row sharing it
+   * means this one continued it.
+   */
+  readonly continued: boolean;
 }
+
+/**
+ * True where an earlier poll of the same walk exists.
+ *
+ * The outer columns are written out with their table, because Drizzle renders
+ * a column inside a select list bare — `"walk_id"` — and inside the subquery
+ * that bare name resolves to `earlier`, comparing every row with itself.
+ */
+const continuedColumn = sql<boolean>`exists (
+  select 1 from ${pollRuns} as earlier
+  where earlier.walk_id = "poll_runs"."walk_id"
+    and earlier.started_at < "poll_runs"."started_at"
+)`;
 
 /**
  * Which collection this poll belongs to.
@@ -116,6 +138,12 @@ export async function recordPollRun(db: Database, record: PollRunRecord): Promis
 
   if (!row) throw new Error("The poll run was not recorded.");
 
+  const [earlier] = await db
+    .select({ id: pollRuns.id })
+    .from(pollRuns)
+    .where(and(eq(pollRuns.walkId, record.walkId), lt(pollRuns.startedAt, record.startedAt)))
+    .limit(1);
+
   await db.execute(sql`
     DELETE FROM ${pollRuns}
     WHERE monitor_id = ${record.monitorId}
@@ -127,7 +155,7 @@ export async function recordPollRun(db: Database, record: PollRunRecord): Promis
       )
   `);
 
-  return toPollRun(row);
+  return toPollRun({ ...row, continued: earlier !== undefined });
 }
 
 /**
@@ -153,7 +181,7 @@ export async function readPollRuns(
   if (!owned) return [];
 
   const rows = await db
-    .select()
+    .select({ ...getTableColumns(pollRuns), continued: continuedColumn })
     .from(pollRuns)
     .where(and(eq(pollRuns.monitorId, monitorId), eq(pollRuns.userId, userId)))
     .orderBy(desc(pollRuns.startedAt))
@@ -178,7 +206,7 @@ export async function latestPollRuns(
    * thirty.
    */
   const rows = await db
-    .select()
+    .select({ ...getTableColumns(pollRuns), continued: continuedColumn })
     .from(pollRuns)
     .where(
       and(
@@ -194,9 +222,10 @@ export async function latestPollRuns(
   return new Map(rows.map((row) => [row.monitorId, toPollRun(row)]));
 }
 
-function toPollRun(row: typeof pollRuns.$inferSelect): PollRun {
+function toPollRun(row: typeof pollRuns.$inferSelect & { continued: boolean }): PollRun {
   return {
     id: row.id,
+    continued: row.continued,
     monitorId: row.monitorId,
     userId: row.userId,
     walkId: row.walkId,

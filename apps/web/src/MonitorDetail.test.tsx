@@ -98,6 +98,23 @@ describe("one monitor's page", () => {
       expect(container.textContent).toContain("due now");
     });
 
+    /** US-148. A row that picked up an earlier walk says so. */
+    it("says when the last poll continued an earlier one", async () => {
+      await show(
+        monitor({
+          lastPoll: poll({
+            continued: true,
+            outcome: "collected",
+            postsReturned: 72,
+            postsNew: 48,
+          }),
+        }),
+      );
+
+      expect(container.textContent).toContain("Continued from the last poll: 72 posts, 48 new");
+      expect(container.textContent).not.toContain("Last poll: 72");
+    });
+
     it("says a monitor that has never polled has never polled", async () => {
       await show(monitor({ lastPolledAt: null, lastPoll: null }));
 

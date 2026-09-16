@@ -91,7 +91,9 @@ jobs:
         env:
           DATABASE_URL: postgres://intentwatch:intentwatch@localhost:5432/intentwatch
 
+      # No token. Each package on npm lists this repository and this workflow
+      # file as a trusted publisher, and npm accepts the job's OIDC token in
+      # place of a secret — that is what `id-token: write` above is for, and
+      # why `registry-url` is set on the Node step. US-156.
       - name: Publish
         run: pnpm --filter "./packages/*" publish --access public --no-git-checks --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

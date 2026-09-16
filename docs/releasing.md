@@ -55,10 +55,11 @@ against the Postgres `pnpm db:up` starts. It packs, installs into
 
 ## Secrets
 
-`NPM_TOKEN` in the repository's Actions secrets: an npm automation token
-for the `@signalscout` scope, with publish rights on both packages. The
-first publish of each package must be done with the token as well; npm
-creates the package on first publish when the scope exists.
+None. Each package on npm lists `rszhd/signalscout` and `release.yml` as a
+trusted publisher, so the release job authenticates with the OIDC token
+GitHub mints for it, and no npm token exists anywhere. US-154 published the
+first version with a granular access token because a package has to exist
+before npm will trust a workflow to publish it; US-156 replaced the token.
 
 ## Versions
 
@@ -66,3 +67,4 @@ creates the package on first publish when the scope exists.
 |---|---|---|
 | 0.1.0 | 2026-09-16 | First publish. Engine and pipeline as US-152 and US-153 left them. |
 | 0.1.1 | 2026-09-16 | `@signalscout/pipeline/testing` exports `insertMonitor` and `fastRetries`. Nothing else changes. |
+| 0.1.2 | 2026-09-16 | Published through trusted publishing, without a token. No code change. |

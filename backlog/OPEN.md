@@ -2,7 +2,7 @@
 
 # Open tickets
 
-31 open — 15 doing, 15 todo, 1 parked (10 p1, 17 p2, 4 p3).
+36 open — 15 doing, 20 todo, 1 parked (15 p1, 17 p2, 4 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -16,6 +16,11 @@
 | p1 | BUG-004 | [The model half of a poll is not capped](doing/BUG-004-the-model-half-of-a-poll-is-not-capped.md) | bug | doing | 2026-09-06T04:42+08:00 |
 | p1 | BUG-016 | [One platform's outage throws away another platform's collection](doing/BUG-016-one-platforms-outage-throws-away-another-platforms-collection.md) | bug | doing | 2026-09-10T10:44+08:00 |
 | p1 | US-033 | [Thirty verdicts say whether the score is right](todo/US-033-thirty-verdicts-say-whether-the-score-is-right.md) | chore | todo | 2026-09-06T03:02+08:00 |
+| p1 | US-151 | [The repository splits into an engine, a pipeline and two apps](todo/US-151-the-repository-splits-into-an-engine-a-pipeline-and-two-apps.md) | chore | todo | 2026-09-16T13:45+08:00 |
+| p1 | US-152 | [The stateless half of core becomes the engine](todo/US-152-the-stateless-half-of-core-becomes-the-engine.md) | chore | todo | 2026-09-16T13:46+08:00 |
+| p1 | US-153 | [What is left of core becomes the pipeline](todo/US-153-what-is-left-of-core-becomes-the-pipeline.md) | chore | todo | 2026-09-16T13:47+08:00 |
+| p1 | US-154 | [The engine and the pipeline are published to npm](todo/US-154-the-engine-and-the-pipeline-are-published-to-npm.md) | chore | todo | 2026-09-16T13:48+08:00 |
+| p1 | US-155 | [The cloud version moves to its own repository](todo/US-155-the-cloud-version-moves-to-its-own-repository.md) | chore | todo | 2026-09-16T13:49+08:00 |
 | p2 | US-015 | [A deleted post stops being shown](doing/US-015-a-deleted-post-stops-being-shown.md) | feature | doing | 2026-09-04T22:49+08:00 |
 | p2 | US-017 | [A self-hosted instance has one account](doing/US-017-a-self-hosted-instance-has-one-account.md) | feature | doing | 2026-09-04T22:49+08:00 |
 | p2 | US-020 | [A monitor can include comments and replies](doing/US-020-a-monitor-can-include-comments-and-replies.md) | feature | doing | 2026-09-05T01:18+08:00 |

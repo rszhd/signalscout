@@ -16,7 +16,7 @@
  */
 import { desc, eq, sql } from "drizzle-orm";
 import type { Database } from "../db/client.js";
-import { monitors, projects, type Signal, type Source } from "../db/schema.js";
+import { type KeySource, monitors, projects, type Signal, type Source } from "../db/schema.js";
 import {
   defaultNotificationSettings,
   saveNotificationSettings,
@@ -110,6 +110,13 @@ export interface CreateMonitorInput extends MonitorAnswers, MonitorPlan, Monitor
    * second, and it applies the credential rule the same as ever.
    */
   readonly startPaused?: boolean;
+  /**
+   * Whose keys the account is on as this monitor is made. US-150. The monitor
+   * belongs to them and runs on no others where the deployment charges. The
+   * route passes the account's state; absent means the instance's, which is
+   * every self-hosted monitor.
+   */
+  readonly keySource?: KeySource;
 }
 
 /** Everything the rules below need to know about the deployment. */
@@ -417,6 +424,7 @@ export async function createMonitor(
       generatedSubreddits: [...input.subreddits],
       sources: [...input.sources],
       ...(input.projectId === undefined ? {} : { projectId: input.projectId }),
+      ...(input.keySource === undefined ? {} : { keySource: input.keySource }),
       ...(input.minScore === undefined ? {} : { minScore: input.minScore }),
       ...(input.pollDays === undefined ? {} : { pollDays: [...input.pollDays] }),
       ...(input.pollTimezone === undefined ? {} : { pollTimezone: input.pollTimezone }),

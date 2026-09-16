@@ -28,6 +28,7 @@ import { type PlanCapacity, platformDue, queriesWithin } from "../billing/capaci
 import { checkAccountBudget } from "../budget/account.js";
 import { enforceBudget, recordSourceUsage } from "../budget/budget.js";
 import {
+  type KeySource,
   maxResumeAttempts,
   monitors,
   type PollOutcome,
@@ -104,6 +105,13 @@ export interface CollectOptions {
    * their own interval, and how many queries a platform may send.
    */
   readonly capacityFor?: (userId: string) => Promise<PlanCapacity | null>;
+  /**
+   * Whose keys this monitor's owner is on. US-150. A monitor made on the
+   * other keys is refused, because the scheduler's filter is one tick old by
+   * the time a job runs. Optional, and undefined checks nothing, which is
+   * every self-hosted instance: there is no switch there.
+   */
+  readonly keySourceFor?: (userId: string) => Promise<KeySource>;
 }
 
 /** What one connector returned in one poll. US-013 records the units against a budget. */
@@ -273,6 +281,7 @@ export function createCollectStep({
   registry,
   credentialsFor,
   accountCapFor = async () => null,
+  keySourceFor,
   choicesFor,
   capacityFor = async () => null,
 }: CollectOptions): Step<PollPayload> {
@@ -410,6 +419,21 @@ export function createCollectStep({
        * account switched off after the month turned over, waiting for somebody
        * to notice and resume them one at a time.
        */
+      /**
+       * The monitor belongs to the keys it was made on. US-150. Checked
+       * before either cap, because it spends nothing and the sentence is the
+       * one a person acts on: switch keys, or make a monitor on these.
+       */
+      if (keySourceFor && (await keySourceFor(monitor.userId)) !== monitor.keySource) {
+        logger.info(
+          { monitorId, madeOn: monitor.keySource },
+          "poll refused: the monitor was made on the other keys",
+        );
+        stopReason = "other_keys";
+        await finish("refused");
+        return;
+      }
+
       const account = await checkAccountBudget(
         db,
         monitor.userId,

@@ -164,6 +164,15 @@ describe("the monitor list", () => {
       expect(container.textContent).not.toContain("Found nothing");
     });
 
+    /** US-150. A monitor made on the other keys reads as stopped, above every other state. */
+    it("labels a monitor made on the other keys, whatever else it says", async () => {
+      await show([monitor({ keySource: "own", runsOnCurrentKeys: false, paused: true })]);
+
+      const pill = container.querySelector(".monitor-status");
+      expect(pill?.textContent?.trim()).toBe("On other keys");
+      expect(pill?.className).toContain("stopped");
+    });
+
     /** US-133. On the plan that lends the keys, no figure is the account's. */
     it("shows no figure in dollars on the plan that lends the keys", async () => {
       const run = poll({

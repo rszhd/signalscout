@@ -2,7 +2,7 @@
 
 # Done
 
-135 finished.
+136 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
@@ -23,6 +23,7 @@
 | BUG-003 | [A post below the threshold is classified again on every poll](done/2026-09/BUG-003-a-post-below-the-threshold-is-classified-again-on-every-poll.md) | bug | fixed | 2026-09 |
 | BUG-002 | [A seven-day window is bought as a month](done/2026-09/BUG-002-a-seven-day-window-is-bought-as-a-month.md) | bug | fixed | 2026-09 |
 | BUG-001 | [A pending Reddit collection is not resumed](done/2026-09/BUG-001-a-pending-reddit-collection-is-not-resumed.md) | bug | shipped | 2026-09 |
+| US-150 | [A monitor belongs to the keys it was made on](done/2026-09/US-150-a-monitor-belongs-to-the-keys-it-was-made-on.md) | feature | shipped | 2026-09 |
 | US-149 | [A figure shown to an account is money spent on its own keys](done/2026-09/US-149-a-figure-shown-to-an-account-is-money-spent-on-its-own-keys.md) | bug | fixed | 2026-09 |
 | US-148 | [A poll that continued a walk says so](done/2026-09/US-148-a-poll-that-continued-a-walk-says-so.md) | feature | shipped | 2026-09 |
 | US-147 | [A monitor can be deleted from its page](done/2026-09/US-147-a-monitor-can-be-deleted-from-its-page.md) | feature | shipped | 2026-09 |

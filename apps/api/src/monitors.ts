@@ -32,6 +32,7 @@ import {
   type FilterDropCounts,
   filterDropCounts,
   groupByPlatform,
+  type KeySource,
   type LastCollection,
   lastCollections,
   latestPollRuns,
@@ -455,6 +456,14 @@ const monitorSchema = z.object({
    * deployment's.
    */
   capacity: capacitySchema,
+  /** Whose keys it was made on. US-150. */
+  keySource: z.enum(["instance", "own"]),
+  /**
+   * Whether the account is on those keys now. False means the monitor is not
+   * polled and the screen says where to switch. Always true where the
+   * deployment does not charge.
+   */
+  runsOnCurrentKeys: z.boolean(),
   /**
    * The pre-filter's settings and what it has dropped, all time.
    *
@@ -543,6 +552,13 @@ export interface MonitorRoutesOptions {
    * undefined, which is every test that does not ask, bounds nobody.
    */
   readonly capacityFor?: (userId: string) => Promise<PlanCapacity | null>;
+  /**
+   * Whose keys an account is on. US-150. A monitor is stamped with it when
+   * made, and a read says whether the monitor runs on the keys the account
+   * is on now. Absent means self-hosted: every monitor is the instance's and
+   * every one runs.
+   */
+  readonly keySourceFor?: (userId: string) => Promise<KeySource>;
   /**
    * Whether this deployment has a working mailer. US-093.
    *
@@ -638,6 +654,8 @@ function filterSettings(body: { preFilter?: { enabled?: boolean; similarityThres
  */
 interface MonitorReadings {
   readonly capacity: PlanCapacity | null;
+  /** The account's key source now, or null where the deployment does not charge. */
+  readonly accountKeySource: KeySource | null;
   readonly state: BudgetState;
   readonly dropped: FilterDropCounts;
   readonly read: number;
@@ -654,8 +672,17 @@ function toResponse(
   runtime: MonitorEnvironment,
   readings: MonitorReadings,
 ) {
-  const { capacity, state, dropped, read, verdicts, collected, notificationProblems, lastPoll } =
-    readings;
+  const {
+    capacity,
+    accountKeySource,
+    state,
+    dropped,
+    read,
+    verdicts,
+    collected,
+    notificationProblems,
+    lastPoll,
+  } = readings;
 
   return {
     id: monitor.id,
@@ -691,6 +718,8 @@ function toResponse(
         ? null
         : { monthlyCapMicros: state.capMicros, onExhausted: state.onExhausted },
     capacity: capacityResponse(capacity),
+    keySource: monitor.keySource,
+    runsOnCurrentKeys: accountKeySource === null || accountKeySource === monitor.keySource,
     spend: {
       sourceMicros: state.spend.sourceMicros,
       modelMicros: state.spend.modelMicros,
@@ -725,6 +754,7 @@ async function readResponse(
   monitor: Monitor,
   runtime: MonitorEnvironment,
   capacity: PlanCapacity | null,
+  accountKeySource: KeySource | null,
 ) {
   const [state, drops, read, verdicts, found, collected, notifications, polls] = await Promise.all([
     checkBudget(db, monitor.id),
@@ -739,6 +769,7 @@ async function readResponse(
 
   return toResponse(monitor, runtime, {
     capacity,
+    accountKeySource,
     state,
     dropped: drops.get(monitor.id) ?? noFilterDrops,
     read: read.get(monitor.id) ?? 0,
@@ -812,6 +843,9 @@ export async function registerMonitorRoutes(
   };
 
   const capacityFor = options.capacityFor ?? (async () => null);
+  /** Null where the deployment does not charge, and then every monitor runs. US-150. */
+  const accountKeySourceFor = async (userId: string): Promise<KeySource | null> =>
+    options.keySourceFor ? await options.keySourceFor(userId) : null;
 
   /**
    * Why a write would put this account past what its plan sells, or null.
@@ -830,8 +864,11 @@ export async function registerMonitorRoutes(
       listMonitors(db, userId),
       listProjects(db, userId),
     ]);
+    // Only the monitors made on the instance's keys, which are the ones the
+    // capacity is about: one made on the account's own does not run here
+    // and fills no slot. US-150.
     const otherMonitors = held
-      .filter((row) => row.id !== exceptMonitorId)
+      .filter((row) => row.id !== exceptMonitorId && row.keySource === "instance")
       .map((row) => ({
         sources: row.sources,
         queries: monitorQueryPlan(row.generatedQueries),
@@ -1093,6 +1130,7 @@ export async function registerMonitorRoutes(
     handler: async (request) => {
       const runtime = await currentEnvironment(sessionUserId(request));
       const capacity = await capacityFor(sessionUserId(request));
+      const accountKeySource = await accountKeySourceFor(sessionUserId(request));
 
       // One read for every monitor's spend, rather than one per row. The
       // screen that shows this is a list, and a per-row query here would be
@@ -1128,6 +1166,7 @@ export async function registerMonitorRoutes(
           // has dropped nothing, which is what zero says.
           toResponse(monitor, runtime, {
             capacity,
+            accountKeySource,
             state: states.get(monitor.id) ?? (await checkBudget(db, monitor.id)),
             dropped: drops.get(monitor.id) ?? noFilterDrops,
             read: read.get(monitor.id) ?? 0,
@@ -1176,6 +1215,8 @@ export async function registerMonitorRoutes(
           ...filterSettings(request.body),
           ...replySettings(request.body),
           userId: person.id,
+          // The keys it is made on, and belongs to. US-150.
+          ...(options.keySourceFor ? { keySource: await options.keySourceFor(person.id) } : {}),
         },
         {
           ...runtime,
@@ -1204,7 +1245,15 @@ export async function registerMonitorRoutes(
 
       return reply
         .code(201)
-        .send(await readResponse(db, monitor, runtime, await capacityFor(monitor.userId)));
+        .send(
+          await readResponse(
+            db,
+            monitor,
+            runtime,
+            await capacityFor(monitor.userId),
+            await accountKeySourceFor(monitor.userId),
+          ),
+        );
     },
   });
 
@@ -1224,6 +1273,7 @@ export async function registerMonitorRoutes(
         monitor,
         await currentEnvironment(sessionUserId(request)),
         await capacityFor(monitor.userId),
+        await accountKeySourceFor(monitor.userId),
       );
     },
   });
@@ -1310,6 +1360,7 @@ export async function registerMonitorRoutes(
         monitor,
         await currentEnvironment(sessionUserId(request)),
         await capacityFor(monitor.userId),
+        await accountKeySourceFor(monitor.userId),
       );
     },
   });
@@ -1334,6 +1385,7 @@ export async function registerMonitorRoutes(
         monitor,
         await currentEnvironment(sessionUserId(request)),
         await capacityFor(monitor.userId),
+        await accountKeySourceFor(monitor.userId),
       );
     },
   });
@@ -1371,7 +1423,13 @@ export async function registerMonitorRoutes(
         });
       }
 
-      return readResponse(db, result.monitor, runtime, await capacityFor(result.monitor.userId));
+      return readResponse(
+        db,
+        result.monitor,
+        runtime,
+        await capacityFor(result.monitor.userId),
+        await accountKeySourceFor(result.monitor.userId),
+      );
     },
   });
 
@@ -1408,6 +1466,7 @@ export async function registerMonitorRoutes(
         monitor,
         await currentEnvironment(sessionUserId(request)),
         await capacityFor(monitor.userId),
+        await accountKeySourceFor(monitor.userId),
       );
     },
   });
@@ -1441,6 +1500,7 @@ export async function registerMonitorRoutes(
         monitor,
         await currentEnvironment(sessionUserId(request)),
         await capacityFor(monitor.userId),
+        await accountKeySourceFor(monitor.userId),
       );
     },
   });

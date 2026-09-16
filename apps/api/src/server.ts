@@ -579,6 +579,11 @@ export async function buildServer({
     // US-133. What the plan sells: monitors, queries per platform, a poll
     // floor per platform and a platform list. Null for everybody else.
     capacityFor: (userId) => keys.capacity(userId),
+    // US-150. A monitor belongs to the keys it was made on, where the
+    // deployment charges. Self-hosted passes nothing and every monitor runs.
+    ...(settings?.mode === "stripe"
+      ? { keySourceFor: (userId: string) => keys.source(userId) }
+      : {}),
     // US-093: whether a new monitor's email notifications can be switched on.
     // The same list the notification screen and its save route read, asked
     // once here so the monitor routes never see the SMTP settings.

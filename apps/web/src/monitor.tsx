@@ -143,6 +143,13 @@ export interface Monitor {
    * no schedule, no budget and no reading dial. Optional, for an older server.
    */
   capacity?: { trial: boolean } | null;
+  /** Whose keys it was made on. US-150. Absent on an older server. */
+  keySource?: "instance" | "own";
+  /**
+   * Whether the account is on those keys now. False means it is not polled
+   * and the page says where to switch. Absent on an older server means true.
+   */
+  runsOnCurrentKeys?: boolean;
   feedback: Feedback;
   /**
    * How many matches came out. US-109.
@@ -214,6 +221,9 @@ export function status(monitor: Monitor): {
   tone: string;
   attention?: boolean;
 } {
+  // First, because nothing below it matters until the account switches back:
+  // a key, a budget or a pause is about a monitor that would otherwise run.
+  if (monitor.runsOnCurrentKeys === false) return { label: "On other keys", tone: "stopped" };
   if (monitor.spend.exhausted) return { label: "Budget spent", tone: "stopped" };
   if (monitor.missingCredentials.length > 0) return { label: "Needs a key", tone: "stopped" };
   if (monitor.paused) return { label: "Paused", tone: "paused" };
@@ -268,6 +278,8 @@ const stopReasonLabels: Record<string, string> = {
   collection_abandoned: "the collection was never ready to read",
   provider_wait: "the provider asked us to come back",
   page_cap: "the page limit for one poll was reached",
+  other_keys: "it was made on other keys",
+  platform_not_due: "not due yet on the plan's schedule",
   still_collecting: "a collection is still running",
   error: "the poll failed",
 };

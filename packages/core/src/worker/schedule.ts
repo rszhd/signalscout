@@ -18,7 +18,7 @@ import { type BillingMode, entitledCondition } from "../billing/index.js";
 import { onInstanceKeysAmong } from "../billing/key-source.js";
 import { accountsOverCap } from "../budget/account.js";
 import type { Database } from "../db/client.js";
-import { monitors, subscriptions } from "../db/schema.js";
+import { accountKeySource, monitors, subscriptions } from "../db/schema.js";
 import type { Logger } from "../logger.js";
 import { pollQueue } from "./queues.js";
 
@@ -99,6 +99,21 @@ export async function findDueMonitors(
           sql`cardinality(${monitors.sources}) > 0`,
           // A paused monitor keeps its history and collects nothing.
           isNull(monitors.pausedAt),
+          /**
+           * The monitor belongs to the keys it was made on. US-150.
+           *
+           * Where the deployment charges, an account on its own keys does not
+           * run a monitor made on the instance's, nor the reverse. Compared
+           * with the account's state in SQL, `instance` where no row exists.
+           * Off means self-hosted, which has no switch and skips nothing.
+           */
+          billing === "off"
+            ? sql`true`
+            : sql`${monitors.keySource} = coalesce(
+                (select ${accountKeySource.source} from ${accountKeySource}
+                  where ${accountKeySource.userId} = ${monitors.userId}),
+                'instance'
+              )`,
           /**
            * Today, where the monitor lives. US-041.
            *

@@ -915,6 +915,42 @@ describe("the monitor routes", () => {
     });
 
     /**
+     * US-150. A monitor belongs to the keys it was made on. The account
+     * switches, the monitor stays and stops, and the read says so; a monitor
+     * made on the account's own keys fills no slot of the plan's capacity.
+     */
+    it("stamps a monitor with the keys it was made on, and says when it is not on them", async () => {
+      await onPlan("own");
+      await withServer({ signup: "open", charging: true }, async (app) => {
+        const ownId = await create(app, { ...newMonitor, name: "On my keys" });
+        let read = (await app.inject({ method: "GET", url: `/api/monitors/${ownId}` })).json();
+        expect(read.keySource).toBe("own");
+        expect(read.runsOnCurrentKeys).toBe(true);
+
+        // Switched onto the instance's keys: the monitor is not on them.
+        await setKeySource(db, owner, "instance");
+        read = (await app.inject({ method: "GET", url: `/api/monitors/${ownId}` })).json();
+        expect(read.runsOnCurrentKeys).toBe(false);
+
+        // And it fills no slot: the plan's one monitor is still free.
+        const oursId = await create(app, {
+          ...newMonitor,
+          name: "On theirs",
+          pollIntervalSeconds: 4 * 60 * 60,
+        });
+        const listed = (await app.inject({ method: "GET", url: "/api/monitors" })).json();
+        const byId = Object.fromEntries(
+          listed.map((row: { id: string; keySource: string; runsOnCurrentKeys: boolean }) => [
+            row.id,
+            [row.keySource, row.runsOnCurrentKeys],
+          ]),
+        );
+        expect(byId[ownId]).toEqual(["own", false]);
+        expect(byId[oursId]).toEqual(["instance", true]);
+      });
+    });
+
+    /**
      * The edit path is the other writer, and a rule applied to one of two is
      * BUG-009 again. The monitor being edited is judged beside the others and
      * never against itself, so an edit that changes nothing is allowed.

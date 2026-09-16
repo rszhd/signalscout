@@ -499,6 +499,12 @@ export async function startWorker({
   const choicesFor = (userId: string) => keys.choices(userId);
   /** What one account's plan sells, for the poll and for the scheduler. US-133. */
   const capacityFor = (userId: string) => keys.capacity(userId);
+  /**
+   * Whose keys an account is on, for the poll to refuse a monitor made on the
+   * other ones. US-150. Only where the deployment charges: self-hosted has no
+   * switch, and undefined checks nothing.
+   */
+  const keySourceFor = billing === "off" ? undefined : (userId: string) => keys.source(userId);
 
   // The logger, so a key still read from its deprecated variable says so once.
   const lookup = credentialsFor ?? credentialsForAccounts(db, keys, logger);
@@ -636,6 +642,7 @@ export async function startWorker({
         accountCapFor,
         choicesFor,
         capacityFor,
+        ...(keySourceFor ? { keySourceFor } : {}),
       }),
     estimate:
       steps.estimate ??

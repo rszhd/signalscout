@@ -1554,6 +1554,38 @@ describe("the poll step", () => {
       expect(run?.stopReason).toBe("account_budget_exhausted");
     });
 
+    /**
+     * US-150. A monitor belongs to the keys it was made on. The scheduler
+     * filters, but a job queued a tick before the switch still arrives, so
+     * the poll refuses it too — before either cap, since it spends nothing.
+     */
+    it("refuses a monitor made on the other keys, before asking anything", async () => {
+      const monitorId = await insertMonitor(database, { keySource: "instance" });
+      const registry = fakeRegistry();
+      const boss = stubBoss();
+
+      await createCollectStep({
+        registry,
+        credentialsFor: credentials,
+        keySourceFor: async () => "own",
+      })({ monitorId }, contextFor(db, boss));
+
+      expect(callsOf(registry)).toHaveLength(0);
+      expect(boss.send).not.toHaveBeenCalled();
+      const [run] = await db.select().from(pollRuns).where(eq(pollRuns.monitorId, monitorId));
+      expect(run?.outcome).toBe("refused");
+      expect(run?.stopReason).toBe("other_keys");
+
+      // On the same keys it polls; with no reader of the state at all — every
+      // self-hosted instance — it polls whatever the row says.
+      await createCollectStep({
+        registry,
+        credentialsFor: credentials,
+        keySourceFor: async () => "instance",
+      })({ monitorId }, contextFor(db, boss));
+      expect(callsOf(registry).length).toBeGreaterThan(0);
+    });
+
     it("polls where the account still has room, whatever the plan", async () => {
       const monitorId = await insertMonitor(database);
 

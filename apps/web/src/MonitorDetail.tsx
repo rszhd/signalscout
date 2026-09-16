@@ -494,6 +494,20 @@ export function MonitorDetail({
             </p>
           )}
 
+          {/*
+            Made on the other keys, so not polled until the account switches
+            back. US-150. Above the key and budget notices, which are about a
+            monitor that would otherwise run.
+          */}
+          {monitor.runsOnCurrentKeys === false && (
+            <p className="monitor-stopped" role="status">
+              This monitor was made on{" "}
+              {monitor.keySource === "own" ? "your own keys" : "SignalScout's keys"} and runs only
+              there. Switch back on the Data &amp; AI screen to run it, or make a new monitor on
+              these keys. <Link to={paths.connections}>Open Data &amp; AI</Link>
+            </p>
+          )}
+
           {monitor.missingCredentials.length > 0 && (
             <p className="monitor-stopped">
               Connect a provider to resume collecting. Missing:{" "}

@@ -56,6 +56,17 @@ smaller — four queries, daily, and neither Instagram nor LinkedIn. Every
 number is a variable under `KEYS_INCLUDED_`, read at boot, with those figures
 as the defaults.
 
+**A monitor belongs to the keys it was made on.** US-150. `monitors.key_source`
+is stamped from the account's state when the monitor is made and never
+rewritten. Where the deployment charges, an account on its own keys does not
+run a monitor made on the instance's, nor the reverse: the scheduler leaves it
+out, a poll that reaches it is refused with `other_keys`, the list shows "On
+other keys", and the page says where to switch. A monitor made on the
+account's own keys fills no slot of the plan's capacity. A self-hosted
+instance has no switch and checks nothing. The migration stamped every
+existing monitor with its account's state at the time, which is the best a
+migration can know.
+
 **A trial may make three projects in total, deleted ones counted.** US-146.
 Deleting a project takes its monitor, which frees the trial's one slot, and a
 new monitor polls at the next tick — so create-and-delete was a way to poll on

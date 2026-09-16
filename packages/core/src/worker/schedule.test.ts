@@ -518,12 +518,37 @@ describe("whether the account has spent its month", () => {
   it("sends a poll for an account spending its own money, however much it spent", async () => {
     const own = await ownerOn("cap-own", "own");
     await spend(own, 90_000_000);
-    await insertMonitor(database, { userId: own });
+    await insertMonitor(database, { userId: own, keySource: "own" });
 
     const result = await enqueueDuePolls(db, boss, silentLogger, "stripe", 15_000_000);
 
     expect(result.due).toBe(1);
     expect(result.overCapSkipped).toBe(0);
+  });
+
+  /**
+   * US-150. A monitor belongs to the keys it was made on. An account on its
+   * own keys does not run a monitor made on the instance's, nor the reverse;
+   * both run again when the account switches back. Self-hosted has no switch,
+   * and the filter is not made there.
+   */
+  it("does not send a poll for a monitor made on the other keys", async () => {
+    const own = await ownerOn("keys-own", "own");
+    await insertMonitor(database, { userId: own, keySource: "instance" });
+    await insertMonitor(database, { userId: own, keySource: "own" });
+    const ours = await ownerOn("keys-ours", "instance");
+    await insertMonitor(database, { userId: ours, keySource: "own" });
+
+    // One of the three: the one made on the keys its account is on.
+    expect((await enqueueDuePolls(db, boss, silentLogger, "stripe", null)).due).toBe(1);
+
+    // Switched back, the other two run and that one stops.
+    await setKeySource(db, own, "instance");
+    await setKeySource(db, ours, "own");
+    expect((await enqueueDuePolls(db, boss, silentLogger, "stripe", null)).due).toBe(2);
+
+    // Self-hosted: every monitor, whatever it says.
+    expect((await enqueueDuePolls(db, boss, silentLogger, "off", null)).due).toBe(3);
   });
 
   /**
@@ -644,7 +669,11 @@ describe("whether the account has spent its month", () => {
 
   it("holds nobody to a floor where the account has no capacity", async () => {
     const owner = await ownerOn("floor-own", "own");
-    const id = await insertMonitor(database, { userId: owner, pollIntervalSeconds: 900 });
+    const id = await insertMonitor(database, {
+      userId: owner,
+      pollIntervalSeconds: 900,
+      keySource: "own",
+    });
     await db
       .update(monitors)
       .set({ lastPolledAt: minutes(20) })

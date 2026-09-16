@@ -98,6 +98,16 @@ describe("one monitor's page", () => {
       expect(container.textContent).toContain("due now");
     });
 
+    /** US-150. Made on the other keys: stopped, and the page says where to switch. */
+    it("says a monitor made on the other keys is not running, and where to switch", async () => {
+      await show(monitor({ keySource: "instance", runsOnCurrentKeys: false }));
+
+      const text = container.textContent ?? "";
+      expect(text).toContain("On other keys");
+      expect(text).toContain("This monitor was made on SignalScout's keys and runs only there.");
+      expect(container.querySelector('a[href="/connections"]')).not.toBeNull();
+    });
+
     /** US-148. A row that picked up an earlier walk says so. */
     it("says when the last poll continued an earlier one", async () => {
       await show(

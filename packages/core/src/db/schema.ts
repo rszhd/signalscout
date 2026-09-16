@@ -374,6 +374,12 @@ export const pollStopReasons = [
    * platforms of the same run are collected as usual.
    */
   "platform_not_due",
+  /**
+   * US-150: the monitor was made on the other keys. The account is on its own
+   * now and this one was made on the instance's, or the reverse; it runs when
+   * the account switches back, and the screen says where.
+   */
+  "other_keys",
   /** The step threw. */
   "error",
 ] as const;
@@ -591,6 +597,21 @@ export const monitors = pgTable(
      */
     includeReplies: boolean("include_replies").notNull().default(false),
     /**
+     * Whose keys this monitor was made on. US-150.
+     *
+     * A monitor belongs to the keys it was made on and runs on no others: one
+     * made on the instance's was fitted to the plan's capacity and priced on
+     * the plan, and one made on the account's own was neither. When the
+     * account is on the other keys the scheduler leaves it alone, a poll that
+     * reaches it is refused, and the screen says so. The check is made only
+     * where the deployment charges; a self-hosted instance has no switch.
+     *
+     * Stamped at creation from the account's state then, never rewritten.
+     * `instance` for every row from before this existed, which the migration
+     * corrects from `account_key_source` where a row says otherwise.
+     */
+    keySource: text("key_source").$type<KeySource>().notNull().default("instance"),
+    /**
      * The cosine similarity a post needs to reach the model, once it has
      * passed the keyword stage.
      *
@@ -710,6 +731,7 @@ export const monitors = pgTable(
     // and a negative threshold would keep everything while reading as a
     // setting somebody had chosen.
     check("monitors_similarity_threshold_range", sql.raw("similarity_threshold BETWEEN 0 AND 1")),
+    check("monitors_key_source_known", oneOf("key_source", keySources)),
   ],
 );
 

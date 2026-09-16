@@ -15,7 +15,7 @@ import { describe, expect, it } from "vitest";
  *    queue, an auth library or a payment provider in the engine is an app
  *    concern that leaked.
  * 2. No source file imports one of them either, however it is declared.
- * 3. No source file imports `packages/core`. The direction is core → engine,
+ * 3. No source file imports `packages/pipeline`. The direction is pipeline → engine,
  *    never back, or the two are one package with a folder between them.
  * 4. No source file reads `process.env`. A key, a model name or a base URL is
  *    an argument. A default parameter of `= process.env` counts as a read,
@@ -26,7 +26,7 @@ import { describe, expect, it } from "vitest";
  * where the environment is read. They ask a real model and write what it
  * answered beside the tests that replay it, so they live with the fixtures.
  *
- * `core-boundary.test.ts` is the model for the shape. The lists differ.
+ * `pipeline-boundary.test.ts` is the model for the shape. The lists differ.
  */
 
 const packageRoot = fileURLToPath(new URL("../", import.meta.url));
@@ -46,7 +46,7 @@ const forbidden = [
   "react",
   "react-dom",
   "react-router",
-  "@signalscout/core",
+  "@signalscout/pipeline",
   "@signalscout/api",
   "@signalscout/worker",
   "@signalscout/web",

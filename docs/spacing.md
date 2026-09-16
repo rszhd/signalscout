@@ -69,4 +69,4 @@ Run it locally, or as part of CI alongside `pnpm lint`:
   migrated it is exempt.
 - The email templates — they are a separate renderer and cannot read the CSS
   scale. They copy the palette, not the spacing.
-- `packages/core` — it is not React and has no UI.
+- `packages/pipeline` — it is not React and has no UI.

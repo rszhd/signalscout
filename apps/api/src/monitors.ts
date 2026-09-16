@@ -2,7 +2,7 @@
  * The HTTP side of a monitor: the form's options, the generated queries, and
  * the writes.
  *
- * Every rule these routes enforce lives in `@signalscout/core`. A route is a
+ * Every rule these routes enforce lives in `@signalscout/pipeline`. A route is a
  * shape check and a status code, and nothing else. That is not tidiness: the
  * worker reads the same rows, so a rule written here would be a rule one
  * caller obeys, and docs/testing.md is clear about how that ends.
@@ -67,7 +67,7 @@ import {
   updateMonitor,
   type VerdictCounts,
   verdictCounts,
-} from "@signalscout/core";
+} from "@signalscout/pipeline";
 import { z } from "zod";
 import { ownedMonitor, sessionUser, sessionUserId } from "./auth.js";
 import type { ApiServer } from "./server.js";

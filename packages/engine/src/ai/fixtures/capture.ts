@@ -18,8 +18,8 @@
  *
  * It spends money — four short calls, well under a cent on a cheap model.
  *
- *     pnpm --filter @signalscout/core capture:classifier
- *     AI_MODEL=gpt-5-mini AI_PROVIDER=openai pnpm --filter @signalscout/core capture:classifier
+ *     pnpm --filter @signalscout/pipeline capture:classifier
+ *     AI_MODEL=gpt-5-mini AI_PROVIDER=openai pnpm --filter @signalscout/pipeline capture:classifier
  *
  * Put the results, the model and the date in the ticket that changed the
  * prompt. A number from a run nobody recorded is a comment, and a comment
@@ -132,7 +132,7 @@ writeFileSync(
   `${here}manifest.json`,
   `${JSON.stringify(
     {
-      capturedBy: "packages/core/src/ai/fixtures/capture.ts",
+      capturedBy: "packages/pipeline/src/ai/fixtures/capture.ts",
       provider: config.provider,
       model: config.model,
       note: "The model's own answers to PLAN.md's four worked examples, as the AI SDK parsed them. The monitor is `exampleMonitor` in examples.ts.",

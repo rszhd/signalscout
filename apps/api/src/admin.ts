@@ -11,7 +11,7 @@
  * The list is read once at registration rather than per request: it comes from
  * the environment, which does not change while the process runs.
  */
-import { adminEmails, type Database, isAdminEmail, registrationsOn } from "@signalscout/core";
+import { adminEmails, type Database, isAdminEmail, registrationsOn } from "@signalscout/pipeline";
 import { z } from "zod";
 import { sessionUser } from "./auth.js";
 import type { ApiServer } from "./server.js";

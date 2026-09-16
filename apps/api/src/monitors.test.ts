@@ -3,7 +3,7 @@
  *
  * The generator is a stub. That is not a shortcut around docs/testing.md: the
  * interface it implements is ours, and the evidence about what a real model
- * does with the prompt belongs to `packages/core`, which owns the prompt. What
+ * does with the prompt belongs to `packages/pipeline`, which owns the prompt. What
  * these tests own is the other half — the status code a person meets, and
  * whether the row the worker reads says what the response claimed.
  *
@@ -36,8 +36,8 @@ import {
   recordSourceUsage,
   recordVerdict,
   setProviderChoice,
-} from "@signalscout/core";
-import { createTestDatabase, type TestDatabase } from "@signalscout/core/testing";
+} from "@signalscout/pipeline";
+import { createTestDatabase, type TestDatabase } from "@signalscout/pipeline/testing";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { buildServer } from "./server.js";
 import { asOwner, testOwner as owner } from "./testing.js";

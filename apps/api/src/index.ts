@@ -1,4 +1,4 @@
-import { createLogger, loadEnv } from "@signalscout/core";
+import { createLogger, loadEnv } from "@signalscout/pipeline";
 import { startApi } from "./start.js";
 
 const env = loadEnv();

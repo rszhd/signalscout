@@ -47,7 +47,7 @@
  *
  * Run it with your own token:
  *
- *     node packages/core/src/sources/providers/apify/linkedin-fixtures/capture.mjs
+ *     node packages/pipeline/src/sources/providers/apify/linkedin-fixtures/capture.mjs
  *     node .../capture.mjs --only=search
  *
  * **Prices are tiered by Apify plan, and this account is on FREE.** A post is

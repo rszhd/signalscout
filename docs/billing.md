@@ -68,7 +68,7 @@ has its own tests in `worker/schedule.test.ts`.
 
 ## Who is entitled
 
-One rule, in `packages/core/src/billing/entitlement.ts`, written twice in the
+One rule, in `packages/pipeline/src/billing/entitlement.ts`, written twice in the
 same file: once for a row already read, and once as SQL for the scheduler's
 query. `entitlement.test.ts` drives both over the same cases, because the only
 thing worth asserting is that they agree.

@@ -47,7 +47,7 @@ function recorded(): RecordedSimilarities {
     ) as RecordedSimilarities;
   } catch {
     throw new Error(
-      "No recorded similarities. Run `pnpm --filter @signalscout/core capture:embeddings` " +
+      "No recorded similarities. Run `pnpm --filter @signalscout/pipeline capture:embeddings` " +
         "with an embedding key. A model's answer is recorded, never written.",
     );
   }

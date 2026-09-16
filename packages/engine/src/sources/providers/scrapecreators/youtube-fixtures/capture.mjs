@@ -37,7 +37,7 @@
  *
  * Run it with your own key. It spends about ten credits:
  *
- *     node packages/core/src/sources/providers/scrapecreators/youtube-fixtures/capture.mjs
+ *     node packages/pipeline/src/sources/providers/scrapecreators/youtube-fixtures/capture.mjs
  *     node .../capture.mjs --only=search
  *
  * What it writes, into this folder: one whole response body per call, with
@@ -616,7 +616,8 @@ writeFileSync(
   `${here}manifest.json`,
   `${JSON.stringify(
     {
-      capturedBy: "packages/core/src/sources/providers/scrapecreators/youtube-fixtures/capture.mjs",
+      capturedBy:
+        "packages/pipeline/src/sources/providers/scrapecreators/youtube-fixtures/capture.mjs",
       provider: "ScrapeCreators, YouTube API v1",
       note: "Channel identity is replaced with stable pseudonyms. Everything else is whole.",
       fixtures,

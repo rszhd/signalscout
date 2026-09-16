@@ -58,7 +58,7 @@ $20 USD per month after a seven-day trial. **The price is Stripe's**, held in
 the object `STRIPE_PRICE_ID` names, and this page states it because a static
 build cannot read it — so the figure here is a copy, and BUG-014 is what
 happens when a copy is left behind. The trial figure is US-072's, held in
-`trialDays` in `packages/core/src/billing/entitlement.ts`; change the page only
+`trialDays` in `packages/pipeline/src/billing/entitlement.ts`; change the page only
 when that constant changes. The page claims no card is asked for, which
 is true because sign-up writes the trial row itself and creates nothing in
 Stripe until somebody opens Checkout. The FAQ says what running out does:

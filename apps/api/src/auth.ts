@@ -28,7 +28,7 @@ import {
   type Logger,
   type Monitor,
   type SignupMode,
-} from "@signalscout/core";
+} from "@signalscout/pipeline";
 import type { FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
 import type { ApiServer } from "./server.js";

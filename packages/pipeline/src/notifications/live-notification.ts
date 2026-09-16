@@ -1,7 +1,7 @@
 /**
  * US-093's last question: does a match actually reach a person?
  *
- *     pnpm --filter @signalscout/core live:notification [sample]
+ *     pnpm --filter @signalscout/pipeline live:notification [sample]
  *
  * **It calls no provider.** The posts it reads are already in the table, bought
  * once and stored for ever, so the provider half of this run is zero — the same

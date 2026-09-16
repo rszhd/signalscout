@@ -5,7 +5,7 @@
  * What this file owns after US-109 is the *list*: the five columns, the
  * filters, the grouping, and the one action a person takes from a row. What a
  * monitor is and what it has spent belongs to `MonitorDetail.test.tsx`, and
- * the rule underneath each figure belongs to `packages/core`, where it is
+ * the rule underneath each figure belongs to `packages/pipeline`, where it is
  * asserted against real Postgres.
  */
 import { act } from "react";

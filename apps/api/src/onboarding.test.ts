@@ -5,8 +5,8 @@
  * marker for the signed-in account, a second call changes nothing, and
  * `/api/auth-status` reports the answer the setup gate reads.
  */
-import { createDatabase, createLogger, type Database, loadEnv } from "@signalscout/core";
-import { createTestDatabase, type TestDatabase } from "@signalscout/core/testing";
+import { createDatabase, createLogger, type Database, loadEnv } from "@signalscout/pipeline";
+import { createTestDatabase, type TestDatabase } from "@signalscout/pipeline/testing";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { buildServer } from "./server.js";
 import { asOwner } from "./testing.js";

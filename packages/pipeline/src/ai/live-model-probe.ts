@@ -1,8 +1,8 @@
 /**
  * Does this provider answer the call this product actually makes? US-124.
  *
- *     pnpm --filter @signalscout/core live:model-probe
- *     pnpm --filter @signalscout/core live:model-probe --model=deepseek-flash
+ *     pnpm --filter @signalscout/pipeline live:model-probe
+ *     pnpm --filter @signalscout/pipeline live:model-probe --model=deepseek-flash
  *
  * **It spends one call, and on a cheap model that is a fraction of a cent.**
  * The same call the Test button on the Models screen makes: `probeChatModel`,

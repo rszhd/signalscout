@@ -1,7 +1,7 @@
 /**
  * US-096 and US-097's last question: does a signed webhook actually arrive?
  *
- *     pnpm --filter @signalscout/core live:webhook
+ *     pnpm --filter @signalscout/pipeline live:webhook
  *
  * **It spends nothing.** No provider is called and no model is called: it
  * delivers matches this instance has already collected and classified, to a

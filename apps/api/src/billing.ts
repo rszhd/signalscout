@@ -36,7 +36,7 @@ import {
   readEntitlement,
   readSubscription,
   trialDays,
-} from "@signalscout/core";
+} from "@signalscout/pipeline";
 import { z } from "zod";
 import { billingBasePath, billingWebhookPath, isOpenPath, sessionUserId } from "./auth.js";
 import type { ApiServer } from "./server.js";

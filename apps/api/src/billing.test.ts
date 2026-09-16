@@ -26,8 +26,8 @@ import {
   startTrial,
   subscriptions,
   users,
-} from "@signalscout/core";
-import { createTestDatabase, type TestDatabase } from "@signalscout/core/testing";
+} from "@signalscout/pipeline";
+import { createTestDatabase, type TestDatabase } from "@signalscout/pipeline/testing";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { billingBasePath, billingWebhookPath, isOpenPath } from "./auth.js";
 import {

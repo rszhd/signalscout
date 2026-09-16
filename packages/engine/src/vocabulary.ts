@@ -6,10 +6,10 @@
  * These lived in `db/schema.ts`, where each array is also a check constraint.
  * US-152 moved them here because the engine needs them and must not import
  * the schema; the schema imports them back and builds its constraints from
- * them, so the direction is core → engine and the constraint still follows
+ * them, so the direction is pipeline → engine and the constraint still follows
  * the array. AGENTS.md's rule holds one step further out: a value added to an
  * array here is not a value the database accepts until the migration in
- * `packages/core` says so.
+ * `packages/pipeline` says so.
  */
 
 /**

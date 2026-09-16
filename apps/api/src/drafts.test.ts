@@ -2,7 +2,7 @@
  * The draft route and the prompt library.
  *
  * The screen half is asserted in `apps/web/src/ReplyDraft.test.tsx`, and the
- * prompt's wording in `packages/core/src/ai/reply.test.ts`. What this file
+ * prompt's wording in `packages/pipeline/src/ai/reply.test.ts`. What this file
  * owns is the route's promises: that a saved prompt actually reaches the
  * model, that a monitor at its cap refuses to spend, that a draft is recorded
  * on the bill, and that a prompt belongs to the account rather than to
@@ -13,7 +13,7 @@
  * instead, and `vitest.config.ts` blanks `AI_API_KEY` so a machine with a key
  * exported cannot spend one by accident.
  */
-import type { Database } from "@signalscout/core";
+import type { Database } from "@signalscout/pipeline";
 import {
   createDatabase,
   createLogger,
@@ -22,8 +22,8 @@ import {
   loadEnv,
   replyPrompts,
   unclaimedUserId,
-} from "@signalscout/core";
-import { createTestDatabase, type TestDatabase } from "@signalscout/core/testing";
+} from "@signalscout/pipeline";
+import { createTestDatabase, type TestDatabase } from "@signalscout/pipeline/testing";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { buildServer } from "./server.js";
 import { asOwner } from "./testing.js";

@@ -6,8 +6,8 @@
  * turned away, and an instance with no list must turn everybody away. The
  * shape of the answer is asserted once, against a real row.
  */
-import { createDatabase, createLogger, type Database, loadEnv, users } from "@signalscout/core";
-import { createTestDatabase, type TestDatabase } from "@signalscout/core/testing";
+import { createDatabase, createLogger, type Database, loadEnv, users } from "@signalscout/pipeline";
+import { createTestDatabase, type TestDatabase } from "@signalscout/pipeline/testing";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { buildServer } from "./server.js";
 import { asUser } from "./testing.js";

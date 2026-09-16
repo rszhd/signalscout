@@ -149,7 +149,7 @@ export interface MonitorEnvironment {
    * The two facts belong to the composition root and not to this file: whether
    * the deployment has a working mailer, and what the owner's address is. The
    * *rule* they feed is `defaultNotificationSettings`, which is in
-   * `packages/core` like every other rule a route enforces.
+   * `packages/pipeline` like every other rule a route enforces.
    *
    * Absent writes no settings row, which is how every monitor behaved before
    * US-093 and is what the worker's own tests describe. A caller that has no

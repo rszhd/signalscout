@@ -37,7 +37,7 @@
  * made against it; spending five more to photograph it would be paying to prove
  * a decision twice. Reddit replies stay with ScrapeCreators.
  *
- *     node packages/core/src/sources/providers/socialcrawl/reddit-fixtures/capture.mjs
+ *     node packages/pipeline/src/sources/providers/socialcrawl/reddit-fixtures/capture.mjs
  *
  * Four billed calls at one credit each, about $0.032, plus one free refusal.
  */

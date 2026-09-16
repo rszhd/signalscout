@@ -23,8 +23,8 @@
  *
  * Run it with your own key. It spends a few credits, against 100 free:
  *
- *     node packages/core/src/sources/providers/scrapecreators/fixtures/capture.mjs
- *     node packages/core/src/sources/providers/scrapecreators/fixtures/capture.mjs --only=credentials
+ *     node packages/pipeline/src/sources/providers/scrapecreators/fixtures/capture.mjs
+ *     node packages/pipeline/src/sources/providers/scrapecreators/fixtures/capture.mjs --only=credentials
  *
  * What it writes, into this folder:
  *
@@ -457,7 +457,7 @@ writeFileSync(
   `${here}manifest.json`,
   `${JSON.stringify(
     {
-      capturedBy: "packages/core/src/sources/providers/scrapecreators/fixtures/capture.mjs",
+      capturedBy: "packages/pipeline/src/sources/providers/scrapecreators/fixtures/capture.mjs",
       provider: "ScrapeCreators, Reddit API v1",
       note: "Author identity is replaced with stable pseudonyms. Everything else is whole.",
       fixtures,

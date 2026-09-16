@@ -2,7 +2,7 @@
  * Everything a draft needs about one match, in one read.
  *
  * US-040. It lives in core rather than in the API for the reason every query
- * does: `apps/api` imports no `drizzle-orm`, and `packages/core` is where the
+ * does: `apps/api` imports no `drizzle-orm`, and `packages/pipeline` is where the
  * database is reached. The route reads this and turns it into a prompt.
  *
  * Three tables: the match to find the pair, the post to answer, and the

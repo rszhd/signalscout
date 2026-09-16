@@ -12,7 +12,7 @@ WORKDIR /app
 FROM base AS deps
 COPY pnpm-workspace.yaml pnpm-lock.yaml package.json ./
 COPY packages/engine/package.json packages/engine/
-COPY packages/core/package.json packages/core/
+COPY packages/pipeline/package.json packages/pipeline/
 COPY apps/api/package.json apps/api/
 COPY apps/web/package.json apps/web/
 COPY apps/worker/package.json apps/worker/
@@ -33,15 +33,15 @@ ENV NODE_ENV=production
 
 COPY pnpm-workspace.yaml pnpm-lock.yaml package.json ./
 COPY packages/engine/package.json packages/engine/
-COPY packages/core/package.json packages/core/
+COPY packages/pipeline/package.json packages/pipeline/
 COPY apps/api/package.json apps/api/
 COPY apps/web/package.json apps/web/
 COPY apps/worker/package.json apps/worker/
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile --prod
 
 COPY --from=build /app/packages/engine/dist packages/engine/dist
-COPY --from=build /app/packages/core/dist packages/core/dist
-COPY --from=build /app/packages/core/drizzle packages/core/drizzle
+COPY --from=build /app/packages/pipeline/dist packages/pipeline/dist
+COPY --from=build /app/packages/pipeline/drizzle packages/pipeline/drizzle
 COPY --from=build /app/apps/api/dist apps/api/dist
 COPY --from=build /app/apps/worker/dist apps/worker/dist
 COPY --from=build /app/apps/web/dist apps/web/dist

@@ -7,7 +7,7 @@
  * judgement about which field a reader was supposed to notice.
  *
  * The third surface — an API response — cannot be asserted from here, because
- * `packages/core` imports neither Fastify nor React. It is asserted in
+ * `packages/pipeline` imports neither Fastify nor React. It is asserted in
  * `apps/api/src/credentials-leak.test.ts` against a real server.
  */
 

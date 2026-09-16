@@ -36,7 +36,7 @@ the message and the HTML is a presentation of it, so a client that shows only
 text loses the styling and nothing else.
 
 The palette is copied from `apps/web/src/styles/tokens.css` into
-`packages/core/src/notifications/email-theme.ts`, because a mail client has no
+`packages/pipeline/src/notifications/email-theme.ts`, because a mail client has no
 external stylesheet and no CSS variables. **Change a colour in one and change
 it in the other.** The copy is deliberate and it is made once: that file holds
 the palette and the shared shell, and the two templates beside it render
@@ -129,7 +129,7 @@ owner's provider keys.
 
 ### Proving a receiver
 
-`pnpm --filter @signalscout/core live:webhook` starts an HTTPS receiver on this
+`pnpm --filter @signalscout/pipeline live:webhook` starts an HTTPS receiver on this
 machine and delivers to it. It spends nothing — no provider and no model — and
 it is the way to check that a change to the signing or the address rules has not
 broken the contract this document describes. It answers three things: a delivery

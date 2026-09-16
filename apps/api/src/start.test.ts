@@ -5,8 +5,8 @@ import type {
   JobSender,
   Logger,
   WorkerHandle,
-} from "@signalscout/core";
-import { createLogger, loadEnv } from "@signalscout/core";
+} from "@signalscout/pipeline";
+import { createLogger, loadEnv } from "@signalscout/pipeline";
 import { describe, expect, it, vi } from "vitest";
 import type { ApiServer } from "./server.js";
 import { startApi } from "./start.js";

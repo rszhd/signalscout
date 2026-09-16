@@ -34,7 +34,7 @@
  *
  * Run it with your own key. It spends about ten credits:
  *
- *     node packages/core/src/sources/providers/scrapecreators/tiktok-fixtures/capture.mjs
+ *     node packages/pipeline/src/sources/providers/scrapecreators/tiktok-fixtures/capture.mjs
  *     node .../capture.mjs --only=search
  *
  * What it writes, into this folder:
@@ -823,7 +823,8 @@ writeFileSync(
   `${here}manifest.json`,
   `${JSON.stringify(
     {
-      capturedBy: "packages/core/src/sources/providers/scrapecreators/tiktok-fixtures/capture.mjs",
+      capturedBy:
+        "packages/pipeline/src/sources/providers/scrapecreators/tiktok-fixtures/capture.mjs",
       provider: "ScrapeCreators, TikTok API v1",
       note:
         "Author identity is replaced with stable pseudonyms, and the handle inside a " +

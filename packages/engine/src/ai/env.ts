@@ -4,7 +4,7 @@ import { aiProviders, embeddingProviders } from "./config.js";
 /**
  * The model settings as environment variables, declared once.
  *
- * `config/env.ts` in `packages/core` spreads `aiFields` into the whole
+ * `config/env.ts` in `packages/pipeline` spreads `aiFields` into the whole
  * application schema, so there is still one declaration of each variable and
  * `.env.example` still has one thing to match. They are here because the
  * capture scripts parse them without a database or the rest of the settings,

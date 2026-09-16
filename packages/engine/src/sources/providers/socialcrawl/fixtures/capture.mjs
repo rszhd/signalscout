@@ -44,8 +44,8 @@
  * Run it with your own key. A new account gets 100 free credits and needs no
  * card; this run spends about eight of them:
  *
- *     node packages/core/src/sources/providers/socialcrawl/fixtures/capture.mjs
- *     node packages/core/src/sources/providers/socialcrawl/fixtures/capture.mjs --only=search
+ *     node packages/pipeline/src/sources/providers/socialcrawl/fixtures/capture.mjs
+ *     node packages/pipeline/src/sources/providers/socialcrawl/fixtures/capture.mjs --only=search
  *
  * What it writes, into this folder:
  *
@@ -706,7 +706,7 @@ if (wanted("generated")) {
   } else {
     failures.push(
       "generated: ai/fixtures/query-plan.json holds no X query. Run " +
-        "`pnpm --filter @signalscout/core capture:queries` first.",
+        "`pnpm --filter @signalscout/pipeline capture:queries` first.",
     );
   }
 }
@@ -746,7 +746,7 @@ writeFileSync(
   `${here}manifest.json`,
   `${JSON.stringify(
     {
-      capturedBy: "packages/core/src/sources/providers/socialcrawl/fixtures/capture.mjs",
+      capturedBy: "packages/pipeline/src/sources/providers/socialcrawl/fixtures/capture.mjs",
       provider: "SocialCrawl, X (Twitter) API v1",
       note: "Author identity is replaced with stable pseudonyms. Everything else is whole.",
       fixtures,

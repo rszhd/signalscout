@@ -42,7 +42,7 @@
  *
  * Run it with your own key. It spends about ten credits:
  *
- *     node packages/core/src/sources/providers/scrapecreators/instagram-fixtures/capture.mjs
+ *     node packages/pipeline/src/sources/providers/scrapecreators/instagram-fixtures/capture.mjs
  *     node .../capture.mjs --only=reels
  */
 import { readFileSync, statSync, writeFileSync } from "node:fs";
@@ -579,7 +579,7 @@ writeFileSync(
   `${JSON.stringify(
     {
       capturedBy:
-        "packages/core/src/sources/providers/scrapecreators/instagram-fixtures/capture.mjs",
+        "packages/pipeline/src/sources/providers/scrapecreators/instagram-fixtures/capture.mjs",
       provider:
         "ScrapeCreators, Instagram: the native popular page and the Google-indexed reels search",
       note: "Identity is replaced with stable pseudonyms. Signed CDN addresses are replaced because they expire within hours. Everything else is whole.",

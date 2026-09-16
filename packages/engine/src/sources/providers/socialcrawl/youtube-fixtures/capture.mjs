@@ -47,7 +47,7 @@
  * Run it with your own key. The default run makes about ten billed calls at
  * one credit each — roughly $0.081.
  *
- *     node packages/core/src/sources/providers/socialcrawl/youtube-fixtures/capture.mjs
+ *     node packages/pipeline/src/sources/providers/socialcrawl/youtube-fixtures/capture.mjs
  *     node .../capture.mjs --only=comments
  *
  * What it writes, into this folder:

@@ -82,7 +82,7 @@ own README.
 
 ## The one rule
 
-**`packages/engine` is stateless, and `packages/core` imports neither Fastify
+**`packages/engine` is stateless, and `packages/pipeline` imports neither Fastify
 nor React.**
 
 The engine declares no database, queue, auth or payment dependency, imports

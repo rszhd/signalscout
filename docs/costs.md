@@ -363,16 +363,16 @@ which costs more and hides nothing.
 - The cap and the spend are on the **Monitors** screen, next to the monitor
   they belong to. A refused poll says why there, in the same sentence the
   worker logged.
-- The rule itself is `packages/core/src/budget/budget.ts`. It is one of the
+- The rule itself is `packages/pipeline/src/budget/budget.ts`. It is one of the
   correctness-critical surfaces named in [testing.md](testing.md), so its
   assertions were written before it was.
-- The pre-filter is `packages/core/src/worker/filter.ts`, its keyword rule is
+- The pre-filter is `packages/pipeline/src/worker/filter.ts`, its keyword rule is
   `packages/engine/src/filter/keywords.ts`, and what it dropped is in
   `filter_drops`.
 - The cost test's arithmetic is `packages/engine/src/estimate/estimate.ts`, and
   its assertions were written first for the same reason: it puts a number in
   front of a person who is about to spend money. The samples are collected by
-  `packages/core/src/worker/estimate.ts`, on the `estimate` queue.
+  `packages/pipeline/src/worker/estimate.ts`, on the `estimate` queue.
 
 ## Deletion checks
 

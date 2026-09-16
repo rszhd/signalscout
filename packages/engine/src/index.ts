@@ -3,7 +3,7 @@
  * the estimate, the classification vocabulary and the cipher. Input in, result
  * and cost out. `engine-boundary.test.ts` is the definition of "stateless".
  *
- * `packages/core` re-exports all of this, so an application imports one
+ * `packages/pipeline` re-exports all of this, so an application imports one
  * package today. US-152.
  */
 export {

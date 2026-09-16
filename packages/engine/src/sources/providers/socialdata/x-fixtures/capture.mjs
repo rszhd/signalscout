@@ -44,7 +44,7 @@
  *
  * Run it with your own key:
  *
- *     node packages/core/src/sources/providers/socialdata/x-fixtures/capture.mjs
+ *     node packages/pipeline/src/sources/providers/socialdata/x-fixtures/capture.mjs
  *
  * **This account's balance is read before and after.** The provider bills per
  * result at $0.0002, so about four calls of twenty tweets is under two cents —

@@ -31,7 +31,7 @@ import {
   startEstimate,
   sources as storableSources,
   subredditSchema,
-} from "@signalscout/core";
+} from "@signalscout/pipeline";
 import { z } from "zod";
 import { ownedMonitor, sessionUserId } from "./auth.js";
 import type { ApiServer } from "./server.js";

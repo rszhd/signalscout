@@ -9,7 +9,7 @@
  * times higher.
  *
  * It lives in core rather than in the API for the reason every query does: the
- * API imports no `drizzle-orm`, and `packages/core` is where the database is
+ * API imports no `drizzle-orm`, and `packages/pipeline` is where the database is
  * reached. The route reads this and shapes it for a screen.
  */
 import { and, eq, isNotNull, sql } from "drizzle-orm";

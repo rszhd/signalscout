@@ -5,7 +5,7 @@
       "path": "packages/engine"
     },
     {
-      "path": "packages/core"
+      "path": "packages/pipeline"
     },
     {
       "path": "apps/api"

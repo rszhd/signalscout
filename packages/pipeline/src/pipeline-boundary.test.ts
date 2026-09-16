@@ -4,10 +4,11 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
 /**
- * The one architectural rule in this repository: `packages/core` imports
- * neither Fastify nor React. The API and the worker both call into core, so
- * the moment core knows about an HTTP framework or a renderer, the business
- * logic stops being testable without one.
+ * Half of the architectural rule in this repository: `packages/pipeline`
+ * imports neither Fastify nor React. The API and the worker both call into the
+ * pipeline, so the moment it knows about an HTTP framework or a renderer, the
+ * business logic stops being testable without one. The other half, that the
+ * engine is stateless, is `engine-boundary.test.ts`.
  *
  * A lint rule says the same thing to an editor. This says it to CI.
  */
@@ -48,7 +49,7 @@ async function sourceFiles(directory: string): Promise<string[]> {
   return files.flat();
 }
 
-describe("packages/core imports neither Fastify nor React", () => {
+describe("packages/pipeline imports neither Fastify nor React", () => {
   it("declares neither as a dependency", async () => {
     const manifest = JSON.parse(await readFile(join(packageRoot, "package.json"), "utf8")) as {
       dependencies?: Record<string, string>;

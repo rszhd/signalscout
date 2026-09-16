@@ -33,8 +33,8 @@ import {
   setProviderChoice,
   sourceCredentials,
   sourceProviders,
-} from "@signalscout/core";
-import { createTestDatabase, type TestDatabase } from "@signalscout/core/testing";
+} from "@signalscout/pipeline";
+import { createTestDatabase, type TestDatabase } from "@signalscout/pipeline/testing";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { buildServer } from "./server.js";
 import { asOwner, asUser, testOwner as owner } from "./testing.js";

@@ -355,7 +355,7 @@ UPDATE query_estimates    SET user_id = '<new>' WHERE user_id = '<old>';
 
 **Every table in that list is one somebody has to remember**, and the list has
 grown three times since it was written. `grep -n user_id
-packages/core/src/db/schema.ts` is how to check it is still complete before
+packages/pipeline/src/db/schema.ts` is how to check it is still complete before
 trusting it.
 
 Two of them are silent when they are missed. A `source_providers` row left

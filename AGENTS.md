@@ -97,7 +97,7 @@ matches no project-scoped route and the catch-all sends it to choose one.
 
 **The UI shares one theme.** Read [docs/design.md](docs/design.md) before changing a screen. Colors and sizing live in `apps/web/src/styles/tokens.css`; shared controls live in `styles/theme.css`. Keep page layout separate, and migrate the remaining screens one at a time.
 
-**`packages/engine` is stateless, and `packages/core` imports neither Fastify
+**`packages/engine` is stateless, and `packages/pipeline` imports neither Fastify
 nor React.** The engine holds connectors, model calls, the pre-filter, the
 estimate and the cipher: input in, result and cost out. It declares no `pg`,
 `drizzle-orm`, `pg-boss`, `better-auth` or `stripe`, imports nothing from
@@ -268,21 +268,21 @@ pnpm --filter @signalscout/engine capture:queries      # spends money
 pnpm --filter @signalscout/engine capture:embeddings   # spends money
 pnpm --filter @signalscout/engine capture:comment-filter # spends money
 pnpm --filter @signalscout/engine capture:triage        # spends money
-pnpm --filter @signalscout/core live:model-probe      # one call, a fraction of a cent
-pnpm --filter @signalscout/core live:provider-switch # spends ~$0.08
-pnpm --filter @signalscout/core live:linkedin-poll   # spends ~$0.08 + model
-pnpm --filter @signalscout/core live:x-poll          # spends ~$0.002 + model
-pnpm --filter @signalscout/core live:sc-tiktok-poll   # spends ~$0.004 + model
-pnpm --filter @signalscout/core live:sc-youtube-poll  # spends ~$0.004 + model
-pnpm --filter @signalscout/core live:apify-linkedin-poll # spends ~$0.05 + model
-pnpm --filter @signalscout/core live:tiktok-poll     # spends ~$0.20 + model
-pnpm --filter @signalscout/core live:tiktok-comments # spends model only
-pnpm --filter @signalscout/core live:instagram-poll   # spends ~$1.65 + model
-pnpm --filter @signalscout/core live:instagram-comments # spends model only
-pnpm --filter @signalscout/core live:thread-loop      # spends up to a cap you pass
-pnpm --filter @signalscout/core live:notification      # spends model only
-pnpm --filter @signalscout/core live:webhook           # spends nothing
-pnpm --filter @signalscout/core measure:lead-position # spends ~$0.40
+pnpm --filter @signalscout/pipeline live:model-probe      # one call, a fraction of a cent
+pnpm --filter @signalscout/pipeline live:provider-switch # spends ~$0.08
+pnpm --filter @signalscout/pipeline live:linkedin-poll   # spends ~$0.08 + model
+pnpm --filter @signalscout/pipeline live:x-poll          # spends ~$0.002 + model
+pnpm --filter @signalscout/pipeline live:sc-tiktok-poll   # spends ~$0.004 + model
+pnpm --filter @signalscout/pipeline live:sc-youtube-poll  # spends ~$0.004 + model
+pnpm --filter @signalscout/pipeline live:apify-linkedin-poll # spends ~$0.05 + model
+pnpm --filter @signalscout/pipeline live:tiktok-poll     # spends ~$0.20 + model
+pnpm --filter @signalscout/pipeline live:tiktok-comments # spends model only
+pnpm --filter @signalscout/pipeline live:instagram-poll   # spends ~$1.65 + model
+pnpm --filter @signalscout/pipeline live:instagram-comments # spends model only
+pnpm --filter @signalscout/pipeline live:thread-loop      # spends up to a cap you pass
+pnpm --filter @signalscout/pipeline live:notification      # spends model only
+pnpm --filter @signalscout/pipeline live:webhook           # spends nothing
+pnpm --filter @signalscout/pipeline measure:lead-position # spends ~$0.40
 pnpm capture:deletions                            # spends ~$0.02
 
 node packages/engine/src/sources/providers/socialcrawl/linkedin-fixtures/capture.mjs   # ~30 credits

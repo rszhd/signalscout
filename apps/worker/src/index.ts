@@ -1,4 +1,4 @@
-import { createLogger, loadEnv, startWorker } from "@signalscout/core";
+import { createLogger, loadEnv, startWorker } from "@signalscout/pipeline";
 
 /**
  * The worker as its own process. It runs the same `startWorker` the API runs

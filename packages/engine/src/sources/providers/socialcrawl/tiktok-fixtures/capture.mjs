@@ -30,7 +30,7 @@
  *   6. **How long is a TikTok comment?** The answer decides whether this
  *      platform can carry a lead at all.
  *
- *     node packages/core/src/sources/providers/socialcrawl/tiktok-fixtures/capture.mjs
+ *     node packages/pipeline/src/sources/providers/socialcrawl/tiktok-fixtures/capture.mjs
  *
  * About six billed calls at one credit each — $0.05 — plus one free refusal.
  */

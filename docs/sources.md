@@ -71,7 +71,7 @@ be.
 
 **5. Add the provider id to `providers`** in
 `packages/engine/src/vocabulary.ts` and run `pnpm db:generate` in
-`packages/core`, whose schema builds the constraints from that array. Six
+`packages/pipeline`, whose schema builds the constraints from that array. Six
 columns carry it, each with its own check constraint: `api_usage`, `source_continuations`,
 `source_credentials`, `posts` (attribution only), `query_estimate_probes` and
 `source_providers`. One migration number, one file.
@@ -101,7 +101,7 @@ nothing about keys, because two providers fetching it agree about neither.
 **2. Write a migration for `posts.source`.** It carries a check constraint
 listing the platforms the schema accepts. Add the id to `sources` in
 `packages/engine/src/vocabulary.ts`, run `pnpm db:generate` in
-`packages/core`, whose schema builds the constraint from that array, and keep
+`packages/pipeline`, whose schema builds the constraint from that array, and keep
 the rule: one migration number, one file.
 
 `assertSourcesCanBeStored` turns the mistake into a failed boot rather than a

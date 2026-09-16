@@ -54,7 +54,7 @@ import {
   setDefaultAiKey,
   triageConfigFromEnvironment,
   unpricedModelsFor,
-} from "@signalscout/core";
+} from "@signalscout/pipeline";
 import { z } from "zod";
 import { sessionUserId } from "./auth.js";
 import type { ApiServer } from "./server.js";

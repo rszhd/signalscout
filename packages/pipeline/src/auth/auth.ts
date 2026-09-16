@@ -14,7 +14,7 @@
  * downstream knows a text id and no more — which is what made `singleUserId` a
  * value to replace rather than a shape to change.
  *
- * `packages/core` imports neither Fastify nor React, and Better Auth is
+ * `packages/pipeline` imports neither Fastify nor React, and Better Auth is
  * neither: it answers a `Request` with a `Response`, and `apps/api` is what
  * turns a Fastify request into one.
  */

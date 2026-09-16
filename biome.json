@@ -42,7 +42,7 @@
       }
     },
     {
-      "includes": ["packages/core/**"],
+      "includes": ["packages/pipeline/**"],
       "linter": {
         "rules": {
           "style": {
@@ -50,10 +50,10 @@
               "level": "error",
               "options": {
                 "paths": {
-                  "fastify": "packages/core imports neither Fastify nor React. See AGENTS.md.",
-                  "react": "packages/core imports neither Fastify nor React. See AGENTS.md.",
-                  "react-dom": "packages/core imports neither Fastify nor React. See AGENTS.md.",
-                  "react-router": "packages/core imports neither Fastify nor React. See AGENTS.md."
+                  "fastify": "packages/pipeline imports neither Fastify nor React. See AGENTS.md.",
+                  "react": "packages/pipeline imports neither Fastify nor React. See AGENTS.md.",
+                  "react-dom": "packages/pipeline imports neither Fastify nor React. See AGENTS.md.",
+                  "react-router": "packages/pipeline imports neither Fastify nor React. See AGENTS.md."
                 }
               }
             }

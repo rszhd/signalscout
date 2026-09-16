@@ -30,7 +30,7 @@ import {
   type SendEmail,
   storedCredentialNames,
   withoutMachineModelKeys,
-} from "@signalscout/core";
+} from "@signalscout/pipeline";
 import Fastify, {
   type FastifyInstance,
   type RawReplyDefaultExpression,

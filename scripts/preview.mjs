@@ -218,7 +218,7 @@ async function main() {
   const baseEnv = { ...process.env, ...fileEnv };
 
   console.log("Applying migrations…");
-  await run("pnpm", ["--filter", "@signalscout/core", "migrate"], { env: baseEnv });
+  await run("pnpm", ["--filter", "@signalscout/pipeline", "migrate"], { env: baseEnv });
 
   // The tunnel first: its address is an input to the API, which has to be told
   // the origin Better Auth will see.

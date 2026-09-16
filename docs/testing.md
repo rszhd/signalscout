@@ -29,7 +29,7 @@ layer takes lies about the thing the other must verify.**
 Say the lie out loud before writing the second test: name the failure it
 catches that the first one cannot. For ordinary CRUD, one test from the route
 to the database covers the routing and the persistence together. A second test
-in `packages/core` earns its place when the rule has a caller the first test
+in `packages/pipeline` earns its place when the rule has a caller the first test
 never reaches — which is what US-012 found, with the monitor routes' counts
 asserted nowhere while the rule under them passed.
 

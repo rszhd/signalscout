@@ -37,7 +37,7 @@ semantics a screen must not get wrong:
 
 `docs/design.md` is the rule; the migration happens one screen at a time. A
 theme class not served by a component (e.g. a page's own `text-button`) stays a
-plain class until a component earns it. Components never import `packages/core`.
+plain class until a component earns it. Components never import `packages/pipeline`.
 
 ## Spacing
 

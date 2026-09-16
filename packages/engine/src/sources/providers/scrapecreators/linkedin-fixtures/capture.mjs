@@ -50,7 +50,7 @@
  *
  * Run it with your own key:
  *
- *     node packages/core/src/sources/providers/scrapecreators/linkedin-fixtures/capture.mjs
+ *     node packages/pipeline/src/sources/providers/scrapecreators/linkedin-fixtures/capture.mjs
  *     node .../capture.mjs --only=search
  *
  * The default run makes four billed calls and three probes that are expected

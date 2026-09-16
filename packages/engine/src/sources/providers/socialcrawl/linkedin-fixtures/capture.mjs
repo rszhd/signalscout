@@ -61,7 +61,7 @@
  * Run it with your own key. The default run makes five billed calls at 5
  * credits each, plus four probes that are expected to be free:
  *
- *     node packages/core/src/sources/providers/socialcrawl/linkedin-fixtures/capture.mjs
+ *     node packages/pipeline/src/sources/providers/socialcrawl/linkedin-fixtures/capture.mjs
  *     node .../capture.mjs --only=search
  *     node .../capture.mjs --only=member    # not in the default run; see below
  *
@@ -824,7 +824,8 @@ writeFileSync(
   `${here}manifest.json`,
   `${JSON.stringify(
     {
-      capturedBy: "packages/core/src/sources/providers/socialcrawl/linkedin-fixtures/capture.mjs",
+      capturedBy:
+        "packages/pipeline/src/sources/providers/socialcrawl/linkedin-fixtures/capture.mjs",
       provider: "SocialCrawl, LinkedIn API v1",
       note: "Author identity is replaced with stable pseudonyms. Everything else is whole.",
       fixtures,

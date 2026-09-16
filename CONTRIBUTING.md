@@ -42,7 +42,7 @@ are easy to break by accident.
 
 Four of them matter more than the rest:
 
-- **`packages/core` imports neither Fastify nor React.** The API and the worker
+- **`packages/pipeline` imports neither Fastify nor React.** The API and the worker
   both call into it. If a change seems to need it, the change is wrong.
 - **A red test is fixed in the code, not in the assertion.** An expected value
   moves only when the behaviour was meant to move, and the commit says which
@@ -79,7 +79,7 @@ uses it, so the phone that saved it does not ask again. `PREVIEW_USER`,
 way. A value typed in front of the command wins over the file.
 
 Only Vite reloads. The API is started without its watcher, so a change under
-`apps/api` or `packages/core` needs the command restarted.
+`apps/api` or `packages/pipeline` needs the command restarted.
 
 Use it to look at screens, not for anything real. Cloudflare terminates TLS at
 its edge, so it can read the traffic there, and a quick tunnel's address is

@@ -16,7 +16,7 @@
  * The insert is idempotent, so the client may call it on every load where both
  * keys are present. A failed call is retried on the next load.
  */
-import { type Database, markOnboardingComplete } from "@signalscout/core";
+import { type Database, markOnboardingComplete } from "@signalscout/pipeline";
 import { z } from "zod";
 import { sessionUserId } from "./auth.js";
 import type { ApiServer } from "./server.js";

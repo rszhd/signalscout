@@ -1,7 +1,7 @@
 /**
  * The inbox route, against real Postgres.
  *
- * `packages/core` owns the ordering rule and asserts it. What is asserted here
+ * `packages/pipeline` owns the ordering rule and asserts it. What is asserted here
  * is the other half: that the screen's own request shape reaches it. A filter
  * the query string drops, a cursor the route re-encodes, or a clock it forgets
  * to carry are all failures the core tests cannot see, and each looks like an
@@ -15,8 +15,8 @@ import {
   matches,
   monitors,
   posts,
-} from "@signalscout/core";
-import { createTestDatabase, type TestDatabase } from "@signalscout/core/testing";
+} from "@signalscout/pipeline";
+import { createTestDatabase, type TestDatabase } from "@signalscout/pipeline/testing";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { buildServer } from "./server.js";
 import { asOwner } from "./testing.js";
@@ -449,7 +449,7 @@ describe("the inbox route", () => {
   /**
    * The inbox as a spreadsheet. US-064.
    *
-   * The escaping is asserted in `packages/core/src/matches/csv.test.ts`. What
+   * The escaping is asserted in `packages/pipeline/src/matches/csv.test.ts`. What
    * belongs here is the route's promise: the file is the list on screen, and
    * it is not one page of it.
    */

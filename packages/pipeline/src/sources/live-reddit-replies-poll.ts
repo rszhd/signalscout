@@ -1,39 +1,46 @@
 /**
- * US-044's live proof: one TikTok poll that reads the comments, end to end.
+ * US-020's live proof: one Reddit poll that reads the replies, end to end.
  *
- * An instrument, not a test. The suite proves our half against the payloads
- * `youtube-fixtures/capture.mjs` recorded, and those answered nine questions
- * about the provider. What none of them can answer is whether the whole path
- * works: search, store, open the threads, store the comments, triage them,
- * classify them with the video above as context, and bill what the connector
- * says it billed.
+ * This is an instrument, not a test. The suite proves our half against
+ * captured payloads — including the thread where ScrapeCreators reports
+ * `has_more: false` with 33 of 58 comments missing — but nothing in it has ever
+ * asked a real provider for a real reply. The claim underneath is that a poll
+ * collects posts, opens the threads worth opening, stores what was said,
+ * classifies it with the thread as context, and bills what the connector says
+ * it billed. The only way to ask that is to ask it.
  *
- *     pnpm --filter @signalscout/core live:tiktok-poll
+ *     pnpm --filter @signalscout/pipeline live:reddit-replies
  *
- * **It spends money and it writes rows.** One credit for the search page, then
- * one per thread opened, at most `maxThreadsPerJob` — so under $0.20 of
- * SocialCrawl credit. The model is the larger half, as always: every comment
- * that survives buys a triage call and every one triage keeps buys a
- * classification. A YouTube comment page is 51 rows against Reddit's 25, so
- * expect roughly twice the model spend of the Reddit run per thread.
+ * **It spends money and it writes rows.** One credit for the subreddit page,
+ * then one per thread opened — at most `maxThreadsPerJob` — so about $0.03 of
+ * ScrapeCreators credit. The model is the larger half: every reply that
+ * survives buys a triage call, and every reply triage keeps buys a
+ * classification. Expect a few hundred triage calls and a few dozen
+ * classifications. It leaves behind a paused monitor, its posts and replies,
+ * its `api_usage` rows and its matches, which are the evidence.
  *
- * **This is the platform where replies are not an option.** US-034 measured it:
- * a search for `flaky tests` returned 45 results and every one of the first
- * twelve was a tutorial. A video is something published to be seen. So this run
- * turns `includeReplies` on and the interesting number is not how many videos
- * matched — it is how many comments did.
+ * It drives the steps by hand with a queue that runs the next one instead of
+ * enqueuing it. The steps are the real ones in the real order, so what runs
+ * here is what the worker runs. The order is the part worth watching:
+ *
+ *     collect → filter → replies → filter → classify
+ *
+ * The second `filter` is the reply pass, and it must skip the keyword and
+ * embedding stages. The `replies` step must not appear a second time, because
+ * a reply has no thread of its own and a loop there would buy the same words
+ * for ever.
  *
  * What it is trying to see, in order:
  *
- *   1. A real search returns videos, stored under the platform and keyed by
- *      YouTube's own id.
- *   2. `api_usage` holds rows for the pair, in credits, priced by the connector.
- *   3. Threads open under the videos the pre-filter kept, and the comments are
- *      stored as `kind = 'reply'` rows linked to their video.
- *   4. The classifier reads a comment with its video above it, and what comes
- *      out is readable by a person.
- *   5. Whether a video ever matches at all, which is this platform's real
- *      question.
+ *   1. A real thread comes back, with real nested replies, keyed by Reddit's
+ *      own `t1_` fullnames.
+ *   2. `posts` holds them as `kind = 'reply'` rows linked to their parent, and
+ *      the deduplication key needed no change to make that work.
+ *   3. `repliesPartial` is written honestly: a thread we did not finish says so.
+ *   4. The classifier reads a reply with its thread above it, and the matches
+ *      it finds are readable by a person.
+ *   5. A second run opens no thread whose reply count has not moved, which is
+ *      the rule that stops an hourly monitor re-buying every conversation.
  */
 
 import {
@@ -48,7 +55,7 @@ import {
   embeddingConfigFromEnvironment,
   embeddingNeedsApiKey,
   needsApiKey,
-  tikTokPlatformId,
+  redditPlatformId,
   triageConfigFromEnvironment,
 } from "@signalscout/engine";
 import { and, desc, eq } from "drizzle-orm";
@@ -63,6 +70,7 @@ import { createFilterStep } from "../worker/filter.js";
 import { classifyQueue, filterQueue, notifyQueue, repliesQueue } from "../worker/queues.js";
 import { createRepliesStep } from "../worker/replies.js";
 import type { StepContext } from "../worker/steps.js";
+import { readProviderChoices } from "./choices.js";
 
 const databaseUrl = process.env.DATABASE_URL;
 
@@ -72,35 +80,26 @@ if (!databaseUrl) {
 }
 
 /**
- * **Not `flaky tests`, and that is the whole point of this run.**
+ * One subreddit, and not a keyword.
  *
- * Every other live poll in this repository used those two words so the answers
- * could be compared. Sending them here would repeat a test US-044 already ran
- * and already learned from: on TikTok *flaky* means dandruff and *test* means a
- * school exam, so the search returned scalp treatment and chemistry quizzes.
- *
- * The finding underneath was that TikTok holds leads where people have to
- * describe something to get a useful answer. The acne thread's top comment was
- * a person listing their fungal acne, redness, sensitive and oily skin and
- * asking whether a product suited them. So this run uses a monitor whose
- * customers are those people, and asks whether the pipeline finds them.
- *
- * A comparison against the other four platforms is not available on this run.
- * That is a cost of testing the platform honestly rather than consistently, and
- * it is the right trade: a consistent test of the wrong thing measures nothing.
+ * US-022 measured both on the same monitor for the same money: the model's own
+ * keyword brought back r/AllFinraExams and r/islam, and one subreddit brought
+ * back fifty posts that were all on topic. This run is about replies, so it
+ * starts from the discovery mode that does not spend the whole budget proving
+ * a point about noise.
  */
-const query = "best skincare for acne scars";
+const subreddit = "softwaretesting";
 
 /**
- * A cap this run fits inside, so the guard is exercised rather than bypassed.
+ * A cap the poll fits inside, so the guard is exercised rather than bypassed.
  *
- * BUG-004's fix means the classify step now stops at the cap mid-batch, so a
- * run that reaches it stops rather than sailing past. That branch has never
- * been reached live.
+ * Larger than the LinkedIn run's because this one buys model calls per reply
+ * rather than per post. The replies step refuses to open a thread once the cap
+ * is reached, which is the branch no live run has ever taken.
  */
-const capMicros = 1_000_000;
+const capMicros = 600_000;
 
-const logger = createLogger({ level: "warn", name: "live-tiktok" });
+const logger = createLogger({ level: "info", name: "live-reddit-replies" });
 const { db, close } = createDatabase(databaseUrl);
 
 const registry = createSourceRegistry({
@@ -113,8 +112,10 @@ const owner = await ownerUserId(db);
 const credentialsFor = credentialsFromStore(db, undefined, process.env, logger);
 
 const started = Date.now();
+const since = () => `${((Date.now() - started) / 1000).toFixed(1)}s`;
+
 function say(line: string): void {
-  console.log(`[${((Date.now() - started) / 1000).toFixed(1).padStart(7)}s] ${line}`);
+  console.log(`[${since().padStart(7)}] ${line}`);
 }
 
 const aiEnvironment = loadAiEnv(process.env);
@@ -167,7 +168,7 @@ function inlineQueue(context: () => StepContext) {
 
       if (queue === repliesQueue && monitorId && postIds) {
         seen.push(`replies(${postIds.length})`);
-        say(`replies: opening comment threads under ${postIds.length} videos`);
+        say(`replies: opening threads under ${postIds.length} posts`);
         await replies({ monitorId, postIds }, context());
         return "inline";
       }
@@ -177,8 +178,9 @@ function inlineQueue(context: () => StepContext) {
         say(`classify: ${postIds.length} items survived the pre-filter`);
 
         // The step throws when it could not score everything, so pg-boss
-        // retries. Right in the worker and wrong here: the items are stored
-        // and billed, and dying now would make somebody pay twice to read them.
+        // retries. That is right in the worker and wrong here: the items are
+        // stored and billed already, and dying now would make somebody pay
+        // twice to read them.
         try {
           await classify({ monitorId, postIds }, context());
         } catch (error) {
@@ -204,7 +206,7 @@ async function counts() {
   const rows = await db
     .select({ id: posts.id, kind: posts.kind })
     .from(posts)
-    .where(eq(posts.source, tikTokPlatformId));
+    .where(eq(posts.source, redditPlatformId));
 
   return {
     posts: rows.filter((row) => row.kind === "post").length,
@@ -212,29 +214,29 @@ async function counts() {
   };
 }
 
+async function usage(monitorId: string) {
+  return db
+    .select({ units: apiUsage.units, micros: apiUsage.estimatedCostMicros })
+    .from(apiUsage)
+    .where(eq(apiUsage.monitorId, monitorId));
+}
+
 async function main(): Promise<void> {
   const [monitor] = await db
     .insert(monitors)
     .values({
       userId: owner,
-      name: "US-044 live TikTok poll",
-      /**
-       * A consumer product, because TikTok is a consumer platform.
-       *
-       * The example monitor in PLAN.md sells a QA tool, and US-044 measured
-       * what that finds here: dandruff. This profile is the one the capture
-       * found people for.
-       */
-      product: "A moisturiser for acne-prone and sensitive skin, fragrance free",
-      idealCustomer:
-        "People with acne-prone, oily or sensitive skin who have tried several products",
-      problem: "Products for acne dry the skin out or make redness and irritation worse",
+      name: "US-020 live Reddit replies",
+      product: "A test runner that records browser flows instead of coding them",
+      idealCustomer: "Small SaaS teams with no dedicated QA engineer",
+      problem: "End-to-end tests break whenever the UI changes",
       signals: ["recommendation_request", "problem"],
-      sources: [tikTokPlatformId],
-      generatedQueries: { [tikTokPlatformId]: [query] },
-      generatedSubreddits: [],
+      sources: [redditPlatformId],
+      generatedQueries: { [redditPlatformId]: [] },
+      generatedSubreddits: [subreddit],
+      // US-022 measured 30 as too low inside a topical subreddit: every post
+      // there is somewhat relevant and the scores compress upward.
       minScore: 50,
-      // Not optional on this platform. The video is not the lead.
       includeReplies: true,
       pausedAt: new Date(),
     })
@@ -246,24 +248,37 @@ async function main(): Promise<void> {
 
   await db.insert(budgets).values({ monitorId, monthlyCapMicros: capMicros, onExhausted: "pause" });
 
-  const [connector] = registry.forPlatform(tikTokPlatformId);
+  // The recorded choice decides, exactly as the poll decides. Passing `among`
+  // without it would make a two-provider deployment ambiguous here and not in
+  // the worker, which is the wrong place to differ.
+  const connector = registry.only(redditPlatformId, {
+    choices: await readProviderChoices(db, owner),
+    among: (
+      await Promise.all(
+        registry
+          .forPlatform(redditPlatformId)
+          .map(async (candidate) =>
+            (await credentialsFor(candidate, owner)) ? candidate.provider.id : undefined,
+          ),
+      )
+    ).filter((id): id is string => id !== undefined),
+  });
 
-  if (!connector) throw new Error("No YouTube connector is registered.");
-  if (!(await credentialsFor(connector, owner))) {
+  if (!connector.fetchReplies) {
     throw new Error(
-      `No credentials for ${connector.provider.id}. Set SOCIALCRAWL_API_KEY, or store one on the connections screen.`,
+      `${connector.provider.id} cannot read replies. This run needs a provider that can.`,
     );
   }
 
   const before = await counts();
 
   say(`monitor ${monitorId}`);
-  say(`query "${query}", replies on, cap $${(capMicros / 1_000_000).toFixed(2)}`);
-  say("monitor: a skincare product, not the QA one — see the header");
-  say(`already stored: ${before.posts} videos, ${before.replies} comments`);
+  say(`r/${subreddit}, replies on, cap $${(capMicros / 1_000_000).toFixed(2)}`);
+  say(`already stored: ${before.posts} posts, ${before.replies} replies`);
   say(
     `connector: ${connector.platform.id} through ${connector.provider.id}; ` +
-      `${connector.pricePerUnitMicros} micro-dollars a ${connector.billableUnit}`,
+      `${connector.pricePerUnitMicros} micro-dollars a ${connector.billableUnit}, ` +
+      `${connector.replyPricePerUnitMicros ?? connector.pricePerUnitMicros} a reply page`,
   );
   say(`classifier ${aiConfig.model}, triage ${triageConfig.model}`);
 
@@ -273,23 +288,20 @@ async function main(): Promise<void> {
   await collect({ monitorId }, context());
 
   const after = await counts();
-  const spent = await db
-    .select({ units: apiUsage.units, micros: apiUsage.estimatedCostMicros })
-    .from(apiUsage)
-    .where(eq(apiUsage.monitorId, monitorId));
+  const spent = await usage(monitorId);
 
   console.log("");
   say(`steps: ${seen.join(" → ")}`);
   say(
-    `stored: ${after.posts} videos (${after.posts - before.posts} new), ` +
-      `${after.replies} comments (${after.replies - before.replies} new)`,
+    `stored: ${after.posts} posts (${after.posts - before.posts} new), ` +
+      `${after.replies} replies (${after.replies - before.replies} new)`,
   );
   say(`api_usage: ${JSON.stringify(spent)}`);
 
   const threads = await db
-    .select({ partial: posts.repliesPartial })
+    .select({ url: posts.url, replyCount: posts.replyCount, partial: posts.repliesPartial })
     .from(posts)
-    .where(and(eq(posts.source, tikTokPlatformId), eq(posts.kind, "post")));
+    .where(and(eq(posts.source, redditPlatformId), eq(posts.kind, "post")));
 
   const opened = threads.filter((row) => row.partial !== null);
   say(
@@ -306,28 +318,20 @@ async function main(): Promise<void> {
       url: posts.url,
       text: posts.excerpt,
       kind: posts.kind,
-      parentId: posts.parentPostId,
     })
     .from(matches)
     .innerJoin(posts, eq(matches.postId, posts.id))
     .where(eq(matches.monitorId, monitorId))
     .orderBy(desc(matches.score));
 
-  const commentMatches = found.filter((row) => row.kind === "reply");
-
   say(
     `matches at or above ${monitor.minScore}: ${found.length} ` +
-      `(${commentMatches.length} of them comments, ${found.length - commentMatches.length} videos)`,
+      `(${found.filter((row) => row.kind === "reply").length} of them replies)`,
   );
 
   for (const match of found) {
-    const [parent] = match.parentId
-      ? await db.select({ title: posts.title }).from(posts).where(eq(posts.id, match.parentId))
-      : [];
-
     console.log(`\n  ${match.score}  [${match.kind}]  ${match.url}`);
-    if (parent) console.log(`     under: ${parent.title ?? "(untitled)"}`);
-    console.log(`     ${match.text?.slice(0, 200).replace(/\s+/g, " ")}`);
+    console.log(`     ${match.text?.slice(0, 160).replace(/\s+/g, " ")}`);
     for (const reason of match.reasons) console.log(`     - ${reason}`);
   }
 

@@ -1,39 +1,42 @@
 /**
- * US-034's live proof: one YouTube poll that reads the comments, end to end.
+ * US-049's live proof: one Instagram poll that reads the comments, end to end.
  *
  * An instrument, not a test. The suite proves our half against the payloads
- * `youtube-fixtures/capture.mjs` recorded, and those answered nine questions
- * about the provider. What none of them can answer is whether the whole path
- * works: search, store, open the threads, store the comments, triage them,
- * classify them with the video above as context, and bill what the connector
- * says it billed.
+ * `instagram-fixtures/capture.mjs` recorded. What no fixture can answer is
+ * whether the whole path works: search, store, open the threads, store the
+ * comments, triage them, classify them with the reel above as context, and bill
+ * what the connector says it billed.
  *
- *     pnpm --filter @signalscout/core live:youtube-poll
+ *     pnpm --filter @signalscout/pipeline live:instagram-poll
  *
- * **It spends money and it writes rows.** One credit for the search page, then
- * one per thread opened, at most `maxThreadsPerJob` — so under $0.20 of
- * SocialCrawl credit. The model is the larger half, as always: every comment
- * that survives buys a triage call and every one triage keeps buys a
- * classification. A YouTube comment page is 51 rows against Reddit's 25, so
- * expect roughly twice the model spend of the Reddit run per thread.
+ * **Read the cost before running it. This is the dearest comment platform we
+ * have.** A search page is 1 credit. **A comment page is 5**, where TikTok's and
+ * YouTube's are 1 — so `maxThreadsPerJob` threads at `maxPagesPerThread` pages
+ * is up to 500 credits, about $4. The cap below is what actually bounds it, and
+ * exercising that guard is half the point of the run: no live poll in this
+ * repository has ever been refused by it, and BUG-004's mid-batch stop has
+ * never been reached.
  *
- * **This is the platform where replies are not an option.** US-034 measured it:
- * a search for `flaky tests` returned 45 results and every one of the first
- * twelve was a tutorial. A video is something published to be seen. So this run
- * turns `includeReplies` on and the interesting number is not how many videos
- * matched — it is how many comments did.
+ * **The question this run has to answer is whether a 26-character comment can
+ * carry a lead.** US-049's capture measured Instagram comments at a median of
+ * 26 characters with none of 29 over sixty, against TikTok's 54 with 22 of 49
+ * over sixty on the same kind of thread. US-044 found TikTok's leads in exactly
+ * the comments that ran long — a person listing their fungal acne, redness and
+ * sensitivity and asking whether a product suited them. If Instagram's comments
+ * are half that length, the honest possibility is that there is no such comment
+ * here, and this run is how that is found out rather than argued.
  *
  * What it is trying to see, in order:
  *
- *   1. A real search returns videos, stored under the platform and keyed by
- *      YouTube's own id.
- *   2. `api_usage` holds rows for the pair, in credits, priced by the connector.
- *   3. Threads open under the videos the pre-filter kept, and the comments are
- *      stored as `kind = 'reply'` rows linked to their video.
- *   4. The classifier reads a comment with its video above it, and what comes
+ *   1. A real search returns reels, stored under the platform and keyed by
+ *      Instagram's own id, with the date window the connector always sends.
+ *   2. `api_usage` holds rows for the pair, in credits, priced by the connector
+ *      — and the search and the comment pages are priced differently.
+ *   3. Threads open under the reels the pre-filter kept, and the comments are
+ *      stored as `kind = 'reply'` rows linked to their reel.
+ *   4. The classifier reads a comment with its reel above it, and what comes
  *      out is readable by a person.
- *   5. Whether a video ever matches at all, which is this platform's real
- *      question.
+ *   5. Whether anything matches at all, which is this platform's real question.
  */
 
 import {
@@ -47,9 +50,9 @@ import {
   createTriager,
   embeddingConfigFromEnvironment,
   embeddingNeedsApiKey,
+  instagramPlatformId,
   needsApiKey,
   triageConfigFromEnvironment,
-  youTubePlatformId,
 } from "@signalscout/engine";
 import { and, desc, eq } from "drizzle-orm";
 import { ownerUserId } from "../auth/user.js";
@@ -72,24 +75,26 @@ if (!databaseUrl) {
 }
 
 /**
- * The same two words the other three platforms were polled with.
+ * The query the capture used, so the two runs can be compared.
  *
- * `flaky tests` ran through Bright Data, ScrapeCreators, SocialCrawl's X
- * endpoint and its LinkedIn one, so a fifth answer joins a comparison that
- * already has four rather than starting a new one.
+ * Not `flaky tests`, for the reason US-044 established on TikTok and US-049
+ * confirmed here: these are consumer platforms, and the words of a trade mean
+ * something else on them. This is a monitor whose customers must describe a
+ * condition to get a useful answer, which is the only shape that has ever found
+ * a lead in a comment section.
  */
-const query = "flaky tests";
+const query = "skincare for acne scars";
 
 /**
- * A cap this run fits inside, so the guard is exercised rather than bypassed.
+ * The cap, and on this platform it is the thing that ends the run.
  *
- * BUG-004's fix means the classify step now stops at the cap mid-batch, so a
- * run that reaches it stops rather than sailing past. That branch has never
- * been reached live.
+ * A dollar buys about 123 credits: one search page and, at 5 credits each,
+ * roughly 24 comment pages. The reply step would happily open 25 threads of up
+ * to 4 pages, so this refuses long before the step's own bounds do.
  */
 const capMicros = 1_000_000;
 
-const logger = createLogger({ level: "warn", name: "live-youtube" });
+const logger = createLogger({ level: "warn", name: "live-instagram" });
 const { db, close } = createDatabase(databaseUrl);
 
 const registry = createSourceRegistry({
@@ -156,7 +161,7 @@ function inlineQueue(context: () => StepContext) {
 
       if (queue === repliesQueue && monitorId && postIds) {
         seen.push(`replies(${postIds.length})`);
-        say(`replies: opening comment threads under ${postIds.length} videos`);
+        say(`replies: opening comment threads under ${postIds.length} reels, 5 credits a page`);
         await replies({ monitorId, postIds }, context());
         return "inline";
       }
@@ -193,7 +198,7 @@ async function counts() {
   const rows = await db
     .select({ id: posts.id, kind: posts.kind })
     .from(posts)
-    .where(eq(posts.source, youTubePlatformId));
+    .where(eq(posts.source, instagramPlatformId));
 
   return {
     posts: rows.filter((row) => row.kind === "post").length,
@@ -206,16 +211,18 @@ async function main(): Promise<void> {
     .insert(monitors)
     .values({
       userId: owner,
-      name: "US-034 live YouTube poll",
-      product: "A test runner that records browser flows instead of coding them",
-      idealCustomer: "Small SaaS teams with no dedicated QA engineer",
-      problem: "End-to-end tests break whenever the UI changes",
+      name: "US-049 live Instagram poll",
+      /** The same monitor US-044 used on TikTok, so the two are comparable. */
+      product: "A moisturiser for acne-prone and sensitive skin, fragrance free",
+      idealCustomer:
+        "People with acne-prone, oily or sensitive skin who have tried several products",
+      problem: "Products for acne dry the skin out or make redness and irritation worse",
       signals: ["recommendation_request", "problem"],
-      sources: [youTubePlatformId],
-      generatedQueries: { [youTubePlatformId]: [query] },
+      sources: [instagramPlatformId],
+      generatedQueries: { [instagramPlatformId]: [query] },
       generatedSubreddits: [],
       minScore: 50,
-      // Not optional on this platform. The video is not the lead.
+      // Not optional on this platform. The reel is not the lead.
       includeReplies: true,
       pausedAt: new Date(),
     })
@@ -227,9 +234,9 @@ async function main(): Promise<void> {
 
   await db.insert(budgets).values({ monitorId, monthlyCapMicros: capMicros, onExhausted: "pause" });
 
-  const [connector] = registry.forPlatform(youTubePlatformId);
+  const [connector] = registry.forPlatform(instagramPlatformId);
 
-  if (!connector) throw new Error("No YouTube connector is registered.");
+  if (!connector) throw new Error("No Instagram connector is registered.");
   if (!(await credentialsFor(connector, owner))) {
     throw new Error(
       `No credentials for ${connector.provider.id}. Set SOCIALCRAWL_API_KEY, or store one on the connections screen.`,
@@ -240,10 +247,11 @@ async function main(): Promise<void> {
 
   say(`monitor ${monitorId}`);
   say(`query "${query}", replies on, cap $${(capMicros / 1_000_000).toFixed(2)}`);
-  say(`already stored: ${before.posts} videos, ${before.replies} comments`);
+  say(`already stored: ${before.posts} reels, ${before.replies} comments`);
   say(
     `connector: ${connector.platform.id} through ${connector.provider.id}; ` +
-      `${connector.pricePerUnitMicros} micro-dollars a ${connector.billableUnit}`,
+      `search ${connector.pricePerUnitMicros} micro-dollars a ${connector.billableUnit}, ` +
+      `a comment page ${connector.replyPricePerUnitMicros}`,
   );
   say(`classifier ${aiConfig.model}, triage ${triageConfig.model}`);
 
@@ -261,15 +269,18 @@ async function main(): Promise<void> {
   console.log("");
   say(`steps: ${seen.join(" → ")}`);
   say(
-    `stored: ${after.posts} videos (${after.posts - before.posts} new), ` +
+    `stored: ${after.posts} reels (${after.posts - before.posts} new), ` +
       `${after.replies} comments (${after.replies - before.replies} new)`,
   );
   say(`api_usage: ${JSON.stringify(spent)}`);
+  say(
+    `provider spend: $${(spent.reduce((total, row) => total + Number(row.micros ?? 0), 0) / 1_000_000).toFixed(4)}`,
+  );
 
   const threads = await db
     .select({ partial: posts.repliesPartial })
     .from(posts)
-    .where(and(eq(posts.source, youTubePlatformId), eq(posts.kind, "post")));
+    .where(and(eq(posts.source, instagramPlatformId), eq(posts.kind, "post")));
 
   const opened = threads.filter((row) => row.partial !== null);
   say(
@@ -278,6 +289,30 @@ async function main(): Promise<void> {
   );
 
   if (unscored) say(`the model did not finish every item: ${unscored}`);
+
+  /**
+   * How long the comments this run stored actually are.
+   *
+   * The capture measured 29 comments on one thread. This is the same
+   * measurement over whatever the poll collected, which is the wider sample the
+   * platform note needs before it can claim a distribution.
+   */
+  const stored = await db
+    .select({ text: posts.excerpt })
+    .from(posts)
+    .where(and(eq(posts.source, instagramPlatformId), eq(posts.kind, "reply")));
+
+  if (stored.length > 0) {
+    const lengths = stored
+      .map((row) => (row.text ?? "").length)
+      .sort((left, right) => left - right);
+    const median = lengths[Math.floor(lengths.length / 2)] ?? 0;
+    say(
+      `comment length over ${lengths.length} stored: median ${median}, ` +
+        `${lengths.filter((length) => length > 60).length} over sixty. ` +
+        "TikTok's skincare thread was median 54, 22 of 49 over sixty.",
+    );
+  }
 
   const found = await db
     .select({
@@ -297,7 +332,7 @@ async function main(): Promise<void> {
 
   say(
     `matches at or above ${monitor.minScore}: ${found.length} ` +
-      `(${commentMatches.length} of them comments, ${found.length - commentMatches.length} videos)`,
+      `(${commentMatches.length} of them comments, ${found.length - commentMatches.length} reels)`,
   );
 
   for (const match of found) {

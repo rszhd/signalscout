@@ -6,7 +6,7 @@ priority: p1
 created: 2026-09-16T13:48+08:00
 parent: US-151
 area: architecture
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -77,3 +77,4 @@ apply its stream with no copy of this repository.
 ## Log
 
 - 2026-09-16T13:48+08:00 — Written as step three of US-151.
+- 2026-09-16T17:58+08:00 — Shipped. The first staging run found release:verify asking the registry for the engine under pnpm; the consumer install moved to npm. NPM_TOKEN made (granular, @signalscout scope, bypass 2FA, expires 2026-12-15) and stored. Tag v0.1.0 on c9114c1 ran release.yml: on-main check, CI, verify, publish. @signalscout/engine and @signalscout/pipeline are on npm at 0.1.0, public. npm says bypass-2FA tokens lose direct publish in January 2027; trusted publishing is the follow-up, and needs a ticket.

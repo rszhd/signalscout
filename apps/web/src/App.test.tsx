@@ -12,7 +12,6 @@
 import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { App } from "./App.js";
-import type { BillingState } from "./Billing.js";
 import { button, field, json, mount, radio, type Screen, settle, setValue } from "./testing.js";
 
 const options = {
@@ -35,35 +34,19 @@ const newMonitor = `${monitors}/new`;
 
 describe("the application screens", () => {
   let screen: Screen;
-  let billingMode: "off" | "stripe";
   /** Whether this account holds the two keys the setup gate asks for. */
   let setUp: boolean;
   /** Whether this account has already finished setup. US-105. */
   let onboarded: boolean;
   /** Whether the two setup reads answer at all. */
   let setupReadable: boolean;
-  let billingState: BillingState;
   /** The base fetch each case can wrap rather than rewrite. */
   let fetchImpl: (request: string | URL | Request) => Promise<Response>;
 
   beforeEach(() => {
-    billingMode = "off";
     setUp = true;
     onboarded = false;
     setupReadable = true;
-    billingState = {
-      mode: "stripe",
-      entitled: true,
-      reason: "trialing",
-      status: "trialing",
-      trialDaysLeft: 7,
-      trialEndsAt: "2026-09-15T00:00:00.000Z",
-      currentPeriodEnd: null,
-      cancelAtPeriodEnd: false,
-      hasBillingAccount: false,
-      trialDays: 7,
-      price: { amount: 2000, currency: "usd", interval: "month" },
-    };
     fetchImpl = async (request: string | URL | Request) => {
       const url = typeof request === "string" ? request : request.toString();
       // US-017 put every screen behind a session. These cases are about
@@ -75,10 +58,8 @@ describe("the application screens", () => {
           signedIn: true,
           account: { name: "The owner", email: "owner@example.com" },
           onboarded,
-          billingMode,
         });
       }
-      if (url === "/api/billing") return json(billingState);
       if (url === "/api/onboarding") return json({ onboarded: true });
       if (url === "/api/monitor-options") return json(options);
       if (url === "/api/monitors") return json([]);
@@ -181,25 +162,6 @@ describe("the application screens", () => {
     expect(screen.container.textContent).toContain("The owner");
     expect(screen.container.textContent).toContain("owner@example.com");
     expect(screen.container.textContent).not.toContain("Self-hosted");
-  });
-
-  it("labels a trial account, and no other account, beside the product name", async () => {
-    billingMode = "stripe";
-    screen = await mount(<App />);
-
-    expect(screen.container.querySelector(".trial-badge")?.textContent).toBe("Trial");
-    expect(screen.container.querySelector('.account-nav a[href="/billing"]')).not.toBeNull();
-
-    await screen.unmount();
-    billingState = {
-      ...billingState,
-      reason: "subscribed",
-      status: "active",
-      currentPeriodEnd: "2026-10-15T00:00:00.000Z",
-    };
-    screen = await mount(<App />);
-
-    expect(screen.container.querySelector(".trial-badge")).toBeNull();
   });
 
   /**
@@ -488,7 +450,7 @@ describe("the application screens", () => {
    * The account screens have a second way in, for a phone. US-123.
    *
    * Below 820px the sidebar becomes a bottom bar and `.sidebar-bottom` is
-   * hidden, so Providers, Voices, Models, Billing and Sign out were reachable
+   * hidden, so Providers, Voices, Models and Sign out were reachable
    * only by typing the address. The bottom bar's Account button opens a sheet
    * holding the same links.
    *
@@ -512,16 +474,15 @@ describe("the application screens", () => {
   /**
    * The address is one address. US-076.
    *
-   * The router lived in the hash until then, so Stripe's return read
-   * `/billing?checkout=done#/billing` — the path was the server's answer and
-   * the hash was the app's, and the two said the same thing twice.
+   * The router lived in the hash until then, so a return from a payment page
+   * read `/billing?checkout=done#/billing` — the path was the server's answer
+   * and the hash was the app's, and the two said the same thing twice.
    */
   it("puts the whole route in the path, with no hash", async () => {
-    billingMode = "stripe";
-    screen = await mount(<App />, "/billing?checkout=done");
+    screen = await mount(<App />, "/models");
 
-    expect(screen.container.textContent).toContain("Billing");
-    expect(screen.path()).toBe("/billing");
+    expect(screen.container.textContent).toContain("Models");
+    expect(screen.path()).toBe("/models");
 
     const links = [...screen.container.querySelectorAll("a")].map((link) =>
       link.getAttribute("href"),
@@ -529,12 +490,8 @@ describe("the application screens", () => {
     for (const link of links) expect(link).not.toContain("#");
   });
 
-  /**
-   * A self-hosted instance has no subscription, so the route is not
-   * registered — and an address naming it lands on the projects list rather
-   * than on a page that can only say the instance does not charge. US-072.
-   */
-  it("does not answer the billing address where the instance does not charge", async () => {
+  /** An address that names no screen lands on the projects list. */
+  it("sends an unknown address to the projects list", async () => {
     screen = await mount(<App />, "/billing");
 
     expect(screen.path()).toBe("/projects");

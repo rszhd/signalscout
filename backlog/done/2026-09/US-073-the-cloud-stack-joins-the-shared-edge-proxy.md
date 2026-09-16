@@ -6,7 +6,7 @@ priority: p1
 created: 2026-09-08T17:03+08:00
 parent:
 area: deployment
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -135,3 +135,4 @@ proxy. `!override []` is what actually drops it.
   /actuator/env, /trace.axd and /@vite/env. They answer 200 because the SPA
   serves index.html for any unknown path, which is worth knowing before somebody
   reads that as a leak.
+- 2026-09-16T20:10+08:00 — Shipped, and moved. The production stack is deployed by the hosted repository since US-155; the edge proxy overlay stays here for self-hosters.

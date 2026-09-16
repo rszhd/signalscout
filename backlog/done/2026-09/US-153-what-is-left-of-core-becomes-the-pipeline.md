@@ -6,7 +6,7 @@ priority: p1
 created: 2026-09-16T13:47+08:00
 parent: US-151
 area: architecture
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -112,3 +112,4 @@ nor React, and neither imports an app.
 ## Log
 
 - 2026-09-16T13:47+08:00 — Written as step two of US-151.
+- 2026-09-16T17:58+08:00 — Shipped in PR #8. Staging deployed first and every screen was clicked through: login, inbox, monitors, providers, models, billing with a live subscription row. Then main at c9114c1 and production; both migration streams ran there and health answers. The admin report was not seen — the staging account is not in ADMIN_EMAILS — and no scheduler tick with the gate was watched, because the staging monitor is paused.

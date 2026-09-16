@@ -1,5 +1,6 @@
 import type { JobSender, Logger, WorkerHandle } from "@signalscout/pipeline";
 import {
+  admitEveryone,
   allStoredCredentialNames,
   assertStoredCredentialsAreReadable,
   builtInSources,
@@ -12,7 +13,6 @@ import {
   storedCredentialNames,
 } from "@signalscout/pipeline";
 import { emailVerificationRequired } from "./auth/verification.js";
-import { billingSettingsFrom, subscriptionGate } from "./billing/index.js";
 import type { Env } from "./config/env.js";
 import { type ApiServer, buildServer as buildServerDefault } from "./server.js";
 
@@ -71,24 +71,9 @@ export async function startApi({
   }
 
   /**
-   * An instance that charges must be able to charge. US-072.
-   *
-   * Here, before the worker and before the first connection, because the state
-   * this refuses is the quiet one: `BILLING_MODE=stripe` with a missing price
-   * or webhook secret runs the whole product, every screen works, every trial
-   * runs out, and nobody is ever asked for money. Nothing about that looks
-   * broken from the outside.
-   *
-   * `buildServer` reads the same function, so this is not the only place it is
-   * checked. It is the place where the message arrives before anything else
-   * has started.
-   */
-  billingSettingsFrom(env);
-
-  /**
    * An instance that asks for a verified address must be able to ask. US-092.
    *
-   * Here for `billingSettingsFrom`'s reason and against a worse failure. A
+   * Here, before anything else has started, and against a worse failure. A
    * deployment with `AUTH_EMAIL_VERIFICATION=required` and no mail server does
    * not half work: it refuses every account it has, the owner's included, with
    * a message about a link that was never posted. Nothing on the screen says
@@ -117,9 +102,9 @@ export async function startApi({
     ? await startWorker({
         databaseUrl: env.DATABASE_URL,
         logger,
-        // The scheduler asks this once a tick, on the API's pool: one short
-        // read, which is the shape of load this pool is for.
-        entitled: subscriptionGate(db, env.BILLING_MODE),
+        // Everyone may poll. This application charges nobody; the hosted one
+        // passes a gate that reads its subscriptions table. US-153.
+        entitled: admitEveryone,
       })
     : null;
 

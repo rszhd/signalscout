@@ -2021,3 +2021,21 @@ $54.00 a month for one keyword polled hourly, which is over a $0.20 cap, so the
 form offered to save the plan without starting it. **The three live tests took
 1 minute 41 seconds, 8 minutes 8 seconds and 2 minutes 45 seconds**, so the
 screen's "about two minutes" is the fastest case and not the normal one.
+
+**The repository split, 2026-09-16 (US-151 to US-155).** One package,
+`packages/core`, became two — a stateless engine and a stateful pipeline —
+and the application above them lost its billing. Counted before the split:
+135 source files in core, 79 touching Postgres. The engine took 94 files by
+`git mv`, the pipeline kept the rest, and the six account tables moved to
+`apps/api` with a migration stream of their own. Both packages were published
+to npm at 0.1.0 from a tag; the hosted product moved to a private repository
+built on them and deployed from there the same evening, on the same box, the
+same database and the same domain, after staging was clicked through screen
+by screen. Two things surfaced on the way: a `pnpm` override for a tarball
+worked on one machine and asked the registry on the CI runner, so the release
+check installs with `npm`; and the "dispatch to roll back" path in the deploy
+workflow had never pushed an image, so its first use handed the box a
+reference with no digest. Neither touched production. The migrations the
+split needed dropped nothing: the pipeline's 0059 is a comment, the
+application's 0000 creates only what is missing, and its 0001 drops the
+subscriptions table an instance on this code never wrote to.

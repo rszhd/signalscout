@@ -21,7 +21,6 @@ export interface AuthStatus {
    */
   readonly onboarded: boolean;
   /** Whether this instance charges for itself. US-072. */
-  readonly billingMode: "off" | "stripe";
 }
 
 /**

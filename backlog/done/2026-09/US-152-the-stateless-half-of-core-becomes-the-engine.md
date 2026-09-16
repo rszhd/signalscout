@@ -6,7 +6,7 @@ priority: p1
 created: 2026-09-16T13:46+08:00
 parent: US-151
 area: architecture
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -128,3 +128,4 @@ stay in core. US-153 sorts out which package owns which command.
   The image builds, starts against a copy of the database and answers
   `/api/health`. `pnpm db:rotate-key` re-encrypted 5 credentials in the
   worktree copy. Not run live: nothing here reaches a provider or a model.
+- 2026-09-16T17:58+08:00 — Shipped in PR #8, merged to main at c9114c1 and deployed to production; health answers.

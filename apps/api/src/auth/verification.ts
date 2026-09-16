@@ -1,8 +1,8 @@
 /**
  * Whether an address is proven before an account is used. US-092.
  *
- * The check here is `billing/config.ts`'s, for the same class of failure and
- * in the opposite direction. A deployment that asks for verification and
+ * The check here is for a whole class of failure, and it is asked at boot. A
+ * deployment that asks for verification and
  * cannot send mail is not a deployment with a broken feature: it is a login
  * that refuses everybody, including the owner, with a message about an email
  * that was never sent. So the mode and the transport are one question, asked
@@ -21,9 +21,7 @@
  *
  * `required` is the cloud shape. Nobody is signed in until a link sent to the
  * address is opened, which is what stops one person registering with another
- * person's address — holding it for ever, because the column is unique — and
- * what stops a fresh seven-day trial being minted from an address nobody has
- * to reach.
+ * person's address, holding it for ever, because the column is unique.
  *
  * The default is off rather than required, and the reason is the upgrade.
  * Every instance running today is self-hosted and most of them have no SMTP at

@@ -10,7 +10,6 @@ import {
   useParams,
 } from "react-router";
 import { requestJson } from "./api.js";
-import { Billing, type BillingState, subscriptionSentence } from "./Billing.js";
 import { BrandLogo } from "./BrandLogo.js";
 import { Connections } from "./Connections.js";
 import { Dialog } from "./components/Dialog.js";
@@ -39,8 +38,8 @@ import { paths, routes } from "./route.js";
  * The route lives in the path, through React Router. US-076 moved it out of
  * the hash: Fastify already serves `index.html` for any path that is not an
  * API route or a file, so a path is a real address — and while the route lived
- * in the hash, a Stripe return read `/billing?checkout=done#/billing`, which is
- * one address saying the same thing twice.
+ * in the hash, a return from a payment page once read
+ * `/billing?checkout=done#/billing`, one address saying the same thing twice.
  *
  * The project is a path segment now, not a query parameter. `route.ts` holds
  * the whole table and explains why.
@@ -88,7 +87,6 @@ function useAuthStatus(): AuthStatus | null {
             signedIn: false,
             account: null,
             onboarded: false,
-            billingMode: "off",
           });
         }
       });
@@ -99,37 +97,6 @@ function useAuthStatus(): AuthStatus | null {
   }, []);
 
   return status;
-}
-
-/** The account's billing state, when this deployment has accounts to bill. */
-function useBillingState(enabled: boolean): BillingState | null {
-  const [state, setState] = useState<BillingState | null>(null);
-
-  useEffect(() => {
-    let current = true;
-
-    if (!enabled) {
-      setState(null);
-      return () => {
-        current = false;
-      };
-    }
-
-    requestJson<BillingState>("/api/billing")
-      .then((answer) => {
-        if (current) setState(answer);
-      })
-      .catch(() => {
-        // A failed read says nothing. Guessing here could label a paid account
-        // as a trial, or tell somebody their trial ended when it did not.
-      });
-
-    return () => {
-      current = false;
-    };
-  }, [enabled]);
-
-  return state;
 }
 
 /**
@@ -202,9 +169,6 @@ function useSetup(enabled: boolean): {
 export function App() {
   const navigate = useNavigate();
   const status = useAuthStatus();
-  const billingState = useBillingState(
-    status?.signedIn === true && status.billingMode === "stripe",
-  );
   const setup = useSetup(status?.signedIn === true);
 
   /**
@@ -333,13 +297,12 @@ export function App() {
    * choose one — which covers the bookmark, the typed address and the link
    * somebody forgot to update, none of which any href can reach.
    *
-   * Connections, Providers, Reply voices, Models and Billing sit outside a
-   * project on purpose: one set of keys, one set of prices, one subscription,
-   * every project.
+   * Connections, Providers, Reply voices and Models sit outside a project on
+   * purpose: one set of keys, one set of prices, every project.
    */
   return (
     <Routes>
-      <Route element={<Shell status={status} billingState={billingState} />}>
+      <Route element={<Shell status={status} />}>
         <Route path={routes.projects} element={<Projects />} />
         {/*
           The project editor's own address. US-045's editor used to be a state
@@ -358,12 +321,6 @@ export function App() {
         <Route path={routes.providers} element={<Providers />} />
         <Route path={routes.replyVoices} element={<ReplyVoices />} />
         <Route path={routes.models} element={<Models />} />
-        {/*
-          Only where this instance charges. US-072. A self-hosted instance has
-          no subscription, so the route is not registered at all and the
-          address falls through to the projects list.
-        */}
-        {status.billingMode === "stripe" && <Route path={routes.billing} element={<Billing />} />}
         <Route path="*" element={<Navigate replace to={paths.projects} />} />
       </Route>
     </Routes>
@@ -458,7 +415,6 @@ type NavIconName =
   | "providers"
   | "voices"
   | "models"
-  | "billing"
   | "account";
 
 const navIconPaths: Record<NavIconName, string> = {
@@ -469,7 +425,6 @@ const navIconPaths: Record<NavIconName, string> = {
   providers: "M8 4v5 M16 4v5 M6 9h12v2a6 6 0 0 1-6 6v3",
   voices: "M5 19l4-.8L18 9.2a2.1 2.1 0 0 0-3-3L5.8 15z M13.8 7.4l2.8 2.8",
   models: "M12 3l1.4 4.6L18 9l-4.6 1.4L12 15l-1.4-4.6L6 9l4.6-1.4z M18.5 15v5 M16 17.5h5",
-  billing: "M4 6h16v12H4z M4 10h16 M7 15h4",
   account: "M12 11.2a3.4 3.4 0 1 0 0-6.8 3.4 3.4 0 0 0 0 6.8 M5.4 19.6a6.6 6.6 0 0 1 13.2 0",
 };
 
@@ -490,13 +445,7 @@ function NavIcon({ name }: { readonly name: NavIconName }) {
 }
 
 /** The sidebar, the banner, and whichever screen the address named. */
-function Shell({
-  status,
-  billingState,
-}: {
-  readonly status: AuthStatus;
-  readonly billingState: BillingState | null;
-}) {
+function Shell({ status }: { readonly status: AuthStatus }) {
   const projectId = useProjectId();
   const listing = useMatch(routes.monitors) !== null;
   const creating = useMatch(routes.newMonitor) !== null;
@@ -510,7 +459,6 @@ function Shell({
   const comparing = useMatch(routes.providers) !== null;
   const voicing = useMatch(routes.replyVoices) !== null;
   const modelling = useMatch(routes.models) !== null;
-  const billing = useMatch(routes.billing) !== null;
   const accountSheet = useRef<HTMLDialogElement | null>(null);
 
   const accountLinks = (
@@ -531,18 +479,6 @@ function Shell({
         <NavIcon name="models" />
         <span>Models</span>
       </Link>
-      {/*
-        Only where this instance charges. US-072. A self-hosted instance
-        has no subscription, so a Billing link there would open a page
-        that can only say so — and the route it reads is not even
-        registered.
-      */}
-      {status.billingMode === "stripe" && (
-        <Link className={billing ? "nav-item current" : "nav-item"} to={paths.billing}>
-          <NavIcon name="billing" />
-          <span>Billing</span>
-        </Link>
-      )}
     </>
   );
 
@@ -564,7 +500,6 @@ function Shell({
         <Link className="brand" to={paths.projects} aria-label="SignalScout home">
           <BrandLogo />
           <span>SignalScout</span>
-          {billingState?.reason === "trialing" && <span className="trial-badge">Trial</span>}
         </Link>
 
         <nav className="site-nav" aria-label="Screens">
@@ -649,8 +584,8 @@ function Shell({
           The same account screens, for a phone. US-123.
 
           Below 820px the sidebar becomes a bottom bar and `.sidebar-bottom`
-          is hidden, which left Providers, Voices, Models, Billing and Sign
-          out reachable only by typing the address. The bar has room for four
+          is hidden, which left Providers, Voices, Models and Sign out
+          reachable only by typing the address. The bar has room for four
           items at 320px, so the fifth is this sheet and the links live in it.
         */}
         <Dialog
@@ -672,15 +607,6 @@ function Shell({
       </aside>
 
       <main className="app-main">
-        {/*
-          Why a write was refused, said wherever a person is. US-072.
-
-          The paywall answers 402 on every route that changes something, and a
-          person meeting that on the monitor form would read it as the form
-          being broken. The banner is the one place that says it is the
-          subscription, and it carries the way out.
-        */}
-        {status.billingMode === "stripe" && !billing && <TrialBanner state={billingState} />}
         <Outlet />
       </main>
     </div>
@@ -714,29 +640,5 @@ function SignOut() {
     <button className="sign-out" disabled={busy} type="button" onClick={signOut}>
       Sign out
     </button>
-  );
-}
-
-/**
- * The trial, on every screen but the billing one.
- *
- * Shown only while there is something to say: the last two days of a trial, or
- * an account the server is already refusing. A banner that is always there is a
- * banner nobody reads, and this one has to be read on the day it matters.
- *
- * It reads the same route the billing page does, so the sentence here and the
- * sentence there cannot disagree.
- */
-function TrialBanner({ state }: { readonly state: BillingState | null }) {
-  if (!state) return null;
-
-  const ending = state.reason === "trialing" && (state.trialDaysLeft ?? 99) <= 2;
-  if (!ending && state.entitled) return null;
-
-  return (
-    <p className={state.entitled ? "trial-banner" : "trial-banner ended"} role="status">
-      <span>{subscriptionSentence(state)}</span>
-      <Link to={paths.billing}>Subscribe</Link>
-    </p>
   );
 }

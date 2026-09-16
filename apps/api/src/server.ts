@@ -35,17 +35,10 @@ import {
   type ZodTypeProvider,
 } from "fastify-type-provider-zod";
 import { z } from "zod";
-import { registerAdminRoutes } from "./admin.js";
 import { type Auth, createAuth } from "./auth/auth.js";
 import { emailVerificationRequired } from "./auth/verification.js";
 import type { SendEmail } from "./auth/verification-email.js";
 import { registerAuthRoutes, type SessionResolver } from "./auth.js";
-import {
-  type BillingProvider,
-  type BillingSettings,
-  billingSettingsFrom,
-} from "./billing/index.js";
-import { registerBillingGate, registerBillingRoutes } from "./billing.js";
 import type { Env } from "./config/env.js";
 import { registerConnectionRoutes } from "./connections.js";
 import { registerDraftRoutes, registerReplyPromptRoutes } from "./drafts.js";
@@ -64,16 +57,6 @@ import { registerProjectRoutes } from "./projects.js";
  */
 export function resolveWebDist(env: Env): string {
   return env.WEB_DIST_PATH ?? new URL("../../web/dist", import.meta.url).pathname;
-}
-
-/**
- * The built admin panel, served at `/admin`. US-111.
- *
- * A path inside the image like the UI's, so a deployment does not move it and
- * the compose file does not carry a variable for it.
- */
-export function resolveAdminDist(): string {
-  return new URL("../../../admin/dist", import.meta.url).pathname;
 }
 
 /**
@@ -169,19 +152,6 @@ export interface BuildServerOptions {
    * will pick up. `start.ts` passes the worker's own queue when there is one.
    */
   jobs?: JobSender | null;
-  /**
-   * What this deployment charges, or null for one that does not. US-072.
-   *
-   * Undefined reads the environment, which is `off` unless it says otherwise.
-   * Null is what a test passes for "this instance is free", and it is the same
-   * shape `auth` uses.
-   */
-  billingSettings?: BillingSettings | null;
-  /**
-   * The payment provider. Injected by every test that reaches these routes,
-   * because no test spends money and no test needs the network.
-   */
-  billing?: BillingProvider;
 }
 
 /**
@@ -256,7 +226,6 @@ export function authFor(env: Env, db: Database, logger: Logger): Auth | null {
     logger,
     trustedOrigins: trustedOrigins(env),
     signup: env.AUTH_SIGNUP,
-    billing: env.BILLING_MODE,
     sendEmail: verificationSenderFor(env),
   });
 }
@@ -382,30 +351,12 @@ export async function buildServer({
   auth,
   session,
   jobs = null,
-  billingSettings,
-  billing,
   canSendEmail,
 }: BuildServerOptions): Promise<ApiServer> {
   const app = Fastify({ loggerInstance: logger }).withTypeProvider<ZodTypeProvider>();
 
   app.setValidatorCompiler(validatorCompiler);
   app.setSerializerCompiler(serializerCompiler);
-
-  /**
-   * What this deployment charges, read before the routes so the login status
-   * route and the paywall below both get the same answer. Null is a build that
-   * does not charge.
-   */
-  const settings =
-    billingSettings === undefined
-      ? billingSettingsFrom({
-          BILLING_MODE: env.BILLING_MODE,
-          STRIPE_SECRET_KEY: env.STRIPE_SECRET_KEY,
-          STRIPE_PRICE_ID: env.STRIPE_PRICE_ID,
-          STRIPE_WEBHOOK_SECRET: env.STRIPE_WEBHOOK_SECRET,
-          APP_URL: env.APP_URL,
-        })
-      : billingSettings;
 
   // First, and it has to be first: its `onRoute` hook only records the routes
   // registered after it, and the count is what `auth.test.ts` checks the open
@@ -417,18 +368,7 @@ export async function buildServer({
     session,
     baseUrl: env.AUTH_URL,
     signup: env.AUTH_SIGNUP,
-    billing: settings?.mode ?? "off",
   });
-
-  /**
-   * The paywall, immediately after the session gate and before every route it
-   * covers. Order is the whole design: it reads the person the gate just set,
-   * and a Fastify `onRequest` hook only sees requests to routes registered
-   * after it — which is also why the billing routes below register later.
-   *
-   * `off` registers nothing at all.
-   */
-  registerBillingGate(app, { db, mode: settings?.mode ?? "off" });
 
   app.route({
     method: "GET",
@@ -443,8 +383,6 @@ export async function buildServer({
     },
     handler: async () => ({ status: "ok" as const, workerInProcess: env.WORKER_IN_PROCESS }),
   });
-
-  await registerBillingRoutes(app, { db, logger, settings, billing });
 
   // The account's setup marker. US-105. Registered here rather than with the
   // connections screen because it is about the account, not a key.
@@ -509,32 +447,6 @@ export async function buildServer({
   });
 
   await registerEstimateRoutes(app, { db, sources, jobs });
-
-  // The operator's view of who is signing up. US-111. Behind the session gate
-  // like every other API route, and then refused unless the address is listed.
-  await registerAdminRoutes(app, { db, adminEmails: env.ADMIN_EMAILS });
-
-  /**
-   * The admin panel, at `/admin`. US-111. A second static root with its own
-   * prefix; `decorateReply: false` because the UI's registration below already
-   * added `reply.sendFile`, and a second one throws.
-   */
-  const adminDist = resolveAdminDist();
-
-  if (existsSync(adminDist)) {
-    await app.register(fastifyStatic, {
-      root: adminDist,
-      prefix: "/admin/",
-      decorateReply: false,
-    });
-
-    // `/admin` with no slash is the address a person types. The static plugin
-    // serves the directory under `/admin/`, so send the bare path there rather
-    // than let it fall through to the UI's catch-all.
-    app.get("/admin", async (_request, reply) => reply.redirect("/admin/"));
-  } else {
-    logger.warn({ adminDist }, "no built admin panel found; /admin is not served");
-  }
 
   const webDist = resolveWebDist(env);
 

@@ -33,7 +33,6 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { APIError } from "better-auth/api";
 import { eq, sql } from "drizzle-orm";
-import { type BillingMode, startTrial } from "../billing/index.js";
 import { accounts, sessions, users, verifications } from "../db/schema.js";
 import { type SignupMode, unclaimedUserId } from "./user.js";
 import { type SendEmail, verificationMessage } from "./verification-email.js";
@@ -106,14 +105,6 @@ export interface CreateAuthOptions {
   readonly trustedOrigins?: readonly string[];
   /** `closed` unless this deployment says otherwise. See `signupModes`. */
   readonly signup?: SignupMode;
-  /**
-   * Whether this deployment charges. `off` unless it says otherwise. US-072.
-   *
-   * Only one thing here reads it: a new account gets its seven free days when
-   * billing is on, and no row at all when it is off. A self-hosted instance
-   * must not accumulate subscription rows for a gate that will never run.
-   */
-  readonly billing?: BillingMode;
   /**
    * How a verification link is sent, or undefined for a deployment that does
    * not verify. US-092.
@@ -196,7 +187,6 @@ export function createAuth({
   logger,
   trustedOrigins = [],
   signup = "closed",
-  billing = "off",
   sendEmail,
 }: CreateAuthOptions) {
   return betterAuth({
@@ -388,29 +378,9 @@ export function createAuth({
             if (await isOnlyAccount(db, user.id)) await claimUnownedRows(db, user.id);
 
             /**
-             * The seven free days. US-072.
-             *
-             * Here rather than in the sign-up route, for this hook's own
-             * reason: every path that creates a user passes through it, and an
-             * account created any other way must not arrive without a trial —
-             * a missing row reads as entitled, which is the free-for-ever
-             * shape.
-             *
-             * It makes no network call. With no card there is nothing for
-             * Stripe to hold, and registration must not be able to fail
-             * because a payment provider is slow. `startTrial` never
-             * overwrites, so this cannot hand a paying account a fresh week.
-             *
-             * Unlike the line above it, this runs for *every* account. The
-             * first-account guard belongs to claiming rows, and confusing the
-             * two would give the second person to register no trial at all.
-             */
-            if (billing !== "off") await startTrial(db, user.id);
-
-            /**
              * The shipped reply voices, saved rather than offered. US-065.
              *
-             * For every account, like the trial and unlike claiming: the
+             * For every account, unlike claiming: the
              * presets are the product's own answer to a blank box, and the
              * second person to register meets the same blank box as the
              * first.

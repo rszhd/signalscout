@@ -3,10 +3,10 @@
  * `pnpm preview` — the dev app on a link you can open from anywhere.
  *
  * Written for one situation: the person reviewing a screen is not at this
- * machine, and the app answers only on localhost. Pushing to `staging` works
- * and takes four to five minutes, because it builds an image and waits for
- * CI. This takes about ten seconds and hot reloads, at the cost of being
- * disposable and trusted less. US-118.
+ * machine, and the app answers only on localhost. A deployed instance would
+ * do, at the cost of building an image and waiting for CI. This takes about
+ * ten seconds and hot reloads, at the cost of being disposable and trusted
+ * less. US-118.
  *
  * The chain:
  *
@@ -14,7 +14,7 @@
  *
  * Every leg over a network is encrypted. Cloudflare decrypts at its edge, so
  * it can read the traffic there — which is why this is for looking at screens
- * and staging is for anything real.
+ * and a deployed instance is for anything real.
  *
  * No worker is started. A poll spends money at a real provider, and a window
  * onto the UI has no reason to start one.
@@ -308,7 +308,7 @@ async function main() {
       "  The browser asks for that password, then the app asks for your account.",
       "  Registration is closed on this process whatever .env says.",
       "",
-      "  Cloudflare can read this traffic at its edge. Use staging for anything real.",
+      "  Cloudflare can read this traffic at its edge. Use a real instance for anything real.",
       "  Ctrl-C stops everything.",
       "",
     ].join("\n"),

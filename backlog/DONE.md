@@ -2,7 +2,7 @@
 
 # Done
 
-115 finished.
+123 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
@@ -21,6 +21,11 @@
 | BUG-003 | [A post below the threshold is classified again on every poll](done/2026-09/BUG-003-a-post-below-the-threshold-is-classified-again-on-every-poll.md) | bug | fixed | 2026-09 |
 | BUG-002 | [A seven-day window is bought as a month](done/2026-09/BUG-002-a-seven-day-window-is-bought-as-a-month.md) | bug | fixed | 2026-09 |
 | BUG-001 | [A pending Reddit collection is not resumed](done/2026-09/BUG-001-a-pending-reddit-collection-is-not-resumed.md) | bug | shipped | 2026-09 |
+| US-155 | [The cloud version moves to its own repository](done/2026-09/US-155-the-cloud-version-moves-to-its-own-repository.md) | chore | shipped | 2026-09 |
+| US-154 | [The engine and the pipeline are published to npm](done/2026-09/US-154-the-engine-and-the-pipeline-are-published-to-npm.md) | chore | shipped | 2026-09 |
+| US-153 | [What is left of core becomes the pipeline](done/2026-09/US-153-what-is-left-of-core-becomes-the-pipeline.md) | chore | shipped | 2026-09 |
+| US-152 | [The stateless half of core becomes the engine](done/2026-09/US-152-the-stateless-half-of-core-becomes-the-engine.md) | chore | shipped | 2026-09 |
+| US-151 | [The repository splits into an engine, a pipeline and two apps](done/2026-09/US-151-the-repository-splits-into-an-engine-a-pipeline-and-two-apps.md) | chore | shipped | 2026-09 |
 | US-127 | [YouTube is fetched through ScrapeCreators](done/2026-09/US-127-youtube-is-fetched-through-scrapecreators.md) | feature | shipped | 2026-09 |
 | US-126 | [TikTok is fetched through ScrapeCreators](done/2026-09/US-126-tiktok-is-fetched-through-scrapecreators.md) | feature | shipped | 2026-09 |
 | US-125 | [The inbox says new matches arrived](done/2026-09/US-125-the-inbox-says-new-matches-arrived.md) | feature | shipped | 2026-09 |
@@ -46,6 +51,7 @@
 | US-103 | [The README is an overview](done/2026-09/US-103-the-readme-is-an-overview.md) | chore | shipped | 2026-09 |
 | US-102 | [A self-hosted install starts from the commands we print](done/2026-09/US-102-a-self-hosted-install-starts-from-the-commands-we-print.md) | bug | shipped | 2026-09 |
 | US-101 | [The README says what the product does now](done/2026-09/US-101-the-readme-says-what-the-product-does-now.md) | chore | shipped | 2026-09 |
+| US-100 | [The cloud version runs at app.signalscout.run](done/2026-09/US-100-the-cloud-version-runs-at-app-signalscout-run.md) | feature | shipped | 2026-09 |
 | US-098 | [A provider card links to its website](done/2026-09/US-098-a-provider-card-links-to-its-website.md) | feature | shipped | 2026-09 |
 | US-097 | [A webhook cannot be aimed at our own network](done/2026-09/US-097-a-webhook-cannot-be-aimed-at-our-own-network.md) | feature | done | 2026-09 |
 | US-096 | [A webhook secret belongs to an account](done/2026-09/US-096-a-webhook-secret-belongs-to-an-account.md) | feature | done | 2026-09 |
@@ -69,6 +75,8 @@
 | US-076 | [The address bar says one thing](done/2026-09/US-076-the-address-bar-says-one-thing.md) | feature | shipped | 2026-09 |
 | US-075 | [A push to staging deploys itself](done/2026-09/US-075-a-push-to-staging-deploys-itself.md) | feature | shipped | 2026-09 |
 | US-074 | [The container carries every setting the app declares](done/2026-09/US-074-the-container-carries-every-setting-the-app-declares.md) | bug | shipped | 2026-09 |
+| US-073 | [The cloud stack joins the shared edge proxy](done/2026-09/US-073-the-cloud-stack-joins-the-shared-edge-proxy.md) | feature | shipped | 2026-09 |
+| US-072 | [A cloud account has seven free days, then a subscription](done/2026-09/US-072-a-cloud-account-has-seven-free-days.md) | feature | shipped | 2026-09 |
 | US-071 | [A standalone landing page introduces the product](done/2026-09/US-071-a-standalone-landing-page-introduces-the-product.md) | feature | shipped | 2026-09 |
 | US-070 | [A reply is drafted by a model of its own](done/2026-09/US-070-a-reply-is-drafted-by-a-model-of-its-own.md) | feature | done | 2026-09 |
 | US-069 | [The sidebar says who is signed in](done/2026-09/US-069-the-sidebar-says-who-is-signed-in.md) | feature | done | 2026-09 |

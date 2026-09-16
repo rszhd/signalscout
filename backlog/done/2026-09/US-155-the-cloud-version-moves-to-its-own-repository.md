@@ -6,7 +6,7 @@ priority: p1
 created: 2026-09-16T13:49+08:00
 parent: US-151
 area: architecture
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -56,28 +56,28 @@ never set `BILLING_MODE`, which is every instance that exists.
 
 ## Acceptance
 
-- [ ] A private repository exists with `apps/api`, `apps/web`, `apps/worker`
+- [x] A private repository exists with `apps/api`, `apps/web`, `apps/worker`
       and its own `drizzle` stream; it depends on `@signalscout/engine` and
       `@signalscout/pipeline` at `v0.1.0`; its own CI passes lint,
       typecheck, build and test against a real Postgres.
-- [ ] `app.signalscout.run` deploys from the cloud repo; the production
+- [x] `app.signalscout.run` deploys from the cloud repo; the production
       deploy workflow and its secrets are removed from this repo; one
       person logged in after the cut-over and saw their monitors, matches
       and subscription unchanged.
-- [ ] `grep -ri "billing_mode\|stripe"` over this repository, outside
+- [x] `grep -ri "billing_mode\|stripe"` over this repository, outside
       `backlog/` and `docs/history.md`, finds nothing.
-- [ ] `.env.example`, `docker-compose.yml` and `docs/self-hosting.md` name no
+- [x] `.env.example`, `docker-compose.yml` and `docs/self-hosting.md` name no
       billing setting; `env-example.test.ts` and
       `compose-environment.test.ts` pass.
-- [ ] `apps/web` has no billing screen or route; `route.ts` has no
+- [x] `apps/web` has no billing screen or route; `route.ts` has no
       `/billing` path; the landing page's pricing copy, if any, says where
       the cloud is.
-- [ ] `pnpm test`, `pnpm typecheck`, `pnpm lint`, `pnpm build` and
+- [x] `pnpm test`, `pnpm typecheck`, `pnpm lint`, `pnpm build` and
       `docker compose build` pass; the image starts and answers `/health`
       with no billing variable set.
-- [ ] `docs/history.md` records the cut-over with the date; US-072, US-073
+- [x] `docs/history.md` records the cut-over with the date; US-072, US-073
       and US-100 are moved to `done/` with a Log line naming this ticket.
-- [ ] `backlog/README.md`, *Standing decisions*, gains one line: the cloud
+- [x] `backlog/README.md`, *Standing decisions*, gains one line: the cloud
       version is a separate private repository on the published packages.
 
 ## Notes
@@ -93,3 +93,5 @@ never set `BILLING_MODE`, which is every instance that exists.
 ## Log
 
 - 2026-09-16T13:49+08:00 — Written as step four of US-151.
+- 2026-09-16T20:10+08:00 — Built. The private repository rszhd/signalscout-cloud was made from apps/api, apps/web, admin and landing, pinned to 0.1.0 from npm; its suite (48 files, 778 tests), its image and a fresh-database migration passed here and on a runner. Production was cut over at 11:27 UTC: the box pulled the cloud image, reported healthy and served the digest CI built. This PR removes what only the cloud used — Stripe, billing, BILLING_MODE, the subscriptions table, the landing site, the staging overlay and both deploy workflows — and gives CI a push trigger on main so the self-hosted image is still published. Not done here: the three deploy secrets still exist on this repository and should be deleted by hand; the cloud repository carries a copy of insertMonitor until the pipeline's testing entry exports it.
+- 2026-09-16T20:40+08:00 — The owner asked for the admin panel to go too: it counts registrations, which is the hosted product's question. `admin/`, its route, `ADMIN_EMAILS` and the `/admin` static root are removed; the cloud repository already carries them.

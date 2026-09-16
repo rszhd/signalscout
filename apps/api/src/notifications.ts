@@ -12,11 +12,11 @@ import {
   optionalEncryptionKey,
   readNotificationSettings,
   readWebhookSecretHint,
-  type SignupMode,
   saveNotificationSettings,
   webhookSecretEnvironment,
 } from "@signalscout/pipeline";
 import { z } from "zod";
+import type { SignupMode } from "./auth/user.js";
 import { ownedMonitor, sessionUserId } from "./auth.js";
 import type { ApiServer } from "./server.js";
 

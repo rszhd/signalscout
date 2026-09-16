@@ -21,8 +21,8 @@
     "check:licenses": "node scripts/check-licenses.mjs",
     "format": "biome check --write .",
     "db:up": "docker compose up -d postgres",
-    "db:migrate": "pnpm --filter @signalscout/pipeline migrate",
-    "db:generate": "pnpm --filter @signalscout/pipeline generate",
+    "db:migrate": "pnpm --filter @signalscout/api migrate",
+    "db:generate": "pnpm --filter @signalscout/pipeline generate && pnpm --filter @signalscout/api generate",
     "db:rotate-key": "pnpm --filter @signalscout/pipeline rotate-key",
     "capture:deletions": "node --env-file=.env packages/engine/src/sources/deletion-fixtures/capture.mjs"
   },

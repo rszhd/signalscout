@@ -97,14 +97,18 @@ matches no project-scoped route and the catch-all sends it to choose one.
 
 **The UI shares one theme.** Read [docs/design.md](docs/design.md) before changing a screen. Colors and sizing live in `apps/web/src/styles/tokens.css`; shared controls live in `styles/theme.css`. Keep page layout separate, and migrate the remaining screens one at a time.
 
-**`packages/engine` is stateless, and `packages/pipeline` imports neither Fastify
-nor React.** The engine holds connectors, model calls, the pre-filter, the
-estimate and the cipher: input in, result and cost out. It declares no `pg`,
-`drizzle-orm`, `pg-boss`, `better-auth` or `stripe`, imports nothing from
-another package, and reads no `process.env` — a key or a model name is an
-argument. `core` is the stateful half and imports the engine; the engine never
-imports core. The API and the worker call into core. `engine-boundary.test.ts`
-and `core-boundary.test.ts` say all of this to CI. If a change seems to need
+**`packages/engine` is stateless, `packages/pipeline` owns only its tables,
+and neither knows an account.** The engine holds connectors, model calls, the
+pre-filter, the estimate and the cipher: input in, result and cost out. It
+declares no `pg`, `drizzle-orm`, `pg-boss`, `better-auth` or `stripe`, imports
+nothing from another package, and reads no `process.env` — a key or a model
+name is an argument. The pipeline is the stateful half: monitors, posts,
+matches, cursors, the budget, the jobs. It imports the engine, never the
+reverse, and it imports neither Fastify, React, Better Auth nor Stripe. It
+knows an owner as `user_id text` and never joins a users table; who may log
+in, who has paid and who may poll are `apps/api`'s — auth, billing and the
+entitlement gate the scheduler is handed. `engine-boundary.test.ts` and
+`pipeline-boundary.test.ts` say all of this to CI. If a change seems to need
 one of them broken, the change is wrong. US-151 says where this is going.
 
 **A red test is fixed in the code, not in the assertion.** An expected value
@@ -175,6 +179,11 @@ harness — so a file with no entry is applied nowhere, and the whole suite pass
 against a database missing the column. `pnpm db:generate` writes both halves;
 BUG-012 restored it after fourteen migrations were written by hand without it.
 `db/migrations.test.ts` is what fails now, by name, when the two disagree.
+There are two streams since US-153 — `packages/pipeline/drizzle` for the
+pipeline's tables and `apps/api/drizzle` for the account tables — each with
+its own journal and its own migrations table, and `pnpm db:generate` runs
+both. A table goes in the stream that owns it; the pipeline never joins an
+account table.
 
 **This file is not a changelog, and it grew to 25,000 words by being used as
 one.** A closed ticket's evidence belongs in its own **Log**, and the rule it

@@ -12,13 +12,10 @@
  */
 import { randomUUID } from "node:crypto";
 import {
-  accountExists,
-  createAuth,
   createDatabase,
   createLogger,
   type Database,
   feedback,
-  loadEnv,
   matches,
   monitors,
   posts,
@@ -27,14 +24,15 @@ import {
   replyPrompts,
   replyVoicePresets,
   sourceProviders,
-  unclaimedUserId,
-  users,
 } from "@signalscout/pipeline";
-import { createTestDatabase, type TestDatabase } from "@signalscout/pipeline/testing";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { accountExists, createAuth } from "./auth/auth.js";
+import { unclaimedUserId } from "./auth/user.js";
 import { authBasePath, isOpenPath, openApiPaths, signedOutMessage } from "./auth.js";
+import { loadEnv } from "./config/env.js";
+import { users } from "./db/schema.js";
 import { type ApiServer, buildServer, trustedOrigins, viteDevOrigins } from "./server.js";
-import { asUser } from "./testing.js";
+import { asUser, createTestDatabase, type TestDatabase } from "./testing.js";
 
 const logger = createLogger({ level: "silent", name: "test" });
 const secret = "a-test-secret-that-is-long-enough-to-pass";

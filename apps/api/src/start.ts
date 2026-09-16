@@ -1,19 +1,19 @@
-import type { Env, JobSender, Logger, WorkerHandle } from "@signalscout/pipeline";
+import type { JobSender, Logger, WorkerHandle } from "@signalscout/pipeline";
 import {
   allStoredCredentialNames,
   assertStoredCredentialsAreReadable,
-  billingSettingsFrom,
   builtInSources,
   configureNetworking,
   createDatabase,
-  emailVerificationRequired,
   jobSenderFor,
   startBlockers,
   startJobSender as startJobSenderDefault,
   startWorker as startWorkerDefault,
   storedCredentialNames,
-  subscriptionGate,
 } from "@signalscout/pipeline";
+import { emailVerificationRequired } from "./auth/verification.js";
+import { billingSettingsFrom, subscriptionGate } from "./billing/index.js";
+import type { Env } from "./config/env.js";
 import { type ApiServer, buildServer as buildServerDefault } from "./server.js";
 
 export interface StartApiOptions {

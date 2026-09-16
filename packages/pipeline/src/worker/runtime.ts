@@ -36,7 +36,6 @@ import {
 } from "@signalscout/engine";
 import { PgBoss } from "pg-boss";
 import { readAiEnvironment as readAiSettingsEnvironment } from "../ai/settings.js";
-import type { SignupMode } from "../auth/user.js";
 import { loadAiEnv, loadNotificationEnv, loadSignupEnv } from "../config/env.js";
 import {
   machineKeysUsable,
@@ -44,6 +43,7 @@ import {
   webhookSecretEnvironment,
   withoutMachineModelKeys,
 } from "../config/machine-keys.js";
+import type { SignupMode } from "../config/signup.js";
 import { createDatabase, type Database, poolOptions } from "../db/client.js";
 import type { NotificationTransport } from "../notifications/deliver.js";
 import { webhookSecretFor } from "../notifications/secret.js";

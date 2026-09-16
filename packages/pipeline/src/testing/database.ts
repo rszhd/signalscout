@@ -41,7 +41,20 @@ async function connectToMaintenanceDatabase(): Promise<Client> {
  * Create an empty database with a name nobody else uses, apply every
  * migration, and hand back its URL. One per test file, dropped afterwards.
  */
-export async function createTestDatabase(label: string): Promise<TestDatabase> {
+export interface TestDatabaseOptions {
+  /**
+   * What to apply to the empty database before handing it over. The
+   * pipeline's own stream by default; an application passes the function
+   * that runs its stream after the pipeline's, so its tests see its tables.
+   * US-153.
+   */
+  readonly migrate?: (databaseUrl: string) => Promise<void>;
+}
+
+export async function createTestDatabase(
+  label: string,
+  { migrate = runMigrations }: TestDatabaseOptions = {},
+): Promise<TestDatabase> {
   const name = `iw_test_${label.replace(/[^a-z0-9]+/gi, "_").toLowerCase()}_${randomBytes(4).toString("hex")}`;
   const admin = await connectToMaintenanceDatabase();
 
@@ -55,7 +68,7 @@ export async function createTestDatabase(label: string): Promise<TestDatabase> {
   url.pathname = `/${name}`;
   const databaseUrl = url.toString();
 
-  await runMigrations(databaseUrl);
+  await migrate(databaseUrl);
 
   return {
     url: databaseUrl,

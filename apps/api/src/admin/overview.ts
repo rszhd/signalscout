@@ -13,9 +13,11 @@
  * The day is UTC, because the database stores instants and a server in a
  * container has no other timezone to mean. `?date=` on the route selects one.
  */
+
+import type { Database } from "@signalscout/pipeline";
+import { matches, monitors, projects } from "@signalscout/pipeline";
 import { and, asc, eq, gte, lt, sql } from "drizzle-orm";
-import type { Database } from "../db/client.js";
-import { matches, monitors, projects, users } from "../db/schema.js";
+import { users } from "../db/schema.js";
 
 /** One account created on the day, and how much it holds. */
 export interface Registration {

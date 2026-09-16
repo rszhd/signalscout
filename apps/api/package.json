@@ -10,17 +10,26 @@
     "dev": "tsx watch src/index.ts",
     "start": "node dist/index.js",
     "dev:worker": "tsx watch src/worker.ts",
-    "start:worker": "node dist/worker.js"
+    "start:worker": "node dist/worker.js",
+    "migrate": "tsx --env-file-if-exists=../../.env src/db/migrate-cli.ts",
+    "generate": "drizzle-kit generate"
   },
   "dependencies": {
     "@fastify/static": "10.1.3",
+    "@signalscout/engine": "workspace:*",
     "@signalscout/pipeline": "workspace:*",
+    "better-auth": "1.7.3",
+    "drizzle-orm": "0.45.2",
     "fastify": "5.12.3",
     "fastify-type-provider-zod": "7.0.0",
+    "stripe": "22.4.0",
     "zod": "4.5.4"
   },
   "devDependencies": {
     "@types/node": "26.4.1",
+    "@types/pg": "8.23.1",
+    "drizzle-kit": "0.31.10",
+    "pg": "8.23.0",
     "tsx": "4.23.13",
     "typescript": "7.0.2",
     "vitest": "5.0.0"

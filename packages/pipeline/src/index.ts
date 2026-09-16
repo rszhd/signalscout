@@ -1,12 +1,4 @@
 export * from "@signalscout/engine";
-export {
-  adminEmails,
-  isAdminEmail,
-  type Registration,
-  type RegistrationsReport,
-  registrationsOn,
-  utcDayBounds,
-} from "./admin/overview.js";
 export { type DraftContext, draftContext } from "./ai/draft-context.js";
 export {
   type AiKey,
@@ -47,69 +39,6 @@ export {
   saveAiTaskSettings,
 } from "./ai/settings.js";
 export {
-  type Auth,
-  accountExists,
-  type CreateAuthOptions,
-  claimUnownedRows,
-  createAuth,
-  isOnlyAccount,
-  minimumPasswordLength,
-  sessionMaxAgeSeconds,
-  sessionRefreshAfterSeconds,
-} from "./auth/auth.js";
-export {
-  hasCompletedOnboarding,
-  markOnboardingComplete,
-} from "./auth/onboarding.js";
-export {
-  ownerUserId,
-  type SignupMode,
-  signupModes,
-  unclaimedUserId,
-} from "./auth/user.js";
-export {
-  type EmailVerificationEnvironment,
-  type EmailVerificationMode,
-  emailVerificationModes,
-  emailVerificationRequired,
-  requiredVerificationVariables,
-} from "./auth/verification.js";
-export { type SendEmail, verificationMessage } from "./auth/verification-email.js";
-export {
-  applyStripeSubscription,
-  type BillingEnvironment,
-  type BillingEvent,
-  type BillingMode,
-  type BillingProvider,
-  type BillingSettings,
-  billingModes,
-  billingSettingsFrom,
-  type CheckoutRequest,
-  type CheckoutResult,
-  createStripeBilling,
-  daysUntil,
-  type Entitlement,
-  type EntitlementReason,
-  entitledCondition,
-  entitlementFor,
-  type HostedPage,
-  handledEventTypes,
-  linkStripeCustomer,
-  type PlanPrice,
-  type PortalRequest,
-  readEntitlement,
-  readSubscription,
-  requiredBillingVariables,
-  type StripeSubscriptionState,
-  type SubscriptionRecord,
-  startTrial,
-  stateFromSubscription,
-  statusFromStripe,
-  subscriptionByCustomer,
-  subscriptionGate,
-  trialDays,
-} from "./billing/index.js";
-export {
   type BudgetState,
   budgetState,
   budgetStates,
@@ -133,13 +62,15 @@ export {
   spendByPair,
 } from "./budget/index.js";
 export {
-  type Env,
-  envSchema,
   loadAiEnv,
-  loadEnv,
   loadNotificationEnv,
+  loadPipelineEnv,
   loadSignupEnv,
   type NotificationEnv,
+  type PipelineEnv,
+  parseEnvironment,
+  pipelineEnvSchema,
+  pipelineFields,
 } from "./config/env.js";
 export {
   machineKeysUsable,
@@ -147,11 +78,16 @@ export {
   webhookSecretEnvironment,
   withoutMachineModelKeys,
 } from "./config/machine-keys.js";
+export { type SignupMode, signupModes, unclaimedUserId } from "./config/signup.js";
 export { createDatabase, type Database } from "./db/client.js";
-export { migrationsFolder, runMigrations } from "./db/migrate.js";
+export {
+  applyMigrations,
+  type MigrationStream,
+  pipelineMigrations,
+  runMigrations,
+} from "./db/migrate.js";
 export {
   type AiTask,
-  accounts,
   aiKeys,
   aiSettings,
   aiTasks,
@@ -196,20 +132,14 @@ export {
   replyPrompts,
   type Signal,
   type Source,
-  type SubscriptionStatus,
-  sessions,
   signals,
   sourceContinuations,
   sourceCoverage,
   sourceCredentials,
   sourceProviders,
   sources,
-  subscriptionStatuses,
-  subscriptions,
-  users,
   type Verdict,
   verdicts,
-  verifications,
 } from "./db/schema.js";
 export {
   daysPerMonth,
@@ -330,6 +260,15 @@ export {
   type ResolveHost,
 } from "./notifications/address-guard.js";
 export { type NotificationTransport, processNotifications } from "./notifications/deliver.js";
+export {
+  type EmailShell,
+  emailFont,
+  emailPalette,
+  escapeHtml,
+  renderButton,
+  renderShell,
+  safeUrl,
+} from "./notifications/email-theme.js";
 export {
   deleteAccountWebhookSecret,
   generateAccountWebhookSecret,

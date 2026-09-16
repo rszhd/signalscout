@@ -18,19 +18,14 @@
  * Putting the login form behind the login is the one way to lock the owner out
  * of their own instance.
  */
-import {
-  type Auth,
-  accountExists,
-  type BillingMode,
-  type Database,
-  getMonitor,
-  hasCompletedOnboarding,
-  type Logger,
-  type Monitor,
-  type SignupMode,
-} from "@signalscout/pipeline";
+
+import { type Database, getMonitor, type Logger, type Monitor } from "@signalscout/pipeline";
 import type { FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
+import { type Auth, accountExists } from "./auth/auth.js";
+import { hasCompletedOnboarding } from "./auth/onboarding.js";
+import type { SignupMode } from "./auth/user.js";
+import type { BillingMode } from "./billing/index.js";
 import type { ApiServer } from "./server.js";
 
 /** What a route knows about the person asking. A text id, and no more. */

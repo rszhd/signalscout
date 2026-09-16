@@ -6,10 +6,18 @@
  * report a project once per monitor. That is why the first case below gives an
  * account two projects and two monitors and asserts the numbers separately.
  */
+
+import {
+  createDatabase,
+  type Database,
+  matches,
+  monitors,
+  posts,
+  projects,
+} from "@signalscout/pipeline";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
-import { createDatabase, type Database } from "../db/client.js";
-import { matches, monitors, posts, projects, users } from "../db/schema.js";
-import { createTestDatabase, type TestDatabase } from "../testing/database.js";
+import { users } from "../db/schema.js";
+import { createTestDatabase, type TestDatabase } from "../testing.js";
 import { adminEmails, isAdminEmail, registrationsOn, utcDayBounds } from "./overview.js";
 
 let database: TestDatabase;

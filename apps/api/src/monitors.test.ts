@@ -20,7 +20,6 @@ import {
   fakeSourceDefinition,
   filterDrops,
   getMonitor,
-  loadEnv,
   type ModelCall,
   matches,
   modelCalls,
@@ -37,10 +36,10 @@ import {
   recordVerdict,
   setProviderChoice,
 } from "@signalscout/pipeline";
-import { createTestDatabase, type TestDatabase } from "@signalscout/pipeline/testing";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
+import { loadEnv } from "./config/env.js";
 import { buildServer } from "./server.js";
-import { asOwner, testOwner as owner } from "./testing.js";
+import { asOwner, createTestDatabase, testOwner as owner, type TestDatabase } from "./testing.js";
 
 const logger = createLogger({ level: "silent", name: "test" });
 

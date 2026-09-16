@@ -1,14 +1,15 @@
 import type {
   createDatabase,
   Database,
-  Env,
   JobSender,
   Logger,
   StartWorkerOptions,
   WorkerHandle,
 } from "@signalscout/pipeline";
-import { admitEveryone, createLogger, loadEnv } from "@signalscout/pipeline";
+import { admitEveryone, createLogger } from "@signalscout/pipeline";
 import { describe, expect, it, vi } from "vitest";
+import type { Env } from "./config/env.js";
+import { loadEnv } from "./config/env.js";
 import type { ApiServer } from "./server.js";
 import { startApi } from "./start.js";
 

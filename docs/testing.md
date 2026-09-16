@@ -58,6 +58,14 @@ Two of our load-bearing pieces are exactly what such a fake gets wrong:
 test file, migrations applied, dropped after, costs a few hundred milliseconds.
 Pay it.
 
+**Two migration streams, one database.** Since US-153 the pipeline's tables
+come from `packages/pipeline/drizzle` and the account tables from
+`apps/api/drizzle`, each under its own migrations table. A pipeline test gets
+the pipeline's stream; a test in `apps/api` uses that package's own
+`createTestDatabase`, which applies both. Each stream has a
+`migrations.test.ts` holding it to the same rules, and `pnpm db:generate` runs
+`drizzle-kit` for both.
+
 **No test spends money.** No test may reach the Reddit API, the X API, or a
 model provider.
 

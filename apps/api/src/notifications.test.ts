@@ -4,15 +4,14 @@ import {
   createLogger,
   type Database,
   generateEncryptionKey,
-  loadEnv,
   notificationDefaults,
   readNotificationSettings,
 } from "@signalscout/pipeline";
-import { createTestDatabase, type TestDatabase } from "@signalscout/pipeline/testing";
 import { afterAll, beforeAll, expect, it } from "vitest";
 import { insertMonitor } from "../../../packages/pipeline/src/worker/testing.js";
+import { loadEnv } from "./config/env.js";
 import { buildServer } from "./server.js";
-import { asUser } from "./testing.js";
+import { asUser, createTestDatabase, type TestDatabase } from "./testing.js";
 
 let database: TestDatabase;
 let db: Database;

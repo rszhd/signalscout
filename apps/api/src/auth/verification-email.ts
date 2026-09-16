@@ -18,7 +18,7 @@ import {
   escapeHtml,
   renderButton,
   renderShell,
-} from "../notifications/email-theme.js";
+} from "@signalscout/pipeline";
 
 /** How a message leaves this instance. US-016's transport, narrowed. */
 export type SendEmail = (

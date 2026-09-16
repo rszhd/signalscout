@@ -52,10 +52,10 @@ import {
   youTubePlatformId,
 } from "@signalscout/engine";
 import { and, desc, eq } from "drizzle-orm";
-import { ownerUserId } from "../auth/user.js";
 import { loadAiEnv } from "../config/env.js";
 import { createDatabase } from "../db/client.js";
 import { apiUsage, budgets, matches, monitors, posts } from "../db/schema.js";
+import { ownerUserId } from "../live/owner.js";
 import { createClassifyStep } from "../worker/classify.js";
 import { createCollectStep } from "../worker/collect.js";
 import { credentialsFromStore } from "../worker/credentials.js";

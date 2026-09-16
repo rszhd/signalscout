@@ -6,13 +6,13 @@ import {
   encryptionKeyIsWellFormed,
 } from "@signalscout/engine";
 import { z } from "zod";
-import { type SignupMode, signupModes } from "../auth/user.js";
-import { emailVerificationModes } from "../auth/verification.js";
-import { billingModes } from "../billing/entitlement.js";
+import { type SignupMode, signupModes } from "./signup.js";
 
 /**
- * Every environment variable the application reads is declared here, once.
- * `.env.example` is the human-readable copy of this schema and must match it.
+ * Every environment variable the pipeline reads is declared here, once. The
+ * application's own schema — `apps/api/src/config/env.ts` — spreads
+ * `pipelineFields` into its own, so each variable is still declared in one
+ * place and `.env.example` still has one thing to match. US-153.
  */
 
 const notificationFields = {
@@ -51,8 +51,14 @@ export function loadSignupEnv(
   return signupEnvSchema.parse(source).AUTH_SIGNUP;
 }
 
-export const envSchema = z.object({
+/**
+ * The pipeline's own settings: the database, the log, the key that opens a
+ * stored credential, the signup rule the worker reads to know whose keys
+ * `.env` holds, and everything a model call or a notification needs.
+ */
+export const pipelineFields = {
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
+
   LOG_LEVEL: z.enum(["fatal", "error", "warn", "info", "debug", "trace", "silent"]).default("info"),
 
   DATABASE_URL: z.string().min(1),
@@ -84,31 +90,6 @@ export const envSchema = z.object({
   ),
 
   /**
-   * What signs a session cookie. US-017.
-   *
-   * Optional here and refused at boot, which is `ENCRYPTION_KEY`'s shape and
-   * for the same reason: `.env.example` is committed with blank values and
-   * `pnpm dev` copies it, so a required field would make a clean checkout fail
-   * to parse its own example file.
-   *
-   * There is no default and there will not be one. A default signing secret is
-   * a default password wearing another name — anybody holding this source could
-   * mint a session for any instance running it. `startApi` says how to make one
-   * and stops.
-   *
-   * Thirty-two characters, because the check that catches a real mistake is a
-   * short paste rather than a weak one.
-   */
-  AUTH_SECRET: blankIsUnset(
-    z
-      .string()
-      .min(32, {
-        message: "must be at least 32 characters. Generate one with `openssl rand -base64 32`.",
-      })
-      .optional(),
-  ),
-
-  /**
    * Whether a stranger may create an account. US-066.
    *
    * `closed` is the default: the first run makes one account and the server
@@ -122,112 +103,31 @@ export const envSchema = z.object({
    */
   AUTH_SIGNUP: blankIsUnset(z.enum(signupModes).default("closed")),
 
-  /**
-   * Whether an address is proven before an account is used. US-092.
-   *
-   * `off` is the default: the address is taken as given, and a session starts
-   * the moment the account exists. `required` sends a link and signs nobody in
-   * until it is opened.
-   *
-   * Off rather than required, for `AUTH_SIGNUP`'s reason and one of its own.
-   * Every instance running today is self-hosted, and most of them have no SMTP
-   * at all — so a version bump that quietly began requiring a link would arrive
-   * as a login that refuses the owner of a machine they run for themselves.
-   *
-   * Setting it to `required` makes the SMTP variables required, and the process
-   * refuses to boot without them. `emailVerificationRequired` is that check,
-   * and it exists because the half-configured state is the silent one: a login
-   * that answers every account with a message about mail nobody sent.
-   */
-  AUTH_EMAIL_VERIFICATION: blankIsUnset(z.enum(emailVerificationModes).default("off")),
-
-  /**
-   * Origins allowed to sign in, besides this instance's own address.
-   *
-   * Comma separated. Leave it empty for the normal install, where one process
-   * serves the UI and the API on one origin. Set it when the UI is served from
-   * somewhere else — a separate static host, or a proxy that rewrites the host
-   * without rewriting the browser's `Origin`.
-   *
-   * `pnpm dev` is exactly that shape, and it needs no entry here: the API adds
-   * the Vite dev server itself when NODE_ENV is development.
-   */
-  AUTH_TRUSTED_ORIGINS: blankIsUnset(z.string().min(1).optional()),
-
-  /**
-   * Where this instance answers, when a proxy rewrites the host.
-   *
-   * Unset means "read it from the request", which is right whenever one
-   * Fastify serves the UI and the API on one origin — the common install. Set
-   * it when the browser's address and the one Fastify sees are different.
-   */
-  AUTH_URL: blankIsUnset(z.string().min(1).optional()),
-
-  /**
-   * The addresses allowed to read the admin view. US-111.
-   *
-   * Comma separated. Empty means nobody is an admin, which is the safe answer
-   * for a self-hosted instance where the question never comes up. The admin
-   * endpoint returns every account's data, so this list is the security
-   * boundary and not a convenience.
-   */
-  ADMIN_EMAILS: blankIsUnset(z.string().min(1).optional()),
-
-  /**
-   * Whether this deployment charges for itself. US-072.
-   *
-   * `off` is the default and it is the self-hosted shape: no trial, no gate,
-   * no payment provider, and every screen behaves exactly as it did before
-   * billing existed. `stripe` is the hosted shape.
-   *
-   * Off rather than on, for `AUTH_SIGNUP`'s reason. Every instance running
-   * today is self-hosted, and a version bump that quietly began refusing
-   * writes on somebody's own machine would arrive as a release note nobody
-   * read.
-   *
-   * Setting it to `stripe` makes the four variables below required, and the
-   * process refuses to boot without them. The failure that check exists for is
-   * the quiet one: an instance that charges nobody, where every screen works.
-   */
-  BILLING_MODE: blankIsUnset(z.enum(billingModes).default("off")),
-
-  /** The Stripe key, price and webhook secret. Required when BILLING_MODE is stripe. */
-  STRIPE_SECRET_KEY: blankIsUnset(z.string().min(1).optional()),
-  STRIPE_PRICE_ID: blankIsUnset(z.string().min(1).optional()),
-  STRIPE_WEBHOOK_SECRET: blankIsUnset(z.string().min(1).optional()),
-
-  /**
-   * Where this instance answers, for the addresses Stripe sends a person back
-   * to. Required when BILLING_MODE is stripe, and not derived from a request
-   * header: a return address built from something the caller controls is a
-   * return address the caller chooses.
-   */
-  APP_URL: blankIsUnset(z.string().min(1).optional()),
-
-  HOST: z.string().min(1).default("0.0.0.0"),
-  PORT: z.coerce.number().int().min(1).max(65535).default(3000),
-
-  /**
-   * true  — the worker runs inside the API process. One container, ~120 MB.
-   * false — the worker runs as a second container from the same image.
-   */
-  WORKER_IN_PROCESS: booleanFromEnv.default(true),
-
-  /** Absolute path to the built UI. Empty means "resolve next to the API build". */
-  WEB_DIST_PATH: z.string().optional(),
-
   ...aiFields,
   ...notificationFields,
-});
+};
 
-export type Env = z.infer<typeof envSchema>;
+export const pipelineEnvSchema = z.object(pipelineFields);
+
+export type PipelineEnv = z.infer<typeof pipelineEnvSchema>;
 
 /**
- * Parse and validate the environment. Throws with a readable list of problems
- * rather than letting a missing variable surface as `undefined` at 02:00.
+ * Parse the pipeline's settings, or say which one is wrong. The application
+ * wraps this with its own fields; a script that runs the pipeline alone —
+ * the live polls, the key rotation — reads this.
  */
-export function loadEnv(source: Record<string, string | undefined> = process.env): Env {
-  const result = envSchema.safeParse(source);
+export function loadPipelineEnv(
+  source: Record<string, string | undefined> = process.env,
+): PipelineEnv {
+  return parseEnvironment(pipelineEnvSchema, source);
+}
+
+/** `safeParse`, with the issues laid out one per line for a person at a terminal. */
+export function parseEnvironment<Schema extends z.ZodType>(
+  schema: Schema,
+  source: Record<string, string | undefined>,
+): z.infer<Schema> {
+  const result = schema.safeParse(source);
 
   if (!result.success) {
     const problems = result.error.issues

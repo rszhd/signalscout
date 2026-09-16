@@ -11,4 +11,5 @@
  */
 
 export { unreachableFetch } from "@signalscout/engine/testing";
-export { createTestDatabase, type TestDatabase } from "./database.js";
+export { createTestDatabase, type TestDatabase, type TestDatabaseOptions } from "./database.js";
+export { inspectMigrationFolder, type MigrationFolderReport } from "./migrations.js";

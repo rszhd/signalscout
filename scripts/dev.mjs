@@ -50,7 +50,7 @@ console.log("Starting Postgres…");
 await run("docker", ["compose", "up", "-d", "--wait", "postgres"]);
 
 console.log("Applying migrations…");
-await run("pnpm", ["--filter", "@signalscout/pipeline", "migrate"], { env });
+await run("pnpm", ["--filter", "@signalscout/api", "migrate"], { env });
 
 await run(
   "pnpm",

@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { builtInSources } from "@signalscout/engine";
+import { environmentVariableFor } from "@signalscout/pipeline";
 import { describe, expect, it } from "vitest";
-import { environmentVariableFor } from "../worker/credentials.js";
 import { envSchema } from "./env.js";
 
 /**

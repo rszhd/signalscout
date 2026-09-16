@@ -5,8 +5,9 @@
  * it out of this file is what stops a second copy of the rule growing beside
  * the query that feeds it.
  */
+
+import type { Database } from "@signalscout/pipeline";
 import { eq } from "drizzle-orm";
-import type { Database } from "../db/client.js";
 import { type SubscriptionStatus, subscriptions } from "../db/schema.js";
 import {
   type BillingMode,

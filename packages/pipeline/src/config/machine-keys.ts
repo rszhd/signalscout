@@ -17,7 +17,7 @@
  * out, so nothing downstream needs to know why they are missing.
  */
 import type { AiEnvironment } from "@signalscout/engine";
-import type { SignupMode } from "../auth/user.js";
+import type { SignupMode } from "../config/signup.js";
 
 export function machineKeysUsable(signup: SignupMode): boolean {
   return signup === "closed";

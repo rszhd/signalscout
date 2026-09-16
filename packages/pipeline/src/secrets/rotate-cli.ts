@@ -12,11 +12,11 @@
  */
 
 import { generateEncryptionKey, requireEncryptionKey } from "@signalscout/engine";
-import { loadEnv } from "../config/env.js";
+import { loadPipelineEnv } from "../config/env.js";
 import { createDatabase } from "../db/client.js";
 import { rotateEncryptionKey } from "./store.js";
 
-const env = loadEnv();
+const env = loadPipelineEnv();
 
 if (!process.env.NEW_ENCRYPTION_KEY?.trim()) {
   process.stderr.write(

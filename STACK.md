@@ -55,6 +55,9 @@ Three rules follow from these:
 ```
 apps/
   api/          Fastify: REST endpoints, serves the built UI and /admin
+    auth/       Better Auth, and who owns a row
+    billing/    entitlement, the scheduler's gate, and Stripe
+    db/         the account tables and their own migration stream
     worker.ts   the same worker as a process of its own
   web/          Vite + React: the intent inbox
 
@@ -66,12 +69,10 @@ packages/
     estimate/   the cost test's arithmetic
     secrets/    the cipher
     vocabulary.ts  platforms, providers, signals, intents, two defaults
-  core/         stateful: owns the tables and the jobs, imports the engine
-    db/         Drizzle schema and migrations
-    worker/     the job steps the worker process registers
+  pipeline/     stateful: owns its tables and the jobs, imports the engine
+    db/         Drizzle schema and migrations, the pipeline's stream
+    worker/     the job steps the worker process registers, and the gate
     budget/     the cap, and what a poll is allowed to spend
-    billing/    entitlement and Stripe
-    auth/       Better Auth, and who owns a row
 
 admin/          Vite + shadcn/ui: the operator panel, served at /admin
 landing/        Astro: the marketing site, its own lockfile, deployed alone
@@ -82,15 +83,17 @@ own README.
 
 ## The one rule
 
-**`packages/engine` is stateless, and `packages/pipeline` imports neither Fastify
-nor React.**
+**`packages/engine` is stateless, `packages/pipeline` owns only its tables, and
+neither knows an account.**
 
 The engine declares no database, queue, auth or payment dependency, imports
-nothing from another package, and reads no environment variable. Core imports
-the engine and never the reverse. The API and the worker both call into core.
-This keeps the business logic testable with plain Vitest, it stops a UI
-concern from leaking into a connector, and it is what a second application
-can build on. US-151 says why there will be one.
+nothing from another package, and reads no environment variable. The pipeline
+imports the engine and never the reverse, imports neither Fastify, React,
+Better Auth nor Stripe, and knows an owner as a text id. Login, billing and
+the rule for who may poll are the application's, in `apps/api`. This keeps
+the business logic testable with plain Vitest, it stops a UI concern from
+leaking into a connector, and it is what a second application can build on.
+US-151 says why there will be one.
 
 When an AI assistant proposes a change that breaks this rule, reject it.
 
@@ -452,13 +455,23 @@ worker      optional, same image, different command
 
 ## Hosted version
 
-Run the same image on one small machine with managed Postgres.
+Run one image on one small machine with managed Postgres.
 
 Do not use a serverless platform. It cannot run an always-on worker, and the
 function plus database bill passes the subscription quickly. The price lives in
 Stripe rather than here — [docs/billing.md](docs/billing.md).
 
-Identical images for self-hosted and hosted means one set of bugs.
+**Until 2026-09-16 this said "identical images for self-hosted and hosted means
+one set of bugs", and it was true while the cloud was this image with
+`BILLING_MODE=on`.** The owner decided then that the cloud becomes a separate,
+private application — its own API, screens, onboarding and plans, changed
+weekly — on the same two published packages. What stays shared is what has
+the bugs worth sharing: every connector, every model call, the budget guard,
+deduplication and the scheduler live in `packages/engine` and
+`packages/pipeline`, tested once, in this repository. What diverges is the
+part that was always going to: who may log in and what they pay. US-151 holds
+the reasoning; US-155 is the cut-over, and until it lands the cloud still
+deploys from here.
 
 ---
 

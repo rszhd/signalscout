@@ -13,23 +13,16 @@
  * changed anything.
  */
 import { randomUUID } from "node:crypto";
+import { createDatabase, createLogger, type Database, monitors } from "@signalscout/pipeline";
+import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
+import { billingBasePath, billingWebhookPath, isOpenPath } from "./auth.js";
 import {
   type BillingEvent,
   type BillingProvider,
   type BillingSettings,
-  createDatabase,
-  createLogger,
-  type Database,
-  loadEnv,
-  monitors,
   readSubscription,
   startTrial,
-  subscriptions,
-  users,
-} from "@signalscout/pipeline";
-import { createTestDatabase, type TestDatabase } from "@signalscout/pipeline/testing";
-import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
-import { billingBasePath, billingWebhookPath, isOpenPath } from "./auth.js";
+} from "./billing/index.js";
 import {
   billingReasonHeader,
   isOpenToUnpaid,
@@ -37,8 +30,10 @@ import {
   unpaidMessage,
   writeMethods,
 } from "./billing.js";
+import { loadEnv } from "./config/env.js";
+import { subscriptions, users } from "./db/schema.js";
 import { type ApiServer, buildServer } from "./server.js";
-import { asUser } from "./testing.js";
+import { asUser, createTestDatabase, type TestDatabase } from "./testing.js";
 
 const logger = createLogger({ level: "silent", name: "test" });
 

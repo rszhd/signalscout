@@ -2,8 +2,8 @@ import { spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { builtInSources } from "@signalscout/engine";
+import { environmentVariableFor } from "@signalscout/pipeline";
 import { describe, expect, it } from "vitest";
-import { environmentVariableFor } from "../worker/credentials.js";
 import { envSchema } from "./env.js";
 
 /**

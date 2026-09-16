@@ -414,6 +414,13 @@
       "when": 1789018586490,
       "tag": "0058_a_walk_says_how_far_it_reached",
       "breakpoints": true
+    },
+    {
+      "idx": 59,
+      "version": "7",
+      "when": 1789548167433,
+      "tag": "0059_the_account_tables_leave_the_pipeline",
+      "breakpoints": true
     }
   ]
 }

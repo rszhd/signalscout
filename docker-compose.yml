@@ -128,7 +128,7 @@ services:
   # same migrations at boot is a race nobody needs.
   migrate:
     image: ${SIGNALSCOUT_IMAGE:-ghcr.io/rszhd/signalscout:latest}
-    command: ["node", "packages/pipeline/dist/db/migrate-cli.js"]
+    command: ["node", "apps/api/dist/db/migrate-cli.js"]
     environment: *app-environment
     depends_on:
       postgres:

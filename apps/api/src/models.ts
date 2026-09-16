@@ -33,7 +33,6 @@ import {
   deleteAiKey,
   draftConfigFromEnvironment,
   type EmbeddingConfig,
-  type Env,
   embeddingConfigFromEnvironment,
   embeddingNeedsApiKey,
   embeddingProviders,
@@ -57,6 +56,7 @@ import {
 } from "@signalscout/pipeline";
 import { z } from "zod";
 import { sessionUserId } from "./auth.js";
+import type { Env } from "./config/env.js";
 import type { ApiServer } from "./server.js";
 
 export interface ModelRoutesOptions {

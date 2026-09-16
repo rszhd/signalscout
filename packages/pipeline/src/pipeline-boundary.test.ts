@@ -15,7 +15,22 @@ import { describe, expect, it } from "vitest";
 
 const packageRoot = fileURLToPath(new URL("../", import.meta.url));
 
-const forbidden = ["fastify", "@fastify/", "react", "react-dom", "react-router"];
+/**
+ * Fastify and React, from the start. Better Auth and Stripe since US-153:
+ * who may log in and who has paid are the application's, and the private
+ * cloud repository answers both differently.
+ */
+const forbidden = [
+  "fastify",
+  "@fastify/",
+  "react",
+  "react-dom",
+  "react-router",
+  "better-auth",
+  "stripe",
+  "@signalscout/api",
+  "@signalscout/web",
+];
 
 function isForbidden(specifier: string): boolean {
   return forbidden.some((name) => specifier === name || specifier.startsWith(`${name}/`));
@@ -49,7 +64,7 @@ async function sourceFiles(directory: string): Promise<string[]> {
   return files.flat();
 }
 
-describe("packages/pipeline imports neither Fastify nor React", () => {
+describe("packages/pipeline imports neither Fastify, React, Better Auth nor Stripe", () => {
   it("declares neither as a dependency", async () => {
     const manifest = JSON.parse(await readFile(join(packageRoot, "package.json"), "utf8")) as {
       dependencies?: Record<string, string>;

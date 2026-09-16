@@ -12,7 +12,7 @@
  * the story in each case, not computed from the code under test.
  */
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
-import { unclaimedUserId } from "../auth/user.js";
+import { unclaimedUserId } from "../config/signup.js";
 import { createDatabase, type Database } from "../db/client.js";
 import { feedback, matches, monitors, posts } from "../db/schema.js";
 import { updateMonitor } from "../monitors/monitors.js";

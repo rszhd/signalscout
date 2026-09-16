@@ -52,7 +52,6 @@ import {
 } from "@signalscout/engine";
 import { and, asc, desc, eq, isNull, sql } from "drizzle-orm";
 import { readAiEnvironment } from "../ai/settings.js";
-import { ownerUserId } from "../auth/user.js";
 import { loadAiEnv, loadNotificationEnv } from "../config/env.js";
 import { createDatabase } from "../db/client.js";
 import {
@@ -63,8 +62,8 @@ import {
   notificationItems,
   notificationSettings,
   posts,
-  users,
 } from "../db/schema.js";
+import { ownerEmail, ownerUserId } from "../live/owner.js";
 import { createMonitor } from "../monitors/monitors.js";
 import { createClassifyStep } from "../worker/classify.js";
 import { createFilterStep } from "../worker/filter.js";
@@ -181,14 +180,14 @@ async function main(): Promise<void> {
   }
 
   const owner = await ownerUserId(db);
-  const [account] = await db.select().from(users).where(eq(users.id, owner));
+  const email = await ownerEmail(db, owner);
 
-  if (!account?.email) {
+  if (!email) {
     console.error("The owning account has no email address, so there is nobody to send to.");
     process.exit(1);
   }
 
-  say(`owner ${owner} — ${account.email}`);
+  say(`owner ${owner} — ${email}`);
   say(
     `mailer ${notificationEnv.SMTP_HOST}:${notificationEnv.SMTP_PORT} from ${notificationEnv.SMTP_FROM}`,
   );
@@ -253,7 +252,7 @@ async function main(): Promise<void> {
     },
     {
       descriptors: [],
-      notificationDefaults: { canSendEmail: true, emailTo: account.email },
+      notificationDefaults: { canSendEmail: true, emailTo: email },
     },
   );
 
@@ -381,7 +380,7 @@ async function main(): Promise<void> {
     .where(eq(notificationSettings.monitorId, monitorId));
 
   say(after?.error ? `email error recorded: ${after.error}` : "no email error recorded");
-  say(`check ${account.email}`);
+  say(`check ${email}`);
 }
 
 try {

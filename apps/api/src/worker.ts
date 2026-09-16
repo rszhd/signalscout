@@ -1,10 +1,6 @@
-import {
-  createDatabase,
-  createLogger,
-  loadEnv,
-  startWorker,
-  subscriptionGate,
-} from "@signalscout/pipeline";
+import { createDatabase, createLogger, startWorker } from "@signalscout/pipeline";
+import { subscriptionGate } from "./billing/index.js";
+import { loadEnv } from "./config/env.js";
 
 /**
  * The worker as its own process — `node apps/api/dist/worker.js`. It runs the

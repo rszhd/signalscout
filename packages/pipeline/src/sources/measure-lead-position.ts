@@ -54,7 +54,6 @@ import {
   triageConfigFromEnvironment,
 } from "@signalscout/engine";
 import { and, desc, eq, inArray, sql } from "drizzle-orm";
-import { ownerUserId } from "../auth/user.js";
 import { recordSourceUsage } from "../budget/budget.js";
 import { loadAiEnv } from "../config/env.js";
 import { createDatabase } from "../db/client.js";
@@ -67,6 +66,7 @@ import {
   posts,
   type Source,
 } from "../db/schema.js";
+import { ownerUserId } from "../live/owner.js";
 import { createClassifyStep } from "../worker/classify.js";
 import { excerptLength } from "../worker/collect.js";
 import { credentialsFromStore } from "../worker/credentials.js";

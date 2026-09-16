@@ -69,28 +69,35 @@ nor React, and neither imports an app.
 
 ## Acceptance
 
-- [ ] `packages/core` is renamed to `packages/pipeline` by `git mv`; the
-      package name is `@signalscout/pipeline`; no file anywhere imports
-      `@signalscout/core`.
-- [ ] `auth/`, `billing/`, `admin/` and `feedback/` are under `apps/api/src`
-      with their tests, and the six tables named above are defined in
-      `apps/api`'s schema, not the pipeline's.
-- [ ] `apps/api/drizzle` has its own journal and migrations table; both
-      streams apply at boot on an empty database and on a copy of the main
-      database; `migrations.test.ts` covers both.
-- [ ] The scheduler takes an entitlement gate and imports nothing from
-      billing. Three test cases: a gate that admits all, a gate that refuses
-      one owner, a gate that throws.
-- [ ] `apps/api` passes a gate built from `BILLING_MODE`, and
-      `billing.test.ts` still proves that an account past its trial does not
-      poll.
-- [ ] `pnpm test`, `pnpm typecheck`, `pnpm lint`, `pnpm build` and
-      `docker compose build` pass; the image starts and answers `/health`.
-- [ ] Every `live:*` and `capture:*` command in AGENTS.md still names a
-      command that exists, in the package that now owns the file.
-- [ ] STACK.md, *Hosted version* and AGENTS.md, *Rules that are easy to
-      break* say the new rule; `docs/testing.md` names the two migration
-      streams.
+- [x] `packages/core` is renamed to `packages/pipeline` by `git mv`; the
+      package name is `@signalscout/pipeline`; no file outside closed tickets,
+      `docs/history.md` and captured fixture metadata names `@signalscout/core`.
+- [x] `auth/`, `billing/` and `admin/` are under `apps/api/src` with their
+      tests, and the six tables named above are defined in `apps/api`'s
+      schema, not the pipeline's. `feedback/` stays: it is the verdicts table,
+      which the pipeline's own returns and reconciliation read — the ticket
+      had it wrong.
+- [x] `apps/api/drizzle` has its own journal and migrations table
+      (`drizzle.__app_migrations`); both streams apply from the image on an
+      empty database (60 + 1 rows, 30 tables) and on the worktree's copy of
+      the main database (twice, the second a no-op); each stream has a
+      `migrations.test.ts`.
+- [x] The scheduler takes an entitlement gate and imports nothing from
+      billing. Four test cases: a gate that admits all, a gate that refuses
+      one owner (asked once, with every due owner), a gate that throws, and
+      no due monitor.
+- [x] `apps/api` passes `subscriptionGate(db, BILLING_MODE)` from both entry
+      points; `start.test.ts` proves it is `admitEveryone` when off and not
+      when on; `billing/entitlement.test.ts` proves the gate refuses an
+      expired trial and a cancelled card and admits everything else.
+- [x] `pnpm test` (122 files, 2,093 tests), `pnpm typecheck`, `pnpm lint`
+      and `pnpm build` pass; the image builds, runs both migration streams,
+      starts and answers `/api/health`; `apps/api/dist/worker.js` starts.
+- [x] Every `live:*` and `capture:*` command in AGENTS.md names a command
+      that exists, in the package that owns the file.
+- [x] STACK.md, *Hosted version* and *The one rule*, AGENTS.md, *Rules that
+      are easy to break*, and `docs/testing.md` say the new rule and name the
+      two migration streams.
 
 ## Notes
 

@@ -8,10 +8,11 @@
  *
  * Real Postgres, like every other test here.
  */
+
+import { createDatabase, type Database } from "@signalscout/pipeline";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
-import { createDatabase, type Database } from "../db/client.js";
 import { userOnboarding } from "../db/schema.js";
-import { createTestDatabase, type TestDatabase } from "../testing/database.js";
+import { createTestDatabase, type TestDatabase } from "../testing.js";
 import { hasCompletedOnboarding, markOnboardingComplete } from "./onboarding.js";
 
 const anna = "user-anna";

@@ -19,14 +19,13 @@ import {
   createLogger,
   createReplyPrompt,
   listReplyPrompts,
-  loadEnv,
   replyPrompts,
-  unclaimedUserId,
 } from "@signalscout/pipeline";
-import { createTestDatabase, type TestDatabase } from "@signalscout/pipeline/testing";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
+import { unclaimedUserId } from "./auth/user.js";
+import { loadEnv } from "./config/env.js";
 import { buildServer } from "./server.js";
-import { asOwner } from "./testing.js";
+import { asOwner, createTestDatabase, type TestDatabase } from "./testing.js";
 
 const logger = createLogger({ level: "silent", name: "test" });
 

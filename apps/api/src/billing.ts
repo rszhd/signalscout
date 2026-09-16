@@ -22,23 +22,23 @@
  * a person to two different places, and the screen reads the reason to decide
  * which sentence to show.
  */
+
+import type { Database, Logger } from "@signalscout/pipeline";
+import { z } from "zod";
+import { billingBasePath, billingWebhookPath, isOpenPath, sessionUserId } from "./auth.js";
 import {
   applyStripeSubscription,
   type BillingMode,
   type BillingProvider,
   type BillingSettings,
   createStripeBilling,
-  type Database,
   type Entitlement,
-  type Logger,
   linkStripeCustomer,
   type PlanPrice,
   readEntitlement,
   readSubscription,
   trialDays,
-} from "@signalscout/pipeline";
-import { z } from "zod";
-import { billingBasePath, billingWebhookPath, isOpenPath, sessionUserId } from "./auth.js";
+} from "./billing/index.js";
 import type { ApiServer } from "./server.js";
 
 /** The methods that change something, and therefore need a paid-up account. */

@@ -40,6 +40,7 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 COPY --from=build /app/packages/engine/dist packages/engine/dist
 COPY --from=build /app/packages/pipeline/dist packages/pipeline/dist
 COPY --from=build /app/packages/pipeline/drizzle packages/pipeline/drizzle
+COPY --from=build /app/apps/api/drizzle apps/api/drizzle
 COPY --from=build /app/apps/api/dist apps/api/dist
 COPY --from=build /app/apps/web/dist apps/web/dist
 COPY --from=build /app/admin/dist admin/dist

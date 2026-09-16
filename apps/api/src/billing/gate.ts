@@ -11,10 +11,11 @@
  * `off` is `admitEveryone` itself, not a query that happens to admit
  * everyone. The self-hosted default must not read a table to decide nothing.
  */
+
+import type { Database } from "@signalscout/pipeline";
+import { admitEveryone, type EntitlementGate } from "@signalscout/pipeline";
 import { and, inArray, not, sql } from "drizzle-orm";
-import type { Database } from "../db/client.js";
 import { subscriptions } from "../db/schema.js";
-import { admitEveryone, type EntitlementGate } from "../worker/entitlement.js";
 import { type BillingMode, entitledCondition } from "./entitlement.js";
 
 export function subscriptionGate(db: Database, mode: BillingMode): EntitlementGate {

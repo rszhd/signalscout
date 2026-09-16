@@ -20,24 +20,21 @@
  */
 
 import type { Logger } from "@signalscout/engine";
-import { betterAuth } from "better-auth";
-import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { APIError } from "better-auth/api";
-import { eq, sql } from "drizzle-orm";
-import { seedPresetReplyVoices } from "../ai/reply-prompts.js";
-import { type BillingMode, startTrial } from "../billing/index.js";
-import type { Database } from "../db/client.js";
+import type { Database } from "@signalscout/pipeline";
 import {
-  accounts,
   feedback,
   monitors,
   projects,
   replyPrompts,
-  sessions,
+  seedPresetReplyVoices,
   sourceProviders,
-  users,
-  verifications,
-} from "../db/schema.js";
+} from "@signalscout/pipeline";
+import { betterAuth } from "better-auth";
+import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { APIError } from "better-auth/api";
+import { eq, sql } from "drizzle-orm";
+import { type BillingMode, startTrial } from "../billing/index.js";
+import { accounts, sessions, users, verifications } from "../db/schema.js";
 import { type SignupMode, unclaimedUserId } from "./user.js";
 import { type SendEmail, verificationMessage } from "./verification-email.js";
 

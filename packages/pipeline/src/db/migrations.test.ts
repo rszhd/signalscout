@@ -18,35 +18,24 @@
  * why they were hand-written, which is why the journal step existed to be
  * forgotten.
  */
-import { readdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
+import { inspectMigrationFolder } from "../testing/migrations.js";
 
 const folder = join(dirname(fileURLToPath(import.meta.url)), "..", "..", "drizzle");
 
-interface Journal {
-  entries: { idx: number; tag: string }[];
-}
+describe("the pipeline's migration folder", () => {
+  const report = inspectMigrationFolder(folder);
 
-const journal = JSON.parse(readFileSync(join(folder, "meta", "_journal.json"), "utf8")) as Journal;
-const files = readdirSync(folder)
-  .filter((name) => name.endsWith(".sql"))
-  .sort();
-
-describe("the migration folder", () => {
   it("has a journal entry for every migration file", () => {
-    const tagged = new Set(journal.entries.map((entry) => `${entry.tag}.sql`));
-
     // Named rather than counted: the failure has to say which file, because
     // the person reading it has just written that file and forgotten a step.
-    expect(files.filter((name) => !tagged.has(name))).toEqual([]);
+    expect(report.unjournaled).toEqual([]);
   });
 
   it("has a migration file for every journal entry", () => {
-    const present = new Set(files);
-
-    expect(journal.entries.filter((entry) => !present.has(`${entry.tag}.sql`))).toEqual([]);
+    expect(report.missing).toEqual([]);
   });
 
   /**
@@ -56,12 +45,7 @@ describe("the migration folder", () => {
    * boot, and the merge is where nobody is looking.
    */
   it("numbers each migration once, in order", () => {
-    expect(journal.entries.map((entry) => entry.idx)).toEqual(
-      journal.entries.map((_, index) => index),
-    );
-    expect(journal.entries.map((entry) => entry.tag.slice(0, 4))).toEqual(
-      journal.entries.map((_, index) => String(index).padStart(4, "0")),
-    );
+    expect(report.numberedInOrder).toBe(true);
   });
 
   /**
@@ -74,15 +58,6 @@ describe("the migration folder", () => {
    * mistake is the one that was turned off.
    */
   it("gives every snapshot its own id", () => {
-    const seen = new Map<string, string[]>();
-
-    for (const name of readdirSync(join(folder, "meta")).filter((one) =>
-      one.endsWith("_snapshot.json"),
-    )) {
-      const { id } = JSON.parse(readFileSync(join(folder, "meta", name), "utf8")) as { id: string };
-      seen.set(id, [...(seen.get(id) ?? []), name]);
-    }
-
-    expect([...seen.values()].filter((names) => names.length > 1)).toEqual([]);
+    expect(report.duplicateSnapshotIds).toEqual([]);
   });
 });

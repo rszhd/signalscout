@@ -6,12 +6,13 @@
  * either form on its own but that they agree. So every case below is driven
  * through `entitlementFor` and through Postgres, from the same fixture.
  */
+
+import { createDatabase, type Database } from "@signalscout/pipeline";
 import { and, eq, sql } from "drizzle-orm";
 import type { Pool } from "pg";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
-import { createDatabase, type Database } from "../db/client.js";
 import { type SubscriptionStatus, subscriptions, users } from "../db/schema.js";
-import { createTestDatabase, type TestDatabase } from "../testing/database.js";
+import { createTestDatabase, type TestDatabase } from "../testing.js";
 import { daysUntil, entitledCondition, entitlementFor, trialDays } from "./entitlement.js";
 import { subscriptionGate } from "./gate.js";
 import { readSubscription, startTrial } from "./store.js";

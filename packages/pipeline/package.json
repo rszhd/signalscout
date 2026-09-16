@@ -18,7 +18,6 @@
   "scripts": {
     "build": "tsc --build",
     "typecheck": "tsc --build",
-    "migrate": "tsx --env-file-if-exists=../../.env src/db/migrate-cli.ts",
     "generate": "drizzle-kit generate",
     "rotate-key": "tsx --env-file-if-exists=../../.env src/secrets/rotate-cli.ts",
     "live:provider-switch": "tsx --env-file-if-exists=../../.env src/sources/live-provider-switch.ts",
@@ -43,13 +42,11 @@
   "dependencies": {
     "@signalscout/engine": "workspace:*",
     "ai": "7.0.92",
-    "better-auth": "1.7.3",
     "drizzle-orm": "0.45.2",
     "nodemailer": "^10.0.0",
     "pg": "8.23.0",
     "pg-boss": "12.30.0",
     "pino": "10.1.0",
-    "stripe": "22.4.0",
     "zod": "4.5.4"
   },
   "devDependencies": {

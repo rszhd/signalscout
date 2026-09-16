@@ -13,8 +13,9 @@
  * US-088 derived setup from the keys alone and argued against a flag. This is
  * that decision reversed, and `db/schema.ts` carries the reasoning.
  */
+
+import type { Database } from "@signalscout/pipeline";
 import { eq } from "drizzle-orm";
-import type { Database } from "../db/client.js";
 import { userOnboarding } from "../db/schema.js";
 
 /**

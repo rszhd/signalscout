@@ -37,9 +37,9 @@ import {
   createSourceRuntime,
 } from "@signalscout/engine";
 import { desc, eq } from "drizzle-orm";
-import { ownerUserId } from "../auth/user.js";
 import { createDatabase } from "../db/client.js";
 import { apiUsage, monitors, posts, sourceContinuations, sourceProviders } from "../db/schema.js";
+import { ownerUserId } from "../live/owner.js";
 import { createCollectStep } from "../worker/collect.js";
 import { credentialsFromStore } from "../worker/credentials.js";
 import type { StepContext } from "../worker/steps.js";

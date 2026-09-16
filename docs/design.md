@@ -101,7 +101,7 @@ preview truncation and mobile reading pane remain page-specific.
 - The bottom bar holds four items: Projects, Intent inbox, Monitors and
   Account. New monitor is not one of them, because the inbox header, the
   monitor list header and every project card already carry that action.
-  Account opens a sheet with Providers, Voices, Models, Billing and Sign out —
+  Account opens a sheet with Providers, Voices, Models and Sign out —
   the sidebar's account section, which a phone does not show.
 - A table wider than the screen becomes one card per row below 600px. Each
   cell carries its column name in `data-label` and the stylesheet prints it
@@ -180,14 +180,6 @@ project. Status, estimated spending, remaining budget and feedback stay visible;
 schedule, budget, pre-filter controls and collection history sit behind a native
 disclosure. Budget, credential and notification issues remain outside it.
 `styles/monitors.css` owns the responsive layout and uses the shared theme.
-
-## Billing
-
-Billing puts the plan and hosting price beside the account's subscription state
-and Stripe action. Trial days have a labelled progress bar. Provider costs sit
-below with a link to connections. The panels stack on narrow screens; loading
-failures offer a retry. `styles/billing.css` owns the layout and uses the shared
-theme. Self-hosted instances show no payment action.
 
 ## Models
 

@@ -425,10 +425,10 @@ Community pull requests should be encouraged for new connectors.
 
 The open-source project remains free and self-hostable.
 
-**It is live.** SignalScout Cloud has run at app.signalscout.run since
-2026-09-10, at **$20 USD a month after seven free days that ask for no card.**
-That figure lives in Stripe and not in this repository — docs/billing.md says
-why, and this paragraph is a copy that goes stale the day the price moves.
+**It is live, and since 2026-09-16 it is a separate private repository.**
+SignalScout Cloud has run at app.signalscout.run since 2026-09-10. It is built
+on the two packages this repository publishes, and its price, its plans and
+its Stripe integration live there and not here — STACK.md, *Hosted version*.
 
 The hosted product is not charging users for social data or AI usage.
 

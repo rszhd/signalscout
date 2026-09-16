@@ -6,7 +6,7 @@ priority: p1
 created: 2026-09-08T14:05+08:00
 parent:
 area:
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -161,3 +161,4 @@ thing that makes somebody come back.
   to the wrong account and looks fine doing it.
 
   Still unproven: a Checkout Session, and any card.
+- 2026-09-16T20:10+08:00 — Shipped, and moved. The trial and the paywall run in the hosted application, which is a private repository since US-155; this repository carries no billing.

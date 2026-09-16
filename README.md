@@ -154,7 +154,6 @@ The scope is one sentence: **find conversations with intent.**
 | [docs/costs.md](docs/costs.md) | What our spend figure is, and what it is wrong about |
 | [docs/secrets.md](docs/secrets.md) | Where a key lives, what encryption promises, how to rotate |
 | [docs/accounts.md](docs/accounts.md) | Accounts, TLS, verifying an address by hand, getting back in |
-| [docs/billing.md](docs/billing.md) | Who is entitled, what a refused write answers |
 | [docs/notifications.md](docs/notifications.md) | SMTP setup and the webhook contract |
 | [docs/deletions.md](docs/deletions.md) | How a removed post stops being shown |
 | [docs/design.md](docs/design.md) | The shared theme, tokens and controls |

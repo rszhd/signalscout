@@ -6,7 +6,7 @@ priority: p1
 created: 2026-09-16T13:45+08:00
 parent:
 area: architecture
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -79,9 +79,9 @@ hides which version is live.
       rule.
 - [x] US-154 shipped: `@signalscout/engine` and `@signalscout/pipeline` are on
       npm with a version, from CI.
-- [ ] US-155 shipped: the private cloud repo runs against the published
+- [x] US-155 shipped: the private cloud repo runs against the published
       packages, and the Stripe code is gone from here.
-- [ ] `docs/history.md` records the decision with the date and the reason.
+- [x] `docs/history.md` records the decision with the date and the reason.
 
 ## Notes
 
@@ -99,3 +99,4 @@ hides which version is live.
 - 2026-09-16T13:45+08:00 — Written from the owner's decision and a count of
   the import graph. Split into US-152 to US-155.
 - 2026-09-16T17:58+08:00 — US-152, US-153 and US-154 shipped; v0.1.0 is on npm. US-155 is what is left, and it needs the private repository made first.
+- 2026-09-16T20:10+08:00 — All four steps shipped. The hosted product deploys from rszhd/signalscout-cloud on @signalscout/engine and @signalscout/pipeline 0.1.0.

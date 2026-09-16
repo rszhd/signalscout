@@ -8,6 +8,13 @@
       "when": 1789548186321,
       "tag": "0000_the_account_tables",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1789558576352,
+      "tag": "0001_the_subscriptions_table_leaves_with_billing",
+      "breakpoints": true
     }
   ]
 }

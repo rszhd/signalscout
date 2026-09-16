@@ -1,5 +1,4 @@
-import { createDatabase, createLogger, startWorker } from "@signalscout/pipeline";
-import { subscriptionGate } from "./billing/index.js";
+import { admitEveryone, createLogger, startWorker } from "@signalscout/pipeline";
 import { loadEnv } from "./config/env.js";
 
 /**
@@ -22,28 +21,22 @@ if (env.WORKER_IN_PROCESS) {
 }
 
 const logger = createLogger({ level: env.LOG_LEVEL, name: "worker" });
-// A pool of the gate's own, beside the worker's. The scheduler asks it once a
-// tick which owners may poll, and the answer lives in a table the pipeline
-// does not own.
-const gate = createDatabase(env.DATABASE_URL);
 const handle = await startWorker({
   databaseUrl: env.DATABASE_URL,
   logger,
-  entitled: subscriptionGate(gate.db, env.BILLING_MODE),
+  // Everyone may poll. This application charges nobody. US-153.
+  entitled: admitEveryone,
 });
 
 for (const signal of ["SIGINT", "SIGTERM"] as const) {
   process.once(signal, () => {
     logger.info({ signal }, "shutting down");
-    handle
-      .stop()
-      .then(() => gate.close())
-      .then(
-        () => process.exit(0),
-        (error: unknown) => {
-          logger.error({ err: error }, "shutdown failed");
-          process.exit(1);
-        },
-      );
+    handle.stop().then(
+      () => process.exit(0),
+      (error: unknown) => {
+        logger.error({ err: error }, "shutdown failed");
+        process.exit(1);
+      },
+    );
   });
 }

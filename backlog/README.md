@@ -121,6 +121,9 @@ the short list, so a decision is not reopened by accident.
   product.
 - **Self-hostable first.** The open-source build is the whole application.
   Nothing is removed to make the hosted version worth paying for.
+- **The hosted version is a separate private repository** on the two packages
+  this one publishes, since US-155. Billing, plans and the cloud's screens
+  live there; nothing here knows a subscription.
 - **One language, one database, two processes.** TypeScript, Postgres, an API
   and a worker. A ticket that adds a service must say why Postgres cannot do
   it.

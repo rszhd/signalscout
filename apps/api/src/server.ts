@@ -40,12 +40,6 @@ import { type Auth, createAuth } from "./auth/auth.js";
 import { emailVerificationRequired } from "./auth/verification.js";
 import type { SendEmail } from "./auth/verification-email.js";
 import { registerAuthRoutes, type SessionResolver } from "./auth.js";
-import {
-  type BillingProvider,
-  type BillingSettings,
-  billingSettingsFrom,
-} from "./billing/index.js";
-import { registerBillingGate, registerBillingRoutes } from "./billing.js";
 import type { Env } from "./config/env.js";
 import { registerConnectionRoutes } from "./connections.js";
 import { registerDraftRoutes, registerReplyPromptRoutes } from "./drafts.js";
@@ -169,19 +163,6 @@ export interface BuildServerOptions {
    * will pick up. `start.ts` passes the worker's own queue when there is one.
    */
   jobs?: JobSender | null;
-  /**
-   * What this deployment charges, or null for one that does not. US-072.
-   *
-   * Undefined reads the environment, which is `off` unless it says otherwise.
-   * Null is what a test passes for "this instance is free", and it is the same
-   * shape `auth` uses.
-   */
-  billingSettings?: BillingSettings | null;
-  /**
-   * The payment provider. Injected by every test that reaches these routes,
-   * because no test spends money and no test needs the network.
-   */
-  billing?: BillingProvider;
 }
 
 /**
@@ -256,7 +237,6 @@ export function authFor(env: Env, db: Database, logger: Logger): Auth | null {
     logger,
     trustedOrigins: trustedOrigins(env),
     signup: env.AUTH_SIGNUP,
-    billing: env.BILLING_MODE,
     sendEmail: verificationSenderFor(env),
   });
 }
@@ -382,30 +362,12 @@ export async function buildServer({
   auth,
   session,
   jobs = null,
-  billingSettings,
-  billing,
   canSendEmail,
 }: BuildServerOptions): Promise<ApiServer> {
   const app = Fastify({ loggerInstance: logger }).withTypeProvider<ZodTypeProvider>();
 
   app.setValidatorCompiler(validatorCompiler);
   app.setSerializerCompiler(serializerCompiler);
-
-  /**
-   * What this deployment charges, read before the routes so the login status
-   * route and the paywall below both get the same answer. Null is a build that
-   * does not charge.
-   */
-  const settings =
-    billingSettings === undefined
-      ? billingSettingsFrom({
-          BILLING_MODE: env.BILLING_MODE,
-          STRIPE_SECRET_KEY: env.STRIPE_SECRET_KEY,
-          STRIPE_PRICE_ID: env.STRIPE_PRICE_ID,
-          STRIPE_WEBHOOK_SECRET: env.STRIPE_WEBHOOK_SECRET,
-          APP_URL: env.APP_URL,
-        })
-      : billingSettings;
 
   // First, and it has to be first: its `onRoute` hook only records the routes
   // registered after it, and the count is what `auth.test.ts` checks the open
@@ -417,18 +379,7 @@ export async function buildServer({
     session,
     baseUrl: env.AUTH_URL,
     signup: env.AUTH_SIGNUP,
-    billing: settings?.mode ?? "off",
   });
-
-  /**
-   * The paywall, immediately after the session gate and before every route it
-   * covers. Order is the whole design: it reads the person the gate just set,
-   * and a Fastify `onRequest` hook only sees requests to routes registered
-   * after it — which is also why the billing routes below register later.
-   *
-   * `off` registers nothing at all.
-   */
-  registerBillingGate(app, { db, mode: settings?.mode ?? "off" });
 
   app.route({
     method: "GET",
@@ -443,8 +394,6 @@ export async function buildServer({
     },
     handler: async () => ({ status: "ok" as const, workerInProcess: env.WORKER_IN_PROCESS }),
   });
-
-  await registerBillingRoutes(app, { db, logger, settings, billing });
 
   // The account's setup marker. US-105. Registered here rather than with the
   // connections screen because it is about the account, not a key.

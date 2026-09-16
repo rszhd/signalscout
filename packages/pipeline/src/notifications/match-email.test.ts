@@ -135,8 +135,8 @@ describe("what the message says", () => {
   });
 
   it("offers the inbox button only where the instance says where it answers", () => {
-    // `APP_URL` is required only for Stripe, so a self-hosted deployment may
-    // have none — and a button pointing nowhere is worse than no button.
+    // `APP_URL` is optional, so a self-hosted deployment may have none — and
+    // a button pointing nowhere is worse than no button.
     expect(render([row()], "https://app.example.test").html).toContain("Open the inbox");
     expect(render([row()]).html).not.toContain("Open the inbox");
   });

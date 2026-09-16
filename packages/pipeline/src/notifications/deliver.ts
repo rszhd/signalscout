@@ -54,8 +54,8 @@ export async function processNotifications(
     /**
      * Where this instance answers, for the "open the inbox" button. US-094.
      *
-     * Optional, and the template renders without it. `APP_URL` is required only
-     * for Stripe, so a self-hosted deployment may not have set one — and a
+     * Optional, and the template renders without it. `APP_URL` is optional
+     * everywhere, so a self-hosted deployment may not have set one — and a
      * button pointing nowhere is worse than no button. A match still links to
      * its own post, which needs nothing configured.
      */

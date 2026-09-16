@@ -72,28 +72,22 @@ const composeOnly = new Map([
   ["EDGE_NETWORK", "the network the proxy and the app meet on"],
   ["TRAEFIK_NAME", "names this stack's router and service"],
   ["ROBOTS_TAG", "what the proxy answers in X-Robots-Tag"],
-  ["TRAEFIK_BASIC_AUTH_USERS", "docker-compose.staging.yml's password prompt"],
 ]);
 
 /**
  * Settings that must not appear in the short file.
  *
- * Not a style rule. Each one is the hosted shape: a self-hoster who meets
- * `BILLING_MODE` on their first install is being asked to decide whether to
- * charge themselves, and `ADMIN_EMAILS` reads as a thing to fill in when
- * filling it in is what opens every account's data to an address.
+ * Not a style rule. Each one is a deployment's shape rather than a person's:
+ * `ADMIN_EMAILS` reads as a thing to fill in when filling it in is what opens
+ * every account's data to an address, and the proxy names belong to whoever
+ * runs a proxy.
  */
 const cloudOnly = [
-  "BILLING_MODE",
-  "STRIPE_SECRET_KEY",
-  "STRIPE_PRICE_ID",
-  "STRIPE_WEBHOOK_SECRET",
   "APP_URL",
   "ADMIN_EMAILS",
   "AUTH_URL",
   "AUTH_TRUSTED_ORIGINS",
   "TRAEFIK_NAME",
-  "TRAEFIK_BASIC_AUTH_USERS",
   "ROBOTS_TAG",
   "EDGE_NETWORK",
 ];

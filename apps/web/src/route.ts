@@ -1,7 +1,7 @@
 /**
  * Every address in this application, in one table. US-076.
  *
- * The route used to live in the hash, and a Stripe return then read
+ * The route used to live in the hash, and a return from a payment page read
  * `/billing?checkout=done#/billing` — one address saying the same thing twice,
  * because the path was the server's answer and the hash was the app's. There
  * is one now. Fastify already hands `index.html` to any path that is not an
@@ -33,7 +33,6 @@ export const routes = {
   providers: "/providers",
   replyVoices: "/reply-voices",
   models: "/models",
-  billing: "/billing",
 } as const;
 
 /**
@@ -57,5 +56,4 @@ export const paths = {
   providers: routes.providers,
   replyVoices: routes.replyVoices,
   models: routes.models,
-  billing: routes.billing,
 } as const;

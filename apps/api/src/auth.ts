@@ -25,7 +25,6 @@ import { z } from "zod";
 import { type Auth, accountExists } from "./auth/auth.js";
 import { hasCompletedOnboarding } from "./auth/onboarding.js";
 import type { SignupMode } from "./auth/user.js";
-import type { BillingMode } from "./billing/index.js";
 import type { ApiServer } from "./server.js";
 
 /** What a route knows about the person asking. A text id, and no more. */
@@ -66,15 +65,6 @@ declare module "fastify" {
 export const authBasePath = "/api/auth";
 
 /**
- * Where the billing routes live, and where Stripe posts. US-072.
- *
- * Declared here rather than beside the routes so that the open list below can
- * name the webhook without importing the module that registers it.
- */
-export const billingBasePath = "/api/billing";
-export const billingWebhookPath = `${billingBasePath}/webhook`;
-
-/**
  * The paths that answer without a session, and why each one does.
  *
  * Three entries, and adding a fourth should be hard. Every one of them is a
@@ -96,26 +86,6 @@ export const openApiPaths: readonly string[] = [
    * the instance and nothing about a person.
    */
   "/api/auth-status",
-  /**
-   * Stripe's webhook. US-072.
-   *
-   * The fourth entry, and this file says a fourth should be hard. It is here
-   * because Stripe has no cookie and never will: a renewal, a failed card and a
-   * cancellation all arrive from a server, months after the person who paid
-   * closed the tab. Refusing them would leave this database believing whatever
-   * it believed at Checkout.
-   *
-   * **The signature is the gate.** `readEvent` verifies the body against
-   * `STRIPE_WEBHOOK_SECRET` and throws when it does not check out, and the
-   * route answers 400 without reading a word of the payload. That is a
-   * stronger check than a session, not a weaker one, and it is the only reason
-   * this line is acceptable.
-   *
-   * The path is a constant rather than a string, because two spellings of it —
-   * one here and one where the route is registered — would open a hole nobody
-   * could see by reading either file.
-   */
-  billingWebhookPath,
 ];
 
 /** The message a signed-out request gets. One sentence, and no detail. */
@@ -139,16 +109,6 @@ export interface AuthRoutesOptions {
    * `createAuth`'s hook, where every path that creates a user passes.
    */
   readonly signup?: SignupMode;
-  /**
-   * Whether this deployment charges. `off` unless it says otherwise. US-072.
-   *
-   * Answered on the status route rather than on a route of its own, because
-   * the shell already calls that one once on load and the answer decides
-   * whether it draws a Billing link at all. It says nothing about a person: a
-   * stranger learns that this is the hosted instance, which the landing page
-   * says out loud.
-   */
-  readonly billing?: BillingMode;
 }
 
 /**
@@ -235,7 +195,7 @@ async function sendResponse(reply: FastifyReply, response: Response): Promise<vo
 
 export async function registerAuthRoutes(
   app: ApiServer,
-  { db, logger, auth, session, baseUrl, signup = "closed", billing = "off" }: AuthRoutesOptions,
+  { db, logger, auth, session, baseUrl, signup = "closed" }: AuthRoutesOptions,
 ): Promise<void> {
   app.decorate("registeredRoutes", [] as { method: string; url: string }[]);
   app.decorateRequest("sessionUser", undefined);
@@ -319,8 +279,6 @@ export async function registerAuthRoutes(
            * is signed in, because there is no account to ask about.
            */
           onboarded: z.boolean(),
-          /** Whether this instance charges. US-072. */
-          billingMode: z.enum(["off", "stripe"]),
         }),
       },
     },
@@ -334,7 +292,6 @@ export async function registerAuthRoutes(
         signedIn: user !== null,
         account: user ? { name: user.name, email: user.email } : null,
         onboarded: user ? await hasCompletedOnboarding(db, user.id) : false,
-        billingMode: billing,
       };
     },
   });

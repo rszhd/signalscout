@@ -29,19 +29,20 @@ the key and sends the bill. The table of who fetches what, at what price and
 with what quirks, is in [docs/sources.md](docs/sources.md) — read it before
 touching a connector.
 
-**An instance has accounts, and the cloud one charges.** Better Auth in the
-same Postgres, `AUTH_SIGNUP` deciding whether anybody else may register, and
-every provider key, model key and provider choice scoped to an account.
-`BILLING_MODE` is `off` by default, so a self-hosted instance meets none of
-Stripe. Read [docs/accounts.md](docs/accounts.md) and
-[docs/billing.md](docs/billing.md).
+**An instance has accounts, and this repository charges nobody.** Better Auth
+in the same Postgres, `AUTH_SIGNUP` deciding whether anybody else may
+register, and every provider key, model key and provider choice scoped to an
+account. Read [docs/accounts.md](docs/accounts.md). The hosted product, which
+charges, is a separate private repository built on the two packages here —
+US-151 and US-155 say why — so nothing here knows a subscription; the
+scheduler is handed a gate that admits everyone.
 
 **Every default is the self-hosted answer.** `AUTH_SIGNUP=closed`,
-`AUTH_EMAIL_VERIFICATION=off`, `BILLING_MODE=off`. Each was the one place an
-implementation went against a literal request, and for one reason: every
-instance running today is self-hosted, and a version bump that silently began
-refusing logins or writes is the failure none of them would forgive. Keep that
-direction when you add the next setting.
+`AUTH_EMAIL_VERIFICATION=off`. Each was the one place an implementation went
+against a literal request, and for one reason: every instance running on this
+code is self-hosted, and a version bump that silently began refusing logins or
+writes is the failure none of them would forgive. Keep that direction when you
+add the next setting.
 
 **Say what has run live and what has not.** Most of this product's claims have
 a measurement behind them and a few do not. The standing gaps are real rate
@@ -66,10 +67,7 @@ finish something, say which half you proved.
 6. Read [`docs/secrets.md`](docs/secrets.md) if the task touches a credential.
    It holds where a key lives, what the encryption guarantees, why a key is
    tested before it is stored, and the rotation steps.
-7. Read [`docs/billing.md`](docs/billing.md) if the task touches the paywall,
-   the trial or Stripe. It holds who is entitled, what a refused write answers,
-   and why the scheduler is the half that matters.
-8. Read [`docs/instruments.md`](docs/instruments.md) before running anything
+7. Read [`docs/instruments.md`](docs/instruments.md) before running anything
    that spends money, and [`docs/history.md`](docs/history.md) when you need to
    know why a number or a decision is what it is.
 
@@ -81,8 +79,8 @@ or false. Do not mark one done that you have not verified.
 ## Rules that are easy to break
 
 **Every address is a path, and `route.ts` holds them all.** US-076 moved the
-router out of the hash on 2026-09-08, after Stripe returned a person to
-`/billing?checkout=done#/billing` — one address saying the same thing twice,
+router out of the hash on 2026-09-08, after a payment page returned a person
+to `/billing?checkout=done#/billing` — one address saying the same thing twice,
 because the path was the server's answer and the hash was the application's.
 `apps/web/src/route.ts` is the whole table: `routes` are the patterns
 `App.tsx` matches, `paths` are the builders every screen links with. Never
@@ -106,8 +104,8 @@ name is an argument. The pipeline is the stateful half: monitors, posts,
 matches, cursors, the budget, the jobs. It imports the engine, never the
 reverse, and it imports neither Fastify, React, Better Auth nor Stripe. It
 knows an owner as `user_id text` and never joins a users table; who may log
-in, who has paid and who may poll are `apps/api`'s — auth, billing and the
-entitlement gate the scheduler is handed. `engine-boundary.test.ts` and
+in and who may poll are `apps/api`'s — auth, and the entitlement gate the
+scheduler is handed, which here admits everyone. `engine-boundary.test.ts` and
 `pipeline-boundary.test.ts` say all of this to CI. If a change seems to need
 one of them broken, the change is wrong. US-151 says where this is going.
 

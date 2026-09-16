@@ -4,8 +4,8 @@
  * The tunnel points here, so nothing reaches the app without the password.
  * That matters more than it looks: the app answers four paths to a stranger —
  * the UI files, `/api/health`, `/api/auth-status` and `/api/auth/*` — and on a
- * public address those are public. US-106 put the same lock in front of
- * staging for the same reason.
+ * public address those are public. US-106 put the same lock in front of a
+ * staging stack for the same reason.
  *
  * Behind the password there are two servers:
  *

@@ -11,9 +11,9 @@ import { envSchema } from "./env.js";
  * Compose reads `.env` to interpolate values into the lines of the compose
  * file. A variable named nowhere in that file therefore never reaches the
  * container, whatever anybody writes in `.env` — and nothing reports it.
- * `BILLING_MODE=stripe` was unreadable this way: the instance booted in `off`
- * mode, every screen worked, every trial ran out, and the boot check written
- * for exactly that state could not fire because the value never arrived.
+ * A mode switch was once unreadable this way: the instance booted in the
+ * default, every screen worked, and the boot check written for exactly that
+ * state could not fire because the value never arrived.
  *
  * This enumerates rather than samples, for the reason `auth.test.ts` walks
  * every registered route: the variable added next month is the one nobody

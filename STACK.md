@@ -56,7 +56,6 @@ Three rules follow from these:
 apps/
   api/          Fastify: REST endpoints, serves the built UI and /admin
     auth/       Better Auth, and who owns a row
-    billing/    entitlement, the scheduler's gate, and Stripe
     db/         the account tables and their own migration stream
     worker.ts   the same worker as a process of its own
   web/          Vite + React: the intent inbox
@@ -75,11 +74,9 @@ packages/
     budget/     the cap, and what a poll is allowed to spend
 
 admin/          Vite + shadcn/ui: the operator panel, served at /admin
-landing/        Astro: the marketing site, its own lockfile, deployed alone
 ```
 
-`admin/` and `landing/` are outside the application workspace. Each has its
-own README.
+`admin/` is outside the application workspace and has its own README.
 
 ## The one rule
 
@@ -89,8 +86,9 @@ neither knows an account.**
 The engine declares no database, queue, auth or payment dependency, imports
 nothing from another package, and reads no environment variable. The pipeline
 imports the engine and never the reverse, imports neither Fastify, React,
-Better Auth nor Stripe, and knows an owner as a text id. Login, billing and
-the rule for who may poll are the application's, in `apps/api`. This keeps
+Better Auth nor Stripe, and knows an owner as a text id. Login and the rule
+for who may poll are the application's, in `apps/api`; billing is the hosted
+application's, in its own repository. This keeps
 the business logic testable with plain Vitest, it stops a UI concern from
 leaking into a connector, and it is what a second application can build on.
 US-151 says why there will be one.
@@ -110,10 +108,6 @@ rendering on every request.
 A static Vite bundle plus Fastify holds around 70-120 MB and spends no CPU on
 rendering. We give up server rendering. We do not need it, because the whole
 application sits behind a login.
-
-The marketing site is a separate Astro static site in `landing/`, deployed
-independently on Vercel. It has its own dependencies and build. It is not part
-of the application workspace or Docker image. See `landing/README.md`.
 
 ## Not Redis
 
@@ -455,23 +449,19 @@ worker      optional, same image, different command
 
 ## Hosted version
 
-Run one image on one small machine with managed Postgres.
+**Since 2026-09-16 the hosted product is a separate, private repository.** It
+depends on `@signalscout/engine` and `@signalscout/pipeline` from npm, at one
+pinned version, and carries its own API, screens, onboarding, plans and
+Stripe. This repository holds no billing code: `BILLING_MODE` is gone, the
+scheduler is handed a gate that admits everyone, and nothing here knows a
+subscription. US-151 holds the reasoning; US-155 was the cut-over.
 
-Do not use a serverless platform. It cannot run an always-on worker, and the
-function plus database bill passes the subscription quickly. The price lives in
-Stripe rather than here — [docs/billing.md](docs/billing.md).
-
-**Until 2026-09-16 this said "identical images for self-hosted and hosted means
-one set of bugs", and it was true while the cloud was this image with
-`BILLING_MODE=on`.** The owner decided then that the cloud becomes a separate,
-private application — its own API, screens, onboarding and plans, changed
-weekly — on the same two published packages. What stays shared is what has
-the bugs worth sharing: every connector, every model call, the budget guard,
-deduplication and the scheduler live in `packages/engine` and
-`packages/pipeline`, tested once, in this repository. What diverges is the
-part that was always going to: who may log in and what they pay. US-151 holds
-the reasoning; US-155 is the cut-over, and until it lands the cloud still
-deploys from here.
+What stays shared is what has the bugs worth sharing: every connector, every
+model call, the budget guard, deduplication and the scheduler are tested once,
+here, and released as a version — `docs/releasing.md`. The hosted repository
+runs one image on one small machine with managed Postgres, not a serverless
+platform: that cannot run an always-on worker, and the function plus database
+bill passes the subscription quickly.
 
 ---
 

@@ -534,9 +534,8 @@ export async function startWorker({
             guardAddresses: !machineKeysUsable(signup),
           }),
         {
-          // US-094. Optional everywhere: `APP_URL` is required only for Stripe,
-          // so the button is offered where a deployment has said where it
-          // answers and left out where it has not.
+          // US-094. Optional everywhere, so the button is offered where a
+          // deployment has said where it answers and left out where it has not.
           appUrl: process.env.APP_URL,
           // US-096. The account's own secret, falling back to the instance's.
           // Read per delivery: one worker serves every account, and a secret

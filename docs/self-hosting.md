@@ -40,8 +40,8 @@ leaves out has a default that is already the self-hosted answer, so what it
 produces boots.
 
 `.env.example` is the reference. It names every variable the application
-reads — sixty-six of them, including the Stripe settings, the proxy names and
-the model price overrides — with the reasoning beside each one. Read it when
+reads — the proxy names and the model price overrides among them — with the
+reasoning beside each one. Read it when
 you want a dial the short file does not offer.
 
 ### The two secrets, and why they are not in the file you copied
@@ -141,14 +141,13 @@ bump that quietly changed one is the upgrade nobody would forgive.
 |---|---|---|
 | `AUTH_SIGNUP` | `closed` — one account, made on the first visit | `open` — anybody may register, and `.env` keys are ignored |
 | `AUTH_EMAIL_VERIFICATION` | `off` — the address is taken as given | `required` — a link is sent, and needs SMTP |
-| `BILLING_MODE` | `off` — no trial, no paywall, no Stripe | `stripe` — seven free days, then a subscription |
 
 Set `AUTH_EMAIL_VERIFICATION=required` wherever signup is open. Without it
 anybody can register with an address they do not own, and receive the digests
 meant for whoever really owns it.
 
 [accounts.md](accounts.md) covers letting other people register and proving an
-address. [billing.md](billing.md) covers the paywall.
+address.
 
 ---
 

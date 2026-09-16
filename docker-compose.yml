@@ -46,21 +46,14 @@ x-app-environment: &app-environment
   SMTP_FROM: ${SMTP_FROM:-}
   WEBHOOK_SIGNING_SECRET: ${WEBHOOK_SIGNING_SECRET:-}
 
-  # What the hosted version charges with. `off` on every self-hosted instance,
-  # which is why it is the default here and in the schema. US-072.
-  #
   # A missing line in this block is not a missing setting — it is a setting
   # that CANNOT be made. Compose reads `.env` to interpolate values into the
   # lines below, so a variable named nowhere here never reaches the container,
-  # whatever anybody writes. That is how BILLING_MODE=stripe came to be
-  # readable by nothing: the instance booted in `off` mode, every screen
-  # worked, and the boot check that exists for exactly this could not fire.
+  # whatever anybody writes. That is how a mode switch once came to be readable
+  # by nothing: the instance booted in the default, every screen worked, and
+  # the boot check that exists for exactly this could not fire.
   # `compose-environment.test.ts` is what keeps this list level with the schema.
-  BILLING_MODE: ${BILLING_MODE:-off}
-  STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
-  STRIPE_PRICE_ID: ${STRIPE_PRICE_ID:-}
-  STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
-  # Where Checkout sends a person back to. Required with BILLING_MODE=stripe.
+  # Where this instance answers, for the links a notification carries.
   APP_URL: ${APP_URL:-}
 
   # The model settings. An account can store its own on the settings screen

@@ -2,16 +2,14 @@ name: CI
 
 on:
   pull_request:
-  # Called by the two deploy workflows, so a commit whose checks never ran
-  # cannot reach a box. That is a property of the job graph rather than a
-  # convention somebody keeps.
-  #
-  # There is no `push` list above, and that is the point rather than an
-  # omission. `staging` was never in it — a push there would run this file
-  # twice for one commit, and the second run would publish the same tag from
-  # the same source for nobody. `main` left it when production got a stack
-  # (US-100), for exactly that reason: the deploy workflow calls this one, so
-  # a push list would double every release.
+  # A push to main publishes the image self-hosters pull. Until US-155 the two
+  # deploy workflows called this one and a push list would have run it twice
+  # for one commit; they live in the cloud repository now, and nothing else
+  # publishes `:latest`.
+  push:
+    branches: [main]
+  # Called by the release workflow, so a tag whose checks never ran cannot
+  # publish a package.
   workflow_call:
     outputs:
       digest:
@@ -92,9 +90,7 @@ jobs:
       - uses: docker/setup-buildx-action@v3
 
       # Pull requests build the image to prove the Dockerfile still works. A
-      # push publishes it, because that is what a server pulls. Staging runs
-      # every check main runs and publishes under its own tag, so the thing
-      # tested on staging is the same artifact main will later carry.
+      # push to main publishes it, because that is what a self-hoster pulls.
       - name: Log in to the registry
         if: github.event_name == 'push'
         uses: docker/login-action@v3
@@ -115,7 +111,6 @@ jobs:
             # docker-compose.yml asked for it by default and README.md told
             # people to run it.
             type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
-            type=raw,value=staging,enable=${{ github.ref == 'refs/heads/staging' }}
             type=sha,format=long
 
       - id: build

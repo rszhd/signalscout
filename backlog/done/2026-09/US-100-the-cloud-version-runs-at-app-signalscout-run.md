@@ -6,7 +6,7 @@ priority: p1
 created: 2026-09-10T03:05+08:00
 parent: US-073
 area: deployment
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -110,4 +110,4 @@ the other. Two thin files each know one answer.
   account is an account creation and a password entry, which this agent may not
   do whoever asks; the browser extension is also not connected here, so the
   `Secure` cookie cannot be read either. Both wait on the owner.
-
+- 2026-09-16T20:10+08:00 — Shipped, and moved. app.signalscout.run is deployed from the private cloud repository since US-155, on the same box and database.

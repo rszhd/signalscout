@@ -16,7 +16,7 @@ describe("loadPipelineEnv", () => {
     const env = loadPipelineEnv({ DATABASE_URL: "postgres://x", PORT: "9" });
 
     expect("PORT" in env).toBe(false);
-    expect("BILLING_MODE" in env).toBe(false);
+    expect("ADMIN_EMAILS" in env).toBe(false);
   });
 
   it("defaults signup to closed, because every instance running today is self-hosted", () => {

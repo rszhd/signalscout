@@ -28,9 +28,10 @@ that bumps it is a pull request about nothing.
 2. Decide the number. Before 1.0, a change that a consumer must react to —
    a renamed export, a changed option, a table that moved streams — moves
    the minor; anything else moves the patch.
-3. Add a line to the *Versions* table below, in the same pull request or the
-   next one. It is the changelog, and it is short by design: what a
-   consumer must know, not what the diff shows.
+3. Move what is under *Unreleased* in [CHANGELOG.md](../CHANGELOG.md) to a
+   heading with the new number and the date, in the same pull request or the
+   next one. It is short by design: what a consumer must know, not what the
+   diff shows.
 4. Tag the merge commit and push the tag:
 
        git tag v0.2.0 <sha on main>
@@ -63,8 +64,7 @@ before npm will trust a workflow to publish it; US-156 replaced the token.
 
 ## Versions
 
-| Version | Date | What a consumer must know |
-|---|---|---|
-| 0.1.0 | 2026-09-16 | First publish. Engine and pipeline as US-152 and US-153 left them. |
-| 0.1.1 | 2026-09-16 | `@signalscout/pipeline/testing` exports `insertMonitor` and `fastRetries`. Nothing else changes. |
-| 0.1.2 | 2026-09-16 | Published through trusted publishing, without a token. No code change. |
+[CHANGELOG.md](../CHANGELOG.md) holds every published version and what a
+consumer must know about it. It lives at the root rather than here because it
+is written for somebody installing the packages, who has not read this file and
+should not have to.

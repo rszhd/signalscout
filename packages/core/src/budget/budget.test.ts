@@ -1,7 +1,8 @@
 import { eq } from "drizzle-orm";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
+import { setKeySource } from "../billing/key-source.js";
 import { createDatabase, type Database } from "../db/client.js";
-import { apiUsage, budgets, modelCalls, monitors } from "../db/schema.js";
+import { accountKeySource, apiUsage, budgets, modelCalls, monitors } from "../db/schema.js";
 import { createTestDatabase, type TestDatabase } from "../testing/database.js";
 import { insertMonitor } from "../worker/testing.js";
 import {
@@ -17,6 +18,7 @@ import {
   recordSourceUsage,
   setBudget,
   spendByMonitor,
+  spendByPair,
 } from "./budget.js";
 
 /** The account these cases spend on. BUG-009 put the owner on every usage row. */
@@ -57,6 +59,7 @@ describe("the budget guard", () => {
   afterEach(async () => {
     await db.delete(modelCalls);
     await db.delete(monitors);
+    await db.delete(accountKeySource);
     // A usage row that belongs to a monitor goes with it. One that belongs to
     // no monitor — US-014's cost test — outlives every monitor, which is
     // correct and is why this line exists.
@@ -239,6 +242,80 @@ describe("the budget guard", () => {
       expect(spend.sourceMicros).toBe(30_000);
       expect(spend.modelMicros).toBe(1_000);
       expect(spend.totalMicros).toBe(31_000);
+    });
+
+    /**
+     * US-149. A figure shown to an account is the account's money. The trial
+     * spent on the instance's keys, and the moment the account switched to
+     * its own every reader summed that too — as a cost, on their page,
+     * against a cap they set on their own money.
+     */
+    it("counts only the rows paid on the keys the account is on now", async () => {
+      const monitorId = await insertMonitor(database);
+      const page = { userId: owner, monitorId, source: "reddit" as const, now: march };
+
+      // The trial's week, on the instance's keys.
+      await recordSourceUsage(db, {
+        ...page,
+        provider: "scrapecreators",
+        units: 10,
+        pricePerUnitMicros: 1_000,
+        keySource: "instance",
+      });
+      await db.insert(modelCalls).values({
+        userId: owner,
+        monitorId,
+        monitorVersion: 1,
+        provider: "openai",
+        model: "test-model",
+        outcome: "scored",
+        latencyMs: 10,
+        estimatedCostMicros: 5_000,
+        keySource: "instance",
+        createdAt: march,
+      });
+      // Then their own.
+      await recordSourceUsage(db, {
+        ...page,
+        provider: "brightdata",
+        units: 2,
+        pricePerUnitMicros: 1_000,
+        keySource: "own",
+      });
+      await db.insert(modelCalls).values({
+        userId: owner,
+        monitorId,
+        monitorVersion: 1,
+        provider: "openai",
+        model: "test-model",
+        outcome: "scored",
+        latencyMs: 10,
+        estimatedCostMicros: 300,
+        keySource: "own",
+        createdAt: march,
+      });
+
+      // No row: the account is on the instance's keys, which is every
+      // self-hosted instance, and everything it spent there counts.
+      let spend = await monitorSpend(db, monitorId, march);
+      expect(spend.sourceMicros).toBe(10_000);
+      expect(spend.modelMicros).toBe(5_000);
+      let pairs = await spendByPair(db, owner);
+      expect(pairs.map((pair) => [pair.provider, pair.micros])).toEqual([
+        ["scrapecreators", 10_000],
+      ]);
+
+      // On its own keys, the instance's half is not its money.
+      await setKeySource(db, owner, "own");
+      spend = await monitorSpend(db, monitorId, march);
+      expect(spend.sourceMicros).toBe(2_000);
+      expect(spend.modelMicros).toBe(300);
+      expect(spend.totalMicros).toBe(2_300);
+      pairs = await spendByPair(db, owner);
+      expect(pairs.map((pair) => [pair.provider, pair.micros])).toEqual([["brightdata", 2_000]]);
+      // And the cap the account set counts its own money alone.
+      await setBudget(db, monitorId, { monthlyCapMicros: 3_000, onExhausted: "pause" });
+      expect((await checkBudget(db, monitorId, march)).exhausted).toBe(false);
     });
 
     it("counts nothing from before this month", async () => {

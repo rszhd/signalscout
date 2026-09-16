@@ -33,6 +33,7 @@ import { and, eq, gte, inArray, sql } from "drizzle-orm";
 import { readKeySource } from "../billing/key-source.js";
 import type { Database } from "../db/client.js";
 import {
+  accountKeySource,
   apiUsage,
   budgets,
   type ExhaustedBehaviour,
@@ -226,6 +227,27 @@ export async function recordSourceUsage(
 }
 
 /**
+ * Only the rows paid for on the keys the account is on now. US-149.
+ *
+ * A figure shown to an account, and a cap the account set, are about the
+ * account's money. `key_source` says whose money a row was, and the account's
+ * state says whose it runs on now; a row on the other is not counted. No row
+ * in `account_key_source` means `instance`, which is every self-hosted
+ * instance — there, everything counts, as it always did. The account fuse
+ * counts the other half, in `account.ts`.
+ *
+ * On the row rather than threaded through eleven callers, so a caller cannot
+ * forget it.
+ */
+function paidOnCurrentKeys(table: typeof apiUsage | typeof modelCalls) {
+  return sql`${table.keySource} = coalesce(
+    (select ${accountKeySource.source} from ${accountKeySource}
+      where ${accountKeySource.userId} = ${table.userId}),
+    'instance'
+  )`;
+}
+
+/**
  * Both halves of the spend, for every monitor named, or for all of them.
  *
  * Summed across connectors on purpose. `units` is comparable only inside one
@@ -259,6 +281,7 @@ async function readSpend(
     .where(
       and(
         gte(apiUsage.day, dayOf(since)),
+        paidOnCurrentKeys(apiUsage),
         ...(only ? [inArray(apiUsage.monitorId, [...only])] : []),
       ),
     )
@@ -286,6 +309,7 @@ async function readSpend(
     .where(
       and(
         gte(modelCalls.createdAt, since),
+        paidOnCurrentKeys(modelCalls),
         ...(only ? [inArray(modelCalls.monitorId, [...only])] : []),
       ),
     )
@@ -373,7 +397,7 @@ export async function spendByPair(db: Database, userId: string): Promise<PairSpe
       micros: sql<number>`sum(${apiUsage.estimatedCostMicros})::bigint`,
     })
     .from(apiUsage)
-    .where(eq(apiUsage.userId, userId))
+    .where(and(eq(apiUsage.userId, userId), paidOnCurrentKeys(apiUsage)))
     .groupBy(apiUsage.source, apiUsage.provider);
 
   return rows.map((row) => ({

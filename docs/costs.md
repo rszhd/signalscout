@@ -192,6 +192,15 @@ Everything is stored in **micro-dollars** — millionths of one US dollar, as
 integers. One classification costs about $0.001, which is a tenth of a cent, so
 a column in cents would record a month of classification as zero.
 
+**Every row says whose money it was, and a figure is made of one kind.**
+`key_source` on both tables is `instance` or `own`, stamped from the account's
+state when the row is written (US-141). A figure shown to an account, and the
+cap it set, count only rows stamped with the key source the account is on now
+(US-149): on its own keys, its own money, and never the trial's week on ours.
+No row in `account_key_source` means `instance`, so a self-hosted instance
+counts everything. The account fuse counts the other half — `instance` only —
+and is the deployment's, not the account's.
+
 ---
 
 ## The cap

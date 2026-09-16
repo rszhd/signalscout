@@ -73,6 +73,15 @@ to and what each one billed. It spends about $0.08 and leaves behind a paused
 monitor and two `api_usage` rows, which are the evidence. Run it when
 `collect.ts` changes how a provider is chosen or resumed.
 
+**It no longer runs as written.** US-158 switched the Bright Data connector
+off on 2026-09-17, and this script records `brightdata` as the Reddit choice,
+so the pipeline refuses it the way it refuses `live:linkedin-poll`. Delete
+`notOffered` from `sources/providers/brightdata/reddit.ts` to run it again. The
+rule it measures — a collection is resumed through the provider that started
+it, whatever the choice now says — is unchanged, and no other pair can be
+measured for it: Bright Data is the only provider here that collects
+asynchronously, which is what makes the race possible at all.
+
 The LinkedIn capture is the sixth, and it has no `package.json` script because
 it is run by hand with a key: `node
 packages/engine/src/sources/providers/socialcrawl/linkedin-fixtures/capture.mjs`.

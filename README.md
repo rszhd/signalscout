@@ -52,12 +52,12 @@ clipboard.
 SignalScout ships the integrations. You own the accounts. Nothing is proxied
 through us, and no data leaves your instance.
 
-Six platforms arrive through five data providers — Bright Data, ScrapeCreators
-and SocialCrawl for Reddit, SocialCrawl and SocialData for X, Apify for
-LinkedIn, and SocialCrawl for YouTube, TikTok and Instagram. You bring a key
-for the providers you actually use, and one Reddit key plus one model key is
-already a useful product. Bright Data, ScrapeCreators and SocialCrawl each have
-a free tier that needs no card.
+Six platforms arrive through four data providers — ScrapeCreators and
+SocialCrawl for Reddit, SocialCrawl and SocialData for X, Apify for LinkedIn,
+and SocialCrawl for YouTube, TikTok and Instagram. You bring a key for the
+providers you actually use, and one Reddit key plus one model key is already a
+useful product. ScrapeCreators and SocialCrawl both have a free tier that needs
+no card.
 
 A key lives in `.env`, where it belongs to the machine, or on a screen, where
 it is tested with the provider before it is stored and belongs to the account

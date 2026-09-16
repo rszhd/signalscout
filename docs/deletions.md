@@ -22,6 +22,17 @@ cost is known only after it answers. Checks use the selected provider and the
 same estimated usage ledger as collection. A check is not assumed free on
 Reddit. See [costs.md](costs.md).
 
+**Reddit deletion checks are weak since 2026-09-17.** US-158 switched the
+Bright Data connector off on price, and it was the only Reddit connector whose
+deletion signal had been proved live. A monitor polling through ScrapeCreators
+gets ambiguous 404s, which leave a match visible. A monitor polling through
+SocialCrawl gets no check at all: that connector implements no `verify`, and
+`reconcile.ts` skips a source without one. So a deleted Reddit post will
+usually stay in an inbox now. The repair is a measurement, not a code change —
+find a removal signal one of the two can give without a false positive. Until
+then, switching Bright Data back on is the only way to reconcile Reddit
+deletions.
+
 A Bright Data check starts a snapshot. Its provider, cursor and paying monitor
 are stored in Postgres. A restart or provider switch resumes that snapshot.
 The cap also applies to resumes. If the paying monitor is deleted while a

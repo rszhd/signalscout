@@ -15,6 +15,8 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { createLogger } from "../../../logger.js";
 import { unreachableFetch } from "../../../testing/network.js";
+import { builtInSources } from "../../index.js";
+import { isOffered } from "../../offering.js";
 import { redditPlatformId } from "../../platforms.js";
 import { createSourceRegistry } from "../../registry.js";
 import { assertSourcesCanBeStored } from "../../storage.js";
@@ -569,5 +571,31 @@ describe("the connector is registered like any other", () => {
 
   it("has a place in the posts table already, so it needs no migration", () => {
     expect(() => assertSourcesCanBeStored([redditPlatformId])).not.toThrow();
+  });
+
+  it("ships without being offered, and says why in a sentence a person can act on", () => {
+    // US-158. The connector is here, priced and tested, and nobody may pick
+    // it. A boolean would say "off", which reaches a person as a bug report:
+    // this reaches them in a 422, a 400 and a log line, so it names the cost
+    // and it names who fetches Reddit instead.
+    expect(isOffered(brightDataReddit)).toBe(false);
+    expect(brightDataReddit.notOffered).toContain("ScrapeCreators");
+  });
+});
+
+describe("the build still fetches Reddit", () => {
+  const reddit = builtInSources.filter((connector) => connector.platform.id === redditPlatformId);
+
+  it("offers the other two providers, so the platform stays on the form", () => {
+    // The case US-053 could not test on LinkedIn, which had one provider.
+    // Switching this one off must cost Reddit a provider and not the platform.
+    expect(reddit.filter(isOffered).map((connector) => connector.provider.id)).toEqual([
+      "scrapecreators",
+      "socialcrawl",
+    ]);
+  });
+
+  it("leaves Bright Data registered, so a collection already paid for is still read", () => {
+    expect(reddit.map((connector) => connector.provider.id)).toContain(brightDataProviderId);
   });
 });

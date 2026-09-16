@@ -228,8 +228,10 @@ caller that has a platform and no provider.
    table without answering the question.
 2. **A recorded choice that cannot run is refused**, never replaced. A person
    who chose ScrapeCreators and lost its key would otherwise have every poll
-   billed to Bright Data, which charges twenty times as much for the same
-   subreddit page.
+   billed to SocialCrawl, which prices the same subreddit page higher. The rule
+   was written against a wider gap: Bright Data charged five to twenty times as
+   much, depending on how many posts a ScrapeCreators request returned, until
+   US-158 switched that pair off.
 3. **One provider that can run is its own answer.** No question is asked. This
    is every deployment holding one key, which is the common case.
 4. **Two that can run and no choice is an error.** Answering from registration
@@ -271,7 +273,7 @@ for the split:
 
 | | Bright Data | ScrapeCreators | SocialCrawl | SocialData | Apify |
 |---|---|---|---|---|---|
-| Fetches | Reddit | Reddit, TikTok, YouTube | Reddit, X, YouTube, TikTok, Instagram — and LinkedIn, switched off since US-053 | X | LinkedIn |
+| Fetches | Reddit, switched off since US-158 | Reddit, TikTok, YouTube | Reddit, X, YouTube, TikTok, Instagram — and LinkedIn, switched off since US-053 | X | LinkedIn |
 | Billable unit | a record | a request | a credit: 1 on X, Reddit, YouTube and TikTok, 5 on LinkedIn and an Instagram comment page | a tweet | a post, settled from the run's own total |
 | Price | $1.50 / 1,000 records | $1.88 / 1,000 requests | $8.12 / 1,000 credits | $0.20 / 1,000 tweets | $2.00 / 1,000 posts |
 | One unit buys | one post | 7 to 23 posts, measured | 20 X posts, 25 Reddit posts, 45 YouTube videos, 30 reels — or 15 Instagram comments for five credits | one tweet | one post |
@@ -309,7 +311,16 @@ table above.
 A connector can ship and not be offered. `ConnectorDescriptor.notOffered` is
 the whole switch: one sentence saying why, on one connector definition, and
 nothing else changes. US-053 built it and LinkedIn through SocialCrawl was its
-first caller, on 2026-09-09.
+first caller, on 2026-09-09. Reddit through Bright Data is the second, on
+2026-09-17: US-158 switched it off on price, and Reddit stayed, fetched by the
+two providers that are left.
+
+**A test that samples a connector is the one thing that does change.** US-053
+claimed the switch costs nothing outside the connector's own file, and US-158
+found the edge of that claim: four test files used Bright Data as their example
+Reddit provider, and each had to name an offered one instead. No production
+code moved. When you switch the next connector off, expect to move the tests
+that borrowed it as a sample.
 
 **Write the sentence for the person who meets it.** It reaches three places: a
 `422` refusing a monitor that names the platform, a `400` refusing a cost test,

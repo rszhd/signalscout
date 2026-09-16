@@ -103,9 +103,11 @@ export class AmbiguousConnectorError extends Error {
  *
  * The second is not answered by quietly using the other provider. A person who
  * chose ScrapeCreators and lost its key would then have every poll billed to
- * Bright Data, which prices the same subreddit page at twenty times as much.
- * The refusal names the choice and what is left, so both repairs — connect
- * that provider, or choose another — are one action.
+ * whoever is left, at a price they never agreed to. The rule was written when
+ * Bright Data still fetched Reddit and charged many times as much for the same
+ * subreddit page; US-158 switched that pair off, and the rule outlives it. The
+ * refusal names the choice and what is left, so both repairs — connect that
+ * provider, or choose another — are one action.
  */
 export class NoUsableProviderError extends Error {
   constructor(

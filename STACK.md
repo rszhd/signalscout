@@ -148,8 +148,7 @@ design more than any framework choice.
 
 | Step | Cost per post |
 |---|---|
-| Reddit read, Bright Data free allowance | $0, first 5,000 records each month |
-| Reddit read, Bright Data pay-as-you-go | $0.0015 |
+| Reddit read, Bright Data — switched off since US-158 | $0.0015, or $0 inside the first 5,000 records each month |
 | Reddit read, ScrapeCreators | ~$0.00027, measured |
 | X read, SocialData | $0.0002 |
 | LinkedIn read, Apify | $0.002 |
@@ -249,7 +248,9 @@ long silences. Keys issued before the policy are grandfathered and still work.
 
 An open-source product cannot ask every self-hoster to win an approval. So
 Reddit is reached through a data provider, and the user brings that provider's
-key. Three fetch it: Bright Data, ScrapeCreators and SocialCrawl.
+key. Two fetch it: ScrapeCreators and SocialCrawl. Bright Data was the first
+and US-158 switched it off on 2026-09-17: it bills a record per post, which is
+about five times what the other two charge for the same subreddit page.
 
 Two facts shape every Reddit connector:
 

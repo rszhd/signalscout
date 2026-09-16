@@ -14,7 +14,6 @@
  * answers from memory.
  */
 import {
-  brightDataReddit,
   type ConnectorDefinition,
   clearProviderChoice,
   createDatabase,
@@ -29,6 +28,7 @@ import {
   readProviderChoices,
   readSourceCredential,
   type SocialSource,
+  scrapeCreatorsReddit,
   setProviderChoice,
   sourceCredentials,
   sourceProviders,
@@ -205,12 +205,16 @@ describe("connecting a provider", () => {
     });
 
     it("carries the provider website from shared provider data", async () => {
-      const app = await server({ sources: [brightDataReddit], environment: {} });
+      // A real connector rather than a fake, because the claim is that the URL
+      // travels from the provider descriptor. It has to be an *offered* one:
+      // US-158 switched Bright Data off, and a provider with no offered
+      // connector has no card on this screen.
+      const app = await server({ sources: [scrapeCreatorsReddit], environment: {} });
 
       try {
         const body = (await app.inject({ method: "GET", url: "/api/connections" })).json();
 
-        expect(body.providers[0]?.websiteUrl).toBe("https://brightdata.com/");
+        expect(body.providers[0]?.websiteUrl).toBe("https://scrapecreators.com/");
       } finally {
         await app.close();
       }

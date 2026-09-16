@@ -16,7 +16,7 @@ the price the connector declares:
 
 | Platform | Provider | Billable unit | Price per unit | Per post |
 |---|---|---|---|---|
-| Reddit | Bright Data | a record | $0.0015 | $0.0015 |
+| Reddit | Bright Data — switched off since US-158 | a record | $0.0015 | $0.0015 |
 | Reddit | ScrapeCreators | a request | $0.00188 | ~$0.00027 (7–23 posts a request) |
 | Reddit | SocialCrawl | a credit | $0.008118 | ~$0.00032 (25 posts) |
 | X | SocialData | a tweet | $0.0002 | $0.0002 |
@@ -58,7 +58,9 @@ price, and then the model is paid to read them.
 
 **The free allowance is not modelled.** Bright Data's first 5,000 records each
 month cost nothing. SignalScout prices every record at the paid rate, so a
-monitor inside the free tier reads as more expensive than it was.
+monitor inside the free tier reads as more expensive than it was. No monitor
+can be inside it any more: US-158 switched that connector off, on the price the
+table above charges once the allowance runs out.
 
 **A failed call may still be billed.** A call that never came back reported no
 units, so it is not in our total. It may well be on the invoice.

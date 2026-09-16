@@ -15,7 +15,7 @@
 import { readFileSync } from "node:fs";
 import { MockLanguageModelV4 } from "ai/test";
 import { describe, expect, it } from "vitest";
-import { defaultMinimumScore } from "../db/schema.js";
+import { defaultMinimumScore } from "../vocabulary.js";
 import { classificationSchema, restatesTheScores } from "./classification.js";
 import { createClassifier } from "./classify.js";
 import type { AiConfig } from "./config.js";

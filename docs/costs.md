@@ -367,9 +367,9 @@ which costs more and hides nothing.
   correctness-critical surfaces named in [testing.md](testing.md), so its
   assertions were written before it was.
 - The pre-filter is `packages/core/src/worker/filter.ts`, its keyword rule is
-  `packages/core/src/filter/keywords.ts`, and what it dropped is in
+  `packages/engine/src/filter/keywords.ts`, and what it dropped is in
   `filter_drops`.
-- The cost test's arithmetic is `packages/core/src/estimate/estimate.ts`, and
+- The cost test's arithmetic is `packages/engine/src/estimate/estimate.ts`, and
   its assertions were written first for the same reason: it puts a number in
   front of a person who is about to spend money. The samples are collected by
   `packages/core/src/worker/estimate.ts`, on the `estimate` queue.

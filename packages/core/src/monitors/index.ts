@@ -1,4 +1,11 @@
 export {
+  describeSignals,
+  intentTypeLabel,
+  type SignalDescription,
+  signalDescriptions,
+  signalList,
+} from "@signalscout/engine";
+export {
   allMonitorQueries,
   type CreatedMonitor,
   type CreateMonitorInput,
@@ -33,10 +40,3 @@ export {
   recordPollRun,
   walkFor,
 } from "./poll-runs.js";
-export {
-  describeSignals,
-  intentTypeLabel,
-  type SignalDescription,
-  signalDescriptions,
-  signalList,
-} from "./signals.js";

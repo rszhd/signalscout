@@ -16,7 +16,7 @@
  * same thing too: it hands the layers below an environment with the keys taken
  * out, so nothing downstream needs to know why they are missing.
  */
-import type { AiEnvironment } from "../ai/config.js";
+import type { AiEnvironment } from "@signalscout/engine";
 import type { SignupMode } from "../auth/user.js";
 
 export function machineKeysUsable(signup: SignupMode): boolean {

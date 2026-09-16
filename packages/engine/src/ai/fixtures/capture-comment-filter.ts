@@ -36,11 +36,11 @@
  */
 import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { aiEnvSchema } from "../../config/env.js";
-import { defaultSimilarityThreshold } from "../../db/schema.js";
 import { monitorDescriptionText, postEmbeddingText } from "../../filter/description.js";
+import { defaultSimilarityThreshold } from "../../vocabulary.js";
 import { type EmbeddingConfig, embeddingConfigFromEnvironment } from "../config.js";
 import { createEmbedder } from "../embed.js";
+import { aiEnvSchema } from "../env.js";
 import { exampleMonitor } from "./examples.js";
 
 const here = fileURLToPath(new URL(".", import.meta.url));

@@ -10,9 +10,10 @@
  *
  * It prints how many rows it changed and never what is in them.
  */
+
+import { generateEncryptionKey, requireEncryptionKey } from "@signalscout/engine";
 import { loadEnv } from "../config/env.js";
 import { createDatabase } from "../db/client.js";
-import { generateEncryptionKey, requireEncryptionKey } from "./cipher.js";
 import { rotateEncryptionKey } from "./store.js";
 
 const env = loadEnv();

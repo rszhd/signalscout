@@ -7,7 +7,7 @@
  * that costs as much as the scorer it is supposed to save money on.
  */
 import { describe, expect, it } from "vitest";
-import { aiTasks } from "../db/schema.js";
+import { aiTasks } from "../vocabulary.js";
 import { defaultEmbeddingModels } from "./config.js";
 import { modelPrices } from "./provider.js";
 import { recommendationsFor, recommendedModelFor, recommendedProviders } from "./recommended.js";

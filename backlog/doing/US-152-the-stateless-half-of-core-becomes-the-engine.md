@@ -39,21 +39,32 @@ whole definition of "stateless" here, and it says four things to CI:
   read the database and stay.
 * `ai/` — `call`, `classification`, `classify`, `config`, `describe`, `draft`,
   `embed`, `prompt`, `provider`, `queries`, `recommended`, `reply`,
-  `reply-prompts` split (the prompt text moves, the table read stays),
   `reply-voices`, `triage`, `triage-prompt`, `probe`, `fixtures/`. Not `keys`,
-  `settings`, `record`, `draft-context`: those read the database and stay.
+  `settings`, `record`, `draft-context`, `reply-prompts`: those read the
+  database and stay. (`reply-prompts` was going to split; it turned out to be
+  table reads only, with the presets already in `reply-voices`.)
 * `filter/description`, `filter/keywords`, `estimate/estimate`,
-  `secrets/cipher`, `logger`, `net`.
+  `secrets/cipher`, `logger`, `net`, `monitors/signals` (as `signals.ts`),
+  `sources/storage`, `testing/network`.
 
-**Seven vocabulary constants move out of `db/schema.ts`.** `sources`,
-`providers`, `signals`, `intentTypes`, `embeddingDimensions`,
-`modelCallPurposes` and `aiTasks` are what five of the moving files import
-from the schema. They are the product's vocabulary, not the database's. They
-move to `engine/src/vocabulary.ts`; `schema.ts` imports them from the engine
-and keeps building its check constraints from them. AGENTS.md's rule — a
-value added to an array in `schema.ts` is not a value the database accepts —
-gets one more step: the array is now in the engine, and the migration is
+**Eight vocabulary constants move out of `db/schema.ts`.** `sources`,
+`providers`, `signals`, `intentTypes`, `embeddingDimensions`, `aiTasks`,
+`defaultMinimumScore` and `defaultSimilarityThreshold` are what the moving
+files import from the schema. They are the product's vocabulary, not the
+database's. They move to `engine/src/vocabulary.ts`; `schema.ts` imports them
+from the engine and keeps building its check constraints from them.
+`modelCallPurposes` stays: nothing in the engine reads it. AGENTS.md's rule —
+a value added to an array in `schema.ts` is not a value the database accepts
+— gets one more step: the array is now in the engine, and the migration is
 still in core. Say so in the rule.
+
+**The AI variables' schema moves too.** The capture scripts parse `AI_*` with
+`aiEnvSchema`, which lived in `config/env.ts` beside every other variable.
+The `aiFields` object and its two helpers move to `engine/src/ai/env.ts`;
+core's `env.ts` imports them back and spreads them into the whole schema, so
+each variable is still declared once. The capture scripts are the boundary
+test's one named exception to the `process.env` rule: they are instruments,
+run by hand, and an entry point is where the environment is read.
 
 **The cipher loses its default.** `secrets/cipher.ts` reads `process.env` as
 a default parameter in two places. The default goes; the two callers in core
@@ -66,27 +77,28 @@ stay in core. US-153 sorts out which package owns which command.
 
 ## Acceptance
 
-- [ ] `packages/engine/src/engine-boundary.test.ts` exists, asserts the four
+- [x] `packages/engine/src/engine-boundary.test.ts` exists, asserts the four
       rules above, and was committed before any file moved.
-- [ ] Every file in the *what moves* list is under `packages/engine/src`, by
+- [x] Every file in the *what moves* list is under `packages/engine/src`, by
       `git mv`, so `git log --follow` still works.
-- [ ] `packages/core/src/index.ts` re-exports every name it exported before,
+- [x] `packages/core/src/index.ts` re-exports every name it exported before,
       from the engine where it moved. `apps/api` and `apps/worker` have no
       import changed.
-- [ ] `db/schema.ts` imports the seven vocabulary constants from
+- [x] `db/schema.ts` imports the eight vocabulary constants from
       `@signalscout/engine` and defines none of them.
-- [ ] `secrets/cipher.ts` has no `process.env` in it; `pnpm db:rotate-key`
+- [x] `secrets/cipher.ts` has no `process.env` in it; `pnpm db:rotate-key`
       still works.
-- [ ] `vitest.config.ts` aliases `@signalscout/engine` to its source, the same
+- [x] `vitest.config.ts` aliases `@signalscout/engine` to its source, the same
       way it does for core, and `pnpm test` passes with the same count of
       test files as before the move, plus one.
-- [ ] `pnpm typecheck`, `pnpm lint` and `pnpm build` pass. `tsconfig.json`
+- [x] `pnpm typecheck`, `pnpm lint` and `pnpm build` pass. `tsconfig.json`
       references the new package; `core` references `engine`.
-- [ ] `docker compose build` produces an image that starts and answers
-      `/health`. The Dockerfile copies the new package.
-- [ ] Each `capture:*` command in `packages/core/package.json` still points at
-      a file that exists.
-- [ ] AGENTS.md, *Rules that are easy to break*: the rule about `packages/core`
+- [x] `docker build` produces an image that starts and answers
+      `/api/health`. The Dockerfile copies the new package.
+- [x] Each `capture:*` command points at a file that exists, in the package
+      that owns it — the five model captures moved to
+      `packages/engine/package.json` with the fixtures they write.
+- [x] AGENTS.md, *Rules that are easy to break*: the rule about `packages/core`
       names both packages and the direction between them; the `schema.ts`
       rule names the vocabulary file.
 
@@ -105,3 +117,14 @@ stay in core. US-153 sorts out which package owns which command.
 ## Log
 
 - 2026-09-16T13:46+08:00 — Written as step one of US-151.
+- 2026-09-16T14:30+08:00 — Built. 91 files moved by `git mv`, plus
+  `monitors/signals`, `sources/storage` and `testing/network`. The boundary
+  test caught two comments that named the forbidden read; the comments were
+  reworded, not the test. Biome reformatted the captured fixture JSON when the
+  exclusion still named `packages/core`; the files were restored byte for byte
+  and the exclusion moved. `tsc --build` from clean failed once because
+  core's reference to the engine was lost in that restore; put back, clean
+  build passes. Suite: 120 files, 2,081 tests, all pass — 119 files before.
+  The image builds, starts against a copy of the database and answers
+  `/api/health`. `pnpm db:rotate-key` re-encrypted 5 credentials in the
+  worktree copy. Not run live: nothing here reaches a provider or a model.

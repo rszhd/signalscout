@@ -1,7 +1,7 @@
 /** Correctness-critical: provider errors are not deletions. Captured wire responses. */
 import { readFileSync } from "node:fs";
 import { expect, it, vi } from "vitest";
-import { silentLogger } from "../../worker/testing.js";
+import { silentLogger } from "../../testing/index.js";
 import { brightDataReddit } from "../providers/brightdata/reddit.js";
 import { scrapeCreatorsReddit } from "../providers/scrapecreators/reddit.js";
 import { createSourceRuntime } from "../runtime.js";

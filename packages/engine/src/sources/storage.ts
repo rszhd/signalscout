@@ -1,4 +1,4 @@
-import { sources as storableSourceIds } from "../db/schema.js";
+import { sources as storableSourceIds } from "../vocabulary.js";
 import type { PlatformId } from "./types.js";
 
 /**

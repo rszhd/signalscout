@@ -22,7 +22,7 @@
  * expert giving advice is not a buyer.
  */
 import { z } from "zod";
-import { describeSignals } from "../monitors/signals.js";
+import { describeSignals } from "../signals.js";
 import type { MonitorProfile, PostForClassification } from "./prompt.js";
 
 /**

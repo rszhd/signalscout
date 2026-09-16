@@ -59,9 +59,14 @@ apps/
   worker/       pg-boss: collect, filter, classify, replies, notify
 
 packages/
-  core/
+  engine/       stateless: input in, result and cost out
     sources/    platforms.ts, and providers/<provider>/<platform>.ts
     ai/         providers, prompts, classification schema, triage
+    filter/     the keyword stage of the pre-filter
+    estimate/   the cost test's arithmetic
+    secrets/    the cipher
+    vocabulary.ts  platforms, providers, signals, intents, two defaults
+  core/         stateful: owns the tables and the jobs, imports the engine
     db/         Drizzle schema and migrations
     worker/     the job steps the worker process registers
     budget/     the cap, and what a poll is allowed to spend
@@ -77,10 +82,15 @@ own README.
 
 ## The one rule
 
-**`packages/core` imports neither Fastify nor React.**
+**`packages/engine` is stateless, and `packages/core` imports neither Fastify
+nor React.**
 
-The API and the worker both call into it. This keeps the business logic testable
-with plain Vitest, and it stops a UI concern from leaking into a connector.
+The engine declares no database, queue, auth or payment dependency, imports
+nothing from another package, and reads no environment variable. Core imports
+the engine and never the reverse. The API and the worker both call into core.
+This keeps the business logic testable with plain Vitest, it stops a UI
+concern from leaking into a connector, and it is what a second application
+can build on. US-151 says why there will be one.
 
 When an AI assistant proposes a change that breaks this rule, reject it.
 

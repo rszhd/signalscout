@@ -10,11 +10,11 @@
  * `classify.test.ts` owns everything else about this step and injects a
  * classifier, which is why it could not have caught either of these.
  */
+
+import { type Classifier, createLogger } from "@signalscout/engine";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
-import type { Classifier } from "../ai/classify.js";
 import { createDatabase, type Database } from "../db/client.js";
 import { modelCalls, posts } from "../db/schema.js";
-import { createLogger } from "../logger.js";
 import { createTestDatabase, type TestDatabase } from "../testing/database.js";
 import { createClassifyStep } from "./classify.js";
 import { classifyQueue, notifyQueue } from "./queues.js";

@@ -10,10 +10,11 @@
  * rooms. The choice belongs at the moment of drafting, which is why the draft
  * route takes a prompt id rather than reading a setting.
  */
+
+import { replyVoicePresets } from "@signalscout/engine";
 import { and, asc, eq, sql } from "drizzle-orm";
 import type { Database } from "../db/client.js";
 import { replyPrompts } from "../db/schema.js";
-import { replyVoicePresets } from "./reply-voices.js";
 
 export interface ReplyPrompt {
   readonly id: string;

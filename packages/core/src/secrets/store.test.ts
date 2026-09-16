@@ -5,19 +5,20 @@
  * catch is a key that reaches somewhere a person can read it, and a stored key
  * that comes back as nothing instead of coming back as an error.
  */
-import { sql } from "drizzle-orm";
-import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
-import { createAiKey } from "../ai/keys.js";
-import { createDatabase, type Database } from "../db/client.js";
-import { aiKeys, sourceCredentials } from "../db/schema.js";
-import { createTestDatabase, type TestDatabase } from "../testing/database.js";
+
 import {
   decryptSecret,
   generateEncryptionKey,
   MissingEncryptionKeyError,
   readEncryptionKey,
   UndecryptableSecretError,
-} from "./cipher.js";
+} from "@signalscout/engine";
+import { sql } from "drizzle-orm";
+import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
+import { createAiKey } from "../ai/keys.js";
+import { createDatabase, type Database } from "../db/client.js";
+import { aiKeys, sourceCredentials } from "../db/schema.js";
+import { createTestDatabase, type TestDatabase } from "../testing/database.js";
 import {
   assertStoredCredentialsAreReadable,
   credentialRecordName,

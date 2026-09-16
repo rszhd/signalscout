@@ -11,12 +11,13 @@
  * monitor id turns the second send into `null`. That is the guarantee the
  * ticket asks for — a queue policy, not a lock this file writes.
  */
+
+import type { Logger } from "@signalscout/engine";
 import { and, eq, isNull, or, sql } from "drizzle-orm";
 import type { PgBoss } from "pg-boss";
 import { type BillingMode, entitledCondition } from "../billing/index.js";
 import type { Database } from "../db/client.js";
 import { monitors, subscriptions } from "../db/schema.js";
-import type { Logger } from "../logger.js";
 import { pollQueue } from "./queues.js";
 
 export interface DueMonitor {

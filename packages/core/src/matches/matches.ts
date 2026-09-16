@@ -89,7 +89,7 @@ import {
  */
 const parentPost = alias(posts, "parent_post");
 
-import { intentTypeLabel } from "../monitors/signals.js";
+import { intentTypeLabel } from "@signalscout/engine";
 
 /**
  * How many points of score one day of age is worth.

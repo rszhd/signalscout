@@ -6,8 +6,9 @@
  * instance polling providers and classifying posts on the owner's keys, with
  * the bill arriving and nothing to say who spent it.
  */
+
+import type { AiEnvironment } from "@signalscout/engine";
 import { describe, expect, it } from "vitest";
-import type { AiEnvironment } from "../ai/config.js";
 import {
   machineKeysUsable,
   providerKeyEnvironment,

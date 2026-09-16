@@ -1,6 +1,5 @@
+import { createLogger, type SocialSource } from "@signalscout/engine";
 import { describe, expect, it } from "vitest";
-import { createLogger } from "../logger.js";
-import type { SocialSource } from "../sources/types.js";
 import {
   credentialsFromEnvironment,
   deprecatedEnvironmentVariableFor,

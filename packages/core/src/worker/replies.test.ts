@@ -7,12 +7,12 @@
  * said in it — and the one honesty rule that decides whether it is correct:
  * a thread we half read is recorded as half read.
  */
+
+import { type CandidateReply, createLogger } from "@signalscout/engine";
 import { and, eq } from "drizzle-orm";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { createDatabase, type Database } from "../db/client.js";
 import { apiUsage, budgets, matches, posts } from "../db/schema.js";
-import { createLogger } from "../logger.js";
-import type { CandidateReply } from "../sources/types.js";
 import { createTestDatabase, type TestDatabase } from "../testing/database.js";
 import type { ClassifyPayload, FilterPayload } from "./queues.js";
 import { repliesQueue } from "./queues.js";

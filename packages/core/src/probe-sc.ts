@@ -1,6 +1,4 @@
-import { createLogger } from "./logger.js";
-import { ScrapeCreatorsRedditSource } from "./sources/providers/scrapecreators/reddit.js";
-import { createSourceRuntime } from "./sources/runtime.js";
+import { createLogger, createSourceRuntime, ScrapeCreatorsRedditSource } from "@signalscout/engine";
 
 const runtime = createSourceRuntime({ logger: createLogger({ level: "silent", name: "probe" }) });
 const source = new ScrapeCreatorsRedditSource(runtime);

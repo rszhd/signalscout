@@ -16,7 +16,7 @@ export {
   sampleWindowDays,
   shortestObservedSpanHours,
   totalsFor,
-} from "./estimate.js";
+} from "@signalscout/engine";
 export {
   type EstimateProbe,
   type EstimateReport,

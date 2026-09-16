@@ -32,21 +32,26 @@
  * window should store no new post, and should bill again, because the provider
  * charges for the search and not for what is new in it.
  */
-import { desc, eq } from "drizzle-orm";
-import { createClassifier } from "../ai/classify.js";
+
 import {
   aiConfigFromEnvironment,
+  builtInSources,
+  createClassifier,
+  createEmbedder,
+  createLogger,
+  createSourceRegistry,
+  createSourceRuntime,
   embeddingConfigFromEnvironment,
   embeddingNeedsApiKey,
   needsApiKey,
-} from "../ai/config.js";
-import { createEmbedder } from "../ai/embed.js";
+  platforms,
+} from "@signalscout/engine";
+import { desc, eq } from "drizzle-orm";
 import { ownerUserId } from "../auth/user.js";
 import { loadAiEnv } from "../config/env.js";
 import { createDatabase } from "../db/client.js";
 import type { Provider, Source } from "../db/schema.js";
 import { apiUsage, budgets, matches, monitors, posts } from "../db/schema.js";
-import { createLogger } from "../logger.js";
 import { createClassifyStep } from "../worker/classify.js";
 import { createCollectStep } from "../worker/collect.js";
 import { credentialsFromStore } from "../worker/credentials.js";
@@ -54,10 +59,6 @@ import { createFilterStep } from "../worker/filter.js";
 import { classifyQueue, filterQueue, notifyQueue, pollQueue } from "../worker/queues.js";
 import type { StepContext } from "../worker/steps.js";
 import { setProviderChoice } from "./choices.js";
-import { builtInSources } from "./index.js";
-import { platforms } from "./platforms.js";
-import { createSourceRegistry } from "./registry.js";
-import { createSourceRuntime } from "./runtime.js";
 
 const databaseUrl = process.env.DATABASE_URL;
 

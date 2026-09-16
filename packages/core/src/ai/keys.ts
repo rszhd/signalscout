@@ -14,10 +14,10 @@
  * plaintext is `ai/settings.ts` resolving what a job runs on.
  */
 import { randomUUID } from "node:crypto";
+import { decryptSecret, type EncryptionKey, encryptSecret, maskSecret } from "@signalscout/engine";
 import { and, asc, eq, sql } from "drizzle-orm";
 import type { Database } from "../db/client.js";
 import { aiKeys } from "../db/schema.js";
-import { decryptSecret, type EncryptionKey, encryptSecret, maskSecret } from "../secrets/cipher.js";
 
 /** What the cipher authenticates: the owner, and this key's own id. */
 export function aiKeyRecordName(userId: string, id: string): string {

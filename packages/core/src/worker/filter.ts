@@ -43,16 +43,21 @@
  * the similarity that caused it, because a threshold nobody can review against
  * real data is a number somebody guessed twice.
  */
+
+import {
+  type Embedder,
+  keepsPost,
+  keywordRuleFor,
+  type MonitorProfile,
+  monitorDescriptionText,
+  postEmbeddingText,
+  type Triager,
+} from "@signalscout/engine";
 import { and, eq, inArray, isNotNull, sql } from "drizzle-orm";
-import type { Embedder } from "../ai/embed.js";
-import type { MonitorProfile } from "../ai/prompt.js";
 import { recordModelCall } from "../ai/record.js";
-import type { Triager } from "../ai/triage.js";
 import { createSpendMeter } from "../budget/budget.js";
 import { monitors, posts, type Signal } from "../db/schema.js";
-import { monitorDescriptionText, postEmbeddingText } from "../filter/description.js";
 import { type FilterDrop, recordFilterDrops } from "../filter/drops.js";
-import { keepsPost, keywordRuleFor } from "../filter/keywords.js";
 import { monitorQueries } from "../monitors/monitors.js";
 import type { FilterPayload } from "./queues.js";
 import { classifyQueue, repliesQueue } from "./queues.js";

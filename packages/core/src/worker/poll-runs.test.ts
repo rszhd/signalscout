@@ -11,6 +11,15 @@
  * down: on 2026-09-09 a monitor polled fifteen times, was billed 82 units, and
  * stored no post. Read that test as the row that would have answered it.
  */
+
+import {
+  type CandidatePost,
+  createSourceRegistry,
+  createSourceRuntime,
+  fakePosts,
+  fakeSourceDefinition,
+} from "@signalscout/engine";
+import { unreachableFetch } from "@signalscout/engine/testing";
 import { eq } from "drizzle-orm";
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { setBudget } from "../budget/budget.js";
@@ -22,13 +31,7 @@ import {
   readPollRuns,
   recordPollRun,
 } from "../monitors/poll-runs.js";
-import { fakePosts } from "../sources/fake/fixtures.js";
-import { fakeSourceDefinition } from "../sources/fake/index.js";
-import { createSourceRegistry } from "../sources/registry.js";
-import { createSourceRuntime } from "../sources/runtime.js";
-import type { CandidatePost } from "../sources/types.js";
 import { createTestDatabase, type TestDatabase } from "../testing/database.js";
-import { unreachableFetch } from "../testing/network.js";
 import { createCollectStep } from "./collect.js";
 import type { CredentialLookup } from "./credentials.js";
 import type { StepContext } from "./steps.js";

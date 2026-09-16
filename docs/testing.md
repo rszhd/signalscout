@@ -19,7 +19,7 @@ its reasoning is written before the code. The test ships in the same commit as
 the feature it covers. Not test-first everywhere, and not test-later.
 
 **The fastest fake that still catches the bug you care about.** Most assertions
-belong in plain unit tests over `packages/core`, which needs no database, no
+belong in plain unit tests over `packages/engine`, which needs no database, no
 network and no clock. Reach for a heavier shape only when the lighter one
 cannot hold the claim up.
 
@@ -222,7 +222,7 @@ the ticket that changed the prompt.
 
 Both halves are one command:
 
-    pnpm --filter @signalscout/core capture:classifier
+    pnpm --filter @signalscout/engine capture:classifier
 
 It scores the four examples against a live model, records the answers as the
 fixtures `ai/examples.test.ts` replays, and prints the scores. The bands that
@@ -322,13 +322,13 @@ number is right.
 Three of ours are exactly this shape:
 
 - the pre-filter similarity threshold (US-008) — the instrument is
-  `packages/core/src/ai/fixtures/capture-embeddings.ts`, and the numbers it
+  `packages/engine/src/ai/fixtures/capture-embeddings.ts`, and the numbers it
   produced on 2026-09-05 are in the ticket and replayed by
   `ai/similarity.test.ts`. Five posts is a gap, not a distribution, so the
   second instrument is the `filter_drops` table: it records the similarity of
   every post the threshold refused, which is what moves the number next
 - the minimum score that makes a match (US-009) — the instrument is
-  `packages/core/src/ai/fixtures/capture.ts`, and the numbers it produced are
+  `packages/engine/src/ai/fixtures/capture.ts`, and the numbers it produced are
   in the ticket
 - the weight of age against score in the inbox ordering (US-011)
 

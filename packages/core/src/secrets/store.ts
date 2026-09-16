@@ -27,10 +27,7 @@
  * A wrong or missing key is a refusal to start, not a surprise at 02:00 on the
  * first poll after somebody edited `.env`.
  */
-import { and, eq, sql } from "drizzle-orm";
-import type { Database } from "../db/client.js";
-import { aiKeys, type Provider, sourceCredentials, webhookSecrets } from "../db/schema.js";
-import { webhookSecretRecordName } from "../notifications/secret.js";
+
 import {
   decryptSecret,
   type EncryptionKey,
@@ -38,7 +35,11 @@ import {
   maskSecret,
   optionalEncryptionKey,
   requireEncryptionKey,
-} from "./cipher.js";
+} from "@signalscout/engine";
+import { and, eq, sql } from "drizzle-orm";
+import type { Database } from "../db/client.js";
+import { aiKeys, type Provider, sourceCredentials, webhookSecrets } from "../db/schema.js";
+import { webhookSecretRecordName } from "../notifications/secret.js";
 
 /**
  * How a credential is named in an error, and what a new ciphertext is

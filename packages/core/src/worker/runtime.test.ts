@@ -1,8 +1,12 @@
+import {
+  type EncryptionKey,
+  generateEncryptionKey,
+  type Logger,
+  readEncryptionKey,
+} from "@signalscout/engine";
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { createDatabase } from "../db/client.js";
 import { sourceCredentials } from "../db/schema.js";
-import type { Logger } from "../logger.js";
-import { type EncryptionKey, generateEncryptionKey, readEncryptionKey } from "../secrets/cipher.js";
 import { putSourceCredential } from "../secrets/store.js";
 import { createTestDatabase, type TestDatabase } from "../testing/database.js";
 import {

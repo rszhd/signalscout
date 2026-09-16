@@ -13,7 +13,7 @@
  * stored" true rather than merely intended.
  */
 import { z } from "zod";
-import { intentTypes } from "../db/schema.js";
+import { intentTypes } from "../vocabulary.js";
 
 /** PLAN.md, *Intent classification*: every dimension is 0 to 100. */
 const score = z

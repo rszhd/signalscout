@@ -35,26 +35,28 @@
  * The monitor's cap still applies. Both paid stages read the spend meter, so a
  * sample that reaches the cap stops rather than finishing.
  */
-import { and, desc, eq, inArray, isNull, sql } from "drizzle-orm";
-import { createClassifier } from "../ai/classify.js";
+
 import {
   aiConfigFromEnvironment,
+  createClassifier,
+  createEmbedder,
+  createLogger,
+  createTriager,
   embeddingConfigFromEnvironment,
   embeddingNeedsApiKey,
+  instagramPlatformId,
   needsApiKey,
+  tikTokPlatformId,
   triageConfigFromEnvironment,
-} from "../ai/config.js";
-import { createEmbedder } from "../ai/embed.js";
-import { createTriager } from "../ai/triage.js";
+} from "@signalscout/engine";
+import { and, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 import { loadAiEnv } from "../config/env.js";
 import { createDatabase } from "../db/client.js";
 import { matches, modelCalls, monitors, posts, type Source } from "../db/schema.js";
-import { createLogger } from "../logger.js";
 import { createClassifyStep } from "../worker/classify.js";
 import { createFilterStep } from "../worker/filter.js";
 import { classifyQueue, filterQueue, notifyQueue } from "../worker/queues.js";
 import type { StepContext } from "../worker/steps.js";
-import { instagramPlatformId, tikTokPlatformId } from "./platforms.js";
 
 const databaseUrl = process.env.DATABASE_URL;
 

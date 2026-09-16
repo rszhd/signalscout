@@ -24,7 +24,7 @@
     "db:migrate": "pnpm --filter @signalscout/core migrate",
     "db:generate": "pnpm --filter @signalscout/core generate",
     "db:rotate-key": "pnpm --filter @signalscout/core rotate-key",
-    "capture:deletions": "node --env-file=.env packages/core/src/sources/deletion-fixtures/capture.mjs"
+    "capture:deletions": "node --env-file=.env packages/engine/src/sources/deletion-fixtures/capture.mjs"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.12",

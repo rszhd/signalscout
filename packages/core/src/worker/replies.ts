@@ -31,11 +31,12 @@
  * harmful there. Triage still runs, and on a reply it is the only paid stage in
  * front of the classifier.
  */
+
+import type { CandidateReply, SocialSource, SourceCredentials } from "@signalscout/engine";
 import { and, eq, gte, inArray, isNotNull, isNull, lt, sql } from "drizzle-orm";
 import { enforceBudget, recordSourceUsage } from "../budget/budget.js";
 import { matches, monitors, type Provider, posts, type Source } from "../db/schema.js";
 import { readProviderChoices } from "../sources/choices.js";
-import type { CandidateReply, SocialSource, SourceCredentials } from "../sources/types.js";
 import type { CollectOptions } from "./collect.js";
 import { excerptLength } from "./collect.js";
 import type { RepliesPayload } from "./queues.js";

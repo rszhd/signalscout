@@ -11,6 +11,19 @@
  * `worker/estimate.ts` advances a run. This file writes it down and reads it
  * back, and `estimate.ts` holds the arithmetic neither of them may repeat.
  */
+
+import {
+  type ConnectorDescriptor,
+  type EstimateSample,
+  type EstimateTotals,
+  exceedsCap,
+  type ProbeRequest,
+  type Projection,
+  projectMonthly,
+  samplePostsPerProbe,
+  sampleWindowDays,
+  totalsFor,
+} from "@signalscout/engine";
 import { and, asc, eq, sql } from "drizzle-orm";
 import type { Database } from "../db/client.js";
 import {
@@ -21,18 +34,6 @@ import {
   queryEstimates,
   type Source,
 } from "../db/schema.js";
-import type { ConnectorDescriptor } from "../sources/types.js";
-import {
-  type EstimateSample,
-  type EstimateTotals,
-  exceedsCap,
-  type ProbeRequest,
-  type Projection,
-  projectMonthly,
-  samplePostsPerProbe,
-  sampleWindowDays,
-  totalsFor,
-} from "./estimate.js";
 
 /** One query, run once against one source. */
 export interface EstimateProbe {

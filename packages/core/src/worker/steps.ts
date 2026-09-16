@@ -8,9 +8,10 @@
  * run.
  *
  */
+
+import type { Logger } from "@signalscout/engine";
 import type { PgBoss } from "pg-boss";
 import type { Database } from "../db/client.js";
-import type { Logger } from "../logger.js";
 import type {
   ClassifyPayload,
   EstimatePayload,

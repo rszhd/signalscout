@@ -37,18 +37,21 @@
  * It leaves behind a paused monitor, its settings row, its matches and its
  * delivery rows, which are the evidence.
  */
-import { and, asc, desc, eq, isNull, sql } from "drizzle-orm";
-import { createClassifier } from "../ai/classify.js";
+
 import {
   aiConfigFromEnvironment,
+  createClassifier,
+  createEmbedder,
+  createLogger,
+  createTriager,
   embeddingConfigFromEnvironment,
   embeddingNeedsApiKey,
   needsApiKey,
+  redditPlatformId,
   triageConfigFromEnvironment,
-} from "../ai/config.js";
-import { createEmbedder } from "../ai/embed.js";
+} from "@signalscout/engine";
+import { and, asc, desc, eq, isNull, sql } from "drizzle-orm";
 import { readAiEnvironment } from "../ai/settings.js";
-import { createTriager } from "../ai/triage.js";
 import { ownerUserId } from "../auth/user.js";
 import { loadAiEnv, loadNotificationEnv } from "../config/env.js";
 import { createDatabase } from "../db/client.js";
@@ -62,9 +65,7 @@ import {
   posts,
   users,
 } from "../db/schema.js";
-import { createLogger } from "../logger.js";
 import { createMonitor } from "../monitors/monitors.js";
-import { redditPlatformId } from "../sources/platforms.js";
 import { createClassifyStep } from "../worker/classify.js";
 import { createFilterStep } from "../worker/filter.js";
 import { classifyQueue, filterQueue, notifyQueue } from "../worker/queues.js";

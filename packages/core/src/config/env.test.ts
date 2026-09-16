@@ -1,5 +1,5 @@
+import { generateEncryptionKey } from "@signalscout/engine";
 import { describe, expect, it } from "vitest";
-import { generateEncryptionKey } from "../secrets/cipher.js";
 import { loadEnv } from "./env.js";
 
 const minimal = { DATABASE_URL: "postgres://user:pw@localhost:5432/signalscout" };

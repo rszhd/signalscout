@@ -9,16 +9,21 @@
  * have, and a test that stored its rows would prove nothing about the poll a
  * deployment actually runs.
  */
+
+import {
+  createSourceRegistry,
+  createSourceRuntime,
+  type FakeSourceOptions,
+  fakeSourceDefinition,
+  type Logger,
+  type SourceRegistry,
+} from "@signalscout/engine";
+import { silentLogger, unreachableFetch } from "@signalscout/engine/testing";
 import { createDatabase } from "../db/client.js";
 import { monitors } from "../db/schema.js";
-import { createLogger, type Logger } from "../logger.js";
-import { type FakeSourceOptions, fakeSourceDefinition } from "../sources/fake/index.js";
-import { createSourceRegistry, type SourceRegistry } from "../sources/registry.js";
-import { createSourceRuntime } from "../sources/runtime.js";
 import type { TestDatabase } from "../testing/database.js";
-import { unreachableFetch } from "../testing/network.js";
 
-export const silentLogger: Logger = createLogger({ level: "silent", name: "test" });
+export { silentLogger };
 
 /** Retries a test can wait out. Production's backoff spans about an hour. */
 export const fastRetries = { retryLimit: 2, retryDelay: 0, retryBackoff: false } as const;

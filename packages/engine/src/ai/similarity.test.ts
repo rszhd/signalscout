@@ -23,7 +23,7 @@
  */
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { defaultSimilarityThreshold, embeddingDimensions } from "../db/schema.js";
+import { defaultSimilarityThreshold, embeddingDimensions } from "../vocabulary.js";
 
 interface RecordedSimilarity {
   readonly externalId: string;

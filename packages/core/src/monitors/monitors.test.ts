@@ -10,11 +10,12 @@
  * The credential fields here are Reddit's real ones, from the connector, so
  * the variable named in the failure is the variable a self-hoster must set.
  */
+
+import { brightDataReddit } from "@signalscout/engine";
 import { eq } from "drizzle-orm";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { createDatabase, type Database } from "../db/client.js";
 import { matches, monitors, posts } from "../db/schema.js";
-import { brightDataReddit } from "../sources/providers/brightdata/reddit.js";
 import { createTestDatabase, type TestDatabase } from "../testing/database.js";
 import { findDueMonitors } from "../worker/schedule.js";
 import {

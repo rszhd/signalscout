@@ -29,18 +29,21 @@
  *   4. Once that collection closes, the next one goes to ScrapeCreators.
  *   5. `api_usage` holds two rows, each priced by the connector that ran.
  */
+
+import {
+  builtInSources,
+  createLogger,
+  createSourceRegistry,
+  createSourceRuntime,
+} from "@signalscout/engine";
 import { desc, eq } from "drizzle-orm";
 import { ownerUserId } from "../auth/user.js";
 import { createDatabase } from "../db/client.js";
 import { apiUsage, monitors, posts, sourceContinuations, sourceProviders } from "../db/schema.js";
-import { createLogger } from "../logger.js";
 import { createCollectStep } from "../worker/collect.js";
 import { credentialsFromStore } from "../worker/credentials.js";
 import type { StepContext } from "../worker/steps.js";
 import { setProviderChoice } from "./choices.js";
-import { builtInSources } from "./index.js";
-import { createSourceRegistry } from "./registry.js";
-import { createSourceRuntime } from "./runtime.js";
 
 const databaseUrl = process.env.DATABASE_URL;
 

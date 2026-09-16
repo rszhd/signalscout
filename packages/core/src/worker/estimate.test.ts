@@ -1,16 +1,22 @@
+import {
+  type CandidatePost,
+  createSourceRegistry,
+  createSourceRuntime,
+  fakeSourceDefinition,
+  maxEstimateAttempts,
+  type SearchRequest,
+  type SocialSource,
+  samplePostsPerProbe,
+  samplesKept,
+} from "@signalscout/engine";
+import { unreachableFetch } from "@signalscout/engine/testing";
 import { eq } from "drizzle-orm";
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { monitorSpend, recordSourceUsage, setBudget } from "../budget/budget.js";
 import { createDatabase, type Database } from "../db/client.js";
 import { apiUsage, monitors, queryEstimateProbes, queryEstimates } from "../db/schema.js";
-import { maxEstimateAttempts, samplePostsPerProbe, samplesKept } from "../estimate/estimate.js";
 import { readEstimate, startEstimate } from "../estimate/runs.js";
-import { fakeSourceDefinition } from "../sources/fake/index.js";
-import { createSourceRegistry } from "../sources/registry.js";
-import { createSourceRuntime } from "../sources/runtime.js";
-import type { CandidatePost, SearchRequest, SocialSource } from "../sources/types.js";
 import { createTestDatabase, type TestDatabase } from "../testing/database.js";
-import { unreachableFetch } from "../testing/network.js";
 import type { CredentialLookup } from "./credentials.js";
 import { createEstimateStep } from "./estimate.js";
 import { estimateQueue } from "./queues.js";

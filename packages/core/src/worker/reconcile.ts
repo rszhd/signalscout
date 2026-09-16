@@ -4,6 +4,13 @@
  * One global stately job checks at most twenty posts, oldest verification first.
  * Polls take priority. Billed checks use the same budget and ledger as polls.
  */
+
+import type {
+  ProviderChoices,
+  SocialSource,
+  SourceCredentials,
+  VerificationResult,
+} from "@signalscout/engine";
 import { and, asc, eq, isNull, lte, or, sql } from "drizzle-orm";
 import { enforceBudget, recordSourceUsage } from "../budget/budget.js";
 import {
@@ -15,12 +22,6 @@ import {
   sourceContinuations,
 } from "../db/schema.js";
 import { readProviderChoices } from "../sources/choices.js";
-import type {
-  ProviderChoices,
-  SocialSource,
-  SourceCredentials,
-  VerificationResult,
-} from "../sources/types.js";
 import type { CollectOptions } from "./collect.js";
 import { pollQueue } from "./queues.js";
 import type { Step } from "./steps.js";

@@ -17,11 +17,25 @@
   },
   "scripts": {
     "build": "tsc --build",
-    "typecheck": "tsc --build"
+    "typecheck": "tsc --build",
+    "capture:classifier": "tsx src/ai/fixtures/capture.ts",
+    "capture:triage": "tsx src/ai/fixtures/capture-triage.ts",
+    "capture:queries": "tsx src/ai/fixtures/capture-queries.ts",
+    "capture:embeddings": "tsx src/ai/fixtures/capture-embeddings.ts",
+    "capture:comment-filter": "tsx src/ai/fixtures/capture-comment-filter.ts"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@ai-sdk/anthropic": "4.0.49",
+    "@ai-sdk/google": "4.0.63",
+    "@ai-sdk/openai": "4.0.58",
+    "@ai-sdk/openai-compatible": "3.0.43",
+    "ai": "7.0.92",
+    "pino": "10.1.0",
+    "zod": "4.5.4"
+  },
   "devDependencies": {
     "@types/node": "26.4.1",
+    "tsx": "4.23.13",
     "typescript": "7.0.2",
     "vitest": "5.0.0"
   }

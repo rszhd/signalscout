@@ -30,8 +30,9 @@
  * purpose, and this comment is here because that looks like an inconsistency
  * until you know it is a decision.
  */
-import type { Signal } from "../db/schema.js";
-import { describeSignals } from "../monitors/signals.js";
+
+import { describeSignals } from "../signals.js";
+import type { Signal } from "../vocabulary.js";
 import type { MonitorProfile } from "./prompt.js";
 
 export type { MonitorProfile } from "./prompt.js";

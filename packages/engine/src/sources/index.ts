@@ -1,8 +1,3 @@
-export {
-  clearProviderChoice,
-  readProviderChoices,
-  setProviderChoice,
-} from "./choices.js";
 export { fakePosts } from "./fake/fixtures.js";
 export {
   createFakeSource,
@@ -28,8 +23,12 @@ export {
   platforms,
   redditPlatform,
   redditPlatformId,
+  tikTokPlatform,
+  tikTokPlatformId,
   xPlatform,
   xPlatformId,
+  youTubePlatform,
+  youTubePlatformId,
 } from "./platforms.js";
 export {
   ApifyLinkedInSource,
@@ -98,11 +97,11 @@ export {
   UnknownConnectorError,
   UnknownSourceError,
 } from "./registry.js";
-export { type ProviderReturn, providerReturns, verdictCount } from "./returns.js";
 export { createSourceRuntime } from "./runtime.js";
 export { assertSourcesCanBeStored } from "./storage.js";
 export type {
   CandidatePost,
+  CandidateReply,
   ConnectorDefinition,
   ConnectorDescriptor,
   CredentialCheck,
@@ -119,6 +118,7 @@ export type {
   SourceCredentials,
   SourceQuery,
   SourceRuntime,
+  VerificationResult,
 } from "./types.js";
 export { connectorIdPattern } from "./types.js";
 

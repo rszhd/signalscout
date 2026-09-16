@@ -14,10 +14,11 @@
  * The one read back is at the bottom: how many posts the classifier has
  * actually read, which is the other half of the pre-filter's own sentence.
  */
+
+import type { ModelCall } from "@signalscout/engine";
 import { and, countDistinct, eq, inArray, isNotNull } from "drizzle-orm";
 import type { Database, Queryable } from "../db/client.js";
 import { type ModelCallOutcome, type ModelCallPurpose, modelCalls } from "../db/schema.js";
-import type { ModelCall } from "./call.js";
 
 export interface RecordModelCallInput {
   readonly purpose: ModelCallPurpose;

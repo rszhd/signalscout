@@ -41,8 +41,8 @@
  */
 import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { aiEnvSchema } from "../../config/env.js";
 import { type AiConfig, triageConfigFromEnvironment } from "../config.js";
+import { aiEnvSchema } from "../env.js";
 import { createTriager } from "../triage.js";
 import type { ItemForTriage, TriageVerdict } from "../triage-prompt.js";
 import { exampleMonitor, labelledExamples } from "./examples.js";

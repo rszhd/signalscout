@@ -26,10 +26,11 @@
  * collection and never resumes a Bright Data snapshot through ScrapeCreators.
  * `collect.ts` is where that is enforced, and where the test for it lives.
  */
+
+import type { ProviderChoices } from "@signalscout/engine";
 import { and, eq, sql } from "drizzle-orm";
 import type { Database } from "../db/client.js";
 import { type Provider, type Source, sourceProviders } from "../db/schema.js";
-import type { ProviderChoices } from "./types.js";
 
 /** Every choice this account has recorded, as a map from platform to provider. */
 export async function readProviderChoices(db: Database, userId: string): Promise<ProviderChoices> {

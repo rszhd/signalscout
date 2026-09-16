@@ -20,10 +20,10 @@
  * screen to say why.
  */
 import { randomBytes } from "node:crypto";
+import { decryptSecret, type EncryptionKey, encryptSecret, maskSecret } from "@signalscout/engine";
 import { eq } from "drizzle-orm";
 import type { Database } from "../db/client.js";
 import { webhookSecrets } from "../db/schema.js";
-import { decryptSecret, type EncryptionKey, encryptSecret, maskSecret } from "../secrets/cipher.js";
 
 /**
  * 32 bytes as hex, which is 64 characters.

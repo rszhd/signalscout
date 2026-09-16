@@ -10,23 +10,22 @@
  * object — an override that produced the right `AiEnvironment` and the wrong
  * classifier would pass the second kind of test and fail a person.
  */
-import { eq } from "drizzle-orm";
-import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
-import { createDatabase, type Database } from "../db/client.js";
-import { aiKeys, aiSettings } from "../db/schema.js";
-import {
-  generateEncryptionKey,
-  readEncryptionKey,
-  UndecryptableSecretError,
-} from "../secrets/cipher.js";
-import { createTestDatabase, type TestDatabase } from "../testing/database.js";
+
 import {
   type AiEnvironment,
   aiConfigFromEnvironment,
   draftConfigFromEnvironment,
   embeddingConfigFromEnvironment,
+  generateEncryptionKey,
+  readEncryptionKey,
   triageConfigFromEnvironment,
-} from "./config.js";
+  UndecryptableSecretError,
+} from "@signalscout/engine";
+import { eq } from "drizzle-orm";
+import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
+import { createDatabase, type Database } from "../db/client.js";
+import { aiKeys, aiSettings } from "../db/schema.js";
+import { createTestDatabase, type TestDatabase } from "../testing/database.js";
 import {
   createAiKey,
   DuplicateAiKeyName,

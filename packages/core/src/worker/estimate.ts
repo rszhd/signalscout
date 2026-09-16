@@ -18,16 +18,21 @@
  * pages for ever. `maxEstimateAttempts` stops a collection that never becomes
  * ready. None of them is a performance setting.
  */
-import { checkBudget, recordSourceUsage } from "../budget/budget.js";
-import type { Provider } from "../db/schema.js";
+
 import {
+  type CandidatePost,
   type EstimateSample,
   maxEstimateAttempts,
+  type SocialSource,
+  type SourceCredentials,
+  type SourceRegistry,
   sampleExcerptLength,
   samplePostsPerProbe,
   samplesKept,
   sampleWindowDays,
-} from "../estimate/estimate.js";
+} from "@signalscout/engine";
+import { checkBudget, recordSourceUsage } from "../budget/budget.js";
+import type { Provider } from "../db/schema.js";
 import {
   type EstimateProbe,
   finishEstimate,
@@ -37,8 +42,6 @@ import {
   refuseEstimate,
 } from "../estimate/runs.js";
 import { readProviderChoices } from "../sources/choices.js";
-import type { SourceRegistry } from "../sources/registry.js";
-import type { CandidatePost, SocialSource, SourceCredentials } from "../sources/types.js";
 import type { CredentialLookup } from "./credentials.js";
 import { type EstimatePayload, estimateQueue } from "./queues.js";
 import type { Step, StepContext } from "./steps.js";

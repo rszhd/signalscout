@@ -2,6 +2,7 @@
  * Assertions precede implementation. Fake answers describe our contract, not a provider payload.
  */
 import { randomUUID } from "node:crypto";
+import type { VerificationResult } from "@signalscout/engine";
 import { eq } from "drizzle-orm";
 import { afterAll, beforeAll, beforeEach, expect, it, vi } from "vitest";
 import { recordSourceUsage, setBudget } from "../budget/budget.js";
@@ -18,7 +19,6 @@ import {
 } from "../db/schema.js";
 import { exportFeedback } from "../feedback/feedback.js";
 import { listMatches } from "../matches/matches.js";
-import type { VerificationResult } from "../sources/types.js";
 import { createTestDatabase, type TestDatabase } from "../testing/database.js";
 import { createReconcileStep } from "./reconcile.js";
 import type { StepContext } from "./steps.js";

@@ -36,11 +36,15 @@
  * would leave a post unscored with nothing to score it again: the next poll
  * asks the source for what is new, and a post from an hour ago is not.
  */
+
+import {
+  type Classifier,
+  type ModelCall,
+  type MonitorProfile,
+  scoreColumns,
+  type ThreadContext,
+} from "@signalscout/engine";
 import { and, count, eq, inArray, isNull, ne } from "drizzle-orm";
-import type { ModelCall } from "../ai/call.js";
-import { scoreColumns } from "../ai/classification.js";
-import type { Classifier } from "../ai/classify.js";
-import type { MonitorProfile, ThreadContext } from "../ai/prompt.js";
 import { recordModelCall } from "../ai/record.js";
 import { createSpendMeter } from "../budget/budget.js";
 import type { Database, Queryable } from "../db/client.js";

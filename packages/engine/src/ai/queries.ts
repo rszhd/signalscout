@@ -25,7 +25,7 @@
 
 import type { LanguageModel } from "ai";
 import { z } from "zod";
-import { describeSignals } from "../monitors/signals.js";
+import { describeSignals } from "../signals.js";
 import type { PlatformDescriptor, PlatformSearchStyle } from "../sources/types.js";
 import { generateStructured, type ModelCall } from "./call.js";
 import type { AiConfig, AiProvider } from "./config.js";

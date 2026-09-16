@@ -35,7 +35,7 @@
  * costs comes from the records. A screen that showed one number would be
  * answering only one of the two questions a person is asking.
  */
-import type { Source } from "../db/schema.js";
+import type { Source } from "../vocabulary.js";
 
 /**
  * How far back a sample looks.

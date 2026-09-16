@@ -73,10 +73,10 @@ Set it to the real signup or checkout destination before publishing.
 
 The providers section names who fetches the posts and who reads them. The data
 providers and the platforms beside each are the connectors the application
-ships — `builtInSources` in `packages/core/src/sources/index.ts` — and only the
+ships — `builtInSources` in `packages/engine/src/sources/index.ts` — and only the
 pairs that are offered: SocialCrawl also has a LinkedIn connector, switched off
 by US-053, so LinkedIn names Apify alone. The model providers are
-`aiProviders` in `packages/core/src/ai/config.ts`. Update this section when a
+`aiProviders` in `packages/engine/src/ai/config.ts`. Update this section when a
 connector is added or switched off. **The heading counts nothing on purpose** —
 "five who fetch" was true on the day it was written and stops being true the
 next time a provider is added, and a headline is the last place anybody looks

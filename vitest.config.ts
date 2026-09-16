@@ -11,6 +11,12 @@ export default defineConfig({
         new URL("./packages/core/src/testing/index.ts", import.meta.url),
       ),
       "@signalscout/core": fileURLToPath(new URL("./packages/core/src/index.ts", import.meta.url)),
+      "@signalscout/engine/testing": fileURLToPath(
+        new URL("./packages/engine/src/testing/index.ts", import.meta.url),
+      ),
+      "@signalscout/engine": fileURLToPath(
+        new URL("./packages/engine/src/index.ts", import.meta.url),
+      ),
     },
   },
   test: {

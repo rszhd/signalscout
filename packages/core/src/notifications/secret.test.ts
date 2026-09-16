@@ -10,10 +10,10 @@
  * secrets, and neither verifying the other's.
  */
 import { createHmac } from "node:crypto";
+import { generateEncryptionKey, readEncryptionKey } from "@signalscout/engine";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { createDatabase, type Database } from "../db/client.js";
 import { webhookSecrets } from "../db/schema.js";
-import { generateEncryptionKey, readEncryptionKey } from "../secrets/cipher.js";
 import { rotateEncryptionKey } from "../secrets/store.js";
 import { createTestDatabase, type TestDatabase } from "../testing/database.js";
 import {

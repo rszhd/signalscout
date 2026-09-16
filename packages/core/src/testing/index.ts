@@ -9,5 +9,6 @@
  * The API's tests need it for the same reason core's do: docs/testing.md
  * starts at real Postgres and there is no in-memory stand-in to fall back to.
  */
+
+export { unreachableFetch } from "@signalscout/engine/testing";
 export { createTestDatabase, type TestDatabase } from "./database.js";
-export { unreachableFetch } from "./network.js";

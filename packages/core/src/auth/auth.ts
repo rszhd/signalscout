@@ -18,6 +18,8 @@
  * neither: it answers a `Request` with a `Response`, and `apps/api` is what
  * turns a Fastify request into one.
  */
+
+import type { Logger } from "@signalscout/engine";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { APIError } from "better-auth/api";
@@ -36,7 +38,6 @@ import {
   users,
   verifications,
 } from "../db/schema.js";
-import type { Logger } from "../logger.js";
 import { type SignupMode, unclaimedUserId } from "./user.js";
 import { type SendEmail, verificationMessage } from "./verification-email.js";
 

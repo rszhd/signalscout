@@ -33,7 +33,7 @@ import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { createOpenAI } from "@ai-sdk/openai";
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 import { APICallError, type EmbeddingModel, embedMany, RetryError } from "ai";
-import { embeddingDimensions } from "../db/schema.js";
+import { embeddingDimensions } from "../vocabulary.js";
 import type { ModelCall } from "./call.js";
 import { type EmbeddingConfig, type EmbeddingProvider, embeddingNeedsApiKey } from "./config.js";
 

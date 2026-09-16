@@ -25,9 +25,9 @@
  */
 import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { aiEnvSchema } from "../../config/env.js";
 import { platforms } from "../../sources/platforms.js";
 import { type AiConfig, aiConfigFromEnvironment } from "../config.js";
+import { aiEnvSchema } from "../env.js";
 import { createQueryGenerator } from "../queries.js";
 import { exampleMonitor } from "./examples.js";
 

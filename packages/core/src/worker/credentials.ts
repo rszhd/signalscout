@@ -30,12 +30,17 @@
  * `REDDIT_API_KEY` is still read, so an instance that is running keeps
  * running, and reading it logs that it is going. The README says so.
  */
+
+import {
+  type ConnectorDescriptor,
+  type EncryptionKey,
+  type Logger,
+  optionalEncryptionKey,
+  type SourceCredentials,
+} from "@signalscout/engine";
 import type { Database } from "../db/client.js";
 import type { Provider } from "../db/schema.js";
-import type { Logger } from "../logger.js";
-import { type EncryptionKey, optionalEncryptionKey } from "../secrets/cipher.js";
 import { credentialSlotName, readSourceCredential } from "../secrets/store.js";
-import type { ConnectorDescriptor, SourceCredentials } from "../sources/types.js";
 
 /**
  * What the poll step calls to get one source's credentials.
@@ -223,7 +228,7 @@ export function missingCredentials(
  */
 export function credentialsFromStore(
   db: Database,
-  key: EncryptionKey | undefined = optionalEncryptionKey(),
+  key: EncryptionKey | undefined = optionalEncryptionKey(process.env),
   environment: Record<string, string | undefined> = process.env,
   logger?: Logger,
 ): CredentialLookup {

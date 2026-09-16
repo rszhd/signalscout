@@ -27,11 +27,11 @@
  */
 import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { aiEnvSchema } from "../../config/env.js";
-import { defaultMinimumScore } from "../../db/schema.js";
+import { defaultMinimumScore } from "../../vocabulary.js";
 import { leadScore } from "../classification.js";
 import { createClassifier } from "../classify.js";
 import { type AiConfig, aiConfigFromEnvironment } from "../config.js";
+import { aiEnvSchema } from "../env.js";
 import { type CapturedClassification, exampleMonitor, labelledExamples } from "./examples.js";
 
 const here = fileURLToPath(new URL(".", import.meta.url));

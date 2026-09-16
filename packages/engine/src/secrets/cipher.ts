@@ -126,9 +126,13 @@ export function readEncryptionKey(value: string): EncryptionKey {
  * Blank means unset, for the reason `config/env.ts` gives: `.env.example` is
  * committed with blank values and `pnpm dev` copies it, so a present-and-empty
  * variable has to read the same as an absent one.
+ *
+ * The environment is passed in, never defaulted. The engine reads no process
+ * variable — `engine-boundary.test.ts` — so the caller says where the key
+ * came from.
  */
 export function requireEncryptionKey(
-  environment: Record<string, string | undefined> = process.env,
+  environment: Record<string, string | undefined>,
 ): EncryptionKey {
   const value = environment.ENCRYPTION_KEY?.trim();
 
@@ -141,7 +145,7 @@ export function requireEncryptionKey(
 
 /** The key if one is set, or undefined. The shape is still checked. */
 export function optionalEncryptionKey(
-  environment: Record<string, string | undefined> = process.env,
+  environment: Record<string, string | undefined>,
 ): EncryptionKey | undefined {
   return environment.ENCRYPTION_KEY?.trim() ? requireEncryptionKey(environment) : undefined;
 }

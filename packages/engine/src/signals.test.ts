@@ -13,10 +13,10 @@
  * neither.
  */
 import { describe, expect, it } from "vitest";
-import { buildSystemPrompt } from "../ai/prompt.js";
-import { buildQueryUserPrompt } from "../ai/queries.js";
-import { intentTypes, signals } from "../db/schema.js";
+import { buildSystemPrompt } from "./ai/prompt.js";
+import { buildQueryUserPrompt } from "./ai/queries.js";
 import { describeSignals, intentTypeLabel, signalDescriptions, signalList } from "./signals.js";
+import { intentTypes, signals } from "./vocabulary.js";
 
 const monitor = {
   product: "A test runner that records browser flows instead of coding them",

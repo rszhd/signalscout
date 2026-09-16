@@ -97,9 +97,15 @@ matches no project-scoped route and the catch-all sends it to choose one.
 
 **The UI shares one theme.** Read [docs/design.md](docs/design.md) before changing a screen. Colors and sizing live in `apps/web/src/styles/tokens.css`; shared controls live in `styles/theme.css`. Keep page layout separate, and migrate the remaining screens one at a time.
 
-**`packages/core` imports neither Fastify nor React.** The API and the worker
-both call into it. This is the one architectural rule in the repository. If a
-change seems to need it, the change is wrong.
+**`packages/engine` is stateless, and `packages/core` imports neither Fastify
+nor React.** The engine holds connectors, model calls, the pre-filter, the
+estimate and the cipher: input in, result and cost out. It declares no `pg`,
+`drizzle-orm`, `pg-boss`, `better-auth` or `stripe`, imports nothing from
+another package, and reads no `process.env` — a key or a model name is an
+argument. `core` is the stateful half and imports the engine; the engine never
+imports core. The API and the worker call into core. `engine-boundary.test.ts`
+and `core-boundary.test.ts` say all of this to CI. If a change seems to need
+one of them broken, the change is wrong. US-151 says where this is going.
 
 **A red test is fixed in the code, not in the assertion.** An expected value
 changes only when the behaviour was meant to change, and the commit says which
@@ -124,12 +130,15 @@ shipped as `?comment_id=`, which the connector invented; it survived a capture,
 two live polls and a code comment admitting it was a guess, because nobody
 pressed it. Open one.
 
-**A value added to an array in `schema.ts` is not a value the database
-accepts.** `modelCallPurposes`, the provider enum and their siblings are also
-check constraints, and TypeScript does not know that. This has shipped three
-times — `apify`, `draft_reply`, `key_test` — and each time a full suite passed,
-the call succeeded, the money was spent, and recording it failed. Write the
-migration in the same change.
+**A value added to an array in `schema.ts` or `vocabulary.ts` is not a value
+the database accepts.** `modelCallPurposes` in the schema, and `sources`,
+`providers`, `intentTypes` and their siblings in
+`packages/engine/src/vocabulary.ts`, are also check constraints, and
+TypeScript does not know that. This has shipped three times — `apify`,
+`draft_reply`, `key_test` — and each time a full suite passed, the call
+succeeded, the money was spent, and recording it failed. The array is now one
+package away from the migration, which makes forgetting easier, not harder.
+Write the migration in the same change.
 
 **Scoping a route means scoping every read in it.** BUG-009 scoped the keys on
 the providers page and left the spend, the counts and the verdicts answering
@@ -254,11 +263,11 @@ node scripts/remove-worktree.mjs <name> # the folder, and the Postgres that came
 backlog/index.sh              # rebuild OPEN.md and DONE.md — run after any ticket change
 backlog/index.sh --check      # exit 1 if either list is stale
 
-pnpm --filter @signalscout/core capture:classifier   # spends money
-pnpm --filter @signalscout/core capture:queries      # spends money
-pnpm --filter @signalscout/core capture:embeddings   # spends money
-pnpm --filter @signalscout/core capture:comment-filter # spends money
-pnpm --filter @signalscout/core capture:triage        # spends money
+pnpm --filter @signalscout/engine capture:classifier   # spends money
+pnpm --filter @signalscout/engine capture:queries      # spends money
+pnpm --filter @signalscout/engine capture:embeddings   # spends money
+pnpm --filter @signalscout/engine capture:comment-filter # spends money
+pnpm --filter @signalscout/engine capture:triage        # spends money
 pnpm --filter @signalscout/core live:model-probe      # one call, a fraction of a cent
 pnpm --filter @signalscout/core live:provider-switch # spends ~$0.08
 pnpm --filter @signalscout/core live:linkedin-poll   # spends ~$0.08 + model
@@ -276,11 +285,11 @@ pnpm --filter @signalscout/core live:webhook           # spends nothing
 pnpm --filter @signalscout/core measure:lead-position # spends ~$0.40
 pnpm capture:deletions                            # spends ~$0.02
 
-node packages/core/src/sources/providers/socialcrawl/linkedin-fixtures/capture.mjs   # ~30 credits
-node packages/core/src/sources/providers/socialcrawl/instagram-fixtures/capture.mjs  # 24 credits, or 14 with --lean
-node packages/core/src/sources/providers/scrapecreators/tiktok-fixtures/capture.mjs   # 9 credits
-node packages/core/src/sources/providers/scrapecreators/youtube-fixtures/capture.mjs  # 8 credits
-node packages/core/src/sources/providers/scrapecreators/instagram-fixtures/capture.mjs # 6 credits
+node packages/engine/src/sources/providers/socialcrawl/linkedin-fixtures/capture.mjs   # ~30 credits
+node packages/engine/src/sources/providers/socialcrawl/instagram-fixtures/capture.mjs  # 24 credits, or 14 with --lean
+node packages/engine/src/sources/providers/scrapecreators/tiktok-fixtures/capture.mjs   # 9 credits
+node packages/engine/src/sources/providers/scrapecreators/youtube-fixtures/capture.mjs  # 8 credits
+node packages/engine/src/sources/providers/scrapecreators/instagram-fixtures/capture.mjs # 6 credits
 ```
 
 Everything from `capture:` down spends real money, and every one of them is an

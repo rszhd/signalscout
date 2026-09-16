@@ -23,31 +23,32 @@
  * thread that keeps producing leads — which is itself one of the four stop
  * reasons worth seeing live.
  */
-import { and, desc, eq, sql } from "drizzle-orm";
-import { createClassifier } from "../ai/classify.js";
+
 import {
   aiConfigFromEnvironment,
+  builtInSources,
+  createClassifier,
+  createEmbedder,
+  createLogger,
+  createSourceRegistry,
+  createSourceRuntime,
+  createTriager,
   embeddingConfigFromEnvironment,
   embeddingNeedsApiKey,
   needsApiKey,
   triageConfigFromEnvironment,
-} from "../ai/config.js";
-import { createEmbedder } from "../ai/embed.js";
-import { createTriager } from "../ai/triage.js";
+} from "@signalscout/engine";
+import { and, desc, eq, sql } from "drizzle-orm";
 import { ownerUserId } from "../auth/user.js";
 import { loadAiEnv } from "../config/env.js";
 import { createDatabase } from "../db/client.js";
 import { apiUsage, budgets, matches, modelCalls, monitors, posts } from "../db/schema.js";
-import { createLogger } from "../logger.js";
 import { createClassifyStep } from "../worker/classify.js";
 import { credentialsFromStore } from "../worker/credentials.js";
 import { createFilterStep } from "../worker/filter.js";
 import { classifyQueue, filterQueue, notifyQueue, repliesQueue } from "../worker/queues.js";
 import { createRepliesStep, maxCommentsPerThread, replyBatchSize } from "../worker/replies.js";
 import type { StepContext } from "../worker/steps.js";
-import { builtInSources } from "./index.js";
-import { createSourceRegistry } from "./registry.js";
-import { createSourceRuntime } from "./runtime.js";
 
 const databaseUrl = process.env.DATABASE_URL;
 

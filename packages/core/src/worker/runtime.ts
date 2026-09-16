@@ -10,20 +10,32 @@
  * here should: a stuck queue is then `SELECT * FROM pgboss.job`, in the
  * database the self-hoster already backs up.
  */
-import { PgBoss } from "pg-boss";
-import { type Classifier, createClassifier } from "../ai/classify.js";
+
 import {
   type AiConfig,
   aiConfigFromEnvironment,
+  assertSourcesCanBeStored,
+  builtInSources,
+  type Classifier,
+  configureNetworking,
+  createClassifier,
+  createEmbedder,
+  createSourceRegistry,
+  createSourceRuntime,
+  createTriager,
+  type Embedder,
   type EmbeddingConfig,
   embeddingConfigFromEnvironment,
   embeddingNeedsApiKey,
+  type Logger,
   needsApiKey,
+  optionalEncryptionKey,
+  type SourceRegistry,
+  type Triager,
   triageConfigFromEnvironment,
-} from "../ai/config.js";
-import { createEmbedder, type Embedder } from "../ai/embed.js";
+} from "@signalscout/engine";
+import { PgBoss } from "pg-boss";
 import { readAiEnvironment as readAiSettingsEnvironment } from "../ai/settings.js";
-import { createTriager, type Triager } from "../ai/triage.js";
 import type { SignupMode } from "../auth/user.js";
 import type { BillingMode } from "../billing/index.js";
 import { loadAiEnv, loadNotificationEnv, loadSignupEnv } from "../config/env.js";
@@ -34,17 +46,10 @@ import {
   withoutMachineModelKeys,
 } from "../config/machine-keys.js";
 import { createDatabase, type Database, poolOptions } from "../db/client.js";
-import type { Logger } from "../logger.js";
-import { configureNetworking } from "../net.js";
 import type { NotificationTransport } from "../notifications/deliver.js";
 import { webhookSecretFor } from "../notifications/secret.js";
 import { createNotificationTransport } from "../notifications/transport.js";
-import { optionalEncryptionKey } from "../secrets/cipher.js";
 import { assertStoredCredentialsAreReadable } from "../secrets/store.js";
-import { builtInSources } from "../sources/index.js";
-import { createSourceRegistry, type SourceRegistry } from "../sources/registry.js";
-import { createSourceRuntime } from "../sources/runtime.js";
-import { assertSourcesCanBeStored } from "../sources/storage.js";
 import { createClassifyStep } from "./classify.js";
 import { createCollectStep } from "./collect.js";
 import { type CredentialLookup, credentialsFromStore } from "./credentials.js";
@@ -539,7 +544,7 @@ export async function startWorker({
             webhookSecretFor(
               db,
               userId,
-              optionalEncryptionKey(),
+              optionalEncryptionKey(process.env),
               // Undefined where signup is open, so an account there signs with
               // its own secret or with nothing at all.
               webhookSecretEnvironment(signup),

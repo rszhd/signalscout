@@ -15,8 +15,9 @@
  * post. That split is what lets a provider cache the monitor half across every
  * post in one poll.
  */
-import type { Signal } from "../db/schema.js";
-import { describeSignals } from "../monitors/signals.js";
+
+import { describeSignals } from "../signals.js";
+import type { Signal } from "../vocabulary.js";
 
 /** The four answers PLAN.md's monitor form asks for, as the classifier sees them. */
 export interface MonitorProfile {

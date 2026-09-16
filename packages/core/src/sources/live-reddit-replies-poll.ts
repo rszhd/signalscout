@@ -42,22 +42,27 @@
  *   5. A second run opens no thread whose reply count has not moved, which is
  *      the rule that stops an hourly monitor re-buying every conversation.
  */
-import { and, desc, eq } from "drizzle-orm";
-import { createClassifier } from "../ai/classify.js";
+
 import {
   aiConfigFromEnvironment,
+  builtInSources,
+  createClassifier,
+  createEmbedder,
+  createLogger,
+  createSourceRegistry,
+  createSourceRuntime,
+  createTriager,
   embeddingConfigFromEnvironment,
   embeddingNeedsApiKey,
   needsApiKey,
+  redditPlatformId,
   triageConfigFromEnvironment,
-} from "../ai/config.js";
-import { createEmbedder } from "../ai/embed.js";
-import { createTriager } from "../ai/triage.js";
+} from "@signalscout/engine";
+import { and, desc, eq } from "drizzle-orm";
 import { ownerUserId } from "../auth/user.js";
 import { loadAiEnv } from "../config/env.js";
 import { createDatabase } from "../db/client.js";
 import { apiUsage, budgets, matches, monitors, posts } from "../db/schema.js";
-import { createLogger } from "../logger.js";
 import { createClassifyStep } from "../worker/classify.js";
 import { createCollectStep } from "../worker/collect.js";
 import { credentialsFromStore } from "../worker/credentials.js";
@@ -66,10 +71,6 @@ import { classifyQueue, filterQueue, notifyQueue, repliesQueue } from "../worker
 import { createRepliesStep } from "../worker/replies.js";
 import type { StepContext } from "../worker/steps.js";
 import { readProviderChoices } from "./choices.js";
-import { builtInSources } from "./index.js";
-import { redditPlatformId } from "./platforms.js";
-import { createSourceRegistry } from "./registry.js";
-import { createSourceRuntime } from "./runtime.js";
 
 const databaseUrl = process.env.DATABASE_URL;
 

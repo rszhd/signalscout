@@ -14,6 +14,12 @@
  * what lets `regenerate` replace the queries without a person retyping
  * anything. That separation is in the schema; this file is where it is used.
  */
+
+import {
+  type ConnectorDescriptor,
+  offeredConnectors,
+  type ProviderChoices,
+} from "@signalscout/engine";
 import { desc, eq, sql } from "drizzle-orm";
 import type { Database } from "../db/client.js";
 import { monitors, projects, type Signal, type Source } from "../db/schema.js";
@@ -21,8 +27,6 @@ import {
   defaultNotificationSettings,
   saveNotificationSettings,
 } from "../notifications/settings.js";
-import { offeredConnectors } from "../sources/offering.js";
-import type { ConnectorDescriptor, ProviderChoices } from "../sources/types.js";
 import { type MissingCredential, missingCredentials } from "../worker/credentials.js";
 
 /** A monitor row, as Drizzle selects it. */

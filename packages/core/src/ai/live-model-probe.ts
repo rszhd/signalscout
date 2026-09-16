@@ -25,10 +25,15 @@
  * Nothing is written. The call is not recorded in the ledger, because there is
  * no account here to bill it to.
  */
+
+import {
+  type AiConfig,
+  type AiProvider,
+  aiConfigFromEnvironment,
+  needsApiKey,
+  probeChatModel,
+} from "@signalscout/engine";
 import { loadAiEnv } from "../config/env.js";
-import type { AiConfig, AiProvider } from "./config.js";
-import { aiConfigFromEnvironment, needsApiKey } from "./config.js";
-import { probeChatModel } from "./probe.js";
 
 function flag(name: string): string | undefined {
   const found = process.argv.find((argument) => argument.startsWith(`--${name}=`));

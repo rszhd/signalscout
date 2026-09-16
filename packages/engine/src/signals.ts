@@ -15,7 +15,7 @@
  * coincidence to be tidied away: the classifier is asked to answer with one of
  * those words, so it should have been told to look for the same words.
  */
-import { type IntentType, type Signal, signals } from "../db/schema.js";
+import { type IntentType, type Signal, signals } from "./vocabulary.js";
 
 export interface SignalDescription {
   readonly id: Signal;

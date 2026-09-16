@@ -17,16 +17,19 @@
  * each case chose.
  */
 
+import {
+  createLogger,
+  fakePosts,
+  type ModelCall,
+  type Triager,
+  type TriageVerdict,
+} from "@signalscout/engine";
 import { and, eq } from "drizzle-orm";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
-import type { ModelCall } from "../ai/call.js";
-import type { Triager, TriageVerdict } from "../ai/triage.js";
 import { monitorSpend } from "../budget/budget.js";
 import { createDatabase, type Database } from "../db/client.js";
 import { filterDrops, modelCalls, posts } from "../db/schema.js";
 import { filterDropCounts } from "../filter/drops.js";
-import { createLogger } from "../logger.js";
-import { fakePosts } from "../sources/fake/fixtures.js";
 import { createTestDatabase, type TestDatabase } from "../testing/database.js";
 import type { ClassifyPayload } from "./queues.js";
 import { filterQueue } from "./queues.js";

@@ -19,13 +19,21 @@
  * account that has stored nothing behaves exactly as it did before this
  * existed. Both are the common case, and neither needed a branch.
  */
+
+import {
+  type AiEnvironment,
+  type AiProvider,
+  decryptSecret,
+  type EmbeddingProvider,
+  type EncryptionKey,
+  followsDefault,
+  optionalEncryptionKey,
+  recommendedModelFor,
+} from "@signalscout/engine";
 import { and, eq } from "drizzle-orm";
 import type { Database } from "../db/client.js";
 import { type AiTask, aiKeys, aiSettings, aiTasks } from "../db/schema.js";
-import { decryptSecret, type EncryptionKey, optionalEncryptionKey } from "../secrets/cipher.js";
-import type { AiEnvironment, AiProvider, EmbeddingProvider } from "./config.js";
 import { readAiKeySecret } from "./keys.js";
-import { followsDefault, recommendedModelFor } from "./recommended.js";
 
 /** One task's settings, as a person edits them. The key is never read back. */
 export interface AiTaskSettings {

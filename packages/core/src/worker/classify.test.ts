@@ -12,12 +12,11 @@
  * blanks AI_API_KEY so a machine with a key exported cannot spend one.
  */
 
+import { type AiConfig, createClassifier, createLogger, fakePosts } from "@signalscout/engine";
 import { APICallError } from "ai";
 import { MockLanguageModelV4 } from "ai/test";
 import { and, eq } from "drizzle-orm";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
-import { createClassifier } from "../ai/classify.js";
-import type { AiConfig } from "../ai/config.js";
 import { classifiedPostCounts } from "../ai/record.js";
 import { createDatabase, type Database } from "../db/client.js";
 import {
@@ -29,9 +28,7 @@ import {
   posts,
   sourceCoverage,
 } from "../db/schema.js";
-import { createLogger } from "../logger.js";
 import { updateMonitor } from "../monitors/monitors.js";
-import { fakePosts } from "../sources/fake/fixtures.js";
 import { createTestDatabase, type TestDatabase } from "../testing/database.js";
 import { maxClassificationAttempts } from "./classify.js";
 import { classifyQueue, pollQueue } from "./queues.js";

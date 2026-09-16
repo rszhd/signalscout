@@ -1,5 +1,5 @@
+import { createLogger } from "@signalscout/engine";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { createLogger } from "../logger.js";
 import { createTestDatabase, type TestDatabase } from "../testing/database.js";
 import { classifyQueue, filterQueue, notifyQueue, pollQueue } from "./queues.js";
 import { startWorker, type WorkerHandle } from "./runtime.js";

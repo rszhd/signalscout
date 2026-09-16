@@ -18,18 +18,15 @@
  * the model is passed in.
  */
 
+import { createEmbedder, createLogger, type EmbeddingConfig, fakePosts } from "@signalscout/engine";
 import { APICallError } from "ai";
 import { MockEmbeddingModelV4 } from "ai/test";
 import { and, eq } from "drizzle-orm";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
-import type { EmbeddingConfig } from "../ai/config.js";
-import { createEmbedder } from "../ai/embed.js";
 import { monitorSpend } from "../budget/budget.js";
 import { createDatabase, type Database } from "../db/client.js";
 import { embeddingDimensions, filterDrops, modelCalls, monitors, posts } from "../db/schema.js";
 import { filterDropCounts } from "../filter/drops.js";
-import { createLogger } from "../logger.js";
-import { fakePosts } from "../sources/fake/fixtures.js";
 import { createTestDatabase, type TestDatabase } from "../testing/database.js";
 import type { ClassifyPayload } from "./queues.js";
 import { filterQueue } from "./queues.js";

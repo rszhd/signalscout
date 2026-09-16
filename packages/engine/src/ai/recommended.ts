@@ -31,7 +31,7 @@
  * models and we can price neither: `provider.ts` says why, and a recommendation
  * we cannot cost is the one thing this table refuses to make.
  */
-import type { AiTask } from "../db/schema.js";
+import type { AiTask } from "../vocabulary.js";
 import {
   type AiProvider,
   canEmbed,

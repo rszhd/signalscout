@@ -1,3 +1,14 @@
+import {
+  type CandidatePost,
+  createSourceRegistry,
+  createSourceRuntime,
+  type FakeSourceOptions,
+  fakePosts,
+  fakeSourceDefinition,
+  type SearchRequest,
+  type SocialSource,
+} from "@signalscout/engine";
+import { unreachableFetch } from "@signalscout/engine/testing";
 import { eq } from "drizzle-orm";
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { setBudget } from "../budget/budget.js";
@@ -12,14 +23,7 @@ import {
   sourceProviders,
 } from "../db/schema.js";
 import { setProviderChoice } from "../sources/choices.js";
-import { fakePosts } from "../sources/fake/fixtures.js";
-import type { FakeSourceOptions } from "../sources/fake/index.js";
-import { fakeSourceDefinition } from "../sources/fake/index.js";
-import { createSourceRegistry } from "../sources/registry.js";
-import { createSourceRuntime } from "../sources/runtime.js";
-import type { CandidatePost, SearchRequest, SocialSource } from "../sources/types.js";
 import { createTestDatabase, type TestDatabase } from "../testing/database.js";
-import { unreachableFetch } from "../testing/network.js";
 import { createCollectStep, excerptLength, maxPagesPerPoll } from "./collect.js";
 import type { CredentialLookup } from "./credentials.js";
 import { filterQueue, pollQueue } from "./queues.js";

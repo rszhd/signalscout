@@ -1,4 +1,12 @@
 #!/usr/bin/env tsx
+import {
+  aiConfigFromEnvironment,
+  createClassifier,
+  createLogger,
+  createTriager,
+  needsApiKey,
+  triageConfigFromEnvironment,
+} from "@signalscout/engine";
 /**
  * Finish the reply half of US-020's live run, without paying a provider again.
  *
@@ -23,13 +31,9 @@
  * already found and the whole poll can be read as one thing.
  */
 import { and, desc, eq } from "drizzle-orm";
-import { createClassifier } from "../ai/classify.js";
-import { aiConfigFromEnvironment, needsApiKey, triageConfigFromEnvironment } from "../ai/config.js";
-import { createTriager } from "../ai/triage.js";
 import { loadAiEnv } from "../config/env.js";
 import { createDatabase } from "../db/client.js";
 import { matches, monitors, posts } from "../db/schema.js";
-import { createLogger } from "../logger.js";
 import { createClassifyStep } from "../worker/classify.js";
 import { createFilterStep } from "../worker/filter.js";
 import { classifyQueue, filterQueue, notifyQueue, repliesQueue } from "../worker/queues.js";

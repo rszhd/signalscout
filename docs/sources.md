@@ -11,7 +11,7 @@ A source has two axes, and US-024 separated them.
 
 Until two providers fetched the same platform, one record could describe both.
 Two cannot share a price, a billable unit or a key list, so they are separate
-records now. `packages/core/src/sources/types.ts` holds the interface, and its
+records now. `packages/engine/src/sources/types.ts` holds the interface, and its
 comments say which axis owns each field.
 
 The two lists below are short on purpose: if adding either needs more than
@@ -23,7 +23,7 @@ this, the interface is wrong and the fix belongs in the interface.
 
 This is the common case, and it touches no platform and no schema.
 
-**1. Make one folder.** `packages/core/src/sources/providers/<provider id>/`.
+**1. Make one folder.** `packages/engine/src/sources/providers/<provider id>/`.
 The id is lower-case letters, digits and hyphens, and it never changes: it
 reaches `source_credentials.provider` and the environment variable that holds
 the key.
@@ -67,11 +67,12 @@ billed ten says only "there was more", and this says how much more there could
 be.
 
 **4. Add one line to `builtInSources`** in
-`packages/core/src/sources/index.ts`, per connector.
+`packages/engine/src/sources/index.ts`, per connector.
 
 **5. Add the provider id to `providers`** in
-`packages/core/src/db/schema.ts` and run `pnpm db:generate`. Six columns carry
-it, each with its own check constraint: `api_usage`, `source_continuations`,
+`packages/engine/src/vocabulary.ts` and run `pnpm db:generate` in
+`packages/core`, whose schema builds the constraints from that array. Six
+columns carry it, each with its own check constraint: `api_usage`, `source_continuations`,
 `source_credentials`, `posts` (attribution only), `query_estimate_probes` and
 `source_providers`. One migration number, one file.
 
@@ -85,7 +86,7 @@ That is the whole change. Nothing that consumes a source needs a case for it:
 the collector pages it through `next`, the budget guard prices it from
 `pricePerUnitMicros`, the cost test projects a month from the units a search
 reports, and the connections screen renders the provider's
-`credentialFields`. `packages/core/src/sources/adding-a-connector.test.ts` is
+`credentialFields`. `packages/engine/src/sources/adding-a-connector.test.ts` is
 that claim written as code — a complete connector, driven by caller code that
 never names it.
 
@@ -93,14 +94,15 @@ never names it.
 
 ## Adding a platform
 
-**1. Describe it in `packages/core/src/sources/platforms.ts`.** An id and a
+**1. Describe it in `packages/engine/src/sources/platforms.ts`.** An id and a
 display name, and nothing else. A platform holds nothing about money and
 nothing about keys, because two providers fetching it agree about neither.
 
 **2. Write a migration for `posts.source`.** It carries a check constraint
 listing the platforms the schema accepts. Add the id to `sources` in
-`packages/core/src/db/schema.ts`, run `pnpm db:generate`, and keep the rule:
-one migration number, one file.
+`packages/engine/src/vocabulary.ts`, run `pnpm db:generate` in
+`packages/core`, whose schema builds the constraint from that array, and keep
+the rule: one migration number, one file.
 
 `assertSourcesCanBeStored` turns the mistake into a failed boot rather than a
 failed insert at 02:00. Call it where the connector is wired in.

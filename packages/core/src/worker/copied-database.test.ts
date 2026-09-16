@@ -14,12 +14,12 @@
  */
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
+import { brightDataReddit } from "@signalscout/engine";
 import { eq, sql } from "drizzle-orm";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { createDatabase, type Database } from "../db/client.js";
 import { monitors } from "../db/schema.js";
 import { type CreateMonitorInput, createMonitor, pauseMonitor } from "../monitors/index.js";
-import { brightDataReddit } from "../sources/providers/brightdata/reddit.js";
 import { createTestDatabase, type TestDatabase } from "../testing/database.js";
 import { findDueMonitors } from "./schedule.js";
 

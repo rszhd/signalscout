@@ -37,17 +37,23 @@
  * positions, so the answer can be re-read later without buying the thread
  * again.
  */
-import { and, desc, eq, inArray, sql } from "drizzle-orm";
-import { createClassifier } from "../ai/classify.js";
+
 import {
   aiConfigFromEnvironment,
+  builtInSources,
+  type CandidateReply,
+  createClassifier,
+  createEmbedder,
+  createLogger,
+  createSourceRegistry,
+  createSourceRuntime,
+  createTriager,
   embeddingConfigFromEnvironment,
   embeddingNeedsApiKey,
   needsApiKey,
   triageConfigFromEnvironment,
-} from "../ai/config.js";
-import { createEmbedder } from "../ai/embed.js";
-import { createTriager } from "../ai/triage.js";
+} from "@signalscout/engine";
+import { and, desc, eq, inArray, sql } from "drizzle-orm";
 import { ownerUserId } from "../auth/user.js";
 import { recordSourceUsage } from "../budget/budget.js";
 import { loadAiEnv } from "../config/env.js";
@@ -61,17 +67,12 @@ import {
   posts,
   type Source,
 } from "../db/schema.js";
-import { createLogger } from "../logger.js";
 import { createClassifyStep } from "../worker/classify.js";
 import { excerptLength } from "../worker/collect.js";
 import { credentialsFromStore } from "../worker/credentials.js";
 import { createFilterStep } from "../worker/filter.js";
 import { classifyQueue, filterQueue, notifyQueue } from "../worker/queues.js";
 import type { StepContext } from "../worker/steps.js";
-import { builtInSources } from "./index.js";
-import { createSourceRegistry } from "./registry.js";
-import { createSourceRuntime } from "./runtime.js";
-import type { CandidateReply } from "./types.js";
 
 const databaseUrl = process.env.DATABASE_URL;
 

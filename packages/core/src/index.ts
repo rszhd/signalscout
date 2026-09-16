@@ -1,3 +1,4 @@
+export * from "@signalscout/engine";
 export {
   adminEmails,
   isAdminEmail,
@@ -6,65 +7,7 @@ export {
   registrationsOn,
   utcDayBounds,
 } from "./admin/overview.js";
-export {
-  generateStructured,
-  type ModelCall,
-  type StructuredCallOptions,
-  type StructuredResult,
-} from "./ai/call.js";
-export {
-  type Classification,
-  classificationSchema,
-  leadScore,
-  maximumReasons,
-  minimumReasons,
-  restatesTheScores,
-  scoreColumns,
-  scoreWeights,
-} from "./ai/classification.js";
-export {
-  type ClassificationOutcome,
-  type Classifier,
-  type ClassifierOptions,
-  type ClassifyRequest,
-  createClassifier,
-} from "./ai/classify.js";
-export {
-  type AiConfig,
-  type AiEnvironment,
-  type AiProvider,
-  aiConfigFromEnvironment,
-  aiProviders,
-  canEmbed,
-  defaultEmbeddingModels,
-  draftConfigFromEnvironment,
-  type EmbeddingConfig,
-  type EmbeddingProvider,
-  embeddingConfigFromEnvironment,
-  embeddingNeedsApiKey,
-  embeddingProviders,
-  needsApiKey,
-  triageConfigFromEnvironment,
-} from "./ai/config.js";
-export {
-  createProjectDescriber,
-  type DescribeResult,
-  describeProject,
-  maximumDocumentCharacters,
-  type ProjectDescriber,
-  type ProjectDraft,
-} from "./ai/describe.js";
-export { createDrafter, type Drafter, type DraftOutcome, type DraftRequest } from "./ai/draft.js";
 export { type DraftContext, draftContext } from "./ai/draft-context.js";
-export {
-  createEmbedder,
-  createEmbeddingModel,
-  type Embedder,
-  type EmbedderOptions,
-  type EmbedOutcome,
-  estimateEmbeddingCostMicros,
-  MissingEmbeddingKeyError,
-} from "./ai/embed.js";
 export {
   type AiKey,
   aiKeyRecordName,
@@ -78,61 +21,10 @@ export {
   setDefaultAiKey,
 } from "./ai/keys.js";
 export {
-  type ModelProbe,
-  type ModelProbeStatus,
-  probeChatModel,
-  probeEmbeddingModel,
-} from "./ai/probe.js";
-export {
-  buildSystemPrompt,
-  buildUserPrompt,
-  type MonitorProfile,
-  type PostForClassification,
-} from "./ai/prompt.js";
-export {
-  createModel,
-  estimateCostMicros,
-  MissingAiKeyError,
-  modelPrices,
-  pricedModelsFor,
-  schemaGoesInThePrompt,
-  unpricedModelsFor,
-} from "./ai/provider.js";
-export {
-  buildQuerySystemPrompt,
-  buildQueryUserPrompt,
-  createQueryGenerator,
-  maximumQueries,
-  maximumSubreddits,
-  minimumQueries,
-  type QueryGenerator,
-  type QueryGeneratorOptions,
-  type QueryPlan,
-  type QueryPlanOutcome,
-  queryListSchemaFor,
-  queryPlanSchemaFor,
-  searchQuerySchema,
-  searchQuerySchemaFor,
-  subredditSchema,
-} from "./ai/queries.js";
-export {
-  followsDefault,
-  recommendationsFor,
-  recommendedModelFor,
-  recommendedProviders,
-} from "./ai/recommended.js";
-export {
   classifiedPostCounts,
   type RecordModelCallInput,
   recordModelCall,
 } from "./ai/record.js";
-export {
-  buildReplySystemPrompt,
-  buildReplyUserPrompt,
-  type Draft,
-  draftSchema,
-  type ReplyVoice,
-} from "./ai/reply.js";
 export {
   type CreateReplyPromptInput,
   createReplyPrompt,
@@ -144,7 +36,6 @@ export {
   type UpdateReplyPromptInput,
   updateReplyPrompt,
 } from "./ai/reply-prompts.js";
-export { type ReplyVoicePreset, replyVoicePresets } from "./ai/reply-voices.js";
 export {
   type AiTaskDraft,
   type AiTaskSettings,
@@ -241,7 +132,6 @@ export {
   spendByPair,
 } from "./budget/index.js";
 export {
-  aiEnvSchema,
   type Env,
   envSchema,
   loadAiEnv,
@@ -363,12 +253,6 @@ export {
   verdictCounts,
 } from "./feedback/feedback.js";
 export {
-  type EmbeddablePost,
-  type MonitorDescription,
-  monitorDescriptionText,
-  postEmbeddingText,
-} from "./filter/description.js";
-export {
   embeddingDropSimilarities,
   type FilterDrop,
   type FilterDropCounts,
@@ -376,14 +260,6 @@ export {
   noFilterDrops,
   recordFilterDrops,
 } from "./filter/drops.js";
-export {
-  type FilterablePost,
-  type KeywordRule,
-  keepsPost,
-  keywordRuleFor,
-  ruleIsEmpty,
-} from "./filter/keywords.js";
-export { createLogger, type Logger, type LoggerOptions, redactedFields } from "./logger.js";
 export {
   type CountNewMatchesOptions,
   countNewMatches,
@@ -446,7 +322,6 @@ export {
   type UpdateMonitorInput,
   updateMonitor,
 } from "./monitors/index.js";
-export { configureNetworking, connectAttemptTimeoutMs } from "./net.js";
 export {
   assertPublicHost,
   isPublicAddress,
@@ -494,21 +369,6 @@ export {
   updateProject,
 } from "./projects/projects.js";
 export {
-  decryptSecret,
-  type EncryptionKey,
-  encryptionKeyIsWellFormed,
-  encryptSecret,
-  generateEncryptionKey,
-  InvalidEncryptionKeyError,
-  MissingEncryptionKeyError,
-  maskSecret,
-  optionalEncryptionKey,
-  readEncryptionKey,
-  requireEncryptionKey,
-  secretsMatch,
-  UndecryptableSecretError,
-} from "./secrets/cipher.js";
-export {
   allStoredCredentialNames,
   assertStoredCredentialsAreReadable,
   type CredentialHint,
@@ -524,66 +384,11 @@ export {
   storedCredentialNames,
 } from "./secrets/store.js";
 export {
-  AmbiguousConnectorError,
-  assertSourcesCanBeStored,
-  brightDataProvider,
-  brightDataProviderId,
-  brightDataReddit,
-  builtInSources,
-  type CandidatePost,
-  type ChoiceOptions,
-  type ConnectorDefinition,
-  type ConnectorDescriptor,
-  type ConnectorKey,
-  ConnectorNotOfferedError,
-  type CredentialCheck,
-  type CredentialField,
   clearProviderChoice,
-  connectorIdPattern,
-  createFakeSource,
-  createSourceRegistry,
-  createSourceRuntime,
-  decideProvider,
-  type FakeSource,
-  type FakeSourceOptions,
-  fakePosts,
-  fakeProviderId,
-  fakeSourceDefinition,
-  fakeSourceId,
-  groupByPlatform,
-  isOffered,
-  type NextPage,
-  NoUsableProviderError,
-  notOfferedReason,
-  offeredConnectors,
-  type PlatformConnectors,
-  type PlatformDescriptor,
-  type PlatformId,
-  type ProviderChoices,
-  type ProviderDecision,
-  type ProviderDescriptor,
-  type ProviderId,
-  type ProviderReturn,
-  platforms,
-  providerReturns,
   readProviderChoices,
-  reasonsByProvider,
-  redditPlatform,
-  redditPlatformId,
-  type SearchRequest,
-  type SearchResult,
-  type SocialSource,
-  type SourceCredentials,
-  type SourceQuery,
-  type SourceRegistry,
-  type SourceRuntime,
   setProviderChoice,
-  UnknownConnectorError,
-  UnknownSourceError,
-  verdictCount,
-  xPlatform,
-  xPlatformId,
-} from "./sources/index.js";
+} from "./sources/choices.js";
+export { type ProviderReturn, providerReturns, verdictCount } from "./sources/returns.js";
 export {
   type ClassifyOptions,
   createClassifyStep,

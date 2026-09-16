@@ -10,18 +10,20 @@
  * `packages/core` imports neither Fastify nor React. It is asserted in
  * `apps/api/src/credentials-leak.test.ts` against a real server.
  */
-import { pino } from "pino";
-import { describe, expect, it } from "vitest";
-import { createLogger, redactedFields } from "../logger.js";
-import { builtInSources } from "../sources/index.js";
+
 import {
+  builtInSources,
+  createLogger,
   decryptSecret,
   encryptSecret,
   generateEncryptionKey,
   maskSecret,
   readEncryptionKey,
+  redactedFields,
   UndecryptableSecretError,
-} from "./cipher.js";
+} from "@signalscout/engine";
+import { pino } from "pino";
+import { describe, expect, it } from "vitest";
 
 /** One value, so any leak is a substring match rather than a judgement. */
 const secret = "brd_7f3a91c4e08b2d65";

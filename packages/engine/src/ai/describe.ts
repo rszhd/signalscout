@@ -29,8 +29,8 @@
 
 import type { LanguageModel } from "ai";
 import { z } from "zod";
-import { signals } from "../db/schema.js";
-import { signalList } from "../monitors/signals.js";
+import { signalList } from "../signals.js";
+import { signals } from "../vocabulary.js";
 import { generateStructured, type StructuredResult } from "./call.js";
 import type { AiConfig } from "./config.js";
 import { createModel } from "./provider.js";

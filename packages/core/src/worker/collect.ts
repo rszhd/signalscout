@@ -23,6 +23,14 @@
  * cannot know what the next poll will cost, so the page cap is what bounds how
  * far past the cap one poll can carry a monitor.
  */
+
+import type {
+  CandidatePost,
+  SocialSource,
+  SourceCredentials,
+  SourceQuery,
+  SourceRegistry,
+} from "@signalscout/engine";
 import { eq, sql } from "drizzle-orm";
 import { enforceBudget, recordSourceUsage } from "../budget/budget.js";
 import {
@@ -38,13 +46,6 @@ import {
 import { monitorQueries } from "../monitors/monitors.js";
 import { recordPollRun, walkFor } from "../monitors/poll-runs.js";
 import { readProviderChoices } from "../sources/choices.js";
-import type { SourceRegistry } from "../sources/registry.js";
-import type {
-  CandidatePost,
-  SocialSource,
-  SourceCredentials,
-  SourceQuery,
-} from "../sources/types.js";
 import {
   type Continuation,
   continuationsFor,

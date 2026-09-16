@@ -35,22 +35,27 @@
  *   5. Whether a video ever matches at all, which is this platform's real
  *      question.
  */
-import { and, desc, eq } from "drizzle-orm";
-import { createClassifier } from "../ai/classify.js";
+
 import {
   aiConfigFromEnvironment,
+  builtInSources,
+  createClassifier,
+  createEmbedder,
+  createLogger,
+  createSourceRegistry,
+  createSourceRuntime,
+  createTriager,
   embeddingConfigFromEnvironment,
   embeddingNeedsApiKey,
   needsApiKey,
   triageConfigFromEnvironment,
-} from "../ai/config.js";
-import { createEmbedder } from "../ai/embed.js";
-import { createTriager } from "../ai/triage.js";
+  youTubePlatformId,
+} from "@signalscout/engine";
+import { and, desc, eq } from "drizzle-orm";
 import { ownerUserId } from "../auth/user.js";
 import { loadAiEnv } from "../config/env.js";
 import { createDatabase } from "../db/client.js";
 import { apiUsage, budgets, matches, monitors, posts } from "../db/schema.js";
-import { createLogger } from "../logger.js";
 import { createClassifyStep } from "../worker/classify.js";
 import { createCollectStep } from "../worker/collect.js";
 import { credentialsFromStore } from "../worker/credentials.js";
@@ -58,10 +63,6 @@ import { createFilterStep } from "../worker/filter.js";
 import { classifyQueue, filterQueue, notifyQueue, repliesQueue } from "../worker/queues.js";
 import { createRepliesStep } from "../worker/replies.js";
 import type { StepContext } from "../worker/steps.js";
-import { builtInSources } from "./index.js";
-import { youTubePlatformId } from "./platforms.js";
-import { createSourceRegistry } from "./registry.js";
-import { createSourceRuntime } from "./runtime.js";
 
 const databaseUrl = process.env.DATABASE_URL;
 

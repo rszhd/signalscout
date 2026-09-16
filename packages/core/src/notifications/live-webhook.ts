@@ -37,15 +37,15 @@ import { createServer } from "node:https";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { desc, eq } from "drizzle-orm";
-import type { NotificationEnv } from "../config/env.js";
-import { createDatabase } from "../db/client.js";
-import { monitors, notificationDeliveries, notificationSettings } from "../db/schema.js";
 import {
   generateEncryptionKey,
   optionalEncryptionKey,
   readEncryptionKey,
-} from "../secrets/cipher.js";
+} from "@signalscout/engine";
+import { desc, eq } from "drizzle-orm";
+import type { NotificationEnv } from "../config/env.js";
+import { createDatabase } from "../db/client.js";
+import { monitors, notificationDeliveries, notificationSettings } from "../db/schema.js";
 import { processNotifications } from "./deliver.js";
 import { generateAccountWebhookSecret, webhookSecretFor } from "./secret.js";
 import { notificationDefaults, saveNotificationSettings } from "./settings.js";
@@ -220,7 +220,7 @@ async function main(): Promise<void> {
 
   // A key of this run's own when the instance has none, so the script works on
   // a machine that has never stored a credential.
-  const key = optionalEncryptionKey() ?? readEncryptionKey(generateEncryptionKey());
+  const key = optionalEncryptionKey(process.env) ?? readEncryptionKey(generateEncryptionKey());
 
   try {
     /**

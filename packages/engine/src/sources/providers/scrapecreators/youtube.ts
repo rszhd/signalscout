@@ -482,7 +482,9 @@ interface ReplyContext {
  * `watch?v=<video>&lc=<comment>`, which is what the platform's Share button
  * produces and what `socialcrawl/youtube.ts` already builds for the same
  * reason. The video id is the one this poll asked about, so the link is made
- * of two ids we hold rather than of anything guessed.
+ * of two ids we hold rather than of anything guessed — and one built from
+ * this capture was opened on 2026-09-17: YouTube showed it as the highlighted
+ * comment at the top of the thread, with the captured text.
  *
  * **There is no parent to check and none to store.** No captured comment
  * carries a post id, so BUG-007's wrong-parent rule has nothing to compare and

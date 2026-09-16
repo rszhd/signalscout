@@ -107,6 +107,11 @@ were out of date and were corrected: Apify's actor offers a server-side
   seconds apart, and running out throws naming the run.
 - `Page.truncated` was added to the SocialCrawl client for the Reddit
   envelope's completeness claim. Nothing else sets it.
+- **One reply link per connector was opened on 2026-09-17**, on the owner's
+  question. YouTube's built `&lc=` link showed the comment highlighted at the
+  top; Reddit's provider link opened the thread with that comment first; X's
+  built link opened the reply and corrected a wrong handle from the id;
+  LinkedIn's provider link showed the post with that comment. All four land.
 
 ## Log
 

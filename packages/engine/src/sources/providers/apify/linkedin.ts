@@ -822,6 +822,7 @@ interface ReplyContext {
  * Nothing here is built and nothing is repaired, which is unusual in this
  * repository: the actor sends an id, a link that opens the comment, the words,
  * an exact ISO date and an author, and a row missing any of them is dropped.
+ * The link was opened on 2026-09-17 and shows the post with that comment.
  *
  * **`postId` carries the urn and `id` does not**, which is the one trap in this
  * shape. A comment says `urn:li:activity:7502584032971595776` where the post it

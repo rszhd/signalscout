@@ -289,6 +289,8 @@ export class SocialCrawlRedditSource implements SocialSource {
      * a re-sort of it. A reply sits immediately under the comment it answers,
      * which is where its parent's words are.
      */
+    // Every comment carries its own `url`, and one from this capture was
+    // opened on 2026-09-17: it lands on the thread with that comment first.
     const flattened = flatten(page.records);
 
     const parsed = flattened

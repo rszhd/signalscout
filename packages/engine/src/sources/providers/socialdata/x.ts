@@ -534,7 +534,9 @@ interface ReplyContext {
  *
  * A reply on this provider is a tweet: the same record, the same fields, the
  * same missing URL. So this reads what `toCandidatePost` reads and adds the
- * two links a reply has and a post does not.
+ * two links a reply has and a post does not. A link built from this capture
+ * was opened on 2026-09-17 and landed on the reply; X also corrected a wrong
+ * handle from the id, so the id is what carries the link.
  *
  * **The wrong-parent check is live here, on `conversation_id_str`.** All 40
  * captured replies carried the id of the post asked about, across two pages

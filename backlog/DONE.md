@@ -2,7 +2,7 @@
 
 # Done
 
-123 finished.
+125 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
@@ -21,6 +21,8 @@
 | BUG-003 | [A post below the threshold is classified again on every poll](done/2026-09/BUG-003-a-post-below-the-threshold-is-classified-again-on-every-poll.md) | bug | fixed | 2026-09 |
 | BUG-002 | [A seven-day window is bought as a month](done/2026-09/BUG-002-a-seven-day-window-is-bought-as-a-month.md) | bug | fixed | 2026-09 |
 | BUG-001 | [A pending Reddit collection is not resumed](done/2026-09/BUG-001-a-pending-reddit-collection-is-not-resumed.md) | bug | shipped | 2026-09 |
+| US-157 | [A consumer's tests can insert a monitor](done/2026-09/US-157-a-consumers-tests-can-insert-a-monitor.md) | chore | shipped | 2026-09 |
+| US-156 | [The release publishes without a token](done/2026-09/US-156-the-release-publishes-without-a-token.md) | chore | shipped | 2026-09 |
 | US-155 | [The cloud version moves to its own repository](done/2026-09/US-155-the-cloud-version-moves-to-its-own-repository.md) | chore | shipped | 2026-09 |
 | US-154 | [The engine and the pipeline are published to npm](done/2026-09/US-154-the-engine-and-the-pipeline-are-published-to-npm.md) | chore | shipped | 2026-09 |
 | US-153 | [What is left of core becomes the pipeline](done/2026-09/US-153-what-is-left-of-core-becomes-the-pipeline.md) | chore | shipped | 2026-09 |

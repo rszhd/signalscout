@@ -6,7 +6,7 @@ import type {
   Logger,
   WorkerHandle,
 } from "@signalscout/pipeline";
-import { createLogger, loadEnv } from "@signalscout/pipeline";
+import { admitEveryone, createLogger, loadEnv } from "@signalscout/pipeline";
 import { describe, expect, it, vi } from "vitest";
 import type { ApiServer } from "./server.js";
 import { startApi } from "./start.js";
@@ -107,6 +107,8 @@ describe("startApi", () => {
 
     expect(worker.startWorker).toHaveBeenCalledTimes(1);
     expect(handle.worker).not.toBeNull();
+    // Off is the default, and off is the gate that reads nothing.
+    expect(worker.startWorker.mock.calls[0]?.[0].entitled).toBe(admitEveryone);
 
     // The worker is here, so the cost test uses its queue. A second `pg-boss`
     // would be a second maintenance loop against the same database.
@@ -114,6 +116,37 @@ describe("startApi", () => {
 
     await handle.stop();
     expect(worker.stop).toHaveBeenCalledTimes(1);
+  });
+
+  it("hands the worker a gate that reads subscriptions when this deployment charges", async () => {
+    const worker = fakeWorker();
+    const database = fakeDatabase();
+
+    const handle = await startApi({
+      env: envWith(true, {
+        BILLING_MODE: "stripe",
+        STRIPE_SECRET_KEY: "sk_test_x",
+        STRIPE_PRICE_ID: "price_x",
+        STRIPE_WEBHOOK_SECRET: "whsec_x",
+        APP_URL: "https://app.example.test",
+      }),
+      logger,
+      buildServer: fakeServer().buildServer,
+      startWorker: worker.startWorker,
+      startJobSender: fakeJobSender().startJobSender,
+      createDatabase: database.createDatabase,
+    });
+
+    /**
+     * The half of billing that costs money. A route that refuses to write is
+     * what a person sees; this is what stops an account that stopped paying
+     * from polling on our bill, and it must be wired here, not only exist.
+     */
+    const entitled = worker.startWorker.mock.calls[0]?.[0].entitled;
+    expect(typeof entitled).toBe("function");
+    expect(entitled).not.toBe(admitEveryone);
+
+    await handle.stop();
   });
 
   it("leaves the worker to a second container when WORKER_IN_PROCESS is false", async () => {

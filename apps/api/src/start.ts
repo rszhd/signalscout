@@ -12,6 +12,7 @@ import {
   startJobSender as startJobSenderDefault,
   startWorker as startWorkerDefault,
   storedCredentialNames,
+  subscriptionGate,
 } from "@signalscout/pipeline";
 import { type ApiServer, buildServer as buildServerDefault } from "./server.js";
 
@@ -104,14 +105,6 @@ export async function startApi({
   // requests failed with what looked like an outage.
   configureNetworking();
 
-  const worker = env.WORKER_IN_PROCESS
-    ? await startWorker({ databaseUrl: env.DATABASE_URL, logger, billing: env.BILLING_MODE })
-    : null;
-
-  if (!worker) {
-    logger.info("WORKER_IN_PROCESS is false; expecting a separate worker container");
-  }
-
   // The API's own pool, separate from the worker's. They have different
   // shapes of load — short reads against long jobs — and one pool shared
   // between them would let a slow poll hold connections a request is waiting
@@ -119,6 +112,20 @@ export async function startApi({
   const { db, close } = openDatabase(env.DATABASE_URL, {
     onError: (error) => logger.error({ err: error }, "an idle database connection failed"),
   });
+
+  const worker = env.WORKER_IN_PROCESS
+    ? await startWorker({
+        databaseUrl: env.DATABASE_URL,
+        logger,
+        // The scheduler asks this once a tick, on the API's pool: one short
+        // read, which is the shape of load this pool is for.
+        entitled: subscriptionGate(db, env.BILLING_MODE),
+      })
+    : null;
+
+  if (!worker) {
+    logger.info("WORKER_IN_PROCESS is false; expecting a separate worker container");
+  }
 
   /**
    * The credential store, checked before the first request.

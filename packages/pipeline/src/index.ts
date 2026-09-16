@@ -106,6 +106,7 @@ export {
   stateFromSubscription,
   statusFromStripe,
   subscriptionByCustomer,
+  subscriptionGate,
   trialDays,
 } from "./billing/index.js";
 export {
@@ -404,6 +405,7 @@ export {
   type MissingCredential,
   missingCredentials,
 } from "./worker/credentials.js";
+export { admitEveryone, type EntitlementGate } from "./worker/entitlement.js";
 export {
   createEstimateStep,
   type EstimateOptions,

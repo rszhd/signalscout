@@ -37,7 +37,6 @@ import {
 import { PgBoss } from "pg-boss";
 import { readAiEnvironment as readAiSettingsEnvironment } from "../ai/settings.js";
 import type { SignupMode } from "../auth/user.js";
-import type { BillingMode } from "../billing/index.js";
 import { loadAiEnv, loadNotificationEnv, loadSignupEnv } from "../config/env.js";
 import {
   machineKeysUsable,
@@ -53,6 +52,7 @@ import { assertStoredCredentialsAreReadable } from "../secrets/store.js";
 import { createClassifyStep } from "./classify.js";
 import { createCollectStep } from "./collect.js";
 import { type CredentialLookup, credentialsFromStore } from "./credentials.js";
+import { admitEveryone, type EntitlementGate } from "./entitlement.js";
 import { createEstimateStep } from "./estimate.js";
 import { createFilterStep } from "./filter.js";
 import { createNotifyStep, enqueueNotifications } from "./notify.js";
@@ -159,13 +159,14 @@ export interface StartWorkerOptions {
   pollingIntervalSeconds?: number;
   notificationTransport?: NotificationTransport;
   /**
-   * Whether this deployment charges. `off` unless it says otherwise. US-072.
+   * Who may poll. Everyone unless the application says otherwise. US-072,
+   * and US-153 made it an argument.
    *
-   * The scheduler is the only thing here that reads it, and it is the half of
+   * The scheduler is the only thing here that asks, and it is the half of
    * the billing gate that costs money: an account whose trial ran out keeps
-   * polling until this is on.
+   * polling until the gate refuses it. `worker/entitlement.ts`.
    */
-  billing?: BillingMode;
+  entitled?: EntitlementGate;
 }
 
 /**
@@ -349,7 +350,7 @@ export async function startWorker({
   scheduleTicks = true,
   pollingIntervalSeconds,
   notificationTransport,
-  billing = "off",
+  entitled = admitEveryone,
   signup = loadSignupEnv(),
 }: StartWorkerOptions): Promise<WorkerHandle> {
   // Before any provider is called. See `net.ts`: Node's 250ms per-address
@@ -594,7 +595,7 @@ export async function startWorker({
   });
 
   await boss.work(scheduleTickQueue, workerOptions, async () => {
-    await enqueueDuePolls(db, boss, logger, billing);
+    await enqueueDuePolls(db, boss, logger, entitled);
     await enqueueNotifications(db, boss);
     await boss.send(reconcileQueue, {}, { singletonKey: "all" });
   });

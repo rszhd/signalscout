@@ -13,6 +13,7 @@ import { createDatabase, type Database } from "../db/client.js";
 import { type SubscriptionStatus, subscriptions, users } from "../db/schema.js";
 import { createTestDatabase, type TestDatabase } from "../testing/database.js";
 import { daysUntil, entitledCondition, entitlementFor, trialDays } from "./entitlement.js";
+import { subscriptionGate } from "./gate.js";
 import { readSubscription, startTrial } from "./store.js";
 
 const now = new Date("2026-09-08T12:00:00Z");
@@ -187,6 +188,63 @@ describe("the same rule, inside a query", () => {
 
     expect(await entitledInSql()).toEqual(inTypeScript.sort());
     expect(inTypeScript.sort()).toEqual(["active", "no-row", "past-due", "trialing-left"]);
+  });
+
+  /**
+   * The scheduler's half. US-072 put the rule inside the due-monitors query;
+   * US-153 made it a gate the scheduler is handed, so these are the cases that
+   * used to live in `worker/schedule.test.ts`, asked of the gate directly.
+   */
+  describe("as the scheduler's gate", () => {
+    async function ownerWith(status: SubscriptionStatus, trialEndsAt: Date | null) {
+      const id = `owner-${status}-${trialEndsAt ? trialEndsAt.getTime() : "none"}`;
+      await makeAccount(id);
+      await db.insert(subscriptions).values({ userId: id, status, trialEndsAt });
+      return id;
+    }
+
+    it("admits an expired account when this deployment does not charge", async () => {
+      const owner = await ownerWith("trialing", hoursFromNow(-1));
+
+      /**
+       * The self-hosted default, and the assertion is that nothing changed. A
+       * `subscriptions` row on an instance that charges nobody must not be
+       * able to stop a poll.
+       */
+      expect(await subscriptionGate(db, "off")(new Set([owner]))).toEqual(new Set([owner]));
+    });
+
+    it("refuses an owner whose trial has run out", async () => {
+      const expired = await ownerWith("trialing", hoursFromNow(-1));
+      const running = await ownerWith("trialing", hoursFromNow(1));
+
+      expect(await subscriptionGate(db, "stripe")(new Set([expired, running]))).toEqual(
+        new Set([running]),
+      );
+    });
+
+    it("keeps a past-due card and refuses a cancelled one", async () => {
+      // The one judgement in the rule: a card that failed this morning is a
+      // person Stripe is still retrying, and stopping their monitors throws
+      // away collection they paid for. `canceled` is where Stripe gave up.
+      const retrying = await ownerWith("past_due", null);
+      const gone = await ownerWith("canceled", null);
+
+      expect(await subscriptionGate(db, "stripe")(new Set([retrying, gone]))).toEqual(
+        new Set([retrying]),
+      );
+    });
+
+    it("admits an account that has no subscription row at all", async () => {
+      /**
+       * No row is the normal state for an account older than the table — the
+       * owner's own among them. A migration that silently stopped the instance
+       * that runs the product is not a state anybody should be able to reach.
+       */
+      const owners = new Set(["older-than-billing"]);
+
+      expect(await subscriptionGate(db, "stripe")(owners)).toEqual(owners);
+    });
   });
 
   it("gives a new account seven days and never a second week", async () => {

@@ -1,8 +1,10 @@
 import { eq, sql } from "drizzle-orm";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { createDatabase, type Database } from "../db/client.js";
-import { defaultPollIntervalSeconds, monitors, subscriptions, users } from "../db/schema.js";
+import { defaultPollIntervalSeconds, monitors } from "../db/schema.js";
 import { createTestDatabase, type TestDatabase } from "../testing/database.js";
+import { admitEveryone, type EntitlementGate } from "./entitlement.js";
+import { pollQueue } from "./queues.js";
 import { startWorker, type WorkerHandle } from "./runtime.js";
 import { enqueueDuePolls, findDueMonitors } from "./schedule.js";
 import { fakeRegistry, fastRetries, insertMonitor, silentLogger, until } from "./testing.js";
@@ -329,89 +331,103 @@ describe("two workers ticking at once", () => {
 });
 
 /**
- * Who has paid, and whose monitors therefore run. US-072.
+ * Who may poll. US-072, and US-153 made it an argument.
  *
  * This is the half of the billing gate that costs money. A route that refuses
  * to write is what a person sees; an account that keeps polling after its trial
- * ran out is invisible from every screen and shows up on an invoice.
+ * ran out is invisible from every screen and shows up on an invoice. The
+ * pipeline does not know who has paid — that is the application's table — so
+ * the scheduler is handed a gate and these cases are its contract: an owner the
+ * gate refuses is never asked to poll, and a gate that fails enqueues nothing.
  */
-describe("whether the owner has paid", () => {
+describe("which owners the gate admits", () => {
   let database: TestDatabase;
-  let db: Database;
-  let close: () => Promise<void>;
+  let worker: WorkerHandle;
 
   beforeAll(async () => {
-    database = await createTestDatabase("worker_due_billing");
-    ({ db, close } = createDatabase(database.url));
+    database = await createTestDatabase("worker_due_gate");
+    worker = await startWorker({
+      databaseUrl: database.url,
+      logger: silentLogger,
+      registry: fakeRegistry(),
+      credentialsFor: () => ({ token: "test-token" }),
+      retry: fastRetries,
+      scheduleTicks: false,
+      // No step: the jobs stay in the queue, which is where the test reads them.
+      steps: { poll: () => new Promise(() => {}) },
+    });
   }, 60_000);
 
   afterAll(async () => {
-    await close?.();
+    await worker?.stop();
     await database?.drop();
   });
 
   afterEach(async () => {
-    await db.delete(monitors);
-    await db.delete(subscriptions);
-    await db.delete(users);
+    await worker.db.delete(monitors);
+    // Every job the last case left behind, whatever state it reached.
+    await worker.boss.deleteAllJobs(pollQueue);
   });
 
-  async function ownerWith(status: string, trialEndsAt: Date | null): Promise<string> {
-    const id = `owner-${status}-${trialEndsAt ? trialEndsAt.getTime() : "none"}`;
-    await db.insert(users).values({ id, name: id, email: `${id}@example.test` });
-    await db.insert(subscriptions).values({ userId: id, status, trialEndsAt });
-    return id;
+  async function queuedMonitorIds(): Promise<string[]> {
+    const jobs = await worker.boss.findJobs<{ monitorId: string }>(pollQueue);
+    return jobs.map((job) => job.data.monitorId).sort();
   }
 
-  it("polls an expired account's monitors when this deployment does not charge", async () => {
-    const owner = await ownerWith("trialing", new Date(Date.now() - 60_000));
-    const id = await insertMonitor(database, { userId: owner });
+  it("polls every due monitor when the gate admits everyone", async () => {
+    const first = await insertMonitor(database, { userId: "paid" });
+    const second = await insertMonitor(database, { userId: "also-paid", name: "Second" });
 
-    /**
-     * The self-hosted default, and the assertion is that nothing changed. A
-     * `subscriptions` row on an instance that charges nobody must not be able
-     * to stop a poll.
-     */
-    expect((await findDueMonitors(db, "off")).map((monitor) => monitor.id)).toEqual([id]);
+    const tick = await enqueueDuePolls(worker.db, worker.boss, silentLogger, admitEveryone);
+
+    expect(tick).toEqual({ due: 2, refused: 0, alreadyQueued: 0 });
+    expect(await queuedMonitorIds()).toEqual([first, second].sort());
   });
 
-  it("does not poll a monitor whose owner's trial has run out", async () => {
-    const expired = await ownerWith("trialing", new Date(Date.now() - 60_000));
-    const running = await ownerWith("trialing", new Date(Date.now() + 60 * 60 * 1000));
+  it("never asks the queue to poll for an owner the gate refuses", async () => {
+    const polling = await insertMonitor(database, { userId: "paid" });
+    await insertMonitor(database, { userId: "lapsed", name: "Lapsed" });
+    const asked: ReadonlySet<string>[] = [];
 
-    const stopped = await insertMonitor(database, { userId: expired });
-    const polling = await insertMonitor(database, { userId: running });
+    const refuseLapsed: EntitlementGate = async (owners) => {
+      asked.push(owners);
+      return new Set([...owners].filter((owner) => owner !== "lapsed"));
+    };
 
-    const ids = (await findDueMonitors(db, "stripe")).map((monitor) => monitor.id);
+    const tick = await enqueueDuePolls(worker.db, worker.boss, silentLogger, refuseLapsed);
 
-    expect(ids).toEqual([polling]);
-    expect(ids).not.toContain(stopped);
+    expect(tick).toEqual({ due: 2, refused: 1, alreadyQueued: 0 });
+    expect(await queuedMonitorIds()).toEqual([polling]);
+    // Once per tick, with every due owner, so a gate that reads a table reads
+    // it once and not once per monitor.
+    expect(asked).toEqual([new Set(["paid", "lapsed"])]);
   });
 
-  it("keeps polling for a past-due card and stops for a cancelled one", async () => {
-    // The one judgement in the rule: a card that failed this morning is a
-    // person Stripe is still retrying, and stopping their monitors throws away
-    // collection they paid for. `canceled` is where Stripe gave up.
-    const retrying = await ownerWith("past_due", null);
-    const gone = await ownerWith("canceled", null);
+  it("enqueues nothing when the gate throws", async () => {
+    await insertMonitor(database, { userId: "paid" });
+    const broken: EntitlementGate = async () => {
+      throw new Error("subscriptions table unreachable");
+    };
 
-    const polling = await insertMonitor(database, { userId: retrying });
-    const stopped = await insertMonitor(database, { userId: gone });
+    await expect(enqueueDuePolls(worker.db, worker.boss, silentLogger, broken)).rejects.toThrow(
+      "subscriptions table unreachable",
+    );
 
-    const ids = (await findDueMonitors(db, "stripe")).map((monitor) => monitor.id);
-
-    expect(ids).toEqual([polling]);
-    expect(ids).not.toContain(stopped);
+    // Not "poll everybody while the gate is down": that is the failure mode
+    // this whole file exists to prevent, one outage at a time.
+    expect(await queuedMonitorIds()).toEqual([]);
   });
 
-  it("polls for an account that has no subscription row at all", async () => {
-    /**
-     * No row is the normal state for an account older than the table — the
-     * owner's own among them. A migration that silently stopped the instance
-     * that runs the product is not a state anybody should be able to reach.
-     */
-    const id = await insertMonitor(database, { userId: "older-than-billing" });
+  it("is asked nothing when no monitor is due", async () => {
+    const asked: ReadonlySet<string>[] = [];
+    const counting: EntitlementGate = async (owners) => {
+      asked.push(owners);
+      return owners;
+    };
 
-    expect((await findDueMonitors(db, "stripe")).map((monitor) => monitor.id)).toEqual([id]);
+    const tick = await enqueueDuePolls(worker.db, worker.boss, silentLogger, counting);
+
+    expect(tick).toEqual({ due: 0, refused: 0, alreadyQueued: 0 });
+    expect(asked).toEqual([]);
   });
 });

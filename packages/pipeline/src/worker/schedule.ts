@@ -13,16 +13,18 @@
  */
 
 import type { Logger } from "@signalscout/engine";
-import { and, eq, isNull, or, sql } from "drizzle-orm";
+import { and, isNull, or, sql } from "drizzle-orm";
 import type { PgBoss } from "pg-boss";
-import { type BillingMode, entitledCondition } from "../billing/index.js";
 import type { Database } from "../db/client.js";
-import { monitors, subscriptions } from "../db/schema.js";
+import { monitors } from "../db/schema.js";
+import { admitEveryone, type EntitlementGate } from "./entitlement.js";
 import { pollQueue } from "./queues.js";
 
 export interface DueMonitor {
   readonly id: string;
   readonly pollIntervalSeconds: number;
+  /** Who the poll is for, so the gate can be asked. */
+  readonly userId: string;
 }
 
 /**
@@ -45,78 +47,67 @@ export interface DueMonitor {
  * in the UI would keep collecting and keep billing, which is the opposite of
  * what a person means when they press it. US-010.
  */
-export async function findDueMonitors(
-  db: Database,
-  /**
-   * Whether this deployment charges. US-072.
-   *
-   * `off` is the default and it is the whole self-hosted behaviour: the join
-   * below is still made and the condition is still true for every row, so the
-   * query a self-hoster runs returns exactly what it returned before billing
-   * existed.
-   *
-   * This is the half of the gate that matters. A route that refuses to write is
-   * what a person sees; this is what stops our hosting, our database and our
-   * compute being spent on an account that stopped paying — and an account
-   * still polling after it cancelled is invisible from every screen.
-   */
-  billing: BillingMode = "off",
-): Promise<DueMonitor[]> {
-  return (
-    db
-      .select({ id: monitors.id, pollIntervalSeconds: monitors.pollIntervalSeconds })
-      .from(monitors)
-      /**
-       * The owner's subscription, or no row.
-       *
-       * A left join and not an inner one, because no row is the normal state:
-       * self-hosted nothing ever writes here, and a hosted instance has accounts
-       * older than the table. `entitledCondition` reads both as entitled.
-       */
-      .leftJoin(subscriptions, eq(subscriptions.userId, monitors.userId))
-      .where(
-        and(
-          billing === "off"
-            ? sql`true`
-            : entitledCondition(sql`${subscriptions.status}`, sql`${subscriptions.trialEndsAt}`),
-          // A monitor that names no source has nothing to poll.
-          sql`cardinality(${monitors.sources}) > 0`,
-          // A paused monitor keeps its history and collects nothing.
-          isNull(monitors.pausedAt),
-          /**
-           * Today, where the monitor lives. US-041.
-           *
-           * `AT TIME ZONE` reads the monitor's own zone, because a person who
-           * chose weekdays meant their weekdays — in UTC a Monday in Kuala Lumpur
-           * starts at 8am on Sunday.
-           */
-          sql`extract(dow from (now() AT TIME ZONE ${monitors.pollTimezone})) = ANY(${monitors.pollDays})`,
-          or(
-            isNull(monitors.lastPolledAt),
-            sql`${monitors.lastPolledAt} + make_interval(secs => ${monitors.pollIntervalSeconds}) <= now()`,
-          ),
+export async function findDueMonitors(db: Database): Promise<DueMonitor[]> {
+  return db
+    .select({
+      id: monitors.id,
+      pollIntervalSeconds: monitors.pollIntervalSeconds,
+      userId: monitors.userId,
+    })
+    .from(monitors)
+    .where(
+      and(
+        // A monitor that names no source has nothing to poll.
+        sql`cardinality(${monitors.sources}) > 0`,
+        // A paused monitor keeps its history and collects nothing.
+        isNull(monitors.pausedAt),
+        /**
+         * Today, where the monitor lives. US-041.
+         *
+         * `AT TIME ZONE` reads the monitor's own zone, because a person who
+         * chose weekdays meant their weekdays — in UTC a Monday in Kuala Lumpur
+         * starts at 8am on Sunday.
+         */
+        sql`extract(dow from (now() AT TIME ZONE ${monitors.pollTimezone})) = ANY(${monitors.pollDays})`,
+        or(
+          isNull(monitors.lastPolledAt),
+          sql`${monitors.lastPolledAt} + make_interval(secs => ${monitors.pollIntervalSeconds}) <= now()`,
         ),
-      )
-  );
+      ),
+    );
 }
 
 export interface TickResult {
   readonly due: number;
+  /** Due monitors whose owner the gate did not admit. Never sent. */
+  readonly refused: number;
   /** Sends that the queue policy turned away because a poll was already in flight. */
   readonly alreadyQueued: number;
 }
 
-/** Send a poll job for every due monitor. One tick of the scheduler. */
+/**
+ * Send a poll job for every due monitor whose owner may poll. One tick of the
+ * scheduler.
+ *
+ * The gate is asked once, with every due owner, before anything is sent. If
+ * it throws, this throws, and nothing was sent: `entitlement.ts` says why
+ * that is the right way round.
+ */
 export async function enqueueDuePolls(
   db: Database,
   boss: PgBoss,
   logger: Logger,
-  billing: BillingMode = "off",
+  entitled: EntitlementGate = admitEveryone,
 ): Promise<TickResult> {
-  const due = await findDueMonitors(db, billing);
+  const due = await findDueMonitors(db);
+  if (due.length === 0) return { due: 0, refused: 0, alreadyQueued: 0 };
+
+  const admitted = await entitled(new Set(due.map((monitor) => monitor.userId)));
+  const sendable = due.filter((monitor) => admitted.has(monitor.userId));
+  const refused = due.length - sendable.length;
   let alreadyQueued = 0;
 
-  for (const monitor of due) {
+  for (const monitor of sendable) {
     // `send` answers null when the queue policy refuses the job. The monitor
     // id as the key is what makes "refuse" mean "this monitor is already
     // being polled".
@@ -132,9 +123,9 @@ export async function enqueueDuePolls(
     }
   }
 
-  const result = { due: due.length, alreadyQueued };
+  const result = { due: due.length, refused, alreadyQueued };
 
-  if (due.length > 0) logger.info(result, "scheduler tick");
+  logger.info(result, "scheduler tick");
 
   return result;
 }

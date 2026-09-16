@@ -16,6 +16,7 @@ export {
   type SubscriptionRecord,
   trialDays,
 } from "./entitlement.js";
+export { subscriptionGate } from "./gate.js";
 export {
   applyStripeSubscription,
   linkStripeCustomer,

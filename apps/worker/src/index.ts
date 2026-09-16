@@ -1,4 +1,10 @@
-import { createLogger, loadEnv, startWorker } from "@signalscout/pipeline";
+import {
+  createDatabase,
+  createLogger,
+  loadEnv,
+  startWorker,
+  subscriptionGate,
+} from "@signalscout/pipeline";
 
 /**
  * The worker as its own process. It runs the same `startWorker` the API runs
@@ -17,21 +23,28 @@ if (env.WORKER_IN_PROCESS) {
 }
 
 const logger = createLogger({ level: env.LOG_LEVEL, name: "worker" });
+// A pool of the gate's own, beside the worker's. The scheduler asks it once a
+// tick which owners may poll, and the answer lives in a table the pipeline
+// does not own.
+const gate = createDatabase(env.DATABASE_URL);
 const handle = await startWorker({
   databaseUrl: env.DATABASE_URL,
   logger,
-  billing: env.BILLING_MODE,
+  entitled: subscriptionGate(gate.db, env.BILLING_MODE),
 });
 
 for (const signal of ["SIGINT", "SIGTERM"] as const) {
   process.once(signal, () => {
     logger.info({ signal }, "shutting down");
-    handle.stop().then(
-      () => process.exit(0),
-      (error: unknown) => {
-        logger.error({ err: error }, "shutdown failed");
-        process.exit(1);
-      },
-    );
+    handle
+      .stop()
+      .then(() => gate.close())
+      .then(
+        () => process.exit(0),
+        (error: unknown) => {
+          logger.error({ err: error }, "shutdown failed");
+          process.exit(1);
+        },
+      );
   });
 }

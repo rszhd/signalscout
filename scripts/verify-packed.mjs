@@ -108,7 +108,7 @@ try {
   const probe = `
     import { createClassifier, builtInSources } from "@signalscout/engine";
     import { pipelineMigrations, runMigrations } from "@signalscout/pipeline";
-    import { createTestDatabase } from "@signalscout/pipeline/testing";
+    import { createTestDatabase, insertMonitor } from "@signalscout/pipeline/testing";
 
     if (typeof createClassifier !== "function") throw new Error("engine: createClassifier is not a function");
     if (builtInSources.length === 0) throw new Error("engine: no built-in sources");
@@ -118,6 +118,8 @@ try {
     // from the tarball's own drizzle/ folder, which is the claim under test.
     const database = await createTestDatabase("packed");
     try {
+      // A consumer's tests insert a monitor through the package. US-157.
+      await insertMonitor(database);
       console.log("migrated " + database.name + " from " + pipelineMigrations.folder);
     } finally {
       await database.drop();

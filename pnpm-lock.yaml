@@ -141,22 +141,6 @@ importers:
         specifier: 8.2.2
         version: 8.2.2(@types/node@26.4.1)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.13)(yaml@2.9.0)
 
-  apps/worker:
-    dependencies:
-      '@signalscout/pipeline':
-        specifier: workspace:*
-        version: link:../../packages/pipeline
-    devDependencies:
-      '@types/node':
-        specifier: 26.4.1
-        version: 26.4.1
-      tsx:
-        specifier: 4.23.13
-        version: 4.23.13
-      typescript:
-        specifier: 7.0.2
-        version: 7.0.2
-
   packages/engine:
     dependencies:
       '@ai-sdk/anthropic':

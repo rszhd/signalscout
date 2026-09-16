@@ -38,7 +38,7 @@ export interface ApiHandle {
  * Start the API, and the worker with it when WORKER_IN_PROCESS is true.
  *
  * The two modes share this one function. A separate worker container runs the
- * same `startWorker` from `apps/worker`, so "in process" and "own container"
+ * same `startWorker` that `worker.ts` runs alone, so "in process" and "own container"
  * differ in where the process boundary falls and in nothing else.
  */
 export async function startApi({

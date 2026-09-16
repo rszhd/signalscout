@@ -48,7 +48,6 @@ const forbidden = [
   "react-router",
   "@signalscout/pipeline",
   "@signalscout/api",
-  "@signalscout/worker",
   "@signalscout/web",
 ];
 

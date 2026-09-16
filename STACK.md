@@ -55,8 +55,8 @@ Three rules follow from these:
 ```
 apps/
   api/          Fastify: REST endpoints, serves the built UI and /admin
+    worker.ts   the same worker as a process of its own
   web/          Vite + React: the intent inbox
-  worker/       pg-boss: collect, filter, classify, replies, notify
 
 packages/
   engine/       stateless: input in, result and cost out

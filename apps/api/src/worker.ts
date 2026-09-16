@@ -7,8 +7,11 @@ import {
 } from "@signalscout/pipeline";
 
 /**
- * The worker as its own process. It runs the same `startWorker` the API runs
- * when WORKER_IN_PROCESS is true, so there is one worker implementation.
+ * The worker as its own process — `node apps/api/dist/worker.js`. It runs the
+ * same `startWorker` the API runs when WORKER_IN_PROCESS is true, so there is
+ * one worker implementation. It lives in this package because what it needs
+ * beyond the pipeline — the settings and the entitlement gate — is this
+ * application's, and US-153 moved both here.
  *
  * Running both at once is a configuration mistake: refuse it rather than let
  * two pollers share a queue by accident.

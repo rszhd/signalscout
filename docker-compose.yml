@@ -155,7 +155,7 @@ services:
   worker:
     profiles: ["worker"]
     image: ${SIGNALSCOUT_IMAGE:-ghcr.io/rszhd/signalscout:latest}
-    command: ["node", "apps/worker/dist/index.js"]
+    command: ["node", "apps/api/dist/worker.js"]
     environment:
       <<: *app-environment
       WORKER_IN_PROCESS: "false"

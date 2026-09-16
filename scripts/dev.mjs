@@ -64,7 +64,7 @@ await run(
     "--kill-others",
     "pnpm --filter @signalscout/api dev",
     "pnpm --filter @signalscout/web dev",
-    "pnpm --filter @signalscout/worker dev",
+    "pnpm --filter @signalscout/api dev:worker",
   ],
   { env },
 );

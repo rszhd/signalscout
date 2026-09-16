@@ -33,13 +33,13 @@ cannot publish.
 
 ## Acceptance
 
-- [ ] `@signalscout/engine` and `@signalscout/pipeline` each list
+- [x] `@signalscout/engine` and `@signalscout/pipeline` each list
       `rszhd/signalscout` / `release.yml` as a trusted publisher on npm.
 - [ ] `release.yml` sets no `NODE_AUTH_TOKEN`; the `NPM_TOKEN` secret is
       deleted from the repository; the token is revoked on npm.
 - [ ] One tag after that publishes both packages, with provenance shown on
       each package page.
-- [ ] `docs/releasing.md`, *Secrets*, says there is none.
+- [x] `docs/releasing.md`, *Secrets*, says there is none.
 
 ## Notes
 
@@ -50,3 +50,4 @@ cannot publish.
 
 - 2026-09-16T18:02+08:00 — Written after the first publish, from what
   npm's token page said.
+- 2026-09-16T21:40+08:00 — Both trusted publishers added on npm through the owner's browser, with `npm publish` allowed so a release needs no promotion step; npm asked the owner to enable 2FA on the account on the way. The workflow drops `NODE_AUTH_TOKEN`; v0.1.2 is the proof, and the secret and the token go once it publishes.

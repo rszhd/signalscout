@@ -1,4 +1,17 @@
 {
   "files": [],
-  "references": [{ "path": "packages/core" }, { "path": "apps/api" }, { "path": "apps/worker" }]
+  "references": [
+    {
+      "path": "packages/engine"
+    },
+    {
+      "path": "packages/core"
+    },
+    {
+      "path": "apps/api"
+    },
+    {
+      "path": "apps/worker"
+    }
+  ]
 }

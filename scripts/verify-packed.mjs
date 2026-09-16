@@ -84,36 +84,22 @@ try {
   }
 
   // --- install into an empty project ----------------------------------------
+  // npm rather than pnpm, on purpose. The pipeline tarball depends on the
+  // engine at an exact version the registry may not have yet — before the
+  // first publish it never has — and npm satisfies that range from the engine
+  // tarball installed beside it without asking the registry. pnpm's override
+  // for the same case worked on one machine and asked the registry on the CI
+  // runner, and a check that passes only where it was written is not a check.
   const project = join(work, "consumer");
-  writeFileSync(
-    join(work, "consumer.package.json"),
-    JSON.stringify(
-      {
-        name: "consumer",
-        private: true,
-        type: "module",
-        dependencies: {
-          "@signalscout/engine": `file:${tarballs.engine}`,
-          "@signalscout/pipeline": `file:${tarballs.pipeline}`,
-        },
-        // The pipeline tarball asks the registry for the engine at an exact
-        // version that may not be published yet. Point it at the tarball.
-        pnpm: { overrides: { "@signalscout/engine": `file:${tarballs.engine}` } },
-      },
-      null,
-      2,
-    ),
-  );
   run("mkdir", ["-p", project]);
-  run("cp", [join(work, "consumer.package.json"), join(project, "package.json")]);
-  run(
-    "pnpm",
-    ["install", "--prefer-offline", "--ignore-workspace", "--config.confirmModulesPurge=false"],
-    {
-      cwd: project,
-      stdio: ["ignore", "inherit", "inherit"],
-    },
+  writeFileSync(
+    join(project, "package.json"),
+    JSON.stringify({ name: "consumer", private: true, type: "module" }, null, 2),
   );
+  run("npm", ["install", "--no-audit", "--no-fund", tarballs.engine, tarballs.pipeline], {
+    cwd: project,
+    stdio: ["ignore", "inherit", "inherit"],
+  });
 
   // --- use them ----------------------------------------------------------------
   const databaseUrl = process.env.TEST_DATABASE_URL ?? process.env.DATABASE_URL;
@@ -143,7 +129,7 @@ try {
     env: { ...process.env, DATABASE_URL: databaseUrl },
   });
   console.log(output);
-  if (!output.includes("/node_modules/@signalscout/pipeline/drizzle")) {
+  if (!output.includes("/consumer/node_modules/@signalscout/pipeline/drizzle")) {
     fail(`migrations came from ${output}, not from the installed package`);
   }
 

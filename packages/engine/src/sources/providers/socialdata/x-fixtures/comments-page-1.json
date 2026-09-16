@@ -1,0 +1,1875 @@
+{
+  "httpStatus": 200,
+  "body": {
+    "tweets": [
+      {
+        "tweet_created_at": "2026-06-29T16:11:07.000000Z",
+        "id": 2071627532865032400,
+        "id_str": "2071627532865032427",
+        "type": "reply",
+        "conversation_id_str": "2064431279383433646",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "@x-user-1 @x-user-2 @x-user-1 First public save of this tweet! \ud83c\udfc6\n\nStats:\n\u2022 42 total saves of meta_alchemist's tweets (ranked #8512)",
+        "source": "<a href=\"https://readwise.io\" rel=\"nofollow\">Readwise DMs</a>",
+        "truncated": false,
+        "in_reply_to_status_id": 2071627148830638300,
+        "in_reply_to_status_id_str": "2071627148830638249",
+        "in_reply_to_user_id": "x-user-3",
+        "in_reply_to_user_id_str": "x-user-4",
+        "in_reply_to_screen_name": "x-user-1",
+        "user": {
+          "id": "x-user-5",
+          "id_str": "x-user-6",
+          "name": "x-user-7",
+          "screen_name": "x-user-8",
+          "location": null,
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 212207,
+          "friends_count": 3202,
+          "listed_count": 1534,
+          "favourites_count": 3030,
+          "statuses_count": 592121,
+          "created_at": "2017-10-17T16:12:02.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-9",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-10",
+          "can_dm": true,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 0,
+        "retweet_count": 0,
+        "favorite_count": 0,
+        "views_count": 23,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "x-user-4",
+              "indices": [
+                0,
+                10
+              ],
+              "name": "x-user-11",
+              "screen_name": "x-user-1"
+            },
+            {
+              "id_str": "x-user-12",
+              "indices": [
+                11,
+                26
+              ],
+              "name": "x-user-13",
+              "screen_name": "x-user-2"
+            },
+            {
+              "id_str": "x-user-4",
+              "indices": [
+                27,
+                37
+              ],
+              "name": "x-user-11",
+              "screen_name": "x-user-1"
+            }
+          ],
+          "display_text_range": [
+            27,
+            139
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-06-10T13:26:47.000000Z",
+        "id": 2064700806893392100,
+        "id_str": "2064700806893392018",
+        "type": "reply",
+        "conversation_id_str": "2064431279383433646",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "@x-user-2 I tried a similar approach for my codebase using Fable 5 Ultracode and twice it has hit the 5h limit. At this rate, it will take a week to audit my code. I guess I could lower the effort level, but...",
+        "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+        "truncated": false,
+        "in_reply_to_status_id": 2064431279383433700,
+        "in_reply_to_status_id_str": "2064431279383433646",
+        "in_reply_to_user_id": "x-user-14",
+        "in_reply_to_user_id_str": "x-user-12",
+        "in_reply_to_screen_name": "x-user-2",
+        "user": {
+          "id": "x-user-15",
+          "id_str": "x-user-15",
+          "name": "x-user-16",
+          "screen_name": "x-user-17",
+          "location": null,
+          "url": "",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 938,
+          "friends_count": 336,
+          "listed_count": 18,
+          "favourites_count": 1515,
+          "statuses_count": 1361,
+          "created_at": "2015-06-22T11:26:47.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-18",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-19",
+          "can_dm": true,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 1,
+        "retweet_count": 0,
+        "favorite_count": 2,
+        "views_count": 1284,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "x-user-12",
+              "indices": [
+                0,
+                15
+              ],
+              "name": "x-user-13",
+              "screen_name": "x-user-2"
+            }
+          ],
+          "display_text_range": [
+            16,
+            216
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-06-10T13:22:22.000000Z",
+        "id": 2064699698196238300,
+        "id_str": "2064699698196238434",
+        "type": "reply",
+        "conversation_id_str": "2064431279383433646",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "@x-user-2 - I created a consolidated version using your prompt, the items I referenced above along with a few other items and the below 'consolidation' prompt to come up with an expanded version and figured I'd share with you for your consideration.\n\nCONSOLIDATION PROMPT:\nAct like an expert prompt engineer, senior system analyst, and director of software engineering and review, analyze, expand, and create an updated, detailed, best in class prompt that combines the below two components and also any additional criteria, validations, verifications, audit components, system considerations, future proofing, or other key items into a single consolidated, comprehensive, cohesive, world class audit\n\nOUTPUT: Google Drive - Markdown File Link (It was too large to paste and X hates documents as attachments)\n\nhttps://t.co/4C9PC2PPZq",
+        "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+        "truncated": false,
+        "in_reply_to_status_id": 2064546310582124500,
+        "in_reply_to_status_id_str": "2064546310582124576",
+        "in_reply_to_user_id": "x-user-20",
+        "in_reply_to_user_id_str": "x-user-21",
+        "in_reply_to_screen_name": "x-user-22",
+        "user": {
+          "id": "x-user-20",
+          "id_str": "x-user-21",
+          "name": "x-user-23",
+          "screen_name": "x-user-22",
+          "location": null,
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": false,
+          "followers_count": 6505,
+          "friends_count": 5524,
+          "listed_count": 15,
+          "favourites_count": 16012,
+          "statuses_count": 8757,
+          "created_at": "2024-03-15T15:24:26.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-24",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-25",
+          "can_dm": false,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 0,
+        "retweet_count": 0,
+        "favorite_count": 2,
+        "views_count": 99,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "x-user-12",
+              "indices": [
+                0,
+                15
+              ],
+              "name": "x-user-13",
+              "screen_name": "x-user-2"
+            },
+            {
+              "id_str": "x-user-12",
+              "indices": [
+                16,
+                31
+              ],
+              "name": "x-user-13",
+              "screen_name": "x-user-2"
+            }
+          ],
+          "hashtags": [],
+          "smarttags": [],
+          "symbols": [],
+          "urls": [
+            {
+              "display_url": "drive.google.com/file/d/1el3442\u2026",
+              "expanded_url": "https://drive.google.com/file/d/1el3442daYnyylxmyKqRwEDm4oZ7PqsPa/view",
+              "indices": [
+                816,
+                839
+              ],
+              "url": "https://t.co/4C9PC2PPZq"
+            }
+          ],
+          "display_text_range": [
+            16,
+            294
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-06-10T13:17:50.000000Z",
+        "id": 2064698555013681700,
+        "id_str": "2064698555013681548",
+        "type": "reply",
+        "conversation_id_str": "2064431279383433646",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "yea i saw your tweet Sammy, and me wanna check whether I was on Fable the whole time when doing this, \n\ni ran 14 audits and never got degraded\n\nhowever saw many cases where people got stopped or got degraded in Fable, especially in biology-related stuff or security audits\n\nbut here with this prompt never got those flags you gotta point out to local repos tho to be safe",
+        "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+        "truncated": false,
+        "in_reply_to_status_id": 2064689666461221000,
+        "in_reply_to_status_id_str": "2064689666461221006",
+        "in_reply_to_user_id": "x-user-26",
+        "in_reply_to_user_id_str": "x-user-26",
+        "in_reply_to_screen_name": "x-user-27",
+        "user": {
+          "id": "x-user-14",
+          "id_str": "x-user-12",
+          "name": "x-user-13",
+          "screen_name": "x-user-2",
+          "location": null,
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 75064,
+          "friends_count": 7197,
+          "listed_count": 839,
+          "favourites_count": 40702,
+          "statuses_count": 38096,
+          "created_at": "2022-05-30T03:13:21.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-28",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-29",
+          "can_dm": true,
+          "affiliation_label": {
+            "label_url": "https://twitter.com/x-user-90",
+            "badge_url": "https://pbs.twimg.com/profile_images/2095828551421616128/IXDiaFs7_bigger.jpg",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "label_type": "BusinessLabel",
+            "display_type": "Badge"
+          }
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 0,
+        "retweet_count": 0,
+        "favorite_count": 3,
+        "views_count": 533,
+        "bookmark_count": 1,
+        "lang": "en",
+        "entities": {
+          "media": [
+            {
+              "allow_download_status": {
+                "allow_download": true
+              },
+              "display_url": "pic.x.com/x-user-91",
+              "expanded_url": "https://x.com/x-user-2/status/2064698555013681548/photo/1",
+              "ext_media_availability": {
+                "status": "Available"
+              },
+              "features": {
+                "large": {
+                  "faces": []
+                },
+                "medium": {
+                  "faces": []
+                },
+                "orig": {
+                  "faces": []
+                },
+                "small": {
+                  "faces": []
+                }
+              },
+              "id_str": "2064697786260713472",
+              "indices": [
+                287,
+                310
+              ],
+              "media_key": "3_2064697786260713472",
+              "media_results": {
+                "result": {
+                  "media_key": "3_2064697786260713472"
+                }
+              },
+              "media_url_https": "https://pbs.twimg.com/media/HKdHsoaa8AAzTBS.png",
+              "original_info": {
+                "focus_rects": [
+                  {
+                    "h": 351,
+                    "w": 627,
+                    "x": 0,
+                    "y": 62
+                  },
+                  {
+                    "h": 413,
+                    "w": 413,
+                    "x": 185,
+                    "y": 0
+                  },
+                  {
+                    "h": 413,
+                    "w": 362,
+                    "x": 210,
+                    "y": 0
+                  },
+                  {
+                    "h": 413,
+                    "w": 207,
+                    "x": 288,
+                    "y": 0
+                  },
+                  {
+                    "h": 413,
+                    "w": 627,
+                    "x": 0,
+                    "y": 0
+                  }
+                ],
+                "height": 413,
+                "width": 627
+              },
+              "sizes": {
+                "large": {
+                  "h": 413,
+                  "resize": "fit",
+                  "w": 627
+                },
+                "medium": {
+                  "h": 413,
+                  "resize": "fit",
+                  "w": 627
+                },
+                "small": {
+                  "h": 413,
+                  "resize": "fit",
+                  "w": 627
+                },
+                "thumb": {
+                  "h": 150,
+                  "resize": "crop",
+                  "w": 150
+                }
+              },
+              "type": "photo",
+              "url": "https://t.co/woYnAXGvTn"
+            }
+          ],
+          "user_mentions": [
+            {
+              "id_str": "x-user-26",
+              "indices": [
+                0,
+                8
+              ],
+              "name": "x-user-27",
+              "screen_name": "x-user-27"
+            }
+          ],
+          "hashtags": [],
+          "smarttags": [],
+          "symbols": [],
+          "urls": [],
+          "display_text_range": [
+            9,
+            286
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-06-10T12:42:31.000000Z",
+        "id": 2064689666461221000,
+        "id_str": "2064689666461221006",
+        "type": "quote",
+        "conversation_id_str": "2064431279383433646",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "@x-user-2 \"claude, tell me the difference between models and make no mistakes\"\n\nmistakes were made in a hallucination it could not control\nhttps://t.co/PxkxjbOprS",
+        "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+        "truncated": false,
+        "in_reply_to_status_id": 2064431279383433700,
+        "in_reply_to_status_id_str": "2064431279383433646",
+        "in_reply_to_user_id": "x-user-14",
+        "in_reply_to_user_id_str": "x-user-12",
+        "in_reply_to_screen_name": "x-user-2",
+        "user": {
+          "id": "x-user-26",
+          "id_str": "x-user-26",
+          "name": "x-user-27",
+          "screen_name": "x-user-27",
+          "location": null,
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 92616,
+          "friends_count": 4181,
+          "listed_count": 3753,
+          "favourites_count": 155849,
+          "statuses_count": 74133,
+          "created_at": "2010-12-07T17:54:04.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-30",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-31",
+          "can_dm": true,
+          "affiliation_label": null
+        },
+        "quoted_status_id": 2064602092375839000,
+        "quoted_status_id_str": "2064602092375838939",
+        "is_quote_status": true,
+        "quoted_status": {
+          "tweet_created_at": "2026-06-10T06:54:31.000000Z",
+          "id": 2064602092375839000,
+          "id_str": "2064602092375838939",
+          "type": "quote",
+          "conversation_id_str": "2064602092375838939",
+          "community_id_str": null,
+          "community_name": null,
+          "text": null,
+          "full_text": "Wait, what?? \n\nIs Anthropic gaslighting us into thinking we are using  Fable 5 when we are actually using Opus 4.8 most of the time??\n\nI get that some categories default to opus 4.8 (cybersecurity, chemistry etc) but this falls outside that scope\n\nWhat is this snake oil salesman tactic??",
+          "source": "<a href=\"http://twitter.com/download/iphone\" rel=\"nofollow\">Twitter for iPhone</a>",
+          "truncated": false,
+          "in_reply_to_status_id": null,
+          "in_reply_to_status_id_str": null,
+          "in_reply_to_user_id": null,
+          "in_reply_to_user_id_str": null,
+          "in_reply_to_screen_name": null,
+          "user": {
+            "id": "x-user-26",
+            "id_str": "x-user-26",
+            "name": "x-user-27",
+            "screen_name": "x-user-27",
+            "location": null,
+            "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "protected": false,
+            "verified": true,
+            "followers_count": 92616,
+            "friends_count": 4181,
+            "listed_count": 3753,
+            "favourites_count": 155849,
+            "statuses_count": 74133,
+            "created_at": "2010-12-07T17:54:04.000000Z",
+            "profile_banner_url": "https://scrubbed.invalid/x-user-30",
+            "profile_image_url_https": "https://scrubbed.invalid/x-user-31",
+            "can_dm": true,
+            "affiliation_label": null
+          },
+          "quoted_status_id": 2064427192273064200,
+          "quoted_status_id_str": "2064427192273064098",
+          "is_quote_status": true,
+          "quoted_status": null,
+          "retweeted_status": null,
+          "quote_count": 3,
+          "reply_count": 53,
+          "retweet_count": 5,
+          "favorite_count": 111,
+          "views_count": 19893,
+          "bookmark_count": 9,
+          "lang": "en",
+          "entities": {
+            "media": [
+              {
+                "allow_download_status": {
+                  "allow_download": true
+                },
+                "display_url": "pic.x.com/x-user-92",
+                "expanded_url": "https://x.com/x-user-27/status/2064602092375838939/photo/1",
+                "ext_media_availability": {
+                  "status": "Available"
+                },
+                "features": {
+                  "large": {
+                    "faces": [
+                      {
+                        "h": 65,
+                        "w": 65,
+                        "x": 142,
+                        "y": 695
+                      }
+                    ]
+                  },
+                  "medium": {
+                    "faces": [
+                      {
+                        "h": 57,
+                        "w": 57,
+                        "x": 125,
+                        "y": 613
+                      }
+                    ]
+                  },
+                  "orig": {
+                    "faces": [
+                      {
+                        "h": 65,
+                        "w": 65,
+                        "x": 142,
+                        "y": 695
+                      }
+                    ]
+                  },
+                  "small": {
+                    "faces": [
+                      {
+                        "h": 32,
+                        "w": 32,
+                        "x": 71,
+                        "y": 347
+                      }
+                    ]
+                  }
+                },
+                "id_str": "2064602086453522432",
+                "indices": [
+                  280,
+                  303
+                ],
+                "media_key": "3_2064602086453522432",
+                "media_results": {
+                  "result": {
+                    "media_key": "3_2064602086453522432"
+                  }
+                },
+                "media_url_https": "https://pbs.twimg.com/media/HKbwqK2XsAAuXVU.jpg",
+                "original_info": {
+                  "focus_rects": [
+                    {
+                      "h": 660,
+                      "w": 1179,
+                      "x": 0,
+                      "y": 246
+                    },
+                    {
+                      "h": 1179,
+                      "w": 1179,
+                      "x": 0,
+                      "y": 0
+                    },
+                    {
+                      "h": 1344,
+                      "w": 1179,
+                      "x": 0,
+                      "y": 0
+                    },
+                    {
+                      "h": 1359,
+                      "w": 680,
+                      "x": 499,
+                      "y": 0
+                    },
+                    {
+                      "h": 1359,
+                      "w": 1179,
+                      "x": 0,
+                      "y": 0
+                    }
+                  ],
+                  "height": 1359,
+                  "width": 1179
+                },
+                "sizes": {
+                  "large": {
+                    "h": 1359,
+                    "resize": "fit",
+                    "w": 1179
+                  },
+                  "medium": {
+                    "h": 1200,
+                    "resize": "fit",
+                    "w": 1041
+                  },
+                  "small": {
+                    "h": 680,
+                    "resize": "fit",
+                    "w": 590
+                  },
+                  "thumb": {
+                    "h": 150,
+                    "resize": "crop",
+                    "w": 150
+                  }
+                },
+                "type": "photo",
+                "url": "https://t.co/yDclzkFiCv"
+              }
+            ],
+            "hashtags": [],
+            "smarttags": [],
+            "symbols": [],
+            "timestamps": [],
+            "urls": [],
+            "user_mentions": [],
+            "display_text_range": [
+              0,
+              279
+            ]
+          },
+          "is_pinned": false
+        },
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 1,
+        "retweet_count": 1,
+        "favorite_count": 3,
+        "views_count": 2528,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "urls": [
+            {
+              "display_url": "x.com/x-user-93/status\u2026",
+              "expanded_url": "https://x.com/x-user-27/status/2064602092375838939?s=20",
+              "indices": [
+                145,
+                168
+              ],
+              "url": "https://t.co/PxkxjbOprS"
+            }
+          ],
+          "user_mentions": [
+            {
+              "id_str": "x-user-12",
+              "indices": [
+                0,
+                15
+              ],
+              "name": "x-user-13",
+              "screen_name": "x-user-2"
+            }
+          ],
+          "display_text_range": [
+            16,
+            168
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-06-10T10:56:31.000000Z",
+        "id": 2064662991149417000,
+        "id_str": "2064662991149416905",
+        "type": "reply",
+        "conversation_id_str": "2064431279383433646",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "@x-user-32 anytime\n\ni did 12 repos on the same audit context window was working fine, make sure you are selecting the 1M Fable\n\nhad no issue with context, so didn't bother splitting stuff tbh",
+        "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+        "truncated": false,
+        "in_reply_to_status_id": 2064652528638197800,
+        "in_reply_to_status_id_str": "2064652528638197830",
+        "in_reply_to_user_id": "x-user-33",
+        "in_reply_to_user_id_str": "x-user-34",
+        "in_reply_to_screen_name": "x-user-32",
+        "user": {
+          "id": "x-user-14",
+          "id_str": "x-user-12",
+          "name": "x-user-13",
+          "screen_name": "x-user-2",
+          "location": null,
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 75064,
+          "friends_count": 7197,
+          "listed_count": 839,
+          "favourites_count": 40702,
+          "statuses_count": 38096,
+          "created_at": "2022-05-30T03:13:21.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-28",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-29",
+          "can_dm": true,
+          "affiliation_label": {
+            "label_url": "https://twitter.com/x-user-90",
+            "badge_url": "https://pbs.twimg.com/profile_images/2095828551421616128/IXDiaFs7_bigger.jpg",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "label_type": "BusinessLabel",
+            "display_type": "Badge"
+          }
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 2,
+        "retweet_count": 0,
+        "favorite_count": 2,
+        "views_count": 1164,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "x-user-34",
+              "indices": [
+                0,
+                8
+              ],
+              "name": "x-user-35",
+              "screen_name": "x-user-32"
+            }
+          ],
+          "display_text_range": [
+            9,
+            189
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-06-10T10:14:56.000000Z",
+        "id": 2064652528638197800,
+        "id_str": "2064652528638197830",
+        "type": "reply",
+        "conversation_id_str": "2064431279383433646",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "Interesting breakdown. I\u2019ve been testing similar prompts with Claude for repo analysis, but I noticed it starts hallucinating once the context window gets too crowded. Have you tried splitting the analysis into smaller chunks and then merging the results? Works better for me, especially when dealing with messy codebases. Still, solid framework - gonna steal a few ideas from this. Thanks for sharing.",
+        "source": "<a href=\"http://twitter.com/download/iphone\" rel=\"nofollow\">Twitter for iPhone</a>",
+        "truncated": false,
+        "in_reply_to_status_id": 2064431279383433700,
+        "in_reply_to_status_id_str": "2064431279383433646",
+        "in_reply_to_user_id": "x-user-14",
+        "in_reply_to_user_id_str": "x-user-12",
+        "in_reply_to_screen_name": "x-user-2",
+        "user": {
+          "id": "x-user-33",
+          "id_str": "x-user-34",
+          "name": "x-user-35",
+          "screen_name": "x-user-32",
+          "location": null,
+          "url": "",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": false,
+          "followers_count": 1,
+          "friends_count": 25,
+          "listed_count": 0,
+          "favourites_count": 97,
+          "statuses_count": 60,
+          "created_at": "2026-06-08T15:45:04.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-36",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-37",
+          "can_dm": true,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 1,
+        "retweet_count": 0,
+        "favorite_count": 2,
+        "views_count": 1351,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "x-user-12",
+              "indices": [
+                0,
+                15
+              ],
+              "name": "x-user-13",
+              "screen_name": "x-user-2"
+            }
+          ],
+          "hashtags": [],
+          "smarttags": [],
+          "symbols": [],
+          "urls": [],
+          "display_text_range": [
+            16,
+            292
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-06-10T10:08:37.000000Z",
+        "id": 2064650937030128000,
+        "id_str": "2064650937030128078",
+        "type": "reply",
+        "conversation_id_str": "2064431279383433646",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "@x-user-2 everyone now working only with Fable 5",
+        "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+        "truncated": false,
+        "in_reply_to_status_id": 2064431279383433700,
+        "in_reply_to_status_id_str": "2064431279383433646",
+        "in_reply_to_user_id": "x-user-14",
+        "in_reply_to_user_id_str": "x-user-12",
+        "in_reply_to_screen_name": "x-user-2",
+        "user": {
+          "id": "x-user-38",
+          "id_str": "x-user-38",
+          "name": "x-user-39",
+          "screen_name": "x-user-40",
+          "location": null,
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 51000,
+          "friends_count": 4250,
+          "listed_count": 834,
+          "favourites_count": 82048,
+          "statuses_count": 74440,
+          "created_at": "2009-03-13T17:15:58.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-41",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-42",
+          "can_dm": true,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 2,
+        "retweet_count": 0,
+        "favorite_count": 2,
+        "views_count": 383,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "x-user-12",
+              "indices": [
+                0,
+                15
+              ],
+              "name": "x-user-13",
+              "screen_name": "x-user-2"
+            }
+          ],
+          "display_text_range": [
+            16,
+            54
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-06-10T06:53:10.000000Z",
+        "id": 2064601752222216400,
+        "id_str": "2064601752222216530",
+        "type": "reply",
+        "conversation_id_str": "2064431279383433646",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "@x-user-2 I literally did first thing as it went live. Some great insight it produced.",
+        "source": "<a href=\"http://twitter.com/download/iphone\" rel=\"nofollow\">Twitter for iPhone</a>",
+        "truncated": false,
+        "in_reply_to_status_id": 2064431279383433700,
+        "in_reply_to_status_id_str": "2064431279383433646",
+        "in_reply_to_user_id": "x-user-14",
+        "in_reply_to_user_id_str": "x-user-12",
+        "in_reply_to_screen_name": "x-user-2",
+        "user": {
+          "id": "x-user-43",
+          "id_str": "x-user-43",
+          "name": "x-user-44",
+          "screen_name": "x-user-45",
+          "location": null,
+          "url": "",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 278,
+          "friends_count": 99,
+          "listed_count": 6,
+          "favourites_count": 1589,
+          "statuses_count": 2150,
+          "created_at": "2009-04-28T01:04:16.000000Z",
+          "profile_banner_url": "",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-46",
+          "can_dm": true,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 1,
+        "retweet_count": 0,
+        "favorite_count": 2,
+        "views_count": 1380,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "x-user-12",
+              "indices": [
+                0,
+                15
+              ],
+              "name": "x-user-13",
+              "screen_name": "x-user-2"
+            }
+          ],
+          "display_text_range": [
+            16,
+            92
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-06-10T06:26:49.000000Z",
+        "id": 2064595119995789600,
+        "id_str": "2064595119995789629",
+        "type": "reply",
+        "conversation_id_str": "2064431279383433646",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "@x-user-2 This is good by itself but if you couple it with Graphify, it's REALLY good",
+        "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+        "truncated": false,
+        "in_reply_to_status_id": 2064431279383433700,
+        "in_reply_to_status_id_str": "2064431279383433646",
+        "in_reply_to_user_id": "x-user-14",
+        "in_reply_to_user_id_str": "x-user-12",
+        "in_reply_to_screen_name": "x-user-2",
+        "user": {
+          "id": "x-user-47",
+          "id_str": "x-user-47",
+          "name": "x-user-48",
+          "screen_name": "x-user-49",
+          "location": null,
+          "url": "",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 24,
+          "friends_count": 286,
+          "listed_count": 1,
+          "favourites_count": 269,
+          "statuses_count": 1008,
+          "created_at": "2010-12-16T17:11:52.000000Z",
+          "profile_banner_url": "",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-50",
+          "can_dm": true,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 1,
+        "retweet_count": 0,
+        "favorite_count": 3,
+        "views_count": 1910,
+        "bookmark_count": 8,
+        "lang": "en",
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "x-user-12",
+              "indices": [
+                0,
+                15
+              ],
+              "name": "x-user-13",
+              "screen_name": "x-user-2"
+            }
+          ],
+          "display_text_range": [
+            16,
+            91
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-06-10T06:14:33.000000Z",
+        "id": 2064592031809438000,
+        "id_str": "2064592031809437997",
+        "type": "reply",
+        "conversation_id_str": "2064431279383433646",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "@x-user-51 Yup, first and foremost if you get the best to do this, then you can handle the individual tasks with lesser frontier models\n\nThe thinking and ability to connect the dots, see what can be improved should be left to the best model if you can get a hand on it tho",
+        "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+        "truncated": false,
+        "in_reply_to_status_id": 2064583028890800600,
+        "in_reply_to_status_id_str": "2064583028890800581",
+        "in_reply_to_user_id": "x-user-52",
+        "in_reply_to_user_id_str": "x-user-52",
+        "in_reply_to_screen_name": "x-user-51",
+        "user": {
+          "id": "x-user-14",
+          "id_str": "x-user-12",
+          "name": "x-user-13",
+          "screen_name": "x-user-2",
+          "location": null,
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 75064,
+          "friends_count": 7197,
+          "listed_count": 839,
+          "favourites_count": 40702,
+          "statuses_count": 38096,
+          "created_at": "2022-05-30T03:13:21.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-28",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-29",
+          "can_dm": true,
+          "affiliation_label": {
+            "label_url": "https://twitter.com/x-user-90",
+            "badge_url": "https://pbs.twimg.com/profile_images/2095828551421616128/IXDiaFs7_bigger.jpg",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "label_type": "BusinessLabel",
+            "display_type": "Badge"
+          }
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 0,
+        "retweet_count": 0,
+        "favorite_count": 2,
+        "views_count": 2109,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "x-user-52",
+              "indices": [
+                0,
+                12
+              ],
+              "name": "x-user-53",
+              "screen_name": "x-user-51"
+            }
+          ],
+          "display_text_range": [
+            13,
+            274
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-06-10T06:10:05.000000Z",
+        "id": 2064590909459907000,
+        "id_str": "2064590909459906969",
+        "type": "reply",
+        "conversation_id_str": "2064431279383433646",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "@x-user-54 are you working on training of any kind, because they have guardrails for that, so others dont use their models for machine learning or training stuff",
+        "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+        "truncated": false,
+        "in_reply_to_status_id": 2064582595443044600,
+        "in_reply_to_status_id_str": "2064582595443044575",
+        "in_reply_to_user_id": "x-user-55",
+        "in_reply_to_user_id_str": "x-user-55",
+        "in_reply_to_screen_name": "x-user-54",
+        "user": {
+          "id": "x-user-14",
+          "id_str": "x-user-12",
+          "name": "x-user-13",
+          "screen_name": "x-user-2",
+          "location": null,
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 75064,
+          "friends_count": 7197,
+          "listed_count": 839,
+          "favourites_count": 40702,
+          "statuses_count": 38096,
+          "created_at": "2022-05-30T03:13:21.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-28",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-29",
+          "can_dm": true,
+          "affiliation_label": {
+            "label_url": "https://twitter.com/x-user-90",
+            "badge_url": "https://pbs.twimg.com/profile_images/2095828551421616128/IXDiaFs7_bigger.jpg",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "label_type": "BusinessLabel",
+            "display_type": "Badge"
+          }
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 1,
+        "retweet_count": 0,
+        "favorite_count": 1,
+        "views_count": 1554,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "x-user-55",
+              "indices": [
+                0,
+                8
+              ],
+              "name": "x-user-56",
+              "screen_name": "x-user-54"
+            }
+          ],
+          "display_text_range": [
+            9,
+            159
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-06-10T05:38:46.000000Z",
+        "id": 2064583028890800600,
+        "id_str": "2064583028890800581",
+        "type": "reply",
+        "conversation_id_str": "2064431279383433646",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "This is exactly the right use case for frontier models.\n\nNot \u201cwrite me some code\u201d.\n\nMore like: look at the whole system, understand the intent, find the weak spots, show me the trade-offs, and tell me what to fix first.\n\nThe key line is this:\n\nGround every claim in actual files.\n\nThat is the difference between useful AI engineering and confident nonsense.",
+        "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+        "truncated": false,
+        "in_reply_to_status_id": 2064431279383433700,
+        "in_reply_to_status_id_str": "2064431279383433646",
+        "in_reply_to_user_id": "x-user-14",
+        "in_reply_to_user_id_str": "x-user-12",
+        "in_reply_to_screen_name": "x-user-2",
+        "user": {
+          "id": "x-user-52",
+          "id_str": "x-user-52",
+          "name": "x-user-53",
+          "screen_name": "x-user-51",
+          "location": null,
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 271340,
+          "friends_count": 109204,
+          "listed_count": 3315,
+          "favourites_count": 310980,
+          "statuses_count": 388945,
+          "created_at": "2007-03-20T12:37:26.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-57",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-58",
+          "can_dm": true,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 1,
+        "retweet_count": 0,
+        "favorite_count": 4,
+        "views_count": 2505,
+        "bookmark_count": 2,
+        "lang": "en",
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "x-user-12",
+              "indices": [
+                0,
+                15
+              ],
+              "name": "x-user-13",
+              "screen_name": "x-user-2"
+            }
+          ],
+          "hashtags": [],
+          "smarttags": [],
+          "symbols": [],
+          "urls": [],
+          "display_text_range": [
+            16,
+            295
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-06-10T05:37:03.000000Z",
+        "id": 2064582595443044600,
+        "id_str": "2064582595443044575",
+        "type": "reply",
+        "conversation_id_str": "2064431279383433646",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "@x-user-2 it doesn't want to audit my own repo lmao https://t.co/QyiGcU1hXM",
+        "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+        "truncated": false,
+        "in_reply_to_status_id": 2064431279383433700,
+        "in_reply_to_status_id_str": "2064431279383433646",
+        "in_reply_to_user_id": "x-user-14",
+        "in_reply_to_user_id_str": "x-user-12",
+        "in_reply_to_screen_name": "x-user-2",
+        "user": {
+          "id": "x-user-55",
+          "id_str": "x-user-55",
+          "name": "x-user-56",
+          "screen_name": "x-user-54",
+          "location": null,
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 14882,
+          "friends_count": 3295,
+          "listed_count": 370,
+          "favourites_count": 87224,
+          "statuses_count": 45446,
+          "created_at": "2012-09-28T19:46:40.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-59",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-60",
+          "can_dm": true,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 1,
+        "retweet_count": 0,
+        "favorite_count": 7,
+        "views_count": 1817,
+        "bookmark_count": 1,
+        "lang": "en",
+        "entities": {
+          "media": [
+            {
+              "allow_download_status": {
+                "allow_download": true
+              },
+              "display_url": "pic.x.com/x-user-94",
+              "expanded_url": "https://x.com/x-user-54/status/2064582595443044575/photo/1",
+              "ext_media_availability": {
+                "status": "Available"
+              },
+              "features": {
+                "large": {
+                  "faces": []
+                },
+                "medium": {
+                  "faces": []
+                },
+                "orig": {
+                  "faces": []
+                },
+                "small": {
+                  "faces": []
+                }
+              },
+              "id_str": "2064582525372997632",
+              "indices": [
+                58,
+                81
+              ],
+              "media_key": "3_2064582525372997632",
+              "media_results": {
+                "result": {
+                  "media_key": "3_2064582525372997632"
+                }
+              },
+              "media_url_https": "https://pbs.twimg.com/media/HKbe3kJWIAAuEa3.png",
+              "original_info": {
+                "focus_rects": [
+                  {
+                    "h": 201,
+                    "w": 359,
+                    "x": 0,
+                    "y": 0
+                  },
+                  {
+                    "h": 201,
+                    "w": 201,
+                    "x": 0,
+                    "y": 0
+                  },
+                  {
+                    "h": 201,
+                    "w": 176,
+                    "x": 9,
+                    "y": 0
+                  },
+                  {
+                    "h": 201,
+                    "w": 101,
+                    "x": 47,
+                    "y": 0
+                  },
+                  {
+                    "h": 201,
+                    "w": 781,
+                    "x": 0,
+                    "y": 0
+                  }
+                ],
+                "height": 201,
+                "width": 781
+              },
+              "sizes": {
+                "large": {
+                  "h": 201,
+                  "resize": "fit",
+                  "w": 781
+                },
+                "medium": {
+                  "h": 201,
+                  "resize": "fit",
+                  "w": 781
+                },
+                "small": {
+                  "h": 175,
+                  "resize": "fit",
+                  "w": 680
+                },
+                "thumb": {
+                  "h": 150,
+                  "resize": "crop",
+                  "w": 150
+                }
+              },
+              "type": "photo",
+              "url": "https://t.co/QyiGcU1hXM"
+            }
+          ],
+          "user_mentions": [
+            {
+              "id_str": "x-user-12",
+              "indices": [
+                0,
+                15
+              ],
+              "name": "x-user-13",
+              "screen_name": "x-user-2"
+            }
+          ],
+          "display_text_range": [
+            16,
+            57
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-06-10T04:04:49.000000Z",
+        "id": 2064559385947361300,
+        "id_str": "2064559385947361373",
+        "type": "reply",
+        "conversation_id_str": "2064431279383433646",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "@x-user-2 are we still doing the \"you are a world-class principal-level software engineer and technical auditor\" thing? that's so 2025",
+        "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+        "truncated": false,
+        "in_reply_to_status_id": 2064431279383433700,
+        "in_reply_to_status_id_str": "2064431279383433646",
+        "in_reply_to_user_id": "x-user-14",
+        "in_reply_to_user_id_str": "x-user-12",
+        "in_reply_to_screen_name": "x-user-2",
+        "user": {
+          "id": "x-user-61",
+          "id_str": "x-user-61",
+          "name": "x-user-62",
+          "screen_name": "x-user-63",
+          "location": null,
+          "url": "",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 26851,
+          "friends_count": 5396,
+          "listed_count": 103,
+          "favourites_count": 94682,
+          "statuses_count": 56597,
+          "created_at": "2009-03-16T21:48:41.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-64",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-65",
+          "can_dm": true,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 0,
+        "retweet_count": 0,
+        "favorite_count": 2,
+        "views_count": 809,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "x-user-12",
+              "indices": [
+                0,
+                15
+              ],
+              "name": "x-user-13",
+              "screen_name": "x-user-2"
+            }
+          ],
+          "display_text_range": [
+            16,
+            140
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-06-10T03:15:22.000000Z",
+        "id": 2064546940084261400,
+        "id_str": "2064546940084261306",
+        "type": "reply",
+        "conversation_id_str": "2064431279383433646",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "@x-user-2 Anyone who puts \"you are a world class engineer\" at the start of a prompt hasn't moved on from Sonnet 3.5",
+        "source": "<a href=\"http://twitter.com/download/android\" rel=\"nofollow\">Twitter for Android</a>",
+        "truncated": false,
+        "in_reply_to_status_id": 2064431279383433700,
+        "in_reply_to_status_id_str": "2064431279383433646",
+        "in_reply_to_user_id": "x-user-14",
+        "in_reply_to_user_id_str": "x-user-12",
+        "in_reply_to_screen_name": "x-user-2",
+        "user": {
+          "id": "x-user-66",
+          "id_str": "x-user-67",
+          "name": "x-user-68",
+          "screen_name": "x-user-69",
+          "location": null,
+          "url": "",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 63,
+          "friends_count": 364,
+          "listed_count": 1,
+          "favourites_count": 364,
+          "statuses_count": 725,
+          "created_at": "2025-09-21T07:30:47.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-70",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-71",
+          "can_dm": false,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 0,
+        "retweet_count": 0,
+        "favorite_count": 3,
+        "views_count": 150,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "x-user-12",
+              "indices": [
+                0,
+                15
+              ],
+              "name": "x-user-13",
+              "screen_name": "x-user-2"
+            }
+          ],
+          "display_text_range": [
+            16,
+            121
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-06-10T03:12:52.000000Z",
+        "id": 2064546310582124500,
+        "id_str": "2064546310582124576",
+        "type": "reply",
+        "conversation_id_str": "2064431279383433646",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "Pretty solid direction, I\u2019d also include having it identify drift / technical debt & remediation plans, current state topology / logical & reference architecture with recommendations on changes and opportunities for enhancement and/or refactoring, database schema / structure / improvements based on best practices, incorporating Post Quantum readiness to the build, a complete security sweep including (as you mentioned) key rotation & handling but also headers / ddos motivation, penetration testing / vulnerabilities / PII & GDPR handling, and yeah\u2026.i could probably go on for awhile.",
+        "source": "<a href=\"http://twitter.com/download/iphone\" rel=\"nofollow\">Twitter for iPhone</a>",
+        "truncated": false,
+        "in_reply_to_status_id": 2064431279383433700,
+        "in_reply_to_status_id_str": "2064431279383433646",
+        "in_reply_to_user_id": "x-user-14",
+        "in_reply_to_user_id_str": "x-user-12",
+        "in_reply_to_screen_name": "x-user-2",
+        "user": {
+          "id": "x-user-20",
+          "id_str": "x-user-21",
+          "name": "x-user-23",
+          "screen_name": "x-user-22",
+          "location": null,
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": false,
+          "followers_count": 6505,
+          "friends_count": 5524,
+          "listed_count": 15,
+          "favourites_count": 16012,
+          "statuses_count": 8757,
+          "created_at": "2024-03-15T15:24:26.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-24",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-25",
+          "can_dm": false,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 1,
+        "retweet_count": 0,
+        "favorite_count": 2,
+        "views_count": 198,
+        "bookmark_count": 2,
+        "lang": "en",
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "x-user-12",
+              "indices": [
+                0,
+                15
+              ],
+              "name": "x-user-13",
+              "screen_name": "x-user-2"
+            }
+          ],
+          "hashtags": [],
+          "smarttags": [],
+          "symbols": [],
+          "urls": [],
+          "display_text_range": [
+            16,
+            301
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-06-10T01:36:00.000000Z",
+        "id": 2064521931161010400,
+        "id_str": "2064521931161010492",
+        "type": "reply",
+        "conversation_id_str": "2064431279383433646",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "@x-user-2 Thanks bro. This was already my plan and your prompt my my life 10x easier.",
+        "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+        "truncated": false,
+        "in_reply_to_status_id": 2064431279383433700,
+        "in_reply_to_status_id_str": "2064431279383433646",
+        "in_reply_to_user_id": "x-user-14",
+        "in_reply_to_user_id_str": "x-user-12",
+        "in_reply_to_screen_name": "x-user-2",
+        "user": {
+          "id": "x-user-72",
+          "id_str": "x-user-73",
+          "name": "x-user-74",
+          "screen_name": "x-user-75",
+          "location": null,
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": false,
+          "followers_count": 701,
+          "friends_count": 377,
+          "listed_count": 2,
+          "favourites_count": 1239,
+          "statuses_count": 1840,
+          "created_at": "2024-02-22T15:29:56.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-76",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-77",
+          "can_dm": true,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 1,
+        "retweet_count": 0,
+        "favorite_count": 2,
+        "views_count": 927,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "x-user-12",
+              "indices": [
+                0,
+                15
+              ],
+              "name": "x-user-13",
+              "screen_name": "x-user-2"
+            }
+          ],
+          "display_text_range": [
+            16,
+            91
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-06-10T01:23:48.000000Z",
+        "id": 2064518862914142500,
+        "id_str": "2064518862914142501",
+        "type": "reply",
+        "conversation_id_str": "2064431279383433646",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "@x-user-2 insane prompt",
+        "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+        "truncated": false,
+        "in_reply_to_status_id": 2064431279383433700,
+        "in_reply_to_status_id_str": "2064431279383433646",
+        "in_reply_to_user_id": "x-user-14",
+        "in_reply_to_user_id_str": "x-user-12",
+        "in_reply_to_screen_name": "x-user-2",
+        "user": {
+          "id": "x-user-78",
+          "id_str": "x-user-79",
+          "name": "x-user-80",
+          "screen_name": "x-user-81",
+          "location": null,
+          "url": "",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 15067,
+          "friends_count": 1159,
+          "listed_count": 51,
+          "favourites_count": 80055,
+          "statuses_count": 18508,
+          "created_at": "2017-11-28T19:01:08.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-82",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-83",
+          "can_dm": true,
+          "affiliation_label": {
+            "label_url": "https://twitter.com/x-user-95",
+            "badge_url": "https://pbs.twimg.com/profile_images/1976372462079324160/wYzq3DXH_bigger.jpg",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "label_type": "BusinessLabel",
+            "display_type": "Badge"
+          }
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 1,
+        "retweet_count": 0,
+        "favorite_count": 3,
+        "views_count": 942,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "x-user-12",
+              "indices": [
+                0,
+                15
+              ],
+              "name": "x-user-13",
+              "screen_name": "x-user-2"
+            }
+          ],
+          "display_text_range": [
+            16,
+            29
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-06-10T01:22:25.000000Z",
+        "id": 2064518514145473000,
+        "id_str": "2064518514145473008",
+        "type": "reply",
+        "conversation_id_str": "2064431279383433646",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "Very supportive! \ud83d\udd25\n\nThis is one of the smartest ways to utilise Claude Fable 5 right now.\n\nThe model is very powerful, but the rate limit is strict. So instead of directly telling \u201cmake a new feature\u201d or \u201crefactor this\u201d, it is more effective to give an in-depth audit first + a structured improvement plan. This prompt makes AI work systematically, evidence-based, and actionable \u2014 not just theory.\n\nEspecially for those who have important repo (side project, startup codebase, or internal tool), this can be a game changer. Immediately increase the quality of the codebase, security, and maintainability without having to think from scratch.\n\nAdditional tips from me:\n\n\u2022 Start from the most critical repo first (the one that makes money or core product).\n\n\u2022 Save the audit output as Markdown, so that it is easy to review with the team.\n\n\u2022 After the audit is completed, then use Fable (or other models) to execute task by task.\n\nThank you @x-user-2 for sharing this high quality prompt. The more people who use this level of prompt engineering, the faster we all level up.\n\nWho has tried it? What is the result? Please share it! \ud83d\ude80",
+        "source": "<a href=\"http://twitter.com/download/iphone\" rel=\"nofollow\">Twitter for iPhone</a>",
+        "truncated": false,
+        "in_reply_to_status_id": 2064431279383433700,
+        "in_reply_to_status_id_str": "2064431279383433646",
+        "in_reply_to_user_id": "x-user-14",
+        "in_reply_to_user_id_str": "x-user-12",
+        "in_reply_to_screen_name": "x-user-2",
+        "user": {
+          "id": "x-user-84",
+          "id_str": "x-user-85",
+          "name": "x-user-86",
+          "screen_name": "x-user-87",
+          "location": null,
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 469118,
+          "friends_count": 8516,
+          "listed_count": 811,
+          "favourites_count": 170587,
+          "statuses_count": 185354,
+          "created_at": "2022-10-11T08:46:24.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-88",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-89",
+          "can_dm": true,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 0,
+        "retweet_count": 0,
+        "favorite_count": 2,
+        "views_count": 516,
+        "bookmark_count": 2,
+        "lang": "en",
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "x-user-12",
+              "indices": [
+                940,
+                955
+              ],
+              "name": "x-user-13",
+              "screen_name": "x-user-2"
+            }
+          ],
+          "hashtags": [],
+          "smarttags": [],
+          "symbols": [],
+          "urls": [],
+          "display_text_range": [
+            16,
+            293
+          ]
+        },
+        "is_pinned": false
+      }
+    ],
+    "next_cursor": "2064518514145473007"
+  }
+}

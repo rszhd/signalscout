@@ -27,6 +27,16 @@ const apiBase = "https://api.socialdata.tools";
 export const endpoints = {
   search: `${apiBase}/twitter/search`,
   balance: `${apiBase}/user/balance`,
+  /**
+   * The replies under one post. US-159.
+   *
+   * The post id is in the path rather than in a parameter, which is why this
+   * is a function where its two neighbours are strings. The endpoint was found
+   * by asking for it: this path answers 200 with `{ tweets, next_cursor }`
+   * where an invented path answers 404 and costs nothing, so the probe that
+   * established it was free.
+   */
+  comments: (postId: string) => `${apiBase}/twitter/tweets/${postId}/comments`,
 } as const;
 
 /**
@@ -206,6 +216,37 @@ export class SocialDataClient {
    */
   async fetchPage(params: Record<string, string>, signal?: AbortSignal): Promise<Page> {
     const answer = await this.call(endpoints.search, params, signal);
+
+    if (answer.httpStatus !== 200) throw this.fail(answer);
+
+    const body = objectOf(answer.body) ?? {};
+    const records = Array.isArray(body.tweets) ? body.tweets : [];
+    const after = text(body.next_cursor);
+
+    return {
+      records,
+      ...(after ? { after } : {}),
+      tweetsReturned: records.length,
+    };
+  }
+
+  /**
+   * Fetch one page of the replies under a post.
+   *
+   * The same envelope as a search — `tweets` and `next_cursor` — and the same
+   * price: twenty replies moved the balance by $0.0040 on 2026-09-17, which is
+   * the 200 micro-dollars a tweet this provider charges for anything.
+   *
+   * It is a second method rather than a parameter because the post id is in
+   * the path, and a client that built its own URLs from a record's fields is
+   * how a connector ends up asking for something nobody captured.
+   */
+  async fetchReplyPage(
+    postId: string,
+    params: Record<string, string>,
+    signal?: AbortSignal,
+  ): Promise<Page> {
+    const answer = await this.call(endpoints.comments(postId), params, signal);
 
     if (answer.httpStatus !== 200) throw this.fail(answer);
 

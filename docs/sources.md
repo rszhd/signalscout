@@ -304,6 +304,35 @@ A connector reports `unitsConsumed` in its own unit and the budget guard prices
 it from the connector's own `pricePerUnitMicros`. Nothing downstream reads the
 table above.
 
+### Who reads replies
+
+Every offered connector reads replies since US-159, and no two of them read
+them the same way. The table is what a person choosing a provider is really
+choosing, measured on 2026-09-17 unless a row says otherwise.
+
+| Platform | Provider | One reply call buys | Price | Ordered | Nested | Completeness claim |
+|---|---|---|---|---|---|---|
+| Reddit | ScrapeCreators | a page of ~25, flat | 1 credit, $0.00188 | no | `parent_id` | **wrong**: `has_more: false` with 33 of 58 missing (US-020) |
+| Reddit | SocialCrawl | **the whole thread**, 34 of 34 five levels deep, no cursor | 5 credits, $0.0406 | no | `parent_id`, tree flattened | `truncated: false` — the one claim measured right |
+| X | SocialCrawl | a page of ~28 | 1 credit, $0.0081 | no | `parent_id` | wrong: cursor to an empty page, refunded (US-020) |
+| X | SocialData | a page of 20 | 20 tweets, $0.0040 | **newest first** — the only reply endpoint that may stop early | `in_reply_to_status_id_str`; `conversation_id_str` checks the thread | cursor followed to 20 more; one overlapped |
+| YouTube | SocialCrawl | a page of ~51 | 1 credit, $0.0081 | newest first, on an exact timestamp | `parent_id` | consistent with `total` on one thread (US-020) |
+| YouTube | ScrapeCreators | a page of 20 | 1 credit, $0.00188 | **no — `order` is ignored**: `top` and `newest` answered the same page | none on the wire; nested replies behind their own token, unread | `continuationToken` pages, no overlap |
+| TikTok | ScrapeCreators | a page of ~11 | 1 credit, $0.00188 | no | `reply_id` | `reply_comment_total` beside a couple of replies (US-119) |
+| TikTok | SocialCrawl | a page of up to 50 | 1 credit, $0.0081 | no | `parent_id` | (US-044) |
+| Instagram | SocialCrawl | a page of 15 | 5 credits, $0.0406 | no | `parent_id` | wrong: `has_more: true` beside an empty page (US-049) |
+| LinkedIn | Apify | up to 10 top-level comments, replies nested beside them | $0.002 a comment, the post price | no | from the tree — no parent id on the wire | none: `maxItems` is the only bound |
+
+Three rows carry a warning the connector's own header repeats. ScrapeCreators
+YouTube computes every comment's date from "4 years ago" and marks every reply
+approximate — it exists so an instance with only that key is not given nothing,
+and `socialcrawl/youtube.ts` stays the better choice. SocialCrawl Reddit is
+twenty-two times the price of ScrapeCreators on the median twelve-comment
+thread, which the cheap one finishes too; it earns its five credits only on a
+busy thread the cheap one cannot finish. And the Apify comments actor is the
+one reply call that waits inside the job rather than handing the wait back,
+because the replies worker takes only `ready` or `done`.
+
 ---
 
 ## Switching a connector off
@@ -469,9 +498,11 @@ had already started: 25 threads bought, nothing stored. A post found today can
 carry comments from 2015, and `posts.replies_read_at` is the only mark that
 says how much of one we hold.
 
-Apply it yourself, and say so in the connector. Two of the four providers offer
-no date parameter on a comment endpoint at all, so the cut is ours in every
-case and the bill is the same either way.
+Apply it yourself, and say so in the connector. Apify's LinkedIn comments actor
+is the one comment endpoint here with a date parameter — `postedLimit`, a named
+range — and the exact cut is still ours there too, because a named range is not
+a timestamp. Everywhere else the provider offers nothing, and the bill is the
+same either way.
 
 ---
 

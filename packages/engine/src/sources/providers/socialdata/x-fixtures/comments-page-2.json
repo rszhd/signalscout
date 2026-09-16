@@ -1,0 +1,1464 @@
+{
+  "httpStatus": 200,
+  "body": {
+    "tweets": [
+      {
+        "tweet_created_at": "2026-06-10T01:22:25.000000Z",
+        "id": 2064518514145473000,
+        "id_str": "2064518514145473008",
+        "type": "reply",
+        "conversation_id_str": "2064431279383433646",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "Very supportive! \ud83d\udd25\n\nThis is one of the smartest ways to utilise Claude Fable 5 right now.\n\nThe model is very powerful, but the rate limit is strict. So instead of directly telling \u201cmake a new feature\u201d or \u201crefactor this\u201d, it is more effective to give an in-depth audit first + a structured improvement plan. This prompt makes AI work systematically, evidence-based, and actionable \u2014 not just theory.\n\nEspecially for those who have important repo (side project, startup codebase, or internal tool), this can be a game changer. Immediately increase the quality of the codebase, security, and maintainability without having to think from scratch.\n\nAdditional tips from me:\n\n\u2022 Start from the most critical repo first (the one that makes money or core product).\n\n\u2022 Save the audit output as Markdown, so that it is easy to review with the team.\n\n\u2022 After the audit is completed, then use Fable (or other models) to execute task by task.\n\nThank you @x-user-1 for sharing this high quality prompt. The more people who use this level of prompt engineering, the faster we all level up.\n\nWho has tried it? What is the result? Please share it! \ud83d\ude80",
+        "source": "<a href=\"http://twitter.com/download/iphone\" rel=\"nofollow\">Twitter for iPhone</a>",
+        "truncated": false,
+        "in_reply_to_status_id": 2064431279383433700,
+        "in_reply_to_status_id_str": "2064431279383433646",
+        "in_reply_to_user_id": "x-user-2",
+        "in_reply_to_user_id_str": "x-user-3",
+        "in_reply_to_screen_name": "x-user-1",
+        "user": {
+          "id": "x-user-4",
+          "id_str": "x-user-5",
+          "name": "x-user-6",
+          "screen_name": "x-user-7",
+          "location": null,
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 469120,
+          "friends_count": 8516,
+          "listed_count": 811,
+          "favourites_count": 170587,
+          "statuses_count": 185354,
+          "created_at": "2022-10-11T08:46:24.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-8",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-9",
+          "can_dm": true,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 0,
+        "retweet_count": 0,
+        "favorite_count": 2,
+        "views_count": 516,
+        "bookmark_count": 2,
+        "lang": "en",
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "x-user-3",
+              "indices": [
+                940,
+                955
+              ],
+              "name": "x-user-10",
+              "screen_name": "x-user-1"
+            }
+          ],
+          "hashtags": [],
+          "smarttags": [],
+          "symbols": [],
+          "urls": [],
+          "display_text_range": [
+            16,
+            293
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-06-09T23:51:21.000000Z",
+        "id": 2064495599026573600,
+        "id_str": "2064495599026573504",
+        "type": "reply",
+        "conversation_id_str": "2064431279383433646",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "@x-user-1 You\u2019re so smart Meta",
+        "source": "<a href=\"http://twitter.com/download/iphone\" rel=\"nofollow\">Twitter for iPhone</a>",
+        "truncated": false,
+        "in_reply_to_status_id": 2064431279383433700,
+        "in_reply_to_status_id_str": "2064431279383433646",
+        "in_reply_to_user_id": "x-user-2",
+        "in_reply_to_user_id_str": "x-user-3",
+        "in_reply_to_screen_name": "x-user-1",
+        "user": {
+          "id": "x-user-11",
+          "id_str": "x-user-12",
+          "name": "x-user-13",
+          "screen_name": "x-user-14",
+          "location": null,
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 39808,
+          "friends_count": 5652,
+          "listed_count": 310,
+          "favourites_count": 94196,
+          "statuses_count": 62966,
+          "created_at": "2017-03-21T23:57:48.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-15",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-16",
+          "can_dm": true,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 1,
+        "retweet_count": 0,
+        "favorite_count": 3,
+        "views_count": 940,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "x-user-3",
+              "indices": [
+                0,
+                15
+              ],
+              "name": "x-user-10",
+              "screen_name": "x-user-1"
+            }
+          ],
+          "display_text_range": [
+            16,
+            36
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-06-09T23:02:59.000000Z",
+        "id": 2064483423977435400,
+        "id_str": "2064483423977435443",
+        "type": "reply",
+        "conversation_id_str": "2064431279383433646",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "@x-user-17 you are doing an audit and improvement plan i dunno what you are talking about\n\nyou dont want an audit to be \"simple enough\"\n\nthere is a place for simplicity there is a place for context and precision",
+        "source": "<a href=\"http://twitter.com/download/iphone\" rel=\"nofollow\">Twitter for iPhone</a>",
+        "truncated": false,
+        "in_reply_to_status_id": 2064482528082162200,
+        "in_reply_to_status_id_str": "2064482528082162096",
+        "in_reply_to_user_id": "x-user-18",
+        "in_reply_to_user_id_str": "x-user-19",
+        "in_reply_to_screen_name": "x-user-17",
+        "user": {
+          "id": "x-user-2",
+          "id_str": "x-user-3",
+          "name": "x-user-10",
+          "screen_name": "x-user-1",
+          "location": null,
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 75065,
+          "friends_count": 7197,
+          "listed_count": 839,
+          "favourites_count": 40702,
+          "statuses_count": 38096,
+          "created_at": "2022-05-30T03:13:21.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-20",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-21",
+          "can_dm": true,
+          "affiliation_label": {
+            "label_url": "https://twitter.com/x-user-70",
+            "badge_url": "https://pbs.twimg.com/profile_images/2095828551421616128/IXDiaFs7_bigger.jpg",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "label_type": "BusinessLabel",
+            "display_type": "Badge"
+          }
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 2,
+        "retweet_count": 0,
+        "favorite_count": 10,
+        "views_count": 1760,
+        "bookmark_count": 1,
+        "lang": "en",
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "x-user-19",
+              "indices": [
+                0,
+                16
+              ],
+              "name": "x-user-22",
+              "screen_name": "x-user-17"
+            }
+          ],
+          "display_text_range": [
+            17,
+            217
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-06-09T22:59:25.000000Z",
+        "id": 2064482528082162200,
+        "id_str": "2064482528082162096",
+        "type": "reply",
+        "conversation_id_str": "2064431279383433646",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "@x-user-1 best prompt is one thats not over engineered and is simple enough that it conveys your point, my original prompt perfectly highlights that",
+        "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+        "truncated": false,
+        "in_reply_to_status_id": 2064481089733960200,
+        "in_reply_to_status_id_str": "2064481089733960181",
+        "in_reply_to_user_id": "x-user-2",
+        "in_reply_to_user_id_str": "x-user-3",
+        "in_reply_to_screen_name": "x-user-1",
+        "user": {
+          "id": "x-user-18",
+          "id_str": "x-user-19",
+          "name": "x-user-22",
+          "screen_name": "x-user-17",
+          "location": null,
+          "url": "",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": false,
+          "followers_count": 36,
+          "friends_count": 232,
+          "listed_count": 0,
+          "favourites_count": 19270,
+          "statuses_count": 641,
+          "created_at": "2026-01-18T14:42:34.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-23",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-24",
+          "can_dm": false,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 2,
+        "retweet_count": 1,
+        "favorite_count": 30,
+        "views_count": 1890,
+        "bookmark_count": 1,
+        "lang": "en",
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "x-user-3",
+              "indices": [
+                0,
+                15
+              ],
+              "name": "x-user-10",
+              "screen_name": "x-user-1"
+            }
+          ],
+          "display_text_range": [
+            16,
+            154
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-06-09T22:57:20.000000Z",
+        "id": 2064482004305900000,
+        "id_str": "2064482004305900004",
+        "type": "reply",
+        "conversation_id_str": "2064431279383433646",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "@x-user-1 and then sell your car in order to pay for the incoming Anthropic invoice",
+        "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+        "truncated": false,
+        "in_reply_to_status_id": 2064431279383433700,
+        "in_reply_to_status_id_str": "2064431279383433646",
+        "in_reply_to_user_id": "x-user-2",
+        "in_reply_to_user_id_str": "x-user-3",
+        "in_reply_to_screen_name": "x-user-1",
+        "user": {
+          "id": "x-user-25",
+          "id_str": "x-user-26",
+          "name": "x-user-27",
+          "screen_name": "x-user-28",
+          "location": null,
+          "url": "",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 602,
+          "friends_count": 1078,
+          "listed_count": 3,
+          "favourites_count": 42905,
+          "statuses_count": 29253,
+          "created_at": "2022-03-24T17:29:14.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-29",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-30",
+          "can_dm": false,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 0,
+        "retweet_count": 0,
+        "favorite_count": 2,
+        "views_count": 239,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "x-user-3",
+              "indices": [
+                0,
+                15
+              ],
+              "name": "x-user-10",
+              "screen_name": "x-user-1"
+            }
+          ],
+          "display_text_range": [
+            16,
+            89
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-06-09T22:53:42.000000Z",
+        "id": 2064481089733960200,
+        "id_str": "2064481089733960181",
+        "type": "reply",
+        "conversation_id_str": "2064431279383433646",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "@x-user-17 you're trippin if you think good prompts don't help\n\nit puts structure and context to things that you want, instead of that, that's how AI works.",
+        "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+        "truncated": false,
+        "in_reply_to_status_id": 2064467406588727600,
+        "in_reply_to_status_id_str": "2064467406588727498",
+        "in_reply_to_user_id": "x-user-18",
+        "in_reply_to_user_id_str": "x-user-19",
+        "in_reply_to_screen_name": "x-user-17",
+        "user": {
+          "id": "x-user-2",
+          "id_str": "x-user-3",
+          "name": "x-user-10",
+          "screen_name": "x-user-1",
+          "location": null,
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 75065,
+          "friends_count": 7197,
+          "listed_count": 839,
+          "favourites_count": 40702,
+          "statuses_count": 38096,
+          "created_at": "2022-05-30T03:13:21.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-20",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-21",
+          "can_dm": true,
+          "affiliation_label": {
+            "label_url": "https://twitter.com/x-user-70",
+            "badge_url": "https://pbs.twimg.com/profile_images/2095828551421616128/IXDiaFs7_bigger.jpg",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "label_type": "BusinessLabel",
+            "display_type": "Badge"
+          }
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 6,
+        "retweet_count": 0,
+        "favorite_count": 19,
+        "views_count": 7292,
+        "bookmark_count": 1,
+        "lang": "en",
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "x-user-19",
+              "indices": [
+                0,
+                16
+              ],
+              "name": "x-user-22",
+              "screen_name": "x-user-17"
+            }
+          ],
+          "display_text_range": [
+            17,
+            162
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-06-09T22:52:15.000000Z",
+        "id": 2064480722912735200,
+        "id_str": "2064480722912735302",
+        "type": "reply",
+        "conversation_id_str": "2064431279383433646",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "@x-user-31 we are getting there, tho everyone has the same tools now, it's about how to make it focus on something people really want",
+        "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+        "truncated": false,
+        "in_reply_to_status_id": 2064469741893210600,
+        "in_reply_to_status_id_str": "2064469741893210574",
+        "in_reply_to_user_id": "x-user-32",
+        "in_reply_to_user_id_str": "x-user-33",
+        "in_reply_to_screen_name": "x-user-31",
+        "user": {
+          "id": "x-user-2",
+          "id_str": "x-user-3",
+          "name": "x-user-10",
+          "screen_name": "x-user-1",
+          "location": null,
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 75065,
+          "friends_count": 7197,
+          "listed_count": 839,
+          "favourites_count": 40702,
+          "statuses_count": 38096,
+          "created_at": "2022-05-30T03:13:21.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-20",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-21",
+          "can_dm": true,
+          "affiliation_label": {
+            "label_url": "https://twitter.com/x-user-70",
+            "badge_url": "https://pbs.twimg.com/profile_images/2095828551421616128/IXDiaFs7_bigger.jpg",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "label_type": "BusinessLabel",
+            "display_type": "Badge"
+          }
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 0,
+        "retweet_count": 0,
+        "favorite_count": 6,
+        "views_count": 6274,
+        "bookmark_count": 1,
+        "lang": "en",
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "x-user-33",
+              "indices": [
+                0,
+                11
+              ],
+              "name": "x-user-34",
+              "screen_name": "x-user-31"
+            }
+          ],
+          "display_text_range": [
+            12,
+            134
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-06-09T22:08:37.000000Z",
+        "id": 2064469741893210600,
+        "id_str": "2064469741893210574",
+        "type": "reply",
+        "conversation_id_str": "2064431279383433646",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "@x-user-1 so now we can really say: Claude make a million dollars, make no mistakes?",
+        "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+        "truncated": false,
+        "in_reply_to_status_id": 2064431279383433700,
+        "in_reply_to_status_id_str": "2064431279383433646",
+        "in_reply_to_user_id": "x-user-2",
+        "in_reply_to_user_id_str": "x-user-3",
+        "in_reply_to_screen_name": "x-user-1",
+        "user": {
+          "id": "x-user-32",
+          "id_str": "x-user-33",
+          "name": "x-user-35",
+          "screen_name": "x-user-31",
+          "location": null,
+          "url": "",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 52129,
+          "friends_count": 3750,
+          "listed_count": 184,
+          "favourites_count": 28506,
+          "statuses_count": 26321,
+          "created_at": "2022-01-14T22:25:42.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-36",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-37",
+          "can_dm": true,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 1,
+        "retweet_count": 0,
+        "favorite_count": 18,
+        "views_count": 7352,
+        "bookmark_count": 1,
+        "lang": "en",
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "x-user-3",
+              "indices": [
+                0,
+                15
+              ],
+              "name": "x-user-10",
+              "screen_name": "x-user-1"
+            }
+          ],
+          "display_text_range": [
+            16,
+            90
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-06-09T21:59:20.000000Z",
+        "id": 2064467406588727600,
+        "id_str": "2064467406588727498",
+        "type": "reply",
+        "conversation_id_str": "2064431279383433646",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "@x-user-1 literally all of this is a waste of time, you can just say, audit my shit, dont fuck up, and it will do the same\nstop being so performative",
+        "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+        "truncated": false,
+        "in_reply_to_status_id": 2064431279383433700,
+        "in_reply_to_status_id_str": "2064431279383433646",
+        "in_reply_to_user_id": "x-user-2",
+        "in_reply_to_user_id_str": "x-user-3",
+        "in_reply_to_screen_name": "x-user-1",
+        "user": {
+          "id": "x-user-18",
+          "id_str": "x-user-19",
+          "name": "x-user-22",
+          "screen_name": "x-user-17",
+          "location": null,
+          "url": "",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": false,
+          "followers_count": 36,
+          "friends_count": 232,
+          "listed_count": 0,
+          "favourites_count": 19270,
+          "statuses_count": 641,
+          "created_at": "2026-01-18T14:42:34.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-23",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-24",
+          "can_dm": false,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 5,
+        "retweet_count": 0,
+        "favorite_count": 120,
+        "views_count": 8262,
+        "bookmark_count": 4,
+        "lang": "en",
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "x-user-3",
+              "indices": [
+                0,
+                15
+              ],
+              "name": "x-user-10",
+              "screen_name": "x-user-1"
+            }
+          ],
+          "display_text_range": [
+            16,
+            155
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-06-09T21:55:15.000000Z",
+        "id": 2064466379030564900,
+        "id_str": "2064466379030564976",
+        "type": "reply",
+        "conversation_id_str": "2064431279383433646",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "@x-user-38 thanks Arslan, it should help a lot yea\n\nbest way to use Fable now is with audits and improvement plans with the rate limits\n\nas most other things can be then much more easily with other models too",
+        "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+        "truncated": false,
+        "in_reply_to_status_id": 2064457556584735000,
+        "in_reply_to_status_id_str": "2064457556584734893",
+        "in_reply_to_user_id": "x-user-39",
+        "in_reply_to_user_id_str": "x-user-40",
+        "in_reply_to_screen_name": "x-user-38",
+        "user": {
+          "id": "x-user-2",
+          "id_str": "x-user-3",
+          "name": "x-user-10",
+          "screen_name": "x-user-1",
+          "location": null,
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 75065,
+          "friends_count": 7197,
+          "listed_count": 839,
+          "favourites_count": 40702,
+          "statuses_count": 38096,
+          "created_at": "2022-05-30T03:13:21.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-20",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-21",
+          "can_dm": true,
+          "affiliation_label": {
+            "label_url": "https://twitter.com/x-user-70",
+            "badge_url": "https://pbs.twimg.com/profile_images/2095828551421616128/IXDiaFs7_bigger.jpg",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "label_type": "BusinessLabel",
+            "display_type": "Badge"
+          }
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 0,
+        "retweet_count": 0,
+        "favorite_count": 4,
+        "views_count": 1500,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "x-user-40",
+              "indices": [
+                0,
+                9
+              ],
+              "name": "x-user-41",
+              "screen_name": "x-user-38"
+            }
+          ],
+          "display_text_range": [
+            10,
+            207
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-06-09T21:04:37.000000Z",
+        "id": 2064453635782721800,
+        "id_str": "2064453635782721681",
+        "type": "reply",
+        "conversation_id_str": "2064431279383433646",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "@x-user-1 hella sure i hit limit about 5 times before i finish phase one of the auditing but yeah thanks, im gonna try this prompt (i did already have 3 different prompt templates before fable)",
+        "source": "<a href=\"http://twitter.com/download/iphone\" rel=\"nofollow\">Twitter for iPhone</a>",
+        "truncated": false,
+        "in_reply_to_status_id": 2064431279383433700,
+        "in_reply_to_status_id_str": "2064431279383433646",
+        "in_reply_to_user_id": "x-user-2",
+        "in_reply_to_user_id_str": "x-user-3",
+        "in_reply_to_screen_name": "x-user-1",
+        "user": {
+          "id": "x-user-42",
+          "id_str": "x-user-43",
+          "name": "x-user-44",
+          "screen_name": "x-user-45",
+          "location": null,
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": false,
+          "followers_count": 849,
+          "friends_count": 792,
+          "listed_count": 10,
+          "favourites_count": 29751,
+          "statuses_count": 22251,
+          "created_at": "2020-03-22T20:50:54.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-46",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-47",
+          "can_dm": false,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 1,
+        "retweet_count": 0,
+        "favorite_count": 6,
+        "views_count": 2534,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "x-user-3",
+              "indices": [
+                0,
+                15
+              ],
+              "name": "x-user-10",
+              "screen_name": "x-user-1"
+            }
+          ],
+          "display_text_range": [
+            16,
+            199
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-06-09T20:59:03.000000Z",
+        "id": 2064452234906374400,
+        "id_str": "2064452234906374456",
+        "type": "reply",
+        "conversation_id_str": "2064431279383433646",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "@x-user-48 they put a lot of safeguards, but yeah its a pretty insane tech that's very risky for crypto",
+        "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+        "truncated": false,
+        "in_reply_to_status_id": 2064438633197671000,
+        "in_reply_to_status_id_str": "2064438633197670853",
+        "in_reply_to_user_id": "x-user-49",
+        "in_reply_to_user_id_str": "x-user-50",
+        "in_reply_to_screen_name": "x-user-48",
+        "user": {
+          "id": "x-user-2",
+          "id_str": "x-user-3",
+          "name": "x-user-10",
+          "screen_name": "x-user-1",
+          "location": null,
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 75065,
+          "friends_count": 7197,
+          "listed_count": 839,
+          "favourites_count": 40702,
+          "statuses_count": 38096,
+          "created_at": "2022-05-30T03:13:21.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-20",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-21",
+          "can_dm": true,
+          "affiliation_label": {
+            "label_url": "https://twitter.com/x-user-70",
+            "badge_url": "https://pbs.twimg.com/profile_images/2095828551421616128/IXDiaFs7_bigger.jpg",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "label_type": "BusinessLabel",
+            "display_type": "Badge"
+          }
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 1,
+        "retweet_count": 0,
+        "favorite_count": 1,
+        "views_count": 1701,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "x-user-50",
+              "indices": [
+                0,
+                9
+              ],
+              "name": "x-user-51",
+              "screen_name": "x-user-48"
+            }
+          ],
+          "display_text_range": [
+            10,
+            102
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-06-09T20:58:21.000000Z",
+        "id": 2064452062365286400,
+        "id_str": "2064452062365286508",
+        "type": "reply",
+        "conversation_id_str": "2064431279383433646",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "@x-user-52 gracias senor! \ud83e\udee1",
+        "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+        "truncated": false,
+        "in_reply_to_status_id": 2064451767069294800,
+        "in_reply_to_status_id_str": "2064451767069294972",
+        "in_reply_to_user_id": "x-user-53",
+        "in_reply_to_user_id_str": "x-user-53",
+        "in_reply_to_screen_name": "x-user-52",
+        "user": {
+          "id": "x-user-2",
+          "id_str": "x-user-3",
+          "name": "x-user-10",
+          "screen_name": "x-user-1",
+          "location": null,
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 75065,
+          "friends_count": 7197,
+          "listed_count": 839,
+          "favourites_count": 40702,
+          "statuses_count": 38096,
+          "created_at": "2022-05-30T03:13:21.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-20",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-21",
+          "can_dm": true,
+          "affiliation_label": {
+            "label_url": "https://twitter.com/x-user-70",
+            "badge_url": "https://pbs.twimg.com/profile_images/2095828551421616128/IXDiaFs7_bigger.jpg",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "label_type": "BusinessLabel",
+            "display_type": "Badge"
+          }
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 0,
+        "retweet_count": 0,
+        "favorite_count": 2,
+        "views_count": 1627,
+        "bookmark_count": 0,
+        "lang": "es",
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "x-user-53",
+              "indices": [
+                0,
+                16
+              ],
+              "name": "x-user-54",
+              "screen_name": "x-user-52"
+            }
+          ],
+          "display_text_range": [
+            17,
+            33
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-06-09T20:57:11.000000Z",
+        "id": 2064451767069294800,
+        "id_str": "2064451767069294972",
+        "type": "reply",
+        "conversation_id_str": "2064431279383433646",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "@x-user-1 bookmarked!",
+        "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+        "truncated": false,
+        "in_reply_to_status_id": 2064431279383433700,
+        "in_reply_to_status_id_str": "2064431279383433646",
+        "in_reply_to_user_id": "x-user-2",
+        "in_reply_to_user_id_str": "x-user-3",
+        "in_reply_to_screen_name": "x-user-1",
+        "user": {
+          "id": "x-user-53",
+          "id_str": "x-user-53",
+          "name": "x-user-54",
+          "screen_name": "x-user-52",
+          "location": null,
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 65373,
+          "friends_count": 29411,
+          "listed_count": 930,
+          "favourites_count": 371574,
+          "statuses_count": 96240,
+          "created_at": "2011-03-20T20:38:56.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-55",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-56",
+          "can_dm": true,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 1,
+        "retweet_count": 0,
+        "favorite_count": 3,
+        "views_count": 1789,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "x-user-3",
+              "indices": [
+                0,
+                15
+              ],
+              "name": "x-user-10",
+              "screen_name": "x-user-1"
+            }
+          ],
+          "display_text_range": [
+            16,
+            27
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-06-09T20:48:05.000000Z",
+        "id": 2064449477641994800,
+        "id_str": "2064449477641994685",
+        "type": "reply",
+        "conversation_id_str": "2064431279383433646",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "@x-user-1 @x-user-57 yep just wanna dive into prompt engineering and finding out how it\u2019s done\n\nwill google what that even is, ty Meta",
+        "source": "<a href=\"http://twitter.com/download/iphone\" rel=\"nofollow\">Twitter for iPhone</a>",
+        "truncated": false,
+        "in_reply_to_status_id": 2064449181255876900,
+        "in_reply_to_status_id_str": "2064449181255876798",
+        "in_reply_to_user_id": "x-user-2",
+        "in_reply_to_user_id_str": "x-user-3",
+        "in_reply_to_screen_name": "x-user-1",
+        "user": {
+          "id": "x-user-58",
+          "id_str": "x-user-59",
+          "name": "x-user-60",
+          "screen_name": "x-user-61",
+          "location": null,
+          "url": "",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 4995,
+          "friends_count": 923,
+          "listed_count": 207,
+          "favourites_count": 171998,
+          "statuses_count": 40966,
+          "created_at": "2021-06-27T22:14:05.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-62",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-63",
+          "can_dm": true,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 1,
+        "retweet_count": 0,
+        "favorite_count": 2,
+        "views_count": 274,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "x-user-3",
+              "indices": [
+                0,
+                15
+              ],
+              "name": "x-user-10",
+              "screen_name": "x-user-1"
+            },
+            {
+              "id_str": "x-user-64",
+              "indices": [
+                16,
+                28
+              ],
+              "name": "x-user-65",
+              "screen_name": "x-user-57"
+            }
+          ],
+          "display_text_range": [
+            29,
+            142
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-06-09T20:37:52.000000Z",
+        "id": 2064446905841811500,
+        "id_str": "2064446905841811518",
+        "type": "reply",
+        "conversation_id_str": "2064431279383433646",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "@x-user-61 anytime Koly, definitely do they are helpful to others too\n\ncheck this account as well @x-user-57",
+        "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+        "truncated": false,
+        "in_reply_to_status_id": 2064446603939750100,
+        "in_reply_to_status_id_str": "2064446603939750097",
+        "in_reply_to_user_id": "x-user-58",
+        "in_reply_to_user_id_str": "x-user-59",
+        "in_reply_to_screen_name": "x-user-61",
+        "user": {
+          "id": "x-user-2",
+          "id_str": "x-user-3",
+          "name": "x-user-10",
+          "screen_name": "x-user-1",
+          "location": null,
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 75065,
+          "friends_count": 7197,
+          "listed_count": 839,
+          "favourites_count": 40702,
+          "statuses_count": 38096,
+          "created_at": "2022-05-30T03:13:21.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-20",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-21",
+          "can_dm": true,
+          "affiliation_label": {
+            "label_url": "https://twitter.com/x-user-70",
+            "badge_url": "https://pbs.twimg.com/profile_images/2095828551421616128/IXDiaFs7_bigger.jpg",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "label_type": "BusinessLabel",
+            "display_type": "Badge"
+          }
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 1,
+        "retweet_count": 0,
+        "favorite_count": 3,
+        "views_count": 355,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "x-user-59",
+              "indices": [
+                0,
+                10
+              ],
+              "name": "x-user-60",
+              "screen_name": "x-user-61"
+            },
+            {
+              "id_str": "x-user-64",
+              "indices": [
+                98,
+                110
+              ],
+              "name": "x-user-65",
+              "screen_name": "x-user-57"
+            }
+          ],
+          "display_text_range": [
+            11,
+            110
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-06-09T20:36:40.000000Z",
+        "id": 2064446603939750100,
+        "id_str": "2064446603939750097",
+        "type": "reply",
+        "conversation_id_str": "2064431279383433646",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "@x-user-1 gonna practice with prompts, appreciate it",
+        "source": "<a href=\"http://twitter.com/download/iphone\" rel=\"nofollow\">Twitter for iPhone</a>",
+        "truncated": false,
+        "in_reply_to_status_id": 2064446214062674200,
+        "in_reply_to_status_id_str": "2064446214062674190",
+        "in_reply_to_user_id": "x-user-2",
+        "in_reply_to_user_id_str": "x-user-3",
+        "in_reply_to_screen_name": "x-user-1",
+        "user": {
+          "id": "x-user-58",
+          "id_str": "x-user-59",
+          "name": "x-user-60",
+          "screen_name": "x-user-61",
+          "location": null,
+          "url": "",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 4995,
+          "friends_count": 923,
+          "listed_count": 207,
+          "favourites_count": 171998,
+          "statuses_count": 40966,
+          "created_at": "2021-06-27T22:14:05.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-62",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-63",
+          "can_dm": true,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 1,
+        "retweet_count": 0,
+        "favorite_count": 2,
+        "views_count": 349,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "x-user-3",
+              "indices": [
+                0,
+                15
+              ],
+              "name": "x-user-10",
+              "screen_name": "x-user-1"
+            }
+          ],
+          "display_text_range": [
+            16,
+            58
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-06-09T20:35:07.000000Z",
+        "id": 2064446214062674200,
+        "id_str": "2064446214062674190",
+        "type": "reply",
+        "conversation_id_str": "2064431279383433646",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "@x-user-61 this was asked to Fable directly, but you gotta ask it right, and if you don't ask it will not deliver this kind of quality, when you say audit this and improve things with a plan\n\nso it's better to have prompts prepared",
+        "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+        "truncated": false,
+        "in_reply_to_status_id": 2064434287680660000,
+        "in_reply_to_status_id_str": "2064434287680659869",
+        "in_reply_to_user_id": "x-user-58",
+        "in_reply_to_user_id_str": "x-user-59",
+        "in_reply_to_screen_name": "x-user-61",
+        "user": {
+          "id": "x-user-2",
+          "id_str": "x-user-3",
+          "name": "x-user-10",
+          "screen_name": "x-user-1",
+          "location": null,
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 75065,
+          "friends_count": 7197,
+          "listed_count": 839,
+          "favourites_count": 40702,
+          "statuses_count": 38096,
+          "created_at": "2022-05-30T03:13:21.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-20",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-21",
+          "can_dm": true,
+          "affiliation_label": {
+            "label_url": "https://twitter.com/x-user-70",
+            "badge_url": "https://pbs.twimg.com/profile_images/2095828551421616128/IXDiaFs7_bigger.jpg",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "label_type": "BusinessLabel",
+            "display_type": "Badge"
+          }
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 1,
+        "retweet_count": 0,
+        "favorite_count": 10,
+        "views_count": 3232,
+        "bookmark_count": 1,
+        "lang": "en",
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "x-user-59",
+              "indices": [
+                0,
+                10
+              ],
+              "name": "x-user-60",
+              "screen_name": "x-user-61"
+            }
+          ],
+          "display_text_range": [
+            11,
+            231
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-06-09T19:47:44.000000Z",
+        "id": 2064434287680660000,
+        "id_str": "2064434287680659869",
+        "type": "reply",
+        "conversation_id_str": "2064431279383433646",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "@x-user-1 i'm curious if you write such prompts yourself or ask another ai to do that",
+        "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+        "truncated": false,
+        "in_reply_to_status_id": 2064431279383433700,
+        "in_reply_to_status_id_str": "2064431279383433646",
+        "in_reply_to_user_id": "x-user-2",
+        "in_reply_to_user_id_str": "x-user-3",
+        "in_reply_to_screen_name": "x-user-1",
+        "user": {
+          "id": "x-user-58",
+          "id_str": "x-user-59",
+          "name": "x-user-60",
+          "screen_name": "x-user-61",
+          "location": null,
+          "url": "",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 4995,
+          "friends_count": 923,
+          "listed_count": 207,
+          "favourites_count": 171998,
+          "statuses_count": 40966,
+          "created_at": "2021-06-27T22:14:05.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-62",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-63",
+          "can_dm": true,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 1,
+        "retweet_count": 0,
+        "favorite_count": 5,
+        "views_count": 3516,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "x-user-3",
+              "indices": [
+                0,
+                15
+              ],
+              "name": "x-user-10",
+              "screen_name": "x-user-1"
+            }
+          ],
+          "display_text_range": [
+            16,
+            91
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-06-09T19:43:26.000000Z",
+        "id": 2064433205374227000,
+        "id_str": "2064433205374226862",
+        "type": "reply",
+        "conversation_id_str": "2064431279383433646",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "@x-user-66 Fable is real AGI-territory, it's smart to improve your previous work with it.",
+        "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+        "truncated": false,
+        "in_reply_to_status_id": 2064431541048979500,
+        "in_reply_to_status_id_str": "2064431541048979489",
+        "in_reply_to_user_id": "x-user-67",
+        "in_reply_to_user_id_str": "x-user-68",
+        "in_reply_to_screen_name": "x-user-66",
+        "user": {
+          "id": "x-user-2",
+          "id_str": "x-user-3",
+          "name": "x-user-10",
+          "screen_name": "x-user-1",
+          "location": null,
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 75065,
+          "friends_count": 7197,
+          "listed_count": 839,
+          "favourites_count": 40702,
+          "statuses_count": 38096,
+          "created_at": "2022-05-30T03:13:21.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-20",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-21",
+          "can_dm": true,
+          "affiliation_label": {
+            "label_url": "https://twitter.com/x-user-70",
+            "badge_url": "https://pbs.twimg.com/profile_images/2095828551421616128/IXDiaFs7_bigger.jpg",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "label_type": "BusinessLabel",
+            "display_type": "Badge"
+          }
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 0,
+        "retweet_count": 0,
+        "favorite_count": 3,
+        "views_count": 2564,
+        "bookmark_count": 0,
+        "lang": "en",
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "x-user-68",
+              "indices": [
+                0,
+                11
+              ],
+              "name": "x-user-69",
+              "screen_name": "x-user-66"
+            }
+          ],
+          "display_text_range": [
+            12,
+            90
+          ]
+        },
+        "is_pinned": false
+      }
+    ],
+    "next_cursor": "2064433205374226861"
+  }
+}

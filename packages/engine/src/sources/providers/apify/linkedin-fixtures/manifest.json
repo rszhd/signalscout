@@ -61,6 +61,41 @@
       },
       "capturedAt": "2026-09-07T05:44:43.191Z",
       "identitiesReplaced": 0
+    },
+    {
+      "file": "comments-flat.json",
+      "request": {
+        "input": {
+          "posts": [
+            "https://www.linkedin.com/feed/update/urn:li:activity:7502584032971595776/"
+          ],
+          "maxItems": 10,
+          "profileScraperMode": "short"
+        },
+        "runId": "WZLjZlAPhiQRstE0y",
+        "elapsedMs": 6541,
+        "phase": "dataset"
+      },
+      "capturedAt": "2026-09-16T17:13:55.119Z",
+      "identitiesReplaced": 19
+    },
+    {
+      "file": "comments-with-replies.json",
+      "request": {
+        "input": {
+          "posts": [
+            "https://www.linkedin.com/feed/update/urn:li:activity:7502584032971595776/"
+          ],
+          "maxItems": 10,
+          "scrapeReplies": true,
+          "profileScraperMode": "short"
+        },
+        "runId": "ah0Da6cQuwTuVocp2",
+        "elapsedMs": 6539,
+        "phase": "dataset"
+      },
+      "capturedAt": "2026-09-16T17:14:09.271Z",
+      "identitiesReplaced": 19
     }
   ]
 }

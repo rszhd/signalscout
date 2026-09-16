@@ -17,9 +17,15 @@ import { createLogger } from "../../../logger.js";
 import { linkedInPlatformId } from "../../platforms.js";
 import { createSourceRegistry } from "../../registry.js";
 import { assertSourcesCanBeStored } from "../../storage.js";
-import type { SearchRequest, SearchResult, SourceRuntime } from "../../types.js";
+import type { ReplyRequest, SearchRequest, SearchResult, SourceRuntime } from "../../types.js";
 import { toCandidatePost as toSocialCrawlPost } from "../socialcrawl/linkedin.js";
-import { ApifyLinkedInSource, apifyLinkedIn, toCandidatePost } from "./linkedin.js";
+import {
+  ApifyLinkedInSource,
+  apifyLinkedIn,
+  flattenComments,
+  toCandidatePost,
+  toCandidateReply,
+} from "./linkedin.js";
 import { apifyProviderId } from "./provider.js";
 
 function fixture(name: string): unknown {
@@ -30,6 +36,8 @@ function fixture(name: string): unknown {
 
 const searchItems = fixture("search-by-date") as Record<string, unknown>[];
 const noResultItems = fixture("search-no-results") as Record<string, unknown>[];
+/** The comments under one post, captured on 2026-09-17 by US-159. */
+const commentItems = fixture("comments-flat") as Record<string, unknown>[];
 const tokenRejected = fixture("credentials-rejected") as {
   httpStatus: number;
   body: unknown;
@@ -598,5 +606,222 @@ describe("checking a token", () => {
 
     expect(check).toEqual({ valid: false, reason: "Enter your Apify API token." });
     expect(provider.calls).toHaveLength(0);
+  });
+});
+
+/**
+ * The comments under one post. US-159, and the only reply path LinkedIn has.
+ *
+ * Captured on 2026-09-17 from `harvestapi~linkedin-post-comments`, on a post
+ * this folder already held: two top-level comments, each with one reply nested
+ * under it, and the whole run charged as two `post-comment` events.
+ */
+describe("the comments under one post", () => {
+  /** The post the run was asked for, read off the manifest. */
+  const postId = "7502584032971595776";
+  const postUrl = `https://www.linkedin.com/feed/update/urn:li:activity:${postId}/`;
+  const commentsRunId = "a-comments-run";
+
+  function commentsRun(overrides: Record<string, unknown> = {}) {
+    return {
+      data: {
+        id: commentsRunId,
+        status: "SUCCEEDED",
+        defaultDatasetId: datasetId,
+        usageTotalUsd: 0.004,
+        chargedEventCounts: { "apify-actor-start": 1, "post-comment": 2 },
+        ...overrides,
+      },
+    };
+  }
+
+  function replyRequest(overrides: Partial<ReplyRequest> = {}): ReplyRequest {
+    return { postUrl, postExternalId: postId, credentials, ...overrides };
+  }
+
+  function sourceFor(routes: Parameters<typeof apify>[0]) {
+    const stub = apify(routes);
+    return { stub, source: new ApifyLinkedInSource(runtimeWith(stub.fetch)) };
+  }
+
+  const succeeded = {
+    start: { status: 201, body: commentsRun() },
+    run: { status: 200, body: commentsRun() },
+    dataset: { status: 200, body: commentItems },
+  };
+
+  /**
+   * The shape this connector needs nothing built for, asserted against the
+   * payload. If a later capture stops filling one of these, the parser starts
+   * dropping rows and this test says which field went.
+   */
+  it("sends an id, a link, the words, a date and an author on every comment", () => {
+    expect(commentItems).toHaveLength(2);
+
+    for (const comment of commentItems) {
+      expect(typeof comment.id).toBe("string");
+      expect(String(comment.linkedinUrl)).toContain("commentUrn");
+      expect(typeof comment.commentary).toBe("string");
+      expect(Number.isNaN(Date.parse(String(comment.createdAt)))).toBe(false);
+      expect((comment.actor as { name?: string }).name).toBeTruthy();
+    }
+  });
+
+  it("reads the whole tree, not just the comments at the top of it", async () => {
+    const { stub, source } = sourceFor(succeeded);
+
+    const result = await source.fetchReplies(replyRequest());
+
+    expect(result.replies).toHaveLength(4);
+    expect(result.itemsReturned).toBe(4);
+
+    const started = stub.calls.find((call) => call.method === "POST");
+    expect(String(started?.url)).toContain("harvestapi~linkedin-post-comments");
+    expect(started?.body).toMatchObject({
+      posts: [postUrl],
+      maxItems: 10,
+      profileScraperMode: "short",
+    });
+  });
+
+  /**
+   * A nested reply carries no parent id of its own — `postId` names the post
+   * at every depth — so the link comes from the walk or it comes from nowhere.
+   */
+  it("takes a nested reply's parent from the tree, because the wire has none", async () => {
+    const { source } = sourceFor(succeeded);
+
+    const { replies } = await source.fetchReplies(replyRequest());
+
+    expect(replies.map((reply) => reply.parentReplyExternalId)).toEqual([
+      undefined,
+      "7502655386131410944",
+      undefined,
+      "7502595429533126658",
+    ]);
+    expect(replies.every((reply) => reply.parentPostExternalId === postId)).toBe(true);
+  });
+
+  it("walks depth first, so a reply follows the comment it answers", async () => {
+    const { source } = sourceFor(succeeded);
+
+    const { replies } = await source.fetchReplies(replyRequest({ positionOffset: 4 }));
+
+    expect(replies.map((reply) => reply.threadPosition)).toEqual([4, 5, 6, 7]);
+    expect(replies[1]?.parentReplyExternalId).toBe(replies[0]?.externalId);
+  });
+
+  /**
+   * `postId` is `urn:li:activity:<id>` and the post is stored as `<id>`. A
+   * literal comparison would drop every comment the actor ever returned.
+   */
+  it("compares the bare activity id, not the urn the comment carries", () => {
+    const first = commentItems[0] as Record<string, unknown>;
+
+    expect(first.postId).toBe(`urn:li:activity:${postId}`);
+    expect(toCandidateReply(first, { parentPostExternalId: postId, position: 0 })).toBeDefined();
+    expect(
+      toCandidateReply(first, { parentPostExternalId: "7000000000000000000", position: 0 }),
+    ).toBeUndefined();
+  });
+
+  it("charges what the settled run says, in whole comments", async () => {
+    const { source } = sourceFor(succeeded);
+
+    const result = await source.fetchReplies(replyRequest());
+
+    // $0.004 at 2,000 micro-dollars a comment, rounded up: the run start is
+    // folded in rather than lost.
+    expect(result.unitsConsumed).toBe(2);
+  });
+
+  it("asks the provider for a window, then makes the exact cut itself", async () => {
+    const { stub, source } = sourceFor(succeeded);
+
+    const since = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000);
+    await source.fetchReplies(replyRequest({ since }));
+
+    const started = stub.calls.find((call) => call.method === "POST");
+    expect((started?.body as { postedLimit?: string } | undefined)?.postedLimit).toBe("week");
+
+    // The named window is coarse. The exact cut is made on every row: a
+    // `since` at the newest captured comment's own instant leaves nothing.
+    const newest = new Date("2026-09-08T04:55:22.895Z");
+    const cut = await source.fetchReplies(replyRequest({ since: newest }));
+
+    expect(cut.replies).toHaveLength(0);
+    // Billed all the same. The cut is made after the money.
+    expect(cut.unitsConsumed).toBe(2);
+  });
+
+  it("never sends the window value the comments actor does not publish", async () => {
+    const { stub, source } = sourceFor(succeeded);
+
+    await source.fetchReplies(replyRequest({ since: new Date(now.getTime() - 30 * 60 * 1000) }));
+
+    const started = stub.calls.find((call) => call.method === "POST");
+    // The post search would send `1h` here. The comments actor's list starts
+    // at `24h`, and this provider ignores an unknown value and bills anyway.
+    expect((started?.body as { postedLimit?: string } | undefined)?.postedLimit).toBe("24h");
+  });
+
+  it("waits for the run rather than handing the wait back", async () => {
+    const { stub, source } = sourceFor({
+      start: { status: 201, body: commentsRun({ status: "RUNNING" }) },
+      run: [
+        { status: 200, body: commentsRun({ status: "RUNNING" }) },
+        { status: 200, body: commentsRun() },
+      ],
+      dataset: { status: 200, body: commentItems },
+    });
+
+    const result = await source.fetchReplies(replyRequest());
+
+    // The replies worker ends its walk on anything but "ready", so a wait
+    // returned here would silently lose a run that was already paid for.
+    expect(result.next.status).toBe("done");
+    expect(result.replies).toHaveLength(4);
+    expect(stub.calls.filter((call) => call.url.includes("/actor-runs/")).length).toBeGreaterThan(
+      1,
+    );
+  });
+
+  /**
+   * A run that never finishes has still been started and will still be billed.
+   * Reporting no comments and no cost would hide that.
+   */
+  it("fails loudly when a run never finishes, naming the run", async () => {
+    const { source } = sourceFor({
+      start: { status: 201, body: commentsRun({ status: "RUNNING" }) },
+      run: { status: 200, body: commentsRun({ status: "RUNNING" }) },
+      dataset: { status: 200, body: commentItems },
+    });
+
+    await expect(source.fetchReplies(replyRequest())).rejects.toThrow(commentsRunId);
+  });
+
+  /**
+   * There is no cursor on this actor. Asking again would start a second run
+   * and buy the same comments twice — the mistake the run id in the search
+   * cursor exists to prevent.
+   */
+  it("reports the thread as partial only when the cap decided where it stopped", async () => {
+    const short = await sourceFor(succeeded).source.fetchReplies(replyRequest());
+    expect(short.partial).toBe(false);
+    expect(short.next.status).toBe("done");
+
+    const capped = await sourceFor({
+      ...succeeded,
+      dataset: { status: 200, body: Array.from({ length: 10 }, () => commentItems[0]) },
+    }).source.fetchReplies(replyRequest());
+
+    expect(capped.partial).toBe(true);
+  });
+
+  it("ends a walk rather than following a cycle in somebody else's data", () => {
+    const loop: Record<string, unknown> = { id: "a" };
+    loop.replies = [loop];
+
+    expect(flattenComments([loop]).length).toBeLessThan(25);
   });
 });

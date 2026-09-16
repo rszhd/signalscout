@@ -20,6 +20,8 @@
  *   6. What does a search matching nothing return, and is it billed?
  *   7. What is the cursor, and does page two repeat page one?
  *   8. Do comments carry an id, a date and a permalink? US-047 needs the link.
+ *      US-159 widened this one: what pages a comment list, whether `order` is
+ *      read at all, and whether a comment's date is read or computed.
  *   9. What does a refused key say, and is a credential probe free?
  *  10. Is there more text than a title? `includeExtras` claims to add the
  *      description, and a title alone is thin for a classifier.
@@ -35,7 +37,8 @@
  * no cost. And a request refused on its input is free, so a credential probe
  * and a malformed URL both cost nothing.
  *
- * Run it with your own key. It spends about ten credits:
+ * Run it with your own key. A whole run spends about fourteen credits, four of
+ * them on the comment questions:
  *
  *     node packages/pipeline/src/sources/providers/scrapecreators/youtube-fixtures/capture.mjs
  *     node .../capture.mjs --only=search
@@ -68,6 +71,16 @@ const endpoints = {
 
 /** The keyword the SocialCrawl YouTube capture used, so one question is asked. */
 const keyword = "flaky tests";
+
+/**
+ * A keyword whose videos have conversations under them.
+ *
+ * `keyword` is the niche this product sells into, and US-121 measured what
+ * that costs the comment question: one video in twenty had a single comment.
+ * A reply parser cannot be built from one comment, so the comment calls ask a
+ * broader question in the same subject.
+ */
+const busyKeyword = "playwright vs cypress";
 
 /** A phrase that cannot occur. Question 6 is what this costs. */
 const impossibleKeyword = "zqxjkv wobblefish intentwatch nonexistent phrase";
@@ -360,6 +373,66 @@ function describeDates(name, body) {
   );
 }
 
+function commentsOf(body) {
+  return Array.isArray(body?.comments) ? body.comments : [];
+}
+
+/**
+ * Everything a reply parser needs to know about one page of comments.
+ *
+ * Five numbers, and each one decides a line of the connector. How many arrived
+ * is the page size a poll is billed for. How many carry a link decides whether
+ * `url` is read or built. How many carry a parent id decides whether nesting
+ * can be stored at all, or only `replyLevel` can. The distinct times of day
+ * say whether the dates are read or computed, the way a video's are. And the
+ * order says whether an early stop is allowed.
+ */
+function describeComments(name, body) {
+  const comments = commentsOf(body);
+
+  if (comments.length === 0) {
+    console.log(`  ${name}: no comments came back`);
+    return;
+  }
+
+  console.log(`  ${name}: ${comments.length} comments`);
+  console.log(`  a comment's keys: ${Object.keys(comments[0]).join(", ")}`);
+
+  const linked = comments.filter(
+    (comment) => typeof comment?.url === "string" && comment.url !== "",
+  ).length;
+  const parented = comments.filter(
+    (comment) =>
+      typeof (comment?.parentId ?? comment?.parent_id) === "string" &&
+      (comment.parentId ?? comment.parent_id) !== "",
+  ).length;
+  const levels = new Set(comments.map((comment) => comment?.replyLevel ?? "(none)"));
+
+  console.log(
+    `  ${linked} of ${comments.length} carry a url, ${parented} carry a parent id, ` +
+      `reply levels: ${[...levels].join(", ")}`,
+  );
+
+  const clocks = new Set(
+    comments
+      .map((comment) => String(comment?.publishedTime ?? ""))
+      .filter(Boolean)
+      .map((stamp) => stamp.slice(11)),
+  );
+
+  const times = comments
+    .map((comment) => Date.parse(comment?.publishedTime ?? ""))
+    .filter((value) => Number.isFinite(value));
+
+  const descending = times.every((value, index) => index === 0 || times[index - 1] >= value);
+
+  console.log(
+    `  ${clocks.size} distinct times of day` +
+      `${clocks.size === 1 && comments.length > 1 ? " — computed from the relative text, not read" : ""}` +
+      `, ${descending ? "newest first" : "NOT in date order"}`,
+  );
+}
+
 function describeText(name, body) {
   const videos = videosOf(body);
   const titles = videos.map((video) => String(video?.title ?? "").length);
@@ -534,32 +607,127 @@ if (wanted("no-results")) {
 }
 
 /**
- * The comments under one video, newest first.
+ * The comments under one video. Question 8, and the whole of US-159.
  *
  * `order` takes `top` and `newest`. A monitor wants what was said since it
  * last looked, so `newest` is the one it would ask for — and this provider's
  * Reddit endpoint accepts a `sort` it then answers with zero comments, which
- * is why the count below is printed rather than assumed.
+ * is why every count below is printed rather than assumed.
+ *
+ * US-121 asked this endpoint one question and got one comment back, which was
+ * enough to decide against building it and not enough to build it from. These
+ * calls ask the four a parser needs:
+ *
+ *   a. Is the paging parameter `continuationToken`, the name the search uses,
+ *      and does page two continue rather than repeat? The search's name is a
+ *      guess until a call makes it a measurement.
+ *   b. Does a comment ever carry a link, or a parent id? The captured one
+ *      carried neither, and `replyLevel` was the only sign of nesting.
+ *   c. Is `order=newest` really newest-first on `publishedTime`? The early
+ *      stop in `fetchReplies` stands on that and nothing else.
+ *   d. Are a comment's dates computed from the relative text, the way a
+ *      video's `publishedTime` is? If they are, no `since` cut may be made on
+ *      one without saying so.
  */
-const commentUrl = commentTargetUrl ?? videoUrl;
+if (wanted("comments")) {
+  /**
+   * A video with a conversation under it, which this niche mostly does not
+   * have: one video in twenty carried a single comment in US-121.
+   *
+   * The search above is reused when it ran. On its own this block buys one, so
+   * that `--only=comments` is a whole answer rather than a failure.
+   */
+  if (!commentTargetUrl) {
+    const busy = await capture(
+      "comments-target-search",
+      endpoints.search,
+      { query: busyKeyword, type: "videos", includeExtras: "true" },
+      { note: "finds a video with comments under it; not a fixture a test reads" },
+    );
 
-if (wanted("comments") && commentUrl) {
-  const comments = await capture(
-    "comments-newest",
-    endpoints.comments,
-    { url: commentUrl, order: "newest" },
-    { note: "newest first, on the first video the search returned" },
-  );
+    const best = videosOf(busy.body)
+      .filter((video) => (video?.commentCountInt ?? 0) > 0)
+      .sort((a, b) => (b.commentCountInt ?? 0) - (a.commentCountInt ?? 0))[0];
 
-  const list = comments.body?.comments;
-  if (Array.isArray(list) && list.length > 0) {
-    console.log(`  ${list.length} comments`);
-    console.log(`  a comment's keys: ${Object.keys(list[0]).join(", ")}`);
-  } else {
-    console.log("  no comments came back");
+    if (best?.url) {
+      commentTargetUrl = best.url;
+      console.log(`  busiest video has ${best.commentCountInt} comments`);
+    }
   }
-} else if (wanted("comments")) {
-  failures.push("comments: the search returned no video URL to ask about.");
+
+  const commentUrl = commentTargetUrl ?? videoUrl;
+
+  if (commentUrl) {
+    const newest = await capture(
+      "comments-newest",
+      endpoints.comments,
+      { url: commentUrl, order: "newest" },
+      { note: "newest first, on the busiest video the search returned" },
+    );
+
+    describeComments("comments-newest", newest.body);
+
+    /**
+     * Page two, by the search's own parameter name. Question a.
+     *
+     * An unrecognised parameter on this provider is ignored and billed in
+     * full, so a wrong name here does not fail — it silently buys page one
+     * twice. That is why the overlap is counted rather than the call being
+     * read as proof.
+     */
+    const token = newest.body?.continuationToken;
+
+    if (typeof token === "string" && token !== "") {
+      const second = await capture(
+        "comments-newest-page-2",
+        endpoints.comments,
+        { url: commentUrl, order: "newest", continuationToken: token },
+        { note: "followed the continuationToken from comments-newest.json" },
+      );
+
+      describeComments("comments-newest-page-2", second.body);
+
+      const ids = (body) =>
+        new Set(
+          commentsOf(body)
+            .map((comment) => comment?.id)
+            .filter(Boolean),
+        );
+      const one = ids(newest.body);
+      const two = ids(second.body);
+      console.log(
+        `  page 2 holds ${two.size} comments and repeats ` +
+          `${[...two].filter((id) => one.has(id)).length} of page 1's ${one.size}`,
+      );
+    } else {
+      failures.push("comments: no continuationToken came back, so page two was not captured.");
+    }
+
+    /**
+     * The other ordering, for the same thread. Question c.
+     *
+     * If `top` and `newest` return the same rows in the same order, the
+     * parameter is being ignored and billed — this provider's habit — and
+     * nothing may be built on the ordering.
+     */
+    const top = await capture(
+      "comments-top",
+      endpoints.comments,
+      { url: commentUrl, order: "top" },
+      { note: "the other ordering, to prove the parameter is read at all" },
+    );
+
+    describeComments("comments-top", top.body);
+
+    const firstOf = (body) => commentsOf(body)[0]?.id;
+    console.log(
+      firstOf(top.body) === firstOf(newest.body)
+        ? "  top and newest open on the same comment — the order may be ignored"
+        : "  top and newest open on different comments — the order is read",
+    );
+  } else {
+    failures.push("comments: no video URL with comments was found to ask about.");
+  }
 }
 
 /**

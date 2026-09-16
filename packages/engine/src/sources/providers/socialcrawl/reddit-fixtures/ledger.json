@@ -28,5 +28,11 @@
     "creditsUsed": 0,
     "creditsRemaining": null,
     "cached": false
+  },
+  {
+    "name": "comments-thread",
+    "creditsUsed": 5,
+    "creditsRemaining": 1089,
+    "cached": false
   }
 ]

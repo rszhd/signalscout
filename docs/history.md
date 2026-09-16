@@ -2039,3 +2039,26 @@ reference with no digest. Neither touched production. The migrations the
 split needed dropped nothing: the pipeline's 0059 is a comment, the
 application's 0000 creates only what is missing, and its 0001 drops the
 subscriptions table an instance on this code never wrote to.
+
+**Every offered connector reads replies, 2026-09-17 (US-159).** Four had
+declined to, each for a recorded reason, and the owner asked for all four; the
+captures that answered them cost about $0.07 in total. ScrapeCreators YouTube:
+twenty comments a credit, `continuationToken` pages with no overlap, and
+`order` is ignored — `top` and `newest` returned the same page — so every date
+is arithmetic on "4 years ago" and every reply is marked approximate. SocialCrawl
+Reddit: one call at five credits returned **34 of 34** claimed comments five
+levels deep with no cursor and `truncated: false`, the first completeness claim
+in this repository measured right; the shared parser drops one wordless
+comment, and its child is stored naming a parent this instance holds no row
+for. SocialData X: `/twitter/tweets/<id>/comments` answers 200 where an invented
+path answers 404 free, twenty replies for $0.0040 — the post price — **newest
+first on both pages**, every reply carrying `conversation_id_str`, and one
+reply repeated between the two pages. Apify LinkedIn: a second actor,
+`linkedin-post-comments`, priced like a post at $0.002, with a `postedLimit`
+window nobody else offers; two comments came with their replies nested and a
+run with `scrapeReplies: true` charged the same two events as one without.
+Two captures leaked identity on their first pass — six X handles through
+`affiliation_label.label_url` and one LinkedIn name through a `PROFILE_MENTION`
+span — and both scrubbers grew the rule. None of the four has run a live poll
+with `includeReplies` on; the connectors are proven against captured payloads
+only.

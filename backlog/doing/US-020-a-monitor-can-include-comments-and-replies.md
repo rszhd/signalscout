@@ -190,8 +190,10 @@ told that comments are unavailable, not quietly given none.
       opt-in is set, and never when it is not
 - [x] The SocialCrawl X connector fetches replies by post URL when the opt-in
       is set, and never when it is not
-- [ ] The SocialCrawl LinkedIn connector does the same, or the ticket records
-      why it was left out
+- [x] The SocialCrawl LinkedIn connector does the same, or the ticket records
+      why it was left out — **left out**: US-053 switched that connector off
+      before it was built, and US-159 gave LinkedIn its reply path through
+      Apify instead
 - [x] A reply is stored as its own row, keyed by the id its platform gives it,
       with a link to its parent post and to its parent reply. Reddit's `t1_`
       fullname and an X reply id are the same kind of key, and
@@ -440,3 +442,10 @@ join both from our own rows.
   and the second is shaped from that X measurement rather than imagined. 1,010
   tests pass.
 
+- 2026-09-17T01:26+08:00 — US-159 closed the four gaps this ticket left:
+  ScrapeCreators YouTube, SocialCrawl Reddit, SocialData X and Apify LinkedIn
+  all read replies now. The "escape hatch" above is built, and the measurement
+  that justified not building it still stands on the median thread; the
+  difference is that a person with only that key is no longer given nothing.
+  The stale LinkedIn box is closed as left out. The capture box below is still
+  open.

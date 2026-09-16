@@ -298,7 +298,7 @@ pnpm capture:deletions                            # spends ~$0.02
 node packages/engine/src/sources/providers/socialcrawl/linkedin-fixtures/capture.mjs   # ~30 credits
 node packages/engine/src/sources/providers/socialcrawl/instagram-fixtures/capture.mjs  # 24 credits, or 14 with --lean
 node packages/engine/src/sources/providers/scrapecreators/tiktok-fixtures/capture.mjs   # 9 credits
-node packages/engine/src/sources/providers/scrapecreators/youtube-fixtures/capture.mjs  # 8 credits
+node packages/engine/src/sources/providers/scrapecreators/youtube-fixtures/capture.mjs  # 14 credits, 4 with --only=comments
 node packages/engine/src/sources/providers/scrapecreators/instagram-fixtures/capture.mjs # 6 credits
 ```
 

@@ -14,9 +14,9 @@ import { createLogger } from "../../../logger.js";
 import { unreachableFetch } from "../../../testing/network.js";
 import { redditPlatformId } from "../../platforms.js";
 import { assertSourcesCanBeStored } from "../../storage.js";
-import type { SearchRequest, SourceRuntime } from "../../types.js";
+import type { ReplyRequest, SearchRequest, SourceRuntime } from "../../types.js";
 import { socialCrawlProviderId } from "./provider.js";
-import { SocialCrawlRedditSource, socialCrawlReddit, toCandidatePost } from "./reddit.js";
+import { flatten, SocialCrawlRedditSource, socialCrawlReddit, toCandidatePost } from "./reddit.js";
 
 interface Captured {
   readonly httpStatus: number;
@@ -34,6 +34,8 @@ const keywordPage2 = fixture("search-keyword-page-2");
 const subredditPosts = fixture("subreddit-posts");
 const scopedSearch = fixture("subreddit-search");
 const credentialsRejected = fixture("credentials-rejected");
+/** The whole nested thread, captured on 2026-09-17 by US-159. */
+const thread = fixture("comments-thread");
 
 function itemsOf(captured: Captured): readonly unknown[] {
   return (captured.body as { data?: { items?: readonly unknown[] } }).data?.items ?? [];
@@ -89,18 +91,16 @@ describe("the connector's declared economics", () => {
   });
 
   /**
-   * Not an omission. Its comment endpoint works and costs 5 credits where
-   * ScrapeCreators' costs 1 for the same thread, measured in US-020. A
-   * deployment that wants Reddit replies uses the cheaper provider, and the
-   * monitor form reads this declaration so a person is told rather than
-   * finding out.
+   * Five credits a call against ScrapeCreators' one, and the monitor form
+   * reads the price from here so a person is told before they tick the box.
    */
-  it("declares that it does not read replies, because the cheap provider does", () => {
+  it("reads replies, and prices them at five times a search", () => {
     const built = new SocialCrawlRedditSource(runtimeWith(unreachableFetch));
 
-    expect(socialCrawlReddit.canFetchReplies).toBe(false);
-    expect(built.canFetchReplies).toBe(false);
-    expect((built as { fetchReplies?: unknown }).fetchReplies).toBeUndefined();
+    expect(socialCrawlReddit.canFetchReplies).toBe(true);
+    expect(built.canFetchReplies).toBe(true);
+    expect(socialCrawlReddit.replyPricePerUnitMicros).toBe(5 * 8118);
+    expect(built.fetchReplies).toBeTypeOf("function");
   });
 });
 
@@ -293,5 +293,183 @@ describe("a key the provider refuses", () => {
       valid: false,
       reason: "Enter your SocialCrawl API key.",
     });
+  });
+});
+
+/**
+ * The thread this connector buys for five credits. US-159.
+ *
+ * Captured on 2026-09-17 against a post claiming 34 comments, and it returned
+ * all 34 — eight at the top and the rest nested five levels deep inside
+ * `replies` arrays, with no cursor.
+ */
+describe("the whole thread under one post", () => {
+  const postId = "1ulc2gz";
+  const postUrl =
+    "https://www.reddit.com/r/softwaretesting/comments/1ulc2gz/mobile_qa_engineers_how_long_would_this_test_take/";
+
+  function replyRequest(overrides: Partial<ReplyRequest> = {}): ReplyRequest {
+    return { postUrl, postExternalId: postId, credentials, ...overrides };
+  }
+
+  /**
+   * The measurement the five credits are justified by, asserted rather than
+   * quoted. ScrapeCreators has been measured stopping at 43 of 95 comments
+   * while reporting itself finished; this answer holds everything.
+   */
+  it("answers with a nested tree, not a page", () => {
+    const top = itemsOf(thread);
+
+    expect(top).toHaveLength(8);
+    expect(flatten(top)).toHaveLength(34);
+    expect((thread.body as { data: { truncated: boolean } }).data.truncated).toBe(false);
+    expect(
+      (thread.body as { pagination: { next_cursor: null } }).pagination.next_cursor,
+    ).toBeNull();
+  });
+
+  /**
+   * 34 arrived and 33 are stored. One comment, `ow825zg`, carries an empty
+   * `text` while claiming not to be deleted — an image-only comment, as far as
+   * this endpoint shows. The shared parser drops it rather than storing
+   * silence for the classifier to score, and `itemsReturned` still counts it,
+   * because the provider sent it and the next walk's positions must account
+   * for it.
+   */
+  it("reads the whole thread for one call of five credits", async () => {
+    const stub = socialCrawl([thread]);
+    const source = new SocialCrawlRedditSource(runtimeWith(stub.fetch));
+
+    const result = await source.fetchReplies(replyRequest());
+
+    expect(stub.calls).toHaveLength(1);
+    expect(new URL(stub.calls[0]?.url ?? "").pathname).toBe("/v1/reddit/post/comments");
+    expect(result.replies).toHaveLength(33);
+    expect(result.itemsReturned).toBe(34);
+    expect(result.unitsConsumed).toBe(5);
+  });
+
+  /**
+   * `itemsReturned` counts the flattened tree and not `data.items`. A caller
+   * told "eight" would start the next walk's positions 26 places too low.
+   */
+  it("counts the comments the provider sent, not the branches it sent them in", async () => {
+    const stub = socialCrawl([thread]);
+    const source = new SocialCrawlRedditSource(runtimeWith(stub.fetch));
+
+    const result = await source.fetchReplies(replyRequest());
+
+    expect(result.itemsReturned).not.toBe(itemsOf(thread).length);
+    expect(result.itemsReturned).toBe(34);
+  });
+
+  it("keeps the thread's shape in parent ids rather than in nesting", async () => {
+    const stub = socialCrawl([thread]);
+    const source = new SocialCrawlRedditSource(runtimeWith(stub.fetch));
+
+    const { replies } = await source.fetchReplies(replyRequest());
+
+    const ids = new Set(replies.map((reply) => reply.externalId));
+    const nested = replies.filter((reply) => reply.parentReplyExternalId !== undefined);
+
+    // 33 stored, 8 of them at the top of the thread.
+    expect(nested.length).toBe(33 - 8);
+    expect(replies.every((reply) => reply.parentPostExternalId === postId)).toBe(true);
+
+    /**
+     * Every nested reply's parent came back in the same call, except one.
+     *
+     * `ow8oido` answers `ow825zg`, the comment with no words, which the parser
+     * drops — so it is stored naming a parent this instance holds no row for.
+     * That is the honest outcome and not a fault to repair: the parent had no
+     * words to give the classifier as context either way, and the post above
+     * it is still stored and still linked. Inventing a row for it, or hiding
+     * the link, would lose a real reply to make a set look tidy.
+     */
+    const orphans = nested.filter((reply) => !ids.has(reply.parentReplyExternalId as string));
+
+    expect(orphans.map((reply) => reply.externalId)).toEqual(["ow8oido"]);
+  });
+
+  /**
+   * US-020 measured `author.username` null on this platform and filled on X,
+   * and wrote author presence down as a per-platform fact. This thread fills
+   * it on every comment, so the fact is per-thread or it has changed — either
+   * way the parser requires nothing it may not get.
+   */
+  it("carries an author, a link and a date on every comment", async () => {
+    const stub = socialCrawl([thread]);
+    const source = new SocialCrawlRedditSource(runtimeWith(stub.fetch));
+
+    const { replies } = await source.fetchReplies(replyRequest());
+
+    expect(replies.every((reply) => reply.author !== undefined)).toBe(true);
+    expect(replies.every((reply) => reply.url.includes("/comment/"))).toBe(true);
+    expect(replies.every((reply) => reply.postedAt.getTime() > 0)).toBe(true);
+  });
+
+  it("walks the tree depth first, so a reply follows the words it answers", async () => {
+    const stub = socialCrawl([thread]);
+    const source = new SocialCrawlRedditSource(runtimeWith(stub.fetch));
+
+    const { replies } = await source.fetchReplies(replyRequest({ positionOffset: 10 }));
+
+    expect(replies[0]?.threadPosition).toBe(10);
+    expect(replies[1]?.parentReplyExternalId).toBe(replies[0]?.externalId);
+    // 34 positions were issued from 10; the last stored reply is the 34th,
+    // and the gap at 33 is the comment with no words.
+    expect(replies.at(-1)?.threadPosition).toBe(43);
+  });
+
+  it("believes the provider when it says nothing was left behind", async () => {
+    const stub = socialCrawl([thread]);
+    const source = new SocialCrawlRedditSource(runtimeWith(stub.fetch));
+
+    const result = await source.fetchReplies(replyRequest());
+
+    expect(result.partial).toBe(false);
+    expect(result.next.status).toBe("done");
+  });
+
+  it("records a truncated answer as partial, whatever the cursor says", async () => {
+    const body = thread.body as { data: Record<string, unknown> };
+    const cut = {
+      httpStatus: 200,
+      body: { ...body, data: { ...body.data, truncated: true } },
+    };
+
+    const stub = socialCrawl([cut]);
+    const source = new SocialCrawlRedditSource(runtimeWith(stub.fetch));
+
+    const result = await source.fetchReplies(replyRequest());
+
+    expect(result.partial).toBe(true);
+    expect(result.next.status).toBe("done");
+  });
+
+  /**
+   * A tree is not in date order — a fresh reply hangs under an old comment —
+   * so the window is a filter over every row and never a stop.
+   */
+  it("cuts on the thread's own window", async () => {
+    const stub = socialCrawl([thread]);
+    const source = new SocialCrawlRedditSource(runtimeWith(stub.fetch));
+
+    const all = await source.fetchReplies(replyRequest());
+    const newest = all.replies.reduce((a, b) => (a.postedAt > b.postedAt ? a : b));
+
+    const later = await source.fetchReplies(replyRequest({ since: newest.postedAt }));
+
+    expect(later.replies).toHaveLength(0);
+    // Still billed, and still counted: an empty page is not a free one.
+    expect(later.itemsReturned).toBe(34);
+    expect(later.unitsConsumed).toBe(5);
+  });
+
+  it("ends a walk rather than following a cycle in somebody else's data", () => {
+    const loop: Record<string, unknown> = { id: "a" };
+    loop.replies = [loop];
+
+    expect(flatten([loop]).length).toBeLessThan(25);
   });
 });

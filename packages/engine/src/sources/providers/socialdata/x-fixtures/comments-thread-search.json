@@ -1,0 +1,2151 @@
+{
+  "httpStatus": 200,
+  "body": {
+    "tweets": [
+      {
+        "tweet_created_at": "2026-09-02T16:56:28.000000Z",
+        "id": 2095194155857097200,
+        "id_str": "2095194155857097096",
+        "type": "quote",
+        "conversation_id_str": "2095194155857097096",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "XAI ENGINEERS JUST SHOWED WHAT A 24/7 REPO OPS DESK COULD LOOK LIKE WITH GROK BOT\n\ngrok bot can watch ci, tests, dependencies and security signals continuously instead of waiting for someone to notice a broken repo hours later\n\n6 bots \u2192 300 repo monitors \u2192 60-second checks \u2192 triage \u2192 safe patch \u2192 draft pr \u2192 human review\n\nflaky tests, lint and deterministic failures stay inside the safe lane. regressions, cves and anything touching real logic get routed straight back to a person\n\nthe system can wait for 3 clean runs, track a 95% test threshold and prepare the fix with context, but it never merges code on its own\n\nthis is the shift from manually checking repos all day to letting grok bot run the night shift while humans keep the final decision",
+        "source": "",
+        "truncated": false,
+        "in_reply_to_status_id": null,
+        "in_reply_to_status_id_str": null,
+        "in_reply_to_user_id": null,
+        "in_reply_to_user_id_str": null,
+        "in_reply_to_screen_name": null,
+        "user": {
+          "id": "x-user-1",
+          "id_str": "x-user-2",
+          "name": "x-user-3",
+          "screen_name": "x-user-4",
+          "location": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 10656,
+          "friends_count": 471,
+          "listed_count": 0,
+          "favourites_count": 71573,
+          "statuses_count": 23103,
+          "created_at": "2025-05-02T16:48:51.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-5",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-6",
+          "can_dm": true,
+          "affiliation_label": null
+        },
+        "quoted_status_id": 2095088203690570200,
+        "quoted_status_id_str": "2095088203690570191",
+        "is_quote_status": true,
+        "quoted_status": {
+          "tweet_created_at": "2026-09-02T09:55:27.000000Z",
+          "id": 2095088203690570200,
+          "id_str": "2095088203690570191",
+          "type": "tweet",
+          "conversation_id_str": "2095088203690570191",
+          "community_id_str": null,
+          "community_name": null,
+          "text": null,
+          "full_text": "https://t.co/q4aU28lxwq",
+          "source": "",
+          "truncated": false,
+          "in_reply_to_status_id": null,
+          "in_reply_to_status_id_str": null,
+          "in_reply_to_user_id": null,
+          "in_reply_to_user_id_str": null,
+          "in_reply_to_screen_name": null,
+          "user": {
+            "id": "x-user-1",
+            "id_str": "x-user-2",
+            "name": "x-user-3",
+            "screen_name": "x-user-4",
+            "location": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "protected": false,
+            "verified": true,
+            "followers_count": 10656,
+            "friends_count": 471,
+            "listed_count": 0,
+            "favourites_count": 71573,
+            "statuses_count": 23103,
+            "created_at": "2025-05-02T16:48:51.000000Z",
+            "profile_banner_url": "https://scrubbed.invalid/x-user-5",
+            "profile_image_url_https": "https://scrubbed.invalid/x-user-6",
+            "can_dm": true,
+            "affiliation_label": null
+          },
+          "quoted_status_id": null,
+          "quoted_status_id_str": null,
+          "is_quote_status": false,
+          "quoted_status": null,
+          "retweeted_status": null,
+          "quote_count": 26,
+          "reply_count": 30,
+          "retweet_count": 17,
+          "favorite_count": 173,
+          "views_count": 304313,
+          "bookmark_count": 348,
+          "lang": "zxx",
+          "entities": {
+            "urls": [
+              {
+                "display_url": "x.com/i/article/2094\u2026",
+                "expanded_url": "https://x.com/i/article/2094515962989125632",
+                "indices": [
+                  0,
+                  23
+                ],
+                "url": "https://t.co/q4aU28lxwq"
+              }
+            ],
+            "display_text_range": [
+              0,
+              23
+            ]
+          },
+          "is_pinned": false
+        },
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 24,
+        "retweet_count": 2,
+        "favorite_count": 85,
+        "views_count": 6125,
+        "bookmark_count": 51,
+        "lang": "en",
+        "entities": {
+          "hashtags": [],
+          "symbols": [],
+          "timestamps": [],
+          "urls": [],
+          "user_mentions": [],
+          "media": [
+            {
+              "allow_download_status": {
+                "allow_download": true
+              },
+              "display_url": "pic.x.com/x-user-108",
+              "expanded_url": "https://x.com/x-user-4/status/2095194155857097096/photo/1",
+              "ext_master_playlist_only": [],
+              "ext_media_availability": {
+                "status": "Available"
+              },
+              "ext_playlists": [],
+              "features": {
+                "large": {
+                  "faces": []
+                }
+              },
+              "id_str": "2095194132667076608",
+              "indices": [
+                276,
+                299
+              ],
+              "media_key": "3_2095194132667076608",
+              "media_url_https": "https://pbs.twimg.com/media/HROf9n0akAAfJWD.jpg",
+              "original_info": {
+                "focus_rects": [
+                  {
+                    "h": 459,
+                    "w": 820,
+                    "x": 0,
+                    "y": 0
+                  },
+                  {
+                    "h": 820,
+                    "w": 820,
+                    "x": 0,
+                    "y": 0
+                  },
+                  {
+                    "h": 935,
+                    "w": 820,
+                    "x": 0,
+                    "y": 0
+                  },
+                  {
+                    "h": 1024,
+                    "w": 512,
+                    "x": 0,
+                    "y": 0
+                  },
+                  {
+                    "h": 1024,
+                    "w": 820,
+                    "x": 0,
+                    "y": 0
+                  }
+                ],
+                "height": 1024,
+                "width": 820
+              },
+              "sizes": {
+                "large": {
+                  "h": 1024,
+                  "w": 820
+                }
+              },
+              "type": "photo",
+              "url": "https://t.co/5pNbub5qPQ"
+            }
+          ],
+          "display_text_range": [
+            0,
+            275
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-09-02T09:55:27.000000Z",
+        "id": 2095088203690570200,
+        "id_str": "2095088203690570191",
+        "type": "tweet",
+        "conversation_id_str": "2095088203690570191",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "https://t.co/q4aU28lxwq",
+        "source": "",
+        "truncated": false,
+        "in_reply_to_status_id": null,
+        "in_reply_to_status_id_str": null,
+        "in_reply_to_user_id": null,
+        "in_reply_to_user_id_str": null,
+        "in_reply_to_screen_name": null,
+        "user": {
+          "id": "x-user-1",
+          "id_str": "x-user-2",
+          "name": "x-user-3",
+          "screen_name": "x-user-4",
+          "location": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 10656,
+          "friends_count": 471,
+          "listed_count": 0,
+          "favourites_count": 71573,
+          "statuses_count": 23103,
+          "created_at": "2025-05-02T16:48:51.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-5",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-6",
+          "can_dm": true,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 26,
+        "reply_count": 30,
+        "retweet_count": 17,
+        "favorite_count": 173,
+        "views_count": 304313,
+        "bookmark_count": 348,
+        "lang": "zxx",
+        "entities": {
+          "urls": [
+            {
+              "display_url": "x.com/i/article/2094\u2026",
+              "expanded_url": "https://x.com/i/article/2094515962989125632",
+              "indices": [
+                0,
+                23
+              ],
+              "url": "https://t.co/q4aU28lxwq"
+            }
+          ],
+          "display_text_range": [
+            0,
+            23
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-09-02T08:03:24.000000Z",
+        "id": 2095060006127149600,
+        "id_str": "2095060006127149480",
+        "type": "tweet",
+        "conversation_id_str": "2095060006127149480",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "call me insane...but this is the closest thing to AGI i've ever seen\n\n19 skills turn an agent into a worker\neyes, ears, hands, a memory\n\ngive this article to your agent\n\nit'll be the most productive thing you do this week https://t.co/6mRsWhLKv6",
+        "source": "",
+        "truncated": false,
+        "in_reply_to_status_id": null,
+        "in_reply_to_status_id_str": null,
+        "in_reply_to_user_id": null,
+        "in_reply_to_user_id_str": null,
+        "in_reply_to_screen_name": null,
+        "user": {
+          "id": "x-user-7",
+          "id_str": "x-user-8",
+          "name": "x-user-9",
+          "screen_name": "x-user-10",
+          "location": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "url": "",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 8679,
+          "friends_count": 988,
+          "listed_count": 0,
+          "favourites_count": 85460,
+          "statuses_count": 57163,
+          "created_at": "2018-12-17T23:36:25.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-11",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-12",
+          "can_dm": true,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 12,
+        "reply_count": 52,
+        "retweet_count": 131,
+        "favorite_count": 1397,
+        "views_count": 687371,
+        "bookmark_count": 4525,
+        "lang": "en",
+        "entities": {
+          "urls": [
+            {
+              "display_url": "x.com/i/article/2094\u2026",
+              "expanded_url": "https://x.com/i/article/2094079614112890881",
+              "indices": [
+                222,
+                245
+              ],
+              "url": "https://t.co/6mRsWhLKv6"
+            }
+          ],
+          "display_text_range": [
+            0,
+            245
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-08-25T09:21:50.000000Z",
+        "id": 2092180643723596000,
+        "id_str": "2092180643723596126",
+        "type": "tweet",
+        "conversation_id_str": "2092180643723596126",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "https://t.co/Qwf48iH7SW",
+        "source": "",
+        "truncated": false,
+        "in_reply_to_status_id": null,
+        "in_reply_to_status_id_str": null,
+        "in_reply_to_user_id": null,
+        "in_reply_to_user_id_str": null,
+        "in_reply_to_screen_name": null,
+        "user": {
+          "id": "x-user-13",
+          "id_str": "x-user-14",
+          "name": "x-user-15",
+          "screen_name": "x-user-15",
+          "location": "",
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 87150,
+          "friends_count": 71,
+          "listed_count": 0,
+          "favourites_count": 17724,
+          "statuses_count": 4508,
+          "created_at": "2024-01-12T15:02:48.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-16",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-17",
+          "can_dm": true,
+          "affiliation_label": null,
+          "verification_info": {
+            "type": "Business"
+          }
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 37,
+        "reply_count": 56,
+        "retweet_count": 60,
+        "favorite_count": 264,
+        "views_count": 30667,
+        "bookmark_count": 29,
+        "lang": "zxx",
+        "entities": {
+          "urls": [
+            {
+              "display_url": "x.com/i/article/2091\u2026",
+              "expanded_url": "https://x.com/i/article/2091843178584264705",
+              "indices": [
+                0,
+                23
+              ],
+              "url": "https://t.co/Qwf48iH7SW"
+            }
+          ],
+          "display_text_range": [
+            0,
+            23
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-08-18T16:56:51.000000Z",
+        "id": 2089758434921161000,
+        "id_str": "2089758434921160877",
+        "type": "tweet",
+        "conversation_id_str": "2089758434921160877",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "https://t.co/RZvOGGyunU",
+        "source": "",
+        "truncated": false,
+        "in_reply_to_status_id": null,
+        "in_reply_to_status_id_str": null,
+        "in_reply_to_user_id": null,
+        "in_reply_to_user_id_str": null,
+        "in_reply_to_screen_name": null,
+        "user": {
+          "id": "x-user-18",
+          "id_str": "x-user-19",
+          "name": "x-user-20",
+          "screen_name": "x-user-21",
+          "location": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 71761,
+          "friends_count": 922,
+          "listed_count": 0,
+          "favourites_count": 26056,
+          "statuses_count": 9734,
+          "created_at": "2022-04-26T16:05:42.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-22",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-23",
+          "can_dm": true,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 36,
+        "reply_count": 86,
+        "retweet_count": 168,
+        "favorite_count": 1505,
+        "views_count": 4206076,
+        "bookmark_count": 1334,
+        "lang": "zxx",
+        "entities": {
+          "urls": [
+            {
+              "display_url": "x.com/i/article/2089\u2026",
+              "expanded_url": "https://x.com/i/article/2089758428420075520",
+              "indices": [
+                0,
+                23
+              ],
+              "url": "https://t.co/RZvOGGyunU"
+            }
+          ],
+          "display_text_range": [
+            0,
+            23
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-08-02T12:27:00.000000Z",
+        "id": 2083892320584257500,
+        "id_str": "2083892320584257634",
+        "type": "tweet",
+        "conversation_id_str": "2083892320584257634",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "https://t.co/tykZ5DOFuZ",
+        "source": "",
+        "truncated": false,
+        "in_reply_to_status_id": null,
+        "in_reply_to_status_id_str": null,
+        "in_reply_to_user_id": null,
+        "in_reply_to_user_id_str": null,
+        "in_reply_to_screen_name": null,
+        "user": {
+          "id": "x-user-24",
+          "id_str": "x-user-25",
+          "name": "x-user-26",
+          "screen_name": "x-user-27",
+          "location": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 14896,
+          "friends_count": 965,
+          "listed_count": 0,
+          "favourites_count": 47145,
+          "statuses_count": 9653,
+          "created_at": "2021-12-13T20:49:44.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-28",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-29",
+          "can_dm": false,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 15,
+        "reply_count": 30,
+        "retweet_count": 6,
+        "favorite_count": 118,
+        "views_count": 128511,
+        "bookmark_count": 203,
+        "lang": "zxx",
+        "entities": {
+          "urls": [
+            {
+              "display_url": "x.com/i/article/2083\u2026",
+              "expanded_url": "http://x.com/i/article/2083879450442100736",
+              "indices": [
+                0,
+                23
+              ],
+              "url": "https://t.co/tykZ5DOFuZ"
+            }
+          ],
+          "display_text_range": [
+            0,
+            23
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-07-18T02:47:00.000000Z",
+        "id": 2078310539885990000,
+        "id_str": "2078310539885989938",
+        "type": "tweet",
+        "conversation_id_str": "2078310539885989938",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "In 1930, the dark, cavernous inner sanctum of the Brihadeeshwara Temple in Thanjavur holds a massive secret. For nearly a 1000 yrs, a series of exquisite, large-scale murals painted during the height of the Chola Empire had been completely lost to history. They were buried under a thick, crude layer of 17th century Nayak era paint & centuries of black soot from oil lamps.\n\nWhen historians finally discovered the hidden Chola paintings beneath the top layer, the ASI faced a terrifying technical nightmare: How do you peel away a 300 yr old layer of paint to reveal a 1000 yr old masterpiece beneath it, w/o destroying either one?\n\nTraditional archaeologists were completely out of their depth. They tried scraping it, but the ancient plaster crumbled into dust. They needed a scientist. Specifically, they needed a young man named Srinivasan Paramasivan, who had just been hired as a mid level chemical assistant at the Government Museum in Madras.\n\nParamasivan did not treat ancient art as a matter of aesthetics; he treated it as a problem of pure chemistry, material science & geology. Working inside a tiny, damp lab at the Madras Museum with next to no budget, he realized that to save the paintings, he had to reverse engineer exactly how the ancient masters created them.\n\nHe pioneered a highly meticulous method of micro-chemical analysis. He chipped off microscopic flakes of the plaster, smaller than a grain of sand & subjected them to rigorous tests to analyze the binding media, the moisture content & the chemical composition of the pigments.\n\nHis findings completely rewrote the history of Indian art. He proved that unlike the secco technique (painting on dry plaster) common in later Indian periods, the Chola masters used the incredibly difficult true fresco (fresco buono) technique. They painted directly onto wet, freshly laid lime plaster, causing the pigment particles to chemically fuse inside the limestone as it dried.\n\nArmed with this chemical truth, Paramasivan designed a delicate, specialized solvent mixture. He carefully brushed it onto the top Nayak layer, softening it just enough so it could be mechanically separated & rolled back like a sticker, exposing the pristine, brilliant 1000 yr old Chola colors underneath. It was the 1st time in global archaeology that a dual layer of ancient frescoes had been successfully separated w/o losing the art.\n\nParamasivan's next massive, hidden triumph involved India's iconic Chola Bronzes. By the late 1930s, ancient bronze statues of Nataraja & other deities stored in museums & temples across South India were actively dying. They were covered in a bright green, flaky crust known to curators as \"Bronze Disease.\"\n\nThis is not ordinary rust. It is a highly destructive electrochemical reaction that occurs when buried copper alloys come into contact with chlorides & moisture. Left unchecked, the metal literally eats itself from the inside out, turning priceless, intricate sculptures into piles of green powder.\n\nWestern museums solved this by scraping the statues down/using aggressive acid baths, which stripped away the beautiful, historic \"patina\" (the dark, protective skin the metal naturally develops over centuries). Paramasivan flatly refused to deface the statues. Instead, he pioneered an incredibly elegant electrolytic restoration method.\n\nHe submerged the fragile, corroded bronze deities into a customized chemical solution, wrapped them in a gentle wire mesh & ran a highly controlled, very low-voltage electrical current through the bath for weeks at a time. The electrical current reversed the chemical oxidation process, forcing the destructive chloride ions to detach from the statue & migrate toward the wire mesh.\n\nWhen the statues emerged from his bath, the destructive disease was completely eradicated, but the gorgeous, original, dark historic patina remained perfectly intact. He had saved the soul of the bronze using basic electrochemistry.\n\nParamasivan eventually rose to become the Archaeological Chemist of the ASI, publishing his groundbreaking research in elite global journals like Nature & Technical Studies in the Field of the Fine Arts.\n\nYet, to his neighbors & his domestic circle, he never looked like a pioneer. He lived a fiercely disciplined, intensely quiet life, rarely boasting about his international publications.\n\nLong before modern universities offered degrees in \"Archaeological Science,\" a quiet man in a modest house in Madras was using electrochemistry, geology & physics to rescue India's greatest artistic legacies from turning into dust.",
+        "source": "",
+        "truncated": false,
+        "in_reply_to_status_id": null,
+        "in_reply_to_status_id_str": null,
+        "in_reply_to_user_id": null,
+        "in_reply_to_user_id_str": null,
+        "in_reply_to_screen_name": null,
+        "user": {
+          "id": "x-user-30",
+          "id_str": "x-user-31",
+          "name": "x-user-32",
+          "screen_name": "x-user-33",
+          "location": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 39257,
+          "friends_count": 72,
+          "listed_count": 0,
+          "favourites_count": 16755,
+          "statuses_count": 9213,
+          "created_at": "2021-11-27T03:06:39.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-34",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-35",
+          "can_dm": true,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 22,
+        "reply_count": 40,
+        "retweet_count": 448,
+        "favorite_count": 1211,
+        "views_count": 30593,
+        "bookmark_count": 218,
+        "lang": "en",
+        "entities": {
+          "hashtags": [],
+          "symbols": [],
+          "urls": [],
+          "user_mentions": [],
+          "media": [
+            {
+              "display_url": "pic.x.com/x-user-109",
+              "expanded_url": "https://x.com/x-user-33/status/2078310539885989938/photo/1",
+              "ext_alt_text": "Paramasivan standing 3rd from left with Sir C. V. Raman & others",
+              "ext_master_playlist_only": [],
+              "ext_media_availability": {
+                "status": "Available"
+              },
+              "ext_playlists": [],
+              "features": {
+                "large": {
+                  "faces": [
+                    {
+                      "h": 41,
+                      "w": 41,
+                      "x": 352,
+                      "y": 123
+                    },
+                    {
+                      "h": 42,
+                      "w": 42,
+                      "x": 55,
+                      "y": 140
+                    },
+                    {
+                      "h": 42,
+                      "w": 42,
+                      "x": 152,
+                      "y": 139
+                    },
+                    {
+                      "h": 40,
+                      "w": 40,
+                      "x": 454,
+                      "y": 140
+                    },
+                    {
+                      "h": 37,
+                      "w": 37,
+                      "x": 694,
+                      "y": 146
+                    },
+                    {
+                      "h": 37,
+                      "w": 37,
+                      "x": 249,
+                      "y": 150
+                    },
+                    {
+                      "h": 42,
+                      "w": 42,
+                      "x": 568,
+                      "y": 149
+                    },
+                    {
+                      "h": 42,
+                      "w": 42,
+                      "x": 56,
+                      "y": 219
+                    },
+                    {
+                      "h": 40,
+                      "w": 40,
+                      "x": 395,
+                      "y": 224
+                    },
+                    {
+                      "h": 41,
+                      "w": 41,
+                      "x": 267,
+                      "y": 228
+                    },
+                    {
+                      "h": 41,
+                      "w": 41,
+                      "x": 607,
+                      "y": 232
+                    },
+                    {
+                      "h": 41,
+                      "w": 41,
+                      "x": 719,
+                      "y": 232
+                    },
+                    {
+                      "h": 41,
+                      "w": 41,
+                      "x": 163,
+                      "y": 236
+                    },
+                    {
+                      "h": 38,
+                      "w": 38,
+                      "x": 516,
+                      "y": 236
+                    },
+                    {
+                      "h": 121,
+                      "w": 121,
+                      "x": 12,
+                      "y": 134
+                    },
+                    {
+                      "h": 113,
+                      "w": 113,
+                      "x": 123,
+                      "y": 330
+                    }
+                  ]
+                }
+              },
+              "id_str": "2078310067829686273",
+              "indices": [
+                280,
+                303
+              ],
+              "media_key": "3_2078310067829686273",
+              "media_url_https": "https://pbs.twimg.com/media/HNej_s4bQAEst9N.png",
+              "original_info": {
+                "focus_rects": [
+                  {
+                    "h": 451,
+                    "w": 805,
+                    "x": 0,
+                    "y": 0
+                  },
+                  {
+                    "h": 600,
+                    "w": 600,
+                    "x": 205,
+                    "y": 0
+                  },
+                  {
+                    "h": 600,
+                    "w": 526,
+                    "x": 279,
+                    "y": 0
+                  },
+                  {
+                    "h": 600,
+                    "w": 300,
+                    "x": 432,
+                    "y": 0
+                  },
+                  {
+                    "h": 600,
+                    "w": 805,
+                    "x": 0,
+                    "y": 0
+                  }
+                ],
+                "height": 600,
+                "width": 805
+              },
+              "sizes": {
+                "large": {
+                  "h": 600,
+                  "w": 805
+                }
+              },
+              "type": "photo",
+              "url": "https://t.co/t6c2TJTldO"
+            },
+            {
+              "display_url": "pic.x.com/x-user-109",
+              "expanded_url": "https://x.com/x-user-33/status/2078310539885989938/photo/1",
+              "ext_master_playlist_only": [],
+              "ext_media_availability": {
+                "status": "Available"
+              },
+              "ext_playlists": [],
+              "features": {
+                "large": {
+                  "faces": [
+                    {
+                      "h": 40,
+                      "w": 40,
+                      "x": 22,
+                      "y": 28
+                    }
+                  ]
+                }
+              },
+              "id_str": "2078310444411052032",
+              "indices": [
+                280,
+                303
+              ],
+              "media_key": "3_2078310444411052032",
+              "media_url_https": "https://pbs.twimg.com/media/HNekVnwa4AAwVzv.png",
+              "original_info": {
+                "focus_rects": [
+                  {
+                    "h": 46,
+                    "w": 83,
+                    "x": 0,
+                    "y": 23
+                  },
+                  {
+                    "h": 83,
+                    "w": 83,
+                    "x": 0,
+                    "y": 5
+                  },
+                  {
+                    "h": 95,
+                    "w": 83,
+                    "x": 0,
+                    "y": 0
+                  },
+                  {
+                    "h": 98,
+                    "w": 49,
+                    "x": 22,
+                    "y": 0
+                  },
+                  {
+                    "h": 98,
+                    "w": 83,
+                    "x": 0,
+                    "y": 0
+                  }
+                ],
+                "height": 98,
+                "width": 83
+              },
+              "sizes": {
+                "large": {
+                  "h": 98,
+                  "w": 83
+                }
+              },
+              "type": "photo",
+              "url": "https://t.co/t6c2TJTldO"
+            }
+          ],
+          "display_text_range": [
+            0,
+            279
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-07-16T17:07:24.000000Z",
+        "id": 2077802290304684300,
+        "id_str": "2077802290304684404",
+        "type": "tweet",
+        "conversation_id_str": "2077802290304684404",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "https://t.co/9ujCmLs3lQ",
+        "source": "",
+        "truncated": false,
+        "in_reply_to_status_id": null,
+        "in_reply_to_status_id_str": null,
+        "in_reply_to_user_id": null,
+        "in_reply_to_user_id_str": null,
+        "in_reply_to_screen_name": null,
+        "user": {
+          "id": "x-user-36",
+          "id_str": "x-user-36",
+          "name": "x-user-37",
+          "screen_name": "x-user-38",
+          "location": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 491026,
+          "friends_count": 1565,
+          "listed_count": 0,
+          "favourites_count": 55422,
+          "statuses_count": 29985,
+          "created_at": "2010-07-13T12:31:51.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-39",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-40",
+          "can_dm": false,
+          "affiliation_label": {
+            "label_url": "https://twitter.com/x-user-110",
+            "badge_url": "https://pbs.twimg.com/profile_images/2092066596915466240/TwZ32AYK_bigger.jpg",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "label_type": "BusinessLabel",
+            "display_type": "Badge"
+          }
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 161,
+        "reply_count": 109,
+        "retweet_count": 338,
+        "favorite_count": 2770,
+        "views_count": 1283692,
+        "bookmark_count": 6754,
+        "lang": "zxx",
+        "entities": {
+          "urls": [
+            {
+              "display_url": "x.com/i/article/2077\u2026",
+              "expanded_url": "http://x.com/i/article/2077626320205574144",
+              "indices": [
+                0,
+                23
+              ],
+              "url": "https://t.co/9ujCmLs3lQ"
+            }
+          ],
+          "display_text_range": [
+            0,
+            23
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-07-15T13:14:42.000000Z",
+        "id": 2077381342376104200,
+        "id_str": "2077381342376104097",
+        "type": "tweet",
+        "conversation_id_str": "2077381342376104097",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "End-to-end tests do not work at scale, nor does staging infrastructure. Past a certain number of services, both turn into a liability, and a big one at that. It is nearly impossible to run a \"company-in-a-box\" environment at scale.\n\nStaging is meant to be a smaller, calmer copy of production. In practice, it becomes its own fragile system. A shared database, shared services, and everything around them all need to be up, on the right version, and in the right state at the same time.\n\nRunning tests across services on top of that staging infrastructure is even more fragile. Test for service A now depends on service B being deployed, service C having the right data, and the staging database not being mid-migration because of someone else's change.\n\nOne flaky service and the whole suite goes red, for a reason that has nothing to do with the code being tested.\n\nWhen that happens, nobody owns the failure, and it somehow becomes the responsibility of a central team (most likely DevOps, SRE, or Platform. Yesss... been in the same situation a decade ago).\n\nWhat works instead is each service owning its own tests and mocking the responses of the services it depends on. No shared staging database. No waiting on five other teams to deploy before you can run a single test suite.\n\nThis gives you a clear separation of concerns. A service is responsible for its own contract and its own correctness, nothing more. Cross-service behavior gets verified through contract tests between two teams, not through a shared environment that everyone touches and no one owns.\n\nIt also shifts accountability to the left because there is no one to blame. If a mock does not match reality, that is a contract problem between two teams, caught early by the team that owns the code.\n\nFewer moving parts, less shared infrastructure to babysit.\n\nSomehow, every company struggles with, there is no end to this problem, and there is probably a billion-dollar business to be built solving it :)\n\nHope this helps.",
+        "source": "",
+        "truncated": false,
+        "in_reply_to_status_id": null,
+        "in_reply_to_status_id_str": null,
+        "in_reply_to_user_id": null,
+        "in_reply_to_user_id_str": null,
+        "in_reply_to_screen_name": null,
+        "user": {
+          "id": "x-user-41",
+          "id_str": "x-user-41",
+          "name": "x-user-42",
+          "screen_name": "x-user-43",
+          "location": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 127033,
+          "friends_count": 1266,
+          "listed_count": 0,
+          "favourites_count": 14159,
+          "statuses_count": 11937,
+          "created_at": "2009-12-23T05:49:24.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-44",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-45",
+          "can_dm": true,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 3,
+        "reply_count": 29,
+        "retweet_count": 19,
+        "favorite_count": 435,
+        "views_count": 29021,
+        "bookmark_count": 200,
+        "lang": "en",
+        "entities": {
+          "hashtags": [],
+          "symbols": [],
+          "urls": [],
+          "user_mentions": [],
+          "display_text_range": [
+            0,
+            278
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-07-14T14:07:10.000000Z",
+        "id": 2077032156866711800,
+        "id_str": "2077032156866711802",
+        "type": "tweet",
+        "conversation_id_str": "2077032156866711802",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "When I was growing up, programming was an expression of creativity.\n\nSomewhere along the way, it became more about the chores. Merge conflicts. Flaky tests. CI failures. Bug triage.\n\nLet's give the chores to the robots and get back to building cool shit.",
+        "source": "",
+        "truncated": false,
+        "in_reply_to_status_id": null,
+        "in_reply_to_status_id_str": null,
+        "in_reply_to_user_id": null,
+        "in_reply_to_user_id_str": null,
+        "in_reply_to_screen_name": null,
+        "user": {
+          "id": "x-user-46",
+          "id_str": "x-user-46",
+          "name": "x-user-47",
+          "screen_name": "x-user-48",
+          "location": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 5566,
+          "friends_count": 616,
+          "listed_count": 0,
+          "favourites_count": 5132,
+          "statuses_count": 462,
+          "created_at": "2008-05-05T05:47:04.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-49",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-50",
+          "can_dm": true,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 6,
+        "reply_count": 46,
+        "retweet_count": 29,
+        "favorite_count": 457,
+        "views_count": 42700,
+        "bookmark_count": 41,
+        "lang": "en",
+        "entities": {
+          "display_text_range": [
+            0,
+            254
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-07-12T14:06:30.000000Z",
+        "id": 2076307213346324500,
+        "id_str": "2076307213346324568",
+        "type": "tweet",
+        "conversation_id_str": "2076307213346324568",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "https://t.co/y1H9r7WFxP",
+        "source": "",
+        "truncated": false,
+        "in_reply_to_status_id": null,
+        "in_reply_to_status_id_str": null,
+        "in_reply_to_user_id": null,
+        "in_reply_to_user_id_str": null,
+        "in_reply_to_screen_name": null,
+        "user": {
+          "id": "x-user-51",
+          "id_str": "x-user-52",
+          "name": "x-user-53",
+          "screen_name": "x-user-54",
+          "location": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 11948,
+          "friends_count": 869,
+          "listed_count": 0,
+          "favourites_count": 75900,
+          "statuses_count": 20199,
+          "created_at": "2021-10-09T19:21:30.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-55",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-56",
+          "can_dm": true,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 12,
+        "reply_count": 32,
+        "retweet_count": 6,
+        "favorite_count": 117,
+        "views_count": 90547,
+        "bookmark_count": 143,
+        "lang": "zxx",
+        "entities": {
+          "urls": [
+            {
+              "display_url": "x.com/i/article/2075\u2026",
+              "expanded_url": "http://x.com/i/article/2075991510042951681",
+              "indices": [
+                0,
+                23
+              ],
+              "url": "https://t.co/y1H9r7WFxP"
+            }
+          ],
+          "display_text_range": [
+            0,
+            23
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-07-10T11:14:44.000000Z",
+        "id": 2075539210325447000,
+        "id_str": "2075539210325446882",
+        "type": "tweet",
+        "conversation_id_str": "2075539210325446882",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "https://t.co/c3d5TKbrA3",
+        "source": "",
+        "truncated": false,
+        "in_reply_to_status_id": null,
+        "in_reply_to_status_id_str": null,
+        "in_reply_to_user_id": null,
+        "in_reply_to_user_id_str": null,
+        "in_reply_to_screen_name": null,
+        "user": {
+          "id": "x-user-57",
+          "id_str": "x-user-57",
+          "name": "x-user-58",
+          "screen_name": "x-user-59",
+          "location": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 18118,
+          "friends_count": 287,
+          "listed_count": 0,
+          "favourites_count": 4381,
+          "statuses_count": 1861,
+          "created_at": "2008-05-28T06:04:45.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-60",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-61",
+          "can_dm": true,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 31,
+        "retweet_count": 1,
+        "favorite_count": 47,
+        "views_count": 50364,
+        "bookmark_count": 37,
+        "lang": "zxx",
+        "entities": {
+          "urls": [
+            {
+              "display_url": "x.com/i/article/2075\u2026",
+              "expanded_url": "http://x.com/i/article/2075536089704456192",
+              "indices": [
+                0,
+                23
+              ],
+              "url": "https://t.co/c3d5TKbrA3"
+            }
+          ],
+          "display_text_range": [
+            0,
+            23
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-06-23T17:26:43.000000Z",
+        "id": 2069472232712389000,
+        "id_str": "2069472232712389112",
+        "type": "tweet",
+        "conversation_id_str": "2069472232712389112",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "https://t.co/JdT9SeLxbZ",
+        "source": "",
+        "truncated": false,
+        "in_reply_to_status_id": null,
+        "in_reply_to_status_id_str": null,
+        "in_reply_to_user_id": null,
+        "in_reply_to_user_id_str": null,
+        "in_reply_to_screen_name": null,
+        "user": {
+          "id": "x-user-62",
+          "id_str": "x-user-63",
+          "name": "x-user-64",
+          "screen_name": "x-user-65",
+          "location": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 24733,
+          "friends_count": 2,
+          "listed_count": 0,
+          "favourites_count": 4114,
+          "statuses_count": 2679,
+          "created_at": "2020-01-26T20:45:49.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-66",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-67",
+          "can_dm": true,
+          "affiliation_label": null,
+          "verification_info": {
+            "type": "Business"
+          }
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 26,
+        "reply_count": 23,
+        "retweet_count": 68,
+        "favorite_count": 925,
+        "views_count": 454486,
+        "bookmark_count": 2870,
+        "lang": "zxx",
+        "entities": {
+          "urls": [
+            {
+              "display_url": "x.com/i/article/2069\u2026",
+              "expanded_url": "http://x.com/i/article/2069465707440644096",
+              "indices": [
+                0,
+                23
+              ],
+              "url": "https://t.co/JdT9SeLxbZ"
+            }
+          ],
+          "display_text_range": [
+            0,
+            23
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-06-22T15:30:21.000000Z",
+        "id": 2069080559595253800,
+        "id_str": "2069080559595253831",
+        "type": "tweet",
+        "conversation_id_str": "2069080559595253831",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "https://t.co/r8Y6Oa2nlz",
+        "source": "",
+        "truncated": false,
+        "in_reply_to_status_id": null,
+        "in_reply_to_status_id_str": null,
+        "in_reply_to_user_id": null,
+        "in_reply_to_user_id_str": null,
+        "in_reply_to_screen_name": null,
+        "user": {
+          "id": "x-user-68",
+          "id_str": "x-user-68",
+          "name": "x-user-69",
+          "screen_name": "x-user-70",
+          "location": "",
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 20851,
+          "friends_count": 924,
+          "listed_count": 0,
+          "favourites_count": 28874,
+          "statuses_count": 8005,
+          "created_at": "2015-03-23T16:44:56.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-71",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-72",
+          "can_dm": true,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 31,
+        "reply_count": 61,
+        "retweet_count": 53,
+        "favorite_count": 392,
+        "views_count": 129382,
+        "bookmark_count": 325,
+        "lang": "zxx",
+        "entities": {
+          "urls": [
+            {
+              "display_url": "x.com/i/article/2068\u2026",
+              "expanded_url": "http://x.com/i/article/2068970770357792768",
+              "indices": [
+                0,
+                23
+              ],
+              "url": "https://t.co/r8Y6Oa2nlz"
+            }
+          ],
+          "display_text_range": [
+            0,
+            23
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-06-21T14:34:47.000000Z",
+        "id": 2068704187492221400,
+        "id_str": "2068704187492221405",
+        "type": "tweet",
+        "conversation_id_str": "2068704187492221405",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "https://t.co/wXfbMqws2J",
+        "source": "",
+        "truncated": false,
+        "in_reply_to_status_id": null,
+        "in_reply_to_status_id_str": null,
+        "in_reply_to_user_id": null,
+        "in_reply_to_user_id_str": null,
+        "in_reply_to_screen_name": null,
+        "user": {
+          "id": "x-user-51",
+          "id_str": "x-user-52",
+          "name": "x-user-53",
+          "screen_name": "x-user-54",
+          "location": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 11948,
+          "friends_count": 869,
+          "listed_count": 0,
+          "favourites_count": 75900,
+          "statuses_count": 20199,
+          "created_at": "2021-10-09T19:21:30.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-55",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-56",
+          "can_dm": true,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 22,
+        "reply_count": 41,
+        "retweet_count": 46,
+        "favorite_count": 389,
+        "views_count": 360241,
+        "bookmark_count": 843,
+        "lang": "zxx",
+        "entities": {
+          "urls": [
+            {
+              "display_url": "x.com/i/article/2068\u2026",
+              "expanded_url": "http://x.com/i/article/2068685902868598784",
+              "indices": [
+                0,
+                23
+              ],
+              "url": "https://t.co/wXfbMqws2J"
+            }
+          ],
+          "display_text_range": [
+            0,
+            23
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-06-20T20:09:47.000000Z",
+        "id": 2068426104088748300,
+        "id_str": "2068426104088748331",
+        "type": "tweet",
+        "conversation_id_str": "2068426104088748331",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "https://t.co/E7cn84qhZk",
+        "source": "",
+        "truncated": false,
+        "in_reply_to_status_id": null,
+        "in_reply_to_status_id_str": null,
+        "in_reply_to_user_id": null,
+        "in_reply_to_user_id_str": null,
+        "in_reply_to_screen_name": null,
+        "user": {
+          "id": "x-user-73",
+          "id_str": "x-user-73",
+          "name": "x-user-74",
+          "screen_name": "x-user-75",
+          "location": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 40311,
+          "friends_count": 4925,
+          "listed_count": 0,
+          "favourites_count": 52164,
+          "statuses_count": 18267,
+          "created_at": "2007-05-22T16:48:48.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-76",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-77",
+          "can_dm": true,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 15,
+        "reply_count": 33,
+        "retweet_count": 167,
+        "favorite_count": 1326,
+        "views_count": 452214,
+        "bookmark_count": 4370,
+        "lang": "zxx",
+        "entities": {
+          "urls": [
+            {
+              "display_url": "x.com/i/article/2068\u2026",
+              "expanded_url": "http://x.com/i/article/2068372607045685248",
+              "indices": [
+                0,
+                23
+              ],
+              "url": "https://t.co/E7cn84qhZk"
+            }
+          ],
+          "display_text_range": [
+            0,
+            23
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-06-18T07:30:30.000000Z",
+        "id": 2067510249687224600,
+        "id_str": "2067510249687224648",
+        "type": "quote",
+        "conversation_id_str": "2067510249687224648",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "the 4 simple claude loop types + random real workflows people are using right now\n\nthese are just random examples of loops people set up. nothing fancy. just ways to make claude do repeat work automatically.\n\nthe 4 basic loop types:\n\n/loop \u2013 repeats a task over and over until you stop it\n\n/goal \u2013 keeps working until it finishes a clear job (like tests passing or a feature done)\n\n/schedule \u2013 runs automatically on a timer (daily, weekly, etc.)\n\n/batch \u2013 does many tasks at the same time to finish faster\n\nrandom real loops people use:\n\npr babysitter \u2013 watches pull requests, fixes errors, and reminds you when reviews are stuck\n\nflaky test fixer \u2013 keeps running tests until it finds unstable ones, then fixes or removes them\n\ndaily triage \u2013 checks new issues every morning and summarizes what needs attention\n\ndocs updater \u2013 keeps documentation updated whenever code changes\n\ndaily briefing \u2013 writes a simple morning summary of what happened in the code\n\ncontent loop \u2013 picks topics and writes first drafts every week\n\ncompetitor watcher \u2013 checks competitor updates and summarizes changes once a week\n\ngoal loop \u2013 keeps coding until the job is fully done and verified\n\nbatch refactor \u2013 changes lots of files at once instead of doing it one by one\n\novernight build chain \u2013 builds a full feature step by step while you sleep\n\nclient report loop \u2013 turns weekly work into a clean client update\n\nlearning loop \u2013 saves mistakes so the system avoids repeating them next time\n\nthe idea is that instead of doing the same boring tasks every day, you set a loop once and let it run in the background.",
+        "source": "",
+        "truncated": false,
+        "in_reply_to_status_id": null,
+        "in_reply_to_status_id_str": null,
+        "in_reply_to_user_id": null,
+        "in_reply_to_user_id_str": null,
+        "in_reply_to_screen_name": null,
+        "user": {
+          "id": "x-user-78",
+          "id_str": "x-user-79",
+          "name": "x-user-80",
+          "screen_name": "x-user-81",
+          "location": "",
+          "url": "",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 26924,
+          "friends_count": 3030,
+          "listed_count": 0,
+          "favourites_count": 152579,
+          "statuses_count": 111141,
+          "created_at": "2024-05-08T16:25:21.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-82",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-83",
+          "can_dm": true,
+          "affiliation_label": {
+            "label_url": "https://twitter.com/x-user-111",
+            "badge_url": "https://pbs.twimg.com/profile_images/2082304298931953664/ZwQo6RP__bigger.jpg",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "label_type": "BusinessLabel",
+            "display_type": "Badge"
+          }
+        },
+        "quoted_status_id": 2066401066518802700,
+        "quoted_status_id_str": "2066401066518802637",
+        "is_quote_status": true,
+        "quoted_status": {
+          "tweet_created_at": "2026-06-15T06:03:00.000000Z",
+          "id": 2066401066518802700,
+          "id_str": "2066401066518802637",
+          "type": "tweet",
+          "conversation_id_str": "2066401066518802637",
+          "community_id_str": null,
+          "community_name": null,
+          "text": null,
+          "full_text": "https://t.co/tlLZjVprSj",
+          "source": "",
+          "truncated": false,
+          "in_reply_to_status_id": null,
+          "in_reply_to_status_id_str": null,
+          "in_reply_to_user_id": null,
+          "in_reply_to_user_id_str": null,
+          "in_reply_to_screen_name": null,
+          "user": {
+            "id": "x-user-78",
+            "id_str": "x-user-79",
+            "name": "x-user-80",
+            "screen_name": "x-user-81",
+            "location": "",
+            "url": "",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "protected": false,
+            "verified": true,
+            "followers_count": 26924,
+            "friends_count": 3030,
+            "listed_count": 0,
+            "favourites_count": 152579,
+            "statuses_count": 111141,
+            "created_at": "2024-05-08T16:25:21.000000Z",
+            "profile_banner_url": "https://scrubbed.invalid/x-user-82",
+            "profile_image_url_https": "https://scrubbed.invalid/x-user-83",
+            "can_dm": true,
+            "affiliation_label": {
+              "label_url": "https://twitter.com/x-user-111",
+              "badge_url": "https://pbs.twimg.com/profile_images/2082304298931953664/ZwQo6RP__bigger.jpg",
+              "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+              "label_type": "BusinessLabel",
+              "display_type": "Badge"
+            }
+          },
+          "quoted_status_id": null,
+          "quoted_status_id_str": null,
+          "is_quote_status": false,
+          "quoted_status": null,
+          "retweeted_status": null,
+          "quote_count": 29,
+          "reply_count": 73,
+          "retweet_count": 191,
+          "favorite_count": 1604,
+          "views_count": 1945211,
+          "bookmark_count": 6039,
+          "lang": "zxx",
+          "entities": {
+            "urls": [
+              {
+                "display_url": "x.com/i/article/2066\u2026",
+                "expanded_url": "http://x.com/i/article/2066041362298912768",
+                "indices": [
+                  0,
+                  23
+                ],
+                "url": "https://t.co/tlLZjVprSj"
+              }
+            ],
+            "display_text_range": [
+              0,
+              23
+            ]
+          },
+          "is_pinned": false
+        },
+        "retweeted_status": null,
+        "quote_count": 2,
+        "reply_count": 22,
+        "retweet_count": 4,
+        "favorite_count": 57,
+        "views_count": 4231,
+        "bookmark_count": 25,
+        "lang": "en",
+        "entities": {
+          "hashtags": [],
+          "symbols": [],
+          "urls": [],
+          "user_mentions": [],
+          "display_text_range": [
+            0,
+            280
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-06-14T17:15:39.000000Z",
+        "id": 2066207953355432200,
+        "id_str": "2066207953355432118",
+        "type": "quote",
+        "conversation_id_str": "2066207953355432118",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "There are two types of engineers in 2026\n\nThe first opens his laptop in the morning, writes a prompt, waits, reads the diff, fixes it, repeats\n\nThe second opens his phone, checks what shipped while he was asleep\n\nDifferent answer to one question: who is the loop?\n\nThe first engineer is the loop, he starts the agent, reviews the output, decides what's next, the moment he steps away it stops\n\nThe second engineer built the system that is the loop instead of him, PR review, flaky tests, CI triage, all running without him, he just reads the report\n\nWhat stops most people isn't complexity\n\nIt's that they never noticed they are the bottleneck\n\nFull guide to building the system that runs without you below",
+        "source": "",
+        "truncated": false,
+        "in_reply_to_status_id": null,
+        "in_reply_to_status_id_str": null,
+        "in_reply_to_user_id": null,
+        "in_reply_to_user_id_str": null,
+        "in_reply_to_screen_name": null,
+        "user": {
+          "id": "x-user-84",
+          "id_str": "x-user-85",
+          "name": "x-user-86",
+          "screen_name": "x-user-87",
+          "location": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "url": "",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 44558,
+          "friends_count": 459,
+          "listed_count": 0,
+          "favourites_count": 17285,
+          "statuses_count": 22725,
+          "created_at": "2024-01-29T00:17:50.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-88",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-89",
+          "can_dm": true,
+          "affiliation_label": null
+        },
+        "quoted_status_id": 2064470776611504000,
+        "quoted_status_id_str": "2064470776611504188",
+        "is_quote_status": true,
+        "quoted_status": {
+          "tweet_created_at": "2026-06-09T22:12:43.000000Z",
+          "id": 2064470776611504000,
+          "id_str": "2064470776611504188",
+          "type": "tweet",
+          "conversation_id_str": "2064470776611504188",
+          "community_id_str": null,
+          "community_name": null,
+          "text": null,
+          "full_text": "https://t.co/6uzT0VDvE3",
+          "source": "",
+          "truncated": false,
+          "in_reply_to_status_id": null,
+          "in_reply_to_status_id_str": null,
+          "in_reply_to_user_id": null,
+          "in_reply_to_user_id_str": null,
+          "in_reply_to_screen_name": null,
+          "user": {
+            "id": "x-user-84",
+            "id_str": "x-user-85",
+            "name": "x-user-86",
+            "screen_name": "x-user-87",
+            "location": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "url": "",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "protected": false,
+            "verified": true,
+            "followers_count": 44558,
+            "friends_count": 459,
+            "listed_count": 0,
+            "favourites_count": 17285,
+            "statuses_count": 22725,
+            "created_at": "2024-01-29T00:17:50.000000Z",
+            "profile_banner_url": "https://scrubbed.invalid/x-user-88",
+            "profile_image_url_https": "https://scrubbed.invalid/x-user-89",
+            "can_dm": true,
+            "affiliation_label": null
+          },
+          "quoted_status_id": null,
+          "quoted_status_id_str": null,
+          "is_quote_status": false,
+          "quoted_status": null,
+          "retweeted_status": null,
+          "quote_count": 1,
+          "reply_count": 1,
+          "retweet_count": 5,
+          "favorite_count": 20,
+          "views_count": 57039,
+          "bookmark_count": 45,
+          "lang": "zxx",
+          "entities": {
+            "urls": [
+              {
+                "display_url": "x.com/i/article/2064\u2026",
+                "expanded_url": "http://x.com/i/article/2064449964986810368",
+                "indices": [
+                  0,
+                  23
+                ],
+                "url": "https://t.co/6uzT0VDvE3"
+              }
+            ],
+            "display_text_range": [
+              0,
+              23
+            ]
+          },
+          "is_pinned": false
+        },
+        "retweeted_status": null,
+        "quote_count": 0,
+        "reply_count": 72,
+        "retweet_count": 23,
+        "favorite_count": 66,
+        "views_count": 15081,
+        "bookmark_count": 25,
+        "lang": "en",
+        "entities": {
+          "hashtags": [],
+          "symbols": [],
+          "timestamps": [],
+          "urls": [],
+          "user_mentions": [],
+          "media": [
+            {
+              "additional_media_info": {
+                "monetizable": false
+              },
+              "allow_download_status": {
+                "allow_download": true
+              },
+              "display_url": "pic.x.com/x-user-112",
+              "expanded_url": "https://x.com/x-user-87/status/2066207953355432118/video/1",
+              "ext_master_playlist_only": [],
+              "ext_media_availability": {
+                "status": "Available"
+              },
+              "ext_playlists": [],
+              "id_str": "2066207862070595584",
+              "indices": [
+                275,
+                298
+              ],
+              "media_key": "13_2066207862070595584",
+              "media_url_https": "https://pbs.twimg.com/amplify_video_thumb/2066207862070595584/img/qhWvfwj5fx_gcnrK.jpg",
+              "original_info": {
+                "focus_rects": [],
+                "height": 1280,
+                "width": 720
+              },
+              "sizes": {
+                "large": {
+                  "h": 1280,
+                  "w": 720
+                }
+              },
+              "type": "video",
+              "url": "https://t.co/h4HUTOF3bB",
+              "video_info": {
+                "aspect_ratio": [
+                  9,
+                  16
+                ],
+                "duration_millis": 64584,
+                "variants": [
+                  {
+                    "content_type": "application/x-mpegURL",
+                    "url": "https://video.twimg.com/amplify_video/2066207862070595584/pl/1IMJiZXSVYAf_RtZ.m3u8?v=6b7"
+                  },
+                  {
+                    "bitrate": 632000,
+                    "content_type": "video/mp4",
+                    "url": "https://video.twimg.com/amplify_video/2066207862070595584/vid/avc1/320x568/3tTBIhSvM1beAdoU.mp4"
+                  },
+                  {
+                    "bitrate": 950000,
+                    "content_type": "video/mp4",
+                    "url": "https://video.twimg.com/amplify_video/2066207862070595584/vid/avc1/480x852/kdfqagPyWRFuF-x0.mp4"
+                  },
+                  {
+                    "bitrate": 2176000,
+                    "content_type": "video/mp4",
+                    "url": "https://video.twimg.com/amplify_video/2066207862070595584/vid/avc1/720x1280/sQW5S2VdAUJS7Gw5.mp4"
+                  }
+                ]
+              }
+            }
+          ],
+          "display_text_range": [
+            0,
+            274
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-06-11T15:09:34.000000Z",
+        "id": 2065089060104721000,
+        "id_str": "2065089060104720776",
+        "type": "tweet",
+        "conversation_id_str": "2065089060104720776",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "https://t.co/hmpJtXuXCq",
+        "source": "",
+        "truncated": false,
+        "in_reply_to_status_id": null,
+        "in_reply_to_status_id_str": null,
+        "in_reply_to_user_id": null,
+        "in_reply_to_user_id_str": null,
+        "in_reply_to_screen_name": null,
+        "user": {
+          "id": "x-user-90",
+          "id_str": "x-user-91",
+          "name": "x-user-92",
+          "screen_name": "x-user-93",
+          "location": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 47092,
+          "friends_count": 98,
+          "listed_count": 0,
+          "favourites_count": 2288,
+          "statuses_count": 1426,
+          "created_at": "2026-05-12T13:23:44.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-94",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-95",
+          "can_dm": true,
+          "affiliation_label": null
+        },
+        "quoted_status_id": null,
+        "quoted_status_id_str": null,
+        "is_quote_status": false,
+        "quoted_status": null,
+        "retweeted_status": null,
+        "quote_count": 112,
+        "reply_count": 65,
+        "retweet_count": 438,
+        "favorite_count": 2654,
+        "views_count": 6782864,
+        "bookmark_count": 8678,
+        "lang": "zxx",
+        "entities": {
+          "urls": [
+            {
+              "display_url": "x.com/i/article/2065\u2026",
+              "expanded_url": "http://x.com/i/article/2065077530571264000",
+              "indices": [
+                0,
+                23
+              ],
+              "url": "https://t.co/hmpJtXuXCq"
+            }
+          ],
+          "display_text_range": [
+            0,
+            23
+          ]
+        },
+        "is_pinned": false
+      },
+      {
+        "tweet_created_at": "2026-06-09T19:35:46.000000Z",
+        "id": 2064431279383433700,
+        "id_str": "2064431279383433646",
+        "type": "quote",
+        "conversation_id_str": "2064431279383433646",
+        "community_id_str": null,
+        "community_name": null,
+        "text": null,
+        "full_text": "Got your hands on Claude Fable 5?\n\nThe first thing you should do is to upgrade your main projects with it, so it drastically impoves everything you've been working on.\n\nRun this Audit & Project Improvement Prompt on each repo that's important to you (simply copy-paste it):\n\nRepo Audit & Improvement Plan: \nPrompt made by Claude Fable 5\n\nYou are a world-class principal-level software engineer and technical auditor. Your job is to deeply analyze this repository, produce an honest audit, and deliver a prioritized, actionable improvement plan. Work in the four phases below, in order. Do not skip ahead. \n\nGround every claim in actual files: cite file paths and line numbers. If you can't verify something, say so explicitly rather than guessing.\n\nPhase 1 / Discovery & Mapping (read before judging)\nExplore the repository systematically before forming any opinions:\n\nMap the directory structure and identify the project type, language(s), frameworks, and runtime targets.\nIdentify entry points, core modules, and the main data/control flow through the system.\n\nRead the package manifest(s), lockfiles, build config, CI config, environment/config files, and any docs (README, CONTRIBUTING, ADRs).\n\nDetermine what the project is for: its purpose, intended users, and apparent maturity (prototype, internal tool, production service, library).\n\nNote conventions already in use (naming, module boundaries, error handling patterns, test style) so recommendations fit the existing culture rather than fighting it.\n\nOutput for this phase: a concise \"Repo Map\" purpose, stack, architecture sketch, key directories with one-line descriptions, and anything that surprised you.\n\nPhase 2 / Audit (evidence-based, severity-rated)\n\nAudit each dimension below. \n\nFor every finding, record: (a) what you found, (b) where (file:line), (c) why it matters (concrete consequence, not vague principle), (d) severity:\n\n Critical / High / Medium / Low.\n\n\u2022 Architecture & design: module boundaries, coupling/cohesion, circular dependencies, leaky abstractions, god objects/files, layering violations, scalability bottlenecks.\n\n\u2022 Code quality: duplication, dead code, complexity hotspots (longest/most-branched functions), inconsistent patterns, error handling gaps (swallowed exceptions, missing edge cases), type safety holes.\n\n\u2022 Security: hardcoded secrets or credentials, injection risks, unsafe deserialization, missing input validation, auth/authz weaknesses, outdated dependencies with known CVEs, overly permissive configs.\n\n\u2022 Testing: coverage gaps (especially around core business logic), test quality (do tests assert behavior or just execution?), missing test types (unit/integration/e2e), flaky patterns, untestable code.\n\n\u2022 Performance: N+1 queries, unnecessary allocations or copies, blocking calls in async paths, missing caching/indexing, unbounded growth (memory, files, queues).\n\n\u2022 Dependencies: outdated, unmaintained, duplicated, or unnecessarily heavy packages; license risks; lockfile hygiene.\n\n\u2022 DevEx & operations: build/setup friction, CI/CD gaps, missing linting/formatting enforcement, logging/observability quality, error reporting, deployment story.\n\n\u2022 Documentation:  README accuracy, onboarding path, undocumented critical behavior, stale docs that contradict code.\n\nRules for this phase:\n\nPrefer 15 high-confidence findings over 50 speculative ones.\n\nDistinguish facts (\"this function has no error handling: src/api/client.ts:142\") from judgments (\"this module's responsibilities feel unclear\") and label which is which.\n\nAlso list what the repo does well: strengths matter for deciding what to preserve.\n\nOutput for this phase: an \"Audit Report\":  findings grouped by dimension, sorted by severity, plus a Strengths section.\n\nDon't forget to mention all the ugly parts that need utmost priority.\n\nPhase 3 / Improvement Strategy\n\nSynthesize the audit into a strategy:\n\nIdentify the 3\u20135 themes that explain most of the findings (e.g., \"no enforced boundaries between layers,\" \"error handling is ad hoc\").\n\nFor each theme, propose a target state and the principle behind it.\n\nState explicit trade-offs: what you're recommending NOT to fix and why (effort vs. payoff, risk, project maturity).\n\nDefine what \"done\" looks like \u2014 measurable signals (e.g., \"CI fails on lint errors,\" \"core module test coverage \u2265 80%,\" \"zero Critical findings\").\n\nPhase 4 / Detailed Task Plan\nConvert the strategy into an execution plan:\n\nBreak work into discrete tasks. Each task must include: Title and one-paragraph description\nFiles/areas affected\n\nAcceptance criteria (how we verify it's done)\nEffort estimate (S = <2h, M = half-day, L = 1\u20132 days, XL = needs breakdown)\n\nRisk of the change itself (could it break things?)\nDependencies on other tasks\n\nOrder tasks into milestones:\n\nMilestone 0\nSafety net: anything needed before refactoring safely (tests around critical paths, CI gates, backups).\n\nMilestone 1 \nCritical fixes: security and correctness issues.\n\nMilestone 2\nHigh-leverage improvements: changes that make all future work easier.\n\nMilestone 3\nQuality & polish: remaining medium/low items worth doing.\n\nFlag quick wins (high impact, S effort) separately so they can be done immediately.\n\nFor the top 3 tasks, include a brief implementation sketch (approach, key steps, gotchas).\n\nFinal Deliverable Format\n\u2022 Produce a single document with these sections:\n\u2022 Executive Summary (\u226410 sentences: overall health grade A\u2013F with justification, top 3 risks, top 3 opportunities)\n\u2022 Repo Map\n\u2022 Audit Report\n\u2022 Improvement Strategy\n\u2022 Task Plan (milestones + task table + quick wins)\n\u2022 Open Questions: anything you need from a human to decide (product intent, deprecation candidates, performance targets)\n\nConstraints\nDo NOT modify any code during this audit. Analysis only.\n\nDo not pad the report. If a dimension is healthy, say so in one sentence and move on.\n\nCalibrate to the project's maturity. Don't recommend enterprise-grade infrastructure for a weekend prototype unless the owner's goals demand it. \n\nAnalyze the project's needs and provide recommendations in the most effective ways.\n\nIf the repo is large, prioritize depth in the core 20% of code that does 80% of the work, and note which areas received lighter review.",
+        "source": "",
+        "truncated": false,
+        "in_reply_to_status_id": null,
+        "in_reply_to_status_id_str": null,
+        "in_reply_to_user_id": null,
+        "in_reply_to_user_id_str": null,
+        "in_reply_to_screen_name": null,
+        "user": {
+          "id": "x-user-96",
+          "id_str": "x-user-97",
+          "name": "x-user-98",
+          "screen_name": "x-user-99",
+          "location": "",
+          "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+          "protected": false,
+          "verified": true,
+          "followers_count": 75064,
+          "friends_count": 7197,
+          "listed_count": 0,
+          "favourites_count": 40702,
+          "statuses_count": 38096,
+          "created_at": "2022-05-30T03:13:21.000000Z",
+          "profile_banner_url": "https://scrubbed.invalid/x-user-100",
+          "profile_image_url_https": "https://scrubbed.invalid/x-user-101",
+          "can_dm": true,
+          "affiliation_label": {
+            "label_url": "https://twitter.com/x-user-113",
+            "badge_url": "https://pbs.twimg.com/profile_images/2095828551421616128/IXDiaFs7_bigger.jpg",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "label_type": "BusinessLabel",
+            "display_type": "Badge"
+          }
+        },
+        "quoted_status_id": 2064394146916229400,
+        "quoted_status_id_str": "2064394146916229443",
+        "is_quote_status": true,
+        "quoted_status": {
+          "tweet_created_at": "2026-06-09T17:08:13.000000Z",
+          "id": 2064394146916229400,
+          "id_str": "2064394146916229443",
+          "type": "tweet",
+          "conversation_id_str": "2064394146916229443",
+          "community_id_str": null,
+          "community_name": null,
+          "text": null,
+          "full_text": "Introducing Claude Fable 5: a Mythos-class model that we\u2019ve made safe for general use.\n\nIts capabilities exceed those of any model we\u2019ve ever made generally available. https://t.co/2AvmEjHIX8",
+          "source": "",
+          "truncated": false,
+          "in_reply_to_status_id": null,
+          "in_reply_to_status_id_str": null,
+          "in_reply_to_user_id": null,
+          "in_reply_to_user_id_str": null,
+          "in_reply_to_screen_name": null,
+          "user": {
+            "id": "x-user-102",
+            "id_str": "x-user-103",
+            "name": "x-user-104",
+            "screen_name": "x-user-105",
+            "location": "",
+            "url": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+            "protected": false,
+            "verified": true,
+            "followers_count": 1786425,
+            "friends_count": 2,
+            "listed_count": 0,
+            "favourites_count": 390,
+            "statuses_count": 654,
+            "created_at": "2025-07-10T13:50:48.000000Z",
+            "profile_banner_url": "https://scrubbed.invalid/x-user-106",
+            "profile_image_url_https": "https://scrubbed.invalid/x-user-107",
+            "can_dm": false,
+            "affiliation_label": {
+              "label_url": "https://twitter.com/x-user-114",
+              "badge_url": "https://pbs.twimg.com/profile_images/1798110641414443008/XP8gyBaY_bigger.jpg",
+              "description": "Scrubbed by capture.mjs. See docs/testing.md.",
+              "label_type": "BusinessLabel",
+              "display_type": "Badge"
+            }
+          },
+          "quoted_status_id": null,
+          "quoted_status_id_str": null,
+          "is_quote_status": false,
+          "quoted_status": null,
+          "retweeted_status": null,
+          "quote_count": 9952,
+          "reply_count": 4953,
+          "retweet_count": 14197,
+          "favorite_count": 103797,
+          "views_count": 57501581,
+          "bookmark_count": 21235,
+          "lang": "en",
+          "entities": {
+            "media": [
+              {
+                "additional_media_info": {
+                  "monetizable": false
+                },
+                "allow_download_status": {
+                  "allow_download": false
+                },
+                "display_url": "pic.x.com/x-user-115",
+                "expanded_url": "https://x.com/x-user-105/status/2064394146916229443/video/1",
+                "ext_master_playlist_only": [],
+                "ext_media_availability": {
+                  "status": "Available"
+                },
+                "ext_playlists": [],
+                "id_str": "2064389698190012416",
+                "indices": [
+                  168,
+                  191
+                ],
+                "media_key": "13_2064389698190012416",
+                "media_url_https": "https://pbs.twimg.com/media/HKY5eixXIAE9EAZ.jpg",
+                "original_info": {
+                  "focus_rects": [],
+                  "height": 1488,
+                  "width": 1048
+                },
+                "sizes": {
+                  "large": {
+                    "h": 1488,
+                    "w": 1048
+                  }
+                },
+                "type": "video",
+                "url": "https://t.co/2AvmEjHIX8",
+                "video_info": {
+                  "aspect_ratio": [
+                    1,
+                    1
+                  ],
+                  "duration_millis": 20416,
+                  "variants": [
+                    {
+                      "content_type": "application/x-mpegURL",
+                      "url": "https://video.twimg.com/amplify_video/2064389698190012416/pl/yCWVJy0pvvpJgCcY.m3u8?v=cfc"
+                    },
+                    {
+                      "bitrate": 432000,
+                      "content_type": "video/mp4",
+                      "url": "https://video.twimg.com/amplify_video/2064389698190012416/vid/avc1/320x320/v_bu310K_SQuN8T-.mp4"
+                    },
+                    {
+                      "bitrate": 832000,
+                      "content_type": "video/mp4",
+                      "url": "https://video.twimg.com/amplify_video/2064389698190012416/vid/avc1/540x540/i2YGNnHhKdA9vTXM.mp4"
+                    },
+                    {
+                      "bitrate": 1280000,
+                      "content_type": "video/mp4",
+                      "url": "https://video.twimg.com/amplify_video/2064389698190012416/vid/avc1/720x720/NII0VeCedbkhk7Or.mp4"
+                    },
+                    {
+                      "bitrate": 8768000,
+                      "content_type": "video/mp4",
+                      "url": "https://video.twimg.com/amplify_video/2064389698190012416/vid/avc1/1080x1080/7cUPc1Huj_gSatel.mp4"
+                    },
+                    {
+                      "bitrate": 25128000,
+                      "content_type": "video/mp4",
+                      "url": "https://video.twimg.com/amplify_video/2064389698190012416/vid/avc1/2160x2160/cRYBJVhIVvopbO92.mp4"
+                    }
+                  ]
+                }
+              }
+            ],
+            "display_text_range": [
+              0,
+              167
+            ]
+          },
+          "is_pinned": false
+        },
+        "retweeted_status": null,
+        "quote_count": 32,
+        "reply_count": 179,
+        "retweet_count": 299,
+        "favorite_count": 3673,
+        "views_count": 593634,
+        "bookmark_count": 10186,
+        "lang": "en",
+        "entities": {
+          "hashtags": [],
+          "symbols": [],
+          "urls": [],
+          "user_mentions": [],
+          "media": [
+            {
+              "allow_download_status": {
+                "allow_download": true
+              },
+              "display_url": "pic.x.com/x-user-116",
+              "expanded_url": "https://x.com/x-user-99/status/2064431279383433646/photo/1",
+              "ext_master_playlist_only": [],
+              "ext_media_availability": {
+                "status": "Available"
+              },
+              "ext_playlists": [],
+              "features": {
+                "large": {
+                  "faces": []
+                }
+              },
+              "id_str": "2064428278920978432",
+              "indices": [
+                284,
+                307
+              ],
+              "media_key": "3_2064428278920978432",
+              "media_url_https": "https://pbs.twimg.com/media/HKZSlPVbIAADvSx.jpg",
+              "original_info": {
+                "focus_rects": [
+                  {
+                    "h": 1075,
+                    "w": 1920,
+                    "x": 0,
+                    "y": 5
+                  },
+                  {
+                    "h": 1080,
+                    "w": 1080,
+                    "x": 0,
+                    "y": 0
+                  },
+                  {
+                    "h": 1080,
+                    "w": 947,
+                    "x": 0,
+                    "y": 0
+                  },
+                  {
+                    "h": 1080,
+                    "w": 540,
+                    "x": 66,
+                    "y": 0
+                  },
+                  {
+                    "h": 1080,
+                    "w": 1920,
+                    "x": 0,
+                    "y": 0
+                  }
+                ],
+                "height": 1080,
+                "width": 1920
+              },
+              "sizes": {
+                "large": {
+                  "h": 1080,
+                  "w": 1920
+                }
+              },
+              "type": "photo",
+              "url": "https://t.co/NyoV98Nx9U"
+            }
+          ],
+          "display_text_range": [
+            0,
+            283
+          ]
+        },
+        "is_pinned": false
+      }
+    ],
+    "next_cursor": "DAADDAABCgABHROf--NWMYgKAAIcplVPjtrRrgAIAAIAAAACCAADAAAAAAgABAAAAAAKAAUdJaiWvEAnEAoABh0lqJa8P9jwCwAHAAAA8EVtUEM2d0FBQWZRL2dHSk4wdkdwL0FBQUFCUWN6Y3ZxUk5mUTRoeTFnMytBMWtIZEhOTVp2Zmtha1BvYzE2UnN0dHJRTWgwSTZ6WHJGOUZlSFFCUU9YdmFJSzBkRXlYNXVGWWhxQnpRaG1qb0ZzQllIS3lsTDdQV1lMWWN0SWFWS2xyaEt4elVWMU1QV2hDaEhMYlp6blpYY0VjY3VENEg5MXRCK0IwVG4vdmpWakdJSFJNL252b1djYzhjcGxWUGp0clJyaHl4Ulo0eUZoRklITlhXTEtNYWtYUWNxS3VQRVJaUmlCenJlUVpPbHRCaQAA"
+  }
+}

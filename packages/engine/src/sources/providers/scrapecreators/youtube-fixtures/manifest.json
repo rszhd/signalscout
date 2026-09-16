@@ -1,18 +1,51 @@
 {
-  "capturedBy": "packages/core/src/sources/providers/scrapecreators/youtube-fixtures/capture.mjs",
+  "capturedBy": "packages/pipeline/src/sources/providers/scrapecreators/youtube-fixtures/capture.mjs",
   "provider": "ScrapeCreators, YouTube API v1",
   "note": "Channel identity is replaced with stable pseudonyms. Everything else is whole.",
   "fixtures": [
     {
+      "file": "comments-newest-page-2.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v1/youtube/video/comments?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DBQqzfHQkREo&order=newest&continuationToken=Eg0SC0JRcXpmSFFrUkVvGAYy8gIKyAJnZXRfcmFua2VkX3N0cmVhbXMtLUNxWUJDSUFFRlJlMzBUZ2Ftd0VLbGdFSTJGOFFnQVFZQnlLTEFkdlBUY0w1Mlk1VGNXZDNxekNwc1hSYlF0VW8wemJ5M1lMTlpEbW00Q0VFY2lMTnh6SklZanQ2SU82SC1LTUNpbXFGYzJPMFBCQ0R3ZUh1UWhQMGIxQWFoX3dvN2dHVmtXUFVfLU4tZlU5aTIxN2dQUF9HNGxaY0hzeXBHN2JJRlhVdWlldDhRQUFoRENTbTJKM3FUR0pMWE1heDl4QW9QalNJVkxVX1VucElna3dyS0hhaU0tbEFTeE1RRkJJRkNMc2dHQUFTQlFpSElCZ0FFZ1VJaUNBWUFCSUZDSWtnR0FBU0JRaW9JQmdBRWdVSXdDQVlBQklGQ0lZZ0dBQVNCd2lGSUJBVUdBRlFBRmdCIhEiC0JRcXpmSFFrUkVvMAB4ASgUQhBjb21tZW50cy1zZWN0aW9u",
+        "note": "followed the continuationToken from comments-newest.json"
+      },
+      "capturedAt": "2026-09-16T16:54:06.044Z",
+      "identitiesReplaced": 60,
+      "bytes": 13871
+    },
+    {
       "file": "comments-newest.json",
       "request": {
         "method": "GET",
-        "url": "https://api.scrapecreators.com/v1/youtube/video/comments?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DfSr0QCEB8uE&order=newest",
-        "note": "newest first, on the first video the search returned"
+        "url": "https://api.scrapecreators.com/v1/youtube/video/comments?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DBQqzfHQkREo&order=newest",
+        "note": "newest first, on the busiest video the search returned"
       },
-      "capturedAt": "2026-09-11T14:53:18.569Z",
-      "identitiesReplaced": 3,
-      "bytes": 762
+      "capturedAt": "2026-09-16T16:54:05.014Z",
+      "identitiesReplaced": 60,
+      "bytes": 17231
+    },
+    {
+      "file": "comments-target-search.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v1/youtube/search?query=playwright+vs+cypress&type=videos&includeExtras=true",
+        "note": "finds a video with comments under it; not a fixture a test reads"
+      },
+      "capturedAt": "2026-09-16T16:54:02.535Z",
+      "identitiesReplaced": 56,
+      "bytes": 67667
+    },
+    {
+      "file": "comments-top.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v1/youtube/video/comments?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DBQqzfHQkREo&order=top",
+        "note": "the other ordering, to prove the parameter is read at all"
+      },
+      "capturedAt": "2026-09-16T16:54:08.285Z",
+      "identitiesReplaced": 60,
+      "bytes": 17189
     },
     {
       "file": "credentials-accepted.json",

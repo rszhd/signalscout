@@ -1,6 +1,6 @@
 {
   "note": "What each run was charged, in the provider's own numbers. Prices are tiered by Apify plan; this account is on FREE, where a post is $0.002 and a zero-result query is $0.001.",
-  "totalUsd": 0.04115,
+  "totalUsd": 0.008,
   "runs": [
     {
       "run": "credentials-rejected",
@@ -82,6 +82,51 @@
       },
       "chargedTotalUsd": null,
       "usageTotalUsd": 0.00105
+    },
+    {
+      "run": "comments-flat",
+      "input": {
+        "posts": [
+          "https://www.linkedin.com/feed/update/urn:li:activity:7502584032971595776/"
+        ],
+        "maxItems": 10,
+        "profileScraperMode": "short"
+      },
+      "runId": "WZLjZlAPhiQRstE0y",
+      "status": "SUCCEEDED",
+      "elapsedMs": 6541,
+      "itemsReturned": 2,
+      "chargedEventCounts": {
+        "post-comment": 2,
+        "main-profile": 0,
+        "full-profile": 0,
+        "full-profile-with-email": 0
+      },
+      "chargedTotalUsd": null,
+      "usageTotalUsd": 0.004
+    },
+    {
+      "run": "comments-with-replies",
+      "input": {
+        "posts": [
+          "https://www.linkedin.com/feed/update/urn:li:activity:7502584032971595776/"
+        ],
+        "maxItems": 10,
+        "scrapeReplies": true,
+        "profileScraperMode": "short"
+      },
+      "runId": "ah0Da6cQuwTuVocp2",
+      "status": "SUCCEEDED",
+      "elapsedMs": 6539,
+      "itemsReturned": 2,
+      "chargedEventCounts": {
+        "post-comment": 2,
+        "main-profile": 0,
+        "full-profile": 0,
+        "full-profile-with-email": 0
+      },
+      "chargedTotalUsd": null,
+      "usageTotalUsd": 0.004
     }
   ]
 }

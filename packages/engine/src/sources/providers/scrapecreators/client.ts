@@ -74,6 +74,20 @@ export const endpoints = {
   tikTokSearch: `${tikTokBase}/search/keyword`,
   tikTokComments: `${tikTokBase}/video/comments`,
   youTubeSearch: `${youTubeBase}/search`,
+  /**
+   * The comments under one video, by URL. US-159.
+   *
+   * One credit buys twenty, and `continuationToken` pages them: measured on
+   * 2026-09-17 against a video claiming 419 comments, where page two returned
+   * twenty more and repeated none of page one.
+   *
+   * `order` is documented as `top` or `newest` and **both were measured
+   * returning the same page in the same order**, opening on the same comment.
+   * This provider ignores a parameter value it does not recognise and bills
+   * the call in full, which is the habit US-119 recorded on TikTok. So the
+   * connector sends `newest` and trusts nothing about the ordering.
+   */
+  youTubeComments: `${youTubeBase}/video/comments`,
 } as const;
 
 /**
@@ -146,6 +160,19 @@ export const tikTokCommentsShape: PageShape = {
  */
 export const youTubeSearchShape: PageShape = {
   recordsOf: (body) => arrayAt(body, "videos"),
+  cursorOf: (body) => textAt(body, "continuationToken"),
+};
+
+/**
+ * YouTube comments: `comments`, and the search's own `continuationToken`.
+ *
+ * The name was a guess off the search until US-159 spent a credit on it. A
+ * wrong parameter name on this provider is ignored and billed, so page two
+ * would have been page one again and the walk would have stored twenty
+ * duplicates — the fixtures record that it does not.
+ */
+export const youTubeCommentsShape: PageShape = {
+  recordsOf: (body) => arrayAt(body, "comments"),
   cursorOf: (body) => textAt(body, "continuationToken"),
 };
 

@@ -190,6 +190,30 @@ function scrubStatusUrl(value, pseudonym) {
   return `${origin}/${pseudonym(handle)}/status/${id}${tail}`;
 }
 
+/**
+ * `twitter.com/<handle>` and `x.com/<handle>/…` wherever they appear.
+ *
+ * US-159's reply capture leaked six handles past the status rule above:
+ * `user.affiliation_label.label_url` is a plain profile link, and a truncated
+ * `display_url` — `x.com/somebody/status…` — has no scheme for that rule to
+ * match. So this one matches the host and the first path segment, with or
+ * without a scheme, and leaves the rest of the string as it was.
+ */
+function scrubProfileUrl(value, pseudonym) {
+  const pattern =
+    /(^|\b)((?:https?:\/\/)?(?:www\.)?(?:x|twitter)\.com\/)([A-Za-z0-9_]{2,15})(?=[/?#…]|$)/gi;
+  const reserved = new Set(["i", "intent", "search", "hashtag", "download", "home", "explore"]);
+  let changed = false;
+
+  const out = value.replace(pattern, (whole, before, origin, handle) => {
+    if (reserved.has(handle.toLowerCase()) || handle.startsWith("x-user-")) return whole;
+    changed = true;
+    return `${before}${origin}${pseudonym(handle)}`;
+  });
+
+  return changed ? out : undefined;
+}
+
 function createScrubber() {
   const pseudonyms = new Map();
   let count = 0;
@@ -232,6 +256,9 @@ function createScrubber() {
 
           const status = scrubStatusUrl(child, pseudonym);
           if (status) return [key, status];
+
+          const profile = scrubProfileUrl(child, pseudonym);
+          if (profile) return [key, profile];
         }
 
         // Numbers, not strings: `user.id` and `in_reply_to_user_id` both
@@ -392,7 +419,50 @@ function describe(name) {
   };
 }
 
+/**
+ * What one page of replies holds, against what the post claimed.
+ *
+ * Four numbers, each deciding a line of the connector. How many arrived says
+ * what the money bought. How many name the post they answer says whether the
+ * conversation can be stored as a shape or only as a list. How many carry a
+ * `user.screen_name` says whether a link can be built at all — this provider
+ * sends no URL and the connector makes one from the handle and the id. And the
+ * order says whether a walk may stop early on a date.
+ */
+function describeComments(name, body, postId) {
+  const tweets = body?.tweets ?? [];
+
+  if (tweets.length === 0) {
+    console.log(`  ${name}: no replies came back`);
+    return;
+  }
+
+  const answering = tweets.filter((tweet) => tweet?.in_reply_to_status_id_str === postId).length;
+  const nested = tweets.filter(
+    (tweet) => tweet?.in_reply_to_status_id_str && tweet.in_reply_to_status_id_str !== postId,
+  ).length;
+  const handled = tweets.filter((tweet) => tweet?.user?.screen_name).length;
+
+  const times = tweets
+    .map((tweet) => Date.parse(tweet?.tweet_created_at ?? ""))
+    .filter((value) => Number.isFinite(value));
+  const descending = times.every((value, index) => index === 0 || times[index - 1] >= value);
+
+  console.log(
+    `  ${name}: ${tweets.length} replies, ${answering} answer the post itself, ` +
+      `${nested} answer another reply, ${handled} carry a handle`,
+  );
+  console.log(`  ${descending ? "newest first" : "NOT in date order"}`);
+  console.log(`  a reply's keys: ${Object.keys(tweets[0]).slice(0, 12).join(", ")}`);
+}
+
 // ---------------------------------------------------------------- the run
+
+const only = process.argv
+  .filter((argument) => argument.startsWith("--only="))
+  .map((argument) => argument.slice("--only=".length));
+
+const wanted = (name) => only.length === 0 || only.some((part) => name.includes(part));
 
 console.log("Asking SocialData about X. This spends from the account balance.");
 
@@ -405,61 +475,137 @@ if (opening !== null && opening <= 0) {
 }
 
 /** Question 8, and free: a key that cannot be real. */
-console.log("\ncredentials-rejected");
-const refused = await call(`/twitter/search?query=${encodeURIComponent(keyword)}`, {
-  key: "not-a-real-key",
-});
-console.log(`  ${refused.status} in ${refused.elapsedMs} ms`);
-ledger.push({
-  call: "credentials-rejected",
-  httpStatus: refused.status,
-  spentUsd: 0,
-  note: "sent with a deliberately invalid key; the balance is another account's",
-});
-save(
-  "credentials-rejected",
-  { httpStatus: refused.status, body: refused.body },
-  {
-    method: "GET",
-    note: "invalid key",
-  },
-);
-
-/** Questions 1, 2, 3, 4 and 6. The call everything else is compared against. */
-const latest = await capture(
-  "search-latest",
-  `/twitter/search?query=${encodeURIComponent(keyword)}&type=Latest`,
-  { note: "type=Latest, no window" },
-);
-
-/** Question 5: does a window inside the query narrow the answer? */
-const since = Math.floor((Date.now() - windowHours * 60 * 60 * 1000) / 1000);
-
-await capture(
-  "search-since",
-  `/twitter/search?query=${encodeURIComponent(`${keyword} since_time:${since}`)}&type=Latest`,
-  { note: `since_time:${since}, which is ${windowHours}h back` },
-);
-
-/** Does the cursor buy different tweets? */
-const cursor = latest?.body?.next_cursor;
-
-if (typeof cursor === "string" && cursor !== "") {
-  await capture(
-    "search-page-2",
-    `/twitter/search?query=${encodeURIComponent(keyword)}&type=Latest&cursor=${encodeURIComponent(cursor)}`,
-    { note: "the cursor from search-latest" },
+if (wanted("credentials")) {
+  console.log("\ncredentials-rejected");
+  const refused = await call(`/twitter/search?query=${encodeURIComponent(keyword)}`, {
+    key: "not-a-real-key",
+  });
+  console.log(`  ${refused.status} in ${refused.elapsedMs} ms`);
+  ledger.push({
+    call: "credentials-rejected",
+    httpStatus: refused.status,
+    spentUsd: 0,
+    note: "sent with a deliberately invalid key; the balance is another account's",
+  });
+  save(
+    "credentials-rejected",
+    { httpStatus: refused.status, body: refused.body },
+    {
+      method: "GET",
+      note: "invalid key",
+    },
   );
-} else {
-  console.log("\nsearch-page-2\n  skipped: the first answer named no cursor");
 }
 
-/** Question 7. Billed in full, refunded, or free? */
-await capture(
-  "search-no-results",
-  `/twitter/search?query=${encodeURIComponent(impossible)}&type=Latest`,
-  { note: "a phrase that cannot occur" },
-);
+/** Questions 1, 2, 3, 4 and 6. The call everything else is compared against. */
+const latest = wanted("search")
+  ? await capture(
+      "search-latest",
+      `/twitter/search?query=${encodeURIComponent(keyword)}&type=Latest`,
+      { note: "type=Latest, no window" },
+    )
+  : undefined;
+
+if (wanted("search")) {
+  /** Question 5: does a window inside the query narrow the answer? */
+  const since = Math.floor((Date.now() - windowHours * 60 * 60 * 1000) / 1000);
+
+  await capture(
+    "search-since",
+    `/twitter/search?query=${encodeURIComponent(`${keyword} since_time:${since}`)}&type=Latest`,
+    { note: `since_time:${since}, which is ${windowHours}h back` },
+  );
+
+  /** Does the cursor buy different tweets? */
+  const cursor = latest?.body?.next_cursor;
+
+  if (typeof cursor === "string" && cursor !== "") {
+    await capture(
+      "search-page-2",
+      `/twitter/search?query=${encodeURIComponent(keyword)}&type=Latest&cursor=${encodeURIComponent(cursor)}`,
+      { note: "the cursor from search-latest" },
+    );
+  } else {
+    console.log("\nsearch-page-2\n  skipped: the first answer named no cursor");
+  }
+
+  /** Question 7. Billed in full, refunded, or free? */
+  await capture(
+    "search-no-results",
+    `/twitter/search?query=${encodeURIComponent(impossible)}&type=Latest`,
+    { note: "a phrase that cannot occur" },
+  );
+}
+
+/**
+ * The replies under one post. US-159, and questions 9 to 12.
+ *
+ * `/twitter/tweets/<id>/comments` was found by asking for it: the path answers
+ * 200 with `{ tweets, next_cursor }`, where an invented path answers 404 and
+ * costs nothing. So the endpoint is measured rather than read out of somebody's
+ * documentation, and the 404 is what makes that probe free.
+ *
+ *   9. **What does a reply cost?** The descriptor said nobody knew. The
+ *      balance either side of the call is the answer, and it is the only
+ *      instrument this provider gives.
+ *  10. **Is a reply the same shape as a post?** If it is, one parser reads
+ *      both and the connector gains a method rather than a vocabulary.
+ *  11. **Does it page, and does page two repeat page one?**
+ *  12. **Does a reply name its parent?** `in_reply_to_status_id_str` is on
+ *      every tweet in the search fixtures, holding null. Under a thread it
+ *      should hold the post — and if it does, this is the only X connector
+ *      here that can store the shape of a conversation rather than a flat
+ *      list.
+ *
+ * The thread is found with `min_replies:`, X's own operator, because the
+ * committed search fixtures' busiest tweet claims six replies and returned
+ * two. A conversation of two tests neither paging nor nesting.
+ */
+if (wanted("comments")) {
+  const busy = await capture(
+    "comments-thread-search",
+    `/twitter/search?query=${encodeURIComponent(`${keyword} min_replies:20`)}&type=Latest`,
+    { note: "finds a thread worth reading; not a fixture a test replays" },
+  );
+
+  const target = (busy?.body?.tweets ?? [])
+    .filter((tweet) => tweet?.id_str)
+    .sort((a, b) => (b?.reply_count ?? 0) - (a?.reply_count ?? 0))[0];
+
+  if (target) {
+    console.log(`\n  thread ${target.id_str} claims ${target.reply_count} replies\n`);
+
+    const first = await capture("comments-page-1", `/twitter/tweets/${target.id_str}/comments`, {
+      note: `the replies under ${target.id_str}, which claims ${target.reply_count}`,
+    });
+
+    describeComments("comments-page-1", first?.body, target.id_str);
+
+    const next = first?.body?.next_cursor;
+
+    if (typeof next === "string" && next !== "") {
+      const second = await capture(
+        "comments-page-2",
+        `/twitter/tweets/${target.id_str}/comments?cursor=${encodeURIComponent(next)}`,
+        { note: "followed next_cursor from comments-page-1" },
+      );
+
+      describeComments("comments-page-2", second?.body, target.id_str);
+
+      const ids = (body) => new Set((body?.tweets ?? []).map((tweet) => tweet?.id_str));
+      const one = ids(first?.body);
+      const two = ids(second?.body);
+      console.log(
+        `  page 2 holds ${two.size} replies and repeats ` +
+          `${[...two].filter((id) => one.has(id)).length} of page 1's ${one.size}`,
+      );
+    } else {
+      console.log("  no next_cursor: one call is the whole answer.");
+    }
+  } else {
+    console.log("  no thread with replies came back; nothing to ask about.");
+  }
+}
 
 // ------------------------------------------------------------ the answers
 
@@ -510,6 +656,67 @@ if (first) {
   }
 }
 
+/**
+ * What the reply calls answered, kept beside the search summary rather than
+ * inside it: they are a different endpoint at a different price.
+ */
+const replyPage = findings.calls.find((entry) => entry.call === "comments-page-1");
+
+if (replyPage) {
+  const spent = ledger.find((entry) => entry.call === "comments-page-1")?.spentUsd ?? null;
+  const raw = answers.get("comments-page-1")?.body?.tweets ?? [];
+  const parent = raw[0]?.in_reply_to_status_id_str ?? null;
+
+  findings.replies = {
+    repliesReturned: raw.length,
+    spentOnOnePage: spent,
+    microDollarsPerReply:
+      spent !== null && raw.length > 0 ? Math.round((spent * 1e6) / raw.length) : null,
+    namesItsParent: parent !== null,
+    carriesUrlField: raw.some((tweet) => tweet?.url),
+    pagedTo: findings.calls.some((entry) => entry.call === "comments-page-2"),
+  };
+}
+
+/**
+ * A partial run adds to the record rather than replacing it.
+ *
+ * `--only=comments` must not erase the four search fixtures' provenance, nor
+ * the findings US-060 computed from them.
+ */
+function keep(previousPath, fresh, key) {
+  if (only.length === 0) return fresh;
+
+  let previous;
+  try {
+    previous = JSON.parse(readFileSync(`${here}${previousPath}`, "utf8"));
+  } catch {
+    return fresh;
+  }
+
+  const older = previousPath === "manifest.json" ? previous.files : previous.calls;
+  if (!Array.isArray(older)) return fresh;
+
+  const rewritten = new Set(fresh.map((entry) => entry[key]));
+  return [...older.filter((entry) => !rewritten.has(entry[key])), ...fresh];
+}
+
+if (only.length > 0) {
+  try {
+    const previous = JSON.parse(readFileSync(`${here}findings.json`, "utf8"));
+    const rewritten = new Set(findings.calls.map((entry) => entry.call));
+
+    findings.calls = [
+      ...(previous.calls ?? []).filter((entry) => !rewritten.has(entry.call)),
+      ...findings.calls,
+    ];
+    findings.summary = findings.summary ?? previous.summary;
+    findings.replies = findings.replies ?? previous.replies;
+  } catch {
+    // No previous findings. A whole run is the fix.
+  }
+}
+
 writeFileSync(`${here}findings.json`, `${JSON.stringify(findings, null, 2)}\n`);
 
 writeFileSync(
@@ -522,7 +729,7 @@ writeFileSync(
       provider: "socialdata",
       platform: "x",
       api,
-      files: written,
+      files: keep("manifest.json", written, "file"),
     },
     null,
     2,
@@ -539,7 +746,7 @@ writeFileSync(
         "honest instrument.",
       balanceBefore: opening,
       balanceAfter: closing,
-      calls: ledger,
+      calls: keep("ledger.json", ledger, "call"),
     },
     null,
     2,

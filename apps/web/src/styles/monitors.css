@@ -115,18 +115,28 @@
   font-size: var(--text-xs);
   line-height: 1.8;
 }
-.monitors-content .monitor-status {
+/*
+  The status pill, on the list and in the monitor page's header. One
+  definition: it used to have two, and the header got the older one in
+  monospace capitals while the list had no colour for `stopped` at all.
+*/
+.monitors-page .monitor-status {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
+  flex: 0 0 auto;
+  min-height: 28px;
+  padding: 0 var(--space-3);
+  border-radius: 999px;
   font-family: inherit;
-  font-weight: 500;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  line-height: 1;
   letter-spacing: normal;
   text-transform: none;
-  border-radius: var(--radius-sm);
-  padding: var(--space-1) var(--space-2);
+  white-space: nowrap;
 }
-.monitors-content .monitor-status::before {
+.monitors-page .monitor-status::before {
   width: 7px;
   height: 7px;
   flex: 0 0 auto;
@@ -134,13 +144,17 @@
   background: currentColor;
   content: "";
 }
-.monitors-content .monitor-status.running {
-  color: var(--accent-text);
-  background: var(--accent-soft);
+.monitors-page .monitor-status.running {
+  color: var(--status-running);
+  background: var(--status-running-soft);
 }
-.monitors-content .monitor-status.paused {
-  color: var(--muted-strong);
-  background: var(--surface-soft);
+.monitors-page .monitor-status.paused {
+  color: var(--status-paused);
+  background: var(--status-paused-soft);
+}
+.monitors-page .monitor-status.stopped {
+  color: var(--status-stopped);
+  background: var(--status-stopped-soft);
 }
 .monitors-content .monitor-spend {
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -378,9 +392,9 @@
  * The amber of `paused` rather than the red of `stopped`: nothing is broken
  * and nothing has been refused. It is running, and it is not producing.
  */
-.monitors-content .monitor-status.running.quiet {
-  color: var(--muted-strong);
-  background: var(--surface-soft);
+.monitors-page .monitor-status.running.quiet {
+  color: var(--status-paused);
+  background: var(--status-paused-soft);
 }
 
 .poll-history {

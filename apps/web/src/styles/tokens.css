@@ -15,6 +15,13 @@
   --quiet-accent-soft: #efeee9;
   --accent-text: #36578f;
   --warning: #8f4c26;
+  /* The three tones a monitor's status pill takes: running, paused or quiet, stopped. */
+  --status-running: #2f6b4f;
+  --status-running-soft: #e4f2ea;
+  --status-paused: #786324;
+  --status-paused-soft: #f8f1d9;
+  --status-stopped: #913e2a;
+  --status-stopped-soft: #f9e8e2;
   --shadow-soft: 0 1px 2px rgb(20 24 21 / 3%), 0 12px 32px rgb(20 24 21 / 5%);
   --shadow: 0 24px 70px rgb(20 24 21 / 14%);
   --radius-sm: 8px;

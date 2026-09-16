@@ -164,6 +164,25 @@ describe("the monitor list", () => {
       expect(container.textContent).not.toContain("Found nothing");
     });
 
+    /** US-133. On the plan that lends the keys, no figure is the account's. */
+    it("shows no figure in dollars on the plan that lends the keys", async () => {
+      const run = poll({
+        outcome: "collected",
+        postsReturned: 5,
+        postsNew: 2,
+        units: 3,
+        estimatedCostMicros: 5_600,
+      });
+      await show([monitor({ lastPoll: run })]);
+      expect(container.textContent).toContain("$0.0056");
+
+      await screen.unmount();
+      await show([monitor({ lastPoll: run, capacity: { trial: true } })]);
+      expect(container.textContent).toContain("Last poll: 5 posts, 2 new");
+      expect(container.textContent).not.toContain("$0.0056");
+      expect(container.textContent).not.toContain("Spend is estimated");
+    });
+
     it("says which platform failed when the poll collected anyway", async () => {
       /**
        * BUG-016. A 503 on X used to discard Reddit's collection outright; now

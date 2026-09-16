@@ -255,6 +255,13 @@ describe("one monitor's page", () => {
       await show(
         monitor({
           capacity: { trial: true },
+          lastPoll: poll({
+            outcome: "collected",
+            postsReturned: 5,
+            postsNew: 2,
+            units: 3,
+            estimatedCostMicros: 5_600,
+          }),
           spend: {
             sourceMicros: 300_000,
             modelMicros: 40_000,
@@ -270,6 +277,9 @@ describe("one monitor's page", () => {
       const text = container.textContent ?? "";
       expect(text).not.toContain("Spent in");
       expect(text).not.toContain("$0.34");
+      // Nor on the poll sentence.
+      expect(text).toContain("Last poll: 5 posts, 2 new");
+      expect(text).not.toContain("$0.0056");
       expect(text).not.toContain("Monthly budget");
       expect(text).not.toContain("Which posts the AI reads");
       expect(container.querySelector(".monitor-schedule-zone")).toBeNull();

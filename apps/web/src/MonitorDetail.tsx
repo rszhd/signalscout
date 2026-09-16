@@ -519,7 +519,7 @@ export function MonitorDetail({
                 id="monitor-activity-title"
                 className="monitor-activity-title monitor-poll-summary"
               >
-                {pollSummary(monitor.lastPoll)}
+                {pollSummary(monitor.lastPoll, { money: !onCapacity })}
               </h2>
             ) : (
               <h2 id="monitor-activity-title" className="monitor-activity-title">
@@ -674,7 +674,7 @@ export function MonitorDetail({
                 </div>
                 <span className="monitor-section-note">Last 20</span>
               </div>
-              <PollHistory monitorId={monitor.id} />
+              <PollHistory monitorId={monitor.id} money={!onCapacity} />
             </section>
           </div>
 

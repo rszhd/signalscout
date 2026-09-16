@@ -286,8 +286,13 @@ export function stopReasonLabel(reason: string | null): string | null {
  * and a poll that found nothing and cost money is not. Only the two numbers
  * together say which.
  */
-export function pollSummary(run: PollRun): string {
-  const spent = run.units > 0 ? ` · ${formatMicros(run.estimatedCostMicros)} (estimated)` : "";
+export function pollSummary(run: PollRun, options: { readonly money?: boolean } = {}): string {
+  // No figure on the plan that lends the keys: the money is not the
+  // account's, and the billing page says what the plan includes instead.
+  const spent =
+    run.units > 0 && options.money !== false
+      ? ` · ${formatMicros(run.estimatedCostMicros)} (estimated)`
+      : "";
   const reason = stopReasonLabel(run.stopReason);
   /**
    * One walk is several rows when a page limit splits it. US-148. A row that
@@ -351,7 +356,14 @@ export function nextPollLabel(monitor: Monitor): string | null {
  * fetched as the page loads rather than behind a disclosure somebody has to
  * find.
  */
-export function PollHistory({ monitorId }: { readonly monitorId: string }) {
+export function PollHistory({
+  monitorId,
+  money = true,
+}: {
+  readonly monitorId: string;
+  /** False on the plan that lends the keys, where no figure is the account's. */
+  readonly money?: boolean;
+}) {
   const [runs, setRuns] = useState<PollRun[] | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -394,7 +406,7 @@ export function PollHistory({ monitorId }: { readonly monitorId: string }) {
           >
             {ageLabel(run.startedAt)}
           </time>
-          <span className="poll-history-what">{pollSummary(run)}</span>
+          <span className="poll-history-what">{pollSummary(run, { money })}</span>
           {/* Which platform did what, because a poll that skipped Reddit and
               collected X is one row and two different answers. */}
           <span className="poll-history-sources">

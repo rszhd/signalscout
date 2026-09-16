@@ -46,7 +46,9 @@ function nextRunLabel(monitor: Monitor): string {
 
 /** What a row says under "Last poll", without opening anything. */
 function lastPollLabel(monitor: Monitor): string {
-  return monitor.lastPoll ? pollSummary(monitor.lastPoll) : "No poll recorded yet";
+  return monitor.lastPoll
+    ? pollSummary(monitor.lastPoll, { money: !monitor.capacity })
+    : "No poll recorded yet";
 }
 
 function MonitorsHeader({ projectId }: { readonly projectId: string }) {
@@ -157,6 +159,8 @@ export function Monitors({ projectId }: { readonly projectId: string }) {
   }
 
   const scoped = monitors.filter((monitor) => monitor.projectId === projectId);
+  // Every monitor of one account answers the same, so the first says it.
+  const onCapacity = Boolean(scoped[0]?.capacity);
   const counts = {
     all: scoped.length,
     running: scoped.filter((monitor) => status(monitor).tone === "running").length,
@@ -185,7 +189,9 @@ export function Monitors({ projectId }: { readonly projectId: string }) {
             <p>
               {counts.attention > 0
                 ? `${counts.attention} monitor${counts.attention === 1 ? " needs" : "s need"} attention. Review the issues below.`
-                : "Manage your schedules, spending and search quality in one place."}
+                : onCapacity
+                  ? "Your monitors, and what each one found."
+                  : "Manage your schedules, spending and search quality in one place."}
             </p>
           </div>
           <a className="secondary-button" href="/api/feedback/export">
@@ -279,10 +285,12 @@ export function Monitors({ projectId }: { readonly projectId: string }) {
             />
           </section>
         ))}
-        <p className="monitors-cost-note">
-          Spend is estimated; your provider’s invoice is the authority. Open a monitor for what it
-          has spent and what it may still spend.
-        </p>
+        {!onCapacity && (
+          <p className="monitors-cost-note">
+            Spend is estimated; your provider’s invoice is the authority. Open a monitor for what it
+            has spent and what it may still spend.
+          </p>
+        )}
       </div>
     </div>
   );

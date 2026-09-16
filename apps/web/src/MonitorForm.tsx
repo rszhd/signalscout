@@ -1295,7 +1295,7 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
                   <summary>Generation details</summary>
                   <p>
                     Written by {plan.model}
-                    {plan.estimatedCostMicros != null
+                    {plan.estimatedCostMicros != null && !options.capacity
                       ? ` · estimated ${formatMicros(plan.estimatedCostMicros)}`
                       : ""}
                   </p>

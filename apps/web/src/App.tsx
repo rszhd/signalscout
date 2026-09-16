@@ -547,7 +547,6 @@ function Shell({
   const addingProject = useMatch(routes.newProject) !== null;
   const editingProject = useMatch(routes.editProject) !== null;
   const projecting = listingProjects || addingProject || editingProject;
-  const comparing = useMatch(routes.providers) !== null;
   const connecting = useMatch(routes.connections) !== null;
   const voicing = useMatch(routes.replyVoices) !== null;
   const modelling = useMatch(routes.models) !== null;
@@ -560,12 +559,6 @@ function Shell({
         <NavIcon name="providers" />
         <span>Data &amp; AI</span>
       </Link>
-      {!managedKeys && (
-        <Link className={comparing ? "nav-item current" : "nav-item"} to={paths.providers}>
-          <NavIcon name="providers" />
-          <span>Compare providers</span>
-        </Link>
-      )}
       <Link className={voicing ? "nav-item current" : "nav-item"} to={paths.replyVoices}>
         <NavIcon name="voices" />
         <span>Voices</span>

@@ -1,7 +1,22 @@
 {
   "name": "@signalscout/pipeline",
   "version": "0.0.0",
-  "private": true,
+  "description": "The stateful half of SignalScout: monitors, posts, matches, cursors, the budget guard and the jobs, with their migrations.",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rszhd/signalscout.git",
+    "directory": "packages/pipeline"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "files": [
+    "dist",
+    "!dist/**/*.test.*",
+    "!dist/tsconfig.tsbuildinfo",
+    "drizzle"
+  ],
   "type": "module",
   "exports": {
     ".": {
@@ -57,5 +72,18 @@
     "tsx": "4.23.13",
     "typescript": "7.0.2",
     "vitest": "5.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "./testing": {
+        "types": "./dist/testing/index.d.ts",
+        "default": "./dist/testing/index.js"
+      }
+    }
   }
 }

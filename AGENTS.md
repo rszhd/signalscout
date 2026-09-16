@@ -265,6 +265,7 @@ pnpm db:generate              # drizzle-kit generate, after a schema change
 docker compose up             # the published image: Postgres, migrations, the app
 
 pnpm db:rotate-key            # re-encrypt stored credentials under a new key
+pnpm release:verify           # pack both packages and use them from outside the workspace
 
 node scripts/new-worktree.mjs <name>    # a worktree with its own ports and a copy of the database
 node scripts/remove-worktree.mjs <name> # the folder, and the Postgres that came with it

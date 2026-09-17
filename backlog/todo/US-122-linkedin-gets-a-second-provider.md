@@ -184,3 +184,32 @@ eliminations, and the answer stands until somebody publishes a new search.
   `packages/engine/src/sources/providers/rapidapi/linkedin-fixtures/capture.mjs`
   is the capture for the first one. It needs `RAPIDAPI_API_KEY` in `.env`,
   spends five requests, and has run against a fake provider only.
+- 2026-09-17T02:20+08:00 — **The owner declined RapidAPI on price**: $175 a
+  month is too much, and there will be no integration with it for now. The
+  capture script written an hour earlier is deleted in the same commit; it
+  never ran, so nothing is lost but the file.
+
+  That leaves LinkedIn where the Context said it might end. Every route
+  found on 2026-09-17 is now eliminated, each for one reason:
+
+  * ScrapeCreators — Google's index (US-055).
+  * SocialCrawl — price (US-053, confirmed by the owner today).
+  * Bright Data — no keyword discovery for posts, from its own docs.
+  * Crustdata — live search is enterprise-only, on request.
+  * Piloterr — the product was withdrawn; its route answers like one that
+    does not exist.
+  * LinkdAPI — searches people, companies and jobs, not posts.
+  * HarvestAPI direct — Apify's own upstream.
+  * Any other Apify actor — not a second provider, by the registry's key.
+  * RapidAPI "Real-Time LinkedIn Scraper API" — $175 a month, declined.
+  * RapidAPI "Fresh LinkedIn Profile Data" — same marketplace, $10 a month
+    at one credit per twenty results, parameters unpublished. Not asked,
+    because the owner declined the marketplace and not one listing.
+  * Unipile — native and fresh, but it runs through the person's own
+    LinkedIn account. Not a provider in this product's sense unless the
+    owner decides it is.
+
+  **LinkedIn keeps one provider.** Apify through HarvestAPI stays the only
+  offer, and this ticket stays open only for a decision on Unipile or for a
+  provider that does not exist yet. Bright Data's one free confirming call,
+  in the acceptance list, is still owed.

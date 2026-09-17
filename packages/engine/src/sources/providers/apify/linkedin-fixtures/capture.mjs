@@ -45,10 +45,15 @@
  *      turned on here: `scrapeComments` is charged per comment, and the
  *      question is the price, not the contents.
  *
+ * US-159 asked four more, and answered the price question that question 9 left
+ * open — a comment costs exactly what a post costs. They are numbered 10 to 13
+ * beside the comment section below, and they run under `--only=comments`.
+ *
  * Run it with your own token:
  *
  *     node packages/pipeline/src/sources/providers/apify/linkedin-fixtures/capture.mjs
  *     node .../capture.mjs --only=search
+ *     node .../capture.mjs --only=comments
  *
  * **Prices are tiered by Apify plan, and this account is on FREE.** A post is
  * $0.002 there and $0.0015 on GOLD and above, which is why the actor's page
@@ -77,6 +82,18 @@ const root = fileURLToPath(new URL("../../../../../../../", import.meta.url));
 
 const api = "https://api.apify.com/v2";
 const actor = "harvestapi~linkedin-post-search";
+/**
+ * The comments actor, and a second actor rather than a flag. US-159.
+ *
+ * `linkedin-post-search` takes `scrapeComments`, and using it would tie the
+ * replies to the search run — this product reads replies under one post, by
+ * URL, in a second call, on every other provider it has. `linkedin-post-comments`
+ * takes `posts: [url]` and is that second call.
+ *
+ * Its `post-comment` event is priced exactly like a post: $0.002 on FREE,
+ * $0.0015 on GOLD, read from the actor's own `pricingInfos` on 2026-09-17.
+ */
+const commentsActor = "harvestapi~linkedin-post-comments";
 
 /**
  * The query the two earlier captures used, so three providers are compared on
@@ -94,6 +111,16 @@ const impossible = "kumquat velocipede telemetry brunch";
  * Ten is enough to answer every question here and costs two cents.
  */
 const maxPosts = 10;
+
+/**
+ * How many comments to ask for under one post.
+ *
+ * Ten is the actor's own default and $0.02 on the FREE plan, where a comment
+ * costs exactly what a post costs. It is enough to see the shape of a comment
+ * and to see whether `scrapeReplies` adds anything; it is not a measurement of
+ * how deep a LinkedIn thread goes, and nothing here should pretend otherwise.
+ */
+const maxComments = 10;
 
 /** How long to wait for a run before giving up, and how often to look. */
 const runTimeoutMs = 5 * 60 * 1000;
@@ -310,9 +337,46 @@ function createScrubber() {
     return pseudonyms.get(value);
   }
 
+  /**
+   * A name written into a comment by a mention.
+   *
+   * US-159's first comment capture committed a real name: the actor marks a
+   * `PROFILE_MENTION` in `commentaryAttributes` with a `start` and a `length`
+   * into `commentary`, scrubs nothing, and the attribute rules above replaced
+   * the profile beside the span while the span itself stayed. The words are
+   * the text this product classifies, so only the named span is replaced —
+   * from the end backwards, so earlier offsets stay true while later ones
+   * are rewritten.
+   */
+  function scrubMentionedNames(text, attributes) {
+    if (typeof text !== "string" || !Array.isArray(attributes)) return text;
+
+    const spans = attributes
+      .filter((attribute) => attribute?.type === "PROFILE_MENTION")
+      .filter(
+        (attribute) => Number.isInteger(attribute.start) && Number.isInteger(attribute.length),
+      )
+      .sort((a, b) => b.start - a.start);
+
+    let out = text;
+    for (const { start, length } of spans) {
+      const name = out.slice(start, start + length);
+      if (name.trim() === "") continue;
+      out = `${out.slice(0, start)}${pseudonym(name)}${out.slice(start + length)}`;
+    }
+    return out;
+  }
+
   function scrub(value, insidePerson = false) {
     if (Array.isArray(value)) return value.map((child) => scrub(child, insidePerson));
     if (value === null || typeof value !== "object") return value;
+
+    if (typeof value.commentary === "string" && Array.isArray(value.commentaryAttributes)) {
+      value = {
+        ...value,
+        commentary: scrubMentionedNames(value.commentary, value.commentaryAttributes),
+      };
+    }
 
     return Object.fromEntries(
       Object.entries(value).map(([key, child]) => {
@@ -410,6 +474,69 @@ async function settledRun(runId, fallback) {
 const written = [];
 const ledger = [];
 const answers = new Map();
+/** What did not finish. Printed at the end and it fails the run. */
+const failures = [];
+
+/**
+ * A committed dataset, read off disk.
+ *
+ * `--only=comments` needs a post to ask about and a search run costs $0.02.
+ * The posts this folder already holds are free, and their ids are committed
+ * whole because an id is not identity.
+ */
+function readCommitted(name) {
+  try {
+    const items = JSON.parse(readFileSync(`${here}${name}.json`, "utf8"));
+    return Array.isArray(items) ? items : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * What one page of LinkedIn comments holds, against what the post claimed.
+ *
+ * Question 11 in one function. A comment this product can use has an id to
+ * deduplicate on, a link a person can open, words to classify, a date to cut
+ * on, and the post it belongs to. Anything missing is a line the connector
+ * must either build or refuse.
+ */
+function describeComments(name, records, postId) {
+  const items = Array.isArray(records) ? records : [];
+
+  if (items.length === 0) {
+    console.log(`  ${name}: no comments came back`);
+    return;
+  }
+
+  const has = (key) => items.filter((item) => item?.[key]).length;
+  const nested = items.filter((item) => item?.parentCommentId ?? item?.replyToId).length;
+  const named = items.filter(
+    (item) => item?.postId === postId || String(item?.post?.id ?? "") === postId,
+  ).length;
+
+  console.log(`  ${name}: ${items.length} comments`);
+  console.log(`  keys: ${Object.keys(items[0]).join(", ")}`);
+  console.log(
+    `  ${has("id")} carry an id, ${has("linkedinUrl")} a link, ${has("commentUrl")} a commentUrl, ` +
+      `${named} name the post, ${nested} answer another comment`,
+  );
+
+  const dates = items
+    .map((item) => Date.parse(item?.createdAt?.date ?? item?.postedAt?.date ?? ""))
+    .filter((value) => Number.isFinite(value));
+
+  if (dates.length > 0) {
+    const descending = dates.every((value, index) => index === 0 || dates[index - 1] >= value);
+    console.log(
+      `  ${dates.length} dated, ${new Date(Math.min(...dates)).toISOString().slice(0, 10)} to ` +
+        `${new Date(Math.max(...dates)).toISOString().slice(0, 10)}, ` +
+        `${descending ? "newest first" : "NOT in date order"}`,
+    );
+  } else {
+    console.log("  no readable date on any comment");
+  }
+}
 
 /**
  * Start a run, wait for it, and read its dataset.
@@ -419,11 +546,11 @@ const answers = new Map();
  * not the run, and the run is where `chargedEventCounts` lives. A capture that
  * could not say what it spent would fail its own ticket.
  */
-async function runActor(name, input) {
+async function runActor(name, input, which = actor) {
   console.log(`\n${name}`);
   console.log(`  input ${JSON.stringify(input)}`);
 
-  const started = await call(`/acts/${actor}/runs`, { method: "POST", body: input });
+  const started = await call(`/acts/${which}/runs`, { method: "POST", body: input });
 
   if (started.status >= 400) {
     console.log(`  ${started.status} starting the run`);
@@ -730,6 +857,87 @@ if (wanted("empty")) {
   });
 }
 
+/**
+ * The comments under one post. US-159, and questions 10 to 13.
+ *
+ * Question 9 asked what a comment would cost and left it there. The answer is
+ * that it costs exactly what a post costs — $0.002 on FREE — read from the
+ * comments actor's own `pricingInfos`, which is free to read. So the price was
+ * never the obstacle; nobody had asked.
+ *
+ *  10. **Does the comments actor take a post URL?** Every other provider here
+ *      reads replies by URL, and a connector that could only get comments as
+ *      part of a search would not fit `fetchReplies` at all.
+ *  11. **Does a LinkedIn comment carry what a lead needs** — its own id, its
+ *      own link, the words, a date, and the post it hangs under?
+ *  12. **Does `postedLimit` narrow comments?** If it does, this is the first
+ *      reply endpoint in the product with a provider-side window, and the
+ *      first that stops paying for a conversation it will discard.
+ *  13. **What does `scrapeReplies` add, and what does it charge?** A reply to
+ *      a comment is where the second half of a thread lives, and it is a
+ *      second per-item charge.
+ *
+ * **The post is chosen for its comments and the search half is reused.** A
+ * post with no comments answers nothing here and still costs a run, which is
+ * the mistake the ScrapeCreators YouTube capture paid four credits to undo.
+ */
+if (wanted("comments")) {
+  const searched =
+    answers.get("search-past-week")?.records ??
+    answers.get("search-by-date")?.records ??
+    readCommitted("search-past-week") ??
+    readCommitted("search-by-date") ??
+    [];
+
+  const busiest = [...searched]
+    .filter((item) => item?.id)
+    .sort((a, b) => (b?.engagement?.comments ?? 0) - (a?.engagement?.comments ?? 0))[0];
+
+  const claimed = busiest?.engagement?.comments ?? 0;
+
+  if (busiest && claimed > 0) {
+    /**
+     * Built from the activity id rather than read from `linkedinUrl`.
+     *
+     * The committed fixtures have the handle in that URL replaced with a
+     * pseudonym — correctly, because it names a person — so the stored link no
+     * longer opens anything. The id is not identity and is committed whole,
+     * and `/feed/update/urn:li:activity:<id>/` is the form the actor's own
+     * example input uses.
+     */
+    const postUrl = `https://www.linkedin.com/feed/update/urn:li:activity:${busiest.id}/`;
+
+    console.log(`\n  post ${busiest.id} claims ${claimed} comments\n`);
+
+    const flat = await runActor(
+      "comments-flat",
+      { posts: [postUrl], maxItems: maxComments, profileScraperMode: "short" },
+      commentsActor,
+    );
+
+    describeComments("comments-flat", flat?.records, busiest.id);
+
+    /** Question 13: the second half of a thread, at a second charge. */
+    const nested = await runActor(
+      "comments-with-replies",
+      {
+        posts: [postUrl],
+        maxItems: maxComments,
+        scrapeReplies: true,
+        profileScraperMode: "short",
+      },
+      commentsActor,
+    );
+
+    describeComments("comments-with-replies", nested?.records, busiest.id);
+  } else {
+    failures.push(
+      "comments: no captured post claims a comment, so nothing was asked. " +
+        "Re-run with --only=search,comments on a keyword whose posts get replies.",
+    );
+  }
+}
+
 // ------------------------------------------------------------ the answers
 
 const findings = {
@@ -858,3 +1066,10 @@ if (findings.summary) {
 }
 
 console.log("\nRead the fixtures before committing them. US-028's first run leaked real names.");
+
+if (failures.length > 0) {
+  console.error("\nSome captures did not finish:");
+  for (const failure of failures) console.error(`  ${failure}`);
+  console.error("\nWhat did arrive is still written. Fix and re-run.");
+  process.exit(1);
+}

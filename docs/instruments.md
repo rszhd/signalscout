@@ -73,6 +73,15 @@ to and what each one billed. It spends about $0.08 and leaves behind a paused
 monitor and two `api_usage` rows, which are the evidence. Run it when
 `collect.ts` changes how a provider is chosen or resumed.
 
+**It no longer runs as written.** US-158 switched the Bright Data connector
+off on 2026-09-17, and this script records `brightdata` as the Reddit choice,
+so the pipeline refuses it the way it refuses `live:linkedin-poll`. Delete
+`notOffered` from `sources/providers/brightdata/reddit.ts` to run it again. The
+rule it measures — a collection is resumed through the provider that started
+it, whatever the choice now says — is unchanged, and no other pair can be
+measured for it: Bright Data is the only provider here that collects
+asynchronously, which is what makes the race possible at all.
+
 The LinkedIn capture is the sixth, and it has no `package.json` script because
 it is run by hand with a key: `node
 packages/engine/src/sources/providers/socialcrawl/linkedin-fixtures/capture.mjs`.
@@ -170,6 +179,24 @@ platform ranks highest. It pages a thread cheaply and classifies only the
 positions asked for, because fetching is a credit for fifty comments and a
 classification is 2,975 micro-dollars. `--report-only` re-reads a run that the
 budget stopped, buying nothing.
+
+**Four captures grew a `--only=comments` mode in US-159**, and each one takes
+its thread from a fixture already committed rather than buying a search to find
+one. `scrapecreators/youtube-fixtures/capture.mjs --only=comments` is the
+exception, because the niche keyword's videos have almost no comments: it spends
+one credit on a broader search first, then three on the comment pages, about
+$0.008. `socialcrawl/reddit-fixtures/capture.mjs --only=comments` is one call
+at five credits, $0.041, and reads the whole thread.
+`socialdata/x-fixtures/capture.mjs --only=comments` is a `min_replies:20`
+search plus two reply pages, about $0.012 from a prepaid balance that answers
+402 when it is empty — read the balance it prints first. And
+`apify/linkedin-fixtures/capture.mjs --only=comments` runs the comments actor
+twice on the busiest committed post, with and without `scrapeReplies`, about
+$0.008 for a two-comment thread. Each partial run merges into the folder's
+manifest and ledger rather than replacing them. Read what they write: the X
+capture's first run leaked six handles through `affiliation_label.label_url`,
+and the LinkedIn one leaked a real name through a `PROFILE_MENTION` span in
+`commentary`. Both rules are in the scrubbers now.
 
 The Instagram capture is run by hand with a key, like LinkedIn's, and it takes
 `--lean`. The full run is 24 credits and answers nine questions; `--lean` is 14

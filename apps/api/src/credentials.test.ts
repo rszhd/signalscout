@@ -36,7 +36,7 @@ const bootSecret = "a-test-secret-that-is-long-enough-to-pass";
 const logger = createLogger({ level: "silent", name: "test" });
 
 /** One value. A leak anywhere below is a substring match, not a judgement. */
-const secret = "brd_7f3a91c4e08b2d65";
+const secret = "sc_7f3a91c4e08b2d65";
 const key = readEncryptionKey(generateEncryptionKey());
 const otherKey = generateEncryptionKey();
 
@@ -83,7 +83,7 @@ describe("a stored credential and the API", () => {
 
   describe("what a response carries", () => {
     it("never carries a key that came from the environment", async () => {
-      const app = await server({ environment: { BRIGHTDATA_API_KEY: secret } });
+      const app = await server({ environment: { SCRAPECREATORS_API_KEY: secret } });
 
       try {
         for (const url of [
@@ -104,7 +104,7 @@ describe("a stored credential and the API", () => {
     it("never carries a key that came from the database", async () => {
       await putSourceCredential(db, key, {
         userId: owner,
-        provider: "brightdata",
+        provider: "scrapecreators",
         field: "apiKey",
         value: secret,
       });
@@ -123,7 +123,7 @@ describe("a stored credential and the API", () => {
     });
 
     it("says a source is configured without saying what with", async () => {
-      const app = await server({ environment: { BRIGHTDATA_API_KEY: secret } });
+      const app = await server({ environment: { SCRAPECREATORS_API_KEY: secret } });
 
       try {
         const body = (await app.inject({ method: "GET", url: "/api/monitor-options" })).json();
@@ -143,7 +143,7 @@ describe("a stored credential and the API", () => {
       // source is not set up, while the worker polls it happily.
       await putSourceCredential(db, key, {
         userId: owner,
-        provider: "brightdata",
+        provider: "scrapecreators",
         field: "apiKey",
         value: secret,
       });
@@ -171,7 +171,7 @@ describe("a stored credential and the API", () => {
         const body = (await app.inject({ method: "GET", url: "/api/monitor-options" })).json();
         const reddit = body.sources.find((source: { id: string }) => source.id === "reddit");
 
-        expect(reddit.missingCredentials[0].environmentVariable).toBe("BRIGHTDATA_API_KEY");
+        expect(reddit.missingCredentials[0].environmentVariable).toBe("SCRAPECREATORS_API_KEY");
         expect(reddit.ready).toBe(false);
       } finally {
         await app.close();
@@ -183,7 +183,7 @@ describe("a stored credential and the API", () => {
       // and path. A route added later that serves a key has to pass this.
       await putSourceCredential(db, key, {
         userId: owner,
-        provider: "brightdata",
+        provider: "scrapecreators",
         field: "apiKey",
         value: secret,
       });
@@ -223,7 +223,7 @@ describe("a stored credential and the API", () => {
     it("refuses to start when a stored credential cannot be decrypted", async () => {
       await putSourceCredential(db, key, {
         userId: owner,
-        provider: "brightdata",
+        provider: "scrapecreators",
         field: "apiKey",
         value: secret,
       });
@@ -247,7 +247,7 @@ describe("a stored credential and the API", () => {
     it("refuses to start when a credential is stored and no key is set", async () => {
       await putSourceCredential(db, key, {
         userId: owner,
-        provider: "brightdata",
+        provider: "scrapecreators",
         field: "apiKey",
         value: secret,
       });
@@ -270,7 +270,7 @@ describe("a stored credential and the API", () => {
     it("never puts the value in the message it refuses with", async () => {
       await putSourceCredential(db, key, {
         userId: owner,
-        provider: "brightdata",
+        provider: "scrapecreators",
         field: "apiKey",
         value: secret,
       });
@@ -291,7 +291,7 @@ describe("a stored credential and the API", () => {
         expect.unreachable("startApi must refuse a credential it cannot read");
       } catch (error) {
         expect(String(error)).not.toContain(secret);
-        expect(String(error)).toContain("brightdata:apiKey");
+        expect(String(error)).toContain("scrapecreators:apiKey");
       }
     });
   });

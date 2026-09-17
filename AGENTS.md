@@ -20,14 +20,16 @@ refuses a poll that would spend past its cap, reads deep comment threads in
 batches, and delivers a match by digest email, immediate email or signed
 webhook.
 
-**Six platforms are fetched, through five providers, and a connector is the
-pair.** Reddit, X, LinkedIn, YouTube, TikTok and Instagram; Bright Data,
-ScrapeCreators, SocialCrawl, SocialData and Apify. Reddit has three providers,
-and X, TikTok and YouTube have two each. A platform is what a person
-ticks and it keys `posts.source` and deduplication. A provider fetches, owns
-the key and sends the bill. The table of who fetches what, at what price and
-with what quirks, is in [docs/sources.md](docs/sources.md) — read it before
-touching a connector.
+**Six platforms are fetched, through four providers, and a connector is the
+pair.** Reddit, X, LinkedIn, YouTube, TikTok and Instagram; ScrapeCreators,
+SocialCrawl, SocialData and Apify. Reddit, X, TikTok and YouTube have two
+providers each. Bright Data is the fifth provider and it fetches nothing now:
+US-158 switched its Reddit connector off on price on 2026-09-17, the way US-053
+switched off LinkedIn through SocialCrawl. Both connectors still ship, and
+neither may be picked. A platform is what a person ticks and it keys
+`posts.source` and deduplication. A provider fetches, owns the key and sends
+the bill. The table of who fetches what, at what price and with what quirks, is
+in [docs/sources.md](docs/sources.md) — read it before touching a connector.
 
 **An instance has accounts, and this repository charges nobody.** Better Auth
 in the same Postgres, `AUTH_SIGNUP` deciding whether anybody else may
@@ -210,7 +212,7 @@ Do not reopen these without being asked. The reasoning is in
 | Python | TypeScript |
 | A managed auth service | Better Auth in our own Postgres |
 | An in-memory Postgres fake | Real Postgres, from the first test file |
-| A Reddit API key per user | Reddit through a provider: Bright Data, ScrapeCreators or SocialCrawl |
+| A Reddit API key per user | Reddit through a provider: ScrapeCreators or SocialCrawl, and Bright Data until US-158 |
 | X's own pay-per-use API | X through a provider: SocialCrawl, and SocialData since US-061 |
 | A platform's price kept on the platform | The price on the pair: one SocialCrawl key, one credit price, and a call that costs 1 on X and 5 on LinkedIn |
 | One record describing a source | A platform and a provider, separate; a connector is the pair |
@@ -296,7 +298,7 @@ pnpm capture:deletions                            # spends ~$0.02
 node packages/engine/src/sources/providers/socialcrawl/linkedin-fixtures/capture.mjs   # ~30 credits
 node packages/engine/src/sources/providers/socialcrawl/instagram-fixtures/capture.mjs  # 24 credits, or 14 with --lean
 node packages/engine/src/sources/providers/scrapecreators/tiktok-fixtures/capture.mjs   # 9 credits
-node packages/engine/src/sources/providers/scrapecreators/youtube-fixtures/capture.mjs  # 8 credits
+node packages/engine/src/sources/providers/scrapecreators/youtube-fixtures/capture.mjs  # 14 credits, 4 with --only=comments
 node packages/engine/src/sources/providers/scrapecreators/instagram-fixtures/capture.mjs # 6 credits
 ```
 

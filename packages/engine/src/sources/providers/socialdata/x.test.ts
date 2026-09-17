@@ -17,10 +17,10 @@ import { createLogger } from "../../../logger.js";
 import { xPlatformId } from "../../platforms.js";
 import { createSourceRegistry } from "../../registry.js";
 import { assertSourcesCanBeStored } from "../../storage.js";
-import type { SearchRequest, SearchResult, SourceRuntime } from "../../types.js";
+import type { ReplyRequest, SearchRequest, SearchResult, SourceRuntime } from "../../types.js";
 import { toCandidatePost as toSocialCrawlPost } from "../socialcrawl/x.js";
 import { socialDataProviderId } from "./provider.js";
-import { SocialDataXSource, socialDataX, toCandidatePost } from "./x.js";
+import { SocialDataXSource, socialDataX, toCandidatePost, toCandidateReply } from "./x.js";
 
 interface Captured {
   readonly httpStatus: number;
@@ -38,6 +38,9 @@ const searchSince = fixture("search-since");
 const searchPage2 = fixture("search-page-2");
 const noResults = fixture("search-no-results");
 const credentialsRejected = fixture("credentials-rejected");
+/** The two reply pages, captured on 2026-09-17 by US-159. */
+const repliesPage1 = fixture("comments-page-1");
+const repliesPage2 = fixture("comments-page-2");
 
 function bodyOf(captured: Captured): Record<string, unknown> {
   return captured.body as Record<string, unknown>;
@@ -143,6 +146,13 @@ describe("the connector's declared economics", () => {
     // The unit is the post, so the pricing page can compare it directly:
     // $0.0100 for fifty against SocialCrawl's $0.0203.
     expect(socialDataX.postsPerUnit).toBe(1);
+  });
+
+  it("prices a reply at the price of a post, because a reply is a tweet", () => {
+    // Twenty replies moved the balance $0.0040, the same 200 micro-dollars a
+    // tweet a search result costs. Measured on 2026-09-17.
+    expect(socialDataX.canFetchReplies).toBe(true);
+    expect(socialDataX.replyPricePerUnitMicros).toBe(200);
   });
 
   it("stores its posts under the platform the schema knows", () => {
@@ -461,5 +471,179 @@ describe("checking a key", () => {
 
     expect(check).toEqual({ valid: false, reason: "Enter your SocialData API key." });
     expect(provider.calls).toHaveLength(0);
+  });
+});
+
+/**
+ * The replies under one post. US-159.
+ *
+ * Captured on 2026-09-17 against a thread of 179 claimed replies, found with
+ * X's own `min_replies:` operator because the committed search fixtures'
+ * busiest tweet claims six and returns two.
+ */
+describe("the replies under one post", () => {
+  /** The post the two captured pages were asked for, read off the manifest. */
+  const threadId = "2064431279383433646";
+
+  function replyRequest(overrides: Partial<ReplyRequest> = {}): ReplyRequest {
+    return {
+      postUrl: `https://x.com/somebody/status/${threadId}`,
+      postExternalId: threadId,
+      credentials,
+      ...overrides,
+    };
+  }
+
+  /**
+   * The two facts this connector is built on, asserted against the payloads
+   * rather than quoted from the ticket.
+   *
+   * Every reply names the conversation it belongs to, which is what makes the
+   * wrong-parent check work. And `text` is null on every one while `full_text`
+   * holds the words — the opposite of the search fixtures, which fill both.
+   */
+  it("names its conversation on every reply, and puts the words in full_text", () => {
+    const all = [...tweetsOf(repliesPage1), ...tweetsOf(repliesPage2)];
+
+    expect(all).toHaveLength(40);
+    expect(all.every((reply) => reply.conversation_id_str === threadId)).toBe(true);
+    expect(all.every((reply) => reply.text === null)).toBe(true);
+    expect(all.every((reply) => typeof reply.full_text === "string")).toBe(true);
+  });
+
+  it("reads twenty replies, and bills the twenty tweets it read", async () => {
+    const stub = socialData([repliesPage1]);
+    const source = new SocialDataXSource(runtimeWith(stub.fetch));
+
+    const result = await source.fetchReplies(replyRequest());
+
+    expect(new URL(stub.calls[0]?.url ?? "").pathname).toBe(`/twitter/tweets/${threadId}/comments`);
+    expect(result.replies).toHaveLength(20);
+    expect(result.itemsReturned).toBe(20);
+    expect(result.unitsConsumed).toBe(20);
+  });
+
+  it("builds the same link for a reply that it builds for a post", async () => {
+    const stub = socialData([repliesPage1]);
+    const source = new SocialDataXSource(runtimeWith(stub.fetch));
+
+    const { replies } = await source.fetchReplies(replyRequest());
+
+    for (const reply of replies) {
+      expect(reply.url).toBe(`https://x.com/${reply.author}/status/${reply.externalId}`);
+    }
+  });
+
+  /**
+   * Nineteen distinct immediate parents across the two pages, all in one
+   * conversation. A reply four levels down answers another reply and still
+   * belongs to the thread, which is why the check is on the conversation.
+   */
+  it("stores the shape of the conversation, not a flat list", async () => {
+    const stub = socialData([repliesPage1]);
+    const source = new SocialDataXSource(runtimeWith(stub.fetch));
+
+    const { replies } = await source.fetchReplies(replyRequest());
+
+    const answeringThePost = replies.filter((reply) => reply.parentReplyExternalId === undefined);
+    const answeringAReply = replies.filter((reply) => reply.parentReplyExternalId !== undefined);
+
+    expect(answeringThePost).toHaveLength(14);
+    expect(answeringAReply).toHaveLength(6);
+    expect(replies.every((reply) => reply.parentPostExternalId === threadId)).toBe(true);
+  });
+
+  /**
+   * BUG-007: a provider asked for one thread answered with a post from
+   * another. On this connector the check has a field to stand on.
+   */
+  it("drops a reply that belongs to another conversation", () => {
+    const first = tweetsOf(repliesPage1)[0] as Record<string, unknown>;
+
+    expect(
+      toCandidateReply(first, { parentPostExternalId: "a-different-post", position: 0 }),
+    ).toBeUndefined();
+    expect(toCandidateReply(first, { parentPostExternalId: threadId, position: 0 })).toBeDefined();
+  });
+
+  it("drops a reply with no words rather than buying a classification for silence", () => {
+    const first = tweetsOf(repliesPage1)[0] as Record<string, unknown>;
+
+    expect(
+      toCandidateReply(
+        { ...first, text: null, full_text: "" },
+        { parentPostExternalId: threadId, position: 0 },
+      ),
+    ).toBeUndefined();
+  });
+
+  it("pages with the cursor, and counts positions across the whole walk", async () => {
+    const stub = socialData([repliesPage1, repliesPage2]);
+    const source = new SocialDataXSource(runtimeWith(stub.fetch));
+
+    const first = await source.fetchReplies(replyRequest());
+    expect(first.next.status).toBe("ready");
+    expect(first.partial).toBe(true);
+
+    const cursor = first.next.status === "ready" ? first.next.cursor : undefined;
+    const second = await source.fetchReplies(
+      replyRequest({ cursor, positionOffset: first.itemsReturned }),
+    );
+
+    expect(new URL(stub.calls[1]?.url ?? "").searchParams.get("cursor")).toBe(cursor);
+    expect(second.replies[0]?.threadPosition).toBe(20);
+  });
+
+  /**
+   * One reply came back on both pages. It is stored once, because
+   * `UNIQUE (source, external_id)` keys a reply exactly as it keys a post —
+   * but the connector reports what it was sent, and it was billed for both.
+   */
+  it("reports the overlap between two pages rather than hiding it", async () => {
+    const stub = socialData([repliesPage1, repliesPage2]);
+    const source = new SocialDataXSource(runtimeWith(stub.fetch));
+
+    const first = await source.fetchReplies(replyRequest());
+    const cursor = first.next.status === "ready" ? first.next.cursor : undefined;
+    const second = await source.fetchReplies(replyRequest({ cursor }));
+
+    const seen = new Set(first.replies.map((reply) => reply.externalId));
+    const repeated = second.replies.filter((reply) => seen.has(reply.externalId));
+
+    expect(repeated).toHaveLength(1);
+    expect(second.unitsConsumed).toBe(20);
+  });
+
+  /**
+   * The early stop, and the only one in the product's reply connectors. Both
+   * captured pages arrived newest first, the second continuing strictly older.
+   */
+  it("stops paging once the page's oldest reply is outside the window", async () => {
+    const stub = socialData([repliesPage1]);
+    const source = new SocialDataXSource(runtimeWith(stub.fetch));
+
+    const all = await source.fetchReplies(replyRequest());
+    const oldest = all.replies.reduce((a, b) => (a.postedAt < b.postedAt ? a : b));
+
+    expect(all.next.status).toBe("ready");
+
+    const windowed = await source.fetchReplies(replyRequest({ since: oldest.postedAt }));
+
+    expect(windowed.next.status).toBe("done");
+    // Not partial: what it did not read is older than what the caller asked
+    // for, and calling that incomplete re-opens the thread on every poll.
+    expect(windowed.partial).toBe(false);
+    expect(windowed.replies.length).toBeLessThan(all.replies.length);
+    // Billed for the whole page either way: the cut is made after the money.
+    expect(windowed.unitsConsumed).toBe(20);
+  });
+
+  it("was captured newest first, which is what the early stop rests on", () => {
+    const at = (reply: Record<string, unknown>) => Date.parse(reply.tweet_created_at as string);
+    const times = [...tweetsOf(repliesPage1), ...tweetsOf(repliesPage2)].map(at);
+
+    expect(
+      times.every((value, index) => index === 0 || (times[index - 1] as number) >= value),
+    ).toBe(true);
   });
 });

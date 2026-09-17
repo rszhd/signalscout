@@ -52,12 +52,12 @@ clipboard.
 SignalScout ships the integrations. You own the accounts. Nothing is proxied
 through us, and no data leaves your instance.
 
-Six platforms arrive through five data providers — Bright Data, ScrapeCreators
-and SocialCrawl for Reddit, SocialCrawl and SocialData for X, Apify for
-LinkedIn, and SocialCrawl for YouTube, TikTok and Instagram. You bring a key
-for the providers you actually use, and one Reddit key plus one model key is
-already a useful product. Bright Data, ScrapeCreators and SocialCrawl each have
-a free tier that needs no card.
+Six platforms arrive through four data providers — ScrapeCreators and
+SocialCrawl for Reddit, SocialCrawl and SocialData for X, Apify for LinkedIn,
+and SocialCrawl for YouTube, TikTok and Instagram. You bring a key for the
+providers you actually use, and one Reddit key plus one model key is already a
+useful product. ScrapeCreators and SocialCrawl both have a free tier that needs
+no card.
 
 A key lives in `.env`, where it belongs to the machine, or on a screen, where
 it is tested with the provider before it is stored and belongs to the account
@@ -161,6 +161,9 @@ The scope is one sentence: **find conversations with intent.**
 | [docs/testing.md](docs/testing.md) | How the tests are written, and what a green suite cannot say |
 | [docs/instruments.md](docs/instruments.md) | Every command that spends money, what it asks and what it costs |
 | [docs/history.md](docs/history.md) | What each ticket measured, in the order it happened |
+| [CHANGELOG.md](CHANGELOG.md) | What each published package version changed for a consumer |
+| [packages/engine/](packages/engine/README.md) | The stateless half, on npm: connectors, model calls, the cipher |
+| [packages/pipeline/](packages/pipeline/README.md) | The stateful half, on npm: the tables, the queues, the migrations |
 | [backlog/](backlog/README.md) | One ticket per file; the folder is the status |
 | [AGENTS.md](AGENTS.md) | Instructions for AI coding agents working in this repo |
 

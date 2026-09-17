@@ -40,6 +40,20 @@ export const actors = {
    * was chosen over a provider that reaches LinkedIn through Google's index.
    */
   linkedInPostSearch: "harvestapi~linkedin-post-search",
+  /**
+   * The comments under one post, by URL. US-159.
+   *
+   * A second actor rather than the search actor's `scrapeComments` flag, and
+   * the reason is the interface: this product reads replies under one post it
+   * has already stored, in a second call, on every provider it has.
+   * `scrapeComments` would tie them to the search run instead, so a monitor
+   * would pay for comments under posts the pre-filter was about to drop.
+   *
+   * It takes `posts: [url]` and charges a `post-comment` event at exactly the
+   * price of a post — $0.002 on FREE, $0.0015 on GOLD — read from the actor's
+   * own `pricingInfos` on 2026-09-17.
+   */
+  linkedInPostComments: "harvestapi~linkedin-post-comments",
 } as const;
 
 /**

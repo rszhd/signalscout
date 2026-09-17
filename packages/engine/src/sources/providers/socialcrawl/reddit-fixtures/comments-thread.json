@@ -1,0 +1,992 @@
+{
+  "httpStatus": 200,
+  "body": {
+    "success": true,
+    "platform": "reddit",
+    "endpoint": "/v1/reddit/post/comments",
+    "data": {
+      "items": [
+        {
+          "comment": {
+            "id": "ov3sslq",
+            "url": "https://www.reddit.com/r/softwaretesting/comments/1ulc2gz/comment/ov3sslq/",
+            "parent_id": "1ulc2gz",
+            "post_id": "1ulc2gz",
+            "text": "30min to write, another 30 to debug and optimize",
+            "author": {
+              "username": "redditor-1",
+              "display_name": "redditor-2",
+              "avatar_url": "https://scrubbed.invalid/redditor-3",
+              "verified": null
+            },
+            "engagement": {
+              "likes": 7,
+              "replies": 1
+            },
+            "flags": {
+              "pinned": null,
+              "deleted": false
+            },
+            "published_at": "2026-07-02T12:22:53.032Z",
+            "ext": {
+              "depth": 0,
+              "published_at_epoch": 1782994973
+            },
+            "replies": [
+              {
+                "id": "ov3wo9x",
+                "url": "https://www.reddit.com/r/softwaretesting/comments/1ulc2gz/comment/ov3wo9x/",
+                "parent_id": "ov3sslq",
+                "post_id": "1ulc2gz",
+                "text": "thanks, that's helpful. just curious, what usually takes most of that extra 30 mins? is it flaky locators, waits, debugging, or something else? if a tool could handle most of that automatically, would you actually consider using it, or would you still stick with appium?",
+                "author": {
+                  "username": "redditor-4",
+                  "display_name": "redditor-5",
+                  "avatar_url": "https://scrubbed.invalid/redditor-6",
+                  "verified": null
+                },
+                "engagement": {
+                  "likes": 1,
+                  "replies": 1
+                },
+                "flags": {
+                  "pinned": null,
+                  "deleted": false
+                },
+                "published_at": "2026-07-02T12:43:53.295Z",
+                "ext": {
+                  "depth": 1,
+                  "published_at_epoch": 1782996233
+                },
+                "replies": [
+                  {
+                    "id": "ov46izf",
+                    "url": "https://www.reddit.com/r/softwaretesting/comments/1ulc2gz/comment/ov46izf/",
+                    "parent_id": "ov3wo9x",
+                    "post_id": "1ulc2gz",
+                    "text": "More of a worst-case, if locators are flaky or for debugging.",
+                    "author": {
+                      "username": "redditor-1",
+                      "display_name": "redditor-2",
+                      "avatar_url": "https://scrubbed.invalid/redditor-3",
+                      "verified": null
+                    },
+                    "engagement": {
+                      "likes": 2,
+                      "replies": 1
+                    },
+                    "flags": {
+                      "pinned": null,
+                      "deleted": false
+                    },
+                    "published_at": "2026-07-02T13:32:39.209Z",
+                    "ext": {
+                      "depth": 2,
+                      "published_at_epoch": 1782999159
+                    },
+                    "replies": [
+                      {
+                        "id": "owfxtl0",
+                        "url": "https://www.reddit.com/r/softwaretesting/comments/1ulc2gz/comment/owfxtl0/",
+                        "parent_id": "ov46izf",
+                        "post_id": "1ulc2gz",
+                        "text": "got it, that's a clear picture thanks\n\nso worst case, it's really flaky locators and debugging eating the time, not the actual writingig ? that tracks with what a few others here have said too. appreciate you breaking it dow",
+                        "author": {
+                          "username": "redditor-4",
+                          "display_name": "redditor-5",
+                          "avatar_url": "https://scrubbed.invalid/redditor-6",
+                          "verified": null
+                        },
+                        "engagement": {
+                          "likes": 2,
+                          "replies": null
+                        },
+                        "flags": {
+                          "pinned": null,
+                          "deleted": false
+                        },
+                        "published_at": "2026-07-09T06:38:43.784Z",
+                        "ext": {
+                          "depth": 3,
+                          "published_at_epoch": 1783579123
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "computed": {
+            "language": "en"
+          }
+        },
+        {
+          "comment": {
+            "id": "ov38iw1",
+            "url": "https://www.reddit.com/r/softwaretesting/comments/1ulc2gz/comment/ov38iw1/",
+            "parent_id": "1ulc2gz",
+            "post_id": "1ulc2gz",
+            "text": "If you're testing that the you can simply search and add an item to the cart then I would mock out the network request and have a mock response. That way I can control exactly what data the UI layer is being passed and I'd know exactly what should be displayed. ",
+            "author": {
+              "username": "redditor-7",
+              "display_name": "redditor-8",
+              "avatar_url": "https://scrubbed.invalid/redditor-9",
+              "verified": null
+            },
+            "engagement": {
+              "likes": 4,
+              "replies": 1
+            },
+            "flags": {
+              "pinned": null,
+              "deleted": false
+            },
+            "published_at": "2026-07-02T10:11:21.785Z",
+            "ext": {
+              "depth": 0,
+              "published_at_epoch": 1782987081
+            },
+            "replies": [
+              {
+                "id": "ov3wwnk",
+                "url": "https://www.reddit.com/r/softwaretesting/comments/1ulc2gz/comment/ov3wwnk/",
+                "parent_id": "ov38iw1",
+                "post_id": "1ulc2gz",
+                "text": "that's a good point, thanks\n\nso for you, having predictable and reliable tests is more important than automating against real app behavior?\n\nalso curious, once the network is mocked, what still ends up taking the most time? writing the test, maintaining it, or debugging when the ui changes?",
+                "author": {
+                  "username": "redditor-4",
+                  "display_name": "redditor-5",
+                  "avatar_url": "https://scrubbed.invalid/redditor-6",
+                  "verified": null
+                },
+                "engagement": {
+                  "likes": 1,
+                  "replies": 1
+                },
+                "flags": {
+                  "pinned": null,
+                  "deleted": false
+                },
+                "published_at": "2026-07-02T12:45:05.371Z",
+                "ext": {
+                  "depth": 1,
+                  "published_at_epoch": 1782996305
+                },
+                "replies": [
+                  {
+                    "id": "ov45lid",
+                    "url": "https://www.reddit.com/r/softwaretesting/comments/1ulc2gz/comment/ov45lid/",
+                    "parent_id": "ov3wwnk",
+                    "post_id": "1ulc2gz",
+                    "text": "> so for you, having predictable and reliable tests is more important than automating against real app behavior? \n\nWhat I described is testing real app behaviour. You're just swapping out the data from a backend and passing a mock. The UI doesn't care where the data came from. \n\nRunning tests that makes real network calls is slow and expensive. It's fine to automate a few essential flows where a user logs in, performs a real search hitting a real test environment, purchasing the item, ect. But you shouldn't be going through login flows and real API calls for every test.",
+                    "author": {
+                      "username": "redditor-7",
+                      "display_name": "redditor-8",
+                      "avatar_url": "https://scrubbed.invalid/redditor-9",
+                      "verified": null
+                    },
+                    "engagement": {
+                      "likes": 1,
+                      "replies": 2
+                    },
+                    "flags": {
+                      "pinned": null,
+                      "deleted": false
+                    },
+                    "published_at": "2026-07-02T13:28:13.083Z",
+                    "ext": {
+                      "depth": 2,
+                      "published_at_epoch": 1782998893
+                    },
+                    "replies": [
+                      {
+                        "id": "ov566ll",
+                        "url": "https://www.reddit.com/r/softwaretesting/comments/1ulc2gz/comment/ov566ll/",
+                        "parent_id": "ov45lid",
+                        "post_id": "1ulc2gz",
+                        "text": "Can you intercept and manipulate responses with Appium like you can with Cypress?",
+                        "author": {
+                          "username": "redditor-10",
+                          "display_name": "redditor-11",
+                          "avatar_url": "https://scrubbed.invalid/redditor-12",
+                          "verified": null
+                        },
+                        "engagement": {
+                          "likes": 1,
+                          "replies": 2
+                        },
+                        "flags": {
+                          "pinned": null,
+                          "deleted": false
+                        },
+                        "published_at": "2026-07-02T16:09:05.926Z",
+                        "ext": {
+                          "depth": 3,
+                          "published_at_epoch": 1783008545
+                        },
+                        "replies": [
+                          {
+                            "id": "ov5cq7g",
+                            "url": "https://www.reddit.com/r/softwaretesting/comments/1ulc2gz/comment/ov5cq7g/",
+                            "parent_id": "ov566ll",
+                            "post_id": "1ulc2gz",
+                            "text": "No idea. I don't use appium because it's so bad.",
+                            "author": {
+                              "username": "redditor-7",
+                              "display_name": "redditor-8",
+                              "avatar_url": "https://scrubbed.invalid/redditor-9",
+                              "verified": null
+                            },
+                            "engagement": {
+                              "likes": 1,
+                              "replies": null
+                            },
+                            "flags": {
+                              "pinned": null,
+                              "deleted": false
+                            },
+                            "published_at": "2026-07-02T16:36:44.660Z",
+                            "ext": {
+                              "depth": 4,
+                              "published_at_epoch": 1783010204
+                            }
+                          },
+                          {
+                            "id": "owfxndv",
+                            "url": "https://www.reddit.com/r/softwaretesting/comments/1ulc2gz/comment/owfxndv/",
+                            "parent_id": "ov566ll",
+                            "post_id": "1ulc2gz",
+                            "text": "No, not natively that's a real capability gap between the two.\n\n**Cypress** runs inside the browser and can hook the network layer directly via `cy.intercept()`stubbing, spying, or modifying requests/responses is a first-class, built-in feature.\n\n**Appium** operates at the UI/OS automation layer (via WebDriver), driving real native or mobile-web apps. It doesn't have a native network interception API. To mock or manipulate network responses with Appium, you typically have to reach outside Appium itself:\n\n* **Proxy-based interception** route device/emulator traffic through mitmproxy or Charles Proxy and rewrite responses there\n* **OS-level config** set a custom proxy or CA cert on the emulator/device, which adds setup and SSL-pinning headaches on real apps\n* **App-level test hooks** some teams build in a debug/mock flag in the app itself (e.g. a build variant that reads from local fixtures instead of hitting the network), which is common for native apps precisely because Appium can't intercept traffic like Cypress can",
+                            "author": {
+                              "username": "redditor-4",
+                              "display_name": "redditor-5",
+                              "avatar_url": "https://scrubbed.invalid/redditor-6",
+                              "verified": null
+                            },
+                            "engagement": {
+                              "likes": 1,
+                              "replies": null
+                            },
+                            "flags": {
+                              "pinned": null,
+                              "deleted": false
+                            },
+                            "published_at": "2026-07-09T06:37:22.235Z",
+                            "ext": {
+                              "depth": 4,
+                              "published_at_epoch": 1783579042
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "id": "owfxgge",
+                        "url": "https://www.reddit.com/r/softwaretesting/comments/1ulc2gz/comment/owfxgge/",
+                        "parent_id": "ov45lid",
+                        "post_id": "1ulc2gz",
+                        "text": "that's a fair distinction, thanks for clarifying mocking is still real app behaviour, just controlled input\n\nso here's a concrete version of what I'm exploring: you write intent like \"Open the Flipkart app. Search for Samsung 43-inch TV. Add it to cart. Go to cart page. Verify the product appears in the cart\" an agent handles the popups/interruptions dynamically (not hardcoded if-else), and it hands you back an actual editable script (not a black box) that you can drop into your existing framework, review, or modify\n\ngiven what you said earlier about appium being bad and mocking being your preferred approach would something like this actually save you time, or does it just move the pain somewhere else (e.g. you'd still need to write/maintain the mocks separately, or you wouldn't trust the agent's popup handling without watching it run first)?",
+                        "author": {
+                          "username": "redditor-4",
+                          "display_name": "redditor-5",
+                          "avatar_url": "https://scrubbed.invalid/redditor-6",
+                          "verified": null
+                        },
+                        "engagement": {
+                          "likes": 1,
+                          "replies": null
+                        },
+                        "flags": {
+                          "pinned": null,
+                          "deleted": false
+                        },
+                        "published_at": "2026-07-09T06:35:50.222Z",
+                        "ext": {
+                          "depth": 3,
+                          "published_at_epoch": 1783578950
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "computed": {
+            "language": "en"
+          }
+        },
+        {
+          "comment": {
+            "id": "ov4zwe1",
+            "url": "https://www.reddit.com/r/softwaretesting/comments/1ulc2gz/comment/ov4zwe1/",
+            "parent_id": "1ulc2gz",
+            "post_id": "1ulc2gz",
+            "text": "- 30 m with automation framework already setup and stabilized for the app\n- 1/2 day with quick and dirty setup of automation framework\n- 1 work week with properly setting up everything, establishing AF attributes in app DOM, lint rules, basic mocks fo the app\n\nAnswers:\n3. yes, useful for simple applications, api testing and lower level tests; useless for more complex setups fo e2e tests which deoending on the app/software in question can be many\n\n4. AI generated anything is not deterministic enough to trust blindly and should be still properly human checked anyway",
+            "author": {
+              "username": "redditor-13",
+              "display_name": "redditor-14",
+              "avatar_url": "https://scrubbed.invalid/redditor-15",
+              "verified": null
+            },
+            "engagement": {
+              "likes": 2,
+              "replies": 1
+            },
+            "flags": {
+              "pinned": null,
+              "deleted": false
+            },
+            "published_at": "2026-07-02T15:42:42.734Z",
+            "ext": {
+              "depth": 0,
+              "published_at_epoch": 1783006962
+            },
+            "replies": [
+              {
+                "id": "owfy4ui",
+                "url": "https://www.reddit.com/r/softwaretesting/comments/1ulc2gz/comment/owfy4ui/",
+                "parent_id": "ov4zwe1",
+                "post_id": "1ulc2gz",
+                "text": "that's a really clear breakdown, thanks\n\ncurious on your last point: when you say ai-generated stuff needs to be human checked anyway, is the concern more about correctness (it might assert the wrong thing) or about not understanding what it actually did (black box problem), or both equally?\n\nalso, that 1 work week for proper setup, dom attributes, lint rules, mocks, is that a one time cost per app, or does it recur a lot as the app evolves?",
+                "author": {
+                  "username": "redditor-4",
+                  "display_name": "redditor-5",
+                  "avatar_url": "https://scrubbed.invalid/redditor-6",
+                  "verified": null
+                },
+                "engagement": {
+                  "likes": 1,
+                  "replies": 1
+                },
+                "flags": {
+                  "pinned": null,
+                  "deleted": false
+                },
+                "published_at": "2026-07-09T06:41:13.539Z",
+                "ext": {
+                  "depth": 1,
+                  "published_at_epoch": 1783579273
+                },
+                "replies": [
+                  {
+                    "id": "owg0but",
+                    "url": "https://www.reddit.com/r/softwaretesting/comments/1ulc2gz/comment/owg0but/",
+                    "parent_id": "owfy4ui",
+                    "post_id": "1ulc2gz",
+                    "text": "correctness in general, but people not understanding what it does which affect more the junior people and that's a huge problem in the long run...\n\n1 week for some setup once per app, sometimes more, depends on the complexity of the app and if you're setting it up for an app that is being created or app that already exist for few years...",
+                    "author": {
+                      "username": "redditor-13",
+                      "display_name": "redditor-14",
+                      "avatar_url": "https://scrubbed.invalid/redditor-15",
+                      "verified": null
+                    },
+                    "engagement": {
+                      "likes": 1,
+                      "replies": null
+                    },
+                    "flags": {
+                      "pinned": null,
+                      "deleted": false
+                    },
+                    "published_at": "2026-07-09T06:58:31.694Z",
+                    "ext": {
+                      "depth": 2,
+                      "published_at_epoch": 1783580311
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "computed": {
+            "language": "en"
+          }
+        },
+        {
+          "comment": {
+            "id": "ov6jbt5",
+            "url": "https://www.reddit.com/r/softwaretesting/comments/1ulc2gz/comment/ov6jbt5/",
+            "parent_id": "1ulc2gz",
+            "post_id": "1ulc2gz",
+            "text": "Not really difficult at all. There is difference in complexity in scraping vs domain object state management as part of the set up and tear down. The latter is usually what adds complexity. Path traversal is trivial.",
+            "author": {
+              "username": "redditor-16",
+              "display_name": "redditor-17",
+              "avatar_url": "https://scrubbed.invalid/redditor-18",
+              "verified": null
+            },
+            "engagement": {
+              "likes": 2,
+              "replies": 1
+            },
+            "flags": {
+              "pinned": null,
+              "deleted": false
+            },
+            "published_at": "2026-07-02T19:38:51.821Z",
+            "ext": {
+              "depth": 0,
+              "published_at_epoch": 1783021131
+            },
+            "replies": [
+              {
+                "id": "owfz3a2",
+                "url": "https://www.reddit.com/r/softwaretesting/comments/1ulc2gz/comment/owfz3a2/",
+                "parent_id": "ov6jbt5",
+                "post_id": "1ulc2gz",
+                "text": "thanks, that's a useful distinction\n\nso when you say domain object state management adds the complexity, is that mostly about setting up the right preconditions/data state before the test runs, or more about cleanly tearing down/resetting state after, or both equally painful\n\nalso curious, is that something you handle manually per test, or do you have shared setup/teardown utilities that most tests reuse",
+                "author": {
+                  "username": "redditor-4",
+                  "display_name": "redditor-5",
+                  "avatar_url": "https://scrubbed.invalid/redditor-6",
+                  "verified": null
+                },
+                "engagement": {
+                  "likes": 1,
+                  "replies": 1
+                },
+                "flags": {
+                  "pinned": null,
+                  "deleted": false
+                },
+                "published_at": "2026-07-09T06:48:48.777Z",
+                "ext": {
+                  "depth": 1,
+                  "published_at_epoch": 1783579728
+                },
+                "replies": [
+                  {
+                    "id": "owi2lmz",
+                    "url": "https://www.reddit.com/r/softwaretesting/comments/1ulc2gz/comment/owi2lmz/",
+                    "parent_id": "owfz3a2",
+                    "post_id": "1ulc2gz",
+                    "text": "Utils. Utils should be responsible for how to . Data management or test dependency management decides what to set per test/test group",
+                    "author": {
+                      "username": "redditor-16",
+                      "display_name": "redditor-17",
+                      "avatar_url": "https://scrubbed.invalid/redditor-18",
+                      "verified": null
+                    },
+                    "engagement": {
+                      "likes": 1,
+                      "replies": null
+                    },
+                    "flags": {
+                      "pinned": null,
+                      "deleted": false
+                    },
+                    "published_at": "2026-07-09T14:47:05.094Z",
+                    "ext": {
+                      "depth": 2,
+                      "published_at_epoch": 1783608425
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "computed": {
+            "language": "en"
+          }
+        },
+        {
+          "comment": {
+            "id": "ov94rx9",
+            "url": "https://www.reddit.com/r/softwaretesting/comments/1ulc2gz/comment/ov94rx9/",
+            "parent_id": "1ulc2gz",
+            "post_id": "1ulc2gz",
+            "text": "With maestro [https://docs.maestro.dev/](https://docs.maestro.dev/) it's been very quick for me especially coming from Appium.",
+            "author": {
+              "username": "redditor-19",
+              "display_name": "redditor-20",
+              "avatar_url": "https://scrubbed.invalid/redditor-21",
+              "verified": null
+            },
+            "engagement": {
+              "likes": 2,
+              "replies": 2
+            },
+            "flags": {
+              "pinned": null,
+              "deleted": false
+            },
+            "published_at": "2026-07-03T03:55:33.385Z",
+            "ext": {
+              "depth": 0,
+              "published_at_epoch": 1783050933
+            },
+            "replies": [
+              {
+                "id": "ov9flqp",
+                "url": "https://www.reddit.com/r/softwaretesting/comments/1ulc2gz/comment/ov9flqp/",
+                "parent_id": "ov94rx9",
+                "post_id": "1ulc2gz",
+                "text": "yeah same, i was just thinking i could do this in a few minutes with maestro",
+                "author": {
+                  "username": "redditor-22",
+                  "display_name": "redditor-23",
+                  "avatar_url": "https://scrubbed.invalid/redditor-24",
+                  "verified": null
+                },
+                "engagement": {
+                  "likes": 2,
+                  "replies": 1
+                },
+                "flags": {
+                  "pinned": null,
+                  "deleted": false
+                },
+                "published_at": "2026-07-03T05:09:06.334Z",
+                "ext": {
+                  "depth": 1,
+                  "published_at_epoch": 1783055346
+                },
+                "replies": [
+                  {
+                    "id": "owfyzyc",
+                    "url": "https://www.reddit.com/r/softwaretesting/comments/1ulc2gz/comment/owfyzyc/",
+                    "parent_id": "ov9flqp",
+                    "post_id": "1ulc2gz",
+                    "text": "\n\nyeah maestro is quick but it's still yaml, you're writing structured syntax, just less verbose than appium. what im exploring is a step further, actual plain english like \"search for samsung tv, add to cart, verify it shows up\" with no yaml/syntax at all, and it self heals when the ui changes instead of you updating locators or yaml files by hand\n\ncoming from appium, would that no-syntax part actually matter to you, or is yaml already simple enough that the difference is marginal",
+                    "author": {
+                      "username": "redditor-4",
+                      "display_name": "redditor-5",
+                      "avatar_url": "https://scrubbed.invalid/redditor-6",
+                      "verified": null
+                    },
+                    "engagement": {
+                      "likes": 1,
+                      "replies": null
+                    },
+                    "flags": {
+                      "pinned": null,
+                      "deleted": false
+                    },
+                    "published_at": "2026-07-09T06:48:05.200Z",
+                    "ext": {
+                      "depth": 2,
+                      "published_at_epoch": 1783579685
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "owfyyi9",
+                "url": "https://www.reddit.com/r/softwaretesting/comments/1ulc2gz/comment/owfyyi9/",
+                "parent_id": "ov94rx9",
+                "post_id": "1ulc2gz",
+                "text": "good point, thanks for clarifying that\n\nyeah maestro is quick but it's still yaml, you're writing structured syntax, just less verbose than appium. what im exploring is a step further, actual plain english like \"search for samsung tv, add to cart, verify it shows up\" with no yaml/syntax at all, and it self heals when the ui changes instead of you updating locators or yaml files by hand\n\ncoming from appium, would that no-syntax part actually matter to you, or is yaml already simple enough that the difference is marginal ",
+                "author": {
+                  "username": "redditor-4",
+                  "display_name": "redditor-5",
+                  "avatar_url": "https://scrubbed.invalid/redditor-6",
+                  "verified": null
+                },
+                "engagement": {
+                  "likes": 1,
+                  "replies": 1
+                },
+                "flags": {
+                  "pinned": null,
+                  "deleted": false
+                },
+                "published_at": "2026-07-09T06:47:46.764Z",
+                "ext": {
+                  "depth": 1,
+                  "published_at_epoch": 1783579666
+                },
+                "replies": [
+                  {
+                    "id": "owiy70m",
+                    "url": "https://www.reddit.com/r/softwaretesting/comments/1ulc2gz/comment/owiy70m/",
+                    "parent_id": "owfyyi9",
+                    "post_id": "1ulc2gz",
+                    "text": "maestro is super lightweight. minimal lag while interacting with emulators. that is another thing i felt better. Also, we use agents as well. In general i see the agents are using maestro mcp smoothly compared to appium mcp tools.",
+                    "author": {
+                      "username": "redditor-19",
+                      "display_name": "redditor-20",
+                      "avatar_url": "https://scrubbed.invalid/redditor-21",
+                      "verified": null
+                    },
+                    "engagement": {
+                      "likes": 1,
+                      "replies": null
+                    },
+                    "flags": {
+                      "pinned": null,
+                      "deleted": false
+                    },
+                    "published_at": "2026-07-09T16:58:57.800Z",
+                    "ext": {
+                      "depth": 2,
+                      "published_at_epoch": 1783616337
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "computed": {
+            "language": "en"
+          }
+        },
+        {
+          "comment": {
+            "id": "ovdtjpz",
+            "url": "https://www.reddit.com/r/softwaretesting/comments/1ulc2gz/comment/ovdtjpz/",
+            "parent_id": "1ulc2gz",
+            "post_id": "1ulc2gz",
+            "text": "1. Roughly how long would this take you to automate in Appium (or your preferred framework)?\n\nI'd say 30 mins tops with Playwright, if im not setting the project from scratch.\n\n1. 2What's usually the biggest time sink locators, framework setup, waits, debugging, or maintenance?\n\nit depends, all could be big time sinkers. From my experience i would say debugging.\n\n1. Have you tried AI-powered testing tools? If yes, what made you stick with Appium?\n\nNo.\n\n1. If an AI tool could generate and maintain tests from plain English, what would stop you from adopting it?\n\nFrom what I experienced so far with automation testing, there's too many questions that an AI tool could answer only by plain english.",
+            "author": {
+              "username": "redditor-25",
+              "display_name": "redditor-26",
+              "avatar_url": "https://scrubbed.invalid/redditor-18",
+              "verified": null
+            },
+            "engagement": {
+              "likes": 2,
+              "replies": 1
+            },
+            "flags": {
+              "pinned": null,
+              "deleted": false
+            },
+            "published_at": "2026-07-03T20:21:20.086Z",
+            "ext": {
+              "depth": 0,
+              "published_at_epoch": 1783110080
+            },
+            "replies": [
+              {
+                "id": "owfyiv7",
+                "url": "https://www.reddit.com/r/softwaretesting/comments/1ulc2gz/comment/owfyiv7/",
+                "parent_id": "ovdtjpz",
+                "post_id": "1ulc2gz",
+                "text": "that's a fair point, thanks for the honest answer\n\ncurious what kind of questions you mean, is it more like edge cases and error states that plain english just can't capture, or more like it can't know your specific app's business logic/rules without you spelling it out in detail\n\none more thing im exploring: suppose after execution you get a debug report back with screenshots at each step plus the reasoning for why it did what it did (e.g. why it clicked what it clicked, how it identified the element) would that kind of transparency actually help close the trust gap for you, or does the plain english problem happen before that, at the point of even generating the test correctly",
+                "author": {
+                  "username": "redditor-4",
+                  "display_name": "redditor-5",
+                  "avatar_url": "https://scrubbed.invalid/redditor-6",
+                  "verified": null
+                },
+                "engagement": {
+                  "likes": 1,
+                  "replies": null
+                },
+                "flags": {
+                  "pinned": null,
+                  "deleted": false
+                },
+                "published_at": "2026-07-09T06:44:20.103Z",
+                "ext": {
+                  "depth": 1,
+                  "published_at_epoch": 1783579460
+                }
+              }
+            ]
+          },
+          "computed": {
+            "language": "en"
+          }
+        },
+        {
+          "comment": {
+            "id": "ow65hfv",
+            "url": "https://www.reddit.com/r/softwaretesting/comments/1ulc2gz/comment/ow65hfv/",
+            "parent_id": "1ulc2gz",
+            "post_id": "1ulc2gz",
+            "text": "hey! tried automating the test case you mentioned in the post using QApilot's CoWork - [https://youtu.be/t3kUPUsQprc](https://youtu.be/t3kUPUsQprc)\n\nAutomating a test case using AI has become quite easier with a lot of tools out there. but like others have pointed out in the comments, the maintenance issue still remains. and also, mobile apps are notorious for quirks like notifications, pop-ups, etc., and the moment any automated flow comes across something like this, it fails. \n\nhaving seen this problem and faced it myself, my team and I built a robust ai agent that plans and replans to overcome the inherent flakiness associated with mobile app automation. we call it QApilot's CoWork. we recently launched on product hunt too and got amazing feedback from the community. \n\ncheck out - [https://qapilot.io/product/cowork](https://qapilot.io/product/cowork) for more details or DM me. I'd be happy to discuss.",
+            "author": {
+              "username": "redditor-27",
+              "display_name": "redditor-28",
+              "avatar_url": "https://scrubbed.invalid/redditor-29",
+              "verified": null
+            },
+            "engagement": {
+              "likes": 2,
+              "replies": 2
+            },
+            "flags": {
+              "pinned": null,
+              "deleted": false
+            },
+            "published_at": "2026-07-07T21:39:58.773Z",
+            "ext": {
+              "depth": 0,
+              "published_at_epoch": 1783460398
+            },
+            "replies": [
+              {
+                "id": "ow7k0k2",
+                "url": "https://www.reddit.com/r/softwaretesting/comments/1ulc2gz/comment/ow7k0k2/",
+                "parent_id": "ow65hfv",
+                "post_id": "1ulc2gz",
+                "text": "Very interesting. Thank you for the detailed response ",
+                "author": {
+                  "username": "redditor-30",
+                  "display_name": "redditor-31",
+                  "avatar_url": "https://scrubbed.invalid/redditor-32",
+                  "verified": null
+                },
+                "engagement": {
+                  "likes": 3,
+                  "replies": null
+                },
+                "flags": {
+                  "pinned": null,
+                  "deleted": false
+                },
+                "published_at": "2026-07-08T02:04:50.469Z",
+                "ext": {
+                  "depth": 1,
+                  "published_at_epoch": 1783476290
+                }
+              },
+              {
+                "id": "ow825zg",
+                "url": "https://www.reddit.com/r/softwaretesting/comments/1ulc2gz/comment/ow825zg/",
+                "parent_id": "ow65hfv",
+                "post_id": "1ulc2gz",
+                "text": null,
+                "author": {
+                  "username": null,
+                  "display_name": null,
+                  "avatar_url": null,
+                  "verified": null
+                },
+                "engagement": {
+                  "likes": 2,
+                  "replies": 1
+                },
+                "flags": {
+                  "pinned": null,
+                  "deleted": false
+                },
+                "published_at": "2026-07-08T03:55:38.353Z",
+                "ext": {
+                  "depth": 1,
+                  "published_at_epoch": 1783482938
+                },
+                "replies": [
+                  {
+                    "id": "ow8oido",
+                    "url": "https://www.reddit.com/r/softwaretesting/comments/1ulc2gz/comment/ow8oido/",
+                    "parent_id": "ow825zg",
+                    "post_id": "1ulc2gz",
+                    "text": "That's an interesting question and is something we thought about a lot. To what extent CoWork should adapt and when should CoWork fail or wait for human approval. That's where the test intent comes into the picture. \n\nLet's say the test intent is \"Add to Cart and verify\". Even with heavy personalisations or A/B UI, CoWork replans, adapts on the fly as long as it is still testing the \"Add to Cart\" test cases. As long as the test intent doesn't change while adapting, CoWork continues. And if test intent change as, it waits for human approval or fails honestly. ",
+                    "author": {
+                      "username": "redditor-27",
+                      "display_name": "redditor-28",
+                      "avatar_url": "https://scrubbed.invalid/redditor-29",
+                      "verified": null
+                    },
+                    "engagement": {
+                      "likes": 2,
+                      "replies": null
+                    },
+                    "flags": {
+                      "pinned": null,
+                      "deleted": false
+                    },
+                    "published_at": "2026-07-08T06:41:44.728Z",
+                    "ext": {
+                      "depth": 2,
+                      "published_at_epoch": 1783492904
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "computed": {
+            "language": "en"
+          }
+        },
+        {
+          "comment": {
+            "id": "ov2uwv8",
+            "url": "https://www.reddit.com/r/softwaretesting/comments/1ulc2gz/comment/ov2uwv8/",
+            "parent_id": "1ulc2gz",
+            "post_id": "1ulc2gz",
+            "text": "1hr ig\nBut if I need to set the framework from scratch it would take more time",
+            "author": {
+              "username": "redditor-33",
+              "display_name": "redditor-34",
+              "avatar_url": "https://scrubbed.invalid/redditor-35",
+              "verified": null
+            },
+            "engagement": {
+              "likes": 1,
+              "replies": 1
+            },
+            "flags": {
+              "pinned": null,
+              "deleted": false
+            },
+            "published_at": "2026-07-02T08:20:18.303Z",
+            "ext": {
+              "depth": 0,
+              "published_at_epoch": 1782980418
+            },
+            "replies": [
+              {
+                "id": "ov2velm",
+                "url": "https://www.reddit.com/r/softwaretesting/comments/1ulc2gz/comment/ov2velm/",
+                "parent_id": "ov2uwv8",
+                "post_id": "1ulc2gz",
+                "text": "thanks mate, that's really helpful!\n\nim curious about one thing: if the framework was already set up, but there was a tool that let you author this entire test in plain English in 2–5 minutes, execute it, and generate a detailed report automatically, would that be something you'd consider using?\n\nor would you still prefer appium? If so, what's the biggest reason trust, debugging, maintenance, CI/CD integration, or something else?\n\nI'm trying to understand what would genuinely make experienced Appium users switch (or not switch",
+                "author": {
+                  "username": "redditor-4",
+                  "display_name": "redditor-5",
+                  "avatar_url": "https://scrubbed.invalid/redditor-6",
+                  "verified": null
+                },
+                "engagement": {
+                  "likes": -2,
+                  "replies": 1
+                },
+                "flags": {
+                  "pinned": null,
+                  "deleted": false
+                },
+                "published_at": "2026-07-02T08:24:26.509Z",
+                "ext": {
+                  "depth": 1,
+                  "published_at_epoch": 1782980666
+                },
+                "replies": [
+                  {
+                    "id": "ov2w7xr",
+                    "url": "https://www.reddit.com/r/softwaretesting/comments/1ulc2gz/comment/ov2w7xr/",
+                    "parent_id": "ov2velm",
+                    "post_id": "1ulc2gz",
+                    "text": "It would only take 5mins to do this with any gpt and I would say maintenance and support is something I'd consider for not switching to ai tools, besides I think there's plenty of paid tools that was already time tested which i would rather use than something new in the market.",
+                    "author": {
+                      "username": "redditor-33",
+                      "display_name": "redditor-34",
+                      "avatar_url": "https://scrubbed.invalid/redditor-35",
+                      "verified": null
+                    },
+                    "engagement": {
+                      "likes": 2,
+                      "replies": 1
+                    },
+                    "flags": {
+                      "pinned": null,
+                      "deleted": false
+                    },
+                    "published_at": "2026-07-02T08:31:09.123Z",
+                    "ext": {
+                      "depth": 2,
+                      "published_at_epoch": 1782981069
+                    },
+                    "replies": [
+                      {
+                        "id": "ov3wd8v",
+                        "url": "https://www.reddit.com/r/softwaretesting/comments/1ulc2gz/comment/ov3wd8v/",
+                        "parent_id": "ov2w7xr",
+                        "post_id": "1ulc2gz",
+                        "text": "that's a really interesting point thanks for sharing\n\nIt sounds like the bottleneck isn't actually authoring the test anymore, especially with GPT helping generate Appium code\n\nIf you don't mind one more question:\n\nlet's say a tool didn't just generate the test, but also automatically handled locator changes, reduced flaky failures, and maintained the test as the app evolved. Would that solve a meaningful problem for you, or would you still prefer staying with Appium?\n\ntrying to understand whether the bigger pain is writing tests or maintaining them over time",
+                        "author": {
+                          "username": "redditor-4",
+                          "display_name": "redditor-5",
+                          "avatar_url": "https://scrubbed.invalid/redditor-6",
+                          "verified": null
+                        },
+                        "engagement": {
+                          "likes": 1,
+                          "replies": 1
+                        },
+                        "flags": {
+                          "pinned": null,
+                          "deleted": false
+                        },
+                        "published_at": "2026-07-02T12:42:15.136Z",
+                        "ext": {
+                          "depth": 3,
+                          "published_at_epoch": 1782996135
+                        },
+                        "replies": [
+                          {
+                            "id": "ov4ylu6",
+                            "url": "https://www.reddit.com/r/softwaretesting/comments/1ulc2gz/comment/ov4ylu6/",
+                            "parent_id": "ov3wd8v",
+                            "post_id": "1ulc2gz",
+                            "text": "Yes but then again at this point I don't trust ai tools much because most of what I have seen is that nobody knows whats happening behind the scene so yes writing tests is easier than maintaining it",
+                            "author": {
+                              "username": "redditor-33",
+                              "display_name": "redditor-34",
+                              "avatar_url": "https://scrubbed.invalid/redditor-35",
+                              "verified": null
+                            },
+                            "engagement": {
+                              "likes": 2,
+                              "replies": 1
+                            },
+                            "flags": {
+                              "pinned": null,
+                              "deleted": false
+                            },
+                            "published_at": "2026-07-02T15:37:16.401Z",
+                            "ext": {
+                              "depth": 4,
+                              "published_at_epoch": 1783006636
+                            },
+                            "replies": [
+                              {
+                                "id": "owfwykv",
+                                "url": "https://www.reddit.com/r/softwaretesting/comments/1ulc2gz/comment/owfwykv/",
+                                "parent_id": "ov4ylu6",
+                                "post_id": "1ulc2gz",
+                                "text": "thhat's a really honest answer, and it lines up with what I keep hearing\n\nsounds like even if maintenance was solved, the black-box part is the real dealbreaker not knowing what's happening behind the scenes\n\nif you could actually see and edit the underlying logic (like it generates readable Appium/step code you can inspect, tweak, or override, instead of a pure black box) would that change the trust equation at all? or is it more fundamental than that, like you just don't trust AI-written assertions regardless of visibilit",
+                                "author": {
+                                  "username": "redditor-4",
+                                  "display_name": "redditor-5",
+                                  "avatar_url": "https://scrubbed.invalid/redditor-6",
+                                  "verified": null
+                                },
+                                "engagement": {
+                                  "likes": 1,
+                                  "replies": null
+                                },
+                                "flags": {
+                                  "pinned": null,
+                                  "deleted": false
+                                },
+                                "published_at": "2026-07-09T06:31:53.689Z",
+                                "ext": {
+                                  "depth": 5,
+                                  "published_at_epoch": 1783578713
+                                }
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "computed": {
+            "language": "en"
+          }
+        }
+      ],
+      "total": null,
+      "truncated": false,
+      "dropped": 0
+    },
+    "credits_used": 5,
+    "request_id": "req-fbwNoA5AExRO1oCZ",
+    "cached": false,
+    "pagination": {
+      "next_cursor": null,
+      "has_more": false,
+      "page_size": 8
+    },
+    "credits_remaining": 1089
+  }
+}

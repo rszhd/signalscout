@@ -6,7 +6,7 @@ priority: p2
 created: 2026-09-16T20:55+08:00
 parent: US-151
 area: architecture
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -40,9 +40,9 @@ repository pinned to it, its copy deleted.
       the file that defines them, and the definition lives once.
 - [x] `pnpm release:verify` still passes, and its probe imports
       `insertMonitor` from the packed tarball.
-- [ ] `v0.1.1` is on npm for both packages, and `docs/releasing.md`'s table
+- [x] `v0.1.1` is on npm for both packages, and `docs/releasing.md`'s table
       names it.
-- [ ] The cloud repository pins `0.1.1`, imports `insertMonitor` from the
+- [x] The cloud repository pins `0.1.1`, imports `insertMonitor` from the
       package, and its copy is gone; its suite passes.
 
 ## Notes
@@ -55,3 +55,4 @@ repository pinned to it, its copy deleted.
 
 - 2026-09-16T20:55+08:00 — Written after the cloud repository's first
   install found the gap.
+- 2026-09-16T21:55+08:00 — v0.1.1 published; the cloud repository pins it, imports insertMonitor from the package, its copy is gone, its suite passes, and production runs on it.

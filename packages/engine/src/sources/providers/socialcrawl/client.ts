@@ -82,6 +82,16 @@ export const endpoints = {
   redditSubreddit: `${apiBase}/reddit/subreddit`,
   /** The one no other provider has: a keyword inside one subreddit. */
   redditSubredditSearch: `${apiBase}/reddit/subreddit/search`,
+  /**
+   * The comments under one Reddit post, by URL. Five credits, US-159.
+   *
+   * It is the one comment endpoint here that answers with a tree rather than a
+   * page: 34 of 34 claimed comments arrived in one call, nested five levels
+   * deep in `replies` arrays, with no cursor at all. That is what the five
+   * credits buy, against ScrapeCreators' one credit for a flat page of 25 that
+   * cannot finish a busy thread.
+   */
+  redditComments: `${apiBase}/reddit/post/comments`,
   linkedInPosts: `${apiBase}/linkedin/search/posts`,
   /**
    * YouTube. US-034.
@@ -211,6 +221,23 @@ export const tikTokSearchProfile = redditProfile(endpoints.tikTokSearch);
 export const tikTokCommentsProfile = redditProfile(endpoints.tikTokComments);
 
 export const redditSearchProfile = redditProfile(endpoints.redditSearch);
+/**
+ * Reddit comments: the same envelope, and **five times the price**.
+ *
+ * The only endpoint in this product that returns a whole thread for one call.
+ * Measured on 2026-09-17: no cursor, `has_more: false`, and every one of the
+ * 34 comments the post claimed, five levels deep. So `standardCallCredits` is
+ * 5 and the walk it feeds ends after one call.
+ */
+export const redditCommentsProfile: EndpointProfile = {
+  endpoint: endpoints.redditComments,
+  standardCallCredits: 5,
+  cursorOf: (body) => {
+    const pagination = objectAt(body, "pagination");
+    if (pagination?.has_more === false) return undefined;
+    return text(pagination?.next_cursor);
+  },
+};
 export const redditSubredditProfile = redditProfile(endpoints.redditSubreddit);
 export const redditSubredditSearchProfile = redditProfile(endpoints.redditSubredditSearch);
 
@@ -374,6 +401,19 @@ export interface Page {
    * derived from either number would be wrong about the other.
    */
   readonly creditsUsed: number;
+  /**
+   * The provider's own completeness claim, where it makes one.
+   *
+   * `data.truncated` arrives on the Reddit comment answer and on nothing else
+   * this product calls — US-020 recorded that Reddit's envelope carries it
+   * where X's carries a cursor instead. It is surfaced here rather than parsed
+   * in the connector because it sits in the envelope, which is the client's
+   * half of the split.
+   *
+   * Absent means the endpoint made no claim, which is not the same as claiming
+   * completeness. A connector reads it that way or not at all.
+   */
+  readonly truncated?: boolean;
 }
 
 /** How long to wait when the provider rate-limits us and names no time. */
@@ -545,6 +585,7 @@ export class SocialCrawlClient {
       records,
       creditsUsed: creditsOf(body, this.profile.standardCallCredits),
       ...(cursor ? { cursor } : {}),
+      ...(typeof data.truncated === "boolean" ? { truncated: data.truncated } : {}),
     };
   }
 }

@@ -37,8 +37,11 @@
 import { xPlatform } from "../../platforms.js";
 import type {
   CandidatePost,
+  CandidateReply,
   ConnectorDefinition,
   CredentialCheck,
+  ReplyRequest,
+  ReplyResult,
   SearchRequest,
   SearchResult,
   SocialSource,
@@ -95,14 +98,32 @@ export const socialDataX: ConnectorDefinition = {
   /** Keywords only. Nothing here searches inside a channel. */
   discovery: ["keyword"],
   /**
-   * The provider has a comments endpoint and this connector does not use it.
+   * Replies, and both of the questions that held them back are answered.
+   * US-159 measured the endpoint on 2026-09-17.
    *
-   * Nobody has measured what it costs or whether the links it returns open the
-   * comment, and US-047's rule is that a match needs a URL that opens the
-   * thing it names. Turning on a per-item charge to find out is a ticket, not
-   * a default.
+   * **The price is the post price.** Twenty replies moved the balance by
+   * $0.0040, which is the same 200 micro-dollars a tweet this provider charges
+   * for a search result. So replies here cost half what they cost through
+   * SocialCrawl, and the rule that held — "turning on a per-item charge to
+   * find out is a ticket" — was answered by the ticket rather than by a guess.
+   *
+   * **The link question is the same question the posts already answered.** A
+   * reply is a tweet with its own id and its own handle, and the URL is built
+   * the way a post's is — the format US-060 opened by hand.
+   *
+   * Two things make this the best reply connector in the product, and both are
+   * measured rather than claimed:
+   *
+   * 1. **The page is newest first**, on both captured pages. It is the only
+   *    reply endpoint here that permits an early stop on `since`, which is
+   *    what stops a monitor paying to read a conversation it will discard.
+   * 2. **Every reply names its conversation.** All 40 captured replies carry
+   *    `conversation_id_str` equal to the post asked about, so BUG-007's
+   *    wrong-parent check is live here rather than inert.
    */
-  canFetchReplies: false,
+  canFetchReplies: true,
+  /** A reply is a tweet, and a tweet is 200 micro-dollars. Measured twice. */
+  replyPricePerUnitMicros: 200,
   create: (runtime) => new SocialDataXSource(runtime),
 };
 
@@ -158,6 +179,7 @@ export class SocialDataXSource implements SocialSource {
   // screen and every step asks the connector the registry built, not the
   // record it was built from. US-034 found that wrong on another connector.
   readonly canFetchReplies = socialDataX.canFetchReplies;
+  readonly replyPricePerUnitMicros = socialDataX.replyPricePerUnitMicros;
 
   constructor(private readonly runtime: SourceRuntime) {}
 
@@ -302,6 +324,73 @@ export class SocialDataXSource implements SocialSource {
    * rounded, because rounding up would ask for posts *after* `since` and drop
    * anything written in the second between.
    */
+  /**
+   * One page of the replies under one post. US-159.
+   *
+   * Twenty replies for $0.0040 and a `next_cursor` that buys twenty more. It
+   * is the same envelope as a search, at the same price per item, from an
+   * endpoint whose path carries the post id.
+   *
+   * **This is the only reply call in the product that may stop early**, and it
+   * is a measurement rather than a documented claim: both captured pages came
+   * back newest first, the second continuing strictly older than the first.
+   * Every other reply endpoint here either has no ordering or was measured
+   * ignoring the parameter that claims one.
+   */
+  async fetchReplies(request: ReplyRequest): Promise<ReplyResult> {
+    const page = await this.client(request.credentials).fetchReplyPage(
+      request.postExternalId,
+      request.cursor ? { cursor: request.cursor } : {},
+      request.signal,
+    );
+
+    const parsed = page.records
+      .map((record, index) =>
+        toCandidateReply(record, {
+          parentPostExternalId: request.postExternalId,
+          position: (request.positionOffset ?? 0) + index,
+        }),
+      )
+      .filter((reply): reply is CandidateReply => reply !== undefined);
+
+    const replies = request.since
+      ? parsed.filter((reply) => reply.postedAt > (request.since as Date))
+      : parsed;
+
+    /**
+     * Whether paging on would buy anything, and the one place this
+     * connector's ordering is finally spent.
+     *
+     * Replies arrive newest first and each page continues older, so once a
+     * page's own oldest reply is outside the window, every later page is too.
+     * Stopping here is the whole reason to prefer this provider for a busy
+     * thread: the alternative is paying 200 micro-dollars a reply to read a
+     * conversation from last year and throw it away.
+     */
+    const oldest = parsed.at(-1)?.postedAt;
+    const pastTheWindow =
+      request.since !== undefined && oldest !== undefined && oldest <= request.since;
+
+    return {
+      replies,
+      itemsReturned: page.records.length,
+      unitsConsumed: page.tweetsReturned,
+      next:
+        page.after && !pastTheWindow ? { status: "ready", cursor: page.after } : { status: "done" },
+      /**
+       * Partial exactly when there is another page worth buying.
+       *
+       * A walk stopped by the window is not partial: the replies it did not
+       * read are older than what the caller asked for, and calling that
+       * incomplete would have the thread re-opened on every poll for ever.
+       * A walk stopped by the provider running out of cursor is not partial
+       * either — unlike ScrapeCreators' Reddit, this endpoint has not been
+       * measured claiming an end it had not reached.
+       */
+      partial: page.after !== undefined && !pastTheWindow,
+    };
+  }
+
   private queryFor(query: string, since: Date | undefined): string {
     if (!since) return query;
 
@@ -433,4 +522,61 @@ function timestampOf(value: unknown): Date | undefined {
 
 function text(value: unknown): string | undefined {
   return typeof value === "string" && value !== "" ? value : undefined;
+}
+
+interface ReplyContext {
+  readonly parentPostExternalId: string;
+  readonly position: number;
+}
+
+/**
+ * One captured reply to one `CandidateReply`.
+ *
+ * A reply on this provider is a tweet: the same record, the same fields, the
+ * same missing URL. So this reads what `toCandidatePost` reads and adds the
+ * two links a reply has and a post does not. A link built from this capture
+ * was opened on 2026-09-17 and landed on the reply; X also corrected a wrong
+ * handle from the id, so the id is what carries the link.
+ *
+ * **The wrong-parent check is live here, on `conversation_id_str`.** All 40
+ * captured replies carried the id of the post asked about, across two pages
+ * and nineteen distinct immediate parents — which is exactly why the
+ * conversation is the field to check rather than `in_reply_to_status_id_str`:
+ * a reply four levels down answers another reply and still belongs to the
+ * thread. BUG-007 was found when SocialCrawl's X endpoint answered with a post
+ * from another conversation entirely, and this is the field that catches it.
+ *
+ * **`text` is null on every captured reply and `full_text` holds the words.**
+ * The search fixtures fill both, so a parser written from those alone would
+ * have stored forty empty replies and bought a classification for each.
+ */
+export function toCandidateReply(
+  record: unknown,
+  { parentPostExternalId, position }: ReplyContext,
+): CandidateReply | undefined {
+  const post = toCandidatePost(record);
+  if (!post) return undefined;
+
+  const row = record as Record<string, unknown>;
+
+  // A reply with no words is dropped rather than stored empty. `toCandidatePost`
+  // tolerates it because a post carries a title and a reply carries nothing
+  // else at all.
+  if (post.text === "") return undefined;
+
+  const conversation = text(row.conversation_id_str);
+  if (conversation && conversation !== parentPostExternalId) return undefined;
+
+  const answers = text(row.in_reply_to_status_id_str);
+  const replyCount = row.reply_count;
+
+  return {
+    ...post,
+    parentPostExternalId,
+    ...(answers && answers !== parentPostExternalId ? { parentReplyExternalId: answers } : {}),
+    threadPosition: position,
+    ...(typeof replyCount === "number" && Number.isFinite(replyCount) && replyCount >= 0
+      ? { replyCount }
+      : {}),
+  };
 }

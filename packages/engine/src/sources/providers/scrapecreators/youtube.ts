@@ -39,8 +39,11 @@
 import { youTubePlatform } from "../../platforms.js";
 import type {
   CandidatePost,
+  CandidateReply,
   ConnectorDefinition,
   CredentialCheck,
+  ReplyRequest,
+  ReplyResult,
   SearchRequest,
   SearchResult,
   SocialSource,
@@ -53,6 +56,7 @@ import {
   endpoints,
   ScrapeCreatorsClient,
   ScrapeCreatorsError,
+  youTubeCommentsShape,
   youTubeSearchShape,
 } from "./client.js";
 import { scrapeCreatorsProvider } from "./provider.js";
@@ -71,20 +75,33 @@ export const scrapeCreatorsYouTube: ConnectorDefinition = {
   discovery: ["keyword"],
   maxUnitsPerQueryPoll: maxPagesPerInput,
   /**
-   * No comments, and the reason is a measurement rather than a missing
-   * endpoint.
+   * Comments, at one credit for twenty — and the weakest reply answer in this
+   * product. US-159 turned it on and the reasons it was off are all still
+   * true.
    *
-   * The endpoint exists and costs a credit. US-121 found **one comment across
-   * twenty videos** on this keyword, and it was "nice video sir". A comment
-   * also carries no permalink and no parent id, and its date is derived from
-   * relative text — "3 weeks ago" — with no `includeExtras` to correct it, so
-   * a stored reply would carry a timestamp this connector cannot stand behind.
+   * It exists so that an instance holding only this provider's key is not
+   * silently given no YouTube replies at all. `socialcrawl/youtube.ts` remains
+   * the better connector for a monitor that wants them, and the monitor form
+   * tells a person which one their key will use.
    *
-   * The description and the transcript are the text worth paying for on this
-   * platform. `socialcrawl/youtube.ts` fetches comments and stays the choice
-   * for a monitor that wants them.
+   * Three limits a caller must know, all measured on 2026-09-17:
+   *
+   * 1. **No comment carries a permalink**, on 60 of 60. The link is built the
+   *    way `socialcrawl/youtube.ts` builds it.
+   * 2. **No comment carries a parent id**, on 60 of 60, and every one arrived
+   *    at `replyLevel` 0. So nesting cannot be stored, and BUG-007's
+   *    wrong-parent check is inert here: there is no `post_id` to disagree
+   *    with. A nested reply is reachable only through its own
+   *    `repliesContinuationToken`, which is a second walk with a second bill
+   *    and is not read.
+   * 3. **Every date is computed from relative text.** Twenty comments on one
+   *    page shared one timestamp to the millisecond, because the provider
+   *    subtracts "4 years ago" from the moment of the call. Every reply is
+   *    marked `postedAtIsApproximate`.
    */
-  canFetchReplies: false,
+  canFetchReplies: true,
+  /** The same credit as a search: one, for a page of twenty comments. */
+  replyPricePerUnitMicros: 1880,
   create: (runtime) => new ScrapeCreatorsYouTubeSource(runtime),
 };
 
@@ -156,6 +173,7 @@ export class ScrapeCreatorsYouTubeSource implements SocialSource {
   readonly pricePerUnitMicros = scrapeCreatorsYouTube.pricePerUnitMicros;
   readonly maxUnitsPerQueryPoll = scrapeCreatorsYouTube.maxUnitsPerQueryPoll;
   readonly canFetchReplies = scrapeCreatorsYouTube.canFetchReplies;
+  readonly replyPricePerUnitMicros = scrapeCreatorsYouTube.replyPricePerUnitMicros;
 
   constructor(private readonly runtime: SourceRuntime) {}
 
@@ -260,6 +278,77 @@ export class ScrapeCreatorsYouTubeSource implements SocialSource {
   }
 
   /**
+   * One page of the comments under one video. US-159.
+   *
+   * Twenty comments for one credit, and `continuationToken` pages them with no
+   * overlap — measured, not read off the search endpoint's parameter names.
+   *
+   * **Nothing here stops early, and the reason is a failed measurement.**
+   * `order` is documented as `top` or `newest`; both were asked for the same
+   * video on 2026-09-17 and both answered with the same twenty comments in the
+   * same order, opening on the same one. Page two then arrived out of date
+   * order entirely — "11 months ago" above "4 years ago". So this connector has
+   * no ordering to stand on, and `socialcrawl/youtube.ts`'s early stop, which
+   * rests on a guarantee that provider does give, has no equivalent here.
+   */
+  async fetchReplies(request: ReplyRequest): Promise<ReplyResult> {
+    const page = await this.client(request.credentials).fetchPage(
+      endpoints.youTubeComments,
+      {
+        url: request.postUrl,
+        /**
+         * Asked for, and not believed. The measurement above says the value is
+         * ignored. It is still sent, because the day the provider starts
+         * reading it, newest is what a monitor wants.
+         */
+        order: "newest",
+        ...(request.cursor ? { continuationToken: request.cursor } : {}),
+      },
+      youTubeCommentsShape,
+      request.signal,
+    );
+
+    const parsed = page.records
+      .map((record, index) =>
+        toCandidateReply(record, {
+          parentPostExternalId: request.postExternalId,
+          position: (request.positionOffset ?? 0) + index,
+        }),
+      )
+      .filter((reply): reply is CandidateReply => reply !== undefined);
+
+    /**
+     * The window, applied to a date the provider itself computes — and this is
+     * the one place this connector departs from `search` above.
+     *
+     * `search` keeps a post whose date is approximate, on US-034's rule that
+     * dropping it loses a lead nobody can tell was lost. Copying that here
+     * would keep **every** comment, because every comment's date is computed,
+     * and that is precisely the fault US-034 found live: a comment written in
+     * June 2021 reaching the inbox as a lead, 1,915 days old.
+     *
+     * So the cut is made, and the relative label is good enough to make it.
+     * YouTube writes "2 hours ago" for a comment that is hours old and "4
+     * years ago" for one that is years old, so the value is precise exactly
+     * where a monitor's window sits and coarse only far outside it. What it
+     * cannot do is decide a boundary case: a comment labelled "1 month ago"
+     * against a window of three weeks is kept or dropped by up to a fortnight
+     * of arithmetic. That is the price of the platform's only timestamp.
+     */
+    const replies = request.since
+      ? parsed.filter((reply) => reply.postedAt > (request.since as Date))
+      : parsed;
+
+    return {
+      replies,
+      itemsReturned: page.records.length,
+      unitsConsumed: page.creditsCharged,
+      next: page.after ? { status: "ready", cursor: page.after } : { status: "done" },
+      partial: hasUnreadReplies(page.records) || page.after !== undefined,
+    };
+  }
+
+  /**
    * Where to go after this page.
    *
    * Two things end a query. The third that `reddit.ts` has cannot exist here:
@@ -351,6 +440,91 @@ export function toCandidatePost(record: unknown): CandidatePost | undefined {
     text: description ? `${title}\n\n${description}` : title,
     postedAt,
     ...(exact ? {} : { postedAtIsApproximate: true }),
+    ...(replyCount === undefined ? {} : { replyCount }),
+  };
+}
+
+/**
+ * Whether this page leaves replies behind it, underneath the comments it
+ * returned.
+ *
+ * A YouTube comment carries `repliesContinuationToken` when it has a thread of
+ * its own, and this connector reads none of them: each is a second walk with a
+ * second bill. Eleven of the sixty captured comments carried one, claiming 18,
+ * 17, 11 and 2 replies among them.
+ *
+ * So a thread is `partial` whenever any comment says it has more underneath,
+ * quite apart from whether the top-level list has another page. That is what
+ * `ReplyResult.partial` is for, and the same rule `scrapecreators/tiktok.ts`
+ * applies to `reply_comment_total`.
+ */
+function hasUnreadReplies(records: readonly unknown[]): boolean {
+  return records.some((record) => {
+    const comment = objectOf(record);
+    if (!comment) return false;
+
+    if (text(comment.repliesContinuationToken)) return true;
+
+    return (countOf(objectOf(comment.engagement)?.replies) ?? 0) > 0;
+  });
+}
+
+interface ReplyContext {
+  readonly parentPostExternalId: string;
+  readonly position: number;
+}
+
+/**
+ * One captured comment to one `CandidateReply`.
+ *
+ * **The link is built, because the provider sends none** — 60 of 60 captured
+ * comments carry no `url`. It is YouTube's own linked-comment form,
+ * `watch?v=<video>&lc=<comment>`, which is what the platform's Share button
+ * produces and what `socialcrawl/youtube.ts` already builds for the same
+ * reason. The video id is the one this poll asked about, so the link is made
+ * of two ids we hold rather than of anything guessed — and one built from
+ * this capture was opened on 2026-09-17: YouTube showed it as the highlighted
+ * comment at the top of the thread, with the captured text.
+ *
+ * **There is no parent to check and none to store.** No captured comment
+ * carries a post id, so BUG-007's wrong-parent rule has nothing to compare and
+ * is inert here, exactly as it is on Instagram. None carries a parent comment
+ * id either, and all sixty arrived at `replyLevel` 0 — a nested reply is
+ * behind its own continuation token and is not read — so
+ * `parentReplyExternalId` is never set rather than being inferred from the
+ * level.
+ *
+ * **Every date is marked approximate.** Twenty comments on one page shared one
+ * timestamp to the millisecond, because the provider subtracts
+ * `publishedTimeText` from the moment of the call. The value is still the best
+ * this endpoint has, and `postedAtIsApproximate` is how nothing downstream
+ * mistakes it for a reading.
+ */
+export function toCandidateReply(
+  record: unknown,
+  { parentPostExternalId, position }: ReplyContext,
+): CandidateReply | undefined {
+  const comment = objectOf(record);
+  if (!comment) return undefined;
+
+  const externalId = text(comment.id);
+  const body = text(comment.content);
+  const postedAt = dateOf(comment.publishedTime);
+
+  if (!externalId || !body || !postedAt) return undefined;
+
+  const author = text(objectOf(comment.author)?.name);
+  const replyCount = countOf(objectOf(comment.engagement)?.replies);
+
+  return {
+    externalId,
+    url: `https://www.youtube.com/watch?v=${parentPostExternalId}&lc=${externalId}`,
+    ...(author ? { author } : {}),
+    text: body,
+    postedAt,
+    postedAtIsApproximate: true,
+    parentPostExternalId,
+    threadPosition: position,
     ...(replyCount === undefined ? {} : { replyCount }),
   };
 }

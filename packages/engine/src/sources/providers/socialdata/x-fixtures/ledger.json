@@ -1,7 +1,7 @@
 {
   "note": "What each call did to the account balance. This provider reports no per-call charge, so its own balance either side of a call is the only honest instrument.",
-  "balanceBefore": 0.0812,
-  "balanceAfter": 0.0718,
+  "balanceBefore": 0.04939999999999999,
+  "balanceAfter": 0.0374,
   "calls": [
     {
       "call": "credentials-rejected",
@@ -48,6 +48,36 @@
       "balanceAfter": 0.0718,
       "spentUsd": 0,
       "note": "a phrase that cannot occur"
+    },
+    {
+      "call": "comments-thread-search",
+      "path": "/twitter/search?query=flaky%20tests%20min_replies%3A20&type=Latest",
+      "httpStatus": 200,
+      "elapsedMs": 1726,
+      "balanceBefore": 0.04939999999999999,
+      "balanceAfter": 0.0454,
+      "spentUsd": 0.004,
+      "note": "finds a thread worth reading; not a fixture a test replays"
+    },
+    {
+      "call": "comments-page-1",
+      "path": "/twitter/tweets/2064431279383433646/comments",
+      "httpStatus": 200,
+      "elapsedMs": 1436,
+      "balanceBefore": 0.0454,
+      "balanceAfter": 0.0414,
+      "spentUsd": 0.004,
+      "note": "the replies under 2064431279383433646, which claims 179"
+    },
+    {
+      "call": "comments-page-2",
+      "path": "/twitter/tweets/2064431279383433646/comments?cursor=2064518514145473007",
+      "httpStatus": 200,
+      "elapsedMs": 1884,
+      "balanceBefore": 0.0414,
+      "balanceAfter": 0.0374,
+      "spentUsd": 0.004,
+      "note": "followed next_cursor from comments-page-1"
     }
   ]
 }

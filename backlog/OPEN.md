@@ -2,7 +2,7 @@
 
 # Open tickets
 
-30 open — 14 doing, 15 todo, 1 parked (7 p1, 19 p2, 4 p3).
+29 open — 12 doing, 16 todo, 1 parked (7 p1, 18 p2, 4 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -19,8 +19,6 @@
 | p2 | US-043 | [A match is kept for something to be done about it](doing/US-043-a-match-is-kept-for-something-to-be-done-about-it.md) | feature | doing | 2026-09-06T12:36+08:00 |
 | p2 | US-049 | [Instagram is the sixth platform](doing/US-049-instagram-is-the-sixth-platform.md) | feature | doing | 2026-09-06T17:05+08:00 |
 | p2 | US-135 | [A worktree runs the whole stack on ports of its own](doing/US-135-a-worktree-runs-the-whole-stack-on-ports-of-its-own.md) | chore | doing | 2026-09-15T14:22+08:00 |
-| p2 | US-156 | [The release publishes without a token](doing/US-156-the-release-publishes-without-a-token.md) | chore | doing | 2026-09-16T18:02+08:00 |
-| p2 | US-157 | [A consumer's tests can insert a monitor](doing/US-157-a-consumers-tests-can-insert-a-monitor.md) | chore | doing | 2026-09-16T20:55+08:00 |
 | p2 | US-035 | [A monitor is told where people are talking](todo/US-035-a-monitor-is-told-where-people-are-talking.md) | spike | todo | 2026-09-06T11:40+08:00 |
 | p2 | US-036 | [A provider is rated per platform, from measurements](todo/US-036-a-provider-is-rated-per-platform-from-measurements.md) | spike | todo | 2026-09-06T11:48+08:00 |
 | p2 | US-037 | [One subscription is enough](todo/US-037-one-subscription-is-enough.md) | feature | todo | 2026-09-06T11:48+08:00 |
@@ -32,6 +30,7 @@
 | p2 | US-062 | [A real model's drafts are replayed](todo/US-062-a-real-model-s-drafts-are-replayed.md) | chore | todo | 2026-09-07T20:30+08:00 |
 | p2 | US-099 | [A button, a field and a dialog are one component each](todo/US-099-a-button-a-field-and-a-dialog-are-one-component-each.md) | chore | todo | 2026-09-10T01:20+08:00 |
 | p2 | US-122 | [LinkedIn gets a second provider](todo/US-122-linkedin-gets-a-second-provider.md) | spike | todo | 2026-09-11T18:44+08:00 |
+| p2 | US-160 | [Instagram gets a second provider](todo/US-160-instagram-gets-a-second-provider.md) | spike | todo | 2026-09-17T01:35+08:00 |
 | p3 | US-018 | [A mutation sweep proves the suite is sensitive](todo/US-018-a-mutation-sweep-proves-the-suite-is-sensitive.md) | chore | todo | 2026-09-04T22:54+08:00 |
 | p3 | US-095 | [The logo travels with the email](todo/US-095-the-logo-travels-with-the-email.md) | feature | todo | 2026-09-10T00:36+08:00 |
 | p3 | BUG-013 | [A key row's error is printed inside a closed dialog](todo/BUG-013-a-key-row-s-error-is-printed-inside-a-closed-dialog.md) | bug | todo | 2026-09-09T11:58+08:00 |

@@ -43,8 +43,8 @@ import { asOwner, createTestDatabase, testOwner as owner, type TestDatabase } fr
 
 const logger = createLogger({ level: "silent", name: "test" });
 
-/** A deployment with the Bright Data key Reddit needs, and one without. */
-const configured = { BRIGHTDATA_API_KEY: "bd-test-key" };
+/** A deployment with the ScrapeCreators key Reddit needs, and one without. */
+const configured = { SCRAPECREATORS_API_KEY: "sc-test-key" };
 const unconfigured = {};
 
 const call: ModelCall = {
@@ -214,20 +214,21 @@ describe("the monitor routes", () => {
             credential.environmentVariable,
           ]),
         ).toEqual([
-          ["BRIGHTDATA_API_KEY"],
           ["SCRAPECREATORS_API_KEY"],
-          // US-031 gave Reddit a third provider. One key of the three is
-          // enough to poll it, so all three are offered and none is demanded.
+          // US-031 gave Reddit a third provider. One key of the two offered is
+          // enough to poll it, so both are offered and neither is demanded.
+          // Bright Data is the third and it is not here: US-158 switched it
+          // off, and a repair nobody may pick is not a repair.
           ["SOCIALCRAWL_API_KEY"],
         ]);
         expect(reddit.missingCredentials[0]).toEqual({
           sourceId: "reddit",
           sourceName: "Reddit",
-          providerId: "brightdata",
-          providerName: "Bright Data",
+          providerId: "scrapecreators",
+          providerName: "ScrapeCreators",
           field: "apiKey",
-          label: "Bright Data API key",
-          environmentVariable: "BRIGHTDATA_API_KEY",
+          label: "ScrapeCreators API key",
+          environmentVariable: "SCRAPECREATORS_API_KEY",
         });
       });
     });
@@ -279,10 +280,10 @@ describe("the monitor routes", () => {
       await withServer({ environment: unconfigured }, async (app) => {
         const response = await app.inject({ method: "GET", url: "/api/monitor-options" });
 
-        expect(response.body).toContain("BRIGHTDATA_API_KEY");
+        expect(response.body).toContain("SCRAPECREATORS_API_KEY");
         // The name of the variable, never its value. US-004 encrypts these,
         // and an endpoint that echoed one would make that pointless.
-        expect(response.body).not.toContain("bd-test-key");
+        expect(response.body).not.toContain("sc-test-key");
       });
     });
 
@@ -570,8 +571,8 @@ describe("the monitor routes", () => {
         // The answers are kept. The monitor is off.
         expect(body.product).toBe(newMonitor.product);
         expect(body.paused).toBe(true);
-        expect(body.missingCredentials[0].environmentVariable).toBe("BRIGHTDATA_API_KEY");
-        expect(body.missingCredentials[0].label).toBe("Bright Data API key");
+        expect(body.missingCredentials[0].environmentVariable).toBe("SCRAPECREATORS_API_KEY");
+        expect(body.missingCredentials[0].label).toBe("ScrapeCreators API key");
       });
     });
   });
@@ -665,18 +666,20 @@ describe("the monitor routes", () => {
         const response = await app.inject({ method: "POST", url: `/api/monitors/${id}/resume` });
 
         expect(response.statusCode).toBe(409);
-        expect(response.json().message).toContain("BRIGHTDATA_API_KEY");
+        expect(response.json().message).toContain("SCRAPECREATORS_API_KEY");
 
-        // Both of Reddit's providers, because either one would unblock the
-        // monitor and the person gets to pick which account to open. US-025
-        // gave Reddit a second provider and US-031 a third; before them there
-        // was one row here, and the rule that produced all three — a platform
-        // is blocked only when every connector for it is — did not change.
+        // Both of Reddit's offered providers, because either one would unblock
+        // the monitor and the person gets to pick which account to open.
+        // US-025 gave Reddit a second provider and US-031 a third; before them
+        // there was one row here, and the rule that produced all of them — a
+        // platform is blocked only when every connector for it is — did not
+        // change. Bright Data left the list when US-158 switched it off, which
+        // is the same rule: it cannot unblock anything now.
         expect(
           response
             .json()
             .missingCredentials.map((missing: { providerId: string }) => missing.providerId),
-        ).toEqual(["brightdata", "scrapecreators", "socialcrawl"]);
+        ).toEqual(["scrapecreators", "socialcrawl"]);
 
         // And the row still says paused, so the worker agrees with the answer.
         const [row] = await db.select().from(monitors);
@@ -686,14 +689,14 @@ describe("the monitor routes", () => {
 
     it("refuses to resume when the chosen provider is the one with no key", async () => {
       /**
-       * US-026. Bright Data has a key and ScrapeCreators does not, so the old
+       * US-026. ScrapeCreators has a key and SocialCrawl does not, so the old
        * rule — a platform is blocked only when every connector for it is —
        * would call this monitor startable. It is not: the poll obeys the
        * choice or refuses, and it never moves the collection to the account
        * nobody picked. The two have to agree, or a monitor starts and then
        * refuses every poll for ever.
        */
-      await setProviderChoice(db, owner, "reddit", "scrapecreators");
+      await setProviderChoice(db, owner, "reddit", "socialcrawl");
 
       try {
         await withServer({ environment: configured }, async (app) => {
@@ -702,8 +705,8 @@ describe("the monitor routes", () => {
           const response = await app.inject({ method: "POST", url: `/api/monitors/${id}/resume` });
 
           expect(response.statusCode).toBe(409);
-          expect(response.json().message).toContain("SCRAPECREATORS_API_KEY");
-          expect(response.json().message).not.toContain("BRIGHTDATA_API_KEY");
+          expect(response.json().message).toContain("SOCIALCRAWL_API_KEY");
+          expect(response.json().message).not.toContain("SCRAPECREATORS_API_KEY");
         });
       } finally {
         await clearProviderChoice(db, owner, "reddit");

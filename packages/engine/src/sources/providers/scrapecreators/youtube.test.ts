@@ -13,12 +13,13 @@ import { describe, expect, it } from "vitest";
 import { createLogger } from "../../../logger.js";
 import { youTubePlatformId } from "../../platforms.js";
 import { assertSourcesCanBeStored } from "../../storage.js";
-import type { SearchRequest, SourceRuntime } from "../../types.js";
+import type { ReplyRequest, SearchRequest, SourceRuntime } from "../../types.js";
 import { scrapeCreatorsProviderId } from "./provider.js";
 import {
   ScrapeCreatorsYouTubeSource,
   scrapeCreatorsYouTube,
   toCandidatePost,
+  toCandidateReply,
   windowFor,
 } from "./youtube.js";
 
@@ -41,6 +42,10 @@ const mixed = fixture("search-mixed");
 const noResults = fixture("search-no-results");
 const credentialsRejected = fixture("credentials-rejected");
 const credentialsAccepted = fixture("credentials-accepted");
+/** The comment pages, captured on 2026-09-17 by US-159. */
+const comments = fixture("comments-newest");
+const commentsPageTwo = fixture("comments-newest-page-2");
+const commentsTop = fixture("comments-top");
 
 interface RawVideo {
   readonly id: string;
@@ -101,14 +106,12 @@ describe("the connector's declared economics", () => {
     expect(scrapeCreatorsYouTube.postsPerUnit).toBe(20);
   });
 
-  /**
-   * US-121 measured one comment across twenty videos, and it was "nice video
-   * sir". A comment here also has no permalink, no parent id, and a date
-   * computed from "3 weeks ago" that no parameter corrects.
-   */
-  it("does not promise replies it should not be asked for", () => {
-    expect(scrapeCreatorsYouTube.canFetchReplies).toBe(false);
-    expect(scrapeCreatorsYouTube.replyPricePerUnitMicros).toBeUndefined();
+  it("fetches replies, at the same credit a search costs", () => {
+    expect(scrapeCreatorsYouTube.canFetchReplies).toBe(true);
+    expect(scrapeCreatorsYouTube.replyPricePerUnitMicros).toBe(1880);
+    expect(
+      new ScrapeCreatorsYouTubeSource(runtimeWith(provider([]).fetch)).fetchReplies,
+    ).toBeTypeOf("function");
   });
 });
 
@@ -433,5 +436,193 @@ describe("credentials", () => {
 
     expect(await source.validateCredentials(credentials)).toEqual({ valid: true });
     expect((credentialsAccepted.body as { credits_charged: number }).credits_charged).toBe(0);
+  });
+});
+
+/**
+ * The replies under one video. US-159.
+ *
+ * Every payload here was captured on 2026-09-17 against a video claiming 419
+ * comments, because the keyword the rest of this file uses has almost none:
+ * US-121 found one comment across twenty videos in that niche, which is enough
+ * evidence to decide against a connector and not enough to build one.
+ */
+describe("the replies under one video", () => {
+  const videoId = "a-video-id";
+
+  function replyRequest(overrides: Partial<ReplyRequest> = {}): ReplyRequest {
+    return {
+      postUrl: `https://www.youtube.com/watch?v=${videoId}`,
+      postExternalId: videoId,
+      credentials,
+      ...overrides,
+    };
+  }
+
+  function rawComments(captured: Captured): readonly Record<string, unknown>[] {
+    return (captured.body as { comments?: readonly Record<string, unknown>[] }).comments ?? [];
+  }
+
+  /**
+   * The measurement the whole connector rests on, asserted against the
+   * fixtures rather than trusted from the Log.
+   *
+   * If a later capture shows this provider filling either field in, these two
+   * expectations fail — and the built link and the missing parent become
+   * repairs of a problem that no longer exists.
+   */
+  it("carries neither a permalink nor a parent id on any captured comment", () => {
+    const all = [...rawComments(comments), ...rawComments(commentsPageTwo)];
+
+    expect(all.length).toBe(40);
+    expect(all.filter((comment) => comment.url !== undefined)).toHaveLength(0);
+    expect(all.filter((comment) => comment.post_id ?? comment.parentId)).toHaveLength(0);
+    expect(all.every((comment) => comment.replyLevel === 0)).toBe(true);
+  });
+
+  it("reads a page of twenty comments for one credit", async () => {
+    const stub = provider([comments]);
+    const source = new ScrapeCreatorsYouTubeSource(runtimeWith(stub.fetch));
+
+    const result = await source.fetchReplies(replyRequest());
+
+    expect(result.itemsReturned).toBe(20);
+    expect(result.replies).toHaveLength(20);
+    expect(result.unitsConsumed).toBe(1);
+  });
+
+  it("asks for the newest order, whatever the provider does with it", async () => {
+    const stub = provider([comments]);
+    const source = new ScrapeCreatorsYouTubeSource(runtimeWith(stub.fetch));
+
+    await source.fetchReplies(replyRequest());
+
+    const asked = new URL(stub.calls[0]?.url ?? "");
+    expect(asked.pathname).toBe("/v1/youtube/video/comments");
+    expect(asked.searchParams.get("order")).toBe("newest");
+    expect(asked.searchParams.get("url")).toBe(`https://www.youtube.com/watch?v=${videoId}`);
+  });
+
+  /**
+   * `top` and `newest` were asked for the same video back to back and answered
+   * with the same comments in the same order. This is why nothing in the
+   * connector stops early on a date.
+   */
+  it("was measured returning the same page under both orderings", () => {
+    const newest = rawComments(comments).map((comment) => comment.id);
+    const top = rawComments(commentsTop).map((comment) => comment.id);
+
+    expect(top[0]).toBe(newest[0]);
+  });
+
+  it("builds YouTube's own linked-comment URL, because the provider sends none", async () => {
+    const stub = provider([comments]);
+    const source = new ScrapeCreatorsYouTubeSource(runtimeWith(stub.fetch));
+
+    const { replies } = await source.fetchReplies(replyRequest());
+
+    for (const reply of replies) {
+      expect(reply.url).toBe(`https://www.youtube.com/watch?v=${videoId}&lc=${reply.externalId}`);
+    }
+  });
+
+  /**
+   * Twenty comments on one page shared one timestamp to the millisecond,
+   * because the provider subtracts "4 years ago" from the moment of the call.
+   * Nothing downstream may read that as a reading.
+   */
+  it("marks every date approximate, because every date is arithmetic", async () => {
+    const stub = provider([comments]);
+    const source = new ScrapeCreatorsYouTubeSource(runtimeWith(stub.fetch));
+
+    const { replies } = await source.fetchReplies(replyRequest());
+
+    expect(replies.every((reply) => reply.postedAtIsApproximate === true)).toBe(true);
+    expect(new Set(replies.map((reply) => reply.postedAt.getTime())).size).toBe(1);
+  });
+
+  it("never claims a parent reply, because no comment names one", async () => {
+    const stub = provider([comments]);
+    const source = new ScrapeCreatorsYouTubeSource(runtimeWith(stub.fetch));
+
+    const { replies } = await source.fetchReplies(replyRequest());
+
+    expect(replies.every((reply) => reply.parentReplyExternalId === undefined)).toBe(true);
+    expect(replies.every((reply) => reply.parentPostExternalId === videoId)).toBe(true);
+  });
+
+  it("pages with the continuation token, and page two repeats nothing", async () => {
+    const stub = provider([comments, commentsPageTwo]);
+    const source = new ScrapeCreatorsYouTubeSource(runtimeWith(stub.fetch));
+
+    const first = await source.fetchReplies(replyRequest());
+    expect(first.next.status).toBe("ready");
+
+    const cursor = first.next.status === "ready" ? first.next.cursor : undefined;
+    const second = await source.fetchReplies(replyRequest({ cursor }));
+
+    expect(new URL(stub.calls[1]?.url ?? "").searchParams.get("continuationToken")).toBe(cursor);
+
+    const seen = new Set(first.replies.map((reply) => reply.externalId));
+    expect(second.replies.filter((reply) => seen.has(reply.externalId))).toHaveLength(0);
+  });
+
+  it("counts the provider's own position across the whole walk", async () => {
+    const stub = provider([comments]);
+    const source = new ScrapeCreatorsYouTubeSource(runtimeWith(stub.fetch));
+
+    const { replies } = await source.fetchReplies(replyRequest({ positionOffset: 20 }));
+
+    expect(replies[0]?.threadPosition).toBe(20);
+    expect(replies.at(-1)?.threadPosition).toBe(39);
+  });
+
+  /**
+   * The cut this connector makes on a date it has already called approximate,
+   * and the one place it departs from `search` above. US-034 is why: keeping
+   * every comment because its date is computed is how a comment from 2021
+   * reached an inbox as a lead.
+   */
+  it("applies the window even though the date is the provider's arithmetic", async () => {
+    const stub = provider([comments]);
+    const source = new ScrapeCreatorsYouTubeSource(runtimeWith(stub.fetch));
+
+    const all = await source.fetchReplies(replyRequest());
+    const newest = all.replies.reduce((a, b) => (a.postedAt > b.postedAt ? a : b));
+
+    const later = await source.fetchReplies(replyRequest({ since: newest.postedAt }));
+
+    expect(later.replies).toHaveLength(0);
+    // Still billed and still counted. An empty page is not a free one.
+    expect(later.itemsReturned).toBe(all.itemsReturned);
+    expect(later.unitsConsumed).toBe(1);
+  });
+
+  /**
+   * A comment with a thread of its own is a second walk with a second bill,
+   * and this connector does not make it. Saying so is what stops the thread
+   * being recorded as fully read.
+   */
+  it("reports a thread as partial while comments hold unread replies", async () => {
+    const stub = provider([comments]);
+    const source = new ScrapeCreatorsYouTubeSource(runtimeWith(stub.fetch));
+
+    const result = await source.fetchReplies(replyRequest());
+
+    expect(
+      rawComments(comments).some((comment) => comment.repliesContinuationToken !== undefined),
+    ).toBe(true);
+    expect(result.partial).toBe(true);
+  });
+
+  it("drops a comment with no words, rather than buying a classification for silence", () => {
+    const first = rawComments(comments)[0] as Record<string, unknown>;
+
+    expect(
+      toCandidateReply({ ...first, content: "" }, { parentPostExternalId: videoId, position: 0 }),
+    ).toBeUndefined();
+    expect(
+      toCandidateReply({ ...first, id: "" }, { parentPostExternalId: videoId, position: 0 }),
+    ).toBeUndefined();
   });
 });

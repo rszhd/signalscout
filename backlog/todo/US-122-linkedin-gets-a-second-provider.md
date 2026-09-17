@@ -102,3 +102,56 @@ eliminations, and the answer stands until somebody publishes a new search.
 
 - 2026-09-11T18:44+08:00 — Written. The owner asked for a second provider on
   every platform.
+
+- 2026-09-17T01:35+08:00 — **Desk research, from public documentation.
+  Nothing below is measured.** Written the day the owner said there is no
+  good second choice on LinkedIn; [US-160](US-160-instagram-gets-a-second-provider.md)
+  is the same work for Instagram.
+
+  **Bright Data's scraper answers no from its own documentation**, as the
+  Context predicted. The LinkedIn scraper page lists four datasets and their
+  discovery modes, and for posts the whole sentence is "Discover posts by
+  company or profile." Keyword discovery is listed for jobs and for profiles
+  and not for posts. The acceptance list still asks for one call to the
+  account, and that call is free. The Posts dataset was not assessed.
+
+  **SocialCrawl's endpoint now lists a `sort_by` parameter**, beside
+  `date_posted` and `content_type`, on its LinkedIn platform page. The
+  connector was switched off because the search is ordered by relevance, and
+  `notOffered` names a date order as the measurement that would bring it
+  back. The endpoint guide answers at zero credits, so ask it first — before
+  any candidate that needs a new account. It stays the dearest of the
+  measured three whatever the answer.
+
+  **Three routes read LinkedIn without Google, and each has a catch.**
+
+  * **Unipile** drives LinkedIn's own search — `keywords`, `sort_by:
+    relevance | date`, `date_posted: past_day | past_week | past_month` — from
+    €49 a month with unlimited calls. The catch is the `account_id`: every
+    call runs through **the person's own connected LinkedIn account**, so the
+    freshness is LinkedIn's and so is the risk of a restricted account. That
+    is a fit for a self-hoster who accepts it and a hard thing to put on the
+    hosted product's connections screen.
+  * **Piloterr** publishes
+    `/api/v2/linkedin/advanced/post/search?query=` and says each result
+    carries "Post ID, URL & publishing date", the text, the author and the
+    engagement, at one to two credits a call with fifty free. **It does not
+    say whether it reads LinkedIn or Google's index**, and that is the first
+    question, before any capture.
+  * **Crustdata** has `/social_post/professional_network/search/live` at one
+    credit a post, three with `exact_keyword_match`, and its own upstream.
+    Live endpoints are "enabled on request" and plan-gated, the lowest tier
+    is about $95 a month, and the site sells through a demo. That is the
+    wrong shape for a key a person pastes; it may be a hosted-product
+    question and it is not this ticket's answer.
+
+  **Named and set aside.** A RapidAPI listing, "Fresh LinkedIn Profile
+  Data", has a Search Posts endpoint with nothing published about method or
+  dates; low priority. HarvestAPI's direct API is the actor's own upstream,
+  which the Context already rules out. Every other keyword search found is an
+  Apify actor, and the Notes already say a second actor is not a second
+  provider.
+
+  **The order to measure, then**: SocialCrawl's `sort_by` for free; Piloterr's
+  method by one call; Unipile only if the owner accepts a person's own account
+  as the credential.

@@ -62,6 +62,42 @@ export const brightDataReddit: ConnectorDefinition = {
   discovery: ["keyword", "channel"],
   /** `defaultRecordsPerInput`: what one keyword collects when nobody says otherwise. */
   maxUnitsPerQueryPoll: defaultRecordsPerInput,
+  /**
+   * Switched off on 2026-09-17, on the owner's decision. US-158.
+   *
+   * This provider bills one record per post, so a Reddit post costs $0.0015
+   * here against about $0.00027 through ScrapeCreators and $0.00032 through
+   * SocialCrawl — five times the cheapest, for the same subreddit page, and
+   * eighteen times when a ScrapeCreators request returns the 23 posts it
+   * returned at its best. Five is the figure the sentence below uses, because
+   * it is the one measured at the other end of that range. The
+   * first 5,000 records each month are free, which is the argument against
+   * switching it off; it stops being an argument at five thousand posts, and
+   * the allowance is paid for in waiting anyway. One collection here took 8
+   * minutes 40 seconds where ScrapeCreators answers in seconds.
+   *
+   * The decision is about the pair and not about Reddit: the platform stays,
+   * fetched by the other two. Every row this connector collected stays
+   * readable, and a collection already paid for is still resumed through
+   * `registry.get`, `verify` included.
+   *
+   * **What the switch costs is deletion reconciliation.** This is the only
+   * Reddit connector whose removal signal was proved live: the capture in
+   * `deletion-fixtures/` got an explicit deleted record and a `dead_page` from
+   * here, while ScrapeCreators answered the same 404 for a removed post and
+   * for a live post asked for the wrong way — so its 404 is uncertain and
+   * leaves the match visible. SocialCrawl's Reddit connector implements no
+   * `verify` at all, so it checks nothing. A Reddit post deleted after it was
+   * matched will now usually stay in the inbox. docs/deletions.md.
+   *
+   * Deleting this field is the way back. Two things would be reason to: a
+   * price change here, or a measurement showing one of the other two can say
+   * "deleted" and mean it.
+   */
+  notOffered:
+    "Reddit through Bright Data is switched off: it bills every post as a " +
+    "record, at about five times what the other two providers charge for the " +
+    "same page. ScrapeCreators and SocialCrawl fetch Reddit here.",
   create: (runtime) => new RedditSource(runtime),
 };
 

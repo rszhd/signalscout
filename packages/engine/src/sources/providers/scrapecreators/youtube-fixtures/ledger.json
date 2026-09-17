@@ -66,20 +66,44 @@
       "note": "a phrase that cannot occur; the ledger says what it cost"
     },
     {
-      "call": "comments-newest",
-      "httpStatus": 200,
-      "elapsedMs": 2374,
-      "creditsCharged": 1,
-      "creditsRemaining": 1754,
-      "note": "newest first, on the first video the search returned"
-    },
-    {
       "call": "transcript",
       "httpStatus": 200,
       "elapsedMs": 6955,
       "creditsCharged": 1,
       "creditsRemaining": 1753,
       "note": "public captions only"
+    },
+    {
+      "call": "comments-target-search",
+      "httpStatus": 200,
+      "elapsedMs": 4809,
+      "creditsCharged": 1,
+      "creditsRemaining": 1524,
+      "note": "finds a video with comments under it; not a fixture a test reads"
+    },
+    {
+      "call": "comments-newest",
+      "httpStatus": 200,
+      "elapsedMs": 2476,
+      "creditsCharged": 1,
+      "creditsRemaining": 1523,
+      "note": "newest first, on the busiest video the search returned"
+    },
+    {
+      "call": "comments-newest-page-2",
+      "httpStatus": 200,
+      "elapsedMs": 1027,
+      "creditsCharged": 1,
+      "creditsRemaining": 1522,
+      "note": "followed the continuationToken from comments-newest.json"
+    },
+    {
+      "call": "comments-top",
+      "httpStatus": 200,
+      "elapsedMs": 2239,
+      "creditsCharged": 1,
+      "creditsRemaining": 1521,
+      "note": "the other ordering, to prove the parameter is read at all"
     }
   ]
 }

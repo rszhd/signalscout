@@ -11,7 +11,7 @@
  * the variable named in the failure is the variable a self-hoster must set.
  */
 
-import { brightDataReddit } from "@signalscout/engine";
+import { scrapeCreatorsReddit } from "@signalscout/engine";
 import { eq } from "drizzle-orm";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { createDatabase, type Database } from "../db/client.js";
@@ -27,10 +27,10 @@ import {
   updateMonitor,
 } from "./monitors.js";
 
-const descriptors = [brightDataReddit];
+const descriptors = [scrapeCreatorsReddit];
 
-/** A deployment that has the Bright Data key Reddit needs. */
-const configured = { BRIGHTDATA_API_KEY: "bd-test-key" };
+/** A deployment that has the ScrapeCreators key Reddit needs. */
+const configured = { SCRAPECREATORS_API_KEY: "sc-test-key" };
 /** A deployment that does not. */
 const unconfigured = {};
 
@@ -248,11 +248,11 @@ describe("a monitor whose source has no credentials", () => {
       {
         sourceId: "reddit",
         sourceName: "Reddit",
-        providerId: "brightdata",
-        providerName: "Bright Data",
+        providerId: "scrapecreators",
+        providerName: "ScrapeCreators",
         field: "apiKey",
-        label: "Bright Data API key",
-        environmentVariable: "BRIGHTDATA_API_KEY",
+        label: "ScrapeCreators API key",
+        environmentVariable: "SCRAPECREATORS_API_KEY",
       },
     ]);
   });
@@ -270,7 +270,7 @@ describe("a monitor whose source has no credentials", () => {
 
     expect(result?.status).toBe("blocked");
     if (result?.status !== "blocked") return;
-    expect(result.missing[0]?.environmentVariable).toBe("BRIGHTDATA_API_KEY");
+    expect(result.missing[0]?.environmentVariable).toBe("SCRAPECREATORS_API_KEY");
 
     // The answer a caller could ignore is not the guard. The row is.
     expect((await getMonitor(db, monitor.id))?.pausedAt).not.toBeNull();
@@ -297,9 +297,9 @@ describe("a monitor whose source has no credentials", () => {
     // A source with two fields, so a user who set one of them is told about
     // the other rather than being sent back to check the one that is right.
     const twoFields = {
-      ...brightDataReddit,
+      ...scrapeCreatorsReddit,
       provider: {
-        ...brightDataReddit.provider,
+        ...scrapeCreatorsReddit.provider,
         credentialFields: [
           { name: "apiKey", label: "API key", secret: true },
           { name: "apiSecret", label: "API secret", secret: true },
@@ -309,11 +309,11 @@ describe("a monitor whose source has no credentials", () => {
 
     const { missing } = await createMonitor(db, input(), {
       descriptors: [twoFields],
-      environment: { BRIGHTDATA_API_KEY: "set" },
+      environment: { SCRAPECREATORS_API_KEY: "set" },
     });
 
     expect(missing.map((credential) => credential.environmentVariable)).toEqual([
-      "BRIGHTDATA_API_SECRET",
+      "SCRAPECREATORS_API_SECRET",
     ]);
   });
 });

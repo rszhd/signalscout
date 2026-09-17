@@ -228,8 +228,10 @@ caller that has a platform and no provider.
    table without answering the question.
 2. **A recorded choice that cannot run is refused**, never replaced. A person
    who chose ScrapeCreators and lost its key would otherwise have every poll
-   billed to Bright Data, which charges twenty times as much for the same
-   subreddit page.
+   billed to SocialCrawl, which prices the same subreddit page higher. The rule
+   was written against a wider gap: Bright Data charged five to twenty times as
+   much, depending on how many posts a ScrapeCreators request returned, until
+   US-158 switched that pair off.
 3. **One provider that can run is its own answer.** No question is asked. This
    is every deployment holding one key, which is the common case.
 4. **Two that can run and no choice is an error.** Answering from registration
@@ -271,7 +273,7 @@ for the split:
 
 | | Bright Data | ScrapeCreators | SocialCrawl | SocialData | Apify |
 |---|---|---|---|---|---|
-| Fetches | Reddit | Reddit, TikTok, YouTube | Reddit, X, YouTube, TikTok, Instagram — and LinkedIn, switched off since US-053 | X | LinkedIn |
+| Fetches | Reddit, switched off since US-158 | Reddit, TikTok, YouTube | Reddit, X, YouTube, TikTok, Instagram — and LinkedIn, switched off since US-053 | X | LinkedIn |
 | Billable unit | a record | a request | a credit: 1 on X, Reddit, YouTube and TikTok, 5 on LinkedIn and an Instagram comment page | a tweet | a post, settled from the run's own total |
 | Price | $1.50 / 1,000 records | $1.88 / 1,000 requests | $8.12 / 1,000 credits | $0.20 / 1,000 tweets | $2.00 / 1,000 posts |
 | One unit buys | one post | 7 to 23 posts, measured | 20 X posts, 25 Reddit posts, 45 YouTube videos, 30 reels — or 15 Instagram comments for five credits | one tweet | one post |
@@ -302,6 +304,35 @@ A connector reports `unitsConsumed` in its own unit and the budget guard prices
 it from the connector's own `pricePerUnitMicros`. Nothing downstream reads the
 table above.
 
+### Who reads replies
+
+Every offered connector reads replies since US-159, and no two of them read
+them the same way. The table is what a person choosing a provider is really
+choosing, measured on 2026-09-17 unless a row says otherwise.
+
+| Platform | Provider | One reply call buys | Price | Ordered | Nested | Completeness claim |
+|---|---|---|---|---|---|---|
+| Reddit | ScrapeCreators | a page of ~25, flat | 1 credit, $0.00188 | no | `parent_id` | **wrong**: `has_more: false` with 33 of 58 missing (US-020) |
+| Reddit | SocialCrawl | **the whole thread**, 34 of 34 five levels deep, no cursor | 5 credits, $0.0406 | no | `parent_id`, tree flattened | `truncated: false` — the one claim measured right |
+| X | SocialCrawl | a page of ~28 | 1 credit, $0.0081 | no | `parent_id` | wrong: cursor to an empty page, refunded (US-020) |
+| X | SocialData | a page of 20 | 20 tweets, $0.0040 | **newest first** — the only reply endpoint that may stop early | `in_reply_to_status_id_str`; `conversation_id_str` checks the thread | cursor followed to 20 more; one overlapped |
+| YouTube | SocialCrawl | a page of ~51 | 1 credit, $0.0081 | newest first, on an exact timestamp | `parent_id` | consistent with `total` on one thread (US-020) |
+| YouTube | ScrapeCreators | a page of 20 | 1 credit, $0.00188 | **no — `order` is ignored**: `top` and `newest` answered the same page | none on the wire; nested replies behind their own token, unread | `continuationToken` pages, no overlap |
+| TikTok | ScrapeCreators | a page of ~11 | 1 credit, $0.00188 | no | `reply_id` | `reply_comment_total` beside a couple of replies (US-119) |
+| TikTok | SocialCrawl | a page of up to 50 | 1 credit, $0.0081 | no | `parent_id` | (US-044) |
+| Instagram | SocialCrawl | a page of 15 | 5 credits, $0.0406 | no | `parent_id` | wrong: `has_more: true` beside an empty page (US-049) |
+| LinkedIn | Apify | up to 10 top-level comments, replies nested beside them | $0.002 a comment, the post price | no | from the tree — no parent id on the wire | none: `maxItems` is the only bound |
+
+Three rows carry a warning the connector's own header repeats. ScrapeCreators
+YouTube computes every comment's date from "4 years ago" and marks every reply
+approximate — it exists so an instance with only that key is not given nothing,
+and `socialcrawl/youtube.ts` stays the better choice. SocialCrawl Reddit is
+twenty-two times the price of ScrapeCreators on the median twelve-comment
+thread, which the cheap one finishes too; it earns its five credits only on a
+busy thread the cheap one cannot finish. And the Apify comments actor is the
+one reply call that waits inside the job rather than handing the wait back,
+because the replies worker takes only `ready` or `done`.
+
 ---
 
 ## Switching a connector off
@@ -309,7 +340,16 @@ table above.
 A connector can ship and not be offered. `ConnectorDescriptor.notOffered` is
 the whole switch: one sentence saying why, on one connector definition, and
 nothing else changes. US-053 built it and LinkedIn through SocialCrawl was its
-first caller, on 2026-09-09.
+first caller, on 2026-09-09. Reddit through Bright Data is the second, on
+2026-09-17: US-158 switched it off on price, and Reddit stayed, fetched by the
+two providers that are left.
+
+**A test that samples a connector is the one thing that does change.** US-053
+claimed the switch costs nothing outside the connector's own file, and US-158
+found the edge of that claim: four test files used Bright Data as their example
+Reddit provider, and each had to name an offered one instead. No production
+code moved. When you switch the next connector off, expect to move the tests
+that borrowed it as a sample.
 
 **Write the sentence for the person who meets it.** It reaches three places: a
 `422` refusing a monitor that names the platform, a `400` refusing a cost test,
@@ -458,9 +498,11 @@ had already started: 25 threads bought, nothing stored. A post found today can
 carry comments from 2015, and `posts.replies_read_at` is the only mark that
 says how much of one we hold.
 
-Apply it yourself, and say so in the connector. Two of the four providers offer
-no date parameter on a comment endpoint at all, so the cut is ours in every
-case and the bill is the same either way.
+Apply it yourself, and say so in the connector. Apify's LinkedIn comments actor
+is the one comment endpoint here with a date parameter — `postedLimit`, a named
+range — and the exact cut is still ours there too, because a named range is not
+a timestamp. Everywhere else the provider offers nothing, and the bill is the
+same either way.
 
 ---
 

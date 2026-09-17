@@ -33,5 +33,12 @@
     "status": 401,
     "elapsedMs": 194,
     "note": "expected free: refused before the query is read"
+  },
+  {
+    "name": "comments-thread",
+    "url": "https://www.socialcrawl.dev/v1/reddit/post/comments?url=https%3A%2F%2Fwww.reddit.com%2Fr%2Fsoftwaretesting%2Fcomments%2F1ulc2gz%2Fmobile_qa_engineers_how_long_would_this_test_take%2F",
+    "status": 200,
+    "elapsedMs": 2399,
+    "note": "five credits: the whole nested tree, if the provider's claim holds"
   }
 ]

@@ -239,10 +239,13 @@ export interface ReplyRequest {
    * nothing here carried a window and the connector had nothing to cut on. A
    * person who wanted a Cypress alternative five years ago chose one long ago.
    *
-   * A connector applies this itself, because no provider we have offers a
-   * server-side date parameter for comments. Where the platform orders newest
-   * first, that is a cheap walk; where it does not, it is a filter over the
-   * page. Either way it must never be ignored.
+   * A connector applies this itself, whatever the provider offers. Most
+   * offer nothing: where the platform orders newest first, the cut is a cheap
+   * walk, and where it does not, it is a filter over a page already paid for.
+   * Apify's LinkedIn comments actor is the one exception, with a named
+   * `postedLimit` window — US-159 — and even there the exact cut is still made
+   * here, because a named range is not a timestamp. Either way it must never
+   * be ignored.
    */
   readonly since?: Date;
   /** Opaque, from a previous `ReplyResult`. Absent starts at the first page. */
@@ -565,8 +568,11 @@ export interface SocialSource extends ConnectorDescriptor {
    * building a connector, because the monitor form has to say which of a
    * person's platforms will actually return them.
    *
-   * US-020. Every provider we have reads replies by post URL, so this is a
-   * second call and not a flag on `search`.
+   * US-020. Every provider we have reads replies under one post — by URL, or
+   * by the id SocialData puts in its path — so this is a second call and not
+   * a flag on `search`. Apify's search actor does offer such a flag, and
+   * US-159 chose its comments actor over it for exactly this reason: a flag
+   * on the search buys comments under posts the pre-filter is about to drop.
    */
   fetchReplies?(request: ReplyRequest): Promise<ReplyResult>;
 }

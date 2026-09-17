@@ -42,8 +42,11 @@
 import { linkedInPlatform } from "../../platforms.js";
 import type {
   CandidatePost,
+  CandidateReply,
   ConnectorDefinition,
   CredentialCheck,
+  ReplyRequest,
+  ReplyResult,
   SearchRequest,
   SearchResult,
   SocialSource,
@@ -78,6 +81,27 @@ const postsPerRun = 25;
  * that is late costs the freshness this connector exists for.
  */
 const resumeAfterSeconds = 5;
+
+/**
+ * How many comments to buy under one post.
+ *
+ * Ten is the actor's own default and $0.02 on the FREE plan, where a comment
+ * is priced exactly like a post. It is the cap that decides what a monitor
+ * with replies on costs here, so raising it raises every projected bill — and
+ * US-020 already settled the principle for every platform: read the top of a
+ * thread and stop, because the model calls are the larger bill.
+ */
+const commentsPerRun = 10;
+
+/**
+ * How many times `fetchReplies` asks whether its run has finished.
+ *
+ * Twelve asks, `resumeAfterSeconds` apart, so about a minute. The captured
+ * comment runs took 6.5 seconds and the captured search runs took 3.3 to 10.5,
+ * so a minute is far outside that range on purpose: the money is spent when the
+ * run starts, and waiting longer is cheaper than abandoning what was bought.
+ */
+const maxWaitAttempts = 12;
 
 export const apifyLinkedIn: ConnectorDefinition = {
   platform: linkedInPlatform,
@@ -124,15 +148,32 @@ export const apifyLinkedIn: ConnectorDefinition = {
   /** `postsPerRun`: what one query costs in one poll. */
   maxUnitsPerQueryPoll: postsPerRun,
   /**
-   * The actor can fetch comments, and this connector does not ask for them.
+   * Comments, since US-159 — and this is the only reply path LinkedIn has.
    *
-   * They are a separate charge at the same price as a post, and whether a
-   * LinkedIn comment carries a lead is a question nobody has measured — on
-   * Instagram and TikTok the comments hold everything and on Reddit they hold
-   * the experts. Turning on a per-item charge to find out is a ticket, not a
-   * default.
+   * Until this connector read them, a person could tick "include replies" on
+   * LinkedIn and be given none, on every provider, silently.
+   *
+   * **The price question that held it back is answered and it is the good
+   * answer**: `post-comment` costs exactly what `post` costs, $0.002 on FREE,
+   * read from `harvestapi~linkedin-post-comments`'s own `pricingInfos` — which
+   * is free to read, so nobody had to spend to find out. Nobody had asked.
+   *
+   * What a live run on 2026-09-17 added, on a post claiming two comments:
+   *
+   * * A comment carries its own id, a deep link that opens it, the words, an
+   *   exact ISO date and its author. Nothing has to be built or repaired.
+   * * **`replies` arrive nested, and they arrived without being asked for.**
+   *   The run with `scrapeReplies: true` returned the same two comments, the
+   *   same nested reply and the same two charged events as the run without it.
+   *   One post is one measurement; the connector does not send the flag and
+   *   does not rely on the nesting being free.
+   * * `postedLimit` narrows comments at the provider. It is the first
+   *   server-side comment window in this product — `ReplyRequest.since` says
+   *   no provider offers one, and that sentence is now out of date here.
    */
-  canFetchReplies: false,
+  canFetchReplies: true,
+  /** A comment is charged like a post: the same event price, the same tiers. */
+  replyPricePerUnitMicros: 2000,
   create: (runtime) => new ApifyLinkedInSource(runtime),
 };
 
@@ -152,6 +193,24 @@ export const apifyLinkedIn: ConnectorDefinition = {
  * says the same thing without a value to get wrong.
  */
 const day = 24 * 60 * 60 * 1000;
+
+/**
+ * The comment windows, which are the post windows without `1h`.
+ *
+ * `harvestapi~linkedin-post-comments` publishes `any`, `24h`, `week`, `month`,
+ * `3months`, `6months` and `year` — one value short of its sibling, read from
+ * its own input schema on 2026-09-17. A connector that reused the list below
+ * would send `1h` to an actor that does not offer it, and this provider
+ * ignores an unknown value and charges for the run anyway.
+ */
+const commentWindows = [
+  { value: "24h", covers: 24 * 60 * 60 * 1000 },
+  { value: "week", covers: 7 * 24 * 60 * 60 * 1000 },
+  { value: "month", covers: 31 * 24 * 60 * 60 * 1000 },
+  { value: "3months", covers: 92 * 24 * 60 * 60 * 1000 },
+  { value: "6months", covers: 184 * 24 * 60 * 60 * 1000 },
+  { value: "year", covers: 366 * 24 * 60 * 60 * 1000 },
+] as const;
 
 const windows = [
   { value: "1h", covers: 60 * 60 * 1000 },
@@ -206,6 +265,7 @@ export class ApifyLinkedInSource implements SocialSource {
   // screen and every step asks the connector the registry built, not the
   // record it was built from. US-034 found that wrong on another connector.
   readonly canFetchReplies = apifyLinkedIn.canFetchReplies;
+  readonly replyPricePerUnitMicros = apifyLinkedIn.replyPricePerUnitMicros;
 
   constructor(private readonly runtime: SourceRuntime) {}
 
@@ -399,6 +459,128 @@ export class ApifyLinkedInSource implements SocialSource {
   }
 
   /**
+   * The comments under one post. US-159, and the only reply path LinkedIn has.
+   *
+   * **This is the one call in the connector that waits rather than handing the
+   * wait back**, and the reason is the caller and not the provider. `search`
+   * returns `{ status: "wait" }` and is resumed by the scheduler; the replies
+   * worker takes only `ready` or `done` and ends its walk on anything else, so
+   * a wait returned here would silently lose the run that was already paid
+   * for. The captured runs finished in 6.5 seconds.
+   *
+   * The wait is bounded, and running out is an error rather than an empty
+   * answer. A run that is still going has been started and will be billed, so
+   * the honest thing is to say so and name the run, not to report zero
+   * comments and zero cost.
+   */
+  async fetchReplies(request: ReplyRequest): Promise<ReplyResult> {
+    const client = this.client(request.credentials);
+
+    const started = await client.startRun(
+      actors.linkedInPostComments,
+      {
+        posts: [request.postUrl],
+        /**
+         * Never zero, and never absent. The actor's default is ten and its
+         * meaning for zero is undocumented — on the search actor zero means
+         * *everything there is*, and this provider bills per item returned.
+         */
+        maxItems: commentsPerRun,
+        /** `short`, so no `main-profile` event is charged beside the comment. */
+        profileScraperMode: "short",
+        ...this.commentWindow(request.since),
+      },
+      request.signal,
+    );
+
+    /**
+     * Attempts, not a clock.
+     *
+     * A loop that compared `runtime.now()` against a deadline would never end
+     * under a runtime whose clock does not move — which every test here uses,
+     * and which is exactly the shape that hangs a worker instead of failing
+     * it. Counting the asks bounds the wait whatever the clock does.
+     */
+    let running = true;
+
+    for (let attempt = 0; attempt < maxWaitAttempts && running; attempt += 1) {
+      running = ApifyClient.isRunning(await client.runStatus(started.runId, request.signal));
+
+      if (running) await this.runtime.sleep(resumeAfterSeconds * 1000);
+    }
+
+    if (running) {
+      throw new ApifyError(
+        "provider",
+        `Apify run ${started.runId} was still running after ` +
+          `${maxWaitAttempts * resumeAfterSeconds}s. It has been started and will be ` +
+          "billed; read it in the Apify console.",
+        0,
+      );
+    }
+
+    const run = await client.readRun(started.runId, request.signal);
+
+    if (run.status !== "SUCCEEDED") {
+      this.runtime.logger.warn(
+        { platform: linkedInPlatform.id, runId: started.runId, status: run.status },
+        "an Apify comments run did not succeed; recording what it cost and moving on",
+      );
+    }
+
+    /**
+     * Depth first, carrying each comment's id down to the replies under it.
+     *
+     * A nested reply names no parent of its own — there is no `parentId` on
+     * the wire — so the only thing that says what it answers is where it sat
+     * in the tree. Flattening without carrying that down would store the
+     * second half of every conversation as though it answered the post.
+     */
+    const flattened = flattenComments(run.records);
+
+    const parsed = flattened
+      .map(({ record, parentReplyExternalId }, index) =>
+        toCandidateReply(record, {
+          parentPostExternalId: request.postExternalId,
+          position: (request.positionOffset ?? 0) + index,
+          ...(parentReplyExternalId ? { parentReplyExternalId } : {}),
+        }),
+      )
+      .filter((reply): reply is CandidateReply => reply !== undefined);
+
+    /**
+     * The exact cut, made here because `postedLimit` is a named range at best.
+     * The comments were paid for whether they are kept or not, which is why
+     * the window is still sent: it is the only comment window in this product
+     * that stops the provider collecting what we would throw away.
+     */
+    const replies = request.since
+      ? parsed.filter((reply) => reply.postedAt > (request.since as Date))
+      : parsed;
+
+    return {
+      replies,
+      itemsReturned: flattened.length,
+      unitsConsumed: this.unitsOf(run),
+      /**
+       * Always done. This actor has no cursor: `maxItems` is the whole bound,
+       * and asking again would start a second run and buy the same comments a
+       * second time — the mistake the run id in `search`'s cursor exists to
+       * prevent.
+       */
+      next: { status: "done" },
+      /**
+       * Partial when the run returned as many top-level comments as it was
+       * allowed to, because then the cap and not the thread decided where it
+       * stopped. It is counted on the top level rather than on the flattened
+       * tree: `maxItems` is documented as comments per post, and the nested
+       * replies arrived beside them without being charged for separately.
+       */
+      partial: run.records.length >= commentsPerRun,
+    };
+  }
+
+  /**
    * What to charge the monitor for one run, in whole posts.
    *
    * The settled bill divided by the price of a post, rounded up. It is not the
@@ -433,6 +615,22 @@ export class ApifyLinkedInSource implements SocialSource {
    * all, sends no window — which on this actor means whatever `sortBy: "date"`
    * gives, and that was a 71-minute page.
    */
+  /**
+   * The same idea as `window`, on the comments actor's shorter list.
+   *
+   * It is the first provider-side comment window this product has. Every other
+   * reply endpoint is asked for a thread and cuts the dates itself afterwards,
+   * having paid for all of them.
+   */
+  private commentWindow(since: Date | undefined): Record<string, string> {
+    if (!since) return {};
+
+    const age = this.runtime.now().getTime() - since.getTime();
+    const window = commentWindows.find((candidate) => age <= candidate.covers);
+
+    return window ? { postedLimit: window.value } : {};
+  }
+
   private window(since: Date | undefined): Record<string, string> {
     if (!since) return {};
 
@@ -552,4 +750,131 @@ function profileSlug(url: string | undefined): string | undefined {
 
 function text(value: unknown): string | undefined {
   return typeof value === "string" && value !== "" ? value : undefined;
+}
+
+function objectOf(value: unknown): Record<string, unknown> | undefined {
+  return typeof value === "object" && value !== null
+    ? (value as Record<string, unknown>)
+    : undefined;
+}
+
+function dateOf(value: unknown): Date | undefined {
+  const iso = text(value);
+  if (!iso) return undefined;
+
+  const parsed = new Date(iso);
+  return Number.isNaN(parsed.getTime()) ? undefined : parsed;
+}
+
+interface FlatComment {
+  readonly record: unknown;
+  /** The comment this one is nested under, when it is nested under one. */
+  readonly parentReplyExternalId?: string;
+}
+
+/**
+ * A tree of comments to a flat list, depth first, carrying the parent down.
+ *
+ * The actor answers with top-level comments, each holding its own `replies`
+ * array of the same shape. A nested reply carries no parent id of its own —
+ * `postId` names the post for every row, whatever its depth — so the tree is
+ * the only thing that says what a reply answers, and the link has to be taken
+ * from the walk before the nesting is discarded.
+ *
+ * Depth is bounded so that a malformed answer ends the walk rather than the
+ * process.
+ */
+export function flattenComments(
+  records: readonly unknown[],
+  parentReplyExternalId?: string,
+  depth = 0,
+): readonly FlatComment[] {
+  if (depth > 20) return [];
+
+  const out: FlatComment[] = [];
+
+  for (const record of records) {
+    const comment = objectOf(record);
+    if (!comment) continue;
+
+    out.push({ record, ...(parentReplyExternalId ? { parentReplyExternalId } : {}) });
+
+    const children = comment.replies;
+    const id = typeof comment.id === "string" ? comment.id : undefined;
+
+    if (Array.isArray(children) && children.length > 0 && id) {
+      out.push(...flattenComments(children, id, depth + 1));
+    }
+  }
+
+  return out;
+}
+
+interface ReplyContext {
+  readonly parentPostExternalId: string;
+  readonly position: number;
+  readonly parentReplyExternalId?: string;
+}
+
+/**
+ * One captured comment to one `CandidateReply`.
+ *
+ * Nothing here is built and nothing is repaired, which is unusual in this
+ * repository: the actor sends an id, a link that opens the comment, the words,
+ * an exact ISO date and an author, and a row missing any of them is dropped.
+ * The link was opened on 2026-09-17 and shows the post with that comment.
+ *
+ * **`postId` carries the urn and `id` does not**, which is the one trap in this
+ * shape. A comment says `urn:li:activity:7502584032971595776` where the post it
+ * hangs under is stored as `7502584032971595776`, so a parent check that
+ * compared them literally would drop every comment it was given. BUG-007's
+ * rule is applied to the bare id underneath.
+ */
+export function toCandidateReply(
+  record: unknown,
+  { parentPostExternalId, position, parentReplyExternalId }: ReplyContext,
+): CandidateReply | undefined {
+  const comment = objectOf(record);
+  if (!comment) return undefined;
+
+  const externalId = text(comment.id);
+  const url = text(comment.linkedinUrl);
+  const body = text(comment.commentary);
+  const postedAt = dateOf(comment.createdAt);
+
+  if (!externalId || !url || !body || !postedAt) return undefined;
+
+  const belongsTo = bareActivityId(text(comment.postId));
+  if (belongsTo && belongsTo !== parentPostExternalId) return undefined;
+
+  const author = text(objectOf(comment.actor)?.name);
+  const replyCount = objectOf(comment.engagement)?.comments;
+
+  return {
+    externalId,
+    url,
+    ...(author ? { author } : {}),
+    text: body,
+    postedAt,
+    parentPostExternalId,
+    ...(parentReplyExternalId ? { parentReplyExternalId } : {}),
+    threadPosition: position,
+    ...(typeof replyCount === "number" && Number.isFinite(replyCount) && replyCount >= 0
+      ? { replyCount }
+      : {}),
+  };
+}
+
+/**
+ * `urn:li:activity:7502584032971595776` to `7502584032971595776`.
+ *
+ * A value with no urn wrapper is returned as it is, because the actor is free
+ * to start sending the bare id and a parser that demanded the prefix would
+ * then drop everything.
+ */
+function bareActivityId(value: string | undefined): string | undefined {
+  if (!value) return undefined;
+
+  const last = value.split(":").at(-1);
+  return last && last !== "" ? last : undefined;
 }

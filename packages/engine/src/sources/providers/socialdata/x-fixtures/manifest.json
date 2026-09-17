@@ -52,6 +52,36 @@
       },
       "capturedAt": "2026-09-07T08:57:14.730Z",
       "identitiesReplaced": 0
+    },
+    {
+      "file": "comments-thread-search.json",
+      "request": {
+        "method": "GET",
+        "path": "/twitter/search?query=flaky%20tests%20min_replies%3A20&type=Latest",
+        "note": "finds a thread worth reading; not a fixture a test replays"
+      },
+      "capturedAt": "2026-09-16T17:06:44.610Z",
+      "identitiesReplaced": 107
+    },
+    {
+      "file": "comments-page-1.json",
+      "request": {
+        "method": "GET",
+        "path": "/twitter/tweets/2064431279383433646/comments",
+        "note": "the replies under 2064431279383433646, which claims 179"
+      },
+      "capturedAt": "2026-09-16T17:06:46.907Z",
+      "identitiesReplaced": 89
+    },
+    {
+      "file": "comments-page-2.json",
+      "request": {
+        "method": "GET",
+        "path": "/twitter/tweets/2064431279383433646/comments?cursor=2064518514145473007",
+        "note": "followed next_cursor from comments-page-1"
+      },
+      "capturedAt": "2026-09-16T17:06:49.572Z",
+      "identitiesReplaced": 69
     }
   ]
 }

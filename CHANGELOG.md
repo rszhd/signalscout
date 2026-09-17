@@ -17,6 +17,10 @@ described here; it is what `main` holds.
 
 ## Unreleased
 
+Nothing yet.
+
+## 0.3.0 — 2026-09-17
+
 **Changed.** `recordModelCall` requires `userId`. A consumer's own routes —
 drafts, query generation, project analysis, key tests — pass the session's
 account; the worker passes the monitor's owner. `model_calls.user_id` is

@@ -300,6 +300,7 @@ node packages/engine/src/sources/providers/socialcrawl/instagram-fixtures/captur
 node packages/engine/src/sources/providers/scrapecreators/tiktok-fixtures/capture.mjs   # 9 credits
 node packages/engine/src/sources/providers/scrapecreators/youtube-fixtures/capture.mjs  # 14 credits, 4 with --only=comments
 node packages/engine/src/sources/providers/scrapecreators/instagram-fixtures/capture.mjs # 6 credits
+node packages/engine/src/sources/providers/hikerapi/instagram-fixtures/capture.mjs       # 5 requests, about half a cent
 ```
 
 Everything from `capture:` down spends real money, and every one of them is an

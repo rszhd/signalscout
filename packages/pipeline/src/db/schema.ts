@@ -919,6 +919,17 @@ export const modelCalls = pgTable(
   "model_calls",
   {
     id: uuid("id").primaryKey().defaultRandom(),
+    /**
+     * Whose bill this call lands on. US-162.
+     *
+     * Not derived from the monitor: a draft, a query generation and a key
+     * test are written with no monitor, and those are exactly the calls a
+     * plan counts per account. Nullable only for the rows written before the
+     * column existed and having no monitor to be backfilled from; every
+     * insert since carries it, and `accountSpend` counts nothing it cannot
+     * attribute.
+     */
+    userId: text("user_id"),
     monitorId: uuid("monitor_id").references(() => monitors.id, { onDelete: "set null" }),
     postId: uuid("post_id").references(() => posts.id, { onDelete: "set null" }),
     /** Named, not chosen by the user: one provider per source, one per model. */
@@ -962,6 +973,8 @@ export const modelCalls = pgTable(
   (table) => [
     // The classifier counts a post's failures on this pair before every call.
     index("model_calls_monitor_post_idx").on(table.monitorId, table.postId),
+    /** `accountSpend` reads a month of one account. US-162. */
+    index("model_calls_user_created_idx").on(table.userId, table.createdAt),
     check("model_calls_outcome_known", oneOf("outcome", modelCallOutcomes)),
     check("model_calls_purpose_known", oneOf("purpose", modelCallPurposes)),
     check(

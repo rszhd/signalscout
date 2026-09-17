@@ -886,6 +886,7 @@ describe("the monitor routes", () => {
           await recordModelCall(db, {
             purpose: "classification",
             outcome: "scored",
+            userId: owner,
             monitorId: id,
             monitorVersion,
             postId: post?.id as string,

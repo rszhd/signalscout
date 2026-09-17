@@ -29,7 +29,7 @@
  * on the wire may have been billed without reporting a unit. docs/costs.md
  * says so to the user, and every screen carries the word "estimated".
  */
-import { and, eq, gte, inArray, sql } from "drizzle-orm";
+import { and, count, eq, gte, inArray, sql } from "drizzle-orm";
 import type { Database } from "../db/client.js";
 import {
   apiUsage,
@@ -317,6 +317,75 @@ export async function spendByMonitor(
   }
 
   return spend;
+}
+
+/** What one account spent since the start of the month, on every monitor and off them. */
+export interface AccountSpend {
+  readonly sourceMicros: number;
+  readonly modelMicros: number;
+  readonly totalMicros: number;
+  readonly since: Date;
+}
+
+/**
+ * Everything one account spent this month, from both ledgers, in one round
+ * trip. US-162.
+ *
+ * This is the number a plan's allowance is checked against, and it differs
+ * from `monitorSpend` in what it keeps: a cost test, a query generation, a
+ * draft and a key test carry no monitor and are on no monitor's cap, but
+ * they are the account's money all the same. Both ledgers carry `user_id`
+ * for exactly this read.
+ *
+ * A model call whose price is unknown sums as nothing, for `readSpend`'s
+ * reason. A model call written before the column existed and backfilled from
+ * no monitor has a null owner and is on nobody's month; the migration says
+ * so.
+ */
+export async function accountSpend(
+  db: Database,
+  userId: string,
+  now: Date = new Date(),
+): Promise<AccountSpend> {
+  const since = monthStart(now);
+  const result = await db.execute<{ source: string | null; model: string | null }>(sql`
+    select
+      (select sum(${apiUsage.estimatedCostMicros}) from ${apiUsage}
+        where ${apiUsage.userId} = ${userId} and ${apiUsage.day} >= ${dayOf(since)}) as source,
+      (select sum(${modelCalls.estimatedCostMicros}) from ${modelCalls}
+        where ${modelCalls.userId} = ${userId} and ${modelCalls.createdAt} >= ${since}) as model
+  `);
+  const row = result.rows[0];
+  const sourceMicros = toMicros(row?.source);
+  const modelMicros = toMicros(row?.model);
+
+  return { sourceMicros, modelMicros, totalMicros: sourceMicros + modelMicros, since };
+}
+
+/**
+ * How many reply drafts one account asked for this month. US-162.
+ *
+ * Every outcome counts: a draft the model refused was still asked for and
+ * still billed, and a plan that counted only the ones that worked would let
+ * a failing model hand out unlimited attempts.
+ */
+export async function draftsThisMonth(
+  db: Database,
+  userId: string,
+  now: Date = new Date(),
+): Promise<number> {
+  const [row] = await db
+    .select({ drafts: count() })
+    .from(modelCalls)
+    .where(
+      and(
+        eq(modelCalls.userId, userId),
+        eq(modelCalls.purpose, "draft_reply"),
+        gte(modelCalls.createdAt, monthStart(now)),
+      ),
+    );
+
+  return Number(row?.drafts ?? 0);
 }
 
 /** What one account has spent through one platform-and-provider pair. */

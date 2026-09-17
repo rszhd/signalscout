@@ -19,6 +19,30 @@ described here; it is what `main` holds.
 
 Nothing yet.
 
+## 0.3.0 — 2026-09-17
+
+**Changed.** `recordModelCall` requires `userId`. A consumer's own routes —
+drafts, query generation, project analysis, key tests — pass the session's
+account; the worker passes the monitor's owner. `model_calls.user_id` is
+added by pipeline migration 0060, which backfills it from the monitor where
+there is one. US-162.
+
+**Added.** `accountSpend(db, userId, now)` and `draftsThisMonth(db, userId,
+now)` from the budget module: one account's month across both ledgers, and
+its draft count, for a plan's allowance and limits. US-162.
+
+**Changed.** `machineKeysUsable` and `providerKeyEnvironment` take a
+`KeyPolicy` — `"account"` or `"instance"` — instead of a `SignupMode`. A
+consumer passing a signup mode gets a type error, and passes
+`keyPolicyOf(env)` or `loadKeyPolicyEnv()` instead. The default policy is the
+old behaviour: `instance` when signup is closed, `account` when open. US-161.
+
+**Added.** `MACHINE_KEYS` in `pipelineFields` and `signupEnvSchema`, the
+`keys` option on `startWorker`, and `sharedInstance(signup)`, which is what
+the webhook address guard and the shared signing secret now follow. A shared
+instance may set `MACHINE_KEYS=instance` to pay for every account's polls and
+model calls; the guard and the secret stay closed to its accounts. US-161.
+
 ## 0.2.0 — 2026-09-17
 
 **Changed.** Four connectors that declared `canFetchReplies: false` now read

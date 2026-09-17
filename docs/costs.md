@@ -136,6 +136,16 @@ the second is a bug while the first is a Tuesday.
 generation, triage and the pre-filter's embeddings alike — including the ones
 that were refused. A refusal is billed like an answer.
 
+Both tables carry `user_id`, and it is written by the caller rather than read
+off the monitor (US-162): a draft, a query generation, a cost test and a key
+test have no monitor, and they are the account's money all the same.
+`accountSpend` sums both ledgers for one account and one month in one read,
+and `draftsThisMonth` counts one purpose — that is the pair a hosted plan is
+checked against. A `model_calls` row from before the column existed was
+backfilled from its monitor; one with no monitor keeps a null owner and is on
+nobody's month, which is the same answer as an unknown price: *we cannot
+say*, never a guess.
+
 The `purpose` column is what makes the four tellable apart, and they are four
 different prices. One embedding call covers a batch of posts, so it carries the
 monitor and no single post: it is on the monitor's bill, which is where the cap

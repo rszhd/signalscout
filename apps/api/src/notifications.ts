@@ -4,7 +4,6 @@ import {
   deleteAccountWebhookSecret,
   generateAccountWebhookSecret,
   isPublicAddress,
-  machineKeysUsable,
   type NotificationEnv,
   notificationDefaults,
   notificationInputSchema,
@@ -13,6 +12,7 @@ import {
   readNotificationSettings,
   readWebhookSecretHint,
   saveNotificationSettings,
+  sharedInstance,
   webhookSecretEnvironment,
 } from "@signalscout/pipeline";
 import { z } from "zod";
@@ -197,7 +197,7 @@ export async function registerNotificationRoutes(
        * does. On a self-hosted instance a receiver on the owner's own network
        * is the normal case.
        */
-      if (request.body.webhookEnabled && !machineKeysUsable(signup)) {
+      if (request.body.webhookEnabled && sharedInstance(signup)) {
         const refusal = literalPrivateHost(request.body.webhookUrl);
         if (refusal) return reply.code(409).send({ message: refusal });
       }

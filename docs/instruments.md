@@ -245,6 +245,17 @@ of its calls are free — a search matching nothing answers 404 and charges 0, a
 page past the documented last one answers 400 and charges 0, and so does a key
 with no query — so on this platform a bad query costs nothing.
 
+The HikerAPI Instagram capture asks Instagram's own Reels-tab search, the
+native route US-120 could not find at ScrapeCreators. It spends 5 requests,
+about half a cent, and the ledger is the difference in `/sys/balance` around
+each call — read the run's total rather than a call's, because that counter
+lags and one call reads as refunded. Two things to know before running it:
+**a search matching nothing returns six unrelated reels and bills**, so there
+is no free "nothing" here, and a working key with no query answers 422 and is
+billed too. It sends `safe_int=true` on every call, because a media `pk` is
+nineteen digits and `JSON.parse` rounds it silently; a connector must send
+the same. US-160 holds what the three runs found.
+
 One lesson from the YouTube and Instagram captures together, because each paid
 to learn it: **read `comment_count` before asking for comments.** Both scripts
 first asked the first result in the page, got an empty comment page, billed for

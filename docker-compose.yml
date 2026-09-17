@@ -25,6 +25,9 @@ x-app-environment: &app-environment
   # closed | open. Closed is the self-hosted default: one account, and the
   # server refuses every attempt after it. See .env.example.
   AUTH_SIGNUP: ${AUTH_SIGNUP:-closed}
+  # account | instance, or empty for the default AUTH_SIGNUP implies. Whose
+  # keys a poll and a model call fall back to. See .env.example.
+  MACHINE_KEYS: ${MACHINE_KEYS:-}
   # off | required. Required sends a confirmation link and signs nobody in
   # until they open it. It needs SMTP_HOST and SMTP_FROM below, and the app
   # refuses to start without them. See .env.example.

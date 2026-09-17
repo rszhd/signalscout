@@ -134,6 +134,12 @@ screens, and a job with no key of its own does not run. That is a refusal you
 can see: the connections screen shows the key as missing and the monitor form
 says the monitor cannot start.
 
+That is the default, not the only shape. `MACHINE_KEYS=instance` keeps the
+keys in `.env` everybody's on an open instance — the hosted product runs that
+way and pays for its accounts. [docs/secrets.md](secrets.md), *Whose key is
+it*, says what still stays closed to a stranger's account when the keys do
+not.
+
 Until US-081 this was advice — *empty the keys out of `.env` before you open
 signup* — and advice is a thing somebody skips. It is now the behaviour. You may
 still leave the keys in `.env`: with signup open they are simply not offered to
@@ -304,6 +310,7 @@ UPDATE webhook_secrets    SET user_id = '<new>' WHERE user_id = '<old>';
 
 -- History, so the spend and poll screens keep answering:
 UPDATE api_usage          SET user_id = '<new>' WHERE user_id = '<old>';
+UPDATE model_calls        SET user_id = '<new>' WHERE user_id = '<old>';
 UPDATE poll_runs          SET user_id = '<new>' WHERE user_id = '<old>';
 UPDATE query_estimates    SET user_id = '<new>' WHERE user_id = '<old>';
 ```

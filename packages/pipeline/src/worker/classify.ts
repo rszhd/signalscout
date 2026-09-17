@@ -220,6 +220,7 @@ export function createClassifyStep({ classifierFor }: ClassifyOptions): Step<Cla
         purpose: "classification",
         outcome,
         call,
+        userId: monitor.userId,
         monitorId,
         monitorVersion: monitor.version,
         postId,

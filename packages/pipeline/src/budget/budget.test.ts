@@ -5,10 +5,12 @@ import { apiUsage, budgets, modelCalls, monitors } from "../db/schema.js";
 import { createTestDatabase, type TestDatabase } from "../testing/database.js";
 import { insertMonitor } from "../worker/testing.js";
 import {
+  accountSpend,
   budgetState,
   budgetStates,
   checkBudget,
   clearBudget,
+  draftsThisMonth,
   enforceBudget,
   formatMicros,
   monitorSpend,
@@ -355,6 +357,150 @@ describe("the budget guard", () => {
 
       expect(spend.get(first)?.totalMicros).toBe(3_000);
       expect(spend.get(second)?.totalMicros).toBe(0);
+    });
+  });
+
+  /**
+   * US-162. The number a plan's allowance is checked against. Its failure
+   * shape is the per-monitor cap's, one level up: money spent past a plan,
+   * silently, on the instance's own keys.
+   */
+  describe("what an account has spent this month", () => {
+    /**
+     * One model row with only the fields that vary between cases. A query
+     * generation by default: it is the call that carries no monitor, and the
+     * check constraint asks a classification for a version.
+     */
+    const modelCall = (
+      values: Partial<typeof modelCalls.$inferInsert> & { readonly createdAt: Date },
+    ) => ({
+      provider: "anthropic",
+      model: "test-model",
+      outcome: "scored" as const,
+      purpose: "query_generation" as const,
+      latencyMs: 10,
+      ...values,
+    });
+
+    it("adds both ledgers, on the account's monitors and off them", async () => {
+      const monitorId = await insertMonitor(database);
+
+      // On a monitor: a poll, and its classification.
+      await recordSourceUsage(db, {
+        userId: owner,
+        monitorId,
+        source: "reddit",
+        provider: "brightdata",
+        units: 10,
+        pricePerUnitMicros: redditPricePerRecord,
+        now: march,
+      });
+      await db.insert(modelCalls).values(
+        modelCall({
+          userId: owner,
+          monitorId,
+          purpose: "classification",
+          monitorVersion: 1,
+          estimatedCostMicros: 1_000,
+          createdAt: march,
+        }),
+      );
+      // Off every monitor: a cost test, and a draft. `monitorSpend` keeps
+      // these off every cap; this read is where they land.
+      await recordSourceUsage(db, {
+        userId: owner,
+        monitorId: null,
+        source: "reddit",
+        provider: "brightdata",
+        units: 10,
+        pricePerUnitMicros: redditPricePerRecord,
+        now: march,
+      });
+      await db.insert(modelCalls).values(
+        modelCall({
+          userId: owner,
+          purpose: "draft_reply",
+          estimatedCostMicros: 12_000,
+          createdAt: march,
+        }),
+      );
+
+      const spend = await accountSpend(db, owner, march);
+
+      expect(spend.sourceMicros).toBe(30_000);
+      expect(spend.modelMicros).toBe(13_000);
+      expect(spend.totalMicros).toBe(43_000);
+      expect(spend.since).toEqual(monthStart(march));
+    });
+
+    it("counts nothing from another account, and nothing from last month", async () => {
+      const february = new Date("2026-02-27T09:00:00.000Z");
+
+      await recordSourceUsage(db, {
+        userId: "user-2",
+        monitorId: null,
+        source: "reddit",
+        provider: "brightdata",
+        units: 10,
+        pricePerUnitMicros: redditPricePerRecord,
+        now: march,
+      });
+      await db
+        .insert(modelCalls)
+        .values([
+          modelCall({ userId: "user-2", estimatedCostMicros: 1_000, createdAt: march }),
+          modelCall({ userId: owner, estimatedCostMicros: 5_000, createdAt: february }),
+        ]);
+      await recordSourceUsage(db, {
+        userId: owner,
+        monitorId: null,
+        source: "reddit",
+        provider: "brightdata",
+        units: 10,
+        pricePerUnitMicros: redditPricePerRecord,
+        now: february,
+      });
+
+      const spend = await accountSpend(db, owner, march);
+
+      expect(spend.totalMicros).toBe(0);
+    });
+
+    /**
+     * A row from before the column existed, with no monitor to be backfilled
+     * from. It is on nobody's month rather than on a guessed one, and a
+     * price nobody configured is nothing rather than a guess: the same rule
+     * `monitorSpend` follows.
+     */
+    it("counts a call with no owner for nobody, and an unpriced call as nothing", async () => {
+      await db
+        .insert(modelCalls)
+        .values([
+          modelCall({ userId: null, estimatedCostMicros: 9_000, createdAt: march }),
+          modelCall({ userId: owner, estimatedCostMicros: null, createdAt: march }),
+          modelCall({ userId: owner, estimatedCostMicros: 250, createdAt: march }),
+        ]);
+
+      const spend = await accountSpend(db, owner, march);
+
+      expect(spend.modelMicros).toBe(250);
+    });
+
+    it("counts the account's drafts this month, whatever the model answered", async () => {
+      const february = new Date("2026-02-27T09:00:00.000Z");
+
+      await db.insert(modelCalls).values([
+        modelCall({ userId: owner, purpose: "draft_reply", createdAt: march }),
+        modelCall({ userId: owner, purpose: "draft_reply", outcome: "failed", createdAt: march }),
+        modelCall({ userId: owner, purpose: "draft_reply", outcome: "rejected", createdAt: march }),
+        // Not a draft, not this month, not this account.
+        modelCall({ userId: owner, purpose: "key_test", createdAt: march }),
+        modelCall({ userId: owner, purpose: "draft_reply", createdAt: february }),
+        modelCall({ userId: "user-2", purpose: "draft_reply", createdAt: march }),
+      ]);
+
+      expect(await draftsThisMonth(db, owner, march)).toBe(3);
+      expect(await draftsThisMonth(db, "user-3", march)).toBe(0);
     });
   });
 

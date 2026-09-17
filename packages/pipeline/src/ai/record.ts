@@ -24,6 +24,13 @@ export interface RecordModelCallInput {
   readonly purpose: ModelCallPurpose;
   readonly outcome: ModelCallOutcome;
   readonly call: ModelCall;
+  /**
+   * Whose bill it lands on. US-162. Required, and not read off the monitor:
+   * a draft, a query generation and a key test have none, and a plan counts
+   * those per account. The worker passes the monitor's owner; a route passes
+   * the session's.
+   */
+  readonly userId: string;
   /** Null before the monitor exists: the queries are written before it does. */
   readonly monitorId?: string | null;
   /**
@@ -44,6 +51,7 @@ export async function recordModelCall(
     purpose,
     outcome,
     call,
+    userId,
     monitorId = null,
     monitorVersion = null,
     postId = null,
@@ -51,6 +59,7 @@ export async function recordModelCall(
   }: RecordModelCallInput,
 ): Promise<void> {
   await db.insert(modelCalls).values({
+    userId,
     monitorId,
     monitorVersion,
     postId,

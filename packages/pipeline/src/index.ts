@@ -39,12 +39,15 @@ export {
   saveAiTaskSettings,
 } from "./ai/settings.js";
 export {
+  type AccountSpend,
+  accountSpend,
   type BudgetState,
   budgetState,
   budgetStates,
   checkBudget,
   clearBudget,
   createSpendMeter,
+  draftsThisMonth,
   enforceBudget,
   formatMicros,
   getBudget,

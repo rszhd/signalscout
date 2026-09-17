@@ -2076,3 +2076,16 @@ the guard and the secret follow `sharedInstance(signup)` alone. The compose
 test caught the variable missing from `docker-compose.yml`, which is the
 failure it exists for. Nothing has run live: the cloud will be the first
 instance to set `instance` with signup open.
+
+**A model call records whose account it was for, 2026-09-17 (US-162).** The
+hosted plans put a monthly allowance on an account, and the ledger could not
+sum one: `api_usage` carried `user_id` since BUG-009 and `model_calls` did
+not, and the calls a plan counts — a draft, a query generation, a key test —
+are the ones written with no monitor to join through. The column is written
+by the caller, never derived; `recordModelCall` requires it, and the type
+checker found all seven callers. Migration 0060 backfills from the monitor
+where there is one and leaves the rest null, which `accountSpend` counts for
+nobody, the same answer as an unknown price. `draftsThisMonth` counts every
+outcome on purpose: a plan that counted only the drafts that worked would let
+a failing model hand out unlimited attempts.
+

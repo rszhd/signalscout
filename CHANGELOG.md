@@ -17,6 +17,16 @@ described here; it is what `main` holds.
 
 ## Unreleased
 
+**Changed.** `recordModelCall` requires `userId`. A consumer's own routes —
+drafts, query generation, project analysis, key tests — pass the session's
+account; the worker passes the monitor's owner. `model_calls.user_id` is
+added by pipeline migration 0060, which backfills it from the monitor where
+there is one. US-162.
+
+**Added.** `accountSpend(db, userId, now)` and `draftsThisMonth(db, userId,
+now)` from the budget module: one account's month across both ledgers, and
+its draft count, for a plan's allowance and limits. US-162.
+
 **Changed.** `machineKeysUsable` and `providerKeyEnvironment` take a
 `KeyPolicy` — `"account"` or `"instance"` — instead of a `SignupMode`. A
 consumer passing a signup mode gets a type error, and passes

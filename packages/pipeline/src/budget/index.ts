@@ -1,10 +1,13 @@
 export {
+  type AccountSpend,
+  accountSpend,
   type BudgetState,
   budgetState,
   budgetStates,
   checkBudget,
   clearBudget,
   createSpendMeter,
+  draftsThisMonth,
   enforceBudget,
   formatMicros,
   getBudget,

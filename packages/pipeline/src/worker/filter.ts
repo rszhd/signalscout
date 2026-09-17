@@ -238,6 +238,7 @@ export function createFilterStep({
           purpose: "triage",
           outcome: outcome.status,
           call: outcome.call,
+          userId: monitor.userId,
           monitorId,
           postId: candidate.id,
           error: outcome.error ?? null,
@@ -376,6 +377,7 @@ export function createFilterStep({
         purpose: "embedding",
         outcome,
         call,
+        userId: monitor.userId,
         monitorId,
         // One call covers many posts, so it belongs to none of them. The row
         // is on the monitor's bill, which is where the cap reads it.

@@ -209,6 +209,7 @@ export async function registerProjectRoutes(
         purpose: "project_analysis",
         outcome: result.status === "ok" ? "scored" : result.status,
         call: result.call,
+        userId: sessionUserId(request),
         // No monitor and no version: this runs before either exists.
         monitorId: null,
         monitorVersion: null,

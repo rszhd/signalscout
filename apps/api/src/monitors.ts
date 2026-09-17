@@ -859,6 +859,7 @@ export async function registerMonitorRoutes(
         purpose: "query_generation",
         outcome: outcome.status === "generated" ? "scored" : outcome.status,
         call: outcome.call,
+        userId: sessionUserId(request),
         error: outcome.status === "generated" ? null : outcome.error,
       });
 

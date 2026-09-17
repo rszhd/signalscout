@@ -310,6 +310,7 @@ UPDATE webhook_secrets    SET user_id = '<new>' WHERE user_id = '<old>';
 
 -- History, so the spend and poll screens keep answering:
 UPDATE api_usage          SET user_id = '<new>' WHERE user_id = '<old>';
+UPDATE model_calls        SET user_id = '<new>' WHERE user_id = '<old>';
 UPDATE poll_runs          SET user_id = '<new>' WHERE user_id = '<old>';
 UPDATE query_estimates    SET user_id = '<new>' WHERE user_id = '<old>';
 ```

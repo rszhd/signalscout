@@ -116,12 +116,9 @@ eliminations, and the answer stands until somebody publishes a new search.
   account, and that call is free. The Posts dataset was not assessed.
 
   **SocialCrawl's endpoint now lists a `sort_by` parameter**, beside
-  `date_posted` and `content_type`, on its LinkedIn platform page. The
-  connector was switched off because the search is ordered by relevance, and
-  `notOffered` names a date order as the measurement that would bring it
-  back. The endpoint guide answers at zero credits, so ask it first — before
-  any candidate that needs a new account. It stays the dearest of the
-  measured three whatever the answer.
+  `date_posted`, on its LinkedIn platform page. It changes nothing: the owner
+  confirmed on 2026-09-17 that the connector is off on price, and a date
+  order does not make $0.2030 for fifty posts cheaper. Not worth a call.
 
   **Three routes read LinkedIn without Google, and each has a catch.**
 
@@ -152,6 +149,12 @@ eliminations, and the answer stands until somebody publishes a new search.
   Apify actor, and the Notes already say a second actor is not a second
   provider.
 
-  **The order to measure, then**: SocialCrawl's `sort_by` for free; Piloterr's
-  method by one call; Unipile only if the owner accepts a person's own account
-  as the credential.
+  **Piloterr's price, read from its pricing page.** Subscription only: $49 a
+  month buys 18,000 credits, about $0.0027 a credit, so a search call is
+  $0.003 to $0.005 against Apify's $0.002 a post. Cheaper per page if a page
+  holds more than a couple of posts; dearer for a self-hoster who would
+  otherwise spend cents. 500 free credits on signup, so the capture is free.
+
+  **The order to measure, then**: Piloterr's method by one call, and its
+  page size; Unipile only if the owner accepts a person's own account as the
+  credential.

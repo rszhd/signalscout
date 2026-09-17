@@ -221,3 +221,16 @@ owner's call, made once with both measurements in front of them.
   **Not measured**: a rate limit, an outage, hashtag search as a second
   route, and whether `/v2/fbsearch/topsearch` finds posts that are not
   reels. Every number here is one keyword on one day.
+- 2026-09-17T03:05+08:00 — **The owner read the measurement and rejected the
+  recommendation: no date window means the search cannot serve a monitor.**
+  That is the right reading of the numbers above. A poll asks for what is
+  new since the last one; a relevance-ordered page spanning two years with
+  no window and a third of it repeated on page two gives a poll no way to
+  ask that and no way to know when to stop. A cheap comment page is worth
+  nothing if the search cannot find the post it hangs on.
+
+  The one route left at this provider is `/v2/hashtag/medias/recent`, a
+  hashtag feed the spec describes as recent-first. If it is dated, ordered
+  and paged, a connector can stop at `since` the way `x.ts` does — at the
+  cost of the query generator writing hashtags for this platform rather
+  than phrases. One request would say. Not spent yet; the owner decides.

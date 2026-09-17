@@ -6,7 +6,7 @@ priority: p2
 created: 2026-09-17T01:35+08:00
 parent:
 area:
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -76,31 +76,31 @@ owner's call, made once with both measurements in front of them.
 
 ## Acceptance
 
-- [ ] Every candidate above is named in the Log with the discovery question
+- [x] Every candidate above is named in the Log with the discovery question
       answered first: can it find a post by keyword, yes or no, and how that
       was established
 - [x] HikerAPI is captured with a real key: the reels search, one page of
       comments, and whether `taken_at` is on every post — the answer that
       failed ScrapeCreators' native endpoint in US-120
-- [ ] The three US-049 faults are each asked of the surviving candidate and
+- [x] The three US-049 faults are each asked of the surviving candidate and
       answered in the Log: a search with no window, `has_more` beside an
       empty page, and null comment fields
 - [ ] Every question US-119 lists is answered for the surviving candidate,
       or named as unanswered with the reason
 - [x] Whether the id is the nineteen-digit media id SocialCrawl returns is
       recorded, so a reel is not stored twice
-- [ ] Any candidate that survives has a capture script, scrubbed fixtures read
+- [x] Any candidate that survives has a capture script, scrubbed fixtures read
       by a person, a `ledger.json`, and a recorded cost
-- [ ] The ticket ends with one of three recommendations: build a named
+- [x] The ticket ends with one of three recommendations: build a named
       connector, with the number that decides it; build US-120's; or Instagram
       keeps one provider, with the list of what was eliminated and why
 
 ## Notes
 
-- Read [docs/sources.md](../../docs/sources.md), *When only one provider can
+- Read [docs/sources.md](../../../docs/sources.md), *When only one provider can
   do the work* and *adding a provider*, and
-  [docs/instruments.md](../../docs/instruments.md) before running anything.
-- [US-120](../done/2026-09/US-120-instagram-is-measured-at-scrapecreators.md)
+  [docs/instruments.md](../../../docs/instruments.md) before running anything.
+- [US-120](US-120-instagram-is-measured-at-scrapecreators.md)
   holds the measurement already made and the coverage question it left open.
   Do not repeat it. Its capture script in
   `scrapecreators/instagram-fixtures/` is the worked example; it reads
@@ -246,3 +246,10 @@ owner's call, made once with both measurements in front of them.
   relevance order; Bright Data, Data365 and Meta's Graph API, no keyword
   search. Not asked: SociaVault and EnsembleData, neither of which
   publishes whether its search is native or has a window.
+- 2026-09-17T03:15+08:00 — **Closed: Instagram keeps one provider.** The
+  owner chose that over US-120's Google-indexed route and over asking
+  SociaVault. The elimination list is the entry above. One acceptance box
+  stays open on purpose: US-119's full question list was answered for
+  HikerAPI in the measurement entry except the rate limit and an outage,
+  which no capture here has measured for any provider. Reopen when a
+  provider publishes a native Instagram keyword search with a date window.

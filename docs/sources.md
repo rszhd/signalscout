@@ -179,11 +179,15 @@ it can discover a stranger, and not only whether it can fetch a URL.
 **Three platforms were measured at a second provider on 2026-09-11**, after
 the owner asked for two everywhere. **TikTok and YouTube now have two
 providers** — US-119 and US-121 measured them, US-126 and US-127 built them.
-Instagram is worth building there only if a Google-indexed search is acceptable
-as the *second* provider, which is the question US-055 answered no to when it
-was the *only* one; the owner has not decided, so it still has one. The
-evidence is in US-119, US-120 and US-121, and the capture scripts beside their
-fixtures re-ask everything.
+Instagram was worth building there only if a Google-indexed search is
+acceptable as the *second* provider, which is the question US-055 answered no
+to when it was the *only* one. **The owner decided on 2026-09-17: Instagram
+and LinkedIn keep one provider each.** US-160 measured HikerAPI, the one
+native Instagram search found, and it has no date window and orders by
+relevance across years, which cannot serve a poll; US-122 eliminated every
+LinkedIn route on price, on Google, or on needing the person's own account.
+The evidence is in US-119 to US-122 and US-160, and the capture scripts
+beside their fixtures re-ask everything.
 
 **Two things the ScrapeCreators build settled that are worth reading before the
 next connector there.** A search on that provider does not answer "nothing" the

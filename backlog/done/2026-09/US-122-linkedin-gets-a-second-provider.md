@@ -6,7 +6,7 @@ priority: p2
 created: 2026-09-11T18:44+08:00
 parent:
 area:
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -85,12 +85,12 @@ eliminations, and the answer stands until somebody publishes a new search.
 
 ## Notes
 
-- Read [docs/sources.md](../../docs/sources.md), *When only one provider can do
+- Read [docs/sources.md](../../../docs/sources.md), *When only one provider can do
   the work*. It holds the X elimination, which is the worked example for this
   ticket.
-- [US-054](../done/2026-09/US-054-linkedin-is-measured-at-the-other-provider.md),
-  [US-055](../done/2026-09/US-055-linkedin-is-fetched-through-scrapecreators.md)
-  and [US-056](../done/2026-09/US-056-linkedin-is-measured-at-apify.md) hold the
+- [US-054](US-054-linkedin-is-measured-at-the-other-provider.md),
+  [US-055](US-055-linkedin-is-fetched-through-scrapecreators.md)
+  and [US-056](US-056-linkedin-is-measured-at-apify.md) hold the
   three measurements already made. Do not repeat them.
 - Reviving SocialCrawl by deleting `notOffered` is not this ticket's answer
   unless the date window exists now. Check the endpoint guide first: SocialCrawl
@@ -213,3 +213,9 @@ eliminations, and the answer stands until somebody publishes a new search.
   offer, and this ticket stays open only for a decision on Unipile or for a
   provider that does not exist yet. Bright Data's one free confirming call,
   in the acceptance list, is still owed.
+- 2026-09-17T03:15+08:00 — **Closed: LinkedIn keeps one provider.** The
+  owner accepted one provider on both platforms rather than Unipile's
+  own-account model. Bright Data's confirming call was never sent; its
+  documentation's answer stands. Reopen when somebody publishes a keyword
+  search of LinkedIn posts behind a key a person can paste, at a price
+  under Apify's $0.002 a post or with a freshness Apify lacks.

@@ -2,7 +2,7 @@
 
 # Done
 
-127 finished.
+129 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
@@ -21,6 +21,7 @@
 | BUG-003 | [A post below the threshold is classified again on every poll](done/2026-09/BUG-003-a-post-below-the-threshold-is-classified-again-on-every-poll.md) | bug | fixed | 2026-09 |
 | BUG-002 | [A seven-day window is bought as a month](done/2026-09/BUG-002-a-seven-day-window-is-bought-as-a-month.md) | bug | fixed | 2026-09 |
 | BUG-001 | [A pending Reddit collection is not resumed](done/2026-09/BUG-001-a-pending-reddit-collection-is-not-resumed.md) | bug | shipped | 2026-09 |
+| US-160 | [Instagram gets a second provider](done/2026-09/US-160-instagram-gets-a-second-provider.md) | spike | shipped | 2026-09 |
 | US-159 | [Every offered connector reads replies](done/2026-09/US-159-every-connector-reads-replies.md) | feature | shipped | 2026-09 |
 | US-158 | [Reddit through Bright Data is switched off](done/2026-09/US-158-reddit-through-bright-data-is-switched-off.md) | chore | shipped | 2026-09 |
 | US-157 | [A consumer's tests can insert a monitor](done/2026-09/US-157-a-consumers-tests-can-insert-a-monitor.md) | chore | shipped | 2026-09 |
@@ -35,6 +36,7 @@
 | US-125 | [The inbox says new matches arrived](done/2026-09/US-125-the-inbox-says-new-matches-arrived.md) | feature | shipped | 2026-09 |
 | US-124 | [DeepSeek is a model provider](done/2026-09/US-124-deepseek-is-a-model-provider.md) | feature | — | 2026-09 |
 | US-123 | [Every screen works on a phone](done/2026-09/US-123-every-screen-works-on-a-phone.md) | chore | shipped | 2026-09 |
+| US-122 | [LinkedIn gets a second provider](done/2026-09/US-122-linkedin-gets-a-second-provider.md) | spike | shipped | 2026-09 |
 | US-121 | [YouTube is measured at ScrapeCreators](done/2026-09/US-121-youtube-is-measured-at-scrapecreators.md) | spike | shipped | 2026-09 |
 | US-120 | [Instagram is measured at ScrapeCreators](done/2026-09/US-120-instagram-is-measured-at-scrapecreators.md) | spike | shipped | 2026-09 |
 | US-119 | [TikTok is measured at ScrapeCreators](done/2026-09/US-119-tiktok-is-measured-at-scrapecreators.md) | spike | shipped | 2026-09 |

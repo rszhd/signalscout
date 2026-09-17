@@ -17,6 +17,10 @@ described here; it is what `main` holds.
 
 ## Unreleased
 
+Nothing yet.
+
+## 0.2.0 — 2026-09-17
+
 **Changed.** Four connectors that declared `canFetchReplies: false` now read
 replies: ScrapeCreators YouTube, SocialCrawl Reddit, SocialData X and Apify
 LinkedIn. A consumer that reads `canFetchRepliesFor` will offer replies on

@@ -17,6 +17,10 @@ described here; it is what `main` holds.
 
 ## Unreleased
 
+Nothing yet.
+
+## 0.4.0 — 2026-09-18
+
 **Added.** `AI_TRIAGE=on|off` switches the triage stage off for a whole
 deployment, and `triageIsOff` reads it. On is the default, so nothing changes
 for an instance that does not set it.

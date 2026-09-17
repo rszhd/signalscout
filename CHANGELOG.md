@@ -17,7 +17,21 @@ described here; it is what `main` holds.
 
 ## Unreleased
 
-Nothing yet.
+**Changed.** Four connectors that declared `canFetchReplies: false` now read
+replies: ScrapeCreators YouTube, SocialCrawl Reddit, SocialData X and Apify
+LinkedIn. A consumer that reads `canFetchRepliesFor` will offer replies on
+every offered platform, and a monitor with replies on will spend at the
+connector's `replyPricePerUnitMicros` — 1,880 on ScrapeCreators YouTube,
+40,590 on SocialCrawl Reddit, 200 on SocialData X and 2,000 on Apify LinkedIn.
+ScrapeCreators YouTube marks every reply `postedAtIsApproximate`. US-159.
+
+**Changed.** Bright Data's Reddit connector is `notOffered`. It still ships and
+still resumes a collection it started, and a recorded choice naming it is
+refused. US-158.
+
+**Added.** `Page.truncated` on the SocialCrawl client, set from the Reddit
+comment envelope. `flatten` from `socialcrawl/reddit`, `flattenComments` from
+`apify/linkedin`, and a `toCandidateReply` from each of the four connectors.
 
 ## 0.1.2 — 2026-09-16
 

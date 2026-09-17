@@ -17,7 +17,17 @@ described here; it is what `main` holds.
 
 ## Unreleased
 
-Nothing yet.
+**Changed.** `machineKeysUsable` and `providerKeyEnvironment` take a
+`KeyPolicy` — `"account"` or `"instance"` — instead of a `SignupMode`. A
+consumer passing a signup mode gets a type error, and passes
+`keyPolicyOf(env)` or `loadKeyPolicyEnv()` instead. The default policy is the
+old behaviour: `instance` when signup is closed, `account` when open. US-161.
+
+**Added.** `MACHINE_KEYS` in `pipelineFields` and `signupEnvSchema`, the
+`keys` option on `startWorker`, and `sharedInstance(signup)`, which is what
+the webhook address guard and the shared signing secret now follow. A shared
+instance may set `MACHINE_KEYS=instance` to pay for every account's polls and
+model calls; the guard and the secret stay closed to its accounts. US-161.
 
 ## 0.2.0 — 2026-09-17
 

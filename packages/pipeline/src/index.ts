@@ -63,6 +63,7 @@ export {
 } from "./budget/index.js";
 export {
   loadAiEnv,
+  loadKeyPolicyEnv,
   loadNotificationEnv,
   loadPipelineEnv,
   loadSignupEnv,
@@ -73,8 +74,13 @@ export {
   pipelineFields,
 } from "./config/env.js";
 export {
+  defaultKeyPolicy,
+  type KeyPolicy,
+  keyPolicies,
+  keyPolicyOf,
   machineKeysUsable,
   providerKeyEnvironment,
+  sharedInstance,
   webhookSecretEnvironment,
   withoutMachineModelKeys,
 } from "./config/machine-keys.js";

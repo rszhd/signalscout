@@ -6,6 +6,7 @@ import {
   encryptionKeyIsWellFormed,
 } from "@signalscout/engine";
 import { z } from "zod";
+import { type KeyPolicy, keyPolicies, keyPolicyOf } from "./machine-keys.js";
 import { type SignupMode, signupModes } from "./signup.js";
 
 /**
@@ -43,12 +44,26 @@ export function loadNotificationEnv(
  */
 export const signupEnvSchema = z.object({
   AUTH_SIGNUP: blankIsUnset(z.enum(signupModes).default("closed")),
+  MACHINE_KEYS: blankIsUnset(z.enum(keyPolicies).optional()),
 });
 
 export function loadSignupEnv(
   source: Record<string, string | undefined> = process.env,
 ): SignupMode {
   return signupEnvSchema.parse(source).AUTH_SIGNUP;
+}
+
+/**
+ * Whose keys pay, for a process that needs that and not the rest. US-161.
+ *
+ * Resolved here rather than left to the caller, so the worker and the
+ * application read one answer: `MACHINE_KEYS` when it is set, and otherwise
+ * the default the signup mode implies.
+ */
+export function loadKeyPolicyEnv(
+  source: Record<string, string | undefined> = process.env,
+): KeyPolicy {
+  return keyPolicyOf(signupEnvSchema.parse(source));
 }
 
 /**
@@ -102,6 +117,17 @@ export const pipelineFields = {
    * their money — to whoever found the address first.
    */
   AUTH_SIGNUP: blankIsUnset(z.enum(signupModes).default("closed")),
+
+  /**
+   * Whose keys pay: `account` or `instance`. US-161.
+   *
+   * Empty means the default for the signup mode — `instance` when closed,
+   * `account` when open — so nothing changes for a deployment that never
+   * sets it. `instance` with signup open is the hosted shape that pays for
+   * its accounts; `config/machine-keys.ts` says which rules still follow
+   * signup there.
+   */
+  MACHINE_KEYS: blankIsUnset(z.enum(keyPolicies).optional()),
 
   ...aiFields,
   ...notificationFields,

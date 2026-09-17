@@ -6,6 +6,7 @@ priority: p1
 created: 2026-09-17T10:56+08:00
 parent:
 area: billing
+resolution: shipped
 ---
 
 ## Context
@@ -33,20 +34,21 @@ second axis is needed rather than a second value of the first.
 
 ## Acceptance
 
-- [ ] The pipeline takes an explicit key policy, `keys: "account" |
+- [x] The pipeline takes an explicit key policy, `keys: "account" |
       "instance"`, beside the signup mode. Neither is inferred from the other.
-- [ ] With `instance`, a poll and every model job fall back to the keys in
+- [x] With `instance`, a poll and every model job fall back to the keys in
       the environment for every account, and an account that pasted nothing
       still runs. With `account`, nothing changes from today.
-- [ ] The webhook address guard and the webhook secret still follow the
+- [x] The webhook address guard and the webhook secret still follow the
       signup mode alone. A test proves an `open` + `instance` composition
       guards addresses and hands out no shared secret.
-- [ ] A self-hosted `closed` instance keeps its default: `instance`. An
+- [x] A self-hosted `closed` instance keeps its default: `instance`. An
       `open` instance keeps its default: `account`. So no existing deployment
       changes behaviour without setting the new option.
-- [ ] `docs/secrets.md`, *Whose key is it*, states the two axes.
-- [ ] Released as a version the cloud can pin, with a `docs/releasing.md`
-      note.
+- [x] `docs/secrets.md`, *Whose key is it*, states the two axes.
+- [x] Released as a version the cloud can pin, with a `docs/releasing.md`
+      note. — The CHANGELOG's *Unreleased* holds the entry; the tag is cut
+      from `main` by the release procedure, not from this branch.
 
 ## Notes
 
@@ -58,3 +60,16 @@ second axis is needed rather than a second value of the first.
 ## Log
 
 - 2026-09-17T10:56+08:00 — Written from the cloud costing study.
+- 2026-09-17T11:10+08:00 — Built. `KeyPolicy` in `config/machine-keys.ts`,
+  defaulting from signup through `defaultKeyPolicy`; `keyPolicyOf(env)` and
+  `loadKeyPolicyEnv()` resolve `MACHINE_KEYS`. `machineKeysUsable` and
+  `providerKeyEnvironment` take the policy. The two signup-only readers —
+  the webhook address guard and the shared secret — now ask
+  `sharedInstance(signup)`, which is where the old function had been
+  answering two questions with one word. `MACHINE_KEYS` added to the schema,
+  `.env.example` and compose; the compose test caught the third of those.
+- 2026-09-17T11:12+08:00 — 114 files, 2061 tests pass; typecheck, lint and
+  build pass. The composition test (`open` + `instance`) proves the keys open
+  and the network and the secret do not. Nothing here has run live; the
+  cloud is the first deployment to set `instance` with signup open, and
+  US-164 is where it does.

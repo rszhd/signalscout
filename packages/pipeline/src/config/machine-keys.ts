@@ -1,26 +1,71 @@
 /**
- * Whether a signed-in account may spend the keys in this machine's `.env`.
- * US-081.
+ * Whose keys the machine's `.env` holds, and who may spend them. US-081,
+ * then US-161.
  *
- * **Closed signup: yes. Open signup: no.**
+ * Two questions live here and they used to be one. **Is this instance
+ * shared?** — that is the signup mode, and it decides what a stranger's
+ * account may do to this machine: aim a webhook at our own network, or sign
+ * with a secret every other account holds. **Whose keys pay?** — that is the
+ * key policy, and it decides whether a poll and a model call may fall back to
+ * the keys in `.env`.
  *
- * The self-hosted instance is one person and their own machine, and `.env` is
- * how they configure it — US-067's environment half exists for exactly that.
- * An instance taking registrations is not that: a stranger who signs up would
- * poll on the owner's providers and classify on the owner's model key, and the
- * bill would arrive with nothing to say who spent it. docs/accounts.md has
- * warned about it in prose since US-067; this is the rule that stops it.
+ * US-081 answered both from signup alone: closed meant the keys were the one
+ * owner's, open meant they were nobody's. That was right for every instance
+ * that existed, and it was one rule, so every screen and every worker seam
+ * answered it the same way. US-161 needed the third shape — a shared instance
+ * that pays for its accounts — and there the two questions part: the keys are
+ * everybody's, and the network and the secret are still not. Flipping signup
+ * to closed would have opened all four doors to get two.
  *
- * It is one function because it is one decision, and every screen and every
- * worker seam has to answer it the same way. What each caller then does is the
- * same thing too: it hands the layers below an environment with the keys taken
- * out, so nothing downstream needs to know why they are missing.
+ * So the policy is explicit now, and it defaults from signup so that no
+ * deployment changes behaviour without asking for it: a self-hosted closed
+ * instance keeps `instance`, an open one keeps `account`.
+ *
+ * What a caller does with the answer is unchanged: it hands the layers below
+ * an environment with the keys taken out, so nothing downstream needs to know
+ * why they are missing.
  */
 import type { AiEnvironment } from "@signalscout/engine";
 import type { SignupMode } from "../config/signup.js";
 
-export function machineKeysUsable(signup: SignupMode): boolean {
-  return signup === "closed";
+/**
+ * `instance` — every account's polls and model calls may fall back to the
+ * keys in `.env`. `account` — nothing falls back; a job with no key of its
+ * own does not run.
+ */
+export const keyPolicies = ["account", "instance"] as const;
+export type KeyPolicy = (typeof keyPolicies)[number];
+
+/** The policy a deployment gets when it names none: US-081's rule. */
+export function defaultKeyPolicy(signup: SignupMode): KeyPolicy {
+  return signup === "closed" ? "instance" : "account";
+}
+
+/**
+ * The policy in force, from the two environment fields that decide it.
+ *
+ * `MACHINE_KEYS` when set, otherwise the default for the signup mode. One
+ * function so the worker and the application cannot resolve the pair two
+ * ways.
+ */
+export function keyPolicyOf(env: {
+  readonly AUTH_SIGNUP: SignupMode;
+  readonly MACHINE_KEYS?: KeyPolicy | undefined;
+}): KeyPolicy {
+  return env.MACHINE_KEYS ?? defaultKeyPolicy(env.AUTH_SIGNUP);
+}
+
+export function machineKeysUsable(keys: KeyPolicy): boolean {
+  return keys === "instance";
+}
+
+/**
+ * Whether strangers hold accounts here. US-097 and US-096 ask this, not the
+ * key policy: a webhook URL is a stranger's string whoever pays for the poll,
+ * and a signing secret shared by every account is forgeable whoever pays.
+ */
+export function sharedInstance(signup: SignupMode): boolean {
+  return signup === "open";
 }
 
 /**
@@ -55,6 +100,9 @@ export function withoutMachineModelKeys(env: AiEnvironment): AiEnvironment {
  * transfers because the shape is identical: a value that belongs to the machine
  * is not a value a stranger's account may act with. The harm differs — this one
  * is forgeable signatures rather than somebody else's bill — and it is worse.
+ * That is why it follows the signup mode and not the key policy (US-161): an
+ * instance that pays for its accounts' polls still must not let them sign as
+ * each other.
  *
  * With signup closed nothing changes: one person, one machine, one `.env`, and
  * every receiver they configured keeps verifying.
@@ -63,7 +111,7 @@ export function webhookSecretEnvironment(
   signup: SignupMode,
   environment: Record<string, string | undefined> = process.env,
 ): string | undefined {
-  return machineKeysUsable(signup) ? environment.WEBHOOK_SIGNING_SECRET : undefined;
+  return sharedInstance(signup) ? undefined : environment.WEBHOOK_SIGNING_SECRET;
 }
 
 /**
@@ -75,8 +123,8 @@ export function webhookSecretEnvironment(
  * monitor cannot start, and the worker's lookup finds nothing to fall back to.
  */
 export function providerKeyEnvironment(
-  signup: SignupMode,
+  keys: KeyPolicy,
   environment: Record<string, string | undefined> = process.env,
 ): Record<string, string | undefined> {
-  return machineKeysUsable(signup) ? environment : {};
+  return machineKeysUsable(keys) ? environment : {};
 }

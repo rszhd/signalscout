@@ -2062,3 +2062,17 @@ Two captures leaked identity on their first pass — six X handles through
 span — and both scrubbers grew the rule. None of the four has run a live poll
 with `includeReplies` on; the connectors are proven against captured payloads
 only.
+
+**Whose keys pay is its own setting, 2026-09-17 (US-161).** The hosted
+product is moving to instance keys — it pays the providers and the model, and
+a person who wants their own keys self-hosts — and the pipeline could not say
+so. `machineKeysUsable(signup)` answered four questions from one word: the
+provider keys, the model keys, the webhook address guard and the shared
+signing secret. A shared instance that pays for its accounts opens the first
+two and must keep the other two shut, and setting signup to `closed` on a
+shared box would have opened all four. So `MACHINE_KEYS` is a second axis,
+`account` or `instance`, defaulting from signup exactly as US-081 decided, and
+the guard and the secret follow `sharedInstance(signup)` alone. The compose
+test caught the variable missing from `docker-compose.yml`, which is the
+failure it exists for. Nothing has run live: the cloud will be the first
+instance to set `instance` with signup open.

@@ -12,6 +12,7 @@ import {
   type Database,
   draftConfigFromEnvironment,
   type JobSender,
+  keyPolicyOf,
   type Logger,
   machineKeysUsable,
   needsApiKey,
@@ -310,10 +311,10 @@ export function aiEnvironmentFor(
   db: Database,
   env: Env,
 ): (userId: string) => Promise<AiEnvironment> {
-  // On an instance taking registrations the machine's model keys are nobody's
-  // to spend, so the account's own settings are laid over an environment that
-  // has none. US-081, and `config/machine-keys.ts` holds the reasoning.
-  const instance = machineKeysUsable(env.AUTH_SIGNUP) ? env : withoutMachineModelKeys(env);
+  // Where the keys are an account's own, the machine's model keys are nobody's
+  // to spend, so the account's settings are laid over an environment that has
+  // none. US-081 and US-161; `config/machine-keys.ts` holds the reasoning.
+  const instance = machineKeysUsable(keyPolicyOf(env)) ? env : withoutMachineModelKeys(env);
 
   return (userId) => readAiEnvironment(db, userId, instance);
 }
@@ -406,9 +407,11 @@ export async function buildServer({
   });
   await registerNotificationRoutes(app, { db, env, encryption, signup: env.AUTH_SIGNUP });
 
-  // The provider keys an account may spend. Empty where signup is open, which
-  // every reader of it then answers correctly with no branch of its own.
-  const providerKeys = providerKeyEnvironment(env.AUTH_SIGNUP, environment);
+  // The provider keys an account may spend. Empty where the keys are an
+  // account's own, which every reader of it then answers correctly with no
+  // branch of its own.
+  const keys = keyPolicyOf(env);
+  const providerKeys = providerKeyEnvironment(keys, environment);
 
   await registerConnectionRoutes(app, {
     db,
@@ -423,7 +426,7 @@ export async function buildServer({
     // The same environment with the machine's model keys taken out where they
     // are nobody's to spend, so the screen's "this instance's key" is offered
     // only where there is one to offer. US-081.
-    env: machineKeysUsable(env.AUTH_SIGNUP) ? env : { ...env, ...withoutMachineModelKeys(env) },
+    env: machineKeysUsable(keys) ? env : { ...env, ...withoutMachineModelKeys(env) },
     encryption,
     ...(modelProbe ? { probe: modelProbe } : {}),
   });

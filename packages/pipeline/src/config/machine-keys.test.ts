@@ -1,17 +1,22 @@
 /**
- * Whose keys the machine's `.env` holds. US-081.
+ * Whose keys the machine's `.env` holds. US-081, then US-161.
  *
  * Correctness-critical: credential encryption's neighbour. The failure here is
  * not a leaked key but a spent one — a stranger who registers on an open
  * instance polling providers and classifying posts on the owner's keys, with
- * the bill arriving and nothing to say who spent it.
+ * the bill arriving and nothing to say who spent it. US-161 adds the other
+ * failure: an instance that chose to pay for its accounts, and in doing so
+ * opened its network and its signing secret to them.
  */
 
 import type { AiEnvironment } from "@signalscout/engine";
 import { describe, expect, it } from "vitest";
 import {
+  defaultKeyPolicy,
+  keyPolicyOf,
   machineKeysUsable,
   providerKeyEnvironment,
+  sharedInstance,
   webhookSecretEnvironment,
   withoutMachineModelKeys,
 } from "./machine-keys.js";
@@ -29,9 +34,28 @@ const instance: AiEnvironment = {
 };
 
 describe("whether the machine's keys are an account's to spend", () => {
-  it("is yes on a self-hosted instance and no on one taking registrations", () => {
-    expect(machineKeysUsable("closed")).toBe(true);
-    expect(machineKeysUsable("open")).toBe(false);
+  it("is what the key policy says", () => {
+    expect(machineKeysUsable("instance")).toBe(true);
+    expect(machineKeysUsable("account")).toBe(false);
+  });
+
+  /**
+   * US-081's rule, kept as the default so that no deployment changes
+   * behaviour by upgrading: a self-hosted instance keeps its keys, and one
+   * taking registrations keeps them out of every account's reach.
+   */
+  it("defaults from the signup mode: closed is instance, open is account", () => {
+    expect(defaultKeyPolicy("closed")).toBe("instance");
+    expect(defaultKeyPolicy("open")).toBe("account");
+
+    expect(keyPolicyOf({ AUTH_SIGNUP: "closed" })).toBe("instance");
+    expect(keyPolicyOf({ AUTH_SIGNUP: "open" })).toBe("account");
+    expect(keyPolicyOf({ AUTH_SIGNUP: "closed", MACHINE_KEYS: undefined })).toBe("instance");
+  });
+
+  it("takes an explicit policy over the default, either way", () => {
+    expect(keyPolicyOf({ AUTH_SIGNUP: "open", MACHINE_KEYS: "instance" })).toBe("instance");
+    expect(keyPolicyOf({ AUTH_SIGNUP: "closed", MACHINE_KEYS: "account" })).toBe("account");
   });
 
   /**
@@ -71,8 +95,43 @@ describe("whether the machine's keys are an account's to spend", () => {
   it("gives a provider-key lookup the environment, or nothing at all", () => {
     const environment = { BRIGHTDATA_API_KEY: "the-machine-key" };
 
-    expect(providerKeyEnvironment("closed", environment)).toEqual(environment);
-    expect(providerKeyEnvironment("open", environment)).toEqual({});
+    expect(providerKeyEnvironment("instance", environment)).toEqual(environment);
+    expect(providerKeyEnvironment("account", environment)).toEqual({});
+  });
+});
+
+/**
+ * The composition US-161 exists for: strangers hold accounts, and the
+ * instance pays for their polls. Paying opens the keys and nothing else.
+ */
+describe("a shared instance that pays for its accounts", () => {
+  const signup = "open" as const;
+  const keys = keyPolicyOf({ AUTH_SIGNUP: signup, MACHINE_KEYS: "instance" });
+  const environment = {
+    BRIGHTDATA_API_KEY: "the-machine-key",
+    WEBHOOK_SIGNING_SECRET: "the-instance-secret-32-characters-long",
+  };
+
+  it("lets every account poll and classify on the machine's keys", () => {
+    expect(machineKeysUsable(keys)).toBe(true);
+    expect(providerKeyEnvironment(keys, environment)).toEqual(environment);
+  });
+
+  it("still guards its own network from a stranger's webhook URL", () => {
+    // US-097 asks who registers, not who pays.
+    expect(sharedInstance(signup)).toBe(true);
+  });
+
+  it("still hands out no shared signing secret", () => {
+    // US-096: a secret every account holds is one any of them can forge with.
+    expect(webhookSecretEnvironment(signup, environment)).toBeUndefined();
+  });
+});
+
+describe("whether strangers hold accounts here", () => {
+  it("follows the signup mode alone", () => {
+    expect(sharedInstance("closed")).toBe(false);
+    expect(sharedInstance("open")).toBe(true);
   });
 });
 

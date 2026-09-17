@@ -36,6 +36,30 @@ prices are what the deployment was configured and measured for. With signup
 closed nothing changes, which is the point of tying the rule to signup rather
 than applying it everywhere.
 
+**Two questions, since US-161, and they used to be one.** *Is this instance
+shared?* is `AUTH_SIGNUP`. *Whose keys pay?* is `MACHINE_KEYS`, `account` or
+`instance`, and when it is empty it takes the answer signup implied all
+along: `instance` when closed, `account` when open. So nothing above changes
+for an instance that never sets it.
+
+The second variable exists for the third shape: a shared instance that pays
+for its accounts, which is what the hosted product runs. There the keys are
+everybody's — `MACHINE_KEYS=instance` with signup open — and two things
+deliberately do **not** open with them, because they follow signup and not the
+policy:
+
+- a webhook URL is still kept off the instance's own network (US-097), since
+  who pays for a poll says nothing about where a stranger may point us;
+- the instance's `WEBHOOK_SIGNING_SECRET` is still nobody's to sign with
+  (US-096), since a secret every account holds is one any of them can forge
+  with.
+
+Setting `AUTH_SIGNUP=closed` on a shared box to get the keys would have opened
+those two doors as well. That is why it is a second variable and not a second
+value of the first. An instance that pays for its accounts needs a guard on
+what they spend; the pipeline has the per-monitor cap and nothing above it,
+and the hosted product adds its own.
+
 **A model key follows the same rule, with two differences.** US-068 and
 US-079. The Models screen stores keys on the account, in `ai_keys`, encrypted
 the same way. Each of the four jobs — scoring, triage, similarity, drafting —

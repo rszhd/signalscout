@@ -36,10 +36,12 @@ import {
 } from "@signalscout/engine";
 import { PgBoss } from "pg-boss";
 import { readAiEnvironment as readAiSettingsEnvironment } from "../ai/settings.js";
-import { loadAiEnv, loadNotificationEnv, loadSignupEnv } from "../config/env.js";
+import { loadAiEnv, loadKeyPolicyEnv, loadNotificationEnv, loadSignupEnv } from "../config/env.js";
 import {
+  type KeyPolicy,
   machineKeysUsable,
   providerKeyEnvironment,
+  sharedInstance,
   webhookSecretEnvironment,
   withoutMachineModelKeys,
 } from "../config/machine-keys.js";
@@ -94,14 +96,23 @@ export interface StartWorkerOptions {
   databaseUrl: string;
   logger: Logger;
   /**
-   * Whether this deployment takes registrations. US-081.
+   * Whether this deployment takes registrations. US-081, US-097, US-096.
    *
-   * It decides one thing here and it is the expensive one: on an instance
-   * taking registrations the keys in `.env` are the machine's and not an
-   * account's, so a poll and a classification run on the owner's own stored
-   * keys or they do not run. Defaults to the environment, which is `closed`.
+   * Where it does, a webhook URL is a stranger's string and is kept off our
+   * own network, and the instance's signing secret is nobody's to sign with.
+   * Defaults to the environment, which is `closed`.
    */
   signup?: SignupMode;
+  /**
+   * Whose keys pay. US-161.
+   *
+   * `instance`: a poll and a model call fall back to the keys in `.env` for
+   * every account. `account`: they fall back to nothing, so a job with no key
+   * of its own does not run. Defaults to the environment, which defaults from
+   * `signup` — `instance` when closed, `account` when open — so a deployment
+   * that never set it behaves as it did.
+   */
+  keys?: KeyPolicy;
   /** The connectors to poll with. Defaults to the built-in ones over the real network. */
   registry?: SourceRegistry;
   /** Where source keys come from. US-004 replaces the environment with the database. */
@@ -352,6 +363,7 @@ export async function startWorker({
   notificationTransport,
   entitled = admitEveryone,
   signup = loadSignupEnv(),
+  keys = loadKeyPolicyEnv(),
 }: StartWorkerOptions): Promise<WorkerHandle> {
   // Before any provider is called. See `net.ts`: Node's 250ms per-address
   // connect budget is shorter than several providers take to answer.
@@ -376,11 +388,11 @@ export async function startWorker({
   }
 
   // The logger, so a key still read from its deprecated variable says so once.
-  // The environment half is empty where signup is open: a stranger's monitor
-  // must not poll on the machine's provider keys. US-081.
+  // The environment half is empty where the keys are an account's own: a
+  // monitor there must not poll on the machine's provider keys. US-081.
   const lookup =
     credentialsFor ??
-    credentialsFromStore(db, undefined, providerKeyEnvironment(signup, process.env), logger);
+    credentialsFromStore(db, undefined, providerKeyEnvironment(keys, process.env), logger);
 
   const sources =
     registry ??
@@ -420,7 +432,7 @@ export async function startWorker({
    * owner's.
    */
   const readAccountBaseEnvironment = () =>
-    machineKeysUsable(signup) ? readAiEnvironment() : withoutMachineModelKeys(readAiEnvironment());
+    machineKeysUsable(keys) ? readAiEnvironment() : withoutMachineModelKeys(readAiEnvironment());
 
   /**
    * The three model clients an account uses. US-068.
@@ -530,8 +542,10 @@ export async function startWorker({
             // US-097. Where a stranger may register, a webhook URL is a
             // stranger's string and this worker makes the request — so it may
             // not be aimed at an address inside our own network. Self-hosted
-            // the network is already the owner's and nothing changes.
-            guardAddresses: !machineKeysUsable(signup),
+            // the network is already the owner's and nothing changes. This
+            // follows signup and not the key policy: who pays for a poll says
+            // nothing about where a stranger may point us. US-161.
+            guardAddresses: sharedInstance(signup),
           }),
         {
           // US-094. Optional everywhere, so the button is offered where a

@@ -158,3 +158,29 @@ eliminations, and the answer stands until somebody publishes a new search.
   **The order to measure, then**: Piloterr's method by one call, and its
   page size; Unipile only if the owner accepts a person's own account as the
   credential.
+- 2026-09-17T02:05+08:00 — **Piloterr is eliminated without a key.** Its docs index no
+  longer lists a post search, the library page for it answers 404, and
+  `api.piloterr.com/v2/linkedin/advanced/post/search` answers
+  `403 Forbidden` — the same answer as a route that does not exist, where a
+  documented route without a key answers `401 No X-API-Key header`. The
+  product was withdrawn. LinkdAPI was checked the same hour and searches
+  people, companies and jobs, not posts.
+
+  **The candidate left is the "Real-Time LinkedIn Scraper API" on RapidAPI**
+  (`linkedin-data-api.p.rapidapi.com`, `POST /search-posts`). Its tutorial
+  documents `keyword`, `sortBy: date_posted | relevance` and
+  `datePosted: past-24h | past-week | past-month`, and the parameters mirror
+  LinkedIn's own `search/results/content/` URL field for field, so it reads
+  LinkedIn and not Google — unmeasured. One call is one credit and a failed
+  call is free. The plans, read from the listing: BASIC is free at 50
+  requests a month and asks for a company email and a LinkedIn profile URL
+  before approval; PRO is $175 a month for 50,000 credits, then $0.004 each.
+  So it is a subscription, and a dear one for a self-hoster; the question a
+  capture answers is how many posts one credit buys. A sibling listing,
+  "Fresh LinkedIn Profile Data", has a `POST /search-posts` at "1 credit per
+  every 20 results" on a $10 BASIC plan, and publishes no parameters; read
+  its playground with a RapidAPI login before choosing between the two.
+
+  `packages/engine/src/sources/providers/rapidapi/linkedin-fixtures/capture.mjs`
+  is the capture for the first one. It needs `RAPIDAPI_API_KEY` in `.env`,
+  spends five requests, and has run against a fake provider only.

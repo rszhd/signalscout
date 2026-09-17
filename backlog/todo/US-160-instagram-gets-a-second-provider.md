@@ -108,9 +108,12 @@ owner's call, made once with both measurements in front of them.
   two captures forgot.
 - `socialcrawl/instagram-fixtures/capture.mjs` asks the three US-049
   questions; ask them again of the new provider, word for word.
-- HikerAPI: https://hikerapi.com/ and the Swagger at
-  https://api.hikerapi.com/docs. The endpoint names above come from its
-  changelog; confirm them against the Swagger before writing a script.
+- HikerAPI: https://hikerapi.com/ and the OpenAPI document at
+  https://api.hikerapi.com/openapi.json, which is where the endpoint names
+  and the `safe_int` parameter come from.
+- `packages/engine/src/sources/providers/hikerapi/instagram-fixtures/capture.mjs`
+  is the capture. It needs `HIKERAPI_ACCESS_KEY` in `.env` and spends about
+  eight requests.
 - Apify: https://apify.com/apify/instagram-scraper and
   https://apify.com/viralanalyzer/instagram-keyword-search-scraper.
 - SociaVault: https://docs.sociavault.com/api-reference/instagram/reels.
@@ -122,3 +125,13 @@ owner's call, made once with both measurements in front of them.
 - 2026-09-17T01:35+08:00 — Written, after the owner said there is no good
   second choice on Instagram or LinkedIn. The candidate list above is desk
   research from public documentation; nothing in it has been measured.
+- 2026-09-17T02:05+08:00 — Wrote the HikerAPI capture script. It has run
+  against a fake provider and not against the real one. The dry run caught one thing worth
+  keeping: Instagram's media `pk` is nineteen digits, past what `JSON.parse`
+  keeps exactly, and three distinct reels deduplicated into one. The
+  provider's `safe_int=true` sends every big integer as a string, so the
+  script sends it on every call and a connector must too. Also confirmed
+  from the OpenAPI document: `/v2/fbsearch/reels` takes no date window at
+  all, so question 4 can only measure how wide a page is; `/v3/fbsearch/reels`
+  is marked deprecated for duplicate pages; and `/sys/balance` is free and
+  moves in real time, which is what the ledger reads.

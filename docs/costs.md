@@ -91,6 +91,15 @@ model made the bill 48% smaller; the same model on both stages made it 48%
 larger. The worker warns at startup when the two match. Choose a triage model
 cheaper than the classifier, or expect the stage to cost you money.
 
+**A deployment with no cheaper model should switch the stage off.** `AI_TRIAGE=off`
+does that, and US-177 added it because the alternative was worse than it looked:
+leaving `AI_TRIAGE_MODEL` blank does not switch triage off, it runs triage on
+the classifier's own model. With no price gap the stage costs 48% more *and*
+keeps the one risk a cascade has — a triage drop leaves no row, no inbox entry
+and nothing for a person to notice, and there is no better reader behind it to
+buy the mistake back. A cascade is worth its risk when the second reader is
+much dearer. When it is the same model, it is not.
+
 It has the same "no price until you set one" behaviour as an embedding.
 `AI_TRIAGE_INPUT_PRICE_MICROS` and `AI_TRIAGE_OUTPUT_PRICE_MICROS` fall back to
 the classifier's prices only while no separate triage model is named. Once one
@@ -359,7 +368,8 @@ or the filter ate it. So three things are true by design:
   so the threshold can be argued with using real data.
 - The Monitors screen shows how many posts each stage has kept from the model,
   and the whole filter can be turned off per monitor. Turning it off turns
-  triage off too: it is one of the filter's stages.
+  triage off too: it is one of the filter's stages. `AI_TRIAGE=off` turns the
+  triage stage off for the whole deployment while the rest of the filter runs.
 - Triage has no threshold to argue with, so its drops are the ones to read
   rather than to count. Only an explicit refusal drops an item — a timeout, a
   rate limit or an unreachable provider all pass it on — and every refusal is a

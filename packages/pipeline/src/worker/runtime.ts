@@ -33,6 +33,7 @@ import {
   type SourceRegistry,
   type Triager,
   triageConfigFromEnvironment,
+  triageIsOff,
 } from "@signalscout/engine";
 import { PgBoss } from "pg-boss";
 import { readAiEnvironment as readAiSettingsEnvironment } from "../ai/settings.js";
@@ -142,8 +143,9 @@ export interface StartWorkerOptions {
    * Unlike the embedder, this defaults to something rather than to nothing:
    * `triageConfigFromEnvironment` falls every setting back to the classifier's,
    * so a deployment that names no triage model still gets the stage. It is
-   * absent only when the classifier itself could not be built, because there is
-   * then no model to fall back to.
+   * absent when the classifier itself could not be built, because there is
+   * then no model to fall back to, and when `AI_TRIAGE=off` says the stage is
+   * not wanted (US-177).
    */
   triager?: Triager;
   /** The triage settings, when they do not come from the process environment. */
@@ -299,17 +301,29 @@ function embedderFromEnvironment(
 /**
  * Build the triager the environment describes.
  *
- * This returns none only when the model behind it cannot be built at all —
+ * It returns none in two cases. The model behind it cannot be built at all —
  * usually a missing key — and in that case the classifier is unconfigured too,
- * so nothing downstream would run either. There is no "triage is switched off"
- * deployment on purpose: the settings fall back to the classifier's, so the
- * question a deployment answers is which model triages, never whether one does.
+ * so nothing downstream would run either. Or `AI_TRIAGE=off` says the stage is
+ * not wanted: US-177 made that a real answer, because a triage call is not
+ * cheaper than the classification it avoids and a deployment running one model
+ * for both stages pays 48% more for a filter whose drops nothing can undo. The
+ * filter step already treats a missing triager as "nothing is dropped on
+ * triage", so there is no second path to write.
  */
 function triagerFromEnvironment(
   config: AiConfig,
   classifierModel: string | undefined,
   logger: Logger,
+  off = false,
 ): Triager | undefined {
+  if (off) {
+    logger.info(
+      { model: classifierModel },
+      "AI_TRIAGE=off: every post the free stages keep goes straight to the classifier",
+    );
+    return undefined;
+  }
+
   if (needsApiKey(config.provider) && !config.apiKey) {
     logger.error(
       { provider: config.provider, model: config.model },
@@ -488,6 +502,7 @@ export async function startWorker({
         triageConfig ?? triageConfigFromEnvironment(mine),
         own.classifier?.model,
         logger,
+        triageIsOff(mine),
       );
 
     modelCache.set(userId, own);
@@ -517,6 +532,7 @@ export async function startWorker({
       triageConfig ?? triageConfigFromEnvironment(readAiEnvironment()),
       model?.model,
       logger,
+      triageIsOff(readAiEnvironment()),
     );
 
   const pipeline: WorkerSteps = {

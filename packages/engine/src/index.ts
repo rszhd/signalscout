@@ -45,6 +45,7 @@ export {
   embeddingProviders,
   needsApiKey,
   triageConfigFromEnvironment,
+  triageIsOff,
 } from "./ai/config.js";
 export {
   createProjectDescriber,

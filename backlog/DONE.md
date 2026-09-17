@@ -2,7 +2,7 @@
 
 # Done
 
-131 finished.
+132 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
@@ -21,6 +21,7 @@
 | BUG-003 | [A post below the threshold is classified again on every poll](done/2026-09/BUG-003-a-post-below-the-threshold-is-classified-again-on-every-poll.md) | bug | fixed | 2026-09 |
 | BUG-002 | [A seven-day window is bought as a month](done/2026-09/BUG-002-a-seven-day-window-is-bought-as-a-month.md) | bug | fixed | 2026-09 |
 | BUG-001 | [A pending Reddit collection is not resumed](done/2026-09/BUG-001-a-pending-reddit-collection-is-not-resumed.md) | bug | shipped | 2026-09 |
+| US-177 | [A deployment can switch triage off](done/2026-09/US-177-a-deployment-can-switch-triage-off.md) | chore | shipped | 2026-09 |
 | US-162 | [A model call records whose account it was for](done/2026-09/US-162-a-model-call-records-whose-account-it-was-for.md) | feature | shipped | 2026-09 |
 | US-161 | [A shared instance may pay for every account's calls](done/2026-09/US-161-a-shared-instance-may-pay-for-every-account.md) | feature | shipped | 2026-09 |
 | US-160 | [Instagram gets a second provider](done/2026-09/US-160-instagram-gets-a-second-provider.md) | spike | shipped | 2026-09 |

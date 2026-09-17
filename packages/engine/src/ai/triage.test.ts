@@ -15,7 +15,7 @@
 import { APICallError } from "ai";
 import { MockLanguageModelV4 } from "ai/test";
 import { describe, expect, it } from "vitest";
-import { type AiConfig, triageConfigFromEnvironment } from "./config.js";
+import { type AiConfig, triageConfigFromEnvironment, triageIsOff } from "./config.js";
 import { createTriager, triageSchema } from "./triage.js";
 import type { ItemForTriage, MonitorProfile } from "./triage-prompt.js";
 import { buildTriageSystemPrompt } from "./triage-prompt.js";
@@ -252,6 +252,21 @@ describe("the triage settings", () => {
     expect(config.provider).toBe("openai");
     expect(config.model).toBe("gpt-5.6-terra");
     expect(config.apiKey).toBe("classifier-key");
+  });
+
+  /**
+   * US-177. The stage is not cheap in itself — a triage answer measured 113
+   * output tokens against a classification's 95 — so the whole saving is the
+   * price gap. A deployment with no gap is allowed to say so.
+   */
+  it("is on unless a deployment says off, and the settings stay readable either way", () => {
+    expect(triageIsOff(base)).toBe(false);
+    expect(triageIsOff({ ...base, AI_TRIAGE: "on" })).toBe(false);
+    expect(triageIsOff({ ...base, AI_TRIAGE: "off" })).toBe(true);
+
+    // The config still answers "how would it triage", because a capture that
+    // measures the stage builds a triager whatever the deployment runs.
+    expect(triageConfigFromEnvironment({ ...base, AI_TRIAGE: "off" }).model).toBe("gpt-5.6-terra");
   });
 
   it("uses the cheaper model when one is named, on the same key", () => {

@@ -48,6 +48,8 @@ export interface AiConfig {
 
 /** The environment variables this reads, named structurally so nothing cycles. */
 export interface AiEnvironment {
+  /** "off" switches the triage stage off entirely. US-177. Unset means on. */
+  readonly AI_TRIAGE?: "on" | "off";
   readonly AI_TRIAGE_MODEL?: string;
   readonly AI_TRIAGE_PROVIDER?: AiProvider;
   readonly AI_TRIAGE_API_KEY?: string;
@@ -213,6 +215,22 @@ export function embeddingConfigFromEnvironment(env: AiEnvironment): EmbeddingCon
  * embedding block gives: an Anthropic key sent to OpenAI fails every call and
  * the sentence a person reads points at the wrong thing.
  */
+/**
+ * Whether this deployment triages at all. US-177.
+ *
+ * Separate from the settings below on purpose: the config answers *how* to
+ * triage and this answers *whether* to, so a capture that measures the stage
+ * still builds a triager on a deployment that has switched it off.
+ *
+ * The stage's own comment says why "off" is a real answer: a triage call is
+ * not cheaper than the classification it avoids, so the saving is the price
+ * gap between the two models. Same model, no gap, and the stage costs 48%
+ * more while keeping the one risk a cascade has — a drop nothing can undo.
+ */
+export function triageIsOff(env: AiEnvironment): boolean {
+  return env.AI_TRIAGE === "off";
+}
+
 export function triageConfigFromEnvironment(env: AiEnvironment): AiConfig {
   const provider = env.AI_TRIAGE_PROVIDER ?? env.AI_PROVIDER;
   const sameProvider = provider === env.AI_PROVIDER;

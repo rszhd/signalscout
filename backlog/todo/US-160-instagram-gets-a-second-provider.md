@@ -234,3 +234,15 @@ owner's call, made once with both measurements in front of them.
   and paged, a connector can stop at `since` the way `x.ts` does — at the
   cost of the query generator writing hashtags for this platform rather
   than phrases. One request would say. Not spent yet; the owner decides.
+- 2026-09-17T03:10+08:00 — **The owner declined the hashtag route too: a
+  hashtag feed is not enough for a monitor.** HikerAPI is eliminated. The
+  capture and its fixtures stay as the evidence, the way US-055's work
+  stayed; nothing reads them.
+
+  Where Instagram stands: SocialCrawl is the one provider offered. The
+  routes measured or read this month and the reason each is out —
+  ScrapeCreators native, no date on any post (US-120); ScrapeCreators
+  reels, Google's index, owner undecided (US-120); HikerAPI, no window and
+  relevance order; Bright Data, Data365 and Meta's Graph API, no keyword
+  search. Not asked: SociaVault and EnsembleData, neither of which
+  publishes whether its search is native or has a window.

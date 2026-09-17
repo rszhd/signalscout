@@ -17,7 +17,21 @@ described here; it is what `main` holds.
 
 ## Unreleased
 
-Nothing yet.
+**Added.** `AI_TRIAGE=on|off` switches the triage stage off for a whole
+deployment, and `triageIsOff` reads it. On is the default, so nothing changes
+for an instance that does not set it.
+
+Set it to `off` when triage and classification would run the same model.
+Leaving `AI_TRIAGE_MODEL` blank does *not* switch the stage off — every triage
+setting falls back to the classifier's, so a blank model means triage runs on
+the classifier's own model, which is the most expensive arrangement available.
+US-030 measured why: a triage answer is not cheaper than the classification it
+avoids, so the whole saving is the price gap between two models, and with no
+gap the stage costs 48% more.
+
+`triageConfigFromEnvironment` is unchanged and still answers how a triager
+would be built, so a capture that measures the stage keeps working on a
+deployment that has switched it off.
 
 ## 0.3.0 — 2026-09-17
 

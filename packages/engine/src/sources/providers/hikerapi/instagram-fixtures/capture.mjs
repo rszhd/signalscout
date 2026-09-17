@@ -104,30 +104,56 @@ if (!accessKey) {
 const identityFields = new Set(["username", "full_name", "biography"]);
 
 /**
+ * Keys that name a person wherever they sit. The first run left `user_id`
+ * raw on every comment and every caption: it is the commenter's `pk` under
+ * a name that does not say so, outside any container the list below named.
+ */
+const alwaysPersonKeys = new Set(["user_id", "pk_id", "fbid_v2", "profile_pic_id"]);
+
+/**
  * `pk` is a primary key under a name that does not say whose. On a person it
  * is identity — US-120's first run let it through — and on a media it is the
  * nineteen-digit id question 3 exists to read, so only the one inside a
- * person container is replaced.
+ * person container is replaced. `strong_id__` and `id` are the same key
+ * under two more names.
  */
-const personKeyFields = new Set(["pk", "id", "fbid_v2", "strong_id__"]);
+const personKeyFields = new Set(["pk", "id", "strong_id__"]);
 
-/** Containers whose every field names one person. */
-const personContainers = new Set(["user", "owner", "author", "caption_user"]);
+/**
+ * Containers whose every field names one person. `ig_artist` is the music
+ * credit on a reel and `account_overlay_user` is the account a snippet
+ * overlay points at; the first run left both raw, because the list had been
+ * written from `user` alone. So the rule below also treats any object that
+ * carries `username` as a person, whatever its key: that is this provider's
+ * own shape, read off its own answer, not a guess about it.
+ */
+const personContainers = new Set([
+  "user",
+  "owner",
+  "author",
+  "caption_user",
+  "ig_artist",
+  "account_overlay_user",
+  "mentioned_user",
+  "coauthor_producers",
+  "sponsor_tags",
+]);
+
+function looksLikePerson(value) {
+  return typeof value?.username === "string" || value?.pk_id !== undefined;
+}
 
 /**
  * Instagram's media addresses are signed CDN URLs with an expiry in the query
  * string. They are most of the bytes and they stop being evidence within
- * hours, so each keeps its key and loses the address.
+ * hours. The first run matched them by key and missed 395 under keys the
+ * list did not name, so they are matched by host now, wherever they sit.
  */
-const mediaFields = new Set([
-  "url",
-  "profile_pic_url",
-  "profile_pic_url_hd",
-  "display_url",
-  "thumbnail_src",
-  "video_url",
-  "hd_profile_pic_url_info",
-]);
+function isCdnUrl(value) {
+  return /^https?:\/\/[^/]*(cdninstagram\.com|fbcdn\.net)\//i.test(value);
+}
+
+const scrubbedMedia = "https://scrubbed.invalid/media-url-expired.bin";
 
 const scrubbedText = "Scrubbed by capture.mjs. See docs/testing.md.";
 
@@ -145,23 +171,27 @@ function createScrubber() {
   }
 
   function scrub(value, insidePerson = false) {
+    // A string inside an array has no key: `sprite_urls: [...]` held twelve
+    // signed addresses the second run missed.
+    if (typeof value === "string" && isCdnUrl(value)) return scrubbedMedia;
     if (Array.isArray(value)) return value.map((child) => scrub(child, insidePerson));
     if (value === null || typeof value !== "object") return value;
 
+    const here = insidePerson || looksLikePerson(value);
+
     return Object.fromEntries(
       Object.entries(value).map(([key, child]) => {
-        if (mediaFields.has(key) && typeof child === "string" && child.startsWith("http")) {
-          return [key, "https://scrubbed.invalid/media-url-expired.bin"];
-        }
+        if (typeof child === "string" && isCdnUrl(child)) return [key, scrubbedMedia];
 
         // A person's key is a number on the wire without `safe_int` and a
         // string with it, and identity either way.
+        const isKey = typeof child === "string" || typeof child === "number";
         if (
-          insidePerson &&
-          personKeyFields.has(key) &&
-          (typeof child === "string" || typeof child === "number")
+          isKey &&
+          child !== "" &&
+          (alwaysPersonKeys.has(key) || (here && personKeyFields.has(key)))
         ) {
-          if (child !== "") return [key, pseudonym(child)];
+          return [key, pseudonym(child)];
         }
 
         if (identityFields.has(key) && typeof child === "string" && child !== "") {
@@ -174,19 +204,22 @@ function createScrubber() {
           const mediaId = child.match(/^(\d{15,})_(\d+)$/);
           if (mediaId) return [key, `${mediaId[1]}_${pseudonym(mediaId[2])}`];
 
-          if (insidePerson && key === "description") return [key, scrubbedText];
+          if (here && key === "description") return [key, scrubbedText];
 
           // A caption and a comment are the text this product classifies, so
-          // they are kept — and people write handles into both.
-          if (child.includes("@")) {
+          // they are kept — and people write handles and their own links
+          // into both.
+          if (child.includes("@") || child.includes("http")) {
             return [
               key,
-              child.replace(/@([A-Za-z0-9._]{2,})/g, (_m, handle) => `@${pseudonym(handle)}`),
+              child
+                .replace(/@([A-Za-z0-9._]{2,})/g, (_m, handle) => `@${pseudonym(handle)}`)
+                .replace(/https?:\/\/\S+/g, "https://scrubbed.invalid/link"),
             ];
           }
         }
 
-        return [key, scrub(child, insidePerson || personContainers.has(key))];
+        return [key, scrub(child, here || personContainers.has(key))];
       }),
     );
   }

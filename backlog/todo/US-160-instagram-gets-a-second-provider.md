@@ -79,7 +79,7 @@ owner's call, made once with both measurements in front of them.
 - [ ] Every candidate above is named in the Log with the discovery question
       answered first: can it find a post by keyword, yes or no, and how that
       was established
-- [ ] HikerAPI is captured with a real key: the reels search, one page of
+- [x] HikerAPI is captured with a real key: the reels search, one page of
       comments, and whether `taken_at` is on every post — the answer that
       failed ScrapeCreators' native endpoint in US-120
 - [ ] The three US-049 faults are each asked of the surviving candidate and
@@ -87,7 +87,7 @@ owner's call, made once with both measurements in front of them.
       empty page, and null comment fields
 - [ ] Every question US-119 lists is answered for the surviving candidate,
       or named as unanswered with the reason
-- [ ] Whether the id is the nineteen-digit media id SocialCrawl returns is
+- [x] Whether the id is the nineteen-digit media id SocialCrawl returns is
       recorded, so a reel is not stored twice
 - [ ] Any candidate that survives has a capture script, scrubbed fixtures read
       by a person, a `ledger.json`, and a recorded cost
@@ -135,3 +135,89 @@ owner's call, made once with both measurements in front of them.
   all, so question 4 can only measure how wide a page is; `/v3/fbsearch/reels`
   is marked deprecated for duplicate pages; and `/sys/balance` is free and
   moves in real time, which is what the ledger reads.
+- 2026-09-17T02:50+08:00 — **Measured. HikerAPI reads Instagram's own
+  search, every reel carries a date, and the id is SocialCrawl's.** Three
+  runs, the first two to fix the scrubber, about fifteen requests in all —
+  under two cents. The fixtures committed are the third run's.
+
+  **Question 1, the one that decides it: 12 of 12 reels carry `taken_at`**,
+  an epoch in seconds, on every page of every run. ScrapeCreators' native
+  endpoint carried none; this one carries all.
+
+  **The id is the same nineteen-digit media id SocialCrawl returns.**
+  `pk: "3864836943138356426"` here against `id: "3919322149840844514"` in
+  `socialcrawl/instagram-fixtures/search-keyword.json` — the same number
+  space, so a reel found through both is stored once. **It arrives as a
+  string only because `safe_int=true` is sent**; without it `JSON.parse`
+  rounds it, which the dry run proved by collapsing three reels into one.
+  A connector must send it on every call.
+
+  **A page is twelve reels, ordered by relevance, with no window to send.**
+  The first page for `flaky tests` ran 31 March to 16 September 2026 in one
+  run and 3 April 2024 to 30 August 2026 in another. Ten of the twelve were
+  about test automation; the other two were a chemistry lesson and a
+  medical reel that matched a word. Captions are long — median 830
+  characters, up to 1,680 — where SocialCrawl's Instagram search in US-049
+  measured a median of 26 on comments.
+
+  **Paging repeats, and it is not deterministic.** Page two, followed by
+  `reels_max_id` and `rank_token`, repeated 7, 6 and 3 of page one's twelve
+  across the three runs, and `page_index` on the *first* page came back 13
+  and 14. The provider marks its own `/v3/fbsearch/reels` deprecated for
+  "pagination issues with duplicate results"; the v2 one has them too. A
+  connector deduplicates by `pk` and treats a second page as a third of a
+  page's worth of new reels.
+
+  **`has_more` is true on every page, including the one that matches
+  nothing.** The impossible phrase returned six unrelated reels and was
+  billed. So this provider answers "nothing" the way ScrapeCreators' TikTok
+  and SocialCrawl's LinkedIn do: with something, for money. US-049's second
+  fault — `has_more` beside an *empty* page — did not reproduce, because
+  there is no empty page.
+
+  **Comments: 16 a page, every one with `pk`, `text`, `created_at` and a
+  `user`, and no field null on every comment.** US-049's third fault does
+  not reproduce. There is no permalink on a comment; Instagram's raw shape
+  never carries one, so a connector builds
+  `instagram.com/p/<code>/c/<pk>/` and somebody must open one before it
+  ships, by AGENTS.md's rule. `next_page_id` is a cursor. **The sample is
+  worthless as a lead sample**: the busiest reel was engagement bait
+  ("Comment PROMPTS I'll send you the full PDF") and its sixteen comments
+  ran a median of six characters — "Prompts", "🙌". The script's rule of
+  "the busiest reel" chose it; the next run should choose the busiest reel
+  whose caption is about the query.
+
+  **Money.** A refused key answers 401 and is free. A working key with no
+  query answers 422 and **is billed** — the pricing page says any answered
+  request is, 400 and 404 included. `/sys/balance` is free, but its
+  `requests` counter lags: the ledger shows one call at −1 and a run of
+  five billable calls moving the counter by three. Read a run's total, not
+  a call's. At $1.00 per thousand on the entry rate, a search page is
+  $0.001 and a comment page is $0.001, against $0.008 and $0.041 at
+  SocialCrawl. A search took 5.1 to 7.5 seconds; a comment page 2.1 to
+  3.6. The account's rate limit is one request a second.
+
+  **The scrubber was wrong three times, and reading the files caught each.**
+  `user_id` on every comment and caption is the commenter's `pk` under a
+  name outside any person container; `ig_artist` and
+  `account_overlay_user` are people the container list had not named; and
+  395 signed CDN addresses sat under keys the field list did not have,
+  then twelve more inside a bare array. The rules are by shape now — any
+  object with a `username` is a person, any `cdninstagram.com` or
+  `fbcdn.net` address is media — and the leak check found nothing on the
+  third run. One thing the rule cannot catch stays: a caption's hashtags,
+  and one hashtag on this page is a person's name. Captions are the text
+  this product classifies and every capture here keeps them.
+
+  **Recommendation: build it, as the second Instagram provider.** It is
+  native, so the objection to US-120's route does not apply; it is eight
+  times cheaper on search and forty times cheaper on comments than the one
+  offered; and it deduplicates against it. What it is not is a better
+  *finder* — relevance order over five years with no window means a poll
+  reads twelve and keeps the few inside `since`, every time. The provider
+  id would be `hikerapi`, the credential field `accessKey`, and the
+  vocabulary migration goes in the same change, by AGENTS.md's rule.
+
+  **Not measured**: a rate limit, an outage, hashtag search as a second
+  route, and whether `/v2/fbsearch/topsearch` finds posts that are not
+  reels. Every number here is one keyword on one day.

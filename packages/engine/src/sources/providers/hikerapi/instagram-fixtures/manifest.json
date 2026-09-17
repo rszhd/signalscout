@@ -1,0 +1,73 @@
+{
+  "capturedBy": "packages/engine/src/sources/providers/hikerapi/instagram-fixtures/capture.mjs",
+  "provider": "HikerAPI, Instagram: the native Reels-tab search and one page of comments",
+  "note": "Identity is replaced with stable pseudonyms. Signed CDN addresses are replaced because they expire within hours. Everything else is whole.",
+  "fixtures": [
+    {
+      "file": "comments-page-1.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.hikerapi.com/v2/media/comments?id=3869776049244941689&safe_int=true",
+        "note": "one page of comments on the busiest reel the search returned"
+      },
+      "capturedAt": "2026-09-17T02:33:19.772Z",
+      "identitiesReplaced": 77,
+      "bytes": 62586
+    },
+    {
+      "file": "credentials-accepted.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.hikerapi.com/v2/fbsearch/reels?safe_int=true",
+        "note": "a working key with no query: refused on the input, not on the key"
+      },
+      "capturedAt": "2026-09-17T02:32:57.452Z",
+      "identitiesReplaced": 0,
+      "bytes": 226
+    },
+    {
+      "file": "credentials-rejected.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.hikerapi.com/v2/fbsearch/reels?query=flaky+tests&safe_int=true",
+        "note": "sent with a deliberately invalid key"
+      },
+      "capturedAt": "2026-09-17T02:32:54.248Z",
+      "identitiesReplaced": 0,
+      "bytes": 157
+    },
+    {
+      "file": "search-no-results.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.hikerapi.com/v2/fbsearch/reels?query=zqxjkv+wobblefish+intentwatch+nonexistent+phrase&safe_int=true",
+        "note": "a phrase that cannot occur; the ledger says what it cost"
+      },
+      "capturedAt": "2026-09-17T02:33:17.107Z",
+      "identitiesReplaced": 29,
+      "bytes": 228066
+    },
+    {
+      "file": "search-page-1.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.hikerapi.com/v2/fbsearch/reels?query=flaky+tests&safe_int=true",
+        "note": "Instagram's own Reels-tab search: no Google in the path, no window to send"
+      },
+      "capturedAt": "2026-09-17T02:33:03.895Z",
+      "identitiesReplaced": 82,
+      "bytes": 491146
+    },
+    {
+      "file": "search-page-2.json",
+      "request": {
+        "method": "GET",
+        "url": "https://api.hikerapi.com/v2/fbsearch/reels?query=flaky+tests&reels_max_id=r%3Aa31c1e84928f4a619cbb2b3b4fd5421e&rank_token=de8e6029-23ab-45f6-984d-09c31d8d2908&safe_int=true",
+        "note": "followed reels_max_id and rank_token from search-page-1.json"
+      },
+      "capturedAt": "2026-09-17T02:33:10.585Z",
+      "identitiesReplaced": 75,
+      "bytes": 467241
+    }
+  ]
+}

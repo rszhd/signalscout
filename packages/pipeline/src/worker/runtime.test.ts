@@ -1,4 +1,5 @@
 import {
+  createLogger,
   type EncryptionKey,
   generateEncryptionKey,
   type Logger,
@@ -269,5 +270,60 @@ describe("a stored credential the worker cannot read", () => {
     // The pass and the fail of the check must differ, or it guards nothing.
     const worker = await startTestWorker(database);
     await worker.stop();
+  });
+});
+
+/**
+ * Whether the worker triages at all. US-177.
+ *
+ * `filter.test.ts` already proves that a worker with no triager drops nothing
+ * on triage. What is proved here is the wiring in front of that: the setting
+ * reaches the boot path and no triager is built. Unset is the interesting
+ * half — it does not mean "off", it means "triage on the classifier's own
+ * model", which is the arrangement that costs more than it saves.
+ */
+describe("AI_TRIAGE", () => {
+  let database: TestDatabase;
+
+  beforeAll(async () => {
+    database = await createTestDatabase("worker_triage_switch");
+  }, 60_000);
+
+  afterAll(async () => {
+    await database?.drop();
+  });
+
+  async function bootLines(value: string | undefined): Promise<string> {
+    const lines: string[] = [];
+    if (value === undefined) vi.stubEnv("AI_TRIAGE", "");
+    else vi.stubEnv("AI_TRIAGE", value);
+
+    const worker = await startWorker({
+      databaseUrl: database.url,
+      logger: createLogger({
+        level: "info",
+        name: "triage-switch-test",
+        destination: { write: (line: string) => lines.push(line) },
+      }),
+      registry: fakeRegistry(),
+      credentialsFor: () => ({ token: "test-token" }),
+      retry: fastRetries,
+      scheduleTicks: false,
+    });
+    await worker.stop();
+
+    return lines.join("\n");
+  }
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it("switches the stage off when a deployment says off", async () => {
+    expect(await bootLines("off")).toContain("AI_TRIAGE=off");
+  });
+
+  it("leaves the stage on when nothing is set, which is not the same as off", async () => {
+    expect(await bootLines(undefined)).not.toContain("AI_TRIAGE=off");
   });
 });

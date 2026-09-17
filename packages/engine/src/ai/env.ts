@@ -117,6 +117,18 @@ export const aiFields = {
   AI_DRAFT_INPUT_PRICE_MICROS: blankIsUnset(z.coerce.number().int().min(0).optional()),
   AI_DRAFT_OUTPUT_PRICE_MICROS: blankIsUnset(z.coerce.number().int().min(0).optional()),
 
+  /**
+   * Whether the worker triages at all. US-177.
+   *
+   * "on" is the default and every deployment's answer until one measures
+   * otherwise. "off" sends every post the free stages kept straight to the
+   * classifier, and is the right answer when triage and classification run
+   * the same model: `triage-prompt.ts` measured a triage answer at 113 output
+   * tokens against a classification's 95, so the stage is not cheap in itself
+   * and the whole saving is the price gap between two models. With no gap it
+   * costs 48% more and its mistakes are still permanent.
+   */
+  AI_TRIAGE: blankIsUnset(z.enum(["on", "off"]).default("on")),
   AI_TRIAGE_PROVIDER: blankIsUnset(z.enum(aiProviders).optional()),
   AI_TRIAGE_MODEL: blankIsUnset(z.string().min(1).optional()),
   AI_TRIAGE_API_KEY: blankIsUnset(z.string().min(1).optional()),

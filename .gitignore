@@ -42,3 +42,9 @@ worktrees/
 # symlinks into `.agents/`, which would be broken links for anyone else.
 .agents/
 .claude/skills/
+
+# `live:triage-score` writes one file per run. They hold excerpts of real
+# posts from a live database, so they stay out of the repository; the numbers
+# that matter go in the ticket.
+triage-score-*.json
+triage-score-cache-*.json

@@ -34,6 +34,8 @@
     "typecheck": "tsc --build",
     "capture:classifier": "tsx src/ai/fixtures/capture.ts",
     "capture:triage": "tsx src/ai/fixtures/capture-triage.ts",
+    "capture:scores": "tsx src/ai/fixtures/capture-scores.ts",
+    "capture:compare": "tsx src/ai/fixtures/compare-models.ts",
     "capture:queries": "tsx src/ai/fixtures/capture-queries.ts",
     "capture:embeddings": "tsx src/ai/fixtures/capture-embeddings.ts",
     "capture:comment-filter": "tsx src/ai/fixtures/capture-comment-filter.ts"

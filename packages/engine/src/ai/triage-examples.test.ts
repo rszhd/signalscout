@@ -23,6 +23,7 @@
  */
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
+import { pinnedTriageModel } from "./fixtures/pinned.js";
 import { triageSchema } from "./triage.js";
 
 /** What `capture-triage.ts` writes. Read from disk, the way examples.test.ts does. */
@@ -55,7 +56,10 @@ interface CapturedTriage {
 }
 
 const verdicts = JSON.parse(
-  readFileSync(new URL("./fixtures/triage-verdicts.json", import.meta.url), "utf8"),
+  readFileSync(
+    new URL(`./fixtures/triage-verdicts-${pinnedTriageModel}.json`, import.meta.url),
+    "utf8",
+  ),
 ) as CapturedTriage;
 
 const answers = verdicts.answers;
@@ -63,7 +67,7 @@ const answers = verdicts.answers;
 describe("what the model returned", () => {
   it("was captured from a real provider, not written here", () => {
     expect(verdicts.provider).toBe("openai");
-    expect(verdicts.model).toBe("gpt-5.6-luna");
+    expect(verdicts.model).toBe(pinnedTriageModel);
     expect(answers).toHaveLength(50);
   });
 
@@ -96,12 +100,17 @@ describe("what the model returned", () => {
    *
    * It is still not where the saving comes from. Read the next test.
    */
-  it("now spends fewer output tokens than a classification, since US-221", () => {
+  it("spends about what a classification spends on output", () => {
     const perItem = verdicts.usage.outputTokens / answers.length;
 
     // ai/fixtures/manifest.json: a classification is 78 to 105 output tokens.
-    expect(perItem).toBeLessThan(95);
+    // 123 on the first prompt, 80 after US-221 sharpened the question, 97
+    // after US-222 added the rules for junk. The thinking tracks the length of
+    // the question, and none of the three is far from a classification's own
+    // output. This band says only that: the answer being one word has never
+    // made the call cheap.
     expect(perItem).toBeGreaterThan(40);
+    expect(perItem).toBeLessThan(140);
   });
 
   /**
@@ -139,18 +148,19 @@ describe("what it kept and dropped", () => {
   it("drops almost all of the people answering, which is the saving", () => {
     expect(verdicts.counts.answering).toBe(26);
 
-    // 3 of 26 on 2026-09-18, and 6 before US-221. The bound sits below that 6:
-    // a prompt that stops asking what the author wants goes red here.
-    expect(verdicts.counts.answeringKept).toBeLessThanOrEqual(5);
+    // 6 before US-221, 3 after it, 2 after US-222. The bound sits below the
+    // first two: a prompt that stops asking what the author wants goes red.
+    expect(verdicts.counts.answeringKept).toBeLessThanOrEqual(4);
   });
 
-  it("keeps a quarter of all comments", () => {
+  it("keeps a sixth of all comments", () => {
     expect(verdicts.counts.comments).toBe(46);
 
-    // 13 on 2026-09-18, and 19 before US-221. Wide enough for the drift two
-    // runs on one day showed, narrow enough to notice the stage loosening.
-    expect(verdicts.counts.commentsKept).toBeGreaterThan(9);
-    expect(verdicts.counts.commentsKept).toBeLessThan(17);
+    // 19, then 13, then 8, across US-221 and US-222 on 2026-09-18. Wide enough
+    // for the drift two runs on one day showed, narrow enough to notice the
+    // stage loosening back.
+    expect(verdicts.counts.commentsKept).toBeGreaterThan(4);
+    expect(verdicts.counts.commentsKept).toBeLessThan(12);
   });
 
   /**
@@ -165,14 +175,32 @@ describe("what it kept and dropped", () => {
    * This is asserted rather than left in prose because the next person to edit
    * the prompt needs to know that this case exists and which way it went.
    */
-  it("refused one of the four people asking, and it is the one about native apps", () => {
+  /**
+   * Two of the four, and the count alone would read as a fault.
+   *
+   * US-029's `asking` label answers "is this person asking?". Triage is asked
+   * "could this be a person to reach, and do they want an answer?", which is
+   * not the same question, so a refused asker has to be read rather than
+   * counted.
+   *
+   * Both refusals are about a different product. One asks how to test a native
+   * Android app and the example monitor sells a browser test runner. The other
+   * asks whether Detox is useful, which is the same mismatch in fewer words;
+   * US-222 added the rule that made it a `no`, and
+   * `triage-scores-*.json` scores it **4**, so refusing it costs nothing.
+   *
+   * That is why the score fixture exists. A keep rate falling is not by itself
+   * bad news, and only a score beside the verdict can say which it is.
+   */
+  it("refused two of the four people asking, and both are about another product", () => {
     expect(verdicts.counts.asking).toBe(4);
-    expect(verdicts.counts.askingKept).toBe(3);
+    expect(verdicts.counts.askingKept).toBe(2);
 
     const refused = answers.filter((answer) => answer.role === "asking" && answer.verdict === "no");
 
-    expect(refused).toHaveLength(1);
-    expect(refused[0]?.item.excerpt).toContain("native android app");
+    expect(refused).toHaveLength(2);
+    expect(refused.map((answer) => answer.item.excerpt).join(" ")).toContain("native android app");
+    expect(refused.map((answer) => answer.item.excerpt).join(" ")).toContain("detox");
     expect(verdicts.monitor.product).toContain("web apps");
   });
 

@@ -1,7 +1,7 @@
 {
   "provider": "openai",
   "model": "gpt-5.6-luna",
-  "capturedAt": "2026-09-18T11:17:43.106Z",
+  "capturedAt": "2026-09-18T12:05:05.606Z",
   "note": "What a real triage model answered for every comment US-029 labelled by hand, plus PLAN.md's four worked example posts. `triage-examples.test.ts` replays these. The two numbers that decide the stage are here: how many people asking it kept, and how many people answering it dropped, which is the saving. A kept count below the total is not automatically a fault: the hand label says whether a person is asking, and triage is asked whether they are a person to reach, which is a different question. Two threads and 46 comments is not a distribution.",
   "monitor": {
     "product": "A test runner for web apps. You record a browser flow once and it keeps working when the UI changes.",
@@ -16,19 +16,19 @@
   "counts": {
     "items": 50,
     "comments": 46,
-    "askingKept": 3,
+    "askingKept": 2,
     "asking": 4,
-    "answeringKept": 3,
+    "answeringKept": 2,
     "answering": 26,
-    "neitherKept": 7,
+    "neitherKept": 4,
     "neither": 16,
-    "commentsKept": 13,
+    "commentsKept": 8,
     "unanswered": 0
   },
   "usage": {
-    "inputTokens": 44199,
-    "outputTokens": 4025,
-    "estimatedCostMicros": 13668
+    "inputTokens": 54049,
+    "outputTokens": 4864,
+    "estimatedCostMicros": 16649
   },
   "answers": [
     {
@@ -44,9 +44,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 867,
-      "outputTokens": 67,
-      "costMicros": 254
+      "inputTokens": 1064,
+      "outputTokens": 189,
+      "costMicros": 440
     },
     {
       "kind": "comment",
@@ -59,11 +59,11 @@
         "title": "Starting Automation from 0% as a QA Lead — How are you using AI, MCPs & Agents in QA?",
         "excerpt": "That's great insight — and one worth considering."
       },
-      "verdict": "yes",
+      "verdict": "no",
       "status": "scored",
-      "inputTokens": 860,
-      "outputTokens": 172,
-      "costMicros": 378
+      "inputTokens": 1057,
+      "outputTokens": 39,
+      "costMicros": 258
     },
     {
       "kind": "comment",
@@ -78,9 +78,9 @@
       },
       "verdict": "yes",
       "status": "scored",
-      "inputTokens": 870,
-      "outputTokens": 209,
-      "costMicros": 425
+      "inputTokens": 1067,
+      "outputTokens": 225,
+      "costMicros": 483
     },
     {
       "kind": "comment",
@@ -93,11 +93,11 @@
         "title": "Starting Automation from 0% as a QA Lead — How are you using AI, MCPs & Agents in QA?",
         "excerpt": "Imagine asking a community for help and not having the decency to actually produce the question yourself."
       },
-      "verdict": "yes",
+      "verdict": "no",
       "status": "scored",
-      "inputTokens": 870,
-      "outputTokens": 91,
-      "costMicros": 283
+      "inputTokens": 1067,
+      "outputTokens": 534,
+      "costMicros": 854
     },
     {
       "kind": "comment",
@@ -112,9 +112,9 @@
       },
       "verdict": "yes",
       "status": "scored",
-      "inputTokens": 859,
-      "outputTokens": 104,
-      "costMicros": 297
+      "inputTokens": 1056,
+      "outputTokens": 116,
+      "costMicros": 350
     },
     {
       "kind": "comment",
@@ -127,11 +127,11 @@
         "title": "Starting Automation from 0% as a QA Lead — How are you using AI, MCPs & Agents in QA?",
         "excerpt": "I wouldn't be surprised."
       },
-      "verdict": "maybe",
+      "verdict": "no",
       "status": "scored",
-      "inputTokens": 856,
-      "outputTokens": 169,
-      "costMicros": 374
+      "inputTokens": 1053,
+      "outputTokens": 16,
+      "costMicros": 230
     },
     {
       "kind": "comment",
@@ -146,9 +146,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 889,
-      "outputTokens": 40,
-      "costMicros": 226
+      "inputTokens": 1086,
+      "outputTokens": 46,
+      "costMicros": 272
     },
     {
       "kind": "comment",
@@ -163,9 +163,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 888,
-      "outputTokens": 48,
-      "costMicros": 235
+      "inputTokens": 1085,
+      "outputTokens": 43,
+      "costMicros": 269
     },
     {
       "kind": "comment",
@@ -180,9 +180,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 880,
-      "outputTokens": 43,
-      "costMicros": 228
+      "inputTokens": 1077,
+      "outputTokens": 16,
+      "costMicros": 235
     },
     {
       "kind": "comment",
@@ -197,9 +197,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 1040,
-      "outputTokens": 74,
-      "costMicros": 297
+      "inputTokens": 1237,
+      "outputTokens": 73,
+      "costMicros": 335
     },
     {
       "kind": "comment",
@@ -212,11 +212,11 @@
         "title": "Starting Automation from 0% as a QA Lead — How are you using AI, MCPs & Agents in QA?",
         "excerpt": "Analysis can be good if you give it access to extracted pw trace and application logs at aame time."
       },
-      "verdict": "yes",
+      "verdict": "no",
       "status": "scored",
-      "inputTokens": 872,
-      "outputTokens": 103,
-      "costMicros": 298
+      "inputTokens": 1069,
+      "outputTokens": 69,
+      "costMicros": 297
     },
     {
       "kind": "comment",
@@ -231,9 +231,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 909,
-      "outputTokens": 120,
-      "costMicros": 326
+      "inputTokens": 1106,
+      "outputTokens": 184,
+      "costMicros": 442
     },
     {
       "kind": "comment",
@@ -248,9 +248,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 869,
-      "outputTokens": 39,
-      "costMicros": 221
+      "inputTokens": 1066,
+      "outputTokens": 64,
+      "costMicros": 290
     },
     {
       "kind": "comment",
@@ -265,9 +265,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 912,
-      "outputTokens": 310,
-      "costMicros": 554
+      "inputTokens": 1109,
+      "outputTokens": 191,
+      "costMicros": 451
     },
     {
       "kind": "comment",
@@ -282,9 +282,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 943,
+      "inputTokens": 1140,
       "outputTokens": 54,
-      "costMicros": 253
+      "costMicros": 293
     },
     {
       "kind": "comment",
@@ -299,9 +299,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 953,
-      "outputTokens": 81,
-      "costMicros": 288
+      "inputTokens": 1150,
+      "outputTokens": 130,
+      "costMicros": 386
     },
     {
       "kind": "comment",
@@ -316,9 +316,9 @@
       },
       "verdict": "maybe",
       "status": "scored",
-      "inputTokens": 908,
-      "outputTokens": 149,
-      "costMicros": 360
+      "inputTokens": 1105,
+      "outputTokens": 253,
+      "costMicros": 525
     },
     {
       "kind": "comment",
@@ -331,11 +331,11 @@
         "title": "Starting Automation from 0% as a QA Lead — How are you using AI, MCPs & Agents in QA?",
         "excerpt": "Toolwise you can mix and match. Figure out how code reviews work at scale and how to measure cost. Fundementally you have a generator so it's output becomes a commodity. Set the expectation that you can trash at any point and recreate so the review process and measurement at scale it it's design and expectation should be solved first."
       },
-      "verdict": "no",
+      "verdict": "maybe",
       "status": "scored",
-      "inputTokens": 917,
-      "outputTokens": 16,
-      "costMicros": 203
+      "inputTokens": 1114,
+      "outputTokens": 283,
+      "costMicros": 562
     },
     {
       "kind": "comment",
@@ -348,11 +348,11 @@
         "title": "Starting Automation from 0% as a QA Lead — How are you using AI, MCPs & Agents in QA?",
         "excerpt": "Focus on wherever the weak spots are with the current manual test suites per Fintech app/system under test and help whoever has developed those first, then use the tools available to help you draft a test plan including an automation development/implementation plan - ensure you get buy-in from product team/s and do research based on the infra/system/platform/app contexts, designs and requirements of your Fintech test targets.\nOnce you've developed automated (or even just semi-automated) unit test scripts locally on your dev machine, use agentic IDEs like Claude Code to help you build out your test suites in your CI pipeline. I've had success with setting up both Gitea and Forgejo Actions and runners in my homelab for personal projects which has helped me to understand Gitlab runners as part of my day job - but your team may use other tools. Basically, each time you commit and merge/push test code changes to your repo it can triggers your CI suite to run a set of automated functional API/unit tests, plus more E2E tests with Playwright (I'm using Python version as my codebase is mostly Python/Flask based) but quite often you'll need to work with developers and DevOps colleagues on how to 'hand over' fully/successfully validated code for promotion from dev/test to later environments."
       },
-      "verdict": "maybe",
+      "verdict": "no",
       "status": "scored",
-      "inputTokens": 1115,
-      "outputTokens": 258,
-      "costMicros": 533
+      "inputTokens": 1312,
+      "outputTokens": 201,
+      "costMicros": 504
     },
     {
       "kind": "comment",
@@ -365,11 +365,11 @@
         "title": "Starting Automation from 0% as a QA Lead — How are you using AI, MCPs & Agents in QA?",
         "excerpt": "[deleted]"
       },
-      "verdict": "yes",
+      "verdict": "maybe",
       "status": "scored",
-      "inputTokens": 854,
-      "outputTokens": 156,
-      "costMicros": 358
+      "inputTokens": 1051,
+      "outputTokens": 282,
+      "costMicros": 549
     },
     {
       "kind": "comment",
@@ -384,9 +384,9 @@
       },
       "verdict": "yes",
       "status": "scored",
-      "inputTokens": 928,
-      "outputTokens": 72,
-      "costMicros": 272
+      "inputTokens": 1125,
+      "outputTokens": 158,
+      "costMicros": 415
     },
     {
       "kind": "comment",
@@ -401,9 +401,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 907,
-      "outputTokens": 75,
-      "costMicros": 271
+      "inputTokens": 1104,
+      "outputTokens": 97,
+      "costMicros": 337
     },
     {
       "kind": "comment",
@@ -418,9 +418,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 898,
-      "outputTokens": 71,
-      "costMicros": 265
+      "inputTokens": 1095,
+      "outputTokens": 44,
+      "costMicros": 272
     },
     {
       "kind": "comment",
@@ -435,9 +435,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 850,
-      "outputTokens": 56,
-      "costMicros": 237
+      "inputTokens": 1047,
+      "outputTokens": 108,
+      "costMicros": 339
     },
     {
       "kind": "comment",
@@ -452,9 +452,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 845,
-      "outputTokens": 65,
-      "costMicros": 247
+      "inputTokens": 1042,
+      "outputTokens": 62,
+      "costMicros": 283
     },
     {
       "kind": "comment",
@@ -469,9 +469,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 859,
-      "outputTokens": 47,
-      "costMicros": 228
+      "inputTokens": 1056,
+      "outputTokens": 77,
+      "costMicros": 304
     },
     {
       "kind": "comment",
@@ -486,9 +486,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 1070,
-      "outputTokens": 80,
-      "costMicros": 310
+      "inputTokens": 1267,
+      "outputTokens": 67,
+      "costMicros": 334
     },
     {
       "kind": "comment",
@@ -503,9 +503,9 @@
       },
       "verdict": "yes",
       "status": "scored",
-      "inputTokens": 844,
-      "outputTokens": 106,
-      "costMicros": 296
+      "inputTokens": 1041,
+      "outputTokens": 138,
+      "costMicros": 374
     },
     {
       "kind": "comment",
@@ -520,9 +520,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 844,
+      "inputTokens": 1041,
       "outputTokens": 41,
-      "costMicros": 218
+      "costMicros": 257
     },
     {
       "kind": "comment",
@@ -537,9 +537,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 838,
-      "outputTokens": 49,
-      "costMicros": 226
+      "inputTokens": 1035,
+      "outputTokens": 42,
+      "costMicros": 257
     },
     {
       "kind": "comment",
@@ -554,9 +554,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 865,
-      "outputTokens": 16,
-      "costMicros": 192
+      "inputTokens": 1062,
+      "outputTokens": 78,
+      "costMicros": 306
     },
     {
       "kind": "comment",
@@ -571,9 +571,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 847,
-      "outputTokens": 54,
-      "costMicros": 234
+      "inputTokens": 1044,
+      "outputTokens": 44,
+      "costMicros": 262
     },
     {
       "kind": "comment",
@@ -586,10 +586,10 @@
         "title": "Playwright is significantly better than Selenium.",
         "excerpt": "I thought detox was useful there. Is it not?"
       },
-      "verdict": "maybe",
+      "verdict": "no",
       "status": "scored",
-      "inputTokens": 846,
-      "outputTokens": 191,
+      "inputTokens": 1043,
+      "outputTokens": 158,
       "costMicros": 398
     },
     {
@@ -605,9 +605,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 845,
-      "outputTokens": 57,
-      "costMicros": 237
+      "inputTokens": 1042,
+      "outputTokens": 55,
+      "costMicros": 274
     },
     {
       "kind": "comment",
@@ -622,9 +622,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 859,
-      "outputTokens": 72,
-      "costMicros": 258
+      "inputTokens": 1056,
+      "outputTokens": 59,
+      "costMicros": 282
     },
     {
       "kind": "comment",
@@ -639,9 +639,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 880,
+      "inputTokens": 1077,
       "outputTokens": 16,
-      "costMicros": 195
+      "costMicros": 235
     },
     {
       "kind": "comment",
@@ -656,9 +656,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 873,
-      "outputTokens": 45,
-      "costMicros": 229
+      "inputTokens": 1070,
+      "outputTokens": 44,
+      "costMicros": 267
     },
     {
       "kind": "comment",
@@ -673,9 +673,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 861,
+      "inputTokens": 1058,
       "outputTokens": 16,
-      "costMicros": 191
+      "costMicros": 231
     },
     {
       "kind": "comment",
@@ -690,9 +690,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 840,
-      "outputTokens": 49,
-      "costMicros": 227
+      "inputTokens": 1037,
+      "outputTokens": 60,
+      "costMicros": 279
     },
     {
       "kind": "comment",
@@ -707,9 +707,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 847,
-      "outputTokens": 40,
-      "costMicros": 217
+      "inputTokens": 1044,
+      "outputTokens": 16,
+      "costMicros": 228
     },
     {
       "kind": "comment",
@@ -724,9 +724,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 864,
-      "outputTokens": 41,
-      "costMicros": 222
+      "inputTokens": 1061,
+      "outputTokens": 45,
+      "costMicros": 266
     },
     {
       "kind": "comment",
@@ -741,9 +741,9 @@
       },
       "verdict": "yes",
       "status": "scored",
-      "inputTokens": 845,
-      "outputTokens": 118,
-      "costMicros": 311
+      "inputTokens": 1042,
+      "outputTokens": 177,
+      "costMicros": 421
     },
     {
       "kind": "comment",
@@ -758,9 +758,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 857,
-      "outputTokens": 58,
-      "costMicros": 241
+      "inputTokens": 1054,
+      "outputTokens": 52,
+      "costMicros": 273
     },
     {
       "kind": "comment",
@@ -775,9 +775,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 870,
-      "outputTokens": 45,
-      "costMicros": 228
+      "inputTokens": 1067,
+      "outputTokens": 51,
+      "costMicros": 275
     },
     {
       "kind": "comment",
@@ -792,9 +792,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 878,
-      "outputTokens": 68,
-      "costMicros": 257
+      "inputTokens": 1075,
+      "outputTokens": 43,
+      "costMicros": 267
     },
     {
       "kind": "comment",
@@ -809,9 +809,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 919,
-      "outputTokens": 41,
-      "costMicros": 233
+      "inputTokens": 1116,
+      "outputTokens": 44,
+      "costMicros": 276
     },
     {
       "kind": "post",
@@ -826,9 +826,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 837,
-      "outputTokens": 57,
-      "costMicros": 236
+      "inputTokens": 1034,
+      "outputTokens": 16,
+      "costMicros": 226
     },
     {
       "kind": "post",
@@ -843,9 +843,9 @@
       },
       "verdict": "yes",
       "status": "scored",
-      "inputTokens": 845,
+      "inputTokens": 1042,
       "outputTokens": 16,
-      "costMicros": 188
+      "costMicros": 228
     },
     {
       "kind": "post",
@@ -860,9 +860,9 @@
       },
       "verdict": "yes",
       "status": "scored",
-      "inputTokens": 848,
-      "outputTokens": 44,
-      "costMicros": 222
+      "inputTokens": 1045,
+      "outputTokens": 16,
+      "costMicros": 228
     },
     {
       "kind": "post",
@@ -877,9 +877,9 @@
       },
       "verdict": "yes",
       "status": "scored",
-      "inputTokens": 859,
+      "inputTokens": 1056,
       "outputTokens": 16,
-      "costMicros": 191
+      "costMicros": 230
     }
   ]
 }

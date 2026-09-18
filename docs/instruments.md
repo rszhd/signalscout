@@ -17,8 +17,54 @@ spends money and a default would let a mistyped flag bill the wrong account.
 **Re-run one when its prompt, its schema or the model changes**, and put the
 numbers in the ticket.
 
-because an answer we wrote would be evidence about our own schema and none
-about the provider.
+## A change that can move a score is measured before it ships
+
+The triage prompt, the classifier prompt, the pre-filter, a threshold, a model:
+anything that changes what reaches an inbox runs the same loop, in this order.
+
+1. `capture:triage`, then `capture:scores` — the fifty hand-labelled items,
+   about three cents. Read whether the leads survived before reading anything
+   else.
+2. If that looks right, `live:triage-score` — everything this instance has
+   stored, every platform, posts and replies, about fifteen cents.
+3. Tighten or loosen, and go round again.
+
+**Every capture takes `--model=` and writes a file per model.** Trying a model
+is one command, not an edit to `.env` somebody has to remember to undo, and a
+second model never overwrites the first. `capture:compare` reads whatever has
+been captured and prints one table: kept, leads kept, the highest score
+refused, the junk still bought. It calls nothing.
+
+`ai/fixtures/pinned.ts` names the pair the product sends, and the tests read
+that pair. Changing a name there is a promotion and it is the last step: the
+suite goes red until the matching capture exists, because a pinned model with
+no recorded evidence is a claim nobody has checked.
+
+**A score is bought once and reused.** Triage feeds the classifier nothing — it
+decides only whether the call happens — so a score belongs to the item, its
+monitor and the classifier's prompt, never to the verdict. Both scoring
+instruments cache under a hash of the exact system prompt sent, so editing
+`prompt.ts`, editing a monitor or changing the model throws the cache away by
+itself. `--rescore` forces it. Two runs over the same fifty on one day differed
+by 2.4 points an item and by 11 on one of them, and that drift reads as triage
+having changed something when it has not.
+
+**`ai/triage-scores.test.ts` holds the same guard for CI.** It goes red the
+moment the classifier's prompt moves, because every recorded score is then a
+claim about a prompt that no longer exists. A red test there is not an
+assertion to fix: re-run the two captures and put the numbers in the ticket.
+
+**Both halves are needed and they answer different questions.** A keep rate
+says the stage drops more items; it never says the stage drops the right ones.
+Only a score beside a verdict says that, and a triage drop leaves no row and no
+score, so the classification has to be bought deliberately, outside the
+pipeline, to see it at all. A deleted lead is the one mistake in this product
+that nobody can notice in production.
+
+**Fifty items from two Reddit threads is not a distribution.** That is why step
+2 exists, and why it caps the sample per platform and kind: Reddit holds more
+than half of everything stored, so one undivided sample would be a Reddit
+measurement wearing six platforms' names.
 
 `live:model-probe` asks one provider whether it answers the call this product
 actually makes. It is the cheapest instrument here — one sentence in, one
@@ -49,6 +95,22 @@ how many people answering it dropped. Read the first one rather than counting
 it — a person asking for a native-app tool is asking, and a monitor selling a
 browser test runner should not reach them, so a refusal there is not
 automatically a fault.
+
+`capture:scores` scores those same fifty with the real classifier and puts the
+score beside the verdict, which is the only way to see what a triage drop was
+worth. Two numbers decide it and they pull apart: a drop at or above the
+threshold is a lead the product would have shown and now never will, and a kept
+item far below it is a classification the stage was meant to save and did not.
+It reads the verdicts file for the triage model it is joining with
+(`--triage-model=`, default the pinned one), so run `capture:triage` first.
+Fifty classifications: about a cent and a half on `gpt-5.6-luna`, fourteen on
+`gpt-5.6-terra`, and nothing at all on a re-run under the same prompt. It
+writes one file per pair of models, because a verdict from one model and a
+score from another is a fact about the two together.
+
+Both read `labelled-subjects.ts`, so the fifty are the same fifty in the same
+order. Two copies of that list would drift, and a score would then sit beside
+the wrong verdict without anything going red.
 
 `capture:embeddings` measures how near each of PLAN.md's five posts is to the
 example monitor, and records the similarities — not the vectors, which would be
@@ -146,6 +208,21 @@ reads comments **already stored**, calls no provider, and skips any the monitor
 has already paid to read. Use it rather than a second poll whenever the question
 is about the classifier and not about the connector — on Instagram that is
 almost always, because the connector's half is the expensive one.
+
+`live:triage-score` asks `capture:scores`'s question of everything this
+instance has stored, against the monitors the items were really collected for.
+It samples up to `--per-cell=` items for each platform and kind, runs triage and
+then classifies **every** sampled item whatever triage said, and reports the
+drops against each monitor's own `min_score` rather than one global number. That
+is the difference between it and `live:tiktok-comments`, which runs the real
+steps and therefore cannot see what the drops were worth. `--dry` prints the
+sample and the estimate and calls nothing.
+
+**It writes nothing** — no match, no drop, no `model_calls` row. An instrument
+that wrote matches would put its own experiment in somebody's inbox, and the
+spend would reach the budget guard for work no account asked for. The price of
+that choice is that the spend is invisible to every screen, so run it with a
+number in mind.
 
 `live:thread-loop` reads one deep thread through the **real loop** rather than
 one batch at a time. It sends a single job and everything after it is

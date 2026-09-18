@@ -115,14 +115,14 @@ export function createFilterStep({
   triagerFor,
 }: FilterOptions = {}): Step<FilterPayload> {
   return async function filter(
-    { monitorId, postIds },
+    { monitorId, postIds, walkId },
     { db, boss, logger }: StepContext,
   ): Promise<void> {
     const ids = [...postIds];
     const startedAt = new Date();
 
     if (ids.length === 0) {
-      await boss.send(classifyQueue, { monitorId, postIds: [] });
+      await boss.send(classifyQueue, { monitorId, postIds: [], walkId });
       return;
     }
 
@@ -167,6 +167,7 @@ export function createFilterStep({
           monitorId,
           userId: monitor.userId,
           stage: "filter",
+          walkId: walkId ?? null,
           startedAt,
           finishedAt: new Date(),
           outcome: "done",
@@ -191,6 +192,7 @@ export function createFilterStep({
       await boss.send(classifyQueue, {
         monitorId,
         postIds: survivors.map((candidate) => candidate.id),
+        walkId,
       });
 
       if (!monitor.includeReplies) return;
@@ -212,6 +214,7 @@ export function createFilterStep({
       await boss.send(repliesQueue, {
         monitorId,
         postIds: threads.map((candidate) => candidate.id),
+        walkId,
       });
     };
 

@@ -46,6 +46,8 @@ export interface StageRunRecord {
   readonly monitorId: string;
   readonly userId: string;
   readonly stage: StageName;
+  /** The collection it was part of, or null. US-203. */
+  readonly walkId?: string | null;
   readonly startedAt: Date;
   readonly finishedAt: Date;
   readonly outcome: StageOutcome;
@@ -57,8 +59,9 @@ export interface StageRunRecord {
   readonly stopReason?: StageStopReason | null;
 }
 
-export interface StageRun extends Omit<StageRunRecord, "units" | "estimatedCostMicros"> {
+export interface StageRun extends Omit<StageRunRecord, "units" | "estimatedCostMicros" | "walkId"> {
   readonly id: string;
+  readonly walkId: string | null;
   readonly units: number;
   readonly estimatedCostMicros: number;
   readonly detail: StageRunDetail | null;
@@ -88,6 +91,7 @@ export async function recordStageRun(
       monitorId: record.monitorId,
       userId: record.userId,
       stage: record.stage,
+      walkId: record.walkId ?? null,
       startedAt: record.startedAt,
       finishedAt: record.finishedAt,
       outcome: record.outcome,
@@ -153,6 +157,7 @@ function toStageRun(row: typeof stageRuns.$inferSelect): StageRun {
     monitorId: row.monitorId,
     userId: row.userId,
     stage: row.stage,
+    walkId: row.walkId ?? null,
     startedAt: row.startedAt,
     // The column is nullable because a row could be written at the start of a
     // run one day. Nothing writes one yet, so a null here reads as "it ended

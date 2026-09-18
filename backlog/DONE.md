@@ -2,7 +2,7 @@
 
 # Done
 
-133 finished.
+134 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
@@ -21,6 +21,7 @@
 | BUG-003 | [A post below the threshold is classified again on every poll](done/2026-09/BUG-003-a-post-below-the-threshold-is-classified-again-on-every-poll.md) | bug | fixed | 2026-09 |
 | BUG-002 | [A seven-day window is bought as a month](done/2026-09/BUG-002-a-seven-day-window-is-bought-as-a-month.md) | bug | fixed | 2026-09 |
 | BUG-001 | [A pending Reddit collection is not resumed](done/2026-09/BUG-001-a-pending-reddit-collection-is-not-resumed.md) | bug | shipped | 2026-09 |
+| US-203 | [A stage says which collection it belongs to](done/2026-09/US-203-a-stage-says-which-collection-it-belongs-to.md) | feature | shipped | 2026-09 |
 | US-201 | [A stage writes down what it did](done/2026-09/US-201-a-stage-writes-down-what-it-did.md) | feature | shipped | 2026-09 |
 | US-177 | [A deployment can switch triage off](done/2026-09/US-177-a-deployment-can-switch-triage-off.md) | chore | shipped | 2026-09 |
 | US-162 | [A model call records whose account it was for](done/2026-09/US-162-a-model-call-records-whose-account-it-was-for.md) | feature | shipped | 2026-09 |

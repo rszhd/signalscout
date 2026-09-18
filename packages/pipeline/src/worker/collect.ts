@@ -273,6 +273,20 @@ export function createCollectStep({ registry, credentialsFor }: CollectOptions):
     let stopReason: PollStopReason | null = null;
     /** Set once the collections in flight have been read. See `walkFor`. */
     let resuming = false;
+    /**
+     * The collection this poll belongs to, read once. US-203.
+     *
+     * Once, because it is used twice — the poll's own row and the filter job
+     * it sends — and two lookups could answer differently: the first writes a
+     * row the second would then read. The stages downstream carry it from
+     * here, so a filter and a classification say which collection they were
+     * part of rather than being guessed at by time.
+     */
+    let walk: string | null = null;
+    const walkId = async (): Promise<string> => {
+      walk ??= await walkFor(db, monitorId, resuming);
+      return walk;
+    };
 
     /**
      * Platforms that were actually asked, and the ones whose provider threw.
@@ -321,7 +335,7 @@ export function createCollectStep({ registry, credentialsFor }: CollectOptions):
         await recordPollRun(db, {
           monitorId,
           userId: monitor.userId,
-          walkId: await walkFor(db, monitorId, resuming),
+          walkId: await walkId(),
           startedAt,
           finishedAt: new Date(),
           outcome,
@@ -904,7 +918,11 @@ export function createCollectStep({ registry, credentialsFor }: CollectOptions):
 
       await finish(stopReason === "provider_wait" ? "waiting" : "collected");
 
-      await boss.send(filterQueue, { monitorId, postIds: stored.map((row) => row.id) });
+      await boss.send(filterQueue, {
+        monitorId,
+        postIds: stored.map((row) => row.id),
+        walkId: await walkId(),
+      });
     } catch (error) {
       /**
        * The step threw, and the row is the only thing that will remember.

@@ -94,7 +94,7 @@ function profileOf(monitor: typeof monitors.$inferSelect): MonitorProfile {
 
 export function createClassifyStep({ classifierFor }: ClassifyOptions): Step<ClassifyPayload> {
   return async function classify(
-    { monitorId, postIds },
+    { monitorId, postIds, walkId },
     { db, boss, logger }: StepContext,
   ): Promise<void> {
     const startedAt = new Date();
@@ -115,6 +115,7 @@ export function createClassifyStep({ classifierFor }: ClassifyOptions): Step<Cla
           monitorId,
           userId,
           stage: "classify",
+          walkId: walkId ?? null,
           startedAt,
           finishedAt: new Date(),
           ...record,
@@ -125,7 +126,7 @@ export function createClassifyStep({ classifierFor }: ClassifyOptions): Step<Cla
     };
 
     if (postIds.length === 0) {
-      await boss.send(notifyQueue, { monitorId, matchIds: [] });
+      await boss.send(notifyQueue, { monitorId, matchIds: [], walkId });
       return;
     }
 
@@ -174,7 +175,7 @@ export function createClassifyStep({ classifierFor }: ClassifyOptions): Step<Cla
         },
         monitor.userId,
       );
-      await boss.send(notifyQueue, { monitorId, matchIds: [] });
+      await boss.send(notifyQueue, { monitorId, matchIds: [], walkId });
       return;
     }
 
@@ -414,7 +415,7 @@ export function createClassifyStep({ classifierFor }: ClassifyOptions): Step<Cla
 
     // Sent before the throw below, on purpose. The matches above are written
     // and a failure on a later post must not hold back the ones that worked.
-    await boss.send(notifyQueue, { monitorId, matchIds });
+    await boss.send(notifyQueue, { monitorId, matchIds, walkId });
 
     /**
      * The threads whose next batch is now decidable. US-048.
@@ -438,7 +439,7 @@ export function createClassifyStep({ classifierFor }: ClassifyOptions): Step<Cla
     const threadIds = parents.map((row) => row.id).filter((id): id is string => id !== null);
 
     if (threadIds.length > 0) {
-      await boss.send(repliesQueue, { monitorId, postIds: threadIds });
+      await boss.send(repliesQueue, { monitorId, postIds: threadIds, walkId });
     }
 
     if (retryable > 0) {

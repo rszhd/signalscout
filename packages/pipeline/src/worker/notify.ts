@@ -29,7 +29,7 @@ export function createNotifyStep(
   transport: NotificationTransport,
   options: NotifyStepOptions = {},
 ): Step<NotifyPayload> {
-  return async ({ monitorId }, { db, logger }) => {
+  return async ({ monitorId, walkId }, { db, logger }) => {
     const startedAt = new Date();
     const pass = await processNotifications(db, monitorId, transport, startedAt, options);
 
@@ -57,6 +57,9 @@ export function createNotifyStep(
         monitorId,
         userId: monitor.userId,
         stage: "notify",
+        // Null on the sweep, which is the truth: `enqueueNotifications` is not
+        // a stage of a collection. US-203.
+        walkId: walkId ?? null,
         startedAt,
         finishedAt: new Date(),
         outcome: pass.sent > 0 ? "done" : "failed",

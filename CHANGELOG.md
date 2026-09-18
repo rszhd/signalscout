@@ -17,6 +17,10 @@ described here; it is what `main` holds.
 
 ## Unreleased
 
+Nothing yet.
+
+## 0.5.0 — 2026-09-18
+
 **Added.** `stage_runs`: one row per run of the filter, replies, classify and
 notify steps, written by the step itself. `readStageRuns(db, userId,
 monitorId, limit)` answers for one monitor, newest first, scoped by owner, the

@@ -111,8 +111,16 @@ export const embeddingDimensions = 1536;
  * committed instrument*: a threshold set too high discards good leads before
  * anyone sees them, and a silent false negative is worse than a noisy inbox
  * because nobody can tell it happened. The instrument that produced this
- * number is `ai/fixtures/capture.mjs`, which scores PLAN.md's four worked
+ * number is `ai/fixtures/capture.ts`, which scores PLAN.md's four worked
  * examples and prints the totals; re-run it before moving this.
+ *
+ * **50 was tried and put back, US-223.** The hosted instance had 26 of 40
+ * monitors set to 50 by hand, which is a default most people overrode, and the
+ * measurements on 2026-09-18 supported the higher bar. It was reverted anyway:
+ * moving it alters the column default, so every consumer takes a migration for
+ * a number each monitor can already set for itself. The real gap is that no
+ * screen shows a monitor its own threshold, and a default is the wrong place
+ * to fix a missing control.
  */
 export const defaultMinimumScore = 30;
 

@@ -17,6 +17,10 @@ described here; it is what `main` holds.
 
 ## Unreleased
 
+Nothing yet.
+
+## 0.6.0 — 2026-09-18
+
 **Added.** `stage_runs.walk_id`: the collection a stage belonged to, the same
 id `poll_runs.walk_id` carries. Every pipeline payload after the poll now
 carries `walkId`, and each step passes it to the next, so a filter and a

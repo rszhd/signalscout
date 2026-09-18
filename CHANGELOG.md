@@ -19,6 +19,8 @@ versioned and is not described here; it is what `main` holds.
 
 ## Unreleased
 
+## 0.9.0 — 2026-09-19
+
 **Added.** `accountSpendSince(db, userId, since)` and
 `draftsSince(db, userId, since)` (US-216): the same two reads over a window
 the caller chooses instead of the calendar month. `accountSpend` and

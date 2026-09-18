@@ -40,6 +40,13 @@ ever. Every version here is permanent and somebody else may be running it.
 2. Decide the number. Before 1.0, a change that a consumer must react to —
    a renamed export, a changed option, a table that moved streams — moves
    the minor; anything else moves the patch.
+
+   **A fix stays a patch even when it adds something.** 0.6.1 corrected a
+   count and added an optional field beside it to explain the correction, and
+   was first cut as a minor on the strength of the new field alone. Ask what a
+   consumer *must* do: nothing, if the number simply becomes right and the new
+   field can be ignored. A release number is a promise about that, not a
+   measure of how much was written.
 3. Move what is under *Unreleased* in [CHANGELOG.md](../CHANGELOG.md) to a
    heading with the new number and the date, in the same pull request or the
    next one. It is short by design: what a consumer must know, not what the

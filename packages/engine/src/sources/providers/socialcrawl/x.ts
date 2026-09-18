@@ -352,6 +352,21 @@ export class SocialCrawlXSource implements SocialSource {
     const posts = request.limit === undefined ? wanted : wanted.slice(0, request.limit);
 
     return {
+      /**
+       * The term this page came from, before the operators were added. US-212.
+       *
+       * The phrase the monitor holds, not the string sent to the provider: a
+       * screen showing `from:someone since:2026-09-18` would be showing this
+       * connector's own syntax back to the person who wrote two words.
+       */
+      ...(this.listFor(request.query, start.phase)[start.index] === undefined
+        ? {}
+        : {
+            foundBy: {
+              kind: start.phase === "keyword" ? ("query" as const) : ("channel" as const),
+              value: this.listFor(request.query, start.phase)[start.index] as string,
+            },
+          }),
       posts,
       unitsConsumed: page.creditsUsed,
       next: this.nextAfter(request, start, page, collected, wanted.length),

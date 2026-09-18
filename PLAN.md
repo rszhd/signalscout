@@ -160,6 +160,9 @@ Especially useful for:
 
 # Monitoring flow
 
+This is the shape. [docs/pipeline.md](docs/pipeline.md) is how it runs: the
+caps, the cursors, and which row each step leaves behind.
+
 ```text
 Reddit ─────┐
             │

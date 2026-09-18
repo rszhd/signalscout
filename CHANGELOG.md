@@ -21,6 +21,24 @@ versioned and is not described here; it is what `main` holds.
 
 Nothing yet.
 
+## 0.8.0 — 2026-09-18
+
+**Added.** `post_discoveries`: which of a monitor's phrases or channels found
+which post. A connector answers `foundBy` on each page — one request carries
+one input, so the page shares an answer — and the poll writes one row per
+monitor, post and input. A post returned by two phrases keeps both: it was
+earned by both, and the poll paid for both searches.
+
+`queryPerformance(db, userId, monitorId)` reads it back, best first: posts
+found, matches, the best score, and when the input last found anything. A
+phrase that finds posts and never matches is the expensive kind of wrong, and
+it had no way of showing itself.
+
+`CandidatePost.foundBy` and `SearchResult.foundBy` are optional. A connector
+that cannot say attributes nothing, and a post stored before this has no row.
+
+Migration `0064` adds the table.
+
 ## 0.7.0 — 2026-09-18
 
 **Added.** `stage_runs.poll_run_id`: the poll whose posts a stage processed.

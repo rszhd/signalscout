@@ -322,6 +322,20 @@ export function createFakeSource(
 
       return {
         posts: page,
+        /**
+         * The monitor's first query, or its first channel. US-212.
+         *
+         * This source does not search: it returns the fixtures it was built
+         * with, whatever was asked. Naming the first input is a stand-in that
+         * keeps the field populated for every test that drives the pipeline
+         * through here — a test about attribution passes its own query and
+         * reads it back.
+         */
+        ...(request.query.queries[0] !== undefined
+          ? { foundBy: { kind: "query" as const, value: request.query.queries[0] } }
+          : request.query.channels[0] !== undefined
+            ? { foundBy: { kind: "channel" as const, value: request.query.channels[0] } }
+            : {}),
         unitsConsumed: unitsPerCall + unitsPerPost * page.length,
         next:
           nextOffset < matching.length

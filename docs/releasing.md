@@ -21,6 +21,21 @@ The manifests say `0.0.0` in git, on purpose. The tag is the version. A
 number in a file is a number somebody forgets to move, and a pull request
 that bumps it is a pull request about nothing.
 
+## A release is asked for, not taken
+
+**The owner approves every release.** Finish the work, commit it, say what is
+waiting to go out, and wait for a yes. Three versions went out in one afternoon
+on 2026-09-18 and that is the failure this rule exists to stop: every published
+version is permanent, and a day of them is a changelog nobody can read.
+
+**Several finished changes share one release.** There is no reason to cut a
+version per ticket when the consumer takes them together, and a batched
+changelog entry is the one a person can actually read.
+
+Nothing about this slows the work down, because nothing waits on a release
+anyway — the section below is how both halves are built and tested before any
+version exists.
+
 ## While the work is in progress, nothing is cut
 
 A feature usually has a half here and a half in the hosted application. That

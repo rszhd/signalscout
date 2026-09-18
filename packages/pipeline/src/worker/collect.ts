@@ -26,6 +26,7 @@
 
 import type {
   CandidatePost,
+  Discovery,
   SocialSource,
   SourceCredentials,
   SourceQuery,
@@ -40,6 +41,7 @@ import {
   type PollRunSource,
   type PollStopReason,
   type Provider,
+  postDiscoveries,
   posts,
   type Source,
 } from "../db/schema.js";
@@ -140,7 +142,17 @@ async function readSource(
 
     pages += 1;
     unitsConsumed += result.unitsConsumed;
-    collected.push(...result.posts);
+    /**
+     * The page's input travels with its posts. US-212.
+     *
+     * One request carries one phrase or one channel, so the whole page shares
+     * an answer — and this loop is where several pages from several inputs are
+     * merged into one list. Copying it now is what stops the association being
+     * lost between here and the insert.
+     */
+    collected.push(
+      ...result.posts.map((post) => (result.foundBy ? { ...post, foundBy: result.foundBy } : post)),
+    );
     await bill(result.unitsConsumed);
 
     if (result.next.status === "done") {
@@ -829,10 +841,32 @@ export function createCollectStep({ registry, credentialsFor }: CollectOptions):
         }
       }
 
+      /**
+       * Which inputs returned which post, before the batch is deduplicated.
+       * US-212.
+       *
+       * Keyed the way the rows are keyed, and a set rather than one value: a
+       * post returned by two phrases was earned by both, and the deduplication
+       * below keeps one row. Recording only the survivor's phrase would credit
+       * one search and hide the other, which is the opposite of what this is
+       * for.
+       */
+      const foundBy = new Map<string, Map<string, Discovery>>();
+
       const collected = outcomes.flatMap((outcome) =>
-        outcome.posts.map((post) =>
-          toRow(outcome.sourceId as Source, outcome.providerId as Provider, post),
-        ),
+        outcome.posts.map((post) => {
+          const row = toRow(outcome.sourceId as Source, outcome.providerId as Provider, post);
+
+          if (post.foundBy) {
+            const key = keyOf(row);
+            const inputs = foundBy.get(key) ?? new Map<string, Discovery>();
+
+            inputs.set(`${post.foundBy.kind}:${post.foundBy.value}`, post.foundBy);
+            foundBy.set(key, inputs);
+          }
+
+          return row;
+        }),
       );
 
       /**
@@ -912,6 +946,8 @@ export function createCollectStep({ registry, credentialsFor }: CollectOptions):
         .returning({
           id: posts.id,
           source: posts.source,
+          /** For US-212: the ids come back here and the attribution is keyed by this. */
+          externalId: posts.externalId,
           /**
            * Whether this statement inserted the row or found it.
            *
@@ -926,6 +962,38 @@ export function createCollectStep({ registry, credentialsFor }: CollectOptions):
 
       for (const entry of runSources) {
         entry.postsNew = stored.filter((row) => row.inserted && row.source === entry.source).length;
+      }
+
+      /**
+       * Which of this monitor's inputs found which post. US-212.
+       *
+       * Written after the posts and before the poll's own row, and never
+       * allowed to fail the poll: the posts are stored and paid for by now, and
+       * losing the note about which phrase found them is far cheaper than
+       * losing the collection. A second poll finding the same post through the
+       * same phrase writes nothing — the primary key says so.
+       */
+      const discovered = stored.flatMap((row) => {
+        const inputs = foundBy.get(keyOf({ source: row.source, externalId: row.externalId }));
+
+        return [...(inputs?.values() ?? [])].map((input) => ({
+          monitorId,
+          postId: row.id,
+          source: row.source,
+          kind: input.kind,
+          value: input.value,
+        }));
+      });
+
+      if (discovered.length > 0) {
+        try {
+          await db.insert(postDiscoveries).values(discovered).onConflictDoNothing();
+        } catch (error) {
+          logger.warn(
+            { monitorId, err: error },
+            "the posts were stored but which query found them was not",
+          );
+        }
       }
 
       await finish(stopReason === "provider_wait" ? "waiting" : "collected");

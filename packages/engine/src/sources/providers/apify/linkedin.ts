@@ -453,6 +453,18 @@ export class ApifyLinkedInSource implements SocialSource {
 
     return {
       posts,
+      /**
+       * The one input this run was for. US-212.
+       *
+       * Read from the cursor rather than passed in: this method finishes a run
+       * the previous poll started, and the query it was started for is exactly
+       * the one the cursor's index names.
+       */
+      ...(request.query.queries[at.index] === undefined
+        ? {}
+        : {
+            foundBy: { kind: "query" as const, value: request.query.queries[at.index] as string },
+          }),
       unitsConsumed: this.unitsOf(run),
       next: onward ? { status: "ready", cursor: encodeCursor(onward) } : { status: "done" },
     };

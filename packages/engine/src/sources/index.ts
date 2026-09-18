@@ -106,6 +106,7 @@ export type {
   ConnectorDescriptor,
   CredentialCheck,
   CredentialField,
+  Discovery,
   NextPage,
   PlatformDescriptor,
   PlatformId,

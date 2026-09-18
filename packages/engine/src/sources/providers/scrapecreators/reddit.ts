@@ -23,6 +23,7 @@ import type {
   CandidateReply,
   ConnectorDefinition,
   CredentialCheck,
+  Discovery,
   ReplyRequest,
   ReplyResult,
   SearchRequest,
@@ -355,6 +356,7 @@ export class ScrapeCreatorsRedditSource implements SocialSource {
 
     return {
       posts,
+      foundBy: input.foundBy,
       unitsConsumed: page.creditsCharged,
       next: this.nextAfter(request, start, page, collected, wanted.length),
     };
@@ -427,10 +429,17 @@ export class ScrapeCreatorsRedditSource implements SocialSource {
   }
 
   /** The endpoint and parameters for the input a cursor points at. */
+  /**
+   * The one input this request is for, and what to call it afterwards.
+   *
+   * `foundBy` travels back to the caller with the page. US-212: this is the
+   * only moment anything knows which phrase or subreddit produced a post, and
+   * a request carries exactly one of them.
+   */
   private inputAt(
     query: SourceQuery,
     at: Cursor,
-  ): { endpoint: string; params: Record<string, string> } | undefined {
+  ): { endpoint: string; params: Record<string, string>; foundBy: Discovery } | undefined {
     const term = this.listFor(query, at.phase)[at.index];
     if (term === undefined) return undefined;
 
@@ -440,6 +449,7 @@ export class ScrapeCreatorsRedditSource implements SocialSource {
       return {
         endpoint: endpoints.search,
         params: { query: term, filter: "posts", sort: sortNewest },
+        foundBy: { kind: "query", value: term },
       };
     }
 
@@ -447,6 +457,7 @@ export class ScrapeCreatorsRedditSource implements SocialSource {
     return {
       endpoint: endpoints.subreddit,
       params: { subreddit: term.replace(/^\/?r\//, ""), sort: sortNewest },
+      foundBy: { kind: "channel", value: term },
     };
   }
 }

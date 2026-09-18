@@ -206,6 +206,8 @@ export class SocialCrawlTikTokSource implements SocialSource {
 
     return {
       posts,
+      // The one input this request was for. US-212.
+      foundBy: { kind: "query", value: query },
       unitsConsumed: page.creditsUsed,
       next: this.nextAfter(request.query, start, page),
     };

@@ -306,7 +306,7 @@ function embedderFromEnvironment(
  * so nothing downstream would run either. Or `AI_TRIAGE=off` says the stage is
  * not wanted: US-177 made that a real answer, because a triage call is not
  * cheaper than the classification it avoids and a deployment running one model
- * for both stages pays 48% more for a filter whose drops nothing can undo. The
+ * for both stages pays 37% more for a filter whose drops nothing can undo. The
  * filter step already treats a missing triager as "nothing is dropped on
  * triage", so there is no second path to write.
  */
@@ -341,8 +341,8 @@ function triagerFromEnvironment(
    * model's own reasoning, so on the pair we measured triage cost about the
    * same per item as the classification it was meant to avoid. All the saving
    * therefore comes from the price gap, and with no gap there is none: on one
-   * model for both stages, triage made 46 comments 48% dearer rather than 48%
-   * cheaper.
+   * model for both stages, triage made 46 comments 37% dearer rather than 61%
+   * cheaper. Both numbers moved with US-221 and neither changed sign.
    *
    * It is a warning and not a refusal because the stage still does its other
    * job — it keeps the experts answering under a post out of the inbox — and

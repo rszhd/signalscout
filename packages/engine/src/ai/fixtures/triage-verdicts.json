@@ -1,7 +1,7 @@
 {
   "provider": "openai",
   "model": "gpt-5.6-luna",
-  "capturedAt": "2026-09-05T18:46:05.044Z",
+  "capturedAt": "2026-09-18T11:17:43.106Z",
   "note": "What a real triage model answered for every comment US-029 labelled by hand, plus PLAN.md's four worked example posts. `triage-examples.test.ts` replays these. The two numbers that decide the stage are here: how many people asking it kept, and how many people answering it dropped, which is the saving. A kept count below the total is not automatically a fault: the hand label says whether a person is asking, and triage is asked whether they are a person to reach, which is a different question. Two threads and 46 comments is not a distribution.",
   "monitor": {
     "product": "A test runner for web apps. You record a browser flow once and it keeps working when the UI changes.",
@@ -18,17 +18,17 @@
     "comments": 46,
     "askingKept": 3,
     "asking": 4,
-    "answeringKept": 6,
+    "answeringKept": 3,
     "answering": 26,
-    "neitherKept": 10,
+    "neitherKept": 7,
     "neither": 16,
-    "commentsKept": 19,
+    "commentsKept": 13,
     "unanswered": 0
   },
   "usage": {
-    "inputTokens": 29999,
-    "outputTokens": 6135,
-    "estimatedCostMicros": 13360
+    "inputTokens": 44199,
+    "outputTokens": 4025,
+    "estimatedCostMicros": 13668
   },
   "answers": [
     {
@@ -44,9 +44,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 583,
-      "outputTokens": 42,
-      "costMicros": 167
+      "inputTokens": 867,
+      "outputTokens": 67,
+      "costMicros": 254
     },
     {
       "kind": "comment",
@@ -59,11 +59,11 @@
         "title": "Starting Automation from 0% as a QA Lead — How are you using AI, MCPs & Agents in QA?",
         "excerpt": "That's great insight — and one worth considering."
       },
-      "verdict": "maybe",
+      "verdict": "yes",
       "status": "scored",
-      "inputTokens": 576,
-      "outputTokens": 64,
-      "costMicros": 192
+      "inputTokens": 860,
+      "outputTokens": 172,
+      "costMicros": 378
     },
     {
       "kind": "comment",
@@ -78,9 +78,9 @@
       },
       "verdict": "yes",
       "status": "scored",
-      "inputTokens": 586,
-      "outputTokens": 205,
-      "costMicros": 363
+      "inputTokens": 870,
+      "outputTokens": 209,
+      "costMicros": 425
     },
     {
       "kind": "comment",
@@ -93,11 +93,11 @@
         "title": "Starting Automation from 0% as a QA Lead — How are you using AI, MCPs & Agents in QA?",
         "excerpt": "Imagine asking a community for help and not having the decency to actually produce the question yourself."
       },
-      "verdict": "maybe",
+      "verdict": "yes",
       "status": "scored",
-      "inputTokens": 586,
-      "outputTokens": 285,
-      "costMicros": 459
+      "inputTokens": 870,
+      "outputTokens": 91,
+      "costMicros": 283
     },
     {
       "kind": "comment",
@@ -110,11 +110,11 @@
         "title": "Starting Automation from 0% as a QA Lead — How are you using AI, MCPs & Agents in QA?",
         "excerpt": "Maybe an AI bot got the job…"
       },
-      "verdict": "maybe",
+      "verdict": "yes",
       "status": "scored",
-      "inputTokens": 575,
-      "outputTokens": 122,
-      "costMicros": 261
+      "inputTokens": 859,
+      "outputTokens": 104,
+      "costMicros": 297
     },
     {
       "kind": "comment",
@@ -127,11 +127,11 @@
         "title": "Starting Automation from 0% as a QA Lead — How are you using AI, MCPs & Agents in QA?",
         "excerpt": "I wouldn't be surprised."
       },
-      "verdict": "yes",
+      "verdict": "maybe",
       "status": "scored",
-      "inputTokens": 572,
-      "outputTokens": 137,
-      "costMicros": 279
+      "inputTokens": 856,
+      "outputTokens": 169,
+      "costMicros": 374
     },
     {
       "kind": "comment",
@@ -146,9 +146,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 605,
-      "outputTokens": 67,
-      "costMicros": 201
+      "inputTokens": 889,
+      "outputTokens": 40,
+      "costMicros": 226
     },
     {
       "kind": "comment",
@@ -163,9 +163,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 604,
-      "outputTokens": 100,
-      "costMicros": 241
+      "inputTokens": 888,
+      "outputTokens": 48,
+      "costMicros": 235
     },
     {
       "kind": "comment",
@@ -180,9 +180,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 596,
-      "outputTokens": 155,
-      "costMicros": 305
+      "inputTokens": 880,
+      "outputTokens": 43,
+      "costMicros": 228
     },
     {
       "kind": "comment",
@@ -197,9 +197,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 756,
-      "outputTokens": 318,
-      "costMicros": 533
+      "inputTokens": 1040,
+      "outputTokens": 74,
+      "costMicros": 297
     },
     {
       "kind": "comment",
@@ -214,9 +214,9 @@
       },
       "verdict": "yes",
       "status": "scored",
-      "inputTokens": 588,
-      "outputTokens": 221,
-      "costMicros": 383
+      "inputTokens": 872,
+      "outputTokens": 103,
+      "costMicros": 298
     },
     {
       "kind": "comment",
@@ -231,9 +231,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 625,
-      "outputTokens": 16,
-      "costMicros": 144
+      "inputTokens": 909,
+      "outputTokens": 120,
+      "costMicros": 326
     },
     {
       "kind": "comment",
@@ -246,11 +246,11 @@
         "title": "Starting Automation from 0% as a QA Lead — How are you using AI, MCPs & Agents in QA?",
         "excerpt": "I almost applied for a very similar job in Charlotte I wonder if this is the same one"
       },
-      "verdict": "maybe",
+      "verdict": "no",
       "status": "scored",
-      "inputTokens": 585,
-      "outputTokens": 117,
-      "costMicros": 257
+      "inputTokens": 869,
+      "outputTokens": 39,
+      "costMicros": 221
     },
     {
       "kind": "comment",
@@ -265,9 +265,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 628,
-      "outputTokens": 185,
-      "costMicros": 348
+      "inputTokens": 912,
+      "outputTokens": 310,
+      "costMicros": 554
     },
     {
       "kind": "comment",
@@ -282,9 +282,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 659,
-      "outputTokens": 110,
-      "costMicros": 264
+      "inputTokens": 943,
+      "outputTokens": 54,
+      "costMicros": 253
     },
     {
       "kind": "comment",
@@ -297,11 +297,11 @@
         "title": "Starting Automation from 0% as a QA Lead — How are you using AI, MCPs & Agents in QA?",
         "excerpt": "Well I guess you can try this, Framework folder structure will grow from time to time, you should build a solid framework for one flow and then if you want the AI to follow it then you can create agents md files on basis of that.\n\n Basically, later on after doing an exploration with playwright MCP, AI should generate test cases automation code on your coding pattern.\n\n Also test case generation sounds good but you should maintain a knowledge base of the product for your AI, so that will be AI source of truth."
       },
-      "verdict": "maybe",
+      "verdict": "no",
       "status": "scored",
-      "inputTokens": 669,
-      "outputTokens": 261,
-      "costMicros": 447
+      "inputTokens": 953,
+      "outputTokens": 81,
+      "costMicros": 288
     },
     {
       "kind": "comment",
@@ -316,9 +316,9 @@
       },
       "verdict": "maybe",
       "status": "scored",
-      "inputTokens": 624,
-      "outputTokens": 225,
-      "costMicros": 395
+      "inputTokens": 908,
+      "outputTokens": 149,
+      "costMicros": 360
     },
     {
       "kind": "comment",
@@ -331,11 +331,11 @@
         "title": "Starting Automation from 0% as a QA Lead — How are you using AI, MCPs & Agents in QA?",
         "excerpt": "Toolwise you can mix and match. Figure out how code reviews work at scale and how to measure cost. Fundementally you have a generator so it's output becomes a commodity. Set the expectation that you can trash at any point and recreate so the review process and measurement at scale it it's design and expectation should be solved first."
       },
-      "verdict": "maybe",
+      "verdict": "no",
       "status": "scored",
-      "inputTokens": 633,
-      "outputTokens": 236,
-      "costMicros": 410
+      "inputTokens": 917,
+      "outputTokens": 16,
+      "costMicros": 203
     },
     {
       "kind": "comment",
@@ -350,9 +350,9 @@
       },
       "verdict": "maybe",
       "status": "scored",
-      "inputTokens": 831,
-      "outputTokens": 288,
-      "costMicros": 512
+      "inputTokens": 1115,
+      "outputTokens": 258,
+      "costMicros": 533
     },
     {
       "kind": "comment",
@@ -367,9 +367,9 @@
       },
       "verdict": "yes",
       "status": "scored",
-      "inputTokens": 570,
-      "outputTokens": 225,
-      "costMicros": 384
+      "inputTokens": 854,
+      "outputTokens": 156,
+      "costMicros": 358
     },
     {
       "kind": "comment",
@@ -384,9 +384,9 @@
       },
       "verdict": "yes",
       "status": "scored",
-      "inputTokens": 644,
-      "outputTokens": 108,
-      "costMicros": 258
+      "inputTokens": 928,
+      "outputTokens": 72,
+      "costMicros": 272
     },
     {
       "kind": "comment",
@@ -399,11 +399,11 @@
         "title": "Playwright is significantly better than Selenium.",
         "excerpt": "I remember when Selenium was the best, but yea the tech is going to keep changing and playwright is the one to use now. I did the Claude integration last week and ran a test. It was so easy and quick, eventhough I chose the difficult MCP setup, instead of the chrome extension.\n\n The same setup and tests would have take days to complete"
       },
-      "verdict": "maybe",
+      "verdict": "no",
       "status": "scored",
-      "inputTokens": 623,
-      "outputTokens": 151,
-      "costMicros": 306
+      "inputTokens": 907,
+      "outputTokens": 75,
+      "costMicros": 271
     },
     {
       "kind": "comment",
@@ -416,11 +416,11 @@
         "title": "Playwright is significantly better than Selenium.",
         "excerpt": "managing every cent is the thing I'd tell every early founder to do. $70k in with a long runway and a product you believe in is honestly a better position than $650k in with bad financial visibility. you're ahead of where I was even if it doesn't feel like it. keep watching the numbers yourself"
       },
-      "verdict": "maybe",
+      "verdict": "no",
       "status": "scored",
-      "inputTokens": 614,
-      "outputTokens": 222,
-      "costMicros": 389
+      "inputTokens": 898,
+      "outputTokens": 71,
+      "costMicros": 265
     },
     {
       "kind": "comment",
@@ -433,11 +433,11 @@
         "title": "Playwright is significantly better than Selenium.",
         "excerpt": "yeah selenium after playwright feels like getting pegged at this point, pain only"
       },
-      "verdict": "maybe",
+      "verdict": "no",
       "status": "scored",
-      "inputTokens": 566,
-      "outputTokens": 152,
-      "costMicros": 296
+      "inputTokens": 850,
+      "outputTokens": 56,
+      "costMicros": 237
     },
     {
       "kind": "comment",
@@ -452,9 +452,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 561,
-      "outputTokens": 110,
-      "costMicros": 244
+      "inputTokens": 845,
+      "outputTokens": 65,
+      "costMicros": 247
     },
     {
       "kind": "comment",
@@ -469,9 +469,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 575,
-      "outputTokens": 197,
-      "costMicros": 351
+      "inputTokens": 859,
+      "outputTokens": 47,
+      "costMicros": 228
     },
     {
       "kind": "comment",
@@ -486,9 +486,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 786,
-      "outputTokens": 58,
-      "costMicros": 227
+      "inputTokens": 1070,
+      "outputTokens": 80,
+      "costMicros": 310
     },
     {
       "kind": "comment",
@@ -503,9 +503,9 @@
       },
       "verdict": "yes",
       "status": "scored",
-      "inputTokens": 560,
-      "outputTokens": 91,
-      "costMicros": 221
+      "inputTokens": 844,
+      "outputTokens": 106,
+      "costMicros": 296
     },
     {
       "kind": "comment",
@@ -520,9 +520,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 560,
-      "outputTokens": 90,
-      "costMicros": 220
+      "inputTokens": 844,
+      "outputTokens": 41,
+      "costMicros": 218
     },
     {
       "kind": "comment",
@@ -537,9 +537,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 554,
-      "outputTokens": 77,
-      "costMicros": 203
+      "inputTokens": 838,
+      "outputTokens": 49,
+      "costMicros": 226
     },
     {
       "kind": "comment",
@@ -554,9 +554,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 581,
-      "outputTokens": 76,
-      "costMicros": 207
+      "inputTokens": 865,
+      "outputTokens": 16,
+      "costMicros": 192
     },
     {
       "kind": "comment",
@@ -571,9 +571,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 563,
-      "outputTokens": 137,
-      "costMicros": 277
+      "inputTokens": 847,
+      "outputTokens": 54,
+      "costMicros": 234
     },
     {
       "kind": "comment",
@@ -588,9 +588,9 @@
       },
       "verdict": "maybe",
       "status": "scored",
-      "inputTokens": 562,
-      "outputTokens": 126,
-      "costMicros": 264
+      "inputTokens": 846,
+      "outputTokens": 191,
+      "costMicros": 398
     },
     {
       "kind": "comment",
@@ -605,9 +605,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 561,
-      "outputTokens": 55,
-      "costMicros": 178
+      "inputTokens": 845,
+      "outputTokens": 57,
+      "costMicros": 237
     },
     {
       "kind": "comment",
@@ -622,9 +622,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 575,
-      "outputTokens": 66,
-      "costMicros": 194
+      "inputTokens": 859,
+      "outputTokens": 72,
+      "costMicros": 258
     },
     {
       "kind": "comment",
@@ -639,9 +639,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 596,
-      "outputTokens": 56,
-      "costMicros": 186
+      "inputTokens": 880,
+      "outputTokens": 16,
+      "costMicros": 195
     },
     {
       "kind": "comment",
@@ -656,9 +656,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 589,
-      "outputTokens": 78,
-      "costMicros": 211
+      "inputTokens": 873,
+      "outputTokens": 45,
+      "costMicros": 229
     },
     {
       "kind": "comment",
@@ -673,9 +673,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 577,
-      "outputTokens": 51,
-      "costMicros": 177
+      "inputTokens": 861,
+      "outputTokens": 16,
+      "costMicros": 191
     },
     {
       "kind": "comment",
@@ -690,9 +690,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 556,
-      "outputTokens": 67,
-      "costMicros": 192
+      "inputTokens": 840,
+      "outputTokens": 49,
+      "costMicros": 227
     },
     {
       "kind": "comment",
@@ -707,9 +707,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 563,
-      "outputTokens": 51,
-      "costMicros": 174
+      "inputTokens": 847,
+      "outputTokens": 40,
+      "costMicros": 217
     },
     {
       "kind": "comment",
@@ -724,9 +724,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 580,
-      "outputTokens": 80,
-      "costMicros": 212
+      "inputTokens": 864,
+      "outputTokens": 41,
+      "costMicros": 222
     },
     {
       "kind": "comment",
@@ -739,11 +739,11 @@
         "title": "Playwright is significantly better than Selenium.",
         "excerpt": "How much time does it take to learn playwright?"
       },
-      "verdict": "maybe",
+      "verdict": "yes",
       "status": "scored",
-      "inputTokens": 561,
-      "outputTokens": 113,
-      "costMicros": 248
+      "inputTokens": 845,
+      "outputTokens": 118,
+      "costMicros": 311
     },
     {
       "kind": "comment",
@@ -758,9 +758,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 573,
-      "outputTokens": 57,
-      "costMicros": 183
+      "inputTokens": 857,
+      "outputTokens": 58,
+      "costMicros": 241
     },
     {
       "kind": "comment",
@@ -775,9 +775,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 586,
-      "outputTokens": 107,
-      "costMicros": 246
+      "inputTokens": 870,
+      "outputTokens": 45,
+      "costMicros": 228
     },
     {
       "kind": "comment",
@@ -792,9 +792,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 594,
-      "outputTokens": 71,
-      "costMicros": 204
+      "inputTokens": 878,
+      "outputTokens": 68,
+      "costMicros": 257
     },
     {
       "kind": "comment",
@@ -809,9 +809,9 @@
       },
       "verdict": "no",
       "status": "scored",
-      "inputTokens": 635,
-      "outputTokens": 37,
-      "costMicros": 171
+      "inputTokens": 919,
+      "outputTokens": 41,
+      "costMicros": 233
     },
     {
       "kind": "post",
@@ -824,11 +824,11 @@
         "title": "Playwright is awesome",
         "excerpt": "Playwright is awesome."
       },
-      "verdict": "maybe",
+      "verdict": "no",
       "status": "scored",
-      "inputTokens": 553,
-      "outputTokens": 199,
-      "costMicros": 349
+      "inputTokens": 837,
+      "outputTokens": 57,
+      "costMicros": 236
     },
     {
       "kind": "post",
@@ -843,9 +843,9 @@
       },
       "verdict": "yes",
       "status": "scored",
-      "inputTokens": 561,
-      "outputTokens": 41,
-      "costMicros": 161
+      "inputTokens": 845,
+      "outputTokens": 16,
+      "costMicros": 188
     },
     {
       "kind": "post",
@@ -860,9 +860,9 @@
       },
       "verdict": "yes",
       "status": "scored",
-      "inputTokens": 564,
-      "outputTokens": 16,
-      "costMicros": 132
+      "inputTokens": 848,
+      "outputTokens": 44,
+      "costMicros": 222
     },
     {
       "kind": "post",
@@ -877,9 +877,9 @@
       },
       "verdict": "yes",
       "status": "scored",
-      "inputTokens": 575,
+      "inputTokens": 859,
       "outputTokens": 16,
-      "costMicros": 134
+      "costMicros": 191
     }
   ]
 }

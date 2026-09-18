@@ -29,6 +29,33 @@
  * a person reading its output. So the two prompts pull different ways on
  * purpose, and this comment is here because that looks like an inconsistency
  * until you know it is a decision.
+ *
+ * **What it screens for is what the second reader scores.** US-221 moved the
+ * question from "could this author be a person to reach?" to that plus "does
+ * anything here say they want an answer?". Three of the classifier's five
+ * dimensions are about the want, so the old question let a plausible person who
+ * wants nothing through to a paid call that was always going to score low.
+ *
+ * That is a narrowing of `maybe`, not a removal of it. `maybe` now means doubt
+ * about a want; the plain absence of one is a `no`. The captured verdicts are
+ * why it was done that way rather than by dropping `maybe`: two of the three
+ * surviving people asking answered `maybe`, and so did one worked example. A
+ * rule that dropped `maybe` would delete real leads to save a handful of expert
+ * comments, and a deleted lead is the mistake nobody can see.
+ *
+ * **A complaint counts as wanting something, and that line is here because the
+ * first capture deleted a lead without it.** Told that wanting nothing is a
+ * `no`, the model refused "Our Playwright tests break whenever the UI changes"
+ * — PLAN.md's `mild-problem-signal`, which it scores 50. The classifier's own
+ * prompt calls a complaint with no question partial intent. Triage has to leave
+ * that judgement to it, so the prompt names the case rather than hoping.
+ *
+ * Measured on 2026-09-18 over the same 50 items on `gpt-5.6-luna`: 19 of 46
+ * comments kept before, 13 after; people answering 6 kept, then 3 of 26; people
+ * asking 3 of 4 either way; every worked example that is a lead still kept.
+ * Output fell from 123 tokens an item to 80, and the cost per call did not
+ * follow — 267 micro-dollars against 273, because the longer prompt bought the
+ * shorter answer.
  */
 
 import { describeSignals } from "../signals.js";
@@ -78,27 +105,51 @@ export function buildTriageSystemPrompt(monitor: MonitorProfile): string {
     "SIGNALS THE USER ASKED FOR",
     describeSignals(monitor.signals satisfies readonly Signal[]),
     "",
+    "WHAT THE SECOND READER ASKS",
+    "It scores five things: whether the post is about this area, whether the",
+    "author describes this problem in their own words, whether they look like",
+    "the ideal customer, whether they are looking for a solution now, and",
+    "whether it is happening now rather than remembered. Three of those five",
+    "are about what the author wants. Judge the same thing: not only who this",
+    "person is, but whether anything here says they want an answer.",
+    "",
     "ANSWER ONE OF THREE",
-    "- yes: the author could plausibly be a person this product should reach.",
-    "- maybe: you cannot tell from what is here.",
-    "- no: the author plainly could not be, whatever the second reader thinks.",
+    "- yes: this could be a person the product should reach, and something",
+    "  here says they want an answer.",
+    "- maybe: something here says they may want an answer, and you cannot tell",
+    "  what it is worth.",
+    "- no: this author describes no problem of their own and asks for nothing,",
+    "  or the author could plainly never be a customer of this product.",
     "",
     "HOW TO CHOOSE",
-    "Ask who the author is, not what the text is about. Under a post about",
-    "this problem, most people are answering it — they name tools, give",
-    "advice, argue. Those are experts, not buyers, and they are the largest",
-    "group you will see. A person describing a problem of their own, or asking",
-    "what others use, is the one worth passing on.",
+    "Ask who the author is and what they want, not what the text is about.",
+    "Under a post about this problem, most people are answering it — they name",
+    "tools, give advice, argue. Those are experts, not buyers, and they are the",
+    "largest group you will see. Refuse them. Refuse on the same ground anyone",
+    "selling, announcing, teaching, joking or reporting news, and anyone",
+    "describing somebody else's problem instead of their own.",
     "",
-    "Being about the right subject is not enough on its own, and being short",
-    "is not a reason to refuse. 'we hit this too, what did you end up using?'",
-    "is nine words and it is the best kind of yes.",
+    "A person describing a problem of their own, or asking what others use, is",
+    "the one to pass on. Being about the right subject is not enough on its",
+    "own, and being short is not a reason to refuse. 'we hit this too, what",
+    "did you end up using?' is nine words and it is the best kind of yes.",
     "",
-    "WHEN YOU ARE UNSURE, ANSWER MAYBE",
+    "A complaint counts as wanting something. 'our tests break whenever the UI",
+    "changes' asks for nothing and names no tool to buy, and it is still a",
+    "person living with this problem today. Never refuse one of those. The",
+    "second reader weighs how much they want an answer; you only say that they",
+    "might.",
+    "",
+    "MAYBE IS FOR A PERSON WHO MIGHT WANT SOMETHING",
     "The two mistakes do not cost the same. A wrong 'yes' costs one more call",
     "and lands on a page a person can read and dismiss. A wrong 'no' deletes",
     "the lead: nothing is stored, nothing is shown, and nobody can tell it",
-    "happened. Refuse only what is plainly not a person, and pass on the rest.",
+    "happened. So when a person may want something and you cannot tell how",
+    "much, answer maybe and let the second reader decide.",
+    "",
+    "That is doubt about a want. It is not doubt about everything: a person who",
+    "plainly wants nothing is a 'no', however little else you can tell about",
+    "them.",
   ].join("\n");
 }
 

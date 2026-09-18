@@ -19,7 +19,18 @@ versioned and is not described here; it is what `main` holds.
 
 ## Unreleased
 
-Nothing yet.
+**Changed.** Triage asks what the author wants, not only who the author is
+(US-221). Three of the classifier's five dimensions are about the want, so a
+plausible person who wanted nothing used to pass and buy a classification that
+scored low. `maybe` is narrower: doubt about a want keeps the item, the plain
+absence of one drops it, and a complaint with no question always keeps it.
+
+Nothing to do to take it — no export, option or table moved. The effect is on
+the bill and on what reaches the inbox. Over the same 46 hand-labelled comments
+on `gpt-5.6-luna`, the stage keeps 13 where it kept 19, drops 23 of the 26
+people answering where it dropped 20, and still keeps every worked example that
+is a lead. The fail-open rule is unchanged: only an explicit `no` drops, and a
+timeout, a refusal or bad JSON all keep the item.
 
 ## 0.8.0 — 2026-09-18
 

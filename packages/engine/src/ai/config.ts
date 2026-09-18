@@ -224,7 +224,7 @@ export function embeddingConfigFromEnvironment(env: AiEnvironment): EmbeddingCon
  *
  * The stage's own comment says why "off" is a real answer: a triage call is
  * not cheaper than the classification it avoids, so the saving is the price
- * gap between the two models. Same model, no gap, and the stage costs 48%
+ * gap between the two models. Same model, no gap, and the stage costs 37%
  * more while keeping the one risk a cascade has — a drop nothing can undo.
  */
 export function triageIsOff(env: AiEnvironment): boolean {

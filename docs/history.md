@@ -2089,3 +2089,35 @@ nobody, the same answer as an unknown price. `draftsThisMonth` counts every
 outcome on purpose: a plan that counted only the drafts that worked would let
 a failing model hand out unlimited attempts.
 
+
+**Triage was asked what the author wants, 2026-09-18 (US-221).** US-030's
+stage asked one question — could this author be a person to reach? — and that
+is a question about who the author is. Three of the classifier's five
+dimensions are about what the author wants, so a plausible person who wanted
+nothing passed triage and bought a classification that was always going to
+score low. The prompt now names what the second reader scores and splits
+`maybe`: doubt about a want stays `maybe`, and the plain absence of one is a
+`no`.
+
+Two captures of the same 50 items, `gpt-5.6-luna`, for $0.0137 each. The first
+refused `mild-problem-signal` — "Our Playwright tests break whenever the UI
+changes", which PLAN.md scores 50 and which is a lead. A complaint asks for
+nothing, and the prompt had just said that wanting nothing is a `no`. So the
+prompt now says a complaint counts and must never be refused, and the second
+capture kept it.
+
+**The stage went from keeping 19 of 46 comments to keeping 13.** People
+answering fell from 6 kept to 3 of 26; people asking held at 3 of 4, the
+refusal being US-030's known one about native Android. All three worked
+examples PLAN.md scores as leads survive, and `low-intent` — the one it does
+not — went from `maybe` to `no`, which is a classification that used to be paid
+for and now is not.
+
+**A sharper question is a shorter one, and not a cheaper one.** Output fell
+from 123 tokens an item to 80, below a classification's 95 for the first time,
+because the model's own reasoning shortened with the question. The cost per
+call did not follow: the longer prompt added to the input what the answer took
+off the output, 267 micro-dollars an item against 273. On the terra–luna pair
+the 46 comments went from 48% cheaper with triage to 61%; on one model for both
+stages, from 48% dearer to 37%. Neither number changed sign, and the worker
+still warns when a deployment has no price gap.

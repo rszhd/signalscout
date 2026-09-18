@@ -123,10 +123,11 @@ export const aiFields = {
    * "on" is the default and every deployment's answer until one measures
    * otherwise. "off" sends every post the free stages kept straight to the
    * classifier, and is the right answer when triage and classification run
-   * the same model: `triage-prompt.ts` measured a triage answer at 113 output
-   * tokens against a classification's 95, so the stage is not cheap in itself
-   * and the whole saving is the price gap between two models. With no gap it
-   * costs 48% more and its mistakes are still permanent.
+   * the same model: `triage-prompt.ts` measured a triage answer at 80 output
+   * tokens against a classification's 95 and the same cost per call, so the
+   * stage is not cheap in itself and the whole saving is the price gap between
+   * two models. With no gap it costs 37% more and its mistakes are still
+   * permanent.
    */
   AI_TRIAGE: blankIsUnset(z.enum(["on", "off"]).default("on")),
   AI_TRIAGE_PROVIDER: blankIsUnset(z.enum(aiProviders).optional()),

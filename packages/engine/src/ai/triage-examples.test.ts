@@ -81,27 +81,38 @@ describe("what the model returned", () => {
   });
 
   /**
-   * The assumption this ticket was written on, and the measurement that broke
-   * it.
+   * The assumption this ticket was written on, the measurement that broke it,
+   * and the second measurement that partly restored it.
    *
    * A one-word answer was expected to cost a fraction of a classification's 95
-   * output tokens. It does not: this model bills its own reasoning as output,
-   * so the answer being short does not make the call short. The saving comes
-   * from the price gap between the two models, which is why
-   * `worker/runtime.ts` warns when a deployment has no gap.
+   * output tokens. On the first prompt it did not: this model bills its own
+   * reasoning as output, and a short answer does not shorten the thinking. The
+   * bound here used to sit *above* 95 to say so.
    *
-   * The bound is above the classification's 95 on purpose. It goes red if some
-   * later prompt makes the answer genuinely cheap, which would be good news
-   * that should be measured rather than assumed.
+   * US-221 sharpened the question and the thinking shrank with it, from 123
+   * output tokens an item to 80. That is below a classification, so the bound
+   * turned over. It is the good news the old comment said should be measured
+   * rather than assumed, and it is measured here.
+   *
+   * It is still not where the saving comes from. Read the next test.
    */
-  it("did not spend fewer output tokens than a classification", () => {
+  it("now spends fewer output tokens than a classification, since US-221", () => {
     const perItem = verdicts.usage.outputTokens / answers.length;
 
     // ai/fixtures/manifest.json: a classification is 78 to 105 output tokens.
-    expect(perItem).toBeGreaterThan(95);
-    expect(perItem).toBeLessThan(200);
+    expect(perItem).toBeLessThan(95);
+    expect(perItem).toBeGreaterThan(40);
   });
 
+  /**
+   * The cost per item did not move, and that is the point of asserting it.
+   *
+   * US-221 cut the output by a third and added as much to the input: 267
+   * micro-dollars an item before, 273 after. A cheaper answer is not a cheaper
+   * call. The saving is the classification that never happens, on a model that
+   * costs several times this one, which is why `worker/runtime.ts` warns when a
+   * deployment has no price gap between the two.
+   */
   it("cost about a quarter of a cent an item, and the run recorded it", () => {
     expect(verdicts.usage.estimatedCostMicros).toBeGreaterThan(0);
 
@@ -125,15 +136,21 @@ describe("what it kept and dropped", () => {
    * for the same reason. An exact count here would go red on a re-capture that
    * changed nothing, and a test that cries wolf is one nobody reads.
    */
-  it("drops most of the people answering, which is the saving", () => {
+  it("drops almost all of the people answering, which is the saving", () => {
     expect(verdicts.counts.answering).toBe(26);
-    expect(verdicts.counts.answeringKept).toBeLessThanOrEqual(9);
+
+    // 3 of 26 on 2026-09-18, and 6 before US-221. The bound sits below that 6:
+    // a prompt that stops asking what the author wants goes red here.
+    expect(verdicts.counts.answeringKept).toBeLessThanOrEqual(5);
   });
 
-  it("keeps roughly half of all comments", () => {
+  it("keeps a quarter of all comments", () => {
     expect(verdicts.counts.comments).toBe(46);
-    expect(verdicts.counts.commentsKept).toBeGreaterThan(12);
-    expect(verdicts.counts.commentsKept).toBeLessThan(28);
+
+    // 13 on 2026-09-18, and 19 before US-221. Wide enough for the drift two
+    // runs on one day showed, narrow enough to notice the stage loosening.
+    expect(verdicts.counts.commentsKept).toBeGreaterThan(9);
+    expect(verdicts.counts.commentsKept).toBeLessThan(17);
   });
 
   /**

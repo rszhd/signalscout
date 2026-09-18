@@ -11,9 +11,11 @@ nobody outside this repository can see does not.
 [docs/history.md](docs/history.md) is the other record — every ticket, in the
 order it happened, including the ones that changed nothing a consumer imports.
 
-Before 1.0, a change a consumer must react to moves the minor and anything else
-moves the patch. The app in this repository is not versioned and is not
-described here; it is what `main` holds.
+**What the number means, and how it is chosen, is in
+[docs/releasing.md](docs/releasing.md)** under *What the number means*: one
+question — what must a consumer do to take this version — with nothing moving
+the patch and something moving the minor. The app in this repository is not
+versioned and is not described here; it is what `main` holds.
 
 ## Unreleased
 

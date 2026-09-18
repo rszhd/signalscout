@@ -336,14 +336,26 @@ describe("what a stage records about itself", () => {
           emailTo: "owner@example.test",
           immediateScore: 70,
         },
-        new Date(Date.now() - 1_000),
+        // Enabled before the match was found, so the match is inside the
+        // window rather than on its edge.
+        new Date(Date.now() - 120_000),
       );
     }
 
+    /**
+     * A match this monitor found a minute ago.
+     *
+     * The time is explicit, and that is not decoration: a delivery is planned
+     * for matches from `enabledSince` up to *now*, and `now` is the instant the
+     * step starts. A row written with the database's `now()` can land on or
+     * after the step's own clock and fall outside its own window, which is a
+     * test that passes on my machine and fails on a faster one. It did.
+     */
     async function matchFor(monitorId: string, postId: string): Promise<void> {
       await db.insert(matches).values({
         monitorId,
         postId,
+        createdAt: new Date(Date.now() - 60_000),
         score: 90,
         relevance: 90,
         problemFit: 90,

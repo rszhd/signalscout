@@ -19,6 +19,22 @@ described here; it is what `main` holds.
 
 Nothing yet.
 
+## 0.7.0 — 2026-09-18
+
+**Fixed.** `stage_runs.detail.scored` on a classification is what the run
+asked the model about, not what it was handed. It counted every candidate it
+looked at, so a retry — handed the same post ids, skipping the ones already
+scored — recorded a hundred and sixteen classifications it made in four
+seconds and never paid for.
+
+**Added.** `detail.skipped` beside it: the posts BUG-003's skip passed over,
+because this monitor's current version had already scored them. Optional, so a
+row written before this has none. `scored` plus `skipped` plus the failures is
+what the run was handed.
+
+The classifier's own log line carries both numbers too, so the row and the log
+cannot drift.
+
 ## 0.6.0 — 2026-09-18
 
 **Added.** `stage_runs.walk_id`: the collection a stage belonged to, the same

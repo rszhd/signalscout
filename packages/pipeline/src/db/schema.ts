@@ -1375,8 +1375,19 @@ export type StageRunDetail =
     }
   | {
       readonly stage: "classify";
-      /** Posts the model answered for, whatever the score. */
+      /**
+       * Posts this run got an answer for from the model, whatever the score.
+       *
+       * Not what it was handed. US-206: a retry is given the same post ids and
+       * skips the ones already scored, and counting those as scored made a
+       * four-second retry claim a hundred and sixteen classifications.
+       */
       readonly scored: number;
+      /**
+       * Posts it did not ask about, because this monitor's current version had
+       * already paid to score them. BUG-003's skip, in the record of the work.
+       */
+      readonly skipped?: number;
       /** Of those, the ones that cleared the monitor's threshold. */
       readonly matched: number;
       /** The model would not answer. They keep their place and are asked again. */

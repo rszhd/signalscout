@@ -237,6 +237,16 @@ export function createClassifyStep({ classifierFor }: ClassifyOptions): Step<Cla
     let dropped = 0;
     let spentMicros = 0;
     /**
+     * What this run actually asked the model, and what it did not. US-206.
+     *
+     * Counted rather than derived from `candidates.length`, which was the bug:
+     * a retry is handed the same post ids, skips the ones already scored — the
+     * whole of BUG-003 — and asked the model once, while the row claimed a
+     * hundred and sixteen classifications in four seconds.
+     */
+    let scoredNow = 0;
+    let skipped = 0;
+    /**
      * BUG-004. The cap can be crossed between the first item and the last.
      *
      * `enforceBudget` answers "may this work start", which is the right
@@ -272,7 +282,10 @@ export function createClassifyStep({ classifierFor }: ClassifyOptions): Step<Cla
     // a batch of parallel calls hits it as one burst that the connector-level
     // back-off in `sources/` cannot help with here.
     for (const post of candidates) {
-      if (alreadyScored.has(post.id)) continue;
+      if (alreadyScored.has(post.id)) {
+        skipped += 1;
+        continue;
+      }
 
       /**
        * Out of money, so stop rather than finish the batch.
@@ -313,6 +326,8 @@ export function createClassifyStep({ classifierFor }: ClassifyOptions): Step<Cla
         continue;
       }
 
+      scoredNow += 1;
+
       if (outcome.score < monitor.minScore) {
         await record(db, post.id, "scored", outcome.call);
         logger.debug(
@@ -352,6 +367,8 @@ export function createClassifyStep({ classifierFor }: ClassifyOptions): Step<Cla
       {
         monitorId,
         posts: candidates.length,
+        scored: scoredNow,
+        skipped,
         matches: matchIds.length,
         dropped,
         unclassified: retryable,
@@ -387,7 +404,8 @@ export function createClassifyStep({ classifierFor }: ClassifyOptions): Step<Cla
         estimatedCostMicros: spentMicros,
         detail: {
           stage: "classify",
-          scored: candidates.length - retryable - dropped - unspentFor,
+          scored: scoredNow,
+          skipped,
           matched: matchIds.length,
           unclassified: retryable,
           dropped,

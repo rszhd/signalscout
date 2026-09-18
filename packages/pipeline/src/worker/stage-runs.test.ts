@@ -195,7 +195,36 @@ describe("what a stage records about itself", () => {
       expect(run?.itemsIn).toBe(1);
       expect(run?.itemsOut).toBe(1);
       expect(run?.estimatedCostMicros).toBe(call.estimatedCostMicros);
-      expect(run?.detail).toMatchObject({ scored: 1, matched: 1, unclassified: 0, leftByCap: 0 });
+      expect(run?.detail).toMatchObject({
+        scored: 1,
+        skipped: 0,
+        matched: 1,
+        unclassified: 0,
+        leftByCap: 0,
+      });
+    });
+
+    /**
+     * The retry, which is what US-206 is about. The first run scores the batch
+     * and the second is handed the same ids, skips them all, and must not
+     * claim it classified them again.
+     */
+    it("counts what it scored, not what it was handed", async () => {
+      const monitorId = await insertMonitor(database);
+      const postId = await insertPost(strongPost);
+      const step = createClassifyStep({
+        classifierFor: async () => stubClassifier(() => scored),
+      });
+
+      await step({ monitorId, postIds: [postId] }, contextFor(db));
+      await step({ monitorId, postIds: [postId] }, contextFor(db));
+
+      const [first, again] = await runsOf(monitorId);
+
+      expect(first?.detail).toMatchObject({ scored: 1, skipped: 0, matched: 1 });
+      // The same post, already paid for: asked about nothing, and says so.
+      expect(again?.itemsIn).toBe(1);
+      expect(again?.detail).toMatchObject({ scored: 0, skipped: 1, matched: 0 });
     });
 
     it("says an account with no model refused, rather than leaving an empty inbox", async () => {

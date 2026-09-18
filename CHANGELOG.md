@@ -19,6 +19,22 @@ versioned and is not described here; it is what `main` holds.
 
 ## Unreleased
 
+**Added.** `accountSpendSince(db, userId, since)` and
+`draftsSince(db, userId, since)` (US-216): the same two reads over a window
+the caller chooses instead of the calendar month. `accountSpend` and
+`draftsThisMonth` are unchanged and still count the calendar month, so a
+consumer that does not bill for the usage can ignore both new exports.
+
+They exist for a consumer that does bill. The month such a deployment cares
+about is the one its customer paid for, which starts on the day they
+subscribed. Counting a calendar month there gives an account that subscribed
+on the 20th a whole allowance for eleven days and a second one on the first.
+
+Separate names rather than a second argument on the existing two: both would
+be a `Date`, the compiler could not tell them apart, and a call site left
+behind by a change of window would count from the wrong moment without failing
+to build.
+
 **Changed.** A post the classifier says is not about this area cannot score as
 a lead (US-225). `leadScore` now scales the weighted total by relevance when
 relevance is under 40, so a post scored 0 for relevance scores 0 overall.

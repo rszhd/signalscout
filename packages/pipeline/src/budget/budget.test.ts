@@ -6,10 +6,12 @@ import { createTestDatabase, type TestDatabase } from "../testing/database.js";
 import { insertMonitor } from "../worker/testing.js";
 import {
   accountSpend,
+  accountSpendSince,
   budgetState,
   budgetStates,
   checkBudget,
   clearBudget,
+  draftsSince,
   draftsThisMonth,
   enforceBudget,
   formatMicros,
@@ -501,6 +503,51 @@ describe("the budget guard", () => {
 
       expect(await draftsThisMonth(db, owner, march)).toBe(3);
       expect(await draftsThisMonth(db, "user-3", march)).toBe(0);
+    });
+
+    /**
+     * The window a billed deployment counts: the month its customer paid
+     * for, which starts on the day they subscribed and not on the first.
+     */
+    it("counts from a window the caller chooses, not from the first of the month", async () => {
+      const theFifth = new Date("2026-03-05T00:00:00.000Z");
+      const theTenth = new Date("2026-03-10T09:00:00.000Z");
+      const theTwentieth = new Date("2026-03-20T09:00:00.000Z");
+
+      await recordSourceUsage(db, {
+        userId: owner,
+        monitorId: null,
+        source: "reddit",
+        provider: "brightdata",
+        units: 10,
+        pricePerUnitMicros: redditPricePerRecord,
+        // Inside the calendar month, outside a window that opens on the tenth.
+        now: theFifth,
+      });
+      await db.insert(modelCalls).values([
+        modelCall({ userId: owner, estimatedCostMicros: 4_000, createdAt: theFifth }),
+        modelCall({ userId: owner, estimatedCostMicros: 7_000, createdAt: theTwentieth }),
+        modelCall({
+          userId: owner,
+          purpose: "draft_reply",
+          createdAt: theFifth,
+        }),
+        modelCall({
+          userId: owner,
+          purpose: "draft_reply",
+          createdAt: theTwentieth,
+        }),
+      ]);
+
+      const month = await accountSpend(db, owner, march);
+      const window = await accountSpendSince(db, owner, theTenth);
+
+      expect(month.totalMicros).toBe(26_000);
+      expect(window.totalMicros).toBe(7_000);
+      expect(window.since).toEqual(theTenth);
+
+      expect(await draftsThisMonth(db, owner, march)).toBe(2);
+      expect(await draftsSince(db, owner, theTenth)).toBe(1);
     });
   });
 

@@ -330,9 +330,19 @@ export function createCollectStep({ registry, credentialsFor }: CollectOptions):
       if (reason && !stopReason) stopReason = reason;
     };
 
+    /**
+     * The row this poll wrote, so the stages it feeds can name it. US-211.
+     *
+     * Set by `finish`, which runs on every exit, and read four lines later
+     * where the filter job is sent. Null if the write failed — the poll still
+     * collected, and a stage that cannot name its poll is better than a poll
+     * that fails over its own description.
+     */
+    let pollRunId: string | null = null;
+
     const finish = async (outcome: PollOutcome): Promise<void> => {
       try {
-        await recordPollRun(db, {
+        const run = await recordPollRun(db, {
           monitorId,
           userId: monitor.userId,
           walkId: await walkId(),
@@ -346,6 +356,8 @@ export function createCollectStep({ registry, credentialsFor }: CollectOptions):
           sources: runSources,
           stopReason,
         });
+
+        pollRunId = run.id;
       } catch (error) {
         // A poll that collected must not be failed by the row that describes
         // it. The posts are stored and the filter job is sent by the time this
@@ -922,6 +934,9 @@ export function createCollectStep({ registry, credentialsFor }: CollectOptions):
         monitorId,
         postIds: stored.map((row) => row.id),
         walkId: await walkId(),
+        // `finish` ran on the line above, so the row exists and this is its
+        // id. US-211.
+        ...(pollRunId ? { pollRunId } : {}),
       });
     } catch (error) {
       /**

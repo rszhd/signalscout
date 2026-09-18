@@ -21,6 +21,25 @@ versioned and is not described here; it is what `main` holds.
 
 Nothing yet.
 
+## 0.7.0 — 2026-09-18
+
+**Added.** `stage_runs.poll_run_id`: the poll whose posts a stage processed.
+`walk_id` says which collection, and a paging collection is several polls, so
+the walk alone could not put a filter under the poll that fed it. Every
+pipeline payload after the poll carries `pollRunId` beside `walkId`, and the
+poll sends the id of the row it has just written rather than one looked up
+afterwards, which would find whichever poll was running when the stage ended.
+
+Two attributions are decisions. A reply's stages carry the poll that found its
+thread, because the comments were collected by no poll of their own. And the
+reference is `on delete set null`: `poll_runs` keeps 200 rows per monitor and
+`stage_runs` keeps 800, so a stage outliving its poll is routine — the row
+stays and loses only the reference.
+
+Null on a job sent by an older worker, and on the notification sweep, which
+belongs to no collection. Migration `0063` adds the column, its index and the
+reference.
+
 ## 0.6.1 — 2026-09-18
 
 **Fixed.** `stage_runs.detail.scored` on a classification is what the run

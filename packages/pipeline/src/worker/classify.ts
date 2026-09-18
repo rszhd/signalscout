@@ -94,7 +94,7 @@ function profileOf(monitor: typeof monitors.$inferSelect): MonitorProfile {
 
 export function createClassifyStep({ classifierFor }: ClassifyOptions): Step<ClassifyPayload> {
   return async function classify(
-    { monitorId, postIds, walkId },
+    { monitorId, postIds, walkId, pollRunId },
     { db, boss, logger }: StepContext,
   ): Promise<void> {
     const startedAt = new Date();
@@ -116,6 +116,7 @@ export function createClassifyStep({ classifierFor }: ClassifyOptions): Step<Cla
           userId,
           stage: "classify",
           walkId: walkId ?? null,
+          pollRunId: pollRunId ?? null,
           startedAt,
           finishedAt: new Date(),
           ...record,
@@ -126,7 +127,7 @@ export function createClassifyStep({ classifierFor }: ClassifyOptions): Step<Cla
     };
 
     if (postIds.length === 0) {
-      await boss.send(notifyQueue, { monitorId, matchIds: [], walkId });
+      await boss.send(notifyQueue, { monitorId, matchIds: [], walkId, pollRunId });
       return;
     }
 
@@ -175,7 +176,7 @@ export function createClassifyStep({ classifierFor }: ClassifyOptions): Step<Cla
         },
         monitor.userId,
       );
-      await boss.send(notifyQueue, { monitorId, matchIds: [], walkId });
+      await boss.send(notifyQueue, { monitorId, matchIds: [], walkId, pollRunId });
       return;
     }
 
@@ -433,7 +434,7 @@ export function createClassifyStep({ classifierFor }: ClassifyOptions): Step<Cla
 
     // Sent before the throw below, on purpose. The matches above are written
     // and a failure on a later post must not hold back the ones that worked.
-    await boss.send(notifyQueue, { monitorId, matchIds, walkId });
+    await boss.send(notifyQueue, { monitorId, matchIds, walkId, pollRunId });
 
     /**
      * The threads whose next batch is now decidable. US-048.
@@ -457,7 +458,9 @@ export function createClassifyStep({ classifierFor }: ClassifyOptions): Step<Cla
     const threadIds = parents.map((row) => row.id).filter((id): id is string => id !== null);
 
     if (threadIds.length > 0) {
-      await boss.send(repliesQueue, { monitorId, postIds: threadIds, walkId });
+      // The thread's own poll travels with it: a reply belongs to the poll
+      // that found the post above it. US-211.
+      await boss.send(repliesQueue, { monitorId, postIds: threadIds, walkId, pollRunId });
     }
 
     if (retryable > 0) {

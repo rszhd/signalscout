@@ -111,6 +111,15 @@ export interface EstimatePayload {
  */
 export interface WalkPayload {
   readonly walkId?: string;
+  /**
+   * The poll whose posts this job is processing. US-211.
+   *
+   * The walk beside it is the collection; this is the one poll inside it, so a
+   * screen can put a filter under the poll that fed it rather than under a
+   * walk that holds three. Optional for the walk's reason: a job sent by an
+   * older worker carries neither.
+   */
+  readonly pollRunId?: string;
 }
 
 export interface FilterPayload extends WalkPayload {

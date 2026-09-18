@@ -60,16 +60,19 @@ finish something, say which half you proved.
 2. Read the ticket's **Context**. It holds the reasoning that the code cannot.
 3. Read [`docs/testing.md`](docs/testing.md) if you will write a test, which is
    almost always.
-4. Read [`docs/sources.md`](docs/sources.md) if the task touches a connector.
+4. Read [`docs/pipeline.md`](docs/pipeline.md) if the task touches the worker.
+   It holds the run in order — what asks for work, the caps that stop it, the
+   four places it keeps its position, and which row each step writes.
+5. Read [`docs/sources.md`](docs/sources.md) if the task touches a connector.
    It holds two lists — adding a provider, and adding a platform — and what
    connectors get wrong.
-5. Read [`docs/costs.md`](docs/costs.md) if the task touches money — a price, a
+6. Read [`docs/costs.md`](docs/costs.md) if the task touches money — a price, a
    cap, a usage row, or a figure shown to a person. It holds what our estimate
    is wrong about, and why it is never rounded to cents.
-6. Read [`docs/secrets.md`](docs/secrets.md) if the task touches a credential.
+7. Read [`docs/secrets.md`](docs/secrets.md) if the task touches a credential.
    It holds where a key lives, what the encryption guarantees, why a key is
    tested before it is stored, and the rotation steps.
-7. Read [`docs/instruments.md`](docs/instruments.md) before running anything
+8. Read [`docs/instruments.md`](docs/instruments.md) before running anything
    that spends money, and [`docs/history.md`](docs/history.md) when you need to
    know why a number or a decision is what it is.
 

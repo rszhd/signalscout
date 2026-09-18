@@ -284,6 +284,17 @@ export interface QueryGenerator {
   readonly provider: AiProvider;
   readonly model: string;
   /**
+   * The ceiling this generator waits under, beside the provider and model it
+   * already reports.
+   *
+   * A plan is not a classification: it runs once per project, with a person
+   * watching, on a model chosen for thinking hard, and a deployment may give
+   * it longer than the per-post ceiling. Reported here so a caller can assert
+   * which ceiling it got — a live run on 2026-09-18 spent two attempts finding
+   * out the hard way, both aborted at 30,062ms.
+   */
+  readonly timeoutMs: number;
+  /**
    * `platforms` is what the monitor watches. Asking about a platform a monitor
    * does not watch buys queries nobody runs, and asking about none is a plan
    * with nothing in it, so the caller passes exactly the ticked list.
@@ -311,6 +322,7 @@ export function createQueryGenerator({
   return {
     provider: config.provider,
     model: config.model,
+    timeoutMs: config.timeoutMs,
 
     async generate(
       monitor: MonitorProfile,

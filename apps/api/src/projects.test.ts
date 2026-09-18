@@ -49,6 +49,7 @@ describe("the project routes", () => {
     return {
       provider: "anthropic",
       model: "test",
+      timeoutMs: 30_000,
       describe: async () => result,
     };
   }
@@ -278,7 +279,12 @@ describe("drafting a project from a document", () => {
       describer:
         result === null
           ? null
-          : { provider: "anthropic", model: "test", describe: async () => result },
+          : {
+              provider: "anthropic",
+              model: "test",
+              timeoutMs: 30_000,
+              describe: async () => result,
+            },
     });
 
     try {

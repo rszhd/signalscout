@@ -59,6 +59,7 @@ import { createSpendMeter } from "../budget/budget.js";
 import { monitors, posts, type Signal } from "../db/schema.js";
 import { type FilterDrop, recordFilterDrops } from "../filter/drops.js";
 import { monitorQueries } from "../monitors/monitors.js";
+import { recordStageRun } from "../monitors/stage-runs.js";
 import type { FilterPayload } from "./queues.js";
 import { classifyQueue, repliesQueue } from "./queues.js";
 import type { Step, StepContext } from "./steps.js";
@@ -118,6 +119,7 @@ export function createFilterStep({
     { db, boss, logger }: StepContext,
   ): Promise<void> {
     const ids = [...postIds];
+    const startedAt = new Date();
 
     if (ids.length === 0) {
       await boss.send(classifyQueue, { monitorId, postIds: [] });
@@ -145,9 +147,47 @@ export function createFilterStep({
     const embedder = await embedderFor?.(monitor.userId);
     const triager = await triagerFor?.(monitor.userId);
 
+    /**
+     * What this run of the stage did, for the history. US-201.
+     *
+     * Written here because `deliver` is where every exit of this step arrives,
+     * which is the same argument the header makes about triage: five exits and
+     * one place they all pass through leaves no caller to forget it.
+     *
+     * A failure to write the row is swallowed. The filter's work is done by
+     * this point and the posts are on their way to the classifier; failing the
+     * job over a history row would retry a stage that had already succeeded.
+     */
+    const writeStageRun = async (survivors: readonly Candidate[], drops: readonly FilterDrop[]) => {
+      const dropped = (stage: FilterDrop["stage"]) =>
+        drops.filter((drop) => drop.stage === stage).length;
+
+      try {
+        await recordStageRun(db, {
+          monitorId,
+          userId: monitor.userId,
+          stage: "filter",
+          startedAt,
+          finishedAt: new Date(),
+          outcome: "done",
+          itemsIn: ids.length,
+          itemsOut: survivors.length,
+          detail: {
+            stage: "filter",
+            keyword: dropped("keyword"),
+            embedding: dropped("embedding"),
+            triage: dropped("triage"),
+          },
+        });
+      } catch (cause) {
+        logger.warn({ monitorId, err: cause }, "the pre-filter's own history row was not written");
+      }
+    };
+
     /** Everything that is still going to the model, and why the rest is not. */
     const deliver = async (survivors: readonly Candidate[], drops: readonly FilterDrop[]) => {
       await recordFilterDrops(db, monitorId, drops);
+      await writeStageRun(survivors, drops);
       await boss.send(classifyQueue, {
         monitorId,
         postIds: survivors.map((candidate) => candidate.id),

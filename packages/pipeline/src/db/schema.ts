@@ -1312,6 +1312,143 @@ export const pollRuns = pgTable(
 );
 
 /**
+ * The stages that write a row of their own. US-201.
+ *
+ * The poll is not one of them. It has `poll_runs`, which says more than this
+ * table can — the walk it belongs to, the platform-by-platform breakdown — and
+ * a second row saying the same thing would be two answers about one job.
+ */
+export const stageNames = ["filter", "replies", "classify", "notify"] as const;
+export type StageName = (typeof stageNames)[number];
+
+/**
+ * What a stage did, in one word, read the way `pollOutcomes` is read.
+ *
+ * `done` is the only one that moved the work along. `empty` is the stage that
+ * ran with nothing to do, which is an answer and not a failure — a filter
+ * handed no posts is the normal end of a poll that found nothing. `refused` is
+ * the stage that could not start: a cap, a missing model, a missing key.
+ * `failed` is the throw, written before the job is retried, because the retry
+ * cannot say what the attempt before it did.
+ */
+export const stageOutcomes = ["done", "empty", "refused", "failed"] as const;
+export type StageOutcome = (typeof stageOutcomes)[number];
+
+/**
+ * Why a stage refused, from a closed set, for `pollStopReasons`' reasons: this
+ * is the field a person reads first, and a sentence written at the call site
+ * can be neither counted nor translated.
+ */
+export const stageStopReasons = [
+  /** US-013's cap stopped it, part way or before it began. */
+  "budget_exhausted",
+  /** No model is configured for this owner, so nothing could be asked. */
+  "no_model",
+  /** No provider of this platform has a key. The replies stage buys pages. */
+  "no_credentials",
+  /** The step threw. The row is written before the throw reaches the queue. */
+  "error",
+] as const;
+export type StageStopReason = (typeof stageStopReasons)[number];
+
+/**
+ * What one stage did, in its own numbers.
+ *
+ * A union rather than a wide row of nullable columns, and JSONB for
+ * `poll_runs.sources`' reason: it is written once, read whole, and never
+ * queried across rows. The two numbers every stage has — what went in and what
+ * came out — are columns, because a screen orders and sums on those.
+ */
+export type StageRunDetail =
+  | {
+      readonly stage: "filter";
+      /** Dropped by each stage of the pre-filter, in the order they run. */
+      readonly keyword: number;
+      readonly embedding: number;
+      readonly triage: number;
+    }
+  | {
+      readonly stage: "replies";
+      readonly threadsOpened: number;
+      readonly threadsSkipped: number;
+      readonly pagesBought: number;
+    }
+  | {
+      readonly stage: "classify";
+      /** Posts the model answered for, whatever the score. */
+      readonly scored: number;
+      /** Of those, the ones that cleared the monitor's threshold. */
+      readonly matched: number;
+      /** The model would not answer. They keep their place and are asked again. */
+      readonly unclassified: number;
+      /** Asked too many times and given up on. US-104's sibling failure. */
+      readonly dropped: number;
+      /** Posts the cap stopped this run from reaching. They keep their place. */
+      readonly leftByCap: number;
+    }
+  | {
+      readonly stage: "notify";
+      /** Deliveries written to the outbox: one email, or one digest of many. */
+      readonly deliveries: number;
+    };
+
+/**
+ * One row per run of a stage after the poll. US-201.
+ *
+ * US-104 wrote `poll_runs` because a poll that collected nothing and a poll
+ * that collected what we already had leave the same absence of rows. Every
+ * stage after it has the same problem and two of them spend money: a filter
+ * that dropped forty posts on triage, a classifier that stopped at the cap
+ * with five posts unread, and a quiet inbox that is none of those look
+ * identical from the tables.
+ *
+ * `filter_drops` is not this. It holds a drop and its similarity, for tuning a
+ * threshold; it cannot say that a stage ran, or what it cost, or that nothing
+ * was dropped at all.
+ */
+export const stageRuns = pgTable(
+  "stage_runs",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    monitorId: uuid("monitor_id")
+      .notNull()
+      .references(() => monitors.id, { onDelete: "cascade" }),
+    /** The owner, copied rather than joined, for `poll_runs.user_id`'s reason. */
+    userId: text("user_id").notNull(),
+    stage: text("stage").$type<StageName>().notNull(),
+    startedAt: timestamp("started_at", { withTimezone: true }).notNull().defaultNow(),
+    finishedAt: timestamp("finished_at", { withTimezone: true }),
+    outcome: text("outcome").$type<StageOutcome>().notNull(),
+    /**
+     * What the stage was handed: posts for the filter and the classifier,
+     * threads for the replies stage, matches for the notifier.
+     */
+    itemsIn: integer("items_in").notNull().default(0),
+    /**
+     * What it passed on: posts that survived, replies stored, matches written,
+     * deliveries queued. Not bounded by `items_in` — one thread returns many
+     * replies — so nothing here asserts it is.
+     */
+    itemsOut: integer("items_out").notNull().default(0),
+    /** Billable units, where the stage buys from a provider. The replies stage does. */
+    units: bigint("units", { mode: "number" }).notNull().default(0),
+    /** Estimated, in the sense docs/costs.md means: provider units and model calls. */
+    estimatedCostMicros: bigint("estimated_cost_micros", { mode: "number" }).notNull().default(0),
+    detail: jsonb("detail").$type<StageRunDetail>(),
+    stopReason: text("stop_reason").$type<StageStopReason>(),
+  },
+  (table) => [
+    // The screen's own query: this monitor's stages, newest first.
+    index("stage_runs_monitor_started_idx").on(table.monitorId, table.startedAt),
+    check("stage_runs_stage_known", oneOf("stage", stageNames)),
+    check("stage_runs_outcome_known", oneOf("outcome", stageOutcomes)),
+    check("stage_runs_stop_reason_known", optionallyOneOf("stop_reason", stageStopReasons)),
+    check("stage_runs_counts_non_negative", sql.raw(`items_in >= 0 AND items_out >= 0`)),
+    check("stage_runs_spend_non_negative", sql.raw(`units >= 0 AND estimated_cost_micros >= 0`)),
+  ],
+);
+
+/**
  * One monitor's monthly cap, and what to do when it is reached.
  *
  * The row is optional and its absence means "no cap". That is deliberate: a

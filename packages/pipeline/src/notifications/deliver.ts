@@ -42,6 +42,19 @@ export interface NotificationTransport {
   webhook: (url: string, body: string, id: string, signingSecret: string | null) => Promise<void>;
 }
 
+/**
+ * What one pass of the outbox did. US-201.
+ *
+ * Two numbers and not one, because they answer different questions: `planned`
+ * is what this monitor's new matches earned, and `sent` is what actually left
+ * the building. A pass that planned three and sent none is an SMTP problem; a
+ * pass that planned none and sent two is the retry of an older one working.
+ */
+export interface NotificationPass {
+  readonly planned: number;
+  readonly sent: number;
+}
+
 export async function processNotifications(
   db: Database,
   monitorId: string,
@@ -71,7 +84,11 @@ export async function processNotifications(
      */
     readonly signingSecretFor?: ((userId: string) => Promise<string | null>) | undefined;
   } = {},
-) {
+): Promise<NotificationPass> {
+  /** Counted for the history row the notify step writes. US-201. */
+  let planned = 0;
+  let sent = 0;
+
   // Commit the outbox before calling a remote service. A crash during delivery
   // leaves the original delivery id available to the next attempt.
   await db.transaction(async (tx) => {
@@ -131,6 +148,7 @@ export async function processNotifications(
             })
             .returning();
           if (!delivery) throw new Error("Notification delivery was not created.");
+          planned += 1;
           await tx
             .insert(items)
             .values(
@@ -154,7 +172,7 @@ export async function processNotifications(
   const availableChannels = (["email", "webhook"] as const).filter(
     (channel) => transport[channel] !== null,
   );
-  if (!availableChannels.length) return;
+  if (!availableChannels.length) return { planned, sent };
   for (let count = 0; count < 50; count++) {
     const worked = await db.transaction(async (tx) => {
       const [config] = await tx
@@ -314,6 +332,7 @@ export async function processNotifications(
         .update(deliveries)
         .set({ status: "sent", attempts, sentAt: now })
         .where(eq(deliveries.id, delivery.id));
+      sent += 1;
       await tx
         .update(settings)
         .set(
@@ -326,6 +345,8 @@ export async function processNotifications(
     });
     if (!worked) break;
   }
+
+  return { planned, sent };
 }
 
 /** Sweep settings too: a lost classify-to-notify enqueue must not lose a match. */

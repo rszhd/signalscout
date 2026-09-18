@@ -56,6 +56,7 @@ import {
   posts,
   type Signal,
 } from "../db/schema.js";
+import { recordStageRun, type StageRunRecord } from "../monitors/stage-runs.js";
 import type { ClassifyPayload } from "./queues.js";
 import { notifyQueue, repliesQueue } from "./queues.js";
 import type { Step, StepContext } from "./steps.js";
@@ -96,6 +97,33 @@ export function createClassifyStep({ classifierFor }: ClassifyOptions): Step<Cla
     { monitorId, postIds },
     { db, boss, logger }: StepContext,
   ): Promise<void> {
+    const startedAt = new Date();
+
+    /**
+     * What this run of the stage did, for the history. US-201.
+     *
+     * The write is swallowed on failure: the matches above it are already
+     * stored, and failing the job over a history row would send the whole
+     * batch back through a model that has been paid for it once.
+     */
+    const writeStageRun = async (
+      record: Omit<StageRunRecord, "monitorId" | "userId" | "stage" | "startedAt" | "finishedAt">,
+      userId: string,
+    ) => {
+      try {
+        await recordStageRun(db, {
+          monitorId,
+          userId,
+          stage: "classify",
+          startedAt,
+          finishedAt: new Date(),
+          ...record,
+        });
+      } catch (cause) {
+        logger.warn({ monitorId, err: cause }, "the classifier's own history row was not written");
+      }
+    };
+
     if (postIds.length === 0) {
       await boss.send(notifyQueue, { monitorId, matchIds: [] });
       return;
@@ -134,6 +162,17 @@ export function createClassifyStep({ classifierFor }: ClassifyOptions): Step<Cla
         { monitorId, posts: postIds.length },
         "classification skipped: no model is configured. Set one on the Models screen, " +
           "or set AI_API_KEY, or AI_PROVIDER=ollama.",
+      );
+      // The row a person needs most: the inbox is empty and nothing is wrong
+      // with the monitor. US-201.
+      await writeStageRun(
+        {
+          outcome: "refused",
+          itemsIn: postIds.length,
+          itemsOut: 0,
+          stopReason: "no_model",
+        },
+        monitor.userId,
       );
       await boss.send(notifyQueue, { monitorId, matchIds: [] });
       return;
@@ -320,6 +359,42 @@ export function createClassifyStep({ classifierFor }: ClassifyOptions): Step<Cla
         unspentFor,
       },
       "posts classified",
+    );
+
+    /**
+     * The same counts, written down. US-201.
+     *
+     * Three outcomes and the order between them matters. `failed` comes first
+     * because the throw below is what happens next: the job goes back to the
+     * queue, and this row is the only account of the attempt that the retry
+     * will not have. `refused` is the cap stopping it part way — the posts it
+     * did not reach keep their place and leave no row of their own, so without
+     * this a capped run and a quiet one look identical.
+     */
+    await writeStageRun(
+      {
+        outcome:
+          retryable > 0
+            ? "failed"
+            : unspentFor > 0
+              ? "refused"
+              : candidates.length === 0
+                ? "empty"
+                : "done",
+        itemsIn: candidates.length,
+        itemsOut: matchIds.length,
+        estimatedCostMicros: spentMicros,
+        detail: {
+          stage: "classify",
+          scored: candidates.length - retryable - dropped - unspentFor,
+          matched: matchIds.length,
+          unclassified: retryable,
+          dropped,
+          leftByCap: unspentFor,
+        },
+        stopReason: retryable > 0 ? "error" : unspentFor > 0 ? "budget_exhausted" : null,
+      },
+      monitor.userId,
     );
 
     if (unspentFor > 0) {

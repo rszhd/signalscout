@@ -19,6 +19,10 @@ versioned and is not described here; it is what `main` holds.
 
 ## Unreleased
 
+Nothing yet.
+
+## 0.8.0 — 2026-09-18
+
 **Added.** `post_discoveries`: which of a monitor's phrases or channels found
 which post. A connector answers `foundBy` on each page — one request carries
 one input, so the page shares an answer — and the poll writes one row per

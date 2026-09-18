@@ -39,12 +39,14 @@
  * prompt. A number from a run nobody recorded is a comment, and a comment
  * cannot be re-run.
  */
+import { createHash } from "node:crypto";
 import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { type AiConfig, triageConfigFromEnvironment } from "../config.js";
 import { aiEnvSchema } from "../env.js";
 import { createTriager } from "../triage.js";
 import type { TriageVerdict } from "../triage-prompt.js";
+import { buildTriageSystemPrompt } from "../triage-prompt.js";
 import { exampleMonitor, labelledExamples } from "./examples.js";
 import { type LabelledSubject, labelledSubjects } from "./labelled-subjects.js";
 
@@ -181,9 +183,24 @@ const answering = comments.filter((answer) => answer.role === "answering");
 const neither = comments.filter((answer) => answer.role === "neither");
 const kept = (rows: readonly Answer[]) => rows.filter((row) => row.verdict !== "no").length;
 
+/**
+ * The prompt these answers were given, as a hash. US-223.
+ *
+ * A recorded verdict is evidence only while the prompt that produced it is the
+ * prompt the product sends. Edit this one and every number in the fixture
+ * becomes a claim about a prompt that no longer exists — and nothing would say
+ * so, because the file still parses and the counts still add up.
+ * `triage-examples.test.ts` compares this and goes red instead.
+ */
+const promptHash = createHash("sha256")
+  .update(`${config.model}\n${buildTriageSystemPrompt(exampleMonitor)}`)
+  .digest("hex")
+  .slice(0, 16);
+
 const record = {
   provider: config.provider,
   model: config.model,
+  promptHash,
   capturedAt: new Date().toISOString(),
   note:
     "What a real triage model answered for every comment US-029 labelled by hand, plus PLAN.md's " +

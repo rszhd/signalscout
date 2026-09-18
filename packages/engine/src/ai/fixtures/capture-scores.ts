@@ -50,7 +50,7 @@
  * about a pair of models and overwriting one with the other loses the pair.
  */
 import { createHash } from "node:crypto";
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { defaultMinimumScore } from "../../vocabulary.js";
 import { createClassifier } from "../classify.js";
@@ -186,17 +186,35 @@ const rescore = process.argv.includes("--rescore");
  */
 const file = `triage-scores-${config.model}-by-${triageModel}.json`;
 
-/** What a previous run scored, where the prompt has not moved since. */
+/**
+ * What any previous run scored under this same prompt, whichever triage model
+ * it was joined with.
+ *
+ * The first version read only its own output file, whose name carries the
+ * triage model. So trying a second triage model looked like a first run and
+ * re-bought all fifty classifications — the exact waste the cache exists to
+ * stop, and it cost two cents to learn.
+ *
+ * The score does not depend on the verdict. Triage feeds the classifier
+ * nothing; it decides only whether the call happens. So every
+ * `triage-scores-<this model>-by-*.json` holds the same scores for the same
+ * items, and any of them under the same prompt hash will do.
+ */
 const cached = new Map<string, Scored>();
 
-if (!rescore && existsSync(`${here}${file}`)) {
-  const previous = JSON.parse(readFileSync(`${here}${file}`, "utf8")) as {
-    promptHash?: string;
-    scored?: readonly Scored[];
-  };
+if (!rescore) {
+  for (const candidate of readdirSync(here)) {
+    if (!candidate.startsWith(`triage-scores-${config.model}-by-`)) continue;
 
-  if (previous.promptHash === promptHash) {
-    for (const row of previous.scored ?? []) cached.set(row.id, row);
+    const previous = JSON.parse(readFileSync(`${here}${candidate}`, "utf8")) as {
+      promptHash?: string;
+      scored?: readonly Scored[];
+    };
+    if (previous.promptHash !== promptHash) continue;
+
+    for (const row of previous.scored ?? []) {
+      if (row.score !== null && !cached.has(row.id)) cached.set(row.id, row);
+    }
   }
 }
 

@@ -85,6 +85,27 @@ const args = process.argv.slice(2);
 const perCell = Number(args.find((arg) => arg.startsWith("--per-cell="))?.split("=")[1] ?? 30);
 const dry = args.includes("--dry");
 
+/**
+ * `--only-dropped-from=<run record>`: re-ask the items a previous run refused.
+ *
+ * This is the question a prompt change actually has to answer. A drop is where
+ * the damage is, so after loosening or tightening the prompt the useful run is
+ * not the whole sample again — it is the set that was refused, asked once more,
+ * to see which answers moved and in which direction.
+ *
+ * It is also the cheap run. The classifications are already bought and cached,
+ * so re-asking a hundred drops is a hundred triage calls and nothing else.
+ */
+const onlyDroppedFrom = args.find((arg) => arg.startsWith("--only-dropped-from="))?.split("=")[1];
+
+/** `--ids=` for one deliberate item, when a single verdict is the question. */
+const onlyIds = args
+  .find((arg) => arg.startsWith("--ids="))
+  ?.split("=")[1]
+  ?.split(",")
+  .map((id) => id.trim())
+  .filter((id) => id !== "");
+
 /** `worker/classify.ts` cuts a parent to this, and so does this file. */
 const parentExcerptLength = 600;
 
@@ -165,10 +186,23 @@ function saveCache(): void {
  * the same lost money by a different route. It saves and then exits rather
  * than continuing, because an interrupt means stop.
  */
+/** Filled by the run, so an interrupt can write down what it had decided. */
+const soFar: Result[] = [];
+let spent = { triage: 0, classify: 0 };
+
 for (const signal of ["SIGINT", "SIGTERM"] as const) {
   process.on(signal, () => {
     saveCache();
-    console.log(`\nStopped. ${scoreCache.size} score(s) kept in ${cacheFile}.`);
+
+    // The record too, and for the same reason: `--only-dropped-from=` reads
+    // it, and the run worth re-asking after a prompt change is usually one
+    // that was stopped because it had already shown its answer.
+    const file = soFar.length > 0 ? writeRecord(soFar, spent.triage, spent.classify) : undefined;
+
+    console.log(
+      `\nStopped after ${soFar.length} item(s). ${scoreCache.size} score(s) kept in ` +
+        `${cacheFile}${file ? `, and the run so far is in ${file}` : ""}.`,
+    );
     process.exit(130);
   });
 }
@@ -248,26 +282,47 @@ async function sample(): Promise<Row[]> {
     order by r.source, r.kind, r.seat
   `);
 
-  return rows.map((row) => ({
-    postId: String(row.post_id),
-    source: String(row.source),
-    kind: String(row.kind),
-    channel: (row.channel as string | null) ?? null,
-    author: (row.author as string | null) ?? null,
-    title: (row.title as string | null) ?? null,
-    excerpt: String(row.excerpt),
-    postedAt: new Date(row.posted_at as string),
-    parentTitle: (row.parent_title as string | null) ?? null,
-    parentExcerpt: (row.parent_excerpt as string | null) ?? null,
-    aboveExcerpt: (row.above_excerpt as string | null) ?? null,
-    monitorId: String(row.monitor_id),
-    monitorName: String(row.monitor_name),
-    product: String(row.product),
-    idealCustomer: String(row.ideal_customer),
-    problem: String(row.problem),
-    signals: (row.signals as string[] | null) ?? [],
-    minScore: Number(row.min_score),
-  }));
+  const wanted = selected();
+
+  return rows
+    .filter((row) => wanted === undefined || wanted.has(String(row.post_id)))
+    .map((row) => ({
+      postId: String(row.post_id),
+      source: String(row.source),
+      kind: String(row.kind),
+      channel: (row.channel as string | null) ?? null,
+      author: (row.author as string | null) ?? null,
+      title: (row.title as string | null) ?? null,
+      excerpt: String(row.excerpt),
+      postedAt: new Date(row.posted_at as string),
+      parentTitle: (row.parent_title as string | null) ?? null,
+      parentExcerpt: (row.parent_excerpt as string | null) ?? null,
+      aboveExcerpt: (row.above_excerpt as string | null) ?? null,
+      monitorId: String(row.monitor_id),
+      monitorName: String(row.monitor_name),
+      product: String(row.product),
+      idealCustomer: String(row.ideal_customer),
+      problem: String(row.problem),
+      signals: (row.signals as string[] | null) ?? [],
+      minScore: Number(row.min_score),
+    }));
+}
+
+/**
+ * The post ids this run is limited to, or undefined for the whole sample.
+ *
+ * A record from a stopped run counts: it is written on the way out for exactly
+ * this, so an interrupted run still says which items it had refused.
+ */
+function selected(): Set<string> | undefined {
+  if (onlyIds) return new Set(onlyIds);
+  if (!onlyDroppedFrom) return undefined;
+
+  const record = JSON.parse(readFileSync(onlyDroppedFrom, "utf8")) as {
+    items?: readonly { postId: string; kept: boolean }[];
+  };
+
+  return new Set((record.items ?? []).filter((item) => !item.kept).map((item) => item.postId));
 }
 
 interface Result extends Row {
@@ -388,6 +443,8 @@ async function main(): Promise<void> {
       status,
     };
     results.push(result);
+    soFar.push(result);
+    spent = { triage: triageMicros, classify: classifyMicros };
 
     done += 1;
     const flag = !result.kept && (result.score ?? 0) >= row.minScore ? " <- DROPPED A MATCH" : "";

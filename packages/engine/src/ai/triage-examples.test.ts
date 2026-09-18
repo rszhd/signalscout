@@ -21,15 +21,19 @@
  * written up as a rate for Reddit, for comments, or for anything but these two
  * threads against this one monitor.
  */
+import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
+import { exampleMonitor } from "./fixtures/examples.js";
 import { pinnedTriageModel } from "./fixtures/pinned.js";
 import { triageSchema } from "./triage.js";
+import { buildTriageSystemPrompt } from "./triage-prompt.js";
 
 /** What `capture-triage.ts` writes. Read from disk, the way examples.test.ts does. */
 interface CapturedTriage {
   readonly provider: string;
   readonly model: string;
+  readonly promptHash: string;
   readonly monitor: { readonly product: string };
   readonly counts: {
     readonly asking: number;
@@ -145,22 +149,27 @@ describe("what it kept and dropped", () => {
    * for the same reason. An exact count here would go red on a re-capture that
    * changed nothing, and a test that cries wolf is one nobody reads.
    */
-  it("drops almost all of the people answering, which is the saving", () => {
+  it("drops most of the people answering, which is the saving", () => {
     expect(verdicts.counts.answering).toBe(26);
-
-    // 6 before US-221, 3 after it, 2 after US-222. The bound sits below the
-    // first two: a prompt that stops asking what the author wants goes red.
-    expect(verdicts.counts.answeringKept).toBeLessThanOrEqual(4);
+    expect(verdicts.counts.answeringKept).toBeLessThanOrEqual(9);
   });
 
-  it("keeps a sixth of all comments", () => {
+  /**
+   * The keep rate has moved four times in one day and the direction is not the
+   * point. 19 before US-221, 13 after it, 8 after US-222 tightened, 14 after
+   * US-223 loosened again to stop a real lead being deleted on live data.
+   *
+   * Tightening and loosening trade the same two numbers against each other:
+   * this run refuses 3 items that would have matched where the tightest one
+   * refused 7, and pays for 12 worthless classifications where that one paid
+   * for 8. Neither is a fault on its own. `triage-scores.test.ts` holds the
+   * one that is — a lead deleted — and this band only says the stage has not
+   * quietly stopped filtering.
+   */
+  it("keeps between a tenth and a half of all comments", () => {
     expect(verdicts.counts.comments).toBe(46);
-
-    // 19, then 13, then 8, across US-221 and US-222 on 2026-09-18. Wide enough
-    // for the drift two runs on one day showed, narrow enough to notice the
-    // stage loosening back.
     expect(verdicts.counts.commentsKept).toBeGreaterThan(4);
-    expect(verdicts.counts.commentsKept).toBeLessThan(12);
+    expect(verdicts.counts.commentsKept).toBeLessThan(23);
   });
 
   /**
@@ -197,11 +206,33 @@ describe("what it kept and dropped", () => {
     expect(verdicts.counts.askingKept).toBe(2);
 
     const refused = answers.filter((answer) => answer.role === "asking" && answer.verdict === "no");
+    const text = refused
+      .map((answer) => answer.item.excerpt)
+      .join(" ")
+      .toLowerCase();
 
     expect(refused).toHaveLength(2);
-    expect(refused.map((answer) => answer.item.excerpt).join(" ")).toContain("native android app");
-    expect(refused.map((answer) => answer.item.excerpt).join(" ")).toContain("detox");
+    expect(text).toContain("native android app");
+    expect(text).toContain("detox");
     expect(verdicts.monitor.product).toContain("web apps");
+  });
+
+  /**
+   * The guard. Read `triage-scores.test.ts`'s header: this is the same one,
+   * for the other prompt.
+   *
+   * A recorded verdict is evidence only while the prompt that produced it is
+   * the prompt the product sends. A red test here means re-run
+   * `capture:triage` and `capture:scores`, read whether the leads survived,
+   * and put the numbers in the ticket. `docs/instruments.md` has the loop.
+   */
+  it("was captured under the prompt the product sends today", () => {
+    const hash = createHash("sha256")
+      .update(`${verdicts.model}\n${buildTriageSystemPrompt(exampleMonitor)}`)
+      .digest("hex")
+      .slice(0, 16);
+
+    expect(hash).toBe(verdicts.promptHash);
   });
 
   /**
@@ -211,11 +242,20 @@ describe("what it kept and dropped", () => {
    * refuses one of them is broken however good its keep rate looks, and this is
    * the assertion that says so.
    */
+  /**
+   * Kept, not `yes`, and the difference is the stage's whole contract.
+   *
+   * Only an explicit `no` drops. `mild-problem-signal` — "our tests break
+   * whenever the UI changes" — has answered `yes` and `maybe` on different
+   * prompts and different days, and both pass it on to the classifier, which
+   * is the only thing this assertion may care about. Demanding `yes` made the
+   * test fail on a run where nothing was lost.
+   */
   it("keeps every worked example that PLAN.md scores as a lead", () => {
     const posts = answers.filter((answer) => answer.kind === "post");
     const leads = posts.filter((answer) => answer.id !== "low-intent");
 
     expect(leads).toHaveLength(3);
-    for (const lead of leads) expect(lead.verdict).toBe("yes");
+    for (const lead of leads) expect(lead.verdict).not.toBe("no");
   });
 });

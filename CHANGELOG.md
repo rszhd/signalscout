@@ -19,6 +19,12 @@ versioned and is not described here; it is what `main` holds.
 
 ## Unreleased
 
+**Changed.** An explicit ask always survives triage (US-223). A request for a
+recommendation, for what others use, or for help with something of the author's
+own is never refused, whatever the post looks like around it. DeepSeek Flash
+refused a person asking for acne-scar recommendations because the post opened
+like a product review, and a refusal leaves no row for anybody to notice.
+
 **Changed.** Triage asks what the author wants, not only who the author is
 (US-221). Three of the classifier's five dimensions are about the want, so a
 plausible person who wanted nothing used to pass and buy a classification that

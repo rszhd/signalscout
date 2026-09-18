@@ -19,6 +19,18 @@ versioned and is not described here; it is what `main` holds.
 
 ## Unreleased
 
+**Changed.** A post the classifier says is not about this area cannot score as
+a lead (US-225). `leadScore` now scales the weighted total by relevance when
+relevance is under 40, so a post scored 0 for relevance scores 0 overall.
+Before, intent and urgency carried 45% between them and a wholly off-topic post
+could reach 42 and land in an inbox — found in a live one, where four of
+seventeen matches were that shape.
+
+Two new exports beside it, `relevanceFloor` and `relevanceGate`, for a consumer
+that wants to explain or reproduce the number. **Scores will move**: anything
+the classifier scored under 40 for relevance now scores lower, and nothing at
+or above 40 changes at all. PLAN.md's four worked examples are unchanged.
+
 **Changed.** An explicit ask always survives triage (US-223). A request for a
 recommendation, for what others use, or for help with something of the author's
 own is never refused, whatever the post looks like around it. DeepSeek Flash

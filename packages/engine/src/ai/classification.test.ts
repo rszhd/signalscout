@@ -187,6 +187,72 @@ describe("the lead score", () => {
   });
 
   /**
+   * The opposite mistake, and the one that reached a real inbox.
+   *
+   * These two are live matches from 2026-09-18, on a monitor for a social
+   * listening tool. Both were scored **0 for relevance and 0 for problem fit**
+   * by the classifier, and both became matches anyway: the weighted sum let
+   * intent and urgency carry 45% between them. "What can I do to stop these
+   * loan offer emails?" scored 31 and "Free trial vs Free plan" scored 42.
+   *
+   * Wanting something urgently is not wanting this. A post the classifier says
+   * is not about this area cannot be a lead, and now it cannot score as one.
+   */
+  it("is nothing when the classifier says the post is not about this area", () => {
+    const loanSpam = classificationSchema.parse(
+      withScores({ relevance: 0, problemFit: 0, icpFit: 30, intent: 70, urgency: 90 }),
+    );
+    const pricingQuestion = classificationSchema.parse(
+      withScores({ relevance: 0, problemFit: 0, icpFit: 50, intent: 80, urgency: 90 }),
+    );
+
+    expect(leadScore(loanSpam)).toBe(0);
+    expect(leadScore(pricingQuestion)).toBe(0);
+  });
+
+  /**
+   * A ratio rather than a cliff, so no single point of relevance decides a
+   * match.
+   *
+   * The fall is steeper than the gate alone, because relevance is in both
+   * halves: it is still one of the five weighted parts, and now it also scales
+   * the result. With the other four held at 80/40/40/40, the sums are 54 at
+   * relevance 40, 50 at 20, 48 at 10 and 46 at 0, and the gate multiplies them
+   * by 1, 0.5, 0.25 and 0.
+   */
+  it("scales the score down as relevance falls, rather than cutting it off", () => {
+    const at = (relevance: number) =>
+      leadScore(
+        classificationSchema.parse(
+          withScores({ relevance, problemFit: 40, icpFit: 40, intent: 80, urgency: 40 }),
+        ),
+      );
+
+    expect(at(40)).toBe(54);
+    expect(at(20)).toBe(25);
+    expect(at(10)).toBe(12);
+    expect(at(0)).toBe(0);
+
+    // At and above the floor the gate does nothing, so relevance is back to
+    // being one weighted part of five and a higher one scores higher.
+    expect(at(80)).toBe(62);
+  });
+
+  /**
+   * The floor is where it is so that nothing on topic moves. PLAN.md's four
+   * worked examples score 45, 94, 95 and 98 for relevance, and `low-intent` is
+   * the closest of them: at 45 it clears the floor and keeps the score it
+   * always had.
+   */
+  it("leaves a post that is on topic exactly where it was", () => {
+    const lowIntent = classificationSchema.parse(
+      withScores({ relevance: 45, problemFit: 0, icpFit: 5, intent: 0, urgency: 0 }),
+    );
+
+    expect(leadScore(lowIntent)).toBe(10);
+  });
+
+  /**
    * "Playwright is awesome" against a monitor for a test runner: the post is
    * about the product area, so relevance is high, and nobody is asking for
    * anything. PLAN.md puts its intent at 3. The lead score has to stay low

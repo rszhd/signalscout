@@ -112,10 +112,16 @@ export type Classification = z.infer<typeof classificationSchema>;
  *
  * The weights follow PLAN.md's own sentence: the product is "an inbox of
  * people who might need your product", so intent — is this person looking for
- * something — carries most, and problem fit next. Relevance keeps an
- * off-topic post out. ICP fit and urgency are modifiers: a post from outside
- * the ideal customer can still be worth reading, and a stale one can still be
- * a lead.
+ * something — carries most, and problem fit next. ICP fit and urgency are
+ * modifiers: a post from outside the ideal customer can still be worth
+ * reading, and a stale one can still be a lead.
+ *
+ * **Relevance is not one of the five.** This comment used to say "relevance
+ * keeps an off-topic post out", and at a fifth of a weighted sum it did no
+ * such thing — intent and urgency carry 45% between them, so a post the
+ * classifier scored 0 for relevance and 0 for problem fit could still reach 42
+ * and land in somebody's inbox. `relevanceGate` below is what that sentence
+ * always meant.
  *
  * These are a stated default, not a measured one. `fixtures/capture.mjs`
  * prints the parts and this total for PLAN.md's four examples, which is the
@@ -129,6 +135,39 @@ export const scoreWeights = {
   urgency: 0.1,
 } as const;
 
+/**
+ * Below this, relevance scales the whole score down instead of contributing a
+ * fifth of it.
+ *
+ * **Found in a live inbox on 2026-09-18.** A monitor for a social listening
+ * tool had matched "What can I do to stop these loan offer emails?" at 31 and
+ * "Free trial vs Free plan" at 42. The classifier had scored both **0 for
+ * relevance and 0 for problem fit** and been overruled by its own weights: the
+ * authors wanted something, urgently, and wanted it about something else
+ * entirely. Four of that monitor's seventeen matches were this shape.
+ *
+ * 40 is chosen so that nothing on topic moves. PLAN.md's four worked examples
+ * score 45, 94, 95 and 98 for relevance, so all four totals are unchanged —
+ * including `low-intent`, which stays at 10 and stays below the threshold for
+ * the reason it always did. The gate only reaches posts the classifier itself
+ * says are barely about this area.
+ *
+ * A ratio rather than a cliff, so there is no score at which one point of
+ * relevance decides a match. Re-run `capture:classifier` before moving it.
+ */
+export const relevanceFloor = 40;
+
+/**
+ * How much of the weighted total survives, given how on-topic the post is.
+ *
+ * 1 at or above the floor, and proportional below it: relevance 20 keeps half,
+ * relevance 0 keeps none. A post that is not about this area cannot be a lead,
+ * however badly its author wants something.
+ */
+export function relevanceGate(relevance: number): number {
+  return Math.min(1, Math.max(0, relevance) / relevanceFloor);
+}
+
 export function leadScore(classification: Classification): number {
   const total =
     classification.intent * scoreWeights.intent +
@@ -137,7 +176,7 @@ export function leadScore(classification: Classification): number {
     classification.icpFit * scoreWeights.icpFit +
     classification.urgency * scoreWeights.urgency;
 
-  return Math.round(total);
+  return Math.round(total * relevanceGate(classification.relevance));
 }
 
 /** The scores as the `matches` columns hold them: integers, 0 to 100. */

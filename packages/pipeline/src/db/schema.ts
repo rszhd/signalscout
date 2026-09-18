@@ -1416,6 +1416,17 @@ export const stageRuns = pgTable(
     /** The owner, copied rather than joined, for `poll_runs.user_id`'s reason. */
     userId: text("user_id").notNull(),
     stage: text("stage").$type<StageName>().notNull(),
+    /**
+     * The collection this stage was part of, or null. US-203.
+     *
+     * The same id `poll_runs.walk_id` carries, handed along in the job rather
+     * than looked up: a stage knows its posts and a post carries no walk, so
+     * reading "the monitor's newest poll" would file a classification under
+     * whichever poll happened to be running when it finished. Null on a row
+     * written before this existed, and on the notification sweep, which
+     * belongs to no collection.
+     */
+    walkId: uuid("walk_id"),
     startedAt: timestamp("started_at", { withTimezone: true }).notNull().defaultNow(),
     finishedAt: timestamp("finished_at", { withTimezone: true }),
     outcome: text("outcome").$type<StageOutcome>().notNull(),
@@ -1440,6 +1451,8 @@ export const stageRuns = pgTable(
   (table) => [
     // The screen's own query: this monitor's stages, newest first.
     index("stage_runs_monitor_started_idx").on(table.monitorId, table.startedAt),
+    // The read that groups a collection with the stages it caused.
+    index("stage_runs_walk_idx").on(table.walkId),
     check("stage_runs_stage_known", oneOf("stage", stageNames)),
     check("stage_runs_outcome_known", oneOf("outcome", stageOutcomes)),
     check("stage_runs_stop_reason_known", optionallyOneOf("stop_reason", stageStopReasons)),

@@ -17,7 +17,15 @@ described here; it is what `main` holds.
 
 ## Unreleased
 
-Nothing yet.
+**Added.** `stage_runs.walk_id`: the collection a stage belonged to, the same
+id `poll_runs.walk_id` carries. Every pipeline payload after the poll now
+carries `walkId`, and each step passes it to the next, so a filter and a
+classification can be shown beside the poll that fed them. A screen that reads
+the rows by time alone cannot pair them: a paging walk is several polls whose
+stages interleave.
+
+Null on a row written by an older worker, and on the notification sweep, which
+belongs to no collection. Migration `0062` adds the column and its index.
 
 ## 0.5.0 — 2026-09-18
 

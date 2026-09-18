@@ -21,6 +21,18 @@ The manifests say `0.0.0` in git, on purpose. The tag is the version. A
 number in a file is a number somebody forgets to move, and a pull request
 that bumps it is a pull request about nothing.
 
+## While the work is in progress, nothing is cut
+
+A feature usually has a half here and a half in the hosted application. That
+one is built against this working copy, not against npm: it packs both
+packages and installs the tarballs, with
+`node scripts/packages-from-source.mjs on` in that repository. A version is cut
+once, when both halves are finished.
+
+Publishing to find out whether the other half reads a new table right — and
+publishing again when it does not — leaves half-finished shapes on npm for
+ever. Every version here is permanent and somebody else may be running it.
+
 ## Cutting one
 
 1. Merge to `main` the way any change reaches it: `dev`, then a pull request

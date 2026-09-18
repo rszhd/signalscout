@@ -183,7 +183,7 @@ export function createRepliesStep({
   credentialsFor,
 }: CollectOptions): Step<RepliesPayload> {
   return async function replies(
-    { monitorId, postIds },
+    { monitorId, postIds, walkId },
     { db, boss, logger }: StepContext,
   ): Promise<void> {
     const ids = [...postIds];
@@ -223,6 +223,7 @@ export function createRepliesStep({
           monitorId,
           userId: monitor.userId,
           stage: "replies",
+          walkId: walkId ?? null,
           startedAt,
           finishedAt: new Date(),
           outcome: record.outcome,
@@ -764,7 +765,7 @@ export function createRepliesStep({
     if (storedReplyIds.length === 0) return;
 
     // Back through the filter, where a reply meets triage and nothing else.
-    await boss.send(filterQueue, { monitorId, postIds: storedReplyIds });
+    await boss.send(filterQueue, { monitorId, postIds: storedReplyIds, walkId });
   };
 }
 

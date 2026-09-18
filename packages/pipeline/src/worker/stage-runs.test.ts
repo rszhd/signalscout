@@ -77,8 +77,11 @@ function stubClassifier(outcome: () => ClassificationOutcome): Classifier {
 
 const scored: ClassificationOutcome = { status: "scored", classification, score: 92, call };
 
+/** The queue, as a step sees it. Typed, so a case can read what was sent. */
 function stubBoss() {
-  return { send: vi.fn(async () => "job-1") };
+  return {
+    send: vi.fn(async (_queue: string, _payload: Record<string, unknown>) => "job-1"),
+  };
 }
 
 function contextFor(db: Database): StepContext {
@@ -352,6 +355,65 @@ describe("what a stage records about itself", () => {
       await createNotifyStep(transport)({ monitorId, matchIds: [] }, contextFor(db));
 
       expect(await runsOf(monitorId)).toEqual([]);
+    });
+  });
+
+  /**
+   * The walk, carried from the poll. US-203.
+   *
+   * Four polls of one paging collection produce four filters, and they
+   * interleave: a filter for one poll runs while the next poll is already
+   * collecting. Without this the history is eight true lines nobody can pair.
+   */
+  describe("which collection a stage belonged to", () => {
+    it("writes the walk the job carried", async () => {
+      const monitorId = await insertMonitor(database, {
+        generatedQueries: ["manually testing signup and checkout"],
+        generatedSubreddits: [],
+      });
+      const postId = await insertPost(strongPost);
+      const walkId = crypto.randomUUID();
+
+      await createFilterStep()({ monitorId, postIds: [postId], walkId }, contextFor(db));
+
+      expect((await runsOf(monitorId))[0]?.walkId).toBe(walkId);
+    });
+
+    it("passes it to the stage it enqueues", async () => {
+      const monitorId = await insertMonitor(database, {
+        generatedQueries: ["manually testing signup and checkout"],
+        generatedSubreddits: [],
+      });
+      const postId = await insertPost(strongPost);
+      const walkId = crypto.randomUUID();
+      const boss = stubBoss();
+
+      await createFilterStep()(
+        { monitorId, postIds: [postId], walkId },
+        { db, boss: boss as unknown as StepContext["boss"], logger: silentLogger },
+      );
+
+      // Every job this step sends carries the collection on, so the classify
+      // row and the replies row file under the same poll as this one.
+      for (const [, payload] of boss.send.mock.calls) {
+        expect(payload.walkId).toBe(walkId);
+      }
+      expect(boss.send.mock.calls.length).toBeGreaterThan(0);
+    });
+
+    it("writes null for a job an older worker sent", async () => {
+      // A worker that predates this field is still a worker. Its jobs are
+      // still work, and a stage that refused to record one would lose the
+      // history over a field that is only ever read for grouping.
+      const monitorId = await insertMonitor(database, {
+        generatedQueries: ["manually testing signup and checkout"],
+        generatedSubreddits: [],
+      });
+      const postId = await insertPost(strongPost);
+
+      await createFilterStep()({ monitorId, postIds: [postId] }, contextFor(db));
+
+      expect((await runsOf(monitorId))[0]?.walkId).toBeNull();
     });
   });
 

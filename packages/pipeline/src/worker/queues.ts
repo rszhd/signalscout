@@ -98,13 +98,28 @@ export interface EstimatePayload {
   readonly estimateId: string;
 }
 
-export interface FilterPayload {
+/**
+ * The collection a job belongs to. US-203.
+ *
+ * It travels with the work rather than being looked up, because a stage knows
+ * its posts and a post carries no walk. Reading "the monitor's newest poll"
+ * instead would attribute a classification to whichever poll happened to be
+ * running when it finished — wrong exactly when a paging walk makes the
+ * history hard to read, which is the case this exists for.
+ *
+ * Optional, so a job sent by an older worker is still a job.
+ */
+export interface WalkPayload {
+  readonly walkId?: string;
+}
+
+export interface FilterPayload extends WalkPayload {
   readonly monitorId: string;
   /** Posts this poll saw, new and already stored. Rows, not payloads. */
   readonly postIds: readonly string[];
 }
 
-export interface RepliesPayload {
+export interface RepliesPayload extends WalkPayload {
   readonly monitorId: string;
   /**
    * Posts whose threads are worth opening. Only `kind = 'post'` rows reach
@@ -114,12 +129,12 @@ export interface RepliesPayload {
   readonly postIds: readonly string[];
 }
 
-export interface ClassifyPayload {
+export interface ClassifyPayload extends WalkPayload {
   readonly monitorId: string;
   readonly postIds: readonly string[];
 }
 
-export interface NotifyPayload {
+export interface NotifyPayload extends WalkPayload {
   readonly monitorId: string;
   readonly matchIds: readonly string[];
 }

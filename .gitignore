@@ -48,3 +48,4 @@ worktrees/
 # that matter go in the ticket.
 triage-score-*.json
 triage-score-cache-*.json
+triage-score-cache-*.json.tmp

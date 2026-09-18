@@ -44,7 +44,8 @@
  * throws the cache away by itself. `--rescore` forces it.
  *
  * The cache holds real people's post text, so it lives beside the run records
- * and `.gitignore` keeps both out of the repository.
+ * and `.gitignore` keeps both out of the repository. It is saved after every
+ * call it pays for, so stopping the run keeps what it has already bought.
  *
  * It spends model money and no provider credit: one triage call per sampled
  * item, and one classification per item that is not already cached. At the prices measured on 2026-09-18 —
@@ -59,7 +60,7 @@
  */
 
 import { createHash } from "node:crypto";
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import {
   aiConfigFromEnvironment,
   buildSystemPrompt,
@@ -135,6 +136,42 @@ const scoreCache = new Map<string, CachedScore>(
     ? Object.entries(JSON.parse(readFileSync(cacheFile, "utf8")) as Record<string, CachedScore>)
     : [],
 );
+
+/**
+ * The cache is written after every classification that was paid for, not at
+ * the end of the run.
+ *
+ * A run over the whole sample is hundreds of calls and several minutes, and it
+ * gets interrupted: stopped on purpose, a provider going quiet, a laptop
+ * closing. The first version saved once, at the end, so an interrupt threw
+ * away every classification the run had already bought — 117 of them on
+ * 2026-09-18, about eight cents, for nothing.
+ *
+ * It renames a temporary file over the real one so that a kill during the
+ * write cannot leave half a JSON file behind. Half a cache is worse than none:
+ * the next run would fail to parse it and start again anyway, and this way a
+ * kill at any moment leaves the cache exactly as it was one item ago.
+ */
+function saveCache(): void {
+  const temporary = `${cacheFile}.tmp`;
+  writeFileSync(temporary, `${JSON.stringify(Object.fromEntries(scoreCache), null, 2)}\n`);
+  renameSync(temporary, cacheFile);
+}
+
+/**
+ * Ctrl-C keeps what the run has already paid for.
+ *
+ * Without this the signal ends the process before the loop can save, which is
+ * the same lost money by a different route. It saves and then exits rather
+ * than continuing, because an interrupt means stop.
+ */
+for (const signal of ["SIGINT", "SIGTERM"] as const) {
+  process.on(signal, () => {
+    saveCache();
+    console.log(`\nStopped. ${scoreCache.size} score(s) kept in ${cacheFile}.`);
+    process.exit(130);
+  });
+}
 
 /**
  * The cache key: this monitor's own system prompt, not a version number.
@@ -340,6 +377,7 @@ async function main(): Promise<void> {
       score = scored.status === "scored" ? scored.score : null;
       status = scored.status;
       scoreCache.set(key, { promptHash, score, status });
+      saveCache();
     }
 
     const result: Result = {
@@ -361,7 +399,7 @@ async function main(): Promise<void> {
     );
   }
 
-  writeFileSync(cacheFile, `${JSON.stringify(Object.fromEntries(scoreCache), null, 2)}\n`);
+  saveCache();
   console.log(
     `\n${reused} score(s) reused from ${cacheFile} under the same prompt; ` +
       `${results.length - reused} bought now. A * marks a reused one.`,

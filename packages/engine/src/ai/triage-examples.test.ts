@@ -21,14 +21,19 @@
  * written up as a rate for Reddit, for comments, or for anything but these two
  * threads against this one monitor.
  */
+import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
+import { exampleMonitor } from "./fixtures/examples.js";
+import { pinnedTriageModel } from "./fixtures/pinned.js";
 import { triageSchema } from "./triage.js";
+import { buildTriageSystemPrompt } from "./triage-prompt.js";
 
 /** What `capture-triage.ts` writes. Read from disk, the way examples.test.ts does. */
 interface CapturedTriage {
   readonly provider: string;
   readonly model: string;
+  readonly promptHash: string;
   readonly monitor: { readonly product: string };
   readonly counts: {
     readonly asking: number;
@@ -55,7 +60,10 @@ interface CapturedTriage {
 }
 
 const verdicts = JSON.parse(
-  readFileSync(new URL("./fixtures/triage-verdicts.json", import.meta.url), "utf8"),
+  readFileSync(
+    new URL(`./fixtures/triage-verdicts-${pinnedTriageModel}.json`, import.meta.url),
+    "utf8",
+  ),
 ) as CapturedTriage;
 
 const answers = verdicts.answers;
@@ -63,7 +71,7 @@ const answers = verdicts.answers;
 describe("what the model returned", () => {
   it("was captured from a real provider, not written here", () => {
     expect(verdicts.provider).toBe("openai");
-    expect(verdicts.model).toBe("gpt-5.6-luna");
+    expect(verdicts.model).toBe(pinnedTriageModel);
     expect(answers).toHaveLength(50);
   });
 
@@ -81,27 +89,43 @@ describe("what the model returned", () => {
   });
 
   /**
-   * The assumption this ticket was written on, and the measurement that broke
-   * it.
+   * The assumption this ticket was written on, the measurement that broke it,
+   * and the second measurement that partly restored it.
    *
    * A one-word answer was expected to cost a fraction of a classification's 95
-   * output tokens. It does not: this model bills its own reasoning as output,
-   * so the answer being short does not make the call short. The saving comes
-   * from the price gap between the two models, which is why
-   * `worker/runtime.ts` warns when a deployment has no gap.
+   * output tokens. On the first prompt it did not: this model bills its own
+   * reasoning as output, and a short answer does not shorten the thinking. The
+   * bound here used to sit *above* 95 to say so.
    *
-   * The bound is above the classification's 95 on purpose. It goes red if some
-   * later prompt makes the answer genuinely cheap, which would be good news
-   * that should be measured rather than assumed.
+   * US-221 sharpened the question and the thinking shrank with it, from 123
+   * output tokens an item to 80. That is below a classification, so the bound
+   * turned over. It is the good news the old comment said should be measured
+   * rather than assumed, and it is measured here.
+   *
+   * It is still not where the saving comes from. Read the next test.
    */
-  it("did not spend fewer output tokens than a classification", () => {
+  it("spends about what a classification spends on output", () => {
     const perItem = verdicts.usage.outputTokens / answers.length;
 
     // ai/fixtures/manifest.json: a classification is 78 to 105 output tokens.
-    expect(perItem).toBeGreaterThan(95);
-    expect(perItem).toBeLessThan(200);
+    // 123 on the first prompt, 80 after US-221 sharpened the question, 97
+    // after US-222 added the rules for junk. The thinking tracks the length of
+    // the question, and none of the three is far from a classification's own
+    // output. This band says only that: the answer being one word has never
+    // made the call cheap.
+    expect(perItem).toBeGreaterThan(40);
+    expect(perItem).toBeLessThan(140);
   });
 
+  /**
+   * The cost per item did not move, and that is the point of asserting it.
+   *
+   * US-221 cut the output by a third and added as much to the input: 267
+   * micro-dollars an item before, 273 after. A cheaper answer is not a cheaper
+   * call. The saving is the classification that never happens, on a model that
+   * costs several times this one, which is why `worker/runtime.ts` warns when a
+   * deployment has no price gap between the two.
+   */
   it("cost about a quarter of a cent an item, and the run recorded it", () => {
     expect(verdicts.usage.estimatedCostMicros).toBeGreaterThan(0);
 
@@ -130,10 +154,22 @@ describe("what it kept and dropped", () => {
     expect(verdicts.counts.answeringKept).toBeLessThanOrEqual(9);
   });
 
-  it("keeps roughly half of all comments", () => {
+  /**
+   * The keep rate has moved four times in one day and the direction is not the
+   * point. 19 before US-221, 13 after it, 8 after US-222 tightened, 14 after
+   * US-223 loosened again to stop a real lead being deleted on live data.
+   *
+   * Tightening and loosening trade the same two numbers against each other:
+   * this run refuses 3 items that would have matched where the tightest one
+   * refused 7, and pays for 12 worthless classifications where that one paid
+   * for 8. Neither is a fault on its own. `triage-scores.test.ts` holds the
+   * one that is — a lead deleted — and this band only says the stage has not
+   * quietly stopped filtering.
+   */
+  it("keeps between a tenth and a half of all comments", () => {
     expect(verdicts.counts.comments).toBe(46);
-    expect(verdicts.counts.commentsKept).toBeGreaterThan(12);
-    expect(verdicts.counts.commentsKept).toBeLessThan(28);
+    expect(verdicts.counts.commentsKept).toBeGreaterThan(4);
+    expect(verdicts.counts.commentsKept).toBeLessThan(23);
   });
 
   /**
@@ -148,15 +184,55 @@ describe("what it kept and dropped", () => {
    * This is asserted rather than left in prose because the next person to edit
    * the prompt needs to know that this case exists and which way it went.
    */
-  it("refused one of the four people asking, and it is the one about native apps", () => {
+  /**
+   * Two of the four, and the count alone would read as a fault.
+   *
+   * US-029's `asking` label answers "is this person asking?". Triage is asked
+   * "could this be a person to reach, and do they want an answer?", which is
+   * not the same question, so a refused asker has to be read rather than
+   * counted.
+   *
+   * Both refusals are about a different product. One asks how to test a native
+   * Android app and the example monitor sells a browser test runner. The other
+   * asks whether Detox is useful, which is the same mismatch in fewer words;
+   * US-222 added the rule that made it a `no`, and
+   * `triage-scores-*.json` scores it **4**, so refusing it costs nothing.
+   *
+   * That is why the score fixture exists. A keep rate falling is not by itself
+   * bad news, and only a score beside the verdict can say which it is.
+   */
+  it("refused two of the four people asking, and both are about another product", () => {
     expect(verdicts.counts.asking).toBe(4);
-    expect(verdicts.counts.askingKept).toBe(3);
+    expect(verdicts.counts.askingKept).toBe(2);
 
     const refused = answers.filter((answer) => answer.role === "asking" && answer.verdict === "no");
+    const text = refused
+      .map((answer) => answer.item.excerpt)
+      .join(" ")
+      .toLowerCase();
 
-    expect(refused).toHaveLength(1);
-    expect(refused[0]?.item.excerpt).toContain("native android app");
+    expect(refused).toHaveLength(2);
+    expect(text).toContain("native android app");
+    expect(text).toContain("detox");
     expect(verdicts.monitor.product).toContain("web apps");
+  });
+
+  /**
+   * The guard. Read `triage-scores.test.ts`'s header: this is the same one,
+   * for the other prompt.
+   *
+   * A recorded verdict is evidence only while the prompt that produced it is
+   * the prompt the product sends. A red test here means re-run
+   * `capture:triage` and `capture:scores`, read whether the leads survived,
+   * and put the numbers in the ticket. `docs/instruments.md` has the loop.
+   */
+  it("was captured under the prompt the product sends today", () => {
+    const hash = createHash("sha256")
+      .update(`${verdicts.model}\n${buildTriageSystemPrompt(exampleMonitor)}`)
+      .digest("hex")
+      .slice(0, 16);
+
+    expect(hash).toBe(verdicts.promptHash);
   });
 
   /**
@@ -166,11 +242,20 @@ describe("what it kept and dropped", () => {
    * refuses one of them is broken however good its keep rate looks, and this is
    * the assertion that says so.
    */
+  /**
+   * Kept, not `yes`, and the difference is the stage's whole contract.
+   *
+   * Only an explicit `no` drops. `mild-problem-signal` — "our tests break
+   * whenever the UI changes" — has answered `yes` and `maybe` on different
+   * prompts and different days, and both pass it on to the classifier, which
+   * is the only thing this assertion may care about. Demanding `yes` made the
+   * test fail on a run where nothing was lost.
+   */
   it("keeps every worked example that PLAN.md scores as a lead", () => {
     const posts = answers.filter((answer) => answer.kind === "post");
     const leads = posts.filter((answer) => answer.id !== "low-intent");
 
     expect(leads).toHaveLength(3);
-    for (const lead of leads) expect(lead.verdict).toBe("yes");
+    for (const lead of leads) expect(lead.verdict).not.toBe("no");
   });
 });

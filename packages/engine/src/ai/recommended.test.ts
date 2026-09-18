@@ -34,7 +34,7 @@ describe("recommended models", () => {
    * US-030's whole finding, as an assertion.
    *
    * Triage reads everything the classifier would, so the stage only pays for
-   * itself through the price gap — on one model for both it measured 48% more
+   * itself through the price gap — on one model for both it measured 37% more
    * rather than less. A pair added later with no gap would ship that loss to
    * every account that never opened the screen, and nothing on the screen
    * would look wrong.

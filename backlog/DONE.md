@@ -2,7 +2,7 @@
 
 # Done
 
-138 finished.
+142 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
@@ -21,6 +21,10 @@
 | BUG-003 | [A post below the threshold is classified again on every poll](done/2026-09/BUG-003-a-post-below-the-threshold-is-classified-again-on-every-poll.md) | bug | fixed | 2026-09 |
 | BUG-002 | [A seven-day window is bought as a month](done/2026-09/BUG-002-a-seven-day-window-is-bought-as-a-month.md) | bug | fixed | 2026-09 |
 | BUG-001 | [A pending Reddit collection is not resumed](done/2026-09/BUG-001-a-pending-reddit-collection-is-not-resumed.md) | bug | shipped | 2026-09 |
+| US-225 | [Relevance decides whether a score counts](done/2026-09/US-225-relevance-decides-whether-a-score-counts.md) | bug | shipped | 2026-09 |
+| US-223 | [The classifier is the model that matters](done/2026-09/US-223-the-classifier-is-the-model-that-matters.md) | feature | shipped | 2026-09 |
+| US-222 | [A triage drop is checked against a score](done/2026-09/US-222-a-triage-drop-is-checked-against-a-score.md) | feature | shipped | 2026-09 |
+| US-221 | [Triage refuses a post that wants nothing](done/2026-09/US-221-triage-refuses-a-post-that-wants-nothing.md) | feature | shipped | 2026-09 |
 | US-216 | [The run is written down](done/2026-09/US-216-the-run-is-written-down.md) | chore | shipped | 2026-09 |
 | US-212 | [A post remembers the query that found it](done/2026-09/US-212-a-post-remembers-the-query-that-found-it.md) | feature | shipped | 2026-09 |
 | US-211 | [A stage says which poll it came from](done/2026-09/US-211-a-stage-says-which-poll-it-came-from.md) | feature | shipped | 2026-09 |

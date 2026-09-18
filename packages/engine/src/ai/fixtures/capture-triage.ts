@@ -39,17 +39,19 @@
  * prompt. A number from a run nobody recorded is a comment, and a comment
  * cannot be re-run.
  */
+import { createHash } from "node:crypto";
 import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { type AiConfig, triageConfigFromEnvironment } from "../config.js";
 import { aiEnvSchema } from "../env.js";
 import { createTriager } from "../triage.js";
-import type { ItemForTriage, TriageVerdict } from "../triage-prompt.js";
+import type { TriageVerdict } from "../triage-prompt.js";
+import { buildTriageSystemPrompt } from "../triage-prompt.js";
 import { exampleMonitor, labelledExamples } from "./examples.js";
+import { type LabelledSubject, labelledSubjects } from "./labelled-subjects.js";
 
 const here = fileURLToPath(new URL(".", import.meta.url));
 const root = fileURLToPath(new URL("../../../../../", import.meta.url));
-const threadsAt = fileURLToPath(new URL("../../sources/deletion-fixtures/", import.meta.url));
 
 /** Read .env without a dependency, the way `capture.ts` does. */
 function readEnvFile(path: string): Record<string, string> {
@@ -77,100 +79,43 @@ function readEnvFile(path: string): Record<string, string> {
 }
 
 const environment = { ...readEnvFile(`${root}.env`), ...process.env };
-const config: AiConfig = triageConfigFromEnvironment(aiEnvSchema.parse(environment));
+
+/**
+ * `--model=` and `--provider=`, because trying a model should not mean editing
+ * `.env` and remembering to put it back.
+ *
+ * New models keep arriving and this is the instrument that says whether one
+ * can be trusted in front of the classifier. A flag makes that a one-line
+ * experiment; an environment edit makes it a thing to undo, and an undo that
+ * is forgotten leaves the next run measuring something nobody meant.
+ */
+function flag(name: string): string | undefined {
+  return process.argv.find((arg) => arg.startsWith(`--${name}=`))?.split("=")[1];
+}
+
+const chosen = { model: flag("model"), provider: flag("provider") };
+const base: AiConfig = triageConfigFromEnvironment(aiEnvSchema.parse(environment));
+const config: AiConfig = {
+  ...base,
+  ...(chosen.model ? { model: chosen.model } : {}),
+  ...(chosen.provider ? { provider: chosen.provider as AiConfig["provider"] } : {}),
+};
 
 if (!config.apiKey) {
   console.error("No key. Set AI_API_KEY, or AI_TRIAGE_API_KEY for a separate triage provider.");
   process.exit(1);
 }
 
-/** The two threads US-029 captured and labelled, in the order it measured them. */
-const threads = [
-  {
-    name: "question-post",
-    thread: "scrapecreators-comments-canonical.json",
-    labels: "comment-labels.json",
-  },
-  {
-    name: "statement-post",
-    thread: "scrapecreators-comments-statement-post.json",
-    labels: "comment-labels-statement-post.json",
-  },
-] as const;
+/**
+ * The fifty items, from `labelled-subjects.ts`.
+ *
+ * They used to be built here. `capture-scores.ts` needs the same fifty in the
+ * same order to be able to put a score beside a verdict, and two copies of the
+ * list would drift.
+ */
+type Subject = LabelledSubject;
 
-interface CapturedComment {
-  readonly id: string;
-  readonly body?: string;
-  readonly replies?: { readonly items?: readonly CapturedComment[] };
-}
-
-interface HandLabel {
-  readonly id: string;
-  readonly role: "asking" | "answering" | "neither";
-  readonly topical: boolean;
-}
-
-function flatten(comments: readonly CapturedComment[]): CapturedComment[] {
-  return comments.flatMap((comment) => [comment, ...flatten(comment.replies?.items ?? [])]);
-}
-
-interface Subject {
-  readonly kind: "comment" | "post";
-  readonly thread: string;
-  readonly id: string;
-  /** The hand label, where there is one. A post has none. */
-  readonly role: HandLabel["role"] | null;
-  readonly item: ItemForTriage;
-}
-
-const subjects: Subject[] = [];
-
-for (const source of threads) {
-  const thread = JSON.parse(readFileSync(`${threadsAt}${source.thread}`, "utf8")) as {
-    post: { title: string; subreddit: string };
-    comments: readonly CapturedComment[];
-  };
-  const hand = JSON.parse(readFileSync(`${threadsAt}${source.labels}`, "utf8")) as {
-    labels: readonly HandLabel[];
-  };
-  const labelOf = new Map(hand.labels.map((label) => [label.id, label]));
-
-  for (const comment of flatten(thread.comments)) {
-    const label = labelOf.get(comment.id);
-    if (!label) throw new Error(`${source.labels} has no label for ${comment.id}.`);
-
-    subjects.push({
-      kind: "comment",
-      thread: source.name,
-      id: comment.id,
-      role: label.role,
-      item: {
-        source: "reddit",
-        channel: thread.post.subreddit,
-        // The parent post's title, because a comment borrows its subject from
-        // the post above it. US-020 stores this; here it is read from the
-        // fixture so the prompt sees what production will send.
-        title: thread.post.title,
-        excerpt: comment.body ?? "",
-      },
-    });
-  }
-}
-
-for (const example of labelledExamples) {
-  subjects.push({
-    kind: "post",
-    thread: "plan-examples",
-    id: example.slug,
-    role: null,
-    item: {
-      source: example.post.source,
-      channel: example.post.channel,
-      title: example.post.title,
-      excerpt: example.post.excerpt,
-    },
-  });
-}
+const subjects = labelledSubjects();
 
 const triager = createTriager({ config });
 
@@ -180,7 +125,18 @@ console.log(
     `${config.provider}/${config.model}.\n`,
 );
 
-interface Answer extends Subject {
+/**
+ * One recorded answer. `item` is the triage half of the subject and nothing
+ * else: the classification half carries a `Date` and a thread, and a fixture
+ * that serialised those would be twice the size and read as evidence about a
+ * call that never happened here.
+ */
+interface Answer {
+  readonly kind: Subject["kind"];
+  readonly thread: string;
+  readonly id: string;
+  readonly role: Subject["role"];
+  readonly item: Subject["forTriage"];
   readonly verdict: TriageVerdict | null;
   readonly status: string;
   readonly inputTokens?: number;
@@ -195,7 +151,7 @@ let costMicros = 0;
 let priced = true;
 
 for (const subject of subjects) {
-  const outcome = await triager.triage({ monitor: exampleMonitor, post: subject.item });
+  const outcome = await triager.triage({ monitor: exampleMonitor, post: subject.forTriage });
 
   inputTokens += outcome.call.inputTokens ?? 0;
   outputTokens += outcome.call.outputTokens ?? 0;
@@ -203,7 +159,11 @@ for (const subject of subjects) {
   else costMicros += outcome.call.estimatedCostMicros;
 
   answers.push({
-    ...subject,
+    kind: subject.kind,
+    thread: subject.thread,
+    id: subject.id,
+    role: subject.role,
+    item: subject.forTriage,
     verdict: outcome.verdict,
     status: outcome.status,
     inputTokens: outcome.call.inputTokens,
@@ -213,7 +173,7 @@ for (const subject of subjects) {
 
   console.log(
     `  ${(outcome.verdict ?? outcome.status).padEnd(6)} ${(subject.role ?? subject.kind).padEnd(10)}` +
-      ` ${subject.id.padEnd(18)} ${subject.item.excerpt.replace(/\s+/g, " ").slice(0, 72)}`,
+      ` ${subject.id.padEnd(18)} ${subject.forTriage.excerpt.replace(/\s+/g, " ").slice(0, 72)}`,
   );
 }
 
@@ -223,9 +183,24 @@ const answering = comments.filter((answer) => answer.role === "answering");
 const neither = comments.filter((answer) => answer.role === "neither");
 const kept = (rows: readonly Answer[]) => rows.filter((row) => row.verdict !== "no").length;
 
+/**
+ * The prompt these answers were given, as a hash. US-223.
+ *
+ * A recorded verdict is evidence only while the prompt that produced it is the
+ * prompt the product sends. Edit this one and every number in the fixture
+ * becomes a claim about a prompt that no longer exists — and nothing would say
+ * so, because the file still parses and the counts still add up.
+ * `triage-examples.test.ts` compares this and goes red instead.
+ */
+const promptHash = createHash("sha256")
+  .update(`${config.model}\n${buildTriageSystemPrompt(exampleMonitor)}`)
+  .digest("hex")
+  .slice(0, 16);
+
 const record = {
   provider: config.provider,
   model: config.model,
+  promptHash,
   capturedAt: new Date().toISOString(),
   note:
     "What a real triage model answered for every comment US-029 labelled by hand, plus PLAN.md's " +
@@ -255,7 +230,15 @@ const record = {
   answers,
 };
 
-writeFileSync(`${here}triage-verdicts.json`, `${JSON.stringify(record, null, 2)}\n`);
+/**
+ * One file per model, never one file overwritten.
+ *
+ * A second model used to erase the first, which made the one comparison this
+ * instrument exists for — is the new model safe enough to put in front of the
+ * classifier — impossible without re-buying the old answers.
+ */
+const outFile = `triage-verdicts-${config.model}.json`;
+writeFileSync(`${here}${outFile}`, `${JSON.stringify(record, null, 2)}\n`);
 
 console.log(`\nAsking kept:    ${kept(asking)} of ${asking.length}`);
 for (const dropped of asking.filter((answer) => answer.verdict === "no")) {
@@ -268,7 +251,7 @@ console.log(`Answering kept: ${kept(answering)} of ${answering.length}`);
 console.log(`Neither kept:   ${kept(neither)} of ${neither.length}`);
 console.log(`Comments kept:  ${kept(comments)} of ${comments.length}`);
 console.log(
-  `\nWrote triage-verdicts.json. ${inputTokens} input and ${outputTokens} output tokens, ` +
+  `\nWrote ${outFile}. ${inputTokens} input and ${outputTokens} output tokens, ` +
     (priced
       ? `about ${(costMicros / 1_000_000).toFixed(6)} US dollars.`
       : `cost unknown: no price is configured for ${config.model}.`),

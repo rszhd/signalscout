@@ -80,21 +80,29 @@ stage saves money at all.
 
 **Triage is a model call, not a free stage.** The pre-filter's third stage asks
 a cheap model about every item the first two kept, so it spends money on the
-items it keeps as well as the ones it drops. Its answer is one word, and that turned out
-not to be the saving: a reasoning model bills its own thinking as output, so a
-triage answer measured 113 output tokens against a classification's 95, and
-cost slightly more per call than the classification it avoids.
+items it keeps as well as the ones it drops. Its answer is one word, and that
+turned out not to be the saving: a reasoning model bills its own thinking as
+output, so a triage answer is not a short call. US-030 measured 113 output
+tokens against a classification's 95; US-221 sharpened the question and the
+thinking shrank with it, to 80. The cost per call did not follow, because the
+longer prompt added to the input what the answer took off the output: 267
+micro-dollars an item before, 273 after. Triage costs about what the
+classification it avoids costs.
 
 **The saving is the price gap between the two models, and nothing else.** Over
-46 real comments, keeping 19, a classifier ten times dearer than the triage
-model made the bill 48% smaller; the same model on both stages made it 48%
+46 real comments, keeping 13, a classifier ten times dearer than the triage
+model made the bill 61% smaller; the same model on both stages made it 37%
 larger. The worker warns at startup when the two match. Choose a triage model
 cheaper than the classifier, or expect the stage to cost you money.
+
+Both numbers moved with US-221 and neither changed sign. The stage kept 19 of
+those 46 comments before it and 13 after, so it now avoids six more
+classifications for the same money spent asking.
 
 **A deployment with no cheaper model should switch the stage off.** `AI_TRIAGE=off`
 does that, and US-177 added it because the alternative was worse than it looked:
 leaving `AI_TRIAGE_MODEL` blank does not switch triage off, it runs triage on
-the classifier's own model. With no price gap the stage costs 48% more *and*
+the classifier's own model. With no price gap the stage costs 37% more *and*
 keeps the one risk a cascade has — a triage drop leaves no row, no inbox entry
 and nothing for a person to notice, and there is no better reader behind it to
 buy the mistake back. A cascade is worth its risk when the second reader is

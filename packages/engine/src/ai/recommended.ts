@@ -17,7 +17,8 @@
  * **Triage is cheaper than scoring on every provider here, and that is the
  * rule rather than a coincidence.** US-030 measured that the triage stage
  * saves money only through the price gap: on one model for both stages it
- * costs 48% *more* than not having it. A recommendation that paired two models
+ * costs 37% *more* than not having it (48% until US-221 sharpened the
+ * question and the stage began refusing more). A recommendation that paired two models
  * of the same price would ship that loss to everybody who never opened the
  * screen. `recommended.test.ts` asserts the gap for every provider in the
  * table, so a future addition cannot quietly close it.

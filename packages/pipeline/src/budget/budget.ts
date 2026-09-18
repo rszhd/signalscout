@@ -319,7 +319,7 @@ export async function spendByMonitor(
   return spend;
 }
 
-/** What one account spent since the start of the month, on every monitor and off them. */
+/** What one account spent since a moment, on every monitor and off them. */
 export interface AccountSpend {
   readonly sourceMicros: number;
   readonly modelMicros: number;
@@ -347,7 +347,28 @@ export async function accountSpend(
   userId: string,
   now: Date = new Date(),
 ): Promise<AccountSpend> {
-  const since = monthStart(now);
+  return accountSpendSince(db, userId, monthStart(now));
+}
+
+/**
+ * The same read over a window the caller chooses.
+ *
+ * The calendar month is right for an instance that pays for nothing — the
+ * per-monitor cap is the only guard here, and it has always counted months.
+ * A deployment that bills for the usage has a different month: the one its
+ * customer paid for, which starts on whatever day they subscribed. It passes
+ * that day rather than keeping a second copy of this read.
+ *
+ * A separate name and not a second argument on `accountSpend`. Both would be
+ * a `Date` and the compiler could not tell them apart, so a call site left
+ * behind by a change of window would count from the wrong moment and be
+ * wrong about money without failing to build.
+ */
+export async function accountSpendSince(
+  db: Database,
+  userId: string,
+  since: Date,
+): Promise<AccountSpend> {
   const result = await db.execute<{ source: string | null; model: string | null }>(sql`
     select
       (select sum(${apiUsage.estimatedCostMicros}) from ${apiUsage}
@@ -374,6 +395,11 @@ export async function draftsThisMonth(
   userId: string,
   now: Date = new Date(),
 ): Promise<number> {
+  return draftsSince(db, userId, monthStart(now));
+}
+
+/** The same count over a window the caller chooses, for `accountSpendSince`'s reason. */
+export async function draftsSince(db: Database, userId: string, since: Date): Promise<number> {
   const [row] = await db
     .select({ drafts: count() })
     .from(modelCalls)
@@ -381,7 +407,7 @@ export async function draftsThisMonth(
       and(
         eq(modelCalls.userId, userId),
         eq(modelCalls.purpose, "draft_reply"),
-        gte(modelCalls.createdAt, monthStart(now)),
+        gte(modelCalls.createdAt, since),
       ),
     );
 

@@ -221,12 +221,34 @@ describe("the prompt", () => {
   it("tells the model which way to fail, because the two mistakes differ in cost", () => {
     const system = buildTriageSystemPrompt(monitor);
 
-    expect(system).toContain("WHEN YOU ARE UNSURE, ANSWER MAYBE");
+    expect(system).toContain("MAYBE IS FOR A PERSON WHO MIGHT WANT SOMETHING");
     expect(system).toContain("A wrong 'no' deletes");
   });
 
   it("names the largest group the stage will see, so it is not mistaken for the target", () => {
     expect(buildTriageSystemPrompt(monitor)).toContain("most people are answering it");
+  });
+
+  /**
+   * US-221. The two lines that carry the narrowing, and the one that holds it
+   * open.
+   *
+   * Triage screens for what the classifier scores, and three of its five
+   * dimensions are about what the author wants. Without the first line a
+   * plausible person who wants nothing is a `maybe` and a paid call; without
+   * the second, `maybe` widens back out into doubt about anything.
+   */
+  it("asks what the author wants, not only who the author is", () => {
+    const system = buildTriageSystemPrompt(monitor);
+
+    expect(system).toContain("whether anything here says they want an answer");
+    expect(system).toContain("plainly wants nothing is a 'no'");
+  });
+
+  it("still leaves maybe open for a person who might want something", () => {
+    const system = buildTriageSystemPrompt(monitor);
+
+    expect(system).toContain("answer maybe and let the second reader decide");
   });
 });
 

@@ -19,7 +19,54 @@ versioned and is not described here; it is what `main` holds.
 
 ## Unreleased
 
-Nothing yet.
+## 0.9.0 — 2026-09-19
+
+**Added.** `accountSpendSince(db, userId, since)` and
+`draftsSince(db, userId, since)` (US-216): the same two reads over a window
+the caller chooses instead of the calendar month. `accountSpend` and
+`draftsThisMonth` are unchanged and still count the calendar month, so a
+consumer that does not bill for the usage can ignore both new exports.
+
+They exist for a consumer that does bill. The month such a deployment cares
+about is the one its customer paid for, which starts on the day they
+subscribed. Counting a calendar month there gives an account that subscribed
+on the 20th a whole allowance for eleven days and a second one on the first.
+
+Separate names rather than a second argument on the existing two: both would
+be a `Date`, the compiler could not tell them apart, and a call site left
+behind by a change of window would count from the wrong moment without failing
+to build.
+
+**Changed.** A post the classifier says is not about this area cannot score as
+a lead (US-225). `leadScore` now scales the weighted total by relevance when
+relevance is under 40, so a post scored 0 for relevance scores 0 overall.
+Before, intent and urgency carried 45% between them and a wholly off-topic post
+could reach 42 and land in an inbox — found in a live one, where four of
+seventeen matches were that shape.
+
+Two new exports beside it, `relevanceFloor` and `relevanceGate`, for a consumer
+that wants to explain or reproduce the number. **Scores will move**: anything
+the classifier scored under 40 for relevance now scores lower, and nothing at
+or above 40 changes at all. PLAN.md's four worked examples are unchanged.
+
+**Changed.** An explicit ask always survives triage (US-223). A request for a
+recommendation, for what others use, or for help with something of the author's
+own is never refused, whatever the post looks like around it. DeepSeek Flash
+refused a person asking for acne-scar recommendations because the post opened
+like a product review, and a refusal leaves no row for anybody to notice.
+
+**Changed.** Triage asks what the author wants, not only who the author is
+(US-221). Three of the classifier's five dimensions are about the want, so a
+plausible person who wanted nothing used to pass and buy a classification that
+scored low. `maybe` is narrower: doubt about a want keeps the item, the plain
+absence of one drops it, and a complaint with no question always keeps it.
+
+Nothing to do to take it — no export, option or table moved. The effect is on
+the bill and on what reaches the inbox. Over the same 46 hand-labelled comments
+on `gpt-5.6-luna`, the stage keeps 13 where it kept 19, drops 23 of the 26
+people answering where it dropped 20, and still keeps every worked example that
+is a lead. The fail-open rule is unchanged: only an explicit `no` drops, and a
+timeout, a refusal or bad JSON all keep the item.
 
 ## 0.8.0 — 2026-09-18
 

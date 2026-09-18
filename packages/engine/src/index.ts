@@ -18,6 +18,8 @@ export {
   leadScore,
   maximumReasons,
   minimumReasons,
+  relevanceFloor,
+  relevanceGate,
   restatesTheScores,
   scoreColumns,
   scoreWeights,

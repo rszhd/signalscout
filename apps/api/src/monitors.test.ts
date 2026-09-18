@@ -79,6 +79,7 @@ function stubGenerator(outcome: QueryPlanOutcome): QueryGenerator {
   return {
     provider: "anthropic",
     model: "claude-haiku-4-5",
+    timeoutMs: 30_000,
     generate: async () => outcome,
   };
 }
@@ -1284,6 +1285,7 @@ describe("the monitor routes", () => {
       const generator: QueryGenerator = {
         provider: "anthropic",
         model: "claude-haiku-4-5",
+        timeoutMs: 30_000,
         generate: async (_answers, wanted) => {
           asked = wanted;
           return { status: "generated", plan, call };

@@ -96,6 +96,8 @@ export type ProjectDraft = z.infer<typeof projectDraftSchema>;
 export interface ProjectDescriber {
   readonly provider: string;
   readonly model: string;
+  /** The ceiling this describer waits under. `queries.ts` says why. */
+  readonly timeoutMs: number;
   readonly describe: (text: string, source?: string) => Promise<DescribeResult>;
 }
 
@@ -113,6 +115,7 @@ export function createProjectDescriber({
   return {
     provider: config.provider,
     model: config.model,
+    timeoutMs: config.timeoutMs,
     describe: (text, source) =>
       describeProject({
         model: languageModel,

@@ -19,7 +19,7 @@ described here; it is what `main` holds.
 
 Nothing yet.
 
-## 0.7.0 — 2026-09-18
+## 0.6.1 — 2026-09-18
 
 **Fixed.** `stage_runs.detail.scored` on a classification is what the run
 asked the model about, not what it was handed. It counted every candidate it

@@ -33,13 +33,58 @@ Publishing to find out whether the other half reads a new table right — and
 publishing again when it does not — leaves half-finished shapes on npm for
 ever. Every version here is permanent and somebody else may be running it.
 
+## What the number means
+
+**The number is a promise about what the upgrade costs a consumer**, and
+nothing else. It is not a measure of how much was written, how long it took, or
+how pleased anybody is with it. There is one consumer today — the hosted
+application — and every published version is permanent, so the promise has to
+hold for whoever installs it next year.
+
+Before 1.0 there are two answers. Ask one question and the answer falls out:
+
+> **What must a consumer do to take this version?**
+
+**Nothing → patch.** A fix. A number that becomes correct. A new optional field
+beside an existing one. A faster query. Anything a consumer can install and
+ignore.
+
+**Something → minor.** A new export they call. A renamed or removed one. A
+changed option or default. A return type that grew. **A migration**, always: a
+release that adds one changes their database when it boots, and that is a thing
+they must know about even when nothing in their code changes.
+
+The major stays 0 until the shape of the packages stops moving. After 1.0 the
+same question moves the major instead of the minor whenever the answer is
+"change your code", and the minor takes the additions.
+
+### What this project has done
+
+| Version | Change | Why |
+|---|---|---|
+| 0.3.0 | `recordModelCall` requires `userId`, plus migration 0060 | Callers had to pass a new argument |
+| 0.4.0 | `AI_TRIAGE=on\|off` and `triageIsOff` | A new export, and a stage a deployment can switch off |
+| 0.5.0 | `stage_runs`, its reads, and `processNotifications` returning a summary | A new table and new exports |
+| 0.6.0 | `stage_runs.walk_id`, carried through the job payloads | A migration, and a field a screen groups by |
+| 0.6.1 | `detail.scored` counts what it scored; optional `detail.skipped` | A corrected number and a field that can be ignored |
+
+**0.6.1 was first cut as 0.7.0**, on the strength of the added field alone. It
+adds nothing a consumer must react to: the count simply becomes the number it
+always claimed to be, and the new field beside it can be ignored for ever. A
+fix stays a patch even when it adds something to explain itself.
+
+### Where the number lives
+
+In the tag, and nowhere else. Both manifests say `0.0.0` in git and the release
+workflow writes the tag's number into both before it packs. A number in a file
+is a number somebody forgets to move, and two packages with two numbers would
+say they can be mixed.
+
 ## Cutting one
 
 1. Merge to `main` the way any change reaches it: `dev`, then a pull request
    with a merge commit.
-2. Decide the number. Before 1.0, a change that a consumer must react to —
-   a renamed export, a changed option, a table that moved streams — moves
-   the minor; anything else moves the patch.
+2. Decide the number with the question above: what must a consumer do?
 3. Move what is under *Unreleased* in [CHANGELOG.md](../CHANGELOG.md) to a
    heading with the new number and the date, in the same pull request or the
    next one. It is short by design: what a consumer must know, not what the

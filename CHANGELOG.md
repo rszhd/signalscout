@@ -11,13 +11,31 @@ nobody outside this repository can see does not.
 [docs/history.md](docs/history.md) is the other record — every ticket, in the
 order it happened, including the ones that changed nothing a consumer imports.
 
-Before 1.0, a change a consumer must react to moves the minor and anything else
-moves the patch. The app in this repository is not versioned and is not
-described here; it is what `main` holds.
+**What the number means, and how it is chosen, is in
+[docs/releasing.md](docs/releasing.md)** under *What the number means*: one
+question — what must a consumer do to take this version — with nothing moving
+the patch and something moving the minor. The app in this repository is not
+versioned and is not described here; it is what `main` holds.
 
 ## Unreleased
 
 Nothing yet.
+
+## 0.6.1 — 2026-09-18
+
+**Fixed.** `stage_runs.detail.scored` on a classification is what the run
+asked the model about, not what it was handed. It counted every candidate it
+looked at, so a retry — handed the same post ids, skipping the ones already
+scored — recorded a hundred and sixteen classifications it made in four
+seconds and never paid for.
+
+**Added.** `detail.skipped` beside it: the posts BUG-003's skip passed over,
+because this monitor's current version had already scored them. Optional, so a
+row written before this has none. `scored` plus `skipped` plus the failures is
+what the run was handed.
+
+The classifier's own log line carries both numbers too, so the row and the log
+cannot drift.
 
 ## 0.6.0 — 2026-09-18
 

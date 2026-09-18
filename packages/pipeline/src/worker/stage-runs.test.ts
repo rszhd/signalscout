@@ -195,7 +195,36 @@ describe("what a stage records about itself", () => {
       expect(run?.itemsIn).toBe(1);
       expect(run?.itemsOut).toBe(1);
       expect(run?.estimatedCostMicros).toBe(call.estimatedCostMicros);
-      expect(run?.detail).toMatchObject({ scored: 1, matched: 1, unclassified: 0, leftByCap: 0 });
+      expect(run?.detail).toMatchObject({
+        scored: 1,
+        skipped: 0,
+        matched: 1,
+        unclassified: 0,
+        leftByCap: 0,
+      });
+    });
+
+    /**
+     * The retry, which is what US-206 is about. The first run scores the batch
+     * and the second is handed the same ids, skips them all, and must not
+     * claim it classified them again.
+     */
+    it("counts what it scored, not what it was handed", async () => {
+      const monitorId = await insertMonitor(database);
+      const postId = await insertPost(strongPost);
+      const step = createClassifyStep({
+        classifierFor: async () => stubClassifier(() => scored),
+      });
+
+      await step({ monitorId, postIds: [postId] }, contextFor(db));
+      await step({ monitorId, postIds: [postId] }, contextFor(db));
+
+      const [first, again] = await runsOf(monitorId);
+
+      expect(first?.detail).toMatchObject({ scored: 1, skipped: 0, matched: 1 });
+      // The same post, already paid for: asked about nothing, and says so.
+      expect(again?.itemsIn).toBe(1);
+      expect(again?.detail).toMatchObject({ scored: 0, skipped: 1, matched: 0 });
     });
 
     it("says an account with no model refused, rather than leaving an empty inbox", async () => {
@@ -307,14 +336,26 @@ describe("what a stage records about itself", () => {
           emailTo: "owner@example.test",
           immediateScore: 70,
         },
-        new Date(Date.now() - 1_000),
+        // Enabled before the match was found, so the match is inside the
+        // window rather than on its edge.
+        new Date(Date.now() - 120_000),
       );
     }
 
+    /**
+     * A match this monitor found a minute ago.
+     *
+     * The time is explicit, and that is not decoration: a delivery is planned
+     * for matches from `enabledSince` up to *now*, and `now` is the instant the
+     * step starts. A row written with the database's `now()` can land on or
+     * after the step's own clock and fall outside its own window, which is a
+     * test that passes on my machine and fails on a faster one. It did.
+     */
     async function matchFor(monitorId: string, postId: string): Promise<void> {
       await db.insert(matches).values({
         monitorId,
         postId,
+        createdAt: new Date(Date.now() - 60_000),
         score: 90,
         relevance: 90,
         problemFit: 90,

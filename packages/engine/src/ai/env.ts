@@ -110,6 +110,7 @@ export const aiFields = {
    * would misreport what it cost, and that figure is shown to the person who
    * pressed the button.
    */
+  AI_DRAFT_TIMEOUT_MS: blankIsUnset(z.coerce.number().int().min(1_000).optional()),
   AI_DRAFT_PROVIDER: blankIsUnset(z.enum(aiProviders).optional()),
   AI_DRAFT_MODEL: blankIsUnset(z.string().min(1).optional()),
   AI_DRAFT_API_KEY: blankIsUnset(z.string().min(1).optional()),

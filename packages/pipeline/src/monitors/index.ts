@@ -40,3 +40,11 @@ export {
   recordPollRun,
   walkFor,
 } from "./poll-runs.js";
+export {
+  maxStageRunsRead,
+  readStageRuns,
+  recordStageRun,
+  type StageRun,
+  type StageRunRecord,
+  stageRunsKeptPerMonitor,
+} from "./stage-runs.js";

@@ -19,6 +19,27 @@ described here; it is what `main` holds.
 
 Nothing yet.
 
+## 0.5.0 — 2026-09-18
+
+**Added.** `stage_runs`: one row per run of the filter, replies, classify and
+notify steps, written by the step itself. `readStageRuns(db, userId,
+monitorId, limit)` answers for one monitor, newest first, scoped by owner, the
+way `readPollRuns` is. A row says what went in, what came out, what it cost,
+and a per-stage detail — the pre-filter's three drop counts, the classifier's
+scored, matched, unclassified and cap-stopped counts, the replies stage's
+threads and pages, the notifier's deliveries.
+
+It answers the question `poll_runs` answers one stage later: a classifier that
+stopped at the cap with five posts unread, a pre-filter that dropped forty on
+triage, and a quiet week look identical from the other tables.
+
+Migration `0061` creates the table. The vocabularies `stageNames`,
+`stageOutcomes` and `stageStopReasons` are check constraints as well as arrays.
+
+**Changed.** `processNotifications` returns `NotificationPass` — `{ planned,
+sent }` — instead of nothing. A caller that ignored the return value is
+unaffected.
+
 ## 0.4.0 — 2026-09-18
 
 **Added.** `AI_TRIAGE=on|off` switches the triage stage off for a whole

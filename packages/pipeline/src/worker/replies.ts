@@ -36,6 +36,7 @@ import type { CandidateReply, SocialSource, SourceCredentials } from "@signalsco
 import { and, eq, gte, inArray, isNotNull, isNull, lt, sql } from "drizzle-orm";
 import { enforceBudget, recordSourceUsage } from "../budget/budget.js";
 import { matches, monitors, type Provider, posts, type Source } from "../db/schema.js";
+import { recordStageRun } from "../monitors/stage-runs.js";
 import { readProviderChoices } from "../sources/choices.js";
 import type { CollectOptions } from "./collect.js";
 import { excerptLength } from "./collect.js";
@@ -188,6 +189,8 @@ export function createRepliesStep({
     const ids = [...postIds];
     if (ids.length === 0) return;
 
+    const startedAt = new Date();
+
     const [monitor] = await db.select().from(monitors).where(eq(monitors.id, monitorId)).limit(1);
 
     if (!monitor) {
@@ -199,6 +202,44 @@ export function createRepliesStep({
       logger.debug({ monitorId }, "replies skipped: this monitor does not read them");
       return;
     }
+
+    /**
+     * What this run of the stage did, for the history. US-201.
+     *
+     * Swallowed on failure, for the reason the filter's is: the pages are
+     * bought and the replies are stored by the time this is written, and a
+     * failed job would buy them again.
+     */
+    const writeStageRun = async (record: {
+      outcome: "done" | "empty" | "refused";
+      itemsOut: number;
+      units?: number;
+      estimatedCostMicros?: number;
+      detail?: { threadsOpened: number; threadsSkipped: number; pagesBought: number };
+      stopReason?: "budget_exhausted" | "no_credentials" | null;
+    }) => {
+      try {
+        await recordStageRun(db, {
+          monitorId,
+          userId: monitor.userId,
+          stage: "replies",
+          startedAt,
+          finishedAt: new Date(),
+          outcome: record.outcome,
+          itemsIn: ids.length,
+          itemsOut: record.itemsOut,
+          units: record.units ?? 0,
+          estimatedCostMicros: record.estimatedCostMicros ?? 0,
+          detail: record.detail ? { stage: "replies", ...record.detail } : null,
+          stopReason: record.stopReason ?? null,
+        });
+      } catch (cause) {
+        logger.warn(
+          { monitorId, err: cause },
+          "the replies stage's own history row was not written",
+        );
+      }
+    };
 
     /**
      * The guard, before anything is asked of a provider.
@@ -242,6 +283,7 @@ export function createRepliesStep({
         { monitorId, capMicros: budget.capMicros, reason: budget.reason },
         "replies refused: the monitor is at its budget cap",
       );
+      await writeStageRun({ outcome: "refused", itemsOut: 0, stopReason: "budget_exhausted" });
       return;
     }
 
@@ -708,6 +750,16 @@ export function createRepliesStep({
       },
       "replies finished",
     );
+
+    // The same counts, written down. US-201. A run that opened no thread is
+    // `empty` rather than `done`: every candidate was skipped, and a person
+    // reading a thread that never grew needs to see that it was considered.
+    await writeStageRun({
+      outcome: opened === 0 ? "empty" : "done",
+      itemsOut: storedReplyIds.length,
+      units: spentUnits,
+      detail: { threadsOpened: opened, threadsSkipped: skipped, pagesBought },
+    });
 
     if (storedReplyIds.length === 0) return;
 

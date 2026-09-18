@@ -86,6 +86,14 @@ hard to guess from the code:
 Nothing is bought twice and nothing is skipped, and every one of those markers
 exists because something was once bought twice. BUG-001 is the cursor's.
 
+The same fact travels one step further for a different reason. A connector
+answers `foundBy` on the page — which phrase or channel this request was for —
+because one request carries one input. The collector copies it onto each post
+as it merges pages, and writes `post_discoveries` after the batch is stored.
+US-212: that is the only moment anything knows which search produced a post,
+and a provider's search is not a substring match, so it cannot be worked out
+later.
+
 ## The caps, and what each one is for
 
 | Cap | Value | What it stops |
@@ -130,7 +138,7 @@ sweeps every monitor with settings, so a lost enqueue cannot lose a match.
 
 | Step | Rows |
 | --- | --- |
-| Poll | `poll_runs`, `posts`, `api_usage`, `source_continuations`, `source_coverage` |
+| Poll | `poll_runs`, `posts`, `post_discoveries`, `api_usage`, `source_continuations`, `source_coverage` |
 | Filter | `stage_runs`, `filter_drops`, `model_calls` (embedding, triage) |
 | Replies | `stage_runs`, `posts`, `api_usage` |
 | Classify | `stage_runs`, `model_calls`, `matches` |

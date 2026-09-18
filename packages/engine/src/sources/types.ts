@@ -140,6 +140,15 @@ export interface SearchRequest {
 export interface CandidatePost {
   /** The id the source gave it, such as a Reddit `t3_` fullname. */
   readonly externalId: string;
+  /**
+   * Which of the monitor's inputs returned it. US-212.
+   *
+   * A connector answers this once per page, on `SearchResult`, because one
+   * request carries one input. The collector copies it onto each post as it
+   * merges pages, which is why it is here as well: by the time a batch is
+   * stored, the pages it came from are gone.
+   */
+  readonly foundBy?: Discovery;
   readonly url: string;
   readonly author?: string;
   /** The subreddit on Reddit. Absent on X, where the author is the context. */
@@ -321,8 +330,35 @@ export type NextPage =
    */
   | { readonly status: "wait"; readonly retryAfter: Date; readonly cursor?: string };
 
+/**
+ * What a monitor asked for that produced these posts. US-212.
+ *
+ * A monitor searches several phrases across several channels and nobody can
+ * say which of them earns anything, because the association is created inside
+ * a connector and thrown away one line later. It is recorded here because this
+ * is the only place it is known: the provider does not say which term matched,
+ * and checking afterwards whether a query's words appear in a post is a guess
+ * — a search is not a substring match.
+ *
+ * It sits on the result rather than on each post because one request carries
+ * one input. Every connector here reads `queries[index]` or one channel per
+ * call, so the whole page shares an answer.
+ */
+export interface Discovery {
+  /** A phrase the monitor searches, or a channel it browses. */
+  readonly kind: "query" | "channel";
+  readonly value: string;
+}
+
 export interface SearchResult {
   readonly posts: readonly CandidatePost[];
+  /**
+   * The query or channel this page came from. US-212.
+   *
+   * Optional, and absent means the connector cannot say. A caller records what
+   * it is given and attributes nothing it was not told.
+   */
+  readonly foundBy?: Discovery;
   /**
    * Billable units this call consumed, in the source's own unit. Zero is a
    * legal answer: Reddit's free tier costs nothing.

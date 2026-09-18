@@ -41,6 +41,10 @@ export {
   walkFor,
 } from "./poll-runs.js";
 export {
+  type QueryPerformance,
+  queryPerformance,
+} from "./query-performance.js";
+export {
   maxStageRunsRead,
   readStageRuns,
   recordStageRun,

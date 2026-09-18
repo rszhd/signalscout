@@ -6,7 +6,7 @@ priority: p1
 created: 2026-09-18T14:53+08:00
 parent:
 area: pipeline
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -37,19 +37,19 @@ prune what they cannot see.
 
 ## Acceptance
 
-- [ ] A candidate post carries the query that returned it, from every connector
+- [x] A candidate post carries the query that returned it, from every connector
       that searches by query.
-- [ ] A post found by browsing a channel rather than by a query records the
+- [x] A post found by browsing a channel rather than by a query records the
       channel, and is not attributed to a query.
-- [ ] A poll records, per monitor, which query found which post — every query
+- [x] A poll records, per monitor, which query found which post — every query
       that returned it, not only the first.
-- [ ] Recording it changes nothing about deduplication, the `posts` row, or
+- [x] Recording it changes nothing about deduplication, the `posts` row, or
       what a poll costs.
-- [ ] A read answers, for one monitor: per query, how many posts it found, how
+- [x] A read answers, for one monitor: per query, how many posts it found, how
       many became matches, the best score, and when it last found anything.
-- [ ] Posts stored before this exist with no attribution, and the read says so
+- [x] Posts stored before this exist with no attribution, and the read says so
       rather than counting them against a query.
-- [ ] `pnpm test`, lint and typecheck pass.
+- [x] `pnpm test`, lint and typecheck pass.
 
 ## Notes
 
@@ -69,3 +69,16 @@ prune what they cannot see.
 - 2026-09-18T14:53+08:00 — Asked for by the owner after reading a day of spend:
   three active monitors, 1,825 classifications, and no way to tell which
   phrases earned them.
+- 2026-09-18T15:24+08:00 — Built it. The answer sits on the page rather than on
+  each post: every connector here reads one input per request, so a page shares
+  an answer and each connector needed one line rather than a map over its
+  results. The collector copies it onto the posts as it merges pages, which is
+  the step where the association used to be lost.
+- 2026-09-18T15:24+08:00 — A post returned by two phrases keeps both rows. The
+  batch is deduplicated before it is stored, so recording only the survivor's
+  phrase would credit one search and hide the other.
+- 2026-09-18T15:24+08:00 — Writing the rows never fails the poll. The posts are
+  stored and paid for by then, and losing the note is cheaper than losing the
+  collection.
+- 2026-09-18T15:24+08:00 — 2093 tests, lint and typecheck pass. Eleven
+  connectors carry it, including the fake one every pipeline test runs through.

@@ -54,6 +54,7 @@ import type {
   CandidateReply,
   ConnectorDefinition,
   CredentialCheck,
+  Discovery,
   ReplyRequest,
   ReplyResult,
   SearchRequest,
@@ -159,6 +160,14 @@ function decodeCursor(cursor: string): Cursor {
 interface Input {
   readonly profile: typeof redditSearchProfile;
   readonly params: Record<string, string>;
+  /**
+   * What to call this input afterwards. US-212.
+   *
+   * The scoped phase pairs a query with a channel, and the query is the
+   * answer: it is the phrase a person wrote and the one they can change. The
+   * channel is in `params` and is the same for every query in that pass.
+   */
+  readonly foundBy: Discovery;
 }
 
 export class SocialCrawlRedditSource implements SocialSource {
@@ -246,6 +255,7 @@ export class SocialCrawlRedditSource implements SocialSource {
 
     return {
       posts,
+      foundBy: input.foundBy,
       unitsConsumed: page.creditsUsed,
       next: this.nextAfter(request.query, start, page),
     };
@@ -357,6 +367,7 @@ export class SocialCrawlRedditSource implements SocialSource {
         queries.map((term) => ({
           profile: redditSubredditSearchProfile,
           params: { subreddit: bare(channel), query: term, sort: "new" },
+          foundBy: { kind: "query" as const, value: term },
         })),
       );
     }
@@ -370,6 +381,7 @@ export class SocialCrawlRedditSource implements SocialSource {
       return channels.map((channel) => ({
         profile: redditSubredditProfile,
         params: { subreddit: bare(channel), sort: "new" },
+        foundBy: { kind: "channel" as const, value: channel },
       }));
     }
 
@@ -385,6 +397,7 @@ export class SocialCrawlRedditSource implements SocialSource {
     return queries.map((term) => ({
       profile: redditSearchProfile,
       params: { query: term, sort: "new" },
+      foundBy: { kind: "query" as const, value: term },
     }));
   }
 

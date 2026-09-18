@@ -1493,6 +1493,68 @@ export const stageRuns = pgTable(
 );
 
 /**
+ * How a post was found: a phrase the monitor searches, or a channel it
+ * browses. US-212.
+ */
+export const discoveryKinds = ["query", "channel"] as const;
+export type DiscoveryKind = (typeof discoveryKinds)[number];
+
+/**
+ * Which of a monitor's inputs found which post. US-212.
+ *
+ * A monitor searches several phrases across several channels and nothing could
+ * say which of them earns anything. A phrase that has never produced a match
+ * is searched on every poll, on every channel, for ever, and the only way to
+ * find it was to delete one and watch what happened.
+ *
+ * **It cannot live on `posts`.** That table is keyed by `(source,
+ * external_id)` with no monitor column, because one row serves every monitor
+ * that found it — and a query belongs to one monitor. So this is the join the
+ * post cannot hold.
+ *
+ * **It cannot be worked out afterwards.** A provider's search is not a
+ * substring match, so checking whether a phrase's words appear in a post is a
+ * guess. The connector knows at the moment the page comes back and nothing
+ * else ever does.
+ *
+ * **One post can have several rows**, and that is the truth rather than a
+ * shortcoming: a post returned by two phrases was earned by both, and a poll
+ * that deduplicated it into one row still paid for both searches.
+ */
+export const postDiscoveries = pgTable(
+  "post_discoveries",
+  {
+    monitorId: uuid("monitor_id")
+      .notNull()
+      .references(() => monitors.id, { onDelete: "cascade" }),
+    postId: uuid("post_id")
+      .notNull()
+      .references(() => posts.id, { onDelete: "cascade" }),
+    /** The platform it came from, so a read can group without joining `posts`. */
+    source: text("source").$type<Source>().notNull(),
+    kind: text("kind").$type<DiscoveryKind>().notNull(),
+    /**
+     * The phrase or the channel, as the monitor holds it.
+     *
+     * Not the string the connector sent: X adds `from:` and `since:` operators,
+     * and a screen showing those back to a person who typed two words would be
+     * showing them this connector's syntax.
+     */
+    value: text("value").notNull(),
+    firstSeenAt: timestamp("first_seen_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    // One row per monitor, post and input. A second poll finding the same post
+    // through the same phrase writes nothing.
+    primaryKey({ columns: [table.monitorId, table.postId, table.kind, table.value] }),
+    // The screen's own query: this monitor's inputs, ranked by what they found.
+    index("post_discoveries_monitor_value_idx").on(table.monitorId, table.kind, table.value),
+    index("post_discoveries_post_idx").on(table.postId),
+    check("post_discoveries_kind_known", oneOf("kind", discoveryKinds)),
+  ],
+);
+
+/**
  * One monitor's monthly cap, and what to do when it is reached.
  *
  * The row is optional and its absence means "no cap". That is deliberate: a

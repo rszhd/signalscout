@@ -24,7 +24,8 @@ import { eq } from "drizzle-orm";
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { setBudget } from "../budget/budget.js";
 import { createDatabase, type Database } from "../db/client.js";
-import { matches, monitors, posts, stageRuns } from "../db/schema.js";
+import { matches, monitors, pollRuns, posts, stageRuns } from "../db/schema.js";
+import { recordPollRun } from "../monitors/poll-runs.js";
 import { readStageRuns, recordStageRun, stageRunsKeptPerMonitor } from "../monitors/stage-runs.js";
 import { notificationDefaults, saveNotificationSettings } from "../notifications/settings.js";
 import { createTestDatabase, type TestDatabase } from "../testing/database.js";
@@ -440,6 +441,107 @@ describe("what a stage records about itself", () => {
         expect(payload.walkId).toBe(walkId);
       }
       expect(boss.send.mock.calls.length).toBeGreaterThan(0);
+    });
+
+    /**
+     * The poll inside the walk. US-211.
+     *
+     * A paging collection is several polls sharing one walk, so the walk alone
+     * cannot say which poll a filter was handed. This can.
+     */
+    it("writes the poll the job came from", async () => {
+      const monitorId = await insertMonitor(database, {
+        generatedQueries: ["manually testing signup and checkout"],
+        generatedSubreddits: [],
+      });
+      const postId = await insertPost(strongPost);
+      const walkId = crypto.randomUUID();
+      const run = await recordPollRun(db, {
+        monitorId,
+        userId: "user-1",
+        walkId,
+        startedAt: new Date(),
+        finishedAt: new Date(),
+        outcome: "collected",
+        postsReturned: 1,
+        postsNew: 1,
+        units: 1,
+        estimatedCostMicros: 0,
+        sources: [],
+        stopReason: null,
+      });
+
+      await createFilterStep()(
+        { monitorId, postIds: [postId], walkId, pollRunId: run.id },
+        contextFor(db),
+      );
+
+      const [stage] = await runsOf(monitorId);
+
+      expect(stage?.pollRunId).toBe(run.id);
+      expect(stage?.walkId).toBe(walkId);
+    });
+
+    it("passes the poll on to the stage it enqueues, beside the walk", async () => {
+      const monitorId = await insertMonitor(database, {
+        generatedQueries: ["manually testing signup and checkout"],
+        generatedSubreddits: [],
+      });
+      const postId = await insertPost(strongPost);
+      const boss = stubBoss();
+
+      await createFilterStep()(
+        { monitorId, postIds: [postId], walkId: "w-1", pollRunId: "p-1" },
+        { db, boss: boss as unknown as StepContext["boss"], logger: silentLogger },
+      );
+
+      for (const [, payload] of boss.send.mock.calls) {
+        expect(payload.pollRunId).toBe("p-1");
+      }
+    });
+
+    /**
+     * `poll_runs` keeps 200 rows per monitor and this table keeps 800, so a
+     * stage outliving its poll is routine rather than rare. The work happened
+     * and the row says so; only the reference goes.
+     */
+    it("keeps the row when the poll it names is trimmed away", async () => {
+      const monitorId = await insertMonitor(database);
+      const run = await recordPollRun(db, {
+        monitorId,
+        userId: "user-1",
+        walkId: crypto.randomUUID(),
+        startedAt: new Date(),
+        finishedAt: new Date(),
+        outcome: "collected",
+        postsReturned: 1,
+        postsNew: 1,
+        units: 1,
+        estimatedCostMicros: 0,
+        sources: [],
+        stopReason: null,
+      });
+
+      await recordStageRun(db, {
+        monitorId,
+        userId: "user-1",
+        stage: "classify",
+        walkId: run.walkId,
+        pollRunId: run.id,
+        startedAt: new Date(),
+        finishedAt: new Date(),
+        outcome: "done",
+        itemsIn: 3,
+        itemsOut: 1,
+      });
+
+      await db.delete(pollRuns).where(eq(pollRuns.id, run.id));
+
+      const [stage] = await runsOf(monitorId);
+
+      expect(stage).toBeDefined();
+      expect(stage?.pollRunId).toBeNull();
+      expect(stage?.walkId).toBe(run.walkId);
     });
 
     it("writes null for a job an older worker sent", async () => {

@@ -1438,6 +1438,24 @@ export const stageRuns = pgTable(
      * belongs to no collection.
      */
     walkId: uuid("walk_id"),
+    /**
+     * The poll whose posts this stage processed, or null. US-211.
+     *
+     * The walk above says which collection; this says which poll inside it, so
+     * a screen can put a filter under the poll that fed it rather than under a
+     * walk holding three of them.
+     *
+     * `set null` and not `cascade`, because the two tables are trimmed at
+     * different depths: `poll_runs` keeps 200 rows per monitor and this table
+     * keeps 800, so a stage outliving its poll is routine. The row stays and
+     * loses only the reference, which a screen reads as "this walk, poll
+     * unknown" — the truth, and better than deleting the record of work that
+     * happened.
+     *
+     * A reply's stages carry the poll that found the thread. The comments
+     * themselves were collected by no poll, and that is the only useful answer.
+     */
+    pollRunId: uuid("poll_run_id").references(() => pollRuns.id, { onDelete: "set null" }),
     startedAt: timestamp("started_at", { withTimezone: true }).notNull().defaultNow(),
     finishedAt: timestamp("finished_at", { withTimezone: true }),
     outcome: text("outcome").$type<StageOutcome>().notNull(),
@@ -1464,6 +1482,8 @@ export const stageRuns = pgTable(
     index("stage_runs_monitor_started_idx").on(table.monitorId, table.startedAt),
     // The read that groups a collection with the stages it caused.
     index("stage_runs_walk_idx").on(table.walkId),
+    // And the one that groups a single poll with them. US-211.
+    index("stage_runs_poll_run_idx").on(table.pollRunId),
     check("stage_runs_stage_known", oneOf("stage", stageNames)),
     check("stage_runs_outcome_known", oneOf("outcome", stageOutcomes)),
     check("stage_runs_stop_reason_known", optionallyOneOf("stop_reason", stageStopReasons)),

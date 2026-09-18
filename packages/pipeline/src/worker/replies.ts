@@ -183,7 +183,7 @@ export function createRepliesStep({
   credentialsFor,
 }: CollectOptions): Step<RepliesPayload> {
   return async function replies(
-    { monitorId, postIds, walkId },
+    { monitorId, postIds, walkId, pollRunId },
     { db, boss, logger }: StepContext,
   ): Promise<void> {
     const ids = [...postIds];
@@ -224,6 +224,7 @@ export function createRepliesStep({
           userId: monitor.userId,
           stage: "replies",
           walkId: walkId ?? null,
+          pollRunId: pollRunId ?? null,
           startedAt,
           finishedAt: new Date(),
           outcome: record.outcome,
@@ -765,7 +766,9 @@ export function createRepliesStep({
     if (storedReplyIds.length === 0) return;
 
     // Back through the filter, where a reply meets triage and nothing else.
-    await boss.send(filterQueue, { monitorId, postIds: storedReplyIds, walkId });
+    // The replies go back through the filter under the poll that found their
+    // thread. They were collected by no poll of their own. US-211.
+    await boss.send(filterQueue, { monitorId, postIds: storedReplyIds, walkId, pollRunId });
   };
 }
 

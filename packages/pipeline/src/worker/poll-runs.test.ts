@@ -39,8 +39,11 @@ import { fakeRegistry, insertMonitor, silentLogger } from "./testing.js";
 
 const credentials: CredentialLookup = () => ({ token: "test-token" });
 
+/** The queue, as a step sees it. Typed, so a case can read what was sent. */
 function stubBoss() {
-  return { send: vi.fn(async () => "job-1") };
+  return {
+    send: vi.fn(async (_queue: string, _payload: Record<string, unknown>) => "job-1"),
+  };
 }
 
 function contextFor(db: Database, boss: ReturnType<typeof stubBoss>): StepContext {
@@ -83,6 +86,18 @@ describe("what a poll records about itself", () => {
     );
   }
 
+  /** The same poll, with the queue it filled kept for reading. US-211. */
+  async function pollWatchingTheQueue(monitorId: string): Promise<ReturnType<typeof stubBoss>> {
+    const boss = stubBoss();
+
+    await createCollectStep({ registry: fakeRegistry(), credentialsFor: credentials })(
+      { monitorId },
+      contextFor(db, boss),
+    );
+
+    return boss;
+  }
+
   it("writes one row saying what the poll collected", async () => {
     const monitorId = await insertMonitor(database);
 
@@ -98,6 +113,26 @@ describe("what a poll records about itself", () => {
     expect(run?.sources).toEqual([
       expect.objectContaining({ source: "reddit", provider: "brightdata", reason: null }),
     ]);
+  });
+
+  /**
+   * The row's own id, in the job it sends. US-211.
+   *
+   * A paging collection is several polls under one walk, so a stage that knows
+   * only the walk cannot be shown under the poll that fed it. This is where
+   * that link is made, and it is made from the row this poll just wrote rather
+   * than from a later lookup that could find the next poll instead.
+   */
+  it("tells the filter which poll collected the posts", async () => {
+    const monitorId = await insertMonitor(database);
+
+    const boss = await pollWatchingTheQueue(monitorId);
+    const [run] = await runsOf(monitorId);
+    const sent = boss.send.mock.calls[0];
+
+    expect(sent?.[0]).toBe("filter");
+    expect(sent?.[1].pollRunId).toBe(run?.id);
+    expect(sent?.[1].walkId).toBe(run?.walkId);
   });
 
   it("says nothing was new when a second monitor collects the same posts", async () => {

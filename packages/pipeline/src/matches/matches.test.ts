@@ -22,6 +22,7 @@ import {
   type MatchPage,
   matchCounts,
   rankDecayPointsPerDay,
+  readMatch,
   setMatchSaved,
   UnusableCursorError,
 } from "./matches.js";
@@ -469,6 +470,62 @@ describe("the inbox list", () => {
       expect(
         await setMatchSaved(db, owner, "00000000-0000-0000-0000-000000000000", true),
       ).toBeUndefined();
+    });
+  });
+
+  /**
+   * One match by id, for an address. US-234.
+   *
+   * The cases that matter are the ones a link makes: somebody else's id, an id
+   * that never existed, and an item the reader has already dismissed. The
+   * first two answer the same way on purpose — a caller that could tell them
+   * apart would let a stranger learn which ids exist.
+   */
+  describe("reading one match", () => {
+    /**
+     * Everything but the rank, which is measured against the clock at the
+     * moment of asking — two calls a millisecond apart differ, and `cursor`
+     * carries the rank, so both move together and neither is a shape.
+     */
+    it("returns it in the shape a page row has", async () => {
+      const id = await seed({ monitorId, score: 71, postedAt: minutesAgo(30) });
+
+      const match = await readMatch(db, owner, id);
+      const [row] = (await listMatches(db, { userId: owner })).matches;
+
+      const withoutTheClock = ({ rank, cursor, ...rest }: InboxMatch) => rest;
+
+      expect(match?.id).toBe(id);
+      expect(match && withoutTheClock(match)).toEqual(row && withoutTheClock(row));
+      expect(match?.rank).toBeCloseTo(row?.rank as number, 3);
+    });
+
+    it("returns nothing for a match belonging to somebody else", async () => {
+      const id = await seed({ monitorId: strangerMonitorId, score: 99, postedAt: minutesAgo(1) });
+
+      expect(await readMatch(db, owner, id)).toBeUndefined();
+    });
+
+    it("answers an id that does not exist the same way", async () => {
+      expect(await readMatch(db, owner, "00000000-0000-4000-8000-000000000000")).toBeUndefined();
+    });
+
+    /** A link is not a filter: referring somebody to a dismissed item means it. */
+    it("returns a match the reader marked not relevant", async () => {
+      const id = await seed({ monitorId, score: 64, postedAt: minutesAgo(10) });
+      await recordVerdict(db, { matchId: id, userId: owner, verdict: "not_relevant" });
+
+      expect((await listMatches(db, { userId: owner })).matches.map((m) => m.id)).not.toContain(id);
+      expect((await readMatch(db, owner, id))?.id).toBe(id);
+    });
+
+    it("narrows the list too, because it is a filter like the others", async () => {
+      const wanted = await seed({ monitorId, score: 80, postedAt: minutesAgo(5) });
+      await seed({ monitorId, score: 90, postedAt: minutesAgo(4) });
+
+      const page = await listMatches(db, { userId: owner, matchId: wanted });
+
+      expect(page.matches.map((match) => match.id)).toEqual([wanted]);
     });
   });
 

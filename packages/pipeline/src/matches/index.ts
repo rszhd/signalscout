@@ -17,6 +17,7 @@ export {
   maximumPageSize,
   noMatchCounts,
   rankDecayPointsPerDay,
+  readMatch,
   setMatchSaved,
   UnusableCursorError,
 } from "./matches.js";

@@ -225,9 +225,17 @@ export interface EvaluationChoice {
   /**
    * The provider's own confidence in the answer, when it reports one.
    *
-   * Not the winning probability, and not derivable from it: TypeSafe computes
-   * it separately. `triage.ts` uses it to decide whether a `no` is explicit
-   * enough to drop a lead on.
+   * **How concentrated the distribution is**, not the winning probability:
+   * docs.typesafe.ai says a 0–1 score reflecting how tightly the probability
+   * clusters on one option. So it is derived from `probabilities` rather than
+   * measured separately, and a wide spread reads as low confidence however
+   * high the leading option is. `triage.ts` uses it to decide whether a `no`
+   * is explicit enough to drop a lead on.
+   *
+   * TypeSafe's own bands are above 0.9 to act unattended, below 0.5 to route
+   * elsewhere, and a middle that wants a second look. Triage's floor sits in
+   * that middle at 0.6, and their guidance is the same as US-229's: test the
+   * threshold against your own domain rather than taking a published one.
    */
   readonly confidence?: number;
 }

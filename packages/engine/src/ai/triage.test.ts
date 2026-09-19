@@ -12,13 +12,15 @@
  * in `kept: true` exists to go red if some later change makes a failure drop
  * an item quietly.
  */
-import { APICallError } from "ai";
+
+import { APICallError, InvalidResponseDataError } from "ai";
 import { MockLanguageModelV4 } from "ai/test";
 import { describe, expect, it } from "vitest";
 import { type AiConfig, triageConfigFromEnvironment, triageIsOff } from "./config.js";
+import type { EvaluationModelInstance } from "./provider.js";
 import { createTriager, triageSchema } from "./triage.js";
-import type { ItemForTriage, MonitorProfile } from "./triage-prompt.js";
-import { buildTriageSystemPrompt } from "./triage-prompt.js";
+import type { ItemForTriage, MonitorProfile, TriageVerdict } from "./triage-prompt.js";
+import { buildTriageSystemPrompt, triageVerdicts } from "./triage-prompt.js";
 
 const monitor: MonitorProfile = {
   product: "A test runner that records browser flows instead of coding them",
@@ -326,5 +328,244 @@ describe("the triage settings", () => {
     const config = triageConfigFromEnvironment({ ...base, AI_INPUT_PRICE_MICROS: 2_000_000 });
 
     expect(config.inputPriceMicros).toBe(2_000_000);
+  });
+});
+
+/**
+ * Triage on an evaluation model. US-230.
+ *
+ * The same rule as every test above, on a second path: **only an explicit `no`
+ * drops.** The branch this covers is new and the failure it exists to catch is
+ * the old one — a `catch`, or a floor, that starts returning `kept: false`.
+ *
+ * One thing here is not in the language-model path. An evaluation model reports
+ * how sure it is, and a `no` it is unsure of is not an explicit `no`. So there
+ * is a floor, it keeps rather than drops below it, and these cases are what
+ * stop a later edit inverting that.
+ */
+
+/** A stand-in evaluation model: the SDK ships no mock for this specification. */
+function evaluationModel(
+  answer: () => {
+    answers: Record<string, unknown>;
+    usage?: { inputTokens?: number; outputTokens?: number; totalTokens?: number };
+    providerMetadata?: Record<string, unknown>;
+  },
+): EvaluationModelInstance {
+  return {
+    specificationVersion: "v4",
+    provider: "typesafe",
+    modelId: "jev-latest",
+    supportedQuestionTypes: ["choice", "score", "boolean"],
+    async doEvaluate() {
+      const given = answer();
+      return {
+        answers: given.answers,
+        usage: given.usage ?? { inputTokens: 900, outputTokens: 6, totalTokens: 906 },
+        warnings: [],
+        providerMetadata: given.providerMetadata,
+      } as never;
+    },
+  } as EvaluationModelInstance;
+}
+
+/**
+ * The distribution is complete on purpose: the SDK refuses an answer that
+ * gives a probability for some options and not others, which is a rule worth
+ * meeting in the stub rather than discovering in production.
+ */
+function choosing(choice: TriageVerdict, confidence?: number): EvaluationModelInstance {
+  const probabilities = Object.fromEntries(
+    triageVerdicts.map((verdict) => [verdict, verdict === choice ? 0.8 : 0.1]),
+  );
+
+  return evaluationModel(() => ({
+    answers: { verdict: { type: "choice", choice, probabilities } },
+    ...(confidence === undefined
+      ? {}
+      : { providerMetadata: { typesafe: { confidence: { verdict: confidence } } } }),
+  }));
+}
+
+function evaluationThrowing(error: unknown): EvaluationModelInstance {
+  return evaluationModel(() => {
+    throw error;
+  });
+}
+
+const evaluationConfig = () =>
+  config({ provider: "typesafe", model: "jev-latest", apiKey: "test-key" });
+
+describe("an evaluation model that answers", () => {
+  it("drops the item on a confident no", async () => {
+    const triager = createTriager({
+      config: evaluationConfig(),
+      evaluationModel: choosing("no", 0.9),
+    });
+
+    const outcome = await triager.triage({ monitor, post });
+
+    expect(outcome.verdict).toBe("no");
+    expect(outcome.kept).toBe(false);
+    expect(outcome.status).toBe("scored");
+  });
+
+  it.each(["yes", "maybe"] as const)("keeps the item on %s", async (verdict) => {
+    const triager = createTriager({
+      config: evaluationConfig(),
+      evaluationModel: choosing(verdict, 0.9),
+    });
+
+    const outcome = await triager.triage({ monitor, post });
+
+    expect(outcome.verdict).toBe(verdict);
+    expect(outcome.kept).toBe(true);
+  });
+
+  it("records the provider, the model and what the call cost", async () => {
+    const triager = createTriager({
+      config: evaluationConfig(),
+      evaluationModel: choosing("no", 0.9),
+    });
+
+    const { call } = await triager.triage({ monitor, post });
+
+    expect(call.provider).toBe("typesafe");
+    expect(call.model).toBe("jev-latest");
+    expect(call.inputTokens).toBe(900);
+    // 900 input tokens at 42,000 micro-dollars a million, and output is free.
+    expect(call.estimatedCostMicros).toBe(38);
+  });
+});
+
+/**
+ * The floor, and why it keeps rather than drops.
+ *
+ * US-229 measured the two leads a weaker rule lost at confidence 0.13 and
+ * 0.25, and the six it kept between 0.64 and 0.86. A `no` under the floor is
+ * the model saying it cannot tell, and this stage may not delete a lead on
+ * that.
+ */
+describe("an unsure no keeps the item", () => {
+  it("keeps a no below the floor", async () => {
+    const triager = createTriager({
+      config: evaluationConfig(),
+      evaluationModel: choosing("no", 0.2),
+    });
+
+    const outcome = await triager.triage({ monitor, post });
+
+    expect(outcome.verdict).toBe("no");
+    expect(outcome.kept).toBe(true);
+    expect(outcome.status).toBe("scored");
+  });
+
+  it("drops a no exactly at the floor, so the boundary is not a gap", async () => {
+    const triager = createTriager({
+      config: evaluationConfig(),
+      evaluationModel: choosing("no", 0.6),
+    });
+
+    expect((await triager.triage({ monitor, post })).kept).toBe(false);
+  });
+
+  it("keeps a no when the provider reports no confidence at all", async () => {
+    const triager = createTriager({
+      config: evaluationConfig(),
+      evaluationModel: choosing("no"),
+    });
+
+    const outcome = await triager.triage({ monitor, post });
+
+    expect(outcome.kept).toBe(true);
+  });
+
+  it("takes a floor the caller sets", async () => {
+    const triager = createTriager({
+      config: evaluationConfig(),
+      evaluationModel: choosing("no", 0.5),
+      confidenceFloor: 0.4,
+    });
+
+    expect((await triager.triage({ monitor, post })).kept).toBe(false);
+  });
+
+  it("never drops on a yes or a maybe, however unsure", async () => {
+    for (const verdict of ["yes", "maybe"] as const) {
+      const triager = createTriager({
+        config: evaluationConfig(),
+        evaluationModel: choosing(verdict, 0.01),
+      });
+
+      expect((await triager.triage({ monitor, post })).kept).toBe(true);
+    }
+  });
+});
+
+describe("an evaluation model that does not answer keeps the item", () => {
+  it("keeps the item when the provider refuses the call", async () => {
+    const triager = createTriager({
+      config: evaluationConfig(),
+      evaluationModel: evaluationThrowing(
+        new APICallError({
+          message: "401 unauthorised",
+          url: "https://api.typesafe.ai/v1",
+          requestBodyValues: {},
+        }),
+      ),
+    });
+
+    const outcome = await triager.triage({ monitor, post });
+
+    expect(outcome.kept).toBe(true);
+    expect(outcome.verdict).toBeNull();
+    expect(outcome.status).toBe("failed");
+  });
+
+  it("keeps the item when our own timeout fires", async () => {
+    const abort = Object.assign(new Error("timed out"), { name: "TimeoutError" });
+    const triager = createTriager({
+      config: evaluationConfig(),
+      evaluationModel: evaluationThrowing(abort),
+    });
+
+    expect((await triager.triage({ monitor, post })).kept).toBe(true);
+  });
+
+  /**
+   * The rounding near-tie, which is a real provider behaviour and not a
+   * hypothetical. TypeSafe rounds to two decimals and the SDK checks the
+   * chosen option holds the highest one; 0.40 against 0.41 fails that check.
+   */
+  it("keeps the item when rounding makes the chosen option not the highest", async () => {
+    const triager = createTriager({
+      config: evaluationConfig(),
+      evaluationModel: evaluationThrowing(
+        new InvalidResponseDataError({
+          data: { verdict: { type: "choice", choice: "no" } },
+          message: 'Question "verdict" did not select a highest-probability option.',
+        }),
+      ),
+    });
+
+    const outcome = await triager.triage({ monitor, post });
+
+    expect(outcome.kept).toBe(true);
+    expect(outcome.verdict).toBeNull();
+    expect(outcome.status).toBe("rejected");
+  });
+
+  it("keeps the item when the provider answers a question we did not ask", async () => {
+    const triager = createTriager({
+      config: evaluationConfig(),
+      evaluationModel: evaluationModel(() => ({
+        answers: { verdict: { type: "score", score: 2 } },
+      })),
+    });
+
+    const outcome = await triager.triage({ monitor, post });
+
+    expect(outcome.kept).toBe(true);
+    expect(outcome.status).toBe("rejected");
   });
 });

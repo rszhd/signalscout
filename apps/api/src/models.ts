@@ -37,6 +37,7 @@ import {
   embeddingNeedsApiKey,
   embeddingProviders,
   followsDefault,
+  isEvaluationProvider,
   listAiKeys,
   type ModelProbe,
   needsApiKey,
@@ -287,6 +288,22 @@ export async function registerModelRoutes(
    * measured and a second copy of them here would answer a different question
    * from the one the worker answers.
    */
+  /**
+   * Which providers a job may be put on. US-230.
+   *
+   * Embedding has always had fewer, because not every provider embeds. Triage
+   * now has more: an evaluation provider answers a typed question and has no
+   * chat endpoint, so it can triage and it cannot classify, draft or embed.
+   * Offering one on the classifier's picker would offer a job that cannot run,
+   * and the person would find out on the next poll rather than on the screen.
+   */
+  function providersFor(task: AiTask): string[] {
+    if (task === "embed") return [...embeddingProviders];
+    if (task === "triage") return [...aiProviders];
+
+    return aiProviders.filter((provider) => !isEvaluationProvider(provider));
+  }
+
   function instanceHasKey(task: AiTask): boolean {
     if (task === "embed") {
       const config = embeddingConfigFromEnvironment(env);
@@ -517,7 +534,7 @@ export async function registerModelRoutes(
         return {
           task,
           ...taskViews[task],
-          providers: [...(task === "embed" ? embeddingProviders : aiProviders)],
+          providers: providersFor(task),
           instance: instanceFor(task),
           fallback: fallbackFor(task, fallbackKey),
           provider: mine?.provider ?? null,

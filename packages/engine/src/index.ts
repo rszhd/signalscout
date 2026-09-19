@@ -45,6 +45,7 @@ export {
   embeddingConfigFromEnvironment,
   embeddingNeedsApiKey,
   embeddingProviders,
+  isEvaluationProvider,
   needsApiKey,
   triageConfigFromEnvironment,
   triageIsOff,
@@ -82,10 +83,14 @@ export {
   type ThreadContext,
 } from "./ai/prompt.js";
 export {
+  createEvaluationModel,
   createModel,
+  type EvaluationModelInstance,
+  EvaluationProviderCannotChatError,
   estimateCostMicros,
   MissingAiKeyError,
   modelPrices,
+  NotAnEvaluationProviderError,
   pricedModelsFor,
   schemaGoesInThePrompt,
   unpricedModelsFor,

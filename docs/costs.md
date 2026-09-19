@@ -108,6 +108,27 @@ and nothing for a person to notice, and there is no better reader behind it to
 buy the mistake back. A cascade is worth its risk when the second reader is
 much dearer. When it is the same model, it is not.
 
+**An evaluation model is the cheapest triage available, and it is not promoted.**
+`AI_TRIAGE_PROVIDER=typesafe` with `AI_TRIAGE_MODEL=jev-latest` runs the stage
+on a model that answers a typed question rather than a prompt. It is priced at
+42,000 micro-dollars per million input tokens and nothing for output, against
+`gpt-5.6-luna`'s 200,000 and 1,200,000. Measured in US-229 over 227 items from
+five platforms: 43.7 micro-dollars an item against 355.6, the same six leads
+scoring 60 or more kept by both, and twelve items sent to the classifier rather
+than seventeen.
+
+Two things stop that being a recommendation. Every one of those numbers was
+fitted to the sample it was then scored against, which is what US-229 is open
+to fix. And the rule it triages by is not the rule `triage-prompt.ts` sends to a
+language model: an evaluation model takes no system prompt, so the question is
+put as structured state, and the question it asks is the one US-221 replaced.
+`pinned.ts` and the recommendation table are untouched, so nothing runs on it
+until a deployment asks.
+
+It also reports how sure it is, which no language model here does. A `no` below
+0.6 confidence keeps the item. That is the stage's own rule — only an explicit
+`no` drops — and it costs a few classifications to hold.
+
 It has the same "no price until you set one" behaviour as an embedding.
 `AI_TRIAGE_INPUT_PRICE_MICROS` and `AI_TRIAGE_OUTPUT_PRICE_MICROS` fall back to
 the classifier's prices only while no separate triage model is named. Once one

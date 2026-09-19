@@ -21,10 +21,19 @@
  * rather than assurances.
  */
 
-import type { LanguageModel } from "ai";
-import { APICallError, generateObject, NoObjectGeneratedError, RetryError } from "ai";
+import type { JSONValue, LanguageModel } from "ai";
+import {
+  APICallError,
+  experimental_evaluate,
+  generateObject,
+  InvalidResponseDataError,
+  NoObjectGeneratedError,
+  RetryError,
+  TypeValidationError,
+} from "ai";
 import { z } from "zod";
 import type { AiConfig, AiProvider } from "./config.js";
+import type { EvaluationModelInstance } from "./provider.js";
 import { estimateCostMicros, schemaGoesInThePrompt } from "./provider.js";
 
 /**
@@ -186,6 +195,145 @@ export async function generateStructured<Value>({
 
     // Anything else is ours. A TypeError here is a bug in this file, and a bug
     // that returns "the model failed" is a bug nobody finds.
+    throw error;
+  }
+}
+
+/**
+ * One evaluation question, asked of a model that answers questions rather than
+ * prompts. US-230.
+ *
+ * `generateStructured`'s three outcomes, kept deliberately identical, because
+ * `triage.ts` maps them to one decision and must not learn a fourth shape.
+ * `ok` carries the chosen option, the distribution over every option and the
+ * provider's own confidence. `rejected` is the model answering badly.
+ * `failed` is not reaching it.
+ *
+ * **The near-tie is a `rejected`, not a crash.** TypeSafe rounds every
+ * probability to two decimal places and the AI SDK checks that the chosen
+ * option holds the highest one. Rounding can break that: an answer came back
+ * `no` with `no` at 0.40 and `yes` at 0.41, and `experimental_evaluate` threw
+ * `InvalidResponseDataError`. That is the model answering in a shape we cannot
+ * use, which is what `rejected` means, and triage keeps the item either way.
+ * Letting it escape as an unhandled throw would take the worker down on an
+ * item the stage is meant to pass along.
+ */
+export interface EvaluationChoice {
+  readonly choice: string;
+  /** One entry per option, when the provider gives a distribution. */
+  readonly probabilities?: Readonly<Record<string, number>>;
+  /**
+   * The provider's own confidence in the answer, when it reports one.
+   *
+   * Not the winning probability, and not derivable from it: TypeSafe computes
+   * it separately. `triage.ts` uses it to decide whether a `no` is explicit
+   * enough to drop a lead on.
+   */
+  readonly confidence?: number;
+}
+
+export type EvaluationResult =
+  | { readonly status: "ok"; readonly answer: EvaluationChoice; readonly call: ModelCall }
+  | { readonly status: "rejected"; readonly error: string; readonly call: ModelCall }
+  | { readonly status: "failed"; readonly error: string; readonly call: ModelCall };
+
+/**
+ * What an evaluation model accepts as state or instructions.
+ *
+ * Narrower than `JSONValue`: the specification takes a string, an object or an
+ * array, and not a bare `null`. Writing it out rather than reaching for the
+ * SDK's internal type keeps this file's imports to the package's public
+ * surface, which is the rule the rest of it follows.
+ */
+export type EvaluationInput = string | Readonly<Record<string, JSONValue>> | readonly JSONValue[];
+
+export interface EvaluationCallOptions {
+  readonly model: EvaluationModelInstance;
+  readonly config: AiConfig;
+  /** The shared state the question is asked about. */
+  readonly state: EvaluationInput;
+  /** What to decide. Objects and arrays are allowed as well as prose. */
+  readonly instructions: EvaluationInput;
+  /** Option name to description. The answer is one of these keys. */
+  readonly criteria: Readonly<Record<string, EvaluationInput | null>>;
+  readonly now?: () => number;
+}
+
+export async function evaluateChoice({
+  model,
+  config,
+  state,
+  instructions,
+  criteria,
+  now = Date.now,
+}: EvaluationCallOptions): Promise<EvaluationResult> {
+  const startedAt = now();
+
+  const measure = (usage?: { inputTokens?: number; outputTokens?: number }): ModelCall => ({
+    provider: config.provider,
+    model: config.model,
+    inputTokens: usage?.inputTokens,
+    outputTokens: usage?.outputTokens,
+    latencyMs: now() - startedAt,
+    estimatedCostMicros: usage ? estimateCostMicros(config, usage) : undefined,
+  });
+
+  try {
+    const result = await experimental_evaluate({
+      model,
+      state,
+      // The key is a literal so the SDK infers a Choice answer rather than a
+      // union of all three question kinds. `verdict` is the only question this
+      // file asks, and `triage.ts` is the only caller.
+      questions: { verdict: { type: "choice" as const, instructions, criteria } },
+      // The queue owns retries, for the reason `generateStructured` gives.
+      maxRetries: 0,
+      abortSignal: AbortSignal.timeout(config.timeoutMs),
+    });
+
+    const answer = result.answers.verdict;
+
+    // The question asked for a Choice, so anything else is the provider
+    // answering a question we did not ask. It cannot happen against a
+    // conforming provider and it is handled rather than asserted away: an
+    // assertion here would throw, and a throw in this file takes the worker
+    // down on an item triage is meant to pass along.
+    if (answer === undefined || answer.type !== "choice") {
+      return {
+        status: "rejected",
+        error: `The provider answered ${answer?.type ?? "nothing"} where a choice was asked for.`,
+        call: measure(result.usage),
+      };
+    }
+
+    const confidence = (
+      result.providerMetadata?.typesafe as { confidence?: Record<string, number> } | undefined
+    )?.confidence?.verdict;
+
+    return {
+      status: "ok",
+      answer: {
+        choice: answer.choice,
+        probabilities: answer.probabilities,
+        ...(confidence === undefined ? {} : { confidence }),
+      },
+      call: measure(result.usage),
+    };
+  } catch (error) {
+    // The provider answered and the answer was not usable: a choice that is
+    // not the highest-probability option after rounding, or a payload that
+    // failed validation. Nothing about the author was learned either way.
+    if (InvalidResponseDataError.isInstance(error) || TypeValidationError.isInstance(error)) {
+      return { status: "rejected", error: messageOf(error), call: measure() };
+    }
+
+    // Nothing came back: the provider refused, the network failed, or our own
+    // timeout fired.
+    if (APICallError.isInstance(error) || RetryError.isInstance(error) || isAbort(error)) {
+      return { status: "failed", error: messageOf(error), call: measure() };
+    }
+
+    // Anything else is ours, and `generateStructured` says why it is rethrown.
     throw error;
   }
 }

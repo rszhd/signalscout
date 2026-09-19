@@ -46,6 +46,14 @@ code is self-hosted, and a version bump that silently began refusing logins or
 writes is the failure none of them would forgive. Keep that direction when you
 add the next setting.
 
+**The hosted application is a fork, not a mirror.** Its `apps/` began as a
+copy of this one on 2026-09-16 and the two have moved apart since: most of
+`MonitorForm.tsx` and `monitors.ts` differ now. That is by decision (US-239
+there): each product goes its own way, and the packages are what they share.
+A fix to a screen or a route here is not ported there, and nothing there is
+ported here, unless a ticket says so by name. Do not read the other
+repository to keep the two aligned.
+
 **Say what has run live and what has not.** Most of this product's claims have
 a measurement behind them and a few do not. The standing gaps are real rate
 limits, real provider outages, and screens no browser has rendered. When you

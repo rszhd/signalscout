@@ -50,6 +50,17 @@ no row, so the classification is bought deliberately, outside the pipeline.
 **Fifty items from two Reddit threads is not a distribution**, which is why
 step 2 exists and caps its sample per platform and kind.
 
+## How they are run
+
+Every `capture:*` is a script of `packages/engine`, every `live:*` and
+`measure:*` a script of `packages/pipeline`, and the captures with no script
+are run by hand with a key in the environment:
+
+    pnpm --filter @signalscout/engine capture:<name>
+    pnpm --filter @signalscout/pipeline live:<name>
+    pnpm capture:deletions
+    node packages/engine/src/sources/providers/<provider>/<platform>-fixtures/capture.mjs
+
 ## The model instruments
 
 | Command | Asks | Spends | Run when |

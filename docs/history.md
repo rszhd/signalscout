@@ -31,6 +31,7 @@ its date.
 - [Secrets: the decisions](#secrets-the-decisions) — moved from `docs/secrets.md`
 - [Accounts: the decisions](#accounts-the-decisions) — moved from `docs/accounts.md`
 - [Code headers: the reasoning moved out](#code-headers-the-reasoning-moved-out) — moved from eight file headers
+- [AGENTS.md: the incidents behind the rules](#agentsmd-the-incidents-behind-the-rules) — moved from `AGENTS.md`
 
 ---
 
@@ -3164,3 +3165,59 @@ What it is trying to see, in order:
      it finds are readable by a person.
   5. A second run opens no thread whose reply count has not moved, which is
      the rule that stops an hourly monitor re-buying every conversation.
+
+---
+
+## AGENTS.md: the incidents behind the rules
+
+Moved here from `AGENTS.md` on 2026-09-20 (US-259), when that file was cut
+to its rules. Each paragraph there now carries the rule and a ticket id;
+this is what the ticket holds.
+
+**Why every address is a path (US-076).** The router moved out of the hash
+on 2026-09-08, after a payment page returned a person to
+`/billing?checkout=done#/billing` — one address saying the same thing twice,
+because the path was the server's answer and the hash was the application's.
+US-045's rule, no project no inbox, is the route table itself now rather
+than an effect that corrects the address after rendering.
+
+**What the engine holds.** Connectors, model calls, the pre-filter, the
+estimate and the cipher. The pipeline holds monitors, posts, matches,
+cursors, the budget and the jobs. The boundary tests name both.
+
+**The three values that shipped without their migration**: `apify`,
+`draft_reply` and `key_test`. Each time a full suite passed, the call
+succeeded, the money was spent, and recording it failed. The arrays live one
+package away from the migration, which makes forgetting easier rather than
+harder.
+
+**BUG-009, the unscoped reads.** The providers page scoped the keys and left
+the spend, the counts and the verdicts answering for the whole instance, so
+a new account saw somebody else's numbers. Nothing went red, because nothing
+on that page was scoped by a test.
+
+**BUG-012, the journal.** Fourteen migrations were written by hand without
+`pnpm db:generate`, so the files existed and the journal did not name them.
+`db/migrations.test.ts` is what fails now, by name, when the two disagree.
+
+**US-047, the invented comment link.** TikTok's shipped as `?comment_id=`,
+which the connector invented; it survived a capture, two live polls and a
+code comment admitting it was a guess, because nobody pressed it. The real
+one is `?cid=`.
+
+**Where a worktree lives, and why (US-135).** `worktrees/<name>` sits
+*inside* the main checkout, so one editor window lists every worktree's
+changes in one source-control view. `.gitignore` and `.dockerignore` both
+carry the folder, because a worktree that is also untracked content of the
+repository it sits in shows up in `git status` and is walked by `pnpm lint`.
+Neither `new-worktree.mjs` nor `remove-worktree.mjs` deletes a branch: a
+folder and a copied database can be made again, and commits cannot.
+
+**The settled decision that was reversed (US-024, 2026-09-05).** The table
+read *a provider picker in the UI* against *one provider per source, named
+but not chosen*. That was right while Reddit had one usable provider and
+wrong the moment two fetch the same platform.
+
+**`AUTH_SIGNUP=closed` and `AUTH_EMAIL_VERIFICATION=off`** were each the one
+place an implementation went against a literal request, for the reason the
+rule still gives.

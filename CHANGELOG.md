@@ -19,6 +19,10 @@ versioned and is not described here; it is what `main` holds.
 
 ## Unreleased
 
+Nothing a consumer must react to. `packages/pipeline`'s `schema.ts` is a
+barrel over one file per table family now (US-248); every export keeps its
+name and `drizzle-kit generate` produces no migration.
+
 ## 0.11.0 — 2026-09-19
 
 **Added.** `readMatch(db, userId, matchId)` returns one match in the shape a

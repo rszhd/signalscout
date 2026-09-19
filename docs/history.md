@@ -26,6 +26,10 @@ its date.
 - [Sources: what was measured](#sources-what-was-measured) — moved from `docs/sources.md`
 - [Costs: what was measured](#costs-what-was-measured) — moved from `docs/costs.md`
 - [Testing: the incidents behind the rules](#testing-the-incidents-behind-the-rules) — moved from `docs/testing.md`
+- [Stack: what was measured](#stack-what-was-measured) — moved from `STACK.md`
+- [Instruments: what the first runs found](#instruments-what-the-first-runs-found) — moved from `docs/instruments.md`
+- [Secrets: the decisions](#secrets-the-decisions) — moved from `docs/secrets.md`
+- [Accounts: the decisions](#accounts-the-decisions) — moved from `docs/accounts.md`
 
 ---
 
@@ -2522,3 +2526,195 @@ twenty seconds under load. Two seconds is not worth a suite that cries wolf.
 **Mutation sweep reading rules**, from the project that ran one: a survivor
 list has a timestamp and can invent gaps that are already closed, and a file
 that logs heavily scores low without being worse tested.
+
+---
+
+## Stack: what was measured
+
+Moved here from `STACK.md` on 2026-09-20, when that page was cut to its
+choices.
+
+**Reddit's providers.** Bright Data was the first, free for the first 5,000
+records a month and $0.0015 a record after, about five times what
+ScrapeCreators and SocialCrawl charge for the same subreddit page; US-158
+switched it off on 2026-09-17. Its free tier needed no card, no company
+verification and no KYC review, which was checked rather than assumed
+because an unverified access claim is what cost this product Reddit's own
+API. Bright Data answers a larger request with a `snapshot_id` to poll; the
+other two answer synchronously.
+
+**The terms, as read.** Bright Data's Master Service Agreement makes the
+customer warrant that their use violates no third-party rights and indemnify
+Bright Data if it does. Two clauses to re-read before a hosted launch: a
+customer may not redistribute collected data "to offer a similar or
+competitive product", and the customer is solely responsible for the lawful
+grounds for personal data.
+
+**X's own API.** Since February 2026 pay-per-use is its only self-serve tier:
+Basic and Pro closed to new signups, no free tier, $0.005 a post read.
+US-006 asked all three accounts held at the time and only SocialCrawl could
+search; US-061 added SocialData on 2026-09-07 for half the price and because
+it takes the window server-side instead of buying everything older than
+`since` and discarding it. US-013 and US-014, the budget guard and the cost
+test, landed before the X connector, in that order on purpose.
+
+**LinkedIn, measured.** Fifty posts cost $0.2030 through SocialCrawl against
+$0.10 through Apify, and the price is not what settled it: every post Apify
+returned was under ninety minutes old, where SocialCrawl's twenty stored
+posts reached back 543 hours in relevance order. An Apify run that had just
+returned ten posts reported five thousandths of a cent, and its real total a
+few seconds later.
+
+**Memory.** A Next.js production build often needs more than 2 GB and fails
+on a 1 GB VPS; its standalone server holds 150–250 MB idle. A static Vite
+bundle plus Fastify holds 70–120 MB.
+
+**The stack table said TanStack Query and shadcn/ui until 2026-09-20.**
+Neither was ever installed; the table was written before the first screen.
+
+---
+
+## Instruments: what the first runs found
+
+Moved here from `docs/instruments.md` on 2026-09-20, when that page was cut
+to its rules and its tables.
+
+**Three captures leaked identity past a scrubber that looked right.** The
+SocialCrawl LinkedIn capture's first run let real names and job headlines
+through, because the scrubber sniffed for fields the provider does not use.
+The SocialData X capture's first run leaked six handles through
+`affiliation_label.label_url`. The Apify LinkedIn one leaked a real name
+through a `PROFILE_MENTION` span in `commentary`. All three rules are in the
+scrubbers now.
+
+**`live:model-probe` exists because the OpenAI wire format is not structured
+output.** DeepSeek publishes `response_format: json_object` and no JSON
+schema, so the AI SDK puts the schema in the prompt instead, and only a real
+call says whether the answer comes back usable.
+
+**Score drift, measured.** Two `capture:scores` runs over the same fifty on
+one day differed by 2.4 points an item and by 11 on one of them, under the
+same prompt. That is why a score is cached under a hash of the prompt and
+reused, so drift is not read as triage having changed something.
+
+**The eval harness judged a rule on a third of the text.** A run record's
+`excerpt` is a 300-character slice while the triage call it recorded saw the
+whole post. The comparison it produced was worthless and looked fine, which
+is why `build-dataset.mjs` refuses rather than warns. US-231 holds the other
+three mistakes that shaped the harness.
+
+**Live polls, as measured.** `live:x-poll`: a 24-hour window bought 7
+tweets for $0.0014. `live:apify-linkedin-poll`: 25 posts for about $0.052.
+`live:tiktok-poll`: the search 2 credits, 25 threads 25 more, 678 comments
+then a triage call each, about $0.37 on the provider and several times that
+on the model. `live:tiktok-comments`: sixty stored comments cost $0.198 on
+2026-09-06. `live:instagram-poll`: $1.6317 with SocialCrawl against $0.3336
+with the model, and a $1.00 cap overshot by 63% on the first run.
+`live:notification`: twenty newest posts scored nothing at 50 where the
+oldest forty produced six matches. `measure:lead-position`: a credit fetches
+fifty comments and a classification is 2,975 micro-dollars.
+
+**`live:provider-switch` leaves a paused monitor and two `api_usage` rows**,
+which are the evidence; the 2026-09-05 run is under *Sources: what was
+measured*.
+
+**Captures, as measured.** ScrapeCreators TikTok: 9 credits, about $0.017,
+ten questions answered (US-119); a page of thirty is 1.8 MB of raw TikTok,
+which is why it stores a digest per page. ScrapeCreators YouTube: 8 credits;
+`includeExtras` turned a 68-character title into a 1,400-character
+description and replaced a computed `publishedTime` with the real
+`publishDate`; the transcript endpoint returned thousands of characters
+where TikTok's returned null; three credits were spent suspecting a parameter
+that was innocent when the video simply had no comments. ScrapeCreators
+Instagram: 6 credits, with a 404 for nothing, a 400 past the last page and a
+400 for no query all free. HikerAPI Instagram: 5 requests, about half a cent,
+the balance counter lagging so one call read as refunded; US-160 holds the
+three runs. SocialCrawl Instagram: the committed fixtures came from a
+`--lean` run at 14 credits, so the hashtag search and whether a `top` walk
+repeats itself are open questions. YouTube `--only=comments`: one credit on a
+broader search and three on comment pages, about $0.008. SocialCrawl Reddit
+`--only=comments`: one call at five credits, $0.041, the whole thread.
+SocialData X `--only=comments`: a `min_replies:20` search plus two reply
+pages, about $0.012. Apify LinkedIn `--only=comments`: about $0.008 for a
+two-comment thread.
+
+---
+
+## Secrets: the decisions
+
+Moved here from `docs/secrets.md` on 2026-09-20, when that page was cut to
+its rules.
+
+**US-004 built the cipher before anything needed it**, because the decision
+about a cipher is a bad one to make in a hurry on the day the first key has
+to move out of a file.
+
+**US-024 renamed the environment variable** from `<SOURCE>_<FIELD>` to
+`<PROVIDER>_<FIELD>`: `REDDIT_API_KEY`, `X_API_KEY` and three more would all
+have held the same SocialCrawl value, and rotating it would give a person
+five chances to leave one behind. The same ticket re-keyed
+`source_credentials` by provider and moved the stored Bright Data key from
+`reddit` to `brightdata` with nobody retyping it, which is why the row
+carries the record name it was sealed with: a derived `brightdata:apiKey`
+could not open a row written as `reddit:apiKey`.
+
+**US-081 made "empty the environment before you open signup" a behaviour.**
+Until then this page said *or accept the bill*, and advice is a thing
+somebody skips.
+
+**US-161 split "whose keys pay" from "is this instance shared".** The hosted
+product is the third shape, a shared instance that pays for its accounts.
+Setting `AUTH_SIGNUP=closed` on a shared box to get the keys would also have
+opened the webhook address guard and the instance's signing secret, which
+follow signup.
+
+**US-068, US-078 and US-079: where a model key lives.** US-068 kept a key on
+each job's row; US-078 wrote a rule for lending one job's key to another; the
+owner read that rule and called it confusing, and US-079 replaced it with a
+list a person picks from. US-083 added the default key.
+
+**US-068 and US-080 decided twice not to test a model key before storing
+it**, because a model call costs money where a Reddit `validateCredentials`
+is free. US-087 reversed that on the owner's decision: the cost is stated on
+the screen rather than avoided.
+
+**The two captured credential answers** are
+`sources/providers/brightdata/fixtures/credentials-accepted.json` and
+`credentials-rejected.json`, replayed by `reddit.test.ts`.
+
+---
+
+## Accounts: the decisions
+
+Moved here from `docs/accounts.md` on 2026-09-20, when that page was cut to
+its rules. The measurements are under *Accounts* above; these are the reasons
+that page used to carry.
+
+**The Traefik overlay exists so the hosted deployment and the documented
+self-hosted one are the same mechanism**, not because Traefik is simpler for
+one hostname; for one hostname it is not. The proxy is its own compose
+project so that `down` on the app never touches the `acme` volume, which
+Let's Encrypt rate-limits refilling.
+
+**`AUTH_SIGNUP` defaults to `closed`** because an instance that upgraded into
+this version without anyone reading the notes must not start accepting
+registrations. **`AUTH_EMAIL_VERIFICATION` defaults to `off`** for the same
+reason in the other direction: a version bump that began refusing logins is
+the failure no self-hoster would forgive.
+
+**The login screen says "Set up this instance" only on the very first
+visit**, when there is nobody to sign in as, and "Create an account" beside
+the form once signup is open.
+
+**Registering an existing address says *check your email***, on purpose,
+and sends nothing: "that address is taken" would enumerate accounts. The
+cost is that somebody who forgot they had an account waits for mail that is
+not coming; the screen names the possibility.
+
+**There is no password reset** because the common install has no mail
+server, and a reset link that never arrives is worse than no button.
+Verification uses mail when it is configured, but it confirms an address
+rather than replacing a password.
+
+**The take-over of `self-hosted` rows is enforced by a count**, not true by
+accident, so a second registration on an open instance inherits nothing.

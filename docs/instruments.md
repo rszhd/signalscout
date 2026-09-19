@@ -1,15 +1,15 @@
 # The instruments
 
-These are the only commands in this repository that spend money. Each one asks
-a real provider or a real model something and records what it said, because an
+These are the only commands in this repository that spend money. Each asks a
+real provider or a real model something and records what it said, because an
 answer we wrote would be evidence about our own schema and none about the
-provider.
+provider. What each first run found is in [history.md](history.md) under
+*Instruments*.
 
 Three rules cover all of them.
 
-**Read what a capture writes before you commit it.** The LinkedIn capture's
-first run leaked real names and job headlines past a scrubber that looked
-right.
+**Read what a capture writes before you commit it.** Three captures leaked a
+real name or handle past a scrubber that looked right.
 
 **Naming the platform is required** on `live-poll.ts`, because a live poll
 spends money and a default would let a mistyped flag bill the wrong account.
@@ -19,356 +19,110 @@ numbers in the ticket.
 
 ## A change that can move a score is measured before it ships
 
-The triage prompt, the classifier prompt, the pre-filter, a threshold, a model:
-anything that changes what reaches an inbox runs the same loop, in this order.
+Anything that changes what reaches an inbox — the triage prompt, the
+classifier prompt, the pre-filter, a threshold, a model — runs this loop:
 
-1. `capture:triage`, then `capture:scores` — the fifty hand-labelled items,
-   about three cents. Read whether the leads survived before reading anything
-   else.
-2. If that looks right, `live:triage-score` — everything this instance has
+1. `capture:triage`, then `capture:scores`: the fifty hand-labelled items,
+   about three cents. Read whether the leads survived before anything else.
+2. If that looks right, `live:triage-score`: everything this instance has
    stored, every platform, posts and replies, about fifteen cents.
 3. Tighten or loosen, and go round again.
 
-**Every capture takes `--model=` and writes a file per model.** Trying a model
-is one command, not an edit to `.env` somebody has to remember to undo, and a
-second model never overwrites the first. `capture:compare` reads whatever has
-been captured and prints one table: kept, leads kept, the highest score
-refused, the junk still bought. It calls nothing.
+**Every capture takes `--model=` and writes a file per model.** A second model
+never overwrites the first, and `capture:compare` prints one table over
+whatever has been captured, calling nothing. `ai/fixtures/pinned.ts` names the
+pair the product sends; changing a name there is a promotion and the last
+step, and the suite goes red until the matching capture exists.
 
-`ai/fixtures/pinned.ts` names the pair the product sends, and the tests read
-that pair. Changing a name there is a promotion and it is the last step: the
-suite goes red until the matching capture exists, because a pinned model with
-no recorded evidence is a claim nobody has checked.
+**A score is bought once and reused.** Both scoring instruments cache under a
+hash of the exact system prompt, so editing the prompt, a monitor or the
+model throws the cache away by itself; `--rescore` forces it. Two runs over
+the same fifty on one day differed by 2.4 points an item, and that drift
+reads as triage having changed something.
 
-**A score is bought once and reused.** Triage feeds the classifier nothing — it
-decides only whether the call happens — so a score belongs to the item, its
-monitor and the classifier's prompt, never to the verdict. Both scoring
-instruments cache under a hash of the exact system prompt sent, so editing
-`prompt.ts`, editing a monitor or changing the model throws the cache away by
-itself. `--rescore` forces it. Two runs over the same fifty on one day differed
-by 2.4 points an item and by 11 on one of them, and that drift reads as triage
-having changed something when it has not.
+**`ai/triage-scores.test.ts` goes red the moment the classifier's prompt
+moves.** It is not an assertion to fix: re-run the two captures and put the
+numbers in the ticket.
 
-**`ai/triage-scores.test.ts` holds the same guard for CI.** It goes red the
-moment the classifier's prompt moves, because every recorded score is then a
-claim about a prompt that no longer exists. A red test there is not an
-assertion to fix: re-run the two captures and put the numbers in the ticket.
+**Both halves are needed.** A keep rate says the stage drops more; only a
+score beside a verdict says it drops the right ones, and a triage drop leaves
+no row, so the classification is bought deliberately, outside the pipeline.
+**Fifty items from two Reddit threads is not a distribution**, which is why
+step 2 exists and caps its sample per platform and kind.
 
-**Both halves are needed and they answer different questions.** A keep rate
-says the stage drops more items; it never says the stage drops the right ones.
-Only a score beside a verdict says that, and a triage drop leaves no row and no
-score, so the classification has to be bought deliberately, outside the
-pipeline, to see it at all. A deleted lead is the one mistake in this product
-that nobody can notice in production.
+## The model instruments
 
-**Fifty items from two Reddit threads is not a distribution.** That is why step
-2 exists, and why it caps the sample per platform and kind: Reddit holds more
-than half of everything stored, so one undivided sample would be a Reddit
-measurement wearing six platforms' names.
+| Command | Asks | Spends | Run when |
+|---|---|---|---|
+| `live:model-probe` | Does this provider answer `generateObject`? The Models screen's Test button with no account behind it. Reads `AI_*`; `--provider=`, `--model=` override. Writes nothing. | one call | a provider is added |
+| `capture:classifier` | Scores PLAN.md's four worked examples; fixtures for `ai/examples.test.ts`; the scores that justify `min_score`. | four calls | the classifier prompt or model changes |
+| `capture:queries` | Writes the example monitor's search queries. Read the output: a subreddit that does not exist and eight queries that are one query are invisible to the schema. | one call | the query prompt changes |
+| `capture:triage` | Triages the 46 hand-labelled comments plus the four examples; fixtures for `ai/triage-examples.test.ts`. Read the kept-asking number rather than counting it: a refusal of an off-product ask is not a fault. | fifty short calls | the triage prompt or model changes |
+| `capture:scores` | Classifies the same fifty and puts the score beside the verdict. Needs `capture:triage` first (`--triage-model=`). One file per pair of models. | ~1.5¢ on `gpt-5.6-luna`, 14¢ on `gpt-5.6-terra`, nothing on a re-run under the same prompt | after `capture:triage` |
+| `capture:embeddings` | Similarity of PLAN.md's five posts to the example monitor; replayed by `ai/similarity.test.ts`. Needs an embedding provider; Anthropic has none. | two calls | the threshold or the embedding model changes |
+| `capture:comment-filter` | What the embedding stage does to a Reddit comment, alone and under its parent's title, on the committed thread. | two calls, 3,009 tokens | `filter/description.ts` changes |
 
-`live:model-probe` asks one provider whether it answers the call this product
-actually makes. It is the cheapest instrument here — one sentence in, one
-boolean out, through `generateObject`, which is the Test button on the Models
-screen with no account behind it. Run it when a provider is added. A provider
-that speaks the OpenAI wire format is not by that fact a provider that speaks
-structured output: DeepSeek publishes `response_format: json_object` and no
-JSON schema, so the AI SDK puts the schema in the prompt instead, and only a
-real call says whether the answer comes back usable. It reads `AI_PROVIDER`,
-`AI_MODEL`, `AI_API_KEY` and `AI_BASE_URL`; `--provider=` and `--model=`
-override the first two, and the key must belong to the provider probed. It
-writes nothing, because there is no account here to bill.
-
-`capture:classifier` scores PLAN.md's four worked examples, records the answers
-as the fixtures `ai/examples.test.ts` replays, and prints the scores that
-justify the default `min_score`. Four short calls.
-
-`capture:queries` writes the search queries for the same example monitor and
-records them. One short call. Read its output rather than trusting it: two
-failures are invisible to the schema, a subreddit that does not exist and eight
-queries that are one query written eight ways.
-
-`capture:triage` asks a real model to triage all 46 comments US-029 labelled by
-hand and PLAN.md's four worked examples, and records the answers as the fixtures
-`ai/triage-examples.test.ts` replays. Fifty short calls, one word back each. It
-prints the two numbers that decide the stage: how many people asking it kept and
-how many people answering it dropped. Read the first one rather than counting
-it — a person asking for a native-app tool is asking, and a monitor selling a
-browser test runner should not reach them, so a refusal there is not
-automatically a fault.
-
-`capture:scores` scores those same fifty with the real classifier and puts the
-score beside the verdict, which is the only way to see what a triage drop was
-worth. Two numbers decide it and they pull apart: a drop at or above the
-threshold is a lead the product would have shown and now never will, and a kept
-item far below it is a classification the stage was meant to save and did not.
-It reads the verdicts file for the triage model it is joining with
-(`--triage-model=`, default the pinned one), so run `capture:triage` first.
-Fifty classifications: about a cent and a half on `gpt-5.6-luna`, fourteen on
-`gpt-5.6-terra`, and nothing at all on a re-run under the same prompt. It
-writes one file per pair of models, because a verdict from one model and a
-score from another is a fact about the two together.
-
-Both read `labelled-subjects.ts`, so the fifty are the same fifty in the same
-order. Two copies of that list would drift, and a score would then sit beside
+Both scoring captures read `labelled-subjects.ts`, so the fifty are the same
+fifty in the same order; two copies would drift and a score would sit beside
 the wrong verdict without anything going red.
 
-`evals/triage` compares triage rules against each other over one
-`live:triage-score` sample. It is the answer to a different question from
-`capture:scores`: that one asks what a drop was worth, and this one asks which
-of two rules drops better. Three commands, and only the middle one spends:
+**`evals/triage`** compares triage *rules* over one `live:triage-score`
+sample — which of two rules drops better, where `capture:scores` asks what a
+drop was worth. `pnpm eval:dataset <run record>` and `pnpm eval:summary` spend
+nothing; `pnpm eval:triage` is about $0.03 for three rules over 227 items.
+Each rule is a provider under `evals/triage/providers/` answering `keep` or
+`drop`; the shipped one imports `createTriager` so it cannot drift. The
+dataset build refuses when `posts` holds less text than the run record: a
+harness judging one rule on a 300-character excerpt produced a worthless
+comparison that looked fine. `promptfoo eval` exits 100 when assertions fail,
+which is the ordinary outcome.
 
-    pnpm eval:dataset <run record>   # reads the database, spends nothing
-    pnpm eval:triage                 # about $0.03 for three rules over 227 items
-    pnpm eval:summary                # reads the last run, spends nothing
+## The pipeline instruments
 
-Each rule is a provider file under `evals/triage/providers/`. The shipped one
-imports `createTriager`, so it cannot drift from what the product sends; a
-candidate keeps its rule under `evals/triage/rules/`. Every provider answers
-`keep` or `drop` — the decision, not the verdict — because a `no` the model is
-unsure of is a keep, and naming the output after the verdict is how that got
-stated backwards once.
+`live-poll.ts` creates a paused monitor with one query and a cap, then drives
+collect, pre-filter and classify with a queue that runs the next step instead
+of enqueuing it. It leaves the monitor, its posts, an `api_usage` row and its
+matches. Run one after changing its connector, and read `api_usage`
+afterwards: the run is evidence only if the row is priced by the connector.
 
-**The dataset build refuses rather than warns.** The run record's `excerpt` is
-a 300-character slice while the triage call it recorded saw the whole post, so
-a harness that reads the record judges one rule on a third of the text. That
-happened, and the comparison it produced was worthless and looked fine.
-`build-dataset.mjs` reads `posts` and stops if anything is shorter there than
-in the record. US-231 holds the other three mistakes that shaped it.
+| Command | Provider half | Notes |
+|---|---|---|
+| `live:x-poll` (`--platform=x --provider=socialdata`) | ~$0.0014 for 7 tweets | The one with a provider-side window; `--since-hours=` defaults to 24 and without it the window is never sent. |
+| `live:sc-tiktok-poll`, `live:sc-youtube-poll` | 2 credits, ~$0.004 | The cheapest polls; the model half is what costs. |
+| `live:apify-linkedin-poll` | ~$0.052 for 25 posts | The one that exercises a waiting collection. The pre-filter drops nothing on LinkedIn. |
+| `live:linkedin-poll` | ~$0.081 | **Refused as written**: SocialCrawl LinkedIn is switched off. Pass `--provider=apify`, or delete `notOffered` to re-measure. |
+| `live:tiktok-poll` | ~$0.37, then a triage call per comment | Turns replies on: 25 threads and 678 comments. Capped, and both paid stages stop at the cap. |
+| `live:instagram-poll` | ~$1.63 against $0.33 of model | **The most expensive poll here.** The first run overshot a $1.00 cap by 63%. |
+| `live:tiktok-comments`, `live:instagram-comments` | nothing | Read comments **already stored** through triage and classification. Skip anything the monitor already paid to read. Use these when the question is the classifier, not the connector. |
+| `live:thread-loop` | the cap you pass, in dollars | One job, and `classify` handing the thread back to `replies` — the only way to see the loop turn. Leaves its own paused monitor. |
+| `live:triage-score` | ~$0.15 | Everything stored, `--per-cell=` per platform and kind, classifies every sampled item whatever triage said, reports drops against each monitor's own `min_score`. **Writes nothing**, so its spend is invisible to every screen; `--dry` estimates. |
+| `measure:lead-position` | ~$0.40 | Pages a thread cheaply and classifies only the positions asked for. `--report-only` re-reads a stopped run. |
+| `live:provider-switch` | ~$0.08 | Starts a Bright Data collection and moves the choice mid-snapshot. **Refused as written** since US-158; delete `notOffered` from `brightdata/reddit.ts` to run it. No other pair can measure this: only Bright Data collects asynchronously. |
+| `live:webhook` | nothing | A signed delivery verifies, a different secret rejects, the hosted guard refuses. Resets delivery rows between the three. |
+| `live:notification` | model only | A match reaches SMTP, in the real order. `--channel=` aims the sample and `--oldest` flips it; the newest twenty scored nothing where the oldest forty produced six. |
 
-`promptfoo eval` exits 100 when assertions fail, which on an eval is the
-ordinary outcome. Do not read it as an error.
+## The captures
 
-`capture:embeddings` measures how near each of PLAN.md's five posts is to the
-example monitor, and records the similarities — not the vectors, which would be
-a quarter of a megabyte to re-prove arithmetic `pgvector` already does.
-`ai/similarity.test.ts` replays them and fails if the default threshold leaves
-the measured gap. Two short calls, well under a hundredth of a cent. It needs
-an embedding provider: Anthropic has none.
+Each is run by hand with a key, writes its fixtures and a `ledger.json` of
+what each call cost, and merges a partial run into the folder's manifest.
 
-`capture:comment-filter` asks what the embedding stage would do to a Reddit
-comment. It reads the thread already committed in
-`sources/deletion-fixtures/`, and the hand labels beside it, and embeds every
-comment twice — alone, and under its parent post's title. Two short calls, 3,009
-tokens. Run it when `filter/description.ts` changes, or against a second thread.
-US-029's answer is recorded in its Log and it is the reason the stage is off for
-comments.
+| Script | Spends | Free calls and traps |
+|---|---|---|
+| `socialcrawl/linkedin-fixtures/capture.mjs` | 5 × 5 credits + 4 free probes | Run when the LinkedIn parser changes. |
+| `socialcrawl/instagram-fixtures/capture.mjs` | 24 credits; `--lean` 14 | `--lean` drops the hashtag search and the second `top` page. **The committed fixtures came from a lean run**, so those two questions are open. |
+| `socialcrawl/reddit-fixtures/capture.mjs --only=comments` | 5 credits, $0.041 | Reads the whole thread in one call. |
+| `socialdata/x-fixtures/capture.mjs --only=comments` | ~$0.012 | Prepaid; an empty balance answers 402. Read the balance it prints first. |
+| `apify/linkedin-fixtures/capture.mjs --only=comments` | ~$0.008 | The comments actor twice, with and without `scrapeReplies`. |
+| `scrapecreators/tiktok-fixtures/capture.mjs` | 9 credits, ~$0.017 | A key with no query and a malformed URL are free. An invalid parameter value is **billed**; read `docs.scrapecreators.com/openapi.json` instead. Writes one whole video and a digest per page: a page is 1.8 MB. |
+| `scrapecreators/youtube-fixtures/capture.mjs` | 8 credits; `--only=comments` ~$0.008 | `includeExtras` is what fills the description and the real `publishDate`. The transcript endpoint is a credit a video. `uploadDate` narrows and leaks. |
+| `scrapecreators/instagram-fixtures/capture.mjs` | 6 credits | Two endpoints: the topic page has no dates, the reels search has everything. A search matching nothing, a page past the last and a key with no query are all free. |
+| `hikerapi/instagram-fixtures/capture.mjs` | 5 requests, ~half a cent | **No free "nothing"**: an empty search returns six unrelated reels and bills. Sends `safe_int=true` because a media `pk` is nineteen digits and `JSON.parse` rounds it. Read the run's balance total, not a call's. |
+| `pnpm capture:deletions` | ~$0.02 | Known available, removed and missing Reddit URLs through both providers; `--comments` probes the alternate endpoint. Writes fixtures, never application rows. |
 
-`live:provider-switch` is the fourth, and it is different in kind: it asks two
-real social-data providers rather than a model, and it writes rows. It starts a
-Bright Data collection, moves the recorded provider to ScrapeCreators while
-that snapshot is still collecting, and reports which provider each resume went
-to and what each one billed. It spends about $0.08 and leaves behind a paused
-monitor and two `api_usage` rows, which are the evidence. Run it when
-`collect.ts` changes how a provider is chosen or resumed.
+**Read `comment_count` before asking for comments.** It is in the search
+answer; two captures paid for an empty comment page before reading it.
 
-**It no longer runs as written.** US-158 switched the Bright Data connector
-off on 2026-09-17, and this script records `brightdata` as the Reddit choice,
-so the pipeline refuses it the way it refuses `live:linkedin-poll`. Delete
-`notOffered` from `sources/providers/brightdata/reddit.ts` to run it again. The
-rule it measures — a collection is resumed through the provider that started
-it, whatever the choice now says — is unchanged, and no other pair can be
-measured for it: Bright Data is the only provider here that collects
-asynchronously, which is what makes the race possible at all.
-
-The LinkedIn capture is the sixth, and it has no `package.json` script because
-it is run by hand with a key: `node
-packages/engine/src/sources/providers/socialcrawl/linkedin-fixtures/capture.mjs`.
-It makes five billed calls at five credits each, plus four probes that are free,
-and it writes `ledger.json` beside the fixtures recording what each one cost.
-Run it when the LinkedIn parser changes. Read the fixtures it writes before you
-commit them — its first run leaked real names past a scrubber that looked right.
-
-`live:linkedin-poll` is US-028's equivalent, **and it no longer runs on
-SocialCrawl**: US-053 switched that connector off, so the poll it drives is
-refused like any other. Pass `--provider=apify`, or delete `notOffered` from
-`socialcrawl/linkedin.ts` to re-measure the connector this paragraph describes.
-The script behind it is
-`live-poll.ts`, and it takes `--platform=` — naming it is required, because a
-live poll spends money and a default would let a mistyped flag bill the wrong
-account. It, and it is a whole pipeline rather
-than one connector: it creates a paused monitor with one LinkedIn query and a
-$0.20 cap, then drives collect, pre-filter and classify with a queue that runs
-the next step instead of enqueuing it. The steps are the real ones in the real
-order. It spends about $0.081 of SocialCrawl credit plus one model call per post
-that survives the filter, and it leaves a paused monitor, its posts, one
-`api_usage` row and its matches. Run it when the LinkedIn connector changes, or
-to prove deduplication — a second run inside the same window should store no new
-post and should bill again, because the provider charges for the search.
-
-`live:x-poll` is the same script with `--platform=x --provider=socialdata`. It
-is the cheapest live poll here — a 24-hour window bought 7 tweets for $0.0014 —
-and it is the one that exercises a provider-side window. `--since-hours=`
-controls it and defaults to 24; a monitor this script creates has never polled,
-so without a `since` the window is never sent and the run proves nothing.
-
-`live:apify-linkedin-poll` is the same script with `--provider=apify`, and it
-is the one that exercises a waiting collection: the Apify connector starts an
-actor run, hands the wait back, and is resumed to read it. One run is 25 posts
-for about $0.052, plus a model call for each — the pre-filter drops none on this
-platform. It records the provider choice, so a build with two LinkedIn
-connectors does not refuse.
-
-`live:tiktok-poll` is the TikTok equivalent of `live:linkedin-poll`, and it
-turns replies on. Read its cost before running it: the search is 2 credits, but
-25 threads is 25 more, and 678 comments then buy a triage call each and a
-classification for most of them. The provider half is about $0.37 and the model
-half is several times that. It is capped, and both paid stages stop at the cap.
-
-`live:tiktok-comments` is the cheap half of that question. It reads comments
-**already stored** — no search, no thread, no provider call at all — and puts a
-sample through triage and classification in the real order. Sixty comments cost
-$0.198 on 2026-09-06. It skips any comment the monitor has already paid to
-read, so a second run with a larger sample buys no answer twice. Use it rather
-than a second poll whenever the question is about the classifier and not about
-the connector.
-
-`live:instagram-poll` is the Instagram equivalent, and it is the **most
-expensive poll here**. A search page is 1 credit and a comment page is 5, so the
-provider half dominates: one run spent $1.6317 with SocialCrawl against $0.3336
-with the model, which is the reverse of every other platform. Pass it a cap you
-mean, and expect it to be exceeded — the first run overshot $1.00 by 63%.
-
-`live:instagram-comments` is the cheap half of that question and it is the same
-script as `live:tiktok-comments`, which US-049 taught to take `--platform=`. It
-reads comments **already stored**, calls no provider, and skips any the monitor
-has already paid to read. Use it rather than a second poll whenever the question
-is about the classifier and not about the connector — on Instagram that is
-almost always, because the connector's half is the expensive one.
-
-`live:triage-score` asks `capture:scores`'s question of everything this
-instance has stored, against the monitors the items were really collected for.
-It samples up to `--per-cell=` items for each platform and kind, runs triage and
-then classifies **every** sampled item whatever triage said, and reports the
-drops against each monitor's own `min_score` rather than one global number. That
-is the difference between it and `live:tiktok-comments`, which runs the real
-steps and therefore cannot see what the drops were worth. `--dry` prints the
-sample and the estimate and calls nothing.
-
-**It writes nothing** — no match, no drop, no `model_calls` row. An instrument
-that wrote matches would put its own experiment in somebody's inbox, and the
-spend would reach the budget guard for work no account asked for. The price of
-that choice is that the spend is invisible to every screen, so run it with a
-number in mind.
-
-`live:thread-loop` reads one deep thread through the **real loop** rather than
-one batch at a time. It sends a single job and everything after it is
-`classify` handing the thread back to `replies`, which is the only way to see
-the loop turn: every test drives one batch per job and two batches never meet.
-Pass the cap in dollars — the budget is what ends it on a thread that keeps
-producing leads, and that is itself a stop reason worth seeing. It leaves a
-paused monitor of its own, so it never skips comments an older monitor has
-already classified.
-
-`live:webhook` answers whether a signed webhook arrives and verifies. It starts
-an HTTPS receiver on this machine, makes the account a signing secret, and
-delivers matches this instance already holds — no provider and no model, so it
-spends nothing. It answers three things: a delivery signed with the account's
-own secret verifies; the same receiver holding a different secret rejects one;
-and with the hosted guard on the same URL is refused before the request. It
-resets the delivery rows between the three, which is the one thing here a real
-deployment never does. Run it when the signing or the address guard changes.
-
-`live:notification` answers whether a match ever reaches a person. It calls no
-provider: it creates a monitor through `createMonitor`, reads posts **already
-stored**, filters and classifies them in the real order, and hands the result to
-the real SMTP transport. `--channel=` aims the sample and `--oldest` flips its
-order, and both matter — twenty newest posts scored nothing at 50 where the
-oldest forty produced six matches. Run it when the notification defaults or the
-delivery rules change. It leaves a paused monitor, its settings row, its matches
-and its delivery rows.
-
-`measure:lead-position` answers whether this product's leads sit where the
-platform ranks highest. It pages a thread cheaply and classifies only the
-positions asked for, because fetching is a credit for fifty comments and a
-classification is 2,975 micro-dollars. `--report-only` re-reads a run that the
-budget stopped, buying nothing.
-
-**Four captures grew a `--only=comments` mode in US-159**, and each one takes
-its thread from a fixture already committed rather than buying a search to find
-one. `scrapecreators/youtube-fixtures/capture.mjs --only=comments` is the
-exception, because the niche keyword's videos have almost no comments: it spends
-one credit on a broader search first, then three on the comment pages, about
-$0.008. `socialcrawl/reddit-fixtures/capture.mjs --only=comments` is one call
-at five credits, $0.041, and reads the whole thread.
-`socialdata/x-fixtures/capture.mjs --only=comments` is a `min_replies:20`
-search plus two reply pages, about $0.012 from a prepaid balance that answers
-402 when it is empty — read the balance it prints first. And
-`apify/linkedin-fixtures/capture.mjs --only=comments` runs the comments actor
-twice on the busiest committed post, with and without `scrapeReplies`, about
-$0.008 for a two-comment thread. Each partial run merges into the folder's
-manifest and ledger rather than replacing them. Read what they write: the X
-capture's first run leaked six handles through `affiliation_label.label_url`,
-and the LinkedIn one leaked a real name through a `PROFILE_MENTION` span in
-`commentary`. Both rules are in the scrubbers now.
-
-The Instagram capture is run by hand with a key, like LinkedIn's, and it takes
-`--lean`. The full run is 24 credits and answers nine questions; `--lean` is 14
-and drops the two 5-credit calls that answer a question rather than feed the
-parser — the hashtag search, and the second `top` comment page that tests whether
-a `top` walk repeats itself. **The committed fixtures came from a lean run**, so
-those two questions are open rather than answered. It prints the two numbers the
-platform is judged on: whether paging buys new posts, and how long a comment is.
-
-`capture:deletions` checks known available, removed and missing Reddit URLs.
-It retains whole provider responses with author identity scrubbed. The default
-run asks both providers; `--comments` probes ScrapeCreators' alternate endpoint.
-It writes fixture files and a request manifest, never application rows. Read
-docs/deletions.md for what each provider has and has not proved.
-
-The ScrapeCreators TikTok capture is run by hand with a key, like the Instagram
-and LinkedIn ones. It answers the ten questions US-119 asks and spends 9
-credits, about $0.017. Two of its calls are free and are worth knowing about
-before you spend anything here: a key with no query answers 400 and charges
-nothing, and a malformed video URL is refused the same way. What is **not**
-free on this provider is an invalid parameter value — `?sort=banana` is ignored
-and the page is billed in full, so the technique that makes its Reddit endpoint
-list its own vocabulary does not work here. Read
-`https://docs.scrapecreators.com/openapi.json` instead, at no cost.
-
-It writes one whole video and a digest per search page rather than whole pages,
-because this provider returns raw TikTok and a page of thirty is 1.8 MB. The
-script says why, beside `digestOf`.
-
-The ScrapeCreators YouTube capture is the same shape and spends 8 credits. Its
-fixtures are stored whole, unlike the TikTok ones, because this endpoint
-answers in a shape the provider designed and a page of twenty videos is 15 KB.
-Two of its calls answer questions that cost money to get wrong: `includeExtras`
-is what turns a 68-character title into a 1,400-character description **and**
-what replaces a computed `publishedTime` with the real `publishDate`, and the
-transcript endpoint charges a credit a video and returns thousands of
-characters where TikTok's returns null. Run it when a YouTube connector is
-written, and read `docs/sources.md` before trusting `uploadDate` — it narrows
-and it leaks.
-
-The ScrapeCreators Instagram capture asks two endpoints rather than one,
-because this platform's two candidates fail in opposite directions: Instagram's
-own topic page returns no date on any post, and the reels search returns
-everything a monitor needs through Google's index. It spends 6 credits. Three
-of its calls are free — a search matching nothing answers 404 and charges 0, a
-page past the documented last one answers 400 and charges 0, and so does a key
-with no query — so on this platform a bad query costs nothing.
-
-The HikerAPI Instagram capture asks Instagram's own Reels-tab search, the
-native route US-120 could not find at ScrapeCreators. It spends 5 requests,
-about half a cent, and the ledger is the difference in `/sys/balance` around
-each call — read the run's total rather than a call's, because that counter
-lags and one call reads as refunded. Two things to know before running it:
-**a search matching nothing returns six unrelated reels and bills**, so there
-is no free "nothing" here, and a working key with no query answers 422 and is
-billed too. It sends `safe_int=true` on every call, because a media `pk` is
-nineteen digits and `JSON.parse` rounds it silently; a connector must send
-the same. US-160 holds what the three runs found.
-
-One lesson from the YouTube and Instagram captures together, because each paid
-to learn it: **read `comment_count` before asking for comments.** Both scripts
-first asked the first result in the page, got an empty comment page, billed for
-it, and in YouTube's case spent three more credits suspecting a parameter that
-was innocent. The count is in the search answer.
-
-`live:sc-tiktok-poll` and `live:sc-youtube-poll` are `live-poll.ts` aimed at the
-second provider for each of those platforms, the way `live:apify-linkedin-poll`
-already is. Each spends 2 ScrapeCreators credits — about $0.004, the cheapest
-live poll in this list — plus one model call per post that survives the
-pre-filter, which is the part that costs. Run one after changing either
-connector, and read `api_usage` afterwards: the run is only evidence if the row
-it wrote is priced by the connector rather than by an assumption.
+`--only=comments` on the four captures that have it takes its thread from a
+fixture already committed rather than buying a search, except YouTube, whose
+niche videos have no comments: it spends one credit on a broader search
+first.

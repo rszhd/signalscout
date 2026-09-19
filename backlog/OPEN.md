@@ -2,7 +2,7 @@
 
 # Open tickets
 
-29 open — 0 doing, 25 todo, 4 parked (1 p1, 19 p2, 9 p3).
+28 open — 0 doing, 24 todo, 4 parked (1 p1, 18 p2, 9 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -24,7 +24,6 @@
 | p2 | US-244 | [The screens no browser has rendered](todo/US-244-the-screens-no-browser-has-rendered.md) | chore | todo | 2026-09-20T00:56+08:00 |
 | p2 | US-247 | [A file header holds the contract, not the story](todo/US-247-a-file-header-holds-the-contract-not-the-story.md) | chore | todo | 2026-09-20T00:58+08:00 |
 | p2 | US-249 | [Recurring procedures are skills, and two checks are hooks](todo/US-249-recurring-procedures-are-skills-and-two-checks-are-hooks.md) | chore | todo | 2026-09-20T00:58+08:00 |
-| p2 | US-250 | [The next four documents are cut to their rules](todo/US-250-the-next-four-documents-are-cut-to-their-rules.md) | chore | todo | 2026-09-20T00:58+08:00 |
 | p2 | BUG-021 | [The classify tests time out on CI, and a red release run looks like the change](todo/BUG-021-classify-tests-time-out-on-ci.md) | bug | todo | 2026-09-19T02:01+08:00 |
 | p3 | US-018 | [A mutation sweep proves the suite is sensitive](todo/US-018-a-mutation-sweep-proves-the-suite-is-sensitive.md) | chore | todo | 2026-09-04T22:54+08:00 |
 | p3 | US-095 | [The logo travels with the email](todo/US-095-the-logo-travels-with-the-email.md) | feature | todo | 2026-09-10T00:36+08:00 |

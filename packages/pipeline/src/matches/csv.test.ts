@@ -174,7 +174,7 @@ describe("the file a person opens", () => {
 
     expect(header).toEqual([
       "score",
-      "intent",
+      "intent_label",
       "posted_at",
       "platform",
       "channel",
@@ -185,6 +185,11 @@ describe("the file a person opens", () => {
       "monitor",
       "verdict",
       "saved",
+      "relevance",
+      "problem_fit",
+      "icp_fit",
+      "intent_score",
+      "urgency",
     ]);
   });
 
@@ -204,6 +209,11 @@ describe("the file a person opens", () => {
       "Flaky tests",
       "good",
       "yes",
+      "90",
+      "72",
+      "84",
+      "94",
+      "60",
     ]);
   });
 

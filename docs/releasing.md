@@ -82,6 +82,17 @@ same question moves the major instead of the minor whenever the answer is
 | 0.5.0 | `stage_runs`, its reads, and `processNotifications` returning a summary | A new table and new exports |
 | 0.6.0 | `stage_runs.walk_id`, carried through the job payloads | A migration, and a field a screen groups by |
 | 0.6.1 | `detail.scored` counts what it scored; optional `detail.skipped` | A corrected number and a field that can be ignored |
+| 0.7.0 | `stage_runs.poll_run_id` | A migration, and a field a screen joins on |
+| 0.8.0 | `post_discoveries`, and `foundBy` on a connector's page | A new table and a field a connector must answer |
+| 0.9.0 | `accountSpendSince` and `draftsSince`; relevance gates `leadScore` | Two new exports, and a score that moved |
+| 0.10.0 | `typesafe` in `aiProviders`, `createEvaluationModel`, `evaluateChoice` | New exports, and an `AiProvider` union that grew |
+| 0.11.0 | `readMatch`, `InboxFilters.matchId`; the CSV renames `intent` and adds five score columns | A new export, and a column heading a consumer may read by |
+
+**0.10.0's only reaction is a type.** Everything in it is a new export beside
+an existing one, and a deployment that sets nothing keeps the model it has. The
+minor is for `AiProvider`, which gained `typesafe`: a consumer holding an
+exhaustive `switch` over it stops compiling until they handle the new member.
+Nothing else in that release asks anything of anybody.
 
 **0.6.1 was first cut as 0.7.0**, on the strength of the added field alone. It
 adds nothing a consumer must react to: the count simply becomes the number it

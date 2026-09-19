@@ -231,6 +231,16 @@ export interface InboxFilters {
    * person's inbox answering somebody else's request.
    */
   readonly userId: string;
+  /**
+   * One match, by id. US-234.
+   *
+   * For a screen that already knows which match it wants — a link somebody
+   * sent, an address that was bookmarked. It narrows like the others rather
+   * than replacing them, so the scoping above still applies: an id belonging
+   * to another account matches nothing, which is the same answer as an id that
+   * does not exist, and is the answer a stranger's link should get.
+   */
+  readonly matchId?: string;
   /** One monitor, or every monitor when undefined. */
   readonly monitorId?: string;
   /**
@@ -409,6 +419,7 @@ function inboxConditions(options: InboxFilters): SQL[] {
     conditions.push(sql`${feedback.verdict} IS DISTINCT FROM 'not_relevant'`);
   }
 
+  if (options.matchId) conditions.push(eq(matches.id, options.matchId));
   if (options.monitorId) conditions.push(eq(matches.monitorId, options.monitorId));
   if (options.projectId) conditions.push(eq(monitors.projectId, options.projectId));
 
@@ -598,6 +609,35 @@ export async function countNewMatches(
  * Returns undefined when no match has that id, so a caller can answer 404
  * rather than reporting a write that did not happen.
  */
+/**
+ * One match, for a screen that already knows which one it wants. US-234.
+ *
+ * **It is `listMatches` with an id and a page of one, on purpose.** The row a
+ * link opens has to be the row the list would have shown — same joins, same
+ * verdict, same saved state, same shape — and the only way to guarantee that
+ * is to ask the same question. `countNewMatches` carries the same rule in its
+ * own comment, and for the same reason: two readings of one row agree on the
+ * day they are written and drift afterwards.
+ *
+ * **`includeNotRelevant` is set, because a link is not a filter.** Somebody
+ * referring a colleague to a match they dismissed still means that match. The
+ * inbox hides judged rows so a person is not shown work they have finished; an
+ * address names one thing and should open it.
+ *
+ * Undefined covers three cases with one answer — no such match, somebody
+ * else's, hidden — and that is deliberate. A caller that could tell them apart
+ * would let a stranger learn which ids exist.
+ */
+export async function readMatch(
+  db: Database,
+  userId: string,
+  matchId: string,
+): Promise<InboxMatch | undefined> {
+  const page = await listMatches(db, { userId, matchId, includeNotRelevant: true, limit: 1 });
+
+  return page.matches[0];
+}
+
 /**
  * Who owns the monitor this match was scored against. US-017.
  *

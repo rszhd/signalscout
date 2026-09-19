@@ -19,10 +19,16 @@ import type { InboxMatch } from "./matches.js";
  * say what it is, then the link — which is the column a person actually acts
  * on. The rest is provenance: which monitor found it, what was judged, whether
  * it was kept.
+ *
+ * The five dimension scores come last (US-237). They are what a person sorts
+ * by once the row is understood, and five numbers between the total and the
+ * words would push the words off the first screen. `intent_label` rather than
+ * `intent` because a heading named after a score should hold a score, and
+ * the score is under `intent_score` beside its siblings.
  */
 const columns = [
   "score",
-  "intent",
+  "intent_label",
   "posted_at",
   "platform",
   "channel",
@@ -33,6 +39,11 @@ const columns = [
   "monitor",
   "verdict",
   "saved",
+  "relevance",
+  "problem_fit",
+  "icp_fit",
+  "intent_score",
+  "urgency",
 ] as const;
 
 /**
@@ -111,6 +122,11 @@ export function matchesToCsv(matches: readonly InboxMatch[]): string {
         match.monitorName,
         match.verdict,
         match.saved ? "yes" : "no",
+        match.relevance,
+        match.problemFit,
+        match.icpFit,
+        match.intent,
+        match.urgency,
       ]),
     ),
   ];

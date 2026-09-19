@@ -234,6 +234,7 @@ export {
   maximumPageSize,
   noMatchCounts,
   rankDecayPointsPerDay,
+  readMatch,
   setMatchSaved,
   UnusableCursorError,
   utf8ByteOrderMark,

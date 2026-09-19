@@ -2121,3 +2121,51 @@ off the output, 267 micro-dollars an item against 273. On the terra–luna pair
 the 46 comments went from 48% cheaper with triage to 61%; on one model for both
 stages, from 48% dearer to 37%. Neither number changed sign, and the worker
 still warns when a deployment has no price gap.
+
+**An evaluation model triages as well as the pinned one, for a seventh of the
+price, and US-229 is the five readings that say so.** TypeSafe's `jev-latest`
+answers a typed question against a shared state instead of reading a prompt.
+Measured on 2026-09-19:
+
+| reading | reference | result |
+|---|---|---|
+| eight matches judged in the inbox | a person | 8 of 8 good |
+| the 50 hand-labelled subjects | a person's labels | better than `gpt-5.6-luna` on every column |
+| 227 posts, five platforms | `gpt-5.6-sol` | 6 of 6 leads kept |
+| 183 held-out posts, side by side | `deepseek-flash` | neither loses a lead; Jev costs a seventh |
+| 30 calls, five per lead | itself | 0 flips |
+
+49 micro-dollars an item against 356. On a live trial it ran 545 calls without
+one failure and removed about 55% of what reached it.
+
+**How the question is put matters more than which model answers it.** An
+evaluation model takes no system prompt, and the spread between three
+translations of one rule was wider than the spread between Jev and
+`gpt-5.6-luna`. Sending `buildTriageSystemPrompt` as the Choice question's
+instructions — 5,166 characters written for a system slot — left the model near
+a coin flip: one plain lead answered `yes` at 0.44 against `no` at 0.40, and
+`no` on the next call. The monitor and the item as structured state, with a
+short rule, took the same lead to 0.94.
+
+**The product's triage rule is tuned for comments, and it shows on posts.**
+US-221 asked whether anything says the author wants an answer, and its fixture
+shows that helped on the 46 labelled comments. Applied to posts the same rule
+keeps 1 item in 227: a founder writing that a launch got no signups describes a
+live problem and asks nothing. The rule that works asks US-221's older question
+and keeps the clause that an explicit ask beats every refusal — dropping that
+clause alone cost two of six leads, both posts that open by describing the
+author's own product and ask for help at the end.
+
+**A refusal the model is unsure of is not a refusal, and it is load-bearing.**
+Two of the six leads answer `no` on all five runs and survive only because a
+`no` under 0.6 confidence keeps. Without the floor the rule catches four of six.
+An earlier reading — that the floor had rescued only junk across two samples —
+came from samples holding no lead near the boundary and was wrong.
+
+**Three of four rule comparisons run that day carried an error in the
+measuring rather than the measured**, and US-231 is the harness built against
+them. A dataset read from `live:triage-score`'s run record judged one rule on a
+300-character slice while the other saw the whole post. A confidence floor was
+written into the analysis backwards. A harness kept its own copy of the rule
+and measured a wording that was never shipped. Each produced a table that
+looked right.

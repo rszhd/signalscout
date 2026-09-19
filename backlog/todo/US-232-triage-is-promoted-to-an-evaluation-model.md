@@ -44,11 +44,11 @@ exists in the place a reader would look first.
 
 - [ ] `pinnedTriageModel` is `jev-latest`, and `pnpm test` passes on the
       fixtures already captured
-- [ ] `docs/history.md` carries US-229's five readings and the date, so the
+- [x] `docs/history.md` carries US-229's five readings and the date, so the
       number behind the choice outlives this ticket
 - [ ] AGENTS.md's *Where the product stands* says triage runs on an evaluation
       model, in one sentence, and deletes nothing it replaces
-- [ ] `.env.example` and `.env.example.self-hosted` name the pair a new
+- [x] `.env.example` and `.env.example.self-hosted` name the pair a new
       instance should start from, with the key it needs
 - [ ] `triage-prompt.ts` says, where a reader meets either prompt, that the
       other exists and asks a different question
@@ -81,3 +81,26 @@ exists in the place a reader would look first.
 
 - 2026-09-19T16:25+08:00 — Written as US-229 closed. The spike's go is in its
   Log with the five readings behind it, and the three things that go rests on.
+
+- 2026-09-19T18:10+08:00 — Two of this ticket's boxes are done early, because
+  0.10.0 shipped and the documents that describe a released version should not
+  wait on a promotion that may not happen.
+
+  `docs/history.md` carries US-229's five readings, and three findings that
+  outlast the model question: how the question is put matters more than which
+  model answers it, the product's triage rule is tuned for comments and keeps
+  1 post in 227 when applied to posts, and the confidence floor is
+  load-bearing rather than a tuning knob.
+
+  `.env.example.self-hosted` had no `AI_TRIAGE_PROVIDER` line at all, so a
+  self-hoster reading only that file could not discover the option a release
+  had just given them.
+
+  Also filled, and not this ticket's doing: `docs/releasing.md`'s version table
+  stopped at 0.6.1, missing 0.7.0, 0.8.0 and 0.9.0 as well as 0.10.0. A table
+  whose job is to teach which number to pick is worth less with four rows
+  missing, so all four were added from the changelog.
+
+  The boxes left are the promotion itself: `pinned.ts`, AGENTS.md, the note in
+  `triage-prompt.ts` that two prompts ask two questions, `recommended.ts`, and
+  a release. None should move until the live trial has run longer.

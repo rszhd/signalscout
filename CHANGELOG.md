@@ -19,9 +19,11 @@ versioned and is not described here; it is what `main` holds.
 
 ## Unreleased
 
+## 0.11.0 — 2026-09-19
+
 **Added.** `readMatch(db, userId, matchId)` returns one match in the shape a
 page row has, or undefined for another account's id (US-234). `InboxFilters`
-takes `matchId`. A new export, so the next version is a minor.
+takes `matchId`. A new export, so the version is a minor.
 
 **Changed.** The CSV from `matchesToCsv` has seventeen columns (US-237). The
 column that held the intent label was named `intent` and is now

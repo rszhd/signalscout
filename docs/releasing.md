@@ -86,6 +86,7 @@ same question moves the major instead of the minor whenever the answer is
 | 0.8.0 | `post_discoveries`, and `foundBy` on a connector's page | A new table and a field a connector must answer |
 | 0.9.0 | `accountSpendSince` and `draftsSince`; relevance gates `leadScore` | Two new exports, and a score that moved |
 | 0.10.0 | `typesafe` in `aiProviders`, `createEvaluationModel`, `evaluateChoice` | New exports, and an `AiProvider` union that grew |
+| 0.11.0 | `readMatch`, `InboxFilters.matchId`; the CSV renames `intent` and adds five score columns | A new export, and a column heading a consumer may read by |
 
 **0.10.0's only reaction is a type.** Everything in it is a new export beside
 an existing one, and a deployment that sets nothing keeps the model it has. The

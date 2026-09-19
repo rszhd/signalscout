@@ -19,6 +19,43 @@ versioned and is not described here; it is what `main` holds.
 
 ## Unreleased
 
+## 0.10.0 — 2026-09-19
+
+**Added.** Triage can run on an evaluation model (US-230). `typesafe` joins
+`aiProviders`, with `jev-latest` as its model, and it is the first provider
+that can triage and cannot classify, draft or embed. A deployment opts in with
+`AI_TRIAGE_PROVIDER=typesafe`, `AI_TRIAGE_MODEL=jev-latest` and a key in
+`AI_TRIAGE_API_KEY`; one that sets none of them keeps the model it has.
+
+New exports beside the existing ones: `createEvaluationModel`,
+`evaluateChoice`, `isEvaluationProvider`, `defaultTriageConfidenceFloor`, the
+type `EvaluationModelInstance`, and two errors —
+`EvaluationProviderCannotChatError`, raised when an evaluation provider is
+named for the classifier, and `NotAnEvaluationProviderError` for the reverse.
+`createTriager` takes two optional settings, `evaluationModel` and
+`confidenceFloor`.
+
+**A `no` the model is unsure of keeps the item.** An evaluation model reports
+how concentrated its answer is, and below `defaultTriageConfidenceFloor` — 0.6
+— triage treats a refusal as not explicit enough to drop a lead on. This is the
+stage's existing rule, one step further out, and it is load-bearing: two of the
+six leads in US-229's sample are refused on every run and survive only because
+of it.
+
+**Changed.** `AiProvider` gained a member. An exhaustive `switch` over it in a
+consumer will no longer compile until `typesafe` is handled, which is the only
+thing in this release a consumer must react to. No migration:
+`ai_keys.provider` and `ai_settings.provider` carry no check constraint.
+
+`ai` moves from 7.0.92 to 7.0.106, because `experimental_evaluate` landed in
+7.0.103.
+
+**Fixed.** `live:triage-score --dry` estimates the models it is about to call
+(US-233). It printed two constants measured once against one pair and ignored
+`--model=` and `--triage-model=`; three runs in a day came in 3.9x, 6.1x and
+0.9x against it. It now reads `modelPrices`, and errs high because a cached
+score costs nothing and it prints before the cache is opened.
+
 ## 0.9.0 — 2026-09-19
 
 **Added.** `accountSpendSince(db, userId, since)` and

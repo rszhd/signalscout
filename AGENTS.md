@@ -235,6 +235,8 @@ node scripts/remove-worktree.mjs <name> # the folder, and the Postgres that came
 
 backlog/index.sh              # rebuild OPEN.md and DONE.md — run after any ticket change
 backlog/index.sh --check      # exit 1 if either list is stale
+
+node scripts/context-cost.mjs # what a session reads before it writes, from the transcripts
 ```
 
 **Every `capture:*`, `live:*` and `measure:*` command spends real money**, from

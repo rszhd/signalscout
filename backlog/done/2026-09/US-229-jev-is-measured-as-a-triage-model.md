@@ -6,7 +6,7 @@ priority: p2
 created: 2026-09-19T09:40+08:00
 parent:
 area: ai
-resolution:
+resolution: go — promote on US-232
 ---
 
 ## Context
@@ -103,9 +103,9 @@ anything.
 - [x] The Log states whether one rule serves both, or whether posts and
       comments need two, and US-221's decision is either upheld or reopened in
       writing
-- [ ] Run-to-run stability is measured under the final rule: each lead called
+- [x] Run-to-run stability is measured under the final rule: each lead called
       five times, and the Log reports how many flipped
-- [ ] The spike ends in a written go or no-go. Implementation is a separate
+- [x] The spike ends in a written go or no-go. Implementation is a separate
       ticket and this one does not do it
 
 ## Notes
@@ -267,3 +267,73 @@ anything.
   — it costs a classification each time it fires.
 
   One box left before a go or no-go: run-to-run stability under this rule.
+
+- 2026-09-19T16:15+08:00 — Stability is measured and it is clean, and the same
+  run overturns what the entry above said about the floor.
+
+  Each of the six leads from the 227-post sample called five times through
+  `createTriager`, so the path is the product's. **Thirty calls, zero flips.**
+  Every lead kept 5 of 5. The instability seen earlier — two leads flipping at
+  confidence 0.13 and 0.15 — was a property of the weaker rule and is gone
+  under this one.
+
+  **Correcting the entry above: the floor is load-bearing, not untested
+  insurance.** Two of the six leads answer `no` on all five runs and survive
+  only because a `no` below 0.6 confidence keeps:
+
+  | score | verdict, five runs | kept |
+  |---|---|---|
+  | 77 — "I need advice from you guys, i have a web agencay" | no, no, no, no, no | by the floor |
+  | 75 — "I lean towards building stuff just to give up" | no, no, no, no, no | by the floor |
+
+  Without the floor this rule catches four of six leads. With it, six of six.
+  The earlier reading — that it had rescued only junk across two samples, and
+  that a third such sample should end it — was drawn from samples that held no
+  lead near the boundary, and generalised from their absence. It is wrong. The
+  floor stays at 0.6 and it is the reason the lead numbers hold.
+
+  That also re-reads the cost. The four junk items it held on the cloud sample
+  are what this insurance costs: four classifications, about 2,200
+  micro-dollars, to keep two leads in six that would otherwise be deleted
+  silently. On `triage.ts`'s own terms that is not close.
+
+  Nine boxes, eight done. The go or no-go is the last.
+
+- 2026-09-19T16:25+08:00 — **Go.** `jev-latest` on the TypeSafe provider should
+  replace `gpt-5.6-luna` as the pinned triage model. US-232 does the promotion;
+  this spike ends here.
+
+  Five readings, two of them against a person rather than a model, and nothing
+  contradicts:
+
+  | reading | reference | result |
+  |---|---|---|
+  | the owner's inbox verdicts | a person | 8 of 8 good |
+  | 50 hand-labelled subjects | a person's labels | better than `gpt-5.6-luna` on every column |
+  | 227-post sample | `gpt-5.6-sol` | 6 of 6 leads kept |
+  | held-out 183 posts, side by side | `deepseek-flash` | neither loses a lead; Jev costs a seventh |
+  | stability, 30 calls | itself | 0 flips |
+
+  It costs 49 micro-dollars an item against 356. On the live trial it ran 545
+  calls for 27,913 micro-dollars, none failed, and it removed about 55% of what
+  reached it.
+
+  **Three things this go rests on, and each is a reason it could be wrong.**
+
+  Six leads decide every post comparison, and the owner's eight verdicts are
+  all positive. Neither sample can say where the boundary is, only that nothing
+  above it was lost. A sample with a lead the rule refuses has not been seen —
+  which is evidence of safety and also evidence of how little has been tested.
+
+  The rule asks US-221's older question rather than the one the language-model
+  prompt asks. That is deliberate and measured, and it means the product now
+  holds two slightly different ideas of a lead in two files. US-232 should say
+  so where a reader will find it.
+
+  The confidence floor is not optional. Two of the six leads answer `no` on all
+  five runs and survive only because a `no` under 0.6 keeps. Promoting the
+  model without the floor would catch four of six.
+
+  **What would reverse this:** a lead refused in the live inbox, a sample where
+  the floor rescues nothing while a boundary lead is present, or the comment
+  numbers moving after US-221's prompt is next edited.

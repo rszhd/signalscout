@@ -92,11 +92,11 @@ anything.
       excluded from the 227
 - [x] The held-out sample contains more than six items scoring 60 or above, or
       the Log says plainly that it does not and that the result is still thin
-- [ ] The Log holds the same table as the Context, for the held-out items, with
+- [x] The Log holds the same table as the Context, for the held-out items, with
       Jev and `gpt-5.6-luna` side by side
-- [ ] The Log answers one question in a sentence: **does Jev refuse a lead
+- [x] The Log answers one question in a sentence: **does Jev refuse a lead
       `gpt-5.6-luna` keeps?** With the count and the scores
-- [ ] The confidence floor is named as a number, or dropped, with the reason
+- [x] The confidence floor is named as a number, or dropped, with the reason
 - [x] The comment half is re-measured: `capture:triage` equivalent over the 50
       labelled subjects with the same rule, so a rule chosen on posts is not
       shipped without knowing what it does to comments
@@ -237,3 +237,33 @@ anything.
   Two boxes left that decide a promotion: `gpt-5.6-luna` has still not been run
   over the same held-out posts, and run-to-run stability under this rule is
   still unmeasured.
+
+- 2026-09-19T15:55+08:00 — The side-by-side exists. `gpt-5.6-luna` was run over
+  the same held-out posts with the same classifier, and the classifications
+  came from cache, so only the triage model differs. 177 items shared.
+
+  | triage | kept | matches caught | leads lost | waste | highest drop | triage $ |
+  |---|---|---|---|---|---|---|
+  | `jev-latest` | 7 | 3/10 | **0** | 4 | 46 | **$0.0097** |
+  | `gpt-5.6-luna` | 5 | 2/10 | **0** | 3 | 46 | $0.0665 |
+
+  **Does Jev refuse a lead `gpt-5.6-luna` keeps? No — not one.** They disagree
+  on six items of 177 and none is a lead: Jev keeps four scoring 31, 17, 2 and
+  0, luna keeps two scoring 0 and 0. Both refuse the same highest-scoring item,
+  at 46. On quality they are indistinguishable on this sample, and Jev costs a
+  seventh as much.
+
+  Six disagreements, all worthless, is not a quality signal in either
+  direction. The cost difference is not noise.
+
+  **The floor stays at 0.6, and the evidence against it is now worth writing
+  down.** All four items Jev kept that luna dropped were the floor holding an
+  unsure `no` — scoring 31, 17, 2 and 0. That is the second sample in a row
+  where it has rescued only junk. It has never yet been asked the question it
+  exists for, because neither sample contained a lead near the boundary. So it
+  is kept as insurance that has not been tested rather than insurance proved
+  useless, and the next sample that does contain a boundary lead is what
+  settles it. If a third sample passes with the floor rescuing nothing, drop it
+  — it costs a classification each time it fires.
+
+  One box left before a go or no-go: run-to-run stability under this rule.

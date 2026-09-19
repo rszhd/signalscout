@@ -87,10 +87,10 @@ anything.
 
 ## Acceptance
 
-- [ ] A held-out sample is measured: items that neither the rule nor the
+- [x] A held-out sample is measured: items that neither the rule nor the
       confidence floor was tuned against, either a later poll or monitors
       excluded from the 227
-- [ ] The held-out sample contains more than six items scoring 60 or above, or
+- [x] The held-out sample contains more than six items scoring 60 or above, or
       the Log says plainly that it does not and that the result is still thin
 - [ ] The Log holds the same table as the Context, for the held-out items, with
       Jev and `gpt-5.6-luna` side by side
@@ -124,12 +124,12 @@ anything.
   up. The first broad-sample comparison was taken that way and was worthless.
   Fetch the text from `posts`, and fail the run if a post is missing rather
   than falling back.
-- The working harness is outside the repository, in the scratchpad, with the
-  three rules in one file and a guard against the truncation above. It is an
-  experiment and no test reads it. Moving it in is the implementation ticket's
-  job, not this one's.
-- `experimental_evaluate` landed in `ai@7.0.103`. This workspace pins
-  `7.0.92`, so any run needs the bump.
+- The harness is in the repository now: `evals/triage`, with a provider per
+  rule and a dataset build that refuses on truncated or orphaned items. US-231
+  holds it and the four mistakes that shaped it. `pnpm eval:triage` is how the
+  remaining boxes get measured.
+- `experimental_evaluate` landed in `ai@7.0.103`. US-230 took the workspace to
+  `7.0.106`, so nothing here needs a bump any more.
 - Two keys reach Jev. A TypeSafe key in `TYPESAFE_AI_API_KEY` is unrestricted.
   An AI Gateway key in `AI_GATEWAY_API_KEY` reaches `typesafe-ai/jev` on the
   free tier but rate-limits it hard: five calls, then a backoff that reached
@@ -175,3 +175,30 @@ anything.
   the classifier. That fixture is worth having on its own: sol moves scores by
   up to 26 points against `gpt-5.6-luna` on the same text, which says the
   luna-scored fixture US-221 and US-222 read is noisier than it looked.
+
+- 2026-09-19T15:05+08:00 — A held-out sample exists now, and it is the
+  instance's own. `live:triage-score --per-cell=60` over 183 posts the cloud
+  had already collected, triaged by `typesafe/jev-latest` and classified by
+  `deepseek-flash`. Nothing in it was tuned against: the rule and the floor
+  were fitted to the 227-post sample from the other database, and this one was
+  drawn afterwards from different data by a different classifier.
+
+  **It contains no item scoring 60 or above. Zero.** So the headline number —
+  no lead deleted — is true and is weaker than it sounds: a sample with no
+  leads in it cannot lose one. What it does say is that 171 drops carried
+  nothing a careful reader would have wanted, and that the highest was 44.
+
+  The seven drops that reached a monitor's minimum are all marketing or hiring
+  posts scoring 32 to 44. The threshold admits them; triage refuses them.
+
+  **What this still does not answer.** `gpt-5.6-luna` was not run over the same
+  items, so there is no side-by-side on this data. The comment half is
+  unmeasured under this rule. Run-to-run stability is unmeasured under it. And
+  the question of whether posts and comments want one rule or two is untouched.
+  Four boxes remain and they are the ones that decide a promotion.
+
+  Separately, the first human verdicts in this work now exist: the owner judged
+  eight matches from the live trial and called all eight good, scoring 40 to
+  73, on `SignalScout5` version 1. Eight positives and no negatives cannot say
+  where the boundary is, but they are the first reference here that is not a
+  model's opinion of a model's opinion.

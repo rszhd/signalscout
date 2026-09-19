@@ -63,7 +63,7 @@ a different list.
       named setting with 0.6 as its default
 - [x] `createModel` refuses an evaluation provider with a sentence that says
       which setting to change, rather than failing inside the SDK
-- [ ] A triage call on Jev records a `model_calls` row with provider, model,
+- [x] A triage call on Jev records a `model_calls` row with provider, model,
       tokens and cost, the same as any other call
 - [x] The Models screen offers the provider for the triage job only, and does
       not offer it for classify, draft or embed
@@ -144,3 +144,55 @@ a different list.
 
   **Not done, and the ticket stays here for it:** nothing has run on a live
   monitor. Every number above is one call or one suite, not a poll.
+
+- 2026-09-19T14:40+08:00 — The ledger box is verified on live traffic, not on a
+  test. The cloud instance has run 545 triage calls on `typesafe/jev-latest`,
+  every one `scored`, every one carrying a monitor and an account, 27,913
+  micro-dollars in total — about 51 an item, against `gpt-5.6-luna`'s 356.
+  Nothing failed and nothing was rejected, so the rounding tie the suite covers
+  has not been seen outside it yet.
+
+  Two things the trial has shown that the fixtures could not. The stage drops
+  about 55% of what reaches it, which is a far higher rate than the 227-post
+  sample suggested, and the owner has read the matches it produced on one
+  monitor and called all eight potential leads. That is the first human
+  judgement anywhere in this work, and it is not yet recorded: `feedback` is
+  still empty, so the verdicts exist only in a conversation.
+
+  Still not done: the drops. A `live:triage-score` run over the cloud data is
+  what says whether any of them was worth keeping.
+
+- 2026-09-19T15:05+08:00 — The drops were measured, on the instance's own data,
+  and they are clean. `live:triage-score --per-cell=60` over 183 stored posts,
+  triage on `typesafe/jev-latest` and the classifier on `deepseek-flash`, which
+  is the pair the cloud actually runs. 178 scored.
+
+  | | items |
+  |---|---|
+  | dropped by triage | 171 |
+  | dropped and scoring 60 or more | **0** |
+  | dropped and reaching the monitor's minimum | 7, scoring 32 to 44 |
+  | kept | 7, of which 4 scored below the minimum |
+
+  **Not one lead was deleted.** The highest-scoring drop is 44, and every one
+  of the seven that would have matched is marketing or hiring: "#hiring we are
+  looking for a Reddit Marketing Expert", "found my first 100 customers on
+  Reddit", "ReddLeads Review". Read against those, the stage is more accurate
+  than the threshold it protects: `min_score = 30` admits promotional content
+  as a match, and triage refuses it.
+
+  **The confidence floor rescued nothing.** Of the seven kept, three were an
+  explicit `yes` (54, 32, 31) and four were a `no` the model was unsure of,
+  held by the 0.6 floor. Those four scored 21, 17, 2 and 0. The floor cost four
+  classifications and saved no lead, because no lead was near the boundary. It
+  is insurance that did not pay out on one sample, which is not the same as
+  insurance that is not worth carrying — but it is the first evidence either
+  way and it belongs in the record.
+
+  Cost: $0.1072, of which $0.0097 was triage. The stage is 9% of the bill and
+  avoids 171 classifications at roughly 550 micro-dollars each.
+
+  This run also settled a question the owner raised and paid nothing to answer:
+  whether to lower a monitor's minimum to see the 30-39 band. On this data that
+  band is entirely promotional, so the answer is no, and no poll was spent
+  finding out.

@@ -38,10 +38,16 @@ worktrees/
 
 # Third-party agent skills. `skills-lock.json` is committed and the installed
 # files are not, the way a lockfile is committed and `node_modules` is not:
-# `npx skills add` restores them from the lock. `.claude/skills/` holds only
-# symlinks into `.agents/`, which would be broken links for anyone else.
+# `npx skills add` restores them from the lock. Third-party entries in
+# `.claude/skills/` are symlinks into `.agents/`, which would be broken links
+# for anyone else. This repository's own skills are listed below and kept.
 .agents/
-.claude/skills/
+.claude/skills/*
+!.claude/skills/add-migration/
+!.claude/skills/capture-fixture/
+!.claude/skills/measure-scoring-change/
+!.claude/skills/cut-release/
+!.claude/skills/worktree/
 
 # `live:triage-score` writes one file per run. They hold excerpts of real
 # posts from a live database, so they stay out of the repository; the numbers

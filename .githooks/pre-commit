@@ -1,0 +1,6 @@
+#!/bin/sh
+# Two checks an agent otherwise has to remember at commit time. Installed by
+# `pnpm install` through the `prepare` script, which sets core.hooksPath here.
+set -e
+cd "$(git rev-parse --show-toplevel)"
+backlog/index.sh --check

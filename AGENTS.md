@@ -327,6 +327,15 @@ without a broken test** — see *Running the suite* in
 
 Do not invent a command that does not exist yet — check `package.json` first.
 
+**Five procedures are skills**, in `.claude/skills/`, each a checklist that
+names the commands and the document holding the why: `add-migration`,
+`capture-fixture`, `measure-scoring-change`, `cut-release`, `worktree`. Load
+the skill when the task is one of those; the document is for the reasoning.
+
+**A pre-commit hook runs `backlog/index.sh --check`.** `pnpm install` sets
+`core.hooksPath` to `.githooks`, so a commit with a stale list is refused
+whether or not anybody remembered.
+
 ---
 
 ## Writing

@@ -6,7 +6,7 @@ priority: p2
 created: 2026-09-20T00:58+08:00
 parent:
 area: tooling
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -21,14 +21,14 @@ remembers.
 
 ## Acceptance
 
-- [ ] `.claude/skills/` holds one skill per procedure, each a checklist
+- [x] `.claude/skills/` holds one skill per procedure, each a checklist
       under 300 words that names the commands and the document holding the
       why. The document keeps the why and loses the step list.
-- [ ] A pre-commit hook runs `backlog/index.sh --check` and refuses a commit
+- [x] A pre-commit hook runs `backlog/index.sh --check` and refuses a commit
       with a stale list.
-- [ ] The same in the cloud repository, plus
+- [x] The same in the cloud repository, plus
       `node scripts/packages-from-source.mjs check`.
-- [ ] `AGENTS.md` names the skills where it now names the procedures.
+- [x] `AGENTS.md` names the skills where it now names the procedures.
 
 ## Notes
 
@@ -41,3 +41,4 @@ remembers.
 - 2026-09-20T00:58+08:00 — Written from the context review of 2026-09-20: the owner asked
   where the AI-assisted workflow loses context and quality, and this is one
   of the findings.
+- 2026-09-20T01:20+08:00 — Shipped. Five skills here, one in the cloud repository (pin-packages), each under 240 words. .githooks/pre-commit runs the backlog check here and both checks there; pnpm install sets core.hooksPath through prepare. Proven: a commit with a stale OPEN.md was refused on this machine, and the cloud commit ran the hook. The documents keep the why; docs/releasing.md and docs/instruments.md still hold their step lists, because a person without the skill reads them there.

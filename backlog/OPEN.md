@@ -2,7 +2,7 @@
 
 # Open tickets
 
-25 open — 0 doing, 21 todo, 4 parked (1 p1, 16 p2, 8 p3).
+30 open — 0 doing, 26 todo, 4 parked (1 p1, 20 p2, 9 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -22,10 +22,15 @@
 | p2 | US-233 | [A dry run estimates the pair it is about to call](todo/US-233-a-dry-run-estimates-the-pair-it-is-about-to-call.md) | bug | todo | 2026-09-19T16:45+08:00 |
 | p2 | US-241 | [The 503 outage case has a test by name](todo/US-241-the-503-outage-case-has-a-test-by-name.md) | chore | todo | 2026-09-20T00:56+08:00 |
 | p2 | US-244 | [The screens no browser has rendered](todo/US-244-the-screens-no-browser-has-rendered.md) | chore | todo | 2026-09-20T00:56+08:00 |
+| p2 | US-246 | [history.md has headings an agent can jump to](todo/US-246-history-md-has-headings-an-agent-can-jump-to.md) | chore | todo | 2026-09-20T00:58+08:00 |
+| p2 | US-247 | [A file header holds the contract, not the story](todo/US-247-a-file-header-holds-the-contract-not-the-story.md) | chore | todo | 2026-09-20T00:58+08:00 |
+| p2 | US-249 | [Recurring procedures are skills, and two checks are hooks](todo/US-249-recurring-procedures-are-skills-and-two-checks-are-hooks.md) | chore | todo | 2026-09-20T00:58+08:00 |
+| p2 | US-250 | [The next four documents are cut to their rules](todo/US-250-the-next-four-documents-are-cut-to-their-rules.md) | chore | todo | 2026-09-20T00:58+08:00 |
 | p2 | BUG-021 | [The classify tests time out on CI, and a red release run looks like the change](todo/BUG-021-classify-tests-time-out-on-ci.md) | bug | todo | 2026-09-19T02:01+08:00 |
 | p3 | US-018 | [A mutation sweep proves the suite is sensitive](todo/US-018-a-mutation-sweep-proves-the-suite-is-sensitive.md) | chore | todo | 2026-09-04T22:54+08:00 |
 | p3 | US-095 | [The logo travels with the email](todo/US-095-the-logo-travels-with-the-email.md) | feature | todo | 2026-09-10T00:36+08:00 |
 | p3 | US-243 | [One Instagram comment link is opened](todo/US-243-one-instagram-comment-link-is-opened.md) | chore | todo | 2026-09-20T00:56+08:00 |
+| p3 | US-248 | [schema.ts is split by table family](todo/US-248-schema-ts-is-split-by-table-family.md) | chore | todo | 2026-09-20T00:58+08:00 |
 | p3 | BUG-013 | [A key row's error is printed inside a closed dialog](todo/BUG-013-a-key-row-s-error-is-printed-inside-a-closed-dialog.md) | bug | todo | 2026-09-09T11:58+08:00 |
 | p3 | US-038 | [Instagram, TikTok and Threads](parked/US-038-instagram-tiktok-and-threads.md) | feature | parked | 2026-09-06T11:56+08:00 |
 | p3 | US-240 | [One capped poll is measured against one uncapped](parked/US-240-one-capped-poll-is-measured-against-one-uncapped.md) | chore | parked | 2026-09-20T00:56+08:00 |

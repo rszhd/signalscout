@@ -144,11 +144,12 @@ anything.
   call, not a verdict, and it will recur wherever near-ties do.
 - Jev is the only evaluation model in the Gateway catalog. There is no cheaper
   substitute to test the shape with, and OpenRouter does not carry it.
-- `modelPrices` in `packages/engine/src/ai/provider.ts` lists `gpt-5.6-sol` at
-  4,000,000 in and 20,000,000 out. The live Gateway catalog lists
-  `openai/gpt-5.6-sol` at $2 and $10 per million, which matches
-  `gpt-5.6-sol-fast` instead. Recorded costs for sol may be twice the real
-  bill. Separate from this ticket and worth a re-read.
+- ~~`modelPrices` lists `gpt-5.6-sol` at twice the Gateway's price.~~
+  **Withdrawn on 2026-09-19.** Re-read the catalog: `openai/gpt-5.6-sol` is
+  $4 and $20 per million, which is what the table says. The earlier reading of
+  $2 and $10 was taken during a promotion — Vercel's changelog calls it "50%
+  off a lower price" — and `sol-fast` had halved in the same way. A discount
+  was mistaken for a stale table. The table holds list prices and is correct.
 - `live:triage-score --dry` estimated $0.159 for the 227-item run and it spent
   $0.9719, six times. The earlier 117-item run estimated $0.080 and spent
   $0.3128. The estimator is wrong in one direction and by a large factor.

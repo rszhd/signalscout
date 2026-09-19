@@ -6,7 +6,7 @@ priority: p1
 created: 2026-09-10T09:51+08:00
 parent:
 area: web
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -143,3 +143,4 @@ configured` at `error` and nothing sees it. Those reasons belong on the row.
   The last box stays open on one word. Nobody has opened the monitor list on
   the production instance, so "legible on the screen" is still read from a
   database rather than from a screen.
+- 2026-09-20T00:55+08:00 — Closed. The open box needs a poll that bills for zero posts to happen live; it is US-245, parked.

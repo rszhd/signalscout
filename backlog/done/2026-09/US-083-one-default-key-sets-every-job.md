@@ -6,7 +6,7 @@ priority: p1
 created: 2026-09-09T11:13+08:00
 parent: US-079
 area: models
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -152,3 +152,4 @@ runs whatever somebody pulled, and costs nothing either way.
   `provider.ts`; sol is $4.00/$20.00 against astra's $10.00/$50.00, so the
   recommendation table, the Models screen view and the three tests that assert
   it move together. A job somebody already saved keeps the model they chose.
+- 2026-09-20T00:55+08:00 — Closed. The open box, a browser rendering the screen, is bundled into US-244 with the other screens no browser has rendered.

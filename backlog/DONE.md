@@ -2,12 +2,13 @@
 
 # Done
 
-145 finished.
+158 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
 | BUG-018 | [An OpenAI-compatible provider is sent no schema](done/2026-09/BUG-018-a-compatible-provider-is-sent-no-schema.md) | bug | — | 2026-09 |
 | BUG-017 | [A poll pays for pages its own window then discards](done/2026-09/BUG-017-a-poll-pays-for-pages-its-own-window-then-discards.md) | bug | fixed | 2026-09 |
+| BUG-016 | [One platform's outage throws away another platform's collection](done/2026-09/BUG-016-one-platforms-outage-throws-away-another-platforms-collection.md) | bug | shipped | 2026-09 |
 | BUG-015 | [One post found twice in a poll throws away the whole collection](done/2026-09/BUG-015-one-post-found-twice-in-a-poll-throws-away-the-whole-collection.md) | bug | fixed | 2026-09 |
 | BUG-014 | [The billing screen names a price nobody charges](done/2026-09/BUG-014-the-billing-screen-names-a-price-nobody-charges.md) | bug | fixed | 2026-09 |
 | BUG-012 | [db:generate has not worked since 0038](done/2026-09/BUG-012-db-generate-has-not-worked-since-0038.md) | bug | fixed | 2026-09 |
@@ -18,11 +19,13 @@
 | BUG-007 | [A comment is stored under a post it is not under](done/2026-09/BUG-007-a-comment-is-stored-under-a-post-it-is-not-under.md) | bug | shipped | 2026-09 |
 | BUG-006 | [The first poll of a monitor stores no replies](done/2026-09/BUG-006-the-first-poll-of-a-monitor-stores-no-replies.md) | bug | shipped | 2026-09 |
 | BUG-005 | [The cost test prices every monitor as hourly](done/2026-09/BUG-005-the-cost-test-prices-every-monitor-as-hourly.md) | bug | shipped | 2026-09 |
+| BUG-004 | [The model half of a poll is not capped](done/2026-09/BUG-004-the-model-half-of-a-poll-is-not-capped.md) | bug | shipped | 2026-09 |
 | BUG-003 | [A post below the threshold is classified again on every poll](done/2026-09/BUG-003-a-post-below-the-threshold-is-classified-again-on-every-poll.md) | bug | fixed | 2026-09 |
 | BUG-002 | [A seven-day window is bought as a month](done/2026-09/BUG-002-a-seven-day-window-is-bought-as-a-month.md) | bug | fixed | 2026-09 |
 | BUG-001 | [A pending Reddit collection is not resumed](done/2026-09/BUG-001-a-pending-reddit-collection-is-not-resumed.md) | bug | shipped | 2026-09 |
 | US-237 | [The CSV carries the five scores and names the label](done/2026-09/US-237-the-csv-carries-the-five-scores-and-names-the-label.md) | feature | shipped | 2026-09 |
 | US-234 | [A match can be read by its id](done/2026-09/US-234-a-match-can-be-read-by-its-id.md) | feature | shipped | 2026-09 |
+| US-230 | [Triage can run on an evaluation model](done/2026-09/US-230-triage-can-run-on-an-evaluation-model.md) | feature | shipped | 2026-09 |
 | US-229 | [Jev is measured as a triage model](done/2026-09/US-229-jev-is-measured-as-a-triage-model.md) | spike | go — promote on US-232 | 2026-09 |
 | US-225 | [Relevance decides whether a score counts](done/2026-09/US-225-relevance-decides-whether-a-score-counts.md) | bug | shipped | 2026-09 |
 | US-223 | [The classifier is the model that matters](done/2026-09/US-223-the-classifier-is-the-model-that-matters.md) | feature | shipped | 2026-09 |
@@ -47,6 +50,7 @@
 | US-153 | [What is left of core becomes the pipeline](done/2026-09/US-153-what-is-left-of-core-becomes-the-pipeline.md) | chore | shipped | 2026-09 |
 | US-152 | [The stateless half of core becomes the engine](done/2026-09/US-152-the-stateless-half-of-core-becomes-the-engine.md) | chore | shipped | 2026-09 |
 | US-151 | [The repository splits into an engine, a pipeline and two apps](done/2026-09/US-151-the-repository-splits-into-an-engine-a-pipeline-and-two-apps.md) | chore | shipped | 2026-09 |
+| US-135 | [A worktree runs the whole stack on ports of its own](done/2026-09/US-135-a-worktree-runs-the-whole-stack-on-ports-of-its-own.md) | chore | shipped | 2026-09 |
 | US-127 | [YouTube is fetched through ScrapeCreators](done/2026-09/US-127-youtube-is-fetched-through-scrapecreators.md) | feature | shipped | 2026-09 |
 | US-126 | [TikTok is fetched through ScrapeCreators](done/2026-09/US-126-tiktok-is-fetched-through-scrapecreators.md) | feature | shipped | 2026-09 |
 | US-125 | [The inbox says new matches arrived](done/2026-09/US-125-the-inbox-says-new-matches-arrived.md) | feature | shipped | 2026-09 |
@@ -70,6 +74,7 @@
 | US-107 | [Setup asks which provider, and preselects none](done/2026-09/US-107-setup-asks-which-provider-and-preselects-none.md) | feature | shipped | 2026-09 |
 | US-106 | [The staging stack is hidden behind a password](done/2026-09/US-106-the-staging-stack-is-hidden-behind-a-password.md) | feature | — | 2026-09 |
 | US-105 | [Onboarding is for new accounts only](done/2026-09/US-105-onboarding-is-for-new-accounts-only.md) | feature | — | 2026-09 |
+| US-104 | [A monitor says what its last poll did](done/2026-09/US-104-a-monitor-says-what-its-last-poll-did.md) | feature | shipped | 2026-09 |
 | US-103 | [The README is an overview](done/2026-09/US-103-the-readme-is-an-overview.md) | chore | shipped | 2026-09 |
 | US-102 | [A self-hosted install starts from the commands we print](done/2026-09/US-102-a-self-hosted-install-starts-from-the-commands-we-print.md) | bug | shipped | 2026-09 |
 | US-101 | [The README says what the product does now](done/2026-09/US-101-the-readme-says-what-the-product-does-now.md) | chore | shipped | 2026-09 |
@@ -88,6 +93,7 @@
 | US-086 | [A saved dialog closes itself](done/2026-09/US-086-a-saved-dialog-closes-itself.md) | feature | done | 2026-09 |
 | US-085 | [A platform with no key cannot be ticked](done/2026-09/US-085-a-platform-with-no-key-cannot-be-ticked.md) | feature | done | 2026-09 |
 | US-084 | [A new monitor starts with a cap and a slower clock](done/2026-09/US-084-a-new-monitor-starts-with-a-cap-and-a-slower-clock.md) | feature | done | 2026-09 |
+| US-083 | [One default key sets every job](done/2026-09/US-083-one-default-key-sets-every-job.md) | feature | shipped | 2026-09 |
 | US-082 | [What the Models screen cost to get right](done/2026-09/US-082-what-the-models-screen-cost-to-get-right.md) | chore | done | 2026-09 |
 | US-081 | [An open instance does not share the machine's keys](done/2026-09/US-081-an-open-instance-does-not-share-the-machines-keys.md) | feature | done | 2026-09 |
 | US-080 | [A model key is tested on the screen](done/2026-09/US-080-a-model-key-is-tested-on-the-screen.md) | feature | done | 2026-09 |
@@ -118,10 +124,13 @@
 | US-054 | [LinkedIn is measured at the other provider](done/2026-09/US-054-linkedin-is-measured-at-the-other-provider.md) | spike | shipped | 2026-09 |
 | US-053 | [A connector ships without being offered](done/2026-09/US-053-a-connector-ships-without-being-offered.md) | feature | done | 2026-09 |
 | US-051 | [A schedule asks two questions, not one](done/2026-09/US-051-a-schedule-asks-two-questions.md) | feature | shipped | 2026-09 |
+| US-049 | [Instagram is the sixth platform](done/2026-09/US-049-instagram-is-the-sixth-platform.md) | feature | shipped | 2026-09 |
 | US-048 | [A deep thread is read in batches and stopped early](done/2026-09/US-048-a-deep-thread-is-read-in-batches-and-stopped-early.md) | feature | shipped | 2026-09 |
 | US-047 | [Every comment link is opened once](done/2026-09/US-047-every-comment-link-is-opened-once.md) | chore | shipped | 2026-09 |
 | US-045 | [A project holds what every monitor repeats](done/2026-09/US-045-a-project-holds-what-every-monitor-repeats.md) | feature | shipped | 2026-09 |
 | US-044 | [TikTok is the fifth platform](done/2026-09/US-044-tiktok-is-the-fifth-platform.md) | feature | shipped | 2026-09 |
+| US-043 | [A match is kept for something to be done about it](done/2026-09/US-043-a-match-is-kept-for-something-to-be-done-about-it.md) | feature | shipped | 2026-09 |
+| US-041 | [A person chooses when a monitor runs](done/2026-09/US-041-a-person-chooses-when-a-monitor-runs.md) | feature | shipped | 2026-09 |
 | US-040 | [A draft reply the person sends themselves](done/2026-09/US-040-a-draft-reply-the-person-sends-themselves.md) | feature | shipped | 2026-09 |
 | US-034 | [YouTube is the fourth platform](done/2026-09/US-034-youtube-is-the-fourth-platform.md) | feature | shipped | 2026-09 |
 | US-032 | [The classifier reads with the careful model](done/2026-09/US-032-the-classifier-reads-with-the-careful-model.md) | chore | shipped | 2026-09 |
@@ -136,8 +145,11 @@
 | US-023 | [A provider key is pasted, tested and stored](done/2026-09/US-023-a-provider-key-is-pasted-tested-and-stored.md) | feature | shipped | 2026-09 |
 | US-022 | [A real match reaches the inbox](done/2026-09/US-022-a-real-match-reaches-the-inbox.md) | chore | shipped | 2026-09 |
 | US-021 | [The application follows the product mockup](done/2026-09/US-021-the-application-follows-the-product-mockup.md) | feature | shipped | 2026-09 |
+| US-020 | [A monitor can include comments and replies](done/2026-09/US-020-a-monitor-can-include-comments-and-replies.md) | feature | shipped | 2026-09 |
 | US-019 | [The project has a license](done/2026-09/US-019-the-project-has-a-license.md) | chore | shipped | 2026-09 |
+| US-017 | [A self-hosted instance has one account](done/2026-09/US-017-a-self-hosted-instance-has-one-account.md) | feature | shipped | 2026-09 |
 | US-016 | [A match reaches email or a webhook](done/2026-09/US-016-a-match-reaches-email-or-a-webhook.md) | feature | — | 2026-09 |
+| US-015 | [A deleted post stops being shown](done/2026-09/US-015-a-deleted-post-stops-being-shown.md) | feature | shipped | 2026-09 |
 | US-014 | [A query's cost is known before it runs](done/2026-09/US-014-a-querys-cost-is-known-before-it-runs.md) | feature | shipped | 2026-09 |
 | US-013 | [A monitor cannot spend past its budget](done/2026-09/US-013-a-monitor-cannot-spend-past-its-budget.md) | feature | shipped | 2026-09 |
 | US-012 | [A match is marked good or not relevant](done/2026-09/US-012-a-match-is-marked-good-or-not-relevant.md) | feature | — | 2026-09 |
@@ -151,6 +163,7 @@
 | US-004 | [A stored key is encrypted at rest](done/2026-09/US-004-a-stored-key-is-encrypted-at-rest.md) | feature | shipped | 2026-09 |
 | US-003 | [A source implements one interface](done/2026-09/US-003-a-source-implements-one-interface.md) | feature | shipped | 2026-09 |
 | US-002 | [The schema holds monitors, posts, matches and feedback](done/2026-09/US-002-the-schema-holds-monitors-posts-matches-and-feedback.md) | feature | shipped | 2026-09 |
+| US-001 | [The workspace runs with one command](done/2026-09/US-001-the-workspace-runs-with-one-command.md) | chore | shipped | 2026-09 |
 
 Open work is in [OPEN.md](OPEN.md). The rules and the ticket
 format are in [README.md](README.md).

@@ -6,7 +6,7 @@ priority: p2
 created: 2026-09-15T14:22+08:00
 parent:
 area: tooling
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -99,8 +99,8 @@ safe, so the pause is not optional.
 - [x] `.gitignore` and `.dockerignore` both exclude `worktrees/`, so the folder
       is not untracked content of the repository it sits in and `pnpm lint` does
       not walk it
-- [ ] One editor window opened on the main checkout lists every worktree in its
-      source-control view. Say whether this was seen or only configured
+- [x] One editor window opened on the main checkout lists every worktree in its
+      source-control view. Say whether this was seen or only configured — **only configured.** The folder is placed inside the checkout for this reason; whether an editor shows it is in US-244.
 - [x] The written `.env` carries `ENCRYPTION_KEY` and `AUTH_SECRET` from the main
       `.env`, so copied credentials stay readable
 - [x] Every monitor in a copied database has `paused_at` set. Asserted against
@@ -171,3 +171,4 @@ safe, so the pause is not optional.
 - 2026-09-15T14:22+08:00 — Written. The owner ran two agents in two worktrees
   and found that only one could run the product, and that the second `pnpm dev`
   would migrate the first one's database.
+- 2026-09-20T00:55+08:00 — Closed. The editor box is answered as *only configured*, and seeing it is US-244.

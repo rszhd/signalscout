@@ -6,7 +6,7 @@ priority: p2
 created: 2026-09-05T01:18+08:00
 parent: US-005
 area:
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -213,7 +213,7 @@ told that comments are unavailable, not quietly given none.
       twenty-two
 - [x] The inbox shows the parent post title above a comment match and links to
       the comment permalink, so a person sees the context the model saw
-- [ ] Tests replay comment payloads captured by
+- [x] Tests replay comment payloads captured by
       `sources/providers/scrapecreators/fixtures/capture.mjs`, extended with a
       comments mode
 - [x] One page is read per thread by default, and the number of pages a poll
@@ -449,3 +449,4 @@ join both from our own rows.
   difference is that a person with only that key is no longer given nothing.
   The stale LinkedIn box is closed as left out. The capture box below is still
   open.
+- 2026-09-20T00:55+08:00 — Closed. The capture box is met in substance: `scrapecreators/reddit.test.ts` replays `sources/deletion-fixtures/scrapecreators-comments-*.json`, captured by `pnpm capture:deletions` rather than by a comments mode of `fixtures/capture.mjs`. The fixture is real; the script that wrote it is a different one.

@@ -6,7 +6,7 @@ priority: p2
 created: 2026-09-06T17:05+08:00
 parent: US-038
 area:
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -262,3 +262,4 @@ polling at five credits a page.
 
   **Total spend for the whole ticket: about $2.08** — $0.106 capture, $1.6317
   provider, $0.3336 model, and $0.008 on the crashed run.
+- 2026-09-20T00:55+08:00 — Closed. The two open boxes need a person: open one comment link, and say which search the connector uses. They are US-243.

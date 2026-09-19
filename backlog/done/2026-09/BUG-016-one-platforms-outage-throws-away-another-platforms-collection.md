@@ -6,7 +6,7 @@ priority: p1
 created: 2026-09-10T10:44+08:00
 parent:
 area: worker
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -120,3 +120,4 @@ does, the poll's own row has to say which platform failed and why —
   row lying about the posts it stored. The failure belongs beside the counts,
   not instead of them. One mutation — never naming the lost platform — turns
   the screen suite red.
+- 2026-09-20T00:55+08:00 — Closed. The one open box, a test for the 503 case by name, is US-241.

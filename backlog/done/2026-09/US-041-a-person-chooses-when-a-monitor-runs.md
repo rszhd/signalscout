@@ -6,7 +6,7 @@ priority: p1
 created: 2026-09-06T12:31+08:00
 parent:
 area:
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -61,7 +61,7 @@ form should offer.
       once a week — and which days, with weekdays and weekends as one press
 - [x] A person picks a timezone, or the monitor takes one and the screen says
       which. "Weekdays" in UTC is wrong for most of the world
-- [ ] The form says what the choice costs, because this is the largest cost
+- [x] The form says what the choice costs, because this is the largest cost
       dial in the product — **half done. Each choice carries its own polls a
       month, which is the unit that matters. The cost test still projects from
       hourly, so a monitor set to weekly is quoted a month of hourly polling.
@@ -155,4 +155,4 @@ form should offer.
   miniature: a number on a screen disagreeing with the number the projection
   uses. So every hint now derives from the same days-per-month the core does,
   and a test pins the values so a hand-edit cannot creep back in.
-
+- 2026-09-20T00:55+08:00 — Closed. The half-open box was finished later: `apps/api/src/estimates.ts` reads a named monitor's own interval and cap, and `estimates.test.ts` (*measures a named monitor against that monitor's own cap and interval*) asserts it.

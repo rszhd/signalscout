@@ -2,24 +2,11 @@
 
 # Open tickets
 
-32 open — 13 doing, 18 todo, 1 parked (7 p1, 21 p2, 4 p3).
+25 open — 0 doing, 21 todo, 4 parked (1 p1, 16 p2, 8 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
-| p1 | US-001 | [The workspace runs with one command](doing/US-001-the-workspace-runs-with-one-command.md) | chore | doing | 2026-09-04T22:49+08:00 |
-| p1 | US-041 | [A person chooses when a monitor runs](doing/US-041-a-person-chooses-when-a-monitor-runs.md) | feature | doing | 2026-09-06T12:31+08:00 |
-| p1 | US-083 | [One default key sets every job](doing/US-083-one-default-key-sets-every-job.md) | feature | doing | 2026-09-09T11:13+08:00 |
-| p1 | US-104 | [A monitor says what its last poll did](doing/US-104-a-monitor-says-what-its-last-poll-did.md) | feature | doing | 2026-09-10T09:51+08:00 |
-| p1 | BUG-004 | [The model half of a poll is not capped](doing/BUG-004-the-model-half-of-a-poll-is-not-capped.md) | bug | doing | 2026-09-06T04:42+08:00 |
-| p1 | BUG-016 | [One platform's outage throws away another platform's collection](doing/BUG-016-one-platforms-outage-throws-away-another-platforms-collection.md) | bug | doing | 2026-09-10T10:44+08:00 |
 | p1 | US-033 | [Thirty verdicts say whether the score is right](todo/US-033-thirty-verdicts-say-whether-the-score-is-right.md) | chore | todo | 2026-09-06T03:02+08:00 |
-| p2 | US-015 | [A deleted post stops being shown](doing/US-015-a-deleted-post-stops-being-shown.md) | feature | doing | 2026-09-04T22:49+08:00 |
-| p2 | US-017 | [A self-hosted instance has one account](doing/US-017-a-self-hosted-instance-has-one-account.md) | feature | doing | 2026-09-04T22:49+08:00 |
-| p2 | US-020 | [A monitor can include comments and replies](doing/US-020-a-monitor-can-include-comments-and-replies.md) | feature | doing | 2026-09-05T01:18+08:00 |
-| p2 | US-043 | [A match is kept for something to be done about it](doing/US-043-a-match-is-kept-for-something-to-be-done-about-it.md) | feature | doing | 2026-09-06T12:36+08:00 |
-| p2 | US-049 | [Instagram is the sixth platform](doing/US-049-instagram-is-the-sixth-platform.md) | feature | doing | 2026-09-06T17:05+08:00 |
-| p2 | US-135 | [A worktree runs the whole stack on ports of its own](doing/US-135-a-worktree-runs-the-whole-stack-on-ports-of-its-own.md) | chore | doing | 2026-09-15T14:22+08:00 |
-| p2 | US-230 | [Triage can run on an evaluation model](doing/US-230-triage-can-run-on-an-evaluation-model.md) | feature | doing | 2026-09-19T10:30+08:00 |
 | p2 | US-035 | [A monitor is told where people are talking](todo/US-035-a-monitor-is-told-where-people-are-talking.md) | spike | todo | 2026-09-06T11:40+08:00 |
 | p2 | US-036 | [A provider is rated per platform, from measurements](todo/US-036-a-provider-is-rated-per-platform-from-measurements.md) | spike | todo | 2026-09-06T11:48+08:00 |
 | p2 | US-037 | [One subscription is enough](todo/US-037-one-subscription-is-enough.md) | feature | todo | 2026-09-06T11:48+08:00 |
@@ -33,11 +20,17 @@
 | p2 | US-231 | [A triage rule is compared by a harness, not by hand](todo/US-231-a-triage-rule-is-compared-by-a-harness-not-by-hand.md) | chore | todo | 2026-09-19T14:10+08:00 |
 | p2 | US-232 | [Triage is promoted to an evaluation model](todo/US-232-triage-is-promoted-to-an-evaluation-model.md) | feature | todo | 2026-09-19T16:25+08:00 |
 | p2 | US-233 | [A dry run estimates the pair it is about to call](todo/US-233-a-dry-run-estimates-the-pair-it-is-about-to-call.md) | bug | todo | 2026-09-19T16:45+08:00 |
+| p2 | US-241 | [The 503 outage case has a test by name](todo/US-241-the-503-outage-case-has-a-test-by-name.md) | chore | todo | 2026-09-20T00:56+08:00 |
+| p2 | US-244 | [The screens no browser has rendered](todo/US-244-the-screens-no-browser-has-rendered.md) | chore | todo | 2026-09-20T00:56+08:00 |
 | p2 | BUG-021 | [The classify tests time out on CI, and a red release run looks like the change](todo/BUG-021-classify-tests-time-out-on-ci.md) | bug | todo | 2026-09-19T02:01+08:00 |
 | p3 | US-018 | [A mutation sweep proves the suite is sensitive](todo/US-018-a-mutation-sweep-proves-the-suite-is-sensitive.md) | chore | todo | 2026-09-04T22:54+08:00 |
 | p3 | US-095 | [The logo travels with the email](todo/US-095-the-logo-travels-with-the-email.md) | feature | todo | 2026-09-10T00:36+08:00 |
+| p3 | US-243 | [One Instagram comment link is opened](todo/US-243-one-instagram-comment-link-is-opened.md) | chore | todo | 2026-09-20T00:56+08:00 |
 | p3 | BUG-013 | [A key row's error is printed inside a closed dialog](todo/BUG-013-a-key-row-s-error-is-printed-inside-a-closed-dialog.md) | bug | todo | 2026-09-09T11:58+08:00 |
 | p3 | US-038 | [Instagram, TikTok and Threads](parked/US-038-instagram-tiktok-and-threads.md) | feature | parked | 2026-09-06T11:56+08:00 |
+| p3 | US-240 | [One capped poll is measured against one uncapped](parked/US-240-one-capped-poll-is-measured-against-one-uncapped.md) | chore | parked | 2026-09-20T00:56+08:00 |
+| p3 | US-242 | [Do saved and a good verdict ever disagree?](parked/US-242-do-saved-and-a-good-verdict-ever-disagree.md) | spike | parked | 2026-09-20T00:56+08:00 |
+| p3 | US-245 | [A poll that billed for zero posts is legible](parked/US-245-a-poll-that-billed-for-zero-posts-is-legible.md) | chore | parked | 2026-09-20T00:56+08:00 |
 
 Finished work is in [DONE.md](DONE.md). The rules and the ticket
 format are in [README.md](README.md).

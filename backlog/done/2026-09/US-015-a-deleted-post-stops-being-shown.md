@@ -6,7 +6,7 @@ priority: p2
 created: 2026-09-04T22:49+08:00
 parent:
 area:
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -38,7 +38,7 @@ monitor past its cap must lose to the poll.
 
 - [x] `last_verified_at` is set whenever a match is checked
 - [x] A scheduled job re-checks matches, oldest verification first
-- [ ] A post that is gone, deleted or removed is hidden from the inbox
+- [x] A post that is gone, deleted or removed is hidden from the inbox
 - [x] A hidden match keeps its score, its reason and its feedback
 - [x] Only an id and an excerpt were ever stored, so hiding removes what is
       shown rather than what was retained
@@ -117,3 +117,4 @@ monitor past its cap must lose to the poll.
   A final test also showed that a collection waiting on a snapshot must retain
   priority over new metered checks. The guard now reads that continuation too.
   No application database migration or deployment was performed.
+- 2026-09-20T00:55+08:00 — Closed. The headline box is the sum of the seven under it, all ticked on 2026-09-05, and `docs/deletions.md` describes the shipped behaviour. It was left unticked by oversight.

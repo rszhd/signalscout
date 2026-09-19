@@ -2,7 +2,7 @@
 
 # Open tickets
 
-27 open — 12 doing, 14 todo, 1 parked (7 p1, 16 p2, 4 p3).
+32 open — 13 doing, 18 todo, 1 parked (7 p1, 21 p2, 4 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -19,6 +19,7 @@
 | p2 | US-043 | [A match is kept for something to be done about it](doing/US-043-a-match-is-kept-for-something-to-be-done-about-it.md) | feature | doing | 2026-09-06T12:36+08:00 |
 | p2 | US-049 | [Instagram is the sixth platform](doing/US-049-instagram-is-the-sixth-platform.md) | feature | doing | 2026-09-06T17:05+08:00 |
 | p2 | US-135 | [A worktree runs the whole stack on ports of its own](doing/US-135-a-worktree-runs-the-whole-stack-on-ports-of-its-own.md) | chore | doing | 2026-09-15T14:22+08:00 |
+| p2 | US-230 | [Triage can run on an evaluation model](doing/US-230-triage-can-run-on-an-evaluation-model.md) | feature | doing | 2026-09-19T10:30+08:00 |
 | p2 | US-035 | [A monitor is told where people are talking](todo/US-035-a-monitor-is-told-where-people-are-talking.md) | spike | todo | 2026-09-06T11:40+08:00 |
 | p2 | US-036 | [A provider is rated per platform, from measurements](todo/US-036-a-provider-is-rated-per-platform-from-measurements.md) | spike | todo | 2026-09-06T11:48+08:00 |
 | p2 | US-037 | [One subscription is enough](todo/US-037-one-subscription-is-enough.md) | feature | todo | 2026-09-06T11:48+08:00 |
@@ -29,6 +30,10 @@
 | p2 | US-052 | [A monitor does not poll overnight](todo/US-052-a-monitor-does-not-poll-overnight.md) | feature | todo | 2026-09-07T00:25+08:00 |
 | p2 | US-062 | [A real model's drafts are replayed](todo/US-062-a-real-model-s-drafts-are-replayed.md) | chore | todo | 2026-09-07T20:30+08:00 |
 | p2 | US-099 | [A button, a field and a dialog are one component each](todo/US-099-a-button-a-field-and-a-dialog-are-one-component-each.md) | chore | todo | 2026-09-10T01:20+08:00 |
+| p2 | US-231 | [A triage rule is compared by a harness, not by hand](todo/US-231-a-triage-rule-is-compared-by-a-harness-not-by-hand.md) | chore | todo | 2026-09-19T14:10+08:00 |
+| p2 | US-232 | [Triage is promoted to an evaluation model](todo/US-232-triage-is-promoted-to-an-evaluation-model.md) | feature | todo | 2026-09-19T16:25+08:00 |
+| p2 | US-233 | [A dry run estimates the pair it is about to call](todo/US-233-a-dry-run-estimates-the-pair-it-is-about-to-call.md) | bug | todo | 2026-09-19T16:45+08:00 |
+| p2 | BUG-021 | [The classify tests time out on CI, and a red release run looks like the change](todo/BUG-021-classify-tests-time-out-on-ci.md) | bug | todo | 2026-09-19T02:01+08:00 |
 | p3 | US-018 | [A mutation sweep proves the suite is sensitive](todo/US-018-a-mutation-sweep-proves-the-suite-is-sensitive.md) | chore | todo | 2026-09-04T22:54+08:00 |
 | p3 | US-095 | [The logo travels with the email](todo/US-095-the-logo-travels-with-the-email.md) | feature | todo | 2026-09-10T00:36+08:00 |
 | p3 | BUG-013 | [A key row's error is printed inside a closed dialog](todo/BUG-013-a-key-row-s-error-is-printed-inside-a-closed-dialog.md) | bug | todo | 2026-09-09T11:58+08:00 |

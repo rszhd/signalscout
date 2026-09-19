@@ -192,3 +192,100 @@ export function buildTriageUserPrompt(post: ItemForTriage): string {
     .filter((line) => line !== undefined)
     .join("\n");
 }
+
+/**
+ * The same question, put to a model that evaluates rather than converses.
+ * US-230.
+ *
+ * **This is not `buildTriageSystemPrompt` in another shape, and the difference
+ * is measured.** US-229 tried four translations over 227 real items:
+ *
+ * Sending the system prompt above as the Choice question's `instructions`
+ * leaves the model near a coin flip. One plain lead answered `yes` at 0.44
+ * against `no` at 0.40 and answered `no` on the next call. The API takes JSON
+ * for `state` and `instructions`; 5,000 characters of prose written for a
+ * system slot is not what it reads.
+ *
+ * Putting the monitor and the item in `state` as JSON, with the rule as short
+ * `instructions`, is what works. The same lead answers `yes` at 0.94.
+ *
+ * **The question is US-221's older one, on purpose.** US-221 tightened it from
+ * "could this author be a person to reach?" to that plus "does anything here
+ * say they want an answer?". On the 46 labelled comments that tightening
+ * helped. On posts it keeps 1 item in 227: a founder who writes that a launch
+ * got no signups describes a live problem and asks nothing, and the tightened
+ * rule refuses them. So this asks the older question and keeps the clause that
+ * an explicit ask beats every refusal — dropping that clause alone cost two of
+ * the six real leads in the sample, both posts that open by describing the
+ * author's own product and ask for help at the end.
+ *
+ * Whether the two readers should ask one question or two is open, and US-229
+ * is where it gets answered. Until then this rule lives beside the other and
+ * neither is the default.
+ */
+export const triageEvaluationInstructions = {
+  question:
+    "You are the first of two readers. Decide only whether a slower, more careful model " +
+    "should spend its time on this item. The question is whether this author could be a " +
+    "person the product should reach. Judge who the author is and what they want, not what " +
+    "the text is about.",
+  refuse: [
+    "Anyone selling, advertising or promoting their own product or content.",
+    "Anyone describing somebody else's problem instead of their own.",
+    "Text with no author to weigh: a moderator's notice, an automatic reply, a bare " +
+      "reaction that only agrees, a joke, a link with no words around it.",
+  ],
+  anExplicitAskBeatsEveryRefusalAbove:
+    "If the author asks for a recommendation, asks what others use, or asks for help with " +
+    "something of their own, the answer is yes or maybe, never no. It does not matter that " +
+    "the post also describes their own product or service, links to it, or reads like an " +
+    "advertisement. Look for the ask before you judge the packaging.",
+  butAskingForSomethingElseIsNo:
+    "Read what they want against the product. Somebody asking for a tool this product does " +
+    "not make, or for a platform it does not cover, could never be its customer, however " +
+    "plainly they are asking.",
+  keep:
+    "A person describing a problem of their own, asking what others use, or saying what they " +
+    "are building and what is not working. They do not have to ask a question. A complaint, " +
+    "a launch with no signups, or a description of a difficulty is a person living with this " +
+    "problem today.",
+  theTwoMistakesDifferInCost:
+    "A wrong yes costs one more call and lands on a page a person can dismiss. A wrong no " +
+    "deletes the lead: nothing is stored, nothing is shown, and nobody can tell it happened. " +
+    "When a person may want something and you cannot tell how much, answer maybe.",
+} as const;
+
+/**
+ * The three verdicts as Choice options, worded from the prompt's own bullets.
+ *
+ * Copied rather than summarised, so that reading a disagreement later is
+ * reading the product's rule and not a paraphrase of it.
+ */
+export const triageEvaluationCriteria: Readonly<Record<TriageVerdict, string>> = {
+  no:
+    "This author describes no problem of their own and asks for nothing, or the author " +
+    "could plainly never be a customer of this product.",
+  maybe: "Something here says they may want an answer, and you cannot tell what it is worth.",
+  yes:
+    "This could be a person the product should reach, and something here says they want " +
+    "an answer.",
+};
+
+/** The monitor and the item as one shared state, which is what the API reads. */
+export function buildTriageEvaluationState(
+  monitor: MonitorProfile,
+  post: ItemForTriage,
+): Record<string, string | string[] | Record<string, string>> {
+  return {
+    theProduct: monitor.product,
+    theIdealCustomer: monitor.idealCustomer,
+    theProblemItSolves: monitor.problem,
+    signalsTheUserAskedFor: [...(monitor.signals satisfies readonly Signal[])],
+    item: {
+      source: post.source,
+      ...(post.channel ? { channel: post.channel } : {}),
+      ...(post.title ? { title: post.title } : {}),
+      text: post.excerpt,
+    },
+  };
+}

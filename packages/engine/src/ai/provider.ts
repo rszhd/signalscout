@@ -17,8 +17,9 @@ import { createAnthropic } from "@ai-sdk/anthropic";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { createOpenAI } from "@ai-sdk/openai";
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
-import type { LanguageModel } from "ai";
-import { type AiConfig, type AiProvider, needsApiKey } from "./config.js";
+import { createTypeSafeAi } from "@ai-sdk/typesafe-ai";
+import type { Experimental_EvaluationModel, LanguageModel } from "ai";
+import { type AiConfig, type AiProvider, isEvaluationProvider, needsApiKey } from "./config.js";
 
 const defaultBaseUrls: Partial<Record<AiProvider, string>> = {
   // DeepSeek documents this host as an OpenAI drop-in. It answers `/v1` for
@@ -39,7 +40,7 @@ const defaultBaseUrls: Partial<Record<AiProvider, string>> = {
  * to `aiProviders` and forgetting this is a compile error, which is the only
  * kind of reminder that works.
  */
-type ClientKind = "openai" | "anthropic" | "google" | "compatible";
+type ClientKind = "openai" | "anthropic" | "google" | "compatible" | "evaluation";
 
 const clients: Readonly<Record<AiProvider, ClientKind>> = {
   openai: "openai",
@@ -48,7 +49,49 @@ const clients: Readonly<Record<AiProvider, ClientKind>> = {
   deepseek: "compatible",
   openrouter: "compatible",
   ollama: "compatible",
+  typesafe: "evaluation",
 };
+
+/**
+ * A built evaluation model, never the string alias the SDK also accepts.
+ *
+ * `Experimental_EvaluationModel` is `string | <the model>`, because
+ * `experimental_evaluate` will resolve a bare id through a configured default
+ * provider. Nothing here does that — the provider and the key are arguments,
+ * for the reason AGENTS.md gives about the engine reading no environment — so
+ * this factory returns the built thing and callers get its real shape.
+ */
+export type EvaluationModelInstance = Exclude<Experimental_EvaluationModel, string>;
+
+/**
+ * The evaluation model for a provider that answers questions rather than
+ * prompts. US-230.
+ *
+ * Separate from `createModel` because the two return different things and no
+ * caller wants both. An evaluation model takes a shared state and typed
+ * questions; it has no prompt, no system message and no token stream. Making
+ * one function return either would push the distinction into every call site,
+ * and the call site that got it wrong is the one that drops leads silently.
+ */
+export function createEvaluationModel(config: AiConfig): EvaluationModelInstance {
+  const { provider, model, apiKey, baseUrl } = config;
+
+  if (!isEvaluationProvider(provider)) throw new NotAnEvaluationProviderError(provider);
+  if (needsApiKey(provider) && !apiKey) throw new MissingAiKeyError(provider);
+
+  return createTypeSafeAi({ apiKey, baseURL: baseUrl }).evaluationModel(model);
+}
+
+/** The mirror of `EvaluationProviderCannotChatError`, for the other direction. */
+export class NotAnEvaluationProviderError extends Error {
+  constructor(provider: AiProvider) {
+    super(
+      `The ${provider} provider has no evaluation endpoint. Triage runs on it through the ` +
+        "language-model path, not this one.",
+    );
+    this.name = "NotAnEvaluationProviderError";
+  }
+}
 
 /**
  * Whether this provider's client sends the schema, or the prompt must. BUG-018.
@@ -79,9 +122,29 @@ export class MissingAiKeyError extends Error {
   }
 }
 
+/**
+ * A provider named for a job it cannot do. US-230.
+ *
+ * `typesafe` answers evaluation questions and has no chat endpoint, so a
+ * deployment that sets `AI_PROVIDER=typesafe` has asked the classifier to run
+ * on a model that cannot classify. Failing here, by name, is the difference
+ * between a sentence that says which setting to change and a stack trace from
+ * inside the SDK on the first poll at 02:00.
+ */
+export class EvaluationProviderCannotChatError extends Error {
+  constructor(provider: AiProvider) {
+    super(
+      `The ${provider} provider answers evaluation questions and cannot run this job. ` +
+        "Use it for triage only: set AI_TRIAGE_PROVIDER and leave AI_PROVIDER on a chat provider.",
+    );
+    this.name = "EvaluationProviderCannotChatError";
+  }
+}
+
 export function createModel(config: AiConfig): LanguageModel {
   const { provider, model, apiKey, baseUrl } = config;
 
+  if (isEvaluationProvider(provider)) throw new EvaluationProviderCannotChatError(provider);
   if (needsApiKey(provider) && !apiKey) throw new MissingAiKeyError(provider);
 
   switch (clients[provider]) {
@@ -158,6 +221,11 @@ export const modelPrices: Readonly<
   "gemini-3.5-flash-lite": { input: 300_000, output: 2_500_000, provider: "google" },
   "gemini-3.5-flash": { input: 1_500_000, output: 9_000_000, provider: "google" },
   "gemini-3.1-pro-preview": { input: 2_000_000, output: 12_000_000, provider: "google" },
+  // TypeSafe's evaluation model, read 2026-09-19 off the AI Gateway catalog:
+  // $0.000000042 per input token and nothing for output. It is the first row
+  // here whose output is free, and the zero is a price we have rather than a
+  // price we lack — `estimateCostMicros` needs both numbers to cost a call.
+  "jev-latest": { input: 42_000, output: 0, provider: "typesafe" },
 };
 
 /**

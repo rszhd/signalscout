@@ -25,12 +25,20 @@
     "db:generate": "pnpm --filter @signalscout/pipeline generate && pnpm --filter @signalscout/api generate",
     "db:rotate-key": "pnpm --filter @signalscout/pipeline rotate-key",
     "capture:deletions": "node --env-file=.env packages/engine/src/sources/deletion-fixtures/capture.mjs",
-    "release:verify": "node scripts/verify-packed.mjs"
+    "release:verify": "node scripts/verify-packed.mjs",
+    "eval:dataset": "node evals/triage/build-dataset.mjs",
+    "eval:triage": "promptfoo eval -c evals/triage/promptfooconfig.yaml --no-cache -j 12",
+    "eval:view": "promptfoo view -n",
+    "eval:summary": "node evals/triage/summarise.mjs"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.12",
+    "@signalscout/engine": "workspace:*",
     "@types/node": "26.4.1",
+    "ai": "7.0.106",
     "concurrently": "10.0.5",
+    "pg": "8.16.3",
+    "promptfoo": "0.123.1",
     "stylelint": "17.15.0",
     "tsx": "4.23.13",
     "typescript": "7.0.2",

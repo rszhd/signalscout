@@ -17,19 +17,35 @@
  * handling of its own. It maps two of those three to "keep going" and never
  * looks at the reason, which is why there is no branch here for a caller to
  * get wrong later.
+ *
+ * **There are two paths now, and the rule is the same on both.** US-230 added
+ * an evaluation provider: a model that answers a typed question against a
+ * shared state instead of reading a prompt. It reaches `evaluateChoice` rather
+ * than `generateStructured`, and the same three outcomes come back, so the
+ * mapping above is unchanged.
+ *
+ * The evaluation path does one thing the other cannot. An evaluation model
+ * reports how sure it is, and **a `no` it is unsure of is not an explicit
+ * `no`**, so it keeps. US-229 measured the two leads a weaker rule deleted at
+ * confidence 0.13 and 0.25, against 0.64 to 0.86 for the six it kept. The
+ * floor is the same rule this file already lives by, one step further out.
  */
 
 import type { LanguageModel } from "ai";
 import { z } from "zod";
-import { generateStructured, type ModelCall } from "./call.js";
-import type { AiConfig, AiProvider } from "./config.js";
-import { createModel } from "./provider.js";
+import { evaluateChoice, generateStructured, type ModelCall } from "./call.js";
+import { type AiConfig, type AiProvider, isEvaluationProvider } from "./config.js";
+import type { EvaluationModelInstance } from "./provider.js";
+import { createEvaluationModel, createModel } from "./provider.js";
 import {
+  buildTriageEvaluationState,
   buildTriageSystemPrompt,
   buildTriageUserPrompt,
   type ItemForTriage,
   type MonitorProfile,
   type TriageVerdict,
+  triageEvaluationCriteria,
+  triageEvaluationInstructions,
   triageVerdicts,
 } from "./triage-prompt.js";
 
@@ -83,21 +99,98 @@ export interface TriagerOptions {
   readonly config: AiConfig;
   /** Overrides the model the config names. A test passes a mock; nothing else does. */
   readonly model?: LanguageModel;
+  /** The same, for a provider that evaluates rather than converses. US-230. */
+  readonly evaluationModel?: EvaluationModelInstance;
+  /**
+   * How sure an evaluation model must be before its `no` drops the item.
+   * US-230.
+   *
+   * Only an evaluation model reports this, so only that path reads it. The
+   * default is 0.6: US-229 measured the leads a weaker rule deleted at 0.13
+   * and 0.25, and the six it kept between 0.64 and 0.86.
+   */
+  readonly confidenceFloor?: number;
   readonly now?: () => number;
 }
 
-export function createTriager({ config, model, now = Date.now }: TriagerOptions): Triager {
+/** The default `confidenceFloor`. US-229 measured it; US-230 ships it. */
+export const defaultTriageConfidenceFloor = 0.6;
+
+export function createTriager({
+  config,
+  model,
+  evaluationModel,
+  confidenceFloor = defaultTriageConfidenceFloor,
+  now = Date.now,
+}: TriagerOptions): Triager {
+  const evaluates = isEvaluationProvider(config.provider);
+
   // Built once, for the reason `classify.ts` gives: a provider per item would
-  // re-read the key and build a fetch client for every one of them.
-  const languageModel = model ?? createModel(config);
+  // re-read the key and build a fetch client for every one of them. Only the
+  // path in use is built, so a chat provider never constructs an evaluation
+  // client and a missing key is reported for the provider actually configured.
+  const languageModel = evaluates ? undefined : (model ?? createModel(config));
+  const evaluator = evaluates ? (evaluationModel ?? createEvaluationModel(config)) : undefined;
+
+  /**
+   * The evaluation path. US-230.
+   *
+   * The same rule as below, with one addition the other path cannot make: a
+   * `no` the model is unsure of is not an explicit `no`, so it keeps. Every
+   * other outcome — a refusal, a timeout, a rounding tie the SDK rejects, an
+   * answer of the wrong kind — reaches the same `kept: true` the header
+   * comment is about.
+   */
+  async function triageByEvaluation({ monitor, post }: TriageRequest): Promise<TriageOutcome> {
+    const result = await evaluateChoice({
+      model: evaluator as EvaluationModelInstance,
+      config,
+      state: buildTriageEvaluationState(monitor, post),
+      instructions: triageEvaluationInstructions,
+      criteria: triageEvaluationCriteria,
+      now,
+    });
+
+    if (result.status !== "ok") {
+      return {
+        kept: true,
+        verdict: null,
+        status: result.status,
+        error: result.error,
+        call: result.call,
+      };
+    }
+
+    const { choice, confidence } = result.answer;
+
+    // A choice outside the three is the model answering something else. It is
+    // not evidence about the author, so the item goes on.
+    if (!(triageVerdicts as readonly string[]).includes(choice)) {
+      return {
+        kept: true,
+        verdict: null,
+        status: "rejected",
+        error: `The model answered "${choice}", which is not one of ${triageVerdicts.join(", ")}.`,
+        call: result.call,
+      };
+    }
+
+    const verdict = choice as TriageVerdict;
+    const sure = confidence !== undefined && confidence >= confidenceFloor;
+
+    return { kept: verdict !== "no" || !sure, verdict, status: "scored", call: result.call };
+  }
 
   return {
     provider: config.provider,
     model: config.model,
 
-    async triage({ monitor, post }: TriageRequest): Promise<TriageOutcome> {
+    async triage(request: TriageRequest): Promise<TriageOutcome> {
+      if (evaluates) return triageByEvaluation(request);
+
+      const { monitor, post } = request;
       const result = await generateStructured({
-        model: languageModel,
+        model: languageModel as LanguageModel,
         config,
         schema: triageSchema,
         schemaName: "triage_verdict",

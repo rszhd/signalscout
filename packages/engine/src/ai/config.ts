@@ -13,6 +13,7 @@ export const aiProviders = [
   "deepseek",
   "openrouter",
   "ollama",
+  "typesafe",
 ] as const;
 export type AiProvider = (typeof aiProviders)[number];
 
@@ -23,7 +24,29 @@ const remoteProviders: readonly AiProvider[] = [
   "google",
   "deepseek",
   "openrouter",
+  "typesafe",
 ];
+
+/**
+ * Providers that answer an evaluation question and cannot hold a conversation.
+ * US-230.
+ *
+ * TypeSafe's Jev takes a shared state and typed questions and returns a choice
+ * with a probability for every option. There is no chat endpoint behind it, so
+ * it can triage and it cannot classify, draft or embed. Every other provider
+ * here is the opposite shape.
+ *
+ * The list exists so the three places that care can ask rather than guess:
+ * `createModel` refuses one of these by name instead of failing inside the
+ * SDK, `triage.ts` picks the evaluation path, and the Models screen offers the
+ * provider for the triage job alone.
+ */
+const evaluationOnlyProviders: readonly AiProvider[] = ["typesafe"];
+
+/** Whether this provider answers evaluation questions rather than prompts. */
+export function isEvaluationProvider(provider: AiProvider): boolean {
+  return evaluationOnlyProviders.includes(provider);
+}
 
 export function needsApiKey(provider: AiProvider): boolean {
   return remoteProviders.includes(provider);

@@ -155,6 +155,28 @@ describe("the models routes", () => {
     });
   });
 
+  /**
+   * An evaluation provider triages and cannot do anything else. US-230.
+   *
+   * Offering it on the classifier's picker would offer a job that cannot run,
+   * and the person would find out on the next poll rather than on the screen.
+   */
+  it("offers an evaluation provider for triage alone", async () => {
+    await withServer(owner, async (app) => {
+      const view = (await app.inject({ method: "GET", url: "/api/models" })).json();
+      const of = (name: string) => view.tasks.find((task: { task: string }) => task.task === name);
+
+      expect(of("triage").providers).toContain("typesafe");
+
+      for (const task of ["classify", "draft", "embed"]) {
+        expect(of(task).providers, `${task} must not offer it`).not.toContain("typesafe");
+      }
+
+      // And it has not cost the other providers their place on triage.
+      expect(of("triage").providers).toContain("openai");
+    });
+  });
+
   it("stores a key as a mask and never returns it", async () => {
     await withServer(owner, async (app) => {
       const keyId = await addKey(app, "My OpenAI key", "sk-1234567890abcd", "openai");

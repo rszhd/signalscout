@@ -67,6 +67,7 @@ import {
   createClassifier,
   createLogger,
   createTriager,
+  estimateCostMicros,
   needsApiKey,
   triageConfigFromEnvironment,
 } from "@signalscout/engine";
@@ -350,15 +351,60 @@ async function main(): Promise<void> {
     `${rows.length} items, at most ${perCell} per platform and kind, against ` +
       `${new Set(rows.map((row) => row.monitorId)).size} monitors.`,
   );
+
+  /**
+   * What this run is about to spend, for the pair it is about to call. US-233.
+   *
+   * **The token counts are a measurement; the prices are not.** This line used
+   * to be `(273 + 415) * rows.length`, two figures taken once against
+   * `gpt-5.6-luna` on both stages. The instrument exists to try other pairs —
+   * `--model=` and `--triage-model=` are its whole point — so the estimate
+   * ignored the thing the run was about. Three runs on 2026-09-19 came in 3.9x,
+   * 6.1x and 0.9x against it, and the 0.9x is the tell: the constants were not
+   * stale, they were right for exactly one pair and wrong for every other.
+   *
+   * So the shapes below stay and the price comes from `modelPrices`, which is
+   * the same table the run's own final total already used — which is why that
+   * line has always been right while this one was wrong.
+   *
+   * An unpriced model answers "cost unknown" rather than a figure, for the
+   * reason `estimateCostMicros` returns undefined rather than a guess: a number
+   * nobody can source reads exactly like one somebody measured.
+   */
+  const measuredCall = {
+    /** One triage call, measured 2026-09-18: about 1,000 in and 80 out. */
+    triage: { inputTokens: 1_000, outputTokens: 80 },
+    /** One classification, same date: about 1,500 in and 95 out. */
+    classify: { inputTokens: 1_500, outputTokens: 95 },
+  };
+
+  function estimateFor(items: number): string {
+    const triage = estimateCostMicros(triageConfig, measuredCall.triage);
+    const classify = estimateCostMicros(aiConfig, measuredCall.classify);
+
+    const unpriced = [
+      triage === undefined ? triageConfig.model : undefined,
+      classify === undefined ? aiConfig.model : undefined,
+    ].filter((model) => model !== undefined);
+
+    if (unpriced.length > 0) {
+      return `cost unknown — no price for ${unpriced.join(" or ")}. Set it, or run a small --per-cell first.`;
+    }
+
+    const total = ((triage as number) + (classify as number)) * items;
+
+    return (
+      `about $${(total / 1_000_000).toFixed(3)} — ${items} items at ` +
+      `${triage} + ${classify} micro-dollars, on token counts measured 2026-09-18.`
+    );
+  }
+
   for (const [cell, count] of [...cells].sort()) console.log(`  ${cell.padEnd(18)} ${count}`);
   console.log(
     `\nTriage: ${triageConfig.provider}/${triageConfig.model}. ` +
       `Classifier: ${aiConfig.provider}/${aiConfig.model}.`,
   );
-  console.log(
-    `Estimated: about $${(((273 + 415) * rows.length) / 1_000_000).toFixed(3)} at the prices ` +
-      "measured on 2026-09-18.\n",
-  );
+  console.log(`Estimated: ${estimateFor(rows.length)}\n`);
 
   if (dry) {
     console.log("--dry: nothing was called.");

@@ -10,12 +10,15 @@
  * No case here makes a call. `createModel` builds a client and sends nothing.
  */
 import { describe, expect, it } from "vitest";
-import { aiProviders, canEmbed, needsApiKey } from "./config.js";
+import { type AiConfig, aiProviders, canEmbed, needsApiKey } from "./config.js";
 import {
+  createEvaluationModel,
   createModel,
+  EvaluationProviderCannotChatError,
   estimateCostMicros,
   MissingAiKeyError,
   modelPrices,
+  NotAnEvaluationProviderError,
   pricedModelsFor,
 } from "./provider.js";
 
@@ -83,5 +86,55 @@ describe("the DeepSeek provider", () => {
     // And a deployment that sets its own band is costed on it.
     const priced = { ...deepseek, inputPriceMicros: 300_000, outputPriceMicros: 1_200_000 };
     expect(estimateCostMicros(priced, usage)).toBe(540);
+  });
+});
+
+/**
+ * A provider that evaluates and cannot converse. US-230.
+ *
+ * The failure this guards is quiet: `AI_PROVIDER=typesafe` would build a
+ * client for a model with no chat endpoint, and the first sign of it would be
+ * an SDK error inside a poll rather than a sentence at startup.
+ */
+describe("an evaluation provider", () => {
+  const typesafe: AiConfig = {
+    provider: "typesafe",
+    model: "jev-latest",
+    apiKey: "test-key",
+    timeoutMs: 30_000,
+  };
+
+  it("is refused by the language-model factory, by name and with the fix", () => {
+    expect(() => createModel(typesafe)).toThrow(EvaluationProviderCannotChatError);
+    expect(() => createModel(typesafe)).toThrow(/AI_TRIAGE_PROVIDER/);
+  });
+
+  it("builds an evaluation model instead", () => {
+    const model = createEvaluationModel(typesafe);
+
+    expect(model.modelId).toBe("jev-latest");
+    expect(model.specificationVersion).toBe("v4");
+  });
+
+  it("needs a key like any other remote provider", () => {
+    expect(() => createEvaluationModel({ ...typesafe, apiKey: undefined })).toThrow(
+      MissingAiKeyError,
+    );
+  });
+
+  it("refuses the evaluation factory for a provider that has no such endpoint", () => {
+    expect(() =>
+      createEvaluationModel({ ...typesafe, provider: "openai", model: "gpt-5.6-luna" }),
+    ).toThrow(NotAnEvaluationProviderError);
+  });
+
+  /**
+   * The output price is zero and that is a price, not a gap. A missing one
+   * makes `estimateCostMicros` answer undefined, and the spend page would go
+   * quiet on the cheapest stage in the pipeline.
+   */
+  it("costs a call on a free output price rather than reporting nothing", () => {
+    expect(estimateCostMicros(typesafe, { inputTokens: 960, outputTokens: 39 })).toBe(40);
+    expect(pricedModelsFor("typesafe")).toEqual(["jev-latest"]);
   });
 });

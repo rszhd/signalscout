@@ -97,10 +97,10 @@ anything.
 - [ ] The Log answers one question in a sentence: **does Jev refuse a lead
       `gpt-5.6-luna` keeps?** With the count and the scores
 - [ ] The confidence floor is named as a number, or dropped, with the reason
-- [ ] The comment half is re-measured: `capture:triage` equivalent over the 50
+- [x] The comment half is re-measured: `capture:triage` equivalent over the 50
       labelled subjects with the same rule, so a rule chosen on posts is not
       shipped without knowing what it does to comments
-- [ ] The Log states whether one rule serves both, or whether posts and
+- [x] The Log states whether one rule serves both, or whether posts and
       comments need two, and US-221's decision is either upheld or reopened in
       writing
 - [ ] Run-to-run stability is measured under the final rule: each lead called
@@ -202,3 +202,38 @@ anything.
   73, on `SignalScout5` version 1. Eight positives and no negatives cannot say
   where the boundary is, but they are the first reference here that is not a
   model's opinion of a model's opinion.
+
+- 2026-09-19T15:35+08:00 — The comment half holds, and it was the risk most
+  likely to end this. `capture:triage --provider=typesafe --model=jev-latest`
+  cost $0.0021 and now runs through the engine rather than a script beside it,
+  so the rule measured is the rule shipped. `capture:scores --triage-model=
+  jev-latest` paired it with `gpt-5.6-sol`'s existing scores and bought
+  nothing: all fifty were cached under the same prompt.
+
+  | triage | kept | leads | top drop | junk kept | triage $ |
+  |---|---|---|---|---|---|
+  | `gpt-5.6-luna` | 17/50 | 3/3 | 34 | 10 | $0.0178 |
+  | `jev-latest` | 15/50 | 3/3 | 34 | 8 | $0.0021 |
+
+  Against the hand labels, which is the only place in this work where the
+  reference is a person: people asking kept 3 of 4 against luna's 2 of 4,
+  people answering 6 of 26 for both, neither kept 3 of 16 against 6, comments
+  kept 12 of 46 against 14. It keeps one more genuine asker and half as many
+  empty ones.
+
+  The asker it refuses is `ol9yf8s`, which luna refuses too and which sol
+  scores 13. The two drops that would have matched at 30 score 34 and 32 and
+  are both people answering somebody else, which is the group US-030 built this
+  stage to refuse. luna's own pinned run drops items up to 46.
+
+  **One rule serves both, and US-221's decision is upheld rather than
+  reopened.** The Context above worried that a rule chosen on posts would
+  damage the comment sample US-221 tuned for. It does not: on the same fifty
+  items, against a person's labels, this rule is better on every column than
+  the one shipped. The narrower reading is that US-221 tightened the *language
+  model's* prompt and this is a different question shape; nothing here says
+  that tightening was wrong for the model it was written for.
+
+  Two boxes left that decide a promotion: `gpt-5.6-luna` has still not been run
+  over the same held-out posts, and run-to-run stability under this rule is
+  still unmeasured.

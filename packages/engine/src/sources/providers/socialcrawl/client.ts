@@ -1,57 +1,18 @@
 /**
- * The SocialCrawl transport, shared by every platform we fetch through it.
+ * The SocialCrawl transport, shared by every platform fetched through it.
+ * This file, its siblings and their fixtures are the only places that name
+ * the provider (STACK.md, *A source is not a provider*).
  *
- * This file, its siblings and the fixtures beside them are the only places in
- * the repository that name SocialCrawl. STACK.md, *A source is not a
- * provider*: a user connects X or LinkedIn, and replacing the provider must
- * change no monitor, no score and no match.
+ * One key, one authentication header and one error vocabulary live here.
+ * Each platform supplies an `EndpointProfile` for what differs: the URL, where
+ * the endpoint puts its cursor, and what a call costs when the answer does not
+ * say. The API is synchronous, so a healthy call never returns
+ * `next: { status: "wait" }`.
  *
- * One provider means one key, one authentication header and one error
- * vocabulary, so those live here and each platform supplies an
- * `EndpointProfile` for the three things that differ: which URL to call, where
- * that endpoint puts its cursor, and what one call costs when the answer does
- * not say. US-028 added the second profile and changed nothing about the
- * first.
- *
- * Every shape below was captured from a live account by `fixtures/capture.mjs`
- * on 2026-09-05, not read from the documentation. Four of the facts it settled
- * are wrong or absent in the documentation:
- *
- * 1. **The cursor is in two places and the documented one is not the only
- *    one.** The documentation names `data.next_cursor`. The answer also
- *    carries `pagination.next_cursor`, a different string with an `sc.` prefix
- *    wrapping the same place. `data.next_cursor` is the one this client sends
- *    back, because it is the one a live run followed to a second page.
- * 2. **`sort` accepts `latest` or `top`, and nothing else.** The documentation
- *    names only `top`. The provider listed both when it refused an invalid
- *    value, which cost nothing to ask.
- * 3. **An empty answer is free.** A search that matches nothing answers 200
- *    with `credits_used: 0`. ScrapeCreators bills for the same thing, so this
- *    is a fact about this provider and not a rule.
- * 4. **An empty answer is not always the truth.** The same query returned
- *    nothing at 20:12 and twenty posts at 20:31, both free. So no page of zero
- *    posts may be read as "this query is finished for good" — only as "there
- *    was nothing this time".
- *
- * The LinkedIn capture on the same day settled three more, and none of them
- * generalises from the X ones — which is the argument for a profile per
- * endpoint rather than one client that assumes:
- *
- * 5. **This endpoint pages, and the documentation says it does not.** The
- *    cursor is at `pagination.next_cursor`, `has_more` sits beside it, and
- *    page two returned ten posts with none of page one's among them.
- * 6. **A search that matches nothing is billed here, and is not empty.** A
- *    phrase that cannot occur returned ten unrelated posts, `total: 98`, and
- *    cost the full five credits. So an empty answer is not the signal on this
- *    endpoint that it is on X's — there is no empty answer to read.
- * 7. **The provider caches, and a cached answer is free.** The same query sent
- *    twice came back flagged `cached: true`, in a third of the time, for zero
- *    credits. No connector may count on it: the window is undocumented, and a
- *    cap sized on cached prices is a cap sized on somebody else's luck.
- *
- * The API is synchronous: a search answered in 1.4 to 5.3 seconds with the
- * posts in the body. There is no snapshot and nothing to poll, so these
- * connectors never return `next: { status: "wait" }` on a healthy call.
+ * Every shape below was captured, not read from the documentation, and the
+ * endpoints disagree with each other on cursors, on whether an empty search
+ * is free and on whether one exists at all. docs/history.md, *Sources: what
+ * was measured*, lists what each capture settled.
  */
 import type { SourceRuntime } from "../../types.js";
 

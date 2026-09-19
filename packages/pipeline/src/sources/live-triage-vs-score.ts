@@ -1,62 +1,18 @@
 /**
  * Does triage refuse anything the classifier would have called a lead?
+ * Asked of everything this instance has stored, per platform and kind.
  *
  *     pnpm --filter @signalscout/pipeline live:triage-score [--per-cell=30] [--dry]
  *     … --model=<classifier> --triage-model=<triage> [--rescore]
  *
- * US-221 made triage stricter, and `capture-scores.ts` answered this on the
- * fifty hand-labelled fixtures. Fifty items from two Reddit threads against one
- * example monitor is not a distribution, and the header of every file that
- * touches them says so. This asks the same question of **everything this
- * instance has stored**: every platform, posts and replies, against the
- * monitors the items were really collected for.
+ * Every sampled item goes through both paid stages and the triage verdict is
+ * recorded, not obeyed: a drop leaves no score in the tables, so the only way
+ * to know what it was worth is to buy it here. Scores are cached under a hash
+ * of the exact system prompt, beside the run records, out of git.
  *
- * **Why it cannot be read from the tables.** A triage drop leaves a
- * `filter_drops` row and no score, because the whole point of the stage is that
- * the classification is never bought. So the only way to know what a dropped
- * item was worth is to buy it once, deliberately, here.
- *
- * So every sampled item goes through **both** paid stages, in that order, and
- * the verdict is recorded rather than obeyed: an item triage refuses is
- * classified anyway. That is the difference between this and
- * `live-tiktok-comments.ts`, which runs the real steps and therefore cannot see
- * what the drops were worth.
- *
- * **What the answer looks like.** Two numbers decide it, and they pull apart:
- *
- * - **A drop at or above the monitor's own `min_score`** is a lead this product
- *   would have shown and now never will. Nobody can notice one in production.
- * - **A kept item far below it** is a classification the stage was meant to
- *   save and did not.
- *
- * **The sample is one per platform and kind, not one big draw.** Reddit holds
- * more than half of everything stored, so an untargeted sample would be a
- * Reddit measurement wearing six platforms' names. `--per-cell` is the cap on
- * each of the ten cells; a cell with fewer rows contributes what it has.
- *
- * **A score is bought once and then reused.** Triage feeds the classifier
- * nothing — it decides only whether the call happens — so a score belongs to
- * the item, its monitor and the classifier's prompt, never to the verdict.
- * Paying again when only the triage prompt moved buys the same answer with
- * drift on it, and drift reads as triage having changed something. Each score
- * is cached under a hash of the exact system prompt that monitor's classifier
- * was sent, so editing `prompt.ts`, editing the monitor or changing the model
- * throws the cache away by itself. `--rescore` forces it.
- *
- * The cache holds real people's post text, so it lives beside the run records
- * and `.gitignore` keeps both out of the repository. It is saved after every
- * call it pays for, so stopping the run keeps what it has already bought.
- *
- * It spends model money and no provider credit: one triage call per sampled
- * item, and one classification per item that is not already cached. At the prices measured on 2026-09-18 —
- * 273 micro-dollars a triage and about 415 a classification on `gpt-5.6-luna` —
- * 30 per cell is roughly 210 items and about $0.15. `--dry` prints the sample
- * and the estimate and calls nothing.
- *
- * **It writes nothing.** No match, no drop, no `model_calls` row, so the spend
- * is invisible to the budget guard and to every screen. That is deliberate — an
- * instrument that wrote matches would put its own experiment in somebody's
- * inbox — and it is the reason to run it with a number in mind.
+ * It writes nothing — no match, no drop, no `model_calls` row — so its spend
+ * is invisible to every screen. docs/instruments.md has the cost and the
+ * reading; US-221 and US-229 hold the measurements.
  */
 
 import { createHash } from "node:crypto";

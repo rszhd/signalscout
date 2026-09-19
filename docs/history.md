@@ -30,6 +30,7 @@ its date.
 - [Instruments: what the first runs found](#instruments-what-the-first-runs-found) — moved from `docs/instruments.md`
 - [Secrets: the decisions](#secrets-the-decisions) — moved from `docs/secrets.md`
 - [Accounts: the decisions](#accounts-the-decisions) — moved from `docs/accounts.md`
+- [Code headers: the reasoning moved out](#code-headers-the-reasoning-moved-out) — moved from eight file headers
 
 ---
 
@@ -2718,3 +2719,448 @@ rather than replacing a password.
 
 **The take-over of `self-hosted` rows is enforced by a count**, not true by
 accident, so a second registration on an open instance inherits nothing.
+
+---
+
+## Code headers: the reasoning moved out
+
+Moved here from the file headers on 2026-09-20 (US-247). A header now holds
+what the file does, its invariants and its failure shape, in about fifteen
+lines; the story behind each rule is below, under the file's path, as it
+was written. The command lines are left out where docs/instruments.md has
+them.
+
+### `packages/pipeline/src/matches/matches.ts`
+
+The read side of the inbox.
+
+Everything the inbox screen shows comes from here, and none of it is
+computed in a route or a component. Two of US-011's acceptance lines are the
+reason. The ordering rule is a product decision that has to be written down
+in one place, and a rule written in a Fastify handler is a rule the next
+caller re-invents. And the deletion reconciliation of US-015 sets
+`matches.hidden`; the inbox is the caller that has to honour it, so the
+filter is here where every caller gets it, not in the query the screen
+happens to send.
+
+## The ordering rule
+
+A match ranks by `score - 12 * age_in_days`, where the age is the *post's*
+age and never the row's. A person joins a conversation, not a database row.
+
+Twelve points a day is the smallest round number that satisfies the example
+in US-011's Context: a 96 from three days ago must rank below an 88 from ten
+minutes ago. Three days costs 36 points, so the 96 ranks 60 and the 88 ranks
+88. A day-old 90 ranks with a fresh 78, and after a week almost nothing
+outranks a fresh match, which is the intent: a week-old thread is closed.
+
+The decay is linear rather than exponential because a person has to be able
+to predict it. "It loses half a point an hour" is a sentence somebody can
+hold; a half-life is not.
+
+Age is clamped at zero. A post dated in the future is a clock difference at
+the source, and it must not rank above its own score.
+
+## The other orders
+
+The rank is the default and not the only one. US-114 added the two halves it
+is made of: the score alone, and the date alone. The rank mixes them at
+twelve points a day, which answers "what should I read next" and answers the
+other two questions badly — "what are the best leads this monitor has ever
+found" and "what arrived since I last looked". Under the rank a fresh low
+score and an old high one land on the same rung, so both answers are
+scattered through one list. The saved list of US-043 has a fourth order, by
+when a thing was kept.
+
+All three go through `orderValue`, which is the one place a page's ordering
+is decided. The sort and the keyset cursor read the same expression, so they
+cannot disagree — and they did disagree before US-114: the saved list sorted
+by `saved_at` and paged on the rank, which dropped rows from page two.
+Each row carries the cursor that resumes after it, in its own ordering,
+because a cursor built anywhere else is a second way to build one.
+
+## What a verdict does to the list
+
+A match the user marked not relevant leaves the default view and stays in
+the table. US-012 is firm that it is not deleted: the verdict is the data
+the feedback loop is being collected for, and a row that was removed to
+tidy a screen cannot teach anything later. `includeNotRelevant` is how a
+person looks at what they dismissed.
+
+The verdict is read here rather than by a second query from the screen, for
+the reason the hidden filter is here: both are the same question about the
+same page, and a caller that asked separately could show a page whose
+buttons disagree with its rows.
+
+## Why the clock is a parameter
+
+`asOf` is passed in and defaults to now. Page two is then ranked against the
+same clock as page one, so a match cannot move between pages while somebody
+reads. Pagination is keyset, on the rank and the id together: an offset over
+a rank that moves with the clock skips rows, and the failure looks like a
+match that was never delivered.
+
+### `packages/pipeline/src/sources/live-triage-vs-score.ts`
+
+Does triage refuse anything the classifier would have called a lead?
+
+    pnpm --filter @signalscout/pipeline live:triage-score [--per-cell=30] [--dry]
+    … --model=<classifier> --triage-model=<triage> [--rescore]
+
+US-221 made triage stricter, and `capture-scores.ts` answered this on the
+fifty hand-labelled fixtures. Fifty items from two Reddit threads against one
+example monitor is not a distribution, and the header of every file that
+touches them says so. This asks the same question of **everything this
+instance has stored**: every platform, posts and replies, against the
+monitors the items were really collected for.
+
+**Why it cannot be read from the tables.** A triage drop leaves a
+`filter_drops` row and no score, because the whole point of the stage is that
+the classification is never bought. So the only way to know what a dropped
+item was worth is to buy it once, deliberately, here.
+
+So every sampled item goes through **both** paid stages, in that order, and
+the verdict is recorded rather than obeyed: an item triage refuses is
+classified anyway. That is the difference between this and
+`live-tiktok-comments.ts`, which runs the real steps and therefore cannot see
+what the drops were worth.
+
+**What the answer looks like.** Two numbers decide it, and they pull apart:
+
+- **A drop at or above the monitor's own `min_score`** is a lead this product
+  would have shown and now never will. Nobody can notice one in production.
+- **A kept item far below it** is a classification the stage was meant to
+  save and did not.
+
+**The sample is one per platform and kind, not one big draw.** Reddit holds
+more than half of everything stored, so an untargeted sample would be a
+Reddit measurement wearing six platforms' names. `--per-cell` is the cap on
+each of the ten cells; a cell with fewer rows contributes what it has.
+
+**A score is bought once and then reused.** Triage feeds the classifier
+nothing — it decides only whether the call happens — so a score belongs to
+the item, its monitor and the classifier's prompt, never to the verdict.
+Paying again when only the triage prompt moved buys the same answer with
+drift on it, and drift reads as triage having changed something. Each score
+is cached under a hash of the exact system prompt that monitor's classifier
+was sent, so editing `prompt.ts`, editing the monitor or changing the model
+throws the cache away by itself. `--rescore` forces it.
+
+The cache holds real people's post text, so it lives beside the run records
+and `.gitignore` keeps both out of the repository. It is saved after every
+call it pays for, so stopping the run keeps what it has already bought.
+
+It spends model money and no provider credit: one triage call per sampled
+item, and one classification per item that is not already cached. At the prices measured on 2026-09-18 —
+273 micro-dollars a triage and about 415 a classification on `gpt-5.6-luna` —
+30 per cell is roughly 210 items and about $0.15. `--dry` prints the sample
+and the estimate and calls nothing.
+
+**It writes nothing.** No match, no drop, no `model_calls` row, so the spend
+is invisible to the budget guard and to every screen. That is deliberate — an
+instrument that wrote matches would put its own experiment in somebody's
+inbox — and it is the reason to run it with a number in mind.
+
+### `packages/engine/src/ai/triage-prompt.ts`
+
+The prompt triage sends. One question, and deliberately not the
+classifier's.
+
+`prompt.ts` asks a model to score five dimensions and justify them. Reusing
+it here with fewer fields would have been the cheap way to write this file
+and the expensive way to own it: the classifier's prompt would then serve
+two callers, and every later edit for one would have to be checked against
+the other. It is also the wrong prompt. Triage does not rank; it answers a
+single yes-or-no question badly enough to be cheap and well enough to be
+safe.
+
+**The answer carries no reasons.** That was expected to be where the saving
+came from — output is priced several times input, and a classification
+returns 95 output tokens — and on the first model we measured it was not.
+`capture:triage` recorded about 113 output tokens per triage answer against
+the classification's 95, because a reasoning model bills its own thinking as
+output and a short answer does not shorten the thinking.
+
+So the reasons are still absent, for the two honest reasons left: there is
+nothing to show a person, and a model asked to justify a one-word answer
+writes more of them. The saving comes from the price gap between the two
+models instead. `worker/runtime.ts` warns when there is no gap.
+
+**The prompt is told which way to fail.** A model asked to be strict will
+be, and here strictness is the expensive direction: a dropped lead leaves no
+row, no inbox entry and nothing for a person to notice. The classifier is
+told to be strict for the opposite reason — it has a threshold behind it and
+a person reading its output. So the two prompts pull different ways on
+purpose, and this comment is here because that looks like an inconsistency
+until you know it is a decision.
+
+**What it screens for is what the second reader scores.** US-221 moved the
+question from "could this author be a person to reach?" to that plus "does
+anything here say they want an answer?". Three of the classifier's five
+dimensions are about the want, so the old question let a plausible person who
+wants nothing through to a paid call that was always going to score low.
+
+That is a narrowing of `maybe`, not a removal of it. `maybe` now means doubt
+about a want; the plain absence of one is a `no`. The captured verdicts are
+why it was done that way rather than by dropping `maybe`: two of the three
+surviving people asking answered `maybe`, and so did one worked example. A
+rule that dropped `maybe` would delete real leads to save a handful of expert
+comments, and a deleted lead is the mistake nobody can see.
+
+**A complaint counts as wanting something, and that line is here because the
+first capture deleted a lead without it.** Told that wanting nothing is a
+`no`, the model refused "Our Playwright tests break whenever the UI changes"
+— PLAN.md's `mild-problem-signal`, which it scores 50. The classifier's own
+prompt calls a complaint with no question partial intent. Triage has to leave
+that judgement to it, so the prompt names the case rather than hoping.
+
+Measured on 2026-09-18 over the same 50 items on `gpt-5.6-luna`: 19 of 46
+comments kept before, 13 after; people answering 6 kept, then 3 of 26; people
+asking 3 of 4 either way; every worked example that is a lead still kept.
+Output fell from 123 tokens an item to 80, and the cost per call did not
+follow — 267 micro-dollars against 273, because the longer prompt bought the
+shorter answer.
+
+### `packages/engine/src/sources/providers/socialcrawl/client.ts`
+
+The SocialCrawl transport, shared by every platform we fetch through it.
+
+This file, its siblings and the fixtures beside them are the only places in
+the repository that name SocialCrawl. STACK.md, *A source is not a
+provider*: a user connects X or LinkedIn, and replacing the provider must
+change no monitor, no score and no match.
+
+One provider means one key, one authentication header and one error
+vocabulary, so those live here and each platform supplies an
+`EndpointProfile` for the three things that differ: which URL to call, where
+that endpoint puts its cursor, and what one call costs when the answer does
+not say. US-028 added the second profile and changed nothing about the
+first.
+
+Every shape below was captured from a live account by `fixtures/capture.mjs`
+on 2026-09-05, not read from the documentation. Four of the facts it settled
+are wrong or absent in the documentation:
+
+1. **The cursor is in two places and the documented one is not the only
+   one.** The documentation names `data.next_cursor`. The answer also
+   carries `pagination.next_cursor`, a different string with an `sc.` prefix
+   wrapping the same place. `data.next_cursor` is the one this client sends
+   back, because it is the one a live run followed to a second page.
+2. **`sort` accepts `latest` or `top`, and nothing else.** The documentation
+   names only `top`. The provider listed both when it refused an invalid
+   value, which cost nothing to ask.
+3. **An empty answer is free.** A search that matches nothing answers 200
+   with `credits_used: 0`. ScrapeCreators bills for the same thing, so this
+   is a fact about this provider and not a rule.
+4. **An empty answer is not always the truth.** The same query returned
+   nothing at 20:12 and twenty posts at 20:31, both free. So no page of zero
+   posts may be read as "this query is finished for good" — only as "there
+   was nothing this time".
+
+The LinkedIn capture on the same day settled three more, and none of them
+generalises from the X ones — which is the argument for a profile per
+endpoint rather than one client that assumes:
+
+5. **This endpoint pages, and the documentation says it does not.** The
+   cursor is at `pagination.next_cursor`, `has_more` sits beside it, and
+   page two returned ten posts with none of page one's among them.
+6. **A search that matches nothing is billed here, and is not empty.** A
+   phrase that cannot occur returned ten unrelated posts, `total: 98`, and
+   cost the full five credits. So an empty answer is not the signal on this
+   endpoint that it is on X's — there is no empty answer to read.
+7. **The provider caches, and a cached answer is free.** The same query sent
+   twice came back flagged `cached: true`, in a third of the time, for zero
+   credits. No connector may count on it: the window is undocumented, and a
+   cap sized on cached prices is a cap sized on somebody else's luck.
+
+The API is synchronous: a search answered in 1.4 to 5.3 seconds with the
+posts in the body. There is no snapshot and nothing to poll, so these
+connectors never return `next: { status: "wait" }` on a healthy call.
+
+### `packages/engine/src/sources/providers/socialcrawl/reddit.ts`
+
+Reddit, fetched through SocialCrawl. US-031.
+
+The third provider for Reddit, and the only one of the three that can search
+*inside* a subreddit. That endpoint is the whole reason this connector
+exists, because US-022 measured the gap it fills: a keyword across all of
+Reddit brings back noise, and a subreddit on its own ignores the monitor's
+words entirely.
+
+**The capture measured that gap again, harder.** On 2026-09-06, one credit
+each:
+
+* `/v1/reddit/search` for `flaky tests` returned 25 posts from r/TIdaL,
+  r/RedditLaqueristaSwap, r/Euphoria_HBO, r/AskVet and r/snapmaker. A watch
+  app's audio output was "still flaky with 3+ devices". A dog had a skin
+  issue.
+* `/v1/reddit/subreddit/search` for the same words inside r/softwaretesting
+  returned 7 posts, **every one on topic and every one from that subreddit**.
+
+So this connector prefers the scoped mode wherever a monitor names both a
+query and a channel, and the plain keyword search is the fallback rather
+than the default. That is the opposite of the other two Reddit connectors,
+and it is a measurement rather than a taste.
+
+**It is the expensive one and it has to earn that.** A credit is 8,118
+micro-dollars against a ScrapeCreators request's 1,880, so every call costs
+4.3 times its equivalent. It buys precision, not volume: seven right posts
+against twenty-five wrong ones.
+
+**It reads replies since US-159, and it is the expensive half of a real
+choice rather than the cheap one.** US-020 measured this endpoint at 5
+credits against ScrapeCreators' 1 and left it unbuilt; what changed is that
+an instance whose only Reddit key is this provider's was then given no
+replies at all, and told nothing.
+
+The capture on 2026-09-17 says what the five credits buy. One call returned
+**34 of the 34 comments the post claimed**, nested five levels deep, with no
+cursor and `truncated: false`. ScrapeCreators buys a flat page of 25 for one
+credit and has been measured stopping at 43 of 95 while reporting itself
+finished. So the two are not the same product at different prices:
+
+* ScrapeCreators: $0.00188 for the top of a thread, and no way to reach the
+  rest.
+* SocialCrawl: $0.0406 for the thread, whole, in one call.
+
+On the median subreddit thread of about twelve comments the cheap one is
+complete too, and buying this instead is paying twenty-two times for the
+same words. The monitor form states the per-platform price, and the choice
+stays the person's.
+
+### `packages/pipeline/src/worker/filter.ts`
+
+The pre-filter step: drop the obvious misses before the model is paid to
+read them.
+
+Two stages, in this order, both inside Postgres.
+
+1. **Keyword and subreddit.** Free. `filter/keywords.ts` holds the rule.
+2. **Embedding similarity.** One embedding of the monitor's description,
+   reused until the monitor is edited, and one batch for the posts that got
+   this far. `pgvector` measures the distance.
+3. **Triage.** US-030. A cheap model reads what survived and answers one
+   question: could this author be a person to reach? `ai/triage.ts` holds
+   it.
+
+An embedding costs about one hundredth of a classification, so the second
+stage pays for itself as soon as it drops a few posts in a hundred. That is
+the arithmetic PLAN.md's bring-your-own-key promise rests on.
+
+The third stage is not that arithmetic and must not be read as it. Triage is
+a model call, so it is expensive next to an embedding and cheap only next to
+a classification. It is here because the two stages above it measure
+*subject*, and under a post about the right subject the people answering are
+on subject too. US-029 measured that: no similarity threshold separates a
+person asking from the experts replying, in either direction, so the job
+falls to something that can read.
+
+**Triage runs inside `pass`, and that is deliberate.** This step has five
+exits — no embedder, no monitor vector, an embedding call that failed, an
+empty keep list, and the ordinary end — and every one of them must reach the
+new stage. docs/testing.md: a rule is only as tested as its least-tested
+caller. Putting the stage at the one place they all go through leaves no
+caller to forget it.
+
+**Every failure here fails open.** No embedder configured, a provider
+outage, a model of the wrong width, a monitor that vanished mid-job: the
+posts go to the classifier. This is deliberate and it is asymmetric on
+purpose. An extra classification is a cost, on a bill somebody can read. A
+dropped good lead is invisible — no row, no inbox entry, nothing to notice —
+and docs/testing.md names this exact swallow as one that needs a test which
+goes red when the swallowed thing breaks. `filter.test.ts` holds it.
+
+**What is dropped is written down.** Every drop goes to `filter_drops` with
+the similarity that caused it, because a threshold nobody can review against
+real data is a number somebody guessed twice.
+
+### `packages/engine/src/sources/providers/socialcrawl/instagram.ts`
+
+Instagram, fetched through SocialCrawl. US-049.
+
+The sixth platform, added against PLAN.md's *Important rule* on the owner's
+decision, and the fifth this one provider fetches on one key.
+
+Three things make it unlike its four siblings here, and each one was measured
+on 2026-09-06 rather than read from the catalogue.
+
+**1. A search with no date window returns the last five years, newest first
+nowhere.** Thirty reels for `skincare for acne scars` ran from December 2021
+to April 2026, in relevance order, and the newest of the thirty was **five
+months old**. A monitor polling for what was said since it last looked would
+have paid a credit a poll to be handed nothing that passed its `since`, for
+as long as it ran. The same query with `date_posted=last-month` returned
+eight reels and **all eight were inside the window**.
+
+So this connector always sends a window, and that is the difference from
+`linkedin.ts`, which sends none when `since` is absent or old and takes what
+it is given. Here that is not a neutral choice, it is the broken one.
+
+**2. `has_more` is wrong, and following it is free.** Page one came back with
+thirty reels, `has_more: true` and a cursor; the cursor returned **zero items
+for zero credits**, with another `has_more: true` and another cursor. So the
+walk ends on an empty page, not on the flag. `client.ts` holds the rest.
+
+**3. The comments are mostly not words, and the leads are all in the few
+that are.** A live poll collected 89 comments: 56 were under ten characters
+and the median was four. Twelve passed sixty characters, and **the two
+highest-scoring matches of the run are the two longest comments in it** — 233
+and 289 characters, scoring 90 and 77. The 90 is the highest any comment has
+scored on any platform in this product.
+
+So this platform is not poor, it is *sparse*, and a median describes it
+badly. What it is expensively is dear to read: a comment page is five credits
+where TikTok's and YouTube's are one, so the same poll spent **$1.6317 with
+the provider and $0.3336 with the model**. Every other platform here spends
+more on the model than on the provider. Budget for the reading.
+
+A fourth difference is smaller and reaches the shared parser: Instagram sends
+`url`, `post_id` and `author.display_name` **null on every comment**. The
+link is built here, the name falls back to the handle in `comments.ts`, and
+the missing `post_id` means BUG-007's defence is inert on this platform —
+nothing here can tell that a comment belongs to another post.
+
+### `packages/pipeline/src/sources/live-reddit-replies-poll.ts`
+
+US-020's live proof: one Reddit poll that reads the replies, end to end.
+
+This is an instrument, not a test. The suite proves our half against
+captured payloads — including the thread where ScrapeCreators reports
+`has_more: false` with 33 of 58 comments missing — but nothing in it has ever
+asked a real provider for a real reply. The claim underneath is that a poll
+collects posts, opens the threads worth opening, stores what was said,
+classifies it with the thread as context, and bills what the connector says
+it billed. The only way to ask that is to ask it.
+
+    pnpm --filter @signalscout/pipeline live:reddit-replies
+
+**It spends money and it writes rows.** One credit for the subreddit page,
+then one per thread opened — at most `maxThreadsPerJob` — so about $0.03 of
+ScrapeCreators credit. The model is the larger half: every reply that
+survives buys a triage call, and every reply triage keeps buys a
+classification. Expect a few hundred triage calls and a few dozen
+classifications. It leaves behind a paused monitor, its posts and replies,
+its `api_usage` rows and its matches, which are the evidence.
+
+It drives the steps by hand with a queue that runs the next one instead of
+enqueuing it. The steps are the real ones in the real order, so what runs
+here is what the worker runs. The order is the part worth watching:
+
+    collect → filter → replies → filter → classify
+
+The second `filter` is the reply pass, and it must skip the keyword and
+embedding stages. The `replies` step must not appear a second time, because
+a reply has no thread of its own and a loop there would buy the same words
+for ever.
+
+What it is trying to see, in order:
+
+  1. A real thread comes back, with real nested replies, keyed by Reddit's
+     own `t1_` fullnames.
+  2. `posts` holds them as `kind = 'reply'` rows linked to their parent, and
+     the deduplication key needed no change to make that work.
+  3. `repliesPartial` is written honestly: a thread we did not finish says so.
+  4. The classifier reads a reply with its thread above it, and the matches
+     it finds are readable by a person.
+  5. A second run opens no thread whose reply count has not moved, which is
+     the rule that stops an hourly monitor re-buying every conversation.

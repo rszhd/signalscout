@@ -1,52 +1,17 @@
 /**
- * Reddit, fetched through SocialCrawl. US-031.
+ * Reddit, fetched through SocialCrawl. US-031, replies since US-159.
  *
- * The third provider for Reddit, and the only one of the three that can search
- * *inside* a subreddit. That endpoint is the whole reason this connector
- * exists, because US-022 measured the gap it fills: a keyword across all of
- * Reddit brings back noise, and a subreddit on its own ignores the monitor's
- * words entirely.
+ * The only Reddit connector that can search *inside* a subreddit, so it
+ * prefers the scoped mode wherever a monitor names a query and a channel, and
+ * the plain keyword search is the fallback. That is the reverse of the other
+ * Reddit connectors, and it was measured: 25 off-topic posts across Reddit
+ * against 7 on-topic inside the subreddit, for the same words.
  *
- * **The capture measured that gap again, harder.** On 2026-09-06, one credit
- * each:
- *
- * * `/v1/reddit/search` for `flaky tests` returned 25 posts from r/TIdaL,
- *   r/RedditLaqueristaSwap, r/Euphoria_HBO, r/AskVet and r/snapmaker. A watch
- *   app's audio output was "still flaky with 3+ devices". A dog had a skin
- *   issue.
- * * `/v1/reddit/subreddit/search` for the same words inside r/softwaretesting
- *   returned 7 posts, **every one on topic and every one from that subreddit**.
- *
- * So this connector prefers the scoped mode wherever a monitor names both a
- * query and a channel, and the plain keyword search is the fallback rather
- * than the default. That is the opposite of the other two Reddit connectors,
- * and it is a measurement rather than a taste.
- *
- * **It is the expensive one and it has to earn that.** A credit is 8,118
- * micro-dollars against a ScrapeCreators request's 1,880, so every call costs
- * 4.3 times its equivalent. It buys precision, not volume: seven right posts
- * against twenty-five wrong ones.
- *
- * **It reads replies since US-159, and it is the expensive half of a real
- * choice rather than the cheap one.** US-020 measured this endpoint at 5
- * credits against ScrapeCreators' 1 and left it unbuilt; what changed is that
- * an instance whose only Reddit key is this provider's was then given no
- * replies at all, and told nothing.
- *
- * The capture on 2026-09-17 says what the five credits buy. One call returned
- * **34 of the 34 comments the post claimed**, nested five levels deep, with no
- * cursor and `truncated: false`. ScrapeCreators buys a flat page of 25 for one
- * credit and has been measured stopping at 43 of 95 while reporting itself
- * finished. So the two are not the same product at different prices:
- *
- * * ScrapeCreators: $0.00188 for the top of a thread, and no way to reach the
- *   rest.
- * * SocialCrawl: $0.0406 for the thread, whole, in one call.
- *
- * On the median subreddit thread of about twelve comments the cheap one is
- * complete too, and buying this instead is paying twenty-two times for the
- * same words. The monitor form states the per-platform price, and the choice
- * stays the person's.
+ * It is the expensive one: a credit is 4.3 times a ScrapeCreators request,
+ * and a reply call is five credits for the whole thread in one answer where
+ * the cheap one buys a flat page of 25 and has been measured stopping early.
+ * On the median twelve-comment thread the cheap one is complete too. The
+ * monitor form states the price; the choice stays the person's.
  */
 import { redditPlatform } from "../../platforms.js";
 import type {

@@ -2,7 +2,7 @@
 
 # Done
 
-160 finished.
+161 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
@@ -24,6 +24,7 @@
 | BUG-002 | [A seven-day window is bought as a month](done/2026-09/BUG-002-a-seven-day-window-is-bought-as-a-month.md) | bug | fixed | 2026-09 |
 | BUG-001 | [A pending Reddit collection is not resumed](done/2026-09/BUG-001-a-pending-reddit-collection-is-not-resumed.md) | bug | shipped | 2026-09 |
 | US-250 | [The next four documents are cut to their rules](done/2026-09/US-250-the-next-four-documents-are-cut-to-their-rules.md) | chore | shipped | 2026-09 |
+| US-247 | [A file header holds the contract, not the story](done/2026-09/US-247-a-file-header-holds-the-contract-not-the-story.md) | chore | shipped | 2026-09 |
 | US-246 | [history.md has headings an agent can jump to](done/2026-09/US-246-history-md-has-headings-an-agent-can-jump-to.md) | chore | shipped | 2026-09 |
 | US-237 | [The CSV carries the five scores and names the label](done/2026-09/US-237-the-csv-carries-the-five-scores-and-names-the-label.md) | feature | shipped | 2026-09 |
 | US-234 | [A match can be read by its id](done/2026-09/US-234-a-match-can-be-read-by-its-id.md) | feature | shipped | 2026-09 |

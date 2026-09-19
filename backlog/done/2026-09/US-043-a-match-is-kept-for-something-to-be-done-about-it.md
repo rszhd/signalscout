@@ -6,7 +6,7 @@ priority: p2
 created: 2026-09-06T12:36+08:00
 parent:
 area:
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -125,4 +125,4 @@ wants more says so.
   request was made — passed anyway. The route is mocked now and the test also
   asserts the button says "Saved" afterwards, which only happens on success.
   Checking why a test passed found it; running it did not.
-
+- 2026-09-20T00:55+08:00 — Closed. The open box is a question that only use can answer; it is US-242, parked.

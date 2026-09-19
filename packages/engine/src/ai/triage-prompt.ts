@@ -1,61 +1,20 @@
 /**
- * The prompt triage sends. One question, and deliberately not the
- * classifier's.
+ * The prompt triage sends: one yes-or-no question, deliberately not the
+ * classifier's (`prompt.ts`), so an edit to one is never checked against the
+ * other.
  *
- * `prompt.ts` asks a model to score five dimensions and justify them. Reusing
- * it here with fewer fields would have been the cheap way to write this file
- * and the expensive way to own it: the classifier's prompt would then serve
- * two callers, and every later edit for one would have to be checked against
- * the other. It is also the wrong prompt. Triage does not rank; it answers a
- * single yes-or-no question badly enough to be cheap and well enough to be
- * safe.
+ * Invariants:
+ * - The answer carries no reasons. The saving is the price gap between the
+ *   two models, not a shorter answer: a reasoning model bills its thinking.
+ * - The prompt is told to fail toward keeping. A dropped lead leaves no row
+ *   and nothing to notice; the classifier is told the opposite because a
+ *   threshold and a person sit behind it.
+ * - It screens for a want, not only a person (US-221). `maybe` means doubt
+ *   about a want; plain absence of one is `no`. A complaint counts as a want,
+ *   because the first capture deleted PLAN.md's `mild-problem-signal`
+ *   without that line.
  *
- * **The answer carries no reasons.** That was expected to be where the saving
- * came from — output is priced several times input, and a classification
- * returns 95 output tokens — and on the first model we measured it was not.
- * `capture:triage` recorded about 113 output tokens per triage answer against
- * the classification's 95, because a reasoning model bills its own thinking as
- * output and a short answer does not shorten the thinking.
- *
- * So the reasons are still absent, for the two honest reasons left: there is
- * nothing to show a person, and a model asked to justify a one-word answer
- * writes more of them. The saving comes from the price gap between the two
- * models instead. `worker/runtime.ts` warns when there is no gap.
- *
- * **The prompt is told which way to fail.** A model asked to be strict will
- * be, and here strictness is the expensive direction: a dropped lead leaves no
- * row, no inbox entry and nothing for a person to notice. The classifier is
- * told to be strict for the opposite reason — it has a threshold behind it and
- * a person reading its output. So the two prompts pull different ways on
- * purpose, and this comment is here because that looks like an inconsistency
- * until you know it is a decision.
- *
- * **What it screens for is what the second reader scores.** US-221 moved the
- * question from "could this author be a person to reach?" to that plus "does
- * anything here say they want an answer?". Three of the classifier's five
- * dimensions are about the want, so the old question let a plausible person who
- * wants nothing through to a paid call that was always going to score low.
- *
- * That is a narrowing of `maybe`, not a removal of it. `maybe` now means doubt
- * about a want; the plain absence of one is a `no`. The captured verdicts are
- * why it was done that way rather than by dropping `maybe`: two of the three
- * surviving people asking answered `maybe`, and so did one worked example. A
- * rule that dropped `maybe` would delete real leads to save a handful of expert
- * comments, and a deleted lead is the mistake nobody can see.
- *
- * **A complaint counts as wanting something, and that line is here because the
- * first capture deleted a lead without it.** Told that wanting nothing is a
- * `no`, the model refused "Our Playwright tests break whenever the UI changes"
- * — PLAN.md's `mild-problem-signal`, which it scores 50. The classifier's own
- * prompt calls a complaint with no question partial intent. Triage has to leave
- * that judgement to it, so the prompt names the case rather than hoping.
- *
- * Measured on 2026-09-18 over the same 50 items on `gpt-5.6-luna`: 19 of 46
- * comments kept before, 13 after; people answering 6 kept, then 3 of 26; people
- * asking 3 of 4 either way; every worked example that is a lead still kept.
- * Output fell from 123 tokens an item to 80, and the cost per call did not
- * follow — 267 micro-dollars against 273, because the longer prompt bought the
- * shorter answer.
+ * docs/history.md, *Costs* and *Model*, hold the numbers behind each.
  */
 
 import { describeSignals } from "../signals.js";

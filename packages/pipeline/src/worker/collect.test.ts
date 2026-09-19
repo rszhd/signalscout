@@ -1,5 +1,7 @@
 import {
+  builtInSources,
   type CandidatePost,
+  type ConnectorDefinition,
   createSourceRegistry,
   createSourceRuntime,
   type FakeSourceOptions,
@@ -243,6 +245,61 @@ describe("the poll step", () => {
       { monitorId },
       contextFor(db, boss),
     );
+
+    const stored = await db.select().from(posts);
+
+    expect(stored).toHaveLength(fakePosts.length);
+    expect(stored.every((post) => post.source === "reddit")).toBe(true);
+    expect(sentTo(boss, filterQueue).postIds).toHaveLength(fakePosts.length);
+  });
+
+  it("keeps Reddit's posts when SocialCrawl answers 503 for X, through the real connector", async () => {
+    /**
+     * The case above stands in for the outage with a thrown `Error`. This
+     * one is the outage as it happened (BUG-016, US-241): the real X
+     * connector, a provider answering 503 with the sentence the production
+     * log recorded, and the `SocialCrawlError` of kind `provider` that the
+     * client builds from it. What the poll does with that error is the
+     * claim; the connector's own handling of a 503 is the part the stub
+     * above could not reach.
+     */
+    const outage = async () =>
+      new Response(
+        JSON.stringify({
+          success: false,
+          error: "twitter is temporarily unavailable. Your credits have been refunded.",
+        }),
+        { status: 503, headers: { "content-type": "application/json" } },
+      );
+
+    const socialCrawlX = builtInSources.find(
+      (definition) => definition.platform.id === "x" && definition.provider.id === "socialcrawl",
+    ) as ConnectorDefinition;
+
+    const registry = createSourceRegistry({
+      definitions: [
+        fakeSourceDefinition({
+          id: "reddit",
+          displayName: "Reddit",
+          providerId: "brightdata",
+          providerName: "Bright Data",
+        }),
+        socialCrawlX,
+      ],
+      runtime: createSourceRuntime({ fetch: outage, logger: silentLogger }),
+    });
+
+    const monitorId = await insertMonitor(database, {
+      sources: ["reddit", "x"],
+      generatedQueries: { reddit: ["flaky tests"], x: ["flaky tests"] },
+    });
+    const boss = stubBoss();
+
+    await createCollectStep({
+      registry,
+      credentialsFor: (connector): Readonly<Record<string, string>> =>
+        connector.provider.id === "socialcrawl" ? { apiKey: "sc_test" } : { token: "test-token" },
+    })({ monitorId }, contextFor(db, boss));
 
     const stored = await db.select().from(posts);
 

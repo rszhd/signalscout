@@ -7,10 +7,106 @@ is what it is, and then read the ticket it names in
 [`backlog/done`](../backlog/done) for the whole story.
 
 It was the first two thousand lines of [AGENTS.md](../AGENTS.md) until US-116
-moved it here. The paragraphs are in the order they were written, which is
-roughly the order the work happened.
+moved it here. Since US-246 the paragraphs are grouped by area; inside an
+area they keep the order they were written, and each names its ticket and
+its date.
+
+## Contents
+
+- [Milestones](#milestones) — The repository split, and the changes that followed it, dated.
+- [Pipeline](#pipeline) — The first end-to-end run, the poll, the walk, and what a poll writes.
+- [Sources](#sources) — Each platform and provider as it arrived: what was measured, what was wrong, what was switched off.
+- [Model](#model) — The embedder, the threshold, deep threads, triage and the classifier, each against a real model.
+- [Costs](#costs) — The budget guard and the cost test on real polls.
+- [Accounts](#accounts) — Login, registration, verification, keys per account, onboarding and the session gate.
+- [Secrets](#secrets) — The first stored credential, and where a key is tested.
+- [Billing](#billing) — The trial, entitlement, Stripe and the webhook.
+- [Notifications](#notifications) — Webhooks, email and the digest, delivered live.
+- [Inbox](#inbox) — Orders, the CSV, reply drafts and the first verdicts.
+- [Sources: what was measured](#sources-what-was-measured) — moved from `docs/sources.md`
+- [Costs: what was measured](#costs-what-was-measured) — moved from `docs/costs.md`
+- [Testing: the incidents behind the rules](#testing-the-incidents-behind-the-rules) — moved from `docs/testing.md`
+- [Stack: what was measured](#stack-what-was-measured) — moved from `STACK.md`
+- [Instruments: what the first runs found](#instruments-what-the-first-runs-found) — moved from `docs/instruments.md`
+- [Secrets: the decisions](#secrets-the-decisions) — moved from `docs/secrets.md`
+- [Accounts: the decisions](#accounts-the-decisions) — moved from `docs/accounts.md`
+- [Code headers: the reasoning moved out](#code-headers-the-reasoning-moved-out) — moved from eight file headers
+- [AGENTS.md: the incidents behind the rules](#agentsmd-the-incidents-behind-the-rules) — moved from `AGENTS.md`
 
 ---
+
+## Milestones
+
+**The repository split, 2026-09-16 (US-151 to US-155).** One package,
+`packages/core`, became two — a stateless engine and a stateful pipeline —
+and the application above them lost its billing. Counted before the split:
+135 source files in core, 79 touching Postgres. The engine took 94 files by
+`git mv`, the pipeline kept the rest, and the six account tables moved to
+`apps/api` with a migration stream of their own. Both packages were published
+to npm at 0.1.0 from a tag; the hosted product moved to a private repository
+built on them and deployed from there the same evening, on the same box, the
+same database and the same domain, after staging was clicked through screen
+by screen. Two things surfaced on the way: a `pnpm` override for a tarball
+worked on one machine and asked the registry on the CI runner, so the release
+check installs with `npm`; and the "dispatch to roll back" path in the deploy
+workflow had never pushed an image, so its first use handed the box a
+reference with no digest. Neither touched production. The migrations the
+split needed dropped nothing: the pipeline's 0059 is a comment, the
+application's 0000 creates only what is missing, and its 0001 drops the
+subscriptions table an instance on this code never wrote to.
+
+**Every offered connector reads replies, 2026-09-17 (US-159).** Four had
+declined to, each for a recorded reason, and the owner asked for all four; the
+captures that answered them cost about $0.07 in total. ScrapeCreators YouTube:
+twenty comments a credit, `continuationToken` pages with no overlap, and
+`order` is ignored — `top` and `newest` returned the same page — so every date
+is arithmetic on "4 years ago" and every reply is marked approximate. SocialCrawl
+Reddit: one call at five credits returned **34 of 34** claimed comments five
+levels deep with no cursor and `truncated: false`, the first completeness claim
+in this repository measured right; the shared parser drops one wordless
+comment, and its child is stored naming a parent this instance holds no row
+for. SocialData X: `/twitter/tweets/<id>/comments` answers 200 where an invented
+path answers 404 free, twenty replies for $0.0040 — the post price — **newest
+first on both pages**, every reply carrying `conversation_id_str`, and one
+reply repeated between the two pages. Apify LinkedIn: a second actor,
+`linkedin-post-comments`, priced like a post at $0.002, with a `postedLimit`
+window nobody else offers; two comments came with their replies nested and a
+run with `scrapeReplies: true` charged the same two events as one without.
+Two captures leaked identity on their first pass — six X handles through
+`affiliation_label.label_url` and one LinkedIn name through a `PROFILE_MENTION`
+span — and both scrubbers grew the rule. None of the four has run a live poll
+with `includeReplies` on; the connectors are proven against captured payloads
+only.
+
+**Whose keys pay is its own setting, 2026-09-17 (US-161).** The hosted
+product is moving to instance keys — it pays the providers and the model, and
+a person who wants their own keys self-hosts — and the pipeline could not say
+so. `machineKeysUsable(signup)` answered four questions from one word: the
+provider keys, the model keys, the webhook address guard and the shared
+signing secret. A shared instance that pays for its accounts opens the first
+two and must keep the other two shut, and setting signup to `closed` on a
+shared box would have opened all four. So `MACHINE_KEYS` is a second axis,
+`account` or `instance`, defaulting from signup exactly as US-081 decided, and
+the guard and the secret follow `sharedInstance(signup)` alone. The compose
+test caught the variable missing from `docker-compose.yml`, which is the
+failure it exists for. Nothing has run live: the cloud will be the first
+instance to set `instance` with signup open.
+
+**A model call records whose account it was for, 2026-09-17 (US-162).** The
+hosted plans put a monthly allowance on an account, and the ledger could not
+sum one: `api_usage` carried `user_id` since BUG-009 and `model_calls` did
+not, and the calls a plan counts — a draft, a query generation, a key test —
+are the ones written with no monitor to join through. The column is written
+by the caller, never derived; `recordModelCall` requires it, and the type
+checker found all seven callers. Migration 0060 backfills from the monitor
+where there is one and leaves the rest null, which `accountSpend` counts for
+nobody, the same answer as an unknown price. `draftsThisMonth` counts every
+outcome on purpose: a plan that counted only the drafts that worked would let
+a failing model hand out unlimited attempts.
+
+---
+
+## Pipeline
 
 **The pipeline works end to end, and US-022 ran it.** On 2026-09-05 one
 monitor went from the form to fifty collected posts, twenty scored matches and
@@ -50,39 +146,153 @@ screen that writes one: a key is tested with the provider before it is stored,
 and a key the provider refuses is never stored. That closed US-010's last box. `apps/web` has four
 screens: the monitor form, the inbox, the monitor list and connections.
 
-**A real credential has been stored, tested and read back.** On 2026-09-05
-US-023 built the connections screen and ran it against Bright Data. US-024 then
-re-keyed that row from `reddit` to `brightdata`, and rehearsed the migration
-against a real database: a key stored the old way came back readable through
-the new code, with nobody retyping it. A wrong key
-was refused in 1.3 seconds, a `PUT` carrying it wrote no row, and the real key
-was accepted in 1.4 seconds and stored encrypted — hint `••••b3e7`, ciphertext
-93 characters, and no row anywhere containing the plaintext. Then the process
-was restarted with `REDDIT_API_KEY` unset, so the database held the only copy,
-and a test with an empty body decrypted the stored value and Bright Data
-accepted it. Paste, test, encrypt, store, boot-check, decrypt, provider
-accepts: proven end to end, on one source.
+**The fixed poll collects, measured live.** On 2026-09-10 the production
+monitor's own plan — five Reddit queries across eight subreddits — was polled
+three times against SocialCrawl: **125 posts returned and 104 stored new**, then
+100 and 95, then 125 and 109. **308 new posts for 14 credits, $0.1137**, where
+the same plan had stored nothing at all. The build is on staging and on
+production, and migration 0058 applied to the production database with a
+collection in flight.
 
-Five probes billed nothing. `api_usage` recorded no row for any of them, which
-is the free-check claim measured rather than argued.
+**The walk boundary is proven in both directions.** All three polls carried one
+`walk_id` and wrote **no coverage row**, because the walk was still paging. A
+second probe on a single (query, subreddit) pair finished inside one poll, wrote
+its mark, and the next poll opened a new walk. What the live run cannot
+discriminate is the mark's *value*: those two walks were two seconds apart, so
+the previous walk's start and the last poll's time are the same number there.
+That claim rests on the unit test.
 
-One thing stays unproven: no real browser has rendered the screen — it is
-driven through jsdom only.
+**An empty scoped Reddit search is refunded.** `Brand24 too expensive` inside
+r/SaaS returned nothing and cost **0 credits**, twice. This file already
+recorded that refund for SocialCrawl's *X search* and said the property does not
+travel; on `/v1/reddit/subreddit/search` it does. A page that matches nothing on
+this endpoint is free, and a page that matches is one credit — so the money in
+BUG-017 was paid for pages that *did* match and were then dropped by our own
+window, not for empty answers.
 
-One consequence bites on any machine that has stored a credential: the process
-refuses to boot without `ENCRYPTION_KEY`. That is US-004's check working as
-documented, and it means a process started before the key existed must be
-restarted.
+**The production monitor is paused, and the owner paused it.** It was found
+that way with **$1.06 spent of a $5.00 cap**, so the budget guard is not the
+cause — and the owner confirmed pressing Pause while the monitor was spending
+money and collecting nothing. There is no fault here: the screen says `Paused`,
+which is the truth. It is recorded because the next reader will find a live
+instance whose only monitor does not poll, and that is a decision rather than a
+bug.
 
-**A key is tested where it is pasted, not where it is used.** The connections
-screen calls `SocialSource.validateCredentials` before it stores anything. The
-screen is keyed by provider since US-024, so one card is one account and one
-rotation. On
-Reddit the probe is free: an empty input list cannot start a collection, so a
-bad key is refused at 401 before the input is read. A refusal and an unreachable
-provider are different answers — 200 with `valid: false` and the provider's own
-sentence, against 502 — because they lead to different actions. Read
-docs/secrets.md, *Testing before storing*.
+**Three faults sat between a paid page and a stored post, and all three are
+fixed.** BUG-015, BUG-016 and BUG-017 were found on 2026-09-10 by asking why
+the first monitor on the production instance collected nothing. Each ends the
+same way — a poll that spent money and stored no row — and each survives the
+other two being fixed.
+
+**A post found twice in one poll used to lose the whole collection.** BUG-015.
+`collect.ts` built one `INSERT` from every post every source returned, and
+Postgres refuses a statement whose own rows collide: *ON CONFLICT DO UPDATE
+command cannot affect row a second time*. It refuses the whole statement, so a
+poll that collected 125 posts stored none of them. The scoped Reddit search
+makes it ordinary rather than rare — five queries across eight subreddits is
+forty searches, and a post matching two of them arrives twice in one batch.
+**`on conflict` is not the guard people assume**: it resolves a collision with
+a row already in the table and says nothing about two rows arriving together.
+The batch is deduplicated on `(source, external_id)` before the statement is
+built, and `poll_runs.posts_returned` still counts what the connectors handed
+back, so a poll that found one post through three searches still says it paid
+for three.
+
+**One platform's outage used to throw away another platform's collection.**
+BUG-016, watched live. SocialCrawl answered 503 for X — *twitter is temporarily
+unavailable, your credits have been refunded* — the connector threw, and
+`collect` never reached its insert. Reddit's pages had been fetched, parsed and
+paid for, and they went with it; SocialCrawl refunded X's credits and nobody
+refunded Reddit's. **Retrying made it worse**, because the retry resumed the
+Reddit walk, bought more pages and threw again. A platform's failure is now
+kept to that platform, its continuation is left alone, and a poll where *every*
+platform asked has failed still throws so the outage reaches the dead letter
+queue. What is not done is the screen: a partial failure carries `error` as its
+stop reason while the outcome reads `collected`, and `pollSummary` shows a
+reason only for a refused, empty or failed poll.
+
+**A walk used to narrow its own window at the seam and pay for pages it then
+discarded.** BUG-017, and it is the one that cost $0.666.
+`monitors.last_polled_at` answered two questions — when a job last ran, which
+the interval needs, and how far the collection reaches, which the window needs
+— and it moves at the start of **every** poll, including the resumes of a walk
+still paging. So when one walk ended and the next began, the new one was handed
+a window as narrow as the gap between two polls: one minute, forty searches
+wide, every page bought and dropped by our own `since` filter. The production
+continuation was found at `scoped|22|0` carrying a seven-hour-old window, and
+two consecutive polls each read 5 pages for 5 credits and returned **zero
+posts**. The same forty pairs with **no** window returned **125 posts in 5
+pages for 5 credits**, so the pages are full and the window emptied them.
+
+`source_coverage` is the second mark, migration 0058, one row per (monitor,
+platform). It is written when a **walk** finishes and holds the moment that walk
+*started* — never its end, because a walk collects up to its own beginning and
+anything written while it paged may have been missed. **Erring early is the safe
+direction**: `posts` deduplicates, so a window that is too wide costs a page,
+and one that is too narrow loses posts with no trace. `greatest()` stops the
+mark moving backwards, and the migration seeds every monitor that has already
+polled from `last_polled_at` — what the window used to be — so the first poll
+after the upgrade behaves like the last one before it.
+
+**Three existing tests changed and none by weakening an assertion.** Each set
+up or reset the window through `last_polled_at`, which is no longer where a
+window comes from. The claims they protect are asserted unchanged.
+
+**Nothing about any of the three has run live.** The measurements above come
+from one probe against a real provider on a development machine and one
+triggered poll on the production box, both read from logs and rows rather than
+from a screen.
+
+**A poll now says what it did, and until it did a monitor that spent $0.666
+and collected nothing read `Running`.** US-104 closed on 2026-09-10, from a
+fault on the production instance. On 2026-09-09 the first monitor on
+app.signalscout.run polled fifteen times, billed SocialCrawl 67 Reddit credits
+and 15 X credits, stored **zero posts**, and stopped at `collect.ts`'s early
+return with no `filter` job ever sent. Every number needed to explain that was
+already in the database — `api_usage` had the spend, `posts` had nothing,
+`pgboss.job` had the timings — and none of them says what a *poll* did.
+
+**That cannot be reconstructed afterwards.** A poll that collected fifty posts
+this instance already held and a poll that collected nothing leave the same
+absence of rows. `poll_runs` is the record, migration 0056, and it is written on
+**seven of `collect.ts`'s eight exits** — the eighth is a deleted monitor, which
+has nothing to attach a row to. The six exits that ask no provider anything are
+the reason: those are the polls a person cannot otherwise explain.
+
+**Three counts, kept apart, because each pair answers a different question.**
+Returned against units says whether the searches found anything at all;
+returned against new says whether it was anything this instance had not seen.
+`posts_new` comes from `xmax = 0` on the returning clause, which is the only way
+to tell an inserted row from a found one when `on conflict do update` returns
+both. One "posts found" number collapses all three, and that is what the monitor
+list had.
+
+**A walk is not a job.** Fifteen poll jobs ran for one collection, because a
+paging walk resumes itself through the queue. `walk_id` groups them — a poll
+that finds no continuation mints one, a poll that resumes inherits the previous
+row's — so one collection reads as one collection rather than fifteen failures.
+
+**The stop reason is a closed set and a screen turns it into a sentence.** It is
+the field a person reads first, so it must be countable and assertable, and it
+is also where a provider's own error text would otherwise reach a page that has
+no redaction rule. Each reason sits on the **platform** rather than the poll: a
+poll may skip Reddit for want of a key and collect X in the same run.
+
+**One mutation passed, and it is the finding worth keeping.** `readPollRuns` has
+two locks — the monitor's owner and the owner on the row — and the scoping test
+could kill neither, because a poll writes both from the same person. Two rows a
+poll cannot produce were written by hand, each leaving one lock holding. **A
+guard nothing can reach is a guard nothing tests.** Twelve of thirteen mutations
+were caught the first time; 1,820 tests pass.
+
+**Nothing has run live.** No poll on a real machine has written a row. The
+production monitor this ticket came from is still the only evidence any of it
+was needed, and why *that* monitor collected nothing is a separate question this
+ticket does not answer.
+
+---
+
+## Sources
 
 **Neither platform is reached through its own API.** Reddit ended self-serve
 app registration in November 2025. X's own API is pay-per-use with no free
@@ -651,6 +861,47 @@ dropped.
 Still unproven for this connector: a real rate limit, a real timeout, a real
 outage, and a second poll proving deduplication on X.
 
+**The Reddit connector has collected twice, live, and both discovery modes
+are proven.** On 2026-09-05 a monitor with one keyword triggered a collection,
+waited through fourteen resumes over 7.6 minutes, and stored forty-nine real
+posts. A real DNS failure hit a poll job in that run, and the retry recovered
+it. Later the same day US-022 collected one subreddit: fifty records for
+$0.075, with the snapshot ready after 8 minutes 40 seconds. The trigger, the
+wait, the cursor, the snapshot read and the storage are proven for the keyword
+phase and the subreddit phase alike.
+
+Three things are still unproven: an expired snapshot, a collection the provider
+reports as failed, and a rate limit.
+
+That run also measured what nobody had measured. A monitor left at the
+60-second floor triggered a collection every minute, and each one billed 9 to
+11 records and returned no posts, because everything it found was older than
+the last poll. Poll frequency is a cost dial. US-013 turned half of that lesson
+into a limit; US-014 turned the other half into arithmetic — polls a month is
+the multiplier, so the same query costs $10.80 a month polled hourly and $648
+polled every minute.
+
+**Keyword discovery returns noise. A subreddit does not.** On 2026-09-05
+US-022 collected the same monitor both ways, for the same $0.075. The model's
+own keyword, "end to end tests keep breaking", brought back "failed both exams
+and don't know what to do" from r/AllFinraExams and "A never ending test" from
+r/islam: Bright Data matched "test" and "end" as ordinary words. One subreddit,
+r/softwaretesting, brought back fifty posts that are all on topic. The
+forty-nine posts the earlier keyword run stored are the same noise, and so are
+the four matches they produced.
+
+Two numbers came with that. A `min_score` of 30 is too low for a subreddit:
+"Dev memes" scored 33 and reached the inbox, because inside a topical subreddit
+every post is somewhat relevant and the scores compress upward. At 50 the same
+poll leaves nine matches and all nine are real. And the pre-filter dropped one
+post of fifty, because it was built for keyword noise — with subreddit
+discovery every collected post costs a model call, and that belongs in any
+arithmetic shown to a person.
+
+---
+
+## Model
+
 **The embedder has met a real provider once.** On 2026-09-05
 `capture:embeddings` embedded PLAN.md's example monitor and the five fake posts
 with OpenAI's `text-embedding-3-small`, for 176 tokens. The provider path, the
@@ -875,6 +1126,151 @@ hand, because Reddit answers 403 to an unauthenticated request, and
 `softwaretesting` was proven by a collection that returned fifty posts from
 it. What the plan is not proven to be is *useful* — a name that exists can
 still be the wrong place to look.
+
+**Triage was asked what the author wants, 2026-09-18 (US-221).** US-030's
+stage asked one question — could this author be a person to reach? — and that
+is a question about who the author is. Three of the classifier's five
+dimensions are about what the author wants, so a plausible person who wanted
+nothing passed triage and bought a classification that was always going to
+score low. The prompt now names what the second reader scores and splits
+`maybe`: doubt about a want stays `maybe`, and the plain absence of one is a
+`no`.
+
+Two captures of the same 50 items, `gpt-5.6-luna`, for $0.0137 each. The first
+refused `mild-problem-signal` — "Our Playwright tests break whenever the UI
+changes", which PLAN.md scores 50 and which is a lead. A complaint asks for
+nothing, and the prompt had just said that wanting nothing is a `no`. So the
+prompt now says a complaint counts and must never be refused, and the second
+capture kept it.
+
+**The stage went from keeping 19 of 46 comments to keeping 13.** People
+answering fell from 6 kept to 3 of 26; people asking held at 3 of 4, the
+refusal being US-030's known one about native Android. All three worked
+examples PLAN.md scores as leads survive, and `low-intent` — the one it does
+not — went from `maybe` to `no`, which is a classification that used to be paid
+for and now is not.
+
+**A sharper question is a shorter one, and not a cheaper one.** Output fell
+from 123 tokens an item to 80, below a classification's 95 for the first time,
+because the model's own reasoning shortened with the question. The cost per
+call did not follow: the longer prompt added to the input what the answer took
+off the output, 267 micro-dollars an item against 273. On the terra–luna pair
+the 46 comments went from 48% cheaper with triage to 61%; on one model for both
+stages, from 48% dearer to 37%. Neither number changed sign, and the worker
+still warns when a deployment has no price gap.
+
+**An evaluation model triages as well as the pinned one, for a seventh of the
+price, and US-229 is the five readings that say so.** TypeSafe's `jev-latest`
+answers a typed question against a shared state instead of reading a prompt.
+Measured on 2026-09-19:
+
+| reading | reference | result |
+|---|---|---|
+| eight matches judged in the inbox | a person | 8 of 8 good |
+| the 50 hand-labelled subjects | a person's labels | better than `gpt-5.6-luna` on every column |
+| 227 posts, five platforms | `gpt-5.6-sol` | 6 of 6 leads kept |
+| 183 held-out posts, side by side | `deepseek-flash` | neither loses a lead; Jev costs a seventh |
+| 30 calls, five per lead | itself | 0 flips |
+
+49 micro-dollars an item against 356. On a live trial it ran 545 calls without
+one failure and removed about 55% of what reached it.
+
+**How the question is put matters more than which model answers it.** An
+evaluation model takes no system prompt, and the spread between three
+translations of one rule was wider than the spread between Jev and
+`gpt-5.6-luna`. Sending `buildTriageSystemPrompt` as the Choice question's
+instructions — 5,166 characters written for a system slot — left the model near
+a coin flip: one plain lead answered `yes` at 0.44 against `no` at 0.40, and
+`no` on the next call. The monitor and the item as structured state, with a
+short rule, took the same lead to 0.94.
+
+**The product's triage rule is tuned for comments, and it shows on posts.**
+US-221 asked whether anything says the author wants an answer, and its fixture
+shows that helped on the 46 labelled comments. Applied to posts the same rule
+keeps 1 item in 227: a founder writing that a launch got no signups describes a
+live problem and asks nothing. The rule that works asks US-221's older question
+and keeps the clause that an explicit ask beats every refusal — dropping that
+clause alone cost two of six leads, both posts that open by describing the
+author's own product and ask for help at the end.
+
+**A refusal the model is unsure of is not a refusal, and it is load-bearing.**
+Two of the six leads answer `no` on all five runs and survive only because a
+`no` under 0.6 confidence keeps. Without the floor the rule catches four of six.
+An earlier reading — that the floor had rescued only junk across two samples —
+came from samples holding no lead near the boundary and was wrong.
+
+**Three of four rule comparisons run that day carried an error in the
+measuring rather than the measured**, and US-231 is the harness built against
+them. A dataset read from `live:triage-score`'s run record judged one rule on a
+300-character slice while the other saw the whole post. A confidence floor was
+written into the analysis backwards. A harness kept its own copy of the rule
+and measured a wording that was never shipped. Each produced a table that
+looked right.
+
+---
+
+## Costs
+
+**The budget guard has now refused a real poll, and US-049 is when.** On
+2026-09-06 an Instagram poll under a $1.00 cap spent $1.6317 and both paid
+stages refused: `classify` stopped with 89 comments unread — BUG-004's
+mid-batch branch, reached live for the first time — and `replies` refused to
+open four more threads. **The overshoot was 63%**, larger than anything
+recorded before, because each overshoot step on that platform is a 5-credit
+comment page rather than a 1-credit one. Read the rest of this paragraph as the
+history it now is. It has now allowed one
+and counted it: US-022's poll ran under a $0.20 cap and recorded $0.075 against
+it. Refusing is the half that no live run has reached. US-013's arithmetic, its
+cap and its two exhausted behaviours are asserted against real Postgres and a
+fake connector, and six deliberate mutations were confirmed to turn the suite
+red. What no test can prove is the input: the guard multiplies the units a
+connector reports by the price the connector declares. One day has now been
+compared against the provider's dashboard: on 2026-09-05 Bright Data reported
+95 records and $0.14, and `api_usage` held 98 records and $0.147 — 3.2% high,
+not low. That is one day against a dashboard, not a reconciliation against an
+invoice. Say the spend is an estimate, because
+[docs/costs.md](costs.md) says so to the user in four specific ways.
+
+**An embedding has no price until somebody sets one.** `provider.ts` carries
+chat prices read from a provider's page; we have read no embedding price, so an
+embedding call is recorded with a null cost until `AI_EMBEDDING_PRICE_MICROS`
+is set. Null means "we cannot say", which is the same rule an unpriced chat
+model already follows. Do not fill that table from memory.
+
+**A cap can be overshot by one poll.** The guard runs before a poll, because a
+page is billed when it is fetched. It cannot know what that poll will cost, so
+a monitor at $9.99 of a $10.00 cap starts one more poll. `maxPagesPerPoll`
+bounds the overshoot. US-014 does not remove it and was never going to: what
+the cost test changes is that a person is shown the size of the thing before
+they start it.
+
+**The cost test has run three times, and the first run corrected it.** On
+2026-09-05 three samples were collected live for $0.042. The trigger, the wait, the cursor, the
+resume and the unattributed `api_usage` row all worked. The arithmetic did not:
+it projected from the posts a sample kept, and the provider bills the records
+it collects. A query that had just cost ten records was reported as free.
+
+It now projects from `unitsConsumed`, and reports a range whenever a sample was
+billed everything it asked for, because one sample of ten cannot say what a
+poll of fifty costs. **Cost comes from units and volume comes from posts. Never
+price anything from a post count** — that is the mistake, it cost $0.042 to
+find, and the interface has carried `unitsConsumed` for exactly this reason
+since US-003.
+
+A second run, after BUG-002 was fixed, verified the window: the same keyword
+kept all ten posts inside seven days, where it had kept none. What is still
+unproven is that a keyword sample of ten predicts a keyword poll of fifty. The
+range is an admission of that, not a measurement of it.
+
+A third run, in US-022, billed ten records for $0.015 and projected $10.80 to
+$54.00 a month for one keyword polled hourly, which is over a $0.20 cap, so the
+form offered to save the plan without starting it. **The three live tests took
+1 minute 41 seconds, 8 minutes 8 seconds and 2 minutes 45 seconds**, so the
+screen's "about two minutes" is the fastest case and not the normal one.
+
+---
+
+## Accounts
 
 **This instance has a login, and one account.** US-017 shipped on 2026-09-08
 and is held in `doing/` with one acceptance box open — the credentials one,
@@ -1349,6 +1745,48 @@ driven through jsdom and the server half through `curl` against the built app.
 Read docs/accounts.md before changing the gate: it holds the proxy header a TLS
 terminator must send, and the SQL for getting back in.
 
+---
+
+## Secrets
+
+**A real credential has been stored, tested and read back.** On 2026-09-05
+US-023 built the connections screen and ran it against Bright Data. US-024 then
+re-keyed that row from `reddit` to `brightdata`, and rehearsed the migration
+against a real database: a key stored the old way came back readable through
+the new code, with nobody retyping it. A wrong key
+was refused in 1.3 seconds, a `PUT` carrying it wrote no row, and the real key
+was accepted in 1.4 seconds and stored encrypted — hint `••••b3e7`, ciphertext
+93 characters, and no row anywhere containing the plaintext. Then the process
+was restarted with `REDDIT_API_KEY` unset, so the database held the only copy,
+and a test with an empty body decrypted the stored value and Bright Data
+accepted it. Paste, test, encrypt, store, boot-check, decrypt, provider
+accepts: proven end to end, on one source.
+
+Five probes billed nothing. `api_usage` recorded no row for any of them, which
+is the free-check claim measured rather than argued.
+
+One thing stays unproven: no real browser has rendered the screen — it is
+driven through jsdom only.
+
+One consequence bites on any machine that has stored a credential: the process
+refuses to boot without `ENCRYPTION_KEY`. That is US-004's check working as
+documented, and it means a process started before the key existed must be
+restarted.
+
+**A key is tested where it is pasted, not where it is used.** The connections
+screen calls `SocialSource.validateCredentials` before it stores anything. The
+screen is keyed by provider since US-024, so one card is one account and one
+rotation. On
+Reddit the probe is free: an empty input list cannot start a collection, so a
+bad key is refused at 401 before the input is read. A refusal and an unreachable
+provider are different answers — 200 with `valid: false` and the provider's own
+sentence, against 502 — because they lead to different actions. Read
+docs/secrets.md, *Testing before storing*.
+
+---
+
+## Billing
+
 **The hosted version charges, and the self-hosted one never meets any of it.**
 US-072 closed on 2026-09-08. `BILLING_MODE` is `off` by default, which is
 `AUTH_SIGNUP`'s rule and reason: every instance running today is self-hosted,
@@ -1450,6 +1888,10 @@ lasting lesson rather than the setting: a whole class of connection fault is
 invisible to a green run, and the thing that found this one was running `curl`
 against the same host from the same machine and watching one client wait where
 the other would not.
+
+---
+
+## Notifications
 
 **A webhook secret belongs to an account, and a webhook cannot be aimed at our
 own network.** US-096 and US-097 closed on 2026-09-10, on the owner's decision
@@ -1593,149 +2035,9 @@ the **third** live sighting of US-006's failure path.
 Existing monitors were deliberately not migrated, so one stays silent until
 somebody opens its notification screen and saves. Read docs/notifications.md.
 
-**The fixed poll collects, measured live.** On 2026-09-10 the production
-monitor's own plan — five Reddit queries across eight subreddits — was polled
-three times against SocialCrawl: **125 posts returned and 104 stored new**, then
-100 and 95, then 125 and 109. **308 new posts for 14 credits, $0.1137**, where
-the same plan had stored nothing at all. The build is on staging and on
-production, and migration 0058 applied to the production database with a
-collection in flight.
+---
 
-**The walk boundary is proven in both directions.** All three polls carried one
-`walk_id` and wrote **no coverage row**, because the walk was still paging. A
-second probe on a single (query, subreddit) pair finished inside one poll, wrote
-its mark, and the next poll opened a new walk. What the live run cannot
-discriminate is the mark's *value*: those two walks were two seconds apart, so
-the previous walk's start and the last poll's time are the same number there.
-That claim rests on the unit test.
-
-**An empty scoped Reddit search is refunded.** `Brand24 too expensive` inside
-r/SaaS returned nothing and cost **0 credits**, twice. This file already
-recorded that refund for SocialCrawl's *X search* and said the property does not
-travel; on `/v1/reddit/subreddit/search` it does. A page that matches nothing on
-this endpoint is free, and a page that matches is one credit — so the money in
-BUG-017 was paid for pages that *did* match and were then dropped by our own
-window, not for empty answers.
-
-**The production monitor is paused, and the owner paused it.** It was found
-that way with **$1.06 spent of a $5.00 cap**, so the budget guard is not the
-cause — and the owner confirmed pressing Pause while the monitor was spending
-money and collecting nothing. There is no fault here: the screen says `Paused`,
-which is the truth. It is recorded because the next reader will find a live
-instance whose only monitor does not poll, and that is a decision rather than a
-bug.
-
-**Three faults sat between a paid page and a stored post, and all three are
-fixed.** BUG-015, BUG-016 and BUG-017 were found on 2026-09-10 by asking why
-the first monitor on the production instance collected nothing. Each ends the
-same way — a poll that spent money and stored no row — and each survives the
-other two being fixed.
-
-**A post found twice in one poll used to lose the whole collection.** BUG-015.
-`collect.ts` built one `INSERT` from every post every source returned, and
-Postgres refuses a statement whose own rows collide: *ON CONFLICT DO UPDATE
-command cannot affect row a second time*. It refuses the whole statement, so a
-poll that collected 125 posts stored none of them. The scoped Reddit search
-makes it ordinary rather than rare — five queries across eight subreddits is
-forty searches, and a post matching two of them arrives twice in one batch.
-**`on conflict` is not the guard people assume**: it resolves a collision with
-a row already in the table and says nothing about two rows arriving together.
-The batch is deduplicated on `(source, external_id)` before the statement is
-built, and `poll_runs.posts_returned` still counts what the connectors handed
-back, so a poll that found one post through three searches still says it paid
-for three.
-
-**One platform's outage used to throw away another platform's collection.**
-BUG-016, watched live. SocialCrawl answered 503 for X — *twitter is temporarily
-unavailable, your credits have been refunded* — the connector threw, and
-`collect` never reached its insert. Reddit's pages had been fetched, parsed and
-paid for, and they went with it; SocialCrawl refunded X's credits and nobody
-refunded Reddit's. **Retrying made it worse**, because the retry resumed the
-Reddit walk, bought more pages and threw again. A platform's failure is now
-kept to that platform, its continuation is left alone, and a poll where *every*
-platform asked has failed still throws so the outage reaches the dead letter
-queue. What is not done is the screen: a partial failure carries `error` as its
-stop reason while the outcome reads `collected`, and `pollSummary` shows a
-reason only for a refused, empty or failed poll.
-
-**A walk used to narrow its own window at the seam and pay for pages it then
-discarded.** BUG-017, and it is the one that cost $0.666.
-`monitors.last_polled_at` answered two questions — when a job last ran, which
-the interval needs, and how far the collection reaches, which the window needs
-— and it moves at the start of **every** poll, including the resumes of a walk
-still paging. So when one walk ended and the next began, the new one was handed
-a window as narrow as the gap between two polls: one minute, forty searches
-wide, every page bought and dropped by our own `since` filter. The production
-continuation was found at `scoped|22|0` carrying a seven-hour-old window, and
-two consecutive polls each read 5 pages for 5 credits and returned **zero
-posts**. The same forty pairs with **no** window returned **125 posts in 5
-pages for 5 credits**, so the pages are full and the window emptied them.
-
-`source_coverage` is the second mark, migration 0058, one row per (monitor,
-platform). It is written when a **walk** finishes and holds the moment that walk
-*started* — never its end, because a walk collects up to its own beginning and
-anything written while it paged may have been missed. **Erring early is the safe
-direction**: `posts` deduplicates, so a window that is too wide costs a page,
-and one that is too narrow loses posts with no trace. `greatest()` stops the
-mark moving backwards, and the migration seeds every monitor that has already
-polled from `last_polled_at` — what the window used to be — so the first poll
-after the upgrade behaves like the last one before it.
-
-**Three existing tests changed and none by weakening an assertion.** Each set
-up or reset the window through `last_polled_at`, which is no longer where a
-window comes from. The claims they protect are asserted unchanged.
-
-**Nothing about any of the three has run live.** The measurements above come
-from one probe against a real provider on a development machine and one
-triggered poll on the production box, both read from logs and rows rather than
-from a screen.
-
-**A poll now says what it did, and until it did a monitor that spent $0.666
-and collected nothing read `Running`.** US-104 closed on 2026-09-10, from a
-fault on the production instance. On 2026-09-09 the first monitor on
-app.signalscout.run polled fifteen times, billed SocialCrawl 67 Reddit credits
-and 15 X credits, stored **zero posts**, and stopped at `collect.ts`'s early
-return with no `filter` job ever sent. Every number needed to explain that was
-already in the database — `api_usage` had the spend, `posts` had nothing,
-`pgboss.job` had the timings — and none of them says what a *poll* did.
-
-**That cannot be reconstructed afterwards.** A poll that collected fifty posts
-this instance already held and a poll that collected nothing leave the same
-absence of rows. `poll_runs` is the record, migration 0056, and it is written on
-**seven of `collect.ts`'s eight exits** — the eighth is a deleted monitor, which
-has nothing to attach a row to. The six exits that ask no provider anything are
-the reason: those are the polls a person cannot otherwise explain.
-
-**Three counts, kept apart, because each pair answers a different question.**
-Returned against units says whether the searches found anything at all;
-returned against new says whether it was anything this instance had not seen.
-`posts_new` comes from `xmax = 0` on the returning clause, which is the only way
-to tell an inserted row from a found one when `on conflict do update` returns
-both. One "posts found" number collapses all three, and that is what the monitor
-list had.
-
-**A walk is not a job.** Fifteen poll jobs ran for one collection, because a
-paging walk resumes itself through the queue. `walk_id` groups them — a poll
-that finds no continuation mints one, a poll that resumes inherits the previous
-row's — so one collection reads as one collection rather than fifteen failures.
-
-**The stop reason is a closed set and a screen turns it into a sentence.** It is
-the field a person reads first, so it must be countable and assertable, and it
-is also where a provider's own error text would otherwise reach a page that has
-no redaction rule. Each reason sits on the **platform** rather than the poll: a
-poll may skip Reddit for want of a key and collect X in the same run.
-
-**One mutation passed, and it is the finding worth keeping.** `readPollRuns` has
-two locks — the monitor's owner and the owner on the row — and the scoping test
-could kill neither, because a poll writes both from the same person. Two rows a
-poll cannot produce were written by hand, each leaving one lock holding. **A
-guard nothing can reach is a guard nothing tests.** Twelve of thirteen mutations
-were caught the first time; 1,820 tests pass.
-
-**Nothing has run live.** No poll on a real machine has written a row. The
-production monitor this ticket came from is still the only evidence any of it
-was needed, and why *that* monitor collected nothing is a separate question this
-ticket does not answer.
+## Inbox
 
 **The inbox has three orders, and adding them found a cursor that was already
 wrong.** US-114 closed on 2026-09-11. US-011's rank subtracts twelve points a
@@ -1928,244 +2230,994 @@ product, the ideal customer, the problem and the signals — and nothing else. I
 is the version a verdict was given against. A rename, an edited query or a
 moved threshold must not move it.
 
-**The Reddit connector has collected twice, live, and both discovery modes
-are proven.** On 2026-09-05 a monitor with one keyword triggered a collection,
-waited through fourteen resumes over 7.6 minutes, and stored forty-nine real
-posts. A real DNS failure hit a poll job in that run, and the retry recovered
-it. Later the same day US-022 collected one subreddit: fifty records for
-$0.075, with the snapshot ready after 8 minutes 40 seconds. The trigger, the
-wait, the cursor, the snapshot read and the storage are proven for the keyword
-phase and the subreddit phase alike.
+---
 
-Three things are still unproven: an expired snapshot, a collection the provider
-reports as failed, and a rate limit.
+## Sources: what was measured
 
-That run also measured what nobody had measured. A monitor left at the
-60-second floor triggered a collection every minute, and each one billed 9 to
-11 records and returned no posts, because everything it found was older than
-the last poll. Poll frequency is a cost dial. US-013 turned half of that lesson
-into a limit; US-014 turned the other half into arithmetic — polls a month is
-the multiplier, so the same query costs $10.80 a month polled hourly and $648
-polled every minute.
+Moved here from `docs/sources.md` on 2026-09-20, when that page was cut to
+its rules. Each paragraph names the ticket that holds the whole story.
 
-**Keyword discovery returns noise. A subreddit does not.** On 2026-09-05
-US-022 collected the same monitor both ways, for the same $0.075. The model's
-own keyword, "end to end tests keep breaking", brought back "failed both exams
-and don't know what to do" from r/AllFinraExams and "A never ending test" from
-r/islam: Bright Data matched "test" and "end" as ordinary words. One subreddit,
-r/softwaretesting, brought back fifty posts that are all on topic. The
-forty-nine posts the earlier keyword run stored are the same noise, and so are
-the four matches they produced.
+**Why X had one provider, and then two.** US-006 asked all three accounts
+held at the time. Bright Data's X dataset answers a discovery trigger with
+`Available types: profile_url, profiles_array` — it fetches the posts of
+accounts you name and cannot search. ScrapeCreators published six X endpoints
+and none was a search. SocialCrawl had `/v1/twitter/search/tweets`. US-061
+added SocialData on 2026-09-07, which searches, so the rule survived: ask
+whether a provider can discover a stranger, not whether it can fetch a URL.
 
-Two numbers came with that. A `min_score` of 30 is too low for a subreddit:
-"Dev memes" scored 33 and reached the inbox, because inside a topical subreddit
-every post is somewhat relevant and the scores compress upward. At 50 the same
-poll leaves nine matches and all nine are real. And the pre-filter dropped one
-post of fifty, because it was built for keyword noise — with subreddit
-discovery every collected post costs a model call, and that belongs in any
-arithmetic shown to a person.
+**LinkedIn was one provider by convenience.** US-028 used SocialCrawl because
+the key was already there; Bright Data and ScrapeCreators were never asked.
+US-056 later measured three providers and US-057 shipped Apify as a second.
+US-053 switched SocialCrawl LinkedIn off on 2026-09-09.
 
-**The budget guard has now refused a real poll, and US-049 is when.** On
-2026-09-06 an Instagram poll under a $1.00 cap spent $1.6317 and both paid
-stages refused: `classify` stopped with 89 comments unread — BUG-004's
-mid-batch branch, reached live for the first time — and `replies` refused to
-open four more threads. **The overshoot was 63%**, larger than anything
-recorded before, because each overshoot step on that platform is a 5-credit
-comment page rather than a 1-credit one. Read the rest of this paragraph as the
-history it now is. It has now allowed one
-and counted it: US-022's poll ran under a $0.20 cap and recorded $0.075 against
-it. Refusing is the half that no live run has reached. US-013's arithmetic, its
-cap and its two exhausted behaviours are asserted against real Postgres and a
-fake connector, and six deliberate mutations were confirmed to turn the suite
-red. What no test can prove is the input: the guard multiplies the units a
-connector reports by the price the connector declares. One day has now been
-compared against the provider's dashboard: on 2026-09-05 Bright Data reported
-95 records and $0.14, and `api_usage` held 98 records and $0.147 — 3.2% high,
-not low. That is one day against a dashboard, not a reconciliation against an
-invoice. Say the spend is an estimate, because
-[docs/costs.md](costs.md) says so to the user in four specific ways.
+**Second providers, 2026-09-11 and 2026-09-17.** After the owner asked for two
+providers everywhere, US-119 and US-121 measured TikTok and YouTube at a
+second provider and US-126 and US-127 built them. The owner decided on
+2026-09-17 that Instagram and LinkedIn keep one provider each: US-160 measured
+HikerAPI, the one native Instagram search found, and it has no date window
+and orders by relevance across years; US-122 eliminated every LinkedIn route
+on price, on Google, or on needing the person's own account. US-158 switched
+Bright Data Reddit off on price on 2026-09-17.
 
-**An embedding has no price until somebody sets one.** `provider.ts` carries
-chat prices read from a provider's page; we have read no embedding price, so an
-embedding call is recorded with a null cost until `AI_EMBEDDING_PRICE_MICROS`
-is set. Null means "we cannot say", which is the same rule an unpriced chat
-model already follows. Do not fill that table from memory.
+**Instagram broke three things its four SocialCrawl siblings agree on**
+(US-049). A search with no date window returned thirty results from 2021 to
+2026 in relevance order, the newest five months old, so Instagram is the one
+connector that always sends a window; LinkedIn deliberately sends none. The
+cursor from a full first page returned zero items, zero credits and another
+`has_more: true`. Three of nine comment fields — `url`, `post_id`,
+`author.display_name` — are null on every comment, against 137 captured
+comments from X, YouTube and TikTok that fill all three, so the shared parser
+falls back to the handle and BUG-007's wrong-parent check is inert there. A
+reel search is 1 credit and a comment page is 5.
 
-**A cap can be overshot by one poll.** The guard runs before a poll, because a
-page is billed when it is fetched. It cannot know what that poll will cost, so
-a monitor at $9.99 of a $10.00 cap starts one more poll. `maxPagesPerPoll`
-bounds the overshoot. US-014 does not remove it and was never going to: what
-the cost test changes is that a person is shown the size of the thing before
-they start it.
+**US-028 asked the LinkedIn endpoint nine questions and four answers
+contradicted the X connector** on the same provider: price per call, cursor,
+sort order, how a date window is taken, and what an empty search returns.
 
-**The cost test has run three times, and the first run corrected it.** On
-2026-09-05 three samples were collected live for $0.042. The trigger, the wait, the cursor, the
-resume and the unattributed `api_usage` row all worked. The arithmetic did not:
-it projected from the posts a sample kept, and the provider bills the records
-it collects. A query that had just cost ten records was reported as free.
+**ScrapeCreators answers "nothing" three ways.** TikTok returns thirty
+unrelated videos and bills; YouTube returns an honest empty page and bills;
+the Instagram reels search answers 404 and charges nothing. An invalid
+parameter value is ignored and billed rather than refused, on every endpoint
+but Reddit.
 
-It now projects from `unitsConsumed`, and reports a range whenever a sample was
-billed everything it asked for, because one sample of ten cannot say what a
-poll of fifty costs. **Cost comes from units and volume comes from posts. Never
-price anything from a post count** — that is the mistake, it cost $0.042 to
-find, and the interface has carried `unitsConsumed` for exactly this reason
-since US-003.
+**The provider switch never reaches a running collection — measured.** On
+2026-09-05 `live:provider-switch` started a Bright Data collection of
+r/softwaretesting, moved the recorded choice to ScrapeCreators one second
+later, and watched the snapshot finish. All four resumes went to Bright Data
+with its own cursor. It spends about $0.08.
 
-A second run, after BUG-002 was fixed, verified the window: the same keyword
-kept all ten posts inside seven days, where it had kept none. What is still
-unproven is that a keyword sample of ten predicts a keyword poll of fifty. The
-range is an admission of that, not a measurement of it.
+**Two Reddit connectors store one row.** A poll through ScrapeCreators
+collected 47 posts from a subreddit Bright Data had already collected and
+stored no new row: both read the `t3_` fullname, which Bright Data calls
+`post_id` and ScrapeCreators calls `name`.
 
-A third run, in US-022, billed ten records for $0.015 and projected $10.80 to
-$54.00 a month for one keyword polled hourly, which is over a $0.20 cap, so the
-form offered to save the plan without starting it. **The three live tests took
-1 minute 41 seconds, 8 minutes 8 seconds and 2 minutes 45 seconds**, so the
-screen's "about two minutes" is the fastest case and not the normal one.
+**BUG-010, whose choice.** `source_providers` was keyed by the platform alone
+until 2026-09-10, so on an instance taking registrations one account's choice
+decided what every account polled through, and a choice that cannot run being
+refused meant a stranger could stop somebody's monitors.
 
-**The repository split, 2026-09-16 (US-151 to US-155).** One package,
-`packages/core`, became two — a stateless engine and a stateful pipeline —
-and the application above them lost its billing. Counted before the split:
-135 source files in core, 79 touching Postgres. The engine took 94 files by
-`git mv`, the pipeline kept the rest, and the six account tables moved to
-`apps/api` with a migration stream of their own. Both packages were published
-to npm at 0.1.0 from a tag; the hosted product moved to a private repository
-built on them and deployed from there the same evening, on the same box, the
-same database and the same domain, after staging was clicked through screen
-by screen. Two things surfaced on the way: a `pnpm` override for a tarball
-worked on one machine and asked the registry on the CI runner, so the release
-check installs with `npm`; and the "dispatch to roll back" path in the deploy
-workflow had never pushed an image, so its first use handed the box a
-reference with no digest. Neither touched production. The migrations the
-split needed dropped nothing: the pipeline's 0059 is a comment, the
-application's 0000 creates only what is missing, and its 0001 drops the
-subscriptions table an instance on this code never wrote to.
+**US-158 found the edge of US-053's claim** that switching a connector off
+costs nothing outside its own file: four test files used Bright Data as their
+sample Reddit provider and each had to name an offered one. No production code
+moved.
 
-**Every offered connector reads replies, 2026-09-17 (US-159).** Four had
-declined to, each for a recorded reason, and the owner asked for all four; the
-captures that answered them cost about $0.07 in total. ScrapeCreators YouTube:
-twenty comments a credit, `continuationToken` pages with no overlap, and
-`order` is ignored — `top` and `newest` returned the same page — so every date
-is arithmetic on "4 years ago" and every reply is marked approximate. SocialCrawl
-Reddit: one call at five credits returned **34 of 34** claimed comments five
-levels deep with no cursor and `truncated: false`, the first completeness claim
-in this repository measured right; the shared parser drops one wordless
-comment, and its child is stored naming a parent this instance holds no row
-for. SocialData X: `/twitter/tweets/<id>/comments` answers 200 where an invented
-path answers 404 free, twenty replies for $0.0040 — the post price — **newest
-first on both pages**, every reply carrying `conversation_id_str`, and one
-reply repeated between the two pages. Apify LinkedIn: a second actor,
-`linkedin-post-comments`, priced like a post at $0.002, with a `postedLimit`
-window nobody else offers; two comments came with their replies nested and a
-run with `scrapeReplies: true` charged the same two events as one without.
-Two captures leaked identity on their first pass — six X handles through
-`affiliation_label.label_url` and one LinkedIn name through a `PROFILE_MENTION`
-span — and both scrubbers grew the rule. None of the four has run a live poll
-with `includeReplies` on; the connectors are proven against captured payloads
-only.
+**The capture scripts, and what each first run corrected.** Bright Data's
+answered three questions the provider's documentation got wrong.
+ScrapeCreators' answered four more, three absent from the documentation: the
+API is synchronous, a `timeframe` is refused beside `sort=new`, and a subreddit
+that does not exist answers 200 with an empty list and bills; the fourth was
+what a credential probe costs, which is why `ledger.json` exists. SocialCrawl
+LinkedIn's scrubber let real names and job headlines through on its first run
+because it sniffed for fields the provider does not use; the provider puts a
+person under `author` as `{ name, description, url, avatar }`.
 
-**Whose keys pay is its own setting, 2026-09-17 (US-161).** The hosted
-product is moving to instance keys — it pays the providers and the model, and
-a person who wants their own keys self-hosts — and the pipeline could not say
-so. `machineKeysUsable(signup)` answered four questions from one word: the
-provider keys, the model keys, the webhook address guard and the shared
-signing secret. A shared instance that pays for its accounts opens the first
-two and must keep the other two shut, and setting signup to `closed` on a
-shared box would have opened all four. So `MACHINE_KEYS` is a second axis,
-`account` or `instance`, defaulting from signup exactly as US-081 decided, and
-the guard and the secret follow `sharedInstance(signup)` alone. The compose
-test caught the variable missing from `docker-compose.yml`, which is the
-failure it exists for. Nothing has run live: the cloud will be the first
-instance to set `instance` with signup open.
+**A ScrapeCreators 404 was captured for an available post** with a shortened
+URL (US-015), which is why only a definite deletion may return `deleted`.
 
-**A model call records whose account it was for, 2026-09-17 (US-162).** The
-hosted plans put a monthly allowance on an account, and the ledger could not
-sum one: `api_usage` carried `user_id` since BUG-009 and `model_calls` did
-not, and the calls a plan counts — a draft, a query generation, a key test —
-are the ones written with no monitor to join through. The column is written
-by the caller, never derived; `recordModelCall` requires it, and the type
-checker found all seven callers. Migration 0060 backfills from the monitor
-where there is one and leaves the rest null, which `accountSpend` counts for
-nobody, the same answer as an unknown price. `draftsThisMonth` counts every
-outcome on purpose: a plan that counted only the drafts that worked would let
-a failing model hand out unlimited attempts.
+### The providers, compared
 
+Measured on the dates the tickets say; prices as read then.
 
-**Triage was asked what the author wants, 2026-09-18 (US-221).** US-030's
-stage asked one question — could this author be a person to reach? — and that
-is a question about who the author is. Three of the classifier's five
-dimensions are about what the author wants, so a plausible person who wanted
-nothing passed triage and bought a classification that was always going to
-score low. The prompt now names what the second reader scores and splits
-`maybe`: doubt about a want stays `maybe`, and the plain absence of one is a
-`no`.
+| | Bright Data | ScrapeCreators | SocialCrawl | SocialData | Apify |
+|---|---|---|---|---|---|
+| Fetches | Reddit, switched off since US-158 | Reddit, TikTok, YouTube | Reddit, X, YouTube, TikTok, Instagram — and LinkedIn, switched off since US-053 | X | LinkedIn |
+| Billable unit | a record | a request | a credit: 1 on X, Reddit, YouTube and TikTok, 5 on LinkedIn and an Instagram comment page | a tweet | a post, settled from the run's own total |
+| Price | $1.50 / 1,000 records | $1.88 / 1,000 requests | $8.12 / 1,000 credits | $0.20 / 1,000 tweets | $2.00 / 1,000 posts |
+| One unit buys | one post | 7 to 23 posts, measured | 20 X posts, 25 Reddit posts, 45 YouTube videos, 30 reels — or 15 Instagram comments for five credits | one tweet | one post |
+| A call that finds nothing | billed | billed | refunded on X search and on a scoped Reddit search; billed in full on LinkedIn, which returns unrelated posts rather than none | billed, outside the free allowance | billed — a run that matches nothing still costs its start event |
+| Shape | trigger, then poll a snapshot | the posts are in the answer | the posts are in the answer | the posts are in the answer | start an actor run, then read it |
+| A collection took | 8 minutes 40 seconds, and 2 minutes 13 on another day | 1.8 to 4.9 seconds | 1.4 to 5.3 seconds | under 2 seconds | 3 to 11 seconds |
+| A refused key says | `Invalid credentials`, as a bare string | `{"message":"Invalid API key"}` | `Invalid API key format. Keys start with 'sc_'.` | 401, and an empty balance is **402** | the actor refuses the run |
 
-Two captures of the same 50 items, `gpt-5.6-luna`, for $0.0137 each. The first
-refused `mild-problem-signal` — "Our Playwright tests break whenever the UI
-changes", which PLAN.md scores 50 and which is a lead. A complaint asks for
-nothing, and the prompt had just said that wanting nothing is a `no`. So the
-prompt now says a complaint counts and must never be refused, and the second
-capture kept it.
+SocialCrawl prices in pounds and every figure here is in micro-dollars, so
+its price carries an exchange rate; `x.ts` names the rate and the day it was
+read.
 
-**The stage went from keeping 19 of 46 comments to keeping 13.** People
-answering fell from 6 kept to 3 of 26; people asking held at 3 of 4, the
-refusal being US-030's known one about native Android. All three worked
-examples PLAN.md scores as leads survive, and `low-intent` — the one it does
-not — went from `maybe` to `no`, which is a classification that used to be paid
-for and now is not.
+### Who reads replies
 
-**A sharper question is a shorter one, and not a cheaper one.** Output fell
-from 123 tokens an item to 80, below a classification's 95 for the first time,
-because the model's own reasoning shortened with the question. The cost per
-call did not follow: the longer prompt added to the input what the answer took
-off the output, 267 micro-dollars an item against 273. On the terra–luna pair
-the 46 comments went from 48% cheaper with triage to 61%; on one model for both
-stages, from 48% dearer to 37%. Neither number changed sign, and the worker
-still warns when a deployment has no price gap.
+Every offered connector reads replies since US-159, and no two read them the
+same way. Measured on 2026-09-17 unless a row says otherwise.
 
-**An evaluation model triages as well as the pinned one, for a seventh of the
-price, and US-229 is the five readings that say so.** TypeSafe's `jev-latest`
-answers a typed question against a shared state instead of reading a prompt.
-Measured on 2026-09-19:
+| Platform | Provider | One reply call buys | Price | Ordered | Nested | Completeness claim |
+|---|---|---|---|---|---|---|
+| Reddit | ScrapeCreators | a page of ~25, flat | 1 credit, $0.00188 | no | `parent_id` | **wrong**: `has_more: false` with 33 of 58 missing (US-020) |
+| Reddit | SocialCrawl | **the whole thread**, 34 of 34 five levels deep, no cursor | 5 credits, $0.0406 | no | `parent_id`, tree flattened | `truncated: false` — the one claim measured right |
+| X | SocialCrawl | a page of ~28 | 1 credit, $0.0081 | no | `parent_id` | wrong: cursor to an empty page, refunded (US-020) |
+| X | SocialData | a page of 20 | 20 tweets, $0.0040 | **newest first** — the only reply endpoint that may stop early | `in_reply_to_status_id_str`; `conversation_id_str` checks the thread | cursor followed to 20 more; one overlapped |
+| YouTube | SocialCrawl | a page of ~51 | 1 credit, $0.0081 | newest first, on an exact timestamp | `parent_id` | consistent with `total` on one thread (US-020) |
+| YouTube | ScrapeCreators | a page of 20 | 1 credit, $0.00188 | **no — `order` is ignored** | none on the wire; nested replies behind their own token, unread | `continuationToken` pages, no overlap |
+| TikTok | ScrapeCreators | a page of ~11 | 1 credit, $0.00188 | no | `reply_id` | `reply_comment_total` beside a couple of replies (US-119) |
+| TikTok | SocialCrawl | a page of up to 50 | 1 credit, $0.0081 | no | `parent_id` | (US-044) |
+| Instagram | SocialCrawl | a page of 15 | 5 credits, $0.0406 | no | `parent_id` | wrong: `has_more: true` beside an empty page (US-049) |
+| LinkedIn | Apify | up to 10 top-level comments, replies nested | $0.002 a comment, the post price | no | from the tree — no parent id on the wire | none: `maxItems` is the only bound |
 
-| reading | reference | result |
-|---|---|---|
-| eight matches judged in the inbox | a person | 8 of 8 good |
-| the 50 hand-labelled subjects | a person's labels | better than `gpt-5.6-luna` on every column |
-| 227 posts, five platforms | `gpt-5.6-sol` | 6 of 6 leads kept |
-| 183 held-out posts, side by side | `deepseek-flash` | neither loses a lead; Jev costs a seventh |
-| 30 calls, five per lead | itself | 0 flips |
+Three rows carry a warning the connector's own header repeats. ScrapeCreators
+YouTube computes every comment's date from "4 years ago" and marks every reply
+approximate; it exists so an instance with only that key is not given nothing,
+and `socialcrawl/youtube.ts` stays the better choice. SocialCrawl Reddit is
+twenty-two times the price of ScrapeCreators on the median twelve-comment
+thread, which the cheap one finishes too. The Apify comments actor is the one
+reply call that waits inside the job rather than handing the wait back,
+because the replies worker takes only `ready` or `done`.
 
-49 micro-dollars an item against 356. On a live trial it ran 545 calls without
-one failure and removed about 55% of what reached it.
+---
 
-**How the question is put matters more than which model answers it.** An
-evaluation model takes no system prompt, and the spread between three
-translations of one rule was wider than the spread between Jev and
-`gpt-5.6-luna`. Sending `buildTriageSystemPrompt` as the Choice question's
-instructions — 5,166 characters written for a system slot — left the model near
-a coin flip: one plain lead answered `yes` at 0.44 against `no` at 0.40, and
-`no` on the next call. The monitor and the item as structured state, with a
-short rule, took the same lead to 0.94.
+## Costs: what was measured
 
-**The product's triage rule is tuned for comments, and it shows on posts.**
-US-221 asked whether anything says the author wants an answer, and its fixture
-shows that helped on the 46 labelled comments. Applied to posts the same rule
-keeps 1 item in 227: a founder writing that a launch got no signups describes a
-live problem and asks nothing. The rule that works asks US-221's older question
-and keeps the clause that an explicit ask beats every refusal — dropping that
-clause alone cost two of six leads, both posts that open by describing the
-author's own product and ask for help at the end.
+Moved here from `docs/costs.md` on 2026-09-20, when that page was cut to its
+rules.
 
-**A refusal the model is unsure of is not a refusal, and it is load-bearing.**
-Two of the six leads answer `no` on all five runs and survive only because a
-`no` under 0.6 confidence keeps. Without the floor the rule catches four of six.
-An earlier reading — that the floor had rescued only junk across two samples —
-came from samples holding no lead near the boundary and was wrong.
+### The price table, as read
 
-**Three of four rule comparisons run that day carried an error in the
-measuring rather than the measured**, and US-231 is the harness built against
-them. A dataset read from `live:triage-score`'s run record judged one rule on a
-300-character slice while the other saw the whole post. A confidence floor was
-written into the analysis backwards. A harness kept its own copy of the rule
-and measured a wording that was never shipped. Each produced a table that
-looked right.
+Each price is the one its connector declares; each per-post figure is that
+price divided by the `postsPerUnit` the connector measured.
+
+| Platform | Provider | Billable unit | Price per unit | Per post |
+|---|---|---|---|---|
+| Reddit | Bright Data — switched off since US-158 | a record | $0.0015 | $0.0015 |
+| Reddit | ScrapeCreators | a request | $0.00188 | ~$0.00027 (7–23 posts a request) |
+| Reddit | SocialCrawl | a credit | $0.008118 | ~$0.00032 (25 posts) |
+| X | SocialData | a tweet | $0.0002 | $0.0002 |
+| X | SocialCrawl | a request | $0.008118 | ~$0.0004 (20 posts) |
+| LinkedIn | Apify | a post | $0.002 | $0.002 |
+| YouTube | SocialCrawl | a credit | $0.008118 | ~$0.00018 (45 videos) |
+| TikTok | SocialCrawl | a credit | $0.008118 | ~$0.00027 (30 videos) |
+| Instagram | SocialCrawl | a credit | $0.008118 | ~$0.00027 (30 reels) |
+| Instagram comments | SocialCrawl | 5 credits a page | $0.0406 | ~$0.0027 (15 comments) |
+
+An Instagram comment at $0.0027 is fifteen times a YouTube video, thirteen
+times a tweet through SocialData, and a third dearer than a LinkedIn post
+through Apify. One live Instagram poll spent $1.6317 with SocialCrawl against
+$0.3336 with the model, the reverse of every other platform. Bright Data's
+first 5,000 records a month were free and never modelled; US-158 switched the
+connector off on the price past the allowance.
+
+**One day has been compared, once.** On 2026-09-05 Bright Data's dashboard
+reported 95 records and $0.14; `api_usage` held 98 records and $0.147 for the
+same day — 3.2% high. The likeliest cause is that a collection is triggered
+with `include_errors=true` and we count every record the snapshot reports
+while the provider does not bill a failed one. A dashboard is not an invoice
+and one day is not a reconciliation.
+
+### Triage, measured
+
+US-030 measured a triage answer at 113 output tokens against a
+classification's 95: a reasoning model bills its thinking as output. US-221
+sharpened the question and the thinking shrank to 80, but the longer prompt
+added to the input what the answer took off the output: 267 micro-dollars an
+item before, 273 after. Over 46 real comments, keeping 13, a classifier ten
+times dearer than the triage model made the bill 61% smaller; the same model
+on both stages made it 37% larger. Before US-221 the stage kept 19 of those
+46; after, 13. US-177 added `AI_TRIAGE=off` because a blank `AI_TRIAGE_MODEL`
+ran triage on the classifier's own model.
+
+US-229 measured `jev-latest` through `AI_TRIAGE_PROVIDER=typesafe` over 227
+items from five platforms: 43.7 micro-dollars an item against `gpt-5.6-luna`'s
+355.6 (priced at 42,000 per million input tokens and nothing for output,
+against 200,000 and 1,200,000), the same six leads scoring 60 or more kept by
+both, and twelve items sent to the classifier rather than seventeen. Every
+number was fitted to the sample it was scored against. An evaluation model
+takes no system prompt, so the question is put as structured state, and it is
+the question US-221 replaced.
+
+### DeepSeek's four rates
+
+US-124 read the page: each model has peak and off-peak rates, each split into
+cache hit and cache miss, and one million input tokens on `deepseek-flash`
+costs $0.003 in one band and $0.30 in another. The usage the API returns does
+not say which band a call landed in.
+
+### The cost test's first live run, 2026-09-05
+
+A sample of "flaky end to end tests" was billed ten records and returned no
+posts: every post it found was three weeks old, outside the window. The
+arithmetic at the time counted posts and reported the query as free. The same
+query costs $10.80 a month polled hourly and $648.00 polled every minute.
+
+Until 2026-09-06 the estimate assumed hourly and every day, and the first
+version of the schedule control quoted a weekly monitor 730 polls where it
+makes about four — wrong by roughly 180 times, in the direction that
+frightens somebody away from a monitor costing pennies. A monitor whose plan
+was measured at $164 a month against a $10 cap is the case the flag exists
+for.
+
+### The similarity threshold
+
+On 2026-09-05 a real embedding model put PLAN.md's four on-topic posts at
+0.26 to 0.57 and a post about sourdough at 0.09, so 0.15 sits inside that gap
+with room on both sides. Five posts, not a distribution. That no similarity
+threshold separates a person asking from the experts replying was measured
+over two real threads, and is why triage exists.
+
+---
+
+## Testing: the incidents behind the rules
+
+Moved here from `docs/testing.md` on 2026-09-20, when that page was cut to
+its rules. Most of these were paid for in another repository; a rule whose
+incident you did not live through is easy to drop under pressure, and this is
+the evidence for each.
+
+**The in-memory Postgres fake.** Another project ran one for a year and kept a
+list of its lies: a `bytea` parameter corrupted through a UTF-8 round trip so
+AES-GCM ciphertext never decrypted; `on conflict do nothing` reporting a row
+count of 1 for a conflicting insert; `count(*) filter (where …)` answering
+with the unfiltered count. The tax was never the lies on the list. It was the
+next one.
+
+**The fixture that was written, not captured.** A webhook test built a Stripe
+subscription object with a top-level `current_period_end`. Stripe had moved
+that field onto the subscription item in a later API version. The suite was
+green and self-consistent for a year while every real subscription in the
+database had a NULL period end. Only a round trip against a real account found
+it.
+
+**The broad catch.** A memory generator ended `except Exception: return None`
+under an honest promise: the feature is an optimisation, so a provider timeout
+must cost a run nothing. It reached the model through `asyncio.run` from inside
+an already running loop, raised on every call, returned `None` every time, and
+nothing went red. Twenty-four assertions covered the parts; none covered the
+one function the caller actually calls.
+
+**The least-tested caller.** Four tickets in a row elsewhere shipped a correct
+rule that one caller never reached, with the assertion on the rule itself
+green every time.
+
+**Two-tests-for-one-feature was found here by US-012**: the monitor routes'
+counts were asserted nowhere while the rule under them passed.
+
+**Deliberate mutations, this project.** About seventy-five were applied
+across eight tickets. The three surfaces written test-first — credential
+encryption, the budget guard, cursor and deduplication — took twenty-three
+and every one was caught the first time. Every gap came from a surface
+written alongside the code:
+
+| Ticket | What the breakage found |
+|---|---|
+| US-007 | A scheduler test that asserted nothing, because one monitor hid the dedup key |
+| US-008 | A fail-open branch nothing covered |
+| US-011 | Ordering expectations written from the constant, so they passed at any value |
+| US-012 | Two route call sites counted nowhere |
+| US-014 | A cost flag counting past the cap where the guard counts at it, and an unreachable branch |
+
+**The two-branch swallow.** Writing the test for the pre-filter's fail-open
+in `worker/filter.test.ts` found that it fails open twice — when the monitor's
+own description cannot be embedded, and when the batch of posts cannot — and
+one case covered only the first. A mutation dropping every post at the second
+branch left the suite green.
+
+**The measured constants and their instruments.** The similarity threshold
+(US-008): `packages/engine/src/ai/fixtures/capture-embeddings.ts`, replayed by
+`ai/similarity.test.ts`, with `filter_drops` as the second instrument. The
+minimum score (US-009): `packages/engine/src/ai/fixtures/capture.ts`. The
+weight of age in the inbox ordering (US-011).
+
+**Suite size and time.** 615 tests in 78.3 seconds on 2026-09-05; 1,922 tests
+in 112 files in 74.6 seconds on 2026-09-11. The count tripled while the wall
+clock barely moved because one setting had dominated it: the suite ran 170
+seconds when five pg-boss worker files were 397 of the 435 seconds of file
+time, every test costing four to six seconds to do milliseconds of work,
+waiting for a worker to poll. `WORKER_POLLING_INTERVAL_SECONDS` at pg-boss's
+floor of 0.5 for the suite alone removed it.
+
+**Six workers, tried and reverted.** At 615 tests they peaked at 57
+connections of the hundred and finished in 39 seconds against four's 41, but
+`classify.test.ts` failed two runs in four, an `until()` wait exceeding its
+twenty seconds under load. Two seconds is not worth a suite that cries wolf.
+
+**Mutation sweep reading rules**, from the project that ran one: a survivor
+list has a timestamp and can invent gaps that are already closed, and a file
+that logs heavily scores low without being worse tested.
+
+---
+
+## Stack: what was measured
+
+Moved here from `STACK.md` on 2026-09-20, when that page was cut to its
+choices.
+
+**Reddit's providers.** Bright Data was the first, free for the first 5,000
+records a month and $0.0015 a record after, about five times what
+ScrapeCreators and SocialCrawl charge for the same subreddit page; US-158
+switched it off on 2026-09-17. Its free tier needed no card, no company
+verification and no KYC review, which was checked rather than assumed
+because an unverified access claim is what cost this product Reddit's own
+API. Bright Data answers a larger request with a `snapshot_id` to poll; the
+other two answer synchronously.
+
+**The terms, as read.** Bright Data's Master Service Agreement makes the
+customer warrant that their use violates no third-party rights and indemnify
+Bright Data if it does. Two clauses to re-read before a hosted launch: a
+customer may not redistribute collected data "to offer a similar or
+competitive product", and the customer is solely responsible for the lawful
+grounds for personal data.
+
+**X's own API.** Since February 2026 pay-per-use is its only self-serve tier:
+Basic and Pro closed to new signups, no free tier, $0.005 a post read.
+US-006 asked all three accounts held at the time and only SocialCrawl could
+search; US-061 added SocialData on 2026-09-07 for half the price and because
+it takes the window server-side instead of buying everything older than
+`since` and discarding it. US-013 and US-014, the budget guard and the cost
+test, landed before the X connector, in that order on purpose.
+
+**LinkedIn, measured.** Fifty posts cost $0.2030 through SocialCrawl against
+$0.10 through Apify, and the price is not what settled it: every post Apify
+returned was under ninety minutes old, where SocialCrawl's twenty stored
+posts reached back 543 hours in relevance order. An Apify run that had just
+returned ten posts reported five thousandths of a cent, and its real total a
+few seconds later.
+
+**Memory.** A Next.js production build often needs more than 2 GB and fails
+on a 1 GB VPS; its standalone server holds 150–250 MB idle. A static Vite
+bundle plus Fastify holds 70–120 MB.
+
+**The stack table said TanStack Query and shadcn/ui until 2026-09-20.**
+Neither was ever installed; the table was written before the first screen.
+
+---
+
+## Instruments: what the first runs found
+
+Moved here from `docs/instruments.md` on 2026-09-20, when that page was cut
+to its rules and its tables.
+
+**Three captures leaked identity past a scrubber that looked right.** The
+SocialCrawl LinkedIn capture's first run let real names and job headlines
+through, because the scrubber sniffed for fields the provider does not use.
+The SocialData X capture's first run leaked six handles through
+`affiliation_label.label_url`. The Apify LinkedIn one leaked a real name
+through a `PROFILE_MENTION` span in `commentary`. All three rules are in the
+scrubbers now.
+
+**`live:model-probe` exists because the OpenAI wire format is not structured
+output.** DeepSeek publishes `response_format: json_object` and no JSON
+schema, so the AI SDK puts the schema in the prompt instead, and only a real
+call says whether the answer comes back usable.
+
+**Score drift, measured.** Two `capture:scores` runs over the same fifty on
+one day differed by 2.4 points an item and by 11 on one of them, under the
+same prompt. That is why a score is cached under a hash of the prompt and
+reused, so drift is not read as triage having changed something.
+
+**The eval harness judged a rule on a third of the text.** A run record's
+`excerpt` is a 300-character slice while the triage call it recorded saw the
+whole post. The comparison it produced was worthless and looked fine, which
+is why `build-dataset.mjs` refuses rather than warns. US-231 holds the other
+three mistakes that shaped the harness.
+
+**Live polls, as measured.** `live:x-poll`: a 24-hour window bought 7
+tweets for $0.0014. `live:apify-linkedin-poll`: 25 posts for about $0.052.
+`live:tiktok-poll`: the search 2 credits, 25 threads 25 more, 678 comments
+then a triage call each, about $0.37 on the provider and several times that
+on the model. `live:tiktok-comments`: sixty stored comments cost $0.198 on
+2026-09-06. `live:instagram-poll`: $1.6317 with SocialCrawl against $0.3336
+with the model, and a $1.00 cap overshot by 63% on the first run.
+`live:notification`: twenty newest posts scored nothing at 50 where the
+oldest forty produced six matches. `measure:lead-position`: a credit fetches
+fifty comments and a classification is 2,975 micro-dollars.
+
+**`live:provider-switch` leaves a paused monitor and two `api_usage` rows**,
+which are the evidence; the 2026-09-05 run is under *Sources: what was
+measured*.
+
+**Captures, as measured.** ScrapeCreators TikTok: 9 credits, about $0.017,
+ten questions answered (US-119); a page of thirty is 1.8 MB of raw TikTok,
+which is why it stores a digest per page. ScrapeCreators YouTube: 8 credits;
+`includeExtras` turned a 68-character title into a 1,400-character
+description and replaced a computed `publishedTime` with the real
+`publishDate`; the transcript endpoint returned thousands of characters
+where TikTok's returned null; three credits were spent suspecting a parameter
+that was innocent when the video simply had no comments. ScrapeCreators
+Instagram: 6 credits, with a 404 for nothing, a 400 past the last page and a
+400 for no query all free. HikerAPI Instagram: 5 requests, about half a cent,
+the balance counter lagging so one call read as refunded; US-160 holds the
+three runs. SocialCrawl Instagram: the committed fixtures came from a
+`--lean` run at 14 credits, so the hashtag search and whether a `top` walk
+repeats itself are open questions. YouTube `--only=comments`: one credit on a
+broader search and three on comment pages, about $0.008. SocialCrawl Reddit
+`--only=comments`: one call at five credits, $0.041, the whole thread.
+SocialData X `--only=comments`: a `min_replies:20` search plus two reply
+pages, about $0.012. Apify LinkedIn `--only=comments`: about $0.008 for a
+two-comment thread.
+
+---
+
+## Secrets: the decisions
+
+Moved here from `docs/secrets.md` on 2026-09-20, when that page was cut to
+its rules.
+
+**US-004 built the cipher before anything needed it**, because the decision
+about a cipher is a bad one to make in a hurry on the day the first key has
+to move out of a file.
+
+**US-024 renamed the environment variable** from `<SOURCE>_<FIELD>` to
+`<PROVIDER>_<FIELD>`: `REDDIT_API_KEY`, `X_API_KEY` and three more would all
+have held the same SocialCrawl value, and rotating it would give a person
+five chances to leave one behind. The same ticket re-keyed
+`source_credentials` by provider and moved the stored Bright Data key from
+`reddit` to `brightdata` with nobody retyping it, which is why the row
+carries the record name it was sealed with: a derived `brightdata:apiKey`
+could not open a row written as `reddit:apiKey`.
+
+**US-081 made "empty the environment before you open signup" a behaviour.**
+Until then this page said *or accept the bill*, and advice is a thing
+somebody skips.
+
+**US-161 split "whose keys pay" from "is this instance shared".** The hosted
+product is the third shape, a shared instance that pays for its accounts.
+Setting `AUTH_SIGNUP=closed` on a shared box to get the keys would also have
+opened the webhook address guard and the instance's signing secret, which
+follow signup.
+
+**US-068, US-078 and US-079: where a model key lives.** US-068 kept a key on
+each job's row; US-078 wrote a rule for lending one job's key to another; the
+owner read that rule and called it confusing, and US-079 replaced it with a
+list a person picks from. US-083 added the default key.
+
+**US-068 and US-080 decided twice not to test a model key before storing
+it**, because a model call costs money where a Reddit `validateCredentials`
+is free. US-087 reversed that on the owner's decision: the cost is stated on
+the screen rather than avoided.
+
+**The two captured credential answers** are
+`sources/providers/brightdata/fixtures/credentials-accepted.json` and
+`credentials-rejected.json`, replayed by `reddit.test.ts`.
+
+---
+
+## Accounts: the decisions
+
+Moved here from `docs/accounts.md` on 2026-09-20, when that page was cut to
+its rules. The measurements are under *Accounts* above; these are the reasons
+that page used to carry.
+
+**The Traefik overlay exists so the hosted deployment and the documented
+self-hosted one are the same mechanism**, not because Traefik is simpler for
+one hostname; for one hostname it is not. The proxy is its own compose
+project so that `down` on the app never touches the `acme` volume, which
+Let's Encrypt rate-limits refilling.
+
+**`AUTH_SIGNUP` defaults to `closed`** because an instance that upgraded into
+this version without anyone reading the notes must not start accepting
+registrations. **`AUTH_EMAIL_VERIFICATION` defaults to `off`** for the same
+reason in the other direction: a version bump that began refusing logins is
+the failure no self-hoster would forgive.
+
+**The login screen says "Set up this instance" only on the very first
+visit**, when there is nobody to sign in as, and "Create an account" beside
+the form once signup is open.
+
+**Registering an existing address says *check your email***, on purpose,
+and sends nothing: "that address is taken" would enumerate accounts. The
+cost is that somebody who forgot they had an account waits for mail that is
+not coming; the screen names the possibility.
+
+**There is no password reset** because the common install has no mail
+server, and a reset link that never arrives is worse than no button.
+Verification uses mail when it is configured, but it confirms an address
+rather than replacing a password.
+
+**The take-over of `self-hosted` rows is enforced by a count**, not true by
+accident, so a second registration on an open instance inherits nothing.
+
+---
+
+## Code headers: the reasoning moved out
+
+Moved here from the file headers on 2026-09-20 (US-247). A header now holds
+what the file does, its invariants and its failure shape, in about fifteen
+lines; the story behind each rule is below, under the file's path, as it
+was written. The command lines are left out where docs/instruments.md has
+them.
+
+### `packages/pipeline/src/matches/matches.ts`
+
+The read side of the inbox.
+
+Everything the inbox screen shows comes from here, and none of it is
+computed in a route or a component. Two of US-011's acceptance lines are the
+reason. The ordering rule is a product decision that has to be written down
+in one place, and a rule written in a Fastify handler is a rule the next
+caller re-invents. And the deletion reconciliation of US-015 sets
+`matches.hidden`; the inbox is the caller that has to honour it, so the
+filter is here where every caller gets it, not in the query the screen
+happens to send.
+
+## The ordering rule
+
+A match ranks by `score - 12 * age_in_days`, where the age is the *post's*
+age and never the row's. A person joins a conversation, not a database row.
+
+Twelve points a day is the smallest round number that satisfies the example
+in US-011's Context: a 96 from three days ago must rank below an 88 from ten
+minutes ago. Three days costs 36 points, so the 96 ranks 60 and the 88 ranks
+88. A day-old 90 ranks with a fresh 78, and after a week almost nothing
+outranks a fresh match, which is the intent: a week-old thread is closed.
+
+The decay is linear rather than exponential because a person has to be able
+to predict it. "It loses half a point an hour" is a sentence somebody can
+hold; a half-life is not.
+
+Age is clamped at zero. A post dated in the future is a clock difference at
+the source, and it must not rank above its own score.
+
+## The other orders
+
+The rank is the default and not the only one. US-114 added the two halves it
+is made of: the score alone, and the date alone. The rank mixes them at
+twelve points a day, which answers "what should I read next" and answers the
+other two questions badly — "what are the best leads this monitor has ever
+found" and "what arrived since I last looked". Under the rank a fresh low
+score and an old high one land on the same rung, so both answers are
+scattered through one list. The saved list of US-043 has a fourth order, by
+when a thing was kept.
+
+All three go through `orderValue`, which is the one place a page's ordering
+is decided. The sort and the keyset cursor read the same expression, so they
+cannot disagree — and they did disagree before US-114: the saved list sorted
+by `saved_at` and paged on the rank, which dropped rows from page two.
+Each row carries the cursor that resumes after it, in its own ordering,
+because a cursor built anywhere else is a second way to build one.
+
+## What a verdict does to the list
+
+A match the user marked not relevant leaves the default view and stays in
+the table. US-012 is firm that it is not deleted: the verdict is the data
+the feedback loop is being collected for, and a row that was removed to
+tidy a screen cannot teach anything later. `includeNotRelevant` is how a
+person looks at what they dismissed.
+
+The verdict is read here rather than by a second query from the screen, for
+the reason the hidden filter is here: both are the same question about the
+same page, and a caller that asked separately could show a page whose
+buttons disagree with its rows.
+
+## Why the clock is a parameter
+
+`asOf` is passed in and defaults to now. Page two is then ranked against the
+same clock as page one, so a match cannot move between pages while somebody
+reads. Pagination is keyset, on the rank and the id together: an offset over
+a rank that moves with the clock skips rows, and the failure looks like a
+match that was never delivered.
+
+### `packages/pipeline/src/sources/live-triage-vs-score.ts`
+
+Does triage refuse anything the classifier would have called a lead?
+
+    pnpm --filter @signalscout/pipeline live:triage-score [--per-cell=30] [--dry]
+    … --model=<classifier> --triage-model=<triage> [--rescore]
+
+US-221 made triage stricter, and `capture-scores.ts` answered this on the
+fifty hand-labelled fixtures. Fifty items from two Reddit threads against one
+example monitor is not a distribution, and the header of every file that
+touches them says so. This asks the same question of **everything this
+instance has stored**: every platform, posts and replies, against the
+monitors the items were really collected for.
+
+**Why it cannot be read from the tables.** A triage drop leaves a
+`filter_drops` row and no score, because the whole point of the stage is that
+the classification is never bought. So the only way to know what a dropped
+item was worth is to buy it once, deliberately, here.
+
+So every sampled item goes through **both** paid stages, in that order, and
+the verdict is recorded rather than obeyed: an item triage refuses is
+classified anyway. That is the difference between this and
+`live-tiktok-comments.ts`, which runs the real steps and therefore cannot see
+what the drops were worth.
+
+**What the answer looks like.** Two numbers decide it, and they pull apart:
+
+- **A drop at or above the monitor's own `min_score`** is a lead this product
+  would have shown and now never will. Nobody can notice one in production.
+- **A kept item far below it** is a classification the stage was meant to
+  save and did not.
+
+**The sample is one per platform and kind, not one big draw.** Reddit holds
+more than half of everything stored, so an untargeted sample would be a
+Reddit measurement wearing six platforms' names. `--per-cell` is the cap on
+each of the ten cells; a cell with fewer rows contributes what it has.
+
+**A score is bought once and then reused.** Triage feeds the classifier
+nothing — it decides only whether the call happens — so a score belongs to
+the item, its monitor and the classifier's prompt, never to the verdict.
+Paying again when only the triage prompt moved buys the same answer with
+drift on it, and drift reads as triage having changed something. Each score
+is cached under a hash of the exact system prompt that monitor's classifier
+was sent, so editing `prompt.ts`, editing the monitor or changing the model
+throws the cache away by itself. `--rescore` forces it.
+
+The cache holds real people's post text, so it lives beside the run records
+and `.gitignore` keeps both out of the repository. It is saved after every
+call it pays for, so stopping the run keeps what it has already bought.
+
+It spends model money and no provider credit: one triage call per sampled
+item, and one classification per item that is not already cached. At the prices measured on 2026-09-18 —
+273 micro-dollars a triage and about 415 a classification on `gpt-5.6-luna` —
+30 per cell is roughly 210 items and about $0.15. `--dry` prints the sample
+and the estimate and calls nothing.
+
+**It writes nothing.** No match, no drop, no `model_calls` row, so the spend
+is invisible to the budget guard and to every screen. That is deliberate — an
+instrument that wrote matches would put its own experiment in somebody's
+inbox — and it is the reason to run it with a number in mind.
+
+### `packages/engine/src/ai/triage-prompt.ts`
+
+The prompt triage sends. One question, and deliberately not the
+classifier's.
+
+`prompt.ts` asks a model to score five dimensions and justify them. Reusing
+it here with fewer fields would have been the cheap way to write this file
+and the expensive way to own it: the classifier's prompt would then serve
+two callers, and every later edit for one would have to be checked against
+the other. It is also the wrong prompt. Triage does not rank; it answers a
+single yes-or-no question badly enough to be cheap and well enough to be
+safe.
+
+**The answer carries no reasons.** That was expected to be where the saving
+came from — output is priced several times input, and a classification
+returns 95 output tokens — and on the first model we measured it was not.
+`capture:triage` recorded about 113 output tokens per triage answer against
+the classification's 95, because a reasoning model bills its own thinking as
+output and a short answer does not shorten the thinking.
+
+So the reasons are still absent, for the two honest reasons left: there is
+nothing to show a person, and a model asked to justify a one-word answer
+writes more of them. The saving comes from the price gap between the two
+models instead. `worker/runtime.ts` warns when there is no gap.
+
+**The prompt is told which way to fail.** A model asked to be strict will
+be, and here strictness is the expensive direction: a dropped lead leaves no
+row, no inbox entry and nothing for a person to notice. The classifier is
+told to be strict for the opposite reason — it has a threshold behind it and
+a person reading its output. So the two prompts pull different ways on
+purpose, and this comment is here because that looks like an inconsistency
+until you know it is a decision.
+
+**What it screens for is what the second reader scores.** US-221 moved the
+question from "could this author be a person to reach?" to that plus "does
+anything here say they want an answer?". Three of the classifier's five
+dimensions are about the want, so the old question let a plausible person who
+wants nothing through to a paid call that was always going to score low.
+
+That is a narrowing of `maybe`, not a removal of it. `maybe` now means doubt
+about a want; the plain absence of one is a `no`. The captured verdicts are
+why it was done that way rather than by dropping `maybe`: two of the three
+surviving people asking answered `maybe`, and so did one worked example. A
+rule that dropped `maybe` would delete real leads to save a handful of expert
+comments, and a deleted lead is the mistake nobody can see.
+
+**A complaint counts as wanting something, and that line is here because the
+first capture deleted a lead without it.** Told that wanting nothing is a
+`no`, the model refused "Our Playwright tests break whenever the UI changes"
+— PLAN.md's `mild-problem-signal`, which it scores 50. The classifier's own
+prompt calls a complaint with no question partial intent. Triage has to leave
+that judgement to it, so the prompt names the case rather than hoping.
+
+Measured on 2026-09-18 over the same 50 items on `gpt-5.6-luna`: 19 of 46
+comments kept before, 13 after; people answering 6 kept, then 3 of 26; people
+asking 3 of 4 either way; every worked example that is a lead still kept.
+Output fell from 123 tokens an item to 80, and the cost per call did not
+follow — 267 micro-dollars against 273, because the longer prompt bought the
+shorter answer.
+
+### `packages/engine/src/sources/providers/socialcrawl/client.ts`
+
+The SocialCrawl transport, shared by every platform we fetch through it.
+
+This file, its siblings and the fixtures beside them are the only places in
+the repository that name SocialCrawl. STACK.md, *A source is not a
+provider*: a user connects X or LinkedIn, and replacing the provider must
+change no monitor, no score and no match.
+
+One provider means one key, one authentication header and one error
+vocabulary, so those live here and each platform supplies an
+`EndpointProfile` for the three things that differ: which URL to call, where
+that endpoint puts its cursor, and what one call costs when the answer does
+not say. US-028 added the second profile and changed nothing about the
+first.
+
+Every shape below was captured from a live account by `fixtures/capture.mjs`
+on 2026-09-05, not read from the documentation. Four of the facts it settled
+are wrong or absent in the documentation:
+
+1. **The cursor is in two places and the documented one is not the only
+   one.** The documentation names `data.next_cursor`. The answer also
+   carries `pagination.next_cursor`, a different string with an `sc.` prefix
+   wrapping the same place. `data.next_cursor` is the one this client sends
+   back, because it is the one a live run followed to a second page.
+2. **`sort` accepts `latest` or `top`, and nothing else.** The documentation
+   names only `top`. The provider listed both when it refused an invalid
+   value, which cost nothing to ask.
+3. **An empty answer is free.** A search that matches nothing answers 200
+   with `credits_used: 0`. ScrapeCreators bills for the same thing, so this
+   is a fact about this provider and not a rule.
+4. **An empty answer is not always the truth.** The same query returned
+   nothing at 20:12 and twenty posts at 20:31, both free. So no page of zero
+   posts may be read as "this query is finished for good" — only as "there
+   was nothing this time".
+
+The LinkedIn capture on the same day settled three more, and none of them
+generalises from the X ones — which is the argument for a profile per
+endpoint rather than one client that assumes:
+
+5. **This endpoint pages, and the documentation says it does not.** The
+   cursor is at `pagination.next_cursor`, `has_more` sits beside it, and
+   page two returned ten posts with none of page one's among them.
+6. **A search that matches nothing is billed here, and is not empty.** A
+   phrase that cannot occur returned ten unrelated posts, `total: 98`, and
+   cost the full five credits. So an empty answer is not the signal on this
+   endpoint that it is on X's — there is no empty answer to read.
+7. **The provider caches, and a cached answer is free.** The same query sent
+   twice came back flagged `cached: true`, in a third of the time, for zero
+   credits. No connector may count on it: the window is undocumented, and a
+   cap sized on cached prices is a cap sized on somebody else's luck.
+
+The API is synchronous: a search answered in 1.4 to 5.3 seconds with the
+posts in the body. There is no snapshot and nothing to poll, so these
+connectors never return `next: { status: "wait" }` on a healthy call.
+
+### `packages/engine/src/sources/providers/socialcrawl/reddit.ts`
+
+Reddit, fetched through SocialCrawl. US-031.
+
+The third provider for Reddit, and the only one of the three that can search
+*inside* a subreddit. That endpoint is the whole reason this connector
+exists, because US-022 measured the gap it fills: a keyword across all of
+Reddit brings back noise, and a subreddit on its own ignores the monitor's
+words entirely.
+
+**The capture measured that gap again, harder.** On 2026-09-06, one credit
+each:
+
+* `/v1/reddit/search` for `flaky tests` returned 25 posts from r/TIdaL,
+  r/RedditLaqueristaSwap, r/Euphoria_HBO, r/AskVet and r/snapmaker. A watch
+  app's audio output was "still flaky with 3+ devices". A dog had a skin
+  issue.
+* `/v1/reddit/subreddit/search` for the same words inside r/softwaretesting
+  returned 7 posts, **every one on topic and every one from that subreddit**.
+
+So this connector prefers the scoped mode wherever a monitor names both a
+query and a channel, and the plain keyword search is the fallback rather
+than the default. That is the opposite of the other two Reddit connectors,
+and it is a measurement rather than a taste.
+
+**It is the expensive one and it has to earn that.** A credit is 8,118
+micro-dollars against a ScrapeCreators request's 1,880, so every call costs
+4.3 times its equivalent. It buys precision, not volume: seven right posts
+against twenty-five wrong ones.
+
+**It reads replies since US-159, and it is the expensive half of a real
+choice rather than the cheap one.** US-020 measured this endpoint at 5
+credits against ScrapeCreators' 1 and left it unbuilt; what changed is that
+an instance whose only Reddit key is this provider's was then given no
+replies at all, and told nothing.
+
+The capture on 2026-09-17 says what the five credits buy. One call returned
+**34 of the 34 comments the post claimed**, nested five levels deep, with no
+cursor and `truncated: false`. ScrapeCreators buys a flat page of 25 for one
+credit and has been measured stopping at 43 of 95 while reporting itself
+finished. So the two are not the same product at different prices:
+
+* ScrapeCreators: $0.00188 for the top of a thread, and no way to reach the
+  rest.
+* SocialCrawl: $0.0406 for the thread, whole, in one call.
+
+On the median subreddit thread of about twelve comments the cheap one is
+complete too, and buying this instead is paying twenty-two times for the
+same words. The monitor form states the per-platform price, and the choice
+stays the person's.
+
+### `packages/pipeline/src/worker/filter.ts`
+
+The pre-filter step: drop the obvious misses before the model is paid to
+read them.
+
+Two stages, in this order, both inside Postgres.
+
+1. **Keyword and subreddit.** Free. `filter/keywords.ts` holds the rule.
+2. **Embedding similarity.** One embedding of the monitor's description,
+   reused until the monitor is edited, and one batch for the posts that got
+   this far. `pgvector` measures the distance.
+3. **Triage.** US-030. A cheap model reads what survived and answers one
+   question: could this author be a person to reach? `ai/triage.ts` holds
+   it.
+
+An embedding costs about one hundredth of a classification, so the second
+stage pays for itself as soon as it drops a few posts in a hundred. That is
+the arithmetic PLAN.md's bring-your-own-key promise rests on.
+
+The third stage is not that arithmetic and must not be read as it. Triage is
+a model call, so it is expensive next to an embedding and cheap only next to
+a classification. It is here because the two stages above it measure
+*subject*, and under a post about the right subject the people answering are
+on subject too. US-029 measured that: no similarity threshold separates a
+person asking from the experts replying, in either direction, so the job
+falls to something that can read.
+
+**Triage runs inside `pass`, and that is deliberate.** This step has five
+exits — no embedder, no monitor vector, an embedding call that failed, an
+empty keep list, and the ordinary end — and every one of them must reach the
+new stage. docs/testing.md: a rule is only as tested as its least-tested
+caller. Putting the stage at the one place they all go through leaves no
+caller to forget it.
+
+**Every failure here fails open.** No embedder configured, a provider
+outage, a model of the wrong width, a monitor that vanished mid-job: the
+posts go to the classifier. This is deliberate and it is asymmetric on
+purpose. An extra classification is a cost, on a bill somebody can read. A
+dropped good lead is invisible — no row, no inbox entry, nothing to notice —
+and docs/testing.md names this exact swallow as one that needs a test which
+goes red when the swallowed thing breaks. `filter.test.ts` holds it.
+
+**What is dropped is written down.** Every drop goes to `filter_drops` with
+the similarity that caused it, because a threshold nobody can review against
+real data is a number somebody guessed twice.
+
+### `packages/engine/src/sources/providers/socialcrawl/instagram.ts`
+
+Instagram, fetched through SocialCrawl. US-049.
+
+The sixth platform, added against PLAN.md's *Important rule* on the owner's
+decision, and the fifth this one provider fetches on one key.
+
+Three things make it unlike its four siblings here, and each one was measured
+on 2026-09-06 rather than read from the catalogue.
+
+**1. A search with no date window returns the last five years, newest first
+nowhere.** Thirty reels for `skincare for acne scars` ran from December 2021
+to April 2026, in relevance order, and the newest of the thirty was **five
+months old**. A monitor polling for what was said since it last looked would
+have paid a credit a poll to be handed nothing that passed its `since`, for
+as long as it ran. The same query with `date_posted=last-month` returned
+eight reels and **all eight were inside the window**.
+
+So this connector always sends a window, and that is the difference from
+`linkedin.ts`, which sends none when `since` is absent or old and takes what
+it is given. Here that is not a neutral choice, it is the broken one.
+
+**2. `has_more` is wrong, and following it is free.** Page one came back with
+thirty reels, `has_more: true` and a cursor; the cursor returned **zero items
+for zero credits**, with another `has_more: true` and another cursor. So the
+walk ends on an empty page, not on the flag. `client.ts` holds the rest.
+
+**3. The comments are mostly not words, and the leads are all in the few
+that are.** A live poll collected 89 comments: 56 were under ten characters
+and the median was four. Twelve passed sixty characters, and **the two
+highest-scoring matches of the run are the two longest comments in it** — 233
+and 289 characters, scoring 90 and 77. The 90 is the highest any comment has
+scored on any platform in this product.
+
+So this platform is not poor, it is *sparse*, and a median describes it
+badly. What it is expensively is dear to read: a comment page is five credits
+where TikTok's and YouTube's are one, so the same poll spent **$1.6317 with
+the provider and $0.3336 with the model**. Every other platform here spends
+more on the model than on the provider. Budget for the reading.
+
+A fourth difference is smaller and reaches the shared parser: Instagram sends
+`url`, `post_id` and `author.display_name` **null on every comment**. The
+link is built here, the name falls back to the handle in `comments.ts`, and
+the missing `post_id` means BUG-007's defence is inert on this platform —
+nothing here can tell that a comment belongs to another post.
+
+### `packages/pipeline/src/sources/live-reddit-replies-poll.ts`
+
+US-020's live proof: one Reddit poll that reads the replies, end to end.
+
+This is an instrument, not a test. The suite proves our half against
+captured payloads — including the thread where ScrapeCreators reports
+`has_more: false` with 33 of 58 comments missing — but nothing in it has ever
+asked a real provider for a real reply. The claim underneath is that a poll
+collects posts, opens the threads worth opening, stores what was said,
+classifies it with the thread as context, and bills what the connector says
+it billed. The only way to ask that is to ask it.
+
+    pnpm --filter @signalscout/pipeline live:reddit-replies
+
+**It spends money and it writes rows.** One credit for the subreddit page,
+then one per thread opened — at most `maxThreadsPerJob` — so about $0.03 of
+ScrapeCreators credit. The model is the larger half: every reply that
+survives buys a triage call, and every reply triage keeps buys a
+classification. Expect a few hundred triage calls and a few dozen
+classifications. It leaves behind a paused monitor, its posts and replies,
+its `api_usage` rows and its matches, which are the evidence.
+
+It drives the steps by hand with a queue that runs the next one instead of
+enqueuing it. The steps are the real ones in the real order, so what runs
+here is what the worker runs. The order is the part worth watching:
+
+    collect → filter → replies → filter → classify
+
+The second `filter` is the reply pass, and it must skip the keyword and
+embedding stages. The `replies` step must not appear a second time, because
+a reply has no thread of its own and a loop there would buy the same words
+for ever.
+
+What it is trying to see, in order:
+
+  1. A real thread comes back, with real nested replies, keyed by Reddit's
+     own `t1_` fullnames.
+  2. `posts` holds them as `kind = 'reply'` rows linked to their parent, and
+     the deduplication key needed no change to make that work.
+  3. `repliesPartial` is written honestly: a thread we did not finish says so.
+  4. The classifier reads a reply with its thread above it, and the matches
+     it finds are readable by a person.
+  5. A second run opens no thread whose reply count has not moved, which is
+     the rule that stops an hourly monitor re-buying every conversation.
+
+---
+
+## AGENTS.md: the incidents behind the rules
+
+Moved here from `AGENTS.md` on 2026-09-20 (US-259), when that file was cut
+to its rules. Each paragraph there now carries the rule and a ticket id;
+this is what the ticket holds.
+
+**Why every address is a path (US-076).** The router moved out of the hash
+on 2026-09-08, after a payment page returned a person to
+`/billing?checkout=done#/billing` — one address saying the same thing twice,
+because the path was the server's answer and the hash was the application's.
+US-045's rule, no project no inbox, is the route table itself now rather
+than an effect that corrects the address after rendering.
+
+**What the engine holds.** Connectors, model calls, the pre-filter, the
+estimate and the cipher. The pipeline holds monitors, posts, matches,
+cursors, the budget and the jobs. The boundary tests name both.
+
+**The three values that shipped without their migration**: `apify`,
+`draft_reply` and `key_test`. Each time a full suite passed, the call
+succeeded, the money was spent, and recording it failed. The arrays live one
+package away from the migration, which makes forgetting easier rather than
+harder.
+
+**BUG-009, the unscoped reads.** The providers page scoped the keys and left
+the spend, the counts and the verdicts answering for the whole instance, so
+a new account saw somebody else's numbers. Nothing went red, because nothing
+on that page was scoped by a test.
+
+**BUG-012, the journal.** Fourteen migrations were written by hand without
+`pnpm db:generate`, so the files existed and the journal did not name them.
+`db/migrations.test.ts` is what fails now, by name, when the two disagree.
+
+**US-047, the invented comment link.** TikTok's shipped as `?comment_id=`,
+which the connector invented; it survived a capture, two live polls and a
+code comment admitting it was a guess, because nobody pressed it. The real
+one is `?cid=`.
+
+**Where a worktree lives, and why (US-135).** `worktrees/<name>` sits
+*inside* the main checkout, so one editor window lists every worktree's
+changes in one source-control view. `.gitignore` and `.dockerignore` both
+carry the folder, because a worktree that is also untracked content of the
+repository it sits in shows up in `git status` and is walked by `pnpm lint`.
+Neither `new-worktree.mjs` nor `remove-worktree.mjs` deletes a branch: a
+folder and a copied database can be made again, and commits cannot.
+
+**The settled decision that was reversed (US-024, 2026-09-05).** The table
+read *a provider picker in the UI* against *one provider per source, named
+but not chosen*. That was right while Reddit had one usable provider and
+wrong the moment two fetch the same platform.
+
+**`AUTH_SIGNUP=closed` and `AUTH_EMAIL_VERIFICATION=off`** were each the one
+place an implementation went against a literal request, for the reason the
+rule still gives.

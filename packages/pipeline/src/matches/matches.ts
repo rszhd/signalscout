@@ -1,71 +1,18 @@
 /**
- * The read side of the inbox.
+ * The read side of the inbox. Everything the inbox screen shows comes from
+ * here; nothing is computed in a route or a component (US-011, US-015).
  *
- * Everything the inbox screen shows comes from here, and none of it is
- * computed in a route or a component. Two of US-011's acceptance lines are the
- * reason. The ordering rule is a product decision that has to be written down
- * in one place, and a rule written in a Fastify handler is a rule the next
- * caller re-invents. And the deletion reconciliation of US-015 sets
- * `matches.hidden`; the inbox is the caller that has to honour it, so the
- * filter is here where every caller gets it, not in the query the screen
- * happens to send.
- *
- * ## The ordering rule
- *
- * A match ranks by `score - 12 * age_in_days`, where the age is the *post's*
- * age and never the row's. A person joins a conversation, not a database row.
- *
- * Twelve points a day is the smallest round number that satisfies the example
- * in US-011's Context: a 96 from three days ago must rank below an 88 from ten
- * minutes ago. Three days costs 36 points, so the 96 ranks 60 and the 88 ranks
- * 88. A day-old 90 ranks with a fresh 78, and after a week almost nothing
- * outranks a fresh match, which is the intent: a week-old thread is closed.
- *
- * The decay is linear rather than exponential because a person has to be able
- * to predict it. "It loses half a point an hour" is a sentence somebody can
- * hold; a half-life is not.
- *
- * Age is clamped at zero. A post dated in the future is a clock difference at
- * the source, and it must not rank above its own score.
- *
- * ## The other orders
- *
- * The rank is the default and not the only one. US-114 added the two halves it
- * is made of: the score alone, and the date alone. The rank mixes them at
- * twelve points a day, which answers "what should I read next" and answers the
- * other two questions badly — "what are the best leads this monitor has ever
- * found" and "what arrived since I last looked". Under the rank a fresh low
- * score and an old high one land on the same rung, so both answers are
- * scattered through one list. The saved list of US-043 has a fourth order, by
- * when a thing was kept.
- *
- * All three go through `orderValue`, which is the one place a page's ordering
- * is decided. The sort and the keyset cursor read the same expression, so they
- * cannot disagree — and they did disagree before US-114: the saved list sorted
- * by `saved_at` and paged on the rank, which dropped rows from page two.
- * Each row carries the cursor that resumes after it, in its own ordering,
- * because a cursor built anywhere else is a second way to build one.
- *
- * ## What a verdict does to the list
- *
- * A match the user marked not relevant leaves the default view and stays in
- * the table. US-012 is firm that it is not deleted: the verdict is the data
- * the feedback loop is being collected for, and a row that was removed to
- * tidy a screen cannot teach anything later. `includeNotRelevant` is how a
- * person looks at what they dismissed.
- *
- * The verdict is read here rather than by a second query from the screen, for
- * the reason the hidden filter is here: both are the same question about the
- * same page, and a caller that asked separately could show a page whose
- * buttons disagree with its rows.
- *
- * ## Why the clock is a parameter
- *
- * `asOf` is passed in and defaults to now. Page two is then ranked against the
- * same clock as page one, so a match cannot move between pages while somebody
- * reads. Pagination is keyset, on the rank and the id together: an offset over
- * a rank that moves with the clock skips rows, and the failure looks like a
- * match that was never delivered.
+ * Invariants:
+ * - A match ranks by `score - 12 * age_in_days`, on the *post's* age, clamped
+ *   at zero. Linear so a person can predict it. US-011 says why twelve.
+ * - Every order goes through `orderValue`; the sort and the keyset cursor
+ *   read the same expression, so they cannot disagree (US-114 is when they
+ *   did). Each row carries the cursor that resumes after it.
+ * - `matches.hidden` from deletion reconciliation is filtered here, where
+ *   every caller gets it. A not-relevant verdict leaves the default view and
+ *   stays in the table (US-012); `includeNotRelevant` shows it.
+ * - `asOf` is a parameter so page two ranks against page one's clock. An
+ *   offset over a moving rank skips rows, and that looks like a lost match.
  */
 import { and, desc, eq, gt, gte, inArray, isNotNull, isNull, or, type SQL, sql } from "drizzle-orm";
 import { type AnyPgColumn, alias } from "drizzle-orm/pg-core";

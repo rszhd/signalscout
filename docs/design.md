@@ -41,15 +41,41 @@ plain class until a component earns it. Components never import `packages/pipeli
 
 ## Spacing
 
-Spacing is on the scale in `tokens.css` and never on a raw px value.
-[docs/spacing.md](spacing.md) owns that rule — the scale, what is exempt, how
-to snap a value that does not fit, and which stylesheets `pnpm lint:css`
-enforces it on. It is not repeated here, because a scale written in two places
-is a scale that disagrees with itself.
+Spacing is on the scale, not on a value. The scale lives in
+`apps/web/src/styles/tokens.css`:
 
-`index.css` still holds legacy page styles and is grandfathered until each page
-migrates. A new rule in a migrated file that uses a raw px spacing value is a
-lint error.
+| Token | `--space-1` | `--space-2` | `--space-3` | `--space-4` | `--space-5` | `--space-6` | `--space-8` | `--space-12` |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Value | 4 | 8 | 12 | 16 | 20 | 24 | 32 | 48 |
+
+**A `padding`, `margin` or `gap` is either `0` or a `var(--space-*)` token,
+never a raw px number.** Two lengths are not spacing and stay raw: a
+hairline of 1–2px for a border or an outline, and a non-spacing length —
+a radius, a width, a height, a shadow offset, a control's `min-height`.
+
+**A value that does not fit moves to the nearest step.** When it sits exactly
+between two, read what it measures: a tight gap between small inline controls
+is `--space-1` or `--space-2`; an inset around a control, a card or a section
+is `--space-4` or `--space-5`. Do not invent a token for a value the scale
+already covers — the scale is coarse on purpose, and the answer to "9px or
+11px?" is whatever the scale offers. The detail that justifies a value you
+care about is worth a comment, not a new token.
+
+The scale is what makes the site read as one site. 9px beside 8px does not
+visibly disagree; 9px beside 11px does, and after a hundred edits no two gaps
+match.
+
+**`pnpm lint:css` enforces it**, because Biome has no CSS rule for this. The
+stylelint script names its files explicitly: `index.css` and the un-migrated
+page stylesheets are grandfathered, since a page that still uses old values
+cannot be enforced until it has adopted the scale. When a page is migrated,
+add its stylesheet to the `lint:css` command and to the migration list below.
+A new rule in a migrated file that uses a raw px spacing value is a lint
+error.
+
+Two things stay out of it: the email templates, which are a separate renderer
+that cannot read the CSS scale and copy the palette rather than the spacing;
+and `packages/pipeline`, which has no UI.
 
 ## Shared patterns
 

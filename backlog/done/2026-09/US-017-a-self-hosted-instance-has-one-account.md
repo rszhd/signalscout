@@ -6,7 +6,7 @@ priority: p2
 created: 2026-09-04T22:49+08:00
 parent:
 area:
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -38,7 +38,7 @@ instance, and signup closes after it.
       enumerates the routes rather than checking a sample
 - [x] Monitors and matches are scoped to an account, so a second user is a data
       change and not a rewrite
-- [ ] **Credentials are scoped to an account.** Deferred on the owner's
+- [x] **Credentials are scoped to an account.** Deferred on the owner's
       decision, with the reason in the Log below. `source_credentials` stays
       keyed by provider alone.
 - [x] Sessions expire, and logging out invalidates the session on the server
@@ -171,3 +171,4 @@ instance, and signup closes after it.
   `Login.tsx` holds the copy the bundle needs, so the number is stated twice
   and the server is still the one that refuses. The two form assertions moved
   because the behaviour was meant to move. `docs/accounts.md` says eight.
+- 2026-09-20T00:55+08:00 — Closed. The deferred box was done by US-153: every provider key, model key and provider choice is scoped to an account now (AGENTS.md, *An instance has accounts*).

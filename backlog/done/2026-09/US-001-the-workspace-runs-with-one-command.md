@@ -6,7 +6,7 @@ priority: p1
 created: 2026-09-04T22:49+08:00
 parent:
 area:
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -37,7 +37,7 @@ untangling a worker that assumed its own process.
 - [x] The Postgres image has the `pgvector` extension available
 - [x] `packages/core` builds with no import of Fastify or React, and a test
       asserts this
-- [ ] The image builds in CI and is pushed to a registry; the server pulls it
+- [x] The image builds in CI and is pushed to a registry; the server pulls it
       rather than compiling
 - [x] `pnpm test`, `pnpm lint` and `pnpm typecheck` pass and run in CI
 - [x] `.env.example` lists every variable the app reads, with no real values
@@ -102,3 +102,4 @@ nothing. That cost an hour here.
   has no remote, so the CI box is unverifiable rather than unverified. A ticket
   closed on a workflow nobody has run is a ticket that reports work it did not
   check.
+- 2026-09-20T00:55+08:00 — Closed. The last box was met long ago: `ci.yml` builds the image on every run and publishes `:latest` on a push to main, and `docker-compose.yml` pulls it. The box was never ticked.

@@ -1,47 +1,19 @@
 /**
  * The pre-filter step: drop the obvious misses before the model is paid to
- * read them.
+ * read them. Three stages, in order: keyword and subreddit
+ * (`filter/keywords.ts`, free), embedding similarity (`pgvector`, about a
+ * hundredth of a classification), and triage (`ai/triage.ts`, a model call,
+ * cheap only next to a classification; US-030).
  *
- * Two stages, in this order, both inside Postgres.
- *
- * 1. **Keyword and subreddit.** Free. `filter/keywords.ts` holds the rule.
- * 2. **Embedding similarity.** One embedding of the monitor's description,
- *    reused until the monitor is edited, and one batch for the posts that got
- *    this far. `pgvector` measures the distance.
- * 3. **Triage.** US-030. A cheap model reads what survived and answers one
- *    question: could this author be a person to reach? `ai/triage.ts` holds
- *    it.
- *
- * An embedding costs about one hundredth of a classification, so the second
- * stage pays for itself as soon as it drops a few posts in a hundred. That is
- * the arithmetic PLAN.md's bring-your-own-key promise rests on.
- *
- * The third stage is not that arithmetic and must not be read as it. Triage is
- * a model call, so it is expensive next to an embedding and cheap only next to
- * a classification. It is here because the two stages above it measure
- * *subject*, and under a post about the right subject the people answering are
- * on subject too. US-029 measured that: no similarity threshold separates a
- * person asking from the experts replying, in either direction, so the job
- * falls to something that can read.
- *
- * **Triage runs inside `pass`, and that is deliberate.** This step has five
- * exits — no embedder, no monitor vector, an embedding call that failed, an
- * empty keep list, and the ordinary end — and every one of them must reach the
- * new stage. docs/testing.md: a rule is only as tested as its least-tested
- * caller. Putting the stage at the one place they all go through leaves no
- * caller to forget it.
- *
- * **Every failure here fails open.** No embedder configured, a provider
- * outage, a model of the wrong width, a monitor that vanished mid-job: the
- * posts go to the classifier. This is deliberate and it is asymmetric on
- * purpose. An extra classification is a cost, on a bill somebody can read. A
- * dropped good lead is invisible — no row, no inbox entry, nothing to notice —
- * and docs/testing.md names this exact swallow as one that needs a test which
- * goes red when the swallowed thing breaks. `filter.test.ts` holds it.
- *
- * **What is dropped is written down.** Every drop goes to `filter_drops` with
- * the similarity that caused it, because a threshold nobody can review against
- * real data is a number somebody guessed twice.
+ * Invariants:
+ * - Triage runs inside `pass`, the one place all five exits of this step go
+ *   through, so no caller can forget it.
+ * - Every failure fails open: no embedder, an outage, a wrong-width model, a
+ *   vanished monitor — the posts go to the classifier. An extra
+ *   classification is a cost somebody can read; a dropped lead is invisible.
+ *   `filter.test.ts` goes red if a swallow starts dropping.
+ * - Every drop is written to `filter_drops` with the similarity that caused
+ *   it, so the threshold can be argued with against real data.
  */
 
 import {

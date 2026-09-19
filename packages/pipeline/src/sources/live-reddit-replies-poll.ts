@@ -1,46 +1,19 @@
 /**
  * US-020's live proof: one Reddit poll that reads the replies, end to end.
- *
- * This is an instrument, not a test. The suite proves our half against
- * captured payloads — including the thread where ScrapeCreators reports
- * `has_more: false` with 33 of 58 comments missing — but nothing in it has ever
- * asked a real provider for a real reply. The claim underneath is that a poll
- * collects posts, opens the threads worth opening, stores what was said,
- * classifies it with the thread as context, and bills what the connector says
- * it billed. The only way to ask that is to ask it.
+ * An instrument, not a test: nothing in the suite has asked a real provider
+ * for a real reply.
  *
  *     pnpm --filter @signalscout/pipeline live:reddit-replies
  *
- * **It spends money and it writes rows.** One credit for the subreddit page,
- * then one per thread opened — at most `maxThreadsPerJob` — so about $0.03 of
- * ScrapeCreators credit. The model is the larger half: every reply that
- * survives buys a triage call, and every reply triage keeps buys a
- * classification. Expect a few hundred triage calls and a few dozen
- * classifications. It leaves behind a paused monitor, its posts and replies,
- * its `api_usage` rows and its matches, which are the evidence.
+ * It spends about $0.03 of ScrapeCreators credit plus a triage call per
+ * surviving reply and a classification per kept one, and it leaves a paused
+ * monitor, its posts and replies, its `api_usage` rows and its matches.
  *
- * It drives the steps by hand with a queue that runs the next one instead of
- * enqueuing it. The steps are the real ones in the real order, so what runs
- * here is what the worker runs. The order is the part worth watching:
- *
- *     collect → filter → replies → filter → classify
- *
- * The second `filter` is the reply pass, and it must skip the keyword and
- * embedding stages. The `replies` step must not appear a second time, because
- * a reply has no thread of its own and a loop there would buy the same words
- * for ever.
- *
- * What it is trying to see, in order:
- *
- *   1. A real thread comes back, with real nested replies, keyed by Reddit's
- *      own `t1_` fullnames.
- *   2. `posts` holds them as `kind = 'reply'` rows linked to their parent, and
- *      the deduplication key needed no change to make that work.
- *   3. `repliesPartial` is written honestly: a thread we did not finish says so.
- *   4. The classifier reads a reply with its thread above it, and the matches
- *      it finds are readable by a person.
- *   5. A second run opens no thread whose reply count has not moved, which is
- *      the rule that stops an hourly monitor re-buying every conversation.
+ * It drives the real steps in the real order with a queue that runs the next
+ * step instead of enqueuing it: collect → filter → replies → filter →
+ * classify. The second `filter` is the reply pass and skips the keyword and
+ * embedding stages; `replies` must not appear twice, or a reply with no
+ * thread of its own would buy the same words for ever.
  */
 
 import {

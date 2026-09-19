@@ -1,47 +1,19 @@
 /**
  * Instagram, fetched through SocialCrawl. US-049.
  *
- * The sixth platform, added against PLAN.md's *Important rule* on the owner's
- * decision, and the fifth this one provider fetches on one key.
+ * Three measured differences from its four siblings on this provider:
+ * - It always sends a date window. Without one the endpoint returns five
+ *   years of reels in relevance order, and a poll's `since` would discard
+ *   everything it paid for. `linkedin.ts` deliberately does the opposite.
+ * - `has_more` is wrong beside an empty page; the walk ends on the empty
+ *   page, not the flag. The empty page is free.
+ * - `url`, `post_id` and `author.display_name` are null on every comment. The
+ *   link is built here, the name falls back to the handle in `comments.ts`,
+ *   and BUG-007's wrong-parent defence is inert on this platform.
  *
- * Three things make it unlike its four siblings here, and each one was measured
- * on 2026-09-06 rather than read from the catalogue.
- *
- * **1. A search with no date window returns the last five years, newest first
- * nowhere.** Thirty reels for `skincare for acne scars` ran from December 2021
- * to April 2026, in relevance order, and the newest of the thirty was **five
- * months old**. A monitor polling for what was said since it last looked would
- * have paid a credit a poll to be handed nothing that passed its `since`, for
- * as long as it ran. The same query with `date_posted=last-month` returned
- * eight reels and **all eight were inside the window**.
- *
- * So this connector always sends a window, and that is the difference from
- * `linkedin.ts`, which sends none when `since` is absent or old and takes what
- * it is given. Here that is not a neutral choice, it is the broken one.
- *
- * **2. `has_more` is wrong, and following it is free.** Page one came back with
- * thirty reels, `has_more: true` and a cursor; the cursor returned **zero items
- * for zero credits**, with another `has_more: true` and another cursor. So the
- * walk ends on an empty page, not on the flag. `client.ts` holds the rest.
- *
- * **3. The comments are mostly not words, and the leads are all in the few
- * that are.** A live poll collected 89 comments: 56 were under ten characters
- * and the median was four. Twelve passed sixty characters, and **the two
- * highest-scoring matches of the run are the two longest comments in it** — 233
- * and 289 characters, scoring 90 and 77. The 90 is the highest any comment has
- * scored on any platform in this product.
- *
- * So this platform is not poor, it is *sparse*, and a median describes it
- * badly. What it is expensively is dear to read: a comment page is five credits
- * where TikTok's and YouTube's are one, so the same poll spent **$1.6317 with
- * the provider and $0.3336 with the model**. Every other platform here spends
- * more on the model than on the provider. Budget for the reading.
- *
- * A fourth difference is smaller and reaches the shared parser: Instagram sends
- * `url`, `post_id` and `author.display_name` **null on every comment**. The
- * link is built here, the name falls back to the handle in `comments.ts`, and
- * the missing `post_id` means BUG-007's defence is inert on this platform —
- * nothing here can tell that a comment belongs to another post.
+ * A comment page is five credits where a search is one, so the provider half
+ * of a poll outweighs the model half, alone among the platforms. The leads
+ * are in the few long comments; the median comment is four characters.
  */
 import { instagramPlatform } from "../../platforms.js";
 import type {

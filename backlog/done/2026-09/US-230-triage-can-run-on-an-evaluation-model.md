@@ -6,7 +6,7 @@ priority: p2
 created: 2026-09-19T10:30+08:00
 parent: US-229
 area: ai
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -196,3 +196,4 @@ a different list.
   whether to lower a monitor's minimum to see the 30-39 band. On this data that
   band is entirely promotional, so the answer is no, and no poll was spent
   finding out.
+- 2026-09-20T00:55+08:00 — Closed. Every box was ticked on 2026-09-19; the ticket was not moved.

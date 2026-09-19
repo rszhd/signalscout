@@ -10,6 +10,7 @@
   },
   "scripts": {
     "setup": "node scripts/init-env.mjs",
+    "prepare": "git config core.hooksPath .githooks || true",
     "dev": "node scripts/dev.mjs",
     "preview": "node scripts/preview.mjs",
     "build": "tsc --build && pnpm --filter @signalscout/web build",

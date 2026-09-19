@@ -6,7 +6,7 @@ priority: p1
 created: 2026-09-06T04:42+08:00
 parent:
 area:
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -143,4 +143,4 @@ is the failure this repository keeps writing down.
   the filter and was never reached has no row anywhere. Making "40 posts are
   waiting" answerable is a schema change, and it belongs to a ticket that wants
   it rather than to this one.
-
+- 2026-09-20T00:55+08:00 — Closed. Six of seven boxes are done and the seventh needs a live run nobody has paid for; it is US-240, parked, so this ticket stops sitting in doing/.

@@ -1,436 +1,248 @@
 # What SignalScout says a monitor cost
 
-SignalScout runs on your API keys. So it has to be able to answer two
-questions: what has this monitor spent, and how do I stop it spending more.
-This page says how it answers them, and — more important — what its answer is
-not.
+SignalScout runs on your API keys, so it must answer two questions: what has
+this monitor spent, and how do I stop it spending more. This page holds the
+rules behind both answers and what the answer is not. The measurements are in
+[history.md](history.md) under *Costs*.
 
 ---
 
 ## Every figure SignalScout shows is an estimate
 
-**The provider's invoice is authoritative. Ours is not.**
+**The provider's invoice is authoritative. Ours is not.** We do not read your
+bill. We count the units each call reported and multiply by the price the
+connector declares — each connector's `pricePerUnitMicros`, and the
+`postsPerUnit` it measured. That arithmetic is wrong in these ways, and
+probably one more we have not met:
 
-We do not read your bill. We count what each call reported and multiply it by
-the price the connector declares:
+- **A failed call may still be billed.** A call that never came back reported
+  no units, so it is not in our total.
+- **The months differ.** Ours starts on the first at midnight UTC. Your
+  provider's starts wherever your account says.
+- **A price changes without asking us.** Prices are constants in this
+  repository.
+- **A free allowance is not modelled.** Every unit is priced at the paid rate.
+- **A vague query is not free silence.** X refunds a search that matches
+  nothing; LinkedIn, YouTube and Instagram return unrelated results at full
+  price, and then the model is paid to read them.
+- **The model's half of a poll is not in the cost test**, and the pre-filter
+  decides how big it is, which is the number nobody can predict.
 
-| Platform | Provider | Billable unit | Price per unit | Per post |
-|---|---|---|---|---|
-| Reddit | Bright Data — switched off since US-158 | a record | $0.0015 | $0.0015 |
-| Reddit | ScrapeCreators | a request | $0.00188 | ~$0.00027 (7–23 posts a request) |
-| Reddit | SocialCrawl | a credit | $0.008118 | ~$0.00032 (25 posts) |
-| X | SocialData | a tweet | $0.0002 | $0.0002 |
-| X | SocialCrawl | a request | $0.008118 | ~$0.0004 (20 posts) |
-| LinkedIn | Apify | a post | $0.002 | $0.002 |
-| YouTube | SocialCrawl | a credit | $0.008118 | ~$0.00018 (45 videos) |
-| TikTok | SocialCrawl | a credit | $0.008118 | ~$0.00027 (30 videos) |
-| Instagram | SocialCrawl | a credit | $0.008118 | ~$0.00027 (30 reels) |
-| Instagram comments | SocialCrawl | 5 credits a page | $0.0406 | ~$0.0027 (15 comments) |
-| A model call | your provider | one call | the provider's own token price | |
+**A comment is not priced like a post.** A connector declares
+`replyPricePerUnitMicros` separately, because a guard fed the post price lets
+a monitor spend five times its cap. An Instagram comment is the dearest item
+this product fetches, about $0.0027, and Instagram is the one platform where
+the provider costs more than the model. Set a cap before ticking that box.
 
-Each price is the one its connector declares, and each per-post figure is that
-price divided by the `postsPerUnit` the connector measured. LinkedIn through
-SocialCrawl is not here because US-053 switched that pair off; Apify fetches
-LinkedIn now.
+**A price we do not have is null, never a guess.** `estimated_cost_micros`
+is null on a call whose price is not configured, and null means *we cannot
+say*; it counts as nothing. A local model through Ollama is genuinely free, an
+unpriced hosted model is unknown, and a number we invented would be
+indistinguishable from a measured one. This is why:
 
-That arithmetic is wrong in every way listed below, and probably in one more we
-have not met yet:
+- **Embeddings have no price until `AI_EMBEDDING_PRICE_MICROS` is set.** The
+  amount is about a hundredth of a classification.
+- **DeepSeek has no row in `modelPrices`.** Its four rates per model (peak,
+  off-peak, cache hit, cache miss) differ a hundredfold and the API does not
+  say which band a call landed in. Set `AI_INPUT_PRICE_MICROS` and
+  `AI_OUTPUT_PRICE_MICROS`, or the per-job price on the Models screen, and set
+  the dearest band.
+- **Triage prices fall back to the classifier's only while no separate
+  triage model is named.** Once one is, `AI_TRIAGE_INPUT_PRICE_MICROS` and
+  `AI_TRIAGE_OUTPUT_PRICE_MICROS` do not fall back, because a cheaper model
+  billed at the classifier's rate would report a saving that never happened.
 
-**An Instagram comment is the dearest item this product fetches.** A comment
-page is five credits for fifteen comments, which is about $0.0027 each —
-fifteen times a YouTube video, thirteen times a tweet through SocialData, and
-about a third dearer than a LinkedIn post through Apify. Set a cap before you
-tick that box.
+**Every amount on a screen is labelled *estimated* and printed to four
+decimal places, never rounded to cents.** Ten Reddit records cost $0.015, and
+a page that rounded that to two cents could not be reconciled against
+anything. Use our figure to notice a monitor running away. Use the invoice to
+know what you owe.
 
-**A comment is not priced like a post, and a guard fed the wrong one lets a
-monitor spend five times its cap.** That is why a connector declares
-`replyPricePerUnitMicros` separately. US-028 found it on LinkedIn, where a call
-was five credits and a credit was not a request.
+### Triage is a model call, not a free stage
 
-**Instagram is the one platform where the provider costs more than the model.**
-A search page is one credit and a comment page is five, and the leads there are
-in the comments. One live poll spent $1.6317 with SocialCrawl against $0.3336
-with the model, which is the reverse of every other platform.
+The pre-filter's third stage asks a cheap model one question about every item
+the first two kept, so it spends on the items it keeps as well as the ones it
+drops. A one-word answer is not a short call: a reasoning model bills its
+thinking as output, and a triage call costs about what the classification it
+avoids costs.
 
-**A vague query is not free silence.** X refunds a search that matches nothing.
-LinkedIn, YouTube and Instagram do not — they return unrelated results at full
-price, and then the model is paid to read them.
+**The saving is the price gap between the two models, and nothing else.** A
+classifier ten times dearer than the triage model made the bill 61% smaller;
+the same model on both stages made it 37% larger. The worker warns at startup
+when the two match.
 
-**The free allowance is not modelled.** Bright Data's first 5,000 records each
-month cost nothing. SignalScout prices every record at the paid rate, so a
-monitor inside the free tier reads as more expensive than it was. No monitor
-can be inside it any more: US-158 switched that connector off, on the price the
-table above charges once the allowance runs out.
+**A deployment with no cheaper model switches the stage off with
+`AI_TRIAGE=off`.** Leaving `AI_TRIAGE_MODEL` blank does not switch it off; it
+runs triage on the classifier's own model, which costs more and keeps the one
+risk a cascade has: a triage drop leaves no row, no inbox entry and nothing
+for a person to notice. A cascade is worth that risk only when the second
+reader is much dearer.
 
-**A failed call may still be billed.** A call that never came back reported no
-units, so it is not in our total. It may well be on the invoice.
-
-**The months may not be the same month.** Our month starts on the first at
-midnight UTC. Your provider's billing month starts wherever your account says.
-
-**A price changes without asking us.** The prices above are constants in this
-repository. A provider that raises one does not tell the code.
-
-**An embedding has no price until you set one.** The pre-filter embeds the
-monitor once and each post it keeps, and we carry no price table for embedding
-models. Until `AI_EMBEDDING_PRICE_MICROS` is set, those calls are recorded with
-no cost — which reads as *we cannot say*, not as *free*. The amount is small:
-an embedding costs about one hundredth of a classification, which is why the
-stage saves money at all.
-
-**Triage is a model call, not a free stage.** The pre-filter's third stage asks
-a cheap model about every item the first two kept, so it spends money on the
-items it keeps as well as the ones it drops. Its answer is one word, and that
-turned out not to be the saving: a reasoning model bills its own thinking as
-output, so a triage answer is not a short call. US-030 measured 113 output
-tokens against a classification's 95; US-221 sharpened the question and the
-thinking shrank with it, to 80. The cost per call did not follow, because the
-longer prompt added to the input what the answer took off the output: 267
-micro-dollars an item before, 273 after. Triage costs about what the
-classification it avoids costs.
-
-**The saving is the price gap between the two models, and nothing else.** Over
-46 real comments, keeping 13, a classifier ten times dearer than the triage
-model made the bill 61% smaller; the same model on both stages made it 37%
-larger. The worker warns at startup when the two match. Choose a triage model
-cheaper than the classifier, or expect the stage to cost you money.
-
-Both numbers moved with US-221 and neither changed sign. The stage kept 19 of
-those 46 comments before it and 13 after, so it now avoids six more
-classifications for the same money spent asking.
-
-**A deployment with no cheaper model should switch the stage off.** `AI_TRIAGE=off`
-does that, and US-177 added it because the alternative was worse than it looked:
-leaving `AI_TRIAGE_MODEL` blank does not switch triage off, it runs triage on
-the classifier's own model. With no price gap the stage costs 37% more *and*
-keeps the one risk a cascade has — a triage drop leaves no row, no inbox entry
-and nothing for a person to notice, and there is no better reader behind it to
-buy the mistake back. A cascade is worth its risk when the second reader is
-much dearer. When it is the same model, it is not.
-
-**An evaluation model is the cheapest triage available, and it is not promoted.**
-`AI_TRIAGE_PROVIDER=typesafe` with `AI_TRIAGE_MODEL=jev-latest` runs the stage
-on a model that answers a typed question rather than a prompt. It is priced at
-42,000 micro-dollars per million input tokens and nothing for output, against
-`gpt-5.6-luna`'s 200,000 and 1,200,000. Measured in US-229 over 227 items from
-five platforms: 43.7 micro-dollars an item against 355.6, the same six leads
-scoring 60 or more kept by both, and twelve items sent to the classifier rather
-than seventeen.
-
-Two things stop that being a recommendation. Every one of those numbers was
-fitted to the sample it was then scored against, which is what US-229 is open
-to fix. And the rule it triages by is not the rule `triage-prompt.ts` sends to a
-language model: an evaluation model takes no system prompt, so the question is
-put as structured state, and the question it asks is the one US-221 replaced.
-`pinned.ts` and the recommendation table are untouched, so nothing runs on it
-until a deployment asks.
-
-It also reports how sure it is, which no language model here does. A `no` below
-0.6 confidence keeps the item. That is the stage's own rule — only an explicit
-`no` drops — and it costs a few classifications to hold.
-
-It has the same "no price until you set one" behaviour as an embedding.
-`AI_TRIAGE_INPUT_PRICE_MICROS` and `AI_TRIAGE_OUTPUT_PRICE_MICROS` fall back to
-the classifier's prices only while no separate triage model is named. Once one
-is, they do not fall back, because a cheaper model billed at the classifier's
-rate would report a saving that never happened.
-
-This is why every amount on a screen is labelled *estimated*, and why the
-figure is deliberately printed to four decimal places rather than rounded to
-cents: ten Reddit records cost $0.015, and a page that rounded that to two
-cents could not be reconciled against anything.
-
-Use our figure to notice a monitor running away. Use the invoice to know what
-you owe.
-
-**One day has been compared, once.** On 2026-09-05 Bright Data's dashboard
-reported 95 records and $0.14. `api_usage` held 98 records and $0.147 for the
-same day: three records more, 3.2%, and high rather than low. The cause is not
-identified. The likeliest candidate is that a collection is triggered with
-`include_errors=true` and we count every record the snapshot reports, while the
-provider does not bill a record that failed. Two things this does not prove: a
-dashboard is not an invoice, and one day is not a reconciliation. Their $0.14
-is 95 × $0.0015 = $0.1425, rounded to cents — which is the rounding this
-document refuses to do.
+**An evaluation model is the cheapest triage available and it is not
+promoted.** `AI_TRIAGE_PROVIDER=typesafe` with `AI_TRIAGE_MODEL=jev-latest`
+answers a typed question, at about an eighth of the cost per item, and it
+reports a confidence: a `no` below 0.6 keeps the item. It is not recommended
+because its numbers were fitted to the sample they were scored against
+(US-229) and the rule it triages by is not the one `triage-prompt.ts` sends
+to a language model. Nothing runs on it until a deployment asks.
 
 ---
 
 ## What is recorded
 
-Two tables, and both are written whatever the outcome.
+Two tables, and both are written whatever the outcome. Everything is in
+**micro-dollars**, millionths of a dollar, as integers: a classification costs
+about $0.001, and a column in cents would record a month of it as zero.
 
-`api_usage` holds one row per monitor per source per day: the billable units
-the connector reported, and their estimated cost. It is written after every
-page, not once per poll, because a poll that fails on its third page was billed
-for the first two.
+**`api_usage`** holds one row per monitor per source per day: the units the
+connector reported and their estimated cost. It is written **after every
+page**, because a poll that fails on its third page was billed for the first
+two. A call billed nothing is still recorded: a ledger that skipped those
+could not tell "polled and cost nothing" from "never polled", and only the
+second is a bug.
 
-A call that was billed nothing is still recorded. Bright Data's trigger call
-bills no records, and a poll that finds only posts older than the last one
-bills records and returns nothing. A ledger that skipped those could not tell
-"this monitor polled and cost nothing" from "this monitor never polled" — and
-the second is a bug while the first is a Tuesday.
+**`model_calls`** holds one row per call to a model — classification, query
+generation, triage and embeddings alike — including the ones refused. A
+refusal is billed like an answer. The `purpose` column is what tells four
+different prices apart; triage and classification are often the same model,
+and without it the one number the triage stage exists to prove could not be
+read. An embedding call covers a batch and carries the monitor and no post; a
+triage call is about one item and carries it.
 
-`model_calls` holds one row per call to a model — classification, query
-generation, triage and the pre-filter's embeddings alike — including the ones
-that were refused. A refusal is billed like an answer.
-
-Both tables carry `user_id`, and it is written by the caller rather than read
-off the monitor (US-162): a draft, a query generation, a cost test and a key
-test have no monitor, and they are the account's money all the same.
-`accountSpend` sums both ledgers for one account and one month in one read,
-and `draftsThisMonth` counts one purpose — that is the pair a hosted plan is
-checked against. A `model_calls` row from before the column existed was
-backfilled from its monitor; one with no monitor keeps a null owner and is on
-nobody's month, which is the same answer as an unknown price: *we cannot
-say*, never a guess.
-
-The `purpose` column is what makes the four tellable apart, and they are four
-different prices. One embedding call covers a batch of posts, so it carries the
-monitor and no single post: it is on the monitor's bill, which is where the cap
-reads it. A triage call is about one item and carries it, like a
-classification.
-
-Triage and classification are often the same model, so nothing but that column
-can tell them apart. Without it a bill would report the cheap stage's calls at
-the expensive stage's rate, and the one number the stage exists to prove — what
-it saved — could not be read at all.
-
-`estimated_cost_micros` is null on a model call whose price is not configured.
-Null means *we cannot say*, and it is counted as nothing rather than guessed.
-A local model through Ollama is genuinely free; an unpriced hosted model is
-unknown; a number we invented would be indistinguishable from a measured one.
-
-**DeepSeek is unpriced on purpose, and it is the clearest case of that rule.**
-US-124 read the page: each model has four rates — peak hours and off-peak
-hours, each split into cache hit and cache miss — and one million input tokens
-on `deepseek-flash` costs $0.003 in one band and $0.30 in another. The usage
-the API returns does not say which band a call landed in. So DeepSeek has no
-row in `modelPrices`, and a deployment that wants a figure sets
-`AI_INPUT_PRICE_MICROS` and `AI_OUTPUT_PRICE_MICROS`, or the per-job price on
-the Models screen. Set the dearest band if you set anything: the cap is checked
-against the high end for the reason this page gives elsewhere.
-
-Everything is stored in **micro-dollars** — millionths of one US dollar, as
-integers. One classification costs about $0.001, which is a tenth of a cent, so
-a column in cents would record a month of classification as zero.
+**Both tables carry `user_id`, written by the caller, never read off the
+monitor** (US-162). A draft, a query generation, a cost test and a key test
+have no monitor and are the account's money all the same. `accountSpend` sums
+both ledgers for one account and one month; `draftsThisMonth` counts one
+purpose. A row with no owner is on nobody's month — *we cannot say*, never a
+guess.
 
 ---
 
 ## The cap
 
-A monitor may be given a monthly cap and one of two behaviours.
+A monitor may have a monthly cap and one of two behaviours. **pause**: the
+monitor is paused at the cap and collects nothing until a person raises the
+cap and resumes it. **notify**: each poll is refused while the cap is spent,
+and polling resumes by itself when next month's spend resets. A monitor with
+no cap still records everything. There is no default cap: that would be this
+software deciding how much of your key it may use.
 
-**pause** — the monitor is paused when the cap is reached. It collects nothing
-until a person raises the cap and resumes it. Its posts, matches and verdicts
-are untouched.
+**The cap can be overshot by up to one poll.** The guard runs before a poll,
+because a page is billed when fetched. It cannot know what the poll will cost:
+the connector decides how many records a query collects. What bounds the
+overshoot is `maxPagesPerPoll` in `worker/collect.ts`, not the cap. The cost
+test is the answer to the size of the thing; the guard is the answer to the
+running of it.
 
-**notify** — the monitor is left running and each poll is refused while the cap
-is spent. It starts collecting again by itself when next month's spend resets,
-with nobody pressing anything.
+**A refused poll leaves bought work unread.** A collection already paid for
+and not yet read is not read while the cap is spent, because every post in it
+would go to the classifier. The `source_continuations` row stays, and raising
+the cap reads the snapshot rather than paying for the query again.
 
-A monitor with no cap still records everything it spends. A default cap would
-be this software deciding how much of your key it may use.
-
-### The cap can be overshot, by up to one poll
-
-The guard runs before a poll, because a page is billed when it is fetched and a
-check afterwards has already spent the money. But it cannot know what the poll
-it is about to allow will cost: the connector decides how many records a query
-collects.
-
-So a monitor at $9.99 of a $10.00 cap will start one more poll, and that poll
-may cost more than a cent. What bounds the overshoot is `maxPagesPerPoll` in
-`worker/collect.ts` — five pages, one job — not the cap.
-
-[The cost test](#what-a-plan-would-cost-before-it-runs) is the answer to this,
-and it is a different kind of answer: it does not stop the overshoot, it tells
-a person the size of the thing before they start it. A monitor whose plan was
-measured at $164 a month against a $10 cap was never going to be saved by a
-guard that runs one poll at a time.
-
-### What a refused poll does with money already spent
-
-A collection Bright Data has already been paid for and not yet read is not read
-while the cap is spent. Reading it would cost nothing more at the source, but
-every post it holds would go to the classifier, and that is money past the cap.
-
-The row in `source_continuations` stays. Raising the cap reads the snapshot
-rather than paying for the query again — if the provider still has it.
+**A plan is exhausted at `spend >= cap`**, not past it. A plan that lands
+exactly on its cap stops collecting before the month ends.
 
 ---
 
 ## What a plan would cost, before it runs
 
-`api_usage` answers "what has this monitor spent". It cannot answer "what will
-this plan spend", and on a metered source that is the more expensive question:
-the money goes at fetch time, before any filter and before the model reads a
-word. No later stage can save a user from a query that is too broad. Only a
-narrower query can.
+On a metered source the money goes at fetch time, before any filter and before
+the model reads a word. No later stage can save a person from a query that is
+too broad; only a narrower query can. So the monitor form has a **Test this
+plan** button. It runs each query once, against ten posts, and reports how
+often that query finds a post, what a month would cost at this monitor's
+schedule, and what the test itself just cost.
 
-So the monitor form has a **Test this plan** button. It runs each query once,
-against ten posts, and reports three things: how often that query finds a post,
-what a month of it would cost at this monitor's poll interval, and what the
-test itself just cost.
+**The test spends money**, about a cent and a half a query at Reddit's rate.
+It runs when the button is pressed, never on a keystroke, and the answer says
+what the answer cost. **Its cost is recorded with no monitor against it**: a
+null `monitor_id` in `api_usage`, on the bill and on no monitor's cap. A cap
+guards the worker, which spends at 02:00 with nobody watching.
 
-**The test spends money.** That is the honest tension in it: the only way to
-find out what a query collects is to collect a little of it. Ten records a
-query is about a cent and a half at Reddit's rate, so testing a plan of eight
-queries costs about twelve cents. It runs when the button is pressed, never on
-a keystroke, and the answer says what the answer cost.
-
-**The test's own cost is recorded with no monitor against it.** The plan is
-usually still a plan — the whole point is to decide before committing — so the
-row in `api_usage` has a null `monitor_id`. It is on the bill and on no
-monitor's cap. `model_calls` already does this for the queries the model
-writes from the same form. A cap guards the worker, which spends at 02:00 with
-nobody watching; the cost test spends only when a person presses a button and
-is shown the price.
-
-### How the monthly figure is worked out
+### The arithmetic
 
     records a poll       what the source charged for one sample of this query
     records a month      = records a poll x polls a month
     estimated cost       = records a month x the source's price
 
-**The cost is counted from the records the source charged for, never from the
-posts we kept.** Those are different numbers, and the difference is the whole
-reason a connector reports `unitsConsumed` instead of letting the caller count
-rows.
+**Count the records the source charged for, never the posts we kept.** The
+first live run billed ten records for a query and returned no posts, and an
+earlier arithmetic reported that query as free; it would have cost that on
+every poll for ever, with nothing on the screen arguing for deleting it.
 
-The first live run, on 2026-09-05, is why this page says so. A sample of "flaky
-end to end tests" was billed ten records and returned no posts at all: every
-post it found was three weeks old, outside the window the sample asked for. An
-earlier version of this arithmetic counted the posts and reported that query as
-costing nothing. It had just cost a cent and a half, and it would have cost
-that on every poll for ever, with nothing on the screen arguing for deleting
-it.
+**The projection uses the schedule the person chose, including the days.** A
+weekday monitor is quoted five sevenths of a daily one. An estimate records
+the schedule it priced; change the schedule afterwards and the old estimate is
+stale rather than silently re-priced. A quote is a record of what you were
+told.
 
-Polling is still the multiplier, and still the biggest dial a person controls:
-the same query costs $10.80 a month polled hourly and $648.00 polled every
-minute.
+**Some figures are a range.** When a sample of ten is billed all ten, the
+source had more to give and a real poll asks for fifty, so the screen shows
+both ends. A single figure invented from that would be a number nothing
+measured. **The cap is checked against the high end**: a warning about money
+is worth giving early, and the range is what lets a person disagree with it.
 
-**The projection uses the schedule you chose, including the days.** A monitor
-set to weekdays makes five sevenths of the polls a daily one does, and is
-quoted five sevenths as much. That was not true until 2026-09-06: the estimate
-assumed hourly and every day for as long as every monitor *was* hourly and every
-day, and the first version of the schedule control quoted a weekly monitor a
-month of hourly polling — 730 polls where it makes about four. Wrong by roughly
-180 times, in the direction that frightens somebody away from a monitor costing
-pennies.
-
-An estimate records the schedule it priced. Change the schedule afterwards and
-the old estimate is stale rather than silently re-priced, because a quote is a
-record of what you were told rather than a live query.
-
-### Why some figures are a range
-
-A sample asks for ten records. When the source bills all ten, it had more to
-give, and a real poll asks for fifty — so a month is somewhere between $10.80
-and $54.00, and one sample of ten cannot say where. The screen shows both ends.
-
-A single figure invented from that would be a number nothing measured, which is
-what this page exists to refuse. The cap is checked against the high end,
-because a warning about money is worth giving early and the range is what lets
-a person disagree with it.
-
-### What this estimate is wrong about
-
-Everything in the list above, and three more of its own.
-
-**A week is not a month.** The sample looks back seven days and multiplies. A
-query about a product launched last week has no history to measure, and a quiet
-Tuesday will lie about a busy Friday.
-
-**A poll is not a sample.** The projection assumes a poll of one query costs
-what one sample of it cost. A poll asks for five times as many records, so a
-query with more to give costs more than the low end says — that is what the
-range is for, and the range is wide.
-
-**The model's half is not in it.** The figures here are what the *source*
-charges. Classifying the posts a plan collects costs about a tenth of a cent
-each, and the cost test does not add it. A plan that collects 7,200 records a
-month will also send some of them to a model — how many depends on the
-pre-filter, which is exactly the number nobody can predict before the monitor
-runs.
+**What the estimate is wrong about.** A week is not a month: the sample looks
+back seven days, and a query about last week's launch has no history. A poll
+is not a sample: a poll asks for five times as many records. The model's half
+is not in it.
 
 ### The flag
 
-A plan projected to cost more than the monitor's cap is flagged before the
-monitor can start, line by line, so a person can see which query is the
-expensive one. "Your plan is too broad" is not an instruction; "this query
-costs $54 of your $10" is.
-
-Flagged, the form saves the monitor **without starting it**. Keeping a plan and
-starting it are two decisions, and the second one belongs to a person who has
-now seen the number. The Monitors screen starts it when they are ready.
-
-The flag counts *at* the cap, not past it, because US-013's guard does: a
-monitor is exhausted at `spend >= cap`, so a plan that lands exactly on its cap
-is a plan that stops collecting before the month ends.
+A plan projected past the monitor's cap is flagged **line by line** before the
+monitor can start, so a person sees which query is the expensive one. "This
+query costs $54 of your $10" is an instruction; "your plan is too broad" is
+not. Flagged, the form saves the monitor **without starting it**. Keeping a
+plan and starting it are two decisions, and the second belongs to a person who
+has now seen the number.
 
 ---
 
 ## The pre-filter is a cost control, and it is also a risk
 
-Between collection and the model sits a filter with three stages: a free
-keyword and subreddit match, then a similarity comparison that costs one
-embedding per post, then triage, which asks a cheap model one question about
-each item that survived. All three exist to keep the model bill down. The
-second pays for itself as soon as it drops a few posts in a hundred; the third
-is a model call, so it is cheap only next to a classification.
+Three stages sit between collection and the model: a free keyword and
+subreddit match, a similarity comparison that costs one embedding per post,
+and triage, which asks a cheap model one question per surviving item. The
+third exists because the first two measure *subject*, and no similarity
+threshold separates a person asking from the experts replying under them.
 
-The third stage exists because the first two measure *subject*, and under a
-post about the right subject the people answering it are on subject too. No
-similarity threshold separates a person asking from the experts replying — that
-was measured over two real threads — so the job falls to something that can
-read.
+**A threshold set too high drops good leads where nobody can see it.** An
+empty inbox looks the same whether the week was quiet or the filter ate it.
+So, by design:
 
-The risk runs the other way. **A threshold set too high drops good leads where
-nobody can see it.** An empty inbox looks the same whether the week was quiet
-or the filter ate it. So three things are true by design:
-
-- The threshold starts low — 0.15 cosine similarity. One run has measured it:
-  on 2026-09-05 a real embedding model put PLAN.md's four on-topic posts at
-  0.26 to 0.57 and a post about sourdough at 0.09, so 0.15 sits inside that gap
-  with room on both sides. **That is five posts, not a distribution.**
-- Every drop is written to `filter_drops` with the similarity that caused it,
-  so the threshold can be argued with using real data.
-- The Monitors screen shows how many posts each stage has kept from the model,
-  and the whole filter can be turned off per monitor. Turning it off turns
-  triage off too: it is one of the filter's stages. `AI_TRIAGE=off` turns the
-  triage stage off for the whole deployment while the rest of the filter runs.
-- Triage has no threshold to argue with, so its drops are the ones to read
-  rather than to count. Only an explicit refusal drops an item — a timeout, a
-  rate limit or an unreachable provider all pass it on — and every refusal is a
-  `filter_drops` row.
-
-An embedding that fails never drops a post. The post goes to the model instead,
-which costs more and hides nothing.
+- The threshold starts low, 0.15 cosine similarity, chosen from five measured
+  posts, not a distribution.
+- Every drop is written to `filter_drops` with the similarity that caused it.
+- The Monitors screen shows how many posts each stage kept from the model, and
+  the whole filter can be turned off per monitor. Turning it off turns triage
+  off too. `AI_TRIAGE=off` turns triage off for the whole deployment while the
+  rest runs.
+- Triage has no threshold, so its drops are the ones to read rather than
+  count. Only an explicit refusal drops an item; a timeout, a rate limit or an
+  unreachable provider passes it on, and every refusal is a `filter_drops`
+  row.
+- An embedding that fails never drops a post. The post goes to the model,
+  which costs more and hides nothing.
 
 ---
 
-## Where to look
-
-- The cap and the spend are on the **Monitors** screen, next to the monitor
-  they belong to. A refused poll says why there, in the same sentence the
-  worker logged.
-- The rule itself is `packages/pipeline/src/budget/budget.ts`. It is one of the
-  correctness-critical surfaces named in [testing.md](testing.md), so its
-  assertions were written before it was.
-- The pre-filter is `packages/pipeline/src/worker/filter.ts`, its keyword rule is
-  `packages/engine/src/filter/keywords.ts`, and what it dropped is in
-  `filter_drops`.
-- The cost test's arithmetic is `packages/engine/src/estimate/estimate.ts`, and
-  its assertions were written first for the same reason: it puts a number in
-  front of a person who is about to spend money. The samples are collected by
-  `packages/pipeline/src/worker/estimate.ts`, on the `estimate` queue.
-
 ## Deletion checks
 
-US-015 re-checks matched posts through the selected provider. These calls are
-metered too. Each reported unit is written to `api_usage` under the monitor
-that started the check. A shared post is checked once for all its matches.
-The cap is checked before each call, and new checks yield to due or active
-polls and collections waiting on a snapshot. One final call can overshoot the cap; its price is known only afterwards.
-Pausing collection does not stop checks on the inbox within that budget.
-See [deletions.md](deletions.md) for frequency and provider limitations.
+Re-checks of matched posts go through the selected provider and are metered
+too. Each unit is written to `api_usage` under the monitor that started the
+check; a shared post is checked once for all its matches. The cap is checked
+before each call, new checks yield to due polls and to collections waiting on
+a snapshot, and one final call can overshoot the cap. Pausing collection does
+not stop checks. See [deletions.md](deletions.md).
+
+## Where to look
+
+- The cap and the spend are on the **Monitors** screen, and a refused poll
+  says why there in the sentence the worker logged.
+- The rule is `packages/pipeline/src/budget/budget.ts`, a correctness-critical
+  surface: its assertions were written before it was.
+- The pre-filter is `packages/pipeline/src/worker/filter.ts`; its keyword rule
+  is `packages/engine/src/filter/keywords.ts`.
+- The cost test's arithmetic is `packages/engine/src/estimate/estimate.ts`,
+  also written test-first; the samples are collected by
+  `packages/pipeline/src/worker/estimate.ts` on the `estimate` queue.

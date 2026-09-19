@@ -1,18 +1,20 @@
 # Adding a source
 
+This page holds the rules. What was measured, and when, is in
+[history.md](history.md) under *Sources*, with the ticket that measured it.
+
 A source has two axes, and US-024 separated them.
 
 * A **platform** is what a person ticks: Reddit, X, LinkedIn. It keys
   `posts.source`, it keys deduplication, and a monitor names it.
-* A **provider** is who fetches, whose key it is, and what it bills: Bright
-  Data, ScrapeCreators, SocialCrawl. One provider key serves every platform
-  that provider fetches.
+* A **provider** is who fetches, whose key it is, and what it bills. One
+  provider key serves every platform that provider fetches.
 * A **connector** is the pair, and it is what the registry holds.
 
-Until two providers fetched the same platform, one record could describe both.
-Two cannot share a price, a billable unit or a key list, so they are separate
-records now. `packages/engine/src/sources/types.ts` holds the interface, and its
-comments say which axis owns each field.
+Two providers fetching one platform cannot share a price, a billable unit or
+a key list, so the three are separate records.
+`packages/engine/src/sources/types.ts` holds the interface, and its comments
+say which axis owns each field.
 
 The two lists below are short on purpose: if adding either needs more than
 this, the interface is wrong and the fix belongs in the interface.
@@ -29,8 +31,8 @@ reaches `source_credentials.provider` and the environment variable that holds
 the key.
 
 **2. Export one `ProviderDescriptor`.** Who the provider is, and the fields a
-person pastes. The list is the provider's, not the platform's — one key serves
-every platform this provider fetches, so it is written once and rotated once.
+person pastes. The list is the provider's, not the platform's — one key is
+written once and rotated once, however many platforms sit behind it.
 
 ```ts
 export const brightDataProvider: ProviderDescriptor = {
@@ -40,8 +42,8 @@ export const brightDataProvider: ProviderDescriptor = {
 };
 ```
 
-**3. Export one `ConnectorDefinition` per platform it fetches.** The pair, plus
-what that pair bills, plus a `create` that takes a `SourceRuntime` and returns
+**3. Export one `ConnectorDefinition` per platform it fetches.** The pair,
+what that pair bills, and a `create` that takes a `SourceRuntime` and returns
 a `SocialSource`.
 
 ```ts
@@ -55,40 +57,33 @@ export const brightDataReddit: ConnectorDefinition = {
 };
 ```
 
-The three money fields belong to the pair and never to the platform alone.
-Bright Data prices a Reddit record at $0.0015 and another provider will not
-price the same record the same, so a number kept on the platform would be one
-provider's arithmetic on every provider's bill.
+The money fields belong to the pair, never to the platform or the provider
+alone. Two providers price the same post differently, and one provider prices
+two platforms differently: SocialCrawl spends one credit on an X call and five
+on a LinkedIn call, under one key and one credit price. Where a request and a
+credit are different numbers, a guard fed the wrong one lets a monitor spend
+five times its cap. Where replies cost differently from posts, declare
+`replyPricePerUnitMicros` separately.
 
 `maxUnitsPerQueryPoll` is the most one query can collect in one poll when the
-caller sets no limit. US-014's cost test uses it as the top of the range it
-reports for a query whose sample came back full: a sample of ten that was
-billed ten says only "there was more", and this says how much more there could
-be.
+caller sets no limit. The cost test uses it as the top of its range for a
+query whose sample came back full.
 
 **4. Add one line to `builtInSources`** in
 `packages/engine/src/sources/index.ts`, per connector.
 
 **5. Add the provider id to `providers`** in
 `packages/engine/src/vocabulary.ts` and run `pnpm db:generate` in
-`packages/pipeline`, whose schema builds the constraints from that array. Six
-columns carry it, each with its own check constraint: `api_usage`, `source_continuations`,
-`source_credentials`, `posts` (attribution only), `query_estimate_probes` and
-`source_providers`. One migration number, one file.
+`packages/pipeline`. Six columns carry a check constraint built from that
+array: `api_usage`, `source_continuations`, `source_credentials`, `posts`,
+`query_estimate_probes` and `source_providers`. One migration number, one
+file. **Nothing in the suite notices this omission**: US-057 shipped a
+connector without it, 1,228 tests passed, 25 real posts were collected, and
+every insert failed.
 
-**Do this, and do not assume a green suite noticed.** US-057 shipped the Apify
-connector without adding `apify` here: 1,228 tests passed, the connector
-collected 25 real posts, and every insert failed. `assertSourcesCanBeStored`
-checks platforms and nothing checks providers, so a connector can be
-registered, tested and unable to write a row.
-
-That is the whole change. Nothing that consumes a source needs a case for it:
-the collector pages it through `next`, the budget guard prices it from
-`pricePerUnitMicros`, the cost test projects a month from the units a search
-reports, and the connections screen renders the provider's
-`credentialFields`. `packages/engine/src/sources/adding-a-connector.test.ts` is
-that claim written as code — a complete connector, driven by caller code that
-never names it.
+That is the whole change. Nothing that consumes a source needs a case for it,
+and `packages/engine/src/sources/adding-a-connector.test.ts` is that claim
+written as code.
 
 ---
 
@@ -96,474 +91,230 @@ never names it.
 
 **1. Describe it in `packages/engine/src/sources/platforms.ts`.** An id and a
 display name, and nothing else. A platform holds nothing about money and
-nothing about keys, because two providers fetching it agree about neither.
+nothing about keys.
 
-**2. Write a migration for `posts.source`.** It carries a check constraint
-listing the platforms the schema accepts. Add the id to `sources` in
+**2. Write a migration for `posts.source`.** Add the id to `sources` in
 `packages/engine/src/vocabulary.ts`, run `pnpm db:generate` in
-`packages/pipeline`, whose schema builds the constraint from that array, and keep
-the rule: one migration number, one file.
-
+`packages/pipeline`, and keep the rule: one migration number, one file.
 `assertSourcesCanBeStored` turns the mistake into a failed boot rather than a
 failed insert at 02:00. Call it where the connector is wired in.
 
-**3. Write at least one connector for it**, by the list above. A platform with
-no provider is a platform nothing can fetch.
+**3. Write at least one connector for it**, by the list above.
 
 ---
 
-## One provider, six platforms
+## Before adding a provider, ask two questions
 
-SocialCrawl fetches X and LinkedIn since US-028, Reddit since US-031, YouTube
-since US-034, TikTok since US-044 and Instagram since US-049, and that is the
-case `ProviderDescriptor` was split out for. Its LinkedIn connector has been
-switched off since US-053 on 2026-09-09 — Apify fetches that platform now — so
-five of its six are offered. Everything this section says still holds: the key,
-the card and the rotation are one for all six. The credential fields are written once
-and the connections screen shows one card, so a person pastes that key once and
-rotates it once however many platforms sit behind it.
+**Can it discover a stranger?** A monitor exists to find a person describing a
+problem. A provider that fetches the posts of accounts you name, and cannot
+search, cannot serve a platform here however good it is at fetching.
 
-What is *not* shared is anything about money or shape. The two endpoints differ
-in their price per call, their cursor, their sort order, how they take a date
-window, and what they do with a search that matches nothing. `client.ts` holds
-one transport and an `EndpointProfile` per platform for the three things that
-differ; everything else is a connector's own business.
+**Sharing a key is not sharing a contract.** When a platform arrives at a
+provider we already use, ask the new endpoint every question the capture
+script asks, including the ones the sibling endpoint already answered. Every
+time this was done the answers differed: a search with no date window that
+returned five years of posts, a `has_more: true` beside an empty page, three
+fields null on every comment that every sibling fills. `client.ts` holds one
+transport and an `EndpointProfile` per platform for what differs.
 
-The lesson is worth keeping every time a platform arrives at this provider:
-sharing a key is not sharing a contract. Ask the new endpoint every question
-the capture script asks, even the ones the sibling endpoint already answered.
-US-028 asked nine, and four of the answers contradicted the X connector.
+**One provider is either by elimination or by convenience, and the two are
+not written down the same way.** Say which. A platform with one provider by
+convenience is an open question; by elimination, a closed one, with the
+measurements in history.md.
 
-**US-049 is the strongest case for that rule so far**, because Instagram broke
-three things its four siblings agree on, and each would have shipped as a silent
-fault:
-
-* **A search with no date window returns five years of posts.** Thirty results
-  ran from 2021 to 2026 in relevance order and the newest was five months old,
-  so a monitor's `since` would have thrown away everything it was billed for,
-  every poll. Instagram is the one connector here that always sends a window;
-  LinkedIn deliberately sends none in the same situation.
-* **`has_more` is true beside an empty page.** The cursor from a full first page
-  returned zero items, zero credits and another `has_more: true`. Reading the
-  flag is an endless walk over nothing.
-* **Three of the nine comment fields are null on every comment**: `url`,
-  `post_id` and `author.display_name`, against 137 captured comments from X,
-  YouTube and TikTok that fill all three. So the shared parser now falls back to
-  the handle for a name, and BUG-007's wrong-parent check is **inert on
-  Instagram** — there is no `post_id` to disagree with.
-
-The prices differ inside one platform too, which is new here. A reel search is
-1 credit and a comment page is 5, so this connector declares
-`replyPricePerUnitMicros` separately from `pricePerUnitMicros`. US-028 found
-that trap on LinkedIn: where a request and a credit are different numbers, a
-guard fed the wrong one lets a monitor spend five times its cap.
-
-## When only one provider can do the work
-
-X is the case worth remembering, because it was one provider for a reason
-rather than by preference — and the reason has since half expired.
-
-US-006 asked all three accounts we already held. Bright Data's X posts dataset
-answers a discovery trigger with `Available types: profile_url,
-profiles_array`, so it fetches the posts of accounts you name and cannot
-search. ScrapeCreators publishes six X endpoints and none of them is a search.
-SocialCrawl has `/v1/twitter/search/tweets`. A monitor exists to find a
-stranger describing a problem, so a provider that cannot search cannot serve X
-here, however good it is at Reddit.
-
-**X has two providers now.** US-061 added SocialData on 2026-09-07, and it did
-not weaken that rule — it searches. So the conclusion to carry forward is the
-question, not the count: before adding a provider for a platform, ask whether
-it can discover a stranger, and not only whether it can fetch a URL.
-
-**Three platforms were measured at a second provider on 2026-09-11**, after
-the owner asked for two everywhere. **TikTok and YouTube now have two
-providers** — US-119 and US-121 measured them, US-126 and US-127 built them.
-Instagram was worth building there only if a Google-indexed search is
-acceptable as the *second* provider, which is the question US-055 answered no
-to when it was the *only* one. **The owner decided on 2026-09-17: Instagram
-and LinkedIn keep one provider each.** US-160 measured HikerAPI, the one
-native Instagram search found, and it has no date window and orders by
-relevance across years, which cannot serve a poll; US-122 eliminated every
-LinkedIn route on price, on Google, or on needing the person's own account.
-The evidence is in US-119 to US-122 and US-160, and the capture scripts
-beside their fixtures re-ask everything.
-
-**Two things the ScrapeCreators build settled that are worth reading before the
-next connector there.** A search on that provider does not answer "nothing" the
-same way twice: TikTok returns thirty unrelated videos and bills, YouTube
-returns an honest empty page and bills, and the Instagram reels search answers
-404 and charges nothing. And an invalid parameter *value* is ignored and billed
-rather than refused, so the technique below — let the provider name its own
-vocabulary for free — works on its Reddit endpoint and nowhere else on it. Its
-OpenAPI document is the free substitute.
-
-**LinkedIn is the opposite case, and the two must not be written down the same
-way.** US-028 used SocialCrawl because it already had the key and the provider
-documents `/v1/linkedin/search/posts`. Bright Data and ScrapeCreators were
-never asked what they can do with LinkedIn. That is one provider by
-convenience, not by elimination — an open question rather than a closed one —
-and US-056 later measured three providers for that platform and US-057 shipped
-a second.
+---
 
 ## Two providers for one platform
 
-This is no longer hypothetical. US-025 gave Reddit a second provider on
-2026-09-05, and both fetch the same subreddits.
-
-The registry holds a connector under the pair, so `registry.get(platform,
-provider)` is the exact address and `registry.only(platform, options)` is for a
+The registry holds a connector under the pair: `registry.get(platform,
+provider)` is the exact address; `registry.only(platform, options)` is for a
 caller that has a platform and no provider.
 
-`decideProvider` is the rule, and it is written once. Four branches, in order:
+`decideProvider` is the rule, written once. Four branches, in order:
 
 1. **A recorded choice that can run wins.** `source_providers` holds one row
-   per platform per account, the connections screen writes it, and
-   `readProviderChoices` reads it. A choice is a decision and not a guess.
+   per platform **per account**, the connections screen writes it, and
+   `readProviderChoices` reads it. A poll reads the choice of the **monitor's
+   owner**, never of whoever is signed in, the same way `worker/credentials.ts`
+   reads their key. The function takes the owner as an argument, so the table
+   cannot be read without answering whose choice (BUG-010).
+2. **A recorded choice that cannot run is refused**, never replaced. Falling
+   back to whoever is left would bill an account at a provider the person did
+   not pick, at a different price.
+3. **One provider that can run is its own answer.** No question is asked.
+4. **Two that can run and no choice is an error.** Registration order would
+   spend somebody's money at a provider they did not pick.
 
-   **Whose choice, is the question every reader must answer.** BUG-010: the
-   table was keyed by the platform alone until 2026-09-10, so on an instance
-   taking registrations one account's choice decided what every other account
-   polled through — and by rule 2 below a choice that cannot run is refused
-   rather than replaced, so a stranger could stop somebody's monitors dead. A
-   poll therefore reads the choice of the **monitor's owner**, never of whoever
-   is signed in, the same way `worker/credentials.ts` reads their key. The
-   function takes the owner as an argument, so there is no way to read the
-   table without answering the question.
-2. **A recorded choice that cannot run is refused**, never replaced. A person
-   who chose ScrapeCreators and lost its key would otherwise have every poll
-   billed to SocialCrawl, which prices the same subreddit page higher. The rule
-   was written against a wider gap: Bright Data charged five to twenty times as
-   much, depending on how many posts a ScrapeCreators request returned, until
-   US-158 switched that pair off.
-3. **One provider that can run is its own answer.** No question is asked. This
-   is every deployment holding one key, which is the common case.
-4. **Two that can run and no choice is an error.** Answering from registration
-   order would spend somebody's money at a provider they did not pick.
+"Can run" is the caller's word, passed as `ChoiceOptions.among`. The poll
+fills it with the providers it holds a key for. A screen describing the build
+rather than running it leaves it out. A choice naming a provider that does not
+fetch the platform decides nothing.
 
-"Can run" is the caller's word, passed as `ChoiceOptions.among`. The poll fills
-it with the providers it holds a key for, so the build shipping two Reddit
-connectors never makes a one-key deployment answer a question. A screen that is
-describing the build rather than running it leaves it out.
-
-A choice naming a provider that does not fetch the platform at all is a stale
-or mistyped row, so it decides nothing and the rules answer as if it were
-absent. It still cannot pick for a platform two providers can run.
-
-The choice is read **per poll**, not at boot, so changing it takes effect on
-the next collection and needs no restart. It never reaches a collection that is
-already running: `source_continuations` carries the provider that started one,
-and `collect.ts` resumes through that provider whatever the choice now says.
-The cursor is a snapshot id the other provider has never heard of, and on a
-provider that bills at collection time, re-running the query pays for it twice.
+**The choice is read per poll**, not at boot, so a change takes effect on the
+next collection with no restart. **It never reaches a collection already
+running**: `source_continuations` carries the provider that started one, and
+`collect.ts` resumes through that provider whatever the choice now says. The
+cursor is one provider's snapshot id, and on a provider that bills at
+collection time, re-running the query pays twice.
 `query_estimate_probes.provider` is the same rule for a cost test's sample.
+`live:provider-switch` is the instrument that proves this; re-run it when the
+rule changes.
 
-That was measured, not argued. On 2026-09-05 `live:provider-switch` started a
-Bright Data collection of r/softwaretesting, moved the recorded choice to
-ScrapeCreators one second later, and watched the snapshot finish. All four
-resumes went to Bright Data with Bright Data's own cursor; ScrapeCreators was
-asked nothing until the collection closed. Re-run that script when this rule
-changes — it spends about $0.08 and it is the only thing that can say whether
-two real providers still behave this way.
+**Two connectors for one platform must agree about a post's id**, or the same
+post becomes two rows. Both Reddit connectors read Reddit's own `t3_` fullname
+under the provider's own field name.
 
-Two connectors for one platform must agree about the id they give a post, or
-the same post becomes two rows. Both Reddit connectors read Reddit's own `t3_`
-fullname — Bright Data calls it `post_id` and ScrapeCreators calls it `name`.
-That was proven live: a poll through ScrapeCreators collected 47 posts from a
-subreddit Bright Data had already collected, and stored no new row.
-
-**The two providers agree about almost nothing else**, which is the argument
-for the split:
-
-| | Bright Data | ScrapeCreators | SocialCrawl | SocialData | Apify |
-|---|---|---|---|---|---|
-| Fetches | Reddit, switched off since US-158 | Reddit, TikTok, YouTube | Reddit, X, YouTube, TikTok, Instagram — and LinkedIn, switched off since US-053 | X | LinkedIn |
-| Billable unit | a record | a request | a credit: 1 on X, Reddit, YouTube and TikTok, 5 on LinkedIn and an Instagram comment page | a tweet | a post, settled from the run's own total |
-| Price | $1.50 / 1,000 records | $1.88 / 1,000 requests | $8.12 / 1,000 credits | $0.20 / 1,000 tweets | $2.00 / 1,000 posts |
-| One unit buys | one post | 7 to 23 posts, measured | 20 X posts, 25 Reddit posts, 45 YouTube videos, 30 reels — or 15 Instagram comments for five credits | one tweet | one post |
-| A call that finds nothing | billed | billed | refunded on X search and on a scoped Reddit search; billed in full on LinkedIn, which returns unrelated posts rather than none | billed, outside the free allowance | billed — a run that matches nothing still costs its start event |
-| Shape | trigger, then poll a snapshot | the posts are in the answer | the posts are in the answer | the posts are in the answer | start an actor run, then read it |
-| A collection took | 8 minutes 40 seconds, and 2 minutes 13 on another day | 1.8 to 4.9 seconds | 1.4 to 5.3 seconds | under 2 seconds | 3 to 11 seconds |
-| A refused key says | `Invalid credentials`, as a bare string | `{"message":"Invalid API key"}` | `Invalid API key format. Keys start with 'sc_'.` | 401, and an empty balance is **402** — a different repair | the actor refuses the run |
-
-**Two of them carry a trap the other three do not.** SocialData is prepaid, so
-an empty balance answers 402 — not a wrong key and not a rate limit, and
-retrying will not help. Apify settles the bill *after* the run ends, so a total
-read too early prices every poll at a fraction of a cent and refuses nothing,
-for ever.
-
-**One provider does not bill one way.** SocialCrawl is the row that proves the
-three money fields belong to the *pair* and never to the provider: the same key
-and the same credit price, and an X call spends one credit where a LinkedIn
-call spends five. That is why the X connector reports requests and the LinkedIn
-connector reports credits — one unit each, each the one its own price is
-written against.
-
-SocialCrawl prices in pounds and every figure in this product is in
-micro-dollars, so its price alone carries an exchange rate. `x.ts` names the
-rate and the day it was read. [costs.md](costs.md) already says the spend is an
-estimate; this is one more reason it is.
-
-A connector reports `unitsConsumed` in its own unit and the budget guard prices
-it from the connector's own `pricePerUnitMicros`. Nothing downstream reads the
-table above.
-
-### Who reads replies
-
-Every offered connector reads replies since US-159, and no two of them read
-them the same way. The table is what a person choosing a provider is really
-choosing, measured on 2026-09-17 unless a row says otherwise.
-
-| Platform | Provider | One reply call buys | Price | Ordered | Nested | Completeness claim |
-|---|---|---|---|---|---|---|
-| Reddit | ScrapeCreators | a page of ~25, flat | 1 credit, $0.00188 | no | `parent_id` | **wrong**: `has_more: false` with 33 of 58 missing (US-020) |
-| Reddit | SocialCrawl | **the whole thread**, 34 of 34 five levels deep, no cursor | 5 credits, $0.0406 | no | `parent_id`, tree flattened | `truncated: false` — the one claim measured right |
-| X | SocialCrawl | a page of ~28 | 1 credit, $0.0081 | no | `parent_id` | wrong: cursor to an empty page, refunded (US-020) |
-| X | SocialData | a page of 20 | 20 tweets, $0.0040 | **newest first** — the only reply endpoint that may stop early | `in_reply_to_status_id_str`; `conversation_id_str` checks the thread | cursor followed to 20 more; one overlapped |
-| YouTube | SocialCrawl | a page of ~51 | 1 credit, $0.0081 | newest first, on an exact timestamp | `parent_id` | consistent with `total` on one thread (US-020) |
-| YouTube | ScrapeCreators | a page of 20 | 1 credit, $0.00188 | **no — `order` is ignored**: `top` and `newest` answered the same page | none on the wire; nested replies behind their own token, unread | `continuationToken` pages, no overlap |
-| TikTok | ScrapeCreators | a page of ~11 | 1 credit, $0.00188 | no | `reply_id` | `reply_comment_total` beside a couple of replies (US-119) |
-| TikTok | SocialCrawl | a page of up to 50 | 1 credit, $0.0081 | no | `parent_id` | (US-044) |
-| Instagram | SocialCrawl | a page of 15 | 5 credits, $0.0406 | no | `parent_id` | wrong: `has_more: true` beside an empty page (US-049) |
-| LinkedIn | Apify | up to 10 top-level comments, replies nested beside them | $0.002 a comment, the post price | no | from the tree — no parent id on the wire | none: `maxItems` is the only bound |
-
-Three rows carry a warning the connector's own header repeats. ScrapeCreators
-YouTube computes every comment's date from "4 years ago" and marks every reply
-approximate — it exists so an instance with only that key is not given nothing,
-and `socialcrawl/youtube.ts` stays the better choice. SocialCrawl Reddit is
-twenty-two times the price of ScrapeCreators on the median twelve-comment
-thread, which the cheap one finishes too; it earns its five credits only on a
-busy thread the cheap one cannot finish. And the Apify comments actor is the
-one reply call that waits inside the job rather than handing the wait back,
-because the replies worker takes only `ready` or `done`.
+A connector reports `unitsConsumed` in its own `billableUnit` and the budget
+guard prices it from the connector's own `pricePerUnitMicros`. Nothing
+downstream reads a comparison table. Two providers carry a trap: SocialData
+is prepaid and an empty balance answers **402**, not a wrong key and not a
+rate limit; Apify settles the bill after the run ends, so a total read too
+early prices every poll at a fraction of a cent and refuses nothing.
 
 ---
 
 ## Switching a connector off
 
-A connector can ship and not be offered. `ConnectorDescriptor.notOffered` is
-the whole switch: one sentence saying why, on one connector definition, and
-nothing else changes. US-053 built it and LinkedIn through SocialCrawl was its
-first caller, on 2026-09-09. Reddit through Bright Data is the second, on
-2026-09-17: US-158 switched it off on price, and Reddit stayed, fetched by the
-two providers that are left.
+`ConnectorDescriptor.notOffered` is the whole switch: one sentence saying why,
+on one connector definition, and nothing else changes in production code.
+Expect to move the **tests** that borrowed the connector as a sample.
 
-**A test that samples a connector is the one thing that does change.** US-053
-claimed the switch costs nothing outside the connector's own file, and US-158
-found the edge of that claim: four test files used Bright Data as their example
-Reddit provider, and each had to name an offered one instead. No production
-code moved. When you switch the next connector off, expect to move the tests
-that borrowed it as a sample.
+**Write the sentence for the person who meets it.** It reaches a `422`
+refusing a monitor, a `400` refusing a cost test, and the log line where a poll
+skips it. Say what is wrong and what fetches the platform instead. Write into
+it what would have to be measured for the connector to come back.
 
-**Write the sentence for the person who meets it.** It reaches three places: a
-`422` refusing a monitor that names the platform, a `400` refusing a cost test,
-and the log line where a poll skips it. So say what is wrong and what fetches
-the platform instead. A boolean would say "off", which is a bug report.
+**Deleting the line from `builtInSources` is worse.** The API takes its
+platform list from the `posts.source` enum, not from the registry, so a monitor
+naming the platform is still written, `startBlockers` reports nothing, and the
+poll throws `UnknownSourceError` at 02:00 with nobody seeing a refusal.
 
-**Deleting the line from `builtInSources` is not the same thing, and it is
-worse.** It hides the platform from the monitor form and leaves three doors
-open. The API takes its platform list from the `posts.source` enum, not from
-the registry, so a `POST /api/monitors` naming the platform is still written.
-`startBlockers` reports nothing for a platform with no connector, so that
-monitor reads as startable. Then the poll throws `UnknownSourceError` at 02:00,
-and nobody sees a refusal — they see a monitor that collects nothing.
+What happens to what already exists:
 
-### What happens to what already exists
-
-* **A monitor that names the platform still runs.** The poll skips that
-  platform with the reason in the log and collects every other one. A decision
-  somebody made about a connector is not an error in a job.
-* **A collection already bought is still read.** `source_continuations` names
-  the provider that started it, and `registry.get` still answers for a
-  switched-off pair. Refusing there would throw away money already spent. The
-  same holds for a cost test's sample and for deletion verification.
-* **The rows stay.** Posts, matches, verdicts and `api_usage` are untouched,
-  and the platform stays in `sources/platforms.ts` and in the `posts.source`
-  enum. Nothing is deleted, so nothing has to be migrated.
-* **A recorded choice naming it is refused, never replaced.** This is the money
-  case. `decideProvider` treats a switched-off provider as one that cannot run,
-  which is branch 2 above: falling back to whoever is left would bill an
-  account the person never chose. The connections screen says so, and names the
-  provider to choose instead.
-
-### What disappears
+* A monitor that names the platform still runs; the poll skips that platform
+  with the reason in the log.
+* A collection already bought is still read: `registry.get` still answers for
+  a switched-off pair, and so do a cost test's sample and deletion
+  verification.
+* The rows stay, and the platform stays in `platforms.ts` and the enum.
+* A recorded choice naming it is refused, never replaced — branch 2 above.
+  The connections screen says so and names the provider to choose instead.
 
 `groupByPlatform` leaves a switched-off connector out, so the monitor form and
-the connections rows both lose it with no branch of their own. A platform whose
-**every** connector is switched off disappears from both screens, from the
-pricing comparison, and from the platforms a query is generated for.
+the connections rows lose it with no branch of their own. A platform whose
+every connector is off disappears from both screens, from the pricing
+comparison and from query generation; a provider whose every connector is off
+loses its card.
 
-A provider whose every connector is off loses its card on the connections
-screen too. That is right: there would be nothing to spend the key on.
-
-### The way back
-
-Delete the field. Nothing else was changed, so nothing else has to be undone —
-the file, the parser, the fixtures, the capture script and the connector's own
-tests all stayed. Write into the sentence what would have to be measured for it
-to come back, because that is the note the next person needs.
-
-**A live poll script that drives the real pipeline will refuse a switched-off
-connector**, because it goes through `registry.only` like everything else.
-Switch the connector back on to re-measure it.
-
-There is no per-deployment override, deliberately. This switch is the build's
-decision, made once for everybody, and an environment variable reversing it
-would be a second answer to the same question — the shape US-026 removed when
-it deleted `REDDIT_PROVIDER`. If a self-hoster ever needs a connector this
-build does not offer, `source_providers` is the precedent: a row, chosen on a
-screen. Nobody has asked yet.
+There is no per-deployment override. The switch is the build's decision, and
+an environment variable reversing it would be a second answer to the same
+question, the shape US-026 removed. A live poll script refuses a switched-off
+connector; switch it back on to re-measure.
 
 ---
 
 ## A query belongs to a platform
 
-`SourceQuery.queries` is the list written for the platform being polled, and
-never the monitor's whole set. `monitors.generated_queries` holds one list per
-platform, `monitorQueries(value, platform)` reads one of them, and the poll
-calls it inside its loop over sources.
-
-The rule each platform holds a query to lives on its `PlatformDescriptor`:
+`SourceQuery.queries` is the list written for the platform being polled, never
+the monitor's whole set. `monitors.generated_queries` holds one list per
+platform and `monitorQueries(value, platform)` reads one. The rule each
+platform holds a query to lives on its `PlatformDescriptor`:
 
 ```ts
 search: { maxQueryWords: 4, note: "An X post is a few sentences, so a long phrase..." }
 ```
 
-A connector never edits a person's words to fit. US-006 is why: on X the same
-six-word phrase returned unrelated posts unquoted and nothing at all quoted,
-and a connector that quietly shortened it would have hidden that from everyone.
-The generator writes for somewhere; the connector asks for what it was given.
+**A connector never edits a person's words to fit.** The generator writes for
+somewhere; the connector asks for what it was given. A connector that quietly
+shortened a phrase would hide from everyone that the phrase returned nothing.
 
 ## What the runtime is for
 
 Every side effect a connector has arrives through `SourceRuntime`: `fetch`,
 `now`, `sleep`, `logger`. Nothing else. A connector that reaches
 `globalThis.fetch` or `Date.now()` directly cannot be tested without the
-network or without real time, and no test in this repository may reach Reddit,
-X or a model provider. See [testing.md](testing.md).
+network or real time. See [testing.md](testing.md).
 
 ---
 
 ## What connectors get wrong
 
-**Cost is not the post count.** One provider bills a call that returns up to
-100 posts; another bills every record; a third refunds the call that finds
-nothing. `unitsConsumed` is the connector's answer, in
+**Cost is not the post count.** `unitsConsumed` is the connector's answer, in
 its own `billableUnit`, and the caller must not compute it.
 
-**The rate limit is yours, not the caller's.** Every provider says it
-differently, and one of ours has never said it at all. Read the signal here and
-back off here. When the wait is longer
-than you are willing to hold the job, return
-`next: { status: "wait", retryAfter, cursor }` and let the scheduler do
-something else. The caller learns *when* to come back and never *how* you knew.
+**The rate limit is yours, not the caller's.** Read the signal here and back
+off here. When the wait is longer than you will hold the job, return
+`next: { status: "wait", retryAfter, cursor }`. Give that wait a cursor
+whenever coming back means reading work already started: the collector stores
+it in `source_continuations`, so the wait costs one row and not a second bill
+(BUG-001).
 
-Give that wait a cursor whenever coming back means reading work already
-started. The collector stores it in `source_continuations` and calls you again
-with it, so the wait costs one row and not a second collection. A wait with no
-cursor means the query starts from the beginning, which on a provider that
-bills at collection time is a second bill. BUG-001 is what a dropped cursor
-cost.
+**A short page is not the last page.** The caller reads `next`, never
+`posts.length`. The fake can be told to hand back a short page so every caller
+can prove it.
 
-**A short page is not the last page.** Return fewer posts than the caller asked
-for whenever you want to. The caller reads `next`, never `posts.length`. Every
-connector must be able to prove this, which is why the fake can be told to do
-it.
-
-**Ask the provider before you pay it.** Two techniques cost nothing and both
-were found late, after captures had paid to answer questions that were already
-written down.
-
-An **invalid parameter value** makes a provider name its own vocabulary. A
-rejected call bills nothing, and `Invalid value for 'order': ... Allowed
-values: top, newest` is a complete answer for free. Use it whenever the
-documentation is silent about what a parameter accepts.
-
-SocialCrawl goes further and publishes a guide per endpoint:
+**Ask the provider before you pay it.** An invalid parameter *value* makes
+most providers name their own vocabulary in a rejected, unbilled call.
+SocialCrawl publishes a guide per endpoint at zero credits:
 
     GET /v1/utility/endpoint?id=tiktok/post/comments
 
-It returns every required and optional parameter, the credit cost, the paging
-style, the caching rule and the billing rules, at **zero credits**. Read it
-before writing a connector, and before believing anything a capture inferred.
+Read it before writing a connector and before believing anything a capture
+inferred. ScrapeCreators is the exception: it ignores and bills an invalid
+value, so use its OpenAPI document instead.
 
-**A parameter a provider accepts is not a parameter that works.**
-ScrapeCreators' Reddit comments endpoint takes `sort`, understands `new` and
-`top`, and answers both with **zero comments while billing a credit** — where
-the same call without it returns the thread. An unrecognised value is ignored
-and behaves correctly, so the broken case is the one the provider knows. Test
-a parameter's effect on real output, not on the status code.
+**A parameter a provider accepts is not a parameter that works.** Test a
+parameter's effect on real output, not on the status code. ScrapeCreators'
+Reddit comments `sort` answers zero comments and bills a credit.
 
-**A thread's window is not the poll's window.** `ReplyRequest.since` is how far
-back this *thread* has been read, and it has nothing to do with when the
-monitor last searched. The two were the same value until BUG-006, and the
-result was that every provider was asked for comments written after the poll
-had already started: 25 threads bought, nothing stored. A post found today can
-carry comments from 2015, and `posts.replies_read_at` is the only mark that
-says how much of one we hold.
+**A search that finds nothing is answered differently by every endpoint**:
+thirty unrelated results and a bill, an honest empty page and a bill, a 404
+and no charge. Capture the empty case.
 
-Apply it yourself, and say so in the connector. Apify's LinkedIn comments actor
-is the one comment endpoint here with a date parameter — `postedLimit`, a named
-range — and the exact cut is still ours there too, because a named range is not
-a timestamp. Everywhere else the provider offers nothing, and the bill is the
-same either way.
+**A thread's window is not the poll's window.** `ReplyRequest.since` is how
+far back this *thread* has been read, and it has nothing to do with when the
+monitor last searched (BUG-006). A post found today can carry comments from
+2015, and `posts.replies_read_at` is the only mark of how much of it we hold.
+Apply the cut yourself, and say so in the connector: no provider offers a
+usable one.
 
 ---
 
 ## Testing a connector
 
 Fixtures for someone else's API are **captured, not written**. Commit the
-capture script beside the fixture, store the payload whole, and scrub the
-identifying fields. A payload written from memory is evidence about our parser
-and no evidence at all about the wire format. [testing.md](testing.md) has the
-case that proves it.
+capture script beside the fixture, store the payload whole, scrub the
+identifying fields, and read what your own script wrote before you commit it.
+A payload written from memory is evidence about our parser and none about
+the wire format. Scrub by naming the container (`author`), not by sniffing
+for fields; one capture let real names through because the provider's shape
+was not the one the scrubber guessed.
 
-`biome.json` excludes `sources/*/fixtures/*.json` from formatting. A captured
-payload is evidence about someone else's API; a formatter that rewrites it
-makes the file a record of our tooling instead.
+`biome.json` excludes `sources/*/fixtures/*.json` from formatting: a formatter
+that rewrites a captured payload makes it a record of our tooling.
 
-`sources/providers/brightdata/fixtures/capture.mjs` is the worked example. Its
-first run answered three questions the provider's own documentation got wrong,
-which is the whole argument for capturing rather than writing.
+Record what each captured call did to the account's balance in a `ledger.json`
+beside the fixtures. A claim that a probe is free is a claim about somebody's
+bill, and the ledger is the evidence.
 
-`sources/providers/socialcrawl/linkedin-fixtures/capture.mjs` is the third, and
-its first run corrected itself before anything was committed: the scrubber let
-real names and real job headlines through, because it decided what a person was
-by sniffing for fields this provider does not use. It puts a person under
-`author` as `{ name, description, url, avatar }`, and none of those tripped the
-rule. Name the container, do not guess at its contents — and read the fixtures
-your own script wrote before you commit them.
-
-`sources/providers/scrapecreators/fixtures/capture.mjs` is the second, and it
-answered four more. Three were not in the documentation at all: the API is
-synchronous, a `timeframe` is refused beside `sort=new`, and a subreddit that
-does not exist answers 200 with an empty list and bills for it. The fourth is
-what a credential probe costs, and that one is not a thing a connector may
-assume — so the script writes `ledger.json` beside the fixtures, recording what
-each captured call did to the account's credit balance. A claim that a check is
-free is a claim about somebody's bill, and the ledger is the evidence for it.
-
-The fake source is the exception, and it is not one: its fixtures are
-`CandidatePost` values, which is our own shape. Use it to test everything
-downstream of a connector. It can be told to run out of allowance and to hand
-back a short page, so a caller can be tested against both without a network and
-without a bill.
+The fake source's fixtures are `CandidatePost` values, our own shape. Use it
+to test everything downstream of a connector; it can run out of allowance and
+hand back a short page.
 
 ## Verifying deletion
 
-US-015 adds an optional `SocialSource.verify` method. It receives a post id,
-its URL, credentials, and an optional opaque cursor. It returns `available`,
-`deleted`, `unknown`, or `pending`, with `unitsConsumed` on every answer.
-`pending` supplies a retry time and may carry a cursor. The worker persists
-that cursor beside its provider and paying monitor, independently of search
-continuations. A provider switch cannot move it.
+`SocialSource.verify` is optional. It receives a post id, its URL, credentials
+and an opaque cursor, and returns `available`, `deleted`, `unknown` or
+`pending`, with `unitsConsumed` on every answer. The worker persists the
+cursor beside its provider and paying monitor; a provider switch cannot move
+it.
 
-Only a definite deletion may return `deleted`. An empty result, missing
-record, outage, inaccessible post, or unsupported method does not establish
-one. In particular, a ScrapeCreators 404 was captured for an available post
-with a shortened URL. See [deletions.md](deletions.md) and the committed
-`capture:deletions` instrument before changing a deletion rule.
+**Only a definite deletion may return `deleted`.** An empty result, a missing
+record, an outage, an inaccessible post or an unsupported method does not
+establish one — a ScrapeCreators 404 was captured for an available post. See
+[deletions.md](deletions.md) and `capture:deletions` before changing a
+deletion rule.
 
-Verification currently uses the connector's existing billable unit and price.
-A provider whose verification endpoint bills differently must declare that
-price separately before it can be used; the worker must never guess one.
+Verification uses the connector's billable unit and price. A provider whose
+verification endpoint bills differently must declare that price before it can
+be used; the worker never guesses one.

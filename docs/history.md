@@ -2169,3 +2169,302 @@ them. A dataset read from `live:triage-score`'s run record judged one rule on a
 written into the analysis backwards. A harness kept its own copy of the rule
 and measured a wording that was never shipped. Each produced a table that
 looked right.
+
+---
+
+## Sources: what was measured
+
+Moved here from `docs/sources.md` on 2026-09-20, when that page was cut to
+its rules. Each paragraph names the ticket that holds the whole story.
+
+**Why X had one provider, and then two.** US-006 asked all three accounts
+held at the time. Bright Data's X dataset answers a discovery trigger with
+`Available types: profile_url, profiles_array` — it fetches the posts of
+accounts you name and cannot search. ScrapeCreators published six X endpoints
+and none was a search. SocialCrawl had `/v1/twitter/search/tweets`. US-061
+added SocialData on 2026-09-07, which searches, so the rule survived: ask
+whether a provider can discover a stranger, not whether it can fetch a URL.
+
+**LinkedIn was one provider by convenience.** US-028 used SocialCrawl because
+the key was already there; Bright Data and ScrapeCreators were never asked.
+US-056 later measured three providers and US-057 shipped Apify as a second.
+US-053 switched SocialCrawl LinkedIn off on 2026-09-09.
+
+**Second providers, 2026-09-11 and 2026-09-17.** After the owner asked for two
+providers everywhere, US-119 and US-121 measured TikTok and YouTube at a
+second provider and US-126 and US-127 built them. The owner decided on
+2026-09-17 that Instagram and LinkedIn keep one provider each: US-160 measured
+HikerAPI, the one native Instagram search found, and it has no date window
+and orders by relevance across years; US-122 eliminated every LinkedIn route
+on price, on Google, or on needing the person's own account. US-158 switched
+Bright Data Reddit off on price on 2026-09-17.
+
+**Instagram broke three things its four SocialCrawl siblings agree on**
+(US-049). A search with no date window returned thirty results from 2021 to
+2026 in relevance order, the newest five months old, so Instagram is the one
+connector that always sends a window; LinkedIn deliberately sends none. The
+cursor from a full first page returned zero items, zero credits and another
+`has_more: true`. Three of nine comment fields — `url`, `post_id`,
+`author.display_name` — are null on every comment, against 137 captured
+comments from X, YouTube and TikTok that fill all three, so the shared parser
+falls back to the handle and BUG-007's wrong-parent check is inert there. A
+reel search is 1 credit and a comment page is 5.
+
+**US-028 asked the LinkedIn endpoint nine questions and four answers
+contradicted the X connector** on the same provider: price per call, cursor,
+sort order, how a date window is taken, and what an empty search returns.
+
+**ScrapeCreators answers "nothing" three ways.** TikTok returns thirty
+unrelated videos and bills; YouTube returns an honest empty page and bills;
+the Instagram reels search answers 404 and charges nothing. An invalid
+parameter value is ignored and billed rather than refused, on every endpoint
+but Reddit.
+
+**The provider switch never reaches a running collection — measured.** On
+2026-09-05 `live:provider-switch` started a Bright Data collection of
+r/softwaretesting, moved the recorded choice to ScrapeCreators one second
+later, and watched the snapshot finish. All four resumes went to Bright Data
+with its own cursor. It spends about $0.08.
+
+**Two Reddit connectors store one row.** A poll through ScrapeCreators
+collected 47 posts from a subreddit Bright Data had already collected and
+stored no new row: both read the `t3_` fullname, which Bright Data calls
+`post_id` and ScrapeCreators calls `name`.
+
+**BUG-010, whose choice.** `source_providers` was keyed by the platform alone
+until 2026-09-10, so on an instance taking registrations one account's choice
+decided what every account polled through, and a choice that cannot run being
+refused meant a stranger could stop somebody's monitors.
+
+**US-158 found the edge of US-053's claim** that switching a connector off
+costs nothing outside its own file: four test files used Bright Data as their
+sample Reddit provider and each had to name an offered one. No production code
+moved.
+
+**The capture scripts, and what each first run corrected.** Bright Data's
+answered three questions the provider's documentation got wrong.
+ScrapeCreators' answered four more, three absent from the documentation: the
+API is synchronous, a `timeframe` is refused beside `sort=new`, and a subreddit
+that does not exist answers 200 with an empty list and bills; the fourth was
+what a credential probe costs, which is why `ledger.json` exists. SocialCrawl
+LinkedIn's scrubber let real names and job headlines through on its first run
+because it sniffed for fields the provider does not use; the provider puts a
+person under `author` as `{ name, description, url, avatar }`.
+
+**A ScrapeCreators 404 was captured for an available post** with a shortened
+URL (US-015), which is why only a definite deletion may return `deleted`.
+
+### The providers, compared
+
+Measured on the dates the tickets say; prices as read then.
+
+| | Bright Data | ScrapeCreators | SocialCrawl | SocialData | Apify |
+|---|---|---|---|---|---|
+| Fetches | Reddit, switched off since US-158 | Reddit, TikTok, YouTube | Reddit, X, YouTube, TikTok, Instagram — and LinkedIn, switched off since US-053 | X | LinkedIn |
+| Billable unit | a record | a request | a credit: 1 on X, Reddit, YouTube and TikTok, 5 on LinkedIn and an Instagram comment page | a tweet | a post, settled from the run's own total |
+| Price | $1.50 / 1,000 records | $1.88 / 1,000 requests | $8.12 / 1,000 credits | $0.20 / 1,000 tweets | $2.00 / 1,000 posts |
+| One unit buys | one post | 7 to 23 posts, measured | 20 X posts, 25 Reddit posts, 45 YouTube videos, 30 reels — or 15 Instagram comments for five credits | one tweet | one post |
+| A call that finds nothing | billed | billed | refunded on X search and on a scoped Reddit search; billed in full on LinkedIn, which returns unrelated posts rather than none | billed, outside the free allowance | billed — a run that matches nothing still costs its start event |
+| Shape | trigger, then poll a snapshot | the posts are in the answer | the posts are in the answer | the posts are in the answer | start an actor run, then read it |
+| A collection took | 8 minutes 40 seconds, and 2 minutes 13 on another day | 1.8 to 4.9 seconds | 1.4 to 5.3 seconds | under 2 seconds | 3 to 11 seconds |
+| A refused key says | `Invalid credentials`, as a bare string | `{"message":"Invalid API key"}` | `Invalid API key format. Keys start with 'sc_'.` | 401, and an empty balance is **402** | the actor refuses the run |
+
+SocialCrawl prices in pounds and every figure here is in micro-dollars, so
+its price carries an exchange rate; `x.ts` names the rate and the day it was
+read.
+
+### Who reads replies
+
+Every offered connector reads replies since US-159, and no two read them the
+same way. Measured on 2026-09-17 unless a row says otherwise.
+
+| Platform | Provider | One reply call buys | Price | Ordered | Nested | Completeness claim |
+|---|---|---|---|---|---|---|
+| Reddit | ScrapeCreators | a page of ~25, flat | 1 credit, $0.00188 | no | `parent_id` | **wrong**: `has_more: false` with 33 of 58 missing (US-020) |
+| Reddit | SocialCrawl | **the whole thread**, 34 of 34 five levels deep, no cursor | 5 credits, $0.0406 | no | `parent_id`, tree flattened | `truncated: false` — the one claim measured right |
+| X | SocialCrawl | a page of ~28 | 1 credit, $0.0081 | no | `parent_id` | wrong: cursor to an empty page, refunded (US-020) |
+| X | SocialData | a page of 20 | 20 tweets, $0.0040 | **newest first** — the only reply endpoint that may stop early | `in_reply_to_status_id_str`; `conversation_id_str` checks the thread | cursor followed to 20 more; one overlapped |
+| YouTube | SocialCrawl | a page of ~51 | 1 credit, $0.0081 | newest first, on an exact timestamp | `parent_id` | consistent with `total` on one thread (US-020) |
+| YouTube | ScrapeCreators | a page of 20 | 1 credit, $0.00188 | **no — `order` is ignored** | none on the wire; nested replies behind their own token, unread | `continuationToken` pages, no overlap |
+| TikTok | ScrapeCreators | a page of ~11 | 1 credit, $0.00188 | no | `reply_id` | `reply_comment_total` beside a couple of replies (US-119) |
+| TikTok | SocialCrawl | a page of up to 50 | 1 credit, $0.0081 | no | `parent_id` | (US-044) |
+| Instagram | SocialCrawl | a page of 15 | 5 credits, $0.0406 | no | `parent_id` | wrong: `has_more: true` beside an empty page (US-049) |
+| LinkedIn | Apify | up to 10 top-level comments, replies nested | $0.002 a comment, the post price | no | from the tree — no parent id on the wire | none: `maxItems` is the only bound |
+
+Three rows carry a warning the connector's own header repeats. ScrapeCreators
+YouTube computes every comment's date from "4 years ago" and marks every reply
+approximate; it exists so an instance with only that key is not given nothing,
+and `socialcrawl/youtube.ts` stays the better choice. SocialCrawl Reddit is
+twenty-two times the price of ScrapeCreators on the median twelve-comment
+thread, which the cheap one finishes too. The Apify comments actor is the one
+reply call that waits inside the job rather than handing the wait back,
+because the replies worker takes only `ready` or `done`.
+
+---
+
+## Costs: what was measured
+
+Moved here from `docs/costs.md` on 2026-09-20, when that page was cut to its
+rules.
+
+### The price table, as read
+
+Each price is the one its connector declares; each per-post figure is that
+price divided by the `postsPerUnit` the connector measured.
+
+| Platform | Provider | Billable unit | Price per unit | Per post |
+|---|---|---|---|---|
+| Reddit | Bright Data — switched off since US-158 | a record | $0.0015 | $0.0015 |
+| Reddit | ScrapeCreators | a request | $0.00188 | ~$0.00027 (7–23 posts a request) |
+| Reddit | SocialCrawl | a credit | $0.008118 | ~$0.00032 (25 posts) |
+| X | SocialData | a tweet | $0.0002 | $0.0002 |
+| X | SocialCrawl | a request | $0.008118 | ~$0.0004 (20 posts) |
+| LinkedIn | Apify | a post | $0.002 | $0.002 |
+| YouTube | SocialCrawl | a credit | $0.008118 | ~$0.00018 (45 videos) |
+| TikTok | SocialCrawl | a credit | $0.008118 | ~$0.00027 (30 videos) |
+| Instagram | SocialCrawl | a credit | $0.008118 | ~$0.00027 (30 reels) |
+| Instagram comments | SocialCrawl | 5 credits a page | $0.0406 | ~$0.0027 (15 comments) |
+
+An Instagram comment at $0.0027 is fifteen times a YouTube video, thirteen
+times a tweet through SocialData, and a third dearer than a LinkedIn post
+through Apify. One live Instagram poll spent $1.6317 with SocialCrawl against
+$0.3336 with the model, the reverse of every other platform. Bright Data's
+first 5,000 records a month were free and never modelled; US-158 switched the
+connector off on the price past the allowance.
+
+**One day has been compared, once.** On 2026-09-05 Bright Data's dashboard
+reported 95 records and $0.14; `api_usage` held 98 records and $0.147 for the
+same day — 3.2% high. The likeliest cause is that a collection is triggered
+with `include_errors=true` and we count every record the snapshot reports
+while the provider does not bill a failed one. A dashboard is not an invoice
+and one day is not a reconciliation.
+
+### Triage, measured
+
+US-030 measured a triage answer at 113 output tokens against a
+classification's 95: a reasoning model bills its thinking as output. US-221
+sharpened the question and the thinking shrank to 80, but the longer prompt
+added to the input what the answer took off the output: 267 micro-dollars an
+item before, 273 after. Over 46 real comments, keeping 13, a classifier ten
+times dearer than the triage model made the bill 61% smaller; the same model
+on both stages made it 37% larger. Before US-221 the stage kept 19 of those
+46; after, 13. US-177 added `AI_TRIAGE=off` because a blank `AI_TRIAGE_MODEL`
+ran triage on the classifier's own model.
+
+US-229 measured `jev-latest` through `AI_TRIAGE_PROVIDER=typesafe` over 227
+items from five platforms: 43.7 micro-dollars an item against `gpt-5.6-luna`'s
+355.6 (priced at 42,000 per million input tokens and nothing for output,
+against 200,000 and 1,200,000), the same six leads scoring 60 or more kept by
+both, and twelve items sent to the classifier rather than seventeen. Every
+number was fitted to the sample it was scored against. An evaluation model
+takes no system prompt, so the question is put as structured state, and it is
+the question US-221 replaced.
+
+### DeepSeek's four rates
+
+US-124 read the page: each model has peak and off-peak rates, each split into
+cache hit and cache miss, and one million input tokens on `deepseek-flash`
+costs $0.003 in one band and $0.30 in another. The usage the API returns does
+not say which band a call landed in.
+
+### The cost test's first live run, 2026-09-05
+
+A sample of "flaky end to end tests" was billed ten records and returned no
+posts: every post it found was three weeks old, outside the window. The
+arithmetic at the time counted posts and reported the query as free. The same
+query costs $10.80 a month polled hourly and $648.00 polled every minute.
+
+Until 2026-09-06 the estimate assumed hourly and every day, and the first
+version of the schedule control quoted a weekly monitor 730 polls where it
+makes about four — wrong by roughly 180 times, in the direction that
+frightens somebody away from a monitor costing pennies. A monitor whose plan
+was measured at $164 a month against a $10 cap is the case the flag exists
+for.
+
+### The similarity threshold
+
+On 2026-09-05 a real embedding model put PLAN.md's four on-topic posts at
+0.26 to 0.57 and a post about sourdough at 0.09, so 0.15 sits inside that gap
+with room on both sides. Five posts, not a distribution. That no similarity
+threshold separates a person asking from the experts replying was measured
+over two real threads, and is why triage exists.
+
+---
+
+## Testing: the incidents behind the rules
+
+Moved here from `docs/testing.md` on 2026-09-20, when that page was cut to
+its rules. Most of these were paid for in another repository; a rule whose
+incident you did not live through is easy to drop under pressure, and this is
+the evidence for each.
+
+**The in-memory Postgres fake.** Another project ran one for a year and kept a
+list of its lies: a `bytea` parameter corrupted through a UTF-8 round trip so
+AES-GCM ciphertext never decrypted; `on conflict do nothing` reporting a row
+count of 1 for a conflicting insert; `count(*) filter (where …)` answering
+with the unfiltered count. The tax was never the lies on the list. It was the
+next one.
+
+**The fixture that was written, not captured.** A webhook test built a Stripe
+subscription object with a top-level `current_period_end`. Stripe had moved
+that field onto the subscription item in a later API version. The suite was
+green and self-consistent for a year while every real subscription in the
+database had a NULL period end. Only a round trip against a real account found
+it.
+
+**The broad catch.** A memory generator ended `except Exception: return None`
+under an honest promise: the feature is an optimisation, so a provider timeout
+must cost a run nothing. It reached the model through `asyncio.run` from inside
+an already running loop, raised on every call, returned `None` every time, and
+nothing went red. Twenty-four assertions covered the parts; none covered the
+one function the caller actually calls.
+
+**The least-tested caller.** Four tickets in a row elsewhere shipped a correct
+rule that one caller never reached, with the assertion on the rule itself
+green every time.
+
+**Two-tests-for-one-feature was found here by US-012**: the monitor routes'
+counts were asserted nowhere while the rule under them passed.
+
+**Deliberate mutations, this project.** About seventy-five were applied
+across eight tickets. The three surfaces written test-first — credential
+encryption, the budget guard, cursor and deduplication — took twenty-three
+and every one was caught the first time. Every gap came from a surface
+written alongside the code:
+
+| Ticket | What the breakage found |
+|---|---|
+| US-007 | A scheduler test that asserted nothing, because one monitor hid the dedup key |
+| US-008 | A fail-open branch nothing covered |
+| US-011 | Ordering expectations written from the constant, so they passed at any value |
+| US-012 | Two route call sites counted nowhere |
+| US-014 | A cost flag counting past the cap where the guard counts at it, and an unreachable branch |
+
+**The two-branch swallow.** Writing the test for the pre-filter's fail-open
+in `worker/filter.test.ts` found that it fails open twice — when the monitor's
+own description cannot be embedded, and when the batch of posts cannot — and
+one case covered only the first. A mutation dropping every post at the second
+branch left the suite green.
+
+**The measured constants and their instruments.** The similarity threshold
+(US-008): `packages/engine/src/ai/fixtures/capture-embeddings.ts`, replayed by
+`ai/similarity.test.ts`, with `filter_drops` as the second instrument. The
+minimum score (US-009): `packages/engine/src/ai/fixtures/capture.ts`. The
+weight of age in the inbox ordering (US-011).
+
+**Suite size and time.** 615 tests in 78.3 seconds on 2026-09-05; 1,922 tests
+in 112 files in 74.6 seconds on 2026-09-11. The count tripled while the wall
+clock barely moved because one setting had dominated it: the suite ran 170
+seconds when five pg-boss worker files were 397 of the 435 seconds of file
+time, every test costing four to six seconds to do milliseconds of work,
+waiting for a worker to poll. `WORKER_POLLING_INTERVAL_SECONDS` at pg-boss's
+floor of 0.5 for the suite alone removed it.
+
+**Six workers, tried and reverted.** At 615 tests they peaked at 57
+connections of the hundred and finished in 39 seconds against four's 41, but
+`classify.test.ts` failed two runs in four, an `until()` wait exceeding its
+twenty seconds under load. Two seconds is not worth a suite that cries wolf.
+
+**Mutation sweep reading rules**, from the project that ran one: a survivor
+list has a timestamp and can invent gaps that are already closed, and a file
+that logs heavily scores low without being worse tested.

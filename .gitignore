@@ -49,3 +49,7 @@ worktrees/
 triage-score-*.json
 triage-score-cache-*.json
 triage-score-cache-*.json.tmp
+
+# The eval dataset is built from a run record and a database, and it carries
+# real people's post text. `pnpm eval:dataset` rebuilds it in seconds.
+evals/*/dataset.json

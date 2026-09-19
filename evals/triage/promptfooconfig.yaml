@@ -1,0 +1,29 @@
+description: Triage rules over one live:triage-score sample, scored against the classifier
+
+# Every provider answers `keep` or `drop` — the decision the stage actually
+# makes, not the verdict behind it. A `no` the model is unsure of is a keep,
+# and naming the output after the verdict is how that got stated backwards
+# once already.
+providers:
+  - id: file://./providers/shipped.mjs
+    label: shipped (AI_TRIAGE_PROVIDER)
+
+  - id: file://./providers/decomposed.mjs
+    label: candidate (decomposed)
+
+  - id: file://./providers/recorded.mjs
+    label: gpt-5.6-luna (recorded)
+    config:
+      label: gpt-5.6-luna (recorded)
+      # Measured by capture:triage over the 50 labelled subjects. Passed in so
+      # promptfoo's cost column compares a replay against a live call fairly,
+      # rather than showing a replay as free.
+      perItemMicros: 355.6
+
+# The providers read context.vars. promptfoo requires a prompt, so this one
+# exists to be required.
+prompts:
+  - "{{source}}: {{text}}"
+
+tests: file://./dataset.json
+

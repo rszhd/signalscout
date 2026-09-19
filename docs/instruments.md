@@ -112,6 +112,32 @@ Both read `labelled-subjects.ts`, so the fifty are the same fifty in the same
 order. Two copies of that list would drift, and a score would then sit beside
 the wrong verdict without anything going red.
 
+`evals/triage` compares triage rules against each other over one
+`live:triage-score` sample. It is the answer to a different question from
+`capture:scores`: that one asks what a drop was worth, and this one asks which
+of two rules drops better. Three commands, and only the middle one spends:
+
+    pnpm eval:dataset <run record>   # reads the database, spends nothing
+    pnpm eval:triage                 # about $0.03 for three rules over 227 items
+    pnpm eval:summary                # reads the last run, spends nothing
+
+Each rule is a provider file under `evals/triage/providers/`. The shipped one
+imports `createTriager`, so it cannot drift from what the product sends; a
+candidate keeps its rule under `evals/triage/rules/`. Every provider answers
+`keep` or `drop` — the decision, not the verdict — because a `no` the model is
+unsure of is a keep, and naming the output after the verdict is how that got
+stated backwards once.
+
+**The dataset build refuses rather than warns.** The run record's `excerpt` is
+a 300-character slice while the triage call it recorded saw the whole post, so
+a harness that reads the record judges one rule on a third of the text. That
+happened, and the comparison it produced was worthless and looked fine.
+`build-dataset.mjs` reads `posts` and stops if anything is shorter there than
+in the record. US-231 holds the other three mistakes that shaped it.
+
+`promptfoo eval` exits 100 when assertions fail, which on an eval is the
+ordinary outcome. Do not read it as an error.
+
 `capture:embeddings` measures how near each of PLAN.md's five posts is to the
 example monitor, and records the similarities — not the vectors, which would be
 a quarter of a megabyte to re-prove arithmetic `pgvector` already does.

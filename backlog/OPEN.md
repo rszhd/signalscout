@@ -2,7 +2,7 @@
 
 # Open tickets
 
-30 open — 13 doing, 16 todo, 1 parked (7 p1, 19 p2, 4 p3).
+31 open — 13 doing, 17 todo, 1 parked (7 p1, 20 p2, 4 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -31,6 +31,7 @@
 | p2 | US-062 | [A real model's drafts are replayed](todo/US-062-a-real-model-s-drafts-are-replayed.md) | chore | todo | 2026-09-07T20:30+08:00 |
 | p2 | US-099 | [A button, a field and a dialog are one component each](todo/US-099-a-button-a-field-and-a-dialog-are-one-component-each.md) | chore | todo | 2026-09-10T01:20+08:00 |
 | p2 | US-229 | [Jev is measured as a triage model](todo/US-229-jev-is-measured-as-a-triage-model.md) | spike | todo | 2026-09-19T09:40+08:00 |
+| p2 | US-231 | [A triage rule is compared by a harness, not by hand](todo/US-231-a-triage-rule-is-compared-by-a-harness-not-by-hand.md) | chore | todo | 2026-09-19T14:10+08:00 |
 | p2 | BUG-021 | [The classify tests time out on CI, and a red release run looks like the change](todo/BUG-021-classify-tests-time-out-on-ci.md) | bug | todo | 2026-09-19T02:01+08:00 |
 | p3 | US-018 | [A mutation sweep proves the suite is sensitive](todo/US-018-a-mutation-sweep-proves-the-suite-is-sensitive.md) | chore | todo | 2026-09-04T22:54+08:00 |
 | p3 | US-095 | [The logo travels with the email](todo/US-095-the-logo-travels-with-the-email.md) | feature | todo | 2026-09-10T00:36+08:00 |

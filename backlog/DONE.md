@@ -2,7 +2,7 @@
 
 # Done
 
-163 finished.
+164 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
@@ -28,6 +28,7 @@
 | US-248 | [schema.ts is split by table family](done/2026-09/US-248-schema-ts-is-split-by-table-family.md) | chore | shipped | 2026-09 |
 | US-247 | [A file header holds the contract, not the story](done/2026-09/US-247-a-file-header-holds-the-contract-not-the-story.md) | chore | shipped | 2026-09 |
 | US-246 | [history.md has headings an agent can jump to](done/2026-09/US-246-history-md-has-headings-an-agent-can-jump-to.md) | chore | shipped | 2026-09 |
+| US-241 | [The 503 outage case has a test by name](done/2026-09/US-241-the-503-outage-case-has-a-test-by-name.md) | chore | shipped | 2026-09 |
 | US-237 | [The CSV carries the five scores and names the label](done/2026-09/US-237-the-csv-carries-the-five-scores-and-names-the-label.md) | feature | shipped | 2026-09 |
 | US-234 | [A match can be read by its id](done/2026-09/US-234-a-match-can-be-read-by-its-id.md) | feature | shipped | 2026-09 |
 | US-230 | [Triage can run on an evaluation model](done/2026-09/US-230-triage-can-run-on-an-evaluation-model.md) | feature | shipped | 2026-09 |

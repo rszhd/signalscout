@@ -2,7 +2,7 @@
 
 # Open tickets
 
-26 open — 0 doing, 22 todo, 4 parked (1 p1, 16 p2, 9 p3).
+25 open — 0 doing, 21 todo, 4 parked (1 p1, 15 p2, 9 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -20,7 +20,6 @@
 | p2 | US-231 | [A triage rule is compared by a harness, not by hand](todo/US-231-a-triage-rule-is-compared-by-a-harness-not-by-hand.md) | chore | todo | 2026-09-19T14:10+08:00 |
 | p2 | US-232 | [Triage is promoted to an evaluation model](todo/US-232-triage-is-promoted-to-an-evaluation-model.md) | feature | todo | 2026-09-19T16:25+08:00 |
 | p2 | US-233 | [A dry run estimates the pair it is about to call](todo/US-233-a-dry-run-estimates-the-pair-it-is-about-to-call.md) | bug | todo | 2026-09-19T16:45+08:00 |
-| p2 | US-241 | [The 503 outage case has a test by name](todo/US-241-the-503-outage-case-has-a-test-by-name.md) | chore | todo | 2026-09-20T00:56+08:00 |
 | p2 | US-244 | [The screens no browser has rendered](todo/US-244-the-screens-no-browser-has-rendered.md) | chore | todo | 2026-09-20T00:56+08:00 |
 | p2 | BUG-021 | [The classify tests time out on CI, and a red release run looks like the change](todo/BUG-021-classify-tests-time-out-on-ci.md) | bug | todo | 2026-09-19T02:01+08:00 |
 | p3 | US-018 | [A mutation sweep proves the suite is sensitive](todo/US-018-a-mutation-sweep-proves-the-suite-is-sensitive.md) | chore | todo | 2026-09-04T22:54+08:00 |

@@ -2,7 +2,7 @@
 
 # Done
 
-158 finished.
+159 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
@@ -23,6 +23,7 @@
 | BUG-003 | [A post below the threshold is classified again on every poll](done/2026-09/BUG-003-a-post-below-the-threshold-is-classified-again-on-every-poll.md) | bug | fixed | 2026-09 |
 | BUG-002 | [A seven-day window is bought as a month](done/2026-09/BUG-002-a-seven-day-window-is-bought-as-a-month.md) | bug | fixed | 2026-09 |
 | BUG-001 | [A pending Reddit collection is not resumed](done/2026-09/BUG-001-a-pending-reddit-collection-is-not-resumed.md) | bug | shipped | 2026-09 |
+| US-246 | [history.md has headings an agent can jump to](done/2026-09/US-246-history-md-has-headings-an-agent-can-jump-to.md) | chore | shipped | 2026-09 |
 | US-237 | [The CSV carries the five scores and names the label](done/2026-09/US-237-the-csv-carries-the-five-scores-and-names-the-label.md) | feature | shipped | 2026-09 |
 | US-234 | [A match can be read by its id](done/2026-09/US-234-a-match-can-be-read-by-its-id.md) | feature | shipped | 2026-09 |
 | US-230 | [Triage can run on an evaluation model](done/2026-09/US-230-triage-can-run-on-an-evaluation-model.md) | feature | shipped | 2026-09 |

@@ -2,7 +2,7 @@
 
 # Open tickets
 
-30 open — 0 doing, 26 todo, 4 parked (1 p1, 20 p2, 9 p3).
+29 open — 0 doing, 25 todo, 4 parked (1 p1, 19 p2, 9 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -22,7 +22,6 @@
 | p2 | US-233 | [A dry run estimates the pair it is about to call](todo/US-233-a-dry-run-estimates-the-pair-it-is-about-to-call.md) | bug | todo | 2026-09-19T16:45+08:00 |
 | p2 | US-241 | [The 503 outage case has a test by name](todo/US-241-the-503-outage-case-has-a-test-by-name.md) | chore | todo | 2026-09-20T00:56+08:00 |
 | p2 | US-244 | [The screens no browser has rendered](todo/US-244-the-screens-no-browser-has-rendered.md) | chore | todo | 2026-09-20T00:56+08:00 |
-| p2 | US-246 | [history.md has headings an agent can jump to](todo/US-246-history-md-has-headings-an-agent-can-jump-to.md) | chore | todo | 2026-09-20T00:58+08:00 |
 | p2 | US-247 | [A file header holds the contract, not the story](todo/US-247-a-file-header-holds-the-contract-not-the-story.md) | chore | todo | 2026-09-20T00:58+08:00 |
 | p2 | US-249 | [Recurring procedures are skills, and two checks are hooks](todo/US-249-recurring-procedures-are-skills-and-two-checks-are-hooks.md) | chore | todo | 2026-09-20T00:58+08:00 |
 | p2 | US-250 | [The next four documents are cut to their rules](todo/US-250-the-next-four-documents-are-cut-to-their-rules.md) | chore | todo | 2026-09-20T00:58+08:00 |

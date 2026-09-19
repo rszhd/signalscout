@@ -6,7 +6,7 @@ priority: p2
 created: 2026-09-20T00:58+08:00
 parent:
 area: docs
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -20,11 +20,11 @@ its shape costs every lookup.
 
 ## Acceptance
 
-- [ ] The file has one heading per area — pipeline, sources, costs, model,
+- [x] The file has one heading per area — pipeline, sources, costs, model,
       accounts, testing, deployment — and every paragraph sits under one.
-- [ ] A short index at the top lists the headings.
-- [ ] No paragraph is rewritten or removed; the change is order and headings.
-- [ ] `AGENTS.md` still points at it the same way.
+- [x] A short index at the top lists the headings.
+- [x] No paragraph is rewritten or removed; the change is order and headings.
+- [x] `AGENTS.md` still points at it the same way.
 
 ## Notes
 
@@ -36,3 +36,4 @@ its shape costs every lookup.
 - 2026-09-20T00:58+08:00 — Written from the context review of 2026-09-20: the owner asked
   where the AI-assisted workflow loses context and quality, and this is one
   of the findings.
+- 2026-09-20T01:07+08:00 — Shipped. Ten areas plus the three sections moved in earlier that day, a Contents list at the top, and the intro says the order is by area now. A sorted diff of non-heading lines against the previous version shows only the intro changed.

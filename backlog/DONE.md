@@ -2,7 +2,7 @@
 
 # Done
 
-144 finished.
+145 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
@@ -21,6 +21,7 @@
 | BUG-003 | [A post below the threshold is classified again on every poll](done/2026-09/BUG-003-a-post-below-the-threshold-is-classified-again-on-every-poll.md) | bug | fixed | 2026-09 |
 | BUG-002 | [A seven-day window is bought as a month](done/2026-09/BUG-002-a-seven-day-window-is-bought-as-a-month.md) | bug | fixed | 2026-09 |
 | BUG-001 | [A pending Reddit collection is not resumed](done/2026-09/BUG-001-a-pending-reddit-collection-is-not-resumed.md) | bug | shipped | 2026-09 |
+| US-237 | [The CSV carries the five scores and names the label](done/2026-09/US-237-the-csv-carries-the-five-scores-and-names-the-label.md) | feature | shipped | 2026-09 |
 | US-234 | [A match can be read by its id](done/2026-09/US-234-a-match-can-be-read-by-its-id.md) | feature | shipped | 2026-09 |
 | US-229 | [Jev is measured as a triage model](done/2026-09/US-229-jev-is-measured-as-a-triage-model.md) | spike | go — promote on US-232 | 2026-09 |
 | US-225 | [Relevance decides whether a score counts](done/2026-09/US-225-relevance-decides-whether-a-score-counts.md) | bug | shipped | 2026-09 |

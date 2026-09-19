@@ -19,6 +19,16 @@ versioned and is not described here; it is what `main` holds.
 
 ## Unreleased
 
+**Added.** `readMatch(db, userId, matchId)` returns one match in the shape a
+page row has, or undefined for another account's id (US-234). `InboxFilters`
+takes `matchId`. A new export, so the next version is a minor.
+
+**Changed.** The CSV from `matchesToCsv` has seventeen columns (US-237). The
+column that held the intent label was named `intent` and is now
+`intent_label`; a consumer that reads the file by heading must rename it. The
+five dimension scores — `relevance`, `problem_fit`, `icp_fit`, `intent_score`,
+`urgency` — follow `saved` as whole numbers. No other column changes meaning.
+
 ## 0.10.0 — 2026-09-19
 
 **Added.** Triage can run on an evaluation model (US-230). `typesafe` joins

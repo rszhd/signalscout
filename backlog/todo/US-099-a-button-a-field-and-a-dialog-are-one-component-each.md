@@ -68,7 +68,7 @@ per commit.
       a raw theme class, and the components are the only path to a dialog
 - [ ] Spacing: `theme.css` and `reply-draft.css` use the `--space-*` scale; a
       `padding`, `margin` or `gap` is `0`, `auto`, a token or a `calc()` of
-      tokens. `docs/spacing.md` names the rule and the snapshot decision
+      tokens. `docs/design.md`, *Spacing*, names the rule and the snapshot decision
 - [ ] `pnpm lint`, `pnpm lint:css`, `pnpm typecheck` and the web tests all pass
 - [ ] `backlog/index.sh` regenerates the lists
 
@@ -96,6 +96,6 @@ per commit.
 - 2026-09-10T01:38+08:00 — Spacing sweep added, on the owner's request for
   across-the-site consistency. The off-scale values were concentrated in
   `theme.css` and `reply-draft.css`; both are now on the scale, and
-  `docs/spacing.md` names the rule. `pnpm lint:css` is the enforcement, since
+  `docs/design.md`, *Spacing*, names the rule. `pnpm lint:css` enforces it, since
   Biome ships no CSS rule for it. Values were snapped to the nearest step;
   `index.css` (160 off-scale rules) is left for its per-page migration.

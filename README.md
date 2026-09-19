@@ -156,8 +156,7 @@ The scope is one sentence: **find conversations with intent.**
 | [docs/accounts.md](docs/accounts.md) | Accounts, TLS, verifying an address by hand, getting back in |
 | [docs/notifications.md](docs/notifications.md) | SMTP setup and the webhook contract |
 | [docs/deletions.md](docs/deletions.md) | How a removed post stops being shown |
-| [docs/design.md](docs/design.md) | The shared theme, tokens and controls |
-| [docs/spacing.md](docs/spacing.md) | The spacing scale |
+| [docs/design.md](docs/design.md) | The shared theme, tokens, the spacing scale and controls |
 | [docs/testing.md](docs/testing.md) | How the tests are written, and what a green suite cannot say |
 | [docs/instruments.md](docs/instruments.md) | Every command that spends money, what it asks and what it costs |
 | [docs/history.md](docs/history.md) | What each ticket measured, in the order it happened |

@@ -63,7 +63,7 @@ function MonitoringBar({
 }
 
 /**
- * The intent inbox.
+ * The inbox.
  *
  * The server owns ranking and filtering. This screen keeps the mockup's
  * compact list-and-detail reading flow while showing only behaviour the
@@ -757,7 +757,7 @@ export function Inbox({
     <div className="product-page inbox-page">
       <header className="topbar">
         <div>
-          <h1>Intent inbox</h1>
+          <h1>Inbox</h1>
           <p className="page-subtitle">Find your next conversation.</p>
         </div>
         {(matches.length > 0 || monitors.length === 0) && (

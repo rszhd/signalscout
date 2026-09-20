@@ -268,7 +268,8 @@ describe("the login screen", () => {
     // false of a cloud tier taking registrations; one sentence now serves both.
     expect(screen.container.textContent).toContain("Sign in to read your inbox");
     // No sidebar, no inbox, and nothing fetched behind the form.
-    expect(screen.container.textContent).not.toContain("Intent inbox");
+    expect(screen.container.querySelector("nav")).toBeNull();
+    expect(screen.container.querySelector(".topbar h1")).toBeNull();
     expect(fetched).toHaveBeenCalledTimes(1);
   });
 });

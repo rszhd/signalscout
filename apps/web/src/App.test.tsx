@@ -191,7 +191,9 @@ describe("the application screens", () => {
   it("opens on the inbox once a project is named", async () => {
     screen = await mount(<App />, inbox);
 
-    expect(screen.container.textContent).toContain("Intent inbox");
+    // The page heading, not the navigation label: "Inbox" is in the sidebar on
+    // every project screen, so the text alone would not say which screen this is.
+    expect(screen.container.querySelector(".topbar h1")?.textContent).toBe("Inbox");
   });
 
   it("reaches the monitor form from the header", async () => {
@@ -231,7 +233,9 @@ describe("the application screens", () => {
 
     await screen.go(inbox);
 
-    expect(screen.container.textContent).toContain("Intent inbox");
+    // The page heading, not the navigation label: "Inbox" is in the sidebar on
+    // every project screen, so the text alone would not say which screen this is.
+    expect(screen.container.querySelector(".topbar h1")?.textContent).toBe("Inbox");
   });
 
   it("keeps page setup open on Escape", async () => {
@@ -460,7 +464,9 @@ describe("the application screens", () => {
   it("shows the inbox once a project is chosen", async () => {
     screen = await mount(<App />, inbox);
 
-    expect(screen.container.textContent).toContain("Intent inbox");
+    // The page heading, not the navigation label: "Inbox" is in the sidebar on
+    // every project screen, so the text alone would not say which screen this is.
+    expect(screen.container.querySelector(".topbar h1")?.textContent).toBe("Inbox");
     expect(screen.path()).toBe(inbox);
   });
 

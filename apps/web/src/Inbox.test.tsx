@@ -88,7 +88,7 @@ const firstPage = {
   asOf: "2026-09-05T12:00:00.000Z",
 };
 
-describe("the intent inbox", () => {
+describe("the inbox", () => {
   let screen: Screen;
   let container: HTMLDivElement;
   let fetchMock: ReturnType<typeof vi.fn>;

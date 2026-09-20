@@ -545,8 +545,7 @@ function Shell({ status }: { readonly status: AuthStatus }) {
                 to={paths.inbox(projectId)}
               >
                 <NavIcon name="inbox" />
-                <span className="nav-label-wide">Intent inbox</span>
-                <span className="nav-label-narrow">Inbox</span>
+                <span>Inbox</span>
               </Link>
               <Link
                 aria-current={monitoring ? "page" : undefined}

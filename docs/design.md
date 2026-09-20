@@ -29,7 +29,7 @@ sits inside it.
   Preserve native semantics and visible keyboard focus.
 - At 820px and below, navigation moves to the bottom. Layouts must work at
   320px without horizontal page scrolling. Respect reduced-motion preferences.
-- The bottom bar holds four items: Projects, Intent inbox, Monitors and
+- The bottom bar holds four items: Projects, Inbox, Monitors and
   Account. New monitor is not one of them, because the inbox header, the
   monitor list header and every project card already carry that action.
   Account opens a sheet with Providers, Voices, Models and Sign out —

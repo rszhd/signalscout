@@ -241,13 +241,13 @@ a {
 }
 
 /*
-  Two labels for one item, and one item for phones only. US-123.
+  One item for phones only. US-123.
 
-  The bottom bar has room for four items at 320px. "Intent inbox" does not fit
-  one of them, and the account screens need a fifth place, so the bar shows the
-  short label and an Account button while the sidebar shows neither.
+  The account screens need a fifth place in a bottom bar with room for four,
+  so the bar shows an Account button and the sidebar does not. (The bar once
+  also swapped a long label for a short one on this item; US-280 gave the item
+  the short label everywhere.)
 */
-.nav-label-narrow,
 .account-sheet-button {
   display: none;
 }
@@ -1755,11 +1755,6 @@ a {
     margin: 0;
   }
 
-  .nav-label-wide {
-    display: none;
-  }
-
-  .nav-label-narrow,
   .account-sheet-button {
     display: flex;
   }

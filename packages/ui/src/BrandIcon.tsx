@@ -41,7 +41,7 @@ export function BrandIcon({ brand, size = 20 }: { brand: string; size?: number }
   return (
     <img
       className="brand-icon"
-      src={`${import.meta.env.BASE_URL}brands/${file}`}
+      src={`${import.meta.env?.BASE_URL ?? "/"}brands/${file}`}
       width={size}
       height={size}
       alt=""

@@ -8,12 +8,12 @@
  * second page is asked for against the first page's clock, and that none of
  * the four things PLAN.md excludes has appeared.
  */
+
+import { ageLabel, idleRefreshMs, workingRefreshMs } from "@signalscout/ui";
+import { monitor as monitorRow, poll } from "@signalscout/ui/testing";
 import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { band, Inbox } from "./Inbox.js";
-import { ageLabel } from "./labels.js";
-import { idleRefreshMs, workingRefreshMs } from "./monitor.js";
-import { monitor as monitorRow, poll } from "./monitor-fixtures.js";
+import { Inbox } from "./Inbox.js";
 import { button, json, mount, type Screen, select, settle, setValue } from "./testing.js";
 
 /** The project every case is inside. The inbox is a question about one. */
@@ -1318,18 +1318,5 @@ describe("the age on a card", () => {
     expect(ago(90)).toBe("2 hours ago");
     expect(ago(60 * 26)).toBe("1 day ago");
     expect(ago(60 * 24 * 3)).toBe("3 days ago");
-  });
-});
-
-describe("the badge on a card", () => {
-  it("bands the whole score, and never names one dimension", () => {
-    // BUG-028: a match at 45 on intent 75 read "Low intent" beside "Intent 75".
-    expect(band(80).label).toBe("Strong lead");
-    expect(band(79).label).toBe("Worth reading");
-    expect(band(55).label).toBe("Worth reading");
-    expect(band(54).label).toBe("Weak lead");
-    for (const score of [0, 54, 55, 79, 80, 100]) {
-      expect(band(score).label.toLowerCase()).not.toContain("intent");
-    }
   });
 });

@@ -1,9 +1,16 @@
+import {
+  ageLabel,
+  BrandIcon,
+  band,
+  type Monitor,
+  type Monitoring,
+  messageFor,
+  monitoringState,
+  requestJson,
+  useMonitorRefresh,
+} from "@signalscout/ui";
 import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router";
-import { messageFor, requestJson } from "./api.js";
-import { BrandIcon } from "./BrandIcon.js";
-import { ageLabel } from "./labels.js";
-import { type Monitor, type Monitoring, monitoringState, useMonitorRefresh } from "./monitor.js";
 import { ReplyDraft } from "./ReplyDraft.js";
 import { paths } from "./route.js";
 
@@ -204,28 +211,6 @@ function limitWords(body: string): { text: string; truncated: boolean } {
     text: `${words.slice(0, postPreviewWordLimit).join(" ")}…`,
     truncated: true,
   };
-}
-
-/**
- * What the score says about a match, in two words. BUG-028.
- *
- * **It takes the score, not the intent**, and it used to be named after one:
- * "High intent" / "Worth reading" / "Low intent". A match reading *Low intent*
- * beside a panel listing *Intent 75* is two correct numbers and one wrong
- * word: a post scoring 45 overall on intent 75 and relevance 35 is somebody
- * asking urgently about something the product does not do, which is the shape
- * US-225 made relevance gate the total for.
- *
- * Banding on `match.intent` would make the label mean its name and stop it
- * summarising the match, and that row would then read "High intent" at 45.
- *
- * "Lead" rather than "match": a match is how this software thinks about a row,
- * and a lead is what the person is scanning for.
- */
-export function band(score: number): { label: string; tone: string } {
-  if (score >= 80) return { label: "Strong lead", tone: "high" };
-  if (score >= 55) return { label: "Worth reading", tone: "medium" };
-  return { label: "Weak lead", tone: "low" };
 }
 
 /**

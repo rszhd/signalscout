@@ -1,8 +1,23 @@
 # Releasing the packages
 
-`@signalscout/engine` and `@signalscout/pipeline` are published to npm so
-that a second application — the private cloud one, US-155 — can install them
-by version. This is how a version is cut, and what it means.
+`@signalscout/engine`, `@signalscout/pipeline` and `@signalscout/ui` are
+published to npm so that a second application — the private cloud one,
+US-155 — can install them by version. This is how a version is cut, and what
+it means.
+
+## Two series, because they move on different clocks
+
+The engine and the pipeline share one number and one tag, `vX.Y.Z`. The UI
+package has its own, `ui-vX.Y.Z`, and `.github/workflows/release-ui.yml`
+publishes it alone (US-270).
+
+Two series rather than one, for a reason in both directions. A colour must not
+cost the pipeline a version nobody can explain. And a pipeline release must
+not renumber the brand, because a consumer reading a new UI version expects
+their screens to change and would go looking for what moved.
+
+Everything below about what a number means, and about asking before taking a
+release, is the same for both series.
 
 ## One version, both packages, one tag
 
@@ -16,6 +31,11 @@ Both packages carry the same version and move together. The pipeline
 depends on the engine at that exact version, because the two are tested
 together in one suite and nothing has tested them mixed. There is no
 separate engine release.
+
+The UI package is not in that tag. `ui-v1.2.3` runs the same checks, sets
+that one package's version, proves the packed tarball installs and works
+outside the workspace, and publishes it. It depends on neither of the other
+two — `ui-boundary.test.ts` says so — so nothing has to move with it.
 
 The manifests say `0.0.0` in git, on purpose. The tag is the version. A
 number in a file is a number somebody forgets to move, and a pull request

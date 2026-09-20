@@ -1,6 +1,5 @@
+import { BrandLogo, codeFor, messageFor, requestJson } from "@signalscout/ui";
 import { type FormEvent, useState } from "react";
-import { codeFor, messageFor, requestJson } from "./api.js";
-import { BrandLogo } from "./BrandLogo.js";
 
 /** Email authentication, with registration offered only when the instance allows it. */
 

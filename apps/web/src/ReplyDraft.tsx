@@ -1,5 +1,5 @@
+import { messageFor, requestJson } from "@signalscout/ui";
 import { useEffect, useRef, useState } from "react";
-import { messageFor, requestJson } from "./api.js";
 
 /**
  * Draft a reply to one match, and keep the prompts that steer it.

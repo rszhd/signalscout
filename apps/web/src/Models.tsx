@@ -1,8 +1,5 @@
+import { BrandIcon, Button, Dialog, messageFor, requestJson } from "@signalscout/ui";
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import { messageFor, requestJson } from "./api.js";
-import { BrandIcon } from "./BrandIcon.js";
-import { Button } from "./components/Button.js";
-import { Dialog } from "./components/Dialog.js";
 
 /**
  * Which model does which job, and whose key pays for it. US-068 to US-081.

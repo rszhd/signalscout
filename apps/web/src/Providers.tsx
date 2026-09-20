@@ -1,8 +1,8 @@
 // biome-ignore-all lint/a11y/noRedundantRoles: the roles are not redundant at phone width, where the stylesheet gives every table element `display: block` and the implicit table semantics go with it. US-123.
+
+import { BrandIcon, messageFor, requestJson } from "@signalscout/ui";
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
-import { messageFor, requestJson } from "./api.js";
-import { BrandIcon } from "./BrandIcon.js";
 import { paths } from "./route.js";
 
 /**

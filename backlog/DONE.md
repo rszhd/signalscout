@@ -2,7 +2,7 @@
 
 # Done
 
-175 finished.
+176 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
@@ -26,6 +26,7 @@
 | BUG-003 | [A post below the threshold is classified again on every poll](done/2026-09/BUG-003-a-post-below-the-threshold-is-classified-again-on-every-poll.md) | bug | fixed | 2026-09 |
 | BUG-002 | [A seven-day window is bought as a month](done/2026-09/BUG-002-a-seven-day-window-is-bought-as-a-month.md) | bug | fixed | 2026-09 |
 | BUG-001 | [A pending Reddit collection is not resumed](done/2026-09/BUG-001-a-pending-reddit-collection-is-not-resumed.md) | bug | shipped | 2026-09 |
+| US-270 | [One brand in a UI package both applications wear](done/2026-09/US-270-one-brand-in-a-ui-package-both-applications-wear.md) | feature | — | 2026-09 |
 | US-269 | [The search plan is a model task of its own](done/2026-09/US-269-the-search-plan-is-a-model-task-of-its-own.md) | feature | shipped | 2026-09 |
 | US-268 | [An inbox item has an address](done/2026-09/US-268-an-inbox-item-has-an-address.md) | feature | shipped | 2026-09 |
 | US-267 | [The monitor page says which queries and sources earn their keep](done/2026-09/US-267-the-monitor-page-says-which-queries-and-sources-earn-their-keep.md) | feature | shipped | 2026-09 |

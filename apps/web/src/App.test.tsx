@@ -156,9 +156,13 @@ describe("the application screens", () => {
   it("shows the signed-in account where the self-hosted label used to be", async () => {
     screen = await mount(<App />);
 
-    expect(
-      screen.container.querySelector<HTMLImageElement>('.brand-logo[src="/logo.png"]'),
-    ).not.toBeNull();
+    // US-270: the mark is the lattice, and it travels with @signalscout/ui
+    // rather than sitting in each application's public folder.
+    // The mark is drawn by `BrandLogo` in @signalscout/ui, so what this
+    // screen owes is that it is rendered and named. US-270.
+    expect(screen.container.querySelector(".brand-logo")?.getAttribute("aria-label")).toBe(
+      "SignalScout",
+    );
     expect(screen.container.textContent).toContain("The owner");
     expect(screen.container.textContent).toContain("owner@example.com");
     expect(screen.container.textContent).not.toContain("Self-hosted");

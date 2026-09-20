@@ -8,16 +8,17 @@
  * the rule underneath each figure belongs to `packages/pipeline`, where it is
  * asserted against real Postgres.
  */
-import { act } from "react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { groupsOf, Monitors } from "./Monitors.js";
-import { idleRefreshMs, workingRefreshMs } from "./monitor.js";
+
+import { idleRefreshMs, workingRefreshMs } from "@signalscout/ui";
 import {
   monitor,
   testMonitorId as monitorId,
   poll,
   testProjectId as projectId,
-} from "./monitor-fixtures.js";
+} from "@signalscout/ui/testing";
+import { act } from "react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { groupsOf, Monitors } from "./Monitors.js";
 import { button, field, json, mount, type Screen, settle, setValue } from "./testing.js";
 
 /** The rows of every table on the screen, the way a person counts them. */

@@ -1,8 +1,5 @@
+import { BrandIcon, Button, Dialog, messageFor, requestJson } from "@signalscout/ui";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { messageFor, requestJson } from "./api.js";
-import { BrandIcon } from "./BrandIcon.js";
-import { Button } from "./components/Button.js";
-import { Dialog } from "./components/Dialog.js";
 
 /**
  * Where a provider key is pasted, tested and stored.

@@ -11,26 +11,30 @@
  * to another account — the same read the list is scoped by, so a person cannot
  * reach a stranger's monitor by typing its id into the address.
  */
-import { useCallback, useEffect, useState } from "react";
-import { Link } from "react-router";
-import { messageFor, requestJson } from "./api.js";
-import { BrandIcon } from "./BrandIcon.js";
-import { Button } from "./components/Button.js";
-import { ageLabel, platformName, providerName } from "./labels.js";
+
 import {
+  ageLabel,
+  BrandIcon,
   type Budget,
+  Button,
   feedbackLabel,
   formatMicros,
   type Monitor,
-  MonitorHistory,
+  messageFor,
   monitoringState,
   monthLabel,
   nextPollLabel,
   type PreFilter,
+  platformName,
+  providerName,
+  requestJson,
   status,
   toMicros,
   useMonitorRefresh,
-} from "./monitor.js";
+} from "@signalscout/ui";
+import { useCallback, useEffect, useState } from "react";
+import { Link } from "react-router";
+import { MonitorHistory } from "./monitor.js";
 import { paths } from "./route.js";
 import { ScheduleField } from "./ScheduleField.js";
 import { describeSchedule } from "./schedule.js";

@@ -1,15 +1,22 @@
 /**
- * The words and the arithmetic both monitor screens share. US-109.
+ * The words and the arithmetic both applications say about a monitor. US-109,
+ * moved into the package by US-270.
  *
- * These moved out of `Monitors.test.tsx` with the functions themselves. They
- * are asserted once, here, rather than on each screen: the list and the
- * monitor page must say the same thing about the same row, and a rule tested
- * through two screens is a rule that can be edited on one of them.
+ * They are asserted once, here, rather than on each screen: two screens must
+ * say the same thing about the same row, and a rule tested through a screen
+ * is a rule that can be edited on the other one. Since US-270 that is true
+ * across two repositories as well as across two screens.
+ *
+ * Where the products differ, the difference is an argument and has a case of
+ * its own: `pollSummary` with `spend: false` is the hosted sentence, and
+ * `pausedByPlan` is the pause only the hosted product can perform.
  */
+
 import { describe, expect, it } from "vitest";
 import {
   activityGroupsOf,
   anyWorking,
+  band,
   formatMicros,
   type Monitor,
   monitoringState,
@@ -20,8 +27,8 @@ import {
   stageLabel,
   stageLine,
   toMicros,
-} from "./monitor.js";
-import { monitor, poll } from "./monitor-fixtures.js";
+} from "./index.js";
+import { monitor, poll } from "./testing/monitors.js";
 
 describe("the money on the screen", () => {
   it("keeps the places a small amount needs", () => {
@@ -246,18 +253,18 @@ describe("the subject of a poll's sentence", () => {
   it("says last by default, and this for a row in the history", () => {
     const collected = poll({ outcome: "collected", postsReturned: 72, postsNew: 12, units: 0 });
     expect(pollSummary(collected)).toBe("Last poll: 72 posts, 12 new");
-    expect(pollSummary(collected, "this")).toBe("This poll: 72 posts, 12 new");
+    expect(pollSummary(collected, { subject: "this" })).toBe("This poll: 72 posts, 12 new");
 
     const empty = poll({ units: 0 });
     expect(pollSummary(empty)).toBe("Last poll found no posts");
-    expect(pollSummary(empty, "this")).toBe("This poll found no posts");
+    expect(pollSummary(empty, { subject: "this" })).toBe("This poll found no posts");
 
     const failed = poll({ outcome: "failed", units: 0 });
     expect(pollSummary(failed)).toBe("The last poll failed");
-    expect(pollSummary(failed, "this")).toBe("This poll failed");
+    expect(pollSummary(failed, { subject: "this" })).toBe("This poll failed");
 
     const refused = poll({ outcome: "refused", stopReason: "budget_exhausted", units: 0 });
-    expect(pollSummary(refused, "this")).toBe(
+    expect(pollSummary(refused, { subject: "this" })).toBe(
       "This poll collected nothing: the monthly budget was spent",
     );
   });
@@ -520,5 +527,62 @@ describe("a poll in the history", () => {
     expect(groups).toHaveLength(3);
     expect(groups.filter((group) => group.poll === null)).toHaveLength(2);
     expect(groups.find((group) => group.poll?.poll.id === "poll-1")?.stages).toHaveLength(0);
+  });
+});
+
+describe("the badge on a match", () => {
+  it("bands the whole score, and never names one dimension", () => {
+    // BUG-028: a match at 45 on intent 75 read "Low intent" beside "Intent 75".
+    expect(band(80).label).toBe("Strong lead");
+    expect(band(79).label).toBe("Worth reading");
+    expect(band(55).label).toBe("Worth reading");
+    expect(band(54).label).toBe("Weak lead");
+    for (const score of [0, 54, 55, 79, 80, 100]) {
+      expect(band(score).label.toLowerCase()).not.toContain("intent");
+    }
+  });
+});
+
+/**
+ * The two places the products differ. US-270.
+ *
+ * Neither is a fork: the hosted product shows a share of an allowance and
+ * never a dollar (US-173 there), and only it can pause a monitor by plan
+ * (US-167 there). One set of words, two arguments.
+ */
+describe("what each product says", () => {
+  const now = new Date("2026-03-14T08:30:00.000Z").getTime();
+  const row = (overrides: Record<string, unknown> = {}): Monitor =>
+    monitor(overrides) as unknown as Monitor;
+
+  it("prints the spend self-hosted and leaves it out hosted", () => {
+    const run = poll({ outcome: "collected", postsReturned: 72, postsNew: 12 });
+
+    expect(pollSummary(run)).toBe("Last poll: 72 posts, 12 new · $0.5439 (estimated)");
+    expect(pollSummary(run, { spend: false })).toBe("Last poll: 72 posts, 12 new");
+    expect(pollSummary(run, { subject: "this", spend: false })).toBe("This poll: 72 posts, 12 new");
+  });
+
+  it("carries the sentence through the monitoring state", () => {
+    const rows = [
+      row({ lastPoll: poll({ outcome: "collected", postsReturned: 72, postsNew: 12 }) }),
+    ];
+
+    expect(monitoringState(rows, now)?.last).toBe(
+      "Last poll: 72 posts, 12 new · $0.5439 (estimated)",
+    );
+    expect(monitoringState(rows, now, { spend: false })?.last).toBe("Last poll: 72 posts, 12 new");
+  });
+
+  it("says which plan paused a monitor, where a plan can", () => {
+    // Self-hosted there is no plan, so the field is absent and the sentence
+    // is the one about a person pressing pause.
+    expect(monitoringState([row({ paused: true })], now)?.now).toBe(
+      "Paused — nothing is collected until it is resumed",
+    );
+    expect(
+      monitoringState([row({ paused: true, pausedByPlan: "Your plan covers one monitor." })], now)
+        ?.now,
+    ).toBe("Your plan covers one monitor.");
   });
 });

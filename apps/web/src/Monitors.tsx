@@ -21,22 +21,24 @@
  * status column beside it, and a page in between is the detour this screen was
  * rewritten to remove.
  */
-import { useCallback, useEffect, useState } from "react";
-import { Link } from "react-router";
-import { messageFor, requestJson } from "./api.js";
-import { BrandIcon } from "./BrandIcon.js";
-import { platformName } from "./labels.js";
+
 import {
   anyWorking,
+  BrandIcon,
   type Monitor,
+  messageFor,
   needsAttention,
   nextPollLabel,
+  platformName,
   pollSummary,
+  requestJson,
   stageLabel,
   stageOf,
   status,
   useMonitorRefresh,
-} from "./monitor.js";
+} from "@signalscout/ui";
+import { useCallback, useEffect, useState } from "react";
+import { Link } from "react-router";
 import { paths } from "./route.js";
 
 type LoadState = "loading" | "ready" | "error";

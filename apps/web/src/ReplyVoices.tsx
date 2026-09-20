@@ -1,5 +1,5 @@
+import { messageFor, requestJson } from "@signalscout/ui";
 import { useEffect, useState } from "react";
-import { messageFor, requestJson } from "./api.js";
 
 /**
  * Account-level writing voices, separate from any one conversation.

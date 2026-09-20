@@ -1,3 +1,4 @@
+import { BrandLogo, Dialog, requestJson } from "@signalscout/ui";
 import { useEffect, useRef, useState } from "react";
 import {
   Link,
@@ -9,10 +10,7 @@ import {
   useNavigate,
   useParams,
 } from "react-router";
-import { requestJson } from "./api.js";
-import { BrandLogo } from "./BrandLogo.js";
 import { Connections } from "./Connections.js";
-import { Dialog } from "./components/Dialog.js";
 import { Inbox } from "./Inbox.js";
 import { type AuthStatus, Login } from "./Login.js";
 import { Models } from "./Models.js";

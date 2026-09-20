@@ -1,6 +1,6 @@
+import { messageFor, requestJson } from "@signalscout/ui";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router";
-import { messageFor, requestJson } from "./api.js";
 import { paths } from "./route.js";
 
 /**

@@ -1,11 +1,37 @@
-/* Shared UI primitives. Page styles own layout, never a second theme. */
+/*
+ * The shared controls, in the brand's own language. US-270.
+ *
+ * Every rule here uses a token name from `tokens.css` and never a raw colour
+ * or a raw spacing value: that is what lets two applications wear one brand
+ * while their screens differ. A page stylesheet owns layout and never a
+ * second theme.
+ *
+ * Application chrome — the sidebar, the navigation, the account sheet — is
+ * layout and stays in each application's own stylesheet.
+ */
+@keyframes running-status-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.2;
+  }
+}
+
+::selection {
+  color: var(--ink);
+  background: var(--surface-brand);
+}
+
 .topbar {
   --topbar-gutter: max(
     var(--page-gutter),
     calc((100% - var(--page-content-width)) / 2 + var(--page-gutter))
   );
 
-  min-height: 128px;
+  min-height: 112px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -19,10 +45,10 @@
 
 .topbar h1 {
   margin: 0;
-  font-size: 1.875rem;
-  font-weight: 600;
-  line-height: 1.15;
-  letter-spacing: -0.035em;
+  font-size: 1.75rem;
+  font-weight: 500;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
 }
 
 .primary-button,
@@ -33,16 +59,21 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--radius-sm);
-  padding: 0 var(--space-4);
-  font-size: var(--text-label);
-  font-weight: 500;
+  border-radius: 999px;
+  padding: 0 var(--space-5);
+  font-size: var(--text-sm);
+  font-weight: 600;
   text-decoration: none;
+  transition:
+    background 140ms ease,
+    border-color 140ms ease,
+    color 140ms ease,
+    box-shadow 140ms ease;
 }
 
 .primary-button,
 .top-primary-button {
-  border: 0;
+  border: 1px solid var(--accent);
   color: var(--text-on-accent);
   background: var(--accent);
   box-shadow: none;
@@ -50,7 +81,9 @@
 
 .primary-button:hover,
 .top-primary-button:hover {
+  border-color: var(--accent-hover);
   background: var(--accent-hover);
+  box-shadow: var(--shadow-soft);
 }
 
 .top-primary-button {
@@ -58,7 +91,7 @@
 }
 
 .top-primary-button span {
-  font-size: 1rem;
+  font-size: var(--text-sm);
   font-weight: 400;
 }
 
@@ -71,8 +104,9 @@
 
 .secondary-button:hover,
 .top-secondary-link:hover {
-  border-color: var(--muted);
-  color: var(--ink);
+  border-color: var(--accent);
+  color: var(--accent-text);
+  background: var(--accent-soft);
 }
 
 .page-subtitle {
@@ -99,7 +133,7 @@
   border-bottom: 2px solid transparent;
   background: transparent;
   color: var(--muted);
-  font-size: var(--text-label);
+  font-size: var(--text-sm);
   font-weight: 500;
 }
 
@@ -110,7 +144,7 @@
 
 :where(button, a, summary):focus-visible {
   outline: 2px solid var(--accent);
-  outline-offset: 3px;
+  outline-offset: 2px;
 }
 
 .top-secondary-link {
@@ -123,7 +157,7 @@
   }
 
   .topbar h1 {
-    font-size: 1.625rem;
+    font-size: 1.5rem;
   }
 }
 /*
@@ -158,10 +192,21 @@
   min-height: var(--control-height-compact);
   padding: 0 var(--space-3);
   border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
+  border-radius: 999px;
   background: var(--surface);
   color: var(--muted-strong);
   font-size: var(--text-sm);
+  font-weight: 500;
+  transition:
+    border-color 140ms ease,
+    color 140ms ease,
+    background 140ms ease;
+}
+
+.compact-button:hover {
+  border-color: var(--accent);
+  color: var(--accent-text);
+  background: var(--accent-soft);
 }
 
 .compact-button.active {
@@ -225,8 +270,7 @@
 }
 
 .app-dialog::backdrop {
-  background: rgb(21 26 34 / 48%);
-  backdrop-filter: blur(2px);
+  background: var(--scrim);
 }
 
 .app-dialog-heading {
@@ -265,10 +309,23 @@
   height: var(--control-height);
   padding: 0 var(--space-3);
   border: 1px solid var(--line-dark);
-  border-radius: var(--radius-sm);
+  border-radius: 4px;
   color: var(--ink);
   background: var(--surface);
   font: inherit;
   font-size: var(--text-body);
   line-height: 1.5;
+  outline: 0;
+  transition:
+    border-color 140ms ease,
+    box-shadow 140ms ease;
+}
+
+.field .form-control:hover {
+  border-color: var(--muted);
+}
+
+.field .form-control:focus {
+  border: 2px solid var(--accent);
+  box-shadow: none;
 }

@@ -297,7 +297,7 @@
 }
 
 .provider-name-cell > div > span {
-  margin-top: 2px;
+  margin-top: var(--space-1);
   color: var(--muted);
   font-size: var(--text-xs);
   line-height: 1.4;

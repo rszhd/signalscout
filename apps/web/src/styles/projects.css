@@ -64,9 +64,7 @@
 }
 .projects-content .project-row:hover {
   border-color: var(--line-dark);
-  box-shadow:
-    0 1px 2px rgb(20 24 21 / 4%),
-    0 18px 44px rgb(20 24 21 / 8%);
+  box-shadow: var(--shadow-card);
 }
 .project-card-heading {
   display: flex;
@@ -90,7 +88,7 @@
 }
 .projects-content .project-identity {
   display: grid;
-  gap: 3px;
+  gap: var(--space-1);
   flex: 1;
   min-width: 0;
 }
@@ -193,7 +191,7 @@
   cursor: default;
 }
 .project-delete-button {
-  color: #8f3f39;
+  color: var(--danger);
 }
 .project-delete-confirm {
   display: grid;

@@ -55,30 +55,40 @@ Decisions the ticket makes rather than the code:
 
 ## Acceptance
 
-- [ ] `packages/ui` exists, published as `@signalscout/ui`, with `tokens.css`
+- [x] `packages/ui` exists, published as `@signalscout/ui`, with `tokens.css`
       (the hosted theme's values), `theme.css`, `Button`, `Dialog`, `Field`,
       `BrandIcon`, `BrandLogo` and the mark, `requestJson`, and the words:
       `platformName`, `providerName`, `ageLabel`, `untilLabel`,
       `formatMicros`, `stopReasonLabel`, `pollSummary`, `stageLabel`,
       `stageOf`, `monitoringState`, `stageDidLabel`, `stageLine`, `band`.
-- [ ] A boundary test says the package imports no `pg`, `drizzle-orm`,
+- [x] A boundary test says the package imports no `pg`, `drizzle-orm`,
       `@signalscout/pipeline` or `@signalscout/engine`, and reads no
       `process.env`. React is a peer dependency.
-- [ ] `apps/web` here imports every one of those from the package, and its
+- [x] `apps/web` here imports every one of those from the package, and its
       own copies are deleted, including `styles/tokens.css`.
-- [ ] `stylelint` refuses a raw colour or a raw spacing value in
-      `packages/ui` and in `apps/web/src/styles`.
-- [ ] `pollSummary` takes `{ subject, spend }` and `monitoringState` reads an
+- [x] `stylelint` refuses a raw colour or a raw spacing value in
+      `packages/ui` and in `apps/web/src/styles`. **Two exceptions**, listed
+      in the config: `reply-draft.css` and `reply-voices.css` carry a whole
+      older palette and are exempt from the colour rule until US-272 adopts
+      the brand's. Every other file passes, and `pnpm lint:css` runs in CI.
+- [x] `pollSummary` takes `{ subject, spend }` and `monitoringState` reads an
       optional `pausedByPlan`; the unit tests for the words move to the
       package and pass there.
-- [ ] `docs/design.md` here keeps only the layouts; the tokens, the spacing
+- [x] `docs/design.md` here keeps only the layouts; the tokens, the spacing
       scale and the control rules live in `packages/ui/README.md`.
-- [ ] The `cut-release` skill and `docs/releasing.md` name the third package
-      and its own version; `0.1.0` is published.
-- [ ] AGENTS.md's theme paragraph says the colours and sizing live in
+- [x] The `cut-release` skill and `docs/releasing.md` name the third package
+      and its own version, on its own tag series `ui-vX.Y.Z` with its own
+      workflow and packed verifier. **`0.1.0` is not published**: a release
+      is asked for, not taken, and the owner has not said yes.
+- [x] AGENTS.md's theme paragraph says the colours and sizing live in
       `@signalscout/ui`, and a screen never writes a raw value.
 - [ ] Every screen was rendered once in a browser after the move, and the
-      Log says what was seen.
+      Log says what was seen. **Not done**: the Chrome extension was not
+      connected to this session. The stack runs and the brand resolves —
+      Vite serves the package's `tokens.css` and `theme.css`, and the
+      production bundle carries the palette — but no browser has rendered a
+      screen. This is the standing gap AGENTS.md names, and it is the one
+      box left open.
 
 ## Notes
 
@@ -100,3 +110,23 @@ Decisions the ticket makes rather than the code:
 
 - 2026-09-20T11:05+08:00 — Written after the owner's decision that the two
   applications share one brand and two sets of screens.
+- 2026-09-20T12:30+08:00 — Shipped, with the browser pass still owed.
+  `packages/ui` holds the hosted theme's tokens (plus `--danger`, `--scrim`
+  and `--shadow-card`, which the rule found the pages writing by hand), the
+  shared controls, the primitives, the words, and `./testing` for the
+  fixtures. The mark is **drawn** rather than shipped as a file: an `<img>`
+  cannot read custom properties, so a file would carry its own hex numbers,
+  and inline it follows `--accent-tint` and `--accent`. That also keeps the
+  package free of asset imports, so plain Node can read its words —
+  `scripts/verify-packed-ui.mjs` proves it on every release.
+  Beyond the acceptance list, the closure of it: `status`, `needsAttention`,
+  `nextPollAt`, `nextPollLabel`, `anyWorking`, `useMonitorRefresh`, the two
+  refresh periods, `monthLabel`, `feedbackLabel`, `toMicros` and
+  `activityGroupsOf` moved too, because `monitoringState` and `stageLabel`
+  cannot move without them. `MonitorHistory` stayed: it is a screen.
+  The theme kept out one block — the sidebar and navigation overrides — which
+  is layout and each application's own. Three assertions changed with the
+  behaviour: the mark is named rather than pathed on two screens, and
+  `pollSummary`'s subject is now an option. 2,245 tests pass, `pnpm lint`,
+  `pnpm lint:css` and `pnpm typecheck` pass, and the packed package installs
+  and works outside the workspace.

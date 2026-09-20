@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router";
 import { App } from "./App.js";
 import "./index.css";
-import "./styles/theme.css";
+import "@signalscout/ui/theme.css";
 import "./styles/login.css";
 import "./styles/models.css";
 import "./styles/monitor-setup.css";

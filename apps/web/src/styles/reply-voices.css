@@ -266,7 +266,7 @@
 
 .reply-voice-delete {
   min-height: var(--control-height-compact);
-  padding: 0 5px;
+  padding: 0 var(--space-1);
   border: 0;
   color: #8f3f39;
   background: transparent;

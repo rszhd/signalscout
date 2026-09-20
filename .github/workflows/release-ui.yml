@@ -1,0 +1,76 @@
+name: Release the UI package
+
+# `@signalscout/ui` carries the brand, and the brand moves on its own clock.
+# Pushing `ui-v1.2.3` runs every check main runs and publishes that package at
+# 1.2.3. It is a second series on purpose: a colour must not cost the engine
+# and the pipeline a version nobody can explain, and the reverse is worse —
+# a pipeline release that renumbers the brand tells a consumer to expect a
+# change to their screens. `release.yml` is the other series. US-270.
+on:
+  push:
+    tags:
+      - "ui-v[0-9]+.[0-9]+.[0-9]+"
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  on-main:
+    name: The tag points at a commit on main
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - run: |
+          git fetch origin main --depth=1000
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then
+            echo "::error::${GITHUB_REF_NAME} points at ${GITHUB_SHA}, which is not on main. Merge first, then tag."
+            exit 1
+          fi
+
+  ci:
+    needs: on-main
+    uses: ./.github/workflows/ci.yml
+    permissions:
+      contents: read
+      packages: write
+
+  publish:
+    name: Publish the UI package to npm
+    needs: ci
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    # No Postgres. This package holds no table and no query; its verifier packs
+    # the tarball, installs it outside the workspace and reads its words.
+    steps:
+      - uses: actions/checkout@v5
+
+      - run: corepack enable
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+
+      # The tag is the version, the way it is for the other two. `ui-v1.2.3`
+      # publishes 1.2.3: the prefix names the series and is not part of it.
+      - name: Set the version from the tag
+        run: |
+          version="${GITHUB_REF_NAME#ui-v}"
+          (cd packages/ui && pnpm version "$version" --no-git-tag-version)
+
+      - name: The packed package installs and works outside the workspace
+        run: pnpm release:verify:ui
+
+      - name: Publish
+        run: |
+          pnpm --filter @signalscout/ui publish --access public --no-git-checks --provenance

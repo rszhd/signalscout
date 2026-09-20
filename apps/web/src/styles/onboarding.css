@@ -32,7 +32,7 @@
 .onboarding-provider-website {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: var(--space-1);
   text-decoration: none;
   color: var(--accent-text);
   font-size: var(--text-sm);

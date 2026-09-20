@@ -6,6 +6,10 @@ name: Release
 # engine at that exact version and nothing has tested them mixed. A tag that
 # is not on main is refused: a release is a commit main has, or it is not a
 # release. docs/releasing.md says how to cut one. US-154.
+#
+# @signalscout/ui is not here. It carries its own number on its own tag,
+# `ui-v1.2.3`, in `release-ui.yml`: a colour must not cost the pipeline a
+# version nobody can explain. US-270.
 on:
   push:
     tags:
@@ -95,5 +99,9 @@ jobs:
       # file as a trusted publisher, and npm accepts the job's OIDC token in
       # place of a secret — that is what `id-token: write` above is for, and
       # why `registry-url` is set on the Node step. US-156.
+      # Named rather than globbed: `./packages/*` would publish the UI package
+      # at this number too, and it has a series of its own. US-270.
       - name: Publish
-        run: pnpm --filter "./packages/*" publish --access public --no-git-checks --provenance
+        run: |
+          pnpm --filter @signalscout/engine --filter @signalscout/pipeline \
+            publish --access public --no-git-checks --provenance

@@ -5,6 +5,9 @@ share a version. Both are published from one tag, and the pipeline depends on
 the engine at that exact version. Upgrade both, or neither.
 [docs/releasing.md](docs/releasing.md) is how a version is cut.
 
+`@signalscout/ui` is here too, under its own heading, because it has its own
+number and its own tag (`ui-vX.Y.Z`) and moves with neither of them.
+
 **An entry says what a consumer must know**, not what the diff shows. A renamed
 export, a changed option, a table that moved: those belong here. A refactor
 nobody outside this repository can see does not.
@@ -16,6 +19,18 @@ order it happened, including the ones that changed nothing a consumer imports.
 question — what must a consumer do to take this version — with nothing moving
 the patch and something moving the minor. The app in this repository is not
 versioned and is not described here; it is what `main` holds.
+
+## @signalscout/ui — Unreleased
+
+**Added.** The package itself, at `0.1.0` when it goes out: SignalScout's
+brand for both applications (US-270). `tokens.css` and `theme.css`, the
+`Button`, `Dialog` and `Field` primitives, `BrandIcon` and `BrandLogo`,
+`requestJson`, and the words both products say about a monitor — the status
+word, the poll and stage sentences, the badge, the ages and the money.
+`@signalscout/ui/testing` carries the monitor and poll fixtures. React is a
+peer dependency. Where the two products differ the words take an argument:
+`pollSummary(run, { spend: false })` is the hosted sentence, and
+`Monitor.pausedByPlan` is the pause only a plan can perform.
 
 ## Unreleased
 

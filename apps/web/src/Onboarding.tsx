@@ -1,7 +1,5 @@
+import { BrandIcon, BrandLogo, messageFor, requestJson } from "@signalscout/ui";
 import { type FormEvent, useCallback, useState } from "react";
-import { messageFor, requestJson } from "./api.js";
-import { BrandIcon } from "./BrandIcon.js";
-import { BrandLogo } from "./BrandLogo.js";
 
 /**
  * The two keys a new account is asked for, before it is given the product.

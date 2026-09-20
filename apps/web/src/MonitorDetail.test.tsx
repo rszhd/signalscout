@@ -9,16 +9,17 @@
  * belong to. The rule itself belongs to `packages/pipeline`; what this owns is
  * whether a person can see it and act on it.
  */
-import { act } from "react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { inputVerdict, MonitorDetail, staleAfterDays } from "./MonitorDetail.js";
-import { idleRefreshMs, workingRefreshMs } from "./monitor.js";
+
+import { idleRefreshMs, workingRefreshMs } from "@signalscout/ui";
 import {
   monitor,
   testMonitorId as monitorId,
   poll,
   testProjectId as projectId,
-} from "./monitor-fixtures.js";
+} from "@signalscout/ui/testing";
+import { act } from "react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { inputVerdict, MonitorDetail, staleAfterDays } from "./MonitorDetail.js";
 import { everyDay, summarise, weekdays } from "./schedule.js";
 import { button, field, json, mount, type Screen, select, settle, setValue } from "./testing.js";
 

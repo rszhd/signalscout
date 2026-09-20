@@ -53,16 +53,21 @@ const chatRecommendations: Readonly<Record<string, Readonly<Partial<Record<AiTas
     classify: "gpt-5.6-terra",
     triage: "gpt-5.6-luna",
     draft: "gpt-5.6-sol",
+    // The plan is written once per monitor and decides every post it will
+    // collect, so the strongest priced model on each provider. US-269.
+    plan: "gpt-5.6-sol",
   },
   anthropic: {
     classify: "claude-sonnet-5",
     triage: "claude-haiku-4-5",
     draft: "claude-fable-5-1",
+    plan: "claude-fable-5-1",
   },
   google: {
     classify: "gemini-3.5-flash",
     triage: "gemini-3.5-flash-lite",
     draft: "gemini-3.1-pro-preview",
+    plan: "gemini-3.1-pro-preview",
   },
 };
 

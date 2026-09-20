@@ -6,10 +6,11 @@
  * first assertion is that nothing is requested until the button is pressed,
  * and the second is that reading the answer back is a `GET`.
  */
+
+import { button, json, mount, type Screen, settle } from "@signalscout/ui/testing";
 import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { CostTest, type EstimateReport } from "./CostTest.js";
-import { button, json, mount, type Screen, settle } from "./testing.js";
 
 const probe = {
   source: "reddit",

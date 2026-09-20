@@ -1,105 +1,10 @@
-# Site design
+# Screens and layout
 
-The intent inbox establishes the visual direction: white reading surfaces,
-cool neutral backgrounds, muted blue for actions and selection, and restrained
-borders. The goal is to make the next useful action obvious while keeping
-secondary information available on demand.
-
-## Source of truth
-
-- `apps/web/src/styles/tokens.css`: semantic colors, Figtree typography, spacing,
-  radii, control heights, page gutters, navigation sizes and reading width.
-- `apps/web/src/styles/theme.css`: shared headers, buttons, view switches,
-  disclosures and keyboard focus treatment.
-- `apps/web/src/index.css`: base layout, navigation and existing page styles.
-  It imports the tokens. `main.tsx` imports the shared theme after page styles
-  so ordinary page rules cannot accidentally restore the older control theme.
-
-Use tokens rather than introducing another gray, blue, radius or shadow in a
-page. Platform brand colors and semantic warning/success colors may differ
-from the site accent. The theme is currently light only.
-
-## Components
-
-A screen uses a shared component before it writes a theme class by hand. The
-components live in `apps/web/src/components/` and own the class names and the
-semantics a screen must not get wrong:
-
-- `Button` — the three control intents (`primary`, `secondary`, `compact`). A
-  page names the intent and never the class. `type` defaults to `button`, so a
-  form's submit button says `type="submit"` explicitly.
-- `Dialog` — the only path to a modal. It owns the native `<dialog>`, the
-  heading row, the Close button and `aria-labelledby`. A screen passes the
-  heading content, the body and a ref it opens with `showModal`. A new dialog
-  is never `role="dialog"` on a div with its own Escape listener.
-- `Field` — the label-plus-control shape. The label is a `<span>`, an optional
-  `<small>` carries supporting text, and the control is children.
-
-`docs/design.md` is the rule; the migration happens one screen at a time. A
-theme class not served by a component (e.g. a page's own `text-button`) stays a
-plain class until a component earns it. Components never import `packages/pipeline`.
-
-## Spacing
-
-Spacing is on the scale, not on a value. The scale lives in
-`apps/web/src/styles/tokens.css`:
-
-| Token | `--space-1` | `--space-2` | `--space-3` | `--space-4` | `--space-5` | `--space-6` | `--space-8` | `--space-12` |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Value | 4 | 8 | 12 | 16 | 20 | 24 | 32 | 48 |
-
-**A `padding`, `margin` or `gap` is either `0` or a `var(--space-*)` token,
-never a raw px number.** Two lengths are not spacing and stay raw: a
-hairline of 1–2px for a border or an outline, and a non-spacing length —
-a radius, a width, a height, a shadow offset, a control's `min-height`.
-
-**A value that does not fit moves to the nearest step.** When it sits exactly
-between two, read what it measures: a tight gap between small inline controls
-is `--space-1` or `--space-2`; an inset around a control, a card or a section
-is `--space-4` or `--space-5`. Do not invent a token for a value the scale
-already covers — the scale is coarse on purpose, and the answer to "9px or
-11px?" is whatever the scale offers. The detail that justifies a value you
-care about is worth a comment, not a new token.
-
-The scale is what makes the site read as one site. 9px beside 8px does not
-visibly disagree; 9px beside 11px does, and after a hundred edits no two gaps
-match.
-
-**`pnpm lint:css` enforces it**, because Biome has no CSS rule for this. The
-stylelint script names its files explicitly: `index.css` and the un-migrated
-page stylesheets are grandfathered, since a page that still uses old values
-cannot be enforced until it has adopted the scale. When a page is migrated,
-add its stylesheet to the `lint:css` command and to the migration list below.
-A new rule in a migrated file that uses a raw px spacing value is a lint
-error.
-
-Two things stay out of it: the email templates, which are a separate renderer
-that cannot read the CSS scale and copy the palette rather than the spacing;
-and `packages/pipeline`, which has no UI.
-
-## Shared patterns
-
-| Pattern | Use |
-| --- | --- |
-| `.topbar`, `.page-subtitle` | One page title, a short supporting sentence, and an optional action. Responsive gutters are shared. |
-| `.primary-button` / `.top-primary-button` | The main action, solid blue, without a decorative shadow. Use a button for an action and an anchor for navigation. |
-| `.secondary-button` / `.top-secondary-link` | Supporting actions, with a quiet outline. |
-| `.compact-button` | Toolbar actions such as Filters. Use `aria-expanded` and `aria-controls` when revealing a panel. |
-| `.view-switch` | A labelled fieldset of buttons switching views. Mark the active button with `aria-pressed`. These are buttons, not ARIA tabs. |
-| `.disclosure` | Native `details` / `summary` for optional detail. A span in the summary can carry a trailing value. |
-
-The inbox uses these shared patterns directly; its list density, column ratio,
-preview truncation and mobile reading pane remain page-specific.
-
-```tsx
-<header className="topbar">
-  <div>
-    <h1>Page title</h1>
-    <p className="page-subtitle">A short explanation of this page.</p>
-  </div>
-  <button className="primary-button" type="button">Main action</button>
-</header>
-```
+What this application's screens do and how they are arranged. **The brand is
+not here**: the palette, the type and spacing scales, the shared controls and
+the mark live in [`@signalscout/ui`](../packages/ui/README.md), which the
+hosted application wears too (US-270). Read that first; this page is what
+sits inside it.
 
 ## Layout and interaction rules
 
@@ -124,9 +29,9 @@ preview truncation and mobile reading pane remain page-specific.
   Preserve native semantics and visible keyboard focus.
 - At 820px and below, navigation moves to the bottom. Layouts must work at
   320px without horizontal page scrolling. Respect reduced-motion preferences.
-- The bottom bar holds four items: Projects, Intent inbox, Monitors and
-  Account. New monitor is not one of them, because the inbox header, the
-  monitor list header and every project card already carry that action.
+- The bottom bar holds four items: Projects, Inbox, Monitors and
+  Account. New monitor is not one of them, because the monitor list header
+  and every project card already carry that action.
   Account opens a sheet with Providers, Voices, Models and Sign out —
   the sidebar's account section, which a phone does not show.
 - A table wider than the screen becomes one card per row below 600px. Each

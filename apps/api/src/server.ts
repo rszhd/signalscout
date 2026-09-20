@@ -18,6 +18,7 @@ import {
   needsApiKey,
   notificationReadiness,
   type ProjectDescriber,
+  planConfigFromEnvironment,
   providerKeyEnvironment,
   type QueryGenerator,
   readAiEnvironment,
@@ -220,12 +221,25 @@ export function authFor(env: Env, db: Database, logger: Logger): Auth | null {
     return null;
   }
 
+  const origins = trustedOrigins(env);
+
+  /**
+   * Say which origins are trusted, once, at startup. BUG-031.
+   *
+   * The refusal a browser gets names none of them, and it must not: a stranger
+   * posting from their own page learns nothing from `403 INVALID_ORIGIN`. This
+   * is the other half of that — the person reading the server's own output
+   * gets the list, so "Invalid origin" on their screen has an answer here
+   * rather than an hour of guessing.
+   */
+  logger.info({ trustedOrigins: origins, webPort: env.WEB_PORT }, "origins that may sign in");
+
   return createAuth({
     db,
     secret: env.AUTH_SECRET,
     baseUrl: env.AUTH_URL,
     logger,
-    trustedOrigins: trustedOrigins(env),
+    trustedOrigins: origins,
     signup: env.AUTH_SIGNUP,
     sendEmail: verificationSenderFor(env),
   });
@@ -266,16 +280,23 @@ export function verificationSenderFor(env: Env): SendEmail | undefined {
 /**
  * The Vite dev server, which is a different origin from the API it proxies to.
  *
- * `pnpm dev` runs the UI on 5173 and proxies `/api` to 3000 with
+ * `pnpm dev` runs the UI on `WEB_PORT` and proxies `/api` to `PORT` with
  * `changeOrigin`, so the request reaches Fastify with the host rewritten and
  * the browser's own `Origin: http://localhost:5173` untouched. Better Auth
  * compares them and refuses — `403 INVALID_ORIGIN` — so every sign-in on a
  * developer's machine fails while production is fine.
  *
+ * **From the port, not a constant.** BUG-031: the constant said 5173 while
+ * `worktrees.mjs` hands slot 2 the port 5175, so every worktree but the main
+ * one refused every sign-in, and the message named no port. `vite.config.ts`
+ * reads the same variable.
+ *
  * Both spellings, because a person types whichever they type and the two are
  * different origins to a browser.
  */
-export const viteDevOrigins = ["http://localhost:5173", "http://127.0.0.1:5173"];
+export function viteDevOrigins(env: Env): string[] {
+  return [`http://localhost:${env.WEB_PORT}`, `http://127.0.0.1:${env.WEB_PORT}`];
+}
 
 /**
  * Which origins may sign in, besides this instance's own address.
@@ -290,7 +311,7 @@ export function trustedOrigins(env: Env): string[] {
     .map((origin) => origin.trim())
     .filter((origin) => origin !== "");
 
-  return env.NODE_ENV === "development" ? [...configured, ...viteDevOrigins] : configured;
+  return env.NODE_ENV === "development" ? [...configured, ...viteDevOrigins(env)] : configured;
 }
 
 /**
@@ -319,19 +340,29 @@ export function aiEnvironmentFor(
   return (userId) => readAiEnvironment(db, userId, instance);
 }
 
+/**
+ * The model that writes a monitor's search plan. US-269.
+ *
+ * The `plan` task's settings, which are the classifier's until somebody
+ * chooses otherwise on the Models screen. The plan is written once per
+ * monitor and decides every post it will collect, so it is the one call a
+ * person may want a dearer model for than the one that scores each post.
+ */
 export function queryGeneratorForEnvironment(
   env: AiEnvironment,
   logger: Logger,
 ): QueryGenerator | null {
-  if (needsApiKey(env.AI_PROVIDER) && !env.AI_API_KEY) {
+  const config = planConfigFromEnvironment(env);
+
+  if (needsApiKey(config.provider) && !config.apiKey) {
     logger.warn(
-      { provider: env.AI_PROVIDER },
+      { provider: config.provider },
       "no model key: the monitor form cannot write queries, and posts are not scored",
     );
     return null;
   }
 
-  return createQueryGenerator({ config: aiConfigFromEnvironment(env) });
+  return createQueryGenerator({ config });
 }
 
 /**

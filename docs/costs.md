@@ -51,6 +51,11 @@ indistinguishable from a measured one. This is why:
   triage model is named.** Once one is, `AI_TRIAGE_INPUT_PRICE_MICROS` and
   `AI_TRIAGE_OUTPUT_PRICE_MICROS` do not fall back, because a cheaper model
   billed at the classifier's rate would report a saving that never happened.
+- **The draft and the search plan follow the same rule**, on `AI_DRAFT_*`
+  and `AI_PLAN_*`. The plan is the one job worth a dearer model than the
+  classifier's: it is written once per monitor, decides every post the
+  monitor will collect, and a model twenty times the price costs cents
+  (US-269). Its calls are recorded under `query_generation`.
 
 **Every amount on a screen is labelled *estimated* and printed to four
 decimal places, never rounded to cents.** Ten Reddit records cost $0.015, and

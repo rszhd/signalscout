@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router";
 import { App } from "./App.js";
 import "./index.css";
-import "./styles/theme.css";
+import "@signalscout/ui/styles.css";
 import "./styles/login.css";
 import "./styles/models.css";
 import "./styles/monitor-setup.css";
@@ -13,8 +13,7 @@ import "./styles/projects.css";
 import "./styles/monitors.css";
 import "./styles/notifications.css";
 import "./styles/providers.css";
-import "./styles/reply-draft.css";
-import "./styles/reply-voices.css";
+import "./styles/sidebar.css";
 
 const container = document.getElementById("root");
 

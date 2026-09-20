@@ -14,17 +14,20 @@
 import {
   createProject,
   type Database,
-  deleteProject,
   fetchDocument,
   getProject,
   listProjects,
+  matches,
   maximumDocumentCharacters,
+  monitors,
   type ProjectDescriber,
+  projects,
   readUploadedDocument,
   recordModelCall,
   signals as signalIds,
   updateProject,
 } from "@signalscout/pipeline";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
 import { sessionUserId } from "./auth.js";
 import type { ApiServer } from "./server.js";
@@ -63,6 +66,14 @@ const projectSchema = z.object({
   signals: z.array(signal),
   /** How many monitors were made from it. Grouping, not ownership. */
   monitorCount: z.number(),
+  /**
+   * How many matches those monitors hold. BUG-030.
+   *
+   * Deleting a project takes its monitors and every match they found, and a
+   * card that says "Delete Acme QA?" does not say that. This is the number
+   * the confirmation names.
+   */
+  matchCount: z.number(),
   createdAt: z.string(),
   updatedAt: z.string(),
 });
@@ -91,13 +102,41 @@ const createBody = z.object(answers);
  */
 const updateBody = createBody.partial();
 
-function serialise(project: Awaited<ReturnType<typeof createProject>>) {
+function serialise(project: Awaited<ReturnType<typeof createProject>>, matchCount = 0) {
   return {
     ...project,
     signals: [...project.signals],
+    matchCount,
     createdAt: project.createdAt.toISOString(),
     updatedAt: project.updatedAt.toISOString(),
   };
+}
+
+/**
+ * Matches per project, for this person's monitors only. BUG-030.
+ *
+ * One grouped read for the whole list rather than one per card, and scoped on
+ * `monitors.user_id` rather than on the project, so a monitor that another
+ * account somehow filed under this project id counts for nobody here.
+ */
+async function matchCountsByProject(
+  db: Database,
+  userId: string,
+  projectIds: readonly string[],
+): Promise<Map<string, number>> {
+  if (projectIds.length === 0) return new Map();
+
+  const rows = await db
+    .select({
+      projectId: monitors.projectId,
+      count: sql<number>`count(${matches.id})::int`,
+    })
+    .from(monitors)
+    .leftJoin(matches, eq(matches.monitorId, monitors.id))
+    .where(and(eq(monitors.userId, userId), inArray(monitors.projectId, [...projectIds])))
+    .groupBy(monitors.projectId);
+
+  return new Map(rows.map((row) => [row.projectId as string, row.count]));
 }
 
 /**
@@ -237,8 +276,14 @@ export async function registerProjectRoutes(
     url: "/api/projects",
     schema: { response: { 200: z.object({ projects: z.array(projectSchema) }) } },
     handler: async (request) => {
-      const found = await listProjects(db, sessionUserId(request));
-      return { projects: found.map(serialise) };
+      const userId = sessionUserId(request);
+      const found = await listProjects(db, userId);
+      const counts = await matchCountsByProject(
+        db,
+        userId,
+        found.map((project) => project.id),
+      );
+      return { projects: found.map((project) => serialise(project, counts.get(project.id) ?? 0)) };
     },
   });
 
@@ -261,11 +306,13 @@ export async function registerProjectRoutes(
       response: { 200: projectSchema, 404: problemSchema },
     },
     handler: async (request, reply) => {
-      const project = await getProject(db, sessionUserId(request), request.params.id);
+      const userId = sessionUserId(request);
+      const project = await getProject(db, userId, request.params.id);
 
       if (!project) return reply.code(404).send({ message: "No such project." });
 
-      return serialise(project);
+      const counts = await matchCountsByProject(db, userId, [project.id]);
+      return serialise(project, counts.get(project.id) ?? 0);
     },
   });
 
@@ -278,16 +325,13 @@ export async function registerProjectRoutes(
       response: { 200: projectSchema, 404: problemSchema },
     },
     handler: async (request, reply) => {
-      const project = await updateProject(
-        db,
-        sessionUserId(request),
-        request.params.id,
-        request.body,
-      );
+      const userId = sessionUserId(request);
+      const project = await updateProject(db, userId, request.params.id, request.body);
 
       if (!project) return reply.code(404).send({ message: "No such project." });
 
-      return serialise(project);
+      const counts = await matchCountsByProject(db, userId, [project.id]);
+      return serialise(project, counts.get(project.id) ?? 0);
     },
   });
 
@@ -298,12 +342,44 @@ export async function registerProjectRoutes(
       params: z.object({ id: z.string().uuid() }),
       response: { 204: z.null(), 404: problemSchema },
     },
+    /**
+     * The project, and the monitors made from it. BUG-030.
+     *
+     * They used to stay, unfiled, which was right when a monitor was made
+     * separately and a project was a set of answers it copied. US-045 made the
+     * inbox project-scoped, so an unfiled monitor has no inbox that reaches
+     * it, no screen that lists it, and it keeps polling on the person's own
+     * keys until somebody finds it in the database.
+     *
+     * One transaction, monitors first. A project deleted on its own would
+     * leave them unfiled *and* unreachable by this read, which is the state
+     * this exists to end; a monitor delete that half-finished would leave a
+     * project claiming monitors it no longer has. The monitors' own rows —
+     * polls, stages, matches, verdicts, continuations — go by the schema's
+     * cascades, the same way `DELETE /api/monitors/:id` takes them.
+     *
+     * Both deletes carry `user_id`. The project's is the ownership check;
+     * the monitors' is BUG-009's rule that a scope is written on every read
+     * and write rather than inherited from the one above it.
+     */
     handler: async (request, reply) => {
-      const gone = await deleteProject(db, sessionUserId(request), request.params.id);
+      const userId = sessionUserId(request);
+
+      const gone = await db.transaction(async (tx) => {
+        await tx
+          .delete(monitors)
+          .where(and(eq(monitors.userId, userId), eq(monitors.projectId, request.params.id)));
+
+        const deleted = await tx
+          .delete(projects)
+          .where(and(eq(projects.id, request.params.id), eq(projects.userId, userId)))
+          .returning({ id: projects.id });
+
+        return deleted.length > 0;
+      });
 
       if (!gone) return reply.code(404).send({ message: "No such project." });
 
-      // The monitors made from it stay, unfiled. Their answers are their own.
       return reply.code(204).send(null);
     },
   });

@@ -8,11 +8,12 @@
  * a sign-up form left on the screen of a public instance is how these tools
  * get taken, and it would look completely normal.
  */
+
+import { button, field, json, mount, type Screen, settle, setValue } from "@signalscout/ui/testing";
 import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { App } from "./App.js";
 import { Login } from "./Login.js";
-import { button, field, json, mount, type Screen, settle, setValue } from "./testing.js";
 
 describe("the login screen", () => {
   let screen: Screen;
@@ -34,9 +35,10 @@ describe("the login screen", () => {
   it("asks for the first account when the instance has none", async () => {
     screen = await mount(<Login firstRun={true} signUpOpen={true} />);
 
-    expect(
-      screen.container.querySelector<HTMLImageElement>('.brand-logo[src="/logo.png"]'),
-    ).not.toBeNull();
+    // US-270/272: every surface uses the canonical nine-dot asset.
+    expect(screen.container.querySelector(".brand-logo")?.getAttribute("src")).toBe(
+      "/brand/mark.svg",
+    );
     expect(screen.container.textContent).toContain("Set up this instance");
     expect(screen.container.textContent).toContain("signup closes behind it");
     expect(screen.container.textContent).not.toContain("Example conversation");
@@ -74,6 +76,9 @@ describe("the login screen", () => {
     expect(screen.container.textContent).toContain("Create an account");
     expect(field("Your name")).toBeTruthy();
     expect(field("Password").minLength).toBe(8);
+    // The placeholder is an example of the shape, not a rule about the value.
+    // People read "you@company.com" as "no Gmail" and left (BUG-029).
+    expect(field("Email").placeholder).toBe("you@example.com");
     // And it does not claim to be the first run, because it is not.
     expect(screen.container.textContent).not.toContain("Set up this instance");
   });
@@ -263,7 +268,8 @@ describe("the login screen", () => {
     // false of a cloud tier taking registrations; one sentence now serves both.
     expect(screen.container.textContent).toContain("Sign in to read your inbox");
     // No sidebar, no inbox, and nothing fetched behind the form.
-    expect(screen.container.textContent).not.toContain("Intent inbox");
+    expect(screen.container.querySelector("nav")).toBeNull();
+    expect(screen.container.querySelector(".topbar h1")).toBeNull();
     expect(fetched).toHaveBeenCalledTimes(1);
   });
 });

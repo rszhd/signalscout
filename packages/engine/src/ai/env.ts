@@ -119,6 +119,20 @@ export const aiFields = {
   AI_DRAFT_OUTPUT_PRICE_MICROS: blankIsUnset(z.coerce.number().int().min(0).optional()),
 
   /**
+   * The model that writes a monitor's search plan. US-269.
+   *
+   * Unset means the classifier's, the way the draft's does. The plan is
+   * written once per monitor and decides every post it will collect, so this
+   * is the one job worth a dearer model than the classifier's.
+   */
+  AI_PLAN_PROVIDER: blankIsUnset(z.enum(aiProviders).optional()),
+  AI_PLAN_MODEL: blankIsUnset(z.string().min(1).optional()),
+  AI_PLAN_API_KEY: blankIsUnset(z.string().min(1).optional()),
+  AI_PLAN_BASE_URL: blankIsUnset(z.string().min(1).optional()),
+  AI_PLAN_INPUT_PRICE_MICROS: blankIsUnset(z.coerce.number().int().min(0).optional()),
+  AI_PLAN_OUTPUT_PRICE_MICROS: blankIsUnset(z.coerce.number().int().min(0).optional()),
+
+  /**
    * Whether the worker triages at all. US-177.
    *
    * "on" is the default and every deployment's answer until one measures

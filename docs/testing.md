@@ -22,10 +22,12 @@ layer takes lies about the thing the other must verify** — and say the lie
 out loud before writing the second test. For ordinary CRUD, one test from the
 route to the database covers routing and persistence together.
 
-**A screen is driven through the DOM a person uses.** `apps/web/src/testing.tsx`
-mounts a screen into a real document, finds an element by its label or by the
-words on its button, and sets a value through the native setter React listens
-to. A test that reaches into props can pass with the control unreachable.
+**A screen is driven through the DOM a person uses.** The harness is
+`@signalscout/ui/testing` — one for both applications since US-274, because a
+harness that drifts makes two suites mean different things while every case
+still passes. It mounts a screen into a real document, finds an element by its
+label or by the words on its button, and sets a value through the native setter
+React listens to. A test that reaches into props can pass with the control unreachable.
 Spend that harness on interactions that carry a decision — submitting the
 form, giving a verdict, showing a failed request. A class, a heading or a
 colour does not owe the suite a case.

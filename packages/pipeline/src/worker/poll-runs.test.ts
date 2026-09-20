@@ -480,6 +480,10 @@ describe("reading a monitor's polls back", () => {
 
     expect(runs).toHaveLength(2);
     expect(runs[0]?.id).toBe(newest.id);
+
+    // US-266: the next page starts strictly before the oldest row held.
+    const older = await readPollRuns(db, "user-1", monitorId, 10, newest.startedAt);
+    expect(older.map((run) => run.id)).toEqual([runs[1]?.id]);
   });
 
   it("answers with nothing for another account's monitor", async () => {

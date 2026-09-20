@@ -11,15 +11,7 @@
  * Whether the gate is shown at all is `App.tsx`'s decision and `App.test.tsx`
  * asserts it, because that is where the application is replaced.
  */
-import { act } from "react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import {
-  type ConnectionsView,
-  hasModelKey,
-  hasProviderKey,
-  type ModelsView,
-  Onboarding,
-} from "./Onboarding.js";
+
 import {
   button,
   field,
@@ -29,7 +21,16 @@ import {
   type Screen,
   settle,
   setValue,
-} from "./testing.js";
+} from "@signalscout/ui/testing";
+import { act } from "react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  type ConnectionsView,
+  hasModelKey,
+  hasProviderKey,
+  type ModelsView,
+  Onboarding,
+} from "./Onboarding.js";
 
 /** Pick a provider the way a person does: press its row. */
 async function choose(name: string): Promise<void> {

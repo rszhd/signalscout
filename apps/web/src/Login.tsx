@@ -1,6 +1,5 @@
+import { BrandLogo, codeFor, FormError, messageFor, requestJson } from "@signalscout/ui";
 import { type FormEvent, useState } from "react";
-import { codeFor, messageFor, requestJson } from "./api.js";
-import { BrandLogo } from "./BrandLogo.js";
 
 /** Email authentication, with registration offered only when the instance allows it. */
 
@@ -286,7 +285,7 @@ export function Login({ firstRun, signUpOpen }: { firstRun: boolean; signUpOpen:
                 <input
                   aria-label="Email"
                   autoComplete="username"
-                  placeholder="you@company.com"
+                  placeholder="you@example.com"
                   required
                   type="email"
                   value={email}
@@ -314,11 +313,7 @@ export function Login({ firstRun, signUpOpen }: { firstRun: boolean; signUpOpen:
                 )}
               </label>
 
-              {error && (
-                <p className="form-error" role="alert">
-                  {error}
-                </p>
-              )}
+              {error && <FormError>{error}</FormError>}
 
               <button className="primary-button" disabled={busy} type="submit">
                 {busy ? "Working…" : signingUp ? "Create the account" : "Sign in"}

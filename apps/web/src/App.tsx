@@ -1,3 +1,4 @@
+import { BrandLogo, Dialog, ReplyVoices, requestJson } from "@signalscout/ui";
 import { useEffect, useRef, useState } from "react";
 import {
   Link,
@@ -9,10 +10,7 @@ import {
   useNavigate,
   useParams,
 } from "react-router";
-import { requestJson } from "./api.js";
-import { BrandLogo } from "./BrandLogo.js";
 import { Connections } from "./Connections.js";
-import { Dialog } from "./components/Dialog.js";
 import { Inbox } from "./Inbox.js";
 import { type AuthStatus, Login } from "./Login.js";
 import { Models } from "./Models.js";
@@ -29,7 +27,6 @@ import {
 } from "./Onboarding.js";
 import { ProjectForm, Projects } from "./Projects.js";
 import { Providers } from "./Providers.js";
-import { ReplyVoices } from "./ReplyVoices.js";
 import { paths, routes } from "./route.js";
 
 /**
@@ -313,6 +310,7 @@ export function App() {
         <Route path={routes.newProject} element={<NewProjectRoute />} />
         <Route path={routes.editProject} element={<EditProjectRoute />} />
         <Route path={routes.inbox} element={<InboxRoute />} />
+        <Route path={routes.inboxMatch} element={<InboxRoute />} />
         <Route path={routes.monitors} element={<MonitorsRoute />} />
         <Route path={routes.newMonitor} element={<MonitorFormRoute />} />
         <Route path={routes.monitor} element={<MonitorRoute />} />
@@ -357,8 +355,12 @@ function EditProjectRoute() {
  * know that, so the impossible case is written out rather than asserted away.
  */
 function InboxRoute() {
-  const { projectId } = useParams();
-  return projectId ? <Inbox projectId={projectId} /> : <Navigate replace to={paths.projects} />;
+  const { projectId, matchId } = useParams();
+  return projectId ? (
+    <Inbox projectId={projectId} matchId={matchId ?? null} />
+  ) : (
+    <Navigate replace to={paths.projects} />
+  );
 }
 
 function MonitorsRoute() {
@@ -448,8 +450,12 @@ function NavIcon({ name }: { readonly name: NavIconName }) {
 function Shell({ status }: { readonly status: AuthStatus }) {
   const projectId = useProjectId();
   const listing = useMatch(routes.monitors) !== null;
-  const creating = useMatch(routes.newMonitor) !== null;
-  const reading = useMatch(routes.inbox) !== null;
+  const readingMonitor = useMatch(routes.monitor) !== null;
+  const editingNotifications = useMatch(routes.notifications) !== null;
+  const monitoring = listing || readingMonitor || editingNotifications;
+  const readingList = useMatch(routes.inbox) !== null;
+  const readingItem = useMatch(routes.inboxMatch) !== null;
+  const reading = readingList || readingItem;
   // The project editor is a page of its own, and the Projects item stays
   // current while a project is being made or edited.
   const listingProjects = useMatch(routes.projects) !== null;
@@ -459,15 +465,24 @@ function Shell({ status }: { readonly status: AuthStatus }) {
   const comparing = useMatch(routes.providers) !== null;
   const voicing = useMatch(routes.replyVoices) !== null;
   const modelling = useMatch(routes.models) !== null;
+  const accounting = comparing || voicing || modelling;
   const accountSheet = useRef<HTMLDialogElement | null>(null);
 
   const accountLinks = (
     <>
-      <Link className={comparing ? "nav-item current" : "nav-item"} to={paths.providers}>
+      <Link
+        aria-current={comparing ? "page" : undefined}
+        className={comparing ? "nav-item current" : "nav-item"}
+        to={paths.providers}
+      >
         <NavIcon name="providers" />
         <span>Providers</span>
       </Link>
-      <Link className={voicing ? "nav-item current" : "nav-item"} to={paths.replyVoices}>
+      <Link
+        aria-current={voicing ? "page" : undefined}
+        className={voicing ? "nav-item current" : "nav-item"}
+        to={paths.replyVoices}
+      >
         <NavIcon name="voices" />
         <span>Voices</span>
       </Link>
@@ -475,7 +490,11 @@ function Shell({ status }: { readonly status: AuthStatus }) {
         Beside Providers rather than inside a project: a model key is one
         account's, for every project it runs. US-068.
       */}
-      <Link className={modelling ? "nav-item current" : "nav-item"} to={paths.models}>
+      <Link
+        aria-current={modelling ? "page" : undefined}
+        className={modelling ? "nav-item current" : "nav-item"}
+        to={paths.models}
+      >
         <NavIcon name="models" />
         <span>Models</span>
       </Link>
@@ -503,7 +522,11 @@ function Shell({ status }: { readonly status: AuthStatus }) {
         </Link>
 
         <nav className="site-nav" aria-label="Screens">
-          <Link className={projecting ? "nav-item current" : "nav-item"} to={paths.projects}>
+          <Link
+            aria-current={projecting ? "page" : undefined}
+            className={projecting ? "nav-item current" : "nav-item"}
+            to={paths.projects}
+          >
             <NavIcon name="projects" />
             <span>Projects</span>
           </Link>
@@ -517,15 +540,16 @@ function Shell({ status }: { readonly status: AuthStatus }) {
           {projectId !== null && (
             <>
               <Link
+                aria-current={reading ? "page" : undefined}
                 className={reading ? "nav-item current" : "nav-item"}
                 to={paths.inbox(projectId)}
               >
                 <NavIcon name="inbox" />
-                <span className="nav-label-wide">Intent inbox</span>
-                <span className="nav-label-narrow">Inbox</span>
+                <span>Inbox</span>
               </Link>
               <Link
-                className={listing ? "nav-item current" : "nav-item"}
+                aria-current={monitoring ? "page" : undefined}
+                className={monitoring ? "nav-item current" : "nav-item"}
                 to={paths.monitors(projectId)}
               >
                 <NavIcon name="monitors" />
@@ -539,17 +563,17 @@ function Shell({ status }: { readonly status: AuthStatus }) {
             make an unfiled monitor, the state migration 0038 emptied out.
           */}
           {projectId !== null && (
-            <Link
-              className={creating ? "nav-item new-monitor-nav current" : "nav-item new-monitor-nav"}
-              to={paths.newMonitor(projectId)}
-            >
+            <Link className="nav-item new-monitor-nav" to={paths.newMonitor(projectId)}>
               <NavIcon name="add" />
               <span>New monitor</span>
             </Link>
           )}
 
           <button
-            className="nav-item account-sheet-button"
+            aria-current={accounting ? "page" : undefined}
+            className={
+              accounting ? "nav-item account-sheet-button current" : "nav-item account-sheet-button"
+            }
             type="button"
             onClick={() => accountSheet.current?.showModal()}
           >

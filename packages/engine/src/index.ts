@@ -47,6 +47,7 @@ export {
   embeddingProviders,
   isEvaluationProvider,
   needsApiKey,
+  planConfigFromEnvironment,
   triageConfigFromEnvironment,
   triageIsOff,
 } from "./ai/config.js";

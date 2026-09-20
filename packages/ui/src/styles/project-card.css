@@ -1,0 +1,319 @@
+/*
+ * The project card. US-273.
+ *
+ * Ships with `ProjectCard`, imported by name — `@signalscout/ui/project-card.css`
+ * — rather than folded into `theme.css`, which stays about primitives. A
+ * composed component and its rules travel together or they drift.
+ *
+ * Nothing here is qualified by a page's own class: the card is the same card
+ * wherever a list of projects is. The list around it — one column or two — is
+ * the page's, and so is its heading and its empty state.
+ *
+ * Every value is a token, the rule US-270 set. The two reds the hosted
+ * stylesheet wrote by hand are `--danger` here.
+ */
+
+.project-row {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  padding: var(--space-8);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  box-shadow: none;
+  transition:
+    border-color 140ms ease,
+    box-shadow 140ms ease;
+}
+.project-row:hover {
+  border-color: var(--surface-brand);
+  box-shadow: var(--shadow-soft);
+}
+
+.project-card-heading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+.project-avatar {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  background: var(--surface-brand);
+  color: var(--accent-text);
+  border-radius: 50%;
+  font-size: var(--text-md);
+  font-weight: 500;
+}
+.project-identity {
+  display: grid;
+  gap: var(--space-1);
+  flex: 1;
+  min-width: 0;
+}
+.project-name {
+  margin: 0;
+  font-size: var(--text-md);
+  font-weight: 600;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+.project-name a {
+  color: var(--ink);
+  text-decoration: none;
+}
+.project-name a:hover {
+  color: var(--accent-text);
+}
+
+/*
+ * The line under the name, with a dot in front of it.
+ *
+ * The dot is why this is one rule for two products: self-hosted it counts
+ * monitors and stays quiet, hosted it is one monitor's state and takes a
+ * colour. `statusTone` picks the colour; no tone is the quiet grey.
+ */
+.project-count {
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+  color: var(--muted);
+}
+.project-count::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--muted);
+}
+.project-count.running::before {
+  background: var(--success);
+  animation: running-status-blink 1.4s ease-in-out infinite;
+}
+.project-count.waiting::before {
+  background: var(--accent);
+}
+.project-count.paused::before {
+  background: var(--warning);
+}
+
+.project-edit-button {
+  border: 0;
+  padding: var(--space-2) var(--space-3);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: var(--text-sm);
+  cursor: pointer;
+  text-decoration: none;
+}
+.project-edit-button:hover {
+  background: var(--surface-soft);
+  color: var(--ink);
+}
+
+.project-product {
+  margin: 0 0 var(--space-6);
+  color: var(--ink);
+  font-size: var(--text-label);
+  line-height: 1.7;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/*
+ * The audience is divided by a line, not boxed. A panel here drew a second
+ * border and a second surface around two lines of text, so the card's own edge
+ * stopped reading as the edge.
+ */
+.project-audience {
+  display: flex;
+  align-items: baseline;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: auto;
+  margin-bottom: var(--space-6);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--line);
+}
+.project-audience > span {
+  color: var(--muted-strong);
+  font-size: var(--text-xs);
+  letter-spacing: 0.04em;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.project-audience p {
+  margin: 0;
+  color: var(--muted-strong);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.project-actions {
+  display: flex;
+  align-items: center;
+  /* The navigation actions sit together at the start; the delete pushes itself
+     to the far end. `space-between` would separate the two that belong side
+     by side. */
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--line);
+}
+
+/* Opening the inbox is the row's own action, and quiet: a filled button on
+   every row of six means none of them reads as the main action. */
+.project-open-button {
+  min-height: var(--control-height-compact);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--space-4);
+  border-radius: 999px;
+  color: var(--accent-text);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-decoration: none;
+}
+.project-open-button:hover {
+  background: var(--accent-soft);
+}
+
+/*
+ * Delete, and the question it asks.
+ *
+ * The first press is a text button at the far end, away from the actions a
+ * person came for. Once asked, the question takes the whole action row and
+ * gives its two choices their own panel, so they stay in order at every width.
+ */
+.project-delete {
+  margin-left: auto;
+  border: 0;
+  padding: var(--space-2) 0;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
+.project-delete:hover {
+  color: var(--danger);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.project-delete-confirm {
+  width: 100%;
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface-soft);
+  color: var(--muted-strong);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.project-delete-confirm-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+.project-delete-confirm .project-delete {
+  min-height: var(--control-height-compact);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 0;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--danger);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--danger);
+  font-weight: 600;
+}
+.project-delete-confirm .project-delete:hover {
+  text-decoration: none;
+}
+.project-delete-keep {
+  min-height: var(--control-height-compact);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line-dark);
+  border-radius: 999px;
+  padding: 0 var(--space-4);
+  background: var(--surface);
+  color: var(--accent-text);
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+.project-delete-keep:hover {
+  background: var(--surface-soft);
+}
+.project-delete:disabled,
+.project-delete-keep:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+@media (max-width: 650px) {
+  .project-row {
+    padding: var(--space-6);
+  }
+  /* The two navigation actions share the row; the delete keeps its own line. */
+  .project-actions > :is(.project-open-button, .secondary-button) {
+    flex: 1 1 auto;
+  }
+  .project-actions > .project-delete {
+    flex: 1 1 100%;
+    margin-left: 0;
+    text-align: right;
+  }
+  .project-delete-confirm-actions > button {
+    flex: 1 1 0;
+    padding-inline: var(--space-3);
+    white-space: nowrap;
+  }
+}
+/*
+  A finger needs a bigger target than a cursor. US-123 measured Edit at 39px on
+  a phone; the minimum is 44px, and the height comes from padding so the card's
+  layout does not move.
+*/
+@media (max-width: 600px) {
+  .project-edit-button {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    padding-inline: var(--space-3);
+  }
+}
+@media (max-width: 380px) {
+  .project-row {
+    padding: var(--space-4);
+  }
+}

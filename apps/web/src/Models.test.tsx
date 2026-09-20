@@ -9,9 +9,7 @@
  * account's keys, that a save carries the choice, and that adding a key posts
  * to the key route and nowhere else.
  */
-import { act, type ReactElement } from "react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { Models } from "./Models.js";
+
 import {
   button,
   field,
@@ -21,7 +19,10 @@ import {
   select,
   settle,
   setValue,
-} from "./testing.js";
+} from "@signalscout/ui/testing";
+import { act, type ReactElement } from "react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { Models } from "./Models.js";
 
 async function mount(element: ReactElement) {
   const screen = await mountScreen(element);

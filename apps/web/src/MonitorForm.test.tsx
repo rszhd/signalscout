@@ -6,10 +6,8 @@
  * small local stubs. They assert the UI-to-API seam: which answers are sent to
  * generation, and whether the plan a person edited is the plan finally stored.
  */
-import { act } from "react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { MonitorForm } from "./MonitorForm.js";
-import { browserTimezone } from "./schedule.js";
+
+import { browserTimezone } from "@signalscout/ui";
 import {
   button,
   field as input,
@@ -19,7 +17,10 @@ import {
   type Screen,
   settle,
   setValue,
-} from "./testing.js";
+} from "@signalscout/ui/testing";
+import { act } from "react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { MonitorForm } from "./MonitorForm.js";
 
 /** The project this monitor is being made in. The route always names one. */
 const projectId = "11111111-1111-1111-1111-111111111111";
@@ -773,6 +774,9 @@ describe("the monitor form", () => {
     expect(payload.budget).toEqual({ monthlyCapMicros: 5_000_000, onExhausted: "pause" });
     expect(payload.pollIntervalSeconds).toBe(21_600);
     expect(payload.pollDays).toEqual([0, 1, 2, 3, 4, 5, 6]);
+    // US-264. The package's default, sent rather than left to the server, so
+    // the form and the monitor page name the same number.
+    expect(payload.minScore).toBe(30);
     expect(fetchMock.mock.calls.some(([url]) => url === "/api/monitors/estimates")).toBe(false);
 
     // "Create another monitor" is the path a second monitor is made on, and it
@@ -787,6 +791,61 @@ describe("the monitor form", () => {
     const rate = container.querySelector('[aria-label="How often"]') as HTMLSelectElement;
     expect(rate.value).toBe("21600");
     expect(container.textContent).toContain("122");
+  });
+
+  describe("the minimum score", () => {
+    // US-264. The number that decides what a person sees was set by nobody
+    // and shown nowhere; this is the control, and the default stays 30.
+    async function toLaunch(): Promise<void> {
+      await act(async () => {
+        setValue(input("Monitor name"), "Journeys");
+        setValue(input("What do you sell?"), "A test runner that records browser flows");
+        setValue(input("Who is most likely to buy it?"), "Small SaaS teams without a QA engineer");
+        setValue(input("What problem does it solve?"), "Their tests break after UI changes");
+      });
+      await toSources();
+      await act(async () => button("Generate search plan").click());
+      await settle();
+      await act(async () => button("Continue to schedule").click());
+    }
+
+    beforeEach(() => {
+      fetchMock.mockImplementation(async (request: string | URL | Request) => {
+        const url = typeof request === "string" ? request : request.toString();
+        if (url === "/api/monitor-options") return json(options);
+        if (url === "/api/monitors/queries") return json(generated);
+        if (url === "/api/monitors") {
+          return json(
+            { id: "monitor-1", name: "Journeys", paused: false, missingCredentials: [] },
+            201,
+          );
+        }
+        throw new Error(`Unexpected request: ${url}`);
+      });
+    });
+
+    it("starts at 30 and sends the number a person typed", async () => {
+      await toLaunch();
+      expect(input("Minimum score to match").value).toBe("30");
+
+      await act(async () => setValue(input("Minimum score to match"), "55"));
+      await act(async () => button("Start monitor").click());
+      await settle();
+
+      const createCall = fetchMock.mock.calls.find(([url]) => url === "/api/monitors");
+      expect(JSON.parse(createCall?.[1]?.body as string).minScore).toBe(55);
+    });
+
+    it("refuses a score outside 0 to 100 before asking the server", async () => {
+      await toLaunch();
+
+      await act(async () => setValue(input("Minimum score to match"), "140"));
+      await act(async () => button("Start monitor").click());
+      await settle();
+
+      expect(container.textContent).toContain("whole number from 0 to 100");
+      expect(fetchMock.mock.calls.some(([url]) => url === "/api/monitors")).toBe(false);
+    });
   });
 
   it("refuses to create a monitor whose budget was cleared", async () => {

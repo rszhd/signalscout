@@ -34,9 +34,9 @@
 
 .providers-overview-copy h2 {
   margin: 0;
-  font-size: 1.5rem;
-  font-weight: 600;
-  letter-spacing: -0.025em;
+  font-size: var(--text-md);
+  font-weight: 500;
+  letter-spacing: -0.02em;
 }
 
 .providers-overview-copy > p:last-child {
@@ -127,9 +127,9 @@
 
 .providers-platform-header h2 {
   margin: 0;
-  font-size: 1.25rem;
-  font-weight: 600;
-  letter-spacing: -0.02em;
+  font-size: var(--text-md);
+  font-weight: 500;
+  letter-spacing: -0.01em;
 }
 
 .providers-platform-header p {
@@ -179,7 +179,6 @@
   color: var(--muted);
   background: var(--surface-soft);
   font-weight: 500;
-  letter-spacing: 0.02em;
   white-space: nowrap;
 }
 
@@ -297,7 +296,7 @@
 }
 
 .provider-name-cell > div > span {
-  margin-top: 2px;
+  margin-top: var(--space-1);
   color: var(--muted);
   font-size: var(--text-xs);
   line-height: 1.4;

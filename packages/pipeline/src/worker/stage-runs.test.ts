@@ -582,6 +582,11 @@ describe("what a stage records about itself", () => {
       expect(mine.map((run) => run.stage)).toEqual(["classify", "filter"]);
       // BUG-009: a read that cannot be performed unscoped cannot be forgotten.
       expect(await readStageRuns(db, "somebody-else", monitorId)).toEqual([]);
+
+      // US-266: the next page starts strictly before the oldest row held.
+      const older = await readStageRuns(db, "user-1", monitorId, 10, mine[0]?.startedAt);
+      expect(older.map((run) => run.stage)).toEqual(["filter"]);
+      expect(await readStageRuns(db, "user-1", monitorId, 10, older[0]?.startedAt)).toEqual([]);
     });
 
     it("keeps a monitor's rows bounded, so the table cannot become the largest", async () => {

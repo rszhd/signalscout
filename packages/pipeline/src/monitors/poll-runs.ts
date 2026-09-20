@@ -20,7 +20,7 @@
  * production run. `walkFor` is what groups them, so a screen shows one
  * collection rather than fifteen failures.
  */
-import { and, desc, eq, inArray, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, lt, sql } from "drizzle-orm";
 import type { Database } from "../db/client.js";
 import {
   monitors,
@@ -143,6 +143,8 @@ export async function readPollRuns(
   userId: string,
   monitorId: string,
   limit = maxPollRunsRead,
+  /** Rows that started strictly before this instant: the next page. US-266. */
+  before?: Date,
 ): Promise<PollRun[]> {
   const [owned] = await db
     .select({ id: monitors.id })
@@ -155,7 +157,13 @@ export async function readPollRuns(
   const rows = await db
     .select()
     .from(pollRuns)
-    .where(and(eq(pollRuns.monitorId, monitorId), eq(pollRuns.userId, userId)))
+    .where(
+      and(
+        eq(pollRuns.monitorId, monitorId),
+        eq(pollRuns.userId, userId),
+        before ? lt(pollRuns.startedAt, before) : undefined,
+      ),
+    )
     .orderBy(desc(pollRuns.startedAt))
     .limit(Math.min(limit, maxPollRunsRead));
 

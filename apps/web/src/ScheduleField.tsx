@@ -6,7 +6,7 @@ import {
   everyDay,
   pollRates,
   summarise,
-} from "./schedule.js";
+} from "@signalscout/ui";
 
 /**
  * When a monitor runs: how often, and which days. US-041, rewritten by US-051.

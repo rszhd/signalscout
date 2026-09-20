@@ -25,6 +25,8 @@ export const routes = {
   newProject: "/projects/new",
   editProject: "/projects/:projectId/edit",
   inbox: "/projects/:projectId",
+  /** One item in the inbox, so a lead can be pointed at. US-268. */
+  inboxMatch: "/projects/:projectId/matches/:matchId",
   monitors: "/projects/:projectId/monitors",
   newMonitor: "/projects/:projectId/monitors/new",
   monitor: "/projects/:projectId/monitors/:monitorId",
@@ -46,6 +48,8 @@ export const paths = {
   newProject: routes.newProject,
   editProject: (projectId: string): string => `/projects/${encodeURIComponent(projectId)}/edit`,
   inbox: (projectId: string): string => `/projects/${encodeURIComponent(projectId)}`,
+  inboxMatch: (projectId: string, matchId: string): string =>
+    `${paths.inbox(projectId)}/matches/${encodeURIComponent(matchId)}`,
   monitors: (projectId: string): string => `${paths.inbox(projectId)}/monitors`,
   newMonitor: (projectId: string): string => `${paths.monitors(projectId)}/new`,
   monitor: (projectId: string, monitorId: string): string =>

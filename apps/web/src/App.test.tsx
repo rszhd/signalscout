@@ -9,10 +9,20 @@
  * project, and an address naming none is sent to choose one. The nav offers
  * only screens that are built.
  */
+
+import {
+  button,
+  field,
+  json,
+  mount,
+  radio,
+  type Screen,
+  settle,
+  setValue,
+} from "@signalscout/ui/testing";
 import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { App } from "./App.js";
-import { button, field, json, mount, radio, type Screen, settle, setValue } from "./testing.js";
 
 const options = {
   signals: [{ id: "problem", label: "Describing the problem", hint: "Clear pain" }],
@@ -156,9 +166,10 @@ describe("the application screens", () => {
   it("shows the signed-in account where the self-hosted label used to be", async () => {
     screen = await mount(<App />);
 
-    expect(
-      screen.container.querySelector<HTMLImageElement>('.brand-logo[src="/logo.png"]'),
-    ).not.toBeNull();
+    // US-270/272: every surface uses the canonical nine-dot asset.
+    expect(screen.container.querySelector(".brand-logo")?.getAttribute("src")).toBe(
+      "/brand/mark.svg",
+    );
     expect(screen.container.textContent).toContain("The owner");
     expect(screen.container.textContent).toContain("owner@example.com");
     expect(screen.container.textContent).not.toContain("Self-hosted");
@@ -180,7 +191,10 @@ describe("the application screens", () => {
   it("opens on the inbox once a project is named", async () => {
     screen = await mount(<App />, inbox);
 
-    expect(screen.container.textContent).toContain("Intent inbox");
+    // The page heading, not the navigation label: "Inbox" is in the sidebar on
+    // every project screen, so the text alone would not say which screen this is.
+    // The heading is hidden since US-281 and is still the page's h1.
+    expect(screen.container.querySelector("h1")?.textContent).toBe("Inbox");
   });
 
   it("reaches the monitor form from the header", async () => {
@@ -220,7 +234,9 @@ describe("the application screens", () => {
 
     await screen.go(inbox);
 
-    expect(screen.container.textContent).toContain("Intent inbox");
+    // The page heading, not the navigation label: "Inbox" is in the sidebar on
+    // every project screen, so the text alone would not say which screen this is.
+    expect(screen.container.querySelector("h1")?.textContent).toBe("Inbox");
   });
 
   it("keeps page setup open on Escape", async () => {
@@ -309,6 +325,30 @@ describe("the application screens", () => {
     expect(links).toContain(inbox);
     expect(links).toContain(monitors);
     expect(links).toContain(newMonitor);
+  });
+
+  it("keeps one monitor destination current throughout monitor work", async () => {
+    const monitor = `${monitors}/00000000-0000-4000-8000-000000000000`;
+
+    for (const address of [newMonitor, monitor, `${monitor}/notifications`]) {
+      screen = await mount(<App />, address);
+
+      const current = screen.container.querySelectorAll('.site-nav [aria-current="page"]');
+      expect(current).toHaveLength(1);
+      expect(current[0]?.getAttribute("href")).toBe(monitors);
+
+      await screen.unmount();
+    }
+  });
+
+  it("shows the account destination as current on its phone navigation", async () => {
+    screen = await mount(<App />, "/providers");
+
+    expect(
+      screen.container
+        .querySelector(".site-nav .account-sheet-button")
+        ?.getAttribute("aria-current"),
+    ).toBe("page");
   });
 
   /**
@@ -425,7 +465,9 @@ describe("the application screens", () => {
   it("shows the inbox once a project is chosen", async () => {
     screen = await mount(<App />, inbox);
 
-    expect(screen.container.textContent).toContain("Intent inbox");
+    // The page heading, not the navigation label: "Inbox" is in the sidebar on
+    // every project screen, so the text alone would not say which screen this is.
+    expect(screen.container.querySelector("h1")?.textContent).toBe("Inbox");
     expect(screen.path()).toBe(inbox);
   });
 

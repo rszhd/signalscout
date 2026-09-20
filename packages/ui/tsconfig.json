@@ -1,0 +1,19 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
+    // Kept inside dist, so `rm -rf dist` is a clean build and not a build that
+    // believes it is already done.
+    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
+    // A package of React components, so it compiles JSX and sees the DOM.
+    // Nothing here touches Node: `ui-boundary.test.ts` says so to CI.
+    "lib": ["es2023", "dom", "dom.iterable"],
+    // Named rather than discovered. The only Node types this package wants
+    // are for `ui-boundary.test.ts`, which reads its own source to prove what
+    // it does not import; nothing that ships touches Node.
+    "types": ["node"],
+    "jsx": "react-jsx"
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx"]
+}

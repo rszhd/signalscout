@@ -5,6 +5,9 @@ share a version. Both are published from one tag, and the pipeline depends on
 the engine at that exact version. Upgrade both, or neither.
 [docs/releasing.md](docs/releasing.md) is how a version is cut.
 
+`@signalscout/ui` is here too, under its own heading, because it has its own
+number and its own tag (`ui-vX.Y.Z`) and moves with neither of them.
+
 **An entry says what a consumer must know**, not what the diff shows. A renamed
 export, a changed option, a table that moved: those belong here. A refactor
 nobody outside this repository can see does not.
@@ -17,11 +20,65 @@ question — what must a consumer do to take this version — with nothing movin
 the patch and something moving the minor. The app in this repository is not
 versioned and is not described here; it is what `main` holds.
 
+## @signalscout/ui — Unreleased
+
+**Added.** The package itself, at `0.1.0` when it goes out: SignalScout's
+brand for both applications (US-270). `tokens.css` and `theme.css`, the
+`Button`, `Dialog` and `Field` primitives, `BrandIcon` and `BrandLogo`,
+`requestJson`, and the words both products say about a monitor — the status
+word, the poll and stage sentences, the badge, the ages and the money.
+`@signalscout/ui/testing` carries the monitor and poll fixtures.
+`ProjectCard` is the first shared
+component that is not a primitive: the project card, with the status line, the
+second action and the delete question as props (US-273). React,
+`react-dom` and `react-router` are peer dependencies — the card links with the
+router, because a plain anchor would reload the application, and the harness
+under `@signalscout/ui/testing` renders (US-274). The schedule's words —
+`pollRates`, `describeSchedule`, `summarise`, `pollRateLabel`, the day rules
+and the timezone helpers — are exported too (US-275). `PageState` and
+`FormError` are the state block and the error row, with their rules in
+`theme.css` and the role each state carries decided by the component
+(US-276); `--danger-soft` joins the tokens for them. `ReplyVoices` is the reply voice editor, the first whole
+screen in the package (US-277); a consumer renders it on a route of its own.
+`ReplyDraft` is the reply composer a match opens (US-278); `--warning-soft`
+joins the tokens for its checks. **One stylesheet**: a consumer imports
+`@signalscout/ui/styles.css` and nothing else — the tokens, the theme and every
+component's rules, in cascade order (US-279). There are no per-file exports. Where
+the two products differ the words take an argument:
+`pollSummary(run, { spend: false })` is the hosted sentence, and
+`Monitor.pausedByPlan` is the pause only a plan can perform.
+
 ## Unreleased
 
-Nothing a consumer must react to. `packages/pipeline`'s `schema.ts` is a
-barrel over one file per table family now (US-248); every export keeps its
-name and `drizzle-kit generate` produces no migration.
+**Added.** A fifth model task, `plan`, for writing a monitor's search plan
+(US-269). `aiTasks` in the engine carries it, `AiEnvironment` takes
+`AI_PLAN_PROVIDER`, `AI_PLAN_MODEL`, `AI_PLAN_API_KEY`, `AI_PLAN_BASE_URL`
+and the two `AI_PLAN_*_PRICE_MICROS`, and `planConfigFromEnvironment` reads
+them with the draft's fallbacks: every setting is the classifier's until one
+is named. The pipeline lays an account's `plan` row over the environment the
+way it lays the other four, and migration 0065 widens the
+`ai_settings_task_known` check to accept the value. A consumer that writes
+plans with `aiConfigFromEnvironment` keeps working and ignores the setting;
+one that wants it calls `planConfigFromEnvironment`. A migration and a new
+export, so the version is a minor.
+
+**Added.** `readPollRuns` and `readStageRuns` take an optional fifth argument,
+`before: Date`, and answer the rows that started strictly before it: the next
+page, for a screen that holds the oldest `startedAt` of the page it has
+(US-266). Absent, both read the newest page as before. A new optional
+parameter, so the version is a minor.
+
+**Changed.** `matchCounts` and `queryPerformance` count a match only at or
+above its monitor's own `min_score`, and `queryPerformance` no longer counts
+a hidden match, the way `matchCounts` never did (US-267). A monitor whose
+floor was raised after matches were written reports fewer than before; the
+rows are untouched. `QueryPerformance` gains `lastMatchedAt`, when a post the
+input found last became a match. A consumer that shows either number sees it
+move, so the version is a minor.
+
+`packages/pipeline`'s `schema.ts` is a barrel over one file per table family
+now (US-248); every export keeps its name and `drizzle-kit generate` produces
+no migration.
 
 ## 0.11.0 — 2026-09-19
 

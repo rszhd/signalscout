@@ -1,0 +1,2 @@
+ALTER TABLE "ai_settings" DROP CONSTRAINT "ai_settings_task_known";--> statement-breakpoint
+ALTER TABLE "ai_settings" ADD CONSTRAINT "ai_settings_task_known" CHECK (task IN ('classify', 'triage', 'embed', 'draft', 'plan'));

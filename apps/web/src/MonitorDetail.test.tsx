@@ -9,28 +9,72 @@
  * belong to. The rule itself belongs to `packages/pipeline`; what this owns is
  * whether a person can see it and act on it.
  */
-import { act } from "react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { MonitorDetail } from "./MonitorDetail.js";
+
+import { idleRefreshMs, workingRefreshMs } from "@signalscout/ui";
 import {
+  button,
+  field,
+  json,
   monitor,
   testMonitorId as monitorId,
+  mount,
   poll,
   testProjectId as projectId,
-} from "./monitor-fixtures.js";
-import { everyDay, summarise, weekdays } from "./schedule.js";
-import { button, field, json, mount, type Screen, select, settle, setValue } from "./testing.js";
+  type Screen,
+  select,
+  settle,
+  setValue,
+} from "@signalscout/ui/testing";
+import { act } from "react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { inputVerdict, MonitorDetail, staleAfterDays } from "./MonitorDetail.js";
 
 describe("one monitor's page", () => {
   let screen: Screen;
   let container: HTMLDivElement;
   let fetchMock: ReturnType<typeof vi.fn>;
 
-  /** The page, with this monitor and the polls it has recorded. */
-  async function show(row: unknown, polls: unknown[] = []) {
+  /**
+   * One page of the history, as the API sends it. US-266. A plain list of
+   * polls is the common case, so a case may hand in polls and get a page.
+   */
+  function activityPage(
+    entries: unknown[],
+    overrides: Record<string, unknown> = {},
+  ): Record<string, unknown> {
+    return {
+      entries: entries.map((entry) =>
+        typeof entry === "object" && entry !== null && "kind" in entry
+          ? entry
+          : { kind: "poll", at: (entry as { startedAt: string }).startedAt, poll: entry },
+      ),
+      stagesRecordedSince: null,
+      more: false,
+      ...overrides,
+    };
+  }
+
+  /** What the two statistics routes answer unless a case says otherwise. US-267. */
+  let queriesAnswer: Record<string, unknown> = { floor: 30, inputs: [] };
+  let leadsAnswer: Record<string, unknown> = {
+    floor: 30,
+    platforms: [],
+    channels: [],
+    kinds: [],
+    intents: [],
+  };
+
+  /** The page, with this monitor and the history it has recorded. */
+  async function show(
+    row: unknown,
+    history: unknown[] = [],
+    pageOverrides: Record<string, unknown> = {},
+  ) {
     fetchMock.mockImplementation(async (request: string | URL | Request) => {
       const url = typeof request === "string" ? request : request.toString();
-      if (url.includes("/polls")) return json(polls);
+      if (url.includes("/activity")) return json(activityPage(history, pageOverrides));
+      if (url.includes("/queries")) return json(queriesAnswer);
+      if (url.includes("/leads")) return json(leadsAnswer);
       if (url.startsWith("/api/monitors/")) return json(row);
       throw new Error(`Unexpected request: ${url}`);
     });
@@ -45,6 +89,8 @@ describe("one monitor's page", () => {
   beforeEach(() => {
     fetchMock = vi.fn();
     vi.stubGlobal("fetch", fetchMock);
+    queriesAnswer = { floor: 30, inputs: [] };
+    leadsAnswer = { floor: 30, platforms: [], channels: [], kinds: [], intents: [] };
   });
 
   afterEach(async () => {
@@ -87,10 +133,91 @@ describe("one monitor's page", () => {
       expect(container.textContent).toContain("due now");
     });
 
-    it("says a monitor that has never polled has never polled", async () => {
+    /**
+     * The headline is what is happening, never what happened. US-265. A
+     * monitor waiting for its next poll is waiting, which is what the inbox
+     * bar says about the same monitor at the same moment.
+     */
+    it("leads with the wait, and keeps the last poll on the supporting line", async () => {
+      const halfHourAgo = new Date(Date.now() - 30 * 60 * 1000).toISOString();
+      await show(monitor({ lastPolledAt: halfHourAgo, lastPoll: poll() }));
+
+      const headline = container.querySelector("#monitor-activity-title");
+      expect(headline?.textContent).toBe("Next poll in 30 minutes");
+      expect(container.querySelector(".monitor-activity-last")?.textContent).toContain(
+        "Last poll found no posts",
+      );
+    });
+
+    it("leads with the stage in flight", async () => {
+      await show(
+        monitor({
+          lastPoll: poll(),
+          stage: { queue: "filter", state: "active", since: new Date().toISOString(), items: 40 },
+        }),
+      );
+
+      expect(container.querySelector("#monitor-activity-title")?.textContent).toBe(
+        "Filtering and triaging 40 posts",
+      );
+    });
+
+    describe("how often the page asks again", () => {
+      beforeEach(() => {
+        vi.useFakeTimers({ toFake: ["setInterval", "clearInterval"] });
+      });
+
+      afterEach(() => {
+        vi.useRealTimers();
+      });
+
+      function reads(): number {
+        return fetchMock.mock.calls.filter(([url]) => String(url) === `/api/monitors/${monitorId}`)
+          .length;
+      }
+
+      async function tick(ms: number): Promise<void> {
+        await act(async () => {
+          vi.advanceTimersByTime(ms);
+        });
+        await settle();
+      }
+
+      it("asks every fifteen seconds while a stage runs", async () => {
+        await show(
+          monitor({
+            stage: {
+              queue: "classify",
+              state: "active",
+              since: new Date().toISOString(),
+              items: 3,
+            },
+          }),
+        );
+        const before = reads();
+
+        await tick(workingRefreshMs);
+        expect(reads()).toBe(before + 1);
+      });
+
+      it("asks once a minute while waiting", async () => {
+        await show(monitor());
+        const before = reads();
+
+        await tick(workingRefreshMs);
+        expect(reads()).toBe(before);
+
+        await tick(idleRefreshMs - workingRefreshMs);
+        expect(reads()).toBe(before + 1);
+      });
+    });
+
+    it("says a monitor that has never polled is waiting for its first poll", async () => {
+      // US-265: the headline is what is happening now, in the inbox bar's own
+      // words, so the two screens cannot disagree about one monitor.
       await show(monitor({ lastPolledAt: null, lastPoll: null }));
 
-      expect(container.textContent).toContain("This monitor has not polled yet.");
+      expect(container.textContent).toContain("Waiting for the first poll");
     });
 
     it("says how many matches came out, and how many nobody has opened", async () => {
@@ -104,22 +231,145 @@ describe("one monitor's page", () => {
      * one, so this is the screen that loads them — and it loads them as it
      * opens, because reading them is why somebody came here.
      */
-    it("loads the poll history without anybody opening a section", async () => {
+    it("loads the history without anybody opening a section", async () => {
       await show(monitor({ lastPoll: poll() }), [
         poll({ id: "older", outcome: "collected", postsReturned: 12, postsNew: 4, units: 2 }),
       ]);
 
-      const asked = fetchMock.mock.calls.filter(([url]) => String(url).includes("/polls"));
+      const asked = fetchMock.mock.calls.filter(([url]) => String(url).includes("/activity"));
 
+      expect(button("Recent activity").getAttribute("aria-selected")).toBe("true");
+      expect(button("Overview").getAttribute("aria-selected")).toBe("false");
       expect(asked).toHaveLength(1);
-      expect(String(asked[0]?.[0])).toContain(`/api/monitors/${monitorId}/polls`);
+      expect(String(asked[0]?.[0])).toContain(`/api/monitors/${monitorId}/activity`);
       expect(container.querySelector(".poll-history")?.textContent).toContain("12 posts, 4 new");
     });
 
-    it("says there are no polls rather than showing an empty list", async () => {
+    it("says nothing has run rather than showing an empty list", async () => {
       await show(monitor(), []);
 
-      expect(container.textContent).toContain("No polls recorded yet.");
+      expect(container.textContent).toContain("Nothing has run yet.");
+    });
+
+    /**
+     * The history as one list. US-266.
+     *
+     * The sentences are pinned in `monitor.test.ts`; what this owns is that
+     * the page shows the stages under their poll, calls a row "this poll" and
+     * only the headline "last", pages past the first forty, and says where
+     * the stage record ends.
+     */
+    describe("every stage, under its poll", () => {
+      const at = "2026-03-14T08:05:00.000Z";
+      const stage = (overrides: Record<string, unknown> = {}) => ({
+        kind: "stage",
+        at,
+        stage: {
+          id: "stage-1",
+          stage: "classify",
+          walkId: "walk-1",
+          pollRunId: "poll-1",
+          startedAt: at,
+          finishedAt: at,
+          outcome: "done",
+          itemsIn: 12,
+          itemsOut: 3,
+          units: 12,
+          estimatedCostMicros: 3000,
+          detail: {
+            stage: "classify",
+            scored: 12,
+            matched: 3,
+            unclassified: 0,
+            dropped: 0,
+            leftByCap: 0,
+          },
+          stopReason: null,
+          ...overrides,
+        },
+      });
+
+      it("shows a stage under the poll it came from, newest first", async () => {
+        await show(monitor({ lastPoll: poll() }), [
+          stage(),
+          stage({
+            id: "stage-0",
+            stage: "filter",
+            startedAt: "2026-03-14T08:02:00.000Z",
+            detail: null,
+            itemsIn: 72,
+            itemsOut: 12,
+            outcome: "done",
+          }),
+          poll({ outcome: "collected", postsReturned: 72, postsNew: 12 }),
+        ]);
+
+        const group = container.querySelector(".activity-collection");
+        const lines = [...(group?.querySelectorAll(".poll-history-what") ?? [])].map(
+          (line) => line.textContent,
+        );
+
+        expect(lines[0]).toContain("This poll: 72 posts, 12 new");
+        expect(lines[1]).toBe("Scored 12 posts — 3 matched");
+        expect(group?.querySelector('[aria-label="Processing after this poll"]')).not.toBeNull();
+      });
+
+      it("calls a row this poll, and only the headline the last", async () => {
+        const halfHourAgo = new Date(Date.now() - 30 * 60 * 1000).toISOString();
+        await show(monitor({ lastPolledAt: halfHourAgo, lastPoll: poll() }), [poll()]);
+
+        expect(container.querySelector(".monitor-activity-last")?.textContent).toContain(
+          "Last poll found no posts",
+        );
+        expect(container.querySelector(".poll-history")?.textContent).toContain(
+          "This poll found no posts",
+        );
+        expect(container.querySelector(".poll-history")?.textContent).not.toContain("Last poll");
+      });
+
+      it("leaves notification deliveries out of the collection work", async () => {
+        await show(monitor(), [
+          stage({ stage: "notify", detail: { stage: "notify", deliveries: 1 } }),
+        ]);
+
+        expect(container.textContent).toContain("Nothing has run yet.");
+      });
+
+      it("asks for the next page before the oldest entry it holds", async () => {
+        const first = poll({ id: "p-first", startedAt: "2026-03-14T08:00:00.000Z" });
+        await show(monitor(), [first], { more: true });
+
+        await act(async () => button("Show older").click());
+        await settle();
+
+        const asked = fetchMock.mock.calls
+          .map(([url]) => String(url))
+          .filter((url) => url.includes("/activity"));
+        expect(asked[1]).toContain(`before=${encodeURIComponent("2026-03-14T08:00:00.000Z")}`);
+      });
+
+      it("says where the stage record ends when the polls go further back", async () => {
+        await show(
+          monitor(),
+          [
+            poll({ id: "recent", startedAt: "2026-03-14T08:00:00.000Z" }),
+            poll({ id: "ancient", startedAt: "2026-03-01T08:00:00.000Z" }),
+          ],
+          { stagesRecordedSince: "2026-03-10T00:00:00.000Z" },
+        );
+
+        expect(container.querySelector(".activity-record-end")?.textContent).toContain(
+          "those records are gone",
+        );
+      });
+
+      it("says nothing about the record's end while every poll has its stages", async () => {
+        await show(monitor(), [poll({ startedAt: "2026-03-14T08:00:00.000Z" })], {
+          stagesRecordedSince: "2026-03-10T00:00:00.000Z",
+        });
+
+        expect(container.querySelector(".activity-record-end")).toBeNull();
+      });
     });
   });
 
@@ -344,6 +594,198 @@ describe("one monitor's page", () => {
     });
   });
 
+  describe("which score makes a match", () => {
+    // US-264. `min_score` decided what every person saw and no screen showed
+    // it, so an empty inbox and a floor set too high looked the same.
+    it("shows the threshold beside the match count", async () => {
+      await show(monitor({ matches: { total: 12, unread: 3 }, minScore: 45 }));
+
+      expect(container.textContent).toContain("3 unread · minimum score 45");
+      expect(field("Minimum score to match for Teams replacing manual QA").value).toBe("45");
+    });
+
+    it("sends the number a person typed", async () => {
+      await show(monitor());
+
+      setValue(field("Minimum score to match for Teams replacing manual QA"), "55");
+      button("Save minimum score").click();
+      await settle();
+
+      const [url, init] = fetchMock.mock.calls.find(
+        ([, options]) => (options as RequestInit)?.method === "PATCH",
+      ) as [string, RequestInit];
+
+      expect(url).toBe(`/api/monitors/${monitorId}`);
+      expect(JSON.parse(String(init.body))).toEqual({ minScore: 55 });
+    });
+
+    it("refuses a score outside 0 to 100 without asking the server", async () => {
+      await show(monitor());
+      const before = fetchMock.mock.calls.length;
+
+      setValue(field("Minimum score to match for Teams replacing manual QA"), "140");
+      button("Save minimum score").click();
+      await settle();
+
+      expect(fetchMock.mock.calls).toHaveLength(before);
+      expect(container.textContent).toContain("whole number from 0 to 100");
+    });
+  });
+
+  /**
+   * Which queries and sources earn their keep. US-267.
+   *
+   * The floor is named on every heading and beside the match count, so the
+   * three numbers a person reads can be reconciled with each other.
+   */
+  describe("which queries and sources earn their keep", () => {
+    const monitorWithPlan = () =>
+      monitor({
+        minScore: 60,
+        matches: { total: 2, unread: 1 },
+        queries: { reddit: ["flaky end to end tests", "manual qa before every release"] },
+        subreddits: ["SaaS"],
+      });
+
+    it("names the floor beside the match count and on both headings", async () => {
+      queriesAnswer = { floor: 60, inputs: [] };
+      leadsAnswer = {
+        floor: 60,
+        platforms: [
+          {
+            value: "reddit",
+            label: "reddit",
+            source: null,
+            matches: 2,
+            averageScore: 90,
+            bestScore: 91,
+            strong: 2,
+          },
+        ],
+        channels: [],
+        kinds: [],
+        intents: [],
+      };
+      await show(monitorWithPlan());
+
+      expect(container.querySelector(".monitor-found")?.textContent).toContain(
+        "2 matches found, 1 unread · at 60 or above",
+      );
+      const notes = [...container.querySelectorAll(".monitor-section-note")].map(
+        (note) => note.textContent,
+      );
+      expect(notes.filter((note) => note === "Matches at 60 or above")).toHaveLength(2);
+    });
+
+    it("lists every input in the plan, and marks the ones to remove", async () => {
+      const fortyDaysAgo = new Date(Date.now() - 40 * 86_400_000).toISOString();
+      queriesAnswer = {
+        floor: 60,
+        inputs: [
+          {
+            kind: "query",
+            value: "flaky end to end tests",
+            posts: 40,
+            matches: 3,
+            bestScore: 91,
+            lastFoundAt: new Date().toISOString(),
+            lastMatchedAt: fortyDaysAgo,
+          },
+          {
+            kind: "channel",
+            value: "SaaS",
+            posts: 12,
+            matches: 0,
+            bestScore: null,
+            lastFoundAt: new Date().toISOString(),
+            lastMatchedAt: null,
+          },
+        ],
+      };
+      await show(monitorWithPlan());
+
+      const rows = [...container.querySelectorAll(".query-performance tbody tr")].map(
+        (row) => row.textContent ?? "",
+      );
+      expect(rows).toHaveLength(3);
+      expect(rows[0]).toContain("flaky end to end tests");
+      expect(rows[0]).toContain("No match in 30 days");
+      expect(rows[1]).toContain("manual qa before every release");
+      expect(rows[1]).toContain("Nothing found yet");
+      expect(rows[2]).toContain("r/SaaS");
+      expect(rows[2]).toContain("Never matched");
+    });
+
+    it("compares the sources one dimension at a time", async () => {
+      leadsAnswer = {
+        floor: 30,
+        platforms: [
+          {
+            value: "reddit",
+            label: "reddit",
+            source: null,
+            matches: 5,
+            averageScore: 48,
+            bestScore: 80,
+            strong: 1,
+          },
+          {
+            value: "tiktok",
+            label: "tiktok",
+            source: null,
+            matches: 2,
+            averageScore: 61,
+            bestScore: 77,
+            strong: 1,
+          },
+        ],
+        channels: [],
+        kinds: [
+          {
+            value: "post",
+            label: "post",
+            source: null,
+            matches: 6,
+            averageScore: 48,
+            bestScore: 80,
+            strong: 1,
+          },
+          {
+            value: "reply",
+            label: "reply",
+            source: null,
+            matches: 1,
+            averageScore: 64,
+            bestScore: 64,
+            strong: 0,
+          },
+        ],
+        intents: [
+          {
+            value: "problem",
+            label: "Describing the problem",
+            source: null,
+            matches: 7,
+            averageScore: 50,
+            bestScore: 80,
+            strong: 2,
+          },
+        ],
+      };
+      await show(monitor());
+
+      const table = () => container.querySelector(".lead-sources tbody")?.textContent ?? "";
+      expect(table()).toContain("Reddit");
+      expect(table()).toContain("48 / 100");
+
+      await act(async () => button("Posts vs. comments").click());
+      expect(table()).toContain("Replies and comments");
+
+      await act(async () => button("Intent").click());
+      expect(table()).toContain("Describing the problem");
+    });
+  });
+
   describe("what the person thought of it", () => {
     it("says how the matches were judged, and how many were judged at all", async () => {
       // PLAN.md's real measure of success. Nine tenths negative is a product
@@ -399,31 +841,6 @@ describe("one monitor's page", () => {
    * in the product.
    */
   describe("choosing when a monitor runs", () => {
-    /**
-     * The hints are computed from the same arithmetic the projection uses, so
-     * a hint and a quote cannot disagree. BUG-005 was exactly that
-     * disagreement at a larger scale, and the first draft of this list said
-     * "about 240 polls a month" where the arithmetic gives 244.
-     */
-    it("says what a schedule costs, from the arithmetic rather than by hand", () => {
-      expect(summarise(3_600, everyDay)).toContain("731");
-      expect(summarise(3 * 3_600, everyDay)).toContain("244");
-      expect(summarise(6 * 3_600, everyDay)).toContain("122");
-      expect(summarise(12 * 3_600, everyDay)).toContain("61");
-      // Five sevenths of hourly, which is the whole reason days exist.
-      expect(summarise(3_600, weekdays)).toContain("522");
-      // And a set no rule names, which the old control could not express.
-      expect(summarise(3_600, [1, 3, 5])).toContain("313");
-    });
-
-    it("reads a day set back as a phrase rather than as numbers", () => {
-      expect(summarise(3_600, everyDay)).toBe("Polls every hour — about 731 polls a month.");
-      expect(summarise(86_400, weekdays)).toContain("on weekdays");
-      expect(summarise(86_400, [0, 6])).toContain("at weekends");
-      expect(summarise(86_400, [1, 3, 5])).toContain("on Mon, Wed and Fri");
-      expect(summarise(86_400, [2])).toContain("on Tues");
-    });
-
     it("asks how often and which days as two questions", async () => {
       await show(monitor());
 
@@ -516,5 +933,41 @@ describe("one monitor's page", () => {
 
       expect(container.textContent).toContain("Asia/Kuala_Lumpur");
     });
+  });
+});
+
+describe("whether a search input earns its keep", () => {
+  const now = Date.parse("2026-09-20T00:00:00.000Z");
+  const day = 86_400_000;
+  const row = (overrides: Record<string, unknown> = {}) =>
+    ({
+      kind: "query",
+      value: "x",
+      posts: 10,
+      matches: 2,
+      bestScore: 80,
+      lastFoundAt: new Date(now).toISOString(),
+      lastMatchedAt: new Date(now - 5 * day).toISOString(),
+      ...overrides,
+    }) as Parameters<typeof inputVerdict>[0];
+
+  it("says nothing about an input that is working, or one with no row yet", () => {
+    expect(inputVerdict(row(), now)).toBeNull();
+    expect(inputVerdict(undefined, now)).toBeNull();
+    expect(inputVerdict(row({ posts: 0, matches: 0, lastMatchedAt: null }), now)).toBeNull();
+  });
+
+  it("marks a phrase that finds posts and never a match", () => {
+    expect(inputVerdict(row({ matches: 0, bestScore: null, lastMatchedAt: null }), now)).toBe(
+      "Never matched",
+    );
+  });
+
+  it("marks a phrase whose last match is older than thirty days", () => {
+    const stale = row({ lastMatchedAt: new Date(now - (staleAfterDays + 1) * day).toISOString() });
+    const fresh = row({ lastMatchedAt: new Date(now - (staleAfterDays - 1) * day).toISOString() });
+
+    expect(inputVerdict(stale, now)).toBe("No match in 30 days");
+    expect(inputVerdict(fresh, now)).toBeNull();
   });
 });

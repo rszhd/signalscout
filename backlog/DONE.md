@@ -2,10 +2,15 @@
 
 # Done
 
-166 finished.
+190 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
+| BUG-033 | [The image does not know the UI package](done/2026-09/BUG-033-the-image-does-not-know-the-ui-package.md) | bug | shipped | 2026-09 |
+| BUG-031 | [A worktree cannot sign in](done/2026-09/BUG-031-a-worktree-cannot-sign-in.md) | bug | shipped | 2026-09 |
+| BUG-030 | [Deleting a project leaves its monitors polling with no inbox](done/2026-09/BUG-030-deleting-a-project-leaves-its-monitors-polling-with-no-inbox.md) | bug | shipped | 2026-09 |
+| BUG-029 | [The email placeholder reads as a rule](done/2026-09/BUG-029-the-email-placeholder-reads-as-a-rule.md) | bug | shipped | 2026-09 |
+| BUG-028 | [The badge says intent and means the score](done/2026-09/BUG-028-the-badge-says-intent-and-means-the-score.md) | bug | shipped | 2026-09 |
 | BUG-018 | [An OpenAI-compatible provider is sent no schema](done/2026-09/BUG-018-a-compatible-provider-is-sent-no-schema.md) | bug | — | 2026-09 |
 | BUG-017 | [A poll pays for pages its own window then discards](done/2026-09/BUG-017-a-poll-pays-for-pages-its-own-window-then-discards.md) | bug | fixed | 2026-09 |
 | BUG-016 | [One platform's outage throws away another platform's collection](done/2026-09/BUG-016-one-platforms-outage-throws-away-another-platforms-collection.md) | bug | shipped | 2026-09 |
@@ -23,6 +28,25 @@
 | BUG-003 | [A post below the threshold is classified again on every poll](done/2026-09/BUG-003-a-post-below-the-threshold-is-classified-again-on-every-poll.md) | bug | fixed | 2026-09 |
 | BUG-002 | [A seven-day window is bought as a month](done/2026-09/BUG-002-a-seven-day-window-is-bought-as-a-month.md) | bug | fixed | 2026-09 |
 | BUG-001 | [A pending Reddit collection is not resumed](done/2026-09/BUG-001-a-pending-reddit-collection-is-not-resumed.md) | bug | shipped | 2026-09 |
+| US-283 | [The mark carries its own style](done/2026-09/US-283-the-mark-carries-its-own-style.md) | chore | shipped | 2026-09 |
+| US-282 | [The open app sets type the way the hosted app does](done/2026-09/US-282-the-open-app-sets-type-the-way-the-hosted-app-does.md) | chore | shipped | 2026-09 |
+| US-281 | [The inbox gives the work the screen](done/2026-09/US-281-the-inbox-gives-the-work-the-screen.md) | chore | shipped | 2026-09 |
+| US-280 | [The intent inbox is called Inbox](done/2026-09/US-280-the-intent-inbox-is-called-inbox.md) | chore | shipped | 2026-09 |
+| US-279 | [One stylesheet export for the package](done/2026-09/US-279-one-stylesheet-export-for-the-package.md) | chore | shipped | 2026-09 |
+| US-278 | [The reply composer follows the hosted one, then is shared](done/2026-09/US-278-the-reply-composer-follows-the-hosted-one-then-is-shared.md) | chore | shipped | 2026-09 |
+| US-277 | [The reply voice editor is one screen](done/2026-09/US-277-the-reply-voice-editor-is-one-screen.md) | chore | shipped | 2026-09 |
+| US-276 | [A state block and an error row are components](done/2026-09/US-276-a-state-block-and-an-error-row-are-components.md) | chore | shipped | 2026-09 |
+| US-275 | [The schedule's words are shared](done/2026-09/US-275-the-schedules-words-are-shared.md) | chore | shipped | 2026-09 |
+| US-274 | [The test harness is shared](done/2026-09/US-274-the-test-harness-is-shared.md) | chore | shipped | 2026-09 |
+| US-273 | [The projects page follows the hosted one](done/2026-09/US-273-the-projects-page-follows-the-hosted-one.md) | chore | shipped | 2026-09 |
+| US-272 | [The open app finishes wearing the shared brand](done/2026-09/US-272-the-open-app-finishes-wearing-the-shared-brand.md) | chore | shipped | 2026-09 |
+| US-270 | [One brand in a UI package both applications wear](done/2026-09/US-270-one-brand-in-a-ui-package-both-applications-wear.md) | feature | — | 2026-09 |
+| US-269 | [The search plan is a model task of its own](done/2026-09/US-269-the-search-plan-is-a-model-task-of-its-own.md) | feature | shipped | 2026-09 |
+| US-268 | [An inbox item has an address](done/2026-09/US-268-an-inbox-item-has-an-address.md) | feature | shipped | 2026-09 |
+| US-267 | [The monitor page says which queries and sources earn their keep](done/2026-09/US-267-the-monitor-page-says-which-queries-and-sources-earn-their-keep.md) | feature | shipped | 2026-09 |
+| US-266 | [The monitor history shows every stage](done/2026-09/US-266-the-monitor-history-shows-every-stage.md) | feature | shipped | 2026-09 |
+| US-265 | [The inbox and the monitor page say which stage runs now](done/2026-09/US-265-the-inbox-and-the-monitor-page-say-which-stage-runs-now.md) | feature | shipped | 2026-09 |
+| US-264 | [The monitor form sets the minimum score](done/2026-09/US-264-the-monitor-form-sets-the-minimum-score.md) | feature | shipped | 2026-09 |
 | US-261 | [The spacing scale lives in design.md](done/2026-09/US-261-the-spacing-scale-lives-in-design-md.md) | chore | shipped | 2026-09 |
 | US-259 | [AGENTS.md is cut to its rules](done/2026-09/US-259-agents-md-is-cut-to-its-rules.md) | chore | shipped | 2026-09 |
 | US-250 | [The next four documents are cut to their rules](done/2026-09/US-250-the-next-four-documents-are-cut-to-their-rules.md) | chore | shipped | 2026-09 |

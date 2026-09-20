@@ -1,0 +1,424 @@
+/*
+ * The shared controls, in the brand's own language. US-270.
+ *
+ * Every rule here uses a token name from `tokens.css` and never a raw colour
+ * or a raw spacing value: that is what lets two applications wear one brand
+ * while their screens differ. A page stylesheet owns layout and never a
+ * second theme.
+ *
+ * Application chrome — the sidebar, the navigation, the account sheet — is
+ * layout and stays in each application's own stylesheet.
+ */
+@keyframes running-status-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.2;
+  }
+}
+
+::selection {
+  color: var(--ink);
+  background: var(--surface-brand);
+}
+
+.topbar {
+  --topbar-gutter: max(
+    var(--page-gutter),
+    calc((100% - var(--page-content-width)) / 2 + var(--page-gutter))
+  );
+
+  min-height: 112px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-6);
+  padding-block: var(--space-8);
+  padding-inline: var(--topbar-gutter);
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.topbar h1 {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 500;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+}
+
+.primary-button,
+.secondary-button,
+.top-primary-button,
+.top-secondary-link {
+  min-height: var(--control-height);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 0 var(--space-5);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-decoration: none;
+  transition:
+    background 140ms ease,
+    border-color 140ms ease,
+    color 140ms ease,
+    box-shadow 140ms ease;
+}
+
+.primary-button,
+.top-primary-button {
+  border: 1px solid var(--accent);
+  color: var(--text-on-accent);
+  background: var(--accent);
+  box-shadow: none;
+}
+
+.primary-button:hover,
+.top-primary-button:hover {
+  border-color: var(--accent-hover);
+  background: var(--accent-hover);
+  box-shadow: var(--shadow-soft);
+}
+
+.top-primary-button {
+  gap: var(--space-2);
+}
+
+.top-primary-button span {
+  font-size: var(--text-sm);
+  font-weight: 400;
+}
+
+.secondary-button,
+.top-secondary-link {
+  border: 1px solid var(--line-dark);
+  color: var(--muted-strong);
+  background: var(--surface);
+}
+
+.secondary-button:hover,
+.top-secondary-link:hover {
+  border-color: var(--accent);
+  color: var(--accent-text);
+  background: var(--accent-soft);
+}
+
+.page-subtitle {
+  max-width: 60ch;
+  margin: var(--space-3) 0 0;
+  color: var(--muted);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+
+.view-switch {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+  display: flex;
+  align-self: stretch;
+  gap: var(--space-6);
+}
+
+.view-switch button {
+  padding: 0 var(--space-1);
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  font-size: var(--text-sm);
+  font-weight: 500;
+}
+
+.view-switch button[aria-pressed="true"] {
+  color: var(--accent-text);
+  border-bottom-color: var(--accent);
+}
+
+:where(button, a, summary):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.top-secondary-link {
+  gap: var(--space-2);
+}
+@media (max-width: 820px) {
+  .topbar {
+    min-height: 108px;
+    padding-block: var(--space-6);
+  }
+
+  .topbar h1 {
+    font-size: 1.5rem;
+  }
+}
+/*
+  The page header stacks on a phone. US-123.
+
+  Title, supporting sentence and action shared one row, so the sentence was
+  squeezed into a three-line column beside a button whose own label then wrapped
+  as well. The action keeps its full size and moves under the title.
+*/
+@media (max-width: 600px) {
+  .topbar {
+    min-height: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-4);
+    padding-block: var(--space-5);
+  }
+
+  .topbar > * {
+    min-width: 0;
+  }
+
+  .topbar > .top-primary-button,
+  .topbar > .top-secondary-link,
+  .topbar > .primary-button,
+  .topbar > .secondary-button {
+    align-self: flex-start;
+  }
+}
+
+.compact-button {
+  min-height: var(--control-height-compact);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--muted-strong);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  transition:
+    border-color 140ms ease,
+    color 140ms ease,
+    background 140ms ease;
+}
+
+.compact-button:hover {
+  border-color: var(--accent);
+  color: var(--accent-text);
+  background: var(--accent-soft);
+}
+
+.compact-button.active {
+  color: var(--accent-text);
+  background: var(--accent-soft);
+}
+
+.disclosure summary {
+  cursor: pointer;
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+
+.disclosure summary > span {
+  float: right;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 440px) {
+  .view-switch {
+    gap: var(--space-4);
+  }
+}
+
+/* The product mark. Its size is the component's `size` prop; it has no clip,
+   because four of the nine dots touch the corners of the drawing. US-283. */
+.brand-logo {
+  display: block;
+  flex: 0 0 auto;
+}
+
+/* Provider and social-platform identities share local image assets. */
+.brand-icon {
+  display: inline-block;
+  flex-shrink: 0;
+  object-fit: contain;
+  vertical-align: middle;
+}
+.brand-icon-fallback {
+  display: inline-grid;
+  place-items: center;
+  border-radius: var(--radius-sm);
+  background: var(--surface-soft);
+  color: var(--muted);
+  font-size: 10px;
+}
+.brand-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  vertical-align: middle;
+}
+
+/* Native modal shell. Screens own dialog content, not a second frame. */
+.app-dialog {
+  width: min(680px, calc(100% - var(--space-8)));
+  max-width: none;
+  max-height: calc(100dvh - var(--space-8));
+  margin: auto;
+  padding: 0;
+  overflow-y: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  color: var(--ink);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  scrollbar-gutter: stable;
+}
+
+.app-dialog::backdrop {
+  background: var(--scrim);
+}
+
+.app-dialog-heading {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-6);
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.app-dialog-heading > button {
+  flex-shrink: 0;
+}
+
+@media (max-width: 600px) {
+  .app-dialog {
+    width: calc(100% - var(--space-4));
+    max-height: calc(100dvh - var(--space-4));
+  }
+
+  .app-dialog-heading {
+    padding: var(--space-4);
+  }
+}
+
+/* Opt-in single-line controls share sizing across inputs and native selects. */
+.field .form-control {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  height: var(--control-height);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--line-dark);
+  border-radius: 4px;
+  color: var(--ink);
+  background: var(--surface);
+  font: inherit;
+  font-size: var(--text-body);
+  line-height: 1.5;
+  outline: 0;
+  transition:
+    border-color 140ms ease,
+    box-shadow 140ms ease;
+}
+
+.field .form-control:hover {
+  border-color: var(--muted);
+}
+
+.field .form-control:focus {
+  border: 2px solid var(--accent);
+  box-shadow: none;
+}
+
+/*
+ * What a screen says while it waits, when it has nothing, and when the server
+ * refused: `PageState`. And a refusal in a form: `FormError`. US-276.
+ *
+ * They lived in each application's `index.css`, and the two copies agreed only
+ * because nobody had edited one yet. The success mark that shared the rule
+ * with them is a screen's own and stayed there.
+ */
+.center-state {
+  min-height: 540px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-12) var(--space-6);
+  text-align: center;
+}
+.center-state h2 {
+  margin: 0;
+  font-size: 1.28rem;
+  letter-spacing: -0.025em;
+}
+.center-state > p {
+  max-width: 430px;
+  margin: var(--space-2) 0 var(--space-5);
+  color: var(--muted);
+  font-size: var(--text-body);
+  line-height: 1.6;
+}
+.page-state {
+  min-height: calc(100vh - 190px);
+}
+.spinner {
+  width: 28px;
+  height: 28px;
+  margin-bottom: var(--space-5);
+  border: 2px solid var(--line-dark);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 700ms linear infinite;
+}
+.state-icon,
+.empty-mark {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  margin-bottom: var(--space-4);
+  border-radius: var(--radius-md);
+  color: var(--accent);
+  background: var(--accent-soft);
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+.state-icon {
+  color: var(--danger);
+  background: var(--danger-soft);
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation: none;
+  }
+}
+
+.form-error {
+  margin: 0 0 var(--space-4);
+  padding: var(--space-3) var(--space-3);
+  border-radius: var(--radius-sm);
+  color: var(--danger);
+  background: var(--danger-soft);
+  font-size: var(--text-sm);
+}
+/* The row shape: the sentence and one action, with the action at the end. */
+div.form-error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}

@@ -1,7 +1,5 @@
+import { BrandIcon, BrandLogo, FormError, messageFor, requestJson } from "@signalscout/ui";
 import { type FormEvent, useCallback, useState } from "react";
-import { messageFor, requestJson } from "./api.js";
-import { BrandIcon } from "./BrandIcon.js";
-import { BrandLogo } from "./BrandLogo.js";
 
 /**
  * The two keys a new account is asked for, before it is given the product.
@@ -327,11 +325,7 @@ function ProviderStep({
         </div>
       )}
 
-      {error && (
-        <p className="form-error" role="alert">
-          {error}
-        </p>
-      )}
+      {error && <FormError>{error}</FormError>}
 
       <div className="setup-actions">
         <button className="primary-button" disabled={busy || !provider} type="submit">
@@ -488,11 +482,7 @@ function ModelStep({
         </div>
       )}
 
-      {error && (
-        <p className="form-error" role="alert">
-          {error}
-        </p>
-      )}
+      {error && <FormError>{error}</FormError>}
 
       <div className="setup-actions">
         <button className="primary-button" disabled={busy || !provider} type="submit">
@@ -585,7 +575,7 @@ export function Onboarding({
     <main className="product-page setup-page onboarding-page">
       <header className="topbar">
         <div className="onboarding-brand">
-          <BrandLogo />
+          <BrandLogo size={40} />
           <div>
             <h1>Set up SignalScout</h1>
             <p className="page-subtitle">

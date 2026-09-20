@@ -7,7 +7,7 @@
       name="description"
       content="Find people publicly talking about the problem your product solves."
     />
-    <meta name="theme-color" content="#171a18" />
+    <meta name="theme-color" content="#f8fafd" />
 
     <!--
       The link preview. A scraper has no page to resolve a relative image
@@ -37,7 +37,15 @@
     />
     <meta name="twitter:image" content="https://www.signalscout.run/og.png" />
 
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <!--
+      Browsers prefer the SVG and fall back to the `.ico`. Both ship: the SVG is
+      the nine-dot mark, and the `.ico` carries the four-dot cut at 16px, which
+      is the only size the nine-dot mark does not survive.
+    -->
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" type="image/svg+xml" href="/brand/mark.svg" />
+    <link rel="apple-touch-icon" href="/brand/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
     <title>SignalScout</title>
   </head>
   <body>

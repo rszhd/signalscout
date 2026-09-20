@@ -11,13 +11,19 @@ import {
   createLogger,
   type Database,
   type DescribeResult,
+  matches,
   modelCalls,
+  monitors,
   type ProjectDescriber,
+  posts,
+  recordPollRun,
+  recordStageRun,
 } from "@signalscout/pipeline";
+import { eq, sql } from "drizzle-orm";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { loadEnv } from "./config/env.js";
 import { buildServer } from "./server.js";
-import { asOwner, createTestDatabase, type TestDatabase } from "./testing.js";
+import { asOwner, asUser, createTestDatabase, type TestDatabase, testOwner } from "./testing.js";
 
 const logger = createLogger({ level: "silent", name: "test" });
 
@@ -225,6 +231,177 @@ describe("the project routes", () => {
 
     expect(response.statusCode).toBe(204);
     expect((await send("GET", `/api/projects/${created.id}`)).statusCode).toBe(404);
+  });
+
+  /**
+   * Deleting a project takes its monitors and everything they hold. BUG-030.
+   *
+   * They used to stay, unfiled. The inbox is project-scoped, so an unfiled
+   * monitor could be reached by no screen and kept polling on the person's
+   * own keys. The scheduler reads `monitors`, so a monitor that is not there
+   * is never due; `collect.test.ts` proves a poll job already queued for a
+   * deleted monitor does nothing.
+   */
+  describe("deleting a project with monitors", () => {
+    let sequence = 0;
+
+    /** A monitor in a project, made the way the form makes one. */
+    async function monitorIn(projectId: string): Promise<string> {
+      const app = await server();
+      try {
+        const response = await app.inject({
+          method: "POST",
+          url: "/api/monitors",
+          payload: {
+            name: `Monitor ${++sequence}`,
+            product: answers.product,
+            idealCustomer: answers.idealCustomer,
+            problem: answers.problem,
+            signals: answers.signals,
+            projectId,
+            queries: { reddit: ["flaky tests"] },
+            subreddits: [],
+            sources: [],
+          },
+        });
+        expect(response.statusCode).toBe(201);
+        return response.json().id as string;
+      } finally {
+        await app.close();
+      }
+    }
+
+    /** One of everything a monitor leaves behind: a match, a poll, a stage. */
+    async function work(monitorId: string): Promise<void> {
+      sequence += 1;
+      const [post] = await db
+        .insert(posts)
+        .values({
+          source: "reddit",
+          externalId: `t3_${sequence}`,
+          url: `https://reddit.com/r/SaaS/comments/${sequence}`,
+          author: "someone",
+          channel: "SaaS",
+          title: "How are small teams handling regression testing?",
+          excerpt: "We're manually checking our major flows before every release.",
+          postedAt: new Date(),
+        })
+        .returning({ id: posts.id });
+      if (!post) throw new Error("The post was not inserted.");
+
+      await db.insert(matches).values({
+        monitorId,
+        postId: post.id,
+        score: 80,
+        relevance: 90,
+        problemFit: 98,
+        icpFit: 91,
+        intent: 94,
+        urgency: 70,
+        intentType: "problem",
+        reasons: ["Small SaaS team"],
+      });
+
+      const at = new Date();
+      const poll = await recordPollRun(db, {
+        monitorId,
+        userId: testOwner,
+        walkId: crypto.randomUUID(),
+        startedAt: at,
+        finishedAt: at,
+        outcome: "collected",
+        postsReturned: 1,
+        postsNew: 1,
+        units: 1,
+        estimatedCostMicros: 5_000,
+        sources: [],
+        stopReason: null,
+      });
+      await recordStageRun(db, {
+        monitorId,
+        userId: testOwner,
+        stage: "classify",
+        pollRunId: poll?.id ?? null,
+        startedAt: at,
+        finishedAt: at,
+        outcome: "done",
+        itemsIn: 1,
+        itemsOut: 1,
+      });
+    }
+
+    async function rowsLeft(monitorId: string) {
+      const count = async (table: string) => {
+        const result = await db.execute(
+          sql`select count(*)::int as n from ${sql.identifier(table)} where monitor_id = ${monitorId}`,
+        );
+        return (result.rows[0] as { n: number }).n;
+      };
+      const [monitor] = await db
+        .select({ id: monitors.id })
+        .from(monitors)
+        .where(eq(monitors.id, monitorId));
+      return {
+        monitor: monitor ? 1 : 0,
+        matches: await count("matches"),
+        polls: await count("poll_runs"),
+        stages: await count("stage_runs"),
+      };
+    }
+
+    it("takes the monitors and everything they found, and nothing of another project's", async () => {
+      const first = await monitorIn(created.id);
+      const second = await monitorIn(created.id);
+      const otherProject = (await post("/api/projects", { ...answers, name: "Beta" })).json();
+      const bystander = await monitorIn(otherProject.id);
+      await work(first);
+      await work(bystander);
+
+      // The card names these two numbers before the person confirms.
+      const listed = (await send("GET", "/api/projects")).json().projects as {
+        id: string;
+        monitorCount: number;
+        matchCount: number;
+      }[];
+      expect(listed.find((p) => p.id === created.id)).toMatchObject({
+        monitorCount: 2,
+        matchCount: 1,
+      });
+      expect(listed.find((p) => p.id === otherProject.id)).toMatchObject({
+        monitorCount: 1,
+        matchCount: 1,
+      });
+
+      expect((await send("DELETE", `/api/projects/${created.id}`)).statusCode).toBe(204);
+
+      expect(await rowsLeft(first)).toEqual({ monitor: 0, matches: 0, polls: 0, stages: 0 });
+      expect(await rowsLeft(second)).toEqual({ monitor: 0, matches: 0, polls: 0, stages: 0 });
+      expect(await rowsLeft(bystander)).toEqual({ monitor: 1, matches: 1, polls: 1, stages: 1 });
+    });
+
+    it("answers 404 to somebody else and leaves every row where it was", async () => {
+      const monitorId = await monitorIn(created.id);
+      await work(monitorId);
+
+      const env = loadEnv({ DATABASE_URL: database.url });
+      const app = await buildServer({
+        session: asUser("a-stranger"),
+        env,
+        logger,
+        db,
+        queryGenerator: null,
+        describer: null,
+      });
+      try {
+        const response = await app.inject({ method: "DELETE", url: `/api/projects/${created.id}` });
+        expect(response.statusCode).toBe(404);
+      } finally {
+        await app.close();
+      }
+
+      expect(await rowsLeft(monitorId)).toEqual({ monitor: 1, matches: 1, polls: 1, stages: 1 });
+      expect((await send("GET", `/api/projects/${created.id}`)).statusCode).toBe(200);
+    });
   });
 });
 

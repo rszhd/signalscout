@@ -2,7 +2,6 @@
 @import "@fontsource/figtree/latin-500.css";
 @import "@fontsource/figtree/latin-700.css";
 @import "tailwindcss";
-@import "./styles/tokens.css";
 
 * {
   box-sizing: border-box;
@@ -18,6 +17,7 @@ body {
   background: var(--background);
   font-size: var(--text-body);
   line-height: 1.55;
+  letter-spacing: -0.006em;
 }
 
 button,
@@ -69,36 +69,14 @@ a {
   width: 100%;
   padding: 0 var(--space-3);
   color: var(--ink);
-  font-size: 1.125rem;
+  font-size: 1.0625rem;
   font-weight: 600;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.015em;
   text-decoration: none;
 }
 
 .brand:hover {
   color: var(--accent-text);
-}
-
-.brand-logo {
-  width: 32px;
-  height: 32px;
-  flex: 0 0 auto;
-  border-radius: var(--radius-sm);
-}
-
-.trial-badge {
-  flex: 0 0 auto;
-  margin-left: auto;
-  padding: var(--space-1) var(--space-2);
-  border: 1px solid var(--surface-brand);
-  border-radius: var(--radius-sm);
-  color: var(--accent-text);
-  background: var(--accent-soft);
-  font-size: 0.625rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  line-height: 1.5;
-  text-transform: uppercase;
 }
 
 .product-note {
@@ -242,13 +220,13 @@ a {
 }
 
 /*
-  Two labels for one item, and one item for phones only. US-123.
+  One item for phones only. US-123.
 
-  The bottom bar has room for four items at 320px. "Intent inbox" does not fit
-  one of them, and the account screens need a fifth place, so the bar shows the
-  short label and an Account button while the sidebar shows neither.
+  The account screens need a fifth place in a bottom bar with room for four,
+  so the bar shows an Account button and the sidebar does not. (The bar once
+  also swapped a long label for a short one on this item; US-280 gave the item
+  the short label everywhere.)
 */
-.nav-label-narrow,
 .account-sheet-button {
   display: none;
 }
@@ -321,73 +299,19 @@ a {
   border: 0;
 }
 
-.center-state {
-  min-height: 540px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 42px 24px;
-  text-align: center;
-}
-
-.center-state h2 {
-  margin: 0;
-  font-size: 1.28rem;
-  letter-spacing: -0.025em;
-}
-
-.center-state > p {
-  max-width: 430px;
-  margin: 8px 0 20px;
-  color: var(--muted);
-  font-size: var(--text-body);
-  line-height: 1.6;
-}
-
-.page-state {
-  min-height: calc(100vh - 190px);
-}
-
-.spinner {
-  width: 28px;
-  height: 28px;
-  margin-bottom: 18px;
-  border: 2px solid #d8dcd6;
-  border-top-color: var(--accent);
-  border-radius: 50%;
-  animation: spin 700ms linear infinite;
-}
-
-.state-icon,
-.success-mark,
-.empty-mark {
+/* The success mark used to share a rule with the state block's marks, which
+   moved to @signalscout/ui with PageState (US-276). It is this screen's own. */
+.success-mark {
   width: 48px;
   height: 48px;
   display: grid;
   place-items: center;
   margin-bottom: 16px;
   border-radius: 12px;
-  color: var(--accent);
-  background: var(--accent-soft);
-  font-size: 1.2rem;
-  font-weight: 700;
-}
-
-.state-icon {
-  color: #9a4031;
-  background: #ffebe7;
-}
-
-.success-mark {
   color: var(--surface);
   background: var(--quiet-accent);
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+  font-size: 1.2rem;
+  font-weight: 700;
 }
 
 /* Inbox */
@@ -447,6 +371,32 @@ a {
 
 .inbox-arrived:hover {
   text-decoration: underline;
+}
+
+/* What the monitoring is doing, above the matches. US-265. */
+.inbox-monitoring {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  padding: var(--space-3) var(--space-6);
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+  font-size: var(--text-sm);
+}
+.inbox-monitoring-now {
+  margin: 0;
+  color: var(--muted-strong);
+  font-weight: 500;
+}
+.inbox-monitoring-last {
+  margin: 0;
+  color: var(--muted);
+}
+.inbox-monitor-link {
+  margin-left: auto;
+  color: var(--muted-strong);
+  font-size: var(--text-sm);
 }
 
 .inbox-toolbar {
@@ -979,57 +929,6 @@ a {
   background: var(--accent-soft);
   font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
   font-size: var(--text-xs);
-}
-
-/*
-  Projects: a name, the product line under it, and what can be done with it.
-  US-045.
-
-  A row rather than a card. A project carries four sentences and a person
-  scanning the list wants the name and the count, not the whole business
-  description repeated down the page.
-*/
-.project-list {
-  width: min(1280px, calc(100% - 76px));
-  display: grid;
-  gap: 12px;
-  margin: 0 auto;
-  padding: 0 0 48px;
-  list-style: none;
-}
-
-.project-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20px 24px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
-  background: var(--surface);
-}
-
-.project-identity {
-  min-width: 0;
-  display: grid;
-  gap: 4px;
-}
-
-.project-identity span {
-  color: var(--text-reading-color);
-  font-size: var(--text-sm);
-}
-
-.project-identity small {
-  color: var(--muted);
-  font-size: var(--text-xs);
-}
-
-.project-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
 }
 
 .monitor-list {
@@ -1600,15 +1499,6 @@ a {
   margin-top: 18px;
 }
 
-.form-error {
-  margin: 0 0 14px;
-  padding: 10px 12px;
-  border-radius: 8px;
-  color: #8f3f39;
-  background: #fff0ed;
-  font-size: var(--text-sm);
-}
-
 .form-actions {
   display: flex;
   align-items: center;
@@ -1844,11 +1734,6 @@ a {
     margin: 0;
   }
 
-  .nav-label-wide {
-    display: none;
-  }
-
-  .nav-label-narrow,
   .account-sheet-button {
     display: flex;
   }
@@ -2291,9 +2176,6 @@ a {
   min-height: 0;
   background: var(--surface);
 }
-.inbox-page .topbar {
-  --topbar-gutter: var(--page-gutter);
-}
 .inbox-toolbar {
   min-height: 68px;
   padding: var(--space-3) var(--space-8);
@@ -2534,17 +2416,6 @@ a {
   not five.
 */
 /*
-  A project row's name, product and monitor count. US-045.
-
-  It sits inside a `.monitor-card`, so the card itself is already styled: this
-  is only the stack of three lines inside it.
-*/
-.project-identity {
-  display: grid;
-  gap: 4px;
-  min-width: 0;
-}
-/*
   A project's monitors, under its name. US-045.
 
   The heading sits at the list's own width rather than the page's, so a group
@@ -2680,18 +2551,6 @@ a {
   color: var(--muted);
   font-size: var(--text-xs);
   line-height: 1.7;
-}
-
-.project-name {
-  font-size: var(--text-md);
-}
-.project-product {
-  color: var(--text-reading-color);
-  overflow-wrap: anywhere;
-}
-.project-count {
-  color: var(--muted);
-  font-size: var(--text-xs);
 }
 
 .thread-depth {
@@ -2926,38 +2785,6 @@ a {
 
   .source-card > input[type="checkbox"] {
     margin-top: var(--space-1);
-  }
-
-  /*
-    The inbox reads inside one screen height, so its header gives up the
-    supporting sentence rather than the list. The toolbar's own sentence is
-    already hidden here for the same reason.
-  */
-  .inbox-page .topbar .page-subtitle {
-    display: none;
-  }
-
-  /*
-    With the sentence gone the title and the action fit one row again, and the
-    inbox keeps that height for the list.
-  */
-  .inbox-page .topbar {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--space-3);
-    padding-block: var(--space-4);
-  }
-
-  .inbox-page .topbar h1 {
-    font-size: 1.375rem;
-  }
-
-  .inbox-page .topbar > .top-secondary-link {
-    align-self: center;
-    min-height: var(--control-height-compact);
-    padding-inline: var(--space-3);
-    white-space: nowrap;
   }
 
   /* Count and export on one line, the ordering sentence under them. */

@@ -667,6 +667,12 @@ export const noMatchCounts: MatchCounts = { total: 0, unread: 0 };
  * A monitor with no matches is absent rather than present with zeros, and a
  * caller may default to `noMatchCounts` without hiding anything: zero here
  * means this monitor has found nothing, which is what zero says.
+ *
+ * A match under the monitor's own `min_score` is not counted either. US-267.
+ * The threshold gates new matches only, so a monitor whose floor was raised
+ * keeps the rows written under the old one; the inbox opens at the monitor's
+ * floor and a count that included those rows would disagree with the screen
+ * beside it. Every count of a monitor's leads uses this one floor.
  */
 export async function matchCounts(
   db: Database,
@@ -679,9 +685,11 @@ export async function matchCounts(
       unread: sql<number>`count(*) filter (where ${matches.readAt} is null)::int`,
     })
     .from(matches)
+    .innerJoin(monitors, eq(monitors.id, matches.monitorId))
     .where(
       and(
         eq(matches.hidden, false),
+        gte(matches.score, monitors.minScore),
         monitorIds && monitorIds.length > 0
           ? inArray(matches.monitorId, [...monitorIds])
           : undefined,

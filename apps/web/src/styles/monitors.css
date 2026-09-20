@@ -22,8 +22,8 @@
 }
 .monitors-overview h2 {
   margin: 0 0 var(--space-2);
-  font-size: 1.25rem;
-  font-weight: 600;
+  font-size: var(--text-md);
+  font-weight: 500;
   letter-spacing: -0.02em;
 }
 .monitors-overview p,
@@ -97,8 +97,8 @@
   width: auto;
   margin: 0 0 var(--space-4);
   padding: 0;
-  font-size: 1.125rem;
-  font-weight: 600;
+  font-size: var(--text-label);
+  font-weight: 500;
   letter-spacing: -0.01em;
   display: flex;
   align-items: baseline;
@@ -115,18 +115,20 @@
   font-size: var(--text-xs);
   line-height: 1.8;
 }
-.monitors-content .monitor-status {
+.monitors-content .monitor-status,
+.monitor-page-actions .monitor-status {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
   font-family: inherit;
-  font-weight: 500;
+  font-weight: 600;
   letter-spacing: normal;
   text-transform: none;
-  border-radius: var(--radius-sm);
+  border-radius: 999px;
   padding: var(--space-1) var(--space-2);
 }
-.monitors-content .monitor-status::before {
+.monitors-content .monitor-status::before,
+.monitor-page-actions .monitor-status::before {
   width: 7px;
   height: 7px;
   flex: 0 0 auto;
@@ -134,11 +136,13 @@
   background: currentColor;
   content: "";
 }
-.monitors-content .monitor-status.running {
+.monitors-content .monitor-status.running,
+.monitor-page-actions .monitor-status.running {
   color: var(--accent-text);
   background: var(--accent-soft);
 }
-.monitors-content .monitor-status.paused {
+.monitors-content .monitor-status.paused,
+.monitor-page-actions .monitor-status.paused {
   color: var(--muted-strong);
   background: var(--surface-soft);
 }
@@ -168,6 +172,9 @@
   font-family: inherit;
   font-variant-numeric: tabular-nums;
   font-size: var(--text-label);
+}
+.monitor-page-content .monitors-cost-note {
+  margin-top: var(--space-4);
 }
 .monitor-settings-section {
   min-width: 0;
@@ -411,6 +418,32 @@
 }
 
 /*
+ * The history as one list: a poll, then the stages it caused, indented
+ * under it. US-266. A stage's line is quieter than a poll's, because the
+ * poll is the event and the stages are what it caused.
+ */
+.activity-collection + .activity-collection {
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--line);
+}
+.activity-entries {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: var(--space-2);
+}
+.activity-stage-entries.grouped {
+  margin-top: var(--space-2);
+  margin-left: var(--space-3);
+  padding-left: var(--space-3);
+  border-left: 2px solid var(--line);
+}
+.activity-record-end {
+  font-size: var(--text-xs);
+}
+
+/*
  * The monitor table. US-109.
  *
  * Five columns and one action, sharing the shape `providers.css` already uses
@@ -496,7 +529,7 @@
   display: block;
   color: var(--ink);
   font-size: var(--text-label);
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1.5;
   overflow-wrap: anywhere;
   text-decoration: none;
@@ -534,7 +567,7 @@
   display: block;
   color: var(--ink);
   font-size: 1.25rem;
-  font-weight: 600;
+  font-weight: 500;
   font-variant-numeric: tabular-nums;
 }
 .monitor-table-found > small {
@@ -572,6 +605,14 @@
   flex-shrink: 0;
   gap: var(--space-3);
 }
+.monitor-page .page-subtitle .brand-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  border-radius: 999px;
+  background: var(--surface-soft);
+}
 .monitor-page-content {
   display: block;
 }
@@ -585,8 +626,11 @@
 }
 .monitor-page-content .monitor-stopped {
   padding: var(--space-4);
-  border-left-color: var(--warning);
-  border-radius: var(--radius-sm);
+  border: 0;
+  border-left: 3px solid var(--warning);
+  border-radius: var(--radius-md);
+  color: var(--muted-strong);
+  background: var(--surface);
 }
 .monitor-activity {
   display: grid;
@@ -595,9 +639,9 @@
   margin-bottom: var(--space-6);
   overflow: hidden;
   border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
   background: var(--surface);
-  box-shadow: var(--shadow-soft);
+  box-shadow: none;
 }
 .monitor-activity-copy {
   display: flex;
@@ -610,15 +654,14 @@
   margin: 0 0 var(--space-2);
   color: var(--accent-text);
   font-size: var(--text-xs);
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  font-weight: 500;
+  letter-spacing: normal;
 }
 .monitor-activity-title {
   max-width: 650px;
   margin: 0;
-  font-size: 1.35rem;
-  font-weight: 600;
+  font-size: 1.25rem;
+  font-weight: 500;
   line-height: 1.35;
   letter-spacing: -0.02em;
 }
@@ -654,7 +697,7 @@
   margin: var(--space-2) 0 var(--space-1);
   color: var(--ink);
   font-size: 1.4rem;
-  font-weight: 600;
+  font-weight: 500;
   font-variant-numeric: tabular-nums;
   line-height: 1.2;
   overflow-wrap: anywhere;
@@ -675,6 +718,48 @@
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
   background: var(--surface);
+}
+.monitor-detail-tabs {
+  display: flex;
+  gap: var(--space-6);
+  padding: 0 var(--space-8);
+  overflow-x: auto;
+  border-bottom: 1px solid var(--line);
+  overscroll-behavior-inline: contain;
+  scrollbar-width: none;
+}
+.monitor-detail-tabs::-webkit-scrollbar {
+  display: none;
+}
+.monitor-detail-main .monitor-detail-tabs button {
+  min-height: 52px;
+  flex: 0 0 auto;
+  padding: 0;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  color: var(--muted-strong);
+  background: transparent;
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  white-space: nowrap;
+}
+.monitor-detail-main .monitor-detail-tabs button:hover {
+  color: var(--ink);
+}
+.monitor-detail-main .monitor-detail-tabs button[aria-selected="true"] {
+  border-bottom-color: var(--accent);
+  color: var(--accent-text);
+}
+.monitor-detail-main .monitor-detail-tabs button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+.monitor-detail-layout .monitor-section-label {
+  color: var(--muted);
+}
+.monitor-detail-main [role="tabpanel"][hidden] {
+  display: none;
 }
 .monitor-detail-section {
   min-width: 0;
@@ -704,6 +789,10 @@
   color: var(--muted);
   font-size: var(--text-xs);
 }
+.monitor-history-heading {
+  justify-content: flex-end;
+  margin-bottom: var(--space-3);
+}
 .monitor-results-section .monitor-found {
   margin: 0;
   color: var(--ink);
@@ -717,6 +806,8 @@
   position: sticky;
   top: var(--space-6);
   padding: 0 var(--space-6);
+  border: 0;
+  background: var(--surface-soft);
 }
 .monitor-settings-heading {
   padding: var(--space-6) 0;
@@ -762,40 +853,61 @@
   padding: var(--space-3) 0;
 }
 .monitor-page-content .poll-history {
-  gap: 0;
+  display: grid;
+  gap: var(--space-3);
 }
-.monitor-page-content .poll-history li {
-  position: relative;
+.monitor-page-content .activity-collection {
+  padding: 0;
+}
+.monitor-page-content .activity-collection + .activity-collection {
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--line);
+}
+.monitor-page-content .activity-entries {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.monitor-page-content .activity-stage-entries.grouped {
+  margin-left: var(--space-4);
+  padding-left: var(--space-4);
+  border-left: 2px solid var(--line);
+}
+.monitor-page-content .activity-entry {
   grid-template-columns: 104px minmax(0, 1fr);
   column-gap: var(--space-5);
-  padding: 0 0 var(--space-6) var(--space-5);
-  border-left: 1px solid var(--line-dark);
+  padding: var(--space-3) 0;
 }
-.monitor-page-content .poll-history li:last-child {
-  padding-bottom: 0;
-}
-.monitor-page-content .poll-history li::before {
-  position: absolute;
-  top: 5px;
-  left: -5px;
-  width: 9px;
-  height: 9px;
-  border: 2px solid var(--surface);
-  border-radius: 50%;
-  background: var(--accent);
-  box-shadow: 0 0 0 1px var(--accent);
-  content: "";
+.monitor-page-content .activity-entry + .activity-entry {
+  border-top: 1px solid var(--line);
 }
 .monitor-page-content .poll-history-when {
   grid-row: 1 / span 2;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 .monitor-page-content .poll-history-what {
   color: var(--ink);
   line-height: 1.5;
 }
+.monitor-page-content .poll-history li.stage-entry .poll-history-what {
+  color: var(--muted-strong);
+}
+.monitor-page-content .poll-history li.poll-entry .poll-history-what {
+  font-weight: 500;
+}
 .monitor-page-content .poll-history-sources {
   grid-column: 2;
-  margin-top: var(--space-1);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+.monitor-page-content .poll-history-sources .brand-label {
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
 }
 
 @media (max-width: 1080px) {
@@ -833,6 +945,10 @@
   .monitor-detail-section {
     padding: var(--space-5);
   }
+  .monitor-detail-tabs {
+    gap: var(--space-4);
+    padding: 0 var(--space-5);
+  }
   .monitor-key-metrics {
     grid-template-columns: 1fr;
   }
@@ -867,7 +983,11 @@
   .monitor-page-content .monitor-spend > div:nth-last-child(-n + 2) {
     border-bottom: 0;
   }
-  .monitor-page-content .poll-history li {
+  .monitor-page-content .activity-stage-entries.grouped {
+    margin-left: var(--space-2);
+    padding-left: var(--space-3);
+  }
+  .monitor-page-content .activity-entry {
     grid-template-columns: 1fr;
     row-gap: var(--space-1);
   }
@@ -875,6 +995,9 @@
   .monitor-page-content .poll-history-sources {
     grid-column: 1;
     grid-row: auto;
+  }
+  .monitor-page-content .poll-history-when {
+    white-space: normal;
   }
 }
 
@@ -973,4 +1096,54 @@
   .monitor-table td.monitor-table-actions .compact-button {
     width: 100%;
   }
+}
+
+/*
+ * The two statistics tables: what each query finds, and where the leads
+ * come from. US-267. One shape for both, so the page has one table voice.
+ */
+.monitor-stats-scroll {
+  overflow-x: auto;
+}
+.monitor-stats-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+}
+.monitor-stats-table thead th,
+.monitor-stats-table tbody th,
+.monitor-stats-table tbody td {
+  padding: var(--space-2) var(--space-3);
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--line);
+}
+.monitor-stats-table thead th {
+  color: var(--muted);
+  font-size: var(--text-xs);
+  font-weight: 500;
+}
+.monitor-stats-table tbody th {
+  font-weight: 500;
+}
+.monitor-stats-table tbody td {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.monitor-stats-value {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.monitor-stats-kind {
+  display: block;
+  color: var(--muted);
+  font-size: var(--text-xs);
+  font-weight: 400;
+}
+.monitor-stats-verdict {
+  color: var(--warning);
+}
+.lead-breakdown-switch {
+  margin: var(--space-5) 0 var(--space-3);
 }

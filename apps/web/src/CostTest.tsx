@@ -1,6 +1,5 @@
+import { FormError, formatMicros, messageFor, requestJson } from "@signalscout/ui";
 import { useEffect, useRef, useState } from "react";
-import { messageFor, requestJson } from "./api.js";
-import { formatMicros } from "./monitor.js";
 
 /**
  * What a search plan would collect, and what it would cost, before it runs.
@@ -278,11 +277,7 @@ export function CostTest({
         </button>
       </div>
 
-      {error && (
-        <p className="form-error" role="alert">
-          {error}
-        </p>
-      )}
+      {error && <FormError>{error}</FormError>}
 
       {collecting && (
         <p className="cost-waiting" role="status">

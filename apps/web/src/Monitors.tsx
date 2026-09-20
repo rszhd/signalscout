@@ -21,12 +21,25 @@
  * status column beside it, and a page in between is the detour this screen was
  * rewritten to remove.
  */
+
+import {
+  anyWorking,
+  BrandIcon,
+  type Monitor,
+  messageFor,
+  needsAttention,
+  nextPollLabel,
+  PageState,
+  platformName,
+  pollSummary,
+  requestJson,
+  stageLabel,
+  stageOf,
+  status,
+  useMonitorRefresh,
+} from "@signalscout/ui";
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router";
-import { messageFor, requestJson } from "./api.js";
-import { BrandIcon } from "./BrandIcon.js";
-import { platformName } from "./labels.js";
-import { type Monitor, needsAttention, nextPollLabel, pollSummary, status } from "./monitor.js";
 import { paths } from "./route.js";
 
 type LoadState = "loading" | "ready" | "error";
@@ -94,6 +107,9 @@ export function Monitors({ projectId }: { readonly projectId: string }) {
     void load();
   }, [load]);
 
+  // Faster while a stage runs, on the one rule every monitor screen shares. US-265.
+  useMonitorRefresh(load, anyWorking(monitors));
+
   async function setPaused(monitor: Monitor, paused: boolean): Promise<void> {
     setPending((ids) => [...ids, monitor.id]);
     setError(null);
@@ -115,10 +131,7 @@ export function Monitors({ projectId }: { readonly projectId: string }) {
     return (
       <div className="product-page monitors-page">
         <MonitorsHeader projectId={projectId} />
-        <div className="center-state page-state">
-          <div className="spinner" aria-hidden="true" />
-          <p>Reading your monitors.</p>
-        </div>
+        <PageState kind="loading">Reading your monitors.</PageState>
       </div>
     );
   }
@@ -127,13 +140,17 @@ export function Monitors({ projectId }: { readonly projectId: string }) {
     return (
       <div className="product-page monitors-page">
         <MonitorsHeader projectId={projectId} />
-        <div className="center-state page-state">
-          <h2>The monitors could not be loaded</h2>
-          <p>{error}</p>
-          <button type="button" className="primary-button" onClick={() => void load()}>
-            Try again
-          </button>
-        </div>
+        <PageState
+          kind="error"
+          heading="The monitors could not be loaded"
+          action={
+            <button type="button" className="primary-button" onClick={() => void load()}>
+              Try again
+            </button>
+          }
+        >
+          {error}
+        </PageState>
       </div>
     );
   }
@@ -142,16 +159,18 @@ export function Monitors({ projectId }: { readonly projectId: string }) {
     return (
       <div className="product-page monitors-page">
         <MonitorsHeader projectId={projectId} />
-        <div className="center-state page-state">
-          <span className="empty-mark" aria-hidden="true">
-            ◎
-          </span>
-          <h2>No monitors yet</h2>
-          <p>Create a monitor and SignalScout will start collecting conversations.</p>
-          <Link className="primary-button" to={paths.newMonitor(projectId)}>
-            Create a monitor
-          </Link>
-        </div>
+        <PageState
+          kind="empty"
+          mark="◎"
+          heading="No monitors yet"
+          action={
+            <Link className="primary-button" to={paths.newMonitor(projectId)}>
+              Create a monitor
+            </Link>
+          }
+        >
+          Create a monitor and SignalScout will start collecting conversations.
+        </PageState>
       </div>
     );
   }
@@ -378,6 +397,7 @@ function MonitorTable({
         <tbody role="rowgroup">
           {monitors.map((monitor) => {
             const running = status(monitor);
+            const stage = stageOf(monitor);
 
             return (
               <tr key={monitor.id} role="row">
@@ -405,6 +425,14 @@ function MonitorTable({
                   >
                     {running.label}
                   </span>
+                  {/* The stage in flight, under the status word. US-265. The
+                      word says whether the monitor is running; this says what
+                      the worker is doing for it at this moment. */}
+                  {stage && (
+                    <small className="monitor-table-note monitor-table-stage">
+                      {stageLabel(stage)}
+                    </small>
+                  )}
                   {/* A broken webhook does not change what the monitor is
                       doing, so it is not the status word — but it is why this
                       row is counted under "Needs attention", and a count a

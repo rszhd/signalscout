@@ -91,6 +91,20 @@ export const envSchema = z.object({
   PORT: z.coerce.number().int().min(1).max(65535).default(3000),
 
   /**
+   * Where the Vite dev server listens, so a sign-in on it is trusted. BUG-031.
+   *
+   * Read for one purpose: in development the UI is a different origin from the
+   * API it proxies to, and Better Auth refuses an origin it was not told
+   * about. `vite.config.ts` reads the same variable, and `worktrees.mjs`
+   * writes it — slot 2's UI is on 5175 — so a constant here is a worktree
+   * nobody can sign in to.
+   *
+   * It changes nothing in production, where one process serves the UI and the
+   * API on one origin and no localhost origin is trusted at all.
+   */
+  WEB_PORT: z.coerce.number().int().min(1).max(65535).default(5173),
+
+  /**
    * true  — the worker runs inside the API process. One container, ~120 MB.
    * false — the worker runs as a second container from the same image.
    */

@@ -86,20 +86,31 @@ screen links with. Never write an address as a string beside a link (US-076).
 `/projects/<id>/monitors`. An address naming no project matches no
 project-scoped route, and the catch-all sends it to choose one (US-045).
 
-**The UI shares one theme.** Read [docs/design.md](docs/design.md) before
-changing a screen. Colors and sizing live in `apps/web/src/styles/tokens.css`;
-shared controls live in `styles/theme.css`. Keep page layout separate.
+**Both applications wear one brand, and it is a package.** Colours, sizing,
+the shared controls, the mark and the words about a monitor live in
+`packages/ui` — read [its README](packages/ui/README.md) before changing a
+screen, and [docs/design.md](docs/design.md) for this application's own
+layouts. **A screen never writes a raw colour or a raw spacing value**; it
+names a token, and `pnpm lint:css` refuses the rest. A value the tokens do not
+have is a change to the package, which the hosted application also takes
+(US-270). Page layout stays in the page's stylesheet. **A screen that is the
+same screen in both products may be shared; a screen that carries the product
+may not** (US-277): the reply voice editor is one screen, and the monitor form
+— five steps and a budget here, one guided flow there — is two.
 
 **`packages/engine` is stateless, `packages/pipeline` owns only its tables,
-and neither knows an account.** The engine is input in, result and cost out:
+`packages/ui` knows the brand and nothing else, and none of them knows an
+account.** The engine is input in, result and cost out:
 no `pg`, `drizzle-orm`, `pg-boss`, `better-auth` or `stripe`, no import from
 another package, no `process.env` — a key or a model name is an argument. The
 pipeline is the stateful half; it imports the engine, never the reverse,
 imports neither Fastify, React, Better Auth nor Stripe, and knows an owner as
 `user_id text` without joining a users table. Who may log in and who may poll
-are `apps/api`'s. `engine-boundary.test.ts` and `pipeline-boundary.test.ts`
-say this to CI; if a change seems to need one broken, the change is wrong
-(US-151).
+are `apps/api`'s. The UI package holds no database, no queue, no framework and
+neither of the other two, and takes React as a peer.
+`engine-boundary.test.ts`, `pipeline-boundary.test.ts` and
+`ui-boundary.test.ts` say this to CI; if a change seems to need one broken,
+the change is wrong (US-151, US-270).
 
 **A red test is fixed in the code, not in the assertion.** An expected value
 changes only when the behaviour was meant to change, and the commit says which

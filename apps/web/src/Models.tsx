@@ -1,8 +1,13 @@
+import {
+  BrandIcon,
+  Button,
+  Dialog,
+  FormError,
+  messageFor,
+  PageState,
+  requestJson,
+} from "@signalscout/ui";
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import { messageFor, requestJson } from "./api.js";
-import { BrandIcon } from "./BrandIcon.js";
-import { Button } from "./components/Button.js";
-import { Dialog } from "./components/Dialog.js";
 
 /**
  * Which model does which job, and whose key pays for it. US-068 to US-081.
@@ -26,7 +31,7 @@ import { Dialog } from "./components/Dialog.js";
  */
 
 interface TaskView {
-  task: "classify" | "triage" | "embed" | "draft";
+  task: "classify" | "triage" | "embed" | "draft" | "plan";
   title: string;
   what: string;
   note: string;
@@ -433,11 +438,7 @@ function KeyLibrary({
             billed to it. The model above is only used for that test and is not saved.
           </p>
 
-          {error && (
-            <p className="form-error" role="alert">
-              {error}
-            </p>
-          )}
+          {error && <FormError>{error}</FormError>}
 
           <Button
             variant="primary"
@@ -1004,13 +1005,9 @@ export function Models() {
     return (
       <div className="product-page models-page">
         <ModelsHeader />
-        <div className="center-state page-state" role="alert">
-          <span className="state-icon" aria-hidden="true">
-            !
-          </span>
-          <h2>Models could not be loaded</h2>
-          <p>{error}</p>
-        </div>
+        <PageState kind="error" heading="Models could not be loaded">
+          {error}
+        </PageState>
       </div>
     );
   }
@@ -1019,10 +1016,7 @@ export function Models() {
     return (
       <div className="product-page models-page">
         <ModelsHeader />
-        <div className="center-state page-state" role="status">
-          <div className="spinner" aria-hidden="true" />
-          <p>Reading your model settings.</p>
-        </div>
+        <PageState kind="loading">Reading your model settings.</PageState>
       </div>
     );
   }

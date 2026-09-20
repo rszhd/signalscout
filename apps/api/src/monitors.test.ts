@@ -25,6 +25,7 @@ import {
   modelCalls,
   monitors,
   type PollRunRecord,
+  postDiscoveries,
   posts,
   type QueryGenerator,
   type QueryPlanOutcome,
@@ -33,6 +34,7 @@ import {
   recordModelCall,
   recordPollRun,
   recordSourceUsage,
+  recordStageRun,
   recordVerdict,
   setProviderChoice,
 } from "@signalscout/pipeline";
@@ -178,7 +180,10 @@ describe("the monitor routes", () => {
   }
 
   /** Create a monitor through the route, and hand back its id. */
-  async function create(app: Awaited<ReturnType<typeof server>>, payload = newMonitor) {
+  async function create(
+    app: Awaited<ReturnType<typeof server>>,
+    payload: Record<string, unknown> = newMonitor,
+  ) {
     const response = await app.inject({ method: "POST", url: "/api/monitors", payload });
     return response.json().id as string;
   }
@@ -1438,6 +1443,324 @@ describe("the monitor routes", () => {
         // And it is not in the list either, so its count is in nobody's row.
         const list = await app.inject({ method: "GET", url: "/api/monitors" });
         expect(list.json().some((one: { id: string }) => one.id === row?.id)).toBe(false);
+      });
+    });
+
+    /**
+     * The history as one list. US-266.
+     *
+     * A poll and the stages after it, merged and newest first, so "the poll
+     * collected 72, the filter kept 12, the classifier matched 3" reads as
+     * one story rather than as three routes.
+     */
+    describe("the activity", () => {
+      async function writeStage(
+        monitorId: string,
+        stage: "filter" | "classify",
+        startedAt: Date,
+        pollRunId: string | null,
+      ) {
+        return await recordStageRun(db, {
+          monitorId,
+          userId: owner,
+          stage,
+          pollRunId,
+          startedAt,
+          finishedAt: startedAt,
+          outcome: "done",
+          itemsIn: 72,
+          itemsOut: stage === "filter" ? 12 : 3,
+          detail:
+            stage === "filter"
+              ? { stage: "filter", keyword: 50, embedding: 8, triage: 2 }
+              : {
+                  stage: "classify",
+                  scored: 12,
+                  matched: 3,
+                  unclassified: 0,
+                  dropped: 0,
+                  leftByCap: 0,
+                },
+        });
+      }
+
+      it("merges polls and stages, newest first, with the poll each stage came from", async () => {
+        await withServer({}, async (app) => {
+          const id = await create(app);
+          const now = Date.now();
+          const t = (minutesAgo: number) => new Date(now - minutesAgo * 60_000);
+          const older = await writePoll(id, { startedAt: t(60), finishedAt: t(60) });
+          await writeStage(id, "filter", t(59), older.id);
+          const newer = await writePoll(id, {
+            startedAt: t(10),
+            finishedAt: t(10),
+            outcome: "collected",
+            postsReturned: 72,
+            postsNew: 12,
+          });
+          await writeStage(id, "filter", t(9), newer.id);
+          await writeStage(id, "classify", t(8), newer.id);
+
+          const response = await app.inject({ method: "GET", url: `/api/monitors/${id}/activity` });
+
+          expect(response.statusCode).toBe(200);
+          const page = response.json();
+          expect(
+            page.entries.map(
+              (entry: { kind: string; poll?: { id: string }; stage?: { stage: string } }) =>
+                entry.kind === "poll"
+                  ? `poll:${entry.poll?.id === newer.id ? "newer" : "older"}`
+                  : entry.stage?.stage,
+            ),
+          ).toEqual(["classify", "filter", "poll:newer", "filter", "poll:older"]);
+          expect(page.entries[0].stage.pollRunId).toBe(newer.id);
+          expect(page.entries[0].stage.detail).toMatchObject({ stage: "classify", matched: 3 });
+          // The oldest stage row kept is where the stage record ends.
+          expect(page.stagesRecordedSince).toBe(t(59).toISOString());
+          expect(page.more).toBe(false);
+        });
+      });
+
+      it("pages with before, and says when there is more", async () => {
+        await withServer({}, async (app) => {
+          const id = await create(app);
+          const at = (minutesAgo: number) => new Date(Date.now() - minutesAgo * 60_000);
+          for (const minutes of [5, 4, 3, 2, 1]) {
+            await writePoll(id, { startedAt: at(minutes), finishedAt: at(minutes) });
+          }
+
+          const first = (
+            await app.inject({ method: "GET", url: `/api/monitors/${id}/activity?limit=2` })
+          ).json();
+          expect(first.entries).toHaveLength(2);
+          expect(first.more).toBe(true);
+
+          const cursor = first.entries[1].at;
+          const second = (
+            await app.inject({
+              method: "GET",
+              url: `/api/monitors/${id}/activity?limit=2&before=${encodeURIComponent(cursor)}`,
+            })
+          ).json();
+          expect(second.entries).toHaveLength(2);
+          expect(second.entries.every((entry: { at: string }) => entry.at < cursor)).toBe(true);
+
+          const last = (
+            await app.inject({
+              method: "GET",
+              url: `/api/monitors/${id}/activity?limit=2&before=${encodeURIComponent(second.entries[1].at)}`,
+            })
+          ).json();
+          expect(last.entries).toHaveLength(1);
+          expect(last.more).toBe(false);
+        });
+      });
+
+      it("answers 404 for a monitor that is not this account's, and never its rows", async () => {
+        const [row] = await db
+          .insert(monitors)
+          .values({
+            userId: "somebody-else",
+            name: "Not yours",
+            product: "A test runner",
+            idealCustomer: "Small SaaS teams",
+            problem: "Flaky end-to-end tests",
+            sources: ["reddit"],
+          })
+          .returning({ id: monitors.id });
+        if (!row) throw new Error("The monitor was not inserted.");
+        await recordStageRun(db, {
+          monitorId: row.id,
+          userId: "somebody-else",
+          stage: "filter",
+          startedAt: new Date(),
+          finishedAt: new Date(),
+          outcome: "done",
+          itemsIn: 1,
+          itemsOut: 1,
+        });
+
+        await withServer({}, async (app) => {
+          const response = await app.inject({
+            method: "GET",
+            url: `/api/monitors/${row.id}/activity`,
+          });
+
+          expect(response.statusCode).toBe(404);
+        });
+      });
+    });
+  });
+
+  /**
+   * Which inputs and sources earn their keep, all at one floor. US-267.
+   *
+   * The floor is the monitor's own `min_score`. The match count on the page,
+   * the count beside each phrase and the count under each platform must
+   * agree, or a person stops trusting all three.
+   */
+  describe("which queries and sources earn their keep", () => {
+    let sequence = 0;
+
+    async function found(
+      monitorId: string,
+      query: string,
+      score: number | null,
+      overrides: { replyTo?: string; channel?: string; hidden?: boolean; ageDays?: number } = {},
+    ): Promise<string> {
+      sequence += 1;
+      const [post] = await db
+        .insert(posts)
+        .values({
+          source: "reddit",
+          externalId: `t3_keep_${sequence}`,
+          url: `https://reddit.com/r/SaaS/comments/keep${sequence}`,
+          author: "someone",
+          channel: overrides.channel ?? "SaaS",
+          // A reply needs its thread: `posts_reply_has_parent`. US-020.
+          ...(overrides.replyTo
+            ? { kind: "reply" as const, parentPostId: overrides.replyTo, threadPosition: 1 }
+            : {}),
+          title: "How are small teams handling regression testing?",
+          excerpt: "We're manually checking our major flows before every release.",
+          postedAt: new Date(),
+        })
+        .returning({ id: posts.id });
+      if (!post) throw new Error("The post was not inserted.");
+
+      await db.insert(postDiscoveries).values({
+        monitorId,
+        postId: post.id,
+        source: "reddit",
+        kind: "query",
+        value: query,
+      });
+
+      if (score !== null) {
+        await db.insert(matches).values({
+          monitorId,
+          postId: post.id,
+          score,
+          relevance: score,
+          problemFit: score,
+          icpFit: score,
+          intent: score,
+          urgency: score,
+          intentType: score >= 70 ? "problem" : "none",
+          reasons: ["A reason"],
+          hidden: overrides.hidden ?? false,
+          createdAt: new Date(Date.now() - (overrides.ageDays ?? 0) * 86_400_000),
+        });
+      }
+
+      return post.id;
+    }
+
+    it("counts the same leads on the page, beside each phrase and under each source", async () => {
+      await withServer({}, async (app) => {
+        const id = await create(app, { ...newMonitor, minScore: 60 });
+        const thread = await found(id, "flaky end to end tests", 91);
+        await found(id, "flaky end to end tests", 45);
+        await found(id, "manual qa before every release", 88, { replyTo: thread });
+        await found(id, "manual qa before every release", null);
+        await found(id, "manual qa before every release", 95, { hidden: true });
+
+        const monitor = (await app.inject({ method: "GET", url: `/api/monitors/${id}` })).json();
+        const queries = (
+          await app.inject({ method: "GET", url: `/api/monitors/${id}/queries` })
+        ).json();
+        const leads = (
+          await app.inject({ method: "GET", url: `/api/monitors/${id}/leads` })
+        ).json();
+
+        // Five found, two under the floor or gone: every screen says two.
+        expect(monitor.matches.total).toBe(2);
+        expect(queries.floor).toBe(60);
+        expect(leads.floor).toBe(60);
+
+        const byQuery = Object.fromEntries(
+          queries.inputs.map((input: { value: string; posts: number; matches: number }) => [
+            input.value,
+            input,
+          ]),
+        );
+        expect(byQuery["flaky end to end tests"]).toMatchObject({
+          posts: 2,
+          matches: 1,
+          bestScore: 91,
+        });
+        expect(byQuery["manual qa before every release"]).toMatchObject({
+          posts: 3,
+          matches: 1,
+          bestScore: 88,
+        });
+
+        const total = leads.platforms.reduce(
+          (sum: number, group: { matches: number }) => sum + group.matches,
+          0,
+        );
+        expect(total).toBe(2);
+        expect(leads.platforms[0]).toMatchObject({ value: "reddit", matches: 2, averageScore: 90 });
+        expect(
+          leads.kinds
+            .map((group: { value: string; matches: number }) => [group.value, group.matches])
+            .sort(),
+        ).toEqual([
+          ["post", 1],
+          ["reply", 1],
+        ]);
+        expect(leads.channels[0]).toMatchObject({ value: "SaaS", source: "reddit", matches: 2 });
+        expect(leads.intents).toMatchObject([
+          { value: "problem", label: "Describing the problem" },
+        ]);
+      });
+    });
+
+    it("says when a phrase last matched, so a dead one can be seen", async () => {
+      await withServer({}, async (app) => {
+        const id = await create(app, { ...newMonitor, minScore: 30 });
+        await found(id, "flaky end to end tests", 80, { ageDays: 45 });
+        await found(id, "manual qa before every release", null);
+
+        const queries = (
+          await app.inject({ method: "GET", url: `/api/monitors/${id}/queries` })
+        ).json();
+        const byQuery = Object.fromEntries(
+          queries.inputs.map((input: { value: string; lastMatchedAt: string | null }) => [
+            input.value,
+            input,
+          ]),
+        );
+
+        const lastMatched = Date.parse(byQuery["flaky end to end tests"].lastMatchedAt);
+        expect(Date.now() - lastMatched).toBeGreaterThan(44 * 86_400_000);
+        expect(byQuery["manual qa before every release"].lastMatchedAt).toBeNull();
+      });
+    });
+
+    it("answers 404 for a monitor that is not this account's, on both routes", async () => {
+      const [row] = await db
+        .insert(monitors)
+        .values({
+          userId: "somebody-else",
+          name: "Not yours",
+          product: "A test runner",
+          idealCustomer: "Small SaaS teams",
+          problem: "Flaky end-to-end tests",
+          sources: ["reddit"],
+        })
+        .returning({ id: monitors.id });
+      if (!row) throw new Error("The monitor was not inserted.");
+      await found(row.id, "theirs", 90);
+
+      await withServer({}, async (app) => {
+        for (const route of ["queries", "leads"]) {
+          const response = await app.inject({
+            method: "GET",
+            url: `/api/monitors/${row.id}/${route}`,
+          });
+          expect(response.statusCode).toBe(404);
+        }
       });
     });
   });

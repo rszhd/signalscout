@@ -8,9 +8,10 @@
  * The arithmetic behind those figures is asserted in
  * `apps/api/src/pricing.test.ts`.
  */
+
+import { json, mount, type Screen, settle } from "@signalscout/ui/testing";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Providers } from "./Providers.js";
-import { json, mount, type Screen, settle } from "./testing.js";
 
 function money(micros: number) {
   return { micros, display: `$${(micros / 1_000_000).toFixed(4)}` };

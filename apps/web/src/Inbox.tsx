@@ -1,13 +1,69 @@
+import {
+  ageLabel,
+  BrandIcon,
+  band,
+  FormError,
+  type Monitor,
+  type Monitoring,
+  messageFor,
+  monitoringState,
+  PageState,
+  ReplyDraft,
+  requestJson,
+  useMonitorRefresh,
+} from "@signalscout/ui";
 import { useCallback, useEffect, useState } from "react";
-import { Link } from "react-router";
-import { messageFor, requestJson } from "./api.js";
-import { BrandIcon } from "./BrandIcon.js";
-import { ageLabel } from "./labels.js";
-import { ReplyDraft } from "./ReplyDraft.js";
+import { Link, useNavigate } from "react-router";
 import { paths } from "./route.js";
 
 /**
- * The intent inbox.
+ * What the monitoring is doing, above the matches. US-265.
+ *
+ * The inbox is the screen a person keeps open, and it was the one screen that
+ * said nothing about collection: an empty list read equally as "nobody is
+ * talking" and as "this was paused a week ago". The bar answers three
+ * questions and stops — what is happening, when the next poll is if the answer
+ * is "waiting", and what the last poll did.
+ *
+ * The latest only. A history belongs on the monitor page, one click away.
+ * Every word comes from `monitor.tsx`, so this screen and the monitor screens
+ * cannot end up saying two different things about one monitor.
+ */
+function MonitoringBar({
+  state,
+  projectId,
+}: {
+  readonly state: Monitoring;
+  readonly projectId: string;
+}) {
+  return (
+    <section className="inbox-monitoring" aria-label="Monitoring">
+      <span className={`monitor-status ${state.tone}${state.attention ? " quiet" : ""}`}>
+        {state.label}
+      </span>
+      <p
+        className="inbox-monitoring-now"
+        title={state.nowAt ? new Date(state.nowAt).toLocaleString() : undefined}
+      >
+        {state.now}
+      </p>
+      {state.last && state.lastAt && (
+        <p className="inbox-monitoring-last">
+          <time dateTime={state.lastAt} title={new Date(state.lastAt).toLocaleString()}>
+            {ageLabel(state.lastAt)}
+          </time>
+          {` · ${state.last}`}
+        </p>
+      )}
+      <Link className="inbox-monitor-link" to={paths.monitor(projectId, state.monitor.id)}>
+        View monitor
+      </Link>
+    </section>
+  );
+}
+
+/**
+ * The inbox.
  *
  * The server owns ranking and filtering. This screen keeps the mockup's
  * compact list-and-detail reading flow while showing only behaviour the
@@ -79,11 +135,40 @@ interface MatchPage {
   asOf: string;
 }
 
+/**
+ * What this screen reads off a monitor row. A `Monitor` is one, and so is
+ * the older, thinner row `thresholdSentence`'s tests hand in.
+ */
 interface MonitorSummary {
   id: string;
   name: string;
   /** Optional, for BUG-009's reason: an older API does not send it. US-045. */
   projectId?: string | null;
+  /** Null until the first poll. Optional for the same reason. */
+  lastPolledAt?: string | null;
+  /** The score a post must reach to become a match. US-264. Optional, as above. */
+  minScore?: number;
+}
+
+/**
+ * Why an inbox that has been polled is still empty, or null. US-264.
+ *
+ * An empty inbox has two readings: nobody is talking, or nothing cleared the
+ * monitor's minimum score. The second was invisible, and the person cannot
+ * tell the two apart without the number. It is named only once a monitor has
+ * polled, because before that the answer is simply "not yet".
+ */
+export function thresholdSentence(monitors: readonly MonitorSummary[]): string | null {
+  const polled = monitors.filter((row) => row.lastPolledAt && row.minScore !== undefined);
+  if (polled.length === 0) return null;
+
+  const scores = [...new Set(polled.map((row) => row.minScore as number))].sort((a, b) => a - b);
+  const floor =
+    scores.length === 1
+      ? `${scores[0]}`
+      : `its monitor's minimum score (${scores[0]} to ${scores[scores.length - 1]})`;
+
+  return `Only a post that scores ${floor} or more becomes a match. If you think that is hiding leads, lower the minimum score on the monitor page.`;
 }
 
 type LoadState = "loading" | "more" | "ready" | "error";
@@ -128,12 +213,6 @@ function limitWords(body: string): { text: string; truncated: boolean } {
     text: `${words.slice(0, postPreviewWordLimit).join(" ")}…`,
     truncated: true,
   };
-}
-
-function band(score: number): { label: string; tone: string } {
-  if (score >= 80) return { label: "High intent", tone: "high" };
-  if (score >= 55) return { label: "Worth reading", tone: "medium" };
-  return { label: "Low intent", tone: "low" };
 }
 
 /**
@@ -286,8 +365,16 @@ function whereItCameFrom(match: Match): string {
  * remounts nothing, so a screen that read it once would keep showing the
  * project a person had navigated away from.
  */
-export function Inbox({ projectId }: { readonly projectId: string }) {
-  const [monitors, setMonitors] = useState<MonitorSummary[]>([]);
+export function Inbox({
+  projectId,
+  matchId: addressed = null,
+}: {
+  readonly projectId: string;
+  /** The item the address names, or null on the plain inbox. US-268. */
+  readonly matchId?: string | null;
+}) {
+  const navigate = useNavigate();
+  const [monitors, setMonitors] = useState<Monitor[]>([]);
   const [monitorId, setMonitorId] = useState("");
   const [minScore, setMinScore] = useState(0);
   const [matches, setMatches] = useState<Match[]>([]);
@@ -319,36 +406,60 @@ export function Inbox({ projectId }: { readonly projectId: string }) {
   const [saving, setSaving] = useState(false);
 
   /**
-   * The monitors this filter offers: the project's own, and no others.
+   * What the monitoring is doing, derived on every render. US-265.
+   *
+   * Derived and not held: it is a reading of the rows below and of the clock,
+   * and a copy in state would be a second answer that goes stale between
+   * renders. `working` decides how often the rows are re-read.
+   */
+  const monitoring = monitoringState(monitors);
+  const working = monitoring?.working === true;
+
+  /**
+   * The project's monitors: what the filter offers, and what the bar reads.
+   *
+   * The whole row rather than the two fields the filter needs, because US-265
+   * put the monitoring status on this screen and the status is derived from
+   * the pause, the spend, the credentials, the last poll and the stage. One
+   * request answers both.
    *
    * Re-read when the project changes rather than once on mount, for the same
    * reason the matches are: moving between projects remounts nothing, and a
    * dropdown left holding another project's monitors offers a filter that
    * empties the inbox for no visible reason.
    */
-  useEffect(() => {
-    let cancelled = false;
-    requestJson<MonitorSummary[]>("/api/monitors")
-      .then((rows) => {
-        if (cancelled) return;
+  const loadMonitors = useCallback(async (): Promise<void> => {
+    try {
+      const rows = await requestJson<Monitor[]>("/api/monitors");
+      const mine = rows.filter((row) => row.projectId === projectId);
 
-        const mine = rows.filter((row) => row.projectId === projectId);
+      setMonitors(mine);
 
-        setMonitors(mine.map(({ id, name }) => ({ id, name })));
-
-        // The monitor filter can outlive the project it belonged to. Clearing
-        // it is the honest reset: keeping it would show an empty inbox and
-        // name no reason.
-        setMonitorId((current) =>
-          current !== "" && !mine.some((row) => row.id === current) ? "" : current,
-        );
-      })
-      .catch(() => undefined);
-
-    return () => {
-      cancelled = true;
-    };
+      // The monitor filter can outlive the project it belonged to. Clearing
+      // it is the honest reset: keeping it would show an empty inbox and
+      // name no reason.
+      setMonitorId((current) =>
+        current !== "" && !mine.some((row) => row.id === current) ? "" : current,
+      );
+    } catch {
+      // Silent, and the bar keeps whatever it last knew. A failed read here
+      // costs the person nothing they asked for, and an error beside the
+      // matches would report the wrong screen as broken.
+    }
   }, [projectId]);
+
+  useEffect(() => {
+    void loadMonitors();
+  }, [loadMonitors]);
+
+  /**
+   * Keep the bar current, on the one rule the monitor screens share. US-265.
+   *
+   * It is also what moves "Next poll in 2 hours" along without the person
+   * reloading: the phrase is rendered from a clock that only ticks when this
+   * re-renders.
+   */
+  useMonitorRefresh(loadMonitors, working);
 
   /**
    * The filters, as the server takes them.
@@ -553,7 +664,79 @@ export function Inbox({ projectId }: { readonly projectId: string }) {
   const filtered = monitorId !== "" || minScore > 0 || showDismissed;
   const orderHeading =
     orders.find((option) => option.value === order)?.heading ?? orders[0].heading;
-  const selectedMatch = matches.find((match) => match.id === selectedMatchId) ?? matches[0] ?? null;
+  /**
+   * The item the address names, when the loaded page does not hold it. US-268.
+   *
+   * A link is sent to somebody whose inbox is not the sender's: a different
+   * filter, a later page, or an item they have already dismissed. The list
+   * resolves a selection against what it has loaded, so without this the
+   * address would quietly open whatever is at the top — the failure US-076
+   * removed from the router and would have reintroduced here.
+   *
+   * It is fetched rather than searched for, and only when the page does not
+   * already answer. A 404 leaves it null and the inbox says so.
+   */
+  const [addressedMatch, setAddressedMatch] = useState<Match | null>(null);
+  const [addressMissing, setAddressMissing] = useState(false);
+
+  useEffect(() => {
+    if (!addressed) {
+      setAddressedMatch(null);
+      setAddressMissing(false);
+      return;
+    }
+
+    // The address asserts the selection after every load, not only on the
+    // first: `loadFirstPage` sets the top row, and it resolves after this
+    // effect ran on mount. Re-asserting is why `matches` is a dependency.
+    setSelectedMatchId(addressed);
+
+    // Nothing is missing until the list has answered. On mount `matches` is
+    // empty, and a fetch decided there asks the server for an item the page
+    // was about to contain — one wasted request on every link that works.
+    if (state === "loading") return;
+
+    if (matches.some((match) => match.id === addressed)) {
+      setAddressedMatch(null);
+      setAddressMissing(false);
+      return;
+    }
+
+    let current = true;
+    requestJson<Match>(`/api/matches/${addressed}`)
+      .then((match) => {
+        if (!current) return;
+        setAddressedMatch(match);
+        setAddressMissing(false);
+      })
+      .catch(() => {
+        if (!current) return;
+        setAddressedMatch(null);
+        setAddressMissing(true);
+      });
+
+    return () => {
+      current = false;
+    };
+  }, [addressed, matches, state]);
+
+  /** Whether the address was copied a moment ago, for the button's own word. */
+  const [copied, setCopied] = useState(false);
+
+  async function copyLink(match: Match): Promise<void> {
+    const address = `${window.location.origin}${paths.inboxMatch(projectId, match.id)}`;
+    try {
+      await navigator.clipboard.writeText(address);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // No clipboard: the address is already in the bar, and the person can
+      // copy it from there. Nothing to report.
+    }
+  }
+
+  const selectedMatch =
+    matches.find((match) => match.id === selectedMatchId) ?? addressedMatch ?? matches[0] ?? null;
   const scoreRows: Array<[string, number]> = selectedMatch
     ? [
         ["Problem fit", selectedMatch.problemFit],
@@ -572,17 +755,11 @@ export function Inbox({ projectId }: { readonly projectId: string }) {
 
   return (
     <div className="product-page inbox-page">
-      <header className="topbar">
-        <div>
-          <h1>Intent inbox</h1>
-          <p className="page-subtitle">Find your next conversation.</p>
-        </div>
-        {(matches.length > 0 || monitors.length === 0) && (
-          <Link className="top-secondary-link" to={paths.newMonitor(projectId)}>
-            <span aria-hidden="true">+ </span>New monitor
-          </Link>
-        )}
-      </header>
+      {/* No visible title: the navigation names the screen and the bar below
+          says what it is doing. The heading stays for a screen reader. US-281. */}
+      <h1 className="visually-hidden">Inbox</h1>
+
+      {monitoring && <MonitoringBar state={monitoring} projectId={projectId} />}
 
       <div className="inbox-toolbar">
         <fieldset className="view-switch inbox-views" aria-label="Which matches">
@@ -695,52 +872,67 @@ export function Inbox({ projectId }: { readonly projectId: string }) {
       </div>
 
       {state === "loading" && (
-        <div className="center-state page-state" role="status">
-          <span className="spinner" aria-hidden="true" />
-          <h2>Loading the inbox</h2>
-          <p>Reading the matches your monitors have scored.</p>
-        </div>
+        <PageState kind="loading" heading="Loading the inbox">
+          Reading the matches your monitors have scored.
+        </PageState>
       )}
 
       {state === "error" && (
-        <div className="center-state page-state error-state" role="alert">
-          <span className="state-icon">!</span>
-          <h2>The inbox could not be loaded</h2>
-          <p>{error}</p>
-          <button className="secondary-button" type="button" onClick={() => void loadFirstPage()}>
-            Try again
-          </button>
-        </div>
+        <PageState
+          kind="error"
+          heading="The inbox could not be loaded"
+          action={
+            <button className="secondary-button" type="button" onClick={() => void loadFirstPage()}>
+              Try again
+            </button>
+          }
+        >
+          {error}
+        </PageState>
       )}
 
-      {state !== "loading" && state !== "error" && matches.length === 0 && (
-        <div className="center-state page-state" role="status">
-          {monitors.length === 0 ? (
-            <>
-              <span className="empty-mark" aria-hidden="true">
-                ✦
-              </span>
-              <h2>No monitors yet</h2>
-              <p>Create a monitor and SignalScout will start collecting conversations.</p>
+      {addressMissing && (
+        <PageState kind="empty" page={false}>
+          That item is not in this inbox any more. It may have been removed, or the link may be for
+          a different account.
+        </PageState>
+      )}
+
+      {state !== "loading" &&
+        state !== "error" &&
+        matches.length === 0 &&
+        !addressedMatch &&
+        (monitors.length === 0 ? (
+          <PageState
+            kind="empty"
+            mark="✦"
+            heading="No monitors yet"
+            action={
               <Link className="primary-button" to={paths.newMonitor(projectId)}>
                 Create a monitor
               </Link>
-            </>
-          ) : filtered ? (
-            <>
-              <h2>No matches with these filters</h2>
-              <p>There may be matches the monitor or the minimum score is hiding.</p>
+            }
+          >
+            Create a monitor and SignalScout will start collecting conversations.
+          </PageState>
+        ) : filtered ? (
+          <PageState
+            kind="empty"
+            heading="No matches with these filters"
+            action={
               <button className="secondary-button" type="button" onClick={clearFilters}>
                 Clear filters
               </button>
-            </>
-          ) : showSaved ? (
-            <>
-              <span className="empty-mark" aria-hidden="true">
-                ☆
-              </span>
-              <h2>No saved conversations yet</h2>
-              <p>Save a conversation from your inbox to come back to it here.</p>
+            }
+          >
+            There may be matches the monitor or the minimum score is hiding.
+          </PageState>
+        ) : showSaved ? (
+          <PageState
+            kind="empty"
+            mark="☆"
+            heading="No saved conversations yet"
+            action={
               <button
                 className="secondary-button"
                 type="button"
@@ -748,16 +940,16 @@ export function Inbox({ projectId }: { readonly projectId: string }) {
               >
                 Back to inbox
               </button>
-            </>
-          ) : (
-            <>
-              <span className="empty-mark" aria-hidden="true">
-                ✦
-              </span>
-              <h2>Nothing has matched yet</h2>
-              <p>
-                Your monitors collect on their own schedule. Matches appear here as they are scored.
-              </p>
+            }
+          >
+            Save a conversation from your inbox to come back to it here.
+          </PageState>
+        ) : (
+          <PageState
+            kind="empty"
+            mark="✦"
+            heading="Nothing has matched yet"
+            action={
               <button
                 className="secondary-button"
                 type="button"
@@ -765,12 +957,14 @@ export function Inbox({ projectId }: { readonly projectId: string }) {
               >
                 Check again
               </button>
-            </>
-          )}
-        </div>
-      )}
+            }
+          >
+            Your monitors collect on their own schedule. Matches appear here as they are scored.
+            {thresholdSentence(monitors) ? ` ${thresholdSentence(monitors)}` : ""}
+          </PageState>
+        ))}
 
-      {state !== "loading" && state !== "error" && matches.length > 0 && selectedMatch && (
+      {state !== "loading" && state !== "error" && selectedMatch && (
         <div className="inbox-layout">
           <div className="match-list-column">
             <div className="list-heading">
@@ -804,6 +998,11 @@ export function Inbox({ projectId }: { readonly projectId: string }) {
                           setSelectedMatchId(match.id);
                           setMobileDetailOpen(true);
                           setExpandedMatchId(null);
+                          // The address follows the reading, so what is on
+                          // screen is what a copied link opens. Replace, so
+                          // Back leaves the inbox rather than walking every
+                          // item that was clicked in it. US-268.
+                          navigate(paths.inboxMatch(projectId, match.id), { replace: true });
                         }}
                       >
                         <span className="match-top">
@@ -987,6 +1186,13 @@ export function Inbox({ projectId }: { readonly projectId: string }) {
                       : "Open conversation ↗"}
                   </a>
                   <button
+                    className="secondary-button"
+                    type="button"
+                    onClick={() => void copyLink(selectedMatch)}
+                  >
+                    {copied ? "Link copied" : "Copy link"}
+                  </button>
+                  <button
                     aria-pressed={selectedMatch.saved}
                     className={`secondary-button ${selectedMatch.saved ? "chosen" : ""}`}
                     disabled={saving}
@@ -1048,11 +1254,7 @@ export function Inbox({ projectId }: { readonly projectId: string }) {
         </div>
       )}
 
-      {error && state === "ready" && (
-        <p className="form-error floating-error" role="alert">
-          {error}
-        </p>
-      )}
+      {error && state === "ready" && <FormError className="floating-error">{error}</FormError>}
     </div>
   );
 }

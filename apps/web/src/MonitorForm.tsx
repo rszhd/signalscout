@@ -1,12 +1,21 @@
+import {
+  BrandIcon,
+  browserTimezone,
+  defaultRate,
+  everyDay,
+  FormError,
+  formatMicros,
+  messageFor,
+  PageState,
+  requestJson,
+  timezoneOptions,
+  toMicros,
+} from "@signalscout/ui";
 import { type FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router";
-import { messageFor, requestJson } from "./api.js";
-import { BrandIcon } from "./BrandIcon.js";
 import { CostTest, type EstimateReport, exceedsCap } from "./CostTest.js";
-import { formatMicros, toMicros } from "./monitor.js";
 import { paths } from "./route.js";
 import { ScheduleField } from "./ScheduleField.js";
-import { browserTimezone, defaultRate, everyDay, timezoneOptions } from "./schedule.js";
 
 interface SignalOption {
   id: string;
@@ -129,6 +138,25 @@ const emptyAnswers: Answers = { name: "", product: "", idealCustomer: "", proble
 const defaultCap = "5";
 
 /**
+ * Where the minimum score starts, as the field carries it. US-264.
+ *
+ * The package's own default, and it stays there on purpose: a threshold set
+ * too high discards good leads before anybody sees them, and a silent false
+ * negative is worse than a noisy inbox because nobody can tell it happened
+ * (US-223). A person with a noisy inbox raises it here, on their own
+ * evidence.
+ */
+const defaultMinScore = "30";
+
+/** A whole number from 0 to 100, or null for anything else. */
+function toMinScore(value: string): number | null {
+  const trimmed = value.trim();
+  if (!/^\d+$/.test(trimmed)) return null;
+  const score = Number(trimmed);
+  return score <= 100 ? score : null;
+}
+
+/**
  * The missing keys as one phrase, grouped by the account they belong to.
  *
  * Fields of one provider are joined with "and", because that account needs
@@ -235,6 +263,7 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
    */
   const [cap, setCap] = useState(defaultCap);
   const [onExhausted, setOnExhausted] = useState("pause");
+  const [minScore, setMinScore] = useState(defaultMinScore);
   const [estimate, setEstimate] = useState<EstimateReport | null>(null);
 
   const headingRef = useRef<HTMLHeadingElement>(null);
@@ -540,6 +569,12 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
       return;
     }
 
+    const threshold = toMinScore(minScore);
+    if (threshold === null) {
+      setError("The minimum score is a whole number from 0 to 100.");
+      return;
+    }
+
     setWorking("creating");
     try {
       const monitor = await requestJson<CreatedMonitor>("/api/monitors", {
@@ -558,6 +593,7 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
           pollIntervalSeconds: schedule.pollIntervalSeconds,
           pollDays: [...schedule.pollDays],
           pollTimezone: timezone,
+          minScore: threshold,
           ...(capMicros === null ? {} : { budget: { monthlyCapMicros: capMicros, onExhausted } }),
           // Kept, not started. The person was shown what it would cost.
           ...(overCap ? { startPaused: true } : {}),
@@ -581,6 +617,7 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
     setError(null);
     setCap(defaultCap);
     setOnExhausted("pause");
+    setMinScore(defaultMinScore);
     takeReport(null);
     setIncludeReplies(false);
     setPollIntervalSeconds(defaultRate);
@@ -624,22 +661,28 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
         </aside>
         <section className="setup-content" aria-label="Create a new monitor">
           {optionsState.state === "loading" && (
-            <div className="center-state" role="status">
-              <span className="spinner" aria-hidden="true" />
-              <h2>Loading monitor options</h2>
-              <p>Checking the sources and signals available in this deployment.</p>
-            </div>
+            <PageState kind="loading" page={false} heading="Loading monitor options">
+              Checking the sources and signals available in this deployment.
+            </PageState>
           )}
 
           {optionsState.state === "error" && (
-            <div className="center-state error-state" role="alert">
-              <span className="state-icon">!</span>
-              <h2>The API did not answer</h2>
-              <p>{optionsState.message}</p>
-              <button className="secondary-button" type="button" onClick={() => location.reload()}>
-                Try again
-              </button>
-            </div>
+            <PageState
+              kind="error"
+              page={false}
+              heading="The API did not answer"
+              action={
+                <button
+                  className="secondary-button"
+                  type="button"
+                  onClick={() => location.reload()}
+                >
+                  Try again
+                </button>
+              }
+            >
+              {optionsState.message}
+            </PageState>
           )}
 
           {options && stage !== "created" && (
@@ -762,11 +805,7 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
                 </div>
               </fieldset>
 
-              {error && (
-                <p className="form-error" role="alert">
-                  {error}
-                </p>
-              )}
+              {error && <FormError>{error}</FormError>}
               <div className="setup-actions">
                 <button
                   className="secondary-button"
@@ -912,11 +951,7 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
                 </div>
               )}
 
-              {error && (
-                <p className="form-error" role="alert">
-                  {error}
-                </p>
-              )}
+              {error && <FormError>{error}</FormError>}
               <div className="setup-actions">
                 <button
                   className="secondary-button"
@@ -1108,11 +1143,7 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
                   </div>
                 </section>
               )}
-              {error && (
-                <p className="form-error" role="alert">
-                  {error}
-                </p>
-              )}
+              {error && <FormError>{error}</FormError>}
               {plan.model && (
                 <details className="disclosure generation-details">
                   <summary>Generation details</summary>
@@ -1217,6 +1248,24 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
                   </label>
                 </div>
               </fieldset>
+              <fieldset className="choice-section threshold-section">
+                <legend>Which posts become matches?</legend>
+                <p>
+                  A post becomes a match when its score reaches this number. A higher number hides
+                  leads before anybody sees them, and nothing says that it did.
+                </p>
+                <label className="field threshold-field">
+                  <span>Minimum score to match</span>
+                  <input
+                    aria-label="Minimum score to match"
+                    inputMode="numeric"
+                    placeholder={defaultMinScore}
+                    required
+                    value={minScore}
+                    onChange={(event) => setMinScore(event.target.value)}
+                  />
+                </label>
+              </fieldset>
               <CostTest
                 monthlyCapMicros={capMicros}
                 pollDays={schedule.pollDays}
@@ -1241,11 +1290,7 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
                   </span>
                 </div>
               )}
-              {error && (
-                <p className="form-error" role="alert">
-                  {error}
-                </p>
-              )}
+              {error && <FormError>{error}</FormError>}
               <div className="setup-actions">
                 <button
                   className="secondary-button"

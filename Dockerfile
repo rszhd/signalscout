@@ -13,6 +13,7 @@ FROM base AS deps
 COPY pnpm-workspace.yaml pnpm-lock.yaml package.json ./
 COPY packages/engine/package.json packages/engine/
 COPY packages/pipeline/package.json packages/pipeline/
+COPY packages/ui/package.json packages/ui/
 COPY apps/api/package.json apps/api/
 COPY apps/web/package.json apps/web/
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
@@ -29,6 +30,7 @@ ENV NODE_ENV=production
 COPY pnpm-workspace.yaml pnpm-lock.yaml package.json ./
 COPY packages/engine/package.json packages/engine/
 COPY packages/pipeline/package.json packages/pipeline/
+COPY packages/ui/package.json packages/ui/
 COPY apps/api/package.json apps/api/
 COPY apps/web/package.json apps/web/
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile --prod

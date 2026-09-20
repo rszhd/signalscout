@@ -59,6 +59,9 @@ jobs:
         run: backlog/index.sh --check
 
       - run: pnpm lint
+      # Biome has no rule for a raw colour or a raw spacing value, and those
+      # are what keep two applications on one brand. US-270.
+      - run: pnpm lint:css
       - run: pnpm typecheck
       - run: pnpm build
       - run: pnpm test
@@ -68,6 +71,9 @@ jobs:
       # so this is the only check that the published shape works. US-154.
       - name: The packed packages install and work outside the workspace
         run: pnpm release:verify
+
+      - name: The packed brand package installs and works outside the workspace
+        run: pnpm release:verify:ui
 
   image:
     name: Build and publish the image

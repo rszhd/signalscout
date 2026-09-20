@@ -18,7 +18,7 @@ import {
 } from "@signalscout/pipeline";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { loadEnv } from "./config/env.js";
-import { buildServer } from "./server.js";
+import { buildServer, queryGeneratorForEnvironment } from "./server.js";
 import { asUser, createTestDatabase, type TestDatabase } from "./testing.js";
 
 const logger = createLogger({ level: "silent", name: "test" });
@@ -124,12 +124,14 @@ describe("the models routes", () => {
       const view = (await app.inject({ method: "GET", url: "/api/models" })).json();
       const classify = view.tasks.find((task: { task: string }) => task.task === "classify");
 
-      // US-070 added the fourth. The order is the order the screen shows.
+      // US-070 added the fourth and US-269 the fifth. The order is the order
+      // the screen shows.
       expect(view.tasks.map((task: { task: string }) => task.task)).toEqual([
         "classify",
         "triage",
         "embed",
         "draft",
+        "plan",
       ]);
       // `hasKey` false: this instance names a provider and stores no key, so
       // "the instance's key" would be no key at all.
@@ -255,6 +257,60 @@ describe("the models routes", () => {
    * instance's key" there offers a job that cannot run — and the way that
    * shows up is a poll that scores nothing.
    */
+  /**
+   * The search plan is a task of its own. US-269.
+   *
+   * The plan is written once per monitor and decides every post it will
+   * collect, so it is the one job worth a dearer model than the classifier's.
+   * What this proves is the wiring: the generator the monitor form is handed
+   * is built from the `plan` row, and choosing one moves nothing else. The
+   * generator's `model` is what it records in `api_usage` on every call.
+   */
+  it("writes the search plan on the plan task's model, and moves no other job", async () => {
+    await withServer(owner, async (app) => {
+      const view = (await app.inject({ method: "GET", url: "/api/models" })).json();
+      const plan = view.tasks.find((task: { task: string }) => task.task === "plan");
+      expect(plan.title).toBe("Writing the search plan");
+      // Nothing chosen: the plan follows the classifier, as every instance
+      // did before the task existed.
+      expect(plan.instance).toEqual({
+        provider: "anthropic",
+        model: "claude-haiku-4-5",
+        hasKey: false,
+      });
+
+      const instance = {
+        AI_PROVIDER: "anthropic" as const,
+        AI_MODEL: "claude-haiku-4-5",
+        AI_TIMEOUT_MS: 30_000,
+      };
+      // A key with a provider becomes the default, and every job follows it
+      // onto that provider's recommended model (US-083). The plan's
+      // recommendation is the strong one, so the generator is already off the
+      // classifier's model here. That is the baseline a choice must leave.
+      const keyId = await addKey(app, "My Anthropic key", "sk-ant-1234567890", "anthropic");
+      const before = await readAiEnvironment(db, owner, instance, encryption);
+      expect(before.AI_MODEL).toBe("claude-sonnet-5");
+      expect(queryGeneratorForEnvironment(before, logger)?.model).toBe("claude-fable-5-1");
+
+      const saved = await app.inject({
+        method: "PUT",
+        url: "/api/models/plan",
+        payload: { provider: "anthropic", model: "claude-opus-5", keyId },
+      });
+      expect(saved.statusCode).toBe(200);
+
+      const after = await readAiEnvironment(db, owner, instance, encryption);
+      const generator = queryGeneratorForEnvironment(after, logger);
+
+      expect(generator?.model).toBe("claude-opus-5");
+      // The classifier and triage did not move.
+      expect(after.AI_MODEL).toBe(before.AI_MODEL);
+      expect(after.AI_TRIAGE_MODEL).toBe(before.AI_TRIAGE_MODEL);
+      expect(after.AI_DRAFT_MODEL).toBe(before.AI_DRAFT_MODEL);
+    });
+  });
+
   it("says whether the instance holds a key for each job", async () => {
     const app = await buildServer({
       session: asUser(owner),

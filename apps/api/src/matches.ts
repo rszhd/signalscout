@@ -29,6 +29,7 @@ import {
   matchOrders,
   matchOwner,
   maximumPageSize,
+  readMatch,
   recordVerdict,
   setMatchSaved,
   verdicts,
@@ -212,6 +213,41 @@ export async function registerMatchRoutes(
         })),
         nextCursor: page.nextCursor,
         asOf: page.asOf.toISOString(),
+      };
+    },
+  });
+
+  /**
+   * One match by its id, for the address that names it. US-268.
+   *
+   * The inbox resolves its selection against the page it has loaded, and the
+   * item somebody was referred to may be on page nine, under a different
+   * filter, or already dismissed. This is what the screen asks when the
+   * address names a match the list does not hold.
+   *
+   * **A stranger's id and a deleted one answer the same 404.** `readMatch`
+   * scopes by owner, so a match belonging to somebody else simply is not
+   * found, and the route cannot tell the two apart to say anything else. That
+   * is the point rather than a limitation — distinguishing them would let
+   * anybody with a session discover which ids exist.
+   */
+  app.route({
+    method: "GET",
+    url: "/api/matches/:id",
+    schema: {
+      params: z.object({ id: z.uuid() }),
+      response: { 200: matchSchema, 404: z.object({ message: z.string() }) },
+    },
+    handler: async (request, reply) => {
+      const match = await readMatch(db, sessionUserId(request), request.params.id);
+
+      if (!match) return reply.code(404).send({ message: "No match has that id." });
+
+      return {
+        ...match,
+        reasons: [...match.reasons],
+        readAt: match.readAt?.toISOString() ?? null,
+        postedAt: match.postedAt.toISOString(),
       };
     },
   });

@@ -986,97 +986,97 @@ export function MonitorDetail({
               hidden={detailView !== "overview"}
             >
               <section className="monitor-detail-section monitor-results-section">
-              <div className="monitor-section-heading">
-                <div>
-                  <p className="monitor-section-label">Results</p>
-                  <h2 className="monitor-detail-title">Match quality</h2>
+                <div className="monitor-section-heading">
+                  <div>
+                    <p className="monitor-section-label">Results</p>
+                    <h2 className="monitor-detail-title">Match quality</h2>
+                  </div>
+                  <Link className="text-link" to={paths.inbox(home)}>
+                    View inbox
+                  </Link>
                 </div>
-                <Link className="text-link" to={paths.inbox(home)}>
-                  View inbox
-                </Link>
-              </div>
-              <p className="monitor-found">
-                {monitor.matches
-                  ? `${monitor.matches.total} matches found, ${monitor.matches.unread} unread`
-                  : "No match count from this server."}
-                {monitor.minScore === undefined ? "" : ` · at ${monitor.minScore} or above`}
-              </p>
-              <p className="monitor-feedback">{feedbackLabel(monitor.feedback)}</p>
+                <p className="monitor-found">
+                  {monitor.matches
+                    ? `${monitor.matches.total} matches found, ${monitor.matches.unread} unread`
+                    : "No match count from this server."}
+                  {monitor.minScore === undefined ? "" : ` · at ${monitor.minScore} or above`}
+                </p>
+                <p className="monitor-feedback">{feedbackLabel(monitor.feedback)}</p>
               </section>
 
               <section className="monitor-detail-section">
-              <div className="monitor-section-heading">
-                <div>
-                  <p className="monitor-section-label">Cost</p>
-                  <h2 className="monitor-detail-title">
-                    Spent in {monthLabel(monitor.spend.since)} (estimated)
-                  </h2>
+                <div className="monitor-section-heading">
+                  <div>
+                    <p className="monitor-section-label">Cost</p>
+                    <h2 className="monitor-detail-title">
+                      Spent in {monthLabel(monitor.spend.since)} (estimated)
+                    </h2>
+                  </div>
                 </div>
-              </div>
-              <dl className="monitor-spend">
-                <div>
-                  <dt>Total</dt>
-                  <dd>{formatMicros(monitor.spend.totalMicros)}</dd>
-                </div>
-                <div>
-                  <dt>Sources</dt>
-                  <dd>{formatMicros(monitor.spend.sourceMicros)}</dd>
-                </div>
-                <div>
-                  <dt>Model</dt>
-                  <dd>{formatMicros(monitor.spend.modelMicros)}</dd>
-                </div>
-                <div>
-                  <dt>Left this month</dt>
-                  <dd>
-                    {monitor.spend.remainingMicros === null
-                      ? "No cap set"
-                      : formatMicros(monitor.spend.remainingMicros)}
-                  </dd>
-                </div>
-              </dl>
-              <p className="monitors-cost-note">
-                Spend is estimated; your provider’s invoice is the authority. Amounts include source
-                and model calls.
-              </p>
+                <dl className="monitor-spend">
+                  <div>
+                    <dt>Total</dt>
+                    <dd>{formatMicros(monitor.spend.totalMicros)}</dd>
+                  </div>
+                  <div>
+                    <dt>Sources</dt>
+                    <dd>{formatMicros(monitor.spend.sourceMicros)}</dd>
+                  </div>
+                  <div>
+                    <dt>Model</dt>
+                    <dd>{formatMicros(monitor.spend.modelMicros)}</dd>
+                  </div>
+                  <div>
+                    <dt>Left this month</dt>
+                    <dd>
+                      {monitor.spend.remainingMicros === null
+                        ? "No cap set"
+                        : formatMicros(monitor.spend.remainingMicros)}
+                    </dd>
+                  </div>
+                </dl>
+                <p className="monitors-cost-note">
+                  Spend is estimated; your provider’s invoice is the authority. Amounts include
+                  source and model calls.
+                </p>
               </section>
 
               <section className="monitor-detail-section collection-settings-section">
-              <div className="monitor-section-heading">
-                <div>
-                  <p className="monitor-section-label">Sources</p>
-                  <h2 className="monitor-detail-title">Last collection</h2>
+                <div className="monitor-section-heading">
+                  <div>
+                    <p className="monitor-section-label">Sources</p>
+                    <h2 className="monitor-detail-title">Last collection</h2>
+                  </div>
                 </div>
-              </div>
-              {/* Who actually collected, which is not always who would collect
+                {/* Who actually collected, which is not always who would collect
                   now: the choice can be changed and this is the record of what
                   ran. Read from the ledger, so the moment is when money was last
                   spent on that pair. US-026. */}
-              {monitor.lastCollected.length === 0 ? (
-                <p className="monitor-origin">No collections recorded yet.</p>
-              ) : (
-                <ul className="collection-list">
-                  {monitor.lastCollected.map((one) => (
-                    <li key={`${one.source}-${one.provider}`}>
-                      <span className="brand-label">
-                        <BrandIcon brand={one.source} size={16} />
-                        {platformName(one.source)}
-                      </span>
-                      <span className="collection-provider">
-                        <BrandIcon brand={one.provider} size={14} />
-                        {providerName(one.provider)}
-                      </span>
-                      {/* The exact moment stays in the tooltip. "2 hours ago"
+                {monitor.lastCollected.length === 0 ? (
+                  <p className="monitor-origin">No collections recorded yet.</p>
+                ) : (
+                  <ul className="collection-list">
+                    {monitor.lastCollected.map((one) => (
+                      <li key={`${one.source}-${one.provider}`}>
+                        <span className="brand-label">
+                          <BrandIcon brand={one.source} size={16} />
+                          {platformName(one.source)}
+                        </span>
+                        <span className="collection-provider">
+                          <BrandIcon brand={one.provider} size={14} />
+                          {providerName(one.provider)}
+                        </span>
+                        {/* The exact moment stays in the tooltip. "2 hours ago"
                           answers "did it run this morning?", and the timestamp
                           answers "which row on the invoice?" — two questions, and
                           only the first is asked here. */}
-                      <time dateTime={one.at} title={new Date(one.at).toLocaleString()}>
-                        {ageLabel(one.at)}
-                      </time>
-                    </li>
-                  ))}
-                </ul>
-              )}
+                        <time dateTime={one.at} title={new Date(one.at).toLocaleString()}>
+                          {ageLabel(one.at)}
+                        </time>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </section>
             </div>
 
@@ -1111,7 +1111,6 @@ export function MonitorDetail({
             >
               <LeadSources monitorId={monitor.id} />
             </div>
-
           </div>
 
           <aside className="monitor-settings-panel" aria-labelledby="monitor-settings-title">

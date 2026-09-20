@@ -344,6 +344,44 @@ describe("one monitor's page", () => {
     });
   });
 
+  describe("which score makes a match", () => {
+    // US-264. `min_score` decided what every person saw and no screen showed
+    // it, so an empty inbox and a floor set too high looked the same.
+    it("shows the threshold beside the match count", async () => {
+      await show(monitor({ matches: { total: 12, unread: 3 }, minScore: 45 }));
+
+      expect(container.textContent).toContain("3 unread · minimum score 45");
+      expect(field("Minimum score to match for Teams replacing manual QA").value).toBe("45");
+    });
+
+    it("sends the number a person typed", async () => {
+      await show(monitor());
+
+      setValue(field("Minimum score to match for Teams replacing manual QA"), "55");
+      button("Save minimum score").click();
+      await settle();
+
+      const [url, init] = fetchMock.mock.calls.find(
+        ([, options]) => (options as RequestInit)?.method === "PATCH",
+      ) as [string, RequestInit];
+
+      expect(url).toBe(`/api/monitors/${monitorId}`);
+      expect(JSON.parse(String(init.body))).toEqual({ minScore: 55 });
+    });
+
+    it("refuses a score outside 0 to 100 without asking the server", async () => {
+      await show(monitor());
+      const before = fetchMock.mock.calls.length;
+
+      setValue(field("Minimum score to match for Teams replacing manual QA"), "140");
+      button("Save minimum score").click();
+      await settle();
+
+      expect(fetchMock.mock.calls).toHaveLength(before);
+      expect(container.textContent).toContain("whole number from 0 to 100");
+    });
+  });
+
   describe("what the person thought of it", () => {
     it("says how the matches were judged, and how many were judged at all", async () => {
       // PLAN.md's real measure of success. Nine tenths negative is a product

@@ -6,7 +6,7 @@ priority: p2
 created: 2026-09-20T09:00+08:00
 parent:
 area: web
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -35,16 +35,20 @@ difference is the default: the cloud starts at 40 from its own measurements.
 
 ## Acceptance
 
-- [ ] The monitor form has a minimum-score field on the *Schedule & budget*
+- [x] The monitor form has a minimum-score field on the *Schedule & budget*
       step, defaulting to 30 for a new monitor and to the saved value when
-      editing.
-- [ ] The field says in one sentence what the number gates and that a
+      editing. Editing lives on the monitor page here, in a settings section
+      beside the schedule, the budget and the pre-filter, because that is
+      where this application edits a monitor.
+- [x] The field says in one sentence what the number gates and that a
       higher number hides leads before anybody sees them.
-- [ ] The monitor page shows the current threshold beside the match count.
-- [ ] `MonitorForm.test.tsx` sends `minScore` on create and on edit, and
+- [x] The monitor page shows the current threshold beside the match count.
+- [x] `MonitorForm.test.tsx` sends `minScore` on create and on edit, and
       refuses a value outside 0–100 before the request.
-- [ ] The inbox's empty state names the threshold when the monitor has
-      collected posts and none cleared it.
+- [x] The inbox's empty state names the threshold when the monitor has
+      collected posts and none cleared it. "Has collected" is read as
+      `lastPolledAt` being set; the list carries no post count and adding a
+      read for one sentence was not worth it.
 
 ## Notes
 
@@ -58,3 +62,10 @@ difference is the default: the cloud starts at 40 from its own measurements.
 
 - 2026-09-20T09:00+08:00 — Written from the cross-repository review of the
   cloud's changes since the split.
+- 2026-09-20T09:14+08:00 — Shipped. The form sends `minScore` (30 unless
+  typed); the monitor page has a *Which posts become matches* section that
+  PATCHes it and shows it beside the match count; the inbox's empty state
+  names it once a monitor has polled. Seven new cases; three mutations
+  (form sends a constant, page sends a constant, inbox ignores the poll)
+  each went red under exactly one of them. 345 web tests pass. No browser
+  has rendered the three screens.

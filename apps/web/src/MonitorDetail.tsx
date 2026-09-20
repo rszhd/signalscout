@@ -140,6 +140,73 @@ function BudgetForm({ monitor, onSaved }: { monitor: Monitor; onSaved: () => Pro
 }
 
 /**
+ * The score a post must reach to become a match, and a way to change it.
+ * US-264.
+ *
+ * `min_score` decided what every person saw and no screen showed it, so an
+ * empty inbox could not be told apart from an inbox whose floor was too
+ * high, and moving the floor meant SQL. The default is the package's 30 and
+ * stays there (US-223); this is where a person raises it on their own
+ * evidence.
+ */
+function ThresholdForm({ monitor, onSaved }: { monitor: Monitor; onSaved: () => Promise<void> }) {
+  const [value, setValue] = useState(String(monitor.minScore ?? ""));
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function save(): Promise<void> {
+    setError(null);
+    const trimmed = value.trim();
+    const minScore = /^\d+$/.test(trimmed) ? Number(trimmed) : null;
+    if (minScore === null || minScore > 100) {
+      setError("Type the minimum score as a whole number from 0 to 100.");
+      return;
+    }
+
+    setBusy(true);
+    try {
+      await requestJson(`/api/monitors/${monitor.id}`, {
+        method: "PATCH",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ minScore }),
+      });
+      await onSaved();
+    } catch (cause) {
+      setError(messageFor(cause, "The minimum score could not be changed."));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="budget-form budget-settings-form threshold-form">
+      <label className="budget-field">
+        <span className="budget-label">Minimum score to match</span>
+        <input
+          aria-label={`Minimum score to match for ${monitor.name}`}
+          inputMode="numeric"
+          placeholder="30"
+          value={value}
+          onChange={(event) => setValue(event.target.value)}
+        />
+      </label>
+
+      <div className="budget-actions">
+        <Button disabled={busy} onClick={() => void save()}>
+          Save minimum score
+        </Button>
+      </div>
+
+      {error && (
+        <p className="budget-error" role="alert">
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}
+
+/**
  * When a monitor runs, and a way to change it. US-041.
  *
  * This was unreachable until then: `poll_interval_seconds` has existed since
@@ -468,6 +535,7 @@ export function MonitorDetail({
               <dd className="monitor-key-value">{monitor.matches ? monitor.matches.total : "—"}</dd>
               <small className="monitor-key-note">
                 {monitor.matches ? `${monitor.matches.unread} unread` : "Count unavailable"}
+                {monitor.minScore === undefined ? "" : ` · minimum score ${monitor.minScore}`}
               </small>
             </div>
             <div className="monitor-key-metric">
@@ -616,6 +684,16 @@ export function MonitorDetail({
             <section className="monitor-settings-section">
               <h3>Which posts the AI reads</h3>
               <PreFilterForm monitor={monitor} onSaved={load} />
+            </section>
+
+            <section className="monitor-settings-section">
+              <h3>Which posts become matches</h3>
+              <p>
+                A post becomes a match when its score reaches this number. A post under it is
+                scored, paid for, and never shown. A higher number hides leads before anybody sees
+                them.
+              </p>
+              <ThresholdForm monitor={monitor} onSaved={load} />
             </section>
 
             <nav className="monitor-card-actions" aria-label="Monitor links">

@@ -26,11 +26,14 @@ const hiringMonitor = {
   name: "Agencies hiring for QA",
   projectId,
 };
-/** Typed, so a case can add the project a monitor belongs to. US-045. */
-const monitors: { id: string; name: string; projectId?: string | null }[] = [
-  qaMonitor,
-  hiringMonitor,
-];
+/** Typed, so a case can add the project a monitor belongs to (US-045) or its threshold (US-264). */
+const monitors: {
+  id: string;
+  name: string;
+  projectId?: string | null;
+  lastPolledAt?: string | null;
+  minScore?: number;
+}[] = [qaMonitor, hiringMonitor];
 
 function match(overrides: Record<string, unknown> = {}) {
   return {
@@ -820,6 +823,25 @@ describe("the intent inbox", () => {
       String(url).startsWith("/api/matches"),
     ).length;
     expect(after).toBe(before + 1);
+  });
+
+  it("names the minimum score once a monitor has polled and nothing cleared it", async () => {
+    // US-264. Before this, "nobody is talking" and "nothing cleared 30" were
+    // the same empty screen.
+    await show({ "/api/matches?": { matches: [], nextCursor: null, asOf: "x" } }, [
+      { ...qaMonitor, lastPolledAt: "2026-09-05T11:00:00.000Z", minScore: 30 },
+    ]);
+
+    expect(container.textContent).toContain("Only a post that scores 30 or more becomes a match");
+  });
+
+  it("says nothing about the score before any monitor has polled", async () => {
+    await show({ "/api/matches?": { matches: [], nextCursor: null, asOf: "x" } }, [
+      { ...qaMonitor, lastPolledAt: null, minScore: 30 },
+    ]);
+
+    expect(container.textContent).toContain("Nothing has matched yet");
+    expect(container.textContent).not.toContain("becomes a match");
   });
 
   it("offers to clear the filters when the filters are what is empty", async () => {

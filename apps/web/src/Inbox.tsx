@@ -84,6 +84,31 @@ interface MonitorSummary {
   name: string;
   /** Optional, for BUG-009's reason: an older API does not send it. US-045. */
   projectId?: string | null;
+  /** Null until the first poll. Optional for the same reason. */
+  lastPolledAt?: string | null;
+  /** The score a post must reach to become a match. US-264. Optional, as above. */
+  minScore?: number;
+}
+
+/**
+ * Why an inbox that has been polled is still empty, or null. US-264.
+ *
+ * An empty inbox has two readings: nobody is talking, or nothing cleared the
+ * monitor's minimum score. The second was invisible, and the person cannot
+ * tell the two apart without the number. It is named only once a monitor has
+ * polled, because before that the answer is simply "not yet".
+ */
+export function thresholdSentence(monitors: readonly MonitorSummary[]): string | null {
+  const polled = monitors.filter((row) => row.lastPolledAt && row.minScore !== undefined);
+  if (polled.length === 0) return null;
+
+  const scores = [...new Set(polled.map((row) => row.minScore as number))].sort((a, b) => a - b);
+  const floor =
+    scores.length === 1
+      ? `${scores[0]}`
+      : `its monitor's minimum score (${scores[0]} to ${scores[scores.length - 1]})`;
+
+  return `Only a post that scores ${floor} or more becomes a match. If you think that is hiding leads, lower the minimum score on the monitor page.`;
 }
 
 type LoadState = "loading" | "more" | "ready" | "error";
@@ -350,7 +375,14 @@ export function Inbox({ projectId }: { readonly projectId: string }) {
 
         const mine = rows.filter((row) => row.projectId === projectId);
 
-        setMonitors(mine.map(({ id, name }) => ({ id, name })));
+        setMonitors(
+          mine.map(({ id, name, lastPolledAt, minScore }) => ({
+            id,
+            name,
+            lastPolledAt,
+            minScore,
+          })),
+        );
 
         // The monitor filter can outlive the project it belonged to. Clearing
         // it is the honest reset: keeping it would show an empty inbox and
@@ -774,6 +806,7 @@ export function Inbox({ projectId }: { readonly projectId: string }) {
               <p>
                 Your monitors collect on their own schedule. Matches appear here as they are scored.
               </p>
+              {thresholdSentence(monitors) && <p>{thresholdSentence(monitors)}</p>}
               <button
                 className="secondary-button"
                 type="button"

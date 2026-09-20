@@ -45,6 +45,8 @@ export function monitor(overrides: Record<string, unknown> = {}) {
     },
     feedback: { good: 0, notRelevant: 0 },
     matches: { total: 0, unread: 0 },
+    // The package's default. US-264.
+    minScore: 30,
     ...overrides,
   };
 }

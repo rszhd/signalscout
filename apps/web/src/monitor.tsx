@@ -135,6 +135,13 @@ export interface Monitor {
   budget: Budget | null;
   spend: Spend;
   preFilter: PreFilter;
+  /**
+   * The score a post must reach to become a match. US-264.
+   *
+   * Optional for `lastPoll`'s reason: an older API does not send it. The
+   * package's default is 30, and US-223 says why it stays there.
+   */
+  minScore?: number;
   feedback: Feedback;
   /**
    * How many matches came out. US-109.

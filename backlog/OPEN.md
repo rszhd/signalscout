@@ -2,7 +2,7 @@
 
 # Open tickets
 
-33 open — 0 doing, 29 todo, 4 parked (1 p1, 23 p2, 9 p3).
+32 open — 0 doing, 28 todo, 4 parked (1 p1, 22 p2, 9 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -22,7 +22,6 @@
 | p2 | US-233 | [A dry run estimates the pair it is about to call](todo/US-233-a-dry-run-estimates-the-pair-it-is-about-to-call.md) | bug | todo | 2026-09-19T16:45+08:00 |
 | p2 | US-244 | [The screens no browser has rendered](todo/US-244-the-screens-no-browser-has-rendered.md) | chore | todo | 2026-09-20T00:56+08:00 |
 | p2 | US-260 | [A script measures what a session reads before it writes](todo/US-260-a-script-measures-what-a-session-reads-before-it-writes.md) | chore | todo | 2026-09-20T02:30+08:00 |
-| p2 | US-264 | [The monitor form sets the minimum score](todo/US-264-the-monitor-form-sets-the-minimum-score.md) | feature | todo | 2026-09-20T09:00+08:00 |
 | p2 | US-265 | [The inbox and the monitor page say which stage runs now](todo/US-265-the-inbox-and-the-monitor-page-say-which-stage-runs-now.md) | feature | todo | 2026-09-20T09:03+08:00 |
 | p2 | US-266 | [The monitor history shows every stage](todo/US-266-the-monitor-history-shows-every-stage.md) | feature | todo | 2026-09-20T09:05+08:00 |
 | p2 | US-267 | [The monitor page says which queries and sources earn their keep](todo/US-267-the-monitor-page-says-which-queries-and-sources-earn-their-keep.md) | feature | todo | 2026-09-20T09:08+08:00 |

@@ -22,10 +22,10 @@ import {
   feedbackLabel,
   formatMicros,
   type Monitor,
+  MonitorHistory,
   monitoringState,
   monthLabel,
   nextPollLabel,
-  PollHistory,
   type PreFilter,
   status,
   toMicros,
@@ -668,11 +668,11 @@ export function MonitorDetail({
               <div className="monitor-section-heading">
                 <div>
                   <p className="monitor-section-label">History</p>
-                  <h2 className="monitor-detail-title">Recent polls</h2>
+                  <h2 className="monitor-detail-title">Recent activity</h2>
                 </div>
-                <span className="monitor-section-note">Last 20</span>
+                <span className="monitor-section-note">Newest first</span>
               </div>
-              <PollHistory monitorId={monitor.id} />
+              <MonitorHistory monitorId={monitor.id} working={monitoring?.working === true} />
             </section>
           </div>
 

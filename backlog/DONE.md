@@ -2,7 +2,7 @@
 
 # Done
 
-171 finished.
+172 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
@@ -26,6 +26,7 @@
 | BUG-003 | [A post below the threshold is classified again on every poll](done/2026-09/BUG-003-a-post-below-the-threshold-is-classified-again-on-every-poll.md) | bug | fixed | 2026-09 |
 | BUG-002 | [A seven-day window is bought as a month](done/2026-09/BUG-002-a-seven-day-window-is-bought-as-a-month.md) | bug | fixed | 2026-09 |
 | BUG-001 | [A pending Reddit collection is not resumed](done/2026-09/BUG-001-a-pending-reddit-collection-is-not-resumed.md) | bug | shipped | 2026-09 |
+| US-266 | [The monitor history shows every stage](done/2026-09/US-266-the-monitor-history-shows-every-stage.md) | feature | shipped | 2026-09 |
 | US-265 | [The inbox and the monitor page say which stage runs now](done/2026-09/US-265-the-inbox-and-the-monitor-page-say-which-stage-runs-now.md) | feature | shipped | 2026-09 |
 | US-264 | [The monitor form sets the minimum score](done/2026-09/US-264-the-monitor-form-sets-the-minimum-score.md) | feature | shipped | 2026-09 |
 | US-261 | [The spacing scale lives in design.md](done/2026-09/US-261-the-spacing-scale-lives-in-design-md.md) | chore | shipped | 2026-09 |

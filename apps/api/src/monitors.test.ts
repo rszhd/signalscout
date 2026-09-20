@@ -33,6 +33,7 @@ import {
   recordModelCall,
   recordPollRun,
   recordSourceUsage,
+  recordStageRun,
   recordVerdict,
   setProviderChoice,
 } from "@signalscout/pipeline";
@@ -1438,6 +1439,151 @@ describe("the monitor routes", () => {
         // And it is not in the list either, so its count is in nobody's row.
         const list = await app.inject({ method: "GET", url: "/api/monitors" });
         expect(list.json().some((one: { id: string }) => one.id === row?.id)).toBe(false);
+      });
+    });
+
+    /**
+     * The history as one list. US-266.
+     *
+     * A poll and the stages after it, merged and newest first, so "the poll
+     * collected 72, the filter kept 12, the classifier matched 3" reads as
+     * one story rather than as three routes.
+     */
+    describe("the activity", () => {
+      async function writeStage(
+        monitorId: string,
+        stage: "filter" | "classify",
+        startedAt: Date,
+        pollRunId: string | null,
+      ) {
+        return await recordStageRun(db, {
+          monitorId,
+          userId: owner,
+          stage,
+          pollRunId,
+          startedAt,
+          finishedAt: startedAt,
+          outcome: "done",
+          itemsIn: 72,
+          itemsOut: stage === "filter" ? 12 : 3,
+          detail:
+            stage === "filter"
+              ? { stage: "filter", keyword: 50, embedding: 8, triage: 2 }
+              : {
+                  stage: "classify",
+                  scored: 12,
+                  matched: 3,
+                  unclassified: 0,
+                  dropped: 0,
+                  leftByCap: 0,
+                },
+        });
+      }
+
+      it("merges polls and stages, newest first, with the poll each stage came from", async () => {
+        await withServer({}, async (app) => {
+          const id = await create(app);
+          const now = Date.now();
+          const t = (minutesAgo: number) => new Date(now - minutesAgo * 60_000);
+          const older = await writePoll(id, { startedAt: t(60), finishedAt: t(60) });
+          await writeStage(id, "filter", t(59), older.id);
+          const newer = await writePoll(id, {
+            startedAt: t(10),
+            finishedAt: t(10),
+            outcome: "collected",
+            postsReturned: 72,
+            postsNew: 12,
+          });
+          await writeStage(id, "filter", t(9), newer.id);
+          await writeStage(id, "classify", t(8), newer.id);
+
+          const response = await app.inject({ method: "GET", url: `/api/monitors/${id}/activity` });
+
+          expect(response.statusCode).toBe(200);
+          const page = response.json();
+          expect(
+            page.entries.map(
+              (entry: { kind: string; poll?: { id: string }; stage?: { stage: string } }) =>
+                entry.kind === "poll"
+                  ? `poll:${entry.poll?.id === newer.id ? "newer" : "older"}`
+                  : entry.stage?.stage,
+            ),
+          ).toEqual(["classify", "filter", "poll:newer", "filter", "poll:older"]);
+          expect(page.entries[0].stage.pollRunId).toBe(newer.id);
+          expect(page.entries[0].stage.detail).toMatchObject({ stage: "classify", matched: 3 });
+          // The oldest stage row kept is where the stage record ends.
+          expect(page.stagesRecordedSince).toBe(t(59).toISOString());
+          expect(page.more).toBe(false);
+        });
+      });
+
+      it("pages with before, and says when there is more", async () => {
+        await withServer({}, async (app) => {
+          const id = await create(app);
+          const at = (minutesAgo: number) => new Date(Date.now() - minutesAgo * 60_000);
+          for (const minutes of [5, 4, 3, 2, 1]) {
+            await writePoll(id, { startedAt: at(minutes), finishedAt: at(minutes) });
+          }
+
+          const first = (
+            await app.inject({ method: "GET", url: `/api/monitors/${id}/activity?limit=2` })
+          ).json();
+          expect(first.entries).toHaveLength(2);
+          expect(first.more).toBe(true);
+
+          const cursor = first.entries[1].at;
+          const second = (
+            await app.inject({
+              method: "GET",
+              url: `/api/monitors/${id}/activity?limit=2&before=${encodeURIComponent(cursor)}`,
+            })
+          ).json();
+          expect(second.entries).toHaveLength(2);
+          expect(second.entries.every((entry: { at: string }) => entry.at < cursor)).toBe(true);
+
+          const last = (
+            await app.inject({
+              method: "GET",
+              url: `/api/monitors/${id}/activity?limit=2&before=${encodeURIComponent(second.entries[1].at)}`,
+            })
+          ).json();
+          expect(last.entries).toHaveLength(1);
+          expect(last.more).toBe(false);
+        });
+      });
+
+      it("answers 404 for a monitor that is not this account's, and never its rows", async () => {
+        const [row] = await db
+          .insert(monitors)
+          .values({
+            userId: "somebody-else",
+            name: "Not yours",
+            product: "A test runner",
+            idealCustomer: "Small SaaS teams",
+            problem: "Flaky end-to-end tests",
+            sources: ["reddit"],
+          })
+          .returning({ id: monitors.id });
+        if (!row) throw new Error("The monitor was not inserted.");
+        await recordStageRun(db, {
+          monitorId: row.id,
+          userId: "somebody-else",
+          stage: "filter",
+          startedAt: new Date(),
+          finishedAt: new Date(),
+          outcome: "done",
+          itemsIn: 1,
+          itemsOut: 1,
+        });
+
+        await withServer({}, async (app) => {
+          const response = await app.inject({
+            method: "GET",
+            url: `/api/monitors/${row.id}/activity`,
+          });
+
+          expect(response.statusCode).toBe(404);
+        });
       });
     });
   });

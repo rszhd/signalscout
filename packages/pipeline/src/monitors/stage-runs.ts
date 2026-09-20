@@ -18,7 +18,7 @@
  * **A failure writes its row before it throws.** The queue retries the job and
  * the retry cannot say what the attempt before it did.
  */
-import { and, desc, eq, sql } from "drizzle-orm";
+import { and, desc, eq, lt, sql } from "drizzle-orm";
 import type { Database } from "../db/client.js";
 import {
   monitors,
@@ -131,12 +131,17 @@ export async function recordStageRun(
  * The owner is an argument rather than something this reads from the monitor,
  * which is BUG-009's lesson stated in a signature: a caller cannot forget to
  * scope a read it cannot perform unscoped.
+ *
+ * `before` is the page cursor: rows that started strictly before that instant.
+ * A screen that has read the first page hands back the oldest `startedAt` it
+ * holds and gets the next one. Absent means the newest page. US-266.
  */
 export async function readStageRuns(
   db: Database,
   userId: string,
   monitorId: string,
   limit = maxStageRunsRead,
+  before?: Date,
 ): Promise<StageRun[]> {
   const [owned] = await db
     .select({ id: monitors.id })
@@ -149,7 +154,13 @@ export async function readStageRuns(
   const rows = await db
     .select()
     .from(stageRuns)
-    .where(and(eq(stageRuns.monitorId, monitorId), eq(stageRuns.userId, userId)))
+    .where(
+      and(
+        eq(stageRuns.monitorId, monitorId),
+        eq(stageRuns.userId, userId),
+        before ? lt(stageRuns.startedAt, before) : undefined,
+      ),
+    )
     .orderBy(desc(stageRuns.startedAt))
     .limit(Math.min(limit, maxStageRunsRead));
 

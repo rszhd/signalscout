@@ -19,9 +19,15 @@ versioned and is not described here; it is what `main` holds.
 
 ## Unreleased
 
-Nothing a consumer must react to. `packages/pipeline`'s `schema.ts` is a
-barrel over one file per table family now (US-248); every export keeps its
-name and `drizzle-kit generate` produces no migration.
+**Added.** `readPollRuns` and `readStageRuns` take an optional fifth argument,
+`before: Date`, and answer the rows that started strictly before it: the next
+page, for a screen that holds the oldest `startedAt` of the page it has
+(US-266). Absent, both read the newest page as before. A new optional
+parameter, so the version is a minor.
+
+`packages/pipeline`'s `schema.ts` is a barrel over one file per table family
+now (US-248); every export keeps its name and `drizzle-kit generate` produces
+no migration.
 
 ## 0.11.0 — 2026-09-19
 

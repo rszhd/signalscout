@@ -6,7 +6,7 @@ priority: p2
 created: 2026-09-20T09:05+08:00
 parent:
 area: web
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -37,17 +37,17 @@ BUG-025, and which hold here:
 
 ## Acceptance
 
-- [ ] `GET /api/monitors/:id/activity` returns polls and their stages as one
+- [x] `GET /api/monitors/:id/activity` returns polls and their stages as one
       collection, newest first, and a test proves the order at both levels.
-- [ ] A test scopes the read to the monitor's owner.
-- [ ] Each stage line says what it did in a sentence: posts dropped and by
+- [x] A test scopes the read to the monitor's owner.
+- [x] Each stage line says what it did in a sentence: posts dropped and by
       which rule, threads read, posts scored and how many matched, the cap
       that stopped it.
-- [ ] Every history row reads "This poll", and only *Current activity* reads
+- [x] Every history row reads "This poll", and only *Current activity* reads
       "Last poll"; a test pins both callers.
-- [ ] The list says where the stage record ends when the polls go further
+- [x] The list says where the stage record ends when the polls go further
       back.
-- [ ] The read is under `maxStageRunsRead` and the screen pages past it.
+- [x] The read is under `maxStageRunsRead` and the screen pages past it.
 
 ## Notes
 
@@ -63,3 +63,18 @@ BUG-025, and which hold here:
 
 - 2026-09-20T09:05+08:00 — Written from the cross-repository review of the
   cloud's changes since the split.
+- 2026-09-20T11:30+08:00 — Shipped. The package's `readPollRuns` and
+  `readStageRuns` take an optional `before: Date` so a screen can page past
+  `maxStageRunsRead`; noted under Unreleased as a minor, and built against
+  the working copy. `GET /api/monitors/:id/activity` answers a page:
+  `entries` merged newest first and cut to `limit`, `more`, and
+  `stagesRecordedSince`, the oldest stage row kept, which is where the
+  screen says the stages are gone rather than absent. `MonitorHistory`
+  replaces `PollHistory` on the monitor page, groups stages under their
+  exact poll, reads on the shared refresh clock, leaves notification
+  deliveries out, and offers *Show older*. `pollSummary` takes a subject.
+  3 route cases, 2 package cases, 21 unit cases and 6 page cases; four
+  mutations (stages oldest first in a group, the history saying "Last
+  poll", the record-end note shown always, the API oldest first) each went
+  red. 781 tests pass across web, API and the touched package files. No
+  browser has rendered the list.

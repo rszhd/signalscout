@@ -12,6 +12,7 @@ import {
   minimumPollIntervalSeconds,
   type PollRun,
   platforms,
+  type StageRun,
   searchQuerySchemaFor,
   signals as signalIds,
   sources as storableSources,
@@ -279,6 +280,106 @@ export const pollRunSchema = z.object({
     }),
   ),
 });
+
+export const stageDetailSchema = z.discriminatedUnion("stage", [
+  z.object({
+    stage: z.literal("filter"),
+    keyword: z.number(),
+    embedding: z.number(),
+    triage: z.number(),
+  }),
+  z.object({
+    stage: z.literal("replies"),
+    threadsOpened: z.number(),
+    threadsSkipped: z.number(),
+    pagesBought: z.number(),
+  }),
+  z.object({
+    stage: z.literal("classify"),
+    /** What the model answered for in this run, not what the run was handed. */
+    scored: z.number(),
+    /** Already scored under this monitor's version, so not asked again. US-206. */
+    skipped: z.number().optional(),
+    matched: z.number(),
+    unclassified: z.number(),
+    dropped: z.number(),
+    leftByCap: z.number(),
+  }),
+  z.object({ stage: z.literal("notify"), deliveries: z.number() }),
+]);
+
+export const stageRunSchema = z.object({
+  id: z.string(),
+  stage: z.string(),
+  /** The collection this stage was part of, or null. US-203. */
+  walkId: z.string().nullable(),
+  /**
+   * The poll inside that collection whose posts it processed, or null. US-211.
+   *
+   * Null in three ordinary cases, and a screen has to read all three the same
+   * way — as "poll unknown", never as a guess. A row written before the field
+   * existed has nothing to attribute. A poll trimmed away takes its reference
+   * with it, since `poll_runs` keeps 200 rows per monitor against
+   * `stage_runs`' 800. And the notification sweep belongs to no collection at
+   * all.
+   */
+  pollRunId: z.string().nullable(),
+  startedAt: z.string(),
+  finishedAt: z.string(),
+  outcome: z.string(),
+  itemsIn: z.number(),
+  itemsOut: z.number(),
+  units: z.number(),
+  estimatedCostMicros: z.number(),
+  detail: stageDetailSchema.nullable(),
+  stopReason: z.string().nullable(),
+});
+
+/**
+ * The history, as one list. US-266.
+ *
+ * A poll and a stage are different rows with different columns, so the entry
+ * carries one or the other and says which. `at` is what the list is ordered
+ * by, lifted out of both so the browser does not have to know where each kind
+ * keeps its clock.
+ */
+export const activityEntrySchema = z.discriminatedUnion("kind", [
+  z.object({ kind: z.literal("poll"), at: z.string(), poll: pollRunSchema }),
+  z.object({ kind: z.literal("stage"), at: z.string(), stage: stageRunSchema }),
+]);
+
+export const activityPageSchema = z.object({
+  entries: z.array(activityEntrySchema),
+  /**
+   * Where the stage record ends, or null when the monitor has none. US-266.
+   *
+   * `stage_runs` keeps 800 rows per monitor and `poll_runs` 200, so a long
+   * history thins to polls alone at the bottom. This is the `startedAt` of the
+   * oldest stage row still kept: a poll older than it had stages once, and
+   * they are gone rather than absent, which the screen says.
+   */
+  stagesRecordedSince: z.string().nullable(),
+  /** Whether asking with `before` set to the last entry's `at` would answer more. */
+  more: z.boolean(),
+});
+
+export function toStageRunResponse(run: StageRun) {
+  return {
+    id: run.id,
+    stage: run.stage,
+    walkId: run.walkId,
+    pollRunId: run.pollRunId,
+    startedAt: run.startedAt.toISOString(),
+    finishedAt: run.finishedAt.toISOString(),
+    outcome: run.outcome,
+    itemsIn: run.itemsIn,
+    itemsOut: run.itemsOut,
+    units: run.units,
+    estimatedCostMicros: run.estimatedCostMicros,
+    detail: run.detail,
+    stopReason: run.stopReason,
+  };
+}
 
 export function toPollRunResponse(run: PollRun) {
   return {

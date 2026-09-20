@@ -1,11 +1,25 @@
 /**
  * One monitor's reads: the row, and what its polls did. US-265.
  */
-import { maxPollRunsRead, readPollRuns } from "@signalscout/pipeline";
+import {
+  maxPollRunsRead,
+  maxStageRunsRead,
+  readPollRuns,
+  readStageRuns,
+  stageRuns,
+} from "@signalscout/pipeline";
+import { and, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import { ownedMonitor, sessionUserId } from "../auth.js";
 import type { ApiServer } from "../server.js";
-import { monitorSchema, pollRunSchema, problemSchema, toPollRunResponse } from "./schemas.js";
+import {
+  activityPageSchema,
+  monitorSchema,
+  pollRunSchema,
+  problemSchema,
+  toPollRunResponse,
+  toStageRunResponse,
+} from "./schemas.js";
 import { type MonitorContext, readResponse } from "./shared.js";
 
 export function registerDetailRoutes(app: ApiServer, context: MonitorContext): void {
@@ -62,6 +76,86 @@ export function registerDetailRoutes(app: ApiServer, context: MonitorContext): v
       );
 
       return runs.map(toPollRunResponse);
+    },
+  });
+
+  /**
+   * Everything this monitor has done, in one list. US-266.
+   *
+   * The polls and the stages after them, merged and ordered by time, because
+   * that is how a person reads a history: the poll collected 72 posts, the
+   * filter kept 12 of them, the classifier matched 3, the notifier sent 1.
+   * Read as two lists on two screens, those four facts are four separate
+   * questions.
+   *
+   * Merged here and not in the browser. Two requests would render half a
+   * history while the other half was in flight, and the page would reorder
+   * itself under somebody reading it.
+   *
+   * `before` pages it: the screen hands back the oldest `at` it holds. Each
+   * table is asked for a whole page past that cursor, because either kind may
+   * fill the top of a page — a monitor that has just polled four times has no
+   * stage rows yet, and one classifying a backlog has little else — and the
+   * merged page is cut to `limit`. `more` is true when either table had a row
+   * beyond the cut.
+   *
+   * The two tables keep different amounts: `poll_runs` holds 200 rows per
+   * monitor and `stage_runs` holds 800. So the bottom of a long list thins out
+   * to polls alone rather than ending. `stagesRecordedSince` is where that
+   * happens, so the screen can say the stages are gone rather than absent.
+   */
+  app.route({
+    method: "GET",
+    url: "/api/monitors/:id/activity",
+    schema: {
+      params: z.object({ id: z.uuid() }),
+      querystring: z.object({
+        limit: z.coerce.number().int().min(1).max(maxStageRunsRead).optional(),
+        before: z.iso.datetime().optional(),
+      }),
+      response: { 200: activityPageSchema, 404: problemSchema },
+    },
+    handler: async (request, reply) => {
+      if (!(await ownedMonitor(db, request, request.params.id))) {
+        return reply.code(404).send({ message: "No monitor has that id." });
+      }
+
+      const limit = request.query.limit ?? maxStageRunsRead;
+      const before = request.query.before ? new Date(request.query.before) : undefined;
+      const userId = sessionUserId(request);
+
+      const [polls, stages, [floor]] = await Promise.all([
+        readPollRuns(db, userId, request.params.id, Math.min(limit, maxPollRunsRead), before),
+        readStageRuns(db, userId, request.params.id, limit, before),
+        db
+          .select({ since: sql<Date | null>`min(${stageRuns.startedAt})` })
+          .from(stageRuns)
+          .where(and(eq(stageRuns.monitorId, request.params.id), eq(stageRuns.userId, userId))),
+      ]);
+
+      const entries = [
+        ...polls.map((run) => ({
+          kind: "poll" as const,
+          at: run.startedAt.toISOString(),
+          poll: toPollRunResponse(run),
+        })),
+        ...stages.map((run) => ({
+          kind: "stage" as const,
+          at: run.startedAt.toISOString(),
+          stage: toStageRunResponse(run),
+        })),
+      ].sort((left, right) => right.at.localeCompare(left.at));
+
+      const since = floor?.since ? new Date(floor.since) : null;
+
+      return {
+        entries: entries.slice(0, limit),
+        stagesRecordedSince: since ? since.toISOString() : null,
+        more:
+          entries.length > limit ||
+          polls.length >= Math.min(limit, maxPollRunsRead) ||
+          stages.length >= limit,
+      };
     },
   });
 }

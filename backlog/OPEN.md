@@ -2,7 +2,7 @@
 
 # Open tickets
 
-30 open — 0 doing, 26 todo, 4 parked (1 p1, 20 p2, 9 p3).
+29 open — 0 doing, 25 todo, 4 parked (1 p1, 19 p2, 9 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -22,7 +22,6 @@
 | p2 | US-233 | [A dry run estimates the pair it is about to call](todo/US-233-a-dry-run-estimates-the-pair-it-is-about-to-call.md) | bug | todo | 2026-09-19T16:45+08:00 |
 | p2 | US-244 | [The screens no browser has rendered](todo/US-244-the-screens-no-browser-has-rendered.md) | chore | todo | 2026-09-20T00:56+08:00 |
 | p2 | US-260 | [A script measures what a session reads before it writes](todo/US-260-a-script-measures-what-a-session-reads-before-it-writes.md) | chore | todo | 2026-09-20T02:30+08:00 |
-| p2 | US-266 | [The monitor history shows every stage](todo/US-266-the-monitor-history-shows-every-stage.md) | feature | todo | 2026-09-20T09:05+08:00 |
 | p2 | US-267 | [The monitor page says which queries and sources earn their keep](todo/US-267-the-monitor-page-says-which-queries-and-sources-earn-their-keep.md) | feature | todo | 2026-09-20T09:08+08:00 |
 | p2 | US-268 | [An inbox item has an address](todo/US-268-an-inbox-item-has-an-address.md) | feature | todo | 2026-09-20T09:10+08:00 |
 | p2 | US-269 | [The search plan is a model task of its own](todo/US-269-the-search-plan-is-a-model-task-of-its-own.md) | feature | todo | 2026-09-20T09:12+08:00 |

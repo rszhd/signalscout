@@ -6,10 +6,10 @@
  * time somebody edits one of them, and "Found nothing" on one screen beside
  * "Running" on the other is the exact failure US-104 was written to end.
  *
- * Nothing here fetches or holds state except `PollHistory`, which is a
- * component because both screens show the same list of polls.
+ * Nothing here fetches or holds state except `MonitorHistory`, which is a
+ * component because it is the one list the monitor page reads on a clock.
  */
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { messageFor, requestJson } from "./api.js";
 import { BrandIcon } from "./BrandIcon.js";
 import { ageLabel, platformName, untilLabel } from "./labels.js";
@@ -304,23 +304,36 @@ export function stopReasonLabel(reason: string | null): string | null {
 }
 
 /**
- * What the last poll did, in one line, without opening anything.
+ * Which poll a sentence is about. US-266.
+ *
+ * `last` is the one poll that is the last: the current-activity line and the
+ * list's column mean it. `this` describes a row in a history, where every row
+ * saying "Last poll" was a claim only the top one could make.
+ */
+export type PollSubject = "last" | "this";
+
+/**
+ * What one poll did, in one line, without opening anything.
  *
  * The spend is on it whenever there was any, and that is the point rather than
  * a detail: a poll that found nothing and cost nothing is a quiet platform,
  * and a poll that found nothing and cost money is not. Only the two numbers
  * together say which.
+ *
+ * The subject defaults to `last` because three of the four callers mean it,
+ * and the fourth — the history — is the one that names its own.
  */
-export function pollSummary(run: PollRun): string {
+export function pollSummary(run: PollRun, subject: PollSubject = "last"): string {
   const spent = run.units > 0 ? ` · ${formatMicros(run.estimatedCostMicros)} (estimated)` : "";
   const reason = stopReasonLabel(run.stopReason);
+  const which = subject === "this" ? "This poll" : "Last poll";
 
   if (run.outcome === "refused") {
-    return `Last poll collected nothing: ${reason ?? "it was refused"}`;
+    return `${which} collected nothing: ${reason ?? "it was refused"}`;
   }
 
   if (run.outcome === "failed") {
-    return `The last poll failed${spent}`;
+    return `${subject === "this" ? "This poll" : "The last poll"} failed${spent}`;
   }
 
   if (run.outcome === "waiting") {
@@ -329,7 +342,7 @@ export function pollSummary(run: PollRun): string {
 
   if (run.outcome === "empty") {
     const because = reason ? `, and ${reason}` : "";
-    return `Last poll found no posts${because}${spent}`;
+    return `${which} found no posts${because}${spent}`;
   }
 
   /**
@@ -345,10 +358,10 @@ export function pollSummary(run: PollRun): string {
 
   if (lost.length > 0) {
     const names = lost.map((entry) => platformName(entry.source)).join(", ");
-    return `Last poll: ${run.postsReturned} posts, ${run.postsNew} new${spent} · ${names} failed`;
+    return `${which}: ${run.postsReturned} posts, ${run.postsNew} new${spent} · ${names} failed`;
   }
 
-  return `Last poll: ${run.postsReturned} posts, ${run.postsNew} new${spent}`;
+  return `${which}: ${run.postsReturned} posts, ${run.postsNew} new${spent}`;
 }
 
 /**
@@ -645,32 +658,313 @@ export function anyWorking(monitors: readonly Monitor[]): boolean {
 }
 
 /**
- * This monitor's recent polls.
+ * One finished run of a stage after the poll. US-266, from US-201's table.
  *
- * The list screen no longer carries this at all: it shows one line per monitor
- * and links to the page, and the page is opened to read exactly this, so it is
- * fetched as the page loads rather than behind a disclosure somebody has to
- * find.
+ * `Stage` above is the live one, read off the queue: what is happening now.
+ * This is the record of one that ended, with what it produced — which the
+ * queue row never held.
  */
-export function PollHistory({ monitorId }: { readonly monitorId: string }) {
-  const [runs, setRuns] = useState<PollRun[] | null>(null);
+export type StageRunDetail =
+  | { stage: "filter"; keyword: number; embedding: number; triage: number }
+  | { stage: "replies"; threadsOpened: number; threadsSkipped: number; pagesBought: number }
+  | {
+      stage: "classify";
+      /** What the model answered for in this run. US-206. */
+      scored: number;
+      /**
+       * Already scored, so not asked again — BUG-003's skip. Optional: a row
+       * written before US-206 counted the skipped posts as scored and has no
+       * number for this.
+       */
+      skipped?: number;
+      matched: number;
+      unclassified: number;
+      dropped: number;
+      leftByCap: number;
+    }
+  | { stage: "notify"; deliveries: number };
+
+export interface StageRun {
+  id: string;
+  stage: string;
+  /** The collection this stage was part of, or null. US-203. */
+  walkId: string | null;
+  /** The exact poll whose posts this stage processed, or null for older rows. US-211. */
+  pollRunId: string | null;
+  startedAt: string;
+  finishedAt: string;
+  outcome: string;
+  itemsIn: number;
+  itemsOut: number;
+  units: number;
+  estimatedCostMicros: number;
+  detail: StageRunDetail | null;
+  stopReason: string | null;
+}
+
+/** One line of the history: a poll, or a stage that ran after one. */
+export type ActivityEntry =
+  | { kind: "poll"; at: string; poll: PollRun }
+  | { kind: "stage"; at: string; stage: StageRun };
+
+/** One page of the history, as the API sends it. */
+export interface ActivityPage {
+  entries: ActivityEntry[];
+  /** Where the stage record ends, or null when there is none. */
+  stagesRecordedSince: string | null;
+  more: boolean;
+}
+
+/** Why a stage refused, in the words the rest of the screen uses. */
+const stageRefusals: Record<string, string> = {
+  budget_exhausted: "the monthly budget was spent",
+  no_model: "no model is configured",
+  no_credentials: "no provider has a key",
+  error: "it failed",
+};
+
+/**
+ * `3 posts`, `1 post`, `2 replies`. The history counts things in nearly every
+ * sentence, and one of the nouns does not take a plain `s`.
+ */
+function count(items: number, noun: string, plural = `${noun}s`): string {
+  return `${items} ${items === 1 ? noun : plural}`;
+}
+
+/**
+ * What one finished stage did, in one line.
+ *
+ * The verbs are past tense and the live bar's are present, deliberately: this
+ * list is read beside a headline that says "Scoring 12 posts", and two
+ * sentences that look the same for a stage that has ended and one that is
+ * running would be the failure US-104 named — a person cannot tell which
+ * half of the screen is about now.
+ *
+ * The drop words are the ones `countsSentence` uses on this same page, so the
+ * pre-filter is explained once and in one voice.
+ */
+export function stageDidLabel(run: StageRun): string {
+  const why = run.stopReason ? stageRefusals[run.stopReason] : null;
+  const detail = run.detail;
+
+  /**
+   * A run that produced nothing at all.
+   *
+   * `failed` is only this when there is no detail to read. A classification
+   * that scored ninety posts and could not score the last twenty-seven ends
+   * `failed` — the job throws so the queue retries it — and a line that said
+   * "Scored nothing of 117 posts: it failed" over a run that had just written
+   * twenty-seven matches would be wrong. What it did comes first, and the
+   * failure is said at the end, where it belongs.
+   */
+  if (run.outcome === "refused" || (run.outcome === "failed" && !detail)) {
+    const what =
+      run.stage === "classify"
+        ? `Scored nothing of ${count(run.itemsIn, "post")}`
+        : run.stage === "replies"
+          ? "Read no thread"
+          : run.stage === "notify"
+            ? `Sent none of ${count(run.itemsIn, "notification")}`
+            : `Filtered nothing of ${count(run.itemsIn, "post")}`;
+
+    return why ? `${what}: ${why}` : what;
+  }
+
+  if (detail?.stage === "filter") {
+    const were = (items: number) => (items === 1 ? "was" : "were");
+
+    const dropped = [
+      detail.keyword > 0 ? `${detail.keyword} did not use your words` : null,
+      detail.embedding > 0
+        ? `${detail.embedding} ${were(detail.embedding)} not about your subject`
+        : null,
+      detail.triage > 0 ? `${detail.triage} read as someone answering` : null,
+    ].filter((part): part is string => part !== null);
+
+    const kept = `Filtered ${count(run.itemsIn, "post")} — ${run.itemsOut} kept`;
+
+    return dropped.length > 0 ? `${kept}, ${dropped.join(", ")}` : kept;
+  }
+
+  if (detail?.stage === "replies") {
+    if (detail.threadsOpened === 0) {
+      return `Opened no thread of ${count(run.itemsIn, "post")}: none had grown`;
+    }
+
+    return `Read ${count(detail.threadsOpened, "thread")} — ${count(run.itemsOut, "reply", "replies")} stored, ${count(detail.pagesBought, "page")} bought`;
+  }
+
+  if (detail?.stage === "classify") {
+    const skipped = detail.skipped ?? 0;
+
+    const extra = [
+      // First, because it is what explains the two numbers above it. US-206:
+      // a retry is handed the whole batch and asks about almost none of it.
+      skipped > 0 ? `${skipped} already scored` : null,
+      detail.unclassified > 0 ? `${detail.unclassified} left unclassified` : null,
+      detail.dropped > 0 ? `${detail.dropped} given up on` : null,
+      detail.leftByCap > 0 ? `${detail.leftByCap} not reached: the cap` : null,
+    ].filter((part): part is string => part !== null);
+
+    /**
+     * "Scored 1 of 116 posts" where the run was handed more than it asked
+     * about, and "Scored 116 posts" where it asked about all of them. The
+     * second number is the batch, and printing it always would put "of 116" on
+     * every ordinary line to no purpose.
+     */
+    const scored =
+      skipped > 0
+        ? `Scored ${detail.scored} of ${count(run.itemsIn, "post")} — ${detail.matched} matched`
+        : `Scored ${count(detail.scored, "post")} — ${detail.matched} matched`;
+
+    return extra.length > 0 ? `${scored}, ${extra.join(", ")}` : scored;
+  }
+
+  if (detail?.stage === "notify") {
+    return `Sent ${count(run.itemsOut, "notification")}`;
+  }
+
+  // A stage this build has no sentence for — a worker newer than this bundle.
+  // The counts are still true, so they are what it says.
+  return `${run.stage}: ${run.itemsIn} in, ${run.itemsOut} out`;
+}
+
+/**
+ * What a stage did, and whether the job survived it.
+ *
+ * Two facts and not one word. A run can write matches and still throw, and
+ * this screen has to say both — the sentence for what it produced, and the
+ * retry that is about to happen, which is why the same batch appears again
+ * further up the list.
+ */
+export function stageLine(run: StageRun): string {
+  const did = stageDidLabel(run);
+
+  if (run.outcome !== "failed" || !run.detail) return did;
+
+  return `${did} — the job failed and will be retried`;
+}
+
+/**
+ * One poll and the completed processing it caused.
+ *
+ * A paging walk can hold several polls, so `walkId` cannot make this pairing.
+ * A stage joins a poll only through its exact `pollRunId`. Older stages and
+ * stages whose poll has aged out of the bounded response stay alone; placing
+ * them under the nearest poll would turn an unknown relationship into a lie.
+ *
+ * Everything is newest first: the groups by their latest event, and the stages
+ * inside one. One list cannot be read in two directions, and a reader scanning
+ * a panel headed *Newest first* is looking for what happened last. The
+ * sequence is not lost with the position: a stage carries its name, so
+ * `classify` above `filter` still reads as the later step. The poll stays
+ * above its stages because it is the group's header rather than one of them.
+ */
+export interface ActivityGroup {
+  key: string;
+  /** The newest moment in the group, which is where it sits in the list. */
+  at: string;
+  poll: Extract<ActivityEntry, { kind: "poll" }> | null;
+  stages: Array<Extract<ActivityEntry, { kind: "stage" }>>;
+}
+
+export function activityGroupsOf(entries: readonly ActivityEntry[]): ActivityGroup[] {
+  const groups: ActivityGroup[] = entries
+    .filter((entry) => entry.kind === "poll")
+    .map((poll) => ({ key: `poll-${poll.poll.id}`, at: poll.at, poll, stages: [] }));
+  const byPoll = new Map(
+    groups.flatMap((group) => (group.poll ? [[group.poll.poll.id, group] as const] : [])),
+  );
+
+  for (const stage of entries.filter((entry) => entry.kind === "stage")) {
+    const group = stage.stage.pollRunId ? byPoll.get(stage.stage.pollRunId) : undefined;
+
+    if (group) {
+      group.stages.push(stage);
+      if (stage.at > group.at) group.at = stage.at;
+    } else {
+      groups.push({ key: `stage-${stage.stage.id}`, at: stage.at, poll: null, stages: [stage] });
+    }
+  }
+
+  for (const group of groups) {
+    group.stages.sort((left, right) => right.at.localeCompare(left.at));
+  }
+
+  return groups.sort((left, right) => right.at.localeCompare(left.at));
+}
+
+/** How many entries one page of the history asks for. */
+export const historyPageSize = 40;
+
+/**
+ * This monitor's recent activity: every poll, and every stage after it. US-266.
+ *
+ * One request and one list. The poll collected 72 posts, the filter kept 12,
+ * the classifier matched 3, the notifier sent 1 — read as two lists those are
+ * four separate questions, and three of them had no answer at all before the
+ * pipeline wrote the rows.
+ *
+ * The page is opened to read exactly this, so it is fetched as the page loads
+ * rather than behind a disclosure somebody has to find, and it re-reads on the
+ * same clock the headline above it does. "Show older" asks for the next page,
+ * before the oldest entry held.
+ *
+ * Notification deliveries are left out. They are not collection work, and a
+ * line per digest between the polls and the scoring adds noise without saying
+ * how a match reached the inbox.
+ */
+export function MonitorHistory({
+  monitorId,
+  working,
+}: {
+  readonly monitorId: string;
+  readonly working: boolean;
+}) {
+  const [page, setPage] = useState<ActivityPage | null>(null);
+  const [older, setOlder] = useState<ActivityEntry[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [loadingOlder, setLoadingOlder] = useState(false);
+
+  const load = useCallback(async (): Promise<void> => {
+    try {
+      setPage(
+        await requestJson<ActivityPage>(
+          `/api/monitors/${monitorId}/activity?limit=${historyPageSize}`,
+        ),
+      );
+      setError(null);
+    } catch (cause: unknown) {
+      setError(messageFor(cause, "The history could not be loaded."));
+    }
+  }, [monitorId]);
 
   useEffect(() => {
-    let live = true;
+    setOlder([]);
+    void load();
+  }, [load]);
 
-    requestJson<PollRun[]>(`/api/monitors/${monitorId}/polls?limit=20`)
-      .then((answer) => {
-        if (live) setRuns(answer);
-      })
-      .catch((cause: unknown) => {
-        if (live) setError(messageFor(cause, "The polls could not be loaded."));
-      });
+  useMonitorRefresh(load, working);
 
-    return () => {
-      live = false;
-    };
-  }, [monitorId]);
+  const entries = [...(page?.entries ?? []), ...older];
+  const oldest = entries[entries.length - 1];
+  const lastPage = older.length > 0 ? older : (page?.entries ?? []);
+
+  async function loadOlder(): Promise<void> {
+    if (!oldest) return;
+    setLoadingOlder(true);
+    try {
+      const next = await requestJson<ActivityPage>(
+        `/api/monitors/${monitorId}/activity?limit=${historyPageSize}&before=${encodeURIComponent(oldest.at)}`,
+      );
+      setOlder((held) => [...held, ...next.entries]);
+      setPage((held) => (held ? { ...held, more: next.more } : held));
+    } catch (cause: unknown) {
+      setError(messageFor(cause, "The older history could not be loaded."));
+    } finally {
+      setLoadingOlder(false);
+    }
+  }
 
   if (error) {
     return (
@@ -680,35 +974,100 @@ export function PollHistory({ monitorId }: { readonly monitorId: string }) {
     );
   }
 
-  if (!runs) return <p className="monitor-origin">Loading…</p>;
+  if (!page) return <p className="monitor-origin">Loading…</p>;
 
-  if (runs.length === 0) return <p className="monitor-origin">No polls recorded yet.</p>;
+  const history = entries.filter(
+    (entry) => entry.kind !== "stage" || entry.stage.stage !== "notify",
+  );
+
+  if (history.length === 0) {
+    return <p className="monitor-origin">Nothing has run yet.</p>;
+  }
+
+  const groups = activityGroupsOf(history);
+  const since = page.stagesRecordedSince;
+  // The stage record ends before the polls do when a poll older than the
+  // oldest stage row is on screen: its stages ran, and they are gone.
+  const stagesEnded = since !== null && lastPage.some((entry) => entry.at < since);
 
   return (
-    <ul className="poll-history">
-      {runs.map((run) => (
-        <li key={run.id}>
-          <time
-            dateTime={run.startedAt}
-            title={new Date(run.startedAt).toLocaleString()}
-            className="poll-history-when"
-          >
-            {ageLabel(run.startedAt)}
-          </time>
-          <span className="poll-history-what">{pollSummary(run)}</span>
-          {/* Which platform did what, because a poll that skipped Reddit and
-              collected X is one row and two different answers. */}
-          <span className="poll-history-sources">
-            {run.sources.map((entry) => (
-              <span key={`${entry.source}-${entry.provider ?? "none"}`} className="brand-label">
-                <BrandIcon brand={entry.source} size={14} />
-                {platformName(entry.source)}: {entry.postsReturned} posts, {entry.postsNew} new
-                {entry.reason ? ` — ${stopReasonLabel(entry.reason)}` : ""}
-              </span>
-            ))}
-          </span>
-        </li>
+    <div className="poll-history">
+      {groups.map((group) => (
+        <div className="activity-collection" key={group.key}>
+          {group.poll && (
+            <ol className="activity-entries activity-poll-entries">
+              <PollEntry run={group.poll.poll} />
+            </ol>
+          )}
+          {group.stages.length > 0 && (
+            <ol
+              className={`activity-entries activity-stage-entries${group.poll ? " grouped" : ""}`}
+              aria-label={
+                group.poll ? "Processing after this poll" : "Processing with unknown poll"
+              }
+            >
+              {group.stages.map((entry) => (
+                <StageEntry key={entry.stage.id} at={entry.at} run={entry.stage} />
+              ))}
+            </ol>
+          )}
+        </div>
       ))}
-    </ul>
+      {stagesEnded && since && (
+        <p className="monitor-origin activity-record-end">
+          Stages are kept for a while and polls for longer. Polls before{" "}
+          <time dateTime={since}>{new Date(since).toLocaleString()}</time> had stages too; those
+          records are gone.
+        </p>
+      )}
+      {page.more && (
+        <button
+          className="secondary-button"
+          type="button"
+          disabled={loadingOlder}
+          onClick={() => void loadOlder()}
+        >
+          {loadingOlder ? "Loading…" : "Show older"}
+        </button>
+      )}
+    </div>
+  );
+}
+
+function StageEntry({ at, run }: { readonly at: string; readonly run: StageRun }) {
+  return (
+    <li className="activity-entry stage-entry">
+      <time dateTime={at} title={new Date(at).toLocaleString()} className="poll-history-when">
+        {ageLabel(at)}
+      </time>
+      <span className="poll-history-what">{stageLine(run)}</span>
+    </li>
+  );
+}
+
+function PollEntry({ run }: { readonly run: PollRun }) {
+  return (
+    <li className="activity-entry poll-entry">
+      <time
+        dateTime={run.startedAt}
+        title={new Date(run.startedAt).toLocaleString()}
+        className="poll-history-when"
+      >
+        {ageLabel(run.startedAt)}
+      </time>
+      {/* "this" poll: the reader is looking at the row. */}
+      <span className="poll-history-what">{pollSummary(run, "this")}</span>
+      {/* Which platform did what, because a poll that skipped Reddit and
+          collected X is one row and two different answers. */}
+      <span className="poll-history-sources">
+        {run.sources.map((entry) => (
+          <span key={`${entry.source}-${entry.provider ?? "none"}`} className="brand-label">
+            <BrandIcon brand={entry.source} size={14} />
+            {platformName(entry.source)}: {entry.postsReturned} posts, {entry.postsNew} new
+            {entry.reason ? ` — ${stopReasonLabel(entry.reason)}` : ""}
+          </span>
+        ))}
+      </span>
+    </li>
   );
 }

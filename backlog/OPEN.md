@@ -2,11 +2,12 @@
 
 # Open tickets
 
-31 open — 0 doing, 27 todo, 4 parked (1 p1, 21 p2, 9 p3).
+31 open — 1 doing, 26 todo, 4 parked (1 p1, 21 p2, 9 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
 | p1 | US-033 | [Thirty verdicts say whether the score is right](todo/US-033-thirty-verdicts-say-whether-the-score-is-right.md) | chore | todo | 2026-09-06T03:02+08:00 |
+| p2 | US-265 | [The inbox and the monitor page say which stage runs now](doing/US-265-the-inbox-and-the-monitor-page-say-which-stage-runs-now.md) | feature | doing | 2026-09-20T09:03+08:00 |
 | p2 | US-035 | [A monitor is told where people are talking](todo/US-035-a-monitor-is-told-where-people-are-talking.md) | spike | todo | 2026-09-06T11:40+08:00 |
 | p2 | US-036 | [A provider is rated per platform, from measurements](todo/US-036-a-provider-is-rated-per-platform-from-measurements.md) | spike | todo | 2026-09-06T11:48+08:00 |
 | p2 | US-037 | [One subscription is enough](todo/US-037-one-subscription-is-enough.md) | feature | todo | 2026-09-06T11:48+08:00 |
@@ -22,7 +23,6 @@
 | p2 | US-233 | [A dry run estimates the pair it is about to call](todo/US-233-a-dry-run-estimates-the-pair-it-is-about-to-call.md) | bug | todo | 2026-09-19T16:45+08:00 |
 | p2 | US-244 | [The screens no browser has rendered](todo/US-244-the-screens-no-browser-has-rendered.md) | chore | todo | 2026-09-20T00:56+08:00 |
 | p2 | US-260 | [A script measures what a session reads before it writes](todo/US-260-a-script-measures-what-a-session-reads-before-it-writes.md) | chore | todo | 2026-09-20T02:30+08:00 |
-| p2 | US-265 | [The inbox and the monitor page say which stage runs now](todo/US-265-the-inbox-and-the-monitor-page-say-which-stage-runs-now.md) | feature | todo | 2026-09-20T09:03+08:00 |
 | p2 | US-266 | [The monitor history shows every stage](todo/US-266-the-monitor-history-shows-every-stage.md) | feature | todo | 2026-09-20T09:05+08:00 |
 | p2 | US-267 | [The monitor page says which queries and sources earn their keep](todo/US-267-the-monitor-page-says-which-queries-and-sources-earn-their-keep.md) | feature | todo | 2026-09-20T09:08+08:00 |
 | p2 | US-268 | [An inbox item has an address](todo/US-268-an-inbox-item-has-an-address.md) | feature | todo | 2026-09-20T09:10+08:00 |

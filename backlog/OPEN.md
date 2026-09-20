@@ -2,7 +2,7 @@
 
 # Open tickets
 
-26 open — 0 doing, 22 todo, 4 parked (1 p1, 16 p2, 9 p3).
+31 open — 0 doing, 27 todo, 4 parked (1 p1, 19 p2, 11 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -22,11 +22,16 @@
 | p2 | US-233 | [A dry run estimates the pair it is about to call](todo/US-233-a-dry-run-estimates-the-pair-it-is-about-to-call.md) | bug | todo | 2026-09-19T16:45+08:00 |
 | p2 | US-244 | [The screens no browser has rendered](todo/US-244-the-screens-no-browser-has-rendered.md) | chore | todo | 2026-09-20T00:56+08:00 |
 | p2 | US-260 | [A script measures what a session reads before it writes](todo/US-260-a-script-measures-what-a-session-reads-before-it-writes.md) | chore | todo | 2026-09-20T02:30+08:00 |
+| p2 | US-274 | [The test harness is shared](todo/US-274-the-test-harness-is-shared.md) | chore | todo | 2026-09-20T18:05+08:00 |
+| p2 | US-275 | [The schedule's words are shared](todo/US-275-the-schedules-words-are-shared.md) | chore | todo | 2026-09-20T18:07+08:00 |
+| p2 | US-276 | [A state block and an error row are components](todo/US-276-a-state-block-and-an-error-row-are-components.md) | chore | todo | 2026-09-20T18:10+08:00 |
 | p2 | BUG-021 | [The classify tests time out on CI, and a red release run looks like the change](todo/BUG-021-classify-tests-time-out-on-ci.md) | bug | todo | 2026-09-19T02:01+08:00 |
 | p3 | US-018 | [A mutation sweep proves the suite is sensitive](todo/US-018-a-mutation-sweep-proves-the-suite-is-sensitive.md) | chore | todo | 2026-09-04T22:54+08:00 |
 | p3 | US-095 | [The logo travels with the email](todo/US-095-the-logo-travels-with-the-email.md) | feature | todo | 2026-09-10T00:36+08:00 |
 | p3 | US-243 | [One Instagram comment link is opened](todo/US-243-one-instagram-comment-link-is-opened.md) | chore | todo | 2026-09-20T00:56+08:00 |
 | p3 | US-258 | [The four densest files lose their inline stories](todo/US-258-the-four-densest-files-lose-their-inline-stories.md) | chore | todo | 2026-09-20T02:05+08:00 |
+| p3 | US-277 | [The reply voice editor is one screen](todo/US-277-the-reply-voice-editor-is-one-screen.md) | chore | todo | 2026-09-20T18:14+08:00 |
+| p3 | US-278 | [The reply composer follows the hosted one, then is shared](todo/US-278-the-reply-composer-follows-the-hosted-one-then-is-shared.md) | chore | todo | 2026-09-20T18:16+08:00 |
 | p3 | BUG-013 | [A key row's error is printed inside a closed dialog](todo/BUG-013-a-key-row-s-error-is-printed-inside-a-closed-dialog.md) | bug | todo | 2026-09-09T11:58+08:00 |
 | p3 | US-038 | [Instagram, TikTok and Threads](parked/US-038-instagram-tiktok-and-threads.md) | feature | parked | 2026-09-06T11:56+08:00 |
 | p3 | US-240 | [One capped poll is measured against one uncapped](parked/US-240-one-capped-poll-is-measured-against-one-uncapped.md) | chore | parked | 2026-09-20T00:56+08:00 |

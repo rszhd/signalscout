@@ -118,6 +118,26 @@ preview truncation and mobile reading pane remain page-specific.
 </header>
 ```
 
+## Components beyond the primitives
+
+`ProjectCard` is the first, and it sets the pattern for the next one. US-273.
+
+- **The product's answers are slots.** The hosted product is one monitor per
+  project, so its status line is that monitor's state and its second action
+  opens it; self-hosted a project holds several, so the status is a count and
+  the action makes the next one. The card knows neither. It knows the shape.
+- **Its stylesheet ships with it and is imported by name** —
+  `@signalscout/ui/project-card.css` — rather than growing `theme.css`, which
+  stays about primitives. A composed component and its rules travel together
+  or they drift.
+- **It holds no state.** The open confirmation is a prop, so the page keeps
+  deciding which card is asking.
+- **It links with the router**, which is why `react-router` is a peer: a card
+  whose name is a plain anchor reloads the application on a click.
+
+What stays with the page: the list's grid, its heading, and its empty state.
+Those are layout.
+
 ## The words
 
 `monitor.ts` holds what both products *say* about a monitor, a poll, a stage

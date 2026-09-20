@@ -1,4 +1,4 @@
-import { messageFor, requestJson } from "@signalscout/ui";
+import { messageFor, ProjectCard, requestJson } from "@signalscout/ui";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { paths } from "./route.js";
@@ -202,7 +202,7 @@ export function Projects() {
   const [loading, setLoading] = useState(true);
   /** The project a person has asked to delete and has not yet confirmed. BUG-030. */
   const [confirming, setConfirming] = useState<string | null>(null);
-  const [deleting, setDeleting] = useState(false);
+  const [deleting, setDeleting] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
@@ -226,21 +226,29 @@ export function Projects() {
    * Delete the project, its monitors and every match they found. BUG-030.
    *
    * The card asked once, in place, with the numbers; this is the press after
-   * that. The list is re-read rather than filtered, so a refusal leaves the
-   * card exactly as the server still has it.
+   * that.
+   *
+   * **The row leaves the list here rather than by re-reading it.** US-273: a
+   * person who has just deleted one project is usually about to do something
+   * else, and a reload moves every other row under them. A failed delete keeps
+   * its row and says why above the list, because a row that vanished on a
+   * failed request would be a deletion that did not happen.
    */
   async function remove(project: Project): Promise<void> {
-    setDeleting(true);
+    setDeleting(project.id);
     setDeleteError(null);
+
     try {
       await requestJson<null>(`/api/projects/${project.id}`, { method: "DELETE" });
-      setConfirming(null);
-      await load();
     } catch (cause) {
       setDeleteError(messageFor(cause, `${project.name} could not be deleted.`));
+      return;
     } finally {
-      setDeleting(false);
+      setDeleting(null);
+      setConfirming(null);
     }
+
+    setProjects((rows) => rows.filter((row) => row.id !== project.id));
   }
 
   return (
@@ -260,17 +268,25 @@ export function Projects() {
       <div className="projects-content">
         {error && (
           <div className="form-error" role="alert">
-            {error}
+            <span>{error}</span>
             <button className="secondary-button" type="button" onClick={() => void load()}>
               Try again
             </button>
           </div>
         )}
+        {/* Above the list, not inside the card: the list is correct and the
+            project is still there. US-273. */}
+        {deleteError && (
+          <div className="form-error" role="alert">
+            <span>{deleteError}</span>
+          </div>
+        )}
         <section aria-label="Your projects">
           {loading ? (
-            <p className="project-state" role="status">
-              Loading projects…
-            </p>
+            <div className="project-state" role="status">
+              <span className="project-state-mark" aria-hidden="true" />
+              <p>Loading projects…</p>
+            </div>
           ) : error ? null : projects.length === 0 ? (
             <div className="project-empty">
               <span className="project-empty-mark" aria-hidden="true">
@@ -288,88 +304,45 @@ export function Projects() {
           ) : (
             <>
               <div className="project-list-heading">
-                <h2>
-                  Your projects <span>{projects.length}</span>
-                </h2>
-                <p>Choose a project to explore its conversations.</p>
+                <div>
+                  <h2>
+                    All projects <span>{projects.length}</span>
+                  </h2>
+                  <p>Open a project to review the conversations it found.</p>
+                </div>
               </div>
               <ul className="project-list">
                 {projects.map((project) => (
-                  <li className="project-row" key={project.id}>
-                    <div className="project-card-heading">
-                      <span className="project-avatar" aria-hidden="true">
-                        {project.name.slice(0, 1).toUpperCase()}
-                      </span>
-                      <div className="project-identity">
-                        <h2 className="project-name">
-                          <Link to={paths.inbox(project.id)}>{project.name}</Link>
-                        </h2>
-
-                        <small className="project-count">
-                          {project.monitorCount === 0
-                            ? "No monitors yet"
-                            : `${project.monitorCount} monitor${project.monitorCount === 1 ? "" : "s"}`}
-                        </small>
-                      </div>
-                      <Link className="project-edit-button" to={paths.editProject(project.id)}>
-                        Edit
-                      </Link>
-                    </div>
-                    <p className="project-product">{project.product}</p>
-                    <div className="project-audience">
-                      <span>Ideal customer</span>
-                      <p>{project.idealCustomer}</p>
-                    </div>
-                    <div className="project-actions">
-                      <Link className="primary-button" to={paths.inbox(project.id)}>
-                        Open inbox →
-                      </Link>
+                  <ProjectCard
+                    key={project.id}
+                    name={project.name}
+                    inboxHref={paths.inbox(project.id)}
+                    product={project.product}
+                    audience={project.idealCustomer}
+                    status={
+                      project.monitorCount === 0
+                        ? "No monitors yet"
+                        : `${project.monitorCount} monitor${project.monitorCount === 1 ? "" : "s"}`
+                    }
+                    editHref={paths.editProject(project.id)}
+                    /* A project holds several monitors here, so this is where
+                       the next one is made. The hosted card offers its one
+                       monitor instead. */
+                    actions={
                       <Link className="secondary-button" to={paths.newMonitor(project.id)}>
                         New monitor
                       </Link>
-                      {confirming !== project.id && (
-                        <button
-                          className="project-text-button project-delete-button"
-                          type="button"
-                          disabled={deleting}
-                          onClick={() => {
-                            setDeleteError(null);
-                            setConfirming(project.id);
-                          }}
-                        >
-                          Delete
-                        </button>
-                      )}
-                    </div>
-                    {confirming === project.id && (
-                      <div className="project-delete-confirm">
-                        <span>{deleteSentence(project)} This cannot be undone.</span>
-                        <div className="project-delete-confirm-actions">
-                          <button
-                            className="project-text-button"
-                            type="button"
-                            disabled={deleting}
-                            onClick={() => setConfirming(null)}
-                          >
-                            Keep it
-                          </button>
-                          <button
-                            className="project-text-button project-delete-button"
-                            type="button"
-                            disabled={deleting}
-                            onClick={() => void remove(project)}
-                          >
-                            {deleting ? "Deleting…" : `Yes, delete ${project.name}`}
-                          </button>
-                        </div>
-                        {deleteError && (
-                          <p className="form-error" role="alert">
-                            {deleteError}
-                          </p>
-                        )}
-                      </div>
-                    )}
-                  </li>
+                    }
+                    deleteQuestion={`${deleteSentence(project)} This cannot be undone.`}
+                    confirming={confirming === project.id}
+                    deleting={deleting === project.id}
+                    onAskDelete={() => {
+                      setDeleteError(null);
+                      setConfirming(project.id);
+                    }}
+                    onKeep={() => setConfirming(null)}
+                    onDelete={() => void remove(project)}
+                  />
                 ))}
               </ul>
             </>

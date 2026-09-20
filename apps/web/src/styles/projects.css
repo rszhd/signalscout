@@ -47,124 +47,7 @@
   gap: var(--space-6);
   list-style: none;
 }
-.projects-content .project-row {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 0;
-  padding: var(--space-8);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
-  background: var(--surface);
-  box-shadow: var(--shadow-soft);
-  transition:
-    border-color 140ms ease,
-    box-shadow 140ms ease;
-}
-.projects-content .project-row:hover {
-  border-color: var(--line-dark);
-  box-shadow: var(--shadow-card);
-}
-.project-card-heading {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  margin-bottom: var(--space-5);
-}
-.project-avatar,
-.project-empty-mark {
-  display: grid;
-  flex-shrink: 0;
-  place-items: center;
-  width: 48px;
-  height: 48px;
-  border: 1px solid var(--surface-brand);
-  background: var(--accent-soft);
-  color: var(--accent-text);
-  border-radius: var(--radius-md);
-  font-size: 1.25rem;
-  font-weight: 600;
-}
-.projects-content .project-identity {
-  display: grid;
-  gap: var(--space-1);
-  flex: 1;
-  min-width: 0;
-}
-.projects-content .project-name {
-  margin: 0;
-  font-size: 1.25rem;
-  font-weight: 600;
-  line-height: 1.5;
-  overflow-wrap: anywhere;
-}
-.project-name a {
-  color: var(--ink);
-  text-decoration: none;
-}
-.project-name a:hover {
-  color: var(--accent-text);
-}
-.projects-content .project-count {
-  width: max-content;
-  padding: var(--space-1) var(--space-2);
-  border-radius: var(--radius-sm);
-  background: var(--surface-soft);
-  font-size: var(--text-xs);
-  color: var(--muted);
-}
-.projects-content .project-product {
-  margin: 0 0 var(--space-6);
-  color: var(--ink);
-  font-size: var(--text-label);
-  line-height: 1.7;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-.project-audience {
-  display: flex;
-  align-items: baseline;
-  flex-direction: column;
-  gap: var(--space-2);
-  margin-top: auto;
-  margin-bottom: var(--space-6);
-  padding: var(--space-4);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-md);
-  background: var(--surface-soft);
-}
-.project-audience > span {
-  color: var(--muted-strong);
-  font-size: var(--text-xs);
-  letter-spacing: 0.04em;
-  font-weight: 600;
-  text-transform: uppercase;
-}
-.project-audience p {
-  margin: 0;
-  color: var(--muted-strong);
-  font-size: var(--text-sm);
-  line-height: 1.6;
-  overflow-wrap: anywhere;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-.project-actions {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: var(--space-3);
-  padding-top: var(--space-5);
-  border-top: 1px solid var(--line);
-}
-.project-text-button,
-.project-edit-button {
+.project-text-button {
   border: 0;
   padding: var(--space-2) 0;
   background: transparent;
@@ -174,40 +57,12 @@
   cursor: pointer;
   text-decoration: none;
 }
-.project-edit-button {
-  color: var(--muted);
-  padding: var(--space-2);
-  border-radius: var(--radius-sm);
-}
-.project-edit-button:hover {
-  background: var(--surface-soft);
-  color: var(--ink);
-}
 .project-text-button:hover {
   text-decoration: underline;
 }
 .project-text-button:disabled {
   opacity: 0.5;
   cursor: default;
-}
-.project-delete-button {
-  color: var(--danger);
-}
-.project-delete-confirm {
-  display: grid;
-  gap: var(--space-2);
-  margin-top: var(--space-3);
-  padding: var(--space-3);
-  border-radius: var(--radius-sm);
-  background: var(--surface-soft);
-  color: var(--muted-strong);
-  font-size: var(--text-sm);
-  overflow-wrap: anywhere;
-}
-.project-delete-confirm-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-4);
 }
 .project-empty {
   max-width: 500px;
@@ -219,18 +74,66 @@
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-soft);
 }
+/* It shared the card's avatar rule until the card left for the package.
+   Its own now, and the one place this page draws that circle. US-273. */
 .project-empty-mark {
+  display: grid;
+  place-items: center;
   margin: 0 auto var(--space-5);
   width: 56px;
   height: 56px;
+  border-radius: 50%;
+  background: var(--surface-brand);
+  color: var(--accent-text);
+  font-size: var(--text-md);
+  font-weight: 500;
 }
 .project-empty h2 {
   font-size: 1.25rem;
 }
-.project-empty p,
-.project-state {
+.project-empty p {
   color: var(--muted);
   line-height: 1.7;
+}
+
+/*
+  Loading, as a marked block rather than a line of text. US-273.
+
+  A bare sentence in the top-left of an empty page reads as the page having
+  finished and found nothing. The mark says the opposite, and it stops where
+  the person asked it to: `prefers-reduced-motion` turns the spin off and
+  leaves the ring.
+*/
+.project-state {
+  min-height: 240px;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: var(--space-4);
+  color: var(--muted);
+  text-align: center;
+  line-height: 1.7;
+}
+.project-state p {
+  margin: 0;
+}
+.project-state-mark {
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--line-dark);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: project-spin 700ms linear infinite;
+}
+@keyframes project-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .project-state-mark {
+    animation: none;
+  }
 }
 .project-empty .primary-button {
   margin-top: var(--space-4);
@@ -445,13 +348,6 @@
   .project-editor-guide {
     display: none;
   }
-  .projects-content .project-row {
-    padding: var(--space-6);
-  }
-
-  .project-actions > :is(.primary-button, .secondary-button) {
-    flex: 1 1 auto;
-  }
   .project-editor form {
     padding: var(--space-5);
   }
@@ -469,7 +365,6 @@
   }
 }
 @media (max-width: 380px) {
-  .projects-content .project-row,
   .project-editor form {
     padding: var(--space-4);
   }
@@ -479,20 +374,5 @@
   .projects-topbar {
     flex-wrap: wrap;
     gap: var(--space-4);
-  }
-}
-
-/*
-  A finger needs a bigger target than a cursor. US-123.
-
-  Edit was 39px tall on a phone. The recommended minimum is 44px, and the
-  extra height comes from padding so the card's layout does not move.
-*/
-@media (max-width: 600px) {
-  .project-edit-button {
-    min-height: 44px;
-    display: inline-flex;
-    align-items: center;
-    padding-inline: var(--space-3);
   }
 }

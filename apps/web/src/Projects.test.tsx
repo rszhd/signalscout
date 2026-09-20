@@ -130,7 +130,7 @@ describe("the projects screen", () => {
       );
       expect(fetchMock.mock.calls.some(([, init]) => init?.method === "DELETE")).toBe(false);
 
-      await act(async () => button("Yes, delete Acme QA").click());
+      await act(async () => button("Yes, delete").click());
       await settle();
 
       const sent = fetchMock.mock.calls.find(([, init]) => init?.method === "DELETE");
@@ -142,11 +142,84 @@ describe("the projects screen", () => {
       await showDeletable([project({ matchCount: 37 })]);
 
       await act(async () => button("Delete").click());
-      await act(async () => button("Keep it").click());
+      await act(async () => button("Keep").click());
 
       expect(container.textContent).not.toContain("This cannot be undone");
       expect(fetchMock.mock.calls.some(([, init]) => init?.method === "DELETE")).toBe(false);
       expect(container.textContent).toContain("Acme QA");
+    });
+
+    /**
+     * The question takes the action row. US-273: two rows of unrelated
+     * controls on a narrow card make a long project name wrap under the
+     * buttons it is about.
+     */
+    it("replaces the card's actions while it asks", async () => {
+      await showDeletable([project({ matchCount: 37 })]);
+
+      expect(container.textContent).toContain("Open inbox");
+      expect(container.textContent).toContain("New monitor");
+
+      await act(async () => button("Delete").click());
+
+      const actions = container.querySelector(".project-actions");
+      expect(actions?.textContent).toContain("This cannot be undone");
+      expect(actions?.querySelector(".project-open-button")).toBeNull();
+      expect(container.textContent).not.toContain("New monitor");
+
+      await act(async () => button("Keep").click());
+      expect(container.querySelector(".project-open-button")).not.toBeNull();
+    });
+
+    /**
+     * The row leaves without a reload. US-273: re-reading the list moves every
+     * other row under a person who is usually about to do something else.
+     */
+    it("takes the row out of the list without asking for the list again", async () => {
+      await showDeletable([
+        project({ matchCount: 37 }),
+        project({ id: "22222222-2222-4222-8222-222222222222", name: "Beta" }),
+      ]);
+      const listReads = () =>
+        fetchMock.mock.calls.filter(
+          ([url, init]) => !init?.method && String(url).startsWith("/api/projects"),
+        ).length;
+      const before = listReads();
+
+      await act(async () => button("Delete").click());
+      await act(async () => button("Yes, delete").click());
+      await settle();
+
+      expect(container.textContent).not.toContain("Acme QA");
+      expect(container.textContent).toContain("Beta");
+      expect(listReads()).toBe(before);
+    });
+
+    /**
+     * A row that vanished on a failed request would be a deletion that did not
+     * happen. US-273.
+     */
+    it("keeps the row and says why when the delete fails", async () => {
+      const rows = [project({ matchCount: 37 })];
+      fetchMock = vi.fn(async (url: string, init?: RequestInit) => {
+        if (init?.method === "DELETE") {
+          return json({ message: "The database is unreachable." }, 503);
+        }
+        if (String(url).startsWith("/api/projects")) return json({ projects: rows });
+        throw new Error(`Unexpected request: ${url}`);
+      });
+      vi.stubGlobal("fetch", fetchMock);
+      screen = await mount(<Projects />);
+      container = screen.container;
+
+      await act(async () => button("Delete").click());
+      await act(async () => button("Yes, delete").click());
+      await settle();
+
+      expect(container.textContent).toContain("The database is unreachable.");
+      expect(container.textContent).toContain("Acme QA");
+      // The question closed, so the row is back to its own actions.
+      expect(container.querySelector(".project-open-button")).not.toBeNull();
     });
 
     it("names what goes, in the right number", () => {

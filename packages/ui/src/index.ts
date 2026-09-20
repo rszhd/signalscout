@@ -61,3 +61,4 @@ export {
   useMonitorRefresh,
   workingRefreshMs,
 } from "./monitor.js";
+export { ProjectCard, type ProjectCardProps } from "./ProjectCard.js";

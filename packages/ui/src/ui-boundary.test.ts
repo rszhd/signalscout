@@ -10,9 +10,11 @@ import { describe, expect, it } from "vitest";
  * release the engine or the pipeline, and a screen cannot reach the database
  * through a button.
  *
- * React is a peer dependency rather than a dependency: both applications
- * already hold one, and two Reacts in one bundle is two renderers and a
- * hook that throws.
+ * React and `react-router` are peer dependencies rather than dependencies:
+ * both applications already hold each, and two Reacts in one bundle is two
+ * renderers and a hook that throws, while two routers is two histories.
+ * `ProjectCard` links with the router because a plain anchor would reload the
+ * whole application on a click. US-273.
  *
  * A second rule, about values rather than imports: a control here uses a
  * token name and never a raw colour or a raw spacing value. `stylelint` says
@@ -86,15 +88,19 @@ describe("packages/ui holds the brand and nothing else", () => {
       ...Object.keys(peerDependencies),
     ];
 
-    // React is allowed, and only as a peer: see the header.
-    expect(declared.filter((name) => isForbidden(name) && name !== "react")).toEqual([]);
+    // React and the router are allowed, and only as peers: see the header.
+    const peers = ["react", "react-router"];
+    expect(declared.filter((name) => isForbidden(name) && !peers.includes(name))).toEqual([]);
   });
 
-  it("takes React as a peer dependency, never as a dependency", async () => {
+  it("takes React and the router as peers, never as dependencies", async () => {
     const { dependencies = {}, peerDependencies = {} } = await manifest();
 
+    // Two Reacts in one bundle is two renderers and a hook that throws; two
+    // routers is two histories, and a link that navigates the wrong one.
     expect(Object.keys(dependencies)).toEqual([]);
     expect(peerDependencies.react).toBeDefined();
+    expect(peerDependencies["react-router"]).toBeDefined();
   });
 
   it("imports none of them in any source file", async () => {

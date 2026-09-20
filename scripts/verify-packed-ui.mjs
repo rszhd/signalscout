@@ -46,6 +46,7 @@ try {
     "package/dist/testing/index.js",
     "package/dist/styles/tokens.css",
     "package/dist/styles/theme.css",
+    "package/dist/styles/project-card.css",
     "package/dist/assets/mark.svg",
     "package/dist/assets/mark-small.svg",
   ]) {

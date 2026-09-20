@@ -43,6 +43,10 @@
     "./mark-small.svg": {
       "development": "./src/assets/mark-small.svg",
       "default": "./dist/assets/mark-small.svg"
+    },
+    "./project-card.css": {
+      "development": "./src/styles/project-card.css",
+      "default": "./dist/styles/project-card.css"
     }
   },
   "scripts": {
@@ -50,12 +54,14 @@
     "typecheck": "tsc --build"
   },
   "peerDependencies": {
-    "react": ">=19"
+    "react": ">=19",
+    "react-router": ">=8"
   },
   "devDependencies": {
     "@types/node": "26.4.1",
     "@types/react": "19.2.18",
     "react": "19.2.8",
+    "react-router": "8.3.1",
     "typescript": "7.0.2",
     "vitest": "5.0.0"
   },
@@ -73,7 +79,8 @@
       "./tokens.css": "./dist/styles/tokens.css",
       "./theme.css": "./dist/styles/theme.css",
       "./mark.svg": "./dist/assets/mark.svg",
-      "./mark-small.svg": "./dist/assets/mark-small.svg"
+      "./mark-small.svg": "./dist/assets/mark-small.svg",
+      "./project-card.css": "./dist/styles/project-card.css"
     }
   }
 }

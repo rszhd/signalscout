@@ -17,6 +17,7 @@ body {
   background: var(--background);
   font-size: var(--text-body);
   line-height: 1.55;
+  letter-spacing: -0.006em;
 }
 
 button,
@@ -68,9 +69,9 @@ a {
   width: 100%;
   padding: 0 var(--space-3);
   color: var(--ink);
-  font-size: 1.125rem;
+  font-size: 1.0625rem;
   font-weight: 600;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.015em;
   text-decoration: none;
 }
 
@@ -83,21 +84,6 @@ a {
   height: 32px;
   flex: 0 0 auto;
   border-radius: var(--radius-sm);
-}
-
-.trial-badge {
-  flex: 0 0 auto;
-  margin-left: auto;
-  padding: var(--space-1) var(--space-2);
-  border: 1px solid var(--surface-brand);
-  border-radius: var(--radius-sm);
-  color: var(--accent-text);
-  background: var(--accent-soft);
-  font-size: 0.625rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  line-height: 1.5;
-  text-transform: uppercase;
 }
 
 .product-note {

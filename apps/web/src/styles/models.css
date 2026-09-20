@@ -44,9 +44,9 @@
 
 .models-section-heading h2 {
   margin: 0;
-  font-size: 1.25rem;
-  font-weight: 600;
-  letter-spacing: -0.02em;
+  font-size: var(--text-md);
+  font-weight: 500;
+  letter-spacing: -0.01em;
 }
 
 .models-section-heading p {
@@ -256,7 +256,7 @@
 .job-tip-label {
   display: block;
   margin-bottom: var(--space-1);
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .job-answer {
@@ -476,6 +476,7 @@
   margin: 0;
   font-size: 1.25rem;
   letter-spacing: -0.02em;
+  font-weight: 500;
 }
 
 .models-dialog .key-form {

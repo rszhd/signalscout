@@ -82,7 +82,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  font-size: var(--text-md);
+  font-size: 1.0625rem;
   font-weight: 600;
   color: var(--ink);
 }
@@ -120,17 +120,16 @@
   margin: 0 0 var(--space-4);
   color: var(--accent-text);
   font-size: var(--text-xs);
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  font-weight: 500;
+  letter-spacing: normal;
 }
 
 .login-story h2 {
   margin: 0;
   font-size: clamp(2rem, 3.5vw, 3rem);
   line-height: 1.12;
-  letter-spacing: -0.045em;
-  font-weight: 600;
+  letter-spacing: -0.04em;
+  font-weight: 500;
 }
 
 .login-story-copy {
@@ -174,7 +173,7 @@
 }
 
 .login-story-points strong {
-  font-weight: 600;
+  font-weight: 500;
   color: var(--ink);
 }
 
@@ -198,6 +197,7 @@
   font-size: clamp(1.75rem, 3vw, 2.25rem);
   line-height: 1.2;
   letter-spacing: -0.035em;
+  font-weight: 500;
 }
 
 .login-card .page-subtitle {

@@ -2,7 +2,7 @@
 
 # Open tickets
 
-27 open — 0 doing, 23 todo, 4 parked (1 p1, 16 p2, 10 p3).
+28 open — 0 doing, 24 todo, 4 parked (1 p1, 17 p2, 10 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -23,6 +23,7 @@
 | p2 | US-244 | [The screens no browser has rendered](todo/US-244-the-screens-no-browser-has-rendered.md) | chore | todo | 2026-09-20T00:56+08:00 |
 | p2 | US-260 | [A script measures what a session reads before it writes](todo/US-260-a-script-measures-what-a-session-reads-before-it-writes.md) | chore | todo | 2026-09-20T02:30+08:00 |
 | p2 | BUG-021 | [The classify tests time out on CI, and a red release run looks like the change](todo/BUG-021-classify-tests-time-out-on-ci.md) | bug | todo | 2026-09-19T02:01+08:00 |
+| p2 | BUG-031 | [A worktree cannot sign in](todo/BUG-031-a-worktree-cannot-sign-in.md) | bug | todo | 2026-09-20T12:55+08:00 |
 | p3 | US-018 | [A mutation sweep proves the suite is sensitive](todo/US-018-a-mutation-sweep-proves-the-suite-is-sensitive.md) | chore | todo | 2026-09-04T22:54+08:00 |
 | p3 | US-095 | [The logo travels with the email](todo/US-095-the-logo-travels-with-the-email.md) | feature | todo | 2026-09-10T00:36+08:00 |
 | p3 | US-243 | [One Instagram comment link is opened](todo/US-243-one-instagram-comment-link-is-opened.md) | chore | todo | 2026-09-20T00:56+08:00 |

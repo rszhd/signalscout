@@ -74,6 +74,9 @@ describe("the login screen", () => {
     expect(screen.container.textContent).toContain("Create an account");
     expect(field("Your name")).toBeTruthy();
     expect(field("Password").minLength).toBe(8);
+    // The placeholder is an example of the shape, not a rule about the value.
+    // People read "you@company.com" as "no Gmail" and left (BUG-029).
+    expect(field("Email").placeholder).toBe("you@example.com");
     // And it does not claim to be the first run, because it is not.
     expect(screen.container.textContent).not.toContain("Set up this instance");
   });

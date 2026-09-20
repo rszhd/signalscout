@@ -286,7 +286,7 @@ export function Login({ firstRun, signUpOpen }: { firstRun: boolean; signUpOpen:
                 <input
                   aria-label="Email"
                   autoComplete="username"
-                  placeholder="you@company.com"
+                  placeholder="you@example.com"
                   required
                   type="email"
                   value={email}

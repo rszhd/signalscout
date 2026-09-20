@@ -6,7 +6,7 @@ priority: p3
 created: 2026-09-20T08:56+08:00
 parent:
 area: web
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -25,8 +25,8 @@ The hosted application fixed this as BUG-027.
 
 ## Acceptance
 
-- [ ] The placeholder is `you@example.com`.
-- [ ] No other placeholder in `apps/web/src` names a kind of address.
+- [x] The placeholder is `you@example.com`.
+- [x] No other placeholder in `apps/web/src` names a kind of address.
 
 ## Notes
 
@@ -36,3 +36,6 @@ The hosted application fixed this as BUG-027.
 
 - 2026-09-20T08:56+08:00 — Written from the cross-repository review of the
   cloud's changes since the split.
+- 2026-09-20T09:06+08:00 — Shipped. The other two placeholders in
+  `apps/web/src` are example problem statements, not addresses. The login
+  test pins the placeholder. 13 login tests pass.

@@ -2,10 +2,11 @@
 
 # Done
 
-189 finished.
+190 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
+| BUG-033 | [The image does not know the UI package](done/2026-09/BUG-033-the-image-does-not-know-the-ui-package.md) | bug | shipped | 2026-09 |
 | BUG-031 | [A worktree cannot sign in](done/2026-09/BUG-031-a-worktree-cannot-sign-in.md) | bug | shipped | 2026-09 |
 | BUG-030 | [Deleting a project leaves its monitors polling with no inbox](done/2026-09/BUG-030-deleting-a-project-leaves-its-monitors-polling-with-no-inbox.md) | bug | shipped | 2026-09 |
 | BUG-029 | [The email placeholder reads as a rule](done/2026-09/BUG-029-the-email-placeholder-reads-as-a-rule.md) | bug | shipped | 2026-09 |

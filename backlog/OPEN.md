@@ -2,7 +2,7 @@
 
 # Open tickets
 
-32 open — 0 doing, 28 todo, 4 parked (1 p1, 22 p2, 9 p3).
+31 open — 0 doing, 27 todo, 4 parked (1 p1, 21 p2, 9 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -28,7 +28,6 @@
 | p2 | US-268 | [An inbox item has an address](todo/US-268-an-inbox-item-has-an-address.md) | feature | todo | 2026-09-20T09:10+08:00 |
 | p2 | US-269 | [The search plan is a model task of its own](todo/US-269-the-search-plan-is-a-model-task-of-its-own.md) | feature | todo | 2026-09-20T09:12+08:00 |
 | p2 | BUG-021 | [The classify tests time out on CI, and a red release run looks like the change](todo/BUG-021-classify-tests-time-out-on-ci.md) | bug | todo | 2026-09-19T02:01+08:00 |
-| p2 | BUG-030 | [Deleting a project leaves its monitors polling with no inbox](todo/BUG-030-deleting-a-project-leaves-its-monitors-polling-with-no-inbox.md) | bug | todo | 2026-09-20T08:58+08:00 |
 | p3 | US-018 | [A mutation sweep proves the suite is sensitive](todo/US-018-a-mutation-sweep-proves-the-suite-is-sensitive.md) | chore | todo | 2026-09-04T22:54+08:00 |
 | p3 | US-095 | [The logo travels with the email](todo/US-095-the-logo-travels-with-the-email.md) | feature | todo | 2026-09-10T00:36+08:00 |
 | p3 | US-243 | [One Instagram comment link is opened](todo/US-243-one-instagram-comment-link-is-opened.md) | chore | todo | 2026-09-20T00:56+08:00 |

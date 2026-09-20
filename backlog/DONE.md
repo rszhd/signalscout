@@ -2,10 +2,11 @@
 
 # Done
 
-169 finished.
+170 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
+| BUG-030 | [Deleting a project leaves its monitors polling with no inbox](done/2026-09/BUG-030-deleting-a-project-leaves-its-monitors-polling-with-no-inbox.md) | bug | shipped | 2026-09 |
 | BUG-029 | [The email placeholder reads as a rule](done/2026-09/BUG-029-the-email-placeholder-reads-as-a-rule.md) | bug | shipped | 2026-09 |
 | BUG-028 | [The badge says intent and means the score](done/2026-09/BUG-028-the-badge-says-intent-and-means-the-score.md) | bug | shipped | 2026-09 |
 | BUG-018 | [An OpenAI-compatible provider is sent no schema](done/2026-09/BUG-018-a-compatible-provider-is-sent-no-schema.md) | bug | — | 2026-09 |

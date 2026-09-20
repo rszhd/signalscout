@@ -6,7 +6,7 @@ priority: p2
 created: 2026-09-20T08:58+08:00
 parent:
 area: api
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -34,16 +34,19 @@ many.
 
 ## Acceptance
 
-- [ ] `DELETE /api/projects/:id` deletes the project's monitors, their polls,
+- [x] `DELETE /api/projects/:id` deletes the project's monitors, their polls,
       their stage runs, and their matches in one transaction; a test proves
       no row of theirs survives.
-- [ ] A monitor of another project is untouched by the same call; a test
+- [x] A monitor of another project is untouched by the same call; a test
       proves it.
-- [ ] The projects screen offers a delete on each card; it asks once, in
+- [x] The projects screen offers a delete on each card; it asks once, in
       place, and names the number of monitors and matches that will go.
-- [ ] The scheduler does not poll a deleted monitor; a test proves the
-      queued job is gone or refused.
-- [ ] The route comment that says monitors stay unfiled is gone.
+- [x] The scheduler does not poll a deleted monitor; a test proves the
+      queued job is gone or refused. `findDueMonitors` reads `monitors`, so
+      a deleted one is never due; `collect.test.ts`, "does nothing when the
+      monitor was deleted between the tick and the job", already proves a
+      job in flight does nothing. No new test was needed for it.
+- [x] The route comment that says monitors stay unfiled is gone.
 
 ## Notes
 
@@ -59,3 +62,16 @@ many.
 
 - 2026-09-20T08:58+08:00 — Written from the cross-repository review of the
   cloud's changes since the split.
+- 2026-09-20T09:40+08:00 — Shipped. The cascade lives in the route, not in
+  the package: `deleteProject` in the pipeline still deletes one row, and
+  the route deletes the person's monitors and then the project in one
+  `db.transaction`, with the monitors' own rows going by the schema's
+  cascades. The package's `deleteProject` and `deleteMonitor` take a
+  `Database` and not a `Queryable`, so the route writes the two deletes
+  itself rather than widening a package signature for one caller. The
+  list, the single read and the update now carry `matchCount`, which the
+  card's confirmation names. Two API cases and three screen cases; three
+  mutations (monitor delete unscoped, monitor delete missing, request
+  never sent) each went red under one case. 328 API and 348 web tests
+  pass. No browser has rendered the card. `projects.css:93` carries a
+  stylelint error from before this ticket, left as found.

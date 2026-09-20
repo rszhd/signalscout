@@ -192,6 +192,25 @@
   opacity: 0.5;
   cursor: default;
 }
+.project-delete-button {
+  color: #8f3f39;
+}
+.project-delete-confirm {
+  display: grid;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--surface-soft);
+  color: var(--muted-strong);
+  font-size: var(--text-sm);
+  overflow-wrap: anywhere;
+}
+.project-delete-confirm-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
 .project-empty {
   max-width: 500px;
   margin: var(--space-12) auto;

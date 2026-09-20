@@ -16,8 +16,8 @@
  */
 import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { Projects } from "./Projects.js";
-import { button, json, mount, type Screen } from "./testing.js";
+import { deleteSentence, Projects } from "./Projects.js";
+import { button, json, mount, type Screen, settle } from "./testing.js";
 
 function project(overrides: Record<string, unknown> = {}) {
   return {
@@ -93,6 +93,80 @@ describe("the projects screen", () => {
     expect(links).toContain("/projects/11111111-1111-4111-8111-111111111111");
     expect(links).toContain("/projects/11111111-1111-4111-8111-111111111111/monitors/new");
     expect(links).toContain("/projects/11111111-1111-4111-8111-111111111111/edit");
+  });
+
+  /**
+   * Deleting takes the monitors and every match they found. BUG-030.
+   *
+   * That is the irreversible part, so the card asks once, in place, with the
+   * numbers, and nothing is sent until the second press.
+   */
+  describe("deleting a project", () => {
+    let fetchMock: ReturnType<typeof vi.fn>;
+    let projects: unknown[];
+
+    async function showDeletable(rows: unknown[]) {
+      projects = rows;
+      fetchMock = vi.fn(async (url: string, init?: RequestInit) => {
+        if (init?.method === "DELETE") {
+          projects = [];
+          return new Response(null, { status: 204 });
+        }
+        if (String(url).startsWith("/api/projects")) return json({ projects });
+        throw new Error(`Unexpected request: ${url}`);
+      });
+      vi.stubGlobal("fetch", fetchMock);
+      screen = await mount(<Projects />);
+      container = screen.container;
+    }
+
+    it("asks once, with the numbers, and sends nothing until the second press", async () => {
+      await showDeletable([project({ matchCount: 37 })]);
+
+      await act(async () => button("Delete").click());
+
+      expect(container.textContent).toContain(
+        "Delete Acme QA, its 2 monitors and the 37 matches they found? This cannot be undone.",
+      );
+      expect(fetchMock.mock.calls.some(([, init]) => init?.method === "DELETE")).toBe(false);
+
+      await act(async () => button("Yes, delete Acme QA").click());
+      await settle();
+
+      const sent = fetchMock.mock.calls.find(([, init]) => init?.method === "DELETE");
+      expect(sent?.[0]).toBe("/api/projects/11111111-1111-4111-8111-111111111111");
+      expect(container.textContent).toContain("No projects yet");
+    });
+
+    it("keeps the project when the person changes their mind", async () => {
+      await showDeletable([project({ matchCount: 37 })]);
+
+      await act(async () => button("Delete").click());
+      await act(async () => button("Keep it").click());
+
+      expect(container.textContent).not.toContain("This cannot be undone");
+      expect(fetchMock.mock.calls.some(([, init]) => init?.method === "DELETE")).toBe(false);
+      expect(container.textContent).toContain("Acme QA");
+    });
+
+    it("names what goes, in the right number", () => {
+      const base = project() as Parameters<typeof deleteSentence>[0];
+
+      expect(deleteSentence({ ...base, monitorCount: 0, matchCount: 0 })).toBe("Delete Acme QA?");
+      expect(deleteSentence({ ...base, monitorCount: 1, matchCount: 0 })).toBe(
+        "Delete Acme QA and its monitor?",
+      );
+      expect(deleteSentence({ ...base, monitorCount: 1, matchCount: 1 })).toBe(
+        "Delete Acme QA, its monitor and the match it found?",
+      );
+      expect(deleteSentence({ ...base, monitorCount: 2, matchCount: 37 })).toBe(
+        "Delete Acme QA, its 2 monitors and the 37 matches they found?",
+      );
+      // An older API sends no match count; the sentence does not invent one.
+      expect(deleteSentence({ ...base, monitorCount: 2, matchCount: undefined })).toBe(
+        "Delete Acme QA and its 2 monitors?",
+      );
+    });
   });
 
   it("shows the server's own sentence when the list cannot be read, and retries", async () => {

@@ -37,6 +37,31 @@ interface Project {
   idealCustomer: string;
   problem: string;
   monitorCount: number;
+  /** Optional for BUG-009's reason: an older API does not send it. BUG-030. */
+  matchCount?: number;
+}
+
+/**
+ * What a delete will take, in the words the confirmation uses. BUG-030.
+ *
+ * "Delete Acme QA?" does not say that two monitors and 37 matches go with
+ * it, and that is the part a person cannot undo.
+ */
+export function deleteSentence(project: Project): string {
+  const monitors =
+    project.monitorCount === 0
+      ? null
+      : `its ${project.monitorCount === 1 ? "monitor" : `${project.monitorCount} monitors`}`;
+  const matches =
+    project.matchCount === undefined || project.matchCount === 0
+      ? null
+      : `the ${project.matchCount === 1 ? "match" : `${project.matchCount} matches`} ${
+          project.monitorCount === 1 ? "it" : "they"
+        } found`;
+  const parts = [project.name, monitors, matches].filter((part) => part !== null);
+
+  if (parts.length === 1) return `Delete ${project.name}?`;
+  return `Delete ${parts.slice(0, -1).join(", ")} and ${parts[parts.length - 1]}?`;
 }
 
 interface Draft {
@@ -175,6 +200,10 @@ export function Projects() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  /** The project a person has asked to delete and has not yet confirmed. BUG-030. */
+  const [confirming, setConfirming] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -192,6 +221,27 @@ export function Projects() {
   useEffect(() => {
     void load();
   }, [load]);
+
+  /**
+   * Delete the project, its monitors and every match they found. BUG-030.
+   *
+   * The card asked once, in place, with the numbers; this is the press after
+   * that. The list is re-read rather than filtered, so a refusal leaves the
+   * card exactly as the server still has it.
+   */
+  async function remove(project: Project): Promise<void> {
+    setDeleting(true);
+    setDeleteError(null);
+    try {
+      await requestJson<null>(`/api/projects/${project.id}`, { method: "DELETE" });
+      setConfirming(null);
+      await load();
+    } catch (cause) {
+      setDeleteError(messageFor(cause, `${project.name} could not be deleted.`));
+    } finally {
+      setDeleting(false);
+    }
+  }
 
   return (
     <>
@@ -277,7 +327,48 @@ export function Projects() {
                       <Link className="secondary-button" to={paths.newMonitor(project.id)}>
                         New monitor
                       </Link>
+                      {confirming !== project.id && (
+                        <button
+                          className="project-text-button project-delete-button"
+                          type="button"
+                          disabled={deleting}
+                          onClick={() => {
+                            setDeleteError(null);
+                            setConfirming(project.id);
+                          }}
+                        >
+                          Delete
+                        </button>
+                      )}
                     </div>
+                    {confirming === project.id && (
+                      <div className="project-delete-confirm">
+                        <span>{deleteSentence(project)} This cannot be undone.</span>
+                        <div className="project-delete-confirm-actions">
+                          <button
+                            className="project-text-button"
+                            type="button"
+                            disabled={deleting}
+                            onClick={() => setConfirming(null)}
+                          >
+                            Keep it
+                          </button>
+                          <button
+                            className="project-text-button project-delete-button"
+                            type="button"
+                            disabled={deleting}
+                            onClick={() => void remove(project)}
+                          >
+                            {deleting ? "Deleting…" : `Yes, delete ${project.name}`}
+                          </button>
+                        </div>
+                        {deleteError && (
+                          <p className="form-error" role="alert">
+                            {deleteError}
+                          </p>
+                        )}
+                      </div>
+                    )}
                   </li>
                 ))}
               </ul>

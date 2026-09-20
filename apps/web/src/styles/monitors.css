@@ -173,6 +173,9 @@
   font-variant-numeric: tabular-nums;
   font-size: var(--text-label);
 }
+.monitor-page-content .monitors-cost-note {
+  margin-top: var(--space-4);
+}
 .monitor-settings-section {
   min-width: 0;
   padding: var(--space-6) 0;
@@ -850,32 +853,38 @@
   padding: var(--space-3) 0;
 }
 .monitor-page-content .poll-history {
-  gap: 0;
+  display: grid;
+  gap: var(--space-3);
 }
-.monitor-page-content .poll-history li {
-  position: relative;
+.monitor-page-content .activity-collection {
+  padding: 0;
+}
+.monitor-page-content .activity-collection + .activity-collection {
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--line);
+}
+.monitor-page-content .activity-entries {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.monitor-page-content .activity-stage-entries.grouped {
+  margin-left: var(--space-4);
+  padding-left: var(--space-4);
+  border-left: 2px solid var(--line);
+}
+.monitor-page-content .activity-entry {
   grid-template-columns: 104px minmax(0, 1fr);
   column-gap: var(--space-5);
-  padding: 0 0 var(--space-6) var(--space-5);
-  border-left: 1px solid var(--line-dark);
+  padding: var(--space-3) 0;
 }
-.monitor-page-content .poll-history li:last-child {
-  padding-bottom: 0;
-}
-.monitor-page-content .poll-history li::before {
-  position: absolute;
-  top: 5px;
-  left: -5px;
-  width: 9px;
-  height: 9px;
-  border: 2px solid var(--surface);
-  border-radius: 50%;
-  background: var(--accent);
-  box-shadow: 0 0 0 1px var(--accent);
-  content: "";
+.monitor-page-content .activity-entry + .activity-entry {
+  border-top: 1px solid var(--line);
 }
 .monitor-page-content .poll-history-when {
   grid-row: 1 / span 2;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 .monitor-page-content .poll-history-what {
   color: var(--ink);
@@ -889,7 +898,16 @@
 }
 .monitor-page-content .poll-history-sources {
   grid-column: 2;
-  margin-top: var(--space-1);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+.monitor-page-content .poll-history-sources .brand-label {
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
 }
 
 @media (max-width: 1080px) {
@@ -927,6 +945,10 @@
   .monitor-detail-section {
     padding: var(--space-5);
   }
+  .monitor-detail-tabs {
+    gap: var(--space-4);
+    padding: 0 var(--space-5);
+  }
   .monitor-key-metrics {
     grid-template-columns: 1fr;
   }
@@ -961,7 +983,11 @@
   .monitor-page-content .monitor-spend > div:nth-last-child(-n + 2) {
     border-bottom: 0;
   }
-  .monitor-page-content .poll-history li {
+  .monitor-page-content .activity-stage-entries.grouped {
+    margin-left: var(--space-2);
+    padding-left: var(--space-3);
+  }
+  .monitor-page-content .activity-entry {
     grid-template-columns: 1fr;
     row-gap: var(--space-1);
   }
@@ -969,6 +995,9 @@
   .monitor-page-content .poll-history-sources {
     grid-column: 1;
     grid-row: auto;
+  }
+  .monitor-page-content .poll-history-when {
+    white-space: normal;
   }
 }
 
@@ -1116,5 +1145,5 @@
   color: var(--warning);
 }
 .lead-breakdown-switch {
-  margin-bottom: var(--space-3);
+  margin: var(--space-5) 0 var(--space-3);
 }

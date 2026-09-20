@@ -746,7 +746,10 @@ export function MonitorDetail({
   const [state, setState] = useState<LoadState>("loading");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const [detailView, setDetailView] = useState<MonitorDetailView>("overview");
+  // Activity is the working view in the hosted app, and it is the reason most
+  // people open a monitor. Keep the self-hosted overview available without
+  // making it an extra stop before the latest run history. US-270.
+  const [detailView, setDetailView] = useState<MonitorDetailView>("history");
 
   const load = useCallback(async (): Promise<void> => {
     try {

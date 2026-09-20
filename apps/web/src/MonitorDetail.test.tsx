@@ -238,6 +238,8 @@ describe("one monitor's page", () => {
 
       const asked = fetchMock.mock.calls.filter(([url]) => String(url).includes("/activity"));
 
+      expect(button("Recent activity").getAttribute("aria-selected")).toBe("true");
+      expect(button("Overview").getAttribute("aria-selected")).toBe("false");
       expect(asked).toHaveLength(1);
       expect(String(asked[0]?.[0])).toContain(`/api/monitors/${monitorId}/activity`);
       expect(container.querySelector(".poll-history")?.textContent).toContain("12 posts, 4 new");

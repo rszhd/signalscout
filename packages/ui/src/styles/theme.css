@@ -231,6 +231,13 @@
   }
 }
 
+/* The product mark. Its size is the component's `size` prop; it has no clip,
+   because four of the nine dots touch the corners of the drawing. US-283. */
+.brand-logo {
+  display: block;
+  flex: 0 0 auto;
+}
+
 /* Provider and social-platform identities share local image assets. */
 .brand-icon {
   display: inline-block;

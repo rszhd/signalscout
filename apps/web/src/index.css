@@ -79,13 +79,6 @@ a {
   color: var(--accent-text);
 }
 
-.brand-logo {
-  width: 32px;
-  height: 32px;
-  flex: 0 0 auto;
-  border-radius: var(--radius-sm);
-}
-
 .product-note {
   margin-top: 29px;
   padding: 13px 12px;

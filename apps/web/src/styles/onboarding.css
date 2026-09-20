@@ -17,11 +17,6 @@
   align-items: center;
   gap: var(--space-4);
 }
-.onboarding-brand .brand-logo {
-  width: 40px;
-  height: 40px;
-  flex-shrink: 0;
-}
 .onboarding-step {
   padding: 0;
 }

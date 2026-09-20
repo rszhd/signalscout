@@ -575,7 +575,7 @@ export function Onboarding({
     <main className="product-page setup-page onboarding-page">
       <header className="topbar">
         <div className="onboarding-brand">
-          <BrandLogo />
+          <BrandLogo size={40} />
           <div>
             <h1>Set up SignalScout</h1>
             <p className="page-subtitle">

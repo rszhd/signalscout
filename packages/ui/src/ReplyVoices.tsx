@@ -1,5 +1,22 @@
-import { FormError, messageFor, PageState, requestJson } from "@signalscout/ui";
+/**
+ * The reply voice editor: one screen, for both applications. US-277.
+ *
+ * The first shared screen, and the reason it may be one: it carries no
+ * product. A voice is a name and an instruction, stored per account and
+ * offered in the draft menu, and nothing about who pays for a model touches
+ * it. US-270 said the brand is one and the screens are two because screens
+ * carry the product; this one does not, so it is one screen. AGENTS.md says
+ * the rule that way now.
+ *
+ * Taken from the hosted copy, which had already adopted `Button` and `Field`.
+ * The route that renders it is each application's own.
+ */
 import { useEffect, useState } from "react";
+import { messageFor, requestJson } from "./api.js";
+import { Button } from "./components/Button.js";
+import { Field } from "./components/Field.js";
+import { FormError } from "./components/FormError.js";
+import { PageState } from "./components/PageState.js";
 
 /**
  * Account-level writing voices, separate from any one conversation.
@@ -24,16 +41,16 @@ function ReplyVoicesHeader({ disabled = false, onNew }: { disabled?: boolean; on
         <h1>Reply voices</h1>
         <p className="page-subtitle">Reusable writing guidance for every project.</p>
       </div>
-      <button
+      <Button
         aria-label="New voice"
         className="top-primary-button"
         disabled={disabled}
-        type="button"
+        variant="primary"
         onClick={onNew}
       >
         <span aria-hidden="true">+</span>
         New voice
-      </button>
+      </Button>
     </header>
   );
 }
@@ -371,9 +388,7 @@ export function ReplyVoices() {
               </header>
 
               <div className="reply-voice-fields">
-                <label className="field">
-                  <span>Voice name</span>
-                  <small>A short name you will recognize in the draft menu.</small>
+                <Field label="Voice name" hint="A short name you will recognize in the draft menu.">
                   <input
                     aria-label="Voice name"
                     disabled={busy}
@@ -385,11 +400,12 @@ export function ReplyVoices() {
                       setNotice(null);
                     }}
                   />
-                </label>
+                </Field>
 
-                <label className="field">
-                  <span>Voice instructions</span>
-                  <small>Describe tone, structure, and wording. Be specific enough to reuse.</small>
+                <Field
+                  label="Voice instructions"
+                  hint="Describe tone, structure, and wording. Be specific enough to reuse."
+                >
                   <textarea
                     aria-label="Voice instructions"
                     disabled={busy}
@@ -405,7 +421,7 @@ export function ReplyVoices() {
                   <span className="reply-voice-character-count">
                     {instruction.length.toLocaleString()} / 4,000 characters
                   </span>
-                </label>
+                </Field>
 
                 <details className="reply-voice-guidance">
                   <summary>What makes a useful voice?</summary>
@@ -462,21 +478,16 @@ export function ReplyVoices() {
                   )}
                 </div>
                 <div>
-                  <button
-                    className="secondary-button"
-                    disabled={busy}
-                    type="button"
-                    onClick={cancel}
-                  >
+                  <Button disabled={busy} onClick={cancel}>
                     Cancel
-                  </button>
-                  <button
-                    className="primary-button"
+                  </Button>
+                  <Button
+                    variant="primary"
                     disabled={busy || !name.trim() || !instruction.trim()}
                     type="submit"
                   >
                     {busy ? "Saving…" : selected ? "Save changes" : "Create voice"}
-                  </button>
+                  </Button>
                 </div>
               </footer>
             </form>
@@ -490,9 +501,9 @@ export function ReplyVoices() {
                 Choose a preset from the library or write your own. Your voices will be available
                 across every project.
               </p>
-              <button className="primary-button" type="button" onClick={startNew}>
+              <Button variant="primary" onClick={startNew}>
                 Create a voice
-              </button>
+              </Button>
 
               {error && <FormError>{error}</FormError>}
             </div>

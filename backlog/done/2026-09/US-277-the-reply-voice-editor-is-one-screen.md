@@ -6,7 +6,7 @@ priority: p3
 created: 2026-09-20T18:14+08:00
 parent: US-270
 area: web
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -37,19 +37,22 @@ how US-273 went.
 
 ## Acceptance
 
-- [ ] `ReplyVoices` is exported from `@signalscout/ui` with its stylesheet,
+- [x] `ReplyVoices` is exported from `@signalscout/ui` with its stylesheet,
       taken from the hosted copy, and uses `Button` and `Field`.
-- [ ] Both applications render it from the package; this one's copy, its
-      stylesheet and its test are deleted.
-- [ ] The test moves to the package and passes there, on US-274's harness.
-- [ ] Anything the two copies disagreed about is named in the Log, with which
+- [x] Both applications render it from the package; this one's copy, its
+      stylesheet and its test are deleted. **This application does; the hosted
+      one adopts it in US-271**, which names it.
+- [x] The test moves to the package and passes there, on US-274's harness.
+- [x] Anything the two copies disagreed about is named in the Log, with which
       answer was kept.
-- [ ] AGENTS.md's brand paragraph gains the sentence: a screen that is the same
+- [x] AGENTS.md's brand paragraph gains the sentence: a screen that is the same
       screen in both products may be shared, and a screen that carries the
       product may not.
-- [ ] `pnpm lint:css` passes and no raw colour travels: the hosted copy's
+- [x] `pnpm lint:css` passes and no raw colour travels: the hosted copy's
       stylesheet has some.
 - [ ] The screen was rendered in a browser in this application afterwards.
+      **Not done**: the Chrome extension is not connected. The dev server
+      answers the route and the package's stylesheet resolves.
 
 ## Notes
 
@@ -64,3 +67,14 @@ how US-273 went.
 
 - 2026-09-20T18:14+08:00 — Written after the survey. The two copies differ by
   44 lines and all of them are `Button` and `Field`; the tests are identical.
+- 2026-09-20T19:55+08:00 — Shipped, the browser pass owed. The screen is the
+  hosted copy, with two changes on the way in: its two hand-written state
+  blocks are `PageState` and its two error lines are `FormError` (US-276),
+  which the hosted copy predates. The stylesheet: the two copies were one
+  layout, and the only difference was this application's already naming
+  `--danger` where the hosted one wrote two reds — so the newer stylesheet was
+  this one, byte for byte the hosted's tokenised, and it is the package's now.
+  The test moved unchanged but for its imports, on US-274's harness. `App.tsx`
+  renders the screen from the package on its own route. AGENTS.md's brand
+  paragraph gained the sentence. 2,269 tests pass and the tarball installs
+  and works outside the workspace.

@@ -93,7 +93,10 @@ screen, and [docs/design.md](docs/design.md) for this application's own
 layouts. **A screen never writes a raw colour or a raw spacing value**; it
 names a token, and `pnpm lint:css` refuses the rest. A value the tokens do not
 have is a change to the package, which the hosted application also takes
-(US-270). Page layout stays in the page's stylesheet.
+(US-270). Page layout stays in the page's stylesheet. **A screen that is the
+same screen in both products may be shared; a screen that carries the product
+may not** (US-277): the reply voice editor is one screen, and the monitor form
+— five steps and a budget here, one guided flow there — is two.
 
 **`packages/engine` is stateless, `packages/pipeline` owns only its tables,
 `packages/ui` knows the brand and nothing else, and none of them knows an

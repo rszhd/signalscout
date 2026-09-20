@@ -1,4 +1,4 @@
-import { BrandLogo, Dialog, requestJson } from "@signalscout/ui";
+import { BrandLogo, Dialog, ReplyVoices, requestJson } from "@signalscout/ui";
 import { useEffect, useRef, useState } from "react";
 import {
   Link,
@@ -27,7 +27,6 @@ import {
 } from "./Onboarding.js";
 import { ProjectForm, Projects } from "./Projects.js";
 import { Providers } from "./Providers.js";
-import { ReplyVoices } from "./ReplyVoices.js";
 import { paths, routes } from "./route.js";
 
 /**

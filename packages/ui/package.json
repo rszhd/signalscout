@@ -47,6 +47,10 @@
     "./project-card.css": {
       "development": "./src/styles/project-card.css",
       "default": "./dist/styles/project-card.css"
+    },
+    "./reply-voices.css": {
+      "development": "./src/styles/reply-voices.css",
+      "default": "./dist/styles/reply-voices.css"
     }
   },
   "scripts": {
@@ -84,7 +88,8 @@
       "./theme.css": "./dist/styles/theme.css",
       "./mark.svg": "./dist/assets/mark.svg",
       "./mark-small.svg": "./dist/assets/mark-small.svg",
-      "./project-card.css": "./dist/styles/project-card.css"
+      "./project-card.css": "./dist/styles/project-card.css",
+      "./reply-voices.css": "./dist/styles/reply-voices.css"
     }
   }
 }

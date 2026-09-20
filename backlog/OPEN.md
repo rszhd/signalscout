@@ -2,7 +2,7 @@
 
 # Open tickets
 
-28 open — 0 doing, 24 todo, 4 parked (1 p1, 16 p2, 11 p3).
+27 open — 0 doing, 23 todo, 4 parked (1 p1, 16 p2, 10 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -27,7 +27,6 @@
 | p3 | US-095 | [The logo travels with the email](todo/US-095-the-logo-travels-with-the-email.md) | feature | todo | 2026-09-10T00:36+08:00 |
 | p3 | US-243 | [One Instagram comment link is opened](todo/US-243-one-instagram-comment-link-is-opened.md) | chore | todo | 2026-09-20T00:56+08:00 |
 | p3 | US-258 | [The four densest files lose their inline stories](todo/US-258-the-four-densest-files-lose-their-inline-stories.md) | chore | todo | 2026-09-20T02:05+08:00 |
-| p3 | US-277 | [The reply voice editor is one screen](todo/US-277-the-reply-voice-editor-is-one-screen.md) | chore | todo | 2026-09-20T18:14+08:00 |
 | p3 | US-278 | [The reply composer follows the hosted one, then is shared](todo/US-278-the-reply-composer-follows-the-hosted-one-then-is-shared.md) | chore | todo | 2026-09-20T18:16+08:00 |
 | p3 | BUG-013 | [A key row's error is printed inside a closed dialog](todo/BUG-013-a-key-row-s-error-is-printed-inside-a-closed-dialog.md) | bug | todo | 2026-09-09T11:58+08:00 |
 | p3 | US-038 | [Instagram, TikTok and Threads](parked/US-038-instagram-tiktok-and-threads.md) | feature | parked | 2026-09-06T11:56+08:00 |

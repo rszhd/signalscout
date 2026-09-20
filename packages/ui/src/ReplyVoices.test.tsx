@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
 
-import { button, field, json, mount, type Screen, settle, setValue } from "@signalscout/ui/testing";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ReplyVoices } from "./ReplyVoices.js";
+import { button, field, json, mount, type Screen, settle, setValue } from "./testing/harness.js";
 
 function voice(overrides: Record<string, unknown> = {}) {
   return {

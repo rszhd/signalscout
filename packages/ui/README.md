@@ -146,6 +146,16 @@ part a screen reader needs.
 What stays with the page: the list's grid, its heading, a success screen with
 a mark of its own. Those are layout.
 
+## A screen that is the same screen
+
+`ReplyVoices` is a whole screen, and the first (US-277). It may be one because
+it carries no product decision: a voice is a name and an instruction, stored
+per account, and nothing about who pays for a model touches it. The rule in
+both `AGENTS.md` files says it this way — a screen that is the same screen in
+both products may be shared; a screen that carries the product may not. The
+route that renders it stays each application's own, and so does its place in
+the navigation.
+
 ## The words
 
 `monitor.ts` holds what both products *say* about a monitor, a poll, a stage

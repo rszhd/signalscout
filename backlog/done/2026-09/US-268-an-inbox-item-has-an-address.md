@@ -6,7 +6,7 @@ priority: p2
 created: 2026-09-20T09:10+08:00
 parent:
 area: web
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -30,15 +30,15 @@ The hosted application built this as US-235.
 
 ## Acceptance
 
-- [ ] `GET /api/matches/:id` returns one match, scoped to the owner; a test
+- [x] `GET /api/matches/:id` returns one match, scoped to the owner; a test
       proves a stranger's id answers 404.
-- [ ] `route.ts` holds the pattern and the builder; no screen writes the
+- [x] `route.ts` holds the pattern and the builder; no screen writes the
       address as a string.
-- [ ] Opening the address shows that item selected even when it is on a
+- [x] Opening the address shows that item selected even when it is on a
       later page, under a filter that hides it, or dismissed; a test covers
       each.
-- [ ] Selecting an item updates the address without reloading the list.
-- [ ] The item panel has a copy-link control.
+- [x] Selecting an item updates the address without reloading the list.
+- [x] The item panel has a copy-link control.
 
 ## Notes
 
@@ -50,3 +50,17 @@ The hosted application built this as US-235.
 
 - 2026-09-20T09:10+08:00 — Written from the cross-repository review of the
   cloud's changes since the split.
+- 2026-09-20T12:50+08:00 — Shipped. `GET /api/matches/:id` reads through
+  the package's `readMatch`, so a stranger's id, a hidden one and one that
+  never existed answer the same 404. `routes.inboxMatch` and
+  `paths.inboxMatch` are the address; `App.tsx` renders the inbox on both
+  patterns and hands it the id. The inbox asserts the selection from the
+  address after every load, fetches the item only when the loaded page
+  does not hold it, shows it even when the filters empty the list, and
+  says so on a 404. A click replaces the address so Back leaves the inbox.
+  *Copy link* writes the address to the clipboard. 3 route cases and 6
+  inbox cases; three mutations (the top row winning over the address, the
+  item never fetched) went red under them, and one did not: `replace`
+  against `push` on the click has no test, because the harness does not
+  expose the history. 764 web and API tests pass. No browser has rendered
+  the link.

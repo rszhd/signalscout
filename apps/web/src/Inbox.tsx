@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { messageFor, requestJson } from "./api.js";
 import { BrandIcon } from "./BrandIcon.js";
 import { ageLabel } from "./labels.js";
@@ -378,7 +378,15 @@ function whereItCameFrom(match: Match): string {
  * remounts nothing, so a screen that read it once would keep showing the
  * project a person had navigated away from.
  */
-export function Inbox({ projectId }: { readonly projectId: string }) {
+export function Inbox({
+  projectId,
+  matchId: addressed = null,
+}: {
+  readonly projectId: string;
+  /** The item the address names, or null on the plain inbox. US-268. */
+  readonly matchId?: string | null;
+}) {
+  const navigate = useNavigate();
   const [monitors, setMonitors] = useState<Monitor[]>([]);
   const [monitorId, setMonitorId] = useState("");
   const [minScore, setMinScore] = useState(0);
@@ -669,7 +677,79 @@ export function Inbox({ projectId }: { readonly projectId: string }) {
   const filtered = monitorId !== "" || minScore > 0 || showDismissed;
   const orderHeading =
     orders.find((option) => option.value === order)?.heading ?? orders[0].heading;
-  const selectedMatch = matches.find((match) => match.id === selectedMatchId) ?? matches[0] ?? null;
+  /**
+   * The item the address names, when the loaded page does not hold it. US-268.
+   *
+   * A link is sent to somebody whose inbox is not the sender's: a different
+   * filter, a later page, or an item they have already dismissed. The list
+   * resolves a selection against what it has loaded, so without this the
+   * address would quietly open whatever is at the top — the failure US-076
+   * removed from the router and would have reintroduced here.
+   *
+   * It is fetched rather than searched for, and only when the page does not
+   * already answer. A 404 leaves it null and the inbox says so.
+   */
+  const [addressedMatch, setAddressedMatch] = useState<Match | null>(null);
+  const [addressMissing, setAddressMissing] = useState(false);
+
+  useEffect(() => {
+    if (!addressed) {
+      setAddressedMatch(null);
+      setAddressMissing(false);
+      return;
+    }
+
+    // The address asserts the selection after every load, not only on the
+    // first: `loadFirstPage` sets the top row, and it resolves after this
+    // effect ran on mount. Re-asserting is why `matches` is a dependency.
+    setSelectedMatchId(addressed);
+
+    // Nothing is missing until the list has answered. On mount `matches` is
+    // empty, and a fetch decided there asks the server for an item the page
+    // was about to contain — one wasted request on every link that works.
+    if (state === "loading") return;
+
+    if (matches.some((match) => match.id === addressed)) {
+      setAddressedMatch(null);
+      setAddressMissing(false);
+      return;
+    }
+
+    let current = true;
+    requestJson<Match>(`/api/matches/${addressed}`)
+      .then((match) => {
+        if (!current) return;
+        setAddressedMatch(match);
+        setAddressMissing(false);
+      })
+      .catch(() => {
+        if (!current) return;
+        setAddressedMatch(null);
+        setAddressMissing(true);
+      });
+
+    return () => {
+      current = false;
+    };
+  }, [addressed, matches, state]);
+
+  /** Whether the address was copied a moment ago, for the button's own word. */
+  const [copied, setCopied] = useState(false);
+
+  async function copyLink(match: Match): Promise<void> {
+    const address = `${window.location.origin}${paths.inboxMatch(projectId, match.id)}`;
+    try {
+      await navigator.clipboard.writeText(address);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // No clipboard: the address is already in the bar, and the person can
+      // copy it from there. Nothing to report.
+    }
+  }
+
+  const selectedMatch =
+    matches.find((match) => match.id === selectedMatchId) ?? addressedMatch ?? matches[0] ?? null;
   const scoreRows: Array<[string, number]> = selectedMatch
     ? [
         ["Problem fit", selectedMatch.problemFit],
@@ -831,7 +911,14 @@ export function Inbox({ projectId }: { readonly projectId: string }) {
         </div>
       )}
 
-      {state !== "loading" && state !== "error" && matches.length === 0 && (
+      {addressMissing && (
+        <p className="center-state page-state" role="status">
+          That item is not in this inbox any more. It may have been removed, or the link may be for
+          a different account.
+        </p>
+      )}
+
+      {state !== "loading" && state !== "error" && matches.length === 0 && !addressedMatch && (
         <div className="center-state page-state" role="status">
           {monitors.length === 0 ? (
             <>
@@ -889,7 +976,7 @@ export function Inbox({ projectId }: { readonly projectId: string }) {
         </div>
       )}
 
-      {state !== "loading" && state !== "error" && matches.length > 0 && selectedMatch && (
+      {state !== "loading" && state !== "error" && selectedMatch && (
         <div className="inbox-layout">
           <div className="match-list-column">
             <div className="list-heading">
@@ -923,6 +1010,11 @@ export function Inbox({ projectId }: { readonly projectId: string }) {
                           setSelectedMatchId(match.id);
                           setMobileDetailOpen(true);
                           setExpandedMatchId(null);
+                          // The address follows the reading, so what is on
+                          // screen is what a copied link opens. Replace, so
+                          // Back leaves the inbox rather than walking every
+                          // item that was clicked in it. US-268.
+                          navigate(paths.inboxMatch(projectId, match.id), { replace: true });
                         }}
                       >
                         <span className="match-top">
@@ -1105,6 +1197,13 @@ export function Inbox({ projectId }: { readonly projectId: string }) {
                       ? "Open the post ↗"
                       : "Open conversation ↗"}
                   </a>
+                  <button
+                    className="secondary-button"
+                    type="button"
+                    onClick={() => void copyLink(selectedMatch)}
+                  >
+                    {copied ? "Link copied" : "Copy link"}
+                  </button>
                   <button
                     aria-pressed={selectedMatch.saved}
                     className={`secondary-button ${selectedMatch.saved ? "chosen" : ""}`}

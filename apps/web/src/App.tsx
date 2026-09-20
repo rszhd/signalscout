@@ -313,6 +313,7 @@ export function App() {
         <Route path={routes.newProject} element={<NewProjectRoute />} />
         <Route path={routes.editProject} element={<EditProjectRoute />} />
         <Route path={routes.inbox} element={<InboxRoute />} />
+        <Route path={routes.inboxMatch} element={<InboxRoute />} />
         <Route path={routes.monitors} element={<MonitorsRoute />} />
         <Route path={routes.newMonitor} element={<MonitorFormRoute />} />
         <Route path={routes.monitor} element={<MonitorRoute />} />
@@ -357,8 +358,12 @@ function EditProjectRoute() {
  * know that, so the impossible case is written out rather than asserted away.
  */
 function InboxRoute() {
-  const { projectId } = useParams();
-  return projectId ? <Inbox projectId={projectId} /> : <Navigate replace to={paths.projects} />;
+  const { projectId, matchId } = useParams();
+  return projectId ? (
+    <Inbox projectId={projectId} matchId={matchId ?? null} />
+  ) : (
+    <Navigate replace to={paths.projects} />
+  );
 }
 
 function MonitorsRoute() {
@@ -449,7 +454,9 @@ function Shell({ status }: { readonly status: AuthStatus }) {
   const projectId = useProjectId();
   const listing = useMatch(routes.monitors) !== null;
   const creating = useMatch(routes.newMonitor) !== null;
-  const reading = useMatch(routes.inbox) !== null;
+  const readingList = useMatch(routes.inbox) !== null;
+  const readingItem = useMatch(routes.inboxMatch) !== null;
+  const reading = readingList || readingItem;
   // The project editor is a page of its own, and the Projects item stays
   // current while a project is being made or edited.
   const listingProjects = useMatch(routes.projects) !== null;

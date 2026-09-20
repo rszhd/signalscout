@@ -914,6 +914,123 @@ describe("the intent inbox", () => {
     });
   });
 
+  /**
+   * An item has an address. US-268.
+   *
+   * The list resolves its selection from the page it holds, so an id alone
+   * would open a different item whenever the match was on a later page, under
+   * another filter, or dismissed — silently, and only for the recipient.
+   * These cases are those three, and the address following a click.
+   */
+  describe("an item's address", () => {
+    const addressed = match({ id: "match-9", title: "The one somebody was sent" });
+
+    async function open(pages: Record<string, unknown>, monitorRows = monitors) {
+      answerWith(pages, monitorRows);
+      screen = await mount(
+        <Inbox projectId={projectId} matchId="match-9" />,
+        `/projects/${projectId}/matches/match-9`,
+      );
+      container = screen.container;
+    }
+
+    function selectedTitle(): string | null | undefined {
+      return container.querySelector('[aria-current="true"] .match-title')?.textContent;
+    }
+
+    it("selects the item when the loaded page holds it", async () => {
+      await open({
+        "/api/matches?": { matches: [match(), addressed], nextCursor: null, asOf: "x" },
+      });
+
+      expect(selectedTitle()).toContain("The one somebody was sent");
+      // Nothing extra was asked for: the page already answered.
+      expect(fetchMock.mock.calls.some(([url]) => String(url) === "/api/matches/match-9")).toBe(
+        false,
+      );
+    });
+
+    it("fetches the item when it is on a later page, and shows it", async () => {
+      await open({ "/api/matches/match-9": addressed });
+
+      expect(fetchMock.mock.calls.some(([url]) => String(url) === "/api/matches/match-9")).toBe(
+        true,
+      );
+      // The panel shows the addressed item, not the top of the list.
+      expect(container.querySelector(".match-detail")?.textContent).toContain(
+        "The one somebody was sent",
+      );
+    });
+
+    it("shows the item when the filters hide every match on the page", async () => {
+      // A dismissed item under the default filter: the list is empty and the
+      // address still means one thing.
+      await open({
+        "/api/matches/match-9": { ...addressed, verdict: "not_relevant" },
+        "/api/matches?": { matches: [], nextCursor: null, asOf: "x" },
+      });
+
+      expect(container.textContent).not.toContain("Nothing has matched yet");
+      expect(container.querySelector(".match-detail")?.textContent).toContain(
+        "The one somebody was sent",
+      );
+    });
+
+    it("says so when the address names an item this inbox cannot reach", async () => {
+      fetchMock.mockImplementation(async (request: string | URL | Request) => {
+        const url = typeof request === "string" ? request : request.toString();
+        if (url === "/api/monitors") return json(monitors);
+        if (url === "/api/matches/match-9") return json({ message: "No match has that id." }, 404);
+        if (url.startsWith("/api/matches/count")) return json({ count: 0 });
+        if (url.startsWith("/api/matches")) return json(firstPage);
+        throw new Error(`Unexpected request: ${url}`);
+      });
+      screen = await mount(
+        <Inbox projectId={projectId} matchId="match-9" />,
+        `/projects/${projectId}/matches/match-9`,
+      );
+      container = screen.container;
+
+      expect(container.textContent).toContain("That item is not in this inbox any more");
+    });
+
+    it("moves the address to the item a person opens, without reloading the list", async () => {
+      await show({
+        "/api/matches?": {
+          matches: [match(), match({ id: "match-2", title: "The second one" })],
+          nextCursor: null,
+          asOf: "x",
+        },
+      });
+      const listReads = () =>
+        fetchMock.mock.calls.filter(([url]) => String(url).startsWith("/api/matches?")).length;
+      const before = listReads();
+
+      const second = [...container.querySelectorAll(".match-card")].find((card) =>
+        card.textContent?.includes("The second one"),
+      ) as HTMLButtonElement;
+      await act(async () => second.click());
+      await settle();
+
+      expect(screen.path()).toBe(`/projects/${projectId}/matches/match-2`);
+      expect(listReads()).toBe(before);
+    });
+
+    it("copies the item's address", async () => {
+      const writeText = vi.fn(async () => undefined);
+      Object.defineProperty(navigator, "clipboard", { value: { writeText }, configurable: true });
+      await show();
+
+      await act(async () => button("Copy link").click());
+      await settle();
+
+      expect(writeText).toHaveBeenCalledWith(
+        `${window.location.origin}/projects/${projectId}/matches/match-1`,
+      );
+      expect(container.textContent).toContain("Link copied");
+    });
+  });
+
   it("names the minimum score once a monitor has polled and nothing cleared it", async () => {
     // US-264. Before this, "nobody is talking" and "nothing cleared 30" were
     // the same empty screen.

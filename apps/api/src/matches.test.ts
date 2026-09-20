@@ -18,7 +18,7 @@ import {
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { loadEnv } from "./config/env.js";
 import { buildServer } from "./server.js";
-import { asOwner, createTestDatabase, type TestDatabase } from "./testing.js";
+import { asOwner, asUser, createTestDatabase, type TestDatabase } from "./testing.js";
 
 const logger = createLogger({ level: "silent", name: "test" });
 
@@ -414,6 +414,62 @@ describe("the inbox route", () => {
       } finally {
         await app.close();
       }
+    });
+  });
+
+  /**
+   * One match by its id, for the address that names it. US-268.
+   *
+   * The list resolves a selection against the page it holds, and an item
+   * somebody was referred to may be on a later page, under another filter,
+   * or dismissed. This is the read the screen falls back to.
+   */
+  describe("one match by its address", () => {
+    it("answers the owner's match, dismissed or not", async () => {
+      const matchId = await seed({ monitorId, score: 94, minutesOld: 12 });
+      await judge(matchId, "not_relevant");
+
+      const response = await get(`/api/matches/${matchId}`);
+
+      expect(response.statusCode).toBe(200);
+      expect(response.json()).toMatchObject({
+        id: matchId,
+        score: 94,
+        verdict: "not_relevant",
+        monitorName: "Teams replacing manual QA",
+      });
+    });
+
+    it("answers 404 to a stranger, the same as for an id that does not exist", async () => {
+      const matchId = await seed({ monitorId, score: 94, minutesOld: 12 });
+      const env = loadEnv({ DATABASE_URL: database.url });
+      const app = await buildServer({
+        session: asUser("a-stranger"),
+        env,
+        logger,
+        db,
+        queryGenerator: null,
+      });
+
+      try {
+        const theirs = await app.inject({ method: "GET", url: `/api/matches/${matchId}` });
+        const nobodys = await app.inject({
+          method: "GET",
+          url: "/api/matches/00000000-0000-4000-8000-000000000000",
+        });
+
+        expect(theirs.statusCode).toBe(404);
+        expect(nobodys.statusCode).toBe(404);
+        expect(theirs.json()).toEqual(nobodys.json());
+      } finally {
+        await app.close();
+      }
+    });
+
+    it("does not answer a match whose post is gone", async () => {
+      const matchId = await seed({ monitorId, score: 94, minutesOld: 12, hidden: true });
+
+      expect((await get(`/api/matches/${matchId}`)).statusCode).toBe(404);
     });
   });
 

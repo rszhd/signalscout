@@ -22,8 +22,10 @@ versioned and is not described here; it is what `main` holds.
 
 ## @signalscout/ui — Unreleased
 
-**Added.** The package itself, at `0.1.0` when it goes out: SignalScout's
-brand for both applications (US-270). `tokens.css` and `theme.css`, the
+## @signalscout/ui — 0.1.0 — 2026-09-20
+
+**Added.** The package itself: SignalScout's brand for both applications
+(US-270). `tokens.css` and `theme.css`, the
 `Button`, `Dialog` and `Field` primitives, `BrandIcon` and `BrandLogo`,
 `requestJson`, and the words both products say about a monitor — the status
 word, the poll and stage sentences, the badge, the ages and the money.
@@ -46,7 +48,9 @@ joins the tokens for its checks. **One stylesheet**: a consumer imports
 component's rules, in cascade order (US-279). There are no per-file exports. Where
 the two products differ the words take an argument:
 `pollSummary(run, { spend: false })` is the hosted sentence, and
-`Monitor.pausedByPlan` is the pause only a plan can perform.
+`Monitor.pausedByPlan` is the pause only a plan can perform. `BrandLogo`
+takes a `size` and carries its one rule in the stylesheet, so a consumer
+sets no rule for the mark (US-283).
 
 ## Unreleased
 

@@ -23,14 +23,18 @@ it rather than writing the value into a screen.
 
 ## Source of truth
 
+- `src/styles/styles.css`: **the one stylesheet an application imports.** It
+  imports the two below and every component's rules, in cascade order. One
+  export on purpose (US-279): Vite caches a dependency's `exports` for the
+  life of the process, so a new export per component needed a dev-server
+  restart and looked like a crash. A component's rules are one line here.
 - `src/styles/tokens.css`: semantic colors, Figtree typography, spacing,
   radii, control heights, page gutters, navigation sizes and reading width.
 - `src/styles/theme.css`: shared headers, buttons, view switches,
   disclosures and keyboard focus treatment.
 - each application's `index.css`: base layout, navigation and its own page
-  styles. It imports `@signalscout/ui/tokens.css`, and its `main.tsx` imports
-  `@signalscout/ui/theme.css` after the page styles so an ordinary page rule
-  cannot accidentally restore an older control theme.
+  styles. Its `main.tsx` imports `@signalscout/ui/styles.css` once, after the
+  base styles and before the page styles.
 
 Use tokens rather than introducing another gray, blue, radius or shadow in a
 page. Platform brand colors and semantic warning/success colors may differ
@@ -126,10 +130,10 @@ preview truncation and mobile reading pane remain page-specific.
   project, so its status line is that monitor's state and its second action
   opens it; self-hosted a project holds several, so the status is a count and
   the action makes the next one. The card knows neither. It knows the shape.
-- **Its stylesheet ships with it and is imported by name** —
-  `@signalscout/ui/project-card.css` — rather than growing `theme.css`, which
-  stays about primitives. A composed component and its rules travel together
-  or they drift.
+- **Its stylesheet ships with it**, as its own file under `src/styles/` and
+  one line in `styles.css`, rather than growing `theme.css`, which stays about
+  primitives. A composed component and its rules travel together or they
+  drift.
 - **It holds no state.** The open confirmation is a prop, so the page keeps
   deciding which card is asking.
 - **It links with the router**, which is why `react-router` is a peer: a card

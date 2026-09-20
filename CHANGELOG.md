@@ -28,7 +28,7 @@ brand for both applications (US-270). `tokens.css` and `theme.css`, the
 `requestJson`, and the words both products say about a monitor — the status
 word, the poll and stage sentences, the badge, the ages and the money.
 `@signalscout/ui/testing` carries the monitor and poll fixtures.
-`ProjectCard` and `@signalscout/ui/project-card.css` are the first shared
+`ProjectCard` is the first shared
 component that is not a primitive: the project card, with the status line, the
 second action and the delete question as props (US-273). React,
 `react-dom` and `react-router` are peer dependencies — the card links with the
@@ -38,11 +38,12 @@ under `@signalscout/ui/testing` renders (US-274). The schedule's words —
 and the timezone helpers — are exported too (US-275). `PageState` and
 `FormError` are the state block and the error row, with their rules in
 `theme.css` and the role each state carries decided by the component
-(US-276); `--danger-soft` joins the tokens for them. `ReplyVoices` and
-`@signalscout/ui/reply-voices.css` are the reply voice editor, the first whole
+(US-276); `--danger-soft` joins the tokens for them. `ReplyVoices` is the reply voice editor, the first whole
 screen in the package (US-277); a consumer renders it on a route of its own.
-`ReplyDraft` and `@signalscout/ui/reply-draft.css` are the reply composer a
-match opens (US-278); `--warning-soft` joins the tokens for its checks. Where
+`ReplyDraft` is the reply composer a match opens (US-278); `--warning-soft`
+joins the tokens for its checks. **One stylesheet**: a consumer imports
+`@signalscout/ui/styles.css` and nothing else — the tokens, the theme and every
+component's rules, in cascade order (US-279). There are no per-file exports. Where
 the two products differ the words take an argument:
 `pollSummary(run, { spend: false })` is the hosted sentence, and
 `Monitor.pausedByPlan` is the pause only a plan can perform.

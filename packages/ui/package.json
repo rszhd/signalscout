@@ -28,14 +28,6 @@
       "types": "./dist/testing/index.d.ts",
       "default": "./dist/testing/index.js"
     },
-    "./tokens.css": {
-      "development": "./src/styles/tokens.css",
-      "default": "./dist/styles/tokens.css"
-    },
-    "./theme.css": {
-      "development": "./src/styles/theme.css",
-      "default": "./dist/styles/theme.css"
-    },
     "./mark.svg": {
       "development": "./src/assets/mark.svg",
       "default": "./dist/assets/mark.svg"
@@ -44,17 +36,9 @@
       "development": "./src/assets/mark-small.svg",
       "default": "./dist/assets/mark-small.svg"
     },
-    "./project-card.css": {
-      "development": "./src/styles/project-card.css",
-      "default": "./dist/styles/project-card.css"
-    },
-    "./reply-voices.css": {
-      "development": "./src/styles/reply-voices.css",
-      "default": "./dist/styles/reply-voices.css"
-    },
-    "./reply-draft.css": {
-      "development": "./src/styles/reply-draft.css",
-      "default": "./dist/styles/reply-draft.css"
+    "./styles.css": {
+      "development": "./src/styles/styles.css",
+      "default": "./dist/styles/styles.css"
     }
   },
   "scripts": {
@@ -88,13 +72,9 @@
         "types": "./dist/testing/index.d.ts",
         "default": "./dist/testing/index.js"
       },
-      "./tokens.css": "./dist/styles/tokens.css",
-      "./theme.css": "./dist/styles/theme.css",
       "./mark.svg": "./dist/assets/mark.svg",
       "./mark-small.svg": "./dist/assets/mark-small.svg",
-      "./project-card.css": "./dist/styles/project-card.css",
-      "./reply-voices.css": "./dist/styles/reply-voices.css",
-      "./reply-draft.css": "./dist/styles/reply-draft.css"
+      "./styles.css": "./dist/styles/styles.css"
     }
   }
 }

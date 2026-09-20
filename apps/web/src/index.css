@@ -2,7 +2,6 @@
 @import "@fontsource/figtree/latin-500.css";
 @import "@fontsource/figtree/latin-700.css";
 @import "tailwindcss";
-@import "@signalscout/ui/tokens.css";
 
 * {
   box-sizing: border-box;

@@ -1,0 +1,18 @@
+/*
+ * Everything an application imports, in one line. US-279.
+ *
+ * The one stylesheet export of the package, and the reason it is one: Vite
+ * caches a dependency's `exports` for the life of the process, so a new
+ * export entry — one per component that ships with rules — needs a restart
+ * and looks like a crash until it gets one. A line added here is inside a
+ * file Vite already watches.
+ *
+ * The order is the cascade. The tokens first, so everything after has them.
+ * The theme next: the shared controls. Then each component's rules, which may
+ * lean on the theme's and never the reverse.
+ */
+@import "./tokens.css";
+@import "./theme.css";
+@import "./project-card.css";
+@import "./reply-draft.css";
+@import "./reply-voices.css";

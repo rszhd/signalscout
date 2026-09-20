@@ -45,6 +45,7 @@ try {
     "package/dist/index.d.ts",
     "package/dist/testing/index.js",
     "package/dist/testing/harness.js",
+    "package/dist/styles/styles.css",
     "package/dist/styles/tokens.css",
     "package/dist/styles/theme.css",
     "package/dist/styles/project-card.css",
@@ -62,6 +63,23 @@ try {
   const entry = run("tar", ["-xOzf", tarball, "package/dist/index.js"]);
   if (entry.includes("react-dom") || entry.includes("./testing")) {
     fail("dist/index.js reaches the harness or react-dom");
+  }
+
+  // The one stylesheet export names every other stylesheet the tarball carries,
+  // so a component whose rules were added to the folder and not to the import
+  // list is caught here rather than on a screen. US-279.
+  const styles = run("tar", ["-xOzf", tarball, "package/dist/styles/styles.css"]);
+  for (const file of listing) {
+    const name = file.match(/^package\/dist\/styles\/(.+\.css)$/)?.[1];
+    if (name && name !== "styles.css" && !styles.includes(`"./${name}"`)) {
+      fail(`dist/styles/${name} is not imported by styles.css`);
+    }
+  }
+  const stylesheetExports = Object.keys(manifest.exports).filter((key) => key.endsWith(".css"));
+  if (stylesheetExports.join() !== "./styles.css") {
+    fail(
+      `exports name ${stylesheetExports.join(", ")}; the package has one stylesheet, ./styles.css`,
+    );
   }
 
   const tests = listing.filter((file) => /\.test\.(js|d\.ts|js\.map|d\.ts\.map)$/.test(file));

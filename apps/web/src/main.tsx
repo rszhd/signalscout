@@ -15,6 +15,7 @@ import "./styles/notifications.css";
 import "./styles/providers.css";
 import "./styles/reply-draft.css";
 import "./styles/reply-voices.css";
+import "./styles/sidebar.css";
 
 const container = document.getElementById("root");
 

@@ -2,7 +2,7 @@
 
 # Open tickets
 
-27 open — 0 doing, 23 todo, 4 parked (1 p1, 16 p2, 10 p3).
+26 open — 0 doing, 22 todo, 4 parked (1 p1, 16 p2, 9 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -27,7 +27,6 @@
 | p3 | US-095 | [The logo travels with the email](todo/US-095-the-logo-travels-with-the-email.md) | feature | todo | 2026-09-10T00:36+08:00 |
 | p3 | US-243 | [One Instagram comment link is opened](todo/US-243-one-instagram-comment-link-is-opened.md) | chore | todo | 2026-09-20T00:56+08:00 |
 | p3 | US-258 | [The four densest files lose their inline stories](todo/US-258-the-four-densest-files-lose-their-inline-stories.md) | chore | todo | 2026-09-20T02:05+08:00 |
-| p3 | US-272 | [Two pages still carry the old palette](todo/US-272-two-pages-still-carry-the-old-palette.md) | chore | todo | 2026-09-20T12:10+08:00 |
 | p3 | BUG-013 | [A key row's error is printed inside a closed dialog](todo/BUG-013-a-key-row-s-error-is-printed-inside-a-closed-dialog.md) | bug | todo | 2026-09-09T11:58+08:00 |
 | p3 | US-038 | [Instagram, TikTok and Threads](parked/US-038-instagram-tiktok-and-threads.md) | feature | parked | 2026-09-06T11:56+08:00 |
 | p3 | US-240 | [One capped poll is measured against one uncapped](parked/US-240-one-capped-poll-is-measured-against-one-uncapped.md) | chore | parked | 2026-09-20T00:56+08:00 |

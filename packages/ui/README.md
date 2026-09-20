@@ -141,16 +141,20 @@ Where the products differ, the difference is an argument and never a fork:
 - **React 19**, as a peer dependency. Two Reacts in one bundle is two
   renderers and a hook that throws.
 - **`public/brands/`** — the provider and platform icons `BrandIcon` names,
-  listed in its own table. They are the one brand asset still copied into
-  each application rather than shipped here.
+  listed in its own table.
+- **`public/brand/mark.svg` and `mark-small.svg`** — copied from this package's
+  exported assets. `BrandLogo` and browser metadata deliberately address the
+  same public files, so the application logo cannot drift from its favicon.
 
 ## The mark
 
-`BrandLogo` draws it: nine positions on a lattice, one of them found. It is
-JSX rather than an SVG file on purpose — an `<img>` cannot read the page's
-custom properties, so a mark in a file carries its own hex numbers and the
-brand has two homes again. Inline, the dots are `var(--accent-tint)` and the
-found one is `var(--accent)`.
+`BrandLogo` renders the canonical `mark.svg`: nine positions on a lattice,
+one of them found. The package also ships `mark-small.svg`, whose four-dot cut
+survives at favicon size. They are exported as `@signalscout/ui/mark.svg` and
+`@signalscout/ui/mark-small.svg`; applications copy them into `public/brand/`
+alongside their generated PNG and ICO variants.
 
-It also means this package holds no asset import, so plain Node can read its
-words. `scripts/verify-packed-ui.mjs` proves that on every release.
+The SVG owns the two mark colours. Those are artwork, not control colours;
+the values deliberately match `--accent-tint` and `--accent`. Keeping the SVG
+in the package makes that duplication visible and releaseable instead of
+letting each application redraw it.

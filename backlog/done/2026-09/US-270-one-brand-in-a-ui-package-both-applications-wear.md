@@ -82,13 +82,8 @@ Decisions the ticket makes rather than the code:
       is asked for, not taken, and the owner has not said yes.
 - [x] AGENTS.md's theme paragraph says the colours and sizing live in
       `@signalscout/ui`, and a screen never writes a raw value.
-- [ ] Every screen was rendered once in a browser after the move, and the
-      Log says what was seen. **Not done**: the Chrome extension was not
-      connected to this session. The stack runs and the brand resolves —
-      Vite serves the package's `tokens.css` and `theme.css`, and the
-      production bundle carries the palette — but no browser has rendered a
-      screen. This is the standing gap AGENTS.md names, and it is the one
-      box left open.
+- [x] Every screen was rendered once in a browser after the move, and the
+      Log says what was seen.
 
 ## Notes
 
@@ -130,3 +125,24 @@ Decisions the ticket makes rather than the code:
   `pollSummary`'s subject is now an option. 2,245 tests pass, `pnpm lint`,
   `pnpm lint:css` and `pnpm typecheck` pass, and the packed package installs
   and works outside the workspace.
+- 2026-09-20T14:38+08:00 — Closed the browser gap while finishing US-272.
+  Sign in, onboarding and every route in `route.ts` were rendered at 1440 by
+  1000 and 375 by 812. The project list, project create and edit, empty inbox,
+  empty monitor list, five-step setup, connections, provider comparison,
+  reply voices and models all carried the package's `#f8fafd` shell and
+  `#0b57d0` accent, with no horizontal page overflow. Monitor detail and
+  notifications were rendered in their not-found states because the audit
+  account deliberately created no monitor and started no billable work. A
+  representative reply composer rendered its draft, warning and copied
+  states. The desktop sidebar and phone bottom navigation both kept their
+  selected destination legible. The production build then found one stale
+  reference to the deleted `src/assets` directory in the package's copy step.
+  The mark is JSX now, so the step copies the two stylesheets and no longer
+  asks for an asset folder that does not exist.
+- 2026-09-20T15:17+08:00 — Owner review rejected that closure because the
+  sidebar, logo and favicon still differed. US-272 completed them. The earlier
+  inline-mark decision is superseded: the package again ships the canonical
+  `mark.svg` and `mark-small.svg`, `BrandLogo` renders the public copy, and the
+  packed verifier requires both assets. The app shell now matches cloud's
+  desktop and phone navigation treatment while keeping this application's own
+  routes. All routes were rendered again after the correction.

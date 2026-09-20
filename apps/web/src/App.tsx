@@ -451,7 +451,9 @@ function NavIcon({ name }: { readonly name: NavIconName }) {
 function Shell({ status }: { readonly status: AuthStatus }) {
   const projectId = useProjectId();
   const listing = useMatch(routes.monitors) !== null;
-  const creating = useMatch(routes.newMonitor) !== null;
+  const readingMonitor = useMatch(routes.monitor) !== null;
+  const editingNotifications = useMatch(routes.notifications) !== null;
+  const monitoring = listing || readingMonitor || editingNotifications;
   const readingList = useMatch(routes.inbox) !== null;
   const readingItem = useMatch(routes.inboxMatch) !== null;
   const reading = readingList || readingItem;
@@ -464,15 +466,24 @@ function Shell({ status }: { readonly status: AuthStatus }) {
   const comparing = useMatch(routes.providers) !== null;
   const voicing = useMatch(routes.replyVoices) !== null;
   const modelling = useMatch(routes.models) !== null;
+  const accounting = comparing || voicing || modelling;
   const accountSheet = useRef<HTMLDialogElement | null>(null);
 
   const accountLinks = (
     <>
-      <Link className={comparing ? "nav-item current" : "nav-item"} to={paths.providers}>
+      <Link
+        aria-current={comparing ? "page" : undefined}
+        className={comparing ? "nav-item current" : "nav-item"}
+        to={paths.providers}
+      >
         <NavIcon name="providers" />
         <span>Providers</span>
       </Link>
-      <Link className={voicing ? "nav-item current" : "nav-item"} to={paths.replyVoices}>
+      <Link
+        aria-current={voicing ? "page" : undefined}
+        className={voicing ? "nav-item current" : "nav-item"}
+        to={paths.replyVoices}
+      >
         <NavIcon name="voices" />
         <span>Voices</span>
       </Link>
@@ -480,7 +491,11 @@ function Shell({ status }: { readonly status: AuthStatus }) {
         Beside Providers rather than inside a project: a model key is one
         account's, for every project it runs. US-068.
       */}
-      <Link className={modelling ? "nav-item current" : "nav-item"} to={paths.models}>
+      <Link
+        aria-current={modelling ? "page" : undefined}
+        className={modelling ? "nav-item current" : "nav-item"}
+        to={paths.models}
+      >
         <NavIcon name="models" />
         <span>Models</span>
       </Link>
@@ -508,7 +523,11 @@ function Shell({ status }: { readonly status: AuthStatus }) {
         </Link>
 
         <nav className="site-nav" aria-label="Screens">
-          <Link className={projecting ? "nav-item current" : "nav-item"} to={paths.projects}>
+          <Link
+            aria-current={projecting ? "page" : undefined}
+            className={projecting ? "nav-item current" : "nav-item"}
+            to={paths.projects}
+          >
             <NavIcon name="projects" />
             <span>Projects</span>
           </Link>
@@ -522,6 +541,7 @@ function Shell({ status }: { readonly status: AuthStatus }) {
           {projectId !== null && (
             <>
               <Link
+                aria-current={reading ? "page" : undefined}
                 className={reading ? "nav-item current" : "nav-item"}
                 to={paths.inbox(projectId)}
               >
@@ -530,7 +550,8 @@ function Shell({ status }: { readonly status: AuthStatus }) {
                 <span className="nav-label-narrow">Inbox</span>
               </Link>
               <Link
-                className={listing ? "nav-item current" : "nav-item"}
+                aria-current={monitoring ? "page" : undefined}
+                className={monitoring ? "nav-item current" : "nav-item"}
                 to={paths.monitors(projectId)}
               >
                 <NavIcon name="monitors" />
@@ -544,17 +565,17 @@ function Shell({ status }: { readonly status: AuthStatus }) {
             make an unfiled monitor, the state migration 0038 emptied out.
           */}
           {projectId !== null && (
-            <Link
-              className={creating ? "nav-item new-monitor-nav current" : "nav-item new-monitor-nav"}
-              to={paths.newMonitor(projectId)}
-            >
+            <Link className="nav-item new-monitor-nav" to={paths.newMonitor(projectId)}>
               <NavIcon name="add" />
               <span>New monitor</span>
             </Link>
           )}
 
           <button
-            className="nav-item account-sheet-button"
+            aria-current={accounting ? "page" : undefined}
+            className={
+              accounting ? "nav-item account-sheet-button current" : "nav-item account-sheet-button"
+            }
             type="button"
             onClick={() => accountSheet.current?.showModal()}
           >

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 130 130" width="130" height="130" role="img" aria-label="SignalScout">
+  <circle cx="9" cy="21" r="9" fill="#8ab4f8"/>
+  <circle cx="59" cy="21" r="9" fill="#8ab4f8"/>
+  <circle cx="9" cy="71" r="9" fill="#8ab4f8"/>
+  <circle cx="59" cy="71" r="9" fill="#8ab4f8"/>
+  <circle cx="109" cy="71" r="9" fill="#8ab4f8"/>
+  <circle cx="9" cy="121" r="9" fill="#8ab4f8"/>
+  <circle cx="59" cy="121" r="9" fill="#8ab4f8"/>
+  <circle cx="109" cy="121" r="9" fill="#8ab4f8"/>
+  <circle cx="109" cy="21" r="21" fill="#0b57d0"/>
+</svg>

@@ -34,11 +34,9 @@ describe("the login screen", () => {
   it("asks for the first account when the instance has none", async () => {
     screen = await mount(<Login firstRun={true} signUpOpen={true} />);
 
-    // US-270: the mark travels with @signalscout/ui.
-    // The mark is drawn by `BrandLogo` in @signalscout/ui, so what this
-    // screen owes is that it is rendered and named. US-270.
-    expect(screen.container.querySelector(".brand-logo")?.getAttribute("aria-label")).toBe(
-      "SignalScout",
+    // US-270/272: every surface uses the canonical nine-dot asset.
+    expect(screen.container.querySelector(".brand-logo")?.getAttribute("src")).toBe(
+      "/brand/mark.svg",
     );
     expect(screen.container.textContent).toContain("Set up this instance");
     expect(screen.container.textContent).toContain("signup closes behind it");

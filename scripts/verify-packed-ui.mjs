@@ -4,10 +4,10 @@
  *
  * `verify-packed.mjs` does this for the engine and the pipeline. This is the
  * same act for the brand package, and it checks the two things `tsc` alone
- * cannot: that the stylesheets and the mark are in the tarball — a build that
- * was `tsc` and nothing else exports `./tokens.css` from a file that is not
- * there — and that `publishConfig` replaced the `development` condition, which
- * points at `src/` and would send a consumer to a folder the tarball omits.
+ * cannot: that the stylesheets and canonical marks are in the tarball — a
+ * build that was `tsc` and nothing else exports files that are not there —
+ * and that `publishConfig` replaced the `development` condition, which points
+ * at `src/` and would send a consumer to a folder the tarball omits.
  *
  * React is not installed here. The words and the labels are plain functions,
  * so importing the entry point proves the module graph resolves; a component
@@ -47,6 +47,7 @@ try {
     "package/dist/styles/tokens.css",
     "package/dist/styles/theme.css",
     "package/dist/assets/mark.svg",
+    "package/dist/assets/mark-small.svg",
   ]) {
     if (!listing.includes(file)) fail(`ships no ${file.replace("package/", "")}`);
   }

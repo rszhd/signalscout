@@ -156,12 +156,9 @@ describe("the application screens", () => {
   it("shows the signed-in account where the self-hosted label used to be", async () => {
     screen = await mount(<App />);
 
-    // US-270: the mark is the lattice, and it travels with @signalscout/ui
-    // rather than sitting in each application's public folder.
-    // The mark is drawn by `BrandLogo` in @signalscout/ui, so what this
-    // screen owes is that it is rendered and named. US-270.
-    expect(screen.container.querySelector(".brand-logo")?.getAttribute("aria-label")).toBe(
-      "SignalScout",
+    // US-270/272: every surface uses the canonical nine-dot asset.
+    expect(screen.container.querySelector(".brand-logo")?.getAttribute("src")).toBe(
+      "/brand/mark.svg",
     );
     expect(screen.container.textContent).toContain("The owner");
     expect(screen.container.textContent).toContain("owner@example.com");
@@ -313,6 +310,30 @@ describe("the application screens", () => {
     expect(links).toContain(inbox);
     expect(links).toContain(monitors);
     expect(links).toContain(newMonitor);
+  });
+
+  it("keeps one monitor destination current throughout monitor work", async () => {
+    const monitor = `${monitors}/00000000-0000-4000-8000-000000000000`;
+
+    for (const address of [newMonitor, monitor, `${monitor}/notifications`]) {
+      screen = await mount(<App />, address);
+
+      const current = screen.container.querySelectorAll('.site-nav [aria-current="page"]');
+      expect(current).toHaveLength(1);
+      expect(current[0]?.getAttribute("href")).toBe(monitors);
+
+      await screen.unmount();
+    }
+  });
+
+  it("shows the account destination as current on its phone navigation", async () => {
+    screen = await mount(<App />, "/providers");
+
+    expect(
+      screen.container
+        .querySelector(".site-nav .account-sheet-button")
+        ?.getAttribute("aria-current"),
+    ).toBe("page");
   });
 
   /**

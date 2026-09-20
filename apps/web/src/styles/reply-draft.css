@@ -1,12 +1,11 @@
 /* The reply composer in the inbox. Prompt editing opens in its own dialog. */
 
 .reply-draft {
-  margin-top: var(--space-8);
+  margin-top: var(--space-6);
   overflow: hidden;
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
   background: var(--surface);
-  box-shadow: 0 1px 2px rgb(20 24 21 / 3%);
 }
 
 .reply-draft-heading {
@@ -16,7 +15,7 @@
   align-items: center;
   padding: var(--space-5);
   border-bottom: 1px solid var(--line);
-  background: linear-gradient(135deg, var(--surface) 35%, var(--accent-soft));
+  background: var(--surface);
 }
 
 .reply-draft-mark {
@@ -24,11 +23,10 @@
   height: 38px;
   display: grid;
   place-items: center;
-  border: 1px solid #dbe4f2;
-  border-radius: 10px;
+  border: 0;
+  border-radius: 50%;
   color: var(--accent-text);
-  background: var(--surface);
-  box-shadow: 0 1px 2px rgb(38 67 111 / 8%);
+  background: var(--accent-soft);
   font-size: 1.25rem;
 }
 
@@ -52,10 +50,10 @@
   align-items: center;
   gap: var(--space-1);
   padding: 0 var(--space-2);
-  border: 1px solid #d9e1d6;
+  border: 0;
   border-radius: 999px;
-  color: #52634e;
-  background: rgb(255 255 255 / 72%);
+  color: var(--muted-strong);
+  background: var(--surface-soft);
   font-size: 0.75rem;
   font-weight: 500;
   white-space: nowrap;
@@ -73,6 +71,7 @@
   height: 14px;
   font-size: 0.6875rem;
   font-weight: 700;
+  color: var(--success);
 }
 
 .reply-draft-controls {
@@ -114,8 +113,8 @@
 .reply-voice-field select:focus,
 .reply-dialog-select select:focus,
 .reply-draft-dialog :where(input, textarea):focus {
-  border-color: #848d85;
-  box-shadow: 0 0 0 3px rgb(25 28 26 / 6%);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
 .reply-draft-manage {
@@ -155,7 +154,7 @@
 .reply-draft-spinner {
   width: 15px;
   height: 15px;
-  border: 2px solid rgb(255 255 255 / 35%);
+  border: 2px solid var(--accent-tint);
   border-top-color: currentcolor;
   border-radius: 50%;
   animation: reply-draft-spin 650ms linear infinite;
@@ -212,8 +211,8 @@
 }
 
 .reply-draft-editor:focus-within {
-  border-color: #848d85;
-  box-shadow: 0 0 0 3px rgb(25 28 26 / 6%);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
 .reply-draft-editor textarea {
@@ -250,10 +249,11 @@
 .reply-draft-checks {
   margin-top: var(--space-3);
   padding: var(--space-3) var(--space-4);
-  border: 1px solid #ead8b7;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--warning);
   border-radius: var(--radius-sm);
-  color: #77542f;
-  background: #fff8e9;
+  color: var(--muted-strong);
+  background: var(--surface-soft);
 }
 
 .reply-draft-checks-heading {
@@ -302,7 +302,7 @@
 }
 
 .reply-draft-copy.copied {
-  background: #52634e;
+  background: var(--success);
 }
 
 .reply-draft-cost {
@@ -321,7 +321,7 @@
   display: grid;
   place-items: center;
   padding: var(--space-5);
-  background: rgb(21 26 34 / 42%);
+  background: var(--scrim);
   backdrop-filter: blur(2px);
 }
 

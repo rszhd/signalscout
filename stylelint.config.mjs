@@ -39,16 +39,5 @@ export default {
       files: ["**/tokens.css"],
       rules: { "declaration-property-value-disallowed-list": null },
     },
-    {
-      /*
-       * Two pages carry a whole older palette — greens and ambers the brand
-       * does not have — from before the theme was redrawn. Naming twelve
-       * one-page colours as brand tokens would be worse than the debt, so
-       * they are exempt until the pages adopt the palette. US-272 is that
-       * work, and this list is what it deletes.
-       */
-      files: ["apps/web/src/styles/reply-draft.css", "apps/web/src/styles/reply-voices.css"],
-      rules: { "declaration-property-value-disallowed-list": null },
-    },
   ],
 };

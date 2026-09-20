@@ -24,13 +24,14 @@ travels *inside* the message meets neither objection.
 `cid:` reference is part of the multipart message: nothing is fetched, nothing
 is hosted, and no client is asked to trust a third party. A data URI is
 stripped by Gmail and Outlook. An inline `<svg>` is stripped by Gmail
-outright, so `favicon.svg` is not the source even though it is the sharper
-asset.
+outright, so the canonical `@signalscout/ui/mark.svg` is not sent directly
+even though it is the sharper source artwork.
 
-**The asset has to live in `packages/core`.** `apps/web/public/logo.png` is the
-mark, and the worker that sends a digest is a container that may not have the
-web app in it at all. A copy inside the sending package is the only version
-that is certainly present when the mail is built.
+**The source asset lives in `packages/ui`.** US-270 split the old core package
+and put the canonical mark there. `apps/web/public/logo.png` is the raster
+copy, but the worker that sends a digest is a container that may not have the
+web app in it at all. The mail build must read or generate its attachment from
+the package rather than reaching into the web app.
 
 **It is 512×512 and 20 KB, which is too big for a 27-pixel header.** It wants
 resizing to about 108 pixels for a 54-pixel display at 2×. Every digest carries
@@ -44,7 +45,7 @@ an empty box says nothing about who sent the message.
 
 - [ ] The mark is attached to the message by content id, not linked, not a
       data URI and not inline SVG
-- [ ] The asset lives in `packages/core`, so the worker container has it
+- [ ] The asset comes from `packages/ui`, so the worker container has it
       without the web app
 - [ ] It is resized for a mail header rather than shipped at 512×512, and the
       per-message byte cost is written down
@@ -58,9 +59,9 @@ an empty box says nothing about who sent the message.
 - `email-theme.ts` holds the shell, so this is one change there plus the
   attachment in `transport.ts`. The transport's `email` signature would gain
   the attachment, or the shell would declare what it needs.
-- `apps/web/public/favicon.svg` is the same mark as vector and is the better
-  source to resize *from*, if the copy is generated rather than downscaled from
-  the PNG.
+- `packages/ui/src/assets/mark.svg` is the canonical vector and is the better
+  source to resize *from*, if the copy is generated rather than downscaled
+  from the PNG.
 - Do not let this become a reason to add a remote image later. The objection in
   US-094 stands for anything fetched at read time.
 
@@ -69,3 +70,5 @@ an empty box says nothing about who sent the message.
 - 2026-09-10T00:36+08:00 — Written when the owner saw US-094's first dressed
   emails and said the logo was missing. Deferred by them in the same message,
   so this is the record rather than the work.
+- 2026-09-20T15:06+08:00 — Updated the source path after US-270 moved the
+  canonical mark into `packages/ui` and US-272 removed the old radar favicon.

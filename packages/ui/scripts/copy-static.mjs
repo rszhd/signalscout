@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * The stylesheets and the mark, into `dist`.
+ * The stylesheets and the marks, into `dist`.
  *
  * `tsc` emits JavaScript and declarations and nothing else, so a published
  * package whose build was `tsc` alone would export `./tokens.css` from a file

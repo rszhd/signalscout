@@ -35,6 +35,14 @@
     "./theme.css": {
       "development": "./src/styles/theme.css",
       "default": "./dist/styles/theme.css"
+    },
+    "./mark.svg": {
+      "development": "./src/assets/mark.svg",
+      "default": "./dist/assets/mark.svg"
+    },
+    "./mark-small.svg": {
+      "development": "./src/assets/mark-small.svg",
+      "default": "./dist/assets/mark-small.svg"
     }
   },
   "scripts": {
@@ -63,7 +71,9 @@
         "default": "./dist/testing/index.js"
       },
       "./tokens.css": "./dist/styles/tokens.css",
-      "./theme.css": "./dist/styles/theme.css"
+      "./theme.css": "./dist/styles/theme.css",
+      "./mark.svg": "./dist/assets/mark.svg",
+      "./mark-small.svg": "./dist/assets/mark-small.svg"
     }
   }
 }

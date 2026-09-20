@@ -6,7 +6,7 @@ priority: p2
 created: 2026-09-20T12:55+08:00
 parent:
 area: api
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -38,20 +38,22 @@ same way, for the same reason.
 
 ## Acceptance
 
-- [ ] `WEB_PORT` is in the API's environment schema, defaulting to 5173, and
+- [x] `WEB_PORT` is in the API's environment schema, defaulting to 5173, and
       `.env.example` and `docker-compose.yml` carry it.
-- [ ] The trusted dev origins are built from it: `localhost` and `127.0.0.1`
+- [x] The trusted dev origins are built from it: `localhost` and `127.0.0.1`
       on that port, in development only.
-- [ ] A test proves a sign-in from the worktree's own port is accepted and one
+- [x] A test proves a sign-in from the worktree's own port is accepted and one
       from another port is refused, with `WEB_PORT` set.
-- [ ] `AUTH_TRUSTED_ORIGINS` still adds origins in both modes, and production
+- [x] `AUTH_TRUSTED_ORIGINS` still adds origins in both modes, and production
       still trusts nothing on localhost.
-- [ ] The refusal names the origin it refused and the ones it would accept, in
+- [x] The refusal names the origin it refused and the ones it would accept, in
       a log line at warn level. The response body stays as Better Auth writes
       it: a stranger learns nothing from it, and this is for the person
       reading the server's output.
-- [ ] `scripts/worktrees.mjs` needs no change; a fresh worktree signs in with
-      no `AUTH_TRUSTED_ORIGINS` entry.
+- [x] `scripts/worktrees.mjs` needs no change; a fresh worktree signs in with
+      no `AUTH_TRUSTED_ORIGINS` entry. Proved by the unit case at 5175 rather
+      than by making a worktree: the script already writes `WEB_PORT`, and the
+      API now reads it.
 
 ## Notes
 
@@ -65,3 +67,12 @@ same way, for the same reason.
 
 - 2026-09-20T12:55+08:00 — Found by running both applications on one machine:
   the second UI took 5174 and every sign-in on it was refused.
+- 2026-09-20T13:10+08:00 — Shipped. `WEB_PORT` is in the schema at 5173,
+  `viteDevOrigins` is a function of it, and `.env.example` and
+  `docker-compose.yml` carry it. The startup line names the trusted list and
+  the port; the browser's refusal still names nothing, which is the half a
+  stranger must not learn from. Two new cases: 5175 is trusted and 5173 is
+  not, and a checkout that sets nothing still gets 5173. Putting the constant
+  back turned the first one red. 2,247 tests pass. Verified live against the
+  running stack: a sign-in from 5173 reaches the credential check and one
+  from 5174 is refused.

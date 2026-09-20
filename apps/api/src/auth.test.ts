@@ -741,19 +741,46 @@ describe("the session gate", () => {
       const development = loadEnv({ DATABASE_URL: database.url, NODE_ENV: "development" });
       const production = loadEnv({ DATABASE_URL: database.url, NODE_ENV: "production" });
 
-      expect(trustedOrigins(development)).toEqual(viteDevOrigins);
+      expect(trustedOrigins(development)).toEqual(viteDevOrigins(development));
       // A production build that trusted localhost would accept a login posted
       // by a page running on the person's own machine.
       expect(trustedOrigins(production)).toEqual([]);
     });
 
+    /**
+     * The dev server's port is a variable, and the trusted origin follows it.
+     * BUG-031: it was a constant saying 5173 while `worktrees.mjs` hands slot
+     * 2 the port 5175, so every worktree but the main one refused every
+     * sign-in — and the message named no port.
+     */
+    it("trusts the dev server on whichever port it was told, and no other", () => {
+      const worktree = loadEnv({
+        DATABASE_URL: database.url,
+        NODE_ENV: "development",
+        WEB_PORT: "5175",
+      });
+
+      expect(trustedOrigins(worktree)).toEqual(["http://localhost:5175", "http://127.0.0.1:5175"]);
+      // The main slot's port is not trusted here: two checkouts on one machine
+      // are two instances, and a sign-in posted from the other one's UI would
+      // reach this API with that origin.
+      expect(trustedOrigins(worktree)).not.toContain("http://localhost:5173");
+    });
+
+    it("defaults to 5173, so a checkout that sets nothing still signs in", () => {
+      const plain = loadEnv({ DATABASE_URL: database.url, NODE_ENV: "development" });
+
+      expect(trustedOrigins(plain)).toEqual(["http://localhost:5173", "http://127.0.0.1:5173"]);
+    });
+
     it("keeps what the environment configured, in both modes", () => {
       const configured = { AUTH_TRUSTED_ORIGINS: "https://app.example, https://admin.example" };
+      const development = loadEnv({ DATABASE_URL: database.url, ...configured });
 
-      expect(trustedOrigins(loadEnv({ DATABASE_URL: database.url, ...configured }))).toEqual([
+      expect(trustedOrigins(development)).toEqual([
         "https://app.example",
         "https://admin.example",
-        ...viteDevOrigins,
+        ...viteDevOrigins(development),
       ]);
 
       expect(

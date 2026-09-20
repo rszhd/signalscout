@@ -17,6 +17,8 @@ x-app-environment: &app-environment
   LOG_LEVEL: ${LOG_LEVEL:-info}
   HOST: 0.0.0.0
   PORT: ${PORT:-3000}
+  # Only the dev server's origin depends on it, and a container has none.
+  WEB_PORT: ${WEB_PORT:-5173}
   DATABASE_URL: postgres://${POSTGRES_USER:-intentwatch}:${POSTGRES_PASSWORD:-intentwatch}@postgres:5432/${POSTGRES_DB:-intentwatch}
   # Signs the session cookie. The app refuses to start without it, because an
   # instance with no login serves its inbox and its keys to whoever finds the

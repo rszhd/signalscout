@@ -2,10 +2,11 @@
 
 # Done
 
-166 finished.
+167 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
+| BUG-028 | [The badge says intent and means the score](done/2026-09/BUG-028-the-badge-says-intent-and-means-the-score.md) | bug | shipped | 2026-09 |
 | BUG-018 | [An OpenAI-compatible provider is sent no schema](done/2026-09/BUG-018-a-compatible-provider-is-sent-no-schema.md) | bug | — | 2026-09 |
 | BUG-017 | [A poll pays for pages its own window then discards](done/2026-09/BUG-017-a-poll-pays-for-pages-its-own-window-then-discards.md) | bug | fixed | 2026-09 |
 | BUG-016 | [One platform's outage throws away another platform's collection](done/2026-09/BUG-016-one-platforms-outage-throws-away-another-platforms-collection.md) | bug | shipped | 2026-09 |

@@ -6,7 +6,7 @@ priority: p3
 created: 2026-09-20T08:55+08:00
 parent:
 area: web
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -30,12 +30,14 @@ one. This ticket ports that decision by name.
 
 ## Acceptance
 
-- [ ] No band label in `Inbox.tsx` contains the word "intent".
-- [ ] The three labels describe the whole match, and the middle one still
+- [x] No band label in `Inbox.tsx` contains the word "intent".
+- [x] The three labels describe the whole match, and the middle one still
       reads *Worth reading*.
-- [ ] `Inbox.test.tsx` asserts the new labels at the three boundaries.
-- [ ] `docs/design.md` or `labels.ts` names the labels once if a second
-      surface uses them.
+- [x] `Inbox.test.tsx` asserts the new labels at the three boundaries.
+- [x] `docs/design.md` or `labels.ts` names the labels once if a second
+      surface uses them. No second surface: the landing site left with
+      US-155, and PLAN.md's "Low intent" is the classifier's concept, not
+      the badge.
 
 ## Notes
 
@@ -46,3 +48,6 @@ one. This ticket ports that decision by name.
 
 - 2026-09-20T08:55+08:00 — Written from the cross-repository review of the
   cloud's changes since the split.
+- 2026-09-20T09:05+08:00 — Shipped. `band()` reads Strong lead / Worth
+  reading / Weak lead, the cloud's words from BUG-026, and is exported so
+  the three boundaries are pinned. 58 inbox tests pass.

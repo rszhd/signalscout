@@ -40,6 +40,7 @@ import { ScheduleField } from "./ScheduleField.js";
 import { describeSchedule } from "./schedule.js";
 
 type LoadState = "loading" | "ready" | "error";
+type MonitorDetailView = "overview" | "history" | "queries" | "leads";
 
 interface QueryPerformanceRow {
   kind: "query" | "channel";
@@ -744,6 +745,7 @@ export function MonitorDetail({
   const [state, setState] = useState<LoadState>("loading");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [detailView, setDetailView] = useState<MonitorDetailView>("overview");
 
   const load = useCallback(async (): Promise<void> => {
     try {
@@ -934,7 +936,56 @@ export function MonitorDetail({
 
         <div className="monitor-detail-layout">
           <div className="monitor-detail-main">
-            <section className="monitor-detail-section monitor-results-section">
+            <div className="monitor-detail-tabs" role="tablist" aria-label="Monitor details">
+              <button
+                id="monitor-overview-tab"
+                type="button"
+                role="tab"
+                aria-selected={detailView === "overview"}
+                aria-controls="monitor-overview-panel"
+                onClick={() => setDetailView("overview")}
+              >
+                Overview
+              </button>
+              <button
+                id="monitor-history-tab"
+                type="button"
+                role="tab"
+                aria-selected={detailView === "history"}
+                aria-controls="monitor-history-panel"
+                onClick={() => setDetailView("history")}
+              >
+                Recent activity
+              </button>
+              <button
+                id="monitor-queries-tab"
+                type="button"
+                role="tab"
+                aria-selected={detailView === "queries"}
+                aria-controls="monitor-queries-panel"
+                onClick={() => setDetailView("queries")}
+              >
+                Search performance
+              </button>
+              <button
+                id="monitor-leads-tab"
+                type="button"
+                role="tab"
+                aria-selected={detailView === "leads"}
+                aria-controls="monitor-leads-panel"
+                onClick={() => setDetailView("leads")}
+              >
+                Lead sources
+              </button>
+            </div>
+
+            <div
+              id="monitor-overview-panel"
+              role="tabpanel"
+              aria-labelledby="monitor-overview-tab"
+              hidden={detailView !== "overview"}
+            >
+              <section className="monitor-detail-section monitor-results-section">
               <div className="monitor-section-heading">
                 <div>
                   <p className="monitor-section-label">Results</p>
@@ -951,12 +1002,9 @@ export function MonitorDetail({
                 {monitor.minScore === undefined ? "" : ` · at ${monitor.minScore} or above`}
               </p>
               <p className="monitor-feedback">{feedbackLabel(monitor.feedback)}</p>
-            </section>
+              </section>
 
-            <LeadSources monitorId={monitor.id} />
-            <QueryPerformance monitor={monitor} />
-
-            <section className="monitor-detail-section">
+              <section className="monitor-detail-section">
               <div className="monitor-section-heading">
                 <div>
                   <p className="monitor-section-label">Cost</p>
@@ -991,9 +1039,9 @@ export function MonitorDetail({
                 Spend is estimated; your provider’s invoice is the authority. Amounts include source
                 and model calls.
               </p>
-            </section>
+              </section>
 
-            <section className="monitor-detail-section collection-settings-section">
+              <section className="monitor-detail-section collection-settings-section">
               <div className="monitor-section-heading">
                 <div>
                   <p className="monitor-section-label">Sources</p>
@@ -1029,18 +1077,41 @@ export function MonitorDetail({
                   ))}
                 </ul>
               )}
-            </section>
+              </section>
+            </div>
 
-            <section className="monitor-detail-section collection-settings-section">
-              <div className="monitor-section-heading">
-                <div>
-                  <p className="monitor-section-label">History</p>
-                  <h2 className="monitor-detail-title">Recent activity</h2>
+            <div
+              id="monitor-history-panel"
+              role="tabpanel"
+              aria-labelledby="monitor-history-tab"
+              hidden={detailView !== "history"}
+            >
+              <section className="monitor-detail-section collection-settings-section">
+                <div className="monitor-section-heading monitor-history-heading">
+                  <span className="monitor-section-note">Newest first</span>
                 </div>
-                <span className="monitor-section-note">Newest first</span>
-              </div>
-              <MonitorHistory monitorId={monitor.id} working={monitoring?.working === true} />
-            </section>
+                <MonitorHistory monitorId={monitor.id} working={monitoring?.working === true} />
+              </section>
+            </div>
+
+            <div
+              id="monitor-queries-panel"
+              role="tabpanel"
+              aria-labelledby="monitor-queries-tab"
+              hidden={detailView !== "queries"}
+            >
+              <QueryPerformance monitor={monitor} />
+            </div>
+
+            <div
+              id="monitor-leads-panel"
+              role="tabpanel"
+              aria-labelledby="monitor-leads-tab"
+              hidden={detailView !== "leads"}
+            >
+              <LeadSources monitorId={monitor.id} />
+            </div>
+
           </div>
 
           <aside className="monitor-settings-panel" aria-labelledby="monitor-settings-title">

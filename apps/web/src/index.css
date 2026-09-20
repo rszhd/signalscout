@@ -2197,9 +2197,6 @@ a {
   min-height: 0;
   background: var(--surface);
 }
-.inbox-page .topbar {
-  --topbar-gutter: var(--page-gutter);
-}
 .inbox-toolbar {
   min-height: 68px;
   padding: var(--space-3) var(--space-8);
@@ -2809,38 +2806,6 @@ a {
 
   .source-card > input[type="checkbox"] {
     margin-top: var(--space-1);
-  }
-
-  /*
-    The inbox reads inside one screen height, so its header gives up the
-    supporting sentence rather than the list. The toolbar's own sentence is
-    already hidden here for the same reason.
-  */
-  .inbox-page .topbar .page-subtitle {
-    display: none;
-  }
-
-  /*
-    With the sentence gone the title and the action fit one row again, and the
-    inbox keeps that height for the list.
-  */
-  .inbox-page .topbar {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--space-3);
-    padding-block: var(--space-4);
-  }
-
-  .inbox-page .topbar h1 {
-    font-size: 1.375rem;
-  }
-
-  .inbox-page .topbar > .top-secondary-link {
-    align-self: center;
-    min-height: var(--control-height-compact);
-    padding-inline: var(--space-3);
-    white-space: nowrap;
   }
 
   /* Count and export on one line, the ordering sentence under them. */

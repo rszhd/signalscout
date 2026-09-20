@@ -193,7 +193,8 @@ describe("the application screens", () => {
 
     // The page heading, not the navigation label: "Inbox" is in the sidebar on
     // every project screen, so the text alone would not say which screen this is.
-    expect(screen.container.querySelector(".topbar h1")?.textContent).toBe("Inbox");
+    // The heading is hidden since US-281 and is still the page's h1.
+    expect(screen.container.querySelector("h1")?.textContent).toBe("Inbox");
   });
 
   it("reaches the monitor form from the header", async () => {
@@ -235,7 +236,7 @@ describe("the application screens", () => {
 
     // The page heading, not the navigation label: "Inbox" is in the sidebar on
     // every project screen, so the text alone would not say which screen this is.
-    expect(screen.container.querySelector(".topbar h1")?.textContent).toBe("Inbox");
+    expect(screen.container.querySelector("h1")?.textContent).toBe("Inbox");
   });
 
   it("keeps page setup open on Escape", async () => {
@@ -466,7 +467,7 @@ describe("the application screens", () => {
 
     // The page heading, not the navigation label: "Inbox" is in the sidebar on
     // every project screen, so the text alone would not say which screen this is.
-    expect(screen.container.querySelector(".topbar h1")?.textContent).toBe("Inbox");
+    expect(screen.container.querySelector("h1")?.textContent).toBe("Inbox");
     expect(screen.path()).toBe(inbox);
   });
 

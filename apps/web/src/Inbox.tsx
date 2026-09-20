@@ -755,17 +755,9 @@ export function Inbox({
 
   return (
     <div className="product-page inbox-page">
-      <header className="topbar">
-        <div>
-          <h1>Inbox</h1>
-          <p className="page-subtitle">Find your next conversation.</p>
-        </div>
-        {(matches.length > 0 || monitors.length === 0) && (
-          <Link className="top-secondary-link" to={paths.newMonitor(projectId)}>
-            <span aria-hidden="true">+ </span>New monitor
-          </Link>
-        )}
-      </header>
+      {/* No visible title: the navigation names the screen and the bar below
+          says what it is doing. The heading stays for a screen reader. US-281. */}
+      <h1 className="visually-hidden">Inbox</h1>
 
       {monitoring && <MonitoringBar state={monitoring} projectId={projectId} />}
 

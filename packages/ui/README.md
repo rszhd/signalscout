@@ -142,7 +142,10 @@ Those are layout.
 
 `monitor.ts` holds what both products *say* about a monitor, a poll, a stage
 and a match: the status word, the poll sentence, the stage sentence, the
-badge, the ages and the money. They are here for the reason the tokens are —
+badge, the ages and the money. `schedule.ts` holds the words for when a
+monitor runs — the rate list, the day rules and "Polls every hour — about 731
+polls a month" — and not the control that lets a person choose one, which the
+hosted product no longer offers (US-173 there). They are here for the reason the tokens are —
 a sentence written twice becomes two sentences, and "Found nothing" beside
 "Running" about one monitor is the failure US-104 exists to prevent.
 

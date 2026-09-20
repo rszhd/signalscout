@@ -30,9 +30,12 @@ word, the poll and stage sentences, the badge, the ages and the money.
 `@signalscout/ui/testing` carries the monitor and poll fixtures.
 `ProjectCard` and `@signalscout/ui/project-card.css` are the first shared
 component that is not a primitive: the project card, with the status line, the
-second action and the delete question as props (US-273). React and
-`react-router` are peer dependencies — the card links with the router, because
-a plain anchor would reload the application. Where the two products differ the words take an argument:
+second action and the delete question as props (US-273). React,
+`react-dom` and `react-router` are peer dependencies — the card links with the
+router, because a plain anchor would reload the application, and the harness
+under `@signalscout/ui/testing` renders (US-274). The schedule's words —
+`pollRates`, `describeSchedule`, `summarise`, `pollRateLabel`, the day rules
+and the timezone helpers — are exported too (US-275). Where the two products differ the words take an argument:
 `pollSummary(run, { spend: false })` is the hosted sentence, and
 `Monitor.pausedByPlan` is the pause only a plan can perform.
 

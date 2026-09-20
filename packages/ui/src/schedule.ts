@@ -1,5 +1,16 @@
 /**
- * The shapes a person can choose for when a monitor runs. US-041.
+ * The shapes a person can choose for when a monitor runs, and the words for
+ * them. US-041, shared by US-275.
+ *
+ * Words and arithmetic only, for the reason `monitor.ts` gives: "every 6
+ * hours" said twice becomes two sentences the first time one is edited, and
+ * both products describe the same monitor's schedule. The control that lets
+ * a person choose one — `ScheduleField` — stays in the application that
+ * offers the choice; the hosted product describes a schedule it does not let
+ * a person set (US-173 there), which is why the words are shared and the
+ * control is not.
+ *
+ * Taken from the hosted copy, which is the same plus `pollRateLabel`.
  *
  * A closed set, not a cron field. The owner named six shapes, and six shapes is
  * a product where a cron parser is a support burden somebody gets wrong
@@ -75,6 +86,18 @@ export interface PollRate {
  * they touch it.
  */
 export const defaultRate = 6 * hour;
+
+/**
+ * A poll interval as the rate list names it, for a screen that shows one it
+ * did not offer — the plan cards. An interval no entry matches is said in
+ * hours rather than left blank.
+ */
+export function pollRateLabel(seconds: number): string {
+  const named = pollRates.find((rate) => rate.seconds === seconds);
+  if (named) return named.label.toLowerCase();
+
+  return `every ${Math.round(seconds / hour)} hours`;
+}
 
 export const pollRates: readonly PollRate[] = [
   { seconds: hour, label: "Every hour" },

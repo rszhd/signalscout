@@ -7,6 +7,7 @@
  * generation, and whether the plan a person edited is the plan finally stored.
  */
 
+import { browserTimezone } from "@signalscout/ui";
 import {
   button,
   field as input,
@@ -20,7 +21,6 @@ import {
 import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { MonitorForm } from "./MonitorForm.js";
-import { browserTimezone } from "./schedule.js";
 
 /** The project this monitor is being made in. The route always names one. */
 const projectId = "11111111-1111-1111-1111-111111111111";

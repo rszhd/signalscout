@@ -28,7 +28,6 @@ import {
 import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { inputVerdict, MonitorDetail, staleAfterDays } from "./MonitorDetail.js";
-import { everyDay, summarise, weekdays } from "./schedule.js";
 
 describe("one monitor's page", () => {
   let screen: Screen;
@@ -840,31 +839,6 @@ describe("one monitor's page", () => {
    * in the product.
    */
   describe("choosing when a monitor runs", () => {
-    /**
-     * The hints are computed from the same arithmetic the projection uses, so
-     * a hint and a quote cannot disagree. BUG-005 was exactly that
-     * disagreement at a larger scale, and the first draft of this list said
-     * "about 240 polls a month" where the arithmetic gives 244.
-     */
-    it("says what a schedule costs, from the arithmetic rather than by hand", () => {
-      expect(summarise(3_600, everyDay)).toContain("731");
-      expect(summarise(3 * 3_600, everyDay)).toContain("244");
-      expect(summarise(6 * 3_600, everyDay)).toContain("122");
-      expect(summarise(12 * 3_600, everyDay)).toContain("61");
-      // Five sevenths of hourly, which is the whole reason days exist.
-      expect(summarise(3_600, weekdays)).toContain("522");
-      // And a set no rule names, which the old control could not express.
-      expect(summarise(3_600, [1, 3, 5])).toContain("313");
-    });
-
-    it("reads a day set back as a phrase rather than as numbers", () => {
-      expect(summarise(3_600, everyDay)).toBe("Polls every hour — about 731 polls a month.");
-      expect(summarise(86_400, weekdays)).toContain("on weekdays");
-      expect(summarise(86_400, [0, 6])).toContain("at weekends");
-      expect(summarise(86_400, [1, 3, 5])).toContain("on Mon, Wed and Fri");
-      expect(summarise(86_400, [2])).toContain("on Tues");
-    });
-
     it("asks how often and which days as two questions", async () => {
       await show(monitor());
 

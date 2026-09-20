@@ -17,6 +17,7 @@ import {
   BrandIcon,
   type Budget,
   Button,
+  describeSchedule,
   feedbackLabel,
   formatMicros,
   type Monitor,
@@ -37,7 +38,6 @@ import { Link } from "react-router";
 import { MonitorHistory } from "./monitor.js";
 import { paths } from "./route.js";
 import { ScheduleField } from "./ScheduleField.js";
-import { describeSchedule } from "./schedule.js";
 
 type LoadState = "loading" | "ready" | "error";
 type MonitorDetailView = "overview" | "history" | "queries" | "leads";

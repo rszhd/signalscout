@@ -2,7 +2,7 @@
 
 # Done
 
-180 finished.
+181 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
@@ -27,6 +27,7 @@
 | BUG-003 | [A post below the threshold is classified again on every poll](done/2026-09/BUG-003-a-post-below-the-threshold-is-classified-again-on-every-poll.md) | bug | fixed | 2026-09 |
 | BUG-002 | [A seven-day window is bought as a month](done/2026-09/BUG-002-a-seven-day-window-is-bought-as-a-month.md) | bug | fixed | 2026-09 |
 | BUG-001 | [A pending Reddit collection is not resumed](done/2026-09/BUG-001-a-pending-reddit-collection-is-not-resumed.md) | bug | shipped | 2026-09 |
+| US-275 | [The schedule's words are shared](done/2026-09/US-275-the-schedules-words-are-shared.md) | chore | shipped | 2026-09 |
 | US-274 | [The test harness is shared](done/2026-09/US-274-the-test-harness-is-shared.md) | chore | shipped | 2026-09 |
 | US-273 | [The projects page follows the hosted one](done/2026-09/US-273-the-projects-page-follows-the-hosted-one.md) | chore | shipped | 2026-09 |
 | US-272 | [The open app finishes wearing the shared brand](done/2026-09/US-272-the-open-app-finishes-wearing-the-shared-brand.md) | chore | shipped | 2026-09 |

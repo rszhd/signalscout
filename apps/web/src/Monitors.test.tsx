@@ -11,6 +11,7 @@
 import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { groupsOf, Monitors } from "./Monitors.js";
+import { idleRefreshMs, workingRefreshMs } from "./monitor.js";
 import {
   monitor,
   testMonitorId as monitorId,
@@ -49,6 +50,76 @@ describe("the monitor list", () => {
   afterEach(async () => {
     await screen?.unmount();
     vi.unstubAllGlobals();
+  });
+
+  describe("the stage in flight", () => {
+    it("marks a monitor the worker is busy with, under its status word", async () => {
+      // US-265. The word says whether it is running; this says what for.
+      await show([
+        monitor({
+          stage: { queue: "classify", state: "active", since: new Date().toISOString(), items: 3 },
+        }),
+      ]);
+
+      expect(container.querySelector(".monitor-table-stage")?.textContent).toBe("Scoring 3 posts");
+    });
+
+    it("marks nothing on a monitor with no work in flight", async () => {
+      await show([monitor({ stage: null })]);
+
+      expect(container.querySelector(".monitor-table-stage")).toBeNull();
+    });
+
+    describe("how often the list asks again", () => {
+      beforeEach(() => {
+        vi.useFakeTimers({ toFake: ["setInterval", "clearInterval"] });
+      });
+
+      afterEach(() => {
+        vi.useRealTimers();
+      });
+
+      function reads(): number {
+        return fetchMock.mock.calls.filter(([url]) => String(url) === "/api/monitors").length;
+      }
+
+      async function tick(ms: number): Promise<void> {
+        await act(async () => {
+          vi.advanceTimersByTime(ms);
+        });
+        await settle();
+      }
+
+      it("asks every fifteen seconds while any monitor has a stage running", async () => {
+        await show([
+          monitor(),
+          monitor({
+            id: "22222222-2222-4222-8222-222222222222",
+            stage: {
+              queue: "classify",
+              state: "active",
+              since: new Date().toISOString(),
+              items: 3,
+            },
+          }),
+        ]);
+        const before = reads();
+
+        await tick(workingRefreshMs);
+        expect(reads()).toBe(before + 1);
+      });
+
+      it("asks once a minute otherwise", async () => {
+        await show([monitor()]);
+        const before = reads();
+
+        await tick(workingRefreshMs);
+        expect(reads()).toBe(before);
+
+        await tick(idleRefreshMs - workingRefreshMs);
+        expect(reads()).toBe(before + 1);
+      });
+    });
   });
 
   describe("the five columns", () => {

@@ -23,6 +23,7 @@ import {
   verdictCounts,
 } from "@signalscout/pipeline";
 import { z } from "zod";
+import { monitorStages } from "../activity.js";
 import { sessionUser, sessionUserId } from "../auth.js";
 import type { ApiServer } from "../server.js";
 import { createBody, monitorSchema, problemSchema } from "./schemas.js";
@@ -49,7 +50,7 @@ export function registerCollectionRoutes(app: ApiServer, context: MonitorContext
       // screen that shows this is a list, and a per-row query here would be
       // the list's cost growing with the number of monitors.
       const rows = await listMonitors(db, sessionUserId(request));
-      const [states, drops, read, verdicts, found, collected, notifications, polls] =
+      const [states, drops, read, verdicts, found, collected, notifications, polls, stages] =
         await Promise.all([
           budgetStates(db),
           filterDropCounts(db),
@@ -66,6 +67,11 @@ export function registerCollectionRoutes(app: ApiServer, context: MonitorContext
           latestPollRuns(
             db,
             sessionUserId(request),
+            rows.map((monitor) => monitor.id),
+          ),
+          // The ids are the scope: they came out of `listMonitors`. US-265.
+          monitorStages(
+            db,
             rows.map((monitor) => monitor.id),
           ),
         ]);
@@ -86,6 +92,7 @@ export function registerCollectionRoutes(app: ApiServer, context: MonitorContext
             collected: collected.get(monitor.id) ?? [],
             notificationProblems: notifications.get(monitor.id) ?? [],
             lastPoll: polls.get(monitor.id) ?? null,
+            stage: stages.get(monitor.id) ?? null,
           }),
         ),
       );

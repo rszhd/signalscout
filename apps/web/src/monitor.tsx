@@ -12,7 +12,7 @@
 import { useEffect, useState } from "react";
 import { messageFor, requestJson } from "./api.js";
 import { BrandIcon } from "./BrandIcon.js";
-import { ageLabel, platformName } from "./labels.js";
+import { ageLabel, platformName, untilLabel } from "./labels.js";
 
 export interface Budget {
   monthlyCapMicros: number;
@@ -101,6 +101,25 @@ export interface PollRun {
   sources: PollRunSource[];
 }
 
+/**
+ * A stage of the work in flight for a monitor, read off the queue. US-265.
+ *
+ * The poll is the first of five, and the short one. The filter, the threads,
+ * the classifier and the notifier are the minutes after it that a person
+ * waits through with the inbox open.
+ */
+export interface Stage {
+  /** The queue's own name. `stageLabel` is where it becomes a sentence. */
+  queue: string;
+  /** `active` is a worker holding it; `queued` is one about to. */
+  state: "active" | "queued";
+  since: string;
+  /** Posts or matches the job holds, or null on a poll, which holds none. */
+  items: number | null;
+  /** The collection it belongs to, or null. */
+  walkId?: string | null;
+}
+
 export interface Monitor {
   notificationIssues?: string[];
   id: string;
@@ -131,6 +150,13 @@ export interface Monitor {
    * talk to one that does not.
    */
   lastPoll?: PollRun | null;
+  /**
+   * What the worker holds for this monitor now, or null. US-265.
+   *
+   * Optional for `lastPoll`'s reason, and read through `stageOf`, which is the
+   * one place that decides whether what an API sent is a stage.
+   */
+  stage?: Stage | null;
   missingCredentials: MissingCredential[];
   budget: Budget | null;
   spend: Spend;
@@ -325,13 +351,297 @@ export function pollSummary(run: PollRun): string {
   return `Last poll: ${run.postsReturned} posts, ${run.postsNew} new${spent}`;
 }
 
-/** When this monitor is due to try again, or null when nothing is scheduled. */
-export function nextPollLabel(monitor: Monitor): string | null {
+/**
+ * When this monitor is next due, as an instant, or null when nothing is
+ * scheduled. The label below and the monitoring bar both read it.
+ */
+export function nextPollAt(monitor: Monitor): string | null {
   if (monitor.paused || !monitor.lastPolledAt) return null;
 
-  const due = new Date(monitor.lastPolledAt).getTime() + monitor.pollIntervalSeconds * 1000;
+  return new Date(
+    new Date(monitor.lastPolledAt).getTime() + monitor.pollIntervalSeconds * 1000,
+  ).toISOString();
+}
 
-  return due <= Date.now() ? "due now" : `next ${new Date(due).toLocaleString()}`;
+/** When this monitor is due to try again, or null when nothing is scheduled. */
+export function nextPollLabel(monitor: Monitor, now: number = Date.now()): string | null {
+  const due = nextPollAt(monitor);
+  if (!due) return null;
+
+  return new Date(due).getTime() <= now ? "due now" : `next ${new Date(due).toLocaleString()}`;
+}
+
+/**
+ * What the monitoring behind a screen is doing, in the words both monitor
+ * screens already use. US-265.
+ *
+ * The inbox is the screen a person keeps open and the only one that said
+ * nothing about collection, so an empty list read as "nobody is talking" and
+ * as "this has been paused for a week" at the same time. This is the answer,
+ * and it is derived here rather than in the inbox for the reason at the top of
+ * this file: a status computed twice becomes two statuses.
+ *
+ * One monitor speaks for the list it is given. The one a person would want to
+ * be told about: a monitor that needs attention before one that is working,
+ * work in flight before a schedule being waited on, and the soonest poll
+ * before a later one.
+ */
+export interface Monitoring {
+  /** The monitor the bar speaks for. */
+  monitor: Monitor;
+  /** Its status, in the two words the monitor screens use. */
+  label: string;
+  tone: string;
+  attention: boolean;
+  /** What is happening now, or what is being waited for. Never empty. */
+  now: string;
+  /** The instant behind `now`, for a `title`. Null when there is none. */
+  nowAt: string | null;
+  /** The last finished poll in one line, or null when none has finished. */
+  last: string | null;
+  lastAt: string | null;
+  /**
+   * Whether work is in flight, rather than a schedule being waited on.
+   *
+   * A screen reads it to ask more often while something is happening: a
+   * classification pass is over in minutes, and a bar refreshed once a minute
+   * would report most of it after it ended.
+   */
+  working: boolean;
+}
+
+/** Whether a poll is running right now. US-104 calls that outcome `waiting`. */
+function collecting(monitor: Monitor): boolean {
+  return monitor.lastPoll?.outcome === "waiting";
+}
+
+/** `12 posts`, `1 post`, or `posts` where the job carries no count. */
+function countOf(items: number | null, noun: string): string {
+  if (items === null) return `${noun}s`;
+
+  return `${items} ${noun}${items === 1 ? "" : "s"}`;
+}
+
+/**
+ * What each stage is called, running and waiting to run.
+ *
+ * A sentence per queue, for the reason `stopReasonLabel` above has one per
+ * code: a screen that printed the value would show somebody `classify`. The
+ * words say what is being done to what, because "Classifying" alone reads as a
+ * state of the monitor and it is work on a known number of posts.
+ *
+ * `filter` names the triage as well as the filtering. They are one queue and
+ * two stages — keywords and embeddings drop for free, then a cheap model reads
+ * what survived — and the model call is the part slow enough to be worth
+ * naming.
+ */
+const stageWords: Record<string, (items: number | null) => { active: string; queued: string }> = {
+  poll: () => ({
+    active: "Collecting posts",
+    queued: "Queued to collect posts",
+  }),
+  filter: (items) => ({
+    active: `Filtering and triaging ${countOf(items, "post")}`,
+    queued: `Queued to filter ${countOf(items, "post")}`,
+  }),
+  replies: (items) => ({
+    active: `Reading comment threads under ${countOf(items, "post")}`,
+    queued: `Queued to read threads under ${countOf(items, "post")}`,
+  }),
+  classify: (items) => ({
+    active: `Scoring ${countOf(items, "post")}`,
+    queued: `Queued to score ${countOf(items, "post")}`,
+  }),
+  notify: (items) => ({
+    active: `Sending ${countOf(items, "notification")}`,
+    queued: `Queued to send ${countOf(items, "notification")}`,
+  }),
+};
+
+/**
+ * One stage, as a person reads it.
+ *
+ * A queue this build has no words for — a worker newer than this bundle — is
+ * said plainly rather than printed as its own name. The stage is still true;
+ * only its sentence is missing.
+ */
+export function stageLabel(stage: Stage): string {
+  const words = stageWords[stage.queue]?.(stage.items);
+
+  if (!words) return stage.state === "active" ? "Working" : "Queued";
+
+  return stage.state === "active" ? words.active : words.queued;
+}
+
+/**
+ * The stage in flight for this monitor, or null.
+ *
+ * The one place that decides whether a `stage` field is a stage: a browser
+ * talking to an API older than the field gets null, not a crash.
+ */
+export function stageOf(monitor: Monitor): Stage | null {
+  const stage = monitor.stage;
+
+  if (!stage || typeof stage.queue !== "string" || !stage.since) return null;
+
+  return stage;
+}
+
+export function monitoringState(
+  monitors: readonly Monitor[],
+  now: number = Date.now(),
+): Monitoring | null {
+  /**
+   * Rows this build can read a status out of.
+   *
+   * `status` reads the spend and the credentials without asking whether they
+   * are there, which is right on a screen that is loaded with the row. Here it
+   * is not: a tab open across a deployment talks to whichever API answers, and
+   * BUG-008 is what a missing field costs on the inbox — the screen itself
+   * disappears. A row the bar cannot read is a row it says nothing about.
+   */
+  const readable = monitors.filter(
+    (monitor) => monitor?.spend != null && Array.isArray(monitor.missingCredentials),
+  );
+
+  if (readable.length === 0) return null;
+
+  const due = (monitor: Monitor): number => {
+    const at = nextPollAt(monitor);
+    return at ? new Date(at).getTime() : Number.POSITIVE_INFINITY;
+  };
+
+  const speaker =
+    readable.find((monitor) => needsAttention(monitor)) ??
+    // Work in flight before a schedule being waited on: one of them is
+    // happening and the other is not.
+    readable.find((monitor) => stageOf(monitor)?.state === "active") ??
+    readable.find((monitor) => collecting(monitor)) ??
+    readable.find((monitor) => stageOf(monitor) !== null) ??
+    [...readable].sort((left, right) => due(left) - due(right))[0];
+
+  // `readable` is not empty, so this cannot happen. The compiler cannot see
+  // that through an index, and a cast here would be the one place this file
+  // stops being checked.
+  if (!speaker) return null;
+
+  const state = status(speaker);
+  const run = speaker.lastPoll ?? null;
+  const nextAt = nextPollAt(speaker);
+  const stage = stageOf(speaker);
+
+  // A poll in flight is the whole answer: it is what is happening now, and the
+  // run it would otherwise be reported as is the same run. Saying both would
+  // print one poll twice. It comes before the stage below because the run says
+  // more than the queue row does — the posts it has collected so far.
+  if (run && collecting(speaker)) {
+    return {
+      monitor: speaker,
+      label: state.label,
+      tone: state.tone,
+      attention: state.attention === true,
+      now: pollSummary(run),
+      nowAt: run.startedAt,
+      last: null,
+      lastAt: null,
+      working: true,
+    };
+  }
+
+  /**
+   * A stage of the work, which is what fills the inbox after a poll.
+   *
+   * It beats the schedule below, because the schedule is what a person is told
+   * when nothing is happening, and something is. The last poll stays beside it:
+   * "Scoring 12 posts" and "Last poll: 72 posts, 12 new" are two facts, and
+   * together they say where those twelve came from.
+   */
+  if (stage) {
+    return {
+      monitor: speaker,
+      label: state.label,
+      tone: state.tone,
+      attention: state.attention === true,
+      now: stageLabel(stage),
+      nowAt: stage.since,
+      last: run ? pollSummary(run) : null,
+      lastAt: run ? run.startedAt : (speaker.lastPolledAt ?? null),
+      working: stage.state === "active",
+    };
+  }
+
+  const waiting = speaker.paused
+    ? "Paused — nothing is collected until it is resumed"
+    : speaker.spend.exhausted
+      ? "No more polls this month"
+      : nextAt
+        ? `Next poll ${untilLabel(nextAt, now)}`
+        : "Waiting for the first poll";
+
+  return {
+    monitor: speaker,
+    label: state.label,
+    tone: state.tone,
+    attention: state.attention === true,
+    now: waiting,
+    nowAt: speaker.paused || speaker.spend.exhausted ? null : nextAt,
+    last: run ? pollSummary(run) : null,
+    lastAt: run ? run.startedAt : (speaker.lastPolledAt ?? null),
+    working: false,
+  };
+}
+
+/**
+ * How often a screen re-reads its monitors. US-265.
+ *
+ * Two periods, because the two questions have different clocks. Waiting for a
+ * schedule is measured in hours, so a minute is early enough. A stage is
+ * measured in minutes — a triage is over in seconds — so a screen on the
+ * minute would report most of a stage after it had ended.
+ *
+ * Both are one `GET /api/monitors`: no provider, no model, no money.
+ */
+export const idleRefreshMs = 60_000;
+export const workingRefreshMs = 15_000;
+
+/**
+ * Re-read on a timer, faster while the worker is busy. US-265.
+ *
+ * One hook for the inbox, the monitor list and the monitor page. The rule is
+ * written once, because a second and third copy of it is how three screens
+ * end up with three answers about how live they are.
+ *
+ * Nothing is asked while the tab is hidden: a laptop left open for a week
+ * would otherwise send thousands of requests about a screen nobody is looking
+ * at. Coming back to the tab asks once, immediately, because the first thing a
+ * person does on returning is read it.
+ */
+export function useMonitorRefresh(reload: () => void | Promise<void>, working: boolean): void {
+  useEffect(() => {
+    const ask = (): void => {
+      if (document.visibilityState === "visible") void reload();
+    };
+
+    const timer = window.setInterval(ask, working ? workingRefreshMs : idleRefreshMs);
+
+    document.addEventListener("visibilitychange", ask);
+
+    return () => {
+      window.clearInterval(timer);
+      document.removeEventListener("visibilitychange", ask);
+    };
+  }, [reload, working]);
+}
+
+/**
+ * Whether any of these monitors has work running. US-265.
+ *
+ * A queued stage is not work in flight. It is about to be, and the screen says
+ * so, but it must not make the browser ask four times a minute for a worker
+ * that has not picked it up.
+ */
+export function anyWorking(monitors: readonly Monitor[]): boolean {
+  return monitors.some((monitor) => stageOf(monitor)?.state === "active");
 }
 
 /**

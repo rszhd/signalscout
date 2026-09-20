@@ -26,7 +26,17 @@ import { Link } from "react-router";
 import { messageFor, requestJson } from "./api.js";
 import { BrandIcon } from "./BrandIcon.js";
 import { platformName } from "./labels.js";
-import { type Monitor, needsAttention, nextPollLabel, pollSummary, status } from "./monitor.js";
+import {
+  anyWorking,
+  type Monitor,
+  needsAttention,
+  nextPollLabel,
+  pollSummary,
+  stageLabel,
+  stageOf,
+  status,
+  useMonitorRefresh,
+} from "./monitor.js";
 import { paths } from "./route.js";
 
 type LoadState = "loading" | "ready" | "error";
@@ -93,6 +103,9 @@ export function Monitors({ projectId }: { readonly projectId: string }) {
   useEffect(() => {
     void load();
   }, [load]);
+
+  // Faster while a stage runs, on the one rule every monitor screen shares. US-265.
+  useMonitorRefresh(load, anyWorking(monitors));
 
   async function setPaused(monitor: Monitor, paused: boolean): Promise<void> {
     setPending((ids) => [...ids, monitor.id]);
@@ -378,6 +391,7 @@ function MonitorTable({
         <tbody role="rowgroup">
           {monitors.map((monitor) => {
             const running = status(monitor);
+            const stage = stageOf(monitor);
 
             return (
               <tr key={monitor.id} role="row">
@@ -405,6 +419,14 @@ function MonitorTable({
                   >
                     {running.label}
                   </span>
+                  {/* The stage in flight, under the status word. US-265. The
+                      word says whether the monitor is running; this says what
+                      the worker is doing for it at this moment. */}
+                  {stage && (
+                    <small className="monitor-table-note monitor-table-stage">
+                      {stageLabel(stage)}
+                    </small>
+                  )}
                   {/* A broken webhook does not change what the monitor is
                       doing, so it is not the status word — but it is why this
                       row is counted under "Needs attention", and a count a

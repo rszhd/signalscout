@@ -12,6 +12,7 @@
 import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { MonitorDetail } from "./MonitorDetail.js";
+import { idleRefreshMs, workingRefreshMs } from "./monitor.js";
 import {
   monitor,
   testMonitorId as monitorId,
@@ -87,10 +88,91 @@ describe("one monitor's page", () => {
       expect(container.textContent).toContain("due now");
     });
 
-    it("says a monitor that has never polled has never polled", async () => {
+    /**
+     * The headline is what is happening, never what happened. US-265. A
+     * monitor waiting for its next poll is waiting, which is what the inbox
+     * bar says about the same monitor at the same moment.
+     */
+    it("leads with the wait, and keeps the last poll on the supporting line", async () => {
+      const halfHourAgo = new Date(Date.now() - 30 * 60 * 1000).toISOString();
+      await show(monitor({ lastPolledAt: halfHourAgo, lastPoll: poll() }));
+
+      const headline = container.querySelector("#monitor-activity-title");
+      expect(headline?.textContent).toBe("Next poll in 30 minutes");
+      expect(container.querySelector(".monitor-activity-last")?.textContent).toContain(
+        "Last poll found no posts",
+      );
+    });
+
+    it("leads with the stage in flight", async () => {
+      await show(
+        monitor({
+          lastPoll: poll(),
+          stage: { queue: "filter", state: "active", since: new Date().toISOString(), items: 40 },
+        }),
+      );
+
+      expect(container.querySelector("#monitor-activity-title")?.textContent).toBe(
+        "Filtering and triaging 40 posts",
+      );
+    });
+
+    describe("how often the page asks again", () => {
+      beforeEach(() => {
+        vi.useFakeTimers({ toFake: ["setInterval", "clearInterval"] });
+      });
+
+      afterEach(() => {
+        vi.useRealTimers();
+      });
+
+      function reads(): number {
+        return fetchMock.mock.calls.filter(([url]) => String(url) === `/api/monitors/${monitorId}`)
+          .length;
+      }
+
+      async function tick(ms: number): Promise<void> {
+        await act(async () => {
+          vi.advanceTimersByTime(ms);
+        });
+        await settle();
+      }
+
+      it("asks every fifteen seconds while a stage runs", async () => {
+        await show(
+          monitor({
+            stage: {
+              queue: "classify",
+              state: "active",
+              since: new Date().toISOString(),
+              items: 3,
+            },
+          }),
+        );
+        const before = reads();
+
+        await tick(workingRefreshMs);
+        expect(reads()).toBe(before + 1);
+      });
+
+      it("asks once a minute while waiting", async () => {
+        await show(monitor());
+        const before = reads();
+
+        await tick(workingRefreshMs);
+        expect(reads()).toBe(before);
+
+        await tick(idleRefreshMs - workingRefreshMs);
+        expect(reads()).toBe(before + 1);
+      });
+    });
+
+    it("says a monitor that has never polled is waiting for its first poll", async () => {
+      // US-265: the headline is what is happening now, in the inbox bar's own
+      // words, so the two screens cannot disagree about one monitor.
       await show(monitor({ lastPolledAt: null, lastPoll: null }));
 
-      expect(container.textContent).toContain("This monitor has not polled yet.");
+      expect(container.textContent).toContain("Waiting for the first poll");
     });
 
     it("says how many matches came out, and how many nobody has opened", async () => {

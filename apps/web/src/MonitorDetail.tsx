@@ -22,13 +22,14 @@ import {
   feedbackLabel,
   formatMicros,
   type Monitor,
+  monitoringState,
   monthLabel,
   nextPollLabel,
   PollHistory,
   type PreFilter,
-  pollSummary,
   status,
   toMicros,
+  useMonitorRefresh,
 } from "./monitor.js";
 import { paths } from "./route.js";
 import { ScheduleField } from "./ScheduleField.js";
@@ -396,6 +397,18 @@ export function MonitorDetail({
     void load();
   }, [load]);
 
+  /**
+   * What the monitor is doing now, on the rule the inbox bar reads. US-265.
+   *
+   * The same function, so this page and the inbox cannot say two different
+   * things about one monitor at one moment. Null only while nothing is
+   * loaded; the screen below is behind the `ready` state.
+   */
+  const monitoring = monitor ? monitoringState([monitor]) : null;
+
+  // Faster while a stage runs, on the one rule every monitor screen shares.
+  useMonitorRefresh(load, monitoring?.working === true);
+
   async function setPaused(paused: boolean): Promise<void> {
     setBusy(true);
     setError(null);
@@ -510,17 +523,18 @@ export function MonitorDetail({
         <section className="monitor-activity" aria-labelledby="monitor-activity-title">
           <div className="monitor-activity-copy">
             <p className="monitor-section-label">Current activity</p>
-            {monitor.lastPoll ? (
-              <h2
-                id="monitor-activity-title"
-                className="monitor-activity-title monitor-poll-summary"
-              >
-                {pollSummary(monitor.lastPoll)}
-              </h2>
-            ) : (
-              <h2 id="monitor-activity-title" className="monitor-activity-title">
-                This monitor has not polled yet.
-              </h2>
+            {/* The headline is what is happening now — a stage in flight, or
+                the wait for the next poll — and never the last poll, which is
+                what happened. The last poll is the supporting line. US-265. */}
+            <h2
+              id="monitor-activity-title"
+              className="monitor-activity-title"
+              title={monitoring?.nowAt ? new Date(monitoring.nowAt).toLocaleString() : undefined}
+            >
+              {monitoring?.now ?? "Waiting for the first poll"}
+            </h2>
+            {monitoring?.last && (
+              <p className="monitor-poll-summary monitor-activity-last">{monitoring.last}</p>
             )}
             <p className="monitor-schedule-summary">
               {describeSchedule(monitor.pollIntervalSeconds, monitor.pollDays)}{" "}

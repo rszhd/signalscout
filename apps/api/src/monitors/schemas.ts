@@ -342,6 +342,20 @@ export const monitorSchema = z.object({
    * to ask. `lastPolledAt` above says a poll happened; this says what it did.
    */
   lastPoll: pollRunSchema.nullable(),
+  /**
+   * The stage of the work in flight, or null when the worker holds nothing
+   * for this monitor. US-265. Read off the queue, not off the row, so it is
+   * true at the instant of the request and never remembered.
+   */
+  stage: z
+    .object({
+      queue: z.string(),
+      state: z.enum(["active", "queued"]),
+      since: z.string(),
+      items: z.number().nullable(),
+      walkId: z.string().nullable(),
+    })
+    .nullable(),
   /** Null when no cap is set. A monitor with no cap still records what it spends. */
   budget: budgetSchema.nullable(),
   spend: spendSchema,

@@ -3,8 +3,55 @@ import { Link } from "react-router";
 import { messageFor, requestJson } from "./api.js";
 import { BrandIcon } from "./BrandIcon.js";
 import { ageLabel } from "./labels.js";
+import { type Monitor, type Monitoring, monitoringState, useMonitorRefresh } from "./monitor.js";
 import { ReplyDraft } from "./ReplyDraft.js";
 import { paths } from "./route.js";
+
+/**
+ * What the monitoring is doing, above the matches. US-265.
+ *
+ * The inbox is the screen a person keeps open, and it was the one screen that
+ * said nothing about collection: an empty list read equally as "nobody is
+ * talking" and as "this was paused a week ago". The bar answers three
+ * questions and stops — what is happening, when the next poll is if the answer
+ * is "waiting", and what the last poll did.
+ *
+ * The latest only. A history belongs on the monitor page, one click away.
+ * Every word comes from `monitor.tsx`, so this screen and the monitor screens
+ * cannot end up saying two different things about one monitor.
+ */
+function MonitoringBar({
+  state,
+  projectId,
+}: {
+  readonly state: Monitoring;
+  readonly projectId: string;
+}) {
+  return (
+    <section className="inbox-monitoring" aria-label="Monitoring">
+      <span className={`monitor-status ${state.tone}${state.attention ? " quiet" : ""}`}>
+        {state.label}
+      </span>
+      <p
+        className="inbox-monitoring-now"
+        title={state.nowAt ? new Date(state.nowAt).toLocaleString() : undefined}
+      >
+        {state.now}
+      </p>
+      {state.last && state.lastAt && (
+        <p className="inbox-monitoring-last">
+          <time dateTime={state.lastAt} title={new Date(state.lastAt).toLocaleString()}>
+            {ageLabel(state.lastAt)}
+          </time>
+          {` · ${state.last}`}
+        </p>
+      )}
+      <Link className="inbox-monitor-link" to={paths.monitor(projectId, state.monitor.id)}>
+        View monitor
+      </Link>
+    </section>
+  );
+}
 
 /**
  * The intent inbox.
@@ -79,6 +126,10 @@ interface MatchPage {
   asOf: string;
 }
 
+/**
+ * What this screen reads off a monitor row. A `Monitor` is one, and so is
+ * the older, thinner row `thresholdSentence`'s tests hand in.
+ */
 interface MonitorSummary {
   id: string;
   name: string;
@@ -328,7 +379,7 @@ function whereItCameFrom(match: Match): string {
  * project a person had navigated away from.
  */
 export function Inbox({ projectId }: { readonly projectId: string }) {
-  const [monitors, setMonitors] = useState<MonitorSummary[]>([]);
+  const [monitors, setMonitors] = useState<Monitor[]>([]);
   const [monitorId, setMonitorId] = useState("");
   const [minScore, setMinScore] = useState(0);
   const [matches, setMatches] = useState<Match[]>([]);
@@ -360,43 +411,60 @@ export function Inbox({ projectId }: { readonly projectId: string }) {
   const [saving, setSaving] = useState(false);
 
   /**
-   * The monitors this filter offers: the project's own, and no others.
+   * What the monitoring is doing, derived on every render. US-265.
+   *
+   * Derived and not held: it is a reading of the rows below and of the clock,
+   * and a copy in state would be a second answer that goes stale between
+   * renders. `working` decides how often the rows are re-read.
+   */
+  const monitoring = monitoringState(monitors);
+  const working = monitoring?.working === true;
+
+  /**
+   * The project's monitors: what the filter offers, and what the bar reads.
+   *
+   * The whole row rather than the two fields the filter needs, because US-265
+   * put the monitoring status on this screen and the status is derived from
+   * the pause, the spend, the credentials, the last poll and the stage. One
+   * request answers both.
    *
    * Re-read when the project changes rather than once on mount, for the same
    * reason the matches are: moving between projects remounts nothing, and a
    * dropdown left holding another project's monitors offers a filter that
    * empties the inbox for no visible reason.
    */
-  useEffect(() => {
-    let cancelled = false;
-    requestJson<MonitorSummary[]>("/api/monitors")
-      .then((rows) => {
-        if (cancelled) return;
+  const loadMonitors = useCallback(async (): Promise<void> => {
+    try {
+      const rows = await requestJson<Monitor[]>("/api/monitors");
+      const mine = rows.filter((row) => row.projectId === projectId);
 
-        const mine = rows.filter((row) => row.projectId === projectId);
+      setMonitors(mine);
 
-        setMonitors(
-          mine.map(({ id, name, lastPolledAt, minScore }) => ({
-            id,
-            name,
-            lastPolledAt,
-            minScore,
-          })),
-        );
-
-        // The monitor filter can outlive the project it belonged to. Clearing
-        // it is the honest reset: keeping it would show an empty inbox and
-        // name no reason.
-        setMonitorId((current) =>
-          current !== "" && !mine.some((row) => row.id === current) ? "" : current,
-        );
-      })
-      .catch(() => undefined);
-
-    return () => {
-      cancelled = true;
-    };
+      // The monitor filter can outlive the project it belonged to. Clearing
+      // it is the honest reset: keeping it would show an empty inbox and
+      // name no reason.
+      setMonitorId((current) =>
+        current !== "" && !mine.some((row) => row.id === current) ? "" : current,
+      );
+    } catch {
+      // Silent, and the bar keeps whatever it last knew. A failed read here
+      // costs the person nothing they asked for, and an error beside the
+      // matches would report the wrong screen as broken.
+    }
   }, [projectId]);
+
+  useEffect(() => {
+    void loadMonitors();
+  }, [loadMonitors]);
+
+  /**
+   * Keep the bar current, on the one rule the monitor screens share. US-265.
+   *
+   * It is also what moves "Next poll in 2 hours" along without the person
+   * reloading: the phrase is rendered from a clock that only ticks when this
+   * re-renders.
+   */
+  useMonitorRefresh(loadMonitors, working);
 
   /**
    * The filters, as the server takes them.
@@ -631,6 +699,8 @@ export function Inbox({ projectId }: { readonly projectId: string }) {
           </Link>
         )}
       </header>
+
+      {monitoring && <MonitoringBar state={monitoring} projectId={projectId} />}
 
       <div className="inbox-toolbar">
         <fieldset className="view-switch inbox-views" aria-label="Which matches">

@@ -35,6 +35,7 @@ import {
   type VerdictCounts,
   verdictCounts,
 } from "@signalscout/pipeline";
+import { type MonitorStage, monitorStages } from "../activity.js";
 import { toPollRunResponse } from "./schemas.js";
 
 export interface MonitorRoutesOptions {
@@ -147,6 +148,8 @@ export interface MonitorReadings {
   readonly collected: readonly LastCollection[];
   readonly notificationProblems: readonly string[];
   readonly lastPoll: PollRun | null;
+  /** What the worker holds for this monitor now, or null. US-265. */
+  readonly stage: MonitorStage | null;
 }
 
 export function toResponse(
@@ -154,7 +157,8 @@ export function toResponse(
   runtime: MonitorEnvironment,
   readings: MonitorReadings,
 ) {
-  const { state, dropped, read, verdicts, collected, notificationProblems, lastPoll } = readings;
+  const { state, dropped, read, verdicts, collected, notificationProblems, lastPoll, stage } =
+    readings;
 
   return {
     id: monitor.id,
@@ -178,6 +182,7 @@ export function toResponse(
     pausedAt: monitor.pausedAt?.toISOString() ?? null,
     lastPolledAt: monitor.lastPolledAt?.toISOString() ?? null,
     lastPoll: lastPoll ? toPollRunResponse(lastPoll) : null,
+    stage,
     createdAt: monitor.createdAt.toISOString(),
     missingCredentials: startBlockers(monitor.sources, runtime),
     lastCollected: collected.map((one) => ({
@@ -219,16 +224,18 @@ export function toResponse(
  * paths end in `toResponse`, so neither can grow a field the other lacks.
  */
 export async function readResponse(db: Database, monitor: Monitor, runtime: MonitorEnvironment) {
-  const [state, drops, read, verdicts, found, collected, notifications, polls] = await Promise.all([
-    checkBudget(db, monitor.id),
-    filterDropCounts(db, [monitor.id]),
-    classifiedPostCounts(db, [monitor.id]),
-    verdictCounts(db, [monitor.id]),
-    matchCounts(db, [monitor.id]),
-    lastCollections(db),
-    notificationIssues(db),
-    latestPollRuns(db, monitor.userId, [monitor.id]),
-  ]);
+  const [state, drops, read, verdicts, found, collected, notifications, polls, stages] =
+    await Promise.all([
+      checkBudget(db, monitor.id),
+      filterDropCounts(db, [monitor.id]),
+      classifiedPostCounts(db, [monitor.id]),
+      verdictCounts(db, [monitor.id]),
+      matchCounts(db, [monitor.id]),
+      lastCollections(db),
+      notificationIssues(db),
+      latestPollRuns(db, monitor.userId, [monitor.id]),
+      monitorStages(db, [monitor.id]),
+    ]);
 
   return toResponse(monitor, runtime, {
     state,
@@ -239,6 +246,7 @@ export async function readResponse(db: Database, monitor: Monitor, runtime: Moni
     collected: collected.get(monitor.id) ?? [],
     notificationProblems: notifications.get(monitor.id) ?? [],
     lastPoll: polls.get(monitor.id) ?? null,
+    stage: stages.get(monitor.id) ?? null,
   });
 }
 

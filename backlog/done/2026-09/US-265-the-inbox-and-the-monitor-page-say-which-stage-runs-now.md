@@ -6,7 +6,7 @@ priority: p2
 created: 2026-09-20T09:03+08:00
 parent:
 area: web
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -42,21 +42,24 @@ not reinvented.
 
 ## Acceptance
 
-- [ ] `GET /api/monitors` and `GET /api/monitors/:id` carry a `stage`: the
+- [x] `GET /api/monitors` and `GET /api/monitors/:id` carry a `stage`: the
       queue, `active` or `queued`, since when, and the item count when the
       job holds one.
-- [ ] The read answers `null` when `pgboss.job` does not exist; a test
+- [x] The read answers `null` when `pgboss.job` does not exist; a test
       proves it against a database the worker never touched.
-- [ ] A test scopes the read: a job for another account's monitor is not
+- [x] A test scopes the read: a job for another account's monitor is not
       reported.
-- [ ] The inbox has one bar at the top: what the monitoring is doing now,
+- [x] The inbox has one bar at the top: what the monitoring is doing now,
       when it runs again if waiting, and what the last poll did.
-- [ ] *Current activity* on the monitor page uses the same rule and says
+- [x] *Current activity* on the monitor page uses the same rule and says
       *Waiting* when nothing runs; the last poll moves to the supporting line.
-- [ ] The monitor list marks a monitor whose stage is running.
-- [ ] Both screens refresh faster while a stage runs and slower while
+      The waiting words are the rule's: "Next poll in 30 minutes", "Waiting
+      for the first poll", "Paused — nothing is collected until it is
+      resumed", "No more polls this month".
+- [x] The monitor list marks a monitor whose stage is running.
+- [x] Both screens refresh faster while a stage runs and slower while
       waiting; the two intervals are named once.
-- [ ] `apps/api/src/monitors.ts` is split by route group before the stage
+- [x] `apps/api/src/monitors.ts` is split by route group before the stage
       route is added, so it does not pass 1,300 lines.
 
 ## Notes
@@ -72,3 +75,19 @@ not reinvented.
 
 - 2026-09-20T09:03+08:00 — Written from the cross-repository review of the
   cloud's changes since the split.
+- 2026-09-20T10:05+08:00 — Split `monitors.ts` into `monitors/` by route
+  group, bodies unchanged, in its own commit.
+- 2026-09-20T10:40+08:00 — Shipped. `apps/api/src/activity.ts` reads
+  `pgboss.job` in one statement for a list of ids and answers an empty map
+  on any failure; `activity.test.ts` drives it through the real `pg-boss`
+  (12 cases, one through the routes as a stranger) and once against a
+  database the worker never touched. `pg-boss` is a dev dependency of the
+  API for that file. `monitor.tsx` holds `monitoringState`, `stageLabel`,
+  `stageOf`, `useMonitorRefresh`, `anyWorking` and the two intervals; the
+  inbox bar, the monitor page headline and the list's stage line all read
+  it. One assertion changed on purpose: a monitor that never polled reads
+  "Waiting for the first poll" and no longer "This monitor has not polled
+  yet." Mutations: intervals swapped, a queued stage counted as working,
+  the headline showing the last poll, the list never speeding up — each
+  went red under its case. 380 web and 340 API tests pass. No browser has
+  rendered the bar.

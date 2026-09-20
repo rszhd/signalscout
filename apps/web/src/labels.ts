@@ -48,6 +48,19 @@ export function providerName(id: string): string {
  * person checking whether a poll ran this morning wants "2 hours ago", and one
  * reconciling a bill wants the timestamp.
  */
+/** How long until, in the largest unit that still says something. US-265. */
+export function untilLabel(at: string, now: number = Date.now()): string {
+  const minutes = Math.round((new Date(at).getTime() - now) / 60_000);
+  if (minutes <= 0) return "due now";
+  if (minutes < 60) return `in ${minutes} minute${minutes === 1 ? "" : "s"}`;
+
+  const hours = Math.round(minutes / 60);
+  if (hours < 24) return `in ${hours} hour${hours === 1 ? "" : "s"}`;
+
+  const days = Math.round(hours / 24);
+  return `in ${days} day${days === 1 ? "" : "s"}`;
+}
+
 export function ageLabel(at: string, now: number = Date.now()): string {
   const minutes = Math.round((now - new Date(at).getTime()) / 60_000);
   if (minutes < 1) return "just now";

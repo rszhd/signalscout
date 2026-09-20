@@ -12,6 +12,8 @@ import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { band, Inbox } from "./Inbox.js";
 import { ageLabel } from "./labels.js";
+import { idleRefreshMs, workingRefreshMs } from "./monitor.js";
+import { monitor as monitorRow, poll } from "./monitor-fixtures.js";
 import { button, json, mount, type Screen, select, settle, setValue } from "./testing.js";
 
 /** The project every case is inside. The inbox is a question about one. */
@@ -823,6 +825,93 @@ describe("the intent inbox", () => {
       String(url).startsWith("/api/matches"),
     ).length;
     expect(after).toBe(before + 1);
+  });
+
+  /**
+   * The bar above the matches. US-265.
+   *
+   * The words are asserted in `monitor.test.ts`; what this owns is that the
+   * bar is on this screen, reads the project's rows, and re-reads them on the
+   * shared rule's two clocks.
+   */
+  describe("the monitoring bar", () => {
+    const stage = {
+      queue: "classify",
+      state: "active",
+      since: "2026-09-05T11:59:00.000Z",
+      items: 12,
+    };
+
+    function rows(overrides: Record<string, unknown> = {}) {
+      return [
+        monitorRow({
+          ...qaMonitor,
+          lastPoll: poll({ outcome: "collected", postsReturned: 72, postsNew: 12 }),
+          ...overrides,
+        }),
+      ];
+    }
+
+    it("says what the worker is doing now, and what the last poll did", async () => {
+      await show({}, rows({ stage }));
+
+      const bar = container.querySelector('[aria-label="Monitoring"]');
+      expect(bar?.textContent).toContain("Running");
+      expect(bar?.textContent).toContain("Scoring 12 posts");
+      expect(bar?.textContent).toContain("Last poll: 72 posts, 12 new");
+      expect(
+        bar?.querySelector(`a[href="/projects/${projectId}/monitors/${qaMonitor.id}"]`),
+      ).not.toBeNull();
+    });
+
+    it("says nothing when the rows carry no status, rather than crashing the inbox", async () => {
+      // BUG-008's shape: a tab open across a deployment. The thin rows the
+      // other cases use are exactly that.
+      await show();
+
+      expect(container.querySelector('[aria-label="Monitoring"]')).toBeNull();
+      expect(container.textContent).toContain("Teams replacing manual QA");
+    });
+
+    describe("how often it asks again", () => {
+      beforeEach(() => {
+        vi.useFakeTimers({ toFake: ["setInterval", "clearInterval"] });
+      });
+
+      afterEach(() => {
+        vi.useRealTimers();
+      });
+
+      function monitorReads(): number {
+        return fetchMock.mock.calls.filter(([url]) => String(url) === "/api/monitors").length;
+      }
+
+      async function tick(ms: number): Promise<void> {
+        await act(async () => {
+          vi.advanceTimersByTime(ms);
+        });
+        await settle();
+      }
+
+      it("asks every fifteen seconds while a stage runs", async () => {
+        await show({}, rows({ stage }));
+        const before = monitorReads();
+
+        await tick(workingRefreshMs);
+        expect(monitorReads()).toBe(before + 1);
+      });
+
+      it("asks once a minute while waiting for the next poll", async () => {
+        await show({}, rows());
+        const before = monitorReads();
+
+        await tick(workingRefreshMs);
+        expect(monitorReads()).toBe(before);
+
+        await tick(idleRefreshMs - workingRefreshMs);
+        expect(monitorReads()).toBe(before + 1);
+      });
+    });
   });
 
   it("names the minimum score once a monitor has polled and nothing cleared it", async () => {

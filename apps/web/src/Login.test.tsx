@@ -8,11 +8,12 @@
  * a sign-up form left on the screen of a public instance is how these tools
  * get taken, and it would look completely normal.
  */
+
+import { button, field, json, mount, type Screen, settle, setValue } from "@signalscout/ui/testing";
 import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { App } from "./App.js";
 import { Login } from "./Login.js";
-import { button, field, json, mount, type Screen, settle, setValue } from "./testing.js";
 
 describe("the login screen", () => {
   let screen: Screen;

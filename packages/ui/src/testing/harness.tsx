@@ -1,7 +1,7 @@
 /**
- * The jsdom harness every screen test drives.
+ * The jsdom harness every screen test drives, in both applications. US-274.
  *
- * docs/testing.md asks for the DOM a person uses, not a rendered tree. So
+ * `docs/testing.md` asks for the DOM a person uses, not a rendered tree. So
  * these helpers find an element the way a person finds it — by the label or
  * the words on the button — and set a value the way a browser does, through
  * the native setter React listens to. A test that reached into props could

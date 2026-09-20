@@ -1,8 +1,9 @@
 // @vitest-environment jsdom
+
+import { button, json, mount, type Screen, settle, setValue } from "@signalscout/ui/testing";
 import { act } from "react";
 import { afterEach, expect, it, vi } from "vitest";
 import { Notifications } from "./Notifications.js";
-import { button, json, mount, type Screen, settle, setValue } from "./testing.js";
 
 let screen: Screen;
 afterEach(async () => {

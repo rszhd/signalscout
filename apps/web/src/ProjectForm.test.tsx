@@ -10,10 +10,11 @@
  * The list is `Projects.test.tsx`. This page is where the copy decision lives:
  * an edit reaches the next monitor and never the ones that already exist.
  */
+
+import { button, field, json, mount, type Screen, settle, setValue } from "@signalscout/ui/testing";
 import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ProjectForm } from "./Projects.js";
-import { button, field, json, mount, type Screen, settle, setValue } from "./testing.js";
 
 const projectId = "11111111-1111-4111-8111-111111111111";
 

@@ -14,10 +14,11 @@
  * and nothing that already exists — the sentence that says so is asserted on
  * the form page, and the edit link here is the way in.
  */
+
+import { button, json, mount, type Screen, settle } from "@signalscout/ui/testing";
 import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { deleteSentence, Projects } from "./Projects.js";
-import { button, json, mount, type Screen, settle } from "./testing.js";
 
 function project(overrides: Record<string, unknown> = {}) {
   return {

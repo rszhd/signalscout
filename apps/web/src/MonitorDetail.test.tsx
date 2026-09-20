@@ -12,16 +12,23 @@
 
 import { idleRefreshMs, workingRefreshMs } from "@signalscout/ui";
 import {
+  button,
+  field,
+  json,
   monitor,
   testMonitorId as monitorId,
+  mount,
   poll,
   testProjectId as projectId,
+  type Screen,
+  select,
+  settle,
+  setValue,
 } from "@signalscout/ui/testing";
 import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { inputVerdict, MonitorDetail, staleAfterDays } from "./MonitorDetail.js";
 import { everyDay, summarise, weekdays } from "./schedule.js";
-import { button, field, json, mount, type Screen, select, settle, setValue } from "./testing.js";
 
 describe("one monitor's page", () => {
   let screen: Screen;

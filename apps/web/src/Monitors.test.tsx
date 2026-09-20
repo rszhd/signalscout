@@ -11,15 +11,21 @@
 
 import { idleRefreshMs, workingRefreshMs } from "@signalscout/ui";
 import {
+  button,
+  field,
+  json,
   monitor,
   testMonitorId as monitorId,
+  mount,
   poll,
   testProjectId as projectId,
+  type Screen,
+  settle,
+  setValue,
 } from "@signalscout/ui/testing";
 import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { groupsOf, Monitors } from "./Monitors.js";
-import { button, field, json, mount, type Screen, settle, setValue } from "./testing.js";
 
 /** The rows of every table on the screen, the way a person counts them. */
 function rows(container: HTMLElement): HTMLTableRowElement[] {

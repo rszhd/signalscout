@@ -6,7 +6,7 @@ priority: p2
 created: 2026-09-20T18:05+08:00
 parent: US-270
 area: web
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -40,19 +40,20 @@ a consumer runs the harness.
 
 ## Acceptance
 
-- [ ] `@signalscout/ui/testing` exports `mount`, `button`, `field`, `select`,
+- [x] `@signalscout/ui/testing` exports `mount`, `button`, `field`, `select`,
       `setValue`, `settle`, `json` and the `Screen` type, beside the fixtures.
-- [ ] The open application's `testing.tsx` is deleted and every test file
+- [x] The open application's `testing.tsx` is deleted and every test file
       imports from the package.
-- [ ] `ProjectCard` has a test of its own in the package: the confirmation
+- [x] `ProjectCard` has a test of its own in the package: the confirmation
       replacing the actions, the status line, and the second action slot.
-- [ ] The package's `vitest` environment is `jsdom` for that file only — the
+- [x] The package's `vitest` environment is `jsdom` for that file only — the
       words' tests need no document and must not pay for one.
-- [ ] `ui-boundary.test.ts` still passes: `react-dom` and `jsdom` are dev
-      dependencies and peers, never dependencies.
-- [ ] `pnpm release:verify:ui` proves the harness is not in the tarball's
+- [x] `ui-boundary.test.ts` still passes: `react-dom` is a dev dependency and
+      a peer, `jsdom` a dev dependency only — the harness uses the document
+      its environment gives it and never imports `jsdom` itself.
+- [x] `pnpm release:verify:ui` proves the harness is not in the tarball's
       `dist/index.js` graph, and that `dist/testing` is.
-- [ ] `docs/testing.md` says the harness is the package's, and names the one
+- [x] `docs/testing.md` says the harness is the package's, and names the one
       place it lives.
 
 ## Notes
@@ -66,3 +67,11 @@ a consumer runs the harness.
 
 - 2026-09-20T18:05+08:00 — Written after a survey of what else the two
   applications hold twice. This was the only file with a diff of zero.
+- 2026-09-20T18:40+08:00 — Shipped. `harness.tsx` moved with `git mv` into
+  `packages/ui/src/testing/` and is exported beside the fixtures; 16 test
+  files here import from the package. `ProjectCard` has six cases of its own,
+  on `jsdom` for that file only. The packed verifier now refuses a main entry
+  that reaches `react-dom` or `./testing` — proved by exporting `mount` from
+  the entry point and watching it refuse. 2,260 tests pass, lint and typecheck
+  pass, and the tarball installs and works outside the workspace. The cloud's
+  copy is byte-identical, so US-271 deletes it and imports the same names.

@@ -44,6 +44,7 @@ try {
     "package/dist/index.js",
     "package/dist/index.d.ts",
     "package/dist/testing/index.js",
+    "package/dist/testing/harness.js",
     "package/dist/styles/tokens.css",
     "package/dist/styles/theme.css",
     "package/dist/styles/project-card.css",
@@ -51,6 +52,14 @@ try {
     "package/dist/assets/mark-small.svg",
   ]) {
     if (!listing.includes(file)) fail(`ships no ${file.replace("package/", "")}`);
+  }
+
+  // The harness renders and so needs react-dom; the words and the components do
+  // not. A main entry that reached react-dom would make every consumer that
+  // only wants a sentence pay for a renderer. US-274.
+  const entry = run("tar", ["-xOzf", tarball, "package/dist/index.js"]);
+  if (entry.includes("react-dom") || entry.includes("./testing")) {
+    fail("dist/index.js reaches the harness or react-dom");
   }
 
   const tests = listing.filter((file) => /\.test\.(js|d\.ts|js\.map|d\.ts\.map)$/.test(file));

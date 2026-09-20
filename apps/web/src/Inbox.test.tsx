@@ -10,11 +10,20 @@
  */
 
 import { ageLabel, idleRefreshMs, workingRefreshMs } from "@signalscout/ui";
-import { monitor as monitorRow, poll } from "@signalscout/ui/testing";
+import {
+  button,
+  json,
+  monitor as monitorRow,
+  mount,
+  poll,
+  type Screen,
+  select,
+  settle,
+  setValue,
+} from "@signalscout/ui/testing";
 import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Inbox } from "./Inbox.js";
-import { button, json, mount, type Screen, select, settle, setValue } from "./testing.js";
 
 /** The project every case is inside. The inbox is a question about one. */
 const projectId = "p1";

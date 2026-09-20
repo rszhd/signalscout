@@ -8,9 +8,19 @@
  * not post. The prompt's wording and the model's behaviour are asserted in
  * core.
  */
+
+import {
+  button,
+  field,
+  json,
+  mount,
+  type Screen,
+  select,
+  settle,
+  setValue,
+} from "@signalscout/ui/testing";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ReplyDraft } from "./ReplyDraft.js";
-import { button, field, json, mount, type Screen, select, settle, setValue } from "./testing.js";
 
 const matchId = "8d2b4a1e-3f5c-4c7a-9e11-2b6d0c4f7a31";
 

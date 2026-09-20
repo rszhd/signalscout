@@ -10,11 +10,12 @@ import { describe, expect, it } from "vitest";
  * release the engine or the pipeline, and a screen cannot reach the database
  * through a button.
  *
- * React and `react-router` are peer dependencies rather than dependencies:
- * both applications already hold each, and two Reacts in one bundle is two
- * renderers and a hook that throws, while two routers is two histories.
- * `ProjectCard` links with the router because a plain anchor would reload the
- * whole application on a click. US-273.
+ * React, `react-dom` and `react-router` are peer dependencies rather than
+ * dependencies: both applications already hold each, and two Reacts in one
+ * bundle is two renderers and a hook that throws, while two routers is two
+ * histories. `ProjectCard` links with the router because a plain anchor would
+ * reload the whole application on a click (US-273), and the test harness under
+ * `./testing` renders, so it needs `react-dom` (US-274).
  *
  * A second rule, about values rather than imports: a control here uses a
  * token name and never a raw colour or a raw spacing value. `stylelint` says
@@ -88,8 +89,8 @@ describe("packages/ui holds the brand and nothing else", () => {
       ...Object.keys(peerDependencies),
     ];
 
-    // React and the router are allowed, and only as peers: see the header.
-    const peers = ["react", "react-router"];
+    // React, its renderer and the router are allowed, and only as peers.
+    const peers = ["react", "react-dom", "react-router"];
     expect(declared.filter((name) => isForbidden(name) && !peers.includes(name))).toEqual([]);
   });
 
@@ -101,6 +102,8 @@ describe("packages/ui holds the brand and nothing else", () => {
     expect(Object.keys(dependencies)).toEqual([]);
     expect(peerDependencies.react).toBeDefined();
     expect(peerDependencies["react-router"]).toBeDefined();
+    // The harness under `./testing` renders, so it needs the renderer. US-274.
+    expect(peerDependencies["react-dom"]).toBeDefined();
   });
 
   it("imports none of them in any source file", async () => {

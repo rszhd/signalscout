@@ -9,10 +9,20 @@
  * project, and an address naming none is sent to choose one. The nav offers
  * only screens that are built.
  */
+
+import {
+  button,
+  field,
+  json,
+  mount,
+  radio,
+  type Screen,
+  settle,
+  setValue,
+} from "@signalscout/ui/testing";
 import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { App } from "./App.js";
-import { button, field, json, mount, radio, type Screen, settle, setValue } from "./testing.js";
 
 const options = {
   signals: [{ id: "problem", label: "Describing the problem", hint: "Clear pain" }],

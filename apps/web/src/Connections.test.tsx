@@ -7,10 +7,11 @@
  * can see which key is set, act on it, and tell a wrong key from an
  * unreachable provider — and whether a typed key stays out of the URL.
  */
+
+import { button, field, json, mount, type Screen, settle, setValue } from "@signalscout/ui/testing";
 import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Connections } from "./Connections.js";
-import { button, field, json, mount, type Screen, settle, setValue } from "./testing.js";
 
 function brightData(overrides: Record<string, unknown> = {}) {
   return {

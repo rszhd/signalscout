@@ -11,7 +11,7 @@
  */
 import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { MonitorDetail } from "./MonitorDetail.js";
+import { inputVerdict, MonitorDetail, staleAfterDays } from "./MonitorDetail.js";
 import { idleRefreshMs, workingRefreshMs } from "./monitor.js";
 import {
   monitor,
@@ -47,6 +47,16 @@ describe("one monitor's page", () => {
     };
   }
 
+  /** What the two statistics routes answer unless a case says otherwise. US-267. */
+  let queriesAnswer: Record<string, unknown> = { floor: 30, inputs: [] };
+  let leadsAnswer: Record<string, unknown> = {
+    floor: 30,
+    platforms: [],
+    channels: [],
+    kinds: [],
+    intents: [],
+  };
+
   /** The page, with this monitor and the history it has recorded. */
   async function show(
     row: unknown,
@@ -56,6 +66,8 @@ describe("one monitor's page", () => {
     fetchMock.mockImplementation(async (request: string | URL | Request) => {
       const url = typeof request === "string" ? request : request.toString();
       if (url.includes("/activity")) return json(activityPage(history, pageOverrides));
+      if (url.includes("/queries")) return json(queriesAnswer);
+      if (url.includes("/leads")) return json(leadsAnswer);
       if (url.startsWith("/api/monitors/")) return json(row);
       throw new Error(`Unexpected request: ${url}`);
     });
@@ -70,6 +82,8 @@ describe("one monitor's page", () => {
   beforeEach(() => {
     fetchMock = vi.fn();
     vi.stubGlobal("fetch", fetchMock);
+    queriesAnswer = { floor: 30, inputs: [] };
+    leadsAnswer = { floor: 30, platforms: [], channels: [], kinds: [], intents: [] };
   });
 
   afterEach(async () => {
@@ -609,6 +623,160 @@ describe("one monitor's page", () => {
     });
   });
 
+  /**
+   * Which queries and sources earn their keep. US-267.
+   *
+   * The floor is named on every heading and beside the match count, so the
+   * three numbers a person reads can be reconciled with each other.
+   */
+  describe("which queries and sources earn their keep", () => {
+    const monitorWithPlan = () =>
+      monitor({
+        minScore: 60,
+        matches: { total: 2, unread: 1 },
+        queries: { reddit: ["flaky end to end tests", "manual qa before every release"] },
+        subreddits: ["SaaS"],
+      });
+
+    it("names the floor beside the match count and on both headings", async () => {
+      queriesAnswer = { floor: 60, inputs: [] };
+      leadsAnswer = {
+        floor: 60,
+        platforms: [
+          {
+            value: "reddit",
+            label: "reddit",
+            source: null,
+            matches: 2,
+            averageScore: 90,
+            bestScore: 91,
+            strong: 2,
+          },
+        ],
+        channels: [],
+        kinds: [],
+        intents: [],
+      };
+      await show(monitorWithPlan());
+
+      expect(container.querySelector(".monitor-found")?.textContent).toContain(
+        "2 matches found, 1 unread · at 60 or above",
+      );
+      const notes = [...container.querySelectorAll(".monitor-section-note")].map(
+        (note) => note.textContent,
+      );
+      expect(notes.filter((note) => note === "Matches at 60 or above")).toHaveLength(2);
+    });
+
+    it("lists every input in the plan, and marks the ones to remove", async () => {
+      const fortyDaysAgo = new Date(Date.now() - 40 * 86_400_000).toISOString();
+      queriesAnswer = {
+        floor: 60,
+        inputs: [
+          {
+            kind: "query",
+            value: "flaky end to end tests",
+            posts: 40,
+            matches: 3,
+            bestScore: 91,
+            lastFoundAt: new Date().toISOString(),
+            lastMatchedAt: fortyDaysAgo,
+          },
+          {
+            kind: "channel",
+            value: "SaaS",
+            posts: 12,
+            matches: 0,
+            bestScore: null,
+            lastFoundAt: new Date().toISOString(),
+            lastMatchedAt: null,
+          },
+        ],
+      };
+      await show(monitorWithPlan());
+
+      const rows = [...container.querySelectorAll(".query-performance tbody tr")].map(
+        (row) => row.textContent ?? "",
+      );
+      expect(rows).toHaveLength(3);
+      expect(rows[0]).toContain("flaky end to end tests");
+      expect(rows[0]).toContain("No match in 30 days");
+      expect(rows[1]).toContain("manual qa before every release");
+      expect(rows[1]).toContain("Nothing found yet");
+      expect(rows[2]).toContain("r/SaaS");
+      expect(rows[2]).toContain("Never matched");
+    });
+
+    it("compares the sources one dimension at a time", async () => {
+      leadsAnswer = {
+        floor: 30,
+        platforms: [
+          {
+            value: "reddit",
+            label: "reddit",
+            source: null,
+            matches: 5,
+            averageScore: 48,
+            bestScore: 80,
+            strong: 1,
+          },
+          {
+            value: "tiktok",
+            label: "tiktok",
+            source: null,
+            matches: 2,
+            averageScore: 61,
+            bestScore: 77,
+            strong: 1,
+          },
+        ],
+        channels: [],
+        kinds: [
+          {
+            value: "post",
+            label: "post",
+            source: null,
+            matches: 6,
+            averageScore: 48,
+            bestScore: 80,
+            strong: 1,
+          },
+          {
+            value: "reply",
+            label: "reply",
+            source: null,
+            matches: 1,
+            averageScore: 64,
+            bestScore: 64,
+            strong: 0,
+          },
+        ],
+        intents: [
+          {
+            value: "problem",
+            label: "Describing the problem",
+            source: null,
+            matches: 7,
+            averageScore: 50,
+            bestScore: 80,
+            strong: 2,
+          },
+        ],
+      };
+      await show(monitor());
+
+      const table = () => container.querySelector(".lead-sources tbody")?.textContent ?? "";
+      expect(table()).toContain("Reddit");
+      expect(table()).toContain("48 / 100");
+
+      await act(async () => button("Posts vs. comments").click());
+      expect(table()).toContain("Replies and comments");
+
+      await act(async () => button("Intent").click());
+      expect(table()).toContain("Describing the problem");
+    });
+  });
+
   describe("what the person thought of it", () => {
     it("says how the matches were judged, and how many were judged at all", async () => {
       // PLAN.md's real measure of success. Nine tenths negative is a product
@@ -781,5 +949,41 @@ describe("one monitor's page", () => {
 
       expect(container.textContent).toContain("Asia/Kuala_Lumpur");
     });
+  });
+});
+
+describe("whether a search input earns its keep", () => {
+  const now = Date.parse("2026-09-20T00:00:00.000Z");
+  const day = 86_400_000;
+  const row = (overrides: Record<string, unknown> = {}) =>
+    ({
+      kind: "query",
+      value: "x",
+      posts: 10,
+      matches: 2,
+      bestScore: 80,
+      lastFoundAt: new Date(now).toISOString(),
+      lastMatchedAt: new Date(now - 5 * day).toISOString(),
+      ...overrides,
+    }) as Parameters<typeof inputVerdict>[0];
+
+  it("says nothing about an input that is working, or one with no row yet", () => {
+    expect(inputVerdict(row(), now)).toBeNull();
+    expect(inputVerdict(undefined, now)).toBeNull();
+    expect(inputVerdict(row({ posts: 0, matches: 0, lastMatchedAt: null }), now)).toBeNull();
+  });
+
+  it("marks a phrase that finds posts and never a match", () => {
+    expect(inputVerdict(row({ matches: 0, bestScore: null, lastMatchedAt: null }), now)).toBe(
+      "Never matched",
+    );
+  });
+
+  it("marks a phrase whose last match is older than thirty days", () => {
+    const stale = row({ lastMatchedAt: new Date(now - (staleAfterDays + 1) * day).toISOString() });
+    const fresh = row({ lastMatchedAt: new Date(now - (staleAfterDays - 1) * day).toISOString() });
+
+    expect(inputVerdict(stale, now)).toBe("No match in 30 days");
+    expect(inputVerdict(fresh, now)).toBeNull();
   });
 });

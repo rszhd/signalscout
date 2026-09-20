@@ -1006,3 +1006,53 @@
     width: 100%;
   }
 }
+
+/*
+ * The two statistics tables: what each query finds, and where the leads
+ * come from. US-267. One shape for both, so the page has one table voice.
+ */
+.monitor-stats-scroll {
+  overflow-x: auto;
+}
+.monitor-stats-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+}
+.monitor-stats-table thead th,
+.monitor-stats-table tbody th,
+.monitor-stats-table tbody td {
+  padding: var(--space-2) var(--space-3);
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--line);
+}
+.monitor-stats-table thead th {
+  color: var(--muted);
+  font-size: var(--text-xs);
+  font-weight: 500;
+}
+.monitor-stats-table tbody th {
+  font-weight: 500;
+}
+.monitor-stats-table tbody td {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.monitor-stats-value {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.monitor-stats-kind {
+  display: block;
+  color: var(--muted);
+  font-size: var(--text-xs);
+  font-weight: 400;
+}
+.monitor-stats-verdict {
+  color: var(--warning);
+}
+.lead-breakdown-switch {
+  margin-bottom: var(--space-3);
+}

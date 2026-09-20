@@ -135,6 +135,13 @@ export interface Monitor {
   projectId?: string | null;
   projectName?: string | null;
   sources: string[];
+  /**
+   * The search plan, as the API holds it: phrases per platform and the
+   * subreddits browsed. US-267 reads it so an input that has never returned
+   * a post is still on the screen. Optional for `lastPoll`'s reason.
+   */
+  queries?: Record<string, string[]>;
+  subreddits?: string[];
   paused: boolean;
   lastPolledAt: string | null;
   /** When it runs. US-041. */

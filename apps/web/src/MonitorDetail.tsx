@@ -37,6 +37,365 @@ import { describeSchedule } from "./schedule.js";
 
 type LoadState = "loading" | "ready" | "error";
 
+interface QueryPerformanceRow {
+  kind: "query" | "channel";
+  value: string;
+  posts: number;
+  matches: number;
+  bestScore: number | null;
+  lastFoundAt: string | null;
+  lastMatchedAt: string | null;
+}
+
+interface QueryPerformancePage {
+  floor: number;
+  inputs: QueryPerformanceRow[];
+}
+
+interface SearchInput {
+  kind: QueryPerformanceRow["kind"];
+  value: string;
+}
+
+interface LeadGroup {
+  value: string;
+  label: string;
+  source: string | null;
+  matches: number;
+  averageScore: number;
+  bestScore: number;
+  strong: number;
+}
+
+interface LeadBreakdown {
+  floor: number;
+  platforms: LeadGroup[];
+  channels: LeadGroup[];
+  kinds: LeadGroup[];
+  intents: LeadGroup[];
+}
+
+/** How long a phrase may go without a match before the screen marks it. US-267. */
+export const staleAfterDays = 30;
+
+function inputKey(input: SearchInput): string {
+  return `${input.kind}:${input.value}`;
+}
+
+/** The plan is the source of truth for inputs that have never returned a post. */
+function searchInputs(monitor: Monitor): SearchInput[] {
+  const inputs: SearchInput[] = [
+    ...Object.values(monitor.queries ?? {}).flatMap((queries) =>
+      queries.map((value) => ({ kind: "query" as const, value: value.trim() })),
+    ),
+    ...(monitor.subreddits ?? []).map((value) => ({
+      kind: "channel" as const,
+      value: value.trim(),
+    })),
+  ].filter((input) => input.value !== "");
+
+  return [...new Map(inputs.map((input) => [inputKey(input), input])).values()];
+}
+
+/**
+ * Whether an input has earned its keep lately. US-267.
+ *
+ * "Never matched" and "no match in thirty days" are the two marks: the first
+ * is a phrase that finds posts and no leads, the expensive kind of wrong, and
+ * the second is one that used to work. Both are what a person removes. An
+ * input with no row has found nothing yet and is not judged.
+ */
+export function inputVerdict(
+  row: QueryPerformanceRow | undefined,
+  now: number = Date.now(),
+): string | null {
+  if (!row || row.posts === 0) return null;
+  if (row.matches === 0 || !row.lastMatchedAt) return "Never matched";
+  const age = now - new Date(row.lastMatchedAt).getTime();
+  if (age > staleAfterDays * 86_400_000) return `No match in ${staleAfterDays} days`;
+  return null;
+}
+
+/**
+ * What each search input has produced since attribution began. US-267.
+ *
+ * A missing row is not an error: collection creates the row, so the monitor's
+ * plan supplies the input and this screen supplies the empty state. A null
+ * best score is different — posts came back, but none became a match.
+ *
+ * The heading names the floor. Every match count here is at or above the
+ * monitor's minimum score, and a statistic nobody can reproduce is worse
+ * than no statistic.
+ */
+function QueryPerformance({ monitor }: { readonly monitor: Monitor }) {
+  const [page, setPage] = useState<QueryPerformancePage | null>(null);
+  const [state, setState] = useState<LoadState>("loading");
+  const [error, setError] = useState<string | null>(null);
+
+  const load = useCallback(async (): Promise<void> => {
+    try {
+      setPage(await requestJson<QueryPerformancePage>(`/api/monitors/${monitor.id}/queries`));
+      setError(null);
+      setState("ready");
+    } catch (cause) {
+      setError(messageFor(cause, "Search performance could not be loaded."));
+      setState("error");
+    }
+  }, [monitor.id]);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  const configured = searchInputs(monitor);
+  const rows = page?.inputs ?? [];
+  const byInput = new Map(rows.map((row) => [inputKey(row), row]));
+  // Older monitor payloads did not carry the plan. Keep their measured rows
+  // useful instead of turning a deploy across two versions into an empty box.
+  const inputs = configured.length > 0 ? configured : rows;
+
+  return (
+    <section className="monitor-detail-section query-performance">
+      <div className="monitor-section-heading">
+        <div>
+          <p className="monitor-section-label">Search plan</p>
+          <h2 className="monitor-detail-title">What each query finds</h2>
+        </div>
+        {page && <span className="monitor-section-note">Matches at {page.floor} or above</span>}
+      </div>
+      <p className="monitor-origin">
+        Only posts collected since query tracking began are counted. A phrase that finds posts and
+        never a match is paying for every poll.
+      </p>
+
+      {state === "loading" && <p className="monitor-origin">Reading search performance.</p>}
+
+      {state === "error" && (
+        <p className="budget-error" role="alert">
+          {error}{" "}
+          <button className="text-button" type="button" onClick={() => void load()}>
+            Try again
+          </button>
+        </p>
+      )}
+
+      {state === "ready" && inputs.length === 0 && (
+        <p className="monitor-origin">No search inputs are configured.</p>
+      )}
+
+      {state === "ready" && inputs.length > 0 && (
+        <div className="monitor-stats-scroll">
+          <table className="monitor-stats-table">
+            <thead>
+              <tr>
+                <th scope="col">Search input</th>
+                <th scope="col">Posts</th>
+                <th scope="col">Matches</th>
+                <th scope="col">Best score</th>
+                <th scope="col">Last found</th>
+              </tr>
+            </thead>
+            <tbody>
+              {inputs.map((input) => {
+                const row = byInput.get(inputKey(input));
+                const verdict = inputVerdict(row);
+                return (
+                  <tr key={inputKey(input)}>
+                    <th scope="row">
+                      <span className="monitor-stats-value">
+                        {input.kind === "channel" ? `r/${input.value}` : input.value}
+                      </span>
+                      <small className="monitor-stats-kind">
+                        {input.kind === "channel" ? "Subreddit" : "Search query"}
+                        {!row ? " · Nothing found yet" : ""}
+                        {verdict ? (
+                          <>
+                            {" · "}
+                            <span className="monitor-stats-verdict">{verdict}</span>
+                          </>
+                        ) : null}
+                      </small>
+                    </th>
+                    <td data-label="Posts">{row ? row.posts.toLocaleString() : "—"}</td>
+                    <td data-label="Matches">{row ? row.matches.toLocaleString() : "—"}</td>
+                    <td data-label="Best score">
+                      {row
+                        ? row.bestScore === null
+                          ? "No match yet"
+                          : `${row.bestScore} / 100`
+                        : "—"}
+                    </td>
+                    <td data-label="Last found">
+                      {row?.lastFoundAt ? (
+                        <time
+                          dateTime={row.lastFoundAt}
+                          title={new Date(row.lastFoundAt).toLocaleString()}
+                        >
+                          {ageLabel(row.lastFoundAt)}
+                        </time>
+                      ) : (
+                        "—"
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </section>
+  );
+}
+
+type LeadDimension = "platforms" | "channels" | "kinds" | "intents";
+
+const leadDimensions: { id: LeadDimension; label: string; itemLabel: string }[] = [
+  { id: "platforms", label: "Platform", itemLabel: "Platform" },
+  { id: "channels", label: "Channel", itemLabel: "Channel" },
+  { id: "kinds", label: "Posts vs. comments", itemLabel: "Kind" },
+  { id: "intents", label: "Intent", itemLabel: "What they were doing" },
+];
+
+function leadGroupName(dimension: LeadDimension, row: LeadGroup): string {
+  if (dimension === "platforms") return platformName(row.value);
+  if (dimension === "channels") return row.source === "reddit" ? `r/${row.value}` : row.value;
+  if (dimension === "kinds") {
+    if (row.value === "post") return "Posts";
+    if (row.value === "reply") return "Replies and comments";
+  }
+  return row.label;
+}
+
+/**
+ * Where this monitor's matches come from, one comparison at a time. US-267.
+ *
+ * Four stacked tables would be longer than the history beside them. The
+ * switch keeps the same columns in one place, so a person changes only the
+ * dimension they are comparing. The API has ordered every list by matches.
+ */
+function LeadSources({ monitorId }: { readonly monitorId: string }) {
+  const [breakdown, setBreakdown] = useState<LeadBreakdown | null>(null);
+  const [dimension, setDimension] = useState<LeadDimension>("platforms");
+  const [state, setState] = useState<LoadState>("loading");
+  const [error, setError] = useState<string | null>(null);
+
+  const load = useCallback(async (): Promise<void> => {
+    try {
+      setBreakdown(await requestJson<LeadBreakdown>(`/api/monitors/${monitorId}/leads`));
+      setError(null);
+      setState("ready");
+    } catch (cause) {
+      setError(messageFor(cause, "Lead sources could not be loaded."));
+      setState("error");
+    }
+  }, [monitorId]);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  const definition = leadDimensions.find((item) => item.id === dimension) ?? leadDimensions[0];
+  const rows = breakdown?.[dimension] ?? [];
+  const hasMatches =
+    breakdown !== null && leadDimensions.some((item) => breakdown[item.id].length > 0);
+
+  return (
+    <section className="monitor-detail-section lead-sources">
+      <div className="monitor-section-heading">
+        <div>
+          <p className="monitor-section-label">Sources</p>
+          <h2 className="monitor-detail-title">Where the leads come from</h2>
+        </div>
+        {breakdown && (
+          <span className="monitor-section-note">Matches at {breakdown.floor} or above</span>
+        )}
+      </div>
+      <p className="monitor-origin">
+        Compare where matches come from and how well they score. A strong lead scores 70 or higher.
+      </p>
+
+      {state === "loading" && <p className="monitor-origin">Reading lead sources.</p>}
+
+      {state === "error" && (
+        <p className="budget-error" role="alert">
+          {error}{" "}
+          <button className="text-button" type="button" onClick={() => void load()}>
+            Try again
+          </button>
+        </p>
+      )}
+
+      {state === "ready" && !hasMatches && (
+        <p className="monitor-origin">No matches yet. This fills in as the monitor finds leads.</p>
+      )}
+
+      {state === "ready" && hasMatches && definition && (
+        <>
+          <fieldset className="view-switch lead-breakdown-switch">
+            <legend className="visually-hidden">Lead breakdown</legend>
+            {leadDimensions.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                aria-pressed={dimension === item.id}
+                onClick={() => setDimension(item.id)}
+              >
+                {item.label}
+              </button>
+            ))}
+          </fieldset>
+
+          {rows.length === 0 ? (
+            <p className="monitor-origin">Nothing to compare here yet.</p>
+          ) : (
+            <div className="monitor-stats-scroll">
+              <table className="monitor-stats-table">
+                <thead>
+                  <tr>
+                    <th scope="col">{definition.itemLabel}</th>
+                    <th scope="col">Matches</th>
+                    <th scope="col">Average</th>
+                    <th scope="col">Best</th>
+                    <th scope="col">Strong 70+</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {rows.map((row) => {
+                    const source =
+                      dimension === "platforms"
+                        ? row.value
+                        : dimension === "channels"
+                          ? row.source
+                          : null;
+                    return (
+                      <tr key={`${row.source ?? "all"}:${row.value}`}>
+                        <th scope="row">
+                          <span className="monitor-stats-value brand-label">
+                            {source ? <BrandIcon brand={source} size={16} /> : null}
+                            {leadGroupName(dimension, row)}
+                          </span>
+                          {dimension === "channels" && row.source ? (
+                            <small className="monitor-stats-kind">{platformName(row.source)}</small>
+                          ) : null}
+                        </th>
+                        <td data-label="Matches">{row.matches.toLocaleString()}</td>
+                        <td data-label="Average">{row.averageScore} / 100</td>
+                        <td data-label="Best">{row.bestScore} / 100</td>
+                        <td data-label="Strong 70+">{row.strong.toLocaleString()}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </>
+      )}
+    </section>
+  );
+}
+
 function BudgetForm({ monitor, onSaved }: { monitor: Monitor; onSaved: () => Promise<void> }) {
   const [cap, setCap] = useState(
     monitor.budget ? String(monitor.budget.monthlyCapMicros / 1_000_000) : "",
@@ -585,9 +944,13 @@ export function MonitorDetail({
                 {monitor.matches
                   ? `${monitor.matches.total} matches found, ${monitor.matches.unread} unread`
                   : "No match count from this server."}
+                {monitor.minScore === undefined ? "" : ` · at ${monitor.minScore} or above`}
               </p>
               <p className="monitor-feedback">{feedbackLabel(monitor.feedback)}</p>
             </section>
+
+            <LeadSources monitorId={monitor.id} />
+            <QueryPerformance monitor={monitor} />
 
             <section className="monitor-detail-section">
               <div className="monitor-section-heading">

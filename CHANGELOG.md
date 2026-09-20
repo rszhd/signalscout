@@ -25,6 +25,14 @@ page, for a screen that holds the oldest `startedAt` of the page it has
 (US-266). Absent, both read the newest page as before. A new optional
 parameter, so the version is a minor.
 
+**Changed.** `matchCounts` and `queryPerformance` count a match only at or
+above its monitor's own `min_score`, and `queryPerformance` no longer counts
+a hidden match, the way `matchCounts` never did (US-267). A monitor whose
+floor was raised after matches were written reports fewer than before; the
+rows are untouched. `QueryPerformance` gains `lastMatchedAt`, when a post the
+input found last became a match. A consumer that shows either number sees it
+move, so the version is a minor.
+
 `packages/pipeline`'s `schema.ts` is a barrel over one file per table family
 now (US-248); every export keeps its name and `drizzle-kit generate` produces
 no migration.

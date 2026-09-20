@@ -163,6 +163,44 @@ describe("which input found a post", () => {
         bestScore: 91,
       });
       expect(input?.lastFoundAt).toBeInstanceOf(Date);
+      expect(input?.lastMatchedAt).toBeInstanceOf(Date);
+    });
+
+    it("counts a match only at or above the monitor's floor, and never a hidden one", async () => {
+      // US-267. The number beside a phrase and the number at the top of the
+      // page use one floor, or a person cannot reconcile them.
+      const monitorId = await insertMonitor(database, {
+        generatedQueries: ["flaky tests"],
+        minScore: 60,
+      });
+      await poll(monitorId);
+
+      const found = await db.select({ id: posts.id }).from(posts);
+      const [first, second, third] = found;
+      if (!first || !second || !third) throw new Error("the poll stored too little to score");
+
+      const scored = (postId: string, score: number, hidden = false) => ({
+        monitorId,
+        postId,
+        score,
+        relevance: score,
+        problemFit: score,
+        icpFit: score,
+        intent: score,
+        urgency: score,
+        intentType: "problem" as const,
+        reasons: ["A reason"],
+        hidden,
+      });
+      await db
+        .insert(matches)
+        .values([scored(first.id, 91), scored(second.id, 45), scored(third.id, 88, true)]);
+
+      const [input] = await queryPerformance(db, "user-1", monitorId);
+
+      expect(input?.posts).toBe(fakePosts.length);
+      expect(input?.matches).toBe(1);
+      expect(input?.bestScore).toBe(91);
     });
 
     it("shows a phrase that finds posts and never matches", async () => {

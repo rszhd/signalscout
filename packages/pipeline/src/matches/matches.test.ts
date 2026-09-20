@@ -10,6 +10,7 @@
  * the reason the decay constant is 12 and not some other number, so it is
  * asserted rather than described.
  */
+import { eq } from "drizzle-orm";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { createDatabase, type Database } from "../db/client.js";
 import { type IntentType, matches, monitors, posts } from "../db/schema.js";
@@ -889,6 +890,16 @@ describe("the inbox list", () => {
       // US-015 hides the match rather than deleting it, so the row is still
       // there. A count that included it would promise a lead that opens on
       // nothing.
+      expect((await matchCounts(db)).get(monitorId)).toEqual({ total: 1, unread: 1 });
+    });
+
+    it("does not count a match under the monitor's own floor", async () => {
+      // US-267. The threshold gates new matches only, so raising it leaves the
+      // old rows; the inbox opens at the floor and this count must agree.
+      await seed({ monitorId, score: 80, postedAt: minutesAgo(10) });
+      await seed({ monitorId, score: 45, postedAt: minutesAgo(20) });
+      await db.update(monitors).set({ minScore: 60 }).where(eq(monitors.id, monitorId));
+
       expect((await matchCounts(db)).get(monitorId)).toEqual({ total: 1, unread: 1 });
     });
 

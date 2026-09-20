@@ -25,6 +25,7 @@ import {
   modelCalls,
   monitors,
   type PollRunRecord,
+  postDiscoveries,
   posts,
   type QueryGenerator,
   type QueryPlanOutcome,
@@ -179,7 +180,10 @@ describe("the monitor routes", () => {
   }
 
   /** Create a monitor through the route, and hand back its id. */
-  async function create(app: Awaited<ReturnType<typeof server>>, payload = newMonitor) {
+  async function create(
+    app: Awaited<ReturnType<typeof server>>,
+    payload: Record<string, unknown> = newMonitor,
+  ) {
     const response = await app.inject({ method: "POST", url: "/api/monitors", payload });
     return response.json().id as string;
   }
@@ -1584,6 +1588,179 @@ describe("the monitor routes", () => {
 
           expect(response.statusCode).toBe(404);
         });
+      });
+    });
+  });
+
+  /**
+   * Which inputs and sources earn their keep, all at one floor. US-267.
+   *
+   * The floor is the monitor's own `min_score`. The match count on the page,
+   * the count beside each phrase and the count under each platform must
+   * agree, or a person stops trusting all three.
+   */
+  describe("which queries and sources earn their keep", () => {
+    let sequence = 0;
+
+    async function found(
+      monitorId: string,
+      query: string,
+      score: number | null,
+      overrides: { replyTo?: string; channel?: string; hidden?: boolean; ageDays?: number } = {},
+    ): Promise<string> {
+      sequence += 1;
+      const [post] = await db
+        .insert(posts)
+        .values({
+          source: "reddit",
+          externalId: `t3_keep_${sequence}`,
+          url: `https://reddit.com/r/SaaS/comments/keep${sequence}`,
+          author: "someone",
+          channel: overrides.channel ?? "SaaS",
+          // A reply needs its thread: `posts_reply_has_parent`. US-020.
+          ...(overrides.replyTo
+            ? { kind: "reply" as const, parentPostId: overrides.replyTo, threadPosition: 1 }
+            : {}),
+          title: "How are small teams handling regression testing?",
+          excerpt: "We're manually checking our major flows before every release.",
+          postedAt: new Date(),
+        })
+        .returning({ id: posts.id });
+      if (!post) throw new Error("The post was not inserted.");
+
+      await db.insert(postDiscoveries).values({
+        monitorId,
+        postId: post.id,
+        source: "reddit",
+        kind: "query",
+        value: query,
+      });
+
+      if (score !== null) {
+        await db.insert(matches).values({
+          monitorId,
+          postId: post.id,
+          score,
+          relevance: score,
+          problemFit: score,
+          icpFit: score,
+          intent: score,
+          urgency: score,
+          intentType: score >= 70 ? "problem" : "none",
+          reasons: ["A reason"],
+          hidden: overrides.hidden ?? false,
+          createdAt: new Date(Date.now() - (overrides.ageDays ?? 0) * 86_400_000),
+        });
+      }
+
+      return post.id;
+    }
+
+    it("counts the same leads on the page, beside each phrase and under each source", async () => {
+      await withServer({}, async (app) => {
+        const id = await create(app, { ...newMonitor, minScore: 60 });
+        const thread = await found(id, "flaky end to end tests", 91);
+        await found(id, "flaky end to end tests", 45);
+        await found(id, "manual qa before every release", 88, { replyTo: thread });
+        await found(id, "manual qa before every release", null);
+        await found(id, "manual qa before every release", 95, { hidden: true });
+
+        const monitor = (await app.inject({ method: "GET", url: `/api/monitors/${id}` })).json();
+        const queries = (
+          await app.inject({ method: "GET", url: `/api/monitors/${id}/queries` })
+        ).json();
+        const leads = (
+          await app.inject({ method: "GET", url: `/api/monitors/${id}/leads` })
+        ).json();
+
+        // Five found, two under the floor or gone: every screen says two.
+        expect(monitor.matches.total).toBe(2);
+        expect(queries.floor).toBe(60);
+        expect(leads.floor).toBe(60);
+
+        const byQuery = Object.fromEntries(
+          queries.inputs.map((input: { value: string; posts: number; matches: number }) => [
+            input.value,
+            input,
+          ]),
+        );
+        expect(byQuery["flaky end to end tests"]).toMatchObject({
+          posts: 2,
+          matches: 1,
+          bestScore: 91,
+        });
+        expect(byQuery["manual qa before every release"]).toMatchObject({
+          posts: 3,
+          matches: 1,
+          bestScore: 88,
+        });
+
+        const total = leads.platforms.reduce(
+          (sum: number, group: { matches: number }) => sum + group.matches,
+          0,
+        );
+        expect(total).toBe(2);
+        expect(leads.platforms[0]).toMatchObject({ value: "reddit", matches: 2, averageScore: 90 });
+        expect(
+          leads.kinds
+            .map((group: { value: string; matches: number }) => [group.value, group.matches])
+            .sort(),
+        ).toEqual([
+          ["post", 1],
+          ["reply", 1],
+        ]);
+        expect(leads.channels[0]).toMatchObject({ value: "SaaS", source: "reddit", matches: 2 });
+        expect(leads.intents).toMatchObject([
+          { value: "problem", label: "Describing the problem" },
+        ]);
+      });
+    });
+
+    it("says when a phrase last matched, so a dead one can be seen", async () => {
+      await withServer({}, async (app) => {
+        const id = await create(app, { ...newMonitor, minScore: 30 });
+        await found(id, "flaky end to end tests", 80, { ageDays: 45 });
+        await found(id, "manual qa before every release", null);
+
+        const queries = (
+          await app.inject({ method: "GET", url: `/api/monitors/${id}/queries` })
+        ).json();
+        const byQuery = Object.fromEntries(
+          queries.inputs.map((input: { value: string; lastMatchedAt: string | null }) => [
+            input.value,
+            input,
+          ]),
+        );
+
+        const lastMatched = Date.parse(byQuery["flaky end to end tests"].lastMatchedAt);
+        expect(Date.now() - lastMatched).toBeGreaterThan(44 * 86_400_000);
+        expect(byQuery["manual qa before every release"].lastMatchedAt).toBeNull();
+      });
+    });
+
+    it("answers 404 for a monitor that is not this account's, on both routes", async () => {
+      const [row] = await db
+        .insert(monitors)
+        .values({
+          userId: "somebody-else",
+          name: "Not yours",
+          product: "A test runner",
+          idealCustomer: "Small SaaS teams",
+          problem: "Flaky end-to-end tests",
+          sources: ["reddit"],
+        })
+        .returning({ id: monitors.id });
+      if (!row) throw new Error("The monitor was not inserted.");
+      await found(row.id, "theirs", 90);
+
+      await withServer({}, async (app) => {
+        for (const route of ["queries", "leads"]) {
+          const response = await app.inject({
+            method: "GET",
+            url: `/api/monitors/${row.id}/${route}`,
+          });
+          expect(response.statusCode).toBe(404);
+        }
       });
     });
   });

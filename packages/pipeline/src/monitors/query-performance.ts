@@ -13,7 +13,7 @@
  * wrong. And the best score says whether the matches were worth reading, since
  * a dozen at 51 is not the same as one at 96.
  */
-import { and, desc, eq, sql } from "drizzle-orm";
+import { and, desc, eq, gte, sql } from "drizzle-orm";
 import type { Database } from "../db/client.js";
 import { type DiscoveryKind, matches, monitors, postDiscoveries } from "../db/schema.js";
 
@@ -29,6 +29,8 @@ export interface QueryPerformance {
   readonly bestScore: number | null;
   /** When it last found a post, which is how a dead phrase shows itself. */
   readonly lastFoundAt: Date | null;
+  /** When a post it found last became a match, or null where none has. US-267. */
+  readonly lastMatchedAt: Date | null;
 }
 
 /**
@@ -41,6 +43,10 @@ export interface QueryPerformance {
  * A post is counted for every input that found it. Two phrases that both
  * returned one post each get one post, and the poll paid for both searches —
  * so dividing it between them would understate what each one costs.
+ *
+ * A match counts only at or above the monitor's own `min_score`, and never
+ * when its post is gone. US-267: the same floor `matchCounts` applies, so the
+ * number beside a phrase and the number at the top of the page agree.
  */
 export async function queryPerformance(
   db: Database,
@@ -48,7 +54,7 @@ export async function queryPerformance(
   monitorId: string,
 ): Promise<QueryPerformance[]> {
   const [owned] = await db
-    .select({ id: monitors.id })
+    .select({ id: monitors.id, minScore: monitors.minScore })
     .from(monitors)
     .where(and(eq(monitors.id, monitorId), eq(monitors.userId, userId)))
     .limit(1);
@@ -63,16 +69,23 @@ export async function queryPerformance(
       matches: sql<number>`count(${matches.id})::int`,
       bestScore: sql<number | null>`max(${matches.score})`,
       lastFoundAt: sql<Date | null>`max(${postDiscoveries.firstSeenAt})`,
+      lastMatchedAt: sql<Date | null>`max(${matches.createdAt})`,
     })
     .from(postDiscoveries)
     /**
      * The match of *this* monitor, not of any monitor that found the post.
      * `matches` is keyed by monitor and post, and a post two monitors hold is
-     * one row here and two there.
+     * one row here and two there. The floor and the hidden flag are on the
+     * join, so a post stays counted as found when its match does not count.
      */
     .leftJoin(
       matches,
-      and(eq(matches.postId, postDiscoveries.postId), eq(matches.monitorId, monitorId)),
+      and(
+        eq(matches.postId, postDiscoveries.postId),
+        eq(matches.monitorId, monitorId),
+        eq(matches.hidden, false),
+        gte(matches.score, owned.minScore),
+      ),
     )
     .where(eq(postDiscoveries.monitorId, monitorId))
     .groupBy(postDiscoveries.kind, postDiscoveries.value)
@@ -85,5 +98,6 @@ export async function queryPerformance(
     matches: Number(row.matches),
     bestScore: row.bestScore === null ? null : Number(row.bestScore),
     lastFoundAt: row.lastFoundAt === null ? null : new Date(row.lastFoundAt),
+    lastMatchedAt: row.lastMatchedAt === null ? null : new Date(row.lastMatchedAt),
   }));
 }

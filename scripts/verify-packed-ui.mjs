@@ -49,6 +49,7 @@ try {
     "package/dist/styles/theme.css",
     "package/dist/styles/project-card.css",
     "package/dist/styles/reply-voices.css",
+    "package/dist/styles/reply-draft.css",
     "package/dist/assets/mark.svg",
     "package/dist/assets/mark-small.svg",
   ]) {

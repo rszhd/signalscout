@@ -8,12 +8,12 @@ import {
   messageFor,
   monitoringState,
   PageState,
+  ReplyDraft,
   requestJson,
   useMonitorRefresh,
 } from "@signalscout/ui";
 import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router";
-import { ReplyDraft } from "./ReplyDraft.js";
 import { paths } from "./route.js";
 
 /**

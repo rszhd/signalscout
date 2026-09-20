@@ -2,7 +2,7 @@
 
 # Done
 
-183 finished.
+184 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
@@ -27,6 +27,7 @@
 | BUG-003 | [A post below the threshold is classified again on every poll](done/2026-09/BUG-003-a-post-below-the-threshold-is-classified-again-on-every-poll.md) | bug | fixed | 2026-09 |
 | BUG-002 | [A seven-day window is bought as a month](done/2026-09/BUG-002-a-seven-day-window-is-bought-as-a-month.md) | bug | fixed | 2026-09 |
 | BUG-001 | [A pending Reddit collection is not resumed](done/2026-09/BUG-001-a-pending-reddit-collection-is-not-resumed.md) | bug | shipped | 2026-09 |
+| US-278 | [The reply composer follows the hosted one, then is shared](done/2026-09/US-278-the-reply-composer-follows-the-hosted-one-then-is-shared.md) | chore | shipped | 2026-09 |
 | US-277 | [The reply voice editor is one screen](done/2026-09/US-277-the-reply-voice-editor-is-one-screen.md) | chore | shipped | 2026-09 |
 | US-276 | [A state block and an error row are components](done/2026-09/US-276-a-state-block-and-an-error-row-are-components.md) | chore | shipped | 2026-09 |
 | US-275 | [The schedule's words are shared](done/2026-09/US-275-the-schedules-words-are-shared.md) | chore | shipped | 2026-09 |

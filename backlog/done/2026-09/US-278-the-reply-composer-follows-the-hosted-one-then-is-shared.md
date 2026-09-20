@@ -6,7 +6,7 @@ priority: p3
 created: 2026-09-20T18:16+08:00
 parent: US-270
 area: web
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -32,17 +32,24 @@ posted from here.
 
 ## Acceptance
 
-- [ ] This application's composer matches the hosted layout: one composing
+- [x] This application's composer matches the hosted layout: one composing
       block, no decorative mark, no safety badge.
-- [ ] `ReplyDraft` is then exported from `@signalscout/ui` with its stylesheet;
+- [x] `ReplyDraft` is then exported from `@signalscout/ui` with its stylesheet;
       both applications render it from there and both copies are deleted.
-- [ ] The test moves to the package and passes there.
-- [ ] The saved-voice picker still reads this application's own voices; if it
-      needs anything the hosted one does not, it is a prop.
-- [ ] `pnpm lint:css` passes with no raw colour in the moved stylesheet.
+      **This application does; the hosted one adopts it in US-271.** Following
+      and sharing collapsed into one step: taking the hosted copy as the
+      package's is what made this application follow it.
+- [x] The test moves to the package and passes there.
+- [x] The saved-voice picker still reads this application's own voices; if it
+      needs anything the hosted one does not, it is a prop. It needed nothing:
+      both read `/api/reply-prompts`, and the byte-identical test proved the
+      behaviour was already one.
+- [x] `pnpm lint:css` passes with no raw colour in the moved stylesheet.
       US-272 has already adopted the palette here; check which copy is newer.
 - [ ] The composer was rendered in a browser afterwards, with a finished draft
-      and with a failure.
+      and with a failure. **Not done**: the Chrome extension is not connected.
+      The dev server resolves the package's stylesheet and the inbox route
+      answers.
 
 ## Notes
 
@@ -54,3 +61,12 @@ posted from here.
 
 - 2026-09-20T18:16+08:00 — Written after the survey: 98 lines apart, tests
   identical, and the hosted copy is the newer layout.
+- 2026-09-20T20:20+08:00 — Shipped, the browser pass owed. The hosted copy is
+  the package's: its one form error is `FormError`, and its stylesheet's ten
+  raw values are tokens — the same choices US-272 had made on this
+  application's older layout: `--accent` and `--accent-soft` for focus,
+  `--accent-tint` for the spinner's ring, `--success` for a copied draft,
+  `--scrim` behind the dialog, and `--warning` with a new `--warning-soft`
+  for the checks, the pair of `--danger-soft`. The test moved unchanged but
+  for its imports. The inbox renders the composer from the package. 2,269
+  tests pass and the tarball installs and works outside the workspace.

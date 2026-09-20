@@ -9,6 +9,8 @@
  * core.
  */
 
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { ReplyDraft } from "./ReplyDraft.js";
 import {
   button,
   field,
@@ -18,9 +20,7 @@ import {
   select,
   settle,
   setValue,
-} from "@signalscout/ui/testing";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { ReplyDraft } from "./ReplyDraft.js";
+} from "./testing/harness.js";
 
 const matchId = "8d2b4a1e-3f5c-4c7a-9e11-2b6d0c4f7a31";
 

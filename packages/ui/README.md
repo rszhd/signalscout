@@ -154,7 +154,9 @@ per account, and nothing about who pays for a model touches it. The rule in
 both `AGENTS.md` files says it this way — a screen that is the same screen in
 both products may be shared; a screen that carries the product may not. The
 route that renders it stays each application's own, and so does its place in
-the navigation.
+the navigation. `ReplyDraft` is the second (US-278): the composer a match opens,
+which followed the hosted layout before it moved, so the package holds the
+newer one.
 
 ## The words
 

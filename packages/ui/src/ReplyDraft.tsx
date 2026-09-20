@@ -1,5 +1,19 @@
-import { FormError, messageFor, requestJson } from "@signalscout/ui";
+/**
+ * The reply composer: one component, for both applications. US-278.
+ *
+ * It carries no product. A draft is a model call on whichever key the
+ * deployment uses, and the screen says the same thing either way — nothing is
+ * posted from here. So it is one component, by the rule US-277 wrote into
+ * AGENTS.md: a screen that is the same screen in both products may be shared.
+ *
+ * Taken from the hosted copy, which is the newer layout — one composing block,
+ * no decorative mark, no safety badge — and the reason it went second: sharing
+ * the older layout first would have frozen it into the package and made the
+ * hosted application take a step back to adopt it.
+ */
 import { useEffect, useRef, useState } from "react";
+import { messageFor, requestJson } from "./api.js";
+import { FormError } from "./components/FormError.js";
 
 /**
  * Draft a reply to one match, and keep the prompts that steer it.
@@ -161,53 +175,11 @@ export function ReplyDraft({ matchId }: { matchId: string }) {
 
   return (
     <section aria-labelledby={headingId} aria-busy={drafting} className="reply-draft">
-      <header className="reply-draft-heading">
-        <span className="reply-draft-mark" aria-hidden="true">
-          ✦
-        </span>
-        <div>
+      <div className="reply-draft-compose">
+        <header className="reply-draft-heading">
           <h3 id={headingId}>Draft a reply</h3>
-          <p>Turn this conversation into a thoughtful starting point.</p>
-        </div>
-        <span className="reply-draft-safety">
-          <span className="reply-draft-safety-icon" aria-hidden="true">
-            ✓
-          </span>
-          You review and post
-        </span>
-      </header>
-
-      <div className="reply-draft-controls">
-        <label className="reply-voice-field">
-          <span>Writing voice</span>
-          <select
-            aria-label="Saved prompt"
-            value={promptId}
-            onChange={(event) => choose(event.target.value)}
-          >
-            <option value="">No saved prompt</option>
-            {prompts.map((prompt) => (
-              <option key={prompt.id} value={prompt.id}>
-                {prompt.name}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <button
-          ref={customizeButton}
-          aria-label={instruction.trim() ? "Edit guidance" : "Customize"}
-          className="reply-draft-manage"
-          type="button"
-          aria-expanded={customizing}
-          aria-haspopup="dialog"
-          onClick={openCustomizer}
-        >
-          <span className="reply-draft-button-icon" aria-hidden="true">
-            ☷
-          </span>
-          {instruction.trim() ? "Edit guidance" : "Customize"}
-        </button>
+          <p>You review and post.</p>
+        </header>
 
         <button
           aria-label={drafting ? "Writing…" : draft ? "Draft again" : "Draft reply"}
@@ -222,21 +194,47 @@ export function ReplyDraft({ matchId }: { matchId: string }) {
               Writing…
             </>
           ) : draft ? (
-            <>
-              <span className="reply-draft-button-icon" aria-hidden="true">
-                ✦
-              </span>
-              Draft again
-            </>
+            "Draft again"
           ) : (
-            <>
-              <span className="reply-draft-button-icon" aria-hidden="true">
-                ✦
-              </span>
-              Draft reply
-            </>
+            "Draft reply"
           )}
         </button>
+
+        <details className="reply-draft-options">
+          <summary>
+            <span>Voice and guidance</span>
+            <small>Optional</small>
+          </summary>
+          <div className="reply-draft-controls">
+            <label className="reply-voice-field">
+              <span>Writing voice</span>
+              <select
+                aria-label="Saved prompt"
+                value={promptId}
+                onChange={(event) => choose(event.target.value)}
+              >
+                <option value="">No saved prompt</option>
+                {prompts.map((prompt) => (
+                  <option key={prompt.id} value={prompt.id}>
+                    {prompt.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <button
+              ref={customizeButton}
+              aria-label={instruction.trim() ? "Edit guidance" : "Customize"}
+              className="reply-draft-manage"
+              type="button"
+              aria-expanded={customizing}
+              aria-haspopup="dialog"
+              onClick={openCustomizer}
+            >
+              {instruction.trim() ? "Edit guidance" : "Customize"}
+            </button>
+          </div>
+        </details>
       </div>
 
       {customizing && (

@@ -14,7 +14,7 @@ import "./styles/projects.css";
 import "./styles/monitors.css";
 import "./styles/notifications.css";
 import "./styles/providers.css";
-import "./styles/reply-draft.css";
+import "@signalscout/ui/reply-draft.css";
 import "@signalscout/ui/reply-voices.css";
 import "./styles/sidebar.css";
 

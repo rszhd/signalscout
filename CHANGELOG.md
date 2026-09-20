@@ -40,7 +40,10 @@ and the timezone helpers — are exported too (US-275). `PageState` and
 `theme.css` and the role each state carries decided by the component
 (US-276); `--danger-soft` joins the tokens for them. `ReplyVoices` and
 `@signalscout/ui/reply-voices.css` are the reply voice editor, the first whole
-screen in the package (US-277); a consumer renders it on a route of its own. Where the two products differ the words take an argument:
+screen in the package (US-277); a consumer renders it on a route of its own.
+`ReplyDraft` and `@signalscout/ui/reply-draft.css` are the reply composer a
+match opens (US-278); `--warning-soft` joins the tokens for its checks. Where
+the two products differ the words take an argument:
 `pollSummary(run, { spend: false })` is the hosted sentence, and
 `Monitor.pausedByPlan` is the pause only a plan can perform.
 

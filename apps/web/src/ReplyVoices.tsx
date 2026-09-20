@@ -1,4 +1,4 @@
-import { messageFor, requestJson } from "@signalscout/ui";
+import { FormError, messageFor, PageState, requestJson } from "@signalscout/ui";
 import { useEffect, useState } from "react";
 
 /**
@@ -278,10 +278,7 @@ export function ReplyVoices() {
     return (
       <div className="product-page reply-voices-page">
         <ReplyVoicesHeader disabled onNew={startNew} />
-        <div className="center-state page-state" role="status">
-          <div className="spinner" aria-hidden="true" />
-          <p>Loading your reply voices.</p>
-        </div>
+        <PageState kind="loading">Loading your reply voices.</PageState>
       </div>
     );
   }
@@ -290,10 +287,9 @@ export function ReplyVoices() {
     return (
       <div className="product-page reply-voices-page">
         <ReplyVoicesHeader disabled onNew={startNew} />
-        <div className="center-state page-state" role="alert">
-          <h2>Reply voices could not be loaded</h2>
-          <p>{error}</p>
-        </div>
+        <PageState kind="error" heading="Reply voices could not be loaded">
+          {error}
+        </PageState>
       </div>
     );
   }
@@ -428,11 +424,7 @@ export function ReplyVoices() {
                   invent facts about it.
                 </p>
 
-                {error && (
-                  <p className="form-error" role="alert">
-                    {error}
-                  </p>
-                )}
+                {error && <FormError>{error}</FormError>}
                 {notice && (
                   <p className="reply-voice-notice" role="status">
                     <span className="reply-voice-notice-icon" aria-hidden="true">
@@ -502,11 +494,7 @@ export function ReplyVoices() {
                 Create a voice
               </button>
 
-              {error && (
-                <p className="form-error" role="alert">
-                  {error}
-                </p>
-              )}
+              {error && <FormError>{error}</FormError>}
             </div>
           )}
         </section>

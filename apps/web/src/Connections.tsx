@@ -1,4 +1,4 @@
-import { BrandIcon, Button, Dialog, messageFor, requestJson } from "@signalscout/ui";
+import { BrandIcon, Button, Dialog, messageFor, PageState, requestJson } from "@signalscout/ui";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 /**
@@ -511,10 +511,7 @@ export function Connections() {
     return (
       <div className="product-page connections-page">
         <ConnectionsHeader />
-        <div className="center-state page-state" role="status">
-          <div className="spinner" aria-hidden="true" />
-          <p>Reading your connections.</p>
-        </div>
+        <PageState kind="loading">Reading your connections.</PageState>
       </div>
     );
   }
@@ -523,13 +520,17 @@ export function Connections() {
     return (
       <div className="product-page connections-page">
         <ConnectionsHeader />
-        <div className="center-state page-state" role="alert">
-          <h2>The connections could not be loaded</h2>
-          <p>{error}</p>
-          <button type="button" className="primary-button" onClick={() => void load()}>
-            Try again
-          </button>
-        </div>
+        <PageState
+          kind="error"
+          heading="The connections could not be loaded"
+          action={
+            <button type="button" className="primary-button" onClick={() => void load()}>
+              Try again
+            </button>
+          }
+        >
+          {error}
+        </PageState>
       </div>
     );
   }

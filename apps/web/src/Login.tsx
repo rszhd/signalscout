@@ -1,4 +1,4 @@
-import { BrandLogo, codeFor, messageFor, requestJson } from "@signalscout/ui";
+import { BrandLogo, codeFor, FormError, messageFor, requestJson } from "@signalscout/ui";
 import { type FormEvent, useState } from "react";
 
 /** Email authentication, with registration offered only when the instance allows it. */
@@ -313,11 +313,7 @@ export function Login({ firstRun, signUpOpen }: { firstRun: boolean; signUpOpen:
                 )}
               </label>
 
-              {error && (
-                <p className="form-error" role="alert">
-                  {error}
-                </p>
-              )}
+              {error && <FormError>{error}</FormError>}
 
               <button className="primary-button" disabled={busy} type="submit">
                 {busy ? "Working…" : signingUp ? "Create the account" : "Sign in"}

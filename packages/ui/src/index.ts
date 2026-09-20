@@ -19,6 +19,8 @@ export { BrandLogo } from "./BrandLogo.js";
 export { Button } from "./components/Button.js";
 export { Dialog } from "./components/Dialog.js";
 export { Field } from "./components/Field.js";
+export { FormError, type FormErrorProps } from "./components/FormError.js";
+export { PageState, type PageStateProps } from "./components/PageState.js";
 export { ageLabel, platformName, providerName, untilLabel } from "./labels.js";
 export {
   type ActivityEntry,

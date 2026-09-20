@@ -1,4 +1,12 @@
-import { BrandIcon, Button, Dialog, messageFor, requestJson } from "@signalscout/ui";
+import {
+  BrandIcon,
+  Button,
+  Dialog,
+  FormError,
+  messageFor,
+  PageState,
+  requestJson,
+} from "@signalscout/ui";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 
 /**
@@ -430,11 +438,7 @@ function KeyLibrary({
             billed to it. The model above is only used for that test and is not saved.
           </p>
 
-          {error && (
-            <p className="form-error" role="alert">
-              {error}
-            </p>
-          )}
+          {error && <FormError>{error}</FormError>}
 
           <Button
             variant="primary"
@@ -1001,13 +1005,9 @@ export function Models() {
     return (
       <div className="product-page models-page">
         <ModelsHeader />
-        <div className="center-state page-state" role="alert">
-          <span className="state-icon" aria-hidden="true">
-            !
-          </span>
-          <h2>Models could not be loaded</h2>
-          <p>{error}</p>
-        </div>
+        <PageState kind="error" heading="Models could not be loaded">
+          {error}
+        </PageState>
       </div>
     );
   }
@@ -1016,10 +1016,7 @@ export function Models() {
     return (
       <div className="product-page models-page">
         <ModelsHeader />
-        <div className="center-state page-state" role="status">
-          <div className="spinner" aria-hidden="true" />
-          <p>Reading your model settings.</p>
-        </div>
+        <PageState kind="loading">Reading your model settings.</PageState>
       </div>
     );
   }

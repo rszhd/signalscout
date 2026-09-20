@@ -321,73 +321,19 @@ a {
   border: 0;
 }
 
-.center-state {
-  min-height: 540px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 42px 24px;
-  text-align: center;
-}
-
-.center-state h2 {
-  margin: 0;
-  font-size: 1.28rem;
-  letter-spacing: -0.025em;
-}
-
-.center-state > p {
-  max-width: 430px;
-  margin: 8px 0 20px;
-  color: var(--muted);
-  font-size: var(--text-body);
-  line-height: 1.6;
-}
-
-.page-state {
-  min-height: calc(100vh - 190px);
-}
-
-.spinner {
-  width: 28px;
-  height: 28px;
-  margin-bottom: 18px;
-  border: 2px solid #d8dcd6;
-  border-top-color: var(--accent);
-  border-radius: 50%;
-  animation: spin 700ms linear infinite;
-}
-
-.state-icon,
-.success-mark,
-.empty-mark {
+/* The success mark used to share a rule with the state block's marks, which
+   moved to @signalscout/ui with PageState (US-276). It is this screen's own. */
+.success-mark {
   width: 48px;
   height: 48px;
   display: grid;
   place-items: center;
   margin-bottom: 16px;
   border-radius: 12px;
-  color: var(--accent);
-  background: var(--accent-soft);
-  font-size: 1.2rem;
-  font-weight: 700;
-}
-
-.state-icon {
-  color: #9a4031;
-  background: #ffebe7;
-}
-
-.success-mark {
   color: var(--surface);
   background: var(--quiet-accent);
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+  font-size: 1.2rem;
+  font-weight: 700;
 }
 
 /* Inbox */
@@ -1624,15 +1570,6 @@ a {
 
 .notice.compact {
   margin-top: 18px;
-}
-
-.form-error {
-  margin: 0 0 14px;
-  padding: 10px 12px;
-  border-radius: 8px;
-  color: #8f3f39;
-  background: #fff0ed;
-  font-size: var(--text-sm);
 }
 
 .form-actions {

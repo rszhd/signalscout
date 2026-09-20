@@ -2,10 +2,12 @@ import {
   ageLabel,
   BrandIcon,
   band,
+  FormError,
   type Monitor,
   type Monitoring,
   messageFor,
   monitoringState,
+  PageState,
   requestJson,
   useMonitorRefresh,
 } from "@signalscout/ui";
@@ -878,59 +880,67 @@ export function Inbox({
       </div>
 
       {state === "loading" && (
-        <div className="center-state page-state" role="status">
-          <span className="spinner" aria-hidden="true" />
-          <h2>Loading the inbox</h2>
-          <p>Reading the matches your monitors have scored.</p>
-        </div>
+        <PageState kind="loading" heading="Loading the inbox">
+          Reading the matches your monitors have scored.
+        </PageState>
       )}
 
       {state === "error" && (
-        <div className="center-state page-state error-state" role="alert">
-          <span className="state-icon">!</span>
-          <h2>The inbox could not be loaded</h2>
-          <p>{error}</p>
-          <button className="secondary-button" type="button" onClick={() => void loadFirstPage()}>
-            Try again
-          </button>
-        </div>
+        <PageState
+          kind="error"
+          heading="The inbox could not be loaded"
+          action={
+            <button className="secondary-button" type="button" onClick={() => void loadFirstPage()}>
+              Try again
+            </button>
+          }
+        >
+          {error}
+        </PageState>
       )}
 
       {addressMissing && (
-        <p className="center-state page-state" role="status">
+        <PageState kind="empty" page={false}>
           That item is not in this inbox any more. It may have been removed, or the link may be for
           a different account.
-        </p>
+        </PageState>
       )}
 
-      {state !== "loading" && state !== "error" && matches.length === 0 && !addressedMatch && (
-        <div className="center-state page-state" role="status">
-          {monitors.length === 0 ? (
-            <>
-              <span className="empty-mark" aria-hidden="true">
-                ✦
-              </span>
-              <h2>No monitors yet</h2>
-              <p>Create a monitor and SignalScout will start collecting conversations.</p>
+      {state !== "loading" &&
+        state !== "error" &&
+        matches.length === 0 &&
+        !addressedMatch &&
+        (monitors.length === 0 ? (
+          <PageState
+            kind="empty"
+            mark="✦"
+            heading="No monitors yet"
+            action={
               <Link className="primary-button" to={paths.newMonitor(projectId)}>
                 Create a monitor
               </Link>
-            </>
-          ) : filtered ? (
-            <>
-              <h2>No matches with these filters</h2>
-              <p>There may be matches the monitor or the minimum score is hiding.</p>
+            }
+          >
+            Create a monitor and SignalScout will start collecting conversations.
+          </PageState>
+        ) : filtered ? (
+          <PageState
+            kind="empty"
+            heading="No matches with these filters"
+            action={
               <button className="secondary-button" type="button" onClick={clearFilters}>
                 Clear filters
               </button>
-            </>
-          ) : showSaved ? (
-            <>
-              <span className="empty-mark" aria-hidden="true">
-                ☆
-              </span>
-              <h2>No saved conversations yet</h2>
-              <p>Save a conversation from your inbox to come back to it here.</p>
+            }
+          >
+            There may be matches the monitor or the minimum score is hiding.
+          </PageState>
+        ) : showSaved ? (
+          <PageState
+            kind="empty"
+            mark="☆"
+            heading="No saved conversations yet"
+            action={
               <button
                 className="secondary-button"
                 type="button"
@@ -938,17 +948,16 @@ export function Inbox({
               >
                 Back to inbox
               </button>
-            </>
-          ) : (
-            <>
-              <span className="empty-mark" aria-hidden="true">
-                ✦
-              </span>
-              <h2>Nothing has matched yet</h2>
-              <p>
-                Your monitors collect on their own schedule. Matches appear here as they are scored.
-              </p>
-              {thresholdSentence(monitors) && <p>{thresholdSentence(monitors)}</p>}
+            }
+          >
+            Save a conversation from your inbox to come back to it here.
+          </PageState>
+        ) : (
+          <PageState
+            kind="empty"
+            mark="✦"
+            heading="Nothing has matched yet"
+            action={
               <button
                 className="secondary-button"
                 type="button"
@@ -956,10 +965,12 @@ export function Inbox({
               >
                 Check again
               </button>
-            </>
-          )}
-        </div>
-      )}
+            }
+          >
+            Your monitors collect on their own schedule. Matches appear here as they are scored.
+            {thresholdSentence(monitors) ? ` ${thresholdSentence(monitors)}` : ""}
+          </PageState>
+        ))}
 
       {state !== "loading" && state !== "error" && selectedMatch && (
         <div className="inbox-layout">
@@ -1251,11 +1262,7 @@ export function Inbox({
         </div>
       )}
 
-      {error && state === "ready" && (
-        <p className="form-error floating-error" role="alert">
-          {error}
-        </p>
-      )}
+      {error && state === "ready" && <FormError className="floating-error">{error}</FormError>}
     </div>
   );
 }

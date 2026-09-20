@@ -1,4 +1,4 @@
-import { BrandIcon, BrandLogo, messageFor, requestJson } from "@signalscout/ui";
+import { BrandIcon, BrandLogo, FormError, messageFor, requestJson } from "@signalscout/ui";
 import { type FormEvent, useCallback, useState } from "react";
 
 /**
@@ -325,11 +325,7 @@ function ProviderStep({
         </div>
       )}
 
-      {error && (
-        <p className="form-error" role="alert">
-          {error}
-        </p>
-      )}
+      {error && <FormError>{error}</FormError>}
 
       <div className="setup-actions">
         <button className="primary-button" disabled={busy || !provider} type="submit">
@@ -486,11 +482,7 @@ function ModelStep({
         </div>
       )}
 
-      {error && (
-        <p className="form-error" role="alert">
-          {error}
-        </p>
-      )}
+      {error && <FormError>{error}</FormError>}
 
       <div className="setup-actions">
         <button className="primary-button" disabled={busy || !provider} type="submit">

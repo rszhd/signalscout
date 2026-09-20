@@ -1,4 +1,4 @@
-import { messageFor, requestJson } from "@signalscout/ui";
+import { FormError, messageFor, requestJson } from "@signalscout/ui";
 import { useEffect, useRef, useState } from "react";
 
 /**
@@ -309,11 +309,7 @@ export function ReplyDraft({ matchId }: { matchId: string }) {
         </div>
       )}
 
-      {error && !customizing && (
-        <p className="form-error" role="alert">
-          {error}
-        </p>
-      )}
+      {error && !customizing && <FormError>{error}</FormError>}
 
       {draft && (
         <div className="reply-draft-result">

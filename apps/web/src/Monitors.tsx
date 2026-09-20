@@ -29,6 +29,7 @@ import {
   messageFor,
   needsAttention,
   nextPollLabel,
+  PageState,
   platformName,
   pollSummary,
   requestJson,
@@ -130,10 +131,7 @@ export function Monitors({ projectId }: { readonly projectId: string }) {
     return (
       <div className="product-page monitors-page">
         <MonitorsHeader projectId={projectId} />
-        <div className="center-state page-state">
-          <div className="spinner" aria-hidden="true" />
-          <p>Reading your monitors.</p>
-        </div>
+        <PageState kind="loading">Reading your monitors.</PageState>
       </div>
     );
   }
@@ -142,13 +140,17 @@ export function Monitors({ projectId }: { readonly projectId: string }) {
     return (
       <div className="product-page monitors-page">
         <MonitorsHeader projectId={projectId} />
-        <div className="center-state page-state">
-          <h2>The monitors could not be loaded</h2>
-          <p>{error}</p>
-          <button type="button" className="primary-button" onClick={() => void load()}>
-            Try again
-          </button>
-        </div>
+        <PageState
+          kind="error"
+          heading="The monitors could not be loaded"
+          action={
+            <button type="button" className="primary-button" onClick={() => void load()}>
+              Try again
+            </button>
+          }
+        >
+          {error}
+        </PageState>
       </div>
     );
   }
@@ -157,16 +159,18 @@ export function Monitors({ projectId }: { readonly projectId: string }) {
     return (
       <div className="product-page monitors-page">
         <MonitorsHeader projectId={projectId} />
-        <div className="center-state page-state">
-          <span className="empty-mark" aria-hidden="true">
-            ◎
-          </span>
-          <h2>No monitors yet</h2>
-          <p>Create a monitor and SignalScout will start collecting conversations.</p>
-          <Link className="primary-button" to={paths.newMonitor(projectId)}>
-            Create a monitor
-          </Link>
-        </div>
+        <PageState
+          kind="empty"
+          mark="◎"
+          heading="No monitors yet"
+          action={
+            <Link className="primary-button" to={paths.newMonitor(projectId)}>
+              Create a monitor
+            </Link>
+          }
+        >
+          Create a monitor and SignalScout will start collecting conversations.
+        </PageState>
       </div>
     );
   }

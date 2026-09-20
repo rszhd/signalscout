@@ -1,4 +1,4 @@
-import { messageFor, ProjectCard, requestJson } from "@signalscout/ui";
+import { FormError, messageFor, ProjectCard, requestJson } from "@signalscout/ui";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { paths } from "./route.js";
@@ -151,11 +151,7 @@ function DraftFromDocument({
         saving.
       </p>
 
-      {problem && (
-        <p className="form-error" role="alert">
-          {problem}
-        </p>
-      )}
+      {problem && <FormError>{problem}</FormError>}
 
       <div className="draft-controls">
         <input
@@ -267,20 +263,19 @@ export function Projects() {
 
       <div className="projects-content">
         {error && (
-          <div className="form-error" role="alert">
-            <span>{error}</span>
-            <button className="secondary-button" type="button" onClick={() => void load()}>
-              Try again
-            </button>
-          </div>
+          <FormError
+            action={
+              <button className="secondary-button" type="button" onClick={() => void load()}>
+                Try again
+              </button>
+            }
+          >
+            {error}
+          </FormError>
         )}
         {/* Above the list, not inside the card: the list is correct and the
             project is still there. US-273. */}
-        {deleteError && (
-          <div className="form-error" role="alert">
-            <span>{deleteError}</span>
-          </div>
-        )}
+        {deleteError && <FormError>{deleteError}</FormError>}
         <section aria-label="Your projects">
           {loading ? (
             <div className="project-state" role="status">
@@ -465,23 +460,22 @@ export function ProjectForm({ projectId }: { readonly projectId: string | null }
             Loading project…
           </p>
         ) : unavailable ? (
-          <div className="form-error" role="alert">
+          <FormError
+            action={
+              <Link className="secondary-button" to={paths.projects}>
+                All projects
+              </Link>
+            }
+          >
             {error}
-            <Link className="secondary-button" to={paths.projects}>
-              All projects
-            </Link>
-          </div>
+          </FormError>
         ) : (
           <section className="project-editor" aria-label="Project details">
             <Link className="project-text-button" to={paths.projects}>
               ← All projects
             </Link>
 
-            {error && (
-              <div className="form-error" role="alert">
-                {error}
-              </div>
-            )}
+            {error && <FormError>{error}</FormError>}
 
             <div className="project-editor-layout">
               <aside className="project-editor-guide">

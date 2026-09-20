@@ -6,7 +6,7 @@ priority: p2
 created: 2026-09-20T18:10+08:00
 parent: US-270
 area: web
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -37,17 +37,22 @@ screen should not have to remember which.
 
 ## Acceptance
 
-- [ ] `PageState` in `@signalscout/ui`: a mark, a heading, a sentence, an
+- [x] `PageState` in `@signalscout/ui`: a mark, a heading, a sentence, an
       optional action, and the right role for `loading` / `empty` / `error`.
-- [ ] `FormError` in `@signalscout/ui`: the server's sentence, an optional
+- [x] `FormError` in `@signalscout/ui`: the server's sentence, an optional
       retry, `role="alert"`.
-- [ ] Every `center-state page-state` and `form-error` in this application's
-      screens is one of the two, or the Log says why it is not.
-- [ ] Their rules move out of the page stylesheets into the package, and
+- [x] Every `center-state page-state` and `form-error` in this application's
+      screens is one of the two, or the Log says why it is not. One is not:
+      the monitor form's success screen (`center-state success-state`) with
+      its own ✓ mark, an eyebrow and a heading that names the monitor. It is a
+      screen of its own rather than a state, and its mark stayed in
+      `index.css` as the page's.
+- [x] Their rules move out of the page stylesheets into the package, and
       `pnpm lint:css` still passes.
-- [ ] A test in the package covers the role each state carries, because that
+- [x] A test in the package covers the role each state carries, because that
       is the part a screen cannot be trusted to remember.
-- [ ] US-271 in the hosted repository names both components.
+- [x] US-271 in the hosted repository names both components — it did already,
+      from the survey that wrote this ticket.
 
 ## Notes
 
@@ -61,3 +66,16 @@ screen should not have to remember which.
 
 - 2026-09-20T18:10+08:00 — Written after counting the hand-written copies:
   17 and 19 here, 11 and 11 hosted.
+- 2026-09-20T19:30+08:00 — Shipped. `PageState` (loading / empty / error, the
+  role decided by the kind, `page={false}` for a notice inside a screen) and
+  `FormError` (a line, or a row with the action at the end). Their rules moved
+  from this application's `index.css` into the package's `theme.css` on
+  tokens, with `--danger-soft` added; the success mark stayed behind as the
+  page's own. Sixteen state blocks and nineteen error rows here are the two
+  components now — the disagreements they carried are gone: two blocks with
+  no role, a spinner that was a `div` on some screens, an error icon on some
+  and not others, and "Try again" that was primary here and secondary there
+  (each screen kept its own button; the block no longer cares). Seven cases
+  in the package; making an error `status` turned one red. 2,269 tests pass
+  and the tarball installs and works outside the workspace. No browser has
+  rendered the blocks.

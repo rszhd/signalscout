@@ -329,3 +329,89 @@
   border: 2px solid var(--accent);
   box-shadow: none;
 }
+
+/*
+ * What a screen says while it waits, when it has nothing, and when the server
+ * refused: `PageState`. And a refusal in a form: `FormError`. US-276.
+ *
+ * They lived in each application's `index.css`, and the two copies agreed only
+ * because nobody had edited one yet. The success mark that shared the rule
+ * with them is a screen's own and stayed there.
+ */
+.center-state {
+  min-height: 540px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-12) var(--space-6);
+  text-align: center;
+}
+.center-state h2 {
+  margin: 0;
+  font-size: 1.28rem;
+  letter-spacing: -0.025em;
+}
+.center-state > p {
+  max-width: 430px;
+  margin: var(--space-2) 0 var(--space-5);
+  color: var(--muted);
+  font-size: var(--text-body);
+  line-height: 1.6;
+}
+.page-state {
+  min-height: calc(100vh - 190px);
+}
+.spinner {
+  width: 28px;
+  height: 28px;
+  margin-bottom: var(--space-5);
+  border: 2px solid var(--line-dark);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 700ms linear infinite;
+}
+.state-icon,
+.empty-mark {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  margin-bottom: var(--space-4);
+  border-radius: var(--radius-md);
+  color: var(--accent);
+  background: var(--accent-soft);
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+.state-icon {
+  color: var(--danger);
+  background: var(--danger-soft);
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation: none;
+  }
+}
+
+.form-error {
+  margin: 0 0 var(--space-4);
+  padding: var(--space-3) var(--space-3);
+  border-radius: var(--radius-sm);
+  color: var(--danger);
+  background: var(--danger-soft);
+  font-size: var(--text-sm);
+}
+/* The row shape: the sentence and one action, with the action at the end. */
+div.form-error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}

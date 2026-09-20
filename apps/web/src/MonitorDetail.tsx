@@ -25,6 +25,7 @@ import {
   monitoringState,
   monthLabel,
   nextPollLabel,
+  PageState,
   type PreFilter,
   platformName,
   providerName,
@@ -795,10 +796,7 @@ export function MonitorDetail({
   if (state === "loading") {
     return (
       <div className="product-page monitors-page monitor-page">
-        <div className="center-state page-state">
-          <div className="spinner" aria-hidden="true" />
-          <p>Reading this monitor.</p>
-        </div>
+        <PageState kind="loading">Reading this monitor.</PageState>
       </div>
     );
   }
@@ -806,13 +804,17 @@ export function MonitorDetail({
   if (state === "error" || !monitor) {
     return (
       <div className="product-page monitors-page monitor-page">
-        <div className="center-state page-state">
-          <h2>This monitor could not be loaded</h2>
-          <p>{error}</p>
-          <Link className="secondary-button" to={paths.monitors(projectId)}>
-            Back to monitors
-          </Link>
-        </div>
+        <PageState
+          kind="error"
+          heading="This monitor could not be loaded"
+          action={
+            <Link className="secondary-button" to={paths.monitors(projectId)}>
+              Back to monitors
+            </Link>
+          }
+        >
+          {error}
+        </PageState>
       </div>
     );
   }

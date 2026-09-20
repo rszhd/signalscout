@@ -3,8 +3,10 @@ import {
   browserTimezone,
   defaultRate,
   everyDay,
+  FormError,
   formatMicros,
   messageFor,
+  PageState,
   requestJson,
   timezoneOptions,
   toMicros,
@@ -659,22 +661,28 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
         </aside>
         <section className="setup-content" aria-label="Create a new monitor">
           {optionsState.state === "loading" && (
-            <div className="center-state" role="status">
-              <span className="spinner" aria-hidden="true" />
-              <h2>Loading monitor options</h2>
-              <p>Checking the sources and signals available in this deployment.</p>
-            </div>
+            <PageState kind="loading" page={false} heading="Loading monitor options">
+              Checking the sources and signals available in this deployment.
+            </PageState>
           )}
 
           {optionsState.state === "error" && (
-            <div className="center-state error-state" role="alert">
-              <span className="state-icon">!</span>
-              <h2>The API did not answer</h2>
-              <p>{optionsState.message}</p>
-              <button className="secondary-button" type="button" onClick={() => location.reload()}>
-                Try again
-              </button>
-            </div>
+            <PageState
+              kind="error"
+              page={false}
+              heading="The API did not answer"
+              action={
+                <button
+                  className="secondary-button"
+                  type="button"
+                  onClick={() => location.reload()}
+                >
+                  Try again
+                </button>
+              }
+            >
+              {optionsState.message}
+            </PageState>
           )}
 
           {options && stage !== "created" && (
@@ -797,11 +805,7 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
                 </div>
               </fieldset>
 
-              {error && (
-                <p className="form-error" role="alert">
-                  {error}
-                </p>
-              )}
+              {error && <FormError>{error}</FormError>}
               <div className="setup-actions">
                 <button
                   className="secondary-button"
@@ -947,11 +951,7 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
                 </div>
               )}
 
-              {error && (
-                <p className="form-error" role="alert">
-                  {error}
-                </p>
-              )}
+              {error && <FormError>{error}</FormError>}
               <div className="setup-actions">
                 <button
                   className="secondary-button"
@@ -1143,11 +1143,7 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
                   </div>
                 </section>
               )}
-              {error && (
-                <p className="form-error" role="alert">
-                  {error}
-                </p>
-              )}
+              {error && <FormError>{error}</FormError>}
               {plan.model && (
                 <details className="disclosure generation-details">
                   <summary>Generation details</summary>
@@ -1294,11 +1290,7 @@ export function MonitorForm({ projectId }: { readonly projectId: string }) {
                   </span>
                 </div>
               )}
-              {error && (
-                <p className="form-error" role="alert">
-                  {error}
-                </p>
-              )}
+              {error && <FormError>{error}</FormError>}
               <div className="setup-actions">
                 <button
                   className="secondary-button"

@@ -35,7 +35,10 @@ second action and the delete question as props (US-273). React,
 router, because a plain anchor would reload the application, and the harness
 under `@signalscout/ui/testing` renders (US-274). The schedule's words —
 `pollRates`, `describeSchedule`, `summarise`, `pollRateLabel`, the day rules
-and the timezone helpers — are exported too (US-275). Where the two products differ the words take an argument:
+and the timezone helpers — are exported too (US-275). `PageState` and
+`FormError` are the state block and the error row, with their rules in
+`theme.css` and the role each state carries decided by the component
+(US-276); `--danger-soft` joins the tokens for them. Where the two products differ the words take an argument:
 `pollSummary(run, { spend: false })` is the hosted sentence, and
 `Monitor.pausedByPlan` is the pause only a plan can perform.
 

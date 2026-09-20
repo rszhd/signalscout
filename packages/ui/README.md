@@ -135,8 +135,16 @@ preview truncation and mobile reading pane remain page-specific.
 - **It links with the router**, which is why `react-router` is a peer: a card
   whose name is a plain anchor reloads the application on a click.
 
-What stays with the page: the list's grid, its heading, and its empty state.
-Those are layout.
+`PageState` and `FormError` came next (US-276): what a screen says while it
+waits, when it has nothing, and when the server refused, and a refusal inside a
+form. They were written by hand fifty-eight times across the two
+applications. The role each carries — `status` for waiting and empty, `alert`
+for an error and a refusal — is the one thing they decide and a caller cannot
+change, because it is the part a screen cannot be trusted to remember and the
+part a screen reader needs.
+
+What stays with the page: the list's grid, its heading, a success screen with
+a mark of its own. Those are layout.
 
 ## The words
 

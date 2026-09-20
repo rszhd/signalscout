@@ -20,6 +20,8 @@
   --success: #137333;
   /* A destructive action's own colour: delete, remove, discard. */
   --danger: #8f3f39;
+  /* Behind a refusal: the error row, the error state's icon. */
+  --danger-soft: #fff0ed;
   /* Behind a modal. Never put text on it. */
   --scrim: rgb(32 33 36 / 40%);
   /* A card that lifts off the page. `--shadow` is for a modal. */

@@ -1,6 +1,6 @@
 // biome-ignore-all lint/a11y/noRedundantRoles: the roles are not redundant at phone width, where the stylesheet gives every table element `display: block` and the implicit table semantics go with it. US-123.
 
-import { BrandIcon, messageFor, requestJson } from "@signalscout/ui";
+import { BrandIcon, messageFor, PageState, requestJson } from "@signalscout/ui";
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { paths } from "./route.js";
@@ -254,10 +254,9 @@ export function Providers() {
     return (
       <div className="product-page providers-page">
         <ProvidersHeader />
-        <div className="center-state page-state" role="alert">
-          <h2>This page could not be loaded</h2>
-          <p>{error}</p>
-        </div>
+        <PageState kind="error" heading="This page could not be loaded">
+          {error}
+        </PageState>
       </div>
     );
   }
@@ -266,10 +265,7 @@ export function Providers() {
     return (
       <div className="product-page providers-page">
         <ProvidersHeader />
-        <div className="center-state page-state" role="status">
-          <div className="spinner" aria-hidden="true" />
-          <p>Reading what each provider charges.</p>
-        </div>
+        <PageState kind="loading">Reading what each provider charges.</PageState>
       </div>
     );
   }

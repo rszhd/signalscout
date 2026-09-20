@@ -1,4 +1,4 @@
-import { formatMicros, messageFor, requestJson } from "@signalscout/ui";
+import { FormError, formatMicros, messageFor, requestJson } from "@signalscout/ui";
 import { useEffect, useRef, useState } from "react";
 
 /**
@@ -277,11 +277,7 @@ export function CostTest({
         </button>
       </div>
 
-      {error && (
-        <p className="form-error" role="alert">
-          {error}
-        </p>
-      )}
+      {error && <FormError>{error}</FormError>}
 
       {collecting && (
         <p className="cost-waiting" role="status">

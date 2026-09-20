@@ -76,14 +76,17 @@ describe("recommended models", () => {
   });
 
   it("offers every job it can fill for one provider", () => {
+    // US-269 added `plan`: the strongest priced model, because the plan is
+    // written once per monitor and decides every post it will collect.
     expect(recommendationsFor("openai")).toEqual({
       classify: "gpt-5.6-terra",
       triage: "gpt-5.6-luna",
       draft: "gpt-5.6-sol",
+      plan: "gpt-5.6-sol",
       embed: "text-embedding-3-small",
     });
 
-    // Three of four, and the missing one is the endpoint Anthropic does not
+    // Four of five, and the missing one is the endpoint Anthropic does not
     // publish rather than a gap in this table.
     expect(recommendationsFor("anthropic").embed).toBeUndefined();
     expect(Object.keys(recommendationsFor("ollama"))).toHaveLength(0);

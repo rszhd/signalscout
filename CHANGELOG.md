@@ -19,6 +19,18 @@ versioned and is not described here; it is what `main` holds.
 
 ## Unreleased
 
+**Added.** A fifth model task, `plan`, for writing a monitor's search plan
+(US-269). `aiTasks` in the engine carries it, `AiEnvironment` takes
+`AI_PLAN_PROVIDER`, `AI_PLAN_MODEL`, `AI_PLAN_API_KEY`, `AI_PLAN_BASE_URL`
+and the two `AI_PLAN_*_PRICE_MICROS`, and `planConfigFromEnvironment` reads
+them with the draft's fallbacks: every setting is the classifier's until one
+is named. The pipeline lays an account's `plan` row over the environment the
+way it lays the other four, and migration 0065 widens the
+`ai_settings_task_known` check to accept the value. A consumer that writes
+plans with `aiConfigFromEnvironment` keeps working and ignores the setting;
+one that wants it calls `planConfigFromEnvironment`. A migration and a new
+export, so the version is a minor.
+
 **Added.** `readPollRuns` and `readStageRuns` take an optional fifth argument,
 `before: Date`, and answer the rows that started strictly before it: the next
 page, for a screen that holds the oldest `startedAt` of the page it has

@@ -26,7 +26,7 @@ import { Dialog } from "./components/Dialog.js";
  */
 
 interface TaskView {
-  task: "classify" | "triage" | "embed" | "draft";
+  task: "classify" | "triage" | "embed" | "draft" | "plan";
   title: string;
   what: string;
   note: string;

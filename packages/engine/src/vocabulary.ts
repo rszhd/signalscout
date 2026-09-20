@@ -162,9 +162,15 @@ export const defaultSimilarityThreshold = 0.15;
  * model output that carries somebody's name into another person's conversation,
  * which is why it is the one of the API's three calls worth choosing.
  *
- * Query generation and project describing stay on the classifier's settings.
- * Both produce input for a person to edit before anything is spent on it, and
- * neither has anybody's name on it.
+ * `plan` is the fifth and US-269 added it. Writing a monitor's search plan
+ * happens once when the monitor is made and again when somebody regenerates
+ * it, and what it produces decides every post the monitor will ever collect.
+ * A weak plan is a month of polling for the wrong conversations, and the
+ * call is rare enough that a model twenty times the classifier's price costs
+ * cents. Unset, it is the classifier's, so no instance changes on the upgrade.
+ *
+ * Project describing stays on the classifier's settings: it produces four
+ * answers for a person to edit before anything is spent on them.
  */
-export const aiTasks = ["classify", "triage", "embed", "draft"] as const;
+export const aiTasks = ["classify", "triage", "embed", "draft", "plan"] as const;
 export type AiTask = (typeof aiTasks)[number];

@@ -82,6 +82,7 @@ export function withoutMachineModelKeys(env: AiEnvironment): AiEnvironment {
     AI_API_KEY: undefined,
     AI_TRIAGE_API_KEY: undefined,
     AI_DRAFT_API_KEY: undefined,
+    AI_PLAN_API_KEY: undefined,
     AI_EMBEDDING_API_KEY: undefined,
   };
 }

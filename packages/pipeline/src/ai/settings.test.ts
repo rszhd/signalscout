@@ -17,6 +17,7 @@ import {
   draftConfigFromEnvironment,
   embeddingConfigFromEnvironment,
   generateEncryptionKey,
+  planConfigFromEnvironment,
   readEncryptionKey,
   triageConfigFromEnvironment,
   UndecryptableSecretError,
@@ -292,6 +293,69 @@ describe("one account's model settings", () => {
         model: "claude-sonnet-5",
         apiKey: "sk-anthropic",
       });
+    });
+  });
+
+  /**
+   * The model that writes the search plan. US-269.
+   *
+   * The draft's rules, copied, and asserted for that reason: every setting
+   * falls back to the classifier's, the key only within one provider, and
+   * the price only while no model is named.
+   */
+  describe("the model that writes the search plan", () => {
+    it("is the classifier's when nothing is set for it", async () => {
+      await saveAiTaskSettings(db, owner, "classify", {
+        provider: "openai",
+        model: "gpt-5.6-terra",
+        keyId: await keyFor("sk-mine"),
+        inputPriceMicros: 2_000_000,
+      });
+
+      expect(
+        planConfigFromEnvironment(await readAiEnvironment(db, owner, instance, encryption)),
+      ).toMatchObject({
+        provider: "openai",
+        model: "gpt-5.6-terra",
+        apiKey: "sk-mine",
+        inputPriceMicros: 2_000_000,
+      });
+    });
+
+    it("takes its own model on the classifier's key, and not the classifier's price", async () => {
+      await saveAiTaskSettings(db, owner, "classify", {
+        provider: "openai",
+        model: "gpt-5.6-terra",
+        keyId: await keyFor("sk-mine"),
+        inputPriceMicros: 2_000_000,
+      });
+      await saveAiTaskSettings(db, owner, "plan", { model: "gpt-5.6-sol" });
+
+      const env = await readAiEnvironment(db, owner, instance, encryption);
+      const config = planConfigFromEnvironment(env);
+
+      expect(config).toMatchObject({ provider: "openai", model: "gpt-5.6-sol", apiKey: "sk-mine" });
+      expect(config.inputPriceMicros).toBeUndefined();
+      // The classifier did not move.
+      expect(aiConfigFromEnvironment(env).model).toBe("gpt-5.6-terra");
+    });
+
+    it("does not send the classifier's key to a different planning provider", async () => {
+      await saveAiTaskSettings(db, owner, "classify", {
+        provider: "openai",
+        keyId: await keyFor("sk-openai"),
+      });
+      await saveAiTaskSettings(db, owner, "plan", {
+        provider: "anthropic",
+        model: "claude-fable-5-1",
+      });
+
+      const config = planConfigFromEnvironment(
+        await readAiEnvironment(db, owner, instance, encryption),
+      );
+
+      expect(config.provider).toBe("anthropic");
+      expect(config.apiKey).toBeUndefined();
     });
   });
 

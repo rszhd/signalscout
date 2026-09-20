@@ -6,7 +6,7 @@ priority: p2
 created: 2026-09-20T09:12+08:00
 parent:
 area: api
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -33,17 +33,19 @@ once.
 
 ## Acceptance
 
-- [ ] `aiTasks` in the engine has `plan`; the boundary tests still pass.
-- [ ] The pipeline's per-account model settings accept `plan`, and reading
+- [x] `aiTasks` in the engine has `plan`; the boundary tests still pass.
+- [x] The pipeline's per-account model settings accept `plan`, and reading
       the settings for an account without one answers the `classify` choice.
-- [ ] `queryGeneratorForEnvironment` uses the `plan` task's provider, key,
+- [x] `queryGeneratorForEnvironment` uses the `plan` task's provider, key,
       model and base URL.
-- [ ] The Models screen has a *Writing the search plan* card that says the
+- [x] The Models screen has a *Writing the search plan* card that says the
       call is rare and worth a strong model.
-- [ ] A test proves a plan written after choosing a `plan` model records
+- [x] A test proves a plan written after choosing a `plan` model records
       that model in `api_usage`, and that a triage or classify call does not
-      move.
-- [ ] `docs/costs.md` names the task and the changelog says what the field
+      move. Proved at the seam: the generator the monitor form is handed
+      reports the chosen model as its `model`, which is what every call it
+      makes records; no test calls a model.
+- [x] `docs/costs.md` names the task and the changelog says what the field
       means to a consumer.
 
 ## Notes
@@ -58,3 +60,18 @@ once.
 
 - 2026-09-20T09:12+08:00 — Written from the cross-repository review of the
   cloud's changes since the split.
+- 2026-09-20T13:30+08:00 — Shipped. Engine: `plan` in `aiTasks`,
+  `AI_PLAN_*` in the environment, `planConfigFromEnvironment` with the
+  draft's fallbacks, and a recommended model per provider (the draft's,
+  the strongest priced). Pipeline: the overlay lays a `plan` row over the
+  environment, the machine key is stripped like the others, and migration
+  0065 widens `ai_settings_task_known`. API: `queryGeneratorForEnvironment`
+  builds from the plan config; the Models route describes the task and the
+  screen renders it from that list. Project describing stays on the
+  classifier. `.env.example`, `docker-compose.yml`, `docs/costs.md` and the
+  changelog carry it. Two assertions changed with the behaviour: the task
+  list has five entries, and the OpenAI recommendations include `plan`.
+  Two mutations (the generator built from the classifier's config, the key
+  crossing providers) each went red. 2,238 tests pass. The migration ran
+  against the local database. The cloud takes a migration when it pins
+  the next version: a minor.

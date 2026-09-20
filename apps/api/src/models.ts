@@ -42,6 +42,7 @@ import {
   type ModelProbe,
   needsApiKey,
   optionalEncryptionKey,
+  planConfigFromEnvironment,
   previewAiEnvironment,
   pricedModelsFor,
   probeChatModel,
@@ -109,6 +110,14 @@ const taskViews: Record<AiTask, { title: string; what: string; note: string }> =
       "Nothing is ever posted from here. This is the one model output that carries your name " +
       "into somebody else's conversation, so it is worth a model that writes well rather than " +
       "the one that scores well.",
+  },
+  plan: {
+    title: "Writing the search plan",
+    what: "Turns your four answers into the phrases and channels a monitor searches.",
+    note:
+      "Once per monitor, and again only when you ask for a new plan. It decides every post " +
+      "the monitor will ever collect, so it is the one call worth a stronger model than " +
+      "scoring: a dearer model here costs cents a month.",
   },
   embed: {
     title: "Similarity",
@@ -317,7 +326,9 @@ export async function registerModelRoutes(
         ? triageConfigFromEnvironment(env)
         : task === "draft"
           ? draftConfigFromEnvironment(env)
-          : aiConfigFromEnvironment(env);
+          : task === "plan"
+            ? planConfigFromEnvironment(env)
+            : aiConfigFromEnvironment(env);
 
     // A local runtime needs no key, so "no key" is not "cannot run" there.
     return !needsApiKey(config.provider) || Boolean(config.apiKey);
@@ -342,6 +353,14 @@ export async function registerModelRoutes(
       return {
         provider: env.AI_DRAFT_PROVIDER ?? env.AI_PROVIDER,
         model: env.AI_DRAFT_MODEL ?? env.AI_MODEL,
+        hasKey,
+      };
+    }
+
+    if (task === "plan") {
+      return {
+        provider: env.AI_PLAN_PROVIDER ?? env.AI_PROVIDER,
+        model: env.AI_PLAN_MODEL ?? env.AI_MODEL,
         hasKey,
       };
     }
@@ -715,7 +734,9 @@ export async function registerModelRoutes(
             ? triageConfigFromEnvironment(mineEnv)
             : task === "draft"
               ? draftConfigFromEnvironment(mineEnv)
-              : aiConfigFromEnvironment(mineEnv);
+              : task === "plan"
+                ? planConfigFromEnvironment(mineEnv)
+                : aiConfigFromEnvironment(mineEnv);
 
       if (!config?.model) {
         return reply.code(400).send({ message: "Name a model for this job, then test it." });

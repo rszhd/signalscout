@@ -284,6 +284,7 @@ function overlay(mine: Map<AiTask, ResolvedTask>, instance: AiEnvironment): AiEn
   const triage = mine.get("triage");
   const embed = mine.get("embed");
   const draft = mine.get("draft");
+  const plan = mine.get("plan");
 
   /**
    * **A moved provider leaves the instance's key behind.**
@@ -303,6 +304,7 @@ function overlay(mine: Map<AiTask, ResolvedTask>, instance: AiEnvironment): AiEn
 
   const instanceTriage = instance.AI_TRIAGE_PROVIDER ?? instance.AI_PROVIDER;
   const instanceDraft = instance.AI_DRAFT_PROVIDER ?? instance.AI_PROVIDER;
+  const instancePlan = instance.AI_PLAN_PROVIDER ?? instance.AI_PROVIDER;
   const instanceEmbed = instance.AI_EMBEDDING_PROVIDER ?? instance.AI_PROVIDER;
 
   return {
@@ -316,6 +318,9 @@ function overlay(mine: Map<AiTask, ResolvedTask>, instance: AiEnvironment): AiEn
       : {}),
     ...(moved(draft, instanceDraft)
       ? { AI_DRAFT_API_KEY: undefined, AI_DRAFT_BASE_URL: undefined }
+      : {}),
+    ...(moved(plan, instancePlan)
+      ? { AI_PLAN_API_KEY: undefined, AI_PLAN_BASE_URL: undefined }
       : {}),
     ...(moved(embed, instanceEmbed)
       ? { AI_EMBEDDING_API_KEY: undefined, AI_EMBEDDING_BASE_URL: undefined }
@@ -353,6 +358,17 @@ function overlay(mine: Map<AiTask, ResolvedTask>, instance: AiEnvironment): AiEn
     ...(draft?.outputPriceMicros === null
       ? {}
       : { AI_DRAFT_OUTPUT_PRICE_MICROS: draft?.outputPriceMicros }),
+
+    ...(plan?.provider ? { AI_PLAN_PROVIDER: plan.provider as AiProvider } : {}),
+    ...(plan?.model ? { AI_PLAN_MODEL: plan.model } : {}),
+    ...(plan?.apiKey ? { AI_PLAN_API_KEY: plan.apiKey } : {}),
+    ...(plan?.baseUrl ? { AI_PLAN_BASE_URL: plan.baseUrl } : {}),
+    ...(plan?.inputPriceMicros === null
+      ? {}
+      : { AI_PLAN_INPUT_PRICE_MICROS: plan?.inputPriceMicros }),
+    ...(plan?.outputPriceMicros === null
+      ? {}
+      : { AI_PLAN_OUTPUT_PRICE_MICROS: plan?.outputPriceMicros }),
 
     ...(embed?.provider ? { AI_EMBEDDING_PROVIDER: embed.provider as EmbeddingProvider } : {}),
     ...(embed?.model ? { AI_EMBEDDING_MODEL: embed.model } : {}),

@@ -18,6 +18,7 @@ import {
   needsApiKey,
   notificationReadiness,
   type ProjectDescriber,
+  planConfigFromEnvironment,
   providerKeyEnvironment,
   type QueryGenerator,
   readAiEnvironment,
@@ -319,19 +320,29 @@ export function aiEnvironmentFor(
   return (userId) => readAiEnvironment(db, userId, instance);
 }
 
+/**
+ * The model that writes a monitor's search plan. US-269.
+ *
+ * The `plan` task's settings, which are the classifier's until somebody
+ * chooses otherwise on the Models screen. The plan is written once per
+ * monitor and decides every post it will collect, so it is the one call a
+ * person may want a dearer model for than the one that scores each post.
+ */
 export function queryGeneratorForEnvironment(
   env: AiEnvironment,
   logger: Logger,
 ): QueryGenerator | null {
-  if (needsApiKey(env.AI_PROVIDER) && !env.AI_API_KEY) {
+  const config = planConfigFromEnvironment(env);
+
+  if (needsApiKey(config.provider) && !config.apiKey) {
     logger.warn(
-      { provider: env.AI_PROVIDER },
+      { provider: config.provider },
       "no model key: the monitor form cannot write queries, and posts are not scored",
     );
     return null;
   }
 
-  return createQueryGenerator({ config: aiConfigFromEnvironment(env) });
+  return createQueryGenerator({ config });
 }
 
 /**

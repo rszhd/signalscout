@@ -86,6 +86,12 @@ export interface AiEnvironment {
   readonly AI_DRAFT_BASE_URL?: string;
   readonly AI_DRAFT_INPUT_PRICE_MICROS?: number;
   readonly AI_DRAFT_OUTPUT_PRICE_MICROS?: number;
+  readonly AI_PLAN_MODEL?: string;
+  readonly AI_PLAN_PROVIDER?: AiProvider;
+  readonly AI_PLAN_API_KEY?: string;
+  readonly AI_PLAN_BASE_URL?: string;
+  readonly AI_PLAN_INPUT_PRICE_MICROS?: number;
+  readonly AI_PLAN_OUTPUT_PRICE_MICROS?: number;
   readonly AI_PROVIDER: AiProvider;
   readonly AI_MODEL: string;
   readonly AI_API_KEY?: string;
@@ -325,5 +331,41 @@ export function draftConfigFromEnvironment(env: AiEnvironment): AiConfig {
     outputPriceMicros: env.AI_DRAFT_MODEL
       ? env.AI_DRAFT_OUTPUT_PRICE_MICROS
       : (env.AI_DRAFT_OUTPUT_PRICE_MICROS ?? env.AI_OUTPUT_PRICE_MICROS),
+  };
+}
+
+/**
+ * The model that writes a monitor's search plan. US-269.
+ *
+ * The draft's shape, for the draft's reasons: every setting falls back to the
+ * classifier's, the key is reused only within one provider, and the price
+ * falls back only with the model. A plan billed at the classifier's rate
+ * would misreport what it cost.
+ *
+ * Its own setting because the two jobs are opposite shapes. Classification
+ * reads one post at a time and the price decides what a person can afford;
+ * the plan is written once per monitor and decides every post the monitor
+ * will ever collect, so a model twenty times the price costs cents and buys
+ * a month of polling the right conversations.
+ *
+ * The timeout is the classifier's. A plan is a few thousand tokens and the
+ * ceiling US-226 gave a draft was for a reasoning model writing prose.
+ */
+export function planConfigFromEnvironment(env: AiEnvironment): AiConfig {
+  const provider = env.AI_PLAN_PROVIDER ?? env.AI_PROVIDER;
+  const sameProvider = provider === env.AI_PROVIDER;
+
+  return {
+    provider,
+    model: env.AI_PLAN_MODEL ?? env.AI_MODEL,
+    apiKey: env.AI_PLAN_API_KEY ?? (sameProvider ? env.AI_API_KEY : undefined),
+    baseUrl: env.AI_PLAN_BASE_URL ?? (sameProvider ? env.AI_BASE_URL : undefined),
+    timeoutMs: env.AI_TIMEOUT_MS,
+    inputPriceMicros: env.AI_PLAN_MODEL
+      ? env.AI_PLAN_INPUT_PRICE_MICROS
+      : (env.AI_PLAN_INPUT_PRICE_MICROS ?? env.AI_INPUT_PRICE_MICROS),
+    outputPriceMicros: env.AI_PLAN_MODEL
+      ? env.AI_PLAN_OUTPUT_PRICE_MICROS
+      : (env.AI_PLAN_OUTPUT_PRICE_MICROS ?? env.AI_OUTPUT_PRICE_MICROS),
   };
 }

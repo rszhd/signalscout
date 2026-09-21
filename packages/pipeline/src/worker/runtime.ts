@@ -82,6 +82,7 @@ import {
 } from "./queues.js";
 import { createReconcileStep } from "./reconcile.js";
 import { createRepliesStep } from "./replies.js";
+import type { CreditWeights } from "./rotation.js";
 import { enqueueDuePolls } from "./schedule.js";
 import type { Step, StepContext, WorkerSteps } from "./steps.js";
 
@@ -189,6 +190,13 @@ export interface StartWorkerOptions {
    * Unset, nothing enforces it. `worker/ceiling.ts` is the rule.
    */
   newPostsPerPairPerDay?: number;
+  /**
+   * What one search on each platform costs in credits, for a monitor whose
+   * platforms take turns across the hour. US-289. A platform not named
+   * weighs one; unset, every platform weighs one. The application's
+   * numbers, like the ceiling above.
+   */
+  creditWeights?: CreditWeights;
 }
 
 /**
@@ -386,6 +394,7 @@ export async function startWorker({
   notificationTransport,
   entitled = admitEveryone,
   newPostsPerPairPerDay,
+  creditWeights,
   signup = loadSignupEnv(),
   keys = loadKeyPolicyEnv(),
 }: StartWorkerOptions): Promise<WorkerHandle> {
@@ -548,7 +557,8 @@ export async function startWorker({
   const pipeline: WorkerSteps = {
     reconcile:
       steps.reconcile ?? createReconcileStep({ registry: sources, credentialsFor: lookup }),
-    poll: steps.poll ?? createCollectStep({ registry: sources, credentialsFor: lookup }),
+    poll:
+      steps.poll ?? createCollectStep({ registry: sources, credentialsFor: lookup, creditWeights }),
     estimate: steps.estimate ?? createEstimateStep({ registry: sources, credentialsFor: lookup }),
     filter:
       steps.filter ??

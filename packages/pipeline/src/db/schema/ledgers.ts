@@ -287,12 +287,19 @@ export const sourceCoverage = pgTable(
       .notNull()
       .references(() => monitors.id, { onDelete: "cascade" }),
     source: text("source").$type<Source>().notNull(),
+    /**
+     * The search this window belongs to, when the monitor's searches take
+     * turns (US-289); the empty string for a platform's channels, and for
+     * the whole platform when nothing takes turns — which is every row
+     * written before the column existed.
+     */
+    query: text("query").notNull().default(""),
     /** The start of the last walk that finished. Never the end of one. */
     coveredThrough: timestamp("covered_through", { withTimezone: true }).notNull(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [
-    primaryKey({ columns: [table.monitorId, table.source] }),
+    primaryKey({ columns: [table.monitorId, table.source, table.query] }),
     check("source_coverage_source_known", oneOf("source", sources)),
   ],
 );

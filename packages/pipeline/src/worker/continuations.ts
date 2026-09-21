@@ -20,6 +20,8 @@ import { type Provider, type Source, sourceContinuations } from "../db/schema.js
 /** One collection in flight, as the poll step needs it. */
 export interface Continuation {
   readonly source: Source;
+  /** The search this walk belongs to; the empty string as `source_coverage.query`. US-289. */
+  readonly query: string;
   /**
    * Who is collecting.
    *
@@ -56,6 +58,7 @@ export async function continuationsFor(
 
   return rows.map((row) => ({
     source: row.source,
+    query: row.query,
     provider: row.provider,
     cursor: row.cursor,
     ...(row.since ? { since: row.since } : {}),
@@ -67,6 +70,7 @@ export async function continuationsFor(
 
 export interface ContinuationRecord {
   readonly source: Source;
+  readonly query: string;
   readonly provider: Provider;
   readonly cursor: string;
   readonly since?: Date;
@@ -91,16 +95,17 @@ export interface ContinuationRecord {
 export async function rememberContinuation(
   db: Database,
   monitorId: string,
-  { source, provider, cursor, since, resumeAfter, progressed }: ContinuationRecord,
+  { source, query, provider, cursor, since, resumeAfter, progressed }: ContinuationRecord,
 ): Promise<void> {
   await db
     .insert(sourceContinuations)
-    .values({ monitorId, source, provider, cursor, since: since ?? null, resumeAfter })
+    .values({ monitorId, source, query, provider, cursor, since: since ?? null, resumeAfter })
     .onConflictDoUpdate({
       target: [
         sourceContinuations.monitorId,
         sourceContinuations.source,
         sourceContinuations.provider,
+        sourceContinuations.query,
       ],
       set: {
         cursor,
@@ -117,6 +122,7 @@ export async function forgetContinuation(
   monitorId: string,
   source: Source,
   provider: Provider,
+  query = "",
 ): Promise<void> {
   await db
     .delete(sourceContinuations)
@@ -125,6 +131,7 @@ export async function forgetContinuation(
         eq(sourceContinuations.monitorId, monitorId),
         eq(sourceContinuations.source, source),
         eq(sourceContinuations.provider, provider),
+        eq(sourceContinuations.query, query),
       ),
     );
 }

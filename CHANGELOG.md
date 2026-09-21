@@ -54,6 +54,12 @@ sets no rule for the mark (US-283).
 
 ## Unreleased
 
+**Added.** A monitor's platforms can take turns across the hour (US-289).
+Migration 0067 adds `poll_credits_per_hour`, `poll_credit_balance` and
+`poll_cursor` to `monitors`; `startWorker` takes `creditWeights`. With the
+first column null nothing changes. A migration and a new option, so the
+version is a minor.
+
 ## 0.12.0 — 2026-09-21
 
 **Added.** `startWorker` takes `newPostsPerPairPerDay`: the most posts one

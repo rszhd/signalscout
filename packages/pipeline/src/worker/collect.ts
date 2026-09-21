@@ -57,6 +57,7 @@ import {
 import { coverageFor, recordCoverage } from "./coverage.js";
 import type { CredentialLookup } from "./credentials.js";
 import { filterQueue, type PollPayload, pollQueue } from "./queues.js";
+import { type CreditWeights, nextTurn } from "./rotation.js";
 import type { Step, StepContext } from "./steps.js";
 
 /**
@@ -86,6 +87,13 @@ export interface CollectOptions {
    * spent buys no more pages. Unset, every thread is opened.
    */
   readonly newPostsPerPairPerDay?: number | undefined;
+  /**
+   * What one search on each platform costs in credits, for a monitor whose
+   * platforms take turns. US-289. A platform not named weighs one. The
+   * application's numbers, like the ceiling above; unset, every platform
+   * weighs one.
+   */
+  readonly creditWeights?: CreditWeights | undefined;
 }
 
 /** What one connector returned in one poll. US-013 records the units against a budget. */
@@ -261,7 +269,11 @@ function sum<T>(items: readonly T[], of: (item: T) => number): number {
   return items.reduce((total, item) => total + of(item), 0);
 }
 
-export function createCollectStep({ registry, credentialsFor }: CollectOptions): Step<PollPayload> {
+export function createCollectStep({
+  registry,
+  credentialsFor,
+  creditWeights = {},
+}: CollectOptions): Step<PollPayload> {
   return async function collect({ monitorId }, { db, boss, logger }: StepContext): Promise<void> {
     const [monitor] = await db.select().from(monitors).where(eq(monitors.id, monitorId)).limit(1);
 
@@ -445,9 +457,46 @@ export function createCollectStep({ registry, credentialsFor }: CollectOptions):
        */
       const covered = await coverageFor(db, monitorId);
 
+      /**
+       * Which platforms this poll runs. US-289. Every one, unless the
+       * platforms take turns — then the next in turn while the hour's
+       * credits cover them, and the balance and cursor are written before
+       * any source is asked, so a poll that fails part way has still spent
+       * what it drew.
+       */
+      const turn =
+        monitor.pollCreditsPerHour === null
+          ? null
+          : nextTurn({
+              sources: monitor.sources,
+              searchesOn: (source) => monitorQueries(monitor.generatedQueries, source).length,
+              weights: creditWeights,
+              creditsPerHour: Number(monitor.pollCreditsPerHour),
+              balance: Number(monitor.pollCreditBalance),
+              cursor: monitor.pollCursor,
+            });
+      const sourcesThisPoll: readonly string[] = turn ? turn.sources : monitor.sources;
+
       // Marked at the start, not at the end: the interval measures poll starts,
       // so a poll that runs long does not stretch the interval it was given.
-      await db.update(monitors).set({ lastPolledAt: sql`now()` }).where(eq(monitors.id, monitorId));
+      await db
+        .update(monitors)
+        .set({
+          lastPolledAt: sql`now()`,
+          ...(turn ? { pollCreditBalance: turn.balance.toFixed(3), pollCursor: turn.cursor } : {}),
+        })
+        .where(eq(monitors.id, monitorId));
+
+      if (turn && sourcesThisPoll.length === 0) {
+        // The balance is still repaying a platform heavier than the hour.
+        // No row: an hourly run saying "0 posts" would be a screen full of
+        // nothing, and the next turn is an hour away.
+        logger.debug(
+          { monitorId, balance: turn.balance, cursor: turn.cursor },
+          "poll skipped: the platforms' credits are spent until the next hour",
+        );
+        return;
+      }
 
       const channels = monitor.generatedSubreddits;
 
@@ -500,7 +549,7 @@ export function createCollectStep({ registry, credentialsFor }: CollectOptions):
         if (!wakeAt || moment < wakeAt) wakeAt = moment;
       };
 
-      for (const sourceId of monitor.sources) {
+      for (const sourceId of sourcesThisPoll) {
         /**
          * A platform this build no longer offers is skipped, not failed.
          *

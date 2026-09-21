@@ -8,7 +8,7 @@
 | --- | ---: | --- | --- | --- | --- |
 | p1 | US-033 | [Thirty verdicts say whether the score is right](todo/US-033-thirty-verdicts-say-whether-the-score-is-right.md) | chore | todo | 2026-09-06T03:02+08:00 |
 | p2 | US-287 | [A pair puts at most so many posts to the classifier a day](doing/US-287-a-pair-puts-at-most-so-many-posts-to-the-classifier-a-day.md) | feature | doing | 2026-09-21T17:55+08:00 |
-| p2 | US-289 | [A project's platforms take turns across the hour](doing/US-289-a-projects-platforms-take-turns-across-the-hour.md) | feature | doing | 2026-09-22T01:10+08:00 |
+| p2 | US-289 | [A project's searches take turns across the hour](doing/US-289-a-projects-searches-take-turns-across-the-hour.md) | feature | doing | 2026-09-22T01:10+08:00 |
 | p2 | US-035 | [A monitor is told where people are talking](todo/US-035-a-monitor-is-told-where-people-are-talking.md) | spike | todo | 2026-09-06T11:40+08:00 |
 | p2 | US-036 | [A provider is rated per platform, from measurements](todo/US-036-a-provider-is-rated-per-platform-from-measurements.md) | spike | todo | 2026-09-06T11:48+08:00 |
 | p2 | US-037 | [One subscription is enough](todo/US-037-one-subscription-is-enough.md) | feature | todo | 2026-09-06T11:48+08:00 |

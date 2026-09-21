@@ -1,6 +1,6 @@
 ---
 id: US-289
-title: A project's platforms take turns across the hour
+title: A project's searches take turns across the hour
 type: feature
 priority: p2
 created: 2026-09-22T01:10+08:00
@@ -20,26 +20,26 @@ the same posts as one checked at 11:00, 14:00 and 17:00 — but a person
 who opens the inbox every hour and finds something new is the point, and
 it spreads load on the providers.
 
-**By platform, not by search.** A poll keeps its "seen up to" window
-(`source_coverage`) and its paging state (`source_continuations`) per
-platform. Rotating single searches would need both per search, which is
-the collect step's loop rewritten and two tables re-keyed; a mistake there
-either re-reads posts or loses them. Rotating platforms keeps both tables
-as they are: a platform runs with all its searches or not at all. With the
-hosted form starting a plan at one search a platform, Starter with four
-platforms gets something new every hour; only a platform that holds more
-searches than the hour's credits waits a turn. Per-search rotation is the
-refinement if the inbox still feels bursty, and it builds on this.
+**By search.** The first cut rotated platforms, because a poll kept its
+"seen up to" window (`source_coverage`) and its paging state
+(`source_continuations`) per platform and re-keying both was the risk. The
+owner wanted four searches on one platform to take turns too, so both
+tables gain a `query` column and the unit of a turn is one search on one
+platform — or a platform's channels, which are a unit of their own. A row
+written before the column carries the empty query, which is the whole
+platform, and that is what a monitor that does not take turns keeps
+writing. A search that sits out an hour therefore picks up from its own
+window and does not lose the posts written meanwhile.
 
-**A credit balance, not a slot.** A platform's searches have weight — one
-credit each, five on LinkedIn — and the hour's credits rarely divide them
-evenly. So the monitor carries a balance: each poll adds its credits an
-hour, runs the next platform in turn while the balance is above zero (the
-first platform may take the balance negative, and it is repaid over the
-next hours), then further platforms only while the balance covers them.
-Over a day this spends exactly the credits an hour, whatever the shapes.
-The balance is capped at one full turn of the platforms, so a monitor
-that was paused for a week runs one turn on resume and not a week's.
+**A credit balance, not a slot.** A search has weight — one credit, five
+on LinkedIn — and the hour's credits rarely divide the turn evenly. So the
+monitor carries a balance: each poll adds its credits an hour, runs the
+next search in turn while the balance is above zero (the first may take the
+balance negative, and it is repaid over the next hours), then further ones
+only while the balance covers them. Over a day this spends exactly the
+credits an hour, whatever the shapes. The balance is capped at one full
+turn, so a monitor that was paused for a week runs one turn on resume and
+not a week's.
 
 **Three columns on the monitor, all nullable or defaulted, and off unless
 set.** `poll_credits_per_hour` null means what every monitor does today:
@@ -69,6 +69,10 @@ column null.
 - [x] Migration 0067 adds `poll_credits_per_hour numeric(8,3)` (nullable),
       `poll_credit_balance numeric(8,3) not null default 0` and
       `poll_cursor integer not null default 0` to `monitors`, journaled.
+- [x] Migration 0068 adds `query text not null default ''` to
+      `source_coverage` (in its primary key) and `source_continuations` (in
+      its unique key), journaled. Its statements were reordered by hand:
+      the generator named the new key before the column it names.
 - [x] `startWorker` takes `creditWeights?: Partial<Record<Source, number>>`;
       a platform not named weighs one. Unset, every platform weighs one.
 - [x] One function decides a poll's platforms from the monitor's sources,
@@ -84,10 +88,12 @@ column null.
       `last_polled_at`, logs at debug, and records no poll run.
 - [x] A monitor with the column null polls every platform, as today;
       `collect.test.ts`'s existing cases are unchanged.
-- [x] `rotation-steps.test.ts` drives a three-platform monitor at one credit an hour
-      through four polls and sees one platform each, in order, and then the
-      first again; and a LinkedIn platform at five credits against one an
-      hour runs once and then waits four polls.
+- [x] `rotation-steps.test.ts` drives a three-platform monitor at one credit
+      an hour through four polls and sees one search each, in order, and
+      then the first again; four searches on one platform one at a time,
+      each with its own window; a LinkedIn search at five credits against
+      one an hour runs once and then waits four polls; and a poll run lists
+      a platform once however many of its searches ran.
 - [x] `docs/pipeline.md` says how a rotating monitor polls and that it is
       off unless an application sets the column.
 - [ ] `docs/releasing.md` names the version; the application pins it and
@@ -110,6 +116,11 @@ column null.
   LinkedIn on a one-credit plan; a slot that always ran it would overspend.
 
 ## Log
+
+- 2026-09-22T02:30+08:00 — Reshaped from platforms to searches on the
+  owner's word: four searches on one platform must take turns too. Both
+  windows gain a `query` column (migration 0068); the collect step runs
+  units. 129 files, 2,304 tests pass.
 
 - 2026-09-22T01:40+08:00 — Built on `feature/us-289-rotation`, from `dev`
   after 0.12.0. `worker/rotation.ts` is the rule, `rotation.test.ts` its

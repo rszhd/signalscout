@@ -57,7 +57,7 @@ import {
 import { coverageFor, recordCoverage } from "./coverage.js";
 import type { CredentialLookup } from "./credentials.js";
 import { filterQueue, type PollPayload, pollQueue } from "./queues.js";
-import { type CreditWeights, nextTurn } from "./rotation.js";
+import { type CreditWeights, nextTurn, type Unit, unitKey, unitsOf } from "./rotation.js";
 import type { Step, StepContext } from "./steps.js";
 
 /**
@@ -343,17 +343,29 @@ export function createCollectStep({
       reason: PollStopReason | null,
       spent?: Pick<PollRunSource, "pages" | "postsReturned" | "units" | "estimatedCostMicros">,
     ): void => {
-      runSources.push({
-        source: sourceId as Source,
-        provider: providerId as Provider | null,
-        pages: spent?.pages ?? 0,
-        postsReturned: spent?.postsReturned ?? 0,
-        // Filled in after the insert, which is the only place that knows.
-        postsNew: 0,
-        units: spent?.units ?? 0,
-        estimatedCostMicros: spent?.estimatedCostMicros ?? 0,
-        reason,
-      });
+      // One entry a platform, however many of its searches ran this poll
+      // (US-289): the row is read per platform, and `postsNew` is counted
+      // per platform after the insert.
+      const existing = runSources.find((entry) => entry.source === sourceId);
+      if (existing) {
+        existing.pages += spent?.pages ?? 0;
+        existing.postsReturned += spent?.postsReturned ?? 0;
+        existing.units += spent?.units ?? 0;
+        existing.estimatedCostMicros += spent?.estimatedCostMicros ?? 0;
+        if (reason && !existing.reason) existing.reason = reason;
+      } else {
+        runSources.push({
+          source: sourceId as Source,
+          provider: providerId as Provider | null,
+          pages: spent?.pages ?? 0,
+          postsReturned: spent?.postsReturned ?? 0,
+          // Filled in after the insert, which is the only place that knows.
+          postsNew: 0,
+          units: spent?.units ?? 0,
+          estimatedCostMicros: spent?.estimatedCostMicros ?? 0,
+          reason,
+        });
+      }
 
       // The first reason, not the last. A poll refused on its first platform
       // and waiting on its second is a refusal a person has to act on.
@@ -457,25 +469,38 @@ export function createCollectStep({
        */
       const covered = await coverageFor(db, monitorId);
 
+      const channels = monitor.generatedSubreddits;
+
       /**
-       * Which platforms this poll runs. US-289. Every one, unless the
-       * platforms take turns — then the next in turn while the hour's
-       * credits cover them, and the balance and cursor are written before
-       * any source is asked, so a poll that fails part way has still spent
-       * what it drew.
+       * What this poll runs. US-289. Every search on every platform, as one
+       * unit a platform, unless the searches take turns — then each search
+       * is a unit of its own, a platform's channels another, and the poll
+       * runs the next units in turn while the hour's credits cover them.
+       * The balance and cursor are written before any source is asked, so a
+       * poll that fails part way has still spent what it drew.
+       *
+       * A unit's window and paging state are kept under its own key, so a
+       * search that sat out an hour picks up where it left off; a platform
+       * that does not take turns keeps them under the empty query, as every
+       * row written before the column did.
        */
       const turn =
         monitor.pollCreditsPerHour === null
           ? null
           : nextTurn({
-              sources: monitor.sources,
-              searchesOn: (source) => monitorQueries(monitor.generatedQueries, source).length,
+              units: unitsOf(
+                monitor.sources,
+                (source) => monitorQueries(monitor.generatedQueries, source),
+                (source) => (source === "reddit" ? channels : []),
+              ),
               weights: creditWeights,
               creditsPerHour: Number(monitor.pollCreditsPerHour),
               balance: Number(monitor.pollCreditBalance),
               cursor: monitor.pollCursor,
             });
-      const sourcesThisPoll: readonly string[] = turn ? turn.sources : monitor.sources;
+      const unitsThisPoll: readonly Unit[] = turn
+        ? turn.units
+        : monitor.sources.map((source) => ({ source, query: "" }));
 
       // Marked at the start, not at the end: the interval measures poll starts,
       // so a poll that runs long does not stretch the interval it was given.
@@ -487,18 +512,16 @@ export function createCollectStep({
         })
         .where(eq(monitors.id, monitorId));
 
-      if (turn && sourcesThisPoll.length === 0) {
-        // The balance is still repaying a platform heavier than the hour.
-        // No row: an hourly run saying "0 posts" would be a screen full of
+      if (turn && unitsThisPoll.length === 0) {
+        // The balance is still repaying a search heavier than the hour. No
+        // row: an hourly run saying "0 posts" would be a screen full of
         // nothing, and the next turn is an hour away.
         logger.debug(
           { monitorId, balance: turn.balance, cursor: turn.cursor },
-          "poll skipped: the platforms' credits are spent until the next hour",
+          "poll skipped: the searches' credits are spent until the next hour",
         );
         return;
       }
-
-      const channels = monitor.generatedSubreddits;
 
       /**
        * Collections this monitor already has in flight, by platform.
@@ -515,7 +538,7 @@ export function createCollectStep({
        */
       const pending = new Map(
         (await continuationsFor(db, monitorId)).map((continuation) => [
-          continuation.source as string,
+          unitKey({ source: continuation.source, query: continuation.query }),
           continuation,
         ]),
       );
@@ -549,7 +572,8 @@ export function createCollectStep({
         if (!wakeAt || moment < wakeAt) wakeAt = moment;
       };
 
-      for (const sourceId of sourcesThisPoll) {
+      for (const unit of unitsThisPoll) {
+        const sourceId = unit.source;
         /**
          * A platform this build no longer offers is skipped, not failed.
          *
@@ -611,7 +635,7 @@ export function createCollectStep({
          * twice. So a changed choice takes effect on the *next* collection, and
          * the one already running finishes where it started.
          */
-        const continuation: Continuation | undefined = pending.get(sourceId);
+        const continuation: Continuation | undefined = pending.get(unitKey(unit));
 
         let source: SocialSource;
 
@@ -660,7 +684,13 @@ export function createCollectStep({
             { monitorId, sourceId, providerId, attempts: continuation.attempts },
             "collection abandoned: it was never ready to read",
           );
-          await forgetContinuation(db, monitorId, continuation.source, continuation.provider);
+          await forgetContinuation(
+            db,
+            monitorId,
+            continuation.source,
+            continuation.provider,
+            continuation.query,
+          );
           noteSource(sourceId, continuation.provider, "collection_abandoned");
           continue;
         }
@@ -685,7 +715,7 @@ export function createCollectStep({
          * reading it here would ask for posts newer than the trigger, and every
          * record the collection was paid for would be filtered away as old.
          */
-        const window = continuation ? continuation.since : covered.get(sourceId);
+        const window = continuation ? continuation.since : covered.get(unitKey(unit));
 
         /**
          * When this walk began, which is what a finished one marks. BUG-017.
@@ -705,7 +735,14 @@ export function createCollectStep({
          * Read inside the loop for that reason: one monitor holds a list per
          * platform, and the platform being polled decides which list it is.
          */
-        const queries = monitorQueries(monitor.generatedQueries, sourceId);
+        // The unit's own search when the searches take turns; the platform's
+        // whole list when they do not. The channels ride with the empty unit.
+        const queries = turn
+          ? unit.query === ""
+            ? []
+            : [unit.query]
+          : monitorQueries(monitor.generatedQueries, sourceId);
+        const unitChannels = unit.query === "" ? channels : [];
 
         /**
          * What this source cost, page by page.
@@ -722,7 +759,7 @@ export function createCollectStep({
 
         const outcome = await readSourceOrFail(
           source,
-          { queries, channels, ...(window ? { since: window } : {}) },
+          { queries, channels: unitChannels, ...(window ? { since: window } : {}) },
           credentials,
           continuation?.cursor,
           (units) => {
@@ -814,6 +851,7 @@ export function createCollectStep({
           if (outcome.waitCursor) {
             await rememberContinuation(db, monitorId, {
               source: source.platform.id as Source,
+              query: unit.query,
               provider: providerId as Provider,
               cursor: outcome.waitCursor,
               ...(window ? { since: window } : {}),
@@ -824,7 +862,13 @@ export function createCollectStep({
             // A wait with no cursor is the interface saying "start this query
             // again from the beginning". The old cursor names a snapshot the
             // source no longer wants us to read.
-            await forgetContinuation(db, monitorId, continuation.source, continuation.provider);
+            await forgetContinuation(
+              db,
+              monitorId,
+              continuation.source,
+              continuation.provider,
+              continuation.query,
+            );
           }
         } else if (outcome.moreCursor) {
           /**
@@ -839,6 +883,7 @@ export function createCollectStep({
            */
           await rememberContinuation(db, monitorId, {
             source: source.platform.id as Source,
+            query: unit.query,
             provider: providerId as Provider,
             cursor: outcome.moreCursor,
             ...(window ? { since: window } : {}),
@@ -855,10 +900,22 @@ export function createCollectStep({
            * the coverage is what gives that walk a window worth having.
            */
           if (continuation) {
-            await forgetContinuation(db, monitorId, continuation.source, continuation.provider);
+            await forgetContinuation(
+              db,
+              monitorId,
+              continuation.source,
+              continuation.provider,
+              continuation.query,
+            );
           }
 
-          await recordCoverage(db, monitorId, source.platform.id as Source, walkStartedAt);
+          await recordCoverage(
+            db,
+            monitorId,
+            source.platform.id as Source,
+            unit.query,
+            walkStartedAt,
+          );
         }
       }
 

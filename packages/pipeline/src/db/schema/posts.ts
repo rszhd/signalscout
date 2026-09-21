@@ -272,6 +272,8 @@ export const sourceContinuations = pgTable(
     cursor: text("cursor").notNull(),
     /** The `since` of the poll that started this collection. Null means all time. */
     since: timestamp("since", { withTimezone: true }),
+    /** The search this walk belongs to, as `source_coverage.query`. US-289. */
+    query: text("query").notNull().default(""),
     /** The source's own answer to "come back at". Nothing reads the snapshot before it. */
     resumeAfter: timestamp("resume_after", { withTimezone: true }).notNull(),
     /**
@@ -288,6 +290,7 @@ export const sourceContinuations = pgTable(
       table.monitorId,
       table.source,
       table.provider,
+      table.query,
     ),
     check("source_continuations_source_known", oneOf("source", sources)),
     check("source_continuations_provider_known", oneOf("provider", providers)),

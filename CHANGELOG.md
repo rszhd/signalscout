@@ -54,11 +54,16 @@ sets no rule for the mark (US-283).
 
 ## Unreleased
 
-**Added.** A monitor's platforms can take turns across the hour (US-289).
+**Added.** A monitor's searches can take turns across the hour (US-289).
 Migration 0067 adds `poll_credits_per_hour`, `poll_credit_balance` and
-`poll_cursor` to `monitors`; `startWorker` takes `creditWeights`. With the
-first column null nothing changes. A migration and a new option, so the
-version is a minor.
+`poll_cursor` to `monitors`; migration 0068 adds `query` to
+`source_coverage` and `source_continuations`, so a search keeps its own
+window and paging state; `startWorker` takes `creditWeights`. With the first
+column null nothing changes: every row written before carries the empty
+query, which is the whole platform. `recordCoverage`, `rememberContinuation`
+and `forgetContinuation` take the query — a consumer that calls them adds
+it; the application does not. A migration and a new option, so the version
+is a minor.
 
 ## 0.12.0 — 2026-09-21
 

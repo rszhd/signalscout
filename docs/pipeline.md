@@ -110,18 +110,21 @@ later.
 The monthly cap in `budgets` is the limit on what a monitor may spend. These
 are the limits on how far one job can carry it past that before the next check.
 
-**A monitor's platforms can take turns across the hour.** US-289. Off
+**A monitor's searches can take turns across the hour.** US-289. Off
 unless an application sets `poll_credits_per_hour` on the monitor, beside an
 hourly `poll_interval_seconds`; null is what every monitor did before, every
-platform every poll. Set, each poll adds that many credits to
-`poll_credit_balance` and runs the next platforms in turn from `poll_cursor`
-— the first while the balance is above zero, so a platform heavier than the
-hour runs and is repaid over the following hours; each further one only
-while the balance covers it. A platform's cost is its searches times the
-platform's weight, from `creditWeights` on `startWorker`. A poll that picks
-none marks `last_polled_at`, logs at debug, and writes no poll run. The
-"seen up to" window and the paging state stay per platform, which is why
-the turn is a platform and not a search. `worker/rotation.ts` is the rule.
+search on every platform every poll. Set, each poll adds that many credits
+to `poll_credit_balance` and runs the next units in turn from `poll_cursor`
+— a unit is one search on one platform, or a platform's channels — the first
+while the balance is above zero, so a search heavier than the hour runs and
+is repaid over the following hours; each further one only while the balance
+covers it. A unit's cost is its platform's weight, from `creditWeights` on
+`startWorker`. A poll that picks none marks `last_polled_at`, logs at debug,
+and writes no poll run. The "seen up to" window (`source_coverage`) and the
+paging state (`source_continuations`) are kept per unit under a `query`
+column — the empty string for the channels, and for the whole platform when
+nothing takes turns, which is every row written before the column existed.
+`worker/rotation.ts` is the rule.
 
 **The ceiling row is off unless an application sets it.** US-287. A pair is one
 query on one platform, as `post_discoveries` records it; the number is how

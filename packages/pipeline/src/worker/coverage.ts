@@ -16,35 +16,45 @@
 import { eq, sql } from "drizzle-orm";
 import type { Database } from "../db/client.js";
 import { type Source, sourceCoverage } from "../db/schema.js";
+import { unitKey } from "./rotation.js";
 
 /** Every platform's mark for one monitor. Absent means "we have never finished a walk". */
+/**
+ * How far each unit's collection already reaches, keyed by `unitKey`.
+ * US-289: a search that sits out an hour keeps its own window, and a
+ * platform whose searches do not take turns keeps one under the empty
+ * query, as every row written before the column did.
+ */
 export async function coverageFor(db: Database, monitorId: string): Promise<Map<string, Date>> {
   const rows = await db
-    .select({ source: sourceCoverage.source, coveredThrough: sourceCoverage.coveredThrough })
+    .select({
+      source: sourceCoverage.source,
+      query: sourceCoverage.query,
+      coveredThrough: sourceCoverage.coveredThrough,
+    })
     .from(sourceCoverage)
     .where(eq(sourceCoverage.monitorId, monitorId));
 
-  return new Map(rows.map((row) => [row.source as string, row.coveredThrough]));
+  return new Map(
+    rows.map((row) => [
+      unitKey({ source: row.source as string, query: row.query }),
+      row.coveredThrough,
+    ]),
+  );
 }
 
-/**
- * Mark one platform covered to the moment the finished walk began.
- *
- * Never moves backwards. A resume that outlived a later walk — or a clock that
- * disagrees with itself across two processes — must not widen the window again
- * and buy a month of history at a provider that charges by the page.
- */
 export async function recordCoverage(
   db: Database,
   monitorId: string,
   source: Source,
+  query: string,
   coveredThrough: Date,
 ): Promise<void> {
   await db
     .insert(sourceCoverage)
-    .values({ monitorId, source, coveredThrough })
+    .values({ monitorId, source, query, coveredThrough })
     .onConflictDoUpdate({
-      target: [sourceCoverage.monitorId, sourceCoverage.source],
+      target: [sourceCoverage.monitorId, sourceCoverage.source, sourceCoverage.query],
       set: {
         coveredThrough: sql`greatest(${sourceCoverage.coveredThrough}, ${coveredThrough})`,
         updatedAt: sql`now()`,

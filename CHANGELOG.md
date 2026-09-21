@@ -54,6 +54,23 @@ sets no rule for the mark (US-283).
 
 ## Unreleased
 
+## 0.12.0 — 2026-09-21
+
+**Added.** `startWorker` takes `newPostsPerPairPerDay`: the most posts one
+pair — one query on one platform, as `post_discoveries` records it — may
+put to the classifier in a UTC day, and the most reply pages it may buy
+(US-287). Unset, nothing changes: every post is read, as before. Set, a post
+past the number is stored and written to `filter_drops` under a new stage,
+`ceiling`; migration 0066 widens `filter_drops_stage_known` for it, and
+`FilterDropCounts` gains `ceiling`. A migration and a new field, so the
+version is a minor.
+
+**Changed.** A reason that only restates the scores no longer fails the
+classification (BUG-288). The schema accepts the answer, the classifier
+removes the reason afterwards, and a scored outcome carries
+`removedReasons`. A consumer that constructs a `scored` outcome by hand adds
+the field; one that reads the classifier sees fewer rejections.
+
 **Added.** A fifth model task, `plan`, for writing a monitor's search plan
 (US-269). `aiTasks` in the engine carries it, `AiEnvironment` takes
 `AI_PLAN_PROVIDER`, `AI_PLAN_MODEL`, `AI_PLAN_API_KEY`, `AI_PLAN_BASE_URL`

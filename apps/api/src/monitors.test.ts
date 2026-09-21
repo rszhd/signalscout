@@ -768,7 +768,7 @@ describe("the monitor routes", () => {
           enabled: true,
           similarityThreshold: 0.15,
           // `triage` joined the stages in US-030.
-          dropped: { keyword: 0, embedding: 0, triage: 0 },
+          dropped: { keyword: 0, embedding: 0, triage: 0, ceiling: 0 },
           // The other half of the sentence the screen writes from these.
           read: 0,
         });
@@ -860,6 +860,7 @@ describe("the monitor routes", () => {
           keyword: 1,
           embedding: 1,
           triage: 0,
+          ceiling: 0,
         });
       });
     });

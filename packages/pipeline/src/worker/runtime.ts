@@ -180,6 +180,15 @@ export interface StartWorkerOptions {
    * polling until the gate refuses it. `worker/entitlement.ts`.
    */
   entitled?: EntitlementGate;
+  /**
+   * The most posts one pair — one query on one platform — may put to the
+   * classifier in a UTC day, and the most reply pages it may buy. US-287.
+   *
+   * The application's number, like the gate above: a hosted product sizes
+   * its plans on it, and a self-hosted instance reads every post it finds.
+   * Unset, nothing enforces it. `worker/ceiling.ts` is the rule.
+   */
+  newPostsPerPairPerDay?: number;
 }
 
 /**
@@ -376,6 +385,7 @@ export async function startWorker({
   pollingIntervalSeconds,
   notificationTransport,
   entitled = admitEveryone,
+  newPostsPerPairPerDay,
   signup = loadSignupEnv(),
   keys = loadKeyPolicyEnv(),
 }: StartWorkerOptions): Promise<WorkerHandle> {
@@ -546,10 +556,15 @@ export async function startWorker({
         embedderFor: async (userId) => (await modelsFor(userId)).embedder,
         triagerFor: async (userId) => (await modelsFor(userId)).triager,
       }),
-    replies: steps.replies ?? createRepliesStep({ registry: sources, credentialsFor: lookup }),
+    replies:
+      steps.replies ??
+      createRepliesStep({ registry: sources, credentialsFor: lookup, newPostsPerPairPerDay }),
     classify:
       steps.classify ??
-      createClassifyStep({ classifierFor: async (userId) => (await modelsFor(userId)).classifier }),
+      createClassifyStep({
+        classifierFor: async (userId) => (await modelsFor(userId)).classifier,
+        newPostsPerPairPerDay,
+      }),
     notify:
       steps.notify ??
       createNotifyStep(

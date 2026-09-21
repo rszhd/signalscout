@@ -12,7 +12,12 @@
 
 import type { LanguageModel } from "ai";
 import { generateStructured, type ModelCall } from "./call.js";
-import { type Classification, classificationSchema, leadScore } from "./classification.js";
+import {
+  type Classification,
+  classificationSchema,
+  leadScore,
+  withoutRestatedScores,
+} from "./classification.js";
 import type { AiConfig, AiProvider } from "./config.js";
 import {
   buildSystemPrompt,
@@ -39,6 +44,8 @@ export type ClassificationOutcome =
       readonly classification: Classification;
       /** The weighted total the monitor's threshold is compared against. */
       readonly score: number;
+      /** Reasons the model wrote that only restated the scores, taken out. BUG-288. */
+      readonly removedReasons: readonly string[];
       readonly call: ModelCall;
     }
   | { readonly status: "rejected"; readonly error: string; readonly call: ModelCall }
@@ -85,10 +92,16 @@ export function createClassifier({ config, model, now = Date.now }: ClassifierOp
 
       if (result.status !== "ok") return result;
 
+      // The line the card would print twice comes out here, after the
+      // answer is accepted, and never costs a retry. BUG-288.
+      const { kept, removed } = withoutRestatedScores(result.object.reasons);
+      const classification = { ...result.object, reasons: kept };
+
       return {
         status: "scored",
-        classification: result.object,
-        score: leadScore(result.object),
+        classification,
+        score: leadScore(classification),
+        removedReasons: removed,
         call: result.call,
       };
     },

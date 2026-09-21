@@ -61,18 +61,41 @@ const valueBeforeName = new RegExp(
   "i",
 );
 
+/**
+ * Whether a reason only restates the scores, which the card already prints.
+ *
+ * **It removes, and does not refuse.** BUG-288. This was a refinement of the
+ * schema until 2026-09-21, and a reason it matched threw the whole answer
+ * away: the model was paid again, wrote the same phrase again, and the post
+ * was dropped after the retries. It matched "high-intent conversations" —
+ * "high", a hyphen, "intent" — in a reason that was quoting the post, on a
+ * product whose whole vocabulary is intent. What the rule protects is one
+ * dull line on a card; what a false match cost was a lead. So the schema
+ * accepts the answer and `withoutRestatedScores` takes the line out
+ * afterwards. A rule that can only cost a line must not be able to cost a
+ * post.
+ */
 export function restatesTheScores(reason: string): boolean {
   return valueAfterName.test(reason) || valueBeforeName.test(reason);
 }
 
-const reason = z
-  .string()
-  .trim()
-  .min(shortestReason)
-  .max(longestReason)
-  .refine((value) => !restatesTheScores(value), {
-    message: "a reason must cite the post, not restate the scores",
-  });
+/**
+ * The reasons worth showing, and the ones taken out. The classification
+ * stands with whatever is left, even under `minimumReasons`: the scores are
+ * the verdict, and a card with one reason is better than no verdict at all.
+ * The caller logs `removed` so the rate can be read.
+ */
+export function withoutRestatedScores(reasons: readonly string[]): {
+  readonly kept: string[];
+  readonly removed: string[];
+} {
+  const kept: string[] = [];
+  const removed: string[] = [];
+  for (const reason of reasons) (restatesTheScores(reason) ? removed : kept).push(reason);
+  return { kept, removed };
+}
+
+const reason = z.string().trim().min(shortestReason).max(longestReason);
 
 /**
  * The classification, in the order the model writes it.

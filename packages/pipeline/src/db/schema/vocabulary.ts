@@ -56,7 +56,14 @@ export const minimumPollIntervalSeconds = 60;
  * this monitor throw away". Its `similarity` is null, like the keyword
  * stage's, because nothing was measured — a model was asked.
  */
-export const filterStages = ["keyword", "embedding", "triage"] as const;
+/**
+ * `ceiling` is not a filter stage but the same kind of row: a post the model
+ * did not read, with the reason. US-287. The day's number for the pair that
+ * found it was spent, so it was stored and left unclassified, and the
+ * Monitors screen counts it where it counts every other post kept from the
+ * model.
+ */
+export const filterStages = ["keyword", "embedding", "triage", "ceiling"] as const;
 
 export type FilterStage = (typeof filterStages)[number];
 

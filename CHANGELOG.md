@@ -54,6 +54,8 @@ sets no rule for the mark (US-283).
 
 ## Unreleased
 
+## 0.13.0 — 2026-09-22
+
 **Added.** A monitor's searches can take turns across the hour (US-289).
 Migration 0067 adds `poll_credits_per_hour`, `poll_credit_balance` and
 `poll_cursor` to `monitors`; migration 0068 adds `query` to

@@ -123,6 +123,29 @@ guess.
 
 ---
 
+## The day's ceiling on a pair
+
+Off unless an application sets it, and this repository's own application does
+not. US-287. A hosted product that pays for every account sizes its plans on a
+number of new posts a query may bring to the classifier in a day, and hourly
+polling has no bound of its own: the first poll of a query is its whole
+backlog, and a busy query polled every hour brings thousands. So `startWorker`
+takes `newPostsPerPairPerDay`, and with it set:
+
+- A pair — one query on one platform, or one channel — may put that many
+  posts to the classifier in a UTC day. A post found by two pairs counts
+  against both and is read while either has room. A reply is its parent's.
+- A post past it is stored and not read, and written to `filter_drops` under
+  the stage `ceiling`, so the Monitors screen counts it beside the filter's
+  own drops ("past the day's limit for the search that found them"). It is
+  not read on a later day: the day's posts are the day's.
+- A reply page counts as one of the pair's posts a day, and a pair whose day
+  is spent opens no thread.
+
+The count is `model_calls` joined to `post_discoveries`, never a counter of
+its own, so it cannot disagree with the ledger. With the number unset, none of
+this runs.
+
 ## The cap
 
 A monitor may have a monthly cap and one of two behaviours. **pause**: the

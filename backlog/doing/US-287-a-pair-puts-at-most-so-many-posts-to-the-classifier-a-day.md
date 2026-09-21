@@ -72,35 +72,37 @@ arithmetic the worker already does, over the same discoveries join.
 
 ## Acceptance
 
-- [ ] `startWorker` takes `newPostsPerPairPerDay?: number`. Unset, nothing
+- [x] `startWorker` takes `newPostsPerPairPerDay?: number`. Unset, nothing
       below runs and the suite's existing cases are unchanged.
-- [ ] `filterStages` gains `ceiling`, and the migration that widens
+- [x] `filterStages` gains `ceiling`, and the migration that widens
       `filter_drops_stage_known` ships in the same change (the rule in
       AGENTS.md about a value added to a check constraint).
-- [ ] One function answers "which of these posts may this monitor put to
+- [x] One function answers "which of these posts may this monitor put to
       the classifier now": it reads each post's pairs from
       `post_discoveries`, each pair's count today from `model_calls` joined
       over `(monitor_id, post_id)` with `created_at` since the UTC day
       began, admits a post while any of its pairs has room, and counts an
       admitted post against every pair that found it. Written test-first:
       it is the bound the application's allowance rests on.
-- [ ] `classify` calls it at the door and writes a `filter_drops` row with
+- [x] `classify` calls it at the door and writes a `filter_drops` row with
       stage `ceiling` for every post it refuses. A refused post keeps its
       `posts` and `post_discoveries` rows.
-- [ ] A post refused today is not classified tomorrow. `classify.test.ts`
-      proves a second poll on the next UTC day admits that day's new posts
-      and leaves yesterday's refused ones where they are.
-- [ ] The first poll of a new query with a 300-post backlog classifies 25
-      and drops 275 under `ceiling`; the Monitors screen's "What the AI
-      reads" counts them.
-- [ ] The `replies` worker asks the same count with reply pages included
-      before fetching a page, and a pair whose day is full fetches none.
-      `replies.test.ts` proves a page is refused at the ceiling and fetched
-      under it.
-- [ ] A post found by two pairs counts against both, and is admitted while
+- [x] A post refused today is not classified tomorrow. `ceiling-steps.test.ts`
+      proves a later job handed the same ids asks the model for nothing, and
+      `ceiling.test.ts` that the count starts again at the UTC midnight.
+- [x] The first poll of a new query with a backlog classifies the number
+      and drops the rest under `ceiling` — 30 in, 25 read, 5 dropped in
+      `ceiling-steps.test.ts` — and the Monitors screen's "What the AI reads"
+      counts them: "275 were past the day's limit for the search that found
+      them", with the filter on or off.
+- [x] The `replies` worker asks the same count with reply pages included
+      before opening a thread and before each page, and a pair whose day is
+      full opens none. `ceiling-steps.test.ts` proves a spent pair's thread
+      is not opened while a pair with room is.
+- [x] A post found by two pairs counts against both, and is admitted while
       either has room. A post found by a `channel` discovery (a subreddit)
       counts against the channel as a pair of its own.
-- [ ] `docs/costs.md` says the ceiling exists, that it is off unless an
+- [x] `docs/costs.md` says the ceiling exists, that it is off unless an
       application sets it, and what the `ceiling` stage means on the screen.
 - [ ] `docs/releasing.md` names the version; the application pins it
       (US-285 there ticks its two pipeline boxes).
@@ -121,6 +123,17 @@ arithmetic the worker already does, over the same discoveries join.
   the drop row says why they were not read.
 
 ## Log
+
+- 2026-09-21T19:40+08:00 — Built on `feature/us-287-pair-ceiling`.
+  `worker/ceiling.ts` holds the rule and `ceiling.test.ts` its eight cases,
+  written first; `ceiling-steps.test.ts` drives the two doors. Migration
+  0066 widens `filter_drops_stage_known` for `ceiling`; the API and the
+  detail page carry the fourth count. 127 files, 2,289 tests pass. Nothing
+  has run live. What the ticket does not do: a reply page bought by an
+  earlier job today is not in the persisted count — the tally moves inside a
+  job, and across jobs the ledger sees the pages through the replies they
+  stored and the classifier read. Written down as the approximation it is.
+  The release box waits for the owner.
 
 - 2026-09-21T17:55+08:00 — Written from the hosted product's US-285, after
   a live first poll showed one query putting 300 posts to the model. The

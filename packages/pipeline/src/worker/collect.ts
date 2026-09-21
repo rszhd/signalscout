@@ -80,6 +80,12 @@ export const excerptLength = 2000;
 export interface CollectOptions {
   readonly registry: SourceRegistry;
   readonly credentialsFor: CredentialLookup;
+  /**
+   * The day's number for one pair, read by the replies step alone. US-287.
+   * A reply page is one of the pair's posts a day, and a pair whose day is
+   * spent buys no more pages. Unset, every thread is opened.
+   */
+  readonly newPostsPerPairPerDay?: number | undefined;
 }
 
 /** What one connector returned in one poll. US-013 records the units against a budget. */

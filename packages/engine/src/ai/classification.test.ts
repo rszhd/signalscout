@@ -16,6 +16,7 @@ import {
   maximumReasons,
   minimumReasons,
   restatesTheScores,
+  withoutRestatedScores,
 } from "./classification.js";
 
 /** PLAN.md, *Intent classification*, the worked example, with its reason split into claims. */
@@ -99,7 +100,9 @@ describe("the classification schema", () => {
 /**
  * PLAN.md's inbox shows *why* a post matched, as a list of claims about that
  * post. A reason that says "intent is 88" tells the reader what the number
- * beside it already says, so the schema refuses it.
+ * beside it already says, so it is taken off the list — and only off the
+ * list. BUG-288: the schema accepts the answer, because a rule that can
+ * only cost a line must not be able to cost a post.
  */
 describe("the reasons", () => {
   it.each([
@@ -108,14 +111,38 @@ describe("the reasons", () => {
     "Problem fit 96, which is strong",
     "The score is high for this post",
     "High intent and strong urgency",
-  ])("rejects %s, which only restates the scores", (reason) => {
+  ])("removes %s, which only restates the scores, and keeps the answer", (reason) => {
     expect(restatesTheScores(reason)).toBe(true);
 
-    // The other reason is a good one, so nothing but the restatement rule can
-    // reject this list. A pair of identical bad reasons would also fail the
-    // rule against repeating a claim, and would pass with this guard removed.
-    const reasons = [reason, "Says they manually test signup and checkout"];
-    expect(classificationSchema.safeParse(withScores({ reasons })).success).toBe(false);
+    const good = "Says they manually test signup and checkout";
+    expect(withoutRestatedScores([reason, good])).toEqual({ kept: [good], removed: [reason] });
+    // The schema no longer refuses it: that is the point.
+    expect(classificationSchema.safeParse(withScores({ reasons: [reason, good] })).success).toBe(
+      true,
+    );
+  });
+
+  /**
+   * The live answer that BUG-288 was written from: "high-intent" quoting the
+   * post's own subject. The rule still matches it — the phrase is the same
+   * letters as "high intent" — and it costs one line of three, not the post.
+   */
+  it("leaves a classification standing when a quoted phrase matches the rule", () => {
+    const live = [
+      "Author asks B2B founders how long it took them to land their first paying client.",
+      "They want a breakdown between high-intent conversations and legal/compliance contract timeline.",
+      "They ask whether the first deal came from connection, cold outreach, or organic community interaction.",
+    ];
+    const { kept, removed } = withoutRestatedScores(live);
+    expect(removed).toEqual([live[1]]);
+    expect(kept).toEqual([live[0], live[2]]);
+    expect(classificationSchema.safeParse(withScores({ reasons: live })).success).toBe(true);
+  });
+
+  it("keeps an answer whose reasons all restate the scores, with none left", () => {
+    const all = ["Intent is 88 out of 100", "Relevance: high"];
+    expect(withoutRestatedScores(all)).toEqual({ kept: [], removed: all });
+    expect(classificationSchema.safeParse(withScores({ reasons: all })).success).toBe(true);
   });
 
   // The other half of the guard. These are PLAN.md's own inbox bullets, and a

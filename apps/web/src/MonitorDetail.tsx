@@ -634,12 +634,15 @@ function ScheduleForm({ monitor, onSaved }: { monitor: Monitor; onSaved: () => P
  * zero, which would invite a question about a stage that did nothing.
  */
 export function countsSentence(preFilter: PreFilter): string {
-  const { keyword, embedding, triage } = preFilter.dropped;
-  const skipped = keyword + embedding + triage;
+  const { keyword, embedding, triage, ceiling } = preFilter.dropped;
+  const skipped = keyword + embedding + triage + ceiling;
   const decided = preFilter.read + skipped;
 
   if (!preFilter.enabled) {
-    return "Every post this monitor collects is read by the AI, and every one is billed.";
+    // The ceiling is not the filter's, so it holds with the filter off. US-287.
+    return ceiling > 0
+      ? `Every post this monitor collects is read by the AI, except ${ceiling} past the day's limit for the search that found them.`
+      : "Every post this monitor collects is read by the AI, and every one is billed.";
   }
 
   if (decided === 0) return "This monitor has not found any posts yet.";
@@ -649,6 +652,7 @@ export function countsSentence(preFilter: PreFilter): string {
     keyword > 0 ? `${keyword} did not use your words` : undefined,
     embedding > 0 ? `${embedding} were not about your subject` : undefined,
     triage > 0 ? `${triage} read as someone answering rather than asking` : undefined,
+    ceiling > 0 ? `${ceiling} were past the day's limit for the search that found them` : undefined,
   ].filter((reason) => reason !== undefined);
 
   return (

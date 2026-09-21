@@ -38,6 +38,7 @@ import { enforceBudget, recordSourceUsage } from "../budget/budget.js";
 import { matches, monitors, type Provider, posts, type Source } from "../db/schema.js";
 import { recordStageRun } from "../monitors/stage-runs.js";
 import { readProviderChoices } from "../sources/choices.js";
+import { loadCeiling } from "./ceiling.js";
 import type { CollectOptions } from "./collect.js";
 import { excerptLength } from "./collect.js";
 import type { RepliesPayload } from "./queues.js";
@@ -181,6 +182,7 @@ interface Thread {
 export function createRepliesStep({
   registry,
   credentialsFor,
+  newPostsPerPairPerDay,
 }: CollectOptions): Step<RepliesPayload> {
   return async function replies(
     { monitorId, postIds, walkId, pollRunId },
@@ -364,6 +366,25 @@ export function createRepliesStep({
     let spentUnits = 0;
     const storedReplyIds: string[] = [];
 
+    /**
+     * The day's room for the pairs that found these posts. US-287. A comment
+     * page is the dearest fetch this product makes, so a page counts as one
+     * of the pair's posts a day, and a pair whose day is spent opens no
+     * thread and buys no further page. The tally moves inside this job; what
+     * earlier jobs today did is the ledger's, through the replies they stored
+     * and the classifier read.
+     */
+    const ceiling =
+      newPostsPerPairPerDay === undefined
+        ? null
+        : await loadCeiling(
+            db,
+            monitorId,
+            candidates.map((post) => post.id),
+            newPostsPerPairPerDay,
+          );
+    let atCeiling = 0;
+
     for (const post of candidates) {
       if (opened >= maxThreadsPerJob) {
         logger.info(
@@ -391,6 +412,12 @@ export function createRepliesStep({
        */
       if (post.replyCount === 0) {
         skipped += 1;
+        continue;
+      }
+
+      if (ceiling && !ceiling.hasRoom(post.id)) {
+        skipped += 1;
+        atCeiling += 1;
         continue;
       }
 
@@ -622,6 +649,10 @@ export function createRepliesStep({
       const wantThisBatch = Math.min(replyBatchSize, roomLeft);
 
       while (pages < maxPagesPerThread && readThisBatch < wantThisBatch) {
+        // Each page is one of the pair's day. US-287.
+        if (ceiling && !ceiling.hasRoom(post.id)) break;
+        ceiling?.charge(post.id);
+
         const result = await connector.fetchReplies({
           postUrl: post.url,
           postExternalId: post.externalId,
@@ -746,6 +777,7 @@ export function createRepliesStep({
         threadsOpened: opened,
         threadsSkipped: skipped,
         pagesBought,
+        atCeiling,
         replies: storedReplyIds.length,
         floor: floor.toISOString(),
         spentUnits,

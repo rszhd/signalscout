@@ -76,7 +76,13 @@ function stubClassifier(outcome: () => ClassificationOutcome): Classifier {
   };
 }
 
-const scored: ClassificationOutcome = { status: "scored", classification, score: 92, call };
+const scored: ClassificationOutcome = {
+  status: "scored",
+  classification,
+  score: 92,
+  removedReasons: [],
+  call,
+};
 
 /** The queue, as a step sees it. Typed, so a case can read what was sent. */
 function stubBoss() {

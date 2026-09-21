@@ -468,7 +468,13 @@ export const monitorSchema = z.object({
    * inbox, and only the number says which question to ask.
    */
   preFilter: preFilterSchema.extend({
-    dropped: z.object({ keyword: z.number(), embedding: z.number(), triage: z.number() }),
+    /** `ceiling`: past the day's number for the search that found them. US-287. */
+    dropped: z.object({
+      keyword: z.number(),
+      embedding: z.number(),
+      triage: z.number(),
+      ceiling: z.number(),
+    }),
     /**
      * How many posts the classifier has read for this monitor.
      *

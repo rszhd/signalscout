@@ -2,10 +2,11 @@
 
 # Done
 
-190 finished.
+191 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
+| BUG-288 | [A reason that says "high-intent" about the post is refused as a score](done/2026-09/BUG-288-a-reason-that-says-high-intent-about-the-post-is-refused-as-a-score.md) | bug | fixed | 2026-09 |
 | BUG-033 | [The image does not know the UI package](done/2026-09/BUG-033-the-image-does-not-know-the-ui-package.md) | bug | shipped | 2026-09 |
 | BUG-031 | [A worktree cannot sign in](done/2026-09/BUG-031-a-worktree-cannot-sign-in.md) | bug | shipped | 2026-09 |
 | BUG-030 | [Deleting a project leaves its monitors polling with no inbox](done/2026-09/BUG-030-deleting-a-project-leaves-its-monitors-polling-with-no-inbox.md) | bug | shipped | 2026-09 |

@@ -105,9 +105,20 @@ later.
 | Comments per thread | 500 | A thread that grows faster than it is read |
 | Classification attempts per post | 3 | A post the model refuses being paid for on every poll |
 | Job attempts | 4, backing off from 30s | A job that throws for ever, retrying all night |
+| Posts per pair per day | unset; the application's | One search putting its whole backlog, or a busy day, to the classifier |
 
 The monthly cap in `budgets` is the limit on what a monitor may spend. These
 are the limits on how far one job can carry it past that before the next check.
+
+**The last row is off unless an application sets it.** US-287. A pair is one
+query on one platform, as `post_discoveries` records it; the number is how
+many posts the pairs that found a post may put to the classifier in a UTC day,
+and how many reply pages they may buy. `startWorker` takes it as
+`newPostsPerPairPerDay`, the way it takes the entitlement gate: a hosted
+product sizes its plans on it, and a self-hosted instance reads every post it
+finds. `worker/ceiling.ts` is the rule; the count is the ledger's
+(`model_calls` joined to the discoveries), and a post refused is written to
+`filter_drops` under the stage `ceiling` and not read on a later day.
 
 ## After the poll
 

@@ -50,7 +50,7 @@ export interface PreFilter {
    * still carries it for whoever is tuning one.
    */
   similarityThreshold: number;
-  dropped: { keyword: number; embedding: number; triage: number };
+  dropped: { keyword: number; embedding: number; triage: number; ceiling: number };
   /** Posts the classifier has read. With the drops it makes the total. */
   read: number;
 }

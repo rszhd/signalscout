@@ -597,7 +597,7 @@ describe("the counter on the monitor list", () => {
     expect(await filterDropCounts(db, [monitorId])).toEqual(
       // `triage` joined the counts in US-030. This worker has no triager, so
       // the stage never ran and its count is zero rather than absent.
-      new Map([[monitorId, { keyword: 1, embedding: 1, triage: 0 }]]),
+      new Map([[monitorId, { keyword: 1, embedding: 1, triage: 0, ceiling: 0 }]]),
     );
   }, 30_000);
 });

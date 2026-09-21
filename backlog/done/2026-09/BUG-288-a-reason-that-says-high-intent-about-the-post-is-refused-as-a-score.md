@@ -6,7 +6,7 @@ priority: p2
 created: 2026-09-21T18:05+08:00
 parent:
 area: engine
-resolution:
+resolution: fixed
 ---
 
 ## Context
@@ -55,21 +55,21 @@ has to remove. The filter is the second reader, not the first.
 
 ## Acceptance
 
-- [ ] `classificationSchema` no longer refuses a reason for restating the
+- [x] `classificationSchema` no longer refuses a reason for restating the
       scores; `restatesTheScores` is applied after parsing, in the
       classifier, and removes the reasons it matches.
-- [ ] The live answer above, as a fixture, classifies with every score and
+- [x] The live answer above, as a fixture, classifies with every score and
       three reasons; nothing is retried and nothing is logged as a failure.
-- [ ] An answer whose reasons all restate the scores still classifies, with
+- [x] An answer whose reasons all restate the scores still classifies, with
       the reasons it has, and the worker logs one line naming the monitor,
       the post and the reasons removed.
-- [ ] `restatesTheScores("high intent")`, `("intent: high")` and
+- [x] `restatesTheScores("high intent")`, `("intent: high")` and
       `("Intent is 88")` are still true, and those reasons never reach the
       inbox; the existing cases in `classify.test.ts` and
       `classification.test.ts` move from "refused" to "removed" and are
       otherwise unchanged.
-- [ ] The prompt keeps its sentence about not restating the scores.
-- [ ] The comment on `restatesTheScores` says why it removes and does not
+- [x] The prompt keeps its sentence about not restating the scores.
+- [x] The comment on `restatesTheScores` says why it removes and does not
       refuse, so the next reader does not make it a gate again.
 
 ## Notes
@@ -86,6 +86,12 @@ has to remove. The filter is the second reader, not the first.
   and the count readable.
 
 ## Log
+
+- 2026-09-21T19:40+08:00 — Fixed on `feature/us-287-pair-ceiling`, beside
+  US-287. `withoutRestatedScores` removes after parsing; the schema's
+  refinement is gone; the outcome carries `removedReasons` and the worker
+  logs them. The live answer is a fixture in `classification.test.ts`. 46
+  engine cases pass, the prompt's sentence is unchanged.
 
 - 2026-09-21T18:05+08:00 — Written from the hosted product's first live
   poll under US-285, where it dropped one post in every batch.

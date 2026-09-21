@@ -515,7 +515,7 @@ describe("one monitor's page", () => {
           preFilter: {
             enabled: true,
             similarityThreshold: 0.15,
-            dropped: { keyword: 340, embedding: 62, triage: 8 },
+            dropped: { keyword: 340, embedding: 62, triage: 8, ceiling: 0 },
             read: 46,
           },
         }),
@@ -535,7 +535,7 @@ describe("one monitor's page", () => {
           preFilter: {
             enabled: true,
             similarityThreshold: 0.15,
-            dropped: { keyword: 12, embedding: 0, triage: 0 },
+            dropped: { keyword: 12, embedding: 0, triage: 0, ceiling: 0 },
             read: 3,
           },
         }),
@@ -544,6 +544,41 @@ describe("one monitor's page", () => {
       expect(container.textContent).toContain("The AI read 3 of 15 posts found");
       expect(container.textContent).toContain("12 did not use your words");
       expect(container.textContent).not.toContain("0 were not about your subject");
+    });
+
+    /**
+     * The day's ceiling is not a filter stage, so it is counted with the
+     * filter off as well as on. US-287.
+     */
+    it("counts the posts past the day's limit beside the filter's stages", async () => {
+      await show(
+        monitor({
+          preFilter: {
+            enabled: true,
+            similarityThreshold: 0.15,
+            dropped: { keyword: 0, embedding: 0, triage: 0, ceiling: 275 },
+            read: 25,
+          },
+        }),
+      );
+      expect(container.textContent).toContain("The AI read 25 of 300 posts found");
+      expect(container.textContent).toContain(
+        "275 were past the day's limit for the search that found them",
+      );
+    });
+
+    it("counts the posts past the day's limit with the filter off too", async () => {
+      await show(
+        monitor({
+          preFilter: {
+            enabled: false,
+            similarityThreshold: 0.15,
+            dropped: { keyword: 0, embedding: 0, triage: 0, ceiling: 275 },
+            read: 25,
+          },
+        }),
+      );
+      expect(container.textContent).toContain("except 275 past the day's limit");
     });
 
     /**
@@ -582,7 +617,7 @@ describe("one monitor's page", () => {
           preFilter: {
             enabled: false,
             similarityThreshold: 0.15,
-            dropped: { keyword: 0, embedding: 0, triage: 0 },
+            dropped: { keyword: 0, embedding: 0, triage: 0, ceiling: 0 },
             read: 9,
           },
         }),

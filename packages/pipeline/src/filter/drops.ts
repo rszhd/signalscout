@@ -62,9 +62,11 @@ export interface FilterDropCounts {
   readonly embedding: number;
   /** US-030. A model call, so this count is the one that stands for money. */
   readonly triage: number;
+  /** US-287. The pair's day was spent; the post was stored and not read. */
+  readonly ceiling: number;
 }
 
-export const noFilterDrops: FilterDropCounts = { keyword: 0, embedding: 0, triage: 0 };
+export const noFilterDrops: FilterDropCounts = { keyword: 0, embedding: 0, triage: 0, ceiling: 0 };
 
 /**
  * Every named monitor's counts, or every monitor's, in one read.
@@ -93,10 +95,13 @@ export async function filterDropCounts(
     )
     .groupBy(filterDrops.monitorId, filterDrops.stage);
 
-  const counts = new Map<string, { keyword: number; embedding: number; triage: number }>();
+  const counts = new Map<
+    string,
+    { keyword: number; embedding: number; triage: number; ceiling: number }
+  >();
 
   for (const row of rows) {
-    const entry = counts.get(row.monitorId) ?? { keyword: 0, embedding: 0, triage: 0 };
+    const entry = counts.get(row.monitorId) ?? { ...noFilterDrops };
     entry[row.stage] = Number(row.dropped);
     counts.set(row.monitorId, entry);
   }

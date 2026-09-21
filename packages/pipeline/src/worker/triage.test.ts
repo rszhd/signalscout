@@ -198,7 +198,7 @@ describe("what triage decides", () => {
 
     const counts = await filterDropCounts(db, [monitorId]);
 
-    expect(counts.get(monitorId)).toEqual({ keyword: 1, embedding: 0, triage: 1 });
+    expect(counts.get(monitorId)).toEqual({ keyword: 1, embedding: 0, triage: 1, ceiling: 0 });
   });
 });
 

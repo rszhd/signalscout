@@ -167,16 +167,30 @@ describe("a model that answers badly", () => {
     expect(outcome).not.toHaveProperty("classification");
   });
 
-  it("rejects reasons that only restate the scores", async () => {
+  /**
+   * BUG-288. A reason that only restates a score is taken off the list, and
+   * the answer stands with the rest — no retry, no dropped post. The
+   * removed lines travel with the outcome so the worker can log them.
+   */
+  it("removes reasons that only restate the scores, and scores the post anyway", async () => {
     const answer = JSON.parse(goodAnswer);
-    answer.reasons = ["Intent is 88 out of 100", "Relevance: high"];
+    answer.reasons = [
+      "Intent is 88 out of 100",
+      "Asks what tools other small teams use",
+      "Relevance: high",
+    ];
 
     const classifier = createClassifier({
       config: config(),
       model: modelReturning(JSON.stringify(answer)),
     });
 
-    expect((await classifier.classify({ monitor, post })).status).toBe("rejected");
+    const outcome = await classifier.classify({ monitor, post });
+    expect(outcome.status).toBe("scored");
+    if (outcome.status !== "scored") throw new Error("unreachable");
+    expect(outcome.classification.reasons).toEqual(["Asks what tools other small teams use"]);
+    expect(outcome.removedReasons).toEqual(["Intent is 88 out of 100", "Relevance: high"]);
+    expect(outcome.score).toBeGreaterThan(0);
   });
 
   it("rejects prose that is not JSON at all", async () => {

@@ -44,11 +44,12 @@ import {
   scoreColumns,
   type ThreadContext,
 } from "@signalscout/engine";
-import { and, count, eq, inArray, isNull, ne } from "drizzle-orm";
+import { and, count, eq, inArray, isNull, ne, notInArray } from "drizzle-orm";
 import { recordModelCall } from "../ai/record.js";
 import { createSpendMeter } from "../budget/budget.js";
 import type { Database, Queryable } from "../db/client.js";
 import {
+  filterDrops,
   type ModelCallOutcome,
   matches,
   modelCalls,
@@ -56,7 +57,9 @@ import {
   posts,
   type Signal,
 } from "../db/schema.js";
+import { recordFilterDrops } from "../filter/drops.js";
 import { recordStageRun, type StageRunRecord } from "../monitors/stage-runs.js";
+import { loadCeiling } from "./ceiling.js";
 import type { ClassifyPayload } from "./queues.js";
 import { notifyQueue, repliesQueue } from "./queues.js";
 import type { Step, StepContext } from "./steps.js";
@@ -81,6 +84,12 @@ export interface ClassifyOptions {
    * key. `runtime.ts` caches per owner; this step only asks.
    */
   readonly classifierFor: (userId: string) => Promise<Classifier | undefined>;
+  /**
+   * The most posts one pair may put to the classifier in a UTC day. US-287.
+   * Unset, every post this step is handed is read, which is what a
+   * self-hosted instance wants. `ceiling.ts` is the rule.
+   */
+  readonly newPostsPerPairPerDay?: number | undefined;
 }
 
 function profileOf(monitor: typeof monitors.$inferSelect): MonitorProfile {
@@ -92,7 +101,10 @@ function profileOf(monitor: typeof monitors.$inferSelect): MonitorProfile {
   };
 }
 
-export function createClassifyStep({ classifierFor }: ClassifyOptions): Step<ClassifyPayload> {
+export function createClassifyStep({
+  classifierFor,
+  newPostsPerPairPerDay,
+}: ClassifyOptions): Step<ClassifyPayload> {
   return async function classify(
     { monitorId, postIds, walkId, pollRunId },
     { db, boss, logger }: StepContext,
@@ -202,11 +214,27 @@ export function createClassifyStep({ classifierFor }: ClassifyOptions): Step<Cla
      * with no thread, scores it low, and nobody is told a lie about who wrote
      * what.
      */
+    /**
+     * A post the ceiling refused on an earlier day is not read on a later one.
+     * US-287: the day's posts are the day's, and a backlog drained at 25 a day
+     * would be the ceiling in name only. The drop row is what says so.
+     */
+    const refusedBefore = db
+      .select({ postId: filterDrops.postId })
+      .from(filterDrops)
+      .where(and(eq(filterDrops.monitorId, monitorId), eq(filterDrops.stage, "ceiling")));
+
     const [candidates, scored, failures, matched] = await Promise.all([
       db
         .select()
         .from(posts)
-        .where(and(inArray(posts.id, ids), isNull(posts.deletedAt))),
+        .where(
+          and(
+            inArray(posts.id, ids),
+            isNull(posts.deletedAt),
+            ...(newPostsPerPairPerDay === undefined ? [] : [notInArray(posts.id, refusedBefore)]),
+          ),
+        ),
       db
         .selectDistinct({ postId: modelCalls.postId })
         .from(modelCalls)
@@ -227,6 +255,22 @@ export function createClassifyStep({ classifierFor }: ClassifyOptions): Step<Cla
     ]);
 
     const threads = await loadThreads(db, candidates);
+
+    /**
+     * The day's room for every pair in this batch, loaded once. US-287. Only
+     * the posts that are about to be paid for are asked: one already scored
+     * or already dropped is skipped below before the ceiling hears of it.
+     */
+    const ceiling =
+      newPostsPerPairPerDay === undefined
+        ? null
+        : await loadCeiling(
+            db,
+            monitorId,
+            candidates.map((post) => post.id),
+            newPostsPerPairPerDay,
+          );
+    const refused: string[] = [];
 
     const alreadyScored = new Set(scored.map((row) => row.postId));
     const alreadyMatched = new Set(matched.map((row) => row.postId));
@@ -303,6 +347,16 @@ export function createClassifyStep({ classifierFor }: ClassifyOptions): Step<Cla
 
       const attempts = attemptsByPost.get(post.id) ?? 0;
 
+      if (ceiling && !ceiling.hasRoom(post.id)) {
+        // Stored, and not read: the pairs that found it have put the day's
+        // number to the classifier. Written as a drop so the screen counts
+        // it, and never asked again. US-287.
+        refused.push(post.id);
+        continue;
+      }
+      // Charged on the attempt, not the answer: a refusal is paid for too.
+      ceiling?.charge(post.id);
+
       if (attempts >= maxClassificationAttempts) {
         dropped += 1;
         logger.error(
@@ -328,6 +382,15 @@ export function createClassifyStep({ classifierFor }: ClassifyOptions): Step<Cla
       }
 
       scoredNow += 1;
+
+      // Not a failure: the answer stands. Logged so the rate can be read,
+      // and so a model that does it on every post is noticed. BUG-288.
+      if (outcome.removedReasons.length > 0) {
+        logger.info(
+          { monitorId, postId: post.id, removed: outcome.removedReasons },
+          "reasons that only restated the scores were left off the card",
+        );
+      }
 
       if (outcome.score < monitor.minScore) {
         await record(db, post.id, "scored", outcome.call);
@@ -364,6 +427,21 @@ export function createClassifyStep({ classifierFor }: ClassifyOptions): Step<Cla
       if (row && !alreadyMatched.has(post.id)) matchIds.push(row.id);
     }
 
+    // The posts the ceiling kept from the model, written where every other
+    // post the model did not read is written, so the screen counts them and
+    // the next batch does not ask again. US-287.
+    await recordFilterDrops(
+      db,
+      monitorId,
+      refused.map((postId) => ({ postId, stage: "ceiling" as const })),
+    );
+    if (refused.length > 0) {
+      logger.info(
+        { monitorId, refused: refused.length, limit: newPostsPerPairPerDay },
+        "posts left unread: their pairs have put the day's number to the classifier",
+      );
+    }
+
     logger.info(
       {
         monitorId,
@@ -373,6 +451,7 @@ export function createClassifyStep({ classifierFor }: ClassifyOptions): Step<Cla
         matches: matchIds.length,
         dropped,
         unclassified: retryable,
+        atCeiling: refused.length,
         spentMicros,
         model: classifier.model,
         unspentFor,

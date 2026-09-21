@@ -54,6 +54,8 @@ sets no rule for the mark (US-283).
 
 ## Unreleased
 
+## 0.12.0 — 2026-09-21
+
 **Added.** `startWorker` takes `newPostsPerPairPerDay`: the most posts one
 pair — one query on one platform, as `post_discoveries` records it — may
 put to the classifier in a UTC day, and the most reply pages it may buy

@@ -11,6 +11,7 @@ import {
   check,
   integer,
   jsonb,
+  numeric,
   pgTable,
   real,
   smallint,
@@ -261,6 +262,21 @@ export const monitors = pgTable(
      * a slow poll from stretching the interval it was given.
      */
     lastPolledAt: timestamp("last_polled_at", { withTimezone: true }),
+    /**
+     * The platforms take turns across the hour when this is set. US-289.
+     *
+     * Null is what every monitor did before: every platform, every poll.
+     * Set, each poll adds this many credits to the balance and runs the
+     * next platforms in turn while it covers them; `worker/rotation.ts` is
+     * the rule and `poll_credit_balance` and `poll_cursor` are its state.
+     * An application that sells credits writes this beside an hourly
+     * `poll_interval_seconds`; the pipeline never sets it.
+     */
+    pollCreditsPerHour: numeric("poll_credits_per_hour", { precision: 8, scale: 3 }),
+    pollCreditBalance: numeric("poll_credit_balance", { precision: 8, scale: 3 })
+      .notNull()
+      .default("0"),
+    pollCursor: integer("poll_cursor").notNull().default(0),
     /**
      * When somebody paused this monitor. Null means it is running.
      *

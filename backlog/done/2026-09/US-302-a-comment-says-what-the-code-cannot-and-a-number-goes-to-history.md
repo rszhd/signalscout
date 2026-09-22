@@ -7,7 +7,7 @@ priority: p2
 created: 2026-09-22T16:34+08:00
 parent:
 area: architecture
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -33,21 +33,24 @@ end of one sentence, not a heading.
 
 ## Acceptance
 
-- [ ] AGENTS.md's rules section holds the comment rule in the words above,
+- [x] AGENTS.md's rules section holds the comment rule in the words above,
       with the three things a comment is for and the two things it is not
       (a measurement, a narrative of how the code came to be).
-- [ ] A script, `scripts/comment-density.mjs`, prints per file the comment
+- [x] A script, `scripts/comment-density.mjs`, prints per file the comment
       share and the count of lines that name a ticket id, sorted, so the
       sweep has a list and a later run has a comparison.
 - [ ] Every comment block over 15 lines outside tests has been read and
       either cut to the rule or kept with a reason in this ticket's Log.
       The measurements moved go to history.md under the ticket that made
-      them.
+      them. **Split out**: 258 blocks in six areas is not one sitting, so
+      this is US-258, US-303, US-304 and US-305.
 - [ ] After the sweep the script is run again and both numbers are recorded
-      here beside the ones above.
-- [ ] US-258 is closed as `duplicate` of this ticket, or this ticket's
-      sweep skips its four files and US-258 does them. The Log says which.
-- [ ] No behaviour changes. The diff is comments and history.md; the test
+      here beside the ones above. **Each child records its own area**; this
+      ticket records the whole repository when the last one closes.
+- [x] US-258 is closed as `duplicate` of this ticket, or this ticket's
+      sweep skips its four files and US-258 does them. The Log says which:
+      US-258 keeps its four files, and the children leave them alone.
+- [x] No behaviour changes. The diff is comments and history.md; the test
       suite is the proof.
 
 ## Notes
@@ -63,3 +66,7 @@ end of one sentence, not a heading.
 ## Log
 
 - 2026-09-22T16:34+08:00 — Written after a review of the source against what a contributor reads, with the numbers above as the baseline.
+- 2026-09-22T20:10+08:00 — The rule is in AGENTS.md and `scripts/comment-density.mjs` is written. It reports per file the comment share and the lines naming a ticket, with `--all`, `--json` for comparing two runs, and `--blocks --min=N` for the list a sweep works from. It counts a line, not a token, and ignores a trailing comment after code — which understates the share, and is the honest direction to be wrong in.
+- 2026-09-22T20:10+08:00 — **The baseline, 2026-09-22**: 383 files, **28,990 comment lines of 118,597 — 24.4%** — **1,722 lines naming a ticket**, and **287 blocks over 15 lines**, of which 258 are outside tests. By area: engine 106, pipeline 98, apps/api 31, apps/web 12, packages/ui 9, evals 2. The densest file is `packages/pipeline/src/worker/collect.ts` at 507 comment lines of 1,140; the densest share is `packages/engine/src/sources/types.ts` at 76%.
+- 2026-09-22T20:10+08:00 — The sweep is split. 258 blocks is a judgment per block and does not fit one session, which is backlog/README.md's own rule 8. US-303 takes `packages/engine`, US-304 `packages/pipeline`, US-305 `apps/` and `packages/ui`. US-258 keeps the four files it already named and stays a child of US-247, where it came from; the three new tickets say which files are its and leave them alone. Do US-258 first: it is the densest, and the judgment it settles is the one the others copy.
+- 2026-09-22T20:10+08:00 — This ticket closes on the rule and the measurement, not on the sweep. Re-open nothing: when the last child closes, put the whole-repository numbers here beside the baseline, and the difference is the answer to whether the rule was worth writing.

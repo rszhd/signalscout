@@ -78,3 +78,15 @@ read the source, store the posts, book the resume.
   the monitor's vector, the posts' vectors, the comparison — share one
   spend counter, and splitting them means passing it around. Worth doing
   when that stage next changes, not before.
+- 2026-09-23T07:35+08:00 — **Classify done.** Its loop *is* its policy — skip what was
+  scored, stop at the cap, respect the ceiling, drop after three failures,
+  write above the threshold — so the loop stays whole in the step, and three
+  things left it: `readLedger` (the four queries that say what is new,
+  scored, failing and already matched), `writeMatch` (the one transaction
+  that writes the ledger row and the match together) and
+  `sendJudgedThreads`. A doc block that described `loadThreads` sat above
+  the ceiling query; it now sits on the call.
+
+  Measured: 452 lines to 358 (280 code lines to 230), control flow eight
+  levels to three. It remains the longest step, by choice. Every comment line
+  survived. No test file changed; full suite 133 files, 2,331 tests.

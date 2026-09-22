@@ -1,5 +1,6 @@
 ---
 id: BUG-013
+labels: [good first issue, easy]
 issue: 34
 title: A key row's error is printed inside a closed dialog
 type: bug

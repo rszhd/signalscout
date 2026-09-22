@@ -82,9 +82,12 @@ set_field() {
 }
 
 # want_labels <frontmatter value> — one label per line, `ticket` first.
+#
+# The trailing newline matters: `read` returns false on a last line without
+# one, so a loop over this silently drops the final label.
 want_labels() {
   printf 'ticket\n'
-  printf '%s' "${1//[\[\]]/}" | tr ',' '\n' | sed -e 's/^[ \t"'"'"']*//' -e 's/[ \t"'"'"']*$//' -e '/^$/d'
+  printf '%s\n' "${1//[\[\]]/}" | tr ',' '\n' | sed -e 's/^[ \t"'"'"']*//' -e 's/[ \t"'"'"']*$//' -e '/^$/d'
 }
 
 say() { printf '%s\n' "$*"; }

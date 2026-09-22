@@ -229,24 +229,37 @@ by hand and says less than both on purpose.
 
 ## Contributing
 
-The most useful contribution is a source connector. Every source implements one
-interface, so adding Hacker News, Bluesky, Mastodon or a forum means one folder
-and one registry entry. [docs/sources.md](docs/sources.md) has both lists — a
-new provider for a platform we already fetch, and a new platform.
+**What helps most, right now:**
 
-**Not yet, though.** PLAN.md holds one rule above the others:
+- **Verdicts on real matches.** If you run an instance, say whether the score
+  was right. Thirty judged matches settle a question no test can
+  ([#32](https://github.com/rszhd/signalscout/issues/32)), and it needs no
+  code at all.
+- **A provider for a platform already fetched.** A second way to reach Reddit,
+  X, LinkedIn, YouTube, TikTok or Instagram. One folder and one registry
+  entry — [docs/sources.md](docs/sources.md) has the list.
+- **A fixture captured from a real response.** We never write one from memory;
+  Instagram alone contradicted three of its provider's documented claims.
+- **A connector's edge case you hit in the wild**, with the payload that
+  caused it.
+- **A doc that was wrong or missing** when you followed it.
+
+[Issues labelled **good first issue** or **help wanted**](https://github.com/rszhd/signalscout/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22%2C%22help+wanted%22)
+are the ones with a whole evening's shape. Each mirrors a ticket file, which
+holds the reasoning and the definition of done.
+
+**A seventh social network is refused.** PLAN.md holds one rule above the
+others:
 
 > Do not add another social network until Reddit and X reliably produce useful
 > matches.
 
 A product with two sources that surfaces five genuinely valuable conversations a
-day beats one with twenty sources generating hundreds of noisy alerts. Help with
-detection quality first.
-
-Six platforms are in the build, and the rule has been crossed four times — each
-one on the owner's decision, each one recorded in its ticket rather than left
-to look like an oversight. It is still the rule, and a pull request adding a
-seventh source meets this same answer.
+day beats one with twenty sources generating hundreds of noisy alerts. Six
+platforms are in the build, and the rule has been crossed four times — each on
+the owner's decision, each recorded in its ticket rather than left to look like
+an oversight. It is still the rule, and a pull request adding a seventh meets
+this same answer.
 
 This repository is written with an AI coding agent, and you may use one too.
 [AI_POLICY.md](AI_POLICY.md) is the rule: understand every line you submit,

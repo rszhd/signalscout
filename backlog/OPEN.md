@@ -2,7 +2,7 @@
 
 # Open tickets
 
-48 open — 1 doing, 38 todo, 9 parked (2 p1, 30 p2, 16 p3).
+48 open — 1 doing, 38 todo, 9 parked (2 p1, 31 p2, 15 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -37,12 +37,12 @@
 | p2 | BUG-311 | [pnpm verdicts offers matches the reader cannot judge](todo/BUG-311-verdicts-offers-matches-the-reader-cannot-judge.md) | bug | todo | 2026-09-22T21:40+08:00 |
 | p2 | BUG-324 | [A long provider wait holds back every platform of a monitor](todo/BUG-324-a-long-provider-wait-holds-back-every-platform.md) | bug | todo | 2026-09-23T06:27+08:00 |
 | p2 | BUG-325 | [A deploy kills a poll that is still running](todo/BUG-325-a-deploy-kills-a-poll-that-is-still-running.md) | bug | todo | 2026-09-23T06:27+08:00 |
+| p2 | BUG-338 | [The image ships the development tools](todo/BUG-338-the-image-ships-the-development-tools.md) | bug | todo | 2026-09-23T07:58+08:00 |
 | p2 | US-322 | [A match reaches Slack, Discord or Telegram](parked/US-322-a-match-reaches-slack-discord-or-telegram.md) | feature | parked | 2026-09-23T05:44+08:00 |
 | p3 | US-018 | [A mutation sweep proves the suite is sensitive](todo/US-018-a-mutation-sweep-proves-the-suite-is-sensitive.md) | chore | todo | 2026-09-04T22:54+08:00 |
 | p3 | US-095 | [The logo travels with the email](todo/US-095-the-logo-travels-with-the-email.md) | feature | todo | 2026-09-10T00:36+08:00 |
 | p3 | US-243 | [One Instagram comment link is opened](todo/US-243-one-instagram-comment-link-is-opened.md) | chore | todo | 2026-09-20T00:56+08:00 |
 | p3 | US-326 | [The npm packages ship no paid-run or debugging scripts](todo/US-326-the-npm-packages-ship-no-paid-run-scripts.md) | chore | todo | 2026-09-23T06:27+08:00 |
-| p3 | US-332 | [The licence check and the audit run in CI and pass](todo/US-332-the-licence-check-and-the-audit-run-in-ci.md) | chore | todo | 2026-09-23T06:41+08:00 |
 | p3 | US-333 | [A budget read adds up only the monitors it needs](todo/US-333-a-budget-read-adds-up-only-the-monitors-it-needs.md) | chore | todo | 2026-09-23T06:41+08:00 |
 | p3 | US-335 | [The paid-run scripts share one harness](todo/US-335-the-paid-run-scripts-share-one-harness.md) | chore | todo | 2026-09-23T06:46+08:00 |
 | p3 | BUG-013 | [A key row's error is printed inside a closed dialog](todo/BUG-013-a-key-row-s-error-is-printed-inside-a-closed-dialog.md) | bug | todo | 2026-09-09T11:58+08:00 |

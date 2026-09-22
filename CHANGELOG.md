@@ -59,8 +59,14 @@ sets no rule for the mark (US-283).
 (`maximumRetryAfterSeconds`). A wait of zero, a time already past or a value
 that is not a wait takes the connector's own fallback, where three connectors
 used to retry at once. A connector's `waitUntil` can therefore be earlier than
-before for a long wait, and later for a zero one. No export changed, so the
-version is a patch.
+before for a long wait, and later for a zero one. No export changed.
+
+**Changed.** `draftContext` takes the user id before the match id and
+answers only for a match on that account's monitor (BUG-330). A consumer
+that calls it passes the signed-in user. **Added.** `readOwnedEstimate(db,
+userId, id)`, a cost test read that answers only for the account that started
+it; `readEstimate` still answers for the whole instance, for the worker. A
+changed signature on an export, so the version is a minor.
 
 ## 0.13.1 — 2026-09-22
 

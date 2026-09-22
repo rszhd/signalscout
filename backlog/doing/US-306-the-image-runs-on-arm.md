@@ -1,5 +1,6 @@
 ---
 id: US-306
+issue: 61
 title: The image runs on ARM
 type: feature
 priority: p2

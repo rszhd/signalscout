@@ -13,6 +13,7 @@
  */
 import type { Logger } from "../../../logger.js";
 import type { SourceRuntime } from "../../types.js";
+import { type ProviderAnswer, ProviderError, readAnswer, retryAfterDate } from "../core.js";
 
 const apiBase = "https://api.socialdata.tools";
 
@@ -48,18 +49,9 @@ export const endpoints = {
  * nowhere left to go. `balance` is the new one, and it is separate because its
  * repair is on the provider's website rather than in this product.
  */
-export class SocialDataError extends Error {
-  constructor(
-    readonly kind: "credentials" | "balance" | "input" | "rateLimit" | "provider",
-    message: string,
-    readonly httpStatus: number,
-    /** Set only on `rateLimit`, and only when the provider named a time. */
-    readonly retryAfter?: Date,
-  ) {
-    super(message);
-    this.name = "SocialDataError";
-  }
-}
+export class SocialDataError extends ProviderError<
+  "credentials" | "balance" | "input" | "rateLimit" | "provider"
+> {}
 
 /** One page of tweets, and how many of them the account was billed for. */
 export interface Page {
@@ -82,11 +74,7 @@ export interface Page {
 /** How long to wait when the provider rate-limits us and names no time. */
 const defaultRetrySeconds = 60;
 
-interface Answer {
-  readonly httpStatus: number;
-  readonly body: unknown;
-  readonly retryAfterHeader: string | null;
-}
+type Answer = ProviderAnswer;
 
 export interface SocialDataClientOptions {
   readonly runtime: SourceRuntime;
@@ -124,22 +112,7 @@ export class SocialDataClient {
       ...(signal ? { signal } : {}),
     });
 
-    const body = await response.text();
-
-    // A refusal is not guaranteed to be JSON. Parsing strictly would turn the
-    // one error a user can fix into an unreadable parse failure.
-    let parsed: unknown;
-    try {
-      parsed = JSON.parse(body);
-    } catch {
-      parsed = body;
-    }
-
-    return {
-      httpStatus: response.status,
-      body: parsed,
-      retryAfterHeader: response.headers.get("retry-after"),
-    };
+    return readAnswer(response);
   }
 
   /**
@@ -310,8 +283,7 @@ export class SocialDataClient {
   }
 
   private retryAt(header: string | null): Date {
-    const seconds = header && /^\d+$/.test(header) ? Number(header) : defaultRetrySeconds;
-    return new Date(this.runtime.now().getTime() + seconds * 1000);
+    return retryAfterDate(header, this.runtime.now(), defaultRetrySeconds);
   }
 }
 

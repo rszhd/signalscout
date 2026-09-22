@@ -32,10 +32,10 @@ the code and not observed: no provider has been seen to send a long wait.
 
 ## Acceptance
 
-- [ ] One function in `packages/engine` turns a `Retry-After` header into a
+- [x] One function in `packages/engine` turns a `Retry-After` header into a
       date, and every provider client uses it.
-- [ ] It reads both forms of the header: seconds, and an HTTP date.
-- [ ] It never returns a wait longer than a named maximum, and a test proves
+- [x] It reads both forms of the header: seconds, and an HTTP date.
+- [x] It never returns a wait longer than a named maximum, and a test proves
       the limit with `Retry-After: 86400`.
 - [ ] A test shows that a monitor with one platform waiting still polls its
       other platforms at its normal interval, or the Log says why the design
@@ -53,3 +53,9 @@ the code and not observed: no provider has been seen to send a long wait.
 ## Log
 
 - 2026-09-23T06:27+08:00 — Found in a review of the open repository.
+- 2026-09-23T07:11+08:00 — Three boxes done by US-334: `retryAfterDate` in
+  `packages/engine/src/sources/providers/core.ts`, used by the four clients
+  that read the header, with a maximum of one hour and a test for
+  `Retry-After: 86400`. The wait that is left is shorter, not gone: a
+  monitor's other platforms still wait with the one that asked, for up to an
+  hour. The last box is about that.

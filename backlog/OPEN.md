@@ -2,12 +2,11 @@
 
 # Open tickets
 
-35 open — 0 doing, 30 todo, 5 parked (2 p1, 22 p2, 11 p3).
+34 open — 0 doing, 29 todo, 5 parked (1 p1, 22 p2, 11 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
 | p1 | US-033 | [Thirty verdicts say whether the score is right](todo/US-033-thirty-verdicts-say-whether-the-score-is-right.md) | chore | todo | 2026-09-06T03:02+08:00 |
-| p1 | US-292 | [The README's first screen shows the product and names the cloud](todo/US-292-the-readme-s-first-screen-shows-the-product-and-the-cloud.md) | chore | todo | 2026-09-22T15:58+08:00 |
 | p2 | US-035 | [A monitor is told where people are talking](todo/US-035-a-monitor-is-told-where-people-are-talking.md) | spike | todo | 2026-09-06T11:40+08:00 |
 | p2 | US-036 | [A provider is rated per platform, from measurements](todo/US-036-a-provider-is-rated-per-platform-from-measurements.md) | spike | todo | 2026-09-06T11:48+08:00 |
 | p2 | US-037 | [One subscription is enough](todo/US-037-one-subscription-is-enough.md) | feature | todo | 2026-09-06T11:48+08:00 |

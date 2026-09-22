@@ -1,5 +1,6 @@
 ---
 id: US-305
+issue: 60
 title: The application comments lose their stories
 type: chore
 priority: p3

@@ -1,5 +1,6 @@
 ---
 id: US-304
+issue: 59
 title: The pipeline comments lose their stories
 type: chore
 priority: p3

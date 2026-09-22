@@ -35,6 +35,17 @@ the story around it.
 `packages/engine/src/sources/providers/apify/linkedin.ts` belong to US-258. Do US-258
 first and leave those alone here.
 
+**Parked on 2026-09-22, the day it was written**, because US-258 tested the
+premise on four files of three different kinds and it did not hold. Read its
+Log before restarting this. The short version: these comments are contracts,
+not stories, and reading every long block bought two per cent.
+
+**What would make this worth doing** is a narrower rule than "read every
+block": a measurement in the code that already sits in docs/history.md is a
+duplicate, and cutting it costs nothing and removes a second copy that can
+drift. `apify/linkedin.ts` held one. Nobody has counted how many more there
+are, and counting them is a smaller ticket than this one.
+
 ## Acceptance
 
 - [ ] `node scripts/comment-density.mjs --blocks --min=15` is run first, and
@@ -55,3 +66,4 @@ first and leave those alone here.
 ## Log
 
 - 2026-09-22T20:05+08:00 — Split from US-302, which holds the rule and the measurement.
+- 2026-09-22T21:10+08:00 — Parked the day it was written. US-258 swept four files first and found contracts rather than stories: 1,406 comment lines became 1,378, and the ten schema files gave up nothing at all. Grinding this area's blocks for the same return is not worth a session. What is worth doing is the narrower thing in the Context above.

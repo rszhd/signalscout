@@ -158,7 +158,9 @@ first encrypt.
 Manual, on purpose: rare, not reversible without the old key, and every row
 moves at once in one transaction.
 
-1. **Back up the database.** The old key is the only way back.
+1. **Back up the database** — [self-hosting.md](self-hosting.md), *Backing
+   up*, has the command. The old key is the only way back, so keep the `.env`
+   holding it until step 7 has passed.
 2. **Generate the new key**: `openssl rand -base64 32`.
 3. **Stop the application**, both processes. A running process holds the old
    key and will write with it.

@@ -2,7 +2,7 @@
 
 # Done
 
-204 finished.
+207 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
@@ -29,6 +29,8 @@
 | BUG-003 | [A post below the threshold is classified again on every poll](done/2026-09/BUG-003-a-post-below-the-threshold-is-classified-again-on-every-poll.md) | bug | fixed | 2026-09 |
 | BUG-002 | [A seven-day window is bought as a month](done/2026-09/BUG-002-a-seven-day-window-is-bought-as-a-month.md) | bug | fixed | 2026-09 |
 | BUG-001 | [A pending Reddit collection is not resumed](done/2026-09/BUG-001-a-pending-reddit-collection-is-not-resumed.md) | bug | shipped | 2026-09 |
+| US-308 | [The app container says whether it is alive](done/2026-09/US-308-the-app-container-says-whether-it-is-alive.md) | bug | shipped | 2026-09 |
+| US-307 | [A self-hoster is told how to upgrade, and how to back up](done/2026-09/US-307-a-self-hoster-is-told-how-to-upgrade-and-how-to-back-up.md) | chore | shipped | 2026-09 |
 | US-302 | [A comment says what the code cannot, and a number goes to history](done/2026-09/US-302-a-comment-says-what-the-code-cannot-and-a-number-goes-to-history.md) | chore | shipped | 2026-09 |
 | US-301 | [A newcomer has a map that fits on one page](done/2026-09/US-301-a-newcomer-has-a-map-that-fits-on-one-page.md) | chore | shipped | 2026-09 |
 | US-300 | [The project says how AI may be used, by the owner and by a contributor](done/2026-09/US-300-the-project-says-how-ai-may-be-used.md) | chore | shipped | 2026-09 |
@@ -63,6 +65,7 @@
 | US-264 | [The monitor form sets the minimum score](done/2026-09/US-264-the-monitor-form-sets-the-minimum-score.md) | feature | shipped | 2026-09 |
 | US-261 | [The spacing scale lives in design.md](done/2026-09/US-261-the-spacing-scale-lives-in-design-md.md) | chore | shipped | 2026-09 |
 | US-259 | [AGENTS.md is cut to its rules](done/2026-09/US-259-agents-md-is-cut-to-its-rules.md) | chore | shipped | 2026-09 |
+| US-258 | [The four densest files lose their inline stories](done/2026-09/US-258-the-four-densest-files-lose-their-inline-stories.md) | chore | shipped | 2026-09 |
 | US-250 | [The next four documents are cut to their rules](done/2026-09/US-250-the-next-four-documents-are-cut-to-their-rules.md) | chore | shipped | 2026-09 |
 | US-249 | [Recurring procedures are skills, and two checks are hooks](done/2026-09/US-249-recurring-procedures-are-skills-and-two-checks-are-hooks.md) | chore | shipped | 2026-09 |
 | US-248 | [schema.ts is split by table family](done/2026-09/US-248-schema-ts-is-split-by-table-family.md) | chore | shipped | 2026-09 |

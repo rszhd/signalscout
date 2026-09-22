@@ -1,34 +1,29 @@
 /**
  * The connector interface every social source implements.
  *
- * PLAN.md sketches three members: `id`, `validateCredentials` and `search`.
- * Three facts about how Reddit and X actually bill and throttle are missing
- * from that sketch, and each one, left out, ends up copied into the worker:
+ * A **platform** is what a person ticks: it keys `posts.source`, it keys
+ * deduplication, and a monitor names it. A **provider** is who fetches, whose
+ * key it is, and what it bills. A **connector** is the pair, and it is what
+ * the registry holds. The two are separate because two providers fetching
+ * Reddit agree about neither the price, the billable unit nor the key list
+ * (US-024).
+ *
+ * Three members exist because the alternative is copying a provider's
+ * behaviour into the worker:
  *
  * 1. **A page carries a cost as well as a cursor.** One provider bills a call
- *    that returns up to 100 posts, another bills every record, and a third
- *    refunds the call that found nothing. The caller cannot work the charge out
- *    from the post count, so `search` reports it.
+ *    returning up to 100 posts, another bills every record, a third refunds
+ *    the call that found nothing. The charge cannot be derived from the post
+ *    count, so `search` reports it.
  * 2. **Back-off belongs to the connector.** Every provider says "slow down" in
- *    its own dialect, and one of ours has never said it at all. The caller
- *    learns only *when* to come back, never how the connector found out.
- * 3. **A source declares its own price.** The budget guard needs a number, and
- *    the three we ship differ by a factor of five. Hard-coding one in the
- *    worker puts a pricing fact in the wrong file.
+ *    its own dialect, and one of ours never says it at all. The caller learns
+ *    when to come back, never how the connector found out.
+ * 3. **A source declares its own price**, because the three we ship differ by
+ *    a factor of five and the budget guard needs a number.
  *
- * US-024 split the word "source" into the two things it had been holding at
- * once. Until then one provider served one platform, so one record could
- * describe both. Two providers fetching Reddit cannot share a price, a
- * billable unit or a key list, so the axes are separate here:
- *
- * * A **platform** is what a person ticks. It keys `posts.source`, it keys
- *   deduplication, and a monitor names it.
- * * A **provider** is who fetches, whose key it is, and what it bills.
- * * A working **connector** is the pair, and it is what the registry holds.
- *
- * The rule underneath did not change. The interface is not weakened to suit a
- * provider, and nothing downstream of a connector learns which provider
- * answered. STACK.md, *A source is not a provider*.
+ * The interface is not weakened to suit a provider, and nothing downstream of
+ * a connector learns which one answered. STACK.md, *A source is not a
+ * provider*.
  */
 import type { Logger } from "../logger.js";
 
@@ -216,18 +211,13 @@ export interface CandidateReply extends CandidatePost {
    * Where the provider put this reply in the thread, counting from zero.
    *
    * **The provider's own order, not ours, and not the order of what we kept.**
-   * It counts every item the provider returned, including the ones a
-   * connector then dropped for being out of window or belonging to another
-   * post — so the stored positions have gaps, and a gap is honest evidence
-   * rather than a defect.
+   * It counts every item the provider returned, including the ones a connector
+   * then dropped for being out of window or belonging to another post — so the
+   * stored positions have gaps, and a gap is evidence rather than a defect.
    *
-   * US-048 exists because nobody knows what this order is worth. A platform
-   * ranks a comment for a general viewer, by likes and replies and recency.
-   * This product wants intent, and a person asking a question has no likes,
-   * because nobody likes a question. Whether our leads sit at the top of that
-   * ordering, the bottom, or evenly through it decides whether reading a deep
-   * thread in batches should ever stop early — and it cannot be asked at all
-   * unless the position is kept.
+   * Keeping it is what let US-048 measure that leads sit *deeper* than a
+   * platform's own ranking suggests, so a batched read must not stop early.
+   * docs/history.md, *Sources*, has the numbers.
    *
    * Absent where a connector cannot say.
    */
@@ -243,18 +233,16 @@ export interface ReplyRequest {
   /**
    * Return nothing said at or before this time.
    *
-   * A thread outlives the post above it. US-034's live YouTube poll returned a
-   * comment written in **June 2021** — 1,915 days old — as a lead, because
-   * nothing here carried a window and the connector had nothing to cut on. A
-   * person who wanted a Cypress alternative five years ago chose one long ago.
+   * **A thread outlives the post above it**, so without this a five-year-old
+   * comment arrives as a lead (US-034 measured one; docs/history.md,
+   * *Sources*).
    *
-   * A connector applies this itself, whatever the provider offers. Most
-   * offer nothing: where the platform orders newest first, the cut is a cheap
-   * walk, and where it does not, it is a filter over a page already paid for.
-   * Apify's LinkedIn comments actor is the one exception, with a named
-   * `postedLimit` window — US-159 — and even there the exact cut is still made
-   * here, because a named range is not a timestamp. Either way it must never
-   * be ignored.
+   * **A connector applies it itself, whatever the provider offers**, and most
+   * offer nothing: where the platform orders newest first the cut is a cheap
+   * walk, and where it does not it is a filter over a page already paid for.
+   * Apify's LinkedIn comments actor is the one exception with its named
+   * `postedLimit` window (US-159), and even there the exact cut is made here,
+   * because a named range is not a timestamp. It is never ignored.
    */
   readonly since?: Date;
   /** Opaque, from a previous `ReplyResult`. Absent starts at the first page. */
@@ -463,22 +451,19 @@ export interface ConnectorDescriptor {
   /**
    * How many posts one billable unit brought back, when somebody measured it.
    *
-   * The price alone cannot be compared across providers, because the units are
-   * different things: one SocialCrawl credit buys 45 YouTube results and 2
-   * LinkedIn posts, so the same credit price is a twentyfold difference in what
-   * a post costs. This is the number that makes `pricePerUnitMicros` mean
-   * something on a screen where two providers sit side by side.
+   * A price cannot be compared across providers without it, because a unit is
+   * a different thing at each one — one SocialCrawl credit buys twenty times
+   * more YouTube than LinkedIn. This is what makes `pricePerUnitMicros` mean
+   * something where two providers sit side by side.
    *
-   * **It is measured, never estimated.** It belongs to a capture run, like the
-   * price does, and the comment beside each one says which. A connector whose
-   * yield nobody has measured leaves it out, and the pricing page says so
-   * rather than inventing a number.
+   * **It is measured, never estimated**, and it belongs to a capture run the
+   * way the price does. A connector whose yield nobody has measured leaves it
+   * out, and the pricing page says so rather than inventing a number.
    *
-   * Where a connector has two discovery modes with different yields — a
-   * ScrapeCreators Reddit keyword request bought 7 posts and a subreddit
-   * request 23 — the **smaller** is declared. Over-reporting a bill is the
-   * direction this repository rounds: a person told they will spend more than
-   * they do stops early, and a person told the reverse spends past their cap.
+   * **Where a connector has two discovery modes, the smaller yield is
+   * declared.** Over-reporting a bill is the direction this repository rounds:
+   * a person told they will spend more than they do stops early, and a person
+   * told the reverse spends past their cap. docs/costs.md has the figures.
    *
    * Never used to bill anything. `unitsConsumed` is what a provider reported
    * and is the only number the budget guard may count; this is for a person
@@ -526,21 +511,20 @@ export interface ConnectorDescriptor {
    * monitor that names the platform is refused with it, and a poll that skips
    * the platform records it. "Off" with no reason is a bug report.
    *
-   * The connector is switched off, not deleted. Its file, its parser, its
-   * fixtures and its tests stay, and the way back is deleting this one field —
-   * which is why the sentence says what would have to change for it to come
-   * back rather than only what is wrong today.
+   * The connector is switched off, not deleted: its file, parser, fixtures and
+   * tests stay, and the way back is deleting this one field. So the sentence
+   * says what would have to change for it to return, not only what is wrong
+   * today.
    *
-   * It is on the *pair* and never on the platform. LinkedIn through SocialCrawl
-   * is dear; LinkedIn through Apify is not, and the platform stays. A platform
-   * whose every connector is switched off disappears from the screens, and a
-   * poll of a monitor already naming it skips it with this sentence rather than
-   * failing the job.
+   * **It is on the pair, never on the platform.** LinkedIn through SocialCrawl
+   * is dear and LinkedIn through Apify is not, so the platform stays. A
+   * platform whose every connector is off leaves the screens, and a poll of a
+   * monitor already naming it skips it with this sentence rather than failing.
    *
-   * Two things it does not stop, both deliberate. A collection already bought
+   * **Two things it deliberately does not stop.** A collection already bought
    * is still resumed and read, through `get` and the continuation's own
-   * provider — refusing there would throw away money already spent. And the
-   * connector is still built, still exported and still tested.
+   * provider, because refusing there throws away money already spent. And the
+   * connector is still built, exported and tested.
    */
   readonly notOffered?: string;
   /**
@@ -604,11 +588,10 @@ export interface SocialSource extends ConnectorDescriptor {
    * building a connector, because the monitor form has to say which of a
    * person's platforms will actually return them.
    *
-   * US-020. Every provider we have reads replies under one post — by URL, or
-   * by the id SocialData puts in its path — so this is a second call and not
-   * a flag on `search`. Apify's search actor does offer such a flag, and
-   * US-159 chose its comments actor over it for exactly this reason: a flag
-   * on the search buys comments under posts the pre-filter is about to drop.
+   * It is a second call and not a flag on `search`, because every provider we
+   * have reads replies under one post. Apify's search actor does offer such a
+   * flag and US-159 refused it: a flag on the search buys comments under posts
+   * the pre-filter is about to drop.
    */
   fetchReplies?(request: ReplyRequest): Promise<ReplyResult>;
 }

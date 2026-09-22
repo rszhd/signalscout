@@ -1,5 +1,6 @@
 ---
 id: US-099
+issue: 47
 title: A button, a field and a dialog are one component each
 type: chore
 priority: p2

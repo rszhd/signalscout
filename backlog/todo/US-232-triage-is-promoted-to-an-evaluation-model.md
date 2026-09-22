@@ -1,5 +1,6 @@
 ---
 id: US-232
+issue: 49
 title: Triage is promoted to an evaluation model
 type: feature
 priority: p2

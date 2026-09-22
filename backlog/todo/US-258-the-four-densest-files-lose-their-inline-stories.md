@@ -1,5 +1,6 @@
 ---
 id: US-258
+issue: 53
 title: The four densest files lose their inline stories
 type: chore
 priority: p3

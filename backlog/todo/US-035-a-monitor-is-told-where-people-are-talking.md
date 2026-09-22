@@ -1,5 +1,6 @@
 ---
 id: US-035
+issue: 37
 title: A monitor is told where people are talking
 type: spike
 priority: p2

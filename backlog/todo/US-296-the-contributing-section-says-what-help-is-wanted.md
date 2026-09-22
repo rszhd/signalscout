@@ -1,5 +1,6 @@
 ---
 id: US-296
+issue: 55
 title: The contributing section says what help is wanted, before what is refused
 type: chore
 priority: p2

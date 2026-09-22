@@ -1,5 +1,6 @@
 ---
 id: US-046
+issue: 42
 title: A reply is posted from the inbox
 type: feature
 priority: p2

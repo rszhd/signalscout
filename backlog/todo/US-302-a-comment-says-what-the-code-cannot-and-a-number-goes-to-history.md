@@ -1,5 +1,6 @@
 ---
 id: US-302
+issue: 57
 title: A comment says what the code cannot, and a number goes to history
 type: chore
 priority: p2

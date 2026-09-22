@@ -1,5 +1,6 @@
 ---
 id: US-037
+issue: 39
 title: One subscription is enough
 type: feature
 priority: p2

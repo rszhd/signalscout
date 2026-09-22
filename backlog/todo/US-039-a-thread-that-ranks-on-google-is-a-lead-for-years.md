@@ -1,5 +1,6 @@
 ---
 id: US-039
+issue: 40
 title: A thread that ranks on Google is a lead for years
 type: spike
 priority: p2

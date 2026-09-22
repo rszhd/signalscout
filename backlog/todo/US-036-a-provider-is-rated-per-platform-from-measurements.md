@@ -1,5 +1,6 @@
 ---
 id: US-036
+issue: 38
 title: A provider is rated per platform, from measurements
 type: spike
 priority: p2

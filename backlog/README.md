@@ -26,6 +26,33 @@ Rebuild them from the ticket files:
 The script owns both files whole. Do not edit them by hand; the next run
 overwrites the change.
 
+## The mirror on GitHub
+
+Every ticket in `todo/` and `doing/` has one GitHub issue, and
+[`sync.sh`](sync.sh) makes it so:
+
+    backlog/sync.sh              open, update and close issues to match the files
+    backlog/sync.sh --dry-run    print what it would do, change nothing
+    backlog/sync.sh --check      exit 1 if the mirror is out of date
+
+**The file wins.** The issue's title is `US-123: <title>`, its body is the
+ticket's **Context** and a link to the file, and both are rewritten from the
+file on the next run. Nothing flows the other way: a comment on an issue is
+for people, and the script never reads one. A ticket that reaches `done/` or
+`parked/` has its issue closed, with the resolution as the reason.
+
+Two frontmatter fields serve it. `issue:` is the number, written back by the
+script — do not set it by hand. `labels:` is a list the script puts on the
+issue beside `ticket`, and it is how `good first issue` reaches a newcomer:
+
+```yaml
+labels: [good first issue, easy]
+```
+
+A request that arrives as an issue goes the other way, by hand: if it is
+agreed, write a ticket file, name the issue in its **Notes**, and comment on
+the issue with the ticket's link. CONTRIBUTING.md says this to contributors.
+
 ## Rules
 
 1. The folder is the status. There is no `status:` field. Never add one.

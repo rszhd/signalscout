@@ -1,5 +1,6 @@
 ---
 id: US-326
+issue: 78
 labels: [good first issue, easy]
 title: The npm packages ship no paid-run or debugging scripts
 type: chore

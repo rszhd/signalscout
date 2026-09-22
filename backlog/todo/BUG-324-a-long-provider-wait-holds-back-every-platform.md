@@ -1,5 +1,6 @@
 ---
 id: BUG-324
+issue: 76
 title: A long provider wait holds back every platform of a monitor
 type: bug
 priority: p2

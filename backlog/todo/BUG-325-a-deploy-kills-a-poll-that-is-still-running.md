@@ -1,5 +1,6 @@
 ---
 id: BUG-325
+issue: 77
 title: A deploy kills a poll that is still running
 type: bug
 priority: p2

@@ -2,7 +2,7 @@
 
 # Done
 
-199 finished.
+200 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
@@ -31,6 +31,7 @@
 | BUG-001 | [A pending Reddit collection is not resumed](done/2026-09/BUG-001-a-pending-reddit-collection-is-not-resumed.md) | bug | shipped | 2026-09 |
 | US-300 | [The project says how AI may be used, by the owner and by a contributor](done/2026-09/US-300-the-project-says-how-ai-may-be-used.md) | chore | shipped | 2026-09 |
 | US-297 | [The README has a roadmap a visitor can read](done/2026-09/US-297-the-readme-has-a-roadmap-a-visitor-can-read.md) | chore | shipped | 2026-09 |
+| US-295 | [A self-hoster runs the published image without git or Node](done/2026-09/US-295-a-self-hoster-runs-the-image-without-git-or-node.md) | feature | shipped | 2026-09 |
 | US-294 | [The repository has a door](done/2026-09/US-294-the-repository-has-a-door.md) | chore | shipped | 2026-09 |
 | US-293 | [A tag is a GitHub Release, and the repository can be found](done/2026-09/US-293-a-tag-is-a-github-release-and-the-repository-can-be-found.md) | chore | shipped | 2026-09 |
 | US-292 | [The README's first screen shows the product and names the cloud](done/2026-09/US-292-the-readme-s-first-screen-shows-the-product-and-the-cloud.md) | chore | shipped | 2026-09 |

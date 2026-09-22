@@ -142,7 +142,11 @@ say they can be mixed.
 
 5. Watch the *Release* workflow. It publishes nothing until the checks pass,
    and it says which step refused if one does.
-6. The last job makes the GitHub Release, titled with the tag and holding
+6. A job re-tags the published image with `0.2.0` and `0.2`, from CI's
+   cache. `latest` is not among them: that one follows `main`, and a tag can
+   point at a commit `main` has moved past. A self-hoster pins a version with
+   `SIGNALSCOUT_IMAGE` (docs/self-hosting.md).
+7. The last job makes the GitHub Release, titled with the tag and holding
    the tag's section of CHANGELOG.md. It runs after npm has the packages,
    so a refused publish leaves no Release naming a version nobody can
    install. It is what a watcher of this repository receives.

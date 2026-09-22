@@ -13,22 +13,38 @@ stored.
 
 ## Install
 
+Two files and one command. No git, no Node, nothing compiled on the server:
+
+```bash
+curl -O https://raw.githubusercontent.com/rszhd/signalscout/main/docker-compose.yml
+curl -o .env https://raw.githubusercontent.com/rszhd/signalscout/main/.env.example.self-hosted
+echo "AUTH_SECRET=$(openssl rand -base64 32)" >> .env
+echo "ENCRYPTION_KEY=$(openssl rand -base64 32)" >> .env
+docker compose up -d
+```
+
+The app is then on <http://localhost:3000>. The compose file pulls
+`ghcr.io/rszhd/signalscout:latest`, which CI builds from `main` and publishes.
+
+**Pin a version** once the instance matters. `latest` follows `main`, so it
+moves when `main` does:
+
+```bash
+echo "SIGNALSCOUT_IMAGE=ghcr.io/rszhd/signalscout:0.13.1" >> .env
+```
+
+Tags are published for the full version (`0.13.1`), the major and minor
+(`0.13`), and `latest`. [releasing.md](releasing.md) says when each moves.
+
+**If you want to change the code**, clone the repository and build the image
+instead. `pnpm setup` writes the same `.env` the two `curl` lines produce,
+and needs Node:
+
 ```bash
 git clone https://github.com/rszhd/signalscout
 cd signalscout
-pnpm setup                # writes .env, and the two secrets it cannot ship
+pnpm setup
 docker compose -f docker-compose.yml -f docker-compose.build.yml up --build
-```
-
-The app is then on <http://localhost:3000>.
-
-**On a server with no Node**, which is the point of the Docker path, do the
-same thing with `openssl`:
-
-```bash
-cp .env.example.self-hosted .env
-echo "AUTH_SECRET=$(openssl rand -base64 32)" >> .env
-echo "ENCRYPTION_KEY=$(openssl rand -base64 32)" >> .env
 ```
 
 ### The two example files

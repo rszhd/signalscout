@@ -9,17 +9,19 @@ problem your product solves — and read why each one scored.
 application, on our servers, with the provider keys already in place. It
 charges for not running a server, never for a feature this build lacks.
 
-Or run it yourself:
+Or run it yourself. No git, no Node, no build — one compose file and the
+published image:
 
 ```bash
-git clone https://github.com/rszhd/signalscout
-cd signalscout
-pnpm setup
-docker compose -f docker-compose.yml -f docker-compose.build.yml up --build
+curl -O https://raw.githubusercontent.com/rszhd/signalscout/main/docker-compose.yml
+curl -o .env https://raw.githubusercontent.com/rszhd/signalscout/main/.env.example.self-hosted
+echo "AUTH_SECRET=$(openssl rand -base64 32)" >> .env
+echo "ENCRYPTION_KEY=$(openssl rand -base64 32)" >> .env
+docker compose up -d
 ```
 
-The app is then on <http://localhost:3000>. [Running it](#running-it) has the
-whole install.
+The app is then on <http://localhost:3000>, asking you to make the first
+account. [Running it](#running-it) has the rest.
 
 ---
 
@@ -131,12 +133,29 @@ say it here than let you find it in an agreement you skimmed.
 
 ## Running it
 
-The four lines at the top are the whole install. `pnpm setup` writes `.env`
-from `.env.example.self-hosted`, plus the two secrets it cannot ship.
+The five lines at the top are the whole install. The compose file pulls
+`ghcr.io/rszhd/signalscout`, which CI builds and publishes, so a 1 GB server
+never compiles anything. `.env.example.self-hosted` names every setting worth
+having and boots as it stands; the two secrets are not in it, because a
+committed file cannot carry a secret.
+
+**Pin a version** rather than following `latest` once you have an instance
+you care about: `SIGNALSCOUT_IMAGE=ghcr.io/rszhd/signalscout:0.13.1` in
+`.env`. Tags exist for the full version, for the major and minor, and for
+`latest`.
 
 On first boot the app asks you to make the first account, and refuses every
 registration after it. One Postgres and one Node process, designed for a 1 GB
 VPS.
+
+**To change the code**, clone it and build the image yourself:
+
+```bash
+git clone https://github.com/rszhd/signalscout
+cd signalscout
+pnpm setup
+docker compose -f docker-compose.yml -f docker-compose.build.yml up --build
+```
 
 **Put it behind TLS before you give it a public address.** It holds provider
 keys that spend money and an inbox of your own research.

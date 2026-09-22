@@ -1,5 +1,6 @@
 ---
 id: US-319
+issue: 73
 title: A self-hoster can check where the image came from
 type: chore
 priority: p2

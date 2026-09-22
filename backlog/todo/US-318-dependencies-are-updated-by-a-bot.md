@@ -1,5 +1,6 @@
 ---
 id: US-318
+issue: 72
 title: Dependencies are updated by a bot
 type: chore
 priority: p2

@@ -1,5 +1,6 @@
 ---
 id: US-320
+issue: 74
 title: The app deploys in one click
 type: feature
 priority: p2

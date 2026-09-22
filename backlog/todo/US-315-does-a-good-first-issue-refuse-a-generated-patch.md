@@ -1,5 +1,6 @@
 ---
 id: US-315
+issue: 69
 title: Does a good first issue refuse a generated patch?
 type: spike
 priority: p2

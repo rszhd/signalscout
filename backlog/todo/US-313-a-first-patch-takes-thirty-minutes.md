@@ -1,5 +1,6 @@
 ---
 id: US-313
+issue: 67
 title: A first patch takes thirty minutes
 type: chore
 priority: p2

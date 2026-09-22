@@ -1,5 +1,6 @@
 ---
 id: US-314
+issue: 68
 title: Ten issues are open to a newcomer
 type: chore
 priority: p2

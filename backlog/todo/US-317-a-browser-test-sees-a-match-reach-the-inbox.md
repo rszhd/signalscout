@@ -1,5 +1,6 @@
 ---
 id: US-317
+issue: 71
 title: A browser test sees a match reach the inbox
 type: chore
 priority: p2

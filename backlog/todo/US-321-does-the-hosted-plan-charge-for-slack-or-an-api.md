@@ -1,5 +1,6 @@
 ---
 id: US-321
+issue: 75
 title: Does the hosted plan charge for Slack, Discord or an API?
 type: spike
 priority: p1

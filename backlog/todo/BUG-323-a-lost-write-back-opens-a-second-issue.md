@@ -1,5 +1,6 @@
 ---
 id: BUG-323
+issue: 66
 title: A lost write-back opens a second issue for one ticket
 type: bug
 priority: p2

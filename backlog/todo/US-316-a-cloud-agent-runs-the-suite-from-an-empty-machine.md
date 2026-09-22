@@ -1,5 +1,6 @@
 ---
 id: US-316
+issue: 70
 title: A cloud agent runs the suite from an empty machine
 type: chore
 priority: p2

@@ -68,6 +68,12 @@ userId, id)`, a cost test read that answers only for the account that started
 it; `readEstimate` still answers for the whole instance, for the worker. A
 changed signature on an export, so the version is a minor.
 
+**Fixed.** `isPublicAddress` reads an IPv6 address by its groups, so every
+spelling of one address gets one answer: an IPv4-mapped address in hex, as a
+URL writes it, is checked as the IPv4 address it carries (BUG-328).
+`assertPublicHost` accepts the bracketed literal `URL.hostname` returns and
+checks it without a lookup.
+
 ## 0.13.1 — 2026-09-22
 
 **Changed.** A monitor's first poll runs every search and charges every

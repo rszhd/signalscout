@@ -54,6 +54,8 @@ sets no rule for the mark (US-283).
 
 ## Unreleased
 
+## 0.13.1 — 2026-09-22
+
 **Changed.** A monitor's first poll runs every search and charges every
 search (US-291). Where the searches take turns, the poll that finds
 `last_polled_at` empty runs the whole turn, and the balance goes as far

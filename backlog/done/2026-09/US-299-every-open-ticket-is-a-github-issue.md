@@ -1,12 +1,13 @@
 ---
 id: US-299
+issue: 33
 title: Every open ticket is a GitHub issue, and closing the file closes it
 type: chore
 priority: p2
 created: 2026-09-22T16:28+08:00
 parent:
 area: tooling
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -29,31 +30,31 @@ US-294. This ticket is the script.
 
 ## Acceptance
 
-- [ ] `backlog/sync.sh` opens one issue per ticket under `todo/` and
+- [x] `backlog/sync.sh` opens one issue per ticket under `todo/` and
       `doing/` that has none, titled `US-123: <title>`, with the Context
       section as the body, a link to the ticket file at its `dev` path, and
       the `ticket` label. It writes the issue number back into the ticket's
       frontmatter as `issue:`, so the mapping lives in the file.
-- [ ] A ticket whose file reaches `done/` or `parked/` has its issue closed
+- [x] A ticket whose file reaches `done/` or `parked/` has its issue closed
       by the next run: `done/` with resolution `shipped` closes as
       completed; `dropped`, `duplicate` and `parked/` close as not planned,
       each with one comment saying which.
-- [ ] A ticket's title or Context change is pushed to the issue on the next
+- [x] A ticket's title or Context change is pushed to the issue on the next
       run. Nothing flows the other way; a comment on the issue is for
       people, and the script never reads it.
-- [ ] Ticket frontmatter gains an optional `labels:` list. The script sets
+- [x] Ticket frontmatter gains an optional `labels:` list. The script sets
       those labels on the issue beside `ticket`, and removes ones the file no
       longer names. This is how `good first issue` reaches the mirror
       (US-296).
-- [ ] `backlog/sync.sh --check` exits 1 when a `todo/` or `doing/` ticket has
+- [x] `backlog/sync.sh --check` exits 1 when a `todo/` or `doing/` ticket has
       no issue or an issue's title does not match, and says which. CI runs
       it on `main` the way `index.sh --check` runs today; it does not run on
       pull requests, which have no token that can write.
-- [ ] The script is idempotent: a second run with nothing changed makes no
+- [x] The script is idempotent: a second run with nothing changed makes no
       request that writes.
-- [ ] backlog/README.md gains a section *The mirror on GitHub*: what is
+- [x] backlog/README.md gains a section *The mirror on GitHub*: what is
       generated, what is not, and the rule that the file wins.
-- [ ] `index.sh` is not changed except to read and ignore the two new fields.
+- [x] `index.sh` is not changed except to read and ignore the two new fields.
 
 ## Notes
 
@@ -72,3 +73,7 @@ US-294. This ticket is the script.
 ## Log
 
 - 2026-09-22T16:28+08:00 — Written after the owner asked whether the backlog should move to Issues. It does not; the mirror does.
+- 2026-09-22T18:55+08:00 — Shipped. `backlog/sync.sh` with `--dry-run` and `--check` beside the plain run, the two frontmatter fields, the CI step, and *The mirror on GitHub* in this folder's README.
+- 2026-09-22T18:55+08:00 — The first run was split on the owner's decision: US-033 alone into issue #32, read and approved, then the remaining 25 into #33 to #57. 26 issues carry the `ticket` label and `--check` reports the mirror matches. US-033 also carries `help wanted`, which came from its `labels:` line and proves that path.
+- 2026-09-22T18:55+08:00 — The CI step runs only on a push to `main` and only for this repository's own pushes, because it reads issues through `gh` and a fork's job has no token that can. It reports rather than fails: an unmirrored ticket is a missing view, not a broken build, and one run of the script fixes it.
+- 2026-09-22T18:55+08:00 — Labels are reconciled both ways, but only over the five the script owns (`MANAGED_LABELS`). A label a person adds to an issue for triage is left alone; that is deliberate, because the file cannot know about it and a mirror that deletes a maintainer's work is worse than one that drifts.

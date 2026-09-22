@@ -1,5 +1,6 @@
 ---
 id: US-095
+issue: 46
 title: The logo travels with the email
 type: feature
 priority: p3

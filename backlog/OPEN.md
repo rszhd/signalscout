@@ -2,7 +2,7 @@
 
 # Open tickets
 
-31 open — 0 doing, 26 todo, 5 parked (1 p1, 20 p2, 10 p3).
+30 open — 0 doing, 25 todo, 5 parked (1 p1, 19 p2, 10 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -23,7 +23,6 @@
 | p2 | US-244 | [The screens no browser has rendered](todo/US-244-the-screens-no-browser-has-rendered.md) | chore | todo | 2026-09-20T00:56+08:00 |
 | p2 | US-260 | [A script measures what a session reads before it writes](todo/US-260-a-script-measures-what-a-session-reads-before-it-writes.md) | chore | todo | 2026-09-20T02:30+08:00 |
 | p2 | US-296 | [The contributing section says what help is wanted, before what is refused](todo/US-296-the-contributing-section-says-what-help-is-wanted.md) | chore | todo | 2026-09-22T16:06+08:00 |
-| p2 | US-299 | [Every open ticket is a GitHub issue, and closing the file closes it](todo/US-299-every-open-ticket-is-a-github-issue.md) | chore | todo | 2026-09-22T16:28+08:00 |
 | p2 | US-301 | [A newcomer has a map that fits on one page](todo/US-301-a-newcomer-has-a-map-that-fits-on-one-page.md) | chore | todo | 2026-09-22T16:32+08:00 |
 | p2 | US-302 | [A comment says what the code cannot, and a number goes to history](todo/US-302-a-comment-says-what-the-code-cannot-and-a-number-goes-to-history.md) | chore | todo | 2026-09-22T16:34+08:00 |
 | p2 | BUG-021 | [The classify tests time out on CI, and a red release run looks like the change](todo/BUG-021-classify-tests-time-out-on-ci.md) | bug | todo | 2026-09-19T02:01+08:00 |

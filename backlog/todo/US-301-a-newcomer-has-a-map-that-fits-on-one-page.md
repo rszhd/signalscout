@@ -1,5 +1,6 @@
 ---
 id: US-301
+issue: 56
 title: A newcomer has a map that fits on one page
 type: chore
 priority: p2

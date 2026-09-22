@@ -2,7 +2,7 @@
 
 # Done
 
-200 finished.
+201 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
@@ -30,6 +30,7 @@
 | BUG-002 | [A seven-day window is bought as a month](done/2026-09/BUG-002-a-seven-day-window-is-bought-as-a-month.md) | bug | fixed | 2026-09 |
 | BUG-001 | [A pending Reddit collection is not resumed](done/2026-09/BUG-001-a-pending-reddit-collection-is-not-resumed.md) | bug | shipped | 2026-09 |
 | US-300 | [The project says how AI may be used, by the owner and by a contributor](done/2026-09/US-300-the-project-says-how-ai-may-be-used.md) | chore | shipped | 2026-09 |
+| US-299 | [Every open ticket is a GitHub issue, and closing the file closes it](done/2026-09/US-299-every-open-ticket-is-a-github-issue.md) | chore | shipped | 2026-09 |
 | US-297 | [The README has a roadmap a visitor can read](done/2026-09/US-297-the-readme-has-a-roadmap-a-visitor-can-read.md) | chore | shipped | 2026-09 |
 | US-295 | [A self-hoster runs the published image without git or Node](done/2026-09/US-295-a-self-hoster-runs-the-image-without-git-or-node.md) | feature | shipped | 2026-09 |
 | US-294 | [The repository has a door](done/2026-09/US-294-the-repository-has-a-door.md) | chore | shipped | 2026-09 |

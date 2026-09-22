@@ -1,5 +1,7 @@
 ---
 id: US-033
+issue: 32
+labels: [help wanted]
 title: Thirty verdicts say whether the score is right
 type: chore
 priority: p1

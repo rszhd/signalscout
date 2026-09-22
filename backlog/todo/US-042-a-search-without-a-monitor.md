@@ -1,5 +1,6 @@
 ---
 id: US-042
+issue: 41
 title: A search without a monitor
 type: feature
 priority: p2

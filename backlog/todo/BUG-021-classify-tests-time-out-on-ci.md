@@ -1,5 +1,6 @@
 ---
 id: BUG-021
+issue: 35
 title: The classify tests time out on CI, and a red release run looks like the change
 type: bug
 priority: p2

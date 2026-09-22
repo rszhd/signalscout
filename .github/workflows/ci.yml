@@ -58,6 +58,18 @@ jobs:
       - name: The backlog lists match the ticket files
         run: backlog/index.sh --check
 
+      # Only on main, and only for this repository's own pushes: the check
+      # reads issues through `gh`, and a fork's job has no token that can.
+      # It reports rather than fails, because an unmirrored ticket is a
+      # missing view, not a broken build — `backlog/sync.sh` fixes it in one
+      # run. US-299.
+      - name: The issue mirror matches the ticket files
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: backlog/sync.sh --check
+
       # The DCO is the whole contribution agreement, so a commit without the
       # line has no agreement. Checked on pull requests from a fork only:
       # the owner's release branches carry commits from before the rule and

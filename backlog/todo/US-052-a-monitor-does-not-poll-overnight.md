@@ -1,5 +1,6 @@
 ---
 id: US-052
+issue: 44
 title: A monitor does not poll overnight
 type: feature
 priority: p2

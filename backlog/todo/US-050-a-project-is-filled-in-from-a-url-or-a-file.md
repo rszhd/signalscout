@@ -1,5 +1,6 @@
 ---
 id: US-050
+issue: 43
 title: A project is filled in from a URL or a file
 type: feature
 priority: p2

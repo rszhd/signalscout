@@ -61,3 +61,20 @@ read the source, store the posts, book the resume.
   ids instead of adding to the run's totals page by page; when a page throws
   the job fails either way and the totals are never written, so nothing a
   test or a person can see moved.
+- 2026-09-23T07:29+08:00 — **Filter done.** The step body calls `keywordStage`, then
+  `embeddingStage`, then `pass`, which triages and hands to `deliver`;
+  `writeStageRun` and `readCandidates` sit beside them. The header's
+  invariant still holds by construction: the embedding stage's three exits
+  now return what goes on, and the step calls `pass` once. `keywordStage`
+  is pure, which the old closure could not be. The candidate query was
+  written twice and is now one function.
+
+  Measured: the step went from 490 lines to 83 (56 code lines), with control
+  flow two levels deep. Every comment line survived, checked the same way as
+  replies. No test file changed; full suite 133 files, 2,331 tests;
+  `filter.test.ts` 25.9 s before, 25.8 s after.
+
+  Left long on purpose: `embeddingStage` is 194 lines. Its three parts —
+  the monitor's vector, the posts' vectors, the comparison — share one
+  spend counter, and splitting them means passing it around. Worth doing
+  when that stage next changes, not before.

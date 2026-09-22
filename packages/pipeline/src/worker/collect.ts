@@ -26,6 +26,7 @@
 import type {
   CandidatePost,
   Discovery,
+  ProviderChoices,
   SocialSource,
   SourceCredentials,
   SourceQuery,
@@ -268,6 +269,557 @@ function sum<T>(items: readonly T[], of: (item: T) => number): number {
   return items.reduce((total, item) => total + of(item), 0);
 }
 
+/** The posts every source returned, one row each, and which inputs found them. */
+function rowsOf(outcomes: readonly SourceOutcome[]) {
+  /**
+   * Which inputs returned which post, before the batch is deduplicated.
+   * US-212.
+   *
+   * Keyed the way the rows are keyed, and a set rather than one value: a
+   * post returned by two phrases was earned by both, and the deduplication
+   * below keeps one row. Recording only the survivor's phrase would credit
+   * one search and hide the other, which is the opposite of what this is
+   * for.
+   */
+  const foundBy = new Map<string, Map<string, Discovery>>();
+
+  const collected = outcomes.flatMap((outcome) =>
+    outcome.posts.map((post) => {
+      const row = toRow(outcome.sourceId as Source, outcome.providerId as Provider, post);
+
+      if (post.foundBy) {
+        const key = keyOf(row);
+        const inputs = foundBy.get(key) ?? new Map<string, Discovery>();
+
+        inputs.set(`${post.foundBy.kind}:${post.foundBy.value}`, post.foundBy);
+        foundBy.set(key, inputs);
+      }
+
+      return row;
+    }),
+  );
+
+  /**
+   * One row per post, before the statement is built. BUG-015.
+   *
+   * Correctness-critical: cursor and deduplication. Postgres refuses a
+   * statement whose own rows collide — `ON CONFLICT DO UPDATE command
+   * cannot affect row a second time` — and it refuses the whole statement,
+   * so a poll that collected a hundred posts stores none of them and has
+   * already paid for every page. `on conflict` resolves a collision with a
+   * row already in the table; it says nothing about two rows arriving
+   * together, and no `do update` variant does.
+   *
+   * The scoped Reddit search makes this ordinary: a post matching two of a
+   * monitor's queries comes back twice into one batch.
+   *
+   * Keyed by `(source, external_id)` and nothing else, because that pair is
+   * the unique index: the same post through two providers is one post,
+   * which is US-024's rule. Last one wins, which is what `do update`
+   * already means for a post the table holds.
+   *
+   * `poll_runs.posts_returned` is counted before this and stays that way. A
+   * poll that found one post through three queries found one post and paid
+   * for three searches, and both halves of that are worth reading.
+   */
+  const rows = [...new Map(collected.map((row) => [keyOf(row), row])).values()];
+
+  return { rows, foundBy };
+}
+
+/**
+ * Every post this poll saw, not only the new ones.
+ *
+ * A post stored by one monitor's poll has still never been matched against
+ * a second monitor, so returning only the inserted rows would drop it out
+ * of that monitor's pipeline for good. `do update` on `fetched_at` alone
+ * returns every id and rewrites nothing else: refreshing the excerpt here
+ * would let a poll resurrect text the author had already removed, which is
+ * the failure US-015 exists to prevent.
+ */
+async function storePosts(db: StepContext["db"], rows: ReturnType<typeof rowsOf>["rows"]) {
+  return db
+    .insert(posts)
+    .values(rows)
+    .onConflictDoUpdate({
+      target: [posts.source, posts.externalId],
+      set: {
+        fetchedAt: sql`now()`,
+        /**
+         * The reply count is refreshed where the text is not, and the
+         * difference is the point. US-020's re-open rule buys a thread again
+         * only when this number has grown, so a column frozen at its first
+         * value makes the rule inert: a conversation that gained twenty
+         * replies looks exactly like one that gained none.
+         *
+         * Refreshing it is safe for the reason the excerpt is not. This is a
+         * counter, not content, so a later poll cannot resurrect words an
+         * author removed by writing it — which is the failure US-015 exists
+         * to prevent and the reason every other field here stays put.
+         *
+         * `coalesce` keeps what we know when a later fetch does not say. A
+         * connector that omits the count must not erase a number an earlier
+         * one gave us.
+         */
+        replyCount: sql`coalesce(excluded.reply_count, ${posts.replyCount})`,
+      },
+    })
+    .returning({
+      id: posts.id,
+      source: posts.source,
+      /** For US-212: the ids come back here and the attribution is keyed by this. */
+      externalId: posts.externalId,
+      /**
+       * Whether this statement inserted the row or found it.
+       *
+       * `xmax` is zero on a tuple this transaction inserted and non-zero on
+       * one it updated, which is the only way to tell them apart when
+       * `on conflict do update` returns both. The distinction is the whole
+       * of US-104's second number: many returned and none new is
+       * deduplication working, and none returned at all is not.
+       */
+      inserted: sql<boolean>`xmax = 0`,
+    });
+}
+
+/**
+ * Which of this monitor's inputs found which post. US-212.
+ *
+ * Written after the posts and before the poll's own row, and never
+ * allowed to fail the poll: the posts are stored and paid for by now, and
+ * losing the note about which phrase found them is far cheaper than
+ * losing the collection. A second poll finding the same post through the
+ * same phrase writes nothing — the primary key says so.
+ */
+async function recordDiscoveries(
+  db: StepContext["db"],
+  logger: StepContext["logger"],
+  monitorId: string,
+  stored: Awaited<ReturnType<typeof storePosts>>,
+  foundBy: ReturnType<typeof rowsOf>["foundBy"],
+): Promise<void> {
+  const discovered = stored.flatMap((row) => {
+    const inputs = foundBy.get(keyOf({ source: row.source, externalId: row.externalId }));
+
+    return [...(inputs?.values() ?? [])].map((input) => ({
+      monitorId,
+      postId: row.id,
+      source: row.source,
+      kind: input.kind,
+      value: input.value,
+    }));
+  });
+
+  if (discovered.length > 0) {
+    try {
+      await db.insert(postDiscoveries).values(discovered).onConflictDoNothing();
+    } catch (error) {
+      logger.warn(
+        { monitorId, err: error },
+        "the posts were stored but which query found them was not",
+      );
+    }
+  }
+}
+
+/** What a poll does with one unit: read it through this source, or skip it and why. */
+type UnitPlan =
+  | {
+      readonly read: false;
+      readonly providerId: string | null;
+      readonly reason: PollStopReason;
+      /** Set when the unit is waiting on its source, so the poll books a wake-up. */
+      readonly wakeAt?: Date;
+    }
+  | {
+      readonly read: true;
+      readonly source: SocialSource;
+      readonly credentials: SourceCredentials;
+      readonly continuation: Continuation | undefined;
+    };
+
+async function connectorForUnit(
+  { db, logger }: Pick<StepContext, "db" | "logger">,
+  { registry, credentialsFor }: Pick<CollectOptions, "registry" | "credentialsFor">,
+  monitor: { readonly id: string; readonly userId: string },
+  unit: Unit,
+  {
+    choices,
+    pending,
+    now,
+  }: {
+    readonly choices: ProviderChoices;
+    readonly pending: ReadonlyMap<string, Continuation>;
+    readonly now: Date;
+  },
+): Promise<UnitPlan> {
+  const monitorId = monitor.id;
+  const sourceId = unit.source;
+
+  /**
+   * A platform this build no longer offers is skipped, not failed.
+   *
+   * US-053. A monitor written before the switch still names it, and the
+   * rest of its platforms are collected exactly as before: a decision
+   * somebody made about a connector is not an error in this job. The reason
+   * is logged because a short poll otherwise reads as a quiet platform.
+   */
+  const notOffered = registry.notOffered(sourceId);
+
+  if (notOffered) {
+    logger.info(
+      { monitorId, sourceId, reason: notOffered },
+      "poll skipped for this source: this build does not offer a connector for it",
+    );
+    return { read: false, providerId: null, reason: "not_offered" };
+  }
+
+  /**
+   * Which of this platform's providers could run, and with what key.
+   *
+   * A monitor names a platform and its row records no provider, so the
+   * provider is decided here. Every candidate is asked for its key first,
+   * because "one provider connected" is the common deployment and it must
+   * not be asked a question it has one answer to. Reddit has two
+   * connectors in the build and most instances hold one of the two keys.
+   */
+  const keyed = new Map<string, SourceCredentials>();
+
+  for (const candidate of registry.forPlatform(sourceId)) {
+    const found = await credentialsFor(candidate, monitor.userId);
+    if (found) keyed.set(candidate.provider.id, found);
+  }
+
+  if (keyed.size === 0) {
+    // A missing key is not transient. Retrying it four times and then
+    // dead-lettering it buries the one sentence the user has to read.
+    logger.error(
+      {
+        monitorId,
+        sourceId,
+        providers: registry.forPlatform(sourceId).map((candidate) => candidate.provider.id),
+      },
+      "poll skipped for this source: no provider for it has credentials configured",
+    );
+    return { read: false, providerId: null, reason: "no_credentials" };
+  }
+
+  /**
+   * A collection in flight belongs to the provider that started it.
+   *
+   * Correctness-critical, and US-026 is the ticket that made it possible
+   * to get wrong. The cursor is opaque and means nothing to another
+   * provider, so resuming a Bright Data snapshot through ScrapeCreators
+   * reads a snapshot id ScrapeCreators has never heard of — and on a
+   * provider that bills at collection time it also pays for the work
+   * twice. So a changed choice takes effect on the *next* collection, and
+   * the one already running finishes where it started.
+   */
+  const continuation: Continuation | undefined = pending.get(unitKey(unit));
+
+  let source: SocialSource;
+
+  if (continuation) {
+    if (!keyed.has(continuation.provider)) {
+      // The key that started this collection is gone. Nothing else can
+      // read it, and the row stays so that putting the key back reads the
+      // snapshot rather than paying for the query again.
+      logger.error(
+        { monitorId, sourceId, providerId: continuation.provider },
+        "collection cannot be resumed: the provider that started it has no credentials",
+      );
+      return { read: false, providerId: continuation.provider, reason: "resume_key_missing" };
+    }
+
+    source = registry.get(sourceId, continuation.provider);
+  } else {
+    try {
+      source = registry.only(sourceId, { choices, among: [...keyed.keys()] });
+    } catch (error) {
+      // Two providers can run and nobody has chosen, or the choice names
+      // one that cannot. Neither is fixed by retrying, and neither is
+      // fixed by picking for them: the point of the refusal is that
+      // spending somebody's money is not a default. The message names the
+      // repair.
+      logger.error(
+        { monitorId, sourceId, err: error },
+        "poll skipped for this source: no provider is chosen for it",
+      );
+      return { read: false, providerId: null, reason: "no_provider_choice" };
+    }
+  }
+
+  const providerId = source.provider.id;
+  // Present by construction: every branch above chose from this map.
+  const credentials = keyed.get(providerId) as SourceCredentials;
+
+  if (continuation && continuation.attempts >= maxResumeAttempts) {
+    // The collection never became ready. Forgetting it lets the next
+    // scheduled poll ask the question again; keeping it would leave the
+    // monitor waiting on a snapshot for ever. Nothing is triggered in its
+    // place here, because giving up must not itself spend money.
+    logger.error(
+      { monitorId, sourceId, providerId, attempts: continuation.attempts },
+      "collection abandoned: it was never ready to read",
+    );
+    await forgetContinuation(
+      db,
+      monitorId,
+      continuation.source,
+      continuation.provider,
+      continuation.query,
+    );
+    return { read: false, providerId: continuation.provider, reason: "collection_abandoned" };
+  }
+
+  if (continuation && continuation.resumeAfter > now) {
+    // The source said when to come back, and it is not yet time. This is
+    // the branch a scheduler tick lands in, and reaching the source from
+    // here is what triggered a second collection before BUG-001 was fixed.
+    logger.debug(
+      { monitorId, sourceId, providerId, resumeAfter: continuation.resumeAfter },
+      "source skipped: its collection is still running",
+    );
+    return {
+      read: false,
+      providerId: continuation.provider,
+      reason: "still_collecting",
+      wakeAt: continuation.resumeAfter,
+    };
+  }
+
+  return { read: true, source, credentials, continuation };
+}
+
+/**
+ * Where this unit's walk stands after a read, written so the next poll knows:
+ * a wait or a page cap is remembered, and a walk read to its end is closed and
+ * its platform covered. Answers when the poll should wake for it, if it should.
+ */
+async function recordWhereTheWalkStands(
+  db: StepContext["db"],
+  monitorId: string,
+  {
+    unit,
+    source,
+    providerId,
+    continuation,
+    outcome,
+    window,
+    walkStartedAt,
+    now,
+  }: {
+    readonly unit: Unit;
+    readonly source: SocialSource;
+    readonly providerId: string;
+    readonly continuation: Continuation | undefined;
+    readonly outcome: SourceOutcome;
+    readonly window: Date | undefined;
+    readonly walkStartedAt: Date;
+    readonly now: Date;
+  },
+): Promise<Date | undefined> {
+  let wake: Date | undefined;
+
+  const progressed = outcome.posts.length > 0;
+
+  if (outcome.waitUntil) {
+    wake = outcome.waitUntil;
+
+    if (outcome.waitCursor) {
+      await rememberContinuation(db, monitorId, {
+        source: source.platform.id as Source,
+        query: unit.query,
+        provider: providerId as Provider,
+        cursor: outcome.waitCursor,
+        ...(window ? { since: window } : {}),
+        resumeAfter: outcome.waitUntil,
+        progressed,
+      });
+    } else if (continuation) {
+      // A wait with no cursor is the interface saying "start this query
+      // again from the beginning". The old cursor names a snapshot the
+      // source no longer wants us to read.
+      await forgetContinuation(
+        db,
+        monitorId,
+        continuation.source,
+        continuation.provider,
+        continuation.query,
+      );
+    }
+  } else if (outcome.moreCursor) {
+    /**
+     * The page cap stopped a source that had another page ready.
+     *
+     * It is remembered like a wait, and due at once, because the pages
+     * behind the cursor are already collected and already billed: reading
+     * them costs nothing and dropping the cursor makes the next poll
+     * collect the whole query again. The cap still holds — it is what one
+     * job may fetch, and US-013's budget guard is what a monitor may
+     * spend.
+     */
+    await rememberContinuation(db, monitorId, {
+      source: source.platform.id as Source,
+      query: unit.query,
+      provider: providerId as Provider,
+      cursor: outcome.moreCursor,
+      ...(window ? { since: window } : {}),
+      resumeAfter: now,
+      progressed,
+    });
+    wake = now;
+  } else {
+    /**
+     * Read to the end. The walk is over, so its platform is covered.
+     *
+     * Both halves matter and BUG-017 is the second one. Forgetting the
+     * continuation is what lets the next poll start a new walk; recording
+     * the coverage is what gives that walk a window worth having.
+     */
+    if (continuation) {
+      await forgetContinuation(
+        db,
+        monitorId,
+        continuation.source,
+        continuation.provider,
+        continuation.query,
+      );
+    }
+
+    await recordCoverage(db, monitorId, source.platform.id as Source, unit.query, walkStartedAt);
+  }
+
+  return wake;
+}
+
+/**
+ * What this poll did, accumulated as it runs and written on every exit.
+ * US-104.
+ *
+ * The row is written by `finish`, and `finish` is called on all eight
+ * exits below — including the six that ask no provider anything. Those are
+ * the polls a person cannot otherwise explain: on 2026-09-09 a production
+ * monitor polled fifteen times, spent $0.666, stored nothing, and the only
+ * evidence left was a container log destroyed by the next deploy.
+ */
+class PollRecord {
+  private readonly sources: Mutable<PollRunSource>[] = [];
+  stopReason: PollStopReason | null = null;
+  /** Set once the collections in flight have been read. See `walkFor`. */
+  resuming = false;
+  /**
+   * The collection this poll belongs to, read once. US-203.
+   *
+   * Once, because it is used twice — the poll's own row and the filter job
+   * it sends — and two lookups could answer differently: the first writes a
+   * row the second would then read. The stages downstream carry it from
+   * here, so a filter and a classification say which collection they were
+   * part of rather than being guessed at by time.
+   */
+  private walk: string | null = null;
+  /**
+   * The row this poll wrote, so the stages it feeds can name it. US-211.
+   *
+   * Set by `finish`, which runs on every exit, and read four lines later
+   * where the filter job is sent. Null if the write failed — the poll still
+   * collected, and a stage that cannot name its poll is better than a poll
+   * that fails over its own description.
+   */
+  pollRunId: string | null = null;
+  private readonly startedAt = new Date();
+
+  constructor(
+    private readonly db: StepContext["db"],
+    private readonly logger: StepContext["logger"],
+    private readonly monitor: { readonly id: string; readonly userId: string },
+  ) {}
+
+  async walkId(): Promise<string> {
+    this.walk ??= await walkFor(this.db, this.monitor.id, this.resuming);
+    return this.walk;
+  }
+
+  /**
+   * One platform's line on the row.
+   *
+   * Its own reason, because a poll may skip Reddit for want of a key and
+   * collect X in the same run, and a poll-level reason alone would report
+   * the whole poll as refused.
+   */
+  note(
+    sourceId: string,
+    providerId: string | null,
+    reason: PollStopReason | null,
+    spent?: Pick<PollRunSource, "pages" | "postsReturned" | "units" | "estimatedCostMicros">,
+  ): void {
+    // One entry a platform, however many of its searches ran this poll
+    // (US-289): the row is read per platform, and `postsNew` is counted
+    // per platform after the insert.
+    const existing = this.sources.find((entry) => entry.source === sourceId);
+    if (existing) {
+      existing.pages += spent?.pages ?? 0;
+      existing.postsReturned += spent?.postsReturned ?? 0;
+      existing.units += spent?.units ?? 0;
+      existing.estimatedCostMicros += spent?.estimatedCostMicros ?? 0;
+      if (reason && !existing.reason) existing.reason = reason;
+    } else {
+      this.sources.push({
+        source: sourceId as Source,
+        provider: providerId as Provider | null,
+        pages: spent?.pages ?? 0,
+        postsReturned: spent?.postsReturned ?? 0,
+        // Filled in after the insert, which is the only place that knows.
+        postsNew: 0,
+        units: spent?.units ?? 0,
+        estimatedCostMicros: spent?.estimatedCostMicros ?? 0,
+        reason,
+      });
+    }
+
+    // The first reason, not the last. A poll refused on its first platform
+    // and waiting on its second is a refusal a person has to act on.
+    if (reason && !this.stopReason) this.stopReason = reason;
+  }
+
+  /** How many of each platform's posts the insert found new. */
+  countNew(stored: readonly { readonly inserted: boolean; readonly source: string }[]): void {
+    for (const entry of this.sources) {
+      entry.postsNew = stored.filter((row) => row.inserted && row.source === entry.source).length;
+    }
+  }
+
+  async finish(outcome: PollOutcome): Promise<void> {
+    try {
+      const run = await recordPollRun(this.db, {
+        monitorId: this.monitor.id,
+        userId: this.monitor.userId,
+        walkId: await this.walkId(),
+        startedAt: this.startedAt,
+        finishedAt: new Date(),
+        outcome,
+        postsReturned: sum(this.sources, (entry) => entry.postsReturned),
+        postsNew: sum(this.sources, (entry) => entry.postsNew),
+        units: sum(this.sources, (entry) => entry.units),
+        estimatedCostMicros: sum(this.sources, (entry) => entry.estimatedCostMicros),
+        sources: this.sources,
+        stopReason: this.stopReason,
+      });
+
+      this.pollRunId = run.id;
+    } catch (error) {
+      // A poll that collected must not be failed by the row that describes
+      // it. The posts are stored and the filter job is sent by the time this
+      // runs; losing the description is worse than nothing and much better
+      // than losing the collection.
+      this.logger.error(
+        { monitorId: this.monitor.id, err: error },
+        "the poll ran but its record was not written",
+      );
+    }
+  }
+}
+
 export function createCollectStep({
   registry,
   credentialsFor,
@@ -287,35 +839,7 @@ export function createCollectStep({
       return;
     }
 
-    /**
-     * What this poll did, accumulated as it runs and written on every exit.
-     * US-104.
-     *
-     * The row is written by `finish`, and `finish` is called on all eight
-     * exits below — including the six that ask no provider anything. Those are
-     * the polls a person cannot otherwise explain: on 2026-09-09 a production
-     * monitor polled fifteen times, spent $0.666, stored nothing, and the only
-     * evidence left was a container log destroyed by the next deploy.
-     */
-    const startedAt = new Date();
-    const runSources: Mutable<PollRunSource>[] = [];
-    let stopReason: PollStopReason | null = null;
-    /** Set once the collections in flight have been read. See `walkFor`. */
-    let resuming = false;
-    /**
-     * The collection this poll belongs to, read once. US-203.
-     *
-     * Once, because it is used twice — the poll's own row and the filter job
-     * it sends — and two lookups could answer differently: the first writes a
-     * row the second would then read. The stages downstream carry it from
-     * here, so a filter and a classification say which collection they were
-     * part of rather than being guessed at by time.
-     */
-    let walk: string | null = null;
-    const walkId = async (): Promise<string> => {
-      walk ??= await walkFor(db, monitorId, resuming);
-      return walk;
-    };
+    const poll = new PollRecord(db, logger, monitor);
 
     /**
      * Platforms that were actually asked, and the ones whose provider threw.
@@ -328,85 +852,6 @@ export function createCollectStep({
      */
     let asked = 0;
     const failures: unknown[] = [];
-
-    /**
-     * One platform's line on the row.
-     *
-     * Its own reason, because a poll may skip Reddit for want of a key and
-     * collect X in the same run, and a poll-level reason alone would report
-     * the whole poll as refused.
-     */
-    const noteSource = (
-      sourceId: string,
-      providerId: string | null,
-      reason: PollStopReason | null,
-      spent?: Pick<PollRunSource, "pages" | "postsReturned" | "units" | "estimatedCostMicros">,
-    ): void => {
-      // One entry a platform, however many of its searches ran this poll
-      // (US-289): the row is read per platform, and `postsNew` is counted
-      // per platform after the insert.
-      const existing = runSources.find((entry) => entry.source === sourceId);
-      if (existing) {
-        existing.pages += spent?.pages ?? 0;
-        existing.postsReturned += spent?.postsReturned ?? 0;
-        existing.units += spent?.units ?? 0;
-        existing.estimatedCostMicros += spent?.estimatedCostMicros ?? 0;
-        if (reason && !existing.reason) existing.reason = reason;
-      } else {
-        runSources.push({
-          source: sourceId as Source,
-          provider: providerId as Provider | null,
-          pages: spent?.pages ?? 0,
-          postsReturned: spent?.postsReturned ?? 0,
-          // Filled in after the insert, which is the only place that knows.
-          postsNew: 0,
-          units: spent?.units ?? 0,
-          estimatedCostMicros: spent?.estimatedCostMicros ?? 0,
-          reason,
-        });
-      }
-
-      // The first reason, not the last. A poll refused on its first platform
-      // and waiting on its second is a refusal a person has to act on.
-      if (reason && !stopReason) stopReason = reason;
-    };
-
-    /**
-     * The row this poll wrote, so the stages it feeds can name it. US-211.
-     *
-     * Set by `finish`, which runs on every exit, and read four lines later
-     * where the filter job is sent. Null if the write failed — the poll still
-     * collected, and a stage that cannot name its poll is better than a poll
-     * that fails over its own description.
-     */
-    let pollRunId: string | null = null;
-
-    const finish = async (outcome: PollOutcome): Promise<void> => {
-      try {
-        const run = await recordPollRun(db, {
-          monitorId,
-          userId: monitor.userId,
-          walkId: await walkId(),
-          startedAt,
-          finishedAt: new Date(),
-          outcome,
-          postsReturned: sum(runSources, (entry) => entry.postsReturned),
-          postsNew: sum(runSources, (entry) => entry.postsNew),
-          units: sum(runSources, (entry) => entry.units),
-          estimatedCostMicros: sum(runSources, (entry) => entry.estimatedCostMicros),
-          sources: runSources,
-          stopReason,
-        });
-
-        pollRunId = run.id;
-      } catch (error) {
-        // A poll that collected must not be failed by the row that describes
-        // it. The posts are stored and the filter job is sent by the time this
-        // runs; losing the description is worse than nothing and much better
-        // than losing the collection.
-        logger.error({ monitorId, err: error }, "the poll ran but its record was not written");
-      }
-    };
 
     try {
       /**
@@ -444,8 +889,8 @@ export function createCollectStep({
 
         // No source was reached, so there is no per-source line to write. The
         // reason is the whole of what happened.
-        stopReason = "budget_exhausted";
-        await finish("refused");
+        poll.stopReason = "budget_exhausted";
+        await poll.finish("refused");
         return;
       }
 
@@ -563,7 +1008,7 @@ export function createCollectStep({
       // A poll that resumes something belongs to the collection it resumes.
       // Read here rather than at `finish`, because the map is emptied as the
       // loop below reads each continuation to its end.
-      resuming = pending.size > 0;
+      poll.resuming = pending.size > 0;
 
       const now = new Date();
       const outcomes: SourceOutcome[] = [];
@@ -576,139 +1021,22 @@ export function createCollectStep({
 
       for (const unit of unitsThisPoll) {
         const sourceId = unit.source;
-        /**
-         * A platform this build no longer offers is skipped, not failed.
-         *
-         * US-053. A monitor written before the switch still names it, and the
-         * rest of its platforms are collected exactly as before: a decision
-         * somebody made about a connector is not an error in this job. The reason
-         * is logged because a short poll otherwise reads as a quiet platform.
-         */
-        const notOffered = registry.notOffered(sourceId);
+        const plan = await connectorForUnit(
+          { db, logger },
+          { registry, credentialsFor },
+          monitor,
+          unit,
+          { choices, pending, now },
+        );
 
-        if (notOffered) {
-          logger.info(
-            { monitorId, sourceId, reason: notOffered },
-            "poll skipped for this source: this build does not offer a connector for it",
-          );
-          noteSource(sourceId, null, "not_offered");
+        if (!plan.read) {
+          if (plan.wakeAt) wakeNoLaterThan(plan.wakeAt);
+          poll.note(sourceId, plan.providerId, plan.reason);
           continue;
         }
 
-        /**
-         * Which of this platform's providers could run, and with what key.
-         *
-         * A monitor names a platform and its row records no provider, so the
-         * provider is decided here. Every candidate is asked for its key first,
-         * because "one provider connected" is the common deployment and it must
-         * not be asked a question it has one answer to. Reddit has two
-         * connectors in the build and most instances hold one of the two keys.
-         */
-        const keyed = new Map<string, SourceCredentials>();
-
-        for (const candidate of registry.forPlatform(sourceId)) {
-          const found = await credentialsFor(candidate, monitor.userId);
-          if (found) keyed.set(candidate.provider.id, found);
-        }
-
-        if (keyed.size === 0) {
-          // A missing key is not transient. Retrying it four times and then
-          // dead-lettering it buries the one sentence the user has to read.
-          logger.error(
-            {
-              monitorId,
-              sourceId,
-              providers: registry.forPlatform(sourceId).map((candidate) => candidate.provider.id),
-            },
-            "poll skipped for this source: no provider for it has credentials configured",
-          );
-          noteSource(sourceId, null, "no_credentials");
-          continue;
-        }
-
-        /**
-         * A collection in flight belongs to the provider that started it.
-         *
-         * Correctness-critical, and US-026 is the ticket that made it possible
-         * to get wrong. The cursor is opaque and means nothing to another
-         * provider, so resuming a Bright Data snapshot through ScrapeCreators
-         * reads a snapshot id ScrapeCreators has never heard of — and on a
-         * provider that bills at collection time it also pays for the work
-         * twice. So a changed choice takes effect on the *next* collection, and
-         * the one already running finishes where it started.
-         */
-        const continuation: Continuation | undefined = pending.get(unitKey(unit));
-
-        let source: SocialSource;
-
-        if (continuation) {
-          if (!keyed.has(continuation.provider)) {
-            // The key that started this collection is gone. Nothing else can
-            // read it, and the row stays so that putting the key back reads the
-            // snapshot rather than paying for the query again.
-            logger.error(
-              { monitorId, sourceId, providerId: continuation.provider },
-              "collection cannot be resumed: the provider that started it has no credentials",
-            );
-            noteSource(sourceId, continuation.provider, "resume_key_missing");
-            continue;
-          }
-
-          source = registry.get(sourceId, continuation.provider);
-        } else {
-          try {
-            source = registry.only(sourceId, { choices, among: [...keyed.keys()] });
-          } catch (error) {
-            // Two providers can run and nobody has chosen, or the choice names
-            // one that cannot. Neither is fixed by retrying, and neither is
-            // fixed by picking for them: the point of the refusal is that
-            // spending somebody's money is not a default. The message names the
-            // repair.
-            logger.error(
-              { monitorId, sourceId, err: error },
-              "poll skipped for this source: no provider is chosen for it",
-            );
-            noteSource(sourceId, null, "no_provider_choice");
-            continue;
-          }
-        }
-
+        const { source, credentials, continuation } = plan;
         const providerId = source.provider.id;
-        // Present by construction: every branch above chose from this map.
-        const credentials = keyed.get(providerId) as SourceCredentials;
-
-        if (continuation && continuation.attempts >= maxResumeAttempts) {
-          // The collection never became ready. Forgetting it lets the next
-          // scheduled poll ask the question again; keeping it would leave the
-          // monitor waiting on a snapshot for ever. Nothing is triggered in its
-          // place here, because giving up must not itself spend money.
-          logger.error(
-            { monitorId, sourceId, providerId, attempts: continuation.attempts },
-            "collection abandoned: it was never ready to read",
-          );
-          await forgetContinuation(
-            db,
-            monitorId,
-            continuation.source,
-            continuation.provider,
-            continuation.query,
-          );
-          noteSource(sourceId, continuation.provider, "collection_abandoned");
-          continue;
-        }
-
-        if (continuation && continuation.resumeAfter > now) {
-          // The source said when to come back, and it is not yet time. This is
-          // the branch a scheduler tick lands in, and reaching the source from
-          // here is what triggered a second collection before BUG-001 was fixed.
-          logger.debug(
-            { monitorId, sourceId, providerId, resumeAfter: continuation.resumeAfter },
-            "source skipped: its collection is still running",
-          );
-          wakeNoLaterThan(continuation.resumeAfter);
-          noteSource(sourceId, continuation.provider, "still_collecting");
-          continue;
-        }
 
         /**
          * A resume asks the question its collection was started with.
@@ -802,7 +1130,7 @@ export function createCollectStep({
               "source failed: the poll continues without it",
             );
             failures.push(error);
-            noteSource(sourceId, providerId, "error", {
+            poll.note(sourceId, providerId, "error", {
               pages: 0,
               postsReturned: 0,
               units: sourceUnits,
@@ -816,7 +1144,7 @@ export function createCollectStep({
 
         outcomes.push(outcome);
 
-        noteSource(
+        poll.note(
           sourceId,
           providerId,
           // A wait and a page cap are both "there is more", and they send a
@@ -845,80 +1173,17 @@ export function createCollectStep({
           "source read",
         );
 
-        const progressed = outcome.posts.length > 0;
-
-        if (outcome.waitUntil) {
-          wakeNoLaterThan(outcome.waitUntil);
-
-          if (outcome.waitCursor) {
-            await rememberContinuation(db, monitorId, {
-              source: source.platform.id as Source,
-              query: unit.query,
-              provider: providerId as Provider,
-              cursor: outcome.waitCursor,
-              ...(window ? { since: window } : {}),
-              resumeAfter: outcome.waitUntil,
-              progressed,
-            });
-          } else if (continuation) {
-            // A wait with no cursor is the interface saying "start this query
-            // again from the beginning". The old cursor names a snapshot the
-            // source no longer wants us to read.
-            await forgetContinuation(
-              db,
-              monitorId,
-              continuation.source,
-              continuation.provider,
-              continuation.query,
-            );
-          }
-        } else if (outcome.moreCursor) {
-          /**
-           * The page cap stopped a source that had another page ready.
-           *
-           * It is remembered like a wait, and due at once, because the pages
-           * behind the cursor are already collected and already billed: reading
-           * them costs nothing and dropping the cursor makes the next poll
-           * collect the whole query again. The cap still holds — it is what one
-           * job may fetch, and US-013's budget guard is what a monitor may
-           * spend.
-           */
-          await rememberContinuation(db, monitorId, {
-            source: source.platform.id as Source,
-            query: unit.query,
-            provider: providerId as Provider,
-            cursor: outcome.moreCursor,
-            ...(window ? { since: window } : {}),
-            resumeAfter: now,
-            progressed,
-          });
-          wakeNoLaterThan(now);
-        } else {
-          /**
-           * Read to the end. The walk is over, so its platform is covered.
-           *
-           * Both halves matter and BUG-017 is the second one. Forgetting the
-           * continuation is what lets the next poll start a new walk; recording
-           * the coverage is what gives that walk a window worth having.
-           */
-          if (continuation) {
-            await forgetContinuation(
-              db,
-              monitorId,
-              continuation.source,
-              continuation.provider,
-              continuation.query,
-            );
-          }
-
-          await recordCoverage(
-            db,
-            monitorId,
-            source.platform.id as Source,
-            unit.query,
-            walkStartedAt,
-          );
-        }
+        const wake = await recordWhereTheWalkStands(db, monitorId, {
+          unit,
+          source,
+          providerId,
+          continuation,
+          outcome,
+          window,
+          walkStartedAt,
+          now,
+        });
+        if (wake) wakeNoLaterThan(wake);
       }
 
       /**
@@ -955,58 +1220,7 @@ export function createCollectStep({
         }
       }
 
-      /**
-       * Which inputs returned which post, before the batch is deduplicated.
-       * US-212.
-       *
-       * Keyed the way the rows are keyed, and a set rather than one value: a
-       * post returned by two phrases was earned by both, and the deduplication
-       * below keeps one row. Recording only the survivor's phrase would credit
-       * one search and hide the other, which is the opposite of what this is
-       * for.
-       */
-      const foundBy = new Map<string, Map<string, Discovery>>();
-
-      const collected = outcomes.flatMap((outcome) =>
-        outcome.posts.map((post) => {
-          const row = toRow(outcome.sourceId as Source, outcome.providerId as Provider, post);
-
-          if (post.foundBy) {
-            const key = keyOf(row);
-            const inputs = foundBy.get(key) ?? new Map<string, Discovery>();
-
-            inputs.set(`${post.foundBy.kind}:${post.foundBy.value}`, post.foundBy);
-            foundBy.set(key, inputs);
-          }
-
-          return row;
-        }),
-      );
-
-      /**
-       * One row per post, before the statement is built. BUG-015.
-       *
-       * Correctness-critical: cursor and deduplication. Postgres refuses a
-       * statement whose own rows collide — `ON CONFLICT DO UPDATE command
-       * cannot affect row a second time` — and it refuses the whole statement,
-       * so a poll that collected a hundred posts stores none of them and has
-       * already paid for every page. `on conflict` resolves a collision with a
-       * row already in the table; it says nothing about two rows arriving
-       * together, and no `do update` variant does.
-       *
-       * The scoped Reddit search makes this ordinary: a post matching two of a
-       * monitor's queries comes back twice into one batch.
-       *
-       * Keyed by `(source, external_id)` and nothing else, because that pair is
-       * the unique index: the same post through two providers is one post,
-       * which is US-024's rule. Last one wins, which is what `do update`
-       * already means for a post the table holds.
-       *
-       * `poll_runs.posts_returned` is counted before this and stays that way. A
-       * poll that found one post through three queries found one post and paid
-       * for three searches, and both halves of that are worth reading.
-       */
-      const rows = [...new Map(collected.map((row) => [keyOf(row), row])).values()];
+      const { rows, foundBy } = rowsOf(outcomes);
 
       if (rows.length === 0) {
         /**
@@ -1016,108 +1230,25 @@ export function createCollectStep({
          * and some of them were paid. It is a different sentence and it sends a
          * person somewhere different — to the queries rather than to a key.
          */
-        await finish(stopReason === "provider_wait" ? "waiting" : "empty");
+        await poll.finish(poll.stopReason === "provider_wait" ? "waiting" : "empty");
         return;
       }
 
-      /**
-       * Every post this poll saw, not only the new ones.
-       *
-       * A post stored by one monitor's poll has still never been matched against
-       * a second monitor, so returning only the inserted rows would drop it out
-       * of that monitor's pipeline for good. `do update` on `fetched_at` alone
-       * returns every id and rewrites nothing else: refreshing the excerpt here
-       * would let a poll resurrect text the author had already removed, which is
-       * the failure US-015 exists to prevent.
-       */
-      const stored = await db
-        .insert(posts)
-        .values(rows)
-        .onConflictDoUpdate({
-          target: [posts.source, posts.externalId],
-          set: {
-            fetchedAt: sql`now()`,
-            /**
-             * The reply count is refreshed where the text is not, and the
-             * difference is the point. US-020's re-open rule buys a thread again
-             * only when this number has grown, so a column frozen at its first
-             * value makes the rule inert: a conversation that gained twenty
-             * replies looks exactly like one that gained none.
-             *
-             * Refreshing it is safe for the reason the excerpt is not. This is a
-             * counter, not content, so a later poll cannot resurrect words an
-             * author removed by writing it — which is the failure US-015 exists
-             * to prevent and the reason every other field here stays put.
-             *
-             * `coalesce` keeps what we know when a later fetch does not say. A
-             * connector that omits the count must not erase a number an earlier
-             * one gave us.
-             */
-            replyCount: sql`coalesce(excluded.reply_count, ${posts.replyCount})`,
-          },
-        })
-        .returning({
-          id: posts.id,
-          source: posts.source,
-          /** For US-212: the ids come back here and the attribution is keyed by this. */
-          externalId: posts.externalId,
-          /**
-           * Whether this statement inserted the row or found it.
-           *
-           * `xmax` is zero on a tuple this transaction inserted and non-zero on
-           * one it updated, which is the only way to tell them apart when
-           * `on conflict do update` returns both. The distinction is the whole
-           * of US-104's second number: many returned and none new is
-           * deduplication working, and none returned at all is not.
-           */
-          inserted: sql<boolean>`xmax = 0`,
-        });
+      const stored = await storePosts(db, rows);
 
-      for (const entry of runSources) {
-        entry.postsNew = stored.filter((row) => row.inserted && row.source === entry.source).length;
-      }
+      poll.countNew(stored);
 
-      /**
-       * Which of this monitor's inputs found which post. US-212.
-       *
-       * Written after the posts and before the poll's own row, and never
-       * allowed to fail the poll: the posts are stored and paid for by now, and
-       * losing the note about which phrase found them is far cheaper than
-       * losing the collection. A second poll finding the same post through the
-       * same phrase writes nothing — the primary key says so.
-       */
-      const discovered = stored.flatMap((row) => {
-        const inputs = foundBy.get(keyOf({ source: row.source, externalId: row.externalId }));
+      await recordDiscoveries(db, logger, monitorId, stored, foundBy);
 
-        return [...(inputs?.values() ?? [])].map((input) => ({
-          monitorId,
-          postId: row.id,
-          source: row.source,
-          kind: input.kind,
-          value: input.value,
-        }));
-      });
-
-      if (discovered.length > 0) {
-        try {
-          await db.insert(postDiscoveries).values(discovered).onConflictDoNothing();
-        } catch (error) {
-          logger.warn(
-            { monitorId, err: error },
-            "the posts were stored but which query found them was not",
-          );
-        }
-      }
-
-      await finish(stopReason === "provider_wait" ? "waiting" : "collected");
+      await poll.finish(poll.stopReason === "provider_wait" ? "waiting" : "collected");
 
       await boss.send(filterQueue, {
         monitorId,
         postIds: stored.map((row) => row.id),
-        walkId: await walkId(),
+        walkId: await poll.walkId(),
         // `finish` ran on the line above, so the row exists and this is its
         // id. US-211.
-        ...(pollRunId ? { pollRunId } : {}),
+        ...(poll.pollRunId ? { pollRunId: poll.pollRunId } : {}),
       });
     } catch (error) {
       /**
@@ -1127,8 +1258,8 @@ export function createCollectStep({
        * reaches a screen. Rethrown after recording, so the retry still happens
        * — this catch changes what a person can read, not what the queue does.
        */
-      stopReason = "error";
-      await finish("failed");
+      poll.stopReason = "error";
+      await poll.finish("failed");
       throw error;
     }
   };

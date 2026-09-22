@@ -2,7 +2,7 @@
 
 # Done
 
-212 finished.
+213 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
@@ -30,6 +30,7 @@
 | BUG-003 | [A post below the threshold is classified again on every poll](done/2026-09/BUG-003-a-post-below-the-threshold-is-classified-again-on-every-poll.md) | bug | fixed | 2026-09 |
 | BUG-002 | [A seven-day window is bought as a month](done/2026-09/BUG-002-a-seven-day-window-is-bought-as-a-month.md) | bug | fixed | 2026-09 |
 | BUG-001 | [A pending Reddit collection is not resumed](done/2026-09/BUG-001-a-pending-reddit-collection-is-not-resumed.md) | bug | shipped | 2026-09 |
+| US-337 | [A pipeline step reads as its phases](done/2026-09/US-337-a-pipeline-step-reads-as-its-phases.md) | chore | shipped | 2026-09 |
 | US-334 | [The provider clients share one core](done/2026-09/US-334-the-provider-clients-share-one-core.md) | chore | shipped | 2026-09 |
 | US-312 | [history.md is retired into the tickets that hold its evidence](done/2026-09/US-312-history-md-is-retired-into-the-tickets.md) | chore | shipped | 2026-09 |
 | US-309 | [One command says what the verdicts mean](done/2026-09/US-309-one-command-says-what-the-verdicts-mean.md) | chore | shipped | 2026-09 |

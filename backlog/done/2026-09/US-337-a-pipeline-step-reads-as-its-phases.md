@@ -7,7 +7,7 @@ priority: p3
 created: 2026-09-23T06:46+08:00
 parent:
 area: worker
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -22,12 +22,12 @@ read the source, store the posts, book the resume.
 
 ## Acceptance
 
-- [ ] One step at a time, each in its own pull request, starting with
+- [x] One step at a time, each in its own pull request, starting with
       replies. The step's body calls named phases and holds no nesting deeper
       than four.
-- [ ] No test's expected value moves. A value that moves is a bug in the
+- [x] No test's expected value moves. A value that moves is a bug in the
       split.
-- [ ] The full suite passes after each step, and the Log records its time
+- [x] The full suite passes after each step, and the Log records its time
       before and after.
 
 ## Notes
@@ -90,3 +90,22 @@ read the source, store the posts, book the resume.
   Measured: 452 lines to 358 (280 code lines to 230), control flow eight
   levels to three. It remains the longest step, by choice. Every comment line
   survived. No test file changed; full suite 133 files, 2,331 tests.
+- 2026-09-23T07:49+08:00 — **Collect done, and the ticket with it.** Done in three stages,
+  with the worker tests run after each. `PollRecord` holds what the poll
+  did and writes it on every exit — the platform lines, the stop reason, the
+  walk and the row id, which were eight variables and three closures in the
+  step. `rowsOf`, `storePosts` and `recordDiscoveries` are the storing,
+  and `rowsOf` has no side effects. `connectorForUnit` decides, for one
+  unit, whether it is read and through which source, and says why when it is
+  not; `recordWhereTheWalkStands` remembers a wait or a page cap, or closes
+  the walk and records its coverage. Both return what the loop needs instead
+  of writing to its variables.
+
+  Measured: 865 lines to 444 (415 code lines to 207); control flow inside the
+  step at most four deep — the `try`, the loop and two `if`s — against
+  eight before. Every comment line survived. No test file changed; full
+  suite 133 files, 2,331 tests; `collect.test.ts` 4.6 s before and after.
+
+  The four steps, before and after: collect 865 → 444, replies 624 → 339,
+  filter 490 → 83, classify 452 → 358. Each is its own branch and merge
+  commit.

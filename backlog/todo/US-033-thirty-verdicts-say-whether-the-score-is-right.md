@@ -119,3 +119,5 @@ and is still not written.
   Nothing about the ticket changed. It still costs no money and still blocks
   PLAN.md's first meaningful question.
 
+- 2026-09-22T20:10+08:00 — US-309 built `pnpm verdicts`, so the half of this ticket that had no method now has one: judge in the inbox, then run one command for the table, the per-platform split, the boundary and the answer. The hour of reading is still the owner's and still the whole remaining cost.
+- 2026-09-22T20:10+08:00 — **Two numbers here are out of date.** The database holds **763** unjudged matches, not 40 — it has grown since 6 September, and judging all of them is not an evening. `pnpm verdicts --sample=40` picks a spread across score bands and platforms, which is better evidence about the boundary than the top forty would be. And the five verdicts described above are not in `feedback`: it holds 8 rows, all `good`, all Reddit posts, none superseded. The reasoning above stands; the arithmetic needs redoing against what is actually stored.

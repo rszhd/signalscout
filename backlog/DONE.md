@@ -2,7 +2,7 @@
 
 # Done
 
-208 finished.
+209 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
@@ -29,6 +29,7 @@
 | BUG-003 | [A post below the threshold is classified again on every poll](done/2026-09/BUG-003-a-post-below-the-threshold-is-classified-again-on-every-poll.md) | bug | fixed | 2026-09 |
 | BUG-002 | [A seven-day window is bought as a month](done/2026-09/BUG-002-a-seven-day-window-is-bought-as-a-month.md) | bug | fixed | 2026-09 |
 | BUG-001 | [A pending Reddit collection is not resumed](done/2026-09/BUG-001-a-pending-reddit-collection-is-not-resumed.md) | bug | shipped | 2026-09 |
+| US-309 | [One command says what the verdicts mean](done/2026-09/US-309-one-command-says-what-the-verdicts-mean.md) | chore | shipped | 2026-09 |
 | US-308 | [The app container says whether it is alive](done/2026-09/US-308-the-app-container-says-whether-it-is-alive.md) | bug | shipped | 2026-09 |
 | US-307 | [A self-hoster is told how to upgrade, and how to back up](done/2026-09/US-307-a-self-hoster-is-told-how-to-upgrade-and-how-to-back-up.md) | chore | shipped | 2026-09 |
 | US-306 | [The image runs on ARM](done/2026-09/US-306-the-image-runs-on-arm.md) | feature | shipped | 2026-09 |

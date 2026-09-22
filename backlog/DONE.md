@@ -2,7 +2,7 @@
 
 # Done
 
-202 finished.
+203 finished.
 
 | ID | Ticket | Type | Resolution | Month |
 | ---: | --- | --- | --- | --- |
@@ -29,6 +29,7 @@
 | BUG-003 | [A post below the threshold is classified again on every poll](done/2026-09/BUG-003-a-post-below-the-threshold-is-classified-again-on-every-poll.md) | bug | fixed | 2026-09 |
 | BUG-002 | [A seven-day window is bought as a month](done/2026-09/BUG-002-a-seven-day-window-is-bought-as-a-month.md) | bug | fixed | 2026-09 |
 | BUG-001 | [A pending Reddit collection is not resumed](done/2026-09/BUG-001-a-pending-reddit-collection-is-not-resumed.md) | bug | shipped | 2026-09 |
+| US-301 | [A newcomer has a map that fits on one page](done/2026-09/US-301-a-newcomer-has-a-map-that-fits-on-one-page.md) | chore | shipped | 2026-09 |
 | US-300 | [The project says how AI may be used, by the owner and by a contributor](done/2026-09/US-300-the-project-says-how-ai-may-be-used.md) | chore | shipped | 2026-09 |
 | US-299 | [Every open ticket is a GitHub issue, and closing the file closes it](done/2026-09/US-299-every-open-ticket-is-a-github-issue.md) | chore | shipped | 2026-09 |
 | US-297 | [The README has a roadmap a visitor can read](done/2026-09/US-297-the-readme-has-a-roadmap-a-visitor-can-read.md) | chore | shipped | 2026-09 |

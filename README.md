@@ -204,6 +204,7 @@ by hand and says less than both on purpose.
 
 | | |
 |---|---|
+| [docs/map.md](docs/map.md) | Ten minutes: what runs, where it lives, how one poll and one request go |
 | [PLAN.md](PLAN.md) | What we are building, and why |
 | [STACK.md](STACK.md) | What we are building it with, and why not the alternatives |
 | [docs/self-hosting.md](docs/self-hosting.md) | The whole install: secrets, TLS, settings, troubleshooting |

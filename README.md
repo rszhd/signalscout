@@ -1,7 +1,27 @@
 # SignalScout
 
-**Open-source AI intent monitoring.** Find the people publicly talking about
-the problem your product solves.
+**Open-source AI intent monitoring.** Find the people publicly describing the
+problem your product solves — and read why each one scored.
+
+![The SignalScout inbox: Reddit conversations ranked by score, one open with its problem fit, ICP fit and intent, and the reasons the model gave](docs/img/inbox.jpg)
+
+**[Try SignalScout Cloud →](https://www.signalscout.run)** — the same
+application, on our servers, with the provider keys already in place. It
+charges for not running a server, never for a feature this build lacks.
+
+Or run it yourself:
+
+```bash
+git clone https://github.com/rszhd/signalscout
+cd signalscout
+pnpm setup
+docker compose -f docker-compose.yml -f docker-compose.build.yml up --build
+```
+
+The app is then on <http://localhost:3000>. [Running it](#running-it) has the
+whole install.
+
+---
 
 Traditional social listening answers *who mentioned my brand*. SignalScout
 answers a different question:
@@ -111,17 +131,12 @@ say it here than let you find it in an agreement you skimmed.
 
 ## Running it
 
-```bash
-git clone https://github.com/rszhd/signalscout
-cd signalscout
-pnpm setup                # writes .env from .env.example.self-hosted,
-                          # and the two secrets it cannot ship
-docker compose -f docker-compose.yml -f docker-compose.build.yml up --build
-```
+The four lines at the top are the whole install. `pnpm setup` writes `.env`
+from `.env.example.self-hosted`, plus the two secrets it cannot ship.
 
-The app is then on <http://localhost:3000>. It asks you to make the first
-account, and refuses every registration after it. One Postgres and one Node
-process, designed for a 1 GB VPS.
+On first boot the app asks you to make the first account, and refuses every
+registration after it. One Postgres and one Node process, designed for a 1 GB
+VPS.
 
 **Put it behind TLS before you give it a public address.** It holds provider
 keys that spend money and an inbox of your own research.

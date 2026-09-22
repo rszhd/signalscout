@@ -6,7 +6,7 @@ priority: p1
 created: 2026-09-22T15:58+08:00
 parent:
 area: docs
-resolution:
+resolution: shipped
 ---
 
 ## Context
@@ -27,20 +27,20 @@ The essay is good and stays. It moves below the fold.
 
 ## Acceptance
 
-- [ ] The first screen of README.md holds, in this order: one-sentence pitch,
+- [x] The first screen of README.md holds, in this order: one-sentence pitch,
       a screenshot or short GIF of the inbox with real-looking matches, a
       "Try SignalScout Cloud" link to https://www.signalscout.run, and the
       install command.
-- [ ] The image lives in the repository (`docs/img/`), not on an external host,
+- [x] The image lives in the repository (`docs/img/`), not on an external host,
       so a fork and an npm README render it.
-- [ ] The install shown is the one a self-hoster runs (see US-295); until that
+- [x] The install shown is the one a self-hoster runs (see US-295); until that
       ships, the current three lines.
-- [ ] The cloud is described in one sentence as the same application with
+- [x] The cloud is described in one sentence as the same application with
       no server and no keys to bring — not as a version with more features.
-- [ ] The existing sections (how it works, keys, costs, providers, what this is
+- [x] The existing sections (how it works, keys, costs, providers, what this is
       not, repository table, contributing, license) survive below, unchanged
       except for links.
-- [ ] `packages/engine/README.md` and `packages/pipeline/README.md` still say
+- [x] `packages/engine/README.md` and `packages/pipeline/README.md` still say
       what they said; this ticket touches the root README only.
 
 ## Notes
@@ -54,3 +54,5 @@ The essay is good and stays. It moves below the fold.
 ## Log
 
 - 2026-09-22T15:58+08:00 — Written from a gap review against the Postiz playbook.
+- 2026-09-22T17:20+08:00 — Shipped. The first screen is the pitch, `docs/img/inbox.jpg`, the cloud link and the four-line install. The essay follows the rule below it, unchanged. *Running it* lost the repeated code block and kept the TLS warning and the self-hosting link.
+- 2026-09-22T17:20+08:00 — The screenshot came from the local dev app at 1568x705, on the SignalScout4 monitor: 44 conversations, the open one scoring 79 with its breakdown and the model's reasons. Two things were changed in the page before the capture, and neither is a product claim: the account email in the sidebar reads `you@example.com` instead of the owner's, and the *Paused* banner is hidden. Every monitor on that machine is paused on purpose, because a poll spends money; the banner is a fact about the machine, not about the product. Replace the image when a running instance can be shown without either edit.

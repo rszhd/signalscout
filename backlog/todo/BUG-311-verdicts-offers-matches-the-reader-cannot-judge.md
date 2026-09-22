@@ -1,5 +1,6 @@
 ---
 id: BUG-311
+issue: 64
 title: pnpm verdicts offers matches the reader cannot judge
 type: bug
 priority: p2

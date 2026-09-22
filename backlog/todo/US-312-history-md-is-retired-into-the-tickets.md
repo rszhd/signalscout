@@ -1,5 +1,6 @@
 ---
 id: US-312
+issue: 65
 title: history.md is retired into the tickets that hold its evidence
 type: chore
 priority: p2

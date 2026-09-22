@@ -149,6 +149,11 @@ export interface BuildServerOptions {
    */
   session?: SessionResolver;
   /**
+   * The sign-in rate limit, on by default. Off only for a test that signs in
+   * more often than a person could and is about something else (BUG-327).
+   */
+  authRateLimit?: boolean;
+  /**
    * How the cost test reaches the worker. Null when this deployment has no
    * queue to send to; the route says so rather than writing a run nothing
    * will pick up. `start.ts` passes the worker's own queue when there is one.
@@ -215,7 +220,12 @@ export function draftConfigForEnvironment(env: AiEnvironment, logger: Logger): A
  * refuses to boot, because a running instance with no login is the failure
  * US-017 exists to prevent and a warning in a log is not a lock.
  */
-export function authFor(env: Env, db: Database, logger: Logger): Auth | null {
+export function authFor(
+  env: Env,
+  db: Database,
+  logger: Logger,
+  { rateLimit = true }: { readonly rateLimit?: boolean } = {},
+): Auth | null {
   if (!env.AUTH_SECRET) {
     logger.warn("no AUTH_SECRET: this build has no login");
     return null;
@@ -242,6 +252,7 @@ export function authFor(env: Env, db: Database, logger: Logger): Auth | null {
     trustedOrigins: origins,
     signup: env.AUTH_SIGNUP,
     sendEmail: verificationSenderFor(env),
+    rateLimit,
   });
 }
 
@@ -305,6 +316,19 @@ export function viteDevOrigins(env: Env): string[] {
  * build that trusted localhost would accept a login posted from a page on the
  * user's own machine, which is the shape this check exists to refuse.
  */
+/**
+ * `TRUST_PROXY` as Fastify's `trustProxy`. See the setting in `config/env.ts`.
+ */
+export function trustProxyFrom(setting: string | undefined): false | string[] {
+  if (setting === undefined) return ["loopback", "uniquelocal"];
+  if (setting.trim().toLowerCase() === "off") return false;
+
+  return setting
+    .split(",")
+    .map((entry) => entry.trim())
+    .filter((entry) => entry.length > 0);
+}
+
 export function trustedOrigins(env: Env): string[] {
   const configured = (env.AUTH_TRUSTED_ORIGINS ?? "")
     .split(",")
@@ -382,10 +406,14 @@ export async function buildServer({
   describer,
   auth,
   session,
+  authRateLimit = true,
   jobs = null,
   canSendEmail,
 }: BuildServerOptions): Promise<ApiServer> {
-  const app = Fastify({ loggerInstance: logger }).withTypeProvider<ZodTypeProvider>();
+  const app = Fastify({
+    loggerInstance: logger,
+    trustProxy: trustProxyFrom(env.TRUST_PROXY),
+  }).withTypeProvider<ZodTypeProvider>();
 
   app.setValidatorCompiler(validatorCompiler);
   app.setSerializerCompiler(serializerCompiler);
@@ -396,7 +424,7 @@ export async function buildServer({
   await registerAuthRoutes(app, {
     db,
     logger,
-    auth: auth === undefined ? authFor(env, db, logger) : auth,
+    auth: auth === undefined ? authFor(env, db, logger, { rateLimit: authRateLimit }) : auth,
     session,
     baseUrl: env.AUTH_URL,
     signup: env.AUTH_SIGNUP,

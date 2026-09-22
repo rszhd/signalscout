@@ -43,6 +43,9 @@ x-app-environment: &app-environment
   AUTH_EMAIL_VERIFICATION: ${AUTH_EMAIL_VERIFICATION:-off}
   # Set it when a proxy rewrites the host. Empty means "read it per request".
   AUTH_URL: ${AUTH_URL:-}
+  # Which connections may name the client in X-Forwarded-For. Empty trusts the
+  # private networks a proxy sits on. See .env.example.
+  TRUST_PROXY: ${TRUST_PROXY:-}
   # Origins allowed to sign in, besides this instance's own. Comma separated.
   AUTH_TRUSTED_ORIGINS: ${AUTH_TRUSTED_ORIGINS:-}
   # Empty until a credential is stored in the database. docs/secrets.md.

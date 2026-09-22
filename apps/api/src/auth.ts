@@ -22,7 +22,7 @@
 import { type Database, getMonitor, type Logger, type Monitor } from "@signalscout/pipeline";
 import type { FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
-import { type Auth, accountExists } from "./auth/auth.js";
+import { type Auth, accountExists, clientAddressHeader } from "./auth/auth.js";
 import { hasCompletedOnboarding } from "./auth/onboarding.js";
 import type { SignupMode } from "./auth/user.js";
 import type { ApiServer } from "./server.js";
@@ -156,6 +156,10 @@ function headersOf(request: FastifyRequest): Headers {
       headers.append(name, value);
     }
   }
+
+  // Set, never passed through: `request.ip` is Fastify's answer under
+  // `TRUST_PROXY`, and a copy the client sent is replaced by it.
+  headers.set(clientAddressHeader, request.ip);
 
   return headers;
 }

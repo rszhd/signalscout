@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { createDatabase, createLogger } from "@signalscout/pipeline";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { loadEnv } from "./config/env.js";
-import { buildServer, verificationSenderFor } from "./server.js";
+import { buildServer, trustProxyFrom, verificationSenderFor } from "./server.js";
 import { asOwner } from "./testing.js";
 
 const logger = createLogger({ level: "silent", name: "test" });
@@ -152,5 +152,21 @@ describe("the sender a verification link leaves through", () => {
     expect(() =>
       verificationSenderFor(loadEnv({ ...base, AUTH_EMAIL_VERIFICATION: "required" })),
     ).toThrow(/SMTP_HOST/);
+  });
+});
+
+/** BUG-327. Which connections may name the client, from `TRUST_PROXY`. */
+describe("trustProxyFrom", () => {
+  it("trusts loopback and the private networks when nothing is set", () => {
+    expect(trustProxyFrom(undefined)).toEqual(["loopback", "uniquelocal"]);
+  });
+
+  it("trusts nobody when it says off", () => {
+    expect(trustProxyFrom("off")).toBe(false);
+    expect(trustProxyFrom(" OFF ")).toBe(false);
+  });
+
+  it("reads a list of addresses and ranges", () => {
+    expect(trustProxyFrom("203.0.113.4, 10.0.0.0/8,")).toEqual(["203.0.113.4", "10.0.0.0/8"]);
   });
 });

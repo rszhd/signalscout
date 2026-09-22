@@ -55,7 +55,7 @@ describe("the session gate", () => {
 
   async function server(): Promise<ApiServer> {
     const env = loadEnv({ DATABASE_URL: database.url, AUTH_SECRET: secret });
-    return buildServer({ env, logger, db, queryGenerator: null });
+    return buildServer({ env, logger, db, queryGenerator: null, authRateLimit: false });
   }
 
   /** Empty every table this file writes, so each case starts on a clean instance. */
@@ -236,7 +236,7 @@ describe("the session gate", () => {
         AUTH_SIGNUP: signup,
       });
 
-      return buildServer({ env, logger, db, queryGenerator: null });
+      return buildServer({ env, logger, db, queryGenerator: null, authRateLimit: false });
     }
 
     it("is closed when nothing says otherwise", async () => {
@@ -381,6 +381,7 @@ describe("the session gate", () => {
         db,
         queryGenerator: null,
         auth: createAuth({
+          rateLimit: false,
           db,
           secret,
           signup: "open",
@@ -580,6 +581,7 @@ describe("the session gate", () => {
         db,
         queryGenerator: null,
         auth: createAuth({
+          rateLimit: false,
           db,
           secret,
           signup: "open",
@@ -732,7 +734,7 @@ describe("the session gate", () => {
         AUTH_TRUSTED_ORIGINS: origin,
       });
 
-      return buildServer({ env, logger, db, queryGenerator: null });
+      return buildServer({ env, logger, db, queryGenerator: null, authRateLimit: false });
     }
 
     it("accepts the origin it was told to trust", async () => {
@@ -1009,6 +1011,99 @@ describe("the session gate", () => {
    * rewrite" is only true if the reads are already scoped — and the day a
    * second account exists is a bad day to find out they are not.
    */
+  /**
+   * BUG-327. Better Auth limits sign-in to three tries in ten seconds per
+   * client, and it knows the client only by the address it is handed. Left to
+   * itself it read `X-Forwarded-For`, which a client writes, and it was off
+   * unless `NODE_ENV` said production.
+   */
+  describe("the sign-in rate limit", () => {
+    async function tryToSignIn(
+      app: ApiServer,
+      remoteAddress: string,
+      headers: Record<string, string> = {},
+    ) {
+      return app.inject({
+        method: "POST",
+        url: `${authBasePath}/sign-in/email`,
+        remoteAddress,
+        headers,
+        payload: { email: "nobody@example.com", password: "not-the-password" },
+      });
+    }
+
+    /** The limiter on, as every deployment has it. */
+    async function limited(): Promise<ApiServer> {
+      const env = loadEnv({ DATABASE_URL: database.url, AUTH_SECRET: secret });
+      return buildServer({ env, logger, db, queryGenerator: null });
+    }
+
+    it("refuses a fourth try in ten seconds from one address", async () => {
+      await clear();
+      const app = await limited();
+
+      try {
+        const statuses = [];
+        for (let attempt = 0; attempt < 4; attempt += 1) {
+          statuses.push((await tryToSignIn(app, "203.0.113.9")).statusCode);
+        }
+
+        expect(statuses.slice(0, 3)).not.toContain(429);
+        expect(statuses[3]).toBe(429);
+      } finally {
+        await app.close();
+      }
+    });
+
+    it("does not give a direct client a new allowance for each address it invents", async () => {
+      await clear();
+      const app = await limited();
+
+      try {
+        const statuses = [];
+        for (let attempt = 0; attempt < 4; attempt += 1) {
+          const invented = `198.51.100.${attempt + 1}`;
+          const answer = await tryToSignIn(app, "203.0.113.10", {
+            "x-forwarded-for": invented,
+            "x-signalscout-client-ip": invented,
+          });
+          statuses.push(answer.statusCode);
+        }
+
+        expect(statuses[3]).toBe(429);
+      } finally {
+        await app.close();
+      }
+    });
+
+    it("keeps two people behind one proxy apart", async () => {
+      await clear();
+      const app = await limited();
+
+      try {
+        // A proxy on the private network in front, as Traefik is.
+        const proxy = "172.18.0.2";
+        for (let attempt = 0; attempt < 3; attempt += 1) {
+          await tryToSignIn(app, proxy, { "x-forwarded-for": "198.51.100.1" });
+        }
+
+        expect(
+          (await tryToSignIn(app, proxy, { "x-forwarded-for": "198.51.100.1" })).statusCode,
+        ).toBe(429);
+        expect(
+          (await tryToSignIn(app, proxy, { "x-forwarded-for": "198.51.100.2" })).statusCode,
+        ).not.toBe(429);
+        // What the client put in front of the proxy's own entry is not believed.
+        expect(
+          (await tryToSignIn(app, proxy, { "x-forwarded-for": "192.0.2.77, 198.51.100.1" }))
+            .statusCode,
+        ).toBe(429);
+      } finally {
+        await app.close();
+      }
+    });
+  });
+
   describe("what one account can see of another's", () => {
     /** A monitor owned by whoever is named, written straight into the table. */
     async function monitorFor(userId: string, name: string): Promise<string> {

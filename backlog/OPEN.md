@@ -2,11 +2,13 @@
 
 # Open tickets
 
-26 open — 0 doing, 22 todo, 4 parked (1 p1, 16 p2, 9 p3).
+34 open — 0 doing, 29 todo, 5 parked (3 p1, 20 p2, 11 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
 | p1 | US-033 | [Thirty verdicts say whether the score is right](todo/US-033-thirty-verdicts-say-whether-the-score-is-right.md) | chore | todo | 2026-09-06T03:02+08:00 |
+| p1 | US-292 | [The README's first screen shows the product and names the cloud](todo/US-292-the-readme-s-first-screen-shows-the-product-and-the-cloud.md) | chore | todo | 2026-09-22T15:58+08:00 |
+| p1 | US-293 | [A tag is a GitHub Release, and the repository can be found](todo/US-293-a-tag-is-a-github-release-and-the-repository-can-be-found.md) | chore | todo | 2026-09-22T16:00+08:00 |
 | p2 | US-035 | [A monitor is told where people are talking](todo/US-035-a-monitor-is-told-where-people-are-talking.md) | spike | todo | 2026-09-06T11:40+08:00 |
 | p2 | US-036 | [A provider is rated per platform, from measurements](todo/US-036-a-provider-is-rated-per-platform-from-measurements.md) | spike | todo | 2026-09-06T11:48+08:00 |
 | p2 | US-037 | [One subscription is enough](todo/US-037-one-subscription-is-enough.md) | feature | todo | 2026-09-06T11:48+08:00 |
@@ -22,16 +24,22 @@
 | p2 | US-233 | [A dry run estimates the pair it is about to call](todo/US-233-a-dry-run-estimates-the-pair-it-is-about-to-call.md) | bug | todo | 2026-09-19T16:45+08:00 |
 | p2 | US-244 | [The screens no browser has rendered](todo/US-244-the-screens-no-browser-has-rendered.md) | chore | todo | 2026-09-20T00:56+08:00 |
 | p2 | US-260 | [A script measures what a session reads before it writes](todo/US-260-a-script-measures-what-a-session-reads-before-it-writes.md) | chore | todo | 2026-09-20T02:30+08:00 |
+| p2 | US-294 | [The repository has a door](todo/US-294-the-repository-has-a-door.md) | chore | todo | 2026-09-22T16:02+08:00 |
+| p2 | US-295 | [A self-hoster runs the published image without git or Node](todo/US-295-a-self-hoster-runs-the-image-without-git-or-node.md) | feature | todo | 2026-09-22T16:04+08:00 |
+| p2 | US-296 | [The contributing section says what help is wanted, before what is refused](todo/US-296-the-contributing-section-says-what-help-is-wanted.md) | chore | todo | 2026-09-22T16:06+08:00 |
+| p2 | US-299 | [Every open ticket is a GitHub issue, and closing the file closes it](todo/US-299-every-open-ticket-is-a-github-issue.md) | chore | todo | 2026-09-22T16:28+08:00 |
 | p2 | BUG-021 | [The classify tests time out on CI, and a red release run looks like the change](todo/BUG-021-classify-tests-time-out-on-ci.md) | bug | todo | 2026-09-19T02:01+08:00 |
 | p3 | US-018 | [A mutation sweep proves the suite is sensitive](todo/US-018-a-mutation-sweep-proves-the-suite-is-sensitive.md) | chore | todo | 2026-09-04T22:54+08:00 |
 | p3 | US-095 | [The logo travels with the email](todo/US-095-the-logo-travels-with-the-email.md) | feature | todo | 2026-09-10T00:36+08:00 |
 | p3 | US-243 | [One Instagram comment link is opened](todo/US-243-one-instagram-comment-link-is-opened.md) | chore | todo | 2026-09-20T00:56+08:00 |
 | p3 | US-258 | [The four densest files lose their inline stories](todo/US-258-the-four-densest-files-lose-their-inline-stories.md) | chore | todo | 2026-09-20T02:05+08:00 |
+| p3 | US-297 | [The README has a roadmap a visitor can read](todo/US-297-the-readme-has-a-roadmap-a-visitor-can-read.md) | chore | todo | 2026-09-22T16:08+08:00 |
 | p3 | BUG-013 | [A key row's error is printed inside a closed dialog](todo/BUG-013-a-key-row-s-error-is-printed-inside-a-closed-dialog.md) | bug | todo | 2026-09-09T11:58+08:00 |
 | p3 | US-038 | [Instagram, TikTok and Threads](parked/US-038-instagram-tiktok-and-threads.md) | feature | parked | 2026-09-06T11:56+08:00 |
 | p3 | US-240 | [One capped poll is measured against one uncapped](parked/US-240-one-capped-poll-is-measured-against-one-uncapped.md) | chore | parked | 2026-09-20T00:56+08:00 |
 | p3 | US-242 | [Do saved and a good verdict ever disagree?](parked/US-242-do-saved-and-a-good-verdict-ever-disagree.md) | spike | parked | 2026-09-20T00:56+08:00 |
 | p3 | US-245 | [A poll that billed for zero posts is legible](parked/US-245-a-poll-that-billed-for-zero-posts-is-legible.md) | chore | parked | 2026-09-20T00:56+08:00 |
+| p3 | US-298 | [The docs have a site](parked/US-298-the-docs-have-a-site.md) | chore | parked | 2026-09-22T16:10+08:00 |
 
 Finished work is in [DONE.md](DONE.md). The rules and the ticket
 format are in [README.md](README.md).

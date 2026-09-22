@@ -40,3 +40,4 @@ diff read by a person.
 
 - 2026-09-20T02:05+08:00 — Split out of US-247, which cut the headers and found the share
   is inline.
+- 2026-09-22T20:05+08:00 — US-302 wrote the comment rule and measured the whole repository, and split the sweep into US-303, US-304 and US-305 by area. This ticket keeps its four named files and stays a child of US-247, where it came from; the three new tickets take the rest of their areas around it. Do this one first — it is the densest, and the judgment it settles is the one the others copy.

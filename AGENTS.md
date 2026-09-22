@@ -293,6 +293,18 @@ Log. **A ticket date carries a time** — `2026-09-05T07:31+08:00`, ISO 8601 to
 the minute with the offset — because several entries land on one day and only
 the time says which came first.
 
+**A comment says what the code cannot.** Three things: the constraint that
+the next reader would break, the trap that has already caught somebody, and
+the decision that would otherwise be made twice. Two things it is not. **A
+measurement goes to [docs/history.md](docs/history.md)**, which owns
+measurements — a comment saying one platform gave 720 matches at an average
+of 48 is a reading from one instance on one day, and in the code it is a
+number nobody can check. **A story about how the code came to be goes to its
+ticket's Log.** A ticket id may stay when it is the only pointer to a
+decision, and then it is one id at the end of one sentence, not a heading.
+`node scripts/comment-density.mjs` says where the dense files are; it does not
+say which comments are wrong, because that is a judgment per comment (US-302).
+
 **A file header holds the contract, not the story.** What the file does, the
 invariants it keeps, the failure shape, and the ticket that holds the rest —
 about fifteen lines. The measurement and the incident go in the ticket's Log

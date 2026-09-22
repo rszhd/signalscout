@@ -2,13 +2,14 @@
 
 # Open tickets
 
-34 open — 0 doing, 29 todo, 5 parked (3 p1, 20 p2, 11 p3).
+37 open — 0 doing, 32 todo, 5 parked (4 p1, 22 p2, 11 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
 | p1 | US-033 | [Thirty verdicts say whether the score is right](todo/US-033-thirty-verdicts-say-whether-the-score-is-right.md) | chore | todo | 2026-09-06T03:02+08:00 |
 | p1 | US-292 | [The README's first screen shows the product and names the cloud](todo/US-292-the-readme-s-first-screen-shows-the-product-and-the-cloud.md) | chore | todo | 2026-09-22T15:58+08:00 |
 | p1 | US-293 | [A tag is a GitHub Release, and the repository can be found](todo/US-293-a-tag-is-a-github-release-and-the-repository-can-be-found.md) | chore | todo | 2026-09-22T16:00+08:00 |
+| p1 | US-300 | [The project says how AI may be used, by the owner and by a contributor](todo/US-300-the-project-says-how-ai-may-be-used.md) | chore | todo | 2026-09-22T16:30+08:00 |
 | p2 | US-035 | [A monitor is told where people are talking](todo/US-035-a-monitor-is-told-where-people-are-talking.md) | spike | todo | 2026-09-06T11:40+08:00 |
 | p2 | US-036 | [A provider is rated per platform, from measurements](todo/US-036-a-provider-is-rated-per-platform-from-measurements.md) | spike | todo | 2026-09-06T11:48+08:00 |
 | p2 | US-037 | [One subscription is enough](todo/US-037-one-subscription-is-enough.md) | feature | todo | 2026-09-06T11:48+08:00 |
@@ -28,6 +29,8 @@
 | p2 | US-295 | [A self-hoster runs the published image without git or Node](todo/US-295-a-self-hoster-runs-the-image-without-git-or-node.md) | feature | todo | 2026-09-22T16:04+08:00 |
 | p2 | US-296 | [The contributing section says what help is wanted, before what is refused](todo/US-296-the-contributing-section-says-what-help-is-wanted.md) | chore | todo | 2026-09-22T16:06+08:00 |
 | p2 | US-299 | [Every open ticket is a GitHub issue, and closing the file closes it](todo/US-299-every-open-ticket-is-a-github-issue.md) | chore | todo | 2026-09-22T16:28+08:00 |
+| p2 | US-301 | [A newcomer has a map that fits on one page](todo/US-301-a-newcomer-has-a-map-that-fits-on-one-page.md) | chore | todo | 2026-09-22T16:32+08:00 |
+| p2 | US-302 | [A comment says what the code cannot, and a number goes to history](todo/US-302-a-comment-says-what-the-code-cannot-and-a-number-goes-to-history.md) | chore | todo | 2026-09-22T16:34+08:00 |
 | p2 | BUG-021 | [The classify tests time out on CI, and a red release run looks like the change](todo/BUG-021-classify-tests-time-out-on-ci.md) | bug | todo | 2026-09-19T02:01+08:00 |
 | p3 | US-018 | [A mutation sweep proves the suite is sensitive](todo/US-018-a-mutation-sweep-proves-the-suite-is-sensitive.md) | chore | todo | 2026-09-04T22:54+08:00 |
 | p3 | US-095 | [The logo travels with the email](todo/US-095-the-logo-travels-with-the-email.md) | feature | todo | 2026-09-10T00:36+08:00 |

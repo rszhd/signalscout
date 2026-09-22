@@ -140,6 +140,55 @@ describe("a monitor's searches taking turns", () => {
     expect(nextTurn(state({ creditsPerHour: 10 })).units).toHaveLength(4);
   });
 
+  /**
+   * The first poll runs the whole turn, charged. US-291.
+   *
+   * The trial's shape: four searches at a sixth of a credit an hour. Before
+   * this the first poll ran one search and the person waited a day to see
+   * the other three; now they see all four in the first minute and the
+   * next turn comes when the balance is repaid. The day's spend is the
+   * same four credits.
+   */
+  describe("on a monitor's first poll", () => {
+    it("runs every unit whatever the balance, and charges them all", () => {
+      const turn = nextTurn(state({ creditsPerHour: 0.167, first: true }));
+
+      expect(turn.units.map((unit) => unit.source)).toEqual(["reddit", "x", "youtube", "tiktok"]);
+      expect(turn.balance).toBeCloseTo(0.167 - 4, 3);
+      expect(turn.cursor).toBe(0);
+    });
+
+    it("runs everything now, then nothing until the balance is repaid, at the same day's spend", () => {
+      const first = nextTurn(state({ creditsPerHour: 0.167, first: true }));
+      const rest = day({ ...state({ creditsPerHour: 0.167 }), balance: first.balance }, 23);
+
+      expect(rest.slice(0, 22).every((ran) => ran.length === 0)).toBe(true);
+      expect(rest[22]).toEqual(["reddit:q"]);
+      // Five in the first 24 polls, the same count the turn-by-turn rule
+      // reaches in 24 polls: the spend is front-loaded, not larger.
+      expect(first.units.length + rest.flat().length).toBe(5);
+    });
+
+    it("weighs the turn, and starts from the cursor", () => {
+      const turn = nextTurn(
+        state({
+          units: [one("x"), one("linkedin")],
+          weights: { linkedin: 5 },
+          cursor: 1,
+          first: true,
+        }),
+      );
+
+      expect(turn.units.map((unit) => unit.source)).toEqual(["linkedin", "x"]);
+      expect(turn.balance).toBeCloseTo(1 - 6, 3);
+      expect(turn.cursor).toBe(1);
+    });
+
+    it("changes nothing for a poll that is not the first", () => {
+      expect(nextTurn(state({ first: false }))).toEqual(nextTurn(state()));
+    });
+  });
+
   it("lists a monitor's units in its order, with a channels unit where it browses some", () => {
     const queries: Record<string, string[]> = { reddit: ["a", "b"], x: ["c"] };
     const units = unitsOf(

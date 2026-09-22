@@ -54,6 +54,15 @@ sets no rule for the mark (US-283).
 
 ## Unreleased
 
+**Changed.** A monitor's first poll runs every search and charges every
+search (US-291). Where the searches take turns, the poll that finds
+`last_polled_at` empty runs the whole turn, and the balance goes as far
+negative as the turn is heavy; the following hours repay it before the next
+turn, as they do for one heavy unit. `nextTurn` takes `first`. Nothing
+changes for a monitor that has polled, or where `poll_credits_per_hour` is
+null. No migration and no new option on `startWorker`, so the version is a
+patch.
+
 ## 0.13.0 — 2026-09-22
 
 **Added.** A monitor's searches can take turns across the hour (US-289).

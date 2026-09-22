@@ -119,7 +119,11 @@ to `poll_credit_balance` and runs the next units in turn from `poll_cursor`
 while the balance is above zero, so a search heavier than the hour runs and
 is repaid over the following hours; each further one only while the balance
 covers it. A unit's cost is its platform's weight, from `creditWeights` on
-`startWorker`. A poll that picks none marks `last_polled_at`, logs at debug,
+`startWorker`. **The first poll runs the whole turn** (US-291): a new
+monitor is asked on every search at once and charged for all of them, and
+the following hours repay the balance before the next turn — the day's
+spend is the same, front-loaded, so a person sees the product work in the
+first minute. A poll that picks none marks `last_polled_at`, logs at debug,
 and writes no poll run. The "seen up to" window (`source_coverage`) and the
 paging state (`source_continuations`) are kept per unit under a `query`
 column — the empty string for the channels, and for the whole platform when

@@ -165,6 +165,7 @@ The scope is one sentence: **find conversations with intent.**
 | [packages/pipeline/](packages/pipeline/README.md) | The stateful half, on npm: the tables, the queues, the migrations |
 | [backlog/](backlog/README.md) | One ticket per file; the folder is the status |
 | [AGENTS.md](AGENTS.md) | Instructions for AI coding agents working in this repo |
+| [AI_POLICY.md](AI_POLICY.md) | How AI may be used here, by the owner and by a contributor |
 
 ---
 
@@ -189,7 +190,10 @@ one on the owner's decision, each one recorded in its ticket rather than left
 to look like an oversight. It is still the rule, and a pull request adding a
 seventh source meets this same answer.
 
-If you use an AI coding agent, read [AGENTS.md](AGENTS.md) before starting.
+This repository is written with an AI coding agent, and you may use one too.
+[AI_POLICY.md](AI_POLICY.md) is the rule: understand every line you submit,
+say what you used, sign as yourself. [AGENTS.md](AGENTS.md) is what the agent
+reads.
 
 ---
 

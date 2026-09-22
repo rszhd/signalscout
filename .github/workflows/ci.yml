@@ -58,6 +58,26 @@ jobs:
       - name: The backlog lists match the ticket files
         run: backlog/index.sh --check
 
+      # The DCO is the whole contribution agreement, so a commit without the
+      # line has no agreement. Checked on pull requests from a fork only:
+      # the owner's release branches carry commits from before the rule and
+      # the commit-msg hook covers the owner from now on. AI_POLICY.md,
+      # US-300.
+      - name: Every commit from outside is signed off
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository
+        env:
+          GH_TOKEN: ${{ github.token }}
+        # Through the API, because the checkout is one commit deep and the
+        # base is not in it.
+        run: |
+          unsigned=$(gh api "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/commits" --paginate \
+            -q '.[] | select(.commit.message | test("Signed-off-by:") | not) | "\(.sha) \(.commit.message | split("\n")[0])"')
+          if [ -n "$unsigned" ]; then
+            echo "::error::A commit lacks Signed-off-by. Use git commit -s. See CONTRIBUTING.md."
+            echo "$unsigned"
+            exit 1
+          fi
+
       - run: pnpm lint
       # Biome has no rule for a raw colour or a raw spacing value, and those
       # are what keep two applications on one brand. US-270.

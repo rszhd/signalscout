@@ -21,8 +21,9 @@ The `-s` adds:
 Signed-off-by: Your Name <your@email>
 ```
 
-That line is the whole ceremony. It is not a copyright assignment and it gives
-nobody rights over your other work. The full text of what you are certifying is
+That line is the whole ceremony, and it is not optional: a pull request from
+outside this repository fails CI when a commit lacks it. It is not a
+copyright assignment and it gives nobody rights over your other work. The full text of what you are certifying is
 at [developercertificate.org](https://developercertificate.org/), and it is
 short enough to read.
 
@@ -31,6 +32,11 @@ without asking anybody, and that convenience is not worth deterring the people
 this project wants patches from.
 
 ## Before you write code
+
+**Read [AI_POLICY.md](AI_POLICY.md).** This repository is written with an AI
+coding agent, and you may use one too. The rule is that you understand
+every line you submit, say what you used, and sign the commit as yourself —
+`Assisted-by:` for the tool, never `Co-authored-by:` a model.
 
 **Find or write a ticket.** `backlog/OPEN.md` lists what is agreed and waiting.
 A ticket's **Context** holds the reasoning the code cannot, and its

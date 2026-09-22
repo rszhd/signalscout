@@ -22,6 +22,7 @@
  */
 import type { Logger } from "../../../logger.js";
 import type { SourceRuntime } from "../../types.js";
+import { type ProviderAnswer, ProviderError, readAnswer, retryAfterDate } from "../core.js";
 
 const apiBase = "https://api.apify.com/v2";
 
@@ -64,18 +65,7 @@ export const actors = {
  * and have nowhere left to go. In a bring-your-own-keys product this sentence
  * is the whole support channel.
  */
-export class ApifyError extends Error {
-  constructor(
-    readonly kind: "credentials" | "input" | "rateLimit" | "provider",
-    message: string,
-    readonly httpStatus: number,
-    /** Set only on `rateLimit`, and only when the provider named a time. */
-    readonly retryAfter?: Date,
-  ) {
-    super(message);
-    this.name = "ApifyError";
-  }
-}
+export class ApifyError extends ProviderError<"credentials" | "input" | "rateLimit" | "provider"> {}
 
 /** A run that has been started but has not finished. */
 export interface PendingRun {
@@ -119,11 +109,7 @@ const settleIntervalMs = 2000;
 /** A run that is still working. Anything else has stopped, well or badly. */
 const runningStatuses = new Set(["READY", "RUNNING"]);
 
-interface Answer {
-  readonly httpStatus: number;
-  readonly body: unknown;
-  readonly retryAfterHeader: string | null;
-}
+type Answer = ProviderAnswer;
 
 export interface ApifyClientOptions {
   readonly runtime: SourceRuntime;
@@ -167,22 +153,7 @@ export class ApifyClient {
       ...(signal ? { signal } : {}),
     });
 
-    const text = await response.text();
-
-    // A refusal is not guaranteed to be JSON. Parsing strictly would turn the
-    // one error a user can fix into an unreadable parse failure.
-    let parsed: unknown;
-    try {
-      parsed = JSON.parse(text);
-    } catch {
-      parsed = text;
-    }
-
-    return {
-      httpStatus: response.status,
-      body: parsed,
-      retryAfterHeader: response.headers.get("retry-after"),
-    };
+    return readAnswer(response);
   }
 
   /**
@@ -408,8 +379,7 @@ export class ApifyClient {
   }
 
   private retryAt(header: string | null): Date {
-    const seconds = header && /^\d+$/.test(header) ? Number(header) : defaultRetrySeconds;
-    return new Date(this.runtime.now().getTime() + seconds * 1000);
+    return retryAfterDate(header, this.runtime.now(), defaultRetrySeconds);
   }
 }
 

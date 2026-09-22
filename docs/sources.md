@@ -69,6 +69,12 @@ five times its cap. Where replies cost differently from posts, declare
 caller sets no limit. The cost test uses it as the top of its range for a
 query whose sample came back full.
 
+**The client builds on `providers/core.ts`.** Its error subclasses
+`ProviderError` with the kinds this provider can produce; `readAnswer` reads
+every response; `retryAfterDate` turns a `Retry-After` header into a wait,
+never longer than `maximumRetryAfterSeconds`. How the key travels and what
+the body holds stay in the client, because that is where providers differ.
+
 **4. Add one line to `builtInSources`** in
 `packages/engine/src/sources/index.ts`, per connector.
 

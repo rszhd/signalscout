@@ -54,6 +54,14 @@ sets no rule for the mark (US-283).
 
 ## Unreleased
 
+**Changed.** A provider's `Retry-After` is read one way for every connector
+(US-334): seconds or an HTTP date, rounded up, and never more than an hour
+(`maximumRetryAfterSeconds`). A wait of zero, a time already past or a value
+that is not a wait takes the connector's own fallback, where three connectors
+used to retry at once. A connector's `waitUntil` can therefore be earlier than
+before for a long wait, and later for a zero one. No export changed, so the
+version is a patch.
+
 ## 0.13.1 — 2026-09-22
 
 **Changed.** A monitor's first poll runs every search and charges every

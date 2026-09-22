@@ -2,7 +2,7 @@
 
 # Open tickets
 
-50 open — 1 doing, 40 todo, 9 parked (2 p1, 31 p2, 17 p3).
+49 open — 1 doing, 39 todo, 9 parked (2 p1, 30 p2, 17 p3).
 
 | Priority | ID | Ticket | Type | Status | Created |
 | --- | ---: | --- | --- | --- | --- |
@@ -33,7 +33,6 @@
 | p2 | US-319 | [A self-hoster can check where the image came from](todo/US-319-a-self-hoster-can-check-where-the-image-came-from.md) | chore | todo | 2026-09-23T05:44+08:00 |
 | p2 | US-320 | [The app deploys in one click](todo/US-320-the-app-deploys-in-one-click.md) | feature | todo | 2026-09-23T05:44+08:00 |
 | p2 | US-331 | [A post that asks for a high score does not get one](todo/US-331-a-post-that-asks-for-a-high-score-does-not-get-one.md) | feature | todo | 2026-09-23T06:41+08:00 |
-| p2 | US-334 | [The provider clients share one core](todo/US-334-the-provider-clients-share-one-core.md) | chore | todo | 2026-09-23T06:46+08:00 |
 | p2 | US-336 | [Every read the API calls takes its account](todo/US-336-every-read-the-api-calls-takes-its-account.md) | chore | todo | 2026-09-23T06:46+08:00 |
 | p2 | BUG-311 | [pnpm verdicts offers matches the reader cannot judge](todo/BUG-311-verdicts-offers-matches-the-reader-cannot-judge.md) | bug | todo | 2026-09-22T21:40+08:00 |
 | p2 | BUG-324 | [A long provider wait holds back every platform of a monitor](todo/BUG-324-a-long-provider-wait-holds-back-every-platform.md) | bug | todo | 2026-09-23T06:27+08:00 |

@@ -105,3 +105,30 @@ jobs:
         run: |
           pnpm --filter @signalscout/engine --filter @signalscout/pipeline \
             publish --access public --no-git-checks --provenance
+
+  # After npm has it, the Releases page says so. The body is the tag's
+  # CHANGELOG.md section, and a tag without one fails here rather than
+  # publish a Release that says nothing — the changelog is written for
+  # exactly this reader. Last, so a refused publish leaves no Release
+  # claiming a version npm does not have. US-293.
+  release:
+    name: Publish the GitHub Release
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - name: The changelog has this version
+        run: node scripts/release-notes.mjs "$GITHUB_REF_NAME" > notes.md
+      - name: Create the Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            --title "$GITHUB_REF_NAME" \
+            --notes-file notes.md \
+            --verify-tag

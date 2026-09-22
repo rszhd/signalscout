@@ -131,11 +131,11 @@ jobs:
           images: ghcr.io/${{ github.repository }}
           tags: |
             # `main` by name, not `is_default_branch`. That macro reads a
-            # setting in a web interface: this repository's default is `dev`,
-            # which CI never runs on, so the condition was false on every run
-            # that could publish and `:latest` was never made — while
-            # docker-compose.yml asked for it by default and README.md told
-            # people to run it.
+            # setting in a web interface. When the default was `dev` — which
+            # CI never runs on — the condition was false on every run that
+            # could publish and `:latest` was never made, while
+            # docker-compose.yml asked for it by default. The default is
+            # `main` since US-293; the name stays so a click cannot undo it.
             type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
             type=sha,format=long
 

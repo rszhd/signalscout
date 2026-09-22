@@ -1,4 +1,4 @@
-<!-- The ticket's Acceptance list is what "done" means. Name it. -->
+<!-- Base branch: dev, not main. The ticket's Acceptance list is what "done" means. Name it. -->
 
 **Ticket:** US-
 

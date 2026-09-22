@@ -112,6 +112,42 @@ describe("the session gate", () => {
     }
   });
 
+  /**
+   * BUG-329. The router decodes a path before it matches, so a percent-encoded
+   * spelling of `/api` reaches the same handler. A gate that reads the raw URL
+   * sees a path that does not start with `/api/` and lets it through.
+   */
+  it("refuses them however the path is spelled", async () => {
+    await clear();
+    const app = await server();
+
+    try {
+      const guarded = app.registeredRoutes.filter(
+        (route) => route.url.startsWith("/api/") && !isOpenPath(route.url),
+      );
+
+      expect(guarded.length).toBeGreaterThan(10);
+
+      for (const route of guarded) {
+        const url = route.url.replace(/:[^/]+/g, "00000000-0000-0000-0000-000000000000");
+
+        for (const spelling of [
+          url.replace(/^\/api/, "/%61pi"),
+          url.replace(/^\/api/, "/%61%70%69"),
+        ]) {
+          const response = await app.inject({ method: route.method as "GET", url: spelling });
+
+          expect(
+            { url: spelling, method: route.method, status: response.statusCode },
+            `${route.method} ${spelling} answered without a session`,
+          ).toEqual({ url: spelling, method: route.method, status: 401 });
+        }
+      }
+    } finally {
+      await app.close();
+    }
+  });
+
   it("says why, in a sentence, rather than only with a number", async () => {
     await clear();
     const app = await server();

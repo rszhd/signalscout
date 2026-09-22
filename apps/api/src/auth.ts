@@ -227,7 +227,11 @@ export async function registerAuthRoutes(
     });
 
   app.addHook("onRequest", async (request, reply) => {
-    const path = request.url.split("?")[0] ?? "";
+    // The route that matched, not the URL as it arrived. The router decodes a
+    // path before it matches, so `/%61pi/matches` reaches `/api/matches` while
+    // its raw spelling does not start with `/api/` (BUG-329). With no match no
+    // handler runs, and the raw path decides only between a 401 and the page.
+    const path = request.routeOptions.url ?? request.url.split("?")[0] ?? "";
 
     if (isOpenPath(path)) return;
 
